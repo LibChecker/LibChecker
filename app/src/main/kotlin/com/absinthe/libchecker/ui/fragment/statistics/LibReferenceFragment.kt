@@ -57,11 +57,10 @@ class LibReferenceFragment :
 
   private val refAdapter = LibReferenceAdapter()
   private var delayShowNavigationJob: Job? = null
-  private var firstScrollFlag = false
-  private var isSearchTextClearOnce = false
-  private var keyword: String = ""
   private var searchUpdateJob: Job? = null
   private var advancedMenuBSDFragment: LibReferenceMenuBSDFragment? = null
+  private var firstScrollFlag = false
+  private var isSearchTextClearOnce = false
 
   override fun init() {
     val context = (context as? BaseActivity<*>) ?: return
@@ -298,9 +297,9 @@ class LibReferenceFragment :
   }
 
   override fun onQueryTextChange(newText: String): Boolean {
-    if (keyword != newText) {
+    if (LibReferenceAdapter.highlightText != newText) {
       isSearchTextClearOnce = newText.isEmpty()
-      keyword = newText
+      LibReferenceAdapter.highlightText = newText
 
       searchUpdateJob?.cancel()
       searchUpdateJob = lifecycleScope.launch(Dispatchers.IO) {

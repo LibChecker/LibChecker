@@ -16,8 +16,10 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.SnapshotOptions
 import com.absinthe.libchecker.model.SnapshotDiffItem
+import com.absinthe.libchecker.recyclerview.adapter.HighlightAdapter
 import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.PREINSTALLED_TIMESTAMP
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.setAlphaForAll
@@ -25,17 +27,14 @@ import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.view.snapshot.SnapshotItemView
-import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 const val ARROW = "→"
-const val PREINSTALLED_TIMESTAMP = 1230768000000 // 2009-01-01 08:00:00 GMT+8
 
-class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
+class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAdapter<SnapshotDiffItem>() {
 
-  var cardMode = CardMode.NORMAL
   private val formatter by unsafeLazy {
     SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
   }
@@ -82,16 +81,17 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
         moved = item.moved && !isNewOrDeleted
       }
 
-      if (item.isTrackItem) {
-        appName.text = buildSpannedString {
+      val appNameLabel = if (item.isTrackItem) {
+        buildSpannedString {
           inSpans(ImageSpan(context, R.drawable.ic_track)) {
             append(" ")
           }
           append(getDiffString(item.labelDiff, isNewOrDeleted))
         }
       } else {
-        appName.text = getDiffString(item.labelDiff, isNewOrDeleted)
+        getDiffString(item.labelDiff, isNewOrDeleted)
       }
+      setOrHighlightText(appName, appNameLabel)
 
       if (isNewOrDeleted) {
         val labelDrawable = if (item.newInstalled) {
@@ -111,7 +111,7 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
         appName.text = sb
       }
 
-      packageName.text = item.packageName
+      setOrHighlightText(packageName, item.packageName)
       versionInfo.text =
         getDiffString(item.versionNameDiff, item.versionCodeDiff, isNewOrDeleted, "%s (%s)")
 

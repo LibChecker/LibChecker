@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.graphics.Color
 import android.net.Uri
 import android.os.IBinder
 import android.util.TypedValue
@@ -15,12 +16,14 @@ import android.view.Gravity
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
+import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.text.HtmlCompat
@@ -35,6 +38,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.LCUris
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
+import com.absinthe.libchecker.model.SnapshotDiffItem
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
 import com.absinthe.libchecker.recyclerview.diff.SnapshotDiffUtil
@@ -77,7 +81,9 @@ import timber.log.Timber
 const val VF_LOADING = 0
 const val VF_LIST = 1
 
-class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
+class SnapshotFragment :
+  BaseListControllerFragment<FragmentSnapshotBinding>(),
+  SearchView.OnQueryTextListener {
 
   private val viewModel: SnapshotViewModel by activityViewModels()
   private val adapter = SnapshotAdapter()
@@ -85,6 +91,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
   private var dropPrevious = false
   private var shouldCompare = true and ShootService.isComputing.not()
   private var shootServiceStarted = false
+  private var keyword: String = ""
 
   private var shootBinder: IShootService? = null
   private val shootListener = object : OnShootListener.Stub() {
@@ -159,7 +166,10 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
                 viewModel.compareDiff(item.timestamp, shouldClearDiff = true)
               }
             }
-          dialog.show(context.supportFragmentManager, TimeNodeBottomSheetDialogFragment::class.java.name)
+          dialog.show(
+            context.supportFragmentManager,
+            TimeNodeBottomSheetDialogFragment::class.java.name
+          )
         }
       }
 
@@ -266,16 +276,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         }
       }.launchIn(lifecycleScope)
       snapshotDiffItems.observe(viewLifecycleOwner) { list ->
-        adapter.setDiffNewData(
-          list.sortedByDescending { it.updateTime }
-            .toMutableList()
-        ) {
-          if (isDetached) {
-            return@setDiffNewData
-          }
-          flip(VF_LIST)
-          adapter.setSpaceFooterView()
-        }
+        updateItems(list)
 
         lifecycleScope.launch(Dispatchers.IO) {
           delay(250)
@@ -414,6 +415,26 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     this.menu = menu.apply {
       findItem(R.id.save)?.isVisible = binding.vfContainer.displayedChild == VF_LIST
     }
+    val context = context ?: return
+    val searchView = SearchView(context).apply {
+      setIconifiedByDefault(false)
+      setOnQueryTextListener(this@SnapshotFragment)
+      queryHint = getText(R.string.search_hint)
+      isQueryRefinementEnabled = true
+
+      findViewById<View>(androidx.appcompat.R.id.search_plate).apply {
+        setBackgroundColor(Color.TRANSPARENT)
+      }
+    }
+
+    menu.findItem(R.id.search).apply {
+      setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW or MenuItem.SHOW_AS_ACTION_IF_ROOM)
+      actionView = searchView
+
+      if (!isListReady) {
+        isVisible = false
+      }
+    }
   }
 
   override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
@@ -460,7 +481,10 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         val scheme = Uri.Builder().scheme(LCUris.SCHEME)
           .authority(LCUris.Bridge.AUTHORITY)
           .appendQueryParameter(LCUris.Bridge.PARAM_ACTION, LCUris.Bridge.ACTION_SHOOT)
-          .appendQueryParameter(LCUris.Bridge.PARAM_AUTHORITY, LibCheckerApp.generateAuthKey().toString())
+          .appendQueryParameter(
+            LCUris.Bridge.PARAM_AUTHORITY,
+            LibCheckerApp.generateAuthKey().toString()
+          )
           .appendQueryParameter(LCUris.Bridge.PARAM_DROP_PREVIOUS, false.toString())
           .build()
           .toString()
@@ -493,6 +517,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
               .setNeutralButton(android.R.string.cancel, null)
               .show()
           }
+
           Constants.SNAPSHOT_KEEP -> computeNewSnapshot(false)
           Constants.SNAPSHOT_DISCARD -> computeNewSnapshot(true)
         }
@@ -505,7 +530,10 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
             GlobalValues.snapshotOptionsLiveData.postValue(GlobalValues.snapshotOptions)
           }
         }
-        advancedMenuBSDFragment?.show(it.supportFragmentManager, SnapshotMenuBSDFragment::class.java.name)
+        advancedMenuBSDFragment?.show(
+          it.supportFragmentManager,
+          SnapshotMenuBSDFragment::class.java.name
+        )
       }
     }
     return true
@@ -526,10 +554,12 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     if (child == VF_LOADING) {
       binding.loading.resumeAnimation()
       menu?.findItem(R.id.save)?.isVisible = false
+      menu?.findItem(R.id.search)?.isVisible = false
     } else {
       binding.loading.pauseAnimation()
       binding.list.scrollToPosition(0)
       menu?.findItem(R.id.save)?.isVisible = true
+      menu?.findItem(R.id.search)?.isVisible = true
     }
 
     binding.vfContainer.displayedChild = child
@@ -560,6 +590,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       Configuration.ORIENTATION_PORTRAIT -> LinearLayoutManager(requireContext())
       Configuration.ORIENTATION_LANDSCAPE ->
         StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+
       else -> throw IllegalStateException("Wrong orientation at SnapshotFragment.")
     }
     return layoutManager
@@ -571,6 +602,49 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     } else {
       flip(VF_LOADING)
       viewModel.compareDiff(GlobalValues.snapshotTimestamp)
+    }
+  }
+
+  override fun onQueryTextSubmit(query: String?): Boolean {
+    return false
+  }
+
+  override fun onQueryTextChange(newText: String?): Boolean {
+    if (keyword != newText) {
+      keyword = newText ?: ""
+      adapter.highlightText = keyword
+      viewModel.snapshotDiffItems.value?.let { items ->
+        val list = if (keyword.isEmpty()) {
+          items
+        } else {
+          items.asSequence()
+            .filter {
+              it.packageName.contains(keyword, ignoreCase = true) ||
+                it.labelDiff.old.contains(keyword, ignoreCase = true) ||
+                it.labelDiff.new?.contains(keyword, ignoreCase = true) == true
+            }.toList()
+        }
+        updateItems(list, true)
+      }
+    }
+    return false
+  }
+
+  private fun updateItems(list: List<SnapshotDiffItem>, highlightRefresh: Boolean = false) = lifecycleScope.launch(Dispatchers.Main) {
+    adapter.setDiffNewData(
+      list.sortedByDescending { it.updateTime }
+        .toMutableList()
+    ) {
+      if (isDetached) {
+        return@setDiffNewData
+      }
+      isListReady = true
+      flip(VF_LIST)
+      adapter.setSpaceFooterView()
+
+      if (highlightRefresh) {
+        adapter.notifyDataSetChanged()
+      }
     }
   }
 }

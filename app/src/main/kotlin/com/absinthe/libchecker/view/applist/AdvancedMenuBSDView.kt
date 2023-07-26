@@ -39,11 +39,7 @@ class AdvancedMenuBSDView(context: Context) : LinearLayout(context), IHeaderView
   }
 
   private val adapter = AdvancedMenuAdapter()
-
-  private val demoAdapter = AppAdapter().also {
-    it.cardMode = AppAdapter.CardMode.DEMO
-  }
-
+  private val demoAdapter = AppAdapter(AppAdapter.CardMode.DEMO)
   private val itemAdapter = LibStringAdapter(Constants.EXAMPLE_PACKAGE, ACTIVITY)
 
   private val demoView = RecyclerView(context).apply {
