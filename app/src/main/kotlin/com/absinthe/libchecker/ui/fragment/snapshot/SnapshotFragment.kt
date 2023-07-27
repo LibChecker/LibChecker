@@ -319,8 +319,9 @@ class SnapshotFragment :
       }
     }.launchIn(lifecycleScope)
     GlobalValues.snapshotOptionsLiveData.observe(viewLifecycleOwner) {
-      // noinspection NotifyDataSetChanged
-      adapter.notifyDataSetChanged()
+      viewModel.snapshotDiffItems.value?.let { items ->
+        updateItems(items)
+      }
     }
   }
 
@@ -648,6 +649,7 @@ class SnapshotFragment :
       adapter.setSpaceFooterView()
 
       if (highlightRefresh) {
+        // noinspection NotifyDataSetChanged
         adapter.notifyDataSetChanged()
       }
     }
