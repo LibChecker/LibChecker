@@ -63,7 +63,7 @@ class AppAdapter : HighlightAdapter<LCItem>() {
       setOrHighlightText(appName, item.label)
       setOrHighlightText(packageName, item.packageName)
 
-      if (packageInfo == null) {
+      if (packageInfo == null && cardMode != CardMode.DEMO) {
         appName.addStrikeThroughSpan()
         packageName.addStrikeThroughSpan()
       }
