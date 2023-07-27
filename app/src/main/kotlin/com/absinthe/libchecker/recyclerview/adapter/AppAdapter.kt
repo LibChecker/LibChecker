@@ -24,9 +24,7 @@ import com.absinthe.libchecker.view.applist.AppItemView
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
-class AppAdapter : HighlightAdapter<LCItem>() {
-
-  var cardMode = CardMode.NORMAL
+class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAdapter<LCItem>() {
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return createBaseViewHolder(

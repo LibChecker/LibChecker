@@ -25,8 +25,12 @@ class SnapshotMenuBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotMenuBS
       maxPeekSize = ((dialog?.window?.decorView?.height ?: 0) * 0.8).toInt()
     }
     optionsViewMap[SnapshotOptions.SHOW_UPDATE_TIME] = root.addOptionItemView(R.string.snapshot_menu_show_update_time, SnapshotOptions.SHOW_UPDATE_TIME)
+    optionsViewMap[SnapshotOptions.HIDE_NO_COMPONENT_CHANGES] = root.addOptionItemView(R.string.snapshot_menu_hide_no_component_changes, SnapshotOptions.HIDE_NO_COMPONENT_CHANGES)
 
     optionsViewMap[SnapshotOptions.SHOW_UPDATE_TIME]?.setOnCheckedChangeCallback {
+      root.updateDemoView()
+    }
+    optionsViewMap[SnapshotOptions.HIDE_NO_COMPONENT_CHANGES]?.setOnCheckedChangeCallback {
       root.updateDemoView()
     }
 

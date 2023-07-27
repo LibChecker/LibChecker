@@ -65,13 +65,12 @@ class AppListFragment :
   SearchView.OnQueryTextListener {
 
   private val appAdapter = AppAdapter()
+  private var delayShowNavigationJob: Job? = null
+  private var advancedMenuBSDFragment: AdvancedMenuBSDFragment? = null
   private var isFirstLaunch = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
   private var isFirstRequestChange = true
   private var isSearchTextClearOnce = false
-  private var delayShowNavigationJob: Job? = null
   private var firstScrollFlag = false
-  private var keyword: String = ""
-  private var advancedMenuBSDFragment: AdvancedMenuBSDFragment? = null
 
   private lateinit var layoutManager: RecyclerView.LayoutManager
 
@@ -192,9 +191,8 @@ class AppListFragment :
   }
 
   override fun onQueryTextChange(newText: String): Boolean {
-    if (keyword != newText) {
+    if (appAdapter.highlightText != newText) {
       isSearchTextClearOnce = newText.isEmpty()
-      keyword = newText
       appAdapter.highlightText = newText
       updateItems(highlightRefresh = true)
 
@@ -387,6 +385,7 @@ class AppListFragment :
       }.toMutableList()
     }
 
+    val keyword = appAdapter.highlightText
     if (keyword.isNotEmpty()) {
       filterList = filterList.filter {
         it.label.contains(keyword, ignoreCase = true) ||

@@ -32,10 +32,7 @@ class SnapshotMenuBSDView(context: Context) : LinearLayout(context), IHeaderView
   }
 
   private val adapter = AdvancedMenuAdapter()
-
-  private val demoAdapter = SnapshotAdapter().also {
-    it.cardMode = SnapshotAdapter.CardMode.DEMO
-  }
+  private val demoAdapter = SnapshotAdapter(SnapshotAdapter.CardMode.DEMO)
 
   private val demoView = RecyclerView(context).apply {
     layoutParams = LayoutParams(

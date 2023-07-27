@@ -267,4 +267,5 @@
 
   <!--  Snapshot menu  -->
   <string name="snapshot_menu_show_update_time">Show Update Time</string>
+  <string name="snapshot_menu_hide_no_component_changes">Hide No Component Changes</string>
 </resources>
