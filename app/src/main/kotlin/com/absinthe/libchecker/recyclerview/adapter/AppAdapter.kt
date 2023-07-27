@@ -16,6 +16,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.utils.FreezeUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.addStrikeThroughSpan
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
@@ -51,7 +52,7 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
       val packageInfo = if (item.packageName != Constants.EXAMPLE_PACKAGE) {
         val packageInfo = runCatching {
           PackageUtils.getPackageInfo(item.packageName)
-        }.getOrNull() ?: return
+        }.getOrNull()
         icon.load(packageInfo)
         packageInfo
       } else {
@@ -59,6 +60,11 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
       }
       setOrHighlightText(appName, item.label)
       setOrHighlightText(packageName, item.packageName)
+
+      if (packageInfo == null && cardMode != CardMode.DEMO) {
+        appName.addStrikeThroughSpan()
+        packageName.addStrikeThroughSpan()
+      }
 
       versionInfo.text = PackageUtils.getVersionString(item.versionName, item.versionCode)
 

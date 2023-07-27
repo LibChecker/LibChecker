@@ -208,3 +208,9 @@ fun ImageView.copyToClipboard() {
     VersionCompat.showCopiedOnClipboardToast(context)
   }
 }
+
+fun TextView.addStrikeThroughSpan() {
+  val span = SpannableString(text)
+  span.setSpan(StrikethroughSpan(), 0, text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+  text = span
+}
