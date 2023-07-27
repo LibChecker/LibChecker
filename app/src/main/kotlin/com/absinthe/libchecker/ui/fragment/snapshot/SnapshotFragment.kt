@@ -320,7 +320,7 @@ class SnapshotFragment :
     }.launchIn(lifecycleScope)
     GlobalValues.snapshotOptionsLiveData.observe(viewLifecycleOwner) {
       viewModel.snapshotDiffItems.value?.let { items ->
-          updateItems(items)
+        updateItems(items)
       }
     }
   }
