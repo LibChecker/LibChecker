@@ -49,7 +49,7 @@ androidX-window = "androidx.window:window:1.1.0"
 square-leakCanary = "com.squareup.leakcanary:leakcanary-android:2.12"
 square-moshi = "com.squareup.moshi:moshi:1.15.0"
 square-okHttp = "com.squareup.okhttp3:okhttp:4.11.0"
-square-okio = "com.squareup.okio:okio:3.4.0"
+square-okio = "com.squareup.okio:okio:3.5.0"
 square-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "square-retrofit" }
 square-retrofit-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "square-retrofit" }
 
