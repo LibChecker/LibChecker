@@ -18,6 +18,7 @@ import com.absinthe.libchecker.constant.SnapshotOptions
 import com.absinthe.libchecker.model.SnapshotDiffItem
 import com.absinthe.libchecker.recyclerview.adapter.HighlightAdapter
 import com.absinthe.libchecker.utils.DateUtils
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.PREINSTALLED_TIMESTAMP
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -86,10 +87,10 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
           inSpans(ImageSpan(context, R.drawable.ic_track)) {
             append(" ")
           }
-          append(getDiffString(item.labelDiff, isNewOrDeleted))
+          append(LCAppUtils.getDiffString(item.labelDiff, isNewOrDeleted))
         }
       } else {
-        getDiffString(item.labelDiff, isNewOrDeleted)
+        LCAppUtils.getDiffString(item.labelDiff, isNewOrDeleted)
       }
       setOrHighlightText(appName, appNameLabel)
 
@@ -113,7 +114,7 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
 
       setOrHighlightText(packageName, item.packageName)
       versionInfo.text =
-        getDiffString(item.versionNameDiff, item.versionCodeDiff, isNewOrDeleted, "%s (%s)")
+        LCAppUtils.getDiffString(item.versionNameDiff, item.versionCodeDiff, isNewOrDeleted, "%s (%s)")
 
       if (item.packageSizeDiff.old > 0L) {
         packageSizeInfo.isVisible = true
@@ -121,12 +122,12 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
           item.packageSizeDiff.old.sizeToString(context),
           item.packageSizeDiff.new?.sizeToString(context)
         )
-        packageSizeInfo.text = getDiffString(sizeDiff, isNewOrDeleted)
+        packageSizeInfo.text = LCAppUtils.getDiffString(sizeDiff, isNewOrDeleted)
       } else {
         packageSizeInfo.isGone = true
       }
 
-      targetApiInfo.text = getDiffString(item.targetApiDiff, isNewOrDeleted, "API %s")
+      targetApiInfo.text = LCAppUtils.getDiffString(item.targetApiDiff, isNewOrDeleted, "API %s")
 
       val oldAbiString = PackageUtils.getAbiString(context, item.abiDiff.old.toInt(), false)
       val oldAbiSpanString: SpannableString
@@ -209,31 +210,6 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
           context.getString(R.string.format_last_updated).format(timeText)
         }
       }
-    }
-  }
-
-  private fun <T> getDiffString(
-    diff: SnapshotDiffItem.DiffNode<T>,
-    isNewOrDeleted: Boolean = false,
-    format: String = "%s"
-  ): String {
-    return if (diff.old != diff.new && !isNewOrDeleted) {
-      "${format.format(diff.old)} $ARROW ${format.format(diff.new)}"
-    } else {
-      format.format(diff.old)
-    }
-  }
-
-  private fun getDiffString(
-    diff1: SnapshotDiffItem.DiffNode<*>,
-    diff2: SnapshotDiffItem.DiffNode<*>,
-    isNewOrDeleted: Boolean = false,
-    format: String = "%s"
-  ): String {
-    return if ((diff1.old != diff1.new || diff2.old != diff2.new) && !isNewOrDeleted) {
-      "${format.format(diff1.old, diff2.old)} $ARROW ${format.format(diff1.new, diff2.new)}"
-    } else {
-      format.format(diff1.old, diff2.old)
     }
   }
 

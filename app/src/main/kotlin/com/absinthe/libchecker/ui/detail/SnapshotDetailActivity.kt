@@ -42,6 +42,7 @@ import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotCompon
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotNativeNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotTitleNode
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
@@ -164,21 +165,21 @@ class SnapshotDetailActivity :
           }
         }
       }
-      snapshotTitle.appNameView.text = getDiffString(entity.labelDiff, isNewOrDeleted)
+      snapshotTitle.appNameView.text = LCAppUtils.getDiffString(entity.labelDiff, isNewOrDeleted)
       snapshotTitle.packageNameView.text = entity.packageName.takeIf { it.contains("/").not() }
         ?: "${entity.packageName.substringBeforeLast("/")} $ARROW ${
           entity.packageName.substringAfterLast(
             "/"
           )
         }"
-      snapshotTitle.versionInfoView.text = getDiffString(
+      snapshotTitle.versionInfoView.text = LCAppUtils.getDiffString(
         entity.versionNameDiff,
         entity.versionCodeDiff,
         isNewOrDeleted,
         "%s (%s)"
       )
       snapshotTitle.targetApiView.text =
-        String.format("API %s", getDiffString(entity.targetApiDiff, isNewOrDeleted))
+        String.format("API %s", LCAppUtils.getDiffString(entity.targetApiDiff, isNewOrDeleted))
 
       if (entity.packageSizeDiff.old > 0L) {
         snapshotTitle.packageSizeView.isVisible = true
@@ -186,7 +187,7 @@ class SnapshotDetailActivity :
           entity.packageSizeDiff.old.sizeToString(this@SnapshotDetailActivity),
           entity.packageSizeDiff.new?.sizeToString(this@SnapshotDetailActivity)
         )
-        snapshotTitle.packageSizeView.text = getDiffString(sizeDiff, isNewOrDeleted)
+        snapshotTitle.packageSizeView.text = LCAppUtils.getDiffString(sizeDiff, isNewOrDeleted)
       } else {
         snapshotTitle.packageSizeView.isVisible = false
       }
@@ -315,31 +316,6 @@ class SnapshotDetailActivity :
     }
 
     return returnList
-  }
-
-  private fun <T> getDiffString(
-    diff: SnapshotDiffItem.DiffNode<T>,
-    isNewOrDeleted: Boolean = false,
-    format: String = "%s"
-  ): String {
-    return if (diff.old != diff.new && !isNewOrDeleted) {
-      "${format.format(diff.old)} $ARROW ${format.format(diff.new)}"
-    } else {
-      format.format(diff.old)
-    }
-  }
-
-  private fun getDiffString(
-    diff1: SnapshotDiffItem.DiffNode<*>,
-    diff2: SnapshotDiffItem.DiffNode<*>,
-    isNewOrDeleted: Boolean = false,
-    format: String = "%s"
-  ): String {
-    return if ((diff1.old != diff1.new || diff2.old != diff2.new) && !isNewOrDeleted) {
-      "${format.format(diff1.old, diff2.old)} $ARROW ${format.format(diff1.new, diff2.new)}"
-    } else {
-      format.format(diff1.old, diff2.old)
-    }
   }
 
   private fun generateReport() {
