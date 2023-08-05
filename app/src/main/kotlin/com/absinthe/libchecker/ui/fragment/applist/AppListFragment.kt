@@ -129,11 +129,13 @@ class AppListFragment :
                 is LinearLayoutManager -> {
                   (layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
                 }
+
                 is StaggeredGridLayoutManager -> {
                   val counts = IntArray(4)
                   (layoutManager as StaggeredGridLayoutManager).findLastVisibleItemPositions(counts)
                   counts[0]
                 }
+
                 else -> {
                   0
                 }
@@ -204,14 +206,17 @@ class AppListFragment :
             EventProperties().set("EASTER_EGG", "AppList Search")
           )
         }
+
         newText == Constants.COMMAND_DEBUG_MODE -> {
           GlobalValues.debugMode = true
           context?.showToast("DEBUG MODE")
         }
+
         newText == Constants.COMMAND_USER_MODE -> {
           GlobalValues.debugMode = false
           context?.showToast("USER MODE")
         }
+
         else -> {
         }
       }
@@ -260,7 +265,10 @@ class AppListFragment :
               advancedMenuBSDFragment = null
             }
           }
-          advancedMenuBSDFragment?.show(it.supportFragmentManager, AdvancedMenuBSDFragment::class.java.name)
+          advancedMenuBSDFragment?.show(
+            it.supportFragmentManager,
+            AdvancedMenuBSDFragment::class.java.name
+          )
         }
       }
     }
@@ -357,72 +365,77 @@ class AppListFragment :
     }
   }
 
-  private fun updateItems(highlightRefresh: Boolean = false) = lifecycleScope.launch(Dispatchers.IO) {
-    Timber.d("updateItems")
-    var filterList: MutableList<LCItem> = Repositories.lcRepository.getLCItems().toMutableList()
+  private fun updateItems(highlightRefresh: Boolean = false) =
+    lifecycleScope.launch(Dispatchers.IO) {
+      Timber.d("updateItems")
+      var filterList: MutableList<LCItem> = Repositories.lcRepository.getLCItems().toMutableList()
 
-    val isNonNativeLibApp64Bit = android.os.Process.is64Bit()
-    val options = GlobalValues.advancedOptions
-    if ((options and AdvancedOptions.SHOW_SYSTEM_APPS) == 0) {
-      filterList = filterList.filter { !it.isSystem }.toMutableList()
-    }
-    if ((options and AdvancedOptions.SHOW_SYSTEM_FRAMEWORK_APPS) == 0) {
-      filterList = filterList.filter { (!it.packageName.startsWith("com.android.") && it.packageName != "android") || !PackageUtils.getPackageInfo(it.packageName).isPreinstalled() }.toMutableList()
-    }
-    if ((options and AdvancedOptions.SHOW_OVERLAYS) == 0) {
-      filterList = filterList.filter { it.abi.toInt() != Constants.OVERLAY }.toMutableList()
-    }
-    if ((options and AdvancedOptions.SHOW_64_BIT_APPS) == 0) {
-      filterList = filterList.filter {
-        val trueAbi = it.abi.mod(Constants.MULTI_ARCH)
-        it.abi.toInt() == Constants.OVERLAY || trueAbi == Constants.X86 || trueAbi == Constants.ARMV7 || trueAbi == Constants.ARMV5 || (trueAbi == Constants.NO_LIBS && !isNonNativeLibApp64Bit)
-      }.toMutableList()
-    }
-    if ((options and AdvancedOptions.SHOW_32_BIT_APPS) == 0) {
-      filterList = filterList.filter {
-        val trueAbi = it.abi.mod(Constants.MULTI_ARCH)
-        it.abi.toInt() == Constants.OVERLAY || trueAbi == Constants.X86_64 || trueAbi == Constants.ARMV8 || (trueAbi == Constants.NO_LIBS && isNonNativeLibApp64Bit)
-      }.toMutableList()
-    }
-
-    val keyword = appAdapter.highlightText
-    if (keyword.isNotEmpty()) {
-      filterList = filterList.filter {
-        it.label.contains(keyword, ignoreCase = true) ||
-          it.packageName.contains(keyword, ignoreCase = true)
-      }.toMutableList()
-
-      if (HarmonyOsUtil.isHarmonyOs() && keyword.contains("Harmony", true)) {
-        filterList = filterList.filter { it.variant == Constants.VARIANT_HAP }.toMutableList()
+      val isNonNativeLibApp64Bit = android.os.Process.is64Bit()
+      val options = GlobalValues.advancedOptions
+      if ((options and AdvancedOptions.SHOW_SYSTEM_APPS) == 0) {
+        filterList = filterList.filter { !it.isSystem }.toMutableList()
       }
-    }
+      if ((options and AdvancedOptions.SHOW_SYSTEM_FRAMEWORK_APPS) == 0) {
+        filterList = filterList.filter {
+          (!it.packageName.startsWith("com.android.") && it.packageName != "android") || runCatching {
+            PackageUtils.getPackageInfo(it.packageName).isPreinstalled()
+          }.getOrDefault(false).not()
+        }.toMutableList()
+      }
+      if ((options and AdvancedOptions.SHOW_OVERLAYS) == 0) {
+        filterList = filterList.filter { it.abi.toInt() != Constants.OVERLAY }.toMutableList()
+      }
+      if ((options and AdvancedOptions.SHOW_64_BIT_APPS) == 0) {
+        filterList = filterList.filter {
+          val trueAbi = it.abi.mod(Constants.MULTI_ARCH)
+          it.abi.toInt() == Constants.OVERLAY || trueAbi == Constants.X86 || trueAbi == Constants.ARMV7 || trueAbi == Constants.ARMV5 || (trueAbi == Constants.NO_LIBS && !isNonNativeLibApp64Bit)
+        }.toMutableList()
+      }
+      if ((options and AdvancedOptions.SHOW_32_BIT_APPS) == 0) {
+        filterList = filterList.filter {
+          val trueAbi = it.abi.mod(Constants.MULTI_ARCH)
+          it.abi.toInt() == Constants.OVERLAY || trueAbi == Constants.X86_64 || trueAbi == Constants.ARMV8 || (trueAbi == Constants.NO_LIBS && isNonNativeLibApp64Bit)
+        }.toMutableList()
+      }
 
-    if ((options and AdvancedOptions.SORT_BY_NAME) > 0) {
-      filterList.sortWith(compareBy({ it.abi }, { it.label }))
-    } else if ((options and AdvancedOptions.SORT_BY_UPDATE_TIME) > 0) {
-      filterList.sortByDescending { it.lastUpdatedTime }
-    } else if ((options and AdvancedOptions.SORT_BY_TARGET_API) > 0) {
-      filterList.sortByDescending { it.targetApi }
-    }
+      val keyword = appAdapter.highlightText
+      if (keyword.isNotEmpty()) {
+        filterList = filterList.filter {
+          it.label.contains(keyword, ignoreCase = true) ||
+            it.packageName.contains(keyword, ignoreCase = true)
+        }.toMutableList()
 
-    withContext(Dispatchers.Main) {
-      appAdapter.apply {
-        setDiffNewData(filterList) {
-          if (isDetached) {
-            return@setDiffNewData
+        if (HarmonyOsUtil.isHarmonyOs() && keyword.contains("Harmony", true)) {
+          filterList = filterList.filter { it.variant == Constants.VARIANT_HAP }.toMutableList()
+        }
+      }
+
+      if ((options and AdvancedOptions.SORT_BY_NAME) > 0) {
+        filterList.sortWith(compareBy({ it.abi }, { it.label }))
+      } else if ((options and AdvancedOptions.SORT_BY_UPDATE_TIME) > 0) {
+        filterList.sortByDescending { it.lastUpdatedTime }
+      } else if ((options and AdvancedOptions.SORT_BY_TARGET_API) > 0) {
+        filterList.sortByDescending { it.targetApi }
+      }
+
+      withContext(Dispatchers.Main) {
+        appAdapter.apply {
+          setDiffNewData(filterList) {
+            if (isDetached || !isBindingInitialized()) {
+              return@setDiffNewData
+            }
+            flip(VF_LIST)
+            isListReady = true
+
+            if (highlightRefresh) {
+              notifyItemRangeChanged(0, data.size)
+            }
+
+            setSpaceFooterView()
           }
-          flip(VF_LIST)
-          isListReady = true
-
-          if (highlightRefresh) {
-            notifyItemRangeChanged(0, data.size)
-          }
-
-          setSpaceFooterView()
         }
       }
     }
-  }
 
   private fun returnTopOfList() {
     binding.list.apply {
@@ -439,6 +452,7 @@ class AppListFragment :
       Configuration.ORIENTATION_PORTRAIT -> LinearLayoutManager(requireContext())
       Configuration.ORIENTATION_LANDSCAPE ->
         StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+
       else -> throw IllegalStateException("Wrong orientation at AppListFragment.")
     }
     return layoutManager

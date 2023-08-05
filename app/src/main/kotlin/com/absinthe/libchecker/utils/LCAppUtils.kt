@@ -17,6 +17,8 @@ import com.absinthe.libchecker.annotation.WINTER
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.model.LibStringItem
+import com.absinthe.libchecker.model.SnapshotDiffItem
+import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.isTempApk
 import com.absinthe.libchecker.utils.extensions.toClassDefType
@@ -167,5 +169,30 @@ object LCAppUtils {
         0
       )
     )
+  }
+
+  fun <T> getDiffString(
+    diff: SnapshotDiffItem.DiffNode<T>,
+    isNewOrDeleted: Boolean = false,
+    format: String = "%s"
+  ): String {
+    return if (diff.old != diff.new && !isNewOrDeleted) {
+      "${format.format(diff.old)} $ARROW ${format.format(diff.new)}"
+    } else {
+      format.format(diff.old)
+    }
+  }
+
+  fun getDiffString(
+    diff1: SnapshotDiffItem.DiffNode<*>,
+    diff2: SnapshotDiffItem.DiffNode<*>,
+    isNewOrDeleted: Boolean = false,
+    format: String = "%s"
+  ): String {
+    return if ((diff1.old != diff1.new || diff2.old != diff2.new) && !isNewOrDeleted) {
+      "${format.format(diff1.old, diff2.old)} $ARROW ${format.format(diff1.new, diff2.new)}"
+    } else {
+      format.format(diff1.old, diff2.old)
+    }
   }
 }

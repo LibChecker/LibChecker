@@ -47,6 +47,10 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment(), IBinding<VB> {
     return visible
   }
 
+  fun isBindingInitialized(): Boolean {
+    return _binding != null
+  }
+
   override fun onDestroyView() {
     Timber.d("${javaClass.simpleName} ==> onDestroyView")
     _binding = null

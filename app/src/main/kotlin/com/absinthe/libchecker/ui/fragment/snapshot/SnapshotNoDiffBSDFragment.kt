@@ -6,7 +6,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.BundleCompat
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.model.SnapshotDiffItem
-import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.putArguments
@@ -53,46 +53,37 @@ class SnapshotNoDiffBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotNoDi
             setImageResource(R.drawable.ic_icon_blueprint)
           }
         }
-        appNameView.text = item.labelDiff.old
+        val isNewOrDeleted = item.deleted || item.newInstalled
+        appNameView.text = LCAppUtils.getDiffString(item.labelDiff, isNewOrDeleted)
         packageNameView.text = item.packageName
-        versionInfoView.text = getDiffString(
+        versionInfoView.text = LCAppUtils.getDiffString(
           item.versionNameDiff,
           item.versionCodeDiff,
-          item.deleted || item.newInstalled,
+          isNewOrDeleted,
           "%s (%s)"
         )
-        targetApiView.text = String.format("API %s", item.targetApiDiff.old)
+        targetApiView.text = LCAppUtils.getDiffString(item.targetApiDiff, isNewOrDeleted, "API %s")
       }
 
       when {
         item.newInstalled -> {
           root.setMode(SnapshotNoDiffBSView.Mode.New)
         }
+
         item.deleted -> {
           root.setMode(SnapshotNoDiffBSView.Mode.Deleted)
         }
+
         item.isNothingChanged() -> {
           root.setMode(SnapshotNoDiffBSView.Mode.NothingChanged)
         }
+
         else -> {
           dismiss()
         }
       }
     } ?: run {
       dismiss()
-    }
-  }
-
-  private fun getDiffString(
-    diff1: SnapshotDiffItem.DiffNode<*>,
-    diff2: SnapshotDiffItem.DiffNode<*>,
-    isNewOrDeleted: Boolean = false,
-    format: String = "%s"
-  ): String {
-    return if ((diff1.old != diff1.new || diff2.old != diff2.new) && !isNewOrDeleted) {
-      "${format.format(diff1.old, diff2.old)} $ARROW ${format.format(diff1.new, diff2.new)}"
-    } else {
-      format.format(diff1.old, diff2.old)
     }
   }
 
