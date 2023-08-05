@@ -421,7 +421,7 @@ class AppListFragment :
       withContext(Dispatchers.Main) {
         appAdapter.apply {
           setDiffNewData(filterList) {
-            if (isDetached) {
+            if (isDetached || !isBindingInitialized()) {
               return@setDiffNewData
             }
             flip(VF_LIST)

@@ -555,9 +555,9 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
     }
   }
 
-  private fun flip(child: Int) {
+  private fun flip(child: Int) = lifecycleScope.launch(Dispatchers.Main) {
     if (binding.vfContainer.displayedChild == child) {
-      return
+      return@launch
     }
     if (child == VF_LOADING) {
       if (binding.extendedFab.isShown) {
