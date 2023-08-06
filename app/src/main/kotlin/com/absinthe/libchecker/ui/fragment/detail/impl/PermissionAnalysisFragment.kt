@@ -67,12 +67,16 @@ class PermissionAnalysisFragment : BaseFilterAnalysisFragment<FragmentLibCompone
 
   override fun onVisibilityChanged(visible: Boolean) {
     super.onVisibilityChanged(visible)
-    if (context != null && visible && hasNonGrantedPermissions()) {
-      val label = requireContext().getString(R.string.permission_not_granted)
-      val color = R.color.material_red_400.getColor(requireContext())
-      viewModel.processMapLiveData.postValue(
-        mapOf(label to color)
-      )
+    if (context != null && visible) {
+      if (hasNonGrantedPermissions()) {
+        val label = requireContext().getString(R.string.permission_not_granted)
+        val color = R.color.material_red_400.getColor(requireContext())
+        viewModel.processMapLiveData.postValue(
+          mapOf(label to color)
+        )
+      } else {
+        viewModel.processMapLiveData.postValue(emptyMap())
+      }
     } else {
       viewModel.processMapLiveData.postValue(viewModel.processesMap)
     }
