@@ -96,6 +96,12 @@ object PropertiesMap {
     2 to "sync"
   )
 
+  private val autoRevokePermissions = mapOf(
+    0 to "allowed",
+    1 to "discouraged",
+    2 to "disallowed"
+  )
+
   fun parseProperty(key: String, value: String): String {
     fun String.addOrigValue(): String {
       return "$this ($value)"
@@ -153,6 +159,10 @@ object PropertiesMap {
 
       "memtagMode" -> {
         memtagModes.getValue(value.toInt()).addOrigValue()
+      }
+
+      "autoRevokePermissions" -> {
+        autoRevokePermissions.getValue(value.toInt()).addOrigValue()
       }
 
       else -> value
