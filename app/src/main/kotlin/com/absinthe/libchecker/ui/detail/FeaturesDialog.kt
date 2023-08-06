@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.ui.detail
 
 import android.content.Context
+import android.content.pm.PackageInfo
 import android.graphics.drawable.Drawable
 import android.os.Build
 import androidx.annotation.DrawableRes
@@ -15,7 +16,6 @@ import com.absinthe.libchecker.ui.fragment.detail.AppBundleBottomSheetDialogFrag
 import com.absinthe.libchecker.ui.fragment.detail.AppInstallSourceBSDFragment
 import com.absinthe.libchecker.ui.fragment.detail.AppPropBottomSheetDialogFragment
 import com.absinthe.libchecker.ui.fragment.detail.EXTRA_PACKAGE_INFO
-import com.absinthe.libchecker.utils.PackageUtils
 
 object FeaturesDialog {
 
@@ -112,10 +112,8 @@ object FeaturesDialog {
     )
   }
 
-  fun showAppPropDialog(activity: FragmentActivity, packageName: String) {
-    val pi = runCatching {
-      PackageUtils.getPackageInfo(packageName)
-    }.getOrNull() ?: return
+  fun showAppPropDialog(activity: FragmentActivity, packageInfo: PackageInfo?) {
+    val pi = packageInfo ?: return
 
     AppPropBottomSheetDialogFragment().apply {
       arguments = bundleOf(

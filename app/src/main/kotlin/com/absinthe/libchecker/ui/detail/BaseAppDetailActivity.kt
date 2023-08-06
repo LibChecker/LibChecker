@@ -613,7 +613,7 @@ abstract class BaseAppDetailActivity :
           Features.Ext.APPLICATION_PROP -> {
             featureAdapter.addData(
               FeatureItem(R.drawable.ic_app_prop) {
-                FeaturesDialog.showAppPropDialog(this, packageInfo.packageName)
+                FeaturesDialog.showAppPropDialog(this, packageInfo)
               }
             )
           }
