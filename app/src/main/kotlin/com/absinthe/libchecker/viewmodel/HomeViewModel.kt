@@ -189,7 +189,7 @@ class HomeViewModel : ViewModel() {
 
   private var requestChangeJob: Job? = null
 
-  fun requestChange() =
+  fun requestChange(checked: Boolean = false) {
     viewModelScope.launch {
       if (appListStatus == STATUS_START_INIT) {
         Timber.d("Request change canceled: STATUS_START_INIT")
@@ -199,10 +199,11 @@ class HomeViewModel : ViewModel() {
         requestChangeJob?.cancel()
       }
 
-      requestChangeJob = requestChangeImpl(LocalAppDataSource.getApplicationMap())
+      requestChangeJob = requestChangeImpl(LocalAppDataSource.getApplicationMap(), checked)
     }
+  }
 
-  private fun requestChangeImpl(appMap: Map<String, PackageInfo>) =
+  private fun requestChangeImpl(appMap: Map<String, PackageInfo>, checked: Boolean) =
     viewModelScope.launch(Dispatchers.IO) {
       val dbItems = Repositories.lcRepository.getLCItems()
       if (dbItems.isEmpty()) {
@@ -221,30 +222,41 @@ class HomeViewModel : ViewModel() {
       val newApps = localApps - dbApps
       val removedApps = dbApps - localApps
 
-      newApps.forEach {
-        runCatching {
-          val info = appMap[it] ?: return@runCatching
-          insert(generateLCItemFromPackageInfo(info, isHarmony))
-        }.onFailure { e ->
-          Timber.e(e, "requestChange: $it")
+      /*
+       * The application list returned with a probability only contains system applications.
+       * When the difference is greater than a certain threshold, we re-request the list.
+       */
+      if (!checked && (newApps.size > 30 || removedApps.size > 30)) {
+        Timber.w("Request change canceled because of large diff, re-request appMap")
+        launch {
+          requestChange(true)
         }
-      }
-
-      removedApps.forEach {
-        Repositories.lcRepository.deleteLCItemByPackageName(it)
-      }
-
-      localApps.intersect(dbApps).asSequence()
-        .mapNotNull { appMap[it] }
-        .filter { pi ->
-          dbItems.find { it.packageName == pi.packageName }?.let {
-            it.versionCode != pi.getVersionCode() ||
-              pi.lastUpdateTime != it.lastUpdatedTime ||
-              it.lastUpdatedTime == 0L
-          } ?: false
-        }.forEach {
-          update(generateLCItemFromPackageInfo(it, isHarmony))
+      } else {
+        newApps.forEach {
+          runCatching {
+            val info = appMap[it] ?: return@runCatching
+            insert(generateLCItemFromPackageInfo(info, isHarmony))
+          }.onFailure { e ->
+            Timber.e(e, "requestChange: $it")
+          }
         }
+
+        removedApps.forEach {
+          Repositories.lcRepository.deleteLCItemByPackageName(it)
+        }
+
+        localApps.intersect(dbApps).asSequence()
+          .mapNotNull { appMap[it] }
+          .filter { pi ->
+            dbItems.find { it.packageName == pi.packageName }?.let {
+              it.versionCode != pi.getVersionCode() ||
+                pi.lastUpdateTime != it.lastUpdatedTime ||
+                it.lastUpdatedTime == 0L
+            } ?: false
+          }.forEach {
+            update(generateLCItemFromPackageInfo(it, isHarmony))
+          }
+      }
 
       refreshList()
 
