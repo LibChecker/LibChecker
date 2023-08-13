@@ -20,6 +20,7 @@
     <item>uk</item>
     <item>ja</item>
     <item>vi</item>
+    <item>in</item>
   </string-array>
 
   <string-array name="language_value" translatable="false">
@@ -32,6 +33,7 @@
     <item>ru-UA</item>
     <item>ja-JP</item>
     <item>vi-VN</item>
+    <item>in-ID</item>
   </string-array>
 
   <string-array name="list_dark_mode" tools:ignore="InconsistentArrays">
