@@ -201,7 +201,7 @@ class ChartFragment :
         dataSet.colors = colors
         // dataSet.setSelectionShift(0f);
         val data = PieData(dataSet).apply {
-          setValueFormatter(PercentFormatter(chartView as PieChart))
+          setValueFormatter(PercentFormatter())
           setValueTextSize(10f)
           setValueTextColor(colorOnSurface)
         }
@@ -279,7 +279,7 @@ class ChartFragment :
         dataSet.colors = colors
         // dataSet.setSelectionShift(0f);
         val data = PieData(dataSet).apply {
-          setValueFormatter(PercentFormatter(chartView as PieChart))
+          setValueFormatter(PercentFormatter())
           setValueTextSize(10f)
           setValueTextColor(colorOnSurface)
         }
@@ -507,7 +507,7 @@ class ChartFragment :
         dataSet.colors = colors
         // dataSet.setSelectionShift(0f);
         val data = PieData(dataSet).apply {
-          setValueFormatter(PercentFormatter(chartView as PieChart))
+          setValueFormatter(PercentFormatter())
           setValueTextSize(10f)
           setValueTextColor(colorOnSurface)
         }
