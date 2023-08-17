@@ -29,7 +29,7 @@ class ResoptPlugin : Plugin<Project> {
             sdkComponents.sdkDirectory.get().toString(), "build-tools", ext.buildToolsVersion, "aapt2"
           )
           val workdir = Paths.get(
-            project.buildDir.path, "intermediates", "optimized_processed_res", name
+            project.layout.buildDirectory.toString(), "intermediates", "optimized_processed_res", name
           ).toFile()
           val zip =
             if (variant.flavorName.isNullOrEmpty()) "resources-${variant.buildType}-optimize.ap_" else "resources-${variant.flavorName}-${variant.buildType}-optimize.ap_"
