@@ -9,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.activity.addCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
@@ -27,6 +26,7 @@ import com.absinthe.libchecker.database.backup.RoomBackup
 import com.absinthe.libchecker.databinding.ActivityBackupBinding
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.main.MainActivity
+import com.absinthe.libchecker.ui.main.addBackStateHandler
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.StorageUtils
 import com.absinthe.libchecker.utils.UiUtils
@@ -63,12 +63,17 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
         .replace(R.id.fragment_container, BackupFragment())
         .commit()
     }
-    onBackPressedDispatcher.addCallback(this, true) {
-      if (intent?.data != null) {
-        startActivity(Intent(this@BackupActivity, MainActivity::class.java))
-      }
-      finish()
-    }
+    onBackPressedDispatcher.addBackStateHandler(
+      lifecycleOwner = this,
+      enabledState = { intent?.data != null },
+      handler = {
+        val intent = Intent(this, MainActivity::class.java)
+          // flags to bring MainActivity to the front and clear back stack
+          .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        startActivity(intent)
+        finish()
+      },
+    )
   }
 
   override fun onApplyUserThemeResource(theme: Resources.Theme, isDecorView: Boolean) {

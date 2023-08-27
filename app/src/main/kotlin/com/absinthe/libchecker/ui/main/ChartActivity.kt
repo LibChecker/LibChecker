@@ -3,7 +3,6 @@ package com.absinthe.libchecker.ui.main
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.ViewGroup
-import androidx.activity.addCallback
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.ActivityChartBinding
 import com.absinthe.libchecker.ui.base.BaseActivity
@@ -22,10 +21,6 @@ class ChartActivity : BaseActivity<ActivityChartBinding>() {
       supportFragmentManager.beginTransaction()
         .replace(R.id.fragment_container, ChartFragment())
         .commit()
-    }
-
-    onBackPressedDispatcher.addCallback(this, true) {
-      finish()
     }
   }
 

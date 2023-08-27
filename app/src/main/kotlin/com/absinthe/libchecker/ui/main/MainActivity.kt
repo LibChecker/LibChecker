@@ -7,7 +7,6 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import android.view.View
-import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.MenuProvider
@@ -232,14 +231,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
       }
     }
 
-    onBackPressedDispatcher.addCallback(this, true) {
-      val closeBtn = findViewById<View>(androidx.appcompat.R.id.search_close_btn)
-      if (closeBtn != null) {
-        binding.toolbar.collapseActionView()
-      } else {
-        finish()
-      }
-    }
+    onBackPressedDispatcher.addBackStateHandler(
+      enabledState = { binding.toolbar.hasExpandedActionView() },
+      handler = { binding.toolbar.collapseActionView() },
+      lifecycleOwner = this,
+    )
   }
 
   /**
