@@ -13,7 +13,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
@@ -69,6 +68,7 @@ import com.absinthe.libchecker.ui.fragment.detail.impl.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.PermissionAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.SignaturesAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
+import com.absinthe.libchecker.ui.main.addBackStateHandler
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
@@ -140,14 +140,11 @@ abstract class BaseAppDetailActivity :
       setDisplayHomeAsUpEnabled(true)
       setDisplayShowHomeEnabled(true)
     }
-    onBackPressedDispatcher.addCallback(this, true) {
-      val closeBtn = findViewById<View>(androidx.appcompat.R.id.search_close_btn)
-      if (closeBtn != null) {
-        binding.toolbar.collapseActionView()
-      } else {
-        finish()
-      }
-    }
+    onBackPressedDispatcher.addBackStateHandler(
+      enabledState = { binding.toolbar.hasExpandedActionView() },
+      handler = { binding.toolbar.collapseActionView() },
+      lifecycleOwner = this,
+    )
   }
 
   protected fun onPackageInfoAvailable(packageInfo: PackageInfo, extraBean: DetailExtraBean?) {

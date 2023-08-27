@@ -14,7 +14,7 @@
     android:appCategory="productivity"
     android:configChanges="orientation"
     android:dataExtractionRules="@xml/data_extraction_rules"
-    android:enableOnBackInvokedCallback="true"
+    android:enableOnBackInvokedCallback="@bool/appOnBackInvokedCallbackEnabled"
     android:fullBackupContent="@xml/backup_rules"
     android:icon="@mipmap/ic_launcher"
     android:label="@string/app_name"
