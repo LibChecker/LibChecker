@@ -7,7 +7,7 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import android.view.View
-import androidx.activity.addCallback
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.MenuProvider
@@ -15,6 +15,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -44,6 +46,9 @@ import com.microsoft.appcenter.analytics.EventProperties
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -232,14 +237,27 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
       }
     }
 
-    onBackPressedDispatcher.addCallback(this, true) {
-      val closeBtn = findViewById<View>(androidx.appcompat.R.id.search_close_btn)
-      if (closeBtn != null) {
+    val backCallback = object : OnBackPressedCallback(false) {
+      override fun handleOnBackPressed() {
         binding.toolbar.collapseActionView()
-      } else {
-        finish()
       }
     }
+    onBackPressedDispatcher.addCallback(this, backCallback)
+    // update callback enabled state every 1s in the background
+    val expandStateFlow = flow {
+      while (true) {
+        emit(binding.toolbar.hasExpandedActionView())
+        delay(1000)
+      }
+    }
+    expandStateFlow
+      .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+      .onEach { expanded -> backCallback.isEnabled = expanded }
+      .flowOn(Dispatchers.Default)
+      .distinctUntilChanged()
+      .onEach { expanded -> Timber.d("main/expandedAction:$expanded") }
+      .flowOn(Dispatchers.Main)
+      .launchIn(lifecycleScope)
   }
 
   /**
