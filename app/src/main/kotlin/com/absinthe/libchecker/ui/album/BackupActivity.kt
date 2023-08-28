@@ -26,10 +26,10 @@ import com.absinthe.libchecker.database.backup.RoomBackup
 import com.absinthe.libchecker.databinding.ActivityBackupBinding
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.main.MainActivity
-import com.absinthe.libchecker.ui.main.addBackStateHandler
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.StorageUtils
 import com.absinthe.libchecker.utils.UiUtils
+import com.absinthe.libchecker.utils.extensions.addBackStateHandler
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.jakewharton.processphoenix.ProcessPhoenix
@@ -72,7 +72,7 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
           .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         startActivity(intent)
         finish()
-      },
+      }
     )
   }
 

@@ -33,6 +33,7 @@ import com.absinthe.libchecker.ui.fragment.settings.SettingsFragment
 import com.absinthe.libchecker.ui.fragment.snapshot.SnapshotFragment
 import com.absinthe.libchecker.ui.fragment.statistics.LibReferenceFragment
 import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.extensions.addBackStateHandler
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.setCurrentItem
 import com.absinthe.libchecker.viewmodel.HomeViewModel
@@ -232,9 +233,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
     }
 
     onBackPressedDispatcher.addBackStateHandler(
-      enabledState = { binding.toolbar.hasExpandedActionView() },
-      handler = { binding.toolbar.collapseActionView() },
       lifecycleOwner = this,
+      enabledState = { binding.toolbar.hasExpandedActionView() },
+      handler = { binding.toolbar.collapseActionView() }
     )
   }
 

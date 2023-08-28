@@ -68,11 +68,11 @@ import com.absinthe.libchecker.ui.fragment.detail.impl.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.PermissionAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.SignaturesAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
-import com.absinthe.libchecker.ui.main.addBackStateHandler
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.utils.extensions.addBackStateHandler
 import com.absinthe.libchecker.utils.extensions.copyToClipboard
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
@@ -141,9 +141,9 @@ abstract class BaseAppDetailActivity :
       setDisplayShowHomeEnabled(true)
     }
     onBackPressedDispatcher.addBackStateHandler(
-      enabledState = { binding.toolbar.hasExpandedActionView() },
-      handler = { binding.toolbar.collapseActionView() },
       lifecycleOwner = this,
+      enabledState = { binding.toolbar.hasExpandedActionView() },
+      handler = { binding.toolbar.collapseActionView() }
     )
   }
 

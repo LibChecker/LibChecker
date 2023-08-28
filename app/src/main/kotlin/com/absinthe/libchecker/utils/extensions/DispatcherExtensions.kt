@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.ui.main
+package com.absinthe.libchecker.utils.extensions
 
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.OnBackPressedDispatcher
@@ -18,7 +18,7 @@ import timber.log.Timber
 inline fun OnBackPressedDispatcher.addBackStateHandler(
   lifecycleOwner: LifecycleOwner,
   crossinline enabledState: () -> Boolean,
-  crossinline handler: () -> Unit,
+  crossinline handler: () -> Unit
 ) {
   val backCallback = object : OnBackPressedCallback(false) {
     override fun handleOnBackPressed() {
