@@ -1,17 +1,153 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <!--  General  -->
+  <string name="title_app_list">Configurações de apps</string>
+  <string name="title_statistics">Atividade</string>
+  <string name="title_snapshot">Captura de tela</string>
+  <string name="title_settings">Definições</string>
+  <string name="title_album">álbuns</string>
+  <string name="loading">Carregando!!!</string>
+  <string name="channel_shoot">Salvar fotos</string>
+  <string name="noti_shoot_title">Salvando snapshot atual</string>
+  <string name="noti_shoot_title_saved">Um snapshot foi salvo</string>
   <!--  App list  -->
+  <string name="menu_search">Procurar</string>
+  <string name="menu_sort">Classificar</string>
+  <string name="menu_filter">Filtrar</string>
+  <string name="search_hint">Procurar…</string>
+  <string name="string_64_bit">64 bits</string>
+  <string name="string_32_bit">32bit</string>
+  <string name="no_libs">Sem bibliotecas nativas</string>
+  <string name="cannot_read">Não é possível ler</string>
+  <string name="unknown">Desconhecido</string>
+  <string name="empty_list">Lista vazia</string>
+  <string name="uncharted_territory">Território desconhecido</string>
+  <string name="get_app_list_denied_tip">Por favor, conceda a\n\"Obter informação de aplicativos instalados\"\npermissão para LibChecker</string>
+  <string name="advanced_menu">Menu Avançado</string>
   <!-- Statistics   -->
+  <string name="title_statistics_dialog">Apps com ABI %s</string>
+  <string name="title_statistics_dialog_no_native_libs">Apps sem bibliotecas nativas</string>
+  <string name="tab_chart">Plano</string>
+  <string name="tab_lib_reference_statistics">Lib reference</string>
+  <string name="not_marked_lib">Biblioteca Desmarcada</string>
+  <string name="submenu_title_component">Componente</string>
+  <string name="submenu_title_manifest">Manifesto</string>
+  <string name="ref_category_all">Todas as opções</string>
+  <string name="ref_category_native">Bibliotecas Nativas</string>
+  <string name="ref_category_service">Serviços</string>
+  <string name="ref_category_activity">Evento</string>
+  <string name="ref_category_br">Transmitir Recepdores</string>
+  <string name="ref_category_cp">Provedores de conteúdo</string>
+  <string name="ref_category_perm">Permissões</string>
+  <string name="ref_category_static">Bibliotecas Estáticas</string>
+  <string name="ref_category_metadata">Metadados</string>
+  <string name="ref_category_package">Pacote</string>
+  <string name="ref_category_shared_uid">UID compartilhado</string>
+  <string name="ref_category_signatures">Assinaturas</string>
+  <string name="ref_category_only_not_marked">Só não marcado</string>
+  <string name="string_kotlin_used">Kotlin usado</string>
+  <string name="string_kotlin_unused">Kotlin não usado</string>
+  <string name="string_compose_used">Compor Jetpack usado</string>
+  <string name="string_compose_unused">Compor Jetpack não utilizado</string>
   <!--  About  -->
+  <string name="settings_about">Sobre</string>
+  <string name="settings_translate">Participar na tradução</string>
+  <string name="settings_translate_summary">Ajude-nos a traduzir este app</string>
+  <string name="settings_rate_us">Avalie-nos</string>
+  <string name="settings_rate_us_summary">Isso pode nos fazer encontrar por mais pessoas</string>
   <!--  Settings  -->
   <!--  Detail  -->
+  <string name="play_app_signing">Iniciar assinatura do aplicativo</string>
+  <string name="play_app_signing_details">Com a assinatura do Play App, o Google gerencia e protege a chave de assinatura do seu aplicativo para você e o usa para assinar otimizado, APKs de distribuição gerados a partir de pacotes de aplicações. O Play App Signing armazena sua chave de assinatura na infraestrutura segura do Google e oferece opções para aumentar a segurança.</string>
+  <string name="pwa_details">Aplicativos Web Progressive (PWA) são construídos e aprimorados com APIs modernas para fornecer recursos aprimorados, confiabilidade e instalação enquanto chega a qualquer um, em qualquer lugar, em qualquer dispositivo com um único código.</string>
+  <string name="jetpack_compose_details">Jetpack Compose é o moderno kit de ferramentas do Android para a construção de interface nativa. Ele simplifica e acelera o desenvolvimento de interface do usuário no Android. Rapidamente dê vida ao seu app com menos código, ferramentas poderosas e APIs intuitivas do Kotlin.</string>
+  <string name="extract_native_libs_tip">O aplicativo declara </string>
+  <string name="xml_detail">Detalhes do XML</string>
+  <string name="format_last_updated">Atualizado em: %s</string>
+  <string name="menu_process">Processo</string>
+  <string name="menu_split">Separar em categorias</string>
+  <string name="alternative_launch_method">Método de Início Alternativo</string>
+  <string name="compare_with_current">Compare com o pacote atual</string>
+  <string name="rx_detail">RxJava é uma implementação Java VM de Extensões Reativas: uma biblioteca para a composição de programas assíncronos e baseados em eventos usando sequências observáveis.</string>
+  <string name="rx_android_detail">Extensões Reativas para Android</string>
+  <string name="rx_kotlin_detail">Extensões do Kotlin para RxJava</string>
+  <string name="permission_not_granted">Não concedido</string>
+  <string name="signature_detail">Detalhes da Assinatura</string>
+  <string name="signature_version">Versão</string>
+  <string name="signature_serial_number">Número de série</string>
+  <string name="signature_issuer">Emissor</string>
+  <string name="signature_subject">Assunto</string>
+  <string name="signature_validity_not_before">Validade não anterior</string>
+  <string name="signature_validity_not_after">Validade não após</string>
+  <string name="signature_public_key_format">Formato de chave pública</string>
+  <string name="signature_public_key_algorithm">Algorítimo de chave pública</string>
+  <string name="signature_public_key_exponent">Chave pública Exponente</string>
+  <string name="signature_public_key_modulus_size">Tamanho do módulo de chave pública</string>
+  <string name="signature_public_key_modulus">Módulo de chave pública</string>
+  <string name="signature_public_key_y">Valor da chave pública Y</string>
+  <string name="signature_public_key_type">Tipo de chave pública</string>
+  <string name="signature_algorithm_name">Nome do Algoritmo da Assinatura</string>
+  <string name="signature_algorithm_oid">OID Algoritmo da assinatura</string>
+  <string name="lib_detail_label_tip">Descrição</string>
+  <string name="lib_detail_develop_team_tip">Equipe de Desenvolvedores</string>
+  <string name="lib_detail_rule_contributors_tip">Colaborador(es) de regras</string>
+  <string name="lib_detail_description_tip">Descriçâo</string>
+  <string name="lib_detail_relative_link_tip">Link relativo</string>
+  <string name="lib_detail_last_update_tip">Atualizado em</string>
+  <string name="lib_detail_app_props_title">Propriedades do aplicativo</string>
+  <string name="lib_detail_app_props_tip">Mais informações</string>
+  <string name="lib_detail_xposed_min_version">Versão Mínima</string>
+  <string name="lib_detail_xposed_default_scope">Escopo padrão</string>
+  <string name="lib_detail_xposed_init_class">Iniciar Classe</string>
+  <string name="lib_detail_app_install_source_title">Origem da Instalação</string>
+  <string name="lib_detail_app_install_source_originating_package">Solicitante de instalação</string>
+  <string name="lib_detail_app_install_source_installing_package">Executar Instalação</string>
+  <string name="lib_detail_app_install_source_empty">Desconhecido</string>
+  <string name="lib_detail_app_install_source_empty_detail">aplicativo adb ou desinstalado</string>
+  <string name="lib_detail_app_install_source_shizuku_usage">Como o Android restringe a API para obter o solicitante de instalação, usamos Shizuku para obter o solicitante de instalação.</string>
+  <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizuku não instalada</string>
+  <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">Clique aqui para instalar Shizuku</string>
   <!--  Toast  -->
   <!--  Snapshot  -->
   <!--  Dialog  -->
   <!--  Album  -->
+  <string name="album_item_track_subtitle">Selecionar aplicativos para forçar uma mudança de comparação</string>
+  <string name="album_backup">Cópia de Segurança</string>
+  <string name="album_backup_summary">Backup de todos os instantâneos</string>
+  <string name="album_restore">Restaurar</string>
+  <string name="album_restore_summary">Restaurar instantâneos do arquivo de backup</string>
+  <string name="album_restore_detail">%1$s : %2$s itens no total\n</string>
+  <string name="album_click_to_choose">Clique para Selecionar</string>
+  <string name="album_dialog_delete_snapshot_message">Processando…</string>
   <!--  Integration  -->
+  <string name="integration_monkey_king_menu_block">Bloqueie através do \"Rei Purificado\"</string>
+  <string name="integration_monkey_king_menu_unblock">Desbloqueie através do \"Rei Purificado\"</string>
+  <string name="integration_blocker_menu_block">Bloqueie através do \"Bloqueador\"</string>
+  <string name="integration_blocker_menu_unblock">Desbloquear através de \"Bloqueador\"</string>
+  <string name="integration_anywhere_menu_editor">Abra-o em \"Em todo lugar- Editor\"</string>
   <!--  Cloud rules  -->
+  <string name="rules_local_repo_version">Versão local do repo</string>
+  <string name="rules_remote_repo_version">Versão remota do repo</string>
+  <string name="rules_btn_restart_to_update">Reiniciar para Atualizar</string>
+  <string name="rules_btn_update">Atualizar</string>
   <!-- Advanced menu -->
+  <string name="adv_show_system_apps">Mostrar Aplicativos do Sistema</string>
+  <string name="adv_show_overlays">Mostrar camadas</string>
+  <string name="adv_show_64_bit">Mostrar aplicativos 64-bit</string>
+  <string name="adv_show_32_bit">Mostrar aplicativos 32-bit</string>
+  <string name="adv_sort_mode">Ordenar Campos</string>
+  <string name="adv_sort_by_time">Atualizado Time</string>
+  <string name="adv_sort_by_target_version">Versão Alvo</string>
+  <string name="adv_sort_by_name">Nome</string>
+  <string name="adv_show_android_version">Mostrar Versão do Android</string>
+  <string name="adv_show_target_version">Mostrar Versão Alvo</string>
+  <string name="adv_show_min_version">Mostrar Versão Mínima</string>
+  <string name="adv_tint_abi_label">Tintura ABI Rótulo</string>
+  <string name="adv_mark_exported">Marcar componente exportado</string>
+  <string name="adv_mark_disabled">Marcar Componente Desabilitado</string>
+  <string name="adv_show_marked_lib">Mostrar bibliotecas marcadas</string>
+  <string name="adv_show_system_framework_apps">Mostrar Aplicativos Framework</string>
   <!--  Snapshot menu  -->
+  <string name="snapshot_menu_show_update_time">Mostrar data de atualização</string>
+  <string name="snapshot_menu_hide_no_component_changes">Não ocultar nenhuma alteração de componente</string>
 </resources>
