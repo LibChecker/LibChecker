@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.FrameLayout
 import androidx.appcompat.widget.SearchView
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -316,7 +317,7 @@ class AppListFragment :
                   Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
                 }
                 activity?.removeMenuProvider(this@AppListFragment)
-                activity?.addMenuProvider(this@AppListFragment)
+                activity?.addMenuProvider(this@AppListFragment, viewLifecycleOwner, Lifecycle.State.RESUMED)
               }
 
               STATUS_NOT_START -> {
