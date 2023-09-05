@@ -1,7 +1,10 @@
 package com.absinthe.libchecker.dev.exception
 
+import androidx.annotation.Keep
 import com.absinthe.libchecker.BuildConfig
+import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 
+@Keep
 class AppListIncompleteException(message: String?) : Exception(message) {
   companion object {
     fun toggleAndSubmit(
@@ -9,20 +12,22 @@ class AppListIncompleteException(message: String?) : Exception(message) {
       newApps: Collection<String>,
       deletedApps: Collection<String>
     ) {
-      if (BuildConfig.IS_DEV_VERSION.not()) return
-      runCatching {
-        val msg = buildString {
-          append("Large diff detected in app list. ")
-          appendLine()
-          append("Total: ${appList.size}")
-          appendLine()
-          append("New: ${newApps.size}")
-          appendLine()
-          append("Deleted: ${deletedApps.size}")
-          appendLine()
-          append("Same: ${newApps.filter { deletedApps.contains(it) }.size}")
+      doOnMainThreadIdle {
+        if (BuildConfig.IS_DEV_VERSION.not()) return@doOnMainThreadIdle
+        runCatching {
+          val msg = buildString {
+            append("Large diff detected in app list. ")
+            appendLine()
+            append("Total: ${appList.size}")
+            appendLine()
+            append("New: ${newApps.size}")
+            appendLine()
+            append("Deleted: ${deletedApps.size}")
+            appendLine()
+            append("Same: ${newApps.filter { deletedApps.contains(it) }.size}")
+          }
+          throw AppListIncompleteException(msg)
         }
-        throw AppListIncompleteException(msg)
       }
     }
   }
