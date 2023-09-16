@@ -65,14 +65,12 @@ public class ResourceParser {
 
       while (event != XmlPullParser.END_DOCUMENT) {
         switch (event) {
-          case XmlPullParser.START_DOCUMENT:
-            Timber.i("START_DOCUMENT");
-            break;
-          case XmlPullParser.START_TAG:
+          case XmlPullParser.START_DOCUMENT -> Timber.i("START_DOCUMENT");
+          case XmlPullParser.START_TAG -> {
             if (lastNode != null && lastNode.isTagOpen) {
               // 关闭上一个标签开头
               spanTexts.add(new SpanText(builder.length(), builder.length() + 1, COLOR_TAG));
-              // builder.append(">\n");
+              builder.append(">");
               lastNode.hasSubTag = true;
             }
             level++;
@@ -129,8 +127,8 @@ public class ResourceParser {
               node.hasSubTag = false;
               if (lineSpace) builder.append('\n');
             }
-            break;
-          case XmlPullParser.TEXT:
+          }
+          case XmlPullParser.TEXT -> {
             if (lastNode != null) {
               spanTexts.add(new SpanText(builder.length(), builder.length() + 1, COLOR_TAG));
               builder.append('>');
@@ -140,8 +138,8 @@ public class ResourceParser {
               if (lastNode.attrCount > 1) builder.append('\n');
               lastNode.hasText = true;
             }
-            break;
-          case XmlPullParser.END_TAG:
+          }
+          case XmlPullParser.END_TAG -> {
             Node node2 = nodes.get(mParser.getName() + '\0' + mParser.getDepth()); //获取标签开始
             if (node2 != null && node2.isTagOpen) {
               if (node2.hasSubTag || node2.hasText) {
@@ -161,8 +159,8 @@ public class ResourceParser {
               node2.isTagOpen = false;
             }
             level--;
-            break;
-          case XmlPullParser.COMMENT:
+          }
+          case XmlPullParser.COMMENT -> {
             // 注释
             builder.append('\n')
               .append(makeIndent(level + 1));
@@ -170,13 +168,9 @@ public class ResourceParser {
             builder.append("<!-- ")
               .append(mParser.getText())
               .append(" -->");
-            break;
-          case XmlPullParser.CDSECT:
-            Timber.i("CDATA: %s", mParser.getText());
-            break;
-          default:
-            Timber.i("event: %s", event);
-            break;
+          }
+          case XmlPullParser.CDSECT -> Timber.i("CDATA: %s", mParser.getText());
+          default -> Timber.i("event: %s", event);
         }
         event = mParser.nextToken();
       }
@@ -251,15 +245,6 @@ public class ResourceParser {
   /**
    * 此类保存上色文本信息
    */
-  private static class SpanText {
-    final int start;
-    final int end;
-    final int color;
-
-    public SpanText(int start, int end, int color) {
-      this.start = start;
-      this.end = end;
-      this.color = color;
-    }
+  private record SpanText(int start, int end, int color) {
   }
 }
