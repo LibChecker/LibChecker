@@ -44,6 +44,7 @@
   <string name="ref_category_package">Пакет</string>
   <string name="ref_category_shared_uid">Общий UID</string>
   <string name="ref_category_signatures">подпись</string>
+  <string name="ref_category_only_not_marked">Только не помеченные</string>
   <string name="string_kotlin_used">Используется Kotlin</string>
   <string name="string_kotlin_unused">Kotlin не используется</string>
   <string name="string_compose_used">Используется Jetpack Compose</string>
@@ -102,6 +103,7 @@
   <string name="app_info_launch">Запустить</string>
   <string name="app_info_settings">Настройки</string>
   <string name="lib_detail_dialog_title">Подробности библиотеки</string>
+  <string name="lib_permission_dialog_title">Детали разрешения</string>
   <string name="agp_details">Система сборки Android Studio основана на Gradle, а подключаемый модуль Android Gradle добавляет несколько функций, характерных для создания приложений для Android. Хотя подключаемый модуль Android обычно обновляется одновременно с Android Studio, этот подключаемый модуль (и остальная часть системы Gradle) может работать независимо от Android Studio и обновляться отдельно.</string>
   <string name="xposed_module">Xposed модуль</string>
   <string name="xposed_module_details">Xposed — это фреймворк для модулей, которые могут изменить поведение системы и приложений, не затрагивая никаких APK. Это здорово, потому что это означает, что модули могут работать с разными версиями ОС и прошивками без каких-либо изменений.</string>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!--  General  -->
+  <string name="title_app_list">التطبيقات</string>
+  <string name="title_statistics">الإحصائيات</string>
+  <string name="title_snapshot">نقطة استعادة أو Snapshot</string>
+  <string name="title_settings">الاعدادات</string>
+  <string name="title_album">ألبوم</string>
+  <string name="loading">جارٍ التحميل…</string>
+  <string name="channel_shoot">حفظ نِقَاط الاستعادة</string>
+  <string name="noti_shoot_title">حفظ نقطة الاستعادة الحالية</string>
+  <string name="noti_shoot_title_saved">تم حفظ نقطة الاستعادة</string>
+  <!--  App list  -->
+  <string name="menu_search">بحث</string>
+  <string name="menu_sort">الفرز</string>
+  <string name="menu_filter">فلتر</string>
+  <string name="search_hint">البحث…</string>
+  <string name="string_64_bit">64 بت</string>
+  <string name="string_32_bit">32 بت</string>
+  <string name="no_libs">لا توجد libs أصلية</string>
+  <string name="cannot_read">لا يمكن القراءة</string>
+  <string name="unknown">غير معروف</string>
+  <string name="empty_list">قائمة فارغة</string>
+  <string name="uncharted_territory">منطقة مجهولة</string>
+  <string name="get_app_list_denied_tip">الرجاء منح إذن \n \"الحصول على معلومات حول التطبيقات المثبتة\" \n  لـLibChecker</string>
+  <string name="advanced_menu">قائمة متقدمة</string>
+  <!-- Statistics   -->
+  <string name="title_statistics_dialog">التطبيقات ذات %s ABI</string>
+  <string name="title_statistics_dialog_no_native_libs">تطبيقات بدون مكتبات أصلية</string>
+  <string name="tab_chart">جدول</string>
+  <string name="tab_lib_reference_statistics">مرجع المكتبة</string>
+  <string name="not_marked_lib">مكتبة بدون علامات</string>
+  <string name="submenu_title_component">مكون</string>
+  <string name="submenu_title_manifest">Manifest</string>
+  <string name="ref_category_all">الكل</string>
+  <string name="ref_category_native">المكتبات الأصلية</string>
+  <string name="ref_category_service">الخدمات</string>
+  <string name="ref_category_activity">الأنشطة</string>
+  <string name="ref_category_br">أجهزة استقبال البث</string>
+  <string name="ref_category_cp">موفري المحتوى</string>
+  <string name="ref_category_perm">الأذونات</string>
+  <string name="ref_category_static">المكتبات الثابتة</string>
+  <string name="ref_category_metadata">البيانات الوصفية</string>
+  <string name="ref_category_package">الحزمة</string>
+  <string name="ref_category_shared_uid">UID المشتركة</string>
+  <string name="ref_category_signatures">التواقيع</string>
+  <string name="ref_category_only_not_marked">فقط لم يتم وضع علامة</string>
+  <string name="string_kotlin_used">يستخدم  كوتلين</string>
+  <string name="string_kotlin_unused">لا يستخدم كوتلين</string>
+  <string name="string_compose_used">يستخدم Jetpack Compose</string>
+  <string name="string_compose_unused">لا يستخدم Jetpack Compose</string>
+  <!--  About  -->
+  <string name="settings_about">حول</string>
+  <string name="settings_translate">المشاركة في الترجمة</string>
+  <string name="settings_translate_summary">ساعدنا في ترجمة هذا التطبيق</string>
+  <string name="settings_rate_us">قيّمنا</string>
+  <!--  Settings  -->
+  <!--  Detail  -->
+  <!--  Toast  -->
+  <!--  Snapshot  -->
+  <!--  Dialog  -->
+  <!--  Album  -->
+  <!--  Integration  -->
+  <!--  Cloud rules  -->
+  <!-- Advanced menu -->
+  <!--  Snapshot menu  -->
+</resources>
