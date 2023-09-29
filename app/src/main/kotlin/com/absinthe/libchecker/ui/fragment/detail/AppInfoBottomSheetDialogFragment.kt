@@ -8,7 +8,6 @@ import android.provider.DocumentsContract
 import android.provider.Settings
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
-import androidx.core.provider.DocumentsContractCompat
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
