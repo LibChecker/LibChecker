@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.PackageManagerCompat
-import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.recyclerview.adapter.detail.AppInfoAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.utils.PackageUtils
@@ -88,7 +87,7 @@ class AppInfoBottomSheetDialogFragment :
     }
 
     aiAdapter.also { adapter ->
-      adapter.setList(getResolveInfoList() + getMaterialFilesItem())
+      adapter.setList(getShowAppInfoList() + getShowAppSourceList())
       adapter.setOnItemClickListener { _, _, position ->
         adapter.data[position].let {
           runCatching {
@@ -104,7 +103,7 @@ class AppInfoBottomSheetDialogFragment :
     }
   }
 
-  private fun getResolveInfoList(): List<AppInfoAdapter.AppInfoItem> {
+  private fun getShowAppInfoList(): List<AppInfoAdapter.AppInfoItem> {
     return PackageManagerCompat.queryIntentActivities(
       Intent(Intent.ACTION_SHOW_APP_INFO),
       PackageManager.MATCH_DEFAULT_ONLY
@@ -115,35 +114,32 @@ class AppInfoBottomSheetDialogFragment :
           Intent(Intent.ACTION_SHOW_APP_INFO)
             .setComponent(ComponentName(it.activityInfo.packageName, it.activityInfo.name))
             .putExtra(Intent.EXTRA_PACKAGE_NAME, packageName)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         )
       }
   }
 
-  private fun getMaterialFilesItem(): List<AppInfoAdapter.AppInfoItem> {
+  private fun getShowAppSourceList(): List<AppInfoAdapter.AppInfoItem> {
     val pkg = packageName ?: return emptyList()
-
-    if (!PackageUtils.isAppInstalled(Constants.PackageNames.MATERIAL_FILES)) {
-      return emptyList()
-    }
-
     val sourceDir = runCatching {
       File(PackageUtils.getPackageInfo(pkg).applicationInfo.sourceDir).parent
     }.getOrNull() ?: return emptyList()
 
-    return listOf(
-      AppInfoAdapter.AppInfoItem(
-        PackageUtils.getPackageInfo(Constants.PackageNames.MATERIAL_FILES).applicationInfo,
-        Intent(Intent.ACTION_VIEW)
-          .setType(DocumentsContract.Document.MIME_TYPE_DIR)
-          .setComponent(
-            ComponentName(
-              Constants.PackageNames.MATERIAL_FILES,
-              "${Constants.PackageNames.MATERIAL_FILES}.filelist.FileListActivity"
-            )
-          )
-          .putExtra("org.openintents.extra.ABSOLUTE_PATH", sourceDir)
-          .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-      )
-    )
+    return PackageManagerCompat.queryIntentActivities(
+      Intent(Intent.ACTION_VIEW).also {
+        it.setType(DocumentsContract.Document.MIME_TYPE_DIR)
+      },
+      PackageManager.MATCH_DEFAULT_ONLY
+    ).filter { it.activityInfo.packageName != BuildConfig.APPLICATION_ID }
+      .map {
+        AppInfoAdapter.AppInfoItem(
+          it.activityInfo,
+          Intent(Intent.ACTION_VIEW)
+            .setType(DocumentsContract.Document.MIME_TYPE_DIR)
+            .setComponent(ComponentName(it.activityInfo.packageName, it.activityInfo.name))
+            .putExtra("org.openintents.extra.ABSOLUTE_PATH", sourceDir)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        )
+      }
   }
 }
