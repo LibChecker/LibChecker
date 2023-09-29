@@ -126,7 +126,6 @@ class AppInfoBottomSheetDialogFragment :
       File(PackageUtils.getPackageInfo(pkg).applicationInfo.sourceDir).parent
     }.getOrNull() ?: return emptyList()
 
-    DocumentsContractCompat.EXTRA_INITIAL_URI
     return PackageManagerCompat.queryIntentActivities(
       Intent(Intent.ACTION_VIEW).also {
         it.setType(DocumentsContract.Document.MIME_TYPE_DIR)
