@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.PackageManagerCompat
-import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.recyclerview.adapter.detail.AppInfoAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.utils.PackageUtils
@@ -144,33 +143,5 @@ class AppInfoBottomSheetDialogFragment :
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         )
       }
-  }
-
-  private fun getMaterialFilesItem(): List<AppInfoAdapter.AppInfoItem> {
-    val pkg = packageName ?: return emptyList()
-
-    if (!PackageUtils.isAppInstalled(Constants.PackageNames.MATERIAL_FILES)) {
-      return emptyList()
-    }
-
-    val sourceDir = runCatching {
-      File(PackageUtils.getPackageInfo(pkg).applicationInfo.sourceDir).parent
-    }.getOrNull() ?: return emptyList()
-
-    return listOf(
-      AppInfoAdapter.AppInfoItem(
-        PackageUtils.getPackageInfo(Constants.PackageNames.MATERIAL_FILES).applicationInfo,
-        Intent(Intent.ACTION_VIEW)
-          .setType(DocumentsContract.Document.MIME_TYPE_DIR)
-          .setComponent(
-            ComponentName(
-              Constants.PackageNames.MATERIAL_FILES,
-              "${Constants.PackageNames.MATERIAL_FILES}.filelist.FileListActivity"
-            )
-          )
-          .putExtra("org.openintents.extra.ABSOLUTE_PATH", sourceDir)
-          .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-      )
-    )
   }
 }
