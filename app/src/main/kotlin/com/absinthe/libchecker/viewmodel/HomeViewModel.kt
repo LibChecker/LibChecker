@@ -32,7 +32,6 @@ import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.dev.exception.AppListIncompleteException
 import com.absinthe.libchecker.model.LibChip
 import com.absinthe.libchecker.model.LibReference
 import com.absinthe.libchecker.model.LibStringItem
@@ -229,7 +228,6 @@ class HomeViewModel : ViewModel() {
        */
       if (!checked && (newApps.size > 30 || removedApps.size > 30)) {
         Timber.w("Request change canceled because of large diff, re-request appMap")
-        AppListIncompleteException.toggleAndSubmit(localApps, newApps, removedApps)
         launch {
           requestChange(true)
         }
