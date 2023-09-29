@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 package com.absinthe.libchecker.compat
 
 import android.content.Intent
