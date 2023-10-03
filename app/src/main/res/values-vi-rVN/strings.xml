@@ -4,8 +4,8 @@
   <string name="title_app_list">Ứng dụng</string>
   <string name="title_statistics">Hệ thống dữ liệu</string>
   <string name="title_snapshot">Chụp ảnh màn hình</string>
-  <string name="title_settings">Cài đặt</string>
-  <string name="title_album">bộ sưu tập</string>
+  <string name="title_settings">Thiết trí</string>
+  <string name="title_album">Chuyên tập</string>
   <string name="loading">Đang tải…</string>
   <string name="channel_shoot">Lưu màn hình chụp nhanh</string>
   <string name="noti_shoot_title">Đang lưu ảnh chụp màn hình hiện tại</string>
@@ -67,7 +67,7 @@
   <string name="colorful_icon">Biểu tượng đầy màu sắc</string>
   <string name="rules_repo_title">Quy tắc repo</string>
   <string name="lib_ref_threshold">Ngưỡng tham khảo thư viện</string>
-  <string name="languages">Ngôn ngữ</string>
+  <string name="languages">Ngữ Ngôn</string>
   <string name="reload_apps">Tải lại danh sách ứng dụng</string>
   <string name="help_docs">Tài liệu trợ giúp</string>
   <string name="join_telegram_group">Giao tiếp</string>
