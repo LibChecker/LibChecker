@@ -2,7 +2,11 @@ package ohos.bundle
 
 object AbilityInfo {
   enum class AbilityType {
-    DATA, PAGE, SERVICE, UNKNOWN, WEB
+    DATA,
+    PAGE,
+    SERVICE,
+    UNKNOWN,
+    WEB
   }
 
   var type = AbilityType.PAGE
