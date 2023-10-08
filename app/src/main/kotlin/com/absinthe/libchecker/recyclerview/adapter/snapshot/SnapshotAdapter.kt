@@ -214,6 +214,7 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
   }
 
   enum class CardMode {
-    NORMAL, DEMO
+    NORMAL,
+    DEMO
   }
 }

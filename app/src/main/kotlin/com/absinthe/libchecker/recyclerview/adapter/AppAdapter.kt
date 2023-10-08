@@ -170,6 +170,7 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
   }
 
   enum class CardMode {
-    NORMAL, DEMO
+    NORMAL,
+    DEMO
   }
 }
