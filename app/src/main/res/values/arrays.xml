@@ -22,6 +22,7 @@
     <item>vi</item>
     <item>in</item>
     <item>pt</item>
+    <item>ar</item>
   </string-array>
 
   <string-array name="language_value" translatable="false">
@@ -36,6 +37,7 @@
     <item>vi-VN</item>
     <item>in-ID</item>
     <item>pt-BR</item>
+    <item>ar-SA</item>
   </string-array>
 
   <string-array name="list_dark_mode" tools:ignore="InconsistentArrays">
