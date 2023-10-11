@@ -122,7 +122,13 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
           item.packageSizeDiff.old.sizeToString(context),
           item.packageSizeDiff.new?.sizeToString(context)
         )
-        packageSizeInfo.text = LCAppUtils.getDiffString(sizeDiff, isNewOrDeleted)
+        val diffText = LCAppUtils.getDiffString(sizeDiff, isNewOrDeleted)
+        if (item.packageSizeDiff.new != null) {
+          val percentage = (item.packageSizeDiff.new.toDouble() / item.packageSizeDiff.old) * 100.0
+          packageSizeInfo.text = diffText.plus(String.format(", %.1f%%", percentage))
+        } else {
+          packageSizeInfo.text = diffText
+        }
       } else {
         packageSizeInfo.isGone = true
       }
