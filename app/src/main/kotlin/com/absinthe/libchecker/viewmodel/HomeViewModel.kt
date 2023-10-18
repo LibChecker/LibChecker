@@ -40,6 +40,7 @@ import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getFeatures
@@ -199,7 +200,22 @@ class HomeViewModel : ViewModel() {
         requestChangeJob?.cancel()
       }
 
-      requestChangeJob = requestChangeImpl(LocalAppDataSource.getApplicationMap(), checked)
+      val appMap = if (checked) {
+        val newPackageManager = LibCheckerApp.app.packageManager
+        val flags = PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS
+        (if (OsUtils.atLeastT()) {
+          newPackageManager.getInstalledPackages(PackageManager.PackageInfoFlags.of(flags.toLong()))
+        } else {
+          newPackageManager.getInstalledPackages(flags)
+        }).asSequence()
+          .filter { it.applicationInfo.sourceDir != null || it.applicationInfo.publicSourceDir != null }
+          .map { it.packageName to it }
+          .toMap()
+      } else {
+        LocalAppDataSource.getApplicationMap()
+      }
+
+      requestChangeJob = requestChangeImpl(appMap, checked)
     }
   }
 
