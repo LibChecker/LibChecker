@@ -203,11 +203,12 @@ class HomeViewModel : ViewModel() {
       val appMap = if (checked) {
         val newPackageManager = LibCheckerApp.app.packageManager
         val flags = PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS
-        (if (OsUtils.atLeastT()) {
+        val appList = if (OsUtils.atLeastT()) {
           newPackageManager.getInstalledPackages(PackageManager.PackageInfoFlags.of(flags.toLong()))
         } else {
           newPackageManager.getInstalledPackages(flags)
-        }).asSequence()
+        }
+        appList.asSequence()
           .filter { it.applicationInfo.sourceDir != null || it.applicationInfo.publicSourceDir != null }
           .map { it.packageName to it }
           .toMap()
