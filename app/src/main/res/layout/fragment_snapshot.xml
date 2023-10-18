@@ -39,12 +39,11 @@
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:clipToPadding="false"
-      android:paddingTop="?actionBarSize"
       android:scrollbars="none"
       app:borderBottomVisibility="never"
       app:borderTopDrawable="@null"
       app:borderTopVisibility="whenTop"
-      app:fitsSystemWindowsInsets="bottom|top" />
+      app:fitsSystemWindowsInsets="bottom" />
 
   </com.absinthe.libchecker.view.app.CustomViewFlipper>
 
