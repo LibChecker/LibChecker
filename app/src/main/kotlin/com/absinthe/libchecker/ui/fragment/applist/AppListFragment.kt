@@ -32,7 +32,6 @@ import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.fragment.IAppBarContainer
 import com.absinthe.libchecker.ui.main.INavViewContainer
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.isPreinstalled
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
@@ -42,7 +41,6 @@ import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import com.absinthe.libraries.utils.utils.UiUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import jonathanfinerty.once.Once
@@ -109,7 +107,6 @@ class AppListFragment :
           }
         setHasFixedSize(true)
         FastScrollerBuilder(this).useMd2Style().build()
-        addPaddingTop(UiUtils.getStatusBarHeight())
         addOnScrollListener(object : RecyclerView.OnScrollListener() {
           override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             if (dx == 0 && dy == 0) {

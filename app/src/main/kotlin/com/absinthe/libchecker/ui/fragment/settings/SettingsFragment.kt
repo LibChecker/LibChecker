@@ -34,12 +34,10 @@ import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.UiUtils
-import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.setBottomPaddingSpace
 import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libraries.utils.extensions.getBoolean
-import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.rulesbundle.LCRemoteRepo
 import com.absinthe.rulesbundle.LCRules
@@ -355,7 +353,6 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
       super.onCreateRecyclerView(inflater, parent, savedInstanceState) as BorderRecyclerView
     recyclerView.id = android.R.id.list
     recyclerView.fixEdgeEffect()
-    recyclerView.addPaddingTop(SystemBarManager.statusBarSize)
     recyclerView.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
     recyclerView.isVerticalScrollBarEnabled = false
 
