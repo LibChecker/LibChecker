@@ -355,7 +355,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
       super.onCreateRecyclerView(inflater, parent, savedInstanceState) as BorderRecyclerView
     recyclerView.id = android.R.id.list
     recyclerView.fixEdgeEffect()
-    // recyclerView.addPaddingTop(SystemBarManager.statusBarSize)
+    recyclerView.addPaddingTop(SystemBarManager.statusBarSize)
     recyclerView.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
     recyclerView.isVerticalScrollBarEnabled = false
 
@@ -372,10 +372,10 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     }
 
     borderViewDelegate = recyclerView.borderViewDelegate
-    // borderViewDelegate.borderVisibilityChangedListener =
-    //   BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-    //     scheduleAppbarRaisingStatus(!top)
-    //   }
+    borderViewDelegate.borderVisibilityChangedListener =
+      BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
+        scheduleAppbarRaisingStatus(!top)
+      }
 
     prefRecyclerView = recyclerView
     return recyclerView
