@@ -14,6 +14,7 @@ plugins {
 
 ksp {
   arg("moshi.generated", "javax.annotation.Generated")
+  arg("room.generateKotlin", "true")
   arg("room.incremental", "true")
   arg("room.schemaLocation", "$projectDir/schemas")
   arg("room.expandProjection", "true")
