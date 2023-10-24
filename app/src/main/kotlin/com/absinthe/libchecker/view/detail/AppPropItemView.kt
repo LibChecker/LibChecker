@@ -53,7 +53,7 @@ class AppPropItemView(context: Context) : AViewGroup(context) {
     layoutParams = LayoutParams(24.dp, 24.dp).also {
       it.marginStart = 8.dp
     }
-    scaleType = ImageView.ScaleType.CENTER_CROP
+    scaleType = ImageView.ScaleType.CENTER
     setImageResource(R.drawable.ic_outline_change_circle_24)
     setBackgroundDrawable(context.getDrawableByAttr(com.google.android.material.R.attr.selectableItemBackgroundBorderless))
     isVisible = false
@@ -79,11 +79,11 @@ class AppPropItemView(context: Context) : AViewGroup(context) {
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-    val textWidth = measuredWidth - paddingStart - paddingEnd
+    linkToIcon.autoMeasure()
+    val textWidth = measuredWidth - paddingStart - paddingEnd - linkToIcon.measuredWidth
     tip.measure(textWidth.toExactlyMeasureSpec(), tip.defaultHeightMeasureSpec(this))
     key.measure(textWidth.toExactlyMeasureSpec(), key.defaultHeightMeasureSpec(this))
     value.measure(textWidth.toExactlyMeasureSpec(), value.defaultHeightMeasureSpec(this))
-    linkToIcon.autoMeasure()
     setMeasuredDimension(
       measuredWidth,
       paddingTop + paddingBottom + tip.measuredHeight + key.measuredHeight + value.measuredHeight
