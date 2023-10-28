@@ -187,7 +187,19 @@ class SnapshotDetailActivity :
           entity.packageSizeDiff.old.sizeToString(this@SnapshotDetailActivity),
           entity.packageSizeDiff.new?.sizeToString(this@SnapshotDetailActivity)
         )
-        snapshotTitle.packageSizeView.text = LCAppUtils.getDiffString(sizeDiff, isNewOrDeleted)
+        val sizeDiffAppend = StringBuilder(LCAppUtils.getDiffString(sizeDiff, isNewOrDeleted))
+        if (entity.packageSizeDiff.new != null) {
+          val diffSize = entity.packageSizeDiff.new!! - entity.packageSizeDiff.old
+          val diffSizeText = buildString {
+            append(if (diffSize > 0) "+" else "")
+            append(diffSize.sizeToString(this@SnapshotDetailActivity))
+          }
+
+          if (diffSize != 0L) {
+            sizeDiffAppend.append(", $diffSizeText")
+          }
+        }
+        snapshotTitle.packageSizeView.text = sizeDiffAppend
       } else {
         snapshotTitle.packageSizeView.isVisible = false
       }
