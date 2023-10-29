@@ -111,6 +111,7 @@ class ApkDetailActivity : BaseAppDetailActivity(), IDetailContainer {
                   onPackageInfoAvailable(pi, null)
                   dialog.dismiss()
                 } ?: run {
+                  Timber.d("PackageParser sdk version=${PackageParser.SDK_VERSION}")
                   // bypass PackageParser check
                   // see also: https://cs.android.com/android/platform/superproject/main/+/main:frameworks/base/core/java/android/content/pm/PackageParser.java;l=2695
                   @Suppress("SoonBlockedPrivateApi")
