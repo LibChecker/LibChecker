@@ -11,6 +11,7 @@ import androidx.annotation.MainThread
 import androidx.annotation.StringRes
 import com.absinthe.libchecker.view.app.ToastView
 import java.lang.ref.WeakReference
+import timber.log.Timber
 
 /**
  * <pre>
@@ -81,6 +82,7 @@ fun Context.showToast(message: String) {
 
 @AnyThread
 fun Context.showToast(@StringRes res: Int) {
+  Timber.d("showToast: ${getString(res)}")
   Toasty.showShort(this, res)
 }
 

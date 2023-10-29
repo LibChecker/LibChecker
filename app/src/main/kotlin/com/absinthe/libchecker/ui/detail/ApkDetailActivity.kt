@@ -2,9 +2,7 @@ package com.absinthe.libchecker.ui.detail
 
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.pm.PackageParser
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import androidx.lifecycle.lifecycleScope
@@ -111,30 +109,7 @@ class ApkDetailActivity : BaseAppDetailActivity(), IDetailContainer {
                   onPackageInfoAvailable(pi, null)
                   dialog.dismiss()
                 } ?: run {
-                  Timber.d("PackageParser sdk version=${PackageParser.SDK_VERSION}")
-                  // bypass PackageParser check
-                  // see also: https://cs.android.com/android/platform/superproject/main/+/main:frameworks/base/core/java/android/content/pm/PackageParser.java;l=2695
-                  @Suppress("SoonBlockedPrivateApi")
-                  PackageParser::class.java.getDeclaredField("SDK_VERSION").apply {
-                    isAccessible = true
-                    set(null, Integer.MAX_VALUE)
-                  }
-
-                  PackageManagerCompat.getPackageArchiveInfo(tf.path, flag)?.also {
-                    it.applicationInfo.sourceDir = tf.path
-                    it.applicationInfo.publicSourceDir = tf.path
-                  }?.let { pi ->
-                    onPackageInfoAvailable(pi, null)
-                    dialog.dismiss()
-                  } ?: run {
-                    finish()
-                  }
-
-                  @Suppress("SoonBlockedPrivateApi")
-                  PackageParser::class.java.getDeclaredField("SDK_VERSION").apply {
-                    set(null, Build.VERSION.SDK_INT)
-                    isAccessible = false
-                  }
+                  finish()
                 }
               }
             } else {
