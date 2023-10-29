@@ -3,6 +3,7 @@ package com.absinthe.libchecker
 import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
+import android.content.pm.PackageParser
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.window.embedding.RuleController
 import androidx.window.embedding.SplitController
@@ -47,6 +48,7 @@ class LibCheckerApp : Application() {
     if (OsUtils.atLeastP()) {
       HiddenApiBypass.addHiddenApiExemptions("")
     }
+    bypassPackageParserCheck()
 
     app = this
     if (!BuildConfig.DEBUG && GlobalValues.isAnonymousAnalyticsEnabled.value == true) {
@@ -113,6 +115,16 @@ class LibCheckerApp : Application() {
           }
         )
       }
+    }
+  }
+
+  private fun bypassPackageParserCheck() {
+    // bypass PackageParser check
+    // see also: https://cs.android.com/android/platform/superproject/main/+/main:frameworks/base/core/java/android/content/pm/PackageParser.java;l=2695
+    @Suppress("SoonBlockedPrivateApi")
+    PackageParser::class.java.getDeclaredField("SDK_VERSION").apply {
+      isAccessible = true
+      set(null, Integer.MAX_VALUE)
     }
   }
 
