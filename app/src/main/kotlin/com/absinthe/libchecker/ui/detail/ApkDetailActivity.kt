@@ -104,7 +104,21 @@ class ApkDetailActivity : BaseAppDetailActivity(), IDetailContainer {
                     or PackageManager.MATCH_DISABLED_COMPONENTS
                     or PackageManager.MATCH_UNINSTALLED_PACKAGES
                   )
-                try {
+                PackageManagerCompat.getPackageArchiveInfo(tf.path, flag)?.also {
+                  it.applicationInfo.sourceDir = tf.path
+                  it.applicationInfo.publicSourceDir = tf.path
+                }?.let { pi ->
+                  onPackageInfoAvailable(pi, null)
+                  dialog.dismiss()
+                } ?: run {
+                  // bypass PackageParser check
+                  // see also: https://cs.android.com/android/platform/superproject/main/+/main:frameworks/base/core/java/android/content/pm/PackageParser.java;l=2695
+                  @Suppress("SoonBlockedPrivateApi")
+                  PackageParser::class.java.getDeclaredField("SDK_VERSION").apply {
+                    isAccessible = true
+                    set(null, Integer.MAX_VALUE)
+                  }
+
                   PackageManagerCompat.getPackageArchiveInfo(tf.path, flag)?.also {
                     it.applicationInfo.sourceDir = tf.path
                     it.applicationInfo.publicSourceDir = tf.path
@@ -114,34 +128,11 @@ class ApkDetailActivity : BaseAppDetailActivity(), IDetailContainer {
                   } ?: run {
                     finish()
                   }
-                } catch (e: Exception) {
-                  Timber.e(e)
-                  if (e is PackageParser.PackageParserException && e.message?.contains("Requires newer sdk version", true) == true) {
-                    // bypass PackageParser check
-                    // see also: https://cs.android.com/android/platform/superproject/main/+/main:frameworks/base/core/java/android/content/pm/PackageParser.java;l=2695
-                    @Suppress("SoonBlockedPrivateApi")
-                    PackageParser::class.java.getDeclaredField("SDK_VERSION").apply {
-                      isAccessible = true
-                      set(null, Integer.MAX_VALUE)
-                    }
 
-                    PackageManagerCompat.getPackageArchiveInfo(tf.path, flag)?.also {
-                      it.applicationInfo.sourceDir = tf.path
-                      it.applicationInfo.publicSourceDir = tf.path
-                    }?.let { pi ->
-                      onPackageInfoAvailable(pi, null)
-                      dialog.dismiss()
-                    } ?: run {
-                      finish()
-                    }
-
-                    @Suppress("SoonBlockedPrivateApi")
-                    PackageParser::class.java.getDeclaredField("SDK_VERSION").apply {
-                      set(null, Build.VERSION.SDK_INT)
-                      isAccessible = false
-                    }
-                  } else {
-                    throw e
+                  @Suppress("SoonBlockedPrivateApi")
+                  PackageParser::class.java.getDeclaredField("SDK_VERSION").apply {
+                    set(null, Build.VERSION.SDK_INT)
+                    isAccessible = false
                   }
                 }
               }
