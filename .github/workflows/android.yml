@@ -45,6 +45,8 @@ jobs:
           java-version: 17
       - uses: gradle/wrapper-validation-action@v1
       - uses: gradle/gradle-build-action@v2
+        with:
+          gradle-home-cache-cleanup: true
       - run: ./gradlew lintKotlin
 
   build:
@@ -60,6 +62,8 @@ jobs:
           distribution: 'zulu'
           java-version: 17
       - uses: gradle/gradle-build-action@v2
+        with:
+          gradle-home-cache-cleanup: true
       - name: Retrieve version
         run: |
           echo VERSION=$(echo ${{ github.event.head_commit.id }} | head -c 10) >> $GITHUB_ENV
