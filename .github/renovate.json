@@ -7,13 +7,14 @@
   ],
   "packageRules": [
     {
+      "groupName": "Kotlin, KSP and MoshiX",
       "matchPackagePrefixes": [
-        "org.jetbrains.kotlin",
         "com.google.devtools.ksp",
+        "dev.zacsweers.moshix"
       ],
-      "excludePackagePrefixes": ["org.jetbrains.kotlinx"],
-      "groupName": "kotlin-based dependencies",
-      "automerge": true
+      "matchPackagePatterns": [
+        "org.jetbrains.kotlin.*"
+      ]
     }
   ]
 }
