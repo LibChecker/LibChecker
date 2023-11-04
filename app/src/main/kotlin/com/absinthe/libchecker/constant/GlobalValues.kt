@@ -4,8 +4,11 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
 import com.absinthe.libchecker.BuildConfig
-import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
-import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.constant.options.AdvancedOptions
+import com.absinthe.libchecker.constant.options.LibReferenceOptions
+import com.absinthe.libchecker.constant.options.SnapshotOptions
+import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
+import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.SPDelegates
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
@@ -62,7 +65,7 @@ object GlobalValues {
 
   val libReferenceThresholdLiveData: MutableLiveData<Int> = MutableLiveData(libReferenceThreshold)
 
-  val season by unsafeLazy { LCAppUtils.getCurrentSeason() }
+  val season by unsafeLazy { DateUtils.getCurrentSeason() }
 
   var locale: Locale = Locale.getDefault()
     get() {

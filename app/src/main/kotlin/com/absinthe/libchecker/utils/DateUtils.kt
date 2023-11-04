@@ -3,6 +3,10 @@ package com.absinthe.libchecker.utils
 import android.icu.util.Calendar
 import android.icu.util.ChineseCalendar
 import android.icu.util.GregorianCalendar
+import com.absinthe.libchecker.annotation.AUTUMN
+import com.absinthe.libchecker.annotation.SPRING
+import com.absinthe.libchecker.annotation.SUMMER
+import com.absinthe.libchecker.annotation.WINTER
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -141,5 +145,29 @@ object DateUtils {
     val timestampDay = calendar.get(Calendar.DAY_OF_MONTH)
 
     return todayYear == timestampYear && todayMonth == timestampMonth && todayDay == timestampDay
+  }
+
+  fun getCurrentSeason(): Int {
+    return when (java.util.Calendar.getInstance(Locale.getDefault()).get(java.util.Calendar.MONTH) + 1) {
+      3, 4, 5 -> SPRING
+      6, 7, 8 -> SUMMER
+      9, 10, 11 -> AUTUMN
+      12, 1, 2 -> WINTER
+      else -> -1
+    }
+  }
+
+  fun getCurrentSeasonString(season: Int = getCurrentSeason()): String {
+    return when (season) {
+      SPRING -> "Spring"
+      SUMMER -> "Summer"
+      AUTUMN -> "Autumn"
+      WINTER -> "Winter"
+      else -> ""
+    }
+  }
+
+  fun getNextSeasonString(): String {
+    return getCurrentSeasonString((getCurrentSeason() + 1) % 4)
   }
 }

@@ -32,7 +32,7 @@ import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
-import com.absinthe.libchecker.ui.main.MainActivity
+import com.absinthe.libchecker.features.home.ui.MainActivity
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getAppName

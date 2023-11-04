@@ -10,8 +10,8 @@ import androidx.core.content.pm.PackageInfoCompat
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.compat.ZipFileCompat
 import com.absinthe.libchecker.database.entity.Features
-import com.absinthe.libchecker.model.KotlinToolingMetadata
-import com.absinthe.libchecker.model.LibStringItem
+import com.absinthe.libchecker.features.applist.detail.bean.KotlinToolingMetadata
+import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
