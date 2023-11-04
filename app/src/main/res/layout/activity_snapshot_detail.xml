@@ -8,7 +8,7 @@
   app:consumeSystemWindowsInsets="start|end"
   app:edgeToEdge="true"
   app:fitsSystemWindowsInsets="start|end|top"
-  tools:context=".ui.detail.SnapshotDetailActivity">
+  tools:context=".features.snapshot.detail.ui.SnapshotDetailActivity">
 
   <com.google.android.material.appbar.AppBarLayout
     android:id="@+id/header_layout"
@@ -25,7 +25,7 @@
       app:expandedTitleTextAppearance="@style/AboutPage.Header.ToolbarTitleExpanded"
       app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
-      <com.absinthe.libchecker.view.snapshot.SnapshotTitleView
+      <com.absinthe.libchecker.features.snapshot.detail.ui.view.SnapshotTitleView
         android:id="@+id/snapshot_title"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

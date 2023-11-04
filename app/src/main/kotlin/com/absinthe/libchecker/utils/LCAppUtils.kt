@@ -16,13 +16,13 @@ import com.absinthe.libchecker.annotation.SUMMER
 import com.absinthe.libchecker.annotation.WINTER
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.URLManager
-import com.absinthe.libchecker.model.LibStringItem
-import com.absinthe.libchecker.model.SnapshotDiffItem
-import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
+import com.absinthe.libchecker.features.statistics.bean.LibStringItem
+import com.absinthe.libchecker.features.snapshot.detail.bean.SnapshotDiffItem
+import com.absinthe.libchecker.features.snapshot.ui.adapter.ARROW
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.isTempApk
 import com.absinthe.libchecker.utils.extensions.toClassDefType
-import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
+import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
 import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.Rule
 import java.io.File

@@ -26,7 +26,7 @@
     tools:targetApi="34">
 
     <activity
-      android:name=".ui.main.MainActivity"
+      android:name=".features.home.ui.MainActivity"
       android:configChanges="orientation"
       android:exported="true"
       android:launchMode="singleTop">
@@ -44,7 +44,7 @@
         android:resource="@xml/shortcuts" />
     </activity>
     <activity
-      android:name=".ui.detail.AppDetailActivity"
+      android:name=".features.applist.detail.ui.AppDetailActivity"
       android:configChanges="orientation"
       android:exported="true"
       android:launchMode="singleTask">
@@ -65,7 +65,7 @@
       </intent-filter>
     </activity>
     <activity
-      android:name=".ui.detail.ApkDetailActivity"
+      android:name=".features.applist.detail.ui.ApkDetailActivity"
       android:configChanges="orientation"
       android:exported="true"
       android:label="@string/detail_label"
@@ -83,14 +83,14 @@
       </intent-filter>
     </activity>
     <activity
-      android:name=".ui.detail.SnapshotDetailActivity"
+      android:name=".features.snapshot.detail.ui.SnapshotDetailActivity"
       android:configChanges="orientation" />
     <activity
-      android:name=".ui.snapshot.AlbumActivity"
+      android:name=".features.album.ui.AlbumActivity"
       android:configChanges="orientation"
       android:label="@string/title_album" />
     <activity
-      android:name=".ui.album.BackupActivity"
+      android:name=".features.album.backup.ui.BackupActivity"
       android:exported="true"
       android:label="@string/album_item_backup_restore_title">
       <intent-filter>
@@ -101,7 +101,7 @@
       </intent-filter>
     </activity>
     <activity
-      android:name=".ui.album.ComparisonActivity"
+      android:name=".features.album.comparison.ui.ComparisonActivity"
       android:exported="true"
       android:label="@string/album_item_comparison_title">
       <intent-filter>
@@ -111,18 +111,18 @@
       </intent-filter>
     </activity>
     <activity
-      android:name=".ui.album.TrackActivity"
+      android:name=".features.album.track.ui.TrackActivity"
       android:label="@string/album_item_track_title" />
     <activity
-      android:name=".ui.main.LibReferenceActivity"
+      android:name=".features.statistics.ui.LibReferenceActivity"
       android:configChanges="orientation"
       android:label="@string/tab_lib_reference_statistics"
       android:launchMode="singleTask" />
     <activity
-      android:name=".ui.main.ChartActivity"
+      android:name=".features.chart.ui.ChartActivity"
       android:label="@string/tab_chart" />
     <activity
-      android:name=".ui.about.AboutActivity"
+      android:name=".features.about.ui.AboutActivity"
       android:label="@string/settings_about"
       android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar" />
     <activity

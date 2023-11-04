@@ -10,7 +10,7 @@
 
     <intent
       android:action="android.intent.action.VIEW"
-      android:targetClass="com.absinthe.libchecker.ui.main.ChartActivity"
+      android:targetClass="com.absinthe.libchecker.features.chart.ui.ChartActivity"
       android:targetPackage="com.absinthe.libchecker" />
   </shortcut>
 
@@ -21,7 +21,7 @@
 
     <intent
       android:action="com.absinthe.libchecker.intent.action.START_STATISTICS"
-      android:targetClass="com.absinthe.libchecker.ui.main.MainActivity"
+      android:targetClass="com.absinthe.libchecker.features.home.ui.MainActivity"
       android:targetPackage="com.absinthe.libchecker" />
   </shortcut>
 
@@ -32,7 +32,7 @@
 
     <intent
       android:action="com.absinthe.libchecker.intent.action.START_SNAPSHOT"
-      android:targetClass="com.absinthe.libchecker.ui.main.MainActivity"
+      android:targetClass="com.absinthe.libchecker.features.home.ui.MainActivity"
       android:targetPackage="com.absinthe.libchecker" />
   </shortcut>
 

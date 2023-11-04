@@ -4,7 +4,7 @@
   android:layout_width="match_parent"
   android:layout_height="match_parent"
   xmlns:tools="http://schemas.android.com/tools"
-  tools:context=".ui.fragment.snapshot.SnapshotFragment">
+  tools:context=".features.snapshot.ui.SnapshotFragment">
 
   <com.absinthe.libchecker.view.app.CustomViewFlipper
     android:id="@+id/vf_container"

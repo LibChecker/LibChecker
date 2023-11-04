@@ -7,14 +7,14 @@ import androidx.fragment.app.FragmentActivity
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.model.DetailExtraBean
-import com.absinthe.libchecker.ui.detail.AppDetailActivity
-import com.absinthe.libchecker.ui.detail.EXTRA_DETAIL_BEAN
-import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
-import com.absinthe.libchecker.ui.fragment.detail.EXTRA_LC_ITEM
-import com.absinthe.libchecker.ui.fragment.detail.OverlayDetailBottomSheetDialogFragment
-import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
-import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
+import com.absinthe.libchecker.features.applist.detail.bean.DetailExtraBean
+import com.absinthe.libchecker.features.applist.detail.ui.AppDetailActivity
+import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_DETAIL_BEAN
+import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_PACKAGE_NAME
+import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_LC_ITEM
+import com.absinthe.libchecker.features.applist.detail.ui.OverlayDetailBottomSheetDialogFragment
+import com.absinthe.libchecker.features.statistics.ui.EXTRA_REF_NAME
+import com.absinthe.libchecker.features.statistics.ui.EXTRA_REF_TYPE
 
 fun FragmentActivity.launchDetailPage(item: LCItem, refName: String? = null, refType: Int = NATIVE) {
   findViewById<View>(androidx.appcompat.R.id.search_src_text)?.clearFocus()
