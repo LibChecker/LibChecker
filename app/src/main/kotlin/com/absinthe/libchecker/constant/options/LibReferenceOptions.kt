@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.constant
+package com.absinthe.libchecker.constant.options
 
 object LibReferenceOptions {
   const val NATIVE_LIBS = 1 shl 0

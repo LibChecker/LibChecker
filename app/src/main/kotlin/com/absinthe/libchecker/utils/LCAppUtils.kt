@@ -8,52 +8,22 @@ import android.text.SpannableStringBuilder
 import androidx.core.text.toSpannable
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.annotation.AUTUMN
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
-import com.absinthe.libchecker.annotation.SPRING
-import com.absinthe.libchecker.annotation.SUMMER
-import com.absinthe.libchecker.annotation.WINTER
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.URLManager
-import com.absinthe.libchecker.features.statistics.bean.LibStringItem
+import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
 import com.absinthe.libchecker.features.snapshot.detail.bean.SnapshotDiffItem
 import com.absinthe.libchecker.features.snapshot.ui.adapter.ARROW
+import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.isTempApk
 import com.absinthe.libchecker.utils.extensions.toClassDefType
-import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
 import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.Rule
 import java.io.File
-import java.util.Calendar
-import java.util.Locale
 
 object LCAppUtils {
-
-  fun getCurrentSeason(): Int {
-    return when (Calendar.getInstance(Locale.getDefault()).get(Calendar.MONTH) + 1) {
-      3, 4, 5 -> SPRING
-      6, 7, 8 -> SUMMER
-      9, 10, 11 -> AUTUMN
-      12, 1, 2 -> WINTER
-      else -> -1
-    }
-  }
-
-  fun getCurrentSeasonString(season: Int = getCurrentSeason()): String {
-    return when (season) {
-      SPRING -> "Spring"
-      SUMMER -> "Summer"
-      AUTUMN -> "Autumn"
-      WINTER -> "Winter"
-      else -> ""
-    }
-  }
-
-  fun getNextSeasonString(): String {
-    return getCurrentSeasonString((getCurrentSeason() + 1) % 4)
-  }
 
   fun setTitle(context: Context): Spannable {
     val sb = SpannableStringBuilder(context.getString(R.string.app_name))

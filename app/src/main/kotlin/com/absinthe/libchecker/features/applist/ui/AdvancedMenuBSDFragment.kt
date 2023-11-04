@@ -2,7 +2,7 @@ package com.absinthe.libchecker.features.applist.ui
 
 import android.content.DialogInterface
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.AdvancedOptions
+import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.features.applist.ui.view.AdvancedMenuBSDView
 import com.absinthe.libchecker.features.applist.ui.view.AdvancedMenuItemView

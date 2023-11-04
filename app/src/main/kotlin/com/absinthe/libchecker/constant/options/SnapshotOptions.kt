@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.constant
+package com.absinthe.libchecker.constant.options
 
 object SnapshotOptions {
   const val SHOW_UPDATE_TIME = 1 shl 0

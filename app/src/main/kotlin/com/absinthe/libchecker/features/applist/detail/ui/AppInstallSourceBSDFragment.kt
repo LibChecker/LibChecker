@@ -11,7 +11,7 @@ import androidx.core.text.scale
 import androidx.core.view.isGone
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.AdvancedOptions
+import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues

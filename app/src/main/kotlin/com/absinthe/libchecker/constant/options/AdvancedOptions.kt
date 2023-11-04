@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.constant
+package com.absinthe.libchecker.constant.options
 
 object AdvancedOptions {
   const val SHOW_SYSTEM_APPS = 1 shl 0

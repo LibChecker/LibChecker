@@ -3,7 +3,7 @@ package com.absinthe.libchecker.features.statistics.ui
 import android.content.DialogInterface
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.LibReferenceOptions
+import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.features.statistics.ui.view.LibReferenceMenuBSDView
 import com.absinthe.libchecker.features.statistics.ui.view.LibReferenceMenuItemView
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment

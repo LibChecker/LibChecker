@@ -9,12 +9,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.features.snapshot.detail.bean.SnapshotDiffItem
-import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.features.home.ui.adapter.AdvancedMenuAdapter
+import com.absinthe.libchecker.features.snapshot.detail.bean.SnapshotDiffItem
 import com.absinthe.libchecker.features.snapshot.ui.adapter.SnapshotAdapter
+import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.DateUtils
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
@@ -49,7 +48,7 @@ class SnapshotMenuBSDView(context: Context) : LinearLayout(context), IHeaderView
       SnapshotDiffItem(
         packageName = Constants.EXAMPLE_PACKAGE,
         updateTime = System.currentTimeMillis(),
-        labelDiff = SnapshotDiffItem.DiffNode(LCAppUtils.getCurrentSeasonString(), LCAppUtils.getNextSeasonString()),
+        labelDiff = SnapshotDiffItem.DiffNode(DateUtils.getCurrentSeasonString(), DateUtils.getNextSeasonString()),
         versionNameDiff = SnapshotDiffItem.DiffNode("2020.3.19", DateUtils.getToday()),
         versionCodeDiff = SnapshotDiffItem.DiffNode(1120, BuildConfig.VERSION_CODE.toLong()),
         abiDiff = SnapshotDiffItem.DiffNode(Constants.ARMV7.toShort(), Constants.ARMV8.toShort()),
