@@ -6,8 +6,8 @@ import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.app.SystemServices
-import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.features.applist.detail.ui.view.PermissionInfoBottomSheetView
+import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.launch

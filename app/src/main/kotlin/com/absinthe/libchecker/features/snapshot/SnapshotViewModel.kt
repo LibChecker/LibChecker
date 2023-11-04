@@ -24,14 +24,14 @@ import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.features.snapshot.detail.bean.ADDED
 import com.absinthe.libchecker.features.snapshot.detail.bean.CHANGED
-import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.features.snapshot.detail.bean.MOVED
 import com.absinthe.libchecker.features.snapshot.detail.bean.REMOVED
 import com.absinthe.libchecker.features.snapshot.detail.bean.SnapshotDetailItem
 import com.absinthe.libchecker.features.snapshot.detail.bean.SnapshotDiffItem
+import com.absinthe.libchecker.features.snapshot.ui.adapter.ARROW
+import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.protocol.Snapshot
 import com.absinthe.libchecker.protocol.SnapshotList
-import com.absinthe.libchecker.features.snapshot.ui.adapter.ARROW
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getAppName

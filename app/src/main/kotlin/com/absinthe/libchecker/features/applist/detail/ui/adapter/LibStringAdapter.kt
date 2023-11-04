@@ -25,14 +25,18 @@ import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.STATIC
-import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.options.AdvancedOptions
+import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_TEXT
+import com.absinthe.libchecker.features.applist.detail.ui.XmlBSDFragment
+import com.absinthe.libchecker.features.applist.detail.ui.view.ComponentLibItemView
+import com.absinthe.libchecker.features.applist.detail.ui.view.MetadataLibItemView
+import com.absinthe.libchecker.features.applist.detail.ui.view.NativeLibItemView
+import com.absinthe.libchecker.features.applist.detail.ui.view.StaticLibItemView
 import com.absinthe.libchecker.features.statistics.bean.DISABLED
 import com.absinthe.libchecker.features.statistics.bean.EXPORTED
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
-import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_TEXT
-import com.absinthe.libchecker.features.applist.detail.ui.XmlBSDFragment
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
@@ -40,10 +44,6 @@ import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.tintTextToPrimary
 import com.absinthe.libchecker.utils.manifest.ResourceParser
-import com.absinthe.libchecker.features.applist.detail.ui.view.ComponentLibItemView
-import com.absinthe.libchecker.features.applist.detail.ui.view.MetadataLibItemView
-import com.absinthe.libchecker.features.applist.detail.ui.view.NativeLibItemView
-import com.absinthe.libchecker.features.applist.detail.ui.view.StaticLibItemView
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import timber.log.Timber
 

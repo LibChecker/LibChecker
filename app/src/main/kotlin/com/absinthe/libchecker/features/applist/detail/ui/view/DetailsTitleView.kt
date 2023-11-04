@@ -12,8 +12,8 @@ import androidx.core.view.marginTop
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.ui.adapter.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.AbiLabelsAdapter
+import com.absinthe.libchecker.ui.adapter.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize

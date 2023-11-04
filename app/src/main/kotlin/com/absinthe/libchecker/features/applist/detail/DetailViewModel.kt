@@ -25,13 +25,13 @@ import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.Features
+import com.absinthe.libchecker.features.applist.LocatedCount
+import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
+import com.absinthe.libchecker.features.applist.detail.bean.StatefulComponent
 import com.absinthe.libchecker.features.statistics.bean.DISABLED
 import com.absinthe.libchecker.features.statistics.bean.LibChip
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
-import com.absinthe.libchecker.features.applist.detail.bean.StatefulComponent
-import com.absinthe.libchecker.features.applist.LocatedCount
-import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.OsUtils

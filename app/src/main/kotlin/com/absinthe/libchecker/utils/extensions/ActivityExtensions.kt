@@ -10,8 +10,8 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.features.applist.detail.bean.DetailExtraBean
 import com.absinthe.libchecker.features.applist.detail.ui.AppDetailActivity
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_DETAIL_BEAN
-import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_LC_ITEM
+import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.features.applist.detail.ui.OverlayDetailBottomSheetDialogFragment
 import com.absinthe.libchecker.features.statistics.ui.EXTRA_REF_NAME
 import com.absinthe.libchecker.features.statistics.ui.EXTRA_REF_TYPE

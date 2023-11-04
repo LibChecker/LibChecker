@@ -3,8 +3,8 @@ package com.absinthe.libchecker.features.applist.detail.ui
 import android.content.pm.PackageInfo
 import com.absinthe.libchecker.compat.BundleCompat
 import com.absinthe.libchecker.features.applist.detail.bean.AppPropItem
-import com.absinthe.libchecker.utils.manifest.ApplicationReader
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppPropsBottomSheetView
+import com.absinthe.libchecker.utils.manifest.ApplicationReader
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import java.io.File

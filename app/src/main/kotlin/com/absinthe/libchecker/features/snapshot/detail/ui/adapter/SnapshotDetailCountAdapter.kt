@@ -7,8 +7,8 @@ import com.absinthe.libchecker.features.snapshot.detail.bean.CHANGED
 import com.absinthe.libchecker.features.snapshot.detail.bean.MOVED
 import com.absinthe.libchecker.features.snapshot.detail.bean.REMOVED
 import com.absinthe.libchecker.features.snapshot.detail.ui.adapter.node.SnapshotDetailCountNode
-import com.absinthe.libchecker.utils.extensions.toColorStateList
 import com.absinthe.libchecker.features.snapshot.detail.ui.view.SnapshotDetailCountView
+import com.absinthe.libchecker.utils.extensions.toColorStateList
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 

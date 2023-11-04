@@ -8,9 +8,9 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
-import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.SignatureDetailAdapter
+import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
+import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.app.IHeaderView

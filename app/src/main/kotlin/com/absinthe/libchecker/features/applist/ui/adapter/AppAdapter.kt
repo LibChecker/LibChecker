@@ -9,11 +9,14 @@ import androidx.core.text.buildSpannedString
 import androidx.core.text.scale
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
+import com.absinthe.libchecker.features.applist.ui.view.AppItemView
+import com.absinthe.libchecker.ui.adapter.HighlightAdapter
 import com.absinthe.libchecker.utils.FreezeUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.addStrikeThroughSpan
@@ -21,9 +24,6 @@ import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getDrawable
-import com.absinthe.libchecker.features.applist.ui.view.AppItemView
-import com.absinthe.libchecker.ui.adapter.HighlightAdapter
-import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
 class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAdapter<LCItem>() {

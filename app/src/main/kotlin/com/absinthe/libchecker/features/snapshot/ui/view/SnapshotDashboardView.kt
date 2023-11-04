@@ -7,6 +7,7 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.features.snapshot.detail.ui.view.SnapshotTypeIndicatorView
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -15,7 +16,6 @@ import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
-import com.absinthe.libchecker.features.snapshot.detail.ui.view.SnapshotTypeIndicatorView
 import com.google.android.material.card.MaterialCardView
 
 class SnapshotDashboardView(context: Context) :

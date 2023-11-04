@@ -7,7 +7,6 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
-import com.absinthe.libchecker.features.settings.ui.LibReferenceThresholdView
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 

@@ -5,8 +5,8 @@ import android.view.Gravity
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import com.absinthe.libchecker.database.entity.TimeStampItem
-import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libchecker.features.snapshot.ui.view.TimeNodeItemView
+import com.absinthe.libchecker.utils.fromJson
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import java.io.IOException

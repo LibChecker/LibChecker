@@ -11,12 +11,12 @@ import androidx.core.os.bundleOf
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.FragmentActivity
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.features.applist.detail.ui.AppBundleBottomSheetDialogFragment
 import com.absinthe.libchecker.features.applist.detail.ui.AppInstallSourceBSDFragment
 import com.absinthe.libchecker.features.applist.detail.ui.AppPropBottomSheetDialogFragment
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_PACKAGE_INFO
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_PACKAGE_NAME
+import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 
 object FeaturesDialog {
 

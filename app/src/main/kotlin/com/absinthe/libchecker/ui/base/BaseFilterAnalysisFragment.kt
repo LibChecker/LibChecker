@@ -3,8 +3,8 @@ package com.absinthe.libchecker.ui.base
 import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.features.applist.LocatedCount
+import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

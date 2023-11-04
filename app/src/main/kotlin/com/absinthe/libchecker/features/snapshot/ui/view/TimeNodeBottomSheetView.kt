@@ -6,8 +6,8 @@ import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.features.snapshot.ui.adapter.TimeNodeAdapter
+import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.app.IHeaderView

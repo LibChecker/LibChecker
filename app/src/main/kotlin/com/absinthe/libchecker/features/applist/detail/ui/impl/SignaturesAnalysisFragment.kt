@@ -4,13 +4,13 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.SIGNATURES
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
-import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
-import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibStringDiffUtil
+import com.absinthe.libchecker.features.applist.LocatedCount
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_PACKAGE_NAME
+import com.absinthe.libchecker.features.applist.detail.ui.SignatureDetailBSDFragment
+import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibStringDiffUtil
+import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.ui.base.BaseDetailFragment
 import com.absinthe.libchecker.ui.base.EXTRA_TYPE
-import com.absinthe.libchecker.features.applist.LocatedCount
-import com.absinthe.libchecker.features.applist.detail.ui.SignatureDetailBSDFragment
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import rikka.core.util.ClipboardUtils

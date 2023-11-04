@@ -7,9 +7,9 @@ import android.view.View
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.features.applist.detail.bean.AlternativeLaunchItem
+import com.absinthe.libchecker.features.applist.detail.ui.view.AlternativeLaunchBSDView
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.showToast
-import com.absinthe.libchecker.features.applist.detail.ui.view.AlternativeLaunchBSDView
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.chad.library.adapter.base.BaseQuickAdapter

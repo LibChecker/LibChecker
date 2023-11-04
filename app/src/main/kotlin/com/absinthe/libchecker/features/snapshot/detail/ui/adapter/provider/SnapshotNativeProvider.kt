@@ -5,14 +5,14 @@ import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.features.applist.detail.ui.LibDetailDialogFragment
 import com.absinthe.libchecker.features.snapshot.detail.bean.ADDED
 import com.absinthe.libchecker.features.snapshot.detail.bean.CHANGED
 import com.absinthe.libchecker.features.snapshot.detail.bean.REMOVED
 import com.absinthe.libchecker.features.snapshot.detail.ui.adapter.node.SnapshotNativeNode
-import com.absinthe.libchecker.ui.base.BaseActivity
-import com.absinthe.libchecker.features.applist.detail.ui.LibDetailDialogFragment
-import com.absinthe.libchecker.utils.extensions.toColorStateList
 import com.absinthe.libchecker.features.snapshot.detail.ui.view.SnapshotDetailNativeView
+import com.absinthe.libchecker.ui.base.BaseActivity
+import com.absinthe.libchecker.utils.extensions.toColorStateList
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.rulesbundle.LCRules
 import com.chad.library.adapter.base.entity.node.BaseNode

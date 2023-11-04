@@ -5,9 +5,9 @@ import android.view.ViewGroup
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.features.album.track.bean.TrackListItem
+import com.absinthe.libchecker.features.album.track.ui.view.TrackItemView
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
-import com.absinthe.libchecker.features.album.track.ui.view.TrackItemView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 

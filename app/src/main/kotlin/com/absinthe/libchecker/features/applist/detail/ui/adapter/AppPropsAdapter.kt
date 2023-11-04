@@ -11,10 +11,10 @@ import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.features.applist.detail.bean.AppPropItem
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_TEXT
 import com.absinthe.libchecker.features.applist.detail.ui.XmlBSDFragment
+import com.absinthe.libchecker.features.applist.detail.ui.view.AppPropItemView
 import com.absinthe.libchecker.utils.extensions.maybeResourceId
 import com.absinthe.libchecker.utils.manifest.PropertiesMap
 import com.absinthe.libchecker.utils.manifest.ResourceParser
-import com.absinthe.libchecker.features.applist.detail.ui.view.AppPropItemView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import timber.log.Timber

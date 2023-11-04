@@ -12,10 +12,10 @@ import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
+import com.absinthe.libchecker.features.applist.detail.DetailViewModel
+import com.absinthe.libchecker.features.applist.detail.ui.view.LibDetailBottomSheetView
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.utils.showToast
-import com.absinthe.libchecker.features.applist.detail.ui.view.LibDetailBottomSheetView
-import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.absinthe.rulesbundle.LCRules

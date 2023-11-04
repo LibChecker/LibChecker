@@ -9,9 +9,9 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.PACKAGE
 import com.absinthe.libchecker.features.statistics.bean.LibReference
 import com.absinthe.libchecker.features.statistics.ui.adapter.LibReferenceAdapter
+import com.absinthe.libchecker.features.statistics.ui.view.MultipleAppsIconItemView
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.tintHighlightText
-import com.absinthe.libchecker.features.statistics.ui.view.MultipleAppsIconItemView
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.chad.library.adapter.base.provider.BaseNodeProvider
 import com.chad.library.adapter.base.viewholder.BaseViewHolder

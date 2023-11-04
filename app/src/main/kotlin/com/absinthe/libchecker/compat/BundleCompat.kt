@@ -2,9 +2,9 @@
 
 package com.absinthe.libchecker.compat
 
+import androidx.core.os.BundleCompat as AndroidXBuildCompat
 import android.os.Bundle
 import android.os.Parcelable
-import androidx.core.os.BundleCompat as AndroidXBuildCompat
 import com.absinthe.libchecker.utils.OsUtils
 import java.io.Serializable
 

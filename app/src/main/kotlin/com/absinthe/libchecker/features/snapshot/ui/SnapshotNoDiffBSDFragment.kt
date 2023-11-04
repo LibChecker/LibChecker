@@ -6,11 +6,11 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.BundleCompat
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.features.snapshot.detail.bean.SnapshotDiffItem
+import com.absinthe.libchecker.features.snapshot.detail.ui.view.SnapshotNoDiffBSView
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.putArguments
-import com.absinthe.libchecker.features.snapshot.detail.ui.view.SnapshotNoDiffBSView
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.launch

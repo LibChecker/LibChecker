@@ -11,11 +11,13 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.constant.options.SnapshotOptions
+import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
 import com.absinthe.libchecker.features.snapshot.detail.bean.SnapshotDiffItem
+import com.absinthe.libchecker.features.snapshot.ui.view.SnapshotItemView
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
 import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.LCAppUtils
@@ -26,8 +28,6 @@ import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.setAlphaForAll
 import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
-import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
-import com.absinthe.libchecker.features.snapshot.ui.view.SnapshotItemView
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import java.text.SimpleDateFormat
 import java.util.Locale

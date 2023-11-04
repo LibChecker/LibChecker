@@ -8,10 +8,10 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.isGone
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.features.applist.ui.view.AppItemView
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.view.AViewGroup
-import com.absinthe.libchecker.features.applist.ui.view.AppItemView
 
 class AppInstallSourceItemView(context: Context) : AViewGroup(context) {
 

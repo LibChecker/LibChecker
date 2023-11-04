@@ -5,9 +5,9 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.features.applist.detail.bean.SignatureDetailItem
+import com.absinthe.libchecker.features.applist.detail.ui.view.SignatureDetailBottomSheetView
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
-import com.absinthe.libchecker.features.applist.detail.ui.view.SignatureDetailBottomSheetView
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.Dispatchers

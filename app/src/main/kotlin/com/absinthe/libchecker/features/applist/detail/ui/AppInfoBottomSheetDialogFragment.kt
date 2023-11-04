@@ -13,11 +13,11 @@ import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.AppInfoAdapter
+import com.absinthe.libchecker.features.applist.detail.ui.view.AppInfoBottomSheetView
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.showToast
-import com.absinthe.libchecker.features.applist.detail.ui.view.AppInfoBottomSheetView
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import java.io.File

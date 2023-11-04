@@ -21,14 +21,14 @@ import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.TrackItem
 import com.absinthe.libchecker.databinding.ActivityTrackBinding
-import com.absinthe.libchecker.features.album.track.ui.view.TrackItemView
-import com.absinthe.libchecker.features.album.track.ui.view.TrackLoadingView
 import com.absinthe.libchecker.features.album.track.bean.TrackListItem
 import com.absinthe.libchecker.features.album.track.ui.adapter.TrackAdapter
 import com.absinthe.libchecker.features.album.track.ui.adapter.TrackListDiff
+import com.absinthe.libchecker.features.album.track.ui.view.TrackItemView
+import com.absinthe.libchecker.features.album.track.ui.view.TrackLoadingView
+import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.utils.extensions.getAppName
-import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

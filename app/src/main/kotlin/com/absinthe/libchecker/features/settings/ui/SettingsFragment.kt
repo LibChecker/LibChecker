@@ -27,8 +27,9 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.features.about.ui.AboutActivity
-import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.features.applist.detail.ui.ApkDetailActivity
+import com.absinthe.libchecker.features.home.HomeViewModel
+import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.base.IAppBarContainer
 import com.absinthe.libchecker.ui.base.IListController
 import com.absinthe.libchecker.utils.LCAppUtils
@@ -36,7 +37,6 @@ import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.setBottomPaddingSpace
-import com.absinthe.libchecker.features.home.HomeViewModel
 import com.absinthe.libraries.utils.extensions.getBoolean
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.rulesbundle.LCRemoteRepo

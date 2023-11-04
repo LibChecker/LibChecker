@@ -15,12 +15,12 @@ import com.absinthe.libchecker.annotation.WINTER
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
 import com.absinthe.libchecker.features.applist.ui.adapter.AppAdapter
+import com.absinthe.libchecker.features.statistics.LibReferenceViewModel
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.isOrientationLandscape
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.paddingTopCompat
-import com.absinthe.libchecker.features.statistics.LibReferenceViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

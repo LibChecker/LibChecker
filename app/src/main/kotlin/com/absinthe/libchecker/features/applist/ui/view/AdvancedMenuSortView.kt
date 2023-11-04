@@ -8,8 +8,8 @@ import android.widget.LinearLayout
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.AppCompatTextView
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.utils.extensions.dp
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup

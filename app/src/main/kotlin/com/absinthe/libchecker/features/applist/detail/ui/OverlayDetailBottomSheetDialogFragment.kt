@@ -12,12 +12,14 @@ import androidx.core.text.scale
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.BundleCompat
-import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
+import com.absinthe.libchecker.features.applist.detail.ui.view.OverlayDetailBottomSheetView
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
@@ -29,8 +31,6 @@ import com.absinthe.libchecker.utils.extensions.getTargetApiString
 import com.absinthe.libchecker.utils.extensions.getVersionString
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
-import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
-import com.absinthe.libchecker.features.applist.detail.ui.view.OverlayDetailBottomSheetView
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import dev.rikka.tools.refine.Refine

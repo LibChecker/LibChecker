@@ -27,15 +27,15 @@ import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE
 import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE_END
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.constant.OnceTag
+import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.features.applist.detail.bean.StatefulComponent
 import com.absinthe.libchecker.features.statistics.bean.LibChip
 import com.absinthe.libchecker.features.statistics.bean.LibReference
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
-import com.absinthe.libchecker.features.applist.detail.bean.StatefulComponent
 import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.ui.base.IListController
 import com.absinthe.libchecker.utils.FileUtils

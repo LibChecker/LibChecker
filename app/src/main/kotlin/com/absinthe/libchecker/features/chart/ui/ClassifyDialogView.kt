@@ -8,14 +8,14 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
+import com.absinthe.libchecker.features.applist.detail.ui.view.AndroidVersionLabelView
 import com.absinthe.libchecker.features.applist.ui.adapter.AppAdapter
+import com.absinthe.libchecker.features.statistics.ui.view.LibReferenceLoadingView
+import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.view.app.IHeaderView
-import com.absinthe.libchecker.features.applist.detail.ui.view.AndroidVersionLabelView
-import com.absinthe.libchecker.features.statistics.ui.view.LibReferenceLoadingView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 

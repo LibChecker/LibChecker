@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.ActivityChartBinding
 import com.absinthe.libchecker.ui.base.BaseActivity
-import com.absinthe.libchecker.features.chart.ui.ChartFragment
 
 class ChartActivity : BaseActivity<ActivityChartBinding>() {
 
