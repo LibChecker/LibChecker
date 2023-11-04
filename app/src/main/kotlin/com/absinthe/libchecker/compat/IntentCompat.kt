@@ -2,9 +2,9 @@
 
 package com.absinthe.libchecker.compat
 
-import androidx.core.content.IntentCompat as AndroidXIntentCompat
 import android.content.Intent
 import android.os.Parcelable
+import androidx.core.content.IntentCompat as AndroidXIntentCompat
 import com.absinthe.libchecker.utils.OsUtils
 import java.io.Serializable
 
