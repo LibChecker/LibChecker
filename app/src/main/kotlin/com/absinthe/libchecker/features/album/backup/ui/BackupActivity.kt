@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
+import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.activity.result.ActivityResultLauncher
@@ -31,6 +32,8 @@ import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.StorageUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.addBackStateHandler
+import com.absinthe.libchecker.utils.extensions.addPaddingTop
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.showToast
 import com.jakewharton.processphoenix.ProcessPhoenix
 import java.io.File
@@ -98,6 +101,16 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
     private lateinit var backupResultLauncher: ActivityResultLauncher<String>
     private lateinit var restoreResultLauncher: ActivityResultLauncher<String>
     private lateinit var roomBackup: RoomBackup
+
+    override fun onCreateView(
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?
+    ): View {
+      return super.onCreateView(inflater, container, savedInstanceState).apply {
+        addPaddingTop(96.dp)
+      }
+    }
 
     override fun onAttach(context: Context) {
       super.onAttach(context)
