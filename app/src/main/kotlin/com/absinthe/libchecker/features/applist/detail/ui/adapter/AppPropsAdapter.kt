@@ -1,11 +1,16 @@
 package com.absinthe.libchecker.features.applist.detail.ui.adapter
 
 import android.content.pm.PackageInfo
-import android.graphics.drawable.ColorDrawable
+import android.graphics.Bitmap
+import android.graphics.drawable.ShapeDrawable
+import android.graphics.drawable.shapes.OvalShape
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
+import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.features.applist.detail.bean.AppPropItem
@@ -68,8 +73,11 @@ class AppPropsAdapter(
         val transformed = itemView.linkToIcon.getTag(R.id.resource_transformed_id) as? Boolean ?: false
         if (transformed) {
           itemView.value.text = parseValue(item)
-          itemView.linkToIcon.setImageResource(R.drawable.ic_outline_change_circle_24)
-          itemView.linkToIcon.setTag(R.id.resource_transformed_id, false)
+          itemView.linkToIcon.apply {
+            scaleType = ImageView.ScaleType.CENTER
+            setImageResource(R.drawable.ic_outline_change_circle_24)
+            setTag(R.id.resource_transformed_id, false)
+          }
         } else {
           var clickedTag = false
           Timber.d("type: $type")
@@ -101,23 +109,29 @@ class AppPropsAdapter(
                 clickedTag = false
               }
               "drawable", "mipmap" -> {
-                itemView.linkToIcon.setImageDrawable(
-                  appResources.getDrawable(
-                    item.value.toInt(),
-                    null
+                appResources.getDrawable(item.value.toInt(), null)?.let { drawable ->
+                  val bitmap = drawable.toBitmap(
+                    itemView.linkToIcon.measuredWidth,
+                    itemView.linkToIcon.measuredHeight,
+                    Bitmap.Config.ARGB_8888
                   )
-                )
+                  itemView.linkToIcon.load(bitmap)
+                }
                 clickedTag = true
               }
+
               "color" -> {
-                itemView.linkToIcon.setImageDrawable(
-                  ColorDrawable(
-                    appResources.getColor(
-                      item.value.toInt(),
-                      null
+                appResources.getColor(item.value.toInt(), null).let { colorInt ->
+                  itemView.linkToIcon.load(
+                    ShapeDrawable(OvalShape()).apply {
+                      paint.color = colorInt
+                    }.toBitmap(
+                      itemView.linkToIcon.measuredWidth,
+                      itemView.linkToIcon.measuredHeight,
+                      Bitmap.Config.ARGB_8888
                     )
                   )
-                )
+                }
                 clickedTag = true
               }
               "dimen" -> {

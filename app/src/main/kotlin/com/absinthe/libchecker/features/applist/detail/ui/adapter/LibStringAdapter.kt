@@ -1,9 +1,12 @@
 package com.absinthe.libchecker.features.applist.detail.ui.adapter
 
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.TransitionDrawable
+import android.graphics.drawable.shapes.OvalShape
 import android.graphics.text.LineBreaker
 import android.text.Layout
 import android.text.Spannable
@@ -11,6 +14,7 @@ import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.view.ViewGroup
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.os.bundleOf
 import androidx.core.text.buildSpannedString
 import androidx.core.text.inSpans
@@ -18,6 +22,7 @@ import androidx.core.text.set
 import androidx.core.text.strikeThrough
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
+import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ET_DYN
 import com.absinthe.libchecker.annotation.LibType
@@ -316,24 +321,25 @@ class LibStringAdapter(
                   clickedTag = false
                 }
                 "drawable", "mipmap" -> {
-                  appResources?.let { res ->
-                    itemView.linkToIcon.setImageDrawable(
-                      res.getDrawable(
-                        item.item.size.toInt(),
-                        null
-                      )
+                  appResources?.getDrawable(item.item.size.toInt(), null)?.let { drawable ->
+                    val bitmap = drawable.toBitmap(
+                      itemView.linkToIcon.measuredWidth,
+                      itemView.linkToIcon.measuredHeight,
+                      Bitmap.Config.ARGB_8888
                     )
+                    itemView.linkToIcon.load(bitmap)
                   }
                   clickedTag = true
                 }
                 "color" -> {
-                  appResources?.let { res ->
-                    itemView.linkToIcon.setImageDrawable(
-                      ColorDrawable(
-                        res.getColor(
-                          item.item.size.toInt(),
-                          null
-                        )
+                  appResources?.getColor(item.item.size.toInt(), null)?.let { colorInt ->
+                    itemView.linkToIcon.load(
+                      ShapeDrawable(OvalShape()).apply {
+                        paint.color = colorInt
+                      }.toBitmap(
+                        itemView.linkToIcon.measuredWidth,
+                        itemView.linkToIcon.measuredHeight,
+                        Bitmap.Config.ARGB_8888
                       )
                     )
                   }
