@@ -17,7 +17,7 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 hiddenApiRefine = { id = "dev.rikka.tools.refine", version.ref = "hiddenApiRefine" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
-kotlinter = { id = "org.jmailen.kotlinter", version = "4.0.1" }
+kotlinter = { id = "org.jmailen.kotlinter", version = "4.1.0" }
 ksp = { id = "com.google.devtools.ksp", version = "1.9.20-1.0.13" }
 protobuf = { id = "com.google.protobuf", version = "0.9.4" }
 moshiX = "dev.zacsweers.moshix:0.25.0"
