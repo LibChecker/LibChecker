@@ -9,7 +9,7 @@
   app:consumeSystemWindowsInsets="start|end"
   app:edgeToEdge="true"
   app:fitsSystemWindowsInsets="start|end"
-  tools:context=".ui.album.TrackActivity">
+  tools:context=".features.album.track.ui.TrackActivity">
 
   <com.google.android.material.appbar.AppBarLayout
     android:id="@+id/appbar"

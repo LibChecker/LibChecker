@@ -4,7 +4,7 @@
   android:layout_width="match_parent"
   android:layout_height="match_parent"
   xmlns:tools="http://schemas.android.com/tools"
-  tools:context=".ui.fragment.snapshot.SnapshotFragment">
+  tools:context=".features.snapshot.ui.SnapshotFragment">
 
   <com.absinthe.libchecker.view.app.CustomViewFlipper
     android:id="@+id/vf_container"
@@ -39,12 +39,11 @@
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:clipToPadding="false"
-      android:paddingTop="?actionBarSize"
       android:scrollbars="none"
       app:borderBottomVisibility="never"
       app:borderTopDrawable="@null"
       app:borderTopVisibility="whenTop"
-      app:fitsSystemWindowsInsets="bottom|top" />
+      app:fitsSystemWindowsInsets="bottom" />
 
   </com.absinthe.libchecker.view.app.CustomViewFlipper>
 

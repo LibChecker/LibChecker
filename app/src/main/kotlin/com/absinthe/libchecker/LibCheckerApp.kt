@@ -2,12 +2,15 @@ package com.absinthe.libchecker
 
 import android.app.Application
 import android.content.Context
+import android.content.pm.PackageManager
+import android.content.pm.PackageParser
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.window.core.ExperimentalWindowApi
+import androidx.window.embedding.RuleController
 import androidx.window.embedding.SplitController
 import coil.Coil
 import coil.ImageLoader
 import com.absinthe.libchecker.app.MainLooperFilter
+import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
@@ -45,6 +48,7 @@ class LibCheckerApp : Application() {
     if (OsUtils.atLeastP()) {
       HiddenApiBypass.addHiddenApiExemptions("")
     }
+    bypassPackageParserCheck()
 
     app = this
     if (!BuildConfig.DEBUG && GlobalValues.isAnonymousAnalyticsEnabled.value == true) {
@@ -93,12 +97,34 @@ class LibCheckerApp : Application() {
     MainLooperFilter.start()
   }
 
-  @OptIn(ExperimentalWindowApi::class)
   private fun initSplitController() {
+    val ratio = UiUtils.getScreenAspectRatio()
+    val hasHinge = if (OsUtils.atLeastR()) {
+      SystemServices.packageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_HINGE_ANGLE)
+    } else {
+      false
+    }
+    Timber.d("initSplitController: getScreenAspectRatio: $ratio, hasHinge=$hasHinge")
     runCatching {
-      if (SplitController.getInstance().isSplitSupported()) {
-        SplitController.initialize(this, R.xml.main_split_config)
+      if (SplitController.getInstance(this).splitSupportStatus == SplitController.SplitSupportStatus.SPLIT_AVAILABLE) {
+        RuleController.getInstance(this).setRules(
+          if (hasHinge || ratio in 0.85f..1.15f) {
+            RuleController.parseRules(this, R.xml.main_split_config_foldable)
+          } else {
+            RuleController.parseRules(this, R.xml.main_split_config)
+          }
+        )
       }
+    }
+  }
+
+  private fun bypassPackageParserCheck() {
+    // bypass PackageParser check
+    // see also: https://cs.android.com/android/platform/superproject/main/+/main:frameworks/base/core/java/android/content/pm/PackageParser.java;l=2695
+    @Suppress("SoonBlockedPrivateApi")
+    PackageParser::class.java.getDeclaredField("SDK_VERSION").apply {
+      isAccessible = true
+      set(null, Integer.MAX_VALUE)
     }
   }
 

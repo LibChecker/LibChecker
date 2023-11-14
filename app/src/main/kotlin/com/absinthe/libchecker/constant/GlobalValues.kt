@@ -4,9 +4,11 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
 import com.absinthe.libchecker.BuildConfig
-import com.absinthe.libchecker.annotation.NATIVE
-import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
-import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.constant.options.AdvancedOptions
+import com.absinthe.libchecker.constant.options.LibReferenceOptions
+import com.absinthe.libchecker.constant.options.SnapshotOptions
+import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
+import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.SPDelegates
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
@@ -26,11 +28,15 @@ object GlobalValues {
   var itemAdvancedOptions: Int by SPDelegates(Constants.PREF_ITEM_ADVANCED_OPTIONS, AdvancedOptions.ITEM_DEFAULT_OPTIONS)
   val itemAdvancedOptionsLiveData: MutableLiveData<Int> = MutableLiveData(itemAdvancedOptions)
 
+  var libReferenceOptions: Int by SPDelegates(Constants.PREF_LIB_REF_OPTIONS, LibReferenceOptions.DEFAULT_OPTIONS)
+  val libReferenceOptionsLiveData: MutableLiveData<Int> = MutableLiveData(libReferenceOptions)
+
+  var snapshotOptions: Int by SPDelegates(Constants.PREF_SNAPSHOT_OPTIONS, SnapshotOptions.DEFAULT_OPTIONS)
+  val snapshotOptionsLiveData: MutableLiveData<Int> = MutableLiveData(snapshotOptions)
+
   var repo: String by SPDelegates(Constants.PREF_RULES_REPO, Constants.REPO_GITLAB)
 
   var snapshotTimestamp: Long by SPDelegates(Constants.PREF_SNAPSHOT_TIMESTAMP, 0)
-
-  var currentLibRefType: Int by SPDelegates(Constants.CURRENT_LIB_REF_TYPE, NATIVE)
 
   var debugMode: Boolean by SPDelegates(Constants.PREF_DEBUG_MODE, false)
 
@@ -59,7 +65,7 @@ object GlobalValues {
 
   val libReferenceThresholdLiveData: MutableLiveData<Int> = MutableLiveData(libReferenceThreshold)
 
-  val season by unsafeLazy { LCAppUtils.getCurrentSeason() }
+  val season by unsafeLazy { DateUtils.getCurrentSeason() }
 
   var locale: Locale = Locale.getDefault()
     get() {

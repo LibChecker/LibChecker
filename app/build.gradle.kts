@@ -117,7 +117,6 @@ dependencies {
   implementation(libs.timber)
   implementation(libs.processPhoenix)
   implementation(libs.once)
-  implementation(libs.cascade)
   implementation(libs.fastScroll)
   implementation(libs.appIconLoader)
   implementation(libs.appIconLoader.coil)
@@ -129,6 +128,8 @@ dependencies {
   implementation(libs.flexbox)
 
   implementation(libs.bundles.rikkax)
+
+  implementation(libs.bundles.shizuku)
 
   debugImplementation(libs.square.leakCanary)
   "marketCompileOnly"(fileTree("ohos"))

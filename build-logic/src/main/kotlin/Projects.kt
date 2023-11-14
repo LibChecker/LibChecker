@@ -6,12 +6,11 @@ import java.time.Instant
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 
-const val baseVersionName = "2.4.0"
+const val baseVersionName = "2.4.3"
 val Project.verName: String get() = "${baseVersionName}${versionNameSuffix}.${exec("git rev-parse --short HEAD")}"
 val Project.verCode: Int get() = exec("git rev-list --count HEAD").toInt()
 val Project.isDevVersion: Boolean get() = exec("git tag -l $baseVersionName").isEmpty()
 val Project.versionNameSuffix: String get() = if (isDevVersion) ".dev" else ""
-val javaLevel = JavaVersion.VERSION_17
 
 fun Project.setupLibraryModule(block: LibraryExtension.() -> Unit = {}) {
   setupBaseModule(block)
@@ -22,7 +21,19 @@ fun Project.setupAppModule(block: BaseAppModuleExtension.() -> Unit = {}) {
     defaultConfig {
       versionCode = verCode
       versionName = verName
-      resourceConfigurations += arrayOf("en", "zh-rCN", "zh-rTW", "zh-rHK", "ru-rRU", "ru-rUA", "ja-rJP")
+      resourceConfigurations += arrayOf(
+        "en",
+        "zh-rCN",
+        "zh-rTW",
+        "zh-rHK",
+        "ru-rRU",
+        "ru-rUA",
+        "ja-rJP",
+        "vi-rVN",
+        "in-rID",
+        "pt-rBR",
+        "ar-rSA",
+      )
     }
     val releaseSigning = if (project.hasProperty("releaseStoreFile")) {
       signingConfigs.create("release") {
@@ -64,17 +75,13 @@ fun Project.setupAppModule(block: BaseAppModuleExtension.() -> Unit = {}) {
 
 private inline fun <reified T : BaseExtension> Project.setupBaseModule(crossinline block: T.() -> Unit = {}) {
   extensions.configure<BaseExtension>("android") {
-    compileSdkVersion(33)
+    compileSdkVersion(34)
     defaultConfig {
       minSdk = 24
-      targetSdk = 33
+      targetSdk = 34
     }
     sourceSets.configureEach {
       java.srcDirs("src/$name/kotlin")
-    }
-    compileOptions {
-      targetCompatibility(javaLevel)
-      sourceCompatibility(javaLevel)
     }
     (this as T).block()
   }

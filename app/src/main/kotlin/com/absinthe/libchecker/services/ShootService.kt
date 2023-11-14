@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo
 import android.content.res.Configuration
 import android.graphics.BitmapFactory
 import android.os.IBinder
@@ -31,7 +32,7 @@ import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
-import com.absinthe.libchecker.ui.main.MainActivity
+import com.absinthe.libchecker.features.home.ui.MainActivity
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getAppName
@@ -107,7 +108,15 @@ class ShootService : LifecycleService() {
         val channel = NotificationChannel(SHOOT_CHANNEL_ID, name, importance)
         createNotificationChannel(channel)
       }
-      startForeground(notificationIdShoot, builder.build())
+      if (OsUtils.atLeastU()) {
+        startForeground(
+          notificationIdShoot,
+          builder.build(),
+          ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+        )
+      } else {
+        startForeground(notificationIdShoot, builder.build())
+      }
     }
   }
 

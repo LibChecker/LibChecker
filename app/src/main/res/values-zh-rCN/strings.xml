@@ -44,8 +44,11 @@
   <string name="ref_category_package">包</string>
   <string name="ref_category_shared_uid">共享的 UID</string>
   <string name="ref_category_signatures">签名</string>
+  <string name="ref_category_only_not_marked">只展示未标记库</string>
   <string name="string_kotlin_used">使用了 Kotlin</string>
   <string name="string_kotlin_unused">未使用 Kotlin</string>
+  <string name="string_compose_used">使用了 Jetpack Compose</string>
+  <string name="string_compose_unused">未使用 Jetpack Compose</string>
   <!--  About  -->
   <string name="settings_about">关于</string>
   <string name="settings_translate">参与翻译</string>
@@ -90,7 +93,7 @@
   <string name="array_snapshot_discard">丢弃</string>
   <!--  Detail  -->
   <string name="detail">详情</string>
-  <string name="detail_label">查看 App 详情</string>
+  <string name="detail_label">查看应用详情</string>
   <string name="not_found">未找到</string>
   <string name="create_an_issue">协助我们来补充信息</string>
   <string name="app_bundle_details">Android App Bundle 是 Android 新推出的一种官方发布格式，可让您以更高效的方式开发和发布应用。借助 Android App Bundle，您可以更轻松地以更小的应用提供优质的使用体验，从而提升安装成功率并减少卸载量。转换过程轻松便捷。您无需重构代码即可开始获享较小应用的优势。改用这种格式后，您可以体验模块化应用开发和可自定义功能交付，并从中受益。</string>
@@ -100,6 +103,7 @@
   <string name="app_info_launch">启动</string>
   <string name="app_info_settings">设置</string>
   <string name="lib_detail_dialog_title">库详情</string>
+  <string name="lib_permission_dialog_title">权限详情</string>
   <string name="agp_details">Android Studio 构建系统以 Gradle 为基础，并且 Android Gradle 插件添加了几项专用于构建 Android 应用的功能。虽然 Android 插件通常会与 Android Studio 的更新步调保持一致，但插件（以及 Gradle 系统的其余部分）可独立于 Android Studio 运行并单独更新。</string>
   <string name="xposed_module">Xposed 模块</string>
   <string name="xposed_module_details">Xposed 是一个模块框架，可以在不接触任何 APK 的情况下更改系统和应用程序的行为。这很棒，因为这意味着模块可以在不同版本甚至 ROM 上工作而无需任何更改。</string>
@@ -109,7 +113,7 @@
   <string name="jetpack_compose_details">Jetpack Compose 是用于构建原生 Android 界面的新工具包。它可简化并加快 Android 上的界面开发，使用更少的代码、强大的工具和直观的 Kotlin API，快速打造生动而精彩的应用。</string>
   <string name="extract_native_libs_tip">该应用声明了 </string>
   <string name="xml_detail">XML 详情</string>
-  <string name="format_last_updated">最近更新: %s</string>
+  <string name="format_last_updated">更新于: %s</string>
   <string name="menu_process">进程</string>
   <string name="menu_split">模块</string>
   <string name="alternative_launch_method">备选的启动方式</string>
@@ -145,11 +149,25 @@
   <string name="lib_detail_xposed_min_version">Min 版本</string>
   <string name="lib_detail_xposed_default_scope">默认 Scope</string>
   <string name="lib_detail_xposed_init_class">初始化类</string>
+  <string name="lib_detail_app_install_source_title">安装来源</string>
+  <string name="lib_detail_app_install_source_originating_package">安装请求方</string>
+  <string name="lib_detail_app_install_source_installing_package">安装执行方</string>
+  <string name="lib_detail_app_install_source_empty">未知</string>
+  <string name="lib_detail_app_install_source_empty_detail">adb 或已被卸载的应用</string>
+  <string name="lib_detail_app_install_source_shizuku_usage">因为安卓限制了获取安装请求者的 API, 我们使用 Shizuku 来获取安装请求者。</string>
+  <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizuku 未安装</string>
+  <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">点此安装 Shizuku</string>
+  <string name="lib_detail_app_install_source_shizuku_low_version">需要 Shizuku API 版本 10</string>
+  <string name="lib_detail_app_install_source_shizuku_low_version_detail">点此升级 Shizuku</string>
+  <string name="lib_detail_app_install_source_shizuku_not_running">Shizuku 未启动</string>
+  <string name="lib_detail_app_install_source_shizuku_not_running_detail">点此跳转到 Shizuku 以启动它</string>
+  <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku 未授权</string>
+  <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">点此进行 Shizuku 授权以获取安装请求方</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已复制到剪贴板</string>
   <string name="toast_not_existing_market">设备中不存在应用市场</string>
   <string name="toast_use_another_file_manager">请使用其它文件管理器打开此 APK</string>
-  <string name="toast_cant_open_app">无法启动此 App</string>
+  <string name="toast_cant_open_app">无法启动此应用</string>
   <string name="toast_cloud_rules_update_error">云端规则更新失败，请重试</string>
   <string name="toast_not_enough_storage_space">存储空间不足</string>
   <!--  Snapshot  -->
@@ -163,9 +181,10 @@
   <string name="snapshot_indicator_moved">移动</string>
   <string name="snapshot_empty_list_title">没有组件变更</string>
   <string name="snapshot_no_snapshot">没有快照</string>
-  <string name="snapshot_detail_new_install_title">这是一个全新的 App</string>
-  <string name="snapshot_detail_deleted_title">此 App 已被移除</string>
+  <string name="snapshot_detail_new_install_title">这是一个全新的应用</string>
+  <string name="snapshot_detail_deleted_title">此应用已被移除</string>
   <string name="snapshot_time_node_uninitialized">（未初始化）</string>
+  <string name="snapshot_preinstalled_app">预置应用</string>
   <string name="snapshot_generate_text_report">生成文字报告</string>
   <string name="snapshot_scheme_tip"><![CDATA[提示: 现在您可以通过<br><b>%s</b><br>在后台生成快照。]]></string>
   <!--  Dialog  -->
@@ -178,6 +197,8 @@
   <string name="dialog_title_confirm_to_delete">确定要删除此快照吗？</string>
   <string name="btn_keep">保留</string>
   <string name="btn_drop">丢弃</string>
+  <string name="dialog_title_compare_diff_apk">注意</string>
+  <string name="dialog_message_compare_diff_apk">确定要对比两个不同的 APK 吗？</string>
   <!--  Album  -->
   <string name="album_compare">对比</string>
   <string name="album_item_comparison_title">对比</string>
@@ -225,4 +246,8 @@
   <string name="adv_mark_exported">标记已导出的组件</string>
   <string name="adv_mark_disabled">标记已禁用的组件</string>
   <string name="adv_show_marked_lib">显示已标记的库</string>
+  <string name="adv_show_system_framework_apps">显示系统框架应用</string>
+  <!--  Snapshot menu  -->
+  <string name="snapshot_menu_show_update_time">显示更新时间</string>
+  <string name="snapshot_menu_hide_no_component_changes">隐藏无组件变更</string>
 </resources>

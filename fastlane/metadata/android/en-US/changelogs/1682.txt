@@ -1,0 +1,9 @@
+- Added the entrance to view the properties in the <application> label on the application details page
+- Fixed the problem of not being able to parse the native libraries of some applications
+- Xposed module tab now shows specific information
+- Introduced advanced menu for "Statistics" module and "Snapshot" module, now you can do more customization
+- Added app installer requestor and installer executor information to the app details page (the ability to get installer requestors depends on Shizuku or Sui)
+- Updated Rules bundle to V32
+- Now compare two APKs in the "Compare" page, and you can compare them in detail
+- Added statistics for Jetpack Compose usage to the chart page
+- Fixed some other issues

@@ -8,7 +8,7 @@
   app:consumeSystemWindowsInsets="start|end"
   app:edgeToEdge="true"
   app:fitsSystemWindowsInsets="start|end|top"
-  tools:context=".ui.detail.AppDetailActivity">
+  tools:context=".features.applist.detail.ui.AppDetailActivity">
 
   <com.google.android.material.appbar.AppBarLayout
     android:id="@+id/header_layout"
@@ -37,7 +37,7 @@
         android:paddingTop="?attr/actionBarSize"
         app:layout_collapseMode="parallax">
 
-        <com.absinthe.libchecker.view.detail.DetailsTitleView
+        <com.absinthe.libchecker.features.applist.detail.ui.view.DetailsTitleView
           android:id="@+id/details_title"
           android:layout_width="match_parent"
           android:layout_height="wrap_content" />
@@ -99,7 +99,7 @@
             android:textColor="?attr/colorControlNormal"
             app:layout_constraintStart_toStartOf="parent" />
 
-          <com.absinthe.libchecker.view.detail.TextSwitcherView
+          <com.absinthe.libchecker.features.applist.detail.ui.view.TextSwitcherView
             android:id="@+id/ts_component_count"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"

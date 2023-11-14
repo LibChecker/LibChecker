@@ -44,8 +44,11 @@
   <string name="ref_category_package">Paket</string>
   <string name="ref_category_shared_uid">Gemeinsame UID</string>
   <string name="ref_category_signatures">Signaturen</string>
+  <string name="ref_category_only_not_marked">Nur nicht markiert</string>
   <string name="string_kotlin_used">Nutzt Kotlin</string>
   <string name="string_kotlin_unused">Nutzt kein Kotlin</string>
+  <string name="string_compose_used">Nutzt Jetpack Compose</string>
+  <string name="string_compose_unused">Nutzt kein Jetpack Compose</string>
   <!--  About  -->
   <string name="settings_about">Über</string>
   <string name="settings_translate">Beteilige dich an der Übersetzung</string>
@@ -53,7 +56,19 @@
   <string name="settings_rate_us">Bewerte uns</string>
   <string name="settings_rate_us_summary">Dies hilft uns von mehr Leuten gefunden zu werden</string>
   <string name="settings_about_summary">Dies ist LibChecker!</string>
+  <string name="about_info">Diese App wird verwendet, um die von Anwendungen auf Ihrem Gerät verwendeten Bibliotheken von Drittanbietern anzuzeigen.</string>
+  <string name="toolbar_rate">Bewerten sie diese App</string>
+  <string name="resource_declaration">Ein Teil der Ressourcen in der Anwendung stammt aus: </string>
+  <string name="library_declaration">Alle in LibChecker markierten Bibliotheksinformationen stammen aus der Entwicklungsdokumentation oder dem Code Repository des SDK, zu dem es gehört. Wenn die Informationen falsch sind, kontaktieren Sie bitte die folgende E-Mail-Adresse: absinthe@absinthe.life</string>
   <!--  Settings  -->
+  <string name="pref_group_normal">Normal</string>
+  <string name="pref_group_others">Sonstige</string>
+  <string name="apk_analytics">APK-Analyse</string>
+  <string name="colorful_icon">Buntes Icon</string>
+  <string name="rules_repo_title">Regelrepo</string>
+  <string name="lib_ref_threshold">Bibliotheksreferenz-Grenzwert</string>
+  <string name="languages">Sprachen</string>
+  <string name="reload_apps">App-Liste aktualisieren</string>
   <!--  Detail  -->
   <!--  Toast  -->
   <!--  Snapshot  -->
@@ -62,4 +77,5 @@
   <!--  Integration  -->
   <!--  Cloud rules  -->
   <!-- Advanced menu -->
+  <!--  Snapshot menu  -->
 </resources>

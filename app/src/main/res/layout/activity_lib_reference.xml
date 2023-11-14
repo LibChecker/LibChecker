@@ -8,7 +8,7 @@
   app:consumeSystemWindowsInsets="start|end"
   app:edgeToEdge="true"
   app:fitsSystemWindowsInsets="start|end"
-  tools:context=".ui.main.LibReferenceActivity">
+  tools:context=".features.statistics.ui.LibReferenceActivity">
 
   <com.google.android.material.appbar.AppBarLayout
     android:id="@+id/appbar"

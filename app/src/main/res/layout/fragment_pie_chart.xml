@@ -61,6 +61,13 @@
         android:layout_height="wrap_content"
         android:text="Min" />
 
+      <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_compose"
+        style="?attr/materialButtonOutlinedStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Compose" />
+
     </com.google.android.material.button.MaterialButtonToggleGroup>
   </HorizontalScrollView>
 

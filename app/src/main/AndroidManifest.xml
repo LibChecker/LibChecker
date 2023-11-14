@@ -5,24 +5,28 @@
 
   <uses-permission android:name="android.permission.INTERNET" />
   <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
   <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
 
+  <!-- TODO RTL support-->
   <application
     android:name=".LibCheckerApp"
     android:appCategory="productivity"
+    android:configChanges="orientation"
     android:dataExtractionRules="@xml/data_extraction_rules"
-    android:enableOnBackInvokedCallback="true"
+    android:enableOnBackInvokedCallback="@bool/appOnBackInvokedCallbackEnabled"
     android:fullBackupContent="@xml/backup_rules"
     android:icon="@mipmap/ic_launcher"
     android:label="@string/app_name"
+    android:largeHeap="true"
     android:roundIcon="@mipmap/ic_launcher_round"
-    android:supportsRtl="true"
+    android:supportsRtl="false"
     android:theme="@style/AppTheme"
-    tools:targetApi="33">
+    tools:targetApi="34">
 
     <activity
-      android:name=".ui.main.MainActivity"
+      android:name=".features.home.ui.MainActivity"
       android:configChanges="orientation"
       android:exported="true"
       android:launchMode="singleTop">
@@ -40,7 +44,7 @@
         android:resource="@xml/shortcuts" />
     </activity>
     <activity
-      android:name=".ui.detail.AppDetailActivity"
+      android:name=".features.applist.detail.ui.AppDetailActivity"
       android:configChanges="orientation"
       android:exported="true"
       android:launchMode="singleTask">
@@ -49,9 +53,19 @@
 
         <category android:name="android.intent.category.DEFAULT" />
       </intent-filter>
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+
+        <data
+          android:scheme="market"
+          android:host="details" />
+      </intent-filter>
     </activity>
     <activity
-      android:name=".ui.detail.ApkDetailActivity"
+      android:name=".features.applist.detail.ui.ApkDetailActivity"
       android:configChanges="orientation"
       android:exported="true"
       android:label="@string/detail_label"
@@ -69,14 +83,14 @@
       </intent-filter>
     </activity>
     <activity
-      android:name=".ui.detail.SnapshotDetailActivity"
+      android:name=".features.snapshot.detail.ui.SnapshotDetailActivity"
       android:configChanges="orientation" />
     <activity
-      android:name=".ui.snapshot.AlbumActivity"
+      android:name=".features.album.ui.AlbumActivity"
       android:configChanges="orientation"
       android:label="@string/title_album" />
     <activity
-      android:name=".ui.album.BackupActivity"
+      android:name=".features.album.backup.ui.BackupActivity"
       android:exported="true"
       android:label="@string/album_item_backup_restore_title">
       <intent-filter>
@@ -87,7 +101,7 @@
       </intent-filter>
     </activity>
     <activity
-      android:name=".ui.album.ComparisonActivity"
+      android:name=".features.album.comparison.ui.ComparisonActivity"
       android:exported="true"
       android:label="@string/album_item_comparison_title">
       <intent-filter>
@@ -97,18 +111,18 @@
       </intent-filter>
     </activity>
     <activity
-      android:name=".ui.album.TrackActivity"
+      android:name=".features.album.track.ui.TrackActivity"
       android:label="@string/album_item_track_title" />
     <activity
-      android:name=".ui.main.LibReferenceActivity"
+      android:name=".features.statistics.ui.LibReferenceActivity"
       android:configChanges="orientation"
       android:label="@string/tab_lib_reference_statistics"
       android:launchMode="singleTask" />
     <activity
-      android:name=".ui.main.ChartActivity"
+      android:name=".features.chart.ui.ChartActivity"
       android:label="@string/tab_chart" />
     <activity
-      android:name=".ui.about.AboutActivity"
+      android:name=".features.about.ui.AboutActivity"
       android:label="@string/settings_about"
       android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar" />
     <activity
@@ -126,8 +140,18 @@
       </intent-filter>
     </activity>
 
-    <service android:name=".services.ShootService" />
+    <service android:name=".services.ShootService"
+      android:foregroundServiceType="dataSync"
+      android:exported="false" />
     <service android:name=".services.WorkerService" />
+
+    <provider
+      android:name="rikka.shizuku.ShizukuProvider"
+      android:authorities="${applicationId}.shizuku"
+      android:multiprocess="false"
+      android:enabled="true"
+      android:exported="true"
+      android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
 
     <provider
       android:name="androidx.core.content.FileProvider"
@@ -143,6 +167,8 @@
     <meta-data
       android:name="channel"
       android:value="${channel}" />
+
+    <property android:name="android.window.PROPERTY_ACTIVITY_EMBEDDING_SPLITS_ENABLED" android:value="true" />
 
   </application>
 

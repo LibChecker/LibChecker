@@ -4,14 +4,14 @@
   xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  tools:context=".ui.fragment.applist.AppListFragment">
+  tools:context=".features.applist.ui.AppListFragment">
 
   <com.absinthe.libchecker.view.app.CustomViewFlipper
     android:id="@+id/vf_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.absinthe.libchecker.view.applist.AppListLoadingView
+    <com.absinthe.libchecker.features.applist.ui.view.AppListLoadingView
       android:id="@+id/loading_view"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
@@ -22,14 +22,13 @@
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:clipToPadding="false"
-      android:paddingTop="?actionBarSize"
       android:scrollbars="none"
       app:borderBottomVisibility="never"
       app:borderTopDrawable="@null"
       app:borderTopVisibility="whenTop"
-      app:fitsSystemWindowsInsets="bottom|top" />
+      app:fitsSystemWindowsInsets="bottom" />
 
-    <com.absinthe.libchecker.view.applist.AppListInitialiseView
+    <com.absinthe.libchecker.features.applist.ui.view.AppListInitialiseView
       android:id="@+id/init_view"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"

@@ -46,9 +46,12 @@
   <string name="ref_category_package">Package</string>
   <string name="ref_category_shared_uid">Shared UID</string>
   <string name="ref_category_signatures">Signatures</string>
+  <string name="ref_category_only_not_marked">Only Not Marked</string>
 
   <string name="string_kotlin_used">Kotlin Used</string>
   <string name="string_kotlin_unused">Kotlin Unused</string>
+  <string name="string_compose_used">Jetpack Compose Used</string>
+  <string name="string_compose_unused">Jetpack Compose Unused</string>
 
   <!--  About  -->
   <string name="settings_about">About</string>
@@ -110,6 +113,7 @@
   <string name="app_info_launch">Launch</string>
   <string name="app_info_settings">Settings</string>
   <string name="lib_detail_dialog_title">Library Details</string>
+  <string name="lib_permission_dialog_title">Permission Detail</string>
   <string name="agp_details">The Android Studio build system is based on Gradle, and the Android Gradle plugin adds several features that are specific to building Android apps. Although the Android plugin is typically updated in lock-step with Android Studio, the plugin (and the rest of the Gradle system) can run independent of Android Studio and be updated separately.</string>
   <string name="xposed_module">Xposed Module</string>
   <string name="xposed_module_details">Xposed is a framework for modules that can change the behavior of the system and apps without touching any APKs. That\'s great because it means that modules can work for different versions and even ROMs without any changes.</string>
@@ -155,6 +159,20 @@
   <string name="lib_detail_xposed_min_version">Min Version</string>
   <string name="lib_detail_xposed_default_scope">Default Scope</string>
   <string name="lib_detail_xposed_init_class">Init Class</string>
+  <string name="lib_detail_app_install_source_title">Installation Source</string>
+  <string name="lib_detail_app_install_source_originating_package">Installation requester</string>
+  <string name="lib_detail_app_install_source_installing_package">Installation Executor</string>
+  <string name="lib_detail_app_install_source_empty">Unknown</string>
+  <string name="lib_detail_app_install_source_empty_detail">adb or uninstalled app</string>
+  <string name="lib_detail_app_install_source_shizuku_usage">Because Android restricts the API to get the installation requester, we use Shizuku to get the installation requester.</string>
+  <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizuku not installed</string>
+  <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">Click here to install Shizuku</string>
+  <string name="lib_detail_app_install_source_shizuku_low_version">Requires Shizuku API 10</string>
+  <string name="lib_detail_app_install_source_shizuku_low_version_detail">Click here to update Shizuku</string>
+  <string name="lib_detail_app_install_source_shizuku_not_running">Shizuku not running</string>
+  <string name="lib_detail_app_install_source_shizuku_not_running_detail">Click here to jump to Shizuku to start it</string>
+  <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku not authorized</string>
+  <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">Click here for Shizuku authorization for installation requester</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Copied to clipboard</string>
@@ -178,6 +196,7 @@
   <string name="snapshot_detail_new_install_title">This App has newly installed</string>
   <string name="snapshot_detail_deleted_title">This App has been removed</string>
   <string name="snapshot_time_node_uninitialized">(Uninitialized)</string>
+  <string name="snapshot_preinstalled_app">Preinstalled app</string>
   <string name="snapshot_generate_text_report">Generate Text Report</string>
   <string name="snapshot_scheme_tip"><![CDATA[Tip: You can now generate snapshots in the background via:<br><b>%s</b>]]></string>
 
@@ -191,6 +210,8 @@
   <string name="dialog_title_confirm_to_delete">Are you sure to delete this snapshot?</string>
   <string name="btn_keep">Keep</string>
   <string name="btn_drop">Discard</string>
+  <string name="dialog_title_compare_diff_apk">Attention</string>
+  <string name="dialog_message_compare_diff_apk">Do you want to compare two different APKs?</string>
 
   <!--  Album  -->
   <string name="album_compare">Compare</string>
@@ -242,5 +263,9 @@
   <string name="adv_mark_exported">Mark Exported Component</string>
   <string name="adv_mark_disabled">Mark Disabled Component</string>
   <string name="adv_show_marked_lib">Show Marked Libraries</string>
+  <string name="adv_show_system_framework_apps">Show Framework Apps</string>
 
+  <!--  Snapshot menu  -->
+  <string name="snapshot_menu_show_update_time">Show Update Time</string>
+  <string name="snapshot_menu_hide_no_component_changes">Hide No Component Changes</string>
 </resources>
