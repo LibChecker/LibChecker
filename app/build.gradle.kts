@@ -77,7 +77,6 @@ configurations.configureEach {
 }
 
 dependencies {
-  implementation("androidx.core:core-ktx:1.10.0")
   compileOnly(projects.hiddenApi)
 
   implementation(libs.kotlinX.coroutines)
