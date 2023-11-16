@@ -38,6 +38,8 @@ object GlobalValues {
 
   var snapshotTimestamp: Long by SPDelegates(Constants.PREF_SNAPSHOT_TIMESTAMP, 0)
 
+  var distributionUpdateTimestamp: Long by SPDelegates(Constants.PREF_DISTRIBUTION_UPDATE_TIMESTAMP, 0)
+
   var debugMode: Boolean by SPDelegates(Constants.PREF_DEBUG_MODE, false)
 
   var snapshotKeep: String by SPDelegates(Constants.PREF_SNAPSHOT_KEEP, Constants.SNAPSHOT_DEFAULT)

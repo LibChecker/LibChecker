@@ -25,6 +25,9 @@ object ApiManager {
 
   const val GITHUB_API_REPO_INFO = "https://api.github.com/repos/%s/%s"
 
+  const val ANDROID_VERSION_DISTRIBUTION_HOST = "https://dl.google.com/"
+  const val ANDROID_VERSION_DISTRIBUTION_PATH = "android/studio/metadata/distributions.json"
+
   private val root
     get() = when (GlobalValues.repo) {
       Constants.REPO_GITHUB -> GITHUB_ROOT_URL

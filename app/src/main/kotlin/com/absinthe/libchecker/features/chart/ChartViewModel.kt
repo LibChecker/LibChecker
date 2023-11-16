@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.features.chart.impl.MarketDistributionChartDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +25,9 @@ class ChartViewModel : ViewModel() {
 
   private val _isLoading = MutableStateFlow(false)
   val isLoading = _isLoading.asStateFlow()
+
+  private val _distributionLastUpdateTime = MutableStateFlow("")
+  val distributionLastUpdateTime = _distributionLastUpdateTime.asStateFlow()
 
   fun setLoading(loading: Boolean) {
     _isLoading.value = loading
@@ -46,6 +50,15 @@ class ChartViewModel : ViewModel() {
         root.addView(newChartView)
         if (dbItems.value?.isNotEmpty() == true) {
           setLoading(false)
+        }
+        if (source is MarketDistributionChartDataSource) {
+          _distributionLastUpdateTime.value = source.distribution
+            ?.get(0)
+            ?.descriptionBlocks
+            ?.find { it.title.isEmpty() }
+            ?.body
+            ?.removePrefix("Last updated: ")
+            .orEmpty()
         }
       }
     }

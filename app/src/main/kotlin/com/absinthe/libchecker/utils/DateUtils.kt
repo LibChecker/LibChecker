@@ -147,6 +147,20 @@ object DateUtils {
     return todayYear == timestampYear && todayMonth == timestampMonth && todayDay == timestampDay
   }
 
+  fun isTimestampThisMonth(timestamp: Long): Boolean {
+    val calendar = Calendar.getInstance()
+    calendar.timeInMillis = timestamp
+
+    val today = Calendar.getInstance()
+    val todayYear = today.get(Calendar.YEAR)
+    val todayMonth = today.get(Calendar.MONTH)
+
+    val timestampYear = calendar.get(Calendar.YEAR)
+    val timestampMonth = calendar.get(Calendar.MONTH)
+
+    return todayYear == timestampYear && todayMonth == timestampMonth
+  }
+
   fun getCurrentSeason(): Int {
     return when (java.util.Calendar.getInstance(Locale.getDefault()).get(java.util.Calendar.MONTH) + 1) {
       3, 4, 5 -> SPRING

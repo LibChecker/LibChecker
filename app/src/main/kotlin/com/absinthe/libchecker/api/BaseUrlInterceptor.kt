@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.api
 
+import com.absinthe.libchecker.api.request.ANDROID_DIST
 import com.absinthe.libchecker.api.request.OWNER
 import com.absinthe.libchecker.api.request.REPO
 import com.absinthe.libchecker.api.request.REPO_INFO
@@ -25,6 +26,9 @@ class BaseUrlInterceptor : Interceptor {
         builder.removeHeader(OWNER)
         builder.removeHeader(REPO)
         builder.url(String.format(ApiManager.GITHUB_API_REPO_INFO, owner, repo))
+      } else if (ANDROID_DIST == headers[0]) {
+        builder.removeHeader(HEADER_BASE_URL)
+        builder.url(ApiManager.ANDROID_VERSION_DISTRIBUTION_HOST)
       }
     }
     return chain.proceed(builder.build())
