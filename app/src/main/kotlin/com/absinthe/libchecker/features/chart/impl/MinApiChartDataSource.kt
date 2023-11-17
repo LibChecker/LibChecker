@@ -10,7 +10,6 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.github.mikephil.charting.charts.BarChart
-import com.github.mikephil.charting.charts.HorizontalBarChart
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
@@ -66,7 +65,7 @@ class MinApiChartDataSource : BaseVariableChartDataSource<BarChart>() {
         }
 
         withContext(Dispatchers.Main) {
-          (chartView as HorizontalBarChart).apply {
+          chartView.apply {
             xAxis.apply {
               valueFormatter = OsVersionAxisFormatter(classifiedMap.map { entry -> entry.key })
               setLabelCount(classifiedMap.size, false)
@@ -82,6 +81,10 @@ class MinApiChartDataSource : BaseVariableChartDataSource<BarChart>() {
 
   override fun getListByXValue(x: Int): List<LCItem> {
     return classifiedMap.entries.elementAtOrNull(x)?.value ?: emptyList()
+  }
+
+  override fun getListKeyByXValue(x: Int): Int? {
+    return classifiedMap.entries.elementAtOrNull(x)?.key
   }
 
   override fun getLabelByXValue(context: Context, x: Int): String {

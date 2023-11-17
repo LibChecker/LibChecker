@@ -50,6 +50,7 @@ object Constants {
   const val PREF_LIB_SORT_MODE = "libSortMode"
   const val PREF_PROCESS_MODE = "processMode"
   const val PREF_SNAPSHOT_TIMESTAMP = "snapshotTimestamp"
+  const val PREF_DISTRIBUTION_UPDATE_TIMESTAMP = "distributionUpdateTimestamp"
 
   const val PREF_LOCAL_BACKUP = "localBackup"
   const val PREF_LOCAL_RESTORE = "localRestore"

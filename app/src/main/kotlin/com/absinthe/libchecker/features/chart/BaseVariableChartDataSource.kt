@@ -18,4 +18,6 @@ abstract class BaseVariableChartDataSource<T : View> : IChartDataSource<T> {
   override fun getListByXValue(x: Int): List<LCItem> {
     return classifiedMap[x] ?: emptyList()
   }
+
+  abstract fun getListKeyByXValue(x: Int): Int?
 }
