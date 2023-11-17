@@ -282,8 +282,7 @@ class ChartFragment :
             ViewGroup.LayoutParams.WRAP_CONTENT
           )
           chip.setOnClickListener {
-            val url = ApiManager.ANDROID_VERSION_DISTRIBUTION_HOST + ApiManager.ANDROID_VERSION_DISTRIBUTION_PATH
-            ClipboardUtils.put(context, url)
+            ClipboardUtils.put(context, ApiManager.ANDROID_VERSION_DISTRIBUTION_URL)
             VersionCompat.showCopiedOnClipboardToast(context)
           }
           if (viewModel.distributionLastUpdateTime.value.isNotEmpty()) {

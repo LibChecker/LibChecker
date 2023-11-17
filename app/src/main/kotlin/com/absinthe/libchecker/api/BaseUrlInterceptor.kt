@@ -13,6 +13,7 @@ const val HEADER_BASE_URL = "Base-Url"
 class BaseUrlInterceptor : Interceptor {
   override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
     val originalRequest = chain.request()
+    Timber.d("originalRequest.url: %s", originalRequest.url)
     val builder: Request.Builder = originalRequest.newBuilder()
     val headers: List<String> = originalRequest.headers(HEADER_BASE_URL)
     if (headers.isNotEmpty()) {
@@ -28,7 +29,7 @@ class BaseUrlInterceptor : Interceptor {
         builder.url(String.format(ApiManager.GITHUB_API_REPO_INFO, owner, repo))
       } else if (ANDROID_DIST == headers[0]) {
         builder.removeHeader(HEADER_BASE_URL)
-        builder.url(ApiManager.ANDROID_VERSION_DISTRIBUTION_HOST)
+        builder.url(ApiManager.ANDROID_VERSION_DISTRIBUTION_URL)
       }
     }
     return chain.proceed(builder.build())
