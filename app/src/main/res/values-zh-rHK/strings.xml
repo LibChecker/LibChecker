@@ -253,4 +253,5 @@
   <!--  Snapshot menu  -->
   <string name="snapshot_menu_show_update_time">顯示更新時間</string>
   <string name="snapshot_menu_hide_no_component_changes">隱藏沒有元件變更</string>
+  <string name="snapshot_menu_diff_highlight">Diff highlight</string>
 </resources>
