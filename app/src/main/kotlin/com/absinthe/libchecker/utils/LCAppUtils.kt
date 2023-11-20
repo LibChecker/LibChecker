@@ -174,21 +174,23 @@ object LCAppUtils {
     isNewOrDeleted: Boolean = false,
     highlightDiffColor: Int? = null
   ): CharSequence {
-    return if (highlightDiffColor != null) {
-      val highlightedNew1 =
-        getHighlightDifferences(diff1.old.toString(), diff1.new.toString(), highlightDiffColor)
-      val highlightedNew2 =
-        getHighlightDifferences(diff2.old.toString(), diff2.new.toString(), highlightDiffColor)
-      buildSpannedString {
-        append("${diff1.old} (${diff2.old})")
-        append(" $ARROW ")
-        append(highlightedNew1)
-        append(" (")
-        append(highlightedNew2)
-        append(")")
+    return if ((diff1.old != diff1.new || diff2.old != diff2.new) && !isNewOrDeleted) {
+      if (highlightDiffColor != null) {
+        val highlightedNew1 =
+          getHighlightDifferences(diff1.old.toString(), diff1.new.toString(), highlightDiffColor)
+        val highlightedNew2 =
+          getHighlightDifferences(diff2.old.toString(), diff2.new.toString(), highlightDiffColor)
+        buildSpannedString {
+          append("${diff1.old} (${diff2.old})")
+          append(" $ARROW ")
+          append(highlightedNew1)
+          append(" (")
+          append(highlightedNew2)
+          append(")")
+        }
+      } else {
+        "${diff1.old} (${diff2.old}) $ARROW ${diff1.new} (${diff2.new})"
       }
-    } else if ((diff1.old != diff1.new || diff2.old != diff2.new) && !isNewOrDeleted) {
-      "${diff1.old} (${diff2.old}) $ARROW ${diff1.new} (${diff2.new})"
     } else {
       "${diff1.old} (${diff2.old})"
     }
