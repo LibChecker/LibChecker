@@ -253,4 +253,5 @@
   <!--  Snapshot menu  -->
   <string name="snapshot_menu_show_update_time">إظهار وقت التحديث</string>
   <string name="snapshot_menu_hide_no_component_changes">إخفاء عدم وجود تغييرات في المكونات</string>
+  <string name="snapshot_menu_diff_highlight">Diff highlight</string>
 </resources>
