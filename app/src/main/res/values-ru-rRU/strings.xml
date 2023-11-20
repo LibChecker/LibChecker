@@ -253,4 +253,5 @@
   <!--  Snapshot menu  -->
   <string name="snapshot_menu_show_update_time">Показать время обновления</string>
   <string name="snapshot_menu_hide_no_component_changes">Скрыть компоненты без изменений</string>
+  <string name="snapshot_menu_diff_highlight">Diff highlight</string>
 </resources>
