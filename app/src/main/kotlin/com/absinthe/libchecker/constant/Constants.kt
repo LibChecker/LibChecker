@@ -89,6 +89,8 @@ object Constants {
   const val PREF_LIB_REF_OPTIONS = "libRefOptions"
   const val PREF_SNAPSHOT_OPTIONS = "snapshotOptions"
 
+  const val PP_FROM_CLOUD_RULES_UPDATE = "ruleDatabaseUpdate"
+
   object Event {
     const val LAUNCH_ACTION = "Launch Action"
     const val SNAPSHOT_CLICK = "Snapshot Click"

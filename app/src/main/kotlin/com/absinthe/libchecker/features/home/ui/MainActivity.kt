@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.STATUS_INIT_END
 import com.absinthe.libchecker.annotation.STATUS_START_INIT
@@ -38,6 +39,7 @@ import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.addBackStateHandler
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.setCurrentItem
+import com.absinthe.rulesbundle.LCRules
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.microsoft.appcenter.analytics.Analytics
@@ -89,6 +91,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+
+    if (intent.getBooleanExtra(Constants.PP_FROM_CLOUD_RULES_UPDATE, false)) {
+      Timber.w("Reinitializing updated rule database")
+      LCRules.init(LibCheckerApp.app)
+    }
 
     initView()
     initObserver()
