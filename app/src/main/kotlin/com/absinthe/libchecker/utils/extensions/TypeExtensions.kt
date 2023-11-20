@@ -9,9 +9,11 @@ fun String.isTempApk(): Boolean {
   return endsWith("${File.separator}${Constants.TEMP_PACKAGE}")
 }
 
-fun Long.sizeToString(context: Context): String {
-  return "${Formatter.formatFileSize(context, this)} ($this Bytes)"
+fun Long.sizeToString(context: Context, showBytes: Boolean = true): String {
+  val formattedSize = Formatter.formatFileSize(context, this)
+  return if (showBytes) "$formattedSize ($this Bytes)" else formattedSize
 }
+
 
 fun ByteArray.toHex(): String {
   return buildString {

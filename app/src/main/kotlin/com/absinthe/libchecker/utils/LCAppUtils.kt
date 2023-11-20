@@ -5,6 +5,8 @@ import android.content.Intent
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
+import androidx.core.text.buildSpannedString
 import androidx.core.text.toSpannable
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
@@ -144,10 +146,23 @@ object LCAppUtils {
   fun <T> getDiffString(
     diff: SnapshotDiffItem.DiffNode<T>,
     isNewOrDeleted: Boolean = false,
-    format: String = "%s"
-  ): String {
+    format: String = "%s",
+    highlightDiffColor: Int? = null
+  ): CharSequence {
     return if (diff.old != diff.new && !isNewOrDeleted) {
-      "${format.format(diff.old)} $ARROW ${format.format(diff.new)}"
+      val oldString = format.format(diff.old)
+      val newString = format.format(diff.new)
+
+      val highlightNewString = if (highlightDiffColor != null) {
+        getHighlightDifferences(oldString, newString, highlightDiffColor)
+      } else {
+        newString
+      }
+      buildSpannedString {
+        append(oldString)
+        append(" $ARROW ")
+        append(highlightNewString)
+      }
     } else {
       format.format(diff.old)
     }
@@ -157,12 +172,56 @@ object LCAppUtils {
     diff1: SnapshotDiffItem.DiffNode<*>,
     diff2: SnapshotDiffItem.DiffNode<*>,
     isNewOrDeleted: Boolean = false,
-    format: String = "%s"
-  ): String {
-    return if ((diff1.old != diff1.new || diff2.old != diff2.new) && !isNewOrDeleted) {
-      "${format.format(diff1.old, diff2.old)} $ARROW ${format.format(diff1.new, diff2.new)}"
+    highlightDiffColor: Int? = null
+  ): CharSequence {
+    return if (highlightDiffColor != null) {
+      val highlightedNew1 =
+        getHighlightDifferences(diff1.old.toString(), diff1.new.toString(), highlightDiffColor)
+      val highlightedNew2 =
+        getHighlightDifferences(diff2.old.toString(), diff2.new.toString(), highlightDiffColor)
+      buildSpannedString {
+        append("${diff1.old} (${diff2.old})")
+        append(" $ARROW ")
+        append(highlightedNew1)
+        append(" (")
+        append(highlightedNew2)
+        append(")")
+      }
+    } else if ((diff1.old != diff1.new || diff2.old != diff2.new) && !isNewOrDeleted) {
+      "${diff1.old} (${diff2.old}) $ARROW ${diff1.new} (${diff2.new})"
     } else {
-      format.format(diff1.old, diff2.old)
+      "${diff1.old} (${diff2.old})"
     }
+  }
+
+  private fun getHighlightDifferences(
+    oldString: String,
+    newString: String,
+    highlightDiffColor: Int
+  ): SpannableString {
+    val spannable = SpannableString(newString)
+    val minLength = minOf(oldString.length, newString.length)
+
+    for (i in 0 until minLength) {
+      if (oldString[i] != newString[i]) {
+        spannable.setSpan(
+          ForegroundColorSpan(highlightDiffColor),
+          i,
+          i + 1,
+          Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+        )
+      }
+    }
+
+    if (newString.length > oldString.length) {
+      spannable.setSpan(
+        ForegroundColorSpan(highlightDiffColor),
+        minLength,
+        newString.length,
+        Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+      )
+    }
+
+    return spannable
   }
 }

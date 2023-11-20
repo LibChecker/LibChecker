@@ -74,6 +74,11 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
       }
 
       val isNewOrDeleted = item.deleted || item.newInstalled
+      val highlightDiffColor = if ((GlobalValues.snapshotOptions and SnapshotOptions.DIFF_HIGHLIGHT) > 0) {
+        context.getColorByAttr(com.google.android.material.R.attr.colorPrimary)
+      } else {
+        null
+      }
 
       stateIndicator.apply {
         added = item.added && !isNewOrDeleted
@@ -82,16 +87,15 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
         moved = item.moved && !isNewOrDeleted
       }
 
-      val appNameLabel = if (item.isTrackItem) {
-        buildSpannedString {
+      val appNameLabel = buildSpannedString {
+        if (item.isTrackItem) {
           inSpans(ImageSpan(context, R.drawable.ic_track)) {
             append(" ")
           }
-          append(LCAppUtils.getDiffString(item.labelDiff, isNewOrDeleted))
         }
-      } else {
-        LCAppUtils.getDiffString(item.labelDiff, isNewOrDeleted)
+        append(LCAppUtils.getDiffString(item.labelDiff, isNewOrDeleted, highlightDiffColor = highlightDiffColor))
       }
+
       setOrHighlightText(appName, appNameLabel)
 
       if (isNewOrDeleted) {
@@ -114,32 +118,40 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
 
       setOrHighlightText(packageName, item.packageName)
       versionInfo.text =
-        LCAppUtils.getDiffString(item.versionNameDiff, item.versionCodeDiff, isNewOrDeleted, "%s (%s)")
+        LCAppUtils.getDiffString(item.versionNameDiff, item.versionCodeDiff, isNewOrDeleted, highlightDiffColor = highlightDiffColor)
 
       if (item.packageSizeDiff.old > 0L) {
         packageSizeInfo.isVisible = true
         val sizeDiff = SnapshotDiffItem.DiffNode(
-          item.packageSizeDiff.old.sizeToString(context),
-          item.packageSizeDiff.new?.sizeToString(context)
+          item.packageSizeDiff.old.sizeToString(context, showBytes = false),
+          item.packageSizeDiff.new?.sizeToString(context, showBytes = false)
         )
-        val diffText = StringBuilder(LCAppUtils.getDiffString(sizeDiff, isNewOrDeleted))
-        if (item.packageSizeDiff.new != null) {
-          val diffSize = item.packageSizeDiff.new - item.packageSizeDiff.old
-          val diffSizeText = buildString {
-            append(if (diffSize > 0) "+" else "")
-            append(diffSize.sizeToString(context))
-          }
+        val bytesDiff = SnapshotDiffItem.DiffNode(
+          item.packageSizeDiff.old,
+          item.packageSizeDiff.new
+        )
+        val diffText = buildSpannedString {
+          append(LCAppUtils.getDiffString(sizeDiff, bytesDiff, isNewOrDeleted, highlightDiffColor = highlightDiffColor))
 
-          if (diffSize != 0L) {
-            diffText.append(", $diffSizeText")
+          if (item.packageSizeDiff.new != null) {
+            val diffSize = item.packageSizeDiff.new - item.packageSizeDiff.old
+            val diffSizeText = buildString {
+              append(if (diffSize > 0) "+" else "")
+              append(diffSize.sizeToString(context))
+            }
+
+            if (diffSize != 0L) {
+              append(", $diffSizeText")
+            }
           }
         }
+
         packageSizeInfo.text = diffText
       } else {
         packageSizeInfo.isGone = true
       }
 
-      targetApiInfo.text = LCAppUtils.getDiffString(item.targetApiDiff, isNewOrDeleted, "API %s")
+      targetApiInfo.text = LCAppUtils.getDiffString(item.targetApiDiff, isNewOrDeleted, "API %s", highlightDiffColor = highlightDiffColor)
 
       val oldAbiString = PackageUtils.getAbiString(context, item.abiDiff.old.toInt(), false)
       val oldAbiSpanString: SpannableString

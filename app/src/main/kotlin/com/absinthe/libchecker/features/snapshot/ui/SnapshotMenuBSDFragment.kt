@@ -26,11 +26,15 @@ class SnapshotMenuBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotMenuBS
     }
     optionsViewMap[SnapshotOptions.SHOW_UPDATE_TIME] = root.addOptionItemView(R.string.snapshot_menu_show_update_time, SnapshotOptions.SHOW_UPDATE_TIME)
     optionsViewMap[SnapshotOptions.HIDE_NO_COMPONENT_CHANGES] = root.addOptionItemView(R.string.snapshot_menu_hide_no_component_changes, SnapshotOptions.HIDE_NO_COMPONENT_CHANGES)
+    optionsViewMap[SnapshotOptions.DIFF_HIGHLIGHT] = root.addOptionItemView(R.string.snapshot_menu_diff_highlight, SnapshotOptions.DIFF_HIGHLIGHT)
 
     optionsViewMap[SnapshotOptions.SHOW_UPDATE_TIME]?.setOnCheckedChangeCallback {
       root.updateDemoView()
     }
     optionsViewMap[SnapshotOptions.HIDE_NO_COMPONENT_CHANGES]?.setOnCheckedChangeCallback {
+      root.updateDemoView()
+    }
+    optionsViewMap[SnapshotOptions.DIFF_HIGHLIGHT]?.setOnCheckedChangeCallback {
       root.updateDemoView()
     }
 
