@@ -63,7 +63,7 @@ class MarketDistributionChartDataSource : BaseVariableChartDataSource<BarChart>(
 
       chartView.apply {
         xAxis.apply {
-          valueFormatter = OsVersionAxisFormatter(distribution!!.map { entry -> entry.apiLevel })
+          valueFormatter = OsVersionAxisFormatter(dist.map { entry -> entry.apiLevel })
           setLabelCount(dist.size, false)
         }
         axisLeft.valueFormatter = PercentageFormatter()

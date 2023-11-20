@@ -175,8 +175,7 @@ class SnapshotDetailActivity :
       snapshotTitle.versionInfoView.text = LCAppUtils.getDiffString(
         entity.versionNameDiff,
         entity.versionCodeDiff,
-        isNewOrDeleted,
-        "%s (%s)"
+        isNewOrDeleted
       )
       snapshotTitle.targetApiView.text =
         String.format("API %s", LCAppUtils.getDiffString(entity.targetApiDiff, isNewOrDeleted))
