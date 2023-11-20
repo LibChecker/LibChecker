@@ -12,6 +12,9 @@ class PercentageFormatter : IAxisValueFormatter, IValueFormatter {
   private val formatter = DecimalFormat("###,###,##0.00%")
 
   override fun getFormattedValue(value: Float, axis: AxisBase?): String {
+    if (value == 0f) {
+      return "0"
+    }
     return formatter.format(value)
   }
 
@@ -21,6 +24,9 @@ class PercentageFormatter : IAxisValueFormatter, IValueFormatter {
     dataSetIndex: Int,
     viewPortHandler: ViewPortHandler?
   ): String {
+    if (value == 0f) {
+      return "0"
+    }
     return formatter.format(value)
   }
 }
