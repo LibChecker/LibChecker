@@ -82,7 +82,7 @@ appCenter-analytics = { module = "com.microsoft.appcenter:appcenter-analytics", 
 appCenter-crashes = { module = "com.microsoft.appcenter:appcenter-crashes", version.ref = "appCenter" }
 appIconLoader = "me.zhanghai.android.appiconloader:appiconloader:1.5.0"
 appIconLoader-coil = "me.zhanghai.android.appiconloader:appiconloader-coil:1.5.0"
-brvah = "io.github.cymchad:BaseRecyclerViewAdapterHelper:3.0.13"
+brvah = "io.github.cymchad:BaseRecyclerViewAdapterHelper:4.0.3"
 coil = "io.coil-kt:coil:2.5.0"
 commons-io = "commons-io:commons-io:2.15.0"
 commons-compress = "org.apache.commons:commons-compress:1.25.0"
