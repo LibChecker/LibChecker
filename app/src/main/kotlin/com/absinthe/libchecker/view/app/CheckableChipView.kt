@@ -27,6 +27,7 @@ import android.graphics.Paint
 import android.graphics.drawable.Drawable
 import android.os.Parcel
 import android.os.Parcelable
+import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
 import android.util.AttributeSet
@@ -254,14 +255,25 @@ class CheckableChipView @JvmOverloads constructor(
       )
     }
 
+    val isRtl = layoutDirection == LAYOUT_DIRECTION_RTL
+
     // Draws beyond bounds and relies on clipToOutline to enforce shape
     val initialIndicatorSize = 8.dp.toFloat()
-    val indicatorCenterX = outlineWidth + padding + padding / 2f + initialIndicatorSize / 2f
+    val indicatorCenterX = if (isRtl) {
+      width - (outlineWidth + padding + padding / 2f + initialIndicatorSize / 2f)
+    } else {
+      outlineWidth + padding + padding / 2f + initialIndicatorSize / 2f
+    }
     val indicatorCenterY = height / 2f
 
+    val indicatorCenterToFarEdge = if (isRtl) {
+      indicatorCenterX
+    } else {
+      width - indicatorCenterX
+    }
     val indicatorSize = lerp(
       initialIndicatorSize,
-      ((width - indicatorCenterX) * 2f).coerceAtLeast((height - indicatorCenterY) * 2f),
+      (indicatorCenterToFarEdge * 2f).coerceAtLeast((height - indicatorCenterY) * 2f),
       progress
     )
 
@@ -281,11 +293,19 @@ class CheckableChipView @JvmOverloads constructor(
     )
 
     // Text
-    val textX = lerp(
-      indicatorCenterX + initialIndicatorSize / 2f + padding,
-      outlineWidth + padding + padding / 2f,
-      progress
-    )
+    val textX = if (isRtl) {
+      lerp(
+        width - (indicatorCenterX + initialIndicatorSize / 2f) + padding,
+        width - (outlineWidth + padding + padding / 2f) - textLayout.textWidth(),
+        progress
+      )
+    } else {
+      lerp(
+        indicatorCenterX + initialIndicatorSize / 2f + padding,
+        outlineWidth + padding + padding / 2f,
+        progress
+      )
+    }
 
     textPaint.apply {
       textSize = this@CheckableChipView.textSize
@@ -303,9 +323,15 @@ class CheckableChipView @JvmOverloads constructor(
     }
 
     // Clear icon
+    val iconX = if (isRtl) {
+      outlineWidth + padding + iconRadius
+    } else {
+      width - outlineWidth - padding - iconRadius
+    }
+
     if (progress > 0f) {
       canvas.withTranslation(
-        x = width - outlineWidth - padding - iconRadius,
+        x = iconX,
         y = height / 2f
       ) {
         canvas.withScale(progress, progress) {
@@ -372,7 +398,9 @@ class CheckableChipView @JvmOverloads constructor(
   }
 
   private fun createLayout(textWidth: Int) {
-    textLayout = StaticLayout.Builder.obtain(text, 0, text.length, textPaint, textWidth).build()
+    textLayout = StaticLayout.Builder.obtain(text, 0, text.length, textPaint, textWidth)
+      .setAlignment(Layout.Alignment.ALIGN_OPPOSITE)
+      .build()
   }
 
   override fun verifyDrawable(who: Drawable): Boolean {

@@ -126,7 +126,7 @@ fun ViewPager2.setCurrentItem(
   interpolator: TimeInterpolator = AccelerateDecelerateInterpolator(),
   pagePxWidth: Int = width
 ) {
-  val pxToDrag: Int = pagePxWidth * (item - currentItem)
+  val pxToDrag: Int = pagePxWidth * (item - currentItem) * (if (isRtl()) -1 else 1)
   val animator = ValueAnimator.ofInt(0, pxToDrag)
   var previousValue = 0
   animator.addUpdateListener { valueAnimator ->
@@ -214,3 +214,25 @@ fun TextView.addStrikeThroughSpan() {
   span.setSpan(StrikethroughSpan(), 0, text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
   text = span
 }
+
+fun View.isRtl(): Boolean {
+  return layoutDirection == View.LAYOUT_DIRECTION_RTL
+}
+
+val View.start: Int
+  get() {
+    return if (isRtl()) {
+      right
+    } else {
+      left
+    }
+  }
+
+val View.end: Int
+  get() {
+    return if (isRtl()) {
+      left
+    } else {
+      right
+    }
+  }
