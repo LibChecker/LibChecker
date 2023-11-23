@@ -49,9 +49,9 @@
   <string name="string_kotlin_unused">Kotlin не используется</string>
   <string name="string_compose_used">Используется Jetpack Compose</string>
   <string name="string_compose_unused">Jetpack Compose не используется</string>
-  <string name="android_dist_source">Source</string>
-  <string name="android_dist_title">Android Version Distribution Statistics</string>
-  <string name="android_dist_subtitle_format">Update Time: %s</string>
+  <string name="android_dist_source">Источник</string>
+  <string name="android_dist_title">Статистика распределения версий Android</string>
+  <string name="android_dist_subtitle_format">Время обновления %s</string>
   <!--  About  -->
   <string name="settings_about">О приложении</string>
   <string name="settings_translate">Участвуйте в переводе</string>
@@ -253,5 +253,5 @@
   <!--  Snapshot menu  -->
   <string name="snapshot_menu_show_update_time">Показать время обновления</string>
   <string name="snapshot_menu_hide_no_component_changes">Скрыть компоненты без изменений</string>
-  <string name="snapshot_menu_diff_highlight">Diff highlight</string>
+  <string name="snapshot_menu_diff_highlight">Показать различия</string>
 </resources>
