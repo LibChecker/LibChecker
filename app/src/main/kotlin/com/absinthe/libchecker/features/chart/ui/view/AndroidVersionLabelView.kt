@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.applist.detail.ui.view
+package com.absinthe.libchecker.features.chart.ui.view
 
 import android.content.Context
 import android.view.ContextThemeWrapper
@@ -52,8 +52,8 @@ class AndroidVersionLabelView(context: Context) : AViewGroup(context) {
   }
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-    val totalWidth = icon.measuredWidth + text.marginStart + text.measuredWidth
-    icon.layout((measuredWidth - totalWidth) / 2, icon.toVerticalCenter(this))
-    text.layout(icon.right + text.marginStart, text.toVerticalCenter(this))
+    val iconOffsetX = (measuredWidth - (icon.measuredWidth + text.marginStart + text.measuredWidth)) / 2
+    icon.layout(iconOffsetX, icon.toVerticalCenter(this))
+    text.layout(iconOffsetX + icon.measuredWidth + text.marginStart, text.toVerticalCenter(this))
   }
 }

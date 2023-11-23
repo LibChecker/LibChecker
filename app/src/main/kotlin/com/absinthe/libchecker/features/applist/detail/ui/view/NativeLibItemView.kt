@@ -11,6 +11,7 @@ import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.children
 import androidx.core.view.marginEnd
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
@@ -91,13 +92,19 @@ class NativeLibItemView(context: Context) : AViewGroup(context) {
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-    val chipWidth = chip?.apply { autoMeasure() }?.measuredWidth ?: 0
-    if (chipWidth != 0) {
-      chipWidth.plus(libName.marginEnd)
+    val chipWidth = chip?.let {
+      it.autoMeasure()
+      return@let it.measuredWidth + libName.marginEnd
+    } ?: 0
+    val maxWidth = measuredWidth - paddingStart - paddingEnd - libName.marginEnd - chipWidth
+
+    children.filter { it != chip }.forEach {
+      it.autoMeasure()
+      if (it.measuredWidth > maxWidth) {
+        it.measure(maxWidth.toExactlyMeasureSpec(), it.defaultHeightMeasureSpec(this))
+      }
     }
-    val libNameWidth = measuredWidth - paddingStart - paddingEnd - libName.marginEnd - chipWidth
-    libName.measure(libNameWidth.toExactlyMeasureSpec(), libName.defaultHeightMeasureSpec(this))
-    libSize.measure(libNameWidth.toExactlyMeasureSpec(), libSize.defaultHeightMeasureSpec(this))
+
     setMeasuredDimension(
       measuredWidth,
       (libName.measuredHeight + libSize.measuredHeight + paddingTop + paddingBottom).coerceAtLeast(
@@ -108,7 +115,7 @@ class NativeLibItemView(context: Context) : AViewGroup(context) {
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     libName.layout(paddingStart, paddingTop)
-    libSize.layout(libName.left, libName.bottom)
+    libSize.layout(paddingStart, libName.bottom)
     chip?.let { it.layout(paddingEnd, it.toVerticalCenter(this), fromRight = true) }
   }
 

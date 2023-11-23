@@ -8,6 +8,7 @@ import androidx.core.view.marginBottom
 import androidx.core.view.marginLeft
 import androidx.core.view.marginRight
 import androidx.core.view.marginTop
+import com.absinthe.libchecker.utils.extensions.isRtl
 
 /**
  * From drakeet
@@ -65,11 +66,10 @@ abstract class AViewGroup(context: Context, attributeSet: AttributeSet? = null) 
   }
 
   protected fun View.layout(x: Int, y: Int, fromRight: Boolean = false) {
-    if (!fromRight) {
-      layout(x, y, x + measuredWidth, y + measuredHeight)
-    } else {
-      layout(this@AViewGroup.measuredWidth - x - measuredWidth, y)
-    }
+    val actualFromRight = if (isRtl()) !fromRight else fromRight
+    val actualX = if (actualFromRight) this@AViewGroup.measuredWidth - x - measuredWidth else x
+
+    layout(actualX, y, actualX + measuredWidth, y + measuredHeight)
   }
 
   protected val Int.dp: Int get() = (this * resources.displayMetrics.density + 0.5f).toInt()

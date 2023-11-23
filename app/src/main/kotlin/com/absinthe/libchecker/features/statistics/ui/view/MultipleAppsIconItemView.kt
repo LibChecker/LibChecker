@@ -6,6 +6,7 @@ import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.children
 import androidx.core.view.marginLeft
 import androidx.core.view.marginRight
 import com.absinthe.libchecker.R
@@ -81,21 +82,20 @@ class MultipleAppsIconItemView(context: Context) : FrameLayout(context) {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
       super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-      icon.autoMeasure()
-      count.autoMeasure()
+      children.forEach {
+        it.autoMeasure()
+      }
       val labelWidth = (
         measuredWidth - paddingStart - paddingEnd -
           icon.measuredWidth - count.measuredWidth -
           labelName.marginLeft - labelName.marginRight
         )
-      labelName.measure(
-        labelWidth.toExactlyMeasureSpec(),
-        labelName.defaultHeightMeasureSpec(this)
-      )
-      libName.measure(
-        labelWidth.toExactlyMeasureSpec(),
-        libName.defaultHeightMeasureSpec(this)
-      )
+      if (labelName.measuredWidth > labelWidth) {
+        labelName.measure(labelWidth.toExactlyMeasureSpec(), labelName.defaultHeightMeasureSpec(this))
+      }
+      if (libName.measuredWidth > labelWidth) {
+        libName.measure(labelWidth.toExactlyMeasureSpec(), libName.defaultHeightMeasureSpec(this))
+      }
       setMeasuredDimension(
         measuredWidth,
         (paddingTop + labelName.measuredHeight + libName.measuredHeight + paddingBottom)
@@ -105,8 +105,8 @@ class MultipleAppsIconItemView(context: Context) : FrameLayout(context) {
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
       icon.layout(paddingStart, icon.toVerticalCenter(this))
-      labelName.layout(icon.right + labelName.marginLeft, paddingTop)
-      libName.layout(labelName.left, labelName.bottom)
+      labelName.layout(paddingStart + icon.measuredWidth + labelName.marginLeft, paddingTop)
+      libName.layout(paddingStart + icon.measuredWidth + labelName.marginLeft, labelName.bottom)
       count.layout(paddingEnd, count.toVerticalCenter(this), fromRight = true)
     }
   }
