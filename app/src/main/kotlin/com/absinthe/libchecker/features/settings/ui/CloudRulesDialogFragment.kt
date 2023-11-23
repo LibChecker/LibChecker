@@ -8,6 +8,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
+import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.utils.DownloadUtils
@@ -93,7 +94,12 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
                   root.cloudRulesContentView.remoteVersion.version.text.toString().toInt()
                 )
                 context?.let {
-                  ProcessPhoenix.triggerRebirth(it)
+                  val intent = SystemServices.packageManager.getLaunchIntentForPackage(
+                    it.packageName
+                  )!!.apply {
+                    putExtra(Constants.PP_FROM_CLOUD_RULES_UPDATE, true)
+                  }
+                  ProcessPhoenix.triggerRebirth(it, intent)
                 }
               }
             }

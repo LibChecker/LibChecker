@@ -61,13 +61,18 @@ class MarketDistributionChartDataSource : BaseVariableChartDataSource<BarChart>(
         setValueTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
       }
 
+      chartView.apply {
+        xAxis.apply {
+          valueFormatter = OsVersionAxisFormatter(dist.map { entry -> entry.apiLevel })
+          setLabelCount(dist.size, false)
+        }
+        axisLeft.valueFormatter = PercentageFormatter()
+        axisRight.valueFormatter = PercentageFormatter()
+        this.data = data
+      }
+
       withContext(Dispatchers.Main) {
         chartView.apply {
-          xAxis.apply {
-            valueFormatter = OsVersionAxisFormatter(distribution!!.map { entry -> entry.apiLevel })
-            setLabelCount(dist.size, false)
-          }
-          this.data = data
           highlightValues(null)
           invalidate()
         }
