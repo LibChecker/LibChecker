@@ -49,6 +49,9 @@
   <string name="string_kotlin_unused">Kotlin не используется</string>
   <string name="string_compose_used">Используется Jetpack Compose</string>
   <string name="string_compose_unused">Jetpack Compose не используется</string>
+  <string name="android_dist_source">Источник</string>
+  <string name="android_dist_title">Статистика распределения версий Android</string>
+  <string name="android_dist_subtitle_format">Время обновления %s</string>
   <!--  About  -->
   <string name="settings_about">О приложении</string>
   <string name="settings_translate">Участвуйте в переводе</string>
@@ -74,7 +77,7 @@
   <string name="anonymous_statistics">Анонимная статистика</string>
   <string name="cloud_rules">Облачные правила</string>
   <string name="dark_mode">Темный режим</string>
-  <string name="snapshot_keep">Правило сохранения моментальных снимков по умолчанию</string>
+  <string name="snapshot_keep">Стандартное поведение при сохранении снимков</string>
   <string name="apk_analytics_summary">Открывает страницу сведений при нажатии на APK-файл</string>
   <string name="colorful_icon_summary">Часть отмеченных библиотек будет отображаться в виде цветных значков.</string>
   <string name="lib_ref_threshold_summary">В списке отображаются только те библиотеки, число ссылок на которые превысило заданный порог</string>
@@ -88,9 +91,9 @@
   <string name="array_dark_mode_auto">Авто</string>
   <string name="array_dark_mode_system">Как в системе</string>
   <string name="array_dark_mode_battery">Зависит от режима энергосбережения</string>
-  <string name="array_snapshot_default">спросить</string>
-  <string name="array_snapshot_keep">резерв</string>
-  <string name="array_snapshot_discard">выбрасывать</string>
+  <string name="array_snapshot_default">Спросить</string>
+  <string name="array_snapshot_keep">Оставить</string>
+  <string name="array_snapshot_discard">Удалить</string>
   <!--  Detail  -->
   <string name="detail">подробности</string>
   <string name="detail_label">Просмотр сведений о приложении</string>
@@ -250,4 +253,5 @@
   <!--  Snapshot menu  -->
   <string name="snapshot_menu_show_update_time">Показать время обновления</string>
   <string name="snapshot_menu_hide_no_component_changes">Скрыть компоненты без изменений</string>
+  <string name="snapshot_menu_diff_highlight">Показать различия</string>
 </resources>
