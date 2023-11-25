@@ -335,10 +335,6 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     val container = (activity as? IAppBarContainer) ?: return
     if (this != viewModel.controller) {
       viewModel.controller = this
-      container.currentMenuProvider?.let { current ->
-        activity?.removeMenuProvider(current)
-      }
-      container.currentMenuProvider = null
     }
     scheduleAppbarRaisingStatus(!getBorderViewDelegate().isShowingTopBorder)
     container.setLiftOnScrollTargetView(prefRecyclerView)
