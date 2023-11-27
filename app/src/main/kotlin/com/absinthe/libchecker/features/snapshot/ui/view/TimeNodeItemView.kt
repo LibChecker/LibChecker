@@ -72,7 +72,7 @@ class TimeNodeItemView(context: Context) : AViewGroup(context) {
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     name.layout(paddingStart, paddingTop)
-    rvList.layout(name.left, name.bottom)
+    rvList.layout(paddingStart, name.bottom)
   }
 
   override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {

@@ -172,7 +172,8 @@ object LCAppUtils {
     diff1: SnapshotDiffItem.DiffNode<*>,
     diff2: SnapshotDiffItem.DiffNode<*>,
     isNewOrDeleted: Boolean = false,
-    highlightDiffColor: Int? = null
+    highlightDiffColor: Int? = null,
+    diff2Suffix: String = ""
   ): CharSequence {
     return if ((diff1.old != diff1.new || diff2.old != diff2.new) && !isNewOrDeleted) {
       if (highlightDiffColor != null) {
@@ -186,6 +187,7 @@ object LCAppUtils {
           append(highlightedNew1)
           append(" (")
           append(highlightedNew2)
+          append(diff2Suffix)
           append(")")
         }
       } else {

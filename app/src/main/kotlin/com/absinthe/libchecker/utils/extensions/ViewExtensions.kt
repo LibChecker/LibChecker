@@ -20,6 +20,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.FileProvider
 import androidx.core.view.children
+import androidx.core.view.isVisible
 import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.compat.VersionCompat
@@ -236,3 +237,6 @@ val View.end: Int
       right
     }
   }
+
+fun View?.visibleWidth() = if (this != null && isVisible) measuredWidth else 0
+fun View?.visibleHeight() = if (this != null && isVisible) measuredHeight else 0

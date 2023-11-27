@@ -7,7 +7,9 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.children
 import androidx.core.view.isVisible
+import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.getDrawableByAttr
 import com.absinthe.libchecker.view.AViewGroup
@@ -20,8 +22,10 @@ class AppPropItemView(context: Context) : AViewGroup(context) {
       R.style.TextView_SansSerif
     )
   ).apply {
-    layoutParams =
-      LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, -1)
+    layoutParams = LayoutParams(
+      ViewGroup.LayoutParams.WRAP_CONTENT,
+      -1
+    )
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
     alpha = 0.85f
   }
@@ -32,8 +36,10 @@ class AppPropItemView(context: Context) : AViewGroup(context) {
       R.style.TextView_SansSerifCondensedMedium
     )
   ).apply {
-    layoutParams =
-      LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+    layoutParams = LayoutParams(
+      ViewGroup.LayoutParams.WRAP_CONTENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
+    )
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
   }
 
@@ -43,8 +49,10 @@ class AppPropItemView(context: Context) : AViewGroup(context) {
       R.style.TextView_SansSerifCondensedMedium
     )
   ).apply {
-    layoutParams =
-      LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+    layoutParams = LayoutParams(
+      ViewGroup.LayoutParams.WRAP_CONTENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
+    )
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
     alpha = 0.65f
   }
@@ -79,11 +87,19 @@ class AppPropItemView(context: Context) : AViewGroup(context) {
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-    linkToIcon.autoMeasure()
-    val textWidth = measuredWidth - paddingStart - paddingEnd - linkToIcon.measuredWidth
-    tip.measure(textWidth.toExactlyMeasureSpec(), tip.defaultHeightMeasureSpec(this))
-    key.measure(textWidth.toExactlyMeasureSpec(), key.defaultHeightMeasureSpec(this))
-    value.measure(textWidth.toExactlyMeasureSpec(), value.defaultHeightMeasureSpec(this))
+    children.forEach {
+      it.autoMeasure()
+    }
+    val textWidth = measuredWidth - paddingStart - paddingEnd - linkToIcon.measuredWidth - linkToIcon.marginStart
+    if (tip.measuredWidth > textWidth) {
+      tip.measure(textWidth.toExactlyMeasureSpec(), tip.defaultHeightMeasureSpec(this))
+    }
+    if (key.measuredWidth > textWidth) {
+      key.measure(textWidth.toExactlyMeasureSpec(), key.defaultHeightMeasureSpec(this))
+    }
+    if (value.measuredWidth > textWidth) {
+      value.measure(textWidth.toExactlyMeasureSpec(), value.defaultHeightMeasureSpec(this))
+    }
     setMeasuredDimension(
       measuredWidth,
       paddingTop + paddingBottom + tip.measuredHeight + key.measuredHeight + value.measuredHeight

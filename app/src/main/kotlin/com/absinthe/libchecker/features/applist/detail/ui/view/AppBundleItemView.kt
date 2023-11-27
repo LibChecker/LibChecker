@@ -6,6 +6,7 @@ import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.children
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.view.AViewGroup
@@ -33,8 +34,10 @@ class AppBundleItemView(context: Context) : AViewGroup(context) {
       R.style.TextView_SansSerifCondensedMedium
     )
   ).apply {
-    layoutParams =
-      LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+    layoutParams = LayoutParams(
+      ViewGroup.LayoutParams.WRAP_CONTENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
+    )
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
   }
 
@@ -66,11 +69,17 @@ class AppBundleItemView(context: Context) : AViewGroup(context) {
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-    icon.autoMeasure()
+    children.forEach {
+      it.autoMeasure()
+    }
     val textWidth =
       measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - name.marginStart
-    name.measure(textWidth.toExactlyMeasureSpec(), name.defaultHeightMeasureSpec(this))
-    size.measure(textWidth.toExactlyMeasureSpec(), size.defaultHeightMeasureSpec(this))
+    if (name.measuredWidth > textWidth) {
+      name.measure(textWidth.toExactlyMeasureSpec(), name.defaultHeightMeasureSpec(this))
+    }
+    if (size.measuredWidth > textWidth) {
+      size.measure(textWidth.toExactlyMeasureSpec(), size.defaultHeightMeasureSpec(this))
+    }
     setMeasuredDimension(
       measuredWidth,
       paddingTop + paddingBottom + name.measuredHeight + size.measuredHeight
@@ -79,8 +88,8 @@ class AppBundleItemView(context: Context) : AViewGroup(context) {
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     icon.layout(paddingStart, icon.toVerticalCenter(this))
-    name.layout(icon.right + name.marginStart, paddingTop)
-    size.layout(name.left, name.bottom)
+    name.layout(paddingStart + icon.measuredWidth + name.marginStart, paddingTop)
+    size.layout(paddingStart + icon.measuredWidth + name.marginStart, name.bottom)
   }
 
   class IconType {

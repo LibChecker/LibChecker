@@ -19,6 +19,7 @@ import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
+import com.absinthe.libchecker.utils.extensions.roundUpToNearestTen
 import com.absinthe.libchecker.utils.extensions.toColorStateList
 import com.absinthe.libchecker.utils.extensions.toColorStateListByColor
 import com.absinthe.libchecker.view.AViewGroup
@@ -32,8 +33,10 @@ import com.absinthe.libchecker.view.AViewGroup
 class AppInfoItemView(context: Context) : AViewGroup(context) {
 
   init {
-    layoutParams =
-      LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+    layoutParams = LayoutParams(
+      ViewGroup.LayoutParams.MATCH_PARENT,
+      ViewGroup.LayoutParams.MATCH_PARENT
+    )
     isClickable = true
     isFocusable = true
     setPadding(4.dp, 12.dp, 4.dp, 12.dp)
@@ -58,11 +61,12 @@ class AppInfoItemView(context: Context) : AViewGroup(context) {
       ViewGroup.LayoutParams.WRAP_CONTENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     ).also {
-      it.topMargin = 12.dp
+      it.topMargin = 8.dp
     }
     gravity = Gravity.CENTER_HORIZONTAL
     maxLines = 1
     ellipsize = TextUtils.TruncateAt.END
+    setPadding(0, 4.dp, 0, 4.dp)
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
     addView(this)
   }
@@ -114,8 +118,8 @@ class AppInfoItemView(context: Context) : AViewGroup(context) {
     )
     setMeasuredDimension(
       measuredWidth,
-      // Ignore errors within 10 pixels, as the different heights of Chinese and English in some fonts can cause the Adapter to fail to align
-      (paddingTop + icon.measuredHeight + text.marginTop + text.measuredHeight + paddingBottom) / 10 * 10
+      // Round up to nearest ten to align items
+      (paddingTop + icon.measuredHeight + text.marginTop + text.measuredHeight + paddingBottom).roundUpToNearestTen()
     )
   }
 

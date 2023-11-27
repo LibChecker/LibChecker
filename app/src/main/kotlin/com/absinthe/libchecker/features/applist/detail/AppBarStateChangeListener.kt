@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.applist.detail.ui.view
+package com.absinthe.libchecker.features.applist.detail
 
 import com.google.android.material.appbar.AppBarLayout
 import kotlin.math.abs

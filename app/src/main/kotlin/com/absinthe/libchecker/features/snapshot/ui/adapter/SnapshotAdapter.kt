@@ -131,7 +131,7 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
           item.packageSizeDiff.new
         )
         val diffText = buildSpannedString {
-          append(LCAppUtils.getDiffString(sizeDiff, bytesDiff, isNewOrDeleted, highlightDiffColor = highlightDiffColor))
+          append(LCAppUtils.getDiffString(sizeDiff, bytesDiff, isNewOrDeleted, highlightDiffColor = highlightDiffColor, diff2Suffix = " Bytes"))
 
           if (item.packageSizeDiff.new != null) {
             val diffSize = item.packageSizeDiff.new - item.packageSizeDiff.old

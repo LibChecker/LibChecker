@@ -7,6 +7,7 @@ import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.children
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -36,7 +37,7 @@ class DetailsTitleView(context: Context, attributeSet: AttributeSet? = null) :
     )
   ).apply {
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     ).also {
       it.marginStart = context.getDimensionPixelSize(R.dimen.normal_padding)
@@ -49,7 +50,7 @@ class DetailsTitleView(context: Context, attributeSet: AttributeSet? = null) :
   val packageNameView =
     AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
       layoutParams = LayoutParams(
-        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
@@ -64,7 +65,7 @@ class DetailsTitleView(context: Context, attributeSet: AttributeSet? = null) :
     )
   ).apply {
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     )
     setTextColor(android.R.color.darker_gray.getColor(context))
@@ -79,7 +80,7 @@ class DetailsTitleView(context: Context, attributeSet: AttributeSet? = null) :
     )
   ).apply {
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     )
     setTextColor(android.R.color.darker_gray.getColor(context))
@@ -111,29 +112,41 @@ class DetailsTitleView(context: Context, attributeSet: AttributeSet? = null) :
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-    iconView.autoMeasure()
+    children.forEach {
+      it.autoMeasure()
+    }
     val textWidth =
       measuredWidth - paddingStart - paddingEnd - iconView.measuredWidth - appNameView.marginStart
-    appNameView.measure(
-      textWidth.toExactlyMeasureSpec(),
-      appNameView.defaultHeightMeasureSpec(this)
-    )
-    packageNameView.measure(
-      textWidth.toExactlyMeasureSpec(),
-      packageNameView.defaultHeightMeasureSpec(this)
-    )
-    versionInfoView.measure(
-      textWidth.toExactlyMeasureSpec(),
-      versionInfoView.defaultHeightMeasureSpec(this)
-    )
-    extraInfoView.measure(
-      textWidth.toExactlyMeasureSpec(),
-      extraInfoView.defaultHeightMeasureSpec(this)
-    )
-    abiLabelsRecyclerView.measure(
-      textWidth.toExactlyMeasureSpec(),
-      abiLabelsRecyclerView.defaultHeightMeasureSpec(this)
-    )
+    if (appNameView.measuredWidth > textWidth) {
+      appNameView.measure(
+        textWidth.toExactlyMeasureSpec(),
+        appNameView.defaultHeightMeasureSpec(this)
+      )
+    }
+    if (packageNameView.measuredWidth > textWidth) {
+      packageNameView.measure(
+        textWidth.toExactlyMeasureSpec(),
+        packageNameView.defaultHeightMeasureSpec(this)
+      )
+    }
+    if (versionInfoView.measuredWidth > textWidth) {
+      versionInfoView.measure(
+        textWidth.toExactlyMeasureSpec(),
+        versionInfoView.defaultHeightMeasureSpec(this)
+      )
+    }
+    if (extraInfoView.measuredWidth > textWidth) {
+      extraInfoView.measure(
+        textWidth.toExactlyMeasureSpec(),
+        extraInfoView.defaultHeightMeasureSpec(this)
+      )
+    }
+    if (abiLabelsRecyclerView.measuredWidth > textWidth) {
+      abiLabelsRecyclerView.measure(
+        textWidth.toExactlyMeasureSpec(),
+        abiLabelsRecyclerView.defaultHeightMeasureSpec(this)
+      )
+    }
     val basicInfoTotalHeight =
       appNameView.measuredHeight +
         packageNameView.measuredHeight +
@@ -151,14 +164,11 @@ class DetailsTitleView(context: Context, attributeSet: AttributeSet? = null) :
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     iconView.layout(paddingStart, paddingTop)
-    appNameView.layout(iconView.right + appNameView.marginStart, paddingTop)
-    packageNameView.layout(appNameView.left, appNameView.bottom)
-    versionInfoView.layout(appNameView.left, packageNameView.bottom)
-    extraInfoView.layout(appNameView.left, versionInfoView.bottom)
-    abiLabelsRecyclerView.layout(appNameView.left + abiLabelsRecyclerView.marginStart, extraInfoView.bottom + abiLabelsRecyclerView.marginTop)
-  }
-
-  companion object {
-    private const val MEGA_BYTE_SI_UNITS = 1000 * 1000
+    val appNameXOffset = paddingStart + iconView.measuredWidth + appNameView.marginStart
+    appNameView.layout(appNameXOffset, paddingTop)
+    packageNameView.layout(appNameXOffset, appNameView.bottom)
+    versionInfoView.layout(appNameXOffset, packageNameView.bottom)
+    extraInfoView.layout(appNameXOffset, versionInfoView.bottom)
+    abiLabelsRecyclerView.layout(appNameXOffset + abiLabelsRecyclerView.marginStart, extraInfoView.bottom + abiLabelsRecyclerView.marginTop)
   }
 }

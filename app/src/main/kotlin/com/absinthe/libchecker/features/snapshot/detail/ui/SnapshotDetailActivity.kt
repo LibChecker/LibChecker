@@ -28,7 +28,7 @@ import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
-import com.absinthe.libchecker.features.applist.detail.ui.view.AppBarStateChangeListener
+import com.absinthe.libchecker.features.applist.detail.AppBarStateChangeListener
 import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
 import com.absinthe.libchecker.features.snapshot.detail.bean.ADDED
 import com.absinthe.libchecker.features.snapshot.detail.bean.CHANGED

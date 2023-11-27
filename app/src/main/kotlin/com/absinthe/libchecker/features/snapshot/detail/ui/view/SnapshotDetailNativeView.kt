@@ -10,6 +10,7 @@ import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.children
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
@@ -17,6 +18,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.toColorStateList
 import com.absinthe.libchecker.utils.extensions.valueUnsafe
+import com.absinthe.libchecker.utils.extensions.visibleHeight
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.rulesbundle.Rule
 import com.google.android.material.card.MaterialCardView
@@ -130,18 +132,18 @@ class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
       super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-      typeIcon.autoMeasure()
+      children.forEach {
+        it.autoMeasure()
+      }
       val textWidth =
         (measuredWidth - paddingStart - typeIcon.measuredWidth - name.marginStart - paddingEnd)
-      name.measure(textWidth.toExactlyMeasureSpec(), name.defaultHeightMeasureSpec(this))
-      libSize.measure(
-        textWidth.toExactlyMeasureSpec(),
-        libSize.defaultHeightMeasureSpec(this)
-      )
-      val chipHeight = chip?.let {
-        it.autoMeasure()
-        it.measuredHeight + it.marginTop
-      } ?: 0
+      if (name.measuredWidth > textWidth) {
+        name.measure(textWidth.toExactlyMeasureSpec(), name.defaultHeightMeasureSpec(this))
+      }
+      if (libSize.measuredWidth > textWidth) {
+        libSize.measure(textWidth.toExactlyMeasureSpec(), libSize.defaultHeightMeasureSpec(this))
+      }
+      val chipHeight = chip?.let { it.measuredHeight + it.marginTop } ?: 0
       setMeasuredDimension(
         measuredWidth,
         paddingTop + name.measuredHeight + libSize.measuredHeight + chipHeight + paddingBottom
@@ -150,17 +152,13 @@ class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
       typeIcon.layout(paddingStart, typeIcon.toVerticalCenter(this))
+      val nameXOffset = paddingStart + typeIcon.measuredWidth + name.marginStart
       name.layout(
-        typeIcon.right + name.marginStart,
-        (
-          measuredHeight - name.measuredHeight - libSize.measuredHeight - (
-            chip?.measuredHeight
-              ?: 0
-            )
-          ) / 2
+        nameXOffset,
+        (measuredHeight - name.measuredHeight - libSize.measuredHeight - chip.visibleHeight()) / 2
       )
-      libSize.layout(name.left, name.bottom)
-      chip?.layout(name.left, libSize.bottom + chip!!.marginTop)
+      libSize.layout(nameXOffset, name.bottom)
+      chip?.layout(nameXOffset, libSize.bottom + chip!!.marginTop)
     }
   }
 }
