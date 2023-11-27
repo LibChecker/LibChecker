@@ -8,8 +8,8 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.absinthe.libchecker.features.chart.ui.view.AndroidVersionLabelView
 import com.absinthe.libchecker.features.applist.ui.adapter.AppAdapter
+import com.absinthe.libchecker.features.chart.ui.view.AndroidVersionLabelView
 import com.absinthe.libchecker.features.statistics.ui.view.LibReferenceLoadingView
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
