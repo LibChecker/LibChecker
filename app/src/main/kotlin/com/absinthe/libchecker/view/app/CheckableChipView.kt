@@ -51,6 +51,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.lerp
 import com.absinthe.libchecker.utils.extensions.textWidth
+import java.text.Bidi
 import kotlin.properties.ObservableProperty
 import kotlin.reflect.KProperty
 
@@ -398,8 +399,13 @@ class CheckableChipView @JvmOverloads constructor(
   }
 
   private fun createLayout(textWidth: Int) {
+    val alignment = if (Bidi(text.toString(), Bidi.DIRECTION_DEFAULT_LEFT_TO_RIGHT).isRightToLeft) {
+      Layout.Alignment.ALIGN_OPPOSITE
+    } else {
+      Layout.Alignment.ALIGN_NORMAL
+    }
     textLayout = StaticLayout.Builder.obtain(text, 0, text.length, textPaint, textWidth)
-      .setAlignment(Layout.Alignment.ALIGN_OPPOSITE)
+      .setAlignment(alignment)
       .build()
   }
 
