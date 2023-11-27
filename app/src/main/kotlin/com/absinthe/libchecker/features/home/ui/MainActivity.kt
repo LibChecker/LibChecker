@@ -14,6 +14,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -87,7 +89,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
       appViewModel.workerBinder = null
     }
   }
-  private var _menuProvider: MenuProvider? = null
+  private val _menuProviders = hashSetOf<MenuProvider>()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -121,12 +123,34 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
     unbindService(workerServiceConnection)
   }
 
-  override fun removeMenuProvider(provider: MenuProvider) {
-    // When current menu provider equals to parameter, we can safely remove provided provider.
-    // This fix should only be used when the pop-up Dialog does not define a Menu.
-    if (appViewModel.appListStatus == STATUS_START_INIT || hasWindowFocus() && currentMenuProvider == provider) {
+  override fun addMenuProvider(provider: MenuProvider) {
+    if (_menuProviders.contains(provider)) {
       super.removeMenuProvider(provider)
     }
+    super.addMenuProvider(provider)
+  }
+
+  override fun addMenuProvider(provider: MenuProvider, owner: LifecycleOwner) {
+    if (_menuProviders.contains(provider)) {
+      super.removeMenuProvider(provider)
+    }
+    super.addMenuProvider(provider, owner)
+  }
+
+  override fun addMenuProvider(
+    provider: MenuProvider,
+    owner: LifecycleOwner,
+    state: Lifecycle.State
+  ) {
+    if (_menuProviders.contains(provider)) {
+      super.removeMenuProvider(provider)
+    }
+    super.addMenuProvider(provider, owner, state)
+  }
+
+  override fun removeMenuProvider(provider: MenuProvider) {
+    super.removeMenuProvider(provider)
+    _menuProviders.remove(provider)
   }
 
   override fun showNavigationView() {
@@ -148,12 +172,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
     Timber.d("hideProgressBar")
     binding.progressHorizontal.hide()
   }
-
-  override var currentMenuProvider: MenuProvider?
-    get() = _menuProvider
-    set(value) {
-      _menuProvider = value
-    }
 
   override fun scheduleAppbarLiftingStatus(isLifted: Boolean) {
     binding.appbar.isLifted = isLifted
