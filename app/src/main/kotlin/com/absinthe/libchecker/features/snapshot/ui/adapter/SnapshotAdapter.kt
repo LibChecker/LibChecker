@@ -118,10 +118,10 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
 
       setOrHighlightText(packageName, item.packageName)
       versionInfo.text = LCAppUtils.getDiffString(
-          diff1 = item.versionNameDiff,
-          diff2 = item.versionCodeDiff,
-          isNewOrDeleted = isNewOrDeleted,
-          highlightDiffColor = highlightDiffColor
+        diff1 = item.versionNameDiff,
+        diff2 = item.versionCodeDiff,
+        isNewOrDeleted = isNewOrDeleted,
+        highlightDiffColor = highlightDiffColor
       )
 
       if (item.packageSizeDiff.old > 0L) {
