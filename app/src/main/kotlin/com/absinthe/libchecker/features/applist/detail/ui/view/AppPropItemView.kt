@@ -24,7 +24,7 @@ class AppPropItemView(context: Context) : AViewGroup(context) {
   ).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.WRAP_CONTENT,
-      -1
+      ViewGroup.LayoutParams.MATCH_PARENT
     )
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
     alpha = 0.85f

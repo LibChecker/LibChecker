@@ -53,7 +53,7 @@ class SnapshotMenuBSDView(context: Context) : LinearLayout(context), IHeaderView
         versionCodeDiff = SnapshotDiffItem.DiffNode(1120, BuildConfig.VERSION_CODE.toLong()),
         abiDiff = SnapshotDiffItem.DiffNode(Constants.ARMV7.toShort(), Constants.ARMV8.toShort()),
         targetApiDiff = SnapshotDiffItem.DiffNode((Build.VERSION.SDK_INT - 1).toShort(), Build.VERSION.SDK_INT.toShort()),
-        packageSizeDiff = SnapshotDiffItem.DiffNode(123456789L, 987654321L),
+        packageSizeDiff = SnapshotDiffItem.DiffNode(12345678L, 87654321L),
         nativeLibsDiff = SnapshotDiffItem.DiffNode(""),
         servicesDiff = SnapshotDiffItem.DiffNode(""),
         activitiesDiff = SnapshotDiffItem.DiffNode(""),
