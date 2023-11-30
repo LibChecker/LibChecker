@@ -27,7 +27,6 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.features.about.AbsAboutActivityProxy
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.showLongToast
 import com.absinthe.libraries.me.Absinthe
@@ -143,24 +142,17 @@ class AboutActivity : AbsAboutActivityProxy(), MenuProvider {
   }
 
   override fun onItemsCreated(items: MutableList<Any>) {
-    val hasInstallCoolApk = PackageUtils.isAppInstalled(Constants.PackageNames.COOLAPK)
-
     items.apply {
       add(Category("What's this"))
       add(Card(getStringByConfiguration(R.string.about_info)))
 
       add(Category("Developers"))
-      val developerUrl = if (hasInstallCoolApk) {
-        URLManager.COOLAPK_HOME_PAGE
-      } else {
-        URLManager.GITHUB_PAGE
-      }
       add(
         Contributor(
           R.drawable.pic_rabbit,
           Absinthe.ME,
           "Developer & Designer",
-          developerUrl
+          Absinthe.GITHUB_HOME_PAGE
         )
       )
       add(

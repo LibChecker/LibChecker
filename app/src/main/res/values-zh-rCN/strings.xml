@@ -54,11 +54,13 @@
   <string name="android_dist_subtitle_format">更新时间： %s</string>
   <!--  About  -->
   <string name="settings_about">关于</string>
+  <string name="settings_about_summary">这里是 LibChecker!</string>
   <string name="settings_translate">参与翻译</string>
   <string name="settings_translate_summary">帮助我们翻译此应用</string>
   <string name="settings_rate_us">给我们评分</string>
   <string name="settings_rate_us_summary">这可以使我们被更多的人发现</string>
-  <string name="settings_about_summary">这里是 LibChecker!</string>
+  <string name="settings_get_updates">获取更新</string>
+  <string name="settings_get_updates_summary">获取更加稳定和功能众多的最新版本</string>
   <string name="about_info">本应用用来查看设备上的应用使用到的第三方库的情况。</string>
   <string name="toolbar_rate">评分</string>
   <string name="resource_declaration">应用中的部分素材来自：</string>

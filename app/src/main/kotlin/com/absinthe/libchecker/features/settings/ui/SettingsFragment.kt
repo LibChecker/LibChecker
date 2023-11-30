@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.os.RemoteException
 import android.text.TextUtils
@@ -32,7 +33,6 @@ import com.absinthe.libchecker.features.home.HomeViewModel
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.base.IAppBarContainer
 import com.absinthe.libchecker.ui.base.IListController
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
@@ -209,6 +209,19 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         true
       }
     }
+    findPreference<Preference>(Constants.PREF_GET_UPDATES)?.apply {
+      setOnPreferenceClickListener {
+        if (AntiShakeUtils.isInvalidClick(prefRecyclerView)) {
+          false
+        } else {
+          GetUpdatesDialogFragment().show(
+            childFragmentManager,
+            GetUpdatesDialogFragment::class.java.name
+          )
+          true
+        }
+      }
+    }
     findPreference<Preference>(Constants.PREF_TRANSLATION)?.apply {
       setOnPreferenceClickListener {
         runCatching {
@@ -252,7 +265,11 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     findPreference<Preference>(Constants.PREF_RATE)?.apply {
       setOnPreferenceClickListener {
         try {
-          LCAppUtils.launchMarketPage(requireContext(), BuildConfig.APPLICATION_ID)
+          startActivity(
+            Intent(Intent.ACTION_VIEW).apply {
+              data = Uri.parse(URLManager.PLAY_STORE_DETAIL_PAGE)
+            }
+          )
           Analytics.trackEvent(
             Constants.Event.SETTINGS,
             EventProperties().set("PREF_RATE", "Clicked")

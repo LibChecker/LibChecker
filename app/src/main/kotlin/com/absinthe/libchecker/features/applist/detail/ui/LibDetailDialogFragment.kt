@@ -90,9 +90,9 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
 
           root.showContent()
 
-          if (it.relativeUrl.startsWith(URLManager.GITHUB) && GlobalValues.isGitHubUnreachable) {
+          if (it.relativeUrl.startsWith(URLManager.GITHUB_HOST) && GlobalValues.isGitHubUnreachable) {
             lifecycleScope.launch(Dispatchers.IO) {
-              val splits = it.relativeUrl.removePrefix(URLManager.GITHUB).split("/")
+              val splits = it.relativeUrl.removePrefix(URLManager.GITHUB_HOST).split("/")
               if (splits.size < 2) {
                 return@launch
               }

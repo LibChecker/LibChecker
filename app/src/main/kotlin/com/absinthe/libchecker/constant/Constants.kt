@@ -39,6 +39,7 @@ object Constants {
   const val PREF_LIB_REF_THRESHOLD = "libRefThreshold"
   const val PREF_RELOAD_APPS = "reloadApps"
   const val PREF_ABOUT = "about"
+  const val PREF_GET_UPDATES = "getUpdates"
   const val PREF_TRANSLATION = "translation"
   const val PREF_HELP = "help"
   const val PREF_RATE = "rate"
@@ -101,7 +102,6 @@ object Constants {
   }
 
   object PackageNames {
-    const val COOLAPK = "com.coolapk.market"
     const val MATERIAL_FILES = "me.zhanghai.android.files"
     const val SHIZUKU = "moe.shizuku.privileged.api"
     const val SYSTEMUI = "com.android.systemui"
