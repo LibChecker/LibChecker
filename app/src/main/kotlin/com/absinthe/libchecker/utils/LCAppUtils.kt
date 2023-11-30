@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.utils
 
 import android.content.Context
-import android.content.Intent
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
@@ -12,8 +11,6 @@ import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
-import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
 import com.absinthe.libchecker.features.snapshot.detail.bean.SnapshotDiffItem
 import com.absinthe.libchecker.features.snapshot.ui.adapter.ARROW
@@ -126,21 +123,6 @@ object LCAppUtils {
       }
       else -> true
     }
-  }
-
-  fun launchMarketPage(context: Context, packageName: String) {
-    context.startActivity(
-      Intent.parseUri(
-        "${
-          if (PackageUtils.isAppInstalled(Constants.PackageNames.COOLAPK)) {
-            URLManager.COOLAPK_SCHEME
-          } else {
-            URLManager.MARKET_SCHEME
-          }
-        }$packageName",
-        0
-      )
-    )
   }
 
   fun <T> getDiffString(

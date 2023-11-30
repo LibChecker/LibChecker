@@ -1,7 +1,9 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
+import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.text.SpannableString
 import android.text.style.ImageSpan
@@ -14,12 +16,12 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppInstallSourceBottomSheetView
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppInstallSourceItemView
 import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
@@ -73,7 +75,11 @@ class AppInstallSourceBSDFragment :
       item.packageView.container.versionInfo.text =
         getString(R.string.lib_detail_app_install_source_shizuku_uninstalled_detail)
       item.packageView.setOnClickListener {
-        LCAppUtils.launchMarketPage(requireContext(), Constants.PackageNames.SHIZUKU)
+        startActivity(
+          Intent(Intent.ACTION_VIEW).apply {
+            data = Uri.parse(URLManager.SHIZUKU_APP_GITHUB_RELEASE_PAGE)
+          }
+        )
       }
     } else {
       if (!Shizuku.pingBinder()) {
@@ -96,7 +102,11 @@ class AppInstallSourceBSDFragment :
           item.packageView.container.versionInfo.text =
             getString(R.string.lib_detail_app_install_source_shizuku_low_version_detail)
           item.packageView.setOnClickListener {
-            LCAppUtils.launchMarketPage(requireContext(), Constants.PackageNames.SHIZUKU)
+            startActivity(
+              Intent(Intent.ACTION_VIEW).apply {
+                data = Uri.parse(URLManager.SHIZUKU_APP_GITHUB_RELEASE_PAGE)
+              }
+            )
           }
         } else if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
           item.packageView.container.appName.text =
