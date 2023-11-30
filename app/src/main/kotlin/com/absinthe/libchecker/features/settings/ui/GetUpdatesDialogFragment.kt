@@ -42,7 +42,7 @@ class GetUpdatesDialogFragment : BaseBottomSheetViewDialogFragment<GetUpdatesDia
         "F-Droid",
         URLManager.FDROID_PAGE,
         R.drawable.ic_fdroid
-      ),
+      )
     )
     root.setItems(items)
   }
