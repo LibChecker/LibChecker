@@ -89,6 +89,14 @@
     </Preference>
 
     <Preference
+      app:icon="@drawable/ic_upgrade"
+      app:key="getUpdates"
+      app:summary="@string/settings_get_updates_summary"
+      app:title="@string/settings_get_updates">
+
+    </Preference>
+
+    <Preference
       app:icon="@drawable/ic_translate_settings"
       app:key="translation"
       app:summary="@string/settings_translate_summary"
