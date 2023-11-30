@@ -6,6 +6,7 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
+import androidx.core.text.BidiFormatter
 import androidx.core.text.buildSpannedString
 import androidx.core.text.toSpannable
 import com.absinthe.libchecker.BuildConfig
@@ -184,8 +185,7 @@ object LCAppUtils {
         val highlightedNew2 =
           getHighlightDifferences(diff2.old.toString(), diff2.new.toString(), highlightDiffColor)
         val allText = diff1.old.toString() + diff1.new + diff2.old + diff2.new + diff1Suffix + diff2Suffix
-        val isRtl = IcuUtils.isRtl(allText)
-
+        val isRtl = BidiFormatter.getInstance().isRtl(allText)
         buildSpannedString {
           append("${diff1.old}$diff1Suffix (${diff2.old}$diff2Suffix)")
           append(" ${getArrow(isRtl)} ")
@@ -235,7 +235,7 @@ object LCAppUtils {
     return spannable
   }
 
-  fun getArrow(isRtl: Boolean): String {
+  private fun getArrow(isRtl: Boolean): String {
     return if (isRtl) {
       ARROW_REVERT
     } else {
