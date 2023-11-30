@@ -209,6 +209,19 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         true
       }
     }
+    findPreference<Preference>(Constants.PREF_GET_UPDATES)?.apply {
+      setOnPreferenceClickListener {
+        if (AntiShakeUtils.isInvalidClick(prefRecyclerView)) {
+          false
+        } else {
+          GetUpdatesDialogFragment().show(
+            childFragmentManager,
+            GetUpdatesDialogFragment::class.java.name
+          )
+          true
+        }
+      }
+    }
     findPreference<Preference>(Constants.PREF_TRANSLATION)?.apply {
       setOnPreferenceClickListener {
         runCatching {
