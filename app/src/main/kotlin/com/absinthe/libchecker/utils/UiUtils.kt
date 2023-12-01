@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.utils
 
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.util.DisplayMetrics
 import android.view.ContextThemeWrapper
@@ -72,5 +73,11 @@ object UiUtils {
     val width = displayMetrics.widthPixels
     val height = displayMetrics.heightPixels
     return width.toFloat() / height.toFloat()
+  }
+
+  fun hasHinge() = if (OsUtils.atLeastR()) {
+    SystemServices.packageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_HINGE_ANGLE)
+  } else {
+    false
   }
 }
