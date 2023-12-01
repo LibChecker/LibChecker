@@ -59,6 +59,8 @@
   <string name="settings_translate_summary">Помогите нам перевести это приложение</string>
   <string name="settings_rate_us">Оценить приложение</string>
   <string name="settings_rate_us_summary">Это может сделать нас доступнее для большего числа людей</string>
+  <string name="settings_get_updates">Get Updates</string>
+  <string name="settings_get_updates_summary">Get the latest version that is more stable and packed with features</string>
   <string name="about_info">Это приложение используется для просмотра сторонних библиотек, используемых приложениями на вашем устройстве.</string>
   <string name="toolbar_rate">Оценка</string>
   <string name="resource_declaration">Часть ресурсов в приложении поступает из: </string>
