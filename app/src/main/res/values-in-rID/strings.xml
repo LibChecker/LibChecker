@@ -51,11 +51,11 @@
   <string name="string_compose_unused">Tak menggunakan Jetpack Compose</string>
   <!--  About  -->
   <string name="settings_about">Tentang</string>
+  <string name="settings_about_summary">Inilah LibChecker!</string>
   <string name="settings_translate">Partisipasi dalam penejermahan</string>
   <string name="settings_translate_summary">Bantu kami menerjemahkan aplikasi ini</string>
   <string name="settings_rate_us">Nilai kami</string>
   <string name="settings_rate_us_summary">Ini dapat membuat kami dikenal lebih banyak orang</string>
-  <string name="settings_about_summary">Inilah LibChecker!</string>
   <string name="about_info">Aplikasi ini digunakan untuk melihat library pihak ketiga yang digunakan oleh aplikasi di perangkat Anda.</string>
   <string name="toolbar_rate">Nilai</string>
   <string name="resource_declaration">Sebagian resource aplikasi berasal dari: </string>

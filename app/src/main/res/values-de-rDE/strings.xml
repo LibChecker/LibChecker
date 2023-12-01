@@ -51,11 +51,11 @@
   <string name="string_compose_unused">Nutzt kein Jetpack Compose</string>
   <!--  About  -->
   <string name="settings_about">Über</string>
+  <string name="settings_about_summary">Dies ist LibChecker!</string>
   <string name="settings_translate">Beteilige dich an der Übersetzung</string>
   <string name="settings_translate_summary">Hilf uns die App zu übersetzen</string>
   <string name="settings_rate_us">Bewerte uns</string>
   <string name="settings_rate_us_summary">Dies hilft uns von mehr Leuten gefunden zu werden</string>
-  <string name="settings_about_summary">Dies ist LibChecker!</string>
   <string name="about_info">Diese App wird verwendet, um die von Anwendungen auf Ihrem Gerät verwendeten Bibliotheken von Drittanbietern anzuzeigen.</string>
   <string name="toolbar_rate">Bewerten sie diese App</string>
   <string name="resource_declaration">Ein Teil der Ressourcen in der Anwendung stammt aus: </string>

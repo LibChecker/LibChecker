@@ -41,9 +41,9 @@
   <string name="string_compose_unused">Jetpack Compose не використовується</string>
   <!--  About  -->
   <string name="settings_about">Про додаток</string>
+  <string name="settings_about_summary">Це LibChecker!</string>
   <string name="settings_rate_us">Оцінити додаток</string>
   <string name="settings_rate_us_summary">Це може зробити нас доступнішим для більшого числа людей</string>
-  <string name="settings_about_summary">Це LibChecker!</string>
   <string name="about_info">Ця програма використовується для перегляду сторонніх бібліотек, котрі використовуються додатками на вашому пристрої.</string>
   <string name="toolbar_rate">Оцінка</string>
   <string name="resource_declaration">Частина ресурсів в додатку надходить з: </string>

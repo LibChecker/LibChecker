@@ -50,10 +50,10 @@
   <string name="string_compose_unused">Jetpack Composeを未使用</string>
   <!--  About  -->
   <string name="settings_about">アプリについて</string>
+  <string name="settings_about_summary">これはLibCheckerです!</string>
   <string name="settings_translate">翻訳に参加する</string>
   <string name="settings_translate_summary">このアプリの翻訳にご協力ください</string>
   <string name="settings_rate_us">アプリを評価</string>
-  <string name="settings_about_summary">これはLibCheckerです!</string>
   <string name="toolbar_rate">評価</string>
   <!--  Settings  -->
   <string name="pref_group_normal">ノーマル</string>

@@ -54,11 +54,11 @@
   <string name="android_dist_subtitle_format">Время обновления %s</string>
   <!--  About  -->
   <string name="settings_about">О приложении</string>
+  <string name="settings_about_summary">Это LibChecker!</string>
   <string name="settings_translate">Участвуйте в переводе</string>
   <string name="settings_translate_summary">Помогите нам перевести это приложение</string>
   <string name="settings_rate_us">Оценить приложение</string>
   <string name="settings_rate_us_summary">Это может сделать нас доступнее для большего числа людей</string>
-  <string name="settings_about_summary">Это LibChecker!</string>
   <string name="about_info">Это приложение используется для просмотра сторонних библиотек, используемых приложениями на вашем устройстве.</string>
   <string name="toolbar_rate">Оценка</string>
   <string name="resource_declaration">Часть ресурсов в приложении поступает из: </string>
