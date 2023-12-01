@@ -50,7 +50,7 @@ class AppPropBottomSheetDialogFragment :
         0,
         AppPropItem(
           key = "Dexopt",
-          value = "${it.first}, ${it.second}"
+          value = "status=${it.first}, reason=${it.second}"
         )
       )
     }
