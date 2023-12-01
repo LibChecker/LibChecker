@@ -49,6 +49,9 @@
   <string name="string_kotlin_unused">لا يستخدم كوتلين</string>
   <string name="string_compose_used">يستخدم Jetpack Compose</string>
   <string name="string_compose_unused">لا يستخدم Jetpack Compose</string>
+  <string name="android_dist_source">Source</string>
+  <string name="android_dist_title">Android Version Distribution Statistics</string>
+  <string name="android_dist_subtitle_format">Update Time: %s</string>
   <!--  About  -->
   <string name="settings_about">حول</string>
   <string name="settings_about_summary">هذا هو LibChecker!</string>
@@ -56,6 +59,8 @@
   <string name="settings_translate_summary">ساعدنا في ترجمة هذا التطبيق</string>
   <string name="settings_rate_us">قيّمنا</string>
   <string name="settings_rate_us_summary">هذا يمكن أن يزيد شعبيته عند المزيد من الناس</string>
+  <string name="settings_get_updates">Get Updates</string>
+  <string name="settings_get_updates_summary">Get the latest version that is more stable and packed with features</string>
   <string name="about_info">يستخدم هذا التطبيق لعرض مكتبات الجهات الخارجية التي تستخدمها التطبيقات في جهازك.</string>
   <string name="toolbar_rate">تقييم</string>
   <string name="resource_declaration">جزء من الموارد في التطبيق يأتي من: </string>
@@ -250,4 +255,5 @@
   <!--  Snapshot menu  -->
   <string name="snapshot_menu_show_update_time">إظهار وقت التحديث</string>
   <string name="snapshot_menu_hide_no_component_changes">إخفاء عدم وجود تغييرات في المكونات</string>
+  <string name="snapshot_menu_diff_highlight">Diff Highlight</string>
 </resources>
