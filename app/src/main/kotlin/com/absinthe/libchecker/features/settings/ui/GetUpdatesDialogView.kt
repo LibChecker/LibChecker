@@ -25,7 +25,7 @@ class GetUpdatesDialogView(context: Context) : LinearLayout(context), IHeaderVie
       ViewGroup.LayoutParams.MATCH_PARENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     )
-    setPadding(16.dp, 16.dp, 16.dp, 0)
+    setPadding(16.dp, 16.dp, 16.dp, 16.dp)
     adapter = _adapter
     layoutManager = LinearLayoutManager(context)
   }

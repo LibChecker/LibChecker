@@ -4,6 +4,7 @@ import android.content.pm.PackageInfo
 import com.absinthe.libchecker.compat.BundleCompat
 import com.absinthe.libchecker.features.applist.detail.bean.AppPropItem
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppPropsBottomSheetView
+import com.absinthe.libchecker.utils.extensions.getDexoptInfo
 import com.absinthe.libchecker.utils.manifest.ApplicationReader
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
@@ -42,7 +43,18 @@ class AppPropBottomSheetDialogFragment :
           }
         )
       }.sortedBy { item -> item.key }
+    }.toMutableList()
+
+    packageInfo.getDexoptInfo()?.let {
+      bundleList.add(
+        0,
+        AppPropItem(
+          key = "Dexopt",
+          value = "status=${it.first}, reason=${it.second}"
+        )
+      )
     }
+
     root.adapter.setList(bundleList)
   }
 }

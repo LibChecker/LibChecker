@@ -2,7 +2,6 @@ package com.absinthe.libchecker
 
 import android.app.Application
 import android.content.Context
-import android.content.pm.PackageManager
 import android.content.pm.PackageParser
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.window.embedding.RuleController
@@ -10,7 +9,6 @@ import androidx.window.embedding.SplitController
 import coil.Coil
 import coil.ImageLoader
 import com.absinthe.libchecker.app.MainLooperFilter
-import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
@@ -51,19 +49,20 @@ class LibCheckerApp : Application() {
     bypassPackageParserCheck()
 
     app = this
-    if (!BuildConfig.DEBUG && GlobalValues.isAnonymousAnalyticsEnabled.value == true) {
-      AppCenter.start(
-        this,
-        BuildConfig.APP_CENTER_SECRET,
-        Analytics::class.java,
-        Crashes::class.java
-      )
-    }
 
     if (BuildConfig.DEBUG) {
       Timber.plant(ThreadAwareDebugTree())
     } else {
       Timber.plant(ReleaseTree())
+
+      if (GlobalValues.isAnonymousAnalyticsEnabled.value == true) {
+        AppCenter.start(
+          this,
+          BuildConfig.APP_CENTER_SECRET,
+          Analytics::class.java,
+          Crashes::class.java
+        )
+      }
     }
 
     LCRules.init(this)
@@ -99,11 +98,7 @@ class LibCheckerApp : Application() {
 
   private fun initSplitController() {
     val ratio = UiUtils.getScreenAspectRatio()
-    val hasHinge = if (OsUtils.atLeastR()) {
-      SystemServices.packageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_HINGE_ANGLE)
-    } else {
-      false
-    }
+    val hasHinge = UiUtils.hasHinge()
     Timber.d("initSplitController: getScreenAspectRatio: $ratio, hasHinge=$hasHinge")
     runCatching {
       if (SplitController.getInstance(this).splitSupportStatus == SplitController.SplitSupportStatus.SPLIT_AVAILABLE) {

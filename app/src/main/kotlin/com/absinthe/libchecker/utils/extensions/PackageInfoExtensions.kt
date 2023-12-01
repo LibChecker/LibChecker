@@ -1,11 +1,13 @@
 package com.absinthe.libchecker.utils.extensions
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageInfoHidden
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.os.Build
 import androidx.core.content.pm.PackageInfoCompat
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.compat.ZipFileCompat
@@ -18,6 +20,7 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libchecker.utils.manifest.HiddenPermissionsReader
 import com.absinthe.libchecker.utils.manifest.ManifestReader
+import dalvik.system.DexFile
 import dev.rikka.tools.refine.Refine
 import java.io.File
 import java.text.DateFormat
@@ -27,6 +30,7 @@ import kotlinx.coroutines.withContext
 import okio.buffer
 import okio.source
 import rikka.material.app.LocaleDelegate
+import timber.log.Timber
 
 /**
  * Get version code of an app
@@ -607,4 +611,37 @@ const val PREINSTALLED_TIMESTAMP = 1230768000000 // 2009-01-01 08:00:00 GMT+8
 
 fun PackageInfo.isPreinstalled(): Boolean {
   return lastUpdateTime <= PREINSTALLED_TIMESTAMP
+}
+
+// Keep in sync with `ABI_TO_INSTRUCTION_SET_MAP` in
+// libcore/libart/src/main/java/dalvik/system/VMRuntime.java.
+private val ABI_TO_INSTRUCTION_SET_MAP = mapOf(
+  "armeabi" to "arm",
+  "armeabi-v7a" to "arm",
+  "x86" to "x86",
+  "x86_64" to "x86_64",
+  "arm64-v8a" to "arm64",
+  "arm64-v8a-hwasan" to "arm64",
+  "riscv64" to "riscv64"
+)
+
+@Suppress("UNCHECKED_CAST")
+@SuppressLint("SoonBlockedPrivateApi")
+fun PackageInfo.getDexoptInfo(): Pair<String, String>? {
+  val ret: Array<String>? = runCatching {
+    val method = DexFile::class.java.getDeclaredMethod(
+      "getDexFileOptimizationStatus",
+      String::class.java,
+      String::class.java
+    )
+    method.isAccessible = true
+    method.invoke(
+      null,
+      applicationInfo.sourceDir,
+      ABI_TO_INSTRUCTION_SET_MAP[Build.SUPPORTED_ABIS[0]]
+    ) as Array<String>
+  }.getOrNull()
+
+  Timber.d("getDexoptInfo: ${ret?.contentToString()}")
+  return ret?.takeIf { it.size == 2 }?.let { it[0] to it[1] }
 }
