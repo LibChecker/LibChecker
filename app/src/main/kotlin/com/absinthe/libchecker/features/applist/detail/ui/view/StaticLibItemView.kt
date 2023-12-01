@@ -7,12 +7,14 @@ import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.children
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.features.statistics.bean.LibChip
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.valueUnsafe
+import com.absinthe.libchecker.utils.extensions.visibleHeight
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.chip.Chip
 
@@ -82,27 +84,25 @@ class StaticLibItemView(context: Context) : AViewGroup(context) {
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+    children.forEach {
+      it.autoMeasure()
+    }
     val libNameWidth = measuredWidth - paddingStart - paddingEnd
-    libName.measure(libNameWidth.toExactlyMeasureSpec(), libName.defaultHeightMeasureSpec(this))
-    libDetail.measure(
-      libNameWidth.toExactlyMeasureSpec(),
-      libDetail.defaultHeightMeasureSpec(this)
-    )
-    chip?.autoMeasure()
+    if (libName.measuredWidth > libNameWidth) {
+      libName.measure(libNameWidth.toExactlyMeasureSpec(), libName.defaultHeightMeasureSpec(this))
+    }
+    if (libDetail.measuredWidth > libNameWidth) {
+      libDetail.measure(libNameWidth.toExactlyMeasureSpec(), libDetail.defaultHeightMeasureSpec(this))
+    }
     setMeasuredDimension(
       measuredWidth,
-      (
-        libName.measuredHeight + libDetail.measuredHeight + (
-          chip?.measuredHeight
-            ?: 0
-          ) + paddingTop + paddingBottom
-        ).coerceAtLeast(40.dp)
+      (libName.measuredHeight + libDetail.measuredHeight + chip.visibleHeight() + paddingTop + paddingBottom).coerceAtLeast(40.dp)
     )
   }
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     libName.layout(paddingStart, paddingTop)
-    libDetail.layout(libName.left, libName.bottom)
-    chip?.layout(libName.left, libDetail.bottom)
+    libDetail.layout(paddingStart, libName.bottom)
+    chip?.layout(paddingStart, libDetail.bottom)
   }
 }

@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.children
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
@@ -140,15 +141,16 @@ class XposedInfoBottomSheetView(context: Context) : AViewGroup(context), IHeader
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
       super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-      icon.autoMeasure()
-      tip.measure(
-        (measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - tip.marginStart).toExactlyMeasureSpec(),
-        tip.defaultHeightMeasureSpec(this)
-      )
-      text.measure(
-        (measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - text.marginStart).toExactlyMeasureSpec(),
-        text.defaultHeightMeasureSpec(this)
-      )
+      children.forEach {
+        it.autoMeasure()
+      }
+      val textWidth = measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - tip.marginStart
+      if (tip.measuredWidth > textWidth) {
+        tip.measure(textWidth.toExactlyMeasureSpec(), tip.defaultHeightMeasureSpec(this))
+      }
+      if (text.measuredWidth > textWidth) {
+        text.measure(textWidth.toExactlyMeasureSpec(), text.defaultHeightMeasureSpec(this))
+      }
       setMeasuredDimension(
         measuredWidth,
         (tip.measuredHeight + text.marginTop + text.measuredHeight).coerceAtLeast(icon.measuredHeight) + paddingTop + paddingBottom
@@ -157,8 +159,8 @@ class XposedInfoBottomSheetView(context: Context) : AViewGroup(context), IHeader
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
       icon.layout(paddingStart, icon.toVerticalCenter(this))
-      tip.layout(icon.right + tip.marginStart, paddingTop)
-      text.layout(tip.left, tip.bottom + text.marginTop)
+      tip.layout(paddingStart + icon.measuredWidth + tip.marginStart, paddingTop)
+      text.layout(paddingStart + icon.measuredWidth + tip.marginStart, tip.bottom + text.marginTop)
     }
   }
 

@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.children
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.dp
@@ -81,7 +82,7 @@ class AppItemView(context: Context) : MaterialCardView(context) {
       )
     ).apply {
       layoutParams = LayoutParams(
-        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       ).also {
         it.marginStart = 8.dp
@@ -96,7 +97,7 @@ class AppItemView(context: Context) : MaterialCardView(context) {
     val packageName =
       AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
         layoutParams = LayoutParams(
-          ViewGroup.LayoutParams.MATCH_PARENT,
+          ViewGroup.LayoutParams.WRAP_CONTENT,
           ViewGroup.LayoutParams.WRAP_CONTENT
         )
         setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
@@ -112,7 +113,7 @@ class AppItemView(context: Context) : MaterialCardView(context) {
       )
     ).apply {
       layoutParams = LayoutParams(
-        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
       setTextColor(android.R.color.darker_gray.getColor(context))
@@ -129,7 +130,7 @@ class AppItemView(context: Context) : MaterialCardView(context) {
       )
     ).apply {
       layoutParams = LayoutParams(
-        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
       setPadding(0, 0, 0, 2.dp)
@@ -185,31 +186,36 @@ class AppItemView(context: Context) : MaterialCardView(context) {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
       super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-      icon.autoMeasure()
+      children.forEach {
+        it.autoMeasure()
+      }
       val textWidth =
         measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - appName.marginStart
-      val fixedTextWidth = if (textAtMostMode) {
-        textWidth.toAtMostMeasureSpec()
-      } else {
-        textWidth.toExactlyMeasureSpec()
+
+      if (appName.measuredWidth > textWidth) {
+        appName.measure(
+          textWidth.toExactlyMeasureSpec(),
+          appName.defaultHeightMeasureSpec(this)
+        )
       }
-      appName.measure(
-        fixedTextWidth,
-        appName.defaultHeightMeasureSpec(this)
-      )
-      packageName.measure(
-        fixedTextWidth,
-        packageName.defaultHeightMeasureSpec(this)
-      )
-      versionInfo.measure(
-        fixedTextWidth,
-        versionInfo.defaultHeightMeasureSpec(this)
-      )
-      abiInfo.measure(
-        fixedTextWidth,
-        abiInfo.defaultHeightMeasureSpec(this)
-      )
-      badge?.autoMeasure()
+      if (packageName.measuredWidth > textWidth) {
+        packageName.measure(
+          textWidth.toExactlyMeasureSpec(),
+          packageName.defaultHeightMeasureSpec(this)
+        )
+      }
+      if (versionInfo.measuredWidth > textWidth) {
+        versionInfo.measure(
+          textWidth.toExactlyMeasureSpec(),
+          versionInfo.defaultHeightMeasureSpec(this)
+        )
+      }
+      if (abiInfo.measuredWidth > textWidth) {
+        abiInfo.measure(
+          textWidth.toExactlyMeasureSpec(),
+          abiInfo.defaultHeightMeasureSpec(this)
+        )
+      }
       setMeasuredDimension(
         measuredWidth,
         paddingTop + appName.measuredHeight + packageName.measuredHeight + versionInfo.measuredHeight + abiInfo.measuredHeight + paddingBottom
@@ -218,10 +224,11 @@ class AppItemView(context: Context) : MaterialCardView(context) {
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
       icon.layout(paddingStart, icon.toVerticalCenter(this))
-      appName.layout(icon.right + appName.marginStart, paddingTop)
-      packageName.layout(appName.left, appName.bottom)
-      versionInfo.layout(appName.left, packageName.bottom)
-      abiInfo.layout(appName.left, versionInfo.bottom)
+      val offsetStart = paddingStart + icon.measuredWidth + appName.marginStart
+      appName.layout(offsetStart, paddingTop)
+      packageName.layout(offsetStart, appName.bottom)
+      versionInfo.layout(offsetStart, packageName.bottom)
+      abiInfo.layout(offsetStart, versionInfo.bottom)
       badge?.layout(paddingTop, paddingEnd, fromRight = true)
     }
   }

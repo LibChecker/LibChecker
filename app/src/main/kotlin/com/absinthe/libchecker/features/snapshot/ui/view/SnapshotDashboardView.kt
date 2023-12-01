@@ -5,6 +5,7 @@ import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.children
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.features.snapshot.detail.ui.view.SnapshotTypeIndicatorView
@@ -134,42 +135,26 @@ class SnapshotDashboardView(context: Context) :
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
       super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-      addedIndicator.autoMeasure()
-      removedIndicator.autoMeasure()
-      changedIndicator.autoMeasure()
-      movedIndicator.autoMeasure()
-      arrow.autoMeasure()
+      children.forEach { it.autoMeasure() }
       val indicatorsHeight = addedIndicator.measuredHeight * 4
-      val indicatorsWidth = listOf(
+      val indicatorsWidth = maxOf(
         addedIndicator.measuredWidth,
         removedIndicator.measuredWidth,
         changedIndicator.measuredWidth,
         movedIndicator.measuredWidth
-      ).maxOrNull()!!
+      )
 
       val textWidth = measuredWidth - paddingStart - paddingEnd - indicatorsWidth
-      tvSnapshotTimestampTitle.let {
-        it.measure(
+      if (tvSnapshotTimestampTitle.measuredWidth > textWidth) {
+        tvSnapshotTimestampTitle.measure(
           textWidth.toExactlyMeasureSpec(),
-          it.defaultHeightMeasureSpec(this)
+          tvSnapshotTimestampTitle.defaultHeightMeasureSpec(this)
         )
       }
-      tvSnapshotTimestampText.let {
-        it.measure(
-          it.defaultWidthMeasureSpec(this),
-          it.defaultHeightMeasureSpec(this)
-        )
-      }
-      tvSnapshotAppsCountTitle.let {
-        it.measure(
+      if (tvSnapshotAppsCountTitle.measuredWidth > textWidth) {
+        tvSnapshotAppsCountTitle.measure(
           textWidth.toExactlyMeasureSpec(),
-          it.defaultHeightMeasureSpec(this)
-        )
-      }
-      tvSnapshotAppsCountText.let {
-        it.measure(
-          it.defaultWidthMeasureSpec(this),
-          it.defaultHeightMeasureSpec(this)
+          tvSnapshotAppsCountTitle.defaultHeightMeasureSpec(this)
         )
       }
 
@@ -185,22 +170,16 @@ class SnapshotDashboardView(context: Context) :
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
       tvSnapshotTimestampTitle.layout(paddingStart, paddingTop)
-      tvSnapshotTimestampText.layout(
-        tvSnapshotTimestampTitle.left,
-        tvSnapshotTimestampTitle.bottom
-      )
+      tvSnapshotTimestampText.layout(paddingStart, tvSnapshotTimestampTitle.bottom)
       arrow.layout(
-        tvSnapshotTimestampText.right,
+        paddingStart + tvSnapshotTimestampText.measuredWidth,
         arrow.toViewVerticalCenter(tvSnapshotTimestampText)
       )
       tvSnapshotAppsCountTitle.layout(
-        tvSnapshotTimestampTitle.left,
+        paddingStart,
         tvSnapshotTimestampText.bottom + tvSnapshotAppsCountTitle.marginTop
       )
-      tvSnapshotAppsCountText.layout(
-        tvSnapshotTimestampTitle.left,
-        tvSnapshotAppsCountTitle.bottom
-      )
+      tvSnapshotAppsCountText.layout(paddingStart, tvSnapshotAppsCountTitle.bottom)
       addedIndicator.layout(paddingEnd, paddingTop, fromRight = true)
       removedIndicator.layout(paddingEnd, addedIndicator.bottom, fromRight = true)
       changedIndicator.layout(paddingEnd, removedIndicator.bottom, fromRight = true)

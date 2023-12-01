@@ -10,6 +10,7 @@ import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.children
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
@@ -115,15 +116,14 @@ class SnapshotDetailComponentView(context: Context) : MaterialCardView(context) 
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
       super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-      typeIcon.autoMeasure()
-      name.measure(
-        (measuredWidth - paddingStart - typeIcon.measuredWidth - name.marginStart - paddingEnd).toExactlyMeasureSpec(),
-        name.defaultHeightMeasureSpec(this)
-      )
-      val chipHeight = chip?.let {
+      children.forEach {
         it.autoMeasure()
-        it.measuredHeight + it.marginTop
-      } ?: 0
+      }
+      val textWidth = measuredWidth - paddingStart - typeIcon.measuredWidth - name.marginStart - paddingEnd
+      if (name.measuredWidth > textWidth) {
+        name.measure(textWidth.toExactlyMeasureSpec(), name.defaultHeightMeasureSpec(this))
+      }
+      val chipHeight = chip?.let { it.measuredHeight + it.marginTop } ?: 0
       setMeasuredDimension(
         measuredWidth,
         paddingTop + name.measuredHeight.coerceAtLeast(typeIcon.measuredHeight) + chipHeight + paddingBottom
@@ -132,8 +132,9 @@ class SnapshotDetailComponentView(context: Context) : MaterialCardView(context) 
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
       typeIcon.layout(paddingStart, typeIcon.toVerticalCenter(this))
-      name.layout(typeIcon.right + name.marginStart, paddingTop)
-      chip?.layout(name.left, name.bottom + chip!!.marginTop)
+      val nameXOffset = paddingStart + typeIcon.measuredWidth + name.marginStart
+      name.layout(nameXOffset, paddingTop)
+      chip?.layout(nameXOffset, name.bottom + chip!!.marginTop)
     }
   }
 }

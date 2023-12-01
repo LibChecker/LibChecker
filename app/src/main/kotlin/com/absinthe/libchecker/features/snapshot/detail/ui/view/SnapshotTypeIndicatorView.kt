@@ -80,7 +80,7 @@ class SnapshotTypeIndicatorView(context: Context) : AViewGroup(context) {
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     text.layout(0, text.toVerticalCenter(this))
-    icon.layout(text.right + icon.marginStart, icon.toVerticalCenter(this))
-    colorLabel.layout(icon.right + colorLabel.marginStart, colorLabel.toVerticalCenter(this))
+    icon.layout(text.measuredWidth + icon.marginStart, icon.toVerticalCenter(this))
+    colorLabel.layout(text.measuredWidth + icon.measuredWidth + colorLabel.marginStart, colorLabel.toVerticalCenter(this))
   }
 }

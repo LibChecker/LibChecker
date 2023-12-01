@@ -33,7 +33,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 const val ARROW = "→"
-
+const val ARROW_REVERT = "←"
 class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAdapter<SnapshotDiffItem>() {
 
   private val formatter by unsafeLazy {
@@ -117,8 +117,12 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
       }
 
       setOrHighlightText(packageName, item.packageName)
-      versionInfo.text =
-        LCAppUtils.getDiffString(item.versionNameDiff, item.versionCodeDiff, isNewOrDeleted, highlightDiffColor = highlightDiffColor)
+      versionInfo.text = LCAppUtils.getDiffString(
+        diff1 = item.versionNameDiff,
+        diff2 = item.versionCodeDiff,
+        isNewOrDeleted = isNewOrDeleted,
+        highlightDiffColor = highlightDiffColor
+      )
 
       if (item.packageSizeDiff.old > 0L) {
         packageSizeInfo.isVisible = true
@@ -131,7 +135,15 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
           item.packageSizeDiff.new
         )
         val diffText = buildSpannedString {
-          append(LCAppUtils.getDiffString(sizeDiff, bytesDiff, isNewOrDeleted, highlightDiffColor = highlightDiffColor))
+          append(
+            LCAppUtils.getDiffString(
+              diff1 = sizeDiff,
+              diff2 = bytesDiff,
+              diff2Suffix = " Bytes",
+              isNewOrDeleted = isNewOrDeleted,
+              highlightDiffColor = highlightDiffColor
+            )
+          )
 
           if (item.packageSizeDiff.new != null) {
             val diffSize = item.packageSizeDiff.new - item.packageSizeDiff.old

@@ -98,10 +98,10 @@ class AlbumItemView(context: Context) : MaterialCardView(context) {
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
       icon.layout(paddingStart, icon.toVerticalCenter(this))
       title.layout(
-        icon.right + title.marginStart,
+        paddingStart + icon.measuredWidth + title.marginStart,
         (measuredHeight - title.measuredHeight - subtitle.measuredHeight) / 2
       )
-      subtitle.layout(title.left, title.bottom)
+      subtitle.layout(paddingStart + icon.measuredWidth + title.marginStart, title.bottom)
     }
   }
 }

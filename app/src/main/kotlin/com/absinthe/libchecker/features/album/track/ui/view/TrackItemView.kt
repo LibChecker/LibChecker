@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.children
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -42,7 +43,7 @@ class TrackItemView(context: Context) : FrameLayout(context) {
       )
     ).apply {
       layoutParams = LayoutParams(
-        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       ).also {
         it.marginStart = 8.dp
@@ -55,7 +56,7 @@ class TrackItemView(context: Context) : FrameLayout(context) {
     val packageName =
       AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
         layoutParams = LayoutParams(
-          ViewGroup.LayoutParams.MATCH_PARENT,
+          ViewGroup.LayoutParams.WRAP_CONTENT,
           ViewGroup.LayoutParams.WRAP_CONTENT
         )
         setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
@@ -78,18 +79,23 @@ class TrackItemView(context: Context) : FrameLayout(context) {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
       super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-      icon.autoMeasure()
-      switch.autoMeasure()
+      children.forEach {
+        it.autoMeasure()
+      }
       val textWidth =
         measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - appName.marginStart - switch.measuredWidth
-      appName.measure(
-        textWidth.toExactlyMeasureSpec(),
-        appName.defaultHeightMeasureSpec(this)
-      )
-      packageName.measure(
-        textWidth.toExactlyMeasureSpec(),
-        appName.defaultHeightMeasureSpec(this)
-      )
+      if (appName.measuredWidth > textWidth) {
+        appName.measure(
+          textWidth.toExactlyMeasureSpec(),
+          appName.defaultHeightMeasureSpec(this)
+        )
+      }
+      if (packageName.measuredWidth > textWidth) {
+        packageName.measure(
+          textWidth.toExactlyMeasureSpec(),
+          packageName.defaultHeightMeasureSpec(this)
+        )
+      }
       setMeasuredDimension(
         measuredWidth,
         (paddingTop + appName.measuredHeight + packageName.measuredHeight + paddingBottom)
@@ -100,8 +106,8 @@ class TrackItemView(context: Context) : FrameLayout(context) {
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
       icon.layout(paddingStart, icon.toVerticalCenter(this))
       switch.layout(paddingEnd, switch.toVerticalCenter(this), fromRight = true)
-      appName.layout(icon.right + appName.marginStart, paddingTop)
-      packageName.layout(appName.left, appName.bottom)
+      appName.layout(paddingStart + icon.measuredWidth + appName.marginStart, paddingTop)
+      packageName.layout(paddingStart + icon.measuredWidth, appName.bottom)
     }
   }
 }

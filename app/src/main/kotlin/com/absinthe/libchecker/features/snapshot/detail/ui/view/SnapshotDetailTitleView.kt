@@ -25,8 +25,10 @@ class SnapshotDetailTitleView(context: Context) : RoundCornerView(context) {
   }
 
   val title = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
-    layoutParams =
-      LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+    layoutParams = LayoutParams(
+      ViewGroup.LayoutParams.WRAP_CONTENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
+    )
     setPadding(10.dp, 6.dp, 10.dp, 6.dp)
     text = context.getString(R.string.snapshot_empty_list_title)
     setTextAppearance(context.getResourceIdByAttr(android.R.attr.textAppearanceListItemSmall))
@@ -35,8 +37,10 @@ class SnapshotDetailTitleView(context: Context) : RoundCornerView(context) {
   }
 
   val list = RecyclerView(context).apply {
-    layoutParams =
-      LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+    layoutParams = LayoutParams(
+      ViewGroup.LayoutParams.WRAP_CONTENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
+    )
   }
 
   init {
@@ -60,7 +64,10 @@ class SnapshotDetailTitleView(context: Context) : RoundCornerView(context) {
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     arrow.layout(arrow.marginStart, arrow.toVerticalCenter(this))
-    title.layout(arrow.right, title.toVerticalCenter(this))
-    list.layout(title.right, list.toVerticalCenter(this))
+    title.layout(arrow.marginStart + arrow.measuredWidth, title.toVerticalCenter(this))
+    list.layout(
+      arrow.marginStart + arrow.measuredWidth + title.measuredWidth,
+      list.toVerticalCenter(this)
+    )
   }
 }

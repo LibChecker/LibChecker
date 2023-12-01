@@ -66,6 +66,6 @@ class NativeLibExtractTipView(context: Context) : AViewGroup(context) {
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     icon.layout(paddingStart, icon.toVerticalCenter(this))
-    text.layout(icon.right + text.marginStart, text.toVerticalCenter(this))
+    text.layout(paddingStart + icon.measuredWidth + text.marginStart, text.toVerticalCenter(this))
   }
 }

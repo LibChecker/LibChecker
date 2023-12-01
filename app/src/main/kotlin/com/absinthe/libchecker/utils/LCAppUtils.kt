@@ -5,6 +5,7 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
+import androidx.core.text.BidiFormatter
 import androidx.core.text.buildSpannedString
 import androidx.core.text.toSpannable
 import com.absinthe.libchecker.BuildConfig
@@ -14,6 +15,7 @@ import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
 import com.absinthe.libchecker.features.snapshot.detail.bean.SnapshotDiffItem
 import com.absinthe.libchecker.features.snapshot.ui.adapter.ARROW
+import com.absinthe.libchecker.features.snapshot.ui.adapter.ARROW_REVERT
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.isTempApk
@@ -152,7 +154,9 @@ object LCAppUtils {
 
   fun getDiffString(
     diff1: SnapshotDiffItem.DiffNode<*>,
+    diff1Suffix: String = "",
     diff2: SnapshotDiffItem.DiffNode<*>,
+    diff2Suffix: String = "",
     isNewOrDeleted: Boolean = false,
     highlightDiffColor: Int? = null
   ): CharSequence {
@@ -162,12 +166,16 @@ object LCAppUtils {
           getHighlightDifferences(diff1.old.toString(), diff1.new.toString(), highlightDiffColor)
         val highlightedNew2 =
           getHighlightDifferences(diff2.old.toString(), diff2.new.toString(), highlightDiffColor)
+        val allText = diff1.old.toString() + diff1.new + diff2.old + diff2.new + diff1Suffix + diff2Suffix
+        val isRtl = BidiFormatter.getInstance().isRtl(allText)
         buildSpannedString {
-          append("${diff1.old} (${diff2.old})")
-          append(" $ARROW ")
+          append("${diff1.old}$diff1Suffix (${diff2.old}$diff2Suffix)")
+          append(" ${getArrow(isRtl)} ")
           append(highlightedNew1)
+          append(diff1Suffix)
           append(" (")
           append(highlightedNew2)
+          append(diff2Suffix)
           append(")")
         }
       } else {
@@ -207,5 +215,13 @@ object LCAppUtils {
     }
 
     return spannable
+  }
+
+  private fun getArrow(isRtl: Boolean): String {
+    return if (isRtl) {
+      ARROW_REVERT
+    } else {
+      ARROW
+    }
   }
 }

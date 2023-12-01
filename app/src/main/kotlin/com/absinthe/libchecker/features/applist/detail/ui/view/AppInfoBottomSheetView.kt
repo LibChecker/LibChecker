@@ -33,8 +33,10 @@ class AppInfoBottomSheetView(context: Context) : AViewGroup(context), IHeaderVie
   }
 
   val setting = AppInfoItemView(context).apply {
-    layoutParams =
-      LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+    layoutParams = LayoutParams(
+      ViewGroup.LayoutParams.WRAP_CONTENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
+    )
     setIcon(R.drawable.ic_settings)
     setIconBackgroundTintColor(R.color.material_blue_grey_300)
     setIconTintColor(Color.WHITE)
@@ -42,8 +44,10 @@ class AppInfoBottomSheetView(context: Context) : AViewGroup(context), IHeaderVie
   }
 
   val list = RecyclerView(context).apply {
-    layoutParams =
-      LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+    layoutParams = LayoutParams(
+      ViewGroup.LayoutParams.MATCH_PARENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
+    )
     overScrollMode = RecyclerView.OVER_SCROLL_NEVER
   }
 
@@ -79,7 +83,7 @@ class AppInfoBottomSheetView(context: Context) : AViewGroup(context), IHeaderVie
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     header.layout(0, paddingTop)
     launch.layout(paddingStart, header.bottom + launch.marginTop)
-    setting.layout(launch.right, launch.top)
+    setting.layout(paddingStart + launch.measuredWidth, launch.top)
     list.layout(paddingStart, launch.bottom)
   }
 

@@ -94,7 +94,10 @@ class ComponentLibItemView(context: Context) : AViewGroup(context) {
     }
 
     val libNameWidth = measuredWidth - paddingStart - paddingEnd - libName.marginEnd - chipWidth
-    libName.measure(libNameWidth.toExactlyMeasureSpec(), libName.defaultHeightMeasureSpec(this))
+    libName.autoMeasure()
+    if (libName.measuredWidth > libNameWidth) {
+      libName.measure(libNameWidth.toExactlyMeasureSpec(), libName.defaultHeightMeasureSpec(this))
+    }
     val height = if (shouldBreakLines) {
       libName.measuredHeight + paddingTop + paddingBottom + (chip?.measuredHeight ?: 0)
     } else {
@@ -106,7 +109,7 @@ class ComponentLibItemView(context: Context) : AViewGroup(context) {
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     if (shouldBreakLines) {
       libName.layout(paddingStart, paddingTop)
-      chip?.layout(libName.left, libName.bottom)
+      chip?.layout(paddingStart, libName.bottom)
     } else {
       libName.layout(paddingStart, libName.toVerticalCenter(this))
       chip?.let {

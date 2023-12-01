@@ -5,6 +5,7 @@ import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.children
 import androidx.core.view.marginEnd
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -57,11 +58,17 @@ class MarketDistributionDashboardView(context: Context) : AViewGroup(context) {
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-    chip.autoMeasure()
+    children.forEach {
+      it.autoMeasure()
+    }
     val chipWidth = chip.measuredWidth + title.marginEnd
     val libNameWidth = measuredWidth - paddingStart - paddingEnd - title.marginEnd - chipWidth
-    title.measure(libNameWidth.toExactlyMeasureSpec(), title.defaultHeightMeasureSpec(this))
-    subtitle.measure(libNameWidth.toExactlyMeasureSpec(), subtitle.defaultHeightMeasureSpec(this))
+    if (title.measuredWidth > libNameWidth) {
+      title.measure(libNameWidth.toExactlyMeasureSpec(), title.defaultHeightMeasureSpec(this))
+    }
+    if (subtitle.measuredWidth > libNameWidth) {
+      subtitle.measure(libNameWidth.toExactlyMeasureSpec(), subtitle.defaultHeightMeasureSpec(this))
+    }
     setMeasuredDimension(
       measuredWidth,
       (title.measuredHeight + subtitle.measuredHeight + paddingTop + paddingBottom).coerceAtLeast(
@@ -72,7 +79,7 @@ class MarketDistributionDashboardView(context: Context) : AViewGroup(context) {
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     title.layout(paddingStart, paddingTop)
-    subtitle.layout(title.left, title.bottom)
+    subtitle.layout(paddingStart, title.bottom)
     chip.layout(paddingEnd, chip.toVerticalCenter(this), fromRight = true)
   }
 }

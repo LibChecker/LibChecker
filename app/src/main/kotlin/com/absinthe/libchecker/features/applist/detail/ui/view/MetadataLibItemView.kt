@@ -7,13 +7,14 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.view.isVisible
+import androidx.core.view.children
 import androidx.core.view.marginEnd
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getDrawableByAttr
+import com.absinthe.libchecker.utils.extensions.visibleWidth
 import com.absinthe.libchecker.view.AViewGroup
 
 class MetadataLibItemView(context: Context) : AViewGroup(context) {
@@ -62,13 +63,17 @@ class MetadataLibItemView(context: Context) : AViewGroup(context) {
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-    linkToIcon.autoMeasure()
-    val linkToIconWidth =
-      if (linkToIcon.isVisible) linkToIcon.measuredWidth + linkToIcon.marginStart else 0
+    children.forEach {
+      it.autoMeasure()
+    }
     val libNameWidth =
-      measuredWidth - paddingStart - paddingEnd - libName.marginEnd - linkToIconWidth
-    libName.measure(libNameWidth.toExactlyMeasureSpec(), libName.defaultHeightMeasureSpec(this))
-    libSize.measure(libNameWidth.toExactlyMeasureSpec(), libSize.defaultHeightMeasureSpec(this))
+      measuredWidth - paddingStart - paddingEnd - libName.marginEnd - linkToIcon.visibleWidth() - linkToIcon.marginStart
+    if (libName.measuredWidth > libNameWidth) {
+      libName.measure(libNameWidth.toExactlyMeasureSpec(), libName.defaultHeightMeasureSpec(this))
+    }
+    if (libSize.measuredWidth > libNameWidth) {
+      libSize.measure(libNameWidth.toExactlyMeasureSpec(), libSize.defaultHeightMeasureSpec(this))
+    }
     setMeasuredDimension(
       measuredWidth,
       (libName.measuredHeight + libSize.measuredHeight + paddingTop + paddingBottom).coerceAtLeast(
@@ -79,7 +84,7 @@ class MetadataLibItemView(context: Context) : AViewGroup(context) {
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     libName.layout(paddingStart, paddingTop)
-    libSize.layout(libName.left, libName.bottom)
+    libSize.layout(paddingStart, libName.bottom)
     linkToIcon.layout(paddingEnd, linkToIcon.toVerticalCenter(this), true)
   }
 }

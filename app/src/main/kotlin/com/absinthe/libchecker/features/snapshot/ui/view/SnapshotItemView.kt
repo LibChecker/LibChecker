@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
@@ -14,6 +15,7 @@ import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
+import com.absinthe.libchecker.utils.extensions.visibleHeight
 import com.absinthe.libchecker.view.RoundCornerView
 
 class SnapshotItemView(context: Context) : FrameLayout(context) {
@@ -52,7 +54,7 @@ class SnapshotItemView(context: Context) : FrameLayout(context) {
       )
     ).apply {
       layoutParams = LayoutParams(
-        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       ).also {
         it.marginStart = 8.dp
@@ -64,8 +66,10 @@ class SnapshotItemView(context: Context) : FrameLayout(context) {
 
     val packageName =
       AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
-        layoutParams =
-          LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        layoutParams = LayoutParams(
+          ViewGroup.LayoutParams.WRAP_CONTENT,
+          ViewGroup.LayoutParams.WRAP_CONTENT
+        )
         setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
         addView(this)
@@ -78,7 +82,7 @@ class SnapshotItemView(context: Context) : FrameLayout(context) {
       )
     ).apply {
       layoutParams = LayoutParams(
-        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
       setTextColor(android.R.color.darker_gray.getColor(context))
@@ -93,7 +97,7 @@ class SnapshotItemView(context: Context) : FrameLayout(context) {
       )
     ).apply {
       layoutParams = LayoutParams(
-        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
       setTextColor(android.R.color.darker_gray.getColor(context))
@@ -108,7 +112,7 @@ class SnapshotItemView(context: Context) : FrameLayout(context) {
       )
     ).apply {
       layoutParams = LayoutParams(
-        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
       setTextColor(android.R.color.darker_gray.getColor(context))
@@ -123,7 +127,7 @@ class SnapshotItemView(context: Context) : FrameLayout(context) {
       )
     ).apply {
       layoutParams = LayoutParams(
-        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
       clipChildren = false
@@ -139,7 +143,7 @@ class SnapshotItemView(context: Context) : FrameLayout(context) {
       )
     ).apply {
       layoutParams = LayoutParams(
-        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
       setTextColor(android.R.color.darker_gray.getColor(context))
@@ -154,48 +158,33 @@ class SnapshotItemView(context: Context) : FrameLayout(context) {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
       super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-      icon.autoMeasure()
+      children.forEach {
+        it.autoMeasure()
+      }
       val textWidth =
         measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - 5.dp - appName.marginStart
-      appName.measure(
-        textWidth.toExactlyMeasureSpec(),
-        appName.defaultHeightMeasureSpec(this)
-      )
-      packageName.measure(
-        textWidth.toExactlyMeasureSpec(),
-        packageName.defaultHeightMeasureSpec(this)
-      )
-      versionInfo.measure(
-        textWidth.toExactlyMeasureSpec(),
-        versionInfo.defaultHeightMeasureSpec(this)
-      )
-      packageSizeInfo.measure(
-        textWidth.toExactlyMeasureSpec(),
-        packageSizeInfo.defaultHeightMeasureSpec(this)
-      )
-      targetApiInfo.measure(
-        textWidth.toExactlyMeasureSpec(),
-        targetApiInfo.defaultHeightMeasureSpec(this)
-      )
-      updateTime.measure(
-        textWidth.toExactlyMeasureSpec(),
-        updateTime.defaultHeightMeasureSpec(this)
-      )
-      abiInfo.measure(
-        textWidth.toExactlyMeasureSpec(),
-        abiInfo.defaultHeightMeasureSpec(this)
-      )
+      if (appName.measuredWidth > textWidth) {
+        appName.measure(textWidth.toExactlyMeasureSpec(), appName.defaultHeightMeasureSpec(this))
+      }
+      if (packageName.measuredWidth > textWidth) {
+        packageName.measure(textWidth.toExactlyMeasureSpec(), packageName.defaultHeightMeasureSpec(this))
+      }
+      if (versionInfo.measuredWidth > textWidth) {
+        versionInfo.measure(textWidth.toExactlyMeasureSpec(), versionInfo.defaultHeightMeasureSpec(this))
+      }
+      if (packageSizeInfo.measuredWidth > textWidth) {
+        packageSizeInfo.measure(textWidth.toExactlyMeasureSpec(), packageSizeInfo.defaultHeightMeasureSpec(this))
+      }
+      if (targetApiInfo.measuredWidth > textWidth) {
+        targetApiInfo.measure(textWidth.toExactlyMeasureSpec(), targetApiInfo.defaultHeightMeasureSpec(this))
+      }
+      if (updateTime.measuredWidth > textWidth) {
+        updateTime.measure(textWidth.toExactlyMeasureSpec(), updateTime.defaultHeightMeasureSpec(this))
+      }
+      if (abiInfo.measuredWidth > textWidth) {
+        abiInfo.measure(textWidth.toExactlyMeasureSpec(), abiInfo.defaultHeightMeasureSpec(this))
+      }
 
-      val packageSizeHeight = if (packageSizeInfo.isVisible) {
-        packageSizeInfo.measuredHeight
-      } else {
-        0
-      }
-      val updateTimeHeight = if (updateTime.isVisible) {
-        updateTime.measuredHeight
-      } else {
-        0
-      }
       setMeasuredDimension(
         measuredWidth,
         (
@@ -203,9 +192,9 @@ class SnapshotItemView(context: Context) : FrameLayout(context) {
             appName.measuredHeight +
             packageName.measuredHeight +
             versionInfo.measuredHeight +
-            packageSizeHeight +
+            packageSizeInfo.visibleHeight() +
             targetApiInfo.measuredHeight +
-            updateTimeHeight +
+            updateTime.visibleHeight() +
             abiInfo.measuredHeight +
             paddingBottom
           )
@@ -218,17 +207,18 @@ class SnapshotItemView(context: Context) : FrameLayout(context) {
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
       icon.layout(paddingStart, icon.toVerticalCenter(this))
-      appName.layout(icon.right + appName.marginStart, paddingTop)
-      packageName.layout(appName.left, appName.bottom)
-      versionInfo.layout(appName.left, packageName.bottom)
-      packageSizeInfo.layout(appName.left, versionInfo.bottom)
+      val appNameXOffset = paddingStart + icon.measuredWidth + appName.marginStart
+      appName.layout(appNameXOffset, paddingTop)
+      packageName.layout(appNameXOffset, appName.bottom)
+      versionInfo.layout(appNameXOffset, packageName.bottom)
+      packageSizeInfo.layout(appNameXOffset, versionInfo.bottom)
       targetApiInfo.layout(
-        appName.left,
+        appNameXOffset,
         if (packageSizeInfo.isVisible) packageSizeInfo.bottom else versionInfo.bottom
       )
-      updateTime.layout(appName.left, targetApiInfo.bottom)
+      updateTime.layout(appNameXOffset, targetApiInfo.bottom)
       abiInfo.layout(
-        appName.left,
+        appNameXOffset,
         if (updateTime.isVisible) updateTime.bottom else targetApiInfo.bottom
       )
       stateIndicator.layout(

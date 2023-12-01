@@ -57,9 +57,9 @@ class SnapshotNoDiffBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotNoDi
         appNameView.text = LCAppUtils.getDiffString(item.labelDiff, isNewOrDeleted)
         packageNameView.text = item.packageName
         versionInfoView.text = LCAppUtils.getDiffString(
-          item.versionNameDiff,
-          item.versionCodeDiff,
-          isNewOrDeleted
+          diff1 = item.versionNameDiff,
+          diff2 = item.versionCodeDiff,
+          isNewOrDeleted = isNewOrDeleted
         )
         targetApiView.text = LCAppUtils.getDiffString(item.targetApiDiff, isNewOrDeleted, "API %s")
       }

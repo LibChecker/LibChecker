@@ -5,6 +5,7 @@ import android.util.TypedValue
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.children
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -16,7 +17,7 @@ class SignatureDetailItemView(context: Context) : AViewGroup(context) {
 
   val type = AppCompatTextView(context).apply {
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     )
     setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
@@ -25,7 +26,7 @@ class SignatureDetailItemView(context: Context) : AViewGroup(context) {
 
   val content = AppCompatTextView(context).apply {
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     ).also {
       it.topMargin = 4.dp
@@ -62,18 +63,18 @@ class SignatureDetailItemView(context: Context) : AViewGroup(context) {
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-    copyToClipboard.autoMeasure()
+    children.forEach {
+      it.autoMeasure()
+    }
     val typeWidth =
       measuredWidth - paddingStart - paddingEnd - copyToClipboard.measuredWidth - copyToClipboard.marginStart
     val contentWidth = measuredWidth - paddingStart - paddingEnd
-    type.measure(
-      typeWidth.toExactlyMeasureSpec(),
-      copyToClipboard.measuredHeight.toExactlyMeasureSpec()
-    )
-    content.measure(
-      contentWidth.toExactlyMeasureSpec(),
-      content.defaultHeightMeasureSpec(this)
-    )
+    if (type.measuredWidth > typeWidth) {
+      type.measure(typeWidth.toExactlyMeasureSpec(), type.defaultHeightMeasureSpec(this))
+    }
+    if (content.measuredWidth > contentWidth) {
+      content.measure(contentWidth.toExactlyMeasureSpec(), content.defaultHeightMeasureSpec(this))
+    }
     setMeasuredDimension(
       measuredWidth,
       (type.measuredHeight + content.measuredHeight + paddingTop + paddingBottom).coerceAtLeast(
@@ -84,7 +85,7 @@ class SignatureDetailItemView(context: Context) : AViewGroup(context) {
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     type.layout(paddingStart, paddingTop)
-    content.layout(type.left, type.bottom)
+    content.layout(paddingStart, type.bottom)
     copyToClipboard.layout(paddingEnd, copyToClipboard.toViewVerticalCenter(type), true)
   }
 }

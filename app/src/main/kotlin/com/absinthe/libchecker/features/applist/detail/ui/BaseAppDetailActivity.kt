@@ -49,6 +49,7 @@ import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.features.applist.DetailFragmentManager
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
+import com.absinthe.libchecker.features.applist.detail.AppBarStateChangeListener
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.FeaturesDialog
 import com.absinthe.libchecker.features.applist.detail.IDetailContainer
@@ -67,7 +68,6 @@ import com.absinthe.libchecker.features.applist.detail.ui.impl.NativeAnalysisFra
 import com.absinthe.libchecker.features.applist.detail.ui.impl.PermissionAnalysisFragment
 import com.absinthe.libchecker.features.applist.detail.ui.impl.SignaturesAnalysisFragment
 import com.absinthe.libchecker.features.applist.detail.ui.impl.StaticAnalysisFragment
-import com.absinthe.libchecker.features.applist.detail.ui.view.AppBarStateChangeListener
 import com.absinthe.libchecker.features.applist.detail.ui.view.ProcessBarView
 import com.absinthe.libchecker.features.snapshot.detail.bean.SnapshotDiffItem
 import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ENTITY
