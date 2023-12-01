@@ -49,6 +49,9 @@
   <string name="string_kotlin_unused">Kotlin chưa sử dụng</string>
   <string name="string_compose_used">Jetpack Compose đã được sử dụng</string>
   <string name="string_compose_unused">Chưa sử dụng Jetpack Compose</string>
+  <string name="android_dist_source">Source</string>
+  <string name="android_dist_title">Android Version Distribution Statistics</string>
+  <string name="android_dist_subtitle_format">Update Time: %s</string>
   <!--  About  -->
   <string name="settings_about">Giới thiệu</string>
   <string name="settings_about_summary">Đây là LibChecker!</string>
@@ -56,6 +59,8 @@
   <string name="settings_translate_summary">Giúp mình với nhóm dịch ứng dụng này</string>
   <string name="settings_rate_us">Đánh giá chúng tôi</string>
   <string name="settings_rate_us_summary">Điều này có thể khiến chúng tôi được nhiều người tìm thấy hơn</string>
+  <string name="settings_get_updates">Get Updates</string>
+  <string name="settings_get_updates_summary">Get the latest version that is more stable and packed with features</string>
   <string name="about_info">Ứng dụng này được sử dụng để xem các thư viện của bên thứ ba được sử dụng bởi các ứng dụng trong thiết bị của bạn.</string>
   <string name="toolbar_rate">Tỷ lệ</string>
   <string name="resource_declaration">Một phần tài nguyên trong ứng dụng đến từ:</string>
@@ -103,6 +108,7 @@
   <string name="app_info_launch">Phóng</string>
   <string name="app_info_settings">Cài đặt</string>
   <string name="lib_detail_dialog_title">Chi tiết thư viện</string>
+  <string name="lib_permission_dialog_title">Permission Detail</string>
   <string name="agp_details">Hệ thống xây dựng Android Studio dựa trên Gradle và plugin Android Gradle bổ sung một số tính năng dành riêng cho việc xây dựng ứng dụng Android. Mặc dù plugin Android thường được cập nhật theo bước khóa với Android Studio, nhưng plugin này (và phần còn lại của hệ thống Gradle) có thể chạy độc lập với Android Studio và được cập nhật riêng.</string>
   <string name="xposed_module">Mô-đun Xposed</string>
   <string name="xposed_module_details">Xposed là một khung dành cho các mô-đun có thể thay đổi hành vi của hệ thống và ứng dụng mà không cần chạm vào bất kỳ APK nào. Điều đó thật tuyệt vì điều đó có nghĩa là các mô-đun có thể hoạt động cho các phiên bản khác nhau và thậm chí cả ROM mà không có bất kỳ thay đổi nào.</string>
@@ -245,6 +251,9 @@
   <string name="adv_mark_exported">Đánh dấu thành phần đã xuất</string>
   <string name="adv_mark_disabled">Đánh dấu thành phần bị vô hiệu hóa</string>
   <string name="adv_show_marked_lib">Hiển thị thư viện được đánh dấu</string>
+  <string name="adv_show_system_framework_apps">Show Framework Apps</string>
   <!--  Snapshot menu  -->
   <string name="snapshot_menu_show_update_time">Hiển thị thời gian cập nhật</string>
+  <string name="snapshot_menu_hide_no_component_changes">Hide No Component Changes</string>
+  <string name="snapshot_menu_diff_highlight">Diff Highlight</string>
 </resources>
