@@ -51,11 +51,11 @@
   <string name="string_compose_unused">未使用 Jetpack Compose</string>
   <!--  About  -->
   <string name="settings_about">關於</string>
+  <string name="settings_about_summary">這裡是 LibChecker！</string>
   <string name="settings_translate">參與翻譯</string>
   <string name="settings_translate_summary">協助翻譯這個應用程式</string>
   <string name="settings_rate_us">給我們評分</string>
   <string name="settings_rate_us_summary">這可以使我們被更多的人發現</string>
-  <string name="settings_about_summary">這裡是 LibChecker！</string>
   <string name="about_info">本應用程式用於檢視裝置上的應用程式使用第三方程式庫的狀況。</string>
   <string name="toolbar_rate">評分</string>
   <string name="resource_declaration">應用程式中的部分資源來自於： </string>

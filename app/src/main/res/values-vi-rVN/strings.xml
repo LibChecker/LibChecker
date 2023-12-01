@@ -51,11 +51,11 @@
   <string name="string_compose_unused">Chưa sử dụng Jetpack Compose</string>
   <!--  About  -->
   <string name="settings_about">Giới thiệu</string>
+  <string name="settings_about_summary">Đây là LibChecker!</string>
   <string name="settings_translate">Tham gia dịch</string>
   <string name="settings_translate_summary">Giúp mình với nhóm dịch ứng dụng này</string>
   <string name="settings_rate_us">Đánh giá chúng tôi</string>
   <string name="settings_rate_us_summary">Điều này có thể khiến chúng tôi được nhiều người tìm thấy hơn</string>
-  <string name="settings_about_summary">Đây là LibChecker!</string>
   <string name="about_info">Ứng dụng này được sử dụng để xem các thư viện của bên thứ ba được sử dụng bởi các ứng dụng trong thiết bị của bạn.</string>
   <string name="toolbar_rate">Tỷ lệ</string>
   <string name="resource_declaration">Một phần tài nguyên trong ứng dụng đến từ:</string>
