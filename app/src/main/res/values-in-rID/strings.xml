@@ -49,6 +49,9 @@
   <string name="string_kotlin_unused">Tak menggunakan Kotlin</string>
   <string name="string_compose_used">Menggunakan Jetpack Compose</string>
   <string name="string_compose_unused">Tak menggunakan Jetpack Compose</string>
+  <string name="android_dist_source">Source</string>
+  <string name="android_dist_title">Android Version Distribution Statistics</string>
+  <string name="android_dist_subtitle_format">Update Time: %s</string>
   <!--  About  -->
   <string name="settings_about">Tentang</string>
   <string name="settings_about_summary">Inilah LibChecker!</string>
@@ -56,6 +59,8 @@
   <string name="settings_translate_summary">Bantu kami menerjemahkan aplikasi ini</string>
   <string name="settings_rate_us">Nilai kami</string>
   <string name="settings_rate_us_summary">Ini dapat membuat kami dikenal lebih banyak orang</string>
+  <string name="settings_get_updates">Get Updates</string>
+  <string name="settings_get_updates_summary">Get the latest version that is more stable and packed with features</string>
   <string name="about_info">Aplikasi ini digunakan untuk melihat library pihak ketiga yang digunakan oleh aplikasi di perangkat Anda.</string>
   <string name="toolbar_rate">Nilai</string>
   <string name="resource_declaration">Sebagian resource aplikasi berasal dari: </string>
@@ -250,4 +255,5 @@
   <!--  Snapshot menu  -->
   <string name="snapshot_menu_show_update_time">Tampilkan Waktu Pembaruan</string>
   <string name="snapshot_menu_hide_no_component_changes">Sembunyikan Komponen Tanpa Perubahan</string>
+  <string name="snapshot_menu_diff_highlight">Diff Highlight</string>
 </resources>
