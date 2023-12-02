@@ -136,6 +136,7 @@ class LibReferenceFragment :
         val item = refAdapter.data[position] as? LibReference ?: return@setOnItemClickListener
         val intent = Intent(context, LibReferenceActivity::class.java)
           .putExtra(EXTRA_REF_NAME, item.libName)
+          .putExtra(EXTRA_REF_LABEL, item.chip?.name)
           .putExtra(EXTRA_REF_TYPE, item.type)
           .putExtra(EXTRA_REF_LIST, item.referredList.toTypedArray())
         startActivity(intent)
