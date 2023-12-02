@@ -54,6 +54,7 @@ import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
+import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPackageSize
 import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getVersionCode
@@ -445,6 +446,8 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
       versionCodeDiff = SnapshotDiffItem.DiffNode(left.versionCode, right.versionCode),
       abiDiff = SnapshotDiffItem.DiffNode(left.abi, right.abi),
       targetApiDiff = SnapshotDiffItem.DiffNode(left.targetApi, right.targetApi),
+      compileSdkDiff = SnapshotDiffItem.DiffNode(left.compileSdk, right.compileSdk),
+      minSdkDiff = SnapshotDiffItem.DiffNode(left.minSdk, right.minSdk),
       nativeLibsDiff = SnapshotDiffItem.DiffNode(left.nativeLibs, right.nativeLibs),
       servicesDiff = SnapshotDiffItem.DiffNode(left.services, right.services),
       activitiesDiff = SnapshotDiffItem.DiffNode(left.activities, right.activities),
@@ -534,7 +537,9 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
           .toJson().orEmpty(),
         permissions = it.getPermissionsList().toJson().orEmpty(),
         metadata = PackageUtils.getMetaDataItems(it).toJson().orEmpty(),
-        packageSize = it.getPackageSize(true)
+        packageSize = it.getPackageSize(true),
+        compileSdk = it.getCompileSdkVersion().toShort(),
+        minSdk = it.applicationInfo.minSdkVersion.toShort()
       )
     } ?: throw IllegalStateException("PackageInfo is null")
   }

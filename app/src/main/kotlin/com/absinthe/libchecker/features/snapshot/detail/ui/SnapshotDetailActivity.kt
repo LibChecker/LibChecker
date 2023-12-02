@@ -55,7 +55,6 @@ import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.launchLibReferencePage
-import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.chad.library.adapter.base.entity.node.BaseNode
@@ -181,31 +180,9 @@ class SnapshotDetailActivity :
         diff2 = entity.versionCodeDiff,
         isNewOrDeleted = isNewOrDeleted
       )
-      snapshotTitle.targetApiView.text =
-        String.format("API %s", LCAppUtils.getDiffString(entity.targetApiDiff, isNewOrDeleted))
 
-      if (entity.packageSizeDiff.old > 0L) {
-        snapshotTitle.packageSizeView.isVisible = true
-        val sizeDiff = SnapshotDiffItem.DiffNode(
-          entity.packageSizeDiff.old.sizeToString(this@SnapshotDetailActivity),
-          entity.packageSizeDiff.new?.sizeToString(this@SnapshotDetailActivity)
-        )
-        val sizeDiffAppend = StringBuilder(LCAppUtils.getDiffString(sizeDiff, isNewOrDeleted))
-        if (entity.packageSizeDiff.new != null) {
-          val diffSize = entity.packageSizeDiff.new!! - entity.packageSizeDiff.old
-          val diffSizeText = buildString {
-            append(if (diffSize > 0) "+" else "")
-            append(diffSize.sizeToString(this@SnapshotDetailActivity))
-          }
-
-          if (diffSize != 0L) {
-            sizeDiffAppend.append(", $diffSizeText")
-          }
-        }
-        snapshotTitle.packageSizeView.text = sizeDiffAppend
-      } else {
-        snapshotTitle.packageSizeView.isVisible = false
-      }
+      snapshotTitle.setApisText(entity, isNewOrDeleted)
+      snapshotTitle.setPackageSizeText(entity, isNewOrDeleted)
     }
 
     viewModel.snapshotDetailItems.observe(this) { details ->
@@ -346,7 +323,7 @@ class SnapshotDetailActivity :
     sb.append(binding.snapshotTitle.appNameView.text).appendLine()
       .append(binding.snapshotTitle.packageNameView.text).appendLine()
       .append(binding.snapshotTitle.versionInfoView.text).appendLine()
-      .append(binding.snapshotTitle.targetApiView.text).appendLine()
+      .append(binding.snapshotTitle.apisView.text).appendLine()
 
     if (binding.snapshotTitle.packageSizeView.isVisible) {
       sb.append(binding.snapshotTitle.packageSizeView.text).appendLine()

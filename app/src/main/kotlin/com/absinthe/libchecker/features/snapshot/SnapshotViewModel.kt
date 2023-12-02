@@ -35,6 +35,7 @@ import com.absinthe.libchecker.protocol.SnapshotList
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getAppName
+import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPackageSize
 import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getVersionCode
@@ -142,6 +143,8 @@ class SnapshotViewModel : ViewModel() {
           SnapshotDiffItem.DiffNode(dbItem.versionCode),
           SnapshotDiffItem.DiffNode(dbItem.abi),
           SnapshotDiffItem.DiffNode(dbItem.targetApi),
+          SnapshotDiffItem.DiffNode(dbItem.compileSdk),
+          SnapshotDiffItem.DiffNode(dbItem.minSdk),
           SnapshotDiffItem.DiffNode(dbItem.nativeLibs),
           SnapshotDiffItem.DiffNode(dbItem.services),
           SnapshotDiffItem.DiffNode(dbItem.activities),
@@ -171,6 +174,8 @@ class SnapshotViewModel : ViewModel() {
             SnapshotDiffItem.DiffNode(versionCode),
             SnapshotDiffItem.DiffNode(PackageUtils.getAbi(pi).toShort()),
             SnapshotDiffItem.DiffNode(ai.targetSdkVersion.toShort()),
+            SnapshotDiffItem.DiffNode(pi.getCompileSdkVersion().toShort()),
+            SnapshotDiffItem.DiffNode(ai.minSdkVersion.toShort()),
             SnapshotDiffItem.DiffNode(
               PackageUtils.getNativeDirLibs(pi).toJson().orEmpty()
             ),
@@ -320,6 +325,14 @@ class SnapshotViewModel : ViewModel() {
         dbItem.targetApi,
         packageInfo.applicationInfo.targetSdkVersion.toShort()
       ),
+      compileSdkDiff = SnapshotDiffItem.DiffNode(
+        dbItem.compileSdk,
+        packageInfo.getCompileSdkVersion().toShort()
+      ),
+      minSdkDiff = SnapshotDiffItem.DiffNode(
+        dbItem.minSdk,
+        packageInfo.applicationInfo.minSdkVersion.toShort()
+      ),
       nativeLibsDiff = SnapshotDiffItem.DiffNode(
         dbItem.nativeLibs,
         PackageUtils.getNativeDirLibs(packageInfo).toJson().orEmpty()
@@ -451,6 +464,8 @@ class SnapshotViewModel : ViewModel() {
           SnapshotDiffItem.DiffNode(preItem.versionCode),
           SnapshotDiffItem.DiffNode(preItem.abi),
           SnapshotDiffItem.DiffNode(preItem.targetApi),
+          SnapshotDiffItem.DiffNode(preItem.compileSdk),
+          SnapshotDiffItem.DiffNode(preItem.minSdk),
           SnapshotDiffItem.DiffNode(preItem.nativeLibs),
           SnapshotDiffItem.DiffNode(preItem.services),
           SnapshotDiffItem.DiffNode(preItem.activities),
@@ -476,6 +491,8 @@ class SnapshotViewModel : ViewModel() {
           SnapshotDiffItem.DiffNode(currItem.versionCode),
           SnapshotDiffItem.DiffNode(currItem.abi),
           SnapshotDiffItem.DiffNode(currItem.targetApi),
+          SnapshotDiffItem.DiffNode(currItem.compileSdk),
+          SnapshotDiffItem.DiffNode(currItem.minSdk),
           SnapshotDiffItem.DiffNode(currItem.nativeLibs),
           SnapshotDiffItem.DiffNode(currItem.services),
           SnapshotDiffItem.DiffNode(currItem.activities),
@@ -508,6 +525,8 @@ class SnapshotViewModel : ViewModel() {
           ),
           abiDiff = SnapshotDiffItem.DiffNode(preItem.abi, currItem.abi),
           targetApiDiff = SnapshotDiffItem.DiffNode(preItem.targetApi, currItem.targetApi),
+          compileSdkDiff = SnapshotDiffItem.DiffNode(preItem.compileSdk, currItem.compileSdk),
+          minSdkDiff = SnapshotDiffItem.DiffNode(preItem.minSdk, currItem.minSdk),
           nativeLibsDiff = SnapshotDiffItem.DiffNode(
             preItem.nativeLibs,
             currItem.nativeLibs
@@ -579,6 +598,14 @@ class SnapshotViewModel : ViewModel() {
             packageInfo.applicationInfo.targetSdkVersion.toShort()
           ),
           SnapshotDiffItem.DiffNode(
+            it.compileSdk,
+            packageInfo.getCompileSdkVersion().toShort()
+          ),
+          SnapshotDiffItem.DiffNode(
+            it.minSdk,
+            packageInfo.applicationInfo.minSdkVersion.toShort()
+          ),
+          SnapshotDiffItem.DiffNode(
             it.nativeLibs,
             PackageUtils.getNativeDirLibs(packageInfo).toJson().orEmpty()
           ),
@@ -643,6 +670,8 @@ class SnapshotViewModel : ViewModel() {
           SnapshotDiffItem.DiffNode(it.versionCode),
           SnapshotDiffItem.DiffNode(it.abi),
           SnapshotDiffItem.DiffNode(it.targetApi),
+          SnapshotDiffItem.DiffNode(it.compileSdk),
+          SnapshotDiffItem.DiffNode(it.minSdk),
           SnapshotDiffItem.DiffNode(it.nativeLibs),
           SnapshotDiffItem.DiffNode(it.services),
           SnapshotDiffItem.DiffNode(it.activities),
@@ -665,6 +694,8 @@ class SnapshotViewModel : ViewModel() {
           SnapshotDiffItem.DiffNode(packageInfo.getVersionCode()),
           SnapshotDiffItem.DiffNode(PackageUtils.getAbi(packageInfo).toShort()),
           SnapshotDiffItem.DiffNode(packageInfo.applicationInfo.targetSdkVersion.toShort()),
+          SnapshotDiffItem.DiffNode(packageInfo.getCompileSdkVersion().toShort()),
+          SnapshotDiffItem.DiffNode(packageInfo.applicationInfo.minSdkVersion.toShort()),
           SnapshotDiffItem.DiffNode(
             PackageUtils.getNativeDirLibs(packageInfo).toJson().orEmpty()
           ),
@@ -1280,7 +1311,9 @@ class SnapshotViewModel : ViewModel() {
             it.providers,
             it.permissions,
             it.metadata,
-            it.packageSize
+            it.packageSize,
+            it.compileSdk.toShort(),
+            it.minSdk.toShort()
           )
           count++
         }

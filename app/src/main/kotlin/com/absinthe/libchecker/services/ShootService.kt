@@ -37,6 +37,7 @@ import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getColor
+import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPackageSize
 import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getVersionCode
@@ -239,7 +240,9 @@ class ShootService : LifecycleService() {
                 .toJson().orEmpty(),
               permissions = info.getPermissionsList().toJson().orEmpty(),
               metadata = PackageUtils.getMetaDataItems(info).toJson().orEmpty(),
-              packageSize = info.getPackageSize(true)
+              packageSize = info.getPackageSize(true),
+              compileSdk = info.getCompileSdkVersion().toShort(),
+              minSdk = ai.minSdkVersion.toShort()
             )
           )
         }
@@ -297,7 +300,9 @@ class ShootService : LifecycleService() {
                 .toJson().orEmpty(),
               permissions = it.getPermissionsList().toJson().orEmpty(),
               metadata = PackageUtils.getMetaDataItems(it).toJson().orEmpty(),
-              packageSize = it.getPackageSize(true)
+              packageSize = it.getPackageSize(true),
+              compileSdk = it.getCompileSdkVersion().toShort(),
+              minSdk = info.minSdkVersion.toShort()
             )
           )
         }

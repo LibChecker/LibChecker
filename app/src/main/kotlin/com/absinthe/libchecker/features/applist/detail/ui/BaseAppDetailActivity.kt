@@ -808,6 +808,14 @@ abstract class BaseAppDetailActivity :
         basePackage.applicationInfo.targetSdkVersion.toShort(),
         analysisPackage.applicationInfo.targetSdkVersion.toShort()
       ),
+      compileSdkDiff = SnapshotDiffItem.DiffNode(
+        basePackage.getCompileSdkVersion().toShort(),
+        analysisPackage.getCompileSdkVersion().toShort()
+      ),
+      minSdkDiff = SnapshotDiffItem.DiffNode(
+        basePackage.applicationInfo.minSdkVersion.toShort(),
+        analysisPackage.applicationInfo.minSdkVersion.toShort()
+      ),
       nativeLibsDiff = SnapshotDiffItem.DiffNode(
         PackageUtils.getNativeDirLibs(basePackage).toJson().orEmpty(),
         PackageUtils.getNativeDirLibs(analysisPackage).toJson().orEmpty()
