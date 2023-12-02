@@ -135,7 +135,7 @@ class SnapshotTitleView(context: Context, attributeSet: AttributeSet? = null) :
     val compileDiff = LCAppUtils.getDiffString(item.compileSdkDiff, isNewOrDeleted).takeIf { item.compileSdkDiff.old > 0 }
     apisView.text = buildSpannedString {
       targetDiff?.let {
-        scale(0.8f) {
+        scale(1f) {
           append("Target: ")
         }
         append(it)
@@ -143,7 +143,7 @@ class SnapshotTitleView(context: Context, attributeSet: AttributeSet? = null) :
       }
 
       minDiff?.let {
-        scale(0.8f) {
+        scale(1f) {
           append("Min: ")
         }
         append(it)
@@ -151,7 +151,7 @@ class SnapshotTitleView(context: Context, attributeSet: AttributeSet? = null) :
       }
 
       compileDiff?.let {
-        scale(0.8f) {
+        scale(1f) {
           append("Compile: ")
         }
         append(it)

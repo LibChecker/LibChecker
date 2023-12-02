@@ -169,7 +169,7 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
       val compileDiff = LCAppUtils.getDiffString(item.compileSdkDiff, isNewOrDeleted, highlightDiffColor = highlightDiffColor).takeIf { item.compileSdkDiff.old > 0 }
       apisInfo.text = buildSpannedString {
         targetDiff?.let {
-          scale(0.8f) {
+          scale(1f) {
             append("Target: ")
           }
           append(it)
@@ -177,7 +177,7 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
         }
 
         minDiff?.let {
-          scale(0.8f) {
+          scale(1f) {
             append("Min: ")
           }
           append(it)
@@ -185,7 +185,7 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
         }
 
         compileDiff?.let {
-          scale(0.8f) {
+          scale(1f) {
             append("Compile: ")
           }
           append(it)
