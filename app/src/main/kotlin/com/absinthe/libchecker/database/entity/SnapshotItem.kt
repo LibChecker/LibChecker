@@ -24,5 +24,7 @@ data class SnapshotItem(
   val providers: String,
   val permissions: String,
   val metadata: String,
-  val packageSize: Long
+  val packageSize: Long,
+  val compileSdk: Short,
+  val minSdk: Short
 )

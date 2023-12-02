@@ -12,6 +12,8 @@ data class SnapshotDiffItem(
   val versionCodeDiff: DiffNode<Long>,
   val abiDiff: DiffNode<Short>,
   val targetApiDiff: DiffNode<Short>,
+  val compileSdkDiff: DiffNode<Short>,
+  val minSdkDiff: DiffNode<Short>,
   val nativeLibsDiff: DiffNode<String>,
   val servicesDiff: DiffNode<String>,
   val activitiesDiff: DiffNode<String>,

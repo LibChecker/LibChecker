@@ -7,6 +7,7 @@ import android.text.style.ImageSpan
 import android.view.ViewGroup
 import androidx.core.text.buildSpannedString
 import androidx.core.text.inSpans
+import androidx.core.text.scale
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import coil.load
@@ -163,7 +164,33 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
         packageSizeInfo.isGone = true
       }
 
-      targetApiInfo.text = LCAppUtils.getDiffString(item.targetApiDiff, isNewOrDeleted, "API %s", highlightDiffColor = highlightDiffColor)
+      val targetDiff = LCAppUtils.getDiffString(item.targetApiDiff, isNewOrDeleted, highlightDiffColor = highlightDiffColor).takeIf { item.targetApiDiff.old > 0 }
+      val minDiff = LCAppUtils.getDiffString(item.minSdkDiff, isNewOrDeleted, highlightDiffColor = highlightDiffColor).takeIf { item.minSdkDiff.old > 0 }
+      val compileDiff = LCAppUtils.getDiffString(item.compileSdkDiff, isNewOrDeleted, highlightDiffColor = highlightDiffColor).takeIf { item.compileSdkDiff.old > 0 }
+      apisInfo.text = buildSpannedString {
+        targetDiff?.let {
+          scale(0.8f) {
+            append("Target: ")
+          }
+          append(it)
+          append("  ")
+        }
+
+        minDiff?.let {
+          scale(0.8f) {
+            append("Min: ")
+          }
+          append(it)
+          append("  ")
+        }
+
+        compileDiff?.let {
+          scale(0.8f) {
+            append("Compile: ")
+          }
+          append(it)
+        }
+      }
 
       val oldAbiString = PackageUtils.getAbiString(context, item.abiDiff.old.toInt(), false)
       val oldAbiSpanString: SpannableString

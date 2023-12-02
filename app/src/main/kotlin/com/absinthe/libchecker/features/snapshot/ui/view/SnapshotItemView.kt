@@ -105,7 +105,7 @@ class SnapshotItemView(context: Context) : FrameLayout(context) {
       addView(this)
     }
 
-    val targetApiInfo = AppCompatTextView(
+    val apisInfo = AppCompatTextView(
       ContextThemeWrapper(
         context,
         R.style.TextView_SansSerifCondensed
@@ -175,8 +175,8 @@ class SnapshotItemView(context: Context) : FrameLayout(context) {
       if (packageSizeInfo.measuredWidth > textWidth) {
         packageSizeInfo.measure(textWidth.toExactlyMeasureSpec(), packageSizeInfo.defaultHeightMeasureSpec(this))
       }
-      if (targetApiInfo.measuredWidth > textWidth) {
-        targetApiInfo.measure(textWidth.toExactlyMeasureSpec(), targetApiInfo.defaultHeightMeasureSpec(this))
+      if (apisInfo.measuredWidth > textWidth) {
+        apisInfo.measure(textWidth.toExactlyMeasureSpec(), apisInfo.defaultHeightMeasureSpec(this))
       }
       if (updateTime.measuredWidth > textWidth) {
         updateTime.measure(textWidth.toExactlyMeasureSpec(), updateTime.defaultHeightMeasureSpec(this))
@@ -193,7 +193,7 @@ class SnapshotItemView(context: Context) : FrameLayout(context) {
             packageName.measuredHeight +
             versionInfo.measuredHeight +
             packageSizeInfo.visibleHeight() +
-            targetApiInfo.measuredHeight +
+            apisInfo.measuredHeight +
             updateTime.visibleHeight() +
             abiInfo.measuredHeight +
             paddingBottom
@@ -212,14 +212,14 @@ class SnapshotItemView(context: Context) : FrameLayout(context) {
       packageName.layout(appNameXOffset, appName.bottom)
       versionInfo.layout(appNameXOffset, packageName.bottom)
       packageSizeInfo.layout(appNameXOffset, versionInfo.bottom)
-      targetApiInfo.layout(
+      apisInfo.layout(
         appNameXOffset,
         if (packageSizeInfo.isVisible) packageSizeInfo.bottom else versionInfo.bottom
       )
-      updateTime.layout(appNameXOffset, targetApiInfo.bottom)
+      updateTime.layout(appNameXOffset, apisInfo.bottom)
       abiInfo.layout(
         appNameXOffset,
-        if (updateTime.isVisible) updateTime.bottom else targetApiInfo.bottom
+        if (updateTime.isVisible) updateTime.bottom else apisInfo.bottom
       )
       stateIndicator.layout(
         paddingEnd,
