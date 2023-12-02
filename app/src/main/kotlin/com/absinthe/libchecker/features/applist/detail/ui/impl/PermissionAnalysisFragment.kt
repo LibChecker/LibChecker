@@ -13,7 +13,8 @@ import com.absinthe.libchecker.ui.base.EXTRA_TYPE
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.putArguments
 
-class PermissionAnalysisFragment : BaseFilterAnalysisFragment<FragmentLibComponentBinding>(),
+class PermissionAnalysisFragment :
+  BaseFilterAnalysisFragment<FragmentLibComponentBinding>(),
   Referable {
 
   override fun getRecyclerView() = binding.list
