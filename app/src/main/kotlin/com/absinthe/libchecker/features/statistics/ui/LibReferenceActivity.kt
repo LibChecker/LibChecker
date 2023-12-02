@@ -17,18 +17,16 @@ import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
 import com.absinthe.libchecker.features.applist.ui.adapter.AppAdapter
 import com.absinthe.libchecker.features.statistics.LibReferenceViewModel
 import com.absinthe.libchecker.ui.base.BaseActivity
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.isOrientationLandscape
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.paddingTopCompat
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.widget.borderview.BorderView
 
 const val EXTRA_REF_NAME = "REF_NAME"
+const val EXTRA_REF_LABEL = "REF_LABEL"
 const val EXTRA_REF_TYPE = "REF_TYPE"
 const val EXTRA_REF_LIST = "REF_LIST"
 
@@ -37,6 +35,7 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
   private val adapter = AppAdapter()
   private val viewModel: LibReferenceViewModel by viewModels()
   private val refName by lazy { intent.extras?.getString(EXTRA_REF_NAME) }
+  private val refLabel by lazy { intent.extras?.getString(EXTRA_REF_LABEL) }
   private val refType by lazy { intent.extras?.getInt(EXTRA_REF_TYPE) ?: NATIVE }
   private val refList by lazy { intent.extras?.getStringArray(EXTRA_REF_LIST) }
 
@@ -51,18 +50,6 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
             viewModel.setData(it.toList())
           } ?: run {
             viewModel.setData(name, refType)
-          }
-        }
-
-        withContext(Dispatchers.IO) {
-          LCAppUtils.getRuleWithRegex(name, refType)?.let {
-            withContext(Dispatchers.Main) {
-              binding.toolbar.title = it.label
-            }
-          } ?: run {
-            withContext(Dispatchers.Main) {
-              binding.toolbar.title = getString(R.string.tab_lib_reference_statistics)
-            }
           }
         }
       }
@@ -86,6 +73,12 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
 
   private fun initView() {
     setSupportActionBar(binding.toolbar)
+    supportActionBar?.apply {
+      refLabel?.let {
+        title = it
+      }
+      subtitle = refName
+    }
     binding.apply {
       root.apply {
         fitsSystemWindows = isOrientationLandscape

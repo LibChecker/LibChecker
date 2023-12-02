@@ -2,7 +2,9 @@ package com.absinthe.libchecker.ui.base
 
 import android.content.Context
 import android.view.Gravity
+import android.widget.ArrayAdapter
 import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -17,9 +19,11 @@ import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
+import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.features.applist.DetailFragmentManager
 import com.absinthe.libchecker.features.applist.LocatedCount
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_LIB
+import com.absinthe.libchecker.features.applist.Referable
 import com.absinthe.libchecker.features.applist.Sortable
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.IDetailContainer
@@ -28,18 +32,27 @@ import com.absinthe.libchecker.features.applist.detail.ui.LibDetailDialogFragmen
 import com.absinthe.libchecker.features.applist.detail.ui.PermissionDetailDialogFragment
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibStringAdapter
 import com.absinthe.libchecker.features.applist.detail.ui.impl.ComponentsAnalysisFragment
+import com.absinthe.libchecker.features.applist.detail.ui.impl.MetaDataAnalysisFragment
 import com.absinthe.libchecker.features.applist.detail.ui.impl.NativeAnalysisFragment
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
+import com.absinthe.libchecker.integrations.anywhere.AnywhereManager
+import com.absinthe.libchecker.integrations.blocker.BlockerManager
+import com.absinthe.libchecker.integrations.monkeyking.MonkeyKingManager
+import com.absinthe.libchecker.integrations.monkeyking.ShareCmpInfo
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.launchLibReferencePage
+import com.absinthe.libchecker.utils.extensions.reverseStrikeThroughAnimation
+import com.absinthe.libchecker.utils.extensions.startStrikeThroughAnimation
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.rulesbundle.LCRules
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import rikka.core.util.ClipboardUtils
 import timber.log.Timber
 
 /**
@@ -77,6 +90,8 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
   }
   protected var isListReady = false
   protected var afterListReadyTask: Runnable? = null
+  private var integrationMonkeyKingBlockList: List<ShareCmpInfo.Component>? = null
+  private var integrationBlockerList: List<ShareCmpInfo.Component>? = null
 
   abstract fun getRecyclerView(): RecyclerView
   abstract fun getFilterListByText(text: String): List<LibStringItemChip>?
@@ -121,6 +136,10 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
           }
           openLibDetailDialog(position)
         }
+      }
+      setOnItemLongClickListener { _, _, position ->
+        doOnLongClick(context, getItem(position), position)
+        true
       }
       setProcessMode(viewModel.processMode)
     }
@@ -270,5 +289,122 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
 
   protected fun hasNonGrantedPermissions(): Boolean {
     return type == PERMISSION && (viewModel.permissionsItems.value?.any { it.item.size == 0L } == true)
+  }
+
+  private fun doOnLongClick(context: Context, item: LibStringItemChip, position: Int) {
+    if (!viewModel.isApk && this is Referable) {
+      val actionMap = mutableMapOf<Int, () -> Unit>()
+      val arrayAdapter = ArrayAdapter<String>(context, android.R.layout.simple_list_item_1)
+      val componentName = item.item.name
+      val fullComponentName = if (componentName.startsWith(".")) {
+        viewModel.packageInfo.packageName + componentName
+      } else {
+        componentName
+      }
+
+      // Copy
+      arrayAdapter.add(getString(android.R.string.copy))
+      actionMap[arrayAdapter.count - 1] = {
+        if (this is MetaDataAnalysisFragment) {
+          ClipboardUtils.put(context, componentName + ": " + item.item.source)
+        } else {
+          ClipboardUtils.put(context, componentName)
+        }
+        VersionCompat.showCopiedOnClipboardToast(context)
+      }
+
+      // Reference
+      arrayAdapter.add(getString(R.string.tab_lib_reference_statistics))
+      actionMap[arrayAdapter.count - 1] = {
+        activity?.launchLibReferencePage(componentName, item.chip?.name, type, null)
+      }
+
+      // Blocker
+      if (this is ComponentsAnalysisFragment && BlockerManager.isSupportInteraction) {
+        if (integrationBlockerList == null) {
+          integrationBlockerList =
+            BlockerManager().queryBlockedComponent(context, viewModel.packageInfo.packageName)
+        }
+        val blockerShouldBlock =
+          integrationBlockerList?.any { it.name == fullComponentName } == false
+        val blockStr = if (blockerShouldBlock) {
+          R.string.integration_blocker_menu_block
+        } else {
+          R.string.integration_blocker_menu_unblock
+        }
+        arrayAdapter.add(getString(blockStr))
+        actionMap[arrayAdapter.count - 1] = {
+          BlockerManager().apply {
+            addBlockedComponent(
+              context,
+              viewModel.packageInfo.packageName,
+              componentName,
+              type,
+              blockerShouldBlock
+            )
+            integrationBlockerList =
+              queryBlockedComponent(context, viewModel.packageInfo.packageName)
+            val shouldTurnToDisable =
+              integrationBlockerList?.any { it.name == fullComponentName } == true && blockerShouldBlock
+            animateTvTitle(position, shouldTurnToDisable)
+          }
+        }
+      }
+
+      // MonkeyKing Purify
+      if (this is ComponentsAnalysisFragment && MonkeyKingManager.isSupportInteraction) {
+        if (integrationMonkeyKingBlockList == null) {
+          integrationMonkeyKingBlockList =
+            MonkeyKingManager().queryBlockedComponent(context, viewModel.packageInfo.packageName)
+        }
+        val monkeyKingShouldBlock =
+          integrationMonkeyKingBlockList?.any { it.name == componentName } == false
+        if (monkeyKingShouldBlock) {
+          arrayAdapter.add(getString(R.string.integration_monkey_king_menu_block))
+        } else {
+          arrayAdapter.add(getString(R.string.integration_monkey_king_menu_unblock))
+        }
+        actionMap[arrayAdapter.count - 1] = {
+          MonkeyKingManager().apply {
+            addBlockedComponent(
+              context,
+              viewModel.packageInfo.packageName,
+              componentName,
+              type,
+              monkeyKingShouldBlock
+            )
+            integrationMonkeyKingBlockList =
+              queryBlockedComponent(context, viewModel.packageInfo.packageName)
+            val shouldTurnToDisable =
+              integrationMonkeyKingBlockList?.any { it.name == fullComponentName } == true && monkeyKingShouldBlock
+            animateTvTitle(position, shouldTurnToDisable)
+          }
+        }
+      }
+
+      // Anywhere-
+      if (type == ACTIVITY && AnywhereManager.isSupportInteraction) {
+        arrayAdapter.add(getString(R.string.integration_anywhere_menu_editor))
+        actionMap[arrayAdapter.count - 1] = {
+          AnywhereManager().launchActivityEditor(
+            context,
+            viewModel.packageInfo.packageName,
+            componentName
+          )
+        }
+      }
+
+      BaseAlertDialogBuilder(context)
+        .setAdapter(arrayAdapter) { _, which ->
+          actionMap[which]?.invoke()
+        }
+        .show()
+    }
+  }
+
+  private fun animateTvTitle(position: Int, shouldTurnToDisable: Boolean) {
+    (adapter.getViewByPosition(position, android.R.id.title) as? TextView)?.run {
+      if (shouldTurnToDisable) startStrikeThroughAnimation() else reverseStrikeThroughAnimation()
+    }
   }
 }
