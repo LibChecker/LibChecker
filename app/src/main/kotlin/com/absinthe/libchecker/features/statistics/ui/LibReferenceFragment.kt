@@ -29,6 +29,7 @@ import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseListControllerFragment
 import com.absinthe.libchecker.ui.base.IAppBarContainer
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
+import com.absinthe.libchecker.utils.extensions.launchLibReferencePage
 import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -134,12 +135,12 @@ class LibReferenceFragment :
         context.findViewById<View>(androidx.appcompat.R.id.search_src_text)?.clearFocus()
 
         val item = refAdapter.data[position] as? LibReference ?: return@setOnItemClickListener
-        val intent = Intent(context, LibReferenceActivity::class.java)
-          .putExtra(EXTRA_REF_NAME, item.libName)
-          .putExtra(EXTRA_REF_LABEL, item.chip?.name)
-          .putExtra(EXTRA_REF_TYPE, item.type)
-          .putExtra(EXTRA_REF_LIST, item.referredList.toTypedArray())
-        startActivity(intent)
+        activity?.launchLibReferencePage(
+          item.libName,
+          item.chip?.name,
+          item.type,
+          item.referredList.toTypedArray()
+        )
       }
       setEmptyView(
         EmptyListView(context).apply {

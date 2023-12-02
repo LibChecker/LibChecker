@@ -2,18 +2,17 @@ package com.absinthe.libchecker.features.applist.detail.ui.impl
 
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.NATIVE
-import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
 import com.absinthe.libchecker.features.applist.LocatedCount
+import com.absinthe.libchecker.features.applist.Referable
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibStringDiffUtil
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.ui.base.BaseFilterAnalysisFragment
 import com.absinthe.libchecker.ui.base.EXTRA_TYPE
 import com.absinthe.libchecker.utils.extensions.putArguments
-import rikka.core.util.ClipboardUtils
 
-class NativeAnalysisFragment : BaseFilterAnalysisFragment<FragmentLibNativeBinding>() {
+class NativeAnalysisFragment : BaseFilterAnalysisFragment<FragmentLibNativeBinding>(), Referable {
 
   private var itemsList: List<LibStringItemChip>? = null
 
@@ -52,11 +51,6 @@ class NativeAnalysisFragment : BaseFilterAnalysisFragment<FragmentLibNativeBindi
 
     adapter.apply {
       animationEnable = true
-      setOnItemLongClickListener { _, _, position ->
-        ClipboardUtils.put(context, getItem(position).item.name)
-        VersionCompat.showCopiedOnClipboardToast(context)
-        true
-      }
       setDiffCallback(LibStringDiffUtil())
       setEmptyView(emptyView)
     }
