@@ -42,7 +42,9 @@ class SnapshotTitleView(context: Context, attributeSet: AttributeSet? = null) :
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.WRAP_CONTENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
-    )
+    ).also {
+      it.marginStart = context.getDimensionPixelSize(R.dimen.normal_padding)
+    }
     setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
     addView(this)
