@@ -227,8 +227,12 @@ object PackageUtils {
     if (packageInfo.applicationInfo.sourceDir == null) {
       return emptyList()
     }
+    val file = File(packageInfo.applicationInfo.sourceDir)
+    if (file.exists().not()) {
+      return emptyList()
+    }
     return runCatching {
-      ZipFileCompat(File(packageInfo.applicationInfo.sourceDir)).use { zipFile ->
+      ZipFileCompat(file).use { zipFile ->
         var elfParser: ELFParser?
         return zipFile.getZipEntries()
           .asSequence()
@@ -595,6 +599,11 @@ object PackageUtils {
     val abiSet = mutableSetOf<Int>()
     var zipFile: IZipFile? = null
 
+    if (file.exists().not()) {
+      Timber.w("File not exists: ${file.absolutePath}")
+      return abiSet
+    }
+
     try {
       zipFile = ZipFileCompat(file)
       val entries = zipFile.getZipEntries()
@@ -712,9 +721,7 @@ object PackageUtils {
     abiSet: Set<Int>? = null
   ): Int {
     val applicationInfo: ApplicationInfo = packageInfo.applicationInfo
-    val use32bitAbi = applicationInfo.isUse32BitAbi()
     val overlay = packageInfo.isOverlay()
-    val multiArch = applicationInfo.flags and ApplicationInfo.FLAG_MULTIARCH != 0
 
     if (overlay) {
       return OVERLAY
@@ -727,9 +734,12 @@ object PackageUtils {
     val file = File(applicationInfo.sourceDir)
     val realAbiSet = abiSet ?: getAbiSet(file, packageInfo, isApk, ignoreArch = true)
 
-    if (realAbiSet.contains(NO_LIBS)) {
+    if (file.exists().not() || realAbiSet.contains(NO_LIBS)) {
       return NO_LIBS
     }
+
+    val use32bitAbi = applicationInfo.isUse32BitAbi()
+    val multiArch = applicationInfo.flags and ApplicationInfo.FLAG_MULTIARCH != 0
 
     var abi = when (Refine.unsafeCast<ApplicationInfoHidden>(applicationInfo).primaryCpuAbi) {
       ARMV8_STRING -> ARMV8
@@ -972,10 +982,7 @@ object PackageUtils {
                   className.startsWith("androidx") -> LibStringItem(
                     className.substring(
                       0,
-                      className.indexOf(
-                        ".",
-                        9
-                      )
+                      className.indexOf(".", 9).takeIf { it != -1 } ?: className.length
                     )
                   )
                   // Filter classes which paths deep level greater than 4

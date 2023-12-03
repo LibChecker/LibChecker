@@ -296,7 +296,7 @@ class SnapshotDetailActivity :
       }
     }
     adapter.setOnItemLongClickListener { _, view, position ->
-      val item = (adapter.data[position] as BaseSnapshotNode).item
+      val item = (adapter.data[position] as? BaseSnapshotNode)?.item ?: return@setOnItemLongClickListener false
       if (item.diffType != REMOVED) {
         val label = ((view as? ViewGroup)?.descendants?.find { it is Chip } as? Chip)?.text?.toString()
         launchLibReferencePage(item.name, label, item.itemType, null)

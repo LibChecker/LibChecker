@@ -548,6 +548,9 @@ class SnapshotFragment :
   }
 
   private fun flip(child: Int) {
+    if (isDetached) {
+      return
+    }
     allowRefreshing = child == VF_LIST
     if (binding.vfContainer.displayedChild == child) {
       return

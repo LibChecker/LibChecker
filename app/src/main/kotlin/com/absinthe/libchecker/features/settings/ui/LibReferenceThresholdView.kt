@@ -11,6 +11,7 @@ import android.widget.EditText
 import androidx.core.widget.doOnTextChanged
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.UiUtils
+import com.absinthe.libchecker.utils.extensions.removeNonDigits
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.slider.Slider
 
@@ -67,7 +68,7 @@ class LibReferenceThresholdView(context: Context) : AViewGroup(context) {
               setText(2f.toInt().toString())
               setSelection(1)
             } else {
-              val c = it.toFloat()
+              val c = it.removeNonDigits().toFloat()
               if (c < 1f) {
                 setText(1f.toInt().toString())
                 setSelection(1)
