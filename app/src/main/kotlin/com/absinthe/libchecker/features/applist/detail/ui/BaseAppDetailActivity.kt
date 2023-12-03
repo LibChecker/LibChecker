@@ -631,6 +631,34 @@ abstract class BaseAppDetailActivity :
       it.abiBundle.observe(this) { bundle ->
         if (bundle != null) {
           initAbiView(bundle.abi, bundle.abiSet)
+
+          val action: Runnable = object : Runnable {
+            override fun run() {
+              if (featureListView?.parent != null) {
+                return
+              }
+              val oldContainerHeight = binding.headerContentLayout.height
+              val newContainerHeight = oldContainerHeight + 40.dp
+              val params = binding.headerContentLayout.layoutParams
+
+              binding.headerContentLayout.addView(featureListView)
+              ValueAnimator.ofInt(oldContainerHeight, newContainerHeight).also { anim ->
+                anim.addUpdateListener { valueAnimator ->
+                  val height = valueAnimator.animatedValue as Int
+
+                  if (valueAnimator.animatedFraction == 1f) {
+                    params.height = ViewGroup.LayoutParams.WRAP_CONTENT
+                  } else {
+                    params.height = height
+                  }
+                  binding.headerContentLayout.layoutParams = params
+                }
+                anim.duration = 250
+                anim.start()
+              }
+            }
+          }
+          binding.detailsTitle.postDelayed(action, 500)
         }
       }
     }
@@ -712,28 +740,6 @@ abstract class BaseAppDetailActivity :
       it.adapter = featureAdapter
       it.clipChildren = false
       it.overScrollMode = View.OVER_SCROLL_NEVER
-    }
-
-    doOnMainThreadIdle {
-      val oldContainerHeight = binding.headerContentLayout.height
-      val newContainerHeight = oldContainerHeight + 40.dp
-      val params = binding.headerContentLayout.layoutParams
-
-      binding.headerContentLayout.addView(featureListView)
-      ValueAnimator.ofInt(oldContainerHeight, newContainerHeight).also {
-        it.addUpdateListener { valueAnimator ->
-          val height = valueAnimator.animatedValue as Int
-
-          if (valueAnimator.animatedFraction == 1f) {
-            params.height = ViewGroup.LayoutParams.WRAP_CONTENT
-          } else {
-            params.height = height
-          }
-          binding.headerContentLayout.layoutParams = params
-        }
-        it.duration = 250
-        it.start()
-      }
     }
 
     return true
@@ -931,9 +937,7 @@ abstract class BaseAppDetailActivity :
           abiLabelsList.add(AbiLabelNode(it, isActive))
         }
       }
-      doOnMainThreadIdle {
-        binding.detailsTitle.abiLabelsAdapter.setList(abiLabelsList)
-      }
+      binding.detailsTitle.abiLabelsAdapter.setList(abiLabelsList)
     }
   }
 }
