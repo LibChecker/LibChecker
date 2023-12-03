@@ -634,7 +634,7 @@ abstract class BaseAppDetailActivity :
 
           val action: Runnable = object : Runnable {
             override fun run() {
-              if (featureListView?.parent != null) {
+              if (featureListView == null || featureListView?.parent != null) {
                 return
               }
               val oldContainerHeight = binding.headerContentLayout.height
