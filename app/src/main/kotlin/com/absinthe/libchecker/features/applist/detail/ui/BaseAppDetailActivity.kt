@@ -634,6 +634,9 @@ abstract class BaseAppDetailActivity :
 
           val action: Runnable = object : Runnable {
             override fun run() {
+              if (featureListView == null) {
+                initFeatureListView()
+              }
               if (featureListView?.parent != null) {
                 return
               }
