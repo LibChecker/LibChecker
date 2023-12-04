@@ -25,7 +25,7 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.copyToClipboard
 import com.absinthe.libchecker.utils.extensions.getAppName
-import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
+import com.absinthe.libchecker.utils.extensions.getCompileSdkVersionString
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.getTargetApiString
 import com.absinthe.libchecker.utils.extensions.getVersionString
@@ -100,7 +100,7 @@ class OverlayDetailBottomSheetDialogFragment :
             scale(0.8f) {
               append(" Compile: ")
             }
-            append(packageInfo.getCompileSdkVersion())
+            append(packageInfo.getCompileSdkVersionString())
             scale(0.8f) {
               append(" Size: ")
             }

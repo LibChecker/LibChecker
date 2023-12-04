@@ -83,6 +83,7 @@ import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
+import com.absinthe.libchecker.utils.extensions.getCompileSdkVersionString
 import com.absinthe.libchecker.utils.extensions.getPackageSize
 import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getTargetApiString
@@ -218,7 +219,7 @@ abstract class BaseAppDetailActivity :
             scale(0.8f) {
               append(" Compile: ")
             }
-            append(packageInfo.getCompileSdkVersion())
+            append(packageInfo.getCompileSdkVersionString())
             scale(0.8f) {
               append(" Size: ")
             }
@@ -649,7 +650,7 @@ abstract class BaseAppDetailActivity :
                 anim.addUpdateListener { valueAnimator ->
                   val height = valueAnimator.animatedValue as Int
 
-                  if (valueAnimator.animatedFraction == 1f) {
+                  if (valueAnimator.animatedFraction == 1f || featureAdapter.data.isEmpty()) {
                     params.height = ViewGroup.LayoutParams.WRAP_CONTENT
                   } else {
                     params.height = height
