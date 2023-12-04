@@ -647,7 +647,7 @@ abstract class BaseAppDetailActivity :
                 anim.addUpdateListener { valueAnimator ->
                   val height = valueAnimator.animatedValue as Int
 
-                  if (valueAnimator.animatedFraction == 1f) {
+                  if (valueAnimator.animatedFraction == 1f || featureAdapter.data.isEmpty()) {
                     params.height = ViewGroup.LayoutParams.WRAP_CONTENT
                   } else {
                     params.height = height
