@@ -28,6 +28,7 @@ import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.SnapshotItem
@@ -47,6 +48,7 @@ import java.lang.ref.WeakReference
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -198,6 +200,7 @@ class ShootService : LifecycleService() {
     var lastProgress = 0
     var ai: ApplicationInfo
     var dbSnapshotItem: SnapshotItem?
+    val shouldSaveFullSnapshot = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.SHOULD_SAVE_FULL_SNAPSHOT)
 
     for (info in appList) {
       try {
@@ -206,7 +209,8 @@ class ShootService : LifecycleService() {
 
         if (dbSnapshotItem?.versionCode == info.getVersionCode() &&
           dbSnapshotItem.lastUpdatedTime == info.lastUpdateTime &&
-          dbSnapshotItem.packageSize == info.getPackageSize(true)
+          dbSnapshotItem.packageSize == info.getPackageSize(true) &&
+          !shouldSaveFullSnapshot
         ) {
           Timber.d("computeSnapshots: ${info.packageName} is up to date")
           dbList.add(
@@ -335,6 +339,10 @@ class ShootService : LifecycleService() {
         .setContentTitle(createConfigurationContext(configuration).resources.getString(R.string.noti_shoot_title_saved))
         .setContentText(getFormatDateString(ts))
       notificationManager.notify(notificationIdShootSuccess, builder.build())
+    }
+
+    if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.SHOULD_SAVE_FULL_SNAPSHOT)) {
+      Once.markDone(OnceTag.SHOULD_SAVE_FULL_SNAPSHOT)
     }
 
     timer.end()
