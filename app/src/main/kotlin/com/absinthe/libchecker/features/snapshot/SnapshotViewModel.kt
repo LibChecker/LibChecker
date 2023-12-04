@@ -40,7 +40,6 @@ import com.absinthe.libchecker.utils.extensions.getPackageSize
 import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.extensions.sizeToString
-import com.absinthe.libchecker.utils.extensions.toShortOrDefault
 import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libchecker.utils.toJson
 import com.absinthe.libraries.utils.manager.TimeRecorder
@@ -175,7 +174,7 @@ class SnapshotViewModel : ViewModel() {
             SnapshotDiffItem.DiffNode(versionCode),
             SnapshotDiffItem.DiffNode(PackageUtils.getAbi(pi).toShort()),
             SnapshotDiffItem.DiffNode(ai.targetSdkVersion.toShort()),
-            SnapshotDiffItem.DiffNode(pi.getCompileSdkVersion().toShortOrDefault(-1)),
+            SnapshotDiffItem.DiffNode(pi.getCompileSdkVersion().toShort()),
             SnapshotDiffItem.DiffNode(ai.minSdkVersion.toShort()),
             SnapshotDiffItem.DiffNode(
               PackageUtils.getNativeDirLibs(pi).toJson().orEmpty()
@@ -328,7 +327,7 @@ class SnapshotViewModel : ViewModel() {
       ),
       compileSdkDiff = SnapshotDiffItem.DiffNode(
         dbItem.compileSdk,
-        packageInfo.getCompileSdkVersion().toShortOrDefault(-1)
+        packageInfo.getCompileSdkVersion().toShort()
       ),
       minSdkDiff = SnapshotDiffItem.DiffNode(
         dbItem.minSdk,
@@ -600,7 +599,7 @@ class SnapshotViewModel : ViewModel() {
           ),
           SnapshotDiffItem.DiffNode(
             it.compileSdk,
-            packageInfo.getCompileSdkVersion().toShortOrDefault(-1)
+            packageInfo.getCompileSdkVersion().toShort()
           ),
           SnapshotDiffItem.DiffNode(
             it.minSdk,
@@ -695,7 +694,7 @@ class SnapshotViewModel : ViewModel() {
           SnapshotDiffItem.DiffNode(packageInfo.getVersionCode()),
           SnapshotDiffItem.DiffNode(PackageUtils.getAbi(packageInfo).toShort()),
           SnapshotDiffItem.DiffNode(packageInfo.applicationInfo.targetSdkVersion.toShort()),
-          SnapshotDiffItem.DiffNode(packageInfo.getCompileSdkVersion().toShortOrDefault(-1)),
+          SnapshotDiffItem.DiffNode(packageInfo.getCompileSdkVersion().toShort()),
           SnapshotDiffItem.DiffNode(packageInfo.applicationInfo.minSdkVersion.toShort()),
           SnapshotDiffItem.DiffNode(
             PackageUtils.getNativeDirLibs(packageInfo).toJson().orEmpty()

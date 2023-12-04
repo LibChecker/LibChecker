@@ -83,13 +83,13 @@ import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
+import com.absinthe.libchecker.utils.extensions.getCompileSdkVersionString
 import com.absinthe.libchecker.utils.extensions.getPackageSize
 import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getTargetApiString
 import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.extensions.getVersionString
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
-import com.absinthe.libchecker.utils.extensions.toShortOrDefault
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.toJson
@@ -219,7 +219,7 @@ abstract class BaseAppDetailActivity :
             scale(0.8f) {
               append(" Compile: ")
             }
-            append(packageInfo.getCompileSdkVersion())
+            append(packageInfo.getCompileSdkVersionString())
             scale(0.8f) {
               append(" Size: ")
             }
@@ -816,8 +816,8 @@ abstract class BaseAppDetailActivity :
         analysisPackage.applicationInfo.targetSdkVersion.toShort()
       ),
       compileSdkDiff = SnapshotDiffItem.DiffNode(
-        basePackage.getCompileSdkVersion().toShortOrDefault(-1),
-        analysisPackage.getCompileSdkVersion().toShortOrDefault(-1)
+        basePackage.getCompileSdkVersion().toShort(),
+        analysisPackage.getCompileSdkVersion().toShort()
       ),
       minSdkDiff = SnapshotDiffItem.DiffNode(
         basePackage.applicationInfo.minSdkVersion.toShort(),

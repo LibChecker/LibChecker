@@ -58,7 +58,6 @@ import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPackageSize
 import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getVersionCode
-import com.absinthe.libchecker.utils.extensions.toShortOrDefault
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.utils.toJson
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -539,7 +538,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
         permissions = it.getPermissionsList().toJson().orEmpty(),
         metadata = PackageUtils.getMetaDataItems(it).toJson().orEmpty(),
         packageSize = it.getPackageSize(true),
-        compileSdk = it.getCompileSdkVersion().toShortOrDefault(-1),
+        compileSdk = it.getCompileSdkVersion().toShort(),
         minSdk = it.applicationInfo.minSdkVersion.toShort()
       )
     } ?: throw IllegalStateException("PackageInfo is null")

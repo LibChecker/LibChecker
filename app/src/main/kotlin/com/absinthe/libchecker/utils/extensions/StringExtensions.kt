@@ -18,7 +18,3 @@ fun String.maybeResourceId(): Boolean {
 fun String.removeNonDigits(): String {
   return this.replace(Regex("\\D"), "")
 }
-
-fun String.toShortOrDefault(defaultValue: Short): Short {
-  return runCatching { this.toShort() }.getOrDefault(defaultValue)
-}

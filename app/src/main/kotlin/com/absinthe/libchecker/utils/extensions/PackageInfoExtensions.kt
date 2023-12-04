@@ -68,9 +68,9 @@ private const val compileSdkVersion = "compileSdkVersion"
  * Get compileSdkVersion of an app
  * @return compileSdkVersion
  */
-fun PackageInfo.getCompileSdkVersion(): String {
+fun PackageInfo.getCompileSdkVersion(): Int {
   return runCatching {
-    val version = if (OsUtils.atLeastS()) {
+    if (OsUtils.atLeastS()) {
       applicationInfo.compileSdkVersion
     } else {
       val demands = ManifestReader.getManifestProperties(
@@ -79,13 +79,20 @@ fun PackageInfo.getCompileSdkVersion(): String {
       )
       demands[compileSdkVersion]?.toString()?.toInt() ?: 0
     }
+  }.getOrDefault(0)
+}
 
-    if (version == 0) {
-      "?"
-    } else {
-      version.toString()
-    }
-  }.getOrDefault("?")
+/**
+ * Get compileSdkVersion string of an app
+ * @return compileSdkVersion string
+ */
+fun PackageInfo.getCompileSdkVersionString(): String {
+  val version = getCompileSdkVersion()
+  return if (version == 0) {
+    "?"
+  } else {
+    version.toString()
+  }
 }
 
 /**
