@@ -41,6 +41,7 @@ import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPackageSize
 import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getVersionCode
+import com.absinthe.libchecker.utils.extensions.toShortOrDefault
 import com.absinthe.libchecker.utils.toJson
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import java.lang.ref.WeakReference
@@ -241,7 +242,7 @@ class ShootService : LifecycleService() {
               permissions = info.getPermissionsList().toJson().orEmpty(),
               metadata = PackageUtils.getMetaDataItems(info).toJson().orEmpty(),
               packageSize = info.getPackageSize(true),
-              compileSdk = info.getCompileSdkVersion().toShort(),
+              compileSdk = info.getCompileSdkVersion().toShortOrDefault(-1),
               minSdk = ai.minSdkVersion.toShort()
             )
           )
@@ -301,7 +302,7 @@ class ShootService : LifecycleService() {
               permissions = it.getPermissionsList().toJson().orEmpty(),
               metadata = PackageUtils.getMetaDataItems(it).toJson().orEmpty(),
               packageSize = it.getPackageSize(true),
-              compileSdk = it.getCompileSdkVersion().toShort(),
+              compileSdk = it.getCompileSdkVersion().toShortOrDefault(-1),
               minSdk = info.minSdkVersion.toShort()
             )
           )

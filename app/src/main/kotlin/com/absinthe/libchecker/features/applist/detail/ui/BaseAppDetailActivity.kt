@@ -89,6 +89,7 @@ import com.absinthe.libchecker.utils.extensions.getTargetApiString
 import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.extensions.getVersionString
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
+import com.absinthe.libchecker.utils.extensions.toShortOrDefault
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.toJson
@@ -815,8 +816,8 @@ abstract class BaseAppDetailActivity :
         analysisPackage.applicationInfo.targetSdkVersion.toShort()
       ),
       compileSdkDiff = SnapshotDiffItem.DiffNode(
-        basePackage.getCompileSdkVersion().toShort(),
-        analysisPackage.getCompileSdkVersion().toShort()
+        basePackage.getCompileSdkVersion().toShortOrDefault(-1),
+        analysisPackage.getCompileSdkVersion().toShortOrDefault(-1)
       ),
       minSdkDiff = SnapshotDiffItem.DiffNode(
         basePackage.applicationInfo.minSdkVersion.toShort(),
