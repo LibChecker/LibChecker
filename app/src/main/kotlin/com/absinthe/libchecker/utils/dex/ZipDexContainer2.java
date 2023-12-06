@@ -7,6 +7,7 @@ import com.google.common.io.ByteStreams;
 
 import com.android.tools.smali.dexlib2.Opcodes;
 import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile;
+import com.android.tools.smali.dexlib2.dexbacked.ZipDexContainer;
 import com.android.tools.smali.dexlib2.iface.MultiDexContainer;
 
 import java.io.File;
@@ -91,7 +92,7 @@ public class ZipDexContainer2 implements MultiDexContainer<DexBackedDexFile> {
     try {
       return new ZipFileCompat(zipFilePath);
     } catch (Exception ex) {
-      throw new org.jf.dexlib2.dexbacked.ZipDexContainer.NotAZipFileException();
+      throw new ZipDexContainer.NotAZipFileException();
     }
   }
 
