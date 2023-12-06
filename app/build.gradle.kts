@@ -103,7 +103,7 @@ dependencies {
   implementation(libs.square.moshi)
   implementation(libs.google.protobuf.javaLite)
   implementation(libs.google.guava.android)
-   implementation(libs.google.dexlib2)
+  implementation(libs.google.dexlib2)
   implementation(libs.rikka.refine.runtime)
   implementation(libs.bundles.zhaobozhen)
   implementation(libs.lc.rules)
