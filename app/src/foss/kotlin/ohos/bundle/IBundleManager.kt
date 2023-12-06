@@ -1,4 +1,4 @@
-@file:Suppress("ALL")
+@file:Suppress("UNUSED_PARAMETER")
 
 package ohos.bundle
 

@@ -1,4 +1,4 @@
-@file:Suppress("ALL")
+@file:Suppress("UNUSED_PARAMETER")
 
 package com.absinthe.libchecker.utils.harmony
 
