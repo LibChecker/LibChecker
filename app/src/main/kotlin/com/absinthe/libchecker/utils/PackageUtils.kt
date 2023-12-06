@@ -69,6 +69,7 @@ import com.absinthe.libchecker.utils.extensions.sha256
 import com.absinthe.libchecker.utils.extensions.toClassDefType
 import com.absinthe.libchecker.utils.extensions.toHexString
 import com.absinthe.libchecker.utils.manifest.StaticLibraryReader
+import com.android.tools.smali.dexlib2.Opcodes
 import dev.rikka.tools.refine.Refine
 import java.io.File
 import java.io.InputStream
@@ -77,7 +78,6 @@ import java.security.interfaces.RSAPublicKey
 import java.text.DateFormat
 import java.util.zip.ZipEntry
 import javax.security.cert.X509Certificate
-import org.jf.dexlib2.Opcodes
 import rikka.shizuku.Shizuku
 import rikka.shizuku.ShizukuBinderWrapper
 import rikka.shizuku.SystemServiceHelper
