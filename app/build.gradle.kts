@@ -102,7 +102,8 @@ dependencies {
   implementation(libs.square.retrofit.moshi)
   implementation(libs.square.moshi)
   implementation(libs.google.protobuf.javaLite)
-  implementation(libs.bundles.grpc)
+  implementation(libs.google.guava.android)
+   implementation(libs.google.dexlib2)
   implementation(libs.rikka.refine.runtime)
   implementation(libs.bundles.zhaobozhen)
   implementation(libs.lc.rules)
@@ -121,7 +122,6 @@ dependencies {
   implementation(libs.appIconLoader)
   implementation(libs.appIconLoader.coil)
   implementation(libs.hiddenApiBypass)
-  implementation(libs.dexLib2)
   implementation(libs.slf4j)
   implementation(libs.commons.io)
   implementation(libs.commons.compress)
@@ -147,25 +147,10 @@ protobuf {
       libs.google.protobuf.protoc.get().toString()
   }
   plugins {
-    // Optional: an artifact spec for a protoc plugin, with "grpc" as
-    // the identifier, which can be referred to in the "plugins"
-    // container of the "generateProtoTasks" closure.
-    id("grpc") {
-      artifact = if (osdetector.os == "osx")
-        "${libs.grpc.gen.get()}:osx-aarch_64"
-      else
-        libs.grpc.gen.get().toString()
-    }
     generateProtoTasks {
       all().forEach {
         it.builtins {
           create("java") {
-            option("lite")
-          }
-        }
-
-        it.plugins {
-          create("grpc") {
             option("lite")
           }
         }

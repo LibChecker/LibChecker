@@ -396,9 +396,9 @@ class AboutActivity : AbsAboutActivityProxy(), MenuProvider {
       add(
         License(
           "dexlib2",
-          "JesusFreke",
+          "Google",
           License.APACHE_2,
-          "https://github.com/JesusFreke/smali"
+          "https://github.com/google/smali"
         )
       )
       add(

@@ -5,9 +5,9 @@ import com.absinthe.libchecker.compat.ZipFileCompat;
 import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
 
-import org.jf.dexlib2.Opcodes;
-import org.jf.dexlib2.dexbacked.DexBackedDexFile;
-import org.jf.dexlib2.iface.MultiDexContainer;
+import com.android.tools.smali.dexlib2.Opcodes;
+import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile;
+import com.android.tools.smali.dexlib2.iface.MultiDexContainer;
 
 import java.io.File;
 import java.io.IOException;
