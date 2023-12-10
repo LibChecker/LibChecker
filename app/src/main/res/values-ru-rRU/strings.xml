@@ -57,8 +57,10 @@
   <string name="settings_about_summary">Это LibChecker!</string>
   <string name="settings_translate">Участвуйте в переводе</string>
   <string name="settings_translate_summary">Помогите нам перевести это приложение</string>
-  <string name="settings_rate_us">Оценить приложение</string>
+  <string name="settings_rate_us">Оцените Нас</string>
   <string name="settings_rate_us_summary">Это может сделать нас доступнее для большего числа людей</string>
+  <string name="settings_get_updates">Обновления</string>
+  <string name="settings_get_updates_summary">Получить последнюю версию, которая является более стабильной и имеет больше функционала</string>
   <string name="about_info">Это приложение используется для просмотра сторонних библиотек, используемых приложениями на вашем устройстве.</string>
   <string name="toolbar_rate">Оценка</string>
   <string name="resource_declaration">Часть ресурсов в приложении поступает из: </string>
@@ -176,7 +178,7 @@
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">Сохранить текущий снимок</string>
   <string name="snapshot_current_timestamp">Отметка времени текущего снимка</string>
-  <string name="snapshot_apps_count">Количество приложений в снимке / Количество заявок</string>
+  <string name="snapshot_apps_count">Количество приложений в снимке / Количество приложений</string>
   <string name="comparison_snapshot_apps_count">Количество приложений в снимке</string>
   <string name="snapshot_indicator_added">Добавлено</string>
   <string name="snapshot_indicator_removed">Удалено</string>
