@@ -112,6 +112,8 @@ class LibStringAdapter(
                 append(item.item.name)
               }
             }
+            // prevent text clipping
+            append(" ")
           }
         } else {
           item.item.name

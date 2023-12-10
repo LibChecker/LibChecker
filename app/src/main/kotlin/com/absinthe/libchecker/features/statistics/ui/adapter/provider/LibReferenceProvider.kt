@@ -87,6 +87,8 @@ class LibReferenceProvider : BaseNodeProvider() {
           italic {
             append(context.getString(R.string.not_marked_lib))
           }
+          // prevent text clipping
+          append(" ")
         }
       }
     }
