@@ -5,12 +5,10 @@ import android.graphics.Bitmap
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.OvalShape
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
-import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.features.applist.detail.bean.AppPropItem
@@ -61,23 +59,28 @@ class AppPropsAdapter(
   }
 
   private fun initLinkBtn(itemView: AppPropItemView, item: AppPropItem) {
-    if (!item.value.maybeResourceId()) return
+    if (!item.value.maybeResourceId()) {
+      itemView.linkToIcon.isVisible = false
+      return
+    }
 
     val type = runCatching {
       appResources.getResourceTypeName(item.value.toInt())
     }.getOrDefault("null")
-    itemView.linkToIcon.isVisible = linkable.contains(type)
+    if (!linkable.contains(type)) {
+      itemView.linkToIcon.isVisible = false
+      return
+    }
 
-    if (itemView.linkToIcon.isVisible) {
-      itemView.linkToIcon.setOnClickListener {
-        val transformed = itemView.linkToIcon.getTag(R.id.resource_transformed_id) as? Boolean ?: false
+    itemView.linkToIcon.apply {
+      isVisible = true
+      setImageResource(R.drawable.ic_outline_change_circle_24)
+      setOnClickListener {
+        val transformed = getTag(R.id.resource_transformed_id) as? Boolean ?: false
         if (transformed) {
           itemView.value.text = parseValue(item)
-          itemView.linkToIcon.apply {
-            scaleType = ImageView.ScaleType.CENTER
-            setImageResource(R.drawable.ic_outline_change_circle_24)
-            setTag(R.id.resource_transformed_id, false)
-          }
+          setImageResource(R.drawable.ic_outline_change_circle_24)
+          setTag(R.id.resource_transformed_id, false)
         } else {
           var clickedTag = false
           Timber.d("type: $type")
@@ -115,22 +118,21 @@ class AppPropsAdapter(
                     itemView.linkToIcon.measuredHeight,
                     Bitmap.Config.ARGB_8888
                   )
-                  itemView.linkToIcon.load(bitmap)
+                  setImageBitmap(bitmap)
                 }
                 clickedTag = true
               }
 
               "color" -> {
                 appResources.getColor(item.value.toInt(), null).let { colorInt ->
-                  itemView.linkToIcon.load(
-                    ShapeDrawable(OvalShape()).apply {
-                      paint.color = colorInt
-                    }.toBitmap(
-                      itemView.linkToIcon.measuredWidth,
-                      itemView.linkToIcon.measuredHeight,
-                      Bitmap.Config.ARGB_8888
-                    )
+                  val bitmap = ShapeDrawable(OvalShape()).apply {
+                    paint.color = colorInt
+                  }.toBitmap(
+                    itemView.linkToIcon.measuredWidth,
+                    itemView.linkToIcon.measuredHeight,
+                    Bitmap.Config.ARGB_8888
                   )
+                  setImageBitmap(bitmap)
                 }
                 clickedTag = true
               }
@@ -143,7 +145,7 @@ class AppPropsAdapter(
               }
             }
           }
-          itemView.linkToIcon.setTag(R.id.resource_transformed_id, clickedTag)
+          setTag(R.id.resource_transformed_id, clickedTag)
         }
       }
     }
