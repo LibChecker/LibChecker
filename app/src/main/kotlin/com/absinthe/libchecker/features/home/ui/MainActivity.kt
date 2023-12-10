@@ -44,6 +44,7 @@ import com.absinthe.libchecker.utils.extensions.setCurrentItem
 import com.absinthe.rulesbundle.LCRules
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.navigation.NavigationBarView
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import jonathanfinerty.once.Once
@@ -155,12 +156,18 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
 
   override fun showNavigationView() {
     Timber.d("showNavigationView")
-    navViewBehavior.slideUp(binding.navView)
+    // NavigationRailView 不需要隐藏，所以不需要显示
+    if (binding.navView is BottomNavigationView) {
+      navViewBehavior.slideUp(binding.navView as BottomNavigationView)
+    }
   }
 
   override fun hideNavigationView() {
     Timber.d("hideNavigationView")
-    navViewBehavior.slideDown(binding.navView)
+    // NavigationRailView 不需要隐藏
+    if (binding.navView is BottomNavigationView) {
+      navViewBehavior.slideDown(binding.navView as BottomNavigationView)
+    }
   }
 
   override fun showProgressBar() {
@@ -182,11 +189,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
   }
 
   private fun initView() {
+    val navView = binding.navView as NavigationBarView
     setSupportActionBar(binding.toolbar)
     supportActionBar?.title = LCAppUtils.setTitle(this)
 
     binding.apply {
-      root.bringChildToFront(binding.appbar)
+      container.bringChildToFront(binding.appbar)
       viewpager.apply {
         adapter = object : FragmentStateAdapter(this@MainActivity) {
           override fun getItemCount(): Int {
@@ -207,7 +215,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
         registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
           override fun onPageSelected(position: Int) {
             super.onPageSelected(position)
-            binding.navView.menu.getItem(position).isChecked = true
+            navView.menu.getItem(position).isChecked = true
           }
         })
 
@@ -218,8 +226,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
       }
 
       navView.apply {
-        (layoutParams as CoordinatorLayout.LayoutParams).also {
-          it.behavior = navViewBehavior
+        if (this is BottomNavigationView) {
+          (layoutParams as CoordinatorLayout.LayoutParams).also {
+            it.behavior = navViewBehavior
+          }
         }
         requestLayout()
         // 当 ViewPager 切换页面时，改变 ViewPager 的显示
@@ -254,7 +264,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
           true
         }
         setOnClickListener { /*Do nothing*/ }
-        fixBottomNavigationViewInsets(this)
+        if (this is BottomNavigationView) {
+          fixBottomNavigationViewInsets(this)
+        }
       }
     }
 
