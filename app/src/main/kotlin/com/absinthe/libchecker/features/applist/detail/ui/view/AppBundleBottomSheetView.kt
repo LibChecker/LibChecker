@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.AppBundleAdapter
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
+import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.app.IHeaderView
@@ -24,7 +25,7 @@ class AppBundleBottomSheetView(context: Context) : LinearLayout(context), IHeade
     title.text = context.getString(R.string.app_bundle)
   }
 
-  private val list = RecyclerView(context).apply {
+  private val list = BottomSheetRecyclerView(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
       ViewGroup.LayoutParams.WRAP_CONTENT

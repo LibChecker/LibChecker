@@ -103,30 +103,8 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
     if (context is IDetailContainer) {
       context.detailFragmentManager.register(type, this)
     }
-    if (DetailFragmentManager.navType == type) {
-      DetailFragmentManager.navComponent?.let {
-        afterListReadyTask = Runnable {
-          navigateToComponentImpl(it)
-        }
-      }
-      DetailFragmentManager.resetNavigationParams()
-    } else {
-      afterListReadyTask = Runnable {
-        lifecycleScope.launch(Dispatchers.IO) {
-          viewModel.queriedText?.let {
-            if (it.isNotEmpty()) {
-              filterList(it)
-            }
-          }
-          if (this@BaseDetailFragment is BaseFilterAnalysisFragment) {
-            viewModel.queriedProcess?.let {
-              if (it.isNotEmpty()) {
-                filterItems(it)
-              }
-            }
-          }
-        }
-      }
+    if (DetailFragmentManager.navType != DetailFragmentManager.NAV_TYPE_NONE) {
+      setupListReadyTask()
     }
     adapter.apply {
       if (needShowLibDetailDialog) {
@@ -227,6 +205,34 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
   fun switchProcessMode() {
     if (isComponentFragment() || isNativeSourceAvailable()) {
       adapter.switchProcessMode()
+    }
+  }
+
+  fun setupListReadyTask() {
+    if (DetailFragmentManager.navType == type) {
+      DetailFragmentManager.navComponent?.let {
+        afterListReadyTask = Runnable {
+          navigateToComponentImpl(it)
+        }
+      }
+      DetailFragmentManager.resetNavigationParams()
+    } else {
+      afterListReadyTask = Runnable {
+        lifecycleScope.launch(Dispatchers.IO) {
+          viewModel.queriedText?.let {
+            if (it.isNotEmpty()) {
+              filterList(it)
+            }
+          }
+          if (this@BaseDetailFragment is BaseFilterAnalysisFragment) {
+            viewModel.queriedProcess?.let {
+              if (it.isNotEmpty()) {
+                filterItems(it)
+              }
+            }
+          }
+        }
+      }
     }
   }
 

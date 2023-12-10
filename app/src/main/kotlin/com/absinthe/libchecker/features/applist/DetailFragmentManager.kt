@@ -68,14 +68,19 @@ class DetailFragmentManager {
   fun navigateToComponent(@LibType refType: Int, component: String) {
     navType = refType
     navComponent = component
+
+    if (navType != NAV_TYPE_NONE) {
+      currentFragment?.setupListReadyTask()
+    }
   }
 
   companion object {
-    var navType: Int = -1
+    const val NAV_TYPE_NONE = -1
+    var navType: Int = NAV_TYPE_NONE
     var navComponent: String? = null
 
     fun resetNavigationParams() {
-      navType = -1
+      navType = NAV_TYPE_NONE
       navComponent = null
     }
   }
