@@ -124,7 +124,7 @@ object LCAppUtils {
         }.getOrDefault(false)
       }
       "libmain.so" -> {
-         runCatching {
+        runCatching {
           otherNativeLibs?.any { it.name == "libunity.so" } == true
         }.getOrDefault(false)
       }
