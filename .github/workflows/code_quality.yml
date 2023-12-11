@@ -28,7 +28,7 @@ jobs:
       # Initialize Gradle Project to build BuildConfig.java
 
       - name: 'Qodana Scan'
-        uses: JetBrains/qodana-action@489ba717a0b11fe2257c4a1713e5fdaf94eeab55 # v2023.2.9
+        uses: JetBrains/qodana-action@a8363b702c2d2d49a77620bcd10541686df21307 # v2023.3.0
         with:
           args: scan,-l,jetbrains/qodana-jvm-android,--yaml-name,qodana.yaml
           use-caches: false
