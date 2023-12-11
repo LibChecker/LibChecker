@@ -82,7 +82,7 @@ object LCAppUtils {
   }
 
   private val checkNativeLibs =
-    listOf("libjiagu.so", "libjiagu_a64.so", "libjiagu_x86.so", "libjiagu_x64.so", "libDexHelper.so", "libDexHelper-x86.so", "libdexjni.so", "libapp.so")
+    listOf("libjiagu.so", "libjiagu_a64.so", "libjiagu_x86.so", "libjiagu_x64.so", "libDexHelper.so", "libDexHelper-x86.so", "libdexjni.so", "libapp.so", "libmain.so")
   fun checkNativeLibValidation(
     packageName: String,
     nativeLib: String,
@@ -121,6 +121,11 @@ object LCAppUtils {
               "io.flutter.FlutterInjector".toClassDefType()
             )
           ).any { it == "io.flutter.FlutterInjector".toClassDefType() }
+        }.getOrDefault(false)
+      }
+      "libmain.so" -> {
+         runCatching {
+          otherNativeLibs?.any { it.name == "libunity.so" } == true
         }.getOrDefault(false)
       }
       else -> true
