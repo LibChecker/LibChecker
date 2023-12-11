@@ -584,7 +584,7 @@ class HomeViewModel : ViewModel() {
       if (referenceMap[it.name] == null) {
         referenceMap[it.name] = mutableSetOf<String>() to NATIVE
       }
-      if (LCAppUtils.checkNativeLibValidation(packageName, it.name)) {
+      if (LCAppUtils.checkNativeLibValidation(packageName, it.name, list)) {
         referenceMap[it.name]!!.first.add(packageName)
       }
     }
