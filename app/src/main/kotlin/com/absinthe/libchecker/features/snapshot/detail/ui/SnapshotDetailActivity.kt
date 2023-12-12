@@ -169,7 +169,7 @@ class SnapshotDetailActivity :
       val pkgSplits = entity.packageName.split("/")
       val first = pkgSplits[0]
       val second = pkgSplits.getOrNull(1)
-      snapshotTitle.packageNameView.text = if (second != first) "$first $ARROW $second" else first
+      snapshotTitle.packageNameView.text = if (second != null && second != first) "$first $ARROW $second" else first
       snapshotTitle.versionInfoView.text = LCAppUtils.getDiffString(
         diff1 = entity.versionNameDiff,
         diff2 = entity.versionCodeDiff,
