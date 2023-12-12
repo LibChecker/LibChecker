@@ -2,7 +2,7 @@
 agp = "8.2.0"
 androidX-lifecycle = "2.6.2"
 androidX-room = "2.6.1"
-appCenter = "5.0.3"
+appCenter = "5.0.4"
 hiddenApiRefine = "4.4.0"
 kotlin = "1.9.21"
 protoc = "3.25.1"
