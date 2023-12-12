@@ -99,9 +99,10 @@ class LibCheckerApp : Application() {
   private fun initSplitController() {
     val ratio = UiUtils.getScreenAspectRatio()
     val hasHinge = UiUtils.hasHinge()
-    Timber.d("initSplitController: getScreenAspectRatio: $ratio, hasHinge=$hasHinge")
+    val splitSupportStatus = SplitController.getInstance(this).splitSupportStatus
+    Timber.d("initSplitController: getScreenAspectRatio: $ratio, hasHinge=$hasHinge, splitSupportStatus=$splitSupportStatus")
     runCatching {
-      if (SplitController.getInstance(this).splitSupportStatus == SplitController.SplitSupportStatus.SPLIT_AVAILABLE) {
+      if (splitSupportStatus == SplitController.SplitSupportStatus.SPLIT_AVAILABLE) {
         RuleController.getInstance(this).setRules(
           if (hasHinge || ratio in 0.85f..1.15f) {
             RuleController.parseRules(this, R.xml.main_split_config_foldable)
