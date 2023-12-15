@@ -81,19 +81,19 @@ jobs:
         run: ./gradlew -PappVerName=${{ env.VERSION }} app:assembleRelease
       - name: Upload built Foss apk
         if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Foss
           path: ${{ github.workspace }}/app/build/outputs/apk/foss/release
       - name: Upload built Market apk
         if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Market
           path: ${{ github.workspace }}/app/build/outputs/apk/market/release
       - name: Upload mappings
         if: success() && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: mappings
           path: "app/build/outputs/mapping/marketRelease"
