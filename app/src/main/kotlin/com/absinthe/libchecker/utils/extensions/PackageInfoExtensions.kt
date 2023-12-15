@@ -614,7 +614,11 @@ fun PackageInfo.getSignatures(context: Context): Sequence<LibStringItem> {
 fun PackageInfo.getAppName(): String? =
   applicationInfo?.loadLabel(SystemServices.packageManager)?.toString()
 
-const val PREINSTALLED_TIMESTAMP = 1230768000000 // 2009-01-01 08:00:00 GMT+8
+val PREINSTALLED_TIMESTAMP by lazy {
+  runCatching {
+    SystemServices.packageManager.getPackageInfo("android", 0).lastUpdateTime
+  }.getOrDefault(1230768000000 /* 2009-01-01 08:00:00 GMT+8 */)
+}
 
 fun PackageInfo.isPreinstalled(): Boolean {
   return lastUpdateTime <= PREINSTALLED_TIMESTAMP

@@ -10,11 +10,11 @@
 
   <androidx.coordinatorlayout.widget.CoordinatorLayout
     android:id="@+id/container"
-    android:layout_width="match_parent"
+    android:layout_width="0dp"
     android:layout_height="match_parent"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintStart_toEndOf="@+id/nav_view"
     app:layout_constraintTop_toTopOf="parent">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -45,15 +45,6 @@
       app:hideAnimationBehavior="outward"
       app:layout_fitsSystemWindowsInsets="top" />
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-      android:id="@+id/nav_view"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:background="?android:attr/windowBackground"
-      app:layout_anchor="@id/viewpager"
-      app:layout_anchorGravity="bottom"
-      app:layout_behavior="@string/hide_bottom_view_on_scroll_behavior"
-      app:menu="@menu/bottom_nav_menu" />
 
     <androidx.viewpager2.widget.ViewPager2
       android:id="@+id/viewpager"
@@ -63,4 +54,14 @@
       app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
   </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+  <com.google.android.material.navigationrail.NavigationRailView
+    android:id="@+id/nav_view"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:menu="@menu/bottom_nav_menu"
+    app:fitsSystemWindowsInsets="top|bottom"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

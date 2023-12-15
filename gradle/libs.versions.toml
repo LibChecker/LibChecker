@@ -2,7 +2,7 @@
 agp = "8.2.0"
 androidX-lifecycle = "2.6.2"
 androidX-room = "2.6.1"
-appCenter = "5.0.3"
+appCenter = "5.0.4"
 hiddenApiRefine = "4.4.0"
 kotlin = "1.9.21"
 protoc = "3.25.1"
@@ -17,7 +17,7 @@ hiddenApiRefine = { id = "dev.rikka.tools.refine", version.ref = "hiddenApiRefin
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 kotlinter = { id = "org.jmailen.kotlinter", version = "4.1.0" }
-ksp = { id = "com.google.devtools.ksp", version = "1.9.21-1.0.15" }
+ksp = { id = "com.google.devtools.ksp", version = "1.9.21-1.0.16" }
 protobuf = { id = "com.google.protobuf", version = "0.9.4" }
 moshiX = "dev.zacsweers.moshix:0.25.1"
 
@@ -27,7 +27,7 @@ gradlePlugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", ve
 
 kotlinX-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"
 
-androidX-activity = "androidx.activity:activity-ktx:1.8.1"
+androidX-activity = "androidx.activity:activity-ktx:1.8.2"
 androidX-appCompat = "androidx.appcompat:appcompat:1.6.1"
 androidX-browser = "androidx.browser:browser:1.7.0"
 androidX-constraintLayout = "androidx.constraintlayout:constraintlayout:2.1.4"
@@ -53,7 +53,7 @@ square-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "s
 square-retrofit-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "square-retrofit" }
 
 google-dexlib2 = "com.android.tools.smali:smali-dexlib2:3.0.3"
-google-material = "com.google.android.material:material:1.10.0"
+google-material = "com.google.android.material:material:1.11.0"
 google-protobuf-javaLite = { module = "com.google.protobuf:protobuf-javalite", version.ref = "protoc" }
 google-protobuf-protoc = { module = "com.google.protobuf:protoc", version.ref = "protoc" }
 

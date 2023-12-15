@@ -152,13 +152,9 @@ class SnapshotDetailActivity :
           this@SnapshotDetailActivity
         )
         runCatching {
-          val icon = if (entity.packageName.contains("/").not() || _icon == null) {
-            appIconLoader.loadIcon(
-              PackageUtils.getPackageInfo(entity.packageName).applicationInfo
-            )
-          } else {
-            _icon
-          }
+          val icon = _icon?.takeIf { entity.packageName.contains("/") } ?: appIconLoader.loadIcon(
+            PackageUtils.getPackageInfo(entity.packageName).applicationInfo
+          )
           load(icon)
         }
         setOnClickListener {
@@ -169,12 +165,11 @@ class SnapshotDetailActivity :
         }
       }
       snapshotTitle.appNameView.text = LCAppUtils.getDiffString(entity.labelDiff, isNewOrDeleted)
-      snapshotTitle.packageNameView.text = entity.packageName.takeIf { it.contains("/").not() }
-        ?: "${entity.packageName.substringBeforeLast("/")} $ARROW ${
-          entity.packageName.substringAfterLast(
-            "/"
-          )
-        }"
+
+      val pkgSplits = entity.packageName.split("/")
+      val first = pkgSplits[0]
+      val second = pkgSplits.getOrNull(1)
+      snapshotTitle.packageNameView.text = if (second != null && second != first) "$first $ARROW $second" else first
       snapshotTitle.versionInfoView.text = LCAppUtils.getDiffString(
         diff1 = entity.versionNameDiff,
         diff2 = entity.versionCodeDiff,
