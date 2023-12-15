@@ -31,7 +31,7 @@ env:
 jobs:
   check:
     name: Check
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -51,7 +51,7 @@ jobs:
 
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - uses: actions/checkout@v4
@@ -135,7 +135,7 @@ jobs:
           curl -v "https://api.telegram.org/bot${BOT_TOKEN}/sendMediaGroup?chat_id=${CHANNEL_ID}&media=%5B%7B%22type%22%3A%22document%22%2C%20%22media%22%3A%22attach%3A%2F%2FmarketRelease%22%2C%22parse_mode%22%3A%22MarkdownV2%22%2C%22caption%22:${ESCAPED}%7D%5D" -F marketRelease="@$MARKET_FILE"
 
   skipped:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     if: ${{ startsWith(github.event.head_commit.message, '[skip ci]') }}
     steps:
       - uses: actions/checkout@v4
@@ -152,7 +152,7 @@ jobs:
             This push skipped building
 
   cancelled:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     if: ${{ cancelled() && github.repository == 'LibChecker/LibChecker' && github.event_name != 'pull_request' && github.ref == 'refs/heads/master' }}
     needs: [check, build]
     steps:
