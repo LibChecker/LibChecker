@@ -20,6 +20,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,7 +31,6 @@ import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
-import com.absinthe.libchecker.compat.BundleCompat
 import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.SnapshotItem
@@ -299,7 +299,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
   private fun parseIntent(intent: Intent) {
     if (intent.action == Intent.ACTION_SEND_MULTIPLE) {
       intent.extras?.let {
-        val uriList = BundleCompat.getParcelableArrayList<Uri>(it, Intent.EXTRA_STREAM)
+        val uriList = BundleCompat.getParcelableArrayList(it, Intent.EXTRA_STREAM, Uri::class.java)
         if (uriList?.size == 2) {
           if (uriList[0].encodedPath?.endsWith(".apk") == true) {
             leftTimeStamp = -1

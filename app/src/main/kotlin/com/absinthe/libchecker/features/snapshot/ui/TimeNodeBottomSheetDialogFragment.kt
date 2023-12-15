@@ -1,8 +1,8 @@
 package com.absinthe.libchecker.features.snapshot.ui
 
 import android.view.ViewGroup
+import androidx.core.os.BundleCompat
 import androidx.fragment.app.activityViewModels
-import com.absinthe.libchecker.compat.BundleCompat
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
@@ -65,9 +65,10 @@ class TimeNodeBottomSheetDialogFragment :
     }
 
     arguments?.let {
-      BundleCompat.getParcelableArrayList<TimeStampItem>(it, EXTRA_TOP_APPS)?.let { topApps ->
-        root.adapter.setList(topApps)
-      }
+      BundleCompat.getParcelableArrayList(it, EXTRA_TOP_APPS, TimeStampItem::class.java)
+        ?.let { topApps ->
+          root.adapter.setList(topApps)
+        }
     }
   }
 
