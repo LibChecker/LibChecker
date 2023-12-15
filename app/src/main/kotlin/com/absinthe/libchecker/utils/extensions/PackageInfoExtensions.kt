@@ -615,9 +615,10 @@ fun PackageInfo.getAppName(): String? =
   applicationInfo?.loadLabel(SystemServices.packageManager)?.toString()
 
 val PREINSTALLED_TIMESTAMP by lazy {
+  // default is 2009-01-01 08:00:00 GMT+8
   runCatching {
     SystemServices.packageManager.getPackageInfo("android", 0).lastUpdateTime
-  }.getOrDefault(1230768000000 /* 2009-01-01 08:00:00 GMT+8 */)
+  }.getOrDefault(1230768000000)
 }
 
 fun PackageInfo.isPreinstalled(): Boolean {
