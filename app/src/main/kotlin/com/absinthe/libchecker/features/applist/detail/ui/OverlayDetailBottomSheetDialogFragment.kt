@@ -7,11 +7,11 @@ import android.os.Build
 import android.text.SpannableString
 import android.text.format.Formatter
 import android.text.style.ImageSpan
+import androidx.core.os.BundleCompat
 import androidx.core.text.buildSpannedString
 import androidx.core.text.scale
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.compat.BundleCompat
 import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
@@ -50,7 +50,7 @@ class OverlayDetailBottomSheetDialogFragment :
 
   override fun init() {
     val lcItem = arguments?.let {
-      BundleCompat.getParcelable<LCItem>(it, EXTRA_LC_ITEM)
+      BundleCompat.getParcelable(it, EXTRA_LC_ITEM, LCItem::class.java)
     } ?: return
     val packageInfo = try {
       PackageUtils.getPackageInfo(lcItem.packageName)

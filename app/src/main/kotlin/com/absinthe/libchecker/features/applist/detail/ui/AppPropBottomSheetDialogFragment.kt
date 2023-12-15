@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
 import android.content.pm.PackageInfo
-import com.absinthe.libchecker.compat.BundleCompat
+import androidx.core.os.BundleCompat
 import com.absinthe.libchecker.features.applist.detail.bean.AppPropItem
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppPropsBottomSheetView
 import com.absinthe.libchecker.utils.extensions.getDexoptInfo
@@ -17,7 +17,11 @@ class AppPropBottomSheetDialogFragment :
   BaseBottomSheetViewDialogFragment<AppPropsBottomSheetView>() {
 
   private val packageInfo by lazy {
-    BundleCompat.getParcelable<PackageInfo>(requireArguments(), EXTRA_PACKAGE_INFO)!!
+    BundleCompat.getParcelable(
+      requireArguments(),
+      EXTRA_PACKAGE_INFO,
+      PackageInfo::class.java
+    )!!
   }
 
   override fun initRootView(): AppPropsBottomSheetView =
