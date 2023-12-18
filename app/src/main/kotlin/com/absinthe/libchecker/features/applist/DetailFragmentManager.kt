@@ -5,8 +5,8 @@ import androidx.core.util.forEach
 import androidx.core.util.valueIterator
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.ui.base.BaseDetailFragment
-import com.absinthe.libchecker.ui.base.BaseFilterAnalysisFragment
+import com.absinthe.libchecker.features.applist.detail.ui.base.BaseDetailFragment
+import com.absinthe.libchecker.features.applist.detail.ui.base.BaseFilterAnalysisFragment
 
 const val MODE_SORT_BY_SIZE = 0
 const val MODE_SORT_BY_LIB = 1

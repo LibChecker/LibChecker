@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.ui.base
+package com.absinthe.libchecker.features.applist.detail.ui.base
 
 import android.content.Context
 import android.view.Gravity
@@ -40,6 +40,8 @@ import com.absinthe.libchecker.integrations.anywhere.AnywhereManager
 import com.absinthe.libchecker.integrations.blocker.BlockerManager
 import com.absinthe.libchecker.integrations.monkeyking.MonkeyKingManager
 import com.absinthe.libchecker.integrations.monkeyking.ShareCmpInfo
+import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
+import com.absinthe.libchecker.ui.base.BaseFragment
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp

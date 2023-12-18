@@ -158,13 +158,12 @@ object PackageUtils {
 
     if (nativePath != null) {
       File(nativePath).listFiles()?.let { files ->
-        var elfParser: ELFParser?
         list.addAll(
           files.asSequence()
             .filter { it.isFile }
             .distinctBy { it.name }
             .map {
-              elfParser = runCatching { ELFParser(it.inputStream()) }.getOrNull()
+              val elfParser = runCatching { ELFParser(it.inputStream()) }.getOrNull()
               LibStringItem(
                 name = it.name,
                 size = FileUtils.getFileSize(it),
@@ -178,18 +177,10 @@ object PackageUtils {
     }
 
     if (list.isEmpty()) {
-      var abi: Int
-      if (specifiedAbi != null) {
-        abi = specifiedAbi
-      } else {
-        abi = runCatching { getAbi(packageInfo) }.getOrNull() ?: return emptyList()
-        if (abi == NO_LIBS) {
-          abi = if (Process.is64Bit()) {
-            ARMV8
-          } else {
-            ARMV7
-          }
-        }
+      var abi = specifiedAbi ?: runCatching { getAbi(packageInfo) }.getOrNull() ?: return emptyList()
+
+      if (abi == NO_LIBS) {
+        abi = if (Process.is64Bit()) ARMV8 else ARMV7
       }
       val abiString = getAbiString(LibCheckerApp.app, abi, false)
       list.addAll(
@@ -233,19 +224,18 @@ object PackageUtils {
     }
     return runCatching {
       ZipFileCompat(file).use { zipFile ->
-        var elfParser: ELFParser?
         return zipFile.getZipEntries()
           .asSequence()
           .filter { (it.isDirectory.not() && it.name.startsWith(childDir)) && it.name.endsWith(".so") }
           .distinctBy { it.name.split("/").last() }
           .map {
-            elfParser = getElfParser(zipFile.getInputStream(it))
+            val elfParser = runCatching { getElfParser(zipFile.getInputStream(it)) }.getOrNull()
             LibStringItem(
               name = it.name.split("/").last(),
               size = it.size,
               source = source,
-              elfType = elfParser!!.getEType(),
-              elfClass = elfParser!!.getEClass()
+              elfType = elfParser?.getEType() ?: ET_NOT_ELF,
+              elfClass = elfParser?.getEClass() ?: ELFParser.EIdent.ELFCLASSNONE
             )
           }
           .toList()
@@ -273,18 +263,17 @@ object PackageUtils {
       fileName.contains("arm") || fileName.contains("x86")
     }.forEach {
       ZipFileCompat(File(it)).use { zipFile ->
-        var elfParser: ELFParser?
         zipFile.getZipEntries().asSequence().forEach { entry ->
           if (entry.name.startsWith("lib/") && entry.isDirectory.not()) {
-            elfParser = getElfParser(zipFile.getInputStream(entry))
+            val elfParser = runCatching { getElfParser(zipFile.getInputStream(entry)) }.getOrNull()
             val fileName = it.split(File.separator).last()
             libList.add(
               LibStringItem(
                 name = entry.name.split("/").last(),
                 size = entry.size,
                 process = if (fileName.startsWith("split_config")) null else fileName,
-                elfType = elfParser!!.getEType(),
-                elfClass = elfParser!!.getEClass()
+                elfType = elfParser?.getEType() ?: ET_NOT_ELF,
+                elfClass = elfParser?.getEClass() ?: ELFParser.EIdent.ELFCLASSNONE
               )
             )
           }
@@ -728,7 +717,7 @@ object PackageUtils {
     }
 
     if (applicationInfo.sourceDir == null) {
-      throw IllegalStateException("SourceDir is null: ${packageInfo.packageName}")
+      throw IllegalStateException("sourceDir is null: ${packageInfo.packageName}")
     }
 
     val file = File(applicationInfo.sourceDir)
@@ -778,13 +767,13 @@ object PackageUtils {
   }
 
   private val ABI_STRING_RES_MAP = arrayMapOf(
+    ERROR to listOf(R.string.cannot_read),
+    NO_LIBS to listOf(R.string.no_libs),
     ARMV8 to listOf(R.string.arm64_v8a),
+    X86_64 to listOf(R.string.x86_64),
     ARMV7 to listOf(R.string.armeabi_v7a),
     ARMV5 to listOf(R.string.armeabi),
-    X86_64 to listOf(R.string.x86_64),
     X86 to listOf(R.string.x86),
-    NO_LIBS to listOf(R.string.no_libs),
-    ERROR to listOf(R.string.cannot_read),
     ARMV8 + MULTI_ARCH to listOf(R.string.arm64_v8a, R.string.multiArch),
     ARMV7 + MULTI_ARCH to listOf(R.string.armeabi_v7a, R.string.multiArch),
     ARMV5 + MULTI_ARCH to listOf(R.string.armeabi, R.string.multiArch),
@@ -793,12 +782,8 @@ object PackageUtils {
   )
 
   private val ABI_BADGE_MAP = arrayMapOf(
-    NO_LIBS to if (Process.is64Bit()) {
-      R.drawable.ic_abi_label_64bit
-    } else {
-      R.drawable.ic_abi_label_32bit
-    },
     ERROR to 0,
+    NO_LIBS to if (Process.is64Bit()) R.drawable.ic_abi_label_64bit else R.drawable.ic_abi_label_32bit,
     ARMV8 to R.drawable.ic_abi_label_64bit,
     X86_64 to R.drawable.ic_abi_label_64bit,
     ARMV7 to R.drawable.ic_abi_label_32bit,

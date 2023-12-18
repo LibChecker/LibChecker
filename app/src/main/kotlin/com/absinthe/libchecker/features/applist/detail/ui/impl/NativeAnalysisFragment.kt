@@ -7,9 +7,9 @@ import com.absinthe.libchecker.features.applist.LocatedCount
 import com.absinthe.libchecker.features.applist.Referable
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibStringDiffUtil
+import com.absinthe.libchecker.features.applist.detail.ui.base.BaseFilterAnalysisFragment
+import com.absinthe.libchecker.features.applist.detail.ui.base.EXTRA_TYPE
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
-import com.absinthe.libchecker.ui.base.BaseFilterAnalysisFragment
-import com.absinthe.libchecker.ui.base.EXTRA_TYPE
 import com.absinthe.libchecker.utils.extensions.putArguments
 
 class NativeAnalysisFragment : BaseFilterAnalysisFragment<FragmentLibNativeBinding>(), Referable {

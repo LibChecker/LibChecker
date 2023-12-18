@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.ui.base
+package com.absinthe.libchecker.features.applist.detail.ui.base
 
 import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
