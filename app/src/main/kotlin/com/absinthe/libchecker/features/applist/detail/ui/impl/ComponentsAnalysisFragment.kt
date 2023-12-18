@@ -14,8 +14,8 @@ import com.absinthe.libchecker.features.statistics.bean.EXPORTED
 import com.absinthe.libchecker.features.statistics.bean.LibChip
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
-import com.absinthe.libchecker.ui.base.BaseFilterAnalysisFragment
-import com.absinthe.libchecker.ui.base.EXTRA_TYPE
+import com.absinthe.libchecker.features.applist.detail.ui.base.BaseFilterAnalysisFragment
+import com.absinthe.libchecker.features.applist.detail.ui.base.EXTRA_TYPE
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.Rule

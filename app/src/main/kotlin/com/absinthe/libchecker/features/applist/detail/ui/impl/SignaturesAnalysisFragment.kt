@@ -9,8 +9,8 @@ import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.features.applist.detail.ui.SignatureDetailBSDFragment
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibStringDiffUtil
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
-import com.absinthe.libchecker.ui.base.BaseDetailFragment
-import com.absinthe.libchecker.ui.base.EXTRA_TYPE
+import com.absinthe.libchecker.features.applist.detail.ui.base.BaseDetailFragment
+import com.absinthe.libchecker.features.applist.detail.ui.base.EXTRA_TYPE
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import rikka.core.util.ClipboardUtils

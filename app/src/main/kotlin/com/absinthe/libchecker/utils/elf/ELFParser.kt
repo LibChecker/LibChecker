@@ -2,7 +2,6 @@ package com.absinthe.libchecker.utils.elf
 
 import com.absinthe.libchecker.annotation.ET_NOT_ELF
 import java.io.InputStream
-import timber.log.Timber
 
 class ELFParser(inputStream: InputStream) {
 
@@ -82,7 +81,6 @@ class ELFParser(inputStream: InputStream) {
         e_shnum = ByteArray(ELF64_HALF)
         e_shstrndx = ByteArray(ELF64_HALF)
       } else {
-        Timber.w("Not a valid ELF file")
         return@use
       }
       it.read(e_type)

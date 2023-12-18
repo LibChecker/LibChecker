@@ -12,8 +12,8 @@ import com.absinthe.libchecker.features.statistics.bean.DISABLED
 import com.absinthe.libchecker.features.statistics.bean.EXPORTED
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
-import com.absinthe.libchecker.ui.base.BaseDetailFragment
-import com.absinthe.libchecker.ui.base.EXTRA_TYPE
+import com.absinthe.libchecker.features.applist.detail.ui.base.BaseDetailFragment
+import com.absinthe.libchecker.features.applist.detail.ui.base.EXTRA_TYPE
 import com.absinthe.libchecker.utils.extensions.putArguments
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
