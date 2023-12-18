@@ -177,8 +177,7 @@ object PackageUtils {
     }
 
     if (list.isEmpty()) {
-      var abi = specifiedAbi ?: runCatching { getAbi(packageInfo) }.getOrNull()
-      ?: return emptyList()
+      var abi = specifiedAbi ?: runCatching { getAbi(packageInfo) }.getOrNull() ?: return emptyList()
 
       if (abi == NO_LIBS) {
         abi = if (Process.is64Bit()) ARMV8 else ARMV7
