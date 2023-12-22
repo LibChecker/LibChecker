@@ -2,7 +2,6 @@ package com.absinthe.libchecker.features.applist.detail.ui.view
 
 import android.content.Context
 import android.view.ViewGroup
-import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageButton
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.features.applist.detail.bean.FeatureItem
