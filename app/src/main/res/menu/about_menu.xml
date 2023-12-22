@@ -1,10 +1,13 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
+<menu xmlns:tools="http://schemas.android.com/tools"
+  xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto">
 
   <item
     android:id="@+id/toolbar_rate"
-    android:icon="@drawable/ic_favorite_white"
+    android:icon="@drawable/ic_favorite"
     android:title="@string/toolbar_rate"
-    app:showAsAction="always" />
+    android:iconTint="@android:color/white"
+    app:showAsAction="always"
+    tools:ignore="UnusedAttribute" />
 
 </menu>

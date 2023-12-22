@@ -13,6 +13,6 @@ class FeatureAdapter : BaseQuickAdapter<FeatureItem, BaseViewHolder>(0) {
   }
 
   override fun convert(holder: BaseViewHolder, item: FeatureItem) {
-    (holder.itemView as FeatureLabelView).setFeature(item.res, item.action)
+    (holder.itemView as FeatureLabelView).setFeature(item)
   }
 }

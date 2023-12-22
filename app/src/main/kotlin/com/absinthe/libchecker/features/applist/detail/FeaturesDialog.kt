@@ -2,6 +2,7 @@ package com.absinthe.libchecker.features.applist.detail
 
 import android.content.Context
 import android.content.pm.PackageInfo
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Build
 import androidx.annotation.DrawableRes
@@ -17,6 +18,7 @@ import com.absinthe.libchecker.features.applist.detail.ui.AppPropBottomSheetDial
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_PACKAGE_INFO
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
+import com.absinthe.libchecker.utils.UiUtils
 
 object FeaturesDialog {
 
@@ -32,7 +34,7 @@ object FeaturesDialog {
   fun showKotlinDialog(context: Context, version: String?) {
     commonShowDialogImpl(
       context,
-      R.drawable.ic_kotlin_logo,
+      com.absinthe.lc.rulesbundle.R.drawable.ic_lib_kotlin,
       R.string.kotlin_string,
       R.string.kotlin_details,
       version
@@ -50,9 +52,10 @@ object FeaturesDialog {
   }
 
   fun showRxKotlinDialog(context: Context, version: String?) {
+    val drawable = UiUtils.changeDrawableColor(context, R.drawable.ic_reactivex, Color.parseColor("#7F52FF"))
     commonShowDialogImpl(
       context,
-      R.drawable.ic_rxkotlin,
+      drawable,
       R.string.rxkotlin,
       R.string.rx_kotlin_detail,
       version
@@ -60,9 +63,10 @@ object FeaturesDialog {
   }
 
   fun showRxAndroidDialog(context: Context, version: String?) {
+    val drawable = UiUtils.changeDrawableColor(context, R.drawable.ic_reactivex, Color.parseColor("#3DDC84"))
     commonShowDialogImpl(
       context,
-      R.drawable.ic_rxandroid,
+      drawable,
       R.string.rxandroid,
       R.string.rx_android_detail,
       version

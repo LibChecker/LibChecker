@@ -81,7 +81,7 @@
     app:title="@string/pref_group_others">
 
     <Preference
-      app:icon="@drawable/ic_logo_setting"
+      app:icon="@drawable/ic_logo"
       app:key="about"
       app:summary="@string/settings_about_summary"
       app:title="@string/settings_about">
@@ -97,7 +97,7 @@
     </Preference>
 
     <Preference
-      app:icon="@drawable/ic_translate_settings"
+      app:icon="@drawable/ic_translate"
       app:key="translation"
       app:summary="@string/settings_translate_summary"
       app:title="@string/settings_translate">
@@ -121,7 +121,7 @@
     </Preference>
 
     <Preference
-      app:icon="@drawable/ic_telegram"
+      app:icon="@drawable/ic_lib_telegram"
       app:key="tg"
       app:summary="@string/join_telegram_group_summary"
       app:title="@string/join_telegram_group">

@@ -5,6 +5,8 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageButton
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.features.applist.detail.bean.FeatureItem
+import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.dp
 
 class FeatureLabelView(context: Context) : AppCompatImageButton(context) {
@@ -16,10 +18,15 @@ class FeatureLabelView(context: Context) : AppCompatImageButton(context) {
     setBackgroundResource(R.drawable.ripple_feature_label)
   }
 
-  fun setFeature(@DrawableRes res: Int, action: () -> Unit) {
-    setImageResource(res)
+  fun setFeature(item: FeatureItem) {
+    item.colorFilterInt?.let {
+      val drawable = UiUtils.changeDrawableColor(context, item.res, it)
+      setImageDrawable(drawable)
+    } ?: run {
+      setImageResource(item.res)
+    }
     setOnClickListener {
-      action()
+      item.action()
     }
   }
 }
