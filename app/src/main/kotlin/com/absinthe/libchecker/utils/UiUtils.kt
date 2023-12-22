@@ -1,13 +1,18 @@
 package com.absinthe.libchecker.utils
 
+import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.drawable.Drawable
 import android.util.DisplayMetrics
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
@@ -79,5 +84,13 @@ object UiUtils {
     SystemServices.packageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_HINGE_ANGLE)
   } else {
     false
+  }
+
+  fun changeDrawableColor(context: Context, drawableResId: Int, color: Int): Drawable {
+    val drawable = ContextCompat.getDrawable(context, drawableResId)?.mutate()
+      ?: throw IllegalArgumentException("Drawable is null")
+    DrawableCompat.setTintMode(drawable, PorterDuff.Mode.SRC_ATOP)
+    DrawableCompat.setTint(drawable, color)
+    return drawable
   }
 }

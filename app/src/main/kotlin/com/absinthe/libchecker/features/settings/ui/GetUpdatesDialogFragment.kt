@@ -36,7 +36,7 @@ class GetUpdatesDialogFragment : BaseBottomSheetViewDialogFragment<GetUpdatesDia
       GetUpdatesItem(
         "Telegram",
         URLManager.TELEGRAM_RELEASES,
-        R.drawable.ic_telegram
+        com.absinthe.lc.rulesbundle.R.drawable.ic_lib_telegram
       ),
       GetUpdatesItem(
         "F-Droid",

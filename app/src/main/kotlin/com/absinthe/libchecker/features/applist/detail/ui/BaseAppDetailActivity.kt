@@ -539,7 +539,7 @@ abstract class BaseAppDetailActivity :
 
           Features.KOTLIN_USED -> {
             featureAdapter.addData(
-              FeatureItem(R.drawable.ic_kotlin_logo) {
+              FeatureItem(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_kotlin) {
                 FeaturesDialog.showKotlinDialog(this, feat.version)
               }
             )
@@ -555,7 +555,7 @@ abstract class BaseAppDetailActivity :
 
           Features.RX_KOTLIN -> {
             featureAdapter.addData(
-              FeatureItem(R.drawable.ic_rxkotlin) {
+              FeatureItem(R.drawable.ic_reactivex, Color.parseColor("#7F52FF")) {
                 FeaturesDialog.showRxKotlinDialog(this, feat.version)
               }
             )
@@ -563,7 +563,7 @@ abstract class BaseAppDetailActivity :
 
           Features.RX_ANDROID -> {
             featureAdapter.addData(
-              FeatureItem(R.drawable.ic_rxandroid) {
+              FeatureItem(R.drawable.ic_reactivex, Color.parseColor("#3DDC84")) {
                 FeaturesDialog.showRxAndroidDialog(this, feat.version)
               }
             )
