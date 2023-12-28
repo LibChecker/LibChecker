@@ -16,10 +16,10 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 hiddenApiRefine = { id = "dev.rikka.tools.refine", version.ref = "hiddenApiRefine" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
-kotlinter = { id = "org.jmailen.kotlinter", version = "4.1.0" }
 ksp = { id = "com.google.devtools.ksp", version = "1.9.22-1.0.16" }
 protobuf = { id = "com.google.protobuf", version = "0.9.4" }
 moshiX = "dev.zacsweers.moshix:0.25.1"
+spotless = "com.diffplug.spotless:6.23.3"
 
 [libraries]
 gradlePlugin-android = { module = "com.android.tools.build:gradle", version.ref = "agp" }
@@ -96,6 +96,7 @@ timber = "com.jakewharton.timber:timber:5.0.1"
 zhaobozhen-axml = { module = "com.github.zhaobozhen.libraries:axml", version.ref = "zhaobozhen" }
 zhaobozhen-me = { module = "com.github.zhaobozhen.libraries:me", version.ref = "zhaobozhen" }
 zhaobozhen-utils = { module = "com.github.zhaobozhen.libraries:utils", version.ref = "zhaobozhen" }
+ktlint = "com.pinterest.ktlint:ktlint-cli:1.1.0"
 
 [bundles]
 androidX-lifecycle = [
