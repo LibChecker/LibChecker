@@ -62,7 +62,13 @@ class ComponentsAnalysisFragment : BaseFilterAnalysisFragment<FragmentLibCompone
               } else {
                 null
               }
-              source = if (!item.enabled) DISABLED else if (item.exported) EXPORTED else null
+              source = if (!item.enabled) {
+                DISABLED
+              } else if (item.exported) {
+                EXPORTED
+              } else {
+                null
+              }
 
               list += LibStringItemChip(
                 LibStringItem(

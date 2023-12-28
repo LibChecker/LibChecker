@@ -65,7 +65,7 @@ setupAppModule {
   applicationVariants.configureEach {
     outputs.configureEach {
       (this as? ApkVariantOutputImpl)?.outputFileName =
-        "LibChecker-${verName}-${verCode}-${name}.apk"
+        "LibChecker-$verName-$verCode-$name.apk"
     }
   }
 }
@@ -80,7 +80,7 @@ dependencies {
   compileOnly(projects.hiddenApi)
 
   implementation(libs.kotlinX.coroutines)
-  //implementation(libs.androidX.appCompat)
+  // implementation(libs.androidX.appCompat)
   implementation(libs.androidX.core)
   implementation(libs.androidX.activity)
   implementation(libs.androidX.fragment)
@@ -141,8 +141,9 @@ protobuf {
       val arch = System.getProperty("os.arch")
       val suffix = if (arch == "x86_64") "x86_64" else "aarch_64"
       "${libs.google.protobuf.protoc.get()}:osx-$suffix"
-    } else
+    } else {
       libs.google.protobuf.protoc.get().toString()
+    }
   }
   plugins {
     generateProtoTasks {
