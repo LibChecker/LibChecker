@@ -19,13 +19,13 @@ Android 6 [Marshmallow](https://github.com/LibChecker/LibChecker/tree/marshmallo
 [LibChecker-Docs](https://github.com/LibChecker/LibChecker-Docs)
 
 ## Download
-[<img src="/source/coolapk-badge.png" width="323" height="125" />](https://www.coolapk.com/apk/com.absinthe.libchecker)
-[<img src="/source/google-play-badge.png" width="323" height="125" />](https://play.google.com/store/apps/details?id=com.absinthe.libchecker)
+<!-- [<img src="./source/coolapk-badge.png" width="323" height="125" />](https://www.coolapk.com/apk/com.absinthe.libchecker) -->
+[<img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" width="323" height="125" />](https://play.google.com/store/apps/details?id=com.absinthe.libchecker)
 [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" width="323" height="125" />](https://f-droid.org/packages/com.absinthe.libchecker/)
 
 ## Discussions
 [Github Discussions](https://github.com/LibChecker/LibChecker/discussions)
 
 ### Telegram Group
-<img src="/source/tg_group_dark.png#gh-dark-mode-only" width="240" height="240" />
-<img src="/source/tg_group_light.png#gh-light-mode-only" width="240" height="240" />
+<img src="./source/tg_group_dark.png#gh-dark-mode-only" width="240" height="240" />
+<img src="./source/tg_group_light.png#gh-light-mode-only" width="240" height="240" />
