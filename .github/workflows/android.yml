@@ -47,7 +47,7 @@ jobs:
       - uses: gradle/gradle-build-action@v2
         with:
           gradle-home-cache-cleanup: true
-      - run: ./gradlew lintKotlin
+      - run: ./gradlew spotlessCheck
 
   build:
     name: Build
