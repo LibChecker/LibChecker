@@ -255,4 +255,5 @@
   <!--  Snapshot menu  -->
   <string name="snapshot_menu_show_update_time">Tampilkan Waktu Pembaruan</string>
   <string name="snapshot_menu_hide_no_component_changes">Sembunyikan Komponen Tanpa Perubahan</string>
+  <string name="snapshot_menu_diff_highlight">Diff Highlight</string>
 </resources>
