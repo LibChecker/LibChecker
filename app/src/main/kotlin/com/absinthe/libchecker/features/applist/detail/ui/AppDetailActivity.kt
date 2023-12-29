@@ -54,14 +54,12 @@ class AppDetailActivity : BaseAppDetailActivity(), IDetailContainer {
     Timber.d("packageName: $pkgName")
     val packageName = pkgName ?: return
     runCatching {
-      @Suppress("DEPRECATION", "InlinedApi")
+      @Suppress("InlinedApi")
       val flag = (
         PackageManager.GET_PERMISSIONS
           or PackageManager.GET_META_DATA
           or PackageManager.MATCH_DISABLED_COMPONENTS
           or PackageManager.MATCH_UNINSTALLED_PACKAGES
-          or PackageManager.GET_SIGNATURES
-          or PackageManager.GET_SIGNING_CERTIFICATES
         )
       PackageUtils.getPackageInfo(packageName, flag)
     }.onFailure {

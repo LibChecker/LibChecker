@@ -367,9 +367,15 @@ class DetailViewModel : ViewModel() {
 
   private suspend fun getSignatureChipList(context: Context): List<LibStringItemChip> =
     withContext(Dispatchers.IO) {
-      packageInfo.getSignatures(context).map {
-        LibStringItemChip(it, null)
-      }.toList()
+      // lazy load signatures
+      runCatching {
+        @Suppress("InlinedApi", "DEPRECATION")
+        val flags = PackageManager.GET_SIGNATURES or PackageManager.GET_SIGNING_CERTIFICATES
+        PackageUtils.getPackageInfo(packageInfo.packageName, flags).getSignatures(context)
+      }.getOrDefault(emptySequence())
+        .map {
+          LibStringItemChip(it, null)
+        }.toList()
     }
 
   fun initAbilities(context: Context, packageName: String) = viewModelScope.launch(Dispatchers.IO) {
