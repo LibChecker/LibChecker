@@ -293,14 +293,9 @@ object PackageUtils {
    */
   fun getSplitsSourceDir(packageInfo: PackageInfo): Array<String>? {
     if (FreezeUtils.isAppFrozen(packageInfo.applicationInfo)) {
-      val files = File(packageInfo.applicationInfo.sourceDir).parentFile
-      if (files?.exists() == true) {
-        return files.listFiles()?.asSequence()
-          ?.filter {
-            it.name.matches(regex_splits)
-          }
+      File(packageInfo.applicationInfo.sourceDir).parentFile?.takeIf { it.exists() }?.let { files ->
+        return files.listFiles { file -> file.name.matches(regex_splits) }
           ?.map { it.absolutePath }
-          ?.toList()
           ?.toTypedArray()
       }
     }
