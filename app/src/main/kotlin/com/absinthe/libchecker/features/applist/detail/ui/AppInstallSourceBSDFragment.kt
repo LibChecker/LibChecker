@@ -1,23 +1,17 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
 import android.content.Intent
-import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.text.SpannableString
 import android.text.style.ImageSpan
 import androidx.annotation.RequiresApi
-import androidx.core.text.buildSpannedString
-import androidx.core.text.scale
 import androidx.core.view.isGone
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
-import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppInstallSourceBottomSheetView
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppInstallSourceItemView
@@ -164,7 +158,7 @@ class AppInstallSourceBSDFragment :
 
     val str = StringBuilder()
       .append(PackageUtils.getAbiString(requireContext(), targetLCItem.abi.toInt(), true))
-      .append(getBuildVersionsInfo(pi, packageName))
+      .append(PackageUtils.getBuildVersionsInfo(pi, packageName))
     val spanString: SpannableString
     val abiBadgeRes = PackageUtils.getAbiBadgeResource(targetLCItem.abi.toInt())
 
@@ -194,46 +188,6 @@ class AppInstallSourceBSDFragment :
 
     Shizuku.removeRequestPermissionResultListener(this)
     Shizuku.removeBinderReceivedListener(this)
-  }
-
-  private fun getBuildVersionsInfo(packageInfo: PackageInfo?, packageName: String): CharSequence {
-    if (packageInfo == null && packageName != Constants.EXAMPLE_PACKAGE) {
-      return ""
-    }
-    val showAndroidVersion =
-      (GlobalValues.advancedOptions and AdvancedOptions.SHOW_ANDROID_VERSION) > 0
-    val showTarget =
-      (GlobalValues.advancedOptions and AdvancedOptions.SHOW_TARGET_API) > 0
-    val showMin =
-      (GlobalValues.advancedOptions and AdvancedOptions.SHOW_MIN_API) > 0
-    val target = packageInfo?.applicationInfo?.targetSdkVersion ?: Build.VERSION.SDK_INT
-    val min = packageInfo?.applicationInfo?.minSdkVersion ?: Build.VERSION.SDK_INT
-
-    return buildSpannedString {
-      if (showTarget) {
-        append(", ")
-        scale(0.8f) {
-          append("Target: ")
-        }
-        append(target.toString())
-        if (showAndroidVersion) {
-          append(" (${AndroidVersions.simpleVersions[target]})")
-        }
-      }
-
-      if (showMin) {
-        if (showTarget) {
-          append(", ")
-        }
-        scale(0.8f) {
-          append(" Min: ")
-        }
-        append(min.toString())
-        if (showAndroidVersion) {
-          append(" (${AndroidVersions.simpleVersions[min]})")
-        }
-      }
-    }
   }
 
   override fun onBinderReceived() {

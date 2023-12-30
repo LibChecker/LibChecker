@@ -247,6 +247,7 @@
   <string name="adv_show_android_version">显示 Android 版本</string>
   <string name="adv_show_target_version">显示 Target 版本</string>
   <string name="adv_show_min_version">显示 Min 版本</string>
+  <string name="adv_show_compile_version">显示 Compile 版本</string>
   <string name="adv_tint_abi_label">ABI 徽标染色</string>
   <string name="adv_mark_exported">标记已导出的组件</string>
   <string name="adv_mark_disabled">标记已禁用的组件</string>

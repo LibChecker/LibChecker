@@ -14,6 +14,7 @@ object AdvancedOptions {
   const val SHOW_MIN_API = 1 shl 10
   const val TINT_ABI_LABEL = 1 shl 11
   const val SHOW_SYSTEM_FRAMEWORK_APPS = 1 shl 12
+  const val SHOW_COMPILE_API = 1 shl 13
 
   const val MARK_EXPORTED = 1 shl 0
   const val MARK_DISABLED = 1 shl 1
