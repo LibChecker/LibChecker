@@ -17,6 +17,8 @@ import android.text.format.Formatter
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.collection.arrayMapOf
+import androidx.core.text.buildSpannedString
+import androidx.core.text.scale
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
@@ -37,6 +39,7 @@ import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.compat.IZipFile
 import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.compat.ZipFileCompat
+import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.Constants.ARMV5
 import com.absinthe.libchecker.constant.Constants.ARMV5_STRING
@@ -52,11 +55,14 @@ import com.absinthe.libchecker.constant.Constants.X86
 import com.absinthe.libchecker.constant.Constants.X86_64
 import com.absinthe.libchecker.constant.Constants.X86_64_STRING
 import com.absinthe.libchecker.constant.Constants.X86_STRING
+import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.features.applist.detail.bean.StatefulComponent
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.utils.dex.DexLibMap
 import com.absinthe.libchecker.utils.dex.FastDexFileFactory
 import com.absinthe.libchecker.utils.elf.ELFParser
+import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getStatefulPermissionsList
 import com.absinthe.libchecker.utils.extensions.getVersionCode
@@ -1201,5 +1207,62 @@ object PackageUtils {
       .setClassName(packageName, launcherActivity)
       .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     context.startActivity(launchIntent)
+  }
+
+  fun getBuildVersionsInfo(packageInfo: PackageInfo?, packageName: String): CharSequence {
+    if (packageInfo == null && packageName != Constants.EXAMPLE_PACKAGE) {
+      return ""
+    }
+    val showAndroidVersion =
+      (GlobalValues.advancedOptions and AdvancedOptions.SHOW_ANDROID_VERSION) > 0
+    val showTarget =
+      (GlobalValues.advancedOptions and AdvancedOptions.SHOW_TARGET_API) > 0
+    val showMin =
+      (GlobalValues.advancedOptions and AdvancedOptions.SHOW_MIN_API) > 0
+    val showCompile =
+      (GlobalValues.advancedOptions and AdvancedOptions.SHOW_COMPILE_API) > 0
+    val target = packageInfo?.applicationInfo?.targetSdkVersion ?: Build.VERSION.SDK_INT
+    val min = packageInfo?.applicationInfo?.minSdkVersion ?: Build.VERSION.SDK_INT
+    val compile = packageInfo?.getCompileSdkVersion() ?: Build.VERSION.SDK_INT
+
+    return buildSpannedString {
+      if (showTarget) {
+        append(", ")
+        scale(0.8f) {
+          append("Target: ")
+        }
+        append(target.toString())
+        if (showAndroidVersion) {
+          append(" (${AndroidVersions.simpleVersions[target]})")
+        }
+      }
+
+      if (showMin) {
+        if (showTarget) {
+          append(", ")
+        }
+        scale(0.8f) {
+          append(" Min: ")
+        }
+        append(min.toString())
+        if (showAndroidVersion) {
+          append(" (${AndroidVersions.simpleVersions[min]})")
+        }
+      }
+
+      if (showCompile) {
+        if (showTarget || showMin) {
+          append(", ")
+        }
+        scale(0.8f) {
+          append(" Compile: ")
+        }
+
+        append(compile.toString().takeIf { it != "0" } ?: "?")
+        if (showAndroidVersion) {
+          append(" (${AndroidVersions.simpleVersions[compile] ?: "?"})")
+        }
+      }
+    }
   }
 }

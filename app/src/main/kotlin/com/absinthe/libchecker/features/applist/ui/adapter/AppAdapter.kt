@@ -1,15 +1,10 @@
 package com.absinthe.libchecker.features.applist.ui.adapter
 
-import android.content.pm.PackageInfo
-import android.os.Build
 import android.text.SpannableString
 import android.text.style.ImageSpan
 import android.view.ViewGroup
-import androidx.core.text.buildSpannedString
-import androidx.core.text.scale
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.AdvancedOptions
@@ -71,7 +66,7 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
 
       val str = StringBuilder()
         .append(PackageUtils.getAbiString(context, item.abi.toInt(), false))
-        .append(getBuildVersionsInfo(packageInfo, item.packageName))
+        .append(PackageUtils.getBuildVersionsInfo(packageInfo, item.packageName))
       val spanString: SpannableString
       val abiBadgeRes = PackageUtils.getAbiBadgeResource(item.abi.toInt())
 
@@ -128,46 +123,6 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
       return super.getItemId(position)
     }
     return data[position].hashCode().toLong()
-  }
-
-  private fun getBuildVersionsInfo(packageInfo: PackageInfo?, packageName: String): CharSequence {
-    if (packageInfo == null && packageName != Constants.EXAMPLE_PACKAGE) {
-      return ""
-    }
-    val showAndroidVersion =
-      (GlobalValues.advancedOptions and AdvancedOptions.SHOW_ANDROID_VERSION) > 0
-    val showTarget =
-      (GlobalValues.advancedOptions and AdvancedOptions.SHOW_TARGET_API) > 0
-    val showMin =
-      (GlobalValues.advancedOptions and AdvancedOptions.SHOW_MIN_API) > 0
-    val target = packageInfo?.applicationInfo?.targetSdkVersion ?: Build.VERSION.SDK_INT
-    val min = packageInfo?.applicationInfo?.minSdkVersion ?: Build.VERSION.SDK_INT
-
-    return buildSpannedString {
-      if (showTarget) {
-        append(", ")
-        scale(0.8f) {
-          append("Target: ")
-        }
-        append(target.toString())
-        if (showAndroidVersion) {
-          append(" (${AndroidVersions.simpleVersions[target]})")
-        }
-      }
-
-      if (showMin) {
-        if (showTarget) {
-          append(", ")
-        }
-        scale(0.8f) {
-          append(" Min: ")
-        }
-        append(min.toString())
-        if (showAndroidVersion) {
-          append(" (${AndroidVersions.simpleVersions[min]})")
-        }
-      }
-    }
   }
 
   enum class CardMode {

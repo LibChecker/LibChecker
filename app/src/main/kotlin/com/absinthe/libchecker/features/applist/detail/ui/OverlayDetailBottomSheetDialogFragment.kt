@@ -1,9 +1,7 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
-import android.content.pm.PackageInfo
 import android.content.pm.PackageInfoHidden
 import android.content.pm.PackageManager
-import android.os.Build
 import android.text.SpannableString
 import android.text.format.Formatter
 import android.text.style.ImageSpan
@@ -12,10 +10,7 @@ import androidx.core.text.buildSpannedString
 import androidx.core.text.scale
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
@@ -131,7 +126,7 @@ class OverlayDetailBottomSheetDialogFragment :
 
           val str = StringBuilder()
             .append(PackageUtils.getAbiString(context, targetLCItem.abi.toInt(), true))
-            .append(getBuildVersionsInfo(pi, targetPackage))
+            .append(PackageUtils.getBuildVersionsInfo(pi, targetPackage))
           val spanString: SpannableString
           val abiBadgeRes = PackageUtils.getAbiBadgeResource(targetLCItem.abi.toInt())
 
@@ -156,46 +151,6 @@ class OverlayDetailBottomSheetDialogFragment :
           targetPackageView.setOnClickListener {
             activity?.launchDetailPage(targetLCItem)
           }
-        }
-      }
-    }
-  }
-
-  private fun getBuildVersionsInfo(packageInfo: PackageInfo?, packageName: String): CharSequence {
-    if (packageInfo == null && packageName != Constants.EXAMPLE_PACKAGE) {
-      return ""
-    }
-    val showAndroidVersion =
-      (GlobalValues.advancedOptions and AdvancedOptions.SHOW_ANDROID_VERSION) > 0
-    val showTarget =
-      (GlobalValues.advancedOptions and AdvancedOptions.SHOW_TARGET_API) > 0
-    val showMin =
-      (GlobalValues.advancedOptions and AdvancedOptions.SHOW_MIN_API) > 0
-    val target = packageInfo?.applicationInfo?.targetSdkVersion ?: Build.VERSION.SDK_INT
-    val min = packageInfo?.applicationInfo?.minSdkVersion ?: Build.VERSION.SDK_INT
-
-    return buildSpannedString {
-      if (showTarget) {
-        append(", ")
-        scale(0.8f) {
-          append("Target: ")
-        }
-        append(target.toString())
-        if (showAndroidVersion) {
-          append(" (${AndroidVersions.simpleVersions[target]})")
-        }
-      }
-
-      if (showMin) {
-        if (showTarget) {
-          append(", ")
-        }
-        scale(0.8f) {
-          append(" Min: ")
-        }
-        append(min.toString())
-        if (showAndroidVersion) {
-          append(" (${AndroidVersions.simpleVersions[min]})")
         }
       }
     }
