@@ -247,6 +247,7 @@
   <string name="adv_show_android_version">Показать версию Android</string>
   <string name="adv_show_target_version">Показать целевую версию</string>
   <string name="adv_show_min_version">Показать минимальную версию</string>
+  <string name="adv_show_compile_version">Show Compile Version</string>
   <string name="adv_tint_abi_label">Tint ABI метка</string>
   <string name="adv_mark_exported">Отметить экспортируемый компонент</string>
   <string name="adv_mark_disabled">Отметить неактивный компонент</string>
