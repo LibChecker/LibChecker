@@ -247,6 +247,7 @@
   <string name="adv_show_android_version">عرض نسخة أندرويد</string>
   <string name="adv_show_target_version">إظهار الإصدار المستهدف</string>
   <string name="adv_show_min_version">عرض الحد الأدنى للإصدار</string>
+  <string name="adv_show_compile_version">Show Compile Version</string>
   <string name="adv_tint_abi_label">تسمية ABI تينت</string>
   <string name="adv_mark_exported">وضع علامة على المكون المصدّر</string>
   <string name="adv_mark_disabled">وضع علامة على مكون المعطل</string>
