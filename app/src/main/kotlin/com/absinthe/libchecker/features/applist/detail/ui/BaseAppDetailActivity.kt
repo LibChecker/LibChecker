@@ -223,8 +223,25 @@ abstract class BaseAppDetailActivity :
             scale(0.8f) {
               append(" Size: ")
             }
-            val apkSize = FileUtils.getFileSize(packageInfo.applicationInfo.sourceDir)
-            append(Formatter.formatFileSize(this@BaseAppDetailActivity, apkSize))
+            var baseApkSize = FileUtils.getFileSize(packageInfo.applicationInfo.sourceDir)
+            val baseFormattedApkSize = Formatter.formatFileSize(this@BaseAppDetailActivity, baseApkSize)
+            val splitApkSizeList = PackageUtils.getSplitsSourceDir(packageInfo)
+              ?.map {
+                val size = FileUtils.getFileSize(it)
+                baseApkSize += size
+                Formatter.formatFileSize(this@BaseAppDetailActivity, size)
+              }
+              ?.toMutableList()
+
+            if (splitApkSizeList.isNullOrEmpty()) {
+              append(baseFormattedApkSize)
+            } else {
+              splitApkSizeList.add(0, baseFormattedApkSize)
+              val totalSize = Formatter.formatFileSize(this@BaseAppDetailActivity, baseApkSize)
+              append(
+                splitApkSizeList.joinToString(separator = " + ", prefix = "(", postfix = " = $totalSize)")
+              )
+            }
 
             packageInfo.sharedUserId?.let {
               appendLine().append("sharedUserId = $it")
