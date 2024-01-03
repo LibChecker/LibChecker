@@ -1,9 +1,6 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.content.pm.PackageInfo
 import android.os.Build
 import android.text.SpannableString
 import android.text.style.ImageSpan
@@ -12,7 +9,6 @@ import androidx.core.view.isGone
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppInstallSourceBottomSheetView
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppInstallSourceItemView
@@ -84,7 +80,7 @@ class AppInstallSourceBSDFragment :
         item.packageView.container.versionInfo.text =
           getString(R.string.lib_detail_app_install_source_shizuku_low_version_detail)
         item.packageView.setOnClickListener {
-          LCAppUtils.launchMarketPage(requireContext(), Constants.PackageNames.SHIZUKU)
+          startActivity(Intent.parseUri("https://github.com/RikkaApps/Shizuku/releases",0))
         }
       }
       ShizukuUtils.Status.NOT_RUNNING -> {
@@ -107,7 +103,7 @@ class AppInstallSourceBSDFragment :
         item.packageView.container.versionInfo.text =
           getString(R.string.lib_detail_app_install_source_shizuku_uninstalled_detail)
         item.packageView.setOnClickListener {
-          LCAppUtils.launchMarketPage(requireContext(), Constants.PackageNames.SHIZUKU)
+          startActivity(Intent.parseUri("https://github.com/RikkaApps/Shizuku/releases",0))
         }
       }
     }
