@@ -247,6 +247,7 @@
   <string name="adv_show_android_version">Tampilkan Versi Android</string>
   <string name="adv_show_target_version">Tampilkan Versi Target</string>
   <string name="adv_show_min_version">Tampilkan Versi Min.</string>
+  <string name="adv_show_compile_version">Tampilkan Versi Kompiler</string>
   <string name="adv_tint_abi_label">Warnai Label ABI</string>
   <string name="adv_mark_exported">Tandai Komponen Ekspor</string>
   <string name="adv_mark_disabled">Tandai Komponen Dinonaktifkan</string>
