@@ -2,11 +2,7 @@ package com.absinthe.libchecker.database.backup
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
-import java.io.BufferedInputStream
-import java.io.BufferedOutputStream
 import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.security.NoSuchAlgorithmException
 import java.security.spec.InvalidKeySpecException
 import java.security.spec.KeySpec
@@ -52,13 +48,7 @@ class AESEncryptionHelper {
    */
   @Throws(Exception::class)
   fun readFile(file: File): ByteArray {
-    val fileContents = file.readBytes()
-    val inputBuffer = BufferedInputStream(
-      FileInputStream(file)
-    )
-    inputBuffer.read(fileContents)
-    inputBuffer.close()
-    return fileContents
+    return file.readBytes()
   }
 
   /**
@@ -68,10 +58,7 @@ class AESEncryptionHelper {
    */
   @Throws(Exception::class)
   fun saveFile(fileData: ByteArray, file: File) {
-    val bos = BufferedOutputStream(FileOutputStream(file, false))
-    bos.write(fileData)
-    bos.flush()
-    bos.close()
+    file.outputStream().buffered().use { it.write(fileData) }
   }
 
   /**
