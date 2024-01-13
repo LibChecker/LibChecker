@@ -17,7 +17,7 @@
   <string name="search_hint">検索…</string>
   <string name="string_64_bit">64bit</string>
   <string name="string_32_bit">32bit</string>
-  <string name="no_libs">ネイティブライブラリはありません</string>
+  <string name="no_libs">ネイティブライブラリなし</string>
   <string name="cannot_read">読み込めません</string>
   <string name="unknown">不明</string>
   <string name="empty_list">空のリスト</string>
