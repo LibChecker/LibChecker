@@ -43,7 +43,6 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 21
-      - uses: gradle/wrapper-validation-action@v2
       - uses: gradle/actions/setup-gradle@v3
         with:
           gradle-home-cache-cleanup: true
