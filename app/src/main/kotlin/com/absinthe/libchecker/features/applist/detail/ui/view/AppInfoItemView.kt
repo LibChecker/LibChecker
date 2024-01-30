@@ -112,12 +112,18 @@ class AppInfoItemView(context: Context) : AViewGroup(context) {
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     icon.autoMeasure()
-    text.measure(
-      (measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(),
-      text.defaultHeightMeasureSpec(this)
-    )
+    text.autoMeasure()
+    val textWidth = measuredWidth - paddingStart - paddingEnd
+    if (text.measuredWidth > textWidth) {
+      text.measure(textWidth.toExactlyMeasureSpec(), text.defaultHeightMeasureSpec(this))
+    }
+    val rootMeasuredWidth = if (layoutParams.width == ViewGroup.LayoutParams.MATCH_PARENT) {
+      measuredWidth
+    } else {
+      icon.measuredWidth.coerceAtLeast(text.measuredWidth) + paddingStart + paddingEnd
+    }
     setMeasuredDimension(
-      measuredWidth,
+      rootMeasuredWidth,
       // Round up to nearest ten to align items
       (paddingTop + icon.measuredHeight + text.marginTop + text.measuredHeight + paddingBottom).roundUpToNearestTen()
     )

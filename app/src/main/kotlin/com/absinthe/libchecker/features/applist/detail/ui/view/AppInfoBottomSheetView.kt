@@ -21,7 +21,7 @@ class AppInfoBottomSheetView(context: Context) : AViewGroup(context), IHeaderVie
 
   val launch = AppInfoItemView(context).apply {
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.WRAP_CONTENT,
+      ViewGroup.LayoutParams.MATCH_PARENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     ).also {
       it.topMargin = 24.dp
@@ -34,7 +34,7 @@ class AppInfoBottomSheetView(context: Context) : AViewGroup(context), IHeaderVie
 
   val setting = AppInfoItemView(context).apply {
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.WRAP_CONTENT,
+      ViewGroup.LayoutParams.MATCH_PARENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     )
     setIcon(R.drawable.ic_settings)
