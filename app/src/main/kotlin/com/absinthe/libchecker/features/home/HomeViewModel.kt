@@ -58,7 +58,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import ohos.bundle.IBundleManager
 import timber.log.Timber
 
@@ -233,6 +235,7 @@ class HomeViewModel : ViewModel() {
         }
       } else {
         newApps.forEach {
+          if (!isActive) return@launch
           runCatching {
             val info = appMap[it] ?: return@runCatching
             insert(generateLCItemFromPackageInfo(info, isHarmony))
@@ -242,6 +245,7 @@ class HomeViewModel : ViewModel() {
         }
 
         removedApps.forEach {
+          if (!isActive) return@launch
           Repositories.lcRepository.deleteLCItemByPackageName(it)
         }
 
@@ -254,6 +258,7 @@ class HomeViewModel : ViewModel() {
                 it.lastUpdatedTime == 0L
             } ?: false
           }.forEach {
+            if (!isActive) return@launch
             update(generateLCItemFromPackageInfo(it, isHarmony))
           }
       }
@@ -266,6 +271,7 @@ class HomeViewModel : ViewModel() {
       updateAppListStatus(STATUS_NOT_START)
 
       if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.HAS_COLLECT_LIB)) {
+        if (!isActive) return@launch
         delay(10000)
         collectPopularLibraries(appMap)
         Once.markDone(OnceTag.HAS_COLLECT_LIB)
@@ -421,8 +427,9 @@ class HomeViewModel : ViewModel() {
       }
     }
 
-    fun computeInternal(@LibType type: Int) {
+    fun computeInternal(@LibType type: Int) = runBlocking {
       for (item in appMap.values) {
+        if (!isActive) return@runBlocking
         if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
           progressCount++
           updateLibRefProgressImpl()
@@ -664,6 +671,9 @@ class HomeViewModel : ViewModel() {
         var chip: LibChip?
         var rule: Rule?
         for (entry in map) {
+          if (!isActive) {
+            return@let
+          }
           if (entry.value.first.size >= GlobalValues.libReferenceThreshold && entry.key.isNotBlank()) {
             rule = LCRules.getRule(entry.key, entry.value.second, true)
             chip = null

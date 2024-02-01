@@ -14,6 +14,7 @@ import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -27,6 +28,9 @@ class MinApiChartDataSource : BaseVariableChartDataSource<BarChart>() {
         var packageInfo: PackageInfo
         var minSdk: Int
         for (item in it) {
+          if (!isActive) {
+            return@withContext
+          }
           try {
             packageInfo = PackageUtils.getPackageInfo(item.packageName)
             minSdk = packageInfo.applicationInfo.minSdkVersion
