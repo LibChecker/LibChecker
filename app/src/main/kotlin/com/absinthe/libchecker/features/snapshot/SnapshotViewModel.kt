@@ -112,6 +112,7 @@ class SnapshotViewModel : ViewModel() {
 
     if (preMap.isEmpty() || preTimeStamp == 0L) {
       snapshotDiffItems.postValue(emptyList())
+      return@runBlocking
     }
 
     val currMap = LocalAppDataSource.getApplicationMap().toMutableMap()
