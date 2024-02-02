@@ -54,7 +54,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import okio.buffer
 import okio.sink
@@ -105,12 +107,12 @@ class SnapshotViewModel : ViewModel() {
     }
   }
 
-  private suspend fun compareDiffWithApplicationList(preTimeStamp: Long) {
+  private suspend fun compareDiffWithApplicationList(preTimeStamp: Long) = runBlocking {
     val preMap = repository.getSnapshots(preTimeStamp).associateBy { it.packageName }
 
     if (preMap.isEmpty() || preTimeStamp == 0L) {
       snapshotDiffItems.postValue(emptyList())
-      return
+      return@runBlocking
     }
 
     val currMap = LocalAppDataSource.getApplicationMap().toMutableMap()
@@ -133,6 +135,7 @@ class SnapshotViewModel : ViewModel() {
     var snapshotDiffContent: String
 
     removedPackageSet.forEach {
+      if (!isActive) return@runBlocking
       dbItem = preMap[it]!!
       diffList.add(
         SnapshotDiffItem(
@@ -160,6 +163,7 @@ class SnapshotViewModel : ViewModel() {
     }
 
     addedPackageSet.forEach {
+      if (!isActive) return@runBlocking
       try {
         pi = currMap[it]!!
         ai = pi.applicationInfo
@@ -229,6 +233,7 @@ class SnapshotViewModel : ViewModel() {
     }
 
     commonPackageSet.forEach {
+      if (!isActive) return@runBlocking
       try {
         dbItem = preMap[it]!!
         pi = currMap[it]!!
@@ -394,15 +399,15 @@ class SnapshotViewModel : ViewModel() {
     return sdi
   }
 
-  private suspend fun compareDiffWithSnapshotList(preTimeStamp: Long, currTimeStamp: Long) {
+  private suspend fun compareDiffWithSnapshotList(preTimeStamp: Long, currTimeStamp: Long) = runBlocking {
     val preMap = repository.getSnapshots(preTimeStamp).associateBy { it.packageName }
     if (preMap.isEmpty()) {
-      return
+      return@runBlocking
     }
 
     val currMap = repository.getSnapshots(currTimeStamp).associateBy { it.packageName }
     if (currMap.isEmpty()) {
-      return
+      return@runBlocking
     }
 
     compareDiffWithSnapshotList(preTimeStamp, preMap, currMap)
@@ -430,13 +435,13 @@ class SnapshotViewModel : ViewModel() {
     preTimeStamp: Long = -1L,
     preMap: Map<String, SnapshotItem>,
     currMap: Map<String, SnapshotItem>
-  ) {
+  ) = runBlocking {
     if (preMap.isEmpty()) {
-      return
+      return@runBlocking
     }
 
     if (currMap.isEmpty()) {
-      return
+      return@runBlocking
     }
 
     val prePackageSet = preMap.map { it.key }.toSet()
@@ -454,6 +459,7 @@ class SnapshotViewModel : ViewModel() {
     val allTrackItems = repository.getTrackItems()
 
     removedPackageSet.forEach {
+      if (!isActive) return@runBlocking
       preItem = preMap[it]!!
       diffList.add(
         SnapshotDiffItem(
@@ -481,6 +487,7 @@ class SnapshotViewModel : ViewModel() {
     }
 
     addedPackageSet.forEach {
+      if (!isActive) return@runBlocking
       currItem = currMap[it]!!
       diffList.add(
         SnapshotDiffItem(
@@ -508,6 +515,7 @@ class SnapshotViewModel : ViewModel() {
     }
 
     commonPackageSet.forEach {
+      if (!isActive) return@runBlocking
       preItem = preMap[it]!!
       currItem = currMap[it]!!
       if (currItem.versionCode != preItem.versionCode || currItem.lastUpdatedTime != preItem.lastUpdatedTime) {

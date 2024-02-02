@@ -13,6 +13,7 @@ import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -25,6 +26,9 @@ class TargetApiChartDataSource : BaseVariableChartDataSource<BarChart>() {
       filteredList?.let {
         var targetApi: Int
         for (item in it) {
+          if (!isActive) {
+            return@withContext
+          }
           try {
             targetApi =
               PackageUtils.getPackageInfo(item.packageName).applicationInfo.targetSdkVersion

@@ -158,8 +158,6 @@ class DetailViewModel : ViewModel() {
     initDexJob = viewModelScope.launch(Dispatchers.IO) {
       val list = getDexChipList(packageName)
       dexLibItems.postValue(list)
-    }.also {
-      it.start()
     }
   }
 
