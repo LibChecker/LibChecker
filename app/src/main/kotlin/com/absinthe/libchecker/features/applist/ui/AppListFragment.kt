@@ -254,12 +254,19 @@ class AppListFragment :
         activity?.let {
           advancedMenuBSDFragment?.dismiss()
           advancedMenuBSDFragment = AdvancedMenuBSDFragment().apply {
-            setOnDismissListener {
-              GlobalValues.advancedOptionsLiveData.postValue(GlobalValues.advancedOptions)
-              GlobalValues.itemAdvancedOptionsLiveData.postValue(GlobalValues.itemAdvancedOptions)
-              GlobalValues.isShowSystemApps.postValue(GlobalValues.advancedOptions and AdvancedOptions.SHOW_SYSTEM_APPS > 0)
-              //noinspection NotifyDataSetChanged
-              appAdapter.notifyDataSetChanged()
+            setOnDismissListener { advancedDiff, itemAdvancedDiff ->
+              if (advancedDiff > 0) {
+                if (advancedDiff and AdvancedOptions.SHOW_SYSTEM_APPS > 0) {
+                  lifecycleScope.launch {
+                    GlobalValues.preferencesFlow.emit(Constants.PREF_SHOW_SYSTEM_APPS to GlobalValues.isShowSystemApps)
+                  }
+                }
+              }
+
+              if (advancedDiff > 0 || itemAdvancedDiff > 0) {
+                //noinspection NotifyDataSetChanged
+                appAdapter.notifyDataSetChanged()
+              }
               advancedMenuBSDFragment = null
             }
           }
@@ -354,13 +361,13 @@ class AppListFragment :
       }.launchIn(lifecycleScope)
     }
 
-    GlobalValues.apply {
-      isShowSystemApps.observe(viewLifecycleOwner) {
+    GlobalValues.preferencesFlow.onEach {
+      if (it.first == Constants.PREF_SHOW_SYSTEM_APPS) {
         if (isListReady) {
           updateItems()
         }
       }
-    }
+    }.launchIn(lifecycleScope)
   }
 
   private fun updateItems(highlightRefresh: Boolean = false) =

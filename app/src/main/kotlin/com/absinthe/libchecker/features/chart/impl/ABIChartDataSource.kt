@@ -40,7 +40,7 @@ class ABIChartDataSource : BaseChartDataSource<PieChart>() {
 
       filteredList?.let {
         for (item in it) {
-          if (GlobalValues.isShowSystemApps.value == false) {
+          if (GlobalValues.isShowSystemApps.not()) {
             if (item.isSystem) continue
           }
           if (item.abi.toInt() == OVERLAY) {

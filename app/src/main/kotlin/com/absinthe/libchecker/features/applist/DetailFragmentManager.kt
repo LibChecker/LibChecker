@@ -61,7 +61,6 @@ class DetailFragmentManager {
   }
 
   fun changeSortMode(mode: Int) {
-    GlobalValues.libSortModeLiveData.value = mode
     GlobalValues.libSortMode = mode
   }
 

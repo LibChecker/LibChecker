@@ -317,11 +317,6 @@ class SnapshotFragment :
         else -> {}
       }
     }.launchIn(lifecycleScope)
-    GlobalValues.snapshotOptionsLiveData.observe(viewLifecycleOwner) {
-      viewModel.snapshotDiffItems.value?.let { items ->
-        updateItems(items, true)
-      }
-    }
   }
 
   override fun onAttach(context: Context) {
@@ -527,8 +522,13 @@ class SnapshotFragment :
       activity?.let {
         advancedMenuBSDFragment?.dismiss()
         advancedMenuBSDFragment = SnapshotMenuBSDFragment().apply {
-          setOnDismissListener {
-            GlobalValues.snapshotOptionsLiveData.postValue(GlobalValues.snapshotOptions)
+          setOnDismissListener { optionsDiff ->
+            if (optionsDiff > 0) {
+              viewModel.snapshotDiffItems.value?.let { items ->
+                updateItems(items, true)
+              }
+            }
+            advancedMenuBSDFragment = null
           }
         }
         advancedMenuBSDFragment?.show(

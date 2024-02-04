@@ -82,7 +82,6 @@ class HomeViewModel : ViewModel() {
   var savedThreshold = GlobalValues.libReferenceThreshold
 
   var controller: IListController? = null
-  var libRefSystemApps: Boolean? = null
   var appListStatus: Int = STATUS_NOT_START
   var workerBinder: IWorkerService? = null
 
@@ -310,7 +309,7 @@ class HomeViewModel : ViewModel() {
 
   private fun collectPopularLibraries(appMap: Map<String, PackageInfo>) =
     viewModelScope.launch(Dispatchers.IO) {
-      if (GlobalValues.isAnonymousAnalyticsEnabled.value == false) {
+      if (GlobalValues.isAnonymousAnalyticsEnabled.not()) {
         return@launch
       }
       val appList = appMap.values
@@ -416,7 +415,7 @@ class HomeViewModel : ViewModel() {
     referenceMap = null
     _libReference.emit(null)
     val map = HashMap<String, Pair<MutableSet<String>, Int>>()
-    val showSystem = GlobalValues.isShowSystemApps.value ?: false
+    val showSystem = GlobalValues.isShowSystemApps
 
     var progressCount = 0
 

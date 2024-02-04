@@ -13,6 +13,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.AndroidVersions
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.FragmentPieChartBinding
 import com.absinthe.libchecker.features.chart.BaseVariableChartDataSource
@@ -43,6 +44,8 @@ import com.google.android.material.button.MaterialButtonToggleGroup
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import rikka.core.util.ClipboardUtils
@@ -107,9 +110,11 @@ class ChartFragment :
       }
     }
 
-    GlobalValues.isShowSystemApps.observe(viewLifecycleOwner) {
-      setData()
-    }
+    GlobalValues.preferencesFlow.onEach {
+      if (it.first == Constants.PREF_SHOW_SYSTEM_APPS) {
+        setData()
+      }
+    }.launchIn(lifecycleScope)
   }
 
   private fun setData() {

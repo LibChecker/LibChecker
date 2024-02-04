@@ -9,7 +9,7 @@ import java.util.TreeMap
 abstract class BaseVariableChartDataSource<T : View> : IChartDataSource<T> {
   protected val classifiedMap: MutableMap<Int, MutableList<LCItem>> = TreeMap()
 
-  protected val filteredList = if (GlobalValues.isShowSystemApps.value == true) {
+  protected val filteredList = if (GlobalValues.isShowSystemApps) {
     Repositories.lcRepository.allDatabaseItems.value
   } else {
     Repositories.lcRepository.allDatabaseItems.value?.filter { !it.isSystem }

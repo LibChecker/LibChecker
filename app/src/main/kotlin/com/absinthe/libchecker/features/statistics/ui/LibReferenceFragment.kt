@@ -58,7 +58,6 @@ class LibReferenceFragment :
   private var advancedMenuBSDFragment: LibReferenceMenuBSDFragment? = null
   private var firstScrollFlag = false
   private var isSearchTextClearOnce = false
-  private var isColorfulIcon = GlobalValues.isColorfulIcon
 
   override fun init() {
     val context = (context as? BaseActivity<*>) ?: return
@@ -181,20 +180,29 @@ class LibReferenceFragment :
         isListReady = true
       }.launchIn(lifecycleScope)
     }
-    GlobalValues.isShowSystemApps.observe(viewLifecycleOwner) {
-      if (homeViewModel.libRefSystemApps == null || homeViewModel.libRefSystemApps != it) {
+    GlobalValues.preferencesFlow.onEach {
+      if (it.first == Constants.PREF_SHOW_SYSTEM_APPS) {
         computeRef(true)
-        homeViewModel.libRefSystemApps = it
       }
-    }
-    GlobalValues.libReferenceThresholdLiveData.observe(viewLifecycleOwner) {
-      if (it < homeViewModel.savedThreshold) {
-        matchRules(true)
-        homeViewModel.savedThreshold = it
-      } else {
-        homeViewModel.refreshRef()
+      when (it.first) {
+        Constants.PREF_SHOW_SYSTEM_APPS -> {
+          computeRef(true)
+        }
+        Constants.PREF_COLORFUL_ICON -> {
+          // noinspection NotifyDataSetChanged
+          refAdapter.notifyDataSetChanged()
+        }
+        Constants.PREF_LIB_REF_THRESHOLD -> {
+          val threshold = it.second as Int
+          if (threshold < homeViewModel.savedThreshold) {
+            matchRules(true)
+            homeViewModel.savedThreshold = threshold
+          } else {
+            homeViewModel.refreshRef()
+          }
+        }
       }
-    }
+    }.launchIn(lifecycleScope)
 
     lifecycleScope.launch {
       if (refAdapter.data.isEmpty()) {
@@ -206,12 +214,6 @@ class LibReferenceFragment :
   override fun onResume() {
     super.onResume()
     (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(binding.list)
-
-    if (GlobalValues.isColorfulIcon != isColorfulIcon) {
-      isColorfulIcon = GlobalValues.isColorfulIcon
-      // noinspection NotifyDataSetChanged
-      refAdapter.notifyDataSetChanged()
-    }
   }
 
   override fun onPause() {
@@ -252,9 +254,10 @@ class LibReferenceFragment :
     if (menuItem.itemId == R.id.filter) {
       advancedMenuBSDFragment?.dismiss()
       advancedMenuBSDFragment = LibReferenceMenuBSDFragment().apply {
-        setOnDismissListener {
-          GlobalValues.libReferenceOptionsLiveData.postValue(GlobalValues.libReferenceOptions)
-          refreshList()
+        setOnDismissListener { optionsDiff ->
+          if (optionsDiff > 0) {
+            refreshList()
+          }
           advancedMenuBSDFragment = null
         }
       }
