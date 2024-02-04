@@ -58,6 +58,7 @@ class LibReferenceFragment :
   private var advancedMenuBSDFragment: LibReferenceMenuBSDFragment? = null
   private var firstScrollFlag = false
   private var isSearchTextClearOnce = false
+  private var isColorfulIcon = GlobalValues.isColorfulIcon
 
   override fun init() {
     val context = (context as? BaseActivity<*>) ?: return
@@ -194,10 +195,6 @@ class LibReferenceFragment :
         homeViewModel.refreshRef()
       }
     }
-    GlobalValues.isColorfulIcon.observe(viewLifecycleOwner) {
-      // noinspection NotifyDataSetChanged
-      refAdapter.notifyDataSetChanged()
-    }
 
     lifecycleScope.launch {
       if (refAdapter.data.isEmpty()) {
@@ -209,6 +206,12 @@ class LibReferenceFragment :
   override fun onResume() {
     super.onResume()
     (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(binding.list)
+
+    if (GlobalValues.isColorfulIcon != isColorfulIcon) {
+      isColorfulIcon = GlobalValues.isColorfulIcon
+      // noinspection NotifyDataSetChanged
+      refAdapter.notifyDataSetChanged()
+    }
   }
 
   override fun onPause() {

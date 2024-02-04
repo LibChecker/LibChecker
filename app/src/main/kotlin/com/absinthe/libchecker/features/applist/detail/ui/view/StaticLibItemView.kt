@@ -13,7 +13,6 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.features.statistics.bean.LibChip
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
-import com.absinthe.libchecker.utils.extensions.valueUnsafe
 import com.absinthe.libchecker.utils.extensions.visibleHeight
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.chip.Chip
@@ -70,7 +69,7 @@ class StaticLibItemView(context: Context) : AViewGroup(context) {
         text = libChip.name
         setChipIconResource(libChip.iconRes)
 
-        if (!GlobalValues.isColorfulIcon.valueUnsafe) {
+        if (!GlobalValues.isColorfulIcon) {
           val icon = chipIcon
           icon?.let {
             it.colorFilter =

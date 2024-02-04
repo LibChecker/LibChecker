@@ -24,7 +24,6 @@ import com.absinthe.libchecker.features.statistics.ui.view.LibReferenceItemView
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.tintHighlightText
-import com.absinthe.libchecker.utils.extensions.valueUnsafe
 import com.absinthe.rulesbundle.LCRules
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.chad.library.adapter.base.provider.BaseNodeProvider
@@ -69,7 +68,7 @@ class LibReferenceProvider : BaseNodeProvider() {
         icon.apply {
           setImageResource(it.iconRes)
 
-          if (!GlobalValues.isColorfulIcon.valueUnsafe) {
+          if (!GlobalValues.isColorfulIcon) {
             this.drawable.mutate().colorFilter =
               ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
           }
