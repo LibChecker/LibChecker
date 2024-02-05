@@ -163,23 +163,20 @@ class ChartFragment :
       chartView.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
     }
 
-    dialog = ClassifyBottomSheetDialogFragment()
-    viewModel.filteredList.postValue(emptyList())
+    dialog = ClassifyBottomSheetDialogFragment().also {
+      lifecycleScope.launch(Dispatchers.IO) {
+        it.setTitle(dataSource?.getLabelByXValue(requireContext(), h.x.toInt()).orEmpty())
+        it.setList(dataSource?.getListByXValue(h.x.toInt()) ?: emptyList())
 
-    lifecycleScope.launch(Dispatchers.IO) {
-      viewModel.dialogTitle.postValue(dataSource?.getLabelByXValue(requireContext(), h.x.toInt()).orEmpty())
-      viewModel.filteredList.postValue(dataSource?.getListByXValue(h.x.toInt()) ?: emptyList())
+        if (dataSource is TargetApiChartDataSource || dataSource is MinApiChartDataSource) {
+          val index = (dataSource as BaseVariableChartDataSource<*>).getListKeyByXValue(h.x.toInt())
+          it.setAndroidVersionLabel(AndroidVersions.versions.find { it.first == index })
+        } else {
+          it.setAndroidVersionLabel(null)
+        }
 
-      if (dataSource is TargetApiChartDataSource || dataSource is MinApiChartDataSource) {
-        val index = (dataSource as BaseVariableChartDataSource<*>).getListKeyByXValue(h.x.toInt())
-        viewModel.androidVersion.postValue(AndroidVersions.versions.find { it.first == index })
-      } else {
-        viewModel.androidVersion.postValue(null)
-      }
-
-      withContext(Dispatchers.Main) {
-        activity?.let { activity ->
-          dialog?.also {
+        withContext(Dispatchers.Main) {
+          activity?.let { activity ->
             it.setOnDismiss {
               this@ChartFragment.dialog = null
               (chartView as? Chart<*>)?.highlightValue(null)

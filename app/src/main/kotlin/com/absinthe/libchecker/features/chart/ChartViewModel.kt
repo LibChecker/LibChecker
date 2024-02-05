@@ -3,7 +3,6 @@ package com.absinthe.libchecker.features.chart
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.database.Repositories
@@ -18,9 +17,6 @@ import kotlinx.coroutines.withContext
 
 class ChartViewModel : ViewModel() {
   val dbItems: LiveData<List<LCItem>> = Repositories.lcRepository.allDatabaseItems
-  val filteredList: MutableLiveData<List<LCItem>> = MutableLiveData()
-  val dialogTitle: MutableLiveData<String> = MutableLiveData()
-  val androidVersion: MutableLiveData<Triple<Int, String, Int?>?> = MutableLiveData()
   private var queryJob: Job? = null
 
   private val _isLoading = MutableStateFlow(false)
