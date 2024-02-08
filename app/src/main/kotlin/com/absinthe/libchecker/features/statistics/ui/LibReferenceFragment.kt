@@ -137,7 +137,7 @@ class LibReferenceFragment :
         val item = refAdapter.data[position] as? LibReference ?: return@setOnItemClickListener
         activity?.launchLibReferencePage(
           item.libName,
-          item.chip?.name,
+          item.rule?.label,
           item.type,
           item.referredList.toTypedArray()
         )
@@ -309,7 +309,7 @@ class LibReferenceFragment :
       searchUpdateJob = lifecycleScope.launch(Dispatchers.IO) {
         homeViewModel.savedRefList?.let { list ->
           val filter = list.filter {
-            it.libName.contains(newText, ignoreCase = true) || it.chip?.name?.contains(
+            it.libName.contains(newText, ignoreCase = true) || it.rule?.label?.contains(
               newText,
               ignoreCase = true
             ) ?: false

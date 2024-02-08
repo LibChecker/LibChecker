@@ -64,17 +64,17 @@ class LibReferenceProvider : BaseNodeProvider() {
 
       setOrHighlightText(libName, libReferenceItem.libName)
 
-      libReferenceItem.chip?.let {
+      libReferenceItem.rule?.let {
         icon.apply {
           setImageResource(it.iconRes)
 
-          if (!GlobalValues.isColorfulIcon) {
+          if (!GlobalValues.isColorfulIcon && !it.isSimpleColorIcon) {
             this.drawable.mutate().colorFilter =
               ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
           }
         }
 
-        setOrHighlightText(labelName, it.name)
+        setOrHighlightText(labelName, it.label)
       } ?: let {
         if (libReferenceItem.type == PERMISSION && libReferenceItem.libName.startsWith("android.permission")) {
           icon.setImageResource(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_android)

@@ -33,7 +33,6 @@ import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.features.applist.detail.bean.StatefulComponent
-import com.absinthe.libchecker.features.statistics.bean.LibChip
 import com.absinthe.libchecker.features.statistics.bean.LibReference
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.services.IWorkerService
@@ -670,22 +669,13 @@ class HomeViewModel : ViewModel() {
         val threshold = GlobalValues.libReferenceThreshold
         val isOnlyNotMarked = GlobalValues.libReferenceOptions and LibReferenceOptions.ONLY_NOT_MARKED > 0
 
-        var chip: LibChip?
         var rule: Rule?
         for (entry in map) {
           if (!isActive) {
             return@let
           }
           if (entry.value.first.size >= threshold && entry.key.isNotBlank()) {
-            chip = null
-            rule = LCRules.getRule(entry.key, entry.value.second, true)?.also {
-              chip = LibChip(
-                iconRes = it.iconRes,
-                name = it.label,
-                regexName = it.regexName
-              )
-            }
-
+            rule = LCRules.getRule(entry.key, entry.value.second, true)
             val shouldAdd = if (isOnlyNotMarked) {
               rule == null && entry.value.second != PERMISSION && entry.value.second != METADATA
             } else {
@@ -695,7 +685,7 @@ class HomeViewModel : ViewModel() {
               refList.add(
                 LibReference(
                   entry.key,
-                  chip,
+                  rule,
                   entry.value.first,
                   entry.value.second
                 )

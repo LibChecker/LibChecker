@@ -13,7 +13,6 @@ import com.absinthe.libchecker.features.applist.detail.ui.base.BaseFilterAnalysi
 import com.absinthe.libchecker.features.applist.detail.ui.base.EXTRA_TYPE
 import com.absinthe.libchecker.features.statistics.bean.DISABLED
 import com.absinthe.libchecker.features.statistics.bean.EXPORTED
-import com.absinthe.libchecker.features.statistics.bean.LibChip
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.extensions.putArguments
@@ -43,22 +42,12 @@ class ComponentsAnalysisFragment : BaseFilterAnalysisFragment<FragmentLibCompone
           }
           lifecycleScope.launch(Dispatchers.IO) {
             val list = mutableListOf<LibStringItemChip>()
-            var chip: LibChip?
             var rule: Rule?
             var source: String?
 
             for (item in componentList) {
               rule = if (!item.componentName.startsWith(".")) {
                 LCRules.getRule(item.componentName, adapter.type, true)
-              } else {
-                null
-              }
-              chip = if (rule != null) {
-                LibChip(
-                  iconRes = rule.iconRes,
-                  name = rule.label,
-                  regexName = rule.regexName
-                )
               } else {
                 null
               }
@@ -76,12 +65,12 @@ class ComponentsAnalysisFragment : BaseFilterAnalysisFragment<FragmentLibCompone
                   source = source,
                   process = item.processName.takeIf { it.isNotEmpty() }
                 ),
-                chip
+                rule
               )
             }
 
             if (sortMode == MODE_SORT_BY_LIB) {
-              list.sortWith(compareByDescending<LibStringItemChip> { it.chip != null }.thenBy { it.item.name })
+              list.sortWith(compareByDescending<LibStringItemChip> { it.rule != null }.thenBy { it.item.name })
             } else {
               list.sortBy { it.item.name }
             }

@@ -61,7 +61,7 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
             }
 
             if (sortMode == MODE_SORT_BY_LIB) {
-              list.sortByDescending { it.chip != null }
+              list.sortByDescending { it.rule != null }
             } else {
               adapter.data.sortedByDescending { it.item.name }
             }

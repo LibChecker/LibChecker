@@ -29,7 +29,6 @@ import com.absinthe.libchecker.features.applist.LocatedCount
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.features.applist.detail.bean.StatefulComponent
 import com.absinthe.libchecker.features.statistics.bean.DISABLED
-import com.absinthe.libchecker.features.statistics.bean.LibChip
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.DateUtils
@@ -49,6 +48,7 @@ import com.absinthe.libchecker.utils.extensions.getStatefulPermissionsList
 import com.absinthe.libchecker.utils.extensions.isTempApk
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.rulesbundle.LCRules
+import com.absinthe.rulesbundle.Rule
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -250,25 +250,19 @@ class DetailViewModel : ViewModel() {
     val list =
       PackageUtils.getNativeDirLibs(packageInfo, specifiedAbi = specifiedAbi).toMutableList()
     val chipList = mutableListOf<LibStringItemChip>()
-    var chip: LibChip?
+    var rule: Rule?
 
     if (list.isEmpty()) {
       return chipList
     } else {
       list.forEach {
-        chip = LCAppUtils.getRuleWithRegex(it.name, NATIVE, info.packageName, list)?.let { rule ->
-          LibChip(
-            iconRes = rule.iconRes,
-            name = rule.label,
-            regexName = rule.regexName
-          )
-        }
-        chipList.add(LibStringItemChip(it, chip))
+        rule = LCAppUtils.getRuleWithRegex(it.name, NATIVE, info.packageName, list)
+        chipList.add(LibStringItemChip(it, rule))
       }
       if (GlobalValues.libSortMode == MODE_SORT_BY_SIZE) {
         chipList.sortByDescending { it.item.size }
       } else {
-        chipList.sortWith(compareByDescending<LibStringItemChip> { it.chip != null }.thenByDescending { it.item.size })
+        chipList.sortWith(compareByDescending<LibStringItemChip> { it.rule != null }.thenByDescending { it.item.size })
       }
     }
     return chipList
@@ -278,26 +272,20 @@ class DetailViewModel : ViewModel() {
     Timber.d("getStaticChipList")
     val list = runCatching { PackageUtils.getStaticLibs(packageInfo) }.getOrDefault(emptyList())
     val chipList = mutableListOf<LibStringItemChip>()
-    var chip: LibChip?
+    var rule: Rule?
 
     if (list.isEmpty()) {
       return chipList
     } else {
       list.forEach {
-        chip = null
-        LCRules.getRule(it.name, STATIC, false)?.let { rule ->
-          chip = LibChip(
-            iconRes = rule.iconRes,
-            name = rule.label,
-            regexName = rule.regexName
-          )
-        }
-        chipList.add(LibStringItemChip(it, chip))
+        rule = null
+        LCRules.getRule(it.name, STATIC, false)
+        chipList.add(LibStringItemChip(it, rule))
       }
       if (GlobalValues.libSortMode == MODE_SORT_BY_SIZE) {
         chipList.sortByDescending { it.item.name }
       } else {
-        chipList.sortByDescending { it.chip != null }
+        chipList.sortByDescending { it.rule != null }
       }
     }
     return chipList
@@ -338,26 +326,20 @@ class DetailViewModel : ViewModel() {
       emptyList()
     }
     val chipList = mutableListOf<LibStringItemChip>()
-    var chip: LibChip?
+    var rule: Rule?
 
     if (list.isEmpty()) {
       return chipList
     } else {
       list.forEach {
-        chip = null
-        LCRules.getRule(it.name, DEX, true)?.let { rule ->
-          chip = LibChip(
-            iconRes = rule.iconRes,
-            name = rule.label,
-            regexName = rule.regexName
-          )
-        }
-        chipList.add(LibStringItemChip(it, chip))
+        rule = null
+        LCRules.getRule(it.name, DEX, true)
+        chipList.add(LibStringItemChip(it, rule))
       }
       if (GlobalValues.libSortMode == MODE_SORT_BY_SIZE) {
         chipList.sortByDescending { it.item.name }
       } else {
-        chipList.sortByDescending { it.chip != null }
+        chipList.sortByDescending { it.rule != null }
       }
     }
     return chipList

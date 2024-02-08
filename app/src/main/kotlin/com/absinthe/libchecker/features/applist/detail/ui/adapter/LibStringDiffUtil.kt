@@ -13,6 +13,6 @@ class LibStringDiffUtil : DiffUtil.ItemCallback<LibStringItemChip>() {
     oldItem: LibStringItemChip,
     newItem: LibStringItemChip
   ): Boolean {
-    return oldItem.item == newItem.item && oldItem.chip == newItem.chip
+    return oldItem.item == newItem.item && oldItem.rule == newItem.rule
   }
 }

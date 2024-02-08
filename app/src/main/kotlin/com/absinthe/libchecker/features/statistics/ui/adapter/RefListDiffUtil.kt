@@ -14,7 +14,7 @@ class RefListDiffUtil : DiffUtil.ItemCallback<BaseNode>() {
     return if (oldItem is LibReference && newItem is LibReference) {
       oldItem.libName == newItem.libName &&
         oldItem.referredList.size == newItem.referredList.size &&
-        oldItem.chip == newItem.chip &&
+        oldItem.rule == newItem.rule &&
         oldItem.type == newItem.type
     } else {
       oldItem == newItem

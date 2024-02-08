@@ -167,7 +167,7 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
         list.sortByDescending { it.item.name }
       }
     } else {
-      list.sortWith(compareByDescending<LibStringItemChip> { it.chip != null }.thenBy { it.item.name })
+      list.sortWith(compareByDescending<LibStringItemChip> { it.rule != null }.thenBy { it.item.name })
     }
 
     if (itemChip != null) {
@@ -269,7 +269,7 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
     }
     val item = adapter.getItem(position)
     val name = item.item.name
-    val isValidLib = item.chip != null
+    val isValidLib = item.rule != null
 
     if (adapter.type == PERMISSION) {
       PermissionDetailDialogFragment.newInstance(name)
@@ -324,7 +324,7 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
       // Reference
       arrayAdapter.add(getString(R.string.tab_lib_reference_statistics))
       actionMap[arrayAdapter.count - 1] = {
-        activity?.launchLibReferencePage(componentName, item.chip?.name, type, null)
+        activity?.launchLibReferencePage(componentName, item.rule?.label, type, null)
       }
 
       // Blocker

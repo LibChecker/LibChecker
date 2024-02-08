@@ -256,10 +256,8 @@ class AppListFragment :
           advancedMenuBSDFragment = AdvancedMenuBSDFragment().apply {
             setOnDismissListener { advancedDiff, itemAdvancedDiff ->
               if (advancedDiff > 0) {
-                if (advancedDiff and AdvancedOptions.SHOW_SYSTEM_APPS > 0) {
-                  lifecycleScope.launch {
-                    GlobalValues.preferencesFlow.emit(Constants.PREF_SHOW_SYSTEM_APPS to GlobalValues.isShowSystemApps)
-                  }
+                lifecycleScope.launch {
+                  GlobalValues.preferencesFlow.emit(Constants.PREF_ADVANCED_OPTIONS to advancedDiff)
                 }
               }
 
@@ -269,11 +267,12 @@ class AppListFragment :
               }
               advancedMenuBSDFragment = null
             }
+          }.also { bsd ->
+            bsd.show(
+              it.supportFragmentManager,
+              AdvancedMenuBSDFragment::class.java.name
+            )
           }
-          advancedMenuBSDFragment?.show(
-            it.supportFragmentManager,
-            AdvancedMenuBSDFragment::class.java.name
-          )
         }
       }
     }
@@ -362,7 +361,7 @@ class AppListFragment :
     }
 
     GlobalValues.preferencesFlow.onEach {
-      if (it.first == Constants.PREF_SHOW_SYSTEM_APPS) {
+      if (it.first == Constants.PREF_ADVANCED_OPTIONS) {
         if (isListReady) {
           updateItems()
         }
