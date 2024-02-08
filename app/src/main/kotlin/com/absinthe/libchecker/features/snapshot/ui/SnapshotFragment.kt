@@ -334,6 +334,8 @@ class SnapshotFragment :
         else -> {}
       }
     }.launchIn(lifecycleScope)
+
+    viewModel.changeTimeStamp(GlobalValues.snapshotTimestamp)
   }
 
   override fun onAttach(context: Context) {

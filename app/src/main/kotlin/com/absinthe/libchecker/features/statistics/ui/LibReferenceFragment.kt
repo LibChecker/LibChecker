@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
@@ -181,12 +182,12 @@ class LibReferenceFragment :
       }.launchIn(lifecycleScope)
     }
     GlobalValues.preferencesFlow.onEach {
-      if (it.first == Constants.PREF_SHOW_SYSTEM_APPS) {
-        computeRef(true)
-      }
       when (it.first) {
-        Constants.PREF_SHOW_SYSTEM_APPS -> {
-          computeRef(true)
+        Constants.PREF_ADVANCED_OPTIONS -> {
+          val options = it.second as Int
+          if (options and AdvancedOptions.SHOW_SYSTEM_APPS > 0) {
+            computeRef(true)
+          }
         }
         Constants.PREF_COLORFUL_ICON -> {
           // noinspection NotifyDataSetChanged

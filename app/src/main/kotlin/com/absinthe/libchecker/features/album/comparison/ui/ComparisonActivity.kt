@@ -271,6 +271,10 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
     }
 
     viewModel.apply {
+      snapshotDiffItemsFlow.onEach {
+        adapter.setList(it.sortedByDescending { it.updateTime })
+        flip(VF_LIST)
+      }.launchIn(lifecycleScope)
       effect.onEach {
         when (it) {
           is SnapshotViewModel.Effect.ChooseComparedApk -> {

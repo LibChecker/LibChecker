@@ -99,7 +99,8 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
       }
     }
     findPreference<TwoStatePreference>(Constants.PREF_COLORFUL_ICON)?.apply {
-      setOnPreferenceChangeListener { _, newValue ->
+      setOnPreferenceChangeListener { pref, newValue ->
+        emitPrefChange(pref.key, newValue)
         Analytics.trackEvent(
           Constants.Event.SETTINGS,
           EventProperties().set("PREF_COLORFUL_ICON", newValue as Boolean)
