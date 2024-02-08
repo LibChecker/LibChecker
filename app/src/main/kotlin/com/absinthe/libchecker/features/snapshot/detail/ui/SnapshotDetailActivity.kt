@@ -62,6 +62,8 @@ import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.chip.Chip
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import me.zhanghai.android.appiconloader.AppIconLoader
 import rikka.core.util.ClipboardUtils
@@ -180,7 +182,54 @@ class SnapshotDetailActivity :
       snapshotTitle.setPackageSizeText(entity, isNewOrDeleted)
     }
 
-    viewModel.snapshotDetailItems.observe(this) { details ->
+    adapter.setEmptyView(
+      when {
+        entity.newInstalled -> SnapshotDetailNewInstallView(this)
+        entity.deleted -> SnapshotDetailDeletedView(this)
+        else -> SnapshotEmptyView(this).apply {
+          layoutParams = FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.WRAP_CONTENT
+          ).also {
+            it.gravity = Gravity.CENTER_HORIZONTAL
+          }
+          addPaddingTop(96.dp)
+        }
+      }
+    )
+    adapter.setOnItemClickListener { _, view, position ->
+      if (adapter.data[position] is SnapshotTitleNode) {
+        adapter.expandOrCollapse(position)
+        return@setOnItemClickListener
+      }
+      if (AntiShakeUtils.isInvalidClick(view)) {
+        return@setOnItemClickListener
+      }
+
+      val item = (adapter.data[position] as BaseSnapshotNode).item
+      if (item.diffType == REMOVED) {
+        return@setOnItemClickListener
+      }
+
+      lifecycleScope.launch {
+        val lcItem = Repositories.lcRepository.getItem(entity.packageName) ?: return@launch
+        launchDetailPage(
+          item = lcItem,
+          refName = item.name,
+          refType = item.itemType
+        )
+      }
+    }
+    adapter.setOnItemLongClickListener { _, view, position ->
+      val item = (adapter.data[position] as? BaseSnapshotNode)?.item ?: return@setOnItemLongClickListener false
+      if (item.diffType != REMOVED) {
+        val label = ((view as? ViewGroup)?.descendants?.find { it is Chip } as? Chip)?.text?.toString()
+        launchLibReferencePage(item.name, label, item.itemType, null)
+      }
+      true
+    }
+
+    viewModel.snapshotDetailItemsFlow.onEach { details ->
       val titleList = mutableListOf<SnapshotTitleNode>()
 
       getNodeList(details.filter { it.itemType == NATIVE }).apply {
@@ -250,54 +299,7 @@ class SnapshotDetailActivity :
       if (titleList.isNotEmpty()) {
         adapter.setList(titleList)
       }
-    }
-
-    adapter.setEmptyView(
-      when {
-        entity.newInstalled -> SnapshotDetailNewInstallView(this)
-        entity.deleted -> SnapshotDetailDeletedView(this)
-        else -> SnapshotEmptyView(this).apply {
-          layoutParams = FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.MATCH_PARENT,
-            FrameLayout.LayoutParams.WRAP_CONTENT
-          ).also {
-            it.gravity = Gravity.CENTER_HORIZONTAL
-          }
-          addPaddingTop(96.dp)
-        }
-      }
-    )
-    adapter.setOnItemClickListener { _, view, position ->
-      if (adapter.data[position] is SnapshotTitleNode) {
-        adapter.expandOrCollapse(position)
-        return@setOnItemClickListener
-      }
-      if (AntiShakeUtils.isInvalidClick(view)) {
-        return@setOnItemClickListener
-      }
-
-      val item = (adapter.data[position] as BaseSnapshotNode).item
-      if (item.diffType == REMOVED) {
-        return@setOnItemClickListener
-      }
-
-      lifecycleScope.launch {
-        val lcItem = Repositories.lcRepository.getItem(entity.packageName) ?: return@launch
-        launchDetailPage(
-          item = lcItem,
-          refName = item.name,
-          refType = item.itemType
-        )
-      }
-    }
-    adapter.setOnItemLongClickListener { _, view, position ->
-      val item = (adapter.data[position] as? BaseSnapshotNode)?.item ?: return@setOnItemLongClickListener false
-      if (item.diffType != REMOVED) {
-        val label = ((view as? ViewGroup)?.descendants?.find { it is Chip } as? Chip)?.text?.toString()
-        launchLibReferencePage(item.name, label, item.itemType, null)
-      }
-      true
-    }
+    }.launchIn(lifecycleScope)
   }
 
   private fun getNodeList(list: List<SnapshotDetailItem>): MutableList<BaseNode> {

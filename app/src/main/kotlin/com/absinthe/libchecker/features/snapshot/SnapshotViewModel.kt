@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.R
@@ -68,10 +67,8 @@ class SnapshotViewModel : ViewModel() {
 
   val repository = Repositories.lcRepository
   val allSnapshots = repository.allSnapshotItemsFlow
-  val timestamp: MutableLiveData<Long> = MutableLiveData(GlobalValues.snapshotTimestamp)
-  val snapshotDiffItems: MutableLiveData<List<SnapshotDiffItem>> = MutableLiveData()
-  val snapshotDetailItems: MutableLiveData<List<SnapshotDetailItem>> = MutableLiveData()
-  val comparingProgressLiveData = MutableLiveData(0)
+  val snapshotDiffItemsFlow: MutableSharedFlow<List<SnapshotDiffItem>> = MutableSharedFlow()
+  val snapshotDetailItemsFlow: MutableSharedFlow<List<SnapshotDetailItem>> = MutableSharedFlow()
 
   private val _effect: MutableSharedFlow<Effect> = MutableSharedFlow()
   val effect = _effect.asSharedFlow()
@@ -111,7 +108,7 @@ class SnapshotViewModel : ViewModel() {
     val preMap = repository.getSnapshots(preTimeStamp).associateBy { it.packageName }
 
     if (preMap.isEmpty() || preTimeStamp == 0L) {
-      snapshotDiffItems.postValue(emptyList())
+      snapshotDiffItemsFlow.emit(emptyList())
       return@runBlocking
     }
 
@@ -228,7 +225,7 @@ class SnapshotViewModel : ViewModel() {
         Timber.e(e)
       } finally {
         count++
-        comparingProgressLiveData.postValue(count * 100 / size)
+        changeComparingProgress(count * 100 / size)
       }
     }
 
@@ -283,11 +280,11 @@ class SnapshotViewModel : ViewModel() {
         Timber.e(e)
       } finally {
         count++
-        comparingProgressLiveData.postValue(count * 100 / size)
+        changeComparingProgress(count * 100 / size)
       }
     }
 
-    snapshotDiffItems.postValue(diffList)
+    snapshotDiffItemsFlow.emit(diffList)
     if (diffList.isNotEmpty()) {
       updateTopApps(preTimeStamp, diffList.subList(0, (diffList.size - 1).coerceAtMost(5)))
     }
@@ -570,7 +567,7 @@ class SnapshotViewModel : ViewModel() {
       }
     }
 
-    snapshotDiffItems.postValue(diffList)
+    snapshotDiffItemsFlow.emit(diffList)
     if (diffList.isNotEmpty() && preTimeStamp != -1L) {
       updateTopApps(preTimeStamp, diffList.subList(0, (diffList.size - 1).coerceAtMost(5)))
     }
@@ -750,12 +747,7 @@ class SnapshotViewModel : ViewModel() {
       }
     }
 
-    diffItem?.let { diff ->
-      val diffList = snapshotDiffItems.value?.toMutableList() ?: mutableListOf()
-      diffList.removeAll { it.packageName == diff.packageName }
-      diffList.add(diff)
-      snapshotDiffItems.postValue(diffList)
-    }
+    diffItem?.let { changeDiffItem(it) }
   }
 
   private suspend fun updateTopApps(timestamp: Long, list: List<SnapshotDiffItem>) {
@@ -814,7 +806,7 @@ class SnapshotViewModel : ViewModel() {
         )
       )
 
-      snapshotDetailItems.postValue(list)
+      snapshotDetailItemsFlow.emit(list)
     }
 
   private fun addComponentDiffInfoFromJson(
@@ -1357,12 +1349,30 @@ class SnapshotViewModel : ViewModel() {
     }
   }
 
+  fun changeTimeStamp(timestamp: Long) {
+    setEffect {
+      Effect.TimeStampChange(timestamp)
+    }
+  }
+
   fun getDashboardCount(timestamp: Long, isLeft: Boolean) = viewModelScope.launch(Dispatchers.IO) {
     Timber.d("getDashboardCount: $timestamp, $isLeft")
     val snapshotCount = repository.getSnapshots(timestamp).size
     val appCount = LocalAppDataSource.getApplicationMap().size
     setEffect {
       Effect.DashboardCountChange(snapshotCount, appCount, isLeft)
+    }
+  }
+
+  private fun changeDiffItem(item: SnapshotDiffItem) {
+    setEffect {
+      Effect.DiffItemChange(item)
+    }
+  }
+
+  private fun changeComparingProgress(progress: Int) {
+    setEffect {
+      Effect.ComparingProgressChange(progress)
     }
   }
 
@@ -1376,5 +1386,8 @@ class SnapshotViewModel : ViewModel() {
   sealed class Effect {
     data class ChooseComparedApk(val isLeftPart: Boolean) : Effect()
     data class DashboardCountChange(val snapshotCount: Int, val appCount: Int, val isLeft: Boolean) : Effect()
+    data class DiffItemChange(val item: SnapshotDiffItem) : Effect()
+    data class TimeStampChange(val timestamp: Long) : Effect()
+    data class ComparingProgressChange(val progress: Int) : Effect()
   }
 }

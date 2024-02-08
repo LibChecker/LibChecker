@@ -93,12 +93,13 @@ class SnapshotFragment :
   private var shouldCompare = true and ShootService.isComputing.not()
   private var shootServiceStarted = false
   private var keyword: String = ""
+  private var currentTimeStamp = GlobalValues.snapshotTimestamp
 
   private var shootBinder: IShootService? = null
   private val shootListener = object : OnShootListener.Stub() {
     override fun onShootFinished(timestamp: Long) {
       lifecycleScope.launch(Dispatchers.Main) {
-        viewModel.timestamp.value = timestamp
+        viewModel.changeTimeStamp(timestamp)
         compareDiff()
         shouldCompare = true
       }
@@ -159,7 +160,7 @@ class SnapshotFragment :
                 val item = timeStampList[position]
                 GlobalValues.snapshotTimestamp = item.timestamp
                 lifecycleScope.launch(Dispatchers.Main) {
-                  viewModel.timestamp.value = item.timestamp
+                  viewModel.changeTimeStamp(item.timestamp)
                   flip(VF_LOADING)
                   dismiss()
                 }
@@ -260,23 +261,13 @@ class SnapshotFragment :
     }
 
     viewModel.apply {
-      timestamp.observe(viewLifecycleOwner) {
-        if (it != 0L) {
-          dashboard.container.tvSnapshotTimestampText.text = getFormatDateString(it)
-        } else {
-          dashboard.container.tvSnapshotTimestampText.text =
-            getString(R.string.snapshot_none)
-          snapshotDiffItems.value = emptyList()
-          flip(VF_LIST)
-        }
-      }
       allSnapshots.onEach {
         if (shouldCompare) {
           compareDiff()
         }
       }.launchIn(lifecycleScope)
-      snapshotDiffItems.observe(viewLifecycleOwner) { list ->
-        updateItems(list)
+      snapshotDiffItemsFlow.onEach {
+        updateItems(it)
 
         lifecycleScope.launch(Dispatchers.IO) {
           delay(250)
@@ -289,10 +280,7 @@ class SnapshotFragment :
             }
           }
         }
-      }
-      comparingProgressLiveData.observe(viewLifecycleOwner) {
-        binding.progressIndicator.setProgressCompat(it, it != 1)
-      }
+      }.launchIn(lifecycleScope)
     }
     homeViewModel.effect.onEach {
       when (it) {
@@ -312,6 +300,35 @@ class SnapshotFragment :
         is SnapshotViewModel.Effect.DashboardCountChange -> {
           dashboard.container.tvSnapshotAppsCountText.text =
             String.format("%d / %d", it.snapshotCount, it.appCount)
+        }
+
+        is SnapshotViewModel.Effect.TimeStampChange -> {
+          currentTimeStamp = it.timestamp
+          if (it.timestamp != 0L) {
+            dashboard.container.tvSnapshotTimestampText.text = viewModel.getFormatDateString(it.timestamp)
+          } else {
+            dashboard.container.tvSnapshotTimestampText.text = getString(R.string.snapshot_none)
+            viewModel.snapshotDiffItemsFlow.emit(emptyList())
+            flip(VF_LIST)
+          }
+        }
+
+        is SnapshotViewModel.Effect.DiffItemChange -> {
+          val newItems = adapter.data
+            .asSequence()
+            .map { i ->
+              if (i.packageName == it.item.packageName) {
+                it.item
+              } else {
+                i
+              }
+            }
+            .toList()
+          updateItems(newItems)
+        }
+
+        is SnapshotViewModel.Effect.ComparingProgressChange -> {
+          binding.progressIndicator.setProgressCompat(it.progress, it.progress != 1)
         }
 
         else -> {}
@@ -354,8 +371,8 @@ class SnapshotFragment :
       viewModel.compareDiff(GlobalValues.snapshotTimestamp)
     }
 
-    if (viewModel.timestamp.value != GlobalValues.snapshotTimestamp) {
-      viewModel.timestamp.value = GlobalValues.snapshotTimestamp
+    if (currentTimeStamp != GlobalValues.snapshotTimestamp) {
+      viewModel.changeTimeStamp(GlobalValues.snapshotTimestamp)
       flip(VF_LOADING)
       viewModel.compareDiff(GlobalValues.snapshotTimestamp, shouldClearDiff = true)
     }
@@ -524,9 +541,7 @@ class SnapshotFragment :
         advancedMenuBSDFragment = SnapshotMenuBSDFragment().apply {
           setOnDismissListener { optionsDiff ->
             if (optionsDiff > 0) {
-              viewModel.snapshotDiffItems.value?.let { items ->
-                updateItems(items, true)
-              }
+              updateItems(adapter.data, true)
             }
             advancedMenuBSDFragment = null
           }
@@ -570,7 +585,7 @@ class SnapshotFragment :
   }
 
   private fun compareDiff() {
-    viewModel.timestamp.value = GlobalValues.snapshotTimestamp
+    viewModel.changeTimeStamp(GlobalValues.snapshotTimestamp)
     isSnapshotDatabaseItemsReady = true
 
     viewModel.getDashboardCount(GlobalValues.snapshotTimestamp, true)
@@ -617,19 +632,17 @@ class SnapshotFragment :
     if (keyword != newText) {
       keyword = newText ?: ""
       adapter.highlightText = keyword
-      viewModel.snapshotDiffItems.value?.let { items ->
-        val list = if (keyword.isEmpty()) {
-          items
-        } else {
-          items.asSequence()
-            .filter {
-              it.packageName.contains(keyword, ignoreCase = true) ||
-                it.labelDiff.old.contains(keyword, ignoreCase = true) ||
-                it.labelDiff.new?.contains(keyword, ignoreCase = true) == true
-            }.toList()
-        }
-        updateItems(list, true)
+      val list = if (keyword.isEmpty()) {
+        adapter.data
+      } else {
+        adapter.data.asSequence()
+          .filter {
+            it.packageName.contains(keyword, ignoreCase = true) ||
+              it.labelDiff.old.contains(keyword, ignoreCase = true) ||
+              it.labelDiff.new?.contains(keyword, ignoreCase = true) == true
+          }.toList()
       }
+      updateItems(list, true)
     }
     return false
   }

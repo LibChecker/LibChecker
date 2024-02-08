@@ -443,31 +443,32 @@ class HomeViewModel : ViewModel() {
 
     updateLibRefProgress(0)
 
-    if (GlobalValues.libReferenceOptions and LibReferenceOptions.NATIVE_LIBS > 0) {
+    val options = GlobalValues.libReferenceOptions
+    if (options and LibReferenceOptions.NATIVE_LIBS > 0) {
       computeInternal(NATIVE)
     }
-    if (GlobalValues.libReferenceOptions and LibReferenceOptions.SERVICES > 0) {
+    if (options and LibReferenceOptions.SERVICES > 0) {
       computeInternal(SERVICE)
     }
-    if (GlobalValues.libReferenceOptions and LibReferenceOptions.ACTIVITIES > 0) {
+    if (options and LibReferenceOptions.ACTIVITIES > 0) {
       computeInternal(ACTIVITY)
     }
-    if (GlobalValues.libReferenceOptions and LibReferenceOptions.RECEIVERS > 0) {
+    if (options and LibReferenceOptions.RECEIVERS > 0) {
       computeInternal(RECEIVER)
     }
-    if (GlobalValues.libReferenceOptions and LibReferenceOptions.PROVIDERS > 0) {
+    if (options and LibReferenceOptions.PROVIDERS > 0) {
       computeInternal(PROVIDER)
     }
-    if (GlobalValues.libReferenceOptions and LibReferenceOptions.PERMISSIONS > 0) {
+    if (options and LibReferenceOptions.PERMISSIONS > 0) {
       computeInternal(PERMISSION)
     }
-    if (GlobalValues.libReferenceOptions and LibReferenceOptions.METADATA > 0) {
+    if (options and LibReferenceOptions.METADATA > 0) {
       computeInternal(METADATA)
     }
-    if (GlobalValues.libReferenceOptions and LibReferenceOptions.PACKAGES > 0) {
+    if (options and LibReferenceOptions.PACKAGES > 0) {
       computeInternal(PACKAGE)
     }
-    if (GlobalValues.libReferenceOptions and LibReferenceOptions.SHARED_UID > 0) {
+    if (options and LibReferenceOptions.SHARED_UID > 0) {
       computeInternal(SHARED_UID)
     }
 
@@ -666,6 +667,8 @@ class HomeViewModel : ViewModel() {
         updateLibRefProgressImpl()
 
         val refList = mutableListOf<LibReference>()
+        val threshold = GlobalValues.libReferenceThreshold
+        val isOnlyNotMarked = GlobalValues.libReferenceOptions and LibReferenceOptions.ONLY_NOT_MARKED > 0
 
         var chip: LibChip?
         var rule: Rule?
@@ -673,17 +676,17 @@ class HomeViewModel : ViewModel() {
           if (!isActive) {
             return@let
           }
-          if (entry.value.first.size >= GlobalValues.libReferenceThreshold && entry.key.isNotBlank()) {
-            rule = LCRules.getRule(entry.key, entry.value.second, true)
+          if (entry.value.first.size >= threshold && entry.key.isNotBlank()) {
             chip = null
-            rule?.let {
+            rule = LCRules.getRule(entry.key, entry.value.second, true)?.also {
               chip = LibChip(
                 iconRes = it.iconRes,
                 name = it.label,
                 regexName = it.regexName
               )
             }
-            val shouldAdd = if (GlobalValues.libReferenceOptions and LibReferenceOptions.ONLY_NOT_MARKED > 0) {
+
+            val shouldAdd = if (isOnlyNotMarked) {
               rule == null && entry.value.second != PERMISSION && entry.value.second != METADATA
             } else {
               true
@@ -717,7 +720,8 @@ class HomeViewModel : ViewModel() {
 
   fun refreshRef() = viewModelScope.launch(Dispatchers.IO) {
     _savedRefList?.let { ref ->
-      _libReference.emit(ref.filter { it.referredList.size >= GlobalValues.libReferenceThreshold })
+      val threshold = GlobalValues.libReferenceThreshold
+      _libReference.emit(ref.filter { it.referredList.size >= threshold })
     }
   }
 
