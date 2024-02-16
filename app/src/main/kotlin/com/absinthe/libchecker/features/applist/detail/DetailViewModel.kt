@@ -5,7 +5,6 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.util.SparseArray
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.annotation.ACTIVITY
@@ -55,6 +54,7 @@ import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -64,44 +64,39 @@ import retrofit2.HttpException
 import timber.log.Timber
 
 class DetailViewModel : ViewModel() {
-
-  val detailBean: MutableLiveData<LibDetailBean?> = MutableLiveData()
-
-  val nativeLibItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
-  val staticLibItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
-  val metaDataItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
-  val permissionsItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
-  val dexLibItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
-  val signaturesLibItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
-  val componentsMap = SparseArray<MutableLiveData<List<StatefulComponent>>>()
-  val abilitiesMap = SparseArray<MutableLiveData<List<StatefulComponent>>>()
-  val itemsCountLiveData: MutableLiveData<LocatedCount> = MutableLiveData(LocatedCount(0, 0))
-  val processToolIconVisibilityLiveData: MutableLiveData<Boolean> = MutableLiveData(false)
-  val processMapLiveData = MutableLiveData<Map<String, Int>>()
+  val nativeLibItems: MutableStateFlow<List<LibStringItemChip>?> = MutableStateFlow(null)
+  val staticLibItems: MutableStateFlow<List<LibStringItemChip>?> = MutableStateFlow(null)
+  val metaDataItems: MutableStateFlow<List<LibStringItemChip>?> = MutableStateFlow(null)
+  val permissionsItems: MutableStateFlow<List<LibStringItemChip>?> = MutableStateFlow(null)
+  val dexLibItems: MutableStateFlow<List<LibStringItemChip>?> = MutableStateFlow(null)
+  val signaturesLibItems: MutableStateFlow<List<LibStringItemChip>?> = MutableStateFlow(null)
+  val componentsMap = SparseArray<MutableStateFlow<List<StatefulComponent>>>()
+  val abilitiesMap = SparseArray<MutableStateFlow<List<StatefulComponent>>>()
+  val itemsCountStateFlow: MutableStateFlow<LocatedCount> = MutableStateFlow(LocatedCount(0, 0))
+  val processToolIconVisibilityStateFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
+  val processMapStateFlow = MutableStateFlow<Map<String, Int>>(emptyMap())
   val itemsCountList = MutableList(12) { 0 }
-  val is64Bit = MutableLiveData<Boolean>(null)
+  val is64Bit = MutableStateFlow<Boolean?>(null)
 
-  var sortMode = GlobalValues.libSortMode
   var isApk = false
   var queriedText: String? = null
   var queriedProcess: String? = null
   var processesMap: Map<String, Int> = mapOf()
-  var processMode: Boolean = GlobalValues.processMode
   var nativeSourceMap: Map<String, Int> = mapOf()
 
   lateinit var packageInfo: PackageInfo
-  val packageInfoLiveData = MutableLiveData<PackageInfo>(null)
+  val packageInfoStateFlow = MutableStateFlow<PackageInfo?>(null)
 
   private val _featuresFlow = MutableSharedFlow<VersionedFeature>()
   val featuresFlow = _featuresFlow.asSharedFlow()
 
-  val abiBundle = MutableLiveData<AbiBundle>(null)
+  val abiBundleStateFlow = MutableStateFlow<AbiBundle?>(null)
 
   init {
-    componentsMap.put(SERVICE, MutableLiveData())
-    componentsMap.put(ACTIVITY, MutableLiveData())
-    componentsMap.put(RECEIVER, MutableLiveData())
-    componentsMap.put(PROVIDER, MutableLiveData())
+    componentsMap.put(SERVICE, MutableStateFlow(emptyList()))
+    componentsMap.put(ACTIVITY, MutableStateFlow(emptyList()))
+    componentsMap.put(RECEIVER, MutableStateFlow(emptyList()))
+    componentsMap.put(PROVIDER, MutableStateFlow(emptyList()))
   }
 
   fun isPackageInfoAvailable(): Boolean {
@@ -132,23 +127,23 @@ class DetailViewModel : ViewModel() {
     nativeSourceMap = sourceMap
 
     if (sourceMap.isNotEmpty()) {
-      processMapLiveData.postValue(sourceMap)
-      processToolIconVisibilityLiveData.postValue(true)
+      processMapStateFlow.emit(sourceMap)
+      processToolIconVisibilityStateFlow.emit(true)
     }
 
-    nativeLibItems.postValue(list)
+    nativeLibItems.emit(list)
   }
 
   fun initStaticData() = viewModelScope.launch(Dispatchers.IO) {
-    staticLibItems.postValue(getStaticChipList())
+    staticLibItems.emit(getStaticChipList())
   }
 
   fun initMetaDataData() = viewModelScope.launch(Dispatchers.IO) {
-    metaDataItems.postValue(getMetaDataChipList())
+    metaDataItems.emit(getMetaDataChipList())
   }
 
   fun initPermissionData() = viewModelScope.launch(Dispatchers.IO) {
-    permissionsItems.postValue(getPermissionChipList())
+    permissionsItems.emit(getPermissionChipList())
   }
 
   var initDexJob: Job? = null
@@ -157,12 +152,12 @@ class DetailViewModel : ViewModel() {
     initDexJob?.cancel()
     initDexJob = viewModelScope.launch(Dispatchers.IO) {
       val list = getDexChipList(packageName)
-      dexLibItems.postValue(list)
+      dexLibItems.emit(list)
     }
   }
 
   fun initSignatures(context: Context) = viewModelScope.launch {
-    signaturesLibItems.value = getSignatureChipList(context)
+    signaturesLibItems.emit(getSignatureChipList(context))
   }
 
   fun initComponentsData() = viewModelScope.launch(Dispatchers.IO) {
@@ -202,10 +197,10 @@ class DetailViewModel : ViewModel() {
         activities.forEach { sc -> processesSet.add(sc.processName) }
         receivers.forEach { sc -> processesSet.add(sc.processName) }
         providers.forEach { sc -> processesSet.add(sc.processName) }
-        componentsMap[SERVICE]?.postValue(services)
-        componentsMap[ACTIVITY]?.postValue(activities)
-        componentsMap[RECEIVER]?.postValue(receivers)
-        componentsMap[PROVIDER]?.postValue(providers)
+        componentsMap[SERVICE]?.emit(services)
+        componentsMap[ACTIVITY]?.emit(activities)
+        componentsMap[RECEIVER]?.emit(receivers)
+        componentsMap[PROVIDER]?.emit(providers)
       }
       processesMap =
         processesSet.filter { it.isNotEmpty() }.associateWith { UiUtils.getRandomColor() }
@@ -216,32 +211,32 @@ class DetailViewModel : ViewModel() {
 
   private val request: LibDetailRequest = ApiManager.create()
 
-  fun requestLibDetail(libName: String, @LibType type: Int, isRegex: Boolean = false) =
-    viewModelScope.launch(Dispatchers.IO) {
-      Timber.d("requestLibDetail")
-      var categoryDir = when (type) {
-        NATIVE -> "native-libs"
-        SERVICE -> "services-libs"
-        ACTIVITY -> "activities-libs"
-        RECEIVER -> "receivers-libs"
-        PROVIDER -> "providers-libs"
-        DEX -> "dex-libs"
-        STATIC -> "static-libs"
-        else -> throw IllegalArgumentException("Illegal LibType: $type.")
-      }
-      if (isRegex) {
-        categoryDir += "/regex"
-      }
-
-      detailBean.postValue(
-        try {
-          request.requestLibDetail(categoryDir, libName)
-        } catch (t: Throwable) {
-          Timber.e(t, "DetailViewModel")
-          null
-        }
-      )
+  suspend fun requestLibDetail(
+    libName: String,
+    @LibType type: Int,
+    isRegex: Boolean = false
+  ): LibDetailBean? {
+    Timber.d("requestLibDetail")
+    var categoryDir = when (type) {
+      NATIVE -> "native-libs"
+      SERVICE -> "services-libs"
+      ACTIVITY -> "activities-libs"
+      RECEIVER -> "receivers-libs"
+      PROVIDER -> "providers-libs"
+      DEX -> "dex-libs"
+      STATIC -> "static-libs"
+      else -> throw IllegalArgumentException("Illegal LibType: $type.")
     }
+    if (isRegex) {
+      categoryDir += "/regex"
+    }
+
+    return runCatching {
+      request.requestLibDetail(categoryDir, libName)
+    }.onFailure {
+      Timber.e(it)
+    }.getOrNull()
+  }
 
   private suspend fun getNativeChipList(
     info: ApplicationInfo,
@@ -278,8 +273,7 @@ class DetailViewModel : ViewModel() {
       return chipList
     } else {
       list.forEach {
-        rule = null
-        LCRules.getRule(it.name, STATIC, false)
+        rule = LCRules.getRule(it.name, STATIC, false)
         chipList.add(LibStringItemChip(it, rule))
       }
       if (GlobalValues.libSortMode == MODE_SORT_BY_SIZE) {
@@ -332,8 +326,7 @@ class DetailViewModel : ViewModel() {
       return chipList
     } else {
       list.forEach {
-        rule = null
-        LCRules.getRule(it.name, DEX, true)
+        rule = LCRules.getRule(it.name, DEX, true)
         chipList.add(LibStringItemChip(it, rule))
       }
       if (GlobalValues.libSortMode == MODE_SORT_BY_SIZE) {
@@ -359,10 +352,10 @@ class DetailViewModel : ViewModel() {
     }
 
   fun initAbilities(context: Context, packageName: String) = viewModelScope.launch(Dispatchers.IO) {
-    abilitiesMap.put(AbilityType.PAGE, MutableLiveData())
-    abilitiesMap.put(AbilityType.SERVICE, MutableLiveData())
-    abilitiesMap.put(AbilityType.WEB, MutableLiveData())
-    abilitiesMap.put(AbilityType.DATA, MutableLiveData())
+    abilitiesMap.put(AbilityType.PAGE, MutableStateFlow(emptyList()))
+    abilitiesMap.put(AbilityType.SERVICE, MutableStateFlow(emptyList()))
+    abilitiesMap.put(AbilityType.WEB, MutableStateFlow(emptyList()))
+    abilitiesMap.put(AbilityType.DATA, MutableStateFlow(emptyList()))
 
     try {
       ApplicationDelegate(context).iBundleManager?.getBundleInfo(
@@ -414,10 +407,10 @@ class DetailViewModel : ViewModel() {
           }
           .toList()
 
-        abilitiesMap[AbilityType.PAGE]?.postValue(pages)
-        abilitiesMap[AbilityType.SERVICE]?.postValue(services)
-        abilitiesMap[AbilityType.WEB]?.postValue(webs)
-        abilitiesMap[AbilityType.DATA]?.postValue(datas)
+        abilitiesMap[AbilityType.PAGE]?.emit(pages)
+        abilitiesMap[AbilityType.SERVICE]?.emit(services)
+        abilitiesMap[AbilityType.WEB]?.emit(webs)
+        abilitiesMap[AbilityType.DATA]?.emit(datas)
       }
     } catch (e: Exception) {
       Timber.e(e)
@@ -503,7 +496,20 @@ class DetailViewModel : ViewModel() {
       ignoreArch = true
     ).toSet()
     val abi = PackageUtils.getAbi(packageInfo, isApk = apkAnalyticsMode, abiSet = abiSet)
-    abiBundle.postValue(AbiBundle(abi, abiSet.sortedByDescending { it == abi }.toSet()))
+    abiBundleStateFlow.emit(AbiBundle(abi, abiSet.sortedByDescending { it == abi }.toSet()))
+  }
+
+  fun updateProcessMap(map: Map<String, Int>) = viewModelScope.launch {
+    processMapStateFlow.emit(map)
+  }
+
+  fun updateProcessToolIconVisibility(visible: Boolean) = viewModelScope.launch {
+    processToolIconVisibilityStateFlow.emit(visible)
+  }
+
+  fun updateItemsCountStateFlow(locate: Int, count: Int) = viewModelScope.launch {
+    itemsCountStateFlow.value = LocatedCount(locate, count)
+    itemsCountList[locate] = count
   }
 
   data class AbiBundle(val abi: Int, val abiSet: Set<Int>)

@@ -4,8 +4,8 @@ import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.compat.VersionCompat
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
-import com.absinthe.libchecker.features.applist.LocatedCount
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibStringDiffUtil
 import com.absinthe.libchecker.features.applist.detail.ui.base.BaseDetailFragment
@@ -16,6 +16,8 @@ import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.extensions.putArguments
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import rikka.core.util.ClipboardUtils
@@ -25,17 +27,16 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
   override fun getRecyclerView() = binding.list
   override val needShowLibDetailDialog = false
 
-  private var itemsList: List<LibStringItemChip>? = null
-
   override fun init() {
     binding.apply {
       list.apply {
         adapter = this@AbilityAnalysisFragment.adapter
       }
     }
+    val flow = viewModel.abilitiesMap[adapter.type]
 
     viewModel.apply {
-      abilitiesMap[adapter.type]?.observe(viewLifecycleOwner) { componentList ->
+      flow?.onEach { componentList ->
         if (componentList.isEmpty()) {
           emptyView.text.text = getString(R.string.empty_list)
         } else {
@@ -60,12 +61,11 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
               )
             }
 
-            if (sortMode == MODE_SORT_BY_LIB) {
+            if (GlobalValues.libSortMode == MODE_SORT_BY_LIB) {
               list.sortByDescending { it.rule != null }
             } else {
               adapter.data.sortedByDescending { it.item.name }
             }
-            itemsList = list
 
             if (viewModel.queriedText?.isNotEmpty() == true) {
               filterList(viewModel.queriedText!!)
@@ -80,12 +80,10 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
           }
         }
         if (!isListReady) {
-          viewModel.itemsCountLiveData.value =
-            LocatedCount(locate = type, count = componentList.size)
-          viewModel.itemsCountList[type] = componentList.size
+          viewModel.updateItemsCountStateFlow(type, componentList.size)
           isListReady = true
         }
-      }
+      }?.launchIn(lifecycleScope)
     }
 
     adapter.apply {
@@ -96,10 +94,12 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
       setDiffCallback(LibStringDiffUtil())
       setEmptyView(emptyView)
     }
-  }
 
-  override fun getFilterListByText(text: String): List<LibStringItemChip>? {
-    return itemsList?.filter { it.item.name.contains(text, true) }
+    if (flow?.value?.isNotEmpty() == true) {
+      lifecycleScope.launch {
+        flow.emit(flow.value)
+      }
+    }
   }
 
   private fun doOnLongClick(componentName: String) {

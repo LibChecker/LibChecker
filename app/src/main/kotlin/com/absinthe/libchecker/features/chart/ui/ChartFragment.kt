@@ -77,7 +77,7 @@ class ChartFragment :
     binding.btnCompose.isVisible = featureInitialized
 
     viewModel.apply {
-      dbItems.observe(viewLifecycleOwner) {
+      dbItems.onEach {
         if (featureInitialized) {
           setDataJob?.cancel()
           setDataJob = lifecycleScope.launch(Dispatchers.IO) {
@@ -87,7 +87,7 @@ class ChartFragment :
             }
           }
         }
-      }
+      }.launchIn(lifecycleScope)
     }
     lifecycleScope.launch {
       lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {

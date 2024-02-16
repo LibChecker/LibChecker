@@ -4,8 +4,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
-import com.absinthe.libchecker.features.applist.LocatedCount
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.features.applist.Referable
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibStringDiffUtil
@@ -19,6 +19,8 @@ import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.Rule
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -31,15 +33,14 @@ class ComponentsAnalysisFragment : BaseFilterAnalysisFragment<FragmentLibCompone
 
   override fun init() {
     binding.list.adapter = adapter
+    val flow = viewModel.componentsMap.get(adapter.type)
 
     viewModel.apply {
-      componentsMap.get(adapter.type).observe(viewLifecycleOwner) { componentList ->
+      flow.onEach { componentList ->
         if (componentList.isEmpty()) {
           emptyView.text.text = getString(R.string.empty_list)
         } else {
-          if (!componentList.isNullOrEmpty()) {
-            adapter.processMap = viewModel.processesMap
-          }
+          adapter.processMap = viewModel.processesMap
           lifecycleScope.launch(Dispatchers.IO) {
             val list = mutableListOf<LibStringItemChip>()
             var rule: Rule?
@@ -69,7 +70,7 @@ class ComponentsAnalysisFragment : BaseFilterAnalysisFragment<FragmentLibCompone
               )
             }
 
-            if (sortMode == MODE_SORT_BY_LIB) {
+            if (GlobalValues.libSortMode == MODE_SORT_BY_LIB) {
               list.sortWith(compareByDescending<LibStringItemChip> { it.rule != null }.thenBy { it.item.name })
             } else {
               list.sortBy { it.item.name }
@@ -93,22 +94,22 @@ class ComponentsAnalysisFragment : BaseFilterAnalysisFragment<FragmentLibCompone
           }
         }
         if (!isListReady) {
-          viewModel.itemsCountLiveData.value =
-            LocatedCount(locate = type, count = componentList.size)
-          viewModel.itemsCountList[type] = componentList.size
+          viewModel.updateItemsCountStateFlow(type, componentList.size)
           isListReady = true
         }
-      }
+      }.launchIn(lifecycleScope)
     }
 
     adapter.apply {
       setDiffCallback(LibStringDiffUtil())
       setEmptyView(emptyView)
     }
-  }
 
-  override fun getFilterListByText(text: String): List<LibStringItemChip>? {
-    return itemsList?.filter { it.item.name.contains(text, true) }
+    if (flow.value.isNotEmpty()) {
+      lifecycleScope.launch {
+        flow.emit(flow.value)
+      }
+    }
   }
 
   override fun getFilterList(process: String?): List<LibStringItemChip>? {

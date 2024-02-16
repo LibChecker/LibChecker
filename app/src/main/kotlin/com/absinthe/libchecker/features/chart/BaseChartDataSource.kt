@@ -9,9 +9,9 @@ abstract class BaseChartDataSource<T : View> : IChartDataSource<T> {
   protected abstract val classifiedList: List<MutableList<LCItem>>
 
   protected val filteredList = if (GlobalValues.isShowSystemApps) {
-    Repositories.lcRepository.allDatabaseItems.value
+    Repositories.lcRepository.allLCItemsStateFlow.value
   } else {
-    Repositories.lcRepository.allDatabaseItems.value?.filter { !it.isSystem }
+    Repositories.lcRepository.allLCItemsStateFlow.value.filter { !it.isSystem }
   }
 
   override fun getListByXValue(x: Int): List<LCItem> {

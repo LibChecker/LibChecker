@@ -20,8 +20,8 @@ import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.compat.VersionCompat
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.features.applist.DetailFragmentManager
-import com.absinthe.libchecker.features.applist.LocatedCount
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.features.applist.Referable
 import com.absinthe.libchecker.features.applist.Sortable
@@ -96,7 +96,6 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
   private var integrationBlockerList: List<ShareCmpInfo.Component>? = null
 
   abstract fun getRecyclerView(): RecyclerView
-  abstract fun getFilterListByText(text: String): List<LibStringItemChip>?
 
   protected abstract val needShowLibDetailDialog: Boolean
 
@@ -121,7 +120,7 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
         doOnLongClick(context, getItem(position), position)
         true
       }
-      setProcessMode(viewModel.processMode)
+      setProcessMode(GlobalValues.processMode)
     }
   }
 
@@ -138,12 +137,12 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
     super.onVisibilityChanged(visible)
     if (visible) {
       if (this is ComponentsAnalysisFragment && viewModel.processesMap.isNotEmpty()) {
-        viewModel.processToolIconVisibilityLiveData.postValue(isComponentFragment())
+        viewModel.updateProcessToolIconVisibility(isComponentFragment())
       } else {
         if (this is NativeAnalysisFragment && viewModel.nativeSourceMap.isNotEmpty()) {
-          viewModel.processToolIconVisibilityLiveData.postValue(true)
+          viewModel.updateProcessToolIconVisibility(true)
         } else {
-          viewModel.processToolIconVisibilityLiveData.postValue(false)
+          viewModel.updateProcessToolIconVisibility(false)
         }
       }
     }
@@ -160,7 +159,7 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
         null
       }
 
-    if (viewModel.sortMode == MODE_SORT_BY_LIB) {
+    if (GlobalValues.libSortMode == MODE_SORT_BY_LIB) {
       if (type == NATIVE) {
         list.sortByDescending { it.item.size }
       } else {
@@ -182,17 +181,17 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
 
   override fun filterList(text: String) {
     adapter.highlightText = text
-    getFilterListByText(text)?.let {
+
+    with(getFilterListByText(text)) {
       lifecycleScope.launch(Dispatchers.Main) {
-        if (it.isEmpty()) {
+        if (isEmpty()) {
           if (getRecyclerView().itemDecorationCount > 0) {
             getRecyclerView().removeItemDecoration(dividerItemDecoration)
           }
           emptyView.text.text = getString(R.string.empty_list)
         }
-        adapter.setDiffNewData(it.toMutableList()) {
-          viewModel.itemsCountLiveData.value = LocatedCount(locate = type, count = it.size)
-          viewModel.itemsCountList[type] = it.size
+        adapter.setDiffNewData(this@with.toMutableList()) {
+          viewModel.updateItemsCountStateFlow(type, size)
           doOnMainThreadIdle {
             //noinspection NotifyDataSetChanged
             adapter.notifyDataSetChanged()
@@ -236,6 +235,10 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
         }
       }
     }
+  }
+
+  protected open fun getFilterListByText(text: String): List<LibStringItemChip> {
+    return adapter.data.filter { it.item.name.contains(text, true) }
   }
 
   private fun navigateToComponentImpl(component: String) {
@@ -296,7 +299,7 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
   }
 
   protected fun hasNonGrantedPermissions(): Boolean {
-    return type == PERMISSION && (viewModel.permissionsItems.value?.any { it.item.size == 0L } == true)
+    return type == PERMISSION && viewModel.permissionsItems.value?.any { it.item.size == 0L } == true
   }
 
   private fun doOnLongClick(context: Context, item: LibStringItemChip, position: Int) {

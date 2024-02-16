@@ -33,7 +33,6 @@ androidX-browser = "androidx.browser:browser:1.7.0"
 androidX-constraintLayout = "androidx.constraintlayout:constraintlayout:2.1.4"
 androidX-core = "androidx.core:core-ktx:1.12.0"
 androidX-fragment = "androidx.fragment:fragment-ktx:1.6.2"
-androidX-lifecycle-liveData = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "androidX-lifecycle" }
 androidX-lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "androidX-lifecycle" }
 androidX-lifecycle-viewModel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidX-lifecycle" }
 androidX-preference = "androidx.preference:preference-ktx:1.2.1"
@@ -101,7 +100,6 @@ ktlint = "com.pinterest.ktlint:ktlint-cli:1.1.1"
 [bundles]
 androidX-lifecycle = [
   "androidX-lifecycle-viewModel",
-  "androidX-lifecycle-liveData",
   "androidX-lifecycle-service"
 ]
 androidX-room = [
