@@ -13,6 +13,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.AndroidVersions
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.FragmentPieChartBinding
 import com.absinthe.libchecker.features.chart.BaseVariableChartDataSource
@@ -43,6 +44,8 @@ import com.google.android.material.button.MaterialButtonToggleGroup
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import rikka.core.util.ClipboardUtils
@@ -74,7 +77,7 @@ class ChartFragment :
     binding.btnCompose.isVisible = featureInitialized
 
     viewModel.apply {
-      dbItems.observe(viewLifecycleOwner) {
+      dbItems.onEach {
         if (featureInitialized) {
           setDataJob?.cancel()
           setDataJob = lifecycleScope.launch(Dispatchers.IO) {
@@ -84,7 +87,7 @@ class ChartFragment :
             }
           }
         }
-      }
+      }.launchIn(lifecycleScope)
     }
     lifecycleScope.launch {
       lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -107,9 +110,11 @@ class ChartFragment :
       }
     }
 
-    GlobalValues.isShowSystemApps.observe(viewLifecycleOwner) {
-      setData()
-    }
+    GlobalValues.preferencesFlow.onEach {
+      if (it.first == Constants.PREF_SHOW_SYSTEM_APPS) {
+        setData()
+      }
+    }.launchIn(lifecycleScope)
   }
 
   private fun setData() {
@@ -158,23 +163,20 @@ class ChartFragment :
       chartView.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
     }
 
-    dialog = ClassifyBottomSheetDialogFragment()
-    viewModel.filteredList.postValue(emptyList())
+    dialog = ClassifyBottomSheetDialogFragment().also {
+      lifecycleScope.launch(Dispatchers.IO) {
+        it.setTitle(dataSource?.getLabelByXValue(requireContext(), h.x.toInt()).orEmpty())
+        it.setList(dataSource?.getListByXValue(h.x.toInt()) ?: emptyList())
 
-    lifecycleScope.launch(Dispatchers.IO) {
-      viewModel.dialogTitle.postValue(dataSource?.getLabelByXValue(requireContext(), h.x.toInt()).orEmpty())
-      viewModel.filteredList.postValue(dataSource?.getListByXValue(h.x.toInt()) ?: emptyList())
+        if (dataSource is TargetApiChartDataSource || dataSource is MinApiChartDataSource) {
+          val index = (dataSource as BaseVariableChartDataSource<*>).getListKeyByXValue(h.x.toInt())
+          it.setAndroidVersionLabel(AndroidVersions.versions.find { it.first == index })
+        } else {
+          it.setAndroidVersionLabel(null)
+        }
 
-      if (dataSource is TargetApiChartDataSource || dataSource is MinApiChartDataSource) {
-        val index = (dataSource as BaseVariableChartDataSource<*>).getListKeyByXValue(h.x.toInt())
-        viewModel.androidVersion.postValue(AndroidVersions.versions.find { it.first == index })
-      } else {
-        viewModel.androidVersion.postValue(null)
-      }
-
-      withContext(Dispatchers.Main) {
-        activity?.let { activity ->
-          dialog?.also {
+        withContext(Dispatchers.Main) {
+          activity?.let { activity ->
             it.setOnDismiss {
               this@ChartFragment.dialog = null
               (chartView as? Chart<*>)?.highlightValue(null)

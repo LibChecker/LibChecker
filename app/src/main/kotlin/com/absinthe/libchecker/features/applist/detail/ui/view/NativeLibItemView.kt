@@ -15,12 +15,11 @@ import androidx.core.view.children
 import androidx.core.view.marginEnd
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.features.statistics.bean.LibChip
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
-import com.absinthe.libchecker.utils.extensions.valueUnsafe
 import com.absinthe.libchecker.view.AViewGroup
+import com.absinthe.rulesbundle.Rule
 import com.google.android.material.chip.Chip
 
 class NativeLibItemView(context: Context) : AViewGroup(context) {
@@ -60,8 +59,8 @@ class NativeLibItemView(context: Context) : AViewGroup(context) {
 
   private var chip: Chip? = null
 
-  fun setChip(libChip: LibChip?) {
-    if (libChip == null) {
+  fun setChip(rule: Rule?) {
+    if (rule == null) {
       chip?.let {
         removeView(it)
         chip = null
@@ -75,10 +74,10 @@ class NativeLibItemView(context: Context) : AViewGroup(context) {
         }
       }
       chip!!.apply {
-        text = libChip.name
-        setChipIconResource(libChip.iconRes)
+        text = rule.label
+        setChipIconResource(rule.iconRes)
 
-        if (!GlobalValues.isColorfulIcon.valueUnsafe) {
+        if (!GlobalValues.isColorfulIcon && !rule.isSimpleColorIcon) {
           val icon = chipIcon
           icon?.let {
             it.colorFilter =

@@ -4,7 +4,6 @@ import android.util.SparseArray
 import androidx.core.util.forEach
 import androidx.core.util.valueIterator
 import com.absinthe.libchecker.annotation.LibType
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.features.applist.detail.ui.base.BaseDetailFragment
 import com.absinthe.libchecker.features.applist.detail.ui.base.BaseFilterAnalysisFragment
 
@@ -58,11 +57,6 @@ class DetailFragmentManager {
     map.forEach { _, value ->
       (value as? BaseFilterAnalysisFragment)?.filterItems(condition)
     }
-  }
-
-  fun changeSortMode(mode: Int) {
-    GlobalValues.libSortModeLiveData.value = mode
-    GlobalValues.libSortMode = mode
   }
 
   fun navigateToComponent(@LibType refType: Int, component: String) {

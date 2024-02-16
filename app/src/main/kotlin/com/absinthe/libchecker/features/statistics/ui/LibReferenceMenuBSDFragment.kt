@@ -14,7 +14,7 @@ class LibReferenceMenuBSDFragment : BaseBottomSheetViewDialogFragment<LibReferen
   private val previousAdvancedOptions = GlobalValues.libReferenceOptions
   private val optionsViewMap = mutableMapOf<Int, LibReferenceMenuItemView>()
 
-  private var onDismissCallback: () -> Unit = {}
+  private var onDismissCallback: (optionsDiff: Int) -> Unit = {}
 
   override fun initRootView(): LibReferenceMenuBSDView = LibReferenceMenuBSDView(requireContext())
 
@@ -36,9 +36,7 @@ class LibReferenceMenuBSDFragment : BaseBottomSheetViewDialogFragment<LibReferen
     optionsViewMap[LibReferenceOptions.ONLY_NOT_MARKED] = root.addOptionItemView(R.string.ref_category_only_not_marked, LibReferenceOptions.ONLY_NOT_MARKED)
 
     dialog?.setOnDismissListener {
-      if (GlobalValues.libReferenceOptions != previousAdvancedOptions) {
-        onDismissCallback()
-      }
+      onDismissCallback(previousAdvancedOptions.xor(GlobalValues.libReferenceOptions))
     }
   }
 
@@ -54,7 +52,7 @@ class LibReferenceMenuBSDFragment : BaseBottomSheetViewDialogFragment<LibReferen
     }
   }
 
-  fun setOnDismissListener(action: () -> Unit) {
+  fun setOnDismissListener(action: (optionsDiff: Int) -> Unit) {
     onDismissCallback = action
   }
 }

@@ -1,9 +1,9 @@
 package com.absinthe.libchecker.features.applist.detail.ui.impl
 
+import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
-import com.absinthe.libchecker.features.applist.LocatedCount
 import com.absinthe.libchecker.features.applist.Referable
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibStringDiffUtil
@@ -12,6 +12,9 @@ import com.absinthe.libchecker.features.applist.detail.ui.base.EXTRA_TYPE
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.putArguments
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 class PermissionAnalysisFragment :
   BaseFilterAnalysisFragment<FragmentLibComponentBinding>(),
@@ -27,36 +30,43 @@ class PermissionAnalysisFragment :
       }
     }
 
-    viewModel.permissionsItems.observe(viewLifecycleOwner) {
-      if (it.isEmpty()) {
-        emptyView.text.text = getString(R.string.empty_list)
-      } else {
-        if (viewModel.queriedText?.isNotEmpty() == true) {
-          filterList(viewModel.queriedText!!)
-        } else {
-          context?.let {
-            binding.list.addItemDecoration(dividerItemDecoration)
-          }
-          adapter.setDiffNewData(it.toMutableList(), afterListReadyTask)
-        }
-      }
-
-      if (!isListReady) {
-        viewModel.itemsCountLiveData.value = LocatedCount(locate = type, count = it.size)
-        viewModel.itemsCountList[type] = it.size
-        isListReady = true
-      }
-    }
-
     adapter.apply {
       animationEnable = true
       setDiffCallback(LibStringDiffUtil())
       setEmptyView(emptyView)
     }
 
-    viewModel.packageInfoLiveData.observe(viewLifecycleOwner) {
-      if (it != null) {
-        viewModel.initPermissionData()
+    viewModel.apply {
+      permissionsItems.onEach {
+        if (it == null) return@onEach
+        if (it.isEmpty()) {
+          emptyView.text.text = getString(R.string.empty_list)
+        } else {
+          if (viewModel.queriedText?.isNotEmpty() == true) {
+            filterList(viewModel.queriedText!!)
+          } else {
+            context?.let {
+              binding.list.addItemDecoration(dividerItemDecoration)
+            }
+            adapter.setDiffNewData(it.toMutableList(), afterListReadyTask)
+          }
+        }
+
+        if (!isListReady) {
+          viewModel.updateItemsCountStateFlow(type, it.size)
+          isListReady = true
+        }
+      }.launchIn(lifecycleScope)
+      packageInfoStateFlow.onEach {
+        if (it != null) {
+          viewModel.initPermissionData()
+        }
+      }.launchIn(lifecycleScope)
+    }
+
+    if (viewModel.permissionsItems.value.isNullOrEmpty().not()) {
+      lifecycleScope.launch {
+        viewModel.permissionsItems.emit(viewModel.permissionsItems.value)
       }
     }
   }
@@ -67,19 +77,13 @@ class PermissionAnalysisFragment :
       if (hasNonGrantedPermissions()) {
         val label = requireContext().getString(R.string.permission_not_granted)
         val color = R.color.material_red_400.getColor(requireContext())
-        viewModel.processMapLiveData.postValue(
-          mapOf(label to color)
-        )
+        viewModel.updateProcessMap(mapOf(label to color))
       } else {
-        viewModel.processMapLiveData.postValue(emptyMap())
+        viewModel.updateProcessMap(emptyMap())
       }
     } else {
-      viewModel.processMapLiveData.postValue(viewModel.processesMap)
+      viewModel.updateProcessMap(viewModel.processesMap)
     }
-  }
-
-  override fun getFilterListByText(text: String): List<LibStringItemChip>? {
-    return viewModel.permissionsItems.value?.filter { it.item.name.contains(text, true) }
   }
 
   override fun getFilterList(process: String?): List<LibStringItemChip>? {

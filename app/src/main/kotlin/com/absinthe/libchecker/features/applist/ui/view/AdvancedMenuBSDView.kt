@@ -15,7 +15,6 @@ import com.absinthe.libchecker.features.applist.ui.adapter.AppAdapter
 import com.absinthe.libchecker.features.home.ui.adapter.AdvancedMenuAdapter
 import com.absinthe.libchecker.features.statistics.bean.DISABLED
 import com.absinthe.libchecker.features.statistics.bean.EXPORTED
-import com.absinthe.libchecker.features.statistics.bean.LibChip
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
@@ -24,6 +23,7 @@ import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
+import com.absinthe.rulesbundle.Rule
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayout
@@ -115,9 +115,12 @@ class AdvancedMenuBSDView(context: Context) : LinearLayout(context), IHeaderView
               name = Constants.EXAMPLE_EXPORTED,
               source = EXPORTED
             ),
-            LibChip(
+            Rule(
+              Constants.EXAMPLE_RULE,
               R.drawable.ic_logo,
-              Constants.EXAMPLE_RULE
+              null,
+              null,
+              true
             )
           )
         )
@@ -126,9 +129,12 @@ class AdvancedMenuBSDView(context: Context) : LinearLayout(context), IHeaderView
             LibStringItem(
               name = Constants.EXAMPLE_NORMAL
             ),
-            LibChip(
+            Rule(
+              Constants.EXAMPLE_RULE,
               R.drawable.ic_logo,
-              Constants.EXAMPLE_RULE
+              null,
+              null,
+              true
             )
           )
         )
@@ -138,9 +144,12 @@ class AdvancedMenuBSDView(context: Context) : LinearLayout(context), IHeaderView
               name = Constants.EXAMPLE_DISABLED,
               source = DISABLED
             ),
-            LibChip(
+            Rule(
+              Constants.EXAMPLE_RULE,
               R.drawable.ic_logo,
-              Constants.EXAMPLE_RULE
+              null,
+              null,
+              true
             )
           )
         )

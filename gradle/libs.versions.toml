@@ -33,7 +33,6 @@ androidX-browser = "androidx.browser:browser:1.7.0"
 androidX-constraintLayout = "androidx.constraintlayout:constraintlayout:2.1.4"
 androidX-core = "androidx.core:core-ktx:1.12.0"
 androidX-fragment = "androidx.fragment:fragment-ktx:1.6.2"
-androidX-lifecycle-liveData = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "androidX-lifecycle" }
 androidX-lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "androidX-lifecycle" }
 androidX-lifecycle-viewModel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidX-lifecycle" }
 androidX-preference = "androidx.preference:preference-ktx:1.2.1"
@@ -86,7 +85,7 @@ drakeet-multitype = "com.drakeet.multitype:multitype:4.3.0"
 fastScroll = "me.zhanghai.android.fastscroll:library:1.3.0"
 flexbox = "com.google.android.flexbox:flexbox:3.0.0"
 hiddenApiBypass = "org.lsposed.hiddenapibypass:hiddenapibypass:4.3"
-lc-rules = "com.github.LibChecker:LibChecker-Rules-Bundle:34.7"
+lc-rules = "com.github.LibChecker:LibChecker-Rules-Bundle:34.9"
 lottie = "com.airbnb.android:lottie:6.3.0"
 mpAndroidChart = "com.github.AppDevNext:AndroidChart:3.1.0.21"
 once = "com.jonathanfinerty.once:once:1.3.1"
@@ -101,7 +100,6 @@ ktlint = "com.pinterest.ktlint:ktlint-cli:1.1.1"
 [bundles]
 androidX-lifecycle = [
   "androidX-lifecycle-viewModel",
-  "androidX-lifecycle-liveData",
   "androidX-lifecycle-service"
 ]
 androidX-room = [

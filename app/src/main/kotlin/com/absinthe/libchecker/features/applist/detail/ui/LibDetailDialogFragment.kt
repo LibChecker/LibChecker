@@ -70,62 +70,58 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
       root.showNotFound()
       return
     }
-    viewModel.detailBean.observe(viewLifecycleOwner) {
-      if (it != null) {
-        root.apply {
-          libDetailContentView.apply {
-            label.text.text = it.label
-            team.text.text = it.team
-            contributor.text.text = it.contributors.toContributorsString()
-            description.text.text = it.description
-            relativeLink.text.apply {
-              isClickable = true
-              movementMethod = LinkMovementMethod.getInstance()
-              text = HtmlCompat.fromHtml(
-                "<a href='${it.relativeUrl}'> ${it.relativeUrl} </a>",
-                HtmlCompat.FROM_HTML_MODE_LEGACY
-              )
+    lifecycleScope.launch(Dispatchers.IO) {
+      runCatching {
+        val detail = if (regexName.isNullOrEmpty()) {
+          viewModel.requestLibDetail(libName, type)
+        } else {
+          viewModel.requestLibDetail(regexName!!, type, true)
+        }
+        if (detail != null) {
+          root.apply {
+            withContext(Dispatchers.Main) {
+              libDetailContentView.apply {
+                label.text.text = detail.label
+                team.text.text = detail.team
+                contributor.text.text = detail.contributors.toContributorsString()
+                description.text.text = detail.description
+                relativeLink.text.apply {
+                  isClickable = true
+                  movementMethod = LinkMovementMethod.getInstance()
+                  text = HtmlCompat.fromHtml(
+                    "<a href='${detail.relativeUrl}'> ${detail.relativeUrl} </a>",
+                    HtmlCompat.FROM_HTML_MODE_LEGACY
+                  )
+                }
+              }
+              showContent()
             }
-          }
 
-          root.showContent()
-
-          if (it.relativeUrl.startsWith(URLManager.GITHUB_HOST) && GlobalValues.isGitHubUnreachable) {
-            lifecycleScope.launch(Dispatchers.IO) {
-              val splits = it.relativeUrl.removePrefix(URLManager.GITHUB_HOST).split("/")
+            if (detail.relativeUrl.startsWith(URLManager.GITHUB_HOST) && GlobalValues.isGitHubUnreachable) {
+              val splits = detail.relativeUrl.removePrefix(URLManager.GITHUB_HOST).split("/")
               if (splits.size < 2) {
                 return@launch
               }
               val date = viewModel.getRepoUpdatedTime(splits[0], splits[1]) ?: return@launch
               withContext(Dispatchers.Main) {
-                root.libDetailContentView.setUpdatedTime(date)
+                libDetailContentView.setUpdatedTime(date)
               }
             }
           }
-        }
-      } else {
-        if (isStickyEventReceived) {
-          root.showNotFound()
         } else {
-          isStickyEventReceived = true
+          if (isStickyEventReceived) {
+            withContext(Dispatchers.Main) {
+              root.showNotFound()
+            }
+          } else {
+            isStickyEventReceived = true
+          }
         }
+      }.onFailure {
+        Timber.e(it)
+        context?.showToast(it.message.toString())
       }
     }
-    runCatching {
-      if (regexName.isNullOrEmpty()) {
-        viewModel.requestLibDetail(libName, type)
-      } else {
-        viewModel.requestLibDetail(regexName!!, type, true)
-      }
-    }.onFailure {
-      Timber.e(it)
-      context?.showToast(it.message.toString())
-    }
-  }
-
-  override fun onDestroyView() {
-    super.onDestroyView()
-    viewModel.detailBean.value = null
   }
 
   override fun show(manager: FragmentManager, tag: String?) {

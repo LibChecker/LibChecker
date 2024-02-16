@@ -16,7 +16,7 @@ class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBS
   private val optionsViewMap = mutableMapOf<Int, AdvancedMenuItemView>()
   private val itemOptionsViewMap = mutableMapOf<Int, AdvancedMenuItemView>()
 
-  private var onDismissCallback: () -> Unit = {}
+  private var onDismissCallback: ((advancedDiff: Int, itemAdvancedDiff: Int) -> Unit)? = null
 
   override fun initRootView(): AdvancedMenuBSDView = AdvancedMenuBSDView(requireContext())
 
@@ -71,9 +71,10 @@ class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBS
     }
 
     dialog?.setOnDismissListener {
-      if (GlobalValues.advancedOptions != previousAdvancedOptions || GlobalValues.itemAdvancedOptions != previousItemAdvancedOptions) {
-        onDismissCallback()
-      }
+      onDismissCallback?.invoke(
+        previousAdvancedOptions.xor(GlobalValues.advancedOptions),
+        previousItemAdvancedOptions.xor(GlobalValues.itemAdvancedOptions)
+      )
     }
   }
 
@@ -90,7 +91,7 @@ class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBS
     }
   }
 
-  fun setOnDismissListener(action: () -> Unit) {
+  fun setOnDismissListener(action: (advancedDiff: Int, itemAdvancedDiff: Int) -> Unit) {
     onDismissCallback = action
   }
 }

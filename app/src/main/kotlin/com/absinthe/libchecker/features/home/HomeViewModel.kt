@@ -33,7 +33,6 @@ import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.features.applist.detail.bean.StatefulComponent
-import com.absinthe.libchecker.features.statistics.bean.LibChip
 import com.absinthe.libchecker.features.statistics.bean.LibReference
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.services.IWorkerService
@@ -82,7 +81,6 @@ class HomeViewModel : ViewModel() {
   var savedThreshold = GlobalValues.libReferenceThreshold
 
   var controller: IListController? = null
-  var libRefSystemApps: Boolean? = null
   var appListStatus: Int = STATUS_NOT_START
   var workerBinder: IWorkerService? = null
 
@@ -310,7 +308,7 @@ class HomeViewModel : ViewModel() {
 
   private fun collectPopularLibraries(appMap: Map<String, PackageInfo>) =
     viewModelScope.launch(Dispatchers.IO) {
-      if (GlobalValues.isAnonymousAnalyticsEnabled.value == false) {
+      if (GlobalValues.isAnonymousAnalyticsEnabled.not()) {
         return@launch
       }
       val appList = appMap.values
@@ -416,7 +414,7 @@ class HomeViewModel : ViewModel() {
     referenceMap = null
     _libReference.emit(null)
     val map = HashMap<String, Pair<MutableSet<String>, Int>>()
-    val showSystem = GlobalValues.isShowSystemApps.value ?: false
+    val showSystem = GlobalValues.isShowSystemApps
 
     var progressCount = 0
 
@@ -444,31 +442,32 @@ class HomeViewModel : ViewModel() {
 
     updateLibRefProgress(0)
 
-    if (GlobalValues.libReferenceOptions and LibReferenceOptions.NATIVE_LIBS > 0) {
+    val options = GlobalValues.libReferenceOptions
+    if (options and LibReferenceOptions.NATIVE_LIBS > 0) {
       computeInternal(NATIVE)
     }
-    if (GlobalValues.libReferenceOptions and LibReferenceOptions.SERVICES > 0) {
+    if (options and LibReferenceOptions.SERVICES > 0) {
       computeInternal(SERVICE)
     }
-    if (GlobalValues.libReferenceOptions and LibReferenceOptions.ACTIVITIES > 0) {
+    if (options and LibReferenceOptions.ACTIVITIES > 0) {
       computeInternal(ACTIVITY)
     }
-    if (GlobalValues.libReferenceOptions and LibReferenceOptions.RECEIVERS > 0) {
+    if (options and LibReferenceOptions.RECEIVERS > 0) {
       computeInternal(RECEIVER)
     }
-    if (GlobalValues.libReferenceOptions and LibReferenceOptions.PROVIDERS > 0) {
+    if (options and LibReferenceOptions.PROVIDERS > 0) {
       computeInternal(PROVIDER)
     }
-    if (GlobalValues.libReferenceOptions and LibReferenceOptions.PERMISSIONS > 0) {
+    if (options and LibReferenceOptions.PERMISSIONS > 0) {
       computeInternal(PERMISSION)
     }
-    if (GlobalValues.libReferenceOptions and LibReferenceOptions.METADATA > 0) {
+    if (options and LibReferenceOptions.METADATA > 0) {
       computeInternal(METADATA)
     }
-    if (GlobalValues.libReferenceOptions and LibReferenceOptions.PACKAGES > 0) {
+    if (options and LibReferenceOptions.PACKAGES > 0) {
       computeInternal(PACKAGE)
     }
-    if (GlobalValues.libReferenceOptions and LibReferenceOptions.SHARED_UID > 0) {
+    if (options and LibReferenceOptions.SHARED_UID > 0) {
       computeInternal(SHARED_UID)
     }
 
@@ -667,24 +666,17 @@ class HomeViewModel : ViewModel() {
         updateLibRefProgressImpl()
 
         val refList = mutableListOf<LibReference>()
+        val threshold = GlobalValues.libReferenceThreshold
+        val isOnlyNotMarked = GlobalValues.libReferenceOptions and LibReferenceOptions.ONLY_NOT_MARKED > 0
 
-        var chip: LibChip?
         var rule: Rule?
         for (entry in map) {
           if (!isActive) {
             return@let
           }
-          if (entry.value.first.size >= GlobalValues.libReferenceThreshold && entry.key.isNotBlank()) {
+          if (entry.value.first.size >= threshold && entry.key.isNotBlank()) {
             rule = LCRules.getRule(entry.key, entry.value.second, true)
-            chip = null
-            rule?.let {
-              chip = LibChip(
-                iconRes = it.iconRes,
-                name = it.label,
-                regexName = it.regexName
-              )
-            }
-            val shouldAdd = if (GlobalValues.libReferenceOptions and LibReferenceOptions.ONLY_NOT_MARKED > 0) {
+            val shouldAdd = if (isOnlyNotMarked) {
               rule == null && entry.value.second != PERMISSION && entry.value.second != METADATA
             } else {
               true
@@ -693,7 +685,7 @@ class HomeViewModel : ViewModel() {
               refList.add(
                 LibReference(
                   entry.key,
-                  chip,
+                  rule,
                   entry.value.first,
                   entry.value.second
                 )
@@ -718,7 +710,8 @@ class HomeViewModel : ViewModel() {
 
   fun refreshRef() = viewModelScope.launch(Dispatchers.IO) {
     _savedRefList?.let { ref ->
-      _libReference.emit(ref.filter { it.referredList.size >= GlobalValues.libReferenceThreshold })
+      val threshold = GlobalValues.libReferenceThreshold
+      _libReference.emit(ref.filter { it.referredList.size >= threshold })
     }
   }
 

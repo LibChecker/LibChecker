@@ -14,7 +14,7 @@ class SnapshotMenuBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotMenuBS
   private val previousAdvancedOptions = GlobalValues.snapshotOptions
   private val optionsViewMap = mutableMapOf<Int, SnapshotMenuItemView>()
 
-  private var onDismissCallback: () -> Unit = {}
+  private var onDismissCallback: (optionsDiff: Int) -> Unit = {}
 
   override fun initRootView(): SnapshotMenuBSDView = SnapshotMenuBSDView(requireContext())
 
@@ -39,9 +39,7 @@ class SnapshotMenuBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotMenuBS
     }
 
     dialog?.setOnDismissListener {
-      if (GlobalValues.snapshotOptions != previousAdvancedOptions) {
-        onDismissCallback()
-      }
+      onDismissCallback(previousAdvancedOptions.xor(GlobalValues.snapshotOptions))
     }
   }
 
@@ -57,7 +55,7 @@ class SnapshotMenuBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotMenuBS
     }
   }
 
-  fun setOnDismissListener(action: () -> Unit) {
+  fun setOnDismissListener(action: (optionsDiff: Int) -> Unit) {
     onDismissCallback = action
   }
 }

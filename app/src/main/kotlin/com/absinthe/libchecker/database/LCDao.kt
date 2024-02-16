@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.database
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -21,9 +20,6 @@ interface LCDao {
   // Item Table
   @Query("SELECT * from item_table ORDER BY label ASC")
   fun getItemsFlow(): Flow<List<LCItem>>
-
-  @Query("SELECT * from item_table ORDER BY label ASC")
-  fun getItemsLiveData(): LiveData<List<LCItem>>
 
   @Query("SELECT * from item_table ORDER BY label ASC")
   suspend fun getItems(): List<LCItem>

@@ -24,7 +24,6 @@ import com.absinthe.libchecker.features.statistics.ui.view.LibReferenceItemView
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.tintHighlightText
-import com.absinthe.libchecker.utils.extensions.valueUnsafe
 import com.absinthe.rulesbundle.LCRules
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.chad.library.adapter.base.provider.BaseNodeProvider
@@ -65,17 +64,17 @@ class LibReferenceProvider : BaseNodeProvider() {
 
       setOrHighlightText(libName, libReferenceItem.libName)
 
-      libReferenceItem.chip?.let {
+      libReferenceItem.rule?.let {
         icon.apply {
           setImageResource(it.iconRes)
 
-          if (!GlobalValues.isColorfulIcon.valueUnsafe) {
+          if (!GlobalValues.isColorfulIcon && !it.isSimpleColorIcon) {
             this.drawable.mutate().colorFilter =
               ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
           }
         }
 
-        setOrHighlightText(labelName, it.name)
+        setOrHighlightText(labelName, it.label)
       } ?: let {
         if (libReferenceItem.type == PERMISSION && libReferenceItem.libName.startsWith("android.permission")) {
           icon.setImageResource(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_android)

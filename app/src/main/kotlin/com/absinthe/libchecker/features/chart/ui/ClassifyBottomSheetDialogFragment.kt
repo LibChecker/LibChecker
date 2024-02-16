@@ -1,15 +1,13 @@
 package com.absinthe.libchecker.features.chart.ui
 
 import android.content.DialogInterface
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import com.absinthe.libchecker.features.chart.ChartViewModel
+import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
 class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<ClassifyDialogView>() {
 
-  private val viewModel: ChartViewModel by activityViewModels()
   private var onDismissAction: (() -> Unit)? = null
 
   override fun initRootView(): ClassifyDialogView =
@@ -21,29 +19,24 @@ class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Clas
     root.post {
       maxPeekSize = ((dialog?.window?.decorView?.height ?: 0) * 0.67).toInt()
     }
-    viewModel.filteredList.observe(viewLifecycleOwner) {
-      root.adapter.setList(it)
-      if (it.isNotEmpty()) {
-        getHeaderView().title.text = viewModel.dialogTitle.value
-        root.addAndroidVersionView(viewModel.androidVersion.value)
-      }
-    }
-    viewModel.dialogTitle.observe(viewLifecycleOwner) {
-      if (viewModel.filteredList.value?.isNotEmpty() == true) {
-        getHeaderView().title.text = it
-      }
-    }
-    viewModel.androidVersion.observe(viewLifecycleOwner) {
-      if (viewModel.filteredList.value?.isNotEmpty() == true) {
-        root.addAndroidVersionView(it)
-      }
-    }
   }
 
   override fun onDismiss(dialog: DialogInterface) {
     super.onDismiss(dialog)
     onDismissAction?.invoke()
     onDismissAction = null
+  }
+
+  fun setTitle(title: String) {
+    root.getHeaderView().title.text = title
+  }
+
+  fun setAndroidVersionLabel(triple: Triple<Int, String, Int?>?) {
+    root.addAndroidVersionView(triple)
+  }
+
+  fun setList(list: List<LCItem>) {
+    root.adapter.setList(list)
   }
 
   fun setOnDismiss(action: () -> Unit) {

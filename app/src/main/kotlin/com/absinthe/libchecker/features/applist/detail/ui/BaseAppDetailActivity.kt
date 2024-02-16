@@ -152,7 +152,9 @@ abstract class BaseAppDetailActivity :
 
   protected fun onPackageInfoAvailable(packageInfo: PackageInfo, extraBean: DetailExtraBean?) {
     viewModel.packageInfo = packageInfo
-    viewModel.packageInfoLiveData.postValue(packageInfo)
+    lifecycleScope.launch {
+      viewModel.packageInfoStateFlow.emit(packageInfo)
+    }
     binding.apply {
       try {
         supportActionBar?.title = null
@@ -293,12 +295,11 @@ abstract class BaseAppDetailActivity :
         AppDetailToolbarItem(R.drawable.ic_lib_sort, R.string.menu_sort) {
           lifecycleScope.launch {
             detailFragmentManager.sortAll()
-            viewModel.sortMode = if (viewModel.sortMode == MODE_SORT_BY_LIB) {
+            GlobalValues.libSortMode = if (GlobalValues.libSortMode == MODE_SORT_BY_LIB) {
               MODE_SORT_BY_SIZE
             } else {
               MODE_SORT_BY_LIB
             }
-            detailFragmentManager.changeSortMode(viewModel.sortMode)
           }
         }
       )
@@ -493,13 +494,13 @@ abstract class BaseAppDetailActivity :
     mediator.attach()
 
     viewModel.also {
-      it.itemsCountLiveData.observe(this) { live ->
+      it.itemsCountStateFlow.onEach { live ->
         if (detailFragmentManager.currentItemsCount != live.count && typeList[binding.tabLayout.selectedTabPosition] == live.locate) {
           binding.tsComponentCount.setText(live.count.toString())
           detailFragmentManager.currentItemsCount = live.count
         }
-      }
-      it.processToolIconVisibilityLiveData.observe(this) { visible ->
+      }.launchIn(lifecycleScope)
+      it.processToolIconVisibilityStateFlow.onEach { visible ->
         if (visible) {
           if (detailFragmentManager.currentFragment?.isComponentFragment() == true) {
             if (!toolbarAdapter.data.contains(toolbarProcessItem)) {
@@ -527,8 +528,9 @@ abstract class BaseAppDetailActivity :
             processBarView?.isGone = true
           }
         }
-      }
-      it.processMapLiveData.observe(this) { map ->
+      }.launchIn(lifecycleScope)
+      it.processMapStateFlow.onEach { map ->
+        if (map.isEmpty()) return@onEach
         if (processBarView == null) {
           initProcessBarView()
         }
@@ -541,7 +543,7 @@ abstract class BaseAppDetailActivity :
           }
         )
         showProcessBarView()
-      }
+      }.launchIn(lifecycleScope)
       it.featuresFlow.onEach { feat ->
         initFeatureListView()
 
@@ -646,7 +648,7 @@ abstract class BaseAppDetailActivity :
           }
         }
       }.launchIn(lifecycleScope)
-      it.abiBundle.observe(this) { bundle ->
+      it.abiBundleStateFlow.onEach { bundle ->
         if (bundle != null) {
           initAbiView(bundle.abi, bundle.abiSet)
 
@@ -681,7 +683,7 @@ abstract class BaseAppDetailActivity :
           }
           binding.detailsTitle.postDelayed(action, 500)
         }
-      }
+      }.launchIn(lifecycleScope)
     }
 
     if (featureListView == null) {
@@ -781,23 +783,23 @@ abstract class BaseAppDetailActivity :
   private val toolbarProcessItem by unsafeLazy {
     AppDetailToolbarItem(R.drawable.ic_processes, R.string.menu_process) {
       detailFragmentManager.deliverSwitchProcessMode()
-      viewModel.processMode = !viewModel.processMode
+      GlobalValues.processMode = !GlobalValues.processMode
 
-      if (viewModel.processMode) {
+      if (GlobalValues.processMode) {
+        val processMap = viewModel.processMapStateFlow.value
+        if (processMap.isEmpty()) return@AppDetailToolbarItem
         if (processBarView == null) {
           initProcessBarView()
         }
-        viewModel.processMapLiveData.value?.let {
-          processBarView?.setData(
-            it.map { mapItem ->
-              ProcessBarAdapter.ProcessBarItem(
-                mapItem.key,
-                mapItem.value
-              )
-            }
-          )
-          processBarView?.isVisible = true
-        }
+        processBarView?.setData(
+          processMap.map { mapItem ->
+            ProcessBarAdapter.ProcessBarItem(
+              mapItem.key,
+              mapItem.value
+            )
+          }
+        )
+        processBarView?.isVisible = true
       } else {
         binding.detailToolbarContainer.removeView(processBarView)
         processBarView = null
@@ -807,7 +809,6 @@ abstract class BaseAppDetailActivity :
           detailFragmentManager.deliverFilterItems(null)
         }
       }
-      GlobalValues.processMode = viewModel.processMode
     }
   }
 
@@ -934,7 +935,7 @@ abstract class BaseAppDetailActivity :
   }
 
   private fun showProcessBarView() {
-    if (viewModel.processToolIconVisibilityLiveData.value == false && detailFragmentManager.currentFragment !is PermissionAnalysisFragment) {
+    if (!viewModel.processToolIconVisibilityStateFlow.value && detailFragmentManager.currentFragment !is PermissionAnalysisFragment) {
       processBarView?.isGone = true
     } else {
       processBarView?.isVisible = true
@@ -943,7 +944,9 @@ abstract class BaseAppDetailActivity :
 
   private fun initAbiView(abi: Int, abiSet: Set<Int>) {
     val trueAbi = abi.mod(Constants.MULTI_ARCH)
-    viewModel.is64Bit.postValue(trueAbi == Constants.ARMV8 || trueAbi == Constants.X86_64)
+    lifecycleScope.launch {
+      viewModel.is64Bit.emit(trueAbi == Constants.ARMV8 || trueAbi == Constants.X86_64)
+    }
 
     if (abiSet.isNotEmpty() && !abiSet.contains(Constants.OVERLAY) && !abiSet.contains(Constants.ERROR)) {
       val abiLabelsList = mutableListOf<AbiLabelNode>()

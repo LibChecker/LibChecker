@@ -55,7 +55,7 @@ class LibCheckerApp : Application() {
     } else {
       Timber.plant(ReleaseTree())
 
-      if (GlobalValues.isAnonymousAnalyticsEnabled.value == true) {
+      if (GlobalValues.isAnonymousAnalyticsEnabled) {
         AppCenter.start(
           this,
           BuildConfig.APP_CENTER_SECRET,

@@ -2,7 +2,6 @@ package com.absinthe.libchecker.constant
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import androidx.lifecycle.MutableLiveData
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.constant.options.LibReferenceOptions
@@ -13,6 +12,7 @@ import com.absinthe.libchecker.utils.SPDelegates
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import java.util.Locale
+import kotlinx.coroutines.flow.MutableSharedFlow
 
 const val SP_NAME = "${BuildConfig.APPLICATION_ID}_preferences"
 
@@ -22,17 +22,15 @@ object GlobalValues {
     return SPUtils.sp
   }
 
+  val preferencesFlow = MutableSharedFlow<Pair<String, Any>>()
+
   var advancedOptions: Int by SPDelegates(Constants.PREF_ADVANCED_OPTIONS, AdvancedOptions.DEFAULT_OPTIONS)
-  val advancedOptionsLiveData: MutableLiveData<Int> = MutableLiveData(advancedOptions)
 
   var itemAdvancedOptions: Int by SPDelegates(Constants.PREF_ITEM_ADVANCED_OPTIONS, AdvancedOptions.ITEM_DEFAULT_OPTIONS)
-  val itemAdvancedOptionsLiveData: MutableLiveData<Int> = MutableLiveData(itemAdvancedOptions)
 
   var libReferenceOptions: Int by SPDelegates(Constants.PREF_LIB_REF_OPTIONS, LibReferenceOptions.DEFAULT_OPTIONS)
-  val libReferenceOptionsLiveData: MutableLiveData<Int> = MutableLiveData(libReferenceOptions)
 
   var snapshotOptions: Int by SPDelegates(Constants.PREF_SNAPSHOT_OPTIONS, SnapshotOptions.DEFAULT_OPTIONS)
-  val snapshotOptionsLiveData: MutableLiveData<Int> = MutableLiveData(snapshotOptions)
 
   var repo: String by SPDelegates(Constants.PREF_RULES_REPO, Constants.REPO_GITLAB)
 
@@ -54,18 +52,12 @@ object GlobalValues {
 
   var libReferenceThreshold: Int by SPDelegates(Constants.PREF_LIB_REF_THRESHOLD, 2)
 
-  val isShowSystemApps: MutableLiveData<Boolean> =
-    MutableLiveData((advancedOptions and AdvancedOptions.SHOW_SYSTEM_APPS) > 0)
+  val isShowSystemApps: Boolean
+    get() = (advancedOptions and AdvancedOptions.SHOW_SYSTEM_APPS) > 0
 
-  val isColorfulIcon: MutableLiveData<Boolean> =
-    MutableLiveData(getPreferences().getBoolean(Constants.PREF_COLORFUL_ICON, true))
+  var isColorfulIcon: Boolean by SPDelegates(Constants.PREF_COLORFUL_ICON, true)
 
-  val isAnonymousAnalyticsEnabled: MutableLiveData<Boolean> =
-    MutableLiveData(getPreferences().getBoolean(Constants.PREF_ANONYMOUS_ANALYTICS, true))
-
-  val libSortModeLiveData: MutableLiveData<Int> = MutableLiveData(libSortMode)
-
-  val libReferenceThresholdLiveData: MutableLiveData<Int> = MutableLiveData(libReferenceThreshold)
+  val isAnonymousAnalyticsEnabled: Boolean by SPDelegates(Constants.PREF_ANONYMOUS_ANALYTICS, true)
 
   val season by unsafeLazy { DateUtils.getCurrentSeason() }
 

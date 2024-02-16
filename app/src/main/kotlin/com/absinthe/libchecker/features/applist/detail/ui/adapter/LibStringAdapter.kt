@@ -153,7 +153,7 @@ class LibStringAdapter(
           }
           setOrHighlightText(libName, itemName)
           if ((GlobalValues.itemAdvancedOptions and AdvancedOptions.SHOW_MARKED_LIB) > 0) {
-            setChip(item.chip)
+            setChip(item.rule)
           } else {
             setChip(null)
           }
@@ -204,7 +204,7 @@ class LibStringAdapter(
     setOrHighlightText(itemView.libName, itemName)
     itemView.libSize.text = PackageUtils.sizeToString(context, item.item, showElfInfo = true, is64Bit = is64Bit)
     if ((GlobalValues.itemAdvancedOptions and AdvancedOptions.SHOW_MARKED_LIB) > 0) {
-      itemView.setChip(item.chip)
+      itemView.setChip(item.rule)
     } else {
       itemView.setChip(null)
     }
@@ -240,7 +240,7 @@ class LibStringAdapter(
       it.text = sb
     }
     if ((GlobalValues.itemAdvancedOptions and AdvancedOptions.SHOW_MARKED_LIB) > 0) {
-      itemView.setChip(item.chip)
+      itemView.setChip(item.rule)
     } else {
       itemView.setChip(null)
     }

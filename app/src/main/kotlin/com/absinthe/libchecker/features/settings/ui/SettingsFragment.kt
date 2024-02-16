@@ -16,6 +16,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -44,6 +45,7 @@ import com.absinthe.rulesbundle.LCRules
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import java.util.Locale
+import kotlinx.coroutines.launch
 import rikka.material.app.LocaleDelegate
 import rikka.preference.SimpleMenuPreference
 import rikka.recyclerview.fixEdgeEffect
@@ -62,11 +64,11 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     setPreferencesFromResource(R.xml.settings, null)
 
     findPreference<TwoStatePreference>(Constants.PREF_SHOW_SYSTEM_APPS)?.apply {
-      setOnPreferenceChangeListener { _, newValue ->
-        GlobalValues.isShowSystemApps.value = newValue as Boolean
+      setOnPreferenceChangeListener { pref, newValue ->
+        emitPrefChange(pref.key, newValue)
         Analytics.trackEvent(
           Constants.Event.SETTINGS,
-          EventProperties().set("PREF_SHOW_SYSTEM_APPS", newValue)
+          EventProperties().set("PREF_SHOW_SYSTEM_APPS", newValue as Boolean)
         )
         true
       }
@@ -97,11 +99,11 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
       }
     }
     findPreference<TwoStatePreference>(Constants.PREF_COLORFUL_ICON)?.apply {
-      setOnPreferenceChangeListener { _, newValue ->
-        GlobalValues.isColorfulIcon.value = newValue as Boolean
+      setOnPreferenceChangeListener { pref, newValue ->
+        emitPrefChange(pref.key, newValue)
         Analytics.trackEvent(
           Constants.Event.SETTINGS,
-          EventProperties().set("PREF_COLORFUL_ICON", newValue)
+          EventProperties().set("PREF_COLORFUL_ICON", newValue as Boolean)
         )
         true
       }
@@ -295,10 +297,6 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     }
     findPreference<TwoStatePreference>(Constants.PREF_ANONYMOUS_ANALYTICS)?.apply {
       isVisible = getBoolean(R.bool.is_foss).not()
-      setOnPreferenceChangeListener { _, newValue ->
-        GlobalValues.isAnonymousAnalyticsEnabled.value = newValue as Boolean
-        true
-      }
     }
 
     val tag = languagePreference.value
@@ -409,4 +407,10 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
   override fun getBorderViewDelegate(): BorderViewDelegate = borderViewDelegate
   override fun isAllowRefreshing(): Boolean = true
   override fun getSuitableLayoutManager(): RecyclerView.LayoutManager? = null
+
+  private fun emitPrefChange(key: String, value: Any) {
+    lifecycleScope.launch {
+      GlobalValues.preferencesFlow.emit(key to value)
+    }
+  }
 }

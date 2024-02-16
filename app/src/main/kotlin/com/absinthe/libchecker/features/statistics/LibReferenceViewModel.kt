@@ -2,7 +2,6 @@ package com.absinthe.libchecker.features.statistics
 
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.annotation.ACTIVITY
@@ -21,12 +20,13 @@ import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class LibReferenceViewModel : ViewModel() {
 
-  val libRefList: MutableLiveData<List<LCItem>> = MutableLiveData()
+  val libRefListFlow: MutableSharedFlow<List<LCItem>> = MutableSharedFlow()
   val dbItemsFlow: Flow<List<LCItem>> = Repositories.lcRepository.allLCItemsFlow
 
   fun setData(name: String, @LibType type: Int) = viewModelScope.launch(Dispatchers.IO) {
@@ -43,19 +43,17 @@ class LibReferenceViewModel : ViewModel() {
           list.add(lcItem)
         }
       }
-      val filterList = if (GlobalValues.isShowSystemApps.value == true) {
+      val filterList = if (GlobalValues.isShowSystemApps) {
         list
       } else {
         list.filter { !it.isSystem }
       }
 
-      if (libRefList.value != filterList) {
-        libRefList.postValue(filterList)
-      }
+      libRefListFlow.emit(filterList)
     }
   }
 
-  private fun setDataInternal(lcItems: List<LCItem>, name: String, @LibType type: Int) {
+  private suspend fun setDataInternal(lcItems: List<LCItem>, name: String, @LibType type: Int) {
     val list = mutableListOf<LCItem>()
 
     lcItems.let { items ->
@@ -128,14 +126,12 @@ class LibReferenceViewModel : ViewModel() {
       }
     }
 
-    val filterList = if (GlobalValues.isShowSystemApps.value == true) {
+    val filterList = if (GlobalValues.isShowSystemApps) {
       list
     } else {
       list.filter { !it.isSystem }
     }
 
-    if (libRefList.value != filterList) {
-      libRefList.postValue(filterList)
-    }
+    libRefListFlow.emit(filterList)
   }
 }

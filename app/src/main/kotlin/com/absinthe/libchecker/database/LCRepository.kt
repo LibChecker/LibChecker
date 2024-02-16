@@ -1,21 +1,30 @@
 package com.absinthe.libchecker.database
 
-import androidx.lifecycle.LiveData
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.SnapshotDiffStoringItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.database.entity.TrackItem
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class LCRepository(private val lcDao: LCDao) {
 
-  val allDatabaseItems: LiveData<List<LCItem>> = lcDao.getItemsLiveData()
+  lateinit var allLCItemsStateFlow: StateFlow<List<LCItem>>
   val allLCItemsFlow: Flow<List<LCItem>> = lcDao.getItemsFlow()
   val allSnapshotItemsFlow: Flow<List<SnapshotItem>> =
     lcDao.getSnapshotsFlow(GlobalValues.snapshotTimestamp)
+
+  init {
+    MainScope().launch {
+      allLCItemsStateFlow = allLCItemsFlow.stateIn(this)
+    }
+  }
 
   private fun checkDatabaseStatus(): Boolean {
     if (LCDatabase.isClosed()) {

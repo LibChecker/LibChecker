@@ -271,10 +271,10 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
     }
 
     viewModel.apply {
-      snapshotDiffItems.observe(this@ComparisonActivity) { list ->
-        adapter.setList(list.sortedByDescending { it.updateTime })
+      snapshotDiffItemsFlow.onEach {
+        adapter.setList(it.sortedByDescending { it.updateTime })
         flip(VF_LIST)
-      }
+      }.launchIn(lifecycleScope)
       effect.onEach {
         when (it) {
           is SnapshotViewModel.Effect.ChooseComparedApk -> {
@@ -291,6 +291,23 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
                 it.snapshotCount.toString()
             }
           }
+
+          is SnapshotViewModel.Effect.DiffItemChange -> {
+            val newItems = adapter.data
+              .asSequence()
+              .map { i ->
+                if (i.packageName == it.item.packageName) {
+                  it.item
+                } else {
+                  i
+                }
+              }
+              .toList()
+            adapter.setList(newItems.sortedByDescending { item -> item.updateTime })
+            flip(VF_LIST)
+          }
+
+          else -> {}
         }
       }.launchIn(lifecycleScope)
     }

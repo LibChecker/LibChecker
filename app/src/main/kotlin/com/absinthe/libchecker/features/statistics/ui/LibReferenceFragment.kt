@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
@@ -137,7 +138,7 @@ class LibReferenceFragment :
         val item = refAdapter.data[position] as? LibReference ?: return@setOnItemClickListener
         activity?.launchLibReferencePage(
           item.libName,
-          item.chip?.name,
+          item.rule?.label,
           item.type,
           item.referredList.toTypedArray()
         )
@@ -180,24 +181,29 @@ class LibReferenceFragment :
         isListReady = true
       }.launchIn(lifecycleScope)
     }
-    GlobalValues.isShowSystemApps.observe(viewLifecycleOwner) {
-      if (homeViewModel.libRefSystemApps == null || homeViewModel.libRefSystemApps != it) {
-        computeRef(true)
-        homeViewModel.libRefSystemApps = it
+    GlobalValues.preferencesFlow.onEach {
+      when (it.first) {
+        Constants.PREF_ADVANCED_OPTIONS -> {
+          val options = it.second as Int
+          if (options and AdvancedOptions.SHOW_SYSTEM_APPS > 0) {
+            computeRef(true)
+          }
+        }
+        Constants.PREF_COLORFUL_ICON -> {
+          // noinspection NotifyDataSetChanged
+          refAdapter.notifyDataSetChanged()
+        }
+        Constants.PREF_LIB_REF_THRESHOLD -> {
+          val threshold = it.second as Int
+          if (threshold < homeViewModel.savedThreshold) {
+            matchRules(true)
+            homeViewModel.savedThreshold = threshold
+          } else {
+            homeViewModel.refreshRef()
+          }
+        }
       }
-    }
-    GlobalValues.libReferenceThresholdLiveData.observe(viewLifecycleOwner) {
-      if (it < homeViewModel.savedThreshold) {
-        matchRules(true)
-        homeViewModel.savedThreshold = it
-      } else {
-        homeViewModel.refreshRef()
-      }
-    }
-    GlobalValues.isColorfulIcon.observe(viewLifecycleOwner) {
-      // noinspection NotifyDataSetChanged
-      refAdapter.notifyDataSetChanged()
-    }
+    }.launchIn(lifecycleScope)
 
     lifecycleScope.launch {
       if (refAdapter.data.isEmpty()) {
@@ -249,9 +255,10 @@ class LibReferenceFragment :
     if (menuItem.itemId == R.id.filter) {
       advancedMenuBSDFragment?.dismiss()
       advancedMenuBSDFragment = LibReferenceMenuBSDFragment().apply {
-        setOnDismissListener {
-          GlobalValues.libReferenceOptionsLiveData.postValue(GlobalValues.libReferenceOptions)
-          refreshList()
+        setOnDismissListener { optionsDiff ->
+          if (optionsDiff > 0) {
+            refreshList()
+          }
           advancedMenuBSDFragment = null
         }
       }
@@ -303,7 +310,7 @@ class LibReferenceFragment :
       searchUpdateJob = lifecycleScope.launch(Dispatchers.IO) {
         homeViewModel.savedRefList?.let { list ->
           val filter = list.filter {
-            it.libName.contains(newText, ignoreCase = true) || it.chip?.name?.contains(
+            it.libName.contains(newText, ignoreCase = true) || it.rule?.label?.contains(
               newText,
               ignoreCase = true
             ) ?: false
