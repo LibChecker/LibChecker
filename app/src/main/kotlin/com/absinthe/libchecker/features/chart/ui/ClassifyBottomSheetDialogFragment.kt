@@ -9,6 +9,9 @@ import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<ClassifyDialogView>() {
 
   private var onDismissAction: (() -> Unit)? = null
+  private var _title: String? = null
+  private var _androidVersionTriple: Triple<Int, String, Int?>? = null
+  private var _list: List<LCItem>? = null
 
   override fun initRootView(): ClassifyDialogView =
     ClassifyDialogView(requireContext(), lifecycleScope)
@@ -18,6 +21,9 @@ class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Clas
   override fun init() {
     root.post {
       maxPeekSize = ((dialog?.window?.decorView?.height ?: 0) * 0.67).toInt()
+      _title?.let { setTitle(it) }
+      _androidVersionTriple?.let { setAndroidVersionLabel(it) }
+      _list?.let { setList(it) }
     }
   }
 
@@ -28,15 +34,24 @@ class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Clas
   }
 
   fun setTitle(title: String) {
-    root.getHeaderView().title.text = title
+    _title = title
+    runCatching {
+      root.getHeaderView().title.text = title
+    }
   }
 
   fun setAndroidVersionLabel(triple: Triple<Int, String, Int?>?) {
-    root.addAndroidVersionView(triple)
+    _androidVersionTriple = triple
+    runCatching {
+      root.addAndroidVersionView(triple)
+    }
   }
 
   fun setList(list: List<LCItem>) {
-    root.adapter.setList(list)
+    _list = list
+    runCatching {
+      root.adapter.setList(list)
+    }
   }
 
   fun setOnDismiss(action: () -> Unit) {
