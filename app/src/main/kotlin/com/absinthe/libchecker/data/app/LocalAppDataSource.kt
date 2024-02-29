@@ -2,7 +2,9 @@ package com.absinthe.libchecker.data.app
 
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.compat.PackageManagerCompat
+import com.absinthe.libchecker.utils.OsUtils
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -11,13 +13,12 @@ import timber.log.Timber
 
 object LocalAppDataSource : AppDataSource {
 
+  var apexPackageSet: Set<String> = emptySet()
+    private set
+
   override fun getApplicationList(ioDispatcher: CoroutineDispatcher): Flow<List<PackageInfo>> =
     flow {
-      Timber.d("getApplicationList start")
-      val list =
-        PackageManagerCompat.getInstalledPackages(PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS)
-      Timber.d("getApplicationList end, apps count: ${list.size}")
-
+      val list = getApplicationList()
       val listByShell = getAppListByShell()
 
       if (listByShell.size > list.size) {
@@ -42,6 +43,8 @@ object LocalAppDataSource : AppDataSource {
     val list =
       PackageManagerCompat.getInstalledPackages(PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS)
     Timber.d("getApplicationList end, apps count: ${list.size}")
+
+    loadApexPackageSet()
     return list
   }
 
@@ -83,5 +86,20 @@ object LocalAppDataSource : AppDataSource {
       Timber.w(t)
       return emptyList()
     }
+  }
+
+  /**
+   * Load apex package set
+   * PackageInfo#isApex is always false
+   * use this method to workaround
+   */
+  private fun loadApexPackageSet() {
+    Timber.d("getApplicationList get apex start")
+    if (OsUtils.atLeastQ()) {
+      apexPackageSet = SystemServices.packageManager.getInstalledModules(0)
+        .map { it.packageName.orEmpty() }
+        .toSet()
+    }
+    Timber.d("getApplicationList get apex end, apex count: ${apexPackageSet.size}")
   }
 }
