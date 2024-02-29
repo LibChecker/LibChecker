@@ -44,13 +44,7 @@ object LocalAppDataSource : AppDataSource {
       PackageManagerCompat.getInstalledPackages(PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS)
     Timber.d("getApplicationList end, apps count: ${list.size}")
 
-    Timber.d("getApplicationList get apex start")
-    if (OsUtils.atLeastQ()) {
-      apexPackageSet = SystemServices.packageManager.getInstalledModules(0)
-        .map { it.packageName.orEmpty() }
-        .toSet()
-    }
-    Timber.d("getApplicationList get apex end, apex count: ${apexPackageSet.size}")
+    loadApexPackageSet()
     return list
   }
 
@@ -92,5 +86,20 @@ object LocalAppDataSource : AppDataSource {
       Timber.w(t)
       return emptyList()
     }
+  }
+
+  /**
+   * Load apex package set
+   * PackageInfo#isApex is always false
+   * use this method to workaround
+   */
+  private fun loadApexPackageSet() {
+    Timber.d("getApplicationList get apex start")
+    if (OsUtils.atLeastQ()) {
+      apexPackageSet = SystemServices.packageManager.getInstalledModules(0)
+        .map { it.packageName.orEmpty() }
+        .toSet()
+    }
+    Timber.d("getApplicationList get apex end, apex count: ${apexPackageSet.size}")
   }
 }
