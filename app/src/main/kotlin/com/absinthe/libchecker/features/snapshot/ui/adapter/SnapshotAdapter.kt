@@ -16,12 +16,14 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.constant.options.SnapshotOptions
+import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
 import com.absinthe.libchecker.features.snapshot.detail.bean.SnapshotDiffItem
 import com.absinthe.libchecker.features.snapshot.ui.view.SnapshotItemView
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
 import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.PREINSTALLED_TIMESTAMP
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -271,6 +273,9 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
           context.getString(R.string.snapshot_preinstalled_app)
         } else {
           context.getString(R.string.format_last_updated).format(timeText)
+        }
+        if (OsUtils.atLeastQ() && LocalAppDataSource.apexPackageSet.contains(item.packageName)) {
+          updateTime.append(", APEX")
         }
       }
     }

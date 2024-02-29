@@ -57,6 +57,7 @@ import com.absinthe.libchecker.constant.Constants.X86_64_STRING
 import com.absinthe.libchecker.constant.Constants.X86_STRING
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.AdvancedOptions
+import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.features.applist.detail.bean.StatefulComponent
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.utils.dex.DexLibMap
@@ -1226,6 +1227,9 @@ object PackageUtils {
     val compile = packageInfo?.getCompileSdkVersion() ?: Build.VERSION.SDK_INT
 
     return buildSpannedString {
+      if (OsUtils.atLeastQ() && LocalAppDataSource.apexPackageSet.contains(packageName)) {
+        append(", APEX")
+      }
       if (showTarget) {
         append(", ")
         scale(0.8f) {
