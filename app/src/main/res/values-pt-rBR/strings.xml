@@ -49,6 +49,7 @@
   <string name="string_kotlin_unused">Kotlin não usado</string>
   <string name="string_compose_used">Compor Jetpack usado</string>
   <string name="string_compose_unused">Compor Jetpack não utilizado</string>
+  <string name="android_dist_source"></string>
   <!--  About  -->
   <string name="settings_about">Sobre</string>
   <string name="settings_translate">Participar na tradução</string>
