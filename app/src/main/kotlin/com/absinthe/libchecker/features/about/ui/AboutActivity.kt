@@ -238,7 +238,8 @@ class AboutActivity : AbsAboutActivityProxy(), MenuProvider {
         "https://lottiefiles.com/21836-blast-off",
         "https://lottiefiles.com/1309-smiley-stack",
         "https://lottiefiles.com/44836-gray-down-arrow",
-        "https://lottiefiles.com/66818-holographic-radar"
+        "https://lottiefiles.com/66818-holographic-radar",
+        "https://pictogrammers.com/library/mdi/"
       )
       add(Category("Acknowledgement"))
       add(
