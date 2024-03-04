@@ -94,6 +94,7 @@ class SnapshotFragment :
   private var shootServiceStarted = false
   private var keyword: String = ""
   private var currentTimeStamp = GlobalValues.snapshotTimestamp
+  private var items = emptyList<SnapshotDiffItem>()
 
   private var shootBinder: IShootService? = null
   private val shootListener = object : OnShootListener.Stub() {
@@ -267,6 +268,7 @@ class SnapshotFragment :
         }
       }.launchIn(lifecycleScope)
       snapshotDiffItemsFlow.onEach {
+        items = it
         updateItems(it)
 
         lifecycleScope.launch(Dispatchers.IO) {
@@ -324,6 +326,7 @@ class SnapshotFragment :
               }
             }
             .toList()
+          items = newItems
           updateItems(newItems)
         }
 
@@ -632,12 +635,12 @@ class SnapshotFragment :
 
   override fun onQueryTextChange(newText: String?): Boolean {
     if (keyword != newText) {
-      keyword = newText ?: ""
+      keyword = newText.orEmpty()
       adapter.highlightText = keyword
       val list = if (keyword.isEmpty()) {
-        adapter.data
+        items
       } else {
-        adapter.data.asSequence()
+        items.asSequence()
           .filter {
             it.packageName.contains(keyword, ignoreCase = true) ||
               it.labelDiff.old.contains(keyword, ignoreCase = true) ||
