@@ -29,53 +29,51 @@ class JetpackComposeChartDataSource : BaseChartDataSource<PieChart>() {
       val entries: ArrayList<PieEntry> = ArrayList()
       val colorOnSurface = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
 
-      filteredList?.let {
-        for (item in it) {
-          if ((item.features and Features.JETPACK_COMPOSE) > 0) {
-            classifiedList[0].add(item)
-          } else {
-            classifiedList[1].add(item)
-          }
+      for (item in filteredList) {
+        if ((item.features and Features.JETPACK_COMPOSE) > 0) {
+          classifiedList[0].add(item)
+        } else {
+          classifiedList[1].add(item)
         }
+      }
 
-        // NOTE: The order of the entries when being added to the entries array determines their position around the center of
-        // the chart.
-        val legendList = mutableListOf<String>()
-        for (i in parties.indices) {
-          entries.add(PieEntry(classifiedList[i].size.toFloat(), parties[i % parties.size]))
-          legendList.add(parties[i % parties.size])
-        }
-        val dataSet = PieDataSet(entries, "").apply {
-          setDrawIcons(false)
-          sliceSpace = 3f
-          iconsOffset = MPPointF(0f, 40f)
-          selectionShift = 5f
-          xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
-          yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
-          valueLineColor = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
-        }
+      // NOTE: The order of the entries when being added to the entries array determines their position around the center of
+      // the chart.
+      val legendList = mutableListOf<String>()
+      for (i in parties.indices) {
+        entries.add(PieEntry(classifiedList[i].size.toFloat(), parties[i % parties.size]))
+        legendList.add(parties[i % parties.size])
+      }
+      val dataSet = PieDataSet(entries, "").apply {
+        setDrawIcons(false)
+        sliceSpace = 3f
+        iconsOffset = MPPointF(0f, 40f)
+        selectionShift = 5f
+        xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+        yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+        valueLineColor = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
+      }
 
-        // add a lot of colors
-        val colors = arrayListOf(
-          Color.parseColor("#37bf6e"),
-          Color.parseColor("#073042")
-        )
+      // add a lot of colors
+      val colors = arrayListOf(
+        Color.parseColor("#37bf6e"),
+        Color.parseColor("#073042")
+      )
 
-        dataSet.colors = colors
-        // dataSet.setSelectionShift(0f);
-        val data = PieData(dataSet).apply {
-          setValueFormatter(PercentFormatter())
-          setValueTextSize(10f)
-          setValueTextColor(colorOnSurface)
-        }
+      dataSet.colors = colors
+      // dataSet.setSelectionShift(0f);
+      val data = PieData(dataSet).apply {
+        setValueFormatter(PercentFormatter())
+        setValueTextSize(10f)
+        setValueTextColor(colorOnSurface)
+      }
 
-        withContext(Dispatchers.Main) {
-          chartView.apply {
-            this.data = data
-            setEntryLabelColor(colorOnSurface)
-            highlightValues(null)
-            invalidate()
-          }
+      withContext(Dispatchers.Main) {
+        chartView.apply {
+          this.data = data
+          setEntryLabelColor(colorOnSurface)
+          highlightValues(null)
+          invalidate()
         }
       }
     }

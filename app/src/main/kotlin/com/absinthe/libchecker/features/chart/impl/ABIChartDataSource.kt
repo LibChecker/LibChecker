@@ -38,71 +38,69 @@ class ABIChartDataSource : BaseChartDataSource<PieChart>() {
       val entries: ArrayList<PieEntry> = ArrayList()
       val colorOnSurface = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
 
-      filteredList?.let {
-        for (item in it) {
-          if (GlobalValues.isShowSystemApps.not()) {
-            if (item.isSystem) continue
-          }
-          if (item.abi.toInt() == OVERLAY) {
-            classifiedList[2].add(item)
-            continue
-          }
-          when (item.abi % MULTI_ARCH) {
-            in ABI_64_BIT -> classifiedList[0].add(item)
-            in ABI_32_BIT -> classifiedList[1].add(item)
-            else -> classifiedList[2].add(item)
-          }
+      for (item in filteredList) {
+        if (GlobalValues.isShowSystemApps.not()) {
+          if (item.isSystem) continue
         }
-
-        // NOTE: The order of the entries when being added to the entries array determines their position around the center of
-        // the chart.
-        val legendList = mutableListOf<String>()
-        for (i in parties.indices) {
-          entries.add(PieEntry(classifiedList[i].size.toFloat(), parties[i % parties.size]))
-          legendList.add(parties[i % parties.size])
+        if (item.abi.toInt() == OVERLAY) {
+          classifiedList[2].add(item)
+          continue
         }
-        val dataSet = PieDataSet(entries, "").apply {
-          setDrawIcons(false)
-          sliceSpace = 3f
-          iconsOffset = MPPointF(0f, 40f)
-          selectionShift = 5f
-          xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
-          yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
-          valueLineColor = colorOnSurface
+        when (item.abi % MULTI_ARCH) {
+          in ABI_64_BIT -> classifiedList[0].add(item)
+          in ABI_32_BIT -> classifiedList[1].add(item)
+          else -> classifiedList[2].add(item)
         }
+      }
 
-        // add a lot of colors
-        val colors: ArrayList<Int> = ArrayList()
+      // NOTE: The order of the entries when being added to the entries array determines their position around the center of
+      // the chart.
+      val legendList = mutableListOf<String>()
+      for (i in parties.indices) {
+        entries.add(PieEntry(classifiedList[i].size.toFloat(), parties[i % parties.size]))
+        legendList.add(parties[i % parties.size])
+      }
+      val dataSet = PieDataSet(entries, "").apply {
+        setDrawIcons(false)
+        sliceSpace = 3f
+        iconsOffset = MPPointF(0f, 40f)
+        selectionShift = 5f
+        xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+        yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+        valueLineColor = colorOnSurface
+      }
 
-        if (OsUtils.atLeastS()) {
-          if (com.absinthe.libraries.utils.utils.UiUtils.isDarkMode()) {
-            colors.add(context.getColor(android.R.color.system_accent1_700))
-            colors.add(context.getColor(android.R.color.system_accent1_800))
-            colors.add(context.getColor(android.R.color.system_accent1_900))
-          } else {
-            colors.add(context.getColor(android.R.color.system_accent1_200))
-            colors.add(context.getColor(android.R.color.system_accent1_300))
-            colors.add(context.getColor(android.R.color.system_accent1_400))
-          }
+      // add a lot of colors
+      val colors: ArrayList<Int> = ArrayList()
+
+      if (OsUtils.atLeastS()) {
+        if (com.absinthe.libraries.utils.utils.UiUtils.isDarkMode()) {
+          colors.add(context.getColor(android.R.color.system_accent1_700))
+          colors.add(context.getColor(android.R.color.system_accent1_800))
+          colors.add(context.getColor(android.R.color.system_accent1_900))
         } else {
-          for (c in ColorTemplate.MATERIAL_COLORS) colors.add(c)
+          colors.add(context.getColor(android.R.color.system_accent1_200))
+          colors.add(context.getColor(android.R.color.system_accent1_300))
+          colors.add(context.getColor(android.R.color.system_accent1_400))
         }
+      } else {
+        for (c in ColorTemplate.MATERIAL_COLORS) colors.add(c)
+      }
 
-        dataSet.colors = colors
-        // dataSet.setSelectionShift(0f);
-        val data = PieData(dataSet).apply {
-          setValueFormatter(PercentFormatter())
-          setValueTextSize(10f)
-          setValueTextColor(colorOnSurface)
-        }
+      dataSet.colors = colors
+      // dataSet.setSelectionShift(0f);
+      val data = PieData(dataSet).apply {
+        setValueFormatter(PercentFormatter())
+        setValueTextSize(10f)
+        setValueTextColor(colorOnSurface)
+      }
 
-        withContext(Dispatchers.Main) {
-          chartView.apply {
-            this.data = data
-            setEntryLabelColor(colorOnSurface)
-            highlightValues(null)
-            invalidate()
-          }
+      withContext(Dispatchers.Main) {
+        chartView.apply {
+          this.data = data
+          setEntryLabelColor(colorOnSurface)
+          highlightValues(null)
+          invalidate()
         }
       }
     }

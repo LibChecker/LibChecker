@@ -16,7 +16,7 @@ class ZipFileCompat(file: File) : IZipFile {
     runCatching {
       javaZipFile = JavaZipFile(file)
     }.onFailure {
-      zipFile = ZipFile(file)
+      zipFile = ZipFile.Builder().setFile(file).get()
     }
   }
 
