@@ -6,6 +6,7 @@ import javax.inject.Inject
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.file.FileSystemOperations
+import org.gradle.configurationcache.extensions.capitalized
 import org.gradle.kotlin.dsl.newInstance
 import org.gradle.process.ExecOperations
 
@@ -29,7 +30,7 @@ class ResoptPlugin : Plugin<Project> {
             sdkComponents.sdkDirectory.get().toString(), "build-tools", ext.buildToolsVersion, "aapt2"
           )
           val workdir = Paths.get(
-            project.layout.buildDirectory.toString(), "intermediates", "optimized_processed_res", name
+            project.layout.buildDirectory.toString(), "intermediates", "optimized_processed_res", name, "optimize${name.replaceFirstChar { it.uppercase() }}Resources"
           ).toFile()
           val zip =
             if (variant.flavorName.isNullOrEmpty()) "resources-${variant.buildType}-optimize.ap_" else "resources-${variant.flavorName}-${variant.buildType}-optimize.ap_"
