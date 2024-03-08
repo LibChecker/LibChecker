@@ -27,6 +27,7 @@ on:
 
 env:
   APP_CENTER_SECRET: ${{secrets.APP_CENTER_SECRET}}
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE20: true
 
 jobs:
   check:
@@ -107,7 +108,7 @@ jobs:
       - name: Get apk info
         if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
         id: apk-info
-        uses: hkusu/apk-info-action@v1
+        uses: zhaobozhen/apk-info-action@v1.1.3
         with:
           apk-path: ${{ steps.apk-path.outputs.foss_path }}
       - name: Upload mappings with App Center CLI
