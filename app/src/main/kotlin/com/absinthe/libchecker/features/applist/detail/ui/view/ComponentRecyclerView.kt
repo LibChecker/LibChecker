@@ -29,6 +29,7 @@ class ComponentRecyclerView : BorderRecyclerView {
         lastX = ev.x
         lastY = ev.y
       }
+
       MotionEvent.ACTION_MOVE -> {
         val deltaX = (ev.x - lastX).absoluteValue
         val deltaY = (ev.y - lastY).absoluteValue

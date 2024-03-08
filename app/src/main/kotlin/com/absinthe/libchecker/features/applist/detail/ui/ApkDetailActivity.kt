@@ -57,9 +57,11 @@ class ApkDetailActivity : BaseAppDetailActivity(), IDetailContainer {
             finish()
           }
         }
+
         i.data?.scheme == "content" -> {
           initPackage(i.data!!)
         }
+
         else -> {
           finish()
         }

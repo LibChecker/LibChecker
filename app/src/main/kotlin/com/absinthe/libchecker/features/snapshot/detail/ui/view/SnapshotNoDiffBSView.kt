@@ -50,12 +50,14 @@ class SnapshotNoDiffBSView(context: Context) : LinearLayout(context), IHeaderVie
             LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         }
       }
+
       Mode.Deleted -> {
         stubView = SnapshotDetailDeletedView(context).apply {
           layoutParams =
             LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         }
       }
+
       Mode.NothingChanged -> {
         stubView = SnapshotEmptyView(context).apply {
           layoutParams =

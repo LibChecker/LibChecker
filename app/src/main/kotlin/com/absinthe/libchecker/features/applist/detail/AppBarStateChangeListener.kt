@@ -19,12 +19,14 @@ abstract class AppBarStateChangeListener : AppBarLayout.OnOffsetChangedListener 
         }
         State.EXPANDED
       }
+
       abs(i) >= appBarLayout.totalScrollRange -> {
         if (mCurrentState != State.COLLAPSED) {
           onStateChanged(appBarLayout, State.COLLAPSED)
         }
         State.COLLAPSED
       }
+
       else -> {
         if (mCurrentState != State.IDLE) {
           onStateChanged(appBarLayout, State.IDLE)

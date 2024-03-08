@@ -185,7 +185,9 @@ class SnapshotDetailActivity :
     adapter.setEmptyView(
       when {
         entity.newInstalled -> SnapshotDetailNewInstallView(this)
+
         entity.deleted -> SnapshotDetailDeletedView(this)
+
         else -> SnapshotEmptyView(this).apply {
           layoutParams = FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.MATCH_PARENT,

@@ -372,18 +372,22 @@ class RoomBackup(var context: Context) : FragmentActivity() {
         val backupFile = File("$INTERNAL_BACKUP_PATH/$filename")
         doBackup(backupFile)
       }
+
       BACKUP_FILE_LOCATION_EXTERNAL -> {
         val backupFile = File("$EXTERNAL_BACKUP_PATH/$filename")
         doBackup(backupFile)
       }
+
       BACKUP_FILE_LOCATION_CUSTOM_DIALOG -> {
         backupFilename = filename
         openBackupfileCreator.launch(backupFilename)
         return
       }
+
       BACKUP_FILE_LOCATION_CUSTOM_FILE -> {
         doBackup(backupLocationCustomFile!!)
       }
+
       else -> return
     }
   }
@@ -507,18 +511,22 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       BACKUP_FILE_LOCATION_INTERNAL -> {
         backupDirectory = INTERNAL_BACKUP_PATH
       }
+
       BACKUP_FILE_LOCATION_EXTERNAL -> {
         backupDirectory = File("$EXTERNAL_BACKUP_PATH/")
       }
+
       BACKUP_FILE_LOCATION_CUSTOM_DIALOG -> {
         openBackupfileChooser.launch(arrayOf("*/*"))
         return
       }
+
       BACKUP_FILE_LOCATION_CUSTOM_FILE -> {
         Timber.d("backupLocationCustomFile!!.exists()? : ${backupLocationCustomFile!!.exists()}")
         doRestore(backupLocationCustomFile!!)
         return
       }
+
       else -> return
     }
 
@@ -661,9 +669,11 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       BACKUP_FILE_LOCATION_INTERNAL -> {
         doRestore(File("$INTERNAL_BACKUP_PATH/$filename"))
       }
+
       BACKUP_FILE_LOCATION_EXTERNAL -> {
         doRestore(File("$EXTERNAL_BACKUP_PATH/$filename"))
       }
+
       else -> return
     }
   }
@@ -728,6 +738,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
         PROCESS_BACKUP -> {
           openBackupfileCreator.launch(backupFilename)
         }
+
         PROCESS_RESTORE -> {
           openBackupfileChooser.launch(arrayOf("*/*"))
         }
@@ -795,13 +806,16 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       BACKUP_FILE_LOCATION_INTERNAL -> {
         INTERNAL_BACKUP_PATH
       }
+
       BACKUP_FILE_LOCATION_EXTERNAL -> {
         File("$EXTERNAL_BACKUP_PATH/")
       }
+
       BACKUP_FILE_LOCATION_CUSTOM_DIALOG -> {
         // In custom backup location no backups will be removed
         return true
       }
+
       else -> return true
     }
 

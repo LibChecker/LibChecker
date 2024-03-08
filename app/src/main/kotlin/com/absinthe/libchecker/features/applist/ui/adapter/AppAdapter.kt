@@ -105,12 +105,15 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
         item.packageName == Constants.EXAMPLE_PACKAGE -> {
           setBadge(null)
         }
+
         item.variant == Constants.VARIANT_HAP -> {
           setBadge(R.drawable.ic_harmony_badge)
         }
+
         FreezeUtils.isAppFrozen(item.packageName) -> {
           setBadge(R.drawable.ic_disabled_package)
         }
+
         else -> {
           setBadge(null)
         }

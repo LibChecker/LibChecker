@@ -442,11 +442,17 @@ abstract class BaseAppDetailActivity :
         override fun createFragment(position: Int): Fragment {
           return when (val type = typeList[position]) {
             NATIVE -> NativeAnalysisFragment.newInstance(packageInfo.packageName)
+
             STATIC -> StaticAnalysisFragment.newInstance(packageInfo.packageName)
+
             PERMISSION -> PermissionAnalysisFragment.newInstance(packageInfo.packageName)
+
             METADATA -> MetaDataAnalysisFragment.newInstance(packageInfo.packageName)
+
             DEX -> DexAnalysisFragment.newInstance(packageInfo.packageName)
+
             SIGNATURES -> SignaturesAnalysisFragment.newInstance(packageInfo.packageName)
+
             else -> if (!isHarmonyMode) {
               ComponentsAnalysisFragment.newInstance(type)
             } else {
