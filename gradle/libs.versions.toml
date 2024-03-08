@@ -95,7 +95,7 @@ timber = "com.jakewharton.timber:timber:5.0.1"
 zhaobozhen-axml = { module = "com.github.zhaobozhen.libraries:axml", version.ref = "zhaobozhen" }
 zhaobozhen-me = { module = "com.github.zhaobozhen.libraries:me", version.ref = "zhaobozhen" }
 zhaobozhen-utils = { module = "com.github.zhaobozhen.libraries:utils", version.ref = "zhaobozhen" }
-ktlint = "com.pinterest.ktlint:ktlint-cli:1.1.1"
+ktlint = "com.pinterest.ktlint:ktlint-cli:1.2.1"
 
 [bundles]
 androidX-lifecycle = [
