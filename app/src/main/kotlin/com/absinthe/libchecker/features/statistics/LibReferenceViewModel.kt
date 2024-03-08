@@ -78,6 +78,7 @@ class LibReferenceViewModel : ViewModel() {
             }
           }
         }
+
         SERVICE, ACTIVITY, RECEIVER, PROVIDER -> {
           for (item in items) {
             try {
@@ -91,6 +92,7 @@ class LibReferenceViewModel : ViewModel() {
             }
           }
         }
+
         PERMISSION -> {
           for (item in items) {
             try {
@@ -103,6 +105,7 @@ class LibReferenceViewModel : ViewModel() {
             }
           }
         }
+
         METADATA -> {
           for (item in items) {
             try {
@@ -121,6 +124,7 @@ class LibReferenceViewModel : ViewModel() {
             }
           }
         }
+
         else -> {
         }
       }

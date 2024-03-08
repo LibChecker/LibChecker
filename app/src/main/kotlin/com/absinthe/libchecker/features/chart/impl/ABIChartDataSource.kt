@@ -114,11 +114,14 @@ class ABIChartDataSource : BaseChartDataSource<PieChart>() {
         context.getString(R.string.title_statistics_dialog),
         context.getString(R.string.string_64_bit)
       )
+
       1 -> String.format(
         context.getString(R.string.title_statistics_dialog),
         context.getString(R.string.string_32_bit)
       )
+
       2 -> context.getString(R.string.title_statistics_dialog_no_native_libs)
+
       else -> ""
     }
   }

@@ -734,10 +734,15 @@ object PackageUtils {
 
     var abi = when (Refine.unsafeCast<ApplicationInfoHidden>(applicationInfo).primaryCpuAbi) {
       ARMV8_STRING -> ARMV8
+
       ARMV7_STRING -> ARMV7
+
       ARMV5_STRING -> ARMV5
+
       X86_64_STRING -> X86_64
+
       X86_STRING -> X86
+
       null -> {
         val supportedAbiSet = mutableSetOf<Int>()
         realAbiSet.forEach {
@@ -963,8 +968,10 @@ object PackageUtils {
                 when {
                   // Remove obfuscated classes
                   !className.contains(".") -> LibStringItem("")
+
                   // Remove kotlin
                   className.startsWith("kotlin") -> LibStringItem("")
+
                   // Merge AndroidX classes
                   className.startsWith("androidx") -> LibStringItem(
                     className.substring(
@@ -972,6 +979,7 @@ object PackageUtils {
                       className.indexOf(".", 9).takeIf { it != -1 } ?: className.length
                     )
                   )
+
                   // Filter classes which paths deep level greater than 4
                   else -> LibStringItem(
                     className.split(".").run {

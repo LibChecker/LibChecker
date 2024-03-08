@@ -33,9 +33,11 @@ object LCAppUtils {
       DateUtils.isChristmas() -> {
         sb.append("\uD83C\uDF84")
       }
+
       DateUtils.isChineseNewYearEve() -> {
         sb.append("\uD83C\uDFEE")
       }
+
       DateUtils.isChineseNewYear() -> {
         sb.append(DateUtils.getChineseZodiac())
       }
@@ -103,6 +105,7 @@ object LCAppUtils {
           ).any { it == "com.qihoo.util.*".toClassDefType() }
         }.getOrDefault(false)
       }
+
       "libDexHelper.so", "libDexHelper-x86.so", "libdexjni.so" -> {
         runCatching {
           PackageUtils.findDexClasses(
@@ -113,6 +116,7 @@ object LCAppUtils {
           ).any { it == "com.secneo.apkwrapper.*".toClassDefType() }
         }.getOrDefault(false)
       }
+
       "libapp.so" -> {
         runCatching {
           otherNativeLibs?.any { it.name == "libflutter.so" } == true || PackageUtils.findDexClasses(
@@ -123,11 +127,13 @@ object LCAppUtils {
           ).any { it == "io.flutter.FlutterInjector".toClassDefType() }
         }.getOrDefault(false)
       }
+
       "libmain.so" -> {
         runCatching {
           otherNativeLibs?.any { it.name == "libunity.so" } == true
         }.getOrDefault(false)
       }
+
       else -> true
     }
   }

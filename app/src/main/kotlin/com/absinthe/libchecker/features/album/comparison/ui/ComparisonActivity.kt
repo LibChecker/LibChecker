@@ -564,6 +564,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
   private fun getSuitableLayoutManager(): RecyclerView.LayoutManager {
     return when (resources.configuration.orientation) {
       Configuration.ORIENTATION_PORTRAIT -> LinearLayoutManager(this)
+
       Configuration.ORIENTATION_LANDSCAPE -> StaggeredGridLayoutManager(
         2,
         StaggeredGridLayoutManager.VERTICAL

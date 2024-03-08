@@ -93,6 +93,7 @@ class AdvancedMenuSortView(context: Context) :
           options and AdvancedOptions.SORT_BY_NAME.inv()
         }
       }
+
       R.id.sort_by_time -> {
         options = if (isChecked) {
           options or AdvancedOptions.SORT_BY_UPDATE_TIME
@@ -100,6 +101,7 @@ class AdvancedMenuSortView(context: Context) :
           options and AdvancedOptions.SORT_BY_UPDATE_TIME.inv()
         }
       }
+
       R.id.sort_by_target_version -> {
         options = if (isChecked) {
           options or AdvancedOptions.SORT_BY_TARGET_API

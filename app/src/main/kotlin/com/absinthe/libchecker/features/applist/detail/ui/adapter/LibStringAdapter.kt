@@ -119,6 +119,7 @@ class LibStringAdapter(
           item.item.name
         }
       }
+
       EXPORTED -> {
         if ((GlobalValues.itemAdvancedOptions and AdvancedOptions.MARK_EXPORTED) > 0) {
           buildSpannedString {
@@ -134,6 +135,7 @@ class LibStringAdapter(
           item.item.name
         }
       }
+
       else -> {
         item.item.name
       }
@@ -141,9 +143,13 @@ class LibStringAdapter(
 
     when (type) {
       NATIVE -> setNativeContent(holder.itemView as NativeLibItemView, item, itemName)
+
       PERMISSION -> setPermissionContent(holder.itemView as ComponentLibItemView, item, itemName)
+
       METADATA -> setMetadataContent(holder.itemView as MetadataLibItemView, item, itemName)
+
       STATIC -> setStaticContent(holder.itemView as StaticLibItemView, item, itemName)
+
       else -> {
         (holder.itemView as ComponentLibItemView).apply {
           processLabelColor = if (item.item.process.isNullOrEmpty() || !processMode) {
@@ -294,6 +300,7 @@ class LibStringAdapter(
                   }
                   clickedTag = true
                 }
+
                 "array" -> {
                   appResources?.let { res ->
                     itemView.libSize.text =
@@ -301,11 +308,13 @@ class LibStringAdapter(
                   }
                   clickedTag = true
                 }
+
                 "bool" -> {
                   appResources?.let { res ->
                     itemView.libSize.text = res.getBoolean(item.item.size.toInt()).toString()
                   }
                 }
+
                 "xml" -> {
                   fragmentManager?.let { fm ->
                     appResources?.let { res ->
@@ -322,6 +331,7 @@ class LibStringAdapter(
                   }
                   clickedTag = false
                 }
+
                 "drawable", "mipmap" -> {
                   appResources?.getDrawable(item.item.size.toInt(), null)?.let { drawable ->
                     val bitmap = drawable.toBitmap(
@@ -333,6 +343,7 @@ class LibStringAdapter(
                   }
                   clickedTag = true
                 }
+
                 "color" -> {
                   appResources?.getColor(item.item.size.toInt(), null)?.let { colorInt ->
                     itemView.linkToIcon.load(
@@ -347,12 +358,14 @@ class LibStringAdapter(
                   }
                   clickedTag = true
                 }
+
                 "dimen" -> {
                   appResources?.let { res ->
                     itemView.libSize.text = res.getDimension(item.item.size.toInt()).toString()
                   }
                   clickedTag = true
                 }
+
                 else -> {
                   clickedTag = false
                 }

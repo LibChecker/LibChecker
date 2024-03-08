@@ -95,11 +95,13 @@ class LibReferenceFragment :
                 is LinearLayoutManager -> {
                   (layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
                 }
+
                 is StaggeredGridLayoutManager -> {
                   val counts = IntArray(4)
                   (layoutManager as StaggeredGridLayoutManager).findLastVisibleItemPositions(counts)
                   counts[0]
                 }
+
                 else -> {
                   0
                 }
@@ -189,10 +191,12 @@ class LibReferenceFragment :
             computeRef(true)
           }
         }
+
         Constants.PREF_COLORFUL_ICON -> {
           // noinspection NotifyDataSetChanged
           refAdapter.notifyDataSetChanged()
         }
+
         Constants.PREF_LIB_REF_THRESHOLD -> {
           val threshold = it.second as Int
           if (threshold < homeViewModel.savedThreshold) {

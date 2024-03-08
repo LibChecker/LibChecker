@@ -90,15 +90,18 @@ class AppPropsAdapter(
                 itemView.value.text = appResources.getString(item.value.toInt())
                 clickedTag = true
               }
+
               "array" -> {
                 itemView.value.text =
                   appResources.getStringArray(item.value.toInt()).contentToString()
                 clickedTag = true
               }
+
               "bool" -> {
                 itemView.value.text = appResources.getBoolean(item.value.toInt()).toString()
                 clickedTag = true
               }
+
               "xml" -> {
                 appResources.getXml(item.value.toInt()).let {
                   val text = ResourceParser(it).setMarkColor(true).parse()
@@ -111,6 +114,7 @@ class AppPropsAdapter(
                 }
                 clickedTag = false
               }
+
               "drawable", "mipmap" -> {
                 appResources.getDrawable(item.value.toInt(), null)?.let { drawable ->
                   val bitmap = drawable.toBitmap(
@@ -136,10 +140,12 @@ class AppPropsAdapter(
                 }
                 clickedTag = true
               }
+
               "dimen" -> {
                 itemView.value.text = appResources.getDimension(item.value.toInt()).toString()
                 clickedTag = true
               }
+
               else -> {
                 clickedTag = false
               }

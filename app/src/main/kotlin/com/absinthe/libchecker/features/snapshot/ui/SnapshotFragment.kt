@@ -537,6 +537,7 @@ class SnapshotFragment :
           }
 
           Constants.SNAPSHOT_KEEP -> computeNewSnapshot(false)
+
           Constants.SNAPSHOT_DISCARD -> computeNewSnapshot(true)
         }
       }
@@ -612,6 +613,7 @@ class SnapshotFragment :
   private fun getSuitableLayoutManagerImpl(configuration: Configuration): RecyclerView.LayoutManager {
     layoutManager = when (configuration.orientation) {
       Configuration.ORIENTATION_PORTRAIT -> LinearLayoutManager(requireContext())
+
       Configuration.ORIENTATION_LANDSCAPE ->
         StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
 

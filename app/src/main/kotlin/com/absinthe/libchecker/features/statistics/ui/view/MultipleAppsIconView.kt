@@ -70,6 +70,7 @@ class MultipleAppsIconView(context: Context) : AViewGroup(context) {
           it.layout(it.toHorizontalCenter(this), it.toVerticalCenter(this))
         }
       }
+
       2 -> {
         val paddingHorizontal = (measuredWidth - iconSize * 2 - iconGap).div(2)
         icons.forEachIndexed { index, view ->
@@ -78,6 +79,7 @@ class MultipleAppsIconView(context: Context) : AViewGroup(context) {
           view.layout(x.toInt(), y.toInt())
         }
       }
+
       3 -> {
         val padding = (measuredWidth - iconSize * 2 - iconGap).div(2)
         icons.forEachIndexed { index, view ->
@@ -90,6 +92,7 @@ class MultipleAppsIconView(context: Context) : AViewGroup(context) {
           }
         }
       }
+
       4 -> {
         val padding = (measuredWidth - iconSize * 2 - iconGap).div(2)
         icons.forEachIndexed { index, view ->

@@ -454,6 +454,7 @@ class AppListFragment :
   private fun getSuitableLayoutManagerImpl(configuration: Configuration): RecyclerView.LayoutManager {
     layoutManager = when (configuration.orientation) {
       Configuration.ORIENTATION_PORTRAIT -> LinearLayoutManager(requireContext())
+
       Configuration.ORIENTATION_LANDSCAPE ->
         StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
 
