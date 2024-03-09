@@ -29,6 +29,9 @@ class XposedInfoDialogFragment : BaseBottomSheetViewDialogFragment<XposedInfoBot
     XposedInfoBottomSheetView(requireContext())
 
   override fun init() {
+    root.post {
+      maxPeekSize = ((dialog?.window?.decorView?.height ?: 0) * 0.67).toInt()
+    }
     val pi = runCatching {
       PackageUtils.getPackageInfo(packageName, PackageManager.GET_META_DATA)
     }.getOrNull() ?: run {
