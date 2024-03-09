@@ -18,7 +18,7 @@ import com.absinthe.libchecker.utils.extensions.md5
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
-import com.absinthe.rulesbundle.LCRules
+import com.absinthe.rulesbundle.Repositories as RulesBundleRepo
 import com.absinthe.rulesbundle.RuleDatabase
 import com.jakewharton.processphoenix.ProcessPhoenix
 import java.io.File
@@ -51,9 +51,9 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
           request.requestCloudRuleInfo()?.let {
             try {
               root.cloudRulesContentView.localVersion.version.text =
-                getLocalRulesVersion().toString()
+                RulesBundleRepo.getLocalRulesVersion(requireContext()).toString()
               root.cloudRulesContentView.remoteVersion.version.text = it.version.toString()
-              if (getLocalRulesVersion() < it.version) {
+              if (RulesBundleRepo.getLocalRulesVersion(requireContext()) < it.version) {
                 root.cloudRulesContentView.setUpdateButtonStatus(true)
               }
               withContext(Dispatchers.Main) {
@@ -90,7 +90,8 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
                 root.cloudRulesContentView.remoteVersion.version.text
               root.cloudRulesContentView.setUpdateButtonStatus(false)
               runCatching {
-                setLocalRulesVersion(
+                RulesBundleRepo.setLocalRulesVersion(
+                  requireContext(),
                   root.cloudRulesContentView.remoteVersion.version.text.toString().toInt()
                 )
                 context?.let {
@@ -116,21 +117,5 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
         }
       }
     )
-  }
-
-  private fun getLocalRulesVersion(): Int {
-    val localCloudVersionFile = File(requireContext().filesDir, "lcrules/version")
-    if (localCloudVersionFile.exists().not()) return LCRules.getVersion()
-    if (localCloudVersionFile.isDirectory.not()) return LCRules.getVersion()
-    localCloudVersionFile.listFiles()?.takeIf { it.isNotEmpty() }?.let {
-      return runCatching { it[0].name.toInt() }.getOrDefault(LCRules.getVersion())
-    } ?: return LCRules.getVersion()
-  }
-
-  private fun setLocalRulesVersion(version: Int) {
-    val localCloudVersionFile = File(requireContext().filesDir, "lcrules/version")
-    if (localCloudVersionFile.isDirectory.not()) localCloudVersionFile.delete()
-    if (localCloudVersionFile.exists().not()) localCloudVersionFile.mkdirs()
-    File(localCloudVersionFile, version.toString()).createNewFile()
   }
 }

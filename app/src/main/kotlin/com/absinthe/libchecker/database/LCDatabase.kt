@@ -12,7 +12,6 @@ import com.absinthe.libchecker.database.entity.SnapshotDiffStoringItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.database.entity.TrackItem
-import com.absinthe.rulesbundle.LCRules
 
 @Database(
   entities = [
@@ -53,7 +52,6 @@ abstract class LCDatabase : RoomDatabase() {
             MIGRATION_16_17, MIGRATION_17_18, MIGRATION_18_19,
             MIGRATION_19_20, MIGRATION_20_21
           )
-          .createFromAsset(LCRules.getRulesAssetPath())
           .build()
         INSTANCE = instance
         return instance
