@@ -49,6 +49,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
@@ -64,6 +65,7 @@ class AppListFragment :
   SearchView.OnQueryTextListener {
 
   private val appAdapter = AppAdapter()
+  private var updateItemsJob: Job? = null
   private var delayShowNavigationJob: Job? = null
   private var advancedMenuBSDFragment: AdvancedMenuBSDFragment? = null
   private var isFirstLaunch = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
@@ -369,7 +371,12 @@ class AppListFragment :
     }.launchIn(lifecycleScope)
   }
 
-  private fun updateItems(highlightRefresh: Boolean = false) =
+  private fun updateItems(highlightRefresh: Boolean = false) {
+    updateItemsJob?.cancel()
+    updateItemsJob = updateItemsImpl(highlightRefresh)
+  }
+
+  private fun updateItemsImpl(highlightRefresh: Boolean = false) =
     lifecycleScope.launch(Dispatchers.IO) {
       Timber.d("updateItems")
       var filterList: MutableList<LCItem> = Repositories.lcRepository.getLCItems().toMutableList()
@@ -422,6 +429,9 @@ class AppListFragment :
         filterList.sortByDescending { it.targetApi }
       }
 
+      if (!isActive) {
+        return@launch
+      }
       withContext(Dispatchers.Main) {
         appAdapter.apply {
           setDiffNewData(filterList) {

@@ -41,6 +41,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
@@ -312,37 +313,39 @@ class LibReferenceFragment :
 
       searchUpdateJob?.cancel()
       searchUpdateJob = lifecycleScope.launch(Dispatchers.IO) {
-        homeViewModel.savedRefList?.let { list ->
-          val filter = list.filter {
-            it.libName.contains(newText, ignoreCase = true) || it.rule?.label?.contains(
-              newText,
-              ignoreCase = true
-            ) ?: false
-          }
-          LibReferenceAdapter.highlightText = newText
+        val savedRefList = homeViewModel.savedRefList ?: return@launch
+        val filter = savedRefList.filter {
+          it.libName.contains(newText, ignoreCase = true) || it.rule?.label?.contains(
+            newText,
+            ignoreCase = true
+          ) ?: false
+        }
+        LibReferenceAdapter.highlightText = newText
 
-          withContext(Dispatchers.Main) {
-            if (isFragmentVisible()) {
-              (activity as? INavViewContainer)?.showProgressBar()
-            }
-            refAdapter.setDiffNewData(filter.toMutableList()) {
-              doOnMainThreadIdle {
-                //noinspection NotifyDataSetChanged
-                refAdapter.notifyDataSetChanged()
-              }
-            }
-            binding.list.post {
-              (activity as? INavViewContainer)?.hideProgressBar()
+        if (!isActive) {
+          return@launch
+        }
+        withContext(Dispatchers.Main) {
+          if (isFragmentVisible()) {
+            (activity as? INavViewContainer)?.showProgressBar()
+          }
+          refAdapter.setDiffNewData(filter.toMutableList()) {
+            doOnMainThreadIdle {
+              //noinspection NotifyDataSetChanged
+              refAdapter.notifyDataSetChanged()
             }
           }
+          binding.list.post {
+            (activity as? INavViewContainer)?.hideProgressBar()
+          }
+        }
 
-          if (newText.equals("Easter Egg", true)) {
-            context?.showToast("🥚")
-            Analytics.trackEvent(
-              Constants.Event.EASTER_EGG,
-              EventProperties().set("EASTER_EGG", "Lib Reference Search")
-            )
-          }
+        if (newText.equals("Easter Egg", true)) {
+          context?.showToast("🥚")
+          Analytics.trackEvent(
+            Constants.Event.EASTER_EGG,
+            EventProperties().set("EASTER_EGG", "Lib Reference Search")
+          )
         }
       }
     }

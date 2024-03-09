@@ -8,6 +8,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.OsUtils
 import rikka.material.app.MaterialActivity
+import timber.log.Timber
 
 abstract class BaseActivity<VB : ViewBinding> : MaterialActivity(), IBinding<VB> {
 
@@ -17,6 +18,16 @@ abstract class BaseActivity<VB : ViewBinding> : MaterialActivity(), IBinding<VB>
     super.onCreate(savedInstanceState)
     binding = (inflateBinding(layoutInflater) as VB).also {
       setContentView(it.root)
+    }
+  }
+
+  override fun invalidateMenu() {
+    // It will somehow cause a crash when calling super.invalidateMenu() in some cases
+    // java.lang.IllegalStateException: The specified child already has a parent. You must call removeView() on the child's parent first.
+    runCatching {
+      super.invalidateMenu()
+    }.onFailure {
+      Timber.e(it)
     }
   }
 
