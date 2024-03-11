@@ -33,6 +33,7 @@ fun Project.setupAppModule(block: BaseAppModuleExtension.() -> Unit = {}) {
         "in-rID",
         "pt-rBR",
         "ar-rSA",
+        "tr-rTR",
       )
     }
     val releaseSigning = if (project.hasProperty("releaseStoreFile")) {
