@@ -23,6 +23,7 @@
     <item>in</item>
     <item>pt</item>
     <item>ar</item>
+    <item>tr</item>
   </string-array>
 
   <string-array name="language_value" translatable="false">
@@ -38,6 +39,7 @@
     <item>in-ID</item>
     <item>pt-BR</item>
     <item>ar-SA</item>
+    <item>tr-TR</item>
   </string-array>
 
   <string-array name="list_dark_mode" tools:ignore="InconsistentArrays">
