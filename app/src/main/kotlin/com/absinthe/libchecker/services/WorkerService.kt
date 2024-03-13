@@ -5,7 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
+import android.os.Message
 import android.os.RemoteCallbackList
 import android.os.RemoteException
 import android.os.SystemClock
@@ -23,17 +26,17 @@ import timber.log.Timber
 
 class WorkerService : LifecycleService() {
 
+  private lateinit var mainHandler: MyHandler
   private var lastPackageChangedTime: Long = 0L
 
   private val packageReceiver by lazy {
     object : BroadcastReceiver() {
       override fun onReceive(context: Context, intent: Intent?) {
         Timber.d("package receiver received: ${intent?.action}")
-        lastPackageChangedTime = SystemClock.elapsedRealtime()
-        notifyPackagesChanged(
-          intent?.data?.encodedSchemeSpecificPart.orEmpty(),
-          intent?.action.orEmpty()
-        )
+
+        val what = intent?.data?.encodedSchemeSpecificPart.orEmpty().hashCode()
+        mainHandler.removeMessages(what)
+        mainHandler.sendMessageDelayed(Message.obtain(mainHandler, what, intent), 1000)
       }
     }
   }
@@ -50,6 +53,7 @@ class WorkerService : LifecycleService() {
     super.onCreate()
     Timber.d("onCreate")
     initializingFeatures = false
+    mainHandler = MyHandler(WeakReference(this))
 
     val intentFilter = IntentFilter().apply {
       addAction(Intent.ACTION_PACKAGE_ADDED)
@@ -70,6 +74,7 @@ class WorkerService : LifecycleService() {
   override fun onDestroy() {
     Timber.d("onDestroy")
     unregisterReceiver(packageReceiver)
+    mainHandler.removeCallbacksAndMessages(null)
     super.onDestroy()
   }
 
@@ -130,6 +135,22 @@ class WorkerService : LifecycleService() {
     override fun unregisterOnWorkerListener(listener: OnWorkerListener?) {
       Timber.d("unregisterOnWorkerListener")
       serviceRef.get()?.listenerList?.unregister(listener)
+    }
+  }
+
+  private class MyHandler(private val serviceRef: WeakReference<WorkerService>) : Handler(Looper.getMainLooper()) {
+    override fun handleMessage(msg: Message) {
+      super.handleMessage(msg)
+      val service = serviceRef.get()
+      if (service != null && msg.obj is Intent) {
+        val intent = msg.obj as Intent
+        Timber.d("handleMessage: $intent")
+        service.lastPackageChangedTime = SystemClock.elapsedRealtime()
+        service.notifyPackagesChanged(
+          intent.data?.encodedSchemeSpecificPart.orEmpty(),
+          intent.action.orEmpty()
+        )
+      }
     }
   }
 
