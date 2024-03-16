@@ -17,6 +17,11 @@
     android:title="@string/title_snapshot" />
 
   <item
+    android:id="@+id/navigation_shortcuts"
+    android:icon="@drawable/ic_shortcut"
+    android:title="@string/title_shortcuts" />
+
+  <item
     android:id="@+id/navigation_settings"
     android:icon="@drawable/ic_settings"
     android:title="@string/title_settings" />

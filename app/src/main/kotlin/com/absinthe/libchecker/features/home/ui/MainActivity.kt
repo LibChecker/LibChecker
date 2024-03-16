@@ -30,6 +30,7 @@ import com.absinthe.libchecker.features.applist.ui.AppListFragment
 import com.absinthe.libchecker.features.home.HomeViewModel
 import com.absinthe.libchecker.features.home.INavViewContainer
 import com.absinthe.libchecker.features.settings.ui.SettingsFragment
+import com.absinthe.libchecker.features.shortcuts.ui.ShortcutsFragment
 import com.absinthe.libchecker.features.snapshot.ui.SnapshotFragment
 import com.absinthe.libchecker.features.statistics.ui.LibReferenceFragment
 import com.absinthe.libchecker.services.IWorkerService
@@ -198,7 +199,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
       viewpager.apply {
         adapter = object : FragmentStateAdapter(this@MainActivity) {
           override fun getItemCount(): Int {
-            return 4
+            return 5
           }
 
           override fun createFragment(position: Int): Fragment {
@@ -206,7 +207,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
               0 -> AppListFragment()
               1 -> LibReferenceFragment()
               2 -> SnapshotFragment()
-              else -> SettingsFragment()
+              3 -> ShortcutsFragment()
+              4 -> SettingsFragment()
+              else -> throw IndexOutOfBoundsException("Invalid index $position, size is 5")
             }
           }
         }
@@ -259,7 +262,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
             R.id.navigation_app_list -> performClickNavigationItem(0)
             R.id.navigation_classify -> performClickNavigationItem(1)
             R.id.navigation_snapshot -> performClickNavigationItem(2)
-            R.id.navigation_settings -> performClickNavigationItem(3)
+            R.id.navigation_shortcuts -> performClickNavigationItem(3)
+            R.id.navigation_settings -> performClickNavigationItem(4)
           }
           true
         }
