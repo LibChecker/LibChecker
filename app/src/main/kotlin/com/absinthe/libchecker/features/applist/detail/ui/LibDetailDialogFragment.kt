@@ -1,8 +1,6 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
 import android.content.DialogInterface
-import android.text.method.LinkMovementMethod
-import androidx.core.text.HtmlCompat
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -42,6 +40,7 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
 
   override fun init() {
     root.apply {
+      maxPeekHeightPercentage = 0.8f
       title.text = libName
       lifecycleScope.launch {
         val iconRes = if (isValidLib) {
@@ -80,20 +79,13 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
         if (detail != null) {
           root.apply {
             withContext(Dispatchers.Main) {
-              libDetailContentView.apply {
-                label.text.text = detail.label
-                team.text.text = detail.team
-                contributor.text.text = detail.contributors.toContributorsString()
-                description.text.text = detail.description
-                relativeLink.text.apply {
-                  isClickable = true
-                  movementMethod = LinkMovementMethod.getInstance()
-                  text = HtmlCompat.fromHtml(
-                    "<a href='${detail.relativeUrl}'> ${detail.relativeUrl} </a>",
-                    HtmlCompat.FROM_HTML_MODE_LEGACY
-                  )
-                }
-              }
+              setContent(
+                detail.label,
+                detail.team,
+                detail.contributors.toContributorsString(),
+                detail.description,
+                "<a href='${detail.relativeUrl}'> ${detail.relativeUrl} </a>"
+              )
               showContent()
             }
 
@@ -104,7 +96,7 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
               }
               val date = viewModel.getRepoUpdatedTime(splits[0], splits[1]) ?: return@launch
               withContext(Dispatchers.Main) {
-                libDetailContentView.setUpdatedTime(date)
+                root.setUpdateTIme(date)
               }
             }
           }

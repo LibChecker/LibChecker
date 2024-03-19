@@ -17,16 +17,14 @@ class XmlBSDFragment : BaseBottomSheetViewDialogFragment<XmlBottomSheetView>() {
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {
+    maxPeekHeightPercentage = 0.67f
     root.apply {
       layoutParams = ViewGroup.LayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
       setPadding(24.dp, 16.dp, 24.dp, 0)
-      post {
-        maxPeekSize = ((dialog?.window?.decorView?.height ?: 0) * 0.67).toInt()
-      }
+      setText(text)
     }
-    root.setText(text)
   }
 }
