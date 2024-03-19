@@ -127,10 +127,5 @@
 -keep,allowobfuscation,allowshrinking class com.absinthe.libchecker.ui.base.BaseActivity
 -keep,allowobfuscation,allowshrinking class * extends com.absinthe.libchecker.ui.base.BaseActivity
 
-# TODO: Waiting for new retrofit release to remove these rules
--keep,allowobfuscation,allowshrinking interface retrofit2.Call
--keep,allowobfuscation,allowshrinking class retrofit2.Response
--keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
-
 # org.apache.commons:commons-compress
 -keep,allowoptimization class org.apache.commons.compress.archivers.zip.**

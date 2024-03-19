@@ -7,7 +7,7 @@ hiddenApiRefine = "4.4.0"
 kotlin = "1.9.23"
 protoc = "4.26.0"
 shizuku = "13.1.5"
-square-retrofit = "2.9.0"
+square-retrofit = "2.10.0"
 zhaobozhen = "1.1.4"
 
 [plugins]
