@@ -8,7 +8,7 @@ kotlin = "1.9.23"
 protoc = "4.26.0"
 shizuku = "13.1.5"
 square-retrofit = "2.10.0"
-zhaobozhen = "1.1.4"
+zhaobozhen = "1.1.5.4"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
