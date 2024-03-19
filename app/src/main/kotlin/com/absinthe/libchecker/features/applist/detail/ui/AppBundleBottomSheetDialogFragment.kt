@@ -20,9 +20,7 @@ class AppBundleBottomSheetDialogFragment :
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {
-    root.post {
-      maxPeekSize = ((dialog?.window?.decorView?.height ?: 0) * 0.67).toInt()
-    }
+    maxPeekHeightPercentage = 0.67f
     packageName?.let {
       val packageInfo = PackageUtils.getPackageInfo(it)
       val list = PackageUtils.getSplitsSourceDir(packageInfo)

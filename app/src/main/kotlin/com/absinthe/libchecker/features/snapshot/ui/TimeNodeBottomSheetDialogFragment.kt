@@ -29,9 +29,7 @@ class TimeNodeBottomSheetDialogFragment :
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {
-    root.post {
-      maxPeekSize = ((dialog?.window?.decorView?.height ?: 0) * 0.67).toInt()
-    }
+    maxPeekHeightPercentage = 0.67f
     customTitle?.let { getHeaderView().title.text = it }
     itemClickAction?.let {
       root.adapter.apply {

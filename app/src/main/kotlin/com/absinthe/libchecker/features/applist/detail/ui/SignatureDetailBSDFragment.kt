@@ -28,9 +28,7 @@ class SignatureDetailBSDFragment :
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {
-    root.post {
-      maxPeekSize = ((dialog?.window?.decorView?.height ?: 0) * 0.67).toInt()
-    }
+    maxPeekHeightPercentage = 0.67f
     root.adapter.setOnItemLongClickListener { _, _, _ ->
       ClipboardUtils.put(requireContext(), detail)
       VersionCompat.showCopiedOnClipboardToast(requireContext())

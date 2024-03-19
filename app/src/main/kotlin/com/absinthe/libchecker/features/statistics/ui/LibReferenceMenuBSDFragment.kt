@@ -21,9 +21,7 @@ class LibReferenceMenuBSDFragment : BaseBottomSheetViewDialogFragment<LibReferen
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {
-    root.post {
-      maxPeekSize = ((dialog?.window?.decorView?.height ?: 0) * 0.8).toInt()
-    }
+    maxPeekHeightPercentage = 0.8f
     optionsViewMap[LibReferenceOptions.NATIVE_LIBS] = root.addOptionItemView(R.string.ref_category_native, LibReferenceOptions.NATIVE_LIBS)
     optionsViewMap[LibReferenceOptions.SERVICES] = root.addOptionItemView(R.string.ref_category_service, LibReferenceOptions.SERVICES)
     optionsViewMap[LibReferenceOptions.ACTIVITIES] = root.addOptionItemView(R.string.ref_category_activity, LibReferenceOptions.ACTIVITIES)

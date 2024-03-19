@@ -19,8 +19,8 @@ class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Clas
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {
+    maxPeekHeightPercentage = 0.67f
     root.post {
-      maxPeekSize = ((dialog?.window?.decorView?.height ?: 0) * 0.67).toInt()
       _title?.let { setTitle(it) }
       _androidVersionTriple?.let { setAndroidVersionLabel(it) }
       _list?.let { setList(it) }
