@@ -285,8 +285,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
     ViewCompat.setOnApplyWindowInsetsListener(view) { _, windowInsets ->
       // 这里不直接使用 windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars())
       // 因为它的结果可能受到 insets 传播链上层某环节的影响，出现了错误的 navigationBarsInsets
+      // 使用 WindowInsetsCompat.Type.systemBars() 以适配如 HyperOS Freeform 之类的奇怪的东西
       val navigationBarsInsets =
-        ViewCompat.getRootWindowInsets(view)!!.getInsets(WindowInsetsCompat.Type.navigationBars())
+        ViewCompat.getRootWindowInsets(view)!!.getInsets(WindowInsetsCompat.Type.systemBars())
       view.updatePadding(bottom = navigationBarsInsets.bottom)
       windowInsets
     }
