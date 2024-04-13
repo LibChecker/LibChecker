@@ -9,6 +9,8 @@ interface AppDataSource {
 
   fun getApplicationList(): List<PackageInfo>
 
+  fun getApplicationList(userId: Int): List<PackageInfo>
+
   fun getApplicationMap(ioDispatcher: CoroutineDispatcher): Flow<Map<String, PackageInfo>>
 
   fun getApplicationMap(): Map<String, PackageInfo>
