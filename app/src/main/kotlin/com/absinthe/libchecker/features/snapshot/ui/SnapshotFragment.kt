@@ -69,12 +69,13 @@ import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
-import java.util.LinkedList
-import java.util.Queue
+import java.util.concurrent.LinkedBlockingQueue
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import rikka.widget.borderview.BorderView
 import timber.log.Timber
@@ -130,7 +131,8 @@ class SnapshotFragment :
       shootBinder = null
     }
   }
-  private val packageQueue: Queue<Pair<String?, String?>> by lazy { LinkedList() }
+  private val packageQueue by lazy { LinkedBlockingQueue<Pair<String?, String?>>() }
+  private var dequeuePackagesJob: Job? = null
   private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
   private var advancedMenuBSDFragment: SnapshotMenuBSDFragment? = null
 
@@ -317,15 +319,8 @@ class SnapshotFragment :
 
         is SnapshotViewModel.Effect.DiffItemChange -> {
           val newItems = adapter.data
-            .asSequence()
-            .map { i ->
-              if (i.packageName == it.item.packageName) {
-                it.item
-              } else {
-                i
-              }
-            }
-            .toList()
+          newItems.removeIf { item -> item.packageName == it.item.packageName }
+          newItems.add(it.item)
           items = newItems
           updateItems(newItems)
         }
@@ -599,11 +594,16 @@ class SnapshotFragment :
     isSnapshotDatabaseItemsReady = false
   }
 
-  @Synchronized
-  private fun dequeuePackages() = lifecycleScope.launch(Dispatchers.IO) {
-    while (packageQueue.isNotEmpty()) {
-      packageQueue.poll()?.first?.let {
-        viewModel.compareItemDiff(GlobalValues.snapshotTimestamp, it)
+  private fun dequeuePackages() {
+    if (dequeuePackagesJob?.isActive == true) {
+      return
+    }
+    dequeuePackagesJob = lifecycleScope.launch(Dispatchers.IO) {
+      while (isActive) {
+        packageQueue.take()?.first?.let {
+          Timber.d("Dequeue package: $it")
+          viewModel.compareItemDiff(GlobalValues.snapshotTimestamp, it)
+        }
       }
     }
   }
