@@ -527,7 +527,7 @@ class HomeViewModel : ViewModel() {
           computeDexReferenceInternal(
             referenceMap,
             packageName,
-            PackageUtils.getDexList(packageName)
+            PackageUtils.getDexList(packageName).toList()
           )
         }
 

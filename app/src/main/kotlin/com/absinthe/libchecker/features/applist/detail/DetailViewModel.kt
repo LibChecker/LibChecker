@@ -314,7 +314,7 @@ class DetailViewModel : ViewModel() {
   private suspend fun getDexChipList(packageName: String): List<LibStringItemChip> {
     Timber.d("getDexChipList")
     val list = try {
-      PackageUtils.getDexList(packageName, packageName.isTempApk()).toMutableList()
+      PackageUtils.getDexList(packageName, packageName.isTempApk())
     } catch (e: Exception) {
       Timber.e(e)
       emptyList()

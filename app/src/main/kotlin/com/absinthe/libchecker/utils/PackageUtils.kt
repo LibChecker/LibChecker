@@ -939,7 +939,7 @@ object PackageUtils {
    * @param isApk True if it is an apk file
    * @return List of LibStringItem
    */
-  fun getDexList(packageName: String, isApk: Boolean = false): List<LibStringItem> {
+  fun getDexList(packageName: String, isApk: Boolean = false): Collection<LibStringItem> {
     try {
       val path = if (isApk) {
         packageName
@@ -952,7 +952,7 @@ object PackageUtils {
       }
       var className: String
 
-      val primaryList = mutableListOf<LibStringItem>()
+      val primarySet = mutableSetOf<LibStringItem>()
       val pkgType = "L${packageName.replace(".", "/")}"
       FastDexFileFactory.loadDexContainer(File(path), Opcodes.getDefault()).apply {
         dexEntryNames.forEachIndexed { index, entry ->
@@ -960,7 +960,7 @@ object PackageUtils {
             return@forEachIndexed
           }
           getEntry(entry)?.let { dexEntry ->
-            primaryList += dexEntry.dexFile.classes
+            primarySet += dexEntry.dexFile.classes
               .asSequence()
               .filter { !it.type.startsWith(pkgType) }
               .map { item ->
@@ -990,33 +990,32 @@ object PackageUtils {
               }
               .toSet()
               .filter { it.name.isNotBlank() }
-              .toMutableList()
           }
         }
       }
 
       // Merge path deep level 3 classes
-      primaryList.filter { it.name.split(".").size == 3 }.forEach {
-        primaryList.removeAll { item -> item.name.startsWith(it.name) }
-        primaryList.add(it)
+      primarySet.filter { it.name.split(".").size == 3 }.forEach {
+        primarySet.removeAll { item -> item.name.startsWith(it.name) }
+        primarySet.add(it)
       }
       // Merge path deep level 4 classes
       var pathLevel3Item: String
       var filter: List<LibStringItem>
-      primaryList.filter { it.name.split(".").size == 4 }.forEach {
+      primarySet.filter { it.name.split(".").size == 4 }.forEach {
         if (DexLibMap.DEEP_LEVEL_3_SET.contains(it.name)) {
           return@forEach
         }
 
         pathLevel3Item = it.name.split(".").subList(0, 3).joinToString(separator = ".")
-        filter = primaryList.filter { item -> item.name.startsWith(pathLevel3Item) }
+        filter = primarySet.filter { item -> item.name.startsWith(pathLevel3Item) }
 
         if (filter.isNotEmpty()) {
-          primaryList.removeAll(filter.toSet())
-          primaryList.add(LibStringItem(pathLevel3Item))
+          primarySet.removeAll(filter.toSet())
+          primarySet.add(LibStringItem(pathLevel3Item))
         }
       }
-      return primaryList
+      return primarySet
     } catch (e: Exception) {
       Timber.e(e)
       return emptyList()
