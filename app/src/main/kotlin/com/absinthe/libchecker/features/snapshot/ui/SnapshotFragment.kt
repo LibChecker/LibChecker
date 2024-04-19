@@ -318,7 +318,7 @@ class SnapshotFragment :
         }
 
         is SnapshotViewModel.Effect.DiffItemChange -> {
-          val newItems = adapter.data
+          val newItems = adapter.data.toMutableList()
           newItems.removeIf { item -> item.packageName == it.item.packageName }
           newItems.add(it.item)
           items = newItems
