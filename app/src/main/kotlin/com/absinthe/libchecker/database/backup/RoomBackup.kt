@@ -380,7 +380,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
 
       BACKUP_FILE_LOCATION_CUSTOM_DIALOG -> {
         backupFilename = filename
-        openBackupfileCreator.launch(backupFilename)
+        openBackupfileCreator.launch(backupFilename!!)
         return
       }
 
@@ -736,7 +736,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       }
       when (currentProcess) {
         PROCESS_BACKUP -> {
-          openBackupfileCreator.launch(backupFilename)
+          backupFilename?.let { openBackupfileCreator.launch(it) }
         }
 
         PROCESS_RESTORE -> {
