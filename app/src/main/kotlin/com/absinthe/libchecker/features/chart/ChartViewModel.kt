@@ -4,19 +4,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.absinthe.libchecker.database.Repositories
-import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.features.chart.impl.MarketDistributionChartDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class ChartViewModel : ViewModel() {
-  val dbItems: StateFlow<List<LCItem>> = Repositories.lcRepository.allLCItemsStateFlow
   private var queryJob: Job? = null
 
   private val _isLoading = MutableStateFlow(false)
@@ -44,7 +40,7 @@ class ChartViewModel : ViewModel() {
           root.removeView(currentChartView)
         }
         root.addView(newChartView)
-        if (dbItems.value.isNotEmpty()) {
+        if (source.getData().isNotEmpty()) {
           setLoading(false)
         }
         if (source is MarketDistributionChartDataSource) {

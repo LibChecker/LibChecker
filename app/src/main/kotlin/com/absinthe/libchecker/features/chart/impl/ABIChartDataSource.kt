@@ -23,7 +23,7 @@ import kotlinx.coroutines.withContext
 private val ABI_64_BIT = setOf(Constants.ARMV8, Constants.X86_64)
 private val ABI_32_BIT = setOf(Constants.ARMV5, Constants.ARMV7, Constants.X86)
 
-class ABIChartDataSource : BaseChartDataSource<PieChart>() {
+class ABIChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>(items) {
   override val classifiedList: List<MutableList<LCItem>> =
     listOf(mutableListOf(), mutableListOf(), mutableListOf())
 
