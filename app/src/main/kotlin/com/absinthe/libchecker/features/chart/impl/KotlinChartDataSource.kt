@@ -16,7 +16,7 @@ import com.github.mikephil.charting.utils.MPPointF
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class KotlinChartDataSource : BaseChartDataSource<PieChart>() {
+class KotlinChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>(items) {
   override val classifiedList: List<MutableList<LCItem>> = listOf(mutableListOf(), mutableListOf())
 
   override suspend fun fillChartView(chartView: PieChart) {

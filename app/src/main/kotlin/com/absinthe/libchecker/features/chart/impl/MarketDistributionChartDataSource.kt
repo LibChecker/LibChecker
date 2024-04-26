@@ -5,6 +5,7 @@ import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.AndroidDistribution
 import com.absinthe.libchecker.api.request.AndroidDistributionRequest
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.features.chart.BaseVariableChartDataSource
 import com.absinthe.libchecker.features.chart.OsVersionAxisFormatter
 import com.absinthe.libchecker.features.chart.PercentageFormatter
@@ -23,7 +24,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-class MarketDistributionChartDataSource : BaseVariableChartDataSource<BarChart>() {
+class MarketDistributionChartDataSource(items: List<LCItem>) : BaseVariableChartDataSource<BarChart>(items) {
   var distribution: List<AndroidDistribution>? = null
     private set
 

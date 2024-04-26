@@ -2,17 +2,16 @@ package com.absinthe.libchecker.features.chart
 
 import android.view.View
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
 import java.util.TreeMap
 
-abstract class BaseVariableChartDataSource<T : View> : IChartDataSource<T> {
+abstract class BaseVariableChartDataSource<T : View>(val items: List<LCItem>) : IChartDataSource<T> {
   protected val classifiedMap: MutableMap<Int, MutableList<LCItem>> = TreeMap()
 
   protected val filteredList = if (GlobalValues.isShowSystemApps) {
-    Repositories.lcRepository.allLCItemsStateFlow.value
+    items
   } else {
-    Repositories.lcRepository.allLCItemsStateFlow.value.filter { !it.isSystem }
+    items.filter { !it.isSystem }
   }
 
   override fun getListByXValue(x: Int): List<LCItem> {
@@ -20,4 +19,8 @@ abstract class BaseVariableChartDataSource<T : View> : IChartDataSource<T> {
   }
 
   abstract fun getListKeyByXValue(x: Int): Int?
+
+  override fun getData(): List<LCItem> {
+    return items
+  }
 }

@@ -15,6 +15,8 @@ import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.database.Repositories
+import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentPieChartBinding
 import com.absinthe.libchecker.features.chart.BaseVariableChartDataSource
 import com.absinthe.libchecker.features.chart.ChartViewModel
@@ -44,8 +46,10 @@ import com.google.android.material.button.MaterialButtonToggleGroup
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import rikka.core.util.ClipboardUtils
@@ -58,6 +62,7 @@ class ChartFragment :
 
   private val viewModel: ChartViewModel by activityViewModels()
   private lateinit var chartView: ViewGroup
+  private lateinit var allLCItemsStateFlow: StateFlow<List<LCItem>>
   private var dataSource: IChartDataSource<*>? = null
   private var dialog: ClassifyBottomSheetDialogFragment? = null
   private var setDataJob: Job? = null
@@ -71,23 +76,27 @@ class ChartFragment :
 
     binding.buttonsGroup.apply {
       addOnButtonCheckedListener(this@ChartFragment)
-      check(R.id.btn_abi)
     }
     binding.btnKotlin.isVisible = featureInitialized
     binding.btnCompose.isVisible = featureInitialized
 
-    viewModel.apply {
-      dbItems.onEach {
+    lifecycleScope.launch {
+      allLCItemsStateFlow = Repositories.lcRepository.allLCItemsFlow.onEach {
         if (featureInitialized) {
           setDataJob?.cancel()
           setDataJob = lifecycleScope.launch(Dispatchers.IO) {
-            delay(2000)
+            if (dataSource != null) {
+              delay(2000)
+            }
             withContext(Dispatchers.Main) {
-              setData()
+              if (dataSource == null) {
+                binding.buttonsGroup.check(R.id.btn_abi)
+              }
+              setData(it)
             }
           }
         }
-      }.launchIn(lifecycleScope)
+      }.stateIn(this)
     }
     lifecycleScope.launch {
       lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -112,12 +121,12 @@ class ChartFragment :
 
     GlobalValues.preferencesFlow.onEach {
       if (it.first == Constants.PREF_SHOW_SYSTEM_APPS) {
-        setData()
+        setData(allLCItemsStateFlow.value)
       }
     }.launchIn(lifecycleScope)
   }
 
-  private fun setData() {
+  private fun setData(items: List<LCItem>) {
     context ?: return
     viewModel.setLoading(true)
     applyDistributionDashboardView()
@@ -126,12 +135,12 @@ class ChartFragment :
     }
 
     when (binding.buttonsGroup.checkedButtonId) {
-      R.id.btn_abi -> setChartData(::generatePieChartView, ::ABIChartDataSource)
-      R.id.btn_kotlin -> setChartData(::generatePieChartView, ::KotlinChartDataSource)
-      R.id.btn_target_api -> setChartData(::generateBarChartView, ::TargetApiChartDataSource)
-      R.id.btn_min_sdk -> setChartData(::generateBarChartView, ::MinApiChartDataSource)
-      R.id.btn_compose -> setChartData(::generatePieChartView, ::JetpackComposeChartDataSource)
-      R.id.btn_distribution -> setChartData(::generateBarChartView, ::MarketDistributionChartDataSource)
+      R.id.btn_abi -> setChartData(::generatePieChartView) { ABIChartDataSource(items) }
+      R.id.btn_kotlin -> setChartData(::generatePieChartView) { KotlinChartDataSource(items) }
+      R.id.btn_target_api -> setChartData(::generateBarChartView) { TargetApiChartDataSource(items) }
+      R.id.btn_min_sdk -> setChartData(::generateBarChartView) { MinApiChartDataSource(items) }
+      R.id.btn_compose -> setChartData(::generatePieChartView) { JetpackComposeChartDataSource(items) }
+      R.id.btn_distribution -> setChartData(::generateBarChartView) { MarketDistributionChartDataSource(items) }
     }
   }
 
@@ -169,7 +178,7 @@ class ChartFragment :
 
       if (dataSource is TargetApiChartDataSource || dataSource is MinApiChartDataSource) {
         val index = (dataSource as BaseVariableChartDataSource<*>).getListKeyByXValue(h.x.toInt())
-        it.setAndroidVersionLabel(AndroidVersions.versions.find { it.first == index })
+        it.setAndroidVersionLabel(AndroidVersions.versions.find { version -> version.first == index })
       } else {
         it.setAndroidVersionLabel(null)
       }
@@ -192,7 +201,7 @@ class ChartFragment :
     checkedId: Int,
     isChecked: Boolean
   ) {
-    setData()
+    setData(allLCItemsStateFlow.value)
   }
 
   private fun generatePieChartView(): PieChart {

@@ -8,4 +8,5 @@ sealed interface IChartDataSource<T : View> {
   suspend fun fillChartView(chartView: T)
   fun getListByXValue(x: Int): List<LCItem>
   fun getLabelByXValue(context: Context, x: Int): String
+  fun getData(): List<LCItem>
 }

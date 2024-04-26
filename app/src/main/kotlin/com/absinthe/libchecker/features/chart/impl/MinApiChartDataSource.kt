@@ -18,7 +18,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-class MinApiChartDataSource : BaseVariableChartDataSource<BarChart>() {
+class MinApiChartDataSource(items: List<LCItem>) : BaseVariableChartDataSource<BarChart>(items) {
   override suspend fun fillChartView(chartView: BarChart) {
     withContext(Dispatchers.Default) {
       val context = chartView.context ?: return@withContext
