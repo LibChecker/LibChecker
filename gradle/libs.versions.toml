@@ -41,7 +41,7 @@ androidX-room-compiler = { module = "androidx.room:room-compiler", version.ref =
 androidX-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidX-room" }
 androidX-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidX-room" }
 androidX-security = "androidx.security:security-crypto:1.1.0-alpha06"
-androidX-viewPager2 = "androidx.viewpager2:viewpager2:1.1.0-beta02"
+androidX-viewPager2 = "androidx.viewpager2:viewpager2:1.1.0-rc01"
 androidX-window = "androidx.window:window:1.2.0"
 
 square-leakCanary = "com.squareup.leakcanary:leakcanary-android:2.14"
