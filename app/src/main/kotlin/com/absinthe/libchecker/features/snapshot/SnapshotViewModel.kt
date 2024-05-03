@@ -1262,7 +1262,7 @@ class SnapshotViewModel : ViewModel() {
         val message = buildString {
           total.forEach {
             append(
-              String.format(context.getString(R.string.album_restore_detail), getFormatDateString(it.key), it.value)
+              String.format(context.getString(R.string.album_restore_detail), getFormatDateString(it.key), it.value.toString())
             )
           }
         }
