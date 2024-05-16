@@ -38,7 +38,8 @@ object AndroidVersions {
     Triple(31, "Android 12", R.drawable.ic_android_s),
     Triple(32, "Android 12L, 12.1", R.drawable.ic_android_s),
     Triple(33, "Tiramisu, 13", R.drawable.ic_android_t),
-    Triple(34, "UpsideDownCake, 14", R.drawable.ic_android_u)
+    Triple(34, "UpsideDownCake, 14", R.drawable.ic_android_u),
+    Triple(35, "Vanilla Ice Cream, 15", R.drawable.ic_android_v),
   )
 
   val simpleVersions = mapOf(
@@ -76,6 +77,7 @@ object AndroidVersions {
     31 to "12",
     32 to "12.1",
     33 to "13",
-    34 to "14"
+    34 to "14",
+    35 to "15",
   )
 }
