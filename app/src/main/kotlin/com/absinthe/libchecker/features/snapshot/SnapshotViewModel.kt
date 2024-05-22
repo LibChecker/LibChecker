@@ -165,6 +165,9 @@ class SnapshotViewModel : ViewModel() {
         pi = currMap[it]!!
         ai = pi.applicationInfo
         versionCode = pi.getVersionCode()
+        val activitiesPi = PackageUtils.getPackageInfo(pi.packageName, PackageManager.GET_ACTIVITIES)
+        val srpPi = PackageUtils.getPackageInfo(pi.packageName, PackageManager.GET_SERVICES or PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS)
+        val miscPi = PackageUtils.getPackageInfo(pi.packageName, PackageManager.GET_PERMISSIONS or PackageManager.GET_META_DATA)
 
         diffList.add(
           SnapshotDiffItem(
@@ -182,37 +185,37 @@ class SnapshotViewModel : ViewModel() {
             ),
             SnapshotDiffItem.DiffNode(
               PackageUtils.getComponentStringList(
-                pi.packageName,
+                srpPi,
                 SERVICE,
                 false
               ).toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
               PackageUtils.getComponentStringList(
-                pi.packageName,
+                activitiesPi,
                 ACTIVITY,
                 false
               ).toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
               PackageUtils.getComponentStringList(
-                pi.packageName,
+                srpPi,
                 RECEIVER,
                 false
               ).toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
               PackageUtils.getComponentStringList(
-                pi.packageName,
+                srpPi,
                 PROVIDER,
                 false
               ).toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
-              pi.getPermissionsList().toJson().orEmpty()
+              miscPi.getPermissionsList().toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
-              PackageUtils.getMetaDataItems(pi).toJson().orEmpty()
+              PackageUtils.getMetaDataItems(miscPi).toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
               pi.getPackageSize(true)
@@ -303,6 +306,15 @@ class SnapshotViewModel : ViewModel() {
     ) {
       return null
     }
+    val activitiesPi = runCatching {
+      PackageUtils.getPackageInfo(packageInfo.packageName, PackageManager.GET_ACTIVITIES)
+    }.getOrNull() ?: return null
+    val srpPi = runCatching {
+      PackageUtils.getPackageInfo(packageInfo.packageName, PackageManager.GET_SERVICES or PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS)
+    }.getOrNull() ?: return null
+    val miscPi = runCatching {
+      PackageUtils.getPackageInfo(packageInfo.packageName, PackageManager.GET_PERMISSIONS or PackageManager.GET_META_DATA)
+    }.getOrNull() ?: return null
     val sdi = SnapshotDiffItem(
       packageName = packageInfo.packageName,
       updateTime = packageInfo.lastUpdateTime,
@@ -342,7 +354,7 @@ class SnapshotViewModel : ViewModel() {
       servicesDiff = SnapshotDiffItem.DiffNode(
         dbItem.services,
         PackageUtils.getComponentStringList(
-          packageInfo.packageName,
+          srpPi,
           SERVICE,
           false
         ).toJson().orEmpty()
@@ -350,7 +362,7 @@ class SnapshotViewModel : ViewModel() {
       activitiesDiff = SnapshotDiffItem.DiffNode(
         dbItem.activities,
         PackageUtils.getComponentStringList(
-          packageInfo.packageName,
+          activitiesPi,
           ACTIVITY,
           false
         ).toJson().orEmpty()
@@ -358,7 +370,7 @@ class SnapshotViewModel : ViewModel() {
       receiversDiff = SnapshotDiffItem.DiffNode(
         dbItem.receivers,
         PackageUtils.getComponentStringList(
-          packageInfo.packageName,
+          srpPi,
           RECEIVER,
           false
         ).toJson().orEmpty()
@@ -366,18 +378,18 @@ class SnapshotViewModel : ViewModel() {
       providersDiff = SnapshotDiffItem.DiffNode(
         dbItem.providers,
         PackageUtils.getComponentStringList(
-          packageInfo.packageName,
+          srpPi,
           PROVIDER,
           false
         ).toJson().orEmpty()
       ),
       permissionsDiff = SnapshotDiffItem.DiffNode(
         dbItem.permissions,
-        packageInfo.getPermissionsList().toJson().orEmpty()
+        miscPi.getPermissionsList().toJson().orEmpty()
       ),
       metadataDiff = SnapshotDiffItem.DiffNode(
         dbItem.metadata,
-        PackageUtils.getMetaDataItems(packageInfo).toJson().orEmpty()
+        PackageUtils.getMetaDataItems(miscPi).toJson().orEmpty()
       ),
       packageSizeDiff = SnapshotDiffItem.DiffNode(
         dbItem.packageSize,

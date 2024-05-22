@@ -41,7 +41,7 @@ object LocalAppDataSource : AppDataSource {
   override fun getApplicationList(): List<PackageInfo> {
     Timber.d("getApplicationList start")
     val list =
-      PackageManagerCompat.getInstalledPackages(PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS)
+      PackageManagerCompat.getInstalledPackages(0)
     Timber.d("getApplicationList end, apps count: ${list.size}")
 
     loadApexPackageSet()
