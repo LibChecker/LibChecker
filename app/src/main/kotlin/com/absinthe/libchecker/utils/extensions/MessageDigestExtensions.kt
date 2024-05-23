@@ -13,7 +13,7 @@ fun ByteArray.md5(separator: CharSequence = ""): String = toByteString().md5().t
 
 fun ByteArray.toHexString(separator: CharSequence = ""): String = joinToString(separator) {
   it.toInt().and(0xff).toString(16).padStart(2, '0')
-}
+}.uppercase()
 
 fun File.md5(): String = readBytes().md5()
 
