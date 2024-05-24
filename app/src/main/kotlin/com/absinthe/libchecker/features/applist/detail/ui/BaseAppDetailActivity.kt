@@ -536,7 +536,6 @@ abstract class BaseAppDetailActivity :
         }
       }.launchIn(lifecycleScope)
       it.processMapStateFlow.onEach { map ->
-        if (map.isEmpty()) return@onEach
         if (processBarView == null) {
           initProcessBarView()
         }
