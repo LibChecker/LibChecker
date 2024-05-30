@@ -31,16 +31,20 @@ class AlternativeLaunchBSDFragment :
       val packageInfo = runCatching {
         PackageUtils.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES)
       }.getOrNull()
-      val list = packageInfo?.activities?.asSequence()
-        ?.filter { it.exported }
-        ?.map {
-          AlternativeLaunchItem(
-            it.loadLabel(SystemServices.packageManager).toString(),
-            it.name
-          )
-        }
-        ?.toList()
-      if (list.isNullOrEmpty()) {
+      val list = if (packageInfo?.activities == null) {
+        emptyList()
+      } else {
+        packageInfo.activities.asSequence()
+          .filter { it.exported }
+          .map {
+            AlternativeLaunchItem(
+              it.loadLabel(SystemServices.packageManager).toString(),
+              it.name
+            )
+          }
+          .toList()
+      }
+      if (list.isEmpty()) {
         activity?.showToast(R.string.toast_cant_open_app)
         dismiss()
         return
