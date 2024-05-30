@@ -49,6 +49,9 @@
   <string name="string_kotlin_unused">未使用 Kotlin</string>
   <string name="string_compose_used">已使用 Jetpack Compose</string>
   <string name="string_compose_unused">未使用 Jetpack Compose</string>
+  <string name="android_dist_source">來源</string>
+  <string name="android_dist_title">Android 版本發佈統計資料</string>
+  <string name="android_dist_subtitle_format">更新時間：%s</string>
   <!--  About  -->
   <string name="settings_about">關於</string>
   <string name="settings_about_summary">這裡是 LibChecker！</string>
@@ -56,6 +59,8 @@
   <string name="settings_translate_summary">協助翻譯這個應用程式</string>
   <string name="settings_rate_us">給我們評分</string>
   <string name="settings_rate_us_summary">這可以使我們被更多的人發現</string>
+  <string name="settings_get_updates">取得更新</string>
+  <string name="settings_get_updates_summary">取得更加穩定並具有更多功能的最新版本</string>
   <string name="about_info">本應用程式用於檢視裝置上的應用程式使用第三方程式庫的狀況。</string>
   <string name="toolbar_rate">評分</string>
   <string name="resource_declaration">應用程式中的部分資源來自於： </string>
@@ -242,6 +247,7 @@
   <string name="adv_show_android_version">顯示 Android 版本</string>
   <string name="adv_show_target_version">顯示 Target 版本</string>
   <string name="adv_show_min_version">顯示 Min 版本</string>
+  <string name="adv_show_compile_version">顯示 Compile 版本</string>
   <string name="adv_tint_abi_label">ABI 標籤染色</string>
   <string name="adv_mark_exported">標示已匯出的元件</string>
   <string name="adv_mark_disabled">標示已停用的元件</string>
@@ -250,4 +256,5 @@
   <!--  Snapshot menu  -->
   <string name="snapshot_menu_show_update_time">顯示更新時間</string>
   <string name="snapshot_menu_hide_no_component_changes">隱藏沒有元件變更</string>
+  <string name="snapshot_menu_diff_highlight">重點標示差異</string>
 </resources>
