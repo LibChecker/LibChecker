@@ -45,6 +45,11 @@ class AlternativeLaunchBSDFragment :
           )
         }
         .toList()
+      if (list.isEmpty()) {
+        activity?.showToast(R.string.toast_cant_open_app)
+        dismiss()
+        return
+      }
       root.adapter.setList(list)
       root.adapter.setOnItemClickListener(object : OnItemClickListener {
         override fun onItemClick(adapter: BaseQuickAdapter<*, *>, view: View, position: Int) {
