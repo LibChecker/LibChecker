@@ -97,6 +97,8 @@ class AppInstallSourceBottomSheetView(context: Context) : AViewGroup(context), I
         header.measuredHeight +
         originatingView.measuredHeight +
         installingView.measuredHeight +
+        firstInstallTimeView.measuredHeight +
+        lastUpdateTimeView.measuredHeight +
         paddingBottom
     )
   }
