@@ -17,10 +17,13 @@ import com.absinthe.libchecker.features.applist.detail.ui.view.AppInstallSourceB
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppInstallSourceItemView
 import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.PREINSTALLED_TIMESTAMP
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
+import java.text.SimpleDateFormat
+import java.util.Locale
 import kotlinx.coroutines.runBlocking
 import rikka.shizuku.Shizuku
 import rikka.sui.Sui
@@ -28,8 +31,7 @@ import rikka.sui.Sui
 @RequiresApi(Build.VERSION_CODES.R)
 class AppInstallSourceBSDFragment :
   BaseBottomSheetViewDialogFragment<AppInstallSourceBottomSheetView>(),
-  Shizuku.OnBinderReceivedListener,
-  Shizuku.OnRequestPermissionResultListener {
+  Shizuku.OnBinderReceivedListener, Shizuku.OnRequestPermissionResultListener {
 
   private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
 
@@ -44,6 +46,7 @@ class AppInstallSourceBSDFragment :
 
     initOriginatingItemView(root.originatingView, info.originatingPackageName)
     initAppInstallSourceItemView(root.installingView, info.installingPackageName)
+    initAppTimeView(root, packageName)
   }
 
   override fun onDestroyView() {
@@ -75,6 +78,7 @@ class AppInstallSourceBSDFragment :
           }
         )
       }
+      item.packageView.container.abiInfo.maxHeight = 0
     } else {
       if (!Shizuku.pingBinder()) {
         item.packageView.container.appName.text =
@@ -87,6 +91,7 @@ class AppInstallSourceBSDFragment :
           PackageUtils.startLaunchAppActivity(requireContext(), Constants.PackageNames.SHIZUKU)
           Shizuku.addBinderReceivedListener(this)
         }
+        item.packageView.container.abiInfo.maxHeight = 0
       } else {
         if (Shizuku.getVersion() < 10) {
           item.packageView.container.appName.text =
@@ -102,6 +107,7 @@ class AppInstallSourceBSDFragment :
               }
             )
           }
+          item.packageView.container.abiInfo.maxHeight = 0
         } else if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
           item.packageView.container.appName.text =
             getString(R.string.lib_detail_app_install_source_shizuku_permission_not_granted)
@@ -113,7 +119,9 @@ class AppInstallSourceBSDFragment :
             Shizuku.addRequestPermissionResultListener(this)
             Shizuku.requestPermission(0)
           }
+          item.packageView.container.abiInfo.maxHeight = 0
         } else {
+          item.packageView.container.abiInfo.maxHeight = Int.MAX_VALUE
           initAppInstallSourceItemView(item, originatingPackageName)
         }
       }
@@ -137,7 +145,7 @@ class AppInstallSourceBSDFragment :
         it.packageName.text =
           getString(R.string.lib_detail_app_install_source_empty_detail)
         it.setVersionInfo("                                                                            ")
-        it.setAbiInfo("                                            ")
+        it.abiInfo.height = 0
       }
       item.packageView.setOnClickListener(null)
       return
@@ -188,6 +196,25 @@ class AppInstallSourceBSDFragment :
 
     Shizuku.removeRequestPermissionResultListener(this)
     Shizuku.removeBinderReceivedListener(this)
+  }
+
+  private fun initAppTimeView(item: AppInstallSourceBottomSheetView, packageName: String?) {
+    if (context == null || packageName == null) {
+      item.isGone = true
+      return
+    }
+    val packageInfo = PackageUtils.getPackageInfo(packageName)
+    val formatterToday = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+    item.firstInstallTimeView.text = if (packageInfo.firstInstallTime <= PREINSTALLED_TIMESTAMP) {
+      getString(R.string.snapshot_preinstalled_app)
+    } else {
+      getString(R.string.format_first_installed).format(formatterToday.format(packageInfo.firstInstallTime))
+    }
+    item.lastUpdateTimeView.text = if (packageInfo.lastUpdateTime <= PREINSTALLED_TIMESTAMP) {
+      getString(R.string.snapshot_preinstalled_app)
+    } else {
+      getString(R.string.format_last_updated).format(formatterToday.format(packageInfo.lastUpdateTime))
+    }
   }
 
   override fun onBinderReceived() {
