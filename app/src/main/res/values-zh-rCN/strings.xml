@@ -119,6 +119,7 @@
   <string name="extract_native_libs_tip">该应用声明了 </string>
   <string name="xml_detail">XML 详情</string>
   <string name="format_last_updated">更新于: %s</string>
+  <string name="format_first_installed">安装于: %s</string>
   <string name="menu_process">进程</string>
   <string name="menu_split">模块</string>
   <string name="alternative_launch_method">备选的启动方式</string>
