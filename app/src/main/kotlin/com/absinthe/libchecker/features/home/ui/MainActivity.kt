@@ -58,7 +58,10 @@ import timber.log.Timber
 
 const val PAGE_TRANSFORM_DURATION = 300L
 
-class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAppBarContainer {
+class MainActivity :
+  BaseActivity<ActivityMainBinding>(),
+  INavViewContainer,
+  IAppBarContainer {
 
   private val appViewModel: HomeViewModel by viewModels()
   private val navViewBehavior by lazy { HideBottomViewOnScrollBehavior<BottomNavigationView>() }

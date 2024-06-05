@@ -19,7 +19,9 @@ import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieDrawable
 import com.google.android.material.button.MaterialButton
 
-class CloudRulesDialogView(context: Context) : AViewGroup(context), IHeaderView {
+class CloudRulesDialogView(context: Context) :
+  AViewGroup(context),
+  IHeaderView {
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =

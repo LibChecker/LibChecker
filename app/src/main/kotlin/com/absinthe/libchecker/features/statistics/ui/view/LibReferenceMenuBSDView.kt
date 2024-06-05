@@ -12,7 +12,9 @@ import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.flexbox.JustifyContent
 
-class LibReferenceMenuBSDView(context: Context) : LinearLayout(context), IHeaderView {
+class LibReferenceMenuBSDView(context: Context) :
+  LinearLayout(context),
+  IHeaderView {
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =

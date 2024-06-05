@@ -13,8 +13,7 @@ import pxb.android.axml.ValueWrapper
 
 const val EXTRA_PACKAGE_INFO = "EXTRA_PACKAGE_INFO"
 
-class AppPropBottomSheetDialogFragment :
-  BaseBottomSheetViewDialogFragment<AppPropsBottomSheetView>() {
+class AppPropBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppPropsBottomSheetView>() {
 
   private val packageInfo by lazy {
     BundleCompat.getParcelable(

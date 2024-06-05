@@ -164,12 +164,14 @@ class ShootService : LifecycleService() {
     Timber.i("computeSnapshots: dropPrevious = $dropPrevious")
     _isShooting = true
 
-    val notificationPermissionGranted = !OsUtils.atLeastT() || ContextCompat.checkSelfPermission(
-      this@ShootService,
-      Manifest.permission.POST_NOTIFICATIONS
-    ) == PackageManager.PERMISSION_GRANTED
+    val notificationPermissionGranted = !OsUtils.atLeastT() ||
+      ContextCompat.checkSelfPermission(
+        this@ShootService,
+        Manifest.permission.POST_NOTIFICATIONS
+      ) == PackageManager.PERMISSION_GRANTED
     areNotificationsEnabled =
-      notificationManager.areNotificationsEnabled() && notificationPermissionGranted
+      notificationManager.areNotificationsEnabled() &&
+      notificationPermissionGranted
 
     notificationManager.cancel(notificationIdShootSuccess)
     showNotification()

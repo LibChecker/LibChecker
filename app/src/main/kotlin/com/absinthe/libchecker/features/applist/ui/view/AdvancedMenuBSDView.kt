@@ -30,7 +30,9 @@ import com.google.android.flexbox.FlexboxLayout
 import com.google.android.flexbox.JustifyContent
 import com.google.android.material.card.MaterialCardView
 
-class AdvancedMenuBSDView(context: Context) : LinearLayout(context), IHeaderView {
+class AdvancedMenuBSDView(context: Context) :
+  LinearLayout(context),
+  IHeaderView {
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =

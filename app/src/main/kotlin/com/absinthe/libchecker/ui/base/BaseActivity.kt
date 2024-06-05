@@ -10,7 +10,9 @@ import com.absinthe.libchecker.utils.OsUtils
 import rikka.material.app.MaterialActivity
 import timber.log.Timber
 
-abstract class BaseActivity<VB : ViewBinding> : MaterialActivity(), IBinding<VB> {
+abstract class BaseActivity<VB : ViewBinding> :
+  MaterialActivity(),
+  IBinding<VB> {
 
   override lateinit var binding: VB
 

@@ -24,7 +24,9 @@ import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
-class XposedInfoBottomSheetView(context: Context) : LinearLayout(context), IHeaderView {
+class XposedInfoBottomSheetView(context: Context) :
+  LinearLayout(context),
+  IHeaderView {
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =

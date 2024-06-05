@@ -12,7 +12,9 @@ import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
-class GetUpdatesDialogView(context: Context) : LinearLayout(context), IHeaderView {
+class GetUpdatesDialogView(context: Context) :
+  LinearLayout(context),
+  IHeaderView {
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)

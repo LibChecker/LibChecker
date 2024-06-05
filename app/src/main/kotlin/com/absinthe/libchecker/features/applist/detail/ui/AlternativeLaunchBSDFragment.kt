@@ -15,8 +15,7 @@ import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.listener.OnItemClickListener
 
-class AlternativeLaunchBSDFragment :
-  BaseBottomSheetViewDialogFragment<AlternativeLaunchBSDView>() {
+class AlternativeLaunchBSDFragment : BaseBottomSheetViewDialogFragment<AlternativeLaunchBSDView>() {
 
   private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
 

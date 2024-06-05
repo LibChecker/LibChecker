@@ -54,7 +54,9 @@ import rikka.widget.borderview.BorderView
 import rikka.widget.borderview.BorderViewDelegate
 import timber.log.Timber
 
-class SettingsFragment : PreferenceFragmentCompat(), IListController {
+class SettingsFragment :
+  PreferenceFragmentCompat(),
+  IListController {
 
   private lateinit var borderViewDelegate: BorderViewDelegate
   private lateinit var prefRecyclerView: RecyclerView

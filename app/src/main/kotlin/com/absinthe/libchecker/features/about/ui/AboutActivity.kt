@@ -44,7 +44,9 @@ import timber.log.Timber
 
 private const val RENGE_CHECKER = "RengeChecker"
 
-class AboutActivity : AbsAboutActivityProxy(), MenuProvider {
+class AboutActivity :
+  AbsAboutActivityProxy(),
+  MenuProvider {
 
   private var shouldShowEasterEggCount = 1
   private val configuration by lazy {

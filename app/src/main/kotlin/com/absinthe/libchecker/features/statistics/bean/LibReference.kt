@@ -14,4 +14,5 @@ data class LibReference(
   val referredList: Set<String>,
   @LibType val type: Int,
   override val childNode: @RawValue MutableList<BaseNode>? = null
-) : Parcelable, BaseNode()
+) : BaseNode(),
+  Parcelable

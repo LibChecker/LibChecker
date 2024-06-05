@@ -7,7 +7,9 @@ import com.github.mikephil.charting.formatter.IValueFormatter
 import com.github.mikephil.charting.utils.ViewPortHandler
 import java.text.DecimalFormat
 
-class PercentageFormatter : IAxisValueFormatter, IValueFormatter {
+class PercentageFormatter :
+  IAxisValueFormatter,
+  IValueFormatter {
 
   private val formatter = DecimalFormat("###,###,##0.00%")
 
