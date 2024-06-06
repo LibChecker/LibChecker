@@ -36,6 +36,8 @@ class AbiLabelProvider : BaseNodeProvider() {
       Constants.ARMV5 -> R.drawable.ic_abi_label_armeabi
       Constants.X86_64 -> R.drawable.ic_abi_label_x86_64
       Constants.X86 -> R.drawable.ic_abi_label_x86
+      Constants.MIPS64 -> R.drawable.ic_abi_label_mips64
+      Constants.MIPS -> R.drawable.ic_abi_label_mips
       Constants.MULTI_ARCH -> R.drawable.ic_abi_label_multi_arch
       else -> throw IllegalArgumentException("wrong abi label")
     }

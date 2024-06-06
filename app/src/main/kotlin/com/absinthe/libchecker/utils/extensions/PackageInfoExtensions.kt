@@ -11,6 +11,12 @@ import android.os.Build
 import androidx.core.content.pm.PackageInfoCompat
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.compat.ZipFileCompat
+import com.absinthe.libchecker.constant.Constants.ARMV7
+import com.absinthe.libchecker.constant.Constants.ARMV8
+import com.absinthe.libchecker.constant.Constants.MIPS
+import com.absinthe.libchecker.constant.Constants.MIPS64
+import com.absinthe.libchecker.constant.Constants.X86
+import com.absinthe.libchecker.constant.Constants.X86_64
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.features.applist.detail.bean.KotlinToolingMetadata
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
@@ -635,6 +641,15 @@ private val ABI_TO_INSTRUCTION_SET_MAP = mapOf(
   "arm64-v8a" to "arm64",
   "arm64-v8a-hwasan" to "arm64",
   "riscv64" to "riscv64"
+)
+
+val INSTRUCTION_SET_MAP_TO_ABI_VALUE = mapOf(
+  "arm64" to ARMV8,
+  "arm" to ARMV7,
+  "x86_64" to X86_64,
+  "x86" to X86,
+  "mips64" to MIPS64,
+  "mips" to MIPS
 )
 
 @Suppress("UNCHECKED_CAST")

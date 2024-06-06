@@ -950,7 +950,7 @@ abstract class BaseAppDetailActivity :
   private fun initAbiView(abi: Int, abiSet: Set<Int>) {
     val trueAbi = abi.mod(Constants.MULTI_ARCH)
     lifecycleScope.launch {
-      viewModel.is64Bit.emit(trueAbi == Constants.ARMV8 || trueAbi == Constants.X86_64)
+      viewModel.is64Bit.emit(PackageUtils.isAbi64Bit(trueAbi))
     }
 
     if (abiSet.isNotEmpty() && !abiSet.contains(Constants.OVERLAY) && !abiSet.contains(Constants.ERROR)) {

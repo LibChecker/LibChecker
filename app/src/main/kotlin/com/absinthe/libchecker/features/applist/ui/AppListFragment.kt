@@ -400,13 +400,13 @@ class AppListFragment :
       if ((options and AdvancedOptions.SHOW_64_BIT_APPS) == 0) {
         filterList = filterList.filter {
           val trueAbi = it.abi.mod(Constants.MULTI_ARCH)
-          it.abi.toInt() == Constants.OVERLAY || trueAbi == Constants.X86 || trueAbi == Constants.ARMV7 || trueAbi == Constants.ARMV5 || (trueAbi == Constants.NO_LIBS && !isNonNativeLibApp64Bit)
+          it.abi.toInt() == Constants.OVERLAY || !PackageUtils.isAbi64Bit(trueAbi) || (trueAbi == Constants.NO_LIBS && !isNonNativeLibApp64Bit)
         }.toMutableList()
       }
       if ((options and AdvancedOptions.SHOW_32_BIT_APPS) == 0) {
         filterList = filterList.filter {
           val trueAbi = it.abi.mod(Constants.MULTI_ARCH)
-          it.abi.toInt() == Constants.OVERLAY || trueAbi == Constants.X86_64 || trueAbi == Constants.ARMV8 || (trueAbi == Constants.NO_LIBS && isNonNativeLibApp64Bit)
+          it.abi.toInt() == Constants.OVERLAY || PackageUtils.isAbi64Bit(trueAbi) || (trueAbi == Constants.NO_LIBS && isNonNativeLibApp64Bit)
         }.toMutableList()
       }
 
