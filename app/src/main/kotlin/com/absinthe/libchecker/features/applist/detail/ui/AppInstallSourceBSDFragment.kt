@@ -145,7 +145,7 @@ class AppInstallSourceBSDFragment :
         it.packageName.text =
           getString(R.string.lib_detail_app_install_source_empty_detail)
         it.setVersionInfo("                                                                            ")
-        it.abiInfo.height = 0
+        it.abiInfo.maxHeight = 0
       }
       item.packageView.setOnClickListener(null)
       return
@@ -210,10 +210,14 @@ class AppInstallSourceBSDFragment :
     } else {
       getString(R.string.format_first_installed).format(formatterToday.format(packageInfo.firstInstallTime))
     }
-    item.lastUpdateTimeView.text = if (packageInfo.lastUpdateTime <= PREINSTALLED_TIMESTAMP) {
-      getString(R.string.snapshot_preinstalled_app)
+    if (packageInfo.firstInstallTime == packageInfo.lastUpdateTime) {
+      item.lastUpdateTimeView.maxHeight = 0
     } else {
-      getString(R.string.format_last_updated).format(formatterToday.format(packageInfo.lastUpdateTime))
+      item.lastUpdateTimeView.text = if (packageInfo.lastUpdateTime <= PREINSTALLED_TIMESTAMP) {
+        getString(R.string.snapshot_preinstalled_app)
+      } else {
+        getString(R.string.format_last_updated).format(formatterToday.format(packageInfo.lastUpdateTime))
+      }
     }
   }
 
