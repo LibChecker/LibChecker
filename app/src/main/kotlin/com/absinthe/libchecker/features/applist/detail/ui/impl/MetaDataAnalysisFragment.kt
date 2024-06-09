@@ -15,7 +15,9 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
-class MetaDataAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>(), Referable {
+class MetaDataAnalysisFragment :
+  BaseDetailFragment<FragmentLibNativeBinding>(),
+  Referable {
 
   override fun getRecyclerView() = binding.list
   override val needShowLibDetailDialog = false

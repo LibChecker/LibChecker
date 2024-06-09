@@ -14,8 +14,10 @@ import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 
-class ComparisonDashboardHalfView(context: Context, attributeSet: AttributeSet? = null) :
-  AViewGroup(context, attributeSet) {
+class ComparisonDashboardHalfView(
+  context: Context,
+  attributeSet: AttributeSet? = null
+) : AViewGroup(context, attributeSet) {
 
   private val tvSnapshotTimestampTitle =
     AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {

@@ -13,8 +13,10 @@ import com.absinthe.libchecker.utils.extensions.isRtl
 /**
  * From drakeet
  */
-abstract class AViewGroup(context: Context, attributeSet: AttributeSet? = null) :
-  ViewGroup(context, attributeSet) {
+abstract class AViewGroup(
+  context: Context,
+  attributeSet: AttributeSet? = null
+) : ViewGroup(context, attributeSet) {
 
   protected fun View.defaultWidthMeasureSpec(parentView: ViewGroup): Int {
     return when (layoutParams.width) {

@@ -9,8 +9,7 @@ import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import java.util.Locale
 
-class AppBundleBottomSheetDialogFragment :
-  BaseBottomSheetViewDialogFragment<AppBundleBottomSheetView>() {
+class AppBundleBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppBundleBottomSheetView>() {
 
   private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
 

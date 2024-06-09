@@ -23,8 +23,10 @@ import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.app.AlwaysMarqueeTextView
 
-class SnapshotTitleView(context: Context, attributeSet: AttributeSet? = null) :
-  AViewGroup(context, attributeSet) {
+class SnapshotTitleView(
+  context: Context,
+  attributeSet: AttributeSet? = null
+) : AViewGroup(context, attributeSet) {
 
   val iconView = AppCompatImageView(context).apply {
     val iconSize = context.getDimensionPixelSize(R.dimen.lib_detail_icon_size)

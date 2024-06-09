@@ -18,7 +18,9 @@ import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.absinthe.libraries.utils.view.HeightAnimatableViewFlipper
 
-class PermissionInfoBottomSheetView(context: Context) : AViewGroup(context), IHeaderView {
+class PermissionInfoBottomSheetView(context: Context) :
+  AViewGroup(context),
+  IHeaderView {
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =

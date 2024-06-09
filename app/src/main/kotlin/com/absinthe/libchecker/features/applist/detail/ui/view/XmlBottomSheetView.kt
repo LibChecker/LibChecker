@@ -13,7 +13,9 @@ import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
-class XmlBottomSheetView(context: Context) : LinearLayout(context), IHeaderView {
+class XmlBottomSheetView(context: Context) :
+  LinearLayout(context),
+  IHeaderView {
 
   private val adapter = Adapter()
 

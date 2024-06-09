@@ -22,7 +22,9 @@ import timber.log.Timber
 const val EXTRA_PACKAGE_NAME = Intent.EXTRA_PACKAGE_NAME
 const val EXTRA_DETAIL_BEAN = "EXTRA_DETAIL_BEAN"
 
-class AppDetailActivity : BaseAppDetailActivity(), IDetailContainer {
+class AppDetailActivity :
+  BaseAppDetailActivity(),
+  IDetailContainer {
 
   private val pkgName by unsafeLazy {
     intent.getStringExtra(EXTRA_PACKAGE_NAME) ?: let {

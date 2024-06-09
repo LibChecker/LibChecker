@@ -8,7 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 import timber.log.Timber
 
-abstract class BaseFragment<VB : ViewBinding> : Fragment(), IBinding<VB> {
+abstract class BaseFragment<VB : ViewBinding> :
+  Fragment(),
+  IBinding<VB> {
 
   private var _binding: VB? = null
 

@@ -8,8 +8,10 @@ import android.graphics.RectF
 import android.util.AttributeSet
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 
-abstract class RoundCornerView(context: Context, attributeSet: AttributeSet? = null) :
-  AViewGroup(context, attributeSet) {
+abstract class RoundCornerView(
+  context: Context,
+  attributeSet: AttributeSet? = null
+) : AViewGroup(context, attributeSet) {
   private val backgroundPath = Path()
   private val paint by lazy {
     Paint().apply {

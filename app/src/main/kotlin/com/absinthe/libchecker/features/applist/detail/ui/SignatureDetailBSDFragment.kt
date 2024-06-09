@@ -17,8 +17,7 @@ import rikka.core.util.ClipboardUtils
 
 const val EXTRA_SIGNATURE_DETAIL = "EXTRA_SIGNATURE_DETAIL"
 
-class SignatureDetailBSDFragment :
-  BaseBottomSheetViewDialogFragment<SignatureDetailBottomSheetView>() {
+class SignatureDetailBSDFragment : BaseBottomSheetViewDialogFragment<SignatureDetailBottomSheetView>() {
 
   private val detail by unsafeLazy { arguments?.getString(EXTRA_SIGNATURE_DETAIL).orEmpty() }
 

@@ -14,7 +14,9 @@ import com.absinthe.libchecker.utils.extensions.putArguments
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-class NativeAnalysisFragment : BaseFilterAnalysisFragment<FragmentLibNativeBinding>(), Referable {
+class NativeAnalysisFragment :
+  BaseFilterAnalysisFragment<FragmentLibNativeBinding>(),
+  Referable {
 
   override fun getRecyclerView() = binding.list
   override val needShowLibDetailDialog = true

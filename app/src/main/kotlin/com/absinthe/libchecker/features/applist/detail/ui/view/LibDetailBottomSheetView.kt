@@ -41,7 +41,9 @@ import com.google.android.material.tabs.TabLayout
 import java.util.Locale
 import timber.log.Timber
 
-class LibDetailBottomSheetView(context: Context) : LinearLayout(context), IHeaderView {
+class LibDetailBottomSheetView(context: Context) :
+  LinearLayout(context),
+  IHeaderView {
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =

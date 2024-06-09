@@ -22,7 +22,9 @@ import okio.sink
 import okio.source
 import timber.log.Timber
 
-class ApkDetailActivity : BaseAppDetailActivity(), IDetailContainer {
+class ApkDetailActivity :
+  BaseAppDetailActivity(),
+  IDetailContainer {
 
   private var tempFile: File? = null
 

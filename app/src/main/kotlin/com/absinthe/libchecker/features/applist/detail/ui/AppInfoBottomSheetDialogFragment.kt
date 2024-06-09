@@ -29,8 +29,7 @@ import java.io.File
  * </pre>
  */
 
-class AppInfoBottomSheetDialogFragment :
-  BaseBottomSheetViewDialogFragment<AppInfoBottomSheetView>() {
+class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppInfoBottomSheetView>() {
 
   private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
   private val aiAdapter = AppInfoAdapter()

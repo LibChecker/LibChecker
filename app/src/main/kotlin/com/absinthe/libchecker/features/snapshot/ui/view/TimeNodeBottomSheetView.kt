@@ -14,7 +14,9 @@ import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import rikka.widget.borderview.BorderRecyclerView
 
-class TimeNodeBottomSheetView(context: Context) : LinearLayout(context), IHeaderView {
+class TimeNodeBottomSheetView(context: Context) :
+  LinearLayout(context),
+  IHeaderView {
 
   val adapter by unsafeLazy { TimeNodeAdapter() }
 

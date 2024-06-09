@@ -119,12 +119,13 @@ object LCAppUtils {
 
       "libapp.so" -> {
         runCatching {
-          otherNativeLibs?.any { it.name == "libflutter.so" } == true || PackageUtils.findDexClasses(
-            source,
-            listOf(
-              "io.flutter.FlutterInjector".toClassDefType()
-            )
-          ).any { it == "io.flutter.FlutterInjector".toClassDefType() }
+          otherNativeLibs?.any { it.name == "libflutter.so" } == true ||
+            PackageUtils.findDexClasses(
+              source,
+              listOf(
+                "io.flutter.FlutterInjector".toClassDefType()
+              )
+            ).any { it == "io.flutter.FlutterInjector".toClassDefType() }
         }.getOrDefault(false)
       }
 

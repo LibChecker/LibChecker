@@ -8,7 +8,9 @@ import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
-class AppInstallSourceBottomSheetView(context: Context) : AViewGroup(context), IHeaderView {
+class AppInstallSourceBottomSheetView(context: Context) :
+  AViewGroup(context),
+  IHeaderView {
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =

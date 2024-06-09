@@ -388,9 +388,10 @@ class AppListFragment :
       }
       if ((options and AdvancedOptions.SHOW_SYSTEM_FRAMEWORK_APPS) == 0) {
         filterList = filterList.filter {
-          (!it.packageName.startsWith("com.android.") && it.packageName != "android") || runCatching {
-            PackageUtils.getPackageInfo(it.packageName).isPreinstalled()
-          }.getOrDefault(false).not()
+          (!it.packageName.startsWith("com.android.") && it.packageName != "android") ||
+            runCatching {
+              PackageUtils.getPackageInfo(it.packageName).isPreinstalled()
+            }.getOrDefault(false).not()
         }.toMutableList()
       }
       if ((options and AdvancedOptions.SHOW_OVERLAYS) == 0) {

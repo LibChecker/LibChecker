@@ -22,7 +22,9 @@ import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.flexbox.JustifyContent
 
-class SnapshotMenuBSDView(context: Context) : LinearLayout(context), IHeaderView {
+class SnapshotMenuBSDView(context: Context) :
+  LinearLayout(context),
+  IHeaderView {
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =

@@ -58,8 +58,7 @@ class LibStringAdapter(
   val packageName: String,
   @LibType val type: Int,
   private val fragmentManager: FragmentManager? = null
-) :
-  HighlightAdapter<LibStringItemChip>() {
+) : HighlightAdapter<LibStringItemChip>() {
 
   var highlightPosition: Int = -1
     private set

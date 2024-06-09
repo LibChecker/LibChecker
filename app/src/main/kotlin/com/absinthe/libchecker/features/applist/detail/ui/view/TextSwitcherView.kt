@@ -18,7 +18,9 @@ import com.absinthe.libchecker.utils.extensions.getColorByAttr
  * time : 2020/09/14
  * </pre>
  */
-class TextSwitcherView : TextSwitcher, ViewSwitcher.ViewFactory {
+class TextSwitcherView :
+  TextSwitcher,
+  ViewSwitcher.ViewFactory {
 
   constructor(context: Context?) : super(context, null)
   constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {

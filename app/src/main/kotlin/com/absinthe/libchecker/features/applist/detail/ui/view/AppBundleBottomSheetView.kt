@@ -15,7 +15,9 @@ import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
-class AppBundleBottomSheetView(context: Context) : LinearLayout(context), IHeaderView {
+class AppBundleBottomSheetView(context: Context) :
+  LinearLayout(context),
+  IHeaderView {
 
   val adapter by unsafeLazy { AppBundleAdapter() }
 

@@ -24,7 +24,9 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ComponentsAnalysisFragment : BaseFilterAnalysisFragment<FragmentLibComponentBinding>(), Referable {
+class ComponentsAnalysisFragment :
+  BaseFilterAnalysisFragment<FragmentLibComponentBinding>(),
+  Referable {
 
   private var itemsList: List<LibStringItemChip>? = null
 

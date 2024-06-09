@@ -10,7 +10,9 @@ import androidx.core.animation.doOnEnd
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import timber.log.Timber
 
-class HeightAnimatableLinearLayout : LinearLayout, View.OnLayoutChangeListener {
+class HeightAnimatableLinearLayout :
+  LinearLayout,
+  View.OnLayoutChangeListener {
   var animationDuration = 350L
   private var animator: ValueAnimator = ObjectAnimator()
 

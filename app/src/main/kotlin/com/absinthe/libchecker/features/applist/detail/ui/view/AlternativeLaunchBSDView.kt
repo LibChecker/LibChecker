@@ -14,7 +14,9 @@ import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
-class AlternativeLaunchBSDView(context: Context) : LinearLayout(context), IHeaderView {
+class AlternativeLaunchBSDView(context: Context) :
+  LinearLayout(context),
+  IHeaderView {
 
   val adapter by unsafeLazy { AlternativeLaunchAdapter() }
 

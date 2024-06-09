@@ -15,8 +15,7 @@ import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
 const val EXTRA_TOP_APPS = "EXTRA_TOP_APPS"
 
-class TimeNodeBottomSheetDialogFragment :
-  BaseBottomSheetViewDialogFragment<TimeNodeBottomSheetView>() {
+class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<TimeNodeBottomSheetView>() {
 
   private val viewModel: SnapshotViewModel by activityViewModels()
   private var itemClickAction: ((position: Int) -> Unit)? = null

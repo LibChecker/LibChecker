@@ -21,7 +21,8 @@ import me.zhanghai.android.fastscroll.FastScrollerBuilder
 
 @SuppressLint("ViewConstructor")
 class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutineScope) :
-  LinearLayout(context), IHeaderView {
+  LinearLayout(context),
+  IHeaderView {
 
   val adapter = AppAdapter()
 

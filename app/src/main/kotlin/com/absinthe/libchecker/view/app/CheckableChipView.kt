@@ -63,7 +63,8 @@ class CheckableChipView @JvmOverloads constructor(
   context: Context,
   attrs: AttributeSet? = null,
   defStyleAttr: Int = 0
-) : View(context, attrs, defStyleAttr), Checkable {
+) : View(context, attrs, defStyleAttr),
+  Checkable {
 
   companion object {
     private const val CHECKING_DURATION = 350L // ms

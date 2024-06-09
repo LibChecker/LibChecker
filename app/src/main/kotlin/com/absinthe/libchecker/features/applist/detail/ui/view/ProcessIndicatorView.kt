@@ -10,8 +10,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibStringAdapter
 
-class ProcessIndicatorView(context: Context, attributeSet: AttributeSet? = null) :
-  FrameLayout(context, attributeSet) {
+class ProcessIndicatorView(
+  context: Context,
+  attributeSet: AttributeSet? = null
+) : FrameLayout(context, attributeSet) {
 
   var isExpand: Boolean = false
     private set
