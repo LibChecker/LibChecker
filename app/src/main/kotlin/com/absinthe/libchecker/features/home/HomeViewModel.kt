@@ -281,10 +281,9 @@ class HomeViewModel : ViewModel() {
     isHarmony: Boolean,
     delayInitFeatures: Boolean = false
   ): LCItem {
-    val variant = if (isHarmony && bundleManager?.getBundleInfo(
-        pi.packageName,
-        IBundleManager.GET_BUNDLE_DEFAULT
-      ) != null
+    val variant = if (
+      isHarmony &&
+      bundleManager?.getBundleInfo(pi.packageName, IBundleManager.GET_BUNDLE_DEFAULT) != null
     ) {
       Constants.VARIANT_HAP
     } else {
