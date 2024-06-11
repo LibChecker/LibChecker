@@ -315,10 +315,11 @@ class LibReferenceFragment :
       searchUpdateJob = lifecycleScope.launch(Dispatchers.IO) {
         val savedRefList = homeViewModel.savedRefList ?: return@launch
         val filter = savedRefList.filter {
-          it.libName.contains(newText, ignoreCase = true) || it.rule?.label?.contains(
-            newText,
-            ignoreCase = true
-          ) ?: false
+          it.libName.contains(newText, ignoreCase = true) ||
+            it.rule?.label?.contains(
+              newText,
+              ignoreCase = true
+            ) ?: false
         }
         LibReferenceAdapter.highlightText = newText
 
