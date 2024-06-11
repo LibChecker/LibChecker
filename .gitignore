@@ -86,3 +86,6 @@ app/market/*
 .settings/org.eclipse.buildship.core.prefs
 app/.settings/org.eclipse.buildship.core.prefs
 .DS_Store
+
+# Kotlin 2.0
+.kotlin/sessions/*

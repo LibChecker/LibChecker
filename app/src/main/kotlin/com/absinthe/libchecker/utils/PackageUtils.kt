@@ -620,10 +620,6 @@ object PackageUtils {
 
         elementName = entry.name
 
-        if (abiSet.size == 5) {
-          break
-        }
-
         if (elementName.startsWith("lib/")) {
           elementName = elementName.removePrefix("lib/")
           when {

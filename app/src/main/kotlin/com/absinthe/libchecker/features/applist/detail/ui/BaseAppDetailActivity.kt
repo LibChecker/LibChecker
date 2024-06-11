@@ -966,7 +966,7 @@ abstract class BaseAppDetailActivity :
           abiLabelsList.add(AbiLabelNode(it, isActive))
         }
       }
-      binding.detailsTitle.abiLabelsAdapter.setList(abiLabelsList)
+      binding.detailsTitle.setAbiLabels(abiLabelsList)
     }
   }
 }
