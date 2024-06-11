@@ -4,6 +4,8 @@
   <string name="armeabi" translatable="false">armeabi</string>
   <string name="x86" translatable="false">x86</string>
   <string name="x86_64" translatable="false">x86_64</string>
+  <string name="mips64" translatable="false">mips64</string>
+  <string name="mips" translatable="false">mips</string>
   <string name="multiArch" translatable="false">multiArch</string>
   <string name="ability" translatable="false">Ability</string>
   <string name="ability_page" translatable="false">Page</string>

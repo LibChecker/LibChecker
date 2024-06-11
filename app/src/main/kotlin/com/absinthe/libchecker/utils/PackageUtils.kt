@@ -48,6 +48,10 @@ import com.absinthe.libchecker.constant.Constants.ARMV7_STRING
 import com.absinthe.libchecker.constant.Constants.ARMV8
 import com.absinthe.libchecker.constant.Constants.ARMV8_STRING
 import com.absinthe.libchecker.constant.Constants.ERROR
+import com.absinthe.libchecker.constant.Constants.MIPS
+import com.absinthe.libchecker.constant.Constants.MIPS64
+import com.absinthe.libchecker.constant.Constants.MIPS64_STRING
+import com.absinthe.libchecker.constant.Constants.MIPS_STRING
 import com.absinthe.libchecker.constant.Constants.MULTI_ARCH
 import com.absinthe.libchecker.constant.Constants.NO_LIBS
 import com.absinthe.libchecker.constant.Constants.OVERLAY
@@ -63,6 +67,7 @@ import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.utils.dex.DexLibMap
 import com.absinthe.libchecker.utils.dex.FastDexFileFactory
 import com.absinthe.libchecker.utils.elf.ELFParser
+import com.absinthe.libchecker.utils.extensions.INSTRUCTION_SET_MAP_TO_ABI_VALUE
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getStatefulPermissionsList
@@ -615,10 +620,6 @@ object PackageUtils {
 
         elementName = entry.name
 
-        if (abiSet.size == 5) {
-          break
-        }
-
         if (elementName.startsWith("lib/")) {
           elementName = elementName.removePrefix("lib/")
           when {
@@ -649,6 +650,18 @@ object PackageUtils {
             elementName.startsWith("$X86_STRING/") -> {
               if (Build.SUPPORTED_ABIS.contains(X86_STRING) || ignoreArch) {
                 abiSet.add(X86)
+              }
+            }
+
+            elementName.startsWith("$MIPS64_STRING/") -> {
+              if (Build.SUPPORTED_ABIS.contains(MIPS64_STRING) || ignoreArch) {
+                abiSet.add(MIPS64)
+              }
+            }
+
+            elementName.startsWith("$MIPS_STRING/") -> {
+              if (Build.SUPPORTED_ABIS.contains(MIPS_STRING) || ignoreArch) {
+                abiSet.add(MIPS)
               }
             }
           }
@@ -689,11 +702,8 @@ object PackageUtils {
     fileList.asSequence()
       .forEach {
         if (it.isDirectory) {
-          when (it.name) {
-            "arm64" -> abis.add(ARMV8)
-            "arm" -> abis.add(ARMV7)
-            "x86_64" -> abis.add(X86_64)
-            "x86" -> abis.add(X86)
+          INSTRUCTION_SET_MAP_TO_ABI_VALUE[it.name]?.let { abi ->
+            abis.add(abi)
           }
         }
       }
@@ -743,6 +753,10 @@ object PackageUtils {
 
       X86_STRING -> X86
 
+      MIPS64_STRING -> MIPS64
+
+      MIPS_STRING -> MIPS
+
       null -> {
         val supportedAbiSet = mutableSetOf<Int>()
         realAbiSet.forEach {
@@ -753,6 +767,7 @@ object PackageUtils {
         if (use32bitAbi) {
           supportedAbiSet.remove(ARMV8)
           supportedAbiSet.remove(X86_64)
+          supportedAbiSet.remove(MIPS64)
         }
         when {
           supportedAbiSet.contains(ARMV8) -> ARMV8
@@ -760,6 +775,8 @@ object PackageUtils {
           supportedAbiSet.contains(ARMV5) -> ARMV5
           supportedAbiSet.contains(X86_64) -> X86_64
           supportedAbiSet.contains(X86) -> X86
+          supportedAbiSet.contains(MIPS64) -> MIPS64
+          supportedAbiSet.contains(MIPS) -> MIPS
           else -> ERROR
         }
       }
@@ -778,14 +795,18 @@ object PackageUtils {
     NO_LIBS to listOf(R.string.no_libs),
     ARMV8 to listOf(R.string.arm64_v8a),
     X86_64 to listOf(R.string.x86_64),
+    MIPS64 to listOf(R.string.mips64),
     ARMV7 to listOf(R.string.armeabi_v7a),
     ARMV5 to listOf(R.string.armeabi),
     X86 to listOf(R.string.x86),
+    MIPS to listOf(R.string.mips),
     ARMV8 + MULTI_ARCH to listOf(R.string.arm64_v8a, R.string.multiArch),
     ARMV7 + MULTI_ARCH to listOf(R.string.armeabi_v7a, R.string.multiArch),
     ARMV5 + MULTI_ARCH to listOf(R.string.armeabi, R.string.multiArch),
     X86_64 + MULTI_ARCH to listOf(R.string.x86_64, R.string.multiArch),
-    X86 + MULTI_ARCH to listOf(R.string.x86, R.string.multiArch)
+    X86 + MULTI_ARCH to listOf(R.string.x86, R.string.multiArch),
+    MIPS64 + MULTI_ARCH to listOf(R.string.mips64, R.string.multiArch),
+    MIPS + MULTI_ARCH to listOf(R.string.mips, R.string.multiArch)
   )
 
   private val ABI_BADGE_MAP = arrayMapOf(
@@ -793,15 +814,19 @@ object PackageUtils {
     NO_LIBS to if (Process.is64Bit()) R.drawable.ic_abi_label_64bit else R.drawable.ic_abi_label_32bit,
     ARMV8 to R.drawable.ic_abi_label_64bit,
     X86_64 to R.drawable.ic_abi_label_64bit,
+    MIPS64 to R.drawable.ic_abi_label_64bit,
     ARMV7 to R.drawable.ic_abi_label_32bit,
     ARMV5 to R.drawable.ic_abi_label_32bit,
     X86 to R.drawable.ic_abi_label_32bit,
+    MIPS to R.drawable.ic_abi_label_32bit,
     OVERLAY to R.drawable.ic_abi_label_no_libs,
     ARMV8 + MULTI_ARCH to R.drawable.ic_abi_label_64bit,
     X86_64 + MULTI_ARCH to R.drawable.ic_abi_label_64bit,
+    MIPS64 + MULTI_ARCH to R.drawable.ic_abi_label_64bit,
     ARMV7 + MULTI_ARCH to R.drawable.ic_abi_label_32bit,
     ARMV5 + MULTI_ARCH to R.drawable.ic_abi_label_32bit,
-    X86 + MULTI_ARCH to R.drawable.ic_abi_label_32bit
+    X86 + MULTI_ARCH to R.drawable.ic_abi_label_32bit,
+    MIPS + MULTI_ARCH to R.drawable.ic_abi_label_32bit
   )
 
   /**
@@ -831,6 +856,10 @@ object PackageUtils {
   @DrawableRes
   fun getAbiBadgeResource(type: Int): Int {
     return ABI_BADGE_MAP[type] ?: 0
+  }
+
+  fun isAbi64Bit(abi: Int): Boolean {
+    return abi in setOf(ARMV8, X86_64, MIPS64)
   }
 
   /**
