@@ -12,10 +12,8 @@ class Renge(private val contextRef: WeakReference<Context>) {
   }
 
   fun inori() {
-
   }
 
   fun sayonara() {
-
   }
 }
