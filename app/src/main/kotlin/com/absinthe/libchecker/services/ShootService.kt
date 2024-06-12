@@ -100,6 +100,19 @@ class ShootService : LifecycleService() {
     ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
   }
 
+  override fun onTimeout(startId: Int) {
+    super.onTimeout(startId)
+    ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
+    stopSelf()
+  }
+
+  override fun onTimeout(startId: Int, fgsType: Int) {
+    super.onTimeout(startId, fgsType)
+    // https://developer.android.com/about/versions/15/behavior-changes-15?hl=zh-cn#datasync-timeout
+    ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
+    stopSelf()
+  }
+
   private fun showNotification() {
     initBuilder()
 
@@ -115,7 +128,7 @@ class ShootService : LifecycleService() {
         startForeground(
           notificationIdShoot,
           builder.build(),
-          ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+          ServiceInfo.FOREGROUND_SERVICE_TYPE_SHORT_SERVICE
         )
       } else {
         startForeground(notificationIdShoot, builder.build())
@@ -205,7 +218,7 @@ class ShootService : LifecycleService() {
 
     for (info in appList) {
       try {
-        ai = info.applicationInfo
+        ai = info.applicationInfo!!
         dbSnapshotItem = repository.getSnapshot(currentSnapshotTimestamp, info.packageName)
 
         if (dbSnapshotItem?.versionCode == info.getVersionCode() &&

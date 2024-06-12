@@ -272,7 +272,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
 
     viewModel.apply {
       snapshotDiffItemsFlow.onEach {
-        adapter.setList(it.sortedByDescending { it.updateTime })
+        adapter.setList(it.sortedByDescending { item -> item.updateTime })
         flip(VF_LIST)
       }.launchIn(lifecycleScope)
       effect.onEach {
@@ -511,16 +511,18 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
               or PackageManager.MATCH_UNINSTALLED_PACKAGES
             )
           pi = PackageManagerCompat.getPackageArchiveInfo(tf.path, flag)?.also {
-            it.applicationInfo.sourceDir = tf.path
-            it.applicationInfo.publicSourceDir = tf.path
-          }
+            it.applicationInfo?.let { ai ->
+              ai.sourceDir = tf.path
+              ai.publicSourceDir = tf.path
 
-          val iconSize = resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size)
-          val appIconLoader = AppIconLoader(iconSize, false, this)
-          if (fileName == Constants.TEMP_PACKAGE) {
-            leftIconOriginal = appIconLoader.loadIcon(pi!!.applicationInfo)
-          } else {
-            rightIconOriginal = appIconLoader.loadIcon(pi!!.applicationInfo)
+              val iconSize = resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size)
+              val appIconLoader = AppIconLoader(iconSize, false, this)
+              if (fileName == Constants.TEMP_PACKAGE) {
+                leftIconOriginal = appIconLoader.loadIcon(ai)
+              } else {
+                rightIconOriginal = appIconLoader.loadIcon(ai)
+              }
+            }
           }
         } else {
           showToast(R.string.toast_not_enough_storage_space)
@@ -530,13 +532,13 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
     }
 
     pi?.let {
-      val ai = it.applicationInfo
+      val ai = it.applicationInfo ?: throw IllegalStateException("ApplicationInfo is null")
       return SnapshotItem(
         id = null,
         packageName = it.packageName,
         timeStamp = -1L,
-        label = it.getAppName() ?: "null",
-        versionName = it.versionName ?: "null",
+        label = it.getAppName().toString(),
+        versionName = it.versionName.toString(),
         versionCode = it.getVersionCode(),
         installedTime = it.firstInstallTime,
         lastUpdatedTime = it.lastUpdateTime,
@@ -556,7 +558,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
         metadata = PackageUtils.getMetaDataItems(it).toJson().orEmpty(),
         packageSize = it.getPackageSize(true),
         compileSdk = it.getCompileSdkVersion().toShort(),
-        minSdk = it.applicationInfo.minSdkVersion.toShort()
+        minSdk = ai.minSdkVersion.toShort()
       )
     } ?: throw IllegalStateException("PackageInfo is null")
   }

@@ -104,7 +104,7 @@ class TrackActivity :
         .asSequence()
         .map {
           TrackListItem(
-            label = it.getAppName() ?: "null",
+            label = it.getAppName().toString(),
             packageName = it.packageName,
             switchState = trackedList.any { trackItem -> trackItem.packageName == it.packageName }
           )

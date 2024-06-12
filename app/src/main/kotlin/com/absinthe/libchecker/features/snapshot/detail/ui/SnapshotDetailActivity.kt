@@ -155,7 +155,7 @@ class SnapshotDetailActivity :
         )
         runCatching {
           val icon = _icon?.takeIf { entity.packageName.contains("/") } ?: appIconLoader.loadIcon(
-            PackageUtils.getPackageInfo(entity.packageName).applicationInfo
+            PackageUtils.getPackageInfo(entity.packageName).applicationInfo!!
           )
           load(icon)
         }

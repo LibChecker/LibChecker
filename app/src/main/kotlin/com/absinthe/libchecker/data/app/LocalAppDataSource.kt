@@ -52,7 +52,7 @@ object LocalAppDataSource : AppDataSource {
     flow {
       getApplicationList(ioDispatcher).collect { list ->
         val map = list.asSequence()
-          .filter { it.applicationInfo.sourceDir != null || it.applicationInfo.publicSourceDir != null }
+          .filter { it.applicationInfo?.sourceDir != null || it.applicationInfo?.publicSourceDir != null }
           .map { it.packageName to it }
           .toMap()
         emit(map)
@@ -61,7 +61,7 @@ object LocalAppDataSource : AppDataSource {
 
   override fun getApplicationMap(): Map<String, PackageInfo> {
     return getApplicationList().asSequence()
-      .filter { it.applicationInfo.sourceDir != null || it.applicationInfo.publicSourceDir != null }
+      .filter { it.applicationInfo?.sourceDir != null || it.applicationInfo?.publicSourceDir != null }
       .map { it.packageName to it }
       .toMap()
   }

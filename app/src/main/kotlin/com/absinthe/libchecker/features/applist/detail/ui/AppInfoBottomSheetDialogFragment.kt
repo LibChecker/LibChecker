@@ -53,7 +53,7 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
         } else {
           PackageUtils.startLaunchAppActivity(requireContext(), packageName)
         }
-      } catch (e: Exception) {
+      } catch (_: Exception) {
         activity?.let {
           AlternativeLaunchBSDFragment().apply {
             arguments = bundleOf(
@@ -72,7 +72,7 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
           .setData(Uri.parse("package:$packageName"))
           .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
-      } catch (e: Exception) {
+      } catch (_: Exception) {
         context?.showToast(R.string.toast_cant_open_app)
       } finally {
         dismiss()
@@ -120,7 +120,7 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
   private fun getShowAppSourceList(): List<AppInfoAdapter.AppInfoItem> {
     val pkg = packageName ?: return emptyList()
     val sourceDir = runCatching {
-      File(PackageUtils.getPackageInfo(pkg).applicationInfo.sourceDir).parent
+      File(PackageUtils.getPackageInfo(pkg).applicationInfo!!.sourceDir).parent
     }.getOrNull() ?: return emptyList()
 
     return PackageManagerCompat.queryIntentActivities(

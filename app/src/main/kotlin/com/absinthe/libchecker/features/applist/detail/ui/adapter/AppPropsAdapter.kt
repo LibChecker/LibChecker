@@ -29,7 +29,7 @@ class AppPropsAdapter(
 
   private val appResources by lazy {
     SystemServices.packageManager.getResourcesForApplication(
-      packageInfo.applicationInfo
+      packageInfo.applicationInfo!!
     )
   }
 
@@ -76,7 +76,7 @@ class AppPropsAdapter(
       isVisible = true
       setImageResource(R.drawable.ic_outline_change_circle_24)
       setOnClickListener {
-        val transformed = getTag(R.id.resource_transformed_id) as? Boolean ?: false
+        val transformed = getTag(R.id.resource_transformed_id) as? Boolean == true
         if (transformed) {
           itemView.value.text = parseValue(item)
           setImageResource(R.drawable.ic_outline_change_circle_24)

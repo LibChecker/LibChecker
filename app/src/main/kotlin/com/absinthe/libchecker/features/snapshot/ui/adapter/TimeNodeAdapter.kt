@@ -42,6 +42,7 @@ class TimeNodeAdapter : BaseQuickAdapter<TimeStampItem, BaseViewHolder>(0) {
                 ).also {
                   gravity = Gravity.CENTER_VERTICAL
                 }
+                // noinspection AndroidLintSetTextI18n
                 text = "…"
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
               }

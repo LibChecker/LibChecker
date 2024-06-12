@@ -174,7 +174,9 @@ abstract class BaseAppDetailActivity :
               false,
               this@BaseAppDetailActivity
             )
-            load(appIconLoader.loadIcon(packageInfo.applicationInfo))
+            packageInfo.applicationInfo?.let { appInfo ->
+              load(appIconLoader.loadIcon(appInfo))
+            }
             if (!apkAnalyticsMode || PackageUtils.isAppInstalled(packageInfo.packageName)) {
               setOnClickListener {
                 if (AntiShakeUtils.isInvalidClick(it)) {
@@ -217,7 +219,7 @@ abstract class BaseAppDetailActivity :
             scale(0.8f) {
               append(" Min: ")
             }
-            append(packageInfo.applicationInfo.minSdkVersion.toString())
+            append(packageInfo.applicationInfo?.minSdkVersion.toString())
             scale(0.8f) {
               append(" Compile: ")
             }
@@ -225,7 +227,7 @@ abstract class BaseAppDetailActivity :
             scale(0.8f) {
               append(" Size: ")
             }
-            var baseApkSize = FileUtils.getFileSize(packageInfo.applicationInfo.sourceDir)
+            var baseApkSize = FileUtils.getFileSize(packageInfo.applicationInfo!!.sourceDir)
             val baseFormattedApkSize = Formatter.formatFileSize(this@BaseAppDetailActivity, baseApkSize)
             val splitApkSizeList = PackageUtils.getSplitsSourceDir(packageInfo)
               ?.map {
@@ -409,7 +411,7 @@ abstract class BaseAppDetailActivity :
       )
     }
 
-    if (packageInfo.applicationInfo.sharedLibraryFiles?.isNotEmpty() == true) {
+    if (packageInfo.applicationInfo?.sharedLibraryFiles?.isNotEmpty() == true) {
       lifecycleScope.launch(Dispatchers.IO) {
         try {
           val libs = runCatching {
@@ -822,11 +824,11 @@ abstract class BaseAppDetailActivity :
       packageName = basePackage.packageName,
       updateTime = basePackage.lastUpdateTime,
       labelDiff = SnapshotDiffItem.DiffNode(
-        basePackage.getAppName() ?: "null",
-        analysisPackage.getAppName() ?: "null"
+        basePackage.getAppName().toString(),
+        analysisPackage.getAppName().toString()
       ),
       versionNameDiff = SnapshotDiffItem.DiffNode(
-        basePackage.versionName,
+        basePackage.versionName.toString(),
         analysisPackage.versionName
       ),
       versionCodeDiff = SnapshotDiffItem.DiffNode(
@@ -838,16 +840,16 @@ abstract class BaseAppDetailActivity :
         PackageUtils.getAbi(analysisPackage).toShort()
       ),
       targetApiDiff = SnapshotDiffItem.DiffNode(
-        basePackage.applicationInfo.targetSdkVersion.toShort(),
-        analysisPackage.applicationInfo.targetSdkVersion.toShort()
+        basePackage.applicationInfo?.targetSdkVersion?.toShort() ?: 0,
+        analysisPackage.applicationInfo?.targetSdkVersion?.toShort()
       ),
       compileSdkDiff = SnapshotDiffItem.DiffNode(
         basePackage.getCompileSdkVersion().toShort(),
         analysisPackage.getCompileSdkVersion().toShort()
       ),
       minSdkDiff = SnapshotDiffItem.DiffNode(
-        basePackage.applicationInfo.minSdkVersion.toShort(),
-        analysisPackage.applicationInfo.minSdkVersion.toShort()
+        basePackage.applicationInfo?.minSdkVersion?.toShort() ?: 0,
+        analysisPackage.applicationInfo?.minSdkVersion?.toShort()
       ),
       nativeLibsDiff = SnapshotDiffItem.DiffNode(
         PackageUtils.getNativeDirLibs(basePackage).toJson().orEmpty(),

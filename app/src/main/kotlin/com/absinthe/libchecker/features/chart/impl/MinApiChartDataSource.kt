@@ -32,7 +32,7 @@ class MinApiChartDataSource(items: List<LCItem>) : BaseVariableChartDataSource<B
         }
         try {
           packageInfo = PackageUtils.getPackageInfo(item.packageName)
-          minSdk = packageInfo.applicationInfo.minSdkVersion
+          minSdk = packageInfo.applicationInfo!!.minSdkVersion
           if (classifiedMap[minSdk] == null) {
             classifiedMap[minSdk] = mutableListOf()
           }

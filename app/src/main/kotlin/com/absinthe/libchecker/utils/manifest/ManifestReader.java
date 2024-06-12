@@ -75,17 +75,15 @@ public class ManifestReader {
     @Override
     public NodeVisitor child(String ns, String name) {
       NodeVisitor child = super.child(ns, name);
-      switch (name) {
-        case "application":
-          return new ApplicationTagVisitor(child);
-        case "uses-sdk":
-          return new UsesSdkTagVisitor(child);
-        case "overlay":
+      return switch (name) {
+        case "application" -> new ApplicationTagVisitor(child);
+        case "uses-sdk" -> new UsesSdkTagVisitor(child);
+        case "overlay" -> {
           properties.put("overlay", true);
-          return new OverlayTagVisitor(child);
-        default:
-      }
-      return child;
+          yield new OverlayTagVisitor(child);
+        }
+        default -> child;
+      };
     }
 
     @Override

@@ -22,7 +22,7 @@ class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
   /**
    * Creates a divider {@link RecyclerView.ItemDecoration} that can be used with a
-   * {@link LinearLayoutManager}.
+   * {@link androidx.recyclerview.widget.LinearLayoutManager}.
    *
    * @param adapter The MultiTypeAdapter
    */

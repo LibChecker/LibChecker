@@ -163,7 +163,7 @@ class SnapshotViewModel : ViewModel() {
       if (!isActive) return@runBlocking
       try {
         pi = currMap[it]!!
-        ai = pi.applicationInfo
+        ai = pi.applicationInfo!!
         versionCode = pi.getVersionCode()
         val activitiesPi = PackageUtils.getPackageInfo(pi.packageName, PackageManager.GET_ACTIVITIES)
         val srpPi = PackageUtils.getPackageInfo(pi.packageName, PackageManager.GET_SERVICES or PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS)
@@ -173,8 +173,8 @@ class SnapshotViewModel : ViewModel() {
           SnapshotDiffItem(
             pi.packageName,
             pi.lastUpdateTime,
-            SnapshotDiffItem.DiffNode(pi.getAppName() ?: "null"),
-            SnapshotDiffItem.DiffNode(pi.versionName),
+            SnapshotDiffItem.DiffNode(pi.getAppName().toString()),
+            SnapshotDiffItem.DiffNode(pi.versionName.toString()),
             SnapshotDiffItem.DiffNode(versionCode),
             SnapshotDiffItem.DiffNode(PackageUtils.getAbi(pi).toShort()),
             SnapshotDiffItem.DiffNode(ai.targetSdkVersion.toShort()),
@@ -257,7 +257,7 @@ class SnapshotViewModel : ViewModel() {
           }
         } else {
           try {
-            snapshotDiffStoringItem?.diffContent?.fromJson<SnapshotDiffItem>()?.let { item ->
+            snapshotDiffStoringItem.diffContent.fromJson<SnapshotDiffItem>()?.let { item ->
               diffList.add(item)
             }
           } catch (e: IOException) {
@@ -320,7 +320,7 @@ class SnapshotViewModel : ViewModel() {
       updateTime = packageInfo.lastUpdateTime,
       labelDiff = SnapshotDiffItem.DiffNode(
         dbItem.label,
-        packageInfo.getAppName() ?: "null"
+        packageInfo.getAppName().toString()
       ),
       versionNameDiff = SnapshotDiffItem.DiffNode(
         dbItem.versionName,
@@ -337,7 +337,7 @@ class SnapshotViewModel : ViewModel() {
       ),
       targetApiDiff = SnapshotDiffItem.DiffNode(
         dbItem.targetApi,
-        packageInfo.applicationInfo.targetSdkVersion.toShort()
+        packageInfo.applicationInfo?.targetSdkVersion?.toShort()
       ),
       compileSdkDiff = SnapshotDiffItem.DiffNode(
         dbItem.compileSdk,
@@ -345,7 +345,7 @@ class SnapshotViewModel : ViewModel() {
       ),
       minSdkDiff = SnapshotDiffItem.DiffNode(
         dbItem.minSdk,
-        packageInfo.applicationInfo.minSdkVersion.toShort()
+        packageInfo.applicationInfo?.minSdkVersion?.toShort()
       ),
       nativeLibsDiff = SnapshotDiffItem.DiffNode(
         dbItem.nativeLibs,
@@ -603,7 +603,7 @@ class SnapshotViewModel : ViewModel() {
         diffItem = SnapshotDiffItem(
           packageInfo.packageName,
           packageInfo.lastUpdateTime,
-          SnapshotDiffItem.DiffNode(it.label, packageInfo.getAppName() ?: "null"),
+          SnapshotDiffItem.DiffNode(it.label, packageInfo.getAppName().toString()),
           SnapshotDiffItem.DiffNode(it.versionName, packageInfo.versionName),
           SnapshotDiffItem.DiffNode(it.versionCode, packageInfo.getVersionCode()),
           SnapshotDiffItem.DiffNode(
@@ -612,7 +612,7 @@ class SnapshotViewModel : ViewModel() {
           ),
           SnapshotDiffItem.DiffNode(
             it.targetApi,
-            packageInfo.applicationInfo.targetSdkVersion.toShort()
+            packageInfo.applicationInfo?.targetSdkVersion?.toShort()
           ),
           SnapshotDiffItem.DiffNode(
             it.compileSdk,
@@ -620,7 +620,7 @@ class SnapshotViewModel : ViewModel() {
           ),
           SnapshotDiffItem.DiffNode(
             it.minSdk,
-            packageInfo.applicationInfo.minSdkVersion.toShort()
+            packageInfo.applicationInfo?.minSdkVersion?.toShort()
           ),
           SnapshotDiffItem.DiffNode(
             it.nativeLibs,
@@ -706,13 +706,13 @@ class SnapshotViewModel : ViewModel() {
         diffItem = SnapshotDiffItem(
           packageInfo.packageName,
           packageInfo.lastUpdateTime,
-          SnapshotDiffItem.DiffNode(packageInfo.getAppName() ?: "null"),
-          SnapshotDiffItem.DiffNode(packageInfo.versionName),
+          SnapshotDiffItem.DiffNode(packageInfo.getAppName().toString()),
+          SnapshotDiffItem.DiffNode(packageInfo.versionName.toString()),
           SnapshotDiffItem.DiffNode(packageInfo.getVersionCode()),
           SnapshotDiffItem.DiffNode(PackageUtils.getAbi(packageInfo).toShort()),
-          SnapshotDiffItem.DiffNode(packageInfo.applicationInfo.targetSdkVersion.toShort()),
+          SnapshotDiffItem.DiffNode(packageInfo.applicationInfo?.targetSdkVersion?.toShort() ?: 0),
           SnapshotDiffItem.DiffNode(packageInfo.getCompileSdkVersion().toShort()),
-          SnapshotDiffItem.DiffNode(packageInfo.applicationInfo.minSdkVersion.toShort()),
+          SnapshotDiffItem.DiffNode(packageInfo.applicationInfo?.minSdkVersion?.toShort() ?: 0),
           SnapshotDiffItem.DiffNode(
             PackageUtils.getNativeDirLibs(packageInfo).toJson().orEmpty()
           ),
