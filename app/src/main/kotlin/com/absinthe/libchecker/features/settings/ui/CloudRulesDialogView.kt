@@ -43,7 +43,7 @@ class CloudRulesDialogView(context: Context) :
     }
     imageAssetsFolder = "/"
     repeatCount = LottieDrawable.INFINITE
-    setAnimation("anim/gray-down-arrow.json")
+    setAnimation("anim/gray-down-arrow.json.zip")
   }
 
   val cloudRulesContentView = CloudRulesContentView(context).apply {

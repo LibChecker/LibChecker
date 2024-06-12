@@ -88,7 +88,7 @@ class LibDetailBottomSheetView(context: Context) :
     }
     imageAssetsFolder = "/"
     repeatCount = LottieDrawable.INFINITE
-    setAnimation("anim/lib_detail_rocket.json")
+    setAnimation("anim/lib_detail_rocket.json.zip")
   }
 
   private val notFoundView = NotFoundView(context).apply {

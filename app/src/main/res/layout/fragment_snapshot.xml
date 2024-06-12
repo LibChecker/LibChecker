@@ -23,7 +23,7 @@
         android:layout_width="@dimen/lottie_anim_size"
         android:layout_height="@dimen/lottie_anim_size"
         app:lottie_autoPlay="true"
-        app:lottie_fileName="anim/holographic_radar.json"
+        app:lottie_fileName="anim/holographic_radar.json.zip"
         app:lottie_loop="true" />
 
       <com.google.android.material.progressindicator.LinearProgressIndicator
