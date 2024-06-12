@@ -24,7 +24,7 @@ class AppListInitialiseView(
     }
     imageAssetsFolder = "/"
     repeatCount = LottieDrawable.INFINITE
-    setAnimation("anim/app_list_loading.json")
+    setAnimation("anim/app_list_loading.json.zip")
     addView(this)
   }
 
