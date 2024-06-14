@@ -75,7 +75,6 @@ class AppInstallSourceBSDFragment :
           }
         )
       }
-      item.packageView.container.abiInfo.maxHeight = 0
     } else {
       if (!Shizuku.pingBinder()) {
         item.packageView.container.appName.text =
@@ -88,7 +87,6 @@ class AppInstallSourceBSDFragment :
           PackageUtils.startLaunchAppActivity(requireContext(), Constants.PackageNames.SHIZUKU)
           Shizuku.addBinderReceivedListener(this)
         }
-        item.packageView.container.abiInfo.maxHeight = 0
       } else {
         if (Shizuku.getVersion() < 10) {
           item.packageView.container.appName.text =
@@ -104,7 +102,6 @@ class AppInstallSourceBSDFragment :
               }
             )
           }
-          item.packageView.container.abiInfo.maxHeight = 0
         } else if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
           item.packageView.container.appName.text =
             getString(R.string.lib_detail_app_install_source_shizuku_permission_not_granted)
@@ -116,9 +113,7 @@ class AppInstallSourceBSDFragment :
             Shizuku.addRequestPermissionResultListener(this)
             Shizuku.requestPermission(0)
           }
-          item.packageView.container.abiInfo.maxHeight = 0
         } else {
-          item.packageView.container.abiInfo.maxHeight = Int.MAX_VALUE
           initAppInstallSourceItemView(item, originatingPackageName)
         }
       }
@@ -142,7 +137,6 @@ class AppInstallSourceBSDFragment :
         it.packageName.text =
           getString(R.string.lib_detail_app_install_source_empty_detail)
         it.setVersionInfo("                                                                            ")
-        it.abiInfo.maxHeight = 0
       }
       item.packageView.setOnClickListener(null)
       return
