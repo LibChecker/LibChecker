@@ -216,10 +216,9 @@ class AppItemView(context: Context) : MaterialCardView(context) {
           abiInfo.defaultHeightMeasureSpec(this)
         )
       }
-      val measuredHeight = if (abiInfo.text.isNullOrEmpty()) {
-        paddingTop + appName.measuredHeight + packageName.measuredHeight + versionInfo.measuredHeight + paddingBottom
-      } else {
-        paddingTop + appName.measuredHeight + packageName.measuredHeight + versionInfo.measuredHeight + abiInfo.measuredHeight + paddingBottom
+      var measuredHeight = paddingTop + appName.measuredHeight + packageName.measuredHeight + versionInfo.measuredHeight + paddingBottom
+      if (!abiInfo.text.isNullOrEmpty()) {
+        measuredHeight += abiInfo.measuredHeight
       }
       setMeasuredDimension(measuredWidth, measuredHeight)
     }
