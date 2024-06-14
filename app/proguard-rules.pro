@@ -108,6 +108,10 @@
 -keep,allowoptimization public class * extends androidx.viewbinding.ViewBinding {
   public static * inflate(android.view.LayoutInflater);
 }
+# This class's inflate method will be pruned by R8 when upgrading to AGP 8.5, we don't know why
+-keep public class com.absinthe.libchecker.databinding.ActivityAppDetailBinding {
+  public static * inflate(android.view.LayoutInflater);
+}
 
 # BottomSheetBehavior
 -keepclassmembers public class com.google.android.material.bottomsheet.BottomSheetBehavior {
