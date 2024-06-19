@@ -73,7 +73,7 @@ object LCAppUtils {
       File(packageName)
     } else {
       runCatching {
-        File(PackageUtils.getPackageInfo(packageName).applicationInfo.sourceDir)
+        File(PackageUtils.getPackageInfo(packageName).applicationInfo!!.sourceDir)
       }.getOrNull()
     } ?: return ruleEntity
 
@@ -93,7 +93,8 @@ object LCAppUtils {
     if (!checkNativeLibs.contains(nativeLib)) {
       return true
     }
-    val source = File(PackageUtils.getPackageInfo(packageName).applicationInfo.sourceDir)
+    val sourceDir = PackageUtils.getPackageInfo(packageName).applicationInfo?.sourceDir ?: return false
+    val source = File(sourceDir)
     return when (nativeLib) {
       "libjiagu.so", "libjiagu_a64.so", "libjiagu_x86.so", "libjiagu_x64.so" -> {
         runCatching {

@@ -88,7 +88,7 @@ class XposedInfoDialogFragment : BaseBottomSheetViewDialogFragment<XposedInfoBot
           )
         }
       }
-      ZipFileCompat(pi.applicationInfo.sourceDir).use { zipFile ->
+      ZipFileCompat(pi.applicationInfo!!.sourceDir).use { zipFile ->
         zipFile.getEntry("assets/xposed_init")?.let { entry ->
           val cls = zipFile.getInputStream(entry).bufferedReader().readLines().firstOrNull()
           list.add(

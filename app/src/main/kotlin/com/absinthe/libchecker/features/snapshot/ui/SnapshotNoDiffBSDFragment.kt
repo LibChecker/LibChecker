@@ -40,7 +40,7 @@ class SnapshotNoDiffBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotNoDi
               requireContext()
             )
             val icon = runCatching {
-              appIconLoader.loadIcon(pi.applicationInfo)
+              appIconLoader.loadIcon(pi.applicationInfo!!)
             }.getOrNull()
             load(icon)
             setOnClickListener {

@@ -1,3 +1,4 @@
+import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
@@ -76,10 +77,10 @@ fun Project.setupAppModule(block: BaseAppModuleExtension.() -> Unit = {}) {
 
 private inline fun <reified T : BaseExtension> Project.setupBaseModule(crossinline block: T.() -> Unit = {}) {
   extensions.configure<BaseExtension>("android") {
-    compileSdkVersion(34)
+    compileSdkVersion(35)
     defaultConfig {
       minSdk = 24
-      targetSdk = 34
+      targetSdk = 35
     }
     sourceSets.configureEach {
       java.srcDirs("src/$name/kotlin")

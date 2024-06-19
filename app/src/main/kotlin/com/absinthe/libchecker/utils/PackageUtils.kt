@@ -121,16 +121,22 @@ object PackageUtils {
     val packageInfo = PackageManagerCompat.getPackageInfo(
       packageName,
       PackageManager.MATCH_DISABLED_COMPONENTS or flag
-    )
-    if (FreezeUtils.isAppFrozen(packageInfo.applicationInfo)) {
-      return PackageManagerCompat.getPackageArchiveInfo(
-        packageInfo.applicationInfo.sourceDir,
-        PackageManager.MATCH_DISABLED_COMPONENTS or flag
-      )?.apply {
-        applicationInfo.sourceDir = packageInfo.applicationInfo.sourceDir
-        applicationInfo.nativeLibraryDir = packageInfo.applicationInfo.nativeLibraryDir
-      } ?: throw PackageManager.NameNotFoundException()
+    ).also {
+      it.applicationInfo?.let { ai ->
+        if (FreezeUtils.isAppFrozen(ai)) {
+          return PackageManagerCompat.getPackageArchiveInfo(
+            ai.sourceDir,
+            PackageManager.MATCH_DISABLED_COMPONENTS or flag
+          )?.apply {
+            applicationInfo?.let { appInfo ->
+              appInfo.sourceDir = ai.sourceDir
+              appInfo.nativeLibraryDir = ai.nativeLibraryDir
+            }
+          } ?: throw PackageManager.NameNotFoundException()
+        }
+      }
     }
+
     return packageInfo
   }
 
@@ -165,7 +171,7 @@ object PackageUtils {
     needStaticLibrary: Boolean = false,
     specifiedAbi: Int? = null
   ): List<LibStringItem> {
-    val nativePath = packageInfo.applicationInfo.nativeLibraryDir
+    val nativePath = packageInfo.applicationInfo?.nativeLibraryDir
     val list = mutableListOf<LibStringItem>()
 
     if (nativePath != null) {
@@ -227,10 +233,10 @@ object PackageUtils {
     childDir: String,
     source: String? = null
   ): List<LibStringItem> {
-    if (packageInfo.applicationInfo.sourceDir == null) {
+    if (packageInfo.applicationInfo?.sourceDir == null) {
       return emptyList()
     }
-    val file = File(packageInfo.applicationInfo.sourceDir)
+    val file = File(packageInfo.applicationInfo!!.sourceDir)
     if (file.exists().not()) {
       return emptyList()
     }
@@ -304,14 +310,15 @@ object PackageUtils {
    * @return List of split apks dirs
    */
   fun getSplitsSourceDir(packageInfo: PackageInfo): Array<String>? {
-    if (FreezeUtils.isAppFrozen(packageInfo.applicationInfo)) {
-      File(packageInfo.applicationInfo.sourceDir).parentFile?.takeIf { it.exists() }?.let { files ->
+    val ai = packageInfo.applicationInfo ?: return null
+    if (FreezeUtils.isAppFrozen(ai)) {
+      File(ai.sourceDir).parentFile?.takeIf { it.exists() }?.let { files ->
         return files.listFiles { file -> file.name.matches(regex_splits) }
           ?.map { it.absolutePath }
           ?.toTypedArray()
       }
     }
-    return packageInfo.applicationInfo.splitSourceDirs
+    return ai.splitSourceDirs
   }
 
   const val STATIC_LIBRARY_SOURCE_PREFIX = "[Path] "
@@ -323,11 +330,11 @@ object PackageUtils {
    * @return static libraries list
    */
   fun getStaticLibs(packageInfo: PackageInfo): List<LibStringItem> {
-    val sharedLibs = packageInfo.applicationInfo.sharedLibraryFiles
+    val sharedLibs = packageInfo.applicationInfo?.sharedLibraryFiles ?: return emptyList()
     try {
       val demands =
-        StaticLibraryReader.getStaticLibrary(File(packageInfo.applicationInfo.sourceDir))
-      if (demands.isNullOrEmpty() || sharedLibs.isNullOrEmpty()) {
+        StaticLibraryReader.getStaticLibrary(File(packageInfo.applicationInfo!!.sourceDir))
+      if (demands.isNullOrEmpty() || sharedLibs.isEmpty()) {
         return listOf()
       }
 
@@ -357,8 +364,9 @@ object PackageUtils {
    * @return meta data list
    */
   fun getMetaDataItems(packageInfo: PackageInfo): List<LibStringItem> {
-    val appResources by lazy { SystemServices.packageManager.getResourcesForApplication(packageInfo.applicationInfo) }
-    packageInfo.applicationInfo.metaData?.let {
+    val ai = packageInfo.applicationInfo ?: return emptyList()
+    val appResources by lazy { SystemServices.packageManager.getResourcesForApplication(ai) }
+    ai.metaData?.let {
       return it.keySet().asSequence()
         .map { key ->
           @Suppress("DEPRECATION")
@@ -669,8 +677,8 @@ object PackageUtils {
       }
 
       if (abiSet.isEmpty()) {
-        if (!isApk && packageInfo.applicationInfo.nativeLibraryDir != null) {
-          abiSet.addAll(getAbiListByNativeDir(packageInfo.applicationInfo.nativeLibraryDir))
+        if (!isApk && packageInfo.applicationInfo?.nativeLibraryDir != null) {
+          abiSet.addAll(getAbiListByNativeDir(packageInfo.applicationInfo!!.nativeLibraryDir))
         }
 
         if (abiSet.isEmpty()) {
@@ -721,7 +729,7 @@ object PackageUtils {
     isApk: Boolean = false,
     abiSet: Set<Int>? = null
   ): Int {
-    val applicationInfo: ApplicationInfo = packageInfo.applicationInfo
+    val applicationInfo: ApplicationInfo = packageInfo.applicationInfo ?: return ERROR
     val overlay = packageInfo.isOverlay()
 
     if (overlay) {
@@ -973,7 +981,7 @@ object PackageUtils {
       val path = if (isApk) {
         packageName
       } else {
-        getPackageInfo(packageName).applicationInfo.sourceDir
+        getPackageInfo(packageName).applicationInfo?.sourceDir
       }
 
       if (path.isNullOrEmpty()) {

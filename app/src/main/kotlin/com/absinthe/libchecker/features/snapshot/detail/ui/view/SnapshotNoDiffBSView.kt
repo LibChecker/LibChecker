@@ -75,8 +75,8 @@ class SnapshotNoDiffBSView(context: Context) :
   }
 
   sealed class Mode {
-    object New : Mode()
-    object Deleted : Mode()
-    object NothingChanged : Mode()
+    data object New : Mode()
+    data object Deleted : Mode()
+    data object NothingChanged : Mode()
   }
 }

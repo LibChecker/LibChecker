@@ -62,6 +62,7 @@ class ComparisonDashboardHalfView(
       )
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
+      // noinspection AndroidLintSetTextI18n
       text = "0"
     }
 

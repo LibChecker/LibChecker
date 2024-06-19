@@ -30,8 +30,9 @@ class AppPropBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppPr
 
   override fun init() {
     maxPeekHeightPercentage = 0.67f
-    val propsMap =
-      ApplicationReader.getManifestProperties(File(packageInfo.applicationInfo.sourceDir))
+    val propsMap = runCatching {
+      ApplicationReader.getManifestProperties(File(packageInfo.applicationInfo!!.sourceDir))
+    }.getOrNull()
     val bundleList = if (propsMap.isNullOrEmpty()) {
       emptyList()
     } else {

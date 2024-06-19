@@ -2,6 +2,7 @@ package com.absinthe.libchecker.features.applist.detail.ui
 
 import android.content.ComponentName
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.view.View
 import com.absinthe.libchecker.R
@@ -30,10 +31,11 @@ class AlternativeLaunchBSDFragment : BaseBottomSheetViewDialogFragment<Alternati
       val packageInfo = runCatching {
         PackageUtils.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES)
       }.getOrNull()
-      val list = if (packageInfo?.activities == null) {
+      val activities = packageInfo?.activities ?: emptyArray<ActivityInfo>()
+      val list = if (activities.isEmpty()) {
         emptyList()
       } else {
-        packageInfo.activities.asSequence()
+        activities.asSequence()
           .filter { it.exported }
           .map {
             AlternativeLaunchItem(

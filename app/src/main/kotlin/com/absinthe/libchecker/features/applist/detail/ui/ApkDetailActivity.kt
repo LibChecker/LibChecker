@@ -106,8 +106,10 @@ class ApkDetailActivity :
                     or PackageManager.MATCH_UNINSTALLED_PACKAGES
                   )
                 PackageManagerCompat.getPackageArchiveInfo(tf.path, flag)?.also {
-                  it.applicationInfo.sourceDir = tf.path
-                  it.applicationInfo.publicSourceDir = tf.path
+                  it.applicationInfo?.let { ai ->
+                    ai.sourceDir = tf.path
+                    ai.publicSourceDir = tf.path
+                  }
                 }?.let { pi ->
                   onPackageInfoAvailable(pi, null)
                   dialog.dismiss()

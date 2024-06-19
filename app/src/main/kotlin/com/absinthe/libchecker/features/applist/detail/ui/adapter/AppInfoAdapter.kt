@@ -36,7 +36,7 @@ class AppInfoAdapter : BaseQuickAdapter<AppInfoAdapter.AppInfoItem, BaseViewHold
       PackageManagerCompat.getPackageInfo(
         packageName,
         0
-      ).applicationInfo.loadIcon(SystemServices.packageManager)
+      ).applicationInfo!!.loadIcon(SystemServices.packageManager)
     }.getOrDefault(ColorDrawable(Color.TRANSPARENT))
   }
 

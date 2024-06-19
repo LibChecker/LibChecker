@@ -254,7 +254,7 @@ class HomeViewModel : ViewModel() {
               it.versionCode != pi.getVersionCode() ||
                 pi.lastUpdateTime != it.lastUpdatedTime ||
                 it.lastUpdatedTime == 0L
-            } ?: false
+            } == true
           }.forEach {
             if (!isActive) return@launch
             update(generateLCItemFromPackageInfo(it, isHarmony))
@@ -292,15 +292,15 @@ class HomeViewModel : ViewModel() {
 
     return LCItem(
       pi.packageName,
-      pi.getAppName() ?: "null",
-      pi.versionName ?: "null",
+      pi.getAppName().toString(),
+      pi.versionName.toString(),
       pi.getVersionCode(),
       pi.firstInstallTime,
       pi.lastUpdateTime,
-      (pi.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
+      (pi.applicationInfo!!.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
       PackageUtils.getAbi(pi).toShort(),
       if (delayInitFeatures) -1 else pi.getFeatures(),
-      pi.applicationInfo.targetSdkVersion.toShort(),
+      pi.applicationInfo!!.targetSdkVersion.toShort(),
       variant
     )
   }
@@ -427,7 +427,7 @@ class HomeViewModel : ViewModel() {
     fun computeInternal(@LibType type: Int) = runBlocking {
       for (item in appMap.values) {
         if (!isActive) return@runBlocking
-        if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+        if (!showSystem && ((item.applicationInfo!!.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
           progressCount++
           updateLibRefProgressImpl()
           continue
@@ -550,7 +550,7 @@ class HomeViewModel : ViewModel() {
           computeMetadataReferenceInternal(
             referenceMap,
             packageName,
-            packageInfo.applicationInfo.metaData
+            packageInfo.applicationInfo?.metaData
           )
         }
 
@@ -567,7 +567,7 @@ class HomeViewModel : ViewModel() {
           val packageInfo = PackageUtils.getPackageInfo(packageName)
           if (packageInfo.sharedUserId?.isNotBlank() == true) {
             if (referenceMap[packageInfo.sharedUserId] == null) {
-              referenceMap[packageInfo.sharedUserId] = mutableSetOf<String>() to SHARED_UID
+              referenceMap[packageInfo.sharedUserId!!] = mutableSetOf<String>() to SHARED_UID
             }
             referenceMap[packageInfo.sharedUserId]!!.first.add(packageName)
           }

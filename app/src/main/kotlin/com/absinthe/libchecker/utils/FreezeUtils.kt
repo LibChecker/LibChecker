@@ -17,7 +17,7 @@ object FreezeUtils {
     return try {
       val flags: Int = Refine.unsafeCast<ApplicationInfoHidden>(ai).privateFlags
       flags or ApplicationInfoHidden.PRIVATE_FLAG_HIDDEN == flags
-    } catch (e: Throwable) {
+    } catch (_: Throwable) {
       ai.flags or FLAG_HIDDEN == ai.flags
     }
   }
@@ -32,7 +32,7 @@ object FreezeUtils {
         packageName,
         PackageManager.MATCH_UNINSTALLED_PACKAGES or PackageManager.MATCH_DISABLED_COMPONENTS
       )
-      return isAppFrozen(packageInfo.applicationInfo)
+      return isAppFrozen(packageInfo.applicationInfo!!)
     }.onFailure {
       Timber.e(it)
     }

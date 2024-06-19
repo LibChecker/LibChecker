@@ -62,7 +62,9 @@ class OverlayDetailBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment
             false,
             requireContext()
           )
-          load(appIconLoader.loadIcon(packageInfo.applicationInfo))
+          packageInfo.applicationInfo?.let {
+            load(appIconLoader.loadIcon(it))
+          }
           setOnLongClickListener {
             copyToClipboard()
             true
@@ -90,7 +92,7 @@ class OverlayDetailBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment
             scale(0.8f) {
               append(" Min: ")
             }
-            append(packageInfo.applicationInfo.minSdkVersion.toString())
+            append(packageInfo.applicationInfo?.minSdkVersion.toString())
             scale(0.8f) {
               append(" Compile: ")
             }
@@ -98,7 +100,7 @@ class OverlayDetailBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment
             scale(0.8f) {
               append(" Size: ")
             }
-            val apkSize = FileUtils.getFileSize(packageInfo.applicationInfo.sourceDir)
+            val apkSize = FileUtils.getFileSize(packageInfo.applicationInfo!!.sourceDir)
             append(Formatter.formatFileSize(context, apkSize))
           }
         }

@@ -30,7 +30,7 @@ class TargetApiChartDataSource(items: List<LCItem>) : BaseVariableChartDataSourc
         }
         try {
           targetApi =
-            PackageUtils.getPackageInfo(item.packageName).applicationInfo.targetSdkVersion
+            PackageUtils.getPackageInfo(item.packageName).applicationInfo!!.targetSdkVersion
           if (classifiedMap[targetApi] == null) {
             classifiedMap[targetApi] = mutableListOf()
           }

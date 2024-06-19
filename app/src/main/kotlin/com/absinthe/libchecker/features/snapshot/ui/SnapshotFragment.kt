@@ -69,6 +69,7 @@ import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
+import java.util.Locale
 import java.util.concurrent.LinkedBlockingQueue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -303,7 +304,7 @@ class SnapshotFragment :
       when (it) {
         is SnapshotViewModel.Effect.DashboardCountChange -> {
           dashboard.container.tvSnapshotAppsCountText.text =
-            String.format("%d / %d", it.snapshotCount, it.appCount)
+            String.format(Locale.getDefault(), "%d / %d", it.snapshotCount, it.appCount)
         }
 
         is SnapshotViewModel.Effect.TimeStampChange -> {
