@@ -34,6 +34,7 @@ import com.absinthe.libchecker.features.home.HomeViewModel
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.base.IAppBarContainer
 import com.absinthe.libchecker.ui.base.IListController
+import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
@@ -129,6 +130,7 @@ class SettingsFragment :
     }
     val languagePreference =
       findPreference<ListPreference>(Constants.PREF_LOCALE)?.apply {
+        isVisible = !OsUtils.atLeastT()
         setOnPreferenceChangeListener { _, newValue ->
           if (newValue is String) {
             val locale: Locale = if ("SYSTEM" == newValue) {
@@ -303,6 +305,7 @@ class SettingsFragment :
 
     val tag = languagePreference.value
     val index = listOf(*languagePreference.entryValues).indexOf(tag)
+    Timber.d("Locale = $tag, index = $index, entries = ${listOf(*languagePreference.entryValues)}")
     val localeName: MutableList<String> = ArrayList()
     val localeNameUser: MutableList<String> = ArrayList()
     val userLocale = GlobalValues.locale
