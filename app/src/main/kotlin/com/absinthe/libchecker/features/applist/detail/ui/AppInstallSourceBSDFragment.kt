@@ -8,6 +8,7 @@ import android.text.SpannableString
 import android.text.style.ImageSpan
 import androidx.annotation.RequiresApi
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
@@ -60,6 +61,7 @@ class AppInstallSourceBSDFragment :
       item.isGone = true
       return
     }
+    item.packageView.container.abiInfo.isVisible = false
     item.packageView.container.icon.load(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_shizuku)
     if (!PackageUtils.isAppInstalled(Constants.PackageNames.SHIZUKU) && !Sui.isSui()) {
       item.packageView.container.appName.text =
@@ -173,6 +175,7 @@ class AppInstallSourceBSDFragment :
     } else {
       item.packageView.container.abiInfo.text = str
     }
+    item.packageView.container.abiInfo.isVisible = true
 
     if (targetLCItem.variant == Constants.VARIANT_HAP) {
       item.packageView.container.setBadge(R.drawable.ic_harmony_badge)

@@ -218,7 +218,7 @@ class AppItemView(context: Context) : MaterialCardView(context) {
       }
       setMeasuredDimension(
         measuredWidth,
-        paddingTop + appName.measuredHeight + packageName.measuredHeight + versionInfo.measuredHeight + abiInfo.measuredHeight + paddingBottom
+        paddingTop + appName.measuredHeightWithVisibility + packageName.measuredHeightWithVisibility + versionInfo.measuredHeightWithVisibility + abiInfo.measuredHeightWithVisibility + paddingBottom
       )
     }
 
