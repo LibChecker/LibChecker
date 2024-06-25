@@ -1,7 +1,9 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
 import android.content.Intent
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.content.pm.PackageParser.PackageParserException
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -13,6 +15,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.features.applist.detail.IDetailContainer
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.showToast
+import com.absinthe.libchecker.utils.xapk.XAPKParser
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -78,55 +81,66 @@ class ApkDetailActivity :
     dialog.show()
 
     lifecycleScope.launch(Dispatchers.IO) {
-      runCatching {
-        tempFile = File(externalCacheDir, Constants.TEMP_PACKAGE).also { tf ->
-          contentResolver.openInputStream(uri)?.use { inputStream ->
-            val fileSize = inputStream.available()
-            val freeSize = Environment.getExternalStorageDirectory().freeSpace
-            Timber.d("fileSize=$fileSize, freeSize=$freeSize")
+      tempFile = File(externalCacheDir, Constants.TEMP_PACKAGE).also { tf ->
+        contentResolver.openInputStream(uri)?.use { inputStream ->
+          val fileSize = inputStream.available()
+          val freeSize = Environment.getExternalStorageDirectory().freeSpace
+          Timber.d("fileSize=$fileSize, freeSize=$freeSize")
 
-            if (freeSize > fileSize * 1.5) {
-              tf.sink().buffer().use { sink ->
-                inputStream.source().buffer().use {
-                  sink.writeAll(it)
-                }
+          if (freeSize > fileSize * 1.5) {
+            tf.sink().buffer().use { sink ->
+              inputStream.source().buffer().use {
+                sink.writeAll(it)
               }
-              isPackageReady = true
+            }
+            isPackageReady = true
 
-              withContext(Dispatchers.Main) {
-                @Suppress("InlinedApi")
-                val flag = (
-                  PackageManager.GET_SERVICES
-                    or PackageManager.GET_ACTIVITIES
-                    or PackageManager.GET_RECEIVERS
-                    or PackageManager.GET_PROVIDERS
-                    or PackageManager.GET_PERMISSIONS
-                    or PackageManager.GET_META_DATA
-                    or PackageManager.MATCH_DISABLED_COMPONENTS
-                    or PackageManager.MATCH_UNINSTALLED_PACKAGES
-                  )
-                PackageManagerCompat.getPackageArchiveInfo(tf.path, flag)?.also {
-                  it.applicationInfo?.let { ai ->
-                    ai.sourceDir = tf.path
-                    ai.publicSourceDir = tf.path
-                  }
-                }?.let { pi ->
+            withContext(Dispatchers.Main) {
+              @Suppress("InlinedApi")
+              val flag = (
+                PackageManager.GET_SERVICES
+                  or PackageManager.GET_ACTIVITIES
+                  or PackageManager.GET_RECEIVERS
+                  or PackageManager.GET_PROVIDERS
+                  or PackageManager.GET_PERMISSIONS
+                  or PackageManager.GET_META_DATA
+                  or PackageManager.MATCH_DISABLED_COMPONENTS
+                  or PackageManager.MATCH_UNINSTALLED_PACKAGES
+                )
+              PackageManagerCompat.getPackageArchiveInfo(tf.path, flag)?.also {
+                it.applicationInfo?.let { ai ->
+                  ai.sourceDir = tf.path
+                  ai.publicSourceDir = tf.path
+                }
+              }?.let { pi ->
+                onPackageInfoAvailable(pi, null)
+                dialog.dismiss()
+              } ?: run {
+                Timber.w("Failed to get PackageArchiveInfo")
+                runCatching {
+                  val pi = initXAPKPackage(tf, flag)
                   onPackageInfoAvailable(pi, null)
                   dialog.dismiss()
-                } ?: run {
+                }.onFailure { exception ->
+                  Timber.e(exception)
+                  dialog.dismiss()
+                  showToast(R.string.toast_use_another_file_manager)
                   finish()
                 }
               }
-            } else {
-              showToast(R.string.toast_not_enough_storage_space)
-              finish()
             }
+          } else {
+            dialog.dismiss()
+            showToast(R.string.toast_not_enough_storage_space)
+            finish()
           }
         }
-      }.onFailure {
-        showToast(R.string.toast_use_another_file_manager)
-        finish()
       }
     }
+  }
+
+  private fun initXAPKPackage(file: File, flags: Int): PackageInfo {
+    val parser = XAPKParser(file, flags)
+    return parser.getPackageInfo() ?: throw PackageParserException()
   }
 }

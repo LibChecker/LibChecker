@@ -22,10 +22,10 @@ import com.absinthe.libchecker.utils.UiUtils
 
 object FeaturesDialog {
 
-  fun showSplitApksDialog(activity: FragmentActivity, packageName: String) {
+  fun showSplitApksDialog(activity: FragmentActivity, packageInfo: PackageInfo) {
     AppBundleBottomSheetDialogFragment().apply {
       arguments = bundleOf(
-        EXTRA_PACKAGE_NAME to packageName
+        EXTRA_PACKAGE_INFO to packageInfo
       )
       show(activity.supportFragmentManager, AppBundleBottomSheetDialogFragment::class.java.name)
     }
