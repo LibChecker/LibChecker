@@ -1,5 +1,7 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
+import android.content.pm.PackageInfo
+import androidx.core.os.BundleCompat
 import com.absinthe.libchecker.features.applist.detail.bean.AppBundleItem
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppBundleBottomSheetView
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppBundleItemView
@@ -11,7 +13,7 @@ import java.util.Locale
 
 class AppBundleBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppBundleBottomSheetView>() {
 
-  private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
+  private val packageInfo by lazy { BundleCompat.getParcelable(requireArguments(), EXTRA_PACKAGE_INFO, PackageInfo::class.java) }
 
   override fun initRootView(): AppBundleBottomSheetView =
     AppBundleBottomSheetView(requireContext())
@@ -20,9 +22,8 @@ class AppBundleBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<App
 
   override fun init() {
     maxPeekHeightPercentage = 0.67f
-    packageName?.let {
-      val packageInfo = PackageUtils.getPackageInfo(it)
-      val list = PackageUtils.getSplitsSourceDir(packageInfo)
+    packageInfo?.let {
+      val list = PackageUtils.getSplitsSourceDir(it)
       val localeList by lazy { Locale.getISOLanguages() }
       val bundleList = if (list.isNullOrEmpty()) {
         emptyList()

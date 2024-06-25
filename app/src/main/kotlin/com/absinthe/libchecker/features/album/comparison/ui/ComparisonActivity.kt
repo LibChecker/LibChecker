@@ -47,7 +47,6 @@ import com.absinthe.libchecker.features.snapshot.ui.adapter.SnapshotAdapter
 import com.absinthe.libchecker.ui.adapter.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
-import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
@@ -106,8 +105,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
   override fun onDestroy() {
     super.onDestroy()
     if (leftTimeStamp == -1L || rightTimeStamp == -1L) {
-      FileUtils.delete(File(Constants.TEMP_PACKAGE))
-      FileUtils.delete(File(Constants.TEMP_PACKAGE_2))
+      externalCacheDir?.deleteRecursively()
     }
   }
 

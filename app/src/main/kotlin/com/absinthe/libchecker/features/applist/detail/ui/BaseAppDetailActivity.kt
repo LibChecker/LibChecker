@@ -558,7 +558,7 @@ abstract class BaseAppDetailActivity :
           Features.SPLIT_APKS -> {
             featureAdapter.addData(
               FeatureItem(R.drawable.ic_aab) {
-                FeaturesDialog.showSplitApksDialog(this, packageInfo.packageName)
+                FeaturesDialog.showSplitApksDialog(this, packageInfo)
               }
             )
           }

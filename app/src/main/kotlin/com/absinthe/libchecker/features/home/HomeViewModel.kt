@@ -37,7 +37,6 @@ import com.absinthe.libchecker.features.statistics.bean.LibReference
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.ui.base.IListController
-import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getAppName
@@ -49,7 +48,6 @@ import com.absinthe.libraries.utils.manager.TimeRecorder
 import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.Rule
 import com.microsoft.appcenter.analytics.Analytics
-import java.io.File
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -715,7 +713,7 @@ class HomeViewModel : ViewModel() {
   }
 
   fun clearApkCache() {
-    FileUtils.delete(File(LibCheckerApp.app.externalCacheDir, Constants.TEMP_PACKAGE))
+    LibCheckerApp.app.externalCacheDir?.deleteRecursively()
   }
 
   private suspend fun insert(item: LCItem) = Repositories.lcRepository.insert(item)

@@ -278,7 +278,7 @@ object PackageUtils {
 
     splitList.filter {
       val fileName = it.split(File.separator).last()
-      fileName.contains("arm") || fileName.contains("x86")
+      fileName.contains("arm") || fileName.contains("x86") || fileName.contains("mips")
     }.forEach {
       ZipFileCompat(File(it)).use { zipFile ->
         zipFile.getZipEntries().asSequence().forEach { entry ->
