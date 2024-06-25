@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isGone
 import androidx.core.view.marginBottom
 import androidx.core.view.marginLeft
 import androidx.core.view.marginRight
@@ -77,6 +78,8 @@ abstract class AViewGroup(
   protected val Int.dp: Int get() = (this * resources.displayMetrics.density + 0.5f).toInt()
   protected val View.measuredWidthWithMargins get() = (measuredWidth + marginLeft + marginRight)
   protected val View.measuredHeightWithMargins get() = (measuredHeight + marginTop + marginBottom)
+  protected val View.measuredWidthWithVisibility get() = if (isGone) 0 else measuredWidth
+  protected val View.measuredHeightWithVisibility get() = if (isGone) 0 else measuredHeight
 
   protected class LayoutParams(width: Int, height: Int) : MarginLayoutParams(width, height)
 }
