@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.content.pm.PackageParser
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.window.embedding.RuleController
 import androidx.window.embedding.SplitController
 import coil.Coil
@@ -75,6 +76,9 @@ class LibCheckerApp : Application() {
     )
     Utility.init(this)
     LocaleDelegate.defaultLocale = GlobalValues.locale
+    if (OsUtils.atLeastT()) {
+      AppCompatDelegate.setApplicationLocales(LocaleListCompat.create(GlobalValues.locale))
+    }
     AppCompatDelegate.setDefaultNightMode(UiUtils.getNightMode())
     Once.initialise(this)
     Repositories.init(this)

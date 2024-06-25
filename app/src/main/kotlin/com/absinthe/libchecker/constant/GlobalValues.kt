@@ -3,16 +3,20 @@ package com.absinthe.libchecker.constant
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.absinthe.libchecker.BuildConfig
+import com.absinthe.libchecker.LibCheckerApp
+import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.constant.options.SnapshotOptions
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.DateUtils
+import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.SPDelegates
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import java.util.Locale
 import kotlinx.coroutines.flow.MutableSharedFlow
+import timber.log.Timber
 
 const val SP_NAME = "${BuildConfig.APPLICATION_ID}_preferences"
 
@@ -63,6 +67,17 @@ object GlobalValues {
 
   var locale: Locale = Locale.getDefault()
     get() {
+      if (OsUtils.atLeastT()) {
+        val systemSelectedLocale = SystemServices.localeManager.getApplicationLocales(LibCheckerApp.app.packageName)
+        Timber.d("System selected locale: $systemSelectedLocale")
+        systemSelectedLocale.get(0)?.let {
+          if (it != field) {
+            field = it
+            getPreferences().edit { putString(Constants.PREF_LOCALE, it.toLanguageTag()) }
+          }
+          return it
+        }
+      }
       val tag = getPreferences().getString(Constants.PREF_LOCALE, null)
       if (tag.isNullOrEmpty() || "SYSTEM" == tag) {
         return Locale.getDefault()

@@ -7,6 +7,7 @@ import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.OsUtils
+import rikka.material.app.LocaleDelegate
 import rikka.material.app.MaterialActivity
 import timber.log.Timber
 
@@ -20,6 +21,16 @@ abstract class BaseActivity<VB : ViewBinding> :
     super.onCreate(savedInstanceState)
     binding = (inflateBinding(layoutInflater) as VB).also {
       setContentView(it.root)
+    }
+  }
+
+  override fun onResume() {
+    super.onResume()
+    if (OsUtils.atLeastT()) {
+      if (LocaleDelegate.defaultLocale != GlobalValues.locale) {
+        LocaleDelegate.defaultLocale = GlobalValues.locale
+        recreate()
+      }
     }
   }
 
