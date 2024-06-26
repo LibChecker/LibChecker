@@ -32,7 +32,7 @@ androidX-appCompat = "androidx.appcompat:appcompat:1.7.0"
 androidX-browser = "androidx.browser:browser:1.8.0"
 androidX-constraintLayout = "androidx.constraintlayout:constraintlayout:2.1.4"
 androidX-core = "androidx.core:core-ktx:1.13.1"
-androidX-fragment = "androidx.fragment:fragment-ktx:1.8.0"
+androidX-fragment = "androidx.fragment:fragment-ktx:1.8.1"
 androidX-lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "androidX-lifecycle" }
 androidX-lifecycle-viewModel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidX-lifecycle" }
 androidX-preference = "androidx.preference:preference-ktx:1.2.1"
