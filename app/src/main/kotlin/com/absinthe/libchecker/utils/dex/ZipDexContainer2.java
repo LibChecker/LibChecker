@@ -10,8 +10,6 @@ import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile;
 import com.android.tools.smali.dexlib2.dexbacked.ZipDexContainer;
 import com.android.tools.smali.dexlib2.iface.MultiDexContainer;
 
-import org.apache.commons.io.IOUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,6 +18,8 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
+
+import okio.Okio;
 
 /**
  * Represents a zip file that contains dex files (i.e. an apk or jar file)
@@ -99,7 +99,7 @@ public class ZipDexContainer2 implements MultiDexContainer<DexBackedDexFile> {
   @NonNull
   protected DexEntry<DexBackedDexFile> loadEntry(@NonNull IZipFile zipFile, @NonNull ZipEntry zipEntry) throws IOException {
     try (InputStream inputStream = zipFile.getInputStream(zipEntry)) {
-      byte[] buf = IOUtils.toByteArray(inputStream);
+      byte[] buf = Okio.buffer(Okio.source(inputStream)).readByteArray();
 
       return new DexEntry<>() {
         @NonNull
