@@ -31,13 +31,13 @@ object FeaturesDialog {
     }
   }
 
-  fun showKotlinDialog(context: Context, version: String?) {
+  fun showKotlinDialog(context: Context, extras: Map<String, String?>?) {
     commonShowDialogImpl(
       context,
       com.absinthe.lc.rulesbundle.R.drawable.ic_lib_kotlin,
       R.string.kotlin_string,
       R.string.kotlin_details,
-      version
+      extras
     )
   }
 
@@ -83,7 +83,7 @@ object FeaturesDialog {
       R.drawable.ic_xposed,
       R.string.xposed_module,
       R.string.xposed_module_details,
-      null
+      version = null
     )
   }
 
@@ -93,7 +93,7 @@ object FeaturesDialog {
       com.absinthe.lc.rulesbundle.R.drawable.ic_lib_play_store,
       R.string.play_app_signing,
       R.string.play_app_signing_details,
-      null
+      version = null
     )
   }
 
@@ -103,7 +103,7 @@ object FeaturesDialog {
       R.drawable.ic_pwa,
       R.string.pwa,
       R.string.pwa_details,
-      null
+      version = null
     )
   }
 
@@ -145,24 +145,7 @@ object FeaturesDialog {
     @StringRes messageRes: Int,
     version: String?
   ) {
-    val dialog = BaseAlertDialogBuilder(context)
-      .setIcon(icon)
-      .setTitle(titleRes)
-      .setMessage(messageRes)
-      .setPositiveButton(android.R.string.ok, null)
-
-    version?.let {
-      dialog.setTitle(
-        HtmlCompat.fromHtml(
-          "${context.getString(titleRes)} <b>$it</b>",
-          HtmlCompat.FROM_HTML_MODE_COMPACT
-        )
-      )
-    } ?: run {
-      dialog.setTitle(titleRes)
-    }
-
-    dialog.show()
+    commonShowDialogImpl(context, icon, titleRes, messageRes, mapOf(context.getString(titleRes) to version))
   }
 
   private fun commonShowDialogImpl(
@@ -173,5 +156,38 @@ object FeaturesDialog {
     version: String?
   ) {
     commonShowDialogImpl(context, context.getDrawable(iconRes)!!, titleRes, messageRes, version)
+  }
+
+  private fun commonShowDialogImpl(
+    context: Context,
+    @DrawableRes iconRes: Int,
+    @StringRes titleRes: Int,
+    @StringRes messageRes: Int,
+    versionInfo: Map<String, String?>?
+  ) {
+    commonShowDialogImpl(context, context.getDrawable(iconRes)!!, titleRes, messageRes, versionInfo)
+  }
+
+  private fun commonShowDialogImpl(
+    context: Context,
+    icon: Drawable,
+    @StringRes titleRes: Int,
+    @StringRes messageRes: Int,
+    versionInfo: Map<String, String?>?
+  ) {
+    val dialog = BaseAlertDialogBuilder(context)
+      .setIcon(icon)
+      .setTitle(titleRes)
+      .setMessage(messageRes)
+      .setPositiveButton(android.R.string.ok, null)
+
+    versionInfo?.let { info ->
+      val title = info.map { "${it.key} <b>${it.value.orEmpty()}</b>" }.joinToString(", ")
+      dialog.setTitle(HtmlCompat.fromHtml(title, HtmlCompat.FROM_HTML_MODE_COMPACT))
+    } ?: run {
+      dialog.setTitle(titleRes)
+    }
+
+    dialog.show()
   }
 }

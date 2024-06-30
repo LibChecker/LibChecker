@@ -38,7 +38,7 @@ import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.getAGPVersion
 import com.absinthe.libchecker.utils.extensions.getFeatures
 import com.absinthe.libchecker.utils.extensions.getJetpackComposeVersion
-import com.absinthe.libchecker.utils.extensions.getKotlinPluginVersion
+import com.absinthe.libchecker.utils.extensions.getKotlinPluginInfo
 import com.absinthe.libchecker.utils.extensions.getRxAndroidVersion
 import com.absinthe.libchecker.utils.extensions.getRxJavaVersion
 import com.absinthe.libchecker.utils.extensions.getRxKotlinVersion
@@ -440,11 +440,11 @@ class DetailViewModel : ViewModel() {
     }
 
     if ((feat and Features.SPLIT_APKS) > 0) {
-      _featuresFlow.emit(VersionedFeature(Features.SPLIT_APKS, null))
+      _featuresFlow.emit(VersionedFeature(Features.SPLIT_APKS))
     }
     if ((feat and Features.KOTLIN_USED) > 0) {
-      val version = packageInfo.getKotlinPluginVersion()
-      _featuresFlow.emit(VersionedFeature(Features.KOTLIN_USED, version))
+      val versionInfo = packageInfo.getKotlinPluginInfo()
+      _featuresFlow.emit(VersionedFeature(Features.KOTLIN_USED, extras = versionInfo))
     }
     if ((feat and Features.RX_JAVA) > 0) {
       val version = packageInfo.getRxJavaVersion()
@@ -463,20 +463,20 @@ class DetailViewModel : ViewModel() {
       _featuresFlow.emit(VersionedFeature(Features.AGP, version))
     }
     if ((feat and Features.XPOSED_MODULE) > 0) {
-      _featuresFlow.emit(VersionedFeature(Features.XPOSED_MODULE, null))
+      _featuresFlow.emit(VersionedFeature(Features.XPOSED_MODULE))
     }
     if ((feat and Features.PLAY_SIGNING) > 0) {
-      _featuresFlow.emit(VersionedFeature(Features.PLAY_SIGNING, null))
+      _featuresFlow.emit(VersionedFeature(Features.PLAY_SIGNING))
     }
     if ((feat and Features.PWA) > 0) {
-      _featuresFlow.emit(VersionedFeature(Features.PWA, null))
+      _featuresFlow.emit(VersionedFeature(Features.PWA))
     }
     if ((feat and Features.JETPACK_COMPOSE) > 0) {
       val version = packageInfo.getJetpackComposeVersion()
       _featuresFlow.emit(VersionedFeature(Features.JETPACK_COMPOSE, version))
     }
 
-    _featuresFlow.emit(VersionedFeature(Features.Ext.APPLICATION_PROP, null))
+    _featuresFlow.emit(VersionedFeature(Features.Ext.APPLICATION_PROP))
 
     if (OsUtils.atLeastR()) {
       runCatching {

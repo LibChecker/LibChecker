@@ -350,16 +350,31 @@ fun ApplicationInfo.isUse32BitAbi(): Boolean {
  * Get Kotlin plugin version of an app
  * @return Kotlin plugin version or null if not found
  */
-fun PackageInfo.getKotlinPluginVersion(): String? {
-  return runCatching {
+fun PackageInfo.getKotlinPluginInfo(): Map<String, String?> {
+  val map = mutableMapOf<String, String?>()
+  map["Kotlin"] = null
+  runCatching {
     ZipFileCompat(applicationInfo!!.sourceDir).use { zip ->
       val entry = zip.getEntry("kotlin-tooling-metadata.json") ?: return@runCatching null
       zip.getInputStream(entry).source().buffer().use {
         val json = it.readUtf8().fromJson<KotlinToolingMetadata>()
-        return json?.buildPluginVersion.takeIf { json?.buildPlugin == "org.jetbrains.kotlin.gradle.plugin.KotlinAndroidPluginWrapper" }
+        map["Kotlin"] =
+          json?.buildPluginVersion.takeIf { json?.buildPlugin == "org.jetbrains.kotlin.gradle.plugin.KotlinAndroidPluginWrapper" }
+        if (json?.buildSystem == "Gradle" && json.buildSystemVersion.isNotEmpty()) {
+          map["Gradle"] = json.buildSystemVersion
+        }
+        val kotlinAndroidTarget =
+          json?.projectTargets?.find { target -> target.target == "org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget" }
+        val sourceCompatibility = kotlinAndroidTarget?.extras?.android?.sourceCompatibility
+        if (kotlinAndroidTarget != null && sourceCompatibility.isNullOrEmpty().not()) {
+          map["Java"] = sourceCompatibility
+        }
       }
     }
-  }.getOrNull()
+  }.onFailure {
+    map["Kotlin"] = null
+  }
+  return map
 }
 
 /**
@@ -368,7 +383,7 @@ fun PackageInfo.getKotlinPluginVersion(): String? {
  */
 fun PackageInfo.isUseJetpackCompose(foundList: List<String>? = null): Boolean {
   val file = File(applicationInfo?.sourceDir ?: return false)
-  val usedInMetaInf = runCatching {
+  val foundInMetaInf = runCatching {
     ZipFileCompat(file).use {
       it.getZipEntries().asSequence().any { entry ->
         entry.isDirectory.not() &&
@@ -377,7 +392,16 @@ fun PackageInfo.isUseJetpackCompose(foundList: List<String>? = null): Boolean {
       }
     }
   }.getOrDefault(false)
-  if (usedInMetaInf) {
+  if (foundInMetaInf) {
+    return true
+  }
+  val foundInComponents = PackageUtils.getPackageInfo(
+    packageName,
+    PackageManager.GET_ACTIVITIES
+  ).activities?.find { activityInfo ->
+    activityInfo.name == "androidx.compose.ui.tooling.PreviewActivity"
+  } != null
+  if (foundInComponents) {
     return true
   }
   if (foundList != null) {

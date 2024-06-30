@@ -566,7 +566,7 @@ abstract class BaseAppDetailActivity :
           Features.KOTLIN_USED -> {
             featureAdapter.addData(
               FeatureItem(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_kotlin) {
-                FeaturesDialog.showKotlinDialog(this, feat.version)
+                FeaturesDialog.showKotlinDialog(this, feat.extras)
               }
             )
           }
