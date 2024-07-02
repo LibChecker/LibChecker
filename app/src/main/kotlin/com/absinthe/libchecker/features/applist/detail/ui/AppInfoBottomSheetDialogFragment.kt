@@ -17,6 +17,7 @@ import com.absinthe.libchecker.features.applist.detail.ui.view.AppInfoBottomShee
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
@@ -65,6 +66,9 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
       } finally {
         dismiss()
       }
+    }
+    packageName?.let {
+      root.launch.setLongClickCopiedToClipboard(PackageUtils.getLauncherActivity(it))
     }
     root.setting.setOnClickListener {
       try {
