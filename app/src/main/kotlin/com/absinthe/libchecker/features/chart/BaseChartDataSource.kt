@@ -5,7 +5,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
 
 abstract class BaseChartDataSource<T : View>(val items: List<LCItem>) : IChartDataSource<T> {
-  protected abstract val classifiedList: List<MutableList<LCItem>>
+  protected abstract val classifiedMap: Map<Int, ChartSourceItem>
 
   protected val filteredList = if (GlobalValues.isShowSystemApps) {
     items
@@ -14,10 +14,14 @@ abstract class BaseChartDataSource<T : View>(val items: List<LCItem>) : IChartDa
   }
 
   override fun getListByXValue(x: Int): List<LCItem> {
-    return classifiedList[x]
+    return classifiedMap[x]!!.data
   }
 
   override fun getData(): List<LCItem> {
     return items
+  }
+
+  fun getChartSourceItems(): Map<Int, ChartSourceItem> {
+    return classifiedMap
   }
 }
