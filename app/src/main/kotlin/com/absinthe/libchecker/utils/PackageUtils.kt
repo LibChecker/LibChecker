@@ -1237,16 +1237,19 @@ object PackageUtils {
     return LibStringItem(serialNumber, 0, source, null)
   }
 
-  fun startLaunchAppActivity(context: Context, packageName: String?) {
-    if (packageName == null) {
-      return
-    }
-    val launcherActivity: String
+  fun getLauncherActivity(packageName: String): String {
     val intent = Intent(Intent.ACTION_MAIN, null)
       .addCategory(Intent.CATEGORY_LAUNCHER)
       .setPackage(packageName)
     val info = PackageManagerCompat.queryIntentActivities(intent, 0)
-    launcherActivity = info.getOrNull(0)?.activityInfo?.name.orEmpty()
+    return info.getOrNull(0)?.activityInfo?.name.orEmpty()
+  }
+
+  fun startLaunchAppActivity(context: Context, packageName: String?) {
+    if (packageName == null) {
+      return
+    }
+    val launcherActivity = getLauncherActivity(packageName)
     val launchIntent = Intent(Intent.ACTION_MAIN)
       .addCategory(Intent.CATEGORY_LAUNCHER)
       .setClassName(packageName, launcherActivity)
