@@ -386,9 +386,10 @@ fun PackageInfo.isUseJetpackCompose(foundList: List<String>? = null): Boolean {
   val foundInMetaInf = runCatching {
     ZipFileCompat(file).use {
       it.getZipEntries().asSequence().any { entry ->
+        val fileName = entry.name.substringAfterLast("/")
         entry.isDirectory.not() &&
-          entry.name.startsWith("androidx.compose") &&
-          entry.name.endsWith(".version")
+          fileName.startsWith("androidx.compose") &&
+          fileName.endsWith(".version")
       }
     }
   }.getOrDefault(false)
