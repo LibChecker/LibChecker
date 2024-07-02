@@ -8,6 +8,7 @@ import com.absinthe.libchecker.constant.Constants.OVERLAY
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.features.chart.BaseChartDataSource
+import com.absinthe.libchecker.features.chart.ChartSourceItem
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.github.mikephil.charting.charts.PieChart
@@ -24,8 +25,7 @@ private val ABI_64_BIT = setOf(Constants.ARMV8, Constants.X86_64, Constants.MIPS
 private val ABI_32_BIT = setOf(Constants.ARMV5, Constants.ARMV7, Constants.X86, Constants.MIPS)
 
 class ABIChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>(items) {
-  override val classifiedList: List<MutableList<LCItem>> =
-    listOf(mutableListOf(), mutableListOf(), mutableListOf())
+  override val classifiedMap: HashMap<Int, ChartSourceItem> = HashMap(3)
 
   override suspend fun fillChartView(chartView: PieChart) {
     withContext(Dispatchers.Default) {
@@ -37,21 +37,30 @@ class ABIChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>(it
       )
       val entries: ArrayList<PieEntry> = ArrayList()
       val colorOnSurface = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
+      val classifiedList = listOf(
+        mutableListOf<LCItem>(),
+        mutableListOf(),
+        mutableListOf()
+      )
 
       for (item in filteredList) {
         if (GlobalValues.isShowSystemApps.not()) {
           if (item.isSystem) continue
         }
         if (item.abi.toInt() == OVERLAY) {
-          classifiedList[2].add(item)
+          classifiedList[NO_LIBS].add(item)
           continue
         }
         when (item.abi % MULTI_ARCH) {
-          in ABI_64_BIT -> classifiedList[0].add(item)
-          in ABI_32_BIT -> classifiedList[1].add(item)
-          else -> classifiedList[2].add(item)
+          in ABI_64_BIT -> classifiedList[IS_64_BIT].add(item)
+          in ABI_32_BIT -> classifiedList[IS_32_BIT].add(item)
+          else -> classifiedList[NO_LIBS].add(item)
         }
       }
+
+      classifiedMap[IS_64_BIT] = ChartSourceItem(R.drawable.ic_abi_label_64bit, false, classifiedList[IS_64_BIT])
+      classifiedMap[IS_32_BIT] = ChartSourceItem(R.drawable.ic_abi_label_32bit, false, classifiedList[IS_32_BIT])
+      classifiedMap[NO_LIBS] = ChartSourceItem(R.drawable.ic_abi_label_no_libs, false, classifiedList[NO_LIBS])
 
       // NOTE: The order of the entries when being added to the entries array determines their position around the center of
       // the chart.
@@ -108,19 +117,25 @@ class ABIChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>(it
 
   override fun getLabelByXValue(context: Context, x: Int): String {
     return when (x) {
-      0 -> String.format(
+      IS_64_BIT -> String.format(
         context.getString(R.string.title_statistics_dialog),
         context.getString(R.string.string_64_bit)
       )
 
-      1 -> String.format(
+      IS_32_BIT -> String.format(
         context.getString(R.string.title_statistics_dialog),
         context.getString(R.string.string_32_bit)
       )
 
-      2 -> context.getString(R.string.title_statistics_dialog_no_native_libs)
+      NO_LIBS -> context.getString(R.string.title_statistics_dialog_no_native_libs)
 
       else -> ""
     }
+  }
+
+  companion object {
+    const val IS_64_BIT = 0
+    const val IS_32_BIT = 1
+    const val NO_LIBS = 2
   }
 }

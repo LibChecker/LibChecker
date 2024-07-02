@@ -6,6 +6,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.features.chart.BaseChartDataSource
+import com.absinthe.libchecker.features.chart.ChartSourceItem
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.data.PieData
@@ -17,7 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class KotlinChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>(items) {
-  override val classifiedList: List<MutableList<LCItem>> = listOf(mutableListOf(), mutableListOf())
+  override val classifiedMap: HashMap<Int, ChartSourceItem> = HashMap(2)
 
   override suspend fun fillChartView(chartView: PieChart) {
     withContext(Dispatchers.Default) {
@@ -28,14 +29,25 @@ class KotlinChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>
       )
       val entries: ArrayList<PieEntry> = ArrayList()
       val colorOnSurface = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
+      val classifiedList = listOf(mutableListOf<LCItem>(), mutableListOf())
 
       for (item in filteredList) {
         if ((item.features and Features.KOTLIN_USED) > 0) {
-          classifiedList[0].add(item)
+          classifiedList[KOTLIN_USED].add(item)
         } else {
-          classifiedList[1].add(item)
+          classifiedList[KOTLIN_UNUSED].add(item)
         }
       }
+      classifiedMap[KOTLIN_USED] = ChartSourceItem(
+        com.absinthe.lc.rulesbundle.R.drawable.ic_lib_kotlin,
+        false,
+        classifiedList[KOTLIN_USED]
+      )
+      classifiedMap[KOTLIN_UNUSED] = ChartSourceItem(
+        com.absinthe.lc.rulesbundle.R.drawable.ic_lib_kotlin,
+        true,
+        classifiedList[KOTLIN_UNUSED]
+      )
 
       // NOTE: The order of the entries when being added to the entries array determines their position around the center of
       // the chart.
@@ -81,9 +93,14 @@ class KotlinChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>
 
   override fun getLabelByXValue(context: Context, x: Int): String {
     return when (x) {
-      0 -> context.getString(R.string.string_kotlin_used)
-      1 -> context.getString(R.string.string_kotlin_unused)
+      KOTLIN_USED -> context.getString(R.string.string_kotlin_used)
+      KOTLIN_UNUSED -> context.getString(R.string.string_kotlin_unused)
       else -> ""
     }
+  }
+
+  companion object {
+    const val KOTLIN_USED = 0
+    const val KOTLIN_UNUSED = 1
   }
 }
