@@ -101,9 +101,11 @@ object LCAppUtils {
           PackageUtils.findDexClasses(
             source,
             listOf(
-              "com.qihoo.util.*".toClassDefType()
-            )
-          ).any { it == "com.qihoo.util.*".toClassDefType() }
+              "com.qihoo.util.*".toClassDefType(),
+              "com.tianyu.util.*".toClassDefType()
+            ),
+            hasAny = true
+          ).isNotEmpty()
         }.getOrDefault(false)
       }
 
@@ -114,7 +116,7 @@ object LCAppUtils {
             listOf(
               "com.secneo.apkwrapper.*".toClassDefType()
             )
-          ).any { it == "com.secneo.apkwrapper.*".toClassDefType() }
+          ).isNotEmpty()
         }.getOrDefault(false)
       }
 
@@ -126,7 +128,7 @@ object LCAppUtils {
               listOf(
                 "io.flutter.FlutterInjector".toClassDefType()
               )
-            ).any { it == "io.flutter.FlutterInjector".toClassDefType() }
+            ).isNotEmpty()
         }.getOrDefault(false)
       }
 
