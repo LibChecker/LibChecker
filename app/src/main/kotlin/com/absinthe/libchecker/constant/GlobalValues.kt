@@ -70,13 +70,12 @@ object GlobalValues {
       if (OsUtils.atLeastT()) {
         val systemSelectedLocale = SystemServices.localeManager.getApplicationLocales(LibCheckerApp.app.packageName)
         Timber.d("System selected locale: $systemSelectedLocale")
-        systemSelectedLocale.get(0)?.let {
-          if (it != field) {
-            field = it
-            getPreferences().edit { putString(Constants.PREF_LOCALE, it.toLanguageTag()) }
-          }
-          return it
+        val locale = systemSelectedLocale.get(0) ?: Locale.getDefault()
+        if (locale != field) {
+          field = locale
+          getPreferences().edit { putString(Constants.PREF_LOCALE, locale.toLanguageTag()) }
         }
+        return locale
       }
       val tag = getPreferences().getString(Constants.PREF_LOCALE, null)
       if (tag.isNullOrEmpty() || "SYSTEM" == tag) {
