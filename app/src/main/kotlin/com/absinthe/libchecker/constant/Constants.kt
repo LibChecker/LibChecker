@@ -82,6 +82,8 @@ object Constants {
 
   const val COMMAND_DEBUG_MODE = "/debugmode"
   const val COMMAND_USER_MODE = "/usermode"
+  const val COMMAND_DUMP_APPS_INFO_TXT = "/dumpAppsInfoTxt"
+  const val COMMAND_DUMP_APPS_INFO_MD = "/dumpAppsInfoMd"
 
   const val RULES_DB_FILE_NAME = "rules.db"
   const val RULES_DATABASE_NAME = "rules_database"
