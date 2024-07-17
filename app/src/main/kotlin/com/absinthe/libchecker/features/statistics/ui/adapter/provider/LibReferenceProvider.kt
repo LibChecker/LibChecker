@@ -1,5 +1,7 @@
 package com.absinthe.libchecker.features.statistics.ui.adapter.provider
 
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
@@ -7,7 +9,6 @@ import androidx.core.text.buildSpannedString
 import androidx.core.text.italic
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.NATIVE
@@ -21,7 +22,6 @@ import com.absinthe.libchecker.features.statistics.bean.LibReference
 import com.absinthe.libchecker.features.statistics.ui.adapter.LibReferenceAdapter
 import com.absinthe.libchecker.features.statistics.ui.view.LibReferenceItemView
 import com.absinthe.libchecker.ui.base.BaseActivity
-import com.absinthe.libchecker.ui.base.SaturationTransformation
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.tintHighlightText
 import com.absinthe.rulesbundle.LCRules
@@ -65,9 +65,12 @@ class LibReferenceProvider : BaseNodeProvider() {
       setOrHighlightText(libName, libReferenceItem.libName)
 
       libReferenceItem.rule?.let {
-        icon.load(it.iconRes) {
+        icon.apply {
+          setImageResource(it.iconRes)
+
           if (!GlobalValues.isColorfulIcon && !it.isSimpleColorIcon) {
-            transformations(SaturationTransformation(0f))
+            this.drawable.mutate().colorFilter =
+              ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
           }
         }
 
