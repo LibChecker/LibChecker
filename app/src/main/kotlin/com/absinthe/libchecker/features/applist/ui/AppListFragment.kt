@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.features.applist.ui
 
+import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Color
 import android.view.Menu
@@ -7,6 +8,8 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.FrameLayout
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -43,6 +46,9 @@ import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -74,6 +80,8 @@ class AppListFragment :
   private var firstScrollFlag = false
 
   private lateinit var layoutManager: RecyclerView.LayoutManager
+  private lateinit var dumpAppsInfoResultLauncher: ActivityResultLauncher<String>
+  private var dumpAppsInfoAsMarkDown = false
 
   override fun init() {
     val context = (context as? BaseActivity<*>) ?: return
@@ -165,6 +173,24 @@ class AppListFragment :
     initObserver()
   }
 
+  override fun onAttach(context: Context) {
+    super.onAttach(context)
+    dumpAppsInfoResultLauncher =
+      registerForActivityResult(ActivityResultContracts.CreateDocument("*/*")) {
+        it?.let {
+          activity?.let { activity ->
+            runCatching {
+              activity.contentResolver.openOutputStream(it)?.let { os ->
+                homeViewModel.dumpAppsInfo(os, dumpAppsInfoAsMarkDown)
+              }
+            }.onFailure { t ->
+              Timber.e(t)
+            }
+          }
+        }
+      }
+  }
+
   override fun onResume() {
     super.onResume()
     if (hasPackageChanged()) {
@@ -215,6 +241,30 @@ class AppListFragment :
         newText == Constants.COMMAND_USER_MODE -> {
           GlobalValues.debugMode = false
           context?.showToast("USER MODE")
+        }
+
+        newText == Constants.COMMAND_DUMP_APPS_INFO_TXT -> {
+          dumpAppsInfoAsMarkDown = false
+          runCatching {
+            val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd, HH:mm:ss", Locale.getDefault())
+            val formattedTime = simpleDateFormat.format(Date(System.currentTimeMillis()))
+            dumpAppsInfoResultLauncher.launch("LibChecker-Dump-Apps-Info-$formattedTime.txt")
+          }.onFailure {
+            Timber.e(it)
+            context?.showToast("Document API not working")
+          }
+        }
+
+        newText == Constants.COMMAND_DUMP_APPS_INFO_MD -> {
+          dumpAppsInfoAsMarkDown = true
+          runCatching {
+            val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd, HH:mm:ss", Locale.getDefault())
+            val formattedTime = simpleDateFormat.format(Date(System.currentTimeMillis()))
+            dumpAppsInfoResultLauncher.launch("LibChecker-Dump-Apps-Info-$formattedTime.md")
+          }.onFailure {
+            Timber.e(it)
+            context?.showToast("Document API not working")
+          }
         }
 
         else -> {
