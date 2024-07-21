@@ -1,7 +1,5 @@
 package com.absinthe.libchecker.database.backup
 
-import com.absinthe.libchecker.database.backup.RoomBackup.Companion.BACKUP_FILE_LOCATION_CUSTOM_FILE
-
 /**
  *  MIT License
  *

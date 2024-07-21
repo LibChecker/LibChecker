@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.features.applist.detail.ui.view
 
 import android.content.Context
-import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatTextView
@@ -21,16 +20,16 @@ class XmlBottomSheetView(context: Context) :
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =
-      LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+      LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
     title.text = context.getString(R.string.xml_detail)
   }
 
   private val container = BottomSheetRecyclerView(context).apply {
     layoutParams =
-      LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+      LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
     adapter = this@XmlBottomSheetView.adapter
     layoutManager = LinearLayoutManager(context)
-    overScrollMode = View.OVER_SCROLL_NEVER
+    overScrollMode = OVER_SCROLL_NEVER
     isVerticalScrollBarEnabled = false
     clipToPadding = false
     clipChildren = false
@@ -57,8 +56,8 @@ class XmlBottomSheetView(context: Context) :
       return createBaseViewHolder(
         AppCompatTextView(context).apply {
           layoutParams = MarginLayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
+            LayoutParams.MATCH_PARENT,
+            LayoutParams.WRAP_CONTENT
           )
           textSize = 10f
           setTextIsSelectable(true)

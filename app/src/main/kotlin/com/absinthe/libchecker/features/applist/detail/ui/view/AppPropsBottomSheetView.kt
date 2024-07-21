@@ -8,7 +8,6 @@ import android.text.SpannableString
 import android.text.style.ImageSpan
 import android.text.style.UnderlineSpan
 import android.view.Gravity
-import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.browser.customtabs.CustomTabsIntent
@@ -42,14 +41,14 @@ class AppPropsBottomSheetView(context: Context, packageInfo: PackageInfo) :
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =
-      LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+      LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
     title.text = context.getString(R.string.lib_detail_app_props_title)
   }
 
   private val tipView = AppCompatTextView(context).apply {
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      LayoutParams.MATCH_PARENT,
+      LayoutParams.WRAP_CONTENT
     ).also {
       it.topMargin = 4.dp
     }
@@ -84,12 +83,12 @@ class AppPropsBottomSheetView(context: Context, packageInfo: PackageInfo) :
 
   private val list = RecyclerView(context).apply {
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      LayoutParams.MATCH_PARENT,
+      LayoutParams.WRAP_CONTENT
     ).also {
       it.topMargin = 24.dp
     }
-    overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+    overScrollMode = OVER_SCROLL_NEVER
     adapter = this@AppPropsBottomSheetView.adapter
     layoutManager = LinearLayoutManager(context)
     isVerticalScrollBarEnabled = false

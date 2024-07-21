@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.features.settings.ui
 
 import android.content.Context
-import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,8 +23,8 @@ class GetUpdatesDialogView(context: Context) :
 
   private val recyclerView = RecyclerView(context).apply {
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      LayoutParams.MATCH_PARENT,
+      LayoutParams.WRAP_CONTENT
     )
     setPadding(16.dp, 16.dp, 16.dp, 16.dp)
     adapter = _adapter

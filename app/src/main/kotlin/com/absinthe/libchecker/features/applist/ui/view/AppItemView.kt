@@ -38,8 +38,8 @@ class AppItemView(context: Context) : MaterialCardView(context) {
       ContextThemeWrapper(context, R.style.TextView_SansSerifCondensedMedium)
     ).apply {
       layoutParams = LayoutParams(
-        ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
+        LayoutParams.WRAP_CONTENT,
+        LayoutParams.WRAP_CONTENT
       ).also {
         it.gravity = Gravity.CENTER
         it.topMargin = 24.dp

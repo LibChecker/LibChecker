@@ -58,7 +58,7 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
       }
     }.launchIn(lifecycleScope)
 
-    viewModel.initDexData(packageName)
+    viewModel.initDexData()
   }
 
   override fun onDetach() {

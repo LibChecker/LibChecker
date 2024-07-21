@@ -96,7 +96,6 @@ class ApkDetailActivity :
             isPackageReady = true
 
             withContext(Dispatchers.Main) {
-              @Suppress("InlinedApi")
               val flag = (
                 PackageManager.GET_SERVICES
                   or PackageManager.GET_ACTIVITIES

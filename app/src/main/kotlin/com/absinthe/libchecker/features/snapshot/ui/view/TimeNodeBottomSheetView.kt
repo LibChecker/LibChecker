@@ -1,10 +1,8 @@
 package com.absinthe.libchecker.features.snapshot.ui.view
 
 import android.content.Context
-import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.features.snapshot.ui.adapter.TimeNodeAdapter
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
@@ -22,14 +20,14 @@ class TimeNodeBottomSheetView(context: Context) :
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =
-      LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+      LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
     title.text = context.getString(R.string.dialog_title_change_timestamp)
   }
 
   private val list = BorderRecyclerView(context).apply {
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      LayoutParams.MATCH_PARENT,
+      LayoutParams.WRAP_CONTENT
     ).also {
       val padding = 16.dp
       it.topMargin = padding
@@ -38,7 +36,7 @@ class TimeNodeBottomSheetView(context: Context) :
     adapter = this@TimeNodeBottomSheetView.adapter
     isVerticalScrollBarEnabled = false
     layoutManager = LinearLayoutManager(context)
-    overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+    overScrollMode = OVER_SCROLL_NEVER
     addItemDecoration(VerticalSpacesItemDecoration(4.dp))
   }
 

@@ -528,10 +528,11 @@ class HomeViewModel : ViewModel() {
         }
 
         DEX -> {
+          val packageInfo = PackageUtils.getPackageInfo(packageName)
           computeDexReferenceInternal(
             referenceMap,
             packageName,
-            PackageUtils.getDexList(packageName).toList()
+            PackageUtils.getDexList(packageInfo).toList()
           )
         }
 

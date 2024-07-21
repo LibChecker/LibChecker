@@ -2,7 +2,6 @@ package com.absinthe.libchecker.features.applist.ui.view
 
 import android.content.Context
 import android.graphics.Typeface
-import android.view.ViewGroup
 import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
 import androidx.appcompat.view.ContextThemeWrapper
@@ -48,8 +47,8 @@ class AdvancedMenuSortView(context: Context) :
   private val group = HorizontalScrollView(context).apply {
     isHorizontalScrollBarEnabled = false
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.WRAP_CONTENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      LayoutParams.WRAP_CONTENT,
+      LayoutParams.WRAP_CONTENT
     ).also {
       it.topMargin = 8.dp
     }

@@ -24,7 +24,7 @@ class BridgeActivity : Activity() {
         val authority = uri.getQueryParameter(LCUris.Bridge.PARAM_AUTHORITY)?.toInt() ?: 0
 
         if (authority == LibCheckerApp.generateAuthKey()) {
-          val dropPrevious = uri.getQueryParameter(LCUris.Bridge.PARAM_DROP_PREVIOUS)?.toBoolean() ?: false
+          val dropPrevious = uri.getQueryParameter(LCUris.Bridge.PARAM_DROP_PREVIOUS)?.toBoolean() == true
 
           startService(
             Intent(this, ShootService::class.java).also {

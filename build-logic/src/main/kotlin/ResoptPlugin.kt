@@ -6,7 +6,6 @@ import javax.inject.Inject
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.file.FileSystemOperations
-import org.gradle.configurationcache.extensions.capitalized
 import org.gradle.kotlin.dsl.newInstance
 import org.gradle.process.ExecOperations
 
