@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.features.home.ui
 
 import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
@@ -110,7 +109,7 @@ class MainActivity :
         setPackage(packageName)
       },
       workerServiceConnection,
-      Context.BIND_AUTO_CREATE
+      BIND_AUTO_CREATE
     )
     appViewModel.clearApkCache()
     handleIntent(intent)
@@ -244,7 +243,7 @@ class MainActivity :
               }
             } else {
               val clickFlag =
-                binding.viewpager.getTag(R.id.viewpager_tab_click) as? Boolean ?: false
+                binding.viewpager.getTag(R.id.viewpager_tab_click) as? Boolean == true
               if (!clickFlag) {
                 binding.viewpager.setTag(R.id.viewpager_tab_click, true)
 

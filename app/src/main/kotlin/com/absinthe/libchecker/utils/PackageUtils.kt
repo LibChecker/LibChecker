@@ -972,25 +972,16 @@ object PackageUtils {
 
   /**
    * Get part of DEX classes (at most 5 DEX's) of an app
-   * @param packageName Package name
-   * @param isApk True if it is an apk file
+   * @param pi PackageInfo of the app
    * @return List of LibStringItem
    */
-  fun getDexList(packageName: String, isApk: Boolean = false): Collection<LibStringItem> {
+  fun getDexList(pi: PackageInfo): Collection<LibStringItem> {
     try {
-      val path = if (isApk) {
-        packageName
-      } else {
-        getPackageInfo(packageName).applicationInfo?.sourceDir
-      }
-
-      if (path.isNullOrEmpty()) {
-        return emptyList()
-      }
+      val path = pi.applicationInfo?.sourceDir ?: return emptyList()
       var className: String
 
       val primarySet = mutableSetOf<LibStringItem>()
-      val pkgType = "L${packageName.replace(".", "/")}"
+      val pkgType = "L${pi.packageName.replace(".", "/")}"
       FastDexFileFactory.loadDexContainer(File(path), Opcodes.getDefault()).apply {
         dexEntryNames.forEachIndexed { index, entry ->
           if (index >= 5) {

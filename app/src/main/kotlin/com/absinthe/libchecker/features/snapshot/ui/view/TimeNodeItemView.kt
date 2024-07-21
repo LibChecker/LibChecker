@@ -45,7 +45,7 @@ class TimeNodeItemView(context: Context) : AViewGroup(context) {
   private val rvList = RecyclerView(context).apply {
     layoutParams =
       LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-    overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+    overScrollMode = OVER_SCROLL_NEVER
     layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
     adapter = this@TimeNodeItemView.adapter
   }

@@ -12,7 +12,7 @@ import okio.sink
 import okio.source
 import timber.log.Timber
 
-class XAPKParser constructor(private val file: File, private val flags: Int = 0) {
+class XAPKParser(private val file: File, private val flags: Int = 0) {
 
   constructor(filePath: String) : this(File(filePath))
 

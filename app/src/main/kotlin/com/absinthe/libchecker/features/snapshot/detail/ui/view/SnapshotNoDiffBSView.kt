@@ -15,14 +15,14 @@ class SnapshotNoDiffBSView(context: Context) :
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =
-      LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+      LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
     title.text = context.getString(R.string.detail)
   }
 
   val title = SnapshotTitleView(context).apply {
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      LayoutParams.MATCH_PARENT,
+      LayoutParams.WRAP_CONTENT
     ).also {
       it.topMargin = 24.dp
     }
@@ -32,7 +32,7 @@ class SnapshotNoDiffBSView(context: Context) :
 
   init {
     layoutParams =
-      LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+      LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
     orientation = VERTICAL
     setPadding(24.dp, 16.dp, 24.dp, 0)
     addView(header)
@@ -49,21 +49,21 @@ class SnapshotNoDiffBSView(context: Context) :
       Mode.New -> {
         stubView = SnapshotDetailNewInstallView(context).apply {
           layoutParams =
-            LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
         }
       }
 
       Mode.Deleted -> {
         stubView = SnapshotDetailDeletedView(context).apply {
           layoutParams =
-            LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
         }
       }
 
       Mode.NothingChanged -> {
         stubView = SnapshotEmptyView(context).apply {
           layoutParams =
-            LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
         }
       }
     }

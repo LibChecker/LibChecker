@@ -2,11 +2,9 @@ package com.absinthe.libchecker.features.applist.detail.ui.view
 
 import android.content.Context
 import android.view.Gravity
-import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.SignatureDetailAdapter
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
@@ -40,12 +38,12 @@ class SignatureDetailBottomSheetView(context: Context) :
 
   val list = BottomSheetRecyclerView(context).apply {
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      LayoutParams.MATCH_PARENT,
+      LayoutParams.WRAP_CONTENT
     ).also {
       it.topMargin = 12.dp
     }
-    overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+    overScrollMode = OVER_SCROLL_NEVER
     adapter = this@SignatureDetailBottomSheetView.adapter
     layoutManager = LinearLayoutManager(context)
     isVerticalScrollBarEnabled = false

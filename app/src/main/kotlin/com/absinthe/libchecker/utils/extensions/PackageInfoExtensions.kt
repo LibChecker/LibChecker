@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageInfoHidden
-import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Build
 import androidx.core.content.pm.PackageInfoCompat
@@ -51,11 +50,9 @@ fun PackageInfo.getVersionCode(): Long {
  * @return version code as String
  */
 fun PackageInfo.getVersionString(): String {
-  return try {
+  return runCatching {
     "${versionName ?: "<unknown>"} (${getVersionCode()})"
-  } catch (e: PackageManager.NameNotFoundException) {
-    "Unknown"
-  }
+  }.getOrDefault("Unknown")
 }
 
 /**
@@ -271,11 +268,11 @@ fun PackageInfo.isPWA(): Boolean {
 fun PackageInfo.isOverlay(): Boolean {
   return try {
     Refine.unsafeCast<PackageInfoHidden>(this).isOverlayPackage
-  } catch (t: Throwable) {
+  } catch (_: Throwable) {
     if (applicationInfo?.sourceDir == null) return false
     val demands =
       ManifestReader.getManifestProperties(File(applicationInfo!!.sourceDir), arrayOf("overlay"))
-    return demands["overlay"] as? Boolean ?: false
+    return demands["overlay"] as? Boolean == true
   }
 }
 
@@ -342,7 +339,7 @@ fun PackageInfo.getFeatures(): Int {
 fun ApplicationInfo.isUse32BitAbi(): Boolean {
   runCatching {
     val demands = ManifestReader.getManifestProperties(File(sourceDir), arrayOf("use32bitAbi"))
-    return demands["use32bitAbi"] as? Boolean ?: false
+    return demands["use32bitAbi"] as? Boolean == true
   }.getOrNull() ?: return false
 }
 
@@ -394,15 +391,6 @@ fun PackageInfo.isUseJetpackCompose(foundList: List<String>? = null): Boolean {
     }
   }.getOrDefault(false)
   if (foundInMetaInf) {
-    return true
-  }
-  val foundInComponents = PackageUtils.getPackageInfo(
-    packageName,
-    PackageManager.GET_ACTIVITIES
-  ).activities?.find { activityInfo ->
-    activityInfo.name == "androidx.compose.ui.tooling.PreviewActivity"
-  } != null
-  if (foundInComponents) {
     return true
   }
   if (foundList != null) {

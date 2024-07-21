@@ -1,12 +1,12 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
-import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Bundle
+import androidx.core.content.ContextCompat
 import com.absinthe.libchecker.annotation.ALL
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.compat.IntentCompat
@@ -18,7 +18,6 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import timber.log.Timber
 
-@SuppressLint("InlinedApi")
 const val EXTRA_PACKAGE_NAME = Intent.EXTRA_PACKAGE_NAME
 const val EXTRA_DETAIL_BEAN = "EXTRA_DETAIL_BEAN"
 
@@ -56,7 +55,6 @@ class AppDetailActivity :
     Timber.d("packageName: $pkgName")
     val packageName = pkgName ?: return
     runCatching {
-      @Suppress("InlinedApi")
       val flag = (
         PackageManager.GET_PERMISSIONS
           or PackageManager.GET_META_DATA
@@ -65,7 +63,7 @@ class AppDetailActivity :
         )
       PackageUtils.getPackageInfo(packageName, flag)
     }.onFailure {
-      Timber.d("getPackageInfo: $packageName failed, " + it.message)
+      Timber.d("getPackageInfo: $packageName failed, %s", it.message)
       finish()
     }.onSuccess { packageInfo ->
       onPackageInfoAvailable(packageInfo, extraBean)
@@ -131,7 +129,7 @@ class AppDetailActivity :
       addDataScheme("package")
     }
 
-    registerReceiver(requestPackageReceiver, intentFilter)
+    ContextCompat.registerReceiver(this, requestPackageReceiver, intentFilter, ContextCompat.RECEIVER_NOT_EXPORTED)
   }
 
   private fun unregisterPackageBroadcast() {

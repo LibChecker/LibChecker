@@ -32,7 +32,7 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
   private val libName by lazy { arguments?.getString(EXTRA_LIB_NAME).orEmpty() }
   private val type by lazy { arguments?.getInt(EXTRA_LIB_TYPE) ?: NATIVE }
   private val regexName by lazy { arguments?.getString(EXTRA_REGEX_NAME) }
-  private val isValidLib by lazy { arguments?.getBoolean(EXTRA_IS_VALID_LIB) ?: true }
+  private val isValidLib by lazy { arguments?.getBoolean(EXTRA_IS_VALID_LIB) != false }
   private val viewModel: DetailViewModel by activityViewModels()
   private var isStickyEventReceived = false
 

@@ -20,6 +20,7 @@ import com.absinthe.libchecker.api.bean.LibDetailBean
 import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
 import com.absinthe.libchecker.api.request.LibDetailRequest
 import com.absinthe.libchecker.app.SystemServices
+import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
@@ -44,7 +45,6 @@ import com.absinthe.libchecker.utils.extensions.getRxJavaVersion
 import com.absinthe.libchecker.utils.extensions.getRxKotlinVersion
 import com.absinthe.libchecker.utils.extensions.getSignatures
 import com.absinthe.libchecker.utils.extensions.getStatefulPermissionsList
-import com.absinthe.libchecker.utils.extensions.isTempApk
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.Rule
@@ -148,10 +148,10 @@ class DetailViewModel : ViewModel() {
 
   var initDexJob: Job? = null
 
-  fun initDexData(packageName: String) {
+  fun initDexData() {
     initDexJob?.cancel()
     initDexJob = viewModelScope.launch(Dispatchers.IO) {
-      val list = getDexChipList(packageName)
+      val list = getDexChipList()
       dexLibItems.emit(list)
     }
   }
@@ -164,28 +164,28 @@ class DetailViewModel : ViewModel() {
     val processesSet = hashSetOf<String>()
     try {
       packageInfo.let {
-        val services = if (it.services?.isNotEmpty() == true) {
+        val services = if (it.services?.isNotEmpty() == true || isApk) {
           it.services
         } else {
           PackageUtils.getPackageInfo(it.packageName, PackageManager.GET_SERVICES).services
         }.let { list ->
           PackageUtils.getComponentList(it.packageName, list, true)
         }
-        val activities = if (it.activities?.isNotEmpty() == true) {
+        val activities = if (it.activities?.isNotEmpty() == true || isApk) {
           it.activities
         } else {
           PackageUtils.getPackageInfo(it.packageName, PackageManager.GET_ACTIVITIES).activities
         }.let { list ->
           PackageUtils.getComponentList(it.packageName, list, true)
         }
-        val receivers = if (it.receivers?.isNotEmpty() == true) {
+        val receivers = if (it.receivers?.isNotEmpty() == true || isApk) {
           it.receivers
         } else {
           PackageUtils.getPackageInfo(it.packageName, PackageManager.GET_RECEIVERS).receivers
         }.let { list ->
           PackageUtils.getComponentList(it.packageName, list, true)
         }
-        val providers = if (it.providers?.isNotEmpty() == true) {
+        val providers = if (it.providers?.isNotEmpty() == true || isApk) {
           it.providers
         } else {
           PackageUtils.getPackageInfo(it.packageName, PackageManager.GET_PROVIDERS).providers
@@ -311,10 +311,10 @@ class DetailViewModel : ViewModel() {
     return chipList
   }
 
-  private suspend fun getDexChipList(packageName: String): List<LibStringItemChip> {
+  private suspend fun getDexChipList(): List<LibStringItemChip> {
     Timber.d("getDexChipList")
     val list = try {
-      PackageUtils.getDexList(packageName, packageName.isTempApk())
+      PackageUtils.getDexList(packageInfo)
     } catch (e: Exception) {
       Timber.e(e)
       emptyList()
@@ -344,7 +344,13 @@ class DetailViewModel : ViewModel() {
       runCatching {
         @Suppress("InlinedApi", "DEPRECATION")
         val flags = PackageManager.GET_SIGNATURES or PackageManager.GET_SIGNING_CERTIFICATES
-        PackageUtils.getPackageInfo(packageInfo.packageName, flags).getSignatures(context)
+        if (!isApk) {
+          PackageUtils.getPackageInfo(packageInfo.packageName, flags).getSignatures(context)
+        } else {
+          PackageManagerCompat.getPackageArchiveInfo(packageInfo.applicationInfo!!.sourceDir, flags)!!.getSignatures(context)
+        }
+      }.onFailure {
+        Timber.e(it)
       }.getOrDefault(emptySequence())
         .map {
           LibStringItemChip(it, null)

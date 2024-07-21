@@ -15,8 +15,8 @@ class ComparisonDashboardView(context: Context) : MaterialCardView(context, null
 
   val container = SnapshotDashboardContainerView(context).apply {
     layoutParams = ViewGroup.LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      LayoutParams.MATCH_PARENT,
+      LayoutParams.WRAP_CONTENT
     )
     val padding = context.getDimensionPixelSize(R.dimen.normal_padding)
     setPadding(padding, padding, padding, padding)
@@ -25,8 +25,8 @@ class ComparisonDashboardView(context: Context) : MaterialCardView(context, null
 
   init {
     layoutParams = ViewGroup.LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      LayoutParams.MATCH_PARENT,
+      LayoutParams.WRAP_CONTENT
     )
     radius = 8.dp.toFloat()
     setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSecondaryContainer))
