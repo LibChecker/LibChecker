@@ -2,7 +2,6 @@ package com.absinthe.libchecker.features.applist.ui.view
 
 import android.content.Context
 import android.os.Build
-import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -36,7 +35,7 @@ class AdvancedMenuBSDView(context: Context) :
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =
-      LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+      LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
     title.text = context.getString(R.string.advanced_menu)
   }
 
@@ -46,12 +45,12 @@ class AdvancedMenuBSDView(context: Context) :
 
   private val demoView = RecyclerView(context).apply {
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      LayoutParams.MATCH_PARENT,
+      LayoutParams.WRAP_CONTENT
     ).also {
       it.topMargin = 24.dp
     }
-    overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+    overScrollMode = OVER_SCROLL_NEVER
     layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
     adapter = demoAdapter
 
@@ -74,8 +73,8 @@ class AdvancedMenuBSDView(context: Context) :
 
   private val sortView = AdvancedMenuSortView(context).apply {
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      LayoutParams.MATCH_PARENT,
+      LayoutParams.WRAP_CONTENT
     ).also {
       it.topMargin = 24.dp
     }
@@ -83,8 +82,8 @@ class AdvancedMenuBSDView(context: Context) :
 
   private val flexLayout = FlexboxLayout(context).apply {
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      LayoutParams.MATCH_PARENT,
+      LayoutParams.WRAP_CONTENT
     ).also {
       it.topMargin = 8.dp
     }
@@ -95,18 +94,18 @@ class AdvancedMenuBSDView(context: Context) :
 
   private val itemView = MaterialCardView(context).apply {
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      LayoutParams.MATCH_PARENT,
+      LayoutParams.WRAP_CONTENT
     ).also {
       it.topMargin = 24.dp
     }
-    overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+    overScrollMode = OVER_SCROLL_NEVER
     strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutline)
     setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSecondaryContainer))
 
     val componentStyleDemoView = RecyclerView(context).apply {
       setPadding(0, 8.dp, 0, 8.dp)
-      overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+      overScrollMode = OVER_SCROLL_NEVER
       layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
       adapter = itemAdapter
 
@@ -163,8 +162,8 @@ class AdvancedMenuBSDView(context: Context) :
 
   private val itemFlexLayout = FlexboxLayout(context).apply {
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      LayoutParams.MATCH_PARENT,
+      LayoutParams.WRAP_CONTENT
     ).also {
       it.topMargin = 8.dp
     }
@@ -175,10 +174,10 @@ class AdvancedMenuBSDView(context: Context) :
 
   private val list = BottomSheetRecyclerView(context).apply {
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      LayoutParams.MATCH_PARENT,
+      LayoutParams.WRAP_CONTENT
     )
-    overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+    overScrollMode = OVER_SCROLL_NEVER
     adapter = this@AdvancedMenuBSDView.adapter
     layoutManager = LinearLayoutManager(context)
     isVerticalScrollBarEnabled = false

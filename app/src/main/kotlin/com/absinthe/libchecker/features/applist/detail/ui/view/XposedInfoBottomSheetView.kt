@@ -13,7 +13,6 @@ import androidx.core.view.children
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.XposedDetailItemAdapter
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
@@ -30,7 +29,7 @@ class XposedInfoBottomSheetView(context: Context) :
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =
-      LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+      LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
     title.text = context.getString(R.string.xposed_module)
   }
 
@@ -38,8 +37,8 @@ class XposedInfoBottomSheetView(context: Context) :
 
   val setting = AppInfoItemView(context).apply {
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.WRAP_CONTENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      LayoutParams.WRAP_CONTENT,
+      LayoutParams.WRAP_CONTENT
     )
     setIcon(R.drawable.ic_settings)
     setIconBackgroundTintColor(R.color.material_blue_grey_300)
@@ -52,7 +51,7 @@ class XposedInfoBottomSheetView(context: Context) :
       FrameLayout.LayoutParams.WRAP_CONTENT
     )
     adapter = contentAdapter
-    overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+    overScrollMode = OVER_SCROLL_NEVER
     layoutManager = LinearLayoutManager(context)
     isVerticalScrollBarEnabled = false
     clipToPadding = false

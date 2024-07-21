@@ -19,7 +19,6 @@ import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import androidx.core.widget.TextViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibDetailItemAdapter
@@ -47,7 +46,7 @@ class LibDetailBottomSheetView(context: Context) :
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =
-      LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+      LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
     title.text = context.getString(R.string.lib_detail_dialog_title)
   }
 
@@ -66,8 +65,8 @@ class LibDetailBottomSheetView(context: Context) :
     )
   ).apply {
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.WRAP_CONTENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      LayoutParams.WRAP_CONTENT,
+      LayoutParams.WRAP_CONTENT
     ).also {
       it.topMargin = 4.dp
     }
@@ -77,7 +76,7 @@ class LibDetailBottomSheetView(context: Context) :
 
   private val viewFlipper = HeightAnimatableViewFlipper(context).apply {
     layoutParams =
-      LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+      LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
     setInAnimation(context, R.anim.anim_fade_in)
     setOutAnimation(context, R.anim.anim_fade_out)
   }
@@ -104,8 +103,8 @@ class LibDetailBottomSheetView(context: Context) :
     addHeaderView(
       TabLayout(context).apply {
         layoutParams = TableLayout.LayoutParams(
-          ViewGroup.LayoutParams.MATCH_PARENT,
-          ViewGroup.LayoutParams.WRAP_CONTENT
+          LayoutParams.MATCH_PARENT,
+          LayoutParams.WRAP_CONTENT
         )
         setBackgroundColor(Color.TRANSPARENT)
         tabMode = TabLayout.MODE_SCROLLABLE
@@ -121,7 +120,7 @@ class LibDetailBottomSheetView(context: Context) :
       FrameLayout.LayoutParams.WRAP_CONTENT
     )
     adapter = contentAdapter
-    overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+    overScrollMode = OVER_SCROLL_NEVER
     layoutManager = LinearLayoutManager(context)
     isVerticalScrollBarEnabled = false
     clipToPadding = false

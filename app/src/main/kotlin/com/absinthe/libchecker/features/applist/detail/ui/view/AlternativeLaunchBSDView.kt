@@ -1,10 +1,8 @@
 package com.absinthe.libchecker.features.applist.detail.ui.view
 
 import android.content.Context
-import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.AlternativeLaunchAdapter
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
@@ -22,18 +20,18 @@ class AlternativeLaunchBSDView(context: Context) :
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =
-      LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+      LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
     title.text = context.getString(R.string.alternative_launch_method)
   }
 
   private val list = BottomSheetRecyclerView(context).apply {
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      LayoutParams.MATCH_PARENT,
+      LayoutParams.WRAP_CONTENT
     ).also {
       it.topMargin = 24.dp
     }
-    overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+    overScrollMode = OVER_SCROLL_NEVER
     adapter = this@AlternativeLaunchBSDView.adapter
     layoutManager = LinearLayoutManager(context)
     isVerticalScrollBarEnabled = false

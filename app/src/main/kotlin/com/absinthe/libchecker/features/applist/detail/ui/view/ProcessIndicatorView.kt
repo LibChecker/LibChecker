@@ -3,7 +3,6 @@ package com.absinthe.libchecker.features.applist.detail.ui.view
 import android.animation.ValueAnimator
 import android.content.Context
 import android.util.AttributeSet
-import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,8 +23,8 @@ class ProcessIndicatorView(
 
   private val indicators = RecyclerView(context).apply {
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      LayoutParams.MATCH_PARENT,
+      LayoutParams.WRAP_CONTENT
     )
     layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
     this.adapter = libStringAdapter
@@ -54,7 +53,7 @@ class ProcessIndicatorView(
   }
 
   private fun setViewHeight(height: Int) {
-    (layoutParams as ViewGroup.LayoutParams).height = height
+    (layoutParams as LayoutParams).height = height
     requestLayout()
   }
 

@@ -11,7 +11,6 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.children
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
-import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.node.AbiLabelNode
@@ -129,7 +128,7 @@ class DetailsTitleView(
       it.marginStart = (-4).dp
       it.bottomMargin = (-4).dp
     }
-    overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+    overScrollMode = OVER_SCROLL_NEVER
     isHorizontalScrollBarEnabled = false
     clipToPadding = false
     clipChildren = false

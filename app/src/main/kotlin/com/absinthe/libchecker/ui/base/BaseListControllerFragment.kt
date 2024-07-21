@@ -32,7 +32,7 @@ abstract class BaseListControllerFragment<T : ViewBinding> :
     activity?.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
     viewLifecycleOwner.lifecycle.addObserver(object : DefaultLifecycleObserver {
       override fun onResume(owner: LifecycleOwner) {
-        scheduleAppbarLiftingStatus(!(getBorderViewDelegate()?.isShowingTopBorder ?: true))
+        scheduleAppbarLiftingStatus(getBorderViewDelegate()?.isShowingTopBorder == false)
       }
 
       override fun onStop(owner: LifecycleOwner) {

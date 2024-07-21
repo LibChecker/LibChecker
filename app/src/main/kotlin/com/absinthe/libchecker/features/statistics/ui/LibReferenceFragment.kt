@@ -319,7 +319,7 @@ class LibReferenceFragment :
             it.rule?.label?.contains(
               newText,
               ignoreCase = true
-            ) ?: false
+            ) == true
         }
         LibReferenceAdapter.highlightText = newText
 

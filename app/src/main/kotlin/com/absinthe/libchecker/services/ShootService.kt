@@ -374,7 +374,7 @@ class ShootService : LifecycleService() {
     }
 
     override fun isShooting(): Boolean {
-      return serviceRef.get()?._isShooting ?: false
+      return serviceRef.get()?._isShooting == true
     }
 
     override fun registerOnShootOverListener(listener: OnShootListener?) {

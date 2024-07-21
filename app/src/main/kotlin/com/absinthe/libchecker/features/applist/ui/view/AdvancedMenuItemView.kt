@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.features.applist.ui.view
 
 import android.content.Context
-import android.view.ViewGroup
 import android.widget.FrameLayout
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
@@ -12,8 +11,8 @@ import com.absinthe.libchecker.view.app.CheckableChipView
 class AdvancedMenuItemView(context: Context) : FrameLayout(context) {
   val chip = CheckableChipView(context).also {
     it.layoutParams = MarginLayoutParams(
-      ViewGroup.LayoutParams.WRAP_CONTENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      LayoutParams.WRAP_CONTENT,
+      LayoutParams.WRAP_CONTENT
     ).also { lp ->
       lp.setMargins(4.dp, 4.dp, 4.dp, 4.dp)
     }

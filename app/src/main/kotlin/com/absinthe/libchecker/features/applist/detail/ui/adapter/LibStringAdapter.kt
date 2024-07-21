@@ -281,7 +281,7 @@ class LibStringAdapter(
 
     if (itemView.linkToIcon.isVisible) {
       itemView.linkToIcon.setOnClickListener {
-        val transformed = itemView.linkToIcon.getTag(R.id.resource_transformed_id) as? Boolean ?: false
+        val transformed = itemView.linkToIcon.getTag(R.id.resource_transformed_id) as? Boolean == true
         if (transformed) {
           itemView.libSize.text = item.item.source
           itemView.linkToIcon.setImageResource(R.drawable.ic_outline_change_circle_24)

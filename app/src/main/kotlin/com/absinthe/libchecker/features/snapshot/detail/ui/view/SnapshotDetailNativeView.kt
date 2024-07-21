@@ -26,7 +26,7 @@ import com.google.android.material.chip.Chip
 class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
 
   val container = SnapshotDetailNativeContainerView(context).apply {
-    layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+    layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
   }
 
   init {

@@ -1,10 +1,8 @@
-import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import java.io.File
 import java.time.Instant
-import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 
 const val baseVersionName = "2.5.0"

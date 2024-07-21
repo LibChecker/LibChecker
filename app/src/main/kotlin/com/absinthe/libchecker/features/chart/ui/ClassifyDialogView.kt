@@ -7,7 +7,6 @@ import android.widget.LinearLayout
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.features.applist.ui.adapter.AppAdapter
 import com.absinthe.libchecker.features.chart.ui.view.AndroidVersionLabelView
@@ -28,20 +27,20 @@ class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutin
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =
-      LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+      LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
   }
 
   private val list = BottomSheetRecyclerView(context).apply {
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.MATCH_PARENT,
+      LayoutParams.MATCH_PARENT,
+      LayoutParams.MATCH_PARENT,
       1.0f
     ).also {
       it.topMargin = 4.dp
     }
     layoutManager = LinearLayoutManager(context)
     adapter = this@ClassifyDialogView.adapter
-    overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+    overScrollMode = OVER_SCROLL_NEVER
     isVerticalScrollBarEnabled = false
     clipToPadding = false
     clipChildren = false
@@ -59,7 +58,7 @@ class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutin
       }
       setEmptyView(
         EmptyListView(context).apply {
-          layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 500.dp)
+          layoutParams = ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, 500.dp)
         }
       )
     }
@@ -69,8 +68,8 @@ class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutin
 
   private val androidVersionView = AndroidVersionLabelView(context).apply {
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      LayoutParams.MATCH_PARENT,
+      LayoutParams.WRAP_CONTENT
     )
     setPadding(0, 4.dp, 0, 4.dp)
   }

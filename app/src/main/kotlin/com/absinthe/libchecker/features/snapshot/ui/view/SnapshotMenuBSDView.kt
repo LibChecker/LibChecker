@@ -2,7 +2,6 @@ package com.absinthe.libchecker.features.snapshot.ui.view
 
 import android.content.Context
 import android.os.Build
-import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,7 +27,7 @@ class SnapshotMenuBSDView(context: Context) :
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =
-      LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+      LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
     title.text = context.getString(R.string.advanced_menu)
   }
 
@@ -37,12 +36,12 @@ class SnapshotMenuBSDView(context: Context) :
 
   private val demoView = RecyclerView(context).apply {
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      LayoutParams.MATCH_PARENT,
+      LayoutParams.WRAP_CONTENT
     ).also {
       it.topMargin = 24.dp
     }
-    overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+    overScrollMode = OVER_SCROLL_NEVER
     layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
     adapter = demoAdapter
 
@@ -75,8 +74,8 @@ class SnapshotMenuBSDView(context: Context) :
 
   private val flexLayout = FlexboxLayout(context).apply {
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      LayoutParams.MATCH_PARENT,
+      LayoutParams.WRAP_CONTENT
     ).also {
       it.topMargin = 8.dp
     }
@@ -87,10 +86,10 @@ class SnapshotMenuBSDView(context: Context) :
 
   private val list = BottomSheetRecyclerView(context).apply {
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      LayoutParams.MATCH_PARENT,
+      LayoutParams.WRAP_CONTENT
     )
-    overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+    overScrollMode = OVER_SCROLL_NEVER
     adapter = this@SnapshotMenuBSDView.adapter
     layoutManager = LinearLayoutManager(context)
     isVerticalScrollBarEnabled = false
