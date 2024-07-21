@@ -1,9 +1,9 @@
 package com.absinthe.libchecker.features.snapshot.ui
 
+import androidx.core.os.BundleCompat
 import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.compat.BundleCompat
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.features.snapshot.detail.bean.SnapshotDiffItem
 import com.absinthe.libchecker.features.snapshot.detail.ui.view.SnapshotNoDiffBSView
@@ -29,7 +29,7 @@ class SnapshotNoDiffBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotNoDi
       dismiss()
       return
     }
-    BundleCompat.getSerializable<SnapshotDiffItem>(arg, EXTRA_DIFF_ITEM)?.let { item ->
+    BundleCompat.getSerializable(arg, EXTRA_DIFF_ITEM, SnapshotDiffItem::class.java)?.let { item ->
       val packageInfo = runCatching { PackageUtils.getPackageInfo(item.packageName) }.getOrNull()
       root.title.apply {
         iconView.apply {
