@@ -12,7 +12,6 @@ import android.os.Message
 import android.os.RemoteCallbackList
 import android.os.RemoteException
 import android.os.SystemClock
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.database.Repositories
@@ -62,7 +61,7 @@ class WorkerService : LifecycleService() {
       addAction(Intent.ACTION_PACKAGE_REMOVED)
       addDataScheme("package")
     }
-    ContextCompat.registerReceiver(this, packageReceiver, intentFilter, ContextCompat.RECEIVER_NOT_EXPORTED)
+    registerReceiver(packageReceiver, intentFilter)
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
