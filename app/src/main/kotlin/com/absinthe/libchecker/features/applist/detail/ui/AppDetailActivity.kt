@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Bundle
-import androidx.core.content.ContextCompat
 import com.absinthe.libchecker.annotation.ALL
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.compat.IntentCompat
@@ -129,7 +128,7 @@ class AppDetailActivity :
       addDataScheme("package")
     }
 
-    ContextCompat.registerReceiver(this, requestPackageReceiver, intentFilter, ContextCompat.RECEIVER_NOT_EXPORTED)
+    registerReceiver(requestPackageReceiver, intentFilter)
   }
 
   private fun unregisterPackageBroadcast() {
