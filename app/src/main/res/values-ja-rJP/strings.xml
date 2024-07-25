@@ -49,6 +49,7 @@
   <string name="string_kotlin_unused">Kotlin未使用</string>
   <string name="string_compose_used">Jetpack Compose使用済み</string>
   <string name="string_compose_unused">Jetpack Compose未使用</string>
+  <string name="android_dist_label">Distribution</string>
   <string name="android_dist_source">ソース</string>
   <string name="android_dist_title">Androidバージョン分布統計</string>
   <string name="android_dist_subtitle_format">更新時間：%s</string>
