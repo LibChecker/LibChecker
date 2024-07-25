@@ -7,7 +7,7 @@
 
   <color name="background_gray">#FF121212</color>
   <color name="lib_icon_background">#50FFFFFF</color>
-  <color name="feature_background">#25000000</color>
+  <color name="feature_background">#15FFFFFF</color>
   <color name="feature_ripple">#25FFFFFF</color>
 
   <color name="renge">#FFBB5E61</color>
