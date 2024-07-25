@@ -49,6 +49,7 @@
   <string name="string_kotlin_unused">Tak menggunakan Kotlin</string>
   <string name="string_compose_used">Menggunakan Jetpack Compose</string>
   <string name="string_compose_unused">Tak menggunakan Jetpack Compose</string>
+  <string name="android_dist_label">Distribution</string>
   <string name="android_dist_source">Sumber</string>
   <string name="android_dist_title">Statistik Distribusi Versi Android</string>
   <string name="android_dist_subtitle_format">Waktu Pembaruan: %s</string>
