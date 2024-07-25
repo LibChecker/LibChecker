@@ -53,6 +53,7 @@
   <string name="string_compose_used">Jetpack Compose Used</string>
   <string name="string_compose_unused">Jetpack Compose Unused</string>
 
+  <string name="android_dist_label">Distribution</string>
   <string name="android_dist_source">Source</string>
   <string name="android_dist_title">Android Version Distribution Statistics</string>
   <string name="android_dist_subtitle_format">Update Time: %s</string>
