@@ -14,7 +14,7 @@ class FeatureLabelView(context: Context) : AppCompatImageButton(context) {
     layoutParams = ViewGroup.MarginLayoutParams(36.dp, 36.dp).also {
       it.marginEnd = 8.dp
     }
-    setBackgroundResource(R.drawable.ripple_feature_label)
+    setBackgroundResource(R.drawable.ripple_feature_label_36dp)
   }
 
   fun setFeature(item: FeatureItem) {

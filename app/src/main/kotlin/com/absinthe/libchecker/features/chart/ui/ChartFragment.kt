@@ -4,7 +4,6 @@ import android.graphics.Color
 import android.view.HapticFeedbackConstants
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -24,18 +23,23 @@ import com.absinthe.libchecker.features.chart.BaseVariableChartDataSource
 import com.absinthe.libchecker.features.chart.ChartViewModel
 import com.absinthe.libchecker.features.chart.IChartDataSource
 import com.absinthe.libchecker.features.chart.IntegerFormatter
+import com.absinthe.libchecker.features.chart.impl.AABChartDataSource
 import com.absinthe.libchecker.features.chart.impl.ABIChartDataSource
+import com.absinthe.libchecker.features.chart.impl.CompileApiChartDataSource
 import com.absinthe.libchecker.features.chart.impl.JetpackComposeChartDataSource
 import com.absinthe.libchecker.features.chart.impl.KotlinChartDataSource
 import com.absinthe.libchecker.features.chart.impl.MarketDistributionChartDataSource
 import com.absinthe.libchecker.features.chart.impl.MinApiChartDataSource
 import com.absinthe.libchecker.features.chart.impl.TargetApiChartDataSource
 import com.absinthe.libchecker.features.chart.ui.view.ChartDetailItemView
+import com.absinthe.libchecker.features.chart.ui.view.ExpandingView
 import com.absinthe.libchecker.features.chart.ui.view.MarketDistributionDashboardView
 import com.absinthe.libchecker.services.WorkerService
 import com.absinthe.libchecker.ui.base.BaseFragment
 import com.absinthe.libchecker.ui.base.SaturationTransformation
 import com.absinthe.libchecker.utils.OsUtils
+import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.Chart
@@ -46,7 +50,6 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
-import com.google.android.material.button.MaterialButtonToggleGroup
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -61,8 +64,7 @@ import timber.log.Timber
 
 class ChartFragment :
   BaseFragment<FragmentPieChartBinding>(),
-  OnChartValueSelectedListener,
-  MaterialButtonToggleGroup.OnButtonCheckedListener {
+  OnChartValueSelectedListener {
 
   private val viewModel: ChartViewModel by activityViewModels()
   private lateinit var chartView: ViewGroup
@@ -71,17 +73,62 @@ class ChartFragment :
   private var dialog: ClassifyBottomSheetDialogFragment? = null
   private var setDataJob: Job? = null
 
+  private enum class ChartType {
+    ABI,
+    KOTLIN,
+    TARGET_SDK,
+    MIN_SDK,
+    COMPILE_SDK,
+    JETPACK_COMPOSE,
+    MARKET_DISTRIBUTION,
+    AAB
+  }
+
+  private val chartTypeToIconRes = mapOf(
+    ChartType.ABI to (R.drawable.ic_logo to R.string.abi_string),
+    ChartType.KOTLIN to (com.absinthe.lc.rulesbundle.R.drawable.ic_lib_kotlin to R.string.kotlin_string),
+    ChartType.TARGET_SDK to (R.drawable.ic_label_target_sdk to R.string.target_sdk_string),
+    ChartType.MIN_SDK to (R.drawable.ic_label_min_sdk to R.string.min_sdk_string),
+    ChartType.COMPILE_SDK to (R.drawable.ic_label_compile_sdk to R.string.compile_sdk_string),
+    ChartType.JETPACK_COMPOSE to (com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetpack_compose to R.string.jetpack_compose_short),
+    ChartType.MARKET_DISTRIBUTION to (com.absinthe.lc.rulesbundle.R.drawable.ic_lib_android to R.string.android_dist_label),
+    ChartType.AAB to (R.drawable.ic_aab to R.string.app_bundle)
+  )
+  private var currentChartType = ChartType.ABI
+  private var currentExpandingView: ExpandingView? = null
+
   override fun init() {
     val featureInitialized = !WorkerService.initializingFeatures
 
     chartView = generatePieChartView()
     binding.root.addView(chartView, -1)
 
-    binding.buttonsGroup.apply {
-      addOnButtonCheckedListener(this@ChartFragment)
+    chartTypeToIconRes.forEach {
+      if (it.key == ChartType.KOTLIN || it.key == ChartType.JETPACK_COMPOSE) {
+        if (!featureInitialized) {
+          return
+        }
+      }
+      val view = ExpandingView(requireContext()).apply {
+        layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
+          it.setMargins(4.dp, 4.dp, 4.dp, 4.dp)
+        }
+        setContent(it.value.first, getString(it.value.second))
+        setOnClickListener { _ ->
+          setData(allLCItemsStateFlow.value, it.key)
+          doOnMainThreadIdle {
+            currentExpandingView?.toggle()
+            toggle()
+            currentExpandingView = this
+          }
+        }
+      }
+      if (currentExpandingView == null) {
+        currentExpandingView = view
+        view.toggle()
+      }
+      binding.featuresContainer.addView(view)
     }
-    binding.btnKotlin.isVisible = featureInitialized
-    binding.btnCompose.isVisible = featureInitialized
 
     lifecycleScope.launch {
       allLCItemsStateFlow = Repositories.lcRepository.allLCItemsFlow.onEach {
@@ -93,7 +140,7 @@ class ChartFragment :
             }
             withContext(Dispatchers.Main) {
               if (dataSource == null) {
-                binding.buttonsGroup.check(R.id.btn_abi)
+                currentChartType = ChartType.ABI
               }
               setData(it)
             }
@@ -130,20 +177,23 @@ class ChartFragment :
     }.launchIn(lifecycleScope)
   }
 
-  private fun setData(items: List<LCItem>) {
+  private fun setData(items: List<LCItem>, chartType: ChartType = currentChartType) {
     context ?: return
     viewModel.setLoading(true)
     if (chartView.parent != null) {
       binding.root.removeView(chartView)
     }
+    currentChartType = chartType
 
-    when (binding.buttonsGroup.checkedButtonId) {
-      R.id.btn_abi -> setChartData(::generatePieChartView) { ABIChartDataSource(items) }
-      R.id.btn_kotlin -> setChartData(::generatePieChartView) { KotlinChartDataSource(items) }
-      R.id.btn_target_api -> setChartData(::generateBarChartView) { TargetApiChartDataSource(items) }
-      R.id.btn_min_sdk -> setChartData(::generateBarChartView) { MinApiChartDataSource(items) }
-      R.id.btn_compose -> setChartData(::generatePieChartView) { JetpackComposeChartDataSource(items) }
-      R.id.btn_distribution -> setChartData(::generateBarChartView) { MarketDistributionChartDataSource(items) }
+    when (chartType) {
+      ChartType.ABI -> setChartData(::generatePieChartView) { ABIChartDataSource(items) }
+      ChartType.KOTLIN -> setChartData(::generatePieChartView) { KotlinChartDataSource(items) }
+      ChartType.TARGET_SDK -> setChartData(::generateBarChartView) { TargetApiChartDataSource(items) }
+      ChartType.MIN_SDK -> setChartData(::generateBarChartView) { MinApiChartDataSource(items) }
+      ChartType.COMPILE_SDK -> setChartData(::generateBarChartView) { CompileApiChartDataSource(items) }
+      ChartType.JETPACK_COMPOSE -> setChartData(::generatePieChartView) { JetpackComposeChartDataSource(items) }
+      ChartType.MARKET_DISTRIBUTION -> setChartData(::generateBarChartView) { MarketDistributionChartDataSource(items) }
+      ChartType.AAB -> setChartData(::generatePieChartView) { AABChartDataSource(items) }
     }
   }
 
@@ -172,14 +222,6 @@ class ChartFragment :
     }
 
     applyItemSelect(h.x.toInt())
-  }
-
-  override fun onButtonChecked(
-    group: MaterialButtonToggleGroup?,
-    checkedId: Int,
-    isChecked: Boolean
-  ) {
-    setData(allLCItemsStateFlow.value)
   }
 
   private fun generatePieChartView(): PieChart {
@@ -260,7 +302,7 @@ class ChartFragment :
 
   private fun applyDashboardView() {
     binding.dashboardContainer.removeAllViews()
-    if (binding.buttonsGroup.checkedButtonId == R.id.btn_distribution) {
+    if (currentChartType == ChartType.MARKET_DISTRIBUTION) {
       val view = MarketDistributionDashboardView(requireContext()).apply {
         layoutParams = ViewGroup.LayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT,
@@ -271,7 +313,10 @@ class ChartFragment :
           VersionCompat.showCopiedOnClipboardToast(context)
         }
         if (viewModel.distributionLastUpdateTime.value.isNotEmpty()) {
-          subtitle.text = getString(R.string.android_dist_subtitle_format, viewModel.distributionLastUpdateTime.value)
+          subtitle.text = getString(
+            R.string.android_dist_subtitle_format,
+            viewModel.distributionLastUpdateTime.value
+          )
         }
       }
       binding.dashboardContainer.addView(view)

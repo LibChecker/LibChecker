@@ -32,7 +32,7 @@ class ChartDetailItemView(context: Context) : FrameLayout(context) {
 
     val icon = AppCompatImageButton(context).apply {
       id = android.R.id.icon
-      val iconSize = context.getDimensionPixelSize(R.dimen.lib_reference_icon_size)
+      val iconSize = context.getDimensionPixelSize(R.dimen.app_icon_size)
       layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
       setBackgroundResource(R.drawable.bg_circle_secondary_container)
       addView(this)
@@ -52,7 +52,7 @@ class ChartDetailItemView(context: Context) : FrameLayout(context) {
         it.marginEnd = 8.dp
       }
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
-      setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+      setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
       addView(this)
     }
 
