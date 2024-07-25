@@ -49,6 +49,7 @@
   <string name="string_kotlin_unused">لا يستخدم كوتلين</string>
   <string name="string_compose_used">يستخدم Jetpack Compose</string>
   <string name="string_compose_unused">لا يستخدم Jetpack Compose</string>
+  <string name="android_dist_label">Distribution</string>
   <string name="android_dist_source">المصدر</string>
   <string name="android_dist_title">إحصائيات توزيع إصدار الأندرويد</string>
   <string name="android_dist_subtitle_format">وقت التحديث: %s</string>
