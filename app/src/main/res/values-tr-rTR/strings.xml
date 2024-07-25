@@ -49,6 +49,7 @@
   <string name="string_kotlin_unused">Kotlin Kullanılmamış</string>
   <string name="string_compose_used">Jetpack Compose Kullanılmış</string>
   <string name="string_compose_unused">Jetpack Compose Kullanılmamış</string>
+  <string name="android_dist_label">Distribution</string>
   <string name="android_dist_source">Kaynak</string>
   <string name="android_dist_title">Android Sürüm Dağılımı İstatistikleri</string>
   <string name="android_dist_subtitle_format">Güncelleme Zamanı: %s</string>
