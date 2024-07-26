@@ -115,6 +115,9 @@ class ChartFragment :
         }
         setContent(it.value.first, getString(it.value.second))
         setOnClickListener { _ ->
+          if (currentExpandingView == this) {
+            return@setOnClickListener
+          }
           setData(allLCItemsStateFlow.value, it.key)
           doOnMainThreadIdle {
             currentExpandingView?.toggle()
