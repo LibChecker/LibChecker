@@ -115,6 +115,9 @@ class ChartFragment :
         }
         setContent(it.value.first, getString(it.value.second))
         setOnClickListener { _ ->
+          if (currentExpandingView == this) {
+            return@setOnClickListener
+          }
           setData(allLCItemsStateFlow.value, it.key)
           doOnMainThreadIdle {
             currentExpandingView?.toggle()
@@ -337,7 +340,9 @@ class ChartFragment :
               labelName.text = dataSource!!.getLabelByXValue(context, key)
               count.text = value.data.size.toString()
               setOnClickListener {
-                applyItemSelect(key)
+                if (value.data.isNotEmpty()) {
+                  applyItemSelect(key)
+                }
               }
             }
           }
