@@ -152,15 +152,19 @@ object LCAppUtils {
       val oldString = format.format(diff.old)
       val newString = format.format(diff.new)
 
-      val highlightNewString = if (highlightDiffColor != null) {
-        getHighlightDifferences(oldString, newString, highlightDiffColor)
+      if (highlightDiffColor != null) {
+        val pair = getHighlightDifferences(oldString, newString, highlightDiffColor)
+        buildSpannedString {
+          append(pair.first)
+          append(" $ARROW ")
+          append(pair.second)
+        }
       } else {
-        newString
-      }
-      buildSpannedString {
-        append(oldString)
-        append(" $ARROW ")
-        append(highlightNewString)
+        buildSpannedString {
+          append(oldString)
+          append(" $ARROW ")
+          append(newString)
+        }
       }
     } else {
       format.format(diff.old)
@@ -177,19 +181,24 @@ object LCAppUtils {
   ): CharSequence {
     return if ((diff1.old != diff1.new || diff2.old != diff2.new) && !isNewOrDeleted) {
       if (highlightDiffColor != null) {
-        val highlightedNew1 =
+        val highlightedPair1 =
           getHighlightDifferences(diff1.old.toString(), diff1.new.toString(), highlightDiffColor)
-        val highlightedNew2 =
+        val highlightedPair2 =
           getHighlightDifferences(diff2.old.toString(), diff2.new.toString(), highlightDiffColor)
-        val allText = diff1.old.toString() + diff1.new + diff2.old + diff2.new + diff1Suffix + diff2Suffix
+        val allText = highlightedPair1.first.toString() + highlightedPair1.second + highlightedPair2.first + highlightedPair2.second + diff1Suffix + diff2Suffix
         val isRtl = BidiFormatter.getInstance().isRtl(allText)
         buildSpannedString {
-          append("${diff1.old}$diff1Suffix (${diff2.old}$diff2Suffix)")
-          append(" ${getArrow(isRtl)} ")
-          append(highlightedNew1)
+          append(highlightedPair1.first)
           append(diff1Suffix)
           append(" (")
-          append(highlightedNew2)
+          append(highlightedPair2.first)
+          append(diff2Suffix)
+          append(")")
+          append(" ${getArrow(isRtl)} ")
+          append(highlightedPair1.second)
+          append(diff1Suffix)
+          append(" (")
+          append(highlightedPair2.second)
           append(diff2Suffix)
           append(")")
         }
@@ -201,17 +210,24 @@ object LCAppUtils {
     }
   }
 
-  private fun getHighlightDifferences(
+  fun getHighlightDifferences(
     oldString: String,
     newString: String,
     highlightDiffColor: Int
-  ): SpannableString {
-    val spannable = SpannableString(newString)
+  ): Pair<SpannableString, SpannableString> {
+    val oldSpannable = SpannableString(oldString)
+    val newSpannable = SpannableString(newString)
     val minLength = minOf(oldString.length, newString.length)
 
     for (i in 0 until minLength) {
       if (oldString[i] != newString[i]) {
-        spannable.setSpan(
+        oldSpannable.setSpan(
+          ForegroundColorSpan(highlightDiffColor),
+          i,
+          i + 1,
+          Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+        )
+        newSpannable.setSpan(
           ForegroundColorSpan(highlightDiffColor),
           i,
           i + 1,
@@ -220,8 +236,15 @@ object LCAppUtils {
       }
     }
 
-    if (newString.length > oldString.length) {
-      spannable.setSpan(
+    if (oldString.length > newString.length) {
+      oldSpannable.setSpan(
+        ForegroundColorSpan(highlightDiffColor),
+        minLength,
+        oldString.length,
+        Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+      )
+    } else if (newString.length > oldString.length) {
+      newSpannable.setSpan(
         ForegroundColorSpan(highlightDiffColor),
         minLength,
         newString.length,
@@ -229,7 +252,7 @@ object LCAppUtils {
       )
     }
 
-    return spannable
+    return Pair(oldSpannable, newSpannable)
   }
 
   private fun getArrow(isRtl: Boolean): String {
