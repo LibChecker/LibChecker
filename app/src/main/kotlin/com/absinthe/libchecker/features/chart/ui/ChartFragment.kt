@@ -337,7 +337,9 @@ class ChartFragment :
               labelName.text = dataSource!!.getLabelByXValue(context, key)
               count.text = value.data.size.toString()
               setOnClickListener {
-                applyItemSelect(key)
+                if (value.data.isNotEmpty()) {
+                  applyItemSelect(key)
+                }
               }
             }
           }
