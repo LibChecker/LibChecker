@@ -89,6 +89,7 @@ import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getTargetApiString
 import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.extensions.getVersionString
+import com.absinthe.libchecker.utils.extensions.isKeyboardShowing
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
@@ -139,13 +140,14 @@ abstract class BaseAppDetailActivity :
     super.onCreate(savedInstanceState)
     addMenuProvider(this, this, Lifecycle.State.STARTED)
     setSupportActionBar(getToolbar())
+    binding.toolbar.isBackInvokedCallbackEnabled = false
     supportActionBar?.apply {
       setDisplayHomeAsUpEnabled(true)
       setDisplayShowHomeEnabled(true)
     }
     onBackPressedDispatcher.addBackStateHandler(
       lifecycleOwner = this,
-      enabledState = { binding.toolbar.hasExpandedActionView() },
+      enabledState = { !isKeyboardShowing() && binding.toolbar.hasExpandedActionView() },
       handler = { binding.toolbar.collapseActionView() }
     )
   }

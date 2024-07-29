@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.Intent
 import android.view.View
 import androidx.core.os.bundleOf
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.FragmentActivity
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.constant.Constants
@@ -65,4 +67,10 @@ fun Activity.launchLibReferencePage(
       )
     )
   startActivity(intent)
+}
+
+fun Activity.isKeyboardShowing(): Boolean {
+  val imeInsets = ViewCompat.getRootWindowInsets(window.decorView.rootView)
+    ?.getInsets(WindowInsetsCompat.Type.ime())
+  return (imeInsets?.bottom ?: 0) > 0
 }
