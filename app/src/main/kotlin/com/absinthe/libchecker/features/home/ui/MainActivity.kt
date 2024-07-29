@@ -39,6 +39,7 @@ import com.absinthe.libchecker.ui.base.IAppBarContainer
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.addBackStateHandler
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
+import com.absinthe.libchecker.utils.extensions.isKeyboardShowing
 import com.absinthe.libchecker.utils.extensions.setCurrentItem
 import com.absinthe.rulesbundle.LCRules
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
@@ -193,6 +194,7 @@ class MainActivity :
   private fun initView() {
     val navView = binding.navView as NavigationBarView
     setSupportActionBar(binding.toolbar)
+    binding.toolbar.isBackInvokedCallbackEnabled = false
     supportActionBar?.title = LCAppUtils.setTitle(this)
 
     binding.apply {
@@ -274,7 +276,7 @@ class MainActivity :
 
     onBackPressedDispatcher.addBackStateHandler(
       lifecycleOwner = this,
-      enabledState = { binding.toolbar.hasExpandedActionView() },
+      enabledState = { !isKeyboardShowing() && binding.toolbar.hasExpandedActionView() },
       handler = { binding.toolbar.collapseActionView() }
     )
   }
