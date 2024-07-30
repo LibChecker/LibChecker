@@ -47,6 +47,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v3
         with:
           gradle-home-cache-cleanup: true
+          validate-wrappers: true
       - run: ./gradlew spotlessCheck
 
   build:
@@ -65,6 +66,7 @@ jobs:
         with:
           cache-encryption-key: Da25KUVSE5jbGds2zXmfXw==
           gradle-home-cache-cleanup: true
+          validate-wrappers: true
       - name: Retrieve version
         run: |
           echo VERSION=$(echo ${{ github.event.head_commit.id }} | head -c 10) >> $GITHUB_ENV
