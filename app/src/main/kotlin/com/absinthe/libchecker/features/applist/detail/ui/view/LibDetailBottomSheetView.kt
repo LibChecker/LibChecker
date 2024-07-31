@@ -37,6 +37,7 @@ import com.absinthe.libraries.utils.view.HeightAnimatableViewFlipper
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieDrawable
 import com.google.android.material.tabs.TabLayout
+import java.io.File
 import java.util.Locale
 import timber.log.Timber
 
@@ -85,7 +86,7 @@ class LibDetailBottomSheetView(context: Context) :
     layoutParams = FrameLayout.LayoutParams(200.dp, 200.dp).also {
       it.gravity = Gravity.CENTER
     }
-    imageAssetsFolder = "/"
+    imageAssetsFolder = File.separator
     repeatCount = LottieDrawable.INFINITE
     setAnimation("anim/lib_detail_rocket.json.zip")
   }

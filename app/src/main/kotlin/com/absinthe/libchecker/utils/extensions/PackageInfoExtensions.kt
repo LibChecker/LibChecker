@@ -7,15 +7,34 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageInfoHidden
 import android.content.res.Configuration
 import android.os.Build
+import android.os.Process
+import androidx.collection.arrayMapOf
 import androidx.core.content.pm.PackageInfoCompat
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.compat.ZipFileCompat
+import com.absinthe.libchecker.constant.Constants.ARMV5
+import com.absinthe.libchecker.constant.Constants.ARMV5_STRING
 import com.absinthe.libchecker.constant.Constants.ARMV7
+import com.absinthe.libchecker.constant.Constants.ARMV7_STRING
 import com.absinthe.libchecker.constant.Constants.ARMV8
+import com.absinthe.libchecker.constant.Constants.ARMV8_STRING
+import com.absinthe.libchecker.constant.Constants.ERROR
 import com.absinthe.libchecker.constant.Constants.MIPS
 import com.absinthe.libchecker.constant.Constants.MIPS64
+import com.absinthe.libchecker.constant.Constants.MIPS64_STRING
+import com.absinthe.libchecker.constant.Constants.MIPS_STRING
+import com.absinthe.libchecker.constant.Constants.MULTI_ARCH
+import com.absinthe.libchecker.constant.Constants.NO_LIBS
+import com.absinthe.libchecker.constant.Constants.OVERLAY
+import com.absinthe.libchecker.constant.Constants.RISCV32
+import com.absinthe.libchecker.constant.Constants.RISCV64
+import com.absinthe.libchecker.constant.Constants.RISCV64_STRING
+import com.absinthe.libchecker.constant.Constants.RISCV_STRING
 import com.absinthe.libchecker.constant.Constants.X86
 import com.absinthe.libchecker.constant.Constants.X86_64
+import com.absinthe.libchecker.constant.Constants.X86_64_STRING
+import com.absinthe.libchecker.constant.Constants.X86_STRING
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.features.applist.detail.bean.KotlinToolingMetadata
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
@@ -383,7 +402,7 @@ fun PackageInfo.isUseJetpackCompose(foundList: List<String>? = null): Boolean {
   val foundInMetaInf = runCatching {
     ZipFileCompat(file).use {
       it.getZipEntries().asSequence().any { entry ->
-        val fileName = entry.name.substringAfterLast("/")
+        val fileName = entry.name.substringAfterLast(File.separator)
         entry.isDirectory.not() &&
           fileName.startsWith("androidx.compose") &&
           fileName.endsWith(".version")
@@ -647,27 +666,6 @@ fun PackageInfo.isPreinstalled(): Boolean {
   return lastUpdateTime <= PREINSTALLED_TIMESTAMP
 }
 
-// Keep in sync with `ABI_TO_INSTRUCTION_SET_MAP` in
-// libcore/libart/src/main/java/dalvik/system/VMRuntime.java.
-private val ABI_TO_INSTRUCTION_SET_MAP = mapOf(
-  "armeabi" to "arm",
-  "armeabi-v7a" to "arm",
-  "x86" to "x86",
-  "x86_64" to "x86_64",
-  "arm64-v8a" to "arm64",
-  "arm64-v8a-hwasan" to "arm64",
-  "riscv64" to "riscv64"
-)
-
-val INSTRUCTION_SET_MAP_TO_ABI_VALUE = mapOf(
-  "arm64" to ARMV8,
-  "arm" to ARMV7,
-  "x86_64" to X86_64,
-  "x86" to X86,
-  "mips64" to MIPS64,
-  "mips" to MIPS
-)
-
 @Suppress("UNCHECKED_CAST")
 @SuppressLint("SoonBlockedPrivateApi")
 fun PackageInfo.getDexoptInfo(): Pair<String, String>? {
@@ -689,3 +687,82 @@ fun PackageInfo.getDexoptInfo(): Pair<String, String>? {
   Timber.d("getDexoptInfo: ${ret?.contentToString()}")
   return ret?.takeIf { it.size == 2 }?.let { it[0] to it[1] }
 }
+
+// Keep in sync with `ABI_TO_INSTRUCTION_SET_MAP` in
+// libcore/libart/src/main/java/dalvik/system/VMRuntime.java.
+private val ABI_TO_INSTRUCTION_SET_MAP = mapOf(
+  "armeabi" to "arm",
+  "armeabi-v7a" to "arm",
+  "x86" to "x86",
+  "x86_64" to "x86_64",
+  "arm64-v8a" to "arm64",
+  "arm64-v8a-hwasan" to "arm64",
+  "riscv64" to "riscv64"
+)
+
+val INSTRUCTION_SET_MAP_TO_ABI_VALUE = mapOf(
+  "arm64" to ARMV8,
+  "arm" to ARMV7,
+  "x86_64" to X86_64,
+  "x86" to X86,
+  "mips64" to MIPS64,
+  "mips" to MIPS,
+  "riscv64" to RISCV64,
+  "riscv32" to RISCV32
+)
+
+val ABI_64_BIT = setOf(ARMV8, X86_64, MIPS64, RISCV64)
+val ABI_32_BIT = setOf(ARMV5, ARMV7, X86, MIPS, RISCV32)
+
+val STRING_ABI_MAP = mapOf(
+  ARMV8_STRING to ARMV8,
+  ARMV7_STRING to ARMV7,
+  ARMV5_STRING to ARMV5,
+  X86_64_STRING to X86_64,
+  X86_STRING to X86,
+  MIPS64_STRING to MIPS64,
+  MIPS_STRING to MIPS,
+  RISCV64_STRING to RISCV64,
+  RISCV_STRING to RISCV32
+)
+
+val ABI_STRING_MAP = STRING_ABI_MAP.entries.associate { (k, v) -> v to k }
+
+val ABI_STRING_RES_MAP = arrayMapOf(
+  ERROR to listOf(R.string.cannot_read),
+  NO_LIBS to listOf(R.string.no_libs),
+  ARMV8 to listOf(R.string.arm64_v8a),
+  X86_64 to listOf(R.string.x86_64),
+  MIPS64 to listOf(R.string.mips64),
+  ARMV7 to listOf(R.string.armeabi_v7a),
+  ARMV5 to listOf(R.string.armeabi),
+  X86 to listOf(R.string.x86),
+  MIPS to listOf(R.string.mips),
+  ARMV8 + MULTI_ARCH to listOf(R.string.arm64_v8a, R.string.multiArch),
+  ARMV7 + MULTI_ARCH to listOf(R.string.armeabi_v7a, R.string.multiArch),
+  ARMV5 + MULTI_ARCH to listOf(R.string.armeabi, R.string.multiArch),
+  X86_64 + MULTI_ARCH to listOf(R.string.x86_64, R.string.multiArch),
+  X86 + MULTI_ARCH to listOf(R.string.x86, R.string.multiArch),
+  MIPS64 + MULTI_ARCH to listOf(R.string.mips64, R.string.multiArch),
+  MIPS + MULTI_ARCH to listOf(R.string.mips, R.string.multiArch)
+)
+
+val ABI_BADGE_MAP = arrayMapOf(
+  ERROR to 0,
+  NO_LIBS to if (Process.is64Bit()) R.drawable.ic_abi_label_64bit else R.drawable.ic_abi_label_32bit,
+  ARMV8 to R.drawable.ic_abi_label_64bit,
+  X86_64 to R.drawable.ic_abi_label_64bit,
+  MIPS64 to R.drawable.ic_abi_label_64bit,
+  ARMV7 to R.drawable.ic_abi_label_32bit,
+  ARMV5 to R.drawable.ic_abi_label_32bit,
+  X86 to R.drawable.ic_abi_label_32bit,
+  MIPS to R.drawable.ic_abi_label_32bit,
+  OVERLAY to R.drawable.ic_abi_label_no_libs,
+  ARMV8 + MULTI_ARCH to R.drawable.ic_abi_label_64bit,
+  X86_64 + MULTI_ARCH to R.drawable.ic_abi_label_64bit,
+  MIPS64 + MULTI_ARCH to R.drawable.ic_abi_label_64bit,
+  ARMV7 + MULTI_ARCH to R.drawable.ic_abi_label_32bit,
+  ARMV5 + MULTI_ARCH to R.drawable.ic_abi_label_32bit,
+  X86 + MULTI_ARCH to R.drawable.ic_abi_label_32bit,
+  MIPS + MULTI_ARCH to R.drawable.ic_abi_label_32bit
+)

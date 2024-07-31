@@ -16,7 +16,6 @@ import android.os.Process
 import android.text.format.Formatter
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
-import androidx.collection.arrayMapOf
 import androidx.core.text.buildSpannedString
 import androidx.core.text.scale
 import com.absinthe.libchecker.LibCheckerApp
@@ -42,23 +41,18 @@ import com.absinthe.libchecker.compat.ZipFileCompat
 import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.Constants.ARMV5
-import com.absinthe.libchecker.constant.Constants.ARMV5_STRING
 import com.absinthe.libchecker.constant.Constants.ARMV7
-import com.absinthe.libchecker.constant.Constants.ARMV7_STRING
 import com.absinthe.libchecker.constant.Constants.ARMV8
-import com.absinthe.libchecker.constant.Constants.ARMV8_STRING
 import com.absinthe.libchecker.constant.Constants.ERROR
 import com.absinthe.libchecker.constant.Constants.MIPS
 import com.absinthe.libchecker.constant.Constants.MIPS64
-import com.absinthe.libchecker.constant.Constants.MIPS64_STRING
-import com.absinthe.libchecker.constant.Constants.MIPS_STRING
 import com.absinthe.libchecker.constant.Constants.MULTI_ARCH
 import com.absinthe.libchecker.constant.Constants.NO_LIBS
 import com.absinthe.libchecker.constant.Constants.OVERLAY
+import com.absinthe.libchecker.constant.Constants.RISCV32
+import com.absinthe.libchecker.constant.Constants.RISCV64
 import com.absinthe.libchecker.constant.Constants.X86
 import com.absinthe.libchecker.constant.Constants.X86_64
-import com.absinthe.libchecker.constant.Constants.X86_64_STRING
-import com.absinthe.libchecker.constant.Constants.X86_STRING
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.data.app.LocalAppDataSource
@@ -67,7 +61,12 @@ import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.utils.dex.DexLibMap
 import com.absinthe.libchecker.utils.dex.FastDexFileFactory
 import com.absinthe.libchecker.utils.elf.ELFParser
+import com.absinthe.libchecker.utils.extensions.ABI_64_BIT
+import com.absinthe.libchecker.utils.extensions.ABI_BADGE_MAP
+import com.absinthe.libchecker.utils.extensions.ABI_STRING_MAP
+import com.absinthe.libchecker.utils.extensions.ABI_STRING_RES_MAP
 import com.absinthe.libchecker.utils.extensions.INSTRUCTION_SET_MAP_TO_ABI_VALUE
+import com.absinthe.libchecker.utils.extensions.STRING_ABI_MAP
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getStatefulPermissionsList
@@ -245,11 +244,11 @@ object PackageUtils {
         return zipFile.getZipEntries()
           .asSequence()
           .filter { (it.isDirectory.not() && it.name.startsWith(childDir)) && it.name.endsWith(".so") }
-          .distinctBy { it.name.split("/").last() }
+          .distinctBy { it.name.split(File.separator).last() }
           .map {
             val elfParser = runCatching { getElfParser(zipFile.getInputStream(it)) }.getOrNull()
             LibStringItem(
-              name = it.name.split("/").last(),
+              name = it.name.split(File.separator).last(),
               size = it.size,
               source = source,
               elfType = elfParser?.getEType() ?: ET_NOT_ELF,
@@ -287,7 +286,7 @@ object PackageUtils {
             val fileName = it.split(File.separator).last()
             libList.add(
               LibStringItem(
-                name = entry.name.split("/").last(),
+                name = entry.name.split(File.separator).last(),
                 size = entry.size,
                 process = if (fileName.startsWith("split_config")) null else fileName,
                 elfType = elfParser?.getEType() ?: ET_NOT_ELF,
@@ -618,7 +617,7 @@ object PackageUtils {
       }
 
       var entry: ZipEntry
-
+      val libDirPrefix = "lib${File.separator}"
       while (entries.hasMoreElements()) {
         entry = entries.nextElement()
 
@@ -628,50 +627,16 @@ object PackageUtils {
 
         elementName = entry.name
 
-        if (elementName.startsWith("lib/")) {
-          elementName = elementName.removePrefix("lib/")
-          when {
-            elementName.startsWith("$ARMV8_STRING/") -> {
-              if (Build.SUPPORTED_ABIS.contains(ARMV8_STRING) || ignoreArch) {
-                abiSet.add(ARMV8)
+        if (elementName.startsWith(libDirPrefix)) {
+          elementName = elementName.removePrefix(libDirPrefix)
+          STRING_ABI_MAP.any { (string, abi) ->
+            if (elementName.startsWith("$string${File.pathSeparator}")) {
+              if (Build.SUPPORTED_ABIS.contains(string) || ignoreArch) {
+                abiSet.add(abi)
               }
+              return@any true
             }
-
-            elementName.startsWith("$ARMV7_STRING/") -> {
-              if (Build.SUPPORTED_ABIS.contains(ARMV7_STRING) || ignoreArch) {
-                abiSet.add(ARMV7)
-              }
-            }
-
-            elementName.startsWith("$ARMV5_STRING/") -> {
-              if (Build.SUPPORTED_ABIS.contains(ARMV5_STRING) || ignoreArch) {
-                abiSet.add(ARMV5)
-              }
-            }
-
-            elementName.startsWith("$X86_64_STRING/") -> {
-              if (Build.SUPPORTED_ABIS.contains(X86_64_STRING) || ignoreArch) {
-                abiSet.add(X86_64)
-              }
-            }
-
-            elementName.startsWith("$X86_STRING/") -> {
-              if (Build.SUPPORTED_ABIS.contains(X86_STRING) || ignoreArch) {
-                abiSet.add(X86)
-              }
-            }
-
-            elementName.startsWith("$MIPS64_STRING/") -> {
-              if (Build.SUPPORTED_ABIS.contains(MIPS64_STRING) || ignoreArch) {
-                abiSet.add(MIPS64)
-              }
-            }
-
-            elementName.startsWith("$MIPS_STRING/") -> {
-              if (Build.SUPPORTED_ABIS.contains(MIPS_STRING) || ignoreArch) {
-                abiSet.add(MIPS)
-              }
-            }
+            false
           }
         }
       }
@@ -702,7 +667,7 @@ object PackageUtils {
    * @return ABI type
    */
   private fun getAbiListByNativeDir(nativePath: String): MutableSet<Int> {
-    val file = File(nativePath.substring(0, nativePath.lastIndexOf("/")))
+    val file = File(nativePath.substring(0, nativePath.lastIndexOf(File.separator)))
     val abis = mutableSetOf<Int>()
 
     val fileList = file.listFiles() ?: return mutableSetOf()
@@ -750,46 +715,29 @@ object PackageUtils {
     val use32bitAbi = applicationInfo.isUse32BitAbi()
     val multiArch = applicationInfo.flags and ApplicationInfo.FLAG_MULTIARCH != 0
 
-    var abi = when (Refine.unsafeCast<ApplicationInfoHidden>(applicationInfo).primaryCpuAbi) {
-      ARMV8_STRING -> ARMV8
-
-      ARMV7_STRING -> ARMV7
-
-      ARMV5_STRING -> ARMV5
-
-      X86_64_STRING -> X86_64
-
-      X86_STRING -> X86
-
-      MIPS64_STRING -> MIPS64
-
-      MIPS_STRING -> MIPS
-
-      null -> {
-        val supportedAbiSet = mutableSetOf<Int>()
-        realAbiSet.forEach {
-          if (Build.SUPPORTED_ABIS.contains(getAbiString(LibCheckerApp.app, it, false))) {
-            supportedAbiSet.add(it)
-          }
-        }
-        if (use32bitAbi) {
-          supportedAbiSet.remove(ARMV8)
-          supportedAbiSet.remove(X86_64)
-          supportedAbiSet.remove(MIPS64)
-        }
-        when {
-          supportedAbiSet.contains(ARMV8) -> ARMV8
-          supportedAbiSet.contains(ARMV7) -> ARMV7
-          supportedAbiSet.contains(ARMV5) -> ARMV5
-          supportedAbiSet.contains(X86_64) -> X86_64
-          supportedAbiSet.contains(X86) -> X86
-          supportedAbiSet.contains(MIPS64) -> MIPS64
-          supportedAbiSet.contains(MIPS) -> MIPS
-          else -> ERROR
+    val primaryCpuAbi = Refine.unsafeCast<ApplicationInfoHidden>(applicationInfo).primaryCpuAbi
+    var abi = STRING_ABI_MAP[primaryCpuAbi] ?: let {
+      val supportedAbiSet = mutableSetOf<Int>()
+      realAbiSet.forEach {
+        if (Build.SUPPORTED_ABIS.contains(ABI_STRING_MAP[it])) {
+          supportedAbiSet.add(it)
         }
       }
-
-      else -> ERROR
+      if (use32bitAbi) {
+        supportedAbiSet.removeAll(ABI_64_BIT)
+      }
+      when {
+        supportedAbiSet.contains(ARMV8) -> ARMV8
+        supportedAbiSet.contains(ARMV7) -> ARMV7
+        supportedAbiSet.contains(ARMV5) -> ARMV5
+        supportedAbiSet.contains(X86_64) -> X86_64
+        supportedAbiSet.contains(X86) -> X86
+        supportedAbiSet.contains(MIPS64) -> MIPS64
+        supportedAbiSet.contains(MIPS) -> MIPS
+        supportedAbiSet.contains(RISCV64) -> RISCV64
+        supportedAbiSet.contains(RISCV32) -> RISCV32
+        else -> ERROR
+      }
     }
 
     if (multiArch) {
@@ -797,45 +745,6 @@ object PackageUtils {
     }
     return abi
   }
-
-  private val ABI_STRING_RES_MAP = arrayMapOf(
-    ERROR to listOf(R.string.cannot_read),
-    NO_LIBS to listOf(R.string.no_libs),
-    ARMV8 to listOf(R.string.arm64_v8a),
-    X86_64 to listOf(R.string.x86_64),
-    MIPS64 to listOf(R.string.mips64),
-    ARMV7 to listOf(R.string.armeabi_v7a),
-    ARMV5 to listOf(R.string.armeabi),
-    X86 to listOf(R.string.x86),
-    MIPS to listOf(R.string.mips),
-    ARMV8 + MULTI_ARCH to listOf(R.string.arm64_v8a, R.string.multiArch),
-    ARMV7 + MULTI_ARCH to listOf(R.string.armeabi_v7a, R.string.multiArch),
-    ARMV5 + MULTI_ARCH to listOf(R.string.armeabi, R.string.multiArch),
-    X86_64 + MULTI_ARCH to listOf(R.string.x86_64, R.string.multiArch),
-    X86 + MULTI_ARCH to listOf(R.string.x86, R.string.multiArch),
-    MIPS64 + MULTI_ARCH to listOf(R.string.mips64, R.string.multiArch),
-    MIPS + MULTI_ARCH to listOf(R.string.mips, R.string.multiArch)
-  )
-
-  private val ABI_BADGE_MAP = arrayMapOf(
-    ERROR to 0,
-    NO_LIBS to if (Process.is64Bit()) R.drawable.ic_abi_label_64bit else R.drawable.ic_abi_label_32bit,
-    ARMV8 to R.drawable.ic_abi_label_64bit,
-    X86_64 to R.drawable.ic_abi_label_64bit,
-    MIPS64 to R.drawable.ic_abi_label_64bit,
-    ARMV7 to R.drawable.ic_abi_label_32bit,
-    ARMV5 to R.drawable.ic_abi_label_32bit,
-    X86 to R.drawable.ic_abi_label_32bit,
-    MIPS to R.drawable.ic_abi_label_32bit,
-    OVERLAY to R.drawable.ic_abi_label_no_libs,
-    ARMV8 + MULTI_ARCH to R.drawable.ic_abi_label_64bit,
-    X86_64 + MULTI_ARCH to R.drawable.ic_abi_label_64bit,
-    MIPS64 + MULTI_ARCH to R.drawable.ic_abi_label_64bit,
-    ARMV7 + MULTI_ARCH to R.drawable.ic_abi_label_32bit,
-    ARMV5 + MULTI_ARCH to R.drawable.ic_abi_label_32bit,
-    X86 + MULTI_ARCH to R.drawable.ic_abi_label_32bit,
-    MIPS + MULTI_ARCH to R.drawable.ic_abi_label_32bit
-  )
 
   /**
    * Get ABI string from ABI type
@@ -867,7 +776,7 @@ object PackageUtils {
   }
 
   fun isAbi64Bit(abi: Int): Boolean {
-    return abi in setOf(ARMV8, X86_64, MIPS64)
+    return abi in ABI_64_BIT
   }
 
   /**
