@@ -507,7 +507,8 @@ class DetailViewModel : ViewModel() {
         abi,
         abiSet.sortedByDescending {
           it == abi || PackageUtils.isAbi64Bit(it)
-        })
+        }
+      )
     )
   }
 
