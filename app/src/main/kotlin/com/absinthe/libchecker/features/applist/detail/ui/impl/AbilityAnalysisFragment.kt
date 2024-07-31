@@ -74,7 +74,7 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
                 context?.let {
                   binding.list.addItemDecoration(dividerItemDecoration)
                 }
-                adapter.setDiffNewData(list, afterListReadyTask)
+                setList(list)
               }
             }
           }

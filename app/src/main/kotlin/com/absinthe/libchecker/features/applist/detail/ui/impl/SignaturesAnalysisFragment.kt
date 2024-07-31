@@ -52,7 +52,7 @@ class SignaturesAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
           context?.let {
             binding.list.addItemDecoration(dividerItemDecoration)
           }
-          adapter.setDiffNewData(it.toMutableList(), afterListReadyTask)
+          setList(it)
         }
       }
 

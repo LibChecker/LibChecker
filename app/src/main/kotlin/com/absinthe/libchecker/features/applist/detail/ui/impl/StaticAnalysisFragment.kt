@@ -47,7 +47,7 @@ class StaticAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
           if (viewModel.queriedText?.isNotEmpty() == true) {
             filterList(viewModel.queriedText!!)
           } else {
-            adapter.setDiffNewData(it.toMutableList(), afterListReadyTask)
+            setList(it)
           }
         }
 

@@ -35,13 +35,13 @@ class NativeAnalysisFragment :
     }
 
     viewModel.nativeLibItems.value?.let {
-      setList(it)
+      setItems(it)
     }
 
     viewModel.apply {
       nativeLibItems.onEach {
         if (it == null) return@onEach
-        setList(it)
+        setItems(it)
         if (it.isNotEmpty()) {
           context?.let {
             binding.list.addItemDecoration(dividerItemDecoration)
@@ -78,7 +78,7 @@ class NativeAnalysisFragment :
     }
   }
 
-  private fun setList(list: List<LibStringItemChip>) {
+  private fun setItems(list: List<LibStringItemChip>) {
     if (list.isEmpty()) {
       emptyView.text.text = getString(R.string.empty_list)
     } else {
@@ -86,7 +86,7 @@ class NativeAnalysisFragment :
       if (viewModel.queriedText?.isNotEmpty() == true) {
         filterList(viewModel.queriedText!!)
       } else {
-        adapter.setDiffNewData(list.toMutableList(), afterListReadyTask)
+        setList(list)
       }
       if (viewModel.queriedProcess?.isNotEmpty() == true) {
         filterItems(viewModel.queriedProcess!!)
