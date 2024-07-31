@@ -11,6 +11,8 @@ object Constants {
   const val X86_64 = 5
   const val MIPS = 6
   const val MIPS64 = 7
+  const val RISCV32 = 8
+  const val RISCV64 = 9
   const val MULTI_ARCH = 10
   const val OVERLAY = 100
 
@@ -24,6 +26,8 @@ object Constants {
   const val X86_64_STRING = "x86_64"
   const val MIPS_STRING = "mips"
   const val MIPS64_STRING = "mips64"
+  const val RISCV_STRING = "riscv32"
+  const val RISCV64_STRING = "riscv64"
   const val OVERLAY_STRING = "Overlay"
 
   const val TEMP_PACKAGE = "lc_temp_package.apk"

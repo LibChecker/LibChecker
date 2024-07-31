@@ -16,6 +16,7 @@ import com.absinthe.libchecker.view.AViewGroup
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieDrawable
 import com.google.android.material.progressindicator.LinearProgressIndicator
+import java.io.File
 
 class LibReferenceLoadingView(
   context: Context,
@@ -27,7 +28,7 @@ class LibReferenceLoadingView(
     layoutParams = FrameLayout.LayoutParams(size, size).also {
       it.gravity = Gravity.CENTER
     }
-    imageAssetsFolder = "/"
+    imageAssetsFolder = File.separator
     repeatCount = LottieDrawable.INFINITE
     val assetName = when (GlobalValues.season) {
       SPRING -> "anim/lib_reference_spring.json.zip"

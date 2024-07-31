@@ -21,6 +21,7 @@ import com.absinthe.libchecker.utils.extensions.isOrientationLandscape
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.paddingTopCompat
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
+import java.io.File
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -112,7 +113,7 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
         (root as ViewGroup).bringChildToFront(appbar)
       }
       lottie.apply {
-        imageAssetsFolder = "/"
+        imageAssetsFolder = File.separator
 
         val assetName = when (GlobalValues.season) {
           SPRING -> "anim/lib_reference_spring.json.zip"

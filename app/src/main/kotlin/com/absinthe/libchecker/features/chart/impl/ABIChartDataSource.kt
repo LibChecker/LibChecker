@@ -2,7 +2,6 @@ package com.absinthe.libchecker.features.chart.impl
 
 import android.content.Context
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.Constants.MULTI_ARCH
 import com.absinthe.libchecker.constant.Constants.OVERLAY
 import com.absinthe.libchecker.constant.GlobalValues
@@ -10,6 +9,8 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.features.chart.BaseChartDataSource
 import com.absinthe.libchecker.features.chart.ChartSourceItem
 import com.absinthe.libchecker.utils.OsUtils
+import com.absinthe.libchecker.utils.extensions.ABI_32_BIT
+import com.absinthe.libchecker.utils.extensions.ABI_64_BIT
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.data.PieData
@@ -20,9 +21,6 @@ import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.utils.MPPointF
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-
-private val ABI_64_BIT = setOf(Constants.ARMV8, Constants.X86_64, Constants.MIPS64)
-private val ABI_32_BIT = setOf(Constants.ARMV5, Constants.ARMV7, Constants.X86, Constants.MIPS)
 
 class ABIChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>(items) {
   override val classifiedMap: HashMap<Int, ChartSourceItem> = HashMap(3)

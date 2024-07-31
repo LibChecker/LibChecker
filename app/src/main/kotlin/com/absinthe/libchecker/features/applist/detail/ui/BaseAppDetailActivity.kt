@@ -951,7 +951,7 @@ abstract class BaseAppDetailActivity :
     }
   }
 
-  private fun initAbiView(abi: Int, abiSet: Set<Int>) {
+  private fun initAbiView(abi: Int, abiSet: Collection<Int>) {
     val trueAbi = abi.mod(Constants.MULTI_ARCH)
     lifecycleScope.launch {
       viewModel.is64Bit.emit(PackageUtils.isAbi64Bit(trueAbi))

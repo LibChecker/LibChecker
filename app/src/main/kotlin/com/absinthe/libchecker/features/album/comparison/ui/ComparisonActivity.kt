@@ -367,8 +367,8 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
 
   private fun getUriFileName(path: String): String {
     val decode = Uri.decode(path)
-    return if (decode.contains("/")) {
-      getUriFileName(decode.split("/").last())
+    return if (decode.contains(File.separator)) {
+      getUriFileName(decode.split(File.separator).last())
     } else {
       decode
     }

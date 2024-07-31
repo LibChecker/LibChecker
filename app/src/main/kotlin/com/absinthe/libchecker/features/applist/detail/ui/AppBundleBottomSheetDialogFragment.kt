@@ -9,6 +9,7 @@ import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
+import java.io.File
 import java.util.Locale
 
 class AppBundleBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppBundleBottomSheetView>() {
@@ -29,7 +30,7 @@ class AppBundleBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<App
         emptyList()
       } else {
         list.map { split ->
-          val name = split.substringAfterLast("/")
+          val name = split.substringAfterLast(File.separator)
           val middleName = name.removeSurrounding("split_config.", ".apk")
           val type = when {
             middleName.startsWith("arm") || middleName.startsWith("x86") -> AppBundleItemView.IconType.TYPE_NATIVE_LIBS
