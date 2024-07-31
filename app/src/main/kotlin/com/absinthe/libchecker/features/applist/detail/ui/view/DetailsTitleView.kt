@@ -103,8 +103,8 @@ class DetailsTitleView(
         Constants.X86 -> R.drawable.ic_abi_label_x86
         Constants.MIPS64 -> R.drawable.ic_abi_label_mips64
         Constants.MIPS -> R.drawable.ic_abi_label_mips
-        Constants.RISCV64 -> R.drawable.ic_abi_label_mips64
-        Constants.RISCV32 -> R.drawable.ic_abi_label_mips
+        Constants.RISCV64 -> R.drawable.ic_abi_label_riscv64
+        Constants.RISCV32 -> R.drawable.ic_abi_label_riscv32
         Constants.MULTI_ARCH -> R.drawable.ic_abi_label_multi_arch
         else -> throw IllegalArgumentException("wrong abi label")
       }

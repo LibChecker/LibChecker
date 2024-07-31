@@ -7,7 +7,6 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageInfoHidden
 import android.content.res.Configuration
 import android.os.Build
-import android.os.Process
 import androidx.collection.arrayMapOf
 import androidx.core.content.pm.PackageInfoCompat
 import com.absinthe.libchecker.R
@@ -26,7 +25,6 @@ import com.absinthe.libchecker.constant.Constants.MIPS64_STRING
 import com.absinthe.libchecker.constant.Constants.MIPS_STRING
 import com.absinthe.libchecker.constant.Constants.MULTI_ARCH
 import com.absinthe.libchecker.constant.Constants.NO_LIBS
-import com.absinthe.libchecker.constant.Constants.OVERLAY
 import com.absinthe.libchecker.constant.Constants.RISCV32
 import com.absinthe.libchecker.constant.Constants.RISCV64
 import com.absinthe.libchecker.constant.Constants.RISCV64_STRING
@@ -734,35 +732,19 @@ val ABI_STRING_RES_MAP = arrayMapOf(
   ARMV8 to listOf(R.string.arm64_v8a),
   X86_64 to listOf(R.string.x86_64),
   MIPS64 to listOf(R.string.mips64),
+  RISCV64 to listOf(R.string.riscv64),
   ARMV7 to listOf(R.string.armeabi_v7a),
   ARMV5 to listOf(R.string.armeabi),
   X86 to listOf(R.string.x86),
   MIPS to listOf(R.string.mips),
+  RISCV32 to listOf(R.string.riscv32),
   ARMV8 + MULTI_ARCH to listOf(R.string.arm64_v8a, R.string.multiArch),
   ARMV7 + MULTI_ARCH to listOf(R.string.armeabi_v7a, R.string.multiArch),
   ARMV5 + MULTI_ARCH to listOf(R.string.armeabi, R.string.multiArch),
   X86_64 + MULTI_ARCH to listOf(R.string.x86_64, R.string.multiArch),
   X86 + MULTI_ARCH to listOf(R.string.x86, R.string.multiArch),
   MIPS64 + MULTI_ARCH to listOf(R.string.mips64, R.string.multiArch),
-  MIPS + MULTI_ARCH to listOf(R.string.mips, R.string.multiArch)
-)
-
-val ABI_BADGE_MAP = arrayMapOf(
-  ERROR to 0,
-  NO_LIBS to if (Process.is64Bit()) R.drawable.ic_abi_label_64bit else R.drawable.ic_abi_label_32bit,
-  ARMV8 to R.drawable.ic_abi_label_64bit,
-  X86_64 to R.drawable.ic_abi_label_64bit,
-  MIPS64 to R.drawable.ic_abi_label_64bit,
-  ARMV7 to R.drawable.ic_abi_label_32bit,
-  ARMV5 to R.drawable.ic_abi_label_32bit,
-  X86 to R.drawable.ic_abi_label_32bit,
-  MIPS to R.drawable.ic_abi_label_32bit,
-  OVERLAY to R.drawable.ic_abi_label_no_libs,
-  ARMV8 + MULTI_ARCH to R.drawable.ic_abi_label_64bit,
-  X86_64 + MULTI_ARCH to R.drawable.ic_abi_label_64bit,
-  MIPS64 + MULTI_ARCH to R.drawable.ic_abi_label_64bit,
-  ARMV7 + MULTI_ARCH to R.drawable.ic_abi_label_32bit,
-  ARMV5 + MULTI_ARCH to R.drawable.ic_abi_label_32bit,
-  X86 + MULTI_ARCH to R.drawable.ic_abi_label_32bit,
-  MIPS + MULTI_ARCH to R.drawable.ic_abi_label_32bit
+  MIPS + MULTI_ARCH to listOf(R.string.mips, R.string.multiArch),
+  RISCV64 + MULTI_ARCH to listOf(R.string.riscv64, R.string.multiArch),
+  RISCV32 + MULTI_ARCH to listOf(R.string.riscv32, R.string.multiArch)
 )

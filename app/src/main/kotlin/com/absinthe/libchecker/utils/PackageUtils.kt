@@ -62,7 +62,6 @@ import com.absinthe.libchecker.utils.dex.DexLibMap
 import com.absinthe.libchecker.utils.dex.FastDexFileFactory
 import com.absinthe.libchecker.utils.elf.ELFParser
 import com.absinthe.libchecker.utils.extensions.ABI_64_BIT
-import com.absinthe.libchecker.utils.extensions.ABI_BADGE_MAP
 import com.absinthe.libchecker.utils.extensions.ABI_STRING_MAP
 import com.absinthe.libchecker.utils.extensions.ABI_STRING_RES_MAP
 import com.absinthe.libchecker.utils.extensions.INSTRUCTION_SET_MAP_TO_ABI_VALUE
@@ -772,10 +771,17 @@ object PackageUtils {
    */
   @DrawableRes
   fun getAbiBadgeResource(type: Int): Int {
-    return ABI_BADGE_MAP[type] ?: 0
+    return when (type) {
+      OVERLAY -> R.drawable.ic_abi_label_no_libs
+      ERROR -> 0
+      else -> if (isAbi64Bit(type % MULTI_ARCH)) R.drawable.ic_abi_label_64bit else R.drawable.ic_abi_label_32bit
+    }
   }
 
   fun isAbi64Bit(abi: Int): Boolean {
+    if (abi == NO_LIBS) {
+      return Process.is64Bit()
+    }
     return abi in ABI_64_BIT
   }
 
