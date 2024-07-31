@@ -35,7 +35,6 @@ import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.app.SystemServices
-import com.absinthe.libchecker.compat.IZipFile
 import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.compat.ZipFileCompat
 import com.absinthe.libchecker.constant.AndroidVersions
@@ -86,7 +85,6 @@ import java.io.InputStream
 import java.security.interfaces.DSAPublicKey
 import java.security.interfaces.RSAPublicKey
 import java.text.DateFormat
-import java.util.zip.ZipEntry
 import javax.security.cert.X509Certificate
 import rikka.shizuku.Shizuku
 import rikka.shizuku.ShizukuBinderWrapper
@@ -597,66 +595,60 @@ object PackageUtils {
     ignoreArch: Boolean = false
   ): Set<Int> {
     var elementName: String
-
     val abiSet = mutableSetOf<Int>()
-    var zipFile: IZipFile? = null
 
     if (file.exists().not()) {
       Timber.w("File not exists: ${file.absolutePath}")
       return abiSet
     }
 
-    try {
-      zipFile = ZipFileCompat(file)
-      val entries = zipFile.getZipEntries()
+    ZipFileCompat(file).use { zipFile ->
+      return runCatching {
+        val libDirPrefix = "lib${File.separator}"
+        val entries = zipFile.getZipEntries()
 
-      if (packageInfo.isOverlay()) {
-        abiSet.add(OVERLAY)
-        return abiSet
-      }
-
-      var entry: ZipEntry
-      val libDirPrefix = "lib${File.separator}"
-      while (entries.hasMoreElements()) {
-        entry = entries.nextElement()
-
-        if (entry.isDirectory) {
-          continue
+        if (packageInfo.isOverlay()) {
+          abiSet.add(OVERLAY)
+          return abiSet
         }
 
-        elementName = entry.name
+        while (entries.hasMoreElements()) {
+          val entry = entries.nextElement()
 
-        if (elementName.startsWith(libDirPrefix)) {
-          elementName = elementName.removePrefix(libDirPrefix)
-          STRING_ABI_MAP.any { (string, abi) ->
-            if (elementName.startsWith("$string${File.pathSeparator}")) {
-              if (Build.SUPPORTED_ABIS.contains(string) || ignoreArch) {
-                abiSet.add(abi)
-              }
-              return@any true
-            }
-            false
+          if (entry.isDirectory) {
+            continue
           }
-        }
-      }
 
-      if (abiSet.isEmpty()) {
-        if (!isApk && packageInfo.applicationInfo?.nativeLibraryDir != null) {
-          abiSet.addAll(getAbiListByNativeDir(packageInfo.applicationInfo!!.nativeLibraryDir))
+          elementName = entry.name
+
+          if (elementName.startsWith(libDirPrefix)) {
+            STRING_ABI_MAP.forEach { (string, abi) ->
+              if (elementName.startsWith("$libDirPrefix$string${File.separator}")) {
+                if (Build.SUPPORTED_ABIS.contains(string) || ignoreArch) {
+                  abiSet.add(abi)
+                }
+                return@forEach
+              }
+            }
+          }
         }
 
         if (abiSet.isEmpty()) {
-          abiSet.add(NO_LIBS)
+          if (!isApk && packageInfo.applicationInfo?.nativeLibraryDir != null) {
+            abiSet.addAll(getAbiListByNativeDir(packageInfo.applicationInfo!!.nativeLibraryDir))
+          }
+
+          if (abiSet.isEmpty()) {
+            abiSet.add(NO_LIBS)
+          }
         }
-      }
-      return abiSet
-    } catch (e: Throwable) {
-      Timber.e(e)
-      abiSet.clear()
-      abiSet.add(ERROR)
-      return abiSet
-    } finally {
-      zipFile?.close()
+        return abiSet
+      }.onFailure {
+        Timber.e(it)
+        abiSet.clear()
+        abiSet.add(ERROR)
+        return abiSet
+      }.getOrDefault(abiSet)
     }
   }
 

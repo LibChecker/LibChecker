@@ -502,7 +502,13 @@ class DetailViewModel : ViewModel() {
       ignoreArch = true
     ).toSet()
     val abi = PackageUtils.getAbi(packageInfo, isApk = apkAnalyticsMode, abiSet = abiSet)
-    abiBundleStateFlow.emit(AbiBundle(abi, abiSet.sortedByDescending { it == abi }.toSet()))
+    abiBundleStateFlow.emit(
+      AbiBundle(
+        abi,
+        abiSet.sortedByDescending {
+          it == abi || PackageUtils.isAbi64Bit(it)
+        })
+    )
   }
 
   fun updateProcessMap(map: Map<String, Int>) = viewModelScope.launch {
@@ -518,5 +524,5 @@ class DetailViewModel : ViewModel() {
     itemsCountList[locate] = count
   }
 
-  data class AbiBundle(val abi: Int, val abiSet: Set<Int>)
+  data class AbiBundle(val abi: Int, val abiSet: Collection<Int>)
 }
