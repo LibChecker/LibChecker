@@ -48,7 +48,7 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
           context?.let {
             binding.list.addItemDecoration(dividerItemDecoration)
           }
-          adapter.setDiffNewData(it.toMutableList(), afterListReadyTask)
+          setList(it)
         }
       }
 

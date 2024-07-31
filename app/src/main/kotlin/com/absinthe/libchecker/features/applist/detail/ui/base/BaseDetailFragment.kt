@@ -96,6 +96,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   protected var afterListReadyTask: Runnable? = null
   private var integrationMonkeyKingBlockList: List<ShareCmpInfo.Component>? = null
   private var integrationBlockerList: List<ShareCmpInfo.Component>? = null
+  private var items: List<LibStringItemChip> = emptyList()
 
   abstract fun getRecyclerView(): RecyclerView
 
@@ -203,7 +204,10 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     }
   }
 
-  fun getItemsCount() = adapter.itemCount
+  fun setList(list: List<LibStringItemChip>) {
+    items = list
+    adapter.setDiffNewData(list.toMutableList(), afterListReadyTask)
+  }
 
   fun switchProcessMode() {
     if (isComponentFragment() || isNativeSourceAvailable()) {
@@ -240,7 +244,10 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   }
 
   protected open fun getFilterListByText(text: String): List<LibStringItemChip> {
-    return adapter.data.filter { it.item.name.contains(text, true) }
+    if (text.isEmpty()) {
+      return items
+    }
+    return items.filter { it.item.name.contains(text, true) }
   }
 
   private fun navigateToComponentImpl(component: String) {

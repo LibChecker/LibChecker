@@ -47,7 +47,7 @@ class MetaDataAnalysisFragment :
             context?.let {
               binding.list.addItemDecoration(dividerItemDecoration)
             }
-            adapter.setDiffNewData(it.toMutableList(), afterListReadyTask)
+            setList(it)
           }
         }
 
