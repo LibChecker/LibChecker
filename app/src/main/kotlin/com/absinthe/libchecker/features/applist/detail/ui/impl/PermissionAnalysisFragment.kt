@@ -45,9 +45,6 @@ class PermissionAnalysisFragment :
           if (viewModel.queriedText?.isNotEmpty() == true) {
             filterList(viewModel.queriedText!!)
           } else {
-            context?.let {
-              binding.list.addItemDecoration(dividerItemDecoration)
-            }
             setList(it)
           }
         }
