@@ -192,6 +192,8 @@ abstract class BaseDetailFragment<T : ViewBinding> :
             getRecyclerView().removeItemDecoration(dividerItemDecoration)
           }
           emptyView.text.text = getString(R.string.empty_list)
+        } else {
+          getRecyclerView().addItemDecoration(dividerItemDecoration)
         }
         adapter.setDiffNewData(this@with.toMutableList()) {
           viewModel.updateItemsCountStateFlow(type, size)
@@ -207,6 +209,13 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   fun setList(list: List<LibStringItemChip>) {
     items = list
     adapter.setDiffNewData(list.toMutableList(), afterListReadyTask)
+    if (items.isEmpty()) {
+      if (getRecyclerView().itemDecorationCount > 0) {
+        getRecyclerView().removeItemDecoration(dividerItemDecoration)
+      }
+    } else {
+      getRecyclerView().addItemDecoration(dividerItemDecoration)
+    }
   }
 
   fun switchProcessMode() {

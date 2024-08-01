@@ -42,11 +42,6 @@ class NativeAnalysisFragment :
       nativeLibItems.onEach {
         if (it == null) return@onEach
         setItems(it)
-        if (it.isNotEmpty()) {
-          context?.let {
-            binding.list.addItemDecoration(dividerItemDecoration)
-          }
-        }
       }.launchIn(lifecycleScope)
       packageInfoStateFlow.onEach {
         if (it != null) {

@@ -44,9 +44,6 @@ class MetaDataAnalysisFragment :
           if (viewModel.queriedText?.isNotEmpty() == true) {
             filterList(viewModel.queriedText!!)
           } else {
-            context?.let {
-              binding.list.addItemDecoration(dividerItemDecoration)
-            }
             setList(it)
           }
         }
