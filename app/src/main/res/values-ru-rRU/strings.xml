@@ -49,6 +49,7 @@
   <string name="string_kotlin_unused">Kotlin не используется</string>
   <string name="string_compose_used">Используется Jetpack Compose</string>
   <string name="string_compose_unused">Jetpack Compose не используется</string>
+  <string name="android_dist_label">Распространение</string>
   <string name="android_dist_source">Источник</string>
   <string name="android_dist_title">Статистика распределения версий Android</string>
   <string name="android_dist_subtitle_format">Время обновления %s</string>
