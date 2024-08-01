@@ -47,11 +47,10 @@ class StaticAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
           if (viewModel.queriedText?.isNotEmpty() == true) {
             filterList(viewModel.queriedText!!)
           } else {
-            setList(it)
             context?.let {
               binding.list.addItemDecoration(dividerItemDecoration)
             }
-            adapter.setDiffNewData(it.toMutableList(), afterListReadyTask)
+            setList(it)
           }
         }
 
