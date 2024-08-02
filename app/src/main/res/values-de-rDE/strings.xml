@@ -36,8 +36,8 @@
   <string name="ref_category_native">Native Bibliotheken</string>
   <string name="ref_category_service">Services</string>
   <string name="ref_category_activity">Activities</string>
-  <string name="ref_category_br">Broadcast Receivers</string>
-  <string name="ref_category_cp">Content Providers</string>
+  <string name="ref_category_br">Rundfunkempfänger</string>
+  <string name="ref_category_cp">Inhaltsanbieter</string>
   <string name="ref_category_perm">Berechtigungen</string>
   <string name="ref_category_static">Statische Bibliotheken</string>
   <string name="ref_category_metadata">Metadaten</string>
@@ -49,6 +49,10 @@
   <string name="string_kotlin_unused">Nutzt kein Kotlin</string>
   <string name="string_compose_used">Nutzt Jetpack Compose</string>
   <string name="string_compose_unused">Nutzt kein Jetpack Compose</string>
+  <string name="android_dist_label">Vertrieb</string>
+  <string name="android_dist_source">Quelle</string>
+  <string name="android_dist_title">Android Version Vertriebsstatistik</string>
+  <string name="android_dist_subtitle_format">Updatezeit: %s</string>
   <!--  About  -->
   <string name="settings_about">Über</string>
   <string name="settings_about_summary">Dies ist LibChecker!</string>
@@ -56,6 +60,8 @@
   <string name="settings_translate_summary">Hilf uns die App zu übersetzen</string>
   <string name="settings_rate_us">Bewerte uns</string>
   <string name="settings_rate_us_summary">Dies hilft uns von mehr Leuten gefunden zu werden</string>
+  <string name="settings_get_updates">Erhalte Updates</string>
+  <string name="settings_get_updates_summary">Hole dir die neuste Version, die stabiler und mit Funktionen voll gepackt ist</string>
   <string name="about_info">Diese App wird verwendet, um die von Anwendungen auf Ihrem Gerät verwendeten Bibliotheken von Drittanbietern anzuzeigen.</string>
   <string name="toolbar_rate">Bewerten sie diese App</string>
   <string name="resource_declaration">Ein Teil der Ressourcen in der Anwendung stammt aus: </string>
@@ -69,6 +75,13 @@
   <string name="lib_ref_threshold">Bibliotheksreferenz-Grenzwert</string>
   <string name="languages">Sprachen</string>
   <string name="reload_apps">App-Liste aktualisieren</string>
+  <string name="help_docs">Handbuch</string>
+  <string name="join_telegram_group">Kommunikation</string>
+  <string name="anonymous_statistics">Anonyme Statistiken</string>
+  <string name="cloud_rules">Cloud-Regeln</string>
+  <string name="dark_mode">Nachtmodus</string>
+  <string name="array_dark_mode_off">Aus</string>
+  <string name="array_dark_mode_on">An</string>
   <!--  Detail  -->
   <!--  Toast  -->
   <!--  Snapshot  -->
