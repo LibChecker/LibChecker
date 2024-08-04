@@ -49,6 +49,7 @@
   <string name="string_kotlin_unused">Tak menggunakan Kotlin</string>
   <string name="string_compose_used">Menggunakan Jetpack Compose</string>
   <string name="string_compose_unused">Tak menggunakan Jetpack Compose</string>
+  <string name="android_dist_label">Distribution</string>
   <string name="android_dist_source">Sumber</string>
   <string name="android_dist_title">Statistik Distribusi Versi Android</string>
   <string name="android_dist_subtitle_format">Waktu Pembaruan: %s</string>
@@ -61,6 +62,9 @@
   <string name="settings_rate_us_summary">Ini dapat membuat kami dikenal lebih banyak orang</string>
   <string name="settings_get_updates">Dapatkan Pembaruan</string>
   <string name="settings_get_updates_summary">Dapatkan versi terbaru yang lebih stabil dan penuh dengan fitur</string>
+  <string name="settings_get_updates_in_app">In-app</string>
+  <string name="settings_get_updates_in_app_chip_stable">Stable</string>
+  <string name="settings_get_updates_in_app_chip_ci">CI</string>
   <string name="about_info">Aplikasi ini digunakan untuk melihat library pihak ketiga yang digunakan oleh aplikasi di perangkat Anda.</string>
   <string name="toolbar_rate">Nilai</string>
   <string name="resource_declaration">Sebagian resource aplikasi berasal dari: </string>
@@ -175,6 +179,7 @@
   <string name="toast_cant_open_app">Tidak dapat membuka aplikasi ini</string>
   <string name="toast_cloud_rules_update_error">Gagal memperbarui rule cloud. Silakan coba lagi.</string>
   <string name="toast_not_enough_storage_space">Tidak cukup ruang penyimpanan</string>
+  <string name="toast_downloading_app">Download requested</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">Simpan snapshot terkini</string>
   <string name="snapshot_current_timestamp">Timestamp Snapshot Terkini</string>
