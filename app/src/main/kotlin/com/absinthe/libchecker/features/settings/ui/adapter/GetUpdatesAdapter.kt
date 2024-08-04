@@ -1,7 +1,5 @@
 package com.absinthe.libchecker.features.settings.ui.adapter
 
-import android.content.Intent
-import android.net.Uri
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.absinthe.libchecker.features.settings.bean.GetUpdatesItem
@@ -27,11 +25,7 @@ class GetUpdatesAdapter : BaseQuickAdapter<GetUpdatesItem, BaseViewHolder>(0) {
       setIconResource(item.iconRes)
       text = item.text
       setOnClickListener {
-        context.startActivity(
-          Intent(Intent.ACTION_VIEW).apply {
-            data = Uri.parse(item.url)
-          }
-        )
+        item.action()
       }
     }
   }

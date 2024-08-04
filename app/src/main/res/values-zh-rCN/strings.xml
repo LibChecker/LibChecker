@@ -62,6 +62,9 @@
   <string name="settings_rate_us_summary">这可以使我们被更多的人发现</string>
   <string name="settings_get_updates">获取更新</string>
   <string name="settings_get_updates_summary">获取更加稳定和功能众多的最新版本</string>
+  <string name="settings_get_updates_in_app">应用内</string>
+  <string name="settings_get_updates_in_app_chip_stable">稳定版</string>
+  <string name="settings_get_updates_in_app_chip_ci">持续集成</string>
   <string name="about_info">本应用用来查看设备上的应用使用到的第三方库的情况。</string>
   <string name="toolbar_rate">评分</string>
   <string name="resource_declaration">应用中的部分素材来自：</string>
@@ -176,6 +179,7 @@
   <string name="toast_cant_open_app">无法启动此应用</string>
   <string name="toast_cloud_rules_update_error">云端规则更新失败，请重试</string>
   <string name="toast_not_enough_storage_space">存储空间不足</string>
+  <string name="toast_downloading_app">已请求下载</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">保存当前快照</string>
   <string name="snapshot_current_timestamp">当前快照时间戳</string>
