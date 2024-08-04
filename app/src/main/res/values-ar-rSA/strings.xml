@@ -49,6 +49,7 @@
   <string name="string_kotlin_unused">لا يستخدم كوتلين</string>
   <string name="string_compose_used">يستخدم Jetpack Compose</string>
   <string name="string_compose_unused">لا يستخدم Jetpack Compose</string>
+  <string name="android_dist_label">Distribution</string>
   <string name="android_dist_source">المصدر</string>
   <string name="android_dist_title">إحصائيات توزيع إصدار الأندرويد</string>
   <string name="android_dist_subtitle_format">وقت التحديث: %s</string>
@@ -61,6 +62,9 @@
   <string name="settings_rate_us_summary">هذا يمكن أن يزيد شعبيته عند المزيد من الناس</string>
   <string name="settings_get_updates">الحصول على التحديث</string>
   <string name="settings_get_updates_summary">الحصول على أحدث إصدار أكثر استقراراً ومعبأ بالمميزات</string>
+  <string name="settings_get_updates_in_app">In-app</string>
+  <string name="settings_get_updates_in_app_chip_stable">Stable</string>
+  <string name="settings_get_updates_in_app_chip_ci">CI</string>
   <string name="about_info">يستخدم هذا التطبيق لعرض مكتبات الجهات الخارجية التي تستخدمها التطبيقات في جهازك.</string>
   <string name="toolbar_rate">تقييم</string>
   <string name="resource_declaration">جزء من الموارد في التطبيق يأتي من: </string>
@@ -175,6 +179,7 @@
   <string name="toast_cant_open_app">لا يمكن فتح هذا التطبيق</string>
   <string name="toast_cloud_rules_update_error">فشل تحديث قواعد السحابة. يرجى المحاولة مرة أخرى.</string>
   <string name="toast_not_enough_storage_space">لا توجد مساحة تخزين كافية</string>
+  <string name="toast_downloading_app">Download requested</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">حفظ نقطة الاستعادة الحالية</string>
   <string name="snapshot_current_timestamp">الطابع الزمني الحالي لنقطة الاستعادة</string>
