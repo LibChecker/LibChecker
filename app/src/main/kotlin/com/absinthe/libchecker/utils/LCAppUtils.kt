@@ -148,7 +148,7 @@ object LCAppUtils {
     format: String = "%s",
     highlightDiffColor: Int? = null
   ): CharSequence {
-    return if (diff.old != diff.new && !isNewOrDeleted) {
+    return if (diff.old != diff.new && diff.new != null && !isNewOrDeleted) {
       val oldString = format.format(diff.old)
       val newString = format.format(diff.new)
 

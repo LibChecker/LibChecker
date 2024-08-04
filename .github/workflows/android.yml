@@ -107,7 +107,7 @@ jobs:
         id: apk-info
         uses: zhaobozhen/apk-info-action@v1.1.3
         with:
-          apk-path: ${{ steps.apk-path.outputs.foss_path }}
+          apk-path: ${{ steps.apk-path.outputs.market_path }}
       - name: Upload mappings with App Center CLI
         if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
         # uses: zhaobozhen/AppCenter-Github-Action@1.0.1
@@ -133,6 +133,70 @@ jobs:
         run: |
           ESCAPED=`python3 -c 'import json,os,urllib.parse; print(urllib.parse.quote(json.dumps(os.environ["COMMIT_MESSAGE"])))'`
           curl -v "https://api.telegram.org/bot${BOT_TOKEN}/sendMediaGroup?chat_id=${CHANNEL_ID}&media=%5B%7B%22type%22%3A%22document%22%2C%20%22media%22%3A%22attach%3A%2F%2FmarketRelease%22%2C%22parse_mode%22%3A%22MarkdownV2%22%2C%22caption%22:${ESCAPED}%7D%5D" -F marketRelease="@$MARKET_FILE"
+      - name: Commit and push artifacts to assets repo
+        if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MARKET_FILE: ${{ github.workspace }}/${{ steps.apk-path.outputs.market_path }}
+        run: |
+            # Define the directory where your build artifacts are located
+            ARTIFACTS_DIR=${MARKET_FILE}
+    
+            # Define the target repository and branch
+            TARGET_REPO=LibChecker/assets
+            TARGET_BRANCH=ci
+
+            # Authenticate GitHub CLI
+            # echo $GITHUB_TOKEN | gh auth login --with-token
+    
+            # Clone the target repository
+            # gh repo clone $TARGET_REPO target-repo
+
+            #Locate the target repository
+            cd ~/Projects/assets
+    
+            # Create a new branch or checkout the existing branch
+            git fetch origin
+            git checkout -B $TARGET_BRANCH
+            git rebase origin $TARGET_BRANCH
+            git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git config --local user.name "github-actions[bot]"
+    
+            # Copy artifacts to the repository
+            cp -f $ARTIFACTS_DIR ./app-release.apk
+    
+            # Commit and push changes
+            git add app-release.apk
+            git commit -m "Add build artifacts"
+            git push origin $TARGET_BRANCH --force
+      - name: Create JSON file
+        if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
+        env:
+          MARKET_FILE: ${{ github.workspace }}/${{ steps.apk-path.outputs.market_path }}
+        run: |
+          cd ~/Projects/assets
+          git checkout main
+          git rebase origin main
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+          echo '{
+            "app": {
+              "version": "${{ steps.apk-info.outputs.version-name }}",
+              "versionCode": ${{steps.apk-info.outputs.version-code }},
+              "extra": {
+                "target": ${{steps.apk-info.outputs.target-sdk-version }},
+                "min": ${{steps.apk-info.outputs.min-sdk-version }},
+                "compile": ${{steps.apk-info.outputs.compile-sdk-version }},
+                "packageSize": ${{ steps.apk-info.outputs.file-size }}
+              },
+              "link": "https://jsdelivr.b-cdn.net/gh/LibChecker/assets@ci/app-release.apk"
+            }
+          }' > ci.json
+                
+          git add ci.json
+          git commit -m "Update ci.json"
+          git push origin main --force
 
   skipped:
     runs-on: self-hosted
