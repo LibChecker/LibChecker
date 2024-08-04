@@ -49,6 +49,7 @@
   <string name="string_kotlin_unused">Kotlin未使用</string>
   <string name="string_compose_used">Jetpack Compose使用済み</string>
   <string name="string_compose_unused">Jetpack Compose未使用</string>
+  <string name="android_dist_label">Distribution</string>
   <string name="android_dist_source">ソース</string>
   <string name="android_dist_title">Androidバージョン分布統計</string>
   <string name="android_dist_subtitle_format">更新時間：%s</string>
@@ -61,6 +62,9 @@
   <string name="settings_rate_us_summary">これにより、より多くの人々に見つけてもらえます</string>
   <string name="settings_get_updates">アップデートを入手</string>
   <string name="settings_get_updates_summary">より安定し、機能が充実した最新バージョンを入手してください</string>
+  <string name="settings_get_updates_in_app">In-app</string>
+  <string name="settings_get_updates_in_app_chip_stable">Stable</string>
+  <string name="settings_get_updates_in_app_chip_ci">CI</string>
   <string name="about_info">このアプリは、デバイス内のアプリケーションで使用されているサードパーティのライブラリを表示するために使用されます。</string>
   <string name="toolbar_rate">評価</string>
   <string name="resource_declaration">アプリケーションの一部のリソースは、以下から提供されています。</string>
@@ -175,6 +179,7 @@
   <string name="toast_cant_open_app">このアプリを開くことができません</string>
   <string name="toast_cloud_rules_update_error">クラウドルールの更新に失敗しました。再試行してください。</string>
   <string name="toast_not_enough_storage_space">ストレージスペースが不足しています</string>
+  <string name="toast_downloading_app">Download requested</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">現在のスナップショットを保存</string>
   <string name="snapshot_current_timestamp">現在のスナップショットのタイムスタンプ</string>
