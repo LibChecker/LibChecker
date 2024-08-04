@@ -62,7 +62,6 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           cache-encryption-key: Da25KUVSE5jbGds2zXmfXw==
-          validate-wrappers: true
       - name: Retrieve version
         run: |
           echo VERSION=$(echo ${{ github.event.head_commit.id }} | head -c 10) >> $GITHUB_ENV
