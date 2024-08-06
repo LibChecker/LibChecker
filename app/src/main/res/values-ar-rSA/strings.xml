@@ -53,6 +53,8 @@
   <string name="android_dist_source">المصدر</string>
   <string name="android_dist_title">إحصائيات توزيع إصدار الأندرويد</string>
   <string name="android_dist_subtitle_format">وقت التحديث: %s</string>
+  <string name="chart_abi_detailed">Detailed</string>
+  <string name="chart_abi_concise">Concise</string>
   <!--  About  -->
   <string name="settings_about">حول</string>
   <string name="settings_about_summary">هذا هو LibChecker!</string>
