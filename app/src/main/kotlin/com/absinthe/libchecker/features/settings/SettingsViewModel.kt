@@ -22,7 +22,10 @@ class SettingsViewModel : ViewModel() {
   val respStateFlow: SharedFlow<GetAppUpdateInfo?> = _respStateFlow.asSharedFlow()
 
   fun requestUpdate(isStableChannel: Boolean) = viewModelScope.launch(Dispatchers.IO) {
-    val resp = request.requestAppUpdateInfo(if (isStableChannel) "stable" else "ci")
+    var resp: GetAppUpdateInfo? = null
+    try {
+      resp = request.requestAppUpdateInfo(if (isStableChannel) "stable" else "ci")
+    } catch (_: Exception) { }
     Timber.d("requestUpdate: %s", resp)
     _respStateFlow.emit(resp)
   }
