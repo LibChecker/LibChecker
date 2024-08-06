@@ -190,6 +190,7 @@ class ShootService : LifecycleService() {
     showNotification()
 
     if (areNotificationsEnabled) {
+      builder.foregroundServiceBehavior = NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE
       notificationManager.notify(notificationIdShoot, builder.build())
     }
 

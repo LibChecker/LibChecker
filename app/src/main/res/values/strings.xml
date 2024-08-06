@@ -67,6 +67,9 @@
   <string name="settings_rate_us_summary">This can make us found by more people</string>
   <string name="settings_get_updates">Get Updates</string>
   <string name="settings_get_updates_summary">Get the latest version that is more stable and packed with features</string>
+  <string name="settings_get_updates_in_app">In-app</string>
+  <string name="settings_get_updates_in_app_chip_stable">Stable</string>
+  <string name="settings_get_updates_in_app_chip_ci">CI</string>
   <string name="about_info">This app is used to view the third-party libraries used by applications in your device.</string>
   <string name="toolbar_rate">Rate</string>
   <string name="resource_declaration">Part of the resources in the application comes from: </string>
@@ -188,6 +191,7 @@
   <string name="toast_cant_open_app">Can\'t open this app</string>
   <string name="toast_cloud_rules_update_error">Failed to update cloud rules. Please try again.</string>
   <string name="toast_not_enough_storage_space">Not enough storage space</string>
+  <string name="toast_downloading_app">Download requested</string>
 
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">Save current snapshot</string>

@@ -59,7 +59,7 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
 
   override fun convert(holder: BaseViewHolder, item: SnapshotDiffItem) {
     (holder.itemView as SnapshotItemView).container.apply {
-      setDrawStroke(cardMode == CardMode.DEMO)
+      setDrawStroke(cardMode == CardMode.DEMO || cardMode == CardMode.GET_APP_UPDATE)
       val packageInfo = runCatching {
         PackageUtils.getPackageInfo(item.packageName)
       }.getOrNull()
@@ -262,7 +262,7 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
       }
       abiInfo.text = builder
 
-      updateTime.isVisible = (GlobalValues.snapshotOptions and SnapshotOptions.SHOW_UPDATE_TIME) > 0
+      updateTime.isVisible = (GlobalValues.snapshotOptions and SnapshotOptions.SHOW_UPDATE_TIME) > 0 && cardMode != CardMode.GET_APP_UPDATE
       if (updateTime.isVisible) {
         val timeText = if (DateUtils.isTimestampToday(item.updateTime)) {
           formatterToday.format(item.updateTime)
@@ -283,6 +283,7 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
 
   enum class CardMode {
     NORMAL,
-    DEMO
+    DEMO,
+    GET_APP_UPDATE
   }
 }

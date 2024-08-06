@@ -11,4 +11,7 @@
   <item name="adapter_bottom_padding_id" type="id" />
 
   <item name="resource_transformed_id" type="id" />
+
+  <item name="in_app_update_chip_stable" type="id" />
+  <item name="in_app_update_chip_ci" type="id" />
 </resources>
