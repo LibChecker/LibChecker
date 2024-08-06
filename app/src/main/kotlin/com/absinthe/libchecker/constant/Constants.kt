@@ -102,6 +102,8 @@ object Constants {
 
   const val PP_FROM_CLOUD_RULES_UPDATE = "ruleDatabaseUpdate"
 
+  const val PREF_DETAILED_ABI_CHART = "detailedAbiChart"
+
   object Event {
     const val LAUNCH_ACTION = "Launch Action"
     const val SNAPSHOT_CLICK = "Snapshot Click"

@@ -1,0 +1,7 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_switch"
+        android:title=""
+        android:actionLayout="@layout/layout_abi_chart_switch"
+        android:showAsAction="always"/>
+</menu>
