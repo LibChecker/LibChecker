@@ -53,6 +53,8 @@
   <string name="android_dist_source">来源</string>
   <string name="android_dist_title">Android 版本分布统计</string>
   <string name="android_dist_subtitle_format">更新时间： %s</string>
+  <string name="chart_abi_detailed">详细</string>
+  <string name="chart_abi_concise">简洁</string>
   <!--  About  -->
   <string name="settings_about">关于</string>
   <string name="settings_about_summary">这里是 LibChecker!</string>
