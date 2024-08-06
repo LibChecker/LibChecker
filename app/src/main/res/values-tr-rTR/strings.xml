@@ -53,6 +53,8 @@
   <string name="android_dist_source">Kaynak</string>
   <string name="android_dist_title">Android Sürüm Dağılımı İstatistikleri</string>
   <string name="android_dist_subtitle_format">Güncelleme Zamanı: %s</string>
+  <string name="chart_abi_detailed">Detailed</string>
+  <string name="chart_abi_concise">Concise</string>
   <!--  About  -->
   <string name="settings_about">Hakkında</string>
   <string name="settings_about_summary">Bu LibChecker!</string>
