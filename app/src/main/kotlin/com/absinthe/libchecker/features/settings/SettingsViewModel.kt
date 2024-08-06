@@ -24,7 +24,7 @@ class SettingsViewModel : ViewModel() {
   fun requestUpdate(isStableChannel: Boolean) = viewModelScope.launch(Dispatchers.IO) {
     val resp = runCatching {
       request.requestAppUpdateInfo(if (isStableChannel) "stable" else "ci")
-    }.onFailure { Timber.d("requestUpdateFail: %s", it.stackTraceToString()) }
+    }.onFailure { Timber.e("requestUpdateFail: %s", it.stackTraceToString()) }
       .onSuccess { Timber.d("requestUpdateSuccess: %s", it) }
       .getOrNull()
     _respStateFlow.emit(resp)
