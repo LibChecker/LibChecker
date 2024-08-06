@@ -63,6 +63,8 @@ object GlobalValues {
 
   val isAnonymousAnalyticsEnabled: Boolean by SPDelegates(Constants.PREF_ANONYMOUS_ANALYTICS, true)
 
+  var isDetailedAbiChart: Boolean by SPDelegates(Constants.PREF_DETAILED_ABI_CHART, false)
+
   val season by unsafeLazy { DateUtils.getCurrentSeason() }
 
   var locale: Locale = Locale.getDefault()

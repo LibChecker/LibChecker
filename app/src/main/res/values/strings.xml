@@ -58,6 +58,9 @@
   <string name="android_dist_title">Android Version Distribution Statistics</string>
   <string name="android_dist_subtitle_format">Update Time: %s</string>
 
+  <string name="chart_abi_detailed">Detailed</string>
+  <string name="chart_abi_concise">Concise</string>
+
   <!--  About  -->
   <string name="settings_about">About</string>
   <string name="settings_about_summary">This is LibChecker!</string>
