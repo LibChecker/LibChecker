@@ -230,7 +230,7 @@ class DetailViewModel : ViewModel() {
       categoryDir += "/regex"
     }
     val libPath = if (type in listOf(SERVICE, ACTIVITY, RECEIVER, PROVIDER)) {
-       libName.replace(".", "/")
+      libName.replace(".", "/")
     } else {
       libName
     }
