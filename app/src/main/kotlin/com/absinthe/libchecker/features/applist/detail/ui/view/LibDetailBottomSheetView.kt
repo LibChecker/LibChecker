@@ -312,6 +312,7 @@ class LibDetailBottomSheetView(context: Context) :
         return@forEach
       }
     }
+    tabLayout.selectTab(tabLayout.getTabAt(libDetailBean.data.indexOf(ruleBean)))
     setContent(ruleBean)
   }
 
