@@ -21,6 +21,8 @@ import androidx.core.widget.TextViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
+import com.absinthe.libchecker.api.bean.LibDetailBean
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibDetailItemAdapter
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.node.LibDetailItem
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
@@ -100,19 +102,33 @@ class LibDetailBottomSheetView(context: Context) :
     }
   }
 
-  private val contentAdapter = LibDetailItemAdapter().apply {
-    addHeaderView(
-      TabLayout(context).apply {
-        layoutParams = TableLayout.LayoutParams(
-          LayoutParams.MATCH_PARENT,
-          LayoutParams.WRAP_CONTENT
-        )
-        setBackgroundColor(Color.TRANSPARENT)
-        tabMode = TabLayout.MODE_SCROLLABLE
-        // TODO: Replace with real data
-        addTab(newTab().setText(Locale("zh").displayLanguage))
-      }
+  private var lastSelectedTabPosition = -1
+  private val tabLayout = TabLayout(context).apply {
+    layoutParams = TableLayout.LayoutParams(
+      LayoutParams.MATCH_PARENT,
+      LayoutParams.WRAP_CONTENT
     )
+    tabMode = TabLayout.MODE_SCROLLABLE
+    setBackgroundColor(Color.TRANSPARENT)
+    addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+      override fun onTabSelected(tab: TabLayout.Tab?) {
+        tab?.let {
+          val libDetailData = libDetailBean?.data?.get(it.position) ?: return
+          if (lastSelectedTabPosition > 0) {
+            GlobalValues.preferredRuleLanguage = libDetailData.locale
+          }
+          lastSelectedTabPosition = it.position
+          setContent(libDetailData)
+        }
+      }
+
+      override fun onTabUnselected(tab: TabLayout.Tab?) {}
+      override fun onTabReselected(tab: TabLayout.Tab?) {}
+    })
+  }
+
+  private val contentAdapter = LibDetailItemAdapter().apply {
+    addHeaderView(tabLayout)
   }
 
   private val libDetailContentView = BottomSheetRecyclerView(context).apply {
@@ -198,7 +214,8 @@ class LibDetailBottomSheetView(context: Context) :
       children.forEach {
         it.autoMeasure()
       }
-      val textWidth = measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - tip.marginStart
+      val textWidth =
+        measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - tip.marginStart
       if (tip.measuredWidth > textWidth) {
         tip.measure(textWidth.toExactlyMeasureSpec(), tip.defaultHeightMeasureSpec(this))
       }
@@ -285,37 +302,56 @@ class LibDetailBottomSheetView(context: Context) :
     }
   }
 
-  fun setContent(label: String, devTeam: String, ruleContributors: String, description: String, sourceLink: String) {
+  private var libDetailBean: LibDetailBean? = null
+
+  fun setLibDetailBean(libDetailBean: LibDetailBean) {
+    this.libDetailBean = libDetailBean
+    libDetailBean.data.forEach {
+      tabLayout.addTab(tabLayout.newTab().setText(Locale.forLanguageTag(it.locale).displayName))
+    }
+
+    var index = 0
+    for (i in libDetailBean.data.indices) {
+      if (libDetailBean.data[i].locale == GlobalValues.preferredRuleLanguage) {
+        index = i
+        break
+      }
+    }
+    tabLayout.selectTab(tabLayout.getTabAt(index))
+    setContent(libDetailBean.data[index])
+  }
+
+  private fun setContent(ruleBean: LibDetailBean.Data) {
     val list = listOf(
       LibDetailItem(
         iconRes = R.drawable.ic_label,
         tipRes = R.string.lib_detail_label_tip,
         textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2),
-        text = label
+        text = ruleBean.data.label
       ),
       LibDetailItem(
         iconRes = R.drawable.ic_team,
         tipRes = R.string.lib_detail_develop_team_tip,
         textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2),
-        text = devTeam
+        text = ruleBean.data.dev_team
       ),
       LibDetailItem(
         iconRes = R.drawable.ic_github,
         tipRes = R.string.lib_detail_rule_contributors_tip,
         textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2),
-        text = ruleContributors
+        text = ruleBean.data.rule_contributors.joinToString(separator = ", ")
       ),
       LibDetailItem(
         iconRes = R.drawable.ic_content,
         tipRes = R.string.lib_detail_description_tip,
         textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBody2),
-        text = description
+        text = ruleBean.data.description
       ),
       LibDetailItem(
         iconRes = R.drawable.ic_url,
         tipRes = R.string.lib_detail_relative_link_tip,
         textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBody2),
-        text = sourceLink
+        text = "<a href='${ruleBean.data.source_link}'> ${ruleBean.data.source_link} </a>"
       )
     )
     contentAdapter.setList(list)

@@ -12,6 +12,7 @@ import com.absinthe.libchecker.features.snapshot.detail.bean.SnapshotDiffItem
 import com.absinthe.libchecker.features.snapshot.ui.adapter.SnapshotAdapter
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.view.app.IHeaderView
+import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.absinthe.libraries.utils.view.HeightAnimatableViewFlipper
 import com.airbnb.lottie.LottieAnimationView
@@ -88,7 +89,12 @@ class InAppUpdateDialogView(context: Context) :
     orientation = VERTICAL
     gravity = Gravity.CENTER_HORIZONTAL
     val padding = 16.dp
-    setPadding(padding, padding, padding, 0)
+    setPadding(
+      padding,
+      padding,
+      padding,
+      (padding - SystemBarManager.navigationBarSize).coerceAtLeast(0)
+    )
     addView(header)
     addView(toggleGroup)
     addView(viewFlipper)

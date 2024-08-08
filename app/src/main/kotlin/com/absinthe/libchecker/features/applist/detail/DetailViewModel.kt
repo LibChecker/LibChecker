@@ -216,7 +216,6 @@ class DetailViewModel : ViewModel() {
     @LibType type: Int,
     isRegex: Boolean = false
   ): LibDetailBean? {
-    Timber.d("requestLibDetail")
     var categoryDir = when (type) {
       NATIVE -> "native-libs"
       SERVICE -> "services-libs"
@@ -230,9 +229,15 @@ class DetailViewModel : ViewModel() {
     if (isRegex) {
       categoryDir += "/regex"
     }
+    val libPath = if (type in listOf(SERVICE, ACTIVITY, RECEIVER, PROVIDER, STATIC)) {
+      libName.replace(".", "/")
+    } else {
+      libName
+    }
+    Timber.d("requestLibDetail: categoryDir = $categoryDir, libPath = $libPath")
 
     return runCatching {
-      request.requestLibDetail(categoryDir, libName)
+      request.requestLibDetail(categoryDir, libPath)
     }.onFailure {
       Timber.e(it)
     }.getOrNull()
@@ -429,7 +434,7 @@ class DetailViewModel : ViewModel() {
       request.requestRepoInfo(owner, repo) ?: return null
     }.onFailure {
       if (it is HttpException) {
-        GlobalValues.isGitHubUnreachable = false
+        GlobalValues.isGitHubReachable = false
       }
     }.getOrNull() ?: return null
     val pushedAt = DateUtils.parseIso8601DateTime(result.pushedAt) ?: return null
