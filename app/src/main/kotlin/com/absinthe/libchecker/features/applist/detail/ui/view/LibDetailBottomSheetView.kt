@@ -102,6 +102,7 @@ class LibDetailBottomSheetView(context: Context) :
     }
   }
 
+  private var lastSelectedTabPosition = -1
   private val tabLayout = TabLayout(context).apply {
     layoutParams = TableLayout.LayoutParams(
       LayoutParams.MATCH_PARENT,
@@ -112,8 +113,12 @@ class LibDetailBottomSheetView(context: Context) :
     addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
       override fun onTabSelected(tab: TabLayout.Tab?) {
         tab?.let {
-          GlobalValues.preferredRuleLanguage = libDetailBean?.data?.get(it.position)?.locale ?: return
-          setContent(libDetailBean?.data?.get(it.position) ?: return)
+          val libDetailData = libDetailBean?.data?.get(it.position) ?: return
+          if (lastSelectedTabPosition > 0) {
+            GlobalValues.preferredRuleLanguage = libDetailData.locale
+          }
+          lastSelectedTabPosition = it.position
+          setContent(libDetailData)
         }
       }
 
@@ -305,15 +310,15 @@ class LibDetailBottomSheetView(context: Context) :
       tabLayout.addTab(tabLayout.newTab().setText(Locale.forLanguageTag(it.locale).displayName))
     }
 
-    var ruleBean = libDetailBean.data[0]
-    libDetailBean.data.forEach {
-      if (it.locale == GlobalValues.preferredRuleLanguage) {
-        ruleBean = it
-        return@forEach
+    var index = 0
+    for (i in libDetailBean.data.indices) {
+      if (libDetailBean.data[i].locale == GlobalValues.preferredRuleLanguage) {
+        index = i
+        break
       }
     }
-    tabLayout.selectTab(tabLayout.getTabAt(libDetailBean.data.indexOf(ruleBean)))
-    setContent(ruleBean)
+    tabLayout.selectTab(tabLayout.getTabAt(index))
+    setContent(libDetailBean.data[index])
   }
 
   private fun setContent(ruleBean: LibDetailBean.Data) {
