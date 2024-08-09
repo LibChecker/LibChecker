@@ -49,12 +49,12 @@
   <string name="string_kotlin_unused">Kotlin Kullanılmamış</string>
   <string name="string_compose_used">Jetpack Compose Kullanılmış</string>
   <string name="string_compose_unused">Jetpack Compose Kullanılmamış</string>
-  <string name="android_dist_label">Distribution</string>
+  <string name="android_dist_label">Dağıtım</string>
   <string name="android_dist_source">Kaynak</string>
   <string name="android_dist_title">Android Sürüm Dağılımı İstatistikleri</string>
   <string name="android_dist_subtitle_format">Güncelleme Zamanı: %s</string>
-  <string name="chart_abi_detailed">Detailed</string>
-  <string name="chart_abi_concise">Concise</string>
+  <string name="chart_abi_detailed">Detaylı</string>
+  <string name="chart_abi_concise">Kısa ve öz</string>
   <!--  About  -->
   <string name="settings_about">Hakkında</string>
   <string name="settings_about_summary">Bu LibChecker!</string>
@@ -64,8 +64,8 @@
   <string name="settings_rate_us_summary">Bu, daha fazla kişi tarafından bulunmamızı sağlayabilir</string>
   <string name="settings_get_updates">Güncellemeleri Alın</string>
   <string name="settings_get_updates_summary">Daha kararlı ve özelliklerle dolu en son sürümü edinin</string>
-  <string name="settings_get_updates_in_app">In-app</string>
-  <string name="settings_get_updates_in_app_chip_stable">Stable</string>
+  <string name="settings_get_updates_in_app">Uygulama içi</string>
+  <string name="settings_get_updates_in_app_chip_stable">Kararlı</string>
   <string name="settings_get_updates_in_app_chip_ci">CI</string>
   <string name="about_info">Bu uygulama, cihazınızdaki uygulamaların kullandığı üçüncü taraf kütüphaneleri görüntülemek için kullanılır.</string>
   <string name="toolbar_rate">Değerlendir</string>
@@ -181,7 +181,7 @@
   <string name="toast_cant_open_app">Bu uygulama açılamıyor</string>
   <string name="toast_cloud_rules_update_error">Bulut kuralları güncellenemedi. Lütfen tekrar deneyin.</string>
   <string name="toast_not_enough_storage_space">Yeterli depolama alanı yok</string>
-  <string name="toast_downloading_app">Download requested</string>
+  <string name="toast_downloading_app">İndirme talep edildi</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">Mevcut anlık görüntüyü kaydet</string>
   <string name="snapshot_current_timestamp">Mevcut Anlık Görüntü Zaman Damgası</string>
