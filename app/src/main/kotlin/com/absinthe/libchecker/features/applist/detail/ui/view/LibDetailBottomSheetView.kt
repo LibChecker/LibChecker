@@ -306,8 +306,10 @@ class LibDetailBottomSheetView(context: Context) :
 
   fun setLibDetailBean(libDetailBean: LibDetailBean) {
     this.libDetailBean = libDetailBean
-    libDetailBean.data.forEach {
-      tabLayout.addTab(tabLayout.newTab().setText(Locale.forLanguageTag(it.locale).displayName))
+    if (tabLayout.tabCount == 0) {
+      libDetailBean.data.forEach {
+        tabLayout.addTab(tabLayout.newTab().setText(Locale.forLanguageTag(it.locale).displayName))
+      }
     }
 
     var index = 0
