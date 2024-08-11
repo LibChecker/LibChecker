@@ -114,7 +114,7 @@ class LibDetailBottomSheetView(context: Context) :
       override fun onTabSelected(tab: TabLayout.Tab?) {
         tab?.let {
           val libDetailData = libDetailBean?.data?.get(it.position) ?: return
-          if (lastSelectedTabPosition > 0) {
+          if (lastSelectedTabPosition >= 0) {
             GlobalValues.preferredRuleLanguage = libDetailData.locale
           }
           lastSelectedTabPosition = it.position

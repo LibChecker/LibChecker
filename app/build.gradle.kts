@@ -123,7 +123,6 @@ dependencies {
   implementation(libs.appIconLoader)
   implementation(libs.appIconLoader.coil)
   implementation(libs.hiddenApiBypass)
-  implementation(libs.slf4j)
   implementation(libs.commons.compress)
   implementation(libs.flexbox)
 
