@@ -9,7 +9,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
 
-const val VERSION = 3
+const val VERSION = 4
 
 const val REPO_INFO = "Repo-Info"
 const val OWNER = "Owner"

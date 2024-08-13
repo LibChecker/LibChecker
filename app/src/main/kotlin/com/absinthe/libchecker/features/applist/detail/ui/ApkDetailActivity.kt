@@ -82,7 +82,13 @@ class ApkDetailActivity :
 
     lifecycleScope.launch(Dispatchers.IO) {
       tempFile = File(externalCacheDir, Constants.TEMP_PACKAGE).also { tf ->
-        contentResolver.openInputStream(uri)?.use { inputStream ->
+        val inputStream = runCatching { contentResolver.openInputStream(uri) }.getOrNull() ?: run {
+          dialog.dismiss()
+          showToast(R.string.toast_use_another_file_manager)
+          finish()
+          return@launch
+        }
+        inputStream.use {
           val fileSize = inputStream.available()
           val freeSize = Environment.getExternalStorageDirectory().freeSpace
           Timber.d("fileSize=$fileSize, freeSize=$freeSize")
