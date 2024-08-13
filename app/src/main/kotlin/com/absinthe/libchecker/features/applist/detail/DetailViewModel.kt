@@ -500,8 +500,9 @@ class DetailViewModel : ViewModel() {
   }
 
   fun initAbiInfo(packageInfo: PackageInfo, apkAnalyticsMode: Boolean) = viewModelScope.launch(Dispatchers.IO) {
+    val source = runCatching { packageInfo.applicationInfo?.sourceDir }.getOrNull() ?: return@launch
     val abiSet = PackageUtils.getAbiSet(
-      file = File(packageInfo.applicationInfo!!.sourceDir),
+      file = File(source),
       packageInfo = packageInfo,
       isApk = apkAnalyticsMode,
       ignoreArch = true
