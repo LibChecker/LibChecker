@@ -4,6 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.features.chart.impl.MarketDistributionChartDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -21,8 +22,23 @@ class ChartViewModel : ViewModel() {
   private val _distributionLastUpdateTime = MutableStateFlow("")
   val distributionLastUpdateTime = _distributionLastUpdateTime.asStateFlow()
 
+  private val _detailAbiSwitch = MutableStateFlow(GlobalValues.isDetailedAbiChart)
+  val detailAbiSwitch = _detailAbiSwitch.asStateFlow()
+
+  private val _detailAbiSwitchVisibility = MutableStateFlow(true)
+  val detailAbiSwitchVisibility = _detailAbiSwitchVisibility.asStateFlow()
+
   fun setLoading(loading: Boolean) {
     _isLoading.value = loading
+  }
+
+  fun setDetailAbiSwitch(isDetailedAbiChart: Boolean) {
+    GlobalValues.isDetailedAbiChart = isDetailedAbiChart
+    _detailAbiSwitch.value = isDetailedAbiChart
+  }
+
+  fun setDetailAbiSwitchVisibility(isVisible: Boolean) {
+    _detailAbiSwitchVisibility.value = isVisible
   }
 
   fun <T : View> applyChartData(

@@ -59,10 +59,6 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
-  private fun List<String>.toContributorsString(): String {
-    return this.joinToString(separator = ", ")
-  }
-
   override fun onStart() {
     super.onStart()
     if (!isValidLib) {
@@ -79,18 +75,13 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
         if (detail != null) {
           root.apply {
             withContext(Dispatchers.Main) {
-              setContent(
-                detail.label,
-                detail.team,
-                detail.contributors.toContributorsString(),
-                detail.description,
-                "<a href='${detail.relativeUrl}'> ${detail.relativeUrl} </a>"
-              )
+              setLibDetailBean(detail)
               showContent()
             }
 
-            if (detail.relativeUrl.startsWith(URLManager.GITHUB_HOST) && GlobalValues.isGitHubUnreachable) {
-              val splits = detail.relativeUrl.removePrefix(URLManager.GITHUB_HOST).split("/")
+            val sourceLink = detail.data[0].data.source_link
+            if (sourceLink.startsWith(URLManager.GITHUB_HOST) && GlobalValues.isGitHubReachable) {
+              val splits = sourceLink.removePrefix(URLManager.GITHUB_HOST).split("/")
               if (splits.size < 2) {
                 return@launch
               }

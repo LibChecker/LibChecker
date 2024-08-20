@@ -11,7 +11,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
 private const val BRANCH_MASTER = "master"
-private const val WORKING_BRANCH = BRANCH_MASTER
+private const val WORKING_BRANCH = "v4"
 
 object ApiManager {
 

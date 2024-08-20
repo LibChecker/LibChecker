@@ -26,6 +26,7 @@ import com.absinthe.libchecker.features.chart.IntegerFormatter
 import com.absinthe.libchecker.features.chart.impl.AABChartDataSource
 import com.absinthe.libchecker.features.chart.impl.ABIChartDataSource
 import com.absinthe.libchecker.features.chart.impl.CompileApiChartDataSource
+import com.absinthe.libchecker.features.chart.impl.DetailedABIChartDataSource
 import com.absinthe.libchecker.features.chart.impl.JetpackComposeChartDataSource
 import com.absinthe.libchecker.features.chart.impl.KotlinChartDataSource
 import com.absinthe.libchecker.features.chart.impl.MarketDistributionChartDataSource
@@ -172,6 +173,15 @@ class ChartFragment :
         }
       }
     }
+    lifecycleScope.launch {
+      lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewModel.detailAbiSwitch.collect {
+          if (currentChartType == ChartType.ABI && this@ChartFragment::allLCItemsStateFlow.isInitialized) {
+            setData(allLCItemsStateFlow.value)
+          }
+        }
+      }
+    }
 
     GlobalValues.preferencesFlow.onEach {
       if (it.first == Constants.PREF_SHOW_SYSTEM_APPS) {
@@ -183,13 +193,20 @@ class ChartFragment :
   private fun setData(items: List<LCItem>, chartType: ChartType = currentChartType) {
     context ?: return
     viewModel.setLoading(true)
+    viewModel.setDetailAbiSwitchVisibility(chartType == ChartType.ABI)
     if (chartView.parent != null) {
       binding.root.removeView(chartView)
     }
     currentChartType = chartType
 
     when (chartType) {
-      ChartType.ABI -> setChartData(::generatePieChartView) { ABIChartDataSource(items) }
+      ChartType.ABI -> {
+        if (GlobalValues.isDetailedAbiChart) {
+          setChartData(::generateBarChartView) { DetailedABIChartDataSource(items) }
+        } else {
+          setChartData(::generatePieChartView) { ABIChartDataSource(items) }
+        }
+      }
       ChartType.KOTLIN -> setChartData(::generatePieChartView) { KotlinChartDataSource(items) }
       ChartType.TARGET_SDK -> setChartData(::generateBarChartView) { TargetApiChartDataSource(items) }
       ChartType.MIN_SDK -> setChartData(::generateBarChartView) { MinApiChartDataSource(items) }

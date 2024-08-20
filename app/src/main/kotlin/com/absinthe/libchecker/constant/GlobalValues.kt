@@ -63,6 +63,10 @@ object GlobalValues {
 
   val isAnonymousAnalyticsEnabled: Boolean by SPDelegates(Constants.PREF_ANONYMOUS_ANALYTICS, true)
 
+  var isDetailedAbiChart: Boolean by SPDelegates(Constants.PREF_DETAILED_ABI_CHART, false)
+
+  var preferredRuleLanguage: String by SPDelegates(Constants.PREF_RULE_LANGUAGE, "zh-Hans")
+
   val season by unsafeLazy { DateUtils.getCurrentSeason() }
 
   var locale: Locale = Locale.getDefault()
@@ -90,7 +94,7 @@ object GlobalValues {
 
   var uuid: String by SPDelegates(Constants.PREF_UUID, String())
 
-  var isGitHubUnreachable = true
+  var isGitHubReachable = true
 
   var trackItemsChanged = false
 }
