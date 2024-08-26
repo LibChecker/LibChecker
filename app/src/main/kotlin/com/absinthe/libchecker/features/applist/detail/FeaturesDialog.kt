@@ -138,6 +138,16 @@ object FeaturesDialog {
     }
   }
 
+  fun show16KBAlignDialog(context: Context) {
+    commonShowDialogImpl(
+      context,
+      R.drawable.ic_16kb_align,
+      R.string.lib_detail_dialog_title_16kb_page_size,
+      R.string.lib_detail_dialog_content_16kb_page_size,
+      version = null
+    )
+  }
+
   private fun commonShowDialogImpl(
     context: Context,
     icon: Drawable,

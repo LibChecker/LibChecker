@@ -39,6 +39,7 @@ import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.elf.ELFParser
 import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libchecker.utils.manifest.HiddenPermissionsReader
 import com.absinthe.libchecker.utils.manifest.ManifestReader
@@ -748,3 +749,24 @@ val ABI_STRING_RES_MAP = arrayMapOf(
   RISCV64 + MULTI_ARCH to listOf(R.string.riscv64, R.string.multiArch),
   RISCV32 + MULTI_ARCH to listOf(R.string.riscv32, R.string.multiArch)
 )
+
+fun PackageInfo.getElfPageSize(): Int {
+  val defaultSize = 4096
+  val sourceDir = applicationInfo?.sourceDir ?: return defaultSize
+  val file = File(sourceDir)
+  if (file.exists().not()) {
+    return defaultSize
+  }
+  return runCatching {
+    ZipFileCompat(file).use { zipFile ->
+      val zipEntry = zipFile.getZipEntries()
+        .asSequence()
+        .firstOrNull { it.isDirectory.not() && it.name.endsWith(".so") }
+        ?: return defaultSize
+      val elfParser = runCatching { ELFParser(zipFile.getInputStream(zipEntry)) }.getOrNull()
+      return elfParser?.getPageSize()?.toInt() ?: defaultSize
+    }
+  }.onFailure {
+    Timber.e(it)
+  }.getOrElse { defaultSize }
+}
