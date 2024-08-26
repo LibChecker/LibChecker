@@ -53,6 +53,8 @@
   <string name="android_dist_source">Источник</string>
   <string name="android_dist_title">Статистика распределения версий Android</string>
   <string name="android_dist_subtitle_format">Время обновления %s</string>
+  <string name="chart_abi_detailed">Detailed</string>
+  <string name="chart_abi_concise">Concise</string>
   <!--  About  -->
   <string name="settings_about">О приложении</string>
   <string name="settings_about_summary">Это LibChecker!</string>
@@ -62,6 +64,9 @@
   <string name="settings_rate_us_summary">Это может сделать нас доступнее для большего числа людей</string>
   <string name="settings_get_updates">Обновления</string>
   <string name="settings_get_updates_summary">Получить последнюю версию, которая является более стабильной и имеет больше функционала</string>
+  <string name="settings_get_updates_in_app">In-app</string>
+  <string name="settings_get_updates_in_app_chip_stable">Stable</string>
+  <string name="settings_get_updates_in_app_chip_ci">CI</string>
   <string name="about_info">Это приложение используется для просмотра сторонних библиотек, используемых приложениями на вашем устройстве.</string>
   <string name="toolbar_rate">Оценка</string>
   <string name="resource_declaration">Часть ресурсов в приложении поступает из: </string>
@@ -119,6 +124,8 @@
   <string name="jetpack_compose_details">Jetpack Compose - это современный набор инструментов для создания нативных пользовательских интерфейсов в Android. Он упрощает и ускоряет разработку пользовательского интерфейса на Android. Вы сможете быстро воплотить в жизнь свое приложение благодаря меньшему количеству кода, мощным инструментам и интуитивно понятным API-интерфейсам Kotlin.</string>
   <string name="extract_native_libs_tip">Приложение декларирует </string>
   <string name="xml_detail">XML Деталь</string>
+  <string name="lib_detail_dialog_title_16kb_page_size">16 KB Page Size</string>
+  <string name="lib_detail_dialog_content_16kb_page_size">Historically, Android has only supported 4 KB memory page sizes, which has optimized system memory performance for the average amount of total memory that Android devices have typically had. Beginning with Android 15, AOSP supports devices that are configured to use a page size of 16 KB (16 KB devices). If your app uses any NDK libraries, either directly or indirectly through an SDK, then you will need to rebuild your app for it to work on these 16 KB devices.</string>
   <string name="format_last_updated">Обновлено: %s</string>
   <string name="menu_process">Приложение</string>
   <string name="menu_split">Разделение</string>
@@ -176,6 +183,7 @@
   <string name="toast_cant_open_app">«Невозможно открыть это приложение»</string>
   <string name="toast_cloud_rules_update_error">Не удалось обновить облачные правила. Пожалуйста, попробуйте еще раз.</string>
   <string name="toast_not_enough_storage_space">Недостаточно места</string>
+  <string name="toast_downloading_app">Download requested</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">Сохранить текущий снимок</string>
   <string name="snapshot_current_timestamp">Отметка времени текущего снимка</string>
