@@ -2,134 +2,160 @@ package com.absinthe.libchecker.utils.elf
 
 import com.absinthe.libchecker.annotation.ET_NOT_ELF
 import java.io.InputStream
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 class ELFParser(inputStream: InputStream) {
 
-  val e_ident = ByteArray(EI_NIDENT)
-  lateinit var e_type: ByteArray
-  lateinit var e_machine: ByteArray
-  lateinit var e_version: ByteArray
-  lateinit var e_entry: ByteArray
-  lateinit var e_phoff: ByteArray
-  lateinit var e_shoff: ByteArray
-  lateinit var e_flags: ByteArray
-  lateinit var e_ehsize: ByteArray
-  lateinit var e_phentsize: ByteArray
-  lateinit var e_phnum: ByteArray
-  lateinit var e_shentsize: ByteArray
-  lateinit var e_shnum: ByteArray
-  lateinit var e_shstrndx: ByteArray
-
-  private lateinit var e_ident_entity: EIdent
+  lateinit var e_ident: EIdent
+  var e_type: Short = 0
+  var e_machine: Short = 0
+  var e_version: Int = 0
+  var e_entry: Long = 0
+  var e_phoff: Long = 0
+  var e_shoff: Long = 0
+  var e_flags: Int = 0
+  var e_ehsize: Short = 0
+  var e_phentsize: Short = 0
+  var e_phnum: Short = 0
+  var e_shentsize: Short = 0
+  var e_shnum: Short = 0
+  var e_shstrndx: Short = 0
+  val programHeaders: MutableList<ProgramHeader> = mutableListOf()
 
   init {
     parse(inputStream)
   }
 
   fun isElf(): Boolean {
-    return e_ident[0].toInt() == 0x7F &&
-      e_ident[1].toInt().toChar() == 'E' &&
-      e_ident[2].toInt().toChar() == 'L' &&
-      e_ident[3].toInt().toChar() == 'F'
+    return e_ident.EI_MAG0 == 0x7F.toByte() &&
+      e_ident.EI_MAG1.toInt().toChar() == 'E' &&
+      e_ident.EI_MAG2.toInt().toChar() == 'L' &&
+      e_ident.EI_MAG3.toInt().toChar() == 'F'
   }
 
   fun getEType(): Int {
-    if (!isElf() || !this::e_type.isInitialized) {
+    if (!isElf()) {
       return ET_NOT_ELF
     }
-    return e_type[0].toInt()
+    return e_type.toInt()
   }
 
   fun getEClass(): Int {
-    if (!isElf() || !this::e_ident_entity.isInitialized) {
+    if (!isElf()) {
       return ET_NOT_ELF
     }
-    return e_ident_entity.EI_CLASS[0].toInt()
+    return e_ident.EI_CLASS.toInt()
+  }
+
+  fun getPageSize(): Long {
+    return programHeaders.find { it.p_type == ProgramHeader.PT_LOAD }?.p_align ?: 4096
   }
 
   private fun parse(inputStream: InputStream) {
     inputStream.use {
-      it.read(e_ident)
-      e_ident_entity = EIdent(e_ident)
+      val e_ident_array = ByteArray(EI_NIDENT)
+      it.read(e_ident_array)
+      e_ident = EIdent(e_ident_array)
 
-      if (e_ident_entity.EI_CLASS[0].toInt() == EIdent.ELFCLASS32) {
-        e_type = ByteArray(ELF32_HALF)
-        e_machine = ByteArray(ELF32_HALF)
-        e_version = ByteArray(ELF32_WORD)
-        e_entry = ByteArray(ELF32_ADDR)
-        e_phoff = ByteArray(ELF32_OFF)
-        e_shoff = ByteArray(ELF32_OFF)
-        e_flags = ByteArray(ELF32_WORD)
-        e_ehsize = ByteArray(ELF32_HALF)
-        e_phentsize = ByteArray(ELF32_HALF)
-        e_phnum = ByteArray(ELF32_HALF)
-        e_shentsize = ByteArray(ELF32_HALF)
-        e_shnum = ByteArray(ELF32_HALF)
-        e_shstrndx = ByteArray(ELF32_HALF)
-      } else if (e_ident_entity.EI_CLASS[0].toInt() == EIdent.ELFCLASS64) {
-        e_type = ByteArray(ELF64_HALF)
-        e_machine = ByteArray(ELF64_HALF)
-        e_version = ByteArray(ELF64_WORD)
-        e_entry = ByteArray(ELF64_ADDR)
-        e_phoff = ByteArray(ELF64_OFF)
-        e_shoff = ByteArray(ELF64_OFF)
-        e_flags = ByteArray(ELF64_WORD)
-        e_ehsize = ByteArray(ELF64_HALF)
-        e_phentsize = ByteArray(ELF64_HALF)
-        e_phnum = ByteArray(ELF64_HALF)
-        e_shentsize = ByteArray(ELF64_HALF)
-        e_shnum = ByteArray(ELF64_HALF)
-        e_shstrndx = ByteArray(ELF64_HALF)
-      } else {
-        return@use
+      val ehSize = when (getEClass()) {
+        EIdent.ELFCLASS32 -> 52 - EI_NIDENT // 32-bit ELF header size
+        EIdent.ELFCLASS64 -> 64 - EI_NIDENT // 64-bit ELF header size
+        else -> return@use
       }
-      it.read(e_type)
-      it.read(e_machine)
-      it.read(e_version)
-      it.read(e_entry)
-      it.read(e_phoff)
-      it.read(e_shoff)
-      it.read(e_flags)
-      it.read(e_ehsize)
-      it.read(e_phentsize)
-      it.read(e_phnum)
-      it.read(e_shentsize)
-      it.read(e_shnum)
-      it.read(e_shstrndx)
+      val buffer = ByteBuffer.allocate(ehSize).order(ByteOrder.LITTLE_ENDIAN)
+      it.read(buffer.array())
+
+      when (getEClass()) {
+        EIdent.ELFCLASS32 -> {
+          e_type = buffer.short
+          e_machine = buffer.short
+          e_version = buffer.int
+          e_entry = buffer.int.toLong() and 0xFFFFFFFFL
+          e_phoff = buffer.int.toLong() and 0xFFFFFFFFL
+          e_shoff = buffer.int.toLong() and 0xFFFFFFFFL
+          e_flags = buffer.int
+          e_ehsize = buffer.short
+          e_phentsize = buffer.short
+          e_phnum = buffer.short
+          e_shentsize = buffer.short
+          e_shnum = buffer.short
+          e_shstrndx = buffer.short
+        }
+
+        EIdent.ELFCLASS64 -> {
+          e_type = buffer.short
+          e_machine = buffer.short
+          e_version = buffer.int
+          e_entry = buffer.long
+          e_phoff = buffer.long
+          e_shoff = buffer.long
+          e_flags = buffer.int
+          e_ehsize = buffer.short
+          e_phentsize = buffer.short
+          e_phnum = buffer.short
+          e_shentsize = buffer.short
+          e_shnum = buffer.short
+          e_shstrndx = buffer.short
+        }
+
+        else -> {
+          return@use
+        }
+      }
+
+      // Program Headers
+      if (e_phoff > 0 && e_phnum > 0) {
+        for (i in 0 until e_phnum) {
+          val phBuffer = ByteBuffer.allocate(e_phentsize.toInt()).order(ByteOrder.LITTLE_ENDIAN)
+          phBuffer.order(ByteOrder.LITTLE_ENDIAN)
+          it.read(phBuffer.array())
+
+          val programHeader = if (getEClass() == EIdent.ELFCLASS32) {
+            ProgramHeader(
+              p_type = phBuffer.int,
+              p_offset = phBuffer.int.toLong() and 0xFFFFFFFFL,
+              p_vaddr = phBuffer.int.toLong() and 0xFFFFFFFFL,
+              p_paddr = phBuffer.int.toLong() and 0xFFFFFFFFL,
+              p_filesz = phBuffer.int.toLong() and 0xFFFFFFFFL,
+              p_memsz = phBuffer.int.toLong() and 0xFFFFFFFFL,
+              p_flags = phBuffer.int,
+              p_align = phBuffer.int.toLong() and 0xFFFFFFFFL
+            )
+          } else {
+            ProgramHeader(
+              p_type = phBuffer.int,
+              p_flags = phBuffer.int,
+              p_offset = phBuffer.long,
+              p_vaddr = phBuffer.long,
+              p_paddr = phBuffer.long,
+              p_filesz = phBuffer.long,
+              p_memsz = phBuffer.long,
+              p_align = phBuffer.long
+            )
+          }
+          programHeaders.add(programHeader)
+        }
+      }
     }
   }
 
-  class EIdent(array: ByteArray) {
-    val EI_MAG0 = ByteArray(1)
-    val EI_MAG1 = ByteArray(1)
-    val EI_MAG2 = ByteArray(1)
-    val EI_MAG3 = ByteArray(1)
-    val EI_CLASS = ByteArray(1)
-    val EI_DATA = ByteArray(1)
-    val EI_VERSION = ByteArray(1)
-    val EI_OSABI = ByteArray(1)
-    val EI_ABIVERSION = ByteArray(1)
-    val EI_PAD = ByteArray(6)
-    val EI_NIDENT = ByteArray(1)
+  override fun toString(): String {
+    return "ELFParser(e_ident=$e_ident, e_type=$e_type, e_machine=$e_machine, e_version=$e_version, e_entry=$e_entry, e_phoff=$e_phoff, e_shoff=$e_shoff, e_flags=$e_flags, e_ehsize=$e_ehsize, e_phentsize=$e_phentsize, e_phnum=$e_phnum, e_shentsize=$e_shentsize, e_shnum=$e_shnum, e_shstrndx=$e_shstrndx, programHeaders=$programHeaders)"
+  }
 
-    init {
-      EI_MAG0[0] = array[0]
-      EI_MAG1[0] = array[1]
-      EI_MAG2[0] = array[2]
-      EI_MAG3[0] = array[3]
-      EI_CLASS[0] = array[4]
-      EI_DATA[0] = array[5]
-      EI_VERSION[0] = array[6]
-      EI_OSABI[0] = array[7]
-      EI_ABIVERSION[0] = array[8]
-      EI_PAD[0] = array[9]
-      EI_PAD[1] = array[10]
-      EI_PAD[2] = array[11]
-      EI_PAD[3] = array[12]
-      EI_PAD[4] = array[13]
-      EI_PAD[5] = array[14]
-      EI_NIDENT[0] = array[15]
-    }
+  class EIdent(array: ByteArray) {
+    val EI_MAG0 = array[0]
+    val EI_MAG1 = array[1]
+    val EI_MAG2 = array[2]
+    val EI_MAG3 = array[3]
+    val EI_CLASS = array[4]
+    val EI_DATA = array[5]
+    val EI_VERSION = array[6]
+    val EI_OSABI = array[7]
+    val EI_ABIVERSION = array[8]
+    val EI_PAD = array.sliceArray(9..14)
+    val EI_NIDENT = array[15]
 
     companion object {
       const val ELFCLASSNONE = 0
@@ -138,34 +164,35 @@ class ELFParser(inputStream: InputStream) {
     }
   }
 
+  data class ProgramHeader(
+    val p_type: Int,
+    val p_offset: Long,
+    val p_vaddr: Long,
+    val p_paddr: Long,
+    val p_filesz: Long,
+    val p_memsz: Long,
+    val p_flags: Int,
+    val p_align: Long
+  ) {
+    companion object {
+      const val PT_LOAD = 1
+    }
+  }
+
   companion object {
-    // See also: https://docs.oracle.com/cd/E19683-01/816-1386/chapter6-43405/index.html
-    // e_type
-    private const val ET_NONE = 0
-    private const val ET_REL = 1
-    private const val ET_EXEC = 2
-    private const val ET_DYN = 3
-    private const val ET_CORE = 4
-    private const val ET_LOPROC = 0xff00
-    private const val ET_HIPROC = 0xffff
-
     private const val EI_NIDENT = 16
-    private const val UNSIGNED_CHAR = 1
 
-    // elf32 offset
+    // ELF32 constants
     private const val ELF32_ADDR = 4
     private const val ELF32_HALF = 2
     private const val ELF32_OFF = 4
-    private const val ELF32_SWORD = 4
     private const val ELF32_WORD = 4
 
-    // elf64 offset
+    // ELF64 constants
     private const val ELF64_ADDR = 8
     private const val ELF64_HALF = 2
     private const val ELF64_OFF = 8
-    private const val ELF64_SWORD = 4
     private const val ELF64_WORD = 4
     private const val ELF64_XWORD = 8
-    private const val ELF64_SXWORD = 8
   }
 }

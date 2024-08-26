@@ -37,6 +37,7 @@ import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.getAGPVersion
+import com.absinthe.libchecker.utils.extensions.getElfPageSize
 import com.absinthe.libchecker.utils.extensions.getFeatures
 import com.absinthe.libchecker.utils.extensions.getJetpackComposeVersion
 import com.absinthe.libchecker.utils.extensions.getKotlinPluginInfo
@@ -496,6 +497,10 @@ class DetailViewModel : ViewModel() {
           _featuresFlow.emit(VersionedFeature(Features.Ext.APPLICATION_INSTALL_SOURCE, info.initiatingPackageName))
         }
       }
+    }
+
+    if (packageInfo.getElfPageSize() == 0x4000) {
+      _featuresFlow.emit(VersionedFeature(Features.Ext.ELF_PAGE_SIZE_16KB))
     }
   }
 
