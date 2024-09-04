@@ -1,0 +1,26 @@
+- Compatible with Android 15
+- Supports detection of applications with 16 KB memory alignment
+- Supports analysis of XAPK installation packages
+- Supports displaying whether an application is APEX
+- Supports detection of applications supporting MIPS and RISC-V architectures
+- Supports multilingual library details information and adds an English option
+- FOSS version supports in-app update checks
+- Added an option to show Compile SDK in the advanced menu of the app list
+- The complete size of Split APKs is now displayed on the app details page
+- For supported applications, the Gradle version and Java compatibility version at compile time are additionally displayed in the Kotlin badge popup
+- Updated the style of the chart page, now for pie charts, data items are additionally displayed in a list, and the style of the data type switch button is updated
+- Added Compile SDK and AAB statistics types in charts, and added a detailed mode for ABI statistics
+- Long press "Launch" in the app details page to copy the app's launcher Activity information to the clipboard
+- Enabled system-level single app language switching support on Android 13 and above and hid the option on the app settings page
+- Added a debugging feature, now entering `/dumpAppsInfoTxt` or `/dumpAppsInfoMd` in the search box of the app list will save the basic information of all apps as a file
+- Updated UI layout for landscape mode
+- Optimized some UI performances
+- Optimized the method of detecting Jetpack Compose
+- Optimized the judgment of pre-installed applications
+- Fixed issues with the app properties page being disordered
+- Fixed issues with the divider lines on the app details page
+- Fixed issues where the alternative launch method page was empty in some cases
+- Fixed issues with Activity embedding not working on Android 12 and above
+- Fixed issues with viewing signature information failing during APK analysis
+
+* Note: Due to Microsoft App Center's upcoming service termination, we may migrate the telemetry platform to Firebase in future versions.
