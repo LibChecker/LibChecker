@@ -172,7 +172,7 @@ class SnapshotTitleView(
       measuredWidth - paddingStart - paddingEnd - iconView.measuredWidth - appNameView.marginStart
     if (appNameView.measuredWidth > textWidth) {
       appNameView.measure(
-        (textWidth - apisView.measuredWidth - appNameView.marginEnd).toExactlyMeasureSpec(),
+        textWidth.toExactlyMeasureSpec(),
         appNameView.defaultHeightMeasureSpec(this)
       )
     }
