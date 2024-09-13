@@ -66,16 +66,6 @@ class SettingsFragment :
   override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
     setPreferencesFromResource(R.xml.settings, null)
 
-    findPreference<TwoStatePreference>(Constants.PREF_SHOW_SYSTEM_APPS)?.apply {
-      setOnPreferenceChangeListener { pref, newValue ->
-        emitPrefChange(pref.key, newValue)
-        Analytics.trackEvent(
-          Constants.Event.SETTINGS,
-          EventProperties().set("PREF_SHOW_SYSTEM_APPS", newValue as Boolean)
-        )
-        true
-      }
-    }
     findPreference<TwoStatePreference>(Constants.PREF_APK_ANALYTICS)?.apply {
       setOnPreferenceChangeListener { _, newValue ->
         val flag = if (newValue as Boolean) {

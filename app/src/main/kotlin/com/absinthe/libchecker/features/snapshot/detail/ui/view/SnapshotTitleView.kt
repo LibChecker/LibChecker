@@ -11,7 +11,6 @@ import androidx.core.text.buildSpannedString
 import androidx.core.text.scale
 import androidx.core.view.children
 import androidx.core.view.isVisible
-import androidx.core.view.marginEnd
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.features.snapshot.detail.bean.SnapshotDiffItem
