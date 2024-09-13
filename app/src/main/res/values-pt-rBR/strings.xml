@@ -49,8 +49,15 @@
   <string name="string_kotlin_unused">Kotlin não usado</string>
   <string name="string_compose_used">Compor Jetpack usado</string>
   <string name="string_compose_unused">Compor Jetpack não utilizado</string>
+  <string name="android_dist_label">Distribuição</string>
+  <string name="android_dist_source">Fonte</string>
+  <string name="android_dist_title">Estatísticas de Distribuição de Versão Android</string>
+  <string name="android_dist_subtitle_format">Tempo de atualização: %s</string>
+  <string name="chart_abi_detailed">Detalhado</string>
+  <string name="chart_abi_concise">Conciso</string>
   <!--  About  -->
   <string name="settings_about">Sobre</string>
+  <string name="settings_about_summary">Isto é LibChecker!</string>
   <string name="settings_translate">Participar na tradução</string>
   <string name="settings_translate_summary">Ajude-nos a traduzir este app</string>
   <string name="settings_rate_us">Avalie-nos</string>

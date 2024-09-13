@@ -5,7 +5,7 @@ import java.io.File
 import java.time.Instant
 import org.gradle.api.Project
 
-const val baseVersionName = "2.5.0"
+const val baseVersionName = "2.5.1"
 val Project.verName: String get() = "${baseVersionName}${versionNameSuffix}.${exec("git rev-parse --short HEAD")}"
 val Project.verCode: Int get() = exec("git rev-list --count HEAD").toInt()
 val Project.isDevVersion: Boolean get() = exec("git tag -l $baseVersionName").isEmpty()

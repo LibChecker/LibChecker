@@ -229,10 +229,8 @@ object PackageUtils {
     childDir: String,
     source: String? = null
   ): List<LibStringItem> {
-    if (packageInfo.applicationInfo?.sourceDir == null) {
-      return emptyList()
-    }
-    val file = File(packageInfo.applicationInfo!!.sourceDir)
+    val sourceDir = packageInfo.applicationInfo?.sourceDir ?: return emptyList()
+    val file = File(sourceDir)
     if (file.exists().not()) {
       return emptyList()
     }

@@ -124,6 +124,8 @@
   <string name="jetpack_compose_details">Jetpack Compose, Android\'in yerel kullanıcı arayüzü oluşturmak için modern araç setidir. Android\'de kullanıcı arayüzü geliştirmeyi basitleştirir ve hızlandırır. Daha az kod, güçlü araçlar ve sezgisel Kotlin API\'leri ile uygulamanızı hızlıca hayata geçirin.</string>
   <string name="extract_native_libs_tip">Uygulama şunu beyan eder: </string>
   <string name="xml_detail">XML Ayrıntısı</string>
+  <string name="lib_detail_dialog_title_16kb_page_size">16 KB Sayfa Boyutu</string>
+  <string name="lib_detail_dialog_content_16kb_page_size">Tarihsel olarak, Android yalnızca 4 KB bellek sayfa boyutlarını desteklemiş ve bu da Android cihazların tipik olarak sahip olduğu ortalama toplam bellek miktarı için sistem belleği performansını optimize etmiştir. Android 15\'ten itibaren AOSP, 16 KB sayfa boyutu (16 KB cihazlar) kullanacak şekilde yapılandırılmış cihazları desteklemektedir. Uygulamanız doğrudan veya dolaylı olarak bir SDK aracılığıyla herhangi bir NDK kütüphanesi kullanıyorsa, uygulamanızı bu 16 KB cihazlarda çalışması için yeniden oluşturmanız gerekecektir.</string>
   <string name="format_last_updated">Güncellenme zamanı: %s</string>
   <string name="menu_process">İşlem</string>
   <string name="menu_split">Böl</string>

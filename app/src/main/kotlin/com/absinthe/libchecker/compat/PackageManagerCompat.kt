@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.compat
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
@@ -8,6 +9,7 @@ import android.content.pm.ResolveInfo
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.utils.OsUtils
 
+@SuppressLint("WrongConstant")
 object PackageManagerCompat {
   fun getPackageInfo(packageName: String, flags: Int): PackageInfo {
     return if (OsUtils.atLeastT()) {
