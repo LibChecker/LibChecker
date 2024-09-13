@@ -182,12 +182,6 @@ class ChartFragment :
         }
       }
     }
-
-    GlobalValues.preferencesFlow.onEach {
-      if (it.first == Constants.PREF_SHOW_SYSTEM_APPS) {
-        setData(allLCItemsStateFlow.value)
-      }
-    }.launchIn(lifecycleScope)
   }
 
   private fun setData(items: List<LCItem>, chartType: ChartType = currentChartType) {

@@ -40,7 +40,6 @@ object Constants {
   const val EXAMPLE_DISABLED = "this.is.disabled"
   const val EXAMPLE_RULE = "Example SDK"
 
-  const val PREF_SHOW_SYSTEM_APPS = "showSystemApps"
   const val PREF_APK_ANALYTICS = "apkAnalytics"
   const val PREF_RULES_REPO = "rulesRepository"
   const val PREF_COLORFUL_ICON = "colorfulIcon"
