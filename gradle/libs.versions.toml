@@ -51,7 +51,7 @@ square-okio = "com.squareup.okio:okio:3.9.1"
 square-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "square-retrofit" }
 square-retrofit-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "square-retrofit" }
 
-google-dexlib2 = "com.android.tools.smali:smali-dexlib2:3.0.7"
+google-dexlib2 = "com.android.tools.smali:smali-dexlib2:3.0.8"
 google-material = "com.google.android.material:material:1.12.0"
 google-protobuf-javaLite = { module = "com.google.protobuf:protobuf-javalite", version.ref = "protoc" }
 google-protobuf-protoc = { module = "com.google.protobuf:protoc", version.ref = "protoc" }
