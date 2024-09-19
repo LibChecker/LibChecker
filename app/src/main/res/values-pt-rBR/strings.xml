@@ -110,6 +110,12 @@
   <string name="app_bundle_details">O Android App Bundle é o novo formato de publicação oficial do Android que oferece uma maneira mais eficiente de construir e lançar o seu aplicativo. O Pacote de Aplicativos Android permite que você ofereça uma ótima experiência em um tamanho de aplicativos menor, o que pode melhorar o sucesso de instalação e reduzir as desinstalações. É fácil mudar. Você não precisa refatorar seu código para começar a se beneficiar de um aplicativo menor. E depois de mudar, você se beneficiará do desenvolvimento de aplicativos modulares e da entrega de recursos personalizáveis.</string>
   <string name="kotlin_details">Kotlin é uma linguagem de programação multiplataforma, digitada estatisticamente, de uso geral com inferência de tipo. O Kotlin foi projetado para interoperar totalmente com Java, e a versão JVM da biblioteca padrão do Kotlin depende da biblioteca da Java Class Library, mas a inferência de tipo permite que sua sintaxe seja mais concisa.</string>
   <string name="items_count">Contagem de itens: </string>
+  <string name="further_operation">Further Operation</string>
+  <string name="app_info_launch">Launch</string>
+  <string name="app_info_settings">Settings</string>
+  <string name="lib_detail_dialog_title">Library Details</string>
+  <string name="lib_permission_dialog_title">Permission Detail</string>
+  <string name="agp_details">The Android Studio build system is based on Gradle, and the Android Gradle plugin adds several features that are specific to building Android apps. Although the Android plugin is typically updated in lock-step with Android Studio, the plugin (and the rest of the Gradle system) can run independent of Android Studio and be updated separately.</string>
   <string name="xposed_module">Módulo Xposed</string>
   <string name="xposed_module_details">Xposed é uma estrutura para módulos que podem alterar o comportamento do sistema e de aplicativos sem tocar em nenhum APK. Isso é ótimo porque significa que os módulos podem funcionar para diferentes versões e até mesmo para ROMs sem quaisquer alterações.</string>
   <string name="play_app_signing">Iniciar assinatura do aplicativo</string>
@@ -118,6 +124,8 @@
   <string name="jetpack_compose_details">Jetpack Compose é o moderno kit de ferramentas do Android para a construção de interface nativa. Ele simplifica e acelera o desenvolvimento de interface do usuário no Android. Rapidamente dê vida ao seu app com menos código, ferramentas poderosas e APIs intuitivas do Kotlin.</string>
   <string name="extract_native_libs_tip">O aplicativo declara </string>
   <string name="xml_detail">Detalhes do XML</string>
+  <string name="lib_detail_dialog_title_16kb_page_size">16 KB Page Size</string>
+  <string name="lib_detail_dialog_content_16kb_page_size">Historically, Android has only supported 4 KB memory page sizes, which has optimized system memory performance for the average amount of total memory that Android devices have typically had. Beginning with Android 15, AOSP supports devices that are configured to use a page size of 16 KB (16 KB devices). If your app uses any NDK libraries, either directly or indirectly through an SDK, then you will need to rebuild your app for it to work on these 16 KB devices.</string>
   <string name="format_last_updated">Atualizado em: %s</string>
   <string name="menu_process">Processo</string>
   <string name="menu_split">Separar em categorias</string>
@@ -162,10 +170,61 @@
   <string name="lib_detail_app_install_source_shizuku_usage">Como o Android restringe a API para obter o solicitante de instalação, usamos Shizuku para obter o solicitante de instalação.</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizuku não instalada</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">Clique aqui para instalar Shizuku</string>
+  <string name="lib_detail_app_install_source_shizuku_low_version">Requires Shizuku API 10</string>
+  <string name="lib_detail_app_install_source_shizuku_low_version_detail">Click here to update Shizuku</string>
+  <string name="lib_detail_app_install_source_shizuku_not_running">Shizuku not running</string>
+  <string name="lib_detail_app_install_source_shizuku_not_running_detail">Click here to jump to Shizuku to start it</string>
+  <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku not authorized</string>
+  <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">Click here for Shizuku authorization for installation requester</string>
   <!--  Toast  -->
+  <string name="toast_copied_to_clipboard">Copied to clipboard</string>
+  <string name="toast_not_existing_market">There\'s not existing any app market</string>
+  <string name="toast_use_another_file_manager">Please use another File Manager to open the APK</string>
+  <string name="toast_cant_open_app">Can\'t open this app</string>
+  <string name="toast_cloud_rules_update_error">Failed to update cloud rules. Please try again.</string>
+  <string name="toast_not_enough_storage_space">Not enough storage space</string>
+  <string name="toast_downloading_app">Download requested</string>
   <!--  Snapshot  -->
+  <string name="snapshot_btn_save_current">Save current snapshot</string>
+  <string name="snapshot_current_timestamp">Current Snapshot Timestamp</string>
+  <string name="snapshot_apps_count">Count of Apps in Snapshot / Count of Apps</string>
+  <string name="comparison_snapshot_apps_count">Count of Apps in Snapshot</string>
+  <string name="snapshot_indicator_added">Added</string>
+  <string name="snapshot_indicator_removed">Removed</string>
+  <string name="snapshot_indicator_changed">Changed</string>
+  <string name="snapshot_indicator_moved">Moved</string>
+  <string name="snapshot_empty_list_title">No Components Changes</string>
+  <string name="snapshot_no_snapshot">No Snapshot</string>
+  <string name="snapshot_detail_new_install_title">This App has newly installed</string>
+  <string name="snapshot_detail_deleted_title">This App has been removed</string>
+  <string name="snapshot_time_node_uninitialized">(Uninitialized)</string>
+  <string name="snapshot_preinstalled_app">Preinstalled app</string>
+  <string name="snapshot_generate_text_report">Generate Text Report</string>
+  <string name="snapshot_scheme_tip"><![CDATA[Tip: You can now generate snapshots in the background via:<br><b>%s</b>]]></string>
   <!--  Dialog  -->
+  <string name="dialog_title_reload_apps">Are you sure to reload all apps?</string>
+  <string name="dialog_subtitle_reload_apps">This may take a few seconds</string>
+  <string name="dialog_title_change_timestamp">Change Time Node</string>
+  <string name="dialog_title_keep_previous_snapshot">Attention</string>
+  <string name="dialog_message_keep_previous_snapshot">Do you want to keep the previous snapshot?</string>
+  <string name="dialog_title_select_to_delete">Choose a Date to Delete Snapshot</string>
+  <string name="dialog_title_confirm_to_delete">Are you sure to delete this snapshot?</string>
+  <string name="btn_keep">Keep</string>
+  <string name="btn_drop">Discard</string>
+  <string name="dialog_title_compare_diff_apk">Attention</string>
+  <string name="dialog_message_compare_diff_apk">Do you want to compare two different APKs?</string>
   <!--  Album  -->
+  <string name="album_compare">Compare</string>
+  <string name="album_item_comparison_title">Comparison</string>
+  <string name="album_item_comparison_subtitle">Compare with two snapshots</string>
+  <string name="album_item_comparison_invalid_compare">Invalid comparison</string>
+  <string name="album_item_comparison_invalid_shared_items">Please select two APK files for comparison</string>
+  <string name="album_item_comparison_choose_local_apk">Choose Local APK</string>
+  <string name="album_item_management_title">Management</string>
+  <string name="album_item_management_subtitle">Manage all snapshots</string>
+  <string name="album_item_backup_restore_title">Backup &amp; Restore</string>
+  <string name="album_item_backup_restore_subtitle">Backup and restore snapshots</string>
+  <string name="album_item_track_title">Track</string>
   <string name="album_item_track_subtitle">Selecionar aplicativos para forçar uma mudança de comparação</string>
   <string name="album_backup">Cópia de Segurança</string>
   <string name="album_backup_summary">Backup de todos os instantâneos</string>
@@ -197,6 +256,7 @@
   <string name="adv_show_android_version">Mostrar Versão do Android</string>
   <string name="adv_show_target_version">Mostrar Versão Alvo</string>
   <string name="adv_show_min_version">Mostrar Versão Mínima</string>
+  <string name="adv_show_compile_version">Show Compile Version</string>
   <string name="adv_tint_abi_label">Tintura ABI Rótulo</string>
   <string name="adv_mark_exported">Marcar componente exportado</string>
   <string name="adv_mark_disabled">Marcar Componente Desabilitado</string>
@@ -205,4 +265,5 @@
   <!--  Snapshot menu  -->
   <string name="snapshot_menu_show_update_time">Mostrar data de atualização</string>
   <string name="snapshot_menu_hide_no_component_changes">Não ocultar nenhuma alteração de componente</string>
+  <string name="snapshot_menu_diff_highlight">Diff Highlight</string>
 </resources>
