@@ -1,11 +1,11 @@
 [versions]
-agp = "8.6.0"
-androidX-lifecycle = "2.8.5"
+agp = "8.6.1"
+androidX-lifecycle = "2.8.6"
 androidX-room = "2.6.1"
 appCenter = "5.0.4"
 hiddenApiRefine = "4.4.0"
 kotlin = "2.0.20"
-protoc = "4.28.1"
+protoc = "4.28.2"
 shizuku = "13.1.5"
 square-retrofit = "2.11.0"
 zhaobozhen = "1.1.5.4"
@@ -25,7 +25,7 @@ spotless = "com.diffplug.spotless:6.25.0"
 gradlePlugin-android = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 gradlePlugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 
-kotlinX-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1"
+kotlinX-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0"
 
 androidX-activity = "androidx.activity:activity-ktx:1.9.2"
 androidX-appCompat = "androidx.appcompat:appcompat:1.7.0"
@@ -47,11 +47,11 @@ androidX-window = "androidx.window:window:1.3.0"
 square-leakCanary = "com.squareup.leakcanary:leakcanary-android:2.14"
 square-moshi = "com.squareup.moshi:moshi:1.15.1"
 square-okHttp = "com.squareup.okhttp3:okhttp:4.12.0"
-square-okio = "com.squareup.okio:okio:3.9.0"
+square-okio = "com.squareup.okio:okio:3.9.1"
 square-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "square-retrofit" }
 square-retrofit-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "square-retrofit" }
 
-google-dexlib2 = "com.android.tools.smali:smali-dexlib2:3.0.7"
+google-dexlib2 = "com.android.tools.smali:smali-dexlib2:3.0.8"
 google-material = "com.google.android.material:material:1.12.0"
 google-protobuf-javaLite = { module = "com.google.protobuf:protobuf-javalite", version.ref = "protoc" }
 google-protobuf-protoc = { module = "com.google.protobuf:protoc", version.ref = "protoc" }
