@@ -24,10 +24,6 @@ import com.google.android.material.card.MaterialCardView
 
 class AppItemView(context: Context) : MaterialCardView(context) {
 
-  constructor(context: Context, textAtMostMode: Boolean) : this(context) {
-    container.textAtMostMode = textAtMostMode
-  }
-
   val container = AppItemContainerView(context).apply {
     val padding = context.getDimensionPixelSize(R.dimen.main_card_padding)
     setPadding(padding, padding, padding, padding)
@@ -65,8 +61,6 @@ class AppItemView(context: Context) : MaterialCardView(context) {
   }
 
   class AppItemContainerView(context: Context) : AViewGroup(context) {
-
-    var textAtMostMode: Boolean = false
 
     val icon = AppCompatImageView(context).apply {
       val iconSize = context.getDimensionPixelSize(R.dimen.app_icon_size)

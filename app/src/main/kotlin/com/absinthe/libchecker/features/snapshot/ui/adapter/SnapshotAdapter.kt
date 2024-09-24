@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.features.snapshot.ui.adapter
 
+import android.graphics.Color
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
@@ -58,8 +59,14 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
   }
 
   override fun convert(holder: BaseViewHolder, item: SnapshotDiffItem) {
+    (holder.itemView as SnapshotItemView).apply {
+      strokeColor = if (cardMode == CardMode.DEMO || cardMode == CardMode.GET_APP_UPDATE) {
+        context.getColorByAttr(com.google.android.material.R.attr.colorOutline)
+      } else {
+        Color.TRANSPARENT
+      }
+    }
     (holder.itemView as SnapshotItemView).container.apply {
-      setDrawStroke(cardMode == CardMode.DEMO || cardMode == CardMode.GET_APP_UPDATE)
       val packageInfo = runCatching {
         PackageUtils.getPackageInfo(item.packageName)
       }.getOrNull()
