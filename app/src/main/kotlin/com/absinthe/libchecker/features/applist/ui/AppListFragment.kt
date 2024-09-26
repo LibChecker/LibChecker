@@ -33,6 +33,7 @@ import com.absinthe.libchecker.features.applist.ui.adapter.AppAdapter
 import com.absinthe.libchecker.features.applist.ui.adapter.AppListDiffUtil
 import com.absinthe.libchecker.features.home.HomeViewModel
 import com.absinthe.libchecker.features.home.INavViewContainer
+import com.absinthe.libchecker.ui.adapter.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseListControllerFragment
 import com.absinthe.libchecker.ui.base.IAppBarContainer
@@ -115,6 +116,13 @@ class AppListFragment :
               scheduleAppbarLiftingStatus(!top)
             }
           }
+        if (itemDecorationCount == 0) {
+          addItemDecoration(
+            HorizontalSpacesItemDecoration(
+              resources.getDimension(R.dimen.normal_padding).toInt() / 2
+            )
+          )
+        }
         setHasFixedSize(true)
         FastScrollerBuilder(this).useMd2Style().build()
         addOnScrollListener(object : RecyclerView.OnScrollListener() {

@@ -42,7 +42,7 @@ class SnapshotTitleProvider : BaseNodeProvider() {
   }
 
   override fun convert(helper: BaseViewHolder, item: BaseNode) {
-    val itemView = helper.itemView as SnapshotDetailTitleView
+    val itemView = (helper.itemView as SnapshotDetailTitleView).container
     val node = item as SnapshotTitleNode
     val countAdapter = SnapshotDetailCountAdapter()
     val countList = mutableListOf(0, 0, 0, 0)

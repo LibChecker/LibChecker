@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.children
@@ -14,17 +13,15 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
-import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.utils.extensions.visibleHeight
-import com.absinthe.libchecker.view.RoundCornerView
+import com.absinthe.libchecker.view.AViewGroup
+import com.google.android.material.card.MaterialCardView
 
-class SnapshotItemView(context: Context) : FrameLayout(context) {
+class SnapshotItemView(context: Context) : MaterialCardView(context) {
 
   val container = SnapshotItemContainerView(context).apply {
     val padding = context.getDimensionPixelSize(R.dimen.main_card_padding)
     setPadding(padding, padding, padding, padding)
-    setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackground))
-    clipToPadding = false
   }
 
   init {
@@ -35,11 +32,7 @@ class SnapshotItemView(context: Context) : FrameLayout(context) {
     addView(container)
   }
 
-  class SnapshotItemContainerView(context: Context) : RoundCornerView(context) {
-
-    init {
-      radius = 8.dp
-    }
+  class SnapshotItemContainerView(context: Context) : AViewGroup(context) {
 
     val icon = AppCompatImageView(context).apply {
       val iconSize = context.getDimensionPixelSize(R.dimen.app_icon_size)
@@ -226,10 +219,6 @@ class SnapshotItemView(context: Context) : FrameLayout(context) {
         stateIndicator.toVerticalCenter(this),
         fromRight = true
       )
-    }
-
-    fun setDrawStroke(shouldDrawStroke: Boolean) {
-      this.shouldDrawStroke = shouldDrawStroke
     }
   }
 }

@@ -17,7 +17,6 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.addStrikeThroughSpan
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
-import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
@@ -25,14 +24,11 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return createBaseViewHolder(
-      AppItemView(context, true).apply {
+      AppItemView(context).apply {
         layoutParams = ViewGroup.MarginLayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT,
           ViewGroup.LayoutParams.WRAP_CONTENT
-        ).also {
-          val margin = context.getDimensionPixelSize(R.dimen.main_card_margin)
-          it.setMargins(0, margin, 0, margin)
-        }
+        )
       }
     )
   }
