@@ -49,9 +49,12 @@
   <string name="string_kotlin_unused">Tak menggunakan Kotlin</string>
   <string name="string_compose_used">Menggunakan Jetpack Compose</string>
   <string name="string_compose_unused">Tak menggunakan Jetpack Compose</string>
+  <string name="android_dist_label">Distribution</string>
   <string name="android_dist_source">Sumber</string>
   <string name="android_dist_title">Statistik Distribusi Versi Android</string>
   <string name="android_dist_subtitle_format">Waktu Pembaruan: %s</string>
+  <string name="chart_abi_detailed">Detailed</string>
+  <string name="chart_abi_concise">Concise</string>
   <!--  About  -->
   <string name="settings_about">Tentang</string>
   <string name="settings_about_summary">Inilah LibChecker!</string>
@@ -61,6 +64,9 @@
   <string name="settings_rate_us_summary">Ini dapat membuat kami dikenal lebih banyak orang</string>
   <string name="settings_get_updates">Dapatkan Pembaruan</string>
   <string name="settings_get_updates_summary">Dapatkan versi terbaru yang lebih stabil dan penuh dengan fitur</string>
+  <string name="settings_get_updates_in_app">In-app</string>
+  <string name="settings_get_updates_in_app_chip_stable">Stable</string>
+  <string name="settings_get_updates_in_app_chip_ci">CI</string>
   <string name="about_info">Aplikasi ini digunakan untuk melihat library pihak ketiga yang digunakan oleh aplikasi di perangkat Anda.</string>
   <string name="toolbar_rate">Nilai</string>
   <string name="resource_declaration">Sebagian resource aplikasi berasal dari: </string>
@@ -118,6 +124,8 @@
   <string name="jetpack_compose_details">Jetpack Compose adalah toolkit modern Android untuk membangun UI native. Ini menyederhanakan dan mempercepat pengembangan UI di Android. Dengan cepat mewujudkan aplikasi Anda dengan kode yang lebih sedikit, alat yang powerful, dan API Kotlin yang intuitif.</string>
   <string name="extract_native_libs_tip">Aplikasi menyatakan </string>
   <string name="xml_detail">Detail XML</string>
+  <string name="lib_detail_dialog_title_16kb_page_size">16 KB Page Size</string>
+  <string name="lib_detail_dialog_content_16kb_page_size">Historically, Android has only supported 4 KB memory page sizes, which has optimized system memory performance for the average amount of total memory that Android devices have typically had. Beginning with Android 15, AOSP supports devices that are configured to use a page size of 16 KB (16 KB devices). If your app uses any NDK libraries, either directly or indirectly through an SDK, then you will need to rebuild your app for it to work on these 16 KB devices.</string>
   <string name="format_last_updated">Diperbarui pada: %s</string>
   <string name="menu_process">Proses</string>
   <string name="menu_split">Pisah</string>
@@ -175,6 +183,7 @@
   <string name="toast_cant_open_app">Tidak dapat membuka aplikasi ini</string>
   <string name="toast_cloud_rules_update_error">Gagal memperbarui rule cloud. Silakan coba lagi.</string>
   <string name="toast_not_enough_storage_space">Tidak cukup ruang penyimpanan</string>
+  <string name="toast_downloading_app">Download requested</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">Simpan snapshot terkini</string>
   <string name="snapshot_current_timestamp">Timestamp Snapshot Terkini</string>
