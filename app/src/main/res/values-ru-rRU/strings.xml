@@ -183,7 +183,7 @@
   <string name="toast_cant_open_app">«Невозможно открыть это приложение»</string>
   <string name="toast_cloud_rules_update_error">Не удалось обновить облачные правила. Пожалуйста, попробуйте еще раз.</string>
   <string name="toast_not_enough_storage_space">Недостаточно места</string>
-  <string name="toast_downloading_app">Запрашивается загрузка</string>
+  <string name="toast_downloading_app">Загрузка начата</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">Сохранить текущий снимок</string>
   <string name="snapshot_current_timestamp">Отметка времени текущего снимка</string>
