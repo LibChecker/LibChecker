@@ -49,11 +49,11 @@
   <string name="string_kotlin_unused">Kotlin не используется</string>
   <string name="string_compose_used">Используется Jetpack Compose</string>
   <string name="string_compose_unused">Jetpack Compose не используется</string>
-  <string name="android_dist_label">Распространение</string>
+  <string name="android_dist_label">Распределение</string>
   <string name="android_dist_source">Источник</string>
   <string name="android_dist_title">Статистика распределения версий Android</string>
   <string name="android_dist_subtitle_format">Время обновления %s</string>
-  <string name="chart_abi_detailed">Больше</string>
+  <string name="chart_abi_detailed">Подробнее</string>
   <string name="chart_abi_concise">Меньше</string>
   <!--  About  -->
   <string name="settings_about">О приложении</string>
@@ -183,7 +183,7 @@
   <string name="toast_cant_open_app">«Невозможно открыть это приложение»</string>
   <string name="toast_cloud_rules_update_error">Не удалось обновить облачные правила. Пожалуйста, попробуйте еще раз.</string>
   <string name="toast_not_enough_storage_space">Недостаточно места</string>
-  <string name="toast_downloading_app">Запрашивается загрузка</string>
+  <string name="toast_downloading_app">Загрузка начата</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">Сохранить текущий снимок</string>
   <string name="snapshot_current_timestamp">Отметка времени текущего снимка</string>
