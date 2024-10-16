@@ -753,7 +753,6 @@ val ABI_STRING_RES_MAP = arrayMapOf(
 private const val PAGE_SIZE_16_KB = 0x4000
 private const val PAGE_SIZE_4_KB = 0x1000
 
-
 /**
  *
  * An app is considered to be 16KB-aligned only if:
