@@ -50,7 +50,11 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
       lifecycleScope.launch {
         viewModel.dbItemsFlow.collect {
           refList?.let {
-            viewModel.setData(it.toList())
+            val currentPackageSet = adapter.data.map { item -> item.packageName }.toSet()
+            val newPackageSet = it.toSet()
+            if (currentPackageSet != newPackageSet) {
+              viewModel.setData(it.toList())
+            }
           } ?: run {
             viewModel.setData(name, refType)
           }
