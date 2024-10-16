@@ -750,23 +750,45 @@ val ABI_STRING_RES_MAP = arrayMapOf(
   RISCV32 + MULTI_ARCH to listOf(R.string.riscv32, R.string.multiArch)
 )
 
-fun PackageInfo.getElfPageSize(): Int {
-  val defaultSize = 4096
-  val sourceDir = applicationInfo?.sourceDir ?: return defaultSize
+private const val PAGE_SIZE_16_KB = 0x4000
+private const val PAGE_SIZE_4_KB = 0x1000
+
+/**
+ *
+ * An app is considered to be 16KB-aligned only if:
+ * - There's at least one native library present
+ * - All native libraries have page sizes that are multiples of 16 KB
+ *
+ */
+fun PackageInfo.is16KBAligned(): Boolean {
+  val defaultSize = PAGE_SIZE_4_KB
+  val sourceDir = applicationInfo?.sourceDir ?: return false
+
   val file = File(sourceDir)
   if (file.exists().not()) {
-    return defaultSize
+    return false
   }
+
   return runCatching {
     ZipFileCompat(file).use { zipFile ->
-      val zipEntry = zipFile.getZipEntries()
+      val pageSizeSet = mutableSetOf<Int>()
+
+      zipFile.getZipEntries()
         .asSequence()
-        .firstOrNull { it.isDirectory.not() && it.name.endsWith(".so") }
-        ?: return defaultSize
-      val elfParser = runCatching { ELFParser(zipFile.getInputStream(zipEntry)) }.getOrNull()
-      return elfParser?.getPageSize()?.toInt() ?: defaultSize
+        .filter { it.isDirectory.not() && it.name.endsWith(".so") }
+        .forEach { zipEntry ->
+          val elfParser = runCatching { ELFParser(zipFile.getInputStream(zipEntry)) }.getOrNull()
+          val pageSize = elfParser?.getPageSize()?.toInt() ?: defaultSize
+          if (pageSize == defaultSize) {
+            return false
+          } else {
+            pageSizeSet += pageSize
+          }
+        }
+
+      return pageSizeSet.isNotEmpty() && pageSizeSet.all { it % PAGE_SIZE_16_KB == 0 }
     }
   }.onFailure {
     Timber.e(it)
-  }.getOrElse { defaultSize }
+  }.getOrElse { false }
 }
