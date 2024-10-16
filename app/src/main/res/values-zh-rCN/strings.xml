@@ -124,7 +124,7 @@
   <string name="jetpack_compose_details">Jetpack Compose 是用于构建原生 Android 界面的新工具包。它可简化并加快 Android 上的界面开发，使用更少的代码、强大的工具和直观的 Kotlin API，快速打造生动而精彩的应用。</string>
   <string name="extract_native_libs_tip">该应用声明了 </string>
   <string name="xml_detail">XML 详情</string>
-  <string name="lib_detail_dialog_title_16kb_page_size">16 KB 页大小</string>
+  <string name="lib_detail_dialog_title_16kb_page_size">16 KB 页大小支持</string>
   <string name="lib_detail_dialog_content_16kb_page_size">历史上，Android 仅支持 4 KB 的内存页大小，这优化了系统内存性能，适用于 Android 设备通常拥有的平均总内存量。自 Android 15 开始，AOSP 支持配置为使用 16 KB 页大小的设备（16 KB 设备）。如果您的应用程序直接或通过 SDK 间接使用任何 NDK 库，那么您需要重新构建您的应用程序，以便其在这些 16 KB 设备上正常运行。</string>
   <string name="format_last_updated">更新于: %s</string>
   <string name="menu_process">进程</string>
