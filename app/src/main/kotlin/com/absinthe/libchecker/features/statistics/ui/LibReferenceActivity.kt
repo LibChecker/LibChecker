@@ -133,7 +133,9 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
 
     viewModel.libRefListFlow.onEach {
       adapter.setList(it)
-      binding.vfContainer.displayedChild = 1
+      if (binding.vfContainer.displayedChild != 1) {
+        binding.vfContainer.displayedChild = 1
+      }
     }.launchIn(lifecycleScope)
 
     adapter.setOnItemClickListener { _, view, position ->
