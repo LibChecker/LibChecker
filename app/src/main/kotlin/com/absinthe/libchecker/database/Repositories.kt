@@ -8,7 +8,7 @@ import java.io.File
 object Repositories {
   private lateinit var context: Application
 
-  val lcRepository by lazy { LCRepository(LCDatabase.getDatabase(context).lcDao()) }
+  val lcRepository by lazy { LCRepository(LCDatabase.getDatabase().lcDao()) }
 
   fun init(application: Application) {
     context = application

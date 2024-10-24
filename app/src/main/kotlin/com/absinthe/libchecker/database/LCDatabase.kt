@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.database
 
-import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -27,38 +26,27 @@ abstract class LCDatabase : RoomDatabase() {
   abstract fun lcDao(): LCDao
 
   companion object {
-    // Singleton prevents multiple instances of database opening at the
-    // same time.
-    @Volatile
-    private var INSTANCE: LCDatabase? = null
-
-    fun getDatabase(context: Context): LCDatabase {
-      val tempInstance = INSTANCE
-      if (tempInstance != null) {
-        return tempInstance
-      }
-      synchronized(this) {
-        val instance = Room.databaseBuilder(
-          context.applicationContext,
-          LCDatabase::class.java,
-          "lc_database"
+    private val INSTANCE: LCDatabase by lazy {
+      Room.databaseBuilder(
+        LibCheckerApp.app,
+        LCDatabase::class.java,
+        "lc_database"
+      )
+        .addMigrations(
+          MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4,
+          MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7,
+          MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10,
+          MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13,
+          MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16,
+          MIGRATION_16_17, MIGRATION_17_18, MIGRATION_18_19,
+          MIGRATION_19_20, MIGRATION_20_21
         )
-          .addMigrations(
-            MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4,
-            MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7,
-            MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10,
-            MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13,
-            MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16,
-            MIGRATION_16_17, MIGRATION_17_18, MIGRATION_18_19,
-            MIGRATION_19_20, MIGRATION_20_21
-          )
-          .build()
-        INSTANCE = instance
-        return instance
-      }
+        .build()
     }
 
-    fun isClosed() = getDatabase(context = LibCheckerApp.app).isOpen.not()
+    fun getDatabase(): LCDatabase = INSTANCE
+
+    fun isClosed() = getDatabase().isOpen.not()
 
     private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
       override fun migrate(db: SupportSQLiteDatabase) {

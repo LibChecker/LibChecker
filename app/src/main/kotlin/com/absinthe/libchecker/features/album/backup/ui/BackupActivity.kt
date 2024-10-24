@@ -156,7 +156,7 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
               val dialog = UiUtils.createLoadingDialog(requireActivity())
               dialog.show()
               roomBackup
-                .database(LCDatabase.getDatabase(requireContext()))
+                .database(LCDatabase.getDatabase())
                 .enableLogDebug(true)
                 .backupLocation(RoomBackup.BACKUP_FILE_LOCATION_CUSTOM_DIALOG)
                 .customBackupFileName("LibChecker-Snapshot-Backups-$formatted.sqlite3")
@@ -249,7 +249,7 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
                     }
                   }
                   roomBackup
-                    .database(LCDatabase.getDatabase(requireContext()))
+                    .database(LCDatabase.getDatabase())
                     .enableLogDebug(true)
                     .backupLocation(RoomBackup.BACKUP_FILE_LOCATION_CUSTOM_FILE)
                     .backupLocationCustomFile(restoreFile)
