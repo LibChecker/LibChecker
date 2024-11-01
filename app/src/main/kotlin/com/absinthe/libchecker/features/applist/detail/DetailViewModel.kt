@@ -37,7 +37,6 @@ import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.getAGPVersion
-import com.absinthe.libchecker.utils.extensions.getElfPageSize
 import com.absinthe.libchecker.utils.extensions.getFeatures
 import com.absinthe.libchecker.utils.extensions.getJetpackComposeVersion
 import com.absinthe.libchecker.utils.extensions.getKotlinPluginInfo
@@ -46,6 +45,7 @@ import com.absinthe.libchecker.utils.extensions.getRxJavaVersion
 import com.absinthe.libchecker.utils.extensions.getRxKotlinVersion
 import com.absinthe.libchecker.utils.extensions.getSignatures
 import com.absinthe.libchecker.utils.extensions.getStatefulPermissionsList
+import com.absinthe.libchecker.utils.extensions.is16KBAligned
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.Rule
@@ -487,7 +487,7 @@ class DetailViewModel : ViewModel() {
       }
     }
 
-    if (packageInfo.getElfPageSize() == 0x4000) {
+    if (packageInfo.is16KBAligned()) {
       _featuresFlow.emit(VersionedFeature(Features.Ext.ELF_PAGE_SIZE_16KB))
     }
 

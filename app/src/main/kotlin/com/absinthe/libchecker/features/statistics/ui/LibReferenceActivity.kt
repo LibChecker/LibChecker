@@ -50,7 +50,11 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
       lifecycleScope.launch {
         viewModel.dbItemsFlow.collect {
           refList?.let {
-            viewModel.setData(it.toList())
+            val currentPackageSet = adapter.data.map { item -> item.packageName }.toSet()
+            val newPackageSet = it.toSet()
+            if (currentPackageSet != newPackageSet) {
+              viewModel.setData(it.toList())
+            }
           } ?: run {
             viewModel.setData(name, refType)
           }
@@ -129,7 +133,9 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
 
     viewModel.libRefListFlow.onEach {
       adapter.setList(it)
-      binding.vfContainer.displayedChild = 1
+      if (binding.vfContainer.displayedChild != 1) {
+        binding.vfContainer.displayedChild = 1
+      }
     }.launchIn(lifecycleScope)
 
     adapter.setOnItemClickListener { _, view, position ->

@@ -103,7 +103,8 @@
       <intent-filter>
         <action android:name="android.intent.action.VIEW" />
         <category android:name="android.intent.category.DEFAULT" />
-        <data android:scheme="content" />
+        <data android:scheme="content"
+          tools:ignore="AppLinkUrlError" />
         <data android:pathPattern=".*\\.lcss" />
       </intent-filter>
     </activity>
