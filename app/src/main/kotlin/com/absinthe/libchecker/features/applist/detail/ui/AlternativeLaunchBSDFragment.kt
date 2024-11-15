@@ -20,8 +20,7 @@ class AlternativeLaunchBSDFragment : BaseBottomSheetViewDialogFragment<Alternati
 
   private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
 
-  override fun initRootView(): AlternativeLaunchBSDView =
-    AlternativeLaunchBSDView(requireContext())
+  override fun initRootView(): AlternativeLaunchBSDView = AlternativeLaunchBSDView(requireContext())
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 

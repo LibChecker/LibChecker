@@ -23,8 +23,7 @@ class AppPropBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppPr
     )!!
   }
 
-  override fun initRootView(): AppPropsBottomSheetView =
-    AppPropsBottomSheetView(requireContext(), packageInfo)
+  override fun initRootView(): AppPropsBottomSheetView = AppPropsBottomSheetView(requireContext(), packageInfo)
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 

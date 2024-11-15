@@ -487,8 +487,7 @@ class CheckableChipView @JvmOverloads constructor(
     afterChangeActions: ((newValue: T) -> Unit)? = null
   ) = object : ObservableProperty<T>(default) {
 
-    override fun beforeChange(property: KProperty<*>, oldValue: T, newValue: T): Boolean =
-      newValue != oldValue
+    override fun beforeChange(property: KProperty<*>, oldValue: T, newValue: T): Boolean = newValue != oldValue
 
     override fun afterChange(property: KProperty<*>, oldValue: T, newValue: T) {
       afterChangeActions?.invoke(newValue)

@@ -651,8 +651,7 @@ fun PackageInfo.getSignatures(context: Context): Sequence<LibStringItem> {
   }
 }
 
-fun PackageInfo.getAppName(): String? =
-  applicationInfo?.loadLabel(SystemServices.packageManager)?.toString()
+fun PackageInfo.getAppName(): String? = applicationInfo?.loadLabel(SystemServices.packageManager)?.toString()
 
 val PREINSTALLED_TIMESTAMP by lazy {
   // default is 2009-01-01 08:00:00 GMT+8

@@ -21,8 +21,7 @@ class SignatureDetailBSDFragment : BaseBottomSheetViewDialogFragment<SignatureDe
 
   private val detail by unsafeLazy { arguments?.getString(EXTRA_SIGNATURE_DETAIL).orEmpty() }
 
-  override fun initRootView(): SignatureDetailBottomSheetView =
-    SignatureDetailBottomSheetView(requireContext())
+  override fun initRootView(): SignatureDetailBottomSheetView = SignatureDetailBottomSheetView(requireContext())
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
