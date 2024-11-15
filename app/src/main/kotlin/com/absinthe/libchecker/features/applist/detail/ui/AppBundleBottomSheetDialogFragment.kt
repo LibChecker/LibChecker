@@ -16,8 +16,7 @@ class AppBundleBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<App
 
   private val packageInfo by lazy { BundleCompat.getParcelable(requireArguments(), EXTRA_PACKAGE_INFO, PackageInfo::class.java) }
 
-  override fun initRootView(): AppBundleBottomSheetView =
-    AppBundleBottomSheetView(requireContext())
+  override fun initRootView(): AppBundleBottomSheetView = AppBundleBottomSheetView(requireContext())
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 

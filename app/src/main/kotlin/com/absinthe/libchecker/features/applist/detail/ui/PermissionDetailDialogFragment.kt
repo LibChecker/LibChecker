@@ -22,8 +22,7 @@ class PermissionDetailDialogFragment : BaseBottomSheetViewDialogFragment<Permiss
       .substringBefore(" ") // remove maxSdkVersion suffix
   }
 
-  override fun initRootView(): PermissionInfoBottomSheetView =
-    PermissionInfoBottomSheetView(requireContext())
+  override fun initRootView(): PermissionInfoBottomSheetView = PermissionInfoBottomSheetView(requireContext())
 
   override fun init() {
     root.apply {

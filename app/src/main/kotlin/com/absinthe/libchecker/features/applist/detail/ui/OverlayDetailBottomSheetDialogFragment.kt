@@ -37,8 +37,7 @@ const val EXTRA_LC_ITEM = "EXTRA_LC_ITEM"
 
 class OverlayDetailBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<OverlayDetailBottomSheetView>() {
 
-  override fun initRootView(): OverlayDetailBottomSheetView =
-    OverlayDetailBottomSheetView(requireContext())
+  override fun initRootView(): OverlayDetailBottomSheetView = OverlayDetailBottomSheetView(requireContext())
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 

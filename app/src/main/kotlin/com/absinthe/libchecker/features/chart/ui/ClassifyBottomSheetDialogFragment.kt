@@ -13,8 +13,7 @@ class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Clas
   private var _androidVersionTriple: Triple<Int, String, Int?>? = null
   private var _list: List<LCItem>? = null
 
-  override fun initRootView(): ClassifyDialogView =
-    ClassifyDialogView(requireContext(), lifecycleScope)
+  override fun initRootView(): ClassifyDialogView = ClassifyDialogView(requireContext(), lifecycleScope)
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 

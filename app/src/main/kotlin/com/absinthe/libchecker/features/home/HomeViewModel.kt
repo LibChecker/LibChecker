@@ -150,47 +150,46 @@ class HomeViewModel : ViewModel() {
 
   private val bundleManager by lazy { ApplicationDelegate(LibCheckerApp.app).iBundleManager }
 
-  private fun initItemsImpl(appList: List<PackageInfo>) =
-    viewModelScope.launch(Dispatchers.IO) {
-      Timber.d("initItems: START")
+  private fun initItemsImpl(appList: List<PackageInfo>) = viewModelScope.launch(Dispatchers.IO) {
+    Timber.d("initItems: START")
 
-      val timeRecorder = TimeRecorder()
-      timeRecorder.start()
+    val timeRecorder = TimeRecorder()
+    timeRecorder.start()
 
-      updateAppListStatus(STATUS_START_INIT)
-      Repositories.lcRepository.deleteAllItems()
-      updateInitProgress(0)
+    updateAppListStatus(STATUS_START_INIT)
+    Repositories.lcRepository.deleteAllItems()
+    updateInitProgress(0)
 
-      val lcItems = mutableListOf<LCItem>()
-      val isHarmony = HarmonyOsUtil.isHarmonyOs()
-      var progressCount = 0
+    val lcItems = mutableListOf<LCItem>()
+    val isHarmony = HarmonyOsUtil.isHarmonyOs()
+    var progressCount = 0
 
-      for (info in appList) {
-        try {
-          lcItems.add(generateLCItemFromPackageInfo(info, isHarmony, true))
-          progressCount++
-          updateInitProgress(progressCount * 100 / appList.size)
-        } catch (e: Throwable) {
-          Timber.e(e, "initItems: ${info.packageName}")
-          continue
-        }
-
-        if (lcItems.size == 50) {
-          insert(lcItems)
-          lcItems.clear()
-        }
+    for (info in appList) {
+      try {
+        lcItems.add(generateLCItemFromPackageInfo(info, isHarmony, true))
+        progressCount++
+        updateInitProgress(progressCount * 100 / appList.size)
+      } catch (e: Throwable) {
+        Timber.e(e, "initItems: ${info.packageName}")
+        continue
       }
 
-      if (lcItems.isNotEmpty()) {
+      if (lcItems.size == 50) {
         insert(lcItems)
+        lcItems.clear()
       }
-      updateAppListStatus(STATUS_INIT_END)
-
-      timeRecorder.end()
-      Timber.d("initItems: END, $timeRecorder")
-      updateAppListStatus(STATUS_NOT_START)
-      initJob = null
     }
+
+    if (lcItems.isNotEmpty()) {
+      insert(lcItems)
+    }
+    updateAppListStatus(STATUS_INIT_END)
+
+    timeRecorder.end()
+    Timber.d("initItems: END, $timeRecorder")
+    updateAppListStatus(STATUS_NOT_START)
+    initJob = null
+  }
 
   private var requestChangeJob: Job? = null
 
@@ -208,78 +207,77 @@ class HomeViewModel : ViewModel() {
     }
   }
 
-  private fun requestChangeImpl(appMap: Map<String, PackageInfo>, checked: Boolean) =
-    viewModelScope.launch(Dispatchers.IO) {
-      val dbItems = Repositories.lcRepository.getLCItems()
-      if (dbItems.isEmpty()) {
-        return@launch
-      }
-      Timber.d("Request change: START")
-      val timeRecorder = TimeRecorder()
+  private fun requestChangeImpl(appMap: Map<String, PackageInfo>, checked: Boolean) = viewModelScope.launch(Dispatchers.IO) {
+    val dbItems = Repositories.lcRepository.getLCItems()
+    if (dbItems.isEmpty()) {
+      return@launch
+    }
+    Timber.d("Request change: START")
+    val timeRecorder = TimeRecorder()
 
-      timeRecorder.start()
-      updateAppListStatus(STATUS_START_REQUEST_CHANGE)
+    timeRecorder.start()
+    updateAppListStatus(STATUS_START_REQUEST_CHANGE)
 
-      val isHarmony = HarmonyOsUtil.isHarmonyOs()
+    val isHarmony = HarmonyOsUtil.isHarmonyOs()
 
-      val localApps = appMap.map { it.key }.toSet()
-      val dbApps = dbItems.map { it.packageName }.toSet()
-      val newApps = localApps - dbApps
-      val removedApps = dbApps - localApps
+    val localApps = appMap.map { it.key }.toSet()
+    val dbApps = dbItems.map { it.packageName }.toSet()
+    val newApps = localApps - dbApps
+    val removedApps = dbApps - localApps
 
       /*
        * The application list returned with a probability only contains system applications.
        * When the difference is greater than a certain threshold, we re-request the list.
        */
-      if (!checked && (newApps.size > 30 || removedApps.size > 30)) {
-        Timber.w("Request change canceled because of large diff, re-request appMap")
-        launch {
-          requestChange(true)
-        }
-      } else {
-        newApps.forEach {
-          if (!isActive) return@launch
-          runCatching {
-            val info = appMap[it] ?: return@runCatching
-            insert(generateLCItemFromPackageInfo(info, isHarmony))
-          }.onFailure { e ->
-            Timber.e(e, "requestChange: $it")
-          }
-        }
-
-        removedApps.forEach {
-          if (!isActive) return@launch
-          Repositories.lcRepository.deleteLCItemByPackageName(it)
-        }
-
-        localApps.intersect(dbApps).asSequence()
-          .mapNotNull { appMap[it] }
-          .filter { pi ->
-            dbItems.find { it.packageName == pi.packageName }?.let {
-              it.versionCode != pi.getVersionCode() ||
-                pi.lastUpdateTime != it.lastUpdatedTime ||
-                it.lastUpdatedTime == 0L
-            } == true
-          }.forEach {
-            if (!isActive) return@launch
-            update(generateLCItemFromPackageInfo(it, isHarmony))
-          }
+    if (!checked && (newApps.size > 30 || removedApps.size > 30)) {
+      Timber.w("Request change canceled because of large diff, re-request appMap")
+      launch {
+        requestChange(true)
       }
-
-      refreshList()
-
-      updateAppListStatus(STATUS_START_REQUEST_CHANGE_END)
-      timeRecorder.end()
-      Timber.d("Request change: END, $timeRecorder")
-      updateAppListStatus(STATUS_NOT_START)
-
-      if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.HAS_COLLECT_LIB)) {
+    } else {
+      newApps.forEach {
         if (!isActive) return@launch
-        delay(10000)
-        collectPopularLibraries(appMap)
-        Once.markDone(OnceTag.HAS_COLLECT_LIB)
+        runCatching {
+          val info = appMap[it] ?: return@runCatching
+          insert(generateLCItemFromPackageInfo(info, isHarmony))
+        }.onFailure { e ->
+          Timber.e(e, "requestChange: $it")
+        }
       }
+
+      removedApps.forEach {
+        if (!isActive) return@launch
+        Repositories.lcRepository.deleteLCItemByPackageName(it)
+      }
+
+      localApps.intersect(dbApps).asSequence()
+        .mapNotNull { appMap[it] }
+        .filter { pi ->
+          dbItems.find { it.packageName == pi.packageName }?.let {
+            it.versionCode != pi.getVersionCode() ||
+              pi.lastUpdateTime != it.lastUpdatedTime ||
+              it.lastUpdatedTime == 0L
+          } == true
+        }.forEach {
+          if (!isActive) return@launch
+          update(generateLCItemFromPackageInfo(it, isHarmony))
+        }
     }
+
+    refreshList()
+
+    updateAppListStatus(STATUS_START_REQUEST_CHANGE_END)
+    timeRecorder.end()
+    Timber.d("Request change: END, $timeRecorder")
+    updateAppListStatus(STATUS_NOT_START)
+
+    if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.HAS_COLLECT_LIB)) {
+      if (!isActive) return@launch
+      delay(10000)
+      collectPopularLibraries(appMap)
+      Once.markDone(OnceTag.HAS_COLLECT_LIB)
+    }
+  }
 
   private fun generateLCItemFromPackageInfo(
     pi: PackageInfo,
@@ -310,64 +308,63 @@ class HomeViewModel : ViewModel() {
     )
   }
 
-  private fun collectPopularLibraries(appMap: Map<String, PackageInfo>) =
-    viewModelScope.launch(Dispatchers.IO) {
-      if (GlobalValues.isAnonymousAnalyticsEnabled.not()) {
-        return@launch
-      }
-      val appList = appMap.values
-      val map = HashMap<String, Int>()
-      var libList: List<LibStringItem>
-      var count: Int
-
-      try {
-        for (item in appList) {
-          libList =
-            PackageUtils.getNativeDirLibs(PackageUtils.getPackageInfo(item.packageName))
-
-          for (lib in libList) {
-            count = map[lib.name] ?: 0
-            map[lib.name] = count + 1
-          }
-        }
-        val properties: MutableMap<String, String> = HashMap()
-        properties["Version"] = Build.VERSION.SDK_INT.toString()
-        Analytics.trackEvent("OS Version", properties)
-
-        for (entry in map) {
-          if (entry.value > 3 && LCAppUtils.getRuleWithRegex(entry.key, NATIVE) == null) {
-            properties.clear()
-            properties["Library name"] = entry.key
-            properties["Library count"] = entry.value.toString()
-
-            Analytics.trackEvent("Native Library", properties)
-          }
-        }
-
-        collectComponentPopularLibraries(
-          appList,
-          SERVICE,
-          "Service"
-        )
-        collectComponentPopularLibraries(
-          appList,
-          ACTIVITY,
-          "Activity"
-        )
-        collectComponentPopularLibraries(
-          appList,
-          RECEIVER,
-          "Receiver"
-        )
-        collectComponentPopularLibraries(
-          appList,
-          PROVIDER,
-          "Provider"
-        )
-      } catch (ignore: Exception) {
-        Timber.e(ignore, "collectPopularLibraries failed")
-      }
+  private fun collectPopularLibraries(appMap: Map<String, PackageInfo>) = viewModelScope.launch(Dispatchers.IO) {
+    if (GlobalValues.isAnonymousAnalyticsEnabled.not()) {
+      return@launch
     }
+    val appList = appMap.values
+    val map = HashMap<String, Int>()
+    var libList: List<LibStringItem>
+    var count: Int
+
+    try {
+      for (item in appList) {
+        libList =
+          PackageUtils.getNativeDirLibs(PackageUtils.getPackageInfo(item.packageName))
+
+        for (lib in libList) {
+          count = map[lib.name] ?: 0
+          map[lib.name] = count + 1
+        }
+      }
+      val properties: MutableMap<String, String> = HashMap()
+      properties["Version"] = Build.VERSION.SDK_INT.toString()
+      Analytics.trackEvent("OS Version", properties)
+
+      for (entry in map) {
+        if (entry.value > 3 && LCAppUtils.getRuleWithRegex(entry.key, NATIVE) == null) {
+          properties.clear()
+          properties["Library name"] = entry.key
+          properties["Library count"] = entry.value.toString()
+
+          Analytics.trackEvent("Native Library", properties)
+        }
+      }
+
+      collectComponentPopularLibraries(
+        appList,
+        SERVICE,
+        "Service"
+      )
+      collectComponentPopularLibraries(
+        appList,
+        ACTIVITY,
+        "Activity"
+      )
+      collectComponentPopularLibraries(
+        appList,
+        RECEIVER,
+        "Receiver"
+      )
+      collectComponentPopularLibraries(
+        appList,
+        PROVIDER,
+        "Provider"
+      )
+    } catch (ignore: Exception) {
+      Timber.e(ignore, "collectPopularLibraries failed")
+    }
+  }
 
   private suspend fun collectComponentPopularLibraries(
     appList: Collection<PackageInfo>,

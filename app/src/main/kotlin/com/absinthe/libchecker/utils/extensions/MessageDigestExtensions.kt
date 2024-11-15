@@ -6,8 +6,7 @@ import okio.ByteString.Companion.toByteString
 
 fun ByteArray.sha1(separator: CharSequence = ""): String = toByteString().sha1().toHex(separator)
 
-fun ByteArray.sha256(separator: CharSequence = ""): String =
-  toByteString().sha256().toHex(separator)
+fun ByteArray.sha256(separator: CharSequence = ""): String = toByteString().sha256().toHex(separator)
 
 fun ByteArray.md5(separator: CharSequence = ""): String = toByteString().md5().toHex(separator)
 

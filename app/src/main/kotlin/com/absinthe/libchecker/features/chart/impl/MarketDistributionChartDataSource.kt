@@ -92,29 +92,28 @@ class MarketDistributionChartDataSource(items: List<LCItem>) : BaseVariableChart
     return distribution?.get(x)?.apiLevel
   }
 
-  private suspend fun getDistribution(context: Context): List<AndroidDistribution>? =
-    withContext(Dispatchers.IO) {
-      runCatching {
-        val localFile = File(File(context.filesDir, "rules"), "android_distribution.json")
-        if (!localFile.exists() || !DateUtils.isTimestampThisMonth(GlobalValues.distributionUpdateTimestamp)) {
-          val request: AndroidDistributionRequest = ApiManager.create()
-          val response = request.requestDistribution()
-          localFile.parentFile?.mkdirs()
-          if (localFile.exists().not()) {
-            localFile.createNewFile()
-          }
-          localFile.writeText(response.toJson().orEmpty())
-          GlobalValues.distributionUpdateTimestamp = System.currentTimeMillis()
-          return@withContext response
+  private suspend fun getDistribution(context: Context): List<AndroidDistribution>? = withContext(Dispatchers.IO) {
+    runCatching {
+      val localFile = File(File(context.filesDir, "rules"), "android_distribution.json")
+      if (!localFile.exists() || !DateUtils.isTimestampThisMonth(GlobalValues.distributionUpdateTimestamp)) {
+        val request: AndroidDistributionRequest = ApiManager.create()
+        val response = request.requestDistribution()
+        localFile.parentFile?.mkdirs()
+        if (localFile.exists().not()) {
+          localFile.createNewFile()
         }
+        localFile.writeText(response.toJson().orEmpty())
+        GlobalValues.distributionUpdateTimestamp = System.currentTimeMillis()
+        return@withContext response
+      }
 
-        val json = localFile.readText()
-        return@withContext json.fromJson<List<AndroidDistribution>>(
-          List::class.java,
-          AndroidDistribution::class.java
-        )
-      }.onFailure {
-        Timber.e(it)
-      }.getOrNull()
-    }
+      val json = localFile.readText()
+      return@withContext json.fromJson<List<AndroidDistribution>>(
+        List::class.java,
+        AndroidDistribution::class.java
+      )
+    }.onFailure {
+      Timber.e(it)
+    }.getOrNull()
+  }
 }

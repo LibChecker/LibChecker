@@ -16,27 +16,26 @@ object LocalAppDataSource : AppDataSource {
   var apexPackageSet: Set<String> = emptySet()
     private set
 
-  override fun getApplicationList(ioDispatcher: CoroutineDispatcher): Flow<List<PackageInfo>> =
-    flow {
-      val list = getApplicationList()
-      val listByShell = getAppListByShell()
+  override fun getApplicationList(ioDispatcher: CoroutineDispatcher): Flow<List<PackageInfo>> = flow {
+    val list = getApplicationList()
+    val listByShell = getAppListByShell()
 
-      if (listByShell.size > list.size) {
-        Timber.d("listByShell.size > list.size")
-        emit(
-          listByShell.mapNotNull { packageName ->
-            runCatching {
-              PackageManagerCompat.getPackageInfo(
-                packageName,
-                PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS
-              )
-            }.getOrNull()
-          }
-        )
-      } else {
-        emit(list)
-      }
-    }.flowOn(ioDispatcher)
+    if (listByShell.size > list.size) {
+      Timber.d("listByShell.size > list.size")
+      emit(
+        listByShell.mapNotNull { packageName ->
+          runCatching {
+            PackageManagerCompat.getPackageInfo(
+              packageName,
+              PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS
+            )
+          }.getOrNull()
+        }
+      )
+    } else {
+      emit(list)
+    }
+  }.flowOn(ioDispatcher)
 
   override fun getApplicationList(): List<PackageInfo> {
     Timber.d("getApplicationList start")
@@ -48,16 +47,15 @@ object LocalAppDataSource : AppDataSource {
     return list
   }
 
-  override fun getApplicationMap(ioDispatcher: CoroutineDispatcher): Flow<Map<String, PackageInfo>> =
-    flow {
-      getApplicationList(ioDispatcher).collect { list ->
-        val map = list.asSequence()
-          .filter { it.applicationInfo?.sourceDir != null || it.applicationInfo?.publicSourceDir != null }
-          .map { it.packageName to it }
-          .toMap()
-        emit(map)
-      }
-    }.flowOn(ioDispatcher)
+  override fun getApplicationMap(ioDispatcher: CoroutineDispatcher): Flow<Map<String, PackageInfo>> = flow {
+    getApplicationList(ioDispatcher).collect { list ->
+      val map = list.asSequence()
+        .filter { it.applicationInfo?.sourceDir != null || it.applicationInfo?.publicSourceDir != null }
+        .map { it.packageName to it }
+        .toMap()
+      emit(map)
+    }
+  }.flowOn(ioDispatcher)
 
   override fun getApplicationMap(): Map<String, PackageInfo> {
     return getApplicationList().asSequence()
