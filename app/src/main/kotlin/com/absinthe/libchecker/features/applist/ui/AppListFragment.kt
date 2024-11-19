@@ -435,6 +435,7 @@ class AppListFragment :
   }
 
   private fun updateItemsImpl(highlightRefresh: Boolean = false) = lifecycleScope.launch(Dispatchers.IO) {
+    delay(250)
     Timber.d("updateItems")
     var filterList: MutableList<LCItem> = Repositories.lcRepository.getLCItems().toMutableList()
 
