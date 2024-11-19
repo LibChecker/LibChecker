@@ -193,7 +193,9 @@ abstract class BaseDetailFragment<T : ViewBinding> :
           }
           emptyView.text.text = getString(R.string.empty_list)
         } else {
-          getRecyclerView().addItemDecoration(dividerItemDecoration)
+          if (getRecyclerView().itemDecorationCount == 0) {
+            getRecyclerView().addItemDecoration(dividerItemDecoration)
+          }
         }
         adapter.setDiffNewData(this@with.toMutableList()) {
           viewModel.updateItemsCountStateFlow(type, size)
