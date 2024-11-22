@@ -10,6 +10,7 @@ plugins {
   alias(libs.plugins.ksp) apply false
   alias(libs.plugins.moshiX) apply false
   alias(libs.plugins.spotless) apply false
+  alias(libs.plugins.aboutlibraries) apply false
   id("build-logic") apply false
 }
 

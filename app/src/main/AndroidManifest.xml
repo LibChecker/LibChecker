@@ -130,10 +130,6 @@
       android:name=".features.chart.ui.ChartActivity"
       android:label="@string/tab_chart" />
     <activity
-      android:name=".features.about.ui.AboutActivity"
-      android:label="@string/settings_about"
-      android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar" />
-    <activity
       android:name=".ui.bridge.BridgeActivity"
       android:exported="true"
       android:theme="@style/Transparent">
