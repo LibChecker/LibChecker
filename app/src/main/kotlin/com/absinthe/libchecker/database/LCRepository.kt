@@ -166,8 +166,7 @@ class LCRepository(private val lcDao: LCDao) {
     lcDao.deleteAllSnapshotDiffItems()
   }
 
-  suspend fun getSnapshotDiff(packageName: String): SnapshotDiffStoringItem? =
-    lcDao.getSnapshotDiff(packageName)
+  suspend fun getSnapshotDiff(packageName: String): SnapshotDiffStoringItem? = lcDao.getSnapshotDiff(packageName)
 
   fun updateFeatures(packageName: String, features: Int) {
     if (checkDatabaseStatus().not()) return

@@ -344,24 +344,23 @@ class DetailViewModel : ViewModel() {
     return chipList
   }
 
-  private suspend fun getSignatureChipList(context: Context): List<LibStringItemChip> =
-    withContext(Dispatchers.IO) {
-      // lazy load signatures
-      runCatching {
-        @Suppress("InlinedApi", "DEPRECATION")
-        val flags = PackageManager.GET_SIGNATURES or PackageManager.GET_SIGNING_CERTIFICATES
-        if (!isApk) {
-          PackageUtils.getPackageInfo(packageInfo.packageName, flags).getSignatures(context)
-        } else {
-          PackageManagerCompat.getPackageArchiveInfo(packageInfo.applicationInfo!!.sourceDir, flags)!!.getSignatures(context)
-        }
-      }.onFailure {
-        Timber.e(it)
-      }.getOrDefault(emptySequence())
-        .map {
-          LibStringItemChip(it, null)
-        }.toList()
-    }
+  private suspend fun getSignatureChipList(context: Context): List<LibStringItemChip> = withContext(Dispatchers.IO) {
+    // lazy load signatures
+    runCatching {
+      @Suppress("InlinedApi", "DEPRECATION")
+      val flags = PackageManager.GET_SIGNATURES or PackageManager.GET_SIGNING_CERTIFICATES
+      if (!isApk) {
+        PackageUtils.getPackageInfo(packageInfo.packageName, flags).getSignatures(context)
+      } else {
+        PackageManagerCompat.getPackageArchiveInfo(packageInfo.applicationInfo!!.sourceDir, flags)!!.getSignatures(context)
+      }
+    }.onFailure {
+      Timber.e(it)
+    }.getOrDefault(emptySequence())
+      .map {
+        LibStringItemChip(it, null)
+      }.toList()
+  }
 
   fun initAbilities(context: Context, packageName: String) = viewModelScope.launch(Dispatchers.IO) {
     abilitiesMap.put(AbilityType.PAGE, MutableStateFlow(emptyList()))

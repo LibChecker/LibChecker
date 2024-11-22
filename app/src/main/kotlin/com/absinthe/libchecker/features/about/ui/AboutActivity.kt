@@ -505,6 +505,5 @@ class AboutActivity :
     return String.format("<a href=\"%s\">%s</a>", url, url)
   }
 
-  private fun getStringByConfiguration(@StringRes res: Int): String =
-    createConfigurationContext(configuration).resources.getString(res)
+  private fun getStringByConfiguration(@StringRes res: Int): String = createConfigurationContext(configuration).resources.getString(res)
 }

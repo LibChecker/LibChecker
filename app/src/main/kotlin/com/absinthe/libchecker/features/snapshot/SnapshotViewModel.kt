@@ -770,56 +770,55 @@ class SnapshotViewModel : ViewModel() {
     repository.updateTimeStampItem(TimeStampItem(timestamp, appsList.toJson()))
   }
 
-  fun computeDiffDetail(context: Context, entity: SnapshotDiffItem) =
-    viewModelScope.launch(Dispatchers.IO) {
-      val list = mutableListOf<SnapshotDetailItem>()
+  fun computeDiffDetail(context: Context, entity: SnapshotDiffItem) = viewModelScope.launch(Dispatchers.IO) {
+    val list = mutableListOf<SnapshotDetailItem>()
 
-      list.addAll(
-        getNativeDiffList(
-          context,
-          entity.nativeLibsDiff.old.fromJson<List<LibStringItem>>(
-            List::class.java,
-            LibStringItem::class.java
-          ) ?: emptyList(),
-          entity.nativeLibsDiff.new?.fromJson<List<LibStringItem>>(
-            List::class.java,
-            LibStringItem::class.java
-          )
+    list.addAll(
+      getNativeDiffList(
+        context,
+        entity.nativeLibsDiff.old.fromJson<List<LibStringItem>>(
+          List::class.java,
+          LibStringItem::class.java
+        ) ?: emptyList(),
+        entity.nativeLibsDiff.new?.fromJson<List<LibStringItem>>(
+          List::class.java,
+          LibStringItem::class.java
         )
       )
-      addComponentDiffInfoFromJson(list, entity.servicesDiff, SERVICE)
-      addComponentDiffInfoFromJson(list, entity.activitiesDiff, ACTIVITY)
-      addComponentDiffInfoFromJson(list, entity.receiversDiff, RECEIVER)
-      addComponentDiffInfoFromJson(list, entity.providersDiff, PROVIDER)
+    )
+    addComponentDiffInfoFromJson(list, entity.servicesDiff, SERVICE)
+    addComponentDiffInfoFromJson(list, entity.activitiesDiff, ACTIVITY)
+    addComponentDiffInfoFromJson(list, entity.receiversDiff, RECEIVER)
+    addComponentDiffInfoFromJson(list, entity.providersDiff, PROVIDER)
 
-      list.addAll(
-        getPermissionsDiffList(
-          entity.permissionsDiff.old.fromJson<List<String>>(
-            List::class.java,
-            String::class.java
-          ).orEmpty().toSet(),
-          entity.permissionsDiff.new?.fromJson<List<String>>(
-            List::class.java,
-            String::class.java
-          )?.toSet()
+    list.addAll(
+      getPermissionsDiffList(
+        entity.permissionsDiff.old.fromJson<List<String>>(
+          List::class.java,
+          String::class.java
+        ).orEmpty().toSet(),
+        entity.permissionsDiff.new?.fromJson<List<String>>(
+          List::class.java,
+          String::class.java
+        )?.toSet()
+      )
+    )
+
+    list.addAll(
+      getMetadataDiffList(
+        entity.metadataDiff.old.fromJson<List<LibStringItem>>(
+          List::class.java,
+          LibStringItem::class.java
+        ) ?: emptyList(),
+        entity.metadataDiff.new?.fromJson<List<LibStringItem>>(
+          List::class.java,
+          LibStringItem::class.java
         )
       )
+    )
 
-      list.addAll(
-        getMetadataDiffList(
-          entity.metadataDiff.old.fromJson<List<LibStringItem>>(
-            List::class.java,
-            LibStringItem::class.java
-          ) ?: emptyList(),
-          entity.metadataDiff.new?.fromJson<List<LibStringItem>>(
-            List::class.java,
-            LibStringItem::class.java
-          )
-        )
-      )
-
-      snapshotDetailItemsFlow.emit(list)
-    }
+    snapshotDetailItemsFlow.emit(list)
+  }
 
   private fun addComponentDiffInfoFromJson(
     list: MutableList<SnapshotDetailItem>,

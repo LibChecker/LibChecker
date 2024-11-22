@@ -21,8 +21,7 @@ fun <T> unsafeLazy(initializer: () -> T): Lazy<T> = lazy(LazyThreadSafetyMode.NO
 @ColorInt
 fun @receiver:ColorRes Int.getColor(context: Context): Int = ContextCompat.getColor(context, this)
 
-fun @receiver:DrawableRes Int.getDrawable(context: Context): Drawable? =
-  ContextCompat.getDrawable(context, this)
+fun @receiver:DrawableRes Int.getDrawable(context: Context): Drawable? = ContextCompat.getDrawable(context, this)
 
 fun @receiver:ColorRes Int.toColorStateList(context: Context): ColorStateList {
   return ColorStateList.valueOf(getColor(context))

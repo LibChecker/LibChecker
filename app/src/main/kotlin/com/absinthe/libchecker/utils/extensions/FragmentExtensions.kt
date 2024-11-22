@@ -13,7 +13,6 @@ fun <T : Fragment> T.putArguments(bundle: Bundle): T {
 }
 
 @MainThread
-fun <T : Fragment> T.putArguments(vararg pairs: Pair<String, Any?>): T =
-  putArguments(bundleOf(*pairs))
+fun <T : Fragment> T.putArguments(vararg pairs: Pair<String, Any?>): T = putArguments(bundleOf(*pairs))
 
 fun DialogFragment.isShowing() = this.dialog?.isShowing == true && !this.isRemoving

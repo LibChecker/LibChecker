@@ -25,8 +25,7 @@ class XposedInfoDialogFragment : BaseBottomSheetViewDialogFragment<XposedInfoBot
 
   private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME).orEmpty() }
 
-  override fun initRootView(): XposedInfoBottomSheetView =
-    XposedInfoBottomSheetView(requireContext())
+  override fun initRootView(): XposedInfoBottomSheetView = XposedInfoBottomSheetView(requireContext())
 
   override fun init() {
     maxPeekHeightPercentage = 0.67f
