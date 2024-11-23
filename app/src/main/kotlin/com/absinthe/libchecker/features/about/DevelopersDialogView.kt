@@ -4,17 +4,10 @@ import android.content.Context
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.absinthe.libchecker.R
-import com.absinthe.libchecker.features.settings.bean.GetUpdatesItem
-import com.absinthe.libchecker.features.settings.ui.adapter.GetUpdatesAdapter
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
-import com.google.android.flexbox.FlexDirection
-import com.google.android.flexbox.FlexWrap
-import com.google.android.flexbox.FlexboxLayout
-import com.google.android.flexbox.JustifyContent
 
 class DevelopersDialogView(context: Context) :
   LinearLayout(context),
