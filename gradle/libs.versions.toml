@@ -126,7 +126,7 @@ shizuku = [
   "shizuku-provider"
 ]
 zhaobozhen = [
-  "zhaobozhen-me",
+  #"zhaobozhen-me",
   "zhaobozhen-utils",
   "zhaobozhen-axml"
 ]

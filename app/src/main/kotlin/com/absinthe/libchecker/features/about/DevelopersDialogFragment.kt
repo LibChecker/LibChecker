@@ -6,7 +6,6 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libraries.me.Absinthe
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
@@ -24,9 +23,9 @@ class DevelopersDialogFragment : BaseBottomSheetViewDialogFragment<DevelopersDia
     super.onViewCreated(view, savedInstanceState)
     var items = listOf(
       DeveloperInfo(
-        Absinthe.ME,
+        "Absinthe",
         "Developer & Designer",
-        Absinthe.GITHUB_HOME_PAGE,
+        "https://github.com/zhaobozhen",
         R.drawable.pic_rabbit
       ),
       DeveloperInfo(
