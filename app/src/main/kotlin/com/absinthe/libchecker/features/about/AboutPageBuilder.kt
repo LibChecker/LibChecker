@@ -1,15 +1,20 @@
 package com.absinthe.libchecker.features.about
 
 import android.content.Context
+import android.view.ContextThemeWrapper
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.text.HtmlCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.findFragment
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
-import com.absinthe.libchecker.utils.Toasty
 import com.mikepenz.aboutlibraries.LibsBuilder
 import com.mikepenz.aboutlibraries.LibsConfiguration
 import com.mikepenz.aboutlibraries.entity.Library
 import com.mikepenz.aboutlibraries.util.SpecialButton
+import timber.log.Timber
 
 object AboutPageBuilder {
   fun start(context: Context) {
@@ -53,7 +58,13 @@ object AboutPageBuilder {
           val context = v.context
           when (specialButton) {
             SpecialButton.SPECIAL1 -> {
-              Toasty.showShort(context, "Devs")
+              Timber.d("Special1 clicked: ${getFragmentManager(context)}")
+              v.findFragment<Fragment>().let {
+                DevelopersDialogFragment().show(
+                  it.childFragmentManager,
+                  DevelopersDialogFragment::class.java.name
+                )
+              }
             }
 
             SpecialButton.SPECIAL2 -> {
@@ -118,7 +129,8 @@ object AboutPageBuilder {
               content.append("<b>").append("Acknowledgement").append("</b>").append("<br>")
               content.append(getAcknowledgementHtmlString(context, list)).append("<br>")
               content.append("<b>").append("Declaration").append("</b>").append("<br>")
-              content.append(context.getString(R.string.library_declaration)).append("<br>").append("<br>")
+              content.append(context.getString(R.string.library_declaration)).append("<br>")
+                .append("<br>")
               content.append("<b>").append("Privacy Policy").append("</b>").append("<br>")
               content.append(getHyperLink("https://absinthe.life/LibChecker-Docs/guide/PRIVACY/"))
 
@@ -176,5 +188,14 @@ object AboutPageBuilder {
     sb.append(context.getString(R.string.resource_declaration)).append("<br>")
     list.forEach { sb.append(getHyperLink(it)).append("<br>") }
     return sb.toString()
+  }
+
+  private fun getFragmentManager(context: Context?): FragmentManager? {
+    Timber.d("Context: $context")
+    return when (context) {
+      is AppCompatActivity -> context.supportFragmentManager
+      is ContextThemeWrapper -> getFragmentManager(context.baseContext)
+      else -> null
+    }
   }
 }
