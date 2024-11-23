@@ -3,11 +3,11 @@ package com.absinthe.libchecker.integrations.anywhere
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libraries.me.Absinthe
 import timber.log.Timber
 
-private const val ANYWHERE_APPLICATION_ID = Absinthe.ANYWHERE_
+private const val ANYWHERE_APPLICATION_ID = Constants.PackageNames.ANYWHERE_
 private const val FIRST_SUPPORT_VERSION_CODE = 2020000
 private const val ACTION_EDITOR = "com.absinthe.anywhere_.intent.action.EDITOR"
 private const val EXTRA_PACKAGE_NAME = "EXTRA_PACKAGE_NAME"
