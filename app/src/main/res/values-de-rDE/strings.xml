@@ -53,6 +53,8 @@
   <string name="android_dist_source">Quelle</string>
   <string name="android_dist_title">Android Version Vertriebsstatistik</string>
   <string name="android_dist_subtitle_format">Updatezeit: %s</string>
+  <string name="chart_abi_detailed"></string>
+  <string name="chart_abi_concise"></string>
   <!--  About  -->
   <string name="settings_about">Über</string>
   <string name="settings_about_summary">Dies ist LibChecker!</string>
@@ -83,6 +85,14 @@
   <string name="array_dark_mode_off">Aus</string>
   <string name="array_dark_mode_on">An</string>
   <!--  Detail  -->
+  <string name="app_bundle_details">.</string>
+  <string name="kotlin_details">.</string>
+  <string name="lib_detail_dialog_title"></string>
+  <string name="agp_details">.</string>
+  <string name="xposed_module_details">.</string>
+  <string name="play_app_signing_details">.</string>
+  <string name="lib_detail_dialog_content_16kb_page_size">.</string>
+  <string name="rx_detail">.</string>
   <!--  Toast  -->
   <!--  Snapshot  -->
   <!--  Dialog  -->
