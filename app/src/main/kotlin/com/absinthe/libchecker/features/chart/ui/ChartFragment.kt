@@ -142,16 +142,17 @@ class ChartFragment :
             }
             withContext(Dispatchers.Main) {
               if (dataSource == null) {
-                currentChartType = ChartType.ABI
+                setData(it, ChartType.ABI)
+              } else {
+                setData(it)
               }
-              setData(it)
             }
           }
         }
       }.stateIn(this)
     }
     lifecycleScope.launch {
-      lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+      lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
         viewModel.isLoading.collect { isLoading ->
           if (isLoading) {
             binding.progressHorizontal.show()
@@ -163,7 +164,7 @@ class ChartFragment :
       }
     }
     lifecycleScope.launch {
-      lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+      lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
         viewModel.distributionLastUpdateTime.collect { time ->
           (binding.dashboardContainer.getChildAt(0) as? MarketDistributionDashboardView)?.let {
             it.subtitle.text = getString(R.string.android_dist_subtitle_format, time)
@@ -172,7 +173,7 @@ class ChartFragment :
       }
     }
     lifecycleScope.launch {
-      lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+      lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
         viewModel.detailAbiSwitch.collect {
           if (currentChartType == ChartType.ABI && this@ChartFragment::allLCItemsStateFlow.isInitialized) {
             setData(allLCItemsStateFlow.value)
@@ -184,12 +185,12 @@ class ChartFragment :
 
   private fun setData(items: List<LCItem>, chartType: ChartType = currentChartType) {
     context ?: return
+    currentChartType = chartType
     viewModel.setLoading(true)
     viewModel.setDetailAbiSwitchVisibility(chartType == ChartType.ABI)
     if (chartView.parent != null) {
       binding.root.removeView(chartView)
     }
-    currentChartType = chartType
 
     when (chartType) {
       ChartType.ABI -> {
