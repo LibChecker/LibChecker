@@ -49,9 +49,12 @@
   <string name="string_kotlin_unused">未使用 Kotlin</string>
   <string name="string_compose_used">已使用 Jetpack Compose</string>
   <string name="string_compose_unused">未使用 Jetpack Compose</string>
+  <string name="android_dist_label">Distribution</string>
   <string name="android_dist_source">來源</string>
   <string name="android_dist_title">Android 版本發佈統計資料</string>
   <string name="android_dist_subtitle_format">更新時間：%s</string>
+  <string name="chart_abi_detailed">Detailed</string>
+  <string name="chart_abi_concise">Concise</string>
   <!--  About  -->
   <string name="settings_about">關於</string>
   <string name="settings_about_summary">這裡是 LibChecker！</string>
@@ -61,6 +64,9 @@
   <string name="settings_rate_us_summary">這可以使我們被更多的人發現</string>
   <string name="settings_get_updates">取得更新</string>
   <string name="settings_get_updates_summary">取得更加穩定並具有更多功能的最新版本</string>
+  <string name="settings_get_updates_in_app">In-app</string>
+  <string name="settings_get_updates_in_app_chip_stable">Stable</string>
+  <string name="settings_get_updates_in_app_chip_ci">CI</string>
   <string name="about_info">本應用程式用於檢視裝置上的應用程式使用第三方程式庫的狀況。</string>
   <string name="toolbar_rate">評分</string>
   <string name="resource_declaration">應用程式中的部分資源來自於： </string>
@@ -118,6 +124,8 @@
   <string name="jetpack_compose_details">Jetpack Compose 是 Android 的新型工具組，用於建置原生 UI。可簡化並加快 Android 平台上的 UI 開發作業。透過較少的程式碼、強大的工具和直觀的 Kotlin API，快速將應用程式上架。</string>
   <string name="extract_native_libs_tip">此應用程式宣告了 </string>
   <string name="xml_detail">XML 詳細資料</string>
+  <string name="lib_detail_dialog_title_16kb_page_size">16 KB Page Size Support</string>
+  <string name="lib_detail_dialog_content_16kb_page_size">Historically, Android has only supported 4 KB memory page sizes, which has optimized system memory performance for the average amount of total memory that Android devices have typically had. Beginning with Android 15, AOSP supports devices that are configured to use a page size of 16 KB (16 KB devices). If your app uses any NDK libraries, either directly or indirectly through an SDK, then you will need to rebuild your app for it to work on these 16 KB devices.</string>
   <string name="format_last_updated">最近更新：%s</string>
   <string name="menu_process">處理程序</string>
   <string name="menu_split">分割</string>
@@ -175,6 +183,7 @@
   <string name="toast_cant_open_app">無法啟動此應用程式</string>
   <string name="toast_cloud_rules_update_error">無法更新雲端規則，請再試一次</string>
   <string name="toast_not_enough_storage_space">儲存空間不足</string>
+  <string name="toast_downloading_app">Download requested</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">儲存目前快照</string>
   <string name="snapshot_current_timestamp">目前快照時間戳記</string>
