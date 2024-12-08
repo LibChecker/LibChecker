@@ -65,7 +65,7 @@ fun Project.setupAppModule(block: BaseAppModuleExtension.() -> Unit = {}) {
           "APP_CENTER_SECRET",
           "\"" + System.getenv("APP_CENTER_SECRET").orEmpty() + "\""
         )
-        buildConfigField("String", "BUILD_TIME", "\"" + Instant.now().toString() + "\"")
+        //buildConfigField("String", "BUILD_TIME", "\"" + Instant.now().toString() + "\"")
       }
     }
 
