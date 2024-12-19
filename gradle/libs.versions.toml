@@ -27,7 +27,7 @@ aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "abo
 gradlePlugin-android = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 gradlePlugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 
-kotlinX-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0"
+kotlinX-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.0"
 
 androidX-activity = "androidx.activity:activity-ktx:1.9.3"
 androidX-appCompat = "androidx.appcompat:appcompat:1.7.0"
