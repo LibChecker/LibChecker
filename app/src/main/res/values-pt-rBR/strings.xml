@@ -55,6 +55,7 @@
   <string name="android_dist_subtitle_format">Tempo de atualização: %s</string>
   <string name="chart_abi_detailed">Detalhado</string>
   <string name="chart_abi_concise">Conciso</string>
+  <string name="chart_item_not_support">Not Support</string>
   <!--  About  -->
   <string name="settings_about">Sobre</string>
   <string name="settings_about_summary">Isto é LibChecker!</string>
