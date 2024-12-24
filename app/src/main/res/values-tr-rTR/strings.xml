@@ -55,6 +55,7 @@
   <string name="android_dist_subtitle_format">Güncelleme Zamanı: %s</string>
   <string name="chart_abi_detailed">Detaylı</string>
   <string name="chart_abi_concise">Kısa ve öz</string>
+  <string name="chart_item_not_support">Desteklenmiyor</string>
   <!--  About  -->
   <string name="settings_about">Hakkında</string>
   <string name="settings_about_summary">Bu LibChecker!</string>
@@ -108,7 +109,7 @@
   <string name="not_found">Bulunamadı</string>
   <string name="create_an_issue">Bilgileri tamamlamamıza yardımcı olun</string>
   <string name="app_bundle_details">Android Uygulama Paketi, uygulamanızı oluşturmak ve yayınlamak için Android\'in yeni, resmi yayınlama formatıdır. Android Uygulama Paketi, daha küçük bir uygulama boyutunda harika bir deneyim sunmanızı sağlar, bu da yükleme başarısını artırabilir ve kaldırmaları azaltabilir. Değiştirmek kolaydır. Daha küçük bir uygulamanın avantajlarından yararlanmaya başlamak için kodunuzu yeniden düzenlemeniz gerekmez. Ve değiştirdikten sonra, modüler uygulama geliştirme ve özelleştirilebilir özellik dağıtımından yararlanacaksınız.</string>
-  <string name="kotlin_details">Kotlin, çapraz platform, statik olarak yazılmış, genel amaçlı bir programlama dilidir ve tür çıkarımı özelliğine sahiptir. Kotlin, Java ile tam olarak birlikte çalışacak şekilde tasarlanmıştır ve Kotlin\'in standart kütüphanesinin JVM sürümü Java Sınıf Kütüphanesi\'ne bağlıdır, ancak tür çıkarımı sözdiziminin daha özlü olmasını sağlar.</string>
+  <string name="kotlin_details">Kotlin, JVM, Android, JavaScript, Wasm ve Native\'i hedefleyen açık kaynaklı statik olarak yazılan bir programlama dilidir. JetBrains tarafından geliştirilmiştir. Kotlin, geliştiricileri daha mutlu etmek için tasarlanmış modern ancak zaten olgun bir programlama dilidir. Özlü, güvenli, Java ve diğer dillerle birlikte çalışabilir ve üretken programlama için birden fazla platform arasında kodu yeniden kullanmanın birçok yolunu sunar.</string>
   <string name="items_count">Öğe sayısı: </string>
   <string name="further_operation">İleri İşlem</string>
   <string name="app_info_launch">Başlat</string>
