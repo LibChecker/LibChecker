@@ -29,11 +29,12 @@ class PageSize16KBChartDataSource(items: List<LCItem>) : BaseChartDataSource<Pie
       val context = chartView.context ?: return@withContext
       val parties = listOf(
         context.resources.getString(R.string.lib_detail_dialog_title_16kb_page_size),
-        context.resources.getString(R.string.chart_item_not_support)
+        context.resources.getString(R.string.chart_item_not_support),
+        context.resources.getString(R.string.title_statistics_dialog_no_native_libs)
       )
       val entries: ArrayList<PieEntry> = ArrayList()
       val colorOnSurface = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
-      val classifiedList = listOf(mutableListOf<LCItem>(), mutableListOf())
+      val classifiedList = listOf(mutableListOf<LCItem>(), mutableListOf(), mutableListOf())
 
       for (item in filteredList) {
         if (!isActive) {
@@ -41,7 +42,9 @@ class PageSize16KBChartDataSource(items: List<LCItem>) : BaseChartDataSource<Pie
         }
         try {
           val pi = PackageUtils.getPackageInfo(item.packageName)
-          if (pi.is16KBAligned()) {
+          if (PackageUtils.hasNoNativeLibs(item.abi.toInt())) {
+            classifiedList[NO_NATIVE_LIBS].add(item)
+          } else if (pi.is16KBAligned()) {
             classifiedList[SUPPORT_16KB].add(item)
           } else {
             classifiedList[NOT_SUPPORT_16KB].add(item)
@@ -60,6 +63,11 @@ class PageSize16KBChartDataSource(items: List<LCItem>) : BaseChartDataSource<Pie
         R.drawable.ic_16kb_align,
         true,
         classifiedList[NOT_SUPPORT_16KB]
+      )
+      classifiedMap[NO_NATIVE_LIBS] = ChartSourceItem(
+        R.drawable.ic_abi_label_no_libs,
+        true,
+        classifiedList[NO_NATIVE_LIBS]
       )
 
       // NOTE: The order of the entries when being added to the entries array determines their position around the center of
@@ -84,11 +92,13 @@ class PageSize16KBChartDataSource(items: List<LCItem>) : BaseChartDataSource<Pie
 
       if (OsUtils.atLeastS()) {
         if (com.absinthe.libraries.utils.utils.UiUtils.isDarkMode()) {
+          colors.add(context.getColor(android.R.color.system_accent1_500))
           colors.add(context.getColor(android.R.color.system_accent1_700))
           colors.add(context.getColor(android.R.color.system_accent1_900))
         } else {
           colors.add(context.getColor(android.R.color.system_accent1_200))
           colors.add(context.getColor(android.R.color.system_accent1_400))
+          colors.add(context.getColor(android.R.color.system_accent1_600))
         }
       } else {
         for (c in ColorTemplate.MATERIAL_COLORS) colors.add(c)
@@ -117,6 +127,7 @@ class PageSize16KBChartDataSource(items: List<LCItem>) : BaseChartDataSource<Pie
     return when (x) {
       SUPPORT_16KB -> context.getString(R.string.lib_detail_dialog_title_16kb_page_size)
       NOT_SUPPORT_16KB -> context.getString(R.string.chart_item_not_support)
+      NO_NATIVE_LIBS -> context.getString(R.string.title_statistics_dialog_no_native_libs)
       else -> ""
     }
   }
@@ -124,5 +135,6 @@ class PageSize16KBChartDataSource(items: List<LCItem>) : BaseChartDataSource<Pie
   companion object {
     const val SUPPORT_16KB = 0
     const val NOT_SUPPORT_16KB = 1
+    const val NO_NATIVE_LIBS = 2
   }
 }
