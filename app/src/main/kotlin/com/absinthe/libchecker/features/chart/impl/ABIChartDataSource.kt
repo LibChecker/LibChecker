@@ -3,12 +3,11 @@ package com.absinthe.libchecker.features.chart.impl
 import android.content.Context
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants.MULTI_ARCH
-import com.absinthe.libchecker.constant.Constants.OVERLAY
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.features.chart.BaseChartDataSource
 import com.absinthe.libchecker.features.chart.ChartSourceItem
 import com.absinthe.libchecker.utils.OsUtils
+import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.ABI_32_BIT
 import com.absinthe.libchecker.utils.extensions.ABI_64_BIT
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -42,17 +41,14 @@ class ABIChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>(it
       )
 
       for (item in filteredList) {
-        if (GlobalValues.isShowSystemApps.not()) {
-          if (item.isSystem) continue
-        }
-        if (item.abi.toInt() == OVERLAY) {
+        if (PackageUtils.hasNoNativeLibs(item.abi.toInt())) {
           classifiedList[NO_LIBS].add(item)
-          continue
-        }
-        when (item.abi % MULTI_ARCH) {
-          in ABI_64_BIT -> classifiedList[IS_64_BIT].add(item)
-          in ABI_32_BIT -> classifiedList[IS_32_BIT].add(item)
-          else -> classifiedList[NO_LIBS].add(item)
+        } else {
+          when (item.abi % MULTI_ARCH) {
+            in ABI_64_BIT -> classifiedList[IS_64_BIT].add(item)
+            in ABI_32_BIT -> classifiedList[IS_32_BIT].add(item)
+            else -> classifiedList[NO_LIBS].add(item)
+          }
         }
       }
 

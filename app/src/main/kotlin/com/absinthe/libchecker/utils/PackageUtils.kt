@@ -1212,4 +1212,8 @@ object PackageUtils {
       }
     }
   }
+
+  fun hasNoNativeLibs(abi: Int): Boolean {
+    return abi == OVERLAY || (abi % MULTI_ARCH) == NO_LIBS
+  }
 }
