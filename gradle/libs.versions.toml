@@ -1,6 +1,6 @@
 [versions]
 agp = "8.7.3"
-aboutlibraries = "11.2.3"
+aboutlibraries = "11.3.0"
 androidX-lifecycle = "2.8.7"
 androidX-room = "2.6.1"
 appCenter = "5.0.5"
