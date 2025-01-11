@@ -8,12 +8,14 @@ import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.findFragment
+import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.mikepenz.aboutlibraries.LibsBuilder
 import com.mikepenz.aboutlibraries.LibsConfiguration
 import com.mikepenz.aboutlibraries.entity.Library
 import com.mikepenz.aboutlibraries.util.SpecialButton
+import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import timber.log.Timber
 
 object AboutPageBuilder {
@@ -26,30 +28,26 @@ object AboutPageBuilder {
       .withAboutSpecial1("Devs")
       .withAboutSpecial2("Contribs")
       .withAboutSpecial3("Credits")
+      .withUiListener(object : LibsConfiguration.LibsUIListener {
+        override fun preOnCreateView(view: View) = view
+
+        override fun postOnCreateView(view: View): View {
+          view.findViewById<RecyclerView>(com.mikepenz.aboutlibraries.R.id.cardListView)?.let { rv ->
+            rv.isVerticalScrollBarEnabled = false
+            FastScrollerBuilder(rv).useMd2Style().build()
+          }
+          return view
+        }
+      })
       .withListener(object : LibsConfiguration.LibsListener {
         override fun onIconClicked(v: View) {
         }
 
-        override fun onLibraryAuthorClicked(
-          v: View,
-          library: Library
-        ): Boolean {
-          return false
-        }
+        override fun onLibraryAuthorClicked(v: View, library: Library) = false
 
-        override fun onLibraryContentClicked(
-          v: View,
-          library: Library
-        ): Boolean {
-          return false
-        }
+        override fun onLibraryContentClicked(v: View, library: Library) = false
 
-        override fun onLibraryBottomClicked(
-          v: View,
-          library: Library
-        ): Boolean {
-          return false
-        }
+        override fun onLibraryBottomClicked(v: View, library: Library) = false
 
         override fun onExtraClicked(
           v: View,
@@ -150,30 +148,13 @@ object AboutPageBuilder {
           return true
         }
 
-        override fun onIconLongClicked(v: View): Boolean {
-          return false
-        }
+        override fun onIconLongClicked(v: View) = false
 
-        override fun onLibraryAuthorLongClicked(
-          v: View,
-          library: Library
-        ): Boolean {
-          return false
-        }
+        override fun onLibraryAuthorLongClicked(v: View, library: Library) = false
 
-        override fun onLibraryContentLongClicked(
-          v: View,
-          library: Library
-        ): Boolean {
-          return false
-        }
+        override fun onLibraryContentLongClicked(v: View, library: Library) = false
 
-        override fun onLibraryBottomLongClicked(
-          v: View,
-          library: Library
-        ): Boolean {
-          return false
-        }
+        override fun onLibraryBottomLongClicked(v: View, library: Library) = false
       })
       .start(context)
   }

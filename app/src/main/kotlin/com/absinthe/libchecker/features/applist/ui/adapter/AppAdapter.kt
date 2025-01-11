@@ -34,13 +34,14 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
   }
 
   override fun convert(holder: BaseViewHolder, item: LCItem) {
-    if (cardMode == CardMode.DEMO) {
-      (holder.itemView as AppItemView).apply {
+    val root = holder.itemView as AppItemView
+    root.apply {
+      if (cardMode == CardMode.DEMO) {
         strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutline)
         setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSecondaryContainer))
       }
     }
-    (holder.itemView as AppItemView).container.apply {
+    root.container.apply {
       val packageInfo = if (item.packageName != Constants.EXAMPLE_PACKAGE) {
         val packageInfo = runCatching {
           PackageUtils.getPackageInfo(item.packageName)

@@ -63,6 +63,7 @@
   </ViewFlipper>
 
   <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+    style="?attr/extendedFloatingActionButtonSurfaceStyle"
     android:id="@+id/extended_fab"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
