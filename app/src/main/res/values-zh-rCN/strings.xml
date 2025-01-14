@@ -166,9 +166,12 @@
   <string name="lib_detail_app_install_source_title">安装来源</string>
   <string name="lib_detail_app_install_source_originating_package">安装请求方</string>
   <string name="lib_detail_app_install_source_installing_package">安装执行方</string>
+  <string name="lib_detail_app_installed_time">安装时间</string>
+  <string name="lib_detail_app_first_installed_time">首次安装时间：</string>
+  <string name="lib_detail_app_last_updated_time">最近更新时间：</string>
   <string name="lib_detail_app_install_source_empty">未知</string>
-  <string name="lib_detail_app_install_source_empty_detail">adb 或已被卸载的应用</string>
-  <string name="lib_detail_app_install_source_shizuku_usage">因为安卓限制了获取安装请求者的 API, 我们使用 Shizuku 来获取安装请求者。</string>
+  <string name="lib_detail_app_install_source_empty_detail">Shell 或已被卸载的应用</string>
+  <string name="lib_detail_app_install_source_shizuku_usage">由于 Android 限制了获取安装请求方的接口, 我们使用 Shizuku 来获取安装请求方。</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizuku 未安装</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">点此安装 Shizuku</string>
   <string name="lib_detail_app_install_source_shizuku_low_version">需要 Shizuku API 版本 10</string>
