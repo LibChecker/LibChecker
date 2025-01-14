@@ -378,7 +378,7 @@ class ChartFragment :
 
       if (dataSource is TargetApiChartDataSource || dataSource is MinApiChartDataSource) {
         val index = (dataSource as BaseVariableChartDataSource<*>).getListKeyByXValue(x)
-        it.setAndroidVersionLabel(AndroidVersions.versions.find { version -> version.first == index })
+        it.setAndroidVersionLabel(AndroidVersions.versions.find { node -> node.version == index })
       } else {
         it.setAndroidVersionLabel(null)
       }
