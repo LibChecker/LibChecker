@@ -2,6 +2,7 @@ package com.absinthe.libchecker.features.chart.ui
 
 import android.content.DialogInterface
 import androidx.lifecycle.lifecycleScope
+import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
@@ -10,7 +11,7 @@ class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Clas
 
   private var onDismissAction: (() -> Unit)? = null
   private var _title: String? = null
-  private var _androidVersionTriple: Triple<Int, String, Int?>? = null
+  private var _androidVersionNode: AndroidVersions.Node? = null
   private var _list: List<LCItem>? = null
 
   override fun initRootView(): ClassifyDialogView = ClassifyDialogView(requireContext(), lifecycleScope)
@@ -21,7 +22,7 @@ class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Clas
     maxPeekHeightPercentage = 0.67f
     root.post {
       _title?.let { setTitle(it) }
-      _androidVersionTriple?.let { setAndroidVersionLabel(it) }
+      _androidVersionNode?.let { setAndroidVersionLabel(it) }
       _list?.let { setList(it) }
     }
   }
@@ -39,10 +40,10 @@ class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Clas
     }
   }
 
-  fun setAndroidVersionLabel(triple: Triple<Int, String, Int?>?) {
-    _androidVersionTriple = triple
+  fun setAndroidVersionLabel(node: AndroidVersions.Node?) {
+    _androidVersionNode = node
     runCatching {
-      root.addAndroidVersionView(triple)
+      root.addAndroidVersionView(node)
     }
   }
 
