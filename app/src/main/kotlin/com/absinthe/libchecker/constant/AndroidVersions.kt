@@ -46,8 +46,8 @@ object AndroidVersions {
   )
 
   val simpleVersions = versions.map {
-    it.version to it.versionName.takeWhile { c -> c == ' ' }
-  }
+    it.version to it.versionName.takeWhile { c -> c != ' ' }
+  }.toMap()
 
   private fun getDate(year: Int, month: Int): Date {
     val calendar = Calendar.getInstance()
