@@ -588,14 +588,10 @@ class HomeViewModel : ViewModel() {
     packageName: String,
     list: List<LibStringItem>
   ) {
-    list.forEach {
-      if (referenceMap[it.name] == null) {
-        referenceMap[it.name] = mutableSetOf<String>() to NATIVE
+    list.filter { LCAppUtils.checkNativeLibValidation(packageName, it.name, list) }
+      .forEach {
+        referenceMap.putIfAbsent(it.name, mutableSetOf<String>() to NATIVE)?.first?.add(packageName)
       }
-      if (LCAppUtils.checkNativeLibValidation(packageName, it.name, list)) {
-        referenceMap[it.name]!!.first.add(packageName)
-      }
-    }
   }
 
   private fun computeComponentReferenceInternal(
@@ -604,12 +600,9 @@ class HomeViewModel : ViewModel() {
     @LibType type: Int,
     components: Array<out ComponentInfo>?
   ) {
-    components?.forEach {
-      if (referenceMap[it.name] == null) {
-        referenceMap[it.name] = mutableSetOf<String>() to type
-      }
-      referenceMap[it.name]!!.first.add(packageName)
-    }
+    components.orEmpty()
+      .filter { it.name.startsWith(packageName).not() }
+      .forEach { referenceMap.putIfAbsent(it.name, mutableSetOf<String>() to type)?.first?.add(packageName) }
   }
 
   private fun computeDexReferenceInternal(
@@ -617,12 +610,8 @@ class HomeViewModel : ViewModel() {
     packageName: String,
     list: List<LibStringItem>
   ) {
-    list.forEach {
-      if (referenceMap[it.name] == null) {
-        referenceMap[it.name] = mutableSetOf<String>() to DEX
-      }
-      referenceMap[it.name]!!.first.add(packageName)
-    }
+    list.filter { it.name.startsWith(packageName).not() }
+      .forEach { referenceMap.putIfAbsent(it.name, mutableSetOf<String>() to DEX)?.first?.add(packageName) }
   }
 
   private fun computePermissionReferenceInternal(
@@ -630,12 +619,7 @@ class HomeViewModel : ViewModel() {
     packageName: String,
     list: Array<out String>?
   ) {
-    list?.forEach {
-      if (referenceMap[it] == null) {
-        referenceMap[it] = mutableSetOf<String>() to PERMISSION
-      }
-      referenceMap[it]!!.first.add(packageName)
-    }
+    list?.forEach { referenceMap.putIfAbsent(it, mutableSetOf<String>() to PERMISSION)?.first?.add(packageName) }
   }
 
   private fun computeMetadataReferenceInternal(
@@ -643,12 +627,7 @@ class HomeViewModel : ViewModel() {
     packageName: String,
     bundle: Bundle?
   ) {
-    bundle?.keySet()?.forEach {
-      if (referenceMap[it] == null) {
-        referenceMap[it] = mutableSetOf<String>() to METADATA
-      }
-      referenceMap[it]!!.first.add(packageName)
-    }
+    bundle?.keySet()?.forEach { referenceMap.putIfAbsent(it, mutableSetOf<String>() to METADATA)?.first?.add(packageName) }
   }
 
   private var matchingJob: Job? = null
