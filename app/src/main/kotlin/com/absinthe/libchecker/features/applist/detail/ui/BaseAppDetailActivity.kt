@@ -32,7 +32,6 @@ import androidx.viewpager2.widget.ViewPager2
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
-import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PERMISSION
@@ -62,7 +61,6 @@ import com.absinthe.libchecker.features.applist.detail.ui.adapter.ProcessBarAdap
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.node.AbiLabelNode
 import com.absinthe.libchecker.features.applist.detail.ui.impl.AbilityAnalysisFragment
 import com.absinthe.libchecker.features.applist.detail.ui.impl.ComponentsAnalysisFragment
-import com.absinthe.libchecker.features.applist.detail.ui.impl.DexAnalysisFragment
 import com.absinthe.libchecker.features.applist.detail.ui.impl.MetaDataAnalysisFragment
 import com.absinthe.libchecker.features.applist.detail.ui.impl.NativeAnalysisFragment
 import com.absinthe.libchecker.features.applist.detail.ui.impl.PermissionAnalysisFragment
@@ -375,7 +373,7 @@ abstract class BaseAppDetailActivity :
         PROVIDER,
         PERMISSION,
         METADATA,
-        DEX,
+        // DEX,
         SIGNATURES
       )
     } else {
@@ -385,7 +383,7 @@ abstract class BaseAppDetailActivity :
         AbilityType.SERVICE,
         AbilityType.WEB,
         AbilityType.DATA,
-        DEX,
+        // DEX,
         SIGNATURES
       )
     }
@@ -398,7 +396,7 @@ abstract class BaseAppDetailActivity :
         getText(R.string.ref_category_cp),
         getText(R.string.ref_category_perm),
         getText(R.string.ref_category_metadata),
-        getText(R.string.ref_category_dex),
+        // getText(R.string.ref_category_dex),
         getText(R.string.ref_category_signatures)
       )
     } else {
@@ -408,7 +406,7 @@ abstract class BaseAppDetailActivity :
         getText(R.string.ability_service),
         getText(R.string.ability_web),
         getText(R.string.ability_data),
-        getText(R.string.ref_category_dex),
+        // getText(R.string.ref_category_dex),
         getText(R.string.ref_category_signatures)
       )
     }
@@ -453,7 +451,7 @@ abstract class BaseAppDetailActivity :
 
             METADATA -> MetaDataAnalysisFragment.newInstance(packageInfo.packageName)
 
-            DEX -> DexAnalysisFragment.newInstance(packageInfo.packageName)
+            // DEX -> DexAnalysisFragment.newInstance(packageInfo.packageName)
 
             SIGNATURES -> SignaturesAnalysisFragment.newInstance(packageInfo.packageName)
 
