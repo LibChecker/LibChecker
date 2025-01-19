@@ -296,12 +296,12 @@ abstract class BaseAppDetailActivity :
       toolbarAdapter.addData(
         AppDetailToolbarItem(R.drawable.ic_lib_sort, R.string.menu_sort) {
           lifecycleScope.launch {
-            detailFragmentManager.sortAll()
             GlobalValues.libSortMode = if (GlobalValues.libSortMode == MODE_SORT_BY_LIB) {
               MODE_SORT_BY_SIZE
             } else {
               MODE_SORT_BY_LIB
             }
+            detailFragmentManager.sortAll()
           }
         }
       )
@@ -758,7 +758,7 @@ abstract class BaseAppDetailActivity :
 
   override fun onQueryTextChange(newText: String): Boolean {
     viewModel.queriedText = newText
-    detailFragmentManager.deliverFilterItemsByText(newText)
+    detailFragmentManager.deliverFilterItemsByText(newText, lifecycleScope)
     return false
   }
 
@@ -821,7 +821,7 @@ abstract class BaseAppDetailActivity :
 
         doOnMainThreadIdle {
           viewModel.queriedProcess = null
-          detailFragmentManager.deliverFilterItems(null)
+          detailFragmentManager.deliverFilterItems(null, null, lifecycleScope)
         }
       }
     }
@@ -942,7 +942,7 @@ abstract class BaseAppDetailActivity :
         } else {
           viewModel.queriedProcess = null
         }
-        detailFragmentManager.deliverFilterItems(viewModel.queriedProcess)
+        detailFragmentManager.deliverFilterItems(null, viewModel.queriedProcess, lifecycleScope)
       }
     }
     binding.detailToolbarContainer.addView(processBarView)

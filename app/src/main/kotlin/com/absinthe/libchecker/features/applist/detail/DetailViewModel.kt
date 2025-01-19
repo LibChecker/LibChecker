@@ -19,7 +19,6 @@ import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.LibDetailBean
 import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
 import com.absinthe.libchecker.api.request.LibDetailRequest
-import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.GlobalValues
@@ -71,8 +70,8 @@ class DetailViewModel : ViewModel() {
   val permissionsItems: MutableStateFlow<List<LibStringItemChip>?> = MutableStateFlow(null)
   val dexLibItems: MutableStateFlow<List<LibStringItemChip>?> = MutableStateFlow(null)
   val signaturesLibItems: MutableStateFlow<List<LibStringItemChip>?> = MutableStateFlow(null)
-  val componentsMap = SparseArray<MutableStateFlow<List<StatefulComponent>>>()
-  val abilitiesMap = SparseArray<MutableStateFlow<List<StatefulComponent>>>()
+  val componentsMap = SparseArray<MutableStateFlow<List<StatefulComponent>?>>()
+  val abilitiesMap = SparseArray<MutableStateFlow<List<StatefulComponent>?>>()
   val itemsCountStateFlow: MutableStateFlow<LocatedCount> = MutableStateFlow(LocatedCount(0, 0))
   val processToolIconVisibilityStateFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
   val processMapStateFlow = MutableStateFlow<Map<String, Int>>(emptyMap())
@@ -94,10 +93,10 @@ class DetailViewModel : ViewModel() {
   val abiBundleStateFlow = MutableStateFlow<AbiBundle?>(null)
 
   init {
-    componentsMap.put(SERVICE, MutableStateFlow(emptyList()))
-    componentsMap.put(ACTIVITY, MutableStateFlow(emptyList()))
-    componentsMap.put(RECEIVER, MutableStateFlow(emptyList()))
-    componentsMap.put(PROVIDER, MutableStateFlow(emptyList()))
+    componentsMap.put(SERVICE, MutableStateFlow(null))
+    componentsMap.put(ACTIVITY, MutableStateFlow(null))
+    componentsMap.put(RECEIVER, MutableStateFlow(null))
+    componentsMap.put(PROVIDER, MutableStateFlow(null))
   }
 
   fun isPackageInfoAvailable(): Boolean {
@@ -293,12 +292,10 @@ class DetailViewModel : ViewModel() {
 
   private fun getMetaDataChipList(): List<LibStringItemChip> {
     Timber.d("getMetaDataChipList")
-    val list = PackageUtils.getMetaDataItems(packageInfo)
-    val chipList = mutableListOf<LibStringItemChip>()
+    val chipList = PackageUtils.getMetaDataItems(packageInfo)
+      .map { LibStringItemChip(it, null) }
+      .toMutableList()
 
-    list.forEach {
-      chipList.add(LibStringItemChip(it, null))
-    }
     chipList.sortByDescending { it.item.name }
     return chipList
   }
@@ -306,15 +303,20 @@ class DetailViewModel : ViewModel() {
   private fun getPermissionChipList(): List<LibStringItemChip> {
     Timber.d("getPermissionChipList")
     val list = packageInfo.getStatefulPermissionsList().asSequence()
-      .map { perm -> LibStringItem(perm.first, if (perm.second) 1 else 0, if (perm.first.contains("maxSdkVersion")) DISABLED else null) }
-      .toList()
-    val chipList = mutableListOf<LibStringItemChip>()
-
-    list.forEach {
-      chipList.add(LibStringItemChip(it, null))
-    }
-    chipList.sortByDescending { it.item.name }
-    return chipList
+      .map { perm ->
+        LibStringItemChip(
+          LibStringItem(
+            name = perm.first,
+            size = if (perm.second) PackageInfo.REQUESTED_PERMISSION_GRANTED.toLong() else 0,
+            source = if (perm.first.contains("maxSdkVersion")) DISABLED else null,
+            process = if (perm.second) PackageInfo.REQUESTED_PERMISSION_GRANTED.toString() else null
+          ),
+          null
+        )
+      }
+      .toMutableList()
+    list.sortByDescending { it.item.name }
+    return list
   }
 
   private suspend fun getDexChipList(): List<LibStringItemChip> {
@@ -363,10 +365,10 @@ class DetailViewModel : ViewModel() {
   }
 
   fun initAbilities(context: Context, packageName: String) = viewModelScope.launch(Dispatchers.IO) {
-    abilitiesMap.put(AbilityType.PAGE, MutableStateFlow(emptyList()))
-    abilitiesMap.put(AbilityType.SERVICE, MutableStateFlow(emptyList()))
-    abilitiesMap.put(AbilityType.WEB, MutableStateFlow(emptyList()))
-    abilitiesMap.put(AbilityType.DATA, MutableStateFlow(emptyList()))
+    abilitiesMap.put(AbilityType.PAGE, MutableStateFlow(null))
+    abilitiesMap.put(AbilityType.SERVICE, MutableStateFlow(null))
+    abilitiesMap.put(AbilityType.WEB, MutableStateFlow(null))
+    abilitiesMap.put(AbilityType.DATA, MutableStateFlow(null))
 
     try {
       ApplicationDelegate(context).iBundleManager?.getBundleInfo(
@@ -479,10 +481,12 @@ class DetailViewModel : ViewModel() {
 
     if (OsUtils.atLeastR()) {
       runCatching {
-        val info = SystemServices.packageManager.getInstallSourceInfo(packageInfo.packageName)
-        if (info.installingPackageName != null) {
+        val info = PackageUtils.getInstallSourceInfo(packageInfo.packageName)
+        if (info?.installingPackageName != null) {
           _featuresFlow.emit(VersionedFeature(Features.Ext.APPLICATION_INSTALL_SOURCE, info.initiatingPackageName))
         }
+      }.onFailure {
+        Timber.e(it)
       }
     }
 
