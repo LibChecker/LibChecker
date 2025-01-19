@@ -7,19 +7,30 @@ import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
 import com.absinthe.libchecker.features.applist.Referable
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibStringDiffUtil
-import com.absinthe.libchecker.features.applist.detail.ui.base.BaseFilterAnalysisFragment
+import com.absinthe.libchecker.features.applist.detail.ui.base.BaseDetailFragment
 import com.absinthe.libchecker.features.applist.detail.ui.base.EXTRA_TYPE
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.extensions.putArguments
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 class NativeAnalysisFragment :
-  BaseFilterAnalysisFragment<FragmentLibNativeBinding>(),
+  BaseDetailFragment<FragmentLibNativeBinding>(),
   Referable {
 
   override fun getRecyclerView() = binding.list
   override val needShowLibDetailDialog = true
+
+  override suspend fun getItems(): List<LibStringItemChip> {
+    return viewModel.nativeLibItems.value ?: viewModel.nativeLibItems.first() ?: emptyList()
+  }
+
+  override fun onItemsAvailable(items: List<LibStringItemChip>) {
+    setItems(items)
+  }
 
   override fun init() {
     binding.apply {
@@ -34,14 +45,10 @@ class NativeAnalysisFragment :
       setEmptyView(emptyView)
     }
 
-    viewModel.nativeLibItems.value?.let {
-      setItems(it)
-    }
-
     viewModel.apply {
       nativeLibItems.onEach {
         if (it == null) return@onEach
-        setItems(it)
+        onItemsAvailable(it)
       }.launchIn(lifecycleScope)
       packageInfoStateFlow.onEach {
         if (it != null) {
@@ -53,6 +60,10 @@ class NativeAnalysisFragment :
           adapter.set64Bit(it)
         }
       }.launchIn(lifecycleScope)
+
+      packageInfoStateFlow.value?.run {
+        nativeLibItems.value ?: run { initSoAnalysisData() }
+      }
     }
   }
 
@@ -65,26 +76,13 @@ class NativeAnalysisFragment :
     super.onVisibilityChanged(visible)
   }
 
-  override fun getFilterList(process: String?): List<LibStringItemChip>? {
-    return if (process.isNullOrEmpty()) {
-      viewModel.nativeLibItems.value
-    } else {
-      viewModel.nativeLibItems.value?.filter { it.item.process == process }
-    }
-  }
-
   private fun setItems(list: List<LibStringItemChip>) {
     if (list.isEmpty()) {
       emptyView.text.text = getString(R.string.empty_list)
     } else {
       adapter.processMap = viewModel.nativeSourceMap
-      if (viewModel.queriedText?.isNotEmpty() == true) {
-        filterList(viewModel.queriedText!!)
-      } else {
-        setList(list)
-      }
-      if (viewModel.queriedProcess?.isNotEmpty() == true) {
-        filterItems(viewModel.queriedProcess!!)
+      lifecycleScope.launch(Dispatchers.IO) {
+        setItemsWithFilter(viewModel.queriedText, viewModel.queriedProcess)
       }
     }
 

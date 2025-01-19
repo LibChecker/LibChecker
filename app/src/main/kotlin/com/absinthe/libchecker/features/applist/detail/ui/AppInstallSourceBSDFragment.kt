@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
 import android.content.Intent
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -19,6 +20,7 @@ import com.absinthe.libchecker.features.applist.detail.ui.view.AppInstallSourceB
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppInstallSourceItemView
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppInstallTimeItemView
 import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
+import com.absinthe.libchecker.utils.FreezeUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.PREINSTALLED_TIMESTAMP
 import com.absinthe.libchecker.utils.extensions.getDrawable
@@ -50,7 +52,7 @@ class AppInstallSourceBSDFragment :
 
     initOriginatingItemView(root.originatingView, info.originatingPackageName)
     initAppInstallSourceItemView(root.installingView, info.installingPackageName)
-    initAppInstalledTimeItemView(root.installedTimeView, pi.firstInstallTime, pi.lastUpdateTime)
+    initAppInstalledTimeItemView(root.installedTimeView, pi)
   }
 
   override fun onDestroyView() {
@@ -199,16 +201,14 @@ class AppInstallSourceBSDFragment :
     Shizuku.removeBinderReceivedListener(this)
   }
 
-  private fun initAppInstalledTimeItemView(
-    item: AppInstallTimeItemView,
-    firstInstalledTime: Long,
-    lastUpdatedTime: Long
-  ) {
-    if (context == null) {
+  private fun initAppInstalledTimeItemView(item: AppInstallTimeItemView, pi: PackageInfo) {
+    if (context == null || FreezeUtils.isAppFrozen(pi.packageName)) {
       item.isGone = true
       return
     }
 
+    val firstInstalledTime = pi.firstInstallTime
+    val lastUpdatedTime = pi.lastUpdateTime
     item.contentView.apply {
       if (firstInstalledTime <= PREINSTALLED_TIMESTAMP) {
         firstInstalledView.libSize.text = getString(R.string.snapshot_preinstalled_app)

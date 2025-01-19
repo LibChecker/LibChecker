@@ -1,7 +1,9 @@
 package com.absinthe.libchecker.features.applist.detail.ui.base
 
 import android.content.Context
+import android.os.Bundle
 import android.view.Gravity
+import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -96,11 +98,21 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   protected var afterListReadyTask: Runnable? = null
   private var integrationMonkeyKingBlockList: List<ShareCmpInfo.Component>? = null
   private var integrationBlockerList: List<ShareCmpInfo.Component>? = null
-  private var items: List<LibStringItemChip> = emptyList()
 
   abstract fun getRecyclerView(): RecyclerView
 
   protected abstract val needShowLibDetailDialog: Boolean
+
+  protected abstract suspend fun getItems(): List<LibStringItemChip>
+  protected abstract fun onItemsAvailable(items: List<LibStringItemChip>)
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    lifecycleScope.launch {
+      val items = withContext(Dispatchers.IO) { getItems() }
+      onItemsAvailable(items)
+    }
+  }
 
   override fun onAttach(context: Context) {
     super.onAttach(context)
@@ -182,41 +194,48 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     }
   }
 
-  override fun filterList(text: String) {
-    adapter.highlightText = text
+  fun sortedList(origin: MutableList<LibStringItemChip>): MutableList<LibStringItemChip> {
+    if (GlobalValues.libSortMode == MODE_SORT_BY_LIB) {
+      if (type == NATIVE) {
+        origin.sortByDescending { it.item.size }
+      } else {
+        origin.sortByDescending { it.item.name }
+      }
+    } else {
+      origin.sortWith(compareByDescending<LibStringItemChip> { it.rule != null }.thenBy { it.item.name })
+    }
+    return origin
+  }
 
-    with(getFilterListByText(text)) {
+  protected open suspend fun getFilterList(
+    searchWords: String?,
+    process: String?
+  ): List<LibStringItemChip>? {
+    return getItems().asSequence()
+      .filter { searchWords == null || it.item.name.contains(searchWords, true) || it.item.source?.contains(searchWords, true) == true }
+      .filter { process == null || it.item.process == process }
+      .toList()
+  }
+
+  override suspend fun setItemsWithFilter(searchWords: String?, process: String?) {
+    adapter.highlightText = searchWords.orEmpty()
+    getFilterList(searchWords, process)?.let {
+      val sortedList = sortedList(it.toMutableList())
       lifecycleScope.launch(Dispatchers.Main) {
-        if (isEmpty()) {
+        if (sortedList.isEmpty()) {
           if (getRecyclerView().itemDecorationCount > 0) {
             getRecyclerView().removeItemDecoration(dividerItemDecoration)
           }
           emptyView.text.text = getString(R.string.empty_list)
-        } else {
-          if (getRecyclerView().itemDecorationCount == 0) {
-            getRecyclerView().addItemDecoration(dividerItemDecoration)
-          }
         }
-        adapter.setDiffNewData(this@with.toMutableList()) {
-          viewModel.updateItemsCountStateFlow(type, size)
+        adapter.setDiffNewData(sortedList) {
+          viewModel.updateItemsCountStateFlow(type, sortedList.size)
           doOnMainThreadIdle {
             //noinspection NotifyDataSetChanged
             adapter.notifyDataSetChanged()
           }
         }
       }
-    }
-  }
-
-  fun setList(list: List<LibStringItemChip>) {
-    items = list
-    adapter.setDiffNewData(list.toMutableList(), afterListReadyTask)
-    if (items.isEmpty()) {
-      if (getRecyclerView().itemDecorationCount > 0) {
-        getRecyclerView().removeItemDecoration(dividerItemDecoration)
-      }
-    } else {
-      getRecyclerView().addItemDecoration(dividerItemDecoration)
     }
   }
 
@@ -237,28 +256,10 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     } else {
       afterListReadyTask = Runnable {
         lifecycleScope.launch(Dispatchers.IO) {
-          viewModel.queriedText?.let {
-            if (it.isNotEmpty()) {
-              filterList(it)
-            }
-          }
-          if (this@BaseDetailFragment is BaseFilterAnalysisFragment) {
-            viewModel.queriedProcess?.let {
-              if (it.isNotEmpty()) {
-                filterItems(it)
-              }
-            }
-          }
+          setItemsWithFilter(viewModel.queriedText, viewModel.queriedProcess)
         }
       }
     }
-  }
-
-  protected open fun getFilterListByText(text: String): List<LibStringItemChip> {
-    if (text.isEmpty()) {
-      return items
-    }
-    return items.filter { it.item.name.contains(text, true) }
   }
 
   private fun navigateToComponentImpl(component: String) {

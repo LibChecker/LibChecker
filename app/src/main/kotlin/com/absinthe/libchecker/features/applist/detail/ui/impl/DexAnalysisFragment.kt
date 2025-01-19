@@ -9,15 +9,38 @@ import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibStringDiffUtil
 import com.absinthe.libchecker.features.applist.detail.ui.base.BaseDetailFragment
 import com.absinthe.libchecker.features.applist.detail.ui.base.EXTRA_TYPE
+import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.extensions.putArguments
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import rikka.core.util.ClipboardUtils
 
 class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
 
   override fun getRecyclerView() = binding.list
   override val needShowLibDetailDialog = false
+
+  override suspend fun getItems(): List<LibStringItemChip> {
+    return viewModel.dexLibItems.value ?: viewModel.dexLibItems.first() ?: emptyList()
+  }
+
+  override fun onItemsAvailable(items: List<LibStringItemChip>) {
+    if (items.isEmpty()) {
+      emptyView.text.text = getString(R.string.uncharted_territory)
+    } else {
+      lifecycleScope.launch(Dispatchers.IO) {
+        setItemsWithFilter(viewModel.queriedText, null)
+      }
+    }
+
+    if (!isListReady) {
+      viewModel.updateItemsCountStateFlow(type, items.size)
+      isListReady = true
+    }
+  }
 
   override fun init() {
     binding.apply {
@@ -37,25 +60,16 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
       setEmptyView(emptyView)
     }
 
-    viewModel.dexLibItems.onEach {
-      if (it == null) return@onEach
-      if (it.isEmpty()) {
-        emptyView.text.text = getString(R.string.uncharted_territory)
-      } else {
-        if (viewModel.queriedText?.isNotEmpty() == true) {
-          filterList(viewModel.queriedText!!)
-        } else {
-          setList(it)
-        }
-      }
+    viewModel.apply {
+      dexLibItems.onEach {
+        if (it == null) return@onEach
+        onItemsAvailable(it)
+      }.launchIn(lifecycleScope)
 
-      if (!isListReady) {
-        viewModel.updateItemsCountStateFlow(type, it.size)
-        isListReady = true
+      packageInfoStateFlow.value?.run {
+        dexLibItems.value ?: run { initDexData() }
       }
-    }.launchIn(lifecycleScope)
-
-    viewModel.initDexData()
+    }
   }
 
   override fun onDetach() {

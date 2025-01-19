@@ -74,9 +74,9 @@ class AppInstallSourceBottomSheetView(context: Context) :
       measuredWidth,
       paddingTop +
         header.measuredHeight +
-        originatingView.measuredHeight +
-        installingView.measuredHeight +
-        installedTimeView.measuredHeight +
+        (if (originatingView.isGone) 0 else originatingView.measuredHeight) +
+        (if (installingView.isGone) 0 else installingView.measuredHeight) +
+        (if (installedTimeView.isGone) 0 else installedTimeView.measuredHeight) +
         paddingBottom
     )
   }
