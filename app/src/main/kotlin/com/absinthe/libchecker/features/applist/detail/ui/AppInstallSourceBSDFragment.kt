@@ -20,6 +20,7 @@ import com.absinthe.libchecker.features.applist.detail.ui.view.AppInstallSourceI
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppInstallTimeItemView
 import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.PREINSTALLED_TIMESTAMP
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
@@ -209,10 +210,18 @@ class AppInstallSourceBSDFragment :
     }
 
     item.contentView.apply {
-      firstInstalledView.libSize.text =
-        SimpleDateFormat.getDateTimeInstance().format(firstInstalledTime)
-      lastUpdatedView.libSize.text =
-        SimpleDateFormat.getDateTimeInstance().format(lastUpdatedTime)
+      if (firstInstalledTime <= PREINSTALLED_TIMESTAMP) {
+        firstInstalledView.libSize.text = getString(R.string.snapshot_preinstalled_app)
+      } else {
+        firstInstalledView.libSize.text =
+          SimpleDateFormat.getDateTimeInstance().format(firstInstalledTime)
+      }
+      if (lastUpdatedTime <= PREINSTALLED_TIMESTAMP) {
+        lastUpdatedView.libSize.text = getString(R.string.snapshot_preinstalled_app)
+      } else {
+        lastUpdatedView.libSize.text =
+          SimpleDateFormat.getDateTimeInstance().format(lastUpdatedTime)
+      }
       (parent as? View)?.setLongClickCopiedToClipboard(item.contentView.getAllContentText())
     }
   }
