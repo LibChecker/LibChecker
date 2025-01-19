@@ -167,7 +167,7 @@
   <string name="lib_detail_app_install_source_originating_package">安裝要求者</string>
   <string name="lib_detail_app_install_source_installing_package">安裝執行程式</string>
   <string name="lib_detail_app_install_source_empty">未知</string>
-  <string name="lib_detail_app_install_source_empty_detail">ADB 或已解除安裝的應用程式</string>
+  <string name="lib_detail_app_install_source_empty_detail">Shell 或已解除安裝的應用程式</string>
   <string name="lib_detail_app_install_source_shizuku_usage">因為 Android 限制了取得安裝要求者的 API，我們使用 Shizuku 以取得安裝要求者。</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizuku 尚未安裝</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">按一下這裡以安裝 Shizuku</string>
