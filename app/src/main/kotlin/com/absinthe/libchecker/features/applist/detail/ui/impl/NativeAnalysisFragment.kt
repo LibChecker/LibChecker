@@ -12,6 +12,7 @@ import com.absinthe.libchecker.features.applist.detail.ui.base.EXTRA_TYPE
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.extensions.putArguments
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -25,7 +26,8 @@ class NativeAnalysisFragment :
   override val needShowLibDetailDialog = true
 
   override suspend fun getItems(): List<LibStringItemChip> {
-    return viewModel.nativeLibItems.value ?: viewModel.nativeLibItems.first() ?: emptyList()
+    val flow = viewModel.nativeLibItems
+    return flow.value ?: flow.filterNotNull().first()
   }
 
   override fun onItemsAvailable(items: List<LibStringItemChip>) {
@@ -46,10 +48,6 @@ class NativeAnalysisFragment :
     }
 
     viewModel.apply {
-      nativeLibItems.onEach {
-        if (it == null) return@onEach
-        onItemsAvailable(it)
-      }.launchIn(lifecycleScope)
       packageInfoStateFlow.onEach {
         if (it != null) {
           viewModel.initSoAnalysisData()

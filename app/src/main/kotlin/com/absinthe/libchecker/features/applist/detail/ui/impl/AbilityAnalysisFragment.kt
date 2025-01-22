@@ -8,12 +8,10 @@ import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibStringDiffUtil
 import com.absinthe.libchecker.features.applist.detail.ui.base.BaseDetailFragment
 import com.absinthe.libchecker.features.applist.detail.ui.base.EXTRA_TYPE
-import com.absinthe.libchecker.features.statistics.bean.DISABLED
-import com.absinthe.libchecker.features.statistics.bean.EXPORTED
-import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.extensions.putArguments
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import rikka.core.util.ClipboardUtils
@@ -22,29 +20,10 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
 
   override fun getRecyclerView() = binding.list
   override val needShowLibDetailDialog = false
-  private var items: List<LibStringItemChip>? = null
 
   override suspend fun getItems(): List<LibStringItemChip> {
-    return items ?: run {
-      val flow = viewModel.abilitiesMap[adapter.type]
-      items = (flow.value ?: flow?.first() ?: emptyList())
-        .map { item ->
-          val source = when {
-            !item.enabled -> DISABLED
-            item.exported -> EXPORTED
-            else -> null
-          }
-
-          LibStringItemChip(
-            LibStringItem(
-              name = item.componentName,
-              source = source
-            ),
-            null
-          )
-        }
-      return items!!
-    }
+    val flow = viewModel.abilitiesMap[adapter.type]
+    return flow.value ?: flow.filterNotNull().first()
   }
 
   override fun onItemsAvailable(items: List<LibStringItemChip>) {
