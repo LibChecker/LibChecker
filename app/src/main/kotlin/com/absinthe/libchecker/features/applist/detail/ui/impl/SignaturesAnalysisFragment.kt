@@ -14,7 +14,10 @@ import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import rikka.core.util.ClipboardUtils
 
@@ -24,7 +27,8 @@ class SignaturesAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
   override val needShowLibDetailDialog = false
 
   override suspend fun getItems(): List<LibStringItemChip> {
-    return viewModel.signaturesLibItems.value ?: viewModel.signaturesLibItems.first() ?: emptyList()
+    val flow = viewModel.signaturesLibItems
+    return flow.value ?: flow.filterNotNull().first()
   }
 
   override fun onItemsAvailable(items: List<LibStringItemChip>) {
@@ -62,7 +66,17 @@ class SignaturesAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
       setEmptyView(emptyView)
     }
 
-    viewModel.initSignatures(requireContext())
+    viewModel.apply {
+      packageInfoStateFlow.onEach {
+        if (it != null) {
+          viewModel.initSignatures(requireContext())
+        }
+      }.launchIn(lifecycleScope)
+
+      packageInfoStateFlow.value?.run {
+        signaturesLibItems.value ?: run { initSignatures(requireContext()) }
+      }
+    }
   }
 
   private fun openSignatureDetailDialog(position: Int) {

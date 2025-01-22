@@ -12,9 +12,8 @@ import com.absinthe.libchecker.features.applist.detail.ui.base.EXTRA_TYPE
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.extensions.putArguments
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class MetaDataAnalysisFragment :
@@ -25,7 +24,8 @@ class MetaDataAnalysisFragment :
   override val needShowLibDetailDialog = false
 
   override suspend fun getItems(): List<LibStringItemChip> {
-    return viewModel.metaDataItems.value ?: viewModel.metaDataItems.first() ?: emptyList()
+    val flow = viewModel.metaDataItems
+    return flow.value ?: flow.filterNotNull().first()
   }
 
   override fun onItemsAvailable(items: List<LibStringItemChip>) {
@@ -57,11 +57,6 @@ class MetaDataAnalysisFragment :
     }
 
     viewModel.apply {
-      metaDataItems.onEach {
-        if (it == null) return@onEach
-        onItemsAvailable(it)
-      }.launchIn(lifecycleScope)
-
       packageInfoStateFlow.value?.run {
         metaDataItems.value ?: run { initMetaDataData() }
       }

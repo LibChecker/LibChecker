@@ -108,9 +108,11 @@ abstract class BaseDetailFragment<T : ViewBinding> :
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    lifecycleScope.launch {
-      val items = withContext(Dispatchers.IO) { getItems() }
-      onItemsAvailable(items)
+    lifecycleScope.launch(Dispatchers.IO) {
+      val items = getItems()
+      withContext(Dispatchers.Main) {
+        onItemsAvailable(items)
+      }
     }
   }
 
@@ -227,6 +229,10 @@ abstract class BaseDetailFragment<T : ViewBinding> :
             getRecyclerView().removeItemDecoration(dividerItemDecoration)
           }
           emptyView.text.text = getString(R.string.empty_list)
+        } else {
+          if (getRecyclerView().itemDecorationCount == 0) {
+            getRecyclerView().addItemDecoration(dividerItemDecoration)
+          }
         }
         adapter.setDiffNewData(sortedList) {
           viewModel.updateItemsCountStateFlow(type, sortedList.size)

@@ -14,6 +14,7 @@ import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.putArguments
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -28,7 +29,8 @@ class PermissionAnalysisFragment :
   override val needShowLibDetailDialog = true
 
   override suspend fun getItems(): List<LibStringItemChip> {
-    return viewModel.permissionsItems.value ?: viewModel.permissionsItems.first() ?: emptyList()
+    val flow = viewModel.permissionsItems
+    return flow.value ?: flow.filterNotNull().first()
   }
 
   override fun onItemsAvailable(items: List<LibStringItemChip>) {
@@ -61,10 +63,6 @@ class PermissionAnalysisFragment :
     }
 
     viewModel.apply {
-      permissionsItems.onEach {
-        if (it == null) return@onEach
-        onItemsAvailable(it)
-      }.launchIn(lifecycleScope)
       packageInfoStateFlow.onEach {
         if (it != null) {
           viewModel.initPermissionData()
@@ -96,7 +94,6 @@ class PermissionAnalysisFragment :
     searchWords: String?,
     process: String?
   ): List<LibStringItemChip>? {
-    Timber.d("getFilterList: $searchWords, $process")
     return getItems().asSequence()
       .filter { searchWords == null || it.item.name.contains(searchWords, true) || it.item.source?.contains(searchWords, true) == true }
       .filter { process == null || it.item.process != PackageInfo.REQUESTED_PERMISSION_GRANTED.toString() }

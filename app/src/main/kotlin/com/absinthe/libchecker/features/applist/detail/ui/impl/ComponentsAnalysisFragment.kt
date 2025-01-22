@@ -9,13 +9,10 @@ import com.absinthe.libchecker.features.applist.Referable
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibStringDiffUtil
 import com.absinthe.libchecker.features.applist.detail.ui.base.BaseDetailFragment
 import com.absinthe.libchecker.features.applist.detail.ui.base.EXTRA_TYPE
-import com.absinthe.libchecker.features.statistics.bean.DISABLED
-import com.absinthe.libchecker.features.statistics.bean.EXPORTED
-import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.extensions.putArguments
-import com.absinthe.rulesbundle.LCRules
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -23,38 +20,13 @@ class ComponentsAnalysisFragment :
   BaseDetailFragment<FragmentLibComponentBinding>(),
   Referable {
 
-  private var itemsList: List<LibStringItemChip>? = null
   override val needShowLibDetailDialog: Boolean = true
 
   override fun getRecyclerView(): RecyclerView = binding.list
 
   override suspend fun getItems(): List<LibStringItemChip> {
-    return itemsList ?: run {
-      val flow = viewModel.componentsMap[adapter.type]
-      itemsList = (flow.value ?: flow?.first() ?: emptyList())
-        .map { item ->
-          val rule = if (!item.componentName.startsWith(".")) {
-            LCRules.getRule(item.componentName, adapter.type, true)
-          } else {
-            null
-          }
-          val source = when {
-            !item.enabled -> DISABLED
-            item.exported -> EXPORTED
-            else -> null
-          }
-
-          LibStringItemChip(
-            LibStringItem(
-              name = item.componentName,
-              source = source,
-              process = item.processName.takeIf { it.isNotEmpty() }
-            ),
-            rule
-          )
-        }
-      return itemsList!!
-    }
+    val flow = viewModel.componentsMap[adapter.type]
+    return flow.value ?: flow.filterNotNull().first()
   }
 
   override fun onItemsAvailable(items: List<LibStringItemChip>) {
