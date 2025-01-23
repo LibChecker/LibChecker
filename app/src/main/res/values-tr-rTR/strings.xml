@@ -123,6 +123,7 @@
   <string name="play_app_signing_details">Play Uygulama İmzalama ile Google, uygulamanızın imzalama anahtarını sizin için yönetir ve korur ve uygulama paketlerinizden oluşturulan optimize edilmiş dağıtım APK\'larını imzalamak için kullanır. Play Uygulama İmzalama, uygulama imzalama anahtarınızı Google\'ın güvenli altyapısında saklar ve güvenliği artırmak için yükseltme seçenekleri sunar.</string>
   <string name="pwa_details">Progressive Web Apps (PWA\'lar), gelişmiş yetenekler, güvenilirlik ve yüklenebilirlik sunmak için modern API\'lerle oluşturulur ve geliştirilir ve tek bir kod tabanıyla herhangi bir cihazda herkese ulaşır.</string>
   <string name="jetpack_compose_details">Jetpack Compose, Android\'in yerel kullanıcı arayüzü oluşturmak için modern araç setidir. Android\'de kullanıcı arayüzü geliştirmeyi basitleştirir ve hızlandırır. Daha az kod, güçlü araçlar ve sezgisel Kotlin API\'leri ile uygulamanızı hızlıca hayata geçirin.</string>
+  <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform is a modern declarative and reactive UI framework developed by JetBrains that provides a simple way to build user interfaces with a small amount of Kotlin code. It also allows you to write your UI once and run it on any of the supported platforms – iOS, Android, desktop (Windows, macOS, Linux), and web.</string>
   <string name="extract_native_libs_tip">Uygulama şunu beyan eder: </string>
   <string name="xml_detail">XML Ayrıntısı</string>
   <string name="lib_detail_dialog_title_16kb_page_size">16 KB Sayfa Boyutu</string>
@@ -166,6 +167,9 @@
   <string name="lib_detail_app_install_source_title">Yükleme Kaynağı</string>
   <string name="lib_detail_app_install_source_originating_package">Yükleme isteyen</string>
   <string name="lib_detail_app_install_source_installing_package">Yükleme Yürütücüsü</string>
+  <string name="lib_detail_app_installed_time">Installation Time</string>
+  <string name="lib_detail_app_first_installed_time">First installed time: </string>
+  <string name="lib_detail_app_last_updated_time">Last installed time: </string>
   <string name="lib_detail_app_install_source_empty">Bilinmiyor</string>
   <string name="lib_detail_app_install_source_empty_detail">adb veya kaldırılmış uygulama</string>
   <string name="lib_detail_app_install_source_shizuku_usage">Android, yükleme isteyicisini almak için API\'yi kısıtladığından, yükleme isteyicisini almak için Shizuku kullanıyoruz.</string>
