@@ -7,7 +7,7 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Bundle
 import com.absinthe.libchecker.annotation.ALL
-import com.absinthe.libchecker.annotation.PERMISSION
+import com.absinthe.libchecker.annotation.isComponentType
 import com.absinthe.libchecker.compat.IntentCompat
 import com.absinthe.libchecker.features.applist.detail.IDetailContainer
 import com.absinthe.libchecker.features.applist.detail.bean.DetailExtraBean
@@ -100,10 +100,10 @@ class AppDetailActivity :
       }
     }
 
-    val componentName = if (refType == PERMISSION) {
-      refName
-    } else {
+    val componentName = if (isComponentType(refType)) {
       refName.removePrefix(packageName)
+    } else {
+      refName
     }
     detailFragmentManager.navigateToComponent(refType, componentName)
   }

@@ -27,3 +27,7 @@ const val SIGNATURES = 11
 @Target(AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.FIELD, AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.SOURCE)
 annotation class LibType
+
+fun isComponentType(@LibType type: Int): Boolean {
+  return type in listOf(SERVICE, ACTIVITY, RECEIVER, PROVIDER)
+}

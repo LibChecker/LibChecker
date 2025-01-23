@@ -762,6 +762,10 @@ abstract class BaseAppDetailActivity :
     return false
   }
 
+  override fun collapseAppBar() {
+    binding.headerLayout.setExpanded(false, true)
+  }
+
   private fun initFeatureListView(): Boolean {
     if (featureListView != null) {
       return false
