@@ -135,6 +135,17 @@ object FeaturesDialog {
     )
   }
 
+  fun showKMPDialog(context: Context, version: String?) {
+    commonShowDialogImpl(
+      context,
+      R.drawable.ic_jetbrain_kmp,
+      R.string.jetbrain_kmp,
+      R.string.jetbrain_compose_multiplatform_details,
+      version = version,
+      sourceLink = "https://www.jetbrains.com/compose-multiplatform/"
+    )
+  }
+
   fun showAppPropDialog(activity: FragmentActivity, packageInfo: PackageInfo?) {
     val pi = packageInfo ?: return
 

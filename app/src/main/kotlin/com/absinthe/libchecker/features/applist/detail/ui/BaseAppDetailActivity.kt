@@ -636,6 +636,14 @@ abstract class BaseAppDetailActivity :
             )
           }
 
+          Features.KMP -> {
+            featureAdapter.addData(
+              FeatureItem(R.drawable.ic_jetbrain_kmp) {
+                FeaturesDialog.showKMPDialog(this, feat.version)
+              }
+            )
+          }
+
           Features.Ext.APPLICATION_PROP -> {
             featureAdapter.addData(
               FeatureItem(R.drawable.ic_app_prop) {
