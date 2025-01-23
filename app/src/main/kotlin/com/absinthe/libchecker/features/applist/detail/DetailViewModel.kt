@@ -46,6 +46,8 @@ import com.absinthe.libchecker.utils.extensions.getRxKotlinVersion
 import com.absinthe.libchecker.utils.extensions.getSignatures
 import com.absinthe.libchecker.utils.extensions.getStatefulPermissionsList
 import com.absinthe.libchecker.utils.extensions.is16KBAligned
+import com.absinthe.libchecker.utils.extensions.isUseKMP
+import com.absinthe.libchecker.utils.extensions.toClassDefType
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.Rule
@@ -530,17 +532,23 @@ class DetailViewModel : ViewModel() {
       _featuresFlow.emit(VersionedFeature(Features.Ext.ELF_PAGE_SIZE_16KB))
     }
 
-    if ((feat and Features.RX_JAVA) > 0) {
-      val version = packageInfo.getRxJavaVersion()
-      _featuresFlow.emit(VersionedFeature(Features.RX_JAVA, version))
-    }
-    if ((feat and Features.RX_KOTLIN) > 0) {
-      val version = packageInfo.getRxKotlinVersion()
-      _featuresFlow.emit(VersionedFeature(Features.RX_KOTLIN, version))
-    }
-    if ((feat and Features.RX_ANDROID) > 0) {
-      val version = packageInfo.getRxAndroidVersion()
-      _featuresFlow.emit(VersionedFeature(Features.RX_ANDROID, version))
+    packageInfo.applicationInfo?.sourceDir?.let { sourceDir ->
+      val foundList = getFeaturesFoundDexList(feat, sourceDir)
+      if ((feat and Features.RX_JAVA) > 0) {
+        val version = packageInfo.getRxJavaVersion(foundList)
+        _featuresFlow.emit(VersionedFeature(Features.RX_JAVA, version))
+      }
+      if ((feat and Features.RX_KOTLIN) > 0) {
+        val version = packageInfo.getRxKotlinVersion(foundList)
+        _featuresFlow.emit(VersionedFeature(Features.RX_KOTLIN, version))
+      }
+      if ((feat and Features.RX_ANDROID) > 0) {
+        val version = packageInfo.getRxAndroidVersion(foundList)
+        _featuresFlow.emit(VersionedFeature(Features.RX_ANDROID, version))
+      }
+      if (packageInfo.isUseKMP(foundList)) {
+        _featuresFlow.emit(VersionedFeature(Features.KMP))
+      }
     }
   }
 
@@ -577,4 +585,43 @@ class DetailViewModel : ViewModel() {
   }
 
   data class AbiBundle(val abi: Int, val abiSet: Collection<Int>)
+
+  private fun getFeaturesFoundDexList(feat: Int, sourceDir: String): List<String>? {
+    val dexList = mutableListOf<String>()
+    if ((feat and Features.RX_JAVA) > 0) {
+      dexList.addAll(
+        listOf(
+          "rx.schedulers.*".toClassDefType(),
+          "io.reactivex.*".toClassDefType(),
+          "io.reactivex.rxjava3.*".toClassDefType()
+        )
+      )
+    }
+    if ((feat and Features.RX_KOTLIN) > 0) {
+      dexList.addAll(
+        listOf(
+          "io.reactivex.rxjava3.kotlin.*".toClassDefType(),
+          "io.reactivex.rxkotlin".toClassDefType(),
+          "rx.lang.kotlin".toClassDefType()
+        )
+      )
+    }
+    if ((feat and Features.RX_ANDROID) > 0) {
+      dexList.addAll(
+        listOf(
+          "io.reactivex.rxjava3.android.*".toClassDefType(),
+          "io.reactivex.android.*".toClassDefType(),
+          "rx.android.*".toClassDefType()
+        )
+      )
+    }
+    if (dexList.isNotEmpty()) {
+      dexList.add("org.jetbrains.compose.*".toClassDefType())
+    }
+    return if (dexList.isNotEmpty()) {
+      PackageUtils.findDexClasses(File(sourceDir), dexList)
+    } else {
+      null
+    }
+  }
 }

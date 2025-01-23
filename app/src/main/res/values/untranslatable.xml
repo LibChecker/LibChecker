@@ -12,6 +12,8 @@
   <string name="pwa" translatable="false">Progressive Web Apps</string>
   <string name="jetpack_compose" translatable="false">Jetpack Compose</string>
   <string name="jetpack_compose_short" translatable="false">Compose</string>
+  <string name="jetbrain_kmp" translatable="false">Compose Multiplatform</string>
+  <string name="jetbrain_kmp_short" translatable="false">KMP</string>
   <string name="rxjava" translatable="false">RxJava</string>
   <string name="rxkotlin" translatable="false">RxKotlin</string>
   <string name="rxandroid" translatable="false">RxAndroid</string>
