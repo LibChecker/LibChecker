@@ -10,4 +10,5 @@ import com.absinthe.libchecker.features.applist.DetailFragmentManager
  */
 interface IDetailContainer {
   var detailFragmentManager: DetailFragmentManager
+  fun collapseAppBar()
 }

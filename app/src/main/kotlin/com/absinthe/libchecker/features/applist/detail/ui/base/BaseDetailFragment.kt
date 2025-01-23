@@ -18,9 +18,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PERMISSION
-import com.absinthe.libchecker.annotation.PROVIDER
-import com.absinthe.libchecker.annotation.RECEIVER
-import com.absinthe.libchecker.annotation.SERVICE
+import com.absinthe.libchecker.annotation.isComponentType
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.features.applist.DetailFragmentManager
@@ -45,7 +43,6 @@ import com.absinthe.libchecker.integrations.monkeyking.ShareCmpInfo
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.base.BaseFragment
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
-import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.launchLibReferencePage
 import com.absinthe.libchecker.utils.extensions.reverseStrikeThroughAnimation
@@ -224,6 +221,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     getFilterList(searchWords, process)?.let {
       val sortedList = sortedList(it.toMutableList())
       lifecycleScope.launch(Dispatchers.Main) {
+        if (isDetached || !isBindingInitialized()) return@launch
         if (sortedList.isEmpty()) {
           if (getRecyclerView().itemDecorationCount > 0) {
             getRecyclerView().removeItemDecoration(dividerItemDecoration)
@@ -235,11 +233,8 @@ abstract class BaseDetailFragment<T : ViewBinding> :
           }
         }
         adapter.setDiffNewData(sortedList) {
+          afterListReadyTask?.run()
           viewModel.updateItemsCountStateFlow(type, sortedList.size)
-          doOnMainThreadIdle {
-            //noinspection NotifyDataSetChanged
-            adapter.notifyDataSetChanged()
-          }
         }
       }
     }
@@ -259,12 +254,6 @@ abstract class BaseDetailFragment<T : ViewBinding> :
         }
       }
       DetailFragmentManager.resetNavigationParams()
-    } else {
-      afterListReadyTask = Runnable {
-        lifecycleScope.launch(Dispatchers.IO) {
-          setItemsWithFilter(viewModel.queriedText, viewModel.queriedProcess)
-        }
-      }
     }
   }
 
@@ -278,6 +267,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     }
 
     Timber.d("navigateToComponent: componentPosition = $componentPosition")
+    (activity as? IDetailContainer)?.collapseAppBar()
     getRecyclerView().scrollToPosition(componentPosition.coerceAtMost(adapter.itemCount - 1))
 
     with(getRecyclerView().layoutManager) {
@@ -318,7 +308,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   }
 
   fun isComponentFragment(): Boolean {
-    return type == ACTIVITY || type == SERVICE || type == RECEIVER || type == PROVIDER
+    return isComponentType(type)
   }
 
   fun isNativeSourceAvailable(): Boolean {
