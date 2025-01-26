@@ -1,10 +1,9 @@
 package com.absinthe.libchecker.constant
 
 import com.absinthe.libchecker.BuildConfig
-import com.absinthe.libraries.me.Absinthe
 
 object URLManager {
-  const val MARKET_PAGE = "${Absinthe.MARKET_DETAIL_SCHEME}${BuildConfig.APPLICATION_ID}"
+  const val MARKET_PAGE = "market://details?id=${BuildConfig.APPLICATION_ID}"
 
   const val SHIZUKU_APP_GITHUB_RELEASE_PAGE = "https://github.com/RikkaApps/Shizuku/releases"
   const val PLAY_STORE_DETAIL_PAGE = "https://play.google.com/store/apps/details?id=com.absinthe.libchecker"

@@ -19,7 +19,6 @@ import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.LibDetailBean
 import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
 import com.absinthe.libchecker.api.request.LibDetailRequest
-import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.GlobalValues
@@ -29,6 +28,7 @@ import com.absinthe.libchecker.features.applist.LocatedCount
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.features.applist.detail.bean.StatefulComponent
 import com.absinthe.libchecker.features.statistics.bean.DISABLED
+import com.absinthe.libchecker.features.statistics.bean.EXPORTED
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.DateUtils
@@ -46,6 +46,8 @@ import com.absinthe.libchecker.utils.extensions.getRxKotlinVersion
 import com.absinthe.libchecker.utils.extensions.getSignatures
 import com.absinthe.libchecker.utils.extensions.getStatefulPermissionsList
 import com.absinthe.libchecker.utils.extensions.is16KBAligned
+import com.absinthe.libchecker.utils.extensions.isUseKMP
+import com.absinthe.libchecker.utils.extensions.toClassDefType
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.Rule
@@ -71,8 +73,8 @@ class DetailViewModel : ViewModel() {
   val permissionsItems: MutableStateFlow<List<LibStringItemChip>?> = MutableStateFlow(null)
   val dexLibItems: MutableStateFlow<List<LibStringItemChip>?> = MutableStateFlow(null)
   val signaturesLibItems: MutableStateFlow<List<LibStringItemChip>?> = MutableStateFlow(null)
-  val componentsMap = SparseArray<MutableStateFlow<List<StatefulComponent>>>()
-  val abilitiesMap = SparseArray<MutableStateFlow<List<StatefulComponent>>>()
+  val componentsMap = SparseArray<MutableStateFlow<List<LibStringItemChip>?>>()
+  val abilitiesMap = SparseArray<MutableStateFlow<List<LibStringItemChip>?>>()
   val itemsCountStateFlow: MutableStateFlow<LocatedCount> = MutableStateFlow(LocatedCount(0, 0))
   val processToolIconVisibilityStateFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
   val processMapStateFlow = MutableStateFlow<Map<String, Int>>(emptyMap())
@@ -94,10 +96,10 @@ class DetailViewModel : ViewModel() {
   val abiBundleStateFlow = MutableStateFlow<AbiBundle?>(null)
 
   init {
-    componentsMap.put(SERVICE, MutableStateFlow(emptyList()))
-    componentsMap.put(ACTIVITY, MutableStateFlow(emptyList()))
-    componentsMap.put(RECEIVER, MutableStateFlow(emptyList()))
-    componentsMap.put(PROVIDER, MutableStateFlow(emptyList()))
+    componentsMap.put(SERVICE, MutableStateFlow(null))
+    componentsMap.put(ACTIVITY, MutableStateFlow(null))
+    componentsMap.put(RECEIVER, MutableStateFlow(null))
+    componentsMap.put(PROVIDER, MutableStateFlow(null))
   }
 
   fun isPackageInfoAvailable(): Boolean {
@@ -194,14 +196,33 @@ class DetailViewModel : ViewModel() {
           PackageUtils.getComponentList(it.packageName, list, true)
         }
 
+        val transform: suspend (StatefulComponent, Int) -> LibStringItemChip =
+          { item, componentType ->
+            val rule = item.componentName.takeIf { !it.startsWith(".") }
+              ?.let { LCRules.getRule(it, componentType, true) }
+            val source = when {
+              !item.enabled -> DISABLED
+              item.exported -> EXPORTED
+              else -> null
+            }
+
+            LibStringItemChip(
+              LibStringItem(
+                name = item.componentName,
+                source = source,
+                process = item.processName.takeIf { it.isNotEmpty() }
+              ),
+              rule
+            )
+          }
         services.forEach { sc -> processesSet.add(sc.processName) }
         activities.forEach { sc -> processesSet.add(sc.processName) }
         receivers.forEach { sc -> processesSet.add(sc.processName) }
         providers.forEach { sc -> processesSet.add(sc.processName) }
-        componentsMap[SERVICE]?.emit(services)
-        componentsMap[ACTIVITY]?.emit(activities)
-        componentsMap[RECEIVER]?.emit(receivers)
-        componentsMap[PROVIDER]?.emit(providers)
+        componentsMap[SERVICE]?.emit(services.map { transform(it, SERVICE) })
+        componentsMap[ACTIVITY]?.emit(activities.map { transform(it, ACTIVITY) })
+        componentsMap[RECEIVER]?.emit(receivers.map { transform(it, RECEIVER) })
+        componentsMap[PROVIDER]?.emit(providers.map { transform(it, PROVIDER) })
       }
       processesMap =
         processesSet.filter { it.isNotEmpty() }.associateWith { UiUtils.getRandomColor() }
@@ -293,12 +314,10 @@ class DetailViewModel : ViewModel() {
 
   private fun getMetaDataChipList(): List<LibStringItemChip> {
     Timber.d("getMetaDataChipList")
-    val list = PackageUtils.getMetaDataItems(packageInfo)
-    val chipList = mutableListOf<LibStringItemChip>()
+    val chipList = PackageUtils.getMetaDataItems(packageInfo)
+      .map { LibStringItemChip(it, null) }
+      .toMutableList()
 
-    list.forEach {
-      chipList.add(LibStringItemChip(it, null))
-    }
     chipList.sortByDescending { it.item.name }
     return chipList
   }
@@ -306,15 +325,20 @@ class DetailViewModel : ViewModel() {
   private fun getPermissionChipList(): List<LibStringItemChip> {
     Timber.d("getPermissionChipList")
     val list = packageInfo.getStatefulPermissionsList().asSequence()
-      .map { perm -> LibStringItem(perm.first, if (perm.second) 1 else 0, if (perm.first.contains("maxSdkVersion")) DISABLED else null) }
-      .toList()
-    val chipList = mutableListOf<LibStringItemChip>()
-
-    list.forEach {
-      chipList.add(LibStringItemChip(it, null))
-    }
-    chipList.sortByDescending { it.item.name }
-    return chipList
+      .map { perm ->
+        LibStringItemChip(
+          LibStringItem(
+            name = perm.first,
+            size = if (perm.second) PackageInfo.REQUESTED_PERMISSION_GRANTED.toLong() else 0,
+            source = if (perm.first.contains("maxSdkVersion")) DISABLED else null,
+            process = if (perm.second) PackageInfo.REQUESTED_PERMISSION_GRANTED.toString() else null
+          ),
+          null
+        )
+      }
+      .toMutableList()
+    list.sortByDescending { it.item.name }
+    return list
   }
 
   private suspend fun getDexChipList(): List<LibStringItemChip> {
@@ -363,10 +387,10 @@ class DetailViewModel : ViewModel() {
   }
 
   fun initAbilities(context: Context, packageName: String) = viewModelScope.launch(Dispatchers.IO) {
-    abilitiesMap.put(AbilityType.PAGE, MutableStateFlow(emptyList()))
-    abilitiesMap.put(AbilityType.SERVICE, MutableStateFlow(emptyList()))
-    abilitiesMap.put(AbilityType.WEB, MutableStateFlow(emptyList()))
-    abilitiesMap.put(AbilityType.DATA, MutableStateFlow(emptyList()))
+    abilitiesMap.put(AbilityType.PAGE, MutableStateFlow(null))
+    abilitiesMap.put(AbilityType.SERVICE, MutableStateFlow(null))
+    abilitiesMap.put(AbilityType.WEB, MutableStateFlow(null))
+    abilitiesMap.put(AbilityType.DATA, MutableStateFlow(null))
 
     try {
       ApplicationDelegate(context).iBundleManager?.getBundleInfo(
@@ -418,10 +442,26 @@ class DetailViewModel : ViewModel() {
           }
           .toList()
 
-        abilitiesMap[AbilityType.PAGE]?.emit(pages)
-        abilitiesMap[AbilityType.SERVICE]?.emit(services)
-        abilitiesMap[AbilityType.WEB]?.emit(webs)
-        abilitiesMap[AbilityType.DATA]?.emit(datas)
+        val transform: suspend (StatefulComponent) -> LibStringItemChip =
+          { item ->
+            val source = when {
+              !item.enabled -> DISABLED
+              item.exported -> EXPORTED
+              else -> null
+            }
+
+            LibStringItemChip(
+              LibStringItem(
+                name = item.componentName,
+                source = source
+              ),
+              null
+            )
+          }
+        abilitiesMap[AbilityType.PAGE]?.emit(pages.map { transform(it) })
+        abilitiesMap[AbilityType.SERVICE]?.emit(services.map { transform(it) })
+        abilitiesMap[AbilityType.WEB]?.emit(webs.map { transform(it) })
+        abilitiesMap[AbilityType.DATA]?.emit(datas.map { transform(it) })
       }
     } catch (e: Exception) {
       Timber.e(e)
@@ -479,10 +519,12 @@ class DetailViewModel : ViewModel() {
 
     if (OsUtils.atLeastR()) {
       runCatching {
-        val info = SystemServices.packageManager.getInstallSourceInfo(packageInfo.packageName)
-        if (info.installingPackageName != null) {
+        val info = PackageUtils.getInstallSourceInfo(packageInfo.packageName)
+        if (info?.installingPackageName != null) {
           _featuresFlow.emit(VersionedFeature(Features.Ext.APPLICATION_INSTALL_SOURCE, info.initiatingPackageName))
         }
+      }.onFailure {
+        Timber.e(it)
       }
     }
 
@@ -490,17 +532,23 @@ class DetailViewModel : ViewModel() {
       _featuresFlow.emit(VersionedFeature(Features.Ext.ELF_PAGE_SIZE_16KB))
     }
 
-    if ((feat and Features.RX_JAVA) > 0) {
-      val version = packageInfo.getRxJavaVersion()
-      _featuresFlow.emit(VersionedFeature(Features.RX_JAVA, version))
-    }
-    if ((feat and Features.RX_KOTLIN) > 0) {
-      val version = packageInfo.getRxKotlinVersion()
-      _featuresFlow.emit(VersionedFeature(Features.RX_KOTLIN, version))
-    }
-    if ((feat and Features.RX_ANDROID) > 0) {
-      val version = packageInfo.getRxAndroidVersion()
-      _featuresFlow.emit(VersionedFeature(Features.RX_ANDROID, version))
+    packageInfo.applicationInfo?.sourceDir?.let { sourceDir ->
+      val foundList = getFeaturesFoundDexList(feat, sourceDir)
+      if ((feat and Features.RX_JAVA) > 0) {
+        val version = packageInfo.getRxJavaVersion(foundList)
+        _featuresFlow.emit(VersionedFeature(Features.RX_JAVA, version))
+      }
+      if ((feat and Features.RX_KOTLIN) > 0) {
+        val version = packageInfo.getRxKotlinVersion(foundList)
+        _featuresFlow.emit(VersionedFeature(Features.RX_KOTLIN, version))
+      }
+      if ((feat and Features.RX_ANDROID) > 0) {
+        val version = packageInfo.getRxAndroidVersion(foundList)
+        _featuresFlow.emit(VersionedFeature(Features.RX_ANDROID, version))
+      }
+      if (packageInfo.isUseKMP(foundList)) {
+        _featuresFlow.emit(VersionedFeature(Features.KMP))
+      }
     }
   }
 
@@ -537,4 +585,43 @@ class DetailViewModel : ViewModel() {
   }
 
   data class AbiBundle(val abi: Int, val abiSet: Collection<Int>)
+
+  private fun getFeaturesFoundDexList(feat: Int, sourceDir: String): List<String>? {
+    val dexList = mutableListOf<String>()
+    if ((feat and Features.RX_JAVA) > 0) {
+      dexList.addAll(
+        listOf(
+          "rx.schedulers.*".toClassDefType(),
+          "io.reactivex.*".toClassDefType(),
+          "io.reactivex.rxjava3.*".toClassDefType()
+        )
+      )
+    }
+    if ((feat and Features.RX_KOTLIN) > 0) {
+      dexList.addAll(
+        listOf(
+          "io.reactivex.rxjava3.kotlin.*".toClassDefType(),
+          "io.reactivex.rxkotlin".toClassDefType(),
+          "rx.lang.kotlin".toClassDefType()
+        )
+      )
+    }
+    if ((feat and Features.RX_ANDROID) > 0) {
+      dexList.addAll(
+        listOf(
+          "io.reactivex.rxjava3.android.*".toClassDefType(),
+          "io.reactivex.android.*".toClassDefType(),
+          "rx.android.*".toClassDefType()
+        )
+      )
+    }
+    if (dexList.isNotEmpty()) {
+      dexList.add("org.jetbrains.compose.*".toClassDefType())
+    }
+    return if (dexList.isNotEmpty()) {
+      PackageUtils.findDexClasses(File(sourceDir), dexList)
+    } else {
+      null
+    }
+  }
 }

@@ -22,7 +22,7 @@
       android:layout_height="match_parent"
       android:background="@null"
       app:contentScrim="?android:colorBackground"
-      app:expandedTitleTextAppearance="@style/AboutPage.Header.ToolbarTitleExpanded"
+      app:expandedTitleTextAppearance="?attr/textAppearanceHeadlineSmall"
       app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
       <com.absinthe.libchecker.features.snapshot.detail.ui.view.SnapshotTitleView

@@ -2,15 +2,13 @@ package com.absinthe.libchecker.features.chart.impl
 
 import android.content.Context
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.Constants.MULTI_ARCH
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.features.chart.BaseChartDataSource
 import com.absinthe.libchecker.features.chart.ChartSourceItem
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.extensions.ABI_32_BIT
-import com.absinthe.libchecker.utils.extensions.ABI_64_BIT
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
+import com.absinthe.libchecker.utils.extensions.is16KBAligned
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
@@ -19,42 +17,58 @@ import com.github.mikephil.charting.formatter.PercentFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.utils.MPPointF
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
-class ABIChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>(items) {
-  override val classifiedMap: HashMap<Int, ChartSourceItem> = HashMap(3)
+class PageSize16KBChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>(items) {
+  override val classifiedMap: HashMap<Int, ChartSourceItem> = HashMap(2)
 
   override suspend fun fillChartView(chartView: PieChart) {
     withContext(Dispatchers.Default) {
       val context = chartView.context ?: return@withContext
       val parties = listOf(
-        context.resources.getString(R.string.string_64_bit),
-        context.resources.getString(R.string.string_32_bit),
-        context.resources.getString(R.string.no_libs)
+        context.resources.getString(R.string.lib_detail_dialog_title_16kb_page_size),
+        context.resources.getString(R.string.chart_item_not_support),
+        context.resources.getString(R.string.title_statistics_dialog_no_native_libs)
       )
       val entries: ArrayList<PieEntry> = ArrayList()
       val colorOnSurface = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
-      val classifiedList = listOf(
-        mutableListOf<LCItem>(),
-        mutableListOf(),
-        mutableListOf()
-      )
+      val classifiedList = listOf(mutableListOf<LCItem>(), mutableListOf(), mutableListOf())
 
       for (item in filteredList) {
-        if (PackageUtils.hasNoNativeLibs(item.abi.toInt())) {
-          classifiedList[NO_LIBS].add(item)
-        } else {
-          when (item.abi % MULTI_ARCH) {
-            in ABI_64_BIT -> classifiedList[IS_64_BIT].add(item)
-            in ABI_32_BIT -> classifiedList[IS_32_BIT].add(item)
-            else -> classifiedList[NO_LIBS].add(item)
+        if (!isActive) {
+          return@withContext
+        }
+        try {
+          val pi = PackageUtils.getPackageInfo(item.packageName)
+          if (PackageUtils.hasNoNativeLibs(item.abi.toInt())) {
+            classifiedList[NO_NATIVE_LIBS].add(item)
+          } else if (pi.is16KBAligned()) {
+            classifiedList[SUPPORT_16KB].add(item)
+          } else {
+            classifiedList[NOT_SUPPORT_16KB].add(item)
           }
+        } catch (e: Exception) {
+          Timber.e(e)
         }
       }
 
-      classifiedMap[IS_64_BIT] = ChartSourceItem(R.drawable.ic_abi_label_64bit, false, classifiedList[IS_64_BIT])
-      classifiedMap[IS_32_BIT] = ChartSourceItem(R.drawable.ic_abi_label_32bit, false, classifiedList[IS_32_BIT])
-      classifiedMap[NO_LIBS] = ChartSourceItem(R.drawable.ic_abi_label_no_libs, false, classifiedList[NO_LIBS])
+      classifiedMap[SUPPORT_16KB] = ChartSourceItem(
+        R.drawable.ic_16kb_align,
+        false,
+        classifiedList[SUPPORT_16KB]
+      )
+      classifiedMap[NOT_SUPPORT_16KB] = ChartSourceItem(
+        R.drawable.ic_16kb_align,
+        true,
+        classifiedList[NOT_SUPPORT_16KB]
+      )
+      classifiedMap[NO_NATIVE_LIBS] = ChartSourceItem(
+        R.drawable.ic_abi_label_no_libs,
+        true,
+        classifiedList[NO_NATIVE_LIBS]
+      )
 
       // NOTE: The order of the entries when being added to the entries array determines their position around the center of
       // the chart.
@@ -70,7 +84,7 @@ class ABIChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>(it
         selectionShift = 5f
         xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
         yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
-        valueLineColor = colorOnSurface
+        valueLineColor = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
       }
 
       // add a lot of colors
@@ -78,13 +92,13 @@ class ABIChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>(it
 
       if (OsUtils.atLeastS()) {
         if (com.absinthe.libraries.utils.utils.UiUtils.isDarkMode()) {
+          colors.add(context.getColor(android.R.color.system_accent1_500))
           colors.add(context.getColor(android.R.color.system_accent1_700))
-          colors.add(context.getColor(android.R.color.system_accent1_800))
           colors.add(context.getColor(android.R.color.system_accent1_900))
         } else {
           colors.add(context.getColor(android.R.color.system_accent1_200))
-          colors.add(context.getColor(android.R.color.system_accent1_300))
           colors.add(context.getColor(android.R.color.system_accent1_400))
+          colors.add(context.getColor(android.R.color.system_accent1_600))
         }
       } else {
         for (c in ColorTemplate.MATERIAL_COLORS) colors.add(c)
@@ -111,25 +125,16 @@ class ABIChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>(it
 
   override fun getLabelByXValue(context: Context, x: Int): String {
     return when (x) {
-      IS_64_BIT -> String.format(
-        context.getString(R.string.title_statistics_dialog),
-        context.getString(R.string.string_64_bit)
-      )
-
-      IS_32_BIT -> String.format(
-        context.getString(R.string.title_statistics_dialog),
-        context.getString(R.string.string_32_bit)
-      )
-
-      NO_LIBS -> context.getString(R.string.title_statistics_dialog_no_native_libs)
-
+      SUPPORT_16KB -> context.getString(R.string.lib_detail_dialog_title_16kb_page_size)
+      NOT_SUPPORT_16KB -> context.getString(R.string.chart_item_not_support)
+      NO_NATIVE_LIBS -> context.getString(R.string.title_statistics_dialog_no_native_libs)
       else -> ""
     }
   }
 
   companion object {
-    const val IS_64_BIT = 0
-    const val IS_32_BIT = 1
-    const val NO_LIBS = 2
+    const val SUPPORT_16KB = 0
+    const val NOT_SUPPORT_16KB = 1
+    const val NO_NATIVE_LIBS = 2
   }
 }

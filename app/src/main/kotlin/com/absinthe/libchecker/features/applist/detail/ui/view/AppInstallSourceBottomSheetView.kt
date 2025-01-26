@@ -34,11 +34,19 @@ class AppInstallSourceBottomSheetView(context: Context) :
     titleView.text = context.getString(R.string.lib_detail_app_install_source_installing_package)
   }
 
+  val installedTimeView = AppInstallTimeItemView(context).apply {
+    layoutParams = LayoutParams(
+      ViewGroup.LayoutParams.MATCH_PARENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
+    )
+  }
+
   init {
     setPadding(24.dp, 16.dp, 24.dp, 16.dp)
     addView(header)
     addView(originatingView)
     addView(installingView)
+    addView(installedTimeView)
   }
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -56,12 +64,19 @@ class AppInstallSourceBottomSheetView(context: Context) :
         if (it.isGone) 0 else it.defaultHeightMeasureSpec(this)
       )
     }
+    installedTimeView.let {
+      it.measure(
+        it.defaultWidthMeasureSpec(this),
+        if (it.isGone) 0 else it.defaultHeightMeasureSpec(this)
+      )
+    }
     setMeasuredDimension(
       measuredWidth,
       paddingTop +
         header.measuredHeight +
-        originatingView.measuredHeight +
-        installingView.measuredHeight +
+        (if (originatingView.isGone) 0 else originatingView.measuredHeight) +
+        (if (installingView.isGone) 0 else installingView.measuredHeight) +
+        (if (installedTimeView.isGone) 0 else installedTimeView.measuredHeight) +
         paddingBottom
     )
   }
@@ -70,6 +85,7 @@ class AppInstallSourceBottomSheetView(context: Context) :
     header.layout(0, paddingTop)
     originatingView.layout(paddingStart, header.bottom)
     installingView.layout(paddingStart, originatingView.bottom)
+    installedTimeView.layout(paddingStart, installingView.bottom)
   }
 
   override fun getHeaderView(): BottomSheetHeaderView {

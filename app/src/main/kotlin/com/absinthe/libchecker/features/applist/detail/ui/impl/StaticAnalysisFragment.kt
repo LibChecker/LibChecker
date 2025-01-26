@@ -9,7 +9,11 @@ import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibStringDiffUtil
 import com.absinthe.libchecker.features.applist.detail.ui.base.BaseDetailFragment
 import com.absinthe.libchecker.features.applist.detail.ui.base.EXTRA_TYPE
+import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.extensions.putArguments
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -19,6 +23,26 @@ class StaticAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
 
   override fun getRecyclerView() = binding.list
   override val needShowLibDetailDialog = true
+
+  override suspend fun getItems(): List<LibStringItemChip> {
+    val flow = viewModel.staticLibItems
+    return flow.value ?: flow.filterNotNull().first()
+  }
+
+  override fun onItemsAvailable(items: List<LibStringItemChip>) {
+    if (items.isEmpty()) {
+      emptyView.text.text = getString(R.string.empty_list)
+    } else {
+      lifecycleScope.launch(Dispatchers.IO) {
+        setItemsWithFilter(viewModel.queriedText, null)
+      }
+    }
+
+    if (!isListReady) {
+      viewModel.updateItemsCountStateFlow(type, items.size)
+      isListReady = true
+    }
+  }
 
   override fun init() {
     binding.apply {
@@ -39,33 +63,14 @@ class StaticAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
     }
 
     viewModel.apply {
-      staticLibItems.onEach {
-        if (it == null) return@onEach
-        if (it.isEmpty()) {
-          emptyView.text.text = getString(R.string.empty_list)
-        } else {
-          if (viewModel.queriedText?.isNotEmpty() == true) {
-            filterList(viewModel.queriedText!!)
-          } else {
-            setList(it)
-          }
-        }
-
-        if (!isListReady) {
-          viewModel.updateItemsCountStateFlow(type, it.size)
-          isListReady = true
-        }
-      }.launchIn(lifecycleScope)
       packageInfoStateFlow.onEach {
         if (it != null) {
           viewModel.initStaticData()
         }
       }.launchIn(lifecycleScope)
-    }
 
-    if (viewModel.staticLibItems.value.isNullOrEmpty().not()) {
-      lifecycleScope.launch {
-        viewModel.staticLibItems.emit(viewModel.staticLibItems.value)
+      packageInfoStateFlow.value?.run {
+        staticLibItems.value ?: run { initStaticData() }
       }
     }
   }

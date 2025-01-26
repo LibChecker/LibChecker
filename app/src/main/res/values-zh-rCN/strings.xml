@@ -55,6 +55,7 @@
   <string name="android_dist_subtitle_format">更新时间： %s</string>
   <string name="chart_abi_detailed">详细</string>
   <string name="chart_abi_concise">简洁</string>
+  <string name="chart_item_not_support">不支持</string>
   <!--  About  -->
   <string name="settings_about">关于</string>
   <string name="settings_about_summary">这里是 LibChecker!</string>
@@ -108,7 +109,7 @@
   <string name="not_found">未找到</string>
   <string name="create_an_issue">协助我们来补充信息</string>
   <string name="app_bundle_details">Android App Bundle 是 Android 新推出的一种官方发布格式，可让您以更高效的方式开发和发布应用。借助 Android App Bundle，您可以更轻松地以更小的应用提供优质的使用体验，从而提升安装成功率并减少卸载量。转换过程轻松便捷。您无需重构代码即可开始获享较小应用的优势。改用这种格式后，您可以体验模块化应用开发和可自定义功能交付，并从中受益。</string>
-  <string name="kotlin_details">Kotlin 是一种在 Java 虚拟机上运行的静态类型编程语言。虽然与 Java 语法并不兼容，但在 JVM 环境中 Kotlin 被设计成可以和 Java 代码相互运作，并可以重复使用如 Java 集合框架等的现有 Java 引用的函数库。</string>
+  <string name="kotlin_details">Kotlin 是由 JetBrains 开发的开源静态类型编程语言。Kotlin 简洁、安全、可与 Java 和其他语言互操作，并提供了许多在多个平台之间重用代码的方法，从而实现高效编程。Kotlin 适用于 JVM、Android、JavaScript、Wasm 和 Native，可用于任何类型的开发，包括服务器端、客户端 Web、Android 和多平台库。</string>
   <string name="items_count">项数：</string>
   <string name="further_operation">进一步操作</string>
   <string name="app_info_launch">启动</string>
@@ -122,6 +123,7 @@
   <string name="play_app_signing_details">借助 Play 应用签名，Google 可以为您管理和保护您应用的签名密钥，并使用它对从您的 app bundle 生成的优化分发 APK 进行签名。Play App Signing 将您的应用签名密钥存储在 Google 的安全基础架构中，并提供升级选项以提高安全性。</string>
   <string name="pwa_details">渐进式 Web 应用程序 (PWA) 使用现代 API 构建和增强，以提供增强的功能、可靠性和可安装性，同时使用单个代码库在任何设备上访问任何人、任何地方。</string>
   <string name="jetpack_compose_details">Jetpack Compose 是用于构建原生 Android 界面的新工具包。它可简化并加快 Android 上的界面开发，使用更少的代码、强大的工具和直观的 Kotlin API，快速打造生动而精彩的应用。</string>
+  <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform 是一个由 JetBrains 开发的现代化声明式和响应式 UI 框架，它提供了一种只需少量 Kotlin 代码即可构建用户界面的简单方法。它还允许您只需编写一次用户界面，即可在任何支持的平台——iOS、Android、桌面（Windows、macOS、Linux）和 Web——上运行。</string>
   <string name="extract_native_libs_tip">该应用声明了 </string>
   <string name="xml_detail">XML 详情</string>
   <string name="lib_detail_dialog_title_16kb_page_size">16 KB 页大小支持</string>
@@ -165,9 +167,12 @@
   <string name="lib_detail_app_install_source_title">安装来源</string>
   <string name="lib_detail_app_install_source_originating_package">安装请求方</string>
   <string name="lib_detail_app_install_source_installing_package">安装执行方</string>
+  <string name="lib_detail_app_installed_time">安装时间</string>
+  <string name="lib_detail_app_first_installed_time">首次安装时间：</string>
+  <string name="lib_detail_app_last_updated_time">最近更新时间：</string>
   <string name="lib_detail_app_install_source_empty">未知</string>
-  <string name="lib_detail_app_install_source_empty_detail">adb 或已被卸载的应用</string>
-  <string name="lib_detail_app_install_source_shizuku_usage">因为安卓限制了获取安装请求者的 API, 我们使用 Shizuku 来获取安装请求者。</string>
+  <string name="lib_detail_app_install_source_empty_detail">Shell 或已被卸载的应用</string>
+  <string name="lib_detail_app_install_source_shizuku_usage">由于 Android 限制了获取安装请求方的接口, 我们使用 Shizuku 来获取安装请求方。</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizuku 未安装</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">点此安装 Shizuku</string>
   <string name="lib_detail_app_install_source_shizuku_low_version">需要 Shizuku API 版本 10</string>

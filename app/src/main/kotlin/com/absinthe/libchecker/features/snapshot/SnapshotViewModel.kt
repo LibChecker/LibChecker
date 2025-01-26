@@ -30,7 +30,6 @@ import com.absinthe.libchecker.features.snapshot.detail.bean.SnapshotDiffItem
 import com.absinthe.libchecker.features.snapshot.ui.adapter.ARROW
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.protocol.Snapshot
-import com.absinthe.libchecker.protocol.SnapshotList
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getAppName
@@ -42,7 +41,6 @@ import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libchecker.utils.toJson
 import com.absinthe.libraries.utils.manager.TimeRecorder
-import com.google.protobuf.InvalidProtocolBufferException
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -57,8 +55,6 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import okio.buffer
-import okio.sink
 import timber.log.Timber
 
 const val CURRENT_SNAPSHOT = -1L
@@ -1213,40 +1209,36 @@ class SnapshotViewModel : ViewModel() {
   }
 
   fun backup(os: OutputStream, resultAction: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
-    val builder: SnapshotList.Builder = SnapshotList.newBuilder()
     val backupList = repository.getSnapshots()
-
-    val snapshotList = mutableListOf<Snapshot>()
     val snapshotBuilder: Snapshot.Builder = Snapshot.newBuilder()
 
-    backupList.forEach {
-      snapshotBuilder.apply {
-        packageName = it.packageName
-        timeStamp = it.timeStamp
-        label = it.label
-        versionName = it.versionName
-        versionCode = it.versionCode
-        installedTime = it.installedTime
-        lastUpdatedTime = it.lastUpdatedTime
-        isSystem = it.isSystem
-        abi = it.abi.toInt()
-        targetApi = it.targetApi.toInt()
-        nativeLibs = it.nativeLibs
-        services = it.services
-        activities = it.activities
-        receivers = it.receivers
-        providers = it.providers
-        permissions = it.permissions
-        metadata = it.metadata
-        packageSize = it.packageSize
+    os.use {
+      backupList.forEach {
+        snapshotBuilder.apply {
+          packageName = it.packageName
+          timeStamp = it.timeStamp
+          label = it.label
+          versionName = it.versionName
+          versionCode = it.versionCode
+          installedTime = it.installedTime
+          lastUpdatedTime = it.lastUpdatedTime
+          isSystem = it.isSystem
+          abi = it.abi.toInt()
+          targetApi = it.targetApi.toInt()
+          nativeLibs = it.nativeLibs
+          services = it.services
+          activities = it.activities
+          receivers = it.receivers
+          providers = it.providers
+          permissions = it.permissions
+          metadata = it.metadata
+          packageSize = it.packageSize
+          compileSdk = it.compileSdk.toInt()
+          minSdk = it.minSdk.toInt()
+        }
+
+        snapshotBuilder.build().writeDelimitedTo(os)
       }
-
-      snapshotList.add(snapshotBuilder.build())
-    }
-
-    builder.addAllSnapshots(snapshotList)
-    os.sink().buffer().use {
-      it.write(builder.build().toByteArray())
     }
 
     withContext(Dispatchers.Main) {
@@ -1261,30 +1253,67 @@ class SnapshotViewModel : ViewModel() {
   ) {
     viewModelScope.launch(Dispatchers.IO) {
       inputStream.use { stream ->
-        val list: SnapshotList = try {
-          SnapshotList.parseFrom(stream)
-        } catch (e: InvalidProtocolBufferException) {
+        val list = mutableListOf<Snapshot>()
+        val timeStampMap = mutableMapOf<Long, Int>()
+
+        runCatching {
+          while (true) {
+            val snapshot = Snapshot.parseDelimitedFrom(stream) ?: break
+            list.add(snapshot)
+            timeStampMap[snapshot.timeStamp] = timeStampMap.getOrDefault(snapshot.timeStamp, 0) + 1
+            if (list.size == 200) {
+              restoreImpl(list)
+              list.clear()
+            }
+          }
+          restoreImpl(list)
+          list.clear()
+        }.onFailure {
+          Timber.e("restore with new format failed: $it")
           withContext(Dispatchers.Main) {
             resultAction(false)
           }
-          SnapshotList.newBuilder().build()
+          return@launch
+          // runCatching {
+          //   val list: SnapshotList = SnapshotList.parseFrom(stream)
+          //   Timber.d("restore with old format: ${list.snapshotsList.size}")
+          //   list.snapshotsList.forEach {
+          //     timeStampMap[it.timeStamp] = timeStampMap.getOrDefault(it.timeStamp, 0) + 1
+          //   }
+          //   restoreImpl(list.snapshotsList)
+          // }.onFailure {
+          //   Timber.e("restore with old format failed: $it")
+          //   withContext(Dispatchers.Main) {
+          //     resultAction(false)
+          //   }
+          //   return@launch
+          // }
         }
-        val total = list.snapshotsList.groupingBy { it.timeStamp }.eachCount()
+
+        repository.deleteDuplicateSnapshotItems()
+        timeStampMap.forEach { insertTimeStamp(it.key) }
+        timeStampMap.keys.maxOrNull()?.let { GlobalValues.snapshotTimestamp = it }
+        withContext(Dispatchers.Main) {
+          resultAction(true)
+        }
+
         val message = buildString {
-          total.forEach {
+          timeStampMap.forEach {
             append(
-              String.format(context.getString(R.string.album_restore_detail), getFormatDateString(it.key), it.value.toString())
+              String.format(
+                context.getString(R.string.album_restore_detail),
+                getFormatDateString(it.key),
+                it.value.toString()
+              )
             )
           }
         }
+
         withContext(Dispatchers.Main) {
           BaseAlertDialogBuilder(context)
             .setTitle(R.string.album_restore)
             .setMessage(message)
             .setPositiveButton(android.R.string.ok) { _, _ ->
-              restoreImpl(list, resultAction)
-            }
-            .setNegativeButton(android.R.string.cancel) { _, _ ->
               resultAction(true)
             }
             .setCancelable(true)
@@ -1294,57 +1323,33 @@ class SnapshotViewModel : ViewModel() {
     }
   }
 
-  private fun restoreImpl(list: SnapshotList, resultAction: (success: Boolean) -> Unit) {
-    viewModelScope.launch(Dispatchers.IO) {
-      val finalList = mutableListOf<SnapshotItem>()
-      val timeStampSet = mutableSetOf<Long>()
-      var count = 0
-
-      list.snapshotsList.forEach {
-        if (it != null) {
-          timeStampSet += it.timeStamp
-          finalList += SnapshotItem(
-            null,
-            it.packageName,
-            it.timeStamp,
-            it.label,
-            it.versionName,
-            it.versionCode,
-            it.installedTime,
-            it.lastUpdatedTime,
-            it.isSystem,
-            it.abi.toShort(),
-            it.targetApi.toShort(),
-            it.nativeLibs,
-            it.services,
-            it.activities,
-            it.receivers,
-            it.providers,
-            it.permissions,
-            it.metadata,
-            it.packageSize,
-            it.compileSdk.toShort(),
-            it.minSdk.toShort()
-          )
-          count++
-        }
-
-        if (count == 50) {
-          repository.insertSnapshots(finalList)
-          finalList.clear()
-          count = 0
-        }
-      }
-
-      repository.insertSnapshots(finalList)
-      repository.deleteDuplicateSnapshotItems()
-      finalList.clear()
-      count = 0
-      timeStampSet.forEach { insertTimeStamp(it) }
-      timeStampSet.maxOrNull()?.let { GlobalValues.snapshotTimestamp = it }
-      withContext(Dispatchers.Main) {
-        resultAction(true)
-      }
+  private suspend fun restoreImpl(list: List<Snapshot>) {
+    list.map {
+      SnapshotItem(
+        null,
+        it.packageName,
+        it.timeStamp,
+        it.label,
+        it.versionName,
+        it.versionCode,
+        it.installedTime,
+        it.lastUpdatedTime,
+        it.isSystem,
+        it.abi.toShort(),
+        it.targetApi.toShort(),
+        it.nativeLibs,
+        it.services,
+        it.activities,
+        it.receivers,
+        it.providers,
+        it.permissions,
+        it.metadata,
+        it.packageSize,
+        it.compileSdk.toShort(),
+        it.minSdk.toShort()
+      )
+    }.let {
+      repository.insertSnapshots(it)
     }
   }
 

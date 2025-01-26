@@ -28,7 +28,7 @@ import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
-import com.absinthe.libchecker.features.about.ui.AboutActivity
+import com.absinthe.libchecker.features.about.AboutPageBuilder
 import com.absinthe.libchecker.features.applist.detail.ui.ApkDetailActivity
 import com.absinthe.libchecker.features.home.HomeViewModel
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
@@ -201,7 +201,7 @@ class SettingsFragment :
     findPreference<Preference>(Constants.PREF_ABOUT)?.apply {
       summary = "${BuildConfig.VERSION_NAME}(${BuildConfig.VERSION_CODE})"
       setOnPreferenceClickListener {
-        startActivity(Intent(requireContext(), AboutActivity::class.java))
+        AboutPageBuilder.start(requireContext())
         true
       }
     }

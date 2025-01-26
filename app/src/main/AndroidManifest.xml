@@ -30,7 +30,7 @@
     android:roundIcon="@mipmap/ic_launcher_round"
     android:supportsRtl="true"
     android:theme="@style/AppTheme"
-    tools:targetApi="34">
+    tools:targetApi="35">
 
     <activity
       android:name=".features.home.ui.MainActivity"
@@ -129,10 +129,6 @@
     <activity
       android:name=".features.chart.ui.ChartActivity"
       android:label="@string/tab_chart" />
-    <activity
-      android:name=".features.about.ui.AboutActivity"
-      android:label="@string/settings_about"
-      android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar" />
     <activity
       android:name=".ui.bridge.BridgeActivity"
       android:exported="true"

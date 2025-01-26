@@ -55,6 +55,7 @@
   <string name="android_dist_subtitle_format">更新時間：%s</string>
   <string name="chart_abi_detailed">詳細</string>
   <string name="chart_abi_concise">簡潔</string>
+  <string name="chart_item_not_support">不支援</string>
   <!--  About  -->
   <string name="settings_about">關於</string>
   <string name="settings_about_summary">這裡是 LibChecker！</string>
@@ -125,7 +126,7 @@
   <string name="extract_native_libs_tip">此應用程式宣告了 </string>
   <string name="xml_detail">XML 詳細資料</string>
   <string name="lib_detail_dialog_title_16kb_page_size">16 KB 分頁大小支援</string>
-  <string name="lib_detail_dialog_content_16kb_page_size">在過去 Android 僅支援 4 KB 的記憶體分頁大小，這優化了系統記憶體效能，適用於 Android 裝置通常擁有的平均總記憶體量。自 Android 15 開始，AOSP 支援配置為使用 16 KB 分頁大小的裝置(16 KB 裝置)。如果您的應用程式直接或透過 SDK 間接使用任何 NDK 程式庫，那麼您需要重新建置您的應用程式，以便在這些 16 KB 裝置上正常運作。</string>
+  <string name="lib_detail_dialog_content_16kb_page_size">在過去 Android 僅支援 4 KB 的記憶體分頁大小，這最佳化了系統記憶體效能，適用於 Android 裝置通常擁有的平均總記憶體量。自 Android 15 開始，AOSP 支援配置為使用 16 KB 分頁大小的裝置(16 KB 裝置)。如果您的應用程式直接或透過 SDK 間接使用任何 NDK 程式庫，那麼您需要重新建置您的應用程式，以便在這些 16 KB 裝置上正常運作。</string>
   <string name="format_last_updated">最近更新：%s</string>
   <string name="menu_process">處理程序</string>
   <string name="menu_split">分割</string>
@@ -166,7 +167,7 @@
   <string name="lib_detail_app_install_source_originating_package">安裝要求者</string>
   <string name="lib_detail_app_install_source_installing_package">安裝執行程式</string>
   <string name="lib_detail_app_install_source_empty">未知</string>
-  <string name="lib_detail_app_install_source_empty_detail">ADB 或已解除安裝的應用程式</string>
+  <string name="lib_detail_app_install_source_empty_detail">Shell 或已解除安裝的應用程式</string>
   <string name="lib_detail_app_install_source_shizuku_usage">因為 Android 限制了取得安裝要求者的 API，我們使用 Shizuku 以取得安裝要求者。</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizuku 尚未安裝</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">按一下這裡以安裝 Shizuku</string>

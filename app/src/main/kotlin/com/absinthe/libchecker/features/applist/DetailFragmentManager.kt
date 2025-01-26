@@ -2,10 +2,12 @@ package com.absinthe.libchecker.features.applist
 
 import android.util.SparseArray
 import androidx.core.util.forEach
-import androidx.core.util.valueIterator
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.features.applist.detail.ui.base.BaseDetailFragment
-import com.absinthe.libchecker.features.applist.detail.ui.base.BaseFilterAnalysisFragment
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 const val MODE_SORT_BY_SIZE = 0
 const val MODE_SORT_BY_LIB = 1
@@ -23,6 +25,7 @@ class DetailFragmentManager {
     private set
 
   private val map = SparseArray<BaseDetailFragment<*>>()
+  private var deliverFilterJob: Job? = null
 
   fun register(position: Int, fragment: BaseDetailFragment<*>) {
     map.put(position, fragment)
@@ -33,17 +36,17 @@ class DetailFragmentManager {
   }
 
   suspend fun sortAll() {
-    val iterator = map.valueIterator()
-    var entry: BaseDetailFragment<*>
-    while (iterator.hasNext()) {
-      entry = iterator.next()
-      entry.sort()
+    map.forEach { _, value ->
+      value.sort()
     }
   }
 
-  fun deliverFilterItemsByText(text: String) {
-    map.forEach { _, value ->
-      value.filterList(text)
+  fun deliverFilterItemsByText(text: String, coroutineScope: CoroutineScope) {
+    deliverFilterJob?.cancel()
+    deliverFilterJob = coroutineScope.launch(Dispatchers.IO) {
+      map.forEach { _, value ->
+        value.setItemsWithFilter(text, null)
+      }
     }
   }
 
@@ -53,9 +56,12 @@ class DetailFragmentManager {
     }
   }
 
-  fun deliverFilterItems(condition: String?) {
-    map.forEach { _, value ->
-      (value as? BaseFilterAnalysisFragment)?.filterItems(condition)
+  fun deliverFilterItems(searchWords: String?, process: String?, coroutineScope: CoroutineScope) {
+    deliverFilterJob?.cancel()
+    deliverFilterJob = coroutineScope.launch(Dispatchers.IO) {
+      map.forEach { _, value ->
+        value.setItemsWithFilter(searchWords, process)
+      }
     }
   }
 

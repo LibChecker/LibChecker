@@ -30,6 +30,7 @@ import com.absinthe.libchecker.features.chart.impl.JetpackComposeChartDataSource
 import com.absinthe.libchecker.features.chart.impl.KotlinChartDataSource
 import com.absinthe.libchecker.features.chart.impl.MarketDistributionChartDataSource
 import com.absinthe.libchecker.features.chart.impl.MinApiChartDataSource
+import com.absinthe.libchecker.features.chart.impl.PageSize16KBChartDataSource
 import com.absinthe.libchecker.features.chart.impl.TargetApiChartDataSource
 import com.absinthe.libchecker.features.chart.ui.view.ChartDetailItemView
 import com.absinthe.libchecker.features.chart.ui.view.ExpandingView
@@ -80,7 +81,8 @@ class ChartFragment :
     COMPILE_SDK,
     JETPACK_COMPOSE,
     MARKET_DISTRIBUTION,
-    AAB
+    AAB,
+    SUPPORT_16KB
   }
 
   private val chartTypeToIconRes = mapOf(
@@ -91,7 +93,8 @@ class ChartFragment :
     ChartType.COMPILE_SDK to (R.drawable.ic_label_compile_sdk to R.string.compile_sdk_string),
     ChartType.JETPACK_COMPOSE to (com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetpack_compose to R.string.jetpack_compose_short),
     ChartType.MARKET_DISTRIBUTION to (com.absinthe.lc.rulesbundle.R.drawable.ic_lib_android to R.string.android_dist_label),
-    ChartType.AAB to (R.drawable.ic_aab to R.string.app_bundle)
+    ChartType.AAB to (R.drawable.ic_aab to R.string.app_bundle),
+    ChartType.SUPPORT_16KB to (R.drawable.ic_16kb_align to R.string.lib_detail_dialog_title_16kb_page_size)
   )
   private var currentChartType = ChartType.ABI
   private var currentExpandingView: ExpandingView? = null
@@ -142,16 +145,17 @@ class ChartFragment :
             }
             withContext(Dispatchers.Main) {
               if (dataSource == null) {
-                currentChartType = ChartType.ABI
+                setData(it, ChartType.ABI)
+              } else {
+                setData(it)
               }
-              setData(it)
             }
           }
         }
       }.stateIn(this)
     }
     lifecycleScope.launch {
-      lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+      lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
         viewModel.isLoading.collect { isLoading ->
           if (isLoading) {
             binding.progressHorizontal.show()
@@ -163,7 +167,7 @@ class ChartFragment :
       }
     }
     lifecycleScope.launch {
-      lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+      lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
         viewModel.distributionLastUpdateTime.collect { time ->
           (binding.dashboardContainer.getChildAt(0) as? MarketDistributionDashboardView)?.let {
             it.subtitle.text = getString(R.string.android_dist_subtitle_format, time)
@@ -172,7 +176,7 @@ class ChartFragment :
       }
     }
     lifecycleScope.launch {
-      lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+      lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
         viewModel.detailAbiSwitch.collect {
           if (currentChartType == ChartType.ABI && this@ChartFragment::allLCItemsStateFlow.isInitialized) {
             setData(allLCItemsStateFlow.value)
@@ -184,12 +188,12 @@ class ChartFragment :
 
   private fun setData(items: List<LCItem>, chartType: ChartType = currentChartType) {
     context ?: return
+    currentChartType = chartType
     viewModel.setLoading(true)
     viewModel.setDetailAbiSwitchVisibility(chartType == ChartType.ABI)
     if (chartView.parent != null) {
       binding.root.removeView(chartView)
     }
-    currentChartType = chartType
 
     when (chartType) {
       ChartType.ABI -> {
@@ -206,6 +210,7 @@ class ChartFragment :
       ChartType.JETPACK_COMPOSE -> setChartData(::generatePieChartView) { JetpackComposeChartDataSource(items) }
       ChartType.MARKET_DISTRIBUTION -> setChartData(::generateBarChartView) { MarketDistributionChartDataSource(items) }
       ChartType.AAB -> setChartData(::generatePieChartView) { AABChartDataSource(items) }
+      ChartType.SUPPORT_16KB -> setChartData(::generatePieChartView) { PageSize16KBChartDataSource(items) }
     }
   }
 
@@ -346,7 +351,8 @@ class ChartFragment :
                   transformations(SaturationTransformation(0f))
                 }
               }
-              labelName.text = dataSource!!.getLabelByXValue(context, key)
+              labelName.text = it.getLabelByXValue(context, key)
+              // noinspection SetTextI18n
               count.text = value.data.size.toString()
               setOnClickListener {
                 if (value.data.isNotEmpty()) {
@@ -372,7 +378,7 @@ class ChartFragment :
 
       if (dataSource is TargetApiChartDataSource || dataSource is MinApiChartDataSource) {
         val index = (dataSource as BaseVariableChartDataSource<*>).getListKeyByXValue(x)
-        it.setAndroidVersionLabel(AndroidVersions.versions.find { version -> version.first == index })
+        it.setAndroidVersionLabel(AndroidVersions.versions.find { node -> node.version == index })
       } else {
         it.setAndroidVersionLabel(null)
       }

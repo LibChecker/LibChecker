@@ -10,16 +10,41 @@ import com.absinthe.libchecker.features.applist.detail.ui.SignatureDetailBSDFrag
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibStringDiffUtil
 import com.absinthe.libchecker.features.applist.detail.ui.base.BaseDetailFragment
 import com.absinthe.libchecker.features.applist.detail.ui.base.EXTRA_TYPE
+import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import rikka.core.util.ClipboardUtils
 
 class SignaturesAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
 
   override fun getRecyclerView() = binding.list
   override val needShowLibDetailDialog = false
+
+  override suspend fun getItems(): List<LibStringItemChip> {
+    val flow = viewModel.signaturesLibItems
+    return flow.value ?: flow.filterNotNull().first()
+  }
+
+  override fun onItemsAvailable(items: List<LibStringItemChip>) {
+    if (items.isEmpty()) {
+      emptyView.text.text = getString(R.string.uncharted_territory)
+    } else {
+      lifecycleScope.launch(Dispatchers.IO) {
+        setItemsWithFilter(viewModel.queriedText, null)
+      }
+    }
+
+    if (!isListReady) {
+      viewModel.updateItemsCountStateFlow(type, items.size)
+      isListReady = true
+    }
+  }
 
   override fun init() {
     binding.list.adapter = adapter
@@ -41,25 +66,17 @@ class SignaturesAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
       setEmptyView(emptyView)
     }
 
-    viewModel.signaturesLibItems.onEach {
-      if (it == null) return@onEach
-      if (it.isEmpty()) {
-        emptyView.text.text = getString(R.string.uncharted_territory)
-      } else {
-        if (viewModel.queriedText?.isNotEmpty() == true) {
-          filterList(viewModel.queriedText!!)
-        } else {
-          setList(it)
+    viewModel.apply {
+      packageInfoStateFlow.onEach {
+        if (it != null) {
+          viewModel.initSignatures(requireContext())
         }
-      }
+      }.launchIn(lifecycleScope)
 
-      if (!isListReady) {
-        viewModel.updateItemsCountStateFlow(type, it.size)
-        isListReady = true
+      packageInfoStateFlow.value?.run {
+        signaturesLibItems.value ?: run { initSignatures(requireContext()) }
       }
-    }.launchIn(lifecycleScope)
-
-    viewModel.initSignatures(requireContext())
+    }
   }
 
   private fun openSignatureDetailDialog(position: Int) {

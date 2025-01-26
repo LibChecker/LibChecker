@@ -11,8 +11,9 @@ import com.absinthe.libchecker.features.applist.detail.ui.base.BaseDetailFragmen
 import com.absinthe.libchecker.features.applist.detail.ui.base.EXTRA_TYPE
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.extensions.putArguments
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class MetaDataAnalysisFragment :
@@ -21,6 +22,26 @@ class MetaDataAnalysisFragment :
 
   override fun getRecyclerView() = binding.list
   override val needShowLibDetailDialog = false
+
+  override suspend fun getItems(): List<LibStringItemChip> {
+    val flow = viewModel.metaDataItems
+    return flow.value ?: flow.filterNotNull().first()
+  }
+
+  override fun onItemsAvailable(items: List<LibStringItemChip>) {
+    if (items.isEmpty()) {
+      emptyView.text.text = getString(R.string.empty_list)
+    } else {
+      lifecycleScope.launch(Dispatchers.IO) {
+        setItemsWithFilter(viewModel.queriedText, null)
+      }
+    }
+
+    if (!isListReady) {
+      viewModel.updateItemsCountStateFlow(type, items.size)
+      isListReady = true
+    }
+  }
 
   override fun init() {
     binding.apply {
@@ -36,40 +57,9 @@ class MetaDataAnalysisFragment :
     }
 
     viewModel.apply {
-      metaDataItems.onEach {
-        if (it == null) return@onEach
-        if (it.isEmpty()) {
-          emptyView.text.text = getString(R.string.empty_list)
-        } else {
-          if (viewModel.queriedText?.isNotEmpty() == true) {
-            filterList(viewModel.queriedText!!)
-          } else {
-            setList(it)
-          }
-        }
-
-        if (!isListReady) {
-          viewModel.updateItemsCountStateFlow(type, it.size)
-          isListReady = true
-        }
-      }.launchIn(lifecycleScope)
-      packageInfoStateFlow.onEach {
-        if (it != null) {
-          viewModel.initMetaDataData()
-        }
-      }.launchIn(lifecycleScope)
-    }
-
-    if (viewModel.metaDataItems.value.isNullOrEmpty().not()) {
-      lifecycleScope.launch {
-        viewModel.metaDataItems.emit(viewModel.metaDataItems.value)
+      packageInfoStateFlow.value?.run {
+        metaDataItems.value ?: run { initMetaDataData() }
       }
-    }
-  }
-
-  override fun getFilterListByText(text: String): List<LibStringItemChip> {
-    return adapter.data.filter {
-      it.item.name.contains(text, true) || it.item.source?.contains(text, true) == true
     }
   }
 

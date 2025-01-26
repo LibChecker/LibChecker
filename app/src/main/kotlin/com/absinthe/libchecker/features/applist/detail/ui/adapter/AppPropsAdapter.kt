@@ -47,7 +47,7 @@ class AppPropsAdapter(
     }
   }
 
-  private val linkable = setOf("string", "array", "bool", "xml", "drawable", "mipmap", "color", "dimen")
+  private val linkable = setOf("array", "bool", "color", "dimen", "drawable", "integer", "mipmap", "string", "xml")
 
   private fun parseValue(item: AppPropItem): String {
     if (item.value.maybeResourceId()) {
@@ -143,6 +143,11 @@ class AppPropsAdapter(
 
               "dimen" -> {
                 itemView.value.text = appResources.getDimension(item.value.toInt()).toString()
+                clickedTag = true
+              }
+
+              "integer" -> {
+                itemView.value.text = appResources.getInteger(item.value.toInt()).toString()
                 clickedTag = true
               }
 

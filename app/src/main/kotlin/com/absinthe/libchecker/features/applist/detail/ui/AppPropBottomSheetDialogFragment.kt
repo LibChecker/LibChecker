@@ -50,7 +50,7 @@ class AppPropBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppPr
       bundleList.add(
         0,
         AppPropItem(
-          key = "Dexopt",
+          key = "dexopt",
           value = "status=${it.first}, reason=${it.second}"
         )
       )

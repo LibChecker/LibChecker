@@ -57,7 +57,6 @@ import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.features.applist.detail.bean.StatefulComponent
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
-import com.absinthe.libchecker.utils.dex.DexLibMap
 import com.absinthe.libchecker.utils.dex.FastDexFileFactory
 import com.absinthe.libchecker.utils.elf.ELFParser
 import com.absinthe.libchecker.utils.extensions.ABI_64_BIT
@@ -881,78 +880,7 @@ object PackageUtils {
    * @return List of LibStringItem
    */
   fun getDexList(pi: PackageInfo): Collection<LibStringItem> {
-    try {
-      val path = pi.applicationInfo?.sourceDir ?: return emptyList()
-      var className: String
-
-      val primarySet = mutableSetOf<LibStringItem>()
-      val pkgType = "L${pi.packageName.replace(".", "/")}"
-      FastDexFileFactory.loadDexContainer(File(path), Opcodes.getDefault()).apply {
-        dexEntryNames.forEachIndexed { index, entry ->
-          if (index >= 5) {
-            return@forEachIndexed
-          }
-          getEntry(entry)?.let { dexEntry ->
-            primarySet += dexEntry.dexFile.classes
-              .asSequence()
-              .filter { !it.type.startsWith(pkgType) }
-              .map { item ->
-                className = item.type.substring(1, item.length - 1).replace("/", ".")
-                when {
-                  // Remove obfuscated classes
-                  !className.contains(".") -> LibStringItem("")
-
-                  // Remove kotlin
-                  className.startsWith("kotlin") -> LibStringItem("")
-
-                  // Merge AndroidX classes
-                  className.startsWith("androidx") -> LibStringItem(
-                    className.substring(
-                      0,
-                      className.indexOf(".", 9).takeIf { it != -1 } ?: className.length
-                    )
-                  )
-
-                  // Filter classes which paths deep level greater than 4
-                  else -> LibStringItem(
-                    className.split(".").run {
-                      this.subList(0, this.size.coerceAtMost(4)).joinToString(separator = ".")
-                    }
-                  )
-                }
-              }
-              .toSet()
-              .filter { it.name.isNotBlank() }
-          }
-        }
-      }
-
-      // Merge path deep level 3 classes
-      primarySet.filter { it.name.split(".").size == 3 }.forEach {
-        primarySet.removeAll { item -> item.name.startsWith(it.name) }
-        primarySet.add(it)
-      }
-      // Merge path deep level 4 classes
-      var pathLevel3Item: String
-      var filter: List<LibStringItem>
-      primarySet.filter { it.name.split(".").size == 4 }.forEach {
-        if (DexLibMap.DEEP_LEVEL_3_SET.contains(it.name)) {
-          return@forEach
-        }
-
-        pathLevel3Item = it.name.split(".").subList(0, 3).joinToString(separator = ".")
-        filter = primarySet.filter { item -> item.name.startsWith(pathLevel3Item) }
-
-        if (filter.isNotEmpty()) {
-          primarySet.removeAll(filter.toSet())
-          primarySet.add(LibStringItem(pathLevel3Item))
-        }
-      }
-      return primarySet
-    } catch (e: Exception) {
-      Timber.e(e)
-      return emptyList()
-    }
+    throw RuntimeException("Not implemented")
   }
 
   /**
@@ -1211,5 +1139,9 @@ object PackageUtils {
         }
       }
     }
+  }
+
+  fun hasNoNativeLibs(abi: Int): Boolean {
+    return abi == OVERLAY || (abi % MULTI_ARCH) == NO_LIBS
   }
 }

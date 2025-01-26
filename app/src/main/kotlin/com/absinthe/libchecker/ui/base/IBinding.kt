@@ -14,6 +14,7 @@ internal sealed interface IBinding<VB : ViewBinding> {
     while (clazz.superclass != null) {
       method = clazz.filterBindingMethod()
       if (method == null) {
+        @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
         clazz = clazz.superclass
       } else {
         @Suppress("UNCHECKED_CAST")

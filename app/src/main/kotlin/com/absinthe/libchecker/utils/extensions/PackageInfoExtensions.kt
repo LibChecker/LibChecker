@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageInfoHidden
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Build
 import androidx.collection.arrayMapOf
@@ -482,7 +483,7 @@ fun PackageInfo.isRxJavaUsed(foundList: List<String>? = null): Boolean {
 
 private const val REACTIVEX_KEYWORD = "Implementation-Version"
 
-suspend fun PackageInfo.getRxJavaVersion(): String? = withContext(Dispatchers.IO) {
+suspend fun PackageInfo.getRxJavaVersion(foundList: List<String>? = null): String? = withContext(Dispatchers.IO) {
   runCatching {
     ZipFileCompat(File(applicationInfo!!.sourceDir)).use { zipFile ->
       zipFile.getEntry("META-INF/rxjava.properties")?.let { ze ->
@@ -494,7 +495,7 @@ suspend fun PackageInfo.getRxJavaVersion(): String? = withContext(Dispatchers.IO
         }
       }
     }
-    val resultList = PackageUtils.findDexClasses(
+    val resultList = foundList ?: PackageUtils.findDexClasses(
       File(applicationInfo!!.sourceDir),
       listOf(
         "rx.schedulers.*".toClassDefType(),
@@ -545,7 +546,7 @@ fun PackageInfo.isRxKotlinUsed(foundList: List<String>? = null): Boolean {
   ).isNotEmpty()
 }
 
-suspend fun PackageInfo.getRxKotlinVersion(): String? = withContext(Dispatchers.IO) {
+suspend fun PackageInfo.getRxKotlinVersion(foundList: List<String>? = null): String? = withContext(Dispatchers.IO) {
   runCatching {
     val file = File(applicationInfo!!.sourceDir)
     ZipFileCompat(file).use { zipFile ->
@@ -558,7 +559,7 @@ suspend fun PackageInfo.getRxKotlinVersion(): String? = withContext(Dispatchers.
         }
       }
     }
-    val resultList = PackageUtils.findDexClasses(
+    val resultList = foundList ?: PackageUtils.findDexClasses(
       file,
       listOf(
         "io.reactivex.rxjava3.kotlin.*".toClassDefType(),
@@ -600,8 +601,8 @@ fun PackageInfo.isRxAndroidUsed(foundList: List<String>? = null): Boolean {
   ).isNotEmpty()
 }
 
-suspend fun PackageInfo.getRxAndroidVersion(): String? = withContext(Dispatchers.IO) {
-  val resultList = PackageUtils.findDexClasses(
+suspend fun PackageInfo.getRxAndroidVersion(foundList: List<String>? = null): String? = withContext(Dispatchers.IO) {
+  val resultList = foundList ?: PackageUtils.findDexClasses(
     File(applicationInfo?.sourceDir ?: return@withContext null),
     listOf(
       "io.reactivex.rxjava3.android.*".toClassDefType(),
@@ -790,4 +791,27 @@ fun PackageInfo.is16KBAligned(): Boolean {
   }.onFailure {
     Timber.e(it)
   }.getOrElse { false }
+}
+
+/**
+ * Check if an app is using Kotlin Multiplatform
+ * @return True if is using Kotlin Multiplatform
+ */
+fun PackageInfo.isUseKMP(foundList: List<String>? = null): Boolean {
+  val providers = runCatching {
+    PackageUtils.getPackageInfo(
+      packageName,
+      PackageManager.GET_PROVIDERS
+    )
+  }.getOrNull()?.providers
+  if (providers != null && providers.any { it.name == "org.jetbrains.compose.resources.AndroidContextProvider" }) {
+    return true
+  }
+  val file = File(applicationInfo?.sourceDir ?: return false)
+  val realFoundList = foundList ?: PackageUtils.findDexClasses(
+    file,
+    listOf("org.jetbrains.compose.*".toClassDefType())
+  )
+  val foundInDex = realFoundList.contains("org.jetbrains.compose.*".toClassDefType())
+  return foundInDex
 }

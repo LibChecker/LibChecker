@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.features.applist.ui.adapter.AppAdapter
 import com.absinthe.libchecker.features.chart.ui.view.AndroidVersionLabelView
@@ -16,6 +17,8 @@ import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
+import java.text.SimpleDateFormat
+import java.util.Locale
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 
 @SuppressLint("ViewConstructor")
@@ -74,10 +77,16 @@ class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutin
     setPadding(0, 4.dp, 0, 4.dp)
   }
 
-  fun addAndroidVersionView(triple: Triple<Int, String, Int?>?) {
-    if (androidVersionView.parent == null && triple != null) {
-      androidVersionView.setIcon(triple.third)
-      androidVersionView.text.text = triple.second
+  fun addAndroidVersionView(node: AndroidVersions.Node?) {
+    if (androidVersionView.parent == null && node != null) {
+      androidVersionView.setIcon(node.iconRes)
+      val text = StringBuilder(node.codeName)
+      if (node.versionName.isNotEmpty()) {
+        text.append(", ").append(node.versionName)
+      }
+      text.append(", ")
+      text.append(SimpleDateFormat("yyyy-MM", Locale.getDefault()).format(node.releaseDate))
+      androidVersionView.text.text = text
       addView(androidVersionView, 1)
     }
   }
