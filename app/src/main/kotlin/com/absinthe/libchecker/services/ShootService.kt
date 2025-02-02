@@ -302,6 +302,13 @@ class ShootService : LifecycleService() {
       repository.deleteSnapshotsAndTimeStamp(GlobalValues.snapshotTimestamp)
     }
 
+    if (GlobalValues.snapshotAutoRemoveThreshold > 0) {
+      repository.retainLatestSnapshotsAndRemoveOld(
+        count = GlobalValues.snapshotAutoRemoveThreshold,
+        forceShowLoading = false
+      )
+    }
+
     if (areNotificationsEnabled) {
       notificationManager.cancel(notificationIdShoot)
 
@@ -322,12 +329,11 @@ class ShootService : LifecycleService() {
     GlobalValues.snapshotTimestamp = ts
     _isShooting = false
     notifyFinished(ts)
-    ServiceCompat.stopForeground(this@ShootService, ServiceCompat.STOP_FOREGROUND_REMOVE)
-    stopSelf()
     Timber.i("computeSnapshots end")
     isComputing = false
 
     if (stopWhenFinish) {
+      ServiceCompat.stopForeground(this@ShootService, ServiceCompat.STOP_FOREGROUND_REMOVE)
       stopSelf()
     }
   }

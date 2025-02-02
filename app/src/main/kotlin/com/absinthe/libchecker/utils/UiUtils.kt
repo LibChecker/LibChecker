@@ -13,6 +13,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
@@ -20,6 +21,7 @@ import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.google.android.material.progressindicator.LinearProgressIndicator
+import com.google.android.material.slider.Slider
 
 object UiUtils {
   fun getRandomColor(): Int {
@@ -92,5 +94,36 @@ object UiUtils {
     DrawableCompat.setTintMode(drawable, PorterDuff.Mode.SRC_ATOP)
     DrawableCompat.setTint(drawable, color)
     return drawable
+  }
+
+  fun createSnapshotAutoRemoveThresholdDialog(context: ContextThemeWrapper): AlertDialog {
+    if (GlobalValues.snapshotAutoRemoveThreshold <= 0) {
+      GlobalValues.snapshotAutoRemoveThreshold = 5
+    }
+    val slider = Slider(context).apply {
+      layoutParams =
+        ViewGroup.MarginLayoutParams(200.dp, ViewGroup.LayoutParams.WRAP_CONTENT).also {
+          setPadding(24.dp, 24.dp, 24.dp, 24.dp)
+        }
+      stepSize = 1f
+      valueFrom = 2f
+      valueTo = 10f
+      value = GlobalValues.snapshotAutoRemoveThreshold.toFloat()
+    }
+    return BaseAlertDialogBuilder(context)
+      .setTitle(R.string.album_item_management_snapshot_auto_remove_default_title)
+      .setView(slider)
+      .setMessage(
+        String.format(
+          context.getString(R.string.album_item_management_snapshot_auto_remove_desc),
+          context.getString(android.R.string.ok)
+        )
+      )
+      .setCancelable(false)
+      .setPositiveButton(android.R.string.ok) { _, _ ->
+        GlobalValues.snapshotAutoRemoveThreshold = slider.value.toInt()
+      }
+      .setNegativeButton(android.R.string.cancel, null)
+      .create()
   }
 }

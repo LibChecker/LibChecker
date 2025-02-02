@@ -1,12 +1,17 @@
 package com.absinthe.libchecker.database
 
+import android.view.ContextThemeWrapper
+import androidx.appcompat.app.AlertDialog
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.SnapshotDiffStoringItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.database.entity.TrackItem
+import com.absinthe.libchecker.utils.UiUtils
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class LCRepository(private val lcDao: LCDao) {
@@ -124,6 +129,30 @@ class LCRepository(private val lcDao: LCDao) {
     lcDao.deleteSnapshots(chunk)
     chunk.clear()
     lcDao.deleteByTimeStamp(timestamp)
+  }
+
+  suspend fun retainLatestSnapshotsAndRemoveOld(count: Int, forceShowLoading: Boolean, context: ContextThemeWrapper? = null) {
+    if (checkDatabaseStatus().not()) return
+    Timber.d("Retain latest $count snapshots and remove old")
+    var loadingDialog: AlertDialog? = null
+    if (forceShowLoading) {
+      withContext(Dispatchers.Main) {
+        loadingDialog = UiUtils.createLoadingDialog(context!!)
+        loadingDialog.show()
+      }
+    }
+    getTimeStamps()
+      .sortedBy { it.timestamp }
+      .reversed()
+      .drop(count)
+      .forEach {
+        deleteSnapshotsAndTimeStamp(it.timestamp)
+      }
+    if (forceShowLoading) {
+      withContext(Dispatchers.Main) {
+        loadingDialog?.dismiss()
+      }
+    }
   }
 
   suspend fun updateTimeStampItem(item: TimeStampItem) {
