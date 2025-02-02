@@ -55,6 +55,7 @@
   <string name="android_dist_subtitle_format">Время обновления %s</string>
   <string name="chart_abi_detailed">Подробнее</string>
   <string name="chart_abi_concise">Меньше</string>
+  <string name="chart_item_not_support">Not Support</string>
   <!--  About  -->
   <string name="settings_about">О приложении</string>
   <string name="settings_about_summary">Это LibChecker!</string>
@@ -122,6 +123,7 @@
   <string name="play_app_signing_details">С помощью Play App Signing Google управляет ключом подписи вашего приложения и защищает его от вашего имени и использует его для подписи оптимизированных APK-файлов для распространения, которые создаются из ваших пакетов приложений. Play App Signing сохраняет ключ подписи вашего приложения в защищенной инфраструктуре Google и предлагает варианты обновления для повышения безопасности.</string>
   <string name="pwa_details">Прогрессивные веб-приложения (PWA) создаются и улучшаются с помощью современных API-интерфейсов, чтобы обеспечить расширенные возможности, надежность и простоту установки, а также охватывать всех, где угодно и на любом устройстве с помощью единой кодовой базы.</string>
   <string name="jetpack_compose_details">Jetpack Compose - это современный набор инструментов для создания нативных пользовательских интерфейсов в Android. Он упрощает и ускоряет разработку пользовательского интерфейса на Android. Вы сможете быстро воплотить в жизнь свое приложение благодаря меньшему количеству кода, мощным инструментам и интуитивно понятным API-интерфейсам Kotlin.</string>
+  <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform is a modern declarative and reactive UI framework developed by JetBrains that provides a simple way to build user interfaces with a small amount of Kotlin code. It also allows you to write your UI once and run it on any of the supported platforms – iOS, Android, desktop (Windows, macOS, Linux), and web.</string>
   <string name="extract_native_libs_tip">Приложение декларирует </string>
   <string name="xml_detail">XML Деталь</string>
   <string name="lib_detail_dialog_title_16kb_page_size">Размер страницы 16 KB</string>
@@ -165,6 +167,9 @@
   <string name="lib_detail_app_install_source_title">Источник установки</string>
   <string name="lib_detail_app_install_source_originating_package">Инициатор установки</string>
   <string name="lib_detail_app_install_source_installing_package">Исполнитель установки</string>
+  <string name="lib_detail_app_installed_time">Installation Time</string>
+  <string name="lib_detail_app_first_installed_time">First installed time: </string>
+  <string name="lib_detail_app_last_updated_time">Last installed time: </string>
   <string name="lib_detail_app_install_source_empty">Неизвестно</string>
   <string name="lib_detail_app_install_source_empty_detail">adb или удаленное приложение</string>
   <string name="lib_detail_app_install_source_shizuku_usage">Поскольку Android ограничивает API запроса на установку, мы используем Shizuku для его получения.</string>
@@ -222,6 +227,9 @@
   <string name="album_item_comparison_choose_local_apk">Выберите локальный APK</string>
   <string name="album_item_management_title">Менеджер</string>
   <string name="album_item_management_subtitle">Управление всеми снимками</string>
+  <string name="album_item_management_snapshot_auto_remove_default_title">Keep Only the Most Recent Snapshots</string>
+  <string name="album_item_management_snapshot_auto_remove_specific_title">Keep Only the %d Most Recent Items</string>
+  <string name="album_item_management_snapshot_auto_remove_desc">Starting from tapping \"%s\", only the most recent snapshots will be retained, and the older snapshots will be automatically deleted.</string>
   <string name="album_item_backup_restore_title">Бекап и восстановление</string>
   <string name="album_item_backup_restore_subtitle">Бекап и восстановление снимков</string>
   <string name="album_item_track_title">Отслеживание</string>
@@ -233,6 +241,7 @@
   <string name="album_restore_detail">%1$s : %2$s элементов всего\n</string>
   <string name="album_click_to_choose">Нажмите, чтобы выбрать</string>
   <string name="album_dialog_delete_snapshot_message">Обработка…</string>
+  <string name="album_snapshot_top_apps_not_initialized">Not loaded yet</string>
   <!--  Integration  -->
   <string name="integration_monkey_king_menu_block">Заблокировать с помощью \"MonkeyKing Purify\"</string>
   <string name="integration_monkey_king_menu_unblock">Разблокировать с помощью \"MonkeyKing Purify\"</string>
