@@ -103,6 +103,7 @@ object Constants {
 
   const val PREF_DETAILED_ABI_CHART = "detailedAbiChart"
   const val PREF_RULE_LANGUAGE = "ruleLanguage"
+  const val PREF_SNAPSHOT_AUTO_REMOVE_THRESHOLD = "snapshotAutoRemoveThreshold"
 
   object Event {
     const val LAUNCH_ACTION = "Launch Action"

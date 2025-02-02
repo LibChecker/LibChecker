@@ -97,4 +97,6 @@ object GlobalValues {
   var isGitHubReachable = true
 
   var trackItemsChanged = false
+
+  var snapshotAutoRemoveThreshold: Int by SPDelegates(Constants.PREF_SNAPSHOT_AUTO_REMOVE_THRESHOLD, -1)
 }
