@@ -227,6 +227,9 @@
   <string name="album_item_comparison_choose_local_apk">Yerel APK Seç</string>
   <string name="album_item_management_title">Yönetim</string>
   <string name="album_item_management_subtitle">Tüm anlık görüntüleri yönet</string>
+  <string name="album_item_management_snapshot_auto_remove_default_title">Yalnızca En Son Anlık Görüntüleri Sakla</string>
+  <string name="album_item_management_snapshot_auto_remove_specific_title">Yalnızca %d En Son Öğeleri Sakla</string>
+  <string name="album_item_management_snapshot_auto_remove_desc">“%s” öğesine dokunulmasından itibaren, yalnızca en son anlık görüntüler saklanacak ve eski anlık görüntüler otomatik olarak silinecektir.</string>
   <string name="album_item_backup_restore_title">Yedekleme ve Geri Yükleme</string>
   <string name="album_item_backup_restore_subtitle">Anlık görüntüleri yedekle ve geri yükle</string>
   <string name="album_item_track_title">Takip Et</string>
@@ -238,6 +241,7 @@
   <string name="album_restore_detail">%1$s : toplam %2$s öğe\n</string>
   <string name="album_click_to_choose">Seçmek için Tıkla</string>
   <string name="album_dialog_delete_snapshot_message">İşleniyor…</string>
+  <string name="album_snapshot_top_apps_not_initialized">Henüz yüklenmedi</string>
   <!--  Integration  -->
   <string name="integration_monkey_king_menu_block">\"MonkeyKing Purify\" ile engelle</string>
   <string name="integration_monkey_king_menu_unblock">\"MonkeyKing Purify\" ile engeli kaldır</string>
