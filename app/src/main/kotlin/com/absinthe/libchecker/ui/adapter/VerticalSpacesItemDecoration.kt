@@ -12,7 +12,8 @@ import androidx.recyclerview.widget.RecyclerView
  */
 class VerticalSpacesItemDecoration(
   private val space: Int,
-  private val influenceParent: Boolean = false
+  private val influenceParent: Boolean = false,
+  private val ratio: Float = 0.5f
 ) : RecyclerView.ItemDecoration() {
 
   override fun getItemOffsets(
@@ -27,8 +28,8 @@ class VerticalSpacesItemDecoration(
     }
 
     outRect.apply {
-      left = space / 2
-      right = space / 2
+      left = (space * ratio).toInt()
+      right = (space * ratio).toInt()
       bottom = space
       top = space
     }

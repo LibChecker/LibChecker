@@ -39,6 +39,8 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
       if (cardMode == CardMode.DEMO) {
         strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutline)
         setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSecondaryContainer))
+      } else {
+        radius = 0f
       }
     }
     root.container.apply {
