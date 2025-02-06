@@ -60,10 +60,11 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
 
   override fun convert(holder: BaseViewHolder, item: SnapshotDiffItem) {
     (holder.itemView as SnapshotItemView).apply {
-      strokeColor = if (cardMode == CardMode.DEMO || cardMode == CardMode.GET_APP_UPDATE) {
-        context.getColorByAttr(com.google.android.material.R.attr.colorOutline)
+      if (cardMode == CardMode.DEMO || cardMode == CardMode.GET_APP_UPDATE) {
+        strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutline)
       } else {
-        Color.TRANSPARENT
+        strokeColor = Color.TRANSPARENT
+        radius = 0f
       }
     }
     (holder.itemView as SnapshotItemView).container.apply {

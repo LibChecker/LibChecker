@@ -12,7 +12,8 @@ import androidx.recyclerview.widget.RecyclerView
  */
 class HorizontalSpacesItemDecoration(
   private val space: Int,
-  private val influenceParent: Boolean = false
+  private val influenceParent: Boolean = false,
+  private val ratio: Float = 0.5f
 ) : RecyclerView.ItemDecoration() {
 
   override fun getItemOffsets(
@@ -29,8 +30,8 @@ class HorizontalSpacesItemDecoration(
     outRect.apply {
       left = space
       right = space
-      bottom = space / 2
-      top = space / 2
+      bottom = (space * ratio).toInt()
+      top = (space * ratio).toInt()
     }
   }
 }

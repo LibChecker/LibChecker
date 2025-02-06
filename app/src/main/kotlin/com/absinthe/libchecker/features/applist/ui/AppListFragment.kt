@@ -33,12 +33,13 @@ import com.absinthe.libchecker.features.applist.ui.adapter.AppAdapter
 import com.absinthe.libchecker.features.applist.ui.adapter.AppListDiffUtil
 import com.absinthe.libchecker.features.home.HomeViewModel
 import com.absinthe.libchecker.features.home.INavViewContainer
-import com.absinthe.libchecker.ui.adapter.HorizontalSpacesItemDecoration
+import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseListControllerFragment
 import com.absinthe.libchecker.ui.base.IAppBarContainer
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.isPreinstalled
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
@@ -117,11 +118,7 @@ class AppListFragment :
             }
           }
         if (itemDecorationCount == 0) {
-          addItemDecoration(
-            HorizontalSpacesItemDecoration(
-              resources.getDimension(R.dimen.normal_padding).toInt() / 2
-            )
-          )
+          addItemDecoration(VerticalSpacesItemDecoration(4.dp, ratio = 0f))
         }
         setHasFixedSize(true)
         FastScrollerBuilder(this).useMd2Style().build()

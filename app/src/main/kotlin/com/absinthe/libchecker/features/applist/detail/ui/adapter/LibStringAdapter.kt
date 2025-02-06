@@ -47,6 +47,7 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
+import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.utils.extensions.tintTextToPrimary
 import com.absinthe.libchecker.utils.manifest.ResourceParser
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
@@ -75,9 +76,7 @@ class LibStringAdapter(
   private var is64Bit: Boolean = false
 
   fun switchProcessMode() {
-    processMode = !processMode
-    //noinspection NotifyDataSetChanged
-    notifyDataSetChanged()
+    setProcessMode(!processMode)
   }
 
   fun setProcessMode(isProcessMode: Boolean) {
@@ -172,7 +171,7 @@ class LibStringAdapter(
           HIGHLIGHT_TRANSITION_DURATION
         )
       }
-      holder.itemView.background = null
+      holder.itemView.setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackground))
     } else {
       val drawable = TransitionDrawable(
         listOf(
