@@ -21,7 +21,7 @@ object ApiManager {
     "https://gitlab.com/zhaobozhen/LibChecker-Rules/-/raw/$WORKING_BRANCH/"
 
   const val GITHUB_NEW_ISSUE_URL =
-    "https://github.com/LibChecker/LibChecker-Rules/issues/new?labels=&template=library-name.md&title=%5BNew+Rule%5D"
+    "https://github.com/LibChecker/LibChecker-Rules/issues/new?labels=&template=submit_new_rule.yml"
 
   const val GITHUB_API_REPO_INFO = "https://api.github.com/repos/%s/%s"
 

@@ -53,7 +53,7 @@ import com.absinthe.libchecker.features.snapshot.ui.view.SnapshotDashboardView
 import com.absinthe.libchecker.services.IShootService
 import com.absinthe.libchecker.services.OnShootListener
 import com.absinthe.libchecker.services.ShootService
-import com.absinthe.libchecker.ui.adapter.HorizontalSpacesItemDecoration
+import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.base.BaseListControllerFragment
@@ -147,7 +147,9 @@ class SnapshotFragment :
         layoutParams = ViewGroup.MarginLayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT,
           ViewGroup.LayoutParams.WRAP_CONTENT
-        )
+        ).also {
+          it.setMargins(8.dp, 0, 8.dp, 0)
+        }
       }
 
     dashboard.setOnClickListener {
@@ -247,11 +249,7 @@ class SnapshotFragment :
           }
 
         if (itemDecorationCount == 0) {
-          addItemDecoration(
-            HorizontalSpacesItemDecoration(
-              resources.getDimension(R.dimen.normal_padding).toInt() / 2
-            )
-          )
+          addItemDecoration(VerticalSpacesItemDecoration(4.dp, ratio = 0f))
         }
         scrollToPosition(0)
       }
