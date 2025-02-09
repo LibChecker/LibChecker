@@ -48,8 +48,8 @@ class ELFParser(inputStream: InputStream) {
     return e_ident.EI_CLASS.toInt()
   }
 
-  fun getPageSize(): Long {
-    return programHeaders.find { it.p_type == ProgramHeader.PT_LOAD }?.p_align ?: 4096
+  fun getPageSize(): Int {
+    return (programHeaders.find { it.p_type == ProgramHeader.PT_LOAD }?.p_align ?: 4096).toInt()
   }
 
   private fun parse(inputStream: InputStream) {
