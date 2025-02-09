@@ -528,7 +528,7 @@ class DetailViewModel : ViewModel() {
       }
     }
 
-    if (packageInfo.is16KBAligned()) {
+    if (packageInfo.is16KBAligned(isApk)) {
       _featuresFlow.emit(VersionedFeature(Features.Ext.ELF_PAGE_SIZE_16KB))
     }
 

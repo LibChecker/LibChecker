@@ -63,6 +63,7 @@ import com.absinthe.libchecker.utils.extensions.ABI_64_BIT
 import com.absinthe.libchecker.utils.extensions.ABI_STRING_MAP
 import com.absinthe.libchecker.utils.extensions.ABI_STRING_RES_MAP
 import com.absinthe.libchecker.utils.extensions.INSTRUCTION_SET_MAP_TO_ABI_VALUE
+import com.absinthe.libchecker.utils.extensions.PAGE_SIZE_4_KB
 import com.absinthe.libchecker.utils.extensions.STRING_ABI_MAP
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPermissionsList
@@ -181,7 +182,8 @@ object PackageUtils {
                 name = it.name,
                 size = FileUtils.getFileSize(it),
                 elfType = elfParser?.getEType() ?: ET_NOT_ELF,
-                elfClass = elfParser?.getEClass() ?: ELFParser.EIdent.ELFCLASSNONE
+                elfClass = elfParser?.getEClass() ?: ELFParser.EIdent.ELFCLASSNONE,
+                pageSize = elfParser?.getPageSize() ?: PAGE_SIZE_4_KB
               )
             }
             .toMutableList()
@@ -246,7 +248,8 @@ object PackageUtils {
               size = it.size,
               source = source,
               elfType = elfParser?.getEType() ?: ET_NOT_ELF,
-              elfClass = elfParser?.getEClass() ?: ELFParser.EIdent.ELFCLASSNONE
+              elfClass = elfParser?.getEClass() ?: ELFParser.EIdent.ELFCLASSNONE,
+              pageSize = elfParser?.getPageSize() ?: PAGE_SIZE_4_KB
             )
           }
           .toList()
@@ -284,7 +287,8 @@ object PackageUtils {
                 size = entry.size,
                 process = if (fileName.startsWith("split_config")) null else fileName,
                 elfType = elfParser?.getEType() ?: ET_NOT_ELF,
-                elfClass = elfParser?.getEClass() ?: ELFParser.EIdent.ELFCLASSNONE
+                elfClass = elfParser?.getEClass() ?: ELFParser.EIdent.ELFCLASSNONE,
+                pageSize = elfParser?.getPageSize() ?: PAGE_SIZE_4_KB
               )
             )
           }

@@ -4,6 +4,7 @@ import android.os.Parcelable
 import com.absinthe.libchecker.annotation.ET_NOT_ELF
 import com.absinthe.libchecker.annotation.ElfType
 import com.absinthe.libchecker.utils.elf.ELFParser
+import com.absinthe.libchecker.utils.extensions.PAGE_SIZE_4_KB
 import com.squareup.moshi.JsonClass
 import kotlinx.parcelize.Parcelize
 
@@ -18,5 +19,6 @@ data class LibStringItem(
   val source: String? = null,
   val process: String? = null,
   @ElfType val elfType: Int = ET_NOT_ELF,
-  val elfClass: Int = ELFParser.EIdent.ELFCLASSNONE
+  val elfClass: Int = ELFParser.EIdent.ELFCLASSNONE,
+  val pageSize: Int = PAGE_SIZE_4_KB
 ) : Parcelable
