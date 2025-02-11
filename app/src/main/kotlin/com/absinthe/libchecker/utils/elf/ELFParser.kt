@@ -63,7 +63,8 @@ class ELFParser(inputStream: InputStream) {
         EIdent.ELFCLASS64 -> 64 - EI_NIDENT // 64-bit ELF header size
         else -> return@use
       }
-      val buffer = ByteBuffer.allocate(ehSize).order(ByteOrder.LITTLE_ENDIAN)
+      val byteOrder = if (e_ident.EI_DATA.toInt() == EIdent.ELFDATA2MSB) ByteOrder.BIG_ENDIAN else ByteOrder.LITTLE_ENDIAN
+      val buffer = ByteBuffer.allocate(ehSize).order(byteOrder)
       it.read(buffer.array())
 
       when (getEClass()) {
@@ -107,8 +108,7 @@ class ELFParser(inputStream: InputStream) {
       // Program Headers
       if (e_phoff > 0 && e_phnum > 0) {
         for (i in 0 until e_phnum) {
-          val phBuffer = ByteBuffer.allocate(e_phentsize.toInt()).order(ByteOrder.LITTLE_ENDIAN)
-          phBuffer.order(ByteOrder.LITTLE_ENDIAN)
+          val phBuffer = ByteBuffer.allocate(e_phentsize.toInt()).order(byteOrder)
           it.read(phBuffer.array())
 
           val programHeader = if (getEClass() == EIdent.ELFCLASS32) {
@@ -161,6 +161,7 @@ class ELFParser(inputStream: InputStream) {
       const val ELFCLASSNONE = 0
       const val ELFCLASS32 = 1
       const val ELFCLASS64 = 2
+      const val ELFDATA2MSB = 2
     }
   }
 
