@@ -111,13 +111,13 @@ class ABIChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>(it
 
   override fun getLabelByXValue(context: Context, x: Int): String {
     return when (x) {
-      IS_64_BIT -> String.format(
-        context.getString(R.string.title_statistics_dialog),
+      IS_64_BIT -> context.getString(
+        R.string.title_statistics_dialog,
         context.getString(R.string.string_64_bit)
       )
 
-      IS_32_BIT -> String.format(
-        context.getString(R.string.title_statistics_dialog),
+      IS_32_BIT -> context.getString(
+        R.string.title_statistics_dialog,
         context.getString(R.string.string_32_bit)
       )
 

@@ -11,6 +11,8 @@ plugins {
   alias(libs.plugins.moshiX) apply false
   alias(libs.plugins.spotless) apply false
   alias(libs.plugins.aboutlibraries) apply false
+  alias(libs.plugins.gms) apply false
+  alias(libs.plugins.firebase.crashlytics) apply false
   id("build-logic") apply false
 }
 

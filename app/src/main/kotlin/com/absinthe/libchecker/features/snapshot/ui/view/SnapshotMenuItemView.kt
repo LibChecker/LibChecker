@@ -4,6 +4,7 @@ import android.content.Context
 import android.widget.FrameLayout
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.view.app.CheckableChipView
@@ -39,6 +40,7 @@ class SnapshotMenuItemView(context: Context) : FrameLayout(context) {
         }
         GlobalValues.snapshotOptions = newOptions
         onCheckedChangeCallback?.invoke(isChecked)
+        Telemetry.recordEvent("snapshot_advanced_item_option_changed", mapOf("option" to text, "isChecked" to isChecked))
       }
     }
   }

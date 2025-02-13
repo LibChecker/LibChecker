@@ -34,8 +34,8 @@ class TimeNodeAutoRemoveView(context: Context) : AViewGroup(context) {
     if (GlobalValues.snapshotAutoRemoveThreshold <= 0) {
       chip.text = context.getString(R.string.album_item_management_snapshot_auto_remove_default_title)
     } else {
-      chip.text = String.format(
-        context.getString(R.string.album_item_management_snapshot_auto_remove_specific_title),
+      chip.text = context.getString(
+        R.string.album_item_management_snapshot_auto_remove_specific_title,
         GlobalValues.snapshotAutoRemoveThreshold
       )
     }

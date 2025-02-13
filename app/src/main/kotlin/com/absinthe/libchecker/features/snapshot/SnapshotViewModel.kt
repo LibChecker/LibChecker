@@ -1300,8 +1300,8 @@ class SnapshotViewModel : ViewModel() {
         val message = buildString {
           timeStampMap.forEach {
             append(
-              String.format(
-                context.getString(R.string.album_restore_detail),
+              context.getString(
+                R.string.album_restore_detail,
                 getFormatDateString(it.key),
                 it.value.toString()
               )

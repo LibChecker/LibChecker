@@ -40,6 +40,7 @@ import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.ui.base.IListController
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getFeatures
 import com.absinthe.libchecker.utils.extensions.getVersionCode
@@ -48,7 +49,6 @@ import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.Rule
-import com.microsoft.appcenter.analytics.Analytics
 import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -329,7 +329,7 @@ class HomeViewModel : ViewModel() {
       }
       val properties: MutableMap<String, String> = HashMap()
       properties["Version"] = Build.VERSION.SDK_INT.toString()
-      Analytics.trackEvent("OS Version", properties)
+      Telemetry.recordEvent("OS Version", properties)
 
       for (entry in map) {
         if (entry.value > 3 && LCAppUtils.getRuleWithRegex(entry.key, NATIVE) == null) {
@@ -337,7 +337,7 @@ class HomeViewModel : ViewModel() {
           properties["Library name"] = entry.key
           properties["Library count"] = entry.value.toString()
 
-          Analytics.trackEvent("Native Library", properties)
+          Telemetry.recordEvent("Native Library", properties)
         }
       }
 
@@ -397,7 +397,7 @@ class HomeViewModel : ViewModel() {
         properties["Library name"] = entry.key
         properties["Library count"] = entry.value.toString()
 
-        Analytics.trackEvent("$label Library", properties)
+        Telemetry.recordEvent("$label Library", properties)
       }
     }
   }
