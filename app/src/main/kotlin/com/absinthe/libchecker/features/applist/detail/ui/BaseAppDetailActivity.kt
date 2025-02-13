@@ -41,8 +41,10 @@ import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.annotation.SIGNATURES
 import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.constant.AbilityType
+import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.features.applist.DetailFragmentManager
@@ -210,24 +212,36 @@ abstract class BaseAppDetailActivity :
         }
 
         val extraInfo = SpannableStringBuilder()
+        val showAndroidVersion =
+          (GlobalValues.advancedOptions and AdvancedOptions.SHOW_ANDROID_VERSION) > 0
+        val ai = packageInfo.applicationInfo!!
         val versionInfo = buildSpannedString {
           if (!isHarmonyMode) {
             scale(0.8f) {
               append("Target: ")
             }
             append(packageInfo.getTargetApiString())
+            if (showAndroidVersion) {
+              append(" (${AndroidVersions.simpleVersions[ai.targetSdkVersion]})")
+            }
             scale(0.8f) {
               append(" Min: ")
             }
-            append(packageInfo.applicationInfo?.minSdkVersion.toString())
+            append(ai.minSdkVersion.toString())
+            if (showAndroidVersion) {
+              append(" (${AndroidVersions.simpleVersions[ai.minSdkVersion]})")
+            }
             scale(0.8f) {
               append(" Compile: ")
             }
             append(packageInfo.getCompileSdkVersionString())
+            if (showAndroidVersion) {
+              append(" (${AndroidVersions.simpleVersions[packageInfo.getCompileSdkVersion()]})")
+            }
             scale(0.8f) {
               append(" Size: ")
             }
-            var baseApkSize = FileUtils.getFileSize(packageInfo.applicationInfo!!.sourceDir)
+            var baseApkSize = FileUtils.getFileSize(ai.sourceDir)
             val baseFormattedApkSize = Formatter.formatFileSize(this@BaseAppDetailActivity, baseApkSize)
             val splitApkSizeList = PackageUtils.getSplitsSourceDir(packageInfo)
               ?.map {
