@@ -38,6 +38,7 @@ import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseListControllerFragment
 import com.absinthe.libchecker.ui.base.IAppBarContainer
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.isPreinstalled
@@ -46,8 +47,6 @@ import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import com.microsoft.appcenter.analytics.Analytics
-import com.microsoft.appcenter.analytics.EventProperties
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -232,9 +231,9 @@ class AppListFragment :
       when {
         newText.equals("Easter Egg", true) -> {
           context?.showToast("🥚")
-          Analytics.trackEvent(
+          Telemetry.recordEvent(
             Constants.Event.EASTER_EGG,
-            EventProperties().set("EASTER_EGG", "AppList Search")
+            mapOf("EASTER_EGG" to "AppList Search")
           )
         }
 

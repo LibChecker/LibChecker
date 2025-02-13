@@ -8,8 +8,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
-import com.microsoft.appcenter.analytics.Analytics
-import com.microsoft.appcenter.analytics.EventProperties
+import com.absinthe.libchecker.utils.Telemetry
 import kotlinx.coroutines.launch
 
 class LibThresholdDialogFragment : DialogFragment() {
@@ -27,9 +26,9 @@ class LibThresholdDialogFragment : DialogFragment() {
           GlobalValues.libReferenceThreshold = threshold
           GlobalValues.preferencesFlow.emit(Constants.PREF_LIB_REF_THRESHOLD to threshold)
         }
-        Analytics.trackEvent(
+        Telemetry.recordEvent(
           Constants.Event.SETTINGS,
-          EventProperties().set("PREF_LIB_REF_THRESHOLD", threshold.toLong())
+          mapOf("PREF_LIB_REF_THRESHOLD" to threshold.toLong())
         )
       }
       .setNegativeButton(android.R.string.cancel, null)

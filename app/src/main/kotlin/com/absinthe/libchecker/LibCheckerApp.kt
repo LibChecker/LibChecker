@@ -15,6 +15,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.timber.ReleaseTree
@@ -24,9 +25,6 @@ import com.absinthe.rulesbundle.LCRemoteRepo
 import com.absinthe.rulesbundle.LCRules
 import com.google.android.material.color.DynamicColors
 import com.jakewharton.processphoenix.ProcessPhoenix
-import com.microsoft.appcenter.AppCenter
-import com.microsoft.appcenter.analytics.Analytics
-import com.microsoft.appcenter.crashes.Crashes
 import java.util.UUID
 import jonathanfinerty.once.Once
 import me.zhanghai.android.appiconloader.coil.AppIconFetcher
@@ -55,17 +53,8 @@ class LibCheckerApp : Application() {
       Timber.plant(ThreadAwareDebugTree())
     } else {
       Timber.plant(ReleaseTree())
-
-      if (GlobalValues.isAnonymousAnalyticsEnabled) {
-        AppCenter.start(
-          this,
-          BuildConfig.APP_CENTER_SECRET,
-          Analytics::class.java,
-          Crashes::class.java
-        )
-      }
     }
-
+    Telemetry.setEnable(GlobalValues.isAnonymousAnalyticsEnabled)
     LCRules.init(this)
     LCRules.setRemoteRepo(
       if (GlobalValues.repo == Constants.REPO_GITHUB) {

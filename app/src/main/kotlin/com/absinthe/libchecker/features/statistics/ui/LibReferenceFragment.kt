@@ -29,13 +29,12 @@ import com.absinthe.libchecker.features.statistics.ui.adapter.RefListDiffUtil
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseListControllerFragment
 import com.absinthe.libchecker.ui.base.IAppBarContainer
+import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.launchLibReferencePage
 import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import com.microsoft.appcenter.analytics.Analytics
-import com.microsoft.appcenter.analytics.EventProperties
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -276,11 +275,11 @@ class LibReferenceFragment :
 
   private fun refreshList() {
     computeRef(true)
-    Analytics.trackEvent(
+    Telemetry.recordEvent(
       Constants.Event.LIB_REFERENCE_FILTER_TYPE,
-      EventProperties().set(
-        "Type",
-        LibReferenceOptions.getOptionsString(GlobalValues.libReferenceOptions)
+      mapOf(
+        "Type" to
+          LibReferenceOptions.getOptionsString(GlobalValues.libReferenceOptions)
       )
     )
   }
@@ -343,9 +342,9 @@ class LibReferenceFragment :
 
         if (newText.equals("Easter Egg", true)) {
           context?.showToast("🥚")
-          Analytics.trackEvent(
+          Telemetry.recordEvent(
             Constants.Event.EASTER_EGG,
-            EventProperties().set("EASTER_EGG", "Lib Reference Search")
+            mapOf("EASTER_EGG" to "Lib Reference Search")
           )
         }
       }

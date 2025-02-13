@@ -59,6 +59,7 @@ import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.base.BaseListControllerFragment
 import com.absinthe.libchecker.ui.base.IAppBarContainer
 import com.absinthe.libchecker.utils.OsUtils
+import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
@@ -67,8 +68,6 @@ import com.absinthe.libchecker.utils.extensions.getDimensionByAttr
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import com.microsoft.appcenter.analytics.Analytics
-import com.microsoft.appcenter.analytics.EventProperties
 import java.util.Locale
 import java.util.concurrent.LinkedBlockingQueue
 import kotlinx.coroutines.Dispatchers
@@ -481,9 +480,9 @@ class SnapshotFragment :
           }
         }
 
-        Analytics.trackEvent(
+        Telemetry.recordEvent(
           Constants.Event.SNAPSHOT_CLICK,
-          EventProperties().set("Action", "Click to Save")
+          mapOf("Action" to "Click to Save")
         )
       }
 
@@ -510,7 +509,7 @@ class SnapshotFragment :
               .toInt()
           it.setPadding(paddingHorizontal, 0, paddingHorizontal, 0)
           it.text =
-            HtmlCompat.fromHtml(String.format(getString(R.string.snapshot_scheme_tip), scheme), 0)
+            HtmlCompat.fromHtml(getString(R.string.snapshot_scheme_tip, scheme), 0)
           it.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
           it.setLongClickCopiedToClipboard(scheme)
         }

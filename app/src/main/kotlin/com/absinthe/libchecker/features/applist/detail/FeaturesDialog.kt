@@ -21,6 +21,7 @@ import com.absinthe.libchecker.features.applist.detail.ui.AppPropBottomSheetDial
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_PACKAGE_INFO
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
+import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.UiUtils
 import timber.log.Timber
@@ -253,5 +254,9 @@ object FeaturesDialog {
     }
 
     dialog.show()
+    Telemetry.recordEvent(
+      "FeatureDialog",
+      mapOf("Feature" to context.getString(titleRes))
+    )
   }
 }

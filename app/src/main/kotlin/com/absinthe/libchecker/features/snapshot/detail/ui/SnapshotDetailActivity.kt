@@ -52,6 +52,7 @@ import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
@@ -61,8 +62,6 @@ import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.chip.Chip
-import com.microsoft.appcenter.analytics.Analytics
-import com.microsoft.appcenter.analytics.EventProperties
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -242,63 +241,63 @@ class SnapshotDetailActivity :
       getNodeList(details.filter { it.itemType == NATIVE }).apply {
         if (isNotEmpty()) {
           titleList.add(SnapshotTitleNode(this, NATIVE))
-          Analytics.trackEvent(
+          Telemetry.recordEvent(
             Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT,
-            EventProperties().set("Native", this.size.toLong())
+            mapOf("Native" to this.size.toLong())
           )
         }
       }
       getNodeList(details.filter { it.itemType == SERVICE }).apply {
         if (isNotEmpty()) {
           titleList.add(SnapshotTitleNode(this, SERVICE))
-          Analytics.trackEvent(
+          Telemetry.recordEvent(
             Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT,
-            EventProperties().set("Service", this.size.toLong())
+            mapOf("Service" to this.size.toLong())
           )
         }
       }
       getNodeList(details.filter { it.itemType == ACTIVITY }).apply {
         if (isNotEmpty()) {
           titleList.add(SnapshotTitleNode(this, ACTIVITY))
-          Analytics.trackEvent(
+          Telemetry.recordEvent(
             Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT,
-            EventProperties().set("Activity", this.size.toLong())
+            mapOf("Activity" to this.size.toLong())
           )
         }
       }
       getNodeList(details.filter { it.itemType == RECEIVER }).apply {
         if (isNotEmpty()) {
           titleList.add(SnapshotTitleNode(this, RECEIVER))
-          Analytics.trackEvent(
+          Telemetry.recordEvent(
             Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT,
-            EventProperties().set("Receiver", this.size.toLong())
+            mapOf("Receiver" to this.size.toLong())
           )
         }
       }
       getNodeList(details.filter { it.itemType == PROVIDER }).apply {
         if (isNotEmpty()) {
           titleList.add(SnapshotTitleNode(this, PROVIDER))
-          Analytics.trackEvent(
+          Telemetry.recordEvent(
             Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT,
-            EventProperties().set("Provider", this.size.toLong())
+            mapOf("Provider" to this.size.toLong())
           )
         }
       }
       getNodeList(details.filter { it.itemType == PERMISSION }).apply {
         if (isNotEmpty()) {
           titleList.add(SnapshotTitleNode(this, PERMISSION))
-          Analytics.trackEvent(
+          Telemetry.recordEvent(
             Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT,
-            EventProperties().set("Permission", this.size.toLong())
+            mapOf("Permission" to this.size.toLong())
           )
         }
       }
       getNodeList(details.filter { it.itemType == METADATA }).apply {
         if (isNotEmpty()) {
           titleList.add(SnapshotTitleNode(this, METADATA))
-          Analytics.trackEvent(
+          Telemetry.recordEvent(
             Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT,
-            EventProperties().set("Metadata", this.size.toLong())
+            mapOf("Metadata" to this.size.toLong())
           )
         }
       }

@@ -16,6 +16,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.AppInfoAdapter
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppInfoBottomSheetView
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
@@ -70,6 +71,10 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
     }
     packageName?.let {
       root.launch.setLongClickCopiedToClipboard(PackageUtils.getLauncherActivity(it))
+      Telemetry.recordEvent(
+        "AppInfoBottomSheet",
+        mapOf("PackageName" to packageName.toString(), "Action" to "Launch")
+      )
     }
     root.setting.setOnClickListener {
       try {
@@ -77,6 +82,10 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
           .setData(Uri.parse("package:$packageName"))
           .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
+        Telemetry.recordEvent(
+          "AppInfoBottomSheet",
+          mapOf("PackageName" to packageName.toString(), "Action" to "Setting")
+        )
       } catch (_: Exception) {
         context?.showToast(R.string.toast_cant_open_app)
       } finally {
@@ -97,6 +106,10 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
         adapter.data[position].let {
           runCatching {
             startActivity(it.intent)
+            Telemetry.recordEvent(
+              "AppInfoBottomSheet",
+              mapOf("PackageName" to packageName.toString(), "Action" to it.pii.packageName)
+            )
           }.onFailure {
             context?.let { ctx ->
               Toasty.showShort(ctx, R.string.toast_cant_open_app)

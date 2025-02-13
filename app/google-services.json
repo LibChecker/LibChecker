@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "64046863267",
+    "project_id": "libchecker-d5633",
+    "storage_bucket": "libchecker-d5633.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:64046863267:android:df697e768acdcca9c54016",
+        "android_client_info": {
+          "package_name": "com.absinthe.libchecker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDssFzUU1qgkeBECWoi79_kur-Q7a6nK6Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:64046863267:android:1fbb06ff60f06eb4c54016",
+        "android_client_info": {
+          "package_name": "com.absinthe.libchecker.debug"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDssFzUU1qgkeBECWoi79_kur-Q7a6nK6Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

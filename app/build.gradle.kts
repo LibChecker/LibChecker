@@ -1,4 +1,5 @@
 import com.android.build.gradle.internal.api.ApkVariantOutputImpl
+import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 
 plugins {
   alias(libs.plugins.android.application)
@@ -10,6 +11,8 @@ plugins {
   alias(libs.plugins.moshiX)
   alias(libs.plugins.aboutlibraries)
   id("res-opt") apply false
+  id(libs.plugins.gms.get().pluginId)
+  id(libs.plugins.firebase.crashlytics.get().pluginId)
 }
 
 ksp {
@@ -35,12 +38,23 @@ setupAppModule {
     viewBinding = true
   }
 
+  buildTypes {
+    debug {
+      configure<CrashlyticsExtension> {
+        mappingFileUploadEnabled = false
+      }
+    }
+  }
+
   productFlavors {
     flavorDimensions += "channel"
 
     create("foss") {
       isDefault = true
       dimension = flavorDimensionList[0]
+      configure<CrashlyticsExtension> {
+        mappingFileUploadEnabled = false
+      }
     }
     create("market") {
       dimension = flavorDimensionList[0]
@@ -133,7 +147,8 @@ dependencies {
 
   debugImplementation(libs.square.leakCanary)
   "marketCompileOnly"(fileTree("ohos"))
-  "marketImplementation"(libs.bundles.appCenter)
+  "marketImplementation"(platform(libs.firebase.bom))
+  "marketImplementation"(libs.bundles.firebase)
 }
 
 protobuf {
