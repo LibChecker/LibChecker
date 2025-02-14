@@ -86,7 +86,7 @@
   <string name="reload_apps_summary">アプリリストが異常に表示された場合は、試してください</string>
   <string name="help_docs_summary">Telegramグループに参加</string>
   <string name="join_telegram_group_summary">Telegramグループに参加する</string>
-  <string name="anonymous_statistics_summary">Microsoft AppCenterを使用して、最も一般的に使用されるマークされたライブラリやいくつかの使用習慣データを匿名で送信し、LibCheckerをより実用的にしています</string>
+  <string name="anonymous_statistics_summary">Google Firebaseを使用して、最も一般的に使用されるマークされたライブラリやいくつかの使用習慣データを匿名で送信し、LibCheckerをより実用的にしています</string>
   <string name="cloud_rules_summary">ここで最新のマークされたライブラリルールを更新してください</string>
   <string name="array_dark_mode_off">オフ</string>
   <string name="array_dark_mode_on">オン</string>

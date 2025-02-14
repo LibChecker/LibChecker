@@ -92,7 +92,7 @@
   <string name="reload_apps_summary">Experimente quando a lista de aplicativos é mostrada anormalmente</string>
   <string name="help_docs_summary">Aprenda a usar o LibChecker</string>
   <string name="join_telegram_group_summary">Junte-se ao nosso grupo do Telegram</string>
-  <string name="anonymous_statistics_summary">Usamos o Microsoft AppCenter para enviar anonimamente as bibliotecas marcadas mais usadas e alguns dados de uso para tornar o LibChecker mais prático</string>
+  <string name="anonymous_statistics_summary">Usamos o Google Firebase para enviar anonimamente as bibliotecas marcadas mais usadas e alguns dados de uso para tornar o LibChecker mais prático</string>
   <string name="cloud_rules_summary">Atualizar as últimas regras da biblioteca marcada aqui</string>
   <string name="array_dark_mode_off">Desativada</string>
   <string name="array_dark_mode_on">Ativada</string>

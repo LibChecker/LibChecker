@@ -93,7 +93,7 @@
   <string name="reload_apps_summary">当应用列表显示不正常时尝试此选项</string>
   <string name="help_docs_summary">学习如何使用 LibChecker</string>
   <string name="join_telegram_group_summary">来一起划水</string>
-  <string name="anonymous_statistics_summary">我们使用 Microsoft AppCenter 来匿名发送最常被人们使用的标记库和一些使用习惯数据来使得 LibChecker 变得更加实用</string>
+  <string name="anonymous_statistics_summary">我们使用 Google Firebase 来匿名发送最常被人们使用的标记库和一些使用习惯数据来使得 LibChecker 变得更加实用</string>
   <string name="cloud_rules_summary">在此更新最新的标记库</string>
   <string name="array_dark_mode_off">关闭</string>
   <string name="array_dark_mode_on">开启</string>
