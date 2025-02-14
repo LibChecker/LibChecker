@@ -55,6 +55,7 @@
   <string name="android_dist_subtitle_format">Tempo de atualização: %s</string>
   <string name="chart_abi_detailed">Detalhado</string>
   <string name="chart_abi_concise">Conciso</string>
+  <string name="chart_item_not_support">Not Support</string>
   <!--  About  -->
   <string name="settings_about">Sobre</string>
   <string name="settings_about_summary">Isto é LibChecker!</string>
@@ -122,6 +123,7 @@
   <string name="play_app_signing_details">Com a assinatura do Play App, o Google gerencia e protege a chave de assinatura do seu aplicativo para você e o usa para assinar otimizado, APKs de distribuição gerados a partir de pacotes de aplicações. O Play App Signing armazena sua chave de assinatura na infraestrutura segura do Google e oferece opções para aumentar a segurança.</string>
   <string name="pwa_details">Aplicativos Web Progressive (PWA) são construídos e aprimorados com APIs modernas para fornecer recursos aprimorados, confiabilidade e instalação enquanto chega a qualquer um, em qualquer lugar, em qualquer dispositivo com um único código.</string>
   <string name="jetpack_compose_details">Jetpack Compose é o moderno kit de ferramentas do Android para a construção de interface nativa. Ele simplifica e acelera o desenvolvimento de interface do usuário no Android. Rapidamente dê vida ao seu app com menos código, ferramentas poderosas e APIs intuitivas do Kotlin.</string>
+  <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform is a modern declarative and reactive UI framework developed by JetBrains that provides a simple way to build user interfaces with a small amount of Kotlin code. It also allows you to write your UI once and run it on any of the supported platforms – iOS, Android, desktop (Windows, macOS, Linux), and web.</string>
   <string name="extract_native_libs_tip">O aplicativo declara </string>
   <string name="xml_detail">Detalhes do XML</string>
   <string name="lib_detail_dialog_title_16kb_page_size">Tamanho da página 16 KB</string>
@@ -165,6 +167,9 @@
   <string name="lib_detail_app_install_source_title">Origem da Instalação</string>
   <string name="lib_detail_app_install_source_originating_package">Solicitante de instalação</string>
   <string name="lib_detail_app_install_source_installing_package">Executar Instalação</string>
+  <string name="lib_detail_app_installed_time">Installation Time</string>
+  <string name="lib_detail_app_first_installed_time">First installed time: </string>
+  <string name="lib_detail_app_last_updated_time">Last installed time: </string>
   <string name="lib_detail_app_install_source_empty">Desconhecido</string>
   <string name="lib_detail_app_install_source_empty_detail">aplicativo adb ou desinstalado</string>
   <string name="lib_detail_app_install_source_shizuku_usage">Como o Android restringe a API para obter o solicitante de instalação, usamos Shizuku para obter o solicitante de instalação.</string>
@@ -222,6 +227,9 @@
   <string name="album_item_comparison_choose_local_apk">Escolha um APK local</string>
   <string name="album_item_management_title">Gerenciamento</string>
   <string name="album_item_management_subtitle">Gerencie todas as snapshots</string>
+  <string name="album_item_management_snapshot_auto_remove_default_title">Keep Only the Most Recent Snapshots</string>
+  <string name="album_item_management_snapshot_auto_remove_specific_title">Keep Only the %d Most Recent Items</string>
+  <string name="album_item_management_snapshot_auto_remove_desc">Starting from tapping \"%s\", only the most recent snapshots will be retained, and the older snapshots will be automatically deleted.</string>
   <string name="album_item_backup_restore_title">Backup &amp; Restaurar</string>
   <string name="album_item_backup_restore_subtitle">Fazer backup e restaurar snapshots</string>
   <string name="album_item_track_title">Rastrear</string>
@@ -233,6 +241,7 @@
   <string name="album_restore_detail">%1$s : %2$s itens no total\n</string>
   <string name="album_click_to_choose">Clique para Selecionar</string>
   <string name="album_dialog_delete_snapshot_message">Processando…</string>
+  <string name="album_snapshot_top_apps_not_initialized">Not loaded yet</string>
   <!--  Integration  -->
   <string name="integration_monkey_king_menu_block">Bloqueie através do \"Rei Purificado\"</string>
   <string name="integration_monkey_king_menu_unblock">Desbloqueie através do \"Rei Purificado\"</string>
