@@ -53,6 +53,7 @@ class NativeLibItemView(context: Context) : AViewGroup(context) {
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
+      setPadding(0, 1.dp, 0, 1.dp)
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
       addView(this)
     }
