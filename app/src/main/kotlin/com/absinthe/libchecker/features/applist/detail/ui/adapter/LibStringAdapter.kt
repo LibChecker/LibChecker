@@ -79,7 +79,6 @@ class LibStringAdapter(
 
   private var processMode: Boolean = false
   private var is64Bit: Boolean = false
-  private var is16KBAligned: Boolean = false
 
   fun switchProcessMode() {
     setProcessMode(!processMode)
@@ -95,10 +94,6 @@ class LibStringAdapter(
     this.is64Bit = is64Bit
     //noinspection NotifyDataSetChanged
     notifyDataSetChanged()
-  }
-
-  fun set16KBAligned(is16KBAligned: Boolean) {
-    this.is16KBAligned = is16KBAligned
   }
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
@@ -227,7 +222,7 @@ class LibStringAdapter(
       val text = PackageUtils.elfTypeToString(item.item.elfInfo.elfType)
       itemView.libSize.append(createNativeLabelSpan(text))
     }
-    if (item.item.elfInfo.pageSize % PAGE_SIZE_16_KB == 0 && !is16KBAligned) {
+    if (item.item.elfInfo.pageSize % PAGE_SIZE_16_KB == 0) {
       val text = "16 KB"
       itemView.libSize.append(createNativeLabelSpan(text))
     }
