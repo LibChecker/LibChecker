@@ -7,7 +7,7 @@ import java.util.Date
 
 object AndroidVersions {
   val versions = listOf(
-    Node(Build.VERSION_CODES.CUR_DEVELOPMENT, "Preview", "", null, Date()),
+    Node(Build.VERSION_CODES.CUR_DEVELOPMENT, "Developing", "", null, Date()),
     Node(1, "Base", "1.0", null, getDate(2008, 9)),
     Node(2, "Base MR1", "1.1", null, getDate(2009, 2)),
     Node(3, "Cupcake", "1.5", null, getDate(2009, 4)),
@@ -42,7 +42,8 @@ object AndroidVersions {
     Node(32, "Android 12L", "12.1", R.drawable.ic_android_s, getDate(2022, 3)),
     Node(33, "Tiramisu", "13", R.drawable.ic_android_t, getDate(2022, 10)),
     Node(34, "UpsideDownCake", "14", R.drawable.ic_android_u, getDate(2023, 10)),
-    Node(35, "Vanilla Ice Cream", "15", R.drawable.ic_android_v, getDate(2024, 10))
+    Node(35, "Vanilla Ice Cream", "15", R.drawable.ic_android_v, getDate(2024, 10)),
+    Node(36, "Baklava", "16", R.drawable.ic_android_baklava, getDate(2025, 5))
   )
 
   val simpleVersions = versions.map {
