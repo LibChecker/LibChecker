@@ -12,7 +12,6 @@ import com.absinthe.libchecker.features.applist.detail.ui.base.BaseDetailFragmen
 import com.absinthe.libchecker.features.applist.detail.ui.base.EXTRA_TYPE
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.extensions.ABI_STRING_MAP
-import com.absinthe.libchecker.utils.extensions.PAGE_SIZE_16_KB
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.Dispatchers
@@ -72,7 +71,7 @@ class NativeAnalysisFragment :
       }.launchIn(lifecycleScope)
       nativeLibTabs.onEach {
         it?.forEach { title ->
-          binding.tabLayout.addTab(binding.tabLayout.newTab().setText(title))
+          binding.tabLayout.addTab(binding.tabLayout.newTab().setText(title), false)
         }
         abiBundleStateFlow.value?.let { bundle ->
           selectTabByAbi(bundle.abi)
@@ -108,7 +107,6 @@ class NativeAnalysisFragment :
     if (list.isEmpty()) {
       emptyView.text.text = getString(R.string.empty_list)
     } else {
-      adapter.set16KBAligned(list.all { it.item.elfInfo.pageSize % PAGE_SIZE_16_KB == 0 })
       adapter.processMap = viewModel.nativeSourceMap
       lifecycleScope.launch(Dispatchers.IO) {
         setItemsWithFilter(viewModel.queriedText, viewModel.queriedProcess)
