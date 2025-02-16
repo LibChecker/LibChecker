@@ -148,7 +148,9 @@ dependencies {
   debugImplementation(libs.square.leakCanary)
   "marketCompileOnly"(fileTree("ohos"))
   "marketImplementation"(platform(libs.firebase.bom))
-  "marketImplementation"(libs.bundles.firebase)
+  "marketImplementation"(libs.bundles.firebase) {
+    exclude(group = "com.google.android.gms", module = "play-services-ads-identifier")
+  }
 }
 
 protobuf {

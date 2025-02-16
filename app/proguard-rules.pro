@@ -133,3 +133,7 @@
 
 # org.apache.commons:commons-compress
 -keep,allowoptimization class org.apache.commons.compress.archivers.zip.**
+
+# exclude com.google.android.gms:play-services-ads-identifier
+-dontwarn com.google.android.gms.ads.identifier.AdvertisingIdClient$Info
+-dontwarn com.google.android.gms.ads.identifier.AdvertisingIdClient
