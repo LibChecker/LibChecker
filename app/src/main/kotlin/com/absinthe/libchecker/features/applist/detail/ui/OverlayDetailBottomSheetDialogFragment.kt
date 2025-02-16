@@ -3,7 +3,6 @@ package com.absinthe.libchecker.features.applist.detail.ui
 import android.content.pm.PackageInfoHidden
 import android.content.pm.PackageManager
 import android.text.SpannableString
-import android.text.format.Formatter
 import android.text.style.ImageSpan
 import androidx.core.os.BundleCompat
 import androidx.core.text.buildSpannedString
@@ -26,6 +25,7 @@ import com.absinthe.libchecker.utils.extensions.getTargetApiString
 import com.absinthe.libchecker.utils.extensions.getVersionString
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
+import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import dev.rikka.tools.refine.Refine
@@ -100,7 +100,7 @@ class OverlayDetailBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment
               append(" Size: ")
             }
             val apkSize = FileUtils.getFileSize(packageInfo.applicationInfo!!.sourceDir)
-            append(Formatter.formatFileSize(context, apkSize))
+            append(apkSize.sizeToString(context, showBytes = false))
           }
         }
       }

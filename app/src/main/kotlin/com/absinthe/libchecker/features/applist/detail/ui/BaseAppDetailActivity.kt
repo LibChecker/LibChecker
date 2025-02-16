@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
 import android.text.SpannableStringBuilder
-import android.text.format.Formatter
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -91,6 +90,7 @@ import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.extensions.getVersionString
 import com.absinthe.libchecker.utils.extensions.isKeyboardShowing
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
+import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.toJson
@@ -242,12 +242,12 @@ abstract class BaseAppDetailActivity :
               append(" Size: ")
             }
             var baseApkSize = FileUtils.getFileSize(ai.sourceDir)
-            val baseFormattedApkSize = Formatter.formatFileSize(this@BaseAppDetailActivity, baseApkSize)
+            val baseFormattedApkSize = baseApkSize.sizeToString(this@BaseAppDetailActivity, showBytes = false)
             val splitApkSizeList = PackageUtils.getSplitsSourceDir(packageInfo)
               ?.map {
                 val size = FileUtils.getFileSize(it)
                 baseApkSize += size
-                Formatter.formatFileSize(this@BaseAppDetailActivity, size)
+                size.sizeToString(this@BaseAppDetailActivity, showBytes = false)
               }
               ?.toMutableList()
 
@@ -255,7 +255,7 @@ abstract class BaseAppDetailActivity :
               append(baseFormattedApkSize)
             } else {
               splitApkSizeList.add(0, baseFormattedApkSize)
-              val totalSize = Formatter.formatFileSize(this@BaseAppDetailActivity, baseApkSize)
+              val totalSize = baseApkSize.sizeToString(this@BaseAppDetailActivity, showBytes = false)
               append(
                 splitApkSizeList.joinToString(separator = " + ", prefix = "(", postfix = " = $totalSize)")
               )
@@ -993,9 +993,11 @@ abstract class BaseAppDetailActivity :
       val abiLabelsList = mutableListOf<AbiLabelNode>()
 
       if (abi >= Constants.MULTI_ARCH) {
-        abiLabelsList.add(AbiLabelNode(Constants.MULTI_ARCH, true) {
-          FeaturesDialog.showMultiArchDialog(this)
-        })
+        abiLabelsList.add(
+          AbiLabelNode(Constants.MULTI_ARCH, true) {
+            FeaturesDialog.showMultiArchDialog(this)
+          }
+        )
       }
 
       abiSet.forEach {

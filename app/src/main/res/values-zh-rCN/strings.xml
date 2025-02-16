@@ -276,4 +276,5 @@
   <string name="snapshot_menu_show_update_time">显示更新时间</string>
   <string name="snapshot_menu_hide_no_component_changes">隐藏无组件变更</string>
   <string name="snapshot_menu_diff_highlight">差异高亮</string>
+  <string name="snapshot_menu_use_iec_units">使用 IEC 单位</string>
 </resources>

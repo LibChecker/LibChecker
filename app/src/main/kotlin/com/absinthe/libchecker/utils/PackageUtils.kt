@@ -13,7 +13,6 @@ import android.content.pm.PackageManager
 import android.content.pm.Signature
 import android.os.Build
 import android.os.Process
-import android.text.format.Formatter
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.core.text.buildSpannedString
@@ -74,6 +73,7 @@ import com.absinthe.libchecker.utils.extensions.maybeResourceId
 import com.absinthe.libchecker.utils.extensions.md5
 import com.absinthe.libchecker.utils.extensions.sha1
 import com.absinthe.libchecker.utils.extensions.sha256
+import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.extensions.toClassDefType
 import com.absinthe.libchecker.utils.extensions.toHexString
 import com.absinthe.libchecker.utils.manifest.StaticLibraryReader
@@ -788,7 +788,7 @@ object PackageUtils {
     item: LibStringItem
   ): String {
     val source = item.source?.let { "[${item.source}]" }.orEmpty()
-    return "(${Formatter.formatFileSize(context, item.size)}) $source"
+    return "(${item.size.sizeToString(context, showBytes = false)}) $source"
   }
 
   /**
