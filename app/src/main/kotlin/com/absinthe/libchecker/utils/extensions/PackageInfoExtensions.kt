@@ -771,7 +771,7 @@ fun PackageInfo.is16KBAligned(isApk: Boolean = false): Boolean {
     packageInfo = this,
     specifiedAbi = PackageUtils.getAbi(this, isApk = isApk)
   )
-  return nativeLibs.isNotEmpty() && nativeLibs.all { it.pageSize % PAGE_SIZE_16_KB == 0 }
+  return nativeLibs.isNotEmpty() && nativeLibs.all { it.elfInfo.pageSize % PAGE_SIZE_16_KB == 0 }
 }
 
 /**

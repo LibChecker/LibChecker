@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.features.applist.detail
 
 import android.content.Context
-import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.util.SparseArray
@@ -67,6 +66,8 @@ import retrofit2.HttpException
 import timber.log.Timber
 
 class DetailViewModel : ViewModel() {
+  private var allNativeLibItems: Map<String, List<LibStringItem>> = emptyMap()
+  val nativeLibTabs: MutableStateFlow<Collection<String>?> = MutableStateFlow(null)
   val nativeLibItems: MutableStateFlow<List<LibStringItemChip>?> = MutableStateFlow(null)
   val staticLibItems: MutableStateFlow<List<LibStringItemChip>?> = MutableStateFlow(null)
   val metaDataItems: MutableStateFlow<List<LibStringItemChip>?> = MutableStateFlow(null)
@@ -107,24 +108,14 @@ class DetailViewModel : ViewModel() {
   }
 
   fun initSoAnalysisData() = viewModelScope.launch(Dispatchers.IO) {
-    val list = ArrayList<LibStringItemChip>()
     val sourceSet = hashSetOf<String>()
 
     try {
-      packageInfo.applicationInfo?.let { info ->
-        list.addAll(
-          getNativeChipList(info, PackageUtils.getAbi(packageInfo, isApk))
-        )
-      }
+      allNativeLibItems = PackageUtils.getSourceLibs(packageInfo)
     } catch (e: PackageManager.NameNotFoundException) {
       Timber.e(e)
     }
 
-    list.forEach { item ->
-      item.item.process?.let { process ->
-        sourceSet.add(process)
-      }
-    }
     val sourceMap = sourceSet.filter { source -> source.isNotEmpty() }
       .associateWith { UiUtils.getRandomColor() }
     nativeSourceMap = sourceMap
@@ -134,7 +125,18 @@ class DetailViewModel : ViewModel() {
       processToolIconVisibilityStateFlow.emit(true)
     }
 
-    nativeLibItems.emit(list)
+    nativeLibTabs.emit(allNativeLibItems.keys)
+    if (allNativeLibItems.isEmpty()) {
+      nativeLibItems.emit(emptyList())
+    }
+  }
+
+  fun loadSoAnalysisData(tab: String) {
+    allNativeLibItems[tab]?.let {
+      viewModelScope.launch(Dispatchers.IO) {
+        nativeLibItems.emit(getNativeChipList(it))
+      }
+    }
   }
 
   fun initStaticData() = viewModelScope.launch(Dispatchers.IO) {
@@ -265,20 +267,16 @@ class DetailViewModel : ViewModel() {
     }.getOrNull()
   }
 
-  private suspend fun getNativeChipList(
-    info: ApplicationInfo,
-    specifiedAbi: Int? = null
-  ): List<LibStringItemChip> {
-    val list =
-      PackageUtils.getNativeDirLibs(packageInfo, specifiedAbi = specifiedAbi).toMutableList()
+  private suspend fun getNativeChipList(list: List<LibStringItem>): List<LibStringItemChip> {
     val chipList = mutableListOf<LibStringItemChip>()
     var rule: Rule?
 
     if (list.isEmpty()) {
       return chipList
     } else {
+      val packageName = packageInfo.packageName
       list.forEach {
-        rule = LCAppUtils.getRuleWithRegex(it.name, NATIVE, info.packageName, list)
+        rule = LCAppUtils.getRuleWithRegex(it.name, NATIVE, packageName, list)
         chipList.add(LibStringItemChip(it, rule))
       }
       if (GlobalValues.libSortMode == MODE_SORT_BY_SIZE) {

@@ -25,7 +25,13 @@ class BottomSheetRecyclerView : BorderRecyclerView {
 
       MotionEvent.ACTION_MOVE -> {
         val deltaY = ev.y - lastY
-        parent.requestDisallowInterceptTouchEvent(deltaY > 0 && canScrollVertically(-1))
+        if (deltaY > 0 && canScrollVertically(-1)) {
+          parent.requestDisallowInterceptTouchEvent(true)
+        }
+      }
+
+      MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> {
+        parent.requestDisallowInterceptTouchEvent(false)
       }
     }
 
