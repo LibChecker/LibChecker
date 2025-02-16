@@ -179,6 +179,17 @@ object FeaturesDialog {
     )
   }
 
+  fun showMultiArchDialog(context: Context) {
+    commonShowDialogImpl(
+      context,
+      R.drawable.ic_abi_label_multi_arch,
+      R.string.multiArch,
+      R.string.multi_arch_dialog_details,
+      version = null,
+      sourceLink = "https://source.android.com/docs/setup/create/64-bit-builds"
+    )
+  }
+
   private fun commonShowDialogImpl(
     context: Context,
     icon: Drawable,

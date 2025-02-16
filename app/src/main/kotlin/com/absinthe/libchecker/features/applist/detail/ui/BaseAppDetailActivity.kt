@@ -993,7 +993,9 @@ abstract class BaseAppDetailActivity :
       val abiLabelsList = mutableListOf<AbiLabelNode>()
 
       if (abi >= Constants.MULTI_ARCH) {
-        abiLabelsList.add(AbiLabelNode(Constants.MULTI_ARCH, true))
+        abiLabelsList.add(AbiLabelNode(Constants.MULTI_ARCH, true) {
+          FeaturesDialog.showMultiArchDialog(this)
+        })
       }
 
       abiSet.forEach {

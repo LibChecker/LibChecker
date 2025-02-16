@@ -116,6 +116,9 @@ class DetailsTitleView(
         v.scaleType = ImageView.ScaleType.CENTER_CROP
         v.setImageResource(res)
         v.alpha = if (it.active) 1f else 0.5f
+        it.action?.let { action ->
+          v.setOnClickListener { action.invoke() }
+        }
       }
       abiLabelsFlexLayout.addView(view)
     }
