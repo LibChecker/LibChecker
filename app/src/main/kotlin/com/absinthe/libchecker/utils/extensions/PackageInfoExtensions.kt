@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.utils.extensions
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
@@ -43,8 +42,8 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libchecker.utils.manifest.HiddenPermissionsReader
 import com.absinthe.libchecker.utils.manifest.ManifestReader
-import dalvik.system.DexFile
 import dev.rikka.tools.refine.Refine
+import hidden.DexFileHidden
 import java.io.File
 import java.text.DateFormat
 import java.util.Properties
@@ -664,26 +663,14 @@ fun PackageInfo.isPreinstalled(): Boolean {
   return lastUpdateTime <= PREINSTALLED_TIMESTAMP
 }
 
-@Suppress("UNCHECKED_CAST")
-@SuppressLint("SoonBlockedPrivateApi")
-fun PackageInfo.getDexoptInfo(): Pair<String, String>? {
+fun PackageInfo.getDexFileOptimizationInfo(): DexFileHidden.OptimizationInfo? {
   val sourceDir = applicationInfo?.sourceDir ?: return null
-  val ret: Array<String>? = runCatching {
-    val method = DexFile::class.java.getDeclaredMethod(
-      "getDexFileOptimizationStatus",
-      String::class.java,
-      String::class.java
-    )
-    method.isAccessible = true
-    method.invoke(
-      null,
-      sourceDir,
-      ABI_TO_INSTRUCTION_SET_MAP[Build.SUPPORTED_ABIS[0]]
-    ) as Array<String>
-  }.getOrNull()
-
-  Timber.d("getDexoptInfo: ${ret?.contentToString()}")
-  return ret?.takeIf { it.size == 2 }?.let { it[0] to it[1] }
+  val info = DexFileHidden.getDexFileOptimizationInfo(
+    sourceDir,
+    ABI_TO_INSTRUCTION_SET_MAP[Build.SUPPORTED_ABIS[0]]!!
+  )
+  Timber.d("getDexFileOptimizationInfo: status=${info.status}, reason=${info.reason}")
+  return info
 }
 
 // Keep in sync with `ABI_TO_INSTRUCTION_SET_MAP` in
