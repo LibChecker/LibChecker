@@ -124,6 +124,7 @@
   <string name="pwa_details">プログレッシブWebアプリ（PWA）は、現代のAPIを使用して構築および強化され、高度な機能、信頼性、インストール可能性を提供しながら、単一のコードベースでどのデバイスでもどこでも誰にでもアクセスします。</string>
   <string name="jetpack_compose_details">Jetpack Composeは、AndroidのネイティブUIを構築するための現代的なツールキットです。これにより、AndroidでのUI開発が簡略化され、加速します。少ないコード、強力なツール、直感的なKotlin APIを使用して、すぐにアプリを実現します。</string>
   <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform is a modern declarative and reactive UI framework developed by JetBrains that provides a simple way to build user interfaces with a small amount of Kotlin code. It also allows you to write your UI once and run it on any of the supported platforms – iOS, Android, desktop (Windows, macOS, Linux), and web.</string>
+  <string name="multi_arch_dialog_details">If an app exposes an API to other apps that can be either 32 bit or 64 bit, the app must have the android:multiarch property set to true within its manifest to avoid potential errors.</string>
   <string name="extract_native_libs_tip">アプリは次のものを宣言します</string>
   <string name="xml_detail">XML詳細</string>
   <string name="lib_detail_dialog_title_16kb_page_size">16 KB Page Size Support</string>
@@ -275,4 +276,5 @@
   <string name="snapshot_menu_show_update_time">更新時間を表示</string>
   <string name="snapshot_menu_hide_no_component_changes">コンポーネントの変更がないものを隠す</string>
   <string name="snapshot_menu_diff_highlight">差分のハイライト表示</string>
+  <string name="snapshot_menu_use_iec_units">Use IEC Units</string>
 </resources>
