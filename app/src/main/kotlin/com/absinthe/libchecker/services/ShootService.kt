@@ -329,11 +329,11 @@ class ShootService : LifecycleService() {
     GlobalValues.snapshotTimestamp = ts
     _isShooting = false
     notifyFinished(ts)
+    ServiceCompat.stopForeground(this@ShootService, ServiceCompat.STOP_FOREGROUND_REMOVE)
     Timber.i("computeSnapshots end")
     isComputing = false
 
     if (stopWhenFinish) {
-      ServiceCompat.stopForeground(this@ShootService, ServiceCompat.STOP_FOREGROUND_REMOVE)
       stopSelf()
     }
   }
