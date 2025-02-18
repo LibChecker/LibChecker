@@ -44,11 +44,11 @@ object PackageManagerCompat {
     }
   }
 
-  fun getInstalledPackages(flags: Int): List<PackageInfo> {
+  fun getInstalledPackages(flags: Long): List<PackageInfo> {
     return if (OsUtils.atLeastT()) {
-      SystemServices.packageManager.getInstalledPackages(PackageManager.PackageInfoFlags.of(flags.toLong()))
+      SystemServices.packageManager.getInstalledPackages(PackageManager.PackageInfoFlags.of(flags))
     } else {
-      SystemServices.packageManager.getInstalledPackages(flags)
+      SystemServices.packageManager.getInstalledPackages(flags.toInt())
     }
   }
 

@@ -248,7 +248,7 @@ class ShootService : LifecycleService() {
               versionCode = info.getVersionCode(),
               installedTime = info.firstInstallTime,
               lastUpdatedTime = info.lastUpdateTime,
-              isSystem = (ai.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
+              isSystem = (ai.flags and ApplicationInfo.FLAG_SYSTEM) > 0,
               abi = PackageUtils.getAbi(info).toShort(),
               targetApi = ai.targetSdkVersion.toShort(),
               nativeLibs = PackageUtils.getNativeDirLibs(info).toJson().orEmpty(),

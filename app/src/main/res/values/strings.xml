@@ -24,6 +24,7 @@
   <string name="uncharted_territory">Uncharted territory</string>
   <string name="get_app_list_denied_tip">Please grant\n"Get info about installed apps"\npermission to LibChecker</string>
   <string name="advanced_menu">Advanced Menu</string>
+  <string name="archived_app">Archived app</string>
 
   <!-- Statistics   -->
   <string name="title_statistics_dialog">Apps with %s ABI</string>

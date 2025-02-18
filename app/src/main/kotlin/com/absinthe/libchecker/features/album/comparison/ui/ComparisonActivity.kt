@@ -540,7 +540,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
         versionCode = it.getVersionCode(),
         installedTime = it.firstInstallTime,
         lastUpdatedTime = it.lastUpdateTime,
-        isSystem = (ai.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
+        isSystem = (ai.flags and ApplicationInfo.FLAG_SYSTEM) > 0,
         abi = PackageUtils.getAbi(it).toShort(),
         targetApi = ai.targetSdkVersion.toShort(),
         nativeLibs = PackageUtils.getNativeDirLibs(it).toJson().orEmpty(),

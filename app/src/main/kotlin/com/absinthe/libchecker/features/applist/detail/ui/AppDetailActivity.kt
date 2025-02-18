@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Bundle
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ALL
 import com.absinthe.libchecker.annotation.isComponentType
 import com.absinthe.libchecker.compat.IntentCompat
@@ -14,6 +15,8 @@ import com.absinthe.libchecker.features.applist.detail.bean.DetailExtraBean
 import com.absinthe.libchecker.features.statistics.ui.EXTRA_REF_NAME
 import com.absinthe.libchecker.features.statistics.ui.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.utils.extensions.isArchivedPackage
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import timber.log.Timber
 
@@ -65,7 +68,13 @@ class AppDetailActivity :
       Timber.d("getPackageInfo: $packageName failed, %s", it.message)
       finish()
     }.onSuccess { packageInfo ->
-      onPackageInfoAvailable(packageInfo, extraBean)
+      if (packageInfo.isArchivedPackage()) {
+        Timber.w("isArchivedPackage: $packageName")
+        Toasty.showLong(this, R.string.archived_app)
+        finish()
+      } else {
+        onPackageInfoAvailable(packageInfo, extraBean)
+      }
     }
   }
 

@@ -67,6 +67,7 @@ import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getStatefulPermissionsList
 import com.absinthe.libchecker.utils.extensions.getVersionCode
+import com.absinthe.libchecker.utils.extensions.isArchivedPackage
 import com.absinthe.libchecker.utils.extensions.isOverlay
 import com.absinthe.libchecker.utils.extensions.isUse32BitAbi
 import com.absinthe.libchecker.utils.extensions.maybeResourceId
@@ -113,9 +114,10 @@ object PackageUtils {
    */
   @Throws(PackageManager.NameNotFoundException::class)
   fun getPackageInfo(packageName: String, flag: Int = 0): PackageInfo {
+    val defaultFlags = PackageManager.MATCH_DISABLED_COMPONENTS or PackageManager.MATCH_UNINSTALLED_PACKAGES
     val packageInfo = PackageManagerCompat.getPackageInfo(
       packageName,
-      PackageManager.MATCH_DISABLED_COMPONENTS or flag
+      defaultFlags or flag
     ).also {
       it.applicationInfo?.let { ai ->
         if (FreezeUtils.isAppFrozen(ai)) {
@@ -687,9 +689,12 @@ object PackageUtils {
     abiSet: Set<Int>? = null
   ): Int {
     val applicationInfo: ApplicationInfo = packageInfo.applicationInfo ?: return ERROR
-    val overlay = packageInfo.isOverlay()
 
-    if (overlay) {
+    if (packageInfo.isArchivedPackage()) {
+      return NO_LIBS
+    }
+
+    if (packageInfo.isOverlay()) {
       return OVERLAY
     }
 

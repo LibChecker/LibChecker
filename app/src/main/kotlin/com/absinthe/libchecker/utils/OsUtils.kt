@@ -4,6 +4,11 @@ import android.os.Build
 import androidx.annotation.ChecksSdkIntAtLeast
 
 object OsUtils {
+  @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.VANILLA_ICE_CREAM)
+  fun atLeastV(): Boolean {
+    return Build.VERSION.SDK_INT >= 35
+  }
+
   @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
   fun atLeastU(): Boolean {
     return Build.VERSION.SDK_INT >= 34
