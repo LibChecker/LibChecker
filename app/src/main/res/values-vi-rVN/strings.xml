@@ -124,6 +124,7 @@
   <string name="pwa_details">Ứng dụng web triển khai ứng dụng (PWA) được xây dựng và cải tiến với các API hiện đại để cung cấp khả năng, độ tin cậy và khả năng cài đặt nâng cao trong khi tiếp cận bất kỳ ai, ở bất kỳ đâu, trên bất kỳ any device only by a codebase.</string>
   <string name="jetpack_compose_details">Jetpack Compose là bộ công cụ hiện đại của Android để xây dựng giao diện người dùng gốc. Nó đơn giản hóa và tăng tốc phát triển giao diện người dùng trên Android. Nhanh chóng đưa ứng dụng của bạn vào cuộc sống với ít mã hơn, công cụ mạnh mẽ và API Kotlin trực quan.</string>
   <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform is a modern declarative and reactive UI framework developed by JetBrains that provides a simple way to build user interfaces with a small amount of Kotlin code. It also allows you to write your UI once and run it on any of the supported platforms – iOS, Android, desktop (Windows, macOS, Linux), and web.</string>
+  <string name="multi_arch_dialog_details">If an app exposes an API to other apps that can be either 32 bit or 64 bit, the app must have the android:multiarch property set to true within its manifest to avoid potential errors.</string>
   <string name="extract_native_libs_tip">Ứng dụng tuyên bố </string>
   <string name="xml_detail">Chi tiết XML</string>
   <string name="lib_detail_dialog_title_16kb_page_size">16 KB Page Size Support</string>
@@ -275,4 +276,5 @@
   <string name="snapshot_menu_show_update_time">Hiển thị thời gian cập nhật</string>
   <string name="snapshot_menu_hide_no_component_changes">Hide No Component Changes</string>
   <string name="snapshot_menu_diff_highlight">Diff Highlight</string>
+  <string name="snapshot_menu_use_iec_units">Use IEC Units</string>
 </resources>
