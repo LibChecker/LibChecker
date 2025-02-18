@@ -124,6 +124,7 @@
   <string name="pwa_details">تم إنشاء تطبيقات الويب التقدمية (PWA) وتحسينها باستخدام واجهات برمجة التطبيقات الحديثة لتوفير إمكانات محسنة وموثوقية وإمكانية تثبيت أثناء الوصول إلى أي شخص في أي مكان وعلى أي جهاز باستخدام قاعدة بيانات واحدة.</string>
   <string name="jetpack_compose_details">(Jetpack Compose) هي مجموعة أدوات Android الحديثة لبناء واجهة مستخدم أصلية. إنه يبسط ويسرع تطوير واجهة المستخدم على Android. اجعل تطبيقك ينبض بالحياة بسرعة باستخدام تعليمات برمجية أقل وأدوات قوية وواجهات برمجة تطبيقات Kotlin سهلة الاستخدام.</string>
   <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform is a modern declarative and reactive UI framework developed by JetBrains that provides a simple way to build user interfaces with a small amount of Kotlin code. It also allows you to write your UI once and run it on any of the supported platforms – iOS, Android, desktop (Windows, macOS, Linux), and web.</string>
+  <string name="multi_arch_dialog_details">If an app exposes an API to other apps that can be either 32 bit or 64 bit, the app must have the android:multiarch property set to true within its manifest to avoid potential errors.</string>
   <string name="extract_native_libs_tip">تصريح التطبيق </string>
   <string name="xml_detail">تفاصيل XML</string>
   <string name="lib_detail_dialog_title_16kb_page_size">16 KB Page Size Support</string>
@@ -275,4 +276,5 @@
   <string name="snapshot_menu_show_update_time">إظهار وقت التحديث</string>
   <string name="snapshot_menu_hide_no_component_changes">إخفاء عدم وجود تغييرات في المكونات</string>
   <string name="snapshot_menu_diff_highlight">تحديد الفروق</string>
+  <string name="snapshot_menu_use_iec_units">Use IEC Units</string>
 </resources>
