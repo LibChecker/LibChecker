@@ -2,6 +2,7 @@ package com.absinthe.libchecker.features.chart.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Build
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.fragment.app.FragmentActivity
@@ -79,7 +80,12 @@ class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutin
 
   fun addAndroidVersionView(node: AndroidVersions.Node?) {
     if (androidVersionView.parent == null && node != null) {
-      androidVersionView.setIcon(node.iconRes)
+      val iconRes = if (node.version == Build.VERSION_CODES.CUR_DEVELOPMENT) {
+        AndroidVersions.versions.getOrNull(Build.VERSION.SDK_INT + 1)?.iconRes
+      } else {
+        node.iconRes
+      }
+      androidVersionView.setIcon(iconRes)
       val text = StringBuilder(node.codeName)
       if (node.versionName.isNotEmpty()) {
         text.append(", ").append(node.versionName)

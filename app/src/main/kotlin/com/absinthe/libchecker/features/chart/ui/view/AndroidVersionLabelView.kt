@@ -29,15 +29,10 @@ class AndroidVersionLabelView(context: Context) : AViewGroup(context) {
   }
 
   fun setIcon(resId: Int?) {
-    resId?.let {
-      icon.setImageResource(it)
-      if (icon.parent == null) {
-        addView(icon)
-      }
-    } ?: run {
-      if (icon.parent != null) {
-        removeView(icon)
-      }
+    val id = resId ?: com.absinthe.lc.rulesbundle.R.drawable.ic_lib_android
+    icon.setImageResource(id)
+    if (icon.parent == null) {
+      addView(icon)
     }
   }
 

@@ -37,6 +37,7 @@ import com.absinthe.libchecker.services.WorkerService
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.IAppBarContainer
 import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.addBackStateHandler
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.isKeyboardShowing
@@ -45,8 +46,6 @@ import com.absinthe.rulesbundle.LCRules
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
-import com.microsoft.appcenter.analytics.Analytics
-import com.microsoft.appcenter.analytics.EventProperties
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -311,9 +310,9 @@ class MainActivity :
       Constants.ACTION_SNAPSHOT -> binding.viewpager.setCurrentItem(2, false)
       Intent.ACTION_APPLICATION_PREFERENCES -> binding.viewpager.setCurrentItem(3, false)
     }
-    Analytics.trackEvent(
+    Telemetry.recordEvent(
       Constants.Event.LAUNCH_ACTION,
-      EventProperties().set("Action", intent.action)
+      mapOf("Action" to intent.action.toString())
     )
   }
 

@@ -878,7 +878,7 @@ class SnapshotViewModel : ViewModel() {
         SnapshotDetailItem(
           item.name,
           item.name,
-          PackageUtils.sizeToString(context, item, false),
+          PackageUtils.sizeToString(context, item),
           REMOVED,
           NATIVE
         )
@@ -889,7 +889,7 @@ class SnapshotViewModel : ViewModel() {
         SnapshotDetailItem(
           item.name,
           item.name,
-          PackageUtils.sizeToString(context, item, false),
+          PackageUtils.sizeToString(context, item),
           ADDED,
           NATIVE
         )
@@ -1300,8 +1300,8 @@ class SnapshotViewModel : ViewModel() {
         val message = buildString {
           timeStampMap.forEach {
             append(
-              String.format(
-                context.getString(R.string.album_restore_detail),
+              context.getString(
+                R.string.album_restore_detail,
                 getFormatDateString(it.key),
                 it.value.toString()
               )

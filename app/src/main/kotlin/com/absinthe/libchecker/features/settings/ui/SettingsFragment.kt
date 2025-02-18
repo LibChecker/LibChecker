@@ -35,6 +35,7 @@ import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.base.IAppBarContainer
 import com.absinthe.libchecker.ui.base.IListController
 import com.absinthe.libchecker.utils.OsUtils
+import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
@@ -43,8 +44,6 @@ import com.absinthe.libraries.utils.extensions.getBoolean
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.rulesbundle.LCRemoteRepo
 import com.absinthe.rulesbundle.LCRules
-import com.microsoft.appcenter.analytics.Analytics
-import com.microsoft.appcenter.analytics.EventProperties
 import java.util.Locale
 import kotlinx.coroutines.launch
 import rikka.material.app.LocaleDelegate
@@ -84,9 +83,9 @@ class SettingsFragment :
           Timber.e(e)
           Toasty.showShort(requireContext(), e.toString())
         }
-        Analytics.trackEvent(
+        Telemetry.recordEvent(
           Constants.Event.SETTINGS,
-          EventProperties().set("PREF_APK_ANALYTICS", newValue)
+          mapOf("PREF_APK_ANALYTICS" to newValue)
         )
         true
       }
@@ -94,9 +93,9 @@ class SettingsFragment :
     findPreference<TwoStatePreference>(Constants.PREF_COLORFUL_ICON)?.apply {
       setOnPreferenceChangeListener { pref, newValue ->
         emitPrefChange(pref.key, newValue)
-        Analytics.trackEvent(
+        Telemetry.recordEvent(
           Constants.Event.SETTINGS,
-          EventProperties().set("PREF_COLORFUL_ICON", newValue as Boolean)
+          mapOf("PREF_COLORFUL_ICON" to newValue as Boolean)
         )
         true
       }
@@ -111,9 +110,9 @@ class SettingsFragment :
             LCRemoteRepo.Gitlab
           }
         )
-        Analytics.trackEvent(
+        Telemetry.recordEvent(
           Constants.Event.SETTINGS,
-          EventProperties().set("PREF_RULES_REPO", newValue)
+          mapOf("PREF_RULES_REPO" to newValue)
         )
         true
       }
@@ -185,9 +184,9 @@ class SettingsFragment :
             .setMessage(R.string.dialog_subtitle_reload_apps)
             .setPositiveButton(android.R.string.ok) { _, _ ->
               viewModel.reloadApps()
-              Analytics.trackEvent(
+              Telemetry.recordEvent(
                 Constants.Event.SETTINGS,
-                EventProperties().set("PREF_RELOAD_APPS", "Ok")
+                mapOf("PREF_RELOAD_APPS" to "Ok")
               )
             }
             .setNegativeButton(android.R.string.cancel, null)
@@ -266,9 +265,9 @@ class SettingsFragment :
               data = Uri.parse(URLManager.PLAY_STORE_DETAIL_PAGE)
             }
           )
-          Analytics.trackEvent(
+          Telemetry.recordEvent(
             Constants.Event.SETTINGS,
-            EventProperties().set("PREF_RATE", "Clicked")
+            mapOf("PREF_RATE" to "Clicked")
           )
         } catch (e: ActivityNotFoundException) {
           Timber.e(e)

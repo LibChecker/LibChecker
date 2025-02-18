@@ -40,7 +40,6 @@ import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.elf.ELFParser
 import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libchecker.utils.manifest.HiddenPermissionsReader
 import com.absinthe.libchecker.utils.manifest.ManifestReader
@@ -750,8 +749,8 @@ val ABI_STRING_RES_MAP = arrayMapOf(
   RISCV32 + MULTI_ARCH to listOf(R.string.riscv32, R.string.multiArch)
 )
 
-private const val PAGE_SIZE_16_KB = 0x4000
-private const val PAGE_SIZE_4_KB = 0x1000
+const val PAGE_SIZE_16_KB = 0x4000
+const val PAGE_SIZE_4_KB = 0x1000
 
 /**
  *
@@ -760,8 +759,7 @@ private const val PAGE_SIZE_4_KB = 0x1000
  * - All native libraries have page sizes that are multiples of 16 KB
  *
  */
-fun PackageInfo.is16KBAligned(): Boolean {
-  val defaultSize = PAGE_SIZE_4_KB
+fun PackageInfo.is16KBAligned(isApk: Boolean = false): Boolean {
   val sourceDir = applicationInfo?.sourceDir ?: return false
 
   val file = File(sourceDir)
@@ -769,28 +767,11 @@ fun PackageInfo.is16KBAligned(): Boolean {
     return false
   }
 
-  return runCatching {
-    ZipFileCompat(file).use { zipFile ->
-      val pageSizeSet = mutableSetOf<Int>()
-
-      zipFile.getZipEntries()
-        .asSequence()
-        .filter { it.isDirectory.not() && it.name.endsWith(".so") }
-        .forEach { zipEntry ->
-          val elfParser = runCatching { ELFParser(zipFile.getInputStream(zipEntry)) }.getOrNull()
-          val pageSize = elfParser?.getPageSize()?.toInt() ?: defaultSize
-          if (pageSize == defaultSize) {
-            return false
-          } else {
-            pageSizeSet += pageSize
-          }
-        }
-
-      return pageSizeSet.isNotEmpty() && pageSizeSet.all { it % PAGE_SIZE_16_KB == 0 }
-    }
-  }.onFailure {
-    Timber.e(it)
-  }.getOrElse { false }
+  val nativeLibs = PackageUtils.getNativeDirLibs(
+    packageInfo = this,
+    specifiedAbi = PackageUtils.getAbi(this, isApk = isApk)
+  )
+  return nativeLibs.isNotEmpty() && nativeLibs.all { it.elfInfo.pageSize % PAGE_SIZE_16_KB == 0 }
 }
 
 /**

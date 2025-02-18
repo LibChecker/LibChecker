@@ -39,6 +39,7 @@ import com.absinthe.libchecker.services.WorkerService
 import com.absinthe.libchecker.ui.base.BaseFragment
 import com.absinthe.libchecker.ui.base.SaturationTransformation
 import com.absinthe.libchecker.utils.OsUtils
+import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -212,6 +213,7 @@ class ChartFragment :
       ChartType.AAB -> setChartData(::generatePieChartView) { AABChartDataSource(items) }
       ChartType.SUPPORT_16KB -> setChartData(::generatePieChartView) { PageSize16KBChartDataSource(items) }
     }
+    Telemetry.recordEvent("Chart", mapOf("ChartType" to chartType))
   }
 
   private fun <T : Chart<*>> setChartData(

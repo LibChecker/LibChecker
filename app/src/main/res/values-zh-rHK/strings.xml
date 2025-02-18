@@ -86,7 +86,7 @@
   <string name="reload_apps_summary">應用程式清單顯示不正常時嘗試此選項</string>
   <string name="help_docs_summary">學習如何使用 LibChecker</string>
   <string name="join_telegram_group_summary">一起來閒聊</string>
-  <string name="anonymous_statistics_summary">我們使用 Microsoft AppCenter 來匿名傳送最常被人們使用的標示庫和一些使用習慣資料以使得 LibChecker 變得更加實用</string>
+  <string name="anonymous_statistics_summary">我們使用 Google Firebase 來匿名傳送最常被人們使用的標示庫和一些使用習慣資料以使得 LibChecker 變得更加實用</string>
   <string name="cloud_rules_summary">在此更新最新的標示庫</string>
   <string name="array_dark_mode_off">關閉</string>
   <string name="array_dark_mode_on">開啟</string>

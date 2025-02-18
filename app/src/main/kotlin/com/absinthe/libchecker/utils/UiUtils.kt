@@ -114,8 +114,8 @@ object UiUtils {
       .setTitle(R.string.album_item_management_snapshot_auto_remove_default_title)
       .setView(slider)
       .setMessage(
-        String.format(
-          context.getString(R.string.album_item_management_snapshot_auto_remove_desc),
+        context.getString(
+          R.string.album_item_management_snapshot_auto_remove_desc,
           context.getString(android.R.string.ok)
         )
       )

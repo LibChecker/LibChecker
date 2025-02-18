@@ -130,7 +130,7 @@
 
     <rikka.material.preference.MaterialSwitchPreference
       app:defaultValue="true"
-      app:icon="@drawable/ic_appcenter"
+      app:icon="@drawable/ic_firebase_monochrome"
       app:key="analytics"
       app:summary="@string/anonymous_statistics_summary"
       app:title="@string/anonymous_statistics" />
