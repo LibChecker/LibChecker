@@ -124,6 +124,7 @@
   <string name="pwa_details">漸進式 Web 應用程式 (PWA) 使用現代 API 建置並增強，以提供增強的功能、可靠性和可安裝性，同時使用單個程式碼存放庫在任何裝置上存取任何人、任何位置。</string>
   <string name="jetpack_compose_details">Jetpack Compose 是 Android 的新型工具組，用於建置原生 UI。可簡化並加快 Android 平台上的 UI 開發作業。透過較少的程式碼、強大的工具和直觀的 Kotlin API，快速將應用程式上架。</string>
   <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform is a modern declarative and reactive UI framework developed by JetBrains that provides a simple way to build user interfaces with a small amount of Kotlin code. It also allows you to write your UI once and run it on any of the supported platforms – iOS, Android, desktop (Windows, macOS, Linux), and web.</string>
+  <string name="multi_arch_dialog_details">If an app exposes an API to other apps that can be either 32 bit or 64 bit, the app must have the android:multiarch property set to true within its manifest to avoid potential errors.</string>
   <string name="extract_native_libs_tip">此應用程式宣告了 </string>
   <string name="xml_detail">XML 詳細資料</string>
   <string name="lib_detail_dialog_title_16kb_page_size">16 KB 分頁大小支援</string>
@@ -275,4 +276,5 @@
   <string name="snapshot_menu_show_update_time">顯示更新時間</string>
   <string name="snapshot_menu_hide_no_component_changes">隱藏沒有元件變更</string>
   <string name="snapshot_menu_diff_highlight">重點標示差異</string>
+  <string name="snapshot_menu_use_iec_units">Use IEC Units</string>
 </resources>
