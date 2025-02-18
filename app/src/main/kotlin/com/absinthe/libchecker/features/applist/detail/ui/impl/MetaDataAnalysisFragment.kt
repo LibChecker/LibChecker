@@ -3,7 +3,7 @@ package com.absinthe.libchecker.features.applist.detail.ui.impl
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.METADATA
-import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
+import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.features.applist.Referable
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibStringDiffUtil
@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class MetaDataAnalysisFragment :
-  BaseDetailFragment<FragmentLibNativeBinding>(),
+  BaseDetailFragment<FragmentLibComponentBinding>(),
   Referable {
 
   override fun getRecyclerView() = binding.list
