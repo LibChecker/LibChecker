@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.utils.xapk
+package com.absinthe.libchecker.utils.apk
 
 import com.squareup.moshi.JsonClass
 

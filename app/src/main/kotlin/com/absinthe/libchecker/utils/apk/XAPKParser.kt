@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.utils.xapk
+package com.absinthe.libchecker.utils.apk
 
 import android.content.pm.PackageInfo
 import com.absinthe.libchecker.LibCheckerApp
@@ -38,12 +38,8 @@ class XAPKParser(private val file: File, private val flags: Int = 0) {
               ai.sourceDir = baseApkFile.path
               ai.publicSourceDir = baseApkFile.path
               ai.splitSourceDirs = rootDir.listFiles()!!
-                .filter { file ->
-                  file.name.startsWith("split_config.")
-                }
-                .map { file ->
-                  file.path
-                }
+                .filter { file -> file.name.startsWith("split_config.") }
+                .map { file -> file.path }
                 .toTypedArray()
             }
           } ?: throw Exception("Failed to get PackageArchiveInfo")

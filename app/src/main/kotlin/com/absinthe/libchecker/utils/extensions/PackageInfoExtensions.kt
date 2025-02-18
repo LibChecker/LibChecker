@@ -16,8 +16,10 @@ import com.absinthe.libchecker.constant.Constants.ARMV5
 import com.absinthe.libchecker.constant.Constants.ARMV5_STRING
 import com.absinthe.libchecker.constant.Constants.ARMV7
 import com.absinthe.libchecker.constant.Constants.ARMV7_STRING
+import com.absinthe.libchecker.constant.Constants.ARMV7_STRING_UNDERLINE
 import com.absinthe.libchecker.constant.Constants.ARMV8
 import com.absinthe.libchecker.constant.Constants.ARMV8_STRING
+import com.absinthe.libchecker.constant.Constants.ARMV8_STRING_UNDERLINE
 import com.absinthe.libchecker.constant.Constants.ERROR
 import com.absinthe.libchecker.constant.Constants.MIPS
 import com.absinthe.libchecker.constant.Constants.MIPS64
@@ -700,7 +702,9 @@ val ABI_64_BIT = setOf(ARMV8, X86_64, MIPS64, RISCV64)
 val ABI_32_BIT = setOf(ARMV5, ARMV7, X86, MIPS, RISCV32)
 
 val STRING_ABI_MAP = mapOf(
+  ARMV8_STRING_UNDERLINE to ARMV8,
   ARMV8_STRING to ARMV8,
+  ARMV7_STRING_UNDERLINE to ARMV7,
   ARMV7_STRING to ARMV7,
   ARMV5_STRING to ARMV5,
   X86_64_STRING to X86_64,

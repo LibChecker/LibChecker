@@ -20,7 +20,9 @@ object Constants {
   const val VARIANT_HAP: Short = 1
 
   const val ARMV8_STRING = "arm64-v8a"
+  const val ARMV8_STRING_UNDERLINE = "arm64_v8a"
   const val ARMV7_STRING = "armeabi-v7a"
+  const val ARMV7_STRING_UNDERLINE = "armeabi_v7a"
   const val ARMV5_STRING = "armeabi"
   const val X86_STRING = "x86"
   const val X86_64_STRING = "x86_64"
