@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class NativeAnalysisFragment :
   BaseDetailFragment<FragmentLibNativeBinding>(),
@@ -73,8 +74,12 @@ class NativeAnalysisFragment :
         it?.forEach { title ->
           binding.tabLayout.addTab(binding.tabLayout.newTab().setText(title), false)
         }
-        abiBundleStateFlow.value?.let { bundle ->
-          selectTabByAbi(bundle.abi)
+        lifecycleScope.launch(Dispatchers.IO) {
+          val flow = viewModel.abiBundleStateFlow
+          val abi = (flow.value ?: flow.filterNotNull().first()).abi
+          withContext(Dispatchers.Main) {
+            selectTabByAbi(abi)
+          }
         }
       }.launchIn(lifecycleScope)
       nativeLibItems.onEach {
@@ -82,11 +87,6 @@ class NativeAnalysisFragment :
           setItems(it)
         }
       }.launchIn(lifecycleScope)
-      abiBundleStateFlow.onEach { bundle ->
-        if (bundle != null) {
-          selectTabByAbi(bundle.abi)
-        }
-      }
 
       packageInfoStateFlow.value?.run {
         nativeLibItems.value ?: run { initSoAnalysisData() }
