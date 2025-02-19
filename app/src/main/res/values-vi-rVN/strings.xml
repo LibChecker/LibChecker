@@ -24,6 +24,7 @@
   <string name="uncharted_territory">Vùng chưa được khám phá</string>
   <string name="get_app_list_denied_tip">Vui lòng cấp\n\"Nhận thông tin về các ứng dụng đã cài đặt\"\n Và cấp quyền cho LibChecker</string>
   <string name="advanced_menu">Cài đặt nâng cấp cao</string>
+  <string name="archived_app">Archived app</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">Ứng dụng có %s ABI</string>
   <string name="title_statistics_dialog_no_native_libs">Ứng dụng không có thư viện gốc</string>
