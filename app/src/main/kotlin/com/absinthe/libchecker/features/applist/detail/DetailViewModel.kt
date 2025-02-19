@@ -122,7 +122,6 @@ class DetailViewModel : ViewModel() {
 
     if (sourceMap.isNotEmpty()) {
       processMapStateFlow.emit(sourceMap)
-      processToolIconVisibilityStateFlow.emit(true)
     }
 
     nativeLibTabs.emit(allNativeLibItems.keys)

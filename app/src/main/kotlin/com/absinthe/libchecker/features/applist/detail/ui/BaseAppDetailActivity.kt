@@ -20,7 +20,6 @@ import androidx.core.text.buildSpannedString
 import androidx.core.text.scale
 import androidx.core.view.MenuProvider
 import androidx.core.view.isGone
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -330,9 +329,6 @@ abstract class BaseAppDetailActivity :
           }
         )
       }
-      if (GlobalValues.processMode && processBarView == null) {
-        initProcessBarView()
-      }
       if (this@BaseAppDetailActivity is ApkDetailActivity && PackageUtils.isAppInstalled(packageInfo.packageName)) {
         toolbarAdapter.addData(
           AppDetailToolbarItem(R.drawable.ic_compare, R.string.compare_with_current) {
@@ -524,46 +520,23 @@ abstract class BaseAppDetailActivity :
       }.launchIn(lifecycleScope)
       it.processToolIconVisibilityStateFlow.onEach { visible ->
         if (visible) {
-          if (detailFragmentManager.currentFragment?.isComponentFragment() == true) {
-            if (!toolbarAdapter.data.contains(toolbarProcessItem)) {
-              toolbarAdapter.addData(toolbarProcessItem)
-            }
-          }
-          if (detailFragmentManager.currentFragment?.isNativeSourceAvailable() == true) {
-            if (!toolbarAdapter.data.contains(toolbarProcessItem)) {
-              toolbarAdapter.addData(toolbarProcessItem)
-            }
-          }
-          if (GlobalValues.processMode || detailFragmentManager.currentFragment is PermissionAnalysisFragment) {
-            if (processBarView == null) {
-              initProcessBarView()
-            }
-            processBarView?.isVisible = true
-          } else {
-            processBarView?.isGone = true
+          if (!toolbarAdapter.data.contains(toolbarProcessItem)) {
+            toolbarAdapter.addData(toolbarProcessItem)
           }
         } else {
           if (toolbarAdapter.data.contains(toolbarProcessItem)) {
             toolbarAdapter.remove(toolbarProcessItem)
           }
-          if (detailFragmentManager.currentFragment !is PermissionAnalysisFragment) {
-            processBarView?.isGone = true
-          }
         }
       }.launchIn(lifecycleScope)
       it.processMapStateFlow.onEach { map ->
-        if (processBarView == null) {
-          initProcessBarView()
+        val list = map.map { mapItem ->
+          ProcessBarAdapter.ProcessBarItem(
+            mapItem.key,
+            mapItem.value
+          )
         }
-        processBarView?.setData(
-          map.map { mapItem ->
-            ProcessBarAdapter.ProcessBarItem(
-              mapItem.key,
-              mapItem.value
-            )
-          }
-        )
-        showProcessBarView()
+        setupProcessBarView(list)
       }.launchIn(lifecycleScope)
       it.featuresFlow.onEach { feat ->
         initFeatureListView()
@@ -826,25 +799,8 @@ abstract class BaseAppDetailActivity :
       detailFragmentManager.deliverSwitchProcessMode()
       GlobalValues.processMode = !GlobalValues.processMode
 
-      if (GlobalValues.processMode) {
-        val processMap = viewModel.processMapStateFlow.value
-        if (processMap.isEmpty()) return@AppDetailToolbarItem
-        if (processBarView == null) {
-          initProcessBarView()
-        }
-        processBarView?.setData(
-          processMap.map { mapItem ->
-            ProcessBarAdapter.ProcessBarItem(
-              mapItem.key,
-              mapItem.value
-            )
-          }
-        )
-        processBarView?.isVisible = true
-      } else {
-        binding.detailToolbarContainer.removeView(processBarView)
-        processBarView = null
-
+      toggleProcessBarViewVisibility()
+      if (!GlobalValues.processMode) {
         doOnMainThreadIdle {
           viewModel.queriedProcess = null
           detailFragmentManager.deliverFilterItems(null, null, lifecycleScope)
@@ -972,15 +928,27 @@ abstract class BaseAppDetailActivity :
       }
     }
     binding.detailToolbarContainer.addView(processBarView)
-    showProcessBarView()
   }
 
-  private fun showProcessBarView() {
-    if (!viewModel.processToolIconVisibilityStateFlow.value && detailFragmentManager.currentFragment !is PermissionAnalysisFragment) {
-      processBarView?.isGone = true
+  private fun setupProcessBarView(list: List<ProcessBarAdapter.ProcessBarItem>) {
+    if (list.isEmpty()) {
+      if (processBarView?.parent != null) {
+        (processBarView?.parent as? ViewGroup)?.removeView(processBarView)
+        processBarView = null
+      }
     } else {
-      processBarView?.isVisible = true
+      if (processBarView == null) {
+        initProcessBarView()
+      }
+      toggleProcessBarViewVisibility()
+      processBarView?.setData(list)
     }
+  }
+
+  private fun toggleProcessBarViewVisibility() {
+    processBarView?.isGone =
+      !GlobalValues.processMode &&
+      detailFragmentManager.currentFragment?.hasNonGrantedPermissions() == false
   }
 
   private fun initAbiView(abi: Int, abiSet: Collection<Int>) {
