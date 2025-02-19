@@ -24,6 +24,7 @@
   <string name="uncharted_territory">未知の領域</string>
   <string name="get_app_list_denied_tip">インストールされているアプリに関する情報を取得する為に\nLibCheckerの権限を許可してください。</string>
   <string name="advanced_menu">詳細メニュー</string>
+  <string name="archived_app">Archived app</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">%s ABI のアプリ</string>
   <string name="title_statistics_dialog_no_native_libs">ネイティブライブラリのないアプリ</string>
