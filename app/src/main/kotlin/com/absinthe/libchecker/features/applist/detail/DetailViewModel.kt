@@ -570,11 +570,6 @@ class DetailViewModel : ViewModel() {
 
   fun updateProcessMap(map: Map<String, Int>) = viewModelScope.launch {
     processMapStateFlow.emit(map)
-    if (map.isEmpty()) {
-      processToolIconVisibilityStateFlow.emit(false)
-    } else {
-      processToolIconVisibilityStateFlow.emit(true)
-    }
   }
 
   fun updateProcessToolIconVisibility(visible: Boolean) = viewModelScope.launch {

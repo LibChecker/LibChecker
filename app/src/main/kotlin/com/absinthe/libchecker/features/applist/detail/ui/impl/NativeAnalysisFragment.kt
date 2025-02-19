@@ -94,15 +94,6 @@ class NativeAnalysisFragment :
     }
   }
 
-  override fun onVisibilityChanged(visible: Boolean) {
-    if (context != null && visible) {
-      viewModel.updateProcessMap(viewModel.nativeSourceMap)
-    } else {
-      viewModel.updateProcessMap(viewModel.processesMap)
-    }
-    super.onVisibilityChanged(visible)
-  }
-
   private fun setItems(list: List<LibStringItemChip>) {
     if (list.isEmpty()) {
       emptyView.text.text = getString(R.string.empty_list)
