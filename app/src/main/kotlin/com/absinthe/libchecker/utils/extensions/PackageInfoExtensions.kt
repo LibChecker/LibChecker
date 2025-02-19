@@ -698,6 +698,8 @@ val INSTRUCTION_SET_MAP_TO_ABI_VALUE = mapOf(
   "riscv32" to RISCV32
 )
 
+val ABI_VALUE_TO_INSTRUCTION_SET_MAP = INSTRUCTION_SET_MAP_TO_ABI_VALUE.entries.associate { (k, v) -> v to k }
+
 val ABI_64_BIT = setOf(ARMV8, X86_64, MIPS64, RISCV64)
 val ABI_32_BIT = setOf(ARMV5, ARMV7, X86, MIPS, RISCV32)
 
@@ -748,9 +750,11 @@ const val PAGE_SIZE_4_KB = 0x1000
  * An app is considered to be 16KB-aligned only if:
  * - There's at least one native library present
  * - All native libraries have page sizes that are multiples of 16 KB
+ * - None of the native libraries are uncompressed and not 16 KB-aligned
+ * @see <a href="https://cs.android.com/android-studio/platform/tools/base/+/mirror-goog-studio-main:sdk-common/src/main/java/com/android/ide/common/pagealign/PageAlignUtils.kt">Ref</a>
  *
  */
-fun PackageInfo.is16KBAligned(isApk: Boolean = false): Boolean {
+fun PackageInfo.is16KBAligned(libs: List<LibStringItem>? = null, isApk: Boolean = false): Boolean {
   val sourceDir = applicationInfo?.sourceDir ?: return false
 
   val file = File(sourceDir)
@@ -758,11 +762,18 @@ fun PackageInfo.is16KBAligned(isApk: Boolean = false): Boolean {
     return false
   }
 
-  val nativeLibs = PackageUtils.getNativeDirLibs(
-    packageInfo = this,
-    specifiedAbi = PackageUtils.getAbi(this, isApk = isApk)
-  )
-  return nativeLibs.isNotEmpty() && nativeLibs.all { it.elfInfo.pageSize % PAGE_SIZE_16_KB == 0 }
+  val nativeLibs = libs ?: run {
+    val abi = PackageUtils.getAbi(this, isApk = isApk)
+    val abiString = ABI_STRING_MAP[abi % MULTI_ARCH]
+    PackageUtils.getSourceLibs(
+      packageInfo = this,
+      specifiedAbi = abi
+    )[abiString] ?: emptyList()
+  }
+
+  return nativeLibs.isNotEmpty() &&
+    nativeLibs.all { it.elfInfo.pageSize % PAGE_SIZE_16_KB == 0 } &&
+    nativeLibs.all { it.elfInfo.uncompressedAndNot16KB.not() }
 }
 
 /**
