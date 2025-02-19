@@ -33,7 +33,6 @@ import com.absinthe.libchecker.features.applist.detail.ui.PermissionDetailDialog
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibStringAdapter
 import com.absinthe.libchecker.features.applist.detail.ui.impl.ComponentsAnalysisFragment
 import com.absinthe.libchecker.features.applist.detail.ui.impl.MetaDataAnalysisFragment
-import com.absinthe.libchecker.features.applist.detail.ui.impl.NativeAnalysisFragment
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.integrations.anywhere.AnywhereManager
@@ -44,6 +43,7 @@ import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.base.BaseFragment
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.launchLibReferencePage
 import com.absinthe.libchecker.utils.extensions.reverseStrikeThroughAnimation
 import com.absinthe.libchecker.utils.extensions.startStrikeThroughAnimation
@@ -150,15 +150,19 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   override fun onVisibilityChanged(visible: Boolean) {
     super.onVisibilityChanged(visible)
     if (visible) {
-      if (this is ComponentsAnalysisFragment && viewModel.processesMap.isNotEmpty()) {
-        viewModel.updateProcessToolIconVisibility(isComponentFragment())
+      val processMap = if (isComponentFragment()) {
+        viewModel.processesMap
+      } else if (isNativeSourceAvailable()) {
+        viewModel.nativeSourceMap
+      } else if (hasNonGrantedPermissions()) {
+        val label = requireContext().getString(R.string.permission_not_granted)
+        val color = R.color.material_red_400.getColor(requireContext())
+        mapOf(label to color)
       } else {
-        if (this is NativeAnalysisFragment && viewModel.nativeSourceMap.isNotEmpty()) {
-          viewModel.updateProcessToolIconVisibility(true)
-        } else {
-          viewModel.updateProcessToolIconVisibility(false)
-        }
+        emptyMap()
       }
+      viewModel.updateProcessMap(processMap)
+      viewModel.updateProcessToolIconVisibility(processMap.isNotEmpty() && !hasNonGrantedPermissions())
     }
   }
 
@@ -315,7 +319,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     return type == NATIVE && viewModel.nativeSourceMap.isNotEmpty()
   }
 
-  protected fun hasNonGrantedPermissions(): Boolean {
+  fun hasNonGrantedPermissions(): Boolean {
     return type == PERMISSION && viewModel.permissionsItems.value?.any { it.item.size == 0L } == true
   }
 
