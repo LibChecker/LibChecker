@@ -62,6 +62,7 @@ import com.absinthe.libchecker.utils.extensions.ABI_64_BIT
 import com.absinthe.libchecker.utils.extensions.ABI_STRING_MAP
 import com.absinthe.libchecker.utils.extensions.ABI_STRING_RES_MAP
 import com.absinthe.libchecker.utils.extensions.INSTRUCTION_SET_MAP_TO_ABI_VALUE
+import com.absinthe.libchecker.utils.extensions.PAGE_SIZE_16_KB
 import com.absinthe.libchecker.utils.extensions.STRING_ABI_MAP
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPermissionsList
@@ -81,11 +82,14 @@ import com.absinthe.libchecker.utils.manifest.StaticLibraryReader
 import com.android.tools.smali.dexlib2.Opcodes
 import dev.rikka.tools.refine.Refine
 import java.io.File
-import java.io.InputStream
+import java.io.FileInputStream
 import java.security.interfaces.DSAPublicKey
 import java.security.interfaces.RSAPublicKey
 import java.text.DateFormat
+import java.util.zip.ZipEntry
 import javax.security.cert.X509Certificate
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream
 import rikka.shizuku.Shizuku
 import rikka.shizuku.ShizukuBinderWrapper
 import rikka.shizuku.SystemServiceHelper
@@ -176,7 +180,11 @@ object PackageUtils {
             .filter { it.isFile }
             .distinctBy { it.name }
             .map {
-              val elfParser = runCatching { ELFParser(it.inputStream()) }.getOrNull()
+              val elfParser = runCatching {
+                it.inputStream().use { input ->
+                  ELFParser(input)
+                }
+              }.getOrNull()
               LibStringItem(
                 name = it.name,
                 size = FileUtils.getFileSize(it),
@@ -211,52 +219,16 @@ object PackageUtils {
    * @param packageInfo PackageInfo
    * @return List of LibStringItem
    */
-  fun getSourceLibs(packageInfo: PackageInfo, childDir: String? = null): Map<String, List<LibStringItem>> {
+  fun getSourceLibs(packageInfo: PackageInfo, childDir: String? = null, specifiedAbi: Int? = null): Map<String, List<LibStringItem>> {
     val sourceDir = packageInfo.applicationInfo?.sourceDir ?: return emptyMap()
     val file = File(sourceDir)
-    if (file.exists().not()) {
-      return emptyMap()
-    }
-    val map = mutableMapOf<String, MutableList<LibStringItem>>()
-    runCatching {
-      ZipFileCompat(file).use { zipFile ->
-        zipFile.getZipEntries()
-          .asSequence()
-          .filter {
-            it.isDirectory.not() &&
-              it.name.endsWith(".so") &&
-              (
-                childDir == null ||
-                  it.name.startsWith(
-                    childDir
-                  )
-                )
-          }
-          .forEach { entry ->
-            fun processEntry(dir: String) {
-              val elfParser =
-                runCatching { getElfParser(zipFile.getInputStream(entry)) }.getOrNull()
-              val item = LibStringItem(
-                name = entry.name.split(File.separator).last(),
-                size = entry.size,
-                elfInfo = ElfInfo(elfParser)
-              )
-              map.getOrPut(dir) { mutableListOf() }.add(item)
-            }
-            STRING_ABI_MAP.keys.find { entry.name.startsWith("lib/$it") }?.let { childDir ->
-              processEntry(childDir)
-            } ?: run {
-              if (entry.name.startsWith("assets/")) {
-                processEntry("assets")
-              }
-            }
-          }
-      }
-    }.onFailure {
-      Timber.e(it)
-    }
+    var map = getApkFileLibs(file, childDir)
     if (map.isEmpty()) {
-      return getSplitLibs(packageInfo)
+      map = getSplitLibs(packageInfo)
+    }
+    if (map.isEmpty() && (childDir == null || specifiedAbi != null)) {
+      val abi = specifiedAbi ?: getAbi(packageInfo)
+      map = mutableMapOf(ABI_STRING_MAP[abi]!! to getNativeDirLibs(packageInfo, specifiedAbi).toMutableList())
     }
     return map
   }
@@ -266,7 +238,7 @@ object PackageUtils {
    * @param packageInfo PackageInfo
    * @return List of LibStringItem
    */
-  private fun getSplitLibs(packageInfo: PackageInfo): Map<String, List<LibStringItem>> {
+  private fun getSplitLibs(packageInfo: PackageInfo): Map<String, MutableList<LibStringItem>> {
     val splitList = getSplitsSourceDir(packageInfo)
     if (splitList.isNullOrEmpty()) {
       return emptyMap()
@@ -277,25 +249,7 @@ object PackageUtils {
       val fileName = it.split(File.separator).last()
       INSTRUCTION_SET_MAP_TO_ABI_VALUE.keys.any { key -> fileName.contains(key) }
     }.forEach { split ->
-      ZipFileCompat(File(split)).use { zipFile ->
-        zipFile.getZipEntries()
-          .asSequence()
-          .filter { it.isDirectory.not() && it.name.endsWith(".so") }
-          .forEach { entry ->
-            STRING_ABI_MAP.keys.find { entry.name.startsWith("lib/$it") }?.let { childDir ->
-              val elfParser =
-                runCatching { getElfParser(zipFile.getInputStream(entry)) }.getOrNull()
-              val fileName = split.split(File.separator).last()
-              val item = LibStringItem(
-                name = entry.name.split(File.separator).last(),
-                size = entry.size,
-                process = if (fileName.startsWith("split_config")) null else fileName,
-                elfInfo = ElfInfo(elfParser)
-              )
-              map.getOrPut(childDir) { mutableListOf() }.add(item)
-            }
-          }
-      }
+      map.putAll(getApkFileLibs(File(split)))
     }
 
     return map
@@ -318,6 +272,45 @@ object PackageUtils {
       }
     }
     return ai.splitSourceDirs
+  }
+
+  private fun getApkFileLibs(file: File, childDir: String? = null): Map<String, MutableList<LibStringItem>> {
+    if (file.exists().not()) {
+      return emptyMap()
+    }
+    val map = mutableMapOf<String, MutableList<LibStringItem>>()
+    FileInputStream(file).use { input ->
+      ZipArchiveInputStream(input).use { zipInput ->
+        var encounterLibsDir = false
+        var entry = zipInput.nextEntry
+        while (entry != null) {
+          try {
+            if (entry.isDirectory || !entry.name.endsWith(".so") || (childDir != null && !entry.name.startsWith(childDir))) {
+              if (entry.isDirectory.not() && encounterLibsDir) {
+                // Optimize for skipping unused entries, since sorted by name
+                break
+              }
+              continue
+            }
+            encounterLibsDir = true
+            val dir = STRING_ABI_MAP.keys.find { entry.name.startsWith("lib/$it") }
+              ?: if (entry.name.split(File.separator).first() == "assets") "assets" else continue
+            val currentEntryUncompressedAndNot16KB = entry.method == ZipEntry.STORED && zipInput.bytesRead % PAGE_SIZE_16_KB != 0L
+            val elfParser = runCatching { ELFParser(zipInput) }.getOrNull()
+            val libSize = entry.size.takeIf { it != ZipArchiveEntry.SIZE_UNKNOWN } ?: elfParser?.getElfFileSize() ?: ZipArchiveEntry.SIZE_UNKNOWN
+            val item = LibStringItem(
+              name = entry.name.split(File.separator).last(),
+              size = libSize,
+              elfInfo = ElfInfo(elfParser, currentEntryUncompressedAndNot16KB)
+            )
+            map.getOrPut(dir) { mutableListOf() }.add(item)
+          } finally {
+            runCatching { entry = zipInput.nextEntry }
+          }
+        }
+      }
+    }
+    return map
   }
 
   const val STATIC_LIBRARY_SOURCE_PREFIX = "[Path] "
@@ -597,7 +590,6 @@ object PackageUtils {
     isApk: Boolean = false,
     ignoreArch: Boolean = false
   ): Set<Int> {
-    var elementName: String
     val abiSet = mutableSetOf<Int>()
 
     if (file.exists().not()) {
@@ -605,15 +597,15 @@ object PackageUtils {
       return abiSet
     }
 
+    if (packageInfo.isOverlay()) {
+      abiSet.add(OVERLAY)
+      return abiSet
+    }
+
     ZipFileCompat(file).use { zipFile ->
       return runCatching {
-        val libDirPrefix = "lib${File.separator}"
+        val libDirPrefix = "lib" + File.separator
         val entries = zipFile.getZipEntries()
-
-        if (packageInfo.isOverlay()) {
-          abiSet.add(OVERLAY)
-          return abiSet
-        }
 
         while (entries.hasMoreElements()) {
           val entry = entries.nextElement()
@@ -622,7 +614,7 @@ object PackageUtils {
             continue
           }
 
-          elementName = entry.name
+          val elementName = entry.name
 
           if (elementName.startsWith(libDirPrefix)) {
             STRING_ABI_MAP.forEach { (string, abi) ->
@@ -949,18 +941,6 @@ object PackageUtils {
     return runCatching {
       PackageManagerCompat.getApplicationInfo(pkgName, 0).enabled
     }.getOrDefault(false)
-  }
-
-  private fun getElfType(file: File): Int {
-    return runCatching {
-      getElfParser(file.inputStream()).getEType()
-    }.onFailure {
-      Timber.e(it)
-    }.getOrDefault(ET_NONE)
-  }
-
-  private fun getElfParser(input: InputStream): ELFParser {
-    return ELFParser(input)
   }
 
   fun describeSignature(
