@@ -226,6 +226,10 @@ class LibStringAdapter(
       val text = "16 KB"
       itemView.libSize.append(createNativeLabelSpan(text))
     }
+    if (item.item.elfInfo.uncompressedAndNot16KB) {
+      val text = "NON 16 KB STORED"
+      itemView.libSize.append(createNativeLabelSpan(text))
+    }
   }
 
   private fun setStaticContent(

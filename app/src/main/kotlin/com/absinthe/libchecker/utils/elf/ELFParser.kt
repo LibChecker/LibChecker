@@ -48,12 +48,38 @@ class ELFParser(inputStream: InputStream) {
     return e_ident.EI_CLASS.toInt()
   }
 
-  fun getPageSize(): Int {
-    return (programHeaders.find { it.p_type == ProgramHeader.PT_LOAD }?.p_align ?: 4096).toInt()
+  fun getMinPageSize(): Int {
+    var minAlign: Long? = null
+    programHeaders.forEach {
+      if (it.p_type == ProgramHeader.PT_LOAD) {
+        minAlign = minAlign?.coerceAtMost(it.p_align) ?: it.p_align
+      }
+    }
+    return minAlign?.toInt() ?: -1
+  }
+
+  fun getElfFileSize(): Long {
+    if (!isElf()) return -1
+
+    var maxSize = e_ehsize.toLong()
+
+    for (header in programHeaders) {
+      val endOffset = header.p_offset + header.p_filesz
+      if (endOffset > maxSize) {
+        maxSize = endOffset
+      }
+    }
+
+    val sectionTableEnd = e_shoff + (e_shentsize * e_shnum)
+    if (sectionTableEnd > maxSize) {
+      maxSize = sectionTableEnd
+    }
+
+    return maxSize
   }
 
   private fun parse(inputStream: InputStream) {
-    inputStream.use {
+    inputStream.also {
       val e_ident_array = ByteArray(EI_NIDENT)
       it.read(e_ident_array)
       e_ident = EIdent(e_ident_array)
@@ -61,9 +87,10 @@ class ELFParser(inputStream: InputStream) {
       val ehSize = when (getEClass()) {
         EIdent.ELFCLASS32 -> 52 - EI_NIDENT // 32-bit ELF header size
         EIdent.ELFCLASS64 -> 64 - EI_NIDENT // 64-bit ELF header size
-        else -> return@use
+        else -> return@also
       }
-      val byteOrder = if (e_ident.EI_DATA.toInt() == EIdent.ELFDATA2MSB) ByteOrder.BIG_ENDIAN else ByteOrder.LITTLE_ENDIAN
+      val byteOrder =
+        if (e_ident.EI_DATA.toInt() == EIdent.ELFDATA2MSB) ByteOrder.BIG_ENDIAN else ByteOrder.LITTLE_ENDIAN
       val buffer = ByteBuffer.allocate(ehSize).order(byteOrder)
       it.read(buffer.array())
 
@@ -101,7 +128,7 @@ class ELFParser(inputStream: InputStream) {
         }
 
         else -> {
-          return@use
+          return@also
         }
       }
 

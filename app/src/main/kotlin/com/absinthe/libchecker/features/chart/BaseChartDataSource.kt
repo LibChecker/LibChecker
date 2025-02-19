@@ -14,7 +14,7 @@ abstract class BaseChartDataSource<T : View>(val items: List<LCItem>) : IChartDa
   }
 
   override fun getListByXValue(x: Int): List<LCItem> {
-    return classifiedMap[x]!!.data
+    return classifiedMap[x]?.data.orEmpty()
   }
 
   override fun getData(): List<LCItem> {
