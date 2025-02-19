@@ -24,6 +24,7 @@
   <string name="uncharted_territory">未知领域</string>
   <string name="get_app_list_denied_tip">请授予 LibChecker\n“读取应用列表”\n权限</string>
   <string name="advanced_menu">高级菜单</string>
+  <string name="archived_app">已归档应用</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">%s架构的应用</string>
   <string name="title_statistics_dialog_no_native_libs">无原生库的应用</string>

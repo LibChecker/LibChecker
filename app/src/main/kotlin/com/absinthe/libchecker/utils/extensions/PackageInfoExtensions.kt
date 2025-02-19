@@ -783,3 +783,7 @@ fun PackageInfo.isUseKMP(foundList: List<String>? = null): Boolean {
   val foundInDex = realFoundList.contains("org.jetbrains.compose.*".toClassDefType())
   return foundInDex
 }
+
+fun PackageInfo.isArchivedPackage(): Boolean {
+  return OsUtils.atLeastV() && archiveTimeMillis > 0
+}

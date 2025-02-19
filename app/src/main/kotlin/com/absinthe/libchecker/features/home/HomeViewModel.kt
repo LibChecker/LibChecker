@@ -44,6 +44,7 @@ import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getFeatures
 import com.absinthe.libchecker.utils.extensions.getVersionCode
+import com.absinthe.libchecker.utils.extensions.isArchivedPackage
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libraries.utils.manager.TimeRecorder
@@ -293,17 +294,18 @@ class HomeViewModel : ViewModel() {
       Constants.VARIANT_APK
     }
 
+    val ai = pi.applicationInfo ?: throw IllegalArgumentException("ApplicationInfo is null")
     return LCItem(
       pi.packageName,
       pi.getAppName().toString(),
-      pi.versionName.toString(),
+      if (pi.isArchivedPackage()) "Archived" else pi.versionName.toString(),
       pi.getVersionCode(),
       pi.firstInstallTime,
       pi.lastUpdateTime,
-      (pi.applicationInfo!!.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
+      (ai.flags and ApplicationInfo.FLAG_SYSTEM) > 0,
       PackageUtils.getAbi(pi).toShort(),
       if (delayInitFeatures) -1 else pi.getFeatures(),
-      pi.applicationInfo!!.targetSdkVersion.toShort(),
+      ai.targetSdkVersion.toShort(),
       variant
     )
   }
@@ -429,7 +431,7 @@ class HomeViewModel : ViewModel() {
     fun computeInternal(@LibType type: Int) = runBlocking {
       for (item in appMap.values) {
         if (!isActive) return@runBlocking
-        if (!showSystem && ((item.applicationInfo!!.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+        if (!showSystem && ((item.applicationInfo!!.flags and ApplicationInfo.FLAG_SYSTEM) > 0)) {
           progressCount++
           updateLibRefProgressImpl()
           continue

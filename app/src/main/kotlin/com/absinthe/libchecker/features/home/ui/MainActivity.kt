@@ -157,7 +157,6 @@ class MainActivity :
   }
 
   override fun showNavigationView() {
-    Timber.d("showNavigationView")
     // NavigationRailView 不需要隐藏，所以不需要显示
     if (binding.navView is BottomNavigationView) {
       navViewBehavior.slideUp(binding.navView as BottomNavigationView)
@@ -165,7 +164,6 @@ class MainActivity :
   }
 
   override fun hideNavigationView() {
-    Timber.d("hideNavigationView")
     // NavigationRailView 不需要隐藏
     if (binding.navView is BottomNavigationView) {
       navViewBehavior.slideDown(binding.navView as BottomNavigationView)
