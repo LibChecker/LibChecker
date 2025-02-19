@@ -24,6 +24,7 @@
   <string name="uncharted_territory">Unerforschtes Gebiet</string>
   <string name="get_app_list_denied_tip">Bitte erteilen Sie\n\"Informationen über installierte Apps\"\nBerechtigung für LibChecker</string>
   <string name="advanced_menu">Erweitertes Menü</string>
+  <string name="archived_app">Archived app</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">Apps mit %s ABI</string>
   <string name="title_statistics_dialog_no_native_libs">Apps ohne native Bibliotheken</string>
