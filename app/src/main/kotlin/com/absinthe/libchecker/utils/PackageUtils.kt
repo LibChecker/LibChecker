@@ -639,6 +639,8 @@ object PackageUtils {
         if (abiSet.isEmpty()) {
           if (!isApk && packageInfo.applicationInfo?.nativeLibraryDir != null) {
             abiSet.addAll(getAbiListByNativeDir(packageInfo.applicationInfo!!.nativeLibraryDir))
+          } else if (packageInfo.applicationInfo!!.splitSourceDirs != null) {
+            abiSet.addAll(getAbiListBySplitApks(packageInfo.applicationInfo!!.splitSourceDirs!!))
           }
 
           if (abiSet.isEmpty()) {
@@ -676,6 +678,18 @@ object PackageUtils {
       }
 
     return abis
+  }
+
+  private fun getAbiListBySplitApks(splitSource: Array<String>): Set<Int> {
+    return splitSource.filter { source -> STRING_ABI_MAP.keys.any { source.contains(it) } }
+      .map { source ->
+        val abiString = source.substringAfterLast(File.separator)
+          .removePrefix("split_config.")
+          .removeSuffix(".apk")
+        STRING_ABI_MAP[abiString] ?: ERROR
+      }
+      .filter { it != ERROR }
+      .toSet()
   }
 
   /**

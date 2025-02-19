@@ -226,10 +226,10 @@ class HomeViewModel : ViewModel() {
     val newApps = localApps - dbApps
     val removedApps = dbApps - localApps
 
-      /*
-       * The application list returned with a probability only contains system applications.
-       * When the difference is greater than a certain threshold, we re-request the list.
-       */
+    /*
+     * The application list returned with a probability only contains system applications.
+     * When the difference is greater than a certain threshold, we re-request the list.
+     */
     if (!checked && (newApps.size > 30 || removedApps.size > 30)) {
       Timber.w("Request change canceled because of large diff, re-request appMap")
       launch {
