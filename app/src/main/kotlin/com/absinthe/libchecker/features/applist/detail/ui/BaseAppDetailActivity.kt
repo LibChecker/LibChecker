@@ -976,7 +976,7 @@ abstract class BaseAppDetailActivity :
   }
 
   private fun showProcessBarView() {
-    if (!viewModel.processToolIconVisibilityStateFlow.value && detailFragmentManager.currentFragment !is PermissionAnalysisFragment) {
+    if (!viewModel.processToolIconVisibilityStateFlow.value) {
       processBarView?.isGone = true
     } else {
       processBarView?.isVisible = true
