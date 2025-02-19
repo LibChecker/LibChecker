@@ -24,6 +24,7 @@
   <string name="uncharted_territory">Territory tidak terpetakan</string>
   <string name="get_app_list_denied_tip">Tolong izinkan\n\"Dapatkan info tentang aplikasi yang terinstal\"\nizin untuk LibChecker</string>
   <string name="advanced_menu">Menu Lanjutan</string>
+  <string name="archived_app">Archived app</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">Aplikasi dengan ABI %s</string>
   <string name="title_statistics_dialog_no_native_libs">Aplikasi tanpa library native</string>
