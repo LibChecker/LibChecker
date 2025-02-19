@@ -24,6 +24,7 @@
   <string name="uncharted_territory">منطقة مجهولة</string>
   <string name="get_app_list_denied_tip">الرجاء منح إذن \n \"الحصول على معلومات حول التطبيقات المثبتة\" \n  لـLibChecker</string>
   <string name="advanced_menu">قائمة متقدمة</string>
+  <string name="archived_app">Archived app</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">التطبيقات ذات %s ABI</string>
   <string name="title_statistics_dialog_no_native_libs">تطبيقات بدون مكتبات أصلية</string>
