@@ -24,6 +24,7 @@
   <string name="uncharted_territory">Keşfedilmemiş bölge</string>
   <string name="get_app_list_denied_tip">Lütfen LibChecker\'a\n\"Yüklü uygulamalar hakkında bilgi al\"\niznini verin</string>
   <string name="advanced_menu">Gelişmiş Menü</string>
+  <string name="archived_app">Archived app</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">%s ABI\'ye sahip uygulamalar</string>
   <string name="title_statistics_dialog_no_native_libs">Yerel kütüphanesi olmayan uygulamalar</string>
