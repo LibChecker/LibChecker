@@ -122,7 +122,6 @@ class DetailViewModel : ViewModel() {
 
     if (sourceMap.isNotEmpty()) {
       processMapStateFlow.emit(sourceMap)
-      processToolIconVisibilityStateFlow.emit(true)
     }
 
     nativeLibTabs.emit(allNativeLibItems.keys)
@@ -571,6 +570,11 @@ class DetailViewModel : ViewModel() {
 
   fun updateProcessMap(map: Map<String, Int>) = viewModelScope.launch {
     processMapStateFlow.emit(map)
+    if (map.isEmpty()) {
+      processToolIconVisibilityStateFlow.emit(false)
+    } else {
+      processToolIconVisibilityStateFlow.emit(true)
+    }
   }
 
   fun updateProcessToolIconVisibility(visible: Boolean) = viewModelScope.launch {
