@@ -24,6 +24,7 @@
   <string name="uncharted_territory">Недосліджена територія</string>
   <string name="get_app_list_denied_tip">Будь ласка надайте\nLibChecker дозвіл отримати\nінформацію про встановлені додатки</string>
   <string name="advanced_menu">Дополнительное меню</string>
+  <string name="archived_app">Archived app</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">Додатки з %s ABI</string>
   <string name="title_statistics_dialog_no_native_libs">Додатки без нативных бібліотек</string>
