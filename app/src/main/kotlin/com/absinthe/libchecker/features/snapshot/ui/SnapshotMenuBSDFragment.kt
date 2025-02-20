@@ -6,6 +6,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.SnapshotOptions
 import com.absinthe.libchecker.features.snapshot.ui.view.SnapshotMenuBSDView
 import com.absinthe.libchecker.features.snapshot.ui.view.SnapshotMenuItemView
+import com.absinthe.libchecker.utils.extensions.supportIECUnit
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
@@ -25,7 +26,10 @@ class SnapshotMenuBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotMenuBS
     optionsViewMap[SnapshotOptions.SHOW_UPDATE_TIME] = root.addOptionItemView(R.string.snapshot_menu_show_update_time, SnapshotOptions.SHOW_UPDATE_TIME)
     optionsViewMap[SnapshotOptions.HIDE_NO_COMPONENT_CHANGES] = root.addOptionItemView(R.string.snapshot_menu_hide_no_component_changes, SnapshotOptions.HIDE_NO_COMPONENT_CHANGES)
     optionsViewMap[SnapshotOptions.DIFF_HIGHLIGHT] = root.addOptionItemView(R.string.snapshot_menu_diff_highlight, SnapshotOptions.DIFF_HIGHLIGHT)
-    optionsViewMap[SnapshotOptions.USE_IEC_UNITS] = root.addOptionItemView(R.string.snapshot_menu_use_iec_units, SnapshotOptions.USE_IEC_UNITS)
+    if (supportIECUnit) {
+      optionsViewMap[SnapshotOptions.USE_IEC_UNITS] =
+        root.addOptionItemView(R.string.snapshot_menu_use_iec_units, SnapshotOptions.USE_IEC_UNITS)
+    }
 
     optionsViewMap[SnapshotOptions.SHOW_UPDATE_TIME]?.setOnCheckedChangeCallback {
       root.updateDemoView()
