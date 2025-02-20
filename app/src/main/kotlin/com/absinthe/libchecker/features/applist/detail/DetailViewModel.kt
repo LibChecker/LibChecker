@@ -50,6 +50,7 @@ import com.absinthe.libchecker.utils.extensions.getRxKotlinVersion
 import com.absinthe.libchecker.utils.extensions.getSignatures
 import com.absinthe.libchecker.utils.extensions.getStatefulPermissionsList
 import com.absinthe.libchecker.utils.extensions.is16KBAligned
+import com.absinthe.libchecker.utils.extensions.isPageSizeCompat
 import com.absinthe.libchecker.utils.extensions.isUseKMP
 import com.absinthe.libchecker.utils.extensions.toClassDefType
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
@@ -540,6 +541,10 @@ class DetailViewModel : ViewModel() {
       }.onFailure {
         Timber.e(it)
       }
+    }
+
+    if (OsUtils.atLeastBaklava() && packageInfo.isPageSizeCompat()) {
+      _featuresFlow.emit(VersionedFeature(Features.Ext.ELF_PAGE_SIZE_16KB_COMPAT))
     }
 
     packageInfo.applicationInfo?.sourceDir?.let { sourceDir ->

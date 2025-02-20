@@ -17,5 +17,6 @@ object Features {
     const val APPLICATION_PROP = -1 shl 0
     const val APPLICATION_INSTALL_SOURCE = -1 shl 1
     const val ELF_PAGE_SIZE_16KB = -1 shl 2
+    const val ELF_PAGE_SIZE_16KB_COMPAT = -1 shl 3
   }
 }
