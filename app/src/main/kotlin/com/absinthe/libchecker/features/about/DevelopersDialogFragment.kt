@@ -41,12 +41,6 @@ class DevelopersDialogFragment : BaseBottomSheetViewDialogFragment<DevelopersDia
         R.drawable.pic_qhy040404
       ),
       DeveloperInfo(
-        "KR LHY",
-        "Bug Fix",
-        "https://github.com/KRLHY",
-        R.drawable.pic_krlhy
-      ),
-      DeveloperInfo(
         "Source Code",
         URLManager.GITHUB_REPO_PAGE,
         URLManager.GITHUB_REPO_PAGE,

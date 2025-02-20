@@ -105,6 +105,14 @@ object AboutPageBuilder {
                 .append("[")
                 .append(getHyperLink("https://t.me/Flyzc"))
                 .append("]")
+                .append("<br>")
+              contributors.append("Bug Fix: ")
+                .append("<b>")
+                .append("KR LHY")
+                .append("</b>")
+                .append("[")
+                .append(getHyperLink("https://github.com/KRLHY"))
+                .append("]")
               showAlertDialog(context, "Contributors", contributors)
             }
 
