@@ -179,6 +179,17 @@ object FeaturesDialog {
     )
   }
 
+  fun show16KBCompatDialog(context: Context) {
+    commonShowDialogImpl(
+      context,
+      R.drawable.ic_16kb_compat,
+      R.string.lib_detail_dialog_title_16kb_page_size_compat,
+      R.string.lib_detail_dialog_content_16kb_page_size_compat,
+      version = null,
+      sourceLink = "https://source.android.com/docs/core/architecture/16kb-page-size/16kb-backcompat-option"
+    )
+  }
+
   fun showMultiArchDialog(context: Context) {
     commonShowDialogImpl(
       context,
@@ -234,7 +245,7 @@ object FeaturesDialog {
     val dialog = BaseAlertDialogBuilder(context)
       .setIcon(icon)
       .setTitle(titleRes)
-      .setMessage(messageRes)
+      .setMessage(HtmlCompat.fromHtml(context.getString(messageRes), HtmlCompat.FROM_HTML_MODE_COMPACT))
       .setPositiveButton(android.R.string.ok, null)
 
     versionInfo?.let { info ->
