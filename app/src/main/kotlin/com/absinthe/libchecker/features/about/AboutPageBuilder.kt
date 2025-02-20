@@ -1,9 +1,15 @@
 package com.absinthe.libchecker.features.about
 
 import android.content.Context
+import android.graphics.Color
+import android.text.method.LinkMovementMethod
+import android.util.TypedValue
 import android.view.ContextThemeWrapper
+import android.view.Gravity
 import android.view.View
+import android.widget.LinearLayout.LayoutParams
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -11,6 +17,7 @@ import androidx.fragment.app.findFragment
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
+import com.absinthe.libchecker.utils.extensions.dp
 import com.mikepenz.aboutlibraries.LibsBuilder
 import com.mikepenz.aboutlibraries.LibsConfiguration
 import com.mikepenz.aboutlibraries.entity.Library
@@ -98,17 +105,7 @@ object AboutPageBuilder {
                 .append("[")
                 .append(getHyperLink("https://t.me/Flyzc"))
                 .append("]")
-              BaseAlertDialogBuilder(context)
-                .setIcon(R.drawable.ic_team)
-                .setTitle("Contributors")
-                .setMessage(
-                  HtmlCompat.fromHtml(
-                    contributors.toString(),
-                    HtmlCompat.FROM_HTML_MODE_LEGACY
-                  )
-                )
-                .setPositiveButton(android.R.string.ok, null)
-                .show()
+              showAlertDialog(context, "Credits", contributors)
             }
 
             SpecialButton.SPECIAL3 -> {
@@ -131,18 +128,7 @@ object AboutPageBuilder {
                 .append("<br>")
               content.append("<b>").append("Privacy Policy").append("</b>").append("<br>")
               content.append(getHyperLink("https://absinthe.life/LibChecker-Docs/guide/PRIVACY/"))
-
-              BaseAlertDialogBuilder(context)
-                .setIcon(R.drawable.ic_content)
-                .setTitle("Credits")
-                .setMessage(
-                  HtmlCompat.fromHtml(
-                    content.toString(),
-                    HtmlCompat.FROM_HTML_MODE_LEGACY
-                  )
-                )
-                .setPositiveButton(android.R.string.ok, null)
-                .show()
+              showAlertDialog(context, "Credits", content)
             }
           }
           return true
@@ -177,6 +163,31 @@ object AboutPageBuilder {
       is AppCompatActivity -> context.supportFragmentManager
       is ContextThemeWrapper -> getFragmentManager(context.baseContext)
       else -> null
+    }
+  }
+
+  private fun showAlertDialog(context: Context, title: String, content: java.lang.StringBuilder) {
+    BaseAlertDialogBuilder(context).apply {
+      setIcon(R.drawable.ic_content)
+      setTitle(title)
+      setView(AppCompatTextView(context).apply {
+        layoutParams = LayoutParams(
+          LayoutParams.MATCH_PARENT,
+          LayoutParams.WRAP_CONTENT
+        ).also {
+          setPadding(24.dp, 16.dp, 24.dp, 0.dp)
+        }
+        movementMethod = LinkMovementMethod.getInstance()
+        highlightColor = Color.TRANSPARENT
+        gravity = Gravity.TOP or Gravity.START
+        setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+        text = HtmlCompat.fromHtml(
+          content.toString(),
+          HtmlCompat.FROM_HTML_MODE_LEGACY
+        )
+      })
+      setPositiveButton(android.R.string.ok, null)
+      show()
     }
   }
 }
