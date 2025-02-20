@@ -105,7 +105,7 @@ object AboutPageBuilder {
                 .append("[")
                 .append(getHyperLink("https://t.me/Flyzc"))
                 .append("]")
-              showAlertDialog(context, "Credits", contributors)
+              showAlertDialog(context, "Contributors", contributors)
             }
 
             SpecialButton.SPECIAL3 -> {
