@@ -55,6 +55,7 @@ class NativeLibItemView(context: Context) : AViewGroup(context) {
       )
       setPadding(0, 1.dp, 0, 1.dp)
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
+      setLineSpacing(2.dp.toFloat(), 1.2f)
       addView(this)
     }
 
