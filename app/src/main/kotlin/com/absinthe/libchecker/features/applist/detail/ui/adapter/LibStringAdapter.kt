@@ -27,6 +27,7 @@ import androidx.fragment.app.FragmentManager
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ET_DYN
+import com.absinthe.libchecker.annotation.ET_NOT_ELF
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
@@ -155,11 +156,8 @@ class LibStringAdapter(
 
       else -> {
         (holder.itemView as ComponentLibItemView).apply {
-          processLabelColor = if (item.item.process.isNullOrEmpty() || !processMode) {
-            -1
-          } else {
-            processMap[item.item.process] ?: UiUtils.getRandomColor()
-          }
+          processLabelColor = item.item.process.takeIf { !it.isNullOrEmpty() && processMode }
+            ?.let { processMap[it] ?: UiUtils.getRandomColor() } ?: -1
           setOrHighlightText(libName, itemName)
           if ((GlobalValues.itemAdvancedOptions and AdvancedOptions.SHOW_MARKED_LIB) > 0) {
             setChip(item.rule)
@@ -218,17 +216,20 @@ class LibStringAdapter(
       itemView.setChip(null)
     }
 
-    if (item.item.elfInfo.elfType != ET_DYN) {
-      val text = PackageUtils.elfTypeToString(item.item.elfInfo.elfType)
+    val elfInfo = item.item.elfInfo
+    if (elfInfo.elfType != ET_DYN) {
+      val text = PackageUtils.elfTypeToString(elfInfo.elfType)
       itemView.libSize.append(createNativeLabelSpan(text))
     }
-    if (item.item.elfInfo.pageSize % PAGE_SIZE_16_KB == 0) {
-      val text = "16 KB"
-      itemView.libSize.append(createNativeLabelSpan(text))
-    }
-    if (item.item.elfInfo.uncompressedAndNot16KB) {
-      val text = "NON 16 KB STORED"
-      itemView.libSize.append(createNativeLabelSpan(text))
+    if (elfInfo.elfType != ET_NOT_ELF) {
+      if (elfInfo.pageSize % PAGE_SIZE_16_KB == 0) {
+        val text = "16 KB"
+        itemView.libSize.append(createNativeLabelSpan(text))
+      }
+      if (elfInfo.uncompressedAndNot16KB) {
+        val text = "NON 16 KB STORED"
+        itemView.libSize.append(createNativeLabelSpan(text))
+      }
     }
   }
 
@@ -390,7 +391,7 @@ class LibStringAdapter(
   }
 
   private fun createNativeLabelSpan(text: String): SpannedString = buildSpannedString {
-    append(" ")
+    append(" $text ")
     val capsuleDrawable = CapsuleDrawable(
       context = context,
       text = text,
@@ -403,7 +404,6 @@ class LibStringAdapter(
     )
     capsuleDrawable.setBounds(0, 0, capsuleDrawable.intrinsicWidth, capsuleDrawable.intrinsicHeight)
     val span = CenterAlignImageSpan(capsuleDrawable)
-    setSpan(span, 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-    append(" ")
+    setSpan(span, 1, 1 + text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
   }
 }
