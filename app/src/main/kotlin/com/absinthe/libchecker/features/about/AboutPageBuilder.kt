@@ -113,7 +113,7 @@ object AboutPageBuilder {
                 .append("[")
                 .append(getHyperLink("https://github.com/KRLHY"))
                 .append("]")
-              showAlertDialog(context, "Contributors", contributors)
+              showAlertDialog(context, R.drawable.ic_team, "Contributors", contributors)
             }
 
             SpecialButton.SPECIAL3 -> {
@@ -136,7 +136,7 @@ object AboutPageBuilder {
                 .append("<br>")
               content.append("<b>").append("Privacy Policy").append("</b>").append("<br>")
               content.append(getHyperLink("https://absinthe.life/LibChecker-Docs/guide/PRIVACY/"))
-              showAlertDialog(context, "Credits", content)
+              showAlertDialog(context, R.drawable.ic_content, "Credits", content)
             }
           }
           return true
@@ -174,9 +174,9 @@ object AboutPageBuilder {
     }
   }
 
-  private fun showAlertDialog(context: Context, title: String, content: StringBuilder) {
+  private fun showAlertDialog(context: Context, iconRes: Int, title: String, content: StringBuilder) {
     BaseAlertDialogBuilder(context).apply {
-      setIcon(R.drawable.ic_content)
+      setIcon(iconRes)
       setTitle(title)
       setView(
         AppCompatTextView(context).apply {
