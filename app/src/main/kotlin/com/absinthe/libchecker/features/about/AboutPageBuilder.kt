@@ -166,7 +166,7 @@ object AboutPageBuilder {
     }
   }
 
-  private fun showAlertDialog(context: Context, title: String, content: java.lang.StringBuilder) {
+  private fun showAlertDialog(context: Context, title: String, content: StringBuilder) {
     BaseAlertDialogBuilder(context).apply {
       setIcon(R.drawable.ic_content)
       setTitle(title)
