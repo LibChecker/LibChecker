@@ -20,6 +20,10 @@ import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
 import com.absinthe.libchecker.api.request.LibDetailRequest
 import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.constant.AbilityType
+import com.absinthe.libchecker.constant.Constants.ERROR
+import com.absinthe.libchecker.constant.Constants.MULTI_ARCH
+import com.absinthe.libchecker.constant.Constants.NO_LIBS
+import com.absinthe.libchecker.constant.Constants.OVERLAY
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.Features
@@ -35,6 +39,7 @@ import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
+import com.absinthe.libchecker.utils.extensions.ABI_STRING_MAP
 import com.absinthe.libchecker.utils.extensions.getAGPVersion
 import com.absinthe.libchecker.utils.extensions.getFeatures
 import com.absinthe.libchecker.utils.extensions.getJetpackComposeVersion
@@ -58,6 +63,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ohos.bundle.AbilityInfo
@@ -107,26 +114,36 @@ class DetailViewModel : ViewModel() {
     return this::packageInfo.isInitialized
   }
 
-  fun initSoAnalysisData() = viewModelScope.launch(Dispatchers.IO) {
-    val sourceSet = hashSetOf<String>()
+  private var initSoAnalysisJob: Job? = null
 
-    try {
-      allNativeLibItems = PackageUtils.getSourceLibs(packageInfo)
-    } catch (e: PackageManager.NameNotFoundException) {
-      Timber.e(e)
-    }
+  fun initSoAnalysisData() {
+    if (initSoAnalysisJob != null) return
+    initSoAnalysisJob = viewModelScope.launch(Dispatchers.IO) {
+      val sourceSet = hashSetOf<String>()
 
-    val sourceMap = sourceSet.filter { source -> source.isNotEmpty() }
-      .associateWith { UiUtils.getRandomColor() }
-    nativeSourceMap = sourceMap
+      val abi = (abiBundleStateFlow.value ?: abiBundleStateFlow.filterNotNull().first()).abi
+      val specifiedAbi = if (abi == ERROR || abi == NO_LIBS || abi == OVERLAY) abi else null
+      allNativeLibItems = PackageUtils.getSourceLibs(packageInfo, specifiedAbi = specifiedAbi)
 
-    if (sourceMap.isNotEmpty()) {
-      processMapStateFlow.emit(sourceMap)
-    }
+      // TODO
+      val sourceMap = sourceSet.filter { source -> source.isNotEmpty() }
+        .associateWith { UiUtils.getRandomColor() }
+      nativeSourceMap = sourceMap
 
-    nativeLibTabs.emit(allNativeLibItems.keys)
-    if (allNativeLibItems.isEmpty()) {
-      nativeLibItems.emit(emptyList())
+      if (sourceMap.isNotEmpty()) {
+        processMapStateFlow.emit(sourceMap)
+      }
+
+      nativeLibTabs.emit(allNativeLibItems.keys)
+      if (allNativeLibItems.isEmpty()) {
+        nativeLibItems.emit(emptyList())
+      }
+
+      allNativeLibItems[ABI_STRING_MAP[abi % MULTI_ARCH]]?.let {
+        if (packageInfo.is16KBAligned(libs = it, isApk = isApk)) {
+          _featuresFlow.emit(VersionedFeature(Features.Ext.ELF_PAGE_SIZE_16KB))
+        }
+      }
     }
   }
 
@@ -523,10 +540,6 @@ class DetailViewModel : ViewModel() {
       }.onFailure {
         Timber.e(it)
       }
-    }
-
-    if (packageInfo.is16KBAligned(isApk)) {
-      _featuresFlow.emit(VersionedFeature(Features.Ext.ELF_PAGE_SIZE_16KB))
     }
 
     packageInfo.applicationInfo?.sourceDir?.let { sourceDir ->
