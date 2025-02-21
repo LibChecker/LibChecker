@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <!--  General  -->
-  <string name="title_app_list">Configurações de apps</string>
-  <string name="title_statistics">Atividade</string>
+  <string name="title_app_list">Aplicativos</string>
+  <string name="title_statistics">Estatísticas</string>
   <string name="title_snapshot">Captura de tela</string>
-  <string name="title_settings">Definições</string>
-  <string name="title_album">álbuns</string>
+  <string name="title_settings">Configurações</string>
+  <string name="title_album">Álbum</string>
   <string name="loading">Carregando!!!</string>
   <string name="channel_shoot">Salvar fotos</string>
   <string name="noti_shoot_title">Salvando snapshot atual</string>

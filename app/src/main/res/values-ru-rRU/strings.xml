@@ -171,7 +171,7 @@
   <string name="lib_detail_app_first_installed_time">Время первой установки: </string>
   <string name="lib_detail_app_last_updated_time">Время последней установки: </string>
   <string name="lib_detail_app_install_source_empty">Неизвестно</string>
-  <string name="lib_detail_app_install_source_empty_detail">adb или удаленное приложение</string>
+  <string name="lib_detail_app_install_source_empty_detail">Shell или удаленное приложение</string>
   <string name="lib_detail_app_install_source_shizuku_usage">Поскольку Android ограничивает API запроса на установку, мы используем Shizuku для его получения.</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizuku не установлен</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">Нажмите здесь, чтобы установить Shizuku</string>
