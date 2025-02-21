@@ -24,6 +24,7 @@
   <string name="uncharted_territory">Keşfedilmemiş bölge</string>
   <string name="get_app_list_denied_tip">Lütfen LibChecker\'a\n\"Yüklü uygulamalar hakkında bilgi al\"\niznini verin</string>
   <string name="advanced_menu">Gelişmiş Menü</string>
+  <string name="archived_app">Archived app</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">%s ABI\'ye sahip uygulamalar</string>
   <string name="title_statistics_dialog_no_native_libs">Yerel kütüphanesi olmayan uygulamalar</string>
@@ -124,10 +125,13 @@
   <string name="pwa_details">Progressive Web Apps (PWA\'lar), gelişmiş yetenekler, güvenilirlik ve yüklenebilirlik sunmak için modern API\'lerle oluşturulur ve geliştirilir ve tek bir kod tabanıyla herhangi bir cihazda herkese ulaşır.</string>
   <string name="jetpack_compose_details">Jetpack Compose, Android\'in yerel kullanıcı arayüzü oluşturmak için modern araç setidir. Android\'de kullanıcı arayüzü geliştirmeyi basitleştirir ve hızlandırır. Daha az kod, güçlü araçlar ve sezgisel Kotlin API\'leri ile uygulamanızı hızlıca hayata geçirin.</string>
   <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform, JetBrains tarafından geliştirilen modern, deklaratif ve tepkisel bir UI (kullanıcı arayüzü) framework\'üdür. Az miktarda Kotlin kodu ile kullanıcı arayüzleri oluşturmanın basit bir yolunu sunar. Ayrıca, kullanıcı arayüzünüzü bir kez yazıp desteklenen tüm platformlarda – iOS, Android, masaüstü (Windows, macOS, Linux) ve web – çalıştırmanıza olanak tanır.</string>
+  <string name="multi_arch_dialog_details"><![CDATA[If an app exposes an API to other apps that can be either 32 bit or 64 bit, the app must have the <b>android:multiarch</b> property set to true within its manifest to avoid potential errors.]]></string>
   <string name="extract_native_libs_tip">Uygulama şunu beyan eder: </string>
   <string name="xml_detail">XML Ayrıntısı</string>
   <string name="lib_detail_dialog_title_16kb_page_size">16 KB Sayfa Boyutu</string>
   <string name="lib_detail_dialog_content_16kb_page_size">Tarihsel olarak, Android yalnızca 4 KB bellek sayfa boyutlarını desteklemiş ve bu da Android cihazların tipik olarak sahip olduğu ortalama toplam bellek miktarı için sistem belleği performansını optimize etmiştir. Android 15\'ten itibaren AOSP, 16 KB sayfa boyutu (16 KB cihazlar) kullanacak şekilde yapılandırılmış cihazları desteklemektedir. Uygulamanız doğrudan veya dolaylı olarak bir SDK aracılığıyla herhangi bir NDK kütüphanesi kullanıyorsa, uygulamanızı bu 16 KB cihazlarda çalışması için yeniden oluşturmanız gerekecektir.</string>
+  <string name="lib_detail_dialog_title_16kb_page_size_compat">16 KB Backcompat</string>
+  <string name="lib_detail_dialog_content_16kb_page_size_compat"><![CDATA[Android 15 introduced support for 16 KB memory pages to optimize performance of the platform. Android 16 adds a compatibility mode, allowing some apps built for 4 KB memory pages to run on a device configured for 16 KB memory pages.\n\nIf Android detects that your app has 4 KB aligned memory pages, it automatically uses compatibility mode and display a notification dialog to the user. Setting the <b>android:pageSizeCompat</b> property in the <b>AndroidManifest.xml</b> to enable the backwards compatibility mode will prevent the display of the dialog when your app launches. For best performance, reliability, and stability, your app should still be 16 KB aligned.]]></string>
   <string name="format_last_updated">Güncellenme zamanı: %s</string>
   <string name="menu_process">İşlem</string>
   <string name="menu_split">Böl</string>
@@ -275,4 +279,5 @@
   <string name="snapshot_menu_show_update_time">Güncelleme Zamanını Göster</string>
   <string name="snapshot_menu_hide_no_component_changes">Bileşen Değişikliği Olmayanları Gizle</string>
   <string name="snapshot_menu_diff_highlight">Fark Vurgusu</string>
+  <string name="snapshot_menu_use_iec_units">Use IEC Units</string>
 </resources>

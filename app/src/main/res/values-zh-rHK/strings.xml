@@ -24,6 +24,7 @@
   <string name="uncharted_territory">未知領域</string>
   <string name="get_app_list_denied_tip">請授予 LibChecker\n「讀取應用程式清單」\n權限</string>
   <string name="advanced_menu">進階選單</string>
+  <string name="archived_app">Archived app</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">%s架構的應用程式</string>
   <string name="title_statistics_dialog_no_native_libs">無原生庫的應用程式</string>
@@ -49,9 +50,13 @@
   <string name="string_kotlin_unused">未使用 Kotlin</string>
   <string name="string_compose_used">已使用 Jetpack Compose</string>
   <string name="string_compose_unused">未使用 Jetpack Compose</string>
+  <string name="android_dist_label">分布</string>
   <string name="android_dist_source">來源</string>
   <string name="android_dist_title">Android 版本發佈統計資料</string>
   <string name="android_dist_subtitle_format">更新時間：%s</string>
+  <string name="chart_abi_detailed">詳細</string>
+  <string name="chart_abi_concise">簡潔</string>
+  <string name="chart_item_not_support">不支持</string>
   <!--  About  -->
   <string name="settings_about">關於</string>
   <string name="settings_about_summary">這裡是 LibChecker！</string>
@@ -61,6 +66,9 @@
   <string name="settings_rate_us_summary">這可以使我們被更多的人發現</string>
   <string name="settings_get_updates">取得更新</string>
   <string name="settings_get_updates_summary">取得更加穩定並具有更多功能的最新版本</string>
+  <string name="settings_get_updates_in_app">In-app</string>
+  <string name="settings_get_updates_in_app_chip_stable">穩定版</string>
+  <string name="settings_get_updates_in_app_chip_ci">CI</string>
   <string name="about_info">本應用程式用於檢視裝置上的應用程式使用第三方程式庫的狀況。</string>
   <string name="toolbar_rate">評分</string>
   <string name="resource_declaration">應用程式中的部分資源來自於： </string>
@@ -116,8 +124,14 @@
   <string name="play_app_signing_details">借助 Play 應用程式簽署，Google 可以為您管理並保護您應用程式的簽署金鑰，並使用它對從您的 App bundle 產生的最佳化分配 APK 進行簽署。Play App Signing 將您的應用程式簽署金鑰儲存在 Google 的安全基礎結構中，並提供升級選項以提高安全性。</string>
   <string name="pwa_details">漸進式 Web 應用程式 (PWA) 使用現代 API 建置並增強，以提供增強的功能、可靠性和可安裝性，同時使用單個程式碼存放庫在任何裝置上存取任何人、任何位置。</string>
   <string name="jetpack_compose_details">Jetpack Compose 是 Android 的新型工具組，用於建置原生 UI。可簡化並加快 Android 平台上的 UI 開發作業。透過較少的程式碼、強大的工具和直觀的 Kotlin API，快速將應用程式上架。</string>
+  <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform is a modern declarative and reactive UI framework developed by JetBrains that provides a simple way to build user interfaces with a small amount of Kotlin code. It also allows you to write your UI once and run it on any of the supported platforms – iOS, Android, desktop (Windows, macOS, Linux), and web.</string>
+  <string name="multi_arch_dialog_details"><![CDATA[If an app exposes an API to other apps that can be either 32 bit or 64 bit, the app must have the <b>android:multiarch</b> property set to true within its manifest to avoid potential errors.]]></string>
   <string name="extract_native_libs_tip">此應用程式宣告了 </string>
   <string name="xml_detail">XML 詳細資料</string>
+  <string name="lib_detail_dialog_title_16kb_page_size">16 KB Page Size Support</string>
+  <string name="lib_detail_dialog_content_16kb_page_size">Historically, Android has only supported 4 KB memory page sizes, which has optimized system memory performance for the average amount of total memory that Android devices have typically had. Beginning with Android 15, AOSP supports devices that are configured to use a page size of 16 KB (16 KB devices). If your app uses any NDK libraries, either directly or indirectly through an SDK, then you will need to rebuild your app for it to work on these 16 KB devices.</string>
+  <string name="lib_detail_dialog_title_16kb_page_size_compat">16 KB Backcompat</string>
+  <string name="lib_detail_dialog_content_16kb_page_size_compat"><![CDATA[Android 15 introduced support for 16 KB memory pages to optimize performance of the platform. Android 16 adds a compatibility mode, allowing some apps built for 4 KB memory pages to run on a device configured for 16 KB memory pages.\n\nIf Android detects that your app has 4 KB aligned memory pages, it automatically uses compatibility mode and display a notification dialog to the user. Setting the <b>android:pageSizeCompat</b> property in the <b>AndroidManifest.xml</b> to enable the backwards compatibility mode will prevent the display of the dialog when your app launches. For best performance, reliability, and stability, your app should still be 16 KB aligned.]]></string>
   <string name="format_last_updated">最近更新：%s</string>
   <string name="menu_process">處理程序</string>
   <string name="menu_split">分割</string>
@@ -157,8 +171,11 @@
   <string name="lib_detail_app_install_source_title">安裝來源</string>
   <string name="lib_detail_app_install_source_originating_package">安裝要求者</string>
   <string name="lib_detail_app_install_source_installing_package">安裝執行程式</string>
+  <string name="lib_detail_app_installed_time">安裝時間</string>
+  <string name="lib_detail_app_first_installed_time">First installed time: </string>
+  <string name="lib_detail_app_last_updated_time">Last installed time: </string>
   <string name="lib_detail_app_install_source_empty">未知</string>
-  <string name="lib_detail_app_install_source_empty_detail">ADB 或已解除安裝的應用程式</string>
+  <string name="lib_detail_app_install_source_empty_detail">Shell 或已解除安裝的應用程式</string>
   <string name="lib_detail_app_install_source_shizuku_usage">因為 Android 限制了取得安裝要求者的 API，我們使用 Shizuku 以取得安裝要求者。</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizuku 尚未安裝</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">按一下這裡以安裝 Shizuku</string>
@@ -175,6 +192,7 @@
   <string name="toast_cant_open_app">無法啟動此應用程式</string>
   <string name="toast_cloud_rules_update_error">無法更新雲端規則，請再試一次</string>
   <string name="toast_not_enough_storage_space">儲存空間不足</string>
+  <string name="toast_downloading_app">已要求下載</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">儲存目前快照</string>
   <string name="snapshot_current_timestamp">目前快照時間戳記</string>
@@ -213,6 +231,9 @@
   <string name="album_item_comparison_choose_local_apk">選擇本機 APK</string>
   <string name="album_item_management_title">管理</string>
   <string name="album_item_management_subtitle">管理所有快照</string>
+  <string name="album_item_management_snapshot_auto_remove_default_title">Keep Only the Most Recent Snapshots</string>
+  <string name="album_item_management_snapshot_auto_remove_specific_title">Keep Only the %d Most Recent Items</string>
+  <string name="album_item_management_snapshot_auto_remove_desc">Starting from tapping \"%s\", only the most recent snapshots will be retained, and the older snapshots will be automatically deleted.</string>
   <string name="album_item_backup_restore_title">備份與還原</string>
   <string name="album_item_backup_restore_subtitle">備份與還原快照</string>
   <string name="album_item_track_title">追蹤</string>
@@ -224,6 +245,7 @@
   <string name="album_restore_detail">%1$s：總計 %2$s 個項目\n</string>
   <string name="album_click_to_choose">按下以選擇</string>
   <string name="album_dialog_delete_snapshot_message">處理中…</string>
+  <string name="album_snapshot_top_apps_not_initialized">尚未加载</string>
   <!--  Integration  -->
   <string name="integration_monkey_king_menu_block">使用「大聖淨化」封鎖此元件</string>
   <string name="integration_monkey_king_menu_unblock">使用「大聖淨化」解除封鎖此元件</string>
@@ -257,4 +279,5 @@
   <string name="snapshot_menu_show_update_time">顯示更新時間</string>
   <string name="snapshot_menu_hide_no_component_changes">隱藏沒有元件變更</string>
   <string name="snapshot_menu_diff_highlight">重點標示差異</string>
+  <string name="snapshot_menu_use_iec_units">Use IEC Units</string>
 </resources>
