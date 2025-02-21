@@ -123,7 +123,7 @@ class DetailViewModel : ViewModel() {
 
       val abi = (abiBundleStateFlow.value ?: abiBundleStateFlow.filterNotNull().first()).abi
       val specifiedAbi = if (abi == ERROR || abi == NO_LIBS || abi == OVERLAY) abi else null
-      allNativeLibItems = PackageUtils.getSourceLibs(packageInfo, specifiedAbi = specifiedAbi)
+      allNativeLibItems = PackageUtils.getSourceLibs(packageInfo, specifiedAbi = specifiedAbi, parseElf = true)
 
       // TODO
       val sourceMap = sourceSet.filter { source -> source.isNotEmpty() }
@@ -531,7 +531,7 @@ class DetailViewModel : ViewModel() {
 
     _featuresFlow.emit(VersionedFeature(Features.Ext.APPLICATION_PROP))
 
-    if (OsUtils.atLeastR()) {
+    if (OsUtils.atLeastR() && !isApk) {
       runCatching {
         val info = PackageUtils.getInstallSourceInfo(packageInfo.packageName)
         if (info?.installingPackageName != null) {

@@ -767,7 +767,8 @@ fun PackageInfo.is16KBAligned(libs: List<LibStringItem>? = null, isApk: Boolean 
     val abiString = ABI_STRING_MAP[abi % MULTI_ARCH]
     PackageUtils.getSourceLibs(
       packageInfo = this,
-      specifiedAbi = abi
+      specifiedAbi = abi,
+      parseElf = true
     )[abiString] ?: emptyList()
   }
 

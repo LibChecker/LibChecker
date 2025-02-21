@@ -28,7 +28,6 @@ import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE
 import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE_END
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.database.Repositories
@@ -54,10 +53,8 @@ import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -271,13 +268,6 @@ class HomeViewModel : ViewModel() {
     timeRecorder.end()
     Timber.d("Request change: END, $timeRecorder")
     updateAppListStatus(STATUS_NOT_START)
-
-    if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.HAS_COLLECT_LIB)) {
-      if (!isActive) return@launch
-      delay(10000)
-      collectPopularLibraries(appMap)
-      Once.markDone(OnceTag.HAS_COLLECT_LIB)
-    }
   }
 
   private fun generateLCItemFromPackageInfo(
