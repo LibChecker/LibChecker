@@ -8,6 +8,7 @@ import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout.LayoutParams
+import android.widget.ScrollView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.text.HtmlCompat
@@ -179,21 +180,27 @@ object AboutPageBuilder {
       setIcon(iconRes)
       setTitle(title)
       setView(
-        AppCompatTextView(context).apply {
+        ScrollView(context).apply{
           layoutParams = LayoutParams(
             LayoutParams.MATCH_PARENT,
             LayoutParams.WRAP_CONTENT
           ).also {
             setPadding(24.dp, 16.dp, 24.dp, 0.dp)
           }
-          movementMethod = LinkMovementMethod.getInstance()
-          highlightColor = Color.TRANSPARENT
-          gravity = Gravity.TOP or Gravity.START
-          setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-          text = HtmlCompat.fromHtml(
-            content.toString(),
-            HtmlCompat.FROM_HTML_MODE_LEGACY
-          )
+          addView(AppCompatTextView(context).apply {
+            layoutParams = LayoutParams(
+              LayoutParams.MATCH_PARENT,
+              LayoutParams.WRAP_CONTENT
+            )
+            movementMethod = LinkMovementMethod.getInstance()
+            highlightColor = Color.TRANSPARENT
+            gravity = Gravity.TOP or Gravity.START
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+            text = HtmlCompat.fromHtml(
+              content.toString(),
+              HtmlCompat.FROM_HTML_MODE_LEGACY
+            )
+          })
         }
       )
       setPositiveButton(android.R.string.ok, null)
