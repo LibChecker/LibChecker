@@ -286,7 +286,8 @@ object PackageUtils {
     if (file.exists().not()) {
       return emptyMap()
     }
-    val sourceDir = specifiedAbi?.let { "lib" + File.separator + ABI_STRING_MAP[it % MULTI_ARCH] }
+    val libDir = "lib"
+    val sourceDir = specifiedAbi?.let { libDir + File.separator + ABI_STRING_MAP[it % MULTI_ARCH] }
     val map = mutableMapOf<String, MutableList<LibStringItem>>()
     FileInputStream(file).use { input ->
       ZipArchiveInputStream(input).use { zipInput ->
@@ -301,9 +302,12 @@ object PackageUtils {
               }
               continue
             }
-            encounteredLibsDir = true
-            val dir = STRING_ABI_MAP.keys.find { entry.name.startsWith("lib" + File.separator + it) }
-              ?: if (entry.name.split(File.separator).first() == "assets") "assets" else continue
+            val pathFirst = entry.name.split(File.separator).first()
+            if (pathFirst == libDir) {
+              encounteredLibsDir = true
+            }
+            val dir = STRING_ABI_MAP.keys.find { entry.name.startsWith(libDir + File.separator + it) }
+              ?: if (pathFirst == "assets") "assets" else continue
             val currentEntryUncompressedAndNot16KB = entry.method == ZipEntry.STORED && zipInput.bytesRead % PAGE_SIZE_16_KB != 0L
             val elfParser = runCatching { ELFParser(zipInput) }.getOrNull()
             val libSize = entry.size.takeIf { it != ZipArchiveEntry.SIZE_UNKNOWN } ?: elfParser?.getElfFileSize() ?: ZipArchiveEntry.SIZE_UNKNOWN
