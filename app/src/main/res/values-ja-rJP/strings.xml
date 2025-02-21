@@ -38,7 +38,7 @@
   <string name="ref_category_service">サービス</string>
   <string name="ref_category_activity">アクティビティ</string>
   <string name="ref_category_br">ブロードキャストレシーバー</string>
-  <string name="ref_category_cp">コンテンツプロバイダー</string>
+  <string name="ref_category_cp">コンテンツプロバイダ</string>
   <string name="ref_category_perm">権限</string>
   <string name="ref_category_static">静的ライブラリ</string>
   <string name="ref_category_metadata">メタデータ</string>
