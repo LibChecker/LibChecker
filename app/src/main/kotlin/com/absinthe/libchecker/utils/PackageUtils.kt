@@ -267,7 +267,7 @@ object PackageUtils {
     return map
   }
 
-  private val regex_splits by lazy { Regex("split_config\\.(.*)\\.apk") }
+  private val regex_splits by lazy { Regex("split_(delivery|config)\\.?(.*)\\.apk") }
 
   /**
    * Get split apks dirs
