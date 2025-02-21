@@ -353,81 +353,81 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     }
 
     if (!viewModel.isApk) {
-    // Blocker
-    if (this is ComponentsAnalysisFragment && BlockerManager.isSupportInteraction) {
-      if (integrationBlockerList == null) {
-        integrationBlockerList =
-          BlockerManager().queryBlockedComponent(context, viewModel.packageInfo.packageName)
-      }
-      val blockerShouldBlock =
-        integrationBlockerList?.any { it.name == fullComponentName } == false
-      val blockStr = if (blockerShouldBlock) {
-        R.string.integration_blocker_menu_block
-      } else {
-        R.string.integration_blocker_menu_unblock
-      }
-      arrayAdapter.add(getString(blockStr))
-      actionMap[arrayAdapter.count - 1] = {
-        BlockerManager().apply {
-          addBlockedComponent(
-            context,
-            viewModel.packageInfo.packageName,
-            componentName,
-            type,
-            blockerShouldBlock
-          )
+      // Blocker
+      if (this is ComponentsAnalysisFragment && BlockerManager.isSupportInteraction) {
+        if (integrationBlockerList == null) {
           integrationBlockerList =
-            queryBlockedComponent(context, viewModel.packageInfo.packageName)
-          val shouldTurnToDisable =
-            integrationBlockerList?.any { it.name == fullComponentName } == true && blockerShouldBlock
-          animateTvTitle(position, shouldTurnToDisable)
+            BlockerManager().queryBlockedComponent(context, viewModel.packageInfo.packageName)
+        }
+        val blockerShouldBlock =
+          integrationBlockerList?.any { it.name == fullComponentName } == false
+        val blockStr = if (blockerShouldBlock) {
+          R.string.integration_blocker_menu_block
+        } else {
+          R.string.integration_blocker_menu_unblock
+        }
+        arrayAdapter.add(getString(blockStr))
+        actionMap[arrayAdapter.count - 1] = {
+          BlockerManager().apply {
+            addBlockedComponent(
+              context,
+              viewModel.packageInfo.packageName,
+              componentName,
+              type,
+              blockerShouldBlock
+            )
+            integrationBlockerList =
+              queryBlockedComponent(context, viewModel.packageInfo.packageName)
+            val shouldTurnToDisable =
+              integrationBlockerList?.any { it.name == fullComponentName } == true && blockerShouldBlock
+            animateTvTitle(position, shouldTurnToDisable)
+          }
         }
       }
-    }
 
-    // MonkeyKing Purify
-    if (this is ComponentsAnalysisFragment && MonkeyKingManager.isSupportInteraction) {
-      if (integrationMonkeyKingBlockList == null) {
-        integrationMonkeyKingBlockList =
-          MonkeyKingManager().queryBlockedComponent(context, viewModel.packageInfo.packageName)
+      // MonkeyKing Purify
+      if (this is ComponentsAnalysisFragment && MonkeyKingManager.isSupportInteraction) {
+        if (integrationMonkeyKingBlockList == null) {
+          integrationMonkeyKingBlockList =
+            MonkeyKingManager().queryBlockedComponent(context, viewModel.packageInfo.packageName)
+        }
+        val monkeyKingShouldBlock =
+          integrationMonkeyKingBlockList?.any { it.name == componentName } == false
+        if (monkeyKingShouldBlock) {
+          arrayAdapter.add(getString(R.string.integration_monkey_king_menu_block))
+        } else {
+          arrayAdapter.add(getString(R.string.integration_monkey_king_menu_unblock))
+        }
+        actionMap[arrayAdapter.count - 1] = {
+          MonkeyKingManager().apply {
+            addBlockedComponent(
+              context,
+              viewModel.packageInfo.packageName,
+              componentName,
+              type,
+              monkeyKingShouldBlock
+            )
+            integrationMonkeyKingBlockList =
+              queryBlockedComponent(context, viewModel.packageInfo.packageName)
+            val shouldTurnToDisable =
+              integrationMonkeyKingBlockList?.any { it.name == fullComponentName } == true && monkeyKingShouldBlock
+            animateTvTitle(position, shouldTurnToDisable)
+          }
+        }
       }
-      val monkeyKingShouldBlock =
-        integrationMonkeyKingBlockList?.any { it.name == componentName } == false
-      if (monkeyKingShouldBlock) {
-        arrayAdapter.add(getString(R.string.integration_monkey_king_menu_block))
-      } else {
-        arrayAdapter.add(getString(R.string.integration_monkey_king_menu_unblock))
-      }
-      actionMap[arrayAdapter.count - 1] = {
-        MonkeyKingManager().apply {
-          addBlockedComponent(
+
+      // Anywhere-
+      if (type == ACTIVITY && AnywhereManager.isSupportInteraction) {
+        arrayAdapter.add(getString(R.string.integration_anywhere_menu_editor))
+        actionMap[arrayAdapter.count - 1] = {
+          AnywhereManager().launchActivityEditor(
             context,
             viewModel.packageInfo.packageName,
-            componentName,
-            type,
-            monkeyKingShouldBlock
+            componentName
           )
-          integrationMonkeyKingBlockList =
-            queryBlockedComponent(context, viewModel.packageInfo.packageName)
-          val shouldTurnToDisable =
-            integrationMonkeyKingBlockList?.any { it.name == fullComponentName } == true && monkeyKingShouldBlock
-          animateTvTitle(position, shouldTurnToDisable)
         }
       }
     }
-
-    // Anywhere-
-    if (type == ACTIVITY && AnywhereManager.isSupportInteraction) {
-      arrayAdapter.add(getString(R.string.integration_anywhere_menu_editor))
-      actionMap[arrayAdapter.count - 1] = {
-        AnywhereManager().launchActivityEditor(
-          context,
-          viewModel.packageInfo.packageName,
-          componentName
-        )
-      }
-    }
-      }
 
     BaseAlertDialogBuilder(context)
       .setAdapter(arrayAdapter) { _, which ->

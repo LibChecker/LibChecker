@@ -3,6 +3,7 @@ package com.absinthe.libchecker.features.applist.detail.ui.view
 import android.content.Context
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
+import android.text.TextUtils
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
@@ -10,6 +11,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.children
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.utils.extensions.displayWidth
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.visibleHeight
@@ -52,33 +54,30 @@ class StaticLibItemView(context: Context) : AViewGroup(context) {
   private var chip: Chip? = null
 
   fun setChip(rule: Rule?) {
-    if (rule == null) {
-      chip?.let {
-        removeView(it)
-        chip = null
-      }
-    } else {
-      if (chip == null) {
-        chip = Chip(context).apply {
-          layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 48.dp)
-          addView(this)
-        }
-      }
-      chip!!.apply {
-        isClickable = false
-        text = rule.label
-        setChipIconResource(rule.iconRes)
+    chip = rule?.let {
+      getOrCreateChip().apply {
+        text = it.label
+        setChipIconResource(it.iconRes)
 
-        if (!GlobalValues.isColorfulIcon && !rule.isSimpleColorIcon) {
-          val icon = chipIcon
-          icon?.let {
-            it.colorFilter =
-              ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
-            chipIcon = it
+        if (!GlobalValues.isColorfulIcon && !it.isSimpleColorIcon) {
+          chipIcon?.let { icon ->
+            icon.colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
+            chipIcon = icon
           }
         }
       }
+    } ?: run {
+      chip?.let { removeView(it) }
+      null
     }
+  }
+
+  private fun getOrCreateChip() = chip ?: Chip(context).apply {
+    isClickable = false
+    layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 48.dp)
+    maxWidth = (context.displayWidth * 0.45f).toInt()
+    ellipsize = TextUtils.TruncateAt.MIDDLE
+    addView(this)
   }
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
