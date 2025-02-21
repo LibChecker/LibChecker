@@ -11,3 +11,7 @@ fun Int.roundUpToNearestTen(): Int {
     this + 10 - this % 10
   }
 }
+
+fun Long?.orZero(): Long {
+  return this ?: 0L
+}
