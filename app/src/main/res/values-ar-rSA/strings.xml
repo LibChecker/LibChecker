@@ -24,6 +24,7 @@
   <string name="uncharted_territory">منطقة مجهولة</string>
   <string name="get_app_list_denied_tip">الرجاء منح إذن \n \"الحصول على معلومات حول التطبيقات المثبتة\" \n  لـLibChecker</string>
   <string name="advanced_menu">قائمة متقدمة</string>
+  <string name="archived_app">Archived app</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">التطبيقات ذات %s ABI</string>
   <string name="title_statistics_dialog_no_native_libs">تطبيقات بدون مكتبات أصلية</string>
@@ -49,9 +50,13 @@
   <string name="string_kotlin_unused">لا يستخدم كوتلين</string>
   <string name="string_compose_used">يستخدم Jetpack Compose</string>
   <string name="string_compose_unused">لا يستخدم Jetpack Compose</string>
+  <string name="android_dist_label">Distribution</string>
   <string name="android_dist_source">المصدر</string>
   <string name="android_dist_title">إحصائيات توزيع إصدار الأندرويد</string>
   <string name="android_dist_subtitle_format">وقت التحديث: %s</string>
+  <string name="chart_abi_detailed">Detailed</string>
+  <string name="chart_abi_concise">Concise</string>
+  <string name="chart_item_not_support">Not Support</string>
   <!--  About  -->
   <string name="settings_about">حول</string>
   <string name="settings_about_summary">هذا هو LibChecker!</string>
@@ -61,6 +66,9 @@
   <string name="settings_rate_us_summary">هذا يمكن أن يزيد شعبيته عند المزيد من الناس</string>
   <string name="settings_get_updates">الحصول على التحديث</string>
   <string name="settings_get_updates_summary">الحصول على أحدث إصدار أكثر استقراراً ومعبأ بالمميزات</string>
+  <string name="settings_get_updates_in_app">In-app</string>
+  <string name="settings_get_updates_in_app_chip_stable">Stable</string>
+  <string name="settings_get_updates_in_app_chip_ci">CI</string>
   <string name="about_info">يستخدم هذا التطبيق لعرض مكتبات الجهات الخارجية التي تستخدمها التطبيقات في جهازك.</string>
   <string name="toolbar_rate">تقييم</string>
   <string name="resource_declaration">جزء من الموارد في التطبيق يأتي من: </string>
@@ -116,8 +124,14 @@
   <string name="play_app_signing_details">باستخدام ميزة \"توقيع تطبيقات Play\"، تدير Google مفتاح توقيع تطبيقك وتحميه نيابة عنك وتستخدمه لتوقيع ملفات APK المحسنة والموزعة التي يتم إنشاؤها من حزم تطبيقاتك. يخزن Play App Signing مفتاح توقيع التطبيق على البنية الأساسية الآمنة من Google ويوفر خيارات ترقية لزيادة الأمان.</string>
   <string name="pwa_details">تم إنشاء تطبيقات الويب التقدمية (PWA) وتحسينها باستخدام واجهات برمجة التطبيقات الحديثة لتوفير إمكانات محسنة وموثوقية وإمكانية تثبيت أثناء الوصول إلى أي شخص في أي مكان وعلى أي جهاز باستخدام قاعدة بيانات واحدة.</string>
   <string name="jetpack_compose_details">(Jetpack Compose) هي مجموعة أدوات Android الحديثة لبناء واجهة مستخدم أصلية. إنه يبسط ويسرع تطوير واجهة المستخدم على Android. اجعل تطبيقك ينبض بالحياة بسرعة باستخدام تعليمات برمجية أقل وأدوات قوية وواجهات برمجة تطبيقات Kotlin سهلة الاستخدام.</string>
+  <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform is a modern declarative and reactive UI framework developed by JetBrains that provides a simple way to build user interfaces with a small amount of Kotlin code. It also allows you to write your UI once and run it on any of the supported platforms – iOS, Android, desktop (Windows, macOS, Linux), and web.</string>
+  <string name="multi_arch_dialog_details"><![CDATA[If an app exposes an API to other apps that can be either 32 bit or 64 bit, the app must have the <b>android:multiarch</b> property set to true within its manifest to avoid potential errors.]]></string>
   <string name="extract_native_libs_tip">تصريح التطبيق </string>
   <string name="xml_detail">تفاصيل XML</string>
+  <string name="lib_detail_dialog_title_16kb_page_size">16 KB Page Size Support</string>
+  <string name="lib_detail_dialog_content_16kb_page_size">Historically, Android has only supported 4 KB memory page sizes, which has optimized system memory performance for the average amount of total memory that Android devices have typically had. Beginning with Android 15, AOSP supports devices that are configured to use a page size of 16 KB (16 KB devices). If your app uses any NDK libraries, either directly or indirectly through an SDK, then you will need to rebuild your app for it to work on these 16 KB devices.</string>
+  <string name="lib_detail_dialog_title_16kb_page_size_compat">16 KB Backcompat</string>
+  <string name="lib_detail_dialog_content_16kb_page_size_compat"><![CDATA[Android 15 introduced support for 16 KB memory pages to optimize performance of the platform. Android 16 adds a compatibility mode, allowing some apps built for 4 KB memory pages to run on a device configured for 16 KB memory pages.\n\nIf Android detects that your app has 4 KB aligned memory pages, it automatically uses compatibility mode and display a notification dialog to the user. Setting the <b>android:pageSizeCompat</b> property in the <b>AndroidManifest.xml</b> to enable the backwards compatibility mode will prevent the display of the dialog when your app launches. For best performance, reliability, and stability, your app should still be 16 KB aligned.]]></string>
   <string name="format_last_updated">تم التحديث في: %s</string>
   <string name="menu_process">العمليات</string>
   <string name="menu_split">مقسم</string>
@@ -157,6 +171,9 @@
   <string name="lib_detail_app_install_source_title">مصدر التثبيت</string>
   <string name="lib_detail_app_install_source_originating_package">مقدم التثبيت</string>
   <string name="lib_detail_app_install_source_installing_package">منفذ التثبيت</string>
+  <string name="lib_detail_app_installed_time">Installation Time</string>
+  <string name="lib_detail_app_first_installed_time">First installed time: </string>
+  <string name="lib_detail_app_last_updated_time">Last installed time: </string>
   <string name="lib_detail_app_install_source_empty">غير معروف</string>
   <string name="lib_detail_app_install_source_empty_detail">Shell أو تطبيق غير مثبت</string>
   <string name="lib_detail_app_install_source_shizuku_usage">نظرا لأن Android يقيد واجهة برمجة التطبيقات للحصول على مقدم التثبيت ، فإننا نستخدم Shizuku للحصول على طالب التثبيت.</string>
@@ -175,6 +192,7 @@
   <string name="toast_cant_open_app">لا يمكن فتح هذا التطبيق</string>
   <string name="toast_cloud_rules_update_error">فشل تحديث قواعد السحابة. يرجى المحاولة مرة أخرى.</string>
   <string name="toast_not_enough_storage_space">لا توجد مساحة تخزين كافية</string>
+  <string name="toast_downloading_app">Download requested</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">حفظ نقطة الاستعادة الحالية</string>
   <string name="snapshot_current_timestamp">الطابع الزمني الحالي لنقطة الاستعادة</string>
@@ -213,6 +231,9 @@
   <string name="album_item_comparison_choose_local_apk">اختر APK المحلي</string>
   <string name="album_item_management_title">إدارة</string>
   <string name="album_item_management_subtitle">إدارة جميع نقاط الاستعادة</string>
+  <string name="album_item_management_snapshot_auto_remove_default_title">Keep Only the Most Recent Snapshots</string>
+  <string name="album_item_management_snapshot_auto_remove_specific_title">Keep Only the %d Most Recent Items</string>
+  <string name="album_item_management_snapshot_auto_remove_desc">Starting from tapping \"%s\", only the most recent snapshots will be retained, and the older snapshots will be automatically deleted.</string>
   <string name="album_item_backup_restore_title">النسخ الاحتياطي &amp; الاستعادة</string>
   <string name="album_item_backup_restore_subtitle">النسخ الاحتياطي واستعادة نقاط الاستعادة</string>
   <string name="album_item_track_title">تتبّع</string>
@@ -224,6 +245,7 @@
   <string name="album_restore_detail">%1$s : %2$s العناصر في المجموع\n</string>
   <string name="album_click_to_choose">انقر للاختيار</string>
   <string name="album_dialog_delete_snapshot_message">جارٍ المعالجة…</string>
+  <string name="album_snapshot_top_apps_not_initialized">Not loaded yet</string>
   <!--  Integration  -->
   <string name="integration_monkey_king_menu_block">حظره عبر \"MonkeyKing Purify\"</string>
   <string name="integration_monkey_king_menu_unblock">إلغاء حظره عبر \"MonkeyKing Purify\"</string>
@@ -257,4 +279,5 @@
   <string name="snapshot_menu_show_update_time">إظهار وقت التحديث</string>
   <string name="snapshot_menu_hide_no_component_changes">إخفاء عدم وجود تغييرات في المكونات</string>
   <string name="snapshot_menu_diff_highlight">تحديد الفروق</string>
+  <string name="snapshot_menu_use_iec_units">Use IEC Units</string>
 </resources>
