@@ -50,13 +50,13 @@
   <string name="string_kotlin_unused">未使用 Kotlin</string>
   <string name="string_compose_used">已使用 Jetpack Compose</string>
   <string name="string_compose_unused">未使用 Jetpack Compose</string>
-  <string name="android_dist_label">Distribution</string>
+  <string name="android_dist_label">分布</string>
   <string name="android_dist_source">來源</string>
   <string name="android_dist_title">Android 版本發佈統計資料</string>
   <string name="android_dist_subtitle_format">更新時間：%s</string>
-  <string name="chart_abi_detailed">Detailed</string>
-  <string name="chart_abi_concise">Concise</string>
-  <string name="chart_item_not_support">Not Support</string>
+  <string name="chart_abi_detailed">詳細</string>
+  <string name="chart_abi_concise">簡潔</string>
+  <string name="chart_item_not_support">不支持</string>
   <!--  About  -->
   <string name="settings_about">關於</string>
   <string name="settings_about_summary">這裡是 LibChecker！</string>
@@ -67,7 +67,7 @@
   <string name="settings_get_updates">取得更新</string>
   <string name="settings_get_updates_summary">取得更加穩定並具有更多功能的最新版本</string>
   <string name="settings_get_updates_in_app">In-app</string>
-  <string name="settings_get_updates_in_app_chip_stable">Stable</string>
+  <string name="settings_get_updates_in_app_chip_stable">穩定版</string>
   <string name="settings_get_updates_in_app_chip_ci">CI</string>
   <string name="about_info">本應用程式用於檢視裝置上的應用程式使用第三方程式庫的狀況。</string>
   <string name="toolbar_rate">評分</string>
@@ -169,7 +169,7 @@
   <string name="lib_detail_app_install_source_title">安裝來源</string>
   <string name="lib_detail_app_install_source_originating_package">安裝要求者</string>
   <string name="lib_detail_app_install_source_installing_package">安裝執行程式</string>
-  <string name="lib_detail_app_installed_time">Installation Time</string>
+  <string name="lib_detail_app_installed_time">安裝時間</string>
   <string name="lib_detail_app_first_installed_time">First installed time: </string>
   <string name="lib_detail_app_last_updated_time">Last installed time: </string>
   <string name="lib_detail_app_install_source_empty">未知</string>
@@ -190,7 +190,7 @@
   <string name="toast_cant_open_app">無法啟動此應用程式</string>
   <string name="toast_cloud_rules_update_error">無法更新雲端規則，請再試一次</string>
   <string name="toast_not_enough_storage_space">儲存空間不足</string>
-  <string name="toast_downloading_app">Download requested</string>
+  <string name="toast_downloading_app">已要求下載</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">儲存目前快照</string>
   <string name="snapshot_current_timestamp">目前快照時間戳記</string>
@@ -243,7 +243,7 @@
   <string name="album_restore_detail">%1$s：總計 %2$s 個項目\n</string>
   <string name="album_click_to_choose">按下以選擇</string>
   <string name="album_dialog_delete_snapshot_message">處理中…</string>
-  <string name="album_snapshot_top_apps_not_initialized">Not loaded yet</string>
+  <string name="album_snapshot_top_apps_not_initialized">尚未加载</string>
   <!--  Integration  -->
   <string name="integration_monkey_king_menu_block">使用「大聖淨化」封鎖此元件</string>
   <string name="integration_monkey_king_menu_unblock">使用「大聖淨化」解除封鎖此元件</string>
