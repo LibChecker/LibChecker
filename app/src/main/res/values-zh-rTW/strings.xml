@@ -38,7 +38,7 @@
   <string name="ref_category_service">服務</string>
   <string name="ref_category_activity">活動</string>
   <string name="ref_category_br">廣播接收器</string>
-  <string name="ref_category_cp">内容提供者</string>
+  <string name="ref_category_cp">內容提供者</string>
   <string name="ref_category_perm">權限</string>
   <string name="ref_category_static">靜態庫</string>
   <string name="ref_category_metadata">中繼資料</string>
@@ -71,7 +71,7 @@
   <string name="settings_get_updates_in_app_chip_ci">CI</string>
   <string name="about_info">本應用程式用於檢視裝置上的應用程式使用第三方程式庫的狀況。</string>
   <string name="toolbar_rate">評分</string>
-  <string name="resource_declaration">應用程式中的部分資源來自於： </string>
+  <string name="resource_declaration">應用程式中的部分資源來自於：</string>
   <string name="library_declaration">LibChecker 中所有標示的程式庫資訊均來自於其所屬的 SDK 的開發文件或程式碼存放庫，如果資訊有有誤，請聯絡：absinthe@absinthe.life</string>
   <!--  Settings  -->
   <string name="pref_group_normal">一般</string>
