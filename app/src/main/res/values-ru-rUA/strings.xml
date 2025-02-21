@@ -24,6 +24,7 @@
   <string name="uncharted_territory">Недосліджена територія</string>
   <string name="get_app_list_denied_tip">Будь ласка надайте\nLibChecker дозвіл отримати\nінформацію про встановлені додатки</string>
   <string name="advanced_menu">Дополнительное меню</string>
+  <string name="archived_app">Archived app</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">Додатки з %s ABI</string>
   <string name="title_statistics_dialog_no_native_libs">Додатки без нативных бібліотек</string>
@@ -49,9 +50,13 @@
   <string name="string_kotlin_unused">Kotlin не використовується</string>
   <string name="string_compose_used">Використовується Jetpack Compose</string>
   <string name="string_compose_unused">Jetpack Compose не використовується</string>
+  <string name="android_dist_label">Distribution</string>
   <string name="android_dist_source">Исходный код</string>
   <string name="android_dist_title">Статистика распределения версий Android</string>
   <string name="android_dist_subtitle_format">Время обновления: %s</string>
+  <string name="chart_abi_detailed">Detailed</string>
+  <string name="chart_abi_concise">Concise</string>
+  <string name="chart_item_not_support">Not Support</string>
   <!--  About  -->
   <string name="settings_about">Про додаток</string>
   <string name="settings_about_summary">Це LibChecker!</string>
@@ -61,6 +66,9 @@
   <string name="settings_rate_us_summary">Це може зробити нас доступнішим для більшого числа людей</string>
   <string name="settings_get_updates">Обновления</string>
   <string name="settings_get_updates_summary">Получить последнюю версию, которая является более стабильной и имеет больше функционала</string>
+  <string name="settings_get_updates_in_app">In-app</string>
+  <string name="settings_get_updates_in_app_chip_stable">Stable</string>
+  <string name="settings_get_updates_in_app_chip_ci">CI</string>
   <string name="about_info">Ця програма використовується для перегляду сторонніх бібліотек, котрі використовуються додатками на вашому пристрої.</string>
   <string name="toolbar_rate">Оцінка</string>
   <string name="resource_declaration">Частина ресурсів в додатку надходить з: </string>
@@ -116,8 +124,12 @@
   <string name="play_app_signing_details">С подписью Play App Signing Google управляет и защищает ключ подписи Вашего приложения и использует его для оптимизации и распространения APK-файлов, создаваемых из Ваших пакетов приложения. Play App Signing хранит ключ подписи Вашего приложения в защищенной инфраструктуре Google и предлагает варианты обновления для повышения безопасности.</string>
   <string name="pwa_details">Progressive Web Apps (PWA) are built and enhanced with modern APIs to deliver enhanced capabilities, reliability, and installability while reaching anyone, anywhere, on any device with a single codebase. </string>
   <string name="jetpack_compose_details">Jetpack Compose — это современный инструментарий для Android для создания собственного UI. Он упрощает и ускоряет разработку UI на Android. Вы можете быстро создать ваше приложение с меньшим кодом, мощным инструментарием и интуитивно понятным Kotlin API.</string>
+  <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform is a modern declarative and reactive UI framework developed by JetBrains that provides a simple way to build user interfaces with a small amount of Kotlin code. It also allows you to write your UI once and run it on any of the supported platforms – iOS, Android, desktop (Windows, macOS, Linux), and web.</string>
+  <string name="multi_arch_dialog_details">If an app exposes an API to other apps that can be either 32 bit or 64 bit, the app must have the android:multiarch property set to true within its manifest to avoid potential errors.</string>
   <string name="extract_native_libs_tip">Объявление приложения </string>
   <string name="xml_detail">XML Деталь</string>
+  <string name="lib_detail_dialog_title_16kb_page_size">16 KB Page Size Support</string>
+  <string name="lib_detail_dialog_content_16kb_page_size">Historically, Android has only supported 4 KB memory page sizes, which has optimized system memory performance for the average amount of total memory that Android devices have typically had. Beginning with Android 15, AOSP supports devices that are configured to use a page size of 16 KB (16 KB devices). If your app uses any NDK libraries, either directly or indirectly through an SDK, then you will need to rebuild your app for it to work on these 16 KB devices.</string>
   <string name="format_last_updated">Обновлено: %s</string>
   <string name="menu_process">Приложение</string>
   <string name="menu_split">Разделить</string>
@@ -141,12 +153,44 @@
   <string name="signature_public_key_modulus">Модуль публичного ключа</string>
   <string name="signature_public_key_y">Значение Y публичного ключа</string>
   <string name="signature_public_key_type">Тип публичного ключа</string>
+  <string name="signature_algorithm_name">Signature Algorithm Name</string>
+  <string name="signature_algorithm_oid">Signature Algorithm OID</string>
+  <string name="lib_detail_label_tip">Label</string>
+  <string name="lib_detail_develop_team_tip">Dev Team</string>
+  <string name="lib_detail_rule_contributors_tip">Rule Contributor(s)</string>
+  <string name="lib_detail_description_tip">Description</string>
+  <string name="lib_detail_relative_link_tip">Relative Link</string>
+  <string name="lib_detail_last_update_tip">Updated at</string>
+  <string name="lib_detail_app_props_title">Application Properties</string>
+  <string name="lib_detail_app_props_tip">More information</string>
+  <string name="lib_detail_xposed_min_version">Min Version</string>
+  <string name="lib_detail_xposed_default_scope">Default Scope</string>
+  <string name="lib_detail_xposed_init_class">Init Class</string>
+  <string name="lib_detail_app_install_source_title">Installation Source</string>
+  <string name="lib_detail_app_install_source_originating_package">Installation requester</string>
+  <string name="lib_detail_app_install_source_installing_package">Installation Executor</string>
+  <string name="lib_detail_app_installed_time">Installation Time</string>
+  <string name="lib_detail_app_first_installed_time">First installed time: </string>
+  <string name="lib_detail_app_last_updated_time">Last installed time: </string>
+  <string name="lib_detail_app_install_source_empty">Unknown</string>
+  <string name="lib_detail_app_install_source_empty_detail">Shell or uninstalled app</string>
+  <string name="lib_detail_app_install_source_shizuku_usage">Because Android restricts the API to get the installation requester, we use Shizuku to get the installation requester.</string>
+  <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizuku not installed</string>
+  <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">Click here to install Shizuku</string>
+  <string name="lib_detail_app_install_source_shizuku_low_version">Requires Shizuku API 10</string>
+  <string name="lib_detail_app_install_source_shizuku_low_version_detail">Click here to update Shizuku</string>
+  <string name="lib_detail_app_install_source_shizuku_not_running">Shizuku not running</string>
+  <string name="lib_detail_app_install_source_shizuku_not_running_detail">Click here to jump to Shizuku to start it</string>
+  <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku not authorized</string>
+  <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">Click here for Shizuku authorization for installation requester</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Скопійовано до буферу обміну</string>
   <string name="toast_not_existing_market">Немає магазину додатків</string>
   <string name="toast_use_another_file_manager">Будь ласка використовуйте інший файловий менеджер, щоб відкрити АРК</string>
   <string name="toast_cant_open_app">Не вдається відкрити цей додаток</string>
   <string name="toast_cloud_rules_update_error">Не вдалося оновити хмарні правила. Будь ласка, спробуйте ще раз.</string>
+  <string name="toast_not_enough_storage_space">Not enough storage space</string>
+  <string name="toast_downloading_app">Download requested</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">Зберегти поточний знімок</string>
   <string name="snapshot_current_timestamp">Відмітка часу поточного знімка</string>
@@ -161,6 +205,8 @@
   <string name="snapshot_detail_new_install_title">Цей додаток нещодавно встановлено</string>
   <string name="snapshot_detail_deleted_title">Цей додаток був видалений</string>
   <string name="snapshot_time_node_uninitialized">(неініціалізований)</string>
+  <string name="snapshot_preinstalled_app">Preinstalled app</string>
+  <string name="snapshot_generate_text_report">Generate Text Report</string>
   <string name="snapshot_scheme_tip"><![CDATA[Совет: Теперь вы можете генерировать снимки в фоновом режиме через:<br><b>%s</b>]]></string>
   <!--  Dialog  -->
   <string name="dialog_title_reload_apps">Ви впевнені, що хочете перезавантажити весь список додатків?</string>
@@ -169,15 +215,23 @@
   <string name="dialog_title_keep_previous_snapshot">Увага</string>
   <string name="dialog_message_keep_previous_snapshot">Ви хочете зберегти попередній знімок?</string>
   <string name="dialog_title_select_to_delete">Выберите дату для удаления снимка</string>
+  <string name="dialog_title_confirm_to_delete">Are you sure to delete this snapshot?</string>
   <string name="btn_keep">Залишити</string>
   <string name="btn_drop">Видалити</string>
+  <string name="dialog_title_compare_diff_apk">Attention</string>
+  <string name="dialog_message_compare_diff_apk">Do you want to compare two different APKs?</string>
   <!--  Album  -->
   <string name="album_compare">Порівняти</string>
   <string name="album_item_comparison_title">Порівняння</string>
   <string name="album_item_comparison_subtitle">Порівняння двох знімків</string>
   <string name="album_item_comparison_invalid_compare">Недійсне порівняння</string>
+  <string name="album_item_comparison_invalid_shared_items">Please select two APK files for comparison</string>
+  <string name="album_item_comparison_choose_local_apk">Choose Local APK</string>
   <string name="album_item_management_title">Менеджер</string>
   <string name="album_item_management_subtitle">Керування усіма знімками</string>
+  <string name="album_item_management_snapshot_auto_remove_default_title">Keep Only the Most Recent Snapshots</string>
+  <string name="album_item_management_snapshot_auto_remove_specific_title">Keep Only the %d Most Recent Items</string>
+  <string name="album_item_management_snapshot_auto_remove_desc">Starting from tapping \"%s\", only the most recent snapshots will be retained, and the older snapshots will be automatically deleted.</string>
   <string name="album_item_backup_restore_title">Бекап і відновлення</string>
   <string name="album_item_backup_restore_subtitle">Бекап і відновлення знімків</string>
   <string name="album_item_track_title">Відслідковування</string>
@@ -186,8 +240,10 @@
   <string name="album_backup_summary">Бекап усіх знімків</string>
   <string name="album_restore">Відновлення</string>
   <string name="album_restore_summary">Відновлення знімків з бекапу</string>
+  <string name="album_restore_detail">%1$s : %2$s items in total\n</string>
   <string name="album_click_to_choose">Натисніть для вибору</string>
   <string name="album_dialog_delete_snapshot_message">Обробка…</string>
+  <string name="album_snapshot_top_apps_not_initialized">Not loaded yet</string>
   <!--  Integration  -->
   <string name="integration_monkey_king_menu_block">Заблокувати з допомогою \"MonkeyKing Purify\"</string>
   <string name="integration_monkey_king_menu_unblock">Розблокувати з допомогою \"MonkeyKing Purify\"</string>
@@ -200,6 +256,20 @@
   <string name="rules_btn_restart_to_update">Перезагрузите, чтобы обновить</string>
   <string name="rules_btn_update">поновити</string>
   <!-- Advanced menu -->
+  <string name="adv_show_system_apps">Show System Apps</string>
+  <string name="adv_show_overlays">Show Overlays</string>
+  <string name="adv_show_64_bit">Show 64-bit Apps</string>
+  <string name="adv_show_32_bit">Show 32-bit Apps</string>
+  <string name="adv_sort_mode">Sort Mode</string>
+  <string name="adv_sort_by_time">Updated Time</string>
+  <string name="adv_sort_by_target_version">Target Version</string>
+  <string name="adv_sort_by_name">Name</string>
+  <string name="adv_show_android_version">Show Android Version</string>
+  <string name="adv_show_target_version">Show Target Version</string>
+  <string name="adv_show_min_version">Show Min Version</string>
+  <string name="adv_show_compile_version">Show Compile Version</string>
+  <string name="adv_tint_abi_label">Tint ABI Label</string>
+  <string name="adv_mark_exported">Mark Exported Component</string>
   <string name="adv_mark_disabled">Выделить отключенные компоненты</string>
   <string name="adv_show_marked_lib">Показать отмеченные библиотеки</string>
   <string name="adv_show_system_framework_apps">Показать приложения фреймворка</string>
@@ -207,4 +277,5 @@
   <string name="snapshot_menu_show_update_time">Показать время обновления</string>
   <string name="snapshot_menu_hide_no_component_changes">Скрыть компоненты без изменений</string>
   <string name="snapshot_menu_diff_highlight">Показать различия</string>
+  <string name="snapshot_menu_use_iec_units">Use IEC Units</string>
 </resources>
