@@ -24,7 +24,6 @@
   <string name="uncharted_territory">Território desconhecido</string>
   <string name="get_app_list_denied_tip">Por favor, conceda a\n\"Obter informação de aplicativos instalados\"\npermissão para LibChecker</string>
   <string name="advanced_menu">Menu Avançado</string>
-  <string name="archived_app">Archived app</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">Apps com ABI %s</string>
   <string name="title_statistics_dialog_no_native_libs">Apps sem bibliotecas nativas</string>
@@ -56,7 +55,6 @@
   <string name="android_dist_subtitle_format">Tempo de atualização: %s</string>
   <string name="chart_abi_detailed">Detalhado</string>
   <string name="chart_abi_concise">Conciso</string>
-  <string name="chart_item_not_support">Not Support</string>
   <!--  About  -->
   <string name="settings_about">Sobre</string>
   <string name="settings_about_summary">Isto é LibChecker!</string>
@@ -124,14 +122,10 @@
   <string name="play_app_signing_details">Com a assinatura do Play App, o Google gerencia e protege a chave de assinatura do seu aplicativo para você e o usa para assinar otimizado, APKs de distribuição gerados a partir de pacotes de aplicações. O Play App Signing armazena sua chave de assinatura na infraestrutura segura do Google e oferece opções para aumentar a segurança.</string>
   <string name="pwa_details">Aplicativos Web Progressive (PWA) são construídos e aprimorados com APIs modernas para fornecer recursos aprimorados, confiabilidade e instalação enquanto chega a qualquer um, em qualquer lugar, em qualquer dispositivo com um único código.</string>
   <string name="jetpack_compose_details">Jetpack Compose é o moderno kit de ferramentas do Android para a construção de interface nativa. Ele simplifica e acelera o desenvolvimento de interface do usuário no Android. Rapidamente dê vida ao seu app com menos código, ferramentas poderosas e APIs intuitivas do Kotlin.</string>
-  <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform is a modern declarative and reactive UI framework developed by JetBrains that provides a simple way to build user interfaces with a small amount of Kotlin code. It also allows you to write your UI once and run it on any of the supported platforms – iOS, Android, desktop (Windows, macOS, Linux), and web.</string>
-  <string name="multi_arch_dialog_details"><![CDATA[If an app exposes an API to other apps that can be either 32 bit or 64 bit, the app must have the <b>android:multiarch</b> property set to true within its manifest to avoid potential errors.]]></string>
   <string name="extract_native_libs_tip">O aplicativo declara </string>
   <string name="xml_detail">Detalhes do XML</string>
   <string name="lib_detail_dialog_title_16kb_page_size">Tamanho da página 16 KB</string>
   <string name="lib_detail_dialog_content_16kb_page_size">Historicamente, o Android só suporta páginas com tamanho de 4 KB de memória, o que optimiza a performance do sistema de memória para a quantia normal de da memória total que os dispositivos Android normalmente tem. Começando com o Android 15, AOSP suporta dispositivos que estão configurados para utilizar o tamanho de página de 16 KB (dispositivos de 16 KB). Se o seu app utiliza qualquer biblioteca NDK, tanto direta quando indiretamente através de um SDK, então você irá precisar reconstruir seu app para isso funcionar nesses dispositivos de 16 KB.</string>
-  <string name="lib_detail_dialog_title_16kb_page_size_compat">16 KB Backcompat</string>
-  <string name="lib_detail_dialog_content_16kb_page_size_compat"><![CDATA[Android 15 introduced support for 16 KB memory pages to optimize performance of the platform. Android 16 adds a compatibility mode, allowing some apps built for 4 KB memory pages to run on a device configured for 16 KB memory pages.\n\nIf Android detects that your app has 4 KB aligned memory pages, it automatically uses compatibility mode and display a notification dialog to the user. Setting the <b>android:pageSizeCompat</b> property in the <b>AndroidManifest.xml</b> to enable the backwards compatibility mode will prevent the display of the dialog when your app launches. For best performance, reliability, and stability, your app should still be 16 KB aligned.]]></string>
   <string name="format_last_updated">Atualizado em: %s</string>
   <string name="menu_process">Processo</string>
   <string name="menu_split">Separar em categorias</string>
@@ -171,9 +165,6 @@
   <string name="lib_detail_app_install_source_title">Origem da Instalação</string>
   <string name="lib_detail_app_install_source_originating_package">Solicitante de instalação</string>
   <string name="lib_detail_app_install_source_installing_package">Executar Instalação</string>
-  <string name="lib_detail_app_installed_time">Installation Time</string>
-  <string name="lib_detail_app_first_installed_time">First installed time: </string>
-  <string name="lib_detail_app_last_updated_time">Last installed time: </string>
   <string name="lib_detail_app_install_source_empty">Desconhecido</string>
   <string name="lib_detail_app_install_source_empty_detail">aplicativo adb ou desinstalado</string>
   <string name="lib_detail_app_install_source_shizuku_usage">Como o Android restringe a API para obter o solicitante de instalação, usamos Shizuku para obter o solicitante de instalação.</string>
@@ -231,9 +222,6 @@
   <string name="album_item_comparison_choose_local_apk">Escolha um APK local</string>
   <string name="album_item_management_title">Gerenciamento</string>
   <string name="album_item_management_subtitle">Gerencie todas as snapshots</string>
-  <string name="album_item_management_snapshot_auto_remove_default_title">Keep Only the Most Recent Snapshots</string>
-  <string name="album_item_management_snapshot_auto_remove_specific_title">Keep Only the %d Most Recent Items</string>
-  <string name="album_item_management_snapshot_auto_remove_desc">Starting from tapping \"%s\", only the most recent snapshots will be retained, and the older snapshots will be automatically deleted.</string>
   <string name="album_item_backup_restore_title">Backup &amp; Restaurar</string>
   <string name="album_item_backup_restore_subtitle">Fazer backup e restaurar snapshots</string>
   <string name="album_item_track_title">Rastrear</string>
@@ -245,7 +233,6 @@
   <string name="album_restore_detail">%1$s : %2$s itens no total\n</string>
   <string name="album_click_to_choose">Clique para Selecionar</string>
   <string name="album_dialog_delete_snapshot_message">Processando…</string>
-  <string name="album_snapshot_top_apps_not_initialized">Not loaded yet</string>
   <!--  Integration  -->
   <string name="integration_monkey_king_menu_block">Bloqueie através do \"Rei Purificado\"</string>
   <string name="integration_monkey_king_menu_unblock">Desbloqueie através do \"Rei Purificado\"</string>
@@ -279,5 +266,4 @@
   <string name="snapshot_menu_show_update_time">Mostrar data de atualização</string>
   <string name="snapshot_menu_hide_no_component_changes">Não ocultar nenhuma alteração de componente</string>
   <string name="snapshot_menu_diff_highlight">Realce do diff</string>
-  <string name="snapshot_menu_use_iec_units">Use IEC Units</string>
 </resources>
