@@ -50,6 +50,7 @@ import com.absinthe.libchecker.utils.extensions.getRxKotlinVersion
 import com.absinthe.libchecker.utils.extensions.getSignatures
 import com.absinthe.libchecker.utils.extensions.getStatefulPermissionsList
 import com.absinthe.libchecker.utils.extensions.is16KBAligned
+import com.absinthe.libchecker.utils.extensions.isPageSizeCompat
 import com.absinthe.libchecker.utils.extensions.isUseKMP
 import com.absinthe.libchecker.utils.extensions.toClassDefType
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
@@ -123,7 +124,7 @@ class DetailViewModel : ViewModel() {
 
       val abi = (abiBundleStateFlow.value ?: abiBundleStateFlow.filterNotNull().first()).abi
       val specifiedAbi = if (abi == ERROR || abi == NO_LIBS || abi == OVERLAY) abi else null
-      allNativeLibItems = PackageUtils.getSourceLibs(packageInfo, specifiedAbi = specifiedAbi)
+      allNativeLibItems = PackageUtils.getSourceLibs(packageInfo, specifiedAbi = specifiedAbi, parseElf = true)
 
       // TODO
       val sourceMap = sourceSet.filter { source -> source.isNotEmpty() }
@@ -531,7 +532,7 @@ class DetailViewModel : ViewModel() {
 
     _featuresFlow.emit(VersionedFeature(Features.Ext.APPLICATION_PROP))
 
-    if (OsUtils.atLeastR()) {
+    if (OsUtils.atLeastR() && !isApk) {
       runCatching {
         val info = PackageUtils.getInstallSourceInfo(packageInfo.packageName)
         if (info?.installingPackageName != null) {
@@ -540,6 +541,10 @@ class DetailViewModel : ViewModel() {
       }.onFailure {
         Timber.e(it)
       }
+    }
+
+    if (OsUtils.atLeastBaklava() && packageInfo.isPageSizeCompat()) {
+      _featuresFlow.emit(VersionedFeature(Features.Ext.ELF_PAGE_SIZE_16KB_COMPAT))
     }
 
     packageInfo.applicationInfo?.sourceDir?.let { sourceDir ->

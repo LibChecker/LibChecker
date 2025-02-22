@@ -656,6 +656,14 @@ abstract class BaseAppDetailActivity :
               }
             )
           }
+
+          Features.Ext.ELF_PAGE_SIZE_16KB_COMPAT -> {
+            featureAdapter.addData(
+              FeatureItem(R.drawable.ic_16kb_compat) {
+                FeaturesDialog.show16KBCompatDialog(this)
+              }
+            )
+          }
         }
       }.launchIn(lifecycleScope)
       it.abiBundleStateFlow.onEach { bundle ->

@@ -152,7 +152,7 @@
   <string name="lib_detail_app_install_source_originating_package">người yêu cầu cài đặt</string>
   <string name="lib_detail_app_install_source_installing_package">Người thực hiện cài đặt</string>
   <string name="lib_detail_app_install_source_empty">không xác định</string>
-  <string name="lib_detail_app_install_source_empty_detail">ADB hoặc ứng dụng đã gỡ cài đặt</string>
+  <string name="lib_detail_app_install_source_empty_detail">Shell hoặc ứng dụng đã gỡ cài đặt</string>
   <string name="lib_detail_app_install_source_shizuku_usage">Vì Android hạn chế API nhận trình yêu cầu cài đặt nên chúng tôi sử dụng Shizuku để nhận trình yêu cầu cài đặt.</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizuku chưa được cài đặt</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">Nhấn vào đây để cài đặt Shizuku</string>

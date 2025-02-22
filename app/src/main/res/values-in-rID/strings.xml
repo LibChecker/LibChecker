@@ -158,7 +158,7 @@
   <string name="lib_detail_app_install_source_originating_package">Pengaju instalasi</string>
   <string name="lib_detail_app_install_source_installing_package">Eksekutor Instalasi</string>
   <string name="lib_detail_app_install_source_empty">Tidak diketahui</string>
-  <string name="lib_detail_app_install_source_empty_detail">adb atau aplikasi yang dihapus instalasinya</string>
+  <string name="lib_detail_app_install_source_empty_detail">Shell atau aplikasi yang dihapus instalasinya</string>
   <string name="lib_detail_app_install_source_shizuku_usage">Karena Android membatasi API untuk mendapatkan pengaju instalasi, kami menggunakan Shizuku untuk mendapatkan pengaju instalasi.</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizuku belum terpasang</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">Klik di sini untuk menginstal Shizuku</string>

@@ -24,6 +24,7 @@
   <string name="uncharted_territory">Keşfedilmemiş bölge</string>
   <string name="get_app_list_denied_tip">Lütfen LibChecker\'a\n\"Yüklü uygulamalar hakkında bilgi al\"\niznini verin</string>
   <string name="advanced_menu">Gelişmiş Menü</string>
+  <string name="archived_app">Arşivlenmiş uygulama</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">%s ABI\'ye sahip uygulamalar</string>
   <string name="title_statistics_dialog_no_native_libs">Yerel kütüphanesi olmayan uygulamalar</string>
@@ -124,10 +125,13 @@
   <string name="pwa_details">Progressive Web Apps (PWA\'lar), gelişmiş yetenekler, güvenilirlik ve yüklenebilirlik sunmak için modern API\'lerle oluşturulur ve geliştirilir ve tek bir kod tabanıyla herhangi bir cihazda herkese ulaşır.</string>
   <string name="jetpack_compose_details">Jetpack Compose, Android\'in yerel kullanıcı arayüzü oluşturmak için modern araç setidir. Android\'de kullanıcı arayüzü geliştirmeyi basitleştirir ve hızlandırır. Daha az kod, güçlü araçlar ve sezgisel Kotlin API\'leri ile uygulamanızı hızlıca hayata geçirin.</string>
   <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform, JetBrains tarafından geliştirilen modern, deklaratif ve tepkisel bir UI (kullanıcı arayüzü) framework\'üdür. Az miktarda Kotlin kodu ile kullanıcı arayüzleri oluşturmanın basit bir yolunu sunar. Ayrıca, kullanıcı arayüzünüzü bir kez yazıp desteklenen tüm platformlarda – iOS, Android, masaüstü (Windows, macOS, Linux) ve web – çalıştırmanıza olanak tanır.</string>
+  <string name="multi_arch_dialog_details"><![CDATA[Bir uygulama 32 bit veya 64 bit olabilen diğer uygulamalara bir API sunuyorsa, olası hataları önlemek için uygulamanın manifestosunda <b>android:multiarch</b> özelliğinin true olarak ayarlanmış olması gerekir.]]></string>
   <string name="extract_native_libs_tip">Uygulama şunu beyan eder: </string>
   <string name="xml_detail">XML Ayrıntısı</string>
   <string name="lib_detail_dialog_title_16kb_page_size">16 KB Sayfa Boyutu</string>
   <string name="lib_detail_dialog_content_16kb_page_size">Tarihsel olarak, Android yalnızca 4 KB bellek sayfa boyutlarını desteklemiş ve bu da Android cihazların tipik olarak sahip olduğu ortalama toplam bellek miktarı için sistem belleği performansını optimize etmiştir. Android 15\'ten itibaren AOSP, 16 KB sayfa boyutu (16 KB cihazlar) kullanacak şekilde yapılandırılmış cihazları desteklemektedir. Uygulamanız doğrudan veya dolaylı olarak bir SDK aracılığıyla herhangi bir NDK kütüphanesi kullanıyorsa, uygulamanızı bu 16 KB cihazlarda çalışması için yeniden oluşturmanız gerekecektir.</string>
+  <string name="lib_detail_dialog_title_16kb_page_size_compat">16 KB Backcompat</string>
+  <string name="lib_detail_dialog_content_16kb_page_size_compat"><![CDATA[Android 15, platformun performansını optimize etmek için 16 KB bellek sayfaları desteğini getirdi. Android 16 ise bir uyumluluk modu ekleyerek, 4 KB bellek sayfaları için oluşturulmuş bazı uygulamaların 16 KB bellek sayfalarıyla yapılandırılmış bir cihazda çalışmasına olanak tanır.\n\nEğer Android, uygulamanızın 4 KB hizalanmış bellek sayfalarına sahip olduğunu algılarsa, otomatik olarak uyumluluk modunu kullanır ve kullanıcıya bir bildirim penceresi gösterir. Uygulamanız başlatıldığında bu pencerenin görüntülenmesini önlemek için <b>AndroidManifest.xml</b> dosyasında <b>android:pageSizeCompat</b> özelliğini ayarlayarak geriye dönük uyumluluk modunu etkinleştirebilirsiniz. En iyi performans, güvenilirlik ve kararlılık için uygulamanızın yine de 16 KB hizalanmış olması önerilir.]]></string>
   <string name="format_last_updated">Güncellenme zamanı: %s</string>
   <string name="menu_process">İşlem</string>
   <string name="menu_split">Böl</string>
@@ -275,4 +279,5 @@
   <string name="snapshot_menu_show_update_time">Güncelleme Zamanını Göster</string>
   <string name="snapshot_menu_hide_no_component_changes">Bileşen Değişikliği Olmayanları Gizle</string>
   <string name="snapshot_menu_diff_highlight">Fark Vurgusu</string>
+  <string name="snapshot_menu_use_iec_units">IEC Birimlerini Kullan</string>
 </resources>

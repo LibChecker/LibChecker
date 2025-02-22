@@ -7,6 +7,7 @@ import com.absinthe.libchecker.features.applist.detail.ui.view.AppBundleBottomSh
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppBundleItemView
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.STRING_ABI_MAP
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import java.io.File
@@ -32,7 +33,7 @@ class AppBundleBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<App
           val name = split.substringAfterLast(File.separator)
           val middleName = name.removeSurrounding("split_config.", ".apk")
           val type = when {
-            middleName.startsWith("arm") || middleName.startsWith("x86") -> AppBundleItemView.IconType.TYPE_NATIVE_LIBS
+            STRING_ABI_MAP.keys.any { arch -> middleName.contains(arch) } -> AppBundleItemView.IconType.TYPE_NATIVE_LIBS
             middleName.endsWith("dpi") -> AppBundleItemView.IconType.TYPE_MATERIALS
             localeList.contains(middleName) -> AppBundleItemView.IconType.TYPE_STRINGS
             else -> AppBundleItemView.IconType.TYPE_OTHERS

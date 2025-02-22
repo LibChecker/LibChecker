@@ -85,14 +85,14 @@ abstract class BaseDetailFragment<T : ViewBinding> :
       text.text = getString(R.string.loading)
     }
   }
-  protected val dividerItemDecoration by lazy {
+  private val dividerItemDecoration by lazy {
     DividerItemDecoration(
       requireContext(),
       DividerItemDecoration.VERTICAL
     )
   }
   protected var isListReady = false
-  protected var afterListReadyTask: Runnable? = null
+  private var afterListReadyTask: Runnable? = null
   private var integrationMonkeyKingBlockList: List<ShareCmpInfo.Component>? = null
   private var integrationBlockerList: List<ShareCmpInfo.Component>? = null
 
@@ -197,7 +197,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     }
   }
 
-  fun sortedList(origin: MutableList<LibStringItemChip>): MutableList<LibStringItemChip> {
+  private fun sortedList(origin: MutableList<LibStringItemChip>): MutableList<LibStringItemChip> {
     if (GlobalValues.libSortMode == MODE_SORT_BY_LIB) {
       if (type == NATIVE) {
         origin.sortByDescending { it.item.size }
@@ -324,33 +324,35 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   }
 
   private fun doOnLongClick(context: Context, item: LibStringItemChip, position: Int) {
-    if (!viewModel.isApk && this is Referable) {
-      val actionMap = mutableMapOf<Int, () -> Unit>()
-      val arrayAdapter = ArrayAdapter<String>(context, android.R.layout.simple_list_item_1)
-      val componentName = item.item.name
-      val fullComponentName = if (componentName.startsWith(".")) {
-        viewModel.packageInfo.packageName + componentName
+    val actionMap = mutableMapOf<Int, () -> Unit>()
+    val arrayAdapter = ArrayAdapter<String>(context, android.R.layout.simple_list_item_1)
+    val componentName = item.item.name
+    val fullComponentName = if (componentName.startsWith(".")) {
+      viewModel.packageInfo.packageName + componentName
+    } else {
+      componentName
+    }
+
+    // Copy
+    arrayAdapter.add(getString(android.R.string.copy))
+    actionMap[arrayAdapter.count - 1] = {
+      if (this is MetaDataAnalysisFragment) {
+        ClipboardUtils.put(context, componentName + ": " + item.item.source)
       } else {
-        componentName
+        ClipboardUtils.put(context, componentName)
       }
+      VersionCompat.showCopiedOnClipboardToast(context)
+    }
 
-      // Copy
-      arrayAdapter.add(getString(android.R.string.copy))
-      actionMap[arrayAdapter.count - 1] = {
-        if (this is MetaDataAnalysisFragment) {
-          ClipboardUtils.put(context, componentName + ": " + item.item.source)
-        } else {
-          ClipboardUtils.put(context, componentName)
-        }
-        VersionCompat.showCopiedOnClipboardToast(context)
-      }
-
-      // Reference
+    // Reference
+    if (this is Referable) {
       arrayAdapter.add(getString(R.string.tab_lib_reference_statistics))
       actionMap[arrayAdapter.count - 1] = {
         activity?.launchLibReferencePage(componentName, item.rule?.label, type, null)
       }
+    }
 
+    if (!viewModel.isApk) {
       // Blocker
       if (this is ComponentsAnalysisFragment && BlockerManager.isSupportInteraction) {
         if (integrationBlockerList == null) {
@@ -425,13 +427,13 @@ abstract class BaseDetailFragment<T : ViewBinding> :
           )
         }
       }
-
-      BaseAlertDialogBuilder(context)
-        .setAdapter(arrayAdapter) { _, which ->
-          actionMap[which]?.invoke()
-        }
-        .show()
     }
+
+    BaseAlertDialogBuilder(context)
+      .setAdapter(arrayAdapter) { _, which ->
+        actionMap[which]?.invoke()
+      }
+      .show()
   }
 
   private fun animateTvTitle(position: Int, shouldTurnToDisable: Boolean) {

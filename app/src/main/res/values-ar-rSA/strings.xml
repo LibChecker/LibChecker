@@ -158,7 +158,7 @@
   <string name="lib_detail_app_install_source_originating_package">مقدم التثبيت</string>
   <string name="lib_detail_app_install_source_installing_package">منفذ التثبيت</string>
   <string name="lib_detail_app_install_source_empty">غير معروف</string>
-  <string name="lib_detail_app_install_source_empty_detail">adb أو تطبيق غير مثبت</string>
+  <string name="lib_detail_app_install_source_empty_detail">Shell أو تطبيق غير مثبت</string>
   <string name="lib_detail_app_install_source_shizuku_usage">نظرا لأن Android يقيد واجهة برمجة التطبيقات للحصول على مقدم التثبيت ، فإننا نستخدم Shizuku للحصول على طالب التثبيت.</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled">شيزوكو غير مثبت</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">انقر هنا لتثبيت شيزوكو</string>

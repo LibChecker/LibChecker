@@ -767,7 +767,8 @@ fun PackageInfo.is16KBAligned(libs: List<LibStringItem>? = null, isApk: Boolean 
     val abiString = ABI_STRING_MAP[abi % MULTI_ARCH]
     PackageUtils.getSourceLibs(
       packageInfo = this,
-      specifiedAbi = abi
+      specifiedAbi = abi,
+      parseElf = true
     )[abiString] ?: emptyList()
   }
 
@@ -801,4 +802,19 @@ fun PackageInfo.isUseKMP(foundList: List<String>? = null): Boolean {
 
 fun PackageInfo.isArchivedPackage(): Boolean {
   return OsUtils.atLeastV() && archiveTimeMillis > 0
+}
+
+/**
+ * Check if an app is 16 kb backcompat
+ * @return True if is 16 kb backcompat
+ * https://source.android.com/docs/core/architecture/16kb-page-size/16kb-backcompat-option
+ */
+fun PackageInfo.isPageSizeCompat(): Boolean {
+  runCatching {
+    val demands = ManifestReader.getManifestProperties(
+      File(applicationInfo!!.sourceDir),
+      arrayOf("pageSizeCompat")
+    )
+    return demands["pageSizeCompat"] as? String == "enabled"
+  }.getOrNull() ?: return false
 }

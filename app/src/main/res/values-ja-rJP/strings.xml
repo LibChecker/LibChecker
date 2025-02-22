@@ -37,7 +37,7 @@
   <string name="ref_category_service">サービス</string>
   <string name="ref_category_activity">アクティビティ</string>
   <string name="ref_category_br">ブロードキャストレシーバー</string>
-  <string name="ref_category_cp">コンテンツプロバイダー</string>
+  <string name="ref_category_cp">コンテンツプロバイダ</string>
   <string name="ref_category_perm">権限</string>
   <string name="ref_category_static">静的ライブラリ</string>
   <string name="ref_category_metadata">メタデータ</string>
@@ -158,7 +158,7 @@
   <string name="lib_detail_app_install_source_originating_package">インストールをリクエストしたパッケージ</string>
   <string name="lib_detail_app_install_source_installing_package">インストールを実行するパッケージ</string>
   <string name="lib_detail_app_install_source_empty">不明</string>
-  <string name="lib_detail_app_install_source_empty_detail">adbまたはアンインストール済みのアプリ</string>
+  <string name="lib_detail_app_install_source_empty_detail">Shellまたはアンインストール済みのアプリ</string>
   <string name="lib_detail_app_install_source_shizuku_usage">Androidはインストールを要求したアプリを取得するAPIを制限しているため、Shizukuを使用してインストールを要求したアプリを取得します。</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizukuがインストールされていません</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">ここをクリックしてShizukuをインストール</string>

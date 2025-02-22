@@ -37,7 +37,7 @@
   <string name="ref_category_service">服務</string>
   <string name="ref_category_activity">活動</string>
   <string name="ref_category_br">廣播接收器</string>
-  <string name="ref_category_cp">内容提供者</string>
+  <string name="ref_category_cp">內容提供者</string>
   <string name="ref_category_perm">權限</string>
   <string name="ref_category_static">靜態庫</string>
   <string name="ref_category_metadata">中繼資料</string>
@@ -70,7 +70,7 @@
   <string name="settings_get_updates_in_app_chip_ci">CI</string>
   <string name="about_info">本應用程式用於檢視裝置上的應用程式使用第三方程式庫的狀況。</string>
   <string name="toolbar_rate">評分</string>
-  <string name="resource_declaration">應用程式中的部分資源來自於： </string>
+  <string name="resource_declaration">應用程式中的部分資源來自於：</string>
   <string name="library_declaration">LibChecker 中所有標示的程式庫資訊均來自於其所屬的 SDK 的開發文件或程式碼存放庫，如果資訊有有誤，請聯絡：absinthe@absinthe.life</string>
   <!--  Settings  -->
   <string name="pref_group_normal">一般</string>
@@ -166,6 +166,7 @@
   <string name="lib_detail_app_install_source_title">安裝來源</string>
   <string name="lib_detail_app_install_source_originating_package">安裝要求者</string>
   <string name="lib_detail_app_install_source_installing_package">安裝執行程式</string>
+  <string name="lib_detail_app_installed_time">安裝時間</string>
   <string name="lib_detail_app_install_source_empty">未知</string>
   <string name="lib_detail_app_install_source_empty_detail">Shell 或已解除安裝的應用程式</string>
   <string name="lib_detail_app_install_source_shizuku_usage">因為 Android 限制了取得安裝要求者的 API，我們使用 Shizuku 以取得安裝要求者。</string>
@@ -234,6 +235,7 @@
   <string name="album_restore_detail">%1$s：總計 %2$s 個項目\n</string>
   <string name="album_click_to_choose">按下以選擇</string>
   <string name="album_dialog_delete_snapshot_message">處理中…</string>
+  <string name="album_snapshot_top_apps_not_initialized">尚未加载</string>
   <!--  Integration  -->
   <string name="integration_monkey_king_menu_block">使用「大聖淨化」封鎖此元件</string>
   <string name="integration_monkey_king_menu_unblock">使用「大聖淨化」解除封鎖此元件</string>

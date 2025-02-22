@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
@@ -42,9 +43,11 @@ class ApkDetailActivity :
     resolveIntent(intent)
   }
 
+  @SuppressLint("UnsafeIntentLaunch")
   override fun onNewIntent(intent: Intent) {
     super.onNewIntent(intent)
-    resolveIntent(intent)
+    finish()
+    startActivity(intent)
   }
 
   override fun onDestroy() {
@@ -83,6 +86,7 @@ class ApkDetailActivity :
 
     lifecycleScope.launch(Dispatchers.IO) {
       tempFile = File(externalCacheDir, Constants.TEMP_PACKAGE).also { tf ->
+        if (tf.exists()) tf.delete()
         val inputStream = runCatching { contentResolver.openInputStream(uri) }.getOrNull() ?: run {
           dialog.dismiss()
           showToast(R.string.toast_use_another_file_manager)
