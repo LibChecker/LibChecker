@@ -83,20 +83,22 @@ object LCAppUtils {
     return ruleEntity
   }
 
-  private val checkNativeLibs =
-    listOf("libjiagu.so", "libjiagu_a64.so", "libjiagu_x86.so", "libjiagu_x64.so", "libDexHelper.so", "libDexHelper-x86.so", "libdexjni.so", "libapp.so", "libmain.so")
+  private val NATIVE_SET_QIHOO = setOf("libjiagu.so", "libjiagu_a64.so", "libjiagu_x86.so", "libjiagu_x64.so")
+  private val NATIVE_SET_SECNEO = setOf("libDexHelper.so", "libDexHelper-x86.so", "libdexjni.so")
+  private val NATIVE_SET_FLUTTER = setOf("libapp.so")
+  private val NATIVE_SET_UNITY = setOf("libmain.so")
+  private val NATIVE_ALL = NATIVE_SET_QIHOO + NATIVE_SET_SECNEO + NATIVE_SET_FLUTTER + NATIVE_SET_UNITY
+
   fun checkNativeLibValidation(
     packageName: String,
     nativeLib: String,
     otherNativeLibs: List<LibStringItem>? = null
   ): Boolean {
-    if (!checkNativeLibs.contains(nativeLib)) {
-      return true
-    }
+    if (!NATIVE_ALL.contains(nativeLib)) return true
     val sourceDir = PackageUtils.getPackageInfo(packageName).applicationInfo?.sourceDir ?: return false
     val source = File(sourceDir)
-    return when (nativeLib) {
-      "libjiagu.so", "libjiagu_a64.so", "libjiagu_x86.so", "libjiagu_x64.so" -> {
+    return when {
+      NATIVE_SET_QIHOO.contains(nativeLib) -> {
         runCatching {
           PackageUtils.findDexClasses(
             source,
@@ -109,7 +111,7 @@ object LCAppUtils {
         }.getOrDefault(false)
       }
 
-      "libDexHelper.so", "libDexHelper-x86.so", "libdexjni.so" -> {
+      NATIVE_SET_SECNEO.contains(nativeLib) -> {
         runCatching {
           PackageUtils.findDexClasses(
             source,
@@ -120,7 +122,7 @@ object LCAppUtils {
         }.getOrDefault(false)
       }
 
-      "libapp.so" -> {
+      NATIVE_SET_FLUTTER.contains(nativeLib) -> {
         runCatching {
           otherNativeLibs?.any { it.name == "libflutter.so" } == true ||
             PackageUtils.findDexClasses(
@@ -132,7 +134,7 @@ object LCAppUtils {
         }.getOrDefault(false)
       }
 
-      "libmain.so" -> {
+      NATIVE_SET_UNITY.contains(nativeLib) -> {
         runCatching {
           otherNativeLibs?.any { it.name == "libunity.so" } == true
         }.getOrDefault(false)

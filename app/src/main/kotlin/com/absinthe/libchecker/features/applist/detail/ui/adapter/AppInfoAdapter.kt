@@ -3,9 +3,9 @@ package com.absinthe.libchecker.features.applist.detail.ui.adapter
 import android.content.Intent
 import android.content.pm.PackageItemInfo
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.view.ViewGroup
+import androidx.core.graphics.drawable.toDrawable
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppInfoItemView
@@ -37,7 +37,7 @@ class AppInfoAdapter : BaseQuickAdapter<AppInfoAdapter.AppInfoItem, BaseViewHold
         packageName,
         0
       ).applicationInfo!!.loadIcon(SystemServices.packageManager)
-    }.getOrDefault(ColorDrawable(Color.TRANSPARENT))
+    }.getOrDefault(Color.TRANSPARENT.toDrawable())
   }
 
   data class AppInfoItem(val pii: PackageItemInfo, val intent: Intent)

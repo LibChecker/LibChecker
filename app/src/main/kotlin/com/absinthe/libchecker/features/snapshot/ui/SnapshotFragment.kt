@@ -32,7 +32,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
@@ -494,7 +493,7 @@ class SnapshotFragment :
           .appendQueryParameter(LCUris.Bridge.PARAM_ACTION, LCUris.Bridge.ACTION_SHOOT)
           .appendQueryParameter(
             LCUris.Bridge.PARAM_AUTHORITY,
-            LibCheckerApp.generateAuthKey().toString()
+            GlobalValues.generateAuthKey().toString()
           )
           .appendQueryParameter(LCUris.Bridge.PARAM_DROP_PREVIOUS, false.toString())
           .build()

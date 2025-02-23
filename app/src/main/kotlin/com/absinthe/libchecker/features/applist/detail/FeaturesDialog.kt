@@ -3,13 +3,13 @@ package com.absinthe.libchecker.features.applist.detail
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
-import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Build
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.core.text.HtmlCompat
@@ -60,7 +60,7 @@ object FeaturesDialog {
   }
 
   fun showRxKotlinDialog(context: Context, version: String?) {
-    val drawable = UiUtils.changeDrawableColor(context, R.drawable.ic_reactivex, Color.parseColor("#7F52FF"))
+    val drawable = UiUtils.changeDrawableColor(context, R.drawable.ic_reactivex, "#7F52FF".toColorInt())
     commonShowDialogImpl(
       context,
       drawable,
@@ -72,7 +72,7 @@ object FeaturesDialog {
   }
 
   fun showRxAndroidDialog(context: Context, version: String?) {
-    val drawable = UiUtils.changeDrawableColor(context, R.drawable.ic_reactivex, Color.parseColor("#3DDC84"))
+    val drawable = UiUtils.changeDrawableColor(context, R.drawable.ic_reactivex, "#3DDC84".toColorInt())
     commonShowDialogImpl(
       context,
       drawable,

@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.LibCheckerApp
+import com.absinthe.libchecker.LibCheckerApp.Companion.app
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.constant.options.LibReferenceOptions
@@ -11,16 +12,25 @@ import com.absinthe.libchecker.constant.options.SnapshotOptions
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.OsUtils
+import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.SPDelegates
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import java.util.Locale
+import java.util.UUID
 import kotlinx.coroutines.flow.MutableSharedFlow
 import timber.log.Timber
 
 const val SP_NAME = "${BuildConfig.APPLICATION_ID}_preferences"
 
 object GlobalValues {
+
+  fun generateAuthKey(): Int {
+    if (uuid.isEmpty()) {
+      uuid = UUID.randomUUID().toString()
+    }
+    return (uuid.hashCode() + PackageUtils.getPackageInfo(app.packageName).firstInstallTime).mod(90000) + 10000
+  }
 
   private fun getPreferences(): SharedPreferences {
     return SPUtils.sp
@@ -47,8 +57,6 @@ object GlobalValues {
   var snapshotKeep: String by SPDelegates(Constants.PREF_SNAPSHOT_KEEP, Constants.SNAPSHOT_DEFAULT)
 
   var darkMode: String by SPDelegates(Constants.PREF_DARK_MODE, Constants.DARK_MODE_FOLLOW_SYSTEM)
-
-  var rengeTheme: Boolean by SPDelegates(Constants.RENGE_THEME, false)
 
   var libSortMode: Int by SPDelegates(Constants.PREF_LIB_SORT_MODE, MODE_SORT_BY_SIZE)
 

@@ -93,8 +93,6 @@ object Constants {
   const val RULES_DB_FILE_NAME = "rules.db"
   const val RULES_DATABASE_NAME = "rules_database"
 
-  const val RENGE_THEME = "rengeTheme"
-
   const val PREF_UUID = "uuid"
   const val PREF_ADVANCED_OPTIONS = "advancedOptions"
   const val PREF_ITEM_ADVANCED_OPTIONS = "itemAdvancedOptions"
