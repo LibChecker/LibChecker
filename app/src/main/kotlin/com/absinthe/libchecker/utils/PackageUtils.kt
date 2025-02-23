@@ -85,7 +85,6 @@ import com.absinthe.libraries.utils.manager.TimeRecorder
 import com.android.tools.smali.dexlib2.Opcodes
 import dev.rikka.tools.refine.Refine
 import java.io.File
-import java.io.FileInputStream
 import java.security.interfaces.DSAPublicKey
 import java.security.interfaces.RSAPublicKey
 import java.text.DateFormat
@@ -93,6 +92,7 @@ import java.util.zip.ZipEntry
 import javax.security.cert.X509Certificate
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream
+import org.apache.commons.io.input.BufferedFileChannelInputStream
 import rikka.shizuku.Shizuku
 import rikka.shizuku.ShizukuBinderWrapper
 import rikka.shizuku.SystemServiceHelper
@@ -327,12 +327,15 @@ object PackageUtils {
     }
 
     if (ENABLE_GET_APK_FILE_LIBS_LOG) timeRecorder.start()
-    FileInputStream(file).use { input ->
+    val bufferedIS = BufferedFileChannelInputStream.Builder()
+      .setFile(file)
+      .get()
+    bufferedIS.use { input ->
       ZipArchiveInputStream(input).use { zipInput ->
         var entry = zipInput.nextEntry
         while (entry != null) {
           try {
-            if (entry.method == ZipArchiveEntry.STORED && entry.size == 0L) continue
+            if (entry.name.isEmpty()) continue
             if (entry.isDirectory || !entry.name.endsWith(".so") || (sourceDir != null && !entry.name.startsWith(sourceDir))) {
               if (entry.isDirectory.not() && pendingEntryDirMap.all { it.value == 0 }) {
                 // Optimize for skipping unused entries, since sorted by name
