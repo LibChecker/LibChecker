@@ -49,16 +49,21 @@ abstract class BaseActivity<VB : ViewBinding> :
   }
 
   override fun computeUserThemeKey(): String {
-    return GlobalValues.darkMode + GlobalValues.rengeTheme
+    return GlobalValues.darkMode
   }
 
+  @Suppress("DEPRECATION")
   override fun onApplyTranslucentSystemBars() {
     super.onApplyTranslucentSystemBars()
-    window.statusBarColor = Color.TRANSPARENT
-    window.decorView.post {
-      window.navigationBarColor = Color.TRANSPARENT
-      if (OsUtils.atLeastQ()) {
-        window.isNavigationBarContrastEnforced = false
+    window.apply {
+      decorView.post {
+        if (!OsUtils.atLeastV()) {
+          statusBarColor = Color.TRANSPARENT
+          navigationBarColor = Color.TRANSPARENT
+        }
+        if (OsUtils.atLeastQ()) {
+          isNavigationBarContrastEnforced = false
+        }
       }
     }
   }
@@ -66,9 +71,5 @@ abstract class BaseActivity<VB : ViewBinding> :
   override fun onApplyUserThemeResource(theme: Resources.Theme, isDecorView: Boolean) {
     theme.applyStyle(R.style.ThemeOverlay, true)
     theme.applyStyle(rikka.material.preference.R.style.ThemeOverlay_Rikka_Material3_Preference, true)
-
-    if (GlobalValues.rengeTheme) {
-      theme.applyStyle(R.style.ThemeOverlay_Renge, true)
-    }
   }
 }

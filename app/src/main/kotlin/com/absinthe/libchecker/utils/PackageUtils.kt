@@ -340,9 +340,8 @@ object PackageUtils {
         var entry = zipInput.nextEntry
         while (entry != null) {
           try {
-            if (entry.name.isEmpty()) continue
-            if (entry.isDirectory || !entry.name.endsWith(".so") || (sourceDir != null && !entry.name.startsWith(sourceDir))) {
-              if (entry.isDirectory.not() && pendingEntryDirMap.all { it.value == 0 }) {
+            if (!entry.name.endsWith(".so") || (sourceDir != null && !entry.name.startsWith(sourceDir))) {
+              if (pendingEntryDirMap.all { it.value == 0 }) {
                 // Optimize for skipping unused entries, since sorted by name
                 if (ENABLE_GET_APK_FILE_LIBS_LOG) Timber.d("${file.absolutePath} Skip at entry: ${entry.name}")
                 break

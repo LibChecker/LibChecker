@@ -12,6 +12,8 @@ import java.io.File
 
 object VersionCompat {
 
+  private const val CLASS_NAME_CLIPBOARD_OVERLAY_VIEW = "com.android.systemui.clipboardoverlay.ClipboardOverlayView"
+
   private val hasClipboardOverlayView: Boolean by lazy {
     runCatching {
       if (DeviceUtils.isOppoDomestic()) return@runCatching false
@@ -22,7 +24,7 @@ object VersionCompat {
       val source = File(sourceDir)
       PackageUtils.findDexClasses(
         source,
-        listOf("com.android.systemui.clipboardoverlay.ClipboardOverlayView".toClassDefType())
+        listOf(CLASS_NAME_CLIPBOARD_OVERLAY_VIEW.toClassDefType())
       ).isNotEmpty()
     }.getOrDefault(false)
   }

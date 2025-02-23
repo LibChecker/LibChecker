@@ -3,10 +3,10 @@ package com.absinthe.libchecker.features.applist.detail.ui
 import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.provider.DocumentsContract
 import android.provider.Settings
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.BuildConfig
@@ -79,7 +79,7 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
     root.setting.setOnClickListener {
       try {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-          .setData(Uri.parse("package:$packageName"))
+          .setData("package:$packageName".toUri())
           .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
         Telemetry.recordEvent(
@@ -167,7 +167,7 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
   private fun getShowMarketList(): List<AppInfoAdapter.AppInfoItem> {
     return PackageManagerCompat.queryIntentActivities(
       Intent(Intent.ACTION_VIEW).also {
-        it.data = Uri.parse("market://details?id=$packageName")
+        it.data = "market://details?id=$packageName".toUri()
       },
       PackageManager.MATCH_DEFAULT_ONLY
     ).filter { it.activityInfo.packageName != BuildConfig.APPLICATION_ID }
@@ -175,7 +175,7 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
         AppInfoAdapter.AppInfoItem(
           it.activityInfo,
           Intent(Intent.ACTION_VIEW)
-            .setData(Uri.parse("market://details?id=$packageName"))
+            .setData("market://details?id=$packageName".toUri())
             .setComponent(ComponentName(it.activityInfo.packageName, it.activityInfo.name))
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         )

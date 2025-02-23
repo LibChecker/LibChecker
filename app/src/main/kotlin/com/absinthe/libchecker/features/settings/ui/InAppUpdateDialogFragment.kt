@@ -77,32 +77,28 @@ class InAppUpdateDialogFragment : BaseBottomSheetViewDialogFragment<InAppUpdateD
       labelDiff = SnapshotDiffItem.DiffNode(ai.loadLabel(SystemServices.packageManager).toString()),
       versionNameDiff = SnapshotDiffItem.DiffNode(
         pi.versionName.toString(),
-        if (getAppUpdateInfo == null) pi.versionName.toString() else getAppUpdateInfo.app.version
+        getAppUpdateInfo?.app?.version ?: pi.versionName.toString()
       ),
       versionCodeDiff = SnapshotDiffItem.DiffNode(
         pi.getVersionCode(),
-        if (getAppUpdateInfo == null) pi.getVersionCode() else getAppUpdateInfo.app.versionCode.toLong()
+        getAppUpdateInfo?.app?.versionCode?.toLong() ?: pi.getVersionCode()
       ),
       abiDiff = SnapshotDiffItem.DiffNode(PackageUtils.getAbi(pi).toShort()),
       targetApiDiff = SnapshotDiffItem.DiffNode(
         ai.targetSdkVersion.toShort(),
-        if (getAppUpdateInfo == null) ai.targetSdkVersion.toShort() else getAppUpdateInfo.app.extra.target.toShort()
+        getAppUpdateInfo?.app?.extra?.target?.toShort() ?: ai.targetSdkVersion.toShort()
       ),
       compileSdkDiff = SnapshotDiffItem.DiffNode(
         pi.getCompileSdkVersion().toShort(),
-        if (getAppUpdateInfo == null) {
-          pi.getCompileSdkVersion().toShort()
-        } else {
-          getAppUpdateInfo.app.extra.compile.toShort()
-        }
+        getAppUpdateInfo?.app?.extra?.compile?.toShort() ?: pi.getCompileSdkVersion().toShort()
       ),
       minSdkDiff = SnapshotDiffItem.DiffNode(
         ai.minSdkVersion.toShort(),
-        if (getAppUpdateInfo == null) ai.minSdkVersion.toShort() else getAppUpdateInfo.app.extra.min.toShort()
+        getAppUpdateInfo?.app?.extra?.min?.toShort() ?: ai.minSdkVersion.toShort()
       ),
       packageSizeDiff = SnapshotDiffItem.DiffNode(
         pi.getPackageSize(includeSplits = false),
-        if (getAppUpdateInfo == null) pi.getPackageSize(includeSplits = false) else getAppUpdateInfo.app.extra.packageSize.toLong()
+        getAppUpdateInfo?.app?.extra?.packageSize?.toLong() ?: pi.getPackageSize(includeSplits = false)
       ),
       nativeLibsDiff = SnapshotDiffItem.DiffNode(""),
       servicesDiff = SnapshotDiffItem.DiffNode(""),

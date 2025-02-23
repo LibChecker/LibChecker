@@ -1,9 +1,9 @@
 package com.absinthe.libchecker.features.settings.ui
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import androidx.core.net.toUri
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.features.settings.bean.GetUpdatesItem
@@ -32,7 +32,7 @@ class GetUpdatesDialogFragment : BaseBottomSheetViewDialogFragment<GetUpdatesDia
       ) {
         context?.startActivity(
           Intent(Intent.ACTION_VIEW).apply {
-            data = Uri.parse(URLManager.GITHUB_REPO_PAGE)
+            data = URLManager.GITHUB_REPO_PAGE.toUri()
           }
         )
       },
@@ -42,7 +42,7 @@ class GetUpdatesDialogFragment : BaseBottomSheetViewDialogFragment<GetUpdatesDia
       ) {
         context?.startActivity(
           Intent(Intent.ACTION_VIEW).apply {
-            data = Uri.parse(URLManager.PLAY_STORE_DETAIL_PAGE)
+            data = URLManager.PLAY_STORE_DETAIL_PAGE.toUri()
           }
         )
       },
@@ -52,7 +52,7 @@ class GetUpdatesDialogFragment : BaseBottomSheetViewDialogFragment<GetUpdatesDia
       ) {
         context?.startActivity(
           Intent(Intent.ACTION_VIEW).apply {
-            data = Uri.parse(URLManager.TELEGRAM_RELEASES)
+            data = URLManager.TELEGRAM_RELEASES.toUri()
           }
         )
       },
@@ -62,7 +62,7 @@ class GetUpdatesDialogFragment : BaseBottomSheetViewDialogFragment<GetUpdatesDia
       ) {
         context?.startActivity(
           Intent(Intent.ACTION_VIEW).apply {
-            data = Uri.parse(URLManager.FDROID_PAGE)
+            data = URLManager.FDROID_PAGE.toUri()
           }
         )
       }

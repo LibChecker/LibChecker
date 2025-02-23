@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.features.chart.impl
 
 import android.content.Context
-import android.graphics.Color
+import androidx.core.graphics.toColorInt
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.database.entity.LCItem
@@ -68,8 +68,8 @@ class AABChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>(it
 
       // add a lot of colors
       val colors = arrayListOf(
-        Color.parseColor("#4285f4"),
-        Color.parseColor("#3ddc84")
+        "#4285f4".toColorInt(),
+        "#3ddc84".toColorInt()
       )
 
       dataSet.colors = colors

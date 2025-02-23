@@ -9,7 +9,6 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
-import android.content.res.Configuration
 import android.graphics.BitmapFactory
 import android.os.IBinder
 import android.os.Process
@@ -64,11 +63,6 @@ class ShootService : LifecycleService() {
   private val notificationIdShootSuccess = notificationIdShoot + 1
   private val builder by lazy { NotificationCompat.Builder(this, SHOOT_CHANNEL_ID) }
   private val notificationManager by lazy { NotificationManagerCompat.from(this) }
-  private val configuration by lazy {
-    Configuration(resources.configuration).apply {
-      setLocale(GlobalValues.locale)
-    }
-  }
   private val repository = Repositories.lcRepository
   private val listenerList = RemoteCallbackList<OnShootListener>()
 
@@ -118,8 +112,7 @@ class ShootService : LifecycleService() {
 
     notificationManager.apply {
       if (OsUtils.atLeastO()) {
-        val name = createConfigurationContext(configuration).resources
-          .getString(R.string.channel_shoot)
+        val name = getString(R.string.channel_shoot)
         val importance = NotificationManager.IMPORTANCE_DEFAULT
         val channel = NotificationChannel(SHOOT_CHANNEL_ID, name, importance)
         createNotificationChannel(channel)
@@ -314,7 +307,7 @@ class ShootService : LifecycleService() {
 
       builder.setProgress(0, 0, false)
         .setOngoing(false)
-        .setContentTitle(createConfigurationContext(configuration).resources.getString(R.string.noti_shoot_title_saved))
+        .setContentTitle(getString(R.string.noti_shoot_title_saved))
         .setContentText(getFormatDateString(ts))
       notificationManager.notify(notificationIdShootSuccess, builder.build())
     }
@@ -354,7 +347,7 @@ class ShootService : LifecycleService() {
       },
       PendingIntent.FLAG_IMMUTABLE
     )
-    builder.setContentTitle(createConfigurationContext(configuration).resources.getString(R.string.noti_shoot_title))
+    builder.setContentTitle(getString(R.string.noti_shoot_title))
       .setSmallIcon(R.drawable.ic_logo)
       .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher))
       .setPriority(NotificationCompat.PRIORITY_LOW)

@@ -114,8 +114,8 @@ class ChartFragment :
         }
       }
       val view = ExpandingView(requireContext()).apply {
-        layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
-          it.setMargins(4.dp, 4.dp, 4.dp, 4.dp)
+        layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).also { lp ->
+          lp.setMargins(4.dp, 4.dp, 4.dp, 4.dp)
         }
         setContent(it.value.first, getString(it.value.second))
         setOnClickListener { _ ->
