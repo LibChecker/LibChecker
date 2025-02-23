@@ -4,7 +4,6 @@ import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
 import android.os.RemoteException
 import android.text.TextUtils
@@ -262,7 +261,7 @@ class SettingsFragment :
         try {
           startActivity(
             Intent(Intent.ACTION_VIEW).apply {
-              data = Uri.parse(URLManager.PLAY_STORE_DETAIL_PAGE)
+              data = URLManager.PLAY_STORE_DETAIL_PAGE.toUri()
             }
           )
           Telemetry.recordEvent(

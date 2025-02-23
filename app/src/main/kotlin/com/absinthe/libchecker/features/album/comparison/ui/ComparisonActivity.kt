@@ -20,6 +20,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.core.graphics.createBitmap
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
@@ -597,7 +598,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
     val iconSize = resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size)
     val leftIcon = Bitmap.createBitmap(leftIconOrigin, 0, 0, leftIconOrigin.width / 2, leftIconOrigin.height)
     val rightIcon = Bitmap.createBitmap(rightIconOrigin, rightIconOrigin.width / 2, 0, rightIconOrigin.width / 2, rightIconOrigin.height)
-    val comboIcon = Bitmap.createBitmap(iconSize, iconSize, Bitmap.Config.ARGB_8888)
+    val comboIcon = createBitmap(iconSize, iconSize)
     val isSameIcon = leftIconOrigin.sameAs(rightIconOrigin)
 
     Canvas(comboIcon).apply {

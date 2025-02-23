@@ -48,8 +48,6 @@ object GlobalValues {
 
   var darkMode: String by SPDelegates(Constants.PREF_DARK_MODE, Constants.DARK_MODE_FOLLOW_SYSTEM)
 
-  var rengeTheme: Boolean by SPDelegates(Constants.RENGE_THEME, false)
-
   var libSortMode: Int by SPDelegates(Constants.PREF_LIB_SORT_MODE, MODE_SORT_BY_SIZE)
 
   var processMode: Boolean by SPDelegates(Constants.PREF_PROCESS_MODE, false)

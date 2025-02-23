@@ -13,6 +13,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.graphics.toColorInt
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.Constants
@@ -34,7 +35,7 @@ object UiUtils {
     val g = range.random()
     val b = range.random()
 
-    return Color.parseColor(String.format("#%02x%02x%02x", r, g, b))
+    return String.format("#%02x%02x%02x", r, g, b).toColorInt()
   }
 
   fun isDarkColor(@ColorInt color: Int): Boolean {

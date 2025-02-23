@@ -10,6 +10,7 @@ import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.graphics.toColorInt
 import androidx.core.view.children
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
@@ -85,7 +86,7 @@ class SnapshotDetailComponentView(context: Context) : MaterialCardView(context) 
               it.topMargin = 4.dp
             }
             setTextColor(Color.BLACK)
-            chipStrokeColor = ColorStateList.valueOf((Color.parseColor("#20000000")))
+            chipStrokeColor = ColorStateList.valueOf(("#20000000".toColorInt()))
             chipStrokeWidth = 1.dp.toFloat()
             chipStartPadding = 10.dp.toFloat()
             setPadding(paddingStart, 2.dp, paddingEnd, 2.dp)

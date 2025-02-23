@@ -38,8 +38,8 @@ class DeveloperInfoAdapter : BaseQuickAdapter<DeveloperInfo, BaseViewHolder>(0) 
           CustomTabsIntent.Builder().build().apply {
             launchUrl(context, item.github.toUri())
           }
-        }.onFailure {
-          Timber.e(it)
+        }.onFailure { t ->
+          Timber.e(t)
           runCatching {
             val intent = Intent(Intent.ACTION_VIEW)
               .setData(item.github.toUri())

@@ -3,12 +3,12 @@ package com.absinthe.libchecker.features.applist.detail.ui
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.text.SpannableString
 import android.text.style.ImageSpan
 import android.view.View
 import androidx.annotation.RequiresApi
+import androidx.core.net.toUri
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import coil.load
@@ -81,7 +81,7 @@ class AppInstallSourceBSDFragment :
       item.packageView.setOnClickListener {
         startActivity(
           Intent(Intent.ACTION_VIEW).apply {
-            data = Uri.parse(URLManager.SHIZUKU_APP_GITHUB_RELEASE_PAGE)
+            data = URLManager.SHIZUKU_APP_GITHUB_RELEASE_PAGE.toUri()
           }
         )
       }
@@ -108,7 +108,7 @@ class AppInstallSourceBSDFragment :
           item.packageView.setOnClickListener {
             startActivity(
               Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse(URLManager.SHIZUKU_APP_GITHUB_RELEASE_PAGE)
+                data = URLManager.SHIZUKU_APP_GITHUB_RELEASE_PAGE.toUri()
               }
             )
           }
