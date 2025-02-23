@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
+import androidx.core.graphics.toColorInt
 import androidx.core.os.bundleOf
 import androidx.core.text.buildSpannedString
 import androidx.core.text.scale
@@ -568,7 +569,7 @@ abstract class BaseAppDetailActivity :
 
           Features.RX_KOTLIN -> {
             featureAdapter.addData(
-              FeatureItem(R.drawable.ic_reactivex, Color.parseColor("#7F52FF")) {
+              FeatureItem(R.drawable.ic_reactivex, "#7F52FF".toColorInt()) {
                 FeaturesDialog.showRxKotlinDialog(this, feat.version)
               }
             )
@@ -576,7 +577,7 @@ abstract class BaseAppDetailActivity :
 
           Features.RX_ANDROID -> {
             featureAdapter.addData(
-              FeatureItem(R.drawable.ic_reactivex, Color.parseColor("#3DDC84")) {
+              FeatureItem(R.drawable.ic_reactivex, "#3DDC84".toColorInt()) {
                 FeaturesDialog.showRxAndroidDialog(this, feat.version)
               }
             )

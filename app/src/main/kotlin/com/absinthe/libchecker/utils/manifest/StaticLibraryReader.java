@@ -49,7 +49,7 @@ public class StaticLibraryReader {
       }
       return bos.toByteArray();
     } catch (Exception e) {
-      e.printStackTrace();
+      Timber.w(e);
     }
     return null;
   }

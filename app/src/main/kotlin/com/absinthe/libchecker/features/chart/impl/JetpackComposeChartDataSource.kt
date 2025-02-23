@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.features.chart.impl
 
 import android.content.Context
-import android.graphics.Color
+import androidx.core.graphics.toColorInt
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.database.entity.LCItem
@@ -69,8 +69,8 @@ class JetpackComposeChartDataSource(items: List<LCItem>) : BaseChartDataSource<P
 
       // add a lot of colors
       val colors = arrayListOf(
-        Color.parseColor("#37bf6e"),
-        Color.parseColor("#073042")
+        "#37bf6e".toColorInt(),
+        "#073042".toColorInt()
       )
 
       dataSet.colors = colors

@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.Paint
+import androidx.core.graphics.createBitmap
 import coil.size.Size
 import coil.transform.Transformation
 
@@ -16,7 +17,7 @@ class SaturationTransformation(private val saturation: Float) : Transformation {
   override suspend fun transform(input: Bitmap, size: Size): Bitmap {
     val width = input.width
     val height = input.height
-    val output = Bitmap.createBitmap(width, height, input.config!!)
+    val output = createBitmap(width, height, input.config ?: Bitmap.Config.ARGB_8888)
 
     val canvas = Canvas(output)
     val paint = Paint()

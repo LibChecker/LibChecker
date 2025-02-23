@@ -1,8 +1,8 @@
 package com.absinthe.libchecker.features.settings
 
 import android.app.DownloadManager
-import android.net.Uri
 import android.os.Environment
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.api.ApiManager
@@ -31,7 +31,7 @@ class SettingsViewModel : ViewModel() {
   }
 
   fun downloadApk(url: String) = viewModelScope.launch(Dispatchers.IO) {
-    val request = DownloadManager.Request(Uri.parse(url)).apply {
+    val request = DownloadManager.Request(url.toUri()).apply {
       setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
       setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
       setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, url.substringAfterLast("/"))

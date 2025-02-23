@@ -46,9 +46,9 @@ object AndroidVersions {
     Node(36, "Baklava", "16", R.drawable.ic_android_baklava, getDate(2025, 5))
   )
 
-  val simpleVersions = versions.map {
+  val simpleVersions = versions.associate {
     it.version to it.versionName.takeWhile { c -> c != ' ' }
-  }.toMap()
+  }
 
   private fun getDate(year: Int, month: Int): Date {
     val calendar = Calendar.getInstance()

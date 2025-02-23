@@ -77,7 +77,7 @@ class PermissionAnalysisFragment :
   override suspend fun getFilterList(
     searchWords: String?,
     process: String?
-  ): List<LibStringItemChip>? {
+  ): List<LibStringItemChip> {
     return getItems().asSequence()
       .filter { searchWords == null || it.item.name.contains(searchWords, true) || it.item.source?.contains(searchWords, true) == true }
       .filter { process == null || it.item.process != PackageInfo.REQUESTED_PERMISSION_GRANTED.toString() }

@@ -21,7 +21,7 @@ class DevelopersDialogFragment : BaseBottomSheetViewDialogFragment<DevelopersDia
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    var items = listOf(
+    val items = listOf(
       DeveloperInfo(
         "Absinthe",
         "Developer & Designer",

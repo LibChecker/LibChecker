@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.integrations.monkeyking
 
 import android.content.Context
-import android.net.Uri
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import com.absinthe.libchecker.annotation.ACTIVITY
@@ -27,7 +26,7 @@ class MonkeyKingManager {
 
   fun queryBlockedComponent(context: Context, packageName: String): List<ShareCmpInfo.Component> {
     val contentResolver = context.contentResolver
-    val uri = Uri.parse(URI_AUTHORIZATION)
+    val uri = URI_AUTHORIZATION.toUri()
     return try {
       val bundle = contentResolver.call(uri, "cmps", packageName, null)
       val shareCmpInfoString = bundle?.getString("cmp_list") ?: return emptyList()
