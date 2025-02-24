@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
@@ -41,13 +40,6 @@ class ApkDetailActivity :
     super.onCreate(savedInstanceState)
     viewModel.isApk = true
     resolveIntent(intent)
-  }
-
-  @SuppressLint("UnsafeIntentLaunch")
-  override fun onNewIntent(intent: Intent) {
-    super.onNewIntent(intent)
-    finish()
-    startActivity(intent)
   }
 
   override fun onDestroy() {
