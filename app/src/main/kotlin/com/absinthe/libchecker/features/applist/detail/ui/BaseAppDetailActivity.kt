@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
 import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
@@ -149,6 +150,13 @@ abstract class BaseAppDetailActivity :
       enabledState = { !isKeyboardShowing() && binding.toolbar.hasExpandedActionView() },
       handler = { binding.toolbar.collapseActionView() }
     )
+  }
+
+  @SuppressLint("UnsafeIntentLaunch")
+  override fun onNewIntent(intent: Intent) {
+    super.onNewIntent(intent)
+    finish()
+    startActivity(intent)
   }
 
   protected fun onPackageInfoAvailable(packageInfo: PackageInfo, extraBean: DetailExtraBean?) {
