@@ -16,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.STATUS_INIT_END
 import com.absinthe.libchecker.annotation.STATUS_NOT_START
@@ -66,19 +67,21 @@ import timber.log.Timber
 const val VF_LOADING = 0
 const val VF_LIST = 1
 const val VF_INIT = 2
+const val VF_REJECT = 3
 
 class AppListFragment :
   BaseListControllerFragment<FragmentAppListBinding>(),
   SearchView.OnQueryTextListener {
 
+  private val isFirstLaunch get() = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
   private val appAdapter = AppAdapter()
   private var updateItemsJob: Job? = null
   private var delayShowNavigationJob: Job? = null
   private var advancedMenuBSDFragment: AdvancedMenuBSDFragment? = null
-  private var isFirstLaunch = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
   private var isFirstRequestChange = true
   private var isSearchTextClearOnce = false
   private var firstScrollFlag = false
+  private var hasInitializedItems = false
 
   private lateinit var layoutManager: RecyclerView.LayoutManager
   private lateinit var dumpAppsInfoResultLauncher: ActivityResultLauncher<String>
@@ -342,13 +345,23 @@ class AppListFragment :
     }
   }
 
+  override fun getSuitableLayoutManager() = binding.list.layoutManager
+
+  override fun onReturnTop() {
+    if (binding.list.canScrollVertically(-1)) {
+      returnTopOfList()
+    } else {
+      flip(VF_LOADING)
+      homeViewModel.requestChange()
+    }
+  }
+
   private fun initObserver() {
     homeViewModel.apply {
       effect.onEach {
         when (it) {
           is HomeViewModel.Effect.ReloadApps -> {
             Once.clearDone(OnceTag.FIRST_LAUNCH)
-            isFirstLaunch = true
             doOnMainThreadIdle {
               initApps()
             }
@@ -372,8 +385,14 @@ class AppListFragment :
 
               STATUS_INIT_END -> {
                 if (isFirstLaunch) {
-                  Once.markDone(OnceTag.FIRST_LAUNCH)
-                  Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
+                  val apps = Repositories.lcRepository.getLCItems()
+                  if (isOnlyAppItself(apps)) {
+                    Timber.d("Only the app itself")
+                    flip(VF_REJECT)
+                  } else {
+                    Once.markDone(OnceTag.FIRST_LAUNCH)
+                    Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
+                  }
                 }
                 activity?.removeMenuProvider(this@AppListFragment)
                 activity?.addMenuProvider(this@AppListFragment, viewLifecycleOwner, Lifecycle.State.RESUMED)
@@ -401,7 +420,7 @@ class AppListFragment :
         }
       }.launchIn(lifecycleScope)
       dbItemsFlow.onEach {
-        if (it.isEmpty()) {
+        if (it.isEmpty() || (isFirstLaunch && !hasInitializedItems)) {
           initApps()
         } else if (
           appListStatus != STATUS_START_INIT &&
@@ -432,8 +451,17 @@ class AppListFragment :
 
   private fun updateItemsImpl(highlightRefresh: Boolean = false) = lifecycleScope.launch(Dispatchers.IO) {
     delay(250)
-    Timber.d("updateItems")
+    Timber.d("updateItemsImpl")
     var filterList: MutableList<LCItem> = Repositories.lcRepository.getLCItems().toMutableList()
+
+    if (isOnlyAppItself(filterList)) {
+      Timber.d("updateItemsImpl: only the app itself")
+      if (homeViewModel.appListStatus == STATUS_NOT_START) {
+        Once.clearDone(OnceTag.FIRST_LAUNCH)
+        flip(VF_REJECT)
+      }
+      return@launch
+    }
 
     val isNonNativeLibApp64Bit = android.os.Process.is64Bit()
     val options = GlobalValues.advancedOptions
@@ -514,8 +542,6 @@ class AppListFragment :
     }
   }
 
-  override fun getSuitableLayoutManager() = binding.list.layoutManager
-
   private fun getSuitableLayoutManagerImpl(configuration: Configuration): RecyclerView.LayoutManager {
     layoutManager = when (configuration.orientation) {
       Configuration.ORIENTATION_PORTRAIT -> LinearLayoutManager(requireContext())
@@ -528,10 +554,10 @@ class AppListFragment :
     return layoutManager
   }
 
-  private fun flip(page: Int) {
-    Timber.d("flip to $page")
+  private fun flip(page: Int) = lifecycleScope.launch(Dispatchers.Main) {
     allowRefreshing = page == VF_LIST
     if (binding.vfContainer.displayedChild != page) {
+      Timber.d("flip to $page")
       binding.vfContainer.displayedChild = page
     }
     if (page == VF_INIT) {
@@ -544,17 +570,13 @@ class AppListFragment :
   }
 
   private fun initApps() {
+    hasInitializedItems = true
     flip(VF_INIT)
     activity?.removeMenuProvider(this)
     homeViewModel.initItems()
   }
 
-  override fun onReturnTop() {
-    if (binding.list.canScrollVertically(-1)) {
-      returnTopOfList()
-    } else {
-      flip(VF_LOADING)
-      homeViewModel.requestChange()
-    }
+  private fun isOnlyAppItself(list: Collection<LCItem>): Boolean {
+    return list.size == 1 && list.first().packageName == BuildConfig.APPLICATION_ID
   }
 }

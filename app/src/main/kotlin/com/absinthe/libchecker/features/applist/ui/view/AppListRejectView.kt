@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.features.applist.ui.view
 
 import android.content.Context
+import android.util.AttributeSet
 import android.view.Gravity
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
@@ -11,7 +12,10 @@ import com.absinthe.libchecker.utils.extensions.getDrawableByAttr
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 
-class AppListRejectView(context: Context) : AViewGroup(context) {
+class AppListRejectView(
+  context: Context,
+  attributeSet: AttributeSet? = null
+) : AViewGroup(context, attributeSet) {
 
   init {
     isClickable = true

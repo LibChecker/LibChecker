@@ -34,6 +34,12 @@
       android:layout_height="wrap_content"
       android:layout_gravity="center" />
 
+    <com.absinthe.libchecker.features.applist.ui.view.AppListRejectView
+      android:id="@+id/reject_view"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center" />
+
   </com.absinthe.libchecker.view.app.CustomViewFlipper>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
