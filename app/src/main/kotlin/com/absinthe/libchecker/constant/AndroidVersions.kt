@@ -43,7 +43,7 @@ object AndroidVersions {
     Node(33, "Tiramisu", "13", R.drawable.ic_android_t, getDate(2022, 10)),
     Node(34, "UpsideDownCake", "14", R.drawable.ic_android_u, getDate(2023, 10)),
     Node(35, "Vanilla Ice Cream", "15", R.drawable.ic_android_v, getDate(2024, 10)),
-    Node(36, "Baklava", "16", R.drawable.ic_android_baklava, getDate(2025, 5))
+    Node(36, "Baklava", "16", R.drawable.ic_android_baklava, getDate(2025, 6))
   )
 
   val simpleVersions = versions.associate {
