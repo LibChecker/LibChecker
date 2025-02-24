@@ -261,7 +261,12 @@ object PackageUtils {
       val isAbiSplitFile = specifiedAbi == null && INSTRUCTION_SET_MAP_TO_ABI_VALUE.keys.any { key -> fileName.contains(key) }
       specifiedAvailable || isAbiSplitFile
     }.forEach { split ->
-      map.putAll(getApkFileLibs(File(split), parseElf = parseElf))
+      val splitMap = getApkFileLibs(File(split), parseElf = parseElf)
+      for ((key, newList) in splitMap) {
+        map.merge(key, newList) { existingList, _ ->
+          existingList.apply { addAll(newList) }
+        }
+      }
     }
 
     return map
