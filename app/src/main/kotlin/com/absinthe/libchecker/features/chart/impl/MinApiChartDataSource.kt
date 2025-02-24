@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.pm.PackageInfo
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.features.chart.BaseVariableChartDataSource
+import com.absinthe.libchecker.features.chart.IAndroidSDKChart
 import com.absinthe.libchecker.features.chart.IntegerFormatter
 import com.absinthe.libchecker.features.chart.OsVersionAxisFormatter
 import com.absinthe.libchecker.utils.PackageUtils
@@ -18,7 +19,9 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-class MinApiChartDataSource(items: List<LCItem>) : BaseVariableChartDataSource<BarChart>(items) {
+class MinApiChartDataSource(items: List<LCItem>) :
+  BaseVariableChartDataSource<BarChart>(items),
+  IAndroidSDKChart {
   override suspend fun fillChartView(chartView: BarChart) {
     withContext(Dispatchers.Default) {
       val context = chartView.context ?: return@withContext

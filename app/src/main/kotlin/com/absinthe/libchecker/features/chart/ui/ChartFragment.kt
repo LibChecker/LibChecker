@@ -20,6 +20,7 @@ import com.absinthe.libchecker.databinding.FragmentPieChartBinding
 import com.absinthe.libchecker.features.chart.BaseChartDataSource
 import com.absinthe.libchecker.features.chart.BaseVariableChartDataSource
 import com.absinthe.libchecker.features.chart.ChartViewModel
+import com.absinthe.libchecker.features.chart.IAndroidSDKChart
 import com.absinthe.libchecker.features.chart.IChartDataSource
 import com.absinthe.libchecker.features.chart.IntegerFormatter
 import com.absinthe.libchecker.features.chart.impl.AABChartDataSource
@@ -378,7 +379,7 @@ class ChartFragment :
       it.setTitle(dataSource?.getLabelByXValue(requireContext(), x).orEmpty())
       it.setList(dataSource?.getListByXValue(x) ?: emptyList())
 
-      if (dataSource is TargetApiChartDataSource || dataSource is MinApiChartDataSource) {
+      if (dataSource is IAndroidSDKChart) {
         val index = (dataSource as BaseVariableChartDataSource<*>).getListKeyByXValue(x)
         it.setAndroidVersionLabel(AndroidVersions.versions.find { node -> node.version == index })
       } else {
