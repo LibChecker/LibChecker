@@ -2,7 +2,6 @@ import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import java.io.File
-import java.time.Instant
 import org.gradle.api.Project
 
 const val baseVersionName = "2.5.1"
@@ -20,7 +19,7 @@ fun Project.setupAppModule(block: BaseAppModuleExtension.() -> Unit = {}) {
     defaultConfig {
       versionCode = verCode
       versionName = verName
-      resourceConfigurations += arrayOf(
+      androidResources.localeFilters += mutableSetOf(
         "en",
         "zh-rCN",
         "zh-rTW",
@@ -67,13 +66,12 @@ fun Project.setupAppModule(block: BaseAppModuleExtension.() -> Unit = {}) {
     block()
   }
 }
-
 private inline fun <reified T : BaseExtension> Project.setupBaseModule(crossinline block: T.() -> Unit = {}) {
   extensions.configure<BaseExtension>("android") {
-    compileSdkVersion(35)
+    compileSdkVersion(36)
     defaultConfig {
       minSdk = 24
-      targetSdk = 35
+      targetSdk = 36
     }
     sourceSets.configureEach {
       java.srcDirs("src/$name/kotlin")
