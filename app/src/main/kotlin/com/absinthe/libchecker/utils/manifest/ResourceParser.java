@@ -81,7 +81,7 @@ public class ResourceParser {
               mParser.getAttributeCount());
             lastNode = node;
             nodes.put(mParser.getName() + '\0' + mParser.getDepth(), node);
-            if (!builder.isEmpty()) {
+            if (builder.length() > 0) {
               builder.append('\n')
                 .append(makeIndent(level));
             }
