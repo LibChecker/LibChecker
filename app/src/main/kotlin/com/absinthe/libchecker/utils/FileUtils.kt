@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.utils
 
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
@@ -58,14 +57,14 @@ object FileUtils {
 
   @Throws(IOException::class)
   fun getEntrySize(zipInput: ZipArchiveInputStream): Int {
-    val byteArrayOutputStream = ByteArrayOutputStream()
     val buffer = ByteArray(1024)
+    var totalSize = 0
     var length: Int
 
-    while ((zipInput.read(buffer).also { length = it }) != -1) {
-      byteArrayOutputStream.write(buffer, 0, length)
+    while (zipInput.read(buffer).also { length = it } != -1) {
+      totalSize += length
     }
 
-    return byteArrayOutputStream.size()
+    return totalSize
   }
 }
