@@ -13,6 +13,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.AndroidVersions
+import com.absinthe.libchecker.constant.GlobalFeatures
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
@@ -87,7 +88,7 @@ class ChartFragment :
     SUPPORT_16KB
   }
 
-  private val chartTypeToIconRes = mapOf(
+  private val chartTypeToIconRes = mutableMapOf(
     ChartType.ABI to (R.drawable.ic_logo to R.string.abi_string),
     ChartType.KOTLIN to (com.absinthe.lc.rulesbundle.R.drawable.ic_lib_kotlin to R.string.kotlin_string),
     ChartType.TARGET_SDK to (R.drawable.ic_label_target_sdk to R.string.target_sdk_string),
@@ -95,11 +96,17 @@ class ChartFragment :
     ChartType.COMPILE_SDK to (R.drawable.ic_label_compile_sdk to R.string.compile_sdk_string),
     ChartType.JETPACK_COMPOSE to (com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetpack_compose to R.string.jetpack_compose_short),
     ChartType.MARKET_DISTRIBUTION to (com.absinthe.lc.rulesbundle.R.drawable.ic_lib_android to R.string.android_dist_label),
-    ChartType.AAB to (R.drawable.ic_aab to R.string.app_bundle),
-    ChartType.SUPPORT_16KB to (R.drawable.ic_16kb_align to R.string.lib_detail_dialog_title_16kb_page_size)
+    ChartType.AAB to (R.drawable.ic_aab to R.string.app_bundle)
   )
   private var currentChartType = ChartType.ABI
   private var currentExpandingView: ExpandingView? = null
+
+  init {
+    if (GlobalFeatures.ENABLE_DETECTING_16KB_PAGE_ALIGNMENT) {
+      chartTypeToIconRes[ChartType.SUPPORT_16KB] =
+        (R.drawable.ic_16kb_align to R.string.lib_detail_dialog_title_16kb_page_size)
+    }
+  }
 
   override fun init() {
     val featureInitialized = !WorkerService.initializingFeatures

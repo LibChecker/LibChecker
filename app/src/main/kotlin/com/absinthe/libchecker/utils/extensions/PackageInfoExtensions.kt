@@ -35,6 +35,7 @@ import com.absinthe.libchecker.constant.Constants.X86
 import com.absinthe.libchecker.constant.Constants.X86_64
 import com.absinthe.libchecker.constant.Constants.X86_64_STRING
 import com.absinthe.libchecker.constant.Constants.X86_STRING
+import com.absinthe.libchecker.constant.GlobalFeatures
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.features.applist.detail.bean.KotlinToolingMetadata
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
@@ -755,6 +756,7 @@ const val PAGE_SIZE_4_KB = 0x1000
  *
  */
 fun PackageInfo.is16KBAligned(libs: List<LibStringItem>? = null, isApk: Boolean = false): Boolean {
+  if (GlobalFeatures.ENABLE_DETECTING_16KB_PAGE_ALIGNMENT.not()) return false
   val sourceDir = applicationInfo?.sourceDir ?: return false
 
   val file = File(sourceDir)
