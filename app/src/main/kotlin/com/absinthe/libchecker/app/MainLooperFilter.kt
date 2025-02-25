@@ -23,21 +23,25 @@ object MainLooperFilter {
     }
   }
 
+  private val heroes = setOf(
+    "addChildrenForExpandedActionView",
+    "android.view.inputmethod.InputMethodManager.startInputInner",
+    "com.android.server.wm.ConfigurationContainer.setActivityType",
+    "com.google.android.gms.common.internal.BaseGmsClient.getRemoteService",
+    "com.swift.sandhook",
+    "handleTopResumedActivityChanged",
+    "lspatch",
+    "MultiSelectPopupWindow.showMultiSelectPopupWindow",
+    "Service.startForeground()",
+    "tryGetViewHolderForPositionByDeadline",
+    "updateForceDarkMode"
+  )
+
   @Throws(Throwable::class)
   private fun dealStackTraceException(e: Throwable) {
     val stack = Log.getStackTraceString(e)
 
-    if (stack.contains("Service.startForeground()") ||
-      stack.contains("com.swift.sandhook") ||
-      stack.contains("updateForceDarkMode") ||
-      stack.contains("MultiSelectPopupWindow.showMultiSelectPopupWindow") ||
-      stack.contains("android.view.inputmethod.InputMethodManager.startInputInner") ||
-      stack.contains("com.android.server.wm.ConfigurationContainer.setActivityType") ||
-      stack.contains("handleTopResumedActivityChanged") ||
-      stack.contains("lspatch") ||
-      stack.contains("tryGetViewHolderForPositionByDeadline") ||
-      stack.contains("addChildrenForExpandedActionView")
-    ) {
+    if (heroes.any { stack.contains(it) }) {
       Timber.w(e)
     } else if (stack.contains("ClipboardService")) {
       Timber.w(e)

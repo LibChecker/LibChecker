@@ -118,7 +118,7 @@ class DetailViewModel : ViewModel() {
   private var initSoAnalysisJob: Job? = null
 
   fun initSoAnalysisData() {
-    if (initSoAnalysisJob != null) return
+    if (initSoAnalysisJob != null || !this::packageInfo.isInitialized) return
     initSoAnalysisJob = viewModelScope.launch(Dispatchers.IO) {
       val sourceSet = hashSetOf<String>()
 
