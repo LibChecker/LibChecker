@@ -28,6 +28,7 @@ import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ET_DYN
 import com.absinthe.libchecker.annotation.ET_NOT_ELF
+import com.absinthe.libchecker.annotation.ET_NOT_SET
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
@@ -217,7 +218,7 @@ class LibStringAdapter(
     }
 
     val elfInfo = item.item.elfInfo
-    if (elfInfo.elfType != ET_DYN) {
+    if (elfInfo.elfType != ET_NOT_SET && elfInfo.elfType != ET_DYN) {
       val text = PackageUtils.elfTypeToString(elfInfo.elfType)
       itemView.libSize.append(createNativeLabelSpan(text))
     }

@@ -26,6 +26,7 @@ import com.absinthe.libchecker.annotation.ET_HIPROC
 import com.absinthe.libchecker.annotation.ET_LOPROC
 import com.absinthe.libchecker.annotation.ET_NONE
 import com.absinthe.libchecker.annotation.ET_NOT_ELF
+import com.absinthe.libchecker.annotation.ET_NOT_SET
 import com.absinthe.libchecker.annotation.ET_REL
 import com.absinthe.libchecker.annotation.ElfType
 import com.absinthe.libchecker.annotation.LibType
@@ -917,6 +918,7 @@ object PackageUtils {
    */
   fun elfTypeToString(@ElfType type: Int): String {
     return when (type) {
+      ET_NOT_SET -> ""
       ET_NOT_ELF -> "Broken ELF"
       ET_NONE -> "No File Type"
       ET_REL -> "Relocatable File"
