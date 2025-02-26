@@ -21,6 +21,11 @@ import com.absinthe.libchecker.utils.PackageUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -30,27 +35,21 @@ class LibReferenceViewModel : ViewModel() {
   val dbItemsFlow: Flow<List<LCItem>> = Repositories.lcRepository.allLCItemsFlow
 
   fun setData(name: String, @LibType type: Int) = viewModelScope.launch(Dispatchers.IO) {
-    dbItemsFlow.collect {
+    dbItemsFlow.collectLatest {
       setDataInternal(it, name, type)
     }
   }
 
   fun setData(packagesList: List<String>) = viewModelScope.launch(Dispatchers.IO) {
-    dbItemsFlow.collect {
-      val list = mutableListOf<LCItem>()
-      packagesList.forEach { pkgName ->
-        it.find { it.packageName == pkgName }?.let { lcItem ->
-          list.add(lcItem)
-        }
-      }
-      val filterList = if (GlobalValues.isShowSystemApps) {
-        list
-      } else {
-        list.filter { !it.isSystem }
-      }
+    val dbItemsStateFlow = dbItemsFlow.stateIn(viewModelScope, SharingStarted.Eagerly, null)
+    val dbItems = dbItemsStateFlow.value.takeUnless { it.isNullOrEmpty() }
+      ?: dbItemsStateFlow.filterNotNull().first()
 
-      libRefListFlow.emit(filterList)
-    }
+    val dbItemsMap = dbItems.associateBy { it.packageName }
+    val list = packagesList.mapNotNull { dbItemsMap[it] }
+
+    val filterList = list.takeIf { GlobalValues.isShowSystemApps } ?: list.filter { !it.isSystem }
+    libRefListFlow.emit(filterList)
   }
 
   private suspend fun setDataInternal(lcItems: List<LCItem>, name: String, @LibType type: Int) {
@@ -81,46 +80,29 @@ class LibReferenceViewModel : ViewModel() {
 
         SERVICE, ACTIVITY, RECEIVER, PROVIDER -> {
           for (item in items) {
-            try {
-              val componentStringList =
-                PackageUtils.getComponentStringList(item.packageName, type, false)
-              if (componentStringList.contains(name)) {
-                list.add(item)
-              }
-            } catch (e: Exception) {
-              continue
+            val componentStringList =
+              PackageUtils.getComponentStringList(item.packageName, type, false)
+            if (componentStringList.contains(name)) {
+              list.add(item)
             }
           }
         }
 
         PERMISSION -> {
           for (item in items) {
-            try {
-              val permissionList = PackageUtils.getPermissionsList(item.packageName)
-              if (permissionList.contains(name)) {
-                list.add(item)
-              }
-            } catch (e: Exception) {
-              continue
+            val permissionList = PackageUtils.getPermissionsList(item.packageName)
+            if (permissionList.contains(name)) {
+              list.add(item)
             }
           }
         }
 
         METADATA -> {
           for (item in items) {
-            try {
-              val metadataList =
-                PackageUtils.getMetaDataItems(
-                  PackageUtils.getPackageInfo(
-                    item.packageName,
-                    PackageManager.GET_META_DATA
-                  )
-                )
-              if (metadataList.any { it.name == name }) {
-                list.add(item)
-              }
-            } catch (e: Exception) {
-              continue
+            val pi = PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_META_DATA)
+            val metadataList = PackageUtils.getMetaDataItems(pi)
+            if (metadataList.any { it.name == name }) {
+              list.add(item)
             }
           }
         }
