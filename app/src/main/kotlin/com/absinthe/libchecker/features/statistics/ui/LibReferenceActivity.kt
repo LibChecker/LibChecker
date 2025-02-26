@@ -24,7 +24,6 @@ import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import java.io.File
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.widget.borderview.BorderView
 
@@ -44,23 +43,8 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-
-    refName?.let { name ->
-      initView()
-      lifecycleScope.launch {
-        viewModel.dbItemsFlow.collect {
-          refList?.let {
-            val currentPackageSet = adapter.data.map { item -> item.packageName }.toSet()
-            val newPackageSet = it.toSet()
-            if (currentPackageSet != newPackageSet) {
-              viewModel.setData(it.toList())
-            }
-          } ?: run {
-            viewModel.setData(name, refType)
-          }
-        }
-      }
-    } ?: finish()
+    initView()
+    initData()
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -148,5 +132,11 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
         refType = refType
       )
     }
+  }
+
+  private fun initData() {
+    this.refName?.let { name ->
+      refList?.toList()?.let(viewModel::setData) ?: viewModel.setData(name, refType)
+    } ?: finish()
   }
 }
