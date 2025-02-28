@@ -28,7 +28,7 @@ class LibThresholdDialogFragment : DialogFragment() {
         }
         Telemetry.recordEvent(
           Constants.Event.SETTINGS,
-          mapOf("PREF_LIB_REF_THRESHOLD" to threshold.toLong())
+          mapOf(Telemetry.Param.CONTENT to Constants.PREF_LIB_REF_THRESHOLD, Telemetry.Param.VALUE to threshold.toLong())
         )
       }
       .setNegativeButton(android.R.string.cancel, null)

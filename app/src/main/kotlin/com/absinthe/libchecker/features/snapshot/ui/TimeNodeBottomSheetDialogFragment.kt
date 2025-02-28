@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.core.os.BundleCompat
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.TimeStampItem
@@ -13,6 +14,7 @@ import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
 import com.absinthe.libchecker.features.snapshot.ui.view.TimeNodeAddApkView
 import com.absinthe.libchecker.features.snapshot.ui.view.TimeNodeAutoRemoveView
 import com.absinthe.libchecker.features.snapshot.ui.view.TimeNodeBottomSheetView
+import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.putArguments
@@ -66,7 +68,7 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
       } else {
         root.adapter.addHeaderView(
           TimeNodeAutoRemoveView(requireContext()).also { autoRemoveView ->
-            autoRemoveView.chip.onCheckedChangeListener = { view, checked ->
+            autoRemoveView.chip.onCheckedChangeListener = { _, checked ->
               autoRemoveView.invalidateText()
               if (checked) {
                 (context as? ContextThemeWrapper)?.let { ctw ->
@@ -92,6 +94,13 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
               } else {
                 GlobalValues.snapshotAutoRemoveThreshold = -1
               }
+              Telemetry.recordEvent(
+                Constants.Event.SNAPSHOT_ADVANCED_MENU_ITEM_CHANGED,
+                mapOf(
+                  Telemetry.Param.CONTENT to autoRemoveView.chip.text,
+                  Telemetry.Param.VALUE to checked
+                )
+              )
             }
           }
         )

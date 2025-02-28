@@ -8,10 +8,12 @@ import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.ui.view.LibDetailBottomSheetView
+import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
@@ -103,6 +105,15 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
       }.onFailure {
         Timber.e(it)
         context?.showToast(it.message.toString())
+      }.also {
+        Telemetry.recordEvent(
+          Constants.Event.LIB_DETAIL_DIALOG,
+          mapOf(
+            Telemetry.Param.CONTENT to libName,
+            Telemetry.Param.CONTENT_TYPE to type,
+            Telemetry.Param.SUCCESS to (it.isSuccess && isValidLib)
+          )
+        )
       }
     }
   }

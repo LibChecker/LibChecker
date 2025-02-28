@@ -82,20 +82,14 @@ class SettingsFragment :
           Timber.e(e)
           Toasty.showShort(requireContext(), e.toString())
         }
-        Telemetry.recordEvent(
-          Constants.Event.SETTINGS,
-          mapOf("PREF_APK_ANALYTICS" to newValue)
-        )
+        recordPreferenceEvent(Constants.PREF_APK_ANALYTICS, newValue)
         true
       }
     }
     findPreference<TwoStatePreference>(Constants.PREF_COLORFUL_ICON)?.apply {
       setOnPreferenceChangeListener { pref, newValue ->
         emitPrefChange(pref.key, newValue)
-        Telemetry.recordEvent(
-          Constants.Event.SETTINGS,
-          mapOf("PREF_COLORFUL_ICON" to newValue as Boolean)
-        )
+        recordPreferenceEvent(Constants.PREF_COLORFUL_ICON, newValue)
         true
       }
     }
@@ -109,10 +103,7 @@ class SettingsFragment :
             LCRemoteRepo.Gitlab
           }
         )
-        Telemetry.recordEvent(
-          Constants.Event.SETTINGS,
-          mapOf("PREF_RULES_REPO" to newValue)
-        )
+        recordPreferenceEvent(Constants.PREF_RULES_REPO, newValue)
         true
       }
     }
@@ -156,6 +147,7 @@ class SettingsFragment :
             childFragmentManager,
             CloudRulesDialogFragment::class.java.name
           )
+          recordPreferenceEvent(Constants.PREF_CLOUD_RULES)
           true
         }
       }
@@ -183,10 +175,7 @@ class SettingsFragment :
             .setMessage(R.string.dialog_subtitle_reload_apps)
             .setPositiveButton(android.R.string.ok) { _, _ ->
               viewModel.reloadApps()
-              Telemetry.recordEvent(
-                Constants.Event.SETTINGS,
-                mapOf("PREF_RELOAD_APPS" to "Ok")
-              )
+              recordPreferenceEvent(Constants.PREF_RELOAD_APPS)
             }
             .setNegativeButton(android.R.string.cancel, null)
             .create()
@@ -212,6 +201,7 @@ class SettingsFragment :
             childFragmentManager,
             GetUpdatesDialogFragment::class.java.name
           )
+          recordPreferenceEvent(Constants.PREF_GET_UPDATES)
           true
         }
       }
@@ -264,10 +254,7 @@ class SettingsFragment :
               data = URLManager.PLAY_STORE_DETAIL_PAGE.toUri()
             }
           )
-          Telemetry.recordEvent(
-            Constants.Event.SETTINGS,
-            mapOf("PREF_RATE" to "Clicked")
-          )
+          recordPreferenceEvent(Constants.PREF_RATE)
         } catch (e: ActivityNotFoundException) {
           Timber.e(e)
         }
@@ -281,6 +268,7 @@ class SettingsFragment :
             Intent(Intent.ACTION_VIEW, URLManager.TELEGRAM_GROUP.toUri())
               .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
           )
+          recordPreferenceEvent(Constants.PREF_TELEGRAM)
         } catch (e: ActivityNotFoundException) {
           Timber.e(e)
         }
@@ -405,5 +393,12 @@ class SettingsFragment :
     lifecycleScope.launch {
       GlobalValues.preferencesFlow.emit(key to value)
     }
+  }
+
+  private fun recordPreferenceEvent(key: String, value: Any = "") {
+    Telemetry.recordEvent(
+      Constants.Event.SETTINGS,
+      mapOf(Telemetry.Param.CONTENT to key, Telemetry.Param.VALUE to value)
+    )
   }
 }

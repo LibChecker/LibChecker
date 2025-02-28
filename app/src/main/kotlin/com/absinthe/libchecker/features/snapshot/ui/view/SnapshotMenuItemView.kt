@@ -3,6 +3,7 @@ package com.absinthe.libchecker.features.snapshot.ui.view
 import android.content.Context
 import android.widget.FrameLayout
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.dp
@@ -40,7 +41,13 @@ class SnapshotMenuItemView(context: Context) : FrameLayout(context) {
         }
         GlobalValues.snapshotOptions = newOptions
         onCheckedChangeCallback?.invoke(isChecked)
-        Telemetry.recordEvent("snapshot_advanced_item_option_changed", mapOf("option" to text, "isChecked" to isChecked))
+        Telemetry.recordEvent(
+          Constants.Event.SNAPSHOT_ADVANCED_MENU_ITEM_CHANGED,
+          mapOf(
+            Telemetry.Param.CONTENT to text,
+            Telemetry.Param.VALUE to isChecked
+          )
+        )
       }
     }
   }

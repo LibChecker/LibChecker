@@ -278,7 +278,7 @@ class LibReferenceFragment :
     Telemetry.recordEvent(
       Constants.Event.LIB_REFERENCE_FILTER_TYPE,
       mapOf(
-        "Type" to
+        Telemetry.Param.CONTENT_TYPE to
           LibReferenceOptions.getOptionsString(GlobalValues.libReferenceOptions)
       )
     )

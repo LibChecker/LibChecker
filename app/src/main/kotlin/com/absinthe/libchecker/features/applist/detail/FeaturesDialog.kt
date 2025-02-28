@@ -15,6 +15,7 @@ import androidx.core.os.bundleOf
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.FragmentActivity
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.features.applist.detail.ui.AppBundleBottomSheetDialogFragment
 import com.absinthe.libchecker.features.applist.detail.ui.AppInstallSourceBSDFragment
 import com.absinthe.libchecker.features.applist.detail.ui.AppPropBottomSheetDialogFragment
@@ -277,8 +278,8 @@ object FeaturesDialog {
 
     dialog.show()
     Telemetry.recordEvent(
-      "FeatureDialog",
-      mapOf("Feature" to context.getString(titleRes))
+      Constants.Event.FEATURE_DIALOG,
+      mapOf(Telemetry.Param.CONTENT to context.getString(titleRes))
     )
   }
 }
