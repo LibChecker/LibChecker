@@ -106,11 +106,18 @@ object Constants {
   const val PREF_SNAPSHOT_AUTO_REMOVE_THRESHOLD = "snapshotAutoRemoveThreshold"
 
   object Event {
-    const val LAUNCH_ACTION = "Launch Action"
-    const val SNAPSHOT_CLICK = "Snapshot Click"
-    const val SETTINGS = "Settings"
-    const val LIB_REFERENCE_FILTER_TYPE = "Lib Reference Filter Type"
+    const val APP_INFO_BOTTOM_SHEET = "App Info Bottom Sheet"
+    const val APP_LIST_ADVANCED_MENU_ITEM_CHANGED = "App List Advanced Menu Item Changed"
+    const val CHART = "Chart"
     const val EASTER_EGG = "Easter Egg"
+    const val FEATURE_DIALOG = "Feature Dialog"
+    const val LAUNCH_ACTION = "Launch Action"
+    const val LIB_DETAIL_DIALOG = "Lib Detail Dialog"
+    const val LIB_REFERENCE_FILTER_TYPE = "Lib Reference Filter Type"
+    const val LIB_REF_ADVANCED_MENU_ITEM_CHANGED = "Lib Ref Advanced Menu Item Changed"
+    const val SETTINGS = "Settings"
+    const val SNAPSHOT_ADVANCED_MENU_ITEM_CHANGED = "Snapshot Advanced Menu Item Changed"
+    const val SNAPSHOT_CLICK = "Snapshot Click"
     const val SNAPSHOT_DETAIL_COMPONENT_COUNT = "Snapshot Detail Component Count"
   }
 

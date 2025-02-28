@@ -13,6 +13,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.AndroidVersions
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalFeatures
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
@@ -221,7 +222,7 @@ class ChartFragment :
       ChartType.AAB -> setChartData(::generatePieChartView) { AABChartDataSource(items) }
       ChartType.SUPPORT_16KB -> setChartData(::generatePieChartView) { PageSize16KBChartDataSource(items) }
     }
-    Telemetry.recordEvent("Chart", mapOf("ChartType" to chartType))
+    Telemetry.recordEvent(Constants.Event.CHART, mapOf(Telemetry.Param.ITEM_ID to chartType))
   }
 
   private fun <T : Chart<*>> setChartData(

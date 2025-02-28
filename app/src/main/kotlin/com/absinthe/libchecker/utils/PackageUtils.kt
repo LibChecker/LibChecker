@@ -332,6 +332,10 @@ object PackageUtils {
       Timber.d("${file.absolutePath} Check zipFile pendingEntryDirMap: $pendingEntryDirMap")
     }
 
+    if (pendingEntryDirMap.isEmpty()) {
+      return emptyMap()
+    }
+
     if (ENABLE_GET_APK_FILE_LIBS_LOG) timeRecorder.start()
     val bufferedIS = BufferedFileChannelInputStream.Builder()
       .setFile(file)
@@ -829,12 +833,9 @@ object PackageUtils {
 
     val primaryCpuAbi = Refine.unsafeCast<ApplicationInfoHidden>(applicationInfo).primaryCpuAbi
     var abi = STRING_ABI_MAP[primaryCpuAbi] ?: let {
-      val supportedAbiSet = mutableSetOf<Int>()
-      realAbiSet.forEach {
-        if (Build.SUPPORTED_ABIS.contains(ABI_STRING_MAP[it])) {
-          supportedAbiSet.add(it)
-        }
-      }
+      val supportedAbiSet = realAbiSet.filter { abi ->
+        Build.SUPPORTED_ABIS.contains(ABI_STRING_MAP[abi])
+      }.toMutableSet()
       if (use32bitAbi) {
         supportedAbiSet.removeAll(ABI_64_BIT)
       }

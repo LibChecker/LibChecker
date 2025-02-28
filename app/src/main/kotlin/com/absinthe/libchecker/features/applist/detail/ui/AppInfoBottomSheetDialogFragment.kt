@@ -72,8 +72,8 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
     packageName?.let {
       root.launch.setLongClickCopiedToClipboard(PackageUtils.getLauncherActivity(it))
       Telemetry.recordEvent(
-        "AppInfoBottomSheet",
-        mapOf("PackageName" to packageName.toString(), "Action" to "Launch")
+        Constants.Event.APP_INFO_BOTTOM_SHEET,
+        mapOf(Telemetry.Param.CONTENT to packageName.toString(), "Action" to "Launch")
       )
     }
     root.setting.setOnClickListener {
@@ -83,8 +83,8 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
           .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
         Telemetry.recordEvent(
-          "AppInfoBottomSheet",
-          mapOf("PackageName" to packageName.toString(), "Action" to "Setting")
+          Constants.Event.APP_INFO_BOTTOM_SHEET,
+          mapOf(Telemetry.Param.CONTENT to packageName.toString(), "Action" to "Setting")
         )
       } catch (_: Exception) {
         context?.showToast(R.string.toast_cant_open_app)
@@ -107,8 +107,8 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
           runCatching {
             startActivity(it.intent)
             Telemetry.recordEvent(
-              "AppInfoBottomSheet",
-              mapOf("PackageName" to packageName.toString(), "Action" to it.pii.packageName)
+              Constants.Event.APP_INFO_BOTTOM_SHEET,
+              mapOf(Telemetry.Param.CONTENT to packageName.toString(), "Action" to it.pii.packageName)
             )
           }.onFailure {
             context?.let { ctx ->

@@ -311,7 +311,7 @@ class MainActivity :
     }
     Telemetry.recordEvent(
       Constants.Event.LAUNCH_ACTION,
-      mapOf("Action" to intent.action.toString())
+      mapOf(Telemetry.Param.VALUE to intent.action.toString())
     )
   }
 
