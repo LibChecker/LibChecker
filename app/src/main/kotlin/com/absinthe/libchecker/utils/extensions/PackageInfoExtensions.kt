@@ -7,6 +7,7 @@ import android.content.pm.PackageInfoHidden
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.collection.arrayMapOf
 import androidx.core.content.pm.PackageInfoCompat
 import com.absinthe.libchecker.R
@@ -666,6 +667,7 @@ fun PackageInfo.isPreinstalled(): Boolean {
   return lastUpdateTime <= PREINSTALLED_TIMESTAMP
 }
 
+@RequiresApi(Build.VERSION_CODES.P)
 fun PackageInfo.getDexFileOptimizationInfo(): DexFileHidden.OptimizationInfo? {
   val sourceDir = applicationInfo?.sourceDir ?: return null
   val info = DexFileHidden.getDexFileOptimizationInfo(

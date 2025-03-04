@@ -5,6 +5,7 @@ import android.os.Looper
 import android.util.Log
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.utils.showToast
+import com.google.android.gms.common.internal.BaseGmsClient
 import timber.log.Timber
 
 object MainLooperFilter {
@@ -27,14 +28,14 @@ object MainLooperFilter {
     "addChildrenForExpandedActionView",
     "android.view.inputmethod.InputMethodManager.startInputInner",
     "com.android.server.wm.ConfigurationContainer.setActivityType",
-    "com.google.android.gms.common.internal.BaseGmsClient.getRemoteService",
     "com.swift.sandhook",
     "handleTopResumedActivityChanged",
     "lspatch",
     "MultiSelectPopupWindow.showMultiSelectPopupWindow",
     "Service.startForeground()",
     "tryGetViewHolderForPositionByDeadline",
-    "updateForceDarkMode"
+    "updateForceDarkMode",
+    BaseGmsClient::class.java.name
   )
 
   @Throws(Throwable::class)
