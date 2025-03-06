@@ -711,8 +711,8 @@ object PackageUtils {
       return abiSet
     }
 
-    ZipFileCompat(file).use { zipFile ->
-      return runCatching {
+    return runCatching {
+      ZipFileCompat(file).use { zipFile ->
         val libDirPrefix = "lib" + File.separator
         var encounteredLibsDir = false
         val entries = zipFile.getZipEntries()
@@ -742,10 +742,12 @@ object PackageUtils {
         }
 
         if (abiSet.isEmpty()) {
-          if (!isApk && packageInfo.applicationInfo?.nativeLibraryDir != null) {
-            abiSet.addAll(getAbiListByNativeDir(packageInfo.applicationInfo!!.nativeLibraryDir))
-          } else if (packageInfo.applicationInfo!!.splitSourceDirs != null) {
-            abiSet.addAll(getAbiListBySplitApks(packageInfo.applicationInfo!!.splitSourceDirs!!))
+          packageInfo.applicationInfo?.let { ai ->
+            if (!isApk && ai.nativeLibraryDir != null) {
+              abiSet.addAll(getAbiListByNativeDir(ai.nativeLibraryDir))
+            } else if (ai.splitSourceDirs != null) {
+              abiSet.addAll(getAbiListBySplitApks(ai.splitSourceDirs ?: emptyArray()))
+            }
           }
 
           if (abiSet.isEmpty()) {
@@ -753,13 +755,13 @@ object PackageUtils {
           }
         }
         return abiSet
-      }.onFailure {
-        Timber.e(it)
-        abiSet.clear()
-        abiSet.add(ERROR)
-        return abiSet
-      }.getOrDefault(abiSet)
-    }
+      }
+    }.onFailure {
+      Timber.e(it)
+      abiSet.clear()
+      abiSet.add(ERROR)
+      return abiSet
+    }.getOrDefault(abiSet)
   }
 
   /**
