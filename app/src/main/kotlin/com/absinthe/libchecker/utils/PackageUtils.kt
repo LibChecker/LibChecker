@@ -722,7 +722,9 @@ object PackageUtils {
           }
         }
       }
-
+      if (abiSet.isEmpty()) {
+        abiSet.add(NO_LIBS)
+      }
       abiSet
     }.onFailure {
       Timber.e(it)
