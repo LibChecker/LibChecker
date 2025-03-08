@@ -699,55 +699,35 @@ object PackageUtils {
     }
 
     return runCatching {
+      val libDirPrefix = "lib${File.separator}"
+
       ZipFileCompat(file).use { zipFile ->
-        val libDirPrefix = "lib" + File.separator
-        var encounteredLibsDir = false
-        val entries = zipFile.getZipEntries()
-
-        while (entries.hasMoreElements()) {
-          val entry = entries.nextElement()
-
-          if (entry.isDirectory) {
-            continue
+        zipFile.getZipEntries()
+          .asSequence()
+          .filter { !it.isDirectory && it.name.startsWith(libDirPrefix) && it.name.endsWith(".so") }
+          .mapNotNull { entry ->
+            STRING_ABI_MAP.entries.find { entry.name.startsWith("$libDirPrefix${it.key}") }
+              ?.takeIf { (string, _) -> ignoreArch || Build.SUPPORTED_ABIS.contains(string) }
+              ?.value
           }
-
-          val elementName = entry.name
-
-          if (elementName.startsWith(libDirPrefix)) {
-            STRING_ABI_MAP.forEach { (string, abi) ->
-              if (elementName.startsWith("$libDirPrefix$string${File.separator}")) {
-                encounteredLibsDir = true
-                if (Build.SUPPORTED_ABIS.contains(string) || ignoreArch) {
-                  abiSet.add(abi)
-                }
-                return@forEach
-              }
-            }
-          } else if (encounteredLibsDir) {
-            break
-          }
-        }
-
-        if (abiSet.isEmpty()) {
-          packageInfo.applicationInfo?.let { ai ->
-            if (!isApk && ai.nativeLibraryDir != null) {
-              abiSet.addAll(getAbiListByNativeDir(ai.nativeLibraryDir))
-            } else if (ai.splitSourceDirs != null) {
-              abiSet.addAll(getAbiListBySplitApks(ai.splitSourceDirs ?: emptyArray()))
-            }
-          }
-
-          if (abiSet.isEmpty()) {
-            abiSet.add(NO_LIBS)
-          }
-        }
-        return abiSet
+          .toCollection(abiSet)
       }
+
+      if (abiSet.isEmpty()) {
+        packageInfo.applicationInfo?.let { ai ->
+          when {
+            !isApk && ai.nativeLibraryDir != null -> abiSet.addAll(getAbiListByNativeDir(ai.nativeLibraryDir))
+            ai.splitSourceDirs != null -> abiSet.addAll(getAbiListBySplitApks(ai.splitSourceDirs ?: emptyArray()))
+            else -> abiSet.add(NO_LIBS)
+          }
+        }
+      }
+
+      abiSet
     }.onFailure {
       Timber.e(it)
       abiSet.clear()
       abiSet.add(ERROR)
-      return abiSet
     }.getOrDefault(abiSet)
   }
 
