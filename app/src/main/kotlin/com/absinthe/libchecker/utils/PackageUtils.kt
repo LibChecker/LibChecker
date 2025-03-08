@@ -422,9 +422,6 @@ object PackageUtils {
     return map
   }
 
-  const val STATIC_LIBRARY_SOURCE_PREFIX = "[Path] "
-  const val VERSION_CODE_PREFIX = "[Version Code] "
-
   /**
    * Get static libraries which app uses
    * @param packageInfo PackageInfo
@@ -439,20 +436,10 @@ object PackageUtils {
         return listOf()
       }
 
-      val list = mutableListOf<LibStringItem>()
-      demands.forEach {
-        val source = sharedLibs.find { shared -> shared.contains(it.key) }
-        if (source != null) {
-          list.add(
-            LibStringItem(
-              name = it.key,
-              size = 0L,
-              source = "$STATIC_LIBRARY_SOURCE_PREFIX$source\n$VERSION_CODE_PREFIX${it.value}"
-            )
-          )
-        }
+      return demands.map {
+        it.value.path = sharedLibs.find { shared -> shared.contains(it.key) }.orEmpty()
+        LibStringItem(name = it.key, size = 0L, source = it.value.toJson())
       }
-      return list
     } catch (e: Exception) {
       Timber.e(e)
       return emptyList()
