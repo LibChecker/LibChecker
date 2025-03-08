@@ -12,7 +12,7 @@
     android:id="@+id/progress_horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:indeterminate="true"
+    android:max="100"
     android:visibility="gone"
     app:hideAnimationBehavior="outward" />
 

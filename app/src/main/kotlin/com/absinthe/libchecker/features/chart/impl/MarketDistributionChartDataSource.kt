@@ -28,7 +28,7 @@ class MarketDistributionChartDataSource(items: List<LCItem>) : BaseVariableChart
   var distribution: List<AndroidDistribution>? = null
     private set
 
-  override suspend fun fillChartView(chartView: BarChart) {
+  override suspend fun fillChartView(chartView: BarChart, onProgressUpdated: (Int) -> Unit) {
     withContext(Dispatchers.Default) {
       val context = chartView.context ?: return@withContext
 

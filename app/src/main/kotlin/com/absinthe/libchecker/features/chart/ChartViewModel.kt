@@ -13,11 +13,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+const val LOADING_PROGRESS_INFINITY = -1
+const val LOADING_PROGRESS_MAX = 100
+
 class ChartViewModel : ViewModel() {
   private var queryJob: Job? = null
 
-  private val _isLoading = MutableStateFlow(false)
-  val isLoading = _isLoading.asStateFlow()
+  private val _loadingProgress = MutableStateFlow(LOADING_PROGRESS_MAX)
+  val loadingProgress = _loadingProgress.asStateFlow()
 
   private val _distributionLastUpdateTime = MutableStateFlow("")
   val distributionLastUpdateTime = _distributionLastUpdateTime.asStateFlow()
@@ -28,8 +31,8 @@ class ChartViewModel : ViewModel() {
   private val _detailAbiSwitchVisibility = MutableStateFlow(true)
   val detailAbiSwitchVisibility = _detailAbiSwitchVisibility.asStateFlow()
 
-  fun setLoading(loading: Boolean) {
-    _isLoading.value = loading
+  fun setLoadingProgress(progress: Int) {
+    _loadingProgress.value = progress
   }
 
   fun setDetailAbiSwitch(isDetailedAbiChart: Boolean) {
@@ -49,7 +52,9 @@ class ChartViewModel : ViewModel() {
   ) {
     queryJob?.cancel()
     queryJob = viewModelScope.launch(Dispatchers.Default) {
-      source.fillChartView(newChartView)
+      source.fillChartView(newChartView) {
+        setLoadingProgress(it)
+      }
 
       withContext(Dispatchers.Main) {
         if (currentChartView != null) {
@@ -57,7 +62,7 @@ class ChartViewModel : ViewModel() {
         }
         root.addView(newChartView)
         if (source.getData().isNotEmpty()) {
-          setLoading(false)
+          setLoadingProgress(LOADING_PROGRESS_MAX)
         }
         if (source is MarketDistributionChartDataSource) {
           _distributionLastUpdateTime.value = source.distribution

@@ -5,6 +5,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.features.chart.ABILabelAxisFormatter
 import com.absinthe.libchecker.features.chart.BaseVariableChartDataSource
+import com.absinthe.libchecker.features.chart.IHeavyWork
 import com.absinthe.libchecker.features.chart.IntegerFormatter
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
@@ -19,16 +20,18 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-class DetailedABIChartDataSource(items: List<LCItem>) : BaseVariableChartDataSource<BarChart>(items) {
-  override suspend fun fillChartView(chartView: BarChart) {
+class DetailedABIChartDataSource(items: List<LCItem>) :
+  BaseVariableChartDataSource<BarChart>(items),
+  IHeavyWork {
+  override suspend fun fillChartView(chartView: BarChart, onProgressUpdated: (Int) -> Unit) {
     withContext(Dispatchers.Default) {
       val context = chartView.context ?: return@withContext
       val entries: ArrayList<BarEntry> = ArrayList()
 
-      for (item in filteredList) {
-        if (!isActive) {
-          return@withContext
-        }
+      val itemCount = filteredList.size
+      var progress = 0
+      filteredList.forEachIndexed { index, item ->
+        if (!isActive) return@withContext
         try {
           val pi = PackageUtils.getPackageInfo(item.packageName)
           val abiSet = PackageUtils.getAbiSet(
@@ -45,6 +48,13 @@ class DetailedABIChartDataSource(items: List<LCItem>) : BaseVariableChartDataSou
           }
         } catch (e: Exception) {
           Timber.e(e)
+        }
+        val p = index * 100 / itemCount
+        if (p > progress) {
+          progress = p
+          withContext(Dispatchers.Main) {
+            onProgressUpdated(progress)
+          }
         }
       }
 
