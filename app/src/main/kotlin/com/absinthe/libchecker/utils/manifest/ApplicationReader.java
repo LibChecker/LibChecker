@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
+import pxb.android.Res_value;
 import pxb.android.axml.AxmlReader;
 import pxb.android.axml.AxmlVisitor;
 import pxb.android.axml.NodeVisitor;
@@ -73,17 +74,6 @@ public class ApplicationReader {
     }
 
     @Override
-    public void attr(String ns, String name, int resourceId, int type, Object obj) {
-      this.name = name;
-      value = obj;
-
-      if (name != null && value != null) {
-        properties.put(name, value);
-      }
-      super.attr(ns, name, resourceId, type, obj);
-    }
-
-    @Override
     public void end() {
       if (name != null && value != null) {
         properties.put(name, value);
@@ -100,14 +90,18 @@ public class ApplicationReader {
       }
 
       @Override
-      public void attr(String ns, String name, int resourceId, int type, Object obj) {
+      public void attr(String ns, String name, int resourceId, String raw, Res_value value) {
         this.name = name;
-        value = obj;
-
-        if (name != null && value != null) {
-          properties.put(name, value);
+        if (value.type == Res_value.TYPE_REFERENCE) {
+          this.value = value.data;
+        } else {
+          this.value = value.toString();
         }
-        super.attr(ns, name, resourceId, type, obj);
+
+        if (name != null && value.type != Res_value.TYPE_NULL) {
+          properties.put(name, this.value);
+        }
+        super.attr(ns, name, resourceId, raw, value);
       }
 
       @Override

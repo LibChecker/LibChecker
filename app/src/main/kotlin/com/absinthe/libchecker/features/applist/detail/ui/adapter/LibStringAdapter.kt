@@ -9,7 +9,6 @@ import android.graphics.drawable.shapes.OvalShape
 import android.graphics.text.LineBreaker
 import android.text.Layout
 import android.text.Spannable
-import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.SpannedString
 import android.text.style.ForegroundColorSpan
@@ -18,9 +17,9 @@ import android.view.ViewGroup
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.os.bundleOf
+import androidx.core.text.bold
 import androidx.core.text.buildSpannedString
 import androidx.core.text.inSpans
-import androidx.core.text.set
 import androidx.core.text.strikeThrough
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
@@ -36,6 +35,7 @@ import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.AdvancedOptions
+import com.absinthe.libchecker.features.applist.detail.bean.StaticLibItem
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_TEXT
 import com.absinthe.libchecker.features.applist.detail.ui.XmlBSDFragment
 import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
@@ -55,6 +55,7 @@ import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
+import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libchecker.utils.manifest.ResourceParser
 import com.absinthe.libchecker.view.drawable.CapsuleDrawable
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
@@ -247,16 +248,17 @@ class LibStringAdapter(
         // noinspection WrongConstant
         it.breakStrategy = Layout.BREAK_STRATEGY_SIMPLE
       }
-      val sb = SpannableStringBuilder(item.item.source)
-      val staticPrefixIndex = sb.indexOf(PackageUtils.STATIC_LIBRARY_SOURCE_PREFIX)
-      sb[staticPrefixIndex, staticPrefixIndex + PackageUtils.STATIC_LIBRARY_SOURCE_PREFIX.length] =
-        StyleSpan(Typeface.BOLD)
 
-      val versionCodePrefixIndex = sb.indexOf(PackageUtils.VERSION_CODE_PREFIX)
-      sb[versionCodePrefixIndex, versionCodePrefixIndex + PackageUtils.VERSION_CODE_PREFIX.length] =
-        StyleSpan(Typeface.BOLD)
-
-      it.text = sb
+      item.item.source?.fromJson<StaticLibItem>()?.let { staticLibItem ->
+        it.text = buildSpannedString {
+          bold { append("[Path] ") }
+          append(staticLibItem.path).appendLine()
+          bold { append("[Version Code] ") }
+          append(staticLibItem.version.toString()).appendLine()
+          bold { append("[Cert] ") }
+          append(staticLibItem.certDigest)
+        }
+      }
     }
     if ((GlobalValues.itemAdvancedOptions and AdvancedOptions.SHOW_MARKED_LIB) > 0) {
       itemView.setChip(item.rule)

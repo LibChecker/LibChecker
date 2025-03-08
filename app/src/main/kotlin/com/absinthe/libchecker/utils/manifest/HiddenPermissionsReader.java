@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
+import pxb.android.Res_value;
 import pxb.android.axml.AxmlReader;
 import pxb.android.axml.AxmlVisitor;
 import pxb.android.axml.NodeVisitor;
@@ -78,14 +79,13 @@ public class HiddenPermissionsReader {
     }
 
     @Override
-    public void attr(String ns, String name, int resourceId, int type, Object obj) {
-      if (type == 3 && "name".equals(name) && obj instanceof String) {
-        this.name = (String) obj;
+    public void attr(String ns, String name, int resourceId, String raw, Res_value value) {
+      if ("name".equals(name) && value.type == Res_value.TYPE_STRING) {
+        this.name = value.toString();
+      } else if ("maxSdkVersion".equals(name) && value.type == Res_value.TYPE_INT_DEC) {
+        this.maxSdkVersion = value.data;
       }
-      if ("maxSdkVersion".equals(name)) {
-        maxSdkVersion = obj;
-      }
-      super.attr(ns, name, resourceId, type, obj);
+      super.attr(ns, name, resourceId, raw, value);
     }
 
     @Override

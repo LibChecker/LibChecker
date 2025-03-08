@@ -4,6 +4,7 @@ import androidx.collection.ArrayMap;
 
 import com.absinthe.libchecker.compat.IZipFile;
 import com.absinthe.libchecker.compat.ZipFileCompat;
+import com.absinthe.libchecker.features.applist.detail.bean.StaticLibItem;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -11,13 +12,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
+import pxb.android.Res_value;
 import pxb.android.axml.AxmlReader;
 import pxb.android.axml.AxmlVisitor;
 import pxb.android.axml.NodeVisitor;
 import timber.log.Timber;
 
 public class StaticLibraryReader {
-  private final ArrayMap<String, Object> staticLibs = new ArrayMap<>();
+  private final ArrayMap<String, StaticLibItem> staticLibs = new ArrayMap<>();
 
   private StaticLibraryReader(File apk) {
     try (IZipFile zip = new ZipFileCompat(apk)) {
@@ -36,7 +38,7 @@ public class StaticLibraryReader {
     }
   }
 
-  public static Map<String, Object> getStaticLibrary(File apk) throws IOException {
+  public static Map<String, StaticLibItem> getStaticLibrary(File apk) throws IOException {
     return new StaticLibraryReader(apk).staticLibs;
   }
 
@@ -98,27 +100,30 @@ public class StaticLibraryReader {
 
   private class StaticLibraryVisitor extends NodeVisitor {
     public String name = null;
-    public Object version = null;
+    public Integer version = null;
+    public String certDigest = null;
 
     public StaticLibraryVisitor(NodeVisitor child) {
       super(child);
     }
 
     @Override
-    public void attr(String ns, String name, int resourceId, int type, Object obj) {
-      if (type == 3 && "name".equals(name)) {
-        this.name = (String) obj;
+    public void attr(String ns, String name, int resourceId, String raw, Res_value value) {
+      if ("name".equals(name) && value.type == Res_value.TYPE_STRING) {
+        this.name = value.toString();
+      } else if ("version".equals(name) && value.type == Res_value.TYPE_INT_DEC) {
+        version = value.data;
+      } else if ("certDigest".equals(name) && value.type == Res_value.TYPE_STRING) {
+        this.certDigest = value.toString();
       }
-      if ("version".equals(name)) {
-        version = obj;
-      }
-      super.attr(ns, name, resourceId, type, obj);
+      super.attr(ns, name, resourceId, raw, value);
     }
 
     @Override
     public void end() {
       if (name != null && version != null) {
-        staticLibs.put(name, version);
+        StaticLibItem item = new StaticLibItem(name, version, certDigest, "");
+        staticLibs.put(name, item);
       }
       super.end();
     }
