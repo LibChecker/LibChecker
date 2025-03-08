@@ -20,7 +20,7 @@ import kotlinx.coroutines.withContext
 class JetpackComposeChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>(items) {
   override val classifiedMap: HashMap<Int, ChartSourceItem> = HashMap(2)
 
-  override suspend fun fillChartView(chartView: PieChart) {
+  override suspend fun fillChartView(chartView: PieChart, onProgressUpdated: (Int) -> Unit) {
     withContext(Dispatchers.Default) {
       val context = chartView.context ?: return@withContext
       val parties = listOf(

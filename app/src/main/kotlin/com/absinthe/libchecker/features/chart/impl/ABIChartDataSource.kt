@@ -19,12 +19,13 @@ import com.github.mikephil.charting.formatter.PercentFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.utils.MPPointF
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 
 class ABIChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>(items) {
   override val classifiedMap: HashMap<Int, ChartSourceItem> = HashMap(3)
 
-  override suspend fun fillChartView(chartView: PieChart) {
+  override suspend fun fillChartView(chartView: PieChart, onProgressUpdated: (Int) -> Unit) {
     withContext(Dispatchers.Default) {
       val context = chartView.context ?: return@withContext
       val parties = listOf(
@@ -41,6 +42,7 @@ class ABIChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>(it
       )
 
       for (item in filteredList) {
+        if (!isActive) return@withContext
         if (PackageUtils.hasNoNativeLibs(item.abi.toInt())) {
           classifiedList[NO_LIBS].add(item)
         } else {

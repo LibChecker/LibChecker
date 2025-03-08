@@ -5,6 +5,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.features.chart.BaseChartDataSource
 import com.absinthe.libchecker.features.chart.ChartSourceItem
+import com.absinthe.libchecker.features.chart.IHeavyWork
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -21,10 +22,12 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-class PageSize16KBChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>(items) {
+class PageSize16KBChartDataSource(items: List<LCItem>) :
+  BaseChartDataSource<PieChart>(items),
+  IHeavyWork {
   override val classifiedMap: HashMap<Int, ChartSourceItem> = HashMap(2)
 
-  override suspend fun fillChartView(chartView: PieChart) {
+  override suspend fun fillChartView(chartView: PieChart, onProgressUpdated: (Int) -> Unit) {
     withContext(Dispatchers.Default) {
       val context = chartView.context ?: return@withContext
       val parties = listOf(
@@ -36,10 +39,10 @@ class PageSize16KBChartDataSource(items: List<LCItem>) : BaseChartDataSource<Pie
       val colorOnSurface = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
       val classifiedList = listOf(mutableListOf<LCItem>(), mutableListOf(), mutableListOf())
 
-      for (item in filteredList) {
-        if (!isActive) {
-          return@withContext
-        }
+      val itemCount = filteredList.size
+      var progress = 0
+      filteredList.forEachIndexed { index, item ->
+        if (!isActive) return@withContext
         try {
           val pi = PackageUtils.getPackageInfo(item.packageName)
           if (PackageUtils.hasNoNativeLibs(item.abi.toInt())) {
@@ -51,6 +54,13 @@ class PageSize16KBChartDataSource(items: List<LCItem>) : BaseChartDataSource<Pie
           }
         } catch (e: Exception) {
           Timber.e(e)
+        }
+        val p = index * 100 / itemCount
+        if (p > progress) {
+          progress = p
+          withContext(Dispatchers.Main) {
+            onProgressUpdated(progress)
+          }
         }
       }
 

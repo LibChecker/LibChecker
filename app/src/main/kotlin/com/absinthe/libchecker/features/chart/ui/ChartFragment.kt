@@ -24,7 +24,10 @@ import com.absinthe.libchecker.features.chart.BaseVariableChartDataSource
 import com.absinthe.libchecker.features.chart.ChartViewModel
 import com.absinthe.libchecker.features.chart.IAndroidSDKChart
 import com.absinthe.libchecker.features.chart.IChartDataSource
+import com.absinthe.libchecker.features.chart.IHeavyWork
 import com.absinthe.libchecker.features.chart.IntegerFormatter
+import com.absinthe.libchecker.features.chart.LOADING_PROGRESS_INFINITY
+import com.absinthe.libchecker.features.chart.LOADING_PROGRESS_MAX
 import com.absinthe.libchecker.features.chart.impl.AABChartDataSource
 import com.absinthe.libchecker.features.chart.impl.ABIChartDataSource
 import com.absinthe.libchecker.features.chart.impl.CompileApiChartDataSource
@@ -166,12 +169,20 @@ class ChartFragment :
     }
     lifecycleScope.launch {
       lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
-        viewModel.isLoading.collect { isLoading ->
-          if (isLoading) {
-            binding.progressHorizontal.show()
-          } else {
-            binding.progressHorizontal.hide()
-            applyDashboardView()
+        viewModel.loadingProgress.collect { progress ->
+          binding.progressHorizontal.let { indicator ->
+            if (progress < LOADING_PROGRESS_MAX) {
+              if (progress <= 0) {
+                indicator.isIndeterminate = progress == LOADING_PROGRESS_INFINITY
+                indicator.progress = 0
+              } else {
+                indicator.setProgressCompat(progress, true)
+              }
+              indicator.show()
+            } else {
+              indicator.hide()
+              applyDashboardView()
+            }
           }
         }
       }
@@ -199,7 +210,6 @@ class ChartFragment :
   private fun setData(items: List<LCItem>, chartType: ChartType = currentChartType) {
     context ?: return
     currentChartType = chartType
-    viewModel.setLoading(true)
     viewModel.setDetailAbiSwitchVisibility(chartType == ChartType.ABI)
     if (chartView.parent != null) {
       binding.root.removeView(chartView)
@@ -231,6 +241,8 @@ class ChartFragment :
   ) {
     val newChartView = generateChartView()
     val ds = dataSourceProvider()
+    val loadingProgress = if (ds is IHeavyWork) 0 else LOADING_PROGRESS_INFINITY
+    viewModel.setLoadingProgress(loadingProgress)
     viewModel.applyChartData(binding.root, chartView, newChartView, ds)
     chartView = newChartView
     dataSource = ds

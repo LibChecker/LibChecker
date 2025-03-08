@@ -22,7 +22,7 @@ import timber.log.Timber
 class MinApiChartDataSource(items: List<LCItem>) :
   BaseVariableChartDataSource<BarChart>(items),
   IAndroidSDKChart {
-  override suspend fun fillChartView(chartView: BarChart) {
+  override suspend fun fillChartView(chartView: BarChart, onProgressUpdated: (Int) -> Unit) {
     withContext(Dispatchers.Default) {
       val context = chartView.context ?: return@withContext
       val entries: ArrayList<BarEntry> = ArrayList()
