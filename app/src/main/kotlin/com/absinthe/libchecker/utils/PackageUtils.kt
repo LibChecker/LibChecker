@@ -715,12 +715,15 @@ object PackageUtils {
 
       if (abiSet.isEmpty()) {
         packageInfo.applicationInfo?.let { ai ->
-          when {
-            !isApk && ai.nativeLibraryDir != null -> abiSet.addAll(getAbiListByNativeDir(ai.nativeLibraryDir))
-            ai.splitSourceDirs != null -> abiSet.addAll(getAbiListBySplitApks(ai.splitSourceDirs ?: emptyArray()))
-            else -> abiSet.add(NO_LIBS)
+          if (!isApk && ai.nativeLibraryDir != null) {
+            abiSet.addAll(getAbiListByNativeDir(ai.nativeLibraryDir))
+          } else if (ai.splitSourceDirs != null) {
+            abiSet.addAll(getAbiListBySplitApks(ai.splitSourceDirs ?: emptyArray()))
           }
         }
+      }
+      if (abiSet.isEmpty()) {
+        abiSet.add(NO_LIBS)
       }
 
       abiSet
