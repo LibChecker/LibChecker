@@ -715,7 +715,7 @@ object PackageUtils {
 
       if (abiSet.isEmpty()) {
         packageInfo.applicationInfo?.let { ai ->
-          if (!isApk && ai.nativeLibraryDir != null) {
+          if (!isApk && ai.nativeLibraryDir != null && File(ai.nativeLibraryDir).exists()) {
             abiSet.addAll(getAbiListByNativeDir(ai.nativeLibraryDir))
           } else if (ai.splitSourceDirs != null) {
             abiSet.addAll(getAbiListBySplitApks(ai.splitSourceDirs ?: emptyArray()))
