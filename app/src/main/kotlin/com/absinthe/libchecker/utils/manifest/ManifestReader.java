@@ -91,9 +91,13 @@ public class ManifestReader {
     public void attr(String ns, String name, int resourceId, String raw, Res_value value) {
       if (contains(name)) {
         this.name = name;
-        this.value = raw;
+        if (value.type == Res_value.TYPE_REFERENCE) {
+          this.value = value.data;
+        } else {
+          this.value = value.toString();
+        }
 
-        if (name != null && this.value != null) {
+        if (name != null && value.type != Res_value.TYPE_NULL) {
           properties.put(name, this.value);
         }
       }
