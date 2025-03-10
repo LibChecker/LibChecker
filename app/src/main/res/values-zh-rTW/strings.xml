@@ -235,7 +235,7 @@
   <string name="album_restore_detail">%1$s：總計 %2$s 個項目\n</string>
   <string name="album_click_to_choose">按下以選擇</string>
   <string name="album_dialog_delete_snapshot_message">處理中…</string>
-  <string name="album_snapshot_top_apps_not_initialized">尚未加载</string>
+  <string name="album_snapshot_top_apps_not_initialized">尚未載入</string>
   <!--  Integration  -->
   <string name="integration_monkey_king_menu_block">使用「大聖淨化」封鎖此元件</string>
   <string name="integration_monkey_king_menu_unblock">使用「大聖淨化」解除封鎖此元件</string>
