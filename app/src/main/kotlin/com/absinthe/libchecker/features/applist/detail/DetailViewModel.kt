@@ -51,8 +51,11 @@ import com.absinthe.libchecker.utils.extensions.getRxKotlinVersion
 import com.absinthe.libchecker.utils.extensions.getSignatures
 import com.absinthe.libchecker.utils.extensions.getStatefulPermissionsList
 import com.absinthe.libchecker.utils.extensions.is16KBAligned
+import com.absinthe.libchecker.utils.extensions.isPWA
 import com.absinthe.libchecker.utils.extensions.isPageSizeCompat
+import com.absinthe.libchecker.utils.extensions.isPlayAppSigning
 import com.absinthe.libchecker.utils.extensions.isUseKMP
+import com.absinthe.libchecker.utils.extensions.isXposedModule
 import com.absinthe.libchecker.utils.extensions.toClassDefType
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.rulesbundle.LCRules
@@ -518,18 +521,18 @@ class DetailViewModel : ViewModel() {
       val version = packageInfo.getAGPVersion()
       _featuresFlow.emit(VersionedFeature(Features.AGP, version))
     }
-    if ((feat and Features.XPOSED_MODULE) > 0) {
-      _featuresFlow.emit(VersionedFeature(Features.XPOSED_MODULE))
-    }
-    if ((feat and Features.PLAY_SIGNING) > 0) {
-      _featuresFlow.emit(VersionedFeature(Features.PLAY_SIGNING))
-    }
-    if ((feat and Features.PWA) > 0) {
-      _featuresFlow.emit(VersionedFeature(Features.PWA))
-    }
     if ((feat and Features.JETPACK_COMPOSE) > 0) {
       val version = packageInfo.getJetpackComposeVersion()
       _featuresFlow.emit(VersionedFeature(Features.JETPACK_COMPOSE, version))
+    }
+    if (packageInfo.isXposedModule()) {
+      _featuresFlow.emit(VersionedFeature(Features.XPOSED_MODULE))
+    }
+    if (packageInfo.isPlayAppSigning()) {
+      _featuresFlow.emit(VersionedFeature(Features.PLAY_SIGNING))
+    }
+    if (packageInfo.isPWA()) {
+      _featuresFlow.emit(VersionedFeature(Features.PWA))
     }
 
     _featuresFlow.emit(VersionedFeature(Features.Ext.APPLICATION_PROP))
