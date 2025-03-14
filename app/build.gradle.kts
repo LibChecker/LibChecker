@@ -75,7 +75,7 @@ setupAppModule {
   )
 
   lint {
-    disable += "AppCompatResource"
+    disable += setOf("AppCompatResource", "MissingTranslation")
   }
 
   dependenciesInfo.includeInApk = false
