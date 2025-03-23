@@ -224,7 +224,7 @@ class LibStringAdapter(
       itemView.libSize.append(createNativeLabelSpan(text))
     }
     if (elfInfo.elfType != ET_NOT_ELF) {
-      if (elfInfo.pageSize % PAGE_SIZE_16_KB == 0) {
+      if (elfInfo.pageSize > 0 && elfInfo.pageSize % PAGE_SIZE_16_KB == 0) {
         val text = "16 KB"
         itemView.libSize.append(createNativeLabelSpan(text))
       }

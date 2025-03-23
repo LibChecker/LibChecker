@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.utils.elf
 
 import com.absinthe.libchecker.annotation.ET_NOT_ELF
+import java.io.EOFException
 import java.io.InputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -64,7 +65,8 @@ class ELFParser(inputStream: InputStream) {
   private fun parse(inputStream: InputStream) {
     inputStream.also {
       val e_ident_array = ByteArray(EI_NIDENT)
-      readBytes += it.read(e_ident_array)
+      readFully(it, e_ident_array, EI_NIDENT)
+      readBytes += EI_NIDENT
       e_ident = EIdent(e_ident_array)
 
       if (!isElf()) {
@@ -72,14 +74,15 @@ class ELFParser(inputStream: InputStream) {
       }
 
       val ehSize = when (getEClass()) {
-        EIdent.ELFCLASS32 -> 52 - EI_NIDENT // 32-bit ELF header size
-        EIdent.ELFCLASS64 -> 64 - EI_NIDENT // 64-bit ELF header size
+        EIdent.ELFCLASS32 -> 36 // 32-bit ELF header size
+        EIdent.ELFCLASS64 -> 48 // 64-bit ELF header size
         else -> return@also
       }
       val byteOrder =
         if (e_ident.EI_DATA.toInt() == EIdent.ELFDATA2MSB) ByteOrder.BIG_ENDIAN else ByteOrder.LITTLE_ENDIAN
       val buffer = ByteBuffer.allocate(ehSize).order(byteOrder)
-      readBytes += it.read(buffer.array())
+      readFully(it, buffer.array(), ehSize)
+      readBytes += ehSize
 
       when (getEClass()) {
         EIdent.ELFCLASS32 -> {
@@ -123,18 +126,19 @@ class ELFParser(inputStream: InputStream) {
       if (e_phoff > 0 && e_phnum > 0) {
         for (i in 0 until e_phnum) {
           val phBuffer = ByteBuffer.allocate(e_phentsize.toInt()).order(byteOrder)
-          readBytes += it.read(phBuffer.array())
+          readFully(it, phBuffer.array(), e_phentsize.toInt())
+          readBytes += e_phentsize.toInt()
 
           val programHeader = if (getEClass() == EIdent.ELFCLASS32) {
             ProgramHeader(
               p_type = phBuffer.int,
-              p_offset = phBuffer.int.toLong() and 0xFFFFFFFFL,
-              p_vaddr = phBuffer.int.toLong() and 0xFFFFFFFFL,
-              p_paddr = phBuffer.int.toLong() and 0xFFFFFFFFL,
-              p_filesz = phBuffer.int.toLong() and 0xFFFFFFFFL,
-              p_memsz = phBuffer.int.toLong() and 0xFFFFFFFFL,
+              p_offset = phBuffer.int.toLong(),
+              p_vaddr = phBuffer.int.toLong(),
+              p_paddr = phBuffer.int.toLong(),
+              p_filesz = phBuffer.int.toLong(),
+              p_memsz = phBuffer.int.toLong(),
               p_flags = phBuffer.int,
-              p_align = phBuffer.int.toLong() and 0xFFFFFFFFL
+              p_align = phBuffer.int.toLong()
             )
           } else {
             ProgramHeader(
@@ -154,8 +158,17 @@ class ELFParser(inputStream: InputStream) {
     }
   }
 
-  override fun toString(): String {
-    return "ELFParser(e_ident=$e_ident, e_type=$e_type, e_machine=$e_machine, e_version=$e_version, e_entry=$e_entry, e_phoff=$e_phoff, e_shoff=$e_shoff, e_flags=$e_flags, e_ehsize=$e_ehsize, e_phentsize=$e_phentsize, e_phnum=$e_phnum, e_shentsize=$e_shentsize, e_shnum=$e_shnum, e_shstrndx=$e_shstrndx, programHeaders=$programHeaders)"
+  private fun readFully(inputStream: InputStream, buffer: ByteArray, length: Int) {
+    var bytesRead = 0
+
+    // Read in a loop until the buffer is fully filled
+    while (bytesRead < length) {
+      val readCount = inputStream.read(buffer, bytesRead, length - bytesRead)
+      if (readCount == -1) {
+        throw EOFException("Unexpected end of stream while reading $length bytes")
+      }
+      bytesRead += readCount
+    }
   }
 
   class EIdent(array: ByteArray) {
