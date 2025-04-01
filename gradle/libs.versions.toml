@@ -20,7 +20,7 @@ hiddenApiRefine = { id = "dev.rikka.tools.refine", version.ref = "hiddenApiRefin
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version = "2.1.20-1.0.32" }
-protobuf = { id = "com.google.protobuf", version = "0.9.4" }
+protobuf = { id = "com.google.protobuf", version = "0.9.5" }
 moshiX = "dev.zacsweers.moshix:0.30.0"
 spotless = "com.diffplug.spotless:7.0.2"
 aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutlibraries" }
