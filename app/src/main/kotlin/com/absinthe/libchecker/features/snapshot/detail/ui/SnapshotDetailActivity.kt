@@ -57,6 +57,7 @@ import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.launchLibReferencePage
+import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.chad.library.adapter.base.entity.node.BaseNode
@@ -166,20 +167,31 @@ class SnapshotDetailActivity :
           }
         }
       }
-      snapshotTitle.appNameView.text = LCAppUtils.getDiffString(entity.labelDiff, isNewOrDeleted)
+      snapshotTitle.apply {
+        appNameView.apply {
+          text = LCAppUtils.getDiffString(entity.labelDiff, isNewOrDeleted)
+          setLongClickCopiedToClipboard(text)
+        }
 
-      val pkgSplits = entity.packageName.split("/")
-      val first = pkgSplits[0]
-      val second = pkgSplits.getOrNull(1)
-      snapshotTitle.packageNameView.text = if (second != null && second != first) "$first $ARROW $second" else first
-      snapshotTitle.versionInfoView.text = LCAppUtils.getDiffString(
-        diff1 = entity.versionNameDiff,
-        diff2 = entity.versionCodeDiff,
-        isNewOrDeleted = isNewOrDeleted
-      )
+        val pkgSplits = entity.packageName.split("/")
+        val first = pkgSplits[0]
+        val second = pkgSplits.getOrNull(1)
+        packageNameView.apply {
+          text = if (second != null && second != first) "$first $ARROW $second" else first
+          setLongClickCopiedToClipboard(text)
+        }
+        versionInfoView.apply {
+          text = LCAppUtils.getDiffString(
+            diff1 = entity.versionNameDiff,
+            diff2 = entity.versionCodeDiff,
+            isNewOrDeleted = isNewOrDeleted
+          )
+          setLongClickCopiedToClipboard(text)
+        }
 
-      snapshotTitle.setApisText(entity, isNewOrDeleted)
-      snapshotTitle.setPackageSizeText(entity, isNewOrDeleted)
+        setApisText(entity, isNewOrDeleted)
+        setPackageSizeText(entity, isNewOrDeleted)
+      }
     }
 
     adapter.setEmptyView(
