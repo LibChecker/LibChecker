@@ -134,6 +134,7 @@ object PackageUtils {
             PackageManager.MATCH_DISABLED_COMPONENTS or flag
           )?.apply {
             applicationInfo?.let { appInfo ->
+              appInfo.enabled = false
               appInfo.sourceDir = ai.sourceDir
               appInfo.nativeLibraryDir = ai.nativeLibraryDir
             }
