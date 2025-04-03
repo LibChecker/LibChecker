@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!--  General  -->
+  <string name="title_app_list">יישומים</string>
+  <string name="title_statistics">סטיסטיקות</string>
+  <string name="title_snapshot">תצלומים</string>
+  <string name="title_settings">הגדרות</string>
+  <string name="title_album">אלבום</string>
+  <string name="loading">טוען…</string>
+  <string name="channel_shoot">שמור תמונות מצב</string>
+  <string name="noti_shoot_title">שומר את תמונת המצב הנוכחית</string>
+  <string name="noti_shoot_title_saved">תמונת מצב נשמרה</string>
+  <!--  App list  -->
+  <string name="menu_search">חיפוש</string>
+  <string name="menu_sort">מיין</string>
+  <string name="menu_filter">מסנן</string>
+  <string name="search_hint">חיפוש…</string>
+  <string name="string_64_bit">64bit</string>
+  <string name="string_32_bit">32bit</string>
+  <string name="no_libs">אין ליברציות מקומיות</string>
+  <string name="cannot_read">לא ניתן לקריאה</string>
+  <string name="unknown">לא ידוע</string>
+  <string name="empty_list">רשימה ריקה</string>
+  <string name="uncharted_territory">טריטוריה לא ידועה</string>
+  <string name="get_app_list_denied_tip">אנא הענק\n\"קבל מידע על אפליקציות מותקנות\"\nהרשאה ל-LibChecker</string>
+  <string name="advanced_menu">תפריט מתקדם</string>
+  <string name="archived_app">אפליקציה בארכיון</string>
+  <!-- Statistics   -->
+  <string name="title_statistics_dialog">אפליקציות עם %s ABI</string>
+  <string name="title_statistics_dialog_no_native_libs">אפליקציות ללא ספריות מקור</string>
+  <string name="tab_chart">תרשים</string>
+  <string name="tab_lib_reference_statistics">איזכור ספריה</string>
+  <string name="not_marked_lib">ספריה לא מסומנת</string>
+  <string name="submenu_title_component">רכיב</string>
+  <string name="submenu_title_manifest">Manifest</string>
+  <string name="ref_category_all">הכל</string>
+  <string name="ref_category_native">ספריות מקומיות</string>
+  <string name="ref_category_service">שירותים</string>
+  <string name="ref_category_activity">אקטיביטים</string>
+  <string name="ref_category_br">מקלטי שידור</string>
+  <string name="ref_category_cp">ספקי תוכן</string>
+  <string name="ref_category_perm">הרשאות</string>
+  <string name="ref_category_static">ספריות סטטיות</string>
+  <string name="ref_category_metadata">נתוני מטא</string>
+  <string name="ref_category_package">חבילה</string>
+  <string name="ref_category_shared_uid">UID משותף</string>
+  <string name="ref_category_signatures">חתימות</string>
+  <string name="ref_category_only_not_marked">רק לא מסומן</string>
+  <string name="string_kotlin_used">קוטלין בשימוש</string>
+  <string name="string_kotlin_unused">קוטלין לא בשימוש</string>
+  <string name="string_compose_used">Jetpack Compose בשימוש</string>
+  <string name="string_compose_unused">Jetpack Compose לא בשימוש</string>
+  <string name="android_dist_label">הפצה</string>
+  <string name="android_dist_source">מקור</string>
+  <string name="android_dist_title">סטטיסטיקת הפצת גרסאות אנדרואיד</string>
+  <string name="android_dist_subtitle_format">זמן עדכון: %s</string>
+  <string name="chart_abi_detailed">מפורט</string>
+  <string name="chart_abi_concise">תמציתי</string>
+  <string name="chart_item_not_support">לא נתמך</string>
+  <!--  About  -->
+  <string name="settings_about">אודות</string>
+  <string name="settings_about_summary">זה LibChecker!</string>
+  <string name="settings_translate">השתתף בתרגום</string>
+  <string name="settings_translate_summary">עזרו לנו לתרגם את האפליקציה הזו</string>
+  <string name="settings_rate_us">דרג אותנו</string>
+  <string name="settings_rate_us_summary">זה יכול לגרום לנו למצוא יותר אנשים</string>
+  <string name="settings_get_updates">קבלת עדכונים</string>
+  <string name="settings_get_updates_summary">קבל את הגרסה האחרונה שהיא יציבה יותר ועמוסה בתכונות</string>
+  <string name="settings_get_updates_in_app">בתוך האפליקציה</string>
+  <string name="settings_get_updates_in_app_chip_stable">יציב</string>
+  <string name="settings_get_updates_in_app_chip_ci">CI</string>
+  <string name="about_info">אפליקציה זו משמשת לצפייה בספריות של צד שלישי המשמשות את היישומים במכשיר שלך.</string>
+  <string name="toolbar_rate">דירוג</string>
+  <string name="resource_declaration">חלק מהמשאבים באפליקציה מגיעים מ: </string>
+  <string name="library_declaration">כל מידע הספריות המסומנות ב-LibChecker מגיע מתיעוד הפיתוח או ממאגר הקוד של ה-SDK אליו הוא שייך. אם המידע שגוי, אנא צור קשר: absinthe@absinthe.life</string>
+  <!--  Settings  -->
+  <string name="pref_group_normal">רגיל</string>
+  <string name="pref_group_others">אחרים</string>
+  <string name="apk_analytics">ניתוח APK</string>
+  <string name="colorful_icon">סמל צבעוני</string>
+  <string name="rules_repo_title">מאגר כללים</string>
+  <string name="lib_ref_threshold">סף הפניה לספרייה</string>
+  <string name="languages">שפות</string>
+  <string name="reload_apps">טען מחדש את רשימת האפליקציות</string>
+  <string name="help_docs">עזרה במסמכים</string>
+  <string name="join_telegram_group">תקשורת</string>
+  <string name="anonymous_statistics">סטטיסטיקות אנונימיות</string>
+  <string name="cloud_rules">ענן כללים</string>
+  <string name="dark_mode">מצב כהה</string>
+  <string name="snapshot_keep">תמונת מצב ברירת מחדל לשמירה</string>
+  <string name="apk_analytics_summary">פתח את דף הפרטים בעת לחיצה על קובץ APK</string>
+  <string name="colorful_icon_summary">חלק מהספריות המסומנות יופיעו כלוגו צבעוני</string>
+  <string name="lib_ref_threshold_summary">רק ספריות עם מספר הפניות לספריה שהגיעו לסף מוצגות ברשימה</string>
+  <string name="reload_apps_summary">נסה כאשר רשימת האפליקציות מוצגת בצורה חריגה</string>
+  <string name="help_docs_summary">למד כיצד להשתמש ב- LibChecker</string>
+  <string name="join_telegram_group_summary">הצטרף לקבוצת הטלגרם שלנו</string>
+  <string name="anonymous_statistics_summary">אנו משתמשים ב-Google Firebase כדי לשלוח באופן אנונימי את הספריות המסומנות הנפוצות ביותר וכמה נתוני הרגלי שימוש כדי להפוך את LibChecker למעשי יותר</string>
+  <string name="cloud_rules_summary">עדכן כאן את כללי הספרייה המסומנים האחרונים</string>
+  <string name="array_dark_mode_off">כיבוי</string>
+  <string name="array_dark_mode_on">הפעל</string>
+  <string name="array_dark_mode_auto">אוטומטי</string>
+  <string name="array_dark_mode_system">ברירת המחדל של המערכת</string>
+  <string name="array_dark_mode_battery">יקבע על פי חסכון סוללה</string>
+  <string name="array_snapshot_default">הודע</string>
+  <string name="array_snapshot_keep">שמור</string>
+  <string name="array_snapshot_discard">השלך</string>
+  <!--  Detail  -->
+  <string name="detail">פרטים</string>
+  <string name="detail_label">הצג מידע אפלקציה</string>
+  <string name="not_found">לא נמצא</string>
+  <string name="create_an_issue">עזרו לנו להשלים את המידע</string>
+  <string name="app_bundle_details">אנדרואיד App Bundle הוא פורמט הפרסום החדש והרשמי של אנדרואיד המציע דרך יעילה יותר לבנות ולהוציא את האפליקציה שלך. ה-Android App Bundle מאפשר לך לספק חוויה נהדרת ביתר קלות בגודל אפליקציה קטן יותר, מה שיכול לשפר את הצלחת ההתקנה ולהפחית את הסרות ההתקנה. זה קל להחליף. אתה לא צריך לשנות את הקוד שלך כדי להתחיל ליהנות מאפליקציה קטנה יותר. וברגע שתעבור, תוכל להפיק תועלת מפיתוח אפליקציות מודולרי ומאספקת תכונות הניתנות להתאמה אישית.</string>
+  <string name="kotlin_details">Kotlin היא שפת תכנות עם הקלדה סטטית בקוד פתוח המכוונת ל-JVM, Android, JavaScript, Wasm ו-Native. זה פותח על ידי JetBrains. Kotlin היא שפת תכנות מודרנית אך כבר בוגרת שנועדה להפוך מפתחים למאושרים יותר. הוא תמציתי, בטוחה, פועלת הדדי עם Java ושפות אחרות, ומספק דרכים רבות לשימוש חוזר בקוד בין פלטפורמות מרובות לתכנות פרודוקטיבי.</string>
+  <string name="items_count">ספירת פריטים: </string>
+  <string name="further_operation">תפעול נוסך</string>
+  <string name="app_info_launch">הפעל</string>
+  <string name="app_info_settings">הגדרות</string>
+  <string name="lib_detail_dialog_title">פרטי ספריה</string>
+  <string name="lib_permission_dialog_title">פרטי הרשאה</string>
+  <string name="agp_details">מערכת הבנייה של Android Studio מבוססת על Gradle, והתוסף של Android Gradle מוסיף מספר תכונות ספציפיות לבניית אפליקציות אנדרואיד. למרות שהתוסף אנדרואיד מתעדכן בדרך כלל בשלב נעילה עם Android Studio, התוסף (ושאר מערכת Gradle) יכול לפעול ללא תלות ב-Android Studio ולהתעדכן בנפרד.</string>
+  <string name="xposed_module">מודול Xposed</string>
+  <string name="xposed_module_details">Xposed היא מסגרת למודולים שיכולה לשנות את התנהגות המערכת והאפליקציות מבלי לגעת באף APK. זה נהדר כי זה אומר שהמודולים יכולים לעבוד עבור גרסאות שונות ואפילו ROM ללא כל שינוי.</string>
+  <string name="play_app_signing">חתימת חנות אפלקציה</string>
+  <string name="play_app_signing_details">עם Play App Signing, גוגל מנהלת ומגנה עבורך על מפתח החתימה של האפליקציה שלך ומשתמשת בו כדי לחתום על חבילות APK מותאמות והפצה שנוצרות מחבילות האפליקציות שלך. Play App Signing מאחסן את מפתח חתימת האפליקציה שלך בתשתית המאובטחת של גוגל ומציע אפשרויות שדרוג להגברת האבטחה.</string>
+  <string name="pwa_details">יישומי אינטרנט מתקדמים (PWA) בנויים ומשופרים עם ממשקי API מודרניים כדי לספק יכולות משופרות, מהימנות וניתנות להתקנה תוך הגעה לכל אחד, בכל מקום, בכל מכשיר עם בסיס קוד יחיד.</string>
+  <string name="jetpack_compose_details">Jetpack Compose הוא ערכת הכלים המודרנית של אנדרואיד לבניית ממשק משתמש מקורי. זה מפשט ומאיץ את פיתוח ממשק המשתמש באנדרואיד. חיש מהר את האפליקציה שלך עם פחות קוד, כלים רבי עוצמה וממשקי API אינטואיטיביים של Kotlin.</string>
+  <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform היא מסגרת ממשק משתמש הצהרתית ותגובתית מודרנית שפותחה על ידי JetBrains המספקת דרך פשוטה לבנות ממשקי משתמש עם כמות קטנה של קוד Kotlin. זה גם מאפשר לך לכתוב את ממשק המשתמש שלך פעם אחת ולהפעיל אותו בכל אחת מהפלטפורמות הנתמכות - iOS, Android, שולחן עבודה (Windows, macOS, Linux) ואינטרנט.</string>
+  <string name="multi_arch_dialog_details"><![CDATA[אם אפליקציה חושפת ממשק API לאפליקציות אחרות שיכולות להיות 32 סיביות או 64 סיביות, האפליקציה חייבת להגדיר את המאפיין <b>android:multiarch</b> כ-true בתוך המניפסט שלה כדי למנוע שגיאות אפשריות.]]></string>
+  <string name="extract_native_libs_tip">האפליקציה מצהירה </string>
+  <string name="xml_detail">פרטי XML</string>
+  <string name="lib_detail_dialog_title_16kb_page_size">תמיכה בגודל עמוד של 16 KB</string>
+  <string name="lib_detail_dialog_content_16kb_page_size">מבחינה היסטורית, אנדרואיד תמכה רק בגדלים של דפי זיכרון של 4 קילו-בייט, מה שמיטב את ביצועי זיכרון המערכת עבור הכמות הממוצעת של הזיכרון הכולל שיש למכשירי אנדרואיד בדרך כלל. החל מ-Android 15, AOSP תומך במכשירים המוגדרים לשימוש בגודל עמוד של 16 KB (מכשירים של 16 KB). אם האפליקציה שלך משתמשת בספריות NDK כלשהן, במישרין או בעקיפין דרך SDK, תצטרך לבנות מחדש את האפליקציה שלך כדי שהיא תעבוד במכשירים אלה בגודל 16 KB.</string>
+  <string name="signature_public_key_exponent">מעריך מפתח ציבורי</string>
+  <!--  Toast  -->
+  <!--  Snapshot  -->
+  <!--  Dialog  -->
+  <!--  Album  -->
+  <!--  Integration  -->
+  <!--  Cloud rules  -->
+  <!-- Advanced menu -->
+  <!--  Snapshot menu  -->
+</resources>
