@@ -1,4 +1,6 @@
 import com.diffplug.gradle.spotless.SpotlessExtension
+import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
   alias(libs.plugins.android.application) apply false
@@ -33,6 +35,13 @@ allprojects {
   plugins.withType<JavaBasePlugin>().configureEach {
     extensions.configure<JavaPluginExtension> {
       toolchain.languageVersion = JavaLanguageVersion.of(21)
+    }
+  }
+
+  tasks.withType<KotlinCompilationTask<*>>().configureEach {
+    compilerOptions {
+      // https://kotlinlang.org/docs/whatsnew2120.html#kotlin-native-new-inlining-optimization
+      freeCompilerArgs.add("-Xbinary=preCodegenInlineThreshold=40")
     }
   }
 }
