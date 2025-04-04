@@ -5,7 +5,6 @@ import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
-import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.BuildConfig
@@ -53,6 +52,7 @@ import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.collections.filter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -477,10 +477,15 @@ class HomeViewModel : ViewModel() {
       when (type) {
         NATIVE -> {
           val packageInfo = PackageUtils.getPackageInfo(packageName)
-          computeNativeReferenceInternal(
+          val list = PackageUtils.getNativeDirLibs(packageInfo)
+          val mapped =
+            list.filter { LCAppUtils.checkNativeLibValidation(packageName, it.name, list) }
+              .map { it.name }
+          computeReferenceInternal(
             referenceMap,
             packageName,
-            PackageUtils.getNativeDirLibs(packageInfo)
+            NATIVE,
+            mapped
           )
         }
 
@@ -518,10 +523,14 @@ class HomeViewModel : ViewModel() {
 
         DEX -> {
           val packageInfo = PackageUtils.getPackageInfo(packageName)
-          computeDexReferenceInternal(
+          val list = PackageUtils.getDexList(packageInfo)
+            .filter { it.name.startsWith(packageName).not() }
+            .map { it.name }
+          computeReferenceInternal(
             referenceMap,
             packageName,
-            PackageUtils.getDexList(packageInfo).toList()
+            DEX,
+            list
           )
         }
 
@@ -530,10 +539,11 @@ class HomeViewModel : ViewModel() {
             packageName,
             PackageManager.GET_PERMISSIONS
           )
-          computePermissionReferenceInternal(
+          computeReferenceInternal(
             referenceMap,
             packageName,
-            packageInfo.requestedPermissions
+            PERMISSION,
+            packageInfo.requestedPermissions?.toList()
           )
         }
 
@@ -542,10 +552,11 @@ class HomeViewModel : ViewModel() {
             packageName,
             PackageManager.GET_META_DATA
           )
-          computeMetadataReferenceInternal(
+          computeReferenceInternal(
             referenceMap,
             packageName,
-            packageInfo.applicationInfo?.metaData
+            METADATA,
+            packageInfo.applicationInfo?.metaData?.keySet()
           )
         }
 
@@ -575,51 +586,31 @@ class HomeViewModel : ViewModel() {
     }
   }
 
-  private fun computeNativeReferenceInternal(
-    referenceMap: HashMap<String, Pair<MutableSet<String>, Int>>,
-    packageName: String,
-    list: List<LibStringItem>
-  ) {
-    list.filter { LCAppUtils.checkNativeLibValidation(packageName, it.name, list) }
-      .forEach {
-        referenceMap.putIfAbsent(it.name, mutableSetOf<String>() to NATIVE)?.first?.add(packageName)
-      }
-  }
-
   private fun computeComponentReferenceInternal(
     referenceMap: HashMap<String, Pair<MutableSet<String>, Int>>,
     packageName: String,
     @LibType type: Int,
     components: Array<out ComponentInfo>?
   ) {
-    components.orEmpty()
-      .filter { it.name.startsWith(packageName).not() }
-      .forEach { referenceMap.putIfAbsent(it.name, mutableSetOf<String>() to type)?.first?.add(packageName) }
+    computeReferenceInternal(
+      referenceMap,
+      packageName,
+      type,
+      components.orEmpty().filter { it.name.startsWith(packageName).not() }.map { it.name }
+    )
   }
 
-  private fun computeDexReferenceInternal(
+  private fun computeReferenceInternal(
     referenceMap: HashMap<String, Pair<MutableSet<String>, Int>>,
     packageName: String,
-    list: List<LibStringItem>
+    @LibType type: Int,
+    list: Collection<String>?
   ) {
-    list.filter { it.name.startsWith(packageName).not() }
-      .forEach { referenceMap.putIfAbsent(it.name, mutableSetOf<String>() to DEX)?.first?.add(packageName) }
-  }
-
-  private fun computePermissionReferenceInternal(
-    referenceMap: HashMap<String, Pair<MutableSet<String>, Int>>,
-    packageName: String,
-    list: Array<out String>?
-  ) {
-    list?.forEach { referenceMap.putIfAbsent(it, mutableSetOf<String>() to PERMISSION)?.first?.add(packageName) }
-  }
-
-  private fun computeMetadataReferenceInternal(
-    referenceMap: HashMap<String, Pair<MutableSet<String>, Int>>,
-    packageName: String,
-    bundle: Bundle?
-  ) {
-    bundle?.keySet()?.forEach { referenceMap.putIfAbsent(it, mutableSetOf<String>() to METADATA)?.first?.add(packageName) }
+    list?.forEach {
+      referenceMap.getOrPut(it) { mutableSetOf<String>() to type }.first.apply {
+        add(packageName)
+      }
+    }
   }
 
   private var matchingJob: Job? = null
@@ -648,7 +639,11 @@ class HomeViewModel : ViewModel() {
             return@let
           }
           if (entry.value.first.size >= threshold && entry.key.isNotBlank()) {
-            rule = LCRules.getRule(entry.key, entry.value.second, true)
+            rule = if (entry.value.second != PERMISSION && entry.value.second != METADATA) {
+              LCRules.getRule(entry.key, entry.value.second, true)
+            } else {
+              null
+            }
             val shouldAdd = if (isOnlyNotMarked) {
               rule == null && entry.value.second != PERMISSION && entry.value.second != METADATA
             } else {
