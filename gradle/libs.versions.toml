@@ -19,7 +19,7 @@ gms = { id = "com.google.gms.google-services", version = "4.4.2" }
 hiddenApiRefine = { id = "dev.rikka.tools.refine", version.ref = "hiddenApiRefine" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
-ksp = { id = "com.google.devtools.ksp", version = "2.1.20-1.0.32" }
+ksp = { id = "com.google.devtools.ksp", version = "2.1.20-2.0.0" }
 protobuf = { id = "com.google.protobuf", version = "0.9.5" }
 moshiX = "dev.zacsweers.moshix:0.30.0"
 spotless = "com.diffplug.spotless:7.0.3"
@@ -29,7 +29,7 @@ aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "abo
 gradlePlugin-android = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 gradlePlugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 
-kotlinX-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1"
+kotlinX-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2"
 
 androidX-activity = "androidx.activity:activity-ktx:1.10.1"
 androidX-annotation = "androidx.annotation:annotation:1.9.1"
