@@ -1,6 +1,6 @@
 [versions]
 agp = "8.9.1"
-aboutlibraries = "11.6.3"
+aboutlibraries = "12.0.0"
 androidX-lifecycle = "2.8.7"
 androidX-room = "2.7.0"
 firebase-bom = "33.10.0"
