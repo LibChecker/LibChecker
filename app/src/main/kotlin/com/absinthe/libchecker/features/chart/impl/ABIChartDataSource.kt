@@ -92,7 +92,7 @@ class ABIChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>(it
         for (c in ColorTemplate.MATERIAL_COLORS) colors.add(c)
       }
 
-      dataSet.colors = colors
+      dataSet.setColors(colors)
       // dataSet.setSelectionShift(0f);
       val data = PieData(dataSet).apply {
         setValueFormatter(PercentFormatter())

@@ -72,7 +72,7 @@ class AABChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>(it
         "#3ddc84".toColorInt()
       )
 
-      dataSet.colors = colors
+      dataSet.setColors(colors)
       // dataSet.setSelectionShift(0f);
       val data = PieData(dataSet).apply {
         setValueFormatter(PercentFormatter())
