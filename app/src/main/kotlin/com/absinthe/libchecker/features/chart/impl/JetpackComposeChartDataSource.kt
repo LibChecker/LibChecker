@@ -73,7 +73,7 @@ class JetpackComposeChartDataSource(items: List<LCItem>) : BaseChartDataSource<P
         "#073042".toColorInt()
       )
 
-      dataSet.colors = colors
+      dataSet.setColors(colors)
       // dataSet.setSelectionShift(0f);
       val data = PieData(dataSet).apply {
         setValueFormatter(PercentFormatter())

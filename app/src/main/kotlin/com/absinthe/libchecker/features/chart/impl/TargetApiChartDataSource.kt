@@ -61,7 +61,7 @@ class TargetApiChartDataSource(items: List<LCItem>) :
         colors.add(UiUtils.getRandomColor())
       }
 
-      dataSet.colors = colors
+      dataSet.setColors(colors)
       // dataSet.setSelectionShift(0f);
       val data = BarData(dataSet).apply {
         setValueTextSize(10f)

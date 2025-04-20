@@ -114,7 +114,7 @@ class PageSize16KBChartDataSource(items: List<LCItem>) :
         for (c in ColorTemplate.MATERIAL_COLORS) colors.add(c)
       }
 
-      dataSet.colors = colors
+      dataSet.setColors(colors)
       // dataSet.setSelectionShift(0f);
       val data = PieData(dataSet).apply {
         setValueFormatter(PercentFormatter())
