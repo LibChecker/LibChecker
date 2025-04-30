@@ -232,15 +232,15 @@ object PackageUtils {
     if (specifiedAbi == ERROR || specifiedAbi == NO_LIBS || specifiedAbi == OVERLAY) return emptyMap()
     val sourceDir = packageInfo.applicationInfo?.sourceDir ?: return emptyMap()
     val file = File(sourceDir)
-    var map = getApkFileLibs(file, specifiedAbi, parseElf)
-    if (map.isEmpty()) {
-      map = getSplitLibs(packageInfo, specifiedAbi, parseElf)
+    val map = getApkFileLibs(file, specifiedAbi, parseElf).toMutableMap()
+    if (map.isEmpty() || (map.keys.size == 1 && map.keys.first() == "assets")) {
+      map += getSplitLibs(packageInfo, specifiedAbi, parseElf)
     }
     if (map.isEmpty() && includeNativeLibsDir) {
       val abi = specifiedAbi ?: getAbi(packageInfo)
       if (abi == ERROR || abi == NO_LIBS || abi == OVERLAY) return emptyMap()
       val libs = getNativeDirLibs(packageInfo, specifiedAbi, parseElf).toMutableList()
-      map = mapOf(ABI_STRING_MAP[abi % MULTI_ARCH]!! to libs)
+      map += mapOf(ABI_STRING_MAP[abi % MULTI_ARCH]!! to libs)
     }
     return map
   }
@@ -482,7 +482,8 @@ object PackageUtils {
   fun isKotlinUsedInClassDex(file: File): Boolean {
     return findDexClasses(
       file,
-      listOf("kotlin.*".toClassDefType(), "kotlinx.*".toClassDefType())
+      listOf("kotlin.*".toClassDefType(), "kotlinx.*".toClassDefType()),
+      hasAny = true
     ).isNotEmpty()
   }
 
