@@ -72,4 +72,8 @@ abstract class BaseActivity<VB : ViewBinding> :
     theme.applyStyle(R.style.ThemeOverlay, true)
     theme.applyStyle(rikka.material.preference.R.style.ThemeOverlay_Rikka_Material3_Preference, true)
   }
+
+  protected fun isBindingInitialized(): Boolean {
+    return ::binding.isInitialized
+  }
 }
