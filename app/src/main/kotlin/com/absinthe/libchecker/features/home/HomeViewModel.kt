@@ -87,6 +87,10 @@ class HomeViewModel : ViewModel() {
   var appListStatus: Int = STATUS_NOT_START
   var workerBinder: IWorkerService? = null
 
+  // Simple menu state management
+  var isSearchMenuExpanded: Boolean = false
+  var currentSearchQuery: String = ""
+
   fun reloadApps() {
     if (appListStatus != STATUS_NOT_START || (initJob?.isActive == false && requestChangeJob?.isActive == false)) {
       Timber.d("reloadApps: ignore, appListStatus: $appListStatus")
@@ -741,5 +745,10 @@ class HomeViewModel : ViewModel() {
         }
       }
     }
+  }
+
+  fun clearMenuState() {
+    isSearchMenuExpanded = false
+    currentSearchQuery = ""
   }
 }

@@ -5,8 +5,10 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
+import android.view.Menu
 import android.view.View
 import androidx.activity.viewModels
+import androidx.appcompat.widget.SearchView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.MenuProvider
 import androidx.core.view.ViewCompat
@@ -127,6 +129,32 @@ class MainActivity :
     unbindService(workerServiceConnection)
   }
 
+  override fun onPause() {
+    super.onPause()
+    saveToolbarMenuState()
+  }
+
+  private fun saveToolbarMenuState() {
+    if (!isBindingInitialized()) {
+      return
+    }
+    if (binding.toolbar.hasExpandedActionView()) {
+      binding.toolbar.menu?.findItem(R.id.search)?.let { searchItem ->
+        val searchView = searchItem.actionView as? SearchView
+        searchView?.let {
+          if (searchItem.isActionViewExpanded) {
+            appViewModel.isSearchMenuExpanded = true
+            it.query?.toString()?.let { query ->
+              appViewModel.currentSearchQuery = query
+            }
+          }
+        }
+      }
+    } else {
+      appViewModel.isSearchMenuExpanded = false
+    }
+  }
+
   override fun addMenuProvider(provider: MenuProvider) {
     if (_menuProviders.contains(provider)) {
       super.removeMenuProvider(provider)
@@ -218,6 +246,7 @@ class MainActivity :
           override fun onPageSelected(position: Int) {
             super.onPageSelected(position)
             navView.menu[position].isChecked = true
+            appViewModel.clearMenuState()
           }
         })
 
@@ -357,6 +386,33 @@ class MainActivity :
       withContext(Dispatchers.Main) {
         Timber.d("initFeatures")
         appViewModel.workerBinder?.initFeatures()
+      }
+    }
+  }
+
+  override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+    val result = super.onPrepareOptionsMenu(menu)
+    restoreToolbarMenuState()
+    return result
+  }
+
+  private fun restoreToolbarMenuState() {
+    if (!isBindingInitialized()) {
+      return
+    }
+    // Only restore state if menu exists and has search item
+    binding.toolbar.post {
+      val searchItem = binding.toolbar.menu?.findItem(R.id.search)
+      if (appViewModel.isSearchMenuExpanded) {
+        val searchView = searchItem?.actionView as? SearchView
+        searchView?.let {
+          if (!searchItem.isActionViewExpanded) {
+            searchItem.expandActionView()
+            if (appViewModel.currentSearchQuery.isNotEmpty()) {
+              it.setQuery(appViewModel.currentSearchQuery, false)
+            }
+          }
+        }
       }
     }
   }
