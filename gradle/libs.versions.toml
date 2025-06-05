@@ -1,12 +1,12 @@
 [versions]
-agp = "8.10.0"
-aboutlibraries = "12.1.2"
-androidX-lifecycle = "2.9.0"
+agp = "8.10.1"
+aboutlibraries = "12.2.0"
+androidX-lifecycle = "2.9.1"
 androidX-room = "2.7.1"
 firebase-bom = "33.10.0"
 hiddenApiRefine = "4.4.0"
 kotlin = "2.1.21"
-protoc = "4.31.0"
+protoc = "4.31.1"
 shizuku = "13.1.5"
 square-retrofit = "2.12.0"
 zhaobozhen = "1.1.6"
@@ -22,7 +22,7 @@ kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref =
 ksp = { id = "com.google.devtools.ksp", version = "2.1.21-2.0.1" }
 protobuf = { id = "com.google.protobuf", version = "0.9.5" }
 moshiX = "dev.zacsweers.moshix:0.30.0"
-spotless = "com.diffplug.spotless:7.0.3"
+spotless = "com.diffplug.spotless:7.0.4"
 aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutlibraries" }
 
 [libraries]
@@ -33,11 +33,11 @@ kotlinX-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2"
 
 androidX-activity = "androidx.activity:activity-ktx:1.10.1"
 androidX-annotation = "androidx.annotation:annotation:1.9.1"
-androidX-appCompat = "androidx.appcompat:appcompat:1.7.0"
+androidX-appCompat = "androidx.appcompat:appcompat:1.7.1"
 androidX-browser = "androidx.browser:browser:1.8.0"
 androidX-constraintLayout = "androidx.constraintlayout:constraintlayout:2.2.1"
 androidX-core = "androidx.core:core-ktx:1.16.0"
-androidX-fragment = "androidx.fragment:fragment-ktx:1.8.7"
+androidX-fragment = "androidx.fragment:fragment-ktx:1.8.8"
 androidX-lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "androidX-lifecycle" }
 androidX-lifecycle-viewModel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidX-lifecycle" }
 androidX-preference = "androidx.preference:preference-ktx:1.2.1"
@@ -45,14 +45,14 @@ androidX-recyclerView = "androidx.recyclerview:recyclerview:1.4.0"
 androidX-room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidX-room" }
 androidX-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidX-room" }
 androidX-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidX-room" }
-androidX-security = "androidx.security:security-crypto:1.1.0-alpha07"
+androidX-security = "androidx.security:security-crypto:1.1.0-beta01"
 androidX-viewPager2 = "androidx.viewpager2:viewpager2:1.1.0"
 androidX-window = "androidx.window:window:1.4.0"
 
 square-leakCanary = "com.squareup.leakcanary:leakcanary-android:2.14"
 square-moshi = "com.squareup.moshi:moshi:1.15.2"
 square-okHttp = "com.squareup.okhttp3:okhttp:4.12.0"
-square-okio = "com.squareup.okio:okio:3.11.0"
+square-okio = "com.squareup.okio:okio:3.12.0"
 square-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "square-retrofit" }
 square-retrofit-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "square-retrofit" }
 
