@@ -31,7 +31,7 @@ class APKSParser(private val file: File, private val flags: Int = 0) {
             ai.sourceDir = baseApkFile.path
             ai.publicSourceDir = baseApkFile.path
             ai.splitSourceDirs = rootDir.listFiles()!!
-              .filter { file -> file.name.startsWith("split_config.") }
+              .filter { file -> file.name.startsWith("split_") && file.extension == "apk" }
               .map { file -> file.path }
               .toTypedArray()
           }
