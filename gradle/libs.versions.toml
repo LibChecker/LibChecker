@@ -1,6 +1,6 @@
 [versions]
 agp = "8.10.1"
-aboutlibraries = "12.2.0"
+aboutlibraries = "12.2.2"
 androidX-lifecycle = "2.9.1"
 androidX-room = "2.7.1"
 firebase-bom = "33.10.0"
@@ -14,12 +14,12 @@ zhaobozhen = "1.1.6"
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
-firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.3" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.4" }
 gms = { id = "com.google.gms.google-services", version = "4.4.2" }
 hiddenApiRefine = { id = "dev.rikka.tools.refine", version.ref = "hiddenApiRefine" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
-ksp = { id = "com.google.devtools.ksp", version = "2.1.21-2.0.1" }
+ksp = { id = "com.google.devtools.ksp", version = "2.1.21-2.0.2" }
 protobuf = { id = "com.google.protobuf", version = "0.9.5" }
 moshiX = "dev.zacsweers.moshix:0.30.0"
 spotless = "com.diffplug.spotless:7.0.4"
