@@ -35,6 +35,7 @@ object MainLooperFilter {
     "Service.startForeground()",
     "tryGetViewHolderForPositionByDeadline",
     "updateForceDarkMode",
+    "Expected the adapter to be 'fresh' while restoring state",
     BaseGmsClient::class.java.name
   )
 
