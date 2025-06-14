@@ -63,20 +63,20 @@ class ELFParser(inputStream: InputStream) {
   }
 
   private fun parse(inputStream: InputStream) {
-    inputStream.also {
+    inputStream.use {
       val e_ident_array = ByteArray(EI_NIDENT)
       readFully(it, e_ident_array, EI_NIDENT)
       readBytes += EI_NIDENT
       e_ident = EIdent(e_ident_array)
 
       if (!isElf()) {
-        return@also
+        return
       }
 
       val ehSize = when (getEClass()) {
         EIdent.ELFCLASS32 -> 36 // 32-bit ELF header size
         EIdent.ELFCLASS64 -> 48 // 64-bit ELF header size
-        else -> return@also
+        else -> return
       }
       val byteOrder =
         if (e_ident.EI_DATA.toInt() == EIdent.ELFDATA2MSB) ByteOrder.BIG_ENDIAN else ByteOrder.LITTLE_ENDIAN
@@ -118,7 +118,7 @@ class ELFParser(inputStream: InputStream) {
         }
 
         else -> {
-          return@also
+          return
         }
       }
 

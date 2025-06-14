@@ -75,7 +75,6 @@ import com.absinthe.libchecker.utils.extensions.isOverlay
 import com.absinthe.libchecker.utils.extensions.isUse32BitAbi
 import com.absinthe.libchecker.utils.extensions.maybeResourceId
 import com.absinthe.libchecker.utils.extensions.md5
-import com.absinthe.libchecker.utils.extensions.orZero
 import com.absinthe.libchecker.utils.extensions.sha1
 import com.absinthe.libchecker.utils.extensions.sha256
 import com.absinthe.libchecker.utils.extensions.sizeToString
@@ -92,8 +91,7 @@ import java.text.DateFormat
 import java.util.zip.ZipEntry
 import javax.security.cert.X509Certificate
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
-import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream
-import org.apache.commons.io.input.BufferedFileChannelInputStream
+import org.apache.commons.compress.archivers.zip.ZipFile
 import rikka.shizuku.Shizuku
 import rikka.shizuku.ShizukuBinderWrapper
 import rikka.shizuku.SystemServiceHelper
@@ -293,7 +291,7 @@ object PackageUtils {
     return ai.splitSourceDirs
   }
 
-  private const val ENABLE_GET_APK_FILE_LIBS_LOG = false
+  private const val ENABLE_GET_APK_FILE_LIBS_LOG = true
 
   private fun getApkFileLibs(file: File, specifiedAbi: Int? = null, parseElf: Boolean): Map<String, MutableList<LibStringItem>> {
     if (file.exists().not()) {
@@ -307,87 +305,39 @@ object PackageUtils {
     val assetsDir = "assets"
     val sourceDir = specifiedAbi?.let { libDir + File.separator + ABI_STRING_MAP[it % MULTI_ARCH] }
     val map = mutableMapOf<String, MutableList<LibStringItem>>()
-    val pendingEntryDirMap = mutableMapOf<String, Int>()
     val timeRecorder = TimeRecorder()
 
     if (ENABLE_GET_APK_FILE_LIBS_LOG) timeRecorder.start()
-    ZipFileCompat(file).use { zipFile ->
-      zipFile.getZipEntries()
+    val getDataOffsetMethod = ZipFile::class.java.getDeclaredMethod("getDataOffset", ZipArchiveEntry::class.java).apply {
+      isAccessible = true
+    }
+    ZipFile.Builder().setFile(file).get().use { zipFile ->
+      zipFile.entries
         .asSequence()
-        .filter { it.name.endsWith(".so") }
-        .forEach {
-          if (it.name.startsWith(libDir + File.separator)) {
-            val split = it.name.split(File.separator)
-            if (split.size >= 2) {
-              val dir = split[1]
-              pendingEntryDirMap[dir] = pendingEntryDirMap.getOrPut(dir) { 0 } + 1
-            }
-          } else if (it.name.startsWith(assetsDir + File.separator)) {
-            pendingEntryDirMap[assetsDir] = pendingEntryDirMap.getOrPut(assetsDir) { 0 } + 1
-          }
+        .filter { !it.isDirectory && it.name.endsWith(".so") && (sourceDir == null || it.name.startsWith(sourceDir)) }
+        .forEach { entry ->
+          val pathFirst = entry.name.split(File.separator).first()
+          val dir = STRING_ABI_MAP.keys.find { entry.name.startsWith(libDir + File.separator + it) }
+            ?: if (pathFirst == assetsDir) assetsDir else return@forEach
+          val offset = getDataOffsetMethod.invoke(zipFile, entry) as Long
+
+          val currentEntryUncompressedAndNot16KB = entry.method == ZipEntry.STORED && (offset % PAGE_SIZE_16_KB) != 0L
+          val elfParser = runCatching { ELFParser(zipFile.getInputStream(entry)) }.getOrNull()
+          val item = LibStringItem(
+            name = entry.name.split(File.separator).last(),
+            size = entry.size,
+            elfInfo = ElfInfo(
+              elfParser?.getEType() ?: ET_NOT_ELF,
+              elfParser?.getMinPageSize() ?: -1,
+              currentEntryUncompressedAndNot16KB
+            )
+          )
+          map.getOrPut(dir) { mutableListOf() }.add(item)
         }
     }
     if (ENABLE_GET_APK_FILE_LIBS_LOG) {
       timeRecorder.end()
       Timber.d("${file.absolutePath} Check zipFile cost: $timeRecorder")
-      Timber.d("${file.absolutePath} Check zipFile pendingEntryDirMap: $pendingEntryDirMap")
-    }
-
-    if (pendingEntryDirMap.isEmpty()) {
-      return emptyMap()
-    }
-
-    if (ENABLE_GET_APK_FILE_LIBS_LOG) timeRecorder.start()
-    val bufferedIS = BufferedFileChannelInputStream.Builder()
-      .setFile(file)
-      .get()
-    bufferedIS.use { input ->
-      ZipArchiveInputStream(input).use { zipInput ->
-        var entry = zipInput.nextEntry
-        while (entry != null) {
-          try {
-            if (!entry.name.endsWith(".so") || (sourceDir != null && !entry.name.startsWith(sourceDir))) {
-              if (pendingEntryDirMap.all { it.value == 0 }) {
-                // Optimize for skipping unused entries, since sorted by name
-                if (ENABLE_GET_APK_FILE_LIBS_LOG) Timber.d("${file.absolutePath} Skip at entry: ${entry.name}")
-                break
-              }
-              continue
-            }
-            val pathFirst = entry.name.split(File.separator).first()
-            val dir = STRING_ABI_MAP.keys.find { entry.name.startsWith(libDir + File.separator + it) }
-              ?: if (pendingEntryDirMap.keys.contains(assetsDir) && pathFirst == assetsDir) assetsDir else continue
-            val count = pendingEntryDirMap.getOrPut(dir) { 0 }
-            if (count > 0) {
-              pendingEntryDirMap[dir] = count - 1
-            }
-            val currentEntryUncompressedAndNot16KB = entry.method == ZipEntry.STORED && zipInput.bytesRead % PAGE_SIZE_16_KB != 0L
-            val elfParser = runCatching { ELFParser(zipInput) }.getOrNull()
-            val libSize = entry.size.takeIf { it != ZipArchiveEntry.SIZE_UNKNOWN } ?: (FileUtils.getEntrySize(zipInput) + (elfParser?.readBytes.orZero()))
-            val item = LibStringItem(
-              name = entry.name.split(File.separator).last(),
-              size = libSize,
-              elfInfo = ElfInfo(
-                elfParser?.getEType() ?: ET_NOT_ELF,
-                elfParser?.getMinPageSize() ?: -1,
-                currentEntryUncompressedAndNot16KB
-              )
-            )
-            map.getOrPut(dir) { mutableListOf() }.add(item)
-          } finally {
-            runCatching {
-              entry = zipInput.nextEntry
-            }.onFailure {
-              Timber.e(it, "${file.absolutePath} Get apk file libs error: ")
-              entry = null
-            }
-          }
-        }
-      }
-      if (ENABLE_GET_APK_FILE_LIBS_LOG) {
-        timeRecorder.end()
-        Timber.d("${file.absolutePath} Get apk file libs cost: $timeRecorder")
-      }
     }
     return map
   }

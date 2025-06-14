@@ -99,9 +99,9 @@ class LibReferenceViewModel : ViewModel() {
 
         METADATA -> {
           for (item in items) {
-            val pi = runCatching { 
-              PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_META_DATA) 
-            }.onFailure { e -> 
+            val pi = runCatching {
+              PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_META_DATA)
+            }.onFailure { e ->
               Timber.e(e, "Failed to retrieve package info for ${item.packageName}")
             }.getOrNull() ?: continue
             val metadataList = PackageUtils.getMetaDataItems(pi)
