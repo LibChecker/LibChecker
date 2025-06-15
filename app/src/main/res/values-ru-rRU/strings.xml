@@ -18,12 +18,13 @@
   <string name="string_64_bit">64 бит</string>
   <string name="string_32_bit">32 бит</string>
   <string name="no_libs">Нет нативных библиотек</string>
-  <string name="cannot_read">«Невозможно прочитать»</string>
+  <string name="cannot_read">Невозможно прочитать</string>
   <string name="unknown">Неизвестно</string>
   <string name="empty_list">Список пуст</string>
   <string name="uncharted_territory">Неизученная территория</string>
   <string name="get_app_list_denied_tip">Пожалуйста, предоставьте\nLibChecker разрешение получить\nинформацию об установленных приложениях</string>
   <string name="advanced_menu">Расширенное меню</string>
+  <string name="archived_app">Архивированные приложения</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">Приложения с %s ABI</string>
   <string name="title_statistics_dialog_no_native_libs">Приложения без нативных библиотек</string>
@@ -35,7 +36,7 @@
   <string name="ref_category_all">Все</string>
   <string name="ref_category_native">Нативные библиотеки</string>
   <string name="ref_category_service">Службы</string>
-  <string name="ref_category_activity">Активити</string>
+  <string name="ref_category_activity">Активности</string>
   <string name="ref_category_br">Широковещательные приемники</string>
   <string name="ref_category_cp">Поставщики контента</string>
   <string name="ref_category_perm">Разрешения</string>
@@ -50,9 +51,9 @@
   <string name="string_compose_used">Используется Jetpack Compose</string>
   <string name="string_compose_unused">Jetpack Compose не используется</string>
   <string name="android_dist_label">Распределение</string>
-  <string name="android_dist_source">Источник</string>
+  <string name="android_dist_source">Исходный код</string>
   <string name="android_dist_title">Статистика распределения версий Android</string>
-  <string name="android_dist_subtitle_format">Время обновления %s</string>
+  <string name="android_dist_subtitle_format">Время обновления: %s</string>
   <string name="chart_abi_detailed">Подробнее</string>
   <string name="chart_abi_concise">Меньше</string>
   <string name="chart_item_not_support">Не поддерживается</string>
@@ -71,7 +72,7 @@
   <string name="about_info">Это приложение используется для просмотра сторонних библиотек, используемых приложениями на вашем устройстве.</string>
   <string name="toolbar_rate">Оценка</string>
   <string name="resource_declaration">Часть ресурсов в приложении поступает из: </string>
-  <string name="library_declaration">Вся информация о отмеченных библиотеках в LibChecker берется из документации для разработчиков или из репозитория кода SDK, которому он принадлежит. Если информация неверна, пожалуйста, обращайтесь: absinthe@absinthe.life</string>
+  <string name="library_declaration">Вся информация об отмеченных библиотеках в LibChecker берется из документации для разработчиков или из репозитория кода SDK, которому он принадлежит. Если информация неверна, пожалуйста, обращайтесь: absinthe@absinthe.life</string>
   <!--  Settings  -->
   <string name="pref_group_normal">Общие</string>
   <string name="pref_group_others">Другие</string>
@@ -91,7 +92,7 @@
   <string name="colorful_icon_summary">Часть отмеченных библиотек будет отображаться в виде цветных значков.</string>
   <string name="lib_ref_threshold_summary">В списке отображаются только те библиотеки, число ссылок на которые превысило заданный порог</string>
   <string name="reload_apps_summary">Попробуйте, если список приложений отображается неправильно</string>
-  <string name="help_docs_summary">Ознакомтесь, как использовать LibChecker</string>
+  <string name="help_docs_summary">Ознакомьтесь, как использовать LibChecker</string>
   <string name="join_telegram_group_summary">Присоединяйтесь к нашей группе в Telegram</string>
   <string name="anonymous_statistics_summary">Мы используем Google Firebase для анонимной отправки наиболее часто используемых помеченных библиотек и некоторых данных о привычках использования, чтобы сделать LibChecker более полезным</string>
   <string name="cloud_rules_summary">Обновите последние отмеченные правила библиотеки здесь</string>
@@ -120,14 +121,17 @@
   <string name="xposed_module">Xposed модуль</string>
   <string name="xposed_module_details">Xposed — это фреймворк для модулей, которые могут изменить поведение системы и приложений, не затрагивая никаких APK. Это здорово, потому что это означает, что модули могут работать с разными версиями ОС и прошивками без каких-либо изменений.</string>
   <string name="play_app_signing">Play подпись приложения</string>
-  <string name="play_app_signing_details">С помощью Play App Signing Google управляет ключом подписи вашего приложения и защищает его от вашего имени и использует его для подписи оптимизированных APK-файлов для распространения, которые создаются из ваших пакетов приложений. Play App Signing сохраняет ключ подписи вашего приложения в защищенной инфраструктуре Google и предлагает варианты обновления для повышения безопасности.</string>
-  <string name="pwa_details">Прогрессивные веб-приложения (PWA) создаются и улучшаются с помощью современных API-интерфейсов, чтобы обеспечить расширенные возможности, надежность и простоту установки, а также охватывать всех, где угодно и на любом устройстве с помощью единой кодовой базы.</string>
-  <string name="jetpack_compose_details">Jetpack Compose - это современный набор инструментов для создания нативных пользовательских интерфейсов в Android. Он упрощает и ускоряет разработку пользовательского интерфейса на Android. Вы сможете быстро воплотить в жизнь свое приложение благодаря меньшему количеству кода, мощным инструментам и интуитивно понятным API-интерфейсам Kotlin.</string>
+  <string name="play_app_signing_details">С помощью Play App Signing Google управляет ключом подписи вашего приложения и защищает его от вашего имени и использует его для подписи оптимизированных APK-файлов для распространения, которые создаются из ваших пакетов приложений. Play App Signing сохраняет ключ подписи вашего приложения в защищённой инфраструктуре Google и предлагает варианты обновления для повышения безопасности.</string>
+  <string name="pwa_details">Прогрессивные веб-приложения (PWA) создаются и улучшаются с помощью современных API-интерфейсов, чтобы обеспечить расширенные возможности, надёжность и простоту установки, а также охватывать всех где угодно и на любом устройстве с помощью единой кодовой базы.</string>
+  <string name="jetpack_compose_details">Jetpack Compose - это современный набор инструментов для создания нативных пользовательских интерфейсов в Android. Он упрощает и ускоряет разработку пользовательского интерфейса на Android. Вы сможете быстро воплотить в жизнь своё приложение благодаря меньшему количеству кода, мощным инструментам и интуитивно понятным API-интерфейсам Kotlin.</string>
   <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform - это современный декларативный и реактивный UI фреймворк, разработанный JetBrains, который предоставляет простой способ создания пользовательских интерфейсов с небольшим количеством кода Kotlin. Он также позволяет написать пользовательский интерфейс единожды и запускать его на любой из поддерживаемых платформ – iOS, Android, ПК (Windows, macOS, Linux) и веб.</string>
+  <string name="multi_arch_dialog_details"><![CDATA[If an app exposes an API to other apps that can be either 32 bit or 64 bit, the app must have the <b>android:multiarch</b> property set to true within its manifest to avoid potential errors.]]></string>
   <string name="extract_native_libs_tip">Приложение декларирует </string>
   <string name="xml_detail">XML Деталь</string>
-  <string name="lib_detail_dialog_title_16kb_page_size">Размер страницы 16 KB</string>
-  <string name="lib_detail_dialog_content_16kb_page_size">Исторически, Android имел поддержку только 4 КБ памяти для страниц, что позволяло оптимизировать производительность системной памяти относительно среднего объема общей памяти, которым обычно располагали устройства Android. Начиная с Android 15, AOSP поддерживает устройства, с размером страниц в 16 КБ (устройства с 16 КБ). Если ваше приложение использует какие-либо библиотеки NDK, прямо или косвенно через SDK, то вам придется переделать свое приложение, чтобы оно работало на устройствах с 16 КБ.</string>
+  <string name="lib_detail_dialog_title_16kb_page_size">Размер страницы 16 КБ</string>
+  <string name="lib_detail_dialog_content_16kb_page_size">Исторически, Android имел поддержку только 4 КБ памяти для страниц, что позволяло оптимизировать производительность системной памяти относительно среднего объёма общей памяти, которым обычно располагали устройства Android. Начиная с Android 15, AOSP поддерживает устройства, с размером страниц в 16 КБ (устройства с 16 КБ). Если ваше приложение использует какие-либо библиотеки NDK, прямо или косвенно через SDK, то вам придётся переделать своё приложение, чтобы оно работало на устройствах с 16 КБ.</string>
+  <string name="lib_detail_dialog_title_16kb_page_size_compat">16 КБ обратная совместимость (Backcompat)</string>
+  <string name="lib_detail_dialog_content_16kb_page_size_compat"><![CDATA[В Android 15 появилась поддержка страниц памяти размером 16 КБ для оптимизации производительности платформы. В Android 16 добавлен режим совместимости, позволяющий некоторым приложениям, созданным для страниц памяти размером 4 КБ, работать на устройстве, настроенном для страниц памяти размером 16 КБ.\n\nЕсли Android обнаруживает, что у вашего приложения есть выровненные страницы памяти размером 4 КБ, он автоматически использует режим совместимости и отображает диалоговое окно уведомления для пользователя. Установка свойства <b>android:pageSizeCompat</b> в <b>AndroidManifest.xml</b> для включения режима обратной совместимости предотвратит отображение диалогового окна при запуске вашего приложения. Для лучшей производительности, надёжности и стабильности ваше приложение по-прежнему должно быть выровнено по размеру 16 КБ.]]></string>
   <string name="format_last_updated">Обновлено: %s</string>
   <string name="menu_process">Приложение</string>
   <string name="menu_split">Разделение</string>
@@ -149,7 +153,7 @@
   <string name="signature_public_key_exponent">Экспонента публичного ключа</string>
   <string name="signature_public_key_modulus_size">Размер модуля публичного ключа</string>
   <string name="signature_public_key_modulus">Модуль публичного ключа</string>
-  <string name="signature_public_key_y">Значение публичного ключа Y</string>
+  <string name="signature_public_key_y">Значение Y публичного ключа</string>
   <string name="signature_public_key_type">Тип публичного ключа</string>
   <string name="signature_algorithm_name">Название алгоритма подписи</string>
   <string name="signature_algorithm_oid">OID алгоритма подписи</string>
@@ -171,7 +175,7 @@
   <string name="lib_detail_app_first_installed_time">Время первой установки: </string>
   <string name="lib_detail_app_last_updated_time">Время последней установки: </string>
   <string name="lib_detail_app_install_source_empty">Неизвестно</string>
-  <string name="lib_detail_app_install_source_empty_detail">Shell или удаленное приложение</string>
+  <string name="lib_detail_app_install_source_empty_detail">Shell или отдалённое приложение</string>
   <string name="lib_detail_app_install_source_shizuku_usage">Поскольку Android ограничивает API запроса на установку, мы используем Shizuku для его получения.</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizuku не установлен</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">Нажмите здесь, чтобы установить Shizuku</string>
@@ -186,9 +190,9 @@
   <string name="toast_not_existing_market">Нет магазина приложений</string>
   <string name="toast_use_another_file_manager">Пожалуйста, используйте другой файловый менеджер, чтобы открыть APK</string>
   <string name="toast_cant_open_app">«Невозможно открыть это приложение»</string>
-  <string name="toast_cloud_rules_update_error">Не удалось обновить облачные правила. Пожалуйста, попробуйте еще раз.</string>
+  <string name="toast_cloud_rules_update_error">Не удалось обновить облачные правила. Пожалуйста, попробуйте ещё раз.</string>
   <string name="toast_not_enough_storage_space">Недостаточно места</string>
-  <string name="toast_downloading_app">Загрузка начата</string>
+  <string name="toast_downloading_app">Началось скачивание</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">Сохранить текущий снимок</string>
   <string name="snapshot_current_timestamp">Отметка времени текущего снимка</string>
@@ -229,28 +233,28 @@
   <string name="album_item_management_subtitle">Управление всеми снимками</string>
   <string name="album_item_management_snapshot_auto_remove_default_title">Оставить только самые последние снимки</string>
   <string name="album_item_management_snapshot_auto_remove_specific_title">Оставить только %d последних элементов</string>
-  <string name="album_item_management_snapshot_auto_remove_desc">Начиная с нажатия на \"%s\", только последние снимки будут сохранены, более старые будут автоматически удалены.</string>
-  <string name="album_item_backup_restore_title">Бекап и восстановление</string>
-  <string name="album_item_backup_restore_subtitle">Бекап и восстановление снимков</string>
+  <string name="album_item_management_snapshot_auto_remove_desc">Начиная с нажатия на «%s», только последние снимки будут сохранены, более старые будут автоматически удалены.</string>
+  <string name="album_item_backup_restore_title">Резервирование и восстановление</string>
+  <string name="album_item_backup_restore_subtitle">Резервирование и восстановление снимков</string>
   <string name="album_item_track_title">Отслеживание</string>
   <string name="album_item_track_subtitle">Выберите приложения для принудительного сравнения изменений</string>
   <string name="album_backup">Бекап</string>
-  <string name="album_backup_summary">Бекап всех снимков</string>
+  <string name="album_backup_summary">Резервирование всех снимков</string>
   <string name="album_restore">Восстановление</string>
-  <string name="album_restore_summary">Восстановление снимков из бекапа</string>
+  <string name="album_restore_summary">Восстановление снимков из резервной копии</string>
   <string name="album_restore_detail">%1$s : %2$s элементов всего\n</string>
   <string name="album_click_to_choose">Нажмите, чтобы выбрать</string>
   <string name="album_dialog_delete_snapshot_message">Обработка…</string>
   <string name="album_snapshot_top_apps_not_initialized">Ещё не загружено</string>
   <!--  Integration  -->
-  <string name="integration_monkey_king_menu_block">Заблокировать с помощью \"MonkeyKing Purify\"</string>
-  <string name="integration_monkey_king_menu_unblock">Разблокировать с помощью \"MonkeyKing Purify\"</string>
-  <string name="integration_blocker_menu_block">Заблокировать через \"Blocker\"</string>
-  <string name="integration_blocker_menu_unblock">Разблокировать через \"Blocker\"</string>
-  <string name="integration_anywhere_menu_editor">Открыть в \"Anywhere- Editor\"</string>
+  <string name="integration_monkey_king_menu_block">Заблокировать с помощью «MonkeyKing Purify»</string>
+  <string name="integration_monkey_king_menu_unblock">Разблокировать с помощью «MonkeyKing Purify»</string>
+  <string name="integration_blocker_menu_block">Заблокировать через «Blocker»</string>
+  <string name="integration_blocker_menu_unblock">Разблокировать через «Blocker»</string>
+  <string name="integration_anywhere_menu_editor">Открыть в «Anywhere- Editor»</string>
   <!--  Cloud rules  -->
   <string name="rules_local_repo_version">Версия локального репозитория</string>
-  <string name="rules_remote_repo_version">Версия удаленного репозитория</string>
+  <string name="rules_remote_repo_version">Версия отдалённого репозитория</string>
   <string name="rules_btn_restart_to_update">Перезагрузите, чтобы обновить</string>
   <string name="rules_btn_update">Обновить</string>
   <!-- Advanced menu -->
@@ -275,4 +279,5 @@
   <string name="snapshot_menu_show_update_time">Показать время обновления</string>
   <string name="snapshot_menu_hide_no_component_changes">Скрыть компоненты без изменений</string>
   <string name="snapshot_menu_diff_highlight">Показать различия</string>
+  <string name="snapshot_menu_use_iec_units">Использовать единицы IEC</string>
 </resources>
