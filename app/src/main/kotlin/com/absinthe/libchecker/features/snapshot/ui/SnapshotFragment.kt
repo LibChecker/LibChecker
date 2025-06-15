@@ -10,6 +10,7 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import android.os.IBinder
 import android.util.TypedValue
 import android.view.Gravity
@@ -46,6 +47,7 @@ import com.absinthe.libchecker.features.snapshot.detail.bean.SnapshotDiffItem
 import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ENTITY
 import com.absinthe.libchecker.features.snapshot.detail.ui.SnapshotDetailActivity
 import com.absinthe.libchecker.features.snapshot.detail.ui.view.SnapshotEmptyView
+import com.absinthe.libchecker.features.snapshot.ui.adapter.ARROW
 import com.absinthe.libchecker.features.snapshot.ui.adapter.SnapshotAdapter
 import com.absinthe.libchecker.features.snapshot.ui.adapter.SnapshotDiffUtil
 import com.absinthe.libchecker.features.snapshot.ui.view.SnapshotDashboardView
@@ -66,6 +68,7 @@ import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getDimensionByAttr
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
+import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import java.util.Locale
 import java.util.concurrent.LinkedBlockingQueue
@@ -307,8 +310,10 @@ class SnapshotFragment :
           currentTimeStamp = it.timestamp
           if (it.timestamp != 0L) {
             dashboard.container.tvSnapshotTimestampText.text = viewModel.getFormatDateString(it.timestamp)
+            updateSystemProps(dashboard, it.timestamp)
           } else {
             dashboard.container.tvSnapshotTimestampText.text = getString(R.string.snapshot_none)
+            dashboard.container.setSystemProps(emptyList())
             viewModel.snapshotDiffItemsFlow.emit(emptyList())
             flip(VF_LIST)
           }
@@ -670,6 +675,41 @@ class SnapshotFragment :
       if (highlightRefresh) {
         // noinspection NotifyDataSetChanged
         adapter.notifyDataSetChanged()
+      }
+    }
+  }
+
+  private fun updateSystemProps(dashboard: SnapshotDashboardView, timestamp: Long) {
+    lifecycleScope.launch(Dispatchers.IO) {
+      val systemProps = runCatching {
+        viewModel.repository.getTimeStamp(timestamp)?.systemProps?.fromJson<Map<String, String>>()
+      }.getOrNull()
+      if (systemProps.isNullOrEmpty()) {
+        dashboard.container.setSystemProps(emptyList())
+      } else {
+        val displayedSystemProps = mutableListOf<Pair<String, String>>()
+        systemProps[Constants.SystemProps.RO_BUILD_ID]?.let {
+          val currentBuildId = Build.ID
+
+          if (it != currentBuildId) {
+            displayedSystemProps.add(
+              getString(R.string.snapshot_build_id) to "$it $ARROW $currentBuildId"
+            )
+          }
+        }
+        systemProps[Constants.SystemProps.RO_BUILD_VERSION_SECURITY_PATCH]?.let {
+          val currentSecurityPatch = Build.VERSION.SECURITY_PATCH
+
+          if (it != currentSecurityPatch) {
+            displayedSystemProps.add(
+              getString(R.string.snapshot_build_security_patch) to "$it $ARROW $currentSecurityPatch"
+            )
+          }
+        }
+
+        launch(Dispatchers.Main) {
+          dashboard.container.setSystemProps(displayedSystemProps)
+        }
       }
     }
   }

@@ -127,4 +127,9 @@ object Constants {
     const val SYSTEMUI = "com.android.systemui"
     const val ANYWHERE_ = "com.absinthe.anywhere_"
   }
+
+  object SystemProps {
+    const val RO_BUILD_ID = "ro.build.id"
+    const val RO_BUILD_VERSION_SECURITY_PATCH = "ro.build.version.security_patch"
+  }
 }

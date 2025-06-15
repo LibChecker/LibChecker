@@ -42,6 +42,8 @@ class LCRepository(private val lcDao: LCDao) {
 
   fun getTimeStamps(): List<TimeStampItem> = lcDao.getTimeStamps()
 
+  suspend fun getTimeStamp(timestamp: Long): TimeStampItem? = lcDao.getTimeStamp(timestamp)
+
   suspend fun getTrackItems(): List<TrackItem> = lcDao.getTrackItems()
 
   suspend fun insert(item: LCItem) {

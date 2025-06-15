@@ -107,6 +107,9 @@ interface LCDao {
   @Query("SELECT * from timestamp_table ORDER BY timestamp DESC")
   fun getTimeStamps(): List<TimeStampItem>
 
+  @Query("SELECT * from timestamp_table WHERE timeStamp LIKE :timestamp")
+  suspend fun getTimeStamp(timestamp: Long): TimeStampItem?
+
   @Delete
   fun delete(item: TimeStampItem)
 

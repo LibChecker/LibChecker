@@ -759,11 +759,12 @@ class SnapshotViewModel : ViewModel() {
   }
 
   private suspend fun updateTopApps(timestamp: Long, list: List<SnapshotDiffItem>) {
+    val systemProps = repository.getTimeStamp(timestamp)?.systemProps
     val appsList = list.asSequence()
       .map { it.packageName }
       .filter { PackageUtils.isAppInstalled(it) }
       .toList()
-    repository.updateTimeStampItem(TimeStampItem(timestamp, appsList.toJson()))
+    repository.updateTimeStampItem(TimeStampItem(timestamp, appsList.toJson(), systemProps))
   }
 
   fun computeDiffDetail(context: Context, entity: SnapshotDiffItem) = viewModelScope.launch(Dispatchers.IO) {
@@ -832,7 +833,7 @@ class SnapshotViewModel : ViewModel() {
     if (timestamp == 0L) {
       return@launch
     }
-    repository.insert(TimeStampItem(timestamp, null))
+    repository.insert(TimeStampItem(timestamp, null, null))
   }
 
   private fun getNativeDiffList(
