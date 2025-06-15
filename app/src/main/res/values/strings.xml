@@ -224,6 +224,8 @@
   <string name="snapshot_preinstalled_app">Preinstalled app</string>
   <string name="snapshot_generate_text_report">Generate Text Report</string>
   <string name="snapshot_scheme_tip"><![CDATA[Tip: You can now generate snapshots in the background via:<br><b>%s</b>]]></string>
+  <string name="snapshot_build_id">Build ID</string>
+  <string name="snapshot_build_security_patch">Security Patch</string>
 
   <!--  Dialog  -->
   <string name="dialog_title_reload_apps">Are you sure to reload all apps?</string>

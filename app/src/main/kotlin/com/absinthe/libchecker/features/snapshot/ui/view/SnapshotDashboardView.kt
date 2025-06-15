@@ -7,8 +7,11 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.children
 import androidx.core.view.marginTop
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.features.snapshot.detail.ui.view.SnapshotTypeIndicatorView
+import com.absinthe.libchecker.features.snapshot.ui.adapter.SystemPropsAdapter
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -87,6 +90,24 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context, null, 
         setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
       }
 
+    private val systemPropAdapter = SystemPropsAdapter()
+
+    private val propsRecyclerView = RecyclerView(context).apply {
+      layoutParams = LayoutParams(
+        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
+      )
+      setHasFixedSize(true)
+      isNestedScrollingEnabled = false
+      adapter = systemPropAdapter
+      overScrollMode = OVER_SCROLL_NEVER
+      layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+    }
+
+    fun setSystemProps(props: List<Pair<String, String>>) {
+      systemPropAdapter.setList(props)
+    }
+
     private val addedIndicator = SnapshotTypeIndicatorView(context).apply {
       setIndicatorInfo(
         context.getString(R.string.snapshot_indicator_added),
@@ -126,6 +147,7 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context, null, 
       addView(arrow)
       addView(tvSnapshotAppsCountTitle)
       addView(tvSnapshotAppsCountText)
+      addView(propsRecyclerView)
       addView(addedIndicator)
       addView(removedIndicator)
       addView(changedIndicator)
@@ -162,7 +184,7 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context, null, 
         (
           tvSnapshotTimestampTitle.measuredHeight + tvSnapshotTimestampText.measuredHeight +
             tvSnapshotAppsCountTitle.marginTop + tvSnapshotAppsCountTitle.measuredHeight +
-            tvSnapshotAppsCountText.measuredHeight
+            tvSnapshotAppsCountText.measuredHeight + propsRecyclerView.measuredHeight
           ).coerceAtLeast(indicatorsHeight) + paddingTop + paddingBottom
       )
     }
@@ -179,6 +201,7 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context, null, 
         tvSnapshotTimestampText.bottom + tvSnapshotAppsCountTitle.marginTop
       )
       tvSnapshotAppsCountText.layout(paddingStart, tvSnapshotAppsCountTitle.bottom)
+      propsRecyclerView.layout(paddingStart, tvSnapshotAppsCountText.bottom)
       addedIndicator.layout(paddingEnd, paddingTop, fromRight = true)
       removedIndicator.layout(paddingEnd, addedIndicator.bottom, fromRight = true)
       changedIndicator.layout(paddingEnd, removedIndicator.bottom, fromRight = true)

@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.database
 
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -18,8 +19,11 @@ import com.absinthe.libchecker.database.entity.TrackItem
     SnapshotItem::class, TimeStampItem::class,
     TrackItem::class, SnapshotDiffStoringItem::class
   ],
-  version = 21,
-  exportSchema = true
+  version = 22,
+  exportSchema = true,
+  autoMigrations = [
+    AutoMigration(from = 21, to = 22)
+  ]
 )
 abstract class LCDatabase : RoomDatabase() {
 

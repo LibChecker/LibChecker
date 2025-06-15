@@ -10,6 +10,7 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.os.IBinder
 import android.os.Process
 import android.os.RemoteCallbackList
@@ -288,7 +289,12 @@ class ShootService : LifecycleService() {
       notificationManager.notify(notificationIdShoot, builder.build())
     }
     repository.insertSnapshots(dbList)
-    repository.insert(TimeStampItem(ts, null))
+
+    val systemProps = mutableMapOf<String, String>()
+    systemProps[Constants.SystemProps.RO_BUILD_VERSION_SECURITY_PATCH] = Build.VERSION.SECURITY_PATCH
+    systemProps[Constants.SystemProps.RO_BUILD_ID] = Build.ID
+
+    repository.insert(TimeStampItem(ts, null, systemProps.toJson()))
 
     if (dropPrevious) {
       Timber.i("deleteSnapshotsAndTimeStamp: ${GlobalValues.snapshotTimestamp}")
