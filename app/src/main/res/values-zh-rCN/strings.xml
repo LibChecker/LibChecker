@@ -210,7 +210,6 @@
   <string name="snapshot_preinstalled_app">预置应用</string>
   <string name="snapshot_generate_text_report">生成文字报告</string>
   <string name="snapshot_scheme_tip"><![CDATA[提示: 现在您可以通过<br><b>%s</b><br>在后台生成快照。]]></string>
-  <string name="snapshot_build_id">Build ID</string>
   <string name="snapshot_build_security_patch">安全补丁</string>
   <!--  Dialog  -->
   <string name="dialog_title_reload_apps">确定要重载应用列表吗？</string>
