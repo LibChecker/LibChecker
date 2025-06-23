@@ -210,6 +210,8 @@
   <string name="snapshot_preinstalled_app">Önceden yüklenmiş uygulama</string>
   <string name="snapshot_generate_text_report">Metin Raporu Oluştur</string>
   <string name="snapshot_scheme_tip"><![CDATA[İpucu: Artık arka planda şu yolla anlık görüntüler oluşturabilirsiniz:<br><b>%s</b>]]></string>
+  <string name="snapshot_build_id">Yapı Kimliği</string>
+  <string name="snapshot_build_security_patch">Güvenlik Yaması</string>
   <!--  Dialog  -->
   <string name="dialog_title_reload_apps">Tüm uygulamaları yeniden yüklemek istediğinizden emin misiniz?</string>
   <string name="dialog_subtitle_reload_apps">Bu işlem birkaç saniye sürebilir</string>

@@ -15,8 +15,6 @@
   <string name="menu_sort">Сортування</string>
   <string name="menu_filter">Фільтр</string>
   <string name="search_hint">Пошук…</string>
-  <string name="string_64_bit">64bit</string>
-  <string name="string_32_bit">32bit</string>
   <string name="no_libs">Немає нативных бібліотек</string>
   <string name="cannot_read">Неможливо прочитати</string>
   <string name="unknown">Невідомо</string>
@@ -110,9 +108,7 @@
   <string name="lib_detail_dialog_title">Информация о библиотеке</string>
   <string name="lib_permission_dialog_title">Информация о разрешениях</string>
   <string name="agp_details">Ситема сборки Android Studio основана на Gradle, а Android Gradle плагин добавляет некоторые функции, специфичные для Android приложений. Хотя обычно плагин обыновляется вместе с Android Studio, сам плагин (и вся остальная система Gradle), может работать независимо от Android Studio и обновляться отдельно.</string>
-  <string name="xposed_module">Xposed Module</string>
   <string name="xposed_module_details">Xposed - это фреймворк для модулей, которые могут изменить поведение системы и приложений без вмешательства в APK-файлы. Это великолепно, поскольку это означает, что модули могут работать на разных версиях и даже прошивках без каких-либо изменений.</string>
-  <string name="play_app_signing">Play App Signing</string>
   <string name="play_app_signing_details">С подписью Play App Signing Google управляет и защищает ключ подписи Вашего приложения и использует его для оптимизации и распространения APK-файлов, создаваемых из Ваших пакетов приложения. Play App Signing хранит ключ подписи Вашего приложения в защищенной инфраструктуре Google и предлагает варианты обновления для повышения безопасности.</string>
   <string name="pwa_details">Progressive Web Apps (PWA) are built and enhanced with modern APIs to deliver enhanced capabilities, reliability, and installability while reaching anyone, anywhere, on any device with a single codebase. </string>
   <string name="jetpack_compose_details">Jetpack Compose — это современный инструментарий для Android для создания собственного UI. Он упрощает и ускоряет разработку UI на Android. Вы можете быстро создать ваше приложение с меньшим кодом, мощным инструментарием и интуитивно понятным Kotlin API.</string>
