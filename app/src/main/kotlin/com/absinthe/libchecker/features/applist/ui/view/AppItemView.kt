@@ -60,7 +60,7 @@ class AppItemView(context: Context, originalTextColor: Boolean = false) : Materi
     floatView.text = text
   }
 
-  class AppItemContainerView(context: Context, val originalTextColor: Boolean = false) : AViewGroup(context) {
+  class AppItemContainerView(context: Context, originalTextColor: Boolean = false) : AViewGroup(context) {
 
     val icon = AppCompatImageView(context).apply {
       val iconSize = context.getDimensionPixelSize(R.dimen.app_icon_size)
