@@ -22,9 +22,9 @@ import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.card.MaterialCardView
 
-class AppItemView(context: Context) : MaterialCardView(context) {
+class AppItemView(context: Context, originalTextColor: Boolean = false) : MaterialCardView(context) {
 
-  val container = AppItemContainerView(context).apply {
+  val container = AppItemContainerView(context, originalTextColor).apply {
     val padding = context.getDimensionPixelSize(R.dimen.main_card_padding)
     setPadding(padding, padding, padding, padding)
   }
@@ -60,7 +60,7 @@ class AppItemView(context: Context) : MaterialCardView(context) {
     floatView.text = text
   }
 
-  class AppItemContainerView(context: Context) : AViewGroup(context) {
+  class AppItemContainerView(context: Context, val originalTextColor: Boolean = false) : AViewGroup(context) {
 
     val icon = AppCompatImageView(context).apply {
       val iconSize = context.getDimensionPixelSize(R.dimen.app_icon_size)
@@ -110,7 +110,9 @@ class AppItemView(context: Context) : MaterialCardView(context) {
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
-      setTextColor(android.R.color.darker_gray.getColor(context))
+      if (!originalTextColor) {
+        setTextColor(android.R.color.darker_gray.getColor(context))
+      }
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
       maxLines = 1
       ellipsize = TextUtils.TruncateAt.END
@@ -128,7 +130,9 @@ class AppItemView(context: Context) : MaterialCardView(context) {
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
       setPadding(0, 0, 0, 2.dp)
-      setTextColor(android.R.color.darker_gray.getColor(context))
+      if (!originalTextColor) {
+        setTextColor(android.R.color.darker_gray.getColor(context))
+      }
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
       maxLines = 1
       ellipsize = TextUtils.TruncateAt.END

@@ -18,7 +18,7 @@ class AppInstallSourceBottomSheetView(context: Context) :
     title.text = context.getString(R.string.lib_detail_app_install_source_title)
   }
 
-  val originatingView = AppInstallSourceItemView(context).apply {
+  val originatingView = AppInstallSourceItemView(context, true).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
@@ -26,7 +26,7 @@ class AppInstallSourceBottomSheetView(context: Context) :
     titleView.text = context.getString(R.string.lib_detail_app_install_source_originating_package)
   }
 
-  val installingView = AppInstallSourceItemView(context).apply {
+  val installingView = AppInstallSourceItemView(context, true).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
       ViewGroup.LayoutParams.WRAP_CONTENT

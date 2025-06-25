@@ -13,7 +13,7 @@ import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.view.AViewGroup
 
-class AppInstallSourceItemView(context: Context) : AViewGroup(context) {
+class AppInstallSourceItemView(context: Context, originalTextColor: Boolean = false) : AViewGroup(context) {
 
   val titleView = AppCompatTextView(
     ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)
@@ -27,7 +27,7 @@ class AppInstallSourceItemView(context: Context) : AViewGroup(context) {
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
   }
 
-  val packageView = AppItemView(context).apply {
+  val packageView = AppItemView(context, originalTextColor).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
