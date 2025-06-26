@@ -49,7 +49,8 @@ class PermissionDetailDialogFragment : BaseBottomSheetViewDialogFragment<Permiss
         return
       }
       root.apply {
-        pi.loadIcon(pm)?.let { icon.load(it) { crossfade(true) } }
+        val iconDrawable = runCatching { pi.loadIcon(pm) }.getOrNull()
+        iconDrawable?.let { icon.load(it) { crossfade(true) } }
         pi.loadLabel(pm).let { if (it.isNotEmpty()) permissionContentView.label.text.text = it }
         pi.loadDescription(pm)
           ?.let { if (it.isNotEmpty()) permissionContentView.description.text.text = it }
