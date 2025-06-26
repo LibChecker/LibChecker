@@ -38,9 +38,13 @@ object LocalAppDataSource : AppDataSource {
   private fun loadApexPackageSet() {
     Timber.d("getApplicationList get apex start")
     if (OsUtils.atLeastQ()) {
-      apexPackageSet = SystemServices.packageManager.getInstalledModules(0)
-        .map { it.packageName.orEmpty() }
-        .toSet()
+      apexPackageSet = runCatching {
+        SystemServices.packageManager.getInstalledModules(0)
+          .map { it.packageName.orEmpty() }
+          .toSet()
+      }.onFailure {
+        Timber.e(it)
+      }.getOrDefault(emptySet())
     }
     Timber.d("getApplicationList get apex end, apex count: ${apexPackageSet.size}")
   }

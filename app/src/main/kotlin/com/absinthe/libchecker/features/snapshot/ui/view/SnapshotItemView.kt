@@ -10,7 +10,6 @@ import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.visibleHeight
@@ -78,7 +77,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
-      setTextColor(android.R.color.darker_gray.getColor(context))
+      setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
       addView(this)
     }
@@ -93,7 +92,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
-      setTextColor(android.R.color.darker_gray.getColor(context))
+      setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
       addView(this)
     }
@@ -108,7 +107,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
-      setTextColor(android.R.color.darker_gray.getColor(context))
+      setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
       addView(this)
     }
@@ -124,7 +123,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
       clipChildren = false
-      setTextColor(android.R.color.darker_gray.getColor(context))
+      setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
       addView(this)
     }
@@ -139,7 +138,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
-      setTextColor(android.R.color.darker_gray.getColor(context))
+      setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
       addView(this)
     }

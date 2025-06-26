@@ -21,6 +21,7 @@ import com.absinthe.libchecker.features.statistics.ui.EXTRA_REF_LIST
 import com.absinthe.libchecker.features.statistics.ui.EXTRA_REF_NAME
 import com.absinthe.libchecker.features.statistics.ui.EXTRA_REF_TYPE
 import com.absinthe.libchecker.features.statistics.ui.LibReferenceActivity
+import com.absinthe.libchecker.utils.Toasty
 
 fun FragmentActivity.launchDetailPage(item: LCItem, refName: String? = null, refType: Int = NATIVE) {
   findViewById<View>(androidx.appcompat.R.id.search_src_text)?.clearFocus()
@@ -47,7 +48,11 @@ fun FragmentActivity.launchDetailPage(item: LCItem, refName: String? = null, ref
           )
         )
       )
-    startActivity(intent)
+    runCatching {
+      startActivity(intent)
+    }.onFailure {
+      Toasty.showLong(this, "But why…")
+    }
   }
 }
 

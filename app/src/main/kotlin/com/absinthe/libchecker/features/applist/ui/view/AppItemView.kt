@@ -15,7 +15,6 @@ import androidx.core.view.children
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getDrawable
@@ -110,7 +109,7 @@ class AppItemView(context: Context) : MaterialCardView(context) {
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
-      setTextColor(android.R.color.darker_gray.getColor(context))
+      setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
       maxLines = 1
       ellipsize = TextUtils.TruncateAt.END
@@ -128,7 +127,7 @@ class AppItemView(context: Context) : MaterialCardView(context) {
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
       setPadding(0, 0, 0, 2.dp)
-      setTextColor(android.R.color.darker_gray.getColor(context))
+      setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
       maxLines = 1
       ellipsize = TextUtils.TruncateAt.END

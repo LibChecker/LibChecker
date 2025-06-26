@@ -15,7 +15,6 @@ import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.features.snapshot.detail.bean.SnapshotDiffItem
 import com.absinthe.libchecker.utils.LCAppUtils
-import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
@@ -73,7 +72,7 @@ class SnapshotTitleView(
       ViewGroup.LayoutParams.WRAP_CONTENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     )
-    setTextColor(android.R.color.darker_gray.getColor(context))
+    setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
     addView(this)
   }
@@ -88,7 +87,7 @@ class SnapshotTitleView(
       ViewGroup.LayoutParams.WRAP_CONTENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     )
-    setTextColor(android.R.color.darker_gray.getColor(context))
+    setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
     addView(this)
   }
@@ -103,7 +102,7 @@ class SnapshotTitleView(
       ViewGroup.LayoutParams.WRAP_CONTENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     )
-    setTextColor(android.R.color.darker_gray.getColor(context))
+    setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
     addView(this)
   }
