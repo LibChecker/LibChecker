@@ -48,6 +48,7 @@
   <string name="ref_category_shared_uid">Shared UID</string>
   <string name="ref_category_signatures">Signatures</string>
   <string name="ref_category_only_not_marked">Only Not Marked</string>
+  <string name="ref_category_action">Action</string>
 
   <string name="string_kotlin_used">Kotlin Used</string>
   <string name="string_kotlin_unused">Kotlin Unused</string>
