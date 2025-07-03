@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.util.SparseArray
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.LibType
@@ -36,6 +37,7 @@ import com.absinthe.libchecker.features.statistics.bean.EXPORTED
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.DateUtils
+import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
@@ -63,6 +65,7 @@ import com.absinthe.rulesbundle.Rule
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
+import kotlin.sequences.flatMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -191,6 +194,11 @@ class DetailViewModel : ViewModel() {
     val processesSet = hashSetOf<String>()
     try {
       packageInfo.let {
+        val parsedActionsMap = IntentFilterUtils.parseComponentsFromApk(it.applicationInfo!!.sourceDir)
+          .asSequence()
+          .map { item -> item.className to item.intentFilters }
+          .toMap()
+
         val services = if (it.services?.isNotEmpty() == true || isApk) {
           it.services
         } else {
@@ -222,8 +230,15 @@ class DetailViewModel : ViewModel() {
 
         val transform: suspend (StatefulComponent, Int) -> LibStringItemChip =
           { item, componentType ->
-            val rule = item.componentName.takeIf { !it.startsWith(".") }
-              ?.let { LCRules.getRule(it, componentType, true) }
+            val rule = if (item.componentName.startsWith(".")) {
+              parsedActionsMap[it.packageName + item.componentName]
+                ?.flatMap { filter -> filter.actions }
+                ?.let { actions ->
+                  LCRules.getRule("actions", ACTION, false)
+                }
+            } else {
+              LCRules.getRule(item.componentName, componentType, true)
+            }
             val source = when {
               !item.enabled -> DISABLED
               item.exported -> EXPORTED

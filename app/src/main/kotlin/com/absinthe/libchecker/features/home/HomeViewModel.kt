@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.LibCheckerApp
+import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.LibType
@@ -36,6 +37,7 @@ import com.absinthe.libchecker.features.statistics.bean.LibReference
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.ui.base.IListController
+import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Telemetry
@@ -52,7 +54,6 @@ import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlin.collections.filter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -227,10 +228,10 @@ class HomeViewModel : ViewModel() {
     val newApps = localApps - dbApps
     val removedApps = dbApps - localApps
 
-    /*
-     * The application list returned with a probability only contains system applications.
-     * When the difference is greater than a certain threshold, we re-request the list.
-     */
+      /*
+       * The application list returned with a probability only contains system applications.
+       * When the difference is greater than a certain threshold, we re-request the list.
+       */
     if (!checked && (newApps.size > 30 || removedApps.size > 30)) {
       Timber.w("Request change canceled because of large diff, re-request appMap")
       launch {
@@ -467,6 +468,9 @@ class HomeViewModel : ViewModel() {
     if (options and LibReferenceOptions.SHARED_UID > 0) {
       computeInternal(SHARED_UID)
     }
+    if (options and LibReferenceOptions.ACTION > 0) {
+      computeInternal(ACTION)
+    }
 
     referenceMap = map
     matchingRules()
@@ -583,6 +587,24 @@ class HomeViewModel : ViewModel() {
           }
         }
 
+        ACTION -> {
+          val packageInfo = PackageUtils.getPackageInfo(packageName)
+          val list = IntentFilterUtils.parseComponentsFromApk(packageInfo.applicationInfo!!.sourceDir)
+            .asSequence()
+            .flatMap { component ->
+              component.intentFilters.asSequence()
+                .flatMap { filter -> filter.actions }
+            }
+            .toSet()
+            .filter { !it.startsWith("android.") }
+          computeReferenceInternal(
+            referenceMap,
+            packageName,
+            ACTION,
+            list
+          )
+        }
+
         else -> {}
       }
     } catch (e: Exception) {
@@ -635,7 +657,8 @@ class HomeViewModel : ViewModel() {
 
         val refList = mutableListOf<LibReference>()
         val threshold = GlobalValues.libReferenceThreshold
-        val isOnlyNotMarked = GlobalValues.libReferenceOptions and LibReferenceOptions.ONLY_NOT_MARKED > 0
+        val isOnlyNotMarked =
+          GlobalValues.libReferenceOptions and LibReferenceOptions.ONLY_NOT_MARKED > 0
 
         var rule: Rule?
         for (entry in map) {
