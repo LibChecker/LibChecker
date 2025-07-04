@@ -15,7 +15,7 @@ zhaobozhen = "1.1.6"
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.4" }
-gms = { id = "com.google.gms.google-services", version = "4.4.2" }
+gms = { id = "com.google.gms.google-services", version = "4.4.3" }
 hiddenApiRefine = { id = "dev.rikka.tools.refine", version.ref = "hiddenApiRefine" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
