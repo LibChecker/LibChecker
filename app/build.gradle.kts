@@ -28,9 +28,6 @@ setupAppModule {
   defaultConfig {
     applicationId = "com.absinthe.libchecker"
   }
-  androidResources {
-    generateLocaleConfig = true
-  }
 
   buildFeatures {
     aidl = true

@@ -19,22 +19,26 @@ fun Project.setupAppModule(block: BaseAppModuleExtension.() -> Unit = {}) {
     defaultConfig {
       versionCode = verCode
       versionName = verName
-      androidResources.localeFilters += mutableSetOf(
-        "en",
-        "ar-rSA",
-        "de-rDE",
-        "in-rID",
-        "iw-rIL",
-        "ja-rJP",
-        "pt-rBR",
-        "ru-rRU",
-        "tr-rTR",
-        "uk-rUA",
-        "vi-rVN",
-        "zh-rCN",
-        "zh-rTW",
-        "zh-rHK",
-      )
+      androidResources {
+        ignoreAssetsPatterns += "!PublicSuffixDatabase.list" // OkHttp5
+        generateLocaleConfig = true
+        localeFilters += mutableSetOf(
+          "en",
+          "ar-rSA",
+          "de-rDE",
+          "in-rID",
+          "iw-rIL",
+          "ja-rJP",
+          "pt-rBR",
+          "ru-rRU",
+          "tr-rTR",
+          "uk-rUA",
+          "vi-rVN",
+          "zh-rCN",
+          "zh-rTW",
+          "zh-rHK",
+        )
+      }
     }
     val releaseSigning = if (project.hasProperty("releaseStoreFile")) {
       signingConfigs.create("release") {
@@ -68,6 +72,7 @@ fun Project.setupAppModule(block: BaseAppModuleExtension.() -> Unit = {}) {
     block()
   }
 }
+
 private inline fun <reified T : BaseExtension> Project.setupBaseModule(crossinline block: T.() -> Unit = {}) {
   extensions.configure<BaseExtension>("android") {
     compileSdkVersion(36)
