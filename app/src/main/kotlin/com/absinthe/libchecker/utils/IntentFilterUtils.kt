@@ -3,9 +3,14 @@ package com.absinthe.libchecker.utils
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.pm.PackageParser
+import com.absinthe.libchecker.annotation.ACTIVITY
+import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.annotation.RECEIVER
+import com.absinthe.libchecker.annotation.SERVICE
 import java.io.File
 
 data class ParsedComponent(
+  @LibType val type: Int,
   val className: String,
   val intentFilters: List<ParsedIntentFilter>
 )
@@ -27,21 +32,25 @@ object IntentFilterUtils {
       PackageManager.GET_ACTIVITIES or PackageManager.GET_RECEIVERS or PackageManager.GET_SERVICES
     )
 
-    val allComponents = mutableListOf<PackageParser.Component<*>>()
-    allComponents.addAll(pkg.activities)
-    allComponents.addAll(pkg.receivers)
-    allComponents.addAll(pkg.services)
+    val allComponents = mutableListOf<Pair<Int, List<PackageParser.Component<*>>>>()
+    allComponents.add(ACTIVITY to pkg.activities)
+    allComponents.add(RECEIVER to pkg.receivers)
+    allComponents.add(SERVICE to pkg.services)
 
-    for (component in allComponents) {
-      if (component.intents.isNullOrEmpty()) continue
+    allComponents.forEach {
+      val (type, components) = it
+      components.forEach { component ->
+        if (component.intents.isNullOrEmpty()) return@forEach
 
-      val intentFilters = component.intents.map { parseIntentFilter(it) }
-      parsedComponents.add(
-        ParsedComponent(
-          className = component.className,
-          intentFilters = intentFilters
+        val intentFilters = component.intents.map { parseIntentFilter(it) }
+        parsedComponents.add(
+          ParsedComponent(
+            type = type,
+            className = component.className,
+            intentFilters = intentFilters
+          )
         )
-      )
+      }
     }
 
     return parsedComponents
