@@ -18,8 +18,8 @@ import com.absinthe.libchecker.utils.extensions.md5
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
+import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.Repositories as RulesBundleRepo
-import com.absinthe.rulesbundle.RuleDatabase
 import com.jakewharton.processphoenix.ProcessPhoenix
 import java.io.File
 import kotlinx.coroutines.Dispatchers
@@ -78,7 +78,7 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
       saveFile,
       object : DownloadUtils.OnDownloadListener {
         override fun onDownloadSuccess() {
-          RuleDatabase.getDatabase(requireContext()).close()
+          LCRules.closeDb()
           Repositories.deleteRulesDatabase()
 
           val databaseDir = requireContext().getDatabasePath(Constants.RULES_DATABASE_NAME).parent

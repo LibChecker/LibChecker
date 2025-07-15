@@ -7,6 +7,7 @@ import android.util.SparseArray
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.annotation.ACTION
+import com.absinthe.libchecker.annotation.ACTION_IN_RULES
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.LibType
@@ -74,6 +75,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import ohos.bundle.AbilityInfo
 import ohos.bundle.IBundleManager
@@ -230,15 +232,21 @@ class DetailViewModel : ViewModel() {
 
         val transform: suspend (StatefulComponent, Int) -> LibStringItemChip =
           { item, componentType ->
-            val rule = if (item.componentName.startsWith(".")) {
-              parsedActionsMap[it.packageName + item.componentName]
+            var rule = LCRules.getRule(item.componentName, componentType, true)
+              .takeIf { !item.componentName.startsWith(".") }
+            if (rule == null) {
+              val fullComponentName = if (item.componentName.startsWith(".")) {
+                it.packageName + item.componentName
+              } else {
+                item.componentName
+              }
+              rule = parsedActionsMap[fullComponentName]
                 ?.flatMap { filter -> filter.actions }
-                ?.let { actions ->
-                  LCRules.getRule("actions", ACTION, false)
-                }
-            } else {
-              LCRules.getRule(item.componentName, componentType, true)
+                ?.asSequence()
+                ?.mapNotNull { action -> runBlocking { LCRules.getRule(action, ACTION_IN_RULES, false) } }
+                ?.firstOrNull()
             }
+
             val source = when {
               !item.enabled -> DISABLED
               item.exported -> EXPORTED
@@ -285,6 +293,7 @@ class DetailViewModel : ViewModel() {
       PROVIDER -> "providers-libs"
       DEX -> "dex-libs"
       STATIC -> "static-libs"
+      ACTION -> "actions-libs"
       else -> throw IllegalArgumentException("Illegal LibType: $type.")
     }
     if (isRegex) {

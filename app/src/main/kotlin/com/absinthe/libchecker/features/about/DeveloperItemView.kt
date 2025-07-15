@@ -66,8 +66,11 @@ class DeveloperItemView(context: Context) : MaterialCardView(context) {
         it.autoMeasure()
       }
       val labelWidth = (
-        measuredWidth - paddingStart - paddingEnd -
-          icon.measuredWidth - name.marginLeft -
+        measuredWidth -
+          paddingStart -
+          paddingEnd -
+          icon.measuredWidth -
+          name.marginLeft -
           name.marginRight
         )
       if (name.measuredWidth > labelWidth) {

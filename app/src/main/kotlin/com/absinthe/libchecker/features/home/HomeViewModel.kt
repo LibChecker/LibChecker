@@ -5,12 +5,12 @@ import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
-import android.os.Environment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.annotation.ACTION
+import com.absinthe.libchecker.annotation.ACTION_IN_RULES
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.LibType
@@ -41,7 +41,6 @@ import com.absinthe.libchecker.ui.base.IListController
 import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.ParsedComponent
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getFeatures
@@ -50,12 +49,8 @@ import com.absinthe.libchecker.utils.extensions.isArchivedPackage
 import com.absinthe.libchecker.utils.extensions.use
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
-import com.absinthe.libchecker.utils.toJson
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import com.absinthe.rulesbundle.LCRules
-import com.absinthe.rulesbundle.Rule
-import com.squareup.moshi.JsonClass
-import java.io.File
 import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -71,7 +66,6 @@ import kotlinx.coroutines.runBlocking
 import ohos.bundle.IBundleManager
 import okio.buffer
 import okio.sink
-import okio.source
 import timber.log.Timber
 
 class HomeViewModel : ViewModel() {
@@ -477,12 +471,6 @@ class HomeViewModel : ViewModel() {
     }
     if (options and LibReferenceOptions.ACTION > 0) {
       computeInternal(ACTION)
-
-      val file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "test.json")
-      file.createNewFile()
-      file.sink().buffer().use { sink ->
-        sink.writeUtf8(testMap.toJson().orEmpty())
-      }
     }
 
     referenceMap = map
@@ -616,10 +604,6 @@ class HomeViewModel : ViewModel() {
             ACTION,
             list
           )
-
-          runBlocking {
-            test(IntentFilterUtils.parseComponentsFromApk(packageInfo.applicationInfo!!.sourceDir))
-          }
         }
 
         else -> {}
@@ -677,23 +661,17 @@ class HomeViewModel : ViewModel() {
         val isOnlyNotMarked =
           GlobalValues.libReferenceOptions and LibReferenceOptions.ONLY_NOT_MARKED > 0
 
-        var rule: Rule?
         for (entry in map) {
-          if (!isActive) {
-            return@let
-          }
+          if (!isActive) return@let
           if (entry.value.first.size >= threshold && entry.key.isNotBlank()) {
-            rule = if (entry.value.second != PERMISSION && entry.value.second != METADATA) {
-              LCRules.getRule(entry.key, entry.value.second, true)
+            val ruleType = if (entry.value.second == ACTION) ACTION_IN_RULES else entry.value.second
+            val rule = if (entry.value.second != PERMISSION && entry.value.second != METADATA) {
+              LCRules.getRule(entry.key, ruleType, true)
             } else {
               null
             }
-            val shouldAdd = if (isOnlyNotMarked) {
-              rule == null && entry.value.second != PERMISSION && entry.value.second != METADATA
-            } else {
-              true
-            }
-            if (shouldAdd) {
+
+            if (!isOnlyNotMarked || rule == null) {
               refList.add(
                 LibReference(
                   entry.key,
@@ -790,31 +768,5 @@ class HomeViewModel : ViewModel() {
   fun clearMenuState() {
     isSearchMenuExpanded = false
     currentSearchQuery = ""
-  }
-
-  @JsonClass(generateAdapter = true)
-  data class TestData(
-    val className: String,
-    val type: Int,
-    val label: String
-  )
-
-  private val testMap = mutableMapOf<String, MutableList<TestData>>()
-
-  suspend fun test(list: List<ParsedComponent>) {
-    list.forEach { it ->
-      it.intentFilters.forEach { filter ->
-        filter.actions.forEach { act ->
-          val rule = LCRules.getRule(it.className, it.type, false)
-          testMap.getOrPut(act) { mutableListOf() }.add(
-            TestData(
-              className = it.className,
-              type = it.type,
-              label = rule?.label.orEmpty()
-            )
-          )
-        }
-      }
-    }
   }
 }

@@ -24,6 +24,8 @@ const val SHARED_UID = 10
 const val SIGNATURES = 11
 const val ACTION = 12
 
+const val ACTION_IN_RULES = com.absinthe.rulesbundle.ACTION
+
 @IntDef(NOT_MARKED, ALL, NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER, DEX, STATIC, PERMISSION, METADATA, PACKAGE, SHARED_UID, SIGNATURES, ACTION)
 @Target(AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.FIELD, AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.SOURCE)

@@ -68,15 +68,16 @@ class GetUpdatesDialogFragment : BaseBottomSheetViewDialogFragment<GetUpdatesDia
       }
     )
     if (getBoolean(R.bool.is_foss)) {
-      items = items + GetUpdatesItem(
-        getString(R.string.settings_get_updates_in_app),
-        R.drawable.ic_logo
-      ) {
-        InAppUpdateDialogFragment().show(
-          childFragmentManager,
-          InAppUpdateDialogFragment::class.java.simpleName
-        )
-      }
+      items = items +
+        GetUpdatesItem(
+          getString(R.string.settings_get_updates_in_app),
+          R.drawable.ic_logo
+        ) {
+          InAppUpdateDialogFragment().show(
+            childFragmentManager,
+            InAppUpdateDialogFragment::class.java.simpleName
+          )
+        }
     }
     root.setItems(items)
   }

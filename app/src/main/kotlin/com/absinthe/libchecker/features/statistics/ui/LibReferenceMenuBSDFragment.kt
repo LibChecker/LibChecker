@@ -32,11 +32,7 @@ class LibReferenceMenuBSDFragment : BaseBottomSheetViewDialogFragment<LibReferen
     optionsViewMap[LibReferenceOptions.PACKAGES] = root.addOptionItemView(R.string.ref_category_package, LibReferenceOptions.PACKAGES)
     optionsViewMap[LibReferenceOptions.SHARED_UID] = root.addOptionItemView(R.string.ref_category_shared_uid, LibReferenceOptions.SHARED_UID)
     optionsViewMap[LibReferenceOptions.ONLY_NOT_MARKED] = root.addOptionItemView(R.string.ref_category_only_not_marked, LibReferenceOptions.ONLY_NOT_MARKED)
-
-    if (GlobalValues.debugMode) {
-      optionsViewMap[LibReferenceOptions.ACTION] =
-        root.addOptionItemView(R.string.ref_category_action, LibReferenceOptions.ACTION)
-    }
+    optionsViewMap[LibReferenceOptions.ACTION] = root.addOptionItemView(R.string.ref_category_action, LibReferenceOptions.ACTION)
 
     dialog?.setOnDismissListener {
       onDismissCallback(previousAdvancedOptions.xor(GlobalValues.libReferenceOptions))

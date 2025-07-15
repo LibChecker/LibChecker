@@ -72,9 +72,13 @@ class ChartDetailItemView(context: Context) : FrameLayout(context) {
         it.autoMeasure()
       }
       val labelWidth = (
-        measuredWidth - paddingStart - paddingEnd -
-          icon.measuredWidth - count.measuredWidth -
-          labelName.marginLeft - labelName.marginRight
+        measuredWidth -
+          paddingStart -
+          paddingEnd -
+          icon.measuredWidth -
+          count.measuredWidth -
+          labelName.marginLeft -
+          labelName.marginRight
         )
       if (labelName.measuredWidth > labelWidth) {
         labelName.measure(labelWidth.toExactlyMeasureSpec(), labelName.defaultHeightMeasureSpec(this))

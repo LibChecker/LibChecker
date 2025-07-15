@@ -114,10 +114,13 @@ class ComparisonDashboardHalfView(
 
     setMeasuredDimension(
       measuredWidth,
-      tvSnapshotTimestampTitle.measuredHeight + tvSnapshotTimestampText.measuredHeight +
+      tvSnapshotTimestampTitle.measuredHeight +
+        tvSnapshotTimestampText.measuredHeight +
         tvSnapshotAppsCountTitle.marginTop +
-        tvSnapshotAppsCountTitle.measuredHeight + tvSnapshotAppsCountText.measuredHeight +
-        paddingTop + paddingBottom
+        tvSnapshotAppsCountTitle.measuredHeight +
+        tvSnapshotAppsCountText.measuredHeight +
+        paddingTop +
+        paddingBottom
     )
   }
 
