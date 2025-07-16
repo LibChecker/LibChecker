@@ -1,5 +1,7 @@
 package com.absinthe.libchecker.constant
 
+import com.absinthe.rulesbundle.Repositories
+
 object Constants {
 
   const val ERROR = -1
@@ -91,7 +93,7 @@ object Constants {
   const val COMMAND_DUMP_APPS_INFO_MD = "/dumpAppsInfoMd"
 
   const val RULES_DB_FILE_NAME = "rules.db"
-  const val RULES_DATABASE_NAME = "rules_database"
+  const val RULES_DATABASE_NAME = Repositories.RULES_DATABASE_NAME
 
   const val PREF_UUID = "uuid"
   const val PREF_ADVANCED_OPTIONS = "advancedOptions"
