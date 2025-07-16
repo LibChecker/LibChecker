@@ -8,6 +8,7 @@ import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import java.io.File
+import timber.log.Timber
 
 data class ParsedComponent(
   @LibType val type: Int,
@@ -27,10 +28,14 @@ object IntentFilterUtils {
     val parsedComponents = mutableListOf<ParsedComponent>()
 
     val parser = PackageParser()
-    val pkg = parser.parsePackage(
-      File(apkPath),
-      PackageManager.GET_ACTIVITIES or PackageManager.GET_RECEIVERS or PackageManager.GET_SERVICES
-    )
+    val pkg = runCatching {
+      parser.parsePackage(
+        File(apkPath),
+        PackageManager.GET_ACTIVITIES or PackageManager.GET_RECEIVERS or PackageManager.GET_SERVICES
+      )
+    }.onFailure {
+      Timber.e(it)
+    }.getOrNull() ?: return emptyList()
 
     val allComponents = mutableListOf<Pair<Int, List<PackageParser.Component<*>>>>()
     allComponents.add(ACTIVITY to pkg.activities)

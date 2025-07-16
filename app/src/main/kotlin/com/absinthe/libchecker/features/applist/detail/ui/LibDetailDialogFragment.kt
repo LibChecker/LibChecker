@@ -6,6 +6,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.constant.Constants
@@ -43,7 +44,7 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
   override fun init() {
     root.apply {
       maxPeekHeightPercentage = 0.8f
-      title.text = libName
+      title.text = if (type == ACTION) "< $libName >" else libName
       lifecycleScope.launch {
         val iconRes = if (isValidLib) {
           LCRules.getRule(libName, type, true)?.iconRes
