@@ -6,6 +6,8 @@ import android.content.pm.PackageManager
 import android.util.SparseArray
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.absinthe.libchecker.annotation.ACTION
+import com.absinthe.libchecker.annotation.ACTION_IN_RULES
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.LibType
@@ -36,6 +38,7 @@ import com.absinthe.libchecker.features.statistics.bean.EXPORTED
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.DateUtils
+import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
@@ -63,6 +66,7 @@ import com.absinthe.rulesbundle.Rule
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
+import kotlin.sequences.flatMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -71,6 +75,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import ohos.bundle.AbilityInfo
 import ohos.bundle.IBundleManager
@@ -191,6 +196,11 @@ class DetailViewModel : ViewModel() {
     val processesSet = hashSetOf<String>()
     try {
       packageInfo.let {
+        val parsedActionsMap = IntentFilterUtils.parseComponentsFromApk(it.applicationInfo!!.sourceDir)
+          .asSequence()
+          .map { item -> item.className to item.intentFilters }
+          .toMap()
+
         val services = if (it.services?.isNotEmpty() == true || isApk) {
           it.services
         } else {
@@ -222,8 +232,21 @@ class DetailViewModel : ViewModel() {
 
         val transform: suspend (StatefulComponent, Int) -> LibStringItemChip =
           { item, componentType ->
-            val rule = item.componentName.takeIf { !it.startsWith(".") }
-              ?.let { LCRules.getRule(it, componentType, true) }
+            var rule = LCRules.getRule(item.componentName, componentType, true)
+              .takeIf { !item.componentName.startsWith(".") }
+            if (rule == null) {
+              val fullComponentName = if (item.componentName.startsWith(".")) {
+                it.packageName + item.componentName
+              } else {
+                item.componentName
+              }
+              rule = parsedActionsMap[fullComponentName]
+                ?.flatMap { filter -> filter.actions }
+                ?.asSequence()
+                ?.mapNotNull { action -> runBlocking { LCRules.getRule(action, ACTION_IN_RULES, false) } }
+                ?.firstOrNull()
+            }
+
             val source = when {
               !item.enabled -> DISABLED
               item.exported -> EXPORTED
@@ -270,6 +293,7 @@ class DetailViewModel : ViewModel() {
       PROVIDER -> "providers-libs"
       DEX -> "dex-libs"
       STATIC -> "static-libs"
+      ACTION -> "actions-libs"
       else -> throw IllegalArgumentException("Illegal LibType: $type.")
     }
     if (isRegex) {

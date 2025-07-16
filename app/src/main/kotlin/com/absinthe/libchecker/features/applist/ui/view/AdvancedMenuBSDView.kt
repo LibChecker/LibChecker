@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
+import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibStringAdapter
@@ -117,6 +118,8 @@ class AdvancedMenuBSDView(context: Context) :
               source = EXPORTED
             ),
             Rule(
+              context.packageName,
+              NATIVE,
               Constants.EXAMPLE_RULE,
               R.drawable.ic_logo,
               null,
@@ -131,6 +134,8 @@ class AdvancedMenuBSDView(context: Context) :
               name = Constants.EXAMPLE_NORMAL
             ),
             Rule(
+              context.packageName,
+              NATIVE,
               Constants.EXAMPLE_RULE,
               R.drawable.ic_logo,
               null,
@@ -146,6 +151,8 @@ class AdvancedMenuBSDView(context: Context) :
               source = DISABLED
             ),
             Rule(
+              context.packageName,
+              NATIVE,
               Constants.EXAMPLE_RULE,
               R.drawable.ic_logo,
               null,

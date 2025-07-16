@@ -11,6 +11,7 @@ object LibReferenceOptions {
   const val PACKAGES = 1 shl 7
   const val SHARED_UID = 1 shl 8
   const val ONLY_NOT_MARKED = 1 shl 9
+  const val ACTION = 1 shl 10
 
   const val DEFAULT_OPTIONS = SERVICES
 
@@ -45,6 +46,9 @@ object LibReferenceOptions {
     }
     if (options and ONLY_NOT_MARKED != 0) {
       sb.append("ONLY_NOT_MARKED, ")
+    }
+    if (options and ACTION != 0) {
+      sb.append("ACTION, ")
     }
     if (sb.isNotEmpty()) {
       sb.delete(sb.length - 2, sb.length)

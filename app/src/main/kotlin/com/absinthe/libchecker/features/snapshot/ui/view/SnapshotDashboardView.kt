@@ -182,10 +182,15 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context, null, 
       setMeasuredDimension(
         measuredWidth,
         (
-          tvSnapshotTimestampTitle.measuredHeight + tvSnapshotTimestampText.measuredHeight +
-            tvSnapshotAppsCountTitle.marginTop + tvSnapshotAppsCountTitle.measuredHeight +
-            tvSnapshotAppsCountText.measuredHeight + propsRecyclerView.measuredHeight
-          ).coerceAtLeast(indicatorsHeight) + paddingTop + paddingBottom
+          tvSnapshotTimestampTitle.measuredHeight +
+            tvSnapshotTimestampText.measuredHeight +
+            tvSnapshotAppsCountTitle.marginTop +
+            tvSnapshotAppsCountTitle.measuredHeight +
+            tvSnapshotAppsCountText.measuredHeight +
+            propsRecyclerView.measuredHeight
+          ).coerceAtLeast(indicatorsHeight) +
+          paddingTop +
+          paddingBottom
       )
     }
 

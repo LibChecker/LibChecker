@@ -305,6 +305,7 @@ class ChartFragment :
       )
       description.isEnabled = false
       legend.isEnabled = false
+      isDragEnabled = false
       setDrawBorders(false)
       setDrawGridBackground(false)
       setFitBars(true)

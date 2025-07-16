@@ -27,6 +27,7 @@ class LibReferenceMenuBSDFragment : BaseBottomSheetViewDialogFragment<LibReferen
     optionsViewMap[LibReferenceOptions.ACTIVITIES] = root.addOptionItemView(R.string.ref_category_activity, LibReferenceOptions.ACTIVITIES)
     optionsViewMap[LibReferenceOptions.RECEIVERS] = root.addOptionItemView(R.string.ref_category_br, LibReferenceOptions.RECEIVERS)
     optionsViewMap[LibReferenceOptions.PROVIDERS] = root.addOptionItemView(R.string.ref_category_cp, LibReferenceOptions.PROVIDERS)
+    optionsViewMap[LibReferenceOptions.ACTION] = root.addOptionItemView(R.string.ref_category_action, LibReferenceOptions.ACTION)
     optionsViewMap[LibReferenceOptions.PERMISSIONS] = root.addOptionItemView(R.string.ref_category_perm, LibReferenceOptions.PERMISSIONS)
     optionsViewMap[LibReferenceOptions.METADATA] = root.addOptionItemView(R.string.ref_category_metadata, LibReferenceOptions.METADATA)
     optionsViewMap[LibReferenceOptions.PACKAGES] = root.addOptionItemView(R.string.ref_category_package, LibReferenceOptions.PACKAGES)

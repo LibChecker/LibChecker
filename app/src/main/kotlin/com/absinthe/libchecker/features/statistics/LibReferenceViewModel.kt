@@ -4,6 +4,7 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.METADATA
@@ -16,6 +17,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
+import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import kotlinx.coroutines.Dispatchers
@@ -33,9 +35,11 @@ class LibReferenceViewModel : ViewModel() {
 
   val libRefListFlow: MutableSharedFlow<List<LCItem>> = MutableSharedFlow()
   val dbItemsFlow: Flow<List<LCItem>> = Repositories.lcRepository.allLCItemsFlow
+  val actionMap: MutableMap<String, Pair<String, Int>> = mutableMapOf()
 
   fun setData(name: String, @LibType type: Int) = viewModelScope.launch(Dispatchers.IO) {
     dbItemsFlow.collectLatest {
+      actionMap.clear()
       setDataInternal(it, name, type)
     }
   }
@@ -111,6 +115,16 @@ class LibReferenceViewModel : ViewModel() {
           }
         }
 
+        ACTION -> {
+          for (item in items) {
+            val pair = getActionPair(item.packageName, name)
+            if (pair != null) {
+              list.add(item)
+              actionMap[item.packageName] = pair
+            }
+          }
+        }
+
         else -> {
         }
       }
@@ -123,5 +137,25 @@ class LibReferenceViewModel : ViewModel() {
     }
 
     libRefListFlow.emit(filterList)
+  }
+
+  fun getActionPair(packageName: String, actionName: String): Pair<String, Int>? {
+    val pi = runCatching {
+      PackageUtils.getPackageInfo(packageName, PackageManager.GET_META_DATA)
+    }.onFailure { e ->
+      Timber.e(e, "Failed to retrieve package info for $packageName")
+    }.getOrNull() ?: return null
+
+    IntentFilterUtils.parseComponentsFromApk(pi.applicationInfo!!.sourceDir)
+      .forEach { component ->
+        component.intentFilters.forEach { filter ->
+          filter.actions.forEach { action ->
+            if (action == actionName) {
+              return Pair(component.className, component.type)
+            }
+          }
+        }
+      }
+    return null
   }
 }

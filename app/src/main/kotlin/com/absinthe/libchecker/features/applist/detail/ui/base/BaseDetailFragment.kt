@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.annotation.ACTION
+import com.absinthe.libchecker.annotation.ACTION_IN_RULES
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PERMISSION
@@ -292,20 +294,21 @@ abstract class BaseDetailFragment<T : ViewBinding> :
       return
     }
     val item = adapter.getItem(position)
-    val name = item.item.name
     val isValidLib = item.rule != null
 
     if (adapter.type == PERMISSION) {
-      PermissionDetailDialogFragment.newInstance(name)
+      PermissionDetailDialogFragment.newInstance(item.item.name)
         .show(childFragmentManager, PermissionDetailDialogFragment::class.java.name)
       return
     }
 
     lifecycleScope.launch(Dispatchers.IO) {
-      val regexName = LCRules.getRule(name, adapter.type, true)?.regexName
+      val name = item.rule?.libName ?: item.item.name
+      val regexName = item.rule?.regexName
+      val libType = if (item.rule?.libType == ACTION_IN_RULES) ACTION else adapter.type
 
       withContext(Dispatchers.Main) {
-        LibDetailDialogFragment.newInstance(name, adapter.type, regexName, isValidLib)
+        LibDetailDialogFragment.newInstance(name, libType, regexName, isValidLib)
           .show(childFragmentManager, LibDetailDialogFragment::class.java.name)
       }
     }
@@ -348,7 +351,9 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     if (this is Referable) {
       arrayAdapter.add(getString(R.string.tab_lib_reference_statistics))
       actionMap[arrayAdapter.count - 1] = {
-        activity?.launchLibReferencePage(componentName, item.rule?.label, type, null)
+        val refName = item.rule?.libName ?: componentName
+        val libType = if (item.rule?.libType == ACTION_IN_RULES) ACTION else type
+        activity?.launchLibReferencePage(refName, item.rule?.label, libType, null)
       }
     }
 

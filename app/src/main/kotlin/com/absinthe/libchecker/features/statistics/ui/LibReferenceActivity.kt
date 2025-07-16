@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.AUTUMN
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.SPRING
@@ -126,11 +127,16 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
       if (AntiShakeUtils.isInvalidClick(view)) {
         return@setOnItemClickListener
       }
-      launchDetailPage(
-        item = adapter.getItem(position),
-        refName = refName,
-        refType = refType
-      )
+      val item = adapter.getItem(position)
+      val (name, type) = if (refType == ACTION) {
+        val pair = viewModel.actionMap[item.packageName]
+          ?: viewModel.getActionPair(item.packageName, refName.orEmpty())
+        (pair?.first ?: item.packageName) to (pair?.second ?: ACTION)
+      } else {
+        refName to refType
+      }
+
+      launchDetailPage(item = item, refName = name, refType = type)
     }
   }
 

@@ -10,12 +10,10 @@ import androidx.core.text.italic
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.annotation.ACTIVITY
+import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PERMISSION
-import com.absinthe.libchecker.annotation.PROVIDER
-import com.absinthe.libchecker.annotation.RECEIVER
-import com.absinthe.libchecker.annotation.SERVICE
+import com.absinthe.libchecker.annotation.isComponentType
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.features.applist.detail.ui.LibDetailDialogFragment
 import com.absinthe.libchecker.features.statistics.bean.LibReference
@@ -97,7 +95,7 @@ class LibReferenceProvider : BaseNodeProvider() {
     super.onChildClick(helper, view, data, position)
     if (view.id == android.R.id.icon) {
       val ref = data as? LibReference ?: return
-      if (ref.type == NATIVE || ref.type == SERVICE || ref.type == ACTIVITY || ref.type == RECEIVER || ref.type == PROVIDER) {
+      if (ref.type == NATIVE || isComponentType(ref.type) || ref.type == ACTION) {
         val name = ref.libName
 
         (context as? LifecycleOwner)?.lifecycleScope?.launch(Dispatchers.IO) {

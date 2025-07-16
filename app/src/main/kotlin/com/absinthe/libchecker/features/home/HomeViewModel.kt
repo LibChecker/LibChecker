@@ -9,6 +9,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.LibCheckerApp
+import com.absinthe.libchecker.annotation.ACTION
+import com.absinthe.libchecker.annotation.ACTION_IN_RULES
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.LibType
@@ -36,6 +38,7 @@ import com.absinthe.libchecker.features.statistics.bean.LibReference
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.ui.base.IListController
+import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Telemetry
@@ -43,16 +46,15 @@ import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getFeatures
 import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.extensions.isArchivedPackage
+import com.absinthe.libchecker.utils.extensions.use
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import com.absinthe.rulesbundle.LCRules
-import com.absinthe.rulesbundle.Rule
 import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlin.collections.filter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -227,10 +229,10 @@ class HomeViewModel : ViewModel() {
     val newApps = localApps - dbApps
     val removedApps = dbApps - localApps
 
-    /*
-     * The application list returned with a probability only contains system applications.
-     * When the difference is greater than a certain threshold, we re-request the list.
-     */
+      /*
+       * The application list returned with a probability only contains system applications.
+       * When the difference is greater than a certain threshold, we re-request the list.
+       */
     if (!checked && (newApps.size > 30 || removedApps.size > 30)) {
       Timber.w("Request change canceled because of large diff, re-request appMap")
       launch {
@@ -467,6 +469,9 @@ class HomeViewModel : ViewModel() {
     if (options and LibReferenceOptions.SHARED_UID > 0) {
       computeInternal(SHARED_UID)
     }
+    if (options and LibReferenceOptions.ACTION > 0) {
+      computeInternal(ACTION)
+    }
 
     referenceMap = map
     matchingRules()
@@ -583,6 +588,24 @@ class HomeViewModel : ViewModel() {
           }
         }
 
+        ACTION -> {
+          val packageInfo = PackageUtils.getPackageInfo(packageName)
+          val list = IntentFilterUtils.parseComponentsFromApk(packageInfo.applicationInfo!!.sourceDir)
+            .asSequence()
+            .flatMap { component ->
+              component.intentFilters.asSequence()
+                .flatMap { filter -> filter.actions }
+            }
+            .toSet()
+            .filter { !it.startsWith("android.") }
+          computeReferenceInternal(
+            referenceMap,
+            packageName,
+            ACTION,
+            list
+          )
+        }
+
         else -> {}
       }
     } catch (e: Exception) {
@@ -635,25 +658,20 @@ class HomeViewModel : ViewModel() {
 
         val refList = mutableListOf<LibReference>()
         val threshold = GlobalValues.libReferenceThreshold
-        val isOnlyNotMarked = GlobalValues.libReferenceOptions and LibReferenceOptions.ONLY_NOT_MARKED > 0
+        val isOnlyNotMarked =
+          GlobalValues.libReferenceOptions and LibReferenceOptions.ONLY_NOT_MARKED > 0
 
-        var rule: Rule?
         for (entry in map) {
-          if (!isActive) {
-            return@let
-          }
+          if (!isActive) return@let
           if (entry.value.first.size >= threshold && entry.key.isNotBlank()) {
-            rule = if (entry.value.second != PERMISSION && entry.value.second != METADATA) {
-              LCRules.getRule(entry.key, entry.value.second, true)
+            val ruleType = if (entry.value.second == ACTION) ACTION_IN_RULES else entry.value.second
+            val rule = if (entry.value.second != PERMISSION && entry.value.second != METADATA) {
+              LCRules.getRule(entry.key, ruleType, true)
             } else {
               null
             }
-            val shouldAdd = if (isOnlyNotMarked) {
-              rule == null && entry.value.second != PERMISSION && entry.value.second != METADATA
-            } else {
-              true
-            }
-            if (shouldAdd) {
+
+            if (!isOnlyNotMarked || rule == null) {
               refList.add(
                 LibReference(
                   entry.key,
