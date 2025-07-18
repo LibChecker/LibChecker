@@ -46,6 +46,7 @@
   <string name="ref_category_shared_uid">Paylaşılan UID</string>
   <string name="ref_category_signatures">İmzalar</string>
   <string name="ref_category_only_not_marked">Sadece İşaretlenmemişler</string>
+  <string name="ref_category_action">Eylem</string>
   <string name="string_kotlin_used">Kotlin Kullanılmış</string>
   <string name="string_kotlin_unused">Kotlin Kullanılmamış</string>
   <string name="string_compose_used">Jetpack Compose Kullanılmış</string>
