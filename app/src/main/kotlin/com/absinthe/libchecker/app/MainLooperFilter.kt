@@ -4,6 +4,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import com.absinthe.libchecker.LibCheckerApp
+import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.utils.showToast
 import com.google.android.gms.common.internal.BaseGmsClient
 import timber.log.Timber
@@ -51,6 +52,9 @@ object MainLooperFilter {
     } else if (stack.contains("de.robv.android.xposed")) {
       Timber.w(e)
       LibCheckerApp.app.showToast("Encounter Xposed module crash")
+    } else if (stack.contains("no such table: rules_table")) {
+      Repositories.deleteRulesDatabase()
+      throw e
     } else {
       throw e
     }
