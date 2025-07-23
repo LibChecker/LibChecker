@@ -121,7 +121,7 @@ class SnapshotDetailActivity :
   }
 
   private fun initView() {
-    addMenuProvider(this, this, Lifecycle.State.STARTED)
+    addMenuProvider(this, this, Lifecycle.State.CREATED)
     setSupportActionBar(binding.toolbar)
     supportActionBar?.apply {
       setDisplayHomeAsUpEnabled(true)
