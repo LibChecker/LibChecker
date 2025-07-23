@@ -139,7 +139,7 @@ abstract class BaseAppDetailActivity :
   override fun onCreate(savedInstanceState: Bundle?) {
     binding = ActivityAppDetailBinding.inflate(layoutInflater)
     super.onCreate(savedInstanceState)
-    addMenuProvider(this, this, Lifecycle.State.CREATED)
+   addMenuProvider(this, this, Lifecycle.State.CREATED)
     setSupportActionBar(getToolbar())
     binding.toolbar.isBackInvokedCallbackEnabled = false
     supportActionBar?.apply {
