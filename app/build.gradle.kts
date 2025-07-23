@@ -61,6 +61,12 @@ setupAppModule {
     }
   }
 
+  packaging {
+    jniLibs {
+      excludes += "lib/**/libdatastore_shared_counter.so" // Jetpack DataStore
+    }
+  }
+
   packagingOptions.resources.excludes += setOf(
     "META-INF/**",
     "okhttp3/**",

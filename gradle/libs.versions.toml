@@ -3,7 +3,7 @@ agp = "8.11.1"
 aboutlibraries = "12.2.4"
 androidX-lifecycle = "2.9.2"
 androidX-room = "2.7.2"
-firebase-bom = "33.10.0"
+firebase-bom = "34.0.0"
 hiddenApiRefine = "4.4.0"
 kotlin = "2.2.0"
 protoc = "4.31.1"
@@ -14,7 +14,7 @@ zhaobozhen = "1.1.6"
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
-firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.4" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.5" }
 gms = { id = "com.google.gms.google-services", version = "4.4.3" }
 hiddenApiRefine = { id = "dev.rikka.tools.refine", version.ref = "hiddenApiRefine" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
@@ -22,7 +22,7 @@ kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref =
 ksp = { id = "com.google.devtools.ksp", version = "2.2.0-2.0.2" }
 protobuf = { id = "com.google.protobuf", version = "0.9.5" }
 moshiX = "dev.zacsweers.moshix:0.31.0"
-spotless = "com.diffplug.spotless:7.1.0"
+spotless = "com.diffplug.spotless:7.2.1"
 aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutlibraries" }
 
 [libraries]
@@ -98,7 +98,7 @@ processPhoenix = "com.jakewharton:process-phoenix:3.0.0"
 timber = "com.jakewharton.timber:timber:5.0.1"
 zhaobozhen-axml = { module = "com.github.zhaobozhen.libraries:axml", version.ref = "zhaobozhen" }
 zhaobozhen-utils = { module = "com.github.zhaobozhen.libraries:utils", version.ref = "zhaobozhen" }
-ktlint = "com.pinterest.ktlint:ktlint-cli:1.7.0"
+ktlint = "com.pinterest.ktlint:ktlint-cli:1.7.1"
 
 [bundles]
 androidX-lifecycle = [
