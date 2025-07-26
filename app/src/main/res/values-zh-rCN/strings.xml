@@ -185,6 +185,9 @@
   <string name="lib_detail_app_install_source_shizuku_not_running_detail">点此跳转到 Shizuku 以启动它</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku 未授权</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">点此进行 Shizuku 授权以获取安装请求方</string>
+  <string name="lib_detail_elf_info">更多信息</string>
+  <string name="lib_detail_dependency_tip">依赖</string>
+  <string name="lib_detail_entry_points_tip">入口点</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已复制到剪贴板</string>
   <string name="toast_not_existing_market">设备中不存在应用市场</string>

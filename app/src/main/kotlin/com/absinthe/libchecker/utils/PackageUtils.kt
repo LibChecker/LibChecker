@@ -57,8 +57,8 @@ import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.features.applist.detail.bean.StatefulComponent
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.utils.dex.FastDexFileFactory
-import com.absinthe.libchecker.utils.elf.ELFParser
 import com.absinthe.libchecker.utils.elf.ElfInfo
+import com.absinthe.libchecker.utils.elf.ElfParser
 import com.absinthe.libchecker.utils.extensions.ABI_64_BIT
 import com.absinthe.libchecker.utils.extensions.ABI_STRING_MAP
 import com.absinthe.libchecker.utils.extensions.ABI_STRING_RES_MAP
@@ -179,15 +179,20 @@ object PackageUtils {
           .filter { it.isFile && it.extension == "so" }
           .distinctBy { it.name }
           .map {
-            val elfParser =
-              runCatching { it.inputStream().use { input -> ELFParser(input) } }.getOrNull()
+            val elfParser = runCatching {
+              ElfParser(it).use { parser ->
+                parser.parseHeader()
+                parser
+              }
+            }.getOrNull()
             LibStringItem(
               name = it.name,
               size = FileUtils.getFileSize(it),
               elfInfo = ElfInfo(
                 elfParser?.getEType() ?: ET_NOT_ELF,
                 elfParser?.getMinPageSize() ?: -1
-              )
+              ),
+              source = it.path
             )
           }
         result.addAll(libs)
@@ -322,7 +327,13 @@ object PackageUtils {
           val offset = getDataOffsetMethod.invoke(zipFile, entry) as Long
 
           val currentEntryUncompressedAndNot16KB = entry.method == ZipEntry.STORED && (offset % PAGE_SIZE_16_KB) != 0L
-          val elfParser = runCatching { ELFParser(zipFile.getInputStream(entry)) }.getOrNull()
+          val elfParser = runCatching {
+            ElfParser(zipFile.getInputStream(entry)).use { parser ->
+              parser.parseHeader()
+              parser
+            }
+          }.getOrNull()
+
           val item = LibStringItem(
             name = entry.name.split(File.separator).last(),
             size = entry.size,
@@ -330,7 +341,8 @@ object PackageUtils {
               elfParser?.getEType() ?: ET_NOT_ELF,
               elfParser?.getMinPageSize() ?: -1,
               currentEntryUncompressedAndNot16KB
-            )
+            ),
+            source = entry.name
           )
           map.getOrPut(dir) { mutableListOf() }.add(item)
         }
@@ -832,8 +844,7 @@ object PackageUtils {
     context: Context,
     item: LibStringItem
   ): String {
-    val source = item.source?.let { "[${item.source}]" }.orEmpty()
-    return "(${item.size.sizeToString(context, showBytes = false)}) $source"
+    return "(${item.size.sizeToString(context, showBytes = false)})"
   }
 
   /**
