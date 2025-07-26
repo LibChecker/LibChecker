@@ -16,6 +16,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.node.AbiLabelNode
+import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.view.AViewGroup
@@ -121,7 +122,7 @@ class DetailsTitleView(
           v.setOnClickListener { action.invoke() }
         }
         if ((GlobalValues.advancedOptions and AdvancedOptions.TINT_ABI_LABEL) > 0) {
-          if (res == R.drawable.ic_abi_label_arm64_v8a) {
+          if (PackageUtils.isAbi64Bit(it.abi)) {
             v.drawable.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorPrimary))
           } else {
             v.drawable.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorTertiary))
