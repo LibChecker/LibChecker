@@ -30,7 +30,7 @@
   <string name="title_statistics_dialog">Apps with %s ABI</string>
   <string name="title_statistics_dialog_no_native_libs">Apps without native libraries</string>
   <string name="tab_chart">Chart</string>
-  <string name="tab_lib_reference_statistics">Lib reference</string>
+  <string name="tab_lib_reference_statistics">Lib Reference</string>
   <string name="not_marked_lib">Unmarked library</string>
 
   <string name="submenu_title_component">Component</string>
@@ -198,6 +198,9 @@
   <string name="lib_detail_app_install_source_shizuku_not_running_detail">Click here to jump to Shizuku to start it</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku not authorized</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">Click here for Shizuku authorization for installation requester</string>
+  <string name="lib_detail_elf_info">More Info</string>
+  <string name="lib_detail_dependency_tip">Dependencies</string>
+  <string name="lib_detail_entry_points_tip">Entry Points</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Copied to clipboard</string>

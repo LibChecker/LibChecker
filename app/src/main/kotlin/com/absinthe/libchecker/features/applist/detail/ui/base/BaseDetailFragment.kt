@@ -29,12 +29,14 @@ import com.absinthe.libchecker.features.applist.Referable
 import com.absinthe.libchecker.features.applist.Sortable
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.IDetailContainer
+import com.absinthe.libchecker.features.applist.detail.ui.ELFDetailDialogFragment
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.features.applist.detail.ui.LibDetailDialogFragment
 import com.absinthe.libchecker.features.applist.detail.ui.PermissionDetailDialogFragment
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibStringAdapter
 import com.absinthe.libchecker.features.applist.detail.ui.impl.ComponentsAnalysisFragment
 import com.absinthe.libchecker.features.applist.detail.ui.impl.MetaDataAnalysisFragment
+import com.absinthe.libchecker.features.applist.detail.ui.impl.NativeAnalysisFragment
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.integrations.anywhere.AnywhereManager
@@ -51,7 +53,6 @@ import com.absinthe.libchecker.utils.extensions.reverseStrikeThroughAnimation
 import com.absinthe.libchecker.utils.extensions.startStrikeThroughAnimation
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import com.absinthe.rulesbundle.LCRules
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -345,6 +346,18 @@ abstract class BaseDetailFragment<T : ViewBinding> :
         ClipboardUtils.put(context, componentName)
       }
       VersionCompat.showCopiedOnClipboardToast(context)
+    }
+
+    // ELF info
+    if (this is NativeAnalysisFragment) {
+      arrayAdapter.add(getString(R.string.lib_detail_elf_info))
+      actionMap[arrayAdapter.count - 1] = {
+        ELFDetailDialogFragment.newInstance(
+          packageName = packageName,
+          elfPath = item.item.source.orEmpty(),
+          ruleIcon = item.rule?.iconRes ?: com.absinthe.lc.rulesbundle.R.drawable.ic_sdk_placeholder
+        ).show(childFragmentManager, ELFDetailDialogFragment::class.java.name)
+      }
     }
 
     // Reference
