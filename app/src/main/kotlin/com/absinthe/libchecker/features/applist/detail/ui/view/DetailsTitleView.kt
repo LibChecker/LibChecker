@@ -13,7 +13,10 @@ import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.node.AbiLabelNode
+import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.view.AViewGroup
@@ -117,6 +120,13 @@ class DetailsTitleView(
         v.alpha = if (it.active) 1f else 0.5f
         it.action?.let { action ->
           v.setOnClickListener { action.invoke() }
+        }
+        if ((GlobalValues.advancedOptions and AdvancedOptions.TINT_ABI_LABEL) > 0) {
+          if (PackageUtils.isAbi64Bit(it.abi)) {
+            v.drawable.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorPrimary))
+          } else {
+            v.drawable.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorTertiary))
+          }
         }
       }
       abiLabelsFlexLayout.addView(view)
