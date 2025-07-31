@@ -45,7 +45,7 @@ androidX-recyclerView = "androidx.recyclerview:recyclerview:1.4.0"
 androidX-room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidX-room" }
 androidX-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidX-room" }
 androidX-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidX-room" }
-androidX-security = "androidx.security:security-crypto:1.1.0-beta01"
+androidX-security = "androidx.security:security-crypto:1.1.0"
 androidX-viewPager2 = "androidx.viewpager2:viewpager2:1.1.0"
 androidX-window = "androidx.window:window:1.4.0"
 
