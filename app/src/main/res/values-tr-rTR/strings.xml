@@ -29,7 +29,7 @@
   <string name="title_statistics_dialog">%s ABI\'ye sahip uygulamalar</string>
   <string name="title_statistics_dialog_no_native_libs">Yerel kütüphanesi olmayan uygulamalar</string>
   <string name="tab_chart">Grafik</string>
-  <string name="tab_lib_reference_statistics">Kütüphane referansı</string>
+  <string name="tab_lib_reference_statistics">Kütüphane Referansı</string>
   <string name="not_marked_lib">İşaretlenmemiş kütüphane</string>
   <string name="submenu_title_component">Bileşen</string>
   <string name="submenu_title_manifest">Manifest</string>
@@ -186,6 +186,9 @@
   <string name="lib_detail_app_install_source_shizuku_not_running_detail">Başlatmak için Shizuku\'ya atlamak için buraya tıklayın</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku yetkilendirilmedi</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">Yükleme isteyicisi için Shizuku yetkilendirmesi için buraya tıklayın</string>
+  <string name="lib_detail_elf_info">Ayrıntılı Bilgi</string>
+  <string name="lib_detail_dependency_tip">Bağımlılıklar</string>
+  <string name="lib_detail_entry_points_tip">Giriş Noktaları</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Panoya kopyalandı</string>
   <string name="toast_not_existing_market">Mevcut bir uygulama mağazası yok</string>
