@@ -21,7 +21,8 @@ import timber.log.Timber
  * androidx.appcompat.app.ToolbarActionBar$1.run (ToolbarActionBar.java:58)
  */
 class ToolbarFix @JvmOverloads constructor(
-  context: Context, attrs: AttributeSet? = null
+  context: Context,
+  attrs: AttributeSet? = null
 ) : Toolbar(context, attrs) {
   private val hiddenViews by lazy {
     Toolbar::class.java.getDeclaredField("mHiddenViews").apply {
