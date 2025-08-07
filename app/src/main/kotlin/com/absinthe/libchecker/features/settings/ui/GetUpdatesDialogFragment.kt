@@ -7,11 +7,13 @@ import androidx.core.net.toUri
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.features.settings.bean.GetUpdatesItem
+import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.extensions.getBoolean
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
+import timber.log.Timber
 
 class GetUpdatesDialogFragment : BaseBottomSheetViewDialogFragment<GetUpdatesDialogView>() {
 
@@ -30,41 +32,25 @@ class GetUpdatesDialogFragment : BaseBottomSheetViewDialogFragment<GetUpdatesDia
         "GitHub",
         R.drawable.ic_github
       ) {
-        context?.startActivity(
-          Intent(Intent.ACTION_VIEW).apply {
-            data = URLManager.GITHUB_REPO_PAGE.toUri()
-          }
-        )
+        launchUri(URLManager.GITHUB_REPO_PAGE)
       },
       GetUpdatesItem(
         "Google Play",
         com.absinthe.lc.rulesbundle.R.drawable.ic_lib_google
       ) {
-        context?.startActivity(
-          Intent(Intent.ACTION_VIEW).apply {
-            data = URLManager.PLAY_STORE_DETAIL_PAGE.toUri()
-          }
-        )
+        launchUri(URLManager.PLAY_STORE_DETAIL_PAGE)
       },
       GetUpdatesItem(
         "Telegram",
         com.absinthe.lc.rulesbundle.R.drawable.ic_lib_telegram
       ) {
-        context?.startActivity(
-          Intent(Intent.ACTION_VIEW).apply {
-            data = URLManager.TELEGRAM_RELEASES.toUri()
-          }
-        )
+        launchUri(URLManager.TELEGRAM_RELEASES)
       },
       GetUpdatesItem(
         "F-Droid",
         R.drawable.ic_fdroid
       ) {
-        context?.startActivity(
-          Intent(Intent.ACTION_VIEW).apply {
-            data = URLManager.FDROID_PAGE.toUri()
-          }
-        )
+        launchUri(URLManager.FDROID_PAGE)
       }
     )
     if (getBoolean(R.bool.is_foss)) {
@@ -80,5 +66,16 @@ class GetUpdatesDialogFragment : BaseBottomSheetViewDialogFragment<GetUpdatesDia
         }
     }
     root.setItems(items)
+  }
+
+  private fun launchUri(uri: String) {
+    runCatching {
+      val intent = Intent(Intent.ACTION_VIEW)
+        .setData(uri.toUri())
+      context?.startActivity(intent)
+    }.onFailure { inner ->
+      Timber.e(inner)
+      Toasty.showShort(requireActivity(), "No browser application")
+    }
   }
 }

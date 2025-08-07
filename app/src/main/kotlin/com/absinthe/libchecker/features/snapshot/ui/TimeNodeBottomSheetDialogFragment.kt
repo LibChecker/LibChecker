@@ -84,7 +84,9 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
                         )
                         val timestampList = Repositories.lcRepository.getTimeStamps()
                         withContext(Dispatchers.Main) {
-                          root.adapter.setList(timestampList)
+                          if (this@TimeNodeBottomSheetDialogFragment.context != null) {
+                            root.adapter.setList(timestampList)
+                          }
                         }
                       }
                     }
