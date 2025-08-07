@@ -141,3 +141,8 @@
 -keepclassmembers class org.apache.commons.compress.archivers.zip.ZipFile {
     private long getDataOffset(org.apache.commons.compress.archivers.zip.ZipArchiveEntry);
 }
+
+# androidx.appcompat.widget.Toolbar
+-keepclassmembers class androidx.appcompat.widget.Toolbar {
+    java.util.ArrayList mHiddenViews;
+}

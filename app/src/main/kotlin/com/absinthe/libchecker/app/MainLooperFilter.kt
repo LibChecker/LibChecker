@@ -26,7 +26,6 @@ object MainLooperFilter {
   }
 
   private val heroes = setOf(
-    "addChildrenForExpandedActionView",
     "android.view.inputmethod.InputMethodManager.startInputInner",
     "com.android.server.wm.ConfigurationContainer.setActivityType",
     "com.swift.sandhook",
