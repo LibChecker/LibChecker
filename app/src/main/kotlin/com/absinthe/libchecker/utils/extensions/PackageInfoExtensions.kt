@@ -824,7 +824,6 @@ fun PackageInfo.isPageSizeCompat(): Boolean {
   }.getOrNull() ?: return false
 }
 
-
 fun PackageInfo.getSignatureSchemes(): ApkVerifier.Result? {
   return runCatching {
     ApkVerifier.Builder(File(applicationInfo!!.sourceDir)).build().verify()
