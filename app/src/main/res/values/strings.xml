@@ -155,6 +155,7 @@
   <string name="rx_kotlin_detail">Kotlin Extensions for RxJava</string>
   <string name="permission_not_granted">Not Granted</string>
   <string name="signature_detail">Signature Detail</string>
+  <string name="signature_scheme_version">Signature Scheme</string>
   <string name="signature_version">Version</string>
   <string name="signature_serial_number">Serial Number</string>
   <string name="signature_issuer">Issuer</string>

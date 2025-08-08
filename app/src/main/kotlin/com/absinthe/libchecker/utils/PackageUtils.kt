@@ -82,6 +82,7 @@ import com.absinthe.libchecker.utils.extensions.toClassDefType
 import com.absinthe.libchecker.utils.extensions.toHexString
 import com.absinthe.libchecker.utils.manifest.StaticLibraryReader
 import com.absinthe.libraries.utils.manager.TimeRecorder
+import com.android.apksig.ApkVerifier
 import com.android.tools.smali.dexlib2.Opcodes
 import dev.rikka.tools.refine.Refine
 import java.io.File
@@ -978,15 +979,38 @@ object PackageUtils {
   fun describeSignature(
     context: Context,
     dateFormat: DateFormat,
-    signature: Signature
+    signature: Signature,
+    sigResult: ApkVerifier.Result?
   ): LibStringItem {
     val bytes = signature.toByteArray()
     val certificate = X509Certificate.getInstance(bytes)
     val serialNumber = "0x${certificate.serialNumber.toString(16)}"
+    val schemes = mutableListOf<String>()
+    sigResult?.let {
+      if (it.isVerifiedUsingV1Scheme) {
+        schemes.add("V1")
+      }
+      if (it.isVerifiedUsingV2Scheme) {
+        schemes.add("V2")
+      }
+      if (it.isVerifiedUsingV3Scheme) {
+        schemes.add("V3")
+      }
+      if (it.isVerifiedUsingV31Scheme) {
+        schemes.add("V3.1")
+      }
+      if (it.isVerifiedUsingV4Scheme) {
+        schemes.add("V4")
+      }
+    }
     val source = buildString {
+      // Signature Scheme Version
+      append(context.getString(R.string.signature_scheme_version))
+      append(":")
+      appendLine(schemes.joinToString(", "))
       // Signature Version
       append(context.getString(R.string.signature_version))
-      append(":v")
+      append(":")
       appendLine(certificate.version + 1)
       // Signature Serial Number
       append(context.getString(R.string.signature_serial_number))

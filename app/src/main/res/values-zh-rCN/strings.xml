@@ -142,6 +142,7 @@
   <string name="rx_kotlin_detail">RxJava 的 Kotlin 扩展</string>
   <string name="permission_not_granted">未授予</string>
   <string name="signature_detail">签名详情</string>
+  <string name="signature_scheme_version">签名方案</string>
   <string name="signature_version">版本</string>
   <string name="signature_serial_number">序列号</string>
   <string name="signature_issuer">发行人</string>
