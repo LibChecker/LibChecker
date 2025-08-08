@@ -46,6 +46,7 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libchecker.utils.manifest.HiddenPermissionsReader
 import com.absinthe.libchecker.utils.manifest.ManifestReader
+import com.android.apksig.ApkVerifier
 import dev.rikka.tools.refine.Refine
 import hidden.DexFileHidden
 import java.io.File
@@ -650,7 +651,7 @@ fun PackageInfo.getSignatures(context: Context): Sequence<LibStringItem> {
     @Suppress("DEPRECATION")
     signatures
   }.orEmpty().asSequence().map {
-    PackageUtils.describeSignature(localedContext, dateFormat, it)
+    PackageUtils.describeSignature(localedContext, dateFormat, it, getSignatureSchemes())
   }
 }
 
@@ -821,4 +822,13 @@ fun PackageInfo.isPageSizeCompat(): Boolean {
     )
     return demands["pageSizeCompat"] as? String == "enabled"
   }.getOrNull() ?: return false
+}
+
+fun PackageInfo.getSignatureSchemes(): ApkVerifier.Result? {
+  return runCatching {
+    ApkVerifier.Builder(File(applicationInfo!!.sourceDir)).build().verify()
+  }.getOrElse {
+    Timber.e(it, "Failed to get signature schemes for package: $packageName")
+    null
+  }
 }
