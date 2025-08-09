@@ -17,6 +17,7 @@ import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.timber.FileLoggingTree
 import com.absinthe.libchecker.utils.timber.ReleaseTree
 import com.absinthe.libchecker.utils.timber.ThreadAwareDebugTree
 import com.absinthe.libraries.utils.utils.Utility
@@ -49,6 +50,7 @@ class LibCheckerApp : Application() {
     } else {
       Timber.plant(ReleaseTree())
     }
+    Timber.plant(FileLoggingTree(this))
     Telemetry.setEnable(GlobalValues.isAnonymousAnalyticsEnabled)
     LCRules.init(this)
     LCRules.setRemoteRepo(
