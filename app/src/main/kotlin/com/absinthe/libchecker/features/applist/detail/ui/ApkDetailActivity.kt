@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
+import android.app.ComponentCaller
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
@@ -39,6 +40,12 @@ class ApkDetailActivity :
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     viewModel.isApk = true
+    resolveIntent(intent)
+  }
+
+  override fun onNewIntent(intent: Intent, caller: ComponentCaller) {
+    super.onNewIntent(intent, caller)
+    Timber.d("onNewIntent: $intent")
     resolveIntent(intent)
   }
 

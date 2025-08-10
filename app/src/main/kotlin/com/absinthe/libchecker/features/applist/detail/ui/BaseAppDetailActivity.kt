@@ -1,13 +1,11 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
 import android.animation.ValueAnimator
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
-import android.text.SpannableStringBuilder
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -77,6 +75,7 @@ import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.addBackStateHandler
 import com.absinthe.libchecker.utils.extensions.copyToClipboard
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
@@ -117,8 +116,6 @@ abstract class BaseAppDetailActivity :
   MenuProvider {
 
   protected val viewModel: DetailViewModel by viewModels()
-  protected var isListReady = false
-  protected var menu: Menu? = null
   protected var typeList = mutableListOf<Int>()
 
   override var detailFragmentManager: DetailFragmentManager = DetailFragmentManager()
@@ -132,7 +129,6 @@ abstract class BaseAppDetailActivity :
 
   private var isHarmonyMode = false
   private var isToolbarCollapsed = false
-  private var hasReloadVariant = false
   private var featureListView: RecyclerView? = null
   private var processBarView: ProcessBarView? = null
 
@@ -151,20 +147,16 @@ abstract class BaseAppDetailActivity :
       enabledState = { !isKeyboardShowing() && binding.toolbar.hasExpandedActionView() },
       handler = { binding.toolbar.collapseActionView() }
     )
-  }
-
-  @SuppressLint("UnsafeIntentLaunch")
-  override fun onNewIntent(intent: Intent) {
-    super.onNewIntent(intent)
-    finish()
-    startActivity(intent)
+    initObserver()
   }
 
   protected fun onPackageInfoAvailable(packageInfo: PackageInfo, extraBean: DetailExtraBean?) {
-    viewModel.packageInfo = packageInfo
-    lifecycleScope.launch {
-      viewModel.packageInfoStateFlow.emit(packageInfo)
-    }
+    resetUiState()
+    viewModel.reset()
+    viewModel.initPackageInfo(packageInfo)
+    viewModel.initAbiInfo(packageInfo, apkAnalyticsMode)
+    val ai = packageInfo.applicationInfo!!
+
     binding.apply {
       try {
         supportActionBar?.title = null
@@ -184,9 +176,7 @@ abstract class BaseAppDetailActivity :
               false,
               this@BaseAppDetailActivity
             )
-            packageInfo.applicationInfo?.let { appInfo ->
-              load(appIconLoader.loadIcon(appInfo))
-            }
+            load(appIconLoader.loadIcon(ai))
             if (!apkAnalyticsMode || PackageUtils.isAppInstalled(packageInfo.packageName)) {
               setOnClickListener {
                 if (AntiShakeUtils.isInvalidClick(it)) {
@@ -199,6 +189,8 @@ abstract class BaseAppDetailActivity :
                   show(supportFragmentManager, AppInfoBottomSheetDialogFragment::class.java.name)
                 }
               }
+            } else {
+              setOnClickListener(null)
             }
             setOnLongClickListener {
               copyToClipboard()
@@ -219,10 +211,8 @@ abstract class BaseAppDetailActivity :
           }
         }
 
-        val extraInfo = SpannableStringBuilder()
         val showAndroidVersion =
           (GlobalValues.advancedOptions and AdvancedOptions.SHOW_ANDROID_VERSION) > 0
-        val ai = packageInfo.applicationInfo!!
         val versionInfo = buildSpannedString {
           if (!isHarmonyMode) {
             scale(0.8f) {
@@ -295,13 +285,11 @@ abstract class BaseAppDetailActivity :
             }
           }
         }
-        extraInfo.append(versionInfo)
 
         detailsTitle.extraInfoView.apply {
-          text = extraInfo
+          text = versionInfo
           setLongClickCopiedToClipboard(text)
         }
-        viewModel.initAbiInfo(packageInfo, apkAnalyticsMode)
       } catch (e: Exception) {
         Timber.e(e)
         Toasty.showLong(this@BaseAppDetailActivity, e.toString())
@@ -309,12 +297,6 @@ abstract class BaseAppDetailActivity :
         return
       }
 
-      if (hasReloadVariant) {
-        hasReloadVariant = false
-        return@apply
-      }
-
-      toolbarAdapter.data.clear()
       toolbarAdapter.addData(
         AppDetailToolbarItem(R.drawable.ic_lib_sort, R.string.menu_sort) {
           lifecycleScope.launch {
@@ -330,15 +312,12 @@ abstract class BaseAppDetailActivity :
       if (extraBean?.variant == Constants.VARIANT_HAP) {
         toolbarAdapter.addData(
           AppDetailToolbarItem(R.drawable.ic_harmonyos_logo, R.string.ability) {
-            if (!hasReloadVariant) {
-              isHarmonyMode = !isHarmonyMode
-              hasReloadVariant = true
-              onPackageInfoAvailable(packageInfo, extraBean)
-            }
+            isHarmonyMode = !isHarmonyMode
+            onPackageInfoAvailable(packageInfo, extraBean)
           }
         )
       }
-      if (this@BaseAppDetailActivity is ApkDetailActivity && PackageUtils.isAppInstalled(packageInfo.packageName)) {
+      if (apkAnalyticsMode && PackageUtils.isAppInstalled(packageInfo.packageName)) {
         toolbarAdapter.addData(
           AppDetailToolbarItem(R.drawable.ic_compare, R.string.compare_with_current) {
             runCatching {
@@ -361,9 +340,11 @@ abstract class BaseAppDetailActivity :
       }
 
       rvToolbar.apply {
-        adapter = toolbarAdapter
-        layoutManager =
-          LinearLayoutManager(this@BaseAppDetailActivity, RecyclerView.HORIZONTAL, false)
+        if (adapter != toolbarAdapter) {
+          adapter = toolbarAdapter
+          layoutManager =
+            LinearLayoutManager(this@BaseAppDetailActivity, RecyclerView.HORIZONTAL, false)
+        }
       }
 
       headerLayout.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
@@ -430,26 +411,22 @@ abstract class BaseAppDetailActivity :
       )
     }
 
-    if (packageInfo.applicationInfo?.sharedLibraryFiles?.isNotEmpty() == true) {
+    if (ai.sharedLibraryFiles?.isNotEmpty() == true) {
       lifecycleScope.launch(Dispatchers.IO) {
-        try {
-          val libs = runCatching {
-            PackageUtils.getStaticLibs(PackageUtils.getPackageInfo(packageInfo.packageName))
-          }.getOrDefault(emptyList())
-          if (libs.isNotEmpty()) {
-            withContext(Dispatchers.Main) {
-              typeList.add(1, STATIC)
-              tabTitles.add(1, getText(R.string.ref_category_static))
-              binding.tabLayout.addTab(
-                binding.tabLayout.newTab()
-                  .also { it.text = getText(R.string.ref_category_static) },
-                1
-              )
-              onStaticLibsAvailable()
-            }
+        val libs = runCatching {
+          PackageUtils.getStaticLibs(PackageUtils.getPackageInfo(packageInfo.packageName))
+        }.getOrDefault(emptyList())
+        if (libs.isNotEmpty()) {
+          withContext(Dispatchers.Main) {
+            typeList.add(1, STATIC)
+            tabTitles.add(1, getText(R.string.ref_category_static))
+            binding.tabLayout.addTab(
+              binding.tabLayout.newTab()
+                .also { it.text = getText(R.string.ref_category_static) },
+              1
+            )
+            onStaticLibsAvailable()
           }
-        } catch (e: PackageManager.NameNotFoundException) {
-          Timber.e(e)
         }
       }
     }
@@ -520,9 +497,75 @@ abstract class BaseAppDetailActivity :
       }
     mediator.attach()
 
+    if (featureListView == null) {
+      viewModel.initFeatures(packageInfo, extraBean?.features ?: -1)
+    }
+
+    if (!isHarmonyMode) {
+      viewModel.initComponentsData()
+    } else {
+      viewModel.initAbilities(this, packageInfo.packageName)
+    }
+
+    // To ensure onPostPackageInfoAvailable() is executed at the end of ui thread
+    lifecycleScope.launch(Dispatchers.IO) {
+      withContext(Dispatchers.Main) {
+        delay(1L)
+        onPostPackageInfoAvailable()
+      }
+    }
+  }
+
+  protected open fun onPostPackageInfoAvailable() {}
+
+  protected open fun onStaticLibsAvailable() {}
+
+  override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+    if (menuItem.itemId == android.R.id.home) {
+      finish()
+    }
+    return true
+  }
+
+  override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+    menuInflater.inflate(R.menu.app_detail_menu, menu)
+
+    val searchView = SearchView(this).apply {
+      setIconifiedByDefault(false)
+      setOnQueryTextListener(this@BaseAppDetailActivity)
+      queryHint = getText(R.string.search_hint)
+      isQueryRefinementEnabled = true
+
+      findViewById<View>(androidx.appcompat.R.id.search_plate).apply {
+        setBackgroundColor(Color.TRANSPARENT)
+      }
+    }
+
+    menu.findItem(R.id.search).apply {
+      setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW or MenuItem.SHOW_AS_ACTION_IF_ROOM)
+      actionView = searchView
+    }
+  }
+
+  override fun onQueryTextSubmit(query: String?): Boolean {
+    return false
+  }
+
+  override fun onQueryTextChange(newText: String): Boolean {
+    viewModel.queriedText = newText
+    detailFragmentManager.deliverFilterItemsByText(newText, lifecycleScope)
+    return false
+  }
+
+  override fun collapseAppBar() {
+    binding.headerLayout.setExpanded(false, true)
+  }
+
+  private fun initObserver() {
     viewModel.also {
       it.itemsCountStateFlow.onEach { live ->
-        if (detailFragmentManager.currentItemsCount != live.count && typeList[binding.tabLayout.selectedTabPosition] == live.locate) {
+        val position = binding.tabLayout.selectedTabPosition
+        if (position >= 0 && detailFragmentManager.currentItemsCount != live.count && typeList[position] == live.locate) {
           binding.tsComponentCount.setText(live.count.toString())
           detailFragmentManager.currentItemsCount = live.count
         }
@@ -554,7 +597,7 @@ abstract class BaseAppDetailActivity :
           Features.SPLIT_APKS -> {
             featureAdapter.addData(
               FeatureItem(R.drawable.ic_aab) {
-                FeaturesDialog.showSplitApksDialog(this, packageInfo)
+                FeaturesDialog.showSplitApksDialog(this, it.packageInfo)
               }
             )
           }
@@ -602,7 +645,7 @@ abstract class BaseAppDetailActivity :
           Features.XPOSED_MODULE -> {
             featureAdapter.addData(
               FeatureItem(R.drawable.ic_xposed) {
-                XposedInfoDialogFragment.newInstance(packageInfo.packageName)
+                XposedInfoDialogFragment.newInstance(it.packageInfo.packageName)
                   .show(supportFragmentManager, XposedInfoDialogFragment::class.java.name)
               }
             )
@@ -643,7 +686,7 @@ abstract class BaseAppDetailActivity :
           Features.Ext.APPLICATION_PROP -> {
             featureAdapter.addData(
               FeatureItem(R.drawable.ic_app_prop) {
-                FeaturesDialog.showAppPropDialog(this, packageInfo)
+                FeaturesDialog.showAppPropDialog(this, it.packageInfo)
               }
             )
           }
@@ -652,7 +695,7 @@ abstract class BaseAppDetailActivity :
             if (OsUtils.atLeastR() && !apkAnalyticsMode) {
               featureAdapter.addData(
                 FeatureItem(R.drawable.ic_install_source) {
-                  FeaturesDialog.showAppInstallSourceDialog(this, packageInfo.packageName)
+                  FeaturesDialog.showAppInstallSourceDialog(this, it.packageInfo.packageName)
                 }
               )
             }
@@ -681,9 +724,7 @@ abstract class BaseAppDetailActivity :
 
           val action: Runnable = object : Runnable {
             override fun run() {
-              if (featureListView == null) {
-                initFeatureListView()
-              }
+              initFeatureListView()
               if (featureListView?.parent != null) {
                 return
               }
@@ -712,75 +753,17 @@ abstract class BaseAppDetailActivity :
         }
       }.launchIn(lifecycleScope)
     }
-
-    if (featureListView == null) {
-      viewModel.initFeatures(packageInfo, extraBean?.features ?: -1)
-    }
-
-    if (!isHarmonyMode) {
-      viewModel.initComponentsData()
-    } else {
-      viewModel.initAbilities(this, packageInfo.packageName)
-    }
-
-    // To ensure onPostPackageInfoAvailable() is executed at the end of ui thread
-    lifecycleScope.launch(Dispatchers.IO) {
-      withContext(Dispatchers.Main) {
-        delay(1L)
-        onPostPackageInfoAvailable()
-      }
-    }
   }
 
-  protected open fun onPostPackageInfoAvailable() {}
-
-  protected open fun onStaticLibsAvailable() {}
-
-  override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-    if (menuItem.itemId == android.R.id.home) {
-      finish()
-    }
-    return true
+  private fun resetUiState() {
+    removeFeatureListView()
+    featureAdapter.setList(emptyList())
+    toolbarAdapter.setList(emptyList())
   }
 
-  override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-    menuInflater.inflate(R.menu.app_detail_menu, menu)
-    this.menu = menu
-
-    val searchView = SearchView(this).apply {
-      setIconifiedByDefault(false)
-      setOnQueryTextListener(this@BaseAppDetailActivity)
-      queryHint = getText(R.string.search_hint)
-      isQueryRefinementEnabled = true
-
-      findViewById<View>(androidx.appcompat.R.id.search_plate).apply {
-        setBackgroundColor(Color.TRANSPARENT)
-      }
-    }
-
-    menu.findItem(R.id.search).apply {
-      setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW or MenuItem.SHOW_AS_ACTION_IF_ROOM)
-      actionView = searchView
-    }
-  }
-
-  override fun onQueryTextSubmit(query: String?): Boolean {
-    return false
-  }
-
-  override fun onQueryTextChange(newText: String): Boolean {
-    viewModel.queriedText = newText
-    detailFragmentManager.deliverFilterItemsByText(newText, lifecycleScope)
-    return false
-  }
-
-  override fun collapseAppBar() {
-    binding.headerLayout.setExpanded(false, true)
-  }
-
-  private fun initFeatureListView(): Boolean {
+  private fun initFeatureListView() {
     if (featureListView != null) {
-      return false
+      return
     }
 
     featureListView = RecyclerView(this).also {
@@ -795,8 +778,15 @@ abstract class BaseAppDetailActivity :
       it.clipChildren = false
       it.overScrollMode = View.OVER_SCROLL_NEVER
     }
+  }
 
-    return true
+  private fun removeFeatureListView() {
+    featureListView?.let {
+      if (it.parent != null) {
+        (it.parent as? ViewGroup)?.removeView(it)
+      }
+    }
+    featureListView = null
   }
 
   private val toolbarQuicklyLaunchItem by unsafeLazy {
@@ -826,107 +816,115 @@ abstract class BaseAppDetailActivity :
     }
   }
 
-  private fun navigateToSnapshotDetailPage(basePackage: PackageInfo, analysisPackage: PackageInfo) {
-    val diff = SnapshotDiffItem(
-      packageName = basePackage.packageName,
-      updateTime = basePackage.lastUpdateTime,
-      labelDiff = SnapshotDiffItem.DiffNode(
-        basePackage.getAppName().toString(),
-        analysisPackage.getAppName().toString()
-      ),
-      versionNameDiff = SnapshotDiffItem.DiffNode(
-        basePackage.versionName.toString(),
-        analysisPackage.versionName
-      ),
-      versionCodeDiff = SnapshotDiffItem.DiffNode(
-        basePackage.getVersionCode(),
-        analysisPackage.getVersionCode()
-      ),
-      abiDiff = SnapshotDiffItem.DiffNode(
-        PackageUtils.getAbi(basePackage).toShort(),
-        PackageUtils.getAbi(analysisPackage).toShort()
-      ),
-      targetApiDiff = SnapshotDiffItem.DiffNode(
-        basePackage.applicationInfo?.targetSdkVersion?.toShort() ?: 0,
-        analysisPackage.applicationInfo?.targetSdkVersion?.toShort()
-      ),
-      compileSdkDiff = SnapshotDiffItem.DiffNode(
-        basePackage.getCompileSdkVersion().toShort(),
-        analysisPackage.getCompileSdkVersion().toShort()
-      ),
-      minSdkDiff = SnapshotDiffItem.DiffNode(
-        basePackage.applicationInfo?.minSdkVersion?.toShort() ?: 0,
-        analysisPackage.applicationInfo?.minSdkVersion?.toShort()
-      ),
-      nativeLibsDiff = SnapshotDiffItem.DiffNode(
-        PackageUtils.getNativeDirLibs(basePackage).toJson().orEmpty(),
-        PackageUtils.getNativeDirLibs(analysisPackage).toJson().orEmpty()
-      ),
-      servicesDiff = SnapshotDiffItem.DiffNode(
-        PackageUtils.getComponentStringList(
-          basePackage,
-          SERVICE,
-          false
-        ).toJson().orEmpty(),
-        PackageUtils.getComponentStringList(
-          analysisPackage,
-          SERVICE,
-          false
-        ).toJson().orEmpty()
-      ),
-      activitiesDiff = SnapshotDiffItem.DiffNode(
-        PackageUtils.getComponentStringList(
-          basePackage,
-          ACTIVITY,
-          false
-        ).toJson().orEmpty(),
-        PackageUtils.getComponentStringList(
-          analysisPackage,
-          ACTIVITY,
-          false
-        ).toJson().orEmpty()
-      ),
-      receiversDiff = SnapshotDiffItem.DiffNode(
-        PackageUtils.getComponentStringList(
-          basePackage,
-          RECEIVER,
-          false
-        ).toJson().orEmpty(),
-        PackageUtils.getComponentStringList(
-          analysisPackage,
-          RECEIVER,
-          false
-        ).toJson().orEmpty()
-      ),
-      providersDiff = SnapshotDiffItem.DiffNode(
-        PackageUtils.getComponentStringList(
-          basePackage,
-          PROVIDER,
-          false
-        ).toJson().orEmpty(),
-        PackageUtils.getComponentStringList(
-          analysisPackage,
-          PROVIDER,
-          false
-        ).toJson().orEmpty()
-      ),
-      permissionsDiff = SnapshotDiffItem.DiffNode(
-        basePackage.getPermissionsList().toJson().orEmpty(),
-        analysisPackage.getPermissionsList().toJson().orEmpty()
-      ),
-      metadataDiff = SnapshotDiffItem.DiffNode(
-        PackageUtils.getMetaDataItems(basePackage).toJson().orEmpty(),
-        PackageUtils.getMetaDataItems(analysisPackage).toJson().orEmpty()
-      ),
-      packageSizeDiff = SnapshotDiffItem.DiffNode(
-        basePackage.getPackageSize(true),
-        analysisPackage.getPackageSize(true)
+  private fun navigateToSnapshotDetailPage(basePackage: PackageInfo, analysisPackage: PackageInfo) = lifecycleScope.launch(Dispatchers.Main) {
+    val dialog = UiUtils.createLoadingDialog(this@BaseAppDetailActivity)
+    dialog.show()
+    withContext(Dispatchers.IO) {
+      val diff = SnapshotDiffItem(
+        packageName = basePackage.packageName,
+        updateTime = basePackage.lastUpdateTime,
+        labelDiff = SnapshotDiffItem.DiffNode(
+          basePackage.getAppName().toString(),
+          analysisPackage.getAppName().toString()
+        ),
+        versionNameDiff = SnapshotDiffItem.DiffNode(
+          basePackage.versionName.toString(),
+          analysisPackage.versionName
+        ),
+        versionCodeDiff = SnapshotDiffItem.DiffNode(
+          basePackage.getVersionCode(),
+          analysisPackage.getVersionCode()
+        ),
+        abiDiff = SnapshotDiffItem.DiffNode(
+          PackageUtils.getAbi(basePackage).toShort(),
+          PackageUtils.getAbi(analysisPackage).toShort()
+        ),
+        targetApiDiff = SnapshotDiffItem.DiffNode(
+          basePackage.applicationInfo?.targetSdkVersion?.toShort() ?: 0,
+          analysisPackage.applicationInfo?.targetSdkVersion?.toShort()
+        ),
+        compileSdkDiff = SnapshotDiffItem.DiffNode(
+          basePackage.getCompileSdkVersion().toShort(),
+          analysisPackage.getCompileSdkVersion().toShort()
+        ),
+        minSdkDiff = SnapshotDiffItem.DiffNode(
+          basePackage.applicationInfo?.minSdkVersion?.toShort() ?: 0,
+          analysisPackage.applicationInfo?.minSdkVersion?.toShort()
+        ),
+        nativeLibsDiff = SnapshotDiffItem.DiffNode(
+          PackageUtils.getNativeDirLibs(basePackage).toJson().orEmpty(),
+          PackageUtils.getNativeDirLibs(analysisPackage).toJson().orEmpty()
+        ),
+        servicesDiff = SnapshotDiffItem.DiffNode(
+          PackageUtils.getComponentStringList(
+            basePackage,
+            SERVICE,
+            false
+          ).toJson().orEmpty(),
+          PackageUtils.getComponentStringList(
+            analysisPackage,
+            SERVICE,
+            false
+          ).toJson().orEmpty()
+        ),
+        activitiesDiff = SnapshotDiffItem.DiffNode(
+          PackageUtils.getComponentStringList(
+            basePackage,
+            ACTIVITY,
+            false
+          ).toJson().orEmpty(),
+          PackageUtils.getComponentStringList(
+            analysisPackage,
+            ACTIVITY,
+            false
+          ).toJson().orEmpty()
+        ),
+        receiversDiff = SnapshotDiffItem.DiffNode(
+          PackageUtils.getComponentStringList(
+            basePackage,
+            RECEIVER,
+            false
+          ).toJson().orEmpty(),
+          PackageUtils.getComponentStringList(
+            analysisPackage,
+            RECEIVER,
+            false
+          ).toJson().orEmpty()
+        ),
+        providersDiff = SnapshotDiffItem.DiffNode(
+          PackageUtils.getComponentStringList(
+            basePackage,
+            PROVIDER,
+            false
+          ).toJson().orEmpty(),
+          PackageUtils.getComponentStringList(
+            analysisPackage,
+            PROVIDER,
+            false
+          ).toJson().orEmpty()
+        ),
+        permissionsDiff = SnapshotDiffItem.DiffNode(
+          basePackage.getPermissionsList().toJson().orEmpty(),
+          analysisPackage.getPermissionsList().toJson().orEmpty()
+        ),
+        metadataDiff = SnapshotDiffItem.DiffNode(
+          PackageUtils.getMetaDataItems(basePackage).toJson().orEmpty(),
+          PackageUtils.getMetaDataItems(analysisPackage).toJson().orEmpty()
+        ),
+        packageSizeDiff = SnapshotDiffItem.DiffNode(
+          basePackage.getPackageSize(true),
+          analysisPackage.getPackageSize(true)
+        )
       )
-    )
 
-    val intent = Intent(this, SnapshotDetailActivity::class.java)
-      .putExtras(bundleOf(EXTRA_ENTITY to diff))
-    startActivity(intent)
+      withContext(Dispatchers.Main) {
+        dialog.dismiss()
+
+        val intent = Intent(this@BaseAppDetailActivity, SnapshotDetailActivity::class.java)
+          .putExtras(bundleOf(EXTRA_ENTITY to diff))
+        startActivity(intent)
+      }
+    }
   }
 
   private fun initProcessBarView() {
