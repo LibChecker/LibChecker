@@ -24,6 +24,7 @@
   <string name="uncharted_territory">未知の領域</string>
   <string name="get_app_list_denied_tip">インストールされているアプリに関する情報を取得する為に\nLibCheckerの権限を許可してください。</string>
   <string name="advanced_menu">詳細メニュー</string>
+  <string name="archived_app">Archived app</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">%s ABI のアプリ</string>
   <string name="title_statistics_dialog_no_native_libs">ネイティブライブラリのないアプリ</string>
@@ -45,13 +46,18 @@
   <string name="ref_category_shared_uid">共有UID</string>
   <string name="ref_category_signatures">署名</string>
   <string name="ref_category_only_not_marked">マークされていないもののみ</string>
+  <string name="ref_category_action">Action</string>
   <string name="string_kotlin_used">Kotlin使用済み</string>
   <string name="string_kotlin_unused">Kotlin未使用</string>
   <string name="string_compose_used">Jetpack Compose使用済み</string>
   <string name="string_compose_unused">Jetpack Compose未使用</string>
+  <string name="android_dist_label">Distribution</string>
   <string name="android_dist_source">ソース</string>
   <string name="android_dist_title">Androidバージョン分布統計</string>
   <string name="android_dist_subtitle_format">更新時間：%s</string>
+  <string name="chart_abi_detailed">Detailed</string>
+  <string name="chart_abi_concise">Concise</string>
+  <string name="chart_item_not_support">Not Support</string>
   <!--  About  -->
   <string name="settings_about">アプリについて</string>
   <string name="settings_about_summary">これはLibCheckerです！</string>
@@ -61,6 +67,9 @@
   <string name="settings_rate_us_summary">これにより、より多くの人々に見つけてもらえます</string>
   <string name="settings_get_updates">アップデートを入手</string>
   <string name="settings_get_updates_summary">より安定し、機能が充実した最新バージョンを入手してください</string>
+  <string name="settings_get_updates_in_app">In-app</string>
+  <string name="settings_get_updates_in_app_chip_stable">Stable</string>
+  <string name="settings_get_updates_in_app_chip_ci">CI</string>
   <string name="about_info">このアプリは、デバイス内のアプリケーションで使用されているサードパーティのライブラリを表示するために使用されます。</string>
   <string name="toolbar_rate">評価</string>
   <string name="resource_declaration">アプリケーションの一部のリソースは、以下から提供されています。</string>
@@ -80,10 +89,12 @@
   <string name="cloud_rules">クラウドルール</string>
   <string name="dark_mode">ダークモード</string>
   <string name="snapshot_keep">スナップショットのデフォルト保持ルール</string>
+  <string name="export_log">Export Log</string>
   <string name="apk_analytics_summary">APKファイルをクリックすると詳細ページが開きます</string>
   <string name="colorful_icon_summary">一部のマークされたライブラリはカラフルなロゴとして表示されます</string>
   <string name="lib_ref_threshold_summary">閾値に達したライブラリ参照数のみがリストに表示されます</string>
   <string name="reload_apps_summary">アプリリストが異常に表示された場合は、試してください</string>
+  <string name="export_log_summary">Export the log file of the app</string>
   <string name="help_docs_summary">Telegramグループに参加</string>
   <string name="join_telegram_group_summary">Telegramグループに参加する</string>
   <string name="anonymous_statistics_summary">Google Firebaseを使用して、最も一般的に使用されるマークされたライブラリやいくつかの使用習慣データを匿名で送信し、LibCheckerをより実用的にしています</string>
@@ -116,8 +127,14 @@
   <string name="play_app_signing_details">Playアプリの署名では、Googleがあなたのアプリの署名キーを管理し、保護し、それを使用して、あなたのアプリバンドルから生成された最適化された配布APKに署名します。Playアプリの署名は、あなたのアプリの署名キーをGoogleの安全なインフラストラクチャ上に保存し、セキュリティを向上させるためのアップグレードオプションを提供します。</string>
   <string name="pwa_details">プログレッシブWebアプリ（PWA）は、現代のAPIを使用して構築および強化され、高度な機能、信頼性、インストール可能性を提供しながら、単一のコードベースでどのデバイスでもどこでも誰にでもアクセスします。</string>
   <string name="jetpack_compose_details">Jetpack Composeは、AndroidのネイティブUIを構築するための現代的なツールキットです。これにより、AndroidでのUI開発が簡略化され、加速します。少ないコード、強力なツール、直感的なKotlin APIを使用して、すぐにアプリを実現します。</string>
+  <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform is a modern declarative and reactive UI framework developed by JetBrains that provides a simple way to build user interfaces with a small amount of Kotlin code. It also allows you to write your UI once and run it on any of the supported platforms – iOS, Android, desktop (Windows, macOS, Linux), and web.</string>
+  <string name="multi_arch_dialog_details"><![CDATA[If an app exposes an API to other apps that can be either 32 bit or 64 bit, the app must have the <b>android:multiarch</b> property set to true within its manifest to avoid potential errors.]]></string>
   <string name="extract_native_libs_tip">アプリは次のものを宣言します</string>
   <string name="xml_detail">XML詳細</string>
+  <string name="lib_detail_dialog_title_16kb_page_size">16 KB Page Size Support</string>
+  <string name="lib_detail_dialog_content_16kb_page_size">Historically, Android has only supported 4 KB memory page sizes, which has optimized system memory performance for the average amount of total memory that Android devices have typically had. Beginning with Android 15, AOSP supports devices that are configured to use a page size of 16 KB (16 KB devices). If your app uses any NDK libraries, either directly or indirectly through an SDK, then you will need to rebuild your app for it to work on these 16 KB devices.</string>
+  <string name="lib_detail_dialog_title_16kb_page_size_compat">16 KB Backcompat</string>
+  <string name="lib_detail_dialog_content_16kb_page_size_compat"><![CDATA[Android 15 introduced support for 16 KB memory pages to optimize performance of the platform. Android 16 adds a compatibility mode, allowing some apps built for 4 KB memory pages to run on a device configured for 16 KB memory pages.\n\nIf Android detects that your app has 4 KB aligned memory pages, it automatically uses compatibility mode and display a notification dialog to the user. Setting the <b>android:pageSizeCompat</b> property in the <b>AndroidManifest.xml</b> to enable the backwards compatibility mode will prevent the display of the dialog when your app launches. For best performance, reliability, and stability, your app should still be 16 KB aligned.]]></string>
   <string name="format_last_updated">更新日：%s</string>
   <string name="menu_process">プロセス</string>
   <string name="menu_split">分割</string>
@@ -128,6 +145,7 @@
   <string name="rx_kotlin_detail">RxJavaのKotlin Extensions</string>
   <string name="permission_not_granted">許可されていません</string>
   <string name="signature_detail">署名の詳細</string>
+  <string name="signature_scheme_version">Signature Scheme</string>
   <string name="signature_version">バージョン</string>
   <string name="signature_serial_number">シリアル番号</string>
   <string name="signature_issuer">発行者</string>
@@ -157,6 +175,9 @@
   <string name="lib_detail_app_install_source_title">インストールソース</string>
   <string name="lib_detail_app_install_source_originating_package">インストールをリクエストしたパッケージ</string>
   <string name="lib_detail_app_install_source_installing_package">インストールを実行するパッケージ</string>
+  <string name="lib_detail_app_installed_time">Installation Time</string>
+  <string name="lib_detail_app_first_installed_time">First installed time: </string>
+  <string name="lib_detail_app_last_updated_time">Last installed time: </string>
   <string name="lib_detail_app_install_source_empty">不明</string>
   <string name="lib_detail_app_install_source_empty_detail">Shellまたはアンインストール済みのアプリ</string>
   <string name="lib_detail_app_install_source_shizuku_usage">Androidはインストールを要求したアプリを取得するAPIを制限しているため、Shizukuを使用してインストールを要求したアプリを取得します。</string>
@@ -168,6 +189,9 @@
   <string name="lib_detail_app_install_source_shizuku_not_running_detail">ここをクリックしてShizukuにジャンプして起動します</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizukuが承認されていません</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">ここをクリックしてShizukuのインストールリクエスターに承認します</string>
+  <string name="lib_detail_elf_info">More Info</string>
+  <string name="lib_detail_dependency_tip">Dependencies</string>
+  <string name="lib_detail_entry_points_tip">Entry Points</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">クリップボードにコピーされました</string>
   <string name="toast_not_existing_market">アプリマーケットが存在しません</string>
@@ -175,6 +199,7 @@
   <string name="toast_cant_open_app">このアプリを開くことができません</string>
   <string name="toast_cloud_rules_update_error">クラウドルールの更新に失敗しました。再試行してください。</string>
   <string name="toast_not_enough_storage_space">ストレージスペースが不足しています</string>
+  <string name="toast_downloading_app">Download requested</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">現在のスナップショットを保存</string>
   <string name="snapshot_current_timestamp">現在のスナップショットのタイムスタンプ</string>
@@ -192,6 +217,8 @@
   <string name="snapshot_preinstalled_app">事前にインストールされたアプリ</string>
   <string name="snapshot_generate_text_report">テキストレポートを生成</string>
   <string name="snapshot_scheme_tip"><![CDATA[ヒント：現在、次のようにバックグラウンドでスナップショットを生成できます：<br><b>%s</b>]]></string>
+  <string name="snapshot_build_id">Build ID</string>
+  <string name="snapshot_build_security_patch">Security Patch</string>
   <!--  Dialog  -->
   <string name="dialog_title_reload_apps">すべてのアプリを再読み込みしますか？</string>
   <string name="dialog_subtitle_reload_apps">これには数秒かかる場合があります</string>
@@ -213,6 +240,9 @@
   <string name="album_item_comparison_choose_local_apk">ローカルのAPKを選択</string>
   <string name="album_item_management_title">管理</string>
   <string name="album_item_management_subtitle">すべてのスナップショットを管理</string>
+  <string name="album_item_management_snapshot_auto_remove_default_title">Keep Only the Most Recent Snapshots</string>
+  <string name="album_item_management_snapshot_auto_remove_specific_title">Keep Only the %d Most Recent Items</string>
+  <string name="album_item_management_snapshot_auto_remove_desc">Starting from tapping \"%s\", only the most recent snapshots will be retained, and the older snapshots will be automatically deleted.</string>
   <string name="album_item_backup_restore_title">バックアップと復元</string>
   <string name="album_item_backup_restore_subtitle">スナップショットをバックアップ/復元します</string>
   <string name="album_item_track_title">トラック</string>
@@ -224,6 +254,7 @@
   <string name="album_restore_detail">%1$s : 合計で%2$s件のアイテム\n</string>
   <string name="album_click_to_choose">クリックで選択</string>
   <string name="album_dialog_delete_snapshot_message">処理中…</string>
+  <string name="album_snapshot_top_apps_not_initialized">Not loaded yet</string>
   <!--  Integration  -->
   <string name="integration_monkey_king_menu_block">MonkeyKing Purifyでブロックをする</string>
   <string name="integration_monkey_king_menu_unblock">MonkeyKing Purifyでのブロックを解除</string>
@@ -257,4 +288,5 @@
   <string name="snapshot_menu_show_update_time">更新時間を表示</string>
   <string name="snapshot_menu_hide_no_component_changes">コンポーネントの変更がないものを隠す</string>
   <string name="snapshot_menu_diff_highlight">差分のハイライト表示</string>
+  <string name="snapshot_menu_use_iec_units">Use IEC Units</string>
 </resources>
