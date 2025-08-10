@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.features.applist.detail.ui.impl
 
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.NATIVE
@@ -71,9 +72,11 @@ class NativeAnalysisFragment :
         }
       }.launchIn(lifecycleScope)
       nativeLibTabs.onEach {
+        binding.tabLayout.removeAllTabs()
         it?.forEach { title ->
           binding.tabLayout.addTab(binding.tabLayout.newTab().setText(title), false)
         }
+        binding.tabLayout.isVisible = binding.tabLayout.tabCount > 1
         lifecycleScope.launch(Dispatchers.IO) {
           val flow = viewModel.abiBundleStateFlow
           val abi = (flow.value ?: flow.filterNotNull().first()).abi

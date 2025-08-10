@@ -755,7 +755,8 @@ object PackageUtils {
     }
 
     if (applicationInfo.sourceDir == null) {
-      throw IllegalStateException("sourceDir is null: ${packageInfo.packageName}")
+      Timber.e("sourceDir is null: ${packageInfo.packageName}")
+      return ERROR
     }
 
     val file = File(applicationInfo.sourceDir)

@@ -96,6 +96,7 @@ class DetailsTitleView(
   }
 
   fun setAbiLabels(abis: List<AbiLabelNode>) {
+    abiLabelsFlexLayout.removeAllViews()
     abis.forEach {
       val res = when (it.abi) {
         Constants.ARMV8 -> R.drawable.ic_abi_label_arm64_v8a
