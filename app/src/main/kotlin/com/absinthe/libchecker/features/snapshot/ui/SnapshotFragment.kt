@@ -629,7 +629,7 @@ class SnapshotFragment :
       binding.list.smoothScrollToPosition(0)
     } else {
       flip(VF_LOADING)
-      viewModel.compareDiff(GlobalValues.snapshotTimestamp)
+      viewModel.compareDiff(currentTimeStamp)
     }
   }
 

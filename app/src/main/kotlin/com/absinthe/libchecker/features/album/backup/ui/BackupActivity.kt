@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
@@ -101,6 +102,7 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
     private lateinit var backupResultLauncher: ActivityResultLauncher<String>
     private lateinit var restoreResultLauncher: ActivityResultLauncher<String>
     private lateinit var roomBackup: RoomBackup
+    private var loadingDialog: AlertDialog? = null
 
     override fun onCreateView(
       inflater: LayoutInflater,
@@ -110,6 +112,12 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
       return super.onCreateView(inflater, container, savedInstanceState).apply {
         addPaddingTop(96.dp)
       }
+    }
+
+    override fun onStart() {
+      super.onStart()
+      loadingDialog?.dismiss()
+      loadingDialog = null
     }
 
     override fun onAttach(context: Context) {
@@ -153,8 +161,8 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
 
           if (StorageUtils.isExternalStorageWritable) {
             if (FileUtils.getFileSize(Repositories.getLCDatabaseFile()) > 100 * 1024 * 1024) {
-              val dialog = UiUtils.createLoadingDialog(requireActivity())
-              dialog.show()
+              loadingDialog = UiUtils.createLoadingDialog(requireActivity())
+              loadingDialog?.show()
               roomBackup
                 .database(LCDatabase.getDatabase())
                 .enableLogDebug(true)
@@ -165,7 +173,8 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
                   onCompleteListener { success, message, exitCode ->
                     Timber.d("success: $success, message: $message, exitCode: $exitCode")
                     lifecycleScope.launch(Dispatchers.Main) {
-                      dialog.dismiss()
+                      loadingDialog?.dismiss()
+                      loadingDialog = null
                     }
                   }
                 }
