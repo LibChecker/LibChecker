@@ -143,7 +143,7 @@
   <string name="rx_kotlin_detail">RxJava için Kotlin Uzantıları</string>
   <string name="permission_not_granted">Verilmedi</string>
   <string name="signature_detail">İmza Ayrıntısı</string>
-  <string name="signature_scheme_version">Signature Scheme</string>
+  <string name="signature_scheme_version">İmza Şeması</string>
   <string name="signature_version">Sürüm</string>
   <string name="signature_serial_number">Seri Numarası</string>
   <string name="signature_issuer">Veren</string>
