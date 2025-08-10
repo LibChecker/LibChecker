@@ -5,6 +5,7 @@ import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Environment
 import android.os.RemoteException
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -12,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.activityViewModels
@@ -43,6 +45,7 @@ import com.absinthe.libraries.utils.extensions.getBoolean
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.rulesbundle.LCRemoteRepo
 import com.absinthe.rulesbundle.LCRules
+import java.io.File
 import java.util.Locale
 import kotlinx.coroutines.launch
 import rikka.material.app.LocaleDelegate
@@ -180,6 +183,49 @@ class SettingsFragment :
             .setNegativeButton(android.R.string.cancel, null)
             .create()
             .show()
+          true
+        }
+      }
+    }
+
+    findPreference<Preference>(Constants.PREF_EXPORT_LOG)?.apply {
+      setOnPreferenceClickListener {
+        if (AntiShakeUtils.isInvalidClick(prefRecyclerView)) {
+          false
+        } else {
+          val logDir = File(requireContext().cacheDir, "logs")
+          if (!logDir.exists() || !logDir.isDirectory) {
+            return@setOnPreferenceClickListener true
+          }
+
+          val latestLogFile = logDir.listFiles()
+            ?.filter { it.isFile && it.name.endsWith(".log") }
+            ?.maxByOrNull { it.lastModified() }
+
+          if (latestLogFile == null) {
+            return@setOnPreferenceClickListener true
+          }
+
+          Timber.d("Latest log file: ${latestLogFile.absolutePath}")
+          try {
+            val uri = FileProvider.getUriForFile(
+              requireContext(),
+              "${BuildConfig.APPLICATION_ID}.fileprovider",
+              latestLogFile
+            )
+            val intent = Intent(Intent.ACTION_SEND).apply {
+              type = "text/plain"
+              putExtra(Intent.EXTRA_STREAM, uri)
+              addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            startActivity(Intent.createChooser(intent, getString(R.string.export_log)))
+          } catch (e: Exception) {
+            Timber.e(e)
+            Toasty.showShort(requireContext(), e.toString())
+          }
+          true
+
+          recordPreferenceEvent(Constants.PREF_EXPORT_LOG)
           true
         }
       }

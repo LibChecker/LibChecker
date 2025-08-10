@@ -88,10 +88,12 @@
   <string name="cloud_rules">云端规则</string>
   <string name="dark_mode">深色模式</string>
   <string name="snapshot_keep">快照默认保留规则</string>
+  <string name="export_log">导出日志</string>
   <string name="apk_analytics_summary">当点击一个 APK 文件时打开详情页</string>
   <string name="colorful_icon_summary">部分标记库会呈现为彩色 Logo</string>
   <string name="lib_ref_threshold_summary">只有库引用数量达到阈值的库才显示在列表中</string>
   <string name="reload_apps_summary">当应用列表显示不正常时尝试此选项</string>
+  <string name="export_log_summary">导出应用的日志文件</string>
   <string name="help_docs_summary">学习如何使用 LibChecker</string>
   <string name="join_telegram_group_summary">来一起划水</string>
   <string name="anonymous_statistics_summary">我们使用 Google Firebase 来匿名发送最常被人们使用的标记库和一些使用习惯数据来使得 LibChecker 变得更加实用</string>

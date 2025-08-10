@@ -3,4 +3,5 @@
   <external-cache-path
     name="lc_temp_icon.png"
     path="." />
+  <cache-path name="logs" path="." />
 </path>

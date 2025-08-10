@@ -74,6 +74,12 @@
       app:summary="@string/reload_apps_summary"
       app:title="@string/reload_apps" />
 
+    <Preference
+      app:icon="@drawable/ic_log"
+      app:key="exportLog"
+      app:summary="@string/export_log_summary"
+      app:title="@string/export_log" />
+
   </PreferenceCategory>
 
   <PreferenceCategory
