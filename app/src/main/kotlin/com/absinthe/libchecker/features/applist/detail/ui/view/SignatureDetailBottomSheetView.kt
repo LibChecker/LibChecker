@@ -43,6 +43,7 @@ class SignatureDetailBottomSheetView(context: Context) :
     ).also {
       it.topMargin = 12.dp
     }
+    setPadding(16.dp, 0, 16.dp, 0)
     overScrollMode = OVER_SCROLL_NEVER
     adapter = this@SignatureDetailBottomSheetView.adapter
     layoutManager = LinearLayoutManager(context)
@@ -56,8 +57,7 @@ class SignatureDetailBottomSheetView(context: Context) :
 
   init {
     orientation = VERTICAL
-    val padding = 16.dp
-    setPadding(padding, padding, padding, 0)
+    setPadding(0, 16.dp, 0, 0)
     addView(header)
     addView(icon)
     addView(list)
