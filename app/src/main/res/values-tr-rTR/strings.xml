@@ -89,10 +89,12 @@
   <string name="cloud_rules">Bulut Kuralları</string>
   <string name="dark_mode">Karanlık Mod</string>
   <string name="snapshot_keep">Anlık Görüntü Varsayılan Saklama Kuralı</string>
+  <string name="export_log">Günlüğü Dışa Aktar</string>
   <string name="apk_analytics_summary">APK dosyasına tıkladığınızda ayrıntı sayfasını açar</string>
   <string name="colorful_icon_summary">İşaretlenmiş kütüphanelerin bir kısmı renkli logo olarak görünecek</string>
   <string name="lib_ref_threshold_summary">Sadece kütüphane referans sayısı eşiğe ulaşan kütüphaneler listede gösterilir</string>
   <string name="reload_apps_summary">Uygulama listesi anormal görüntülendiğinde deneyin</string>
+  <string name="export_log_summary">Uygulamanın günlük dosyasını dışa aktar</string>
   <string name="help_docs_summary">LibChecker\'ı nasıl kullanacağınızı öğrenin</string>
   <string name="join_telegram_group_summary">Telegram grubumuza katılın</string>
   <string name="anonymous_statistics_summary">LibChecker\'ı daha pratik hale getirmek için en sık kullanılan işaretli kütüphaneleri ve bazı kullanım alışkanlıkları verilerini anonim olarak göndermek için Google Firebase kullanıyoruz</string>
