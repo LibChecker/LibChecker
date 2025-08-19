@@ -1,12 +1,12 @@
 [versions]
-agp = "8.12.0"
+agp = "8.12.1"
 aboutlibraries = "12.2.4"
 androidX-lifecycle = "2.9.2"
 androidX-room = "2.7.2"
 firebase-bom = "34.1.0"
 hiddenApiRefine = "4.4.0"
-kotlin = "2.2.0"
-protoc = "4.31.1"
+kotlin = "2.2.10"
+protoc = "4.32.0"
 shizuku = "13.1.5"
 square-retrofit = "3.0.0"
 zhaobozhen = "1.1.6"
@@ -19,7 +19,7 @@ gms = { id = "com.google.gms.google-services", version = "4.4.3" }
 hiddenApiRefine = { id = "dev.rikka.tools.refine", version.ref = "hiddenApiRefine" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
-ksp = { id = "com.google.devtools.ksp", version = "2.2.0-2.0.2" }
+ksp = { id = "com.google.devtools.ksp", version = "2.2.10-2.0.2" }
 protobuf = { id = "com.google.protobuf", version = "0.9.5" }
 moshiX = "dev.zacsweers.moshix:0.31.0"
 spotless = "com.diffplug.spotless:7.2.1"
@@ -36,8 +36,8 @@ androidX-annotation = "androidx.annotation:annotation:1.9.1"
 androidX-appCompat = "androidx.appcompat:appcompat:1.7.1"
 androidX-browser = "androidx.browser:browser:1.9.0"
 androidX-constraintLayout = "androidx.constraintlayout:constraintlayout:2.2.1"
-androidX-core = "androidx.core:core-ktx:1.16.0"
-androidX-fragment = "androidx.fragment:fragment-ktx:1.8.8"
+androidX-core = "androidx.core:core-ktx:1.17.0"
+androidX-fragment = "androidx.fragment:fragment-ktx:1.8.9"
 androidX-lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "androidX-lifecycle" }
 androidX-lifecycle-viewModel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidX-lifecycle" }
 androidX-preference = "androidx.preference:preference-ktx:1.2.1"
