@@ -60,13 +60,13 @@ class ELFInfoBottomSheetView(context: Context) :
         iconRes = R.drawable.ic_content,
         tipRes = R.string.lib_detail_dependency_tip,
         textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2),
-        text = deps
+        text = deps.takeIf { it.isNotEmpty() } ?: context.getString(R.string.empty_list)
       ),
       LibDetailItem(
         iconRes = R.drawable.ic_content,
         tipRes = R.string.lib_detail_entry_points_tip,
         textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2),
-        text = entryPoints
+        text = entryPoints.takeIf { it.isNotEmpty() } ?: context.getString(R.string.empty_list)
       )
     )
     contentAdapter.setList(list)
