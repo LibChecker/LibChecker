@@ -13,17 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.absinthe.libchecker.utils.elf;
+package com.absinthe.libchecker.utils.elf
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+import java.io.IOException
 
-public class Dynamic32Structure extends Elf.DynamicStructure {
-    public Dynamic32Structure(final ElfParser parser, final Elf.Header header,
-                              long baseOffset, final int index) throws IOException {
-        baseOffset = baseOffset + (index * 8L);
-        tag = parser.readWord(baseOffset);
-        val = parser.readWord(baseOffset + 0x4);
-    }
+class Dynamic32Structure @Throws(IOException::class) constructor(
+  parser: ElfParser,
+  header: Elf.Header,
+  baseOffset: Long,
+  index: Int
+) : Elf.DynamicStructure() {
+  init {
+    val offset = baseOffset + (index * 8L)
+    tag = parser.readWord(offset)
+    `val` = parser.readWord(offset + 0x4)
+  }
 }
