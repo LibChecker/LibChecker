@@ -277,11 +277,15 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     (activity as? IDetailContainer)?.collapseAppBar()
     getRecyclerView().scrollToPosition(componentPosition.coerceAtMost(adapter.itemCount - 1))
 
-    with(getRecyclerView().layoutManager) {
+    // Calculate better offset to provide improved visual experience for highlighting
+    val recyclerView = getRecyclerView()
+    val centerOffset = recyclerView.height / 4  // Place highlighted item about 1/4 from top for better visibility
+    
+    with(recyclerView.layoutManager) {
       if (this is LinearLayoutManager) {
-        scrollToPositionWithOffset(componentPosition, 0)
+        scrollToPositionWithOffset(componentPosition, centerOffset)
       } else if (this is StaggeredGridLayoutManager) {
-        scrollToPositionWithOffset(componentPosition, 0)
+        scrollToPositionWithOffset(componentPosition, centerOffset)
       }
     }
 
