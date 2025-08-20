@@ -18,6 +18,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.ACTION_IN_RULES
 import com.absinthe.libchecker.annotation.ACTIVITY
+import com.absinthe.libchecker.annotation.ET_NOT_ELF
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.isComponentType
@@ -349,7 +350,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     }
 
     // ELF info
-    if (this is NativeAnalysisFragment) {
+    if (this is NativeAnalysisFragment && item.item.elfInfo.elfType != ET_NOT_ELF) {
       arrayAdapter.add(getString(R.string.lib_detail_elf_info))
       actionMap[arrayAdapter.count - 1] = {
         ELFDetailDialogFragment.newInstance(
@@ -361,7 +362,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     }
 
     // Reference
-    if (this is Referable) {
+    if (this is Referable && !componentName.startsWith(".")) {
       arrayAdapter.add(getString(R.string.tab_lib_reference_statistics))
       actionMap[arrayAdapter.count - 1] = {
         val refName = item.rule?.libName ?: componentName
