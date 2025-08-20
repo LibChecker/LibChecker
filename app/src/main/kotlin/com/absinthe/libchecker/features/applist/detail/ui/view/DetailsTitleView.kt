@@ -122,12 +122,14 @@ class DetailsTitleView(
         it.action?.let { action ->
           v.setOnClickListener { action.invoke() }
         }
-        if ((GlobalValues.advancedOptions and AdvancedOptions.TINT_ABI_LABEL) > 0) {
-          if (PackageUtils.isAbi64Bit(it.abi)) {
+        if (PackageUtils.isAbi64Bit(it.abi)) {
+          if ((GlobalValues.advancedOptions and AdvancedOptions.TINT_ABI_LABEL) > 0) {
             v.drawable.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorPrimary))
           } else {
-            v.drawable.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorTertiary))
+            v.drawable.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
           }
+        } else {
+          v.drawable.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorTertiary))
         }
       }
       abiLabelsFlexLayout.addView(view)
