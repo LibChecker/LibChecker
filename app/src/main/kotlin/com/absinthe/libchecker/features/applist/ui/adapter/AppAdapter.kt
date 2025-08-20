@@ -77,14 +77,14 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
         spanString = SpannableString(paddingString)
         abiBadgeRes.getDrawable(context)?.let {
           it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
-          if (abiBadgeRes == R.drawable.ic_abi_label_64bit) {
-            if ((GlobalValues.advancedOptions and AdvancedOptions.TINT_ABI_LABEL) > 0) {
+          if ((GlobalValues.advancedOptions and AdvancedOptions.TINT_ABI_LABEL) > 0) {
+            if (abiBadgeRes == R.drawable.ic_abi_label_64bit) {
               it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorPrimary))
             } else {
-              it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
+              it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorTertiary))
             }
           } else {
-            it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorTertiary))
+            it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
           }
           val span = CenterAlignImageSpan(it)
           spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)

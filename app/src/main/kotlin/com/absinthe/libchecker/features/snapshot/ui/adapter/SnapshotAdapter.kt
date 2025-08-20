@@ -240,14 +240,14 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
           }
           newAbiSpanString = SpannableString(newPaddingString)
           abiBadgeRes.getDrawable(context)?.let {
-            if (abiBadgeRes == R.drawable.ic_abi_label_64bit) {
-              if ((GlobalValues.advancedOptions and AdvancedOptions.TINT_ABI_LABEL) > 0) {
+            if ((GlobalValues.advancedOptions and AdvancedOptions.TINT_ABI_LABEL) > 0) {
+              if (abiBadgeRes == R.drawable.ic_abi_label_64bit) {
                 it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorPrimary))
               } else {
-                it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
+                it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorTertiary))
               }
             } else {
-              it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorTertiary))
+              it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
             }
             it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
             val span = CenterAlignImageSpan(it)
