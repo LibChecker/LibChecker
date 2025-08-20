@@ -279,8 +279,8 @@ abstract class BaseDetailFragment<T : ViewBinding> :
 
     // Calculate better offset to provide improved visual experience for highlighting
     val recyclerView = getRecyclerView()
-    val centerOffset = recyclerView.height / 4  // Place highlighted item about 1/4 from top for better visibility
-    
+    val centerOffset = recyclerView.height / 4 // Place highlighted item about 1/4 from top for better visibility
+
     with(recyclerView.layoutManager) {
       if (this is LinearLayoutManager) {
         scrollToPositionWithOffset(componentPosition, centerOffset)
