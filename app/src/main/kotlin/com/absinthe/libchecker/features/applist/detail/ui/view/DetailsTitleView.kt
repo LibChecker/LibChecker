@@ -128,6 +128,8 @@ class DetailsTitleView(
           } else {
             v.drawable.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorTertiary))
           }
+        } else {
+          v.drawable.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
         }
       }
       abiLabelsFlexLayout.addView(view)

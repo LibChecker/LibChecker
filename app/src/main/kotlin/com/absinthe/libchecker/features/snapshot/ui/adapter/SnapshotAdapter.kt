@@ -246,6 +246,8 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
               } else {
                 it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorTertiary))
               }
+            } else {
+              it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
             }
             it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
             val span = CenterAlignImageSpan(it)
