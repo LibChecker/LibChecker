@@ -47,6 +47,7 @@ import com.absinthe.libchecker.integrations.monkeyking.ShareCmpInfo
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.base.BaseFragment
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
+import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.launchLibReferencePage
@@ -275,18 +276,22 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     }
 
     Timber.d("navigateToComponent: componentPosition = $componentPosition")
-    (activity as? IDetailContainer)?.collapseAppBar()
-    getRecyclerView().scrollToPosition(componentPosition.coerceAtMost(adapter.itemCount - 1))
 
-    // Calculate better offset to provide improved visual experience for highlighting
-    val recyclerView = getRecyclerView()
-    val centerOffset = recyclerView.height / 4 // Place highlighted item about 1/4 from top for better visibility
+    doOnMainThreadIdle {
+      (activity as? IDetailContainer)?.collapseAppBar()
+      getRecyclerView().scrollToPosition(componentPosition.coerceAtMost(adapter.itemCount - 1))
 
-    with(recyclerView.layoutManager) {
-      if (this is LinearLayoutManager) {
-        scrollToPositionWithOffset(componentPosition, centerOffset)
-      } else if (this is StaggeredGridLayoutManager) {
-        scrollToPositionWithOffset(componentPosition, centerOffset)
+      // Calculate better offset to provide improved visual experience for highlighting
+      val recyclerView = getRecyclerView()
+      // Place highlighted item about 1/4 from top for better visibility
+      val centerOffset = recyclerView.height / 4
+
+      with(recyclerView.layoutManager) {
+        if (this is LinearLayoutManager) {
+          scrollToPositionWithOffset(componentPosition, centerOffset)
+        } else if (this is StaggeredGridLayoutManager) {
+          scrollToPositionWithOffset(componentPosition, centerOffset)
+        }
       }
     }
 

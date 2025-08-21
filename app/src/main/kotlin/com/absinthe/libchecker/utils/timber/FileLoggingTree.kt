@@ -48,9 +48,11 @@ class FileLoggingTree(context: Context) : Timber.DebugTree() {
       else -> "?"
     }
 
-    logFile.appendText("$logTimeStamp $priorityChar/$tag: $message\n")
-    t?.let {
-      logFile.appendText(Log.getStackTraceString(it) + "\n")
+    if (logFile.exists()) {
+      logFile.appendText("$logTimeStamp $priorityChar/$tag: $message\n")
+      t?.let {
+        logFile.appendText(Log.getStackTraceString(it) + "\n")
+      }
     }
   }
 }

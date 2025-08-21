@@ -66,13 +66,11 @@ class LibReferenceViewModel : ViewModel() {
           var natives: List<LibStringItem>
 
           for (item in items) {
-            natives = try {
+            natives = runCatching {
               packageInfo = PackageUtils.getPackageInfo(item.packageName)
               PackageUtils.getNativeDirLibs(packageInfo)
-            } catch (e: Exception) {
-              Timber.e(e)
-              emptyList()
-            }
+            }.onFailure { Timber.e(it) }
+              .getOrDefault(emptyList())
 
             natives.find { it.name == name }?.run {
               if (LCAppUtils.checkNativeLibValidation(item.packageName, name)) {

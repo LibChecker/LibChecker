@@ -35,9 +35,9 @@ class DetailFragmentManager {
     map.remove(position)
   }
 
-  suspend fun sortAll() {
+  fun sortAll(scope: CoroutineScope) {
     map.forEach { _, value ->
-      value.sort()
+      scope.launch { value.sort() }
     }
   }
 

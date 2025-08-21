@@ -125,7 +125,14 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
     if (data.isEmpty() || position >= data.size) {
       return super.getItemId(position)
     }
-    return data[position].hashCode().toLong()
+    return data[position].packageName.hashCode().toLong()
+  }
+
+  override fun getItemViewType(position: Int): Int {
+    if (data.isEmpty() || position >= data.size) {
+      return super.getItemViewType(position)
+    }
+    return data[position].packageName.hashCode()
   }
 
   enum class CardMode {

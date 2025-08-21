@@ -299,14 +299,12 @@ abstract class BaseAppDetailActivity :
 
       toolbarAdapter.addData(
         AppDetailToolbarItem(R.drawable.ic_lib_sort, R.string.menu_sort) {
-          lifecycleScope.launch {
-            GlobalValues.libSortMode = if (GlobalValues.libSortMode == MODE_SORT_BY_LIB) {
-              MODE_SORT_BY_SIZE
-            } else {
-              MODE_SORT_BY_LIB
-            }
-            detailFragmentManager.sortAll()
+          GlobalValues.libSortMode = if (GlobalValues.libSortMode == MODE_SORT_BY_LIB) {
+            MODE_SORT_BY_SIZE
+          } else {
+            MODE_SORT_BY_LIB
           }
+          detailFragmentManager.sortAll(lifecycleScope)
         }
       )
       if (extraBean?.variant == Constants.VARIANT_HAP) {
