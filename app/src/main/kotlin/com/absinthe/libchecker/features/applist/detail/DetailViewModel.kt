@@ -158,6 +158,9 @@ class DetailViewModel : ViewModel() {
     if (initSoAnalysisJob?.isActive == true) {
       return
     }
+    if (nativeLibItems.value != null) {
+      return
+    }
     initSoAnalysisJob = viewModelScope.launch(Dispatchers.IO) {
       val sourceSet = hashSetOf<String>()
 
@@ -197,21 +200,30 @@ class DetailViewModel : ViewModel() {
   }
 
   fun initStaticData() = viewModelScope.launch(Dispatchers.IO) {
-    staticLibItems.emit(getStaticChipList())
+    if (staticLibItems.value == null) {
+      staticLibItems.emit(getStaticChipList())
+    }
   }
 
   fun initMetaDataData() = viewModelScope.launch(Dispatchers.IO) {
-    metaDataItems.emit(getMetaDataChipList())
+    if (metaDataItems.value == null) {
+      metaDataItems.emit(getMetaDataChipList())
+    }
   }
 
   fun initPermissionData() = viewModelScope.launch(Dispatchers.IO) {
-    permissionsItems.emit(getPermissionChipList())
+    if (permissionsItems.value == null) {
+      permissionsItems.emit(getPermissionChipList())
+    }
   }
 
   var initDexJob: Job? = null
 
   fun initDexData() {
     initDexJob?.cancel()
+    if (dexLibItems.value != null) {
+      return
+    }
     initDexJob = viewModelScope.launch(Dispatchers.IO) {
       val list = getDexChipList()
       dexLibItems.emit(list)
@@ -219,7 +231,9 @@ class DetailViewModel : ViewModel() {
   }
 
   fun initSignatures(context: Context) = viewModelScope.launch {
-    signaturesLibItems.emit(getSignatureChipList(context))
+    if (signaturesLibItems.value == null) {
+      signaturesLibItems.emit(getSignatureChipList(context))
+    }
   }
 
   fun initComponentsData() = viewModelScope.launch(Dispatchers.IO) {
