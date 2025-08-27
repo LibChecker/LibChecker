@@ -11,7 +11,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.absinthe.libchecker.features.applist.ui.view.AppListLoadingView
+    <com.google.android.material.loadingindicator.LoadingIndicator
+      style="@style/Widget.Material3.LoadingIndicator.Contained"
       android:id="@+id/loading_view"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"

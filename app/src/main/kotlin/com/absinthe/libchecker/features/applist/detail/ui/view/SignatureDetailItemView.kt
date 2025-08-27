@@ -7,6 +7,7 @@ import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.children
 import androidx.core.view.marginStart
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDrawableByAttr
@@ -39,8 +40,8 @@ class SignatureDetailItemView(context: Context) : AViewGroup(context) {
     }
     scaleX = 0.8F
     scaleY = 0.8F
-    setImageResource(com.google.android.material.R.drawable.abc_ic_menu_copy_mtrl_am_alpha)
-    setBackgroundDrawable(context.getDrawableByAttr(com.google.android.material.R.attr.selectableItemBackgroundBorderless))
+    setImageResource(R.drawable.ic_twotone_content_copy_24)
+    setBackgroundDrawable(context.getDrawableByAttr(android.R.attr.selectableItemBackgroundBorderless))
     setOnClickListener {
       ClipboardUtils.put(
         context,
