@@ -47,7 +47,7 @@ class NativeLibExtractTipView(context: Context) : AViewGroup(context) {
         append("android:extractNativeLibs=\"false\"")
       }
     }
-    setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceListItemSecondary))
+    setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceDisplayMedium))
     addView(this)
   }
 
