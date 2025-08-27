@@ -57,7 +57,7 @@ class MetadataLibItemView(context: Context) : AViewGroup(context) {
     }
     scaleType = ImageView.ScaleType.CENTER
     setImageResource(R.drawable.ic_outline_change_circle_24)
-    setBackgroundDrawable(context.getDrawableByAttr(com.google.android.material.R.attr.selectableItemBackgroundBorderless))
+    setBackgroundDrawable(context.getDrawableByAttr(android.R.attr.selectableItemBackgroundBorderless))
     addView(this)
   }
 
