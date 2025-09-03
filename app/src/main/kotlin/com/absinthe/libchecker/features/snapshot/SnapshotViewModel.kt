@@ -71,6 +71,9 @@ class SnapshotViewModel : ViewModel() {
 
   private var compareDiffJob: Job? = null
 
+  var currentTimeStamp: Long = GlobalValues.snapshotTimestamp
+    private set
+
   fun isComparingActive(): Boolean = compareDiffJob == null || compareDiffJob?.isActive == true
 
   fun compareDiff(
@@ -82,6 +85,7 @@ class SnapshotViewModel : ViewModel() {
       compareDiffJob?.cancel()
     }
     compareDiffJob = viewModelScope.launch(Dispatchers.IO) {
+      currentTimeStamp = preTimeStamp
       val timer = TimeRecorder().apply { start() }
 
       if (shouldClearDiff) {
