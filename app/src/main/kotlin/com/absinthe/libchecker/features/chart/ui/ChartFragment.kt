@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.features.chart.ui
 
 import android.graphics.Color
+import android.os.Build
 import android.view.HapticFeedbackConstants
 import android.view.ViewGroup
 import android.widget.LinearLayout
@@ -191,7 +192,7 @@ class ChartFragment :
       lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
         viewModel.distributionLastUpdateTime.collect { time ->
           (binding.dashboardContainer.getChildAt(0) as? MarketDistributionDashboardView)?.let {
-            it.subtitle.text = getString(R.string.android_dist_subtitle_format, time)
+            it.subtitle.text = getDistDashboardSubtitle(time)
           }
         }
       }
@@ -354,10 +355,7 @@ class ChartFragment :
           VersionCompat.showCopiedOnClipboardToast(context)
         }
         if (viewModel.distributionLastUpdateTime.value.isNotEmpty()) {
-          subtitle.text = getString(
-            R.string.android_dist_subtitle_format,
-            viewModel.distributionLastUpdateTime.value
-          )
+          subtitle.text = getDistDashboardSubtitle(viewModel.distributionLastUpdateTime.value)
         }
       }
       binding.dashboardContainer.addView(view)
@@ -418,5 +416,16 @@ class ChartFragment :
         )
       }
     }
+  }
+
+  private fun getDistDashboardSubtitle(time: String): String {
+    var androidVersion = AndroidVersions.simpleVersions[Build.VERSION.SDK_INT]
+    if (OsUtils.atLeastBaklava()) {
+      val minor = Build.getMinorSdkVersion(Build.VERSION.SDK_INT_FULL)
+      if (minor > 0) {
+        androidVersion = androidVersion.plus(", minor $minor")
+      }
+    }
+    return getString(R.string.android_dist_subtitle_format, time) + System.lineSeparator() + "API ${Build.VERSION.SDK_INT} (Android $androidVersion)"
   }
 }
