@@ -354,16 +354,21 @@ class SnapshotFragment :
 
     if (!shootServiceStarted && isFragmentVisible()) {
       context?.applicationContext?.also {
-        val intent = Intent(it, ShootService::class.java).apply {
-          setPackage(it.packageName)
+        runCatching {
+          val intent = Intent(it, ShootService::class.java).apply {
+            setPackage(it.packageName)
+          }
+          it.startService(intent)
+          it.bindService(
+            intent,
+            shootServiceConnection,
+            Service.BIND_AUTO_CREATE
+          )
+        }.onFailure { t ->
+          Timber.e(t)
+        }.onSuccess {
+          shootServiceStarted = true
         }
-        it.startService(intent)
-        it.bindService(
-          intent,
-          shootServiceConnection,
-          Service.BIND_AUTO_CREATE
-        )
-        shootServiceStarted = true
       }
     }
 
