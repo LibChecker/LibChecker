@@ -96,7 +96,6 @@ class SnapshotFragment :
   private var shouldCompare = true and ShootService.isComputing.not()
   private var shootServiceStarted = false
   private var keyword: String = ""
-  private var currentTimeStamp = GlobalValues.snapshotTimestamp
   private var items = emptyList<SnapshotDiffItem>()
 
   private var shootBinder: IShootService? = null
@@ -307,7 +306,6 @@ class SnapshotFragment :
         }
 
         is SnapshotViewModel.Effect.TimeStampChange -> {
-          currentTimeStamp = it.timestamp
           if (it.timestamp != 0L) {
             dashboard.container.tvSnapshotTimestampText.text = viewModel.getFormatDateString(it.timestamp)
             updateSystemProps(dashboard, it.timestamp)
@@ -378,7 +376,7 @@ class SnapshotFragment :
       viewModel.compareDiff(GlobalValues.snapshotTimestamp)
     }
 
-    if (currentTimeStamp != GlobalValues.snapshotTimestamp) {
+    if (viewModel.currentTimeStamp != GlobalValues.snapshotTimestamp) {
       viewModel.changeTimeStamp(GlobalValues.snapshotTimestamp)
       flip(VF_LOADING)
       viewModel.compareDiff(GlobalValues.snapshotTimestamp, shouldClearDiff = true)
@@ -634,7 +632,7 @@ class SnapshotFragment :
       binding.list.smoothScrollToPosition(0)
     } else {
       flip(VF_LOADING)
-      viewModel.compareDiff(currentTimeStamp)
+      viewModel.compareDiff(GlobalValues.snapshotTimestamp)
     }
   }
 
