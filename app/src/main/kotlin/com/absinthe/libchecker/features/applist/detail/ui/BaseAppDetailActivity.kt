@@ -720,34 +720,31 @@ abstract class BaseAppDetailActivity :
         if (bundle != null) {
           initAbiView(bundle.abi, bundle.abiSet)
 
-          val action: Runnable = object : Runnable {
-            override fun run() {
-              initFeatureListView()
-              if (featureListView?.parent != null) {
-                return
-              }
-              val oldContainerHeight = binding.headerContentLayout.height
-              val newContainerHeight = oldContainerHeight + 40.dp
-              val params = binding.headerContentLayout.layoutParams
+          doOnMainThreadIdle {
+            initFeatureListView()
+            if (featureListView?.parent != null) {
+              return@doOnMainThreadIdle
+            }
+            val oldContainerHeight = binding.headerContentLayout.height
+            val newContainerHeight = oldContainerHeight + 40.dp
+            val params = binding.headerContentLayout.layoutParams
 
-              binding.headerContentLayout.addView(featureListView)
-              ValueAnimator.ofInt(oldContainerHeight, newContainerHeight).also { anim ->
-                anim.addUpdateListener { valueAnimator ->
-                  val height = valueAnimator.animatedValue as Int
+            binding.headerContentLayout.addView(featureListView)
+            ValueAnimator.ofInt(oldContainerHeight, newContainerHeight).also { anim ->
+              anim.addUpdateListener { valueAnimator ->
+                val height = valueAnimator.animatedValue as Int
 
-                  if (valueAnimator.animatedFraction == 1f || featureAdapter.data.isEmpty()) {
-                    params.height = ViewGroup.LayoutParams.WRAP_CONTENT
-                  } else {
-                    params.height = height
-                  }
-                  binding.headerContentLayout.layoutParams = params
+                if (valueAnimator.animatedFraction == 1f || featureAdapter.data.isEmpty()) {
+                  params.height = ViewGroup.LayoutParams.WRAP_CONTENT
+                } else {
+                  params.height = height
                 }
-                anim.duration = 250
-                anim.start()
+                binding.headerContentLayout.layoutParams = params
               }
+              anim.duration = 250
+              anim.start()
             }
           }
-          binding.detailsTitle.postDelayed(action, 500)
         }
       }.launchIn(lifecycleScope)
     }

@@ -511,10 +511,7 @@ class SnapshotFragment :
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
           )
-          val paddingHorizontal =
-            context.getDimensionByAttr(com.google.android.material.R.attr.dialogPreferredPadding)
-              .toInt()
-          it.setPadding(paddingHorizontal, 0, paddingHorizontal, 0)
+          it.setPadding(24.dp, 0, 24.dp, 0)
           it.text =
             HtmlCompat.fromHtml(getString(R.string.snapshot_scheme_tip, scheme), 0)
           it.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
