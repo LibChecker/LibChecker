@@ -86,7 +86,7 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
 
       val isNewOrDeleted = item.deleted || item.newInstalled
       val highlightDiffColor = if ((GlobalValues.snapshotOptions and SnapshotOptions.DIFF_HIGHLIGHT) > 0) {
-        context.getColorByAttr(com.google.android.material.R.attr.colorPrimaryFixedDim)
+        context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary)
       } else {
         null
       }
@@ -242,7 +242,7 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
           abiBadgeRes.getDrawable(context)?.let {
             if ((GlobalValues.advancedOptions and AdvancedOptions.TINT_ABI_LABEL) > 0) {
               if (abiBadgeRes == R.drawable.ic_abi_label_64bit) {
-                it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorPrimaryFixedDim))
+                it.setTint(context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary))
               } else {
                 it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorTertiary))
               }

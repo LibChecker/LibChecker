@@ -131,7 +131,7 @@ class LibStringAdapter(
           buildSpannedString {
             append(item.item.name)
             setSpan(
-              ForegroundColorSpan(context.getColorByAttr(com.google.android.material.R.attr.colorPrimaryFixedDim)),
+              ForegroundColorSpan(context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary)),
               0,
               item.item.name.length,
               Spannable.SPAN_INCLUSIVE_EXCLUSIVE
