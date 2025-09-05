@@ -124,7 +124,7 @@ class DetailsTitleView(
         }
         if ((GlobalValues.advancedOptions and AdvancedOptions.TINT_ABI_LABEL) > 0) {
           if (PackageUtils.isAbi64Bit(it.abi)) {
-            v.drawable.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorPrimaryFixedDim))
+            v.drawable.setTint(context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary))
           } else {
             v.drawable.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorTertiary))
           }
