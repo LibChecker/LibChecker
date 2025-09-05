@@ -40,8 +40,7 @@ allprojects {
 
   tasks.withType<KotlinCompilationTask<*>>().configureEach {
     compilerOptions {
-      // https://kotlinlang.org/docs/whatsnew2120.html#kotlin-native-new-inlining-optimization
-      freeCompilerArgs.add("-Xbinary=preCodegenInlineThreshold=40")
+      freeCompilerArgs.add("-Xannotation-default-target=param-property")
     }
   }
 }
