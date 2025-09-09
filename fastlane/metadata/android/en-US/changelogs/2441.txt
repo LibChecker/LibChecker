@@ -1,0 +1,5 @@
+- Now supports identifying and marking libraries via the action tag in a component’s IntentFilter, with lower display priority than class name matching
+- Added an Action type in the advanced menu of the library reference statistics page
+- Snapshots saved from this version will additionally record the system’s Build ID and security patch level
+
+Full changelog: https://github.com/LibChecker/LibChecker/blob/master/changelog/CHANGELOG.md
