@@ -4,7 +4,7 @@ import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import java.io.File
 import org.gradle.api.Project
 
-const val baseVersionName = "2.5.2"
+const val baseVersionName = "2.5.3"
 val Project.verName: String get() = "${baseVersionName}${versionNameSuffix}.${exec("git rev-parse --short=7 HEAD")}"
 val Project.verCode: Int get() = exec("git rev-list --count HEAD").toInt()
 val Project.isDevVersion: Boolean get() = exec("git tag -l $baseVersionName").isEmpty()
