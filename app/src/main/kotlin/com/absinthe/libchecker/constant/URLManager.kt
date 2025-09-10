@@ -19,4 +19,5 @@ object URLManager {
   const val TELEGRAM_RELEASES = "https://t.me/libchecker_releases"
 
   const val ANDROID_DEV_MANIFEST_APPLICATION = "https://developer.android.com/guide/topics/manifest/application-element"
+  const val ANDROID_DEV_MANIFEST_APPLICATION_CN = "https://developer.android.google.cn/guide/topics/manifest/application-element"
 }

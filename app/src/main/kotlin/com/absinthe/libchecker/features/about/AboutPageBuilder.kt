@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.features.about
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.text.method.LinkMovementMethod
 import android.util.TypedValue
@@ -11,6 +12,7 @@ import android.widget.LinearLayout.LayoutParams
 import android.widget.ScrollView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -18,11 +20,13 @@ import androidx.fragment.app.findFragment
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
+import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.dp
 import com.mikepenz.aboutlibraries.LibsBuilder
 import com.mikepenz.aboutlibraries.LibsConfiguration
 import com.mikepenz.aboutlibraries.entity.Library
 import com.mikepenz.aboutlibraries.util.SpecialButton
+import java.util.Locale
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import timber.log.Timber
 
@@ -51,11 +55,20 @@ object AboutPageBuilder {
         override fun onIconClicked(v: View) {
         }
 
-        override fun onLibraryAuthorClicked(v: View, library: Library) = false
+        override fun onLibraryAuthorClicked(v: View, library: Library): Boolean {
+          openLibraryLink(context, library.website)
+          return true
+        }
 
-        override fun onLibraryContentClicked(v: View, library: Library) = false
+        override fun onLibraryContentClicked(v: View, library: Library): Boolean {
+          openLibraryLink(context, library.website)
+          return true
+        }
 
-        override fun onLibraryBottomClicked(v: View, library: Library) = false
+        override fun onLibraryBottomClicked(v: View, library: Library): Boolean {
+          openLibraryLink(context, library.website)
+          return true
+        }
 
         override fun onExtraClicked(
           v: View,
@@ -145,11 +158,20 @@ object AboutPageBuilder {
 
         override fun onIconLongClicked(v: View) = false
 
-        override fun onLibraryAuthorLongClicked(v: View, library: Library) = false
+        override fun onLibraryAuthorLongClicked(v: View, library: Library): Boolean {
+          openLibraryLink(context, library.website)
+          return true
+        }
 
-        override fun onLibraryContentLongClicked(v: View, library: Library) = false
+        override fun onLibraryContentLongClicked(v: View, library: Library): Boolean {
+          openLibraryLink(context, library.website)
+          return true
+        }
 
-        override fun onLibraryBottomLongClicked(v: View, library: Library) = false
+        override fun onLibraryBottomLongClicked(v: View, library: Library): Boolean {
+          openLibraryLink(context, library.website)
+          return true
+        }
       })
       .start(context)
   }
@@ -207,6 +229,33 @@ object AboutPageBuilder {
       )
       setPositiveButton(android.R.string.ok, null)
       show()
+    }
+  }
+
+  private fun openLibraryLink(context: Context, url: String?) {
+    if (!url.isNullOrEmpty()) {
+      runCatching {
+        val intent = Intent(Intent.ACTION_VIEW)
+          .setData(
+            if (Locale.getDefault().country != "CN") {
+              url.toUri()
+            } else {
+              if (url.startsWith("https://developer.android.com")) {
+                url.replace(
+                  "https://developer.android.com",
+                  "https://developer.android.google.cn"
+                )
+                  .toUri()
+              } else {
+                url.toUri()
+              }
+            }
+          )
+        context.startActivity(intent)
+      }.onFailure { inner ->
+        Timber.e(inner)
+        Toasty.showShort(context, "No browser application")
+      }
     }
   }
 }

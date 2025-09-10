@@ -25,6 +25,7 @@ import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.UiUtils
+import java.util.Locale
 import timber.log.Timber
 
 object FeaturesDialog {
@@ -91,7 +92,7 @@ object FeaturesDialog {
       R.string.agp,
       R.string.agp_details,
       version = version,
-      sourceLink = "https://developer.android.com/build/gradle-build-overview"
+      sourceLink = getAndroidRelatedLink("developer", "/build/gradle-build-overview")
     )
   }
 
@@ -112,7 +113,7 @@ object FeaturesDialog {
       R.string.play_app_signing,
       R.string.play_app_signing_details,
       version = null,
-      sourceLink = "https://developer.android.com/studio/publish/app-signing#enroll"
+      sourceLink = getAndroidRelatedLink("developer", "/studio/publish/app-signing#enroll")
     )
   }
 
@@ -133,7 +134,7 @@ object FeaturesDialog {
       R.string.jetpack_compose,
       R.string.jetpack_compose_details,
       version = version,
-      sourceLink = "https://developer.android.com/compose"
+      sourceLink = getAndroidRelatedLink("developer", "/compose")
     )
   }
 
@@ -176,7 +177,7 @@ object FeaturesDialog {
       R.string.lib_detail_dialog_title_16kb_page_size,
       R.string.lib_detail_dialog_content_16kb_page_size,
       version = null,
-      sourceLink = "https://developer.android.com/guide/practices/page-sizes"
+      sourceLink = getAndroidRelatedLink("developer", "/guide/practices/page-sizes")
     )
   }
 
@@ -187,7 +188,7 @@ object FeaturesDialog {
       R.string.lib_detail_dialog_title_16kb_page_size_compat,
       R.string.lib_detail_dialog_content_16kb_page_size_compat,
       version = null,
-      sourceLink = "https://source.android.com/docs/core/architecture/16kb-page-size/16kb-backcompat-option"
+      sourceLink = getAndroidRelatedLink("source", "/docs/core/architecture/16kb-page-size/16kb-backcompat-option")
     )
   }
 
@@ -198,7 +199,7 @@ object FeaturesDialog {
       R.string.multiArch,
       R.string.multi_arch_dialog_details,
       version = null,
-      sourceLink = "https://source.android.com/docs/setup/create/64-bit-builds"
+      sourceLink = getAndroidRelatedLink("source", "/docs/setup/create/64-bit-builds")
     )
   }
 
@@ -281,5 +282,23 @@ object FeaturesDialog {
       Constants.Event.FEATURE_DIALOG,
       mapOf(Telemetry.Param.CONTENT to context.getString(titleRes))
     )
+  }
+
+  private fun getAndroidRelatedLink(type: String, address: String): String {
+    return if (type == "developer") {
+      if (Locale.getDefault().country != "CN") {
+        "https://developer.android.com$address"
+      } else {
+        "https://developer.android.google.cn$address"
+      }
+    } else if (type == "source") {
+      if (Locale.getDefault().country != "CN") {
+        "https://source.android.com$address"
+      } else {
+        "https://source.android.google.cn$address"
+      }
+    } else {
+      "type wrong"
+    }
   }
 }
