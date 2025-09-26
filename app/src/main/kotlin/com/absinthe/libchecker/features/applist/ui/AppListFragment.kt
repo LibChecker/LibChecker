@@ -85,6 +85,7 @@ class AppListFragment :
 
   private lateinit var layoutManager: RecyclerView.LayoutManager
   private lateinit var dumpAppsInfoResultLauncher: ActivityResultLauncher<String>
+  private lateinit var queryAllPackagesPermissionLauncher: ActivityResultLauncher<String>
   private var dumpAppsInfoAsMarkDown = false
 
   override fun init() {
@@ -175,6 +176,15 @@ class AppListFragment :
           appAdapter.setSpaceFooterView()
         }
       }
+      rejectView.setOnClickListener {
+        try {
+          if (::queryAllPackagesPermissionLauncher.isInitialized && vfContainer.displayedChild == VF_REJECT) {
+            queryAllPackagesPermissionLauncher.launch(Constants.GET_INSTALLED_APPS)
+          }
+        } catch (e: Exception) {
+          Timber.e(e)
+        }
+      }
     }
 
     initObserver()
@@ -193,6 +203,15 @@ class AppListFragment :
             }.onFailure { t ->
               Timber.e(t)
             }
+          }
+        }
+      }
+    queryAllPackagesPermissionLauncher =
+      registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        if (isGranted) {
+          homeViewModel.checkPackagesPermission = false
+          if (isAdded) {
+            initApps()
           }
         }
       }
@@ -556,6 +575,7 @@ class AppListFragment :
 
   private fun flip(page: Int) = lifecycleScope.launch(Dispatchers.Main) {
     allowRefreshing = page == VF_LIST
+    homeViewModel.checkPackagesPermission = page == VF_REJECT
     if (binding.vfContainer.displayedChild != page) {
       Timber.d("flip to $page")
       binding.vfContainer.displayedChild = page

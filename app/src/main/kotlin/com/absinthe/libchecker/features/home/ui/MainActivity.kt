@@ -1,8 +1,10 @@
 package com.absinthe.libchecker.features.home.ui
 
+import android.Manifest
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.IBinder
 import android.view.Menu
@@ -10,6 +12,7 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -306,6 +309,21 @@ class MainActivity :
       enabledState = { !isKeyboardShowing() && binding.toolbar.hasExpandedActionView() },
       handler = { binding.toolbar.collapseActionView() }
     )
+  }
+
+  override fun onResume() {
+    super.onResume()
+    if (appViewModel.checkPackagesPermission) {
+      val granted =
+        ContextCompat.checkSelfPermission(
+          this,
+          Constants.GET_INSTALLED_APPS
+        ) == PackageManager.PERMISSION_GRANTED
+      if (granted) {
+        appViewModel.checkPackagesPermission = false
+        appViewModel.initItems()
+      }
+    }
   }
 
   /**
