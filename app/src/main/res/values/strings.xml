@@ -71,7 +71,7 @@
   <string name="settings_translate_summary">Help us translate this app</string>
   <string name="settings_rate_us">Rate us</string>
   <string name="settings_rate_us_summary">This can make us be found by more people</string>
-  <string name="settings_get_updates">Get Updates</string>
+  <string name="settings_get_updates">Get updates</string>
   <string name="settings_get_updates_summary">Get the latest version that is more feature-packed and stable</string>
   <string name="settings_get_updates_in_app">In-app</string>
   <string name="settings_get_updates_in_app_chip_stable">Stable</string>
@@ -125,7 +125,7 @@
   <string name="not_found">Not found</string>
   <string name="create_an_issue">Help us supplement the information</string>
   <string name="app_bundle_details">The Android App Bundle is an Android\'s official publishing format that offers a more efficient way to build and release your app. The Android App Bundle lets you more easily deliver a great experience in a smaller app size, which can improve install success and reduce uninstalls. It\'s easy to switch. You don\'t need to refactor your code to start benefiting from a smaller app. And once you\'ve switched, you\'ll benefit from modular app development and customizable feature delivery.</string>
-  <string name="kotlin_details">Kotlin is an open-source statically typed programming language that targets the JVM, Android, JavaScript, Wasm, and Native. It\'s developed by JetBrains. Kotlin is a modern but already mature programming language designed to make developers happier. It\'s concise, safe, interoperable with Java and other languages, and provides many ways to reuse code between multiple platforms for productive programming.</string>
+  <string name="kotlin_details">Kotlin is an open source statically typed programming language that targets the JVM, Android, JavaScript, Wasm, and Native. It\'s developed by JetBrains. Kotlin is a modern but already mature programming language designed to make developers happier. It\'s concise, safe, interoperable with Java and other languages, and provides many ways to reuse code between multiple platforms for productive programming.</string>
   <string name="items_count">Items count: </string>
   <string name="further_operation">Further operation</string>
   <string name="app_info_launch">Launch</string>
