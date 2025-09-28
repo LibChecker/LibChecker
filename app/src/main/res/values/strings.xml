@@ -17,7 +17,7 @@
   <string name="search_hint">Search…</string>
   <string name="string_64_bit">64-bit</string>
   <string name="string_32_bit">32-bit</string>
-  <string name="no_libs">No native libs</string>
+  <string name="no_libs">No native libraries</string>
   <string name="cannot_read">Can\'t read</string>
   <string name="unknown">Unknown</string>
   <string name="empty_list">Empty list</string>
