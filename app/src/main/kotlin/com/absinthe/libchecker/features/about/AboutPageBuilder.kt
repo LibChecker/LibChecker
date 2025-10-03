@@ -59,17 +59,17 @@ object AboutPageBuilder {
 
         override fun onLibraryAuthorClicked(v: View, library: Library): Boolean {
           openLibraryLink(context, library.website)
-          return true
+          return false
         }
 
         override fun onLibraryContentClicked(v: View, library: Library): Boolean {
           openLibraryLink(context, library.website)
-          return true
+          return false
         }
 
         override fun onLibraryBottomClicked(v: View, library: Library): Boolean {
           openLibraryLink(context, library.website)
-          return true
+          return false
         }
 
         override fun onExtraClicked(
@@ -160,20 +160,11 @@ object AboutPageBuilder {
 
         override fun onIconLongClicked(v: View) = false
 
-        override fun onLibraryAuthorLongClicked(v: View, library: Library): Boolean {
-          openLibraryLink(context, library.website)
-          return true
-        }
+        override fun onLibraryAuthorLongClicked(v: View, library: Library) = false
 
-        override fun onLibraryContentLongClicked(v: View, library: Library): Boolean {
-          openLibraryLink(context, library.website)
-          return true
-        }
+        override fun onLibraryContentLongClicked(v: View, library: Library) = false
 
-        override fun onLibraryBottomLongClicked(v: View, library: Library): Boolean {
-          openLibraryLink(context, library.website)
-          return true
-        }
+        override fun onLibraryBottomLongClicked(v: View, library: Library) = false
       })
       .start(context)
   }
@@ -237,26 +228,41 @@ object AboutPageBuilder {
   private fun openLibraryLink(context: Context, url: String?) {
     if (!url.isNullOrEmpty()) {
       runCatching {
-        val intent = Intent(Intent.ACTION_VIEW)
-          .setData(
-            if (Locale.getDefault().country != "CN") {
-              url.toUri()
+        CustomTabsIntent.Builder().build().apply {
+          if (Locale.getDefault().country != "CN") {
+            launchUrl(context, url.toUri())
+          } else {
+            if (url.startsWith("https://developer.android.com")) {
+              launchUrl(context, url.replace("https://developer.android.com", "https://developer.android.google.cn").toUri())
             } else {
-              if (url.startsWith("https://developer.android.com")) {
-                url.replace(
-                  "https://developer.android.com",
-                  "https://developer.android.google.cn"
-                )
-                  .toUri()
-              } else {
-                url.toUri()
-              }
+              launchUrl(context, url.toUri())
             }
-          )
-        context.startActivity(intent)
-      }.onFailure { inner ->
-        Timber.e(inner)
-        Toasty.showShort(context, "No browser application")
+          }
+        }
+      }.onFailure {
+        Timber.e(it)
+        runCatching {
+          val intent = Intent(Intent.ACTION_VIEW)
+            .setData(
+              if (Locale.getDefault().country != "CN") {
+                url.toUri()
+              } else {
+                if (url.startsWith("https://developer.android.com")) {
+                  url.replace(
+                    "https://developer.android.com",
+                    "https://developer.android.google.cn"
+                  )
+                    .toUri()
+                } else {
+                  url.toUri()
+                }
+              }
+            )
+          context.startActivity(intent)
+        }.onFailure { inner ->
+          Timber.e(inner)
+          Toasty.showShort(context, "No browser application")
+        }
       }
     }
   }
