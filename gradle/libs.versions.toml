@@ -1,9 +1,9 @@
 [versions]
 agp = "8.13.0"
 aboutlibraries = "12.2.4"
-androidX-lifecycle = "2.9.3"
-androidX-room = "2.7.2"
-firebase-bom = "34.2.0"
+androidX-lifecycle = "2.9.4"
+androidX-room = "2.8.1"
+firebase-bom = "34.3.0"
 hiddenApiRefine = "4.4.0"
 kotlin = "2.2.10"
 protoc = "4.32.0"
@@ -22,7 +22,7 @@ kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref =
 ksp = { id = "com.google.devtools.ksp", version = "2.2.10-2.0.2" }
 protobuf = { id = "com.google.protobuf", version = "0.9.5" }
 moshiX = "dev.zacsweers.moshix:0.31.0"
-spotless = "com.diffplug.spotless:7.2.1"
+spotless = "com.diffplug.spotless:8.0.0"
 aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutlibraries" }
 
 [libraries]
@@ -31,7 +31,7 @@ gradlePlugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", ve
 
 kotlinX-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2"
 
-androidX-activity = "androidx.activity:activity-ktx:1.10.1"
+androidX-activity = "androidx.activity:activity-ktx:1.11.0"
 androidX-annotation = "androidx.annotation:annotation:1.9.1"
 androidX-appCompat = "androidx.appcompat:appcompat:1.7.1"
 androidX-browser = "androidx.browser:browser:1.9.0"
@@ -47,7 +47,7 @@ androidX-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidX
 androidX-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidX-room" }
 androidX-security = "androidx.security:security-crypto:1.1.0"
 androidX-viewPager2 = "androidx.viewpager2:viewpager2:1.1.0"
-androidX-window = "androidx.window:window:1.4.0"
+androidX-window = "androidx.window:window:1.5.0"
 
 square-leakCanary = "com.squareup.leakcanary:leakcanary-android:2.14"
 square-moshi = "com.squareup.moshi:moshi:1.15.2"
@@ -92,8 +92,8 @@ firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
 flexbox = "com.google.android.flexbox:flexbox:3.0.0"
 hiddenApiBypass = "org.lsposed.hiddenapibypass:hiddenapibypass:6.1"
 lc-rules = "com.github.LibChecker:LibChecker-Rules-Bundle:42"
-lottie = "com.airbnb.android:lottie:6.6.7"
-mpAndroidChart = "com.github.AppDevNext:AndroidChart:3.1.0.30"
+lottie = "com.airbnb.android:lottie:6.6.10"
+mpAndroidChart = "com.github.AppDevNext:AndroidChart:3.1.0.31"
 once = "com.jonathanfinerty.once:once:1.3.1"
 processPhoenix = "com.jakewharton:process-phoenix:3.0.0"
 timber = "com.jakewharton.timber:timber:5.0.1"
