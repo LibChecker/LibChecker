@@ -2,7 +2,7 @@
 agp = "8.13.0"
 aboutlibraries = "12.2.4"
 androidX-lifecycle = "2.9.3"
-androidX-room = "2.7.2"
+androidX-room = "2.8.1"
 firebase-bom = "34.2.0"
 hiddenApiRefine = "4.4.0"
 kotlin = "2.2.10"
