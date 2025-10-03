@@ -58,7 +58,9 @@ class TrackItemView(context: Context) : FrameLayout(context) {
         layoutParams = LayoutParams(
           ViewGroup.LayoutParams.WRAP_CONTENT,
           ViewGroup.LayoutParams.WRAP_CONTENT
-        )
+        ).also {
+          it.marginStart = 8.dp
+        }
         setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
         addView(this)
@@ -83,7 +85,7 @@ class TrackItemView(context: Context) : FrameLayout(context) {
         it.autoMeasure()
       }
       val textWidth =
-        measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - appName.marginStart - switch.measuredWidth
+        measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - appName.marginStart - packageName.marginStart - switch.measuredWidth
       if (appName.measuredWidth > textWidth) {
         appName.measure(
           textWidth.toExactlyMeasureSpec(),
@@ -107,7 +109,7 @@ class TrackItemView(context: Context) : FrameLayout(context) {
       icon.layout(paddingStart, icon.toVerticalCenter(this))
       switch.layout(paddingEnd, switch.toVerticalCenter(this), fromRight = true)
       appName.layout(paddingStart + icon.measuredWidth + appName.marginStart, paddingTop)
-      packageName.layout(paddingStart + icon.measuredWidth, appName.bottom)
+      packageName.layout(paddingStart + icon.measuredWidth + packageName.marginStart, appName.bottom)
     }
   }
 }
