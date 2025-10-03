@@ -26,7 +26,6 @@ import com.absinthe.libchecker.utils.extensions.paddingBottomCompat
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
-import java.util.Locale
 import timber.log.Timber
 
 class AppPropsBottomSheetView(context: Context, packageInfo: PackageInfo) :
@@ -66,23 +65,13 @@ class AppPropsBottomSheetView(context: Context, packageInfo: PackageInfo) :
     setOnClickListener {
       runCatching {
         CustomTabsIntent.Builder().build().apply {
-          if (Locale.getDefault().country != "CN") {
-            launchUrl(context, URLManager.ANDROID_DEV_MANIFEST_APPLICATION.toUri())
-          } else {
-            launchUrl(context, URLManager.ANDROID_DEV_MANIFEST_APPLICATION_CN.toUri())
-          }
+          launchUrl(context, URLManager.ANDROID_DEV_MANIFEST_APPLICATION.toUri())
         }
       }.onFailure {
         Timber.e(it)
         runCatching {
           val intent = Intent(Intent.ACTION_VIEW)
-            .setData(
-              if (Locale.getDefault().country != "CN") {
-                URLManager.ANDROID_DEV_MANIFEST_APPLICATION.toUri()
-              } else {
-                URLManager.ANDROID_DEV_MANIFEST_APPLICATION_CN.toUri()
-              }
-            )
+            .setData(URLManager.ANDROID_DEV_MANIFEST_APPLICATION.toUri())
           context.startActivity(intent)
         }.onFailure { inner ->
           Timber.e(inner)
