@@ -10,6 +10,7 @@ plugins {
   alias(libs.plugins.ksp)
   alias(libs.plugins.moshiX)
   alias(libs.plugins.aboutlibraries)
+  id("clean-aboutlibraries")
   id("res-opt") apply false
   id(libs.plugins.gms.get().pluginId)
   id(libs.plugins.firebase.crashlytics.get().pluginId)
