@@ -22,6 +22,10 @@ gradlePlugin {
       id = "res-opt"
       implementationClass = "ResoptPlugin"
     }
+    create("clean-aboutlibraries") {
+      id = "clean-aboutlibraries"
+      implementationClass = "CleanAboutLibrariesPlugin"
+    }
   }
 }
 
