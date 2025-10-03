@@ -45,6 +45,7 @@ object ApiManager {
       .readTimeout(30, TimeUnit.SECONDS)
       .writeTimeout(30, TimeUnit.SECONDS)
       .addInterceptor(BaseUrlInterceptor())
+      .addInterceptor(AndroidDevelopersInterceptor())
       .build()
     Retrofit.Builder()
       .addConverterFactory(MoshiConverterFactory.create(JsonUtil.moshi))
