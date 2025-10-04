@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.constant
 
 import com.absinthe.libchecker.BuildConfig
+import java.util.Locale
 
 object URLManager {
   const val MARKET_PAGE = "market://details?id=${BuildConfig.APPLICATION_ID}"
@@ -18,5 +19,6 @@ object URLManager {
   const val TELEGRAM_GROUP = "https://t.me/libcheckerr"
   const val TELEGRAM_RELEASES = "https://t.me/libchecker_releases"
 
-  const val ANDROID_DEV_MANIFEST_APPLICATION = "https://developer.android.com/guide/topics/manifest/application-element"
+  val ANDROID_DEV_HOST = if (Locale.CHINA.equals(Locale.getDefault())) "android.google.cn" else "android.com"
+  val ANDROID_DEV_MANIFEST_APPLICATION = "https://developer.$ANDROID_DEV_HOST/guide/topics/manifest/application-element"
 }

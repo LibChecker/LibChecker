@@ -16,6 +16,7 @@ import androidx.core.text.HtmlCompat
 import androidx.fragment.app.FragmentActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.URLManager.ANDROID_DEV_HOST
 import com.absinthe.libchecker.features.applist.detail.ui.AppBundleBottomSheetDialogFragment
 import com.absinthe.libchecker.features.applist.detail.ui.AppInstallSourceBSDFragment
 import com.absinthe.libchecker.features.applist.detail.ui.AppPropBottomSheetDialogFragment
@@ -91,7 +92,7 @@ object FeaturesDialog {
       R.string.agp,
       R.string.agp_details,
       version = version,
-      sourceLink = "https://developer.android.com/build/gradle-build-overview"
+      sourceLink = "https://developer.$ANDROID_DEV_HOST/build/gradle-build-overview"
     )
   }
 
@@ -112,7 +113,7 @@ object FeaturesDialog {
       R.string.play_app_signing,
       R.string.play_app_signing_details,
       version = null,
-      sourceLink = "https://developer.android.com/studio/publish/app-signing#enroll"
+      sourceLink = "https://developer.$ANDROID_DEV_HOST/studio/publish/app-signing#enroll"
     )
   }
 
@@ -133,7 +134,7 @@ object FeaturesDialog {
       R.string.jetpack_compose,
       R.string.jetpack_compose_details,
       version = version,
-      sourceLink = "https://developer.android.com/compose"
+      sourceLink = "https://developer.$ANDROID_DEV_HOST/compose"
     )
   }
 
@@ -176,7 +177,7 @@ object FeaturesDialog {
       R.string.lib_detail_dialog_title_16kb_page_size,
       R.string.lib_detail_dialog_content_16kb_page_size,
       version = null,
-      sourceLink = "https://developer.android.com/guide/practices/page-sizes"
+      sourceLink = "https://developer.$ANDROID_DEV_HOST/guide/practices/page-sizes"
     )
   }
 
@@ -187,7 +188,7 @@ object FeaturesDialog {
       R.string.lib_detail_dialog_title_16kb_page_size_compat,
       R.string.lib_detail_dialog_content_16kb_page_size_compat,
       version = null,
-      sourceLink = "https://source.android.com/docs/core/architecture/16kb-page-size/16kb-backcompat-option"
+      sourceLink = "https://source.$ANDROID_DEV_HOST/docs/core/architecture/16kb-page-size/16kb-backcompat-option"
     )
   }
 
@@ -198,7 +199,7 @@ object FeaturesDialog {
       R.string.multiArch,
       R.string.multi_arch_dialog_details,
       version = null,
-      sourceLink = "https://source.android.com/docs/setup/create/64-bit-builds"
+      sourceLink = "https://source.$ANDROID_DEV_HOST/docs/setup/create/64-bit-builds"
     )
   }
 
