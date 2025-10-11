@@ -17,7 +17,7 @@
   <string name="search_hint">Search…</string>
   <string name="string_64_bit">64-bit</string>
   <string name="string_32_bit">32-bit</string>
-  <string name="no_libs">No native libraries</string>
+  <string name="no_libs">No native libs</string>
   <string name="cannot_read">Can\'t read</string>
   <string name="unknown">Unknown</string>
   <string name="empty_list">Empty list</string>
@@ -124,7 +124,7 @@
   <string name="detail_label">View app details</string>
   <string name="not_found">Not found</string>
   <string name="create_an_issue">Help us supplement the information</string>
-  <string name="app_bundle_details">The Android App Bundle is an Android\'s official publishing format that offers a more efficient way to build and release your app. The Android App Bundle lets you more easily deliver a great experience in a smaller app size, which can improve install success and reduce uninstalls. It\'s easy to switch. You don\'t need to refactor your code to start benefiting from a smaller app. And once you\'ve switched, you\'ll benefit from modular app development and customizable feature delivery.</string>
+  <string name="app_bundle_details">An Android App Bundle is a publishing format that includes all your app\'s compiled code and resources, and defers APK generation and signing to Google Play.\nGoogle Play uses your app bundle to generate and serve optimized APKs for each device configuration, so only the code and resources that are needed for a specific device are downloaded to run your app. You no longer have to build, sign, and manage multiple APKs to optimize support for different devices, and users get smaller, more-optimized downloads.</string>
   <string name="kotlin_details">Kotlin is an open source statically typed programming language that targets the JVM, Android, JavaScript, Wasm, and Native. It\'s developed by JetBrains. Kotlin is a modern but already mature programming language designed to make developers happier. It\'s concise, safe, interoperable with Java and other languages, and provides many ways to reuse code between multiple platforms for productive programming.</string>
   <string name="items_count">Items count: </string>
   <string name="further_operation">Further operation</string>
@@ -143,7 +143,7 @@
   <string name="multi_arch_dialog_details"><![CDATA[If an app exposes an API to other apps that can be either 32-bit or 64-bit, the app must have the <b>android:multiarch</b> property set to true within its manifest to avoid potential errors.]]></string>
   <string name="extract_native_libs_tip">The app declares </string>
   <string name="xml_detail">XML Detail</string>
-  <string name="lib_detail_dialog_title_16kb_page_size">16 KB pae Size Support</string>
+  <string name="lib_detail_dialog_title_16kb_page_size">16 KB page size support</string>
   <string name="lib_detail_dialog_content_16kb_page_size">Historically, Android has only supported 4 KB memory page sizes, which has optimized system memory performance for the average amount of total memory that Android devices have typically had. Beginning with Android 15, AOSP supports devices that are configured to use a page size of 16 KB (16 KB devices). If your app uses any NDK libraries, either directly or indirectly through an SDK, then you will need to rebuild your app for it to work on these 16 KB devices.</string>
   <string name="lib_detail_dialog_title_16kb_page_size_compat">16 KB backwards compatibility</string>
   <string name="lib_detail_dialog_content_16kb_page_size_compat"><![CDATA[Android 15 introduced support for 16 KB memory pages to optimize performance of the platform. Android 16 adds a compatibility mode, allowing some apps built for 4 KB memory pages to run on a device configured for 16 KB memory pages.\n\nIf Android detects that your app has 4 KB aligned memory pages, it automatically uses compatibility mode and display a notification dialog to the user. Setting the <b>android:pageSizeCompat</b> property in the <b>AndroidManifest.xml</b> to enable the backwards compatibility mode will prevent the display of the dialog when your app launches. For best performance, reliability, and stability, your app should still be 16 KB aligned.]]></string>
@@ -277,7 +277,7 @@
   <string name="integration_monkey_king_menu_unblock">Unblock it via \"MonkeyKing Purify\"</string>
   <string name="integration_blocker_menu_block">Block it via \"Blocker\"</string>
   <string name="integration_blocker_menu_unblock">Unblock it via \"Blocker\"</string>
-  <string name="integration_anywhere_menu_editor">Open it in \"Anywhere-Editor\"</string>
+  <string name="integration_anywhere_menu_editor">Open it in \"Anywhere- Editor\"</string>
 
   <!--  Cloud rules  -->
   <string name="rules_local_repo_version">Local repository version</string>
