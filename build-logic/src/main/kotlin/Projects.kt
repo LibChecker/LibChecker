@@ -1,3 +1,4 @@
+import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
@@ -75,7 +76,15 @@ fun Project.setupAppModule(block: BaseAppModuleExtension.() -> Unit = {}) {
 
 private inline fun <reified T : BaseExtension> Project.setupBaseModule(crossinline block: T.() -> Unit = {}) {
   extensions.configure<BaseExtension>("android") {
-    compileSdkVersion(36)
+    (this as? CommonExtension<*, *, *, *, *, *>)?.apply {
+      compileSdk {
+        version = release(36) {
+          minorApiLevel = 1
+        }
+      }
+    } ?: {
+      compileSdkVersion(36)
+    }
     defaultConfig {
       minSdk = 24
       targetSdk = 36
