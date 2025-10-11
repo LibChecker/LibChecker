@@ -108,6 +108,8 @@ object Constants {
   const val PREF_RULE_LANGUAGE = "ruleLanguage"
   const val PREF_SNAPSHOT_AUTO_REMOVE_THRESHOLD = "snapshotAutoRemoveThreshold"
 
+  const val GET_INSTALLED_APPS = "com.android.permission.GET_INSTALLED_APPS"
+
   object Event {
     const val APP_INFO_BOTTOM_SHEET = "App Info Bottom Sheet"
     const val APP_LIST_ADVANCED_MENU_ITEM_CHANGED = "App List Advanced Menu Item Changed"

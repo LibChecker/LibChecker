@@ -88,6 +88,7 @@ class HomeViewModel : ViewModel() {
   var controller: IListController? = null
   var appListStatus: Int = STATUS_NOT_START
   var workerBinder: IWorkerService? = null
+  var checkPackagesPermission: Boolean = false
 
   // Simple menu state management
   var isSearchMenuExpanded: Boolean = false
