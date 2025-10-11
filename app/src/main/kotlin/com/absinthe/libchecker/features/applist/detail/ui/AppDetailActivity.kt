@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
+import android.app.ComponentCaller
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -17,7 +18,6 @@ import com.absinthe.libchecker.features.statistics.ui.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.isArchivedPackage
-import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import timber.log.Timber
 
 const val EXTRA_PACKAGE_NAME = Intent.EXTRA_PACKAGE_NAME
@@ -27,25 +27,10 @@ class AppDetailActivity :
   BaseAppDetailActivity(),
   IDetailContainer {
 
-  private val pkgName by unsafeLazy {
-    intent.getStringExtra(EXTRA_PACKAGE_NAME) ?: let {
-      intent.data?.let { uri ->
-        uri.getQueryParameter("id").takeIf { uri.scheme == "market" && uri.host == "details" }
-      }
-    }
-  }
-  private val refName by unsafeLazy {
-    intent.getStringExtra(EXTRA_REF_NAME)
-  }
-  private val refType by unsafeLazy {
-    intent.getIntExtra(EXTRA_REF_TYPE, ALL)
-  }
-  private val extraBean by unsafeLazy {
-    IntentCompat.getParcelableExtra<DetailExtraBean>(
-      intent,
-      EXTRA_DETAIL_BEAN
-    )
-  }
+  private var pkgName: String? = null
+  private var refName: String? = null
+  private var refType: Int? = null
+  private var extraBean: DetailExtraBean? = null
 
   override val apkAnalyticsMode: Boolean = false
   override fun requirePackageName() = pkgName
@@ -54,6 +39,38 @@ class AppDetailActivity :
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     isPackageReady = true
+    initPackage(intent)
+  }
+
+  override fun onNewIntent(intent: Intent, caller: ComponentCaller) {
+    super.onNewIntent(intent, caller)
+    initPackage(intent)
+  }
+
+  override fun onPostPackageInfoAvailable() {
+    resolveReferenceExtras()
+  }
+
+  override fun onStart() {
+    super.onStart()
+    registerPackageBroadcast()
+  }
+
+  override fun onStop() {
+    super.onStop()
+    unregisterPackageBroadcast()
+  }
+
+  private fun initPackage(intent: Intent) {
+    pkgName = intent.getStringExtra(EXTRA_PACKAGE_NAME) ?: let {
+      intent.data?.let { uri ->
+        uri.getQueryParameter("id").takeIf { uri.scheme == "market" && uri.host == "details" }
+      }
+    }
+    refName = intent.getStringExtra(EXTRA_REF_NAME)
+    refType = intent.getIntExtra(EXTRA_REF_TYPE, ALL)
+    extraBean = IntentCompat.getParcelableExtra<DetailExtraBean>(intent, EXTRA_DETAIL_BEAN)
+
     Timber.d("packageName: $pkgName")
     val packageName = pkgName ?: return
     runCatching {
@@ -78,20 +95,6 @@ class AppDetailActivity :
     }
   }
 
-  override fun onPostPackageInfoAvailable() {
-    resolveReferenceExtras()
-  }
-
-  override fun onStart() {
-    super.onStart()
-    registerPackageBroadcast()
-  }
-
-  override fun onStop() {
-    super.onStop()
-    unregisterPackageBroadcast()
-  }
-
   private fun resolveReferenceExtras() {
     if (pkgName == null || refName == null || refType == ALL) {
       return
@@ -100,6 +103,7 @@ class AppDetailActivity :
   }
 
   private fun navigateToReferenceComponentPosition(packageName: String, refName: String) {
+    val refType = refType ?: return
     val position = typeList.indexOf(refType)
     binding.viewpager.currentItem = position
     binding.tabLayout.post {
