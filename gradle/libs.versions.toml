@@ -1,12 +1,12 @@
 [versions]
 agp = "8.13.0"
-aboutlibraries = "12.2.4"
+aboutlibraries = "13.0.0"
 androidX-lifecycle = "2.9.4"
-androidX-room = "2.8.1"
-firebase-bom = "34.3.0"
+androidX-room = "2.8.2"
+firebase-bom = "34.4.0"
 hiddenApiRefine = "4.4.0"
 kotlin = "2.2.20"
-protoc = "4.32.0"
+protoc = "4.32.1"
 shizuku = "13.1.5"
 square-retrofit = "3.0.0"
 zhaobozhen = "1.1.6"
@@ -15,7 +15,7 @@ zhaobozhen = "1.1.6"
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.6" }
-gms = { id = "com.google.gms.google-services", version = "4.4.3" }
+gms = { id = "com.google.gms.google-services", version = "4.4.4" }
 hiddenApiRefine = { id = "dev.rikka.tools.refine", version.ref = "hiddenApiRefine" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
@@ -51,8 +51,8 @@ androidX-window = "androidx.window:window:1.5.0"
 
 square-leakCanary = "com.squareup.leakcanary:leakcanary-android:2.14"
 square-moshi = "com.squareup.moshi:moshi:1.15.2"
-square-okHttp = "com.squareup.okhttp3:okhttp:5.1.0"
-square-okio = "com.squareup.okio:okio:3.16.0"
+square-okHttp = "com.squareup.okhttp3:okhttp:5.2.1"
+square-okio = "com.squareup.okio:okio:3.16.1"
 square-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "square-retrofit" }
 square-retrofit-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "square-retrofit" }
 
@@ -82,7 +82,7 @@ aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref
 aboutlibraries-ui = { module = "com.mikepenz:aboutlibraries", version.ref = "aboutlibraries" }
 appIconLoader = "me.zhanghai.android.appiconloader:appiconloader:1.5.0"
 appIconLoader-coil = "me.zhanghai.android.appiconloader:appiconloader-coil:1.5.0"
-brvah = "io.github.cymchad:BaseRecyclerViewAdapterHelper:3.0.14"
+brvah = "io.github.cymchad:BaseRecyclerViewAdapterHelper:3.0.16"
 coil = "io.coil-kt:coil:2.7.0"
 commons-compress = "org.apache.commons:commons-compress:1.28.0"
 fastScroll = "me.zhanghai.android.fastscroll:library:1.3.0"
