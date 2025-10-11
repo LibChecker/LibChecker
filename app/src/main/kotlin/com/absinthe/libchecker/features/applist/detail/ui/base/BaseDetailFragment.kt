@@ -38,6 +38,7 @@ import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibStringAdapt
 import com.absinthe.libchecker.features.applist.detail.ui.impl.ComponentsAnalysisFragment
 import com.absinthe.libchecker.features.applist.detail.ui.impl.MetaDataAnalysisFragment
 import com.absinthe.libchecker.features.applist.detail.ui.impl.NativeAnalysisFragment
+import com.absinthe.libchecker.features.applist.detail.ui.impl.PermissionAnalysisFragment
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.integrations.anywhere.AnywhereManager
@@ -340,7 +341,10 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   private fun doOnLongClick(context: Context, item: LibStringItemChip, position: Int) {
     val actionMap = mutableMapOf<Int, () -> Unit>()
     val arrayAdapter = ArrayAdapter<String>(context, android.R.layout.simple_list_item_1)
-    val componentName = item.item.name
+    var componentName = item.item.name
+    if (this is PermissionAnalysisFragment) {
+      componentName = componentName.substringBefore(" ")
+    }
     val fullComponentName = if (componentName.startsWith(".")) {
       viewModel.packageInfo.packageName + componentName
     } else {
