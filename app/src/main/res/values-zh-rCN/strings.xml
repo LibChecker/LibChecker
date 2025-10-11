@@ -112,7 +112,7 @@
   <string name="detail_label">查看应用详情</string>
   <string name="not_found">未找到</string>
   <string name="create_an_issue">协助我们来补充信息</string>
-  <string name="app_bundle_details">Android App Bundle 是 Android 新推出的一种官方发布格式，可让您以更高效的方式开发和发布应用。借助 Android App Bundle，您可以更轻松地以更小的应用提供优质的使用体验，从而提升安装成功率并减少卸载量。转换过程轻松便捷。您无需重构代码即可开始获享较小应用的优势。改用这种格式后，您可以体验模块化应用开发和可自定义功能交付，并从中受益。</string>
+  <string name="app_bundle_details">Android App Bundle 是一种发布格式，其中包含了应用的所有已编译代码和资源，并将 APK 的生成与签名工作交由 Google Play 处理。\nGoogle Play 会根据你的 App Bundle 为每种设备配置生成并分发经过优化的 APK，这样每台设备只会下载其运行应用所需的代码和资源。你不再需要为了不同设备手动构建、签名和管理多个 APK，从而简化了流程；同时，用户也能获得更小、更优化的下载包。</string>
   <string name="kotlin_details">Kotlin 是由 JetBrains 开发的开源静态类型编程语言。Kotlin 简洁、安全、可与 Java 和其他语言互操作，并提供了许多在多个平台之间重用代码的方法，从而实现高效编程。Kotlin 适用于 JVM、Android、JavaScript、Wasm 和 Native，可用于任何类型的开发，包括服务器端、客户端 Web、Android 和多平台库。</string>
   <string name="items_count">项数：</string>
   <string name="further_operation">进一步操作</string>
