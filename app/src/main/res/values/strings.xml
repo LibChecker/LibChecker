@@ -86,7 +86,7 @@
   <string name="pref_group_others">Others</string>
 
   <string name="apk_analytics">APK details</string>
-  <string name="colorful_icon">Colorful logos</string>
+  <string name="colorful_icon">Colorful icon</string>
   <string name="rules_repo_title">Rules repository</string>
   <string name="lib_ref_threshold">Library reference threshold</string>
   <string name="languages">Languages</string>
