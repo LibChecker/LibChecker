@@ -41,8 +41,8 @@ class APKSParser(private val file: File, private val flags: Int = 0) {
 
   private fun dumpApks(zipFile: ZipFileCompat): File {
     Timber.d("Dumping apks")
-    val rootDir = File(LibCheckerApp.app.externalCacheDir, "apks")
-    rootDir.mkdir()
+    val rootDir = File(LibCheckerApp.app.externalCacheDir, "apks" + File.separator + zipFile.hashCode())
+    rootDir.mkdirs()
 
     zipFile.getZipEntries()
       .asSequence()
