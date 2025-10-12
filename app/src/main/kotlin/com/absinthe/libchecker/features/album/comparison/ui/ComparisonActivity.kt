@@ -50,6 +50,7 @@ import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
+import com.absinthe.libchecker.utils.apk.APKSParser
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getAppName
@@ -88,7 +89,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
   private var leftIconOriginal: Bitmap? = null
   private var rightIconOriginal: Bitmap? = null
 
-  private lateinit var chooseApkResultLauncher: ActivityResultLauncher<String>
+  private lateinit var chooseApkResultLauncher: ActivityResultLauncher<Array<String>>
 
   private val dashboardView by lazy {
     ComparisonDashboardView(
@@ -119,7 +120,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
 
   private fun registerCallbacks() {
     chooseApkResultLauncher =
-      registerForActivityResult(ActivityResultContracts.GetContent()) {
+      registerForActivityResult(ActivityResultContracts.OpenDocument()) {
         if (isLeftPartChoosing) {
           leftTimeStamp = -1
           leftUri = it
@@ -278,7 +279,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
         when (it) {
           is SnapshotViewModel.Effect.ChooseComparedApk -> {
             isLeftPartChoosing = it.isLeftPart
-            chooseApkResultLauncher.launch("application/vnd.android.package-archive")
+            chooseApkResultLauncher.launch(arrayOf("application/vnd.android.package-archive", "application/octet-stream"))
           }
 
           is SnapshotViewModel.Effect.DashboardCountChange -> {
@@ -317,14 +318,18 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
       intent.extras?.let {
         val uriList = BundleCompat.getParcelableArrayList(it, Intent.EXTRA_STREAM, Uri::class.java)
         if (uriList?.size == 2) {
-          if (uriList[0].encodedPath?.endsWith(".apk") == true) {
+          if (uriList[0].encodedPath?.endsWith(".apk") == true ||
+            uriList[0].encodedPath?.endsWith(".apks") == true
+          ) {
             leftTimeStamp = -1
             leftUri = uriList[0]
           } else {
             showToast(R.string.album_item_comparison_invalid_shared_items)
           }
 
-          if (uriList[1].encodedPath?.endsWith(".apk") == true) {
+          if (uriList[1].encodedPath?.endsWith(".apk") == true ||
+            uriList[1].encodedPath?.endsWith(".apks") == true
+          ) {
             rightTimeStamp = -1
             rightUri = uriList[1]
           } else {
@@ -509,18 +514,18 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
               or PackageManager.MATCH_DISABLED_COMPONENTS
               or PackageManager.MATCH_UNINSTALLED_PACKAGES
             )
-          pi = PackageManagerCompat.getPackageArchiveInfo(tf.path, flag)?.also {
-            it.applicationInfo?.let { ai ->
-              ai.sourceDir = tf.path
-              ai.publicSourceDir = tf.path
+          pi = PackageManagerCompat.getPackageArchiveInfo(tf.path, flag)?.apply {
+            applicationInfo?.sourceDir = tf.path
+            applicationInfo?.publicSourceDir = tf.path
+          } ?: APKSParser(File(tf.path), flag).getPackageInfo()
 
-              val iconSize = resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size)
-              val appIconLoader = AppIconLoader(iconSize, false, this)
-              if (fileName == Constants.TEMP_PACKAGE) {
-                leftIconOriginal = appIconLoader.loadIcon(ai)
-              } else {
-                rightIconOriginal = appIconLoader.loadIcon(ai)
-              }
+          pi?.applicationInfo?.let {
+            val iconSize = resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size)
+            val appIconLoader = AppIconLoader(iconSize, false, this)
+            if (fileName == Constants.TEMP_PACKAGE) {
+              leftIconOriginal = appIconLoader.loadIcon(it)
+            } else {
+              rightIconOriginal = appIconLoader.loadIcon(it)
             }
           }
         } else {
