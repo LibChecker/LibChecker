@@ -598,7 +598,7 @@ class HomeViewModel : ViewModel() {
                 .flatMap { filter -> filter.actions }
             }
             .toSet()
-            .filter { !it.startsWith("android.") }
+          // .filter { !it.startsWith("android.") }
           computeReferenceInternal(
             referenceMap,
             packageName,
