@@ -1,16 +1,17 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
 import android.content.DialogInterface
+import androidx.core.text.buildSpannedString
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.features.applist.detail.ui.view.PermissionInfoBottomSheetView
+import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 const val EXTRA_ORIG_PERM_NAME = "EXTRA_ORIG_PERM_NAME"
@@ -25,38 +26,47 @@ class PermissionDetailDialogFragment : BaseBottomSheetViewDialogFragment<Permiss
   override fun initRootView(): PermissionInfoBottomSheetView = PermissionInfoBottomSheetView(requireContext())
 
   override fun init() {
+    val pm = SystemServices.packageManager
     root.apply {
-      title.text = origPermName
-      lifecycleScope.launch {
-        icon.load(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_android) {
-          crossfade(true)
-        }
+      val permissionInfo = runCatching {
+        pm.getPermissionInfo(origPermName, 0)
+      }.onFailure {
+        Timber.e(it)
+        icon.load(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_android)
         permissionContentView.description.text.text = context.getText(R.string.not_found)
+      }.getOrNull()
+
+      if (permissionInfo == null || permissionInfo.icon == 0) {
+        icon.load(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_android)
+      } else {
+        icon.load(permissionInfo.loadIcon(pm))
+      }
+
+      val titleText = buildSpannedString {
+        append(origPermName)
+
+        val targetPi = runCatching { PackageUtils.getPackageInfo(permissionInfo?.packageName.orEmpty()) }.getOrNull()
+        if (permissionInfo != null && targetPi != null) {
+          appendLine()
+          append(
+            String.format(
+              getString(R.string.lib_permission_provided_by_format),
+              targetPi.getAppName()
+            )
+          )
+        }
+      }
+      title.text = titleText
+
+      if (permissionInfo != null) {
+        permissionInfo.loadLabel(pm).let { if (it.isNotEmpty()) permissionContentView.label.text.text = it }
+        permissionInfo.loadDescription(pm)
+          ?.let { if (it.isNotEmpty()) permissionContentView.description.text.text = it }
       }
     }
   }
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
-
-  override fun onStart() {
-    super.onStart()
-    SystemServices.packageManager.let { pm ->
-      val pi = runCatching {
-        pm.getPermissionInfo(origPermName, 0)
-      }.getOrElse {
-        Timber.e(it)
-        root.showNotFound()
-        return
-      }
-      root.apply {
-        val iconDrawable = runCatching { pi.loadIcon(pm) }.getOrNull()
-        iconDrawable?.let { icon.load(it) { crossfade(true) } }
-        pi.loadLabel(pm).let { if (it.isNotEmpty()) permissionContentView.label.text.text = it }
-        pi.loadDescription(pm)
-          ?.let { if (it.isNotEmpty()) permissionContentView.description.text.text = it }
-      }
-    }
-  }
 
   override fun show(manager: FragmentManager, tag: String?) {
     if (!isShowing) {
