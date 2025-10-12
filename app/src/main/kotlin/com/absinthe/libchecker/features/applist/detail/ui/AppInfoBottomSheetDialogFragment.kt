@@ -73,7 +73,7 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
       root.launch.setLongClickCopiedToClipboard(PackageUtils.getLauncherActivity(it))
       Telemetry.recordEvent(
         Constants.Event.APP_INFO_BOTTOM_SHEET,
-        mapOf(Telemetry.Param.CONTENT to packageName.toString(), "Action" to "Launch")
+        mapOf(Telemetry.Param.CONTENT to "Unknown", "Action" to "Launch")
       )
     }
     root.setting.setOnClickListener {
@@ -84,7 +84,10 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
         startActivity(intent)
         Telemetry.recordEvent(
           Constants.Event.APP_INFO_BOTTOM_SHEET,
-          mapOf(Telemetry.Param.CONTENT to packageName.toString(), "Action" to "Setting")
+          mapOf(
+            Telemetry.Param.CONTENT to "Unknown",
+            "Action" to "Setting"
+          )
         )
       } catch (_: Exception) {
         context?.showToast(R.string.toast_cant_open_app)
@@ -106,10 +109,10 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
         adapter.data[position].let {
           runCatching {
             startActivity(it.intent)
-            Telemetry.recordEvent(
-              Constants.Event.APP_INFO_BOTTOM_SHEET,
-              mapOf(Telemetry.Param.CONTENT to packageName.toString(), "Action" to it.pii.packageName)
-            )
+            // Telemetry.recordEvent(
+            //   Constants.Event.APP_INFO_BOTTOM_SHEET,
+            //   mapOf(Telemetry.Param.CONTENT to packageName.toString(), "Action" to it.pii.packageName)
+            // )
           }.onFailure {
             context?.let { ctx ->
               Toasty.showShort(ctx, R.string.toast_cant_open_app)
