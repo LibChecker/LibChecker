@@ -1,12 +1,12 @@
 [versions]
 agp = "8.13.0"
-aboutlibraries = "13.0.0"
+aboutlibraries = "12.2.4"
 androidX-lifecycle = "2.9.4"
 androidX-room = "2.8.2"
 firebase-bom = "34.4.0"
 hiddenApiRefine = "4.4.0"
 kotlin = "2.2.20"
-protoc = "4.32.1"
+protoc = "4.33.0"
 shizuku = "13.1.5"
 square-retrofit = "3.0.0"
 zhaobozhen = "1.1.6"
@@ -52,7 +52,7 @@ androidX-window = "androidx.window:window:1.5.0"
 square-leakCanary = "com.squareup.leakcanary:leakcanary-android:2.14"
 square-moshi = "com.squareup.moshi:moshi:1.15.2"
 square-okHttp = "com.squareup.okhttp3:okhttp:5.2.1"
-square-okio = "com.squareup.okio:okio:3.16.1"
+square-okio = "com.squareup.okio:okio:3.16.2"
 square-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "square-retrofit" }
 square-retrofit-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "square-retrofit" }
 
