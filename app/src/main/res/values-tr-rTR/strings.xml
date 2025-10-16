@@ -120,6 +120,7 @@
   <string name="app_info_settings">Ayarlar</string>
   <string name="lib_detail_dialog_title">Kütüphane Ayrıntıları</string>
   <string name="lib_permission_dialog_title">İzin Ayrıntısı</string>
+  <string name="lib_permission_provided_by_format">%s tarafından sağlandı</string>
   <string name="agp_details">Android Studio derleme sistemi Gradle\'a dayanmaktadır ve Android Gradle eklentisi, Android uygulamaları oluşturmaya özgü birkaç özellik ekler. Android eklentisi genellikle Android Studio ile eşzamanlı olarak güncellense de, eklenti (ve Gradle sisteminin geri kalanı) Android Studio\'dan bağımsız olarak çalışabilir ve ayrı olarak güncellenebilir.</string>
   <string name="xposed_module">Xposed Modülü</string>
   <string name="xposed_module_details">Xposed, herhangi bir APK\'ya dokunmadan sistem ve uygulamaların davranışını değiştirebilen modüller için bir çerçevedir. Bu harikadır çünkü modüllerin herhangi bir değişiklik yapılmadan farklı sürümler ve hatta ROM\'lar için çalışabileceği anlamına gelir.</string>

@@ -41,7 +41,6 @@
   <string name="ref_category_cp">Nhà cung cấp nội dung</string>
   <string name="ref_category_perm">Quyền</string>
   <string name="ref_category_static">Thư viện</string>
-  <string name="ref_category_metadata">Metadata</string>
   <string name="ref_category_package">Gói</string>
   <string name="ref_category_shared_uid">UID dùng chung</string>
   <string name="ref_category_signatures">Chữ ký</string>
