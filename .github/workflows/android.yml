@@ -145,6 +145,8 @@ jobs:
           cp -f $FOSS_FILE ./app-release.apk
           
           # Commit and push changes
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
           git add app-release.apk
           git commit -m "Add build artifacts"
           git push origin ci --force
@@ -175,6 +177,8 @@ jobs:
             }
           }' > ci.json
 
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
           git add ci.json
           git commit -m "Update ci.json"
           git push origin main --force
