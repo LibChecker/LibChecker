@@ -32,7 +32,7 @@ env:
 jobs:
   check:
     name: Check
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v5
@@ -49,7 +49,7 @@ jobs:
 
   build:
     name: Build
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v5
@@ -124,53 +124,42 @@ jobs:
             Snapshot apk is attached
         run: |
           ESCAPED=`python3 -c 'import json,os,urllib.parse; print(urllib.parse.quote(json.dumps(os.environ["COMMIT_MESSAGE"])))'`
-          curl -v "https://api.telegram.org/bot${BOT_TOKEN}/sendMediaGroup?chat_id=${CHANNEL_ID}&media=%5B%7B%22type%22%3A%22document%22%2C%20%22media%22%3A%22attach%3A%2F%2FmarketRelease%22%2C%22parse_mode%22%3A%22MarkdownV2%22%2C%22caption%22:${ESCAPED}%7D%5D" -F marketRelease="@$MARKET_FILE"
+          curl -v "https://api.telegram.org/bot${BOT_TOKEN}/sendMediaGroup?chat_id=${CHANNEL_ID}&media=%5B%7B%22type%22%3A%22document%22%2C%20%22media%22%3A%22attach%3A%2F%2FmarketRelease%22%2C%22pars[...]
+      - name: Checkout assets repository
+        if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
+        uses: actions/checkout@v5
+        with:
+          repository: LibChecker/assets
+          ref: ci
+          path: assets-ci
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Commit and push artifacts to assets repo
         if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FOSS_FILE: ${{ github.workspace }}/${{ steps.apk-path.outputs.foss_path }}
         run: |
-            # Define the directory where your build artifacts are located
-            ARTIFACTS_DIR=${FOSS_FILE}
-
-            # Define the target repository and branch
-            TARGET_REPO=LibChecker/assets
-            TARGET_BRANCH=ci
-
-            # Authenticate GitHub CLI
-            # echo $GITHUB_TOKEN | gh auth login --with-token
-
-            # Clone the target repository
-            # gh repo clone $TARGET_REPO target-repo
-
-            #Locate the target repository
-            cd ~/Projects/assets
-
-            # Create a new branch or checkout the existing branch
-            git fetch origin
-            git checkout -B $TARGET_BRANCH
-            git rebase origin $TARGET_BRANCH
-            git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git config --local user.name "github-actions[bot]"
-
-            # Copy artifacts to the repository
-            cp -f $ARTIFACTS_DIR ./app-release.apk
-
-            # Commit and push changes
-            git add app-release.apk
-            git commit -m "Add build artifacts"
-            git push origin $TARGET_BRANCH --force
+          cd ${{ github.workspace }}/assets-ci
+          
+          # Copy artifacts to the repository
+          cp -f $FOSS_FILE ./app-release.apk
+          
+          # Commit and push changes
+          git add app-release.apk
+          git commit -m "Add build artifacts"
+          git push origin ci --force
+      - name: Checkout assets repository (main branch)
+        if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
+        uses: actions/checkout@v5
+        with:
+          repository: LibChecker/assets
+          ref: main
+          path: assets-main
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Create JSON file
         if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
-        env:
-          FOSS_FILE: ${{ github.workspace }}/${{ steps.apk-path.outputs.foss_path }}
         run: |
-          cd ~/Projects/assets
-          git checkout main
-          git rebase origin main
-          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
+          cd ${{ github.workspace }}/assets-main
 
           echo '{
             "app": {
@@ -191,7 +180,7 @@ jobs:
           git push origin main --force
 
   skipped:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     if: ${{ startsWith(github.event.head_commit.message, '[skip ci]') }}
     steps:
       - uses: actions/checkout@v5
@@ -208,7 +197,7 @@ jobs:
             This push skipped building
 
   cancelled:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     if: ${{ cancelled() && github.repository == 'LibChecker/LibChecker' && github.event_name != 'pull_request' && github.ref == 'refs/heads/master' }}
     needs: [check, build]
     steps:
