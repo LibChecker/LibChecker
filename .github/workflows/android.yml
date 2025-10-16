@@ -132,11 +132,11 @@ jobs:
           repository: LibChecker/assets
           ref: ci
           path: assets-ci
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
       - name: Commit and push artifacts to assets repo
         if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           FOSS_FILE: ${{ github.workspace }}/${{ steps.apk-path.outputs.foss_path }}
         run: |
           cd ${{ github.workspace }}/assets-ci
@@ -157,7 +157,7 @@ jobs:
           repository: LibChecker/assets
           ref: main
           path: assets-main
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
       - name: Create JSON file
         if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
         run: |
