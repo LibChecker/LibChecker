@@ -13,7 +13,13 @@ object LibReferenceOptions {
   const val ONLY_NOT_MARKED = 1 shl 9
   const val ACTION = 1 shl 10
 
-  const val DEFAULT_OPTIONS = SERVICES
+  const val DEFAULT_OPTIONS =
+    NATIVE_LIBS or
+      SERVICES or
+      ACTIVITIES or
+      RECEIVERS or
+      PROVIDERS or
+      ACTION
 
   fun getOptionsString(options: Int): String {
     val sb = StringBuilder()
