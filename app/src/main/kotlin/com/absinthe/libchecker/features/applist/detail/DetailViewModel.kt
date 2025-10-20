@@ -572,6 +572,20 @@ class DetailViewModel : ViewModel() {
 
   fun initFeatures(packageInfo: PackageInfo, features: Int) = viewModelScope.launch(Dispatchers.IO) {
     Timber.d("initFeatures: features = $features")
+
+    _featuresFlow.emit(VersionedFeature(Features.Ext.APPLICATION_PROP))
+
+    if (OsUtils.atLeastR() && !isApk) {
+      runCatching {
+        val info = PackageUtils.getInstallSourceInfo(packageInfo.packageName)
+        if (info?.installingPackageName != null) {
+          _featuresFlow.emit(VersionedFeature(Features.Ext.APPLICATION_INSTALL_SOURCE, info.initiatingPackageName))
+        }
+      }.onFailure {
+        Timber.e(it)
+      }
+    }
+
     var feat = features
     if (feat == -1) {
       feat = packageInfo.getFeatures()
@@ -601,19 +615,6 @@ class DetailViewModel : ViewModel() {
     }
     if (packageInfo.isPWA()) {
       _featuresFlow.emit(VersionedFeature(Features.PWA))
-    }
-
-    _featuresFlow.emit(VersionedFeature(Features.Ext.APPLICATION_PROP))
-
-    if (OsUtils.atLeastR() && !isApk) {
-      runCatching {
-        val info = PackageUtils.getInstallSourceInfo(packageInfo.packageName)
-        if (info?.installingPackageName != null) {
-          _featuresFlow.emit(VersionedFeature(Features.Ext.APPLICATION_INSTALL_SOURCE, info.initiatingPackageName))
-        }
-      }.onFailure {
-        Timber.e(it)
-      }
     }
 
     if (OsUtils.atLeastBaklava() && packageInfo.isPageSizeCompat()) {

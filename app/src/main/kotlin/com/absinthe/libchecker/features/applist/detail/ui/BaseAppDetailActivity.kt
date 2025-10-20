@@ -55,6 +55,7 @@ import com.absinthe.libchecker.features.applist.detail.IDetailContainer
 import com.absinthe.libchecker.features.applist.detail.bean.AppDetailToolbarItem
 import com.absinthe.libchecker.features.applist.detail.bean.DetailExtraBean
 import com.absinthe.libchecker.features.applist.detail.bean.FeatureItem
+import com.absinthe.libchecker.features.applist.detail.bean.FeaturePriority
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.AppDetailToolbarAdapter
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.FeatureAdapter
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.ProcessBarAdapter
@@ -682,7 +683,9 @@ abstract class BaseAppDetailActivity :
           }
 
           Features.Ext.APPLICATION_PROP -> {
+            val position = featureAdapter.data.size.coerceAtMost(FeaturePriority.PRIORITY_APP_PROP)
             featureAdapter.addData(
+              position,
               FeatureItem(R.drawable.ic_app_prop) {
                 FeaturesDialog.showAppPropDialog(this, it.packageInfo)
               }
@@ -690,8 +693,10 @@ abstract class BaseAppDetailActivity :
           }
 
           Features.Ext.APPLICATION_INSTALL_SOURCE -> {
+            val position = featureAdapter.data.size.coerceAtMost(FeaturePriority.PRIORITY_APP_INSTALL_SOURCE)
             if (OsUtils.atLeastR() && !apkAnalyticsMode) {
               featureAdapter.addData(
+                position,
                 FeatureItem(R.drawable.ic_install_source) {
                   FeaturesDialog.showAppInstallSourceDialog(this, it.packageInfo.packageName)
                 }
@@ -700,7 +705,9 @@ abstract class BaseAppDetailActivity :
           }
 
           Features.Ext.ELF_PAGE_SIZE_16KB -> {
+            val position = featureAdapter.data.size.coerceAtMost(FeaturePriority.PRIORITY_16_KB_PAGE_SIZE)
             featureAdapter.addData(
+              position,
               FeatureItem(R.drawable.ic_16kb_align) {
                 FeaturesDialog.show16KBAlignDialog(this)
               }
@@ -708,7 +715,9 @@ abstract class BaseAppDetailActivity :
           }
 
           Features.Ext.ELF_PAGE_SIZE_16KB_COMPAT -> {
+            val position = featureAdapter.data.size.coerceAtMost(FeaturePriority.PRIORITY_16_KB_PAGE_SIZE_COMPAT)
             featureAdapter.addData(
+              position,
               FeatureItem(R.drawable.ic_16kb_compat) {
                 FeaturesDialog.show16KBCompatDialog(this)
               }
