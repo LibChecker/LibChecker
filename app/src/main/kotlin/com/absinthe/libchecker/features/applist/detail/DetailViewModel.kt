@@ -417,9 +417,9 @@ class DetailViewModel : ViewModel() {
         LibStringItemChip(
           LibStringItem(
             name = perm.first,
-            size = if (perm.second) PackageInfo.REQUESTED_PERMISSION_GRANTED.toLong() else 0,
+            size = if (perm.second && !isApk) PackageInfo.REQUESTED_PERMISSION_GRANTED.toLong() else 0,
             source = if (perm.first.contains("maxSdkVersion")) DISABLED else null,
-            process = if (perm.second) PackageInfo.REQUESTED_PERMISSION_GRANTED.toString() else null
+            process = if (perm.second && !isApk) PackageInfo.REQUESTED_PERMISSION_GRANTED.toString() else null
           ),
           null
         )
