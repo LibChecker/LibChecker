@@ -767,15 +767,17 @@ fun PackageInfo.is16KBAligned(libs: List<LibStringItem>? = null, isApk: Boolean 
     return false
   }
 
-  val nativeLibs = libs ?: run {
-    val abi = PackageUtils.getAbi(this, isApk = isApk)
-    val abiString = ABI_STRING_MAP[abi % MULTI_ARCH]
-    PackageUtils.getSourceLibs(
-      packageInfo = this,
-      specifiedAbi = abi,
-      parseElf = true
-    )[abiString] ?: emptyList()
-  }
+  val nativeLibs = (
+    libs ?: run {
+      val abi = PackageUtils.getAbi(this, isApk = isApk)
+      val abiString = ABI_STRING_MAP[abi % MULTI_ARCH]
+      PackageUtils.getSourceLibs(
+        packageInfo = this,
+        specifiedAbi = abi,
+        parseElf = true
+      )[abiString] ?: emptyList()
+    }
+    ).filter { it.elfInfo.pageSize > 0 }
 
   return nativeLibs.isNotEmpty() &&
     nativeLibs.all { it.elfInfo.pageSize % PAGE_SIZE_16_KB == 0 } &&
