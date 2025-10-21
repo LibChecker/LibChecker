@@ -19,6 +19,6 @@ object URLManager {
   const val TELEGRAM_GROUP = "https://t.me/libcheckerr"
   const val TELEGRAM_RELEASES = "https://t.me/libchecker_releases"
 
-  val ANDROID_DEV_HOST = if (Locale.CHINA.equals(Locale.getDefault())) "android.google.cn" else "android.com"
+  val ANDROID_DEV_HOST = if ("CN".equals(Locale.getDefault().country)) "android.google.cn" else "android.com"
   val ANDROID_DEV_MANIFEST_APPLICATION = "https://developer.$ANDROID_DEV_HOST/guide/topics/manifest/application-element"
 }

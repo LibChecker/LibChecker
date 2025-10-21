@@ -10,7 +10,7 @@ class AndroidDevelopersInterceptor : Interceptor {
     val originalRequest = chain.request()
     val originalUrl = originalRequest.url
     Timber.d("originalRequest.url: %s", originalUrl)
-    if (originalUrl.host != "android.com" || !Locale.CHINA.equals(Locale.getDefault())) return chain.proceed(originalRequest)
+    if (originalUrl.host != "android.com" || !"CN".equals(Locale.getDefault().country)) return chain.proceed(originalRequest)
 
     val newUrl = originalUrl.newBuilder()
       .host("android.google.cn")
