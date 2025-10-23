@@ -13,6 +13,8 @@ import android.os.Bundle
 import android.os.Environment
 import android.view.ContextThemeWrapper
 import android.view.Gravity
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -23,6 +25,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.createBitmap
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.MenuProvider
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -44,6 +48,7 @@ import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ICON
 import com.absinthe.libchecker.features.snapshot.detail.ui.SnapshotDetailActivity
 import com.absinthe.libchecker.features.snapshot.detail.ui.view.SnapshotEmptyView
 import com.absinthe.libchecker.features.snapshot.ui.TimeNodeBottomSheetDialogFragment
+import com.absinthe.libchecker.features.snapshot.ui.VF_LIST
 import com.absinthe.libchecker.features.snapshot.ui.adapter.SnapshotAdapter
 import com.absinthe.libchecker.ui.adapter.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.ui.base.BaseActivity
@@ -77,7 +82,9 @@ import rikka.widget.borderview.BorderView
 const val VF_LOADING = 0
 const val VF_LIST = 1
 
-class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
+class ComparisonActivity :
+  BaseActivity<ActivityComparisonBinding>(),
+  MenuProvider {
 
   private val viewModel: SnapshotViewModel by viewModels()
   private val adapter = SnapshotAdapter()
@@ -111,6 +118,36 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
     }
   }
 
+  override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+    menuInflater.inflate(R.menu.comparison_menu, menu)
+  }
+
+  override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+    if (menuItem.itemId == R.id.compare) {
+      if (binding.vfContainer.displayedChild == VF_LOADING) {
+        return false
+      }
+      if (leftTimeStamp == 0L || rightTimeStamp == 0L) {
+        showToast(R.string.album_item_comparison_invalid_compare)
+        return false
+      }
+      if (leftTimeStamp != -1L && rightTimeStamp != -1L) {
+        if (leftTimeStamp == rightTimeStamp) {
+          showToast(R.string.album_item_comparison_invalid_compare)
+          return false
+        }
+        viewModel.compareDiff(
+          leftTimeStamp.coerceAtMost(rightTimeStamp),
+          leftTimeStamp.coerceAtLeast(rightTimeStamp)
+        )
+        flip(VF_LOADING)
+      } else {
+        compareDiffContainsApk()
+      }
+    }
+    return true
+  }
+
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     if (item.itemId == android.R.id.home) {
       onBackPressedDispatcher.onBackPressed()
@@ -133,6 +170,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
   }
 
   private fun initView() {
+    addMenuProvider(this, this, Lifecycle.State.CREATED)
     setSupportActionBar(binding.toolbar)
     (binding.root as ViewGroup).bringChildToFront(binding.appbar)
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -192,36 +230,6 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
     }
 
     binding.apply {
-      extendedFab.apply {
-        setOnClickListener {
-          if (AntiShakeUtils.isInvalidClick(it)) {
-            return@setOnClickListener
-          }
-          if (leftTimeStamp == 0L || rightTimeStamp == 0L) {
-            showToast(R.string.album_item_comparison_invalid_compare)
-            return@setOnClickListener
-          }
-          if (leftTimeStamp != -1L && rightTimeStamp != -1L) {
-            if (leftTimeStamp == rightTimeStamp) {
-              showToast(R.string.album_item_comparison_invalid_compare)
-              return@setOnClickListener
-            }
-            viewModel.compareDiff(
-              leftTimeStamp.coerceAtMost(rightTimeStamp),
-              leftTimeStamp.coerceAtLeast(rightTimeStamp)
-            )
-            flip(VF_LOADING)
-          } else {
-            compareDiffContainsApk()
-          }
-        }
-        setOnLongClickListener {
-          if (adapter.data.isNotEmpty()) {
-            hide()
-          }
-          true
-        }
-      }
       recyclerview.apply {
         adapter = this@ComparisonActivity.adapter
         layoutManager = getSuitableLayoutManager()
@@ -585,14 +593,8 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
       return@launch
     }
     if (child == VF_LOADING) {
-      if (binding.extendedFab.isShown) {
-        binding.extendedFab.hide()
-      }
       binding.loading.resumeAnimation()
     } else {
-      if (!binding.extendedFab.isShown) {
-        binding.extendedFab.show()
-      }
       binding.loading.pauseAnimation()
     }
 
