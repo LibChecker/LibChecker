@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.features.about
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.text.method.LinkMovementMethod
 import android.util.TypedValue
@@ -11,13 +12,17 @@ import android.widget.LinearLayout.LayoutParams
 import android.widget.ScrollView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.findFragment
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.constant.URLManager.ANDROID_DEV_HOST
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
+import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.dp
 import com.mikepenz.aboutlibraries.LibsBuilder
 import com.mikepenz.aboutlibraries.LibsConfiguration
@@ -51,11 +56,20 @@ object AboutPageBuilder {
         override fun onIconClicked(v: View) {
         }
 
-        override fun onLibraryAuthorClicked(v: View, library: Library) = false
+        override fun onLibraryAuthorClicked(v: View, library: Library): Boolean {
+          openLibraryLink(context, library.website)
+          return false
+        }
 
-        override fun onLibraryContentClicked(v: View, library: Library) = false
+        override fun onLibraryContentClicked(v: View, library: Library): Boolean {
+          openLibraryLink(context, library.website)
+          return false
+        }
 
-        override fun onLibraryBottomClicked(v: View, library: Library) = false
+        override fun onLibraryBottomClicked(v: View, library: Library): Boolean {
+          openLibraryLink(context, library.website)
+          return false
+        }
 
         override fun onExtraClicked(
           v: View,
@@ -172,6 +186,27 @@ object AboutPageBuilder {
       is AppCompatActivity -> context.supportFragmentManager
       is ContextThemeWrapper -> getFragmentManager(context.baseContext)
       else -> null
+    }
+  }
+
+  private fun openLibraryLink(context: Context, url: String?) {
+    if (!url.isNullOrEmpty()) {
+      val targetUrl = url.replace("android.com", ANDROID_DEV_HOST)
+      runCatching {
+        CustomTabsIntent.Builder().build().apply {
+          launchUrl(context, targetUrl.toUri())
+        }
+      }.onFailure {
+        Timber.e(it)
+        runCatching {
+          val intent = Intent(Intent.ACTION_VIEW)
+            .setData(targetUrl.toUri())
+          context.startActivity(intent)
+        }.onFailure { inner ->
+          Timber.e(inner)
+          Toasty.showShort(context, "No browser application")
+        }
+      }
     }
   }
 
