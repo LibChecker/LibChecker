@@ -120,6 +120,7 @@
   <string name="app_info_settings">Setelan</string>
   <string name="lib_detail_dialog_title">Detail Library</string>
   <string name="lib_permission_dialog_title">Detail Perizinan</string>
+  <string name="lib_permission_provided_by_format">Provided by %s</string>
   <string name="agp_details">Sistem pembuatan Android Studio didasarkan pada Gradle, dan plugin Android Gradle menambahkan beberapa fitur khusus untuk membangun aplikasi Android. Meskipun plugin Android biasanya diperbarui secara bersamaan dengan Android Studio, plugin (dan sistem Gradle lainnya) dapat berjalan secara independen dari Android Studio dan diperbarui secara terpisah.</string>
   <string name="xposed_module">Modul Xposed</string>
   <string name="xposed_module_details">Xposed adalah kerangka kerja untuk modul yang dapat mengubah perilaku sistem dan aplikasi tanpa mempengaruhi APK apa pun. Ini sangat bagus karena berarti modul dapat bekerja pada versi yang berbeda dan bahkan ROM tanpa perubahan apa pun.</string>
@@ -231,6 +232,8 @@
   <string name="btn_drop">Buang</string>
   <string name="dialog_title_compare_diff_apk">Perhatian</string>
   <string name="dialog_message_compare_diff_apk">Apakah Anda ingin membandingkan dua APK yang berbeda?</string>
+  <string name="dialog_themed_and_alternative_app_icons">Themed and alternative icons</string>
+  <string name="dialog_themed">Themed</string>
   <!--  Album  -->
   <string name="album_compare">Bandingkan</string>
   <string name="album_item_comparison_title">Perbandingan</string>
