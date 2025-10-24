@@ -5,6 +5,9 @@ import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.graphics.drawable.AdaptiveIconDrawable
+import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
@@ -12,6 +15,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.graphics.toColorInt
@@ -71,6 +75,7 @@ import com.absinthe.libchecker.features.applist.detail.ui.view.ProcessBarView
 import com.absinthe.libchecker.features.snapshot.detail.bean.SnapshotDiffItem
 import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ENTITY
 import com.absinthe.libchecker.features.snapshot.detail.ui.SnapshotDetailActivity
+import com.absinthe.libchecker.ui.adapter.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.OsUtils
@@ -82,6 +87,7 @@ import com.absinthe.libchecker.utils.extensions.copyToClipboard
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getAppName
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersionString
 import com.absinthe.libchecker.utils.extensions.getPackageSize
@@ -619,7 +625,7 @@ abstract class BaseAppDetailActivity :
 
           Features.RX_KOTLIN -> {
             featureAdapter.addData(
-              FeatureItem(R.drawable.ic_reactivex, "#7F52FF".toColorInt()) {
+              FeatureItem(R.drawable.ic_reactivex, colorFilterInt = "#7F52FF".toColorInt()) {
                 FeaturesDialog.showRxKotlinDialog(this, feat.version)
               }
             )
@@ -627,7 +633,7 @@ abstract class BaseAppDetailActivity :
 
           Features.RX_ANDROID -> {
             featureAdapter.addData(
-              FeatureItem(R.drawable.ic_reactivex, "#3DDC84".toColorInt()) {
+              FeatureItem(R.drawable.ic_reactivex, colorFilterInt = "#3DDC84".toColorInt()) {
                 FeaturesDialog.showRxAndroidDialog(this, feat.version)
               }
             )
@@ -723,6 +729,20 @@ abstract class BaseAppDetailActivity :
               }
             )
           }
+
+          Features.Ext.APPLICATION_ICONS -> {
+            if (OsUtils.atLeastT() && viewModel.appIcons.isNotEmpty()) {
+              val isFirstMonochrome = viewModel.appIcons[0].isMonochrome
+              val drawables = prepareAppIconDrawables()
+              if (drawables.isNotEmpty()) {
+                featureAdapter.addData(
+                  FeatureItem(-1, drawables = drawables) {
+                    FeaturesDialog.showAppIconsDialog(this, drawables, isFirstMonochrome)
+                  }
+                )
+              }
+            }
+          }
         }
       }.launchIn(lifecycleScope)
       it.abiBundleStateFlow.onEach { bundle ->
@@ -777,9 +797,11 @@ abstract class BaseAppDetailActivity :
       ).also { lp ->
         lp.topMargin = 4.dp
       }
+      it.addItemDecoration(HorizontalSpacesItemDecoration(4.dp))
       it.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
       it.adapter = featureAdapter
       it.clipChildren = false
+      it.clipToPadding = false
       it.overScrollMode = View.OVER_SCROLL_NEVER
     }
   }
@@ -994,6 +1016,38 @@ abstract class BaseAppDetailActivity :
         }
       }
       binding.detailsTitle.setAbiLabels(abiLabelsList)
+    }
+  }
+
+  @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+  private fun prepareAppIconDrawables(): List<Drawable> {
+    val firstIcon = viewModel.appIcons[0]
+    val drawables = viewModel.appIcons.map { it.drawable }.toMutableList()
+
+    val processedDrawable = when {
+      firstIcon.isMonochrome && firstIcon.drawable is AdaptiveIconDrawable -> {
+        createMonochromeIconWithBackground(firstIcon.drawable)
+      }
+      else -> firstIcon.drawable
+    }
+
+    processedDrawable?.let {
+      drawables[0] = it
+    } ?: drawables.removeAt(0)
+
+    return drawables
+  }
+
+  @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+  private fun createMonochromeIconWithBackground(adaptiveIcon: AdaptiveIconDrawable): Drawable? {
+    return adaptiveIcon.monochrome?.apply {
+      setTint(getColorByAttr(androidx.appcompat.R.attr.colorPrimary))
+    }?.let { foreground ->
+      UiUtils.addCircleBackground(
+        this,
+        foreground,
+        getColorByAttr(com.google.android.material.R.attr.colorSecondaryContainer)
+      )
     }
   }
 }

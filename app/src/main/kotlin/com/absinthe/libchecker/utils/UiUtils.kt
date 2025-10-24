@@ -2,7 +2,9 @@ package com.absinthe.libchecker.utils
 
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
 import android.util.DisplayMetrics
@@ -12,7 +14,9 @@ import androidx.annotation.ColorInt
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.graphics.drawable.toDrawable
 import androidx.core.graphics.toColorInt
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.app.SystemServices
@@ -23,6 +27,7 @@ import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.slider.Slider
+import kotlin.math.max
 
 object UiUtils {
   fun getRandomColor(): Int {
@@ -126,5 +131,23 @@ object UiUtils {
       }
       .setNegativeButton(android.R.string.cancel, null)
       .create()
+  }
+
+  fun addCircleBackground(context: Context, drawable: Drawable, circleColor: Int): Drawable {
+    val width = drawable.intrinsicWidth.takeIf { it > 0 } ?: 100
+    val height = drawable.intrinsicHeight.takeIf { it > 0 } ?: 100
+
+    val bitmap = createBitmap(width, height)
+    val canvas = Canvas(bitmap)
+
+    val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    paint.color = circleColor
+    val radius = max(width, height) / 2f
+    canvas.drawCircle(width / 2f, height / 2f, radius, paint)
+
+    drawable.setBounds(0, 0, width, height)
+    drawable.draw(canvas)
+
+    return bitmap.toDrawable(context.resources)
   }
 }

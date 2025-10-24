@@ -5,9 +5,16 @@ import android.content.Intent
 import android.content.pm.PackageInfo
 import android.graphics.drawable.Drawable
 import android.os.Build
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.LinearLayout.LayoutParams
+import android.widget.ScrollView
 import androidx.annotation.DrawableRes
+import androidx.annotation.OptIn
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
@@ -26,6 +33,17 @@ import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.UiUtils
+import com.absinthe.libchecker.utils.extensions.copyToClipboard
+import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.paddingStartCompat
+import com.absinthe.libchecker.utils.extensions.paddingTopCompat
+import com.google.android.flexbox.FlexDirection
+import com.google.android.flexbox.FlexWrap
+import com.google.android.flexbox.FlexboxLayout
+import com.google.android.flexbox.JustifyContent
+import com.google.android.material.badge.BadgeDrawable
+import com.google.android.material.badge.BadgeUtils
+import com.google.android.material.badge.ExperimentalBadgeUtils
 import timber.log.Timber
 
 object FeaturesDialog {
@@ -200,6 +218,70 @@ object FeaturesDialog {
       R.string.multi_arch_dialog_details,
       version = null,
       sourceLink = "https://source.$ANDROID_DEV_HOST/docs/setup/create/64-bit-builds"
+    )
+  }
+
+  fun showAppIconsDialog(context: Context, drawables: List<Drawable>, isFirstMonochrome: Boolean) {
+    val flexLayout = FlexboxLayout(context).apply {
+      layoutParams = LayoutParams(
+        LayoutParams.MATCH_PARENT,
+        LayoutParams.WRAP_CONTENT
+      )
+      paddingStartCompat = 24.dp
+      paddingTopCompat = 16.dp
+      flexWrap = FlexWrap.WRAP
+      justifyContent = JustifyContent.FLEX_START
+      flexDirection = FlexDirection.ROW
+    }
+
+    @OptIn(ExperimentalBadgeUtils::class)
+    fun createBadge(anchor: View) {
+      val badge = BadgeDrawable.create(context).apply {
+        text = context.getString(R.string.dialog_themed)
+        badgeGravity = BadgeDrawable.TOP_START
+      }
+      BadgeUtils.attachBadgeDrawable(badge, anchor)
+    }
+
+    drawables.forEach { drawable ->
+      flexLayout.addView(
+        AppCompatImageView(context).apply {
+          layoutParams = ViewGroup.MarginLayoutParams(48.dp, 48.dp).apply {
+            setMargins(0, 8.dp, 16.dp, 8.dp)
+          }
+          scaleType = ImageView.ScaleType.CENTER_CROP
+          setImageDrawable(drawable)
+          setOnLongClickListener {
+            copyToClipboard()
+            true
+          }
+        }
+      )
+    }
+    if (isFirstMonochrome) {
+      flexLayout.getChildAt(0)?.let {
+        it.post { createBadge(it) }
+      }
+    }
+    val scrollView = ScrollView(context).apply {
+      layoutParams = LayoutParams(
+        LayoutParams.MATCH_PARENT,
+        LayoutParams.WRAP_CONTENT
+      )
+      addView(flexLayout)
+    }
+
+    val titleRes = R.string.dialog_themed_and_alternative_app_icons
+    val dialog = BaseAlertDialogBuilder(context)
+      .setIcon(drawables[0])
+      .setTitle(titleRes)
+      .setView(scrollView)
+      .setPositiveButton(android.R.string.ok, null)
+
+    dialog.show()
+    Telemetry.recordEvent(
+      Constants.Event.FEATURE_DIALOG,
+      mapOf(Telemetry.Param.CONTENT to context.getString(titleRes))
     )
   }
 
