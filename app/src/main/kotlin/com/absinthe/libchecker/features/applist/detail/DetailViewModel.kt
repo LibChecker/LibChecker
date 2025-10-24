@@ -1,8 +1,10 @@
 package com.absinthe.libchecker.features.applist.detail
 
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.graphics.drawable.AdaptiveIconDrawable
 import android.util.SparseArray
 import androidx.core.util.forEach
 import androidx.lifecycle.ViewModel
@@ -21,6 +23,7 @@ import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.LibDetailBean
 import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
 import com.absinthe.libchecker.api.request.LibDetailRequest
+import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.Constants.ERROR
@@ -33,6 +36,7 @@ import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.features.applist.LocatedCount
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
+import com.absinthe.libchecker.features.applist.detail.bean.AppIconItem
 import com.absinthe.libchecker.features.applist.detail.bean.StatefulComponent
 import com.absinthe.libchecker.features.statistics.bean.DISABLED
 import com.absinthe.libchecker.features.statistics.bean.EXPORTED
@@ -104,6 +108,7 @@ class DetailViewModel : ViewModel() {
   var queriedProcess: String? = null
   var processesMap: Map<String, Int> = mapOf()
   var nativeSourceMap: Map<String, Int> = mapOf()
+  var appIcons: List<AppIconItem> = listOf()
 
   lateinit var packageInfo: PackageInfo
     private set
@@ -617,6 +622,11 @@ class DetailViewModel : ViewModel() {
       _featuresFlow.emit(VersionedFeature(Features.PWA))
     }
 
+    appIcons = getAllAppIcons(packageInfo)
+    if (appIcons.isNotEmpty()) {
+      _featuresFlow.emit(VersionedFeature(Features.Ext.APPLICATION_ICONS))
+    }
+
     if (OsUtils.atLeastBaklava() && packageInfo.isPageSizeCompat()) {
       _featuresFlow.emit(VersionedFeature(Features.Ext.ELF_PAGE_SIZE_16KB_COMPAT))
     }
@@ -712,5 +722,24 @@ class DetailViewModel : ViewModel() {
     } else {
       null
     }
+  }
+
+  private fun getAllAppIcons(pi: PackageInfo): List<AppIconItem> {
+    if (!OsUtils.atLeastO()) return emptyList()
+    val icons = mutableListOf<AppIconItem>()
+    val mainIcon = SystemServices.packageManager.getApplicationIcon(pi.applicationInfo!!)
+    if (mainIcon is AdaptiveIconDrawable) {
+      icons.add(AppIconItem(mainIcon, true))
+    }
+
+    val altIconsIntent = Intent(Intent.ACTION_MAIN).apply {
+      addCategory(Intent.CATEGORY_LAUNCHER)
+      setPackage(pi.packageName)
+    }
+    PackageManagerCompat.queryIntentActivities(altIconsIntent, PackageManager.MATCH_DISABLED_COMPONENTS)
+      .takeIf { it.size > 1 }
+      ?.map { it.loadIcon(SystemServices.packageManager) }
+      ?.forEach { icons.add(AppIconItem(it, false)) }
+    return icons
   }
 }
