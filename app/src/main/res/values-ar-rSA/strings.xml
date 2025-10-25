@@ -15,7 +15,7 @@
   <string name="menu_sort">الفرز</string>
   <string name="menu_filter">فلتر</string>
   <string name="search_hint">البحث…</string>
-  <string name="string_64_bit">64 بت</string>
+  <string name="string_64_bit">64-bit</string>
   <string name="string_32_bit">32 بت</string>
   <string name="no_libs">لا توجد libs أصلية</string>
   <string name="cannot_read">لا يمكن القراءة</string>
