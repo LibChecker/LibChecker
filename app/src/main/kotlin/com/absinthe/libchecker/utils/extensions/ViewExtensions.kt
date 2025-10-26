@@ -36,6 +36,7 @@ import com.absinthe.libraries.utils.extensions.addPaddingTop
 import com.absinthe.libraries.utils.utils.UiUtils
 import java.io.File
 import rikka.core.util.ClipboardUtils
+import timber.log.Timber
 
 fun View.setLongClickCopiedToClipboard(text: CharSequence) {
   setOnLongClickListener {
@@ -247,7 +248,7 @@ fun View?.visibleHeight() = if (this != null && isVisible) measuredHeight else 0
 
 fun View.animatedBlurAction(action: () -> Unit) {
   var hasActed = false
-  val supportBlur = OsUtils.atLeastS()
+  var supportBlur = OsUtils.atLeastS()
   val animator = ValueAnimator.ofFloat(0f, 16f).apply {
     duration = 300L
     interpolator = LinearInterpolator()
@@ -258,13 +259,18 @@ fun View.animatedBlurAction(action: () -> Unit) {
       val blurRadius = animation.animatedValue as Float
       val progress = animation.animatedFraction
       if (supportBlur) {
-        setRenderEffect(
-          RenderEffect.createBlurEffect(
-            blurRadius,
-            blurRadius,
-            Shader.TileMode.DECAL
+        runCatching {
+          setRenderEffect(
+            RenderEffect.createBlurEffect(
+              blurRadius,
+              blurRadius,
+              Shader.TileMode.DECAL
+            )
           )
-        )
+        }.onFailure {
+          supportBlur = false
+          Timber.e(it)
+        }
       } else {
         alpha = 1f - progress
       }
