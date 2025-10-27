@@ -15,7 +15,7 @@
   <string name="menu_sort">الفرز</string>
   <string name="menu_filter">فلتر</string>
   <string name="search_hint">البحث…</string>
-  <string name="string_64_bit">64 بت</string>
+  <string name="string_64_bit">64-bit</string>
   <string name="string_32_bit">32 بت</string>
   <string name="no_libs">لا توجد libs أصلية</string>
   <string name="cannot_read">لا يمكن القراءة</string>
@@ -120,6 +120,7 @@
   <string name="app_info_settings">الاعدادات</string>
   <string name="lib_detail_dialog_title">تفاصيل المكتبة</string>
   <string name="lib_permission_dialog_title">تفاصيل الإذن</string>
+  <string name="lib_permission_provided_by_format"></string>
   <string name="agp_details">يعتمد نظام بناء Android Studio على Gradle, ويضيف المكون الإضافي Android Gradle العديد من الميزات الخاصة بإنشاء تطبيقات Android. على الرغم من أن المكون الإضافي لنظام Android يتم تحديثه عادة في خطوة قفل مع Android Studio ، إلا أن المكون الإضافي (وبقية نظام Gradle) يمكن تشغيله بشكل مستقل عن Android Studio ويتم تحديثه بشكل منفصل.</string>
   <string name="xposed_module">وحدة Xposed</string>
   <string name="xposed_module_details">Xposed هو إطار عمل للوحدات النمطية التي يمكنها تغيير سلوك النظام والتطبيقات دون لمس أي ملفات APK. هذا رائع لأنه يعني أن الوحدات يمكن أن تعمل مع إصدارات مختلفة وحتى ذاكرة القراءة فقط دون أي تغييرات.</string>
@@ -231,6 +232,7 @@
   <string name="btn_drop">تجاهل</string>
   <string name="dialog_title_compare_diff_apk">انتباه</string>
   <string name="dialog_message_compare_diff_apk">هل تريد مقارنة اثنين من ملفات APK مختلفة؟</string>
+  <string name="dialog_themed_and_alternative_app_icons"></string>
   <!--  Album  -->
   <string name="album_compare">مقارنة</string>
   <string name="album_item_comparison_title">المقارنة</string>
