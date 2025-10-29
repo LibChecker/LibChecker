@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.features.home.ui
 
-import android.Manifest
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
@@ -30,6 +29,7 @@ import com.absinthe.libchecker.annotation.STATUS_INIT_END
 import com.absinthe.libchecker.annotation.STATUS_START_INIT
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.OnceTag
+import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.features.applist.ui.AppListFragment
 import com.absinthe.libchecker.features.home.HomeViewModel
@@ -38,7 +38,6 @@ import com.absinthe.libchecker.features.settings.ui.SettingsFragment
 import com.absinthe.libchecker.features.snapshot.ui.SnapshotFragment
 import com.absinthe.libchecker.features.statistics.ui.LibReferenceFragment
 import com.absinthe.libchecker.services.IWorkerService
-import com.absinthe.libchecker.services.OnWorkerListener
 import com.absinthe.libchecker.services.WorkerService
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.IAppBarContainer
@@ -70,27 +69,10 @@ class MainActivity :
 
   private val appViewModel: HomeViewModel by viewModels()
   private val navViewBehavior by lazy { HideBottomViewOnScrollBehavior<BottomNavigationView>() }
-  private val workerListener = object : OnWorkerListener.Stub() {
-    override fun onReceivePackagesChanged(packageName: String?, action: String?) {
-      if (packageName != null && action != null) {
-        if (action == Intent.ACTION_PACKAGE_REMOVED) {
-          Timber.d("Package $packageName removed")
-        } else {
-          Timber.d("Package $packageName changed")
-        }
-      }
-      appViewModel.packageChanged(packageName.orEmpty(), action.orEmpty())
-    }
-  }
   private val workerServiceConnection = object : ServiceConnection {
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
       if (service?.pingBinder() == true) {
         appViewModel.workerBinder = IWorkerService.Stub.asInterface(service)
-        runCatching {
-          appViewModel.workerBinder?.registerOnWorkerListener(workerListener)
-        }.onFailure {
-          Timber.e(it)
-        }
       }
     }
 
@@ -128,7 +110,6 @@ class MainActivity :
 
   override fun onDestroy() {
     super.onDestroy()
-    appViewModel.workerBinder?.unregisterOnWorkerListener(workerListener)
     unbindService(workerServiceConnection)
   }
 
@@ -393,6 +374,10 @@ class MainActivity :
         }
       }.launchIn(lifecycleScope)
     }
+    LocalAppDataSource.packageChangeFlow.onEach {
+      Timber.d("MainActivity received package change: $it")
+      appViewModel.packageChanged(it)
+    }.launchIn(lifecycleScope)
   }
 
   private fun initFeatures() {

@@ -31,6 +31,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.data.app.LocalAppDataSource
+import com.absinthe.libchecker.data.app.PackageChangeState
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.features.applist.detail.bean.StatefulComponent
@@ -94,6 +95,8 @@ class HomeViewModel : ViewModel() {
   var isSearchMenuExpanded: Boolean = false
   var currentSearchQuery: String = ""
 
+  private val pendingChangedPackages = ArrayDeque<PackageChangeState>()
+
   fun reloadApps() {
     if (appListStatus != STATUS_NOT_START || (initJob?.isActive == false && requestChangeJob?.isActive == false)) {
       Timber.d("reloadApps: ignore, appListStatus: $appListStatus")
@@ -110,9 +113,9 @@ class HomeViewModel : ViewModel() {
     }
   }
 
-  fun packageChanged(packageName: String, action: String) {
+  fun packageChanged(packageChangeState: PackageChangeState) {
     setEffect {
-      Effect.PackageChanged(packageName, action)
+      Effect.PackageChanged(packageChangeState)
     }
   }
 
@@ -198,25 +201,22 @@ class HomeViewModel : ViewModel() {
 
   private var requestChangeJob: Job? = null
 
-  fun requestChange(checked: Boolean = false) {
+  fun requestChange(packageChangeState: PackageChangeState? = null) {
     viewModelScope.launch {
       if (appListStatus == STATUS_START_INIT) {
         Timber.d("Request change canceled: STATUS_START_INIT")
         return@launch
       }
-      if (requestChangeJob?.isActive == true) {
-        requestChangeJob?.cancel()
-      }
-
-      requestChangeJob = requestChangeImpl(LocalAppDataSource.getApplicationMap(), checked)
+      packageChangeState?.let { pendingChangedPackages.add(it) }
+      requestChangeJob?.cancel()
+      requestChangeJob = requestChangeImpl(packageChangeState == null)
     }
   }
 
-  private fun requestChangeImpl(appMap: Map<String, PackageInfo>, checked: Boolean) = viewModelScope.launch(Dispatchers.IO) {
+  private fun requestChangeImpl(forceUpdate: Boolean) = viewModelScope.launch(Dispatchers.IO) {
     val dbItems = Repositories.lcRepository.getLCItems()
-    if (dbItems.isEmpty()) {
-      return@launch
-    }
+    if (dbItems.isEmpty()) return@launch
+
     Timber.d("Request change: START")
     val timeRecorder = TimeRecorder()
 
@@ -225,25 +225,52 @@ class HomeViewModel : ViewModel() {
 
     val isHarmony = HarmonyOsUtil.isHarmonyOs()
 
-    val localApps = appMap.map { it.key }.toSet()
-    val dbApps = dbItems.map { it.packageName }.toSet()
-    val newApps = localApps - dbApps
-    val removedApps = dbApps - localApps
+    if (!forceUpdate) {
+      while (pendingChangedPackages.isNotEmpty() && isActive) {
+        val currentState = pendingChangedPackages.removeFirst()
+        val currentPackageName = currentState.getActualPackageInfo().packageName
+
+        if (pendingChangedPackages.none { it.getActualPackageInfo().packageName == currentPackageName }) {
+          when (currentState) {
+            is PackageChangeState.Added -> {
+              val item = generateLCItemFromPackageInfo(currentState.getActualPackageInfo(), isHarmony)
+              insert(item)
+            }
+
+            is PackageChangeState.Removed -> {
+              Repositories.lcRepository.deleteLCItemByPackageName(currentState.getActualPackageInfo().packageName)
+            }
+
+            is PackageChangeState.Replaced -> {
+              val item = generateLCItemFromPackageInfo(currentState.getActualPackageInfo(), isHarmony)
+              update(item)
+            }
+          }
+        }
+      }
+    } else {
+      val dbApps = dbItems.map { it.packageName }.toSet()
+      var applications = LocalAppDataSource.getApplicationMap()
+      var localApps = applications.map { it -> it.key }.toSet()
+      var newApps = localApps - dbApps
+      var removedApps = dbApps - localApps
 
       /*
        * The application list returned with a probability only contains system applications.
        * When the difference is greater than a certain threshold, we re-request the list.
        */
-    if (!checked && (newApps.size > 30 || removedApps.size > 30)) {
-      Timber.w("Request change canceled because of large diff, re-request appMap")
-      launch {
-        requestChange(true)
+      if (newApps.size > 30 || removedApps.size > 30) {
+        Timber.w("Request change canceled because of large diff, re-request appMap")
+        applications = LocalAppDataSource.getApplicationMap(true)
+        localApps = applications.map { it -> it.key }.toSet()
+        newApps = localApps - dbApps
+        removedApps = dbApps - localApps
       }
-    } else {
+
       newApps.forEach {
         if (!isActive) return@launch
         runCatching {
-          val info = appMap[it] ?: return@runCatching
+          val info = applications[it] ?: return@runCatching
           insert(generateLCItemFromPackageInfo(info, isHarmony))
         }.onFailure { e ->
           Timber.e(e, "requestChange: $it")
@@ -256,7 +283,7 @@ class HomeViewModel : ViewModel() {
       }
 
       localApps.intersect(dbApps).asSequence()
-        .mapNotNull { appMap[it] }
+        .mapNotNull { applications[it] }
         .filter { pi ->
           dbItems.find { it.packageName == pi.packageName }?.let {
             it.versionCode != pi.getVersionCode() ||
@@ -591,13 +618,14 @@ class HomeViewModel : ViewModel() {
 
         ACTION -> {
           val packageInfo = PackageUtils.getPackageInfo(packageName)
-          val list = IntentFilterUtils.parseComponentsFromApk(packageInfo.applicationInfo!!.sourceDir)
-            .asSequence()
-            .flatMap { component ->
-              component.intentFilters.asSequence()
-                .flatMap { filter -> filter.actions }
-            }
-            .toSet()
+          val list =
+            IntentFilterUtils.parseComponentsFromApk(packageInfo.applicationInfo!!.sourceDir)
+              .asSequence()
+              .flatMap { component ->
+                component.intentFilters.asSequence()
+                  .flatMap { filter -> filter.actions }
+              }
+              .toSet()
           // .filter { !it.startsWith("android.") }
           computeReferenceInternal(
             referenceMap,
@@ -722,7 +750,7 @@ class HomeViewModel : ViewModel() {
     data class ReloadApps(val obj: Any? = null) : Effect()
     data class UpdateInitProgress(val progress: Int) : Effect()
     data class UpdateAppListStatus(val status: Int) : Effect()
-    data class PackageChanged(val packageName: String, val action: String) : Effect()
+    data class PackageChanged(val packageChangeState: PackageChangeState) : Effect()
     data class RefreshList(val obj: Any? = null) : Effect()
     data class UpdateLibRefProgress(val progress: Int) : Effect()
   }

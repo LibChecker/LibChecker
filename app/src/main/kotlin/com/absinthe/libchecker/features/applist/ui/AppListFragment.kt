@@ -219,9 +219,6 @@ class AppListFragment :
 
   override fun onResume() {
     super.onResume()
-    if (hasPackageChanged()) {
-      homeViewModel.requestChange()
-    }
     (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(binding.list)
     if (homeViewModel.appListStatus == STATUS_START_INIT) {
       flip(VF_INIT)
