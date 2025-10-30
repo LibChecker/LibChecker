@@ -27,6 +27,7 @@ object MainLooperFilter {
 
   private val heroes = setOf(
     "android.view.inputmethod.InputMethodManager.startInputInner",
+    "android.window.BackMotionEvent.getTouchX()",
     "com.android.server.wm.ConfigurationContainer.setActivityType",
     "com.swift.sandhook",
     "handleTopResumedActivityChanged",
@@ -34,6 +35,7 @@ object MainLooperFilter {
     "MultiSelectPopupWindow.showMultiSelectPopupWindow",
     "Service.startForeground()",
     "tryGetViewHolderForPositionByDeadline",
+    "trying to unhide a view that was not hidden",
     "updateForceDarkMode",
     "Expected the adapter to be 'fresh' while restoring state",
     BaseGmsClient::class.java.name

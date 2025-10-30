@@ -105,7 +105,7 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context, null, 
     }
 
     fun setSystemProps(props: List<Pair<String, String>>) {
-      systemPropAdapter.setList(props)
+      post { systemPropAdapter.setList(props) }
     }
 
     private val addedIndicator = SnapshotTypeIndicatorView(context).apply {

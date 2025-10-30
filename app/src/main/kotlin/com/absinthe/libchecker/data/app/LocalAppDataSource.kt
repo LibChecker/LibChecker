@@ -14,6 +14,9 @@ import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.isArchivedPackage
+import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.concurrent.read
+import kotlin.concurrent.write
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -25,7 +28,8 @@ import timber.log.Timber
 
 object LocalAppDataSource : AppDataSource {
 
-  val applications: MutableList<PackageInfo> = loadApplications().toMutableList()
+  private val applicationsLock = ReentrantReadWriteLock()
+  private val applications: MutableList<PackageInfo> = loadApplications().toMutableList()
   val apexPackageSet: Set<String> = loadApexPackageSet()
 
   private val _PackageChangeFlow: MutableSharedFlow<PackageChangeState> = MutableSharedFlow()
@@ -94,10 +98,15 @@ object LocalAppDataSource : AppDataSource {
 
   override fun getApplicationList(forceUpdate: Boolean): List<PackageInfo> {
     if (forceUpdate) {
-      applications.clear()
-      applications.addAll(loadApplications())
+      applicationsLock.write {
+        applications.clear()
+        applications.addAll(loadApplications())
+      }
     }
-    return applications
+
+    return applicationsLock.read {
+      applications.toList()
+    }
   }
 
   override fun getApplicationMap(forceUpdate: Boolean): Map<String, PackageInfo> {
@@ -137,18 +146,20 @@ object LocalAppDataSource : AppDataSource {
   }
 
   private fun updateApplications(state: PackageChangeState) {
-    when (state) {
-      is PackageChangeState.Added -> {
-        applications.add(state.getActualPackageInfo())
-      }
+    applicationsLock.write {
+      when (state) {
+        is PackageChangeState.Added -> {
+          applications.add(state.getActualPackageInfo())
+        }
 
-      is PackageChangeState.Removed -> {
-        applications.removeAll { it.packageName == state.getActualPackageInfo().packageName }
-      }
+        is PackageChangeState.Removed -> {
+          applications.removeAll { it.packageName == state.getActualPackageInfo().packageName }
+        }
 
-      is PackageChangeState.Replaced -> {
-        applications.removeAll { it.packageName == state.getActualPackageInfo().packageName }
-        applications.add(state.getActualPackageInfo())
+        is PackageChangeState.Replaced -> {
+          applications.removeAll { it.packageName == state.getActualPackageInfo().packageName }
+          applications.add(state.getActualPackageInfo())
+        }
       }
     }
   }
