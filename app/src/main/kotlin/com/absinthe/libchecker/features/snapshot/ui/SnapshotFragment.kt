@@ -69,6 +69,7 @@ import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libchecker.utils.fromJson
+import com.absinthe.libchecker.view.app.AppsListLoadingView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import java.util.Locale
 import java.util.concurrent.LinkedBlockingQueue
@@ -260,6 +261,7 @@ class SnapshotFragment :
           adapter.setSpaceFooterView()
         }
       }
+      loading.setPreloadedBitmap(AppsListLoadingView.TextureType.APPS)
     }
 
     viewModel.apply {
@@ -293,6 +295,10 @@ class SnapshotFragment :
             dequeuePackages()
             viewModel.getDashboardCount(GlobalValues.snapshotTimestamp, true)
           }
+        }
+
+        is HomeViewModel.Effect.SphereTextureAvailable -> {
+          binding.loading.setPreloadedBitmap(AppsListLoadingView.TextureType.APPS)
         }
 
         else -> {}
@@ -582,11 +588,11 @@ class SnapshotFragment :
       return
     }
     if (child == VF_LOADING) {
-      binding.loading.resumeAnimation()
+      binding.loading.startSpinning()
       menu?.findItem(R.id.save)?.isVisible = false
       menu?.findItem(R.id.search)?.isVisible = false
     } else {
-      binding.loading.pauseAnimation()
+      binding.loading.stopSpinning()
       binding.list.scrollToPosition(0)
       menu?.findItem(R.id.save)?.isVisible = true
       menu?.findItem(R.id.search)?.isVisible = true

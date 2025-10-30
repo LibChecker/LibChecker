@@ -47,6 +47,7 @@ import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libchecker.utils.showToast
+import com.absinthe.libchecker.view.app.AppsListLoadingView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -432,6 +433,10 @@ class AppListFragment :
             updateItems()
           }
 
+          is HomeViewModel.Effect.SphereTextureAvailable -> {
+            binding.initView.loadingView.setPreloadedBitmap(AppsListLoadingView.TextureType.APPS)
+          }
+
           else -> {}
         }
       }.launchIn(lifecycleScope)
@@ -446,6 +451,7 @@ class AppListFragment :
           if (hasPackageChanged() || isFirstRequestChange) {
             isFirstRequestChange = false
             homeViewModel.requestChange()
+            homeViewModel.generateAppsListSphereTexture(requireContext())
           }
         }
       }.launchIn(lifecycleScope)
@@ -579,10 +585,10 @@ class AppListFragment :
     }
     if (page == VF_INIT) {
       menu?.findItem(R.id.search)?.isVisible = false
-      binding.initView.loadingView.resumeAnimation()
+      binding.initView.loadingView.startSpinning()
     } else {
       menu?.findItem(R.id.search)?.isVisible = true
-      binding.initView.loadingView.pauseAnimation()
+      binding.initView.loadingView.stopSpinning()
     }
   }
 
@@ -590,6 +596,7 @@ class AppListFragment :
     hasInitializedItems = true
     flip(VF_INIT)
     activity?.removeMenuProvider(this)
+    homeViewModel.generateAppsListSphereTexture(requireContext())
     homeViewModel.initItems()
   }
 
