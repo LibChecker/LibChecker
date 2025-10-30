@@ -38,15 +38,13 @@
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:background="@null"
+      android:clipChildren="false"
       android:gravity="center">
 
-      <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/lottie"
-        android:layout_width="@dimen/lottie_anim_size"
-        android:layout_height="@dimen/lottie_anim_size"
-        app:lottie_autoPlay="true"
-        app:lottie_loop="true"
-        app:lottie_enableMergePathsForKitKatAndAbove="true" />
+      <com.absinthe.libchecker.view.app.RingDotsView
+        android:id="@+id/loading"
+        android:layout_width="@dimen/general_loading_size"
+        android:layout_height="@dimen/general_loading_size" />
 
     </LinearLayout>
 

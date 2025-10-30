@@ -5,15 +5,12 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTION
-import com.absinthe.libchecker.annotation.AUTUMN
 import com.absinthe.libchecker.annotation.NATIVE
-import com.absinthe.libchecker.annotation.SPRING
-import com.absinthe.libchecker.annotation.SUMMER
-import com.absinthe.libchecker.annotation.WINTER
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
 import com.absinthe.libchecker.features.applist.ui.adapter.AppAdapter
 import com.absinthe.libchecker.features.statistics.LibReferenceViewModel
@@ -21,8 +18,9 @@ import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.utils.extensions.isOrientationLandscape
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.paddingTopCompat
+import com.absinthe.libchecker.view.app.RingDotsView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import java.io.File
+import com.absinthe.rulesbundle.IconResMap
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
@@ -101,19 +99,23 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
         displayedChild = 0
         (root as ViewGroup).bringChildToFront(appbar)
       }
-      lottie.apply {
-        imageAssetsFolder = File.separator
+      loading.setHighlightIconProvider(object : RingDotsView.HighlightIconProvider {
+        override suspend fun produce(emitter: RingDotsView.HighlightIconEmitter) {
+          while (true) {
+            if (!loading.isHighlightAnimationAvailable()) {
+              break
+            }
+            val index = (0 until 100).random()
+            if (IconResMap.isSingleColorIcon(index)) {
+              continue
+            }
+            val iconRes = IconResMap.getIconRes(index)
+            val drawable = ContextCompat.getDrawable(loading.context, iconRes) ?: continue
 
-        val assetName = when (GlobalValues.season) {
-          SPRING -> "anim/lib_reference_spring.json.zip"
-          SUMMER -> "anim/lib_reference_summer.json.zip"
-          AUTUMN -> "anim/lib_reference_autumn.json.zip"
-          WINTER -> "anim/lib_reference_winter.json.zip"
-          else -> "anim/lib_reference_summer.json.zip"
+            emitter.emit(drawable.toBitmap())
+          }
         }
-
-        setAnimation(assetName)
-      }
+      })
     }
 
     viewModel.libRefListFlow.onEach {

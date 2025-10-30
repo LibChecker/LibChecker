@@ -11,6 +11,7 @@
   <dimen name="app_bar_elevation">4dp</dimen>
 
   <dimen name="lottie_anim_size">300dp</dimen>
+  <dimen name="general_loading_size">200dp</dimen>
 
   <integer name="rd_material_dialog_enter_alpha_anim_duration">150</integer>
   <integer name="rd_material_dialog_enter_scale_anim_duration">225</integer>

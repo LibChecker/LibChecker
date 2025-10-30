@@ -135,13 +135,8 @@ object AboutPageBuilder {
               val content = StringBuilder()
               val list = listOf(
                 "https://www.iconfont.cn/",
-                "https://lottiefiles.com/22122-fanimation",
-                "https://lottiefiles.com/77311-sweet-teapot-with-autumn-herbs-and-birds",
-                "https://lottiefiles.com/51686-a-botanical-wreath-loading",
                 "https://lottiefiles.com/21836-blast-off",
-                "https://lottiefiles.com/1309-smiley-stack",
                 "https://lottiefiles.com/44836-gray-down-arrow",
-                "https://lottiefiles.com/66818-holographic-radar",
                 "https://pictogrammers.com/library/mdi/"
               )
               content.append("<b>").append("Acknowledgement").append("</b>").append("<br>")

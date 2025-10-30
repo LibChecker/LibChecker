@@ -821,7 +821,7 @@ class DetailViewModel : ViewModel() {
     if (!OsUtils.atLeastO()) return emptyList()
     val icons = mutableListOf<AppIconItem>()
     val mainIcon = SystemServices.packageManager.getApplicationIcon(pi.applicationInfo!!)
-    if (mainIcon is AdaptiveIconDrawable) {
+    if (OsUtils.atLeastT() && mainIcon is AdaptiveIconDrawable && mainIcon.monochrome != null) {
       icons.add(AppIconItem(mainIcon, true))
     }
 

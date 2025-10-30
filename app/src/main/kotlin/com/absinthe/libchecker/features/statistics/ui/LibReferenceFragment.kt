@@ -8,6 +8,8 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.FrameLayout
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -34,7 +36,9 @@ import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.launchLibReferencePage
 import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libchecker.utils.showToast
+import com.absinthe.libchecker.view.app.RingDotsView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
+import com.absinthe.rulesbundle.IconResMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -126,6 +130,23 @@ class LibReferenceFragment :
           refAdapter.setSpaceFooterView()
         }
       }
+      loadingView.loadingView.setHighlightIconProvider(object : RingDotsView.HighlightIconProvider {
+        override suspend fun produce(emitter: RingDotsView.HighlightIconEmitter) {
+          while (true) {
+            if (!binding.loadingView.loadingView.isHighlightAnimationAvailable()) {
+              break
+            }
+            val index = (0 until 100).random()
+            if (IconResMap.isSingleColorIcon(index)) {
+              continue
+            }
+            val iconRes = IconResMap.getIconRes(index)
+            val drawable = ContextCompat.getDrawable(context, iconRes) ?: continue
+
+            emitter.emit(drawable.toBitmap())
+          }
+        }
+      })
     }
 
     refAdapter.apply {
@@ -219,6 +240,9 @@ class LibReferenceFragment :
   override fun onResume() {
     super.onResume()
     (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(binding.list)
+    if (binding.vfContainer.displayedChild == VF_LOADING) {
+      binding.loadingView.loadingView.start()
+    }
   }
 
   override fun onPause() {
@@ -226,6 +250,7 @@ class LibReferenceFragment :
     advancedMenuBSDFragment?.dismiss()
     advancedMenuBSDFragment = null
     (activity as? INavViewContainer)?.hideProgressBar()
+    binding.loadingView.loadingView.stop()
   }
 
   override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -376,10 +401,12 @@ class LibReferenceFragment :
     }
     if (child == VF_LOADING) {
       menu?.findItem(R.id.search)?.isVisible = false
-      binding.loadingView.loadingView.resumeAnimation()
+      if (isResumed) {
+        binding.loadingView.loadingView.start()
+      }
     } else {
       menu?.findItem(R.id.search)?.isVisible = true
-      binding.loadingView.loadingView.pauseAnimation()
+      binding.loadingView.loadingView.stop()
       binding.list.scrollToPosition(0)
     }
 
