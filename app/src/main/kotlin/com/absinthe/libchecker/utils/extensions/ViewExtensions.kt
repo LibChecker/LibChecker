@@ -193,7 +193,7 @@ fun TextView.reverseStrikeThroughAnimation(): ValueAnimator {
 }
 
 fun ImageView.copyToClipboard() {
-  val bitmap = drawable.toBitmap()
+  val bitmap = runCatching { drawable.toBitmap() }.getOrNull() ?: return
   val iconFile = File(context.externalCacheDir, Constants.TEMP_ICON)
   if (!iconFile.exists()) {
     iconFile.createNewFile()
