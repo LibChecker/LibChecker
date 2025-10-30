@@ -4,7 +4,7 @@ import android.content.pm.PackageInfo
 
 interface AppDataSource {
 
-  fun getApplicationList(): List<PackageInfo>
+  fun getApplicationList(forceUpdate: Boolean = false): List<PackageInfo>
 
-  fun getApplicationMap(): Map<String, PackageInfo>
+  fun getApplicationMap(forceUpdate: Boolean = false): Map<String, PackageInfo>
 }

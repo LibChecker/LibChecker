@@ -1,19 +1,13 @@
 package com.absinthe.libchecker.services
 
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.os.Handler
 import android.os.IBinder
-import android.os.Looper
-import android.os.Message
 import android.os.RemoteCallbackList
 import android.os.RemoteException
-import android.os.SystemClock
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
+import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getFeatures
@@ -25,21 +19,6 @@ import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 class WorkerService : LifecycleService() {
-
-  private lateinit var mainHandler: MyHandler
-  private var lastPackageChangedTime: Long = 0L
-
-  private val packageReceiver by lazy {
-    object : BroadcastReceiver() {
-      override fun onReceive(context: Context, intent: Intent?) {
-        Timber.d("package receiver received: ${intent?.action}")
-
-        val what = intent?.data?.encodedSchemeSpecificPart.orEmpty().hashCode()
-        mainHandler.removeMessages(what)
-        mainHandler.sendMessageDelayed(Message.obtain(mainHandler, what, intent), 1000)
-      }
-    }
-  }
 
   private val listenerList = RemoteCallbackList<OnWorkerListener>()
   private val binder by lazy { WorkerBinder(this) }
@@ -53,15 +32,7 @@ class WorkerService : LifecycleService() {
     super.onCreate()
     Timber.d("onCreate")
     initializingFeatures = false
-    mainHandler = MyHandler(WeakReference(this))
-
-    val intentFilter = IntentFilter().apply {
-      addAction(Intent.ACTION_PACKAGE_ADDED)
-      addAction(Intent.ACTION_PACKAGE_REPLACED)
-      addAction(Intent.ACTION_PACKAGE_REMOVED)
-      addDataScheme("package")
-    }
-    registerReceiver(packageReceiver, intentFilter)
+    LocalAppDataSource.addLifecycleOwner(this)
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -73,8 +44,7 @@ class WorkerService : LifecycleService() {
 
   override fun onDestroy() {
     Timber.d("onDestroy")
-    unregisterReceiver(packageReceiver)
-    mainHandler.removeCallbacksAndMessages(null)
+    LocalAppDataSource.removeLifecycleOwner(this)
     super.onDestroy()
   }
 
@@ -122,7 +92,7 @@ class WorkerService : LifecycleService() {
     }
 
     override fun getLastPackageChangedTime(): Long {
-      return serviceRef.get()?.lastPackageChangedTime ?: 0
+      return 0
     }
 
     override fun registerOnWorkerListener(listener: OnWorkerListener?) {
@@ -135,22 +105,6 @@ class WorkerService : LifecycleService() {
     override fun unregisterOnWorkerListener(listener: OnWorkerListener?) {
       Timber.d("unregisterOnWorkerListener")
       serviceRef.get()?.listenerList?.unregister(listener)
-    }
-  }
-
-  private class MyHandler(private val serviceRef: WeakReference<WorkerService>) : Handler(Looper.getMainLooper()) {
-    override fun handleMessage(msg: Message) {
-      super.handleMessage(msg)
-      val service = serviceRef.get()
-      if (service != null && msg.obj is Intent) {
-        val intent = msg.obj as Intent
-        Timber.d("handleMessage: $intent")
-        service.lastPackageChangedTime = SystemClock.elapsedRealtime()
-        service.notifyPackagesChanged(
-          intent.data?.encodedSchemeSpecificPart.orEmpty(),
-          intent.action.orEmpty()
-        )
-      }
     }
   }
 

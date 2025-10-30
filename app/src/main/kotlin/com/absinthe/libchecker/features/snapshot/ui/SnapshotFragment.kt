@@ -38,6 +38,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.LCUris
 import com.absinthe.libchecker.constant.options.SnapshotOptions
+import com.absinthe.libchecker.data.app.PackageChangeState
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.features.album.ui.AlbumActivity
 import com.absinthe.libchecker.features.home.HomeViewModel
@@ -65,7 +66,6 @@ import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.extensions.getDimensionByAttr
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libchecker.utils.fromJson
@@ -132,7 +132,7 @@ class SnapshotFragment :
       shootBinder = null
     }
   }
-  private val packageQueue by lazy { LinkedBlockingQueue<Pair<String?, String?>>() }
+  private val packageQueue by lazy { LinkedBlockingQueue<PackageChangeState>() }
   private var dequeuePackagesJob: Job? = null
   private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
   private var advancedMenuBSDFragment: SnapshotMenuBSDFragment? = null
@@ -289,7 +289,7 @@ class SnapshotFragment :
       when (it) {
         is HomeViewModel.Effect.PackageChanged -> {
           if (allowRefreshing) {
-            packageQueue.offer(it.packageName to it.action)
+            packageQueue.offer(it.packageChangeState)
             dequeuePackages()
             viewModel.getDashboardCount(GlobalValues.snapshotTimestamp, true)
           }
@@ -321,6 +321,13 @@ class SnapshotFragment :
           val newItems = adapter.data.toMutableList()
           newItems.removeIf { item -> item.packageName == it.item.packageName }
           newItems.add(it.item)
+          items = newItems
+          updateItems(newItems)
+        }
+
+        is SnapshotViewModel.Effect.DiffItemRemove -> {
+          val newItems = adapter.data.toMutableList()
+          newItems.removeIf { item -> item.packageName == it.packageName }
           items = newItems
           updateItems(newItems)
         }
@@ -420,6 +427,7 @@ class SnapshotFragment :
         }
       }
       shootBinder = null
+      dequeuePackagesJob?.cancel()
     }
   }
 
@@ -602,9 +610,10 @@ class SnapshotFragment :
     }
     dequeuePackagesJob = lifecycleScope.launch(Dispatchers.IO) {
       while (isActive) {
-        packageQueue.take()?.first?.let {
+        packageQueue.take()?.let {
           Timber.d("Dequeue package: $it")
-          viewModel.compareItemDiff(GlobalValues.snapshotTimestamp, it)
+          val packageName = it.getActualPackageInfo().packageName
+          viewModel.compareItemDiff(GlobalValues.snapshotTimestamp, packageName)
         }
       }
     }
