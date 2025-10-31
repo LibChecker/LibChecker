@@ -113,7 +113,7 @@ class SnapshotViewModel : ViewModel() {
       return@runBlocking
     }
 
-    val currMap = LocalAppDataSource.getApplicationMap().toMutableMap()
+    val currMap = LocalAppDataSource.getApplicationMap(true).toMutableMap()
     val prePackageSet = preMap.map { it.key }.toSet()
     val currPackageSet = currMap.map { it.key }.toSet()
     val removedPackageSet = prePackageSet - currPackageSet

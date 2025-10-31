@@ -159,7 +159,7 @@ class ShootService : LifecycleService() {
   }
 
   private fun computeSnapshots(dropPrevious: Boolean = false, stopWhenFinish: Boolean = false) = lifecycleScope.launch(Dispatchers.IO) {
-    computeSnapshotsImpl(LocalAppDataSource.getApplicationList(), dropPrevious, stopWhenFinish)
+    computeSnapshotsImpl(LocalAppDataSource.getApplicationList(true), dropPrevious, stopWhenFinish)
   }
 
   private suspend fun computeSnapshotsImpl(appList: List<PackageInfo>, dropPrevious: Boolean = false, stopWhenFinish: Boolean = false) {
