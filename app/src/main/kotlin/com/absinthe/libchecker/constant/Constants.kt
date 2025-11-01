@@ -107,6 +107,7 @@ object Constants {
   const val PREF_DETAILED_ABI_CHART = "detailedAbiChart"
   const val PREF_RULE_LANGUAGE = "ruleLanguage"
   const val PREF_SNAPSHOT_AUTO_REMOVE_THRESHOLD = "snapshotAutoRemoveThreshold"
+  const val PREF_LONG_TAP_SHARE_BUTTON_TIP = "longTapShareButtonTip"
 
   const val GET_INSTALLED_APPS = "com.android.permission.GET_INSTALLED_APPS"
 
