@@ -230,37 +230,39 @@ class ShootService : LifecycleService() {
           )
         } else {
           val activitiesPi = PackageUtils.getPackageInfo(info.packageName, PackageManager.GET_ACTIVITIES)
-          val srpPi = PackageUtils.getPackageInfo(info.packageName, PackageManager.GET_SERVICES or PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS)
-          val miscPi = PackageUtils.getPackageInfo(info.packageName, PackageManager.GET_PERMISSIONS or PackageManager.GET_META_DATA)
-          dbList.add(
-            SnapshotItem(
-              id = null,
-              packageName = info.packageName,
-              timeStamp = ts,
-              label = info.getAppName().toString(),
-              versionName = info.versionName.toString(),
-              versionCode = info.getVersionCode(),
-              installedTime = info.firstInstallTime,
-              lastUpdatedTime = info.lastUpdateTime,
-              isSystem = (ai.flags and ApplicationInfo.FLAG_SYSTEM) > 0,
-              abi = PackageUtils.getAbi(info).toShort(),
-              targetApi = ai.targetSdkVersion.toShort(),
-              nativeLibs = PackageUtils.getNativeDirLibs(info).toJson().orEmpty(),
-              services = PackageUtils.getComponentStringList(srpPi, SERVICE, false)
-                .toJson().orEmpty(),
-              activities = PackageUtils.getComponentStringList(activitiesPi, ACTIVITY, false)
-                .toJson().orEmpty(),
-              receivers = PackageUtils.getComponentStringList(srpPi, RECEIVER, false)
-                .toJson().orEmpty(),
-              providers = PackageUtils.getComponentStringList(srpPi, PROVIDER, false)
-                .toJson().orEmpty(),
-              permissions = miscPi.getPermissionsList().toJson().orEmpty(),
-              metadata = PackageUtils.getMetaDataItems(miscPi).toJson().orEmpty(),
-              packageSize = info.getPackageSize(true),
-              compileSdk = info.getCompileSdkVersion().toShort(),
-              minSdk = ai.minSdkVersion.toShort()
+          val othersPi = PackageUtils.getPackageInfo(info.packageName, PackageManager.GET_SERVICES or PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS or PackageManager.GET_PERMISSIONS or PackageManager.GET_META_DATA)
+          val abi = PackageUtils.getAbi(info)
+          if (abi != Constants.ERROR) {
+            dbList.add(
+              SnapshotItem(
+                id = null,
+                packageName = info.packageName,
+                timeStamp = ts,
+                label = info.getAppName().toString(),
+                versionName = info.versionName.toString(),
+                versionCode = info.getVersionCode(),
+                installedTime = info.firstInstallTime,
+                lastUpdatedTime = info.lastUpdateTime,
+                isSystem = (ai.flags and ApplicationInfo.FLAG_SYSTEM) > 0,
+                abi = abi.toShort(),
+                targetApi = ai.targetSdkVersion.toShort(),
+                nativeLibs = PackageUtils.getNativeDirLibs(info).toJson().orEmpty(),
+                services = PackageUtils.getComponentStringList(othersPi, SERVICE, false)
+                  .toJson().orEmpty(),
+                activities = PackageUtils.getComponentStringList(activitiesPi, ACTIVITY, false)
+                  .toJson().orEmpty(),
+                receivers = PackageUtils.getComponentStringList(othersPi, RECEIVER, false)
+                  .toJson().orEmpty(),
+                providers = PackageUtils.getComponentStringList(othersPi, PROVIDER, false)
+                  .toJson().orEmpty(),
+                permissions = othersPi.getPermissionsList().toJson().orEmpty(),
+                metadata = PackageUtils.getMetaDataItems(othersPi).toJson().orEmpty(),
+                packageSize = info.getPackageSize(true),
+                compileSdk = info.getCompileSdkVersion().toShort(),
+                minSdk = ai.minSdkVersion.toShort()
+              )
             )
-          )
+          }
         }
 
         count++
