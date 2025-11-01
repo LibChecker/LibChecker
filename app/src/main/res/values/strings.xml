@@ -130,6 +130,7 @@
   <string name="further_operation">Further operation</string>
   <string name="app_info_launch">Launch</string>
   <string name="app_info_settings">Settings</string>
+  <string name="app_info_share">Settings</string>
   <string name="lib_detail_dialog_title">Library details</string>
   <string name="lib_permission_dialog_title">Permission details</string>
   <string name="lib_permission_provided_by_format">Provided by %s</string>
@@ -214,6 +215,7 @@
   <string name="toast_cloud_rules_update_error">Failed to update cloud rules. Please try again</string>
   <string name="toast_not_enough_storage_space">Not enough storage space</string>
   <string name="toast_downloading_app">Download requested</string>
+  <string name="toast_long_tap_share_button_tip">Long press the “Share” button to choose where to save</string>
 
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">Save current snapshot</string>

@@ -118,6 +118,7 @@
   <string name="further_operation">进一步操作</string>
   <string name="app_info_launch">启动</string>
   <string name="app_info_settings">设置</string>
+  <string name="app_info_share">分享</string>
   <string name="lib_detail_dialog_title">库详情</string>
   <string name="lib_permission_dialog_title">权限详情</string>
   <string name="lib_permission_provided_by_format">由 %s 提供</string>
@@ -201,6 +202,7 @@
   <string name="toast_cloud_rules_update_error">云端规则更新失败，请重试</string>
   <string name="toast_not_enough_storage_space">存储空间不足</string>
   <string name="toast_downloading_app">已请求下载</string>
+  <string name="toast_long_tap_share_button_tip">长按「分享」按钮以选择位置保存</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">保存当前快照</string>
   <string name="snapshot_current_timestamp">当前快照时间戳</string>

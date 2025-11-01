@@ -25,7 +25,11 @@ import com.absinthe.rulesbundle.LCRemoteRepo
 import com.absinthe.rulesbundle.LCRules
 import com.google.android.material.color.DynamicColors
 import com.jakewharton.processphoenix.ProcessPhoenix
+import java.io.File
 import jonathanfinerty.once.Once
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import me.zhanghai.android.appiconloader.coil.AppIconFetcher
 import me.zhanghai.android.appiconloader.coil.AppIconKeyer
 import org.lsposed.hiddenapibypass.HiddenApiBypass
@@ -79,6 +83,9 @@ class LibCheckerApp : Application() {
         }
         .build()
     }
+    GlobalScope.launch(Dispatchers.IO) {
+      clearCache()
+    }
   }
 
   override fun attachBaseContext(base: Context?) {
@@ -115,6 +122,13 @@ class LibCheckerApp : Application() {
     PackageParser::class.java.getDeclaredField("SDK_VERSION").apply {
       isAccessible = true
       set(null, Integer.MAX_VALUE)
+    }
+  }
+
+  private fun clearCache() {
+    val sharedApkDir = File(cacheDir, "shared_apk")
+    if (sharedApkDir.exists() && sharedApkDir.isDirectory) {
+      sharedApkDir.deleteRecursively()
     }
   }
 
