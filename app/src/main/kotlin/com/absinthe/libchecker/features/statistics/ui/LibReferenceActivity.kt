@@ -8,12 +8,7 @@ import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTION
-import com.absinthe.libchecker.annotation.AUTUMN
 import com.absinthe.libchecker.annotation.NATIVE
-import com.absinthe.libchecker.annotation.SPRING
-import com.absinthe.libchecker.annotation.SUMMER
-import com.absinthe.libchecker.annotation.WINTER
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
 import com.absinthe.libchecker.features.applist.ui.adapter.AppAdapter
 import com.absinthe.libchecker.features.statistics.LibReferenceViewModel
@@ -21,8 +16,8 @@ import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.utils.extensions.isOrientationLandscape
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.paddingTopCompat
+import com.absinthe.libchecker.view.app.AppsListLoadingView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import java.io.File
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
@@ -101,18 +96,8 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
         displayedChild = 0
         (root as ViewGroup).bringChildToFront(appbar)
       }
-      lottie.apply {
-        imageAssetsFolder = File.separator
-
-        val assetName = when (GlobalValues.season) {
-          SPRING -> "anim/lib_reference_spring.json.zip"
-          SUMMER -> "anim/lib_reference_summer.json.zip"
-          AUTUMN -> "anim/lib_reference_autumn.json.zip"
-          WINTER -> "anim/lib_reference_winter.json.zip"
-          else -> "anim/lib_reference_summer.json.zip"
-        }
-
-        setAnimation(assetName)
+      loading.apply {
+        setPreloadedBitmap(AppsListLoadingView.TextureType.LIBS)
       }
     }
 

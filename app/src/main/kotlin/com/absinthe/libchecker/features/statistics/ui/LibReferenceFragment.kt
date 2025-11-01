@@ -34,6 +34,7 @@ import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.launchLibReferencePage
 import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libchecker.utils.showToast
+import com.absinthe.libchecker.view.app.AppsListLoadingView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -167,6 +168,10 @@ class LibReferenceFragment :
               it.progress,
               it.progress > 0
             )
+          }
+
+          is HomeViewModel.Effect.SphereTextureAvailable -> {
+            binding.loadingView.loadingView.setPreloadedBitmap(AppsListLoadingView.TextureType.LIBS)
           }
 
           else -> {}
@@ -376,10 +381,10 @@ class LibReferenceFragment :
     }
     if (child == VF_LOADING) {
       menu?.findItem(R.id.search)?.isVisible = false
-      binding.loadingView.loadingView.resumeAnimation()
+      binding.loadingView.loadingView.startSpinning()
     } else {
       menu?.findItem(R.id.search)?.isVisible = true
-      binding.loadingView.loadingView.pauseAnimation()
+      binding.loadingView.loadingView.stopSpinning()
       binding.list.scrollToPosition(0)
     }
 

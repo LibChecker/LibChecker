@@ -5,32 +5,31 @@ import android.util.AttributeSet
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.view.AViewGroup
-import com.airbnb.lottie.LottieAnimationView
-import com.airbnb.lottie.LottieDrawable
+import com.absinthe.libchecker.view.app.AppsListLoadingView
 import com.google.android.material.progressindicator.LinearProgressIndicator
-import java.io.File
 
 class AppListInitialiseView(
   context: Context,
   attributeSet: AttributeSet? = null
 ) : AViewGroup(context, attributeSet) {
 
-  val loadingView = LottieAnimationView(context).apply {
-    val size = context.getDimensionPixelSize(R.dimen.lottie_anim_size)
+  val loadingView = AppsListLoadingView(context).apply {
+    val size = context.getDimensionPixelSize(R.dimen.sphere_loading_size)
     layoutParams = FrameLayout.LayoutParams(size, size).also {
       it.gravity = Gravity.CENTER
     }
-    imageAssetsFolder = File.separator
-    repeatCount = LottieDrawable.INFINITE
-    setAnimation("anim/app_list_loading.json.zip")
+    setPreloadedBitmap(AppsListLoadingView.TextureType.APPS)
     addView(this)
   }
 
   val progressIndicator = LinearProgressIndicator(context).apply {
-    layoutParams = LayoutParams(200.dp, ViewGroup.LayoutParams.WRAP_CONTENT)
+    layoutParams = LayoutParams(200.dp, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+      topMargin = 16.dp
+    }
     trackCornerRadius = 3.dp
     addView(this)
   }
@@ -41,12 +40,12 @@ class AppListInitialiseView(
     progressIndicator.autoMeasure()
     setMeasuredDimension(
       loadingView.measuredWidth.coerceAtLeast(progressIndicator.measuredWidth),
-      loadingView.measuredHeight + progressIndicator.measuredHeight
+      loadingView.measuredHeight + progressIndicator.measuredHeight + progressIndicator.marginTop
     )
   }
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     loadingView.layout(loadingView.toHorizontalCenter(this), 0)
-    progressIndicator.layout(progressIndicator.toHorizontalCenter(this), loadingView.bottom)
+    progressIndicator.layout(progressIndicator.toHorizontalCenter(this), loadingView.bottom + progressIndicator.marginTop)
   }
 }
