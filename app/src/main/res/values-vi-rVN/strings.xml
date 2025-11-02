@@ -194,6 +194,8 @@
   <string name="lib_detail_elf_info">Thông tin thêm</string>
   <string name="lib_detail_dependency_tip">Phụ thuộc</string>
   <string name="lib_detail_entry_points_tip">Điểm vào</string>
+  <string name="apk_preview">APK Preview</string>
+  <string name="apk_preview_item_not_available">Cannot be displayed in preview mode</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Sao chép vào clipboard</string>
   <string name="toast_not_existing_market">Không tồn tại bất kỳ thị trường ứng dụng nào</string>
