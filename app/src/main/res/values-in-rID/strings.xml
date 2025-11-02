@@ -194,6 +194,8 @@
   <string name="lib_detail_elf_info">Info Selengkapnya</string>
   <string name="lib_detail_dependency_tip">Dependensi</string>
   <string name="lib_detail_entry_points_tip">Entry Point</string>
+  <string name="apk_preview">APK Preview</string>
+  <string name="apk_preview_item_not_available">Cannot be displayed in preview mode</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Tersalin ke papan klip</string>
   <string name="toast_not_existing_market">Tidak ada di market aplikasi apa pun</string>
