@@ -118,8 +118,10 @@
   <string name="further_operation">さらなる操作</string>
   <string name="app_info_launch">起動</string>
   <string name="app_info_settings">設定</string>
+  <string name="app_info_share">Settings</string>
   <string name="lib_detail_dialog_title">ライブラリ詳細</string>
   <string name="lib_permission_dialog_title">権限詳細</string>
+  <string name="lib_permission_provided_by_format">Provided by %s</string>
   <string name="agp_details">Android StudioのビルドシステムはGradleに基づいており、Android GradleプラグインはAndroidアプリのビルドに特化したいくつかの機能を追加します。Androidプラグインは通常、Android Studioとロックステップで更新されますが、プラグイン（およびGradleシステムの残り）はAndroid Studioから独立して実行でき、別々に更新できます。</string>
   <string name="xposed_module">Xposedモジュール</string>
   <string name="xposed_module_details">Xposedは、APKに触れることなくシステムとアプリの動作を変更することができるモジュールのフレームワークです。それは素晴らしいことです、なぜならそれはモジュールが異なるバージョンやROMで変更なしに動作できることを意味します。</string>
@@ -200,6 +202,7 @@
   <string name="toast_cloud_rules_update_error">クラウドルールの更新に失敗しました。再試行してください。</string>
   <string name="toast_not_enough_storage_space">ストレージスペースが不足しています</string>
   <string name="toast_downloading_app">ダウンロードをリクエストしました</string>
+  <string name="toast_long_tap_share_button_tip">Long press the “Share” button to choose where to save</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">現在のスナップショットを保存</string>
   <string name="snapshot_current_timestamp">現在のスナップショットのタイムスタンプ</string>
@@ -231,6 +234,8 @@
   <string name="btn_drop">破棄</string>
   <string name="dialog_title_compare_diff_apk">注意</string>
   <string name="dialog_message_compare_diff_apk">異なる2つのAPKを比較しますか？</string>
+  <string name="dialog_themed_and_alternative_app_icons">Themed and alternative icons</string>
+  <string name="dialog_themed">Themed</string>
   <!--  Album  -->
   <string name="album_compare">比較</string>
   <string name="album_item_comparison_title">比較</string>
