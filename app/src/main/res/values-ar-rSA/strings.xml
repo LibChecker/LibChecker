@@ -194,6 +194,8 @@
   <string name="lib_detail_elf_info">معلومات أكثر</string>
   <string name="lib_detail_dependency_tip">التبعية</string>
   <string name="lib_detail_entry_points_tip">نقاط الدخول</string>
+  <string name="apk_preview">APK Preview</string>
+  <string name="apk_preview_item_not_available">Cannot be displayed in preview mode</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">نسخ إلى الحافظة</string>
   <string name="toast_not_existing_market">لا يوجد أي سوق تطبيقات موجود</string>
