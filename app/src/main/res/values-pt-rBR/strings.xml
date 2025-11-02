@@ -194,6 +194,8 @@
   <string name="lib_detail_elf_info">Mais informações</string>
   <string name="lib_detail_dependency_tip">Dependências</string>
   <string name="lib_detail_entry_points_tip">Pontos de Entrada</string>
+  <string name="apk_preview">APK Preview</string>
+  <string name="apk_preview_item_not_available">Cannot be displayed in preview mode</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Copiado para área de transferência</string>
   <string name="toast_not_existing_market">Não há nenhum mercado de aplicativos existente</string>
