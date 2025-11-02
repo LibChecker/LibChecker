@@ -23,14 +23,12 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import timber.log.Timber
 
 class AppPropsAdapter(
-  packageInfo: PackageInfo,
+  packageInfo: PackageInfo?,
   private val fragMgr: FragmentManager
 ) : BaseQuickAdapter<AppPropItem, BaseViewHolder>(0) {
 
   private val appResources by lazy {
-    SystemServices.packageManager.getResourcesForApplication(
-      packageInfo.applicationInfo!!
-    )
+    packageInfo?.applicationInfo?.let { ai -> SystemServices.packageManager.getResourcesForApplication(ai) }
   }
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
@@ -50,15 +48,14 @@ class AppPropsAdapter(
   private val linkable = setOf("array", "bool", "color", "dimen", "drawable", "integer", "mipmap", "string", "xml")
 
   private fun parseValue(item: AppPropItem): String {
-    if (item.value.maybeResourceId()) {
-      try {
-        return appResources.getResourceName(item.value.toInt())
-      } catch (_: Exception) {}
+    if (appResources != null && item.value.maybeResourceId()) {
+      runCatching { appResources!!.getResourceName(item.value.toInt()) }
     }
     return PropertiesMap.parseProperty(item.key, item.value)
   }
 
   private fun initLinkBtn(itemView: AppPropItemView, item: AppPropItem) {
+    val appResources = this.appResources ?: return
     if (!item.value.maybeResourceId()) {
       itemView.linkToIcon.isVisible = false
       return

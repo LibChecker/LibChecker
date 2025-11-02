@@ -29,6 +29,7 @@ import com.absinthe.libchecker.features.applist.detail.ui.AppInstallSourceBSDFra
 import com.absinthe.libchecker.features.applist.detail.ui.AppPropBottomSheetDialogFragment
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_PACKAGE_INFO
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_PACKAGE_NAME
+import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_PROPS
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.Toasty
@@ -37,6 +38,7 @@ import com.absinthe.libchecker.utils.extensions.copyToClipboard
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.paddingStartCompat
 import com.absinthe.libchecker.utils.extensions.paddingTopCompat
+import com.absinthe.libchecker.utils.toJson
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayout
@@ -173,6 +175,15 @@ object FeaturesDialog {
     AppPropBottomSheetDialogFragment().apply {
       arguments = bundleOf(
         EXTRA_PACKAGE_INFO to pi
+      )
+      show(activity.supportFragmentManager, AppPropBottomSheetDialogFragment::class.java.name)
+    }
+  }
+
+  fun showAppPropDialog(activity: FragmentActivity, props: Map<String, String>) {
+    AppPropBottomSheetDialogFragment().apply {
+      arguments = bundleOf(
+        EXTRA_PROPS to props.toJson()
       )
       show(activity.supportFragmentManager, AppPropBottomSheetDialogFragment::class.java.name)
     }

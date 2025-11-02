@@ -6,6 +6,7 @@ import com.absinthe.libchecker.features.applist.detail.bean.AppPropItem
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppPropsBottomSheetView
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.extensions.getDexFileOptimizationInfo
+import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libchecker.utils.manifest.ApplicationReader
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
@@ -13,6 +14,7 @@ import java.io.File
 import pxb.android.axml.ValueWrapper
 
 const val EXTRA_PACKAGE_INFO = "EXTRA_PACKAGE_INFO"
+const val EXTRA_PROPS = "EXTRA_PROPS"
 
 class AppPropBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppPropsBottomSheetView>() {
 
@@ -21,7 +23,11 @@ class AppPropBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppPr
       requireArguments(),
       EXTRA_PACKAGE_INFO,
       PackageInfo::class.java
-    )!!
+    )
+  }
+
+  private val props by lazy {
+    requireArguments().getString(EXTRA_PROPS)?.fromJson<Map<String, String>>()
   }
 
   override fun initRootView(): AppPropsBottomSheetView = AppPropsBottomSheetView(requireContext(), packageInfo)
@@ -30,8 +36,8 @@ class AppPropBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppPr
 
   override fun init() {
     maxPeekHeightPercentage = 0.67f
-    val propsMap = runCatching {
-      ApplicationReader.getManifestProperties(File(packageInfo.applicationInfo!!.sourceDir))
+    val propsMap = props ?: runCatching {
+      ApplicationReader.getManifestProperties(File(packageInfo!!.applicationInfo!!.sourceDir))
     }.getOrNull()
     val bundleList = if (propsMap.isNullOrEmpty()) {
       emptyList()
@@ -48,7 +54,7 @@ class AppPropBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppPr
     }.toMutableList()
 
     if (OsUtils.atLeastP()) {
-      packageInfo.getDexFileOptimizationInfo()?.let {
+      packageInfo?.getDexFileOptimizationInfo()?.let {
         bundleList.add(
           0,
           AppPropItem(

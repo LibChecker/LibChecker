@@ -38,15 +38,18 @@ object ApiManager {
 
   val rulesBundleUrl = "${root}cloud/rules/v$VERSION/rules.db"
 
-  @PublishedApi
-  internal val retrofit by unsafeLazy {
-    val okHttpClient = OkHttpClient.Builder()
+  val okHttpClient by unsafeLazy {
+    OkHttpClient.Builder()
       .connectTimeout(30, TimeUnit.SECONDS)
       .readTimeout(30, TimeUnit.SECONDS)
       .writeTimeout(30, TimeUnit.SECONDS)
       .addInterceptor(BaseUrlInterceptor())
       .addInterceptor(AndroidDevelopersInterceptor())
       .build()
+  }
+
+  @PublishedApi
+  internal val retrofit by unsafeLazy {
     Retrofit.Builder()
       .addConverterFactory(MoshiConverterFactory.create(JsonUtil.moshi))
       .client(okHttpClient)

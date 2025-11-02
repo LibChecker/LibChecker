@@ -85,7 +85,7 @@
   <string name="pref_group_normal">Normal</string>
   <string name="pref_group_others">Others</string>
 
-  <string name="apk_analytics">APK details</string>
+  <string name="apk_analytics">APK analytics</string>
   <string name="colorful_icon">Colorful icon</string>
   <string name="rules_repo_title">Rules repository</string>
   <string name="lib_ref_threshold">Library reference threshold</string>
@@ -182,7 +182,7 @@
   <string name="lib_detail_relative_link_tip">Relative link</string>
   <string name="lib_detail_last_update_tip">Updated at</string>
   <string name="lib_detail_app_props_title">App properties</string>
-  <string name="lib_detail_app_props_tip">More detaild</string>
+  <string name="lib_detail_app_props_tip">More details</string>
   <string name="lib_detail_xposed_min_version">Minimum version</string>
   <string name="lib_detail_xposed_default_scope">Default scope</string>
   <string name="lib_detail_xposed_init_class">Initialization class</string>
@@ -206,6 +206,8 @@
   <string name="lib_detail_elf_info">More details</string>
   <string name="lib_detail_dependency_tip">Dependencies</string>
   <string name="lib_detail_entry_points_tip">Entry points</string>
+  <string name="apk_preview">APK Preview</string>
+  <string name="apk_preview_item_not_available">Cannot be displayed in preview mode</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Copied to clipboard</string>

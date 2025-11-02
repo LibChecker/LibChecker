@@ -417,24 +417,24 @@ object PackageUtils {
    */
   fun getMetaDataItems(packageInfo: PackageInfo): List<LibStringItem> {
     val ai = packageInfo.applicationInfo ?: return emptyList()
+    val metadata = ai.metaData ?: return emptyList()
     val appResources by lazy { SystemServices.packageManager.getResourcesForApplication(ai) }
-    ai.metaData?.let {
-      return it.keySet().asSequence()
-        .map { key ->
-          @Suppress("DEPRECATION")
-          var value = it.get(key).toString()
-          var id = 0L
 
-          if (value.maybeResourceId()) {
-            id = value.toLong()
-            runCatching {
-              value = appResources.getResourceName(id.toInt())
-            }
+    return metadata.keySet().asSequence()
+      .map { key ->
+        @Suppress("DEPRECATION")
+        var value = metadata.get(key).toString()
+        var id = 0L
+
+        if (value.maybeResourceId()) {
+          id = value.toLong()
+          runCatching {
+            value = appResources.getResourceName(id.toInt())
           }
-          LibStringItem(key, id, value)
         }
-        .toList()
-    } ?: return emptyList()
+        LibStringItem(key, id, value)
+      }
+      .toList()
   }
 
   /**
@@ -607,6 +607,26 @@ object PackageUtils {
           isComponentExported(it),
           it.processName.orEmpty().removePrefix(it.packageName)
         )
+      }
+      .toList()
+  }
+
+  fun getComponentList(
+    packageName: String,
+    list: List<String>,
+    isSimpleName: Boolean
+  ): List<StatefulComponent> {
+    if (list.isEmpty()) {
+      return emptyList()
+    }
+    return list.asSequence()
+      .map {
+        val name = if (isSimpleName) {
+          it.removePrefix(packageName)
+        } else {
+          it
+        }
+        StatefulComponent(componentName = name, enabled = true, exported = true, processName = "")
       }
       .toList()
   }

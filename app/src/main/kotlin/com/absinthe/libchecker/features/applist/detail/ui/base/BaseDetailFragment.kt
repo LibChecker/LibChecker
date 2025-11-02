@@ -339,6 +339,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   }
 
   private fun doOnLongClick(context: Context, item: LibStringItemChip, position: Int) {
+    val packageName = viewModel.apkPreviewInfo?.packageName ?: viewModel.packageInfo.packageName
     val actionMap = mutableMapOf<Int, () -> Unit>()
     val arrayAdapter = ArrayAdapter<String>(context, android.R.layout.simple_list_item_1)
     var componentName = item.item.name
@@ -346,7 +347,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
       componentName = componentName.substringBefore(" ")
     }
     val fullComponentName = if (componentName.startsWith(".")) {
-      viewModel.packageInfo.packageName + componentName
+      packageName + componentName
     } else {
       componentName
     }
@@ -363,7 +364,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     }
 
     // ELF info
-    if (this is NativeAnalysisFragment && item.item.elfInfo.elfType != ET_NOT_ELF) {
+    if (!viewModel.isApkPreview && this is NativeAnalysisFragment && item.item.elfInfo.elfType != ET_NOT_ELF) {
       arrayAdapter.add(getString(R.string.lib_detail_elf_info))
       actionMap[arrayAdapter.count - 1] = {
         ELFDetailDialogFragment.newInstance(
@@ -384,12 +385,12 @@ abstract class BaseDetailFragment<T : ViewBinding> :
       }
     }
 
-    if (!viewModel.isApk) {
+    if (!viewModel.isApk && !viewModel.isApkPreview) {
       // Blocker
       if (this is ComponentsAnalysisFragment && BlockerManager.isSupportInteraction) {
         if (integrationBlockerList == null) {
           integrationBlockerList =
-            BlockerManager().queryBlockedComponent(context, viewModel.packageInfo.packageName)
+            BlockerManager().queryBlockedComponent(context, packageName)
         }
         val blockerShouldBlock =
           integrationBlockerList?.any { it.name == fullComponentName } == false
@@ -403,13 +404,13 @@ abstract class BaseDetailFragment<T : ViewBinding> :
           BlockerManager().apply {
             addBlockedComponent(
               context,
-              viewModel.packageInfo.packageName,
+              packageName,
               componentName,
               type,
               blockerShouldBlock
             )
             integrationBlockerList =
-              queryBlockedComponent(context, viewModel.packageInfo.packageName)
+              queryBlockedComponent(context, packageName)
             val shouldTurnToDisable =
               integrationBlockerList?.any { it.name == fullComponentName } == true && blockerShouldBlock
             animateTvTitle(position, shouldTurnToDisable)
@@ -421,7 +422,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
       if (this is ComponentsAnalysisFragment && MonkeyKingManager.isSupportInteraction) {
         if (integrationMonkeyKingBlockList == null) {
           integrationMonkeyKingBlockList =
-            MonkeyKingManager().queryBlockedComponent(context, viewModel.packageInfo.packageName)
+            MonkeyKingManager().queryBlockedComponent(context, packageName)
         }
         val monkeyKingShouldBlock =
           integrationMonkeyKingBlockList?.any { it.name == componentName } == false
@@ -434,13 +435,13 @@ abstract class BaseDetailFragment<T : ViewBinding> :
           MonkeyKingManager().apply {
             addBlockedComponent(
               context,
-              viewModel.packageInfo.packageName,
+              packageName,
               componentName,
               type,
               monkeyKingShouldBlock
             )
             integrationMonkeyKingBlockList =
-              queryBlockedComponent(context, viewModel.packageInfo.packageName)
+              queryBlockedComponent(context, packageName)
             val shouldTurnToDisable =
               integrationMonkeyKingBlockList?.any { it.name == fullComponentName } == true && monkeyKingShouldBlock
             animateTvTitle(position, shouldTurnToDisable)
@@ -454,7 +455,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
         actionMap[arrayAdapter.count - 1] = {
           AnywhereManager().launchActivityEditor(
             context,
-            viewModel.packageInfo.packageName,
+            packageName,
             componentName
           )
         }

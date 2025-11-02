@@ -42,6 +42,25 @@ public class ApplicationReader {
     return new ApplicationReader(apk).properties;
   }
 
+  private ApplicationReader(byte[] bytes) throws IOException {
+    try {
+      AxmlReader reader = new AxmlReader(bytes != null ? bytes : new byte[0]);
+      reader.accept(new AxmlVisitor() {
+        @Override
+        public NodeVisitor child(String ns, String name) {
+          NodeVisitor child = super.child(ns, name);
+          return new ManifestTagVisitor(child);
+        }
+      });
+    } catch (Exception e) {
+      Timber.e(e);
+    }
+  }
+
+  public static Map<String, Object> getManifestProperties(byte[] bytes) throws IOException {
+    return new ApplicationReader(bytes).properties;
+  }
+
   public static byte[] getBytesFromInputStream(InputStream inputStream) {
     try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
       byte[] b = new byte[1024];

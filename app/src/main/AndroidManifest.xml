@@ -28,6 +28,7 @@
     android:hardwareAccelerated="true"
     android:icon="@mipmap/ic_launcher"
     android:label="@string/app_name"
+    android:usesCleartextTraffic="true"
     android:largeHeap="true"
     android:roundIcon="@mipmap/ic_launcher_round"
     android:supportsRtl="true"
@@ -89,6 +90,7 @@
         <action android:name="android.intent.action.SEND" />
         <category android:name="android.intent.category.DEFAULT" />
         <data android:mimeType="application/vnd.android.package-archive" />
+        <data android:mimeType="text/plain"/>
       </intent-filter>
     </activity>
     <activity
