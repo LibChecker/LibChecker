@@ -118,6 +118,7 @@
   <string name="further_operation">مزيد من العمليات</string>
   <string name="app_info_launch">تشغيل</string>
   <string name="app_info_settings">الاعدادات</string>
+  <string name="app_info_share">Settings</string>
   <string name="lib_detail_dialog_title">تفاصيل المكتبة</string>
   <string name="lib_permission_dialog_title">تفاصيل الإذن</string>
   <string name="lib_permission_provided_by_format">Provided by %s</string>
@@ -201,6 +202,7 @@
   <string name="toast_cloud_rules_update_error">فشل تحديث قواعد السحابة. يرجى المحاولة مرة أخرى.</string>
   <string name="toast_not_enough_storage_space">لا توجد مساحة تخزين كافية</string>
   <string name="toast_downloading_app">تم طلب التنزيل</string>
+  <string name="toast_long_tap_share_button_tip">Long press the “Share” button to choose where to save</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">حفظ نقطة الاستعادة الحالية</string>
   <string name="snapshot_current_timestamp">الطابع الزمني الحالي لنقطة الاستعادة</string>
