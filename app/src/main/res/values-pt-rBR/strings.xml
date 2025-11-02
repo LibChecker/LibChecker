@@ -118,8 +118,10 @@
   <string name="further_operation">Operações adicionais</string>
   <string name="app_info_launch">Executar</string>
   <string name="app_info_settings">Configurações</string>
+  <string name="app_info_share">Settings</string>
   <string name="lib_detail_dialog_title">Detalhes de biblioteca</string>
   <string name="lib_permission_dialog_title">Detalhes da permissão</string>
+  <string name="lib_permission_provided_by_format">Provided by %s</string>
   <string name="agp_details">O sistema de construção do Android Studio é baseado no Gradle e o plugin Android Gradle adiciona vários recursos específicos para a construção de aplicativos Android. Embora o plugin Android seja normalmente atualizado na etapa de bloqueio do Android Studio, o plugin (e o resto do sistema Gradle) pode rodar independente do Android Studio e ser atualizado separadamente.</string>
   <string name="xposed_module">Módulo Xposed</string>
   <string name="xposed_module_details">Xposed é uma estrutura para módulos que podem alterar o comportamento do sistema e de aplicativos sem tocar em nenhum APK. Isso é ótimo porque significa que os módulos podem funcionar para diferentes versões e até mesmo para ROMs sem quaisquer alterações.</string>
@@ -200,6 +202,7 @@
   <string name="toast_cloud_rules_update_error">Falha ao atualizar as regras da nuvem. Por favor, tente novamente.</string>
   <string name="toast_not_enough_storage_space">Não há espaço suficiente no armazenamento</string>
   <string name="toast_downloading_app">Download solicitado</string>
+  <string name="toast_long_tap_share_button_tip">Long press the “Share” button to choose where to save</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">Salve a snapshot atual</string>
   <string name="snapshot_current_timestamp">Timestamp atual de Snapshot</string>
@@ -231,6 +234,8 @@
   <string name="btn_drop">Discartar</string>
   <string name="dialog_title_compare_diff_apk">Atenção</string>
   <string name="dialog_message_compare_diff_apk">Você gostaria de comparar os dois diferentes APKs?</string>
+  <string name="dialog_themed_and_alternative_app_icons">Themed and alternative icons</string>
+  <string name="dialog_themed">Themed</string>
   <!--  Album  -->
   <string name="album_compare">Comparar</string>
   <string name="album_item_comparison_title">Compararão</string>
