@@ -194,6 +194,8 @@
   <string name="lib_detail_elf_info">詳細情報</string>
   <string name="lib_detail_dependency_tip">依存関係</string>
   <string name="lib_detail_entry_points_tip">エントリーポイント</string>
+  <string name="apk_preview">APK Preview</string>
+  <string name="apk_preview_item_not_available">Cannot be displayed in preview mode</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">クリップボードにコピーされました</string>
   <string name="toast_not_existing_market">アプリマーケットが存在しません</string>
