@@ -118,8 +118,10 @@
   <string name="further_operation">Weitere Aktionen</string>
   <string name="app_info_launch">Starten</string>
   <string name="app_info_settings">Einstellungen</string>
+  <string name="app_info_share">Settings</string>
   <string name="lib_detail_dialog_title">Bibliotheksdetails</string>
   <string name="lib_permission_dialog_title">Berechtigungsdetails</string>
+  <string name="lib_permission_provided_by_format">Provided by %s</string>
   <string name="agp_details">.</string>
   <string name="xposed_module">Xposed-Modul</string>
   <string name="xposed_module_details">.</string>
@@ -200,6 +202,7 @@
   <string name="toast_cloud_rules_update_error">Cloud-Regeln konnten nicht aktualisiert werden. Bitte versuchen Sie es erneut.</string>
   <string name="toast_not_enough_storage_space">Nicht genügend Speicherplatz</string>
   <string name="toast_downloading_app">Download angefordert</string>
+  <string name="toast_long_tap_share_button_tip">Long press the “Share” button to choose where to save</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">Aktuellen Schnappschuss speichern</string>
   <string name="snapshot_current_timestamp">Zeitstempel des aktuellen Schnappschusses</string>
@@ -231,6 +234,8 @@
   <string name="btn_drop">Verwerfen</string>
   <string name="dialog_title_compare_diff_apk">Achtung</string>
   <string name="dialog_message_compare_diff_apk">Möchten Sie zwei unterschiedliche APKs vergleichen?</string>
+  <string name="dialog_themed_and_alternative_app_icons">Themed and alternative icons</string>
+  <string name="dialog_themed">Themed</string>
   <!--  Album  -->
   <string name="album_compare">Vergleichen</string>
   <string name="album_item_comparison_title">Vergleich</string>
