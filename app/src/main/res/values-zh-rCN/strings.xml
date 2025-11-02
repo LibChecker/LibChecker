@@ -194,6 +194,8 @@
   <string name="lib_detail_elf_info">更多信息</string>
   <string name="lib_detail_dependency_tip">依赖</string>
   <string name="lib_detail_entry_points_tip">入口点</string>
+  <string name="apk_preview">APK 预览</string>
+  <string name="apk_preview_item_not_available">无法在预览模式下显示</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已复制到剪贴板</string>
   <string name="toast_not_existing_market">设备中不存在应用市场</string>
