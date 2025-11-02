@@ -118,6 +118,7 @@
   <string name="further_operation">İleri İşlem</string>
   <string name="app_info_launch">Başlat</string>
   <string name="app_info_settings">Ayarlar</string>
+  <string name="app_info_share">Settings</string>
   <string name="lib_detail_dialog_title">Kütüphane Ayrıntıları</string>
   <string name="lib_permission_dialog_title">İzin Ayrıntısı</string>
   <string name="lib_permission_provided_by_format">%s tarafından sağlandı</string>
@@ -201,6 +202,7 @@
   <string name="toast_cloud_rules_update_error">Bulut kuralları güncellenemedi. Lütfen tekrar deneyin.</string>
   <string name="toast_not_enough_storage_space">Yeterli depolama alanı yok</string>
   <string name="toast_downloading_app">İndirme talep edildi</string>
+  <string name="toast_long_tap_share_button_tip">Long press the “Share” button to choose where to save</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">Mevcut anlık görüntüyü kaydet</string>
   <string name="snapshot_current_timestamp">Mevcut Anlık Görüntü Zaman Damgası</string>
@@ -232,6 +234,8 @@
   <string name="btn_drop">At</string>
   <string name="dialog_title_compare_diff_apk">Dikkat</string>
   <string name="dialog_message_compare_diff_apk">İki farklı APK\'yı karşılaştırmak istiyor musunuz?</string>
+  <string name="dialog_themed_and_alternative_app_icons">Themed and alternative icons</string>
+  <string name="dialog_themed">Themed</string>
   <!--  Album  -->
   <string name="album_compare">Karşılaştır</string>
   <string name="album_item_comparison_title">Karşılaştırma</string>
