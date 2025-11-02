@@ -48,6 +48,7 @@ import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
+import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
 import com.absinthe.libchecker.utils.extensions.ABI_STRING_MAP
 import com.absinthe.libchecker.utils.extensions.getAGPVersion
 import com.absinthe.libchecker.utils.extensions.getFeatures
@@ -64,6 +65,7 @@ import com.absinthe.libchecker.utils.extensions.isPageSizeCompat
 import com.absinthe.libchecker.utils.extensions.isPlayAppSigning
 import com.absinthe.libchecker.utils.extensions.isUseKMP
 import com.absinthe.libchecker.utils.extensions.isXposedModule
+import com.absinthe.libchecker.utils.extensions.maybeResourceId
 import com.absinthe.libchecker.utils.extensions.toClassDefType
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.rulesbundle.LCRules
@@ -104,6 +106,8 @@ class DetailViewModel : ViewModel() {
   val is64Bit = MutableStateFlow<Boolean?>(null)
 
   var isApk = false
+  var isApkPreview = false
+
   var queriedText: String? = null
   var queriedProcess: String? = null
   var processesMap: Map<String, Int> = mapOf()
@@ -112,6 +116,7 @@ class DetailViewModel : ViewModel() {
 
   lateinit var packageInfo: PackageInfo
     private set
+  var apkPreviewInfo: ApkPreviewInfo? = null
   val packageInfoStateFlow = MutableStateFlow<PackageInfo?>(null)
 
   private val _featuresFlow = MutableSharedFlow<VersionedFeature>()
@@ -171,8 +176,19 @@ class DetailViewModel : ViewModel() {
 
       val abi = (abiBundleStateFlow.value ?: abiBundleStateFlow.filterNotNull().first()).abi
       val specifiedAbi = if (abi == ERROR || abi == NO_LIBS || abi == OVERLAY) abi else null
-      val parseElf = GlobalFeatures.ENABLE_DETECTING_16KB_PAGE_ALIGNMENT
-      allNativeLibItems = PackageUtils.getSourceLibs(packageInfo, specifiedAbi = specifiedAbi, parseElf = parseElf)
+      val parseElf = GlobalFeatures.ENABLE_DETECTING_16KB_PAGE_ALIGNMENT && !isApkPreview
+      allNativeLibItems = if (!isApkPreview && apkPreviewInfo == null) {
+        PackageUtils.getSourceLibs(packageInfo, specifiedAbi = specifiedAbi, parseElf = parseElf)
+      } else {
+        apkPreviewInfo!!.nativeLibs.map {
+          ABI_STRING_MAP[it.key]!! to it.value.map { value ->
+            LibStringItem(
+              name = value.first,
+              size = value.second.toLong()
+            )
+          }
+        }.toMap()
+      }
 
       // TODO
       val sourceMap = sourceSet.filter { source -> source.isNotEmpty() }
@@ -189,7 +205,7 @@ class DetailViewModel : ViewModel() {
       }
 
       allNativeLibItems[ABI_STRING_MAP[abi % MULTI_ARCH]]?.let {
-        if (packageInfo.is16KBAligned(libs = it, isApk = isApk)) {
+        if (!isApkPreview && packageInfo.is16KBAligned(libs = it, isApk = isApk)) {
           _featuresFlow.emit(VersionedFeature(Features.Ext.ELF_PAGE_SIZE_16KB))
         }
       }
@@ -327,6 +343,40 @@ class DetailViewModel : ViewModel() {
     }
   }
 
+  fun initComponentsDataInPreview() = viewModelScope.launch(Dispatchers.IO) {
+    val previewInfo = apkPreviewInfo ?: return@launch
+    val services = PackageUtils.getComponentList(previewInfo.packageName, previewInfo.services, true)
+    val activities = PackageUtils.getComponentList(previewInfo.packageName, previewInfo.activities, true)
+    val receivers = PackageUtils.getComponentList(previewInfo.packageName, previewInfo.receivers, true)
+    val providers = PackageUtils.getComponentList(previewInfo.packageName, previewInfo.providers, true)
+
+    val transform: suspend (StatefulComponent, Int) -> LibStringItemChip =
+      { item, componentType ->
+        val rule = LCRules.getRule(item.componentName, componentType, true)
+          .takeIf { !item.componentName.startsWith(".") }
+
+        val source = when {
+          !item.enabled -> DISABLED
+          item.exported -> EXPORTED
+          else -> null
+        }
+
+        LibStringItemChip(
+          LibStringItem(
+            name = item.componentName,
+            source = source,
+            process = item.processName.takeIf { it.isNotEmpty() }
+          ),
+          rule
+        )
+      }
+
+    componentsMap[SERVICE]?.emit(services.map { transform(it, SERVICE) })
+    componentsMap[ACTIVITY]?.emit(activities.map { transform(it, ACTIVITY) })
+    componentsMap[RECEIVER]?.emit(receivers.map { transform(it, RECEIVER) })
+    componentsMap[PROVIDER]?.emit(providers.map { transform(it, PROVIDER) })
+  }
+
   private val request: LibDetailRequest = ApiManager.create()
 
   suspend fun requestLibDetail(
@@ -369,7 +419,7 @@ class DetailViewModel : ViewModel() {
     if (list.isEmpty()) {
       return chipList
     } else {
-      val packageName = packageInfo.packageName
+      val packageName = apkPreviewInfo?.packageName ?: packageInfo.packageName
       list.forEach {
         rule = LCAppUtils.getRuleWithRegex(it.name, NATIVE, packageName, list)
         chipList.add(LibStringItemChip(it, rule))
@@ -407,9 +457,25 @@ class DetailViewModel : ViewModel() {
 
   private fun getMetaDataChipList(): List<LibStringItemChip> {
     Timber.d("getMetaDataChipList")
-    val chipList = PackageUtils.getMetaDataItems(packageInfo)
-      .map { LibStringItemChip(it, null) }
-      .toMutableList()
+    val chipList = if (!isApkPreview && apkPreviewInfo == null) {
+      PackageUtils.getMetaDataItems(packageInfo)
+        .map { LibStringItemChip(it, null) }
+    } else {
+      apkPreviewInfo!!.metadata
+        .map {
+          var flag = 0L
+          val value = if (it.value is Long || (it.value as? String)?.maybeResourceId() == true) {
+            flag = -1
+            null
+          } else {
+            it.value.toString()
+          }
+          LibStringItemChip(
+            LibStringItem(it.key, flag, value),
+            null
+          )
+        }
+    }.toMutableList()
 
     chipList.sortByDescending { it.item.name }
     return chipList
@@ -417,19 +483,28 @@ class DetailViewModel : ViewModel() {
 
   private fun getPermissionChipList(): List<LibStringItemChip> {
     Timber.d("getPermissionChipList")
-    val list = packageInfo.getStatefulPermissionsList().asSequence()
-      .map { perm ->
-        LibStringItemChip(
-          LibStringItem(
-            name = perm.first,
-            size = if (perm.second && !isApk) PackageInfo.REQUESTED_PERMISSION_GRANTED.toLong() else 0,
-            source = if (perm.first.contains("maxSdkVersion")) DISABLED else null,
-            process = if (perm.second && !isApk) PackageInfo.REQUESTED_PERMISSION_GRANTED.toString() else null
-          ),
-          null
-        )
-      }
-      .toMutableList()
+    val list = if (!isApkPreview && apkPreviewInfo == null) {
+      packageInfo.getStatefulPermissionsList().asSequence()
+        .map { perm ->
+          LibStringItemChip(
+            LibStringItem(
+              name = perm.first,
+              size = if (perm.second && !isApk) PackageInfo.REQUESTED_PERMISSION_GRANTED.toLong() else 0,
+              source = if (perm.first.contains("maxSdkVersion")) DISABLED else null,
+              process = if (perm.second && !isApk) PackageInfo.REQUESTED_PERMISSION_GRANTED.toString() else null
+            ),
+            null
+          )
+        }
+    } else {
+      apkPreviewInfo!!.permissions.asSequence()
+        .map { perm ->
+          LibStringItemChip(
+            LibStringItem(name = perm, size = 0, source = null, process = null),
+            null
+          )
+        }
+    }.toMutableList()
     list.sortByDescending { it.item.name }
     return list
   }
@@ -575,6 +650,10 @@ class DetailViewModel : ViewModel() {
     return formatter.format(pushedAt)
   }
 
+  fun emitFeature(feature: VersionedFeature) = viewModelScope.launch {
+    _featuresFlow.emit(feature)
+  }
+
   fun initFeatures(packageInfo: PackageInfo, features: Int) = viewModelScope.launch(Dispatchers.IO) {
     Timber.d("initFeatures: features = $features")
 
@@ -660,6 +739,20 @@ class DetailViewModel : ViewModel() {
       ignoreArch = true
     ).toSet()
     val abi = PackageUtils.getAbi(packageInfo, isApk = apkAnalyticsMode, abiSet = abiSet)
+    abiBundleStateFlow.emit(
+      AbiBundle(
+        abi,
+        abiSet.sortedByDescending {
+          it == abi || PackageUtils.isAbi64Bit(it)
+        }
+      )
+    )
+  }
+
+  fun initAbiInfo(apkPreviewInfo: ApkPreviewInfo) = viewModelScope.launch(Dispatchers.IO) {
+    val abiSet = apkPreviewInfo.abiSet
+    if (abiSet.isEmpty()) return@launch
+    val abi = abiSet.first()
     abiBundleStateFlow.emit(
       AbiBundle(
         abi,

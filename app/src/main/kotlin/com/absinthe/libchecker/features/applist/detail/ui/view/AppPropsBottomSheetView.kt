@@ -28,7 +28,7 @@ import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import timber.log.Timber
 
-class AppPropsBottomSheetView(context: Context, packageInfo: PackageInfo) :
+class AppPropsBottomSheetView(context: Context, packageInfo: PackageInfo?) :
   LinearLayout(context),
   IHeaderView {
 

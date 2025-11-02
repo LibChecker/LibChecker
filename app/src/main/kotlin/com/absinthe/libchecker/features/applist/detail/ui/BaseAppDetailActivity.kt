@@ -56,6 +56,7 @@ import com.absinthe.libchecker.features.applist.detail.AppBarStateChangeListener
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.FeaturesDialog
 import com.absinthe.libchecker.features.applist.detail.IDetailContainer
+import com.absinthe.libchecker.features.applist.detail.VersionedFeature
 import com.absinthe.libchecker.features.applist.detail.bean.AppDetailToolbarItem
 import com.absinthe.libchecker.features.applist.detail.bean.DetailExtraBean
 import com.absinthe.libchecker.features.applist.detail.bean.FeatureItem
@@ -160,16 +161,35 @@ abstract class BaseAppDetailActivity :
   protected fun onPackageInfoAvailable(packageInfo: PackageInfo, extraBean: DetailExtraBean?) {
     resetUiState()
     viewModel.reset()
+    val ai = packageInfo.applicationInfo
+    val apkPreviewInfo = viewModel.apkPreviewInfo
+
     viewModel.initPackageInfo(packageInfo)
-    viewModel.initAbiInfo(packageInfo, apkAnalyticsMode)
-    val ai = packageInfo.applicationInfo!!
+    if (apkPreviewInfo != null) {
+      viewModel.initAbiInfo(apkPreviewInfo)
+    } else {
+      viewModel.initAbiInfo(packageInfo, apkAnalyticsMode)
+    }
+
+    val packageName = apkPreviewInfo?.packageName ?: packageInfo.packageName
+    val appName = apkPreviewInfo?.let { getString(R.string.apk_preview) } ?: packageInfo.getAppName()
+    val versionCode = apkPreviewInfo?.versionCode ?: packageInfo.getVersionCode()
+    val versionName = apkPreviewInfo?.versionName ?: packageInfo.versionName
+    val versionString = apkPreviewInfo?.let { "${it.versionName} (${it.versionCode})" } ?: packageInfo.getVersionString()
+    val targetSdkVersionString = apkPreviewInfo?.targetSdkVersion?.toString() ?: packageInfo.getTargetApiString()
+    val targetSdkVersion = apkPreviewInfo?.targetSdkVersion ?: ai!!.targetSdkVersion
+    val minSdkVersion = apkPreviewInfo?.minSdkVersion ?: ai!!.minSdkVersion
+    val compileSdkVersionString = apkPreviewInfo?.compileSdkVersion?.toString() ?: packageInfo.getCompileSdkVersionString()
+    val compileSdkVersion = apkPreviewInfo?.compileSdkVersion ?: packageInfo.getCompileSdkVersion()
+    val sharedUserId = packageInfo.sharedUserId
+    val sharedLibraryFiles = ai?.sharedLibraryFiles
 
     binding.apply {
       try {
         supportActionBar?.title = null
         collapsingToolbar.also {
           it.setOnApplyWindowInsetsListener(null)
-          it.title = packageInfo.getAppName() ?: getString(R.string.detail_label)
+          it.title = appName ?: getString(R.string.detail_label)
         }
         headerLayout.addOnOffsetChangedListener(object : AppBarStateChangeListener() {
           override fun onStateChanged(appBarLayout: AppBarLayout, state: State) {
@@ -183,15 +203,19 @@ abstract class BaseAppDetailActivity :
               false,
               this@BaseAppDetailActivity
             )
-            load(appIconLoader.loadIcon(ai))
-            if (!apkAnalyticsMode || PackageUtils.isAppInstalled(packageInfo.packageName)) {
+            ai?.let {
+              load(appIconLoader.loadIcon(it))
+            } ?: run {
+              load(R.drawable.ic_icon_blueprint)
+            }
+            if (!apkAnalyticsMode || PackageUtils.isAppInstalled(packageName)) {
               setOnClickListener {
                 if (AntiShakeUtils.isInvalidClick(it)) {
                   return@setOnClickListener
                 }
                 AppInfoBottomSheetDialogFragment().apply {
                   arguments = bundleOf(
-                    EXTRA_PACKAGE_NAME to packageInfo.packageName
+                    EXTRA_PACKAGE_NAME to packageName
                   )
                   show(supportFragmentManager, AppInfoBottomSheetDialogFragment::class.java.name)
                 }
@@ -205,97 +229,111 @@ abstract class BaseAppDetailActivity :
             }
           }
           appNameView.apply {
-            text = packageInfo.getAppName()
+            text = appName
             setLongClickCopiedToClipboard(text)
           }
           packageNameView.apply {
-            text = packageInfo.packageName
+            text = packageName
             setLongClickCopiedToClipboard(text)
           }
           versionInfoView.apply {
-            text = packageInfo.getVersionString()
+            text = versionString
             setLongClickCopiedToClipboard(text)
           }
         }
 
-        val showAndroidVersion =
-          (GlobalValues.advancedOptions and AdvancedOptions.SHOW_ANDROID_VERSION) > 0
-        val versionInfo = buildSpannedString {
-          if (!isHarmonyMode) {
-            scale(0.8f) {
-              append("Target: ")
-            }
-            append(packageInfo.getTargetApiString())
-            if (showAndroidVersion) {
-              append(" (${AndroidVersions.simpleVersions[ai.targetSdkVersion]})")
-            }
-            scale(0.8f) {
-              append(" Min: ")
-            }
-            append(ai.minSdkVersion.toString())
-            if (showAndroidVersion) {
-              append(" (${AndroidVersions.simpleVersions[ai.minSdkVersion]})")
-            }
-            scale(0.8f) {
-              append(" Compile: ")
-            }
-            append(packageInfo.getCompileSdkVersionString())
-            if (showAndroidVersion) {
-              append(" (${AndroidVersions.simpleVersions[packageInfo.getCompileSdkVersion()]})")
-            }
-            scale(0.8f) {
-              append(" Size: ")
-            }
-            var baseApkSize = FileUtils.getFileSize(ai.sourceDir)
-            val baseFormattedApkSize = baseApkSize.sizeToString(this@BaseAppDetailActivity, showBytes = false)
-            val splitApkSizeList = PackageUtils.getSplitsSourceDir(packageInfo)
-              ?.map {
-                val size = FileUtils.getFileSize(it)
-                baseApkSize += size
-                size.sizeToString(this@BaseAppDetailActivity, showBytes = false)
+        lifecycleScope.launch {
+          val showAndroidVersion =
+            (GlobalValues.advancedOptions and AdvancedOptions.SHOW_ANDROID_VERSION) > 0
+          val versionInfo = buildSpannedString {
+            if (!isHarmonyMode) {
+              scale(0.8f) {
+                append("Target: ")
               }
-              ?.toMutableList()
+              append(targetSdkVersionString)
+              if (showAndroidVersion) {
+                append(" (${AndroidVersions.simpleVersions[targetSdkVersion]})")
+              }
+              scale(0.8f) {
+                append(" Min: ")
+              }
+              append(minSdkVersion.toString())
+              if (showAndroidVersion) {
+                append(" (${AndroidVersions.simpleVersions[minSdkVersion]})")
+              }
+              scale(0.8f) {
+                append(" Compile: ")
+              }
+              append(compileSdkVersionString)
+              if (showAndroidVersion) {
+                append(" (${AndroidVersions.simpleVersions[compileSdkVersion]})")
+              }
+              scale(0.8f) {
+                append(" Size: ")
+              }
+              var baseApkSize = apkPreviewInfo?.packageSize ?: FileUtils.getFileSize(ai!!.sourceDir)
+              val baseFormattedApkSize = baseApkSize.sizeToString(this@BaseAppDetailActivity, showBytes = false)
 
-            if (splitApkSizeList.isNullOrEmpty()) {
-              append(baseFormattedApkSize)
+              if (!viewModel.isApkPreview) {
+                val splitApkSizeList = PackageUtils.getSplitsSourceDir(packageInfo)
+                  ?.map {
+                    val size = FileUtils.getFileSize(it)
+                    baseApkSize += size
+                    size.sizeToString(this@BaseAppDetailActivity, showBytes = false)
+                  }
+                  ?.toMutableList()
+
+                if (splitApkSizeList.isNullOrEmpty()) {
+                  append(baseFormattedApkSize)
+                } else {
+                  splitApkSizeList.add(0, baseFormattedApkSize)
+                  val totalSize =
+                    baseApkSize.sizeToString(this@BaseAppDetailActivity, showBytes = false)
+                  append(
+                    splitApkSizeList.joinToString(
+                      separator = " + ",
+                      prefix = "(",
+                      postfix = " = $totalSize)"
+                    )
+                  )
+                }
+              } else {
+                append(baseFormattedApkSize)
+              }
+
+              sharedUserId?.let {
+                appendLine().append("sharedUserId = $it")
+              }
             } else {
-              splitApkSizeList.add(0, baseFormattedApkSize)
-              val totalSize = baseApkSize.sizeToString(this@BaseAppDetailActivity, showBytes = false)
-              append(
-                splitApkSizeList.joinToString(separator = " + ", prefix = "(", postfix = " = $totalSize)")
-              )
-            }
+              if (extraBean?.variant == Constants.VARIANT_HAP) {
+                bundleManager?.let {
+                  val hapBundle = it.getBundleInfo(
+                    packageName,
+                    IBundleManager.GET_BUNDLE_DEFAULT
+                  )
+                  scale(0.8f) {
+                    append("Target: ")
+                  }
+                  append(hapBundle.targetVersion.toString())
+                  scale(0.8f) {
+                    append("Min: ")
+                  }
+                  append(hapBundle.minSdkVersion.toString())
 
-            packageInfo.sharedUserId?.let {
-              appendLine().append("sharedUserId = $it")
-            }
-          } else {
-            if (extraBean?.variant == Constants.VARIANT_HAP) {
-              bundleManager?.let {
-                val hapBundle = it.getBundleInfo(
-                  packageInfo.packageName,
-                  IBundleManager.GET_BUNDLE_DEFAULT
-                )
-                scale(0.8f) {
-                  append("Target: ")
-                }
-                append(hapBundle.targetVersion.toString())
-                scale(0.8f) {
-                  append("Min: ")
-                }
-                append(hapBundle.minSdkVersion.toString())
-
-                if (!hapBundle.jointUserId.isNullOrEmpty()) {
-                  appendLine().append("jointUserId = ${hapBundle.jointUserId}")
+                  if (!hapBundle.jointUserId.isNullOrEmpty()) {
+                    appendLine().append("jointUserId = ${hapBundle.jointUserId}")
+                  }
                 }
               }
             }
           }
-        }
 
-        detailsTitle.extraInfoView.apply {
-          text = versionInfo
-          setLongClickCopiedToClipboard(text)
+          withContext(Dispatchers.Main) {
+            detailsTitle.extraInfoView.apply {
+              text = versionInfo
+              setLongClickCopiedToClipboard(text)
+            }
+          }
         }
       } catch (e: Exception) {
         Timber.e(e)
@@ -322,12 +360,12 @@ abstract class BaseAppDetailActivity :
           }
         )
       }
-      if (apkAnalyticsMode && PackageUtils.isAppInstalled(packageInfo.packageName)) {
+      if (apkAnalyticsMode && !viewModel.isApkPreview && PackageUtils.isAppInstalled(packageName)) {
         toolbarAdapter.addData(
           AppDetailToolbarItem(R.drawable.ic_compare, R.string.compare_with_current) {
             runCatching {
               val basePackage = PackageUtils.getPackageInfo(
-                viewModel.packageInfo.packageName,
+                packageName,
                 PackageManager.GET_ACTIVITIES
                   or PackageManager.GET_RECEIVERS
                   or PackageManager.GET_SERVICES
@@ -415,11 +453,15 @@ abstract class BaseAppDetailActivity :
         getText(R.string.ref_category_signatures)
       )
     }
+    if (viewModel.isApkPreview) {
+      typeList.remove(SIGNATURES)
+      tabTitles.remove(getText(R.string.ref_category_signatures))
+    }
 
-    if (ai.sharedLibraryFiles?.isNotEmpty() == true) {
+    if (sharedLibraryFiles?.isNotEmpty() == true) {
       lifecycleScope.launch(Dispatchers.IO) {
         val libs = runCatching {
-          PackageUtils.getStaticLibs(PackageUtils.getPackageInfo(packageInfo.packageName))
+          PackageUtils.getStaticLibs(PackageUtils.getPackageInfo(packageName))
         }.getOrDefault(emptyList())
         if (libs.isNotEmpty()) {
           withContext(Dispatchers.Main) {
@@ -444,17 +486,17 @@ abstract class BaseAppDetailActivity :
 
         override fun createFragment(position: Int): Fragment {
           return when (val type = typeList[position]) {
-            NATIVE -> NativeAnalysisFragment.newInstance(packageInfo.packageName)
+            NATIVE -> NativeAnalysisFragment.newInstance(packageName)
 
-            STATIC -> StaticAnalysisFragment.newInstance(packageInfo.packageName)
+            STATIC -> StaticAnalysisFragment.newInstance(packageName)
 
-            PERMISSION -> PermissionAnalysisFragment.newInstance(packageInfo.packageName)
+            PERMISSION -> PermissionAnalysisFragment.newInstance(packageName)
 
-            METADATA -> MetaDataAnalysisFragment.newInstance(packageInfo.packageName)
+            METADATA -> MetaDataAnalysisFragment.newInstance(packageName)
 
-            // DEX -> DexAnalysisFragment.newInstance(packageInfo.packageName)
+            // DEX -> DexAnalysisFragment.newInstance(packageName)
 
-            SIGNATURES -> SignaturesAnalysisFragment.newInstance(packageInfo.packageName)
+            SIGNATURES -> SignaturesAnalysisFragment.newInstance(packageName)
 
             else -> if (!isHarmonyMode) {
               ComponentsAnalysisFragment.newInstance(type)
@@ -503,13 +545,21 @@ abstract class BaseAppDetailActivity :
     mediator.attach()
 
     if (featureListView == null) {
-      viewModel.initFeatures(packageInfo, extraBean?.features ?: -1)
+      if (viewModel.isApkPreview) {
+        viewModel.emitFeature(VersionedFeature(Features.Ext.APPLICATION_PROP))
+      } else {
+        viewModel.initFeatures(packageInfo, extraBean?.features ?: -1)
+      }
     }
 
     if (!isHarmonyMode) {
-      viewModel.initComponentsData()
+      if (viewModel.isApkPreview) {
+        viewModel.initComponentsDataInPreview()
+      } else {
+        viewModel.initComponentsData()
+      }
     } else {
-      viewModel.initAbilities(this, packageInfo.packageName)
+      viewModel.initAbilities(this, packageName)
     }
 
     // To ensure onPostPackageInfoAvailable() is executed at the end of ui thread
@@ -693,7 +743,11 @@ abstract class BaseAppDetailActivity :
             featureAdapter.addData(
               position,
               FeatureItem(R.drawable.ic_app_prop) {
-                FeaturesDialog.showAppPropDialog(this, it.packageInfo)
+                if (viewModel.isApkPreview && viewModel.apkPreviewInfo != null) {
+                  FeaturesDialog.showAppPropDialog(this, viewModel.apkPreviewInfo!!.appProps)
+                } else {
+                  FeaturesDialog.showAppPropDialog(this, it.packageInfo)
+                }
               }
             )
           }

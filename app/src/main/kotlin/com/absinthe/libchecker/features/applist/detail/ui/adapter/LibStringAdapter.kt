@@ -287,9 +287,15 @@ class LibStringAdapter(
     item: LibStringItemChip,
     itemName: CharSequence
   ) {
+    val isApkPreviewMode = item.item.size == -1L
     setOrHighlightText(itemView.libName, itemName)
-    setOrHighlightText(itemView.libSize, item.item.source.orEmpty())
 
+    if (isApkPreviewMode) {
+      setOrHighlightText(itemView.libSize, "<${context.getString(R.string.apk_preview_item_not_available)}>")
+      return
+    }
+
+    setOrHighlightText(itemView.libSize, item.item.source.orEmpty())
     val type = runCatching {
       appResources?.getResourceTypeName(item.item.size.toInt())
     }.getOrDefault("null")
