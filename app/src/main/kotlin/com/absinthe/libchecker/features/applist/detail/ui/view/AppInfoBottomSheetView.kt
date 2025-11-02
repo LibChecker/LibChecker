@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.core.view.marginTop
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.utils.extensions.end
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.manager.SystemBarManager
@@ -45,6 +46,17 @@ class AppInfoBottomSheetView(context: Context) :
     setText(R.string.app_info_settings)
   }
 
+  val share = AppInfoItemView(context).apply {
+    layoutParams = LayoutParams(
+      ViewGroup.LayoutParams.MATCH_PARENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
+    )
+    setIcon(R.drawable.ic_share)
+    setIconBackgroundTintColor(R.color.material_indigo_300)
+    setIconTintColor(Color.WHITE)
+    setText(R.string.app_info_share)
+  }
+
   val list = RecyclerView(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
@@ -63,6 +75,7 @@ class AppInfoBottomSheetView(context: Context) :
     addView(header)
     addView(launch)
     addView(setting)
+    addView(share)
     addView(list)
   }
 
@@ -72,6 +85,7 @@ class AppInfoBottomSheetView(context: Context) :
     val itemWidth = (measuredWidth - paddingStart - paddingEnd) / 4
     launch.measure(itemWidth.toExactlyMeasureSpec(), launch.defaultHeightMeasureSpec(this))
     setting.measure(itemWidth.toExactlyMeasureSpec(), setting.defaultHeightMeasureSpec(this))
+    share.measure(itemWidth.toExactlyMeasureSpec(), share.defaultHeightMeasureSpec(this))
     list.measure(
       (measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(),
       list.defaultHeightMeasureSpec(this)
@@ -85,7 +99,8 @@ class AppInfoBottomSheetView(context: Context) :
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     header.layout(0, paddingTop)
     launch.layout(paddingStart, header.bottom + launch.marginTop)
-    setting.layout(paddingStart + launch.measuredWidth, launch.top)
+    setting.layout(launch.end, launch.top)
+    share.layout(setting.end, launch.top)
     list.layout(paddingStart, launch.bottom)
   }
 

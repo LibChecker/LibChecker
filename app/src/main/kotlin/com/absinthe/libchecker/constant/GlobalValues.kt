@@ -107,4 +107,6 @@ object GlobalValues {
   var trackItemsChanged = false
 
   var snapshotAutoRemoveThreshold: Int by SPDelegates(Constants.PREF_SNAPSHOT_AUTO_REMOVE_THRESHOLD, -1)
+
+  var longTapShareButtonTip: Boolean by SPDelegates(Constants.PREF_LONG_TAP_SHARE_BUTTON_TIP, false)
 }
