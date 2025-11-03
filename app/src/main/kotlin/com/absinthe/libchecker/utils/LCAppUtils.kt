@@ -205,10 +205,10 @@ object LCAppUtils {
           append(")")
         }
       } else {
-        "${diff1.old} (${diff2.old}) $ARROW ${diff1.new} (${diff2.new})"
+        "${diff1.old} (${diff2.old}$diff2Suffix) $ARROW ${diff1.new} (${diff2.new}$diff2Suffix)"
       }
     } else {
-      "${diff1.old} (${diff2.old})"
+      "${diff1.old} (${diff2.old}$diff2Suffix)"
     }
   }
 
