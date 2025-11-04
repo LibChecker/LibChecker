@@ -234,7 +234,12 @@ class DetailViewModel : ViewModel() {
 
   fun initPermissionData() = viewModelScope.launch(Dispatchers.IO) {
     if (permissionsItems.value == null) {
-      permissionsItems.emit(getPermissionChipList())
+      val permissions = getPermissionChipList()
+      permissionsItems.emit(permissions)
+
+      if (permissions.any { it.item.name == "android.permission.POST_PROMOTED_NOTIFICATIONS" }) {
+        _featuresFlow.emit(VersionedFeature(Features.LIVE_UPDATE_NOTIFICATION))
+      }
     }
   }
 

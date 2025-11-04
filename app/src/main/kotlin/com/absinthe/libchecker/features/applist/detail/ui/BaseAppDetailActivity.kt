@@ -562,6 +562,9 @@ abstract class BaseAppDetailActivity :
       viewModel.initAbilities(this, packageName)
     }
 
+    // Detect Live Update notification
+    viewModel.initPermissionData()
+
     // To ensure onPostPackageInfoAvailable() is executed at the end of ui thread
     lifecycleScope.launch(Dispatchers.IO) {
       withContext(Dispatchers.Main) {
@@ -734,6 +737,14 @@ abstract class BaseAppDetailActivity :
             featureAdapter.addData(
               FeatureItem(R.drawable.ic_jetbrain_kmp) {
                 FeaturesDialog.showKMPDialog(this, feat.version)
+              }
+            )
+          }
+
+          Features.LIVE_UPDATE_NOTIFICATION -> {
+            featureAdapter.addData(
+              FeatureItem(R.drawable.ic_feature_live_update) {
+                FeaturesDialog.showLiveUpdateNotificationDialog(this)
               }
             )
           }
