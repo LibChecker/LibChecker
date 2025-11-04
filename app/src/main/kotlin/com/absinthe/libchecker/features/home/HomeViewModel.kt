@@ -1,10 +1,14 @@
 package com.absinthe.libchecker.features.home
 
+import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.os.Build
+import android.graphics.Bitmap
+import android.graphics.drawable.AdaptiveIconDrawable
+import android.graphics.drawable.Drawable
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.BuildConfig
@@ -34,24 +38,26 @@ import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.data.app.PackageChangeState
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.features.applist.detail.bean.StatefulComponent
 import com.absinthe.libchecker.features.statistics.bean.LibReference
-import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.ui.base.IListController
 import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.Telemetry
+import com.absinthe.libchecker.utils.UiUtils
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getAppName
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getFeatures
 import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.extensions.isArchivedPackage
-import com.absinthe.libchecker.utils.extensions.use
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libraries.utils.manager.TimeRecorder
+import com.absinthe.rulesbundle.IconResMap
 import com.absinthe.rulesbundle.LCRules
+import java.io.File
 import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -116,6 +122,12 @@ class HomeViewModel : ViewModel() {
   fun packageChanged(packageChangeState: PackageChangeState) {
     setEffect {
       Effect.PackageChanged(packageChangeState)
+    }
+  }
+
+  fun sphereTextureAvailable() {
+    setEffect {
+      Effect.SphereTextureAvailable()
     }
   }
 
@@ -332,100 +344,6 @@ class HomeViewModel : ViewModel() {
       ai.targetSdkVersion.toShort(),
       variant
     )
-  }
-
-  private fun collectPopularLibraries(appMap: Map<String, PackageInfo>) = viewModelScope.launch(Dispatchers.IO) {
-    if (GlobalValues.isAnonymousAnalyticsEnabled.not()) {
-      return@launch
-    }
-    val appList = appMap.values
-    val map = HashMap<String, Int>()
-    var libList: List<LibStringItem>
-    var count: Int
-
-    try {
-      for (item in appList) {
-        libList =
-          PackageUtils.getNativeDirLibs(PackageUtils.getPackageInfo(item.packageName))
-
-        for (lib in libList) {
-          count = map[lib.name] ?: 0
-          map[lib.name] = count + 1
-        }
-      }
-      val properties: MutableMap<String, String> = HashMap()
-      properties["Version"] = Build.VERSION.SDK_INT.toString()
-      Telemetry.recordEvent("OS Version", properties)
-
-      for (entry in map) {
-        if (entry.value > 3 && LCAppUtils.getRuleWithRegex(entry.key, NATIVE) == null) {
-          properties.clear()
-          properties["Library name"] = entry.key
-          properties["Library count"] = entry.value.toString()
-
-          Telemetry.recordEvent("Native Library", properties)
-        }
-      }
-
-      collectComponentPopularLibraries(
-        appList,
-        SERVICE,
-        "Service"
-      )
-      collectComponentPopularLibraries(
-        appList,
-        ACTIVITY,
-        "Activity"
-      )
-      collectComponentPopularLibraries(
-        appList,
-        RECEIVER,
-        "Receiver"
-      )
-      collectComponentPopularLibraries(
-        appList,
-        PROVIDER,
-        "Provider"
-      )
-    } catch (ignore: Exception) {
-      Timber.e(ignore, "collectPopularLibraries failed")
-    }
-  }
-
-  private suspend fun collectComponentPopularLibraries(
-    appList: Collection<PackageInfo>,
-    @LibType type: Int,
-    label: String
-  ) {
-    val map = HashMap<String, Int>()
-    var compLibList: List<StatefulComponent>
-    var count: Int
-
-    for (item in appList) {
-      try {
-        compLibList = PackageUtils.getComponentList(item.packageName, type, false)
-
-        for (lib in compLibList) {
-          count = map[lib.componentName] ?: 0
-          map[lib.componentName] = count + 1
-        }
-      } catch (e: Exception) {
-        Timber.e(e)
-        continue
-      }
-    }
-
-    val properties: MutableMap<String, String> = HashMap()
-
-    for (entry in map) {
-      if (entry.value > 3 && LCAppUtils.getRuleWithRegex(entry.key, type) == null) {
-        properties.clear()
-        properties["Library name"] = entry.key
-        properties["Library count"] = entry.value.toString()
-
-        Telemetry.recordEvent("$label Library", properties)
-      }
-    }
   }
 
   private var computeLibReferenceJob: Job? = null
@@ -753,6 +671,7 @@ class HomeViewModel : ViewModel() {
     data class PackageChanged(val packageChangeState: PackageChangeState) : Effect()
     data class RefreshList(val obj: Any? = null) : Effect()
     data class UpdateLibRefProgress(val progress: Int) : Effect()
+    data class SphereTextureAvailable(val obj: Any? = null) : Effect()
   }
 
   fun dumpAppsInfo(os: OutputStream, saveAsMarkDown: Boolean) {
@@ -797,5 +716,61 @@ class HomeViewModel : ViewModel() {
   fun clearMenuState() {
     isSearchMenuExpanded = false
     currentSearchQuery = ""
+  }
+
+  fun generateAppsListSphereTexture(context: Context) {
+    viewModelScope.launch(Dispatchers.IO) {
+      val baseDir = context.filesDir.resolve("sphere_texture")
+      if (!baseDir.exists()) {
+        baseDir.mkdirs()
+      }
+      if ((baseDir.listFiles()?.size ?: 0) >= 2) {
+        return@launch
+      }
+      baseDir.resolve("apps").mkdirs()
+      baseDir.resolve("libs").mkdirs()
+
+      val icons = mutableListOf<Drawable>()
+
+      // Apps icons
+      val defaultIcon = context.packageManager.defaultActivityIcon
+      val defaultMonoIcon = if (OsUtils.atLeastT() && defaultIcon is AdaptiveIconDrawable) defaultIcon.monochrome else null
+      LocalAppDataSource.getApplicationList().forEach {
+        if (icons.size >= 75) return@forEach
+        val icon = context.packageManager.getApplicationIcon(it.applicationInfo!!)
+        val result = if (OsUtils.atLeastT()) {
+          (icon as? AdaptiveIconDrawable)?.monochrome.takeIf { icon -> !UiUtils.drawablesAreEqual(icon, defaultMonoIcon) }
+            ?.apply { setTint(context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary)) }
+        } else {
+          icon.takeIf { icon -> !UiUtils.drawablesAreEqual(icon, defaultIcon) }
+        } ?: return@forEach
+        icons.add(result)
+      }
+      val iconSize = 48.dp
+      repeat(5) {
+        val subIcons = icons.shuffled().take(25)
+        val bitmap = UiUtils.getDrawableStrip(context, subIcons, iconSize, iconSize)
+        val file = File(baseDir.resolve("apps"), "$it.png")
+        file.sink().buffer().use { sink ->
+          bitmap.compress(Bitmap.CompressFormat.PNG, 100, sink.outputStream())
+        }
+      }
+
+      // Libs icons
+      icons.clear()
+      repeat(50) {
+        icons.add(ContextCompat.getDrawable(context, IconResMap.getIconRes(it))!!)
+      }
+      repeat(5) {
+        val subIcons = icons.shuffled().take(25)
+        val bitmap = UiUtils.getDrawableStrip(context, subIcons, iconSize, iconSize)
+        val file = File(baseDir.resolve("libs"), "$it.png")
+        file.sink().buffer().use { sink ->
+          bitmap.compress(Bitmap.CompressFormat.PNG, 100, sink.outputStream())
+        }
+      }
+
+      sphereTextureAvailable()
+    }
   }
 }
