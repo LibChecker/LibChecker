@@ -196,6 +196,8 @@
   <string name="lib_detail_entry_points_tip">入口点</string>
   <string name="apk_preview">APK 预览</string>
   <string name="apk_preview_item_not_available">无法在预览模式下显示</string>
+  <string name="feature_live_update_notification">实时更新通知</string>
+  <string name="feature_live_update_notification_summary">系统会提升实时更新通知的优先级。升级的通知在系统界面上会更醒目地显示，包括在通知抽屉顶部、锁屏上以及状态栏中以微件形式显示。</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已复制到剪贴板</string>
   <string name="toast_not_existing_market">设备中不存在应用市场</string>
