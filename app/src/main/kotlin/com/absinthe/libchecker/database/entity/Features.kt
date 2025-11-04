@@ -12,6 +12,7 @@ object Features {
   const val RX_KOTLIN = 1 shl 8
   const val RX_ANDROID = 1 shl 9
   const val KMP = 1 shl 10
+  const val LIVE_UPDATE_NOTIFICATION = 1 shl 11
 
   object Ext {
     const val APPLICATION_PROP = -1 shl 0

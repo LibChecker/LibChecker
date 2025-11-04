@@ -169,6 +169,17 @@ object FeaturesDialog {
     )
   }
 
+  fun showLiveUpdateNotificationDialog(context: Context) {
+    commonShowDialogImpl(
+      context,
+      R.drawable.ic_feature_live_update,
+      R.string.feature_live_update_notification,
+      R.string.feature_live_update_notification_summary,
+      version = null,
+      sourceLink = "https://developer.$ANDROID_DEV_HOST/develop/ui/views/notifications/live-update"
+    )
+  }
+
   fun showAppPropDialog(activity: FragmentActivity, packageInfo: PackageInfo?) {
     val pi = packageInfo ?: return
 
