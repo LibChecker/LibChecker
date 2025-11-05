@@ -302,7 +302,7 @@ class MainActivity :
         ) == PackageManager.PERMISSION_GRANTED
       if (granted) {
         appViewModel.checkPackagesPermission = false
-        appViewModel.initItems()
+        appViewModel.initItems(this)
       }
     }
   }
@@ -346,7 +346,7 @@ class MainActivity :
   private fun initObserver() {
     appViewModel.apply {
       if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
-        initItems()
+        initItems(this@MainActivity)
       } else {
         initFeatures()
       }

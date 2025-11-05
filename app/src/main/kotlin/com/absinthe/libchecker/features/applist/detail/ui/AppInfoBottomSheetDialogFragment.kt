@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.provider.DocumentsContract
 import android.provider.Settings
@@ -370,7 +371,7 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
     if (!targetDir.exists()) {
       targetDir.mkdirs()
     }
-    val targetFile = File(targetDir, buildSuggestedPackageFileName(packageInfo, hasSplits))
+    val targetFile = File(targetDir, buildSuggestedPackageFileName(context.packageManager, packageInfo, hasSplits))
     val latestSourceTimestamp = (listOf(sourceFile) + splitFiles).maxOf { it.lastModified() }
     val needRebuild = !targetFile.exists() ||
       targetFile.lastModified() < latestSourceTimestamp ||
@@ -397,10 +398,11 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
   }
 
   private fun buildSuggestedPackageFileName(
-    packageInfo: android.content.pm.PackageInfo,
+    packageManager: PackageManager,
+    packageInfo: PackageInfo,
     hasSplits: Boolean
   ): String {
-    val appName = packageInfo.getAppName().takeUnless { it.isNullOrBlank() }
+    val appName = packageInfo.getAppName(packageManager).takeUnless { it.isNullOrBlank() }
       ?: packageInfo.packageName
     val versionName = packageInfo.versionName.orEmpty()
     val versionCode = packageInfo.getVersionCode()

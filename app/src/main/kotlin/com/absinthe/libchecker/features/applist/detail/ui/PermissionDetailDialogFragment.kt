@@ -51,7 +51,7 @@ class PermissionDetailDialogFragment : BaseBottomSheetViewDialogFragment<Permiss
           append(
             String.format(
               getString(R.string.lib_permission_provided_by_format),
-              targetPi.getAppName()
+              targetPi.getAppName(context.packageManager)
             )
           )
         }

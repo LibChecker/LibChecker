@@ -22,6 +22,7 @@ import com.absinthe.libchecker.utils.apk.XAPKParser
 import com.absinthe.libchecker.utils.showToast
 import java.io.File
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okio.buffer
@@ -186,8 +187,10 @@ class ApkDetailActivity :
       val previewInfo = runCatching { ApkPreview(url).parse() }
         .onFailure {
           Timber.e(it)
-          Toasty.showLong(this@ApkDetailActivity, it.toString())
-          finish()
+          withContext(Dispatchers.Main) {
+            Toasty.showLong(this@ApkDetailActivity, it.toString())
+            finish()
+          }
         }.getOrNull()?.getOrNull() ?: return@launch
       viewModel.apkPreviewInfo = previewInfo
 

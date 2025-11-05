@@ -37,7 +37,7 @@ class XposedInfoDialogFragment : BaseBottomSheetViewDialogFragment<XposedInfoBot
       return
     }
     root.apply {
-      setting.setText(pi.getAppName().orEmpty())
+      setting.setText(pi.getAppName(context.packageManager).orEmpty())
       setting.setOnClickListener {
         val intent = Intent(Intent.ACTION_MAIN).also {
           it.`package` = packageName
