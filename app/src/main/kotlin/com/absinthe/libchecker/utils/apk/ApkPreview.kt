@@ -4,17 +4,21 @@ import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.utils.extensions.STRING_ABI_MAP
 import com.absinthe.libchecker.utils.manifest.FullManifestReader
 import com.absinthe.libraries.utils.manager.TimeRecorder
+import java.io.IOException
 import java.net.HttpURLConnection
+import java.net.SocketTimeoutException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.charset.Charset
 import java.util.zip.Inflater
 import java.util.zip.InflaterInputStream
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.Request
 import timber.log.Timber
 
 class ApkPreview(val url: String) {
   private val client = ApiManager.okHttpClient
+  private val httpUrl = url.toHttpUrlOrNull() ?: throw IllegalArgumentException("Invalid URL: $url")
   private val elfMap: MutableMap<Int, MutableList<Pair<String, Int>>> = mutableMapOf()
 
   fun parse(): Result<ApkPreviewInfo> = runCatching {
@@ -325,7 +329,7 @@ class ApkPreview(val url: String) {
 
   private fun fetchMetadata(): FileMetadata {
     val headRequest = newRequestBuilder().head().build()
-    val headResult = runCatching { client.newCall(headRequest).execute() }.getOrNull()
+    val headResult = runCatching { executeRequest(headRequest) }.getOrNull()
 
     headResult?.use { response ->
       if (response.isSuccessful) {
@@ -339,7 +343,7 @@ class ApkPreview(val url: String) {
       }
     }
 
-    client.newCall(newRequestBuilder().get().build()).execute().use { response ->
+    executeRequest(newRequestBuilder().get().build()).use { response ->
       if (!response.isSuccessful) {
         error("Metadata request failed: ${response.code}")
       }
@@ -448,7 +452,7 @@ class ApkPreview(val url: String) {
       .header("Range", "bytes=$rangeStart-")
       .build()
 
-    client.newCall(request).execute().use { response ->
+    executeRequest(request).use { response ->
       if (!response.isSuccessful) {
         throw RangeNotSupportedException("Tail request failed with code ${response.code}")
       }
@@ -471,7 +475,7 @@ class ApkPreview(val url: String) {
       .header("Range", "bytes=$offset-$end")
       .build()
 
-    client.newCall(request).execute().use { response ->
+    executeRequest(request).use { response ->
       if (response.code != HttpURLConnection.HTTP_PARTIAL) {
         throw RangeNotSupportedException("Range request $offset-$end failed with code ${response.code}")
       }
@@ -480,7 +484,7 @@ class ApkPreview(val url: String) {
   }
 
   private fun downloadEntireArchive(): ByteArray {
-    client.newCall(newRequestBuilder().get().build()).execute().use { response ->
+    executeRequest(newRequestBuilder().get().build()).use { response ->
       if (!response.isSuccessful) {
         error("Full download failed: ${response.code}")
       }
@@ -489,8 +493,16 @@ class ApkPreview(val url: String) {
   }
 
   private fun newRequestBuilder(): Request.Builder = Request.Builder()
-    .url(url)
+    .url(httpUrl)
     .header("Accept-Encoding", "identity")
+
+  private fun executeRequest(request: Request) = try {
+    client.newCall(request).execute()
+  } catch (e: SocketTimeoutException) {
+    throw ApkPreviewNetworkException("Request to $url timed out", e)
+  } catch (e: IOException) {
+    throw ApkPreviewNetworkException("Request to $url failed", e)
+  }
 
   private companion object {
     private const val MANIFEST_ENTRY_NAME = "AndroidManifest.xml"
@@ -529,6 +541,8 @@ data class ApkPreviewInfo(
 )
 
 private class RangeNotSupportedException(message: String) : Exception(message)
+
+private class ApkPreviewNetworkException(message: String, cause: Throwable? = null) : Exception(message, cause)
 
 fun ByteArray.indexOfSequence(sub: ByteArray, fromIndex: Int = 0): Int {
   if (sub.isEmpty()) return -1

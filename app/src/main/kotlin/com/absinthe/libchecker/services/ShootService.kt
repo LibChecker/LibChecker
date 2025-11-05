@@ -238,7 +238,7 @@ class ShootService : LifecycleService() {
                 id = null,
                 packageName = info.packageName,
                 timeStamp = ts,
-                label = info.getAppName().toString(),
+                label = info.getAppName(packageManager).toString(),
                 versionName = info.versionName.toString(),
                 versionCode = info.getVersionCode(),
                 installedTime = info.firstInstallTime,

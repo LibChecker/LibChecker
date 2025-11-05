@@ -58,7 +58,6 @@ import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.apk.APKSParser
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPackageSize
@@ -137,6 +136,7 @@ class ComparisonActivity :
           return false
         }
         viewModel.compareDiff(
+          this,
           leftTimeStamp.coerceAtMost(rightTimeStamp),
           leftTimeStamp.coerceAtLeast(rightTimeStamp)
         )
@@ -543,36 +543,35 @@ class ComparisonActivity :
       }
     }
 
-    pi?.let {
-      val ai = it.applicationInfo ?: throw IllegalStateException("ApplicationInfo is null")
-      return SnapshotItem(
-        id = null,
-        packageName = it.packageName,
-        timeStamp = -1L,
-        label = it.getAppName().toString(),
-        versionName = it.versionName.toString(),
-        versionCode = it.getVersionCode(),
-        installedTime = it.firstInstallTime,
-        lastUpdatedTime = it.lastUpdateTime,
-        isSystem = (ai.flags and ApplicationInfo.FLAG_SYSTEM) > 0,
-        abi = PackageUtils.getAbi(it).toShort(),
-        targetApi = ai.targetSdkVersion.toShort(),
-        nativeLibs = PackageUtils.getNativeDirLibs(it).toJson().orEmpty(),
-        services = PackageUtils.getComponentStringList(it, SERVICE, false)
-          .toJson().orEmpty(),
-        activities = PackageUtils.getComponentStringList(it, ACTIVITY, false)
-          .toJson().orEmpty(),
-        receivers = PackageUtils.getComponentStringList(it, RECEIVER, false)
-          .toJson().orEmpty(),
-        providers = PackageUtils.getComponentStringList(it, PROVIDER, false)
-          .toJson().orEmpty(),
-        permissions = it.getPermissionsList().toJson().orEmpty(),
-        metadata = PackageUtils.getMetaDataItems(it).toJson().orEmpty(),
-        packageSize = it.getPackageSize(true),
-        compileSdk = it.getCompileSdkVersion().toShort(),
-        minSdk = ai.minSdkVersion.toShort()
-      )
-    } ?: throw IllegalStateException("PackageInfo is null")
+    pi ?: throw IllegalStateException("PackageInfo is null")
+    val ai = pi.applicationInfo ?: throw IllegalStateException("ApplicationInfo is null")
+    return SnapshotItem(
+      id = null,
+      packageName = pi.packageName,
+      timeStamp = -1L,
+      label = packageManager.getApplicationLabel(ai).toString(),
+      versionName = pi.versionName.toString(),
+      versionCode = pi.getVersionCode(),
+      installedTime = pi.firstInstallTime,
+      lastUpdatedTime = pi.lastUpdateTime,
+      isSystem = (ai.flags and ApplicationInfo.FLAG_SYSTEM) > 0,
+      abi = PackageUtils.getAbi(pi).toShort(),
+      targetApi = ai.targetSdkVersion.toShort(),
+      nativeLibs = PackageUtils.getNativeDirLibs(pi).toJson().orEmpty(),
+      services = PackageUtils.getComponentStringList(pi, SERVICE, false)
+        .toJson().orEmpty(),
+      activities = PackageUtils.getComponentStringList(pi, ACTIVITY, false)
+        .toJson().orEmpty(),
+      receivers = PackageUtils.getComponentStringList(pi, RECEIVER, false)
+        .toJson().orEmpty(),
+      providers = PackageUtils.getComponentStringList(pi, PROVIDER, false)
+        .toJson().orEmpty(),
+      permissions = pi.getPermissionsList().toJson().orEmpty(),
+      metadata = PackageUtils.getMetaDataItems(pi).toJson().orEmpty(),
+      packageSize = pi.getPackageSize(true),
+      compileSdk = pi.getCompileSdkVersion().toShort(),
+      minSdk = ai.minSdkVersion.toShort()
+    )
   }
 
   private fun getSuitableLayoutManager(): RecyclerView.LayoutManager {

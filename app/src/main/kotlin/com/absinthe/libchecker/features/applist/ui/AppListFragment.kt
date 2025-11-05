@@ -393,7 +393,7 @@ class AppListFragment :
       returnTopOfList()
     } else {
       flip(VF_LOADING)
-      homeViewModel.requestChange()
+      context?.let { context -> homeViewModel.requestChange(context) }
     }
   }
 
@@ -413,7 +413,7 @@ class AppListFragment :
           }
 
           is HomeViewModel.Effect.PackageChanged -> {
-            requestChange()
+            context?.let { context -> homeViewModel.requestChange(context) }
           }
 
           is HomeViewModel.Effect.UpdateAppListStatus -> {
@@ -470,7 +470,7 @@ class AppListFragment :
           updateItems()
           if (hasPackageChanged() || isFirstRequestChange) {
             isFirstRequestChange = false
-            homeViewModel.requestChange()
+            context?.let { context -> homeViewModel.requestChange(context) }
           }
         }
       }.launchIn(lifecycleScope)
@@ -616,8 +616,10 @@ class AppListFragment :
   private fun initApps() {
     hasInitializedItems = true
     flip(VF_INIT)
-    activity?.removeMenuProvider(this)
-    homeViewModel.initItems()
+    activity?.let {
+      it.removeMenuProvider(this)
+      homeViewModel.initItems(it)
+    }
   }
 
   private fun isOnlyAppItself(list: Collection<LCItem>): Boolean {

@@ -78,6 +78,7 @@ class SnapshotViewModel : ViewModel() {
   fun isComparingActive(): Boolean = compareDiffJob == null || compareDiffJob?.isActive == true
 
   fun compareDiff(
+    context: Context,
     preTimeStamp: Long,
     currTimeStamp: Long = CURRENT_SNAPSHOT,
     shouldClearDiff: Boolean = false
@@ -94,7 +95,7 @@ class SnapshotViewModel : ViewModel() {
       }
 
       if (currTimeStamp == CURRENT_SNAPSHOT) {
-        compareDiffWithApplicationList(preTimeStamp)
+        compareDiffWithApplicationList(context, preTimeStamp)
       } else {
         compareDiffWithSnapshotList(preTimeStamp, currTimeStamp)
       }
@@ -105,7 +106,7 @@ class SnapshotViewModel : ViewModel() {
     }
   }
 
-  private fun compareDiffWithApplicationList(preTimeStamp: Long) = runBlocking {
+  private fun compareDiffWithApplicationList(context: Context, preTimeStamp: Long) = runBlocking {
     val preMap = repository.getSnapshots(preTimeStamp).associateBy { it.packageName }
 
     if (preMap.isEmpty() || preTimeStamp == 0L) {
@@ -113,6 +114,7 @@ class SnapshotViewModel : ViewModel() {
       return@runBlocking
     }
 
+    val packageManager = context.packageManager
     val currMap = LocalAppDataSource.getApplicationMap(true).toMutableMap()
     val prePackageSet = preMap.map { it.key }.toSet()
     val currPackageSet = currMap.map { it.key }.toSet()
@@ -136,7 +138,7 @@ class SnapshotViewModel : ViewModel() {
     addedPackageSet.forEach {
       if (!isActive) return@runBlocking
       try {
-        val newInfo = convertToSnapshotItem(currMap[it]!!)
+        val newInfo = convertToSnapshotItem(packageManager, currMap[it]!!)
         diffList.add(generateSnapshotDiffItem(null, newInfo, allTrackItems)!!)
       } catch (e: Exception) {
         Timber.e(e)
@@ -154,7 +156,7 @@ class SnapshotViewModel : ViewModel() {
         snapshotDiffStoringItem = repository.getSnapshotDiff(snapshotItem.packageName)
 
         if (snapshotDiffStoringItem?.lastUpdatedTime != presentItem.lastUpdateTime) {
-          getDiffItemByComparingDBWithLocal(snapshotItem, presentItem, allTrackItems)?.let { item ->
+          getDiffItemByComparingDBWithLocal(packageManager, snapshotItem, presentItem, allTrackItems)?.let { item ->
             diffList.add(item)
 
             snapshotDiffContent = item.toJson().orEmpty()
@@ -175,6 +177,7 @@ class SnapshotViewModel : ViewModel() {
             Timber.e(e, "diffContent parsing failed")
 
             getDiffItemByComparingDBWithLocal(
+              packageManager,
               snapshotItem,
               presentItem,
               allTrackItems
@@ -207,6 +210,7 @@ class SnapshotViewModel : ViewModel() {
   }
 
   private fun getDiffItemByComparingDBWithLocal(
+    packageManager: PackageManager,
     dbItem: SnapshotItem,
     packageInfo: PackageInfo,
     trackItems: List<TrackItem>
@@ -218,7 +222,7 @@ class SnapshotViewModel : ViewModel() {
     ) {
       return null
     }
-    return generateSnapshotDiffItem(dbItem, convertToSnapshotItem(packageInfo), trackItems)
+    return generateSnapshotDiffItem(dbItem, convertToSnapshotItem(packageManager, packageInfo), trackItems)
   }
 
   private fun compareDiffWithSnapshotList(preTimeStamp: Long, currTimeStamp: Long) = runBlocking {
@@ -306,13 +310,14 @@ class SnapshotViewModel : ViewModel() {
   }
 
   suspend fun compareItemDiff(
+    packageManager: PackageManager,
     timeStamp: Long = GlobalValues.snapshotTimestamp,
     packageName: String
   ) {
     val presentInfo = runCatching {
       val flags = PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS
       PackageUtils.getPackageInfo(packageName, flags)
-    }.getOrNull()?.let { convertToSnapshotItem(it) }
+    }.getOrNull()?.let { convertToSnapshotItem(packageManager, it) }
     val snapshotInfo = repository.getSnapshot(timeStamp, packageName)
     val allTrackItems = repository.getTrackItems()
     val diffItem = generateSnapshotDiffItem(snapshotInfo, presentInfo, allTrackItems)
@@ -324,7 +329,7 @@ class SnapshotViewModel : ViewModel() {
     }
   }
 
-  private fun convertToSnapshotItem(packageInfo: PackageInfo): SnapshotItem {
+  private fun convertToSnapshotItem(packageManager: PackageManager, packageInfo: PackageInfo): SnapshotItem {
     val flaggedPi = PackageUtils.getPackageInfo(
       packageInfo.packageName,
       PackageManager.GET_SERVICES or PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS or PackageManager.GET_PERMISSIONS or PackageManager.GET_META_DATA
@@ -335,7 +340,7 @@ class SnapshotViewModel : ViewModel() {
       timeStamp = 0,
       installedTime = packageInfo.firstInstallTime,
       lastUpdatedTime = packageInfo.lastUpdateTime,
-      label = packageInfo.getAppName().toString(),
+      label = packageInfo.getAppName(packageManager).toString(),
       versionName = packageInfo.versionName.toString(),
       versionCode = packageInfo.getVersionCode(),
       abi = PackageUtils.getAbi(packageInfo).toShort(),

@@ -172,9 +172,7 @@ abstract class BaseAppDetailActivity :
     }
 
     val packageName = apkPreviewInfo?.packageName ?: packageInfo.packageName
-    val appName = apkPreviewInfo?.let { getString(R.string.apk_preview) } ?: packageInfo.getAppName()
-    val versionCode = apkPreviewInfo?.versionCode ?: packageInfo.getVersionCode()
-    val versionName = apkPreviewInfo?.versionName ?: packageInfo.versionName
+    val appName = apkPreviewInfo?.let { getString(R.string.apk_preview) } ?: packageInfo.getAppName(packageManager)
     val versionString = apkPreviewInfo?.let { "${it.versionName} (${it.versionCode})" } ?: packageInfo.getVersionString()
     val targetSdkVersionString = apkPreviewInfo?.targetSdkVersion?.toString() ?: packageInfo.getTargetApiString()
     val targetSdkVersion = apkPreviewInfo?.targetSdkVersion ?: ai!!.targetSdkVersion
@@ -915,8 +913,8 @@ abstract class BaseAppDetailActivity :
         packageName = basePackage.packageName,
         updateTime = basePackage.lastUpdateTime,
         labelDiff = SnapshotDiffItem.DiffNode(
-          basePackage.getAppName().toString(),
-          analysisPackage.getAppName().toString()
+          basePackage.getAppName(packageManager).toString(),
+          analysisPackage.getAppName(packageManager).toString()
         ),
         versionNameDiff = SnapshotDiffItem.DiffNode(
           basePackage.versionName.toString(),

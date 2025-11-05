@@ -32,6 +32,7 @@ import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseListControllerFragment
 import com.absinthe.libchecker.ui.base.IAppBarContainer
 import com.absinthe.libchecker.utils.Telemetry
+import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.launchLibReferencePage
 import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
@@ -142,8 +143,10 @@ class LibReferenceFragment :
             }
             val iconRes = IconResMap.getIconRes(index)
             val drawable = ContextCompat.getDrawable(context, iconRes) ?: continue
+            val circleBackgroundDrawable =
+              UiUtils.addCircleBackground(context, drawable, R.color.feature_background)
 
-            emitter.emit(drawable.toBitmap())
+            emitter.emit(circleBackgroundDrawable.toBitmap())
           }
         }
       })

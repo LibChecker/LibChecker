@@ -174,7 +174,7 @@ class SnapshotFragment :
                   flip(VF_LOADING)
                   dismiss()
                 }
-                viewModel.compareDiff(item.timestamp, shouldClearDiff = true)
+                viewModel.compareDiff(context, item.timestamp, shouldClearDiff = true)
               }
             }
           dialog.show(
@@ -377,9 +377,10 @@ class SnapshotFragment :
 
   override fun onResume() {
     super.onResume()
+    val context = context ?: return
 
     if (!shootServiceStarted && isFragmentVisible()) {
-      context?.applicationContext?.also {
+      context.applicationContext?.also {
         runCatching {
           val intent = Intent(it, ShootService::class.java).apply {
             setPackage(it.packageName)
@@ -401,13 +402,13 @@ class SnapshotFragment :
     if (GlobalValues.trackItemsChanged) {
       GlobalValues.trackItemsChanged = false
       flip(VF_LOADING)
-      viewModel.compareDiff(GlobalValues.snapshotTimestamp)
+      viewModel.compareDiff(context, GlobalValues.snapshotTimestamp)
     }
 
     if (viewModel.currentTimeStamp != GlobalValues.snapshotTimestamp) {
       viewModel.changeTimeStamp(GlobalValues.snapshotTimestamp)
       flip(VF_LOADING)
-      viewModel.compareDiff(GlobalValues.snapshotTimestamp, shouldClearDiff = true)
+      viewModel.compareDiff(context, GlobalValues.snapshotTimestamp, shouldClearDiff = true)
     }
 
     if (shouldCompare) {
@@ -419,7 +420,7 @@ class SnapshotFragment :
     }
 
     if (hasPackageChanged()) {
-      viewModel.compareDiff(GlobalValues.snapshotTimestamp)
+      viewModel.compareDiff(context, GlobalValues.snapshotTimestamp)
     }
     (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(binding.list)
 
@@ -624,11 +625,12 @@ class SnapshotFragment :
   }
 
   private fun compareDiff() {
+    val context = context ?: return
     viewModel.changeTimeStamp(GlobalValues.snapshotTimestamp)
     isSnapshotDatabaseItemsReady = true
 
     viewModel.getDashboardCount(GlobalValues.snapshotTimestamp, true)
-    viewModel.compareDiff(GlobalValues.snapshotTimestamp)
+    viewModel.compareDiff(context, GlobalValues.snapshotTimestamp)
     isSnapshotDatabaseItemsReady = false
   }
 
@@ -641,7 +643,8 @@ class SnapshotFragment :
         packageQueue.take()?.let {
           Timber.d("Dequeue package: $it")
           val packageName = it.getActualPackageInfo().packageName
-          viewModel.compareItemDiff(GlobalValues.snapshotTimestamp, packageName)
+          val packageManager = context?.packageManager ?: return@let
+          viewModel.compareItemDiff(packageManager, GlobalValues.snapshotTimestamp, packageName)
         }
       }
     }
@@ -662,11 +665,12 @@ class SnapshotFragment :
   }
 
   override fun onReturnTop() {
+    val context = context ?: return
     if (binding.list.canScrollVertically(-1)) {
       binding.list.smoothScrollToPosition(0)
     } else {
       flip(VF_LOADING)
-      viewModel.compareDiff(GlobalValues.snapshotTimestamp)
+      viewModel.compareDiff(context, GlobalValues.snapshotTimestamp)
     }
   }
 

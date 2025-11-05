@@ -159,20 +159,21 @@ class HomeViewModel : ViewModel() {
 
   private var initJob: Job? = null
 
-  fun initItems() {
+  fun initItems(context: Context) {
     if (initJob?.isActive == true) {
       return
     }
     viewModelScope.launch {
-      initJob = initItemsImpl(LocalAppDataSource.getApplicationList())
+      initJob = initItemsImpl(context, LocalAppDataSource.getApplicationList())
     }
   }
 
   private val bundleManager by lazy { ApplicationDelegate(LibCheckerApp.app).iBundleManager }
 
-  private fun initItemsImpl(appList: List<PackageInfo>) = viewModelScope.launch(Dispatchers.IO) {
+  private fun initItemsImpl(context: Context, appList: List<PackageInfo>) = viewModelScope.launch(Dispatchers.IO) {
     Timber.d("initItems: START")
 
+    val packageManager = context.packageManager
     val timeRecorder = TimeRecorder()
     timeRecorder.start()
 
@@ -186,7 +187,7 @@ class HomeViewModel : ViewModel() {
 
     for (info in appList) {
       try {
-        lcItems.add(generateLCItemFromPackageInfo(info, isHarmony, true))
+        lcItems.add(generateLCItemFromPackageInfo(packageManager, info, isHarmony, true))
         progressCount++
         updateInitProgress(progressCount * 100 / appList.size)
       } catch (e: Throwable) {
@@ -213,7 +214,7 @@ class HomeViewModel : ViewModel() {
 
   private var requestChangeJob: Job? = null
 
-  fun requestChange(packageChangeState: PackageChangeState? = null) {
+  fun requestChange(context: Context, packageChangeState: PackageChangeState? = null) {
     viewModelScope.launch {
       if (appListStatus == STATUS_START_INIT) {
         Timber.d("Request change canceled: STATUS_START_INIT")
@@ -221,16 +222,17 @@ class HomeViewModel : ViewModel() {
       }
       packageChangeState?.let { pendingChangedPackages.add(it) }
       requestChangeJob?.cancel()
-      requestChangeJob = requestChangeImpl(packageChangeState == null)
+      requestChangeJob = requestChangeImpl(context, packageChangeState == null)
     }
   }
 
-  private fun requestChangeImpl(forceUpdate: Boolean) = viewModelScope.launch(Dispatchers.IO) {
+  private fun requestChangeImpl(context: Context, forceUpdate: Boolean) = viewModelScope.launch(Dispatchers.IO) {
     val dbItems = Repositories.lcRepository.getLCItems()
     if (dbItems.isEmpty()) return@launch
 
     Timber.d("Request change: START")
     val timeRecorder = TimeRecorder()
+    val packageManager = context.packageManager
 
     timeRecorder.start()
     updateAppListStatus(STATUS_START_REQUEST_CHANGE)
@@ -245,7 +247,7 @@ class HomeViewModel : ViewModel() {
         if (pendingChangedPackages.none { it.getActualPackageInfo().packageName == currentPackageName }) {
           when (currentState) {
             is PackageChangeState.Added -> {
-              val item = generateLCItemFromPackageInfo(currentState.getActualPackageInfo(), isHarmony)
+              val item = generateLCItemFromPackageInfo(packageManager, currentState.getActualPackageInfo(), isHarmony)
               insert(item)
             }
 
@@ -254,7 +256,7 @@ class HomeViewModel : ViewModel() {
             }
 
             is PackageChangeState.Replaced -> {
-              val item = generateLCItemFromPackageInfo(currentState.getActualPackageInfo(), isHarmony)
+              val item = generateLCItemFromPackageInfo(packageManager, currentState.getActualPackageInfo(), isHarmony)
               update(item)
             }
           }
@@ -283,7 +285,7 @@ class HomeViewModel : ViewModel() {
         if (!isActive) return@launch
         runCatching {
           val info = applications[it] ?: return@runCatching
-          insert(generateLCItemFromPackageInfo(info, isHarmony))
+          insert(generateLCItemFromPackageInfo(packageManager, info, isHarmony))
         }.onFailure { e ->
           Timber.e(e, "requestChange: $it")
         }
@@ -304,7 +306,7 @@ class HomeViewModel : ViewModel() {
           } == true
         }.forEach {
           if (!isActive) return@launch
-          update(generateLCItemFromPackageInfo(it, isHarmony))
+          update(generateLCItemFromPackageInfo(packageManager, it, isHarmony))
         }
     }
 
@@ -317,6 +319,7 @@ class HomeViewModel : ViewModel() {
   }
 
   private fun generateLCItemFromPackageInfo(
+    packageManager: PackageManager,
     pi: PackageInfo,
     isHarmony: Boolean,
     delayInitFeatures: Boolean = false
@@ -333,7 +336,7 @@ class HomeViewModel : ViewModel() {
     val ai = pi.applicationInfo ?: throw IllegalArgumentException("ApplicationInfo is null")
     return LCItem(
       pi.packageName,
-      pi.getAppName().toString(),
+      pi.getAppName(packageManager).toString(),
       if (pi.isArchivedPackage()) "Archived" else pi.versionName.toString(),
       pi.getVersionCode(),
       pi.firstInstallTime,

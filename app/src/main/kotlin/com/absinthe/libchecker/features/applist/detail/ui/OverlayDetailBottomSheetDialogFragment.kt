@@ -70,7 +70,7 @@ class OverlayDetailBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment
           }
         }
         appNameView.apply {
-          text = packageInfo.getAppName()
+          text = packageInfo.getAppName(context.packageManager)
           setLongClickCopiedToClipboard(text)
         }
         packageNameView.apply {
