@@ -184,14 +184,13 @@ class ApkDetailActivity :
     dialog.show()
 
     lifecycleScope.launch(Dispatchers.IO) {
-      val previewInfo = runCatching { ApkPreview(url).parse() }
-        .onFailure {
-          Timber.e(it)
-          withContext(Dispatchers.Main) {
-            Toasty.showLong(this@ApkDetailActivity, it.toString())
-            finish()
-          }
-        }.getOrNull()?.getOrNull() ?: return@launch
+      val previewInfo = ApkPreview(url).parse().onFailure {
+        Timber.e(it)
+        withContext(Dispatchers.Main) {
+          Toasty.showLong(this@ApkDetailActivity, it.toString())
+          finish()
+        }
+      }.getOrNull() ?: return@launch
       viewModel.apkPreviewInfo = previewInfo
 
       withContext(Dispatchers.Main) {
