@@ -3,6 +3,7 @@ package com.absinthe.libchecker
 import android.app.Application
 import android.content.Context
 import android.content.pm.PackageParser
+import android.os.StrictMode
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import androidx.window.embedding.RuleController
@@ -111,6 +112,7 @@ class LibCheckerApp : Application() {
     }
   }
 
+  @Suppress("SoonBlockedPrivateApi, DiscouragedPrivateApi")
   private fun bypass() {
     if (OsUtils.atLeastP()) {
       HiddenApiBypass.addHiddenApiExemptions("")
@@ -118,10 +120,14 @@ class LibCheckerApp : Application() {
 
     // bypass PackageParser check
     // see also: https://cs.android.com/android/platform/superproject/main/+/main:frameworks/base/core/java/android/content/pm/PackageParser.java;l=2695
-    @Suppress("SoonBlockedPrivateApi")
     PackageParser::class.java.getDeclaredField("SDK_VERSION").apply {
       isAccessible = true
       set(null, Integer.MAX_VALUE)
+    }
+
+    runCatching {
+      StrictMode::class.java.getDeclaredMethod("disableDeathOnFileUriExposure").invoke(null)
+      Timber.i("StrictMode: disableDeathOnFileUriExposure")
     }
   }
 
