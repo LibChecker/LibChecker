@@ -824,8 +824,9 @@ class DetailViewModel : ViewModel() {
 
   private fun getAllAppIcons(pi: PackageInfo): List<AppIconItem> {
     if (!OsUtils.atLeastO()) return emptyList()
+    val ai = pi.applicationInfo ?: return emptyList()
     val icons = mutableListOf<AppIconItem>()
-    val mainIcon = SystemServices.packageManager.getApplicationIcon(pi.applicationInfo!!)
+    val mainIcon = SystemServices.packageManager.getApplicationIcon(ai)
     if (OsUtils.atLeastT() && mainIcon is AdaptiveIconDrawable && mainIcon.monochrome != null) {
       icons.add(AppIconItem(mainIcon, true))
     }
@@ -834,10 +835,16 @@ class DetailViewModel : ViewModel() {
       addCategory(Intent.CATEGORY_LAUNCHER)
       setPackage(pi.packageName)
     }
-    PackageManagerCompat.queryIntentActivities(altIconsIntent, PackageManager.MATCH_DISABLED_COMPONENTS)
-      .takeIf { it.size > 1 }
-      ?.map { it.loadIcon(SystemServices.packageManager) }
-      ?.forEach { icons.add(AppIconItem(it, false)) }
+    val intents = PackageManagerCompat.queryIntentActivities(altIconsIntent, PackageManager.MATCH_DISABLED_COMPONENTS)
+    val iconResSet = mutableSetOf(ai.icon)
+    intents
+      .asSequence()
+      .filter { it.activityInfo?.targetActivity != null && !iconResSet.contains(it.iconResource) }
+      .map {
+        iconResSet.add(it.iconResource)
+        it.loadIcon(SystemServices.packageManager)
+      }
+      .forEach { icons.add(AppIconItem(it, false)) }
     return icons
   }
 }

@@ -1,12 +1,12 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
+import android.Manifest
 import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.provider.DocumentsContract
 import android.provider.Settings
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
@@ -50,6 +50,8 @@ import timber.log.Timber
  * time : 2020/10/25
  * </pre>
  */
+
+const val MIMETYPE_APK = "application/vnd.android.package-archive"
 
 class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppInfoBottomSheetView>() {
 
@@ -312,26 +314,22 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
 
   private fun getShowAppSourceList(): List<AppInfoAdapter.AppInfoItem> {
     val pkg = packageName ?: return emptyList()
-    val sourceDir = runCatching {
-      File(PackageUtils.getPackageInfo(pkg).applicationInfo!!.sourceDir).parent
-    }.getOrNull() ?: return emptyList()
+    val source = PackageUtils.getPackageInfo(pkg).applicationInfo?.sourceDir ?: return emptyList()
+    val sourcePath = runCatching { File(source) }.getOrNull() ?: return emptyList()
 
     return PackageManagerCompat.queryIntentActivities(
       Intent(Intent.ACTION_VIEW).also {
-        it.setType(DocumentsContract.Document.MIME_TYPE_DIR)
+        it.setDataAndType(sourcePath.toUri(), MIMETYPE_APK)
       },
       PackageManager.MATCH_DEFAULT_ONLY
-    ).filter {
-      // it.activityInfo.packageName != BuildConfig.APPLICATION_ID
-      it.activityInfo.packageName == Constants.PackageNames.MATERIAL_FILES
-    }
+    )
+      .filter { isFileManager(it.activityInfo.packageName) }
       .map {
         AppInfoAdapter.AppInfoItem(
           it.activityInfo,
           Intent(Intent.ACTION_VIEW)
-            .setType(DocumentsContract.Document.MIME_TYPE_DIR)
-            .setComponent(ComponentName(it.activityInfo.packageName, it.activityInfo.name))
-            .putExtra("org.openintents.extra.ABSOLUTE_PATH", sourceDir)
+            .setPackage(it.activityInfo.packageName)
+            .setDataAndType(sourcePath.toUri(), MIMETYPE_APK)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         )
       }
@@ -441,7 +439,44 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
     return if (file.extension.equals("apks", ignoreCase = true)) {
       "application/octet-stream"
     } else {
-      "application/vnd.android.package-archive"
+      MIMETYPE_APK
     }
+  }
+
+  private fun isFileManager(packageName: String): Boolean {
+    val viewIntent = Intent(Intent.ACTION_VIEW).apply {
+      setDataAndType("file:///".toUri(), "*/*")
+      setPackage(packageName)
+    }
+    val canHandleFiles = PackageManagerCompat.queryIntentActivities(
+      viewIntent,
+      PackageManager.MATCH_DEFAULT_ONLY
+    ).any { it.activityInfo.packageName == packageName }
+
+    val permissions = PackageUtils.getPermissionsList(packageName)
+    val hasStoragePermission = permissions.any {
+      it == "android.permission.MANAGE_EXTERNAL_STORAGE" ||
+        it == Manifest.permission.READ_EXTERNAL_STORAGE ||
+        it == Manifest.permission.WRITE_EXTERNAL_STORAGE
+    }
+
+    val getContentIntent = Intent(Intent.ACTION_GET_CONTENT).apply {
+      type = "*/*"
+      setPackage(packageName)
+    }
+    val canPickFiles = PackageManagerCompat.queryIntentActivities(
+      getContentIntent,
+      PackageManager.MATCH_DEFAULT_ONLY
+    ).any { it.activityInfo.packageName == packageName }
+
+    val openTreeIntent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
+      setPackage(packageName)
+    }
+    val canManageDirectories = PackageManagerCompat.queryIntentActivities(
+      openTreeIntent,
+      PackageManager.MATCH_DEFAULT_ONLY
+    ).any { it.activityInfo.packageName == packageName }
+
+    return (canHandleFiles || canPickFiles || canManageDirectories) && hasStoragePermission
   }
 }
