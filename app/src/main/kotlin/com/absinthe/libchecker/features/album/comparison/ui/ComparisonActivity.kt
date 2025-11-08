@@ -38,6 +38,7 @@ import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.databinding.ActivityComparisonBinding
 import com.absinthe.libchecker.features.album.comparison.ui.view.ComparisonDashboardView
@@ -55,6 +56,7 @@ import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
+import com.absinthe.libchecker.utils.UiUtils.toCircularBitmap
 import com.absinthe.libchecker.utils.apk.APKSParser
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
@@ -65,6 +67,7 @@ import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.utils.toJson
+import com.absinthe.libchecker.view.app.RingDotsView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import java.io.File
 import kotlinx.coroutines.Dispatchers
@@ -251,6 +254,23 @@ class ComparisonActivity :
         setOutAnimation(this@ComparisonActivity, R.anim.anim_fade_out)
         displayedChild = VF_LIST
       }
+      loading.setHighlightIconProvider(object : RingDotsView.HighlightIconProvider {
+        override suspend fun produce(emitter: RingDotsView.HighlightIconEmitter) {
+          val applications = LocalAppDataSource.getApplicationList()
+          val defaultIcon = packageManager.defaultActivityIcon
+          while (true) {
+            if (!loading.isHighlightAnimationAvailable()) {
+              break
+            }
+            val ai = applications.random().applicationInfo ?: continue
+            val drawable = ai.loadIcon(packageManager)
+              ?.takeIf { icon -> !UiUtils.drawablesAreEqual(icon, defaultIcon) }
+              ?: continue
+
+            emitter.emit(drawable.toCircularBitmap())
+          }
+        }
+      })
     }
 
     adapter.apply {
@@ -592,9 +612,9 @@ class ComparisonActivity :
       return@launch
     }
     if (child == VF_LOADING) {
-      binding.loading.resumeAnimation()
+      binding.loading.start()
     } else {
-      binding.loading.pauseAnimation()
+      binding.loading.stop()
     }
 
     binding.vfContainer.displayedChild = child
