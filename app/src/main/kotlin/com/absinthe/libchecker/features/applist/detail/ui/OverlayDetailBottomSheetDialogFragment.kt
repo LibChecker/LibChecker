@@ -107,7 +107,7 @@ class OverlayDetailBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment
 
       targetPackageView.apply {
         container.let {
-          val targetPackage = Refine.unsafeCast<PackageInfoHidden>(packageInfo).overlayTarget
+          val targetPackage = Refine.unsafeCast<PackageInfoHidden>(packageInfo).overlayTarget ?: return
           val targetLCItem = runBlocking { Repositories.lcRepository.getItem(targetPackage) }
 
           if (targetLCItem == null) {

@@ -37,13 +37,11 @@
       android:orientation="vertical"
       android:paddingTop="?actionBarSize">
 
-      <com.airbnb.lottie.LottieAnimationView
+      <com.absinthe.libchecker.view.app.RingDotsView
         android:id="@+id/loading"
-        android:layout_width="@dimen/lottie_anim_size"
-        android:layout_height="@dimen/lottie_anim_size"
-        app:lottie_autoPlay="true"
-        app:lottie_fileName="anim/holographic_radar.json.zip"
-        app:lottie_loop="true" />
+        android:layout_width="@dimen/general_loading_size"
+        android:layout_height="@dimen/general_loading_size"
+        android:layout_gravity="center" />
 
     </LinearLayout>
 
