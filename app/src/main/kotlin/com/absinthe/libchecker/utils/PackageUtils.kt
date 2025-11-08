@@ -343,7 +343,8 @@ object PackageUtils {
               elfParser?.getMinPageSize() ?: -1,
               currentEntryUncompressedAndNot16KB
             ),
-            source = entry.name
+            source = entry.name,
+            process = file.name
           )
           map.getOrPut(dir) { mutableListOf() }.add(item)
         }
