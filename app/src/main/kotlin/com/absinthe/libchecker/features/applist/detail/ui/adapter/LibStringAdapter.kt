@@ -205,11 +205,12 @@ class LibStringAdapter(
     item: LibStringItemChip,
     itemName: CharSequence
   ) {
-    itemView.processLabelColor = if (item.item.process.isNullOrEmpty() || !processMode) {
-      -1
-    } else {
-      processMap[item.item.process] ?: UiUtils.getRandomColor()
-    }
+    // itemView.processLabelColor = if (item.item.process.isNullOrEmpty() || !processMode) {
+    //   -1
+    // } else {
+    //   processMap[item.item.process] ?: UiUtils.getRandomColor()
+    // }
+    itemView.processLabelColor = -1
     setOrHighlightText(itemView.libName, itemName)
     itemView.libSize.text = PackageUtils.sizeToString(context, item.item)
     if ((GlobalValues.itemAdvancedOptions and AdvancedOptions.SHOW_MARKED_LIB) > 0) {
