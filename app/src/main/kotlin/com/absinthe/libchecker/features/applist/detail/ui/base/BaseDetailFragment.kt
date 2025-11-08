@@ -1,7 +1,10 @@
 package com.absinthe.libchecker.features.applist.detail.ui.base
 
+import android.content.ContentValues
 import android.content.Context
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.view.Gravity
 import android.view.View
 import android.widget.ArrayAdapter
@@ -14,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewbinding.ViewBinding
+import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.ACTION_IN_RULES
@@ -23,6 +27,7 @@ import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.isComponentType
 import com.absinthe.libchecker.compat.VersionCompat
+import com.absinthe.libchecker.compat.ZipFileCompat
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.features.applist.DetailFragmentManager
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_LIB
@@ -40,6 +45,7 @@ import com.absinthe.libchecker.features.applist.detail.ui.impl.MetaDataAnalysisF
 import com.absinthe.libchecker.features.applist.detail.ui.impl.NativeAnalysisFragment
 import com.absinthe.libchecker.features.applist.detail.ui.impl.PermissionAnalysisFragment
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
+import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.integrations.anywhere.AnywhereManager
 import com.absinthe.libchecker.integrations.blocker.BlockerManager
@@ -47,6 +53,8 @@ import com.absinthe.libchecker.integrations.monkeyking.MonkeyKingManager
 import com.absinthe.libchecker.integrations.monkeyking.ShareCmpInfo
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.base.BaseFragment
+import com.absinthe.libchecker.utils.OsUtils
+import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
@@ -55,7 +63,9 @@ import com.absinthe.libchecker.utils.extensions.launchLibReferencePage
 import com.absinthe.libchecker.utils.extensions.reverseStrikeThroughAnimation
 import com.absinthe.libchecker.utils.extensions.startStrikeThroughAnimation
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
+import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
+import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -221,7 +231,12 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     process: String?
   ): List<LibStringItemChip>? {
     return getItems().asSequence()
-      .filter { searchWords == null || it.item.name.contains(searchWords, true) || it.item.source?.contains(searchWords, true) == true }
+      .filter {
+        searchWords == null || it.item.name.contains(
+          searchWords,
+          true
+        ) || it.item.source?.contains(searchWords, true) == true
+      }
       .filter { process == null || it.item.process == process }
       .toList()
   }
@@ -364,14 +379,39 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     }
 
     // ELF info
-    if (!viewModel.isApkPreview && this is NativeAnalysisFragment && item.item.elfInfo.elfType != ET_NOT_ELF) {
-      arrayAdapter.add(getString(R.string.lib_detail_elf_info))
+    if (!viewModel.isApkPreview && this is NativeAnalysisFragment) {
+      arrayAdapter.add(getString(R.string.lib_detail_elf_extract))
       actionMap[arrayAdapter.count - 1] = {
-        ELFDetailDialogFragment.newInstance(
-          packageName = packageName,
-          elfPath = item.item.source.orEmpty(),
-          ruleIcon = item.rule?.iconRes ?: com.absinthe.lc.rulesbundle.R.drawable.ic_sdk_placeholder
-        ).show(childFragmentManager, ELFDetailDialogFragment::class.java.name)
+        val loading = UiUtils.createLoadingDialog(requireActivity())
+        lifecycleScope.launch {
+          withContext(Dispatchers.Main) {
+            loading.show()
+          }
+
+          val result = extractElf(item.item)
+
+          withContext(Dispatchers.Main) {
+            loading.dismiss()
+            result.onSuccess {
+              context.showToast(R.string.lib_detail_elf_extract_success)
+            }.onFailure { e ->
+              Timber.e(e, "Failed to extract ELF: ${item.item}")
+              context.showToast(R.string.lib_detail_elf_extract_failed)
+            }
+          }
+        }
+      }
+
+      if (item.item.elfInfo.elfType != ET_NOT_ELF) {
+        arrayAdapter.add(getString(R.string.lib_detail_elf_info))
+        actionMap[arrayAdapter.count - 1] = {
+          ELFDetailDialogFragment.newInstance(
+            packageName = packageName,
+            elfPath = item.item.source.orEmpty(),
+            ruleIcon = item.rule?.iconRes
+              ?: com.absinthe.lc.rulesbundle.R.drawable.ic_sdk_placeholder
+          ).show(childFragmentManager, ELFDetailDialogFragment::class.java.name)
+        }
       }
     }
 
@@ -472,6 +512,81 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   private fun animateTvTitle(position: Int, shouldTurnToDisable: Boolean) {
     (adapter.getViewByPosition(position, android.R.id.title) as? TextView)?.run {
       if (shouldTurnToDisable) startStrikeThroughAnimation() else reverseStrikeThroughAnimation()
+    }
+  }
+
+  private suspend fun extractElf(item: LibStringItem): Result<Unit> = withContext(Dispatchers.IO) {
+    Timber.d("Extract ELF: $item")
+
+    runCatching {
+      if (viewModel.isApkPreview) {
+        error("not available in apk preview mode")
+      }
+      val elfSourcePath = item.source ?: error("elf source is null")
+
+      val apkSourcePath = viewModel.packageInfo.applicationInfo?.sourceDir?.split(File.separator)?.toMutableList()?.apply {
+        removeLast()
+        addLast(item.process.toString())
+      }?.joinToString(File.separator) ?: error("apk source file is invalid")
+
+      val sourceFile = File(apkSourcePath)
+      if (!sourceFile.exists() || !sourceFile.canRead()) {
+        error("apk source file is invalid")
+      }
+
+      val zipFile = ZipFileCompat(sourceFile)
+      try {
+        val entry = zipFile.getEntry(elfSourcePath) ?: error("Failed to find elf entry")
+        val sourceElfInputStream = zipFile.getInputStream(entry)
+
+        val packageName = viewModel.packageInfo.packageName
+        val dir = BuildConfig.APPLICATION_ID +
+          File.separator + packageName +
+          File.separator + elfSourcePath.take(elfSourcePath.lastIndexOf(File.separator))
+        Timber.d("dir = $dir")
+
+        if (OsUtils.atLeastQ()) {
+          val contentValues = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, item.name)
+            put(MediaStore.MediaColumns.MIME_TYPE, "application/octet-stream")
+            put(
+              MediaStore.MediaColumns.RELATIVE_PATH,
+              Environment.DIRECTORY_DOWNLOADS + File.separator + dir
+            )
+          }
+
+          val context = context ?: error("Context is null")
+          val uri = context.contentResolver.insert(
+            MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+            contentValues
+          ) ?: error("Failed to create MediaStore entry")
+
+          context.contentResolver.openOutputStream(uri)?.use { outputStream ->
+            sourceElfInputStream.use { inputStream ->
+              inputStream.copyTo(outputStream)
+            }
+          } ?: error("Failed to open output stream")
+        } else {
+          val downloadsDir =
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+          val parentDir = downloadsDir.resolve(dir)
+          if (!parentDir.exists()) {
+            parentDir.mkdirs()
+          }
+
+          val targetFile = parentDir.resolve(item.name)
+          targetFile.createNewFile()
+
+          sourceElfInputStream.use { inputStream ->
+            targetFile.outputStream().use { outputStream ->
+              inputStream.copyTo(outputStream)
+            }
+          }
+        }
+      } finally {
+        zipFile.close()
+      }
+      Unit
     }
   }
 }
