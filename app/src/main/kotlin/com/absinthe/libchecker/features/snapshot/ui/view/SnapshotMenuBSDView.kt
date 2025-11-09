@@ -64,10 +64,10 @@ class SnapshotMenuBSDView(context: Context) :
         providersDiff = SnapshotDiffItem.DiffNode(""),
         permissionsDiff = SnapshotDiffItem.DiffNode(""),
         metadataDiff = SnapshotDiffItem.DiffNode(""),
-        added = true,
-        removed = true,
-        changed = true,
-        moved = true
+        added = 1,
+        removed = 1,
+        changed = 1,
+        moved = 1
       )
     )
   }

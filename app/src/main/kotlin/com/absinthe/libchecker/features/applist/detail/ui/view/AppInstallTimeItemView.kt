@@ -9,8 +9,10 @@ import androidx.core.view.isGone
 import androidx.core.view.marginBottom
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
+import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.card.MaterialCardView
 
@@ -47,6 +49,7 @@ class AppInstallTimeItemView(context: Context) : AViewGroup(context) {
     ).also {
       it.topMargin = 8.dp
     }
+    setSmoothRoundCorner(12.dp)
     strokeWidth = 1.dp
     strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutline)
     setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSecondaryContainer))

@@ -10,8 +10,10 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginStart
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getDimensionByAttr
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
+import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.card.MaterialCardView
 
@@ -19,12 +21,13 @@ class SnapshotDetailTitleView(context: Context) : MaterialCardView(context) {
 
   val container = SnapshotDetailTitleContainerView(context).apply {
     layoutParams = ViewGroup.LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
+      LayoutParams.MATCH_PARENT,
       context.getDimensionByAttr(android.R.attr.listPreferredItemHeightSmall).toInt()
     )
   }
 
   init {
+    setSmoothRoundCorner(16.dp)
     strokeColor = Color.TRANSPARENT
     addView(container)
   }

@@ -15,9 +15,11 @@ import com.absinthe.libchecker.ui.adapter.HighlightAdapter
 import com.absinthe.libchecker.utils.FreezeUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.addStrikeThroughSpan
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.utils.extensions.getDrawable
+import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
 class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAdapter<LCItem>() {
@@ -37,6 +39,7 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
     val root = holder.itemView as AppItemView
     root.apply {
       if (cardMode == CardMode.DEMO) {
+        setSmoothRoundCorner(20.dp)
         strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutline)
         setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSecondaryContainer))
       } else {
@@ -92,6 +95,11 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
         if (item.abi / Constants.MULTI_ARCH == 1) {
           R.drawable.ic_multi_arch.getDrawable(context)?.let {
             it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+            if ((GlobalValues.advancedOptions and AdvancedOptions.TINT_ABI_LABEL) > 0) {
+              it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorSecondary))
+            } else {
+              it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
+            }
             val span = CenterAlignImageSpan(it)
             spanString.setSpan(span, 2, 3, ImageSpan.ALIGN_BOTTOM)
           }
