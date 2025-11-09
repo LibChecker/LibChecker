@@ -21,6 +21,7 @@ import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
+import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.absinthe.rulesbundle.Rule
@@ -77,7 +78,7 @@ class AdvancedMenuBSDView(context: Context) :
       LayoutParams.MATCH_PARENT,
       LayoutParams.WRAP_CONTENT
     ).also {
-      it.topMargin = 24.dp
+      it.topMargin = 12.dp
     }
   }
 
@@ -98,8 +99,9 @@ class AdvancedMenuBSDView(context: Context) :
       LayoutParams.MATCH_PARENT,
       LayoutParams.WRAP_CONTENT
     ).also {
-      it.topMargin = 24.dp
+      it.topMargin = 8.dp
     }
+    setSmoothRoundCorner(20.dp)
     overScrollMode = OVER_SCROLL_NEVER
     strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutline)
     setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSecondaryContainer))

@@ -22,10 +22,10 @@ data class SnapshotDiffItem(
   val permissionsDiff: DiffNode<String>,
   val metadataDiff: DiffNode<String>,
   val packageSizeDiff: DiffNode<Long>,
-  var added: Boolean = false,
-  var removed: Boolean = false,
-  var changed: Boolean = false,
-  var moved: Boolean = false,
+  var added: Int = 0,
+  var removed: Int = 0,
+  var changed: Int = 0,
+  var moved: Int = 0,
   var newInstalled: Boolean = false,
   var deleted: Boolean = false,
   var isTrackItem: Boolean = false
@@ -33,5 +33,5 @@ data class SnapshotDiffItem(
   @JsonClass(generateAdapter = true)
   data class DiffNode<T>(val old: T, val new: T? = null) : Serializable
 
-  fun isNothingChanged() = !added && !removed && !changed && !moved
+  fun isNothingChanged() = added == 0 && removed == 0 && changed == 0 && moved == 0
 }

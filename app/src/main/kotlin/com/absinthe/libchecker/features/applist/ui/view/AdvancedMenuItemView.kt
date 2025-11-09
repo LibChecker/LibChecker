@@ -16,7 +16,7 @@ class AdvancedMenuItemView(context: Context) : FrameLayout(context) {
       LayoutParams.WRAP_CONTENT,
       LayoutParams.WRAP_CONTENT
     ).also { lp ->
-      lp.setMargins(4.dp, 4.dp, 4.dp, 4.dp)
+      lp.setMargins(0, 4.dp, 8.dp, 4.dp)
     }
     val checkedColor = R.color.advanced_menu_item_text_checked.getColor(context)
     val uncheckedColor = R.color.advanced_menu_item_text_not_checked.getColor(context)

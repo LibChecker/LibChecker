@@ -34,6 +34,9 @@ import com.absinthe.libraries.utils.extensions.addPaddingEnd
 import com.absinthe.libraries.utils.extensions.addPaddingStart
 import com.absinthe.libraries.utils.extensions.addPaddingTop
 import com.absinthe.libraries.utils.utils.UiUtils
+import com.google.android.material.card.MaterialCardView
+import com.google.android.material.shape.ShapeAppearanceModel
+import com.google.android.material.shape.SuperEllipseCornerTreatment
 import java.io.File
 import rikka.core.util.ClipboardUtils
 import timber.log.Timber
@@ -281,4 +284,13 @@ fun View.animatedBlurAction(action: () -> Unit) {
     }
   }
   animator.start()
+}
+
+fun MaterialCardView.setSmoothRoundCorner(radius: Int) {
+  val radius = radius.toFloat()
+  val shape = ShapeAppearanceModel.builder()
+    .setAllCorners(SuperEllipseCornerTreatment(radius))
+    .build()
+
+  shapeAppearanceModel = shape
 }

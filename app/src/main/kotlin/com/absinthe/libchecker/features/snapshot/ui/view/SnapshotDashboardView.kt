@@ -19,6 +19,7 @@ import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
+import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.card.MaterialCardView
 
@@ -35,7 +36,7 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context, null, 
       LayoutParams.MATCH_PARENT,
       LayoutParams.WRAP_CONTENT
     )
-    radius = 8.dp.toFloat()
+    setSmoothRoundCorner(12.dp)
     setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSecondaryContainer))
     addView(container)
   }

@@ -2,6 +2,7 @@ package com.absinthe.libchecker.features.snapshot.detail.ui.adapter.provider
 
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
+import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
@@ -13,8 +14,9 @@ import com.absinthe.libchecker.features.snapshot.detail.bean.REMOVED
 import com.absinthe.libchecker.features.snapshot.detail.ui.adapter.node.SnapshotComponentNode
 import com.absinthe.libchecker.features.snapshot.detail.ui.view.SnapshotDetailComponentView
 import com.absinthe.libchecker.ui.base.BaseActivity
-import com.absinthe.libchecker.utils.extensions.toColorStateList
+import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
+import com.absinthe.libraries.utils.utils.UiUtils
 import com.absinthe.rulesbundle.LCRules
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.chad.library.adapter.base.provider.BaseNodeProvider
@@ -65,13 +67,20 @@ class SnapshotComponentProvider : BaseNodeProvider() {
         }
       )
 
-      helper.itemView.backgroundTintList = colorRes.toColorStateList(context)
+      val baseColor = colorRes.getColor(context)
+      val alpha = if (UiUtils.isDarkMode()) {
+        (0.75f * 255).toInt() and 0xFF
+      } else {
+        (0.95f * 255).toInt() and 0xFF
+      }
+      val alphaColor = (baseColor and 0x00FFFFFF) or (alpha shl 24)
+      background = alphaColor.toDrawable()
 
       (this@SnapshotComponentProvider.context as? LifecycleOwner)?.lifecycleScope?.launch {
         val rule = LCRules.getRule(snapshotItem.name, snapshotItem.itemType, true)
 
         withContext(Dispatchers.Main) {
-          setChip(rule, colorRes)
+          setChip(rule, alphaColor)
           if (rule != null) {
             setChipOnClickListener {
               if (AntiShakeUtils.isInvalidClick(it)) {

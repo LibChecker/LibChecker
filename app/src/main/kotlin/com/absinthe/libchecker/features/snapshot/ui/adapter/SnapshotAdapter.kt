@@ -27,9 +27,11 @@ import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.PREINSTALLED_TIMESTAMP
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.setAlphaForAll
+import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
 import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
@@ -61,6 +63,7 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
   override fun convert(holder: BaseViewHolder, item: SnapshotDiffItem) {
     (holder.itemView as SnapshotItemView).apply {
       if (cardMode == CardMode.DEMO || cardMode == CardMode.GET_APP_UPDATE) {
+        setSmoothRoundCorner(16.dp)
         strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutline)
       } else {
         strokeColor = Color.TRANSPARENT
@@ -92,10 +95,14 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
       }
 
       stateIndicator.apply {
-        added = item.added && !isNewOrDeleted
-        removed = item.removed && !isNewOrDeleted
-        changed = item.changed && !isNewOrDeleted
-        moved = item.moved && !isNewOrDeleted
+        if (isNewOrDeleted) {
+          added = false
+          removed = false
+          changed = false
+          moved = false
+        } else {
+          setSnapshotStateCounts(item.added, item.removed, item.changed, item.moved)
+        }
       }
 
       val appNameLabel = buildSpannedString {

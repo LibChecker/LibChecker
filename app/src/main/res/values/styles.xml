@@ -61,8 +61,8 @@
   </style>
 
   <style name="AppListMaterialCard" parent="Widget.MaterialComponents.CardView">
-    <item name="cardCornerRadius">3dp</item>
-    <item name="cardElevation">1dp</item>
+    <item name="cardCornerRadius">4dp</item>
+    <item name="cardElevation">0dp</item>
   </style>
 
   <style name="AlbumMaterialCard" parent="Widget.Material3.CardView.Outlined">
