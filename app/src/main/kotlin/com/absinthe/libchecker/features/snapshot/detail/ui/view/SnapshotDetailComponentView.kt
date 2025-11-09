@@ -94,9 +94,9 @@ class SnapshotDetailComponentView(context: Context) : MaterialCardView(context) 
             chipStartPadding = 10.dp.toFloat()
             setPadding(paddingStart, 2.dp, paddingEnd, 2.dp)
             addView(this)
+            chip = this
           }
           ).apply {
-          chip = this
           setChipIconResource(rule.iconRes)
           text = rule.label
           chipBackgroundColor = ColorStateList.valueOf(color)
