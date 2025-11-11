@@ -37,6 +37,7 @@ import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import java.text.SimpleDateFormat
 import java.util.Locale
+import kotlin.math.abs
 
 const val ARROW = "→"
 const val ARROW_REVERT = "←"
@@ -95,13 +96,18 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
       }
 
       stateIndicator.apply {
-        if (isNewOrDeleted) {
-          added = false
-          removed = false
-          changed = false
-          moved = false
+        if (cardMode == CardMode.DEMO) {
+          startDemoAnimation()
         } else {
-          setSnapshotStateCounts(item.added, item.removed, item.changed, item.moved)
+          stopDemoAnimation()
+          if (isNewOrDeleted) {
+            added = false
+            removed = false
+            changed = false
+            moved = false
+          } else {
+            setSnapshotStateCounts(item.added, item.removed, item.changed, item.moved)
+          }
         }
       }
 
