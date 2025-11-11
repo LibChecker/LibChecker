@@ -10,7 +10,7 @@ const val MOVED = 3
 data class SnapshotDetailItem(
   val name: String,
   val title: String,
-  val extra: String,
+  val extra: CharSequence,
   val diffType: Int,
   @LibType val itemType: Int
 )

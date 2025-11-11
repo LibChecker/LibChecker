@@ -22,6 +22,7 @@ import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
 import com.absinthe.libchecker.utils.extensions.toColorStateList
 import com.absinthe.libchecker.utils.extensions.visibleHeight
 import com.absinthe.libchecker.view.AViewGroup
+import com.absinthe.libraries.utils.utils.UiUtils
 import com.absinthe.rulesbundle.Rule
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
@@ -33,6 +34,9 @@ class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
   }
 
   init {
+    if (UiUtils.isDarkMode()) {
+      strokeColor = Color.TRANSPARENT
+    }
     setSmoothRoundCorner(16.dp)
     addView(container)
   }
@@ -101,9 +105,7 @@ class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
             layoutParams = LayoutParams(
               ViewGroup.LayoutParams.WRAP_CONTENT,
               ViewGroup.LayoutParams.WRAP_CONTENT
-            ).also {
-              it.topMargin = 4.dp
-            }
+            )
             setTextColor(Color.BLACK)
             chipStrokeColor = ColorStateList.valueOf(("#20000000".toColorInt()))
             chipStrokeWidth = 1.dp.toFloat()

@@ -172,12 +172,28 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
           if (item.packageSizeDiff.new != null) {
             val diffSize = item.packageSizeDiff.new - item.packageSizeDiff.old
             val diffSizeText = buildString {
-              append(if (diffSize > 0) "+" else "")
+              if (diffSize > 0) {
+                append("+")
+              }
               append(diffSize.sizeToString(context))
+              append(", ")
+              if (diffSize > 0) {
+                append("+")
+              }
+              val percentage = (diffSize.toFloat() / item.packageSizeDiff.old)
+              if (abs(percentage) < 0.001f) {
+                if (percentage < 0) {
+                  append("-")
+                }
+                append("<0.1%")
+              } else {
+                append(String.format(Locale.getDefault(), "%.1f%%", percentage * 100))
+              }
             }
 
             if (diffSize != 0L) {
-              append(", $diffSizeText")
+              appendLine()
+              append(diffSizeText)
             }
           }
         }
