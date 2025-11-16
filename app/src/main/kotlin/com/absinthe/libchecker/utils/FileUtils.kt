@@ -37,7 +37,7 @@ object FileUtils {
   }
 
   private fun deleteFile(file: File?): Boolean {
-    return file != null && (!file.exists() || file.isFile && file.delete())
+    return file != null && (!file.exists() || (file.isFile && file.delete()))
   }
 
   fun getFileSize(file: File): Long {

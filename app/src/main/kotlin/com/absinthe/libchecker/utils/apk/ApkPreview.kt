@@ -318,6 +318,7 @@ class ApkPreview(val url: String) {
 
   private fun decompressEntry(compressedData: ByteArray, method: Int): ByteArray = when (method) {
     0 -> compressedData
+
     8 -> if (compressedData.isEmpty()) {
       ByteArray(0)
     } else {
