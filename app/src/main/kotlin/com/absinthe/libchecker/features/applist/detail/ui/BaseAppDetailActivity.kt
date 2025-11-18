@@ -1091,6 +1091,7 @@ abstract class BaseAppDetailActivity :
       firstIcon.isMonochrome && firstIcon.drawable is AdaptiveIconDrawable -> {
         createMonochromeIconWithBackground(firstIcon.drawable)
       }
+
       else -> firstIcon.drawable
     }
 
