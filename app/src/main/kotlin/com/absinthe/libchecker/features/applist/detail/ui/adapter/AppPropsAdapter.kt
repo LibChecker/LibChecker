@@ -1,6 +1,6 @@
 package com.absinthe.libchecker.features.applist.detail.ui.adapter
 
-import android.content.pm.PackageInfo
+import android.content.pm.ApplicationInfo
 import android.graphics.Bitmap
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.OvalShape
@@ -23,12 +23,14 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import timber.log.Timber
 
 class AppPropsAdapter(
-  packageInfo: PackageInfo?,
+  ai: ApplicationInfo?,
   private val fragMgr: FragmentManager
 ) : BaseQuickAdapter<AppPropItem, BaseViewHolder>(0) {
 
   private val appResources by lazy {
-    packageInfo?.applicationInfo?.let { ai -> SystemServices.packageManager.getResourcesForApplication(ai) }
+    runCatching { SystemServices.packageManager.getResourcesForApplication(ai!!) }
+      .onFailure { Timber.e(it) }
+      .getOrNull()
   }
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
@@ -49,7 +51,9 @@ class AppPropsAdapter(
 
   private fun parseValue(item: AppPropItem): String {
     if (appResources != null && item.value.maybeResourceId()) {
-      runCatching { appResources!!.getResourceName(item.value.toInt()) }
+      runCatching {
+        return appResources!!.getResourceName(item.value.toInt())
+      }
     }
     return PropertiesMap.parseProperty(item.key, item.value)
   }

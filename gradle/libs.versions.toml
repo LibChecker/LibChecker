@@ -3,10 +3,10 @@ agp = "8.13.1"
 aboutlibraries = "12.2.4"
 androidX-lifecycle = "2.9.4"
 androidX-room = "2.8.3"
-firebase-bom = "34.5.0"
+firebase-bom = "34.6.0"
 hiddenApiRefine = "4.4.0"
 kotlin = "2.2.21"
-protoc = "4.33.0"
+protoc = "4.33.1"
 shizuku = "13.1.5"
 square-retrofit = "3.0.0"
 zhaobozhen = "1.1.6"
@@ -21,7 +21,7 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version = "2.3.2" }
 protobuf = { id = "com.google.protobuf", version = "0.9.5" }
-moshiX = "dev.zacsweers.moshix:0.32.0"
+moshiX = "dev.zacsweers.moshix:0.33.0"
 spotless = "com.diffplug.spotless:8.0.0"
 aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutlibraries" }
 
@@ -52,7 +52,7 @@ androidX-window = "androidx.window:window:1.5.0"
 square-leakCanary = "com.squareup.leakcanary:leakcanary-android:2.14"
 square-moshi = "com.squareup.moshi:moshi:1.15.2"
 square-okHttp = "com.squareup.okhttp3:okhttp:5.3.1"
-square-okio = "com.squareup.okio:okio:3.16.2"
+square-okio = "com.squareup.okio:okio:3.16.4"
 square-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "square-retrofit" }
 square-retrofit-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "square-retrofit" }
 
