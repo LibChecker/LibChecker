@@ -152,7 +152,7 @@ class SnapshotFragment :
           ViewGroup.LayoutParams.MATCH_PARENT,
           ViewGroup.LayoutParams.WRAP_CONTENT
         ).also {
-          it.setMargins(8.dp, 0, 8.dp, 0)
+          it.setMargins(8.dp, 2.dp, 8.dp, 2.dp)
         }
       }
 
@@ -215,10 +215,6 @@ class SnapshotFragment :
       headerWithEmptyEnable = true
       dashboard.also {
         setHeaderView(it)
-        (it.parent as? ViewGroup)?.apply {
-          clipToPadding = false
-          clipChildren = false
-        }
       }
       setEmptyView(emptyView)
       setDiffCallback(SnapshotDiffUtil())
