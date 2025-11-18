@@ -34,7 +34,7 @@ class AppPropsBottomSheetView(context: Context, packageInfo: PackageInfo?) :
 
   val adapter by unsafeLazy {
     AppPropsAdapter(
-      packageInfo,
+      packageInfo?.applicationInfo,
       (context as FragmentActivity).supportFragmentManager
     )
   }
