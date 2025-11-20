@@ -224,13 +224,21 @@ class ChartFragment :
           setChartData(::generatePieChartView) { ABIChartDataSource(items) }
         }
       }
+
       ChartType.KOTLIN -> setChartData(::generatePieChartView) { KotlinChartDataSource(items) }
+
       ChartType.TARGET_SDK -> setChartData(::generateBarChartView) { TargetApiChartDataSource(items) }
+
       ChartType.MIN_SDK -> setChartData(::generateBarChartView) { MinApiChartDataSource(items) }
+
       ChartType.COMPILE_SDK -> setChartData(::generateBarChartView) { CompileApiChartDataSource(items) }
+
       ChartType.JETPACK_COMPOSE -> setChartData(::generatePieChartView) { JetpackComposeChartDataSource(items) }
+
       ChartType.MARKET_DISTRIBUTION -> setChartData(::generateBarChartView) { MarketDistributionChartDataSource(items) }
+
       ChartType.AAB -> setChartData(::generatePieChartView) { AABChartDataSource(items) }
+
       ChartType.SUPPORT_16KB -> setChartData(::generatePieChartView) { PageSize16KBChartDataSource(items) }
     }
     Telemetry.recordEvent(Constants.Event.CHART, mapOf(Telemetry.Param.ITEM_ID to chartType))

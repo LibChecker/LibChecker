@@ -471,6 +471,7 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
           }
           drawDynamicRing(canvas, cx, cy, spec, radiusBase, phaseOffset, rotation, resolver)
         }
+
         isInnerAffectedRing -> {
           val resolver: (Int) -> Float = { dotIndex ->
             val dotAngle = normalizeDegrees(phaseOffset + dotIndex * angleStep + rotation)
@@ -481,6 +482,7 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
           }
           drawDynamicRing(canvas, cx, cy, spec, radiusBase, phaseOffset, rotation, resolver)
         }
+
         else -> {
           val bitmap = ringBitmaps.getOrNull(index)
           if (bitmap != null && !bitmap.isRecycled) {
@@ -604,6 +606,7 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
     val ringCount = ringSpecs.size
     val targetRingIndex = when {
       ringCount <= 0 -> -1
+
       else -> {
         val resolved = resolveHighlightRingIndex(ringSpecs)
         val fallback = highlightRingIndex
@@ -676,7 +679,9 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
         val t = (elapsed / growDuration).coerceIn(0f, 1f)
         easeOutCubic(t)
       }
+
       elapsed <= growDuration + holdDuration -> 1f
+
       else -> {
         if (shrinkDuration <= 0f) {
           0f
