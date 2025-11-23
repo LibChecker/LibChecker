@@ -917,36 +917,37 @@ class SnapshotViewModel : ViewModel() {
   }
 
   fun backup(os: OutputStream, resultAction: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
-    val backupList = repository.getSnapshots()
-    val snapshotBuilder: Snapshot.Builder = Snapshot.newBuilder()
+    os.use { os ->
+      val snapshotBuilder: Snapshot.Builder = Snapshot.newBuilder()
+      repository.getTimeStamps().forEach { (timestamp, _, _) ->
+        val backupList = repository.getSnapshots(timestamp)
+        Timber.d("backup: timestamps=$timestamp, count=${backupList.size}")
+        backupList.forEach {
+          snapshotBuilder.apply {
+            packageName = it.packageName
+            timeStamp = it.timeStamp
+            label = it.label
+            versionName = it.versionName
+            versionCode = it.versionCode
+            installedTime = it.installedTime
+            lastUpdatedTime = it.lastUpdatedTime
+            isSystem = it.isSystem
+            abi = it.abi.toInt()
+            targetApi = it.targetApi.toInt()
+            nativeLibs = it.nativeLibs
+            services = it.services
+            activities = it.activities
+            receivers = it.receivers
+            providers = it.providers
+            permissions = it.permissions
+            metadata = it.metadata
+            packageSize = it.packageSize
+            compileSdk = it.compileSdk.toInt()
+            minSdk = it.minSdk.toInt()
+          }
 
-    os.use {
-      Timber.d("backup: list=${backupList.size}")
-      backupList.forEach {
-        snapshotBuilder.apply {
-          packageName = it.packageName
-          timeStamp = it.timeStamp
-          label = it.label
-          versionName = it.versionName
-          versionCode = it.versionCode
-          installedTime = it.installedTime
-          lastUpdatedTime = it.lastUpdatedTime
-          isSystem = it.isSystem
-          abi = it.abi.toInt()
-          targetApi = it.targetApi.toInt()
-          nativeLibs = it.nativeLibs
-          services = it.services
-          activities = it.activities
-          receivers = it.receivers
-          providers = it.providers
-          permissions = it.permissions
-          metadata = it.metadata
-          packageSize = it.packageSize
-          compileSdk = it.compileSdk.toInt()
-          minSdk = it.minSdk.toInt()
+          snapshotBuilder.build().writeDelimitedTo(os)
         }
-
-        snapshotBuilder.build().writeDelimitedTo(os)
       }
     }
 
