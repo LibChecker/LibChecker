@@ -921,6 +921,7 @@ class SnapshotViewModel : ViewModel() {
     val snapshotBuilder: Snapshot.Builder = Snapshot.newBuilder()
 
     os.use {
+      Timber.d("backup: list=${backupList.size}")
       backupList.forEach {
         snapshotBuilder.apply {
           packageName = it.packageName

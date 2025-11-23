@@ -1,15 +1,15 @@
 [versions]
 agp = "8.13.1"
 aboutlibraries = "12.2.4"
-androidX-lifecycle = "2.9.4"
-androidX-room = "2.8.3"
+androidX-lifecycle = "2.10.0"
+androidX-room = "2.8.4"
 firebase-bom = "34.6.0"
 hiddenApiRefine = "4.4.0"
 kotlin = "2.2.21"
 protoc = "4.33.1"
 shizuku = "13.1.5"
 square-retrofit = "3.0.0"
-zhaobozhen = "1.1.6"
+zhaobozhen = "1.1.8"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -31,7 +31,7 @@ gradlePlugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", ve
 
 kotlinX-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2"
 
-androidX-activity = "androidx.activity:activity-ktx:1.11.0"
+androidX-activity = "androidx.activity:activity-ktx:1.12.0"
 androidX-annotation = "androidx.annotation:annotation:1.9.1"
 androidX-appCompat = "androidx.appcompat:appcompat:1.7.1"
 androidX-browser = "androidx.browser:browser:1.9.0"
@@ -47,11 +47,11 @@ androidX-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidX
 androidX-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidX-room" }
 androidX-security = "androidx.security:security-crypto:1.1.0"
 androidX-viewPager2 = "androidx.viewpager2:viewpager2:1.1.0"
-androidX-window = "androidx.window:window:1.5.0"
+androidX-window = "androidx.window:window:1.5.1"
 
 square-leakCanary = "com.squareup.leakcanary:leakcanary-android:2.14"
 square-moshi = "com.squareup.moshi:moshi:1.15.2"
-square-okHttp = "com.squareup.okhttp3:okhttp:5.3.1"
+square-okHttp = "com.squareup.okhttp3:okhttp:5.3.2"
 square-okio = "com.squareup.okio:okio:3.16.4"
 square-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "square-retrofit" }
 square-retrofit-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "square-retrofit" }
