@@ -130,6 +130,7 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
                 val dialog = UiUtils.createLoadingDialog(activity)
                 dialog.show()
                 activity.contentResolver.openOutputStream(it)?.let { os ->
+                  Timber.d("backupResultLauncher: openOutputStream")
                   viewModel.backup(os) {
                     dialog.dismiss()
                   }
