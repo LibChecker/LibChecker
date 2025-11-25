@@ -23,6 +23,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.LibDetailBean
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.URLManager.ANDROID_DEV_HOST
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibDetailItemAdapter
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.node.LibDetailItem
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
@@ -353,7 +354,7 @@ class LibDetailBottomSheetView(context: Context) :
         iconRes = R.drawable.ic_url,
         tipRes = R.string.lib_detail_relative_link_tip,
         textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBody2),
-        text = "<a href='${ruleBean.data.source_link}'> ${ruleBean.data.source_link} </a>"
+        text = "<a href='${ruleBean.data.source_link.replace("android.com", ANDROID_DEV_HOST)}'> ${ruleBean.data.source_link.replace("android.com", ANDROID_DEV_HOST)} </a>"
       )
     )
     contentAdapter.setList(list)
