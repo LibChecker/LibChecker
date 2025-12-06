@@ -85,7 +85,7 @@ class AESEncryptionHelper {
       // the key can be saved plain, because i am using EncryptedSharedPreferences
       val editor = sharedPref.edit()
       editor.putString(BACKUP_SECRET_KEY, password)
-      // I use .commit because when using .apply the needed app restart is faster then apply and the preferences wont be saved
+      // I use .commit because when using .apply the needed app restart is faster then apply and the preferences won't be saved
       editor.commit()
 
       return secretKey

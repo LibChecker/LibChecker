@@ -350,7 +350,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
    * Start Backup process, and set onComplete Listener to success, if no error occurred, else onComplete Listener success is false
    * and error message is passed
    *
-   * if custom storage ist selected, the [openBackupfileCreator] will be launched
+   * if custom storage is selected, the [openBackupfileCreator] will be launched
    */
   fun backup() {
     if (enableLogDebug) Timber.d("Starting Backup ...")
@@ -494,7 +494,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
    * if internal or external storage is selected, this function shows a list of all available backup files in a MaterialAlertDialog and
    * calls [restoreSelectedInternalExternalFile] to restore selected file
    *
-   * if custom storage ist selected, the [openBackupfileChooser] will be launched
+   * if custom storage is selected, the [openBackupfileChooser] will be launched
    */
   fun restore() {
     if (enableLogDebug) Timber.d("Starting Restore ...")
@@ -632,7 +632,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       // Decrypt tempfile and write to database file
       val decryptedBytes = decryptBackup() ?: return
 
-      // Close the database if decryption is succesfull
+      // Close the database if decryption is successful
       roomDatabase!!.close()
 
       val bos = BufferedOutputStream(FileOutputStream(DATABASE_FILE, false))

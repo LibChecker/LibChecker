@@ -191,7 +191,7 @@
   <string name="lib_detail_app_install_source_installing_package">Installation executor</string>
   <string name="lib_detail_app_installed_time">Installation time</string>
   <string name="lib_detail_app_first_installed_time">First installation time: </string>
-  <string name="lib_detail_app_last_updated_time">Last installion time: </string>
+  <string name="lib_detail_app_last_updated_time">Last installation time: </string>
   <string name="lib_detail_app_install_source_empty">Unknown</string>
   <string name="lib_detail_app_install_source_empty_detail">Shell or uninstalled app</string>
   <string name="lib_detail_app_install_source_shizuku_usage">Because Android restricts the API to get the installation requester, we use Shizuku to get the installation requester</string>
