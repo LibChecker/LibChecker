@@ -62,9 +62,15 @@ jobs:
       - uses: gradle/actions/setup-gradle@v5
         with:
           cache-encryption-key: Da25KUVSE5jbGds2zXmfXw==
-      - name: Retrieve version
+      - name: Detect dev version
+        id: version-check
         run: |
-          echo VERSION=$(echo ${{ github.event.head_commit.id }} | head -c 10) >> $GITHUB_ENV
+          base_version=$(grep 'const val baseVersionName' build-logic/src/main/kotlin/Projects.kt | sed 's/.*"\(.*\)".*/\1/')
+          if git tag -l "$base_version" | grep -q .; then
+            echo "is_dev=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_dev=true" >> "$GITHUB_OUTPUT"
+          fi
       - name: Write sign info
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master' && github.repository == 'LibChecker/LibChecker'
         run: |
@@ -75,8 +81,11 @@ jobs:
             echo releaseStoreFile='${{ github.workspace }}/key.jks' >> gradle.properties
             echo ${{ secrets.SIGNING_KEY }} | base64 --decode > ${{ github.workspace }}/key.jks
           fi
+      - name: Clean build
+        if: steps.version-check.outputs.is_dev == 'false'
+        run: ./gradlew clean
       - name: Build with Gradle
-        run: ./gradlew -PappVerName=${{ env.VERSION }} app:assembleRelease
+        run: ./gradlew app:assembleRelease
       - name: Upload built Foss apk
         if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
         uses: actions/upload-artifact@v5
