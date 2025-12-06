@@ -192,6 +192,9 @@
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku yetkilendirilmedi</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">Yükleme isteyicisi için Shizuku yetkilendirmesi için buraya tıklayın</string>
   <string name="lib_detail_elf_info">Daha fazla ayrıntı</string>
+  <string name="lib_detail_elf_extract">Çıkar</string>
+  <string name="lib_detail_elf_extract_success">ELF dosyası İndirilenler\'e kaydedildi</string>
+  <string name="lib_detail_elf_extract_failed">ELF dosyası çıkarılamadı</string>
   <string name="lib_detail_dependency_tip">Bağımlılıklar</string>
   <string name="lib_detail_entry_points_tip">Giriş noktaları</string>
   <string name="apk_preview">APK Önizleme</string>
