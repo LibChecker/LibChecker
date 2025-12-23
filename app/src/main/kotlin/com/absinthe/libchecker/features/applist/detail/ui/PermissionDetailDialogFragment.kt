@@ -28,12 +28,14 @@ class PermissionDetailDialogFragment : BaseBottomSheetViewDialogFragment<Permiss
   override fun init() {
     val pm = SystemServices.packageManager
     root.apply {
+      icon.load(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_android)
+      permissionContentView.label.text.text = context.getText(R.string.not_found)
+      permissionContentView.description.text.text = context.getText(R.string.not_found)
+
       val permissionInfo = runCatching {
         pm.getPermissionInfo(origPermName, 0)
       }.onFailure {
         Timber.e(it)
-        icon.load(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_android)
-        permissionContentView.description.text.text = context.getText(R.string.not_found)
       }.getOrNull()
 
       if (permissionInfo == null || permissionInfo.icon == 0) {
