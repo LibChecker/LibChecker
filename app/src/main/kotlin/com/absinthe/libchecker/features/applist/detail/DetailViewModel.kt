@@ -839,7 +839,7 @@ class DetailViewModel : ViewModel() {
     val iconResSet = mutableSetOf(ai.icon)
     intents
       .asSequence()
-      .filter { it.activityInfo?.targetActivity != null && !iconResSet.contains(it.iconResource) }
+      .filter { !iconResSet.contains(it.iconResource) }
       .map {
         iconResSet.add(it.iconResource)
         it.loadIcon(SystemServices.packageManager)
