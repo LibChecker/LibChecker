@@ -22,7 +22,7 @@ kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref =
 ksp = { id = "com.google.devtools.ksp", version = "2.3.4" }
 protobuf = { id = "com.google.protobuf", version = "0.9.6" }
 moshiX = "dev.zacsweers.moshix:0.34.1"
-spotless = "com.diffplug.spotless:8.0.0"
+spotless = "com.diffplug.spotless:8.1.0"
 aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutlibraries" }
 
 [libraries]
