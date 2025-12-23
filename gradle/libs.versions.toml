@@ -1,6 +1,6 @@
 [versions]
 agp = "8.13.2"
-aboutlibraries = "12.2.4"
+aboutlibraries = "13.2.1"
 androidX-lifecycle = "2.10.0"
 androidX-room = "2.8.4"
 firebase-bom = "34.7.0"
@@ -23,7 +23,7 @@ ksp = { id = "com.google.devtools.ksp", version = "2.3.4" }
 protobuf = { id = "com.google.protobuf", version = "0.9.6" }
 moshiX = "dev.zacsweers.moshix:0.34.1"
 spotless = "com.diffplug.spotless:8.1.0"
-aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutlibraries" }
+aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin.android", version.ref = "aboutlibraries" }
 
 [libraries]
 gradlePlugin-android = { module = "com.android.tools.build:gradle", version.ref = "agp" }
