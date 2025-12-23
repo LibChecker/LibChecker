@@ -6,8 +6,8 @@ import android.text.TextUtils
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.Gravity
-import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
@@ -15,14 +15,12 @@ import androidx.annotation.StringRes
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.isVisible
-import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
-import com.absinthe.libchecker.utils.extensions.roundUpToNearestTen
 import com.absinthe.libchecker.utils.extensions.toColorStateList
 import com.absinthe.libchecker.utils.extensions.toColorStateListByColor
-import com.absinthe.libchecker.view.AViewGroup
 
 /**
  * <pre>
@@ -30,13 +28,15 @@ import com.absinthe.libchecker.view.AViewGroup
  * time : 2020/10/25
  * </pre>
  */
-class AppInfoItemView(context: Context) : AViewGroup(context) {
+class AppInfoItemView(context: Context) : LinearLayout(context) {
 
   init {
+    orientation = VERTICAL
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.MATCH_PARENT
+      LayoutParams.MATCH_PARENT,
+      LayoutParams.WRAP_CONTENT
     )
+    gravity = Gravity.CENTER_HORIZONTAL
     isClickable = true
     isFocusable = true
     setPadding(4.dp, 12.dp, 4.dp, 12.dp)
@@ -58,8 +58,8 @@ class AppInfoItemView(context: Context) : AViewGroup(context) {
     )
   ).apply {
     layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.WRAP_CONTENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      LayoutParams.WRAP_CONTENT,
+      LayoutParams.WRAP_CONTENT
     ).also {
       it.topMargin = 8.dp
     }
@@ -107,30 +107,5 @@ class AppInfoItemView(context: Context) : AViewGroup(context) {
 
   fun setIconBackgroundTintColor(@ColorRes res: Int) {
     icon.backgroundTintList = res.toColorStateList(context)
-  }
-
-  override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-    super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-    icon.autoMeasure()
-    text.autoMeasure()
-    val textWidth = measuredWidth - paddingStart - paddingEnd
-    if (text.measuredWidth > textWidth) {
-      text.measure(textWidth.toExactlyMeasureSpec(), text.defaultHeightMeasureSpec(this))
-    }
-    val rootMeasuredWidth = if (layoutParams.width == ViewGroup.LayoutParams.MATCH_PARENT) {
-      measuredWidth
-    } else {
-      icon.measuredWidth.coerceAtLeast(text.measuredWidth) + paddingStart + paddingEnd
-    }
-    setMeasuredDimension(
-      rootMeasuredWidth,
-      // Round up to nearest ten to align items
-      (paddingTop + icon.measuredHeight + text.marginTop + text.measuredHeight + paddingBottom).roundUpToNearestTen()
-    )
-  }
-
-  override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-    icon.layout(icon.toHorizontalCenter(this), paddingTop)
-    text.layout(text.toHorizontalCenter(this), icon.bottom + text.marginTop)
   }
 }
