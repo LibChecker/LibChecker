@@ -14,6 +14,7 @@ import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
+import com.google.android.material.button.MaterialButton
 
 class OverlayDetailBottomSheetView(context: Context) :
   AViewGroup(context),
@@ -60,12 +61,24 @@ class OverlayDetailBottomSheetView(context: Context) :
     setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSecondaryContainer))
   }
 
+  val moreDetailButton = MaterialButton(context).apply {
+    layoutParams = LayoutParams(
+      ViewGroup.LayoutParams.MATCH_PARENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
+    ).also {
+      it.topMargin = 8.dp
+    }
+    text = context.getString(R.string.lib_detail_elf_info)
+    rippleColor = context.getColorStateListByAttr(com.google.android.material.R.attr.colorOnSecondaryContainer)
+  }
+
   init {
     setPadding(24.dp, 16.dp, 24.dp, 16.dp)
     addView(header)
     addView(detailsTitleView)
     addView(targetTitleView)
     addView(targetPackageView)
+    addView(moreDetailButton)
   }
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -80,6 +93,10 @@ class OverlayDetailBottomSheetView(context: Context) :
       (measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(),
       targetPackageView.defaultHeightMeasureSpec(this)
     )
+    moreDetailButton.measure(
+      (measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(),
+      moreDetailButton.defaultHeightMeasureSpec(this)
+    )
     setMeasuredDimension(
       measuredWidth,
       paddingTop +
@@ -90,6 +107,8 @@ class OverlayDetailBottomSheetView(context: Context) :
         targetTitleView.measuredHeight +
         targetPackageView.marginTop +
         targetPackageView.measuredHeight +
+        moreDetailButton.marginTop +
+        moreDetailButton.measuredHeight +
         paddingBottom
     )
   }
@@ -99,6 +118,7 @@ class OverlayDetailBottomSheetView(context: Context) :
     detailsTitleView.layout(paddingStart, header.bottom + detailsTitleView.marginTop)
     targetTitleView.layout(paddingStart, detailsTitleView.bottom + targetTitleView.marginTop)
     targetPackageView.layout(paddingStart, targetTitleView.bottom + targetPackageView.marginTop)
+    moreDetailButton.layout(paddingStart, targetPackageView.bottom + moreDetailButton.marginTop)
   }
 
   override fun getHeaderView(): BottomSheetHeaderView {

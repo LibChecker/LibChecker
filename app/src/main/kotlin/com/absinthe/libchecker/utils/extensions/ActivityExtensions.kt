@@ -23,9 +23,9 @@ import com.absinthe.libchecker.features.statistics.ui.EXTRA_REF_TYPE
 import com.absinthe.libchecker.features.statistics.ui.LibReferenceActivity
 import com.absinthe.libchecker.utils.Toasty
 
-fun FragmentActivity.launchDetailPage(item: LCItem, refName: String? = null, refType: Int = NATIVE) {
+fun FragmentActivity.launchDetailPage(item: LCItem, refName: String? = null, refType: Int = NATIVE, forceDetail: Boolean = false) {
   findViewById<View>(androidx.appcompat.R.id.search_src_text)?.clearFocus()
-  if (item.abi.toInt() == Constants.OVERLAY) {
+  if (item.abi.toInt() == Constants.OVERLAY && !forceDetail) {
     OverlayDetailBottomSheetDialogFragment().apply {
       arguments = bundleOf(
         EXTRA_LC_ITEM to item
