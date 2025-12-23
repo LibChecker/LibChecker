@@ -49,7 +49,7 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
     root.container.apply {
       val packageInfo = if (item.packageName != Constants.EXAMPLE_PACKAGE) {
         val packageInfo = runCatching {
-          PackageUtils.getPackageInfo(item.packageName)
+          PackageUtils.getPackageInfo(item.packageName, needAchieve = false)
         }.getOrNull()
         icon.load(packageInfo)
         packageInfo

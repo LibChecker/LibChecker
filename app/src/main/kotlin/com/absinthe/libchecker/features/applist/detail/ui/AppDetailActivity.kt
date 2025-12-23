@@ -74,13 +74,8 @@ class AppDetailActivity :
     Timber.d("packageName: $pkgName")
     val packageName = pkgName ?: return
     runCatching {
-      val flag = (
-        PackageManager.GET_PERMISSIONS
-          or PackageManager.GET_META_DATA
-          or PackageManager.MATCH_DISABLED_COMPONENTS
-          or PackageManager.MATCH_UNINSTALLED_PACKAGES
-        )
-      PackageUtils.getPackageInfo(packageName, flag)
+      val flag = PackageManager.GET_PERMISSIONS or PackageManager.GET_META_DATA
+      PackageUtils.getPackageInfo(packageName, flag, false)
     }.onFailure {
       Timber.d("getPackageInfo: $packageName failed, %s", it.message)
       finish()

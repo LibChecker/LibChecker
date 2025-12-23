@@ -116,26 +116,32 @@ object PackageUtils {
    * Get packageInfo
    * @param packageName Package name string
    * @param flag Flag mask
+   * @param needAchieve Whether need to achieve frozen app info
    * @return PackageInfo
    * @throws PackageManager.NameNotFoundException
    */
   @Throws(PackageManager.NameNotFoundException::class)
-  fun getPackageInfo(packageName: String, flag: Int = 0): PackageInfo {
+  fun getPackageInfo(packageName: String, flag: Int = 0, needAchieve: Boolean = true): PackageInfo {
     val defaultFlags = PackageManager.MATCH_DISABLED_COMPONENTS or PackageManager.MATCH_UNINSTALLED_PACKAGES
     val packageInfo = PackageManagerCompat.getPackageInfo(
       packageName,
       defaultFlags or flag
     ).also {
       it.applicationInfo?.let { ai ->
-        if (FreezeUtils.isAppFrozen(ai)) {
+        if (needAchieve && FreezeUtils.isAppFrozen(ai)) {
           return PackageManagerCompat.getPackageArchiveInfo(
             ai.sourceDir,
             PackageManager.MATCH_DISABLED_COMPONENTS or flag
           )?.apply {
             applicationInfo?.let { appInfo ->
+              val rootDir = File(ai.sourceDir).parentFile!!
               appInfo.enabled = false
               appInfo.sourceDir = ai.sourceDir
               appInfo.nativeLibraryDir = ai.nativeLibraryDir
+              appInfo.splitSourceDirs = rootDir.listFiles()!!
+                .filter { file -> file.name.startsWith("split_") && file.extension == "apk" }
+                .map { file -> file.path }
+                .toTypedArray()
             }
           } ?: throw PackageManager.NameNotFoundException()
         }
