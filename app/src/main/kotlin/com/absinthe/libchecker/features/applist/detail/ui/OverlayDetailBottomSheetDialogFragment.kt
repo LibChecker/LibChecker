@@ -153,6 +153,10 @@ class OverlayDetailBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment
           }
         }
       }
+
+      moreDetailButton.setOnClickListener {
+        activity?.launchDetailPage(lcItem, forceDetail = true)
+      }
     }
   }
 }
