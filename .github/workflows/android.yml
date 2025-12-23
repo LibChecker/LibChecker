@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Skip duplicate actions
         uses: fkirc/skip-duplicate-actions@v5
         with:
@@ -52,7 +52,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - uses: actions/setup-java@v5
@@ -136,7 +136,7 @@ jobs:
           curl -v "https://api.telegram.org/bot${BOT_TOKEN}/sendMediaGroup?chat_id=${CHANNEL_ID}&media=%5B%7B%22type%22%3A%22document%22%2C%20%22media%22%3A%22attach%3A%2F%2FmarketRelease%22%2C%22parse_mode%22%3A%22MarkdownV2%22%2C%22caption%22:${ESCAPED}%7D%5D" -F marketRelease="@$MARKET_FILE"
       - name: Checkout assets repository
         if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: LibChecker/assets
           ref: ci
@@ -161,7 +161,7 @@ jobs:
           git push origin ci --force
       - name: Checkout assets repository (main branch)
         if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: LibChecker/assets
           ref: main
@@ -196,7 +196,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.event.head_commit.message, '[skip ci]') }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Send commit to telegram
         uses: appleboy/telegram-action@master
         with:
