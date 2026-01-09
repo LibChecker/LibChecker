@@ -305,7 +305,7 @@
   <string name="adv_sort_by_time">Last updated</string>
   <string name="adv_sort_by_target_version">Target version</string>
   <string name="adv_sort_by_name">Name</string>
-  <string name="adv_show_android_version">Show Android bersion</string>
+  <string name="adv_show_android_version">Show Android version</string>
   <string name="adv_show_target_version">Show target version</string>
   <string name="adv_show_min_version">Show minimum version</string>
   <string name="adv_show_compile_version">Show compile version</string>
