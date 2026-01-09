@@ -46,6 +46,7 @@
   <string name="ref_category_shared_uid">Общий UID</string>
   <string name="ref_category_signatures">подпись</string>
   <string name="ref_category_only_not_marked">Только не помеченные</string>
+  <string name="ref_category_action">Action</string>
   <string name="string_kotlin_used">Используется Kotlin</string>
   <string name="string_kotlin_unused">Kotlin не используется</string>
   <string name="string_compose_used">Используется Jetpack Compose</string>
@@ -88,10 +89,12 @@
   <string name="cloud_rules">Облачные правила</string>
   <string name="dark_mode">Темный режим</string>
   <string name="snapshot_keep">Стандартное поведение при сохранении снимков</string>
+  <string name="export_log">Export log</string>
   <string name="apk_analytics_summary">Открывает страницу сведений при нажатии на APK-файл</string>
   <string name="colorful_icon_summary">Часть отмеченных библиотек будет отображаться в виде цветных значков.</string>
   <string name="lib_ref_threshold_summary">В списке отображаются только те библиотеки, число ссылок на которые превысило заданный порог</string>
   <string name="reload_apps_summary">Попробуйте, если список приложений отображается неправильно</string>
+  <string name="export_log_summary">Export the log file of the app</string>
   <string name="help_docs_summary">Ознакомьтесь, как использовать LibChecker</string>
   <string name="join_telegram_group_summary">Присоединяйтесь к нашей группе в Telegram</string>
   <string name="anonymous_statistics_summary">Мы используем Google Firebase для анонимной отправки наиболее часто используемых помеченных библиотек и некоторых данных о привычках использования, чтобы сделать LibChecker более полезным</string>
@@ -115,8 +118,10 @@
   <string name="further_operation">Дополнительные опции</string>
   <string name="app_info_launch">Запустить</string>
   <string name="app_info_settings">Настройки</string>
+  <string name="app_info_share">Settings</string>
   <string name="lib_detail_dialog_title">Подробности библиотеки</string>
   <string name="lib_permission_dialog_title">Детали разрешения</string>
+  <string name="lib_permission_provided_by_format">Provided by %s</string>
   <string name="agp_details">Система сборки Android Studio основана на Gradle, а подключаемый модуль Android Gradle добавляет несколько функций, характерных для создания приложений для Android. Хотя подключаемый модуль Android обычно обновляется одновременно с Android Studio, этот подключаемый модуль (и остальная часть системы Gradle) может работать независимо от Android Studio и обновляться отдельно.</string>
   <string name="xposed_module">Xposed модуль</string>
   <string name="xposed_module_details">Xposed — это фреймворк для модулей, которые могут изменить поведение системы и приложений, не затрагивая никаких APK. Это здорово, потому что это означает, что модули могут работать с разными версиями ОС и прошивками без каких-либо изменений.</string>
@@ -125,6 +130,7 @@
   <string name="pwa_details">Прогрессивные веб-приложения (PWA) создаются и улучшаются с помощью современных API-интерфейсов, чтобы обеспечить расширенные возможности, надёжность и простоту установки, а также охватывать всех где угодно и на любом устройстве с помощью единой кодовой базы.</string>
   <string name="jetpack_compose_details">Jetpack Compose - это современный набор инструментов для создания нативных пользовательских интерфейсов в Android. Он упрощает и ускоряет разработку пользовательского интерфейса на Android. Вы сможете быстро воплотить в жизнь своё приложение благодаря меньшему количеству кода, мощным инструментам и интуитивно понятным API-интерфейсам Kotlin.</string>
   <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform - это современный декларативный и реактивный UI фреймворк, разработанный JetBrains, который предоставляет простой способ создания пользовательских интерфейсов с небольшим количеством кода Kotlin. Он также позволяет написать пользовательский интерфейс единожды и запускать его на любой из поддерживаемых платформ – iOS, Android, ПК (Windows, macOS, Linux) и веб.</string>
+  <string name="multi_arch_dialog_details"><![CDATA[If an app exposes an API to other apps that can be either 32-bit or 64-bit, the app must have the <b>android:multiarch</b> property set to true within its manifest to avoid potential errors.]]></string>
   <string name="extract_native_libs_tip">Приложение декларирует </string>
   <string name="xml_detail">XML Деталь</string>
   <string name="lib_detail_dialog_title_16kb_page_size">Размер страницы 16 КБ</string>
@@ -141,6 +147,7 @@
   <string name="rx_kotlin_detail">Расширения Kotlin для RxJava</string>
   <string name="permission_not_granted">Не предоставлено</string>
   <string name="signature_detail">Детали подписи</string>
+  <string name="signature_scheme_version">Signature scheme</string>
   <string name="signature_version">Версия</string>
   <string name="signature_serial_number">Серийный номер</string>
   <string name="signature_issuer">Издатель</string>
@@ -184,6 +191,16 @@
   <string name="lib_detail_app_install_source_shizuku_not_running_detail">Нажмите здесь, чтобы перейти к Shizuku</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku не авторизован</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">Нажмите здесь для авторизации Shizuku для инсталлятора</string>
+  <string name="lib_detail_elf_info">More details</string>
+  <string name="lib_detail_elf_extract">Extract</string>
+  <string name="lib_detail_elf_extract_success">ELF file saved to Downloads</string>
+  <string name="lib_detail_elf_extract_failed">Failed to extract ELF file</string>
+  <string name="lib_detail_dependency_tip">Dependencies</string>
+  <string name="lib_detail_entry_points_tip">Entry points</string>
+  <string name="apk_preview">APK Preview</string>
+  <string name="apk_preview_item_not_available">Cannot be displayed in preview mode</string>
+  <string name="feature_live_update_notification">Live Update notification</string>
+  <string name="feature_live_update_notification_summary">The system promotes Live Update notifications. Promoted notifications appear more prominently on system surfaces, including at the top of the notification drawer and the lock screen, and as a chip in the status bar.</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Скопировано в буфер обмена</string>
   <string name="toast_not_existing_market">Нет магазина приложений</string>
@@ -192,6 +209,7 @@
   <string name="toast_cloud_rules_update_error">Не удалось обновить облачные правила. Пожалуйста, попробуйте ещё раз.</string>
   <string name="toast_not_enough_storage_space">Недостаточно места</string>
   <string name="toast_downloading_app">Началось скачивание</string>
+  <string name="toast_long_tap_share_button_tip">Long press the “Share” button to choose where to save</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">Сохранить текущий снимок</string>
   <string name="snapshot_current_timestamp">Отметка времени текущего снимка</string>
@@ -209,6 +227,8 @@
   <string name="snapshot_preinstalled_app">Предустановленное приложение</string>
   <string name="snapshot_generate_text_report">Создать текстовый отчет</string>
   <string name="snapshot_scheme_tip"><![CDATA[Совет: Теперь вы можете генерировать снимки в фоновом режиме через:<br><b>%s</b>]]></string>
+  <string name="snapshot_build_id">Build ID</string>
+  <string name="snapshot_build_security_patch">Security patch</string>
   <!--  Dialog  -->
   <string name="dialog_title_reload_apps">Вы уверены, что хотите перезагрузить все приложения?</string>
   <string name="dialog_subtitle_reload_apps">Это может занять несколько секунд</string>
@@ -221,6 +241,8 @@
   <string name="btn_drop">Удалить</string>
   <string name="dialog_title_compare_diff_apk">Внимание</string>
   <string name="dialog_message_compare_diff_apk">Вы хотите сравнить два различных APK?</string>
+  <string name="dialog_themed_and_alternative_app_icons">Themed and alternative icons</string>
+  <string name="dialog_themed">Themed</string>
   <!--  Album  -->
   <string name="album_compare">Сравнить</string>
   <string name="album_item_comparison_title">Сравнение</string>
