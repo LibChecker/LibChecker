@@ -118,8 +118,10 @@
   <string name="further_operation">תפעול נוסך</string>
   <string name="app_info_launch">הפעל</string>
   <string name="app_info_settings">הגדרות</string>
+  <string name="app_info_share">Settings</string>
   <string name="lib_detail_dialog_title">פרטי ספריה</string>
   <string name="lib_permission_dialog_title">פרטי הרשאה</string>
+  <string name="lib_permission_provided_by_format">Provided by %s</string>
   <string name="agp_details">מערכת הבנייה של Android Studio מבוססת על Gradle, והתוסף של Android Gradle מוסיף מספר תכונות ספציפיות לבניית אפליקציות אנדרואיד. למרות שהתוסף אנדרואיד מתעדכן בדרך כלל בשלב נעילה עם Android Studio, התוסף (ושאר מערכת Gradle) יכול לפעול ללא תלות ב-Android Studio ולהתעדכן בנפרד.</string>
   <string name="xposed_module">מודול Xposed</string>
   <string name="xposed_module_details">Xposed היא מסגרת למודולים שיכולה לשנות את התנהגות המערכת והאפליקציות מבלי לגעת באף APK. זה נהדר כי זה אומר שהמודולים יכולים לעבוד עבור גרסאות שונות ואפילו ROM ללא כל שינוי.</string>
@@ -190,8 +192,15 @@
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku לא מאושר</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">לחץ כאן לאישור Shizuku עבור מבקש ההתקנה</string>
   <string name="lib_detail_elf_info">מידע נוסף</string>
+  <string name="lib_detail_elf_extract">Extract</string>
+  <string name="lib_detail_elf_extract_success">ELF file saved to Downloads</string>
+  <string name="lib_detail_elf_extract_failed">Failed to extract ELF file</string>
   <string name="lib_detail_dependency_tip">תלויות</string>
   <string name="lib_detail_entry_points_tip">נקודות כניסה</string>
+  <string name="apk_preview">APK Preview</string>
+  <string name="apk_preview_item_not_available">Cannot be displayed in preview mode</string>
+  <string name="feature_live_update_notification">Live Update notification</string>
+  <string name="feature_live_update_notification_summary">The system promotes Live Update notifications. Promoted notifications appear more prominently on system surfaces, including at the top of the notification drawer and the lock screen, and as a chip in the status bar.</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">הועתק ללוח הגזירים</string>
   <string name="toast_not_existing_market">לא קיים שום שוק אפליקציות</string>
@@ -200,6 +209,7 @@
   <string name="toast_cloud_rules_update_error">נכשל בעדכון חוקי הענן. נא לנסות שוב.</string>
   <string name="toast_not_enough_storage_space">אין מספיק מקום אחסון</string>
   <string name="toast_downloading_app">הורדה נתבקשה</string>
+  <string name="toast_long_tap_share_button_tip">Long press the “Share” button to choose where to save</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">שמור את תמונת המצב הנוכחית</string>
   <string name="snapshot_current_timestamp">חותמת זמן של תמונת מצב נוכחית</string>
@@ -231,6 +241,8 @@
   <string name="btn_drop">השלך</string>
   <string name="dialog_title_compare_diff_apk">שים לב</string>
   <string name="dialog_message_compare_diff_apk">האם ברצונך להשוות בין שני קבצי APK שונים?</string>
+  <string name="dialog_themed_and_alternative_app_icons">Themed and alternative icons</string>
+  <string name="dialog_themed">Themed</string>
   <!--  Album  -->
   <string name="album_compare">השווה</string>
   <string name="album_item_comparison_title">השוואה</string>
