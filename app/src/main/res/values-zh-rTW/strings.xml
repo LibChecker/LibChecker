@@ -24,6 +24,7 @@
   <string name="uncharted_territory">未知領域</string>
   <string name="get_app_list_denied_tip">請授予 LibChecker\n「讀取應用程式清單」\n權限</string>
   <string name="advanced_menu">進階選單</string>
+  <string name="archived_app">已存檔的應用程式</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">%s架構的應用程式</string>
   <string name="title_statistics_dialog_no_native_libs">無原生庫的應用程式</string>
@@ -87,10 +88,12 @@
   <string name="cloud_rules">雲端規則</string>
   <string name="dark_mode">深色模式</string>
   <string name="snapshot_keep">快照預設保留規則</string>
+  <string name="export_log">匯出日誌</string>
   <string name="apk_analytics_summary">按下 APK 檔案時開啟詳細資料頁面</string>
   <string name="colorful_icon_summary">部分標示庫會呈現為彩色標誌</string>
   <string name="lib_ref_threshold_summary">只有庫參考數量達到閾值的庫才顯示在清單中</string>
   <string name="reload_apps_summary">應用程式清單顯示不正常時嘗試此選項</string>
+  <string name="export_log_summary">匯出應用程式的日誌檔</string>
   <string name="help_docs_summary">學習如何使用 LibChecker</string>
   <string name="join_telegram_group_summary">一起來閒聊</string>
   <string name="anonymous_statistics_summary">我們使用 Google Firebase 來匿名傳送最常被人們使用的標示庫和一些使用習慣資料以使得 LibChecker 變得更加實用</string>
@@ -114,8 +117,10 @@
   <string name="further_operation">進一步作業</string>
   <string name="app_info_launch">啟動</string>
   <string name="app_info_settings">設定</string>
+  <string name="app_info_share">設定</string>
   <string name="lib_detail_dialog_title">庫詳細資料</string>
   <string name="lib_permission_dialog_title">權限詳細資料</string>
+  <string name="lib_permission_provided_by_format">由 %s 提供</string>
   <string name="agp_details">Android Studio 建置系統以 Gradle 為基礎，並且 Android Gradle 外掛程式新增了幾項專用於建置 Android 應用程式的功能。雖然 Android 外掛程式通常會與 Android Studio 的更新步調保持一致，但外掛程式 (以及 Gradle 系統的其餘部分) 可獨立於 Android Studio 執行並單獨更新。</string>
   <string name="xposed_module">Xposed 模組</string>
   <string name="xposed_module_details">Xposed 是一個模組架構，可以在不接觸任何 APK 的狀況下變更系統和應用程式的行為。這很棒，因為這意味著模組可以在不同版本甚至 ROM 上運作而無需任何變更。</string>
@@ -123,10 +128,14 @@
   <string name="play_app_signing_details">借助 Play 應用程式簽署，Google 可以為您管理並保護您應用程式的簽署金鑰，並使用它對從您的 App bundle 產生的最佳化分配 APK 進行簽署。Play App Signing 將您的應用程式簽署金鑰儲存在 Google 的安全基礎結構中，並提供升級選項以提高安全性。</string>
   <string name="pwa_details">漸進式 Web 應用程式 (PWA) 使用現代 API 建置並增強，以提供增強的功能、可靠性和可安裝性，同時使用單個程式碼存放庫在任何裝置上存取任何人、任何位置。</string>
   <string name="jetpack_compose_details">Jetpack Compose 是 Android 的新型工具組，用於建置原生 UI。可簡化並加快 Android 平台上的 UI 開發作業。透過較少的程式碼、強大的工具和直觀的 Kotlin API，快速將應用程式上架。</string>
+  <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform 是由 JetBrains 開發的現代宣告式且反應式的使用者介面框架，提供一種簡單的方式，用少量 Kotlin 程式碼來建立使用者介面。它也允許你只需撰寫一次 UI，就能在任何支援的平台上運行——iOS、Android、桌面（Windows、macOS、Linux 和網頁版）。</string>
+  <string name="multi_arch_dialog_details"><![CDATA[如果應用程式將 API 暴露給其他 32 位元或 64 位元的應用程式，該應用程式必須在其清單中將 <b>android：multiarch</b> 屬性設為 true，以避免潛在錯誤。]]></string>
   <string name="extract_native_libs_tip">此應用程式宣告了 </string>
   <string name="xml_detail">XML 詳細資料</string>
   <string name="lib_detail_dialog_title_16kb_page_size">16 KB 分頁大小支援</string>
   <string name="lib_detail_dialog_content_16kb_page_size">在過去 Android 僅支援 4 KB 的記憶體分頁大小，這最佳化了系統記憶體效能，適用於 Android 裝置通常擁有的平均總記憶體量。自 Android 15 開始，AOSP 支援配置為使用 16 KB 分頁大小的裝置(16 KB 裝置)。如果您的應用程式直接或透過 SDK 間接使用任何 NDK 程式庫，那麼您需要重新建置您的應用程式，以便在這些 16 KB 裝置上正常運作。</string>
+  <string name="lib_detail_dialog_title_16kb_page_size_compat">16 KB 向下相容性</string>
+  <string name="lib_detail_dialog_content_16kb_page_size_compat"><![CDATA[Android 15 引入了 16 KB 記憶體頁面的支援，以優化平台效能。Android 16 新增相容模式，允許部分為 4 KB 記憶體頁面設計的應用程式，在設定為 16 KB 記憶體頁面的裝置上運行。\n\n若 Android 偵測到您的應用程式有 4 KB 記憶體頁面對齊，會自動啟用相容模式並顯示通知對話框給使用者。在 <b>AndroidManifest.xml</b> 中設定 <b>android：pageSizeComppat</b>，啟用向下相容模式，會阻止應用程式啟動時對話框的顯示。為了達到最佳效能、可靠性和穩定性，您的應用程式仍應該保持 16 KB 對齊。]]></string>
   <string name="format_last_updated">最近更新：%s</string>
   <string name="menu_process">處理程序</string>
   <string name="menu_split">分割</string>
@@ -137,6 +146,7 @@
   <string name="rx_kotlin_detail">RxJava 的 Kotlin 擴展</string>
   <string name="permission_not_granted">未授予</string>
   <string name="signature_detail">簽章詳細資料</string>
+  <string name="signature_scheme_version">簽名方案</string>
   <string name="signature_version">版本</string>
   <string name="signature_serial_number">序號</string>
   <string name="signature_issuer">簽發者</string>
@@ -167,6 +177,8 @@
   <string name="lib_detail_app_install_source_originating_package">安裝要求者</string>
   <string name="lib_detail_app_install_source_installing_package">安裝執行程式</string>
   <string name="lib_detail_app_installed_time">安裝時間</string>
+  <string name="lib_detail_app_first_installed_time">首次安裝時間：</string>
+  <string name="lib_detail_app_last_updated_time">最後安裝時間：</string>
   <string name="lib_detail_app_install_source_empty">未知</string>
   <string name="lib_detail_app_install_source_empty_detail">Shell 或已解除安裝的應用程式</string>
   <string name="lib_detail_app_install_source_shizuku_usage">因為 Android 限制了取得安裝要求者的 API，我們使用 Shizuku 以取得安裝要求者。</string>
@@ -178,14 +190,25 @@
   <string name="lib_detail_app_install_source_shizuku_not_running_detail">按一下這裡以跳轉到 Shizuku 以將其啟動</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku 未經授權</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">按一下這裡進行 Shizuku 授權以取得安裝要求者</string>
+  <string name="lib_detail_elf_info">更多細節</string>
+  <string name="lib_detail_elf_extract">擷取</string>
+  <string name="lib_detail_elf_extract_success">ELF 檔案已儲存至下載區</string>
+  <string name="lib_detail_elf_extract_failed">無法擷取 ELF 檔案</string>
+  <string name="lib_detail_dependency_tip">相依關係</string>
+  <string name="lib_detail_entry_points_tip">入口</string>
+  <string name="apk_preview">APK 預覽</string>
+  <string name="apk_preview_item_not_available">無法在預覽模式下顯示</string>
+  <string name="feature_live_update_notification">即時更新通知</string>
+  <string name="feature_live_update_notification_summary">系統會推廣即時更新通知。推廣的通知會在系統介面上更顯眼地顯示，包括顯示於通知抽屜頂端和鎖定畫面，並以狀態列中的晶片形式呈現。</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已複製到剪貼簿</string>
-  <string name="toast_not_existing_market">裝置中不存在應用市集</string>
+  <string name="toast_not_existing_market">裝置中不存在應用市場</string>
   <string name="toast_use_another_file_manager">請使用其它檔案管理員開啟此 APK</string>
   <string name="toast_cant_open_app">無法啟動此應用程式</string>
   <string name="toast_cloud_rules_update_error">無法更新雲端規則，請再試一次</string>
   <string name="toast_not_enough_storage_space">儲存空間不足</string>
   <string name="toast_downloading_app">已要求下載</string>
+  <string name="toast_long_tap_share_button_tip">長按「分享」按鈕選擇存檔位置</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">儲存目前快照</string>
   <string name="snapshot_current_timestamp">目前快照時間戳記</string>
@@ -203,6 +226,8 @@
   <string name="snapshot_preinstalled_app">內建應用程式</string>
   <string name="snapshot_generate_text_report">產生文字報告</string>
   <string name="snapshot_scheme_tip"><![CDATA[提示：現在您可以透過<br><b>%s</b><br>在背景產生快照。]]></string>
+  <string name="snapshot_build_id">Build ID</string>
+  <string name="snapshot_build_security_patch">安全性修補程式</string>
   <!--  Dialog  -->
   <string name="dialog_title_reload_apps">確定要重新載入應用程式清單嗎？</string>
   <string name="dialog_subtitle_reload_apps">這可能會花費幾秒鐘的時間</string>
@@ -215,6 +240,8 @@
   <string name="btn_drop">捨棄</string>
   <string name="dialog_title_compare_diff_apk">注意</string>
   <string name="dialog_message_compare_diff_apk">要比較兩個不同的 APK 嗎？</string>
+  <string name="dialog_themed_and_alternative_app_icons">主題與替代圖示</string>
+  <string name="dialog_themed">主題</string>
   <!--  Album  -->
   <string name="album_compare">比較</string>
   <string name="album_item_comparison_title">比較</string>
@@ -224,6 +251,9 @@
   <string name="album_item_comparison_choose_local_apk">選擇本機 APK</string>
   <string name="album_item_management_title">管理</string>
   <string name="album_item_management_subtitle">管理所有快照</string>
+  <string name="album_item_management_snapshot_auto_remove_default_title">只保留最新的快照</string>
+  <string name="album_item_management_snapshot_auto_remove_specific_title">只保留最近的 %d 個項目</string>
+  <string name="album_item_management_snapshot_auto_remove_desc">從點選「%s」開始，只有最新的快照會被保留，舊快照則會自動刪除。</string>
   <string name="album_item_backup_restore_title">備份與還原</string>
   <string name="album_item_backup_restore_subtitle">備份與還原快照</string>
   <string name="album_item_track_title">追蹤</string>
@@ -269,4 +299,5 @@
   <string name="snapshot_menu_show_update_time">顯示更新時間</string>
   <string name="snapshot_menu_hide_no_component_changes">隱藏沒有元件變更</string>
   <string name="snapshot_menu_diff_highlight">重點標示差異</string>
+  <string name="snapshot_menu_use_iec_units">使用 IEC 單元</string>
 </resources>
