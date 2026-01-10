@@ -329,18 +329,26 @@ class ApkPreview(val url: String) {
   }
 
   private fun fetchMetadata(): FileMetadata {
-    val headRequest = newRequestBuilder().head().build()
-    val headResult = runCatching { executeRequest(headRequest) }.getOrNull()
+    val isAwsPresignedUrl = httpUrl.queryParameterNames.any { it.startsWith("X-Amz-") }
 
-    headResult?.use { response ->
-      if (response.isSuccessful) {
-        val contentLength = response.header("Content-Length")?.toLongOrNull() ?: -1L
-        val supportsRange =
-          response.header("Accept-Ranges")?.contains("bytes", ignoreCase = true) == true
-        return FileMetadata(contentLength, supportsRange)
-      }
-      if (response.code != HttpURLConnection.HTTP_BAD_METHOD && response.code != HttpURLConnection.HTTP_NOT_IMPLEMENTED) {
-        error("Failed to fetch metadata for $url with HEAD: ${response.code}")
+    if (!isAwsPresignedUrl) {
+      val headRequest = newRequestBuilder().head().build()
+      val headResult = runCatching { executeRequest(headRequest) }.getOrNull()
+
+      headResult?.use { response ->
+        if (response.isSuccessful) {
+          val contentLength = response.header("Content-Length")?.toLongOrNull() ?: -1L
+          val supportsRange =
+            response.header("Accept-Ranges")?.contains("bytes", ignoreCase = true) == true
+          return FileMetadata(contentLength, supportsRange)
+        }
+        if (response.code != HttpURLConnection.HTTP_BAD_REQUEST &&
+          response.code != HttpURLConnection.HTTP_UNAUTHORIZED &&
+          response.code != HttpURLConnection.HTTP_FORBIDDEN &&
+          response.code != HttpURLConnection.HTTP_BAD_METHOD &&
+          response.code != HttpURLConnection.HTTP_NOT_IMPLEMENTED) {
+          error("Failed to fetch metadata for $url with HEAD: ${response.code}")
+        }
       }
     }
 
