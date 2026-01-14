@@ -21,7 +21,7 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version = "2.3.4" }
 protobuf = { id = "com.google.protobuf", version = "0.9.6" }
-moshiX = "dev.zacsweers.moshix:0.34.1"
+moshiX = "dev.zacsweers.moshix:0.34.2"
 spotless = "com.diffplug.spotless:8.1.0"
 aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin.android", version.ref = "aboutlibraries" }
 
