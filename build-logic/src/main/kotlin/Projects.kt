@@ -1,7 +1,6 @@
+import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.CommonExtension
-import com.android.build.gradle.BaseExtension
-import com.android.build.gradle.LibraryExtension
-import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
+import com.android.build.api.dsl.LibraryExtension
 import java.io.File
 import org.gradle.api.Project
 
@@ -15,11 +14,14 @@ fun Project.setupLibraryModule(block: LibraryExtension.() -> Unit = {}) {
   setupBaseModule(block)
 }
 
-fun Project.setupAppModule(block: BaseAppModuleExtension.() -> Unit = {}) {
-  setupBaseModule<BaseAppModuleExtension> {
+fun Project.setupAppModule(block: ApplicationExtension.() -> Unit = {}) {
+  setupBaseModule<ApplicationExtension> {
     defaultConfig {
       versionCode = verCode
       versionName = verName
+      minSdk = 24
+      targetSdk = 36
+
       androidResources {
         ignoreAssetsPatterns += "!PublicSuffixDatabase.list" // OkHttp5
         generateLocaleConfig = true
@@ -74,24 +76,14 @@ fun Project.setupAppModule(block: BaseAppModuleExtension.() -> Unit = {}) {
   }
 }
 
-private inline fun <reified T : BaseExtension> Project.setupBaseModule(crossinline block: T.() -> Unit = {}) {
-  extensions.configure<BaseExtension>("android") {
-    (this as? CommonExtension<*, *, *, *, *, *>)?.apply {
-      compileSdk {
-        version = release(36) {
-          minorApiLevel = 1
-        }
-      }
-    } ?: {
-      compileSdkVersion(36)
-    }
-    defaultConfig {
-      minSdk = 24
-      targetSdk = 36
-    }
+private inline fun <reified T : CommonExtension> Project.setupBaseModule(crossinline block: T.() -> Unit = {}) {
+  extensions.configure<CommonExtension>("android") {
+    compileSdk = 36
+
     sourceSets.configureEach {
-      java.srcDirs("src/$name/kotlin")
+      java.directories.add("src/$name/kotlin")
     }
+    includeKotlinToolingMetadataInApk()
     (this as T).block()
   }
 }
@@ -99,3 +91,10 @@ private inline fun <reified T : BaseExtension> Project.setupBaseModule(crossinli
 fun Project.exec(command: String): String = providers.exec {
   commandLine(command.split(" "))
 }.standardOutput.asText.get().trim()
+
+fun Project.includeKotlinToolingMetadataInApk() {
+  val m = Class.forName("org.jetbrains.kotlin.gradle.tooling.IncludeKotlinToolingMetadataInApkKt")
+    .getDeclaredMethod("includeKotlinToolingMetadataInApk", Project::class.java)
+  m.isAccessible = true
+  m.invoke(null, this)
+}

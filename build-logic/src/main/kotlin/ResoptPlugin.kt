@@ -18,6 +18,7 @@ interface Injected {
 }
 
 class ResoptPlugin : Plugin<Project> {
+  @Suppress("NewApi")
   override fun apply(project: Project) {
     project.plugins.withType(AndroidBasePlugin::class.java) {
       project.extensions.configure(AndroidComponentsExtension::class.java) {
@@ -29,7 +30,10 @@ class ResoptPlugin : Plugin<Project> {
             sdkComponents.sdkDirectory.get().toString(), "build-tools", ext.buildToolsVersion, "aapt2"
           )
           val workdir = Paths.get(
-            project.layout.buildDirectory.toString(), "intermediates", "optimized_processed_res", name, "optimize${name.replaceFirstChar { it.uppercase() }}Resources"
+            project.layout.buildDirectory.get().toString(), "intermediates", "optimized_processed_res", name, "optimize${name.replaceFirstChar { it.uppercase() }}Resources"
+          ).toFile()
+          val cfg = Paths.get(
+            project.layout.projectDirectory.toString(), "aapt2-resources.cfg"
           ).toFile()
           val zip =
             if (variant.flavorName.isNullOrEmpty()) "resources-${variant.buildType}-optimize.ap_" else "resources-${variant.flavorName}-${variant.buildType}-optimize.ap_"
@@ -42,6 +46,7 @@ class ResoptPlugin : Plugin<Project> {
                   aapt2,
                   "optimize",
                   "--collapse-resource-names",
+                  "--resources-config-path", cfg.path,
                   "-o",
                   optimized,
                   zip

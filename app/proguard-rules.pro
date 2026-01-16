@@ -66,15 +66,12 @@
 }
 
 -assumenosideeffects class kotlin.jvm.internal.Intrinsics {
-    static void checkParameterIsNotNull(java.lang.Object, java.lang.String);
-    static void checkExpressionValueIsNotNull(java.lang.Object, java.lang.String);
-    static void checkNotNullExpressionValue(java.lang.Object, java.lang.String);
-    static void checkReturnedValueIsNotNull(java.lang.Object, java.lang.String, java.lang.String);
-    static void checkReturnedValueIsNotNull(java.lang.Object, java.lang.String);
-    static void checkFieldIsNotNull(java.lang.Object, java.lang.String, java.lang.String);
-    static void checkFieldIsNotNull(java.lang.Object, java.lang.String);
-    static void checkNotNull(java.lang.Object, java.lang.String);
-    static void checkNotNullParameter(java.lang.Object, java.lang.String);
+    public static void check*(...);
+    public static void throw*(...);
+}
+
+-assumenosideeffects class java.util.Objects {
+    ** requireNonNull(...);
 }
 
 -dontwarn org.xmlpull.v1.XmlPullParser

@@ -1,18 +1,16 @@
-import com.android.build.gradle.internal.api.ApkVariantOutputImpl
 import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 
 plugins {
   alias(libs.plugins.android.application)
-  alias(libs.plugins.kotlin.android)
   alias(libs.plugins.kotlin.parcelize)
   alias(libs.plugins.protobuf)
   alias(libs.plugins.hiddenApiRefine)
   alias(libs.plugins.ksp)
   alias(libs.plugins.moshiX)
   alias(libs.plugins.aboutlibraries)
-  id("res-opt") apply false
   id(libs.plugins.gms.get().pluginId)
   id(libs.plugins.firebase.crashlytics.get().pluginId)
+  id("res-opt")
 }
 
 ksp {
@@ -48,13 +46,13 @@ setupAppModule {
 
     create("foss") {
       isDefault = true
-      dimension = flavorDimensionList[0]
+      dimension = flavorDimensions[0]
       configure<CrashlyticsExtension> {
         mappingFileUploadEnabled = false
       }
     }
     create("market") {
-      dimension = flavorDimensionList[0]
+      dimension = flavorDimensions[0]
     }
     all {
       manifestPlaceholders["channel"] = this.name
@@ -65,28 +63,35 @@ setupAppModule {
     jniLibs {
       excludes += "lib/**/libdatastore_shared_counter.so" // Jetpack DataStore
     }
+    resources {
+      excludes += setOf(
+        "META-INF/**",
+        "okhttp3/**",
+        "kotlin/**",
+        "org/**",
+        "**.properties",
+        "**.bin",
+        "**/*.proto"
+      )
+    }
   }
-
-  packagingOptions.resources.excludes += setOf(
-    "META-INF/**",
-    "okhttp3/**",
-    "kotlin/**",
-    "org/**",
-    "**.properties",
-    "**.bin",
-    "**/*.proto"
-  )
 
   lint {
     disable += setOf("AppCompatResource", "MissingTranslation")
   }
 
   dependenciesInfo.includeInApk = false
+}
 
-  applicationVariants.configureEach {
-    outputs.configureEach {
-      (this as? ApkVariantOutputImpl)?.outputFileName =
-        "LibChecker-$verName-$verCode-$name.apk"
+androidComponents {
+  onVariants { variant ->
+    variant.outputs.forEach { output ->
+      // TODO: https://github.com/android/gradle-recipes/blob/cbe7c7dea2a3f5b1764756f24bf453d1235c80e2/listenToArtifacts/README.md
+      with(output as com.android.build.api.variant.impl.VariantOutputImpl) {
+        val newApkName =
+          "LibChecker-${versionName.get()}-${versionCode.get()}-${variant.buildType}.apk"
+        outputFileName = newApkName
+      }
     }
   }
 }
