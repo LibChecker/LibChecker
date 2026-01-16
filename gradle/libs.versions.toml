@@ -1,5 +1,5 @@
 [versions]
-agp = "8.13.2"
+agp = "9.0.0"
 aboutlibraries = "13.2.1"
 androidX-lifecycle = "2.10.0"
 androidX-room = "2.8.4"
