@@ -825,10 +825,32 @@ class DetailViewModel : ViewModel() {
   private fun getAllAppIcons(pi: PackageInfo): List<AppIconItem> {
     if (!OsUtils.atLeastO()) return emptyList()
     val ai = pi.applicationInfo ?: return emptyList()
+    val pm = SystemServices.packageManager
     val icons = mutableListOf<AppIconItem>()
-    val mainIcon = SystemServices.packageManager.getApplicationIcon(ai)
+
+    // Get the icon displayed by the system (potentially themed/overridden by OEM)
+    val mainIcon = pm.getApplicationIcon(ai)
+
+    // Check if the system-returned icon has a monochrome layer
+    var hasAddedMonochrome = false
     if (OsUtils.atLeastT() && mainIcon is AdaptiveIconDrawable && mainIcon.monochrome != null) {
       icons.add(AppIconItem(mainIcon, true))
+      hasAddedMonochrome = true
+    }
+
+    // If monochrome is missing (likely due to OEM icon packs),
+    // try loading the raw drawable directly from resources to bypass the theme engine.
+    if (!hasAddedMonochrome && OsUtils.atLeastT() && ai.icon != 0) {
+      try {
+        val res = pm.getResourcesForApplication(ai)
+        // Load the drawable directly using the resource ID, bypassing PM's icon logic
+        val rawIcon = res.getDrawable(ai.icon, null)
+
+        if (rawIcon is AdaptiveIconDrawable && rawIcon.monochrome != null) {
+          icons.add(AppIconItem(rawIcon, true))
+        }
+      } catch (_: Exception) {
+      }
     }
 
     val altIconsIntent = Intent(Intent.ACTION_MAIN).apply {
