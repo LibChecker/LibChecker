@@ -377,13 +377,15 @@ fun PackageInfo.getKotlinPluginInfo(): Map<String, String?> {
       val entry = zip.getEntry("kotlin-tooling-metadata.json") ?: return@runCatching null
       zip.getInputStream(entry).source().buffer().use {
         val json = it.readUtf8().fromJson<KotlinToolingMetadata>()
+        val kotlinAndroidTarget =
+          json?.projectTargets?.find { target -> target.target == "org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget" }
+
         map["Kotlin"] =
-          json?.buildPluginVersion.takeIf { json?.buildPlugin == "org.jetbrains.kotlin.gradle.plugin.KotlinAndroidPluginWrapper" }
+          json?.buildPluginVersion.takeIf { json?.buildPlugin == "org.jetbrains.kotlin.gradle.plugin.KotlinAndroidPluginWrapper" || kotlinAndroidTarget != null }
         if (json?.buildSystem == "Gradle" && json.buildSystemVersion.isNotEmpty()) {
           map["Gradle"] = json.buildSystemVersion
         }
-        val kotlinAndroidTarget =
-          json?.projectTargets?.find { target -> target.target == "org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget" }
+
         val sourceCompatibility = kotlinAndroidTarget?.extras?.android?.sourceCompatibility
         if (kotlinAndroidTarget != null && sourceCompatibility.isNullOrEmpty().not()) {
           map["Java"] = sourceCompatibility

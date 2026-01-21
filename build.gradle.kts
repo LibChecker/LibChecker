@@ -5,7 +5,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 plugins {
   alias(libs.plugins.android.application) apply false
   alias(libs.plugins.android.library) apply false
-  alias(libs.plugins.kotlin.android) apply false
   alias(libs.plugins.kotlin.parcelize) apply false
   alias(libs.plugins.protobuf) apply false
   alias(libs.plugins.hiddenApiRefine) apply false
@@ -34,7 +33,7 @@ allprojects {
   // See https://kotlinlang.org/docs/gradle-configure-project.html#gradle-java-toolchains-support
   plugins.withType<JavaBasePlugin>().configureEach {
     extensions.configure<JavaPluginExtension> {
-      toolchain.languageVersion = JavaLanguageVersion.of(21)
+      toolchain.languageVersion = JavaLanguageVersion.of(25)
     }
   }
 
@@ -42,5 +41,12 @@ allprojects {
     compilerOptions {
       freeCompilerArgs.add("-Xannotation-default-target=param-property")
     }
+  }
+}
+
+buildscript {
+  dependencies {
+    // For KGP
+    classpath(libs.gradlePlugin.kotlin)
   }
 }
