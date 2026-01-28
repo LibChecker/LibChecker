@@ -118,9 +118,10 @@
   <string name="further_operation">مزيد من العمليات</string>
   <string name="app_info_launch">تشغيل</string>
   <string name="app_info_settings">الاعدادات</string>
-  <string name="app_info_share"></string>
+  <string name="app_info_share">Settings</string>
   <string name="lib_detail_dialog_title">تفاصيل المكتبة</string>
   <string name="lib_permission_dialog_title">تفاصيل الإذن</string>
+  <string name="lib_permission_provided_by_format">Provided by %s</string>
   <string name="agp_details">يعتمد نظام بناء Android Studio على Gradle, ويضيف المكون الإضافي Android Gradle العديد من الميزات الخاصة بإنشاء تطبيقات Android. على الرغم من أن المكون الإضافي لنظام Android يتم تحديثه عادة في خطوة قفل مع Android Studio ، إلا أن المكون الإضافي (وبقية نظام Gradle) يمكن تشغيله بشكل مستقل عن Android Studio ويتم تحديثه بشكل منفصل.</string>
   <string name="xposed_module">وحدة Xposed</string>
   <string name="xposed_module_details">Xposed هو إطار عمل للوحدات النمطية التي يمكنها تغيير سلوك النظام والتطبيقات دون لمس أي ملفات APK. هذا رائع لأنه يعني أن الوحدات يمكن أن تعمل مع إصدارات مختلفة وحتى ذاكرة القراءة فقط دون أي تغييرات.</string>
@@ -191,8 +192,15 @@
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">شيزوكو غير مصرح به</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">انقر هنا للحصول على إذن Shizuku مقدم التثبيت</string>
   <string name="lib_detail_elf_info">معلومات أكثر</string>
+  <string name="lib_detail_elf_extract">Extract</string>
+  <string name="lib_detail_elf_extract_success">ELF file saved to Downloads</string>
+  <string name="lib_detail_elf_extract_failed">Failed to extract ELF file</string>
   <string name="lib_detail_dependency_tip">التبعية</string>
   <string name="lib_detail_entry_points_tip">نقاط الدخول</string>
+  <string name="apk_preview">APK Preview</string>
+  <string name="apk_preview_item_not_available">Cannot be displayed in preview mode</string>
+  <string name="feature_live_update_notification">Live Update notification</string>
+  <string name="feature_live_update_notification_summary">The system promotes Live Update notifications. Promoted notifications appear more prominently on system surfaces, including at the top of the notification drawer and the lock screen, and as a chip in the status bar.</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">نسخ إلى الحافظة</string>
   <string name="toast_not_existing_market">لا يوجد أي سوق تطبيقات موجود</string>
@@ -201,6 +209,7 @@
   <string name="toast_cloud_rules_update_error">فشل تحديث قواعد السحابة. يرجى المحاولة مرة أخرى.</string>
   <string name="toast_not_enough_storage_space">لا توجد مساحة تخزين كافية</string>
   <string name="toast_downloading_app">تم طلب التنزيل</string>
+  <string name="toast_long_tap_share_button_tip">Long press the “Share” button to choose where to save</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">حفظ نقطة الاستعادة الحالية</string>
   <string name="snapshot_current_timestamp">الطابع الزمني الحالي لنقطة الاستعادة</string>
@@ -232,6 +241,8 @@
   <string name="btn_drop">تجاهل</string>
   <string name="dialog_title_compare_diff_apk">انتباه</string>
   <string name="dialog_message_compare_diff_apk">هل تريد مقارنة اثنين من ملفات APK مختلفة؟</string>
+  <string name="dialog_themed_and_alternative_app_icons">Themed and alternative icons</string>
+  <string name="dialog_themed">Themed</string>
   <!--  Album  -->
   <string name="album_compare">مقارنة</string>
   <string name="album_item_comparison_title">المقارنة</string>
