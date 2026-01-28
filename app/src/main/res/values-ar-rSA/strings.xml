@@ -118,6 +118,7 @@
   <string name="further_operation">مزيد من العمليات</string>
   <string name="app_info_launch">تشغيل</string>
   <string name="app_info_settings">الاعدادات</string>
+  <string name="app_info_share"></string>
   <string name="lib_detail_dialog_title">تفاصيل المكتبة</string>
   <string name="lib_permission_dialog_title">تفاصيل الإذن</string>
   <string name="agp_details">يعتمد نظام بناء Android Studio على Gradle, ويضيف المكون الإضافي Android Gradle العديد من الميزات الخاصة بإنشاء تطبيقات Android. على الرغم من أن المكون الإضافي لنظام Android يتم تحديثه عادة في خطوة قفل مع Android Studio ، إلا أن المكون الإضافي (وبقية نظام Gradle) يمكن تشغيله بشكل مستقل عن Android Studio ويتم تحديثه بشكل منفصل.</string>
