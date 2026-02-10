@@ -33,7 +33,7 @@ allprojects {
   // See https://kotlinlang.org/docs/gradle-configure-project.html#gradle-java-toolchains-support
   plugins.withType<JavaBasePlugin>().configureEach {
     extensions.configure<JavaPluginExtension> {
-      toolchain.languageVersion = JavaLanguageVersion.of(25)
+      toolchain.languageVersion = JavaLanguageVersion.of(21)
     }
   }
 
