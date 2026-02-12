@@ -223,7 +223,7 @@ class XposedInfoDialogFragment : BaseBottomSheetViewDialogFragment<XposedInfoBot
         } else {
           null
         } ?: moduleProp?.getProperty("description")
-        ?: metadataBundle["xposeddescription"]?.source.toString()
+          ?: metadataBundle["xposeddescription"]?.source.toString()
 
         if (description.isNotBlank() && description != "null") {
           list.add(
