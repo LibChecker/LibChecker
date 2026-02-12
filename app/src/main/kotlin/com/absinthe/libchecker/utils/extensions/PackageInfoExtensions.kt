@@ -359,10 +359,13 @@ fun PackageInfo.getFeatures(): Int {
  * @return True if is using 32-bit ABI
  */
 fun ApplicationInfo.isUse32BitAbi(): Boolean {
-  runCatching {
-    val demands = ManifestReader.getManifestProperties(File(sourceDir), arrayOf("use32bitAbi"))
-    return demands["use32bitAbi"] as? Boolean == true
-  }.getOrNull() ?: return false
+  return runCatching {
+    val demands = ManifestReader.getManifestProperties(
+      File(sourceDir),
+      arrayOf("use32bitAbi")
+    )
+    demands["use32bitAbi"] as? Boolean == true
+  }.getOrElse { false }
 }
 
 /**
@@ -819,13 +822,13 @@ fun PackageInfo.isArchivedPackage(): Boolean {
  * https://source.android.com/docs/core/architecture/16kb-page-size/16kb-backcompat-option
  */
 fun PackageInfo.isPageSizeCompat(): Boolean {
-  runCatching {
+  return runCatching {
     val demands = ManifestReader.getManifestProperties(
       File(applicationInfo!!.sourceDir),
       arrayOf("pageSizeCompat")
     )
-    return demands["pageSizeCompat"] as? String == "enabled"
-  }.getOrNull() ?: return false
+    demands["pageSizeCompat"] as? String == "enabled"
+  }.getOrElse { false }
 }
 
 fun PackageInfo.getSignatureSchemes(): ApkVerifier.Result? {
