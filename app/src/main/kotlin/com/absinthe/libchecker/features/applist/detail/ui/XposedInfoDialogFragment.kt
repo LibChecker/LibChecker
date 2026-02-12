@@ -18,6 +18,7 @@ import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
+import java.util.Properties
 
 const val CATEGORY_XPOSED_SETTINGS = "de.robv.android.xposed.category.MODULE_SETTINGS"
 
@@ -64,30 +65,41 @@ class XposedInfoDialogFragment : BaseBottomSheetViewDialogFragment<XposedInfoBot
       }
       val metadataBundle = PackageUtils.getMetaDataItems(pi).associateBy { it.name }
       val list = mutableListOf<XposedDetailItem>()
-      list.add(
-        XposedDetailItem(
-          iconRes = R.drawable.ic_app_prop,
-          tip = context.getString(R.string.lib_detail_xposed_min_version),
-          text = metadataBundle["xposedminversion"]?.source.toString(),
-          textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2)
-        )
-      )
-      metadataBundle["xposedscope"]?.let { scopeItem ->
-        val appRes = SystemServices.packageManager.getResourcesForApplication(packageName)
-        runCatching {
-          appRes.getStringArray(scopeItem.size.toInt()).contentToString()
-        }.getOrNull()?.let { content ->
-          list.add(
-            XposedDetailItem(
-              iconRes = R.drawable.ic_app_prop,
-              tip = context.getString(R.string.lib_detail_xposed_default_scope),
-              text = content,
-              textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2)
-            )
-          )
-        }
-      }
+
       ZipFileCompat(pi.applicationInfo!!.sourceDir).use { zipFile ->
+        val moduleProp = zipFile.getEntry("META-INF/xposed/module.prop")?.let { entry ->
+          Properties().apply {
+            load(zipFile.getInputStream(entry))
+          }
+        }
+
+        val minVersion = moduleProp?.getProperty("xposedMinVersion")
+          ?: metadataBundle["xposedminversion"]?.source.toString()
+        list.add(
+          XposedDetailItem(
+            iconRes = R.drawable.ic_app_prop,
+            tip = context.getString(R.string.lib_detail_xposed_min_version),
+            text = minVersion,
+            textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2)
+          )
+        )
+
+        metadataBundle["xposedscope"]?.let { scopeItem ->
+          val appRes = SystemServices.packageManager.getResourcesForApplication(packageName)
+          runCatching {
+            appRes.getStringArray(scopeItem.size.toInt()).contentToString()
+          }.getOrNull()?.let { content ->
+            list.add(
+              XposedDetailItem(
+                iconRes = R.drawable.ic_app_prop,
+                tip = context.getString(R.string.lib_detail_xposed_default_scope),
+                text = content,
+                textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2)
+              )
+            )
+          }
+        }
+
         zipFile.getEntry("assets/xposed_init")?.let { entry ->
           val cls = zipFile.getInputStream(entry).bufferedReader().readLines().firstOrNull()
           list.add(
@@ -99,15 +111,18 @@ class XposedInfoDialogFragment : BaseBottomSheetViewDialogFragment<XposedInfoBot
             )
           )
         }
-      }
-      list.add(
-        XposedDetailItem(
-          iconRes = R.drawable.ic_content,
-          tip = context.getString(R.string.lib_detail_description_tip),
-          text = metadataBundle["xposeddescription"]?.source.toString(),
-          textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBody2)
+
+        val description = moduleProp?.getProperty("description")
+          ?: metadataBundle["xposeddescription"]?.source.toString()
+        list.add(
+          XposedDetailItem(
+            iconRes = R.drawable.ic_content,
+            tip = context.getString(R.string.lib_detail_description_tip),
+            text = description,
+            textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBody2)
+          )
         )
-      )
+      }
       contentAdapter.setList(list)
     }
   }

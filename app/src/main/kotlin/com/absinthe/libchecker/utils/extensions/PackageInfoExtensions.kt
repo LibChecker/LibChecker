@@ -260,8 +260,16 @@ fun PackageInfo.getPackageSize(includeSplits: Boolean): Long {
  * @return True if is a Xposed module
  */
 fun PackageInfo.isXposedModule(): Boolean {
-  val metaData = applicationInfo?.metaData ?: return false
-  return metaData.getBoolean("xposedmodule") || metaData.containsKey("xposedminversion")
+  val metaData = applicationInfo?.metaData
+  if (metaData != null && (metaData.getBoolean("xposedmodule") || metaData.containsKey("xposedminversion"))) {
+    return true
+  }
+  val sourceDir = applicationInfo?.sourceDir ?: return false
+  return runCatching {
+    ZipFileCompat(File(sourceDir)).use {
+      it.getEntry("META-INF/xposed/module.prop") != null
+    }
+  }.getOrDefault(false)
 }
 
 /**
