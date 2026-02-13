@@ -184,6 +184,8 @@
   <string name="lib_detail_app_props_title">App properties</string>
   <string name="lib_detail_app_props_tip">More details</string>
   <string name="lib_detail_xposed_min_version">Minimum version</string>
+  <string name="lib_detail_xposed_target_version">Target version</string>
+  <string name="lib_detail_xposed_static_scope">Static scope</string>
   <string name="lib_detail_xposed_default_scope">Default scope</string>
   <string name="lib_detail_xposed_init_class">Initialization class</string>
   <string name="lib_detail_app_install_source_title">Installation source</string>

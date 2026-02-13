@@ -172,6 +172,8 @@
   <string name="lib_detail_app_props_title">应用属性</string>
   <string name="lib_detail_app_props_tip">更多资料</string>
   <string name="lib_detail_xposed_min_version">Min 版本</string>
+  <string name="lib_detail_xposed_target_version">Target 版本</string>
+  <string name="lib_detail_xposed_static_scope">静态 Scope</string>
   <string name="lib_detail_xposed_default_scope">默认 Scope</string>
   <string name="lib_detail_xposed_init_class">初始化类</string>
   <string name="lib_detail_app_install_source_title">安装来源</string>

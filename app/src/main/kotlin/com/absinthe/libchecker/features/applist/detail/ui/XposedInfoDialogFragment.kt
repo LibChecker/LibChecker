@@ -18,6 +18,7 @@ import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
+import java.util.Properties
 
 const val CATEGORY_XPOSED_SETTINGS = "de.robv.android.xposed.category.MODULE_SETTINGS"
 
@@ -64,50 +65,177 @@ class XposedInfoDialogFragment : BaseBottomSheetViewDialogFragment<XposedInfoBot
       }
       val metadataBundle = PackageUtils.getMetaDataItems(pi).associateBy { it.name }
       val list = mutableListOf<XposedDetailItem>()
-      list.add(
-        XposedDetailItem(
-          iconRes = R.drawable.ic_app_prop,
-          tip = context.getString(R.string.lib_detail_xposed_min_version),
-          text = metadataBundle["xposedminversion"]?.source.toString(),
-          textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2)
-        )
-      )
-      metadataBundle["xposedscope"]?.let { scopeItem ->
-        val appRes = SystemServices.packageManager.getResourcesForApplication(packageName)
-        runCatching {
-          appRes.getStringArray(scopeItem.size.toInt()).contentToString()
-        }.getOrNull()?.let { content ->
+
+      ZipFileCompat(pi.applicationInfo!!.sourceDir).use { zipFile ->
+        // --- Load Modern Config (module.prop) ---
+        val moduleProp = zipFile.getEntry("META-INF/xposed/module.prop")?.let { entry ->
+          Properties().apply {
+            load(zipFile.getInputStream(entry))
+          }
+        }
+        // --- Min API Version ---
+        // Doc: "minApiVersion (int) - Indicates the minimal Xposed API version"
+        // Fallback: legacy xposedMinVersion (prop) -> legacy meta-data
+        val minVersions = mutableListOf<Int>()
+
+        moduleProp?.getProperty("minApiVersion")?.toIntOrNull()?.let {
+          minVersions.add(it)
+        }
+        moduleProp?.getProperty("xposedMinVersion")?.toIntOrNull()?.let {
+          minVersions.add(it)
+        }
+        metadataBundle["xposedminversion"]?.source?.toIntOrNull()?.let {
+          minVersions.add(it)
+        }
+
+        val finalMinVersion = minVersions.minOrNull()?.toString()
+
+        if (!finalMinVersion.isNullOrBlank()) {
           list.add(
             XposedDetailItem(
               iconRes = R.drawable.ic_app_prop,
-              tip = context.getString(R.string.lib_detail_xposed_default_scope),
-              text = content,
+              tip = context.getString(R.string.lib_detail_xposed_min_version),
+              text = finalMinVersion,
               textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2)
             )
           )
         }
-      }
-      ZipFileCompat(pi.applicationInfo!!.sourceDir).use { zipFile ->
+
+        // --- Target API Version ---
+        // Doc: "targetApiVersion (int) - Indicates the target Xposed API version"
+        val targetVersion = moduleProp?.getProperty("targetApiVersion")
+        if (!targetVersion.isNullOrBlank()) {
+          list.add(
+            XposedDetailItem(
+              iconRes = R.drawable.ic_app_prop,
+              tip = context.getString(R.string.lib_detail_xposed_target_version),
+              text = targetVersion,
+              textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2)
+            )
+          )
+        }
+
+        // --- Static Scope (New in Modern API) ---
+        // Doc: "staticScope (boolean) - Indicates whether users should not apply the module on any other app out of scope"
+        val staticScope = moduleProp?.getProperty("staticScope")
+        if (staticScope == "true") {
+          list.add(
+            XposedDetailItem(
+              iconRes = R.drawable.ic_app_prop,
+              tip = context.getString(R.string.lib_detail_xposed_static_scope),
+              text = "True",
+              textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2)
+            )
+          )
+        }
+
+        // --- Scope List ---
+        // Doc: "scope list uses META-INF/xposed/scope.list (one line for one package name)"
+        val scopeListEntry = zipFile.getEntry("META-INF/xposed/scope.list")
+        if (scopeListEntry != null) {
+          val scopes = zipFile.getInputStream(scopeListEntry).bufferedReader().readLines()
+            .filter { it.isNotBlank() }
+
+          if (scopes.isNotEmpty()) {
+            list.add(
+              XposedDetailItem(
+                iconRes = R.drawable.ic_app_prop,
+                tip = context.getString(R.string.lib_detail_xposed_default_scope),
+                text = scopes.joinToString("\n"),
+                textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2)
+              )
+            )
+          }
+        } else {
+          // Legacy: Metadata resource array
+          metadataBundle["xposedscope"]?.let { scopeItem ->
+            val appRes = SystemServices.packageManager.getResourcesForApplication(packageName)
+            runCatching {
+              appRes.getStringArray(scopeItem.size.toInt()).contentToString()
+            }.getOrNull()?.let { content ->
+              list.add(
+                XposedDetailItem(
+                  iconRes = R.drawable.ic_app_prop,
+                  tip = context.getString(R.string.lib_detail_xposed_default_scope),
+                  text = content,
+                  textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2)
+                )
+              )
+            }
+          }
+        }
+
+        // --- Entry Points ---
+        // Doc: "Java entry now uses META-INF/xposed/java_init.list"
+        zipFile.getEntry("META-INF/xposed/java_init.list")?.let { entry ->
+          val classes = zipFile.getInputStream(entry).bufferedReader().readLines()
+            .filter { it.isNotBlank() }
+            .joinToString("\n")
+          if (classes.isNotBlank()) {
+            list.add(
+              XposedDetailItem(
+                iconRes = R.drawable.ic_app_prop,
+                tip = context.getString(R.string.lib_detail_xposed_init_class) + " (Java)",
+                text = classes,
+                textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2)
+              )
+            )
+          }
+        }
+
+        // Doc: "native entry now uses META-INF/xposed/native_init.list"
+        zipFile.getEntry("META-INF/xposed/native_init.list")?.let { entry ->
+          val libs = zipFile.getInputStream(entry).bufferedReader().readLines()
+            .filter { it.isNotBlank() }
+            .joinToString("\n")
+          if (libs.isNotBlank()) {
+            list.add(
+              XposedDetailItem(
+                iconRes = R.drawable.ic_app_prop,
+                tip = context.getString(R.string.lib_detail_xposed_init_class) + " (Native)",
+                text = libs,
+                textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2)
+              )
+            )
+          }
+        }
+
+        // Legacy: assets/xposed_init
         zipFile.getEntry("assets/xposed_init")?.let { entry ->
           val cls = zipFile.getInputStream(entry).bufferedReader().readLines().firstOrNull()
+          if (!cls.isNullOrBlank()) {
+            list.add(
+              XposedDetailItem(
+                iconRes = R.drawable.ic_app_prop,
+                tip = context.getString(R.string.lib_detail_xposed_init_class) + " (Legacy)",
+                text = cls,
+                textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2)
+              )
+            )
+          }
+        }
+
+        // --- Description ---
+        // Doc: "module description uses the android:description resource"
+        // Fallback: module.prop description -> metadata xposeddescription
+        val description = if (pi.applicationInfo?.descriptionRes != 0) {
+          pi.applicationInfo?.loadDescription(SystemServices.packageManager)?.toString()
+        } else {
+          null
+        } ?: moduleProp?.getProperty("description")
+          ?: metadataBundle["xposeddescription"]?.source.toString()
+
+        if (description.isNotBlank() && description != "null") {
           list.add(
             XposedDetailItem(
-              iconRes = R.drawable.ic_app_prop,
-              tip = context.getString(R.string.lib_detail_xposed_init_class),
-              text = cls.toString(),
-              textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2)
+              iconRes = R.drawable.ic_content,
+              tip = context.getString(R.string.lib_detail_description_tip),
+              text = description,
+              textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBody2)
             )
           )
         }
       }
-      list.add(
-        XposedDetailItem(
-          iconRes = R.drawable.ic_content,
-          tip = context.getString(R.string.lib_detail_description_tip),
-          text = metadataBundle["xposeddescription"]?.source.toString(),
-          textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBody2)
-        )
-      )
       contentAdapter.setList(list)
     }
   }
