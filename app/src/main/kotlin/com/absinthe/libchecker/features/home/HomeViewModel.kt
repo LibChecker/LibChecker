@@ -164,7 +164,7 @@ class HomeViewModel : ViewModel() {
       return
     }
     viewModelScope.launch {
-      initJob = initItemsImpl(context, LocalAppDataSource.getApplicationList())
+      initJob = initItemsImpl(context, LocalAppDataSource.getApplicationList(true))
     }
   }
 
@@ -264,8 +264,8 @@ class HomeViewModel : ViewModel() {
       }
     } else {
       val dbApps = dbItems.map { it.packageName }.toSet()
-      var applications = LocalAppDataSource.getApplicationMap()
-      var localApps = applications.map { it -> it.key }.toSet()
+      var applications = LocalAppDataSource.getApplicationMap(true)
+      var localApps = applications.map { it.key }.toSet()
       var newApps = localApps - dbApps
       var removedApps = dbApps - localApps
 
@@ -276,7 +276,7 @@ class HomeViewModel : ViewModel() {
       if (newApps.size > 30 || removedApps.size > 30) {
         Timber.w("Request change canceled because of large diff, re-request appMap")
         applications = LocalAppDataSource.getApplicationMap(true)
-        localApps = applications.map { it -> it.key }.toSet()
+        localApps = applications.map { it.key }.toSet()
         newApps = localApps - dbApps
         removedApps = dbApps - localApps
       }
