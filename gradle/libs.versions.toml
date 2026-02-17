@@ -5,7 +5,7 @@ androidX-lifecycle = "2.10.0"
 androidX-room = "2.8.4"
 firebase-bom = "34.8.0"
 hiddenApiRefine = "4.4.0"
-kotlin = "2.3.0"
+kotlin = "2.3.10"
 protoc = "4.33.4"
 shizuku = "13.1.5"
 square-retrofit = "3.0.0"
@@ -18,7 +18,7 @@ firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.
 gms = { id = "com.google.gms.google-services", version = "4.4.4" }
 hiddenApiRefine = { id = "dev.rikka.tools.refine", version.ref = "hiddenApiRefine" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
-ksp = { id = "com.google.devtools.ksp", version = "2.3.5" }
+ksp = { id = "com.google.devtools.ksp", version = "2.3.6" }
 protobuf = { id = "com.google.protobuf", version = "0.9.6" }
 moshiX = "dev.zacsweers.moshix:0.34.4"
 spotless = "com.diffplug.spotless:8.2.1"
