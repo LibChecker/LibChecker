@@ -9,7 +9,7 @@
   app:consumeSystemWindowsInsets="start|end"
   app:edgeToEdge="true"
   app:fitsSystemWindowsInsets="start|end"
-  tools:context=".ui.album.TrackActivity">
+  tools:context=".features.album.track.ui.TrackActivity">
 
   <com.google.android.material.appbar.AppBarLayout
     android:id="@+id/appbar"
@@ -19,7 +19,7 @@
     android:fitsSystemWindows="true"
     app:layout_constraintTop_toTopOf="parent">
 
-    <androidx.appcompat.widget.Toolbar
+    <androidx.appcompat.widget.ToolbarFix
       android:id="@+id/toolbar"
       style="?actionBarStyle"
       android:layout_width="match_parent"

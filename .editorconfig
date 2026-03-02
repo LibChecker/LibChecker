@@ -9,3 +9,12 @@ trim_trailing_whitespace = true
 
 [*.java]
 ij_java_use_single_class_imports = true
+
+[*.{kt,kts}]
+ij_kotlin_imports_layout = *
+ij_kotlin_allow_trailing_comma = false
+ij_kotlin_allow_trailing_comma_on_call_site = false
+ktlint_code_style = intellij_idea
+ktlint_standard_property-naming = disabled
+ktlint_standard_backing-property-naming = disabled
+ktlint_standard_function-expression-body = disabled

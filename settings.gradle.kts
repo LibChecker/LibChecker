@@ -1,28 +1,50 @@
 pluginManagement {
-  resolutionStrategy {
-    eachPlugin {
-      if (requested.id.id == "dev.rikka.tools.refine.gradle-plugin") {
-        useModule("dev.rikka.tools.refine:gradle-plugin:${requested.version}")
+  repositories {
+    google {
+      content {
+        includeGroupByRegex(".*google.*")
+        includeGroupByRegex(".*android.*")
       }
     }
-  }
-  repositories {
-    gradlePluginPortal()
-    google()
     mavenCentral()
+    gradlePluginPortal()
   }
+
+  includeBuild("build-logic")
 }
 
 dependencyResolutionManagement {
-  repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+  repositoriesMode = RepositoriesMode.FAIL_ON_PROJECT_REPOS
   repositories {
-    google()
+    google {
+      content {
+        includeGroupByRegex(".*google.*")
+        includeGroupByRegex(".*android.*")
+      }
+    }
     mavenCentral()
     maven("https://jitpack.io")
   }
 }
 
+plugins {
+  id("com.gradle.develocity") version "4.3.2"
+  id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
+
+develocity {
+  buildScan {
+    termsOfUseUrl = "https://gradle.com/terms-of-service"
+    termsOfUseAgree = "yes"
+    // TODO: workaround for https://github.com/gradle/gradle/issues/22879.
+    val isCI = providers.environmentVariable("CI").isPresent
+    publishing.onlyIf { isCI }
+  }
+}
+
+enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 include(":app", ":hidden-api")
+
 rootProject.name = "LibChecker"

@@ -1,14 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.absinthe.libchecker.view.detail.ComponentRecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
-  android:id="@android:id/list"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  android:clipToPadding="false"
-  android:descendantFocusability="beforeDescendants"
-  android:scrollbars="none"
-  app:borderBottomVisibility="never"
-  app:borderTopDrawable="@null"
-  app:borderTopVisibility="whenTop"
-  app:fitsSystemWindowsInsets="bottom"
-  app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+  android:orientation="vertical">
+
+  <com.google.android.material.tabs.TabLayout
+    android:id="@+id/tab_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?android:colorBackground"
+    app:tabGravity="start"
+    app:tabMode="scrollable" />
+
+  <com.absinthe.libchecker.features.applist.detail.ui.view.ComponentRecyclerView
+    android:id="@android:id/list"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:descendantFocusability="beforeDescendants"
+    android:scrollbars="none"
+    app:borderBottomVisibility="never"
+    app:borderTopDrawable="@null"
+    app:borderTopVisibility="whenTop"
+    app:fitsSystemWindowsInsets="bottom"
+    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+</LinearLayout>

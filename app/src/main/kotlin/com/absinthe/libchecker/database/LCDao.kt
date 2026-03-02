@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.database
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -20,7 +19,10 @@ interface LCDao {
 
   // Item Table
   @Query("SELECT * from item_table ORDER BY label ASC")
-  fun getItems(): LiveData<List<LCItem>>
+  fun getItemsFlow(): Flow<List<LCItem>>
+
+  @Query("SELECT * from item_table ORDER BY label ASC")
+  suspend fun getItems(): List<LCItem>
 
   @Query("SELECT * from item_table WHERE packageName LIKE :packageName")
   suspend fun getItem(packageName: String): LCItem?
@@ -37,15 +39,18 @@ interface LCDao {
   @Delete
   suspend fun delete(item: LCItem)
 
+  @Query("DELETE FROM item_table WHERE packageName = :packageName")
+  fun deleteLCItemByPackageName(packageName: String)
+
   @Query("DELETE FROM item_table")
   fun deleteAllItems()
 
-  @Query("UPDATE item_table SET isKotlinUsed = :used WHERE packageName = :packageName")
-  fun updateKotlinUsage(packageName: String, used: Boolean)
+  @Query("UPDATE item_table SET features = :features WHERE packageName = :packageName")
+  fun updateFeatures(packageName: String, features: Int)
 
   @Transaction
-  fun updateKotlinUsage(map: Map<String, Boolean>) {
-    map.forEach { updateKotlinUsage(it.key, it.value) }
+  fun updateFeatures(map: Map<String, Int>) {
+    map.forEach { updateFeatures(it.key, it.value) }
   }
 
   // Snapshot Table
@@ -64,10 +69,10 @@ interface LCDao {
   @Query("SELECT * from snapshot_table WHERE timeStamp LIKE :timestamp ORDER BY packageName ASC")
   fun getSnapshotsFlow(timestamp: Long): Flow<List<SnapshotItem>>
 
-  @Insert(onConflict = OnConflictStrategy.IGNORE)
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
   suspend fun insert(item: SnapshotItem)
 
-  @Insert(onConflict = OnConflictStrategy.IGNORE)
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
   suspend fun insertSnapshots(items: List<SnapshotItem>)
 
   @Update
@@ -78,6 +83,10 @@ interface LCDao {
 
   @Delete
   suspend fun delete(item: SnapshotItem)
+
+  @Transaction
+  @Query("DELETE FROM snapshot_table WHERE id NOT IN (SELECT id FROM snapshot_table GROUP BY packageName, timeStamp, versionCode, lastUpdatedTime, packageSize)")
+  suspend fun deleteDuplicateSnapshotItems()
 
   @Transaction
   @Query("DELETE FROM snapshot_table")
@@ -92,11 +101,14 @@ interface LCDao {
   fun deleteSnapshots(list: List<SnapshotItem>)
 
   // TimeStamp Table
-  @Insert(onConflict = OnConflictStrategy.IGNORE)
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
   suspend fun insert(item: TimeStampItem)
 
   @Query("SELECT * from timestamp_table ORDER BY timestamp DESC")
   fun getTimeStamps(): List<TimeStampItem>
+
+  @Query("SELECT * from timestamp_table WHERE timeStamp LIKE :timestamp")
+  suspend fun getTimeStamp(timestamp: Long): TimeStampItem?
 
   @Delete
   fun delete(item: TimeStampItem)

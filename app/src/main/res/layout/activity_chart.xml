@@ -16,7 +16,7 @@
     android:fitsSystemWindows="true"
     app:layout_constraintTop_toTopOf="parent">
 
-    <androidx.appcompat.widget.Toolbar
+    <androidx.appcompat.widget.ToolbarFix
       android:id="@+id/toolbar"
       style="?actionBarStyle"
       android:layout_width="match_parent"

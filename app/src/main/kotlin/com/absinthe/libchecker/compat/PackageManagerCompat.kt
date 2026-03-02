@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 package com.absinthe.libchecker.compat
 
 import android.content.Intent
@@ -7,22 +5,10 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
-import com.absinthe.libchecker.SystemServices
+import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.utils.OsUtils
 
 object PackageManagerCompat {
-  val MATCH_DISABLED_COMPONENTS = if (OsUtils.atLeastN()) {
-    PackageManager.MATCH_DISABLED_COMPONENTS
-  } else {
-    PackageManager.GET_DISABLED_COMPONENTS
-  }
-
-  val MATCH_UNINSTALLED_PACKAGES = if (OsUtils.atLeastN()) {
-    PackageManager.MATCH_UNINSTALLED_PACKAGES
-  } else {
-    PackageManager.GET_UNINSTALLED_PACKAGES
-  }
-
   fun getPackageInfo(packageName: String, flags: Int): PackageInfo {
     return if (OsUtils.atLeastT()) {
       SystemServices.packageManager.getPackageInfo(
@@ -58,11 +44,11 @@ object PackageManagerCompat {
     }
   }
 
-  fun getInstalledPackages(flags: Int): List<PackageInfo> {
+  fun getInstalledPackages(flags: Long): List<PackageInfo> {
     return if (OsUtils.atLeastT()) {
-      SystemServices.packageManager.getInstalledPackages(PackageManager.PackageInfoFlags.of(flags.toLong()))
+      SystemServices.packageManager.getInstalledPackages(PackageManager.PackageInfoFlags.of(flags))
     } else {
-      SystemServices.packageManager.getInstalledPackages(flags)
+      SystemServices.packageManager.getInstalledPackages(flags.toInt())
     }
   }
 

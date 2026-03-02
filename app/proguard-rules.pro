@@ -1,31 +1,10 @@
-# This is a configuration file for ProGuard.
-# http://proguard.sourceforge.net/index.html#manual/usage.html
-#
-# Starting with version 2.2 of the Android plugin for Gradle, this file is distributed together with
-# the plugin and unpacked at build-time. The files in $ANDROID_HOME are no longer maintained and
-# will be ignored by new version of the Android plugin for Gradle.
-
-#-dontusemixedcaseclassnames
--dontskipnonpubliclibraryclasses
+-dontusemixedcaseclassnames
 -verbose
-
-# Optimization is turned off by default. Dex does not like code run
-# through the ProGuard optimize and preverify steps (and performs some
-# of these optimizations on its own).
-# -dontoptimize
--optimizationpasses 5
--optimizations !code/simplification/arithmetic,!field/*,!class/merging/*,!code/allocation/variable,!class/unboxing/enum
--repackageclasses com.absinthe.libchecker
-
--dontpreverify
 
 # Preserve some attributes that may be required for reflection.
 -keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod
 
 -keep class * extends androidx.fragment.app.Fragment{}
--dontnote com.android.vending.licensing.ILicensingService
--dontnote com.google.vending.licensing.ILicensingService
--dontnote com.google.android.vending.licensing.ILicensingService
 
 # For native methods, see http://proguard.sourceforge.net/manual/examples.html#native
 -keepclasseswithmembernames class * {
@@ -50,7 +29,7 @@
 }
 
 -keepclassmembers class * implements android.os.Parcelable {
-    public static final ** CREATOR;
+    public static final android.os.Parcelable$Creator CREATOR;
 }
 
 -keepclassmembers class **.R$* {
@@ -87,15 +66,12 @@
 }
 
 -assumenosideeffects class kotlin.jvm.internal.Intrinsics {
-    static void checkParameterIsNotNull(java.lang.Object, java.lang.String);
-    static void checkExpressionValueIsNotNull(java.lang.Object, java.lang.String);
-    static void checkNotNullExpressionValue(java.lang.Object, java.lang.String);
-    static void checkReturnedValueIsNotNull(java.lang.Object, java.lang.String, java.lang.String);
-    static void checkReturnedValueIsNotNull(java.lang.Object, java.lang.String);
-    static void checkFieldIsNotNull(java.lang.Object, java.lang.String, java.lang.String);
-    static void checkFieldIsNotNull(java.lang.Object, java.lang.String);
-    static void checkNotNull(java.lang.Object, java.lang.String);
-    static void checkNotNullParameter(java.lang.Object, java.lang.String);
+    public static void check*(...);
+    public static void throw*(...);
+}
+
+-assumenosideeffects class java.util.Objects {
+    ** requireNonNull(...);
 }
 
 -dontwarn org.xmlpull.v1.XmlPullParser
@@ -125,24 +101,14 @@
 -keepattributes SourceFile,LineNumberTable
 -renamesourcefileattribute SourceFile
 
--dontwarn java.lang.ClassValue
-
-# OkHttp
--dontwarn org.conscrypt.**
--dontwarn org.conscrypt.ConscryptHostnameVerifier
--dontwarn okhttp3.internal.platform.ConscryptPlatform
-
--dontwarn org.bouncycastle.jsse.BCSSLParameters
--dontwarn org.bouncycastle.jsse.BCSSLSocket
--dontwarn org.bouncycastle.jsse.provider.BouncyCastleJsseProvider
-
--dontwarn org.openjsse.javax.net.ssl.SSLParameters
--dontwarn org.openjsse.javax.net.ssl.SSLSocket
--dontwarn org.openjsse.net.ssl.OpenJSSE
--dontwarn org.slf4j.impl.StaticLoggerBinder
-
 # ViewBinding
--keep public class * extends androidx.viewbinding.ViewBinding {*;}
+-keep,allowoptimization public class * extends androidx.viewbinding.ViewBinding {
+  public static * inflate(android.view.LayoutInflater);
+}
+# This class's inflate method will be pruned by R8 when upgrading to AGP 8.5, we don't know why
+-keep public class com.absinthe.libchecker.databinding.ActivityAppDetailBinding {
+  public static * inflate(android.view.LayoutInflater);
+}
 
 # BottomSheetBehavior
 -keepclassmembers public class com.google.android.material.bottomsheet.BottomSheetBehavior {
@@ -152,4 +118,28 @@
 # MPAndroidChart
 -keep public class com.github.mikephil.charting.animation.* {
     public protected *;
+}
+
+# R8 full mode
+# Once
+-keep,allowobfuscation,allowshrinking class jonathanfinerty.once.PersistedMap
+
+# ViewBinding
+-keep,allowobfuscation,allowshrinking class com.absinthe.libchecker.ui.base.BaseActivity
+-keep,allowobfuscation,allowshrinking class * extends com.absinthe.libchecker.ui.base.BaseActivity
+
+# org.apache.commons:commons-compress
+-keep,allowoptimization class org.apache.commons.compress.archivers.zip.**
+
+# exclude com.google.android.gms:play-services-ads-identifier
+-dontwarn com.google.android.gms.ads.identifier.AdvertisingIdClient$Info
+-dontwarn com.google.android.gms.ads.identifier.AdvertisingIdClient
+
+-keepclassmembers class org.apache.commons.compress.archivers.zip.ZipFile {
+    private long getDataOffset(org.apache.commons.compress.archivers.zip.ZipArchiveEntry);
+}
+
+# androidx.appcompat.widget.Toolbar
+-keepclassmembers class androidx.appcompat.widget.Toolbar {
+    java.util.ArrayList mHiddenViews;
 }

@@ -1,0 +1,40 @@
+<!-- The split configuration for activities. -->
+<resources
+  xmlns:window="http://schemas.android.com/apk/res-auto">
+
+  <!-- Automatically split the following activity pairs. -->
+  <SplitPairRule
+    window:splitRatio="0.5"
+    window:clearTop="true">
+    <SplitPairFilter
+      window:primaryActivityName="com.absinthe.libchecker.features.home.ui.main.MainActivity"
+      window:secondaryActivityName="com.absinthe.libchecker.features.applist.detail.ui.AppDetailActivity" />
+    <SplitPairFilter
+      window:primaryActivityName="com.absinthe.libchecker.features.home.ui.main.MainActivity"
+      window:secondaryActivityName="com.absinthe.libchecker.features.statistics.ui.LibReferenceActivity" />
+    <SplitPairFilter
+      window:primaryActivityName="com.absinthe.libchecker.features.home.ui.main.MainActivity"
+      window:secondaryActivityName="com.absinthe.libchecker.features.chart.ui.ChartActivity" />
+    <SplitPairFilter
+      window:primaryActivityName="com.absinthe.libchecker.features.home.ui.main.MainActivity"
+      window:secondaryActivityName="com.absinthe.libchecker.features.snapshot.detail.ui.SnapshotDetailActivity" />
+    <SplitPairFilter
+      window:primaryActivityName="com.absinthe.libchecker.features.home.ui.main.MainActivity"
+      window:secondaryActivityName="com.absinthe.libchecker.features.about.ui.AboutActivity" />
+
+    <SplitPairFilter
+      window:primaryActivityName="com.absinthe.libchecker.features.statistics.ui.LibReferenceActivity"
+      window:secondaryActivityName="com.absinthe.libchecker.features.applist.detail.ui.AppDetailActivity" />
+    <SplitPairFilter
+      window:primaryActivityName="com.absinthe.libchecker.features.snapshot.detail.ui.SnapshotDetailActivity"
+      window:secondaryActivityName="com.absinthe.libchecker.features.applist.detail.ui.AppDetailActivity" />
+
+    <SplitPairFilter
+      window:primaryActivityName="com.absinthe.libchecker.features.album.ui.AlbumActivity"
+      window:secondaryActivityName="com.absinthe.libchecker.features.album.backup.ui.BackupActivity" />
+    <SplitPairFilter
+      window:primaryActivityName="com.absinthe.libchecker.features.album.ui.AlbumActivity"
+      window:secondaryActivityName="com.absinthe.libchecker.features.album.track.ui.TrackActivity" />
+  </SplitPairRule>
+
+</resources>

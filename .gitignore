@@ -13,7 +13,7 @@
 bin/
 gen/
 out/
-#  Uncomment the following line in case you need and you don't have the release build type files in your app
+# Uncomment the following line in case you need and you don't have the release build type files in your app
 # release/
 
 # Gradle files
@@ -75,13 +75,17 @@ lint/intermediates/
 lint/generated/
 lint/outputs/
 lint/tmp/
+
 # lint/reports/
 app/.classpath
 app/.project
-app/release/*
-app/debug/*
+app/foss/*
+app/market/*
 
 .project
 .settings/org.eclipse.buildship.core.prefs
 app/.settings/org.eclipse.buildship.core.prefs
 .DS_Store
+
+# Kotlin 2.0
+.kotlin/sessions/*

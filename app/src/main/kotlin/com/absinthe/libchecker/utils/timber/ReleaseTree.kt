@@ -2,7 +2,7 @@ package com.absinthe.libchecker.utils.timber
 
 import android.util.Log
 import com.absinthe.libchecker.constant.GlobalValues
-import com.microsoft.appcenter.crashes.Crashes
+import com.absinthe.libchecker.utils.Telemetry
 import timber.log.Timber
 
 class ReleaseTree : Timber.DebugTree() {
@@ -23,10 +23,12 @@ class ReleaseTree : Timber.DebugTree() {
     t?.let {
       if (priority == Log.ERROR) {
         val stack = Log.getStackTraceString(it)
-        if (stack.contains("was cancelled")) {
+        if (stack.contains("was cancelled") ||
+          stack.contains("NameNotFoundException")
+        ) {
           return
         }
-        Crashes.trackError(it)
+        Telemetry.recordException(it)
       }
     }
   }

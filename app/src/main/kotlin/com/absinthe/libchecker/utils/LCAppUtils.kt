@@ -1,85 +1,45 @@
 package com.absinthe.libchecker.utils
 
 import android.content.Context
-import android.content.Intent
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.Drawable
-import android.os.Handler
-import android.os.Looper
-import android.os.MessageQueue
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
-import android.view.ContextThemeWrapper
-import android.view.ViewGroup
-import androidx.appcompat.app.AlertDialog
-import androidx.core.os.bundleOf
+import android.text.style.ForegroundColorSpan
+import androidx.core.text.BidiFormatter
+import androidx.core.text.buildSpannedString
 import androidx.core.text.toSpannable
-import androidx.fragment.app.FragmentActivity
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.SystemServices
-import com.absinthe.libchecker.annotation.AUTUMN
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
-import com.absinthe.libchecker.annotation.SPRING
-import com.absinthe.libchecker.annotation.SUMMER
-import com.absinthe.libchecker.annotation.WINTER
-import com.absinthe.libchecker.base.BaseAlertDialogBuilder
-import com.absinthe.libchecker.bean.DetailExtraBean
-import com.absinthe.libchecker.bean.LibStringItem
-import com.absinthe.libchecker.compat.PackageManagerCompat
-import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.Constants.OVERLAY
-import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.ui.detail.AppDetailActivity
-import com.absinthe.libchecker.ui.detail.EXTRA_DETAIL_BEAN
-import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
-import com.absinthe.libchecker.ui.fragment.detail.EXTRA_LC_ITEM
-import com.absinthe.libchecker.ui.fragment.detail.OverlayDetailBottomSheetDialogFragment
-import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
-import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
-import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
+import com.absinthe.libchecker.features.snapshot.detail.bean.SnapshotDiffItem
+import com.absinthe.libchecker.features.snapshot.ui.adapter.ARROW
+import com.absinthe.libchecker.features.snapshot.ui.adapter.ARROW_REVERT
+import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.isTempApk
-import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
+import com.absinthe.libchecker.utils.extensions.toClassDefType
 import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.Rule
-import com.google.android.material.progressindicator.LinearProgressIndicator
-import rikka.material.app.DayNightDelegate
 import java.io.File
-import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.Month
-import java.util.Date
-import java.util.Locale
 
 object LCAppUtils {
 
-  fun getCurrentSeason(): Int {
-    return when (LocalDate.now().month) {
-      Month.MARCH, Month.APRIL, Month.MAY -> SPRING
-      Month.JUNE, Month.JULY, Month.AUGUST -> SUMMER
-      Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER -> AUTUMN
-      Month.DECEMBER, Month.JANUARY, Month.FEBRUARY -> WINTER
-      else -> -1
-    }
-  }
-
   fun setTitle(context: Context): Spannable {
     val sb = SpannableStringBuilder(context.getString(R.string.app_name))
-    val date = SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date())
 
     when {
-      date.endsWith("1225") -> {
+      DateUtils.isChristmas() -> {
         sb.append("\uD83C\uDF84")
       }
-      date == "20220131" -> {
+
+      DateUtils.isChineseNewYearEve() -> {
         sb.append("\uD83C\uDFEE")
       }
-      date == "20220201" -> {
-        sb.append("\uD83D\uDC2F")
+
+      DateUtils.isChineseNewYear() -> {
+        sb.append(DateUtils.getChineseZodiac())
       }
     }
 
@@ -92,17 +52,10 @@ object LCAppUtils {
       )
       spanString.setSpan(span, 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
       sb.append(spanString)
+    } else {
+      sb.append(" ")
     }
     return sb.toSpannable()
-  }
-
-  fun getAppIcon(packageName: String): Drawable {
-    return runCatching {
-      PackageManagerCompat.getPackageInfo(
-        packageName,
-        0
-      ).applicationInfo.loadIcon(SystemServices.packageManager)
-    }.getOrDefault(ColorDrawable(Color.TRANSPARENT))
   }
 
   suspend fun getRuleWithRegex(
@@ -112,144 +65,203 @@ object LCAppUtils {
     nativeLibs: List<LibStringItem>? = null
   ): Rule? {
     val ruleEntity = LCRules.getRule(name, type, true) ?: return null
-    if (type == NATIVE) {
-      if (packageName == null) {
-        return ruleEntity
-      }
-      val isApk = packageName.isTempApk()
-      val source = if (isApk) {
-        File(packageName)
-      } else {
-        runCatching {
-          File(PackageUtils.getPackageInfo(packageName).applicationInfo.sourceDir)
-        }.getOrNull()
-      }
-      if (source == null) {
-        return ruleEntity
-      }
-      when (name) {
-        "libjiagu.so", "libjiagu_a64.so", "libjiagu_x86.so", "libjiagu_x64.so" -> {
-          return if (PackageUtils.hasDexClass(source, "com.qihoo.util.QHClassLoader")) {
-            ruleEntity
-          } else {
-            null
-          }
-        }
-        "libapp.so" -> {
-          return if (nativeLibs?.any { it.name == "libflutter.so" } == true || PackageUtils.hasDexClass(
-              source,
-              "io.flutter.FlutterInjector"
-            )
-          ) {
-            ruleEntity
-          } else {
-            null
-          }
-        }
-        else -> return ruleEntity
-      }
-    } else {
+    if (type != NATIVE || packageName == null) {
       return ruleEntity
     }
+
+    if (packageName.isTempApk()) {
+      File(packageName)
+    } else {
+      runCatching {
+        File(PackageUtils.getPackageInfo(packageName).applicationInfo!!.sourceDir)
+      }.getOrNull()
+    } ?: return ruleEntity
+
+    if (!checkNativeLibValidation(packageName, name, nativeLibs)) {
+      return null
+    }
+    return ruleEntity
   }
 
-  fun checkNativeLibValidation(packageName: String, nativeLib: String): Boolean {
-    return when (nativeLib) {
-      "libjiagu.so" -> {
+  private val NATIVE_SET_QIHOO = setOf("libjiagu.so", "libjiagu_a64.so", "libjiagu_x86.so", "libjiagu_x64.so")
+  private val NATIVE_SET_SECNEO = setOf("libDexHelper.so", "libDexHelper-x86.so", "libdexjni.so")
+  private val NATIVE_SET_FLUTTER = setOf("libapp.so")
+  private val NATIVE_SET_UNITY = setOf("libmain.so")
+  private val NATIVE_ALL = NATIVE_SET_QIHOO + NATIVE_SET_SECNEO + NATIVE_SET_FLUTTER + NATIVE_SET_UNITY
+
+  fun checkNativeLibValidation(
+    packageName: String,
+    nativeLib: String,
+    otherNativeLibs: List<LibStringItem>? = null
+  ): Boolean {
+    if (!NATIVE_ALL.contains(nativeLib)) return true
+    val sourceDir = PackageUtils.getPackageInfo(packageName).applicationInfo?.sourceDir ?: return false
+    val source = File(sourceDir)
+    return when {
+      NATIVE_SET_QIHOO.contains(nativeLib) -> {
         runCatching {
-          val source = File(PackageUtils.getPackageInfo(packageName).applicationInfo.sourceDir)
-          PackageUtils.hasDexClass(source, "com.qihoo.util.QHClassLoader")
+          PackageUtils.findDexClasses(
+            source,
+            listOf(
+              "com.qihoo.util.*".toClassDefType(),
+              "com.tianyu.util.*".toClassDefType()
+            ),
+            hasAny = true
+          ).isNotEmpty()
         }.getOrDefault(false)
       }
-      "libapp.so" -> {
+
+      NATIVE_SET_SECNEO.contains(nativeLib) -> {
         runCatching {
-          val source = File(PackageUtils.getPackageInfo(packageName).applicationInfo.sourceDir)
-          PackageUtils.hasDexClass(source, "io.flutter.FlutterInjector")
+          PackageUtils.findDexClasses(
+            source,
+            listOf(
+              "com.secneo.apkwrapper.*".toClassDefType()
+            )
+          ).isNotEmpty()
         }.getOrDefault(false)
       }
+
+      NATIVE_SET_FLUTTER.contains(nativeLib) -> {
+        runCatching {
+          otherNativeLibs?.any { it.name == "libflutter.so" } == true ||
+            PackageUtils.findDexClasses(
+              source,
+              listOf(
+                "io.flutter.FlutterInjector".toClassDefType()
+              )
+            ).isNotEmpty()
+        }.getOrDefault(false)
+      }
+
+      NATIVE_SET_UNITY.contains(nativeLib) -> {
+        runCatching {
+          otherNativeLibs?.any { it.name == "libunity.so" } == true
+        }.getOrDefault(false)
+      }
+
       else -> true
     }
   }
 
-  fun getNightMode(nightModeString: String): Int {
-    return when (nightModeString) {
-      Constants.DARK_MODE_OFF -> DayNightDelegate.MODE_NIGHT_NO
-      Constants.DARK_MODE_ON -> DayNightDelegate.MODE_NIGHT_YES
-      Constants.DARK_MODE_FOLLOW_SYSTEM -> DayNightDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-      else -> DayNightDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-    }
-  }
+  fun <T> getDiffString(
+    diff: SnapshotDiffItem.DiffNode<T>,
+    isNewOrDeleted: Boolean = false,
+    format: String = "%s",
+    highlightDiffColor: Int? = null
+  ): CharSequence {
+    return if (diff.old != diff.new && diff.new != null && !isNewOrDeleted) {
+      val oldString = format.format(diff.old)
+      val newString = format.format(diff.new)
 
-  fun launchDetailPage(
-    context: FragmentActivity,
-    item: LCItem,
-    refName: String? = null,
-    refType: Int = NATIVE
-  ) {
-    if (item.abi.toInt() == OVERLAY) {
-      OverlayDetailBottomSheetDialogFragment().apply {
-        arguments = bundleOf(
-          EXTRA_LC_ITEM to item
-        )
-        show(context.supportFragmentManager, tag)
+      if (highlightDiffColor != null) {
+        val pair = getHighlightDifferences(oldString, newString, highlightDiffColor)
+        buildSpannedString {
+          append(pair.first)
+          append(" $ARROW ")
+          append(pair.second)
+        }
+      } else {
+        buildSpannedString {
+          append(oldString)
+          append(" $ARROW ")
+          append(newString)
+        }
       }
     } else {
-      val intent = Intent(context, AppDetailActivity::class.java)
-        .putExtras(
-          bundleOf(
-            EXTRA_PACKAGE_NAME to item.packageName,
-            EXTRA_REF_NAME to refName,
-            EXTRA_REF_TYPE to refType,
-            EXTRA_DETAIL_BEAN to DetailExtraBean(
-              item.isSplitApk,
-              item.isKotlinUsed,
-              item.variant
-            )
-          )
-        )
-      context.startActivity(intent)
+      format.format(diff.old)
     }
   }
 
-  fun createLoadingDialog(context: ContextThemeWrapper): AlertDialog {
-    return BaseAlertDialogBuilder(context)
-      .setView(
-        LinearProgressIndicator(context).apply {
-          layoutParams = ViewGroup.LayoutParams(200.dp, ViewGroup.LayoutParams.WRAP_CONTENT).also {
-            setPadding(24.dp, 24.dp, 24.dp, 24.dp)
-          }
-          trackCornerRadius = 3.dp
-          isIndeterminate = true
+  fun getDiffString(
+    diff1: SnapshotDiffItem.DiffNode<*>,
+    diff1Suffix: String = "",
+    diff2: SnapshotDiffItem.DiffNode<*>,
+    diff2Suffix: String = "",
+    isNewOrDeleted: Boolean = false,
+    highlightDiffColor: Int? = null
+  ): CharSequence {
+    return if ((diff1.old != diff1.new || diff2.old != diff2.new) && !isNewOrDeleted) {
+      if (highlightDiffColor != null) {
+        val highlightedPair1 =
+          getHighlightDifferences(diff1.old.toString(), diff1.new.toString(), highlightDiffColor)
+        val highlightedPair2 =
+          getHighlightDifferences(diff2.old.toString(), diff2.new.toString(), highlightDiffColor)
+        val allText = highlightedPair1.first.toString() + highlightedPair1.second + highlightedPair2.first + highlightedPair2.second + diff1Suffix + diff2Suffix
+        val isRtl = BidiFormatter.getInstance().isRtl(allText)
+        buildSpannedString {
+          append(highlightedPair1.first)
+          append(diff1Suffix)
+          append(" (")
+          append(highlightedPair2.first)
+          append(diff2Suffix)
+          append(")")
+          append(" ${getArrow(isRtl)} ")
+          append(highlightedPair1.second)
+          append(diff1Suffix)
+          append(" (")
+          append(highlightedPair2.second)
+          append(diff2Suffix)
+          append(")")
         }
-      )
-      .setCancelable(false)
-      .create()
-  }
-}
-
-/**
- * From drakeet
- */
-fun doOnMainThreadIdle(action: () -> Unit) {
-  val handler = Handler(Looper.getMainLooper())
-
-  val idleHandler = MessageQueue.IdleHandler {
-    handler.removeCallbacksAndMessages(null)
-    action()
-    return@IdleHandler false
-  }
-
-  fun setupIdleHandler(queue: MessageQueue) {
-    queue.addIdleHandler(idleHandler)
-  }
-
-  if (Looper.getMainLooper() == Looper.myLooper()) {
-    setupIdleHandler(Looper.myQueue())
-  } else {
-    if (OsUtils.atLeastM()) {
-      setupIdleHandler(Looper.getMainLooper().queue)
+      } else {
+        "${diff1.old} (${diff2.old}$diff2Suffix) $ARROW ${diff1.new} (${diff2.new}$diff2Suffix)"
+      }
     } else {
-      handler.post { setupIdleHandler(Looper.myQueue()) }
+      "${diff1.old} (${diff2.old}$diff2Suffix)"
+    }
+  }
+
+  fun getHighlightDifferences(
+    oldString: String,
+    newString: String,
+    highlightDiffColor: Int
+  ): Pair<SpannableString, SpannableString> {
+    val oldSpannable = SpannableString(oldString)
+    val newSpannable = SpannableString(newString)
+    val minLength = minOf(oldString.length, newString.length)
+
+    for (i in 0 until minLength) {
+      if (oldString[i] != newString[i]) {
+        oldSpannable.setSpan(
+          ForegroundColorSpan(highlightDiffColor),
+          i,
+          i + 1,
+          Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+        )
+        newSpannable.setSpan(
+          ForegroundColorSpan(highlightDiffColor),
+          i,
+          i + 1,
+          Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+        )
+      }
+    }
+
+    if (oldString.length > newString.length) {
+      oldSpannable.setSpan(
+        ForegroundColorSpan(highlightDiffColor),
+        minLength,
+        oldString.length,
+        Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+      )
+    } else if (newString.length > oldString.length) {
+      newSpannable.setSpan(
+        ForegroundColorSpan(highlightDiffColor),
+        minLength,
+        newString.length,
+        Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+      )
+    }
+
+    return Pair(oldSpannable, newSpannable)
+  }
+
+  private fun getArrow(isRtl: Boolean): String {
+    return if (isRtl) {
+      ARROW_REVERT
+    } else {
+      ARROW
     }
   }
 }

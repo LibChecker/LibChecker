@@ -1,0 +1,12 @@
+- Compatible with Android 14.
+- You can now click on a specific permission to see a description of what the permission does (if available).
+- Added a filter for "System Framework Apps" on the "Apps" page.
+- Added a filter for "No component changes" on the "Snapshots" page.
+- The "Snapshots" page supports searching.
+- Snapshot update times now differentiate between pre-installed apps.
+- Optimized split-screen effect on foldable devices
+- Optimized the detection method of Rx and Jetpack Compose.
+- Fixed some apps not being parsed.
+- Fixed an issue where APK file signatures could not be viewed
+- Fixed some UI issues.
+- Added Vietnamese translation.

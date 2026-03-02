@@ -4,14 +4,14 @@
   xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  tools:context=".ui.fragment.statistics.LibReferenceFragment">
+  tools:context=".features.statistics.ui.LibReferenceFragment">
 
-  <ViewFlipper
+  <com.absinthe.libchecker.view.app.CustomViewFlipper
     android:id="@+id/vf_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.absinthe.libchecker.view.statistics.LibReferenceLoadingView
+    <com.absinthe.libchecker.features.statistics.ui.view.LibReferenceLoadingView
       android:id="@+id/loading_view"
       android:layout_width="match_parent"
       android:layout_height="match_parent" />
@@ -21,13 +21,12 @@
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:clipToPadding="false"
-      android:paddingTop="?actionBarSize"
       android:scrollbars="none"
       app:borderBottomVisibility="never"
       app:borderTopDrawable="@null"
       app:borderTopVisibility="whenTop"
-      app:fitsSystemWindowsInsets="bottom|top" />
+      app:fitsSystemWindowsInsets="bottom" />
 
-  </ViewFlipper>
+  </com.absinthe.libchecker.view.app.CustomViewFlipper>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

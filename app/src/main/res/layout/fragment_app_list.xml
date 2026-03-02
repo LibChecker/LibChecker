@@ -4,15 +4,17 @@
   xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  tools:context=".ui.fragment.applist.AppListFragment">
+  tools:context=".features.applist.ui.AppListFragment">
 
-  <ViewFlipper
+  <com.absinthe.libchecker.view.app.CustomViewFlipper
     android:id="@+id/vf_container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:clipChildren="false">
 
-    <com.absinthe.libchecker.view.applist.AppListLoadingView
+    <com.google.android.material.loadingindicator.LoadingIndicator
       android:id="@+id/loading_view"
+      style="@style/Widget.Material3.LoadingIndicator.Contained"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_gravity="center" />
@@ -22,19 +24,24 @@
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:clipToPadding="false"
-      android:paddingTop="?actionBarSize"
       android:scrollbars="none"
       app:borderBottomVisibility="never"
       app:borderTopDrawable="@null"
       app:borderTopVisibility="whenTop"
-      app:fitsSystemWindowsInsets="bottom|top" />
+      app:fitsSystemWindowsInsets="bottom" />
 
-    <com.absinthe.libchecker.view.applist.AppListInitialiseView
+    <com.absinthe.libchecker.features.applist.ui.view.AppListInitialiseView
       android:id="@+id/init_view"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_gravity="center" />
 
-  </ViewFlipper>
+    <com.absinthe.libchecker.features.applist.ui.view.AppListRejectView
+      android:id="@+id/reject_view"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center" />
+
+  </com.absinthe.libchecker.view.app.CustomViewFlipper>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

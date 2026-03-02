@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.absinthe.libchecker.view.detail.ComponentRecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.absinthe.libchecker.features.applist.detail.ui.view.ComponentRecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
   android:id="@android:id/list"
   android:layout_width="match_parent"

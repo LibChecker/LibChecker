@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <color name="colorPrimary">#6200EE</color>
-  <color name="colorPrimaryMd3">#6200EE</color>
   <color name="aboutHeader">#6200EE</color>
   <color name="textNormal">#FF000000</color>
   <color name="textSecondary">#80464646</color>
@@ -23,4 +22,8 @@
   <color name="ic_launcher_foreground">#FFFFFF</color>
   <color name="ic_launcher_background">#6200EE</color>
   <color name="ic_launcher_back">#6200EE</color>
+
+  <color name="advanced_menu_item_overlay">@color/material_blue_grey_800</color>
+  <color name="advanced_menu_item_text_not_checked">#232323</color>
+  <color name="advanced_menu_item_text_checked">#ECECEC</color>
 </resources>

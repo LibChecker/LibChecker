@@ -1,0 +1,7 @@
+- Now supports sharing APK download links to LibChecker, displaying most basic information by downloading a small amount of metadata, especially suitable for oversized apps or games
+- Supported comparing APKS files
+- Supported displaying the permission provider on the permission details page
+- Supported detecting app themed and alternative launch icons
+- Supported detecting "Live Update Notifications"
+
+Full changelog: https://github.com/LibChecker/LibChecker/blob/master/changelog/CHANGELOG.md

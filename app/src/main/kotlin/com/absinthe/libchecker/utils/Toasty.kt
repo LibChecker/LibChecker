@@ -11,6 +11,7 @@ import androidx.annotation.MainThread
 import androidx.annotation.StringRes
 import com.absinthe.libchecker.view.app.ToastView
 import java.lang.ref.WeakReference
+import timber.log.Timber
 
 /**
  * <pre>
@@ -19,13 +20,12 @@ import java.lang.ref.WeakReference
  * </pre>
  */
 object Toasty {
-
   private val handler = Handler(Looper.getMainLooper())
-  private var toast: Toast? = null
+  private var toastRef: WeakReference<Toast>? = null
 
   @AnyThread
   fun showShort(context: Context, message: String) {
-    if (Looper.getMainLooper().thread === Thread.currentThread()) {
+    if (Looper.getMainLooper() == Looper.myLooper()) {
       //noinspection WrongThread
       show(context, message, Toast.LENGTH_SHORT)
     } else {
@@ -40,7 +40,7 @@ object Toasty {
 
   @AnyThread
   fun showLong(context: Context, message: String) {
-    if (Looper.getMainLooper().thread === Thread.currentThread()) {
+    if (Looper.getMainLooper() == Looper.myLooper()) {
       //noinspection WrongThread
       show(context, message, Toast.LENGTH_LONG)
     } else {
@@ -56,27 +56,22 @@ object Toasty {
   @Suppress("deprecation")
   @MainThread
   private fun show(context: Context, message: String, duration: Int) {
-    toast?.cancel()
+    toastRef?.get()?.cancel()
 
-    WeakReference(context).get()?.let { ctx ->
-      if (OsUtils.atLeastR() && context !is ContextThemeWrapper) {
-        Toast(ctx).also {
-          it.duration = duration
-          it.setText(message)
-          toast = it
-        }.show()
-      } else {
-        val view = ToastView(ctx).also {
-          it.message.text = message
-        }
-        Toast(ctx).also {
-          it.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 200)
-          it.duration = duration
-          it.view = view
-          toast = it
-        }.show()
+    val toast = if (OsUtils.atLeastR() && context !is ContextThemeWrapper) {
+      Toast.makeText(context, message, duration)
+    } else {
+      val view = ToastView(context).also {
+        it.message.text = message
+      }
+      Toast(context).also {
+        it.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 200)
+        it.duration = duration
+        it.view = view
       }
     }
+    toastRef = WeakReference(toast)
+    toast.show()
   }
 }
 
@@ -87,6 +82,7 @@ fun Context.showToast(message: String) {
 
 @AnyThread
 fun Context.showToast(@StringRes res: Int) {
+  Timber.d("showToast: ${getString(res)}")
   Toasty.showShort(this, res)
 }
 

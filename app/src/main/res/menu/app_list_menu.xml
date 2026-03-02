@@ -12,8 +12,8 @@
     tools:ignore="AlwaysShowAction" />
 
   <item
-    android:id="@+id/sort"
-    android:icon="@drawable/ic_sort"
-    android:title="@string/menu_sort"
+    android:id="@+id/advanced"
+    android:icon="@drawable/ic_menu"
+    android:title="@string/advanced_menu"
     app:showAsAction="always" />
 </menu>

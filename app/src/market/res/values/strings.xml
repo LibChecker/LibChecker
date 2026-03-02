@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-  <string name="privacy_title">Privacy Policy</string>
-  <string name="privacy_content"><![CDATA[Please be sure to carefully read and fully understand the terms of the Service Agreement and the Privacy Policy, including but not limited to: In order to better provide our services to you, we need to collect your device identification, operation logs and other information for analysis and optimization of application performance. <br/>You can read the <a href=\"https://absinthe.life/LibChecker-Docs/guide/TERMS/\">Terms</a> and the <a href=\"https://absinthe.life/LibChecker-Docs/guide/PRIVACY/\">Privacy Policy</a> for more details. If you agree, please click the button below to start receiving our services.]]></string>
-  <string name="agree">Agree</string>
-  <string name="deny">Deny</string>
-</resources>

@@ -5,5 +5,5 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class RepoInfoResp(
-  @field:Json(name = "pushed_at") val pushed_at: String
+  @Json(name = "pushed_at") val pushedAt: String
 )

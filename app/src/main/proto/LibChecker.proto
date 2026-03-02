@@ -29,6 +29,8 @@ message Snapshot {
   string permissions = 16;
   string metadata = 17;
   int64 packageSize = 18;
+  uint32 compileSdk = 19;
+  uint32 minSdk = 20;
 }
 
 message CloudRulesBundle {

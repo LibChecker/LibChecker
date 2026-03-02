@@ -1,5 +1,3 @@
-@file:Suppress("unused")
-
 package com.absinthe.libchecker.utils
 
 import com.squareup.moshi.Moshi
@@ -39,8 +37,7 @@ object JsonUtil {
 
 inline fun <reified T> String.fromJson(): T? = JsonUtil.fromJson(this)
 
-inline fun <reified T> String.fromJson(rawType: Class<*>, vararg typeArguments: Class<*>): T? =
-  JsonUtil.fromJson(this, rawType, *typeArguments)
+inline fun <reified T> String.fromJson(rawType: Class<*>, vararg typeArguments: Class<*>): T? = JsonUtil.fromJson(this, rawType, *typeArguments)
 
 @Language("JSON")
 fun Any?.toJson(): String? = JsonUtil.toJson(this)

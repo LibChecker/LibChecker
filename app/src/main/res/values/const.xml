@@ -4,10 +4,18 @@
   <string name="armeabi" translatable="false">armeabi</string>
   <string name="x86" translatable="false">x86</string>
   <string name="x86_64" translatable="false">x86_64</string>
+  <string name="mips64" translatable="false">mips64</string>
+  <string name="mips" translatable="false">mips</string>
+  <string name="riscv64" translatable="false">riscv64</string>
+  <string name="riscv32" translatable="false">riscv32</string>
   <string name="multiArch" translatable="false">multiArch</string>
   <string name="ability" translatable="false">Ability</string>
   <string name="ability_page" translatable="false">Page</string>
   <string name="ability_service" translatable="false">Service</string>
   <string name="ability_data" translatable="false">Data</string>
   <string name="ability_web" translatable="false">Web</string>
+  <string name="signature_md5" translatable="false">MD5</string>
+  <string name="signature_sha1" translatable="false">SHA-1</string>
+  <string name="signature_sha256" translatable="false">SHA-256</string>
+  <string name="signature_char_string" translatable="false">CharString</string>
 </resources>

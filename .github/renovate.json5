@@ -1,0 +1,18 @@
+{
+  labels: [
+    'dependencies',
+  ],
+  extends: [
+    'config:recommended',
+  ],
+  packageRules: [
+    {
+      groupName: 'Kotlin, KSP and MoshiX',
+      matchPackageNames: [
+        'com.google.devtools.ksp{/,}**',
+        'dev.zacsweers.moshix{/,}**',
+        '/org.jetbrains.kotlin.*/',
+      ],
+    },
+  ],
+}

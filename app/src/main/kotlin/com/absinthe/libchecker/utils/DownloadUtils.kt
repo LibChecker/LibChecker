@@ -1,5 +1,7 @@
 package com.absinthe.libchecker.utils
 
+import java.io.File
+import java.io.IOException
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
@@ -8,8 +10,6 @@ import okhttp3.Response
 import okio.buffer
 import okio.sink
 import okio.source
-import java.io.File
-import java.io.IOException
 
 object DownloadUtils {
   private val client by lazy { OkHttpClient() }
@@ -39,6 +39,7 @@ object DownloadUtils {
             body.byteStream().source().buffer().use { input ->
               file.sink().buffer().use { output ->
                 output.writeAll(input)
+                listener.onDownloadSuccess()
               }
             }
           } ?: run {

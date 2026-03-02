@@ -1,136 +1,113 @@
-import com.android.build.gradle.internal.api.ApkVariantOutputImpl
-import com.google.protobuf.gradle.builtins
-import com.google.protobuf.gradle.generateProtoTasks
-import com.google.protobuf.gradle.id
-import com.google.protobuf.gradle.plugins
-import com.google.protobuf.gradle.protobuf
-import com.google.protobuf.gradle.protoc
-import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
-import java.nio.file.Paths
+import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 
 plugins {
-  id(libs.plugins.android.application.get().pluginId)
-  id(libs.plugins.kotlin.android.get().pluginId)
-  id(libs.plugins.kotlin.parcelize.get().pluginId)
+  alias(libs.plugins.android.application)
+  alias(libs.plugins.kotlin.parcelize)
   alias(libs.plugins.protobuf)
   alias(libs.plugins.hiddenApiRefine)
   alias(libs.plugins.ksp)
+  alias(libs.plugins.moshiX)
+  alias(libs.plugins.aboutlibraries)
+  id(libs.plugins.gms.get().pluginId)
+  id(libs.plugins.firebase.crashlytics.get().pluginId)
+  id("res-opt")
 }
 
 ksp {
   arg("moshi.generated", "javax.annotation.Generated")
+  arg("room.generateKotlin", "true")
   arg("room.incremental", "true")
   arg("room.schemaLocation", "$projectDir/schemas")
   arg("room.expandProjection", "true")
 }
 
 setupAppModule {
+  namespace = "com.absinthe.libchecker"
   defaultConfig {
     applicationId = "com.absinthe.libchecker"
-    namespace = "com.absinthe.libchecker"
   }
 
   buildFeatures {
+    aidl = true
+    buildConfig = true
     viewBinding = true
   }
 
-  compileOptions {
-    isCoreLibraryDesugaringEnabled = true
-  }
-
-  sourceSets {
-    named("main") {
-      java {
-        srcDirs("src/main/kotlin")
-      }
-    }
-    named("foss") {
-      java {
-        srcDirs("src/foss/kotlin")
-      }
-    }
-    named("market") {
-      java {
-        srcDirs("src/market/kotlin")
+  buildTypes {
+    debug {
+      configure<CrashlyticsExtension> {
+        mappingFileUploadEnabled = false
       }
     }
   }
 
-  packagingOptions.resources.excludes += setOf(
-    "META-INF/**",
-    "okhttp3/**",
-    "kotlin/**",
-    "org/**",
-    "**.properties",
-    "**.bin"
-  )
+  productFlavors {
+    flavorDimensions += "channel"
+
+    create("foss") {
+      isDefault = true
+      dimension = flavorDimensions[0]
+      configure<CrashlyticsExtension> {
+        mappingFileUploadEnabled = false
+      }
+    }
+    create("market") {
+      dimension = flavorDimensions[0]
+    }
+    all {
+      manifestPlaceholders["channel"] = this.name
+    }
+  }
+
+  packaging {
+    jniLibs {
+      excludes += "lib/**/libdatastore_shared_counter.so" // Jetpack DataStore
+    }
+    resources {
+      excludes += setOf(
+        "META-INF/**",
+        "okhttp3/**",
+        "kotlin/**",
+        "org/**",
+        "**.properties",
+        "**.bin",
+        "**/*.proto"
+      )
+    }
+  }
 
   lint {
-    disable += "AppCompatResource"
+    disable += setOf("AppCompatResource", "MissingTranslation")
   }
 
   dependenciesInfo.includeInApk = false
+}
 
-  applicationVariants.all {
-    outputs.all {
-      (this as? ApkVariantOutputImpl)?.outputFileName =
-        "LibChecker-${verName}-${verCode}-${name}.apk"
+androidComponents {
+  onVariants { variant ->
+    variant.outputs.forEach { output ->
+      // TODO: https://github.com/android/gradle-recipes/blob/cbe7c7dea2a3f5b1764756f24bf453d1235c80e2/listenToArtifacts/README.md
+      with(output as com.android.build.api.variant.impl.VariantOutputImpl) {
+        val newApkName =
+          "LibChecker-${versionName.get()}-${versionCode.get()}-${variant.buildType}.apk"
+        outputFileName = newApkName
+      }
     }
   }
 }
 
-tasks.whenTaskAdded {
-  if (name == "optimizeFossReleaseResources" || name == "optimizeMarketReleaseResources") {
-    val flavor = name.removePrefix("optimize").removeSuffix("ReleaseResources")
-    val flavorLowerCase = flavor.toLowerCaseAsciiOnly()
-    val optimizeReleaseRes = task("optimize${flavor}ReleaseRes").doLast {
-      val aapt2 = File(
-        androidComponents.sdkComponents.sdkDirectory.get().asFile,
-        "build-tools/${project.android.buildToolsVersion}/aapt2"
-      )
-      val zip = Paths.get(
-        buildDir.path,
-        "intermediates",
-        "optimized_processed_res",
-        "${flavorLowerCase}Release",
-        "resources-${flavorLowerCase}-release-optimize.ap_"
-      )
-      val optimized = File("${zip}.opt")
-      val cmd = exec {
-        commandLine(
-          aapt2, "optimize",
-          "--collapse-resource-names",
-          "--resources-config-path", "aapt2-resources.cfg",
-          "-o", optimized,
-          zip
-        )
-        isIgnoreExitValue = false
-      }
-      if (cmd.exitValue == 0) {
-        delete(zip)
-        optimized.renameTo(zip.toFile())
-      }
-    }
-
-    finalizedBy(optimizeReleaseRes)
-  }
-}
-
-configurations.all {
+configurations.configureEach {
   exclude("androidx.appcompat", "appcompat")
   exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
   exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
 }
 
 dependencies {
-  compileOnly(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
-  compileOnly(fileTree("ohos"))
   compileOnly(projects.hiddenApi)
 
-  coreLibraryDesugaring(libs.agp.desugering)
-
   implementation(libs.kotlinX.coroutines)
-  implementation(libs.androidX.appCompat)
+  // implementation(libs.androidX.appCompat)
+  implementation(libs.android.apksig)
   implementation(libs.androidX.core)
   implementation(libs.androidX.activity)
   implementation(libs.androidX.fragment)
@@ -151,34 +128,39 @@ dependencies {
   implementation(libs.square.retrofit.moshi)
   implementation(libs.square.moshi)
   implementation(libs.google.protobuf.javaLite)
-  implementation(libs.bundles.grpc)
+  implementation(libs.google.dexlib2)
   implementation(libs.rikka.refine.runtime)
   implementation(libs.bundles.zhaobozhen)
-  implementation(libs.bundles.appCenter)
   implementation(libs.lc.rules)
+  // implementation(files("libs/library-release.aar"))
 
   ksp(libs.androidX.room.compiler)
-  ksp(libs.square.moshi.compiler)
 
   implementation(libs.lottie)
-  implementation(libs.drakeet.about)
-  implementation(libs.drakeet.multitype)
+  implementation(libs.aboutlibraries.core)
+  implementation(libs.aboutlibraries.ui)
   implementation(libs.brvah)
   implementation(libs.mpAndroidChart)
   implementation(libs.timber)
   implementation(libs.processPhoenix)
   implementation(libs.once)
-  implementation(libs.cascade)
   implementation(libs.fastScroll)
   implementation(libs.appIconLoader)
+  implementation(libs.appIconLoader.coil)
   implementation(libs.hiddenApiBypass)
-  implementation(libs.dexLib2)
-  implementation(libs.slf4j)
-  implementation(libs.commons.io)
+  implementation(libs.commons.compress)
+  implementation(libs.flexbox)
 
   implementation(libs.bundles.rikkax)
 
+  implementation(libs.bundles.shizuku)
+
   debugImplementation(libs.square.leakCanary)
+  "marketCompileOnly"(fileTree("ohos"))
+  "marketImplementation"(platform(libs.firebase.bom))
+  "marketImplementation"(libs.bundles.firebase) {
+    exclude(group = "com.google.android.gms", module = "play-services-ads-identifier")
+  }
 }
 
 protobuf {
@@ -188,29 +170,15 @@ protobuf {
       val arch = System.getProperty("os.arch")
       val suffix = if (arch == "x86_64") "x86_64" else "aarch_64"
       "${libs.google.protobuf.protoc.get()}:osx-$suffix"
-    } else
+    } else {
       libs.google.protobuf.protoc.get().toString()
+    }
   }
   plugins {
-    // Optional: an artifact spec for a protoc plugin, with "grpc" as
-    // the identifier, which can be referred to in the "plugins"
-    // container of the "generateProtoTasks" closure.
-    id("grpc") {
-      artifact = if (osdetector.os == "osx")
-        "${libs.grpc.gen.get()}:osx-aarch_64"
-      else
-        libs.grpc.gen.get().toString()
-    }
     generateProtoTasks {
       all().forEach {
         it.builtins {
           create("java") {
-            option("lite")
-          }
-        }
-
-        it.plugins {
-          create("grpc") {
             option("lite")
           }
         }

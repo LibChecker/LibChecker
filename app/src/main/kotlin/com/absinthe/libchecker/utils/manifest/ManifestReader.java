@@ -2,13 +2,16 @@ package com.absinthe.libchecker.utils.manifest;
 
 import androidx.collection.ArrayMap;
 
+import com.absinthe.libchecker.compat.IZipFile;
+import com.absinthe.libchecker.compat.ZipFileCompat;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
-import java.util.jar.JarFile;
 
+import pxb.android.Res_value;
 import pxb.android.axml.AxmlReader;
 import pxb.android.axml.AxmlVisitor;
 import pxb.android.axml.NodeVisitor;
@@ -19,9 +22,9 @@ public class ManifestReader {
   private final ArrayMap<String, Object> properties = new ArrayMap<>();
   private final String[] demands;
 
-  private ManifestReader(File apk, String[] demands) throws IOException {
+  private ManifestReader(File apk, String[] demands) {
     this.demands = demands;
-    try (JarFile zip = new JarFile(apk)) {
+    try (IZipFile zip = new ZipFileCompat(apk)) {
       InputStream is = zip.getInputStream(zip.getEntry("AndroidManifest.xml"));
       byte[] bytes = getBytesFromInputStream(is);
       AxmlReader reader = new AxmlReader(bytes != null ? bytes : new byte[0]);
@@ -37,6 +40,26 @@ public class ManifestReader {
     }
   }
 
+  private ManifestReader(byte[] bytes, String[] demands) {
+    this.demands = demands;
+    try {
+      AxmlReader reader = new AxmlReader(bytes != null ? bytes : new byte[0]);
+      reader.accept(new AxmlVisitor() {
+        @Override
+        public NodeVisitor child(String ns, String name) {
+          NodeVisitor child = super.child(ns, name);
+          return new ManifestTagVisitor(child);
+        }
+      });
+    } catch (Exception e) {
+      Timber.e(e);
+    }
+  }
+
+  public static Map<String, Object> getManifestProperties(byte[] bytes, String[] demands) throws IOException {
+    return new ManifestReader(bytes, demands).properties;
+  }
+
   public static Map<String, Object> getManifestProperties(File apk, String[] demands) throws IOException {
     return new ManifestReader(apk, demands).properties;
   }
@@ -50,7 +73,7 @@ public class ManifestReader {
       }
       return bos.toByteArray();
     } catch (Exception e) {
-      e.printStackTrace();
+      Timber.w(e);
     }
     return null;
   }
@@ -63,6 +86,9 @@ public class ManifestReader {
   }
 
   private class ManifestTagVisitor extends NodeVisitor {
+    public String name = null;
+    public Object value = null;
+
     public ManifestTagVisitor(NodeVisitor child) {
       super(child);
     }
@@ -70,17 +96,40 @@ public class ManifestReader {
     @Override
     public NodeVisitor child(String ns, String name) {
       NodeVisitor child = super.child(ns, name);
-      switch (name) {
-        case "application":
-          return new ApplicationTagVisitor(child);
-        case "uses-sdk":
-          return new UsesSdkTagVisitor(child);
-        case "overlay":
+      return switch (name) {
+        case "application" -> new ApplicationTagVisitor(child);
+        case "uses-sdk" -> new UsesSdkTagVisitor(child);
+        case "overlay" -> {
           properties.put("overlay", true);
-          return new OverlayTagVisitor(child);
-        default:
+          yield new OverlayTagVisitor(child);
+        }
+        default -> child;
+      };
+    }
+
+    @Override
+    public void attr(String ns, String name, int resourceId, String raw, Res_value value) {
+      if (contains(name)) {
+        this.name = name;
+        if (value.type == Res_value.TYPE_REFERENCE) {
+          this.value = value.data;
+        } else {
+          this.value = value.toString();
+        }
+
+        if (name != null && value.type != Res_value.TYPE_NULL) {
+          properties.put(name, this.value);
+        }
       }
-      return child;
+      super.attr(ns, name, resourceId, raw, value);
+    }
+
+    @Override
+    public void end() {
+      if (name != null && value != null) {
+        properties.put(name, value);
+      }
+      super.end();
     }
 
     private class ApplicationTagVisitor extends NodeVisitor {
@@ -92,16 +141,20 @@ public class ManifestReader {
       }
 
       @Override
-      public void attr(String ns, String name, int resourceId, int type, Object obj) {
+      public void attr(String ns, String name, int resourceId, String raw, Res_value value) {
         if (contains(name)) {
           this.name = name;
-          value = obj;
+          if (value.type == Res_value.TYPE_REFERENCE) {
+            this.value = value.data;
+          } else {
+            this.value = value.toString();
+          }
 
-          if (name != null && value != null) {
-            properties.put(name, value);
+          if (name != null && value.type != Res_value.TYPE_NULL) {
+            properties.put(name, this.value);
           }
         }
-        super.attr(ns, name, resourceId, type, obj);
+        super.attr(ns, name, resourceId, raw, value);
       }
 
       @Override
@@ -122,12 +175,16 @@ public class ManifestReader {
       }
 
       @Override
-      public void attr(String ns, String name, int resourceId, int type, Object obj) {
+      public void attr(String ns, String name, int resourceId, String raw, Res_value value) {
         if (contains(name)) {
           this.name = name;
-          value = obj;
+          if (value.type == Res_value.TYPE_REFERENCE) {
+            this.value = value.data;
+          } else {
+            this.value = value.toString();
+          }
         }
-        super.attr(ns, name, resourceId, type, obj);
+        super.attr(ns, name, resourceId, raw, value);
       }
 
       @Override
@@ -148,12 +205,16 @@ public class ManifestReader {
       }
 
       @Override
-      public void attr(String ns, String name, int resourceId, int type, Object obj) {
+      public void attr(String ns, String name, int resourceId, String raw, Res_value value) {
         if (contains(name)) {
           this.name = name;
-          value = obj;
+          if (value.type == Res_value.TYPE_REFERENCE) {
+            this.value = value.data;
+          } else {
+            this.value = value.toString();
+          }
         }
-        super.attr(ns, name, resourceId, type, obj);
+        super.attr(ns, name, resourceId, raw, value);
       }
 
       @Override

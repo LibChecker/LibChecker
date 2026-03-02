@@ -16,7 +16,7 @@
     android:fitsSystemWindows="true"
     app:layout_constraintTop_toTopOf="parent">
 
-    <androidx.appcompat.widget.Toolbar
+    <androidx.appcompat.widget.ToolbarFix
       android:id="@+id/toolbar"
       style="?actionBarStyle"
       android:layout_width="match_parent"
@@ -37,13 +37,11 @@
       android:orientation="vertical"
       android:paddingTop="?actionBarSize">
 
-      <com.airbnb.lottie.LottieAnimationView
+      <com.absinthe.libchecker.view.app.RingDotsView
         android:id="@+id/loading"
-        android:layout_width="@dimen/lottie_anim_size"
-        android:layout_height="@dimen/lottie_anim_size"
-        app:lottie_autoPlay="true"
-        app:lottie_fileName="anim/holographic_radar.json"
-        app:lottie_loop="true" />
+        android:layout_width="@dimen/general_loading_size"
+        android:layout_height="@dimen/general_loading_size"
+        android:layout_gravity="center" />
 
     </LinearLayout>
 
@@ -61,16 +59,5 @@
       app:fitsSystemWindowsInsets="bottom|top" />
 
   </ViewFlipper>
-
-  <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-    android:id="@+id/extended_fab"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_margin="24dp"
-    android:text="@string/album_compare"
-    app:icon="@drawable/ic_compare"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_fitsSystemWindowsInsets="bottom|end" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

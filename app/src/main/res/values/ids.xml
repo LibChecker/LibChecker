@@ -3,4 +3,15 @@
   <item name="last_click_time" type="id" />
   <item name="viewpager_tab_click" type="id" />
   <item name="meta_data_transform_id" type="id" />
+
+  <item name="sort_by_name" type="id" />
+  <item name="sort_by_time" type="id" />
+  <item name="sort_by_target_version" type="id" />
+
+  <item name="adapter_bottom_padding_id" type="id" />
+
+  <item name="resource_transformed_id" type="id" />
+
+  <item name="in_app_update_chip_stable" type="id" />
+  <item name="in_app_update_chip_ci" type="id" />
 </resources>

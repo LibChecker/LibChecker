@@ -1,0 +1,13 @@
+- Android 6 is **no longer** supported
+- Now accelerates saving of new snapshots by reusing unchanged items from old snapshots
+- Now ELF files that are not of the DYN type are marked on the details page
+- No longer lists apps in the app list that are not fully uninstalled
+- AppCenter and HarmonyOS detection-related content has been removed from the FOSS channel
+- CompileSdkVersion is now displayed on the app details page
+- Fix cloud rules not updating
+- Now supports single app comparison, i.e. you can select a single APK or a snapshot in the comparison interface, or select two APK files externally to share with LibChecker for comparison
+- Optimize Traditional Chinese translation
+- Support detecting ReactiveX framework
+- The menu on the app list page supports more operations, and the "Show System Apps" on the settings page has been moved to the advanced menu.
+- Added progress display in the stats library reference process
+- Updated Rules to version 27

@@ -1,18 +1,21 @@
 package com.absinthe.libchecker.database
 
-import androidx.lifecycle.LiveData
+import android.view.ContextThemeWrapper
+import androidx.appcompat.app.AlertDialog
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.SnapshotDiffStoringItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.database.entity.TrackItem
+import com.absinthe.libchecker.utils.UiUtils
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class LCRepository(private val lcDao: LCDao) {
-
-  val allDatabaseItems: LiveData<List<LCItem>> = lcDao.getItems()
+  val allLCItemsFlow: Flow<List<LCItem>> = lcDao.getItemsFlow()
   val allSnapshotItemsFlow: Flow<List<SnapshotItem>> =
     lcDao.getSnapshotsFlow(GlobalValues.snapshotTimestamp)
 
@@ -23,6 +26,8 @@ class LCRepository(private val lcDao: LCDao) {
     }
     return true
   }
+
+  suspend fun getLCItems(): List<LCItem> = lcDao.getItems()
 
   suspend fun getItem(packageName: String): LCItem? {
     if (checkDatabaseStatus().not()) return null
@@ -36,6 +41,8 @@ class LCRepository(private val lcDao: LCDao) {
   suspend fun getSnapshot(timestamp: Long, packageName: String) = lcDao.getSnapshot(timestamp, packageName)
 
   fun getTimeStamps(): List<TimeStampItem> = lcDao.getTimeStamps()
+
+  suspend fun getTimeStamp(timestamp: Long): TimeStampItem? = lcDao.getTimeStamp(timestamp)
 
   suspend fun getTrackItems(): List<TrackItem> = lcDao.getTrackItems()
 
@@ -94,6 +101,11 @@ class LCRepository(private val lcDao: LCDao) {
     lcDao.delete(item)
   }
 
+  fun deleteLCItemByPackageName(packageName: String) {
+    if (checkDatabaseStatus().not()) return
+    lcDao.deleteLCItemByPackageName(packageName)
+  }
+
   suspend fun delete(item: TrackItem) {
     if (checkDatabaseStatus().not()) return
     lcDao.delete(item)
@@ -121,9 +133,38 @@ class LCRepository(private val lcDao: LCDao) {
     lcDao.deleteByTimeStamp(timestamp)
   }
 
+  suspend fun retainLatestSnapshotsAndRemoveOld(count: Int, forceShowLoading: Boolean, context: ContextThemeWrapper? = null) {
+    if (checkDatabaseStatus().not()) return
+    Timber.d("Retain latest $count snapshots and remove old")
+    var loadingDialog: AlertDialog? = null
+    if (forceShowLoading) {
+      withContext(Dispatchers.Main) {
+        loadingDialog = UiUtils.createLoadingDialog(context!!)
+        loadingDialog.show()
+      }
+    }
+    getTimeStamps()
+      .sortedBy { it.timestamp }
+      .reversed()
+      .drop(count)
+      .forEach {
+        deleteSnapshotsAndTimeStamp(it.timestamp)
+      }
+    if (forceShowLoading) {
+      withContext(Dispatchers.Main) {
+        loadingDialog?.dismiss()
+      }
+    }
+  }
+
   suspend fun updateTimeStampItem(item: TimeStampItem) {
     if (checkDatabaseStatus().not()) return
     lcDao.update(item)
+  }
+
+  suspend fun deleteDuplicateSnapshotItems() {
+    if (checkDatabaseStatus().not()) return
+    lcDao.deleteDuplicateSnapshotItems()
   }
 
   fun deleteAllSnapshots() {
@@ -156,16 +197,15 @@ class LCRepository(private val lcDao: LCDao) {
     lcDao.deleteAllSnapshotDiffItems()
   }
 
-  suspend fun getSnapshotDiff(packageName: String): SnapshotDiffStoringItem? =
-    lcDao.getSnapshotDiff(packageName)
+  suspend fun getSnapshotDiff(packageName: String): SnapshotDiffStoringItem? = lcDao.getSnapshotDiff(packageName)
 
-  fun updateKotlinUsage(packageName: String, used: Boolean) {
+  fun updateFeatures(packageName: String, features: Int) {
     if (checkDatabaseStatus().not()) return
-    lcDao.updateKotlinUsage(packageName, used)
+    lcDao.updateFeatures(packageName, features)
   }
 
-  fun updateKotlinUsage(map: Map<String, Boolean>) {
+  fun updateFeatures(map: Map<String, Int>) {
     if (checkDatabaseStatus().not()) return
-    lcDao.updateKotlinUsage(map)
+    lcDao.updateFeatures(map)
   }
 }

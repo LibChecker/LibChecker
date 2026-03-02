@@ -1,8 +1,10 @@
 package com.absinthe.libchecker.utils
 
 import java.io.File
+import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Paths
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream
 
 object FileUtils {
 
@@ -10,7 +12,9 @@ object FileUtils {
     if (file == null) return false
     return if (file.isDirectory) {
       deleteDir(file)
-    } else deleteFile(file)
+    } else {
+      deleteFile(file)
+    }
   }
 
   private fun deleteDir(dir: File?): Boolean {
@@ -33,7 +37,7 @@ object FileUtils {
   }
 
   private fun deleteFile(file: File?): Boolean {
-    return file != null && (!file.exists() || file.isFile && file.delete())
+    return file != null && (!file.exists() || (file.isFile && file.delete()))
   }
 
   fun getFileSize(file: File): Long {
@@ -49,5 +53,18 @@ object FileUtils {
       val file = File(path)
       if (file.exists()) file.length() else 0
     }
+  }
+
+  @Throws(IOException::class)
+  fun getEntrySize(zipInput: ZipArchiveInputStream): Int {
+    val buffer = ByteArray(1024)
+    var totalSize = 0
+    var length: Int
+
+    while (zipInput.read(buffer).also { length = it } != -1) {
+      totalSize += length
+    }
+
+    return totalSize
   }
 }

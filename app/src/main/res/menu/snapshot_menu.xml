@@ -1,9 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:app="http://schemas.android.com/apk/res-auto">
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools">
+
+  <item
+    android:id="@+id/search"
+    android:icon="@drawable/ic_search"
+    android:title="@string/menu_search"
+    app:actionViewClass="androidx.appcompat.widget.SearchView"
+    app:showAsAction="always|collapseActionView"
+    tools:ignore="AlwaysShowAction" />
+
   <item
     android:id="@+id/save"
     android:icon="@drawable/ic_outline_save"
     android:title="@string/snapshot_btn_save_current"
+    app:showAsAction="always" />
+
+  <item
+    android:id="@+id/advanced"
+    android:icon="@drawable/ic_menu"
+    android:title="@string/advanced_menu"
     app:showAsAction="always" />
 </menu>

@@ -10,7 +10,9 @@ import androidx.core.animation.doOnEnd
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import timber.log.Timber
 
-class HeightAnimatableLinearLayout : LinearLayout, View.OnLayoutChangeListener {
+class HeightAnimatableLinearLayout :
+  LinearLayout,
+  View.OnLayoutChangeListener {
   var animationDuration = 350L
   private var animator: ValueAnimator = ObjectAnimator()
 
@@ -69,8 +71,11 @@ class HeightAnimatableLinearLayout : LinearLayout, View.OnLayoutChangeListener {
   }
 
   private fun enqueueAnimation(action: () -> Unit) {
-    if (!animator.isRunning) action()
-    else animator.doOnEnd { action() }
+    if (!animator.isRunning) {
+      action()
+    } else {
+      animator.doOnEnd { action() }
+    }
   }
 
   private fun setClippedHeight(newHeight: Int) {

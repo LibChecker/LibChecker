@@ -1,0 +1,169 @@
+package com.absinthe.libchecker.features.snapshot.detail.ui.view
+
+import android.content.Context
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
+import android.util.TypedValue
+import android.view.ContextThemeWrapper
+import android.view.ViewGroup
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.graphics.toColorInt
+import androidx.core.view.children
+import androidx.core.view.marginStart
+import androidx.core.view.marginTop
+import com.absinthe.libchecker.R
+import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
+import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
+import com.absinthe.libchecker.utils.extensions.toColorStateList
+import com.absinthe.libchecker.utils.extensions.visibleHeight
+import com.absinthe.libchecker.view.AViewGroup
+import com.absinthe.libraries.utils.utils.UiUtils
+import com.absinthe.rulesbundle.Rule
+import com.google.android.material.card.MaterialCardView
+import com.google.android.material.chip.Chip
+
+class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
+
+  val container = SnapshotDetailNativeContainerView(context).apply {
+    layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+  }
+
+  init {
+    if (UiUtils.isDarkMode()) {
+      strokeColor = Color.TRANSPARENT
+    }
+    setSmoothRoundCorner(16.dp)
+    addView(container)
+  }
+
+  class SnapshotDetailNativeContainerView(context: Context) : AViewGroup(context) {
+
+    init {
+      clipToPadding = false
+      val padding = context.getDimensionPixelSize(R.dimen.main_card_padding)
+      setPadding(padding, padding, padding, padding)
+    }
+
+    val typeIcon = AppCompatImageView(context).apply {
+      layoutParams = LayoutParams(16.dp, 16.dp)
+      imageTintList = R.color.material_blue_grey_700.toColorStateList(context)
+      addView(this)
+    }
+
+    val name = AppCompatTextView(
+      ContextThemeWrapper(
+        context,
+        R.style.TextView_SansSerifMedium
+      )
+    ).apply {
+      layoutParams = LayoutParams(
+        ViewGroup.LayoutParams.WRAP_CONTENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
+      ).also {
+        it.marginStart = 8.dp
+      }
+      setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+      setTextColor(Color.BLACK)
+      addView(this)
+    }
+
+    val libSize = AppCompatTextView(
+      ContextThemeWrapper(
+        context,
+        R.style.TextView_SansSerifCondensed
+      )
+    ).apply {
+      layoutParams = LayoutParams(
+        ViewGroup.LayoutParams.WRAP_CONTENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
+      )
+      setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
+      setTextColor(Color.BLACK)
+      addView(this)
+    }
+
+    private var chip: Chip? = null
+
+    fun setChipOnClickListener(listener: OnClickListener?) {
+      chip?.setOnClickListener(listener)
+    }
+
+    fun setChip(rule: Rule?, color: Int) {
+      if (rule == null) {
+        if (chip != null) {
+          removeView(chip)
+          chip = null
+        }
+      } else {
+        (
+          chip ?: Chip(context).apply {
+            layoutParams = LayoutParams(
+              ViewGroup.LayoutParams.WRAP_CONTENT,
+              ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            setTextColor(Color.BLACK)
+            chipStrokeColor = ColorStateList.valueOf(("#20000000".toColorInt()))
+            chipStrokeWidth = 1.dp.toFloat()
+            chipStartPadding = 10.dp.toFloat()
+            setPadding(paddingStart, 2.dp, paddingEnd, 2.dp)
+            addView(this)
+            chip = this
+          }
+          ).apply {
+          setChipIconResource(rule.iconRes)
+          text = rule.label
+          chipBackgroundColor = ColorStateList.valueOf(color)
+
+          if (!GlobalValues.isColorfulIcon && !rule.isSimpleColorIcon) {
+            val icon = chipIcon
+            icon?.let {
+              it.mutate().colorFilter =
+                ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
+              chipIcon = it
+            }
+          } else if (rule.isSimpleColorIcon) {
+            chipIcon?.mutate()?.setTint(Color.BLACK)
+          } else {
+            setChipIconResource(rule.iconRes)
+          }
+        }
+      }
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+      super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+      children.forEach {
+        it.autoMeasure()
+      }
+      val textWidth =
+        (measuredWidth - paddingStart - typeIcon.measuredWidth - name.marginStart - paddingEnd)
+      if (name.measuredWidth > textWidth) {
+        name.measure(textWidth.toExactlyMeasureSpec(), name.defaultHeightMeasureSpec(this))
+      }
+      if (libSize.measuredWidth > textWidth) {
+        libSize.measure(textWidth.toExactlyMeasureSpec(), libSize.defaultHeightMeasureSpec(this))
+      }
+      val chipHeight = chip?.let { it.measuredHeight + it.marginTop } ?: 0
+      setMeasuredDimension(
+        measuredWidth,
+        paddingTop + name.measuredHeight + libSize.measuredHeight + chipHeight + paddingBottom
+      )
+    }
+
+    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+      typeIcon.layout(paddingStart, typeIcon.toVerticalCenter(this))
+      val nameXOffset = paddingStart + typeIcon.measuredWidth + name.marginStart
+      name.layout(
+        nameXOffset,
+        (measuredHeight - name.measuredHeight - libSize.measuredHeight - chip.visibleHeight()) / 2
+      )
+      libSize.layout(nameXOffset, name.bottom)
+      chip?.layout(nameXOffset, libSize.bottom + chip!!.marginTop)
+    }
+  }
+}

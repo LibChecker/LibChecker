@@ -2,7 +2,7 @@ package com.absinthe.libchecker.database.backup
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
-import java.io.*
+import java.io.File
 import java.security.NoSuchAlgorithmException
 import java.security.spec.InvalidKeySpecException
 import java.security.spec.KeySpec
@@ -48,13 +48,7 @@ class AESEncryptionHelper {
    */
   @Throws(Exception::class)
   fun readFile(file: File): ByteArray {
-    val fileContents = file.readBytes()
-    val inputBuffer = BufferedInputStream(
-      FileInputStream(file)
-    )
-    inputBuffer.read(fileContents)
-    inputBuffer.close()
-    return fileContents
+    return file.readBytes()
   }
 
   /**
@@ -64,10 +58,7 @@ class AESEncryptionHelper {
    */
   @Throws(Exception::class)
   fun saveFile(fileData: ByteArray, file: File) {
-    val bos = BufferedOutputStream(FileOutputStream(file, false))
-    bos.write(fileData)
-    bos.flush()
-    bos.close()
+    file.outputStream().buffered().use { it.write(fileData) }
   }
 
   /**
@@ -78,13 +69,12 @@ class AESEncryptionHelper {
    */
   @SuppressLint("ApplySharedPref")
   fun getSecretKey(sharedPref: SharedPreferences, iv: ByteArray): SecretKey {
-
-    //get key: String from sharedpref
+    // get key: String from sharedpref
     var password = sharedPref.getString(BACKUP_SECRET_KEY, null)
 
-    //If no key is stored in shared pref, create one and save it
+    // If no key is stored in shared pref, create one and save it
     if (password == null) {
-      //generate random string
+      // generate random string
       val stringLength = 15
       val charset = ('a'..'z') + ('A'..'Z') + ('1'..'9')
       password = (1..stringLength)
@@ -92,16 +82,16 @@ class AESEncryptionHelper {
         .joinToString("")
 
       val secretKey = generateSecretKey(password, iv)
-      //the key can be saved plain, because i am using EncryptedSharedPreferences
+      // the key can be saved plain, because i am using EncryptedSharedPreferences
       val editor = sharedPref.edit()
       editor.putString(BACKUP_SECRET_KEY, password)
-      //I use .commit because when using .apply the needed app restart is faster then apply and the preferences wont be saved
+      // I use .commit because when using .apply the needed app restart is faster then apply and the preferences won't be saved
       editor.commit()
 
       return secretKey
     }
 
-    //generate secretKey, and return it
+    // generate secretKey, and return it
     return generateSecretKey(password, iv)
   }
 
@@ -112,7 +102,7 @@ class AESEncryptionHelper {
    * @return SecretKey
    */
   fun getSecretKeyWithCustomPw(encryptPassword: String, iv: ByteArray): SecretKey {
-    //generate secretKey, and return it
+    // generate secretKey, and return it
     return generateSecretKey(encryptPassword, iv)
   }
 
@@ -126,8 +116,8 @@ class AESEncryptionHelper {
    */
   @Throws(NoSuchAlgorithmException::class, InvalidKeySpecException::class)
   private fun generateSecretKey(password: String, iv: ByteArray?): SecretKey {
-    //convert random string to secretKey
-    val spec: KeySpec = PBEKeySpec(password.toCharArray(), iv, 65536, 128) // AES-128
+    // convert random string to secretKey
+    val spec: KeySpec = PBEKeySpec(password.toCharArray(), iv, 65536, 128) //  AES-128
     val secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
     val key = secretKeyFactory.generateSecret(spec).encoded
     return SecretKeySpec(key, "AES")

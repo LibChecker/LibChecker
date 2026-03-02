@@ -3,7 +3,11 @@ package com.absinthe.libchecker.utils.extensions
 import android.animation.Animator
 import android.animation.TimeInterpolator
 import android.animation.ValueAnimator
+import android.content.ClipData
 import android.content.res.Resources
+import android.graphics.Bitmap
+import android.graphics.RenderEffect
+import android.graphics.Shader
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
@@ -13,16 +17,29 @@ import android.text.style.StrikethroughSpan
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.LinearInterpolator
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.FileProvider
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.children
+import androidx.core.view.isVisible
 import androidx.viewpager2.widget.ViewPager2
+import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.compat.VersionCompat
+import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libraries.utils.extensions.addPaddingBottom
 import com.absinthe.libraries.utils.extensions.addPaddingEnd
 import com.absinthe.libraries.utils.extensions.addPaddingStart
 import com.absinthe.libraries.utils.extensions.addPaddingTop
 import com.absinthe.libraries.utils.utils.UiUtils
+import com.google.android.material.card.MaterialCardView
+import com.google.android.material.shape.ShapeAppearanceModel
+import com.google.android.material.shape.SuperEllipseCornerTreatment
+import java.io.File
 import rikka.core.util.ClipboardUtils
+import timber.log.Timber
 
 fun View.setLongClickCopiedToClipboard(text: CharSequence) {
   setOnLongClickListener {
@@ -86,7 +103,7 @@ fun TextView.tintHighlightText(highlightText: String, rawText: CharSequence) {
     val builder = SpannableStringBuilder()
     val spannableString = SpannableString(text.toString())
     val start = text.indexOf(highlightText, 0, true)
-    val color = context.getColorByAttr(com.google.android.material.R.attr.colorPrimary)
+    val color = context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary)
     spannableString.setSpan(
       ForegroundColorSpan(color),
       start,
@@ -101,7 +118,7 @@ fun TextView.tintHighlightText(highlightText: String, rawText: CharSequence) {
 fun TextView.tintTextToPrimary() {
   val builder = SpannableStringBuilder()
   val spannableString = SpannableString(text.toString())
-  val color = context.getColorByAttr(com.google.android.material.R.attr.colorPrimary)
+  val color = context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary)
   spannableString.setSpan(
     ForegroundColorSpan(color),
     0,
@@ -118,7 +135,7 @@ fun ViewPager2.setCurrentItem(
   interpolator: TimeInterpolator = AccelerateDecelerateInterpolator(),
   pagePxWidth: Int = width
 ) {
-  val pxToDrag: Int = pagePxWidth * (item - currentItem)
+  val pxToDrag: Int = pagePxWidth * (item - currentItem) * (if (isRtl()) -1 else 1)
   val animator = ValueAnimator.ofInt(0, pxToDrag)
   var previousValue = 0
   animator.addUpdateListener { valueAnimator ->
@@ -176,4 +193,104 @@ fun TextView.reverseStrikeThroughAnimation(): ValueAnimator {
   animator.duration = 1000
   animator.start()
   return animator
+}
+
+fun ImageView.copyToClipboard() {
+  val bitmap = runCatching { drawable.toBitmap() }.getOrNull() ?: return
+  val iconFile = File(context.externalCacheDir, Constants.TEMP_ICON)
+  if (!iconFile.exists()) {
+    iconFile.createNewFile()
+  }
+  iconFile.outputStream().use {
+    bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
+  }
+  val uri = FileProvider.getUriForFile(
+    context,
+    BuildConfig.APPLICATION_ID + ".fileprovider",
+    iconFile
+  )
+  if (ClipboardUtils.put(
+      context,
+      ClipData.newUri(context.contentResolver, Constants.TEMP_ICON, uri)
+    )
+  ) {
+    VersionCompat.showCopiedOnClipboardToast(context)
+  }
+}
+
+fun TextView.addStrikeThroughSpan() {
+  val span = SpannableString(text)
+  span.setSpan(StrikethroughSpan(), 0, text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+  text = span
+}
+
+fun View.isRtl(): Boolean {
+  return layoutDirection == View.LAYOUT_DIRECTION_RTL
+}
+
+val View.start: Int
+  get() {
+    return if (isRtl()) {
+      right
+    } else {
+      left
+    }
+  }
+
+val View.end: Int
+  get() {
+    return if (isRtl()) {
+      left
+    } else {
+      right
+    }
+  }
+
+fun View?.visibleWidth() = if (this != null && isVisible) measuredWidth else 0
+fun View?.visibleHeight() = if (this != null && isVisible) measuredHeight else 0
+
+fun View.animatedBlurAction(action: () -> Unit) {
+  var hasActed = false
+  var supportBlur = OsUtils.atLeastS()
+  val animator = ValueAnimator.ofFloat(0f, 16f).apply {
+    duration = 300L
+    interpolator = LinearInterpolator()
+    repeatCount = 1
+    repeatMode = ValueAnimator.REVERSE
+
+    addUpdateListener { animation ->
+      val blurRadius = animation.animatedValue as Float
+      val progress = animation.animatedFraction
+      if (supportBlur) {
+        runCatching {
+          setRenderEffect(
+            RenderEffect.createBlurEffect(
+              blurRadius,
+              blurRadius,
+              Shader.TileMode.DECAL
+            )
+          )
+        }.onFailure {
+          supportBlur = false
+          Timber.e(it)
+        }
+      } else {
+        alpha = 1f - progress
+      }
+      if (animation.animatedFraction > 0.95f && !hasActed) {
+        hasActed = true
+        action()
+      }
+    }
+  }
+  animator.start()
+}
+
+fun MaterialCardView.setSmoothRoundCorner(radius: Int) {
+  val radius = radius.toFloat()
+  val shape = ShapeAppearanceModel.builder()
+    .setAllCorners(SuperEllipseCornerTreatment(radius))
+    .build()
+
+  shapeAppearanceModel = shape
 }

@@ -1,0 +1,83 @@
+name: Bug Report / Bug 反馈
+description: Report a bug / 反馈一个 Bug
+labels: [ "bug" ]
+title: "[BUG] "
+body:
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist / 检查清单
+      description: Ensure that our bug report form is appropriate for you. / 确保我们的错误报告表单适合您。
+      options:
+        - label: No one has submitted a similar or identical bug report before. / 之前没有人提交过类似或相同的 bug report。
+          required: true
+        - label: I'm using the latest version of LibChecker. / 我正在使用 LibChecker 的最新版本。
+          required: true
+  - type: dropdown
+    id: version
+    attributes:
+      label: LibChecker version / LibChecker 版本
+      description: Please select the version you are using / 请选择正在使用的版本
+      options:
+        - Latest release / 最新稳定版
+        - Latest CI / 最新 CI 版
+    validations:
+      required: true
+  - type: textarea
+    id: bug
+    attributes:
+      label: Bug description / Bug 描述
+      description: Please describe the bug / 请描述 bug 详情
+      placeholder: |
+        e.g. Crashed when generating snapshot.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior / 预期行为
+      description: What did you expect to happen? / 你预期会发生什么？
+      placeholder: |
+        e.g. A New snapshot!
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior / 实际行为
+      description: What happened instead? / 反而发生了什么？
+      placeholder: |
+        e.g. Crashed.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce / 复现步骤
+      description: How to reproduce the bug. / 如何复现这个 bug。
+      placeholder: |
+        1. Open the app
+        2. Crashed
+
+        What an app.
+  - type: input
+    id: ui
+    attributes:
+      label: UI / OS
+      description: Your system UI or OS / 你的系统 UI 或 OS
+      placeholder: MIUI / Harmony OS / OneUI / etc.
+    validations:
+      required: true
+  - type: input
+    id: android
+    attributes:
+      label: Android Version / Android 版本
+      description: Your Android Version / 你的 Android 版本
+      placeholder: "12"
+    validations:
+      required: true
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional info / 额外信息
+      description: Everything else you consider worthy that we didn't ask for. / 任何你觉得值得说的。

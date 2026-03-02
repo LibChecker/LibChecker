@@ -5,22 +5,29 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.CreateDocument
 import androidx.fragment.app.FragmentActivity
 import androidx.room.RoomDatabase
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.common.io.Files.copy
+import java.io.BufferedOutputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
+import java.text.SimpleDateFormat
+import java.util.Arrays
+import java.util.Calendar
+import java.util.Locale
+import javax.crypto.BadPaddingException
 import kotlinx.coroutines.runBlocking
 import org.apache.commons.io.comparator.LastModifiedFileComparator
-import java.io.*
-import java.text.SimpleDateFormat
-import java.util.*
-import javax.crypto.BadPaddingException
+import timber.log.Timber
 
 /**
  *  MIT License
@@ -247,17 +254,17 @@ class RoomBackup(var context: Context) : FragmentActivity() {
    */
   private fun initRoomBackup(): Boolean {
     if (roomDatabase == null) {
-      if (enableLogDebug) Log.d(TAG, "roomDatabase is missing")
+      if (enableLogDebug) Timber.d("roomDatabase is missing")
       onCompleteListener?.onComplete(
         false,
         "roomDatabase is missing",
         OnCompleteListener.EXIT_CODE_ERROR_ROOM_DATABASE_MISSING
       )
-      //       throw IllegalArgumentException("roomDatabase is not initialized")
+      //        throw IllegalArgumentException("roomDatabase is not initialized")
       return false
     }
 
-    //Create or retrieve the Master Key for encryption/decryption
+    // Create or retrieve the Master Key for encryption/decryption
     val masterKeyAlias = MasterKey.Builder(context)
       .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
       .build()
@@ -269,7 +276,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
         BACKUP_FILE_LOCATION_CUSTOM_FILE
       )
     ) {
-      if (enableLogDebug) Log.d(TAG, "backupLocation is missing")
+      if (enableLogDebug) Timber.d("backupLocation is missing")
       onCompleteListener?.onComplete(
         false,
         "backupLocation is missing",
@@ -279,10 +286,9 @@ class RoomBackup(var context: Context) : FragmentActivity() {
     }
 
     if (backupLocation == BACKUP_FILE_LOCATION_CUSTOM_FILE && backupLocationCustomFile == null) {
-      if (enableLogDebug) Log.d(
-        TAG,
-        "backupLocation is set to custom backup file, but no file is defined"
-      )
+      if (enableLogDebug) {
+        Timber.d("backupLocation is set to custom backup file, but no file is defined")
+      }
       onCompleteListener?.onComplete(
         false,
         "backupLocation is set to custom backup file, but no file is defined",
@@ -291,8 +297,8 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       return false
     }
 
-    //Initialize/open an instance of EncryptedSharedPreferences
-    //Encryption key is stored in plain text in an EncryptedSharedPreferences --> it is saved encrypted
+    // Initialize/open an instance of EncryptedSharedPreferences
+    // Encryption key is stored in plain text in an EncryptedSharedPreferences --> it is saved encrypted
     sharedPreferences = EncryptedSharedPreferences.create(
       context,
       SHARED_PREFS,
@@ -301,30 +307,29 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
     )
 
-    dbName = roomDatabase!!.getOpenHelper().databaseName!!
+    dbName = roomDatabase!!.openHelper.databaseName!!
     INTERNAL_BACKUP_PATH = File("${context.filesDir}/databasebackup/")
     TEMP_BACKUP_PATH = File("${context.filesDir}/databasebackup-temp/")
     TEMP_BACKUP_FILE = File("$TEMP_BACKUP_PATH/tempbackup.sqlite3")
     EXTERNAL_BACKUP_PATH = File(context.getExternalFilesDir("backup")!!.toURI())
     DATABASE_FILE = File(context.getDatabasePath(dbName).toURI())
 
-    //Create internal and temp backup directory if does not exist
+    // Create internal and temp backup directory if does not exist
     try {
       INTERNAL_BACKUP_PATH.mkdirs()
       TEMP_BACKUP_PATH.mkdirs()
-    } catch (e: FileAlreadyExistsException) {
-    } catch (e: IOException) {
+    } catch (_: FileAlreadyExistsException) {
+    } catch (_: IOException) {
     }
 
     if (enableLogDebug) {
-      Log.d(TAG, "DatabaseName: $dbName")
-      Log.d(TAG, "Database Location: $DATABASE_FILE")
-      Log.d(TAG, "INTERNAL_BACKUP_PATH: $INTERNAL_BACKUP_PATH")
-      Log.d(TAG, "EXTERNAL_BACKUP_PATH: $EXTERNAL_BACKUP_PATH")
-      if (backupLocationCustomFile != null) Log.d(
-        TAG,
-        "backupLocationCustomFile: $backupLocationCustomFile"
-      )
+      Timber.d("DatabaseName: $dbName")
+      Timber.d("Database Location: $DATABASE_FILE")
+      Timber.d("INTERNAL_BACKUP_PATH: $INTERNAL_BACKUP_PATH")
+      Timber.d("EXTERNAL_BACKUP_PATH: $EXTERNAL_BACKUP_PATH")
+      if (backupLocationCustomFile != null) {
+        Timber.d("backupLocationCustomFile: $backupLocationCustomFile")
+      }
     }
     return true
   }
@@ -345,40 +350,44 @@ class RoomBackup(var context: Context) : FragmentActivity() {
    * Start Backup process, and set onComplete Listener to success, if no error occurred, else onComplete Listener success is false
    * and error message is passed
    *
-   * if custom storage ist selected, the [openBackupfileCreator] will be launched
+   * if custom storage is selected, the [openBackupfileCreator] will be launched
    */
   fun backup() {
-    if (enableLogDebug) Log.d(TAG, "Starting Backup ...")
+    if (enableLogDebug) Timber.d("Starting Backup ...")
     val success = initRoomBackup()
     if (!success) return
 
-    //Needed for storage permissions request
+    // Needed for storage permissions request
     currentProcess = PROCESS_BACKUP
 
-    //Create name for backup file, if no custom name is set: Database name + currentTime + .sqlite3
+    // Create name for backup file, if no custom name is set: Database name + currentTime + .sqlite3
     var filename =
       if (customBackupFileName == null) "$dbName-${getTime()}.sqlite3" else customBackupFileName as String
-    //Add .aes extension to filename, if file is encrypted
+    // Add .aes extension to filename, if file is encrypted
     if (backupIsEncrypted) filename += ".aes"
-    if (enableLogDebug) Log.d(TAG, "backupFilename: $filename")
+    if (enableLogDebug) Timber.d("backupFilename: $filename")
 
     when (backupLocation) {
       BACKUP_FILE_LOCATION_INTERNAL -> {
         val backupFile = File("$INTERNAL_BACKUP_PATH/$filename")
         doBackup(backupFile)
       }
+
       BACKUP_FILE_LOCATION_EXTERNAL -> {
         val backupFile = File("$EXTERNAL_BACKUP_PATH/$filename")
         doBackup(backupFile)
       }
+
       BACKUP_FILE_LOCATION_CUSTOM_DIALOG -> {
         backupFilename = filename
-        openBackupfileCreator.launch(backupFilename)
+        openBackupfileCreator.launch(backupFilename!!)
         return
       }
+
       BACKUP_FILE_LOCATION_CUSTOM_FILE -> {
         doBackup(backupLocationCustomFile!!)
       }
+
       else -> return
     }
   }
@@ -389,7 +398,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
    * @param destination File
    */
   private fun doBackup(destination: File) {
-    //Close the database
+    // Close the database
     roomDatabase!!.close()
     if (backupIsEncrypted) {
       val encryptedBytes = encryptBackup() ?: return
@@ -398,20 +407,19 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       bos.flush()
       bos.close()
     } else {
-      //Copy current database to save location (/files dir)
-      copy(DATABASE_FILE, destination)
+      // Copy current database to save location (/files dir)
+      DATABASE_FILE.copyTo(destination)
     }
 
-    //If maxFileCount is set and is reached, delete oldest file
+    // If maxFileCount is set and is reached, delete oldest file
     if (maxFileCount != null) {
       val deleted = deleteOldBackup()
       if (!deleted) return
     }
 
-    if (enableLogDebug) Log.d(
-      TAG,
-      "Backup done, encrypted($backupIsEncrypted) and saved to $destination"
-    )
+    if (enableLogDebug) {
+      Timber.d("Backup done, encrypted($backupIsEncrypted) and saved to $destination")
+    }
     onCompleteListener?.onComplete(true, "success", OnCompleteListener.EXIT_CODE_SUCCESS)
   }
 
@@ -421,25 +429,28 @@ class RoomBackup(var context: Context) : FragmentActivity() {
    * @param destination OutputStream
    */
   private fun doBackup(destination: OutputStream) {
-    //Close the database
+    // Close the database
     roomDatabase!!.close()
     if (backupIsEncrypted) {
       val encryptedBytes = encryptBackup() ?: return
       destination.write(encryptedBytes)
     } else {
-      //Copy current database to save location (/files dir)
-      copy(DATABASE_FILE, destination)
+      // Copy current database to save location (/files dir)
+      DATABASE_FILE.inputStream().use { input ->
+        destination.use { output ->
+          input.copyTo(output)
+        }
+      }
     }
 
-    //If maxFileCount is set and is reached, delete oldest file
+    // If maxFileCount is set and is reached, delete oldest file
     if (maxFileCount != null) {
       val deleted = deleteOldBackup()
       if (!deleted) return
     }
-    if (enableLogDebug) Log.d(
-      TAG,
-      "Backup done, encrypted($backupIsEncrypted) and saved to $destination"
-    )
+    if (enableLogDebug) {
+      Timber.d("Backup done, encrypted($backupIsEncrypted) and saved to $destination")
+    }
     onCompleteListener?.onComplete(true, "success", OnCompleteListener.EXIT_CODE_SUCCESS)
   }
 
@@ -451,10 +462,10 @@ class RoomBackup(var context: Context) : FragmentActivity() {
    */
   private fun encryptBackup(): ByteArray? {
     try {
-      //Copy database you want to backup to temp directory
-      copy(DATABASE_FILE, TEMP_BACKUP_FILE)
+      // Copy database you want to backup to temp directory
+      DATABASE_FILE.copyTo(TEMP_BACKUP_FILE)
 
-      //encrypt temp file, and save it to backup location
+      // encrypt temp file, and save it to backup location
       val encryptDecryptBackup = AESEncryptionHelper()
       val fileData = encryptDecryptBackup.readFile(TEMP_BACKUP_FILE)
 
@@ -462,12 +473,12 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       val encryptedBytes =
         aesEncryptionManager.encryptData(sharedPreferences, encryptPassword, fileData)
 
-      //Delete temp file
+      // Delete temp file
       TEMP_BACKUP_FILE.delete()
 
       return encryptedBytes
     } catch (e: Exception) {
-      if (enableLogDebug) Log.d(TAG, "error during encryption: ${e.message}")
+      if (enableLogDebug) Timber.d("error during encryption: ${e.message}")
       onCompleteListener?.onComplete(
         false,
         "error during encryption",
@@ -483,44 +494,48 @@ class RoomBackup(var context: Context) : FragmentActivity() {
    * if internal or external storage is selected, this function shows a list of all available backup files in a MaterialAlertDialog and
    * calls [restoreSelectedInternalExternalFile] to restore selected file
    *
-   * if custom storage ist selected, the [openBackupfileChooser] will be launched
+   * if custom storage is selected, the [openBackupfileChooser] will be launched
    */
   fun restore() {
-    if (enableLogDebug) Log.d(TAG, "Starting Restore ...")
+    if (enableLogDebug) Timber.d("Starting Restore ...")
     val success = initRoomBackup()
     if (!success) return
 
-    //Needed for storage permissions request
+    // Needed for storage permissions request
     currentProcess = PROCESS_RESTORE
 
-    //Path of Backup Directory
+    // Path of Backup Directory
     val backupDirectory: File
 
     when (backupLocation) {
       BACKUP_FILE_LOCATION_INTERNAL -> {
         backupDirectory = INTERNAL_BACKUP_PATH
       }
+
       BACKUP_FILE_LOCATION_EXTERNAL -> {
         backupDirectory = File("$EXTERNAL_BACKUP_PATH/")
       }
+
       BACKUP_FILE_LOCATION_CUSTOM_DIALOG -> {
         openBackupfileChooser.launch(arrayOf("*/*"))
         return
       }
+
       BACKUP_FILE_LOCATION_CUSTOM_FILE -> {
-        Log.d(TAG, "backupLocationCustomFile!!.exists()? : ${backupLocationCustomFile!!.exists()}")
+        Timber.d("backupLocationCustomFile!!.exists()? : ${backupLocationCustomFile!!.exists()}")
         doRestore(backupLocationCustomFile!!)
         return
       }
+
       else -> return
     }
 
-    //All Files in an Array of type File
+    // All Files in an Array of type File
     val arrayOfFiles = backupDirectory.listFiles()
 
-    //If array is null or empty show "error" and return
+    // If array is null or empty show "error" and return
     if (arrayOfFiles.isNullOrEmpty()) {
-      if (enableLogDebug) Log.d(TAG, "No backups available to restore")
+      if (enableLogDebug) Timber.d("No backups available to restore")
       onCompleteListener?.onComplete(
         false,
         "No backups available",
@@ -530,30 +545,30 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       return
     }
 
-    //Sort Array: lastModified
+    // Sort Array: lastModified
     Arrays.sort(arrayOfFiles, LastModifiedFileComparator.LASTMODIFIED_COMPARATOR)
 
-    //New empty MutableList of String
+    // New empty MutableList of String
     val mutableListOfFilesAsString = mutableListOf<String>()
 
-    //Add each filename to mutablelistOfFilesAsString
+    // Add each filename to mutablelistOfFilesAsString
     runBlocking {
       for (i in arrayOfFiles.indices) {
         mutableListOfFilesAsString.add(arrayOfFiles[i].name)
       }
     }
 
-    //Convert MutableList to Array
+    // Convert MutableList to Array
     val filesStringArray = mutableListOfFilesAsString.toTypedArray()
 
-    //Show MaterialAlertDialog, with all available files, and on click Listener
+    // Show MaterialAlertDialog, with all available files, and on click Listener
     MaterialAlertDialogBuilder(context)
       .setTitle(customRestoreDialogTitle)
       .setItems(filesStringArray) { _, which ->
         restoreSelectedInternalExternalFile(filesStringArray[which])
       }
       .setOnCancelListener {
-        if (enableLogDebug) Log.d(TAG, "Restore dialog canceled")
+        if (enableLogDebug) Timber.d("Restore dialog canceled")
         onCompleteListener?.onComplete(
           false,
           "Restore dialog canceled",
@@ -569,11 +584,11 @@ class RoomBackup(var context: Context) : FragmentActivity() {
    * @param source File
    */
   private fun doRestore(source: File) {
-    //Close the database
+    // Close the database
     roomDatabase!!.close()
     val fileExtension = source.extension
     if (backupIsEncrypted) {
-      copy(source, TEMP_BACKUP_FILE)
+      source.copyTo(TEMP_BACKUP_FILE)
       val decryptedBytes = decryptBackup() ?: return
       val bos = BufferedOutputStream(FileOutputStream(DATABASE_FILE, false))
       bos.write(decryptedBytes)
@@ -581,10 +596,9 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       bos.close()
     } else {
       if (fileExtension == "aes") {
-        if (enableLogDebug) Log.d(
-          TAG,
-          "Cannot restore database, it is encrypted. Maybe you forgot to add the property .fileIsEncrypted(true)"
-        )
+        if (enableLogDebug) {
+          Timber.d("Cannot restore database, it is encrypted. Maybe you forgot to add the property .fileIsEncrypted(true)")
+        }
         onCompleteListener?.onComplete(
           false,
           "cannot restore database, see Log for more details (if enabled)",
@@ -592,14 +606,13 @@ class RoomBackup(var context: Context) : FragmentActivity() {
         )
         return
       }
-      //Copy back database and replace current database
-      copy(source, DATABASE_FILE)
+      // Copy back database and replace current database
+      source.copyTo(DATABASE_FILE)
     }
 
-    if (enableLogDebug) Log.d(
-      TAG,
-      "Restore done, decrypted($backupIsEncrypted) and restored from $source"
-    )
+    if (enableLogDebug) {
+      Timber.d("Restore done, decrypted($backupIsEncrypted) and restored from $source")
+    }
     onCompleteListener?.onComplete(true, "success", OnCompleteListener.EXIT_CODE_SUCCESS)
   }
 
@@ -610,16 +623,16 @@ class RoomBackup(var context: Context) : FragmentActivity() {
    */
   private fun doRestore(source: InputStream) {
     if (backupIsEncrypted) {
-      //Save inputstream to temp file
+      // Save inputstream to temp file
       source.use { input ->
         TEMP_BACKUP_FILE.outputStream().use { output ->
           input.copyTo(output)
         }
       }
-      //Decrypt tempfile and write to database file
+      // Decrypt tempfile and write to database file
       val decryptedBytes = decryptBackup() ?: return
 
-      //Close the database if decryption is succesfull
+      // Close the database if decryption is successful
       roomDatabase!!.close()
 
       val bos = BufferedOutputStream(FileOutputStream(DATABASE_FILE, false))
@@ -627,10 +640,10 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       bos.flush()
       bos.close()
     } else {
-      //Close the database
+      // Close the database
       roomDatabase!!.close()
 
-      //Copy back database and replace current database
+      // Copy back database and replace current database
       source.use { input ->
         DATABASE_FILE.outputStream().use { output ->
           input.copyTo(output)
@@ -638,10 +651,9 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       }
     }
 
-    if (enableLogDebug) Log.d(
-      TAG,
-      "Restore done, decrypted($backupIsEncrypted) and restored from $source"
-    )
+    if (enableLogDebug) {
+      Timber.d("Restore done, decrypted($backupIsEncrypted) and restored from $source")
+    }
     onCompleteListener?.onComplete(true, "success", OnCompleteListener.EXIT_CODE_SUCCESS)
   }
 
@@ -651,15 +663,17 @@ class RoomBackup(var context: Context) : FragmentActivity() {
    * @param filename String
    */
   private fun restoreSelectedInternalExternalFile(filename: String) {
-    if (enableLogDebug) Log.d(TAG, "Restore selected file...")
+    if (enableLogDebug) Timber.d("Restore selected file...")
 
     when (backupLocation) {
       BACKUP_FILE_LOCATION_INTERNAL -> {
         doRestore(File("$INTERNAL_BACKUP_PATH/$filename"))
       }
+
       BACKUP_FILE_LOCATION_EXTERNAL -> {
         doRestore(File("$EXTERNAL_BACKUP_PATH/$filename"))
       }
+
       else -> return
     }
   }
@@ -672,7 +686,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
    */
   private fun decryptBackup(): ByteArray? {
     try {
-      //Decrypt temp file, and save it to database location
+      // Decrypt temp file, and save it to database location
       val encryptDecryptBackup = AESEncryptionHelper()
       val fileData = encryptDecryptBackup.readFile(TEMP_BACKUP_FILE)
 
@@ -680,12 +694,12 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       val decryptedBytes =
         aesEncryptionManager.decryptData(sharedPreferences, encryptPassword, fileData)
 
-      //Delete tem file
+      // Delete tem file
       TEMP_BACKUP_FILE.delete()
 
       return decryptedBytes
     } catch (e: BadPaddingException) {
-      if (enableLogDebug) Log.d(TAG, "error during decryption (wrong password): ${e.message}")
+      if (enableLogDebug) Timber.d("error during decryption (wrong password): ${e.message}")
       onCompleteListener?.onComplete(
         false,
         "error during decryption (wrong password) see Log for more details (if enabled)",
@@ -693,7 +707,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       )
       return null
     } catch (e: Exception) {
-      if (enableLogDebug) Log.d(TAG, "error during decryption: ${e.message}")
+      if (enableLogDebug) Timber.d("error during decryption: ${e.message}")
       onCompleteListener?.onComplete(
         false,
         "error during decryption see Log for more details (if enabled)",
@@ -722,8 +736,9 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       }
       when (currentProcess) {
         PROCESS_BACKUP -> {
-          openBackupfileCreator.launch(backupFilename)
+          backupFilename?.let { openBackupfileCreator.launch(it) }
         }
+
         PROCESS_RESTORE -> {
           openBackupfileChooser.launch(arrayOf("*/*"))
         }
@@ -751,7 +766,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
    * Opens the [ActivityResultContracts.CreateDocument] and prompts the user to select a path for creating the new backup file
    */
   private val openBackupfileCreator =
-    (context as ComponentActivity).registerForActivityResult(ActivityResultContracts.CreateDocument()) { result ->
+    (context as ComponentActivity).registerForActivityResult(CreateDocument("todo/todo")) { result ->
       if (result != null) {
         val out = context.contentResolver.openOutputStream(result)!!
         doBackup(out)
@@ -768,7 +783,6 @@ class RoomBackup(var context: Context) : FragmentActivity() {
    * @return current time formatted as String
    */
   private fun getTime(): String {
-
     val currentTime = Calendar.getInstance().time
 
     val sdf = if (Build.VERSION.SDK_INT <= 28) {
@@ -786,28 +800,31 @@ class RoomBackup(var context: Context) : FragmentActivity() {
    * @return true if old files deleted or nothing to do
    */
   private fun deleteOldBackup(): Boolean {
-    //Path of Backup Directory
+    // Path of Backup Directory
 
     val backupDirectory: File = when (backupLocation) {
       BACKUP_FILE_LOCATION_INTERNAL -> {
         INTERNAL_BACKUP_PATH
       }
+
       BACKUP_FILE_LOCATION_EXTERNAL -> {
         File("$EXTERNAL_BACKUP_PATH/")
       }
+
       BACKUP_FILE_LOCATION_CUSTOM_DIALOG -> {
-        //In custom backup location no backups will be removed
+        // In custom backup location no backups will be removed
         return true
       }
+
       else -> return true
     }
 
-    //All Files in an Array of type File
+    // All Files in an Array of type File
     val arrayOfFiles = backupDirectory.listFiles()
 
-    //If array is null or empty nothing to do and return
+    // If array is null or empty nothing to do and return
     if (arrayOfFiles.isNullOrEmpty()) {
-      if (enableLogDebug) Log.d(TAG, "")
+      if (enableLogDebug) Timber.d("")
       onCompleteListener?.onComplete(
         false,
         "maxFileCount: Failed to get list of backups",
@@ -815,17 +832,17 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       )
       return false
     } else if (arrayOfFiles.size > maxFileCount!!) {
-      //Sort Array: lastModified
+      // Sort Array: lastModified
       Arrays.sort(arrayOfFiles, LastModifiedFileComparator.LASTMODIFIED_COMPARATOR)
 
-      //Get count of files to delete
+      // Get count of files to delete
       val fileCountToDelete = arrayOfFiles.size - maxFileCount!!
 
       for (i in 1..fileCountToDelete) {
-        //Delete all old files (i-1 because array starts a 0)
+        // Delete all old files (i-1 because array starts a 0)
         arrayOfFiles[i - 1].delete()
 
-        if (enableLogDebug) Log.d(TAG, "maxFileCount reached: ${arrayOfFiles[i - 1]} deleted")
+        if (enableLogDebug) Timber.d("maxFileCount reached: ${arrayOfFiles[i - 1]} deleted")
       }
     }
     return true

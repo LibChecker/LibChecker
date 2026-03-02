@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <color name="colorPrimaryMd3">@android:color/system_accent1_100</color>
-  <color name="colorSurfaceMd3">@android:color/system_neutral1_900</color>
-  <color name="colorActivatedMd3">@android:color/system_neutral1_700</color>
+  <color name="lib_icon_background">#00FFFFFF</color>
+  <color name="ic_launcher_foreground">@android:color/system_accent1_0</color>
+  <color name="ic_launcher_background">@android:color/system_accent1_600</color>
 </resources>

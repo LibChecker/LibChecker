@@ -2,18 +2,23 @@ package com.absinthe.libchecker
 
 import android.app.Application
 import android.content.Context
-import androidx.window.core.ExperimentalWindowApi
+import android.content.pm.PackageParser
+import android.os.StrictMode
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
+import androidx.window.embedding.RuleController
 import androidx.window.embedding.SplitController
 import coil.Coil
 import coil.ImageLoader
-import com.absinthe.libchecker.app.AppIconFetcherFactory
-import com.absinthe.libchecker.app.Global
+import com.absinthe.libchecker.app.MainLooperFilter
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.OsUtils
-import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.Telemetry
+import com.absinthe.libchecker.utils.UiUtils
+import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.timber.FileLoggingTree
 import com.absinthe.libchecker.utils.timber.ReleaseTree
 import com.absinthe.libchecker.utils.timber.ThreadAwareDebugTree
 import com.absinthe.libraries.utils.utils.Utility
@@ -21,15 +26,16 @@ import com.absinthe.rulesbundle.LCRemoteRepo
 import com.absinthe.rulesbundle.LCRules
 import com.google.android.material.color.DynamicColors
 import com.jakewharton.processphoenix.ProcessPhoenix
-import com.microsoft.appcenter.AppCenter
-import com.microsoft.appcenter.analytics.Analytics
-import com.microsoft.appcenter.crashes.Crashes
+import java.io.File
 import jonathanfinerty.once.Once
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import me.zhanghai.android.appiconloader.coil.AppIconFetcher
+import me.zhanghai.android.appiconloader.coil.AppIconKeyer
 import org.lsposed.hiddenapibypass.HiddenApiBypass
-import rikka.material.app.DayNightDelegate
 import rikka.material.app.LocaleDelegate
 import timber.log.Timber
-import java.util.UUID
 
 class LibCheckerApp : Application() {
 
@@ -40,26 +46,17 @@ class LibCheckerApp : Application() {
       return
     }
 
-    if (OsUtils.atLeastP()) {
-      HiddenApiBypass.addHiddenApiExemptions("")
-    }
+    bypass()
 
     app = this
-    if (!BuildConfig.DEBUG && GlobalValues.isAnonymousAnalyticsEnabled.value == true) {
-      AppCenter.start(
-        this,
-        BuildConfig.APP_CENTER_SECRET,
-        Analytics::class.java,
-        Crashes::class.java
-      )
-    }
 
     if (BuildConfig.DEBUG) {
       Timber.plant(ThreadAwareDebugTree())
     } else {
       Timber.plant(ReleaseTree())
     }
-
+    Timber.plant(FileLoggingTree(this))
+    Telemetry.setEnable(GlobalValues.isAnonymousAnalyticsEnabled)
     LCRules.init(this)
     LCRules.setRemoteRepo(
       if (GlobalValues.repo == Constants.REPO_GITHUB) {
@@ -70,48 +67,79 @@ class LibCheckerApp : Application() {
     )
     Utility.init(this)
     LocaleDelegate.defaultLocale = GlobalValues.locale
-    DayNightDelegate.setApplicationContext(this)
-    DayNightDelegate.setDefaultNightMode(LCAppUtils.getNightMode(GlobalValues.darkMode))
+    if (OsUtils.atLeastT()) {
+      AppCompatDelegate.setApplicationLocales(LocaleListCompat.create(GlobalValues.locale))
+    }
+    AppCompatDelegate.setDefaultNightMode(UiUtils.getNightMode())
     Once.initialise(this)
     Repositories.init(this)
-    Repositories.checkRulesDatabase()
-    initSplitController()
     DynamicColors.applyToActivitiesIfAvailable(this)
+    initSplitController()
 
     Coil.setImageLoader {
-      ImageLoader(this).newBuilder()
+      ImageLoader.Builder(this)
         .components {
-          add(AppIconFetcherFactory(this@LibCheckerApp))
+          add(AppIconKeyer())
+          add(AppIconFetcher.Factory(40.dp, false, this@LibCheckerApp))
         }
         .build()
+    }
+    GlobalScope.launch(Dispatchers.IO) {
+      clearCache()
     }
   }
 
   override fun attachBaseContext(base: Context?) {
     super.attachBaseContext(base)
-    Global.start()
+    MainLooperFilter.start()
   }
 
-  @OptIn(ExperimentalWindowApi::class)
   private fun initSplitController() {
+    val ratio = UiUtils.getScreenAspectRatio()
+    val hasHinge = UiUtils.hasHinge()
+    val splitSupportStatus = SplitController.getInstance(this).splitSupportStatus
+    Timber.d("initSplitController: getScreenAspectRatio: $ratio, hasHinge=$hasHinge, splitSupportStatus=$splitSupportStatus")
     runCatching {
-      if (SplitController.getInstance().isSplitSupported()) {
-        SplitController.initialize(this, R.xml.main_split_config)
+      if (splitSupportStatus == SplitController.SplitSupportStatus.SPLIT_AVAILABLE) {
+        RuleController.getInstance(this).setRules(
+          if (hasHinge || ratio in 0.85f..1.15f) {
+            RuleController.parseRules(this, R.xml.main_split_config_foldable)
+          } else {
+            RuleController.parseRules(this, R.xml.main_split_config)
+          }
+        )
       }
+    }
+  }
+
+  @Suppress("SoonBlockedPrivateApi, DiscouragedPrivateApi")
+  private fun bypass() {
+    if (OsUtils.atLeastP()) {
+      HiddenApiBypass.addHiddenApiExemptions("")
+    }
+
+    // bypass PackageParser check
+    // see also: https://cs.android.com/android/platform/superproject/main/+/main:frameworks/base/core/java/android/content/pm/PackageParser.java;l=2695
+    PackageParser::class.java.getDeclaredField("SDK_VERSION").apply {
+      isAccessible = true
+      set(null, Integer.MAX_VALUE)
+    }
+
+    runCatching {
+      StrictMode::class.java.getDeclaredMethod("disableDeathOnFileUriExposure").invoke(null)
+      Timber.i("StrictMode: disableDeathOnFileUriExposure")
+    }
+  }
+
+  private fun clearCache() {
+    val sharedApkDir = File(cacheDir, "shared_apk")
+    if (sharedApkDir.exists() && sharedApkDir.isDirectory) {
+      sharedApkDir.deleteRecursively()
     }
   }
 
   companion object {
     //noinspection StaticFieldLeak
     lateinit var app: Application
-
-    fun generateAuthKey(): Int {
-      if (GlobalValues.uuid.isEmpty()) {
-        GlobalValues.uuid = UUID.randomUUID().toString()
-      }
-      return (GlobalValues.uuid.hashCode() + PackageUtils.getPackageInfo(app.packageName).firstInstallTime).mod(
-        90000
-      ) + 10000
-    }
   }
 }

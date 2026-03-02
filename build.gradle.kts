@@ -1,28 +1,52 @@
+import com.diffplug.gradle.spotless.SpotlessExtension
+import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
+
 plugins {
-  id(libs.plugins.android.application.get().pluginId) apply false
-  id(libs.plugins.android.library.get().pluginId) apply false
-  id(libs.plugins.kotlin.android.get().pluginId) apply false
+  alias(libs.plugins.android.application) apply false
+  alias(libs.plugins.android.library) apply false
+  alias(libs.plugins.kotlin.parcelize) apply false
   alias(libs.plugins.protobuf) apply false
-  alias(libs.plugins.kotlinter) apply false
   alias(libs.plugins.hiddenApiRefine) apply false
   alias(libs.plugins.ksp) apply false
+  alias(libs.plugins.moshiX) apply false
+  alias(libs.plugins.spotless) apply false
+  alias(libs.plugins.aboutlibraries) apply false
+  alias(libs.plugins.gms) apply false
+  alias(libs.plugins.firebase.crashlytics) apply false
+  id("build-logic") apply false
 }
 
 allprojects {
-  apply(plugin = rootProject.libs.plugins.kotlinter.get().pluginId)
-
-  tasks.matching {
-    it.name.contains("transformClassesWithHiddenApiRefine")
-  }.configureEach {
-    notCompatibleWithConfigurationCache("https://github.com/RikkaApps/HiddenApiRefinePlugin/issues/9")
+  plugins.apply(rootProject.libs.plugins.spotless.get().pluginId)
+  extensions.configure<SpotlessExtension> {
+    kotlin {
+      target("src/**/*.kt")
+      ktlint(rootProject.libs.ktlint.get().version)
+    }
+    kotlinGradle {
+      ktlint(rootProject.libs.ktlint.get().version)
+    }
   }
-  tasks.matching {
-    it.name.contains("optimize(.*)ReleaseRes".toRegex())
-  }.configureEach {
-    notCompatibleWithConfigurationCache("optimizeReleaseRes tasks haven't support CC.")
+
+  // Configure Java to use our chosen language level. Kotlin will automatically pick this up.
+  // See https://kotlinlang.org/docs/gradle-configure-project.html#gradle-java-toolchains-support
+  plugins.withType<JavaBasePlugin>().configureEach {
+    extensions.configure<JavaPluginExtension> {
+      toolchain.languageVersion = JavaLanguageVersion.of(25)
+    }
+  }
+
+  tasks.withType<KotlinCompilationTask<*>>().configureEach {
+    compilerOptions {
+      freeCompilerArgs.add("-Xannotation-default-target=param-property")
+    }
   }
 }
 
-task<Delete>("clean") {
-  delete(rootProject.buildDir)
+buildscript {
+  dependencies {
+    // For KGP
+    classpath(libs.gradlePlugin.kotlin)
+  }
 }

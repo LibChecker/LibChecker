@@ -1,0 +1,16 @@
+- Fixed the predictive back gesture above Android 14
+- Fixed the issue of duplicate menu options
+- Updated the Rules bundle to V34
+- Fixed XML parsing failure in some cases
+- Snapshots now display the differential in application size changes
+- Updated some icon styles and text
+- Added support for Arabic and optimized RTL layout
+- Fixed the issue where APK files with a minSdk version higher than the current device could not be analyzed
+- Added a copy button to the application signature information page
+- Added an Android version distribution chart (sourced from Google)
+- Added an option to highlight differences on the snapshot page
+- Fixed potential update failures of cloud-based rules
+- Added a channel for obtaining application updates in the settings page
+- Added Dexopt information to the application properties page
+- Long pressing components on the application detail and snapshot detail pages allows quick access to the reference detail page
+- New snapshots now start recording compileSdk and minSdk

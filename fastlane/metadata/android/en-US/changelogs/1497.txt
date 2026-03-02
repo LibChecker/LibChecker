@@ -1,0 +1,3 @@
+- Adjust the split screen logic in widescreen
+- Added more options in the advanced menu
+- Improve the smoothness and stability of the application

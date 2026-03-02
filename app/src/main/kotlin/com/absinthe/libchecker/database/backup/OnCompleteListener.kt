@@ -1,7 +1,5 @@
 package com.absinthe.libchecker.database.backup
 
-import com.absinthe.libchecker.database.backup.RoomBackup.Companion.BACKUP_FILE_LOCATION_CUSTOM_FILE
-
 /**
  *  MIT License
  *
@@ -57,7 +55,7 @@ interface OnCompleteListener {
     /** You tried to restore a encrypted backup but [RoomBackup.backupIsEncrypted] is set to false */
     const val EXIT_CODE_ERROR_RESTORE_BACKUP_IS_ENCRYPTED = 9
 
-    /** No backups to restore are available in internal/external sotrage */
+    /** No backups to restore are available in internal/external storage */
     const val EXIT_CODE_ERROR_RESTORE_NO_BACKUPS_AVAILABLE = 10
 
     /** No room database to backup is provided  */

@@ -1,12 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <string name="app_name" translatable="false">LibChecker</string>
+  <string name="apk" translatable="false">APK</string>
   <string name="app_bundle" translatable="false">App Bundles</string>
+  <string name="abi_string" translatable="false">ABI</string>
   <string name="kotlin_string" translatable="false">Kotlin</string>
+  <string name="target_sdk_string" translatable="false">Target SDK</string>
+  <string name="min_sdk_string" translatable="false">Min SDK</string>
+  <string name="compile_sdk_string" translatable="false">Compile SDK</string>
   <string name="agp" translatable="false">Android Gradle Plugin</string>
   <string name="pwa" translatable="false">Progressive Web Apps</string>
   <string name="jetpack_compose" translatable="false">Jetpack Compose</string>
+  <string name="jetpack_compose_short" translatable="false">Compose</string>
+  <string name="jetbrain_kmp" translatable="false">Compose Multiplatform</string>
+  <string name="jetbrain_kmp_short" translatable="false">KMP</string>
+  <string name="rxjava" translatable="false">RxJava</string>
+  <string name="rxkotlin" translatable="false">RxKotlin</string>
+  <string name="rxandroid" translatable="false">RxAndroid</string>
+
+  <string name="empty" translatable="false"> </string>
+
+  <string name="ref_category_dex" translatable="false">Dex</string>
 
   <string name="snapshot_none" translatable="false">None</string>
-
-  <string name="extract_native_libs_tip_part_b" translatable="false">android:extractNativeLibs="false"</string>
 </resources>

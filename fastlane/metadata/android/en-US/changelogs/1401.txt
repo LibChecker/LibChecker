@@ -1,0 +1,3 @@
+- Marking of not granted permissions
+- UI improvements
+- Bugs fixes
