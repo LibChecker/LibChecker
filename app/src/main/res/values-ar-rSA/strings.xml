@@ -118,8 +118,10 @@
   <string name="further_operation">مزيد من العمليات</string>
   <string name="app_info_launch">تشغيل</string>
   <string name="app_info_settings">الاعدادات</string>
+  <string name="app_info_share">الإعدادات</string>
   <string name="lib_detail_dialog_title">تفاصيل المكتبة</string>
   <string name="lib_permission_dialog_title">تفاصيل الإذن</string>
+  <string name="lib_permission_provided_by_format">مقدمة من قِبل %s</string>
   <string name="agp_details">يعتمد نظام بناء Android Studio على Gradle, ويضيف المكون الإضافي Android Gradle العديد من الميزات الخاصة بإنشاء تطبيقات Android. على الرغم من أن المكون الإضافي لنظام Android يتم تحديثه عادة في خطوة قفل مع Android Studio ، إلا أن المكون الإضافي (وبقية نظام Gradle) يمكن تشغيله بشكل مستقل عن Android Studio ويتم تحديثه بشكل منفصل.</string>
   <string name="xposed_module">وحدة Xposed</string>
   <string name="xposed_module_details">Xposed هو إطار عمل للوحدات النمطية التي يمكنها تغيير سلوك النظام والتطبيقات دون لمس أي ملفات APK. هذا رائع لأنه يعني أن الوحدات يمكن أن تعمل مع إصدارات مختلفة وحتى ذاكرة القراءة فقط دون أي تغييرات.</string>
@@ -170,6 +172,8 @@
   <string name="lib_detail_app_props_title">خصائص التطبيق</string>
   <string name="lib_detail_app_props_tip">المزيد من المعلومات</string>
   <string name="lib_detail_xposed_min_version">الحد الأدنى للإصدار</string>
+  <string name="lib_detail_xposed_target_version">الإصدار المستهدف</string>
+  <string name="lib_detail_xposed_static_scope">نطاق ثابت</string>
   <string name="lib_detail_xposed_default_scope">النطاق الافتراضي</string>
   <string name="lib_detail_xposed_init_class">فئة النشاط</string>
   <string name="lib_detail_app_install_source_title">مصدر التثبيت</string>
@@ -190,8 +194,15 @@
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">شيزوكو غير مصرح به</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">انقر هنا للحصول على إذن Shizuku مقدم التثبيت</string>
   <string name="lib_detail_elf_info">معلومات أكثر</string>
+  <string name="lib_detail_elf_extract">استخرج</string>
+  <string name="lib_detail_elf_extract_success">ملف ELF محفوظ في التنزيلات</string>
+  <string name="lib_detail_elf_extract_failed">فشل في استخراج ملف ELF</string>
   <string name="lib_detail_dependency_tip">التبعية</string>
   <string name="lib_detail_entry_points_tip">نقاط الدخول</string>
+  <string name="apk_preview">معاينة APK</string>
+  <string name="apk_preview_item_not_available">لا يمكن عرضها في وضع المعاينة</string>
+  <string name="feature_live_update_notification">إشعار التحديث المباشر</string>
+  <string name="feature_live_update_notification_summary">ويعزز النظام إشعارات التحديث المباشر. الإشعارات الترويجية تظهر بشكل أكثر بروزا على أسطح النظام، بما في ذلك في الجزء العلوي من درج الإشعارات وشاشة القفل، وكشريحة في شريط الحالة.</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">نسخ إلى الحافظة</string>
   <string name="toast_not_existing_market">لا يوجد أي سوق تطبيقات موجود</string>
@@ -200,6 +211,7 @@
   <string name="toast_cloud_rules_update_error">فشل تحديث قواعد السحابة. يرجى المحاولة مرة أخرى.</string>
   <string name="toast_not_enough_storage_space">لا توجد مساحة تخزين كافية</string>
   <string name="toast_downloading_app">تم طلب التنزيل</string>
+  <string name="toast_long_tap_share_button_tip">اضغط مطولاً على زر \"مشاركة\" لاختيار مكان للحفظ</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">حفظ نقطة الاستعادة الحالية</string>
   <string name="snapshot_current_timestamp">الطابع الزمني الحالي لنقطة الاستعادة</string>
@@ -231,6 +243,8 @@
   <string name="btn_drop">تجاهل</string>
   <string name="dialog_title_compare_diff_apk">انتباه</string>
   <string name="dialog_message_compare_diff_apk">هل تريد مقارنة اثنين من ملفات APK مختلفة؟</string>
+  <string name="dialog_themed_and_alternative_app_icons">أيقونات بديلة ومخصّصة</string>
+  <string name="dialog_themed">السمة</string>
   <!--  Album  -->
   <string name="album_compare">مقارنة</string>
   <string name="album_item_comparison_title">المقارنة</string>
