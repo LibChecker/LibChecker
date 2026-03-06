@@ -303,6 +303,7 @@ class LibDetailBottomSheetView(context: Context) :
   }
 
   private var libDetailBean: LibDetailBean? = null
+  private var updateTime: String? = null
 
   fun setLibDetailBean(libDetailBean: LibDetailBean) {
     this.libDetailBean = libDetailBean
@@ -324,7 +325,7 @@ class LibDetailBottomSheetView(context: Context) :
   }
 
   private fun setContent(ruleBean: LibDetailBean.Data) {
-    val list = listOf(
+    val list = arrayListOf(
       LibDetailItem(
         iconRes = R.drawable.ic_label,
         tipRes = R.string.lib_detail_label_tip,
@@ -356,18 +357,24 @@ class LibDetailBottomSheetView(context: Context) :
         text = "<a href='${ruleBean.data.source_link}'> ${ruleBean.data.source_link} </a>"
       )
     )
+    updateTime?.let {
+      list.add(
+        LibDetailItem(
+          iconRes = R.drawable.ic_time,
+          tipRes = R.string.lib_detail_last_update_tip,
+          textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBody2),
+          text = it
+        )
+      )
+    }
     contentAdapter.setList(list)
   }
 
   fun setUpdateTIme(time: String) {
-    contentAdapter.addData(
-      LibDetailItem(
-        iconRes = R.drawable.ic_time,
-        tipRes = R.string.lib_detail_last_update_tip,
-        textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBody2),
-        text = time
-      )
-    )
+    if (libDetailBean != null) {
+      updateTime = time
+      setContent(libDetailBean!!.data[tabLayout.selectedTabPosition])
+    }
   }
 
   fun showContent() {
