@@ -18,10 +18,13 @@ import timber.log.Timber
 
 class ApkPreview(val url: String) {
   private val client = ApiManager.okHttpClient
-  private val httpUrl = url.toHttpUrlOrNull() ?: throw IllegalArgumentException("Invalid URL: $url")
+  private val httpUrl = url.toHttpUrlOrNull()
   private val elfMap: MutableMap<Int, MutableList<Pair<String, Int>>> = mutableMapOf()
 
   fun parse(): Result<ApkPreviewInfo> = runCatching {
+    if (httpUrl == null) {
+      throw IllegalArgumentException("Invalid URL: $url")
+    }
     val recorder = TimeRecorder().apply { start() }
     val metadata = fetchMetadata()
 
@@ -494,7 +497,7 @@ class ApkPreview(val url: String) {
   }
 
   private fun newRequestBuilder(): Request.Builder = Request.Builder()
-    .url(httpUrl)
+    .url(httpUrl!!)
     .header("Accept-Encoding", "identity")
 
   private fun executeRequest(request: Request) = try {

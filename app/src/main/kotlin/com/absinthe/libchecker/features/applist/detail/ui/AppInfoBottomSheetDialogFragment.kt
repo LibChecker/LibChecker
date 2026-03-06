@@ -315,7 +315,7 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
 
   private fun getShowAppSourceList(): List<AppInfoAdapter.AppInfoItem> {
     val pkg = packageName ?: return emptyList()
-    val source = PackageUtils.getPackageInfo(pkg).applicationInfo?.sourceDir ?: return emptyList()
+    val source = runCatching { PackageUtils.getPackageInfo(pkg).applicationInfo?.sourceDir }.getOrNull() ?: return emptyList()
     val sourcePath = runCatching { File(source) }.getOrNull() ?: return emptyList()
 
     return PackageManagerCompat.queryIntentActivities(
