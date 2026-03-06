@@ -19,7 +19,6 @@ import androidx.core.graphics.withTranslation
 import com.absinthe.libchecker.utils.extensions.dpToDimension
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.BlockingQueue
-import kotlin.coroutines.coroutineContext
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
@@ -31,6 +30,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -114,19 +114,20 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
   private var highlightAnimationAvailable = false
   private var isRunning = false
 
-  private val iconEmitter = object : HighlightIconEmitter {
-    override suspend fun emit(bitmap: Bitmap) {
-      coroutineContext.ensureActive()
-      try {
+  private val iconEmitter = HighlightIconEmitter { bitmap ->
+    currentCoroutineContext().ensureActive()
+    try {
+      // See also: RecordingCanvas#throwIfCannotDraw
+      if (bitmap.byteCount <= 150 * 1024 * 1024) {
         highlightBitmapQueue.put(bitmap)
         notifyBitmapQueueAvailable()
-      } catch (interruption: InterruptedException) {
-        Thread.currentThread().interrupt()
-        throw CancellationException(
-          "Interrupted while enqueuing highlight bitmap",
-          interruption
-        )
       }
+    } catch (interruption: InterruptedException) {
+      Thread.currentThread().interrupt()
+      throw CancellationException(
+        "Interrupted while enqueuing highlight bitmap",
+        interruption
+      )
     }
   }
 
