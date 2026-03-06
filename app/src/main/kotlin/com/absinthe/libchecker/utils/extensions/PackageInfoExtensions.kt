@@ -420,7 +420,7 @@ fun PackageInfo.isUseJetpackCompose(foundList: List<String>? = null): Boolean {
       it.getZipEntries().asSequence().any { entry ->
         val fileName = entry.name.substringAfterLast(File.separator)
         entry.isDirectory.not() &&
-          fileName.startsWith("androidx.compose") &&
+          (fileName.startsWith("androidx.compose.ui") || fileName.startsWith("androidx.compose.material")) &&
           fileName.endsWith(".version")
       }
     }
