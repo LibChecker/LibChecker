@@ -346,7 +346,8 @@ class ApkPreview(val url: String) {
           response.code != HttpURLConnection.HTTP_UNAUTHORIZED &&
           response.code != HttpURLConnection.HTTP_FORBIDDEN &&
           response.code != HttpURLConnection.HTTP_BAD_METHOD &&
-          response.code != HttpURLConnection.HTTP_NOT_IMPLEMENTED) {
+          response.code != HttpURLConnection.HTTP_NOT_IMPLEMENTED
+        ) {
           error("Failed to fetch metadata for $url with HEAD: ${response.code}")
         }
       }
