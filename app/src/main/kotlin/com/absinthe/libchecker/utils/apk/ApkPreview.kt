@@ -332,6 +332,9 @@ class ApkPreview(val url: String) {
   }
 
   private fun fetchMetadata(): FileMetadata {
+    if (httpUrl == null) {
+      throw IllegalArgumentException("Invalid URL: $url")
+    }
     val isAwsPresignedUrl = httpUrl.queryParameterNames.any { it.startsWith("X-Amz-") }
 
     if (!isAwsPresignedUrl) {
