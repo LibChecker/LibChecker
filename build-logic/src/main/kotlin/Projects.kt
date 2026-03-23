@@ -20,7 +20,7 @@ fun Project.setupAppModule(block: ApplicationExtension.() -> Unit = {}) {
       versionCode = verCode
       versionName = verName
       minSdk = 24
-      targetSdk = 36
+      targetSdk = 37
 
       androidResources {
         ignoreAssetsPatterns += "!PublicSuffixDatabase.list" // OkHttp5
@@ -78,7 +78,8 @@ fun Project.setupAppModule(block: ApplicationExtension.() -> Unit = {}) {
 
 private inline fun <reified T : CommonExtension> Project.setupBaseModule(crossinline block: T.() -> Unit = {}) {
   extensions.configure<CommonExtension>("android") {
-    compileSdk = 36
+    compileSdk = 37
+    compileSdkMinor = 0
 
     sourceSets.configureEach {
       java.directories.add("src/$name/kotlin")
