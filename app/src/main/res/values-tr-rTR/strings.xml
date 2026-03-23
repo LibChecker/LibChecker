@@ -172,6 +172,8 @@
   <string name="lib_detail_app_props_title">Uygulama özellikleri</string>
   <string name="lib_detail_app_props_tip">Daha fazla ayrıntı</string>
   <string name="lib_detail_xposed_min_version">Minimum sürüm</string>
+  <string name="lib_detail_xposed_target_version">Hedef sürüm</string>
+  <string name="lib_detail_xposed_static_scope">Statik kapsam</string>
   <string name="lib_detail_xposed_default_scope">Varsayılan kapsam</string>
   <string name="lib_detail_xposed_init_class">Başlatma sınıfı</string>
   <string name="lib_detail_app_install_source_title">Yükleme kaynağı</string>
