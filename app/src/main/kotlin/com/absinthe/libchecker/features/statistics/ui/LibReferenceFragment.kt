@@ -362,6 +362,7 @@ class LibReferenceFragment :
               //noinspection NotifyDataSetChanged
               refAdapter.notifyDataSetChanged()
             }
+            refAdapter.setSpaceFooterView()
           }
           binding.list.post {
             (activity as? INavViewContainer)?.hideProgressBar()
