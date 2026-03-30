@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.features.chart
 
-import com.github.mikephil.charting.components.AxisBase
-import com.github.mikephil.charting.formatter.IAxisValueFormatter
+import info.appdev.charting.components.AxisBase
+import info.appdev.charting.formatter.IAxisValueFormatter
 
 class OsVersionAxisFormatter(private val apis: List<Int>) : IAxisValueFormatter {
 

@@ -349,8 +349,11 @@ object UiUtils {
     return bitmap
   }
 
-  fun Drawable.toCircularBitmap(): Bitmap {
-    val bitmap = createBitmap(intrinsicWidth, intrinsicHeight)
+  fun Drawable.toCircularBitmap(maxSize: Int = 128): Bitmap {
+    val bitmap = createBitmap(
+      intrinsicWidth.coerceAtMost(maxSize),
+      intrinsicHeight.coerceAtMost(maxSize)
+    )
     val canvas = Canvas(bitmap)
     setBounds(0, 0, canvas.width, canvas.height)
     draw(canvas)

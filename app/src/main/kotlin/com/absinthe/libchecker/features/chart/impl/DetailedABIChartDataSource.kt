@@ -10,10 +10,10 @@ import com.absinthe.libchecker.features.chart.IntegerFormatter
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
-import com.github.mikephil.charting.charts.BarChart
-import com.github.mikephil.charting.data.BarData
-import com.github.mikephil.charting.data.BarDataSet
-import com.github.mikephil.charting.data.BarEntry
+import info.appdev.charting.charts.BarChart
+import info.appdev.charting.data.BarData
+import info.appdev.charting.data.BarDataSet
+import info.appdev.charting.data.BarEntry
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
@@ -66,7 +66,7 @@ class DetailedABIChartDataSource(items: List<LCItem>) :
         index++
       }
       val dataSet = BarDataSet(entries, "").apply {
-        setDrawIcons(false)
+        isDrawIcons = false
         valueFormatter = IntegerFormatter()
       }
 

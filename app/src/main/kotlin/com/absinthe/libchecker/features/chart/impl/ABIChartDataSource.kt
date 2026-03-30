@@ -11,13 +11,13 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.ABI_32_BIT
 import com.absinthe.libchecker.utils.extensions.ABI_64_BIT
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
-import com.github.mikephil.charting.charts.PieChart
-import com.github.mikephil.charting.data.PieData
-import com.github.mikephil.charting.data.PieDataSet
-import com.github.mikephil.charting.data.PieEntry
-import com.github.mikephil.charting.formatter.PercentFormatter
-import com.github.mikephil.charting.utils.ColorTemplate
-import com.github.mikephil.charting.utils.MPPointF
+import info.appdev.charting.charts.PieChart
+import info.appdev.charting.data.PieData
+import info.appdev.charting.data.PieDataSet
+import info.appdev.charting.data.PieEntry
+import info.appdev.charting.formatter.PercentFormatter
+import info.appdev.charting.utils.ColorTemplate
+import info.appdev.charting.utils.PointF
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
@@ -66,9 +66,9 @@ class ABIChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>(it
         legendList.add(parties[i % parties.size])
       }
       val dataSet = PieDataSet(entries, "").apply {
-        setDrawIcons(false)
+        isDrawIcons = false
         sliceSpace = 3f
-        iconsOffset = MPPointF(0f, 40f)
+        iconsOffset = PointF(0f, 40f)
         selectionShift = 5f
         xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
         yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE

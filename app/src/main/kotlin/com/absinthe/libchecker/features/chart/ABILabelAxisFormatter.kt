@@ -2,8 +2,8 @@ package com.absinthe.libchecker.features.chart
 
 import android.content.Context
 import com.absinthe.libchecker.utils.PackageUtils
-import com.github.mikephil.charting.components.AxisBase
-import com.github.mikephil.charting.formatter.IAxisValueFormatter
+import info.appdev.charting.components.AxisBase
+import info.appdev.charting.formatter.IAxisValueFormatter
 
 class ABILabelAxisFormatter(private val context: Context, private val abis: List<Int>) : IAxisValueFormatter {
 

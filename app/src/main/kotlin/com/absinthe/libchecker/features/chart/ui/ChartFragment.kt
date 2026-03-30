@@ -50,15 +50,15 @@ import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
-import com.github.mikephil.charting.animation.Easing
-import com.github.mikephil.charting.charts.Chart
-import com.github.mikephil.charting.charts.HorizontalBarChart
-import com.github.mikephil.charting.charts.PieChart
-import com.github.mikephil.charting.components.Legend
-import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.highlight.Highlight
-import com.github.mikephil.charting.listener.OnChartValueSelectedListener
+import info.appdev.charting.animation.Easing
+import info.appdev.charting.charts.Chart
+import info.appdev.charting.charts.HorizontalBarChart
+import info.appdev.charting.charts.PieChart
+import info.appdev.charting.components.Legend
+import info.appdev.charting.components.XAxis
+import info.appdev.charting.data.Entry
+import info.appdev.charting.highlight.Highlight
+import info.appdev.charting.listener.OnChartValueSelectedListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -261,16 +261,14 @@ class ChartFragment :
     Timber.d("Nothing selected")
   }
 
-  override fun onValueSelected(e: Entry?, h: Highlight?) {
-    if (e == null) return
-    if (h == null) return
+  override fun onValueSelected(entry: Entry, highlight: Highlight) {
     if (dialog != null) return
     if (dataSource is MarketDistributionChartDataSource) {
       (chartView as? Chart<*>)?.highlightValue(null)
       return
     }
 
-    applyItemSelect(h.x.toInt())
+    applyItemSelect(highlight.x.toInt())
   }
 
   private fun generatePieChartView(): PieChart {
@@ -292,8 +290,8 @@ class ChartFragment :
         yEntrySpace = 0f
         isWordWrapEnabled = true
       }
-      animateY(800, Easing.EaseInOutQuad)
-      setUsePercentValues(true)
+      isUsePercentValues = true
+      animateY(800, Easing.easeInOutQuad)
       setExtraOffsets(24f, 0f, 24f, 0f)
       setEntryLabelColor(colorOnSurface)
       setEntryLabelTextSize(11f)
@@ -320,25 +318,25 @@ class ChartFragment :
       setFitBars(true)
       xAxis.apply {
         position = XAxis.XAxisPosition.BOTTOM
-        setDrawGridLines(false)
-        setDrawLabels(true)
+        isDrawGridLines = false
         granularity = 1f
         textSize = 10f
         textColor = colorOnSurface
+        setDrawLabels(true)
       }
       axisLeft.apply {
         valueFormatter = IntegerFormatter()
-        setDrawGridLines(false)
-        setDrawZeroLine(false)
+        isDrawGridLines = false
+        isDrawZeroLine = false
         textColor = colorOnSurface
       }
       axisRight.apply {
         valueFormatter = IntegerFormatter()
-        setDrawGridLines(false)
-        setDrawZeroLine(false)
+        isDrawGridLines = false
+        isDrawZeroLine = false
         textColor = colorOnSurface
       }
-      animateY(650, Easing.EaseInOutQuad)
+      animateY(650, Easing.easeInOutQuad)
       setMaxVisibleValueCount(50)
       setDrawGridBackground(false)
       setDrawBorders(false)
