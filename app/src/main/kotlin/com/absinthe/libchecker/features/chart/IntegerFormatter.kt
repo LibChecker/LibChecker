@@ -1,10 +1,10 @@
 package com.absinthe.libchecker.features.chart
 
-import com.github.mikephil.charting.components.AxisBase
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.formatter.IAxisValueFormatter
-import com.github.mikephil.charting.formatter.IValueFormatter
-import com.github.mikephil.charting.utils.ViewPortHandler
+import info.appdev.charting.components.AxisBase
+import info.appdev.charting.data.Entry
+import info.appdev.charting.formatter.IAxisValueFormatter
+import info.appdev.charting.formatter.IValueFormatter
+import info.appdev.charting.utils.ViewPortHandler
 import java.text.DecimalFormat
 
 class IntegerFormatter :

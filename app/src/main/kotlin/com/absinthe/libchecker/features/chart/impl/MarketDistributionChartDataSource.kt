@@ -15,10 +15,10 @@ import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.toPercentage
 import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libchecker.utils.toJson
-import com.github.mikephil.charting.charts.BarChart
-import com.github.mikephil.charting.data.BarData
-import com.github.mikephil.charting.data.BarDataSet
-import com.github.mikephil.charting.data.BarEntry
+import info.appdev.charting.charts.BarChart
+import info.appdev.charting.data.BarData
+import info.appdev.charting.data.BarDataSet
+import info.appdev.charting.data.BarEntry
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -45,7 +45,7 @@ class MarketDistributionChartDataSource(items: List<LCItem>) : BaseVariableChart
         legendList.add(dist[i].distributionPercentage.toFloat().toPercentage())
       }
       val dataSet = BarDataSet(entries, "").apply {
-        setDrawIcons(false)
+        isDrawIcons = false
         valueFormatter = PercentageFormatter()
       }
 
