@@ -118,16 +118,22 @@ class LibCheckerApp : Application() {
       HiddenApiBypass.addHiddenApiExemptions("")
     }
 
-    // bypass PackageParser check
-    // see also: https://cs.android.com/android/platform/superproject/main/+/main:frameworks/base/core/java/android/content/pm/PackageParser.java;l=2695
-    PackageParser::class.java.getDeclaredField("SDK_VERSION").apply {
-      isAccessible = true
-      set(null, Integer.MAX_VALUE)
+    runCatching {
+      // bypass PackageParser check
+      // see also: https://cs.android.com/android/platform/superproject/main/+/main:frameworks/base/core/java/android/content/pm/PackageParser.java;l=2695
+      PackageParser::class.java.getDeclaredField("SDK_VERSION").apply {
+        isAccessible = true
+        set(null, Integer.MAX_VALUE)
+      }
+    }.onFailure {
+      Timber.w("bypass [PackageParser check] failed")
     }
 
     runCatching {
       StrictMode::class.java.getDeclaredMethod("disableDeathOnFileUriExposure").invoke(null)
       Timber.i("StrictMode: disableDeathOnFileUriExposure")
+    }.onFailure {
+      Timber.w("bypass [StrictMode: disableDeathOnFileUriExposure] failed")
     }
   }
 
