@@ -5,10 +5,10 @@ import androidx.core.os.BundleCompat
 import com.absinthe.libchecker.features.applist.detail.bean.AppBundleItem
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppBundleBottomSheetView
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppBundleItemView
+import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.STRING_ABI_MAP
-import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import java.io.File
 import java.util.Locale

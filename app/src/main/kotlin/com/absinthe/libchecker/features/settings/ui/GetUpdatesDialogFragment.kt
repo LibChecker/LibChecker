@@ -7,10 +7,10 @@ import androidx.core.net.toUri
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.features.settings.bean.GetUpdatesItem
+import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.extensions.getBoolean
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import timber.log.Timber

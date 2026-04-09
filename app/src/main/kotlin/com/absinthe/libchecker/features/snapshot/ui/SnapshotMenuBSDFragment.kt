@@ -6,8 +6,8 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.SnapshotOptions
 import com.absinthe.libchecker.features.snapshot.ui.view.SnapshotMenuBSDView
 import com.absinthe.libchecker.features.snapshot.ui.view.SnapshotMenuItemView
+import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.extensions.supportIECUnit
-import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
 class SnapshotMenuBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotMenuBSDView>() {
