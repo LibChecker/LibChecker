@@ -6,7 +6,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.features.applist.ui.view.AdvancedMenuBSDView
 import com.absinthe.libchecker.features.applist.ui.view.AdvancedMenuItemView
-import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
+import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
 class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBSDView>() {

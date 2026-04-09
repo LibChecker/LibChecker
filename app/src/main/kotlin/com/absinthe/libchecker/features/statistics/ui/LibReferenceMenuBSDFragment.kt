@@ -6,7 +6,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.features.statistics.ui.view.LibReferenceMenuBSDView
 import com.absinthe.libchecker.features.statistics.ui.view.LibReferenceMenuItemView
-import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
+import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
 class LibReferenceMenuBSDFragment : BaseBottomSheetViewDialogFragment<LibReferenceMenuBSDView>() {

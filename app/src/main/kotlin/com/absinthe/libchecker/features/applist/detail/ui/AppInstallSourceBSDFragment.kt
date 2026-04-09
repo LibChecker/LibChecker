@@ -20,13 +20,13 @@ import com.absinthe.libchecker.features.applist.detail.ui.view.AppInstallSourceB
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppInstallSourceItemView
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppInstallTimeItemView
 import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
+import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.FreezeUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.PREINSTALLED_TIMESTAMP
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
-import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import java.text.SimpleDateFormat
 import kotlinx.coroutines.runBlocking

@@ -11,12 +11,12 @@ import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.Repositories
+import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.DownloadUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.md5
 import com.absinthe.libchecker.utils.showToast
-import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.Repositories as RulesBundleRepo
