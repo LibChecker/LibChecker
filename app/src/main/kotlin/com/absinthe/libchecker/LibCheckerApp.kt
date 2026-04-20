@@ -29,8 +29,8 @@ import com.jakewharton.processphoenix.ProcessPhoenix
 import java.io.File
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import me.zhanghai.android.appiconloader.coil.AppIconFetcher
 import me.zhanghai.android.appiconloader.coil.AppIconKeyer
 import org.lsposed.hiddenapibypass.HiddenApiBypass
