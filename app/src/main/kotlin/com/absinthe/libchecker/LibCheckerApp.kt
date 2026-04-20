@@ -29,8 +29,8 @@ import com.jakewharton.processphoenix.ProcessPhoenix
 import java.io.File
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.MainScope
 import me.zhanghai.android.appiconloader.coil.AppIconFetcher
 import me.zhanghai.android.appiconloader.coil.AppIconKeyer
 import org.lsposed.hiddenapibypass.HiddenApiBypass
@@ -38,6 +38,8 @@ import rikka.material.app.LocaleDelegate
 import timber.log.Timber
 
 class LibCheckerApp : Application() {
+
+  private val appScope = MainScope()
 
   override fun onCreate() {
     super.onCreate()
@@ -84,7 +86,7 @@ class LibCheckerApp : Application() {
         }
         .build()
     }
-    GlobalScope.launch(Dispatchers.IO) {
+    appScope.launch(Dispatchers.IO) {
       clearCache()
     }
   }
