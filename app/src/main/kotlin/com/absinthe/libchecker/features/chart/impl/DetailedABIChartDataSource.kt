@@ -13,7 +13,7 @@ import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import info.appdev.charting.charts.BarChart
 import info.appdev.charting.data.BarData
 import info.appdev.charting.data.BarDataSet
-import info.appdev.charting.data.BarEntry
+import info.appdev.charting.data.BarEntryFloat
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
@@ -26,7 +26,7 @@ class DetailedABIChartDataSource(items: List<LCItem>) :
   override suspend fun fillChartView(chartView: BarChart, onProgressUpdated: (Int) -> Unit) {
     withContext(Dispatchers.Default) {
       val context = chartView.context ?: return@withContext
-      val entries: ArrayList<BarEntry> = ArrayList()
+      val entries: ArrayList<BarEntryFloat> = ArrayList()
 
       val itemCount = filteredList.size
       var progress = 0
@@ -61,7 +61,7 @@ class DetailedABIChartDataSource(items: List<LCItem>) :
       val legendList = mutableListOf<String>()
       var index = 0
       classifiedMap.forEach { entry ->
-        entries.add(BarEntry(index.toFloat(), entry.value.size.toFloat()))
+        entries.add(BarEntryFloat(index.toFloat(), entry.value.size.toFloat()))
         legendList.add(entry.key.toString())
         index++
       }

@@ -18,7 +18,7 @@ import com.absinthe.libchecker.utils.toJson
 import info.appdev.charting.charts.BarChart
 import info.appdev.charting.data.BarData
 import info.appdev.charting.data.BarDataSet
-import info.appdev.charting.data.BarEntry
+import info.appdev.charting.data.BarEntryFloat
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -38,10 +38,10 @@ class MarketDistributionChartDataSource(items: List<LCItem>) : BaseVariableChart
       }
       val dist = distribution ?: return@withContext
       val parties = dist.map { it.name }
-      val entries: ArrayList<BarEntry> = ArrayList()
+      val entries: ArrayList<BarEntryFloat> = ArrayList()
       val legendList = mutableListOf<String>()
       for (i in parties.indices) {
-        entries.add(BarEntry(i.toFloat(), dist[i].distributionPercentage.toFloat()))
+        entries.add(BarEntryFloat(i.toFloat(), dist[i].distributionPercentage.toFloat()))
         legendList.add(dist[i].distributionPercentage.toFloat().toPercentage())
       }
       val dataSet = BarDataSet(entries, "").apply {
