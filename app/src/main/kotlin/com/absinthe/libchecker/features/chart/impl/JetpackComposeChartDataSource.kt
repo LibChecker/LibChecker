@@ -11,7 +11,7 @@ import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import info.appdev.charting.charts.PieChart
 import info.appdev.charting.data.PieData
 import info.appdev.charting.data.PieDataSet
-import info.appdev.charting.data.PieEntry
+import info.appdev.charting.data.PieEntryFloat
 import info.appdev.charting.formatter.PercentFormatter
 import info.appdev.charting.utils.PointF
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +27,7 @@ class JetpackComposeChartDataSource(items: List<LCItem>) : BaseChartDataSource<P
         context.resources.getString(R.string.string_compose_used),
         context.resources.getString(R.string.string_compose_unused)
       )
-      val entries: ArrayList<PieEntry> = ArrayList()
+      val entries: ArrayList<PieEntryFloat> = ArrayList()
       val colorOnSurface = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
       val classifiedList = listOf(mutableListOf<LCItem>(), mutableListOf())
 
@@ -54,7 +54,7 @@ class JetpackComposeChartDataSource(items: List<LCItem>) : BaseChartDataSource<P
       // the chart.
       val legendList = mutableListOf<String>()
       for (i in parties.indices) {
-        entries.add(PieEntry(classifiedList[i].size.toFloat(), parties[i % parties.size]))
+        entries.add(PieEntryFloat(classifiedList[i].size.toFloat(), parties[i % parties.size]))
         legendList.add(parties[i % parties.size])
       }
       val dataSet = PieDataSet(entries, "").apply {
