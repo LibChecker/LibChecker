@@ -118,8 +118,10 @@
   <string name="further_operation">תפעול נוסך</string>
   <string name="app_info_launch">הפעל</string>
   <string name="app_info_settings">הגדרות</string>
+  <string name="app_info_share">הגדרות</string>
   <string name="lib_detail_dialog_title">פרטי ספריה</string>
   <string name="lib_permission_dialog_title">פרטי הרשאה</string>
+  <string name="lib_permission_provided_by_format">מסופק על ידי %s</string>
   <string name="agp_details">מערכת הבנייה של Android Studio מבוססת על Gradle, והתוסף של Android Gradle מוסיף מספר תכונות ספציפיות לבניית אפליקציות אנדרואיד. למרות שהתוסף אנדרואיד מתעדכן בדרך כלל בשלב נעילה עם Android Studio, התוסף (ושאר מערכת Gradle) יכול לפעול ללא תלות ב-Android Studio ולהתעדכן בנפרד.</string>
   <string name="xposed_module">מודול Xposed</string>
   <string name="xposed_module_details">Xposed היא מסגרת למודולים שיכולה לשנות את התנהגות המערכת והאפליקציות מבלי לגעת באף APK. זה נהדר כי זה אומר שהמודולים יכולים לעבוד עבור גרסאות שונות ואפילו ROM ללא כל שינוי.</string>
@@ -170,6 +172,8 @@
   <string name="lib_detail_app_props_title">מאפייני אפליקציה</string>
   <string name="lib_detail_app_props_tip">מידע נוסף</string>
   <string name="lib_detail_xposed_min_version">גרסה מינימלית</string>
+  <string name="lib_detail_xposed_target_version">גרסת יעד</string>
+  <string name="lib_detail_xposed_static_scope">טווח סטטי</string>
   <string name="lib_detail_xposed_default_scope">טווח ברירת מחדל</string>
   <string name="lib_detail_xposed_init_class">מחלקת אתחול</string>
   <string name="lib_detail_app_install_source_title">מקור התקנה</string>
@@ -190,8 +194,14 @@
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku לא מאושר</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">לחץ כאן לאישור Shizuku עבור מבקש ההתקנה</string>
   <string name="lib_detail_elf_info">מידע נוסף</string>
+  <string name="lib_detail_elf_extract">חילוץ</string>
+  <string name="lib_detail_elf_extract_success">קובץ ELF נשמר בתיקיית ההורדות</string>
+  <string name="lib_detail_elf_extract_failed">חילוץ קובץ ELF נכשל</string>
   <string name="lib_detail_dependency_tip">תלויות</string>
   <string name="lib_detail_entry_points_tip">נקודות כניסה</string>
+  <string name="apk_preview">תצוגה מקדימה של APK</string>
+  <string name="apk_preview_item_not_available">לא ניתן לתצוגה במצב תצוגה מקדימה</string>
+  <string name="feature_live_update_notification">התראת עדכון בזמן אמת</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">הועתק ללוח הגזירים</string>
   <string name="toast_not_existing_market">לא קיים שום שוק אפליקציות</string>
@@ -200,6 +210,7 @@
   <string name="toast_cloud_rules_update_error">נכשל בעדכון חוקי הענן. נא לנסות שוב.</string>
   <string name="toast_not_enough_storage_space">אין מספיק מקום אחסון</string>
   <string name="toast_downloading_app">הורדה נתבקשה</string>
+  <string name="toast_long_tap_share_button_tip">לחץ לחיצה ארוכה על כפתור ה״שיתוף״ בכדי לבחור היכן לשמור</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">שמור את תמונת המצב הנוכחית</string>
   <string name="snapshot_current_timestamp">חותמת זמן של תמונת מצב נוכחית</string>
