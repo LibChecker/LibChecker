@@ -81,7 +81,7 @@ aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref
 aboutlibraries-ui = { module = "com.mikepenz:aboutlibraries", version.ref = "aboutlibraries" }
 appIconLoader = "me.zhanghai.android.appiconloader:appiconloader:1.5.0"
 appIconLoader-coil = "me.zhanghai.android.appiconloader:appiconloader-coil:1.5.0"
-brvah = "io.github.cymchad:BaseRecyclerViewAdapterHelper:3.0.14"
+brvah = "io.github.cymchad:BaseRecyclerViewAdapterHelper:3.0.16"
 coil = "io.coil-kt:coil:2.7.0"
 commons-compress = "org.apache.commons:commons-compress:1.28.0"
 fastScroll = "me.zhanghai.android.fastscroll:library:1.3.0"
