@@ -11,8 +11,9 @@ import androidx.core.text.inSpans
 import androidx.core.view.marginEnd
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.utils.extensions.getColor
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
+import com.absinthe.libchecker.utils.extensions.toColorStateListByColor
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.span.CustomTypefaceSpan
 
@@ -24,12 +25,15 @@ class NativeLibExtractTipView(context: Context) : AViewGroup(context) {
     val horizontalPadding = 16.dp
     val verticalPadding = 8.dp
     setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding)
-    setBackgroundColor(R.color.highlight_component.getColor(context))
+    setBackgroundColor(context.getColorByAttr(com.google.android.material.R.attr.colorSecondaryContainer))
   }
 
   private val icon = AppCompatImageView(context).apply {
     layoutParams = LayoutParams(24.dp, 24.dp)
     setImageResource(R.drawable.ic_outline_info)
+    imageTintList =
+      context.getColorByAttr(com.google.android.material.R.attr.colorOnSecondaryContainer)
+        .toColorStateListByColor()
     addView(this)
   }
 
@@ -47,7 +51,8 @@ class NativeLibExtractTipView(context: Context) : AViewGroup(context) {
         append("android:extractNativeLibs=\"false\"")
       }
     }
-    setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceDisplayMedium))
+    setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBodyMedium))
+    setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSecondaryContainer))
     addView(this)
   }
 

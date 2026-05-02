@@ -209,7 +209,11 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> :
   private fun createMaterialShapeDrawable(bottomSheet: View): MaterialShapeDrawable {
     // Create a ShapeAppearanceModel with the same shapeAppearanceOverlay used in the style
     val shapeAppearanceModel =
-      ShapeAppearanceModel.builder(context, 0, R.style.CustomShapeAppearanceBottomSheetDialog)
+      ShapeAppearanceModel.builder(
+        context,
+        0,
+        com.absinthe.libchecker.R.style.App_ShapeAppearance_M3E_BottomSheetDialog
+      )
         .build()
 
     // Create a new MaterialShapeDrawable (you can't use the original MaterialShapeDrawable in the BottomSheet)

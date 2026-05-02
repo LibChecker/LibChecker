@@ -34,7 +34,6 @@ import kotlinx.coroutines.launch
 import me.zhanghai.android.appiconloader.coil.AppIconFetcher
 import me.zhanghai.android.appiconloader.coil.AppIconKeyer
 import org.lsposed.hiddenapibypass.HiddenApiBypass
-import rikka.material.app.LocaleDelegate
 import timber.log.Timber
 
 class LibCheckerApp : Application() {
@@ -66,7 +65,6 @@ class LibCheckerApp : Application() {
       }
     )
     Utility.init(this)
-    LocaleDelegate.defaultLocale = GlobalValues.locale
     if (OsUtils.atLeastT()) {
       AppCompatDelegate.setApplicationLocales(LocaleListCompat.create(GlobalValues.locale))
     }

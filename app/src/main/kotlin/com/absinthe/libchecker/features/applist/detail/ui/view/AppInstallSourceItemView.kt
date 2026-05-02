@@ -35,8 +35,8 @@ class AppInstallSourceItemView(context: Context) : AViewGroup(context) {
       it.topMargin = 8.dp
     }
     strokeWidth = 1.dp
-    strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutline)
-    setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSecondaryContainer))
+    strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutlineVariant)
+    setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSurfaceContainerHigh))
   }
 
   init {

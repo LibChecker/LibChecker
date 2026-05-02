@@ -54,6 +54,7 @@ import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
+import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.launchLibReferencePage
@@ -94,6 +95,10 @@ class SnapshotDetailActivity :
   }
 
   override fun requirePackageName() = entity.packageName.takeIf { it.contains("/").not() }
+
+  override fun onApplyContentWindowInsets() {
+    binding.root.applySystemBarsPadding(left = true, top = true, right = true)
+  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -142,6 +147,7 @@ class SnapshotDetailActivity :
       })
       list.apply {
         adapter = this@SnapshotDetailActivity.adapter
+        applySystemBarsPadding(bottom = true)
         (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         addItemDecoration(VerticalSpacesItemDecoration(4.dp))
       }

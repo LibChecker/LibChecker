@@ -1,8 +1,7 @@
 package com.absinthe.libchecker.features.snapshot.ui.view
 
 import android.content.Context
-import android.util.TypedValue
-import android.view.ContextThemeWrapper
+import android.graphics.Typeface
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
@@ -12,6 +11,7 @@ import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
+import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.utils.extensions.visibleHeight
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.card.MaterialCardView
@@ -33,113 +33,89 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
 
   class SnapshotItemContainerView(context: Context) : AViewGroup(context) {
 
+    private val condensedTypeface = Typeface.create("sans-serif-condensed", Typeface.NORMAL)
+    private val condensedMediumTypeface = Typeface.create("sans-serif-condensed-medium", Typeface.NORMAL)
+
     val icon = AppCompatImageView(context).apply {
       val iconSize = context.getDimensionPixelSize(R.dimen.app_icon_size)
       layoutParams = LayoutParams(iconSize, iconSize)
       addView(this)
     }
 
-    val appName = AppCompatTextView(
-      ContextThemeWrapper(
-        context,
-        R.style.TextView_SansSerifMedium
-      )
-    ).apply {
+    val appName = AppCompatTextView(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       ).also {
         it.marginStart = 8.dp
       }
+      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleMedium))
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
-      setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
       addView(this)
     }
 
-    val packageName =
-      AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
-        layoutParams = LayoutParams(
-          ViewGroup.LayoutParams.WRAP_CONTENT,
-          ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
-        addView(this)
-      }
-
-    val versionInfo = AppCompatTextView(
-      ContextThemeWrapper(
-        context,
-        R.style.TextView_SansSerifCondensed
-      )
-    ).apply {
+    val packageName = AppCompatTextView(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
+      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBodySmallEmphasized))
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
-      setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
       addView(this)
     }
 
-    val packageSizeInfo = AppCompatTextView(
-      ContextThemeWrapper(
-        context,
-        R.style.TextView_SansSerifCondensed
-      )
-    ).apply {
+    val versionInfo = AppCompatTextView(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
+      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceLabelSmall))
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
-      setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
+      typeface = condensedTypeface
       addView(this)
     }
 
-    val apisInfo = AppCompatTextView(
-      ContextThemeWrapper(
-        context,
-        R.style.TextView_SansSerifCondensed
-      )
-    ).apply {
+    val packageSizeInfo = AppCompatTextView(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
+      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceLabelSmall))
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
-      setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
+      typeface = condensedTypeface
       addView(this)
     }
 
-    val abiInfo = AppCompatTextView(
-      ContextThemeWrapper(
-        context,
-        R.style.TextView_SansSerifCondensedMedium
+    val apisInfo = AppCompatTextView(context).apply {
+      layoutParams = LayoutParams(
+        ViewGroup.LayoutParams.WRAP_CONTENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
       )
-    ).apply {
+      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceLabelSmall))
+      setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
+      typeface = condensedTypeface
+      addView(this)
+    }
+
+    val abiInfo = AppCompatTextView(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
       clipChildren = false
+      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceLabelSmall))
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
-      setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
+      typeface = condensedMediumTypeface
       addView(this)
     }
 
-    val updateTime = AppCompatTextView(
-      ContextThemeWrapper(
-        context,
-        R.style.TextView_SansSerifCondensed
-      )
-    ).apply {
+    val updateTime = AppCompatTextView(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
+      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceLabelSmall))
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
-      setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
       addView(this)
     }
 

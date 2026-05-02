@@ -2,10 +2,10 @@ package com.absinthe.libchecker.features.applist.ui.view
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.widget.FrameLayout
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.view.app.RingDotsView
 import com.google.android.material.progressindicator.CircularProgressIndicator
@@ -27,7 +27,9 @@ class AppListInitialiseView(
     addView(this)
   }
 
-  val progressIndicator = CircularProgressIndicator(context).apply {
+  val progressIndicator = CircularProgressIndicator(
+    ContextThemeWrapper(context, R.style.App_Widget_M3E_CircularProgressIndicator)
+  ).apply {
     layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).also {
       it.gravity = Gravity.CENTER
     }

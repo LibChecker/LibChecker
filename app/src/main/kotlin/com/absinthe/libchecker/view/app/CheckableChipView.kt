@@ -116,7 +116,15 @@ class CheckableChipView @JvmOverloads constructor(
    */
   var onCheckedChangeListener: ((view: CheckableChipView, checked: Boolean) -> Unit)? = null
 
-  var textColorPair = Color.BLACK to Color.WHITE
+  var textColorPair = Color.TRANSPARENT to Color.TRANSPARENT
+    set(value) {
+      field = value
+      checkedTextColor = if (isChecked) {
+        value.first
+      } else {
+        value.second
+      }
+    }
 
   private var targetProgress: Float = 0f
 
@@ -163,10 +171,11 @@ class CheckableChipView @JvmOverloads constructor(
           getDimensionOrThrow(R.styleable.CheckableChipView_ccv_outlineCornerRadius)
       }
 
-      checkedColor = getColor(R.styleable.CheckableChipView_android_color, checkedColor)
-      checkedTextColor =
-        getColor(R.styleable.CheckableChipView_ccv_checkedTextColor, Color.TRANSPARENT)
       defaultTextColor = getColorOrThrow(R.styleable.CheckableChipView_android_textColor)
+      checkedColor = getColor(R.styleable.CheckableChipView_android_color, checkedColor)
+      val resolvedCheckedTextColor =
+        getColor(R.styleable.CheckableChipView_ccv_checkedTextColor, defaultTextColor)
+      textColorPair = resolvedCheckedTextColor to defaultTextColor
 
       getString(R.styleable.CheckableChipView_android_text)?.let { text = it }
       textSize =

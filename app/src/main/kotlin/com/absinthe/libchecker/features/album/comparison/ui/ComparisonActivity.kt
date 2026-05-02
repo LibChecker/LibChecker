@@ -59,6 +59,7 @@ import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.UiUtils.toCircularBitmap
 import com.absinthe.libchecker.utils.apk.APKSParser
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
+import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
@@ -235,6 +236,7 @@ class ComparisonActivity :
     binding.apply {
       recyclerview.apply {
         adapter = this@ComparisonActivity.adapter
+        applySystemBarsPadding(top = true, bottom = true)
         layoutManager = getSuitableLayoutManager()
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->

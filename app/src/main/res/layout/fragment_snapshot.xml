@@ -25,7 +25,7 @@
 
       <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/progress_indicator"
-        style="@style/GeneralProgressIndicator"
+        style="@style/App.Widget.M3E.CircularProgressIndicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center" />
@@ -40,8 +40,7 @@
       android:scrollbars="none"
       app:borderBottomVisibility="never"
       app:borderTopDrawable="@null"
-      app:borderTopVisibility="whenTop"
-      app:fitsSystemWindowsInsets="bottom" />
+      app:borderTopVisibility="whenTop" />
 
   </com.absinthe.libchecker.view.app.CustomViewFlipper>
 

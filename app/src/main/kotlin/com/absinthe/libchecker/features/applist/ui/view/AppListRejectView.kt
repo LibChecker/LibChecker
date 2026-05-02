@@ -34,7 +34,7 @@ class AppListRejectView(
       it.topMargin = 20.dp
     }
     gravity = Gravity.CENTER
-    setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadline6))
+    setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleLarge))
     text = context.getString(R.string.get_app_list_denied_tip)
     addView(this)
   }

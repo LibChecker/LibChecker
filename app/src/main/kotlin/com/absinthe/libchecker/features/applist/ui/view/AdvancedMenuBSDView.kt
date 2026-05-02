@@ -103,8 +103,8 @@ class AdvancedMenuBSDView(context: Context) :
     }
     setSmoothRoundCorner(20.dp)
     overScrollMode = OVER_SCROLL_NEVER
-    strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutline)
-    setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSecondaryContainer))
+    strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutlineVariant)
+    setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSurfaceContainerHigh))
 
     val componentStyleDemoView = RecyclerView(context).apply {
       setPadding(0, 8.dp, 0, 8.dp)

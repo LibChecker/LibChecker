@@ -1,29 +1,122 @@
 <resources>
 
-  <!-- Base application theme. -->
+  <!-- App themes -->
   <style name="AppTheme" parent="Theme" />
 
   <style name="App.LibChip.Material3" parent="Widget.Material3.Chip.Assist.Elevated">
     <item name="chipIconTint">@null</item>
   </style>
 
-  <style name="CustomBottomSheetDialog" parent="@style/ThemeOverlay.MaterialComponents.BottomSheetDialog">
-    <item name="bottomSheetStyle">@style/CustomBottomSheet</item>
+  <style name="App.PreferenceThemeOverlay" parent="@style/PreferenceThemeOverlay">
+    <item name="android:scrollbars">none</item>
+    <item name="preferenceStyle">@style/App.Preference.M3E</item>
+    <item name="dialogPreferenceStyle">@style/App.Preference.M3E</item>
+    <item name="preferenceCategoryStyle">@style/App.Preference.M3E.Category</item>
+    <item name="switchPreferenceCompatStyle">@style/App.Preference.M3E.Switch</item>
+    <item name="preferenceScreenStyle">@style/App.Preference.M3E.Screen</item>
+    <item name="preferenceFragmentListStyle">@style/App.PreferenceFragmentList.M3E</item>
+    <item name="preferenceCategoryTitleTextAppearance">@style/App.TextAppearance.M3E.Preference.Category</item>
   </style>
 
-  <style name="CustomBottomSheetDialog.Md3" parent="@style/ThemeOverlay.Material3.BottomSheetDialog">
-    <item name="bottomSheetStyle">@style/CustomBottomSheet.Md3</item>
+  <style name="App.Preference.M3E" parent="@style/Preference.Material">
+    <item name="android:layout">@layout/preference_m3e</item>
+    <item name="allowDividerAbove">false</item>
+    <item name="allowDividerBelow">false</item>
+    <item name="iconSpaceReserved">true</item>
+    <item name="singleLineTitle">false</item>
   </style>
 
-  <style name="CustomBottomSheet" parent="Widget.MaterialComponents.BottomSheet">
-    <item name="shapeAppearanceOverlay">@style/CustomShapeAppearanceBottomSheetDialog</item>
+  <style name="App.Preference.M3E.Screen" parent="@style/Preference.PreferenceScreen.Material">
+    <item name="android:layout">@layout/preference_m3e</item>
+    <item name="allowDividerAbove">false</item>
+    <item name="allowDividerBelow">false</item>
+    <item name="iconSpaceReserved">true</item>
   </style>
 
-  <style name="CustomBottomSheet.Md3" parent="Widget.Material3.BottomSheet">
-    <item name="shapeAppearanceOverlay">@style/CustomShapeAppearanceBottomSheetDialog</item>
+  <style name="App.Preference.M3E.Switch" parent="@style/Preference.SwitchPreferenceCompat.Material">
+    <item name="android:layout">@layout/preference_m3e</item>
+    <item name="android:widgetLayout">@layout/preference_widget_material_switch</item>
+    <item name="allowDividerAbove">false</item>
+    <item name="allowDividerBelow">false</item>
+    <item name="iconSpaceReserved">true</item>
+    <item name="singleLineTitle">false</item>
   </style>
 
-  <style name="CustomShapeAppearanceBottomSheetDialog" parent="">
+  <style name="App.Preference.M3E.Category" parent="@style/Preference.Category.Material">
+    <item name="android:layout">@layout/preference_category_m3e</item>
+    <item name="allowDividerAbove">false</item>
+    <item name="allowDividerBelow">false</item>
+    <item name="iconSpaceReserved">false</item>
+  </style>
+
+  <style name="App.PreferenceFragmentList.M3E" parent="@style/PreferenceFragmentList.Material">
+    <item name="android:divider">@null</item>
+    <item name="android:dividerHeight">0dp</item>
+  </style>
+
+  <style name="App.TextAppearance.M3E.Preference.Category" parent="@style/TextAppearance.Material3.TitleSmall">
+    <item name="android:textColor">?attr/colorPrimary</item>
+  </style>
+
+  <style name="App.ThemeOverlay.M3E.BottomSheetDialog" parent="@style/ThemeOverlay.Material3.BottomSheetDialog">
+    <item name="bottomSheetStyle">@style/App.Widget.M3E.BottomSheet</item>
+  </style>
+
+  <!-- M3E widget defaults -->
+  <style name="App.Widget.M3E.AppBarLayout" parent="Widget.Material3Expressive.AppBarLayout">
+    <item name="liftOnScrollColor">?attr/colorSurfaceContainer</item>
+  </style>
+
+  <style name="App.Widget.M3E.Toolbar.Surface" parent="Widget.Material3Expressive.Toolbar.Surface">
+    <item name="android:minHeight">?attr/actionBarSize</item>
+  </style>
+
+  <style name="App.Widget.M3E.CollapsingToolbar.Medium" parent="Widget.Material3Expressive.CollapsingToolbar.Medium">
+    <item name="contentScrim">?attr/colorSurfaceContainer</item>
+    <item name="expandedTitleTextAppearance">?attr/textAppearanceHeadlineMedium</item>
+  </style>
+
+  <style name="App.Widget.M3E.BottomNavigationView" parent="Widget.Material3Expressive.BottomNavigationView">
+    <item name="backgroundTint">?attr/colorSurfaceContainer</item>
+  </style>
+
+  <style name="App.Widget.M3E.NavigationRailView" parent="Widget.Material3Expressive.NavigationRailView">
+    <item name="backgroundTint">?attr/colorSurfaceContainer</item>
+  </style>
+
+  <style name="App.Widget.M3E.LinearProgressIndicator" parent="Widget.Material3Expressive.LinearProgressIndicator">
+    <item name="trackCornerRadius">2dp</item>
+  </style>
+
+  <style name="App.Widget.M3E.LinearProgressIndicator.Wavy" parent="Widget.Material3Expressive.LinearProgressIndicator.Wavy">
+    <item name="trackThickness">8dp</item>
+    <item name="trackCornerRadius">4dp</item>
+  </style>
+
+  <style name="App.Widget.M3E.CircularProgressIndicator" parent="Widget.Material3Expressive.CircularProgressIndicator">
+    <item name="indicatorSize">44dp</item>
+    <item name="trackThickness">6dp</item>
+    <item name="trackCornerRadius">3dp</item>
+  </style>
+
+  <style name="App.Widget.M3E.LoadingIndicator.Contained" parent="Widget.Material3.LoadingIndicator.Contained">
+    <item name="containerColor">?attr/colorSurfaceContainerHighest</item>
+  </style>
+
+  <style name="App.Widget.M3E.Slider" parent="Widget.Material3Expressive.Slider.Medium" />
+
+  <style name="App.Widget.M3E.ToolbarCard" parent="Widget.Material3.CardView.Filled">
+    <item name="cardCornerRadius">0dp</item>
+    <item name="cardElevation">0dp</item>
+    <item name="strokeWidth">0dp</item>
+  </style>
+
+  <style name="App.Widget.M3E.BottomSheet" parent="Widget.Material3.BottomSheet">
+    <item name="shapeAppearanceOverlay">@style/App.ShapeAppearance.M3E.BottomSheetDialog</item>
+  </style>
+
+  <!-- Shape appearances -->
+  <style name="App.ShapeAppearance.M3E.BottomSheetDialog" parent="">
     <item name="cornerFamily">rounded</item>
     <item name="cornerSizeTopRight">16dp</item>
     <item name="cornerSizeTopLeft">16dp</item>
@@ -31,11 +124,7 @@
     <item name="cornerSizeBottomLeft">0dp</item>
   </style>
 
-  <style name="GeneralProgressIndicator" parent="Widget.MaterialComponents.LinearProgressIndicator">
-    <item name="android:width">200dp</item>
-    <item name="trackCornerRadius">3dp</item>
-  </style>
-
+  <!-- Font family helpers -->
   <style name="TextView.SansSerif" parent="Widget.MaterialComponents.TextView">
     <item name="fontFamily">sans-serif</item>
   </style>
@@ -60,23 +149,19 @@
     <item name="fontFamily">monospace</item>
   </style>
 
-  <style name="AppListMaterialCard" parent="Widget.MaterialComponents.CardView">
-    <item name="cardCornerRadius">4dp</item>
+  <!-- Cards -->
+  <style name="AppListMaterialCard" parent="Widget.Material3.CardView.Outlined">
+    <item name="cardCornerRadius">16dp</item>
     <item name="cardElevation">0dp</item>
+    <item name="strokeColor">?attr/colorOutlineVariant</item>
   </style>
 
   <style name="AlbumMaterialCard" parent="Widget.Material3.CardView.Outlined">
-    <item name="cardCornerRadius">8dp</item>
+    <item name="cardCornerRadius">18dp</item>
+    <item name="strokeColor">?attr/colorOutlineVariant</item>
   </style>
 
-  <style name="App.Material3.CardView" parent="Widget.Material3.CardView.Outlined">
-    <item name="android:stateListAnimator">@null</item>
-    <item name="android:background">@null</item>
-    <item name="android:foreground">@null</item>
-    <item name="cardPreventCornerOverlap">false</item>
-    <item name="strokeColor">@android:color/transparent</item>
-  </style>
-
+  <!-- Utility styles -->
   <style name="Widget.LC.PopupMenu" parent="Widget.AppCompat.ListView.DropDown">
     <item name="android:paddingEnd">-16dp</item>
     <item name="android:clipToPadding">false</item>
@@ -88,26 +173,24 @@
     <item name="android:windowIsTranslucent">true</item>
   </style>
 
+  <!-- Custom views -->
   <style name="Widget.CheckableChipView" parent="">
     <item name="android:padding">8dp</item>
 
-    <item name="android:textColor">@color/advanced_menu_item_text_not_checked</item>
+    <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
     <item name="android:textSize">14sp</item>
 
     <item name="ccv_outlineWidth">1dp</item>
-    <item name="ccv_outlineColor">@color/advanced_menu_item_overlay</item>
+    <item name="ccv_outlineColor">?attr/colorOutlineVariant</item>
 
-    <item name="android:color">@color/advanced_menu_item_overlay</item>
+    <item name="android:color">?attr/colorSurfaceInverse</item>
+    <item name="ccv_checkedTextColor">?attr/colorOnSurfaceInverse</item>
 
     <item name="ccv_clearIcon">@drawable/ic_check</item>
     <item name="ccv_foreground">?android:selectableItemBackground</item>
   </style>
 
   <style name="App.Widget.AdvancedMenuToggle" parent="Base.AppTheme">
-    <item name="materialButtonStyle">@style/Widget.Material3.Button.OutlinedButton</item>
-    <item name="colorSecondaryContainer">@color/advanced_menu_item_overlay</item>
-    <item name="colorOnSecondaryContainer">@color/advanced_menu_item_text_checked</item>
-    <item name="colorOutline">@color/advanced_menu_item_overlay</item>
-    <item name="colorOnSurface">@color/advanced_menu_item_text_not_checked</item>
+    <item name="materialButtonStyle">@style/Widget.Material3Expressive.Button.OutlinedButton</item>
   </style>
 </resources>

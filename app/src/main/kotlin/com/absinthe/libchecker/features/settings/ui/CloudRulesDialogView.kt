@@ -165,7 +165,7 @@ class CloudRulesDialogView(context: Context) :
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
-      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadline3))
+      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadlineLarge))
     }
 
     val desc = AppCompatTextView(

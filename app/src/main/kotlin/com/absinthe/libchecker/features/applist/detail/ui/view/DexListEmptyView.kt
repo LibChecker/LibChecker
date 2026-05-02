@@ -23,7 +23,7 @@ class DexListEmptyView(context: Context) : AViewGroup(context) {
     layoutParams =
       LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     text = context.getString(R.string.loading)
-    setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadline5))
+    setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadlineSmall))
     addView(this)
   }
 

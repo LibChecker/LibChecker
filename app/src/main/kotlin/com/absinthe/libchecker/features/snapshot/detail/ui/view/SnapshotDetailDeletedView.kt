@@ -27,7 +27,7 @@ class SnapshotDetailDeletedView(context: Context) : AViewGroup(context) {
         it.topMargin = 16.dp
       }
       text = context.getString(R.string.snapshot_detail_deleted_title)
-      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadline6))
+      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleLarge))
       addView(this)
     }
 

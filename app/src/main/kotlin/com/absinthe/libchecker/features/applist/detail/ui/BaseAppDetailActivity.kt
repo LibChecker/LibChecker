@@ -84,6 +84,7 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.addBackStateHandler
+import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.copyToClipboard
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
@@ -130,6 +131,10 @@ abstract class BaseAppDetailActivity :
 
   abstract val apkAnalyticsMode: Boolean
   abstract fun getToolbar(): Toolbar
+
+  override fun onApplyContentWindowInsets() {
+    binding.root.applySystemBarsPadding(left = true, top = true, right = true)
+  }
 
   private val bundleManager by unsafeLazy { ApplicationDelegate(this).iBundleManager }
   private val featureAdapter by unsafeLazy { FeatureAdapter() }

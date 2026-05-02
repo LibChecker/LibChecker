@@ -79,11 +79,12 @@ object UiUtils {
   fun createLoadingDialog(context: ContextThemeWrapper): AlertDialog {
     return BaseAlertDialogBuilder(context)
       .setView(
-        LinearProgressIndicator(context).apply {
+        LinearProgressIndicator(
+          ContextThemeWrapper(context, R.style.App_Widget_M3E_LinearProgressIndicator_Wavy)
+        ).apply {
           layoutParams = ViewGroup.LayoutParams(200.dp, ViewGroup.LayoutParams.WRAP_CONTENT).also {
             setPadding(24.dp, 24.dp, 24.dp, 24.dp)
           }
-          trackCornerRadius = 3.dp
           isIndeterminate = true
         }
       )
@@ -118,7 +119,7 @@ object UiUtils {
     if (GlobalValues.snapshotAutoRemoveThreshold <= 0) {
       GlobalValues.snapshotAutoRemoveThreshold = 5
     }
-    val slider = Slider(context).apply {
+    val slider = Slider(ContextThemeWrapper(context, R.style.App_Widget_M3E_Slider)).apply {
       layoutParams =
         ViewGroup.MarginLayoutParams(200.dp, ViewGroup.LayoutParams.WRAP_CONTENT).also {
           setPadding(24.dp, 24.dp, 24.dp, 24.dp)

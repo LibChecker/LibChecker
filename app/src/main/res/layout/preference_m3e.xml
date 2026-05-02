@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:layout_marginTop="@dimen/settings_preference_card_spacing"
+  android:layout_marginBottom="@dimen/settings_preference_card_spacing"
+  android:foreground="?attr/selectableItemBackground"
+  app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
+  app:cardCornerRadius="@dimen/settings_preference_inner_corner_radius"
+  app:cardElevation="0dp"
+  app:strokeWidth="0dp">
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:baselineAligned="false"
+    android:gravity="center_vertical"
+    android:minHeight="@dimen/settings_preference_min_height"
+    android:orientation="horizontal"
+    android:paddingStart="24dp"
+    android:paddingTop="10dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="10dp">
+
+    <FrameLayout
+      android:id="@+id/icon_frame"
+      android:layout_width="@dimen/settings_preference_icon_container_size"
+      android:layout_height="@dimen/settings_preference_icon_container_size"
+      android:layout_marginEnd="18dp">
+
+      <ImageView
+        android:id="@android:id/icon"
+        android:layout_width="@dimen/settings_preference_icon_size"
+        android:layout_height="@dimen/settings_preference_icon_size"
+        android:layout_gravity="center"
+        android:importantForAccessibility="no"
+        app:tint="?attr/colorOnSurfaceVariant" />
+    </FrameLayout>
+
+    <View
+      android:id="@android:id/empty"
+      android:layout_width="0dp"
+      android:layout_height="0dp"
+      android:layout_gravity="center_vertical"
+      android:visibility="invisible" />
+
+    <LinearLayout
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:orientation="vertical">
+
+      <TextView
+        android:id="@android:id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:textAppearance="?attr/textAppearanceTitleMedium"
+        android:textColor="?attr/colorOnSurface" />
+
+      <TextView
+        android:id="@android:id/summary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:ellipsize="end"
+        android:maxLines="3"
+        android:textAppearance="?attr/textAppearanceBodyMedium"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:visibility="gone" />
+    </LinearLayout>
+
+    <LinearLayout
+      android:id="@android:id/widget_frame"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="16dp"
+      android:gravity="center"
+      android:minWidth="48dp"
+      android:orientation="vertical" />
+
+    <ImageView
+      android:id="@+id/settings_preference_chevron"
+      android:layout_width="24dp"
+      android:layout_height="24dp"
+      android:layout_marginStart="8dp"
+      android:importantForAccessibility="no"
+      android:src="@drawable/ic_chevron_right"
+      app:tint="?attr/colorOnSurface" />
+  </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

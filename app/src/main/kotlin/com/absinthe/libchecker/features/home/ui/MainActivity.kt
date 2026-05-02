@@ -44,6 +44,7 @@ import com.absinthe.libchecker.ui.base.IAppBarContainer
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.addBackStateHandler
+import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.isKeyboardShowing
 import com.absinthe.libchecker.utils.extensions.setCurrentItem
@@ -281,6 +282,8 @@ class MainActivity :
         setOnClickListener { /*Do nothing*/ }
         if (this is BottomNavigationView) {
           fixBottomNavigationViewInsets(this)
+        } else {
+          applySystemBarsPadding(top = true, bottom = true)
         }
       }
     }

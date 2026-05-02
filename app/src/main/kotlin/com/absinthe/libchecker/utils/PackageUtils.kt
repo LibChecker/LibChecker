@@ -857,6 +857,23 @@ object PackageUtils {
     }
   }
 
+  @DrawableRes
+  fun getLargeAbiBadgeResource(type: Int): Int {
+    return when (type % MULTI_ARCH) {
+      ARMV8 -> R.drawable.ic_abi_label_arm64_v8a
+      ARMV7 -> R.drawable.ic_abi_label_armeabi_v7a
+      ARMV5 -> R.drawable.ic_abi_label_armeabi
+      X86_64 -> R.drawable.ic_abi_label_x86_64
+      X86 -> R.drawable.ic_abi_label_x86
+      MIPS64 -> R.drawable.ic_abi_label_mips64
+      MIPS -> R.drawable.ic_abi_label_mips
+      RISCV64 -> R.drawable.ic_abi_label_riscv64
+      RISCV32 -> R.drawable.ic_abi_label_riscv32
+      ERROR -> 0
+      else -> 0
+    }
+  }
+
   fun isAbi64Bit(abi: Int): Boolean {
     if (abi == NO_LIBS) {
       return Process.is64Bit()

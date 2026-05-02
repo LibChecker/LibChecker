@@ -4,25 +4,23 @@
   xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  android:fitsSystemWindows="false"
-  app:consumeSystemWindowsInsets="start|end"
-  app:edgeToEdge="true"
-  app:fitsSystemWindowsInsets="start|end|top"
   tools:context=".features.applist.detail.ui.AppDetailActivity">
 
   <com.google.android.material.appbar.AppBarLayout
     android:id="@+id/header_layout"
+    style="?attr/appBarLayoutStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?android:colorBackground">
+    android:background="?attr/colorSurface">
 
     <com.google.android.material.appbar.CollapsingToolbarLayout
       android:id="@+id/collapsing_toolbar"
+      style="@style/App.Widget.M3E.CollapsingToolbar.Medium"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:background="@null"
-      app:contentScrim="?android:colorBackground"
-      app:expandedTitleTextAppearance="?attr/textAppearanceHeadlineSmall"
+      app:contentScrim="?attr/colorSurfaceContainer"
+      app:expandedTitleTextAppearance="?attr/textAppearanceHeadlineMedium"
       app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
       <LinearLayout
@@ -46,6 +44,7 @@
 
       <androidx.appcompat.widget.ToolbarFix
         android:id="@+id/toolbar"
+        style="?actionBarStyle"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         app:layout_collapseMode="pin" />
@@ -70,7 +69,8 @@
 
     </com.google.android.material.tabs.TabLayout>
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
+      style="@style/App.Widget.M3E.ToolbarCard"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:backgroundTint="?android:colorBackground"
@@ -118,7 +118,7 @@
 
       </LinearLayout>
 
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
     <androidx.viewpager2.widget.ViewPager2
       android:id="@+id/viewpager"

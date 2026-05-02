@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.app.CheckableChipView
 
@@ -18,9 +17,6 @@ class TimeNodeAutoRemoveView(context: Context) : AViewGroup(context) {
     ).also { lp ->
       lp.setMargins(4.dp, 4.dp, 4.dp, 4.dp)
     }
-    val checkedColor = R.color.advanced_menu_item_text_checked.getColor(context)
-    val uncheckedColor = R.color.advanced_menu_item_text_not_checked.getColor(context)
-    it.textColorPair = checkedColor to uncheckedColor
     it.isChecked = GlobalValues.snapshotAutoRemoveThreshold > 0
   }
 

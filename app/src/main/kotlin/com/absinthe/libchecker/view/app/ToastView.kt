@@ -1,12 +1,13 @@
 package com.absinthe.libchecker.view.app
 
 import android.content.Context
-import android.graphics.Color
 import android.view.Gravity
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
+import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 
 class ToastView(context: Context) : AViewGroup(context) {
@@ -16,8 +17,8 @@ class ToastView(context: Context) : AViewGroup(context) {
       LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     maxWidth = 300.dp
     gravity = Gravity.CENTER
-    setTextAppearance(android.R.style.TextAppearance_Material_Body2)
-    setTextColor(Color.BLACK)
+    setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBodyMedium))
+    setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceInverse))
     val padding = 12.dp
     setPadding(padding, padding, padding, padding)
     setBackgroundResource(R.drawable.bg_toast)

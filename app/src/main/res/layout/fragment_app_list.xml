@@ -14,7 +14,7 @@
 
     <com.google.android.material.loadingindicator.LoadingIndicator
       android:id="@+id/loading_view"
-      style="@style/Widget.Material3.LoadingIndicator.Contained"
+      style="@style/App.Widget.M3E.LoadingIndicator.Contained"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_gravity="center" />
@@ -27,8 +27,7 @@
       android:scrollbars="none"
       app:borderBottomVisibility="never"
       app:borderTopDrawable="@null"
-      app:borderTopVisibility="whenTop"
-      app:fitsSystemWindowsInsets="bottom" />
+      app:borderTopVisibility="whenTop" />
 
     <com.absinthe.libchecker.features.applist.ui.view.AppListInitialiseView
       android:id="@+id/init_view"

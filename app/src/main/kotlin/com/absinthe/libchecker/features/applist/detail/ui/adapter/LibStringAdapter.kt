@@ -181,7 +181,8 @@ class LibStringAdapter(
       val drawable = TransitionDrawable(
         listOf(
           Color.TRANSPARENT.toDrawable(),
-          R.color.highlight_component.getColor(context).toDrawable()
+          context.getColorByAttr(com.google.android.material.R.attr.colorSecondaryContainer)
+            .toDrawable()
         ).toTypedArray()
       )
       holder.itemView.background = drawable
@@ -406,9 +407,9 @@ class LibStringAdapter(
       context = context,
       text = text,
       textSize = 10.dp.toFloat(),
-      textColor = context.getColorByAttr(com.google.android.material.R.attr.colorOnSecondaryContainer),
-      backgroundColor = context.getColorByAttr(com.google.android.material.R.attr.colorSecondaryContainer),
-      borderColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutline),
+      textColor = context.getColorByAttr(com.google.android.material.R.attr.colorOnSecondaryFixed),
+      backgroundColor = context.getColorByAttr(com.google.android.material.R.attr.colorSecondaryFixed),
+      borderColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutlineVariant),
       borderWidth = 1f,
       cornerRadius = 5.dp.toFloat()
     )

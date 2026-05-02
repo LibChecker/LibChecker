@@ -2,10 +2,4 @@
 <resources>
 
   <style name="ThemeOverlay" />
-
-  <style name="ThemeOverlay.Black">
-    <item name="android:colorPrimary">@android:color/black</item>
-    <item name="android:colorPrimaryDark">@android:color/black</item>
-    <item name="android:colorBackground">@android:color/black</item>
-  </style>
 </resources>

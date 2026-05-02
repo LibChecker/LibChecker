@@ -33,7 +33,6 @@ import com.absinthe.libraries.utils.extensions.addPaddingBottom
 import com.absinthe.libraries.utils.extensions.addPaddingEnd
 import com.absinthe.libraries.utils.extensions.addPaddingStart
 import com.absinthe.libraries.utils.extensions.addPaddingTop
-import com.absinthe.libraries.utils.utils.UiUtils
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.shape.ShapeAppearanceModel
 import com.google.android.material.shape.SuperEllipseCornerTreatment
@@ -89,12 +88,6 @@ var View.paddingBottomCompat: Int
 
 fun View.addPaddingBottom(padding: Int) {
   addPaddingBottom(padding)
-}
-
-fun ViewGroup.setSystemPadding() {
-  val isOrientationLandscape = context.isOrientationLandscape
-  fitsSystemWindows = isOrientationLandscape
-  setPadding(0, if (isOrientationLandscape) 0 else UiUtils.getStatusBarHeight(), 0, 0)
 }
 
 fun TextView.tintHighlightText(highlightText: String, rawText: CharSequence) {

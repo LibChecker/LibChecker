@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <!-- Launcher and shortcut accents -->
   <color name="ic_launcher_foreground">@android:color/system_accent1_0</color>
   <color name="ic_launcher_background">@android:color/system_accent1_600</color>
 </resources>

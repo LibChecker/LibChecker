@@ -2,11 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
   android:layout_width="match_parent"
-  android:layout_height="match_parent"
-  android:fitsSystemWindows="false"
-  app:consumeSystemWindowsInsets="start|end"
-  app:edgeToEdge="true"
-  app:fitsSystemWindowsInsets="start|end">
+  android:layout_height="match_parent">
 
   <androidx.coordinatorlayout.widget.CoordinatorLayout
     android:id="@+id/container"
@@ -19,11 +15,10 @@
 
     <com.google.android.material.appbar.AppBarLayout
       android:id="@+id/appbar"
-      style="?appBarStyle"
+      style="?attr/appBarLayoutStyle"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_gravity="top"
-      android:fitsSystemWindows="true"
       app:liftOnScroll="true">
 
       <com.google.android.material.appbar.MaterialToolbar
@@ -37,13 +32,13 @@
 
     <com.google.android.material.progressindicator.LinearProgressIndicator
       android:id="@+id/progress_horizontal"
+      style="@style/App.Widget.M3E.LinearProgressIndicator.Wavy"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_marginTop="?actionBarSize"
       android:indeterminate="true"
       android:visibility="gone"
-      app:hideAnimationBehavior="outward"
-      app:layout_fitsSystemWindowsInsets="top" />
+      app:hideAnimationBehavior="outward" />
 
 
     <androidx.viewpager2.widget.ViewPager2
@@ -57,11 +52,11 @@
 
   <com.google.android.material.navigationrail.NavigationRailView
     android:id="@+id/nav_view"
+    style="@style/App.Widget.M3E.NavigationRailView"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent"
-    app:menu="@menu/bottom_nav_menu"
-    app:fitsSystemWindowsInsets="top|bottom"/>
+    app:menu="@menu/bottom_nav_menu" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,7 +7,6 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.view.app.CheckableChipView
 
 class SnapshotMenuItemView(context: Context) : FrameLayout(context) {
@@ -18,9 +17,6 @@ class SnapshotMenuItemView(context: Context) : FrameLayout(context) {
     ).also { lp ->
       lp.setMargins(0, 4.dp, 8.dp, 4.dp)
     }
-    val checkedColor = R.color.advanced_menu_item_text_checked.getColor(context)
-    val uncheckedColor = R.color.advanced_menu_item_text_not_checked.getColor(context)
-    it.textColorPair = checkedColor to uncheckedColor
   }
 
   private var onCheckedChangeCallback: ((isChecked: Boolean) -> Unit)? = null

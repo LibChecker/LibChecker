@@ -26,7 +26,7 @@ class EmptyListView(context: Context) : AViewGroup(context) {
       it.topMargin = 8.dp
     }
     text = context.getString(R.string.empty_list)
-    setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadline5))
+    setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadlineSmall))
     addView(this)
   }
 
