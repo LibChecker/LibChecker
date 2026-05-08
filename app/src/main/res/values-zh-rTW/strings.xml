@@ -172,6 +172,8 @@
   <string name="lib_detail_app_props_title">應用程式屬性</string>
   <string name="lib_detail_app_props_tip">更多資訊</string>
   <string name="lib_detail_xposed_min_version">Min 版本</string>
+  <string name="lib_detail_xposed_target_version">目標版本</string>
+  <string name="lib_detail_xposed_static_scope">靜態範圍</string>
   <string name="lib_detail_xposed_default_scope">預設範圍</string>
   <string name="lib_detail_xposed_init_class">初始類別</string>
   <string name="lib_detail_app_install_source_title">安裝來源</string>

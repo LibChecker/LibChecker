@@ -56,7 +56,7 @@ import info.appdev.charting.charts.HorizontalBarChart
 import info.appdev.charting.charts.PieChart
 import info.appdev.charting.components.Legend
 import info.appdev.charting.components.XAxis
-import info.appdev.charting.data.Entry
+import info.appdev.charting.data.EntryFloat
 import info.appdev.charting.highlight.Highlight
 import info.appdev.charting.listener.OnChartValueSelectedListener
 import kotlinx.coroutines.Dispatchers
@@ -261,7 +261,7 @@ class ChartFragment :
     Timber.d("Nothing selected")
   }
 
-  override fun onValueSelected(entry: Entry, highlight: Highlight) {
+  override fun onValueSelected(entryFloat: EntryFloat, highlight: Highlight) {
     if (dialog != null) return
     if (dataSource is MarketDistributionChartDataSource) {
       (chartView as? Chart<*>)?.highlightValue(null)
