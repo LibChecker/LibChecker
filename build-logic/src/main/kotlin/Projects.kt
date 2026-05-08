@@ -71,6 +71,7 @@ fun Project.setupAppModule(block: ApplicationExtension.() -> Unit = {}) {
         //buildConfigField("String", "BUILD_TIME", "\"" + Instant.now().toString() + "\"")
       }
     }
+
     block()
   }
 }
@@ -83,6 +84,7 @@ private inline fun <reified T : CommonExtension> Project.setupBaseModule(crossin
     sourceSets.configureEach {
       java.directories.add("src/$name/kotlin")
     }
+    includeKotlinToolingMetadataInApk()
     (this as T).block()
   }
 }
@@ -90,3 +92,10 @@ private inline fun <reified T : CommonExtension> Project.setupBaseModule(crossin
 fun Project.exec(command: String): String = providers.exec {
   commandLine(command.split(" "))
 }.standardOutput.asText.get().trim()
+
+fun Project.includeKotlinToolingMetadataInApk() {
+  val m = Class.forName("org.jetbrains.kotlin.gradle.tooling.IncludeKotlinToolingMetadataInApkKt")
+    .getDeclaredMethod("includeKotlinToolingMetadataInApk", Project::class.java)
+  m.isAccessible = true
+  m.invoke(null, this)
+}
