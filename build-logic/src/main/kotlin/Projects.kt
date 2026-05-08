@@ -92,10 +92,3 @@ private inline fun <reified T : CommonExtension> Project.setupBaseModule(crossin
 fun Project.exec(command: String): String = providers.exec {
   commandLine(command.split(" "))
 }.standardOutput.asText.get().trim()
-
-fun Project.includeKotlinToolingMetadataInApk() {
-  val m = Class.forName("org.jetbrains.kotlin.gradle.tooling.IncludeKotlinToolingMetadataInApkKt")
-    .getDeclaredMethod("includeKotlinToolingMetadataInApk", Project::class.java)
-  m.isAccessible = true
-  m.invoke(null, this)
-}
