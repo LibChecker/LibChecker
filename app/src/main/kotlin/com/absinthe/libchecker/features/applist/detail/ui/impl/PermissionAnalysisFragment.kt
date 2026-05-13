@@ -38,7 +38,7 @@ class PermissionAnalysisFragment :
       emptyView.text.text = getString(R.string.empty_list)
     } else {
       lifecycleScope.launch(Dispatchers.IO) {
-        setItemsWithFilter(viewModel.queriedText, null)
+        setItemsWithFilter(items, viewModel.queriedText, null)
       }
     }
 
@@ -56,7 +56,7 @@ class PermissionAnalysisFragment :
     }
 
     adapter.apply {
-      animationEnable = true
+      animationEnable = false
       setDiffCallback(LibStringDiffUtil())
       setEmptyView(emptyView)
     }
@@ -74,11 +74,12 @@ class PermissionAnalysisFragment :
     }
   }
 
-  override suspend fun getFilterList(
+  override fun filterItems(
+    items: List<LibStringItemChip>,
     searchWords: String?,
     process: String?
   ): List<LibStringItemChip> {
-    return getItems().asSequence()
+    return items.asSequence()
       .filter { searchWords == null || it.item.name.contains(searchWords, true) || it.item.source?.contains(searchWords, true) == true }
       .filter { process == null || it.item.process != PackageInfo.REQUESTED_PERMISSION_GRANTED.toString() }
       .toList()

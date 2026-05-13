@@ -245,7 +245,7 @@ abstract class BaseAppDetailActivity :
           }
         }
 
-        lifecycleScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
           val showAndroidVersion =
             (GlobalValues.advancedOptions and AdvancedOptions.SHOW_ANDROID_VERSION) > 0
           val versionInfo = buildSpannedString {

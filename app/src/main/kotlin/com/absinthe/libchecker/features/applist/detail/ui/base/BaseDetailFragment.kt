@@ -115,12 +115,16 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   abstract fun getRecyclerView(): RecyclerView
 
   protected abstract val needShowLibDetailDialog: Boolean
+  protected open val autoLoadItems: Boolean = true
 
   protected abstract suspend fun getItems(): List<LibStringItemChip>
   protected abstract fun onItemsAvailable(items: List<LibStringItemChip>)
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+    if (!autoLoadItems) {
+      return
+    }
     lifecycleScope.launch(Dispatchers.IO) {
       val items = getItems()
       withContext(Dispatchers.Main) {
@@ -226,11 +230,12 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     return origin
   }
 
-  protected open suspend fun getFilterList(
+  protected open fun filterItems(
+    items: List<LibStringItemChip>,
     searchWords: String?,
     process: String?
-  ): List<LibStringItemChip>? {
-    return getItems().asSequence()
+  ): List<LibStringItemChip> {
+    return items.asSequence()
       .filter {
         searchWords == null || it.item.name.contains(
           searchWords,
@@ -241,12 +246,32 @@ abstract class BaseDetailFragment<T : ViewBinding> :
       .toList()
   }
 
+  protected open suspend fun getFilterList(
+    searchWords: String?,
+    process: String?
+  ): List<LibStringItemChip>? {
+    return filterItems(getItems(), searchWords, process)
+  }
+
+  protected suspend fun setItemsWithFilter(
+    items: List<LibStringItemChip>,
+    searchWords: String?,
+    process: String?
+  ) {
+    adapter.highlightText = searchWords.orEmpty()
+    updateItemsWithFilterResult(filterItems(items, searchWords, process))
+  }
+
   override suspend fun setItemsWithFilter(searchWords: String?, process: String?) {
     adapter.highlightText = searchWords.orEmpty()
-    getFilterList(searchWords, process)?.let {
+    updateItemsWithFilterResult(getFilterList(searchWords, process))
+  }
+
+  private suspend fun updateItemsWithFilterResult(items: List<LibStringItemChip>?) {
+    items?.let {
       val sortedList = sortedList(it.toMutableList())
-      lifecycleScope.launch(Dispatchers.Main) {
-        if (isDetached || !isBindingInitialized()) return@launch
+      withContext(Dispatchers.Main) {
+        if (isDetached || !isBindingInitialized()) return@withContext
         if (sortedList.isEmpty()) {
           if (getRecyclerView().itemDecorationCount > 0) {
             getRecyclerView().removeItemDecoration(dividerItemDecoration)

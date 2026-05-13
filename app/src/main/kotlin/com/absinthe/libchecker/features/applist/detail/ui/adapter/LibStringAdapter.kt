@@ -45,6 +45,7 @@ import com.absinthe.libchecker.features.applist.detail.ui.view.NativeLibItemView
 import com.absinthe.libchecker.features.applist.detail.ui.view.StaticLibItemView
 import com.absinthe.libchecker.features.statistics.bean.DISABLED
 import com.absinthe.libchecker.features.statistics.bean.EXPORTED
+import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
 import com.absinthe.libchecker.utils.OsUtils
@@ -82,6 +83,7 @@ class LibStringAdapter(
 
   private var processMode: Boolean = false
   private var is64Bit: Boolean = false
+  private val nativeSizeTextCache = mutableMapOf<LibStringItem, CharSequence>()
 
   fun switchProcessMode() {
     setProcessMode(!processMode)
@@ -100,12 +102,14 @@ class LibStringAdapter(
   }
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-    return when (type) {
-      NATIVE -> createBaseViewHolder(NativeLibItemView(context))
-      METADATA -> createBaseViewHolder(MetadataLibItemView(context))
-      STATIC -> createBaseViewHolder(StaticLibItemView(context))
-      else -> createBaseViewHolder(ComponentLibItemView(context))
+    val itemView = when (type) {
+      NATIVE -> NativeLibItemView(context)
+      METADATA -> MetadataLibItemView(context)
+      STATIC -> StaticLibItemView(context)
+      else -> ComponentLibItemView(context)
     }
+    itemView.setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackground))
+    return createBaseViewHolder(itemView)
   }
 
   override fun convert(holder: BaseViewHolder, item: LibStringItemChip) {
@@ -175,8 +179,8 @@ class LibStringAdapter(
         (holder.itemView.background as TransitionDrawable).reverseTransition(
           HIGHLIGHT_TRANSITION_DURATION
         )
+        holder.itemView.setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackground))
       }
-      holder.itemView.setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackground))
     } else {
       val drawable = TransitionDrawable(
         listOf(
@@ -213,26 +217,31 @@ class LibStringAdapter(
     // }
     itemView.processLabelColor = -1
     setOrHighlightText(itemView.libName, itemName)
-    itemView.libSize.text = PackageUtils.sizeToString(context, item.item)
+    itemView.libSize.text = getNativeSizeText(item)
     if ((GlobalValues.itemAdvancedOptions and AdvancedOptions.SHOW_MARKED_LIB) > 0) {
       itemView.setChip(item.rule)
     } else {
       itemView.setChip(null)
     }
+  }
 
-    val elfInfo = item.item.elfInfo
-    if (elfInfo.elfType != ET_NOT_SET && elfInfo.elfType != ET_DYN) {
-      val text = PackageUtils.elfTypeToString(elfInfo.elfType)
-      itemView.libSize.append(createNativeLabelSpan(text))
-    }
-    if (elfInfo.elfType != ET_NOT_ELF) {
-      if (elfInfo.pageSize > 0 && elfInfo.pageSize % PAGE_SIZE_16_KB == 0) {
-        val text = "16 KB"
-        itemView.libSize.append(createNativeLabelSpan(text))
+  private fun getNativeSizeText(item: LibStringItemChip): CharSequence = nativeSizeTextCache.getOrPut(item.item) {
+    buildSpannedString {
+      append(PackageUtils.sizeToString(context, item.item))
+      val elfInfo = item.item.elfInfo
+      if (elfInfo.elfType != ET_NOT_SET && elfInfo.elfType != ET_DYN) {
+        val text = PackageUtils.elfTypeToString(elfInfo.elfType)
+        append(createNativeLabelSpan(text))
       }
-      if (elfInfo.uncompressedAndNot16KB) {
-        val text = "NON 16 KB STORED"
-        itemView.libSize.append(createNativeLabelSpan(text))
+      if (elfInfo.elfType != ET_NOT_ELF) {
+        if (elfInfo.pageSize > 0 && elfInfo.pageSize % PAGE_SIZE_16_KB == 0) {
+          val text = "16 KB"
+          append(createNativeLabelSpan(text))
+        }
+        if (elfInfo.uncompressedAndNot16KB) {
+          val text = "NON 16 KB STORED"
+          append(createNativeLabelSpan(text))
+        }
       }
     }
   }

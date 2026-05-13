@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Bundle
+import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ALL
 import com.absinthe.libchecker.annotation.isComponentType
@@ -18,6 +19,10 @@ import com.absinthe.libchecker.features.statistics.ui.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.isArchivedPackage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 const val EXTRA_PACKAGE_NAME = Intent.EXTRA_PACKAGE_NAME
@@ -31,6 +36,7 @@ class AppDetailActivity :
   private var refName: String? = null
   private var refType: Int? = null
   private var extraBean: DetailExtraBean? = null
+  private var initPackageJob: Job? = null
 
   override val apkAnalyticsMode: Boolean = false
   override fun requirePackageName() = pkgName
@@ -73,19 +79,27 @@ class AppDetailActivity :
 
     Timber.d("packageName: $pkgName")
     val packageName = pkgName ?: return
-    runCatching {
-      val flag = PackageManager.GET_PERMISSIONS or PackageManager.GET_META_DATA
-      PackageUtils.getPackageInfo(packageName, flag, false)
-    }.onFailure {
-      Timber.d("getPackageInfo: $packageName failed, %s", it.message)
-      finish()
-    }.onSuccess { packageInfo ->
-      if (packageInfo.isArchivedPackage()) {
-        Timber.w("isArchivedPackage: $packageName")
-        Toasty.showLong(this, R.string.archived_app)
-        finish()
-      } else {
-        onPackageInfoAvailable(packageInfo, extraBean)
+    val detailExtraBean = extraBean
+    initPackageJob?.cancel()
+    initPackageJob = lifecycleScope.launch(Dispatchers.IO) {
+      runCatching {
+        val flag = PackageManager.GET_PERMISSIONS or PackageManager.GET_META_DATA
+        PackageUtils.getPackageInfo(packageName, flag, false)
+      }.onFailure {
+        Timber.d("getPackageInfo: $packageName failed, %s", it.message)
+        withContext(Dispatchers.Main) {
+          finish()
+        }
+      }.onSuccess { packageInfo ->
+        withContext(Dispatchers.Main) {
+          if (packageInfo.isArchivedPackage()) {
+            Timber.w("isArchivedPackage: $packageName")
+            Toasty.showLong(this@AppDetailActivity, R.string.archived_app)
+            finish()
+          } else {
+            onPackageInfoAvailable(packageInfo, detailExtraBean)
+          }
+        }
       }
     }
   }

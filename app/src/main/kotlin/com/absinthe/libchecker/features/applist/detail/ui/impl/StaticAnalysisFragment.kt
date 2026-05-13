@@ -34,7 +34,7 @@ class StaticAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>()
       emptyView.text.text = getString(R.string.empty_list)
     } else {
       lifecycleScope.launch(Dispatchers.IO) {
-        setItemsWithFilter(viewModel.queriedText, null)
+        setItemsWithFilter(items, viewModel.queriedText, null)
       }
     }
 
@@ -52,7 +52,7 @@ class StaticAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>()
     }
 
     adapter.apply {
-      animationEnable = true
+      animationEnable = false
       setOnItemLongClickListener { _, _, position ->
         ClipboardUtils.put(requireContext(), getItem(position).item.name)
         VersionCompat.showCopiedOnClipboardToast(context)
