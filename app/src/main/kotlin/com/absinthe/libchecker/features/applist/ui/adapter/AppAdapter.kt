@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.features.applist.ui.adapter
 
 import android.content.Context
+import android.content.pm.PackageInfo
 import android.text.SpannableString
 import android.text.style.ImageSpan
 import android.view.ViewGroup
@@ -24,6 +25,9 @@ import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
 class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAdapter<LCItem>() {
+
+  private var packageInfoMap: Map<String, PackageInfo> = emptyMap()
+  private val frozenStateCache = mutableMapOf<String, Boolean>()
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return createBaseViewHolder(
@@ -49,9 +53,7 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
     }
     root.container.apply {
       val packageInfo = if (item.packageName != Constants.EXAMPLE_PACKAGE) {
-        val packageInfo = runCatching {
-          PackageUtils.getPackageInfo(item.packageName, needAchieve = false)
-        }.getOrNull()
+        val packageInfo = getPackageInfo(item)
         icon.load(packageInfo)
         packageInfo
       } else {
@@ -106,7 +108,7 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
           setBadge(R.drawable.ic_harmony_badge)
         }
 
-        FreezeUtils.isAppFrozen(item.packageName) -> {
+        isAppFrozen(item, packageInfo) -> {
           setBadge(R.drawable.ic_disabled_package)
         }
 
@@ -124,11 +126,19 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
     return data[position].packageName.hashCode().toLong()
   }
 
-  override fun getItemViewType(position: Int): Int {
-    if (data.isEmpty() || position >= data.size) {
-      return super.getItemViewType(position)
+  fun updatePackageStateCache(packageInfoMap: Map<String, PackageInfo>) {
+    this.packageInfoMap = packageInfoMap
+    frozenStateCache.clear()
+  }
+
+  private fun getPackageInfo(item: LCItem): PackageInfo? {
+    return packageInfoMap[item.packageName]
+  }
+
+  private fun isAppFrozen(item: LCItem, packageInfo: PackageInfo?): Boolean {
+    return frozenStateCache.getOrPut(item.packageName) {
+      packageInfo?.applicationInfo?.let { FreezeUtils.isAppFrozen(it) } ?: true
     }
-    return data[position].packageName.hashCode()
   }
 
   enum class CardMode {

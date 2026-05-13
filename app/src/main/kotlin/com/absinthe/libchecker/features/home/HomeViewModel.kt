@@ -62,6 +62,7 @@ import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -163,14 +164,18 @@ class HomeViewModel : ViewModel() {
     if (initJob?.isActive == true) {
       return
     }
-    viewModelScope.launch {
-      initJob = initItemsImpl(context, LocalAppDataSource.getApplicationList(true))
+    initJob = viewModelScope.launch(Dispatchers.IO) {
+      try {
+        initItemsImpl(context, LocalAppDataSource.getApplicationList(true))
+      } finally {
+        initJob = null
+      }
     }
   }
 
   private val bundleManager by lazy { ApplicationDelegate(LibCheckerApp.app).iBundleManager }
 
-  private fun initItemsImpl(context: Context, appList: List<PackageInfo>) = viewModelScope.launch(Dispatchers.IO) {
+  private suspend fun initItemsImpl(context: Context, appList: List<PackageInfo>) {
     Timber.d("initItems: START")
 
     val packageManager = context.packageManager
@@ -199,6 +204,8 @@ class HomeViewModel : ViewModel() {
         insert(lcItems)
         lcItems.clear()
       }
+
+      if (!currentCoroutineContext().isActive) return
     }
 
     if (lcItems.isNotEmpty()) {
@@ -209,7 +216,6 @@ class HomeViewModel : ViewModel() {
     timeRecorder.end()
     Timber.d("initItems: END, $timeRecorder")
     updateAppListStatus(STATUS_NOT_START)
-    initJob = null
   }
 
   private var requestChangeJob: Job? = null
