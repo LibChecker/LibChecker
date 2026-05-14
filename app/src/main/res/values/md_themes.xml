@@ -148,6 +148,7 @@
   <color name="md_theme_libchecker_palette_neutral_variant_100">#FFFFFFFF</color>
   <style name="Theme.Material3Expressive.Light.LibChecker" parent="Theme.Material3Expressive.Light">
     <item name="android:statusBarColor">@android:color/transparent</item>
+    <item name="android:windowLightStatusBar">true</item>
     <item name="android:backgroundDimAmount">0.32</item>
     <item name="android:textColorPrimary">?attr/colorOnSurface</item>
     <item name="android:textColorPrimaryInverse">?attr/colorOnSurfaceInverse</item>
@@ -217,6 +218,7 @@
   </style>
   <style name="Theme.Material3Expressive.Dark.LibChecker" parent="Theme.Material3Expressive.Dark">
     <item name="android:statusBarColor">?android:colorBackground</item>
+    <item name="android:windowLightStatusBar">false</item>
     <item name="android:backgroundDimAmount">0.32</item>
     <item name="android:textColorPrimary">?attr/colorOnSurface</item>
     <item name="android:textColorPrimaryInverse">?attr/colorOnSurfaceInverse</item>

@@ -10,6 +10,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.collection.arrayMapOf
 import androidx.core.content.pm.PackageInfoCompat
+import androidx.core.text.isDigitsOnly
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.compat.ZipFileCompat
@@ -398,7 +399,7 @@ fun PackageInfo.getKotlinPluginInfo(): Map<String, String?> {
         }
 
         val sourceCompatibility = kotlinAndroidTarget?.extras?.android?.sourceCompatibility
-        if (kotlinAndroidTarget != null && sourceCompatibility.isNullOrEmpty().not()) {
+        if (kotlinAndroidTarget != null && sourceCompatibility?.isDigitsOnly() == true) {
           map["Java"] = sourceCompatibility
         }
       }
