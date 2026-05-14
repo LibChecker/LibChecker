@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.features.statistics.ui
 
-import android.content.res.Configuration
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.ViewGroup
@@ -15,9 +14,8 @@ import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
 import com.absinthe.libchecker.features.applist.ui.adapter.AppAdapter
 import com.absinthe.libchecker.features.statistics.LibReferenceViewModel
 import com.absinthe.libchecker.ui.base.BaseActivity
-import com.absinthe.libchecker.utils.extensions.isOrientationLandscape
+import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
-import com.absinthe.libchecker.utils.extensions.paddingTopCompat
 import com.absinthe.libchecker.view.app.RingDotsView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.rulesbundle.IconResMap
@@ -53,14 +51,6 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
     return super.onOptionsItemSelected(item)
   }
 
-  override fun onConfigurationChanged(newConfig: Configuration) {
-    super.onConfigurationChanged(newConfig)
-    binding.root.apply {
-      fitsSystemWindows = newConfig.isOrientationLandscape
-      paddingTopCompat = 0
-    }
-  }
-
   private fun initView() {
     setSupportActionBar(binding.toolbar)
     supportActionBar?.apply {
@@ -70,16 +60,12 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
       subtitle = refName
     }
     binding.apply {
-      root.apply {
-        fitsSystemWindows = isOrientationLandscape
-        paddingTopCompat = 0
-      }
-
       supportActionBar?.setDisplayHomeAsUpEnabled(true)
       (root as ViewGroup).bringChildToFront(appbar)
 
       list.apply {
         adapter = this@LibReferenceActivity.adapter
+        applySystemBarsPadding(top = true, bottom = true)
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
             binding.appbar.isLifted = !top

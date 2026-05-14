@@ -4,18 +4,13 @@
   xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  android:fitsSystemWindows="false"
-  app:consumeSystemWindowsInsets="start|end"
-  app:edgeToEdge="true"
-  app:fitsSystemWindowsInsets="start|end"
   tools:context=".features.statistics.ui.LibReferenceActivity">
 
   <com.google.android.material.appbar.AppBarLayout
     android:id="@+id/appbar"
-    style="?appBarStyle"
+    style="?attr/appBarLayoutStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:fitsSystemWindows="true"
     app:layout_constraintTop_toTopOf="parent">
 
     <androidx.appcompat.widget.ToolbarFix
@@ -58,7 +53,6 @@
       app:borderBottomVisibility="never"
       app:borderTopDrawable="@null"
       app:borderTopVisibility="whenTop"
-      app:fitsSystemWindowsInsets="bottom|top"
       app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
   </ViewFlipper>

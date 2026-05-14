@@ -26,7 +26,7 @@ class SnapshotEmptyView(context: Context) : AViewGroup(context) {
       it.topMargin = (-16).dp
     }
     text = context.getString(R.string.snapshot_empty_list_title)
-    setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadline5))
+    setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadlineSmall))
     addView(this)
   }
 

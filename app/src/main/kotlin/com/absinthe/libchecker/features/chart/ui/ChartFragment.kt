@@ -47,6 +47,7 @@ import com.absinthe.libchecker.ui.base.BaseFragment
 import com.absinthe.libchecker.ui.base.SaturationTransformation
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.Telemetry
+import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -114,6 +115,7 @@ class ChartFragment :
   }
 
   override fun init() {
+    binding.root.applySystemBarsPadding(top = true, bottom = true)
     val featureInitialized = !WorkerService.initializingFeatures
 
     chartView = generatePieChartView()

@@ -2,7 +2,7 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
   android:shape="rectangle">
 
-  <solid android:color="#CCDFDFDF" />
+  <solid android:color="?attr/colorSurfaceContainerHighest" />
 
   <corners
     android:bottomLeftRadius="@dimen/snapshot_detail_count_radius"

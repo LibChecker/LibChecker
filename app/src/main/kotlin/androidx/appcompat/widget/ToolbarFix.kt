@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
+import com.google.android.material.appbar.MaterialToolbar
 import timber.log.Timber
 
 /**
@@ -23,7 +24,7 @@ import timber.log.Timber
 class ToolbarFix @JvmOverloads constructor(
   context: Context,
   attrs: AttributeSet? = null
-) : Toolbar(context, attrs) {
+) : MaterialToolbar(context, attrs) {
   private val hiddenViews by lazy {
     Toolbar::class.java.getDeclaredField("mHiddenViews").apply {
       isAccessible = true

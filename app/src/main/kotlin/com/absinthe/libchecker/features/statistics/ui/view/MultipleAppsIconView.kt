@@ -25,7 +25,7 @@ class MultipleAppsIconView(context: Context) : AViewGroup(context) {
     }
     clipToOutline = true
     setOutlineProvider(outlineProvider)
-    setBackgroundColor(context.getColorByAttr(com.google.android.material.R.attr.colorSecondaryContainer))
+    setBackgroundColor(context.getColorByAttr(com.google.android.material.R.attr.colorSurfaceContainerHigh))
   }
 
   fun setIcons(packages: List<String>) {

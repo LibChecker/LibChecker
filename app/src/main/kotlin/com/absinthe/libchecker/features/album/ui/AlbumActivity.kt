@@ -22,6 +22,7 @@ import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
 import com.absinthe.libchecker.features.snapshot.ui.TimeNodeBottomSheetDialogFragment
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
+import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
@@ -77,6 +78,7 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
     binding.llContainer.apply {
       overScrollMode = RecyclerView.OVER_SCROLL_NEVER
       adapter = this@AlbumActivity.adapter
+      applySystemBarsPadding(top = true, bottom = true)
       borderVisibilityChangedListener =
         BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
           binding.appbar.isLifted = !top

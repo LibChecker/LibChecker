@@ -24,8 +24,7 @@
       android:scrollbars="none"
       app:borderBottomVisibility="never"
       app:borderTopDrawable="@null"
-      app:borderTopVisibility="whenTop"
-      app:fitsSystemWindowsInsets="bottom" />
+      app:borderTopVisibility="whenTop" />
 
   </com.absinthe.libchecker.view.app.CustomViewFlipper>
 

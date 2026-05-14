@@ -10,5 +10,4 @@
   app:borderBottomVisibility="never"
   app:borderTopDrawable="@null"
   app:borderTopVisibility="whenTop"
-  app:fitsSystemWindowsInsets="bottom"
   app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />

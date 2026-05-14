@@ -1,5 +1,7 @@
 package com.absinthe.libchecker.features.applist.ui.adapter
 
+import android.content.Context
+import android.content.pm.PackageInfo
 import android.text.SpannableString
 import android.text.style.ImageSpan
 import android.view.ViewGroup
@@ -24,6 +26,9 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
 class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAdapter<LCItem>() {
 
+  private var packageInfoMap: Map<String, PackageInfo> = emptyMap()
+  private val frozenStateCache = mutableMapOf<String, Boolean>()
+
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return createBaseViewHolder(
       AppItemView(context).apply {
@@ -40,17 +45,15 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
     root.apply {
       if (cardMode == CardMode.DEMO) {
         setSmoothRoundCorner(20.dp)
-        strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutline)
-        setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSecondaryContainer))
+        strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutlineVariant)
+        setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSurfaceContainerHigh))
       } else {
         radius = 0f
       }
     }
     root.container.apply {
       val packageInfo = if (item.packageName != Constants.EXAMPLE_PACKAGE) {
-        val packageInfo = runCatching {
-          PackageUtils.getPackageInfo(item.packageName, needAchieve = false)
-        }.getOrNull()
+        val packageInfo = getPackageInfo(item)
         icon.load(packageInfo)
         packageInfo
       } else {
@@ -69,44 +72,31 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
       val str = StringBuilder()
         .append(PackageUtils.getAbiString(context, item.abi.toInt(), false))
         .append(PackageUtils.getBuildVersionsInfo(packageInfo, item.packageName))
-      val spanString: SpannableString
-      val abiBadgeRes = PackageUtils.getAbiBadgeResource(item.abi.toInt())
+      val abi = item.abi.toInt()
+      val useDetachedAbiBadges = shouldUseDetachedAbiBadges()
+      setDetachedAbiBadgeLayoutEnabled(useDetachedAbiBadges)
 
-      if (item.abi.toInt() != Constants.OVERLAY && item.abi.toInt() != Constants.ERROR && abiBadgeRes != 0) {
-        var paddingString = "  $str"
-        if (item.abi / Constants.MULTI_ARCH == 1) {
-          paddingString = "  $paddingString"
-        }
-        spanString = SpannableString(paddingString)
-        abiBadgeRes.getDrawable(context)?.let {
-          it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
-          if ((GlobalValues.advancedOptions and AdvancedOptions.TINT_ABI_LABEL) > 0) {
-            if (abiBadgeRes == R.drawable.ic_abi_label_64bit) {
-              it.setTint(context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary))
-            } else {
-              it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorTertiary))
+      if (useDetachedAbiBadges) {
+        val abiBadgeRes = PackageUtils.getLargeAbiBadgeResource(abi)
+        if (abi != Constants.OVERLAY && abi != Constants.ERROR && abiBadgeRes != 0) {
+          val abiBadge = abiBadgeRes.getDrawable(context)?.mutate()?.apply {
+            setTint(context.getAbiBadgeTint(abi % Constants.MULTI_ARCH))
+          }
+          val multiArchBadge = if (abi / Constants.MULTI_ARCH == 1) {
+            R.drawable.ic_abi_label_multi_arch.getDrawable(context)?.mutate()?.apply {
+              setTint(context.getMultiArchBadgeTint())
             }
           } else {
-            it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
+            null
           }
-          val span = CenterAlignImageSpan(it)
-          spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
+          setAbiBadges(abiBadge, multiArchBadge)
+        } else {
+          setAbiBadges(null, null)
         }
-        if (item.abi / Constants.MULTI_ARCH == 1) {
-          R.drawable.ic_multi_arch.getDrawable(context)?.let {
-            it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
-            if ((GlobalValues.advancedOptions and AdvancedOptions.TINT_ABI_LABEL) > 0) {
-              it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorSecondary))
-            } else {
-              it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
-            }
-            val span = CenterAlignImageSpan(it)
-            spanString.setSpan(span, 2, 3, ImageSpan.ALIGN_BOTTOM)
-          }
-        }
-        abiInfo.text = spanString
-      } else {
         abiInfo.text = str
+      } else {
+        setAbiBadges(null, null)
+        abiInfo.text = context.buildInlineAbiInfo(abi, str)
       }
 
       when {
@@ -118,7 +108,7 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
           setBadge(R.drawable.ic_harmony_badge)
         }
 
-        FreezeUtils.isAppFrozen(item.packageName) -> {
+        isAppFrozen(item, packageInfo) -> {
           setBadge(R.drawable.ic_disabled_package)
         }
 
@@ -136,15 +126,83 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
     return data[position].packageName.hashCode().toLong()
   }
 
-  override fun getItemViewType(position: Int): Int {
-    if (data.isEmpty() || position >= data.size) {
-      return super.getItemViewType(position)
+  fun updatePackageStateCache(packageInfoMap: Map<String, PackageInfo>) {
+    this.packageInfoMap = packageInfoMap
+    frozenStateCache.clear()
+  }
+
+  private fun getPackageInfo(item: LCItem): PackageInfo? {
+    return packageInfoMap[item.packageName]
+  }
+
+  private fun isAppFrozen(item: LCItem, packageInfo: PackageInfo?): Boolean {
+    return frozenStateCache.getOrPut(item.packageName) {
+      packageInfo?.applicationInfo?.let { FreezeUtils.isAppFrozen(it) } ?: true
     }
-    return data[position].packageName.hashCode()
   }
 
   enum class CardMode {
     NORMAL,
     DEMO
   }
+}
+
+private fun shouldUseDetachedAbiBadges(): Boolean {
+  return listOf(
+    AdvancedOptions.SHOW_ANDROID_VERSION,
+    AdvancedOptions.SHOW_TARGET_API,
+    AdvancedOptions.SHOW_MIN_API,
+    AdvancedOptions.SHOW_COMPILE_API
+  ).count { (GlobalValues.advancedOptions and it) > 0 } >= 4
+}
+
+private fun Context.getAbiBadgeTint(abi: Int): Int {
+  if ((GlobalValues.advancedOptions and AdvancedOptions.TINT_ABI_LABEL) == 0) {
+    return getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant)
+  }
+  return getColorByAttr(
+    if (PackageUtils.isAbi64Bit(abi)) {
+      androidx.appcompat.R.attr.colorPrimary
+    } else {
+      com.google.android.material.R.attr.colorTertiary
+    }
+  )
+}
+
+private fun Context.buildInlineAbiInfo(abi: Int, text: CharSequence): CharSequence {
+  val abiBadgeRes = PackageUtils.getAbiBadgeResource(abi)
+  if (abi == Constants.OVERLAY || abi == Constants.ERROR || abiBadgeRes == 0) {
+    return text
+  }
+
+  var paddingString = "  $text"
+  if (abi / Constants.MULTI_ARCH == 1) {
+    paddingString = "  $paddingString"
+  }
+  val spanString = SpannableString(paddingString)
+
+  abiBadgeRes.getDrawable(this)?.mutate()?.let {
+    it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+    it.setTint(getAbiBadgeTint(abi % Constants.MULTI_ARCH))
+    spanString.setSpan(CenterAlignImageSpan(it), 0, 1, ImageSpan.ALIGN_BOTTOM)
+  }
+  if (abi / Constants.MULTI_ARCH == 1) {
+    R.drawable.ic_multi_arch.getDrawable(this)?.mutate()?.let {
+      it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+      it.setTint(getMultiArchBadgeTint())
+      spanString.setSpan(CenterAlignImageSpan(it), 2, 3, ImageSpan.ALIGN_BOTTOM)
+    }
+  }
+
+  return spanString
+}
+
+private fun Context.getMultiArchBadgeTint(): Int {
+  return getColorByAttr(
+    if ((GlobalValues.advancedOptions and AdvancedOptions.TINT_ABI_LABEL) > 0) {
+      com.google.android.material.R.attr.colorSecondary
+    } else {
+      com.google.android.material.R.attr.colorOnSurfaceVariant
+    }
+  )
 }

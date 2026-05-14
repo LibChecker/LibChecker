@@ -4,25 +4,23 @@
   xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  android:fitsSystemWindows="false"
-  app:consumeSystemWindowsInsets="start|end"
-  app:edgeToEdge="true"
-  app:fitsSystemWindowsInsets="start|end|top"
   tools:context=".features.snapshot.detail.ui.SnapshotDetailActivity">
 
   <com.google.android.material.appbar.AppBarLayout
     android:id="@+id/header_layout"
+    style="?attr/appBarLayoutStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?android:colorBackground">
+    android:background="?attr/colorSurface">
 
     <com.google.android.material.appbar.CollapsingToolbarLayout
       android:id="@+id/collapsing_toolbar"
+      style="@style/App.Widget.M3E.CollapsingToolbar.Medium"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:background="@null"
-      app:contentScrim="?android:colorBackground"
-      app:expandedTitleTextAppearance="?attr/textAppearanceHeadlineSmall"
+      app:contentScrim="?attr/colorSurfaceContainer"
+      app:expandedTitleTextAppearance="?attr/textAppearanceHeadlineMedium"
       app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
       <com.absinthe.libchecker.features.snapshot.detail.ui.view.SnapshotTitleView
@@ -36,6 +34,7 @@
 
       <androidx.appcompat.widget.ToolbarFix
         android:id="@+id/toolbar"
+        style="?actionBarStyle"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         app:layout_collapseMode="pin" />
@@ -57,7 +56,6 @@
       android:clipToPadding="false"
       android:overScrollMode="never"
       android:padding="@dimen/normal_padding"
-      app:fitsSystemWindowsInsets="bottom"
       app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
   </LinearLayout>

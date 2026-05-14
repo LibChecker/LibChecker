@@ -28,6 +28,7 @@ import com.absinthe.libchecker.features.album.track.ui.view.TrackItemView
 import com.absinthe.libchecker.features.album.track.ui.view.TrackLoadingView
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.ui.base.BaseActivity
+import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.getAppName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -60,6 +61,7 @@ class TrackActivity :
 
     binding.list.apply {
       adapter = this@TrackActivity.adapter
+      applySystemBarsPadding(top = true, bottom = true)
       layoutManager = LinearLayoutManager(this@TrackActivity)
       borderVisibilityChangedListener =
         BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->

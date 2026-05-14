@@ -556,8 +556,10 @@ class AppListFragment :
     if (!isActive) {
       return@launch
     }
+    val packageInfoMap = LocalAppDataSource.getApplicationMap()
     withContext(Dispatchers.Main) {
       appAdapter.apply {
+        updatePackageStateCache(packageInfoMap)
         setDiffNewData(filterList) {
           if (isDetached || !isBindingInitialized()) {
             return@setDiffNewData

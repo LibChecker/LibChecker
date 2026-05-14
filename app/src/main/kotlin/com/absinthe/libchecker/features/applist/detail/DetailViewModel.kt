@@ -81,7 +81,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import ohos.bundle.AbilityInfo
 import ohos.bundle.IBundleManager
@@ -145,7 +144,12 @@ class DetailViewModel : ViewModel() {
   fun reset() {
     Timber.d("reset")
     initSoAnalysisJob?.cancel()
+    initStaticJob?.cancel()
+    initMetaDataJob?.cancel()
+    initPermissionJob?.cancel()
     initDexJob?.cancel()
+    initSignaturesJob?.cancel()
+    initComponentsJob?.cancel()
     allNativeLibItems = emptyMap()
     nativeLibTabs.value = null
     nativeLibItems.value = null
@@ -220,20 +224,35 @@ class DetailViewModel : ViewModel() {
     }
   }
 
-  fun initStaticData() = viewModelScope.launch(Dispatchers.IO) {
-    if (staticLibItems.value == null) {
+  private var initStaticJob: Job? = null
+
+  fun initStaticData() {
+    if (initStaticJob?.isActive == true || staticLibItems.value != null) {
+      return
+    }
+    initStaticJob = viewModelScope.launch(Dispatchers.IO) {
       staticLibItems.emit(getStaticChipList())
     }
   }
 
-  fun initMetaDataData() = viewModelScope.launch(Dispatchers.IO) {
-    if (metaDataItems.value == null) {
+  private var initMetaDataJob: Job? = null
+
+  fun initMetaDataData() {
+    if (initMetaDataJob?.isActive == true || metaDataItems.value != null) {
+      return
+    }
+    initMetaDataJob = viewModelScope.launch(Dispatchers.IO) {
       metaDataItems.emit(getMetaDataChipList())
     }
   }
 
-  fun initPermissionData() = viewModelScope.launch(Dispatchers.IO) {
-    if (permissionsItems.value == null) {
+  private var initPermissionJob: Job? = null
+
+  fun initPermissionData() {
+    if (initPermissionJob?.isActive == true || permissionsItems.value != null) {
+      return
+    }
+    initPermissionJob = viewModelScope.launch(Dispatchers.IO) {
       val permissions = getPermissionChipList()
       permissionsItems.emit(permissions)
 
@@ -246,8 +265,7 @@ class DetailViewModel : ViewModel() {
   var initDexJob: Job? = null
 
   fun initDexData() {
-    initDexJob?.cancel()
-    if (dexLibItems.value != null) {
+    if (initDexJob?.isActive == true || dexLibItems.value != null) {
       return
     }
     initDexJob = viewModelScope.launch(Dispatchers.IO) {
@@ -256,95 +274,156 @@ class DetailViewModel : ViewModel() {
     }
   }
 
-  fun initSignatures(context: Context) = viewModelScope.launch {
-    if (signaturesLibItems.value == null) {
+  private var initSignaturesJob: Job? = null
+
+  fun initSignatures(context: Context) {
+    if (initSignaturesJob?.isActive == true || signaturesLibItems.value != null) {
+      return
+    }
+    initSignaturesJob = viewModelScope.launch {
       signaturesLibItems.emit(getSignatureChipList(context))
     }
   }
 
-  fun initComponentsData() = viewModelScope.launch(Dispatchers.IO) {
-    val processesSet = hashSetOf<String>()
-    try {
-      packageInfo.let {
-        val parsedActionsMap = IntentFilterUtils.parseComponentsFromApk(it.applicationInfo!!.sourceDir)
-          .asSequence()
-          .map { item -> item.className to item.intentFilters }
-          .toMap()
+  private var initComponentsJob: Job? = null
 
-        val services = if (it.services?.isNotEmpty() == true || isApk) {
-          it.services
-        } else {
-          PackageUtils.getPackageInfo(it.packageName, PackageManager.GET_SERVICES).services
-        }.let { list ->
-          PackageUtils.getComponentList(it.packageName, list, true)
-        }
-        val activities = if (it.activities?.isNotEmpty() == true || isApk) {
-          it.activities
-        } else {
-          PackageUtils.getPackageInfo(it.packageName, PackageManager.GET_ACTIVITIES).activities
-        }.let { list ->
-          PackageUtils.getComponentList(it.packageName, list, true)
-        }
-        val receivers = if (it.receivers?.isNotEmpty() == true || isApk) {
-          it.receivers
-        } else {
-          PackageUtils.getPackageInfo(it.packageName, PackageManager.GET_RECEIVERS).receivers
-        }.let { list ->
-          PackageUtils.getComponentList(it.packageName, list, true)
-        }
-        val providers = if (it.providers?.isNotEmpty() == true || isApk) {
-          it.providers
-        } else {
-          PackageUtils.getPackageInfo(it.packageName, PackageManager.GET_PROVIDERS).providers
-        }.let { list ->
-          PackageUtils.getComponentList(it.packageName, list, true)
-        }
+  fun initComponentsData() {
+    if (initComponentsJob?.isActive == true) {
+      return
+    }
+    if (
+      componentsMap[SERVICE]?.value != null &&
+      componentsMap[ACTIVITY]?.value != null &&
+      componentsMap[RECEIVER]?.value != null &&
+      componentsMap[PROVIDER]?.value != null
+    ) {
+      return
+    }
+    initComponentsJob = viewModelScope.launch(Dispatchers.IO) {
+      val processesSet = hashSetOf<String>()
+      try {
+        packageInfo.let { packageInfo ->
+          val parsedActionsMap = IntentFilterUtils.parseComponentsFromApk(packageInfo.applicationInfo!!.sourceDir)
+            .asSequence()
+            .map { item -> item.className to item.intentFilters }
+            .toMap()
 
-        val transform: suspend (StatefulComponent, Int) -> LibStringItemChip =
-          { item, componentType ->
-            var rule = LCRules.getRule(item.componentName, componentType, true)
-              .takeIf { !item.componentName.startsWith(".") }
-            if (rule == null) {
-              val fullComponentName = if (item.componentName.startsWith(".")) {
-                it.packageName + item.componentName
-              } else {
-                item.componentName
-              }
-              rule = parsedActionsMap[fullComponentName]
-                ?.flatMap { filter -> filter.actions }
-                ?.asSequence()
-                ?.mapNotNull { action -> runBlocking { LCRules.getRule(action, ACTION_IN_RULES, false) } }
-                ?.firstOrNull()
-            }
-
-            val source = when {
-              !item.enabled -> DISABLED
-              item.exported -> EXPORTED
-              else -> null
-            }
-
-            LibStringItemChip(
-              LibStringItem(
-                name = item.componentName,
-                source = source,
-                process = item.processName.takeIf { it.isNotEmpty() }
-              ),
-              rule
-            )
+          val componentPackageInfo = if (
+            !isApk && (
+              packageInfo.services.isNullOrEmpty() ||
+                packageInfo.activities.isNullOrEmpty() ||
+                packageInfo.receivers.isNullOrEmpty() ||
+                packageInfo.providers.isNullOrEmpty()
+              )
+          ) {
+            runCatching {
+              PackageUtils.getPackageInfo(
+                packageInfo.packageName,
+                PackageManager.GET_SERVICES
+                  or PackageManager.GET_ACTIVITIES
+                  or PackageManager.GET_RECEIVERS
+                  or PackageManager.GET_PROVIDERS
+              )
+            }.onFailure {
+              Timber.e(it)
+            }.getOrNull()
+          } else {
+            packageInfo
           }
-        services.forEach { sc -> processesSet.add(sc.processName) }
-        activities.forEach { sc -> processesSet.add(sc.processName) }
-        receivers.forEach { sc -> processesSet.add(sc.processName) }
-        providers.forEach { sc -> processesSet.add(sc.processName) }
-        componentsMap[SERVICE]?.emit(services.map { transform(it, SERVICE) })
-        componentsMap[ACTIVITY]?.emit(activities.map { transform(it, ACTIVITY) })
-        componentsMap[RECEIVER]?.emit(receivers.map { transform(it, RECEIVER) })
-        componentsMap[PROVIDER]?.emit(providers.map { transform(it, PROVIDER) })
+
+          val services = if (packageInfo.services?.isNotEmpty() == true || isApk) {
+            packageInfo.services
+          } else {
+            componentPackageInfo?.services
+          }.let { list ->
+            PackageUtils.getComponentList(packageInfo.packageName, list, true)
+          }
+          val activities = if (packageInfo.activities?.isNotEmpty() == true || isApk) {
+            packageInfo.activities
+          } else {
+            componentPackageInfo?.activities
+          }.let { list ->
+            PackageUtils.getComponentList(packageInfo.packageName, list, true)
+          }
+          val receivers = if (packageInfo.receivers?.isNotEmpty() == true || isApk) {
+            packageInfo.receivers
+          } else {
+            componentPackageInfo?.receivers
+          }.let { list ->
+            PackageUtils.getComponentList(packageInfo.packageName, list, true)
+          }
+          val providers = if (packageInfo.providers?.isNotEmpty() == true || isApk) {
+            packageInfo.providers
+          } else {
+            componentPackageInfo?.providers
+          }.let { list ->
+            PackageUtils.getComponentList(packageInfo.packageName, list, true)
+          }
+
+          val ruleCache = mutableMapOf<String, Rule?>()
+          suspend fun getRuleCached(name: String, @LibType type: Int, regex: Boolean): Rule? {
+            val key = "$type:$regex:$name"
+            if (ruleCache.containsKey(key)) {
+              return ruleCache[key]
+            }
+            return LCRules.getRule(name, type, regex).also {
+              ruleCache[key] = it
+            }
+          }
+
+          val transform: suspend (StatefulComponent, Int) -> LibStringItemChip =
+            { item, componentType ->
+              var rule = if (!item.componentName.startsWith(".")) {
+                getRuleCached(item.componentName, componentType, true)
+              } else {
+                null
+              }
+              if (rule == null) {
+                val fullComponentName = if (item.componentName.startsWith(".")) {
+                  packageInfo.packageName + item.componentName
+                } else {
+                  item.componentName
+                }
+                parsedActionsMap[fullComponentName]?.let { filters ->
+                  for (filter in filters) {
+                    for (action in filter.actions) {
+                      rule = getRuleCached(action, ACTION_IN_RULES, false)
+                      if (rule != null) break
+                    }
+                    if (rule != null) break
+                  }
+                }
+              }
+
+              val source = when {
+                !item.enabled -> DISABLED
+                item.exported -> EXPORTED
+                else -> null
+              }
+
+              LibStringItemChip(
+                LibStringItem(
+                  name = item.componentName,
+                  source = source,
+                  process = item.processName.takeIf { it.isNotEmpty() }
+                ),
+                rule
+              )
+            }
+          services.forEach { sc -> processesSet.add(sc.processName) }
+          activities.forEach { sc -> processesSet.add(sc.processName) }
+          receivers.forEach { sc -> processesSet.add(sc.processName) }
+          providers.forEach { sc -> processesSet.add(sc.processName) }
+          processesMap =
+            processesSet.filter { it.isNotEmpty() }.associateWith { UiUtils.getRandomColor() }
+          componentsMap[SERVICE]?.emit(services.map { transform(it, SERVICE) })
+          componentsMap[ACTIVITY]?.emit(activities.map { transform(it, ACTIVITY) })
+          componentsMap[RECEIVER]?.emit(receivers.map { transform(it, RECEIVER) })
+          componentsMap[PROVIDER]?.emit(providers.map { transform(it, PROVIDER) })
+        }
+      } catch (e: Exception) {
+        Timber.e(e)
       }
-      processesMap =
-        processesSet.filter { it.isNotEmpty() }.associateWith { UiUtils.getRandomColor() }
-    } catch (e: Exception) {
-      Timber.e(e)
     }
   }
 

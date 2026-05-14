@@ -30,7 +30,7 @@ class ComparisonDashboardView(context: Context) : MaterialCardView(context, null
       LayoutParams.WRAP_CONTENT
     )
     setSmoothRoundCorner(12.dp)
-    setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSecondaryContainer))
+    setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSurfaceContainerHigh))
     addView(container)
   }
 

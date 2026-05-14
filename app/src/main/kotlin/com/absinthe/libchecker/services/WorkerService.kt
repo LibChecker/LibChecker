@@ -13,15 +13,15 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getFeatures
 import java.lang.ref.WeakReference
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class WorkerService : LifecycleService() {
 
   private val listenerList = RemoteCallbackList<OnWorkerListener>()
   private val binder by lazy { WorkerBinder(this) }
+  private var initFeaturesJob: Job? = null
 
   override fun onBind(intent: Intent): IBinder {
     super.onBind(intent)
@@ -61,26 +61,41 @@ class WorkerService : LifecycleService() {
     listenerList.finishBroadcast()
   }
 
+  @Synchronized
   private fun initFeatures() {
+    if (initFeaturesJob?.isActive == true) {
+      Timber.d("initFeatures skipped")
+      return
+    }
+
     Timber.d("initFeatures")
     initializingFeatures = true
 
-    Repositories.lcRepository.allLCItemsFlow.onEach {
-      it.forEach { item ->
-        if (item.features == -1) {
-          runCatching {
-            val feature = PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_META_DATA).getFeatures()
-            Repositories.lcRepository.updateFeatures(item.packageName, feature)
-          }.onFailure { e ->
-            Timber.w(e)
+    initFeaturesJob = lifecycleScope.launch(Dispatchers.IO) {
+      try {
+        val packageInfoMap = LocalAppDataSource.getApplicationMap()
+        val featuresMap = Repositories.lcRepository.getLCItems()
+          .asSequence()
+          .filter { it.features == -1 }
+          .mapNotNull { item ->
+            runCatching {
+              val packageInfo = packageInfoMap[item.packageName]
+                ?: PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_META_DATA)
+              item.packageName to packageInfo.getFeatures()
+            }.onFailure { e ->
+              Timber.w(e)
+            }.getOrNull()
           }
+          .toMap()
+
+        if (featuresMap.isNotEmpty()) {
+          Repositories.lcRepository.updateFeatures(featuresMap)
         }
+      } finally {
+        initializingFeatures = false
+        Timber.d("initFeatures finished")
       }
-      initializingFeatures = false
-      Timber.d("initFeatures finished")
     }
-      .flowOn(Dispatchers.IO)
-      .launchIn(lifecycleScope)
   }
 
   class WorkerBinder(service: WorkerService) : IWorkerService.Stub() {

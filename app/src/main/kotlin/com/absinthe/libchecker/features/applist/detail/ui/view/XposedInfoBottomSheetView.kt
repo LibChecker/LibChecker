@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.features.applist.detail.ui.view
 
 import android.content.Context
-import android.graphics.Color
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.ViewGroup
@@ -18,6 +17,7 @@ import com.absinthe.libchecker.features.applist.detail.ui.adapter.XposedDetailIt
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.manager.SystemBarManager
@@ -41,8 +41,9 @@ class XposedInfoBottomSheetView(context: Context) :
       LayoutParams.WRAP_CONTENT
     )
     setIcon(R.drawable.ic_settings)
-    setIconBackgroundTintColor(R.color.material_blue_grey_300)
-    setIconTintColor(Color.WHITE)
+    setIconTintColor(
+      context.getColorByAttr(com.google.android.material.R.attr.colorOnSecondaryContainer)
+    )
   }
 
   private val xposedDetailContentView = BottomSheetRecyclerView(context).apply {

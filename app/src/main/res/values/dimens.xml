@@ -7,6 +7,13 @@
   <dimen name="normal_icon_size">24dp</dimen>
   <dimen name="app_info_icon_size">45dp</dimen>
   <dimen name="normal_padding_24">24dp</dimen>
+  <dimen name="settings_list_vertical_padding">8dp</dimen>
+  <dimen name="settings_preference_card_spacing">2dp</dimen>
+  <dimen name="settings_preference_min_height">76dp</dimen>
+  <dimen name="settings_preference_corner_radius">20dp</dimen>
+  <dimen name="settings_preference_inner_corner_radius">4dp</dimen>
+  <dimen name="settings_preference_icon_container_size">40dp</dimen>
+  <dimen name="settings_preference_icon_size">26dp</dimen>
 
   <dimen name="app_bar_elevation">4dp</dimen>
 

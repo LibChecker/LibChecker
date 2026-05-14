@@ -56,8 +56,10 @@ class ChartActivity :
 
   override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
     menuInflater.inflate(R.menu.abi_chart_menu, menu)
-    val menuItem: MenuItem = menu.findItem(R.id.action_switch)
-    val switch: MaterialSwitch = menuItem.actionView?.findViewById(R.id.switch_abi_chart)!!
+    val switch = menu.findItem(R.id.action_switch)
+      ?.actionView
+      ?.findViewById<MaterialSwitch>(R.id.switch_abi_chart)
+      ?: return
     detailedAbiSwitch = switch
 
     switch.setOnCheckedChangeListener { button, isChecked ->

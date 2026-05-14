@@ -5,22 +5,29 @@ import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.Environment
 import android.os.RemoteException
 import android.text.TextUtils
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.FileProvider
+import androidx.core.content.edit
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
+import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.ListPreference
 import androidx.preference.Preference
+import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.PreferenceGroup
+import androidx.preference.PreferenceGroupAdapter
+import androidx.preference.SwitchPreferenceCompat
 import androidx.preference.TwoStatePreference
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.BuildConfig
@@ -35,21 +42,22 @@ import com.absinthe.libchecker.features.home.HomeViewModel
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.base.IAppBarContainer
 import com.absinthe.libchecker.ui.base.IListController
+import com.absinthe.libchecker.utils.LocaleUtils
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.UiUtils
+import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.setBottomPaddingSpace
 import com.absinthe.libraries.utils.extensions.getBoolean
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.rulesbundle.LCRemoteRepo
 import com.absinthe.rulesbundle.LCRules
+import com.google.android.material.card.MaterialCardView
 import java.io.File
 import java.util.Locale
 import kotlinx.coroutines.launch
-import rikka.material.app.LocaleDelegate
-import rikka.preference.SimpleMenuPreference
 import rikka.recyclerview.fixEdgeEffect
 import rikka.widget.borderview.BorderRecyclerView
 import rikka.widget.borderview.BorderView
@@ -60,12 +68,23 @@ class SettingsFragment :
   PreferenceFragmentCompat(),
   IListController {
 
+  private companion object {
+    val NAVIGATION_PREFERENCE_KEYS = setOf(
+      Constants.PREF_ABOUT,
+      Constants.PREF_TRANSLATION,
+      Constants.PREF_HELP,
+      Constants.PREF_RATE,
+      Constants.PREF_TELEGRAM
+    )
+  }
+
   private lateinit var borderViewDelegate: BorderViewDelegate
   private lateinit var prefRecyclerView: RecyclerView
   private val viewModel: HomeViewModel by activityViewModels()
 
   override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
     setPreferencesFromResource(R.xml.settings, null)
+    preferenceScreen.applyM3eLayoutResources()
 
     findPreference<TwoStatePreference>(Constants.PREF_APK_ANALYTICS)?.apply {
       setOnPreferenceChangeListener { _, newValue ->
@@ -96,7 +115,8 @@ class SettingsFragment :
         true
       }
     }
-    findPreference<SimpleMenuPreference>(Constants.PREF_RULES_REPO)?.apply {
+    findPreference<ListPreference>(Constants.PREF_RULES_REPO)?.apply {
+      summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
       setOnPreferenceChangeListener { _, newValue ->
         GlobalValues.repo = newValue as String
         LCRules.setRemoteRepo(
@@ -116,24 +136,28 @@ class SettingsFragment :
         setOnPreferenceChangeListener { _, newValue ->
           if (newValue is String) {
             val locale: Locale = if ("SYSTEM" == newValue) {
-              LocaleDelegate.systemLocale
+              LocaleUtils.systemLocale
             } else {
               Locale.forLanguageTag(newValue)
             }
-            LocaleDelegate.defaultLocale = locale
+            preferenceManager.sharedPreferences?.edit {
+              putString(Constants.PREF_LOCALE, newValue)
+            }
             Timber.d("Locale = $locale")
             activity?.recreate()
           }
           true
         }
       }!!
-    findPreference<SimpleMenuPreference>(Constants.PREF_SNAPSHOT_KEEP)?.apply {
+    findPreference<ListPreference>(Constants.PREF_SNAPSHOT_KEEP)?.apply {
+      summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
       setOnPreferenceChangeListener { _, newValue ->
         GlobalValues.snapshotKeep = newValue.toString()
         true
       }
     }
-    findPreference<SimpleMenuPreference>(Constants.PREF_DARK_MODE)?.apply {
+    findPreference<ListPreference>(Constants.PREF_DARK_MODE)?.apply {
+      summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
       setOnPreferenceChangeListener { _, newValue ->
         GlobalValues.darkMode = newValue.toString()
         AppCompatDelegate.setDefaultNightMode(UiUtils.getNightMode())
@@ -393,6 +417,7 @@ class SettingsFragment :
     recyclerView.fixEdgeEffect()
     recyclerView.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
     recyclerView.isVerticalScrollBarEnabled = false
+    recyclerView.applySystemBarsPadding(bottom = true)
 
     doOnMainThreadIdle {
       recyclerView.setBottomPaddingSpace()
@@ -400,9 +425,7 @@ class SettingsFragment :
 
     val lp = recyclerView.layoutParams
     if (lp is FrameLayout.LayoutParams) {
-      lp.rightMargin =
-        recyclerView.context.resources.getDimension(rikka.material.R.dimen.rd_activity_horizontal_margin)
-          .toInt()
+      lp.rightMargin = recyclerView.context.resources.getDimension(R.dimen.normal_padding).toInt()
       lp.leftMargin = lp.rightMargin
     }
 
@@ -413,6 +436,15 @@ class SettingsFragment :
       }
 
     prefRecyclerView = recyclerView
+    recyclerView.addOnChildAttachStateChangeListener(
+      object : RecyclerView.OnChildAttachStateChangeListener {
+        override fun onChildViewAttachedToWindow(view: View) {
+          styleSettingsPreferenceItem(recyclerView, view)
+        }
+
+        override fun onChildViewDetachedFromWindow(view: View) = Unit
+      }
+    )
     return recyclerView
   }
 
@@ -439,6 +471,76 @@ class SettingsFragment :
     lifecycleScope.launch {
       GlobalValues.preferencesFlow.emit(key to value)
     }
+  }
+
+  private fun Preference.applyM3eLayoutResources() {
+    when (this) {
+      is PreferenceCategory -> {
+        layoutResource = R.layout.preference_category_m3e
+        isIconSpaceReserved = false
+      }
+
+      is SwitchPreferenceCompat -> {
+        layoutResource = R.layout.preference_m3e
+        widgetLayoutResource = R.layout.preference_widget_material_switch
+        isIconSpaceReserved = true
+      }
+
+      else -> {
+        layoutResource = R.layout.preference_m3e
+        isIconSpaceReserved = true
+      }
+    }
+
+    if (this is PreferenceGroup) {
+      for (index in 0 until preferenceCount) {
+        getPreference(index).applyM3eLayoutResources()
+      }
+    }
+  }
+
+  private fun styleSettingsPreferenceItem(recyclerView: RecyclerView, itemView: View) {
+    val adapter = recyclerView.adapter as? PreferenceGroupAdapter ?: return
+    val position = recyclerView.getChildAdapterPosition(itemView)
+    if (position == RecyclerView.NO_POSITION) return
+
+    val preference = adapter.getItem(position)
+    val card = itemView as? MaterialCardView ?: return
+    if (!preference.isSettingsRowPreference()) return
+
+    val previous = if (position > 0) adapter.getItem(position - 1) else null
+    val next = if (position < adapter.itemCount - 1) adapter.getItem(position + 1) else null
+    val isFirstInGroup = !previous.isSettingsRowPreference()
+    val isLastInGroup = !next.isSettingsRowPreference()
+    val outerRadius = resources.getDimension(R.dimen.settings_preference_corner_radius)
+    val innerRadius = resources.getDimension(R.dimen.settings_preference_inner_corner_radius)
+    val topRadius = if (isFirstInGroup) outerRadius else innerRadius
+    val bottomRadius = if (isLastInGroup) outerRadius else innerRadius
+
+    card.shapeAppearanceModel = card.shapeAppearanceModel.toBuilder()
+      .setTopLeftCornerSize(topRadius)
+      .setTopRightCornerSize(topRadius)
+      .setBottomLeftCornerSize(bottomRadius)
+      .setBottomRightCornerSize(bottomRadius)
+      .build()
+
+    itemView.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+      topMargin = if (isFirstInGroup) {
+        0
+      } else {
+        resources.getDimensionPixelSize(R.dimen.settings_preference_card_spacing)
+      }
+      bottomMargin = 0
+    }
+
+    val hasSwitch = preference is TwoStatePreference
+    itemView.findViewById<View>(android.R.id.widget_frame)?.isVisible = hasSwitch
+    itemView.findViewById<View>(R.id.settings_preference_chevron)?.isVisible =
+      preference?.key in NAVIGATION_PREFERENCE_KEYS
+  }
+
+  private fun Preference?.isSettingsRowPreference(): Boolean {
+    return this != null && this !is PreferenceCategory
   }
 
   private fun recordPreferenceEvent(key: String, value: Any = "") {

@@ -50,8 +50,16 @@ class ComponentLibItemView(context: Context) : AViewGroup(context) {
     }
 
   private var chip: Chip? = null
+  private var chipRule: Rule? = null
+  private var chipColorfulIcon = GlobalValues.isColorfulIcon
 
   fun setChip(rule: Rule?) {
+    val colorfulIcon = GlobalValues.isColorfulIcon
+    if (chipRule == rule && chipColorfulIcon == colorfulIcon) {
+      return
+    }
+    chipRule = rule
+    chipColorfulIcon = colorfulIcon
     chip = rule?.let {
       getOrCreateChip().apply {
         text = it.label

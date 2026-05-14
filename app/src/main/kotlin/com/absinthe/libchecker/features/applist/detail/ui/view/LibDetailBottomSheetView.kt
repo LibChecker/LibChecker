@@ -28,7 +28,6 @@ import com.absinthe.libchecker.features.applist.detail.ui.adapter.node.LibDetail
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
@@ -248,7 +247,7 @@ class LibDetailBottomSheetView(context: Context) :
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
       text = context.getString(R.string.not_found)
-      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBody2))
+      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBodyMedium))
     }
 
     private val createNewIssueText = AppCompatTextView(context).apply {
@@ -257,7 +256,7 @@ class LibDetailBottomSheetView(context: Context) :
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
       text = context.getString(R.string.create_an_issue)
-      setLinkTextColor(R.color.colorPrimary.getColor(context))
+      setLinkTextColor(context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary))
       gravity = Gravity.CENTER_VERTICAL
       setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_github, 0, 0, 0)
       compoundDrawablePadding = 4.dp
@@ -329,31 +328,31 @@ class LibDetailBottomSheetView(context: Context) :
       LibDetailItem(
         iconRes = R.drawable.ic_label,
         tipRes = R.string.lib_detail_label_tip,
-        textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2),
+        textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleSmall),
         text = ruleBean.data.label
       ),
       LibDetailItem(
         iconRes = R.drawable.ic_team,
         tipRes = R.string.lib_detail_develop_team_tip,
-        textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2),
+        textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleSmall),
         text = ruleBean.data.dev_team
       ),
       LibDetailItem(
         iconRes = R.drawable.ic_github,
         tipRes = R.string.lib_detail_rule_contributors_tip,
-        textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2),
+        textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleSmall),
         text = ruleBean.data.rule_contributors.joinToString(separator = ", ")
       ),
       LibDetailItem(
         iconRes = R.drawable.ic_content,
         tipRes = R.string.lib_detail_description_tip,
-        textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBody2),
+        textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBodyMedium),
         text = ruleBean.data.description
       ),
       LibDetailItem(
         iconRes = R.drawable.ic_url,
         tipRes = R.string.lib_detail_relative_link_tip,
-        textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBody2),
+        textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBodyMedium),
         text = "<a href='${ruleBean.data.source_link}'> ${ruleBean.data.source_link} </a>"
       )
     )
@@ -362,7 +361,7 @@ class LibDetailBottomSheetView(context: Context) :
         LibDetailItem(
           iconRes = R.drawable.ic_time,
           tipRes = R.string.lib_detail_last_update_tip,
-          textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBody2),
+          textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBodyMedium),
           text = it
         )
       )

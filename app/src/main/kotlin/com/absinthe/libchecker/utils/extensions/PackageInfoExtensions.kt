@@ -10,6 +10,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.collection.arrayMapOf
 import androidx.core.content.pm.PackageInfoCompat
+import androidx.core.text.isDigitsOnly
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.compat.ZipFileCompat
@@ -37,6 +38,7 @@ import com.absinthe.libchecker.constant.Constants.X86_64
 import com.absinthe.libchecker.constant.Constants.X86_64_STRING
 import com.absinthe.libchecker.constant.Constants.X86_STRING
 import com.absinthe.libchecker.constant.GlobalFeatures
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.features.applist.detail.bean.KotlinToolingMetadata
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
@@ -56,7 +58,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okio.buffer
 import okio.source
-import rikka.material.app.LocaleDelegate
 import timber.log.Timber
 
 /**
@@ -398,7 +399,7 @@ fun PackageInfo.getKotlinPluginInfo(): Map<String, String?> {
         }
 
         val sourceCompatibility = kotlinAndroidTarget?.extras?.android?.sourceCompatibility
-        if (kotlinAndroidTarget != null && sourceCompatibility.isNullOrEmpty().not()) {
+        if (kotlinAndroidTarget != null && sourceCompatibility?.isDigitsOnly() == true) {
           map["Java"] = sourceCompatibility
         }
       }
@@ -644,15 +645,16 @@ suspend fun PackageInfo.getRxAndroidVersion(foundList: List<String>? = null): St
  * @return List of LibStringItem
  */
 fun PackageInfo.getSignatures(context: Context): Sequence<LibStringItem> {
+  val locale = GlobalValues.locale
   val localedContext = context.createConfigurationContext(
     Configuration(context.resources.configuration).apply {
-      setLocale(LocaleDelegate.defaultLocale)
+      setLocale(locale)
     }
   )
   val dateFormat = DateFormat.getDateTimeInstance(
     DateFormat.LONG,
     DateFormat.LONG,
-    LocaleDelegate.defaultLocale
+    locale
   )
   return if (OsUtils.atLeastP() && signingInfo != null) {
     if (signingInfo!!.hasMultipleSigners()) {

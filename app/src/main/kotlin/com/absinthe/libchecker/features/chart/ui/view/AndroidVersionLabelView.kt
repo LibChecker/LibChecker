@@ -24,7 +24,7 @@ class AndroidVersionLabelView(context: Context) : AViewGroup(context) {
     ).also {
       it.marginStart = 8.dp
     }
-    setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2))
+    setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleSmall))
     addView(this)
   }
 

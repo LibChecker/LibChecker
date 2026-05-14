@@ -4,7 +4,7 @@
   <application>
     <meta-data
         android:name="debug.test.color"
-        android:resource="@color/colorPrimary" />
+        android:resource="@color/md_theme_libchecker_light_primary" />
     <meta-data
       android:name="debug.test.drawable1"
       android:resource="@drawable/ic_snapshot" />

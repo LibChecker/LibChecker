@@ -2,18 +2,13 @@
   xmlns:app="http://schemas.android.com/apk/res-auto"
   android:id="@+id/container"
   android:layout_width="match_parent"
-  android:layout_height="match_parent"
-  android:fitsSystemWindows="false"
-  app:consumeSystemWindowsInsets="start|end"
-  app:edgeToEdge="true"
-  app:fitsSystemWindowsInsets="start|end">
+  android:layout_height="match_parent">
 
   <com.google.android.material.appbar.AppBarLayout
     android:id="@+id/appbar"
-    style="?appBarStyle"
+    style="?attr/appBarLayoutStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:fitsSystemWindows="true"
     app:layout_constraintTop_toTopOf="parent">
 
     <androidx.appcompat.widget.ToolbarFix

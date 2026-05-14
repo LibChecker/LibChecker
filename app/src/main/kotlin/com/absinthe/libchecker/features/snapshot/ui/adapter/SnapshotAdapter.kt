@@ -65,7 +65,7 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
     (holder.itemView as SnapshotItemView).apply {
       if (cardMode == CardMode.DEMO || cardMode == CardMode.GET_APP_UPDATE) {
         setSmoothRoundCorner(16.dp)
-        strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutline)
+        strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutlineVariant)
       } else {
         strokeColor = Color.TRANSPARENT
         radius = 0f

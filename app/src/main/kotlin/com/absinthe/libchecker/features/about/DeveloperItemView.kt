@@ -26,7 +26,7 @@ class DeveloperItemView(context: Context) : MaterialCardView(context) {
 
   init {
     setSmoothRoundCorner(16.dp)
-    strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutline)
+    strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutlineVariant)
     addView(container)
   }
 
@@ -59,7 +59,7 @@ class DeveloperItemView(context: Context) : MaterialCardView(context) {
         it.marginStart = 8.dp
         it.marginEnd = 8.dp
       }
-      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2))
+      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleSmall))
       addView(this)
     }
 

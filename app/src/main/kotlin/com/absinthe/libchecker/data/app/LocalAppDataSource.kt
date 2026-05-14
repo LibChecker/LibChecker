@@ -29,8 +29,10 @@ import timber.log.Timber
 object LocalAppDataSource : AppDataSource {
 
   private val applicationsLock = ReentrantReadWriteLock()
-  private val applications: MutableList<PackageInfo> = loadApplications().toMutableList()
-  val apexPackageSet: Set<String> = loadApexPackageSet()
+  private val applications: MutableList<PackageInfo> = mutableListOf()
+  private val applicationMap: MutableMap<String, PackageInfo> = mutableMapOf()
+  private var applicationsLoaded: Boolean = false
+  val apexPackageSet: Set<String> by lazy { loadApexPackageSet() }
 
   private val _PackageChangeFlow: MutableSharedFlow<PackageChangeState> = MutableSharedFlow()
   val packageChangeFlow: SharedFlow<PackageChangeState> = _PackageChangeFlow.asSharedFlow()
@@ -97,31 +99,49 @@ object LocalAppDataSource : AppDataSource {
   }
 
   override fun getApplicationList(forceUpdate: Boolean): List<PackageInfo> {
-    if (forceUpdate) {
-      applicationsLock.write {
-        applications.clear()
-        applications.addAll(loadApplications())
-      }
-    }
-
+    ensureApplicationsLoaded(forceUpdate)
     return applicationsLock.read {
       applications.toList()
     }
   }
 
   override fun getApplicationMap(forceUpdate: Boolean): Map<String, PackageInfo> {
-    return getApplicationList(forceUpdate).asSequence()
-      .filter { it.applicationInfo?.sourceDir != null || it.applicationInfo?.publicSourceDir != null || it.isArchivedPackage() }
-      .map { it.packageName to it }
-      .toMap()
+    ensureApplicationsLoaded(forceUpdate)
+    return applicationsLock.read {
+      applicationMap.filterValues { it.isVisiblePackageInfo() }
+    }
+  }
+
+  private fun ensureApplicationsLoaded(forceUpdate: Boolean = false) {
+    if (!forceUpdate && applicationsLock.read { applicationsLoaded }) {
+      return
+    }
+    applicationsLock.write {
+      if (forceUpdate || !applicationsLoaded) {
+        refreshApplicationsLocked()
+      }
+    }
+  }
+
+  private fun refreshApplicationsLocked() {
+    applications.clear()
+    applications.addAll(loadApplications())
+    applicationMap.clear()
+    applicationMap.putAll(applications.associateBy { it.packageName })
+    applicationsLoaded = true
   }
 
   private fun loadApplications(): List<PackageInfo> {
     Timber.d("loadApplications start")
-    val flag = if (OsUtils.atLeastV()) PackageManager.MATCH_ARCHIVED_PACKAGES else 0
+    val archivedFlag = if (OsUtils.atLeastV()) PackageManager.MATCH_ARCHIVED_PACKAGES else 0L
+    val flag = PackageManager.GET_META_DATA.toLong() or archivedFlag
     val list = PackageManagerCompat.getInstalledPackages(flag)
     Timber.d("loadApplications end, apps count: ${list.size}")
     return list
+  }
+
+  private fun PackageInfo.isVisiblePackageInfo(): Boolean {
+    return applicationInfo?.sourceDir != null || applicationInfo?.publicSourceDir != null || isArchivedPackage()
   }
 
   /**
@@ -147,18 +167,25 @@ object LocalAppDataSource : AppDataSource {
 
   private fun updateApplications(state: PackageChangeState) {
     applicationsLock.write {
+      if (!applicationsLoaded) {
+        refreshApplicationsLocked()
+      }
+      val packageInfo = state.getActualPackageInfo()
       when (state) {
         is PackageChangeState.Added -> {
-          applications.add(state.getActualPackageInfo())
+          applications.add(packageInfo)
+          applicationMap[packageInfo.packageName] = packageInfo
         }
 
         is PackageChangeState.Removed -> {
-          applications.removeAll { it.packageName == state.getActualPackageInfo().packageName }
+          applications.removeAll { it.packageName == packageInfo.packageName }
+          applicationMap.remove(packageInfo.packageName)
         }
 
         is PackageChangeState.Replaced -> {
-          applications.removeAll { it.packageName == state.getActualPackageInfo().packageName }
-          applications.add(state.getActualPackageInfo())
+          applications.removeAll { it.packageName == packageInfo.packageName }
+          applications.add(packageInfo)
+          applicationMap[packageInfo.packageName] = packageInfo
         }
       }
     }

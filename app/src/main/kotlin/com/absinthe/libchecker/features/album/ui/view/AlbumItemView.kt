@@ -10,7 +10,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.extensions.getColor
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
@@ -35,7 +35,7 @@ class AlbumItemView(context: Context) : MaterialCardView(context) {
 
   init {
     setSmoothRoundCorner(12.dp)
-    setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSecondaryContainer))
+    setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSurfaceContainerHigh))
     addView(container)
   }
 
@@ -55,7 +55,7 @@ class AlbumItemView(context: Context) : MaterialCardView(context) {
       ).also {
         it.marginStart = context.getDimensionPixelSize(R.dimen.album_card_inset_horizontal)
       }
-      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadline6))
+      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleLarge))
     }
 
     val subtitle = AppCompatTextView(context).apply {
@@ -63,8 +63,8 @@ class AlbumItemView(context: Context) : MaterialCardView(context) {
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
-      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2))
-      setTextColor(R.color.textSecondary.getColor(context))
+      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleSmall))
+      setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
     }
 
     init {

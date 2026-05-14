@@ -33,7 +33,7 @@ class MetaDataAnalysisFragment :
       emptyView.text.text = getString(R.string.empty_list)
     } else {
       lifecycleScope.launch(Dispatchers.IO) {
-        setItemsWithFilter(viewModel.queriedText, null)
+        setItemsWithFilter(items, viewModel.queriedText, null)
       }
     }
 
@@ -51,7 +51,7 @@ class MetaDataAnalysisFragment :
     }
 
     adapter.apply {
-      animationEnable = true
+      animationEnable = false
       setDiffCallback(LibStringDiffUtil())
       setEmptyView(emptyView)
     }

@@ -1,34 +1,52 @@
 package com.absinthe.libchecker.ui.base
 
+import android.content.Context
 import android.content.res.Resources
-import android.graphics.Color
 import android.os.Bundle
+import android.view.View
+import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
 import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.utils.LocaleUtils
 import com.absinthe.libchecker.utils.OsUtils
-import rikka.material.app.LocaleDelegate
-import rikka.material.app.MaterialActivity
+import com.absinthe.libchecker.utils.extensions.applySystemBarsMargin
+import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
+import java.util.Locale
 import timber.log.Timber
 
 abstract class BaseActivity<VB : ViewBinding> :
-  MaterialActivity(),
+  AppCompatActivity(),
   IBinding<VB> {
 
   override lateinit var binding: VB
+  private var appliedLocale: Locale? = null
+
+  override fun attachBaseContext(newBase: Context) {
+    val locale = GlobalValues.locale
+    appliedLocale = locale
+    super.attachBaseContext(LocaleUtils.wrapContext(newBase, locale))
+  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
+    onApplyUserThemeResource(theme, false)
+    if (shouldApplyTranslucentSystemBars()) {
+      onApplyTranslucentSystemBars()
+    }
     super.onCreate(savedInstanceState)
     binding = (inflateBinding(layoutInflater) as VB).also {
       setContentView(it.root)
+    }
+    if (shouldApplyTranslucentSystemBars()) {
+      onApplyContentWindowInsets()
     }
   }
 
   override fun onResume() {
     super.onResume()
     if (OsUtils.atLeastT()) {
-      if (LocaleDelegate.defaultLocale != GlobalValues.locale) {
-        LocaleDelegate.defaultLocale = GlobalValues.locale
+      if (appliedLocale != GlobalValues.locale) {
         recreate()
       }
     }
@@ -44,33 +62,29 @@ abstract class BaseActivity<VB : ViewBinding> :
     }
   }
 
-  override fun shouldApplyTranslucentSystemBars(): Boolean {
+  open fun shouldApplyTranslucentSystemBars(): Boolean {
     return true
   }
 
-  override fun computeUserThemeKey(): String {
+  open fun computeUserThemeKey(): String {
     return GlobalValues.darkMode
   }
 
-  @Suppress("DEPRECATION")
-  override fun onApplyTranslucentSystemBars() {
-    super.onApplyTranslucentSystemBars()
-    window.apply {
-      decorView.post {
-        if (!OsUtils.atLeastV()) {
-          statusBarColor = Color.TRANSPARENT
-          navigationBarColor = Color.TRANSPARENT
-        }
-        if (OsUtils.atLeastQ()) {
-          isNavigationBarContrastEnforced = false
-        }
-      }
+  open fun onApplyTranslucentSystemBars() {
+    enableEdgeToEdge()
+    if (OsUtils.atLeastQ()) {
+      window.isNavigationBarContrastEnforced = false
     }
   }
 
-  override fun onApplyUserThemeResource(theme: Resources.Theme, isDecorView: Boolean) {
+  open fun onApplyContentWindowInsets() {
+    binding.root.applySystemBarsPadding(left = true, right = true)
+    binding.root.findViewById<View>(R.id.appbar)?.applySystemBarsPadding(top = true)
+    binding.root.findViewById<View>(R.id.progress_horizontal)?.applySystemBarsMargin(top = true)
+  }
+
+  open fun onApplyUserThemeResource(theme: Resources.Theme, isDecorView: Boolean) {
     theme.applyStyle(R.style.ThemeOverlay, true)
-    theme.applyStyle(rikka.material.preference.R.style.ThemeOverlay_Rikka_Material3_Preference, true)
   }
 
   protected fun isBindingInitialized(): Boolean {

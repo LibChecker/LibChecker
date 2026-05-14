@@ -96,7 +96,7 @@ class XposedInfoDialogFragment : BaseBottomSheetViewDialogFragment<XposedInfoBot
               iconRes = R.drawable.ic_app_prop,
               tip = context.getString(R.string.lib_detail_xposed_min_version),
               text = finalMinVersion,
-              textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2)
+              textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleSmall)
             )
           )
         }
@@ -110,7 +110,7 @@ class XposedInfoDialogFragment : BaseBottomSheetViewDialogFragment<XposedInfoBot
               iconRes = R.drawable.ic_app_prop,
               tip = context.getString(R.string.lib_detail_xposed_target_version),
               text = targetVersion,
-              textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2)
+              textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleSmall)
             )
           )
         }
@@ -124,7 +124,7 @@ class XposedInfoDialogFragment : BaseBottomSheetViewDialogFragment<XposedInfoBot
               iconRes = R.drawable.ic_app_prop,
               tip = context.getString(R.string.lib_detail_xposed_static_scope),
               text = "True",
-              textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2)
+              textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleSmall)
             )
           )
         }
@@ -142,7 +142,7 @@ class XposedInfoDialogFragment : BaseBottomSheetViewDialogFragment<XposedInfoBot
                 iconRes = R.drawable.ic_app_prop,
                 tip = context.getString(R.string.lib_detail_xposed_default_scope),
                 text = scopes.joinToString("\n"),
-                textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2)
+                textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleSmall)
               )
             )
           }
@@ -158,7 +158,7 @@ class XposedInfoDialogFragment : BaseBottomSheetViewDialogFragment<XposedInfoBot
                   iconRes = R.drawable.ic_app_prop,
                   tip = context.getString(R.string.lib_detail_xposed_default_scope),
                   text = content,
-                  textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2)
+                  textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleSmall)
                 )
               )
             }
@@ -177,7 +177,7 @@ class XposedInfoDialogFragment : BaseBottomSheetViewDialogFragment<XposedInfoBot
                 iconRes = R.drawable.ic_app_prop,
                 tip = context.getString(R.string.lib_detail_xposed_init_class) + " (Java)",
                 text = classes,
-                textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2)
+                textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleSmall)
               )
             )
           }
@@ -194,7 +194,7 @@ class XposedInfoDialogFragment : BaseBottomSheetViewDialogFragment<XposedInfoBot
                 iconRes = R.drawable.ic_app_prop,
                 tip = context.getString(R.string.lib_detail_xposed_init_class) + " (Native)",
                 text = libs,
-                textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2)
+                textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleSmall)
               )
             )
           }
@@ -209,7 +209,7 @@ class XposedInfoDialogFragment : BaseBottomSheetViewDialogFragment<XposedInfoBot
                 iconRes = R.drawable.ic_app_prop,
                 tip = context.getString(R.string.lib_detail_xposed_init_class) + " (Legacy)",
                 text = cls,
-                textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2)
+                textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleSmall)
               )
             )
           }
@@ -231,7 +231,7 @@ class XposedInfoDialogFragment : BaseBottomSheetViewDialogFragment<XposedInfoBot
               iconRes = R.drawable.ic_content,
               tip = context.getString(R.string.lib_detail_description_tip),
               text = description,
-              textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBody2)
+              textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBodyMedium)
             )
           )
         }
