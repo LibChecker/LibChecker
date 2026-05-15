@@ -14,6 +14,8 @@ import com.absinthe.libchecker.utils.extensions.getFeatures
 import java.lang.ref.WeakReference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -31,7 +33,7 @@ class WorkerService : LifecycleService() {
   override fun onCreate() {
     super.onCreate()
     Timber.d("onCreate")
-    initializingFeatures = false
+    updateFeatureInitializationState(running = false)
     LocalAppDataSource.addLifecycleOwner(this)
   }
 
@@ -69,7 +71,7 @@ class WorkerService : LifecycleService() {
     }
 
     Timber.d("initFeatures")
-    initializingFeatures = true
+    updateFeatureInitializationState(running = true, completed = false)
 
     initFeaturesJob = lifecycleScope.launch(Dispatchers.IO) {
       try {
@@ -92,7 +94,7 @@ class WorkerService : LifecycleService() {
           Repositories.lcRepository.updateFeatures(featuresMap)
         }
       } finally {
-        initializingFeatures = false
+        updateFeatureInitializationState(running = false, completed = true)
         Timber.d("initFeatures finished")
       }
     }
@@ -124,6 +126,22 @@ class WorkerService : LifecycleService() {
   }
 
   companion object {
-    var initializingFeatures: Boolean = false
+    data class FeatureInitializationState(
+      val running: Boolean = false,
+      val completed: Boolean = false
+    )
+
+    private val _featureInitializationState = MutableStateFlow(FeatureInitializationState())
+    val featureInitializationState = _featureInitializationState.asStateFlow()
+
+    val initializingFeatures: Boolean
+      get() = featureInitializationState.value.running
+
+    private fun updateFeatureInitializationState(
+      running: Boolean,
+      completed: Boolean = featureInitializationState.value.completed
+    ) {
+      _featureInitializationState.value = FeatureInitializationState(running, completed)
+    }
   }
 }

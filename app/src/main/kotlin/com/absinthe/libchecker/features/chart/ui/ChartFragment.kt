@@ -81,6 +81,14 @@ class ChartFragment :
   private var dataSource: IChartDataSource<*>? = null
   private var dialog: ClassifyBottomSheetDialogFragment? = null
   private var setDataJob: Job? = null
+  private var chartLoadingProgress = LOADING_PROGRESS_MAX
+  private var featureInitializationRunning = WorkerService.initializingFeatures
+  private var featureInitializationCompleted = WorkerService.featureInitializationState.value.completed
+  private var hasReceivedLCItems = false
+  private var hasUninitializedFeatureItems = false
+  private val isFeatureInitializationPending: Boolean
+    get() = featureInitializationRunning ||
+      (hasReceivedLCItems && !featureInitializationCompleted && hasUninitializedFeatureItems)
 
   private enum class ChartType {
     ABI,
@@ -116,55 +124,33 @@ class ChartFragment :
 
   override fun init() {
     binding.root.applySystemBarsPadding(top = true, bottom = true)
-    val featureInitialized = !WorkerService.initializingFeatures
+    featureInitializationRunning = WorkerService.featureInitializationState.value.running
+    featureInitializationCompleted = WorkerService.featureInitializationState.value.completed
 
     chartView = generatePieChartView()
     binding.root.addView(chartView, -1)
-
-    chartTypeToIconRes.forEach {
-      if (it.key == ChartType.KOTLIN || it.key == ChartType.JETPACK_COMPOSE) {
-        if (!featureInitialized) {
-          return
-        }
-      }
-      val view = ExpandingView(requireContext()).apply {
-        layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).also { lp ->
-          lp.setMargins(4.dp, 4.dp, 4.dp, 4.dp)
-        }
-        setContent(it.value.first, getString(it.value.second))
-        setOnClickListener { _ ->
-          if (currentExpandingView == this) {
-            return@setOnClickListener
-          }
-          setData(allLCItemsStateFlow.value, it.key)
-          doOnMainThreadIdle {
-            currentExpandingView?.toggle()
-            toggle()
-            currentExpandingView = this
-          }
-        }
-      }
-      if (currentExpandingView == null) {
-        currentExpandingView = view
-        view.toggle()
-      }
-      binding.featuresContainer.addView(view)
-    }
+    renderChartTypeSelector()
+    updateProgressIndicator()
 
     lifecycleScope.launch {
       allLCItemsStateFlow = Repositories.lcRepository.allLCItemsFlow.onEach {
-        if (featureInitialized) {
-          setDataJob?.cancel()
-          setDataJob = lifecycleScope.launch(Dispatchers.IO) {
-            if (dataSource != null) {
-              delay(2000)
-            }
-            withContext(Dispatchers.Main) {
-              if (dataSource == null) {
-                setData(it, ChartType.ABI)
-              } else {
-                setData(it)
-              }
+        hasReceivedLCItems = true
+        hasUninitializedFeatureItems = it.any { item -> item.features == FEATURES_NOT_INITIALIZED }
+        featureInitializationCompleted =
+          !hasUninitializedFeatureItems || WorkerService.featureInitializationState.value.completed
+        renderChartTypeSelector()
+        updateProgressIndicator()
+
+        setDataJob?.cancel()
+        setDataJob = lifecycleScope.launch(Dispatchers.IO) {
+          if (dataSource != null) {
+            delay(2000)
+          }
+          withContext(Dispatchers.Main) {
+            if (dataSource == null) {
+              setData(it, ChartType.ABI)
+            } else {
+              setData(it)
             }
           }
         }
@@ -173,19 +159,26 @@ class ChartFragment :
     lifecycleScope.launch {
       lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
         viewModel.loadingProgress.collect { progress ->
-          binding.progressHorizontal.let { indicator ->
-            if (progress < LOADING_PROGRESS_MAX) {
-              if (progress <= 0) {
-                indicator.isIndeterminate = progress == LOADING_PROGRESS_INFINITY
-                indicator.progress = 0
-              } else {
-                indicator.setProgressCompat(progress, true)
-              }
-              indicator.show()
-            } else {
-              indicator.hide()
-              applyDashboardView()
-            }
+          chartLoadingProgress = progress
+          if (progress >= LOADING_PROGRESS_MAX) {
+            applyDashboardView()
+          }
+          updateProgressIndicator()
+        }
+      }
+    }
+    lifecycleScope.launch {
+      lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
+        WorkerService.featureInitializationState.collect { state ->
+          val wasPending = isFeatureInitializationPending
+          featureInitializationRunning = state.running
+          featureInitializationCompleted =
+            state.completed || (hasReceivedLCItems && !hasUninitializedFeatureItems)
+          renderChartTypeSelector()
+          updateProgressIndicator()
+
+          if (wasPending && !isFeatureInitializationPending && this@ChartFragment::allLCItemsStateFlow.isInitialized) {
+            setData(allLCItemsStateFlow.value)
           }
         }
       }
@@ -206,6 +199,85 @@ class ChartFragment :
             setData(allLCItemsStateFlow.value)
           }
         }
+      }
+    }
+  }
+
+  private fun renderChartTypeSelector() {
+    val featureChartsAvailable = !isFeatureInitializationPending
+    if (!featureChartsAvailable && currentChartType.requiresFeatureInitialization()) {
+      currentChartType = ChartType.ABI
+    }
+
+    binding.featuresContainer.removeAllViews()
+    currentExpandingView = null
+
+    var firstView: ExpandingView? = null
+    var firstType: ChartType? = null
+    chartTypeToIconRes.forEach { (chartType, content) ->
+      if (chartType.requiresFeatureInitialization() && !featureChartsAvailable) {
+        return@forEach
+      }
+
+      val view = ExpandingView(requireContext()).apply {
+        layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).also { lp ->
+          lp.setMargins(4.dp, 4.dp, 4.dp, 4.dp)
+        }
+        setContent(content.first, getString(content.second))
+        setOnClickListener {
+          if (currentChartType == chartType || !this@ChartFragment::allLCItemsStateFlow.isInitialized) {
+            return@setOnClickListener
+          }
+          setData(allLCItemsStateFlow.value, chartType)
+          doOnMainThreadIdle {
+            currentExpandingView?.toggle()
+            toggle()
+            currentExpandingView = this
+          }
+        }
+      }
+
+      if (firstView == null) {
+        firstView = view
+        firstType = chartType
+      }
+      if (currentChartType == chartType) {
+        currentExpandingView = view
+        view.toggle()
+      }
+      binding.featuresContainer.addView(view)
+    }
+
+    if (currentExpandingView == null) {
+      currentExpandingView = firstView
+      firstType?.let { currentChartType = it }
+      firstView?.toggle()
+    }
+  }
+
+  private fun ChartType.requiresFeatureInitialization(): Boolean {
+    return this == ChartType.KOTLIN || this == ChartType.JETPACK_COMPOSE
+  }
+
+  private fun updateProgressIndicator() {
+    val progress = when {
+      chartLoadingProgress < LOADING_PROGRESS_MAX -> chartLoadingProgress
+      isFeatureInitializationPending -> LOADING_PROGRESS_INFINITY
+      else -> LOADING_PROGRESS_MAX
+    }
+
+    binding.progressHorizontal.let { indicator ->
+      if (progress < LOADING_PROGRESS_MAX) {
+        if (progress <= 0) {
+          indicator.isIndeterminate = progress == LOADING_PROGRESS_INFINITY
+          indicator.progress = 0
+        } else {
+          indicator.isIndeterminate = false
+          indicator.setProgressCompat(progress, true)
+        }
+        indicator.show()
+      } else {
+        indicator.hide()
       }
     }
   }
@@ -435,5 +507,9 @@ class ChartFragment :
       }
     }
     return getString(R.string.android_dist_subtitle_format, time) + System.lineSeparator() + "API ${Build.VERSION.SDK_INT} (Android $androidVersion)"
+  }
+
+  companion object {
+    private const val FEATURES_NOT_INITIALIZED = -1
   }
 }
