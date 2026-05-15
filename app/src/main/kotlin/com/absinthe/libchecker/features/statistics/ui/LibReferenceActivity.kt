@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
 import com.absinthe.libchecker.features.applist.ui.adapter.AppAdapter
 import com.absinthe.libchecker.features.statistics.LibReferenceViewModel
@@ -19,8 +20,10 @@ import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.view.app.RingDotsView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.rulesbundle.IconResMap
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.widget.borderview.BorderView
 
@@ -105,6 +108,10 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
     }
 
     viewModel.libRefListFlow.onEach {
+      val packageInfoMap = withContext(Dispatchers.IO) {
+        LocalAppDataSource.getApplicationMap()
+      }
+      adapter.updatePackageStateCache(packageInfoMap)
       adapter.setList(it)
       if (binding.vfContainer.displayedChild != 1) {
         binding.vfContainer.displayedChild = 1

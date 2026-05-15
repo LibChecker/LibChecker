@@ -11,7 +11,9 @@
     style="?attr/appBarLayoutStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/colorSurface">
+    android:background="?attr/colorSurface"
+    app:liftOnScroll="false"
+    app:liftOnScrollColor="?attr/colorSurface">
 
     <com.google.android.material.appbar.CollapsingToolbarLayout
       android:id="@+id/collapsing_toolbar"
@@ -19,7 +21,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:background="@null"
-      app:contentScrim="?attr/colorSurfaceContainer"
+      app:contentScrim="?attr/colorSurface"
       app:expandedTitleTextAppearance="?attr/textAppearanceHeadlineMedium"
       app:layout_scrollFlags="scroll|exitUntilCollapsed">
 

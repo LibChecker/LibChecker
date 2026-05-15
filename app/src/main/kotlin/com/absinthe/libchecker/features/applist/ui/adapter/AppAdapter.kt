@@ -133,6 +133,9 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
 
   private fun getPackageInfo(item: LCItem): PackageInfo? {
     return packageInfoMap[item.packageName]
+      ?: runCatching {
+        PackageUtils.getPackageInfo(item.packageName)
+      }.getOrNull()
   }
 
   private fun isAppFrozen(item: LCItem, packageInfo: PackageInfo?): Boolean {

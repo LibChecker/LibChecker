@@ -74,7 +74,9 @@ class LibReferenceProvider : BaseNodeProvider() {
 
         setOrHighlightText(labelName, it.label)
       } ?: let {
-        if (libReferenceItem.type == PERMISSION && libReferenceItem.libName.startsWith("android.permission")) {
+        val isAndroidGroupPermission = libReferenceItem.type == PERMISSION && libReferenceItem.libName.startsWith("android.permission")
+        val isAndroidGroupAction = libReferenceItem.type == ACTION && libReferenceItem.libName.startsWith("android.intent.action")
+        if (isAndroidGroupPermission || isAndroidGroupAction) {
           icon.setImageResource(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_android)
         } else {
           icon.setImageResource(R.drawable.ic_question)
