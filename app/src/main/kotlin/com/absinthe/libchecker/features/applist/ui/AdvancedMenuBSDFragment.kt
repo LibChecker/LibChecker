@@ -6,6 +6,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.features.applist.ui.view.AdvancedMenuBSDView
 import com.absinthe.libchecker.features.applist.ui.view.AdvancedMenuItemView
+import com.absinthe.libchecker.features.applist.ui.view.AdvancedMenuSection
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
@@ -29,11 +30,11 @@ class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBS
     optionsViewMap[AdvancedOptions.SHOW_OVERLAYS] = root.addOptionItemView(R.string.adv_show_overlays, AdvancedOptions.SHOW_OVERLAYS)
     optionsViewMap[AdvancedOptions.SHOW_64_BIT_APPS] = root.addOptionItemView(R.string.adv_show_64_bit, AdvancedOptions.SHOW_64_BIT_APPS)
     optionsViewMap[AdvancedOptions.SHOW_32_BIT_APPS] = root.addOptionItemView(R.string.adv_show_32_bit, AdvancedOptions.SHOW_32_BIT_APPS)
-    optionsViewMap[AdvancedOptions.SHOW_ANDROID_VERSION] = root.addOptionItemView(R.string.adv_show_android_version, AdvancedOptions.SHOW_ANDROID_VERSION)
-    optionsViewMap[AdvancedOptions.SHOW_TARGET_API] = root.addOptionItemView(R.string.adv_show_target_version, AdvancedOptions.SHOW_TARGET_API)
-    optionsViewMap[AdvancedOptions.SHOW_MIN_API] = root.addOptionItemView(R.string.adv_show_min_version, AdvancedOptions.SHOW_MIN_API)
-    optionsViewMap[AdvancedOptions.SHOW_COMPILE_API] = root.addOptionItemView(R.string.adv_show_compile_version, AdvancedOptions.SHOW_COMPILE_API)
-    optionsViewMap[AdvancedOptions.TINT_ABI_LABEL] = root.addOptionItemView(R.string.adv_tint_abi_label, AdvancedOptions.TINT_ABI_LABEL)
+    optionsViewMap[AdvancedOptions.SHOW_ANDROID_VERSION] = root.addOptionItemView(R.string.adv_show_android_version, AdvancedOptions.SHOW_ANDROID_VERSION, AdvancedMenuSection.View)
+    optionsViewMap[AdvancedOptions.SHOW_TARGET_API] = root.addOptionItemView(R.string.adv_show_target_version, AdvancedOptions.SHOW_TARGET_API, AdvancedMenuSection.View)
+    optionsViewMap[AdvancedOptions.SHOW_MIN_API] = root.addOptionItemView(R.string.adv_show_min_version, AdvancedOptions.SHOW_MIN_API, AdvancedMenuSection.View)
+    optionsViewMap[AdvancedOptions.SHOW_COMPILE_API] = root.addOptionItemView(R.string.adv_show_compile_version, AdvancedOptions.SHOW_COMPILE_API, AdvancedMenuSection.View)
+    optionsViewMap[AdvancedOptions.TINT_ABI_LABEL] = root.addOptionItemView(R.string.adv_tint_abi_label, AdvancedOptions.TINT_ABI_LABEL, AdvancedMenuSection.View)
 
     optionsViewMap[AdvancedOptions.SHOW_ANDROID_VERSION]?.setOnCheckedChangeCallback {
       root.updateDemoView()
