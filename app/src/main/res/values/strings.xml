@@ -130,7 +130,7 @@
   <string name="further_operation">Further operation</string>
   <string name="app_info_launch">Launch</string>
   <string name="app_info_settings">Settings</string>
-  <string name="app_info_share">Settings</string>
+  <string name="app_info_share">Share</string>
   <string name="lib_detail_dialog_title">Library details</string>
   <string name="lib_permission_dialog_title">Permission details</string>
   <string name="lib_permission_provided_by_format">Provided by %s</string>
