@@ -34,6 +34,7 @@ import com.google.android.material.card.MaterialCardView
 enum class AdvancedMenuSection {
   /** Option section for app list filtering. */
   Filter,
+
   /** Option section for app list view. */
   View
 }
