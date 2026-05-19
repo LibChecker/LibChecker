@@ -31,6 +31,14 @@ import com.google.android.flexbox.FlexboxLayout
 import com.google.android.flexbox.JustifyContent
 import com.google.android.material.card.MaterialCardView
 
+enum class AdvancedMenuSection {
+  /** Option section for app list filtering. */
+  Filter,
+
+  /** Option section for app list view. */
+  View
+}
+
 class AdvancedMenuBSDView(context: Context) :
   LinearLayout(context),
   IHeaderView {
@@ -83,6 +91,18 @@ class AdvancedMenuBSDView(context: Context) :
   }
 
   private val flexLayout = FlexboxLayout(context).apply {
+    layoutParams = LayoutParams(
+      LayoutParams.MATCH_PARENT,
+      LayoutParams.WRAP_CONTENT
+    ).also {
+      it.topMargin = 8.dp
+    }
+    flexWrap = FlexWrap.WRAP
+    justifyContent = JustifyContent.FLEX_START
+    flexDirection = FlexDirection.ROW
+  }
+
+  private val flexLayout2 = FlexboxLayout(context).apply {
     layoutParams = LayoutParams(
       LayoutParams.MATCH_PARENT,
       LayoutParams.WRAP_CONTENT
@@ -199,12 +219,22 @@ class AdvancedMenuBSDView(context: Context) :
       addData(demoView)
       addData(sortView)
       addData(flexLayout)
+      addData(flexLayout2)
       addData(itemView)
       addData(itemFlexLayout)
     }
   }
 
+  /** Add an option item to the [Filter][AdvancedMenuSection.Filter] section. */
   fun addOptionItemView(labelRes: Int, option: Int): AdvancedMenuItemView {
+    return addOptionItemView(labelRes, option, AdvancedMenuSection.Filter)
+  }
+
+  fun addOptionItemView(labelRes: Int, option: Int, section: AdvancedMenuSection): AdvancedMenuItemView {
+    val flexLayout = when (section) {
+      AdvancedMenuSection.Filter -> flexLayout
+      AdvancedMenuSection.View -> flexLayout2
+    }
     val view = AdvancedMenuItemView(context).apply {
       setOption(labelRes, option)
     }
