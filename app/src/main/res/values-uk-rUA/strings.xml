@@ -244,6 +244,7 @@
   <string name="dialog_title_compare_diff_apk">Увага</string>
   <string name="dialog_message_compare_diff_apk">Бажаєте порівняти два різних APK?</string>
   <string name="dialog_themed_and_alternative_app_icons">Адаптивні та альтернативні іконки</string>
+  <string name="dialog_themed">Themed</string>
   <!--  Album  -->
   <string name="album_compare">Порівняти</string>
   <string name="album_item_comparison_title">Порівняння</string>
