@@ -39,6 +39,15 @@ setupAppModule {
         mappingFileUploadEnabled = false
       }
     }
+    release {
+      optimization {
+        enable = true
+        keepRules {
+          // https://github.com/AppDevNext/AndroidChart/blob/master/chartLib/proguard-lib.pro
+          ignoreFrom(libs.mpAndroidChart.get().module.toString())
+        }
+      }
+    }
   }
 
   productFlavors {

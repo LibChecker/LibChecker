@@ -143,3 +143,8 @@
 -keepclassmembers class androidx.appcompat.widget.Toolbar {
     java.util.ArrayList mHiddenViews;
 }
+
+# Chart
+-keep public class info.appdev.charting.animation.* {
+    public protected *;
+}

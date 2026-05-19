@@ -22,8 +22,12 @@ dependencyResolutionManagement {
         includeGroupByRegex(".*android.*")
       }
     }
+    maven("https://jitpack.io") {
+      content {
+        includeGroupByRegex("com.github.*")
+      }
+    }
     mavenCentral()
-    maven("https://jitpack.io")
   }
 }
 
