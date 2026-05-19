@@ -306,7 +306,7 @@ object PackageUtils {
   private const val ENABLE_GET_APK_FILE_LIBS_LOG = true
 
   private fun getApkFileLibs(file: File, specifiedAbi: Int? = null, parseElf: Boolean): Map<String, MutableList<LibStringItem>> {
-    if (file.exists().not()) {
+    if (file.exists().not() || file.canRead().not()) {
       return emptyMap()
     }
     if (!parseElf) {
