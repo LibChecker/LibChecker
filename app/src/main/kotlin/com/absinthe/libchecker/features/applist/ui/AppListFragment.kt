@@ -36,6 +36,7 @@ import com.absinthe.libchecker.features.applist.ui.adapter.AppListDiffUtil
 import com.absinthe.libchecker.features.home.HomeViewModel
 import com.absinthe.libchecker.features.home.INavViewContainer
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
+import com.absinthe.libchecker.ui.animator.ParticleRemoveItemAnimator
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseListControllerFragment
 import com.absinthe.libchecker.ui.base.IAppBarContainer
@@ -79,6 +80,7 @@ class AppListFragment :
 
   private val isFirstLaunch get() = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
   private val appAdapter = AppAdapter()
+  private val particleItemAnimator = ParticleRemoveItemAnimator()
   private var updateItemsJob: Job? = null
   private var delayShowNavigationJob: Job? = null
   private var advancedMenuBSDFragment: AdvancedMenuBSDFragment? = null
@@ -116,6 +118,7 @@ class AppListFragment :
     binding.apply {
       list.apply {
         adapter = appAdapter
+        itemAnimator = particleItemAnimator
         borderDelegate = borderViewDelegate
         layoutManager = getSuitableLayoutManagerImpl(resources.configuration)
         borderVisibilityChangedListener =
@@ -493,7 +496,9 @@ class AppListFragment :
   private fun updateItemsImpl(highlightRefresh: Boolean = false) = lifecycleScope.launch(Dispatchers.IO) {
     delay(250)
     Timber.d("updateItemsImpl")
-    var filterList: MutableList<LCItem> = Repositories.lcRepository.getLCItems().toMutableList()
+    val dbItems = Repositories.lcRepository.getLCItems()
+    val dbPackageNames = dbItems.mapTo(mutableSetOf()) { it.packageName }
+    var filterList: MutableList<LCItem> = dbItems.toMutableList()
 
     if (isOnlyAppItself(filterList)) {
       Timber.d("updateItemsImpl: only the app itself")
@@ -559,6 +564,15 @@ class AppListFragment :
     val packageInfoMap = LocalAppDataSource.getApplicationMap()
     withContext(Dispatchers.Main) {
       appAdapter.apply {
+        // Only apps that disappeared from the backing database get the particle effect.
+        // Newly added apps are present in filterList but absent from current adapter data,
+        // so they go through RecyclerView's normal add path instead.
+        particleItemAnimator.prepareParticleRemovals(
+          data.asSequence()
+            .filter { it.packageName !in dbPackageNames }
+            .map { ParticleRemoveItemAnimator.stableItemIdForKey(it.packageName) }
+            .toList()
+        )
         updatePackageStateCache(packageInfoMap)
         setDiffNewData(filterList) {
           if (isDetached || !isBindingInitialized()) {

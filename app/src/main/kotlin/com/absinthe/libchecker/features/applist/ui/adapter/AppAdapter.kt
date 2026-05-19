@@ -14,6 +14,7 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
 import com.absinthe.libchecker.features.applist.ui.view.AppItemView
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
+import com.absinthe.libchecker.ui.animator.ParticleRemoveItemAnimator
 import com.absinthe.libchecker.utils.FreezeUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.addStrikeThroughSpan
@@ -123,7 +124,7 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
     if (data.isEmpty() || position >= data.size) {
       return super.getItemId(position)
     }
-    return data[position].packageName.hashCode().toLong()
+    return ParticleRemoveItemAnimator.stableItemIdForKey(data[position].packageName)
   }
 
   fun updatePackageStateCache(packageInfoMap: Map<String, PackageInfo>) {

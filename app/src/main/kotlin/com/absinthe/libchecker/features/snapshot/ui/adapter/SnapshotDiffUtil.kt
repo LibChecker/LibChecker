@@ -6,7 +6,8 @@ import com.absinthe.libchecker.features.snapshot.detail.bean.SnapshotDiffItem
 class SnapshotDiffUtil : DiffUtil.ItemCallback<SnapshotDiffItem>() {
 
   override fun areItemsTheSame(oldItem: SnapshotDiffItem, newItem: SnapshotDiffItem): Boolean {
-    return oldItem.packageName == newItem.packageName
+    return oldItem.packageName == newItem.packageName &&
+      oldItem.identityState == newItem.identityState
   }
 
   override fun areContentsTheSame(oldItem: SnapshotDiffItem, newItem: SnapshotDiffItem): Boolean {
@@ -24,4 +25,11 @@ class SnapshotDiffUtil : DiffUtil.ItemCallback<SnapshotDiffItem>() {
       oldItem.deleted == newItem.deleted &&
       oldItem.isTrackItem == newItem.isTrackItem
   }
+
+  private val SnapshotDiffItem.identityState: Int
+    get() = when {
+      deleted -> -1
+      newInstalled -> 1
+      else -> 0
+    }
 }
