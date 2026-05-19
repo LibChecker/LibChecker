@@ -60,10 +60,6 @@ fun Project.setupAppModule(block: ApplicationExtension.() -> Unit = {}) {
       release {
         isMinifyEnabled = true
         isShrinkResources = true
-        proguardFiles(
-          getDefaultProguardFile("proguard-android-optimize.txt"),
-          "proguard-rules.pro"
-        )
       }
       all {
         signingConfig = releaseSigning
