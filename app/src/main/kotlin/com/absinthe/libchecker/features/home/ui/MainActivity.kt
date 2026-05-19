@@ -6,10 +6,13 @@ import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.IBinder
+import android.view.Gravity
 import android.view.Menu
 import android.view.View
+import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
+import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
@@ -34,6 +37,7 @@ import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.features.applist.ui.AppListFragment
 import com.absinthe.libchecker.features.home.HomeViewModel
 import com.absinthe.libchecker.features.home.INavViewContainer
+import com.absinthe.libchecker.features.home.ui.view.HomeToolbarTitleView
 import com.absinthe.libchecker.features.settings.ui.SettingsFragment
 import com.absinthe.libchecker.features.snapshot.ui.SnapshotFragment
 import com.absinthe.libchecker.features.statistics.ui.LibReferenceFragment
@@ -70,6 +74,7 @@ class MainActivity :
 
   private val appViewModel: HomeViewModel by viewModels()
   private val navViewBehavior by lazy { HideBottomViewOnScrollBehavior<BottomNavigationView>() }
+  private val toolbarTitleView by lazy { HomeToolbarTitleView(this) }
   private val workerServiceConnection = object : ServiceConnection {
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
       if (service?.pingBinder() == true) {
@@ -206,7 +211,7 @@ class MainActivity :
     val navView = binding.navView as NavigationBarView
     setSupportActionBar(binding.toolbar)
     binding.toolbar.isBackInvokedCallbackEnabled = false
-    supportActionBar?.title = LCAppUtils.setTitle(this)
+    setupToolbarTitle()
 
     binding.apply {
       container.bringChildToFront(binding.appbar)
@@ -295,6 +300,23 @@ class MainActivity :
     )
   }
 
+  private fun setupToolbarTitle() {
+    supportActionBar?.title = null
+    binding.toolbar.title = null
+    toolbarTitleView.setTitle(LCAppUtils.setTitle(this))
+    if (toolbarTitleView.parent == null) {
+      binding.toolbar.addView(
+        toolbarTitleView,
+        Toolbar.LayoutParams(
+          ViewGroup.LayoutParams.WRAP_CONTENT,
+          ViewGroup.LayoutParams.MATCH_PARENT
+        ).apply {
+          gravity = Gravity.START or Gravity.CENTER_VERTICAL
+        }
+      )
+    }
+  }
+
   override fun onResume() {
     super.onResume()
     if (appViewModel.checkPackagesPermission) {
@@ -375,6 +397,10 @@ class MainActivity :
 
           else -> {}
         }
+      }.launchIn(lifecycleScope)
+
+      isRequestChangeRunning.onEach {
+        toolbarTitleView.setLoading(it)
       }.launchIn(lifecycleScope)
     }
     LocalAppDataSource.packageChangeFlow.onEach {

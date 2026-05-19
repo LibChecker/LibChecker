@@ -109,7 +109,8 @@ class ParticleRemoveItemAnimator : DefaultItemAnimator() {
     seed: Long,
     private val onStart: () -> Unit,
     private val onCleanUp: (ParticleAnimationDecoration) -> Unit
-  ) : RecyclerView.ItemDecoration(), View.OnAttachStateChangeListener {
+  ) : RecyclerView.ItemDecoration(),
+    View.OnAttachStateChangeListener {
 
     val itemId = seed
     private val density = recyclerView.resources.displayMetrics.density
