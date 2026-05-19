@@ -5,7 +5,7 @@ import com.absinthe.libchecker.utils.extensions.tintHighlightText
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
-abstract class HighlightAdapter<T> : BaseQuickAdapter<T, BaseViewHolder>(0) {
+abstract class HighlightAdapter<T : Any> : BaseQuickAdapter<T, BaseViewHolder>(0) {
 
   var highlightText: String = ""
 

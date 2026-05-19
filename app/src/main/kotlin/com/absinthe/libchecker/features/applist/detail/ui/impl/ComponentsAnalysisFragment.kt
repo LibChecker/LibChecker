@@ -49,7 +49,8 @@ class ComponentsAnalysisFragment :
 
     adapter.apply {
       setDiffCallback(LibStringDiffUtil())
-      setEmptyView(emptyView)
+      stateView = this@ComponentsAnalysisFragment.emptyView
+      isStateViewEnable = true
     }
   }
 

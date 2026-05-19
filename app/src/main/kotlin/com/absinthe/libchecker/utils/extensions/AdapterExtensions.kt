@@ -4,14 +4,13 @@ import android.view.ViewGroup
 import android.widget.Space
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
-import com.chad.library.adapter.base.BaseQuickAdapter
-import com.chad.library.adapter.base.viewholder.BaseViewHolder
+import com.chad.library.adapter.base.HeaderFooterSupport
 
-fun BaseQuickAdapter<*, BaseViewHolder>.setSpaceFooterView() {
-  recyclerViewOrNull?.let { rv ->
+fun HeaderFooterSupport.setSpaceFooterView() {
+  legacyRecyclerViewOrNull?.let { rv ->
     fun should(): Boolean {
       val a = rv.childCount
-      val b = itemCount
+      val b = legacyItemCount()
       return if (!hasFooterLayout()) {
         a >= b
       } else {

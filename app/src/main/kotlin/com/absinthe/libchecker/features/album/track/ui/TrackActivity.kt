@@ -97,7 +97,8 @@ class TrackActivity :
           doSaveItemState(position, (view as Checkable).isChecked)
         }
       }
-      setEmptyView(TrackLoadingView(this@TrackActivity))
+      stateView = TrackLoadingView(this@TrackActivity)
+      isStateViewEnable = true
     }
 
     lifecycleScope.launch(Dispatchers.IO) {
@@ -118,7 +119,7 @@ class TrackActivity :
         adapter.setList(list)
         menu?.findItem(R.id.search)?.isVisible = true
         isListReady = true
-        adapter.setEmptyView(
+        adapter.stateView =
           EmptyListView(this@TrackActivity).apply {
             layoutParams = FrameLayout.LayoutParams(
               FrameLayout.LayoutParams.MATCH_PARENT,
@@ -127,7 +128,7 @@ class TrackActivity :
               it.gravity = Gravity.CENTER
             }
           }
-        )
+        adapter.isStateViewEnable = true
       }
     }
   }

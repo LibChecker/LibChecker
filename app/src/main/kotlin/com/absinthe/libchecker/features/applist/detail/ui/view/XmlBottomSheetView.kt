@@ -43,14 +43,14 @@ class XmlBottomSheetView(context: Context) :
   }
 
   fun setText(text: CharSequence?) {
-    adapter.setList(listOf(text, ""))
+    adapter.setList(listOf(text ?: "", ""))
   }
 
   override fun getHeaderView(): BottomSheetHeaderView {
     return header
   }
 
-  class Adapter : BaseQuickAdapter<CharSequence?, BaseViewHolder>(0) {
+  class Adapter : BaseQuickAdapter<CharSequence, BaseViewHolder>(0) {
 
     override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
       return createBaseViewHolder(
@@ -65,7 +65,7 @@ class XmlBottomSheetView(context: Context) :
       )
     }
 
-    override fun convert(holder: BaseViewHolder, item: CharSequence?) {
+    override fun convert(holder: BaseViewHolder, item: CharSequence) {
       (holder.itemView as AppCompatTextView).text = item
     }
   }

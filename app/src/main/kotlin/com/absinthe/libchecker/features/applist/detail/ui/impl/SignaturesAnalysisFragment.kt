@@ -63,7 +63,8 @@ class SignaturesAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
         true
       }
       setDiffCallback(LibStringDiffUtil())
-      setEmptyView(emptyView)
+      stateView = this@SignaturesAnalysisFragment.emptyView
+      isStateViewEnable = true
     }
 
     viewModel.apply {

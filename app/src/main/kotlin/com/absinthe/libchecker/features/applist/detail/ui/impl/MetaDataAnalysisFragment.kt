@@ -53,7 +53,8 @@ class MetaDataAnalysisFragment :
     adapter.apply {
       animationEnable = false
       setDiffCallback(LibStringDiffUtil())
-      setEmptyView(emptyView)
+      stateView = this@MetaDataAnalysisFragment.emptyView
+      isStateViewEnable = true
     }
 
     viewModel.apply {

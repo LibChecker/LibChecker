@@ -286,7 +286,8 @@ class ComparisonActivity :
         }
         addPaddingTop(96.dp)
       }
-      setEmptyView(emptyView)
+      stateView = emptyView
+      isStateViewEnable = true
       setHeaderView(dashboardView)
       setOnItemClickListener { _, view, position ->
         if (AntiShakeUtils.isInvalidClick(view)) {

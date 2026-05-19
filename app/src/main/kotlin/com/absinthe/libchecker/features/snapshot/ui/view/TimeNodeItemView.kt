@@ -27,7 +27,7 @@ class TimeNodeItemView(context: Context) : AViewGroup(context) {
   }
 
   val adapter = TimeNodeItemAdapter().apply {
-    setEmptyView(
+    stateView =
       AppCompatTextView(
         ContextThemeWrapper(
           context,
@@ -39,7 +39,7 @@ class TimeNodeItemView(context: Context) : AViewGroup(context) {
         text = context.getString(R.string.album_snapshot_top_apps_not_initialized)
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
       }
-    )
+    isStateViewEnable = true
   }
 
   private val rvList = RecyclerView(context).apply {

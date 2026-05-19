@@ -60,11 +60,11 @@ class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutin
       setOnItemClickListener { _, _, position ->
         (context as? FragmentActivity)?.launchDetailPage(adapter.getItem(position))
       }
-      setEmptyView(
+      stateView =
         EmptyListView(context).apply {
           layoutParams = ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, 500.dp)
         }
-      )
+      isStateViewEnable = true
     }
     addView(header)
     addView(list)

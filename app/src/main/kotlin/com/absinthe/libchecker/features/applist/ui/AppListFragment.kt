@@ -103,14 +103,14 @@ class AppListFragment :
       }
       it.setDiffCallback(AppListDiffUtil())
       it.setHasStableIds(true)
-      it.setEmptyView(
+      it.stateView =
         EmptyListView(context).apply {
           layoutParams = FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.MATCH_PARENT,
             FrameLayout.LayoutParams.MATCH_PARENT
           )
         }
-      )
+      it.isStateViewEnable = true
     }
 
     binding.apply {
