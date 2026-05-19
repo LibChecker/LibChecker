@@ -57,7 +57,8 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
         true
       }
       setDiffCallback(LibStringDiffUtil())
-      setEmptyView(emptyView)
+      stateView = this@DexAnalysisFragment.emptyView
+      isStateViewEnable = true
     }
 
     viewModel.apply {

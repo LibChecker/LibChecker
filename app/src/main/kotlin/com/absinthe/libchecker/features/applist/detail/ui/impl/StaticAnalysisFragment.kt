@@ -59,7 +59,8 @@ class StaticAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>()
         true
       }
       setDiffCallback(LibStringDiffUtil())
-      setEmptyView(emptyView)
+      stateView = this@StaticAnalysisFragment.emptyView
+      isStateViewEnable = true
     }
 
     viewModel.apply {

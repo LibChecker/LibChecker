@@ -54,7 +54,8 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
         true
       }
       setDiffCallback(LibStringDiffUtil())
-      setEmptyView(emptyView)
+      stateView = this@AbilityAnalysisFragment.emptyView
+      isStateViewEnable = true
     }
 
     if (flow?.value?.isNotEmpty() == true) {

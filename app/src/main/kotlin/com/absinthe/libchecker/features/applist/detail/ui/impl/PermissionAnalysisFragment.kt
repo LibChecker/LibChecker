@@ -58,7 +58,8 @@ class PermissionAnalysisFragment :
     adapter.apply {
       animationEnable = false
       setDiffCallback(LibStringDiffUtil())
-      setEmptyView(emptyView)
+      stateView = this@PermissionAnalysisFragment.emptyView
+      isStateViewEnable = true
     }
 
     viewModel.apply {

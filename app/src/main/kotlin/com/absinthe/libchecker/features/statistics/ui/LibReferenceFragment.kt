@@ -169,14 +169,14 @@ class LibReferenceFragment :
           item.referredList.toTypedArray()
         )
       }
-      setEmptyView(
+      stateView =
         EmptyListView(context).apply {
           layoutParams = FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.MATCH_PARENT,
             FrameLayout.LayoutParams.MATCH_PARENT
           )
         }
-      )
+      isStateViewEnable = true
     }
 
     homeViewModel.apply {

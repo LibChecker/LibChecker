@@ -58,7 +58,8 @@ class NativeAnalysisFragment :
     adapter.apply {
       animationEnable = false
       setDiffCallback(LibStringDiffUtil())
-      setEmptyView(emptyView)
+      stateView = this@NativeAnalysisFragment.emptyView
+      isStateViewEnable = true
     }
 
     viewModel.apply {

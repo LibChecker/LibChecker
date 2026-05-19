@@ -216,7 +216,8 @@ class SnapshotFragment :
       dashboard.also {
         setHeaderView(it)
       }
-      setEmptyView(emptyView)
+      stateView = emptyView
+      isStateViewEnable = true
       setDiffCallback(SnapshotDiffUtil())
       setOnItemClickListener { _, view, position ->
         if (AntiShakeUtils.isInvalidClick(view)) {

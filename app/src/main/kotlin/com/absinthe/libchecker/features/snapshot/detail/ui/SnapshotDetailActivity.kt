@@ -200,7 +200,7 @@ class SnapshotDetailActivity :
       }
     }
 
-    adapter.setEmptyView(
+    adapter.stateView =
       when {
         entity.newInstalled -> SnapshotDetailNewInstallView(this)
 
@@ -216,7 +216,7 @@ class SnapshotDetailActivity :
           addPaddingTop(96.dp)
         }
       }
-    )
+    adapter.isStateViewEnable = true
     adapter.setOnItemClickListener { _, view, position ->
       if (adapter.data[position] is SnapshotTitleNode) {
         adapter.expandOrCollapse(position)

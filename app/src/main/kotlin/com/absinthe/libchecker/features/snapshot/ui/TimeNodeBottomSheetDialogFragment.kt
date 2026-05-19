@@ -45,7 +45,7 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
       setOnItemClickListener { _, _, position ->
         itemClickAction?.invoke(position)
       }
-      setEmptyView(
+      stateView =
         EmptyListView(context).apply {
           layoutParams = ViewGroup.MarginLayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -54,7 +54,7 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
             it.bottomMargin = 16.dp
           }
         }
-      )
+      isStateViewEnable = true
       root.adapter.removeAllHeaderView()
       if (isCompareMode) {
         root.adapter.addHeaderView(
