@@ -57,6 +57,7 @@ import com.absinthe.libchecker.services.IShootService
 import com.absinthe.libchecker.services.OnShootListener
 import com.absinthe.libchecker.services.ShootService
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
+import com.absinthe.libchecker.ui.animator.ParticleRemoveItemAnimator
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.base.BaseListControllerFragment
@@ -95,6 +96,8 @@ class SnapshotFragment :
 
   private val viewModel: SnapshotViewModel by activityViewModels()
   private val adapter = SnapshotAdapter()
+  private val particleItemAnimator = ParticleRemoveItemAnimator()
+  private val pendingParticleRemovePackageNames = linkedSetOf<String>()
   private var isSnapshotDatabaseItemsReady = false
   private var dropPrevious = false
   private var shouldCompare = true and ShootService.isComputing.not()
@@ -240,6 +243,7 @@ class SnapshotFragment :
     binding.apply {
       list.apply {
         adapter = this@SnapshotFragment.adapter
+        itemAnimator = particleItemAnimator
         borderDelegate = borderViewDelegate
         layoutManager = getSuitableLayoutManagerImpl(resources.configuration)
         borderVisibilityChangedListener =
@@ -307,7 +311,11 @@ class SnapshotFragment :
       when (it) {
         is HomeViewModel.Effect.PackageChanged -> {
           if (allowRefreshing) {
-            packageQueue.offer(it.packageChangeState)
+            val packageChangeState = it.packageChangeState
+            if (packageChangeState is PackageChangeState.Removed) {
+              pendingParticleRemovePackageNames += packageChangeState.getActualPackageInfo().packageName
+            }
+            packageQueue.offer(packageChangeState)
             dequeuePackages()
             viewModel.getDashboardCount(GlobalValues.snapshotTimestamp, true)
           }
@@ -336,6 +344,9 @@ class SnapshotFragment :
         }
 
         is SnapshotViewModel.Effect.DiffItemChange -> {
+          if (it.item.deleted) {
+            pendingParticleRemovePackageNames += it.item.packageName
+          }
           val newItems = adapter.data.toMutableList()
           newItems.removeIf { item -> item.packageName == it.item.packageName }
           newItems.add(it.item)
@@ -344,6 +355,7 @@ class SnapshotFragment :
         }
 
         is SnapshotViewModel.Effect.DiffItemRemove -> {
+          pendingParticleRemovePackageNames += it.packageName
           val newItems = adapter.data.toMutableList()
           newItems.removeIf { item -> item.packageName == it.packageName }
           items = newItems
@@ -696,12 +708,34 @@ class SnapshotFragment :
 
   private fun updateItems(list: List<SnapshotDiffItem>, highlightRefresh: Boolean = false) = lifecycleScope.launch(Dispatchers.Main) {
     val filterList = list.toMutableList()
-    if (GlobalValues.snapshotOptions.and(SnapshotOptions.HIDE_NO_COMPONENT_CHANGES) != 0) {
-      filterList.removeAll { it.isNothingChanged() }
+    filterList.removeAll(::shouldHideSnapshotItem)
+    val sortedList = filterList.sortedByDescending { it.updateTime }.toMutableList()
+    if (highlightRefresh) {
+      particleItemAnimator.prepareParticleRemovals(emptyList())
+    } else {
+      val newPackageNames = sortedList.mapTo(mutableSetOf()) { it.packageName }
+      val pendingRemovePackageNames = pendingParticleRemovePackageNames.toSet()
+      val deletedReplacementPackageNames = sortedList.asSequence()
+        .filter { it.deleted && it.packageName in pendingRemovePackageNames }
+        .mapTo(mutableSetOf()) { it.packageName }
+      val consumedRemovePackageNames = mutableSetOf<String>()
+      particleItemAnimator.prepareParticleRemovals(
+        adapter.data.asSequence()
+          .filter {
+            val shouldAnimate = it.packageName !in newPackageNames ||
+              it.packageName in deletedReplacementPackageNames
+            if (shouldAnimate) {
+              consumedRemovePackageNames += it.packageName
+            }
+            shouldAnimate
+          }
+          .map { SnapshotAdapter.stableItemIdFor(it) }
+          .toList()
+      )
+      pendingParticleRemovePackageNames.removeAll(consumedRemovePackageNames)
     }
     adapter.setDiffNewData(
-      filterList.sortedByDescending { it.updateTime }
-        .toMutableList()
+      sortedList
     ) {
       if (isDetached) {
         return@setDiffNewData
@@ -715,6 +749,11 @@ class SnapshotFragment :
         adapter.notifyDataSetChanged()
       }
     }
+  }
+
+  private fun shouldHideSnapshotItem(item: SnapshotDiffItem): Boolean {
+    return GlobalValues.snapshotOptions.and(SnapshotOptions.HIDE_NO_COMPONENT_CHANGES) != 0 &&
+      item.isNothingChanged()
   }
 
   private fun updateSystemProps(dashboard: SnapshotDashboardView, timestamp: Long) {

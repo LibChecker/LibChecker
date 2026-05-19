@@ -22,6 +22,7 @@ import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageS
 import com.absinthe.libchecker.features.snapshot.detail.bean.SnapshotDiffItem
 import com.absinthe.libchecker.features.snapshot.ui.view.SnapshotItemView
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
+import com.absinthe.libchecker.ui.animator.ParticleRemoveItemAnimator
 import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.OsUtils
@@ -42,6 +43,10 @@ import kotlin.math.abs
 const val ARROW = "→"
 const val ARROW_REVERT = "←"
 class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAdapter<SnapshotDiffItem>() {
+
+  init {
+    setHasStableIds(true)
+  }
 
   private val formatter by unsafeLazy {
     SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
@@ -317,6 +322,25 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
           updateTime.append(", APEX")
         }
       }
+    }
+  }
+
+  override fun getItemId(position: Int): Long {
+    val dataPosition = position - headerLayoutCount
+    if (dataPosition !in data.indices) {
+      return Long.MIN_VALUE + position
+    }
+    return stableItemIdFor(data[dataPosition])
+  }
+
+  companion object {
+    fun stableItemIdFor(item: SnapshotDiffItem): Long {
+      val state = when {
+        item.deleted -> "deleted"
+        item.newInstalled -> "new"
+        else -> "normal"
+      }
+      return ParticleRemoveItemAnimator.stableItemIdForKey("${item.packageName}:$state")
     }
   }
 
