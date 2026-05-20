@@ -2,7 +2,7 @@ package com.absinthe.libchecker.features.about
 
 import android.os.Bundle
 import android.view.View
-import com.absinthe.libchecker.R
+import androidx.core.net.toUri
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
@@ -26,25 +26,25 @@ class DevelopersDialogFragment : BaseBottomSheetViewDialogFragment<DevelopersDia
         "Absinthe",
         "Developer & Designer",
         "https://github.com/zhaobozhen",
-        R.drawable.pic_rabbit
+        "https://avatars.githubusercontent.com/u/25247117".toUri()
       ),
       DeveloperInfo(
         "Goooler",
         "Code Tidy & Optimize",
         "https://github.com/Goooler",
-        R.drawable.pic_kali
+        "https://avatars.githubusercontent.com/u/10363352".toUri()
       ),
       DeveloperInfo(
         "qhy040404",
         "Developer",
         "https://github.com/qhy040404",
-        R.drawable.pic_qhy040404
+        "https://avatars.githubusercontent.com/u/45379733".toUri()
       ),
       DeveloperInfo(
         "Source Code",
         URLManager.GITHUB_REPO_PAGE,
         URLManager.GITHUB_REPO_PAGE,
-        R.drawable.ic_github
+        "https://avatars.githubusercontent.com/u/116417672".toUri()
       )
     )
 

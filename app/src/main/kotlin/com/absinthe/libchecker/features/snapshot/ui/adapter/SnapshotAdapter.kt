@@ -326,11 +326,10 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
   }
 
   override fun getItemId(position: Int): Long {
-    val dataPosition = position - headerLayoutCount
-    if (dataPosition !in data.indices) {
+    if (position !in data.indices) {
       return Long.MIN_VALUE + position
     }
-    return stableItemIdFor(data[dataPosition])
+    return stableItemIdFor(data[position])
   }
 
   companion object {
