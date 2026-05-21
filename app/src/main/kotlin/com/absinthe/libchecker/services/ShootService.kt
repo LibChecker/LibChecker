@@ -362,9 +362,18 @@ class ShootService : LifecycleService() {
       .setOngoing(true)
       .setAutoCancel(false).apply {
         if (!OsUtils.atLeastS()) {
-          color = getColorByAttr(androidx.appcompat.R.attr.colorPrimary)
+          color = getNotificationColor()
         }
       }
+  }
+
+  private fun getNotificationColor(): Int {
+    return runCatching {
+      getColorByAttr(androidx.appcompat.R.attr.colorPrimary)
+    }.getOrElse {
+      Timber.w(it, "Failed to resolve notification color")
+      ContextCompat.getColor(this, R.color.md_theme_libchecker_light_primary)
+    }
   }
 
   companion object {
