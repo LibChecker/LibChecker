@@ -87,6 +87,7 @@ class AppListFragment :
   private var isFirstRequestChange = true
   private var isSearchTextClearOnce = false
   private var firstScrollFlag = false
+  private var hasUserScrolledList = false
   private var hasInitializedItems = false
 
   private lateinit var layoutManager: RecyclerView.LayoutManager
@@ -133,6 +134,12 @@ class AppListFragment :
         setHasFixedSize(true)
         FastScrollerBuilder(this).useMd2Style().build()
         addOnScrollListener(object : RecyclerView.OnScrollListener() {
+          override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+            if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+              hasUserScrolledList = true
+            }
+          }
+
           override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             if (dx == 0 && dy == 0) {
               // scrolled by dragging scrolling bar
@@ -574,6 +581,13 @@ class AppListFragment :
             .toList()
         )
         updatePackageStateCache(packageInfoMap)
+        val currentPackageNames = data.mapTo(mutableSetOf()) { it.packageName }
+        val firstPackageName = filterList.firstOrNull()?.packageName
+        val shouldReturnTopAfterInsert = !hasUserScrolledList &&
+          currentPackageNames.isNotEmpty() &&
+          firstPackageName != null &&
+          firstPackageName !in currentPackageNames
+
         setDiffNewData(filterList) {
           if (isDetached || !isBindingInitialized()) {
             return@setDiffNewData
@@ -586,6 +600,9 @@ class AppListFragment :
           }
 
           setSpaceFooterView()
+          if (shouldReturnTopAfterInsert) {
+            returnTopOfList()
+          }
         }
       }
     }
