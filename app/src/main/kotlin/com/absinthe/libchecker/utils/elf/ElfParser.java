@@ -165,6 +165,7 @@ public class ElfParser implements Closeable, Elf {
     int i = 0;
     final List<Long> neededOffsets = new ArrayList<>();
     long vStringTableOff = 0;
+    boolean stringTableFound = false;
     Elf.DynamicStructure dynStructure;
     do {
       dynStructure = header.getDynamicStructure(dynamicSectionOff, i);
@@ -172,16 +173,28 @@ public class ElfParser implements Closeable, Elf {
         neededOffsets.add(dynStructure.val);
       } else if (dynStructure.tag == DynamicStructure.DT_STRTAB) {
         vStringTableOff = dynStructure.val; // d_ptr union
+        stringTableFound = true;
       }
       ++i;
     } while (dynStructure.tag != DynamicStructure.DT_NULL);
 
-    if (vStringTableOff == 0) {
-      throw new IllegalStateException("String table offset not found!");
+    if (neededOffsets.isEmpty()) {
+      return Collections.unmodifiableList(dependencies);
+    }
+
+    if (!stringTableFound) {
+      Timber.w("String table offset not found while parsing ELF dependencies");
+      return Collections.unmodifiableList(dependencies);
     }
 
     // Map to file offset
-    final long stringTableOff = offsetFromVma(header, numProgramHeaderEntries, vStringTableOff);
+    final long stringTableOff;
+    try {
+      stringTableOff = offsetFromVma(header, numProgramHeaderEntries, vStringTableOff);
+    } catch (IllegalStateException e) {
+      Timber.w(e, "Could not map ELF string table to file offset");
+      return Collections.unmodifiableList(dependencies);
+    }
     for (final Long strOff : neededOffsets) {
       dependencies.add(dataSource.readString(stringTableOff + strOff));
     }
