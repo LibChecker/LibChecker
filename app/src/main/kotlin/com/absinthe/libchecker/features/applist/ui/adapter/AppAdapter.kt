@@ -27,7 +27,6 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
 class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAdapter<LCItem>() {
 
-  private var packageInfoMap: Map<String, PackageInfo> = emptyMap()
   private val frozenStateCache = mutableMapOf<String, Boolean>()
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
@@ -127,16 +126,14 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
     return ParticleRemoveItemAnimator.stableItemIdForKey(data[position].packageName)
   }
 
-  fun updatePackageStateCache(packageInfoMap: Map<String, PackageInfo>) {
-    this.packageInfoMap = packageInfoMap
+  fun clearPackageStateCache() {
     frozenStateCache.clear()
   }
 
   private fun getPackageInfo(item: LCItem): PackageInfo? {
-    return packageInfoMap[item.packageName]
-      ?: runCatching {
-        PackageUtils.getPackageInfo(item.packageName)
-      }.getOrNull()
+    return runCatching {
+      PackageUtils.getPackageInfo(item.packageName)
+    }.getOrNull()
   }
 
   private fun isAppFrozen(item: LCItem, packageInfo: PackageInfo?): Boolean {

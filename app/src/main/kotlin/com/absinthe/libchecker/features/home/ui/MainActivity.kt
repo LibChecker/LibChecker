@@ -57,12 +57,10 @@ import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
 import jonathanfinerty.once.Once
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 const val PAGE_TRANSFORM_DURATION = 300L
@@ -372,8 +370,6 @@ class MainActivity :
     appViewModel.apply {
       if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
         initItems(this@MainActivity)
-      } else {
-        initFeatures()
       }
 
       effect.onEach {
@@ -391,7 +387,6 @@ class MainActivity :
               doOnMainThreadIdle {
                 showNavigationView()
               }
-              initFeatures()
             }
           }
 
@@ -407,19 +402,6 @@ class MainActivity :
       Timber.d("MainActivity received package change: $it")
       appViewModel.packageChanged(it)
     }.launchIn(lifecycleScope)
-  }
-
-  private fun initFeatures() {
-    lifecycleScope.launch {
-      while (appViewModel.workerBinder == null) {
-        delay(300)
-      }
-
-      withContext(Dispatchers.Main) {
-        Timber.d("initFeatures")
-        appViewModel.workerBinder?.initFeatures()
-      }
-    }
   }
 
   override fun onPrepareOptionsMenu(menu: Menu?): Boolean {

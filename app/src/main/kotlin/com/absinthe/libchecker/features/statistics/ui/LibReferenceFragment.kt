@@ -64,6 +64,14 @@ class LibReferenceFragment :
   private var advancedMenuBSDFragment: LibReferenceMenuBSDFragment? = null
   private var firstScrollFlag = false
   private var isSearchTextClearOnce = false
+  private var hasRequestedInitialCompute = false
+  private var deferredReferenceWork: DeferredReferenceWork? = null
+  private var deferredReferenceWorkNeedsLoading = false
+
+  private enum class DeferredReferenceWork {
+    COMPUTE,
+    MATCH
+  }
 
   override fun init() {
     val context = (context as? BaseActivity<*>) ?: return
@@ -183,7 +191,7 @@ class LibReferenceFragment :
       effect.onEach {
         when (it) {
           is HomeViewModel.Effect.PackageChanged -> {
-            computeRef(false)
+            requestComputeRef(false)
           }
 
           is HomeViewModel.Effect.UpdateLibRefProgress -> {
@@ -212,7 +220,7 @@ class LibReferenceFragment :
         Constants.PREF_ADVANCED_OPTIONS -> {
           val options = it.second as Int
           if (options and AdvancedOptions.SHOW_SYSTEM_APPS > 0) {
-            computeRef(true)
+            requestComputeRef(true)
           }
         }
 
@@ -224,7 +232,7 @@ class LibReferenceFragment :
         Constants.PREF_LIB_REF_THRESHOLD -> {
           val threshold = it.second as Int
           if (threshold < homeViewModel.savedThreshold) {
-            matchRules(true)
+            requestMatchRules(true)
             homeViewModel.savedThreshold = threshold
           } else {
             homeViewModel.refreshRef()
@@ -232,12 +240,6 @@ class LibReferenceFragment :
         }
       }
     }.launchIn(lifecycleScope)
-
-    lifecycleScope.launch {
-      if (refAdapter.data.isEmpty()) {
-        computeRef(true)
-      }
-    }
   }
 
   override fun onResume() {
@@ -302,7 +304,7 @@ class LibReferenceFragment :
   }
 
   private fun refreshList() {
-    computeRef(true)
+    requestComputeRef(true)
     Telemetry.recordEvent(
       Constants.Event.LIB_REFERENCE_FILTER_TYPE,
       mapOf(
@@ -310,6 +312,46 @@ class LibReferenceFragment :
           LibReferenceOptions.getOptionsString(GlobalValues.libReferenceOptions)
       )
     )
+  }
+
+  private fun requestComputeRef(needShowLoading: Boolean) {
+    if (!isFragmentVisible()) {
+      deferReferenceWork(DeferredReferenceWork.COMPUTE, needShowLoading)
+      return
+    }
+    hasRequestedInitialCompute = true
+    computeRef(needShowLoading)
+  }
+
+  private fun requestMatchRules(needShowLoading: Boolean) {
+    if (!isFragmentVisible()) {
+      deferReferenceWork(DeferredReferenceWork.MATCH, needShowLoading)
+      return
+    }
+    hasRequestedInitialCompute = true
+    matchRules(needShowLoading)
+  }
+
+  private fun deferReferenceWork(work: DeferredReferenceWork, needShowLoading: Boolean) {
+    deferredReferenceWork = when {
+      work == DeferredReferenceWork.COMPUTE -> DeferredReferenceWork.COMPUTE
+      deferredReferenceWork == DeferredReferenceWork.COMPUTE -> DeferredReferenceWork.COMPUTE
+      else -> work
+    }
+    deferredReferenceWorkNeedsLoading = deferredReferenceWorkNeedsLoading || needShowLoading
+  }
+
+  private fun runDeferredReferenceWork() {
+    val work = deferredReferenceWork ?: return
+    val needShowLoading = deferredReferenceWorkNeedsLoading || refAdapter.data.isEmpty()
+    deferredReferenceWork = null
+    deferredReferenceWorkNeedsLoading = false
+    hasRequestedInitialCompute = true
+
+    when (work) {
+      DeferredReferenceWork.COMPUTE -> computeRef(needShowLoading)
+      DeferredReferenceWork.MATCH -> matchRules(needShowLoading)
+    }
   }
 
   private fun computeRef(needShowLoading: Boolean) {
@@ -385,6 +427,12 @@ class LibReferenceFragment :
     super.onVisibilityChanged(visible)
     if (visible) {
       refAdapter.setSpaceFooterView()
+      if (!hasRequestedInitialCompute && refAdapter.data.isEmpty()) {
+        hasRequestedInitialCompute = true
+        computeRef(true)
+      } else {
+        runDeferredReferenceWork()
+      }
     }
   }
 
