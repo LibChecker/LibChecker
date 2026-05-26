@@ -202,13 +202,12 @@ class AppListFragment :
       }
       initView.loadingView.setHighlightIconProvider(object : RingDotsView.HighlightIconProvider {
         override suspend fun produce(emitter: RingDotsView.HighlightIconEmitter) {
-          val applications = LocalAppDataSource.getApplicationList()
           val defaultIcon = context.packageManager.defaultActivityIcon
           while (true) {
             if (!initView.loadingView.isHighlightAnimationAvailable()) {
               break
             }
-            val ai = applications.random().applicationInfo ?: continue
+            val ai = LocalAppDataSource.getRandomApplicationInfo() ?: break
             val drawable = ai.loadIcon(context.packageManager)
               ?.takeIf { icon -> !UiUtils.drawablesAreEqual(icon, defaultIcon) }
               ?: continue
@@ -507,9 +506,8 @@ class AppListFragment :
     Timber.d("updateItemsImpl")
     val dbItems = Repositories.lcRepository.getLCItems()
     val dbPackageNames = dbItems.mapTo(mutableSetOf()) { it.packageName }
-    var filterList: MutableList<LCItem> = dbItems.toMutableList()
 
-    if (isOnlyAppItself(filterList)) {
+    if (isOnlyAppItself(dbItems)) {
       Timber.d("updateItemsImpl: only the app itself")
       if (homeViewModel.appListStatus == STATUS_NOT_START) {
         Once.clearDone(OnceTag.FIRST_LAUNCH)
@@ -520,45 +518,47 @@ class AppListFragment :
 
     val isNonNativeLibApp64Bit = android.os.Process.is64Bit()
     val options = GlobalValues.advancedOptions
+    var filterSequence = dbItems.asSequence()
     if ((options and AdvancedOptions.SHOW_SYSTEM_APPS) == 0) {
-      filterList = filterList.filter { !it.isSystem }.toMutableList()
+      filterSequence = filterSequence.filter { !it.isSystem }
     }
     if ((options and AdvancedOptions.SHOW_SYSTEM_FRAMEWORK_APPS) == 0) {
-      filterList = filterList.filter {
+      filterSequence = filterSequence.filter {
         (!it.packageName.startsWith("com.android.") && it.packageName != "android") ||
           runCatching {
             PackageUtils.getPackageInfo(it.packageName).isPreinstalled()
           }.getOrDefault(false).not()
-      }.toMutableList()
+      }
     }
     if ((options and AdvancedOptions.SHOW_OVERLAYS) == 0) {
-      filterList = filterList.filter { it.abi.toInt() != Constants.OVERLAY }.toMutableList()
+      filterSequence = filterSequence.filter { it.abi.toInt() != Constants.OVERLAY }
     }
     if ((options and AdvancedOptions.SHOW_64_BIT_APPS) == 0) {
-      filterList = filterList.filter {
+      filterSequence = filterSequence.filter {
         val trueAbi = it.abi.mod(Constants.MULTI_ARCH)
         it.abi.toInt() == Constants.OVERLAY || !PackageUtils.isAbi64Bit(trueAbi) || (trueAbi == Constants.NO_LIBS && !isNonNativeLibApp64Bit)
-      }.toMutableList()
+      }
     }
     if ((options and AdvancedOptions.SHOW_32_BIT_APPS) == 0) {
-      filterList = filterList.filter {
+      filterSequence = filterSequence.filter {
         val trueAbi = it.abi.mod(Constants.MULTI_ARCH)
         it.abi.toInt() == Constants.OVERLAY || PackageUtils.isAbi64Bit(trueAbi) || (trueAbi == Constants.NO_LIBS && isNonNativeLibApp64Bit)
-      }.toMutableList()
+      }
     }
 
     val keyword = appAdapter.highlightText
     if (keyword.isNotEmpty()) {
-      filterList = filterList.filter {
+      filterSequence = filterSequence.filter {
         it.label.contains(keyword, ignoreCase = true) ||
           it.packageName.contains(keyword, ignoreCase = true)
-      }.toMutableList()
+      }
 
       if (HarmonyOsUtil.isHarmonyOs() && keyword.contains("Harmony", true)) {
-        filterList = filterList.filter { it.variant == Constants.VARIANT_HAP }.toMutableList()
+        filterSequence = filterSequence.filter { it.variant == Constants.VARIANT_HAP }
       }
     }
 
+    val filterList = filterSequence.toMutableList()
     if ((options and AdvancedOptions.SORT_BY_NAME) > 0) {
       filterList.sortWith(compareBy({ it.abi }, { it.label }))
     } else if ((options and AdvancedOptions.SORT_BY_UPDATE_TIME) > 0) {
@@ -570,7 +570,6 @@ class AppListFragment :
     if (!isActive) {
       return@launch
     }
-    val packageInfoMap = LocalAppDataSource.getApplicationMap()
     withContext(Dispatchers.Main) {
       appAdapter.apply {
         // Only apps that disappeared from the backing database get the particle effect.
@@ -582,7 +581,7 @@ class AppListFragment :
             .map { ParticleRemoveItemAnimator.stableItemIdForKey(it.packageName) }
             .toList()
         )
-        updatePackageStateCache(packageInfoMap)
+        clearPackageStateCache()
         val shouldReturnTopAfterRequestChange = pendingReturnTopAfterRequestChange &&
           !highlightRefresh &&
           !hasUserScrolledList &&

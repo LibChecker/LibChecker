@@ -267,13 +267,12 @@ class SnapshotFragment :
       }
       loading.setHighlightIconProvider(object : RingDotsView.HighlightIconProvider {
         override suspend fun produce(emitter: RingDotsView.HighlightIconEmitter) {
-          val applications = LocalAppDataSource.getApplicationList()
           val defaultIcon = context.packageManager.defaultActivityIcon
           while (true) {
             if (!loading.isHighlightAnimationAvailable()) {
               break
             }
-            val ai = applications.random().applicationInfo ?: continue
+            val ai = LocalAppDataSource.getRandomApplicationInfo() ?: break
             val drawable = ai.loadIcon(context.packageManager)
               ?.takeIf { icon -> !UiUtils.drawablesAreEqual(icon, defaultIcon) }
               ?: continue
@@ -313,7 +312,7 @@ class SnapshotFragment :
           if (allowRefreshing) {
             val packageChangeState = it.packageChangeState
             if (packageChangeState is PackageChangeState.Removed) {
-              pendingParticleRemovePackageNames += packageChangeState.getActualPackageInfo().packageName
+              pendingParticleRemovePackageNames += packageChangeState.packageName
             }
             packageQueue.offer(packageChangeState)
             dequeuePackages()
@@ -651,7 +650,7 @@ class SnapshotFragment :
       while (isActive) {
         packageQueue.take()?.let {
           Timber.d("Dequeue package: $it")
-          val packageName = it.getActualPackageInfo().packageName
+          val packageName = it.packageName
           val packageManager = context?.packageManager ?: return@let
           viewModel.compareItemDiff(packageManager, GlobalValues.snapshotTimestamp, packageName)
         }

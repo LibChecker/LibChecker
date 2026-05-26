@@ -75,24 +75,29 @@ class WorkerService : LifecycleService() {
 
     initFeaturesJob = lifecycleScope.launch(Dispatchers.IO) {
       try {
-        val packageInfoMap = LocalAppDataSource.getApplicationMap()
-        val featuresMap = Repositories.lcRepository.getLCItems()
-          .asSequence()
-          .filter { it.features == -1 }
-          .mapNotNull { item ->
-            runCatching {
-              val packageInfo = packageInfoMap[item.packageName]
-                ?: PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_META_DATA)
-              item.packageName to packageInfo.getFeatures()
-            }.onFailure { e ->
-              Timber.w(e)
-            }.getOrNull()
-          }
-          .toMap()
+        val pendingPackages = Repositories.lcRepository.getUninitializedFeaturePackageNames()
+        val featuresMap = HashMap<String, Int>(FEATURE_UPDATE_BATCH_SIZE)
 
-        if (featuresMap.isNotEmpty()) {
+        fun flushFeatures() {
+          if (featuresMap.isEmpty()) {
+            return
+          }
           Repositories.lcRepository.updateFeatures(featuresMap)
+          featuresMap.clear()
         }
+
+        pendingPackages.forEach { packageName ->
+          runCatching {
+            val packageInfo = PackageUtils.getPackageInfo(packageName, PackageManager.GET_META_DATA)
+            featuresMap[packageName] = packageInfo.getFeatures()
+            if (featuresMap.size >= FEATURE_UPDATE_BATCH_SIZE) {
+              flushFeatures()
+            }
+          }.onFailure { e ->
+            Timber.w(e)
+          }
+        }
+        flushFeatures()
       } finally {
         updateFeatureInitializationState(running = false, completed = true)
         Timber.d("initFeatures finished")
@@ -126,6 +131,8 @@ class WorkerService : LifecycleService() {
   }
 
   companion object {
+    private const val FEATURE_UPDATE_BATCH_SIZE = 32
+
     data class FeatureInitializationState(
       val running: Boolean = false,
       val completed: Boolean = false

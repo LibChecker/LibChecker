@@ -29,6 +29,11 @@ class LCRepository(private val lcDao: LCDao) {
 
   suspend fun getLCItems(): List<LCItem> = lcDao.getItems()
 
+  suspend fun getUninitializedFeaturePackageNames(): List<String> {
+    if (checkDatabaseStatus().not()) return emptyList()
+    return lcDao.getUninitializedFeaturePackageNames()
+  }
+
   suspend fun getItem(packageName: String): LCItem? {
     if (checkDatabaseStatus().not()) return null
     return lcDao.getItem(packageName)

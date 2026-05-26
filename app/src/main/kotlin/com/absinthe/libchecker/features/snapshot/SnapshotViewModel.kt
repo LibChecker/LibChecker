@@ -26,7 +26,6 @@ import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.SnapshotDiffStoringItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
-import com.absinthe.libchecker.database.entity.TrackItem
 import com.absinthe.libchecker.features.snapshot.detail.bean.ADDED
 import com.absinthe.libchecker.features.snapshot.detail.bean.CHANGED
 import com.absinthe.libchecker.features.snapshot.detail.bean.MOVED
@@ -121,31 +120,34 @@ class SnapshotViewModel : ViewModel() {
     }
 
     val packageManager = context.packageManager
-    val currMap = LocalAppDataSource.getApplicationMap(true).toMutableMap()
-    val prePackageSet = preMap.map { it.key }.toSet()
-    val currPackageSet = currMap.map { it.key }.toSet()
-    val removedPackageSet = prePackageSet - currPackageSet
-    val addedPackageSet = currPackageSet - prePackageSet
-    val commonPackageSet = prePackageSet intersect currPackageSet
+    val currMap = LocalAppDataSource.getApplicationMap(true)
 
     val diffList = mutableListOf<SnapshotDiffItem>()
-    val allTrackItems = repository.getTrackItems()
+    val trackPackageNames = repository.getTrackItems()
+      .asSequence()
+      .map { it.packageName }
+      .toSet()
     val size = currMap.size
 
     var count = 0
     var snapshotDiffStoringItem: SnapshotDiffStoringItem?
     var snapshotDiffContent: String
 
-    removedPackageSet.forEach {
+    preMap.forEach { (packageName, snapshotItem) ->
       if (!isActive) return@runBlocking
-      diffList.add(generateSnapshotDiffItem(preMap[it], null, allTrackItems)!!)
+      if (packageName !in currMap) {
+        diffList.add(generateSnapshotDiffItem(snapshotItem, null, trackPackageNames)!!)
+      }
     }
 
-    addedPackageSet.forEach {
+    currMap.forEach { (packageName, packageInfo) ->
       if (!isActive) return@runBlocking
+      if (packageName in preMap) {
+        return@forEach
+      }
       try {
-        val newInfo = convertToSnapshotItem(packageManager, currMap[it]!!)
-        diffList.add(generateSnapshotDiffItem(null, newInfo, allTrackItems)!!)
+        val newInfo = convertToSnapshotItem(packageManager, packageInfo)
+        diffList.add(generateSnapshotDiffItem(null, newInfo, trackPackageNames)!!)
       } catch (e: Exception) {
         Timber.e(e)
       } finally {
@@ -154,15 +156,14 @@ class SnapshotViewModel : ViewModel() {
       }
     }
 
-    commonPackageSet.forEach {
+    preMap.forEach { (packageName, snapshotItem) ->
       if (!isActive) return@runBlocking
+      val presentItem = currMap[packageName] ?: return@forEach
       try {
-        val snapshotItem = preMap[it]!!
-        val presentItem = currMap[it]!!
         snapshotDiffStoringItem = repository.getSnapshotDiff(snapshotItem.packageName)
 
         if (snapshotDiffStoringItem?.lastUpdatedTime != presentItem.lastUpdateTime) {
-          getDiffItemByComparingDBWithLocal(packageManager, snapshotItem, presentItem, allTrackItems)?.let { item ->
+          getDiffItemByComparingDBWithLocal(packageManager, snapshotItem, presentItem, trackPackageNames)?.let { item ->
             diffList.add(item)
 
             snapshotDiffContent = item.toJson().orEmpty()
@@ -186,7 +187,7 @@ class SnapshotViewModel : ViewModel() {
               packageManager,
               snapshotItem,
               presentItem,
-              allTrackItems
+              trackPackageNames
             )?.let { item ->
               diffList.add(item)
 
@@ -219,16 +220,16 @@ class SnapshotViewModel : ViewModel() {
     packageManager: PackageManager,
     dbItem: SnapshotItem,
     packageInfo: PackageInfo,
-    trackItems: List<TrackItem>
+    trackPackageNames: Set<String>
   ): SnapshotDiffItem? {
     if (packageInfo.getVersionCode() == dbItem.versionCode &&
       packageInfo.lastUpdateTime == dbItem.lastUpdatedTime &&
       packageInfo.getPackageSize(true) == dbItem.packageSize &&
-      trackItems.any { trackItem -> trackItem.packageName == dbItem.packageName }.not()
+      dbItem.packageName !in trackPackageNames
     ) {
       return null
     }
-    return generateSnapshotDiffItem(dbItem, convertToSnapshotItem(packageManager, packageInfo), trackItems)
+    return generateSnapshotDiffItem(dbItem, convertToSnapshotItem(packageManager, packageInfo), trackPackageNames)
   }
 
   private fun compareDiffWithSnapshotList(preTimeStamp: Long, currTimeStamp: Long) = runBlocking {
@@ -276,36 +277,32 @@ class SnapshotViewModel : ViewModel() {
       return@runBlocking
     }
 
-    val prePackageSet = preMap.map { it.key }.toSet()
-    val currPackageSet = currMap.map { it.key }.toSet()
-    val removedPackageSet = prePackageSet - currPackageSet
-    val addedPackageSet = currPackageSet - prePackageSet
-    val commonPackageSet = prePackageSet intersect currPackageSet
     val diffList = mutableListOf<SnapshotDiffItem>()
 
-    var preItem: SnapshotItem
-    var currItem: SnapshotItem
+    val trackPackageNames = repository.getTrackItems()
+      .asSequence()
+      .map { it.packageName }
+      .toSet()
 
-    val allTrackItems = repository.getTrackItems()
-
-    removedPackageSet.forEach {
+    preMap.forEach { (packageName, preItem) ->
       if (!isActive) return@runBlocking
-      preItem = preMap[it]!!
-      diffList.add(generateSnapshotDiffItem(preItem, null, allTrackItems)!!)
+      if (packageName !in currMap) {
+        diffList.add(generateSnapshotDiffItem(preItem, null, trackPackageNames)!!)
+      }
     }
 
-    addedPackageSet.forEach {
+    currMap.forEach { (packageName, currItem) ->
       if (!isActive) return@runBlocking
-      currItem = currMap[it]!!
-      diffList.add(generateSnapshotDiffItem(null, currItem, allTrackItems)!!)
+      if (packageName !in preMap) {
+        diffList.add(generateSnapshotDiffItem(null, currItem, trackPackageNames)!!)
+      }
     }
 
-    commonPackageSet.forEach {
+    preMap.forEach { (packageName, preItem) ->
       if (!isActive) return@runBlocking
-      preItem = preMap[it]!!
-      currItem = currMap[it]!!
+      val currItem = currMap[packageName] ?: return@forEach
       if (currItem.versionCode != preItem.versionCode || currItem.lastUpdatedTime != preItem.lastUpdatedTime) {
-        diffList.add(generateSnapshotDiffItem(preItem, currItem, allTrackItems)!!)
+        diffList.add(generateSnapshotDiffItem(preItem, currItem, trackPackageNames)!!)
       }
     }
 
@@ -325,8 +322,11 @@ class SnapshotViewModel : ViewModel() {
       PackageUtils.getPackageInfo(packageName, flags)
     }.getOrNull()?.let { convertToSnapshotItem(packageManager, it) }
     val snapshotInfo = repository.getSnapshot(timeStamp, packageName)
-    val allTrackItems = repository.getTrackItems()
-    val diffItem = generateSnapshotDiffItem(snapshotInfo, presentInfo, allTrackItems)
+    val trackPackageNames = repository.getTrackItems()
+      .asSequence()
+      .map { it.packageName }
+      .toSet()
+    val diffItem = generateSnapshotDiffItem(snapshotInfo, presentInfo, trackPackageNames)
 
     diffItem?.let {
       changeDiffItem(it)
@@ -384,7 +384,7 @@ class SnapshotViewModel : ViewModel() {
   private fun generateSnapshotDiffItem(
     oldInfo: SnapshotItem?,
     newInfo: SnapshotItem?,
-    trackItems: List<TrackItem>
+    trackPackageNames: Set<String>
   ): SnapshotDiffItem? {
     if (oldInfo == null && newInfo == null) {
       return null
@@ -411,7 +411,7 @@ class SnapshotViewModel : ViewModel() {
         SnapshotDiffItem.DiffNode(targetInfo.packageSize),
         newInstalled = newInstalled,
         deleted = !newInstalled,
-        isTrackItem = trackItems.any { trackItem -> trackItem.packageName == targetInfo.packageName }
+        isTrackItem = targetInfo.packageName in trackPackageNames
       )
     } else {
       return SnapshotDiffItem(
@@ -432,7 +432,7 @@ class SnapshotViewModel : ViewModel() {
         permissionsDiff = SnapshotDiffItem.DiffNode(oldInfo.permissions, newInfo.permissions),
         metadataDiff = SnapshotDiffItem.DiffNode(oldInfo.metadata, newInfo.metadata),
         packageSizeDiff = SnapshotDiffItem.DiffNode(oldInfo.packageSize, newInfo.packageSize),
-        isTrackItem = trackItems.any { trackItem -> trackItem.packageName == newInfo.packageName }
+        isTrackItem = newInfo.packageName in trackPackageNames
       ).apply {
         val diffIndicator = compareDiffIndicator(this)
         added = diffIndicator.added
@@ -1084,7 +1084,7 @@ class SnapshotViewModel : ViewModel() {
   fun getDashboardCount(timestamp: Long, isLeft: Boolean) = viewModelScope.launch(Dispatchers.IO) {
     Timber.d("getDashboardCount: $timestamp, $isLeft")
     val snapshotCount = repository.getSnapshots(timestamp).size
-    val appCount = LocalAppDataSource.getApplicationMap().size
+    val appCount = LocalAppDataSource.getApplicationCount()
     setEffect {
       Effect.DashboardCountChange(snapshotCount, appCount, isLeft)
     }

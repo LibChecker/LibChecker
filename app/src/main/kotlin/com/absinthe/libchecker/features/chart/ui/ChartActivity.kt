@@ -1,6 +1,10 @@
 package com.absinthe.libchecker.features.chart.ui
 
+import android.content.ComponentName
+import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -15,6 +19,8 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityChartBinding
 import com.absinthe.libchecker.features.chart.ChartViewModel
+import com.absinthe.libchecker.services.IWorkerService
+import com.absinthe.libchecker.services.WorkerService
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.google.android.material.materialswitch.MaterialSwitch
 import kotlinx.coroutines.launch
@@ -24,6 +30,20 @@ class ChartActivity :
   MenuProvider {
   private val viewModel by viewModels<ChartViewModel>()
   private var detailedAbiSwitch: MaterialSwitch? = null
+  private var isWorkerServiceBound = false
+  private var workerBinder: IWorkerService? = null
+  private val workerServiceConnection = object : ServiceConnection {
+    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+      if (service?.pingBinder() == true) {
+        workerBinder = IWorkerService.Stub.asInterface(service)
+        workerBinder?.initFeatures()
+      }
+    }
+
+    override fun onServiceDisconnected(name: ComponentName?) {
+      workerBinder = null
+    }
+  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -45,6 +65,23 @@ class ChartActivity :
         .replace(R.id.fragment_container, ChartFragment())
         .commit()
     }
+
+    isWorkerServiceBound = bindService(
+      Intent(this, WorkerService::class.java).apply {
+        setPackage(packageName)
+      },
+      workerServiceConnection,
+      BIND_AUTO_CREATE
+    )
+  }
+
+  override fun onDestroy() {
+    if (isWorkerServiceBound) {
+      unbindService(workerServiceConnection)
+      isWorkerServiceBound = false
+    }
+    workerBinder = null
+    super.onDestroy()
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {

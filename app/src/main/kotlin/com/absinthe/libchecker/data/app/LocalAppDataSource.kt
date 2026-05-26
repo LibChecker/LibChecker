@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
@@ -29,8 +30,9 @@ import timber.log.Timber
 object LocalAppDataSource : AppDataSource {
 
   private val applicationsLock = ReentrantReadWriteLock()
-  private val applications: MutableList<PackageInfo> = mutableListOf()
-  private val applicationMap: MutableMap<String, PackageInfo> = mutableMapOf()
+  private val applicationMap: MutableMap<String, PackageInfo> = linkedMapOf()
+  private var applicationListSnapshot: List<PackageInfo> = emptyList()
+  private var applicationMapSnapshot: Map<String, PackageInfo> = emptyMap()
   private var applicationsLoaded: Boolean = false
   val apexPackageSet: Set<String> by lazy { loadApexPackageSet() }
 
@@ -38,7 +40,7 @@ object LocalAppDataSource : AppDataSource {
   val packageChangeFlow: SharedFlow<PackageChangeState> = _PackageChangeFlow.asSharedFlow()
 
   private var coroutineScope: CoroutineScope? = null
-  private val pendingIntents = ArrayDeque<Intent>()
+  private val pendingIntents = ArrayDeque<PendingPackageIntent>()
 
   private val packageReceiver by lazy {
     object : BroadcastReceiver() {
@@ -47,18 +49,21 @@ object LocalAppDataSource : AppDataSource {
         Timber.d("package receiver received: ${intent.action}, data: ${intent.data}")
 
         val packageName = intent.data?.encodedSchemeSpecificPart.orEmpty()
-        intent.setPackage(packageName)
+        val action = intent.action ?: return
+        if (packageName.isBlank()) {
+          return
+        }
 
-        pendingIntents.add(intent)
+        pendingIntents.add(PendingPackageIntent(action, packageName))
 
         coroutineScope?.launch {
           delay(1000)
 
           while (pendingIntents.isNotEmpty() && isActive) {
             val currentIntent = pendingIntents.removeFirst()
-            val currentPackageName = currentIntent.`package`
+            val currentPackageName = currentIntent.packageName
 
-            if (pendingIntents.none { it.`package` == currentPackageName }) {
+            if (pendingIntents.none { it.packageName == currentPackageName }) {
               generatePackageChangeState(currentIntent)?.let { state ->
                 updateApplications(state)
                 _PackageChangeFlow.emit(state)
@@ -101,14 +106,28 @@ object LocalAppDataSource : AppDataSource {
   override fun getApplicationList(forceUpdate: Boolean): List<PackageInfo> {
     ensureApplicationsLoaded(forceUpdate)
     return applicationsLock.read {
-      applications.toList()
+      applicationListSnapshot
     }
   }
 
   override fun getApplicationMap(forceUpdate: Boolean): Map<String, PackageInfo> {
     ensureApplicationsLoaded(forceUpdate)
     return applicationsLock.read {
-      applicationMap.filterValues { it.isVisiblePackageInfo() }
+      applicationMapSnapshot
+    }
+  }
+
+  fun getApplicationCount(forceUpdate: Boolean = false): Int {
+    ensureApplicationsLoaded(forceUpdate)
+    return applicationsLock.read {
+      applicationMap.size
+    }
+  }
+
+  fun getRandomApplicationInfo(forceUpdate: Boolean = false): ApplicationInfo? {
+    ensureApplicationsLoaded(forceUpdate)
+    return applicationsLock.read {
+      applicationListSnapshot.randomOrNull()?.applicationInfo
     }
   }
 
@@ -124,20 +143,28 @@ object LocalAppDataSource : AppDataSource {
   }
 
   private fun refreshApplicationsLocked() {
-    applications.clear()
-    applications.addAll(loadApplications())
     applicationMap.clear()
-    applicationMap.putAll(applications.associateBy { it.packageName })
+    loadApplications()
+      .asSequence()
+      .filter { it.isVisiblePackageInfo() }
+      .forEach { applicationMap[it.packageName] = it }
+    updateSnapshotsLocked()
     applicationsLoaded = true
   }
 
   private fun loadApplications(): List<PackageInfo> {
     Timber.d("loadApplications start")
-    val archivedFlag = if (OsUtils.atLeastV()) PackageManager.MATCH_ARCHIVED_PACKAGES else 0L
-    val flag = PackageManager.GET_META_DATA.toLong() or archivedFlag
-    val list = PackageManagerCompat.getInstalledPackages(flag)
+    val list = PackageManagerCompat.getInstalledPackages(getInstalledPackageFlags())
     Timber.d("loadApplications end, apps count: ${list.size}")
     return list
+  }
+
+  private fun getInstalledPackageFlags(): Long {
+    return if (OsUtils.atLeastV()) PackageManager.MATCH_ARCHIVED_PACKAGES else 0L
+  }
+
+  private fun loadPackageInfo(packageName: String): PackageInfo? {
+    return runCatching { PackageUtils.getPackageInfo(packageName) }.getOrNull()
   }
 
   private fun PackageInfo.isVisiblePackageInfo(): Boolean {
@@ -170,37 +197,50 @@ object LocalAppDataSource : AppDataSource {
       if (!applicationsLoaded) {
         refreshApplicationsLocked()
       }
-      val packageInfo = state.getActualPackageInfo()
+      val packageName = state.packageName
       when (state) {
         is PackageChangeState.Added -> {
-          applications.add(packageInfo)
-          applicationMap[packageInfo.packageName] = packageInfo
+          val packageInfo = loadPackageInfo(packageName)
+          if (packageInfo?.isVisiblePackageInfo() == true) {
+            applicationMap[packageName] = packageInfo
+          } else {
+            applicationMap.remove(packageName)
+          }
         }
 
         is PackageChangeState.Removed -> {
-          applications.removeAll { it.packageName == packageInfo.packageName }
-          applicationMap.remove(packageInfo.packageName)
+          applicationMap.remove(packageName)
         }
 
         is PackageChangeState.Replaced -> {
-          applications.removeAll { it.packageName == packageInfo.packageName }
-          applications.add(packageInfo)
-          applicationMap[packageInfo.packageName] = packageInfo
+          val packageInfo = loadPackageInfo(packageName)
+          if (packageInfo?.isVisiblePackageInfo() == true) {
+            applicationMap[packageName] = packageInfo
+          } else {
+            applicationMap.remove(packageName)
+          }
         }
       }
+      updateSnapshotsLocked()
     }
   }
 
-  private fun generatePackageChangeState(intent: Intent): PackageChangeState? {
-    val packageName = intent.data?.encodedSchemeSpecificPart.orEmpty()
-    val packageInfo =
-      runCatching { PackageUtils.getPackageInfo(packageName) }.getOrNull()
-        ?: PackageInfo().apply { this.packageName = packageName }
+  private fun updateSnapshotsLocked() {
+    applicationListSnapshot = applicationMap.values.toList()
+    applicationMapSnapshot = applicationMap.toMap()
+  }
+
+  private fun generatePackageChangeState(intent: PendingPackageIntent): PackageChangeState? {
     return when (intent.action) {
-      Intent.ACTION_PACKAGE_ADDED -> PackageChangeState.Added(packageInfo)
-      Intent.ACTION_PACKAGE_REMOVED -> PackageChangeState.Removed(packageInfo)
-      Intent.ACTION_PACKAGE_REPLACED -> PackageChangeState.Replaced(packageInfo)
+      Intent.ACTION_PACKAGE_ADDED -> PackageChangeState.Added(intent.packageName)
+      Intent.ACTION_PACKAGE_REMOVED -> PackageChangeState.Removed(intent.packageName)
+      Intent.ACTION_PACKAGE_REPLACED -> PackageChangeState.Replaced(intent.packageName)
       else -> null
     }
   }
+
+  private data class PendingPackageIntent(
+    val action: String,
+    val packageName: String
+  )
 }

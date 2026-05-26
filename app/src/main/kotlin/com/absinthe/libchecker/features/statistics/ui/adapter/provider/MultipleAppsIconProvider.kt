@@ -40,7 +40,7 @@ class MultipleAppsIconProvider : BaseNodeProvider() {
   override fun convert(helper: BaseViewHolder, item: BaseNode) {
     (helper.itemView as MultipleAppsIconItemView).container.apply {
       val libReferenceItem = item as LibReference
-      icon.setIcons(libReferenceItem.referredList.toList())
+      icon.setIcons(libReferenceItem.referredList)
       count.text = libReferenceItem.referredList.size.toString()
       labelName.text = buildSpannedString {
         italic {

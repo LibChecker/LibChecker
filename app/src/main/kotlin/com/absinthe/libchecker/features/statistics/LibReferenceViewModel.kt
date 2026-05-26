@@ -49,8 +49,8 @@ class LibReferenceViewModel : ViewModel() {
     val dbItems = dbItemsStateFlow.value.takeUnless { it.isNullOrEmpty() }
       ?: dbItemsStateFlow.filterNotNull().first()
 
-    val dbItemsMap = dbItems.associateBy { it.packageName }
-    val list = packagesList.mapNotNull { dbItemsMap[it] }
+    val packageSet = packagesList.toHashSet()
+    val list = dbItems.filter { it.packageName in packageSet }
 
     val filterList = list.takeIf { GlobalValues.isShowSystemApps } ?: list.filter { !it.isSystem }
     libRefListFlow.emit(filterList)

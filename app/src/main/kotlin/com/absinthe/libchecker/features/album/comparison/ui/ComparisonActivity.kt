@@ -258,13 +258,12 @@ class ComparisonActivity :
       }
       loading.setHighlightIconProvider(object : RingDotsView.HighlightIconProvider {
         override suspend fun produce(emitter: RingDotsView.HighlightIconEmitter) {
-          val applications = LocalAppDataSource.getApplicationList()
           val defaultIcon = packageManager.defaultActivityIcon
           while (true) {
             if (!loading.isHighlightAnimationAvailable()) {
               break
             }
-            val ai = applications.random().applicationInfo ?: continue
+            val ai = LocalAppDataSource.getRandomApplicationInfo() ?: break
             val drawable = ai.loadIcon(packageManager)
               ?.takeIf { icon -> !UiUtils.drawablesAreEqual(icon, defaultIcon) }
               ?: continue

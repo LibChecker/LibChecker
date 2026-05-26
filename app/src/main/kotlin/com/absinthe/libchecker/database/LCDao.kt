@@ -24,6 +24,9 @@ interface LCDao {
   @Query("SELECT * from item_table ORDER BY label ASC")
   suspend fun getItems(): List<LCItem>
 
+  @Query("SELECT packageName from item_table WHERE features = -1")
+  suspend fun getUninitializedFeaturePackageNames(): List<String>
+
   @Query("SELECT * from item_table WHERE packageName LIKE :packageName")
   suspend fun getItem(packageName: String): LCItem?
 
