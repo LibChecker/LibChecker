@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.chad.library.adapter4.BaseQuickAdapter as BaseQuickAdapter4
+import java.util.concurrent.atomic.AtomicLong
 
 abstract class BaseQuickAdapter<T : Any, VH : RecyclerView.ViewHolder>(
   @LayoutRes private val layoutResId: Int = 0
@@ -259,7 +260,7 @@ abstract class BaseQuickAdapter<T : Any, VH : RecyclerView.ViewHolder>(
       return concat
     }
 
-    val concat = ConcatAdapter().also { concatAdapter = it }
+    val concat = createHeaderFooterConcatAdapter().also { concatAdapter = it }
     syncingHeaderFooter = true
     try {
       headerAdapters.forEach { concat.addAdapter(it) }
@@ -313,6 +314,12 @@ abstract class BaseQuickAdapter<T : Any, VH : RecyclerView.ViewHolder>(
   private class SingleViewAdapter(
     private val view: View
   ) : RecyclerView.Adapter<BaseViewHolder>() {
+    private val stableItemId = nextStableItemId.getAndDecrement()
+
+    init {
+      setHasStableIds(true)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
       (view.parent as? ViewGroup)?.removeView(view)
       return BaseViewHolder(view)
@@ -321,5 +328,21 @@ abstract class BaseQuickAdapter<T : Any, VH : RecyclerView.ViewHolder>(
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) = Unit
 
     override fun getItemCount(): Int = 1
+
+    override fun getItemId(position: Int): Long = stableItemId
+
+    companion object {
+      private val nextStableItemId = AtomicLong(Long.MAX_VALUE)
+    }
+  }
+
+  private fun createHeaderFooterConcatAdapter(): ConcatAdapter {
+    if (!hasStableIds()) {
+      return ConcatAdapter()
+    }
+    val config = ConcatAdapter.Config.Builder()
+      .setStableIdMode(ConcatAdapter.Config.StableIdMode.SHARED_STABLE_IDS)
+      .build()
+    return ConcatAdapter(config)
   }
 }
