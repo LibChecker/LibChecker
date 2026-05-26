@@ -88,6 +88,7 @@ class AppListFragment :
   private var isSearchTextClearOnce = false
   private var firstScrollFlag = false
   private var hasUserScrolledList = false
+  private var pendingReturnTopAfterRequestChange = false
   private var hasInitializedItems = false
 
   private lateinit var layoutManager: RecyclerView.LayoutManager
@@ -464,6 +465,7 @@ class AppListFragment :
           }
 
           is HomeViewModel.Effect.RefreshList -> {
+            pendingReturnTopAfterRequestChange = true
             updateItems()
           }
 
@@ -581,12 +583,13 @@ class AppListFragment :
             .toList()
         )
         updatePackageStateCache(packageInfoMap)
-        val currentPackageNames = data.mapTo(mutableSetOf()) { it.packageName }
-        val firstPackageName = filterList.firstOrNull()?.packageName
-        val shouldReturnTopAfterInsert = !hasUserScrolledList &&
-          currentPackageNames.isNotEmpty() &&
-          firstPackageName != null &&
-          firstPackageName !in currentPackageNames
+        val shouldReturnTopAfterRequestChange = pendingReturnTopAfterRequestChange &&
+          !highlightRefresh &&
+          !hasUserScrolledList &&
+          data.isNotEmpty()
+        if (pendingReturnTopAfterRequestChange && !highlightRefresh) {
+          pendingReturnTopAfterRequestChange = false
+        }
 
         setDiffNewData(filterList) {
           if (isDetached || !isBindingInitialized()) {
@@ -600,7 +603,7 @@ class AppListFragment :
           }
 
           setSpaceFooterView()
-          if (shouldReturnTopAfterInsert) {
+          if (shouldReturnTopAfterRequestChange) {
             returnTopOfList()
           }
         }
@@ -610,8 +613,12 @@ class AppListFragment :
 
   private fun returnTopOfList() {
     binding.list.apply {
-      if (canScrollVertically(-1)) {
-        smoothScrollToPosition(0)
+      post {
+        when (val manager = layoutManager) {
+          is LinearLayoutManager -> manager.scrollToPositionWithOffset(0, 0)
+          is StaggeredGridLayoutManager -> manager.scrollToPositionWithOffset(0, 0)
+          else -> scrollToPosition(0)
+        }
       }
     }
   }
