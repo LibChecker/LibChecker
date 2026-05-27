@@ -3,6 +3,7 @@ package com.absinthe.libchecker.ui.base
 import android.content.Context
 import android.content.res.Resources
 import android.os.Bundle
+import android.text.method.TextKeyListener
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -52,6 +53,11 @@ abstract class BaseActivity<VB : ViewBinding> :
     }
   }
 
+  override fun onDestroy() {
+    super.onDestroy()
+    releaseTextKeyListeners()
+  }
+
   override fun invalidateMenu() {
     // It will somehow cause a crash when calling super.invalidateMenu() in some cases
     // java.lang.IllegalStateException: The specified child already has a parent. You must call removeView() on the child's parent first.
@@ -89,5 +95,18 @@ abstract class BaseActivity<VB : ViewBinding> :
 
   protected fun isBindingInitialized(): Boolean {
     return ::binding.isInitialized
+  }
+
+  // TextKeyListener keeps process-wide singletons; release settings callbacks
+  // that may otherwise retain a destroyed Activity context.
+  private fun releaseTextKeyListeners() {
+    runCatching {
+      TextKeyListener.Capitalize.values().forEach { capitalize ->
+        TextKeyListener.getInstance(false, capitalize).release()
+        TextKeyListener.getInstance(true, capitalize).release()
+      }
+    }.onFailure {
+      Timber.w(it)
+    }
   }
 }
