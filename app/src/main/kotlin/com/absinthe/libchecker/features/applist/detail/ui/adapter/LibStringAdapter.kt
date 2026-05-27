@@ -238,11 +238,22 @@ class LibStringAdapter(
           val text = "16 KB"
           append(createNativeLabelSpan(text))
         }
-        if (elfInfo.uncompressedAndNot16KB) {
-          val text = "NON 16 KB STORED"
+        getZipAlignmentText(elfInfo.zipAlignment)?.let { zipAlignmentText ->
+          val text = zipAlignmentText
           append(createNativeLabelSpan(text))
         }
       }
+    }
+  }
+
+  private fun getZipAlignmentText(zipAlignment: Long): String? {
+    if (zipAlignment <= 0L || zipAlignment >= PAGE_SIZE_16_KB) {
+      return null
+    }
+    return if (zipAlignment >= 1024L && zipAlignment % 1024L == 0L) {
+      "${zipAlignment / 1024}KB ZIPALIGN"
+    } else {
+      "${zipAlignment}B ZIPALIGN"
     }
   }
 

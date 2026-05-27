@@ -796,7 +796,7 @@ fun PackageInfo.is16KBAligned(libs: List<LibStringItem>? = null, isApk: Boolean 
 
   return nativeLibs.isNotEmpty() &&
     nativeLibs.all { it.elfInfo.pageSize % PAGE_SIZE_16_KB == 0 } &&
-    nativeLibs.all { it.elfInfo.uncompressedAndNot16KB.not() }
+    nativeLibs.all { it.elfInfo.zipAlignment <= 0L || it.elfInfo.zipAlignment >= PAGE_SIZE_16_KB }
 }
 
 /**
