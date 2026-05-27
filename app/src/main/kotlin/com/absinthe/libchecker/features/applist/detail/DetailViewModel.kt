@@ -68,6 +68,7 @@ import com.absinthe.libchecker.utils.extensions.isXposedModule
 import com.absinthe.libchecker.utils.extensions.maybeResourceId
 import com.absinthe.libchecker.utils.extensions.toClassDefType
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
+import com.absinthe.libchecker.utils.manifest.ApplicationReader
 import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.Rule
 import java.io.File
@@ -90,6 +91,8 @@ import timber.log.Timber
 private const val NATIVE_ACTIVITY_CLASS_NAME = "android.app.NativeActivity"
 private const val NATIVE_ACTIVITY_LIB_NAME_METADATA = "android.app.lib_name"
 private const val NATIVE_ACTIVITY_LABEL = "NativeActivity"
+private const val ZYGOTE_PRELOAD_NATIVE_LIB_PROPERTY = "zygotePreloadNativeLib"
+private const val ZYGOTE_PRELOAD_NATIVE_LIB_LABEL = "PRELOAD"
 
 class DetailViewModel : ViewModel() {
   private var allNativeLibItems: Map<String, List<LibStringItem>> = emptyMap()
@@ -509,12 +512,16 @@ class DetailViewModel : ViewModel() {
     } else {
       val packageName = apkPreviewInfo?.packageName ?: packageInfo.packageName
       val nativeActivityLibNames = getNativeActivityLibNames()
+      val preloadNativeLibNames = getZygotePreloadNativeLibNames()
       list.forEach {
         rule = LCAppUtils.getRuleWithRegex(it.name, NATIVE, packageName, list)
-        val labels = if (it.name in nativeActivityLibNames) {
-          listOf(NATIVE_ACTIVITY_LABEL)
-        } else {
-          emptyList()
+        val labels = mutableListOf<String>().apply {
+          if (it.name in nativeActivityLibNames) {
+            add(NATIVE_ACTIVITY_LABEL)
+          }
+          if (it.name in preloadNativeLibNames) {
+            add(ZYGOTE_PRELOAD_NATIVE_LIB_LABEL)
+          }
         }
         chipList.add(LibStringItemChip(it, rule, labels))
       }
@@ -548,15 +555,37 @@ class DetailViewModel : ViewModel() {
       .filter { it.name == NATIVE_ACTIVITY_CLASS_NAME }
       .mapNotNull { it.metaData?.getString(NATIVE_ACTIVITY_LIB_NAME_METADATA) }
       .filter { it.isNotBlank() }
-      .map { it.toNativeActivityLibName() }
+      .map { it.toNativeLibFileName() }
       .toSet()
   }
 
-  private fun String.toNativeActivityLibName(): String {
+  private fun String.toNativeLibFileName(): String {
     val normalizedName = trim()
+      .substringAfterLast('/')
       .removePrefix("lib")
       .removeSuffix(".so")
     return "lib$normalizedName.so"
+  }
+
+  private fun getZygotePreloadNativeLibNames(): Set<String> {
+    if (!OsUtils.atLeastCinnamonBun()) {
+      return emptySet()
+    }
+
+    val preloadNativeLib = apkPreviewInfo?.appProps?.get(ZYGOTE_PRELOAD_NATIVE_LIB_PROPERTY)
+      ?: packageInfo.applicationInfo?.sourceDir?.let { sourceDir ->
+        runCatching {
+          ApplicationReader.getManifestProperties(File(sourceDir))[ZYGOTE_PRELOAD_NATIVE_LIB_PROPERTY]?.toString()
+        }.onFailure {
+          Timber.e(it)
+        }.getOrNull()
+      }
+      ?: return emptySet()
+
+    return preloadNativeLib
+      .takeIf { it.isNotBlank() }
+      ?.let { setOf(it.toNativeLibFileName()) }
+      ?: emptySet()
   }
 
   private suspend fun getStaticChipList(): List<LibStringItemChip> {
