@@ -333,7 +333,11 @@ object PackageUtils {
             ?: if (pathFirst == assetsDir) assetsDir else return@forEach
           val offset = getDataOffsetMethod.invoke(zipFile, entry) as Long
 
-          val currentEntryUncompressedAndNot16KB = entry.method == ZipEntry.STORED && (offset % PAGE_SIZE_16_KB) != 0L
+          val currentEntryZipAlignment = if (entry.method == ZipEntry.STORED) {
+            getZipAlignment(offset)
+          } else {
+            -1
+          }
           val elfParser = runCatching {
             ElfParser(zipFile.getInputStream(entry)).use { parser ->
               parser.parseHeader()
@@ -347,7 +351,7 @@ object PackageUtils {
             elfInfo = ElfInfo(
               elfParser?.getEType() ?: ET_NOT_ELF,
               elfParser?.getMinPageSize() ?: -1,
-              currentEntryUncompressedAndNot16KB
+              zipAlignment = currentEntryZipAlignment
             ),
             source = entry.name,
             process = file.name
@@ -360,6 +364,13 @@ object PackageUtils {
       Timber.d("${file.absolutePath} Check zipFile cost: $timeRecorder")
     }
     return map
+  }
+
+  private fun getZipAlignment(offset: Long): Long {
+    if (offset <= 0L) {
+      return -1
+    }
+    return java.lang.Long.lowestOneBit(offset)
   }
 
   private fun getApkFileLibsWithoutParsingElf(file: File, specifiedAbi: Int? = null): Map<String, MutableList<LibStringItem>> {

@@ -10,5 +10,5 @@ import kotlinx.parcelize.Parcelize
 data class ElfInfo(
   val elfType: Int = ET_NOT_SET,
   val pageSize: Int = -1,
-  val uncompressedAndNot16KB: Boolean = false
+  val zipAlignment: Long = -1
 ) : Parcelable
