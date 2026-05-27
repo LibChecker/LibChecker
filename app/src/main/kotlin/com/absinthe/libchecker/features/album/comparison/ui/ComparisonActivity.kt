@@ -66,6 +66,7 @@ import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPackageSize
 import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getVersionCode
+import com.absinthe.libchecker.utils.extensions.requireAvailableCacheDir
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.utils.toJson
 import com.absinthe.libchecker.view.app.RingDotsView
@@ -117,7 +118,11 @@ class ComparisonActivity :
   override fun onDestroy() {
     super.onDestroy()
     if (leftTimeStamp == -1L || rightTimeStamp == -1L) {
-      externalCacheDir?.deleteRecursively()
+      externalCacheDir?.let { cacheDir ->
+        File(cacheDir, Constants.TEMP_PACKAGE).delete()
+        File(cacheDir, Constants.TEMP_PACKAGE_2).delete()
+        File(cacheDir, "apks").deleteRecursively()
+      }
     }
   }
 
@@ -522,7 +527,7 @@ class ComparisonActivity :
 
   private fun getSnapshotItemByUri(uri: Uri, fileName: String): SnapshotItem {
     var pi: PackageInfo? = null
-    File(externalCacheDir, fileName).also { tf ->
+    File(requireAvailableCacheDir(), fileName).also { tf ->
       contentResolver.openInputStream(uri)?.use { inputStream ->
         val fileSize = inputStream.available()
         val freeSize = Environment.getExternalStorageDirectory().freeSpace

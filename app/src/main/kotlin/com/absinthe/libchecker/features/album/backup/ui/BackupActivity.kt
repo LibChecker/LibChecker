@@ -43,6 +43,7 @@ import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.requireAvailableCacheDir
 import com.absinthe.libchecker.utils.extensions.setBottomPaddingSpace
 import com.absinthe.libchecker.utils.showToast
 import com.google.android.material.card.MaterialCardView
@@ -338,7 +339,7 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
               dialog.show()
               if (uri.toString().endsWith(".sqlite3")) {
                 lifecycleScope.launch(Dispatchers.IO) {
-                  val restoreFile = File(activity.externalCacheDir, "restore.sqlite3")
+                  val restoreFile = File(activity.requireAvailableCacheDir(), "restore.sqlite3")
                   inputStream.source().buffer().use { source ->
                     restoreFile.outputStream().sink().buffer().use { sink ->
                       source.readAll(sink)

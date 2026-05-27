@@ -52,6 +52,7 @@ import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getFeatures
 import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.extensions.isArchivedPackage
+import com.absinthe.libchecker.utils.extensions.requireAvailableCacheDir
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libraries.utils.manager.TimeRecorder
@@ -719,7 +720,8 @@ class HomeViewModel : ViewModel() {
   }
 
   fun clearApkCache() {
-    LibCheckerApp.app.externalCacheDir?.deleteRecursively()
+    LibCheckerApp.app.externalCacheDir?.listFiles()?.forEach { it.deleteRecursively() }
+    LibCheckerApp.app.requireAvailableCacheDir()
   }
 
   private suspend fun insert(item: LCItem) = Repositories.lcRepository.insert(item)

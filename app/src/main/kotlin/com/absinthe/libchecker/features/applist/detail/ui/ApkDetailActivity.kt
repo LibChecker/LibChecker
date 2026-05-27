@@ -19,6 +19,7 @@ import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.apk.APKSParser
 import com.absinthe.libchecker.utils.apk.ApkPreview
 import com.absinthe.libchecker.utils.apk.XAPKParser
+import com.absinthe.libchecker.utils.extensions.requireAvailableCacheDir
 import com.absinthe.libchecker.utils.showToast
 import java.io.File
 import kotlinx.coroutines.Dispatchers
@@ -91,7 +92,7 @@ class ApkDetailActivity :
     dialog.show()
 
     lifecycleScope.launch(Dispatchers.IO) {
-      tempFile = File(externalCacheDir, Constants.TEMP_PACKAGE).also { tf ->
+      tempFile = File(requireAvailableCacheDir(), Constants.TEMP_PACKAGE).also { tf ->
         if (tf.exists()) tf.delete()
         val inputStream = runCatching { contentResolver.openInputStream(uri) }.getOrNull() ?: run {
           dialog.dismiss()
