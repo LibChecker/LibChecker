@@ -87,6 +87,10 @@ import ohos.bundle.IBundleManager
 import retrofit2.HttpException
 import timber.log.Timber
 
+private const val NATIVE_ACTIVITY_CLASS_NAME = "android.app.NativeActivity"
+private const val NATIVE_ACTIVITY_LIB_NAME_METADATA = "android.app.lib_name"
+private const val NATIVE_ACTIVITY_LABEL = "NativeActivity"
+
 class DetailViewModel : ViewModel() {
   private var allNativeLibItems: Map<String, List<LibStringItem>> = emptyMap()
   val nativeLibTabs: MutableStateFlow<Collection<String>?> = MutableStateFlow(null)
@@ -504,9 +508,15 @@ class DetailViewModel : ViewModel() {
       return chipList
     } else {
       val packageName = apkPreviewInfo?.packageName ?: packageInfo.packageName
+      val nativeActivityLibNames = getNativeActivityLibNames()
       list.forEach {
         rule = LCAppUtils.getRuleWithRegex(it.name, NATIVE, packageName, list)
-        chipList.add(LibStringItemChip(it, rule))
+        val labels = if (it.name in nativeActivityLibNames) {
+          listOf(NATIVE_ACTIVITY_LABEL)
+        } else {
+          emptyList()
+        }
+        chipList.add(LibStringItemChip(it, rule, labels))
       }
       if (GlobalValues.libSortMode == MODE_SORT_BY_SIZE) {
         chipList.sortByDescending { it.item.size }
@@ -515,6 +525,38 @@ class DetailViewModel : ViewModel() {
       }
     }
     return chipList
+  }
+
+  private fun getNativeActivityLibNames(): Set<String> {
+    if (isApkPreview) {
+      return emptySet()
+    }
+    val activityPackageInfo = if (packageInfo.activities != null) {
+      packageInfo
+    } else {
+      runCatching {
+        PackageUtils.getPackageInfo(
+          packageInfo.packageName,
+          PackageManager.GET_ACTIVITIES or PackageManager.GET_META_DATA,
+          false
+        )
+      }.getOrNull()
+    } ?: return emptySet()
+
+    return activityPackageInfo.activities.orEmpty()
+      .asSequence()
+      .filter { it.name == NATIVE_ACTIVITY_CLASS_NAME }
+      .mapNotNull { it.metaData?.getString(NATIVE_ACTIVITY_LIB_NAME_METADATA) }
+      .filter { it.isNotBlank() }
+      .map { it.toNativeActivityLibName() }
+      .toSet()
+  }
+
+  private fun String.toNativeActivityLibName(): String {
+    val normalizedName = trim()
+      .removePrefix("lib")
+      .removeSuffix(".so")
+    return "lib$normalizedName.so"
   }
 
   private suspend fun getStaticChipList(): List<LibStringItemChip> {

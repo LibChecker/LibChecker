@@ -83,7 +83,7 @@ class LibStringAdapter(
 
   private var processMode: Boolean = false
   private var is64Bit: Boolean = false
-  private val nativeSizeTextCache = mutableMapOf<LibStringItem, CharSequence>()
+  private val nativeSizeTextCache = mutableMapOf<Pair<LibStringItem, List<String>>, CharSequence>()
 
   fun switchProcessMode() {
     setProcessMode(!processMode)
@@ -225,7 +225,7 @@ class LibStringAdapter(
     }
   }
 
-  private fun getNativeSizeText(item: LibStringItemChip): CharSequence = nativeSizeTextCache.getOrPut(item.item) {
+  private fun getNativeSizeText(item: LibStringItemChip): CharSequence = nativeSizeTextCache.getOrPut(item.item to item.labels) {
     buildSpannedString {
       append(PackageUtils.sizeToString(context, item.item))
       val elfInfo = item.item.elfInfo
@@ -242,6 +242,9 @@ class LibStringAdapter(
           val text = zipAlignmentText
           append(createNativeLabelSpan(text))
         }
+      }
+      item.labels.forEach { label ->
+        append(createNativeLabelSpan(label))
       }
     }
   }
