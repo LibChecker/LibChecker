@@ -4,6 +4,7 @@ import android.content.pm.PackageInfo
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.compat.ZipFileCompat
+import com.absinthe.libchecker.utils.extensions.requireAvailableCacheDir
 import com.absinthe.libchecker.utils.extensions.use
 import com.absinthe.libchecker.utils.fromJson
 import java.io.File
@@ -49,8 +50,8 @@ class XAPKParser(private val file: File, private val flags: Int = 0) {
 
   private fun dumpApks(zipFile: ZipFileCompat, json: XAPKManifest): File {
     Timber.d("Dumping apks")
-    val rootDir = File(LibCheckerApp.app.externalCacheDir, json.package_name)
-    rootDir.mkdir()
+    val rootDir = File(LibCheckerApp.app.requireAvailableCacheDir(), json.package_name)
+    rootDir.mkdirs()
 
     json.split_apks.forEach { apkConfig ->
       val entry =
