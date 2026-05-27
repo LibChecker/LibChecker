@@ -1,20 +1,18 @@
 package com.absinthe.libchecker.api.request
 
 import com.absinthe.libchecker.BuildConfig
-import com.absinthe.libchecker.api.HEADER_BASE_URL
+import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.GetAppUpdateInfo
 import retrofit2.http.GET
 import retrofit2.http.Header
-import retrofit2.http.Headers
+import retrofit2.http.Path
 
-const val APP_UPDATE_HOST = "App-Update-Host"
-const val CHANNEL = "Channel"
+private const val CHANNEL = "channel"
 
 interface GetAppUpdateRequest {
-  @Headers("$HEADER_BASE_URL: $APP_UPDATE_HOST")
-  @GET("{$CHANNEL}.json")
+  @GET("${ApiManager.ASSETS_REPO_BASE_URL}{$CHANNEL}.json")
   suspend fun requestAppUpdateInfo(
-    @Header(CHANNEL) channel: String,
+    @Path(CHANNEL) channel: String,
     @Header("Referer") referer: String = BuildConfig.APPLICATION_ID
   ): GetAppUpdateInfo?
 }
