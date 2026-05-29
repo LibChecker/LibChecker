@@ -11,6 +11,7 @@ import androidx.core.view.marginRight
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
+import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
@@ -27,6 +28,7 @@ class DeveloperItemView(context: Context) : MaterialCardView(context) {
   init {
     setSmoothRoundCorner(16.dp)
     strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutlineVariant)
+    setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSurfaceContainerHigh))
     addView(container)
   }
 
