@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.ApplicationInfoHidden
 import android.content.pm.ComponentInfo
-import android.content.pm.IPackageManager
 import android.content.pm.InstallSourceInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
@@ -93,9 +92,6 @@ import java.util.zip.ZipEntry
 import javax.security.cert.X509Certificate
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
 import org.apache.commons.compress.archivers.zip.ZipFile
-import rikka.shizuku.Shizuku
-import rikka.shizuku.ShizukuBinderWrapper
-import rikka.shizuku.SystemServiceHelper
 import timber.log.Timber
 
 object PackageUtils {
@@ -1000,22 +996,12 @@ object PackageUtils {
       Timber.e(e)
       return null
     }
-    if (!Shizuku.pingBinder()) {
-      Timber.e("Shizuku not running")
+    if (!ShizukuManager.requireAvailable()) {
       return origInstallSourceInfo
     }
-    if (Shizuku.getVersion() < 10) {
-      Timber.e("Requires Shizuku API 10")
-      return origInstallSourceInfo
-    } else if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
-      Timber.i("Shizuku not authorized")
-      return origInstallSourceInfo
-    }
-    return IPackageManager.Stub.asInterface(
-      ShizukuBinderWrapper(SystemServiceHelper.getSystemService("package"))
-    ).let {
+    return ShizukuManager.getPackageManager().let {
       if (OsUtils.atLeastU()) {
-        it.getInstallSourceInfo(packageName, Shizuku.getUid())
+        it.getInstallSourceInfo(packageName, ShizukuManager.getUid())
       } else {
         it.getInstallSourceInfo(packageName)
       }

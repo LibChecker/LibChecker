@@ -41,12 +41,20 @@ class AppInstallSourceBottomSheetView(context: Context) :
     )
   }
 
+  val dexoptView = AppDexoptItemView(context).apply {
+    layoutParams = LayoutParams(
+      ViewGroup.LayoutParams.MATCH_PARENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
+    )
+  }
+
   init {
     setPadding(24.dp, 16.dp, 24.dp, 16.dp)
     addView(header)
     addView(originatingView)
     addView(installingView)
     addView(installedTimeView)
+    addView(dexoptView)
   }
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -70,6 +78,12 @@ class AppInstallSourceBottomSheetView(context: Context) :
         if (it.isGone) 0 else it.defaultHeightMeasureSpec(this)
       )
     }
+    dexoptView.let {
+      it.measure(
+        it.defaultWidthMeasureSpec(this),
+        if (it.isGone) 0 else it.defaultHeightMeasureSpec(this)
+      )
+    }
     setMeasuredDimension(
       measuredWidth,
       paddingTop +
@@ -77,6 +91,7 @@ class AppInstallSourceBottomSheetView(context: Context) :
         (if (originatingView.isGone) 0 else originatingView.measuredHeight) +
         (if (installingView.isGone) 0 else installingView.measuredHeight) +
         (if (installedTimeView.isGone) 0 else installedTimeView.measuredHeight) +
+        (if (dexoptView.isGone) 0 else dexoptView.measuredHeight) +
         paddingBottom
     )
   }
@@ -86,6 +101,7 @@ class AppInstallSourceBottomSheetView(context: Context) :
     originatingView.layout(paddingStart, header.bottom)
     installingView.layout(paddingStart, originatingView.bottom)
     installedTimeView.layout(paddingStart, installingView.bottom)
+    dexoptView.layout(paddingStart, installedTimeView.bottom)
   }
 
   override fun getHeaderView(): BottomSheetHeaderView {
