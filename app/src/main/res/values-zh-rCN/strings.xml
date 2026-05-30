@@ -193,6 +193,9 @@
   <string name="lib_detail_app_install_source_shizuku_not_running_detail">点此跳转到 Shizuku 以启动它</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku 未授权</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">点此进行 Shizuku 授权以获取安装请求方</string>
+  <string name="lib_detail_app_dexopt_title">DEX 优化</string>
+  <string name="lib_detail_app_dexopt_status">状态</string>
+  <string name="lib_detail_app_dexopt_reason">原因</string>
   <string name="lib_detail_elf_info">更多信息</string>
   <string name="lib_detail_elf_extract">提取</string>
   <string name="lib_detail_elf_extract_success">ELF 文件已保存到下载目录</string>

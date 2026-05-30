@@ -5,8 +5,6 @@ import androidx.core.os.BundleCompat
 import com.absinthe.libchecker.features.applist.detail.bean.AppPropItem
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppPropsBottomSheetView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
-import com.absinthe.libchecker.utils.OsUtils
-import com.absinthe.libchecker.utils.extensions.getDexFileOptimizationInfo
 import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libchecker.utils.manifest.ApplicationReader
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
@@ -52,18 +50,6 @@ class AppPropBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppPr
         )
       }.sortedBy { item -> item.key }
     }.toMutableList()
-
-    if (OsUtils.atLeastP()) {
-      packageInfo?.getDexFileOptimizationInfo()?.let {
-        bundleList.add(
-          0,
-          AppPropItem(
-            key = "dexopt",
-            value = "status=${it.status}, reason=${it.reason}"
-          )
-        )
-      }
-    }
 
     root.adapter.setList(bundleList)
   }
