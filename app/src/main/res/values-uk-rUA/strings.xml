@@ -193,6 +193,9 @@
   <string name="lib_detail_app_install_source_shizuku_not_running_detail">Натисніть тут, щоб перейти до Shizuku та запустити його</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku не авторизовано</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">Натисніть тут для авторизації Shizuku для запитувача встановлення</string>
+  <string name="lib_detail_app_dexopt_title">DEX optimization</string>
+  <string name="lib_detail_app_dexopt_status">Status</string>
+  <string name="lib_detail_app_dexopt_reason">Reason</string>
   <string name="lib_detail_elf_info">Детальніше</string>
   <string name="lib_detail_elf_extract">Розпакувати</string>
   <string name="lib_detail_elf_extract_success">Файл ELF збережено до завантажень</string>
