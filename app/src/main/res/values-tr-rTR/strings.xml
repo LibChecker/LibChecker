@@ -193,6 +193,9 @@
   <string name="lib_detail_app_install_source_shizuku_not_running_detail">Başlatmak için Shizuku\'ya atlamak için buraya tıklayın</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku yetkilendirilmedi</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">Yükleme isteyicisi için Shizuku yetkilendirmesi için buraya tıklayın</string>
+  <string name="lib_detail_app_dexopt_title">DEX optimization</string>
+  <string name="lib_detail_app_dexopt_status">Status</string>
+  <string name="lib_detail_app_dexopt_reason">Reason</string>
   <string name="lib_detail_elf_info">Daha fazla ayrıntı</string>
   <string name="lib_detail_elf_extract">Çıkar</string>
   <string name="lib_detail_elf_extract_success">ELF dosyası İndirilenler\'e kaydedildi</string>
