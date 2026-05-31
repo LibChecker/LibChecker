@@ -76,7 +76,7 @@ class InAppUpdateDialogView(context: Context) :
     }
     imageAssetsFolder = File.separator
     repeatCount = LottieDrawable.INFINITE
-    setAnimation("anim/lib_detail_rocket.json.zip")
+    setAnimation("anim/gray-down-arrow.json.zip")
   }
 
   val updateButton = MaterialButton(context).apply {

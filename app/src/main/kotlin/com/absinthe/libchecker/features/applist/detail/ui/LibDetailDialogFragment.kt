@@ -46,12 +46,13 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
       maxPeekHeightPercentage = 0.8f
       title.text = if (type == ACTION) "< $libName >" else libName
       lifecycleScope.launch {
-        val iconRes = if (isValidLib) {
-          LCRules.getRule(libName, type, true)?.iconRes
-            ?: com.absinthe.lc.rulesbundle.R.drawable.ic_sdk_placeholder
+        val rule = if (isValidLib) {
+          LCRules.getRule(libName, type, true)
         } else {
-          com.absinthe.lc.rulesbundle.R.drawable.ic_sdk_placeholder
+          null
         }
+        val iconRes = rule?.iconRes ?: com.absinthe.lc.rulesbundle.R.drawable.ic_sdk_placeholder
+        setLoadingIcon(iconRes, rule?.isSimpleColorIcon == true)
         icon.load(iconRes) {
           crossfade(true)
           placeholder(R.drawable.ic_logo)
