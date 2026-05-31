@@ -29,4 +29,18 @@
     <attr name="alvHighlightStrength" format="float" />
     <attr name="alvAxisTilt" format="float" />
   </declare-styleable>
+
+  <declare-styleable name="IconCarouselView">
+    <attr name="icvAutoStart" format="boolean" />
+    <attr name="icvReverse" format="boolean" />
+    <attr name="icvIconSize" format="dimension" />
+    <attr name="icvIconSpacing" format="dimension" />
+    <attr name="icvIconPadding" format="dimension" />
+    <attr name="icvCenterScale" format="float" />
+    <attr name="icvSideScale" format="float" />
+    <attr name="icvStepDuration" format="integer" />
+    <attr name="icvHoldFraction" format="float" />
+    <attr name="icvSideBlurRadius" format="dimension" />
+    <attr name="icvVisibleSlots" format="float" />
+  </declare-styleable>
 </resources>
