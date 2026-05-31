@@ -193,6 +193,9 @@
   <string name="lib_detail_app_install_source_shizuku_not_running_detail">ここをクリックしてShizukuにジャンプして起動します</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizukuが承認されていません</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">ここをクリックしてShizukuのインストールリクエスターに承認します</string>
+  <string name="lib_detail_app_dexopt_title">DEX optimization</string>
+  <string name="lib_detail_app_dexopt_status">Status</string>
+  <string name="lib_detail_app_dexopt_reason">Reason</string>
   <string name="lib_detail_elf_info">詳細情報</string>
   <string name="lib_detail_elf_extract">Extract</string>
   <string name="lib_detail_elf_extract_success">ELF file saved to Downloads</string>
