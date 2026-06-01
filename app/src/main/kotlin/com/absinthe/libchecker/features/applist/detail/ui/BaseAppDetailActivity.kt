@@ -738,7 +738,7 @@ abstract class BaseAppDetailActivity :
 
           Features.KMP -> {
             featureAdapter.addData(
-              FeatureItem(R.drawable.ic_jetbrain_kmp) {
+              FeatureItem(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetbrain_kmp) {
                 FeaturesDialog.showKMPDialog(this, feat.version)
               }
             )
