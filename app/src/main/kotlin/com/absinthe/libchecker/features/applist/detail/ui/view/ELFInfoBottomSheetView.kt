@@ -54,7 +54,7 @@ class ELFInfoBottomSheetView(context: Context) :
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
   }
 
-  fun setContent(deps: String, entryPoints: String) {
+  fun setContent(deps: String, entryPoints: String, isStripped: Boolean) {
     val list = listOf(
       LibDetailItem(
         iconRes = R.drawable.ic_content,
@@ -67,6 +67,12 @@ class ELFInfoBottomSheetView(context: Context) :
         tipRes = R.string.lib_detail_entry_points_tip,
         textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleSmall),
         text = entryPoints.takeIf { it.isNotEmpty() } ?: context.getString(R.string.empty_list)
+      ),
+      LibDetailItem(
+        iconRes = if (isStripped) R.drawable.ic_yes else R.drawable.ic_no,
+        tipRes = R.string.lib_detail_optimization_tip,
+        textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleSmall),
+        text = context.getString(if (isStripped) R.string.lib_detail_optimization_on else R.string.lib_detail_optimization_off)
       )
     )
     contentAdapter.setList(list)

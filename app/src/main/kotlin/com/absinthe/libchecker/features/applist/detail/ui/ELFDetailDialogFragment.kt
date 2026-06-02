@@ -38,7 +38,7 @@ class ELFDetailDialogFragment : BaseBottomSheetViewDialogFragment<ELFInfoBottomS
         icon.load(ruleIcon) {
           crossfade(true)
         }
-        setContent(getString(R.string.loading), getString(R.string.loading))
+        setContent(getString(R.string.loading), getString(R.string.loading), false)
       }
     }
   }
@@ -53,7 +53,8 @@ class ELFDetailDialogFragment : BaseBottomSheetViewDialogFragment<ELFInfoBottomS
         root.apply {
           setContent(
             info.deps.joinToString(", "),
-            info.entryPoints.joinToString(System.lineSeparator()) { it -> "◉$it" }
+            info.entryPoints.joinToString(System.lineSeparator()) { "◉${Typography.nbsp}$it" },
+            info.isStripped
           )
         }
       }
@@ -82,7 +83,8 @@ class ELFDetailDialogFragment : BaseBottomSheetViewDialogFragment<ELFInfoBottomS
           val parser = ElfParser(it)
           return Info(
             deps = parser.parseNeededDependencies(),
-            entryPoints = parser.parseEntryPoints()
+            entryPoints = parser.parseEntryPoints(),
+            isStripped = parser.isSymbolTableStripped()
           ).also {
             parser.close()
           }
@@ -109,7 +111,8 @@ class ELFDetailDialogFragment : BaseBottomSheetViewDialogFragment<ELFInfoBottomS
           val parser = ElfParser(zipFile.getInputStream(it))
           return Info(
             deps = parser.parseNeededDependencies(),
-            entryPoints = parser.parseEntryPoints()
+            entryPoints = parser.parseEntryPoints(),
+            isStripped = parser.isSymbolTableStripped()
           ).also {
             parser.close()
           }
@@ -132,6 +135,7 @@ class ELFDetailDialogFragment : BaseBottomSheetViewDialogFragment<ELFInfoBottomS
 
   data class Info(
     val deps: List<String>,
-    val entryPoints: List<String>
+    val entryPoints: List<String>,
+    val isStripped: Boolean
   )
 }

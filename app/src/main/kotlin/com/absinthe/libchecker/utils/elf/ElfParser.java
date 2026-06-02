@@ -263,6 +263,21 @@ public class ElfParser implements Closeable, Elf {
     return entryPoints;
   }
 
+  public boolean isSymbolTableStripped() throws IOException {
+    if (mHeader == null) {
+      mHeader = parseHeader();
+    }
+
+    for (int i = 0; i < mHeader.shnum; ++i) {
+      final Elf.SectionHeader sh = mHeader.getSectionHeader(i);
+      if (sh.type == Elf.SectionHeader.SHT_SYMTAB) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   /**
    * Reads bytes from the ELF file into the given buffer.
    *
