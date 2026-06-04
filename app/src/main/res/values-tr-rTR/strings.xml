@@ -202,6 +202,9 @@
   <string name="lib_detail_elf_extract_failed">ELF dosyası çıkarılamadı</string>
   <string name="lib_detail_dependency_tip">Bağımlılıklar</string>
   <string name="lib_detail_entry_points_tip">Giriş noktaları</string>
+  <string name="lib_detail_optimization_tip">Optimization</string>
+  <string name="lib_detail_optimization_on">Native symbols are stripped, resulting in app size savings.</string>
+  <string name="lib_detail_optimization_off">Native symbols are not stripped, preventing app size savings.</string>
   <string name="apk_preview">APK Önizleme</string>
   <string name="apk_preview_item_not_available">Önizleme modunda görüntülenemez</string>
   <string name="feature_live_update_notification">Canlı Güncelleme bildirimi</string>
