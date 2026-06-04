@@ -202,6 +202,9 @@
   <string name="lib_detail_elf_extract_failed">Failed to extract ELF file</string>
   <string name="lib_detail_dependency_tip">Phụ thuộc</string>
   <string name="lib_detail_entry_points_tip">Điểm vào</string>
+  <string name="lib_detail_optimization_tip">Optimization</string>
+  <string name="lib_detail_optimization_on">Native symbols are stripped, resulting in app size savings.</string>
+  <string name="lib_detail_optimization_off">Native symbols are not stripped, preventing app size savings.</string>
   <string name="apk_preview">APK Preview</string>
   <string name="apk_preview_item_not_available">Cannot be displayed in preview mode</string>
   <string name="feature_live_update_notification">Live Update notification</string>
