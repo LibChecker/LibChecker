@@ -202,6 +202,9 @@
   <string name="lib_detail_elf_extract_failed">فشل في استخراج ملف ELF</string>
   <string name="lib_detail_dependency_tip">التبعية</string>
   <string name="lib_detail_entry_points_tip">نقاط الدخول</string>
+  <string name="lib_detail_optimization_tip">Optimization</string>
+  <string name="lib_detail_optimization_on">Native symbols are stripped, resulting in app size savings.</string>
+  <string name="lib_detail_optimization_off">Native symbols are not stripped, preventing app size savings.</string>
   <string name="apk_preview">معاينة APK</string>
   <string name="apk_preview_item_not_available">لا يمكن عرضها في وضع المعاينة</string>
   <string name="feature_live_update_notification">إشعار التحديث المباشر</string>
