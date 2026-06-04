@@ -202,6 +202,9 @@
   <string name="lib_detail_elf_extract_failed">無法擷取 ELF 檔案</string>
   <string name="lib_detail_dependency_tip">相依關係</string>
   <string name="lib_detail_entry_points_tip">入口</string>
+  <string name="lib_detail_optimization_tip">Optimization</string>
+  <string name="lib_detail_optimization_on">Native symbols are stripped, resulting in app size savings.</string>
+  <string name="lib_detail_optimization_off">Native symbols are not stripped, preventing app size savings.</string>
   <string name="apk_preview">APK 預覽</string>
   <string name="apk_preview_item_not_available">無法在預覽模式下顯示</string>
   <string name="feature_live_update_notification">即時更新通知</string>
