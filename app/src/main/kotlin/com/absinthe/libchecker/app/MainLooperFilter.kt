@@ -40,6 +40,7 @@ object MainLooperFilter {
     "Called attach on a child which is not detached",
     "Expected the adapter to be 'fresh' while restoring state",
     "Fragment no longer exists for key",
+    "The specified child already has a parent",
     "Tmp detached view should be removed from RecyclerView",
     BaseGmsClient::class.java.name
   )
