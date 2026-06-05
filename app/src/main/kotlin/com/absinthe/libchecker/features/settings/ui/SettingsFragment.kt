@@ -240,7 +240,6 @@ class SettingsFragment :
             Timber.e(e)
             Toasty.showShort(requireContext(), e.toString())
           }
-          true
 
           recordPreferenceEvent(Constants.PREF_EXPORT_LOG)
           true
