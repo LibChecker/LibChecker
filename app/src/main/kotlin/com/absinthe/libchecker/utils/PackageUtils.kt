@@ -134,7 +134,7 @@ object PackageUtils {
               appInfo.enabled = false
               appInfo.sourceDir = ai.sourceDir
               appInfo.nativeLibraryDir = ai.nativeLibraryDir
-              appInfo.splitSourceDirs = rootDir.listFiles()!!
+              appInfo.splitSourceDirs = rootDir.listFiles().orEmpty()
                 .filter { file -> file.name.startsWith("split_") && file.extension == "apk" }
                 .map { file -> file.path }
                 .toTypedArray()
