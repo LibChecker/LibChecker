@@ -549,10 +549,9 @@ abstract class BaseDetailFragment<T : ViewBinding> :
       }
       val elfSourcePath = item.source ?: error("elf source is null")
 
-      val apkSourcePath = viewModel.packageInfo.applicationInfo?.sourceDir?.split(File.separator)?.toMutableList()?.apply {
-        removeLast()
-        addLast(item.process.toString())
-      }?.joinToString(File.separator) ?: error("apk source file is invalid")
+      val apkSourcePath = viewModel.packageInfo.applicationInfo?.sourceDir
+        ?.let { File(it).parentFile?.resolve(item.process.toString())?.path }
+        ?: error("apk source file is invalid")
 
       val sourceFile = File(apkSourcePath)
       if (!sourceFile.exists() || !sourceFile.canRead()) {
