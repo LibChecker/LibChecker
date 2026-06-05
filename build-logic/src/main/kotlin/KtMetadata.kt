@@ -25,8 +25,7 @@ fun Project.includeKotlinToolingMetadataInApk() {
           "include${capName}KotlinToolingMetadataInApk",
           CopyKotlinToolingMetadataForApkTask::class.java
         ) {
-          dependsOn(metadataTask)
-          inputDirectory.set(layout.buildDirectory.dir("kotlinToolingMetadata"))
+          inputDirectory.set(metadataTask.flatMap { layout.buildDirectory.dir("kotlinToolingMetadata") })
         }
 
         variant.artifacts

@@ -2,16 +2,6 @@ plugins {
   `kotlin-dsl`
 }
 
-repositories {
-  google {
-    content {
-      includeGroupByRegex(".*google.*")
-      includeGroupByRegex(".*android.*")
-    }
-  }
-  mavenCentral()
-}
-
 gradlePlugin {
   plugins {
     create("build-logic") {
@@ -28,4 +18,5 @@ gradlePlugin {
 dependencies {
   implementation(libs.gradlePlugin.android)
   implementation(libs.gradlePlugin.kotlin)
+  implementation(libs.gradlePlugin.spotless)
 }
