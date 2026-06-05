@@ -15,7 +15,7 @@ class FileLoggingTree(context: Context) : Timber.DebugTree() {
   init {
     val logDir = File(context.cacheDir, "logs")
     if (!logDir.exists()) {
-      logDir.mkdir()
+      logDir.mkdirs()
     }
     val logTimeStamp = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault()).format(Date())
     logFile = File(logDir, "$logTimeStamp.log")
@@ -48,11 +48,17 @@ class FileLoggingTree(context: Context) : Timber.DebugTree() {
       else -> "?"
     }
 
-    if (logFile.exists()) {
+    runCatching {
+      if (!logFile.exists()) {
+        logFile.parentFile?.mkdirs()
+        logFile.createNewFile()
+      }
       logFile.appendText("$logTimeStamp $priorityChar/$tag: $message\n")
       t?.let {
         logFile.appendText(Log.getStackTraceString(it) + "\n")
       }
+    }.onFailure {
+      Log.e("FileLoggingTree", "Failed to append log file", it)
     }
   }
 }
