@@ -720,9 +720,14 @@ class HomeViewModel : ViewModel() {
     }
   }
 
+  private var clearApkCacheJob: Job? = null
+
   fun clearApkCache() {
-    LibCheckerApp.app.externalCacheDir?.listFiles()?.forEach { it.deleteRecursively() }
-    LibCheckerApp.app.requireAvailableCacheDir()
+    clearApkCacheJob?.cancel()
+    clearApkCacheJob = viewModelScope.launch(Dispatchers.IO) {
+      LibCheckerApp.app.externalCacheDir?.listFiles()?.forEach { it.deleteRecursively() }
+      LibCheckerApp.app.requireAvailableCacheDir()
+    }
   }
 
   private suspend fun insert(item: LCItem) = Repositories.lcRepository.insert(item)

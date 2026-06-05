@@ -947,10 +947,16 @@ fun PackageInfo.isPageSizeCompat(): Boolean {
 }
 
 fun PackageInfo.getSignatureSchemes(): ApkVerifier.Result? {
+  val sourceDir = applicationInfo?.sourceDir
+  if (sourceDir.isNullOrBlank()) {
+    Timber.w("Failed to get signature schemes for package without sourceDir: $packageName")
+    return null
+  }
+
   return runCatching {
-    ApkVerifier.Builder(File(applicationInfo!!.sourceDir)).build().verify()
+    ApkVerifier.Builder(File(sourceDir)).build().verify()
   }.getOrElse {
-    Timber.e(it, "Failed to get signature schemes for package: $packageName")
+    Timber.w(it, "Failed to get signature schemes for package: $packageName")
     null
   }
 }
