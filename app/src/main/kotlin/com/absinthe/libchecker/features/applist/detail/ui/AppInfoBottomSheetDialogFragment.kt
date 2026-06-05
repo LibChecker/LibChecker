@@ -14,7 +14,7 @@ import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.PackageManagerCompat
@@ -270,7 +270,7 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
     }
     root.list.apply {
       adapter = aiAdapter
-      layoutManager = StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL)
+      layoutManager = GridLayoutManager(context, 4)
       setHasFixedSize(true)
     }
 
