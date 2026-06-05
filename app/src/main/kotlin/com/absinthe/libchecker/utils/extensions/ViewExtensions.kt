@@ -265,7 +265,7 @@ fun View.animatedBlurAction(action: () -> Unit) {
           )
         }.onFailure {
           supportBlur = false
-          Timber.e(it)
+          Timber.w(it, "RenderEffect blur failed, falling back to alpha animation")
         }
       } else {
         alpha = 1f - progress
