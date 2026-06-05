@@ -11,9 +11,8 @@ import androidx.window.embedding.SplitController
 import coil.Coil
 import coil.ImageLoader
 import com.absinthe.libchecker.app.MainLooperFilter
-import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.database.Repositories
+import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.UiUtils
@@ -22,8 +21,6 @@ import com.absinthe.libchecker.utils.timber.FileLoggingTree
 import com.absinthe.libchecker.utils.timber.ReleaseTree
 import com.absinthe.libchecker.utils.timber.ThreadAwareDebugTree
 import com.absinthe.libraries.utils.utils.Utility
-import com.absinthe.rulesbundle.LCRemoteRepo
-import com.absinthe.rulesbundle.LCRules
 import com.google.android.material.color.DynamicColors
 import com.jakewharton.processphoenix.ProcessPhoenix
 import java.io.File
@@ -58,21 +55,13 @@ class LibCheckerApp : Application() {
     }
     Timber.plant(FileLoggingTree(this))
     Telemetry.setEnable(GlobalValues.isAnonymousAnalyticsEnabled)
-    LCRules.init(this)
-    LCRules.setRemoteRepo(
-      if (GlobalValues.repo == Constants.REPO_GITHUB) {
-        LCRemoteRepo.Github
-      } else {
-        LCRemoteRepo.Gitlab
-      }
-    )
+    RulesRepository.init(this)
     Utility.init(this)
     if (OsUtils.atLeastT()) {
       AppCompatDelegate.setApplicationLocales(LocaleListCompat.create(GlobalValues.locale))
     }
     AppCompatDelegate.setDefaultNightMode(UiUtils.getNightMode())
     Once.initialise(this)
-    Repositories.init(this)
     DynamicColors.applyToActivitiesIfAvailable(this)
     initSplitController()
 

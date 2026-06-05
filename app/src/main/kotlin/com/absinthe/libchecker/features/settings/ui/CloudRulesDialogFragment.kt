@@ -10,22 +10,17 @@ import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.database.Repositories
+import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.DownloadUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.extensions.md5
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
-import com.absinthe.rulesbundle.LCRules
-import com.absinthe.rulesbundle.Repositories as RulesBundleRepo
 import com.jakewharton.processphoenix.ProcessPhoenix
-import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import rikka.core.os.FileUtils
 import timber.log.Timber
 
 class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDialogView>() {
@@ -51,9 +46,9 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
           request.requestCloudRuleInfo()?.let {
             try {
               root.cloudRulesContentView.localVersion.version.text =
-                RulesBundleRepo.getLocalRulesVersion(requireContext()).toString()
+                RulesRepository.getLocalVersion(requireContext()).toString()
               root.cloudRulesContentView.remoteVersion.version.text = it.version.toString()
-              if (RulesBundleRepo.getLocalRulesVersion(requireContext()) < it.version) {
+              if (RulesRepository.getLocalVersion(requireContext()) < it.version) {
                 root.cloudRulesContentView.setUpdateButtonStatus(true)
               }
               withContext(Dispatchers.Main) {
@@ -72,25 +67,19 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
   }
 
   private fun requestBundle() {
-    val saveFile = File(requireContext().cacheDir, Constants.RULES_DB_FILE_NAME)
+    val saveFile = RulesRepository.getDownloadFile(requireContext())
     DownloadUtils.download(
       ApiManager.rulesBundleUrl,
       saveFile,
       object : DownloadUtils.OnDownloadListener {
         override fun onDownloadSuccess() {
-          LCRules.closeDb()
-          Repositories.deleteRulesDatabase()
-
-          val databaseDir = requireContext().getDatabasePath(Constants.RULES_DATABASE_NAME).parent
-          FileUtils.copy(saveFile, File(databaseDir, Constants.RULES_DATABASE_NAME))
-
-          if (File(databaseDir, Constants.RULES_DATABASE_NAME).md5() == saveFile.md5()) {
+          if (RulesRepository.replaceDatabase(saveFile, requireContext())) {
             lifecycleScope.launch(Dispatchers.Main) {
               root.cloudRulesContentView.localVersion.version.text =
                 root.cloudRulesContentView.remoteVersion.version.text
               root.cloudRulesContentView.setUpdateButtonStatus(false)
               runCatching {
-                RulesBundleRepo.setLocalRulesVersion(
+                RulesRepository.setLocalVersion(
                   requireContext(),
                   root.cloudRulesContentView.remoteVersion.version.text.toString().toInt()
                 )

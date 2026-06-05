@@ -36,6 +36,7 @@ import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
+import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.features.about.AboutPageBuilder
 import com.absinthe.libchecker.features.applist.detail.ui.ApkDetailActivity
 import com.absinthe.libchecker.features.home.HomeViewModel
@@ -52,8 +53,6 @@ import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.setBottomPaddingSpace
 import com.absinthe.libraries.utils.extensions.getBoolean
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import com.absinthe.rulesbundle.LCRemoteRepo
-import com.absinthe.rulesbundle.LCRules
 import com.google.android.material.card.MaterialCardView
 import java.io.File
 import java.util.Locale
@@ -119,13 +118,7 @@ class SettingsFragment :
       summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
       setOnPreferenceChangeListener { _, newValue ->
         GlobalValues.repo = newValue as String
-        LCRules.setRemoteRepo(
-          if (GlobalValues.repo == Constants.REPO_GITHUB) {
-            LCRemoteRepo.Github
-          } else {
-            LCRemoteRepo.Gitlab
-          }
-        )
+        RulesRepository.setRemoteRepo(GlobalValues.repo)
         recordPreferenceEvent(Constants.PREF_RULES_REPO, newValue)
         true
       }
