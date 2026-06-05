@@ -143,7 +143,9 @@ fun PackageInfo.getStatefulPermissionsList(): List<Pair<String, Boolean>> {
   }
 
   if (flags?.size != requestedPermissions?.size) {
-    return requestedPermissions?.map { it to true }?.toMutableList()?.apply {
+    return requestedPermissions?.mapNotNull { permission ->
+      permission?.let { it to true }
+    }?.toMutableList()?.apply {
       if (hidden.isNotEmpty()) {
         hidden.forEach { (p, v) ->
           add("$p (maxSdkVersion: $v)" to false)
@@ -152,8 +154,10 @@ fun PackageInfo.getStatefulPermissionsList(): List<Pair<String, Boolean>> {
     } ?: emptyList()
   }
 
-  return requestedPermissions?.mapIndexed { index, s ->
-    s to ((flags?.get(index) ?: 0) and PackageInfo.REQUESTED_PERMISSION_GRANTED != 0)
+  return requestedPermissions?.mapIndexedNotNull { index, permission ->
+    permission?.let {
+      it to ((flags?.get(index) ?: 0) and PackageInfo.REQUESTED_PERMISSION_GRANTED != 0)
+    }
   }?.toMutableList()?.apply {
     if (hidden.isNotEmpty()) {
       hidden.forEach { (p, v) ->
