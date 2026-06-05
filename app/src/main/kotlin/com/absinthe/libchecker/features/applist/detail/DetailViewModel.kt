@@ -33,6 +33,7 @@ import com.absinthe.libchecker.constant.Constants.OVERLAY
 import com.absinthe.libchecker.constant.GlobalFeatures
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
+import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.features.applist.LocatedCount
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
@@ -69,7 +70,6 @@ import com.absinthe.libchecker.utils.extensions.maybeResourceId
 import com.absinthe.libchecker.utils.extensions.toClassDefType
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.manifest.ApplicationReader
-import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.Rule
 import java.io.File
 import java.text.SimpleDateFormat
@@ -373,7 +373,7 @@ class DetailViewModel : ViewModel() {
             if (ruleCache.containsKey(key)) {
               return ruleCache[key]
             }
-            return LCRules.getRule(name, type, regex).also {
+            return RulesRepository.getRule(name, type, regex).also {
               ruleCache[key] = it
             }
           }
@@ -443,7 +443,7 @@ class DetailViewModel : ViewModel() {
 
     val transform: suspend (StatefulComponent, Int) -> LibStringItemChip =
       { item, componentType ->
-        val rule = LCRules.getRule(item.componentName, componentType, true)
+        val rule = RulesRepository.getRule(item.componentName, componentType, true)
           .takeIf { !item.componentName.startsWith(".") }
 
         val source = when {
@@ -513,8 +513,9 @@ class DetailViewModel : ViewModel() {
       val packageName = apkPreviewInfo?.packageName ?: packageInfo.packageName
       val nativeActivityLibNames = getNativeActivityLibNames()
       val preloadNativeLibNames = getZygotePreloadNativeLibNames()
+      val nativeLibNames = list.map { it.name }
       list.forEach {
-        rule = LCAppUtils.getRuleWithRegex(it.name, NATIVE, packageName, list)
+        rule = RulesRepository.getRuleWithRegex(it.name, NATIVE, packageName, nativeLibNames)
         val labels = mutableListOf<String>().apply {
           if (it.name in nativeActivityLibNames) {
             add(NATIVE_ACTIVITY_LABEL)
@@ -598,7 +599,7 @@ class DetailViewModel : ViewModel() {
       return chipList
     } else {
       list.forEach {
-        rule = LCRules.getRule(it.name, STATIC, false)
+        rule = RulesRepository.getRule(it.name, STATIC, false)
         chipList.add(LibStringItemChip(it, rule))
       }
       if (GlobalValues.libSortMode == MODE_SORT_BY_SIZE) {
@@ -679,7 +680,7 @@ class DetailViewModel : ViewModel() {
       return chipList
     } else {
       list.forEach {
-        rule = LCRules.getRule(it.name, DEX, true)
+        rule = RulesRepository.getRule(it.name, DEX, true)
         chipList.add(LibStringItemChip(it, rule))
       }
       if (GlobalValues.libSortMode == MODE_SORT_BY_SIZE) {

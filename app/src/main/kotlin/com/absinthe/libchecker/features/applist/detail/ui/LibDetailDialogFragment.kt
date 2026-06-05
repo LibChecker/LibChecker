@@ -12,6 +12,7 @@ import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
+import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.ui.view.LibDetailBottomSheetView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
@@ -19,7 +20,6 @@ import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
-import com.absinthe.rulesbundle.LCRules
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -47,7 +47,7 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
       title.text = if (type == ACTION) "< $libName >" else libName
       lifecycleScope.launch {
         val rule = if (isValidLib) {
-          LCRules.getRule(libName, type, true)
+          RulesRepository.getRule(libName, type, true)
         } else {
           null
         }

@@ -15,6 +15,7 @@ import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.isComponentType
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.features.applist.detail.ui.LibDetailDialogFragment
 import com.absinthe.libchecker.features.statistics.bean.LibReference
 import com.absinthe.libchecker.features.statistics.ui.adapter.LibReferenceAdapter
@@ -22,7 +23,6 @@ import com.absinthe.libchecker.features.statistics.ui.view.LibReferenceItemView
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.tintHighlightText
-import com.absinthe.rulesbundle.LCRules
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.chad.library.adapter.base.provider.BaseNodeProvider
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
@@ -101,7 +101,7 @@ class LibReferenceProvider : BaseNodeProvider() {
         val name = ref.libName
 
         (context as? LifecycleOwner)?.lifecycleScope?.launch(Dispatchers.IO) {
-          val regexName = LCRules.getRule(name, ref.type, true)?.regexName
+          val regexName = RulesRepository.getRule(name, ref.type, true)?.regexName
 
           withContext(Dispatchers.Main) {
             (context as BaseActivity<*>).findViewById<View>(androidx.appcompat.R.id.search_src_text)?.clearFocus()

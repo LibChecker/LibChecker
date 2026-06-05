@@ -10,19 +10,11 @@ import androidx.core.text.buildSpannedString
 import androidx.core.text.toSpannable
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.annotation.LibType
-import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
 import com.absinthe.libchecker.features.snapshot.detail.bean.SnapshotDiffItem
 import com.absinthe.libchecker.features.snapshot.ui.adapter.ARROW
 import com.absinthe.libchecker.features.snapshot.ui.adapter.ARROW_REVERT
-import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.utils.extensions.getDrawable
-import com.absinthe.libchecker.utils.extensions.isTempApk
-import com.absinthe.libchecker.utils.extensions.toClassDefType
-import com.absinthe.rulesbundle.LCRules
-import com.absinthe.rulesbundle.Rule
-import java.io.File
 
 object LCAppUtils {
 
@@ -56,92 +48,6 @@ object LCAppUtils {
       sb.append(" ")
     }
     return sb.toSpannable()
-  }
-
-  suspend fun getRuleWithRegex(
-    name: String,
-    @LibType type: Int,
-    packageName: String? = null,
-    nativeLibs: List<LibStringItem>? = null
-  ): Rule? {
-    val ruleEntity = LCRules.getRule(name, type, true) ?: return null
-    if (type != NATIVE || packageName == null) {
-      return ruleEntity
-    }
-
-    if (packageName.isTempApk()) {
-      File(packageName)
-    } else {
-      runCatching {
-        File(PackageUtils.getPackageInfo(packageName).applicationInfo!!.sourceDir)
-      }.getOrNull()
-    } ?: return ruleEntity
-
-    if (!checkNativeLibValidation(packageName, name, nativeLibs)) {
-      return null
-    }
-    return ruleEntity
-  }
-
-  private val NATIVE_SET_QIHOO = setOf("libjiagu.so", "libjiagu_a64.so", "libjiagu_x86.so", "libjiagu_x64.so")
-  private val NATIVE_SET_SECNEO = setOf("libDexHelper.so", "libDexHelper-x86.so", "libdexjni.so")
-  private val NATIVE_SET_FLUTTER = setOf("libapp.so")
-  private val NATIVE_SET_UNITY = setOf("libmain.so")
-  private val NATIVE_ALL = NATIVE_SET_QIHOO + NATIVE_SET_SECNEO + NATIVE_SET_FLUTTER + NATIVE_SET_UNITY
-
-  fun checkNativeLibValidation(
-    packageName: String,
-    nativeLib: String,
-    otherNativeLibs: List<LibStringItem>? = null
-  ): Boolean {
-    if (!NATIVE_ALL.contains(nativeLib)) return true
-    val sourceDir = PackageUtils.getPackageInfo(packageName).applicationInfo?.sourceDir ?: return false
-    val source = File(sourceDir)
-    return when {
-      NATIVE_SET_QIHOO.contains(nativeLib) -> {
-        runCatching {
-          PackageUtils.findDexClasses(
-            source,
-            listOf(
-              "com.qihoo.util.*".toClassDefType(),
-              "com.tianyu.util.*".toClassDefType()
-            ),
-            hasAny = true
-          ).isNotEmpty()
-        }.getOrDefault(false)
-      }
-
-      NATIVE_SET_SECNEO.contains(nativeLib) -> {
-        runCatching {
-          PackageUtils.findDexClasses(
-            source,
-            listOf(
-              "com.secneo.apkwrapper.*".toClassDefType()
-            )
-          ).isNotEmpty()
-        }.getOrDefault(false)
-      }
-
-      NATIVE_SET_FLUTTER.contains(nativeLib) -> {
-        runCatching {
-          otherNativeLibs?.any { it.name == "libflutter.so" } == true ||
-            PackageUtils.findDexClasses(
-              source,
-              listOf(
-                "io.flutter.FlutterInjector".toClassDefType()
-              )
-            ).isNotEmpty()
-        }.getOrDefault(false)
-      }
-
-      NATIVE_SET_UNITY.contains(nativeLib) -> {
-        runCatching {
-          otherNativeLibs?.any { it.name == "libunity.so" } == true
-        }.getOrDefault(false)
-      }
-
-      else -> true
-    }
   }
 
   fun <T> getDiffString(

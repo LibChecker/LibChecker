@@ -37,6 +37,7 @@ import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.data.app.PackageChangeState
 import com.absinthe.libchecker.database.Repositories
+import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.features.statistics.bean.LibReference
 import com.absinthe.libchecker.services.IWorkerService
@@ -57,7 +58,6 @@ import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import com.absinthe.rulesbundle.IconResMap
-import com.absinthe.rulesbundle.LCRules
 import java.io.File
 import java.io.OutputStream
 import java.text.SimpleDateFormat
@@ -482,9 +482,10 @@ class HomeViewModel : ViewModel() {
         NATIVE -> {
           val packageInfo = PackageUtils.getPackageInfo(packageName)
           val list = PackageUtils.getNativeDirLibs(packageInfo)
+          val nativeLibNames = list.map { it.name }
           val mapped =
             list.asSequence()
-              .filter { LCAppUtils.checkNativeLibValidation(packageName, it.name, list) }
+              .filter { RulesRepository.checkNativeLibValidation(packageName, it.name, nativeLibNames) }
               .map { it.name }
           computeReferenceInternal(
             referenceMap,
@@ -675,7 +676,7 @@ class HomeViewModel : ViewModel() {
           if (entry.value.first.size >= threshold && entry.key.isNotBlank()) {
             val ruleType = if (entry.value.second == ACTION) ACTION_IN_RULES else entry.value.second
             val rule = if (entry.value.second != PERMISSION && entry.value.second != METADATA) {
-              LCRules.getRule(entry.key, ruleType, true)
+              RulesRepository.getRule(entry.key, ruleType, true)
             } else {
               null
             }
