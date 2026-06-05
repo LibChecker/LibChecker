@@ -57,8 +57,9 @@ object MainLooperFilter {
       Timber.w(e)
       LibCheckerApp.app.showToast("Encounter Xposed module crash")
     } else if (RulesRepository.isMissingRulesTableStack(stack)) {
+      Timber.w(e)
       RulesRepository.deleteDatabase()
-      throw e
+      RulesRepository.reinitialize()
     } else {
       throw e
     }
