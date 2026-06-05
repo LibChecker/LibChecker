@@ -33,7 +33,7 @@ public class HiddenPermissionsReader {
         }
       });
     } catch (Exception e) {
-      Timber.e(e);
+      Timber.w(e);
     }
   }
 
