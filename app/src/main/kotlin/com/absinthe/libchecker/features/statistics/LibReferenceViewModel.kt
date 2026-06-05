@@ -15,10 +15,10 @@ import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
+import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.utils.IntentFilterUtils
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -73,7 +73,7 @@ class LibReferenceViewModel : ViewModel() {
               .getOrDefault(emptyList())
 
             natives.find { it.name == name }?.run {
-              if (LCAppUtils.checkNativeLibValidation(item.packageName, name)) {
+              if (RulesRepository.checkNativeLibValidation(item.packageName, name)) {
                 list.add(item)
               }
             }
