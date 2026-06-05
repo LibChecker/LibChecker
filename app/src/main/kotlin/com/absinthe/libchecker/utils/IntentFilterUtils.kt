@@ -34,7 +34,7 @@ object IntentFilterUtils {
         PackageManager.GET_ACTIVITIES or PackageManager.GET_RECEIVERS or PackageManager.GET_SERVICES
       )
     }.onFailure {
-      Timber.e(it)
+      Timber.w(it, "Failed to parse intent filters from APK: $apkPath")
     }.getOrNull() ?: return emptyList()
 
     val allComponents = mutableListOf<Pair<Int, List<PackageParser.Component<*>>>>()
