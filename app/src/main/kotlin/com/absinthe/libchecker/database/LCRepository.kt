@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.database
 
+import android.database.sqlite.SQLiteBlobTooBigException
 import android.view.ContextThemeWrapper
 import androidx.appcompat.app.AlertDialog
 import com.absinthe.libchecker.constant.GlobalValues
@@ -16,8 +17,8 @@ import timber.log.Timber
 
 class LCRepository(private val lcDao: LCDao) {
   val allLCItemsFlow: Flow<List<LCItem>> = lcDao.getItemsFlow()
-  val allSnapshotItemsFlow: Flow<List<SnapshotItem>> =
-    lcDao.getSnapshotsFlow(GlobalValues.snapshotTimestamp)
+  val allSnapshotItemsFlow: Flow<Int> =
+    lcDao.getSnapshotsCountFlow(GlobalValues.snapshotTimestamp)
 
   private fun checkDatabaseStatus(): Boolean {
     if (LCDatabase.isClosed()) {
@@ -39,11 +40,32 @@ class LCRepository(private val lcDao: LCDao) {
     return lcDao.getItem(packageName)
   }
 
-  suspend fun getSnapshots() = lcDao.getSnapshots()
+  suspend fun getSnapshots(): List<SnapshotItem> {
+    return try {
+      lcDao.getSnapshots()
+    } catch (e: SQLiteBlobTooBigException) {
+      Timber.w(e, "Snapshot rows are too large, fallback to summaries")
+      lcDao.getSnapshotSummaries().map { it.toSnapshotItem() }
+    }
+  }
 
-  suspend fun getSnapshots(timestamp: Long) = lcDao.getSnapshots(timestamp)
+  suspend fun getSnapshots(timestamp: Long): List<SnapshotItem> {
+    return try {
+      lcDao.getSnapshots(timestamp)
+    } catch (e: SQLiteBlobTooBigException) {
+      Timber.w(e, "Snapshot rows are too large, fallback to summaries: $timestamp")
+      lcDao.getSnapshotSummaries(timestamp).map { it.toSnapshotItem() }
+    }
+  }
 
-  suspend fun getSnapshot(timestamp: Long, packageName: String) = lcDao.getSnapshot(timestamp, packageName)
+  suspend fun getSnapshot(timestamp: Long, packageName: String): SnapshotItem? {
+    return try {
+      lcDao.getSnapshot(timestamp, packageName)
+    } catch (e: SQLiteBlobTooBigException) {
+      Timber.w(e, "Snapshot row is too large, fallback to summary: $timestamp, $packageName")
+      lcDao.getSnapshotSummary(timestamp, packageName)?.toSnapshotItem()
+    }
+  }
 
   fun getTimeStamps(): List<TimeStampItem> = lcDao.getTimeStamps()
 

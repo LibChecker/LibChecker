@@ -10,6 +10,7 @@ import androidx.room.Update
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.SnapshotDiffStoringItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
+import com.absinthe.libchecker.database.entity.SnapshotSummaryItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.database.entity.TrackItem
 import kotlinx.coroutines.flow.Flow
@@ -61,16 +62,24 @@ interface LCDao {
   @Query("SELECT * from snapshot_table ORDER BY packageName ASC")
   suspend fun getSnapshots(): List<SnapshotItem>
 
+  @Query("SELECT id, packageName, timeStamp, label, versionName, versionCode, installedTime, lastUpdatedTime, isSystem, abi, targetApi, packageSize, compileSdk, minSdk from snapshot_table ORDER BY packageName ASC")
+  suspend fun getSnapshotSummaries(): List<SnapshotSummaryItem>
+
   @Transaction
   @Query("SELECT * from snapshot_table WHERE timeStamp LIKE :timestamp ORDER BY packageName ASC")
   suspend fun getSnapshots(timestamp: Long): List<SnapshotItem>
 
+  @Query("SELECT id, packageName, timeStamp, label, versionName, versionCode, installedTime, lastUpdatedTime, isSystem, abi, targetApi, packageSize, compileSdk, minSdk from snapshot_table WHERE timeStamp LIKE :timestamp ORDER BY packageName ASC")
+  suspend fun getSnapshotSummaries(timestamp: Long): List<SnapshotSummaryItem>
+
   @Query("SELECT * from snapshot_table WHERE timeStamp LIKE :timestamp AND packageName LIKE :packageName ORDER BY packageName ASC")
   suspend fun getSnapshot(timestamp: Long, packageName: String): SnapshotItem?
 
-  @Transaction
-  @Query("SELECT * from snapshot_table WHERE timeStamp LIKE :timestamp ORDER BY packageName ASC")
-  fun getSnapshotsFlow(timestamp: Long): Flow<List<SnapshotItem>>
+  @Query("SELECT id, packageName, timeStamp, label, versionName, versionCode, installedTime, lastUpdatedTime, isSystem, abi, targetApi, packageSize, compileSdk, minSdk from snapshot_table WHERE timeStamp LIKE :timestamp AND packageName LIKE :packageName ORDER BY packageName ASC")
+  suspend fun getSnapshotSummary(timestamp: Long, packageName: String): SnapshotSummaryItem?
+
+  @Query("SELECT COUNT(*) from snapshot_table WHERE timeStamp LIKE :timestamp")
+  fun getSnapshotsCountFlow(timestamp: Long): Flow<Int>
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   suspend fun insert(item: SnapshotItem)
