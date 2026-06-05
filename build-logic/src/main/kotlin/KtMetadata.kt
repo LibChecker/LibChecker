@@ -5,7 +5,9 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -25,7 +27,8 @@ fun Project.includeKotlinToolingMetadataInApk() {
           "include${capName}KotlinToolingMetadataInApk",
           CopyKotlinToolingMetadataForApkTask::class.java
         ) {
-          inputDirectory.set(metadataTask.flatMap { layout.buildDirectory.dir("kotlinToolingMetadata") })
+          dependsOn(metadataTask)
+          inputFile.set(layout.buildDirectory.file("kotlinToolingMetadata/kotlin-tooling-metadata.json"))
         }
 
         variant.artifacts
@@ -46,18 +49,23 @@ private fun Project.getKotlinToolingMetadataTaskProvider(): TaskProvider<out Tas
 }
 
 abstract class CopyKotlinToolingMetadataForApkTask : DefaultTask() {
-  @get:InputDirectory
+  @get:InputFile
+  @get:Optional
   @get:PathSensitive(PathSensitivity.RELATIVE)
-  abstract val inputDirectory: DirectoryProperty
+  abstract val inputFile: RegularFileProperty
 
   @get:OutputDirectory
   abstract val outputDirectory: DirectoryProperty
 
   @TaskAction
   fun run() {
-    val input = inputDirectory.file("kotlin-tooling-metadata.json").get().asFile
+    val input = inputFile.get().asFile
+    val outputDir = outputDirectory.get().asFile
+    outputDir.mkdirs()
+    if (!input.isFile) {
+      return
+    }
     val output = outputDirectory.file("kotlin-tooling-metadata.json").get().asFile
-    output.parentFile.mkdirs()
     input.copyTo(output, overwrite = true)
   }
 }

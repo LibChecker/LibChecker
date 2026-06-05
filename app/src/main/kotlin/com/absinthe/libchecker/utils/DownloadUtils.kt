@@ -35,15 +35,11 @@ object DownloadUtils {
         }
         file.createNewFile()
         runCatching {
-          response.body?.let { body ->
-            body.byteStream().source().buffer().use { input ->
-              file.sink().buffer().use { output ->
-                output.writeAll(input)
-                listener.onDownloadSuccess()
-              }
+          response.body.byteStream().source().buffer().use { input ->
+            file.sink().buffer().use { output ->
+              output.writeAll(input)
+              listener.onDownloadSuccess()
             }
-          } ?: run {
-            listener.onDownloadFailed()
           }
         }.onFailure {
           listener.onDownloadFailed()

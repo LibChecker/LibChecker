@@ -9,17 +9,14 @@ internal sealed interface IBinding<VB : ViewBinding> {
   val binding: VB
 
   fun <T : ViewBinding> inflateBinding(inflater: LayoutInflater): T {
-    var method: Method?
-    var clazz: Class<*> = javaClass
-    while (clazz.superclass != null) {
-      method = clazz.filterBindingMethod()
-      if (method == null) {
-        @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
-        clazz = clazz.superclass
-      } else {
+    var clazz: Class<*>? = javaClass
+    while (clazz != null) {
+      val method = clazz.filterBindingMethod()
+      if (method != null) {
         @Suppress("UNCHECKED_CAST")
         return method.invoke(null, inflater) as T
       }
+      clazz = clazz.superclass
     }
     error("No Binding type argument found.")
   }
