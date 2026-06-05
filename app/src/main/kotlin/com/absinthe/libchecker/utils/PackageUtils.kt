@@ -316,44 +316,52 @@ object PackageUtils {
     val timeRecorder = TimeRecorder()
 
     if (ENABLE_GET_APK_FILE_LIBS_LOG) timeRecorder.start()
-    val getDataOffsetMethod = ZipFile::class.java.getDeclaredMethod("getDataOffset", ZipArchiveEntry::class.java).apply {
-      isAccessible = true
-    }
-    ZipFile.Builder().setFile(file).get().use { zipFile ->
-      zipFile.entries
-        .asSequence()
-        .filter { !it.isDirectory && it.name.endsWith(".so") && (sourceDir == null || it.name.startsWith(sourceDir)) }
-        .forEach { entry ->
-          val pathFirst = entry.name.split(File.separator).first()
-          val dir = STRING_ABI_MAP.keys.find { entry.name.startsWith(libDir + File.separator + it) }
-            ?: if (pathFirst == assetsDir) assetsDir else return@forEach
-          val offset = getDataOffsetMethod.invoke(zipFile, entry) as Long
+    try {
+      val getDataOffsetMethod = ZipFile::class.java.getDeclaredMethod("getDataOffset", ZipArchiveEntry::class.java).apply {
+        isAccessible = true
+      }
+      ZipFile.Builder().setFile(file).get().use { zipFile ->
+        zipFile.entries
+          .asSequence()
+          .filter { !it.isDirectory && it.name.endsWith(".so") && (sourceDir == null || it.name.startsWith(sourceDir)) }
+          .forEach { entry ->
+            val pathFirst = entry.name.split(File.separator).first()
+            val dir = STRING_ABI_MAP.keys.find { entry.name.startsWith(libDir + File.separator + it) }
+              ?: if (pathFirst == assetsDir) assetsDir else return@forEach
+            val offset = getDataOffsetMethod.invoke(zipFile, entry) as Long
 
-          val currentEntryZipAlignment = if (entry.method == ZipEntry.STORED) {
-            getZipAlignment(offset)
-          } else {
-            -1
-          }
-          val elfParser = runCatching {
-            ElfParser(zipFile.getInputStream(entry)).use { parser ->
-              parser.parseHeader()
-              parser
+            val currentEntryZipAlignment = if (entry.method == ZipEntry.STORED) {
+              getZipAlignment(offset)
+            } else {
+              -1
             }
-          }.getOrNull()
+            val elfParser = runCatching {
+              ElfParser(zipFile.getInputStream(entry)).use { parser ->
+                parser.parseHeader()
+                parser
+              }
+            }.getOrNull()
 
-          val item = LibStringItem(
-            name = entry.name.split(File.separator).last(),
-            size = entry.size,
-            elfInfo = ElfInfo(
-              elfParser?.getEType() ?: ET_NOT_ELF,
-              elfParser?.getMinPageSize() ?: -1,
-              zipAlignment = currentEntryZipAlignment
-            ),
-            source = entry.name,
-            process = file.name
-          )
-          map.getOrPut(dir) { mutableListOf() }.add(item)
-        }
+            val item = LibStringItem(
+              name = entry.name.split(File.separator).last(),
+              size = entry.size,
+              elfInfo = ElfInfo(
+                elfParser?.getEType() ?: ET_NOT_ELF,
+                elfParser?.getMinPageSize() ?: -1,
+                zipAlignment = currentEntryZipAlignment
+              ),
+              source = entry.name,
+              process = file.name
+            )
+            map.getOrPut(dir) { mutableListOf() }.add(item)
+          }
+      }
+    } catch (e: OutOfMemoryError) {
+      logApkFileLibsFailure(file, parseElf = true, e)
+      return emptyMap()
+    } catch (e: Exception) {
+      logApkFileLibsFailure(file, parseElf = true, e)
+      return getApkFileLibsWithoutParsingElf(file, specifiedAbi)
     }
     if (ENABLE_GET_APK_FILE_LIBS_LOG) {
       timeRecorder.end()
@@ -378,26 +386,38 @@ object PackageUtils {
     val sourceDir = specifiedAbi?.let { libDir + File.separator + ABI_STRING_MAP[it % MULTI_ARCH] }
     val map = mutableMapOf<String, MutableList<LibStringItem>>()
 
-    ZipFileCompat(file).use { zipFile ->
-      zipFile.getZipEntries()
-        .asSequence()
-        .filter {
-          it.isDirectory.not() && it.name.endsWith(".so") && (sourceDir == null || it.name.startsWith(sourceDir))
-        }
-        .forEach { entry ->
-          val pathFirst = entry.name.split(File.separator).first()
-          val dir = STRING_ABI_MAP.keys.find { entry.name.startsWith(libDir + File.separator + it) }
-            ?: if (pathFirst == assetsDir) assetsDir else return@forEach
-          val item = LibStringItem(
-            name = entry.name.split(File.separator).last(),
-            size = entry.size,
-            elfInfo = ElfInfo()
-          )
-          map.getOrPut(dir) { mutableListOf() }.add(item)
-        }
+    try {
+      ZipFileCompat(file).use { zipFile ->
+        zipFile.getZipEntries()
+          .asSequence()
+          .filter {
+            it.isDirectory.not() && it.name.endsWith(".so") && (sourceDir == null || it.name.startsWith(sourceDir))
+          }
+          .forEach { entry ->
+            val pathFirst = entry.name.split(File.separator).first()
+            val dir = STRING_ABI_MAP.keys.find { entry.name.startsWith(libDir + File.separator + it) }
+              ?: if (pathFirst == assetsDir) assetsDir else return@forEach
+            val item = LibStringItem(
+              name = entry.name.split(File.separator).last(),
+              size = entry.size,
+              elfInfo = ElfInfo()
+            )
+            map.getOrPut(dir) { mutableListOf() }.add(item)
+          }
+      }
+    } catch (e: OutOfMemoryError) {
+      logApkFileLibsFailure(file, parseElf = false, e)
+      return emptyMap()
+    } catch (e: Exception) {
+      logApkFileLibsFailure(file, parseElf = false, e)
+      return emptyMap()
     }
 
     return map
+  }
+
+  private fun logApkFileLibsFailure(file: File, parseElf: Boolean, throwable: Throwable) {
+    Timber.w(throwable, "Failed to parse native libs from ${file.absolutePath}, parseElf=$parseElf")
   }
 
   /**
