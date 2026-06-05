@@ -499,7 +499,7 @@ class DetailViewModel : ViewModel() {
     return runCatching {
       request.requestLibDetail(categoryDir, libPath)
     }.onFailure {
-      Timber.e(it)
+      Timber.w(it, "Failed to request lib detail: $categoryDir/$libPath")
     }.getOrNull()
   }
 
