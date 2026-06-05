@@ -144,10 +144,14 @@ abstract class BaseAppDetailActivity :
   private var isToolbarCollapsed = false
   private var featureListView: RecyclerView? = null
   private var processBarView: ProcessBarView? = null
+  private var tabLayoutMediator: TabLayoutMediator? = null
+  private var pageChangeCallback: ViewPager2.OnPageChangeCallback? = null
+  private var packageUiGeneration = 0
 
   override fun onCreate(savedInstanceState: Bundle?) {
     binding = ActivityAppDetailBinding.inflate(layoutInflater)
     super.onCreate(savedInstanceState)
+    binding.viewpager.isSaveEnabled = false
     addMenuProvider(this, this, Lifecycle.State.CREATED)
     setSupportActionBar(getToolbar())
     binding.toolbar.isBackInvokedCallbackEnabled = false
@@ -163,7 +167,16 @@ abstract class BaseAppDetailActivity :
     initObserver()
   }
 
+  override fun onDestroy() {
+    tabLayoutMediator?.detach()
+    tabLayoutMediator = null
+    pageChangeCallback?.let { binding.viewpager.unregisterOnPageChangeCallback(it) }
+    pageChangeCallback = null
+    super.onDestroy()
+  }
+
   protected fun onPackageInfoAvailable(packageInfo: PackageInfo, extraBean: DetailExtraBean?) {
+    val uiGeneration = ++packageUiGeneration
     resetUiState()
     viewModel.reset()
     val ai = packageInfo.applicationInfo
@@ -390,6 +403,7 @@ abstract class BaseAppDetailActivity :
           adapter = toolbarAdapter
           layoutManager =
             LinearLayoutManager(this@BaseAppDetailActivity, RecyclerView.HORIZONTAL, false)
+          itemAnimator = null
         }
       }
 
@@ -468,13 +482,12 @@ abstract class BaseAppDetailActivity :
         }.getOrDefault(emptyList())
         if (libs.isNotEmpty()) {
           withContext(Dispatchers.Main) {
+            if (uiGeneration != packageUiGeneration || STATIC in typeList) {
+              return@withContext
+            }
             typeList.add(1, STATIC)
             tabTitles.add(1, getText(R.string.ref_category_static))
-            binding.tabLayout.addTab(
-              binding.tabLayout.newTab()
-                .also { it.text = getText(R.string.ref_category_static) },
-              1
-            )
+            binding.viewpager.adapter?.notifyItemInserted(1)
             onStaticLibsAvailable()
           }
         }
@@ -488,7 +501,7 @@ abstract class BaseAppDetailActivity :
         }
 
         override fun createFragment(position: Int): Fragment {
-          return when (val type = typeList[position]) {
+          return when (val type = typeList.getOrElse(position) { NATIVE }) {
             NATIVE -> NativeAnalysisFragment.newInstance(packageName)
 
             STATIC -> StaticAnalysisFragment.newInstance(packageName)
@@ -508,17 +521,25 @@ abstract class BaseAppDetailActivity :
             }
           }
         }
+
+        override fun getItemId(position: Int): Long {
+          return typeList.getOrElse(position) { NATIVE }.toLong()
+        }
+
+        override fun containsItem(itemId: Long): Boolean {
+          return typeList.any { it.toLong() == itemId }
+        }
       }
-      registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+      pageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
           super.onPageSelected(position)
-          if (typeList[position] == NATIVE) {
+          if (typeList.getOrNull(position) == NATIVE) {
             toolbarProcessItem.tooltipTextRes = R.string.menu_split
           } else {
             toolbarProcessItem.tooltipTextRes = R.string.menu_process
           }
         }
-      })
+      }.also { registerOnPageChangeCallback(it) }
     }
     binding.tabLayout.apply {
       removeAllTabs()
@@ -527,12 +548,13 @@ abstract class BaseAppDetailActivity :
       }
       addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
         override fun onTabSelected(tab: TabLayout.Tab) {
-          val count = viewModel.itemsCountList[typeList[tab.position]]
+          val type = typeList.getOrNull(tab.position) ?: return
+          val count = viewModel.itemsCountList[type]
           if (detailFragmentManager.currentItemsCount != count) {
             binding.tsComponentCount.setText(count.toString())
             detailFragmentManager.currentItemsCount = count
           }
-          detailFragmentManager.selectedPosition = typeList[tab.position]
+          detailFragmentManager.selectedPosition = type
         }
 
         override fun onTabUnselected(tab: TabLayout.Tab?) {}
@@ -541,11 +563,10 @@ abstract class BaseAppDetailActivity :
       })
     }
 
-    val mediator =
+    tabLayoutMediator =
       TabLayoutMediator(binding.tabLayout, binding.viewpager) { tab, position ->
-        tab.text = tabTitles[position]
-      }
-    mediator.attach()
+        tab.text = tabTitles.getOrNull(position)
+      }.also { it.attach() }
 
     if (featureListView == null) {
       if (viewModel.isApkPreview) {
@@ -848,6 +869,12 @@ abstract class BaseAppDetailActivity :
   }
 
   private fun resetUiState() {
+    tabLayoutMediator?.detach()
+    tabLayoutMediator = null
+    pageChangeCallback?.let { binding.viewpager.unregisterOnPageChangeCallback(it) }
+    pageChangeCallback = null
+    binding.viewpager.adapter = null
+    binding.tabLayout.clearOnTabSelectedListeners()
     removeFeatureListView()
     featureAdapter.setList(emptyList())
     toolbarAdapter.setList(emptyList())
@@ -868,6 +895,7 @@ abstract class BaseAppDetailActivity :
       it.addItemDecoration(HorizontalSpacesItemDecoration(4.dp))
       it.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
       it.adapter = featureAdapter
+      it.itemAnimator = null
       it.clipChildren = false
       it.clipToPadding = false
       it.overScrollMode = View.OVER_SCROLL_NEVER

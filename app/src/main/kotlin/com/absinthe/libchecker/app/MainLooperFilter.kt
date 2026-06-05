@@ -37,7 +37,10 @@ object MainLooperFilter {
     "tryGetViewHolderForPositionByDeadline",
     "trying to unhide a view that was not hidden",
     "updateForceDarkMode",
+    "Called attach on a child which is not detached",
     "Expected the adapter to be 'fresh' while restoring state",
+    "Fragment no longer exists for key",
+    "Tmp detached view should be removed from RecyclerView",
     BaseGmsClient::class.java.name
   )
 
