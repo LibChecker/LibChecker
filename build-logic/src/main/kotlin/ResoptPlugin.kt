@@ -1,11 +1,11 @@
 import com.android.build.api.dsl.CommonExtension
-import com.android.build.api.variant.AndroidComponentsExtension
-import com.android.build.gradle.api.AndroidBasePlugin
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import java.nio.file.Paths
 import javax.inject.Inject
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.file.FileSystemOperations
+import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.newInstance
 import org.gradle.process.ExecOperations
 
@@ -20,52 +20,57 @@ interface Injected {
 class ResoptPlugin : Plugin<Project> {
   @Suppress("NewApi")
   override fun apply(project: Project) {
-    project.plugins.withType(AndroidBasePlugin::class.java) {
-      project.extensions.configure(AndroidComponentsExtension::class.java) {
-        onVariants { variant ->
-          if (variant.buildType != "release") return@onVariants
-          val name = variant.name
-          val ext = project.extensions.getByType(CommonExtension::class.java)
-          val aapt2 = Paths.get(
-            sdkComponents.sdkDirectory.get().toString(), "build-tools", ext.buildToolsVersion, "aapt2"
-          )
-          val workdir = Paths.get(
-            project.layout.buildDirectory.get().toString(), "intermediates", "optimized_processed_res", name, "optimize${name.replaceFirstChar { it.uppercase() }}Resources"
-          ).toFile()
-          val cfg = Paths.get(
-            project.layout.projectDirectory.toString(), "aapt2-resources.cfg"
-          ).toFile()
-          val zip =
-            if (variant.flavorName.isNullOrEmpty()) "resources-${variant.buildType}-optimize.ap_" else "resources-${variant.flavorName}-${variant.buildType}-optimize.ap_"
-          val optimized = "$zip.opt"
-          project.afterEvaluate {
-            val injected = objects.newInstance<Injected>()
-            tasks.getByPath("optimize${name.replaceFirstChar { c -> c.uppercase() }}Resources").doLast {
-              val cmd = injected.exec.exec {
-                commandLine(
-                  aapt2,
-                  "optimize",
-                  "--collapse-resource-names",
-                  "--resources-config-path", cfg.path,
-                  "-o",
-                  optimized,
-                  zip
-                )
-                workingDir = workdir
-                isIgnoreExitValue = true
+    project.plugins.withId("com.android.application") {
+      val androidComponents = project.extensions.getByType<ApplicationAndroidComponentsExtension>()
+      val androidExtension = project.extensions.getByType(CommonExtension::class.java)
+      val injected = project.objects.newInstance<Injected>()
+
+      androidComponents.onVariants(androidComponents.selector().withBuildType("release")) { variant ->
+        val name = variant.name
+        val capName = name.replaceFirstChar { it.uppercase() }
+        val optimizeTaskName = "optimize${capName}Resources"
+        val aapt2 = androidComponents.sdkComponents.sdkDirectory.map {
+          Paths.get(it.asFile.toString(), "build-tools", androidExtension.buildToolsVersion, "aapt2").toFile()
+        }
+        val workdir = project.layout.buildDirectory.dir(
+          "intermediates/optimized_processed_res/$name/$optimizeTaskName"
+        )
+        val cfg = project.layout.projectDirectory.file("aapt2-resources.cfg")
+        val zip =
+          if (variant.flavorName.isNullOrEmpty()) {
+            "resources-${variant.buildType}-optimize.ap_"
+          } else {
+            "resources-${variant.flavorName}-${variant.buildType}-optimize.ap_"
+          }
+        val optimized = "$zip.opt"
+
+        project.tasks.matching { it.name == optimizeTaskName }.configureEach {
+          doLast {
+            val workdirFile = workdir.get().asFile
+            val cmd = injected.exec.exec {
+              commandLine(
+                aapt2.get(),
+                "optimize",
+                "--collapse-resource-names",
+                "--resources-config-path", cfg.asFile.path,
+                "-o",
+                optimized,
+                zip
+              )
+              workingDir = workdirFile
+              isIgnoreExitValue = true
+            }
+            if (cmd.exitValue == 0) {
+              injected.fs.copy {
+                from(workdirFile.resolve(optimized))
+                rename { zip }
+                into(workdirFile)
               }
-              if (cmd.exitValue == 0) {
-                injected.fs.copy {
-                  from(workdir.resolve(optimized))
-                  rename { zip }
-                  into(workdir)
-                }
-                injected.fs.delete {
-                  delete(workdir.resolve(optimized))
-                }
-              } else {
-                println("Failed to optimize $name resources")
+              injected.fs.delete {
+                delete(workdirFile.resolve(optimized))
               }
+            } else {
+              println("Failed to optimize $name resources")
             }
           }
         }

@@ -6,6 +6,7 @@ androidX-room = "2.8.4"
 firebase-bom = "34.14.0"
 hiddenApiRefine = "4.4.0"
 kotlin = "2.4.0"
+ktlint = "1.8.0"
 protoc = "4.35.0"
 shizuku = "13.1.5"
 square-retrofit = "3.0.0"
@@ -27,6 +28,7 @@ aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin.android", version.re
 [libraries]
 gradlePlugin-android = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 gradlePlugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+gradlePlugin-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradle", version = "8.6.0" }
 
 kotlinX-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0"
 
@@ -91,7 +93,7 @@ processPhoenix = "com.jakewharton:process-phoenix:3.0.0"
 timber = "com.jakewharton.timber:timber:5.0.1"
 zhaobozhen-axml = { module = "com.github.zhaobozhen.libraries:axml", version.ref = "zhaobozhen" }
 zhaobozhen-utils = { module = "com.github.zhaobozhen.libraries:utils", version.ref = "zhaobozhen" }
-ktlint = "com.pinterest.ktlint:ktlint-cli:1.8.0"
+ktlint = { module = "com.pinterest.ktlint:ktlint-cli", version.ref = "ktlint" }
 
 [bundles]
 androidX-lifecycle = [
