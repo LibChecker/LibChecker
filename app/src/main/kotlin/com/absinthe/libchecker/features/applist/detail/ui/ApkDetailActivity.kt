@@ -186,7 +186,7 @@ class ApkDetailActivity :
 
     lifecycleScope.launch(Dispatchers.IO) {
       val previewInfo = ApkPreview(url).parse().onFailure {
-        Timber.e(it)
+        Timber.w(it, "Failed to preview APK from URL: $url")
         withContext(Dispatchers.Main) {
           Toasty.showLong(this@ApkDetailActivity, it.toString())
           finish()
