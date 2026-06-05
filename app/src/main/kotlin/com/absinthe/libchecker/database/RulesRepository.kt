@@ -1,25 +1,89 @@
 package com.absinthe.libchecker.database
 
+import android.content.Context
 import android.database.sqlite.SQLiteException
 import android.os.SystemClock
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.isTempApk
+import com.absinthe.libchecker.utils.extensions.md5
 import com.absinthe.libchecker.utils.extensions.toClassDefType
+import com.absinthe.rulesbundle.LCRemoteRepo
 import com.absinthe.rulesbundle.LCRules
+import com.absinthe.rulesbundle.Repositories as RulesBundleRepo
 import com.absinthe.rulesbundle.Rule
 import java.io.File
+import rikka.core.os.FileUtils as RikkaFileUtils
 import timber.log.Timber
 
 object RulesRepository {
 
   private const val MISSING_RULES_TABLE_MESSAGE = "no such table: rules_table"
   private const val RECOVERY_THROTTLE_MS = 2_000L
+  private const val RULES_DB_FILE_NAME = "rules.db"
 
   private val recoveryLock = Any()
   private var lastRecoveryUptime = 0L
+
+  fun init(context: Context) {
+    LCRules.init(context)
+    setRemoteRepo(GlobalValues.repo)
+  }
+
+  fun reinitialize() {
+    init(LibCheckerApp.app)
+  }
+
+  fun setRemoteRepo(repo: String) {
+    LCRules.setRemoteRepo(
+      if (repo == Constants.REPO_GITHUB) {
+        LCRemoteRepo.Github
+      } else {
+        LCRemoteRepo.Gitlab
+      }
+    )
+  }
+
+  fun getLocalVersion(context: Context): Int {
+    return RulesBundleRepo.getLocalRulesVersion(context)
+  }
+
+  fun setLocalVersion(context: Context, version: Int) {
+    RulesBundleRepo.setLocalRulesVersion(context, version)
+  }
+
+  fun getDatabaseFile(context: Context = LibCheckerApp.app): File {
+    val databaseDir = context.getDatabasePath(RulesBundleRepo.RULES_DATABASE_NAME).parent
+    return File(databaseDir, RulesBundleRepo.RULES_DATABASE_NAME)
+  }
+
+  fun getDownloadFile(context: Context): File {
+    return File(context.cacheDir, RULES_DB_FILE_NAME)
+  }
+
+  fun replaceDatabase(source: File, context: Context = LibCheckerApp.app): Boolean {
+    LCRules.closeDb()
+    deleteDatabase(context)
+    val target = getDatabaseFile(context)
+    RikkaFileUtils.copy(source, target)
+    return target.md5() == source.md5()
+  }
+
+  fun deleteDatabase(context: Context = LibCheckerApp.app) {
+    val databaseDir = context.getDatabasePath(RulesBundleRepo.RULES_DATABASE_NAME).parent
+    FileUtils.delete(File(databaseDir, RulesBundleRepo.RULES_DATABASE_NAME))
+    FileUtils.delete(File(databaseDir, "${RulesBundleRepo.RULES_DATABASE_NAME}-shm"))
+    FileUtils.delete(File(databaseDir, "${RulesBundleRepo.RULES_DATABASE_NAME}-wal"))
+  }
+
+  fun isMissingRulesTableStack(stack: String): Boolean {
+    return stack.contains(MISSING_RULES_TABLE_MESSAGE)
+  }
 
   suspend fun getRule(name: String, @LibType type: Int, regex: Boolean): Rule? {
     return try {
@@ -136,9 +200,8 @@ object RulesRepository {
       lastRecoveryUptime = now
 
       Timber.w(cause, "Rules database is missing rules_table, rebuilding.")
-      LCRules.closeDb()
-      Repositories.deleteRulesDatabase()
-      LCRules.init(LibCheckerApp.app)
+      deleteDatabase()
+      reinitialize()
     }
   }
 }

@@ -26,13 +26,13 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
-import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.STATUS_INIT_END
 import com.absinthe.libchecker.annotation.STATUS_START_INIT
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.data.app.LocalAppDataSource
+import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.features.applist.ui.AppListFragment
 import com.absinthe.libchecker.features.home.HomeViewModel
@@ -52,7 +52,6 @@ import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.isKeyboardShowing
 import com.absinthe.libchecker.utils.extensions.setCurrentItem
-import com.absinthe.rulesbundle.LCRules
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
@@ -91,7 +90,7 @@ class MainActivity :
 
     if (intent.getBooleanExtra(Constants.PP_FROM_CLOUD_RULES_UPDATE, false)) {
       Timber.w("Reinitializing updated rule database")
-      LCRules.init(LibCheckerApp.app)
+      RulesRepository.reinitialize()
     }
 
     initView()

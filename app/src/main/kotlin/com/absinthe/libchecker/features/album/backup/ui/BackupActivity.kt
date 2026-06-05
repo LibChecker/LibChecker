@@ -30,6 +30,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.Repositories
+import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.database.backup.RoomBackup
 import com.absinthe.libchecker.databinding.ActivityBackupBinding
 import com.absinthe.libchecker.features.home.ui.MainActivity
@@ -165,7 +166,7 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
           val formatted = simpleDateFormat.format(date)
 
           if (StorageUtils.isExternalStorageWritable) {
-            if (FileUtils.getFileSize(Repositories.getLCDatabaseFile()) > 100 * 1024 * 1024) {
+            if (FileUtils.getFileSize(RulesRepository.getDatabaseFile()) > 100 * 1024 * 1024) {
               loadingDialog = UiUtils.createLoadingDialog(requireActivity())
               loadingDialog?.show()
               roomBackup
