@@ -34,7 +34,7 @@ public class StaticLibraryReader {
         }
       });
     } catch (Exception e) {
-      Timber.e(e);
+      Timber.w(e);
     }
   }
 

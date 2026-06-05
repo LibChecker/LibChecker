@@ -43,7 +43,7 @@ public class FullManifestReader {
         }
       });
     } catch (Exception e) {
-      Timber.e(e);
+      Timber.w(e);
     }
   }
 
@@ -59,7 +59,7 @@ public class FullManifestReader {
         }
       });
     } catch (Exception e) {
-      Timber.e(e);
+      Timber.w(e);
     }
   }
 
