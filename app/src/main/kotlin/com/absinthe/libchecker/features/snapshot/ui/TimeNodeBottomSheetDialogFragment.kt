@@ -68,17 +68,35 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
       } else {
         root.adapter.addHeaderView(
           TimeNodeAutoRemoveView(requireContext()).also { autoRemoveView ->
+            fun recordChanged(checked: Boolean) {
+              Telemetry.recordEvent(
+                Constants.Event.SNAPSHOT_ADVANCED_MENU_ITEM_CHANGED,
+                mapOf(
+                  Telemetry.Param.CONTENT to autoRemoveView.chip.text,
+                  Telemetry.Param.VALUE to checked
+                )
+              )
+            }
+
             autoRemoveView.chip.onCheckedChangeListener = { _, checked ->
               autoRemoveView.invalidateText()
               if (checked) {
-                (context as? ContextThemeWrapper)?.let { ctw ->
-                  val dialog = UiUtils.createSnapshotAutoRemoveThresholdDialog(ctw)
-                  dialog.setOnDismissListener {
+                val ctw = context as? ContextThemeWrapper
+                if (ctw == null) {
+                  autoRemoveView.syncWithAutoRemoveThreshold()
+                } else {
+                  var confirmedThreshold: Int? = null
+                  val dialog = UiUtils.createSnapshotAutoRemoveThresholdDialog(ctw) { threshold ->
+                    confirmedThreshold = threshold
                     autoRemoveView.invalidateText()
-                    if (GlobalValues.snapshotAutoRemoveThreshold > 0) {
+                    recordChanged(true)
+                  }
+                  dialog.setOnDismissListener {
+                    autoRemoveView.syncWithAutoRemoveThreshold()
+                    confirmedThreshold?.let { threshold ->
                       lifecycleScope.launch(Dispatchers.IO) {
                         Repositories.lcRepository.retainLatestSnapshotsAndRemoveOld(
-                          count = GlobalValues.snapshotAutoRemoveThreshold,
+                          count = threshold,
                           forceShowLoading = true,
                           context = ctw
                         )
@@ -95,14 +113,9 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
                 }
               } else {
                 GlobalValues.snapshotAutoRemoveThreshold = -1
+                autoRemoveView.invalidateText()
+                recordChanged(false)
               }
-              Telemetry.recordEvent(
-                Constants.Event.SNAPSHOT_ADVANCED_MENU_ITEM_CHANGED,
-                mapOf(
-                  Telemetry.Param.CONTENT to autoRemoveView.chip.text,
-                  Telemetry.Param.VALUE to checked
-                )
-              )
             }
           }
         )
