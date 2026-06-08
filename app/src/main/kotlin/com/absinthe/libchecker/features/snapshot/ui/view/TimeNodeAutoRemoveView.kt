@@ -37,6 +37,14 @@ class TimeNodeAutoRemoveView(context: Context) : AViewGroup(context) {
     }
   }
 
+  fun syncWithAutoRemoveThreshold() {
+    val listener = chip.onCheckedChangeListener
+    chip.onCheckedChangeListener = null
+    chip.isChecked = GlobalValues.snapshotAutoRemoveThreshold > 0
+    chip.onCheckedChangeListener = listener
+    invalidateText()
+  }
+
   override fun generateDefaultLayoutParams(): ViewGroup.LayoutParams {
     return ViewGroup.LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
