@@ -53,6 +53,7 @@ import rikka.widget.borderview.BorderView
 
 const val VF_LOADING = 0
 const val VF_LIST = 1
+private const val SEARCH_UPDATE_DELAY_MILLIS = 160L
 
 class LibReferenceFragment :
   BaseListControllerFragment<FragmentLibReferenceBinding>(),
@@ -381,42 +382,51 @@ class LibReferenceFragment :
       LibReferenceAdapter.highlightText = newText
 
       searchUpdateJob?.cancel()
-      searchUpdateJob = lifecycleScope.launch(Dispatchers.IO) {
-        val savedRefList = homeViewModel.savedRefList ?: return@launch
-        val filter = savedRefList.filter {
-          it.libName.contains(newText, ignoreCase = true) ||
-            it.rule?.label?.contains(
-              newText,
-              ignoreCase = true
-            ) == true
-        }
-        LibReferenceAdapter.highlightText = newText
-
-        if (!isActive) {
-          return@launch
-        }
-        withContext(Dispatchers.Main) {
+      searchUpdateJob = lifecycleScope.launch {
+        var progressBarShown = false
+        try {
+          if (newText.isNotEmpty()) {
+            delay(SEARCH_UPDATE_DELAY_MILLIS)
+          }
           if (isFragmentVisible()) {
             (activity as? INavViewContainer)?.showProgressBar()
+            progressBarShown = true
           }
-          refAdapter.setDiffNewData(filter.toMutableList()) {
-            doOnMainThreadIdle {
-              //noinspection NotifyDataSetChanged
-              refAdapter.notifyDataSetChanged()
+          val savedRefList = homeViewModel.savedRefList ?: return@launch
+          val filter = withContext(Dispatchers.Default) {
+            if (newText.isEmpty()) {
+              savedRefList
+            } else {
+              savedRefList.filter {
+                it.libName.contains(newText, ignoreCase = true) ||
+                  it.rule?.label?.contains(
+                    newText,
+                    ignoreCase = true
+                  ) == true
+              }
             }
+          }
+          LibReferenceAdapter.highlightText = newText
+
+          if (!isActive) {
+            return@launch
+          }
+          refAdapter.setList(filter)
+          doOnMainThreadIdle {
             refAdapter.setSpaceFooterView()
           }
-          binding.list.post {
+
+          if (newText.equals("Easter Egg", true)) {
+            context?.showToast("🥚")
+            Telemetry.recordEvent(
+              Constants.Event.EASTER_EGG,
+              mapOf("EASTER_EGG" to "Lib Reference Search")
+            )
+          }
+        } finally {
+          if (progressBarShown) {
             (activity as? INavViewContainer)?.hideProgressBar()
           }
-        }
-
-        if (newText.equals("Easter Egg", true)) {
-          context?.showToast("🥚")
-          Telemetry.recordEvent(
-            Constants.Event.EASTER_EGG,
-            mapOf("EASTER_EGG" to "Lib Reference Search")
-          )
         }
       }
     }
