@@ -60,6 +60,7 @@ import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
@@ -423,7 +424,7 @@ class AppListFragment :
           }
 
           is HomeViewModel.Effect.PackageChanged -> {
-            context?.let { context -> homeViewModel.requestChange(context) }
+            context?.let { context -> homeViewModel.requestChange(context, it.packageChangeState) }
           }
 
           is HomeViewModel.Effect.UpdateAppListStatus -> {
@@ -471,7 +472,7 @@ class AppListFragment :
           else -> {}
         }
       }.launchIn(lifecycleScope)
-      dbItemsFlow.onEach {
+      dbItemsFlow.distinctUntilChanged(::areAppListItemsTheSame).onEach {
         if (it.isEmpty() || (isFirstLaunch && !hasInitializedItems)) {
           initApps()
         } else if (
@@ -494,6 +495,23 @@ class AppListFragment :
         }
       }
     }.launchIn(lifecycleScope)
+  }
+
+  private fun areAppListItemsTheSame(old: List<LCItem>, new: List<LCItem>): Boolean {
+    if (old.size != new.size) {
+      return false
+    }
+    return old.zip(new).all { (oldItem, newItem) ->
+      oldItem.packageName == newItem.packageName &&
+        oldItem.label == newItem.label &&
+        oldItem.versionName == newItem.versionName &&
+        oldItem.versionCode == newItem.versionCode &&
+        oldItem.lastUpdatedTime == newItem.lastUpdatedTime &&
+        oldItem.isSystem == newItem.isSystem &&
+        oldItem.abi == newItem.abi &&
+        oldItem.targetApi == newItem.targetApi &&
+        oldItem.variant == newItem.variant
+    }
   }
 
   private fun updateItems(highlightRefresh: Boolean = false) {

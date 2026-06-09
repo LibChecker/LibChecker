@@ -109,6 +109,7 @@ class HomeViewModel : ViewModel() {
   var currentSearchQuery: String = ""
 
   private val pendingChangedPackages = ArrayDeque<PackageChangeState>()
+  private var pendingFeatureInitializationRequest = false
 
   fun reloadApps() {
     if (appListStatus != STATUS_NOT_START || (initJob?.isActive == false && requestChangeJob?.isActive == false)) {
@@ -129,6 +130,34 @@ class HomeViewModel : ViewModel() {
   fun packageChanged(packageChangeState: PackageChangeState) {
     setEffect {
       Effect.PackageChanged(packageChangeState)
+    }
+  }
+
+  fun connectWorkerBinder(binder: IWorkerService) {
+    workerBinder = binder
+    if (pendingFeatureInitializationRequest) {
+      requestFeatureInitialization()
+    }
+  }
+
+  fun disconnectWorkerBinder() {
+    workerBinder = null
+  }
+
+  fun requestFeatureInitialization() {
+    val binder = workerBinder ?: run {
+      pendingFeatureInitializationRequest = true
+      return
+    }
+    if (appListStatus == STATUS_START_INIT || appListStatus == STATUS_START_REQUEST_CHANGE) {
+      pendingFeatureInitializationRequest = true
+      return
+    }
+    pendingFeatureInitializationRequest = false
+    runCatching {
+      binder.initFeatures()
+    }.onFailure {
+      Timber.w(it, "requestFeatureInitialization failed")
     }
   }
 
@@ -222,6 +251,7 @@ class HomeViewModel : ViewModel() {
     timeRecorder.end()
     Timber.d("initItems: END, $timeRecorder")
     updateAppListStatus(STATUS_NOT_START)
+    requestFeatureInitialization()
   }
 
   private var requestChangeJob: Job? = null
@@ -275,7 +305,7 @@ class HomeViewModel : ViewModel() {
             when (currentState) {
               is PackageChangeState.Added -> {
                 val packageInfo = getChangedPackageInfo(currentPackageName) ?: continue
-                val item = generateLCItemFromPackageInfo(packageManager, packageInfo, isHarmony)
+                val item = generateLCItemFromPackageInfo(packageManager, packageInfo, isHarmony, true)
                 insert(item)
               }
 
@@ -285,7 +315,7 @@ class HomeViewModel : ViewModel() {
 
               is PackageChangeState.Replaced -> {
                 val packageInfo = getChangedPackageInfo(currentPackageName) ?: continue
-                val item = generateLCItemFromPackageInfo(packageManager, packageInfo, isHarmony)
+                val item = generateLCItemFromPackageInfo(packageManager, packageInfo, isHarmony, true)
                 update(item)
               }
             }
@@ -309,7 +339,7 @@ class HomeViewModel : ViewModel() {
           .forEach {
             if (!isActive) return@launch
             runCatching {
-              insert(generateLCItemFromPackageInfo(packageManager, it, isHarmony))
+              insert(generateLCItemFromPackageInfo(packageManager, it, isHarmony, true))
             }.onFailure { e ->
               Timber.e(e, "requestChange: ${it.packageName}")
             }
@@ -333,7 +363,7 @@ class HomeViewModel : ViewModel() {
           }.forEach { (packageInfo, _) ->
             if (!isActive) return@launch
             runCatching {
-              update(generateLCItemFromPackageInfo(packageManager, packageInfo, isHarmony))
+              update(generateLCItemFromPackageInfo(packageManager, packageInfo, isHarmony, true))
             }.onFailure { e ->
               Timber.e(e, "requestChange: ${packageInfo.packageName}")
             }
@@ -350,6 +380,7 @@ class HomeViewModel : ViewModel() {
         updateAppListStatus(STATUS_NOT_START)
         _isRequestChangeRunning.value = false
         requestChangeJob = null
+        requestFeatureInitialization()
       }
     }
   }

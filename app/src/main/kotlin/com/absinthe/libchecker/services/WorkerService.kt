@@ -24,6 +24,7 @@ class WorkerService : LifecycleService() {
   private val listenerList = RemoteCallbackList<OnWorkerListener>()
   private val binder by lazy { WorkerBinder(this) }
   private var initFeaturesJob: Job? = null
+  private var pendingInitFeaturesRequest = false
 
   override fun onBind(intent: Intent): IBinder {
     super.onBind(intent)
@@ -66,42 +67,62 @@ class WorkerService : LifecycleService() {
   @Synchronized
   private fun initFeatures() {
     if (initFeaturesJob?.isActive == true) {
-      Timber.d("initFeatures skipped")
+      Timber.d("initFeatures queued")
+      pendingInitFeaturesRequest = true
       return
     }
 
+    startInitFeaturesLocked()
+  }
+
+  private fun startInitFeaturesLocked() {
     Timber.d("initFeatures")
+    pendingInitFeaturesRequest = false
     updateFeatureInitializationState(running = true, completed = false)
 
     initFeaturesJob = lifecycleScope.launch(Dispatchers.IO) {
       try {
-        val pendingPackages = Repositories.lcRepository.getUninitializedFeaturePackageNames()
-        val featuresMap = HashMap<String, Int>(FEATURE_UPDATE_BATCH_SIZE)
-
-        fun flushFeatures() {
-          if (featuresMap.isEmpty()) {
-            return
-          }
-          Repositories.lcRepository.updateFeatures(featuresMap)
-          featuresMap.clear()
-        }
-
-        pendingPackages.forEach { packageName ->
-          runCatching {
-            val packageInfo = PackageUtils.getPackageInfo(packageName, PackageManager.GET_META_DATA)
-            featuresMap[packageName] = packageInfo.getFeatures()
-            if (featuresMap.size >= FEATURE_UPDATE_BATCH_SIZE) {
-              flushFeatures()
-            }
-          }.onFailure { e ->
-            Timber.w(e)
-          }
-        }
-        flushFeatures()
+        initPendingFeatures()
       } finally {
-        updateFeatureInitializationState(running = false, completed = true)
-        Timber.d("initFeatures finished")
+        finishInitFeatures()
       }
+    }
+  }
+
+  private suspend fun initPendingFeatures() {
+    val pendingPackages = Repositories.lcRepository.getUninitializedFeaturePackageNames()
+    val featuresMap = HashMap<String, Int>(FEATURE_UPDATE_BATCH_SIZE)
+
+    fun flushFeatures() {
+      if (featuresMap.isEmpty()) {
+        return
+      }
+      Repositories.lcRepository.updateFeatures(featuresMap)
+      featuresMap.clear()
+    }
+
+    pendingPackages.forEach { packageName ->
+      runCatching {
+        val packageInfo = PackageUtils.getPackageInfo(packageName, PackageManager.GET_META_DATA)
+        featuresMap[packageName] = packageInfo.getFeatures()
+        if (featuresMap.size >= FEATURE_UPDATE_BATCH_SIZE) {
+          flushFeatures()
+        }
+      }.onFailure { e ->
+        Timber.w(e)
+      }
+    }
+    flushFeatures()
+  }
+
+  @Synchronized
+  private fun finishInitFeatures() {
+    initFeaturesJob = null
+    if (pendingInitFeaturesRequest) {
+      startInitFeaturesLocked()
+    } else {
+      updateFeatureInitializationState(running = false, completed = true)
+      Timber.d("initFeatures finished")
     }
   }
 
