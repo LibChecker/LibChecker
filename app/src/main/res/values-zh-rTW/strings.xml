@@ -193,12 +193,18 @@
   <string name="lib_detail_app_install_source_shizuku_not_running_detail">按一下這裡以跳轉到 Shizuku 以將其啟動</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku 未經授權</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">按一下這裡進行 Shizuku 授權以取得安裝要求者</string>
+  <string name="lib_detail_app_dexopt_title">DEX optimization</string>
+  <string name="lib_detail_app_dexopt_status">Status</string>
+  <string name="lib_detail_app_dexopt_reason">Reason</string>
   <string name="lib_detail_elf_info">更多細節</string>
   <string name="lib_detail_elf_extract">擷取</string>
   <string name="lib_detail_elf_extract_success">ELF 檔案已儲存至下載區</string>
   <string name="lib_detail_elf_extract_failed">無法擷取 ELF 檔案</string>
   <string name="lib_detail_dependency_tip">相依關係</string>
   <string name="lib_detail_entry_points_tip">入口</string>
+  <string name="lib_detail_optimization_tip">Optimization</string>
+  <string name="lib_detail_optimization_on">Native symbols are stripped, resulting in app size savings.</string>
+  <string name="lib_detail_optimization_off">Native symbols are not stripped, preventing app size savings.</string>
   <string name="apk_preview">APK 預覽</string>
   <string name="apk_preview_item_not_available">無法在預覽模式下顯示</string>
   <string name="feature_live_update_notification">即時更新通知</string>
@@ -304,4 +310,6 @@
   <string name="snapshot_menu_diff_highlight">重點標示差異</string>
   <string name="snapshot_menu_use_iec_units">使用 IEC 單元</string>
   <!-- A11y -->
+  <string name="a11y_state_expanded">Expanded</string>
+  <string name="a11y_state_collapsed">Collapsed</string>
 </resources>
