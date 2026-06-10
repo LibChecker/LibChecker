@@ -115,7 +115,6 @@ dependencies {
 
   implementation(libs.kotlinX.coroutines)
   // implementation(libs.androidX.appCompat)
-  implementation(libs.android.apksig)
   implementation(libs.androidX.core)
   implementation(libs.androidX.activity)
   implementation(libs.androidX.fragment)
