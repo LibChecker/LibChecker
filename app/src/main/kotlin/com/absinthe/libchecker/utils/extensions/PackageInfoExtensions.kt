@@ -45,10 +45,10 @@ import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.ShizukuManager
+import com.absinthe.libchecker.utils.apk.ApkSignatureSchemeDetector
 import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libchecker.utils.manifest.HiddenPermissionsReader
 import com.absinthe.libchecker.utils.manifest.ManifestReader
-import com.android.apksig.ApkVerifier
 import dev.rikka.tools.refine.Refine
 import hidden.DexFileHidden
 import java.io.File
@@ -660,7 +660,7 @@ fun PackageInfo.getSignatures(context: Context): Sequence<LibStringItem> {
     DateFormat.LONG,
     locale
   )
-  return if (OsUtils.atLeastP() && signingInfo != null) {
+  val signatureArray = if (OsUtils.atLeastP() && signingInfo != null) {
     if (signingInfo!!.hasMultipleSigners()) {
       signingInfo!!.apkContentsSigners
     } else {
@@ -668,9 +668,11 @@ fun PackageInfo.getSignatures(context: Context): Sequence<LibStringItem> {
     }
   } else {
     @Suppress("DEPRECATION")
-    signatures
-  }.orEmpty().asSequence().map {
-    PackageUtils.describeSignature(localedContext, dateFormat, it, getSignatureSchemes())
+    this.signatures
+  }
+  val signatureSchemes = getSignatureSchemes()
+  return signatureArray.orEmpty().asSequence().map {
+    PackageUtils.describeSignature(localedContext, dateFormat, it, signatureSchemes)
   }
 }
 
@@ -946,17 +948,17 @@ fun PackageInfo.isPageSizeCompat(): Boolean {
   }.getOrElse { false }
 }
 
-fun PackageInfo.getSignatureSchemes(): ApkVerifier.Result? {
+fun PackageInfo.getSignatureSchemes(): List<String> {
   val sourceDir = applicationInfo?.sourceDir
   if (sourceDir.isNullOrBlank()) {
     Timber.w("Failed to get signature schemes for package without sourceDir: $packageName")
-    return null
+    return emptyList()
   }
 
   return runCatching {
-    ApkVerifier.Builder(File(sourceDir)).build().verify()
+    ApkSignatureSchemeDetector.detect(File(sourceDir))
   }.getOrElse {
     Timber.w(it, "Failed to get signature schemes for package: $packageName")
-    null
+    emptyList()
   }
 }
