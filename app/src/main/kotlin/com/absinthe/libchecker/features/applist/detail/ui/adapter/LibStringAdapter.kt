@@ -170,6 +170,11 @@ class LibStringAdapter(
           } else {
             setChip(null)
           }
+          contentDescription = buildItemDescription(
+            itemName,
+            item.rule?.label.takeIf { (GlobalValues.itemAdvancedOptions and AdvancedOptions.SHOW_MARKED_LIB) > 0 },
+            item.item.process.takeIf { !it.isNullOrEmpty() && processMode }
+          )
         }
       }
     }
@@ -223,6 +228,11 @@ class LibStringAdapter(
     } else {
       itemView.setChip(null)
     }
+    itemView.contentDescription = buildItemDescription(
+      itemName,
+      itemView.libSize.text,
+      item.rule?.label.takeIf { (GlobalValues.itemAdvancedOptions and AdvancedOptions.SHOW_MARKED_LIB) > 0 }
+    )
   }
 
   private fun getNativeSizeText(item: LibStringItemChip): CharSequence = nativeSizeTextCache.getOrPut(item.item to item.labels) {
@@ -290,6 +300,11 @@ class LibStringAdapter(
     } else {
       itemView.setChip(null)
     }
+    itemView.contentDescription = buildItemDescription(
+      itemName,
+      itemView.libDetail.text,
+      item.rule?.label.takeIf { (GlobalValues.itemAdvancedOptions and AdvancedOptions.SHOW_MARKED_LIB) > 0 }
+    )
   }
 
   private fun setPermissionContent(
@@ -303,6 +318,10 @@ class LibStringAdapter(
       -1
     }
     setOrHighlightText(itemView.libName, itemName)
+    itemView.contentDescription = buildItemDescription(
+      itemName,
+      context.getString(R.string.permission_not_granted).takeIf { item.item.size == 0L }
+    )
   }
 
   private val metadataLinkable = setOf("string", "array", "bool", "xml", "drawable", "mipmap", "color", "dimen")
@@ -317,6 +336,7 @@ class LibStringAdapter(
 
     if (isApkPreviewMode) {
       setOrHighlightText(itemView.libSize, "<${context.getString(R.string.apk_preview_item_not_available)}>")
+      itemView.contentDescription = buildItemDescription(itemName, itemView.libSize.text)
       return
     }
 
@@ -333,6 +353,7 @@ class LibStringAdapter(
           itemView.libSize.text = item.item.source
           itemView.linkToIcon.setImageResource(R.drawable.ic_outline_change_circle_24)
           itemView.linkToIcon.setTag(R.id.resource_transformed_id, false)
+          itemView.contentDescription = buildItemDescription(itemName, itemView.libSize.text)
         } else {
           var clickedTag = false
           item.item.source?.let {
@@ -419,9 +440,17 @@ class LibStringAdapter(
             }
           }
           itemView.linkToIcon.setTag(R.id.resource_transformed_id, clickedTag)
+          itemView.contentDescription = buildItemDescription(itemName, itemView.libSize.text)
         }
       }
     }
+    itemView.contentDescription = buildItemDescription(itemName, itemView.libSize.text)
+  }
+
+  private fun buildItemDescription(vararg parts: CharSequence?): String {
+    return parts
+      .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
+      .joinToString()
   }
 
   private fun createNativeLabelSpan(text: String): SpannedString = buildSpannedString {

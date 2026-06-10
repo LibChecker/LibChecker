@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.features.home
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.ComponentInfo
@@ -682,6 +683,7 @@ class HomeViewModel : ViewModel() {
     matchingRules(map)
   }
 
+  @SuppressLint("WrongConstant")
   private fun matchingRules(map: HashMap<String, Pair<MutableSet<String>, Int>>) {
     matchingJob?.cancel()
     matchingJob = viewModelScope.launch(Dispatchers.IO) {

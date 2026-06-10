@@ -92,6 +92,8 @@ class NativeLibItemView(context: Context) : AViewGroup(context) {
 
   private fun getOrCreateChip() = chip ?: Chip(context).apply {
     isClickable = false
+    isFocusable = false
+    importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 48.dp)
     maxWidth = (context.displayWidth * 0.45f).toInt()
     ellipsize = TextUtils.TruncateAt.MIDDLE

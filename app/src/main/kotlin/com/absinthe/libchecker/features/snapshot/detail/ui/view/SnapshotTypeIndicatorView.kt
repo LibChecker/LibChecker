@@ -31,6 +31,7 @@ class SnapshotTypeIndicatorView(context: Context) : AViewGroup(context) {
     layoutParams = LayoutParams(16.dp, 16.dp).also {
       it.marginStart = 4.dp
     }
+    importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     addView(this)
   }
 
@@ -38,11 +39,13 @@ class SnapshotTypeIndicatorView(context: Context) : AViewGroup(context) {
     layoutParams = LayoutParams(20.dp, 5.dp).also {
       it.marginStart = 4.dp
     }
+    importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     addView(this)
   }
 
   fun setIndicatorInfo(str: String, iconDrawable: Drawable?, labelColorRes: Int) {
     text.text = str
+    contentDescription = str
     icon.setImageDrawable(iconDrawable)
     colorLabel.setBackgroundColor(labelColorRes)
   }

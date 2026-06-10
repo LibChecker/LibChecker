@@ -64,6 +64,7 @@ class LibDetailBottomSheetView(context: Context) :
       it.topMargin = 4.dp
     }
     setBackgroundResource(R.drawable.bg_circle_outline)
+    importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
   }
 
   val title = AppCompatTextView(
@@ -267,6 +268,7 @@ class LibDetailBottomSheetView(context: Context) :
 
     val icon = AppCompatImageView(context).apply {
       layoutParams = LayoutParams(24.dp, 24.dp)
+      importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     }
 
     val tip = AppCompatTextView(context).apply {
@@ -296,6 +298,13 @@ class LibDetailBottomSheetView(context: Context) :
       addView(icon)
       addView(tip)
       addView(text)
+    }
+
+    fun updateContentDescription() {
+      contentDescription = listOf(tip.text, text.text)
+        .map { it.toString().trim() }
+        .filter(String::isNotEmpty)
+        .joinToString()
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -329,6 +338,7 @@ class LibDetailBottomSheetView(context: Context) :
     private val icon = AppCompatImageView(context).apply {
       layoutParams = LayoutParams(64.dp, 64.dp)
       setImageResource(R.drawable.ic_failed)
+      importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     }
 
     private val notFoundText = AppCompatTextView(context).apply {

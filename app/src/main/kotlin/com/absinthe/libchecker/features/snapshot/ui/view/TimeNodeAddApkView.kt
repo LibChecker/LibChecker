@@ -34,6 +34,7 @@ class TimeNodeAddApkView(context: Context) : AViewGroup(context) {
   init {
     setPadding(8.dp, 8.dp, 8.dp, 8.dp)
     setBackgroundResource(R.drawable.bg_lib_detail_item)
+    contentDescription = context.getString(R.string.album_item_comparison_choose_local_apk)
     addView(name)
   }
 

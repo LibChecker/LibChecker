@@ -437,6 +437,7 @@ class ChartFragment :
         if (viewModel.distributionLastUpdateTime.value.isNotEmpty()) {
           subtitle.text = getDistDashboardSubtitle(viewModel.distributionLastUpdateTime.value)
         }
+        updateContentDescription()
       }
       binding.dashboardContainer.addView(view)
     } else if (dataSource is BaseChartDataSource && chartView is PieChart) {

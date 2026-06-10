@@ -15,6 +15,7 @@ class ProcessBarAdapter : BaseQuickAdapter<ProcessBarAdapter.ProcessBarItem, Bas
     (holder.itemView as ProcessBarView.ProcessBarItemView).apply {
       setIndicatorColor(item.color)
       text.text = item.process
+      contentDescription = item.process
     }
   }
 

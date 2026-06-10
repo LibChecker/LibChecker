@@ -84,6 +84,7 @@ class XposedInfoBottomSheetView(context: Context) :
 
     val icon = AppCompatImageView(context).apply {
       layoutParams = LayoutParams(24.dp, 24.dp)
+      importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     }
 
     val tip = AppCompatTextView(context).apply {
@@ -113,6 +114,13 @@ class XposedInfoBottomSheetView(context: Context) :
       addView(icon)
       addView(tip)
       addView(text)
+    }
+
+    fun updateContentDescription() {
+      contentDescription = listOf(tip.text, text.text)
+        .map { it.toString().trim() }
+        .filter(String::isNotEmpty)
+        .joinToString()
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

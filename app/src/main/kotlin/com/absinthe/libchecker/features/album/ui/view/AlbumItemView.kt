@@ -46,6 +46,7 @@ class AlbumItemView(context: Context) : MaterialCardView(context) {
       layoutParams = LayoutParams(iconSize, iconSize)
       setBackgroundResource(R.drawable.bg_circle_secondary_container)
       scaleType = ImageView.ScaleType.CENTER_INSIDE
+      importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     }
 
     val title = AppCompatTextView(context).apply {

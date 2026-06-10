@@ -34,6 +34,7 @@ class SignatureDetailBottomSheetView(context: Context) :
     }
     setImageResource(R.drawable.ic_signatures)
     setBackgroundResource(R.drawable.bg_circle_outline)
+    importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
   }
 
   val list = BottomSheetRecyclerView(context).apply {

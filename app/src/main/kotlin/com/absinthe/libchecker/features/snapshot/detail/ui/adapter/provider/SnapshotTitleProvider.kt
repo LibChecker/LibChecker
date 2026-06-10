@@ -16,6 +16,10 @@ import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
+import com.absinthe.libchecker.features.snapshot.detail.bean.ADDED
+import com.absinthe.libchecker.features.snapshot.detail.bean.CHANGED
+import com.absinthe.libchecker.features.snapshot.detail.bean.MOVED
+import com.absinthe.libchecker.features.snapshot.detail.bean.REMOVED
 import com.absinthe.libchecker.features.snapshot.detail.ui.adapter.SnapshotDetailCountAdapter
 import com.absinthe.libchecker.features.snapshot.detail.ui.adapter.node.BaseSnapshotNode
 import com.absinthe.libchecker.features.snapshot.detail.ui.adapter.node.SnapshotDetailCountNode
@@ -75,7 +79,17 @@ class SnapshotTitleProvider : BaseNodeProvider() {
       }
 
       countAdapter.setList(finalList)
+      helper.itemView.contentDescription = buildTitleDescription(
+        itemView.title.text,
+        finalList,
+        node.isExpanded
+      )
     } ?: run {
+      helper.itemView.contentDescription = buildTitleDescription(
+        itemView.title.text,
+        finalList,
+        node.isExpanded
+      )
       (context as? LifecycleOwner)?.lifecycleScope?.launch(Dispatchers.Default) {
         @Suppress("UNCHECKED_CAST")
         (item.childNode as List<BaseSnapshotNode>).forEach { diffNode ->
@@ -92,6 +106,11 @@ class SnapshotTitleProvider : BaseNodeProvider() {
 
         withContext(Dispatchers.Main) {
           countAdapter.setList(finalList)
+          helper.itemView.contentDescription = buildTitleDescription(
+            itemView.title.text,
+            finalList,
+            node.isExpanded
+          )
         }
       }
     }
@@ -119,5 +138,36 @@ class SnapshotTitleProvider : BaseNodeProvider() {
       duration = 200
       start()
     }
+  }
+
+  private fun buildTitleDescription(
+    title: CharSequence,
+    counts: List<SnapshotDetailCountNode>,
+    expanded: Boolean
+  ): String {
+    return (
+      listOf(title) +
+        counts.map { "${getStatusLabel(it.status)} ${it.count}" } +
+        listOf(
+          context.getString(
+            if (expanded) R.string.a11y_state_expanded else R.string.a11y_state_collapsed
+          )
+        )
+      )
+      .map { it.toString().trim() }
+      .filter(String::isNotEmpty)
+      .joinToString()
+  }
+
+  private fun getStatusLabel(status: Int): String {
+    return context.getString(
+      when (status) {
+        ADDED -> R.string.snapshot_indicator_added
+        REMOVED -> R.string.snapshot_indicator_removed
+        CHANGED -> R.string.snapshot_indicator_changed
+        MOVED -> R.string.snapshot_indicator_moved
+        else -> android.R.string.untitled
+      }
+    )
   }
 }

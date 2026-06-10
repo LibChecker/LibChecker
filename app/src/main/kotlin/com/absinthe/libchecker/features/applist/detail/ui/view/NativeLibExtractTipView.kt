@@ -31,6 +31,7 @@ class NativeLibExtractTipView(context: Context) : AViewGroup(context) {
   private val icon = AppCompatImageView(context).apply {
     layoutParams = LayoutParams(24.dp, 24.dp)
     setImageResource(R.drawable.ic_outline_info)
+    importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     imageTintList =
       context.getColorByAttr(com.google.android.material.R.attr.colorOnSecondaryContainer)
         .toColorStateListByColor()

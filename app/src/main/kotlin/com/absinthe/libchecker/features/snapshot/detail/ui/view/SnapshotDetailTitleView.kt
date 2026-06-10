@@ -39,6 +39,7 @@ class SnapshotDetailTitleView(context: Context) : MaterialCardView(context) {
         it.marginStart = 16.dp
       }
       setImageResource(R.drawable.ic_arrow)
+      importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
       addView(this)
     }
 

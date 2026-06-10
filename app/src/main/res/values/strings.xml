@@ -328,4 +328,8 @@
   <string name="snapshot_menu_hide_no_component_changes">Hide no component changes</string>
   <string name="snapshot_menu_diff_highlight">Differences highlight</string>
   <string name="snapshot_menu_use_iec_units">Use IEC units</string>
+
+  <!-- A11y -->
+  <string name="a11y_state_expanded">Expanded</string>
+  <string name="a11y_state_collapsed">Collapsed</string>
 </resources>

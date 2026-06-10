@@ -39,6 +39,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
     val icon = AppCompatImageView(context).apply {
       val iconSize = context.getDimensionPixelSize(R.dimen.app_icon_size)
       layoutParams = LayoutParams(iconSize, iconSize)
+      importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
       addView(this)
     }
 
@@ -121,6 +122,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
 
     val stateIndicator = SnapshotStateIndicatorView(context).apply {
       layoutParams = LayoutParams(5.dp, ViewGroup.LayoutParams.MATCH_PARENT)
+      importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
       addView(this)
     }
 

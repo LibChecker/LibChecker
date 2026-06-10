@@ -15,6 +15,7 @@ class SnapshotEmptyView(context: Context) : AViewGroup(context) {
   private val image = ImageView(context).apply {
     layoutParams = LayoutParams(200.dp, 200.dp)
     setImageResource(R.drawable.ic_notebook)
+    importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     addView(this)
   }
 
@@ -28,6 +29,14 @@ class SnapshotEmptyView(context: Context) : AViewGroup(context) {
     text = context.getString(R.string.snapshot_empty_list_title)
     setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadlineSmall))
     addView(this)
+  }
+
+  init {
+    updateContentDescription()
+  }
+
+  fun updateContentDescription() {
+    contentDescription = text.text
   }
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

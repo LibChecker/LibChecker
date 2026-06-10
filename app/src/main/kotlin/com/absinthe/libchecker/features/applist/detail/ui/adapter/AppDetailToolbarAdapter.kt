@@ -19,11 +19,13 @@ class AppDetailToolbarAdapter : BaseQuickAdapter<AppDetailToolbarItem, BaseViewH
 
   override fun convert(holder: BaseViewHolder, item: AppDetailToolbarItem) {
     (holder.itemView as AppDetailToolbarView).apply {
+      val label = context.getString(item.tooltipTextRes)
       setImageResource(item.icon)
+      contentDescription = label
       setOnClickListener { item.onClick() }
 
       if (OsUtils.atLeastO()) {
-        tooltipText = context.getString(item.tooltipTextRes)
+        tooltipText = label
       }
     }
   }

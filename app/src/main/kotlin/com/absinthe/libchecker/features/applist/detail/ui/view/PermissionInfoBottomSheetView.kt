@@ -34,6 +34,7 @@ class PermissionInfoBottomSheetView(context: Context) :
       it.topMargin = 4.dp
     }
     setBackgroundResource(R.drawable.bg_circle_outline)
+    importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
   }
 
   val title = AppCompatTextView(
@@ -127,6 +128,7 @@ class PermissionInfoBottomSheetView(context: Context) :
 
     val icon = AppCompatImageView(context).apply {
       layoutParams = LayoutParams(24.dp, 24.dp)
+      importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     }
 
     val tip = AppCompatTextView(context).apply {
@@ -158,6 +160,13 @@ class PermissionInfoBottomSheetView(context: Context) :
       addView(text)
     }
 
+    fun updateContentDescription() {
+      contentDescription = listOf(tip.text, text.text)
+        .map { it.toString().trim() }
+        .filter(String::isNotEmpty)
+        .joinToString()
+    }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
       super.onMeasure(widthMeasureSpec, heightMeasureSpec)
       icon.autoMeasure()
@@ -187,6 +196,7 @@ class PermissionInfoBottomSheetView(context: Context) :
     private val icon = AppCompatImageView(context).apply {
       layoutParams = LayoutParams(64.dp, 64.dp)
       setImageResource(R.drawable.ic_failed)
+      importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     }
 
     private val notFoundText = AppCompatTextView(context).apply {

@@ -321,9 +321,11 @@ class ComparisonActivity :
             if (it.isLeft) {
               dashboardView.container.leftPart.tvSnapshotAppsCountText.text =
                 it.snapshotCount.toString()
+              dashboardView.container.leftPart.updateContentDescription()
             } else {
               dashboardView.container.rightPart.tvSnapshotAppsCountText.text =
                 it.snapshotCount.toString()
+              dashboardView.container.rightPart.updateContentDescription()
             }
           }
 
@@ -392,6 +394,7 @@ class ComparisonActivity :
           it.leftPart.tvSnapshotTimestampText.text = viewModel.getFormatDateString(leftTimeStamp)
           viewModel.getDashboardCount(leftTimeStamp, true)
         }
+        it.leftPart.updateContentDescription()
 
         if (rightTimeStamp == -1L) {
           rightUri?.encodedPath?.let { path ->
@@ -402,6 +405,7 @@ class ComparisonActivity :
           it.rightPart.tvSnapshotTimestampText.text = viewModel.getFormatDateString(rightTimeStamp)
           viewModel.getDashboardCount(rightTimeStamp, false)
         }
+        it.rightPart.updateContentDescription()
       }
     }
   }

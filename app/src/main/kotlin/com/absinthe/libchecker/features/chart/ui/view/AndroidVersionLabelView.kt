@@ -14,6 +14,7 @@ class AndroidVersionLabelView(context: Context) : AViewGroup(context) {
 
   private val icon = AppCompatImageView(context).apply {
     layoutParams = LayoutParams(24.dp, 24.dp)
+    importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     addView(this)
   }
 

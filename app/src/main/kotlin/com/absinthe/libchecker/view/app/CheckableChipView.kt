@@ -34,7 +34,9 @@ import android.util.AttributeSet
 import android.view.SoundEffectConstants
 import android.view.View
 import android.view.ViewOutlineProvider
+import android.view.accessibility.AccessibilityNodeInfo
 import android.view.animation.AnimationUtils
+import android.widget.CheckBox
 import android.widget.Checkable
 import android.widget.TextView
 import androidx.annotation.CallSuper
@@ -89,7 +91,9 @@ class CheckableChipView @JvmOverloads constructor(
   /**
    * Sets the text to be displayed.
    */
-  var text: CharSequence by viewProperty("", requestLayout = true)
+  var text: CharSequence by viewProperty("", requestLayout = true) {
+    contentDescription = it
+  }
 
   /**
    * Sets the textSize to be displayed.
@@ -157,6 +161,7 @@ class CheckableChipView @JvmOverloads constructor(
   init {
     clipToOutline = true
     isClickable = true
+    importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
 
     context.withStyledAttributes(
       set = attrs,
@@ -390,6 +395,16 @@ class CheckableChipView @JvmOverloads constructor(
       playSoundEffect(SoundEffectConstants.CLICK)
     }
     return handled
+  }
+
+  @Suppress("DEPRECATION")
+  override fun onInitializeAccessibilityNodeInfo(info: AccessibilityNodeInfo) {
+    super.onInitializeAccessibilityNodeInfo(info)
+    info.className = CheckBox::class.java.name
+    info.text = text
+    info.isCheckable = true
+    info.isChecked = isChecked
+    info.isClickable = isClickable
   }
 
   override fun isChecked() = targetProgress == 1f

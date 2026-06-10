@@ -21,11 +21,13 @@ class AppListRejectView(
     isClickable = true
     isFocusable = true
     background = context.getDrawableByAttr(com.google.android.material.R.attr.colorSurface)
+    contentDescription = context.getString(R.string.get_app_list_denied_tip)
   }
 
   private val image = AppCompatImageView(context).apply {
     layoutParams = LayoutParams(200.dp, 200.dp)
     setImageResource(R.drawable.ic_deny)
+    importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     addView(this)
   }
 

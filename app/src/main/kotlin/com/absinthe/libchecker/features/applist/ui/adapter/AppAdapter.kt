@@ -116,6 +116,12 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
           setBadge(null)
         }
       }
+      root.setItemContentDescription(
+        item.label,
+        item.packageName,
+        versionInfo.text,
+        PackageUtils.getAbiString(context, item.abi.toInt(), true)
+      )
     }
   }
 

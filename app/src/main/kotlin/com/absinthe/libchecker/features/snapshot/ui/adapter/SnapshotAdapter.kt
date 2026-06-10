@@ -322,6 +322,16 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
           updateTime.append(", APEX")
         }
       }
+      (holder.itemView as SnapshotItemView).contentDescription = buildItemDescription(
+        appName.text,
+        packageName.text,
+        versionInfo.text,
+        packageSizeInfo.text.takeIf { packageSizeInfo.isVisible },
+        apisInfo.text,
+        abiInfo.text,
+        updateTime.text.takeIf { updateTime.isVisible },
+        buildSnapshotStateDescription(context, item)
+      )
     }
   }
 
@@ -348,4 +358,19 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
     DEMO,
     GET_APP_UPDATE
   }
+}
+
+private fun buildItemDescription(vararg parts: CharSequence?): String {
+  return parts
+    .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
+    .joinToString()
+}
+
+private fun buildSnapshotStateDescription(context: android.content.Context, item: SnapshotDiffItem): String {
+  return listOf(
+    item.added.takeIf { it > 0 }?.let { "${context.getString(R.string.snapshot_indicator_added)} $it" },
+    item.removed.takeIf { it > 0 }?.let { "${context.getString(R.string.snapshot_indicator_removed)} $it" },
+    item.changed.takeIf { it > 0 }?.let { "${context.getString(R.string.snapshot_indicator_changed)} $it" },
+    item.moved.takeIf { it > 0 }?.let { "${context.getString(R.string.snapshot_indicator_moved)} $it" }
+  ).filterNotNull().joinToString()
 }

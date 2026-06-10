@@ -309,4 +309,7 @@
   <string name="snapshot_menu_hide_no_component_changes">隐藏无组件变更</string>
   <string name="snapshot_menu_diff_highlight">差异高亮</string>
   <string name="snapshot_menu_use_iec_units">使用 IEC 单位</string>
+  <!-- A11y -->
+  <string name="a11y_state_expanded">展开</string>
+  <string name="a11y_state_collapsed">折叠</string>
 </resources>

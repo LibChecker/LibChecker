@@ -24,6 +24,7 @@ class TimeNodeAdapter : BaseQuickAdapter<TimeStampItem, BaseViewHolder>(0) {
   override fun convert(holder: BaseViewHolder, item: TimeStampItem) {
     (holder.itemView as TimeNodeItemView).apply {
       name.text = getFormatDateString(item.timestamp)
+      contentDescription = name.text
       try {
         item.topApps?.let {
           val list = it.fromJson<List<String>>(

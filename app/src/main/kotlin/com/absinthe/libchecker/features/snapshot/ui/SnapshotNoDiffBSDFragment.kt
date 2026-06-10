@@ -55,6 +55,7 @@ class SnapshotNoDiffBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotNoDi
         }
         val isNewOrDeleted = item.deleted || item.newInstalled
         appNameView.text = LCAppUtils.getDiffString(item.labelDiff, isNewOrDeleted)
+        iconView.contentDescription = appNameView.text
         packageNameView.text = item.packageName
         versionInfoView.text = LCAppUtils.getDiffString(
           diff1 = item.versionNameDiff,

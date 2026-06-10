@@ -91,6 +91,7 @@ class CloudRulesDialogView(context: Context) :
     private val arrow = AppCompatImageView(context).apply {
       layoutParams = LayoutParams(48.dp, 48.dp)
       setImageResource(R.drawable.ic_arrow_right)
+      importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     }
 
     val remoteVersion = CloudRulesVersionView(context).apply {
@@ -181,6 +182,13 @@ class CloudRulesDialogView(context: Context) :
     init {
       addView(version)
       addView(desc)
+    }
+
+    fun updateContentDescription() {
+      contentDescription = listOf(desc.text, version.text)
+        .map { it.toString().trim() }
+        .filter(String::isNotEmpty)
+        .joinToString()
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

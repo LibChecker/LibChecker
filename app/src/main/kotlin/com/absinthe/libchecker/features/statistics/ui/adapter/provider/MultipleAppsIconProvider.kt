@@ -53,7 +53,18 @@ class MultipleAppsIconProvider : BaseNodeProvider() {
       } else {
         setOrHighlightText(libName, libReferenceItem.libName)
       }
+      helper.itemView.contentDescription = buildItemDescription(
+        labelName.text,
+        libName.text,
+        count.text
+      )
     }
+  }
+
+  private fun buildItemDescription(vararg parts: CharSequence?): String {
+    return parts
+      .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
+      .joinToString()
   }
 
   private fun setOrHighlightText(view: TextView, text: CharSequence) {

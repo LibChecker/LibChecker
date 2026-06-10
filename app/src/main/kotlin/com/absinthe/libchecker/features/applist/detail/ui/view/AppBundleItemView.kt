@@ -15,6 +15,7 @@ class AppBundleItemView(context: Context) : AViewGroup(context) {
 
   private val icon = AppCompatImageView(context).apply {
     layoutParams = LayoutParams(24.dp, 24.dp)
+    importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
   }
 
   private val name =
@@ -61,10 +62,19 @@ class AppBundleItemView(context: Context) : AViewGroup(context) {
 
   fun setNameText(text: String) {
     name.text = text
+    updateContentDescription()
   }
 
   fun setSizeText(text: String) {
     size.text = text
+    updateContentDescription()
+  }
+
+  private fun updateContentDescription() {
+    contentDescription = listOf(name.text, size.text)
+      .map { it.toString().trim() }
+      .filter(String::isNotEmpty)
+      .joinToString()
   }
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

@@ -188,6 +188,7 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
       title.text = getString(titleRes)
       subtitle.text = getString(subtitleRes)
     }
+    contentDescription = listOf(getString(titleRes), getString(subtitleRes)).joinToString()
   }
 
   private fun getFormatDateString(timestamp: Long): String {

@@ -164,6 +164,7 @@ class SnapshotFragment :
     }
 
     dashboard.container.apply {
+      updateDashboardContentDescription(dashboard)
       fun changeTimeNode() {
         lifecycleScope.launch(Dispatchers.IO) {
           val timeStampList = viewModel.repository.getTimeStamps()
@@ -212,6 +213,7 @@ class SnapshotFragment :
       if (GlobalValues.snapshotTimestamp == 0L) {
         text.text = getString(R.string.snapshot_no_snapshot)
       }
+      updateContentDescription()
     }
 
     adapter.apply {
@@ -328,14 +330,17 @@ class SnapshotFragment :
         is SnapshotViewModel.Effect.DashboardCountChange -> {
           dashboard.container.tvSnapshotAppsCountText.text =
             String.format(Locale.getDefault(), "%d / %d", it.snapshotCount, it.appCount)
+          updateDashboardContentDescription(dashboard)
         }
 
         is SnapshotViewModel.Effect.TimeStampChange -> {
           if (it.timestamp != 0L) {
             dashboard.container.tvSnapshotTimestampText.text = viewModel.getFormatDateString(it.timestamp)
+            updateDashboardContentDescription(dashboard)
             updateSystemProps(dashboard, it.timestamp)
           } else {
             dashboard.container.tvSnapshotTimestampText.text = getString(R.string.snapshot_none)
+            updateDashboardContentDescription(dashboard)
             dashboard.container.setSystemProps(emptyList())
             viewModel.snapshotDiffItemsFlow.emit(emptyList())
             flip(VF_LIST)
@@ -788,5 +793,24 @@ class SnapshotFragment :
         }
       }
     }
+  }
+
+  private fun updateDashboardContentDescription(dashboard: SnapshotDashboardView) {
+    dashboard.contentDescription = listOf(
+      getString(R.string.snapshot_current_timestamp),
+      dashboard.container.tvSnapshotTimestampText.text,
+      getString(R.string.snapshot_apps_count),
+      dashboard.container.tvSnapshotAppsCountText.text
+    )
+      .mapNotNull { it.toString().trim().takeIf(String::isNotEmpty) }
+      .joinToString()
+    dashboard.container.tvSnapshotTimestampText.contentDescription = listOf(
+      getString(R.string.dialog_title_change_timestamp),
+      dashboard.container.tvSnapshotTimestampText.text
+    )
+      .mapNotNull { it.toString().trim().takeIf(String::isNotEmpty) }
+      .joinToString()
+    dashboard.container.arrow.contentDescription =
+      dashboard.container.tvSnapshotTimestampText.contentDescription
   }
 }

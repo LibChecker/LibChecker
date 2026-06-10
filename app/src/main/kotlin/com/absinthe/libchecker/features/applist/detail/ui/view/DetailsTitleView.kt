@@ -2,6 +2,7 @@ package com.absinthe.libchecker.features.applist.detail.ui.view
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatImageView
@@ -101,6 +102,11 @@ class DetailsTitleView(
         }
         v.scaleType = ImageView.ScaleType.CENTER_CROP
         v.setImageResource(res)
+        v.contentDescription = when (it.abi) {
+          Constants.MULTI_ARCH -> context.getString(R.string.multiArch)
+          else -> PackageUtils.getAbiString(context, it.abi, showExtraInfo = false)
+        }
+        v.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
         v.alpha = if (it.active) 1f else 0.5f
         it.action?.let { action ->
           v.setOnClickListener { action.invoke() }

@@ -20,6 +20,7 @@ class SnapshotDetailCountView(context: Context) : AppCompatTextView(context) {
       it.marginEnd = 4.dp
     }
     background = R.drawable.bg_snapshot_detail_count.getDrawable(context)
+    importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     setPadding(8.dp, 2.dp, 8.dp, 2.dp)
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
     setTextColor(R.color.material_grey_800.getColor(context))

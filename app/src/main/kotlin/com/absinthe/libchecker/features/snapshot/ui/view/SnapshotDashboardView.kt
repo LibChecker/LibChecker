@@ -68,6 +68,7 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context, null, 
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
       setImageResource(R.drawable.ic_arrow_drop_down)
+      contentDescription = context.getString(R.string.snapshot_current_timestamp)
       setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackgroundBorderless))
     }
 
