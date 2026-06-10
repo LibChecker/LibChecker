@@ -193,15 +193,22 @@
   <string name="lib_detail_app_install_source_shizuku_not_running_detail">לחץ כאן כדי לעבור ל-Shizuku ולהפעיל אותו</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku לא מאושר</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">לחץ כאן לאישור Shizuku עבור מבקש ההתקנה</string>
+  <string name="lib_detail_app_dexopt_title">DEX optimization</string>
+  <string name="lib_detail_app_dexopt_status">Status</string>
+  <string name="lib_detail_app_dexopt_reason">Reason</string>
   <string name="lib_detail_elf_info">מידע נוסף</string>
   <string name="lib_detail_elf_extract">חילוץ</string>
   <string name="lib_detail_elf_extract_success">קובץ ELF נשמר בתיקיית ההורדות</string>
   <string name="lib_detail_elf_extract_failed">חילוץ קובץ ELF נכשל</string>
   <string name="lib_detail_dependency_tip">תלויות</string>
   <string name="lib_detail_entry_points_tip">נקודות כניסה</string>
+  <string name="lib_detail_optimization_tip">Optimization</string>
+  <string name="lib_detail_optimization_on">Native symbols are stripped, resulting in app size savings.</string>
+  <string name="lib_detail_optimization_off">Native symbols are not stripped, preventing app size savings.</string>
   <string name="apk_preview">תצוגה מקדימה של APK</string>
   <string name="apk_preview_item_not_available">לא ניתן לתצוגה במצב תצוגה מקדימה</string>
   <string name="feature_live_update_notification">התראת עדכון בזמן אמת</string>
+  <string name="feature_live_update_notification_summary">The system promotes Live Update notifications. Promoted notifications appear more prominently on system surfaces, including at the top of the notification drawer and the lock screen, and as a chip in the status bar.</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">הועתק ללוח הגזירים</string>
   <string name="toast_not_existing_market">לא קיים שום שוק אפליקציות</string>
@@ -242,6 +249,8 @@
   <string name="btn_drop">השלך</string>
   <string name="dialog_title_compare_diff_apk">שים לב</string>
   <string name="dialog_message_compare_diff_apk">האם ברצונך להשוות בין שני קבצי APK שונים?</string>
+  <string name="dialog_themed_and_alternative_app_icons">Themed and alternative icons</string>
+  <string name="dialog_themed">Themed</string>
   <!--  Album  -->
   <string name="album_compare">השווה</string>
   <string name="album_item_comparison_title">השוואה</string>
@@ -301,4 +310,6 @@
   <string name="snapshot_menu_diff_highlight">הדגשת שינויים</string>
   <string name="snapshot_menu_use_iec_units">השתמש ביחידות IEC</string>
   <!-- A11y -->
+  <string name="a11y_state_expanded">Expanded</string>
+  <string name="a11y_state_collapsed">Collapsed</string>
 </resources>
