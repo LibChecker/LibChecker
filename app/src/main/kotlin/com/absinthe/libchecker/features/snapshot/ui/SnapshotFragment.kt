@@ -513,10 +513,11 @@ class SnapshotFragment :
         flip(VF_LOADING)
         (context as INavViewContainer).showNavigationView()
         this@SnapshotFragment.dropPrevious = dropPrevious
-        ContextCompat.startForegroundService(
-          context,
-          Intent(context, ShootService::class.java)
-        )
+        runCatching {
+          context.startService(Intent(context, ShootService::class.java))
+        }.onFailure {
+          Timber.w(it, "Failed to start snapshot service")
+        }
         shootBinder?.computeSnapshot(dropPrevious) ?: run {
           Timber.w("shoot binder is null")
           Toasty.showShort(context, "Snapshot service error")
