@@ -108,15 +108,15 @@ class ShootService : LifecycleService() {
     stopSelf()
   }
 
-  private fun showNotification() {
+  private fun showNotification(): Boolean {
     initBuilder()
 
-    notificationManager.apply {
+    return runCatching {
       if (OsUtils.atLeastO()) {
         val name = getString(R.string.channel_shoot)
         val importance = NotificationManager.IMPORTANCE_DEFAULT
         val channel = NotificationChannel(SHOOT_CHANNEL_ID, name, importance)
-        createNotificationChannel(channel)
+        notificationManager.createNotificationChannel(channel)
       }
       if (OsUtils.atLeastU()) {
         startForeground(
@@ -127,7 +127,9 @@ class ShootService : LifecycleService() {
       } else {
         startForeground(notificationIdShoot, builder.build())
       }
-    }
+    }.onFailure {
+      Timber.w(it, "Failed to start snapshot foreground service")
+    }.isSuccess
   }
 
   @Synchronized
@@ -176,12 +178,12 @@ class ShootService : LifecycleService() {
         this@ShootService,
         Manifest.permission.POST_NOTIFICATIONS
       ) == PackageManager.PERMISSION_GRANTED
-    areNotificationsEnabled =
+    val canPostNotification =
       notificationManager.areNotificationsEnabled() &&
-      notificationPermissionGranted
+        notificationPermissionGranted
 
     notificationManager.cancel(notificationIdShootSuccess)
-    showNotification()
+    areNotificationsEnabled = showNotification() && canPostNotification
 
     if (areNotificationsEnabled) {
       builder.foregroundServiceBehavior = NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE
