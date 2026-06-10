@@ -15,6 +15,7 @@ object URLManager {
 
   const val DOCS_PAGE = "https://absinthe.life/LibChecker-Docs"
   const val CROWDIN_PAGE = "https://crowdin.com/project/libchecker"
+  const val WEBUI_PAGE = "https://lc.absinthe.life"
 
   const val TELEGRAM_GROUP = "https://t.me/libcheckerr"
   const val TELEGRAM_RELEASES = "https://t.me/libchecker_releases"

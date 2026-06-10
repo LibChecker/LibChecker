@@ -248,6 +248,21 @@ class SettingsFragment :
       }
     }
 
+    findPreference<Preference>(Constants.PREF_EXPORT_APPS)?.apply {
+      setOnPreferenceClickListener {
+        if (AntiShakeUtils.isInvalidClick(prefRecyclerView)) {
+          false
+        } else {
+          ExportAppsDialogFragment().show(
+            childFragmentManager,
+            ExportAppsDialogFragment::class.java.name
+          )
+          recordPreferenceEvent(Constants.PREF_EXPORT_APPS)
+          true
+        }
+      }
+    }
+
     findPreference<Preference>(Constants.PREF_ABOUT)?.apply {
       summary = "${BuildConfig.VERSION_NAME}(${BuildConfig.VERSION_CODE})"
       setOnPreferenceClickListener {
