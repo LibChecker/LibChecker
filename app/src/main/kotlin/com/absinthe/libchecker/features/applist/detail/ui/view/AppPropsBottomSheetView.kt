@@ -53,8 +53,9 @@ class AppPropsBottomSheetView(context: Context, packageInfo: PackageInfo?) :
       it.topMargin = 4.dp
     }
     gravity = Gravity.CENTER
+    val tip = context.getString(R.string.lib_detail_app_props_tip)
+    contentDescription = tip
     R.drawable.ic_open_in_new.getDrawable(context)?.let {
-      val tip = context.getString(R.string.lib_detail_app_props_tip)
       it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
       val span = CenterAlignImageSpan(it)
       val spannableString = SpannableString("$tip  ")

@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.features.settings.ui
 
+import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Intent
@@ -491,6 +492,7 @@ class SettingsFragment :
     }
   }
 
+  @SuppressLint("RestrictedApi")
   private fun styleSettingsPreferenceItem(recyclerView: RecyclerView, itemView: View) {
     val adapter = recyclerView.adapter as? PreferenceGroupAdapter ?: return
     val position = recyclerView.getChildAdapterPosition(itemView)
@@ -529,10 +531,34 @@ class SettingsFragment :
     itemView.findViewById<View>(android.R.id.widget_frame)?.isVisible = hasSwitch
     itemView.findViewById<View>(R.id.settings_preference_chevron)?.isVisible =
       preference?.key in NAVIGATION_PREFERENCE_KEYS
+    itemView.findViewById<View>(android.R.id.title)?.importantForAccessibility =
+      View.IMPORTANT_FOR_ACCESSIBILITY_NO
+    itemView.findViewById<View>(android.R.id.summary)?.importantForAccessibility =
+      View.IMPORTANT_FOR_ACCESSIBILITY_NO
+    itemView.contentDescription = buildPreferenceDescription(preference)
   }
 
   private fun Preference?.isSettingsRowPreference(): Boolean {
     return this != null && this !is PreferenceCategory
+  }
+
+  private fun buildPreferenceDescription(preference: Preference?): String {
+    val parts = mutableListOf<CharSequence?>(
+      preference?.title,
+      preference?.summary
+    )
+    if (preference is TwoStatePreference) {
+      parts += getString(
+        if (preference.isChecked) {
+          R.string.array_dark_mode_on
+        } else {
+          R.string.array_dark_mode_off
+        }
+      )
+    }
+    return parts
+      .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
+      .joinToString()
   }
 
   private fun recordPreferenceEvent(key: String, value: Any = "") {

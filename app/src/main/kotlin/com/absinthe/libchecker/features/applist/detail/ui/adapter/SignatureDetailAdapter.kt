@@ -16,6 +16,7 @@ class SignatureDetailAdapter : BaseQuickAdapter<SignatureDetailItem, BaseViewHol
     (holder.itemView as SignatureDetailItemView).apply {
       type.text = item.type
       content.text = item.content
+      contentDescription = listOf(item.type, item.content).joinToString()
     }
   }
 }

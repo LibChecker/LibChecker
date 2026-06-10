@@ -26,6 +26,7 @@ import com.absinthe.libchecker.utils.extensions.tintHighlightText
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.chad.library.adapter.base.provider.BaseNodeProvider
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
+import java.text.NumberFormat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -58,13 +59,22 @@ class LibReferenceProvider : BaseNodeProvider() {
   override fun convert(helper: BaseViewHolder, item: BaseNode) {
     (helper.itemView as LibReferenceItemView).container.apply {
       val libReferenceItem = item as LibReference
-      count.text = libReferenceItem.referredList.size.toString()
+      val canOpenDetail = libReferenceItem.type == NATIVE ||
+        isComponentType(libReferenceItem.type) ||
+        libReferenceItem.type == ACTION
+      count.text = NumberFormat.getIntegerInstance().format(libReferenceItem.referredList.size)
+      icon.importantForAccessibility = if (canOpenDetail) {
+        View.IMPORTANT_FOR_ACCESSIBILITY_YES
+      } else {
+        View.IMPORTANT_FOR_ACCESSIBILITY_NO
+      }
 
       setOrHighlightText(libName, libReferenceItem.libName)
 
       libReferenceItem.rule?.let {
         icon.apply {
           setImageResource(it.iconRes)
+          contentDescription = it.label
 
           if (!GlobalValues.isColorfulIcon && !it.isSimpleColorIcon) {
             this.drawable.mutate().colorFilter =
@@ -81,6 +91,7 @@ class LibReferenceProvider : BaseNodeProvider() {
         } else {
           icon.setImageResource(R.drawable.ic_question)
         }
+        icon.contentDescription = libReferenceItem.libName
 
         labelName.text = buildSpannedString {
           italic {
@@ -90,6 +101,11 @@ class LibReferenceProvider : BaseNodeProvider() {
           append(" ")
         }
       }
+      helper.itemView.contentDescription = buildItemDescription(
+        labelName.text,
+        libName.text,
+        count.text
+      )
     }
   }
 
@@ -119,5 +135,11 @@ class LibReferenceProvider : BaseNodeProvider() {
     } else {
       view.text = text
     }
+  }
+
+  private fun buildItemDescription(vararg parts: CharSequence?): String {
+    return parts
+      .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
+      .joinToString()
   }
 }

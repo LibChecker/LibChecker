@@ -56,6 +56,12 @@ class MarketDistributionDashboardView(context: Context) : AViewGroup(context) {
     addView(this)
   }
 
+  fun updateContentDescription() {
+    contentDescription = listOf(title.text, subtitle.text, chip.text)
+      .mapNotNull { it.toString().trim().takeIf(String::isNotEmpty) }
+      .joinToString()
+  }
+
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     children.forEach {

@@ -178,6 +178,7 @@ class SnapshotDetailActivity :
           text = LCAppUtils.getDiffString(entity.labelDiff, isNewOrDeleted)
           setLongClickCopiedToClipboard(text)
         }
+        iconView.contentDescription = appNameView.text
 
         val pkgSplits = entity.packageName.split("/")
         val first = pkgSplits[0]

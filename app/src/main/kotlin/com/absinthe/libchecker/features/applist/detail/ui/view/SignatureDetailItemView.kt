@@ -41,6 +41,7 @@ class SignatureDetailItemView(context: Context) : AViewGroup(context) {
     scaleX = 0.8F
     scaleY = 0.8F
     setImageResource(R.drawable.ic_twotone_content_copy_24)
+    contentDescription = context.getString(android.R.string.copy)
     setBackgroundDrawable(context.getDrawableByAttr(android.R.attr.selectableItemBackgroundBorderless))
     setOnClickListener {
       ClipboardUtils.put(

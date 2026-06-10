@@ -22,6 +22,7 @@ class SystemPropsAdapter : BaseQuickAdapter<(Pair<String, String>), BaseViewHold
     (holder.itemView as SystemPropItemView).also {
       it.tvTitle.text = item.first
       it.tvText.text = item.second
+      it.contentDescription = listOf(item.first, item.second).joinToString()
     }
   }
 }

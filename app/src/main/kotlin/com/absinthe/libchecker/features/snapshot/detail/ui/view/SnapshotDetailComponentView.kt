@@ -47,6 +47,7 @@ class SnapshotDetailComponentView(context: Context) : MaterialCardView(context) 
     val typeIcon = AppCompatImageView(context).apply {
       layoutParams = LayoutParams(16.dp, 16.dp)
       imageTintList = R.color.material_blue_grey_700.toColorStateList(context)
+      importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
       addView(this)
     }
 

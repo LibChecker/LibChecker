@@ -18,6 +18,7 @@ class XposedDetailItemAdapter : BaseQuickAdapter<XposedDetailItem, BaseViewHolde
       tip.text = item.tip
       text.text = item.text
       text.setTextAppearance(item.textStyleRes)
+      updateContentDescription()
     }
   }
 }

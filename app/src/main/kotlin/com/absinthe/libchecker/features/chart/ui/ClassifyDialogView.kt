@@ -93,6 +93,7 @@ class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutin
       text.append(", ")
       text.append(SimpleDateFormat("yyyy-MM", Locale.getDefault()).format(node.releaseDate))
       androidVersionView.text.text = text
+      androidVersionView.contentDescription = text
       addView(androidVersionView, 1)
     }
   }

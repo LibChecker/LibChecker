@@ -170,6 +170,15 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
         item.isGone = true
       }
     }
+
+    if (!item.isGone) {
+      item.packageView.setItemContentDescription(
+        item.titleView.text,
+        item.packageView.container.appName.text,
+        item.packageView.container.packageName.text,
+        item.packageView.container.versionInfo.text
+      )
+    }
   }
 
   private fun initAppInstallSourceItemView(
@@ -194,6 +203,11 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
         it.abiInfo.isVisible = true
         it.setBadge(null)
       }
+      item.packageView.setItemContentDescription(
+        item.titleView.text,
+        item.packageView.container.appName.text,
+        item.packageView.container.packageName.text
+      )
       item.packageView.setOnClickListener(null)
       return
     }
@@ -217,6 +231,7 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
     val str = StringBuilder()
       .append(PackageUtils.getAbiString(requireContext(), targetLCItem.abi.toInt(), true))
       .append(PackageUtils.getBuildVersionsInfo(pi, packageName))
+      .toString()
     val spanString: SpannableString
     val abiBadgeRes = PackageUtils.getAbiBadgeResource(targetLCItem.abi.toInt())
 
@@ -232,6 +247,13 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
       item.packageView.container.abiInfo.text = str
     }
     item.packageView.container.abiInfo.isVisible = true
+    item.packageView.setItemContentDescription(
+      item.titleView.text,
+      targetLCItem.label,
+      packageName,
+      item.packageView.container.versionInfo.text,
+      str
+    )
 
     if (targetLCItem.variant == Constants.VARIANT_HAP) {
       item.packageView.container.setBadge(R.drawable.ic_harmony_badge)

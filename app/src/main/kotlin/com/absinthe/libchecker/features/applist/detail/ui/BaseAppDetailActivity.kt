@@ -219,6 +219,7 @@ abstract class BaseAppDetailActivity :
               false,
               this@BaseAppDetailActivity
             )
+            contentDescription = appName ?: getString(R.string.detail_label)
             ai?.let {
               load(appIconLoader.loadIcon(it))
             } ?: run {
@@ -533,10 +534,16 @@ abstract class BaseAppDetailActivity :
       pageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
           super.onPageSelected(position)
-          if (typeList.getOrNull(position) == NATIVE) {
-            toolbarProcessItem.tooltipTextRes = R.string.menu_split
+          val tooltipTextRes = if (typeList.getOrNull(position) == NATIVE) {
+            R.string.menu_split
           } else {
-            toolbarProcessItem.tooltipTextRes = R.string.menu_process
+            R.string.menu_process
+          }
+          if (toolbarProcessItem.tooltipTextRes != tooltipTextRes) {
+            toolbarProcessItem.tooltipTextRes = tooltipTextRes
+            toolbarAdapter.data.indexOf(toolbarProcessItem).takeIf { it >= 0 }?.let {
+              toolbarAdapter.notifyItemChanged(it)
+            }
           }
         }
       }.also { registerOnPageChangeCallback(it) }
@@ -678,7 +685,7 @@ abstract class BaseAppDetailActivity :
         when (feat.featureType) {
           Features.SPLIT_APKS -> {
             featureAdapter.addData(
-              FeatureItem(R.drawable.ic_aab) {
+              FeatureItem(R.drawable.ic_aab, R.string.app_bundle) {
                 FeaturesDialog.showSplitApksDialog(this, it.packageInfo)
               }
             )
@@ -686,7 +693,7 @@ abstract class BaseAppDetailActivity :
 
           Features.KOTLIN_USED -> {
             featureAdapter.addData(
-              FeatureItem(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_kotlin) {
+              FeatureItem(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_kotlin, R.string.kotlin_string) {
                 FeaturesDialog.showKotlinDialog(this, feat.extras)
               }
             )
@@ -694,7 +701,7 @@ abstract class BaseAppDetailActivity :
 
           Features.RX_JAVA -> {
             featureAdapter.addData(
-              FeatureItem(R.drawable.ic_reactivex) {
+              FeatureItem(R.drawable.ic_reactivex, R.string.rxjava) {
                 FeaturesDialog.showRxJavaDialog(this, feat.version)
               }
             )
@@ -702,7 +709,7 @@ abstract class BaseAppDetailActivity :
 
           Features.RX_KOTLIN -> {
             featureAdapter.addData(
-              FeatureItem(R.drawable.ic_reactivex, colorFilterInt = "#7F52FF".toColorInt()) {
+              FeatureItem(R.drawable.ic_reactivex, R.string.rxkotlin, colorFilterInt = "#7F52FF".toColorInt()) {
                 FeaturesDialog.showRxKotlinDialog(this, feat.version)
               }
             )
@@ -710,7 +717,7 @@ abstract class BaseAppDetailActivity :
 
           Features.RX_ANDROID -> {
             featureAdapter.addData(
-              FeatureItem(R.drawable.ic_reactivex, colorFilterInt = "#3DDC84".toColorInt()) {
+              FeatureItem(R.drawable.ic_reactivex, R.string.rxandroid, colorFilterInt = "#3DDC84".toColorInt()) {
                 FeaturesDialog.showRxAndroidDialog(this, feat.version)
               }
             )
@@ -718,7 +725,7 @@ abstract class BaseAppDetailActivity :
 
           Features.AGP -> {
             featureAdapter.addData(
-              FeatureItem(R.drawable.ic_gradle) {
+              FeatureItem(R.drawable.ic_gradle, R.string.agp) {
                 FeaturesDialog.showAGPDialog(this, feat.version)
               }
             )
@@ -726,7 +733,7 @@ abstract class BaseAppDetailActivity :
 
           Features.XPOSED_MODULE -> {
             featureAdapter.addData(
-              FeatureItem(R.drawable.ic_xposed) {
+              FeatureItem(R.drawable.ic_xposed, R.string.xposed_module) {
                 XposedInfoDialogFragment.newInstance(it.packageInfo.packageName)
                   .show(supportFragmentManager, XposedInfoDialogFragment::class.java.name)
               }
@@ -735,7 +742,7 @@ abstract class BaseAppDetailActivity :
 
           Features.PLAY_SIGNING -> {
             featureAdapter.addData(
-              FeatureItem(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_play_store) {
+              FeatureItem(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_play_store, R.string.play_app_signing) {
                 FeaturesDialog.showPlayAppSigningDialog(this)
               }
             )
@@ -743,7 +750,7 @@ abstract class BaseAppDetailActivity :
 
           Features.PWA -> {
             featureAdapter.addData(
-              FeatureItem(R.drawable.ic_pwa) {
+              FeatureItem(R.drawable.ic_pwa, R.string.pwa) {
                 FeaturesDialog.showPWADialog(this)
               }
             )
@@ -751,7 +758,7 @@ abstract class BaseAppDetailActivity :
 
           Features.JETPACK_COMPOSE -> {
             featureAdapter.addData(
-              FeatureItem(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetpack_compose) {
+              FeatureItem(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetpack_compose, R.string.jetpack_compose) {
                 FeaturesDialog.showJetpackComposeDialog(this, feat.version)
               }
             )
@@ -759,7 +766,7 @@ abstract class BaseAppDetailActivity :
 
           Features.KMP -> {
             featureAdapter.addData(
-              FeatureItem(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetbrain_kmp) {
+              FeatureItem(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetbrain_kmp, R.string.jetbrain_kmp) {
                 FeaturesDialog.showKMPDialog(this, feat.version)
               }
             )
@@ -767,7 +774,7 @@ abstract class BaseAppDetailActivity :
 
           Features.LIVE_UPDATE_NOTIFICATION -> {
             featureAdapter.addData(
-              FeatureItem(R.drawable.ic_feature_live_update) {
+              FeatureItem(R.drawable.ic_feature_live_update, R.string.feature_live_update_notification) {
                 FeaturesDialog.showLiveUpdateNotificationDialog(this)
               }
             )
@@ -777,7 +784,7 @@ abstract class BaseAppDetailActivity :
             val position = featureAdapter.data.size.coerceAtMost(FeaturePriority.PRIORITY_APP_PROP)
             featureAdapter.addData(
               position,
-              FeatureItem(R.drawable.ic_app_prop) {
+              FeatureItem(R.drawable.ic_app_prop, R.string.lib_detail_app_props_title) {
                 if (viewModel.isApkPreview && viewModel.apkPreviewInfo != null) {
                   FeaturesDialog.showAppPropDialog(this, viewModel.apkPreviewInfo!!.appProps)
                 } else {
@@ -792,7 +799,7 @@ abstract class BaseAppDetailActivity :
             if (OsUtils.atLeastR() && !apkAnalyticsMode) {
               featureAdapter.addData(
                 position,
-                FeatureItem(R.drawable.ic_install_source) {
+                FeatureItem(R.drawable.ic_install_source, R.string.lib_detail_app_install_source_title) {
                   FeaturesDialog.showAppInstallSourceDialog(this, it.packageInfo.packageName)
                 }
               )
@@ -803,7 +810,7 @@ abstract class BaseAppDetailActivity :
             val position = featureAdapter.data.size.coerceAtMost(FeaturePriority.PRIORITY_16_KB_PAGE_SIZE)
             featureAdapter.addData(
               position,
-              FeatureItem(R.drawable.ic_16kb_align) {
+              FeatureItem(R.drawable.ic_16kb_align, R.string.lib_detail_dialog_title_16kb_page_size) {
                 FeaturesDialog.show16KBAlignDialog(this)
               }
             )
@@ -813,7 +820,7 @@ abstract class BaseAppDetailActivity :
             val position = featureAdapter.data.size.coerceAtMost(FeaturePriority.PRIORITY_16_KB_PAGE_SIZE_COMPAT)
             featureAdapter.addData(
               position,
-              FeatureItem(R.drawable.ic_16kb_compat) {
+              FeatureItem(R.drawable.ic_16kb_compat, R.string.lib_detail_dialog_title_16kb_page_size_compat) {
                 FeaturesDialog.show16KBCompatDialog(this)
               }
             )
@@ -825,7 +832,7 @@ abstract class BaseAppDetailActivity :
               val drawables = prepareAppIconDrawables()
               if (drawables.isNotEmpty()) {
                 featureAdapter.addData(
-                  FeatureItem(-1, drawables = drawables) {
+                  FeatureItem(-1, R.string.dialog_themed_and_alternative_app_icons, drawables = drawables) {
                     FeaturesDialog.showAppIconsDialog(this, drawables, isFirstMonochrome)
                   }
                 )

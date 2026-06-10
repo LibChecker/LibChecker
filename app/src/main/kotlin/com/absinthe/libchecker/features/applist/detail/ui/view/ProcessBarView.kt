@@ -68,6 +68,7 @@ class ProcessBarView(context: Context) : RecyclerView(context) {
       layoutParams = LayoutParams(18.dp, 18.dp)
       setImageResource(R.drawable.bg_circle_secondary_container)
       setPadding(2.dp, 2.dp, 2.dp, 2.dp)
+      importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
       addView(this)
     }
 

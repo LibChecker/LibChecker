@@ -16,6 +16,7 @@ class AlternativeLaunchAdapter : BaseQuickAdapter<AlternativeLaunchItem, BaseVie
     (holder.itemView as AlternativeLaunchItemView).apply {
       label.text = item.label
       className.text = item.className
+      contentDescription = listOf(item.label, item.className).joinToString()
     }
   }
 }

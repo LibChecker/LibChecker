@@ -57,6 +57,7 @@ class ExpandingView @JvmOverloads constructor(
   fun setContent(iconRes: Int, content: String) {
     icon.setImageResource(iconRes)
     text.text = content
+    contentDescription = content
   }
 
   private fun measureExpandedWidth() {

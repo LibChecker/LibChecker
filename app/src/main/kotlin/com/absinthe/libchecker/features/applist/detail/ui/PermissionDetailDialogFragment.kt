@@ -65,6 +65,8 @@ class PermissionDetailDialogFragment : BaseBottomSheetViewDialogFragment<Permiss
         permissionInfo.loadDescription(pm)
           ?.let { if (it.isNotEmpty()) permissionContentView.description.text.text = it }
       }
+      permissionContentView.label.updateContentDescription()
+      permissionContentView.description.updateContentDescription()
     }
   }
 

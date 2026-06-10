@@ -43,6 +43,7 @@ class AppPropsAdapter(
       // setTipText("TODO")
       key.text = item.key
       value.text = parseValue(item)
+      contentDescription = buildItemDescription(key.text, value.text)
       initLinkBtn(this, item)
     }
   }
@@ -80,6 +81,7 @@ class AppPropsAdapter(
         val transformed = getTag(R.id.resource_transformed_id) as? Boolean == true
         if (transformed) {
           itemView.value.text = parseValue(item)
+          itemView.contentDescription = buildItemDescription(itemView.key.text, itemView.value.text)
           setImageResource(R.drawable.ic_outline_change_circle_24)
           setTag(R.id.resource_transformed_id, false)
         } else {
@@ -157,9 +159,16 @@ class AppPropsAdapter(
               }
             }
           }
+          itemView.contentDescription = buildItemDescription(itemView.key.text, itemView.value.text)
           setTag(R.id.resource_transformed_id, clickedTag)
         }
       }
     }
+  }
+
+  private fun buildItemDescription(vararg parts: CharSequence?): String {
+    return parts
+      .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
+      .joinToString()
   }
 }

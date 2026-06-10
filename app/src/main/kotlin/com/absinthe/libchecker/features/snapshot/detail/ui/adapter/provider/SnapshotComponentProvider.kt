@@ -66,6 +66,10 @@ class SnapshotComponentProvider : BaseNodeProvider() {
           else -> throw IllegalArgumentException("wrong diff type")
         }
       )
+      helper.itemView.contentDescription = buildItemDescription(
+        getStatusLabel(snapshotItem.diffType),
+        snapshotItem.title
+      )
 
       val baseColor = colorRes.getColor(context)
       val alpha = if (UiUtils.isDarkMode()) {
@@ -81,6 +85,11 @@ class SnapshotComponentProvider : BaseNodeProvider() {
 
         withContext(Dispatchers.Main) {
           setChip(rule, alphaColor)
+          helper.itemView.contentDescription = buildItemDescription(
+            getStatusLabel(snapshotItem.diffType),
+            snapshotItem.title,
+            rule?.label
+          )
           if (rule != null) {
             setChipOnClickListener {
               if (AntiShakeUtils.isInvalidClick(it)) {
@@ -98,5 +107,23 @@ class SnapshotComponentProvider : BaseNodeProvider() {
         }
       }
     }
+  }
+
+  private fun buildItemDescription(vararg parts: CharSequence?): String {
+    return parts
+      .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
+      .joinToString()
+  }
+
+  private fun getStatusLabel(status: Int): String {
+    return context.getString(
+      when (status) {
+        ADDED -> R.string.snapshot_indicator_added
+        REMOVED -> R.string.snapshot_indicator_removed
+        CHANGED -> R.string.snapshot_indicator_changed
+        MOVED -> R.string.snapshot_indicator_moved
+        else -> android.R.string.untitled
+      }
+    )
   }
 }

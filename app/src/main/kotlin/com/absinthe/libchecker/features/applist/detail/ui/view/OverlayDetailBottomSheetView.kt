@@ -35,7 +35,7 @@ class OverlayDetailBottomSheetView(context: Context) :
     }
   }
 
-  private val targetTitleView = AppCompatTextView(
+  val targetTitleView = AppCompatTextView(
     ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)
   ).apply {
     layoutParams = LayoutParams(

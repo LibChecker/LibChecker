@@ -15,6 +15,7 @@ class EmptyListView(context: Context) : AViewGroup(context) {
   private val icon = AppCompatImageView(context).apply {
     layoutParams = LayoutParams(160.dp, 160.dp)
     setImageResource(R.drawable.ic_empty_list)
+    importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     addView(this)
   }
 
@@ -28,6 +29,10 @@ class EmptyListView(context: Context) : AViewGroup(context) {
     text = context.getString(R.string.empty_list)
     setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadlineSmall))
     addView(this)
+  }
+
+  init {
+    contentDescription = text.text
   }
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

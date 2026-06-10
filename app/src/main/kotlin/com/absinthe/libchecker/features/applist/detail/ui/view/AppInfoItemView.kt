@@ -48,6 +48,7 @@ class AppInfoItemView(context: Context) : LinearLayout(context) {
     layoutParams = LayoutParams(iconSize, iconSize)
     scaleType = ImageView.ScaleType.CENTER_CROP
     setBackgroundResource(R.drawable.bg_circle_secondary_container)
+    importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     addView(this)
   }
 
@@ -74,6 +75,7 @@ class AppInfoItemView(context: Context) : LinearLayout(context) {
   fun setText(charSequence: CharSequence) {
     text.text = charSequence
     text.isVisible = charSequence.isNotEmpty()
+    contentDescription = charSequence
   }
 
   fun setText(@StringRes res: Int) {

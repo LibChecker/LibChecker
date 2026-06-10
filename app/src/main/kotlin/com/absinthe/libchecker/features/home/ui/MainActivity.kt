@@ -281,7 +281,7 @@ class MainActivity :
           }
           true
         }
-        setOnClickListener { /*Do nothing*/ }
+        importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
         if (this is BottomNavigationView) {
           fixBottomNavigationViewInsets(this)
         } else {

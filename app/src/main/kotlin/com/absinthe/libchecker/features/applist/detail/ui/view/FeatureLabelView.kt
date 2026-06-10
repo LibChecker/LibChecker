@@ -33,6 +33,7 @@ class FeatureLabelView(context: Context) : AppCompatImageButton(context) {
   }
 
   fun setFeature(item: FeatureItem) {
+    contentDescription = item.titleRes.takeIf { it != 0 }?.let(context::getString)
     item.colorFilterInt?.let {
       val drawable = UiUtils.changeDrawableColor(context, item.res, it)
       setImageDrawable(drawable)

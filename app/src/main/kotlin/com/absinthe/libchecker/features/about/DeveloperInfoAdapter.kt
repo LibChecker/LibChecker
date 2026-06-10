@@ -32,6 +32,7 @@ class DeveloperInfoAdapter : BaseQuickAdapter<DeveloperInfo, BaseViewHolder>(0) 
       }
       container.name.text = item.name
       container.desc.text = item.desc
+      contentDescription = listOf(item.name, item.desc).joinToString()
       setOnClickListener {
         val context = it.context
         runCatching {

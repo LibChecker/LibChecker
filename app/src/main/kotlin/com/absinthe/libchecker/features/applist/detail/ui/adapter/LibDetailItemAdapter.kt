@@ -32,6 +32,7 @@ class LibDetailItemAdapter : BaseQuickAdapter<LibDetailItem, BaseViewHolder>(0) 
           text = item.text
         }
       }
+      updateContentDescription()
     }
   }
 }

@@ -26,6 +26,7 @@ class MultipleAppsIconView(context: Context) : AViewGroup(context) {
     clipToOutline = true
     setOutlineProvider(outlineProvider)
     setBackgroundColor(context.getColorByAttr(com.google.android.material.R.attr.colorSurfaceContainerHigh))
+    importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
   }
 
   fun setIcons(packages: Iterable<String>) {
@@ -41,6 +42,7 @@ class MultipleAppsIconView(context: Context) : AViewGroup(context) {
           PackageUtils.getPackageInfo(packageName)
         }.getOrNull() ?: return
 
+        it.importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
         it.load(packageInfo)
       }
       icons.add(icon)

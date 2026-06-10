@@ -73,6 +73,7 @@ class OverlayDetailBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment
           text = packageInfo.getAppName(context.packageManager)
           setLongClickCopiedToClipboard(text)
         }
+        iconView.contentDescription = appNameView.text
         packageNameView.apply {
           text = lcItem.packageName
           setLongClickCopiedToClipboard(text)
@@ -127,6 +128,7 @@ class OverlayDetailBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment
           val str = StringBuilder()
             .append(PackageUtils.getAbiString(context, targetLCItem.abi.toInt(), true))
             .append(PackageUtils.getBuildVersionsInfo(pi, targetPackage))
+            .toString()
           val spanString: SpannableString
           val abiBadgeRes = PackageUtils.getAbiBadgeResource(targetLCItem.abi.toInt())
 
@@ -141,6 +143,13 @@ class OverlayDetailBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment
           } else {
             it.abiInfo.text = str
           }
+          targetPackageView.setItemContentDescription(
+            targetTitleView.text,
+            targetLCItem.label,
+            targetPackage,
+            it.versionInfo.text,
+            str
+          )
 
           if (lcItem.variant == Constants.VARIANT_HAP) {
             it.setBadge(R.drawable.ic_harmony_badge)

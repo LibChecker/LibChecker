@@ -55,6 +55,13 @@ class AppItemView(context: Context) : MaterialCardView(context) {
       addView(floatView)
     }
     floatView.text = text
+    setItemContentDescription(text)
+  }
+
+  fun setItemContentDescription(vararg parts: CharSequence?) {
+    contentDescription = parts
+      .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
+      .joinToString()
   }
 
   class AppItemContainerView(context: Context) : AViewGroup(context) {
@@ -67,6 +74,7 @@ class AppItemView(context: Context) : MaterialCardView(context) {
       val iconSize = context.getDimensionPixelSize(R.dimen.app_icon_size)
       layoutParams = LayoutParams(iconSize, iconSize)
       setImageResource(R.drawable.ic_icon_blueprint)
+      importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
       addView(this)
     }
 
@@ -164,6 +172,7 @@ class AppItemView(context: Context) : MaterialCardView(context) {
         if (badge == null) {
           badge = AppCompatImageView(context).apply {
             layoutParams = LayoutParams(24.dp, 24.dp)
+            importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
             addView(this)
           }
         }
@@ -189,6 +198,7 @@ class AppItemView(context: Context) : MaterialCardView(context) {
       return (view ?: AppCompatImageView(context).also { addView(it) }).apply {
         layoutParams = LayoutParams(drawable.intrinsicWidth, drawable.intrinsicHeight)
         setImageDrawable(drawable)
+        importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
       }
     }
 

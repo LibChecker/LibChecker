@@ -41,6 +41,13 @@ class TrackAdapter : BaseQuickAdapter<TrackListItem, BaseViewHolder>(0) {
       appName.text = item.label
       packageName.text = item.packageName
       switch.isChecked = item.switchState
+      switch.contentDescription = buildItemDescription(item.label, item.packageName)
     }
   }
+}
+
+private fun buildItemDescription(vararg parts: CharSequence?): String {
+  return parts
+    .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
+    .joinToString()
 }

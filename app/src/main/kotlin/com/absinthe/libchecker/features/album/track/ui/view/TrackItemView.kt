@@ -33,6 +33,7 @@ class TrackItemView(context: Context) : FrameLayout(context) {
     val icon = AppCompatImageView(context).apply {
       val iconSize = context.getDimensionPixelSize(R.dimen.app_icon_size)
       layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
+      importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
       addView(this)
     }
 

@@ -36,6 +36,7 @@ class ELFInfoBottomSheetView(context: Context) :
       it.topMargin = 4.dp
     }
     setBackgroundResource(R.drawable.bg_circle_outline)
+    importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
   }
 
   val title = AppCompatTextView(
