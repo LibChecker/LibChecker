@@ -98,6 +98,7 @@ object Constants {
 
   const val PP_FROM_CLOUD_RULES_UPDATE = "ruleDatabaseUpdate"
   const val PREF_EXPORT_LOG = "exportLog"
+  const val PREF_EXPORT_APPS = "exportApps"
 
   const val PREF_DETAILED_ABI_CHART = "detailedAbiChart"
   const val PREF_RULE_LANGUAGE = "ruleLanguage"

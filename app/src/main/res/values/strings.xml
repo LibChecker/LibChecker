@@ -98,12 +98,17 @@
   <string name="dark_mode">Dark mode</string>
   <string name="snapshot_keep">Snapshot keep rule</string>
   <string name="export_log">Export log</string>
+  <string name="export_apps">Export app info</string>
 
   <string name="apk_analytics_summary">Open the details page when clicking an APK file</string>
   <string name="colorful_icon_summary">Some marked libraries will have a colored logo</string>
   <string name="lib_ref_threshold_summary">Only libraries with the number of library references reaching the threshold are displayed in the list</string>
   <string name="reload_apps_summary">Recommended to use when the app list is shown abnormally</string>
   <string name="export_log_summary">Export the log file of the app</string>
+  <string name="export_apps_webui_tip">Exported apps can be viewed on the WebUI</string>
+  <string name="export_apps_start">Start</string>
+  <string name="export_apps_success">Exported %1$d apps</string>
+  <string name="export_apps_failed">Failed to export apps: %1$s</string>
   <string name="help_docs_summary">Learn how to use LibChecker</string>
   <string name="join_telegram_group_summary">Join our Telegram group</string>
   <string name="anonymous_statistics_summary">We use Google Firebase to anonymously send the most commonly used marked libraries and some usage habit data to make LibChecker better</string>

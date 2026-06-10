@@ -76,6 +76,12 @@
       app:summary="@string/export_log_summary"
       app:title="@string/export_log" />
 
+    <Preference
+      app:icon="@drawable/ic_app_list"
+      app:key="exportApps"
+      app:summary="@string/export_apps_webui_tip"
+      app:title="@string/export_apps" />
+
   </PreferenceCategory>
 
   <PreferenceCategory
