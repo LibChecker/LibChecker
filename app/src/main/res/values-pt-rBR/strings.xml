@@ -193,12 +193,18 @@
   <string name="lib_detail_app_install_source_shizuku_not_running_detail">Clique aqui para pular para o Shizuku para começa-lo</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku não autorizado</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">Clique aqui para autorização Shizuku para requisitador de instalação</string>
+  <string name="lib_detail_app_dexopt_title">DEX optimization</string>
+  <string name="lib_detail_app_dexopt_status">Status</string>
+  <string name="lib_detail_app_dexopt_reason">Reason</string>
   <string name="lib_detail_elf_info">Mais informações</string>
   <string name="lib_detail_elf_extract">Extrair</string>
   <string name="lib_detail_elf_extract_success">Arquivo ELF salvo em Downloads</string>
   <string name="lib_detail_elf_extract_failed">Falha ao extrair o arquivo ELF</string>
   <string name="lib_detail_dependency_tip">Dependências</string>
   <string name="lib_detail_entry_points_tip">Pontos de Entrada</string>
+  <string name="lib_detail_optimization_tip">Optimization</string>
+  <string name="lib_detail_optimization_on">Native symbols are stripped, resulting in app size savings.</string>
+  <string name="lib_detail_optimization_off">Native symbols are not stripped, preventing app size savings.</string>
   <string name="apk_preview">Prévia do APK</string>
   <string name="apk_preview_item_not_available">Não pode ser exibido no modo de visualização</string>
   <string name="feature_live_update_notification">Notificação de atualização ao vivo</string>
@@ -304,4 +310,6 @@
   <string name="snapshot_menu_diff_highlight">Realce do diff</string>
   <string name="snapshot_menu_use_iec_units">Usar Unidades IEC</string>
   <!-- A11y -->
+  <string name="a11y_state_expanded">Expanded</string>
+  <string name="a11y_state_collapsed">Collapsed</string>
 </resources>
