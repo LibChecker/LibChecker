@@ -193,12 +193,18 @@
   <string name="lib_detail_app_install_source_shizuku_not_running_detail">Натисніть тут, щоб перейти до Shizuku та запустити його</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku не авторизовано</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">Натисніть тут для авторизації Shizuku для запитувача встановлення</string>
+  <string name="lib_detail_app_dexopt_title">DEX optimization</string>
+  <string name="lib_detail_app_dexopt_status">Status</string>
+  <string name="lib_detail_app_dexopt_reason">Reason</string>
   <string name="lib_detail_elf_info">Детальніше</string>
   <string name="lib_detail_elf_extract">Розпакувати</string>
   <string name="lib_detail_elf_extract_success">Файл ELF збережено до завантажень</string>
   <string name="lib_detail_elf_extract_failed">Не вдалося витягти ELF файл</string>
   <string name="lib_detail_dependency_tip">Залежності</string>
   <string name="lib_detail_entry_points_tip">Точки входу</string>
+  <string name="lib_detail_optimization_tip">Optimization</string>
+  <string name="lib_detail_optimization_on">Native symbols are stripped, resulting in app size savings.</string>
+  <string name="lib_detail_optimization_off">Native symbols are not stripped, preventing app size savings.</string>
   <string name="apk_preview">Попередній перегляд APK-файлу</string>
   <string name="apk_preview_item_not_available">Неможливо відобразити в режимі попереднього перегляду</string>
   <string name="feature_live_update_notification">Повідомлення про оновлення</string>
@@ -244,6 +250,7 @@
   <string name="dialog_title_compare_diff_apk">Увага</string>
   <string name="dialog_message_compare_diff_apk">Бажаєте порівняти два різних APK?</string>
   <string name="dialog_themed_and_alternative_app_icons">Адаптивні та альтернативні іконки</string>
+  <string name="dialog_themed">Themed</string>
   <!--  Album  -->
   <string name="album_compare">Порівняти</string>
   <string name="album_item_comparison_title">Порівняння</string>
@@ -303,4 +310,6 @@
   <string name="snapshot_menu_diff_highlight">Показати відмінності</string>
   <string name="snapshot_menu_use_iec_units">Використовувати одиниці IEC</string>
   <!-- A11y -->
+  <string name="a11y_state_expanded">Expanded</string>
+  <string name="a11y_state_collapsed">Collapsed</string>
 </resources>
