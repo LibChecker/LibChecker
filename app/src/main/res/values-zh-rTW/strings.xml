@@ -303,4 +303,5 @@
   <string name="snapshot_menu_hide_no_component_changes">隱藏沒有元件變更</string>
   <string name="snapshot_menu_diff_highlight">重點標示差異</string>
   <string name="snapshot_menu_use_iec_units">使用 IEC 單元</string>
+  <!-- A11y -->
 </resources>
