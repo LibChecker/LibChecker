@@ -279,4 +279,5 @@
   <string name="snapshot_menu_hide_no_component_changes">Скрыть компоненты без изменений</string>
   <string name="snapshot_menu_diff_highlight">Показать различия</string>
   <string name="snapshot_menu_use_iec_units">Использовать единицы IEC</string>
+  <!-- A11y -->
 </resources>

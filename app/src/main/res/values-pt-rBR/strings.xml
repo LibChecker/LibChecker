@@ -303,4 +303,5 @@
   <string name="snapshot_menu_hide_no_component_changes">Não ocultar nenhuma alteração de componente</string>
   <string name="snapshot_menu_diff_highlight">Realce do diff</string>
   <string name="snapshot_menu_use_iec_units">Usar Unidades IEC</string>
+  <!-- A11y -->
 </resources>
