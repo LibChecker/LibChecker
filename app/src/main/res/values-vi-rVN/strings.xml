@@ -288,4 +288,5 @@
   <string name="snapshot_menu_hide_no_component_changes">Ẩn những thay đổi không có thành phần</string>
   <string name="snapshot_menu_diff_highlight">Tô sáng khác biệt</string>
   <string name="snapshot_menu_use_iec_units">Sử dụng đơn vị IEC</string>
+  <!-- A11y -->
 </resources>
