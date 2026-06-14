@@ -69,9 +69,10 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
 
       versionInfo.text = PackageUtils.getVersionString(item.versionName, item.versionCode)
 
+      val buildVersionsInfo = PackageUtils.getBuildVersionsInfo(packageInfo, item.packageName)
       val str = StringBuilder()
         .append(PackageUtils.getAbiString(context, item.abi.toInt(), false))
-        .append(PackageUtils.getBuildVersionsInfo(packageInfo, item.packageName))
+        .append(buildVersionsInfo)
       val abi = item.abi.toInt()
       val useDetachedAbiBadges = shouldUseDetachedAbiBadges()
       setDetachedAbiBadgeLayoutEnabled(useDetachedAbiBadges)
@@ -120,7 +121,9 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
         item.label,
         item.packageName,
         versionInfo.text,
-        PackageUtils.getAbiString(context, item.abi.toInt(), true)
+        StringBuilder()
+          .append(PackageUtils.getAbiString(context, item.abi.toInt(), true))
+          .append(buildVersionsInfo)
       )
     }
   }
