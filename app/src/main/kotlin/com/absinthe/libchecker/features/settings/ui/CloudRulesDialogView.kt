@@ -9,16 +9,13 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.app.IHeaderView
+import com.absinthe.libchecker.view.app.RuleLoadingView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.absinthe.libraries.utils.view.HeightAnimatableViewFlipper
-import com.airbnb.lottie.LottieAnimationView
-import com.airbnb.lottie.LottieDrawable
 import com.google.android.material.button.MaterialButton
-import java.io.File
 
 class CloudRulesDialogView(context: Context) :
   AViewGroup(context),
@@ -37,14 +34,10 @@ class CloudRulesDialogView(context: Context) :
     setOutAnimation(context, R.anim.anim_fade_out)
   }
 
-  private val loadingAnim = LottieAnimationView(context).apply {
-    val size = context.getDimensionPixelSize(R.dimen.lottie_anim_size)
-    layoutParams = FrameLayout.LayoutParams(size, size).also {
+  private val loading = RuleLoadingView(context).apply {
+    layoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 160.dp).also {
       it.gravity = Gravity.CENTER
     }
-    imageAssetsFolder = File.separator
-    repeatCount = LottieDrawable.INFINITE
-    setAnimation("anim/gray-down-arrow.json.zip")
   }
 
   val cloudRulesContentView = CloudRulesContentView(context).apply {
@@ -57,7 +50,7 @@ class CloudRulesDialogView(context: Context) :
   init {
     addView(header)
     addView(viewFlipper)
-    viewFlipper.addView(loadingAnim)
+    viewFlipper.addView(loading)
     viewFlipper.addView(cloudRulesContentView)
   }
 
@@ -71,11 +64,6 @@ class CloudRulesDialogView(context: Context) :
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     header.layout(0, paddingTop)
     viewFlipper.layout(0, header.bottom)
-  }
-
-  override fun onAttachedToWindow() {
-    super.onAttachedToWindow()
-    loadingAnim.playAnimation()
   }
 
   class CloudRulesContentView(context: Context) : AViewGroup(context) {
@@ -212,6 +200,7 @@ class CloudRulesDialogView(context: Context) :
   }
 
   fun showContent() {
+    loading.stop()
     if (viewFlipper.displayedChildView != cloudRulesContentView) {
       viewFlipper.show(cloudRulesContentView)
     }

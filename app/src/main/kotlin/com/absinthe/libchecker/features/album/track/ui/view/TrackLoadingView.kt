@@ -4,34 +4,37 @@ import android.content.Context
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.view.AViewGroup
-import com.airbnb.lottie.LottieAnimationView
-import com.airbnb.lottie.LottieDrawable
-import java.io.File
+import com.absinthe.libchecker.view.app.RingDotsView
 
 class TrackLoadingView(context: Context) : AViewGroup(context) {
 
-  private val anim = LottieAnimationView(context).apply {
-    val size = context.getDimensionPixelSize(R.dimen.lottie_anim_size)
+  private val loading = RingDotsView(context).apply {
+    val size = context.getDimensionPixelSize(R.dimen.general_loading_size)
     layoutParams = LayoutParams(size, size)
-    imageAssetsFolder = File.separator
-    repeatCount = LottieDrawable.INFINITE
-    setAnimation("anim/track_target.json.zip")
-    enableMergePathsForKitKatAndAbove(true)
-    addView(this)
+  }
+
+  init {
+    addView(loading)
+    loading.setAppIconHighlightProvider()
   }
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-    anim.autoMeasure()
+    loading.autoMeasure()
     setMeasuredDimension(measuredWidth, measuredHeight)
   }
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-    anim.layout(anim.toHorizontalCenter(this), anim.toVerticalCenter(this))
+    loading.layout(loading.toHorizontalCenter(this), loading.toVerticalCenter(this))
   }
 
   override fun onAttachedToWindow() {
     super.onAttachedToWindow()
-    anim.playAnimation()
+    loading.start()
+  }
+
+  override fun onDetachedFromWindow() {
+    loading.stop()
+    super.onDetachedFromWindow()
   }
 }

@@ -26,7 +26,6 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.constant.options.AdvancedOptions
-import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
@@ -42,8 +41,6 @@ import com.absinthe.libchecker.ui.base.BaseListControllerFragment
 import com.absinthe.libchecker.ui.base.IAppBarContainer
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Telemetry
-import com.absinthe.libchecker.utils.UiUtils
-import com.absinthe.libchecker.utils.UiUtils.toCircularBitmap
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.isPreinstalled
@@ -51,7 +48,6 @@ import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libchecker.utils.showToast
-import com.absinthe.libchecker.view.app.RingDotsView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -201,22 +197,7 @@ class AppListFragment :
           Timber.e(e)
         }
       }
-      initView.loadingView.setHighlightIconProvider(object : RingDotsView.HighlightIconProvider {
-        override suspend fun produce(emitter: RingDotsView.HighlightIconEmitter) {
-          val defaultIcon = context.packageManager.defaultActivityIcon
-          while (true) {
-            if (!initView.loadingView.isHighlightAnimationAvailable()) {
-              break
-            }
-            val ai = LocalAppDataSource.getRandomApplicationInfo() ?: break
-            val drawable = ai.loadIcon(context.packageManager)
-              ?.takeIf { icon -> !UiUtils.drawablesAreEqual(icon, defaultIcon) }
-              ?: continue
-
-            emitter.emit(drawable.toCircularBitmap())
-          }
-        }
-      })
+      initView.loadingView.setAppIconHighlightProvider()
     }
 
     initObserver()

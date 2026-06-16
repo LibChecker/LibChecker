@@ -3,20 +3,16 @@ package com.absinthe.libchecker.features.applist.detail.ui.view
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.graphics.drawable.Drawable
 import android.text.method.LinkMovementMethod
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.Gravity
-import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TableLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.text.HtmlCompat
 import androidx.core.view.children
 import androidx.core.view.marginStart
@@ -31,21 +27,17 @@ import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibDetailItemA
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.node.LibDetailItem
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
-import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.app.IHeaderView
-import com.absinthe.libchecker.view.app.IconCarouselView
+import com.absinthe.libchecker.view.app.RuleLoadingView
 import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.absinthe.libraries.utils.view.HeightAnimatableViewFlipper
-import com.absinthe.rulesbundle.IconResMap
-import com.google.android.material.loadingindicator.LoadingIndicator
 import com.google.android.material.tabs.TabLayout
 import java.util.Locale
-import kotlin.random.Random
 import timber.log.Timber
 
 class LibDetailBottomSheetView(context: Context) :
@@ -90,29 +82,8 @@ class LibDetailBottomSheetView(context: Context) :
     setOutAnimation(context, R.anim.anim_fade_out)
   }
 
-  private val loadingCarouselView = if (OsUtils.atLeastS()) {
-    IconCarouselView(context).apply {
-      layoutParams = createLoadingLayoutParams()
-      setIconDrawables(createLoadingIconDrawables(context))
-    }
-  } else {
-    null
-  }
-
-  private val loading: View = loadingCarouselView ?: FrameLayout(context).apply {
+  private val loading = RuleLoadingView(context).apply {
     layoutParams = createLoadingLayoutParams()
-    addView(
-      LoadingIndicator(
-        ContextThemeWrapper(context, R.style.App_Widget_M3E_LoadingIndicator_Contained)
-      ).apply {
-        layoutParams = FrameLayout.LayoutParams(
-          FrameLayout.LayoutParams.WRAP_CONTENT,
-          FrameLayout.LayoutParams.WRAP_CONTENT
-        ).also {
-          it.gravity = Gravity.CENTER
-        }
-      }
-    )
   }
 
   private val notFoundView = NotFoundView(context).apply {
@@ -190,7 +161,7 @@ class LibDetailBottomSheetView(context: Context) :
   override fun onAttachedToWindow() {
     super.onAttachedToWindow()
     if (viewFlipper.displayedChildView == loading) {
-      loadingCarouselView?.start()
+      loading.start()
     }
   }
 
@@ -199,60 +170,7 @@ class LibDetailBottomSheetView(context: Context) :
   }
 
   fun setLoadingIcon(iconRes: Int, isSingleColorIcon: Boolean = false) {
-    loadingCarouselView?.setIconDrawables(
-      createLoadingIconDrawables(
-        context = context,
-        initialIcon = LoadingIcon(iconRes, isSingleColorIcon)
-      )
-    )
-  }
-
-  private fun createLoadingIconDrawables(
-    context: Context,
-    initialIcon: LoadingIcon? = null
-  ): List<Drawable> {
-    val randomIcons = (0 until LOADING_ICON_POOL_COUNT)
-      .shuffled(Random(System.nanoTime()))
-      .mapNotNull { index ->
-        runCatching {
-          LoadingIcon(
-            iconRes = IconResMap.getIconRes(index),
-            isSingleColorIcon = IconResMap.isSingleColorIcon(index)
-          )
-        }.getOrNull()
-      }
-      .filter { it.iconRes != initialIcon?.iconRes }
-      .take(LOADING_ICON_COUNT - if (initialIcon == null) 0 else 1)
-
-    return (listOfNotNull(initialIcon) + randomIcons)
-      .mapNotNull {
-        context.getCarouselIconDrawable(it.iconRes, it.isSingleColorIcon)
-      }
-      .ifEmpty {
-        listOfNotNull(
-          context.getCarouselIconDrawable(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_android),
-          context.getCarouselIconDrawable(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_google),
-          context.getCarouselIconDrawable(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_kotlin),
-          context.getCarouselIconDrawable(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_telegram)
-        )
-      }
-  }
-
-  private fun Context.getCarouselIconDrawable(
-    iconRes: Int,
-    isSingleColorIcon: Boolean = runCatching {
-      IconResMap.isSingleColorIcon(IconResMap.getResIndex(iconRes))
-    }.getOrDefault(false)
-  ): Drawable? {
-    val drawable = ContextCompat.getDrawable(this, iconRes)?.mutate() ?: return null
-    return DrawableCompat.wrap(drawable).mutate().also {
-      if (isSingleColorIcon) {
-        DrawableCompat.setTint(
-          it,
-          getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
-        )
-      }
-    }
+    loading.setInitialIcon(iconRes, isSingleColorIcon)
   }
 
   private fun createLoadingLayoutParams(): FrameLayout.LayoutParams {
@@ -478,26 +396,16 @@ class LibDetailBottomSheetView(context: Context) :
 
   fun showContent() {
     Timber.d("showContent")
-    loadingCarouselView?.stop()
+    loading.stop()
     if (viewFlipper.displayedChildView != libDetailContentView) {
       viewFlipper.show(libDetailContentView)
     }
   }
 
   fun showNotFound() {
-    loadingCarouselView?.stop()
+    loading.stop()
     if (viewFlipper.displayedChildView != notFoundView) {
       viewFlipper.show(notFoundView)
     }
   }
-
-  private companion object {
-    private const val LOADING_ICON_COUNT = 18
-    private const val LOADING_ICON_POOL_COUNT = 100
-  }
-
-  private data class LoadingIcon(
-    val iconRes: Int,
-    val isSingleColorIcon: Boolean
-  )
 }

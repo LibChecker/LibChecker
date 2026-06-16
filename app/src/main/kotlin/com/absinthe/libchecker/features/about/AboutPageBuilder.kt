@@ -135,7 +135,6 @@ object AboutPageBuilder {
               val content = StringBuilder()
               val list = listOf(
                 "https://www.iconfont.cn/",
-                "https://lottiefiles.com/44836-gray-down-arrow",
                 "https://pictogrammers.com/library/mdi/"
               )
               content.append("<b>").append("Acknowledgement").append("</b>").append("<br>")

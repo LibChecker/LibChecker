@@ -15,11 +15,9 @@ import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.absinthe.libraries.utils.view.HeightAnimatableViewFlipper
-import com.airbnb.lottie.LottieAnimationView
-import com.airbnb.lottie.LottieDrawable
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
-import java.io.File
+import com.google.android.material.loadingindicator.LoadingIndicator
 
 class InAppUpdateDialogView(context: Context) :
   LinearLayout(context),
@@ -70,13 +68,12 @@ class InAppUpdateDialogView(context: Context) :
     setOutAnimation(context, R.anim.anim_fade_out)
   }
 
-  private val loading = LottieAnimationView(context).apply {
+  private val loading = LoadingIndicator(
+    ContextThemeWrapper(context, R.style.App_Widget_M3E_LoadingIndicator_Contained)
+  ).apply {
     layoutParams = FrameLayout.LayoutParams(150.dp, 150.dp).also {
       it.gravity = Gravity.CENTER
     }
-    imageAssetsFolder = File.separator
-    repeatCount = LottieDrawable.INFINITE
-    setAnimation("anim/gray-down-arrow.json.zip")
   }
 
   val updateButton = MaterialButton(context).apply {
@@ -122,10 +119,5 @@ class InAppUpdateDialogView(context: Context) :
 
   override fun getHeaderView(): BottomSheetHeaderView {
     return header
-  }
-
-  override fun onAttachedToWindow() {
-    super.onAttachedToWindow()
-    loading.playAnimation()
   }
 }

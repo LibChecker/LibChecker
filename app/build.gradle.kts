@@ -143,7 +143,6 @@ dependencies {
 
   ksp(libs.androidX.room.compiler)
 
-  implementation(libs.lottie)
   implementation(libs.aboutlibraries.core)
   implementation(libs.aboutlibraries.ui)
   implementation(libs.brvah)
