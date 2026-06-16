@@ -4,8 +4,6 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.activity.viewModels
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTION
@@ -16,9 +14,7 @@ import com.absinthe.libchecker.features.statistics.LibReferenceViewModel
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
-import com.absinthe.libchecker.view.app.RingDotsView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import com.absinthe.rulesbundle.IconResMap
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
@@ -85,23 +81,7 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
         displayedChild = 0
         (root as ViewGroup).bringChildToFront(appbar)
       }
-      loading.setHighlightIconProvider(object : RingDotsView.HighlightIconProvider {
-        override suspend fun produce(emitter: RingDotsView.HighlightIconEmitter) {
-          while (true) {
-            if (!loading.isHighlightAnimationAvailable()) {
-              break
-            }
-            val index = (0 until 100).random()
-            if (IconResMap.isSingleColorIcon(index)) {
-              continue
-            }
-            val iconRes = IconResMap.getIconRes(index)
-            val drawable = ContextCompat.getDrawable(loading.context, iconRes) ?: continue
-
-            emitter.emit(drawable.toBitmap())
-          }
-        }
-      })
+      loading.setRuleIconHighlightProvider()
     }
 
     viewModel.libRefListFlow.onEach {

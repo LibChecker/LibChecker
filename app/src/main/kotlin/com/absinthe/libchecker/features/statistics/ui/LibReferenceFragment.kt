@@ -8,8 +8,6 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.FrameLayout
 import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -32,14 +30,11 @@ import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseListControllerFragment
 import com.absinthe.libchecker.ui.base.IAppBarContainer
 import com.absinthe.libchecker.utils.Telemetry
-import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.launchLibReferencePage
 import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libchecker.utils.showToast
-import com.absinthe.libchecker.view.app.RingDotsView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import com.absinthe.rulesbundle.IconResMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -140,25 +135,7 @@ class LibReferenceFragment :
           refAdapter.setSpaceFooterView()
         }
       }
-      loadingView.loadingView.setHighlightIconProvider(object : RingDotsView.HighlightIconProvider {
-        override suspend fun produce(emitter: RingDotsView.HighlightIconEmitter) {
-          while (true) {
-            if (!binding.loadingView.loadingView.isHighlightAnimationAvailable()) {
-              break
-            }
-            val index = (0 until 100).random()
-            if (IconResMap.isSingleColorIcon(index)) {
-              continue
-            }
-            val iconRes = IconResMap.getIconRes(index)
-            val drawable = ContextCompat.getDrawable(context, iconRes) ?: continue
-            val circleBackgroundDrawable =
-              UiUtils.addCircleBackground(context, drawable, R.color.feature_background)
-
-            emitter.emit(circleBackgroundDrawable.toBitmap())
-          }
-        }
-      })
+      loadingView.loadingView.setRuleIconHighlightProvider(withCircleBackground = true)
     }
 
     refAdapter.apply {

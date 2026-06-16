@@ -6,21 +6,26 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.RectF
-import android.graphics.Shader
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.LinearInterpolator
+import androidx.annotation.ColorRes
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.createBitmap
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.withTranslation
+import com.absinthe.libchecker.R
+import com.absinthe.libchecker.data.app.LocalAppDataSource
+import com.absinthe.libchecker.utils.UiUtils
+import com.absinthe.libchecker.utils.UiUtils.toCircularBitmap
 import com.absinthe.libchecker.utils.extensions.dpToDimension
-import java.util.concurrent.ArrayBlockingQueue
-import java.util.concurrent.BlockingQueue
+import com.absinthe.rulesbundle.IconResMap
 import kotlin.math.PI
 import kotlin.math.abs
+import kotlin.math.ceil
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.min
@@ -30,16 +35,22 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context, attrs) {
 
   companion object {
     private const val MAX_HIGHLIGHT_QUEUE_SIZE = 3
-    private const val HIGHLIGHT_RING_PUSH = 0.12f
+    private const val HIGHLIGHT_RING_PUSH = 0.09f
+    private const val MAX_HIGHLIGHT_BITMAP_BYTES = 150 * 1024 * 1024
+    private const val RING_ALPHA = 232
+    private const val RULE_ICON_POOL_COUNT = 100
+    private const val HIGHLIGHT_PROVIDER_MAX_MISSES = 8
+    private const val HIGHLIGHT_PROVIDER_RETRY_DELAY_MS = 120L
   }
 
   fun interface HighlightIconEmitter {
@@ -60,12 +71,14 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
   )
 
   private data class DotMeta(val ringIndex: Int, val indexInRing: Int)
+  private data class RingBitmap(val bitmap: Bitmap)
+  private data class HighlightBitmap(val bitmap: Bitmap, val recyclable: Boolean)
 
   private var highlightRingIndex = 0
 
-  var rotateDuration = 10000L
-  var highlightDuration = 1000L
-  var highlightHoldDuration = 1000L
+  var rotateDuration = 12000L
+  var highlightDuration = 850L
+  var highlightHoldDuration = 1250L
 
   var ringSpecs: List<RingSpec> = createDefaultRingSpecs()
     set(value) {
@@ -85,17 +98,23 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
   private val bitmapPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
     isFilterBitmap = true
   }
-  private val ringBitmaps: MutableList<Bitmap> = mutableListOf()
+  private val highlightDst = RectF()
+  private val ringBitmaps: MutableList<RingBitmap?> = mutableListOf()
   private var ringBitmapsDirty = true
+  private var geometryDirty = true
+  private var cachedRingRadii = FloatArray(0)
+  private var cachedPhaseOffsets = FloatArray(0)
+  private var highlightRadiusScales = FloatArray(0)
 
   private val gradientStops = intArrayOf(
-    0xFFFF9D5B.toInt(),
-    0xFFFF6FB4.toInt(),
-    0xFFB96BFF.toInt(),
-    0xFF6296FF.toInt(),
-    0xFF3AE4FF.toInt()
+    0xFF64D2FF.toInt(),
+    0xFF0A84FF.toInt(),
+    0xFFBF5AF2.toInt(),
+    0xFFFF375F.toInt(),
+    0xFFFF9F0A.toInt(),
+    0xFF30D158.toInt()
   )
-  private val gradientPositions = floatArrayOf(0f, 0.28f, 0.54f, 0.78f, 1f)
+  private val gradientPositions = floatArrayOf(0f, 0.18f, 0.39f, 0.62f, 0.82f, 1f)
 
   private var highlightIndex = -1
   private var highlightProgress = 0f
@@ -104,30 +123,35 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
   private var ringRotations: FloatArray = FloatArray(0)
   private var lastRotateAnimatorValue = 0f
 
-  private val highlightBitmapQueue: BlockingQueue<Bitmap> =
-    ArrayBlockingQueue(MAX_HIGHLIGHT_QUEUE_SIZE)
-  private var currentHighlightBitmap: Bitmap? = null
+  private val highlightBitmapChannel = Channel<HighlightBitmap>(MAX_HIGHLIGHT_QUEUE_SIZE)
+  private var currentHighlightBitmap: HighlightBitmap? = null
   private var highlightIconProvider: HighlightIconProvider? = null
   private var iconProducerJob: Job? = null
 
   @Volatile
   private var highlightAnimationAvailable = false
+
+  @Volatile
   private var isRunning = false
 
   private val iconEmitter = HighlightIconEmitter { bitmap ->
     currentCoroutineContext().ensureActive()
+    // See also: RecordingCanvas#throwIfCannotDraw
+    if (bitmap.isRecycled || bitmap.byteCount > MAX_HIGHLIGHT_BITMAP_BYTES) {
+      recycleBitmap(bitmap)
+      return@HighlightIconEmitter
+    }
+    if (!isRunning || !highlightAnimationAvailable) {
+      recycleBitmap(bitmap)
+      return@HighlightIconEmitter
+    }
+    val highlightBitmap = HighlightBitmap(bitmap, recyclable = true)
     try {
-      // See also: RecordingCanvas#throwIfCannotDraw
-      if (bitmap.byteCount <= 150 * 1024 * 1024) {
-        highlightBitmapQueue.put(bitmap)
-        notifyBitmapQueueAvailable()
-      }
-    } catch (interruption: InterruptedException) {
-      Thread.currentThread().interrupt()
-      throw CancellationException(
-        "Interrupted while enqueuing highlight bitmap",
-        interruption
-      )
+      highlightBitmapChannel.send(highlightBitmap)
+      notifyBitmapQueueAvailable()
+    } catch (cancellation: CancellationException) {
+      recycleHighlightBitmap(highlightBitmap)
+      throw cancellation
     }
   }
 
@@ -155,13 +179,12 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
     super.onDetachedFromWindow()
     stopAnimations()
     stopIconProducer()
-    clearHighlightQueue()
+    clearHighlightBitmaps()
     invalidateRingBitmaps()
     updateHighlightAvailability()
   }
 
   private fun startAnimations() {
-    Timber.d("startAnimations: $this")
     updateHighlightAvailability()
     if (!isRunning || !isAttachedToWindow) {
       return
@@ -170,7 +193,7 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
       stopAnimations()
       resetRingRotationState()
       highlightIndex = -1
-      invalidate()
+      invalidateOnAnimationFrame()
       return
     }
 
@@ -180,7 +203,6 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
   }
 
   private fun stopAnimations() {
-    Timber.d("stopAnimations: $this")
     stopRotateAnimator()
     stopHighlightAnimator()
     resetRingRotationState()
@@ -209,7 +231,7 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
             }
           }
           lastRotateAnimatorValue = value
-          invalidate()
+          invalidateOnAnimationFrame()
         }
         start()
       }
@@ -240,7 +262,7 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
 
     if (highlightAnim == null) {
       if (currentHighlightBitmap == null) {
-        currentHighlightBitmap = highlightBitmapQueue.poll()
+        currentHighlightBitmap = pollHighlightBitmap()
         if (currentHighlightBitmap == null) {
           provider?.let { startIconProducerJob(it) }
           return
@@ -263,7 +285,7 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
         })
         addUpdateListener {
           highlightProgress = computeHighlightProgress(it.animatedFraction)
-          invalidate()
+          invalidateOnAnimationFrame()
         }
         start()
       }
@@ -281,22 +303,19 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
     highlightAnim = null
     highlightProgress = 0f
     highlightIndex = -1
-    currentHighlightBitmap = null
-    invalidate()
+    clearCurrentHighlightBitmap()
+    invalidateOnAnimationFrame()
   }
 
   private fun shouldHighlightAnimate(): Boolean {
-    if (!isRunning) return false
-    if (!highlightAnimationAvailable) return false
-    val hasBitmap = currentHighlightBitmap != null || !highlightBitmapQueue.isEmpty()
-    return hasBitmap
+    return isRunning && highlightAnimationAvailable
   }
 
   private fun advanceHighlightBitmap(): Boolean {
     highlightIconProvider?.let { startIconProducerJob(it) }
-    val next = highlightBitmapQueue.poll()
-    currentHighlightBitmap = next
-    return next != null
+    clearCurrentHighlightBitmap()
+    currentHighlightBitmap = pollHighlightBitmap()
+    return currentHighlightBitmap != null
   }
 
   private fun notifyBitmapQueueAvailable() {
@@ -330,9 +349,37 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
     iconProducerJob = null
   }
 
-  private fun clearHighlightQueue() {
-    highlightBitmapQueue.clear()
+  private fun pollHighlightBitmap(): HighlightBitmap? {
+    return highlightBitmapChannel.tryReceive().getOrNull()
+  }
+
+  private fun clearHighlightBitmaps() {
+    clearQueuedHighlightBitmaps()
+    clearCurrentHighlightBitmap()
+  }
+
+  private fun clearQueuedHighlightBitmaps() {
+    while (true) {
+      val bitmap = highlightBitmapChannel.tryReceive().getOrNull() ?: break
+      recycleHighlightBitmap(bitmap)
+    }
+  }
+
+  private fun clearCurrentHighlightBitmap() {
+    currentHighlightBitmap?.let(::recycleHighlightBitmap)
     currentHighlightBitmap = null
+  }
+
+  private fun recycleHighlightBitmap(bitmap: HighlightBitmap) {
+    if (bitmap.recyclable) {
+      recycleBitmap(bitmap.bitmap)
+    }
+  }
+
+  private fun recycleBitmap(bitmap: Bitmap) {
+    if (!bitmap.isRecycled) {
+      bitmap.recycle()
+    }
   }
 
   private fun updateHighlightAvailability() {
@@ -348,10 +395,11 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
     baseRadius: Float,
     phaseOffset: Float,
     rotation: Float,
-    radiusProvider: (Int) -> Float = { baseRadius }
+    radiusScales: FloatArray? = null,
+    highlightAngleDeg: Float = 0f,
+    innerPushStrength: Float = 0f
   ) {
     if (spec.dotCount <= 0 || baseRadius <= 0f) return
-    val originalShader = paint.shader
     val originalColor = paint.color
     val originalAlpha = paint.alpha
 
@@ -362,33 +410,29 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
         val baseAngle = dotIndex * angleStep
         val angleDeg = baseAngle + phaseOffset
         val angleRad = Math.toRadians(angleDeg.toDouble())
-        val resolvedRadius = radiusProvider(dotIndex).coerceAtLeast(0f)
+        val radiusScale = when {
+          radiusScales != null -> radiusScales[dotIndex]
+
+          innerPushStrength > 0f -> {
+            val dotAngle = normalizeDegrees(angleDeg + rotation)
+            val diff = shortestAngleDistance(highlightAngleDeg, dotAngle)
+            val weight = computeInnerDisplacementWeight(abs(diff), angleStep)
+            1f + innerPushStrength * weight
+          }
+
+          else -> 1f
+        }
+        val resolvedRadius = (baseRadius * radiusScale).coerceAtLeast(0f)
         val x = (cos(angleRad) * resolvedRadius).toFloat()
         val y = (sin(angleRad) * resolvedRadius).toFloat()
 
         val angleFraction = baseAngle / 360f
-        val halfStepFraction = (angleStep / 360f) * 0.5f
-        val shift = spec.colorShift
-        val startColor = sampleGradient(normalizeUnit(angleFraction - halfStepFraction + shift))
-        val endColor = sampleGradient(normalizeUnit(angleFraction + halfStepFraction + shift))
-
-        val tangentAngle = angleRad + PI / 2
-        val cosTangent = cos(tangentAngle)
-        val sinTangent = sin(tangentAngle)
-        val halfSpan = spec.dotRadiusPx * 1.3f
-        val startX = (x - cosTangent * halfSpan).toFloat()
-        val startY = (y - sinTangent * halfSpan).toFloat()
-        val endX = (x + cosTangent * halfSpan).toFloat()
-        val endY = (y + sinTangent * halfSpan).toFloat()
-
-        val shader = LinearGradient(startX, startY, endX, endY, startColor, endColor, Shader.TileMode.CLAMP)
-        paint.shader = shader
+        paint.color = sampleGradient(normalizeUnit(angleFraction + spec.colorShift))
+        paint.alpha = RING_ALPHA
         drawCircle(x, y, spec.dotRadiusPx, paint)
-        paint.shader = null
       }
     }
 
-    paint.shader = originalShader
     paint.color = originalColor
     paint.alpha = originalAlpha
   }
@@ -399,24 +443,22 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
 
     val cx = width / 2f
     val cy = height / 2f
-    val maxRadius = min(width, height) / 2f
-    val largestDot = ringSpecs.maxOfOrNull { it.dotRadiusPx } ?: 0f
-    val radiusLimit = max(0f, maxRadius - largestDot * 1.5f)
-    val radii = computeRingRadii(radiusLimit)
-    val phaseOffsets = computePhaseOffsets()
+    ensureGeometryCache()
+    val radii = cachedRingRadii
+    val phaseOffsets = cachedPhaseOffsets
 
-    ensureRingBitmaps(width, height, radii, phaseOffsets)
+    ensureRingBitmaps(radii, phaseOffsets)
 
-    val highlightBitmap = currentHighlightBitmap
+    val highlightBitmap = currentHighlightBitmap?.bitmap?.takeIf { !it.isRecycled }
     val highlightMeta = dots.getOrNull(highlightIndex)
     val highlightRingIdx = highlightMeta?.ringIndex
 
     var highlightAngleDeg = 0f
-    val highlightScaleMap: Map<Int, Float> = if (highlightMeta != null && highlightRingIdx != null) {
+    val highlightScales = if (highlightMeta != null && highlightRingIdx != null) {
       val spec = ringSpecs.getOrNull(highlightRingIdx)
       val dotCount = spec?.dotCount ?: 0
       if (spec == null || dotCount <= 0) {
-        emptyMap()
+        null
       } else {
         val basePhase = phaseOffsets.getOrNull(highlightRingIdx) ?: 0f
         val rotation = ringRotations.getOrNull(highlightRingIdx) ?: 0f
@@ -426,26 +468,13 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
 
         val push = (HIGHLIGHT_RING_PUSH * highlightProgress).coerceAtLeast(0f)
         if (push == 0f) {
-          emptyMap()
+          null
         } else {
-          val center = wrapIndex(highlightMeta.indexInRing, dotCount)
-          val map = mutableMapOf<Int, Float>()
-          map[center] = 1f + push
-          if (dotCount > 1) {
-            val left = wrapIndex(center - 1, dotCount)
-            val right = wrapIndex(center + 1, dotCount)
-            if (left != center) {
-              map[left] = 1f + push * 0.6f
-            }
-            if (right != center && right != left) {
-              map[right] = 1f + push * 0.6f
-            }
-          }
-          map
+          prepareHighlightRadiusScales(dotCount, highlightMeta.indexInRing, push)
         }
       }
     } else {
-      emptyMap()
+      null
     }
 
     val innerRingIdx = highlightRingIdx?.minus(1)?.takeIf { it >= 0 }
@@ -460,37 +489,44 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
       val phaseOffset = phaseOffsets.getOrNull(index) ?: 0f
       val rotation = ringRotations.getOrNull(index) ?: 0f
       val isHighlightRing = highlightRingIdx == index && spec.dotCount > 0
-      val angleStep = if (spec.dotCount > 0) 360f / spec.dotCount else 0f
       val isInnerAffectedRing = innerRingIdx == index && spec.dotCount > 0 && innerPushStrength > 0f
-      val shouldDynamicHighlight = isHighlightRing && highlightScaleMap.isNotEmpty()
+      val shouldDynamicHighlight = isHighlightRing && highlightScales != null
 
       when {
         shouldDynamicHighlight -> {
-          val resolver: (Int) -> Float = { dotIndex ->
-            val scale = highlightScaleMap[dotIndex] ?: 1f
-            radiusBase * scale
-          }
-          drawDynamicRing(canvas, cx, cy, spec, radiusBase, phaseOffset, rotation, resolver)
+          drawDynamicRing(
+            canvas = canvas,
+            cx = cx,
+            cy = cy,
+            spec = spec,
+            baseRadius = radiusBase,
+            phaseOffset = phaseOffset,
+            rotation = rotation,
+            radiusScales = highlightScales
+          )
         }
 
         isInnerAffectedRing -> {
-          val resolver: (Int) -> Float = { dotIndex ->
-            val dotAngle = normalizeDegrees(phaseOffset + dotIndex * angleStep + rotation)
-            val diff = shortestAngleDistance(highlightAngleDeg, dotAngle)
-            val weight = computeInnerDisplacementWeight(abs(diff), angleStep)
-            val scale = 1f + innerPushStrength * weight
-            radiusBase * scale
-          }
-          drawDynamicRing(canvas, cx, cy, spec, radiusBase, phaseOffset, rotation, resolver)
+          drawDynamicRing(
+            canvas = canvas,
+            cx = cx,
+            cy = cy,
+            spec = spec,
+            baseRadius = radiusBase,
+            phaseOffset = phaseOffset,
+            rotation = rotation,
+            highlightAngleDeg = highlightAngleDeg,
+            innerPushStrength = innerPushStrength
+          )
         }
 
         else -> {
-          val bitmap = ringBitmaps.getOrNull(index)
+          val ringBitmap = ringBitmaps.getOrNull(index)
+          val bitmap = ringBitmap?.bitmap
           if (bitmap != null && !bitmap.isRecycled) {
             canvas.withTranslation(cx, cy) {
               rotate(rotation)
-              translate(-cx, -cy)
-              drawBitmap(bitmap, 0f, 0f, bitmapPaint)
+              drawBitmap(bitmap, -bitmap.width / 2f, -bitmap.height / 2f, bitmapPaint)
             }
           }
         }
@@ -505,7 +541,7 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
         val phaseOffset = phaseOffsets.getOrNull(highlightMeta.ringIndex) ?: 0f
         val radiusBase = radii.getOrNull(highlightMeta.ringIndex) ?: 0f
         val radiusScale = if (highlightMeta.ringIndex == highlightRingIdx) {
-          highlightScaleMap[wrapIndex(highlightMeta.indexInRing, spec.dotCount)] ?: 1f
+          highlightScales?.get(wrapIndex(highlightMeta.indexInRing, spec.dotCount)) ?: 1f
         } else {
           1f
         }
@@ -513,7 +549,7 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
         val angleDeg = baseAngle + phaseOffset + rotation
         val angleRad = Math.toRadians(angleDeg.toDouble())
         val radius = radiusBase * radiusScale
-        val size = spec.dotRadiusPx * (1.1f + highlightProgress * 2.6f)
+        val size = spec.dotRadiusPx * (1.1f + highlightProgress * 2.35f)
         val x = cx + cos(angleRad) * radius
         val y = cy + sin(angleRad) * radius
         if (highlightProgress > 0.12f) {
@@ -532,15 +568,52 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
     }
   }
 
+  private fun ensureGeometryCache() {
+    if (!geometryDirty && cachedRingRadii.size == ringSpecs.size && cachedPhaseOffsets.size == ringSpecs.size) {
+      return
+    }
+
+    val maxRadius = min(width, height) / 2f
+    val largestDot = ringSpecs.maxOfOrNull { it.dotRadiusPx } ?: 0f
+    val radiusLimit = max(0f, maxRadius - largestDot * 1.5f)
+    cachedRingRadii = computeRingRadii(radiusLimit)
+    cachedPhaseOffsets = computePhaseOffsets()
+    geometryDirty = false
+    ringBitmapsDirty = true
+  }
+
+  private fun prepareHighlightRadiusScales(
+    dotCount: Int,
+    centerIndex: Int,
+    push: Float
+  ): FloatArray {
+    if (highlightRadiusScales.size < dotCount) {
+      highlightRadiusScales = FloatArray(dotCount)
+    }
+    for (index in 0 until dotCount) {
+      highlightRadiusScales[index] = 1f
+    }
+
+    val center = wrapIndex(centerIndex, dotCount)
+    highlightRadiusScales[center] = 1f + push
+    if (dotCount > 1) {
+      val left = wrapIndex(center - 1, dotCount)
+      val right = wrapIndex(center + 1, dotCount)
+      if (left != center) {
+        highlightRadiusScales[left] = 1f + push * 0.55f
+      }
+      if (right != center && right != left) {
+        highlightRadiusScales[right] = 1f + push * 0.55f
+      }
+    }
+    return highlightRadiusScales
+  }
+
   private fun ensureRingBitmaps(
-    width: Int,
-    height: Int,
     radii: FloatArray,
     phaseOffsets: FloatArray
   ) {
-    val needsRebuild = ringBitmapsDirty ||
-      ringBitmaps.size != ringSpecs.size ||
-      ringBitmaps.any { it.width != width || it.height != height }
+    val needsRebuild = ringBitmapsDirty || ringBitmaps.size != ringSpecs.size
 
     if (!needsRebuild) {
       return
@@ -549,20 +622,23 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
     clearRingBitmaps()
     if (width <= 0 || height <= 0) return
 
-    val cx = width / 2f
-    val cy = height / 2f
     val basePaint = paint
-    basePaint.alpha = 255
+    val originalColor = basePaint.color
+    val originalAlpha = basePaint.alpha
+    basePaint.alpha = RING_ALPHA
 
     ringSpecs.forEachIndexed { index, spec ->
       if (spec.dotCount <= 0) {
-        ringBitmaps.add(createBitmap(width, height))
+        ringBitmaps.add(null)
         return@forEachIndexed
       }
 
-      val bitmap = createBitmap(width, height)
-      val bitmapCanvas = Canvas(bitmap)
       val radius = radii.getOrNull(index) ?: 0f
+      val bitmapRadius = radius + spec.dotRadiusPx * 1.5f
+      val bitmapSize = ceil(bitmapRadius * 2f).toInt().coerceAtLeast(1)
+      val bitmapCenter = bitmapSize / 2f
+      val bitmap = createBitmap(bitmapSize, bitmapSize)
+      val bitmapCanvas = Canvas(bitmap)
       val phaseOffset = phaseOffsets.getOrNull(index) ?: 0f
       val angleStep = 360f / spec.dotCount
 
@@ -570,35 +646,20 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
         val baseAngle = dotIndex * angleStep
         val angleDeg = baseAngle + phaseOffset
         val angleRad = Math.toRadians(angleDeg.toDouble())
-        val x = cx + cos(angleRad) * radius
-        val y = cy + sin(angleRad) * radius
+        val x = bitmapCenter + cos(angleRad) * radius
+        val y = bitmapCenter + sin(angleRad) * radius
 
         val angleFraction = baseAngle / 360f
-        val halfStepFraction = (angleStep / 360f) * 0.5f
-        val shift = spec.colorShift
-        val startColor = sampleGradient(normalizeUnit(angleFraction - halfStepFraction + shift))
-        val endColor = sampleGradient(normalizeUnit(angleFraction + halfStepFraction + shift))
-
-        val tangentAngle = angleRad + PI / 2
-        val cosTangent = cos(tangentAngle)
-        val sinTangent = sin(tangentAngle)
-        val halfSpan = spec.dotRadiusPx * 1.3f
-        val startX = x.toFloat() - (cosTangent * halfSpan).toFloat()
-        val startY = y.toFloat() - (sinTangent * halfSpan).toFloat()
-        val endX = x.toFloat() + (cosTangent * halfSpan).toFloat()
-        val endY = y.toFloat() + (sinTangent * halfSpan).toFloat()
-
-        val shader =
-          LinearGradient(startX, startY, endX, endY, startColor, endColor, Shader.TileMode.CLAMP)
-        basePaint.shader = shader
+        basePaint.color = sampleGradient(normalizeUnit(angleFraction + spec.colorShift))
         bitmapCanvas.drawCircle(x.toFloat(), y.toFloat(), spec.dotRadiusPx, basePaint)
-        basePaint.shader = null
       }
 
-      ringBitmaps.add(bitmap)
+      ringBitmaps.add(RingBitmap(bitmap))
     }
 
     ringBitmapsDirty = false
+    basePaint.color = originalColor
+    basePaint.alpha = originalAlpha
   }
 
   private fun rebuildDots(restartAnimations: Boolean) {
@@ -644,10 +705,10 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
       if (isRunning) {
         startAnimations()
       } else {
-        invalidate()
+        invalidateOnAnimationFrame()
       }
     } else {
-      invalidate()
+      invalidateOnAnimationFrame()
     }
   }
 
@@ -744,25 +805,22 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
     val originalColor = paint.color
     val originalAlpha = paint.alpha
 
-    paint.color = ColorUtils.setAlphaComponent(tint, (alpha * 0.9f).toInt())
+    paint.color = ColorUtils.setAlphaComponent(tint, (alpha * 0.24f).toInt())
+    canvas.drawCircle(x, y, size * 1.22f, paint)
+
+    paint.color = ColorUtils.setAlphaComponent(tint, (alpha * 0.62f).toInt())
     canvas.drawCircle(x, y, size, paint)
 
     bitmap?.let {
       val inset = size * 0.12f
-      val dst = RectF(x - size + inset, y - size + inset, x + size - inset, y + size - inset)
+      highlightDst.set(x - size + inset, y - size + inset, x + size - inset, y + size - inset)
       paint.alpha = (170 + 85 * progress).toInt().coerceIn(0, 255)
-      canvas.drawBitmap(it, null, dst, paint)
+      canvas.drawBitmap(it, null, highlightDst, paint)
       paint.alpha = 255
     }
 
     paint.color = originalColor
     paint.alpha = originalAlpha
-  }
-
-  private fun circularDistance(a: Int, b: Int, count: Int): Int {
-    if (count <= 0 || a < 0 || b < 0) return Int.MAX_VALUE
-    val diff = abs(a - b)
-    return min(diff, count - diff)
   }
 
   private fun wrapIndex(index: Int, size: Int): Int {
@@ -796,17 +854,91 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
     stopIconProducer()
     highlightIconProvider = null
     stopHighlightAnimator()
-    clearHighlightQueue()
+    clearHighlightBitmaps()
     if (bitmap == null) {
-      invalidate()
+      invalidateOnAnimationFrame()
       return
     }
 
-    if (!highlightBitmapQueue.offer(bitmap)) {
-      highlightBitmapQueue.clear()
-      highlightBitmapQueue.offer(bitmap)
-    }
+    highlightBitmapChannel.trySend(HighlightBitmap(bitmap, recyclable = false))
     notifyBitmapQueueAvailable()
+  }
+
+  fun setAppIconHighlightProvider() {
+    setHighlightIconProvider(object : HighlightIconProvider {
+      override suspend fun produce(emitter: HighlightIconEmitter) {
+        val packageManager = context.packageManager
+        val defaultIcon = packageManager.defaultActivityIcon
+        var misses = 0
+        while (true) {
+          currentCoroutineContext().ensureActive()
+          if (!isHighlightAnimationAvailable()) {
+            break
+          }
+          val ai = LocalAppDataSource.getRandomApplicationInfo()
+          if (ai == null) {
+            delay(HIGHLIGHT_PROVIDER_RETRY_DELAY_MS)
+            continue
+          }
+          val drawable = ai.loadIcon(packageManager)
+            ?.takeIf { icon -> !UiUtils.drawablesAreEqual(icon, defaultIcon) }
+          if (drawable == null) {
+            misses++
+            if (misses >= HIGHLIGHT_PROVIDER_MAX_MISSES) {
+              misses = 0
+              delay(HIGHLIGHT_PROVIDER_RETRY_DELAY_MS)
+            }
+            continue
+          }
+
+          misses = 0
+          emitter.emit(drawable.toCircularBitmap())
+        }
+      }
+    })
+  }
+
+  fun setRuleIconHighlightProvider(
+    withCircleBackground: Boolean = false,
+    @ColorRes circleBackgroundColorRes: Int = R.color.feature_background
+  ) {
+    setHighlightIconProvider(object : HighlightIconProvider {
+      override suspend fun produce(emitter: HighlightIconEmitter) {
+        var misses = 0
+        while (true) {
+          currentCoroutineContext().ensureActive()
+          if (!isHighlightAnimationAvailable()) {
+            break
+          }
+          val index = Random.nextInt(RULE_ICON_POOL_COUNT)
+          if (IconResMap.isSingleColorIcon(index)) {
+            misses++
+            if (misses >= HIGHLIGHT_PROVIDER_MAX_MISSES) {
+              misses = 0
+              delay(HIGHLIGHT_PROVIDER_RETRY_DELAY_MS)
+            }
+            continue
+          }
+          val drawable = ContextCompat.getDrawable(context, IconResMap.getIconRes(index))
+          if (drawable == null) {
+            misses++
+            if (misses >= HIGHLIGHT_PROVIDER_MAX_MISSES) {
+              misses = 0
+              delay(HIGHLIGHT_PROVIDER_RETRY_DELAY_MS)
+            }
+            continue
+          }
+
+          misses = 0
+          val icon = if (withCircleBackground) {
+            UiUtils.addCircleBackground(context, drawable, circleBackgroundColorRes)
+          } else {
+            drawable
+          }
+          emitter.emit(icon.toBitmap())
+        }
+      }
+    })
   }
 
   fun setHighlightIconProvider(provider: HighlightIconProvider?) {
@@ -814,7 +946,7 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
 
     stopHighlightAnimator()
     stopIconProducer()
-    clearHighlightQueue()
+    clearHighlightBitmaps()
     highlightIconProvider = provider
     updateHighlightAvailability()
 
@@ -825,7 +957,7 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
     if (isAttachedToWindow && isRunning) {
       ensureHighlightAnimator()
     } else {
-      invalidate()
+      invalidateOnAnimationFrame()
     }
   }
 
@@ -846,23 +978,33 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
     isRunning = false
     stopAnimations()
     stopIconProducer()
+    clearQueuedHighlightBitmaps()
     updateHighlightAvailability()
-    stopIconProducer()
   }
 
   private fun invalidateRingBitmaps() {
+    geometryDirty = true
     ringBitmapsDirty = true
     clearRingBitmaps()
   }
 
   private fun clearRingBitmaps() {
     if (ringBitmaps.isEmpty()) return
-    ringBitmaps.forEach { bmp ->
-      if (!bmp.isRecycled) {
-        bmp.recycle()
+    ringBitmaps.forEach { ringBitmap ->
+      val bitmap = ringBitmap?.bitmap
+      if (bitmap != null && !bitmap.isRecycled) {
+        bitmap.recycle()
       }
     }
     ringBitmaps.clear()
+  }
+
+  private fun invalidateOnAnimationFrame() {
+    if (isAttachedToWindow) {
+      postInvalidateOnAnimation()
+    } else {
+      invalidate()
+    }
   }
 
   private fun ensureRingRotationState() {
@@ -900,34 +1042,34 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
     val count = 24
     return listOf(
       RingSpec(
-        0.62f,
+        0.58f,
         count,
-        context.dpToDimension(2.4f),
-        rotationScale = 1f,
+        context.dpToDimension(2.2f),
+        rotationScale = 0.86f,
         colorShift = -0.02f,
         phaseOffsetMultiplier = 0f
       ),
       RingSpec(
-        0.72f,
+        0.70f,
         count,
-        context.dpToDimension(3.9f),
-        rotationScale = 1f,
+        context.dpToDimension(3.5f),
+        rotationScale = 0.96f,
         colorShift = 0.04f,
         phaseOffsetMultiplier = 0f
       ),
       RingSpec(
-        0.85f,
+        0.82f,
         count,
-        context.dpToDimension(3.4f),
-        rotationScale = 1f,
+        context.dpToDimension(3.1f),
+        rotationScale = 1.05f,
         colorShift = 0.08f,
         phaseOffsetMultiplier = 0f
       ),
       RingSpec(
         0.9f,
         count,
-        context.dpToDimension(5.6f),
-        rotationScale = 1f,
+        context.dpToDimension(5.0f),
+        rotationScale = 1.14f,
         colorShift = 0.12f,
         phaseOffsetMultiplier = 0f
       )
