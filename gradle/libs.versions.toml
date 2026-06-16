@@ -28,7 +28,7 @@ aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin.android", version.re
 [libraries]
 gradlePlugin-android = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 gradlePlugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-gradlePlugin-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradle", version = "8.6.0" }
+gradlePlugin-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradle", version = "8.7.0" }
 
 kotlinX-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0"
 
