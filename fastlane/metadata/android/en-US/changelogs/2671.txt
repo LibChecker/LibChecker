@@ -1,0 +1,21 @@
+- Adapted for Android 17
+- Added app info export in Settings. Exported files can now be opened in WebUI¹ and viewed visually
+- Added a detail page for Overlay apps
+- Added support for detecting Modern Xposed API module information
+- Moved DEX optimization information from the app properties dialog to the install source dialog. More accurate results are now shown for users with Shizuku granted
+- For native libraries that already support 16 KB page alignment but are not ZIP-aligned to 16 KB, the specific ZIP alignment value is now shown
+- Added new detection labels to the native library list
+- Added detection for stripped symbol tables on the native library detail page
+- Improved the speed and accuracy of app signing scheme detection
+- Fixed an issue where alternative icons or themed icons could not be loaded correctly in some cases
+- Fixed incomplete Split APKs list detection for some apps
+- Fixed an issue where the update date disappeared on the library detail page after switching languages
+- Fixed an issue where the app list on the home page might not refresh in some cases
+- Fixed false positives in Jetpack Compose detection for some apps
+- Fixed an issue where the bottom sheet might fail to show on wide-screen devices while staying in landscape orientation
+- Optimized the UI layout of advanced settings for the app list
+- Updated several UI designs
+- Optimized accessibility
+- Updated rules database to version 44
+
+¹ You can now visit https://lc.absinthe.life/ on any device to analyze and compare Android app packages. All analysis is performed locally.
