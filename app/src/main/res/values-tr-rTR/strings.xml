@@ -303,4 +303,5 @@
   <string name="snapshot_menu_hide_no_component_changes">Bileşen değişikliği olmayanları gizle</string>
   <string name="snapshot_menu_diff_highlight">Farklılıkları vurgula</string>
   <string name="snapshot_menu_use_iec_units">IEC birimlerini kullan</string>
+  <!-- A11y -->
 </resources>

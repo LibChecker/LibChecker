@@ -300,4 +300,5 @@
   <string name="snapshot_menu_hide_no_component_changes">הסתר אפליקציות ללא שינויים ברכיבים</string>
   <string name="snapshot_menu_diff_highlight">הדגשת שינויים</string>
   <string name="snapshot_menu_use_iec_units">השתמש ביחידות IEC</string>
+  <!-- A11y -->
 </resources>

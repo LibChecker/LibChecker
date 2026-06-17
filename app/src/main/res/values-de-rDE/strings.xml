@@ -289,4 +289,5 @@
   <string name="snapshot_menu_hide_no_component_changes">Keine Komponentenänderungen ausblenden</string>
   <string name="snapshot_menu_diff_highlight">Differenz hervorheben</string>
   <string name="snapshot_menu_use_iec_units">IEC-Einheiten verwenden</string>
+  <!-- A11y -->
 </resources>
