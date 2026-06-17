@@ -4,7 +4,7 @@ import com.android.build.api.dsl.LibraryExtension
 import java.io.File
 import org.gradle.api.Project
 
-const val baseVersionName = "2.5.4"
+const val baseVersionName = "2.5.5"
 
 fun Project.setupLibraryModule(block: LibraryExtension.() -> Unit = {}) {
   setupBaseModule(block)
