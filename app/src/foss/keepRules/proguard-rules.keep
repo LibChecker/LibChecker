@@ -1,0 +1,3 @@
+# Keep R8 shrinking and optimization enabled while disabling obfuscation for
+# reproducible build diagnostics in the FOSS flavor.
+-dontobfuscate

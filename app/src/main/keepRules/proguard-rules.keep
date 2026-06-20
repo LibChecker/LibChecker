@@ -1,10 +1,6 @@
 -dontusemixedcaseclassnames
 -verbose
 
-# Keep R8 shrinking and optimization enabled while disabling obfuscation for
-# reproducible build diagnostics.
--dontobfuscate
-
 # Preserve some attributes that may be required for reflection.
 -keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod
 
