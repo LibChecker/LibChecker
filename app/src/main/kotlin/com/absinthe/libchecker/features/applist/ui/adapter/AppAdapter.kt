@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.features.applist.ui.adapter
 
 import android.content.Context
-import android.content.pm.PackageInfo
 import android.text.SpannableString
 import android.text.style.ImageSpan
 import android.view.ViewGroup
@@ -11,6 +10,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.app.InstalledPackageState
 import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
 import com.absinthe.libchecker.features.applist.ui.view.AppItemView
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
@@ -27,7 +27,7 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
 class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAdapter<LCItem>() {
 
-  private val frozenStateCache = mutableMapOf<String, Boolean>()
+  private val packageStateCache = mutableMapOf<String, InstalledPackageState>()
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return createBaseViewHolder(
@@ -52,12 +52,10 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
       }
     }
     root.container.apply {
-      val packageInfo = if (item.packageName != Constants.EXAMPLE_PACKAGE) {
-        val packageInfo = getPackageInfo(item)
+      val packageState = getPackageState(item)
+      val packageInfo = packageState.packageInfo
+      if (item.packageName != Constants.EXAMPLE_PACKAGE) {
         icon.load(packageInfo)
-        packageInfo
-      } else {
-        null
       }
       setOrHighlightText(appName, item.label)
       setOrHighlightText(packageName, item.packageName)
@@ -109,7 +107,7 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
           setBadge(R.drawable.ic_harmony_badge)
         }
 
-        isAppFrozen(item, packageInfo) -> {
+        packageState.isFrozen -> {
           setBadge(R.drawable.ic_disabled_package)
         }
 
@@ -135,19 +133,26 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
     return ParticleRemoveItemAnimator.stableItemIdForKey(data[position].packageName)
   }
 
+  fun setPackageStates(packageStates: Map<String, InstalledPackageState>) {
+    packageStateCache.clear()
+    packageStateCache.putAll(packageStates)
+  }
+
   fun clearPackageStateCache() {
-    frozenStateCache.clear()
+    packageStateCache.clear()
   }
 
-  private fun getPackageInfo(item: LCItem): PackageInfo? {
-    return runCatching {
-      PackageUtils.getPackageInfo(item.packageName)
-    }.getOrNull()
-  }
-
-  private fun isAppFrozen(item: LCItem, packageInfo: PackageInfo?): Boolean {
-    return frozenStateCache.getOrPut(item.packageName) {
-      packageInfo?.applicationInfo?.let { FreezeUtils.isAppFrozen(it) } ?: true
+  private fun getPackageState(item: LCItem): InstalledPackageState {
+    return packageStateCache.getOrPut(item.packageName) {
+      if (item.packageName == Constants.EXAMPLE_PACKAGE) {
+        InstalledPackageState(packageInfo = null, isFrozen = false)
+      } else {
+        val packageInfo = runCatching { PackageUtils.getPackageInfo(item.packageName) }.getOrNull()
+        InstalledPackageState(
+          packageInfo = packageInfo,
+          isFrozen = packageInfo?.applicationInfo?.let { FreezeUtils.isAppFrozen(it) } ?: true
+        )
+      }
     }
   }
 

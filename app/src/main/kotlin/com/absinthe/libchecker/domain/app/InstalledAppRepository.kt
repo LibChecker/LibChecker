@@ -18,4 +18,6 @@ interface InstalledAppRepository {
   fun isPackageInstalled(packageName: String): Boolean
 
   fun isPackagePreinstalled(packageName: String): Boolean
+
+  fun getPackageState(packageName: String): InstalledPackageState
 }

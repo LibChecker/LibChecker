@@ -516,6 +516,7 @@ class AppListFragment :
       keyword = keyword,
       isCurrentProcess64Bit = android.os.Process.is64Bit()
     ).toMutableList()
+    val packageStates = homeViewModel.getAppListPackageStates(filterList)
 
     if (!isActive) {
       return@launch
@@ -531,7 +532,7 @@ class AppListFragment :
             .map { ParticleRemoveItemAnimator.stableItemIdForKey(it.packageName) }
             .toList()
         )
-        clearPackageStateCache()
+        setPackageStates(packageStates)
         val shouldReturnTopAfterRequestChange = pendingReturnTopAfterRequestChange &&
           !highlightRefresh &&
           !hasUserScrolledList &&

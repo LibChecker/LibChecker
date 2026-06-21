@@ -16,8 +16,10 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.ExportAppListUseCase
 import com.absinthe.libchecker.domain.app.FilterAppListItemsUseCase
+import com.absinthe.libchecker.domain.app.GetAppListPackageStatesUseCase
 import com.absinthe.libchecker.domain.app.InitializeAppListUseCase
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.InstalledPackageState
 import com.absinthe.libchecker.domain.app.PackageChangeState
 import com.absinthe.libchecker.domain.app.SyncAppListChangesUseCase
 import com.absinthe.libchecker.domain.statistics.ComputeLibReferenceUseCase
@@ -46,7 +48,8 @@ class HomeViewModel(
   private val syncAppListChangesUseCase: SyncAppListChangesUseCase,
   private val computeLibReferenceUseCase: ComputeLibReferenceUseCase,
   private val exportAppListUseCase: ExportAppListUseCase,
-  private val filterAppListItemsUseCase: FilterAppListItemsUseCase
+  private val filterAppListItemsUseCase: FilterAppListItemsUseCase,
+  private val getAppListPackageStatesUseCase: GetAppListPackageStatesUseCase
 ) : ViewModel() {
 
   val dbItemsFlow: Flow<List<LCItem>> = appListRepository.items
@@ -175,6 +178,10 @@ class HomeViewModel(
         isCurrentProcess64Bit = isCurrentProcess64Bit
       )
     )
+  }
+
+  suspend fun getAppListPackageStates(items: List<LCItem>): Map<String, InstalledPackageState> {
+    return getAppListPackageStatesUseCase(items)
   }
 
   suspend fun isOnlySelfAppInDatabase(): Boolean {
