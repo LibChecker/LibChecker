@@ -34,9 +34,7 @@ import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import java.text.SimpleDateFormat
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 @RequiresApi(Build.VERSION_CODES.R)
@@ -219,7 +217,7 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
     }
 
     lifecycleScope.launch {
-      val target = loadPackageListItem(packageName) ?: run {
+      val target = viewModel.getRelatedAppListItem(packageName) ?: run {
         item.isGone = true
         return@launch
       }
@@ -228,14 +226,6 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
 
       bindAppInstallSourceItemView(item, packageName, targetLCItem, pi)
     }
-  }
-
-  private suspend fun loadPackageListItem(packageName: String): PackageListItem? = withContext(Dispatchers.IO) {
-    val targetLCItem = viewModel.getAppListItem(packageName) ?: return@withContext null
-    val pi = runCatching {
-      PackageUtils.getPackageInfo(packageName)
-    }.getOrNull()
-    PackageListItem(targetLCItem, pi)
   }
 
   private fun bindAppInstallSourceItemView(
@@ -291,11 +281,6 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
       activity?.launchDetailPage(targetLCItem)
     }
   }
-
-  private data class PackageListItem(
-    val item: LCItem,
-    val packageInfo: PackageInfo?
-  )
 
   private fun initAppInstalledTimeItemView(item: AppInstallTimeItemView, pi: PackageInfo) {
     if (context == null || FreezeUtils.isAppFrozen(pi.packageName)) {

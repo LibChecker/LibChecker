@@ -17,7 +17,6 @@ import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.database.entity.Features
-import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppBundleSplitItem
 import com.absinthe.libchecker.domain.app.AppDetailAbi
 import com.absinthe.libchecker.domain.app.AppDetailPackageSize
@@ -40,7 +39,9 @@ import com.absinthe.libchecker.domain.app.GetAppManifestPropertiesUseCase
 import com.absinthe.libchecker.domain.app.GetArchivePackageInfoUseCase
 import com.absinthe.libchecker.domain.app.GetInstalledAppComparisonPackageUseCase
 import com.absinthe.libchecker.domain.app.GetLibraryDetailUseCase
+import com.absinthe.libchecker.domain.app.GetRelatedAppListItemUseCase
 import com.absinthe.libchecker.domain.app.HasInstalledStaticLibrariesUseCase
+import com.absinthe.libchecker.domain.app.RelatedAppListItem
 import com.absinthe.libchecker.domain.app.SortAppDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.domain.snapshot.BuildPackageComparisonSnapshotItemUseCase
@@ -91,6 +92,7 @@ class DetailViewModel(
   private val getInstalledAppComparisonPackageUseCase: GetInstalledAppComparisonPackageUseCase,
   private val hasInstalledStaticLibrariesUseCase: HasInstalledStaticLibrariesUseCase,
   private val getLibraryDetailUseCase: GetLibraryDetailUseCase,
+  private val getRelatedAppListItemUseCase: GetRelatedAppListItemUseCase,
   private val sortAppDetailItemsUseCase: SortAppDetailItemsUseCase,
   private val buildPackageComparisonSnapshotItemUseCase: BuildPackageComparisonSnapshotItemUseCase
 ) : ViewModel() {
@@ -518,8 +520,10 @@ class DetailViewModel(
     _featuresFlow.emit(feature)
   }
 
-  suspend fun getAppListItem(packageName: String): LCItem? {
-    return appListRepository.getItem(packageName)
+  suspend fun getRelatedAppListItem(packageName: String): RelatedAppListItem? {
+    return withContext(Dispatchers.IO) {
+      getRelatedAppListItemUseCase(packageName)
+    }
   }
 
   fun initFeatures(packageInfo: PackageInfo, features: Int) = viewModelScope.launch(Dispatchers.IO) {

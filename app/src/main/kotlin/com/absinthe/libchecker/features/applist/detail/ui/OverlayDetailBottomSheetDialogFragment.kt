@@ -31,9 +31,7 @@ import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import dev.rikka.tools.refine.Refine
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import me.zhanghai.android.appiconloader.AppIconLoader
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import timber.log.Timber
@@ -117,7 +115,7 @@ class OverlayDetailBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment
         container.let {
           val targetPackage = Refine.unsafeCast<PackageInfoHidden>(packageInfo).overlayTarget ?: return
           lifecycleScope.launch {
-            val target = loadPackageListItem(targetPackage) ?: run {
+            val target = viewModel.getRelatedAppListItem(targetPackage) ?: run {
               addFloatView(targetPackage)
               return@launch
             }
@@ -130,14 +128,6 @@ class OverlayDetailBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment
         activity?.launchDetailPage(lcItem, forceDetail = true)
       }
     }
-  }
-
-  private suspend fun loadPackageListItem(packageName: String): PackageListItem? = withContext(Dispatchers.IO) {
-    val targetLCItem = viewModel.getAppListItem(packageName) ?: return@withContext null
-    val pi = runCatching {
-      PackageUtils.getPackageInfo(packageName)
-    }.getOrNull()
-    PackageListItem(targetLCItem, pi)
   }
 
   private fun bindTargetPackageView(
@@ -191,9 +181,4 @@ class OverlayDetailBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment
       }
     }
   }
-
-  private data class PackageListItem(
-    val item: LCItem,
-    val packageInfo: PackageInfo?
-  )
 }

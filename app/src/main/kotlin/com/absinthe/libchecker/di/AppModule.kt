@@ -35,6 +35,7 @@ import com.absinthe.libchecker.domain.app.GetAppManifestPropertiesUseCase
 import com.absinthe.libchecker.domain.app.GetArchivePackageInfoUseCase
 import com.absinthe.libchecker.domain.app.GetInstalledAppComparisonPackageUseCase
 import com.absinthe.libchecker.domain.app.GetLibraryDetailUseCase
+import com.absinthe.libchecker.domain.app.GetRelatedAppListItemUseCase
 import com.absinthe.libchecker.domain.app.HasInstalledStaticLibrariesUseCase
 import com.absinthe.libchecker.domain.app.InitializeAppListUseCase
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
@@ -118,6 +119,7 @@ val appModule = module {
   factory { GetArchivePackageInfoUseCase() }
   factory { GetInstalledAppComparisonPackageUseCase(get()) }
   factory { GetLibraryDetailUseCase(get()) }
+  factory { GetRelatedAppListItemUseCase(get(), get()) }
   factory { HasInstalledStaticLibrariesUseCase(get()) }
   factory { SortAppDetailItemsUseCase() }
   factory { BuildArchiveSnapshotItemUseCase(androidContext()) }
@@ -166,6 +168,7 @@ val appModule = module {
       getInstalledAppComparisonPackageUseCase = get(),
       hasInstalledStaticLibrariesUseCase = get(),
       getLibraryDetailUseCase = get(),
+      getRelatedAppListItemUseCase = get(),
       sortAppDetailItemsUseCase = get(),
       buildPackageComparisonSnapshotItemUseCase = get()
     )
