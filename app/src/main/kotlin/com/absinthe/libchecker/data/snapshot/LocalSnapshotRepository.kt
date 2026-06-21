@@ -33,6 +33,13 @@ class LocalSnapshotRepository(
     repository.deleteSnapshotsAndTimeStamp(timestamp)
   }
 
+  override suspend fun retainLatestSnapshots(count: Int) {
+    repository.retainLatestSnapshotsAndRemoveOld(
+      count = count,
+      forceShowLoading = false
+    )
+  }
+
   override suspend fun deleteDuplicateSnapshotItems() {
     repository.deleteDuplicateSnapshotItems()
   }

@@ -310,6 +310,10 @@ class SnapshotViewModel(
     snapshotLibrary.deleteTimeStamp(timestamp)
   }
 
+  suspend fun retainLatestSnapshotsAndGetTimeStamps(count: Int): List<TimeStampItem> {
+    return snapshotLibrary.retainLatestSnapshotsAndGetTimeStamps(count)
+  }
+
   fun backup(os: OutputStream, resultAction: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
     snapshotArchive.backup(os)
     withContext(Dispatchers.Main) {

@@ -25,4 +25,9 @@ class SnapshotLibraryUseCase(
   suspend fun deleteTimeStamp(timestamp: Long) {
     repository.deleteSnapshotsAndTimeStamp(timestamp)
   }
+
+  suspend fun retainLatestSnapshotsAndGetTimeStamps(count: Int): List<TimeStampItem> {
+    repository.retainLatestSnapshots(count)
+    return repository.getTimeStamps()
+  }
 }

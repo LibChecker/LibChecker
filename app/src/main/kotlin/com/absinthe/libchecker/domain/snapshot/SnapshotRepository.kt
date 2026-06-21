@@ -10,5 +10,6 @@ interface SnapshotRepository {
   suspend fun insertSnapshots(items: List<SnapshotItem>)
   suspend fun insertTimeStamp(item: TimeStampItem)
   suspend fun deleteSnapshotsAndTimeStamp(timestamp: Long)
+  suspend fun retainLatestSnapshots(count: Int)
   suspend fun deleteDuplicateSnapshotItems()
 }

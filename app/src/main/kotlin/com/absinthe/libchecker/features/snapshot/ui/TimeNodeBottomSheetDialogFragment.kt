@@ -2,11 +2,11 @@ package com.absinthe.libchecker.features.snapshot.ui
 
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.core.os.BundleCompat
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
@@ -95,15 +95,20 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
                     autoRemoveView.syncWithAutoRemoveThreshold()
                     confirmedThreshold?.let { threshold ->
                       lifecycleScope.launch(Dispatchers.IO) {
-                        Repositories.lcRepository.retainLatestSnapshotsAndRemoveOld(
-                          count = threshold,
-                          forceShowLoading = true,
-                          context = ctw
-                        )
-                        val timestampList = Repositories.lcRepository.getTimeStamps()
-                        withContext(Dispatchers.Main) {
-                          if (this@TimeNodeBottomSheetDialogFragment.context != null) {
-                            root.adapter.setList(timestampList)
+                        var loadingDialog: AlertDialog? = null
+                        try {
+                          withContext(Dispatchers.Main) {
+                            loadingDialog = UiUtils.createLoadingDialog(ctw).also { it.show() }
+                          }
+                          val timestampList = viewModel.retainLatestSnapshotsAndGetTimeStamps(threshold)
+                          withContext(Dispatchers.Main) {
+                            if (this@TimeNodeBottomSheetDialogFragment.context != null) {
+                              root.adapter.setList(timestampList)
+                            }
+                          }
+                        } finally {
+                          withContext(Dispatchers.Main) {
+                            loadingDialog?.dismiss()
                           }
                         }
                       }
