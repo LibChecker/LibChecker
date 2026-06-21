@@ -105,7 +105,7 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
         return@setOnClickListener
       }
       lifecycleScope.launch(Dispatchers.IO) {
-        val timeStampList = viewModel.repository.getTimeStamps().toMutableList()
+        val timeStampList = viewModel.getTimeStamps().toMutableList()
         withContext(Dispatchers.Main) {
           val dialog = TimeNodeBottomSheetDialogFragment
             .newInstance(ArrayList(timeStampList)).apply {
@@ -125,7 +125,7 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
                         dialog = com.absinthe.libchecker.utils.UiUtils.createLoadingDialog(this@AlbumActivity)
                         dialog.show()
                       }
-                      viewModel.repository.deleteSnapshotsAndTimeStamp(item.timestamp)
+                      viewModel.deleteSnapshotsAndTimeStamp(item.timestamp)
                       if (position < timeStampList.size) {
                         timeStampList.removeAt(position)
                       }

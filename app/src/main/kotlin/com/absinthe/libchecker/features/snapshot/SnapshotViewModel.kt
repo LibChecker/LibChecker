@@ -17,6 +17,7 @@ import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotListsUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotItemFactory
+import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
@@ -45,12 +46,13 @@ import timber.log.Timber
 const val CURRENT_SNAPSHOT = -1L
 
 class SnapshotViewModel(
-  val repository: LCRepository,
+  private val repository: LCRepository,
   private val snapshotItemFactory: SnapshotItemFactory,
   private val compareSnapshotItems: CompareSnapshotItemsUseCase,
   private val compareSnapshotLists: CompareSnapshotListsUseCase,
   private val buildSnapshotDetailItems: BuildSnapshotDetailItemsUseCase,
-  private val snapshotArchive: SnapshotArchiveUseCase
+  private val snapshotArchive: SnapshotArchiveUseCase,
+  private val snapshotLibrary: SnapshotLibraryUseCase
 ) : ViewModel() {
 
   val allSnapshots = repository.allSnapshotItemsFlow
@@ -290,6 +292,22 @@ class SnapshotViewModel(
 
   fun computeDiffDetail(context: Context, entity: SnapshotDiffItem) = viewModelScope.launch(Dispatchers.IO) {
     snapshotDetailItemsFlow.emit(buildSnapshotDetailItems(context, entity))
+  }
+
+  fun getTimeStamps(): List<TimeStampItem> {
+    return snapshotLibrary.getTimeStamps()
+  }
+
+  suspend fun getSnapshots(timestamp: Long, packageName: String? = null): List<SnapshotItem> {
+    return snapshotLibrary.getSnapshots(timestamp, packageName)
+  }
+
+  suspend fun getTimeStampSystemProps(timestamp: Long): String? {
+    return snapshotLibrary.getSystemProps(timestamp)
+  }
+
+  suspend fun deleteSnapshotsAndTimeStamp(timestamp: Long) {
+    snapshotLibrary.deleteTimeStamp(timestamp)
   }
 
   fun backup(os: OutputStream, resultAction: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {

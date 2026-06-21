@@ -3,14 +3,18 @@ package com.absinthe.libchecker.data.snapshot
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
-import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveRepository
+import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 
-class LocalSnapshotArchiveRepository(
+class LocalSnapshotRepository(
   private val repository: LCRepository
-) : SnapshotArchiveRepository {
+) : SnapshotRepository {
 
   override fun getTimeStamps(): List<TimeStampItem> {
     return repository.getTimeStamps()
+  }
+
+  override suspend fun getTimeStamp(timestamp: Long): TimeStampItem? {
+    return repository.getTimeStamp(timestamp)
   }
 
   override suspend fun getSnapshots(timestamp: Long): List<SnapshotItem> {
@@ -23,6 +27,10 @@ class LocalSnapshotArchiveRepository(
 
   override suspend fun insertTimeStamp(item: TimeStampItem) {
     repository.insert(item)
+  }
+
+  override suspend fun deleteSnapshotsAndTimeStamp(timestamp: Long) {
+    repository.deleteSnapshotsAndTimeStamp(timestamp)
   }
 
   override suspend fun deleteDuplicateSnapshotItems() {

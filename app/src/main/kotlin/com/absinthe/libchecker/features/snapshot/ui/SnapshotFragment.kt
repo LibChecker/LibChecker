@@ -163,7 +163,7 @@ class SnapshotFragment :
       updateDashboardContentDescription(dashboard)
       fun changeTimeNode() {
         lifecycleScope.launch(Dispatchers.IO) {
-          val timeStampList = viewModel.repository.getTimeStamps()
+          val timeStampList = viewModel.getTimeStamps()
           val dialog = TimeNodeBottomSheetDialogFragment.newInstance(ArrayList(timeStampList))
             .apply {
               setOnItemClickListener { position ->
@@ -749,7 +749,7 @@ class SnapshotFragment :
   private fun updateSystemProps(dashboard: SnapshotDashboardView, timestamp: Long) {
     lifecycleScope.launch(Dispatchers.IO) {
       val systemProps = runCatching {
-        viewModel.repository.getTimeStamp(timestamp)?.systemProps?.fromJson<Map<String, String>>()
+        viewModel.getTimeStampSystemProps(timestamp)?.fromJson<Map<String, String>>()
       }.getOrNull()
       if (systemProps.isNullOrEmpty()) {
         dashboard.container.setSystemProps(emptyList())

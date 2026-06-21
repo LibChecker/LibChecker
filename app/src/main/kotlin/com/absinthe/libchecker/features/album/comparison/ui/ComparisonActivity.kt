@@ -192,7 +192,7 @@ class ComparisonActivity :
             return@setOnClickListener
           }
           lifecycleScope.launch(Dispatchers.IO) {
-            val timeStampList = viewModel.repository.getTimeStamps()
+            val timeStampList = viewModel.getTimeStamps()
             val dialog = TimeNodeBottomSheetDialogFragment
               .newInstance(ArrayList(timeStampList))
               .apply {
@@ -215,7 +215,7 @@ class ComparisonActivity :
             return@setOnClickListener
           }
           lifecycleScope.launch(Dispatchers.IO) {
-            val timeStampList = viewModel.repository.getTimeStamps()
+            val timeStampList = viewModel.getTimeStamps()
             val dialog = TimeNodeBottomSheetDialogFragment
               .newInstance(ArrayList(timeStampList))
               .apply {
@@ -454,10 +454,9 @@ class ComparisonActivity :
       listOf(leftPackage)
     } else if (leftTimeStamp > 0) {
       if (rightPackage != null) {
-        viewModel.repository.getSnapshots(leftTimeStamp)
-          .filter { it.packageName == rightPackage.packageName }
+        viewModel.getSnapshots(leftTimeStamp, rightPackage.packageName)
       } else {
-        viewModel.repository.getSnapshots(leftTimeStamp)
+        viewModel.getSnapshots(leftTimeStamp)
       }
     } else {
       showToast(R.string.album_item_comparison_invalid_compare)
@@ -468,10 +467,9 @@ class ComparisonActivity :
       listOf(rightPackage)
     } else if (rightTimeStamp > 0) {
       if (leftPackage != null) {
-        viewModel.repository.getSnapshots(rightTimeStamp)
-          .filter { it.packageName == leftPackage.packageName }
+        viewModel.getSnapshots(rightTimeStamp, leftPackage.packageName)
       } else {
-        viewModel.repository.getSnapshots(rightTimeStamp)
+        viewModel.getSnapshots(rightTimeStamp)
       }
     } else {
       showToast(R.string.album_item_comparison_invalid_compare)

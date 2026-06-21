@@ -6,7 +6,7 @@ import java.io.InputStream
 import java.io.OutputStream
 
 class SnapshotArchiveUseCase(
-  private val repository: SnapshotArchiveRepository,
+  private val repository: SnapshotRepository,
   private val codec: SnapshotArchiveCodec
 ) {
 
