@@ -30,9 +30,9 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.data.app.LocalAppDataSource
-import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
+import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.features.home.ui.MainActivity
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
@@ -51,6 +51,7 @@ import java.util.Locale
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 import timber.log.Timber
 
 private const val SHOOT_CHANNEL_ID = "shoot_channel"
@@ -64,7 +65,7 @@ class ShootService : LifecycleService() {
   private val notificationIdShootSuccess = notificationIdShoot + 1
   private val builder by lazy { NotificationCompat.Builder(this, SHOOT_CHANNEL_ID) }
   private val notificationManager by lazy { NotificationManagerCompat.from(this) }
-  private val repository = Repositories.lcRepository
+  private val snapshotRepository: SnapshotRepository by inject()
   private val listenerList = RemoteCallbackList<OnShootListener>()
 
   private val binder by lazy { ShootBinder(this) }
@@ -195,7 +196,7 @@ class ShootService : LifecycleService() {
     }
     val ts = System.currentTimeMillis()
 
-    repository.deleteAllSnapshotDiffItems()
+    snapshotRepository.deleteAllSnapshotDiffItems()
 
     val size = appList.size
     val dbList = mutableListOf<SnapshotItem>()
@@ -215,7 +216,7 @@ class ShootService : LifecycleService() {
 
     for (info in appList) {
       ai = info.applicationInfo ?: continue
-      dbSnapshotItem = repository.getSnapshot(currentSnapshotTimestamp, info.packageName)
+      dbSnapshotItem = snapshotRepository.getSnapshot(currentSnapshotTimestamp, info.packageName)
 
       if (dbSnapshotItem?.versionCode == info.getVersionCode() &&
         dbSnapshotItem.lastUpdatedTime == info.lastUpdateTime &&
@@ -280,7 +281,7 @@ class ShootService : LifecycleService() {
           builder.setProgress(size, count, false)
           notificationManager.notify(notificationIdShoot, builder.build())
         }
-        repository.insertSnapshots(dbList)
+        snapshotRepository.insertSnapshots(dbList)
         dbList.clear()
       }
     }
@@ -289,24 +290,21 @@ class ShootService : LifecycleService() {
       builder.setProgress(size, count, false)
       notificationManager.notify(notificationIdShoot, builder.build())
     }
-    repository.insertSnapshots(dbList)
+    snapshotRepository.insertSnapshots(dbList)
 
     val systemProps = mutableMapOf<String, String>()
     systemProps[Constants.SystemProps.RO_BUILD_VERSION_SECURITY_PATCH] = Build.VERSION.SECURITY_PATCH
     systemProps[Constants.SystemProps.RO_BUILD_ID] = Build.ID
 
-    repository.insert(TimeStampItem(ts, null, systemProps.toJson()))
+    snapshotRepository.insertTimeStamp(TimeStampItem(ts, null, systemProps.toJson()))
 
     if (dropPrevious) {
       Timber.i("deleteSnapshotsAndTimeStamp: ${GlobalValues.snapshotTimestamp}")
-      repository.deleteSnapshotsAndTimeStamp(GlobalValues.snapshotTimestamp)
+      snapshotRepository.deleteSnapshotsAndTimeStamp(GlobalValues.snapshotTimestamp)
     }
 
     if (GlobalValues.snapshotAutoRemoveThreshold > 0) {
-      repository.retainLatestSnapshotsAndRemoveOld(
-        count = GlobalValues.snapshotAutoRemoveThreshold,
-        forceShowLoading = false
-      )
+      snapshotRepository.retainLatestSnapshots(GlobalValues.snapshotAutoRemoveThreshold)
     }
 
     if (areNotificationsEnabled) {

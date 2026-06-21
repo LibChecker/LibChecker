@@ -21,6 +21,10 @@ class LocalSnapshotRepository(
     return repository.getSnapshots(timestamp)
   }
 
+  override suspend fun getSnapshot(timestamp: Long, packageName: String): SnapshotItem? {
+    return repository.getSnapshot(timestamp, packageName)
+  }
+
   override suspend fun insertSnapshots(items: List<SnapshotItem>) {
     repository.insertSnapshots(items)
   }
@@ -42,5 +46,9 @@ class LocalSnapshotRepository(
 
   override suspend fun deleteDuplicateSnapshotItems() {
     repository.deleteDuplicateSnapshotItems()
+  }
+
+  override suspend fun deleteAllSnapshotDiffItems() {
+    repository.deleteAllSnapshotDiffItems()
   }
 }
