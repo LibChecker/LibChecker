@@ -27,6 +27,7 @@ import com.absinthe.libchecker.domain.app.GetAppDetailPackageSizeUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPermissionChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailSignatureChipsUseCase
+import com.absinthe.libchecker.domain.app.GetAppDetailStaticLibraryChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppListPackageStatesUseCase
 import com.absinthe.libchecker.domain.app.GetAppManifestPropertiesUseCase
 import com.absinthe.libchecker.domain.app.GetArchivePackageInfoUseCase
@@ -86,6 +87,7 @@ val appModule = module {
   factory { GetAppDetailFeaturesUseCase(get()) }
   factory { GetAppDetailMetadataChipsUseCase() }
   factory { GetAppDetailNativeLibrariesUseCase() }
+  factory { GetAppDetailStaticLibraryChipsUseCase() }
   factory { GetAppDetailPackageUseCase(get()) }
   factory { GetAppDetailPackageSizeUseCase(get()) }
   factory { GetAppDetailPermissionChipsUseCase() }
@@ -112,7 +114,29 @@ val appModule = module {
   factory { SnapshotLibraryUseCase(get()) }
 
   viewModel { ChartViewModel(get()) }
-  viewModel { DetailViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+  viewModel {
+    DetailViewModel(
+      appListRepository = get(),
+      getAppDetailPackage = get(),
+      getAppBundleItemsUseCase = get(),
+      getAppDetailAbiUseCase = get(),
+      getAppDetailComponentChipsUseCase = get(),
+      getAppDetailFeaturesUseCase = get(),
+      getAppDetailMetadataChipsUseCase = get(),
+      getAppDetailNativeLibrariesUseCase = get(),
+      getAppDetailStaticLibraryChipsUseCase = get(),
+      getAppDetailPackageSizeUseCase = get(),
+      getApkPreviewInfoUseCase = get(),
+      getAppDetailPermissionChipsUseCase = get(),
+      getAppDetailSignatureChipsUseCase = get(),
+      getAppManifestPropertiesUseCase = get(),
+      getArchivePackageInfoUseCase = get(),
+      getInstalledAppComparisonPackageUseCase = get(),
+      hasInstalledStaticLibrariesUseCase = get(),
+      getLibraryDetailUseCase = get(),
+      buildPackageComparisonSnapshotItemUseCase = get()
+    )
+  }
   viewModel { HomeViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
   viewModel { LibReferenceViewModel(get()) }
   viewModel { SnapshotViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
