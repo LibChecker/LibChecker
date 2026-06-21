@@ -1,11 +1,6 @@
 package com.absinthe.libchecker.features.home
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.drawable.AdaptiveIconDrawable
-import android.graphics.drawable.Drawable
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.BuildConfig
@@ -28,14 +23,8 @@ import com.absinthe.libchecker.domain.statistics.LibReferenceItem
 import com.absinthe.libchecker.features.statistics.bean.LibReference
 import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.ui.base.IListController
-import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.UiUtils
-import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.requireAvailableCacheDir
-import com.absinthe.rulesbundle.IconResMap
-import java.io.File
 import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -141,12 +130,6 @@ class HomeViewModel(
       binder.initFeatures()
     }.onFailure {
       Timber.w(it, "requestFeatureInitialization failed")
-    }
-  }
-
-  fun sphereTextureAvailable() {
-    setEffect {
-      Effect.SphereTextureAvailable()
     }
   }
 
@@ -388,7 +371,6 @@ class HomeViewModel(
     data class PackageChanged(val packageChangeState: PackageChangeState) : Effect()
     data class RefreshList(val obj: Any? = null) : Effect()
     data class UpdateLibRefProgress(val progress: Int) : Effect()
-    data class SphereTextureAvailable(val obj: Any? = null) : Effect()
   }
 
   fun dumpAppsInfo(os: OutputStream, saveAsMarkDown: Boolean) {
@@ -433,61 +415,5 @@ class HomeViewModel(
   fun clearMenuState() {
     isSearchMenuExpanded = false
     currentSearchQuery = ""
-  }
-
-  fun generateAppsListSphereTexture(context: Context) {
-    viewModelScope.launch(Dispatchers.IO) {
-      val baseDir = context.filesDir.resolve("sphere_texture")
-      if (!baseDir.exists()) {
-        baseDir.mkdirs()
-      }
-      if ((baseDir.listFiles()?.size ?: 0) >= 2) {
-        return@launch
-      }
-      baseDir.resolve("apps").mkdirs()
-      baseDir.resolve("libs").mkdirs()
-
-      val icons = mutableListOf<Drawable>()
-
-      // Apps icons
-      val defaultIcon = context.packageManager.defaultActivityIcon
-      val defaultMonoIcon = if (OsUtils.atLeastT() && defaultIcon is AdaptiveIconDrawable) defaultIcon.monochrome else null
-      installedAppRepository.getApplicationList().forEach {
-        if (icons.size >= 75) return@forEach
-        val icon = context.packageManager.getApplicationIcon(it.applicationInfo!!)
-        val result = if (OsUtils.atLeastT()) {
-          (icon as? AdaptiveIconDrawable)?.monochrome.takeIf { icon -> !UiUtils.drawablesAreEqual(icon, defaultMonoIcon) }
-            ?.apply { setTint(context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary)) }
-        } else {
-          icon.takeIf { icon -> !UiUtils.drawablesAreEqual(icon, defaultIcon) }
-        } ?: return@forEach
-        icons.add(result)
-      }
-      val iconSize = 48.dp
-      repeat(5) {
-        val subIcons = icons.shuffled().take(25)
-        val bitmap = UiUtils.getDrawableStrip(context, subIcons, iconSize, iconSize)
-        val file = File(baseDir.resolve("apps"), "$it.png")
-        file.sink().buffer().use { sink ->
-          bitmap.compress(Bitmap.CompressFormat.PNG, 100, sink.outputStream())
-        }
-      }
-
-      // Libs icons
-      icons.clear()
-      repeat(50) {
-        icons.add(ContextCompat.getDrawable(context, IconResMap.getIconRes(it))!!)
-      }
-      repeat(5) {
-        val subIcons = icons.shuffled().take(25)
-        val bitmap = UiUtils.getDrawableStrip(context, subIcons, iconSize, iconSize)
-        val file = File(baseDir.resolve("libs"), "$it.png")
-        file.sink().buffer().use { sink ->
-          bitmap.compress(Bitmap.CompressFormat.PNG, 100, sink.outputStream())
-        }
-      }
-
-      sphereTextureAvailable()
-    }
   }
 }

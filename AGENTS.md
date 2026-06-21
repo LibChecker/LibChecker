@@ -56,6 +56,8 @@ Important `:app` boundaries:
   package-change sources to the `domain/app/` interfaces.
 - `domain/statistics/` owns statistics/reference computation rules. Keep
   package scanning and rule-matching loops out of fragments and ViewModels.
+- Loading indicators should use `RingDotsView`; do not reintroduce the removed
+  `AppsListLoadingView` or `sphere_texture` preloading path.
 - `compat/` wraps platform/API-level differences. Check here before adding new
   SDK-version branches.
 - `utils/apk`, `utils/manifest`, `utils/dex`, `utils/elf`, `PackageUtils`,
