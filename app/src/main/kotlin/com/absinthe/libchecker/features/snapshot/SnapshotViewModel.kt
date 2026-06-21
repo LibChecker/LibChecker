@@ -14,6 +14,7 @@ import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.snapshot.ArchiveSnapshotItem
 import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotDetailItemsUseCase
+import com.absinthe.libchecker.domain.snapshot.BuildSnapshotPairDiffUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemWithInstalledAppUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotListsUseCase
@@ -56,7 +57,8 @@ class SnapshotViewModel(
   private val buildSnapshotDetailItems: BuildSnapshotDetailItemsUseCase,
   private val snapshotArchive: SnapshotArchiveUseCase,
   private val snapshotLibrary: SnapshotLibraryUseCase,
-  private val buildArchiveSnapshotItemUseCase: BuildArchiveSnapshotItemUseCase
+  private val buildArchiveSnapshotItemUseCase: BuildArchiveSnapshotItemUseCase,
+  private val buildSnapshotPairDiffUseCase: BuildSnapshotPairDiffUseCase
 ) : ViewModel() {
 
   val allSnapshots = repository.currentSnapshotCount
@@ -161,6 +163,10 @@ class SnapshotViewModel(
     return withContext(Dispatchers.IO) {
       buildArchiveSnapshotItemUseCase(uri, destinationFile, iconSize)
     }
+  }
+
+  fun buildSnapshotPairDiff(left: SnapshotItem, right: SnapshotItem): SnapshotDiffItem {
+    return buildSnapshotPairDiffUseCase(left, right)
   }
 
   suspend fun compareItemDiff(
