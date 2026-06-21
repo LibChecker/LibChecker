@@ -35,6 +35,7 @@ import com.absinthe.libchecker.domain.app.GetAppDetailPackageUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPermissionChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailSignatureChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailStaticLibraryChipsUseCase
+import com.absinthe.libchecker.domain.app.GetAppInstallSourceDetailsUseCase
 import com.absinthe.libchecker.domain.app.GetAppManifestPropertiesUseCase
 import com.absinthe.libchecker.domain.app.GetArchivePackageInfoUseCase
 import com.absinthe.libchecker.domain.app.GetInstalledAppComparisonPackageUseCase
@@ -78,6 +79,7 @@ class DetailViewModel(
   private val getAppDetailPackage: GetAppDetailPackageUseCase,
   private val getAppBundleItemsUseCase: GetAppBundleItemsUseCase,
   private val getAppDetailAbiUseCase: GetAppDetailAbiUseCase,
+  private val getAppInstallSourceDetailsUseCase: GetAppInstallSourceDetailsUseCase,
   private val getAppDetailComponentChipsUseCase: GetAppDetailComponentChipsUseCase,
   private val getAppDetailFeaturesUseCase: GetAppDetailFeaturesUseCase,
   private val getAppDetailMetadataChipsUseCase: GetAppDetailMetadataChipsUseCase,
@@ -161,6 +163,10 @@ class DetailViewModel(
     return withContext(Dispatchers.IO) {
       getAppBundleItemsUseCase(packageInfo)
     }
+  }
+
+  suspend fun getAppInstallSourceDetails(packageName: String) = withContext(Dispatchers.IO) {
+    getAppInstallSourceDetailsUseCase(packageName)
   }
 
   suspend fun getApkPreviewInfo(url: String): Result<ApkPreviewInfo> {

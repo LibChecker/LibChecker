@@ -23,10 +23,10 @@ import com.absinthe.libchecker.utils.extensions.isUseKMP
 import com.absinthe.libchecker.utils.extensions.isXposedModule
 import com.absinthe.libchecker.utils.extensions.toClassDefType
 import java.io.File
-import timber.log.Timber
 
 class GetAppDetailFeaturesUseCase(
-  private val appListRepository: AppListRepository
+  private val appListRepository: AppListRepository,
+  private val installedAppRepository: InstalledAppRepository
 ) {
 
   suspend operator fun invoke(
@@ -38,13 +38,9 @@ class GetAppDetailFeaturesUseCase(
     features.add(VersionedFeature(Features.Ext.APPLICATION_PROP))
 
     if (OsUtils.atLeastR() && !isApk) {
-      runCatching {
-        val info = PackageUtils.getInstallSourceInfo(packageInfo.packageName)
-        if (info?.installingPackageName != null) {
-          features.add(VersionedFeature(Features.Ext.APPLICATION_INSTALL_SOURCE, info.initiatingPackageName))
-        }
-      }.onFailure {
-        Timber.e(it)
+      val info = installedAppRepository.getInstallSource(packageInfo.packageName)
+      if (info?.installingPackageName != null) {
+        features.add(VersionedFeature(Features.Ext.APPLICATION_INSTALL_SOURCE, info.initiatingPackageName))
       }
     }
 

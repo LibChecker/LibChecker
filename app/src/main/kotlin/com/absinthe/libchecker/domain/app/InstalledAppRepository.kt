@@ -23,5 +23,7 @@ interface InstalledAppRepository {
 
   fun isPackagePreinstalled(packageName: String): Boolean
 
+  fun getInstallSource(packageName: String): AppInstallSource?
+
   fun getPackageState(packageName: String): InstalledPackageState
 }

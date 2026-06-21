@@ -1,13 +1,16 @@
 package com.absinthe.libchecker.data.app
 
 import android.content.pm.PackageInfo
+import com.absinthe.libchecker.domain.app.AppInstallSource
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.InstalledPackageState
 import com.absinthe.libchecker.domain.app.PackageChangeState
 import com.absinthe.libchecker.utils.FreezeUtils
+import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.isPreinstalled
 import kotlinx.coroutines.flow.SharedFlow
+import timber.log.Timber
 
 object LocalInstalledAppRepository : InstalledAppRepository {
 
@@ -41,6 +44,23 @@ object LocalInstalledAppRepository : InstalledAppRepository {
 
   override fun isPackagePreinstalled(packageName: String): Boolean {
     return getPackageInfo(packageName)?.isPreinstalled() == true
+  }
+
+  override fun getInstallSource(packageName: String): AppInstallSource? {
+    if (!OsUtils.atLeastR()) {
+      return null
+    }
+    return runCatching {
+      PackageUtils.getInstallSourceInfo(packageName)?.let {
+        AppInstallSource(
+          initiatingPackageName = it.initiatingPackageName,
+          originatingPackageName = it.originatingPackageName,
+          installingPackageName = it.installingPackageName
+        )
+      }
+    }.onFailure {
+      Timber.e(it)
+    }.getOrNull()
   }
 
   override fun getPackageState(packageName: String): InstalledPackageState {

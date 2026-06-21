@@ -16,6 +16,8 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.app.AppInstallSource
+import com.absinthe.libchecker.domain.app.AppInstallSourceDetails
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppDexoptItemView
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppInstallSourceBottomSheetView
@@ -42,7 +44,6 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
 
   private val viewModel: DetailViewModel by activityViewModel()
   private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
-  private var packageInfo: PackageInfo? = null
   private var binderReceivedHandle: ShizukuManager.ListenerHandle? = null
   private var permissionResultHandle: ShizukuManager.ListenerHandle? = null
 
@@ -53,18 +54,26 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
   override fun init() {
     maxPeekHeightPercentage = 0.67f
     val packageName = packageName ?: return
-    val pi = runCatching { PackageUtils.getPackageInfo(packageName) }.getOrNull() ?: return
-    packageInfo = pi
+    lifecycleScope.launch {
+      val details = viewModel.getAppInstallSourceDetails(packageName) ?: return@launch
+      bindAppInstallSourceDetails(details)
+    }
+  }
 
-    PackageUtils.getInstallSourceInfo(packageName)?.let { info ->
-      initOriginatingItemView(root.originatingView, info.originatingPackageName)
-      initAppInstallSourceItemView(root.installingView, info.installingPackageName)
+  private fun bindAppInstallSourceDetails(details: AppInstallSourceDetails) {
+    bindAppInstallSourceItems(details.installSource)
+    initAppInstalledTimeItemView(root.installedTimeView, details.packageInfo)
+    initDexoptItemView(root.dexoptView, details.packageInfo)
+  }
+
+  private fun bindAppInstallSourceItems(installSource: AppInstallSource?) {
+    installSource?.let {
+      initOriginatingItemView(root.originatingView, it.originatingPackageName)
+      initAppInstallSourceItemView(root.installingView, it.installingPackageName)
     } ?: run {
       root.originatingView.isGone = true
       root.installingView.isGone = true
     }
-    initAppInstalledTimeItemView(root.installedTimeView, pi)
-    initDexoptItemView(root.dexoptView, pi)
   }
 
   override fun onDestroyView() {
@@ -331,20 +340,10 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
     }
 
     val packageName = packageName ?: return
-    PackageUtils.getInstallSourceInfo(packageName)?.let {
-      initOriginatingItemView(root.originatingView, it.originatingPackageName)
-      initAppInstallSourceItemView(root.installingView, it.installingPackageName)
-    } ?: run {
-      root.originatingView.isGone = true
-      root.installingView.isGone = true
+    lifecycleScope.launch {
+      val details = viewModel.getAppInstallSourceDetails(packageName) ?: return@launch
+      bindAppInstallSourceDetails(details)
     }
-
-    val pi = packageInfo ?: runCatching {
-      PackageUtils.getPackageInfo(packageName)
-    }.getOrNull()?.also {
-      packageInfo = it
-    } ?: return
-    initDexoptItemView(root.dexoptView, pi)
   }
 
   private fun openShizukuReleasePage() {
