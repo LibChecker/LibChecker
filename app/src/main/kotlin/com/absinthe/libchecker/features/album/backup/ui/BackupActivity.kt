@@ -15,7 +15,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
@@ -60,6 +59,7 @@ import kotlinx.coroutines.launch
 import okio.buffer
 import okio.sink
 import okio.source
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import rikka.recyclerview.fixEdgeEffect
 import rikka.widget.borderview.BorderRecyclerView
 import rikka.widget.borderview.BorderView
@@ -102,7 +102,7 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
 
   class BackupFragment : PreferenceFragmentCompat() {
 
-    private val viewModel: SnapshotViewModel by viewModels()
+    private val viewModel: SnapshotViewModel by viewModel()
 
     private lateinit var backupResultLauncher: ActivityResultLauncher<String>
     private lateinit var restoreResultLauncher: ActivityResultLauncher<String>

@@ -20,7 +20,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.createBitmap
 import androidx.core.os.BundleCompat
@@ -77,6 +76,7 @@ import me.zhanghai.android.appiconloader.AppIconLoader
 import okio.buffer
 import okio.sink
 import okio.source
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import rikka.widget.borderview.BorderView
 
 const val VF_LOADING = 0
@@ -86,7 +86,7 @@ class ComparisonActivity :
   BaseActivity<ActivityComparisonBinding>(),
   MenuProvider {
 
-  private val viewModel: SnapshotViewModel by viewModels()
+  private val viewModel: SnapshotViewModel by viewModel()
   private val adapter = SnapshotAdapter()
   private var leftTimeStamp = 0L
   private var rightTimeStamp = 0L

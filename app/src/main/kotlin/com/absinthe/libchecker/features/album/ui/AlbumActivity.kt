@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.ContextThemeWrapper
 import android.view.MenuItem
 import android.view.ViewGroup
-import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -32,11 +31,12 @@ import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import rikka.widget.borderview.BorderView
 
 class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
 
-  private val viewModel: SnapshotViewModel by viewModels()
+  private val viewModel: SnapshotViewModel by viewModel()
   private val adapter = AlbumAdapter()
 
   override fun onCreate(savedInstanceState: Bundle?) {

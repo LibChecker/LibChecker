@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.features.snapshot
 
 import android.content.Context
-import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -22,10 +21,11 @@ import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.data.app.LocalAppDataSource
-import com.absinthe.libchecker.database.Repositories
+import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.entity.SnapshotDiffStoringItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
+import com.absinthe.libchecker.domain.snapshot.SnapshotItemFactory
 import com.absinthe.libchecker.features.snapshot.detail.bean.ADDED
 import com.absinthe.libchecker.features.snapshot.detail.bean.CHANGED
 import com.absinthe.libchecker.features.snapshot.detail.bean.MOVED
@@ -37,10 +37,7 @@ import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.protocol.Snapshot
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.extensions.getAppName
-import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPackageSize
-import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.fromJson
@@ -65,9 +62,11 @@ import timber.log.Timber
 
 const val CURRENT_SNAPSHOT = -1L
 
-class SnapshotViewModel : ViewModel() {
+class SnapshotViewModel(
+  val repository: LCRepository,
+  private val snapshotItemFactory: SnapshotItemFactory
+) : ViewModel() {
 
-  val repository = Repositories.lcRepository
   val allSnapshots = repository.allSnapshotItemsFlow
   val snapshotDiffItemsFlow: MutableSharedFlow<List<SnapshotDiffItem>> = MutableSharedFlow()
   val snapshotDetailItemsFlow: MutableSharedFlow<List<SnapshotDetailItem>> = MutableSharedFlow()
@@ -146,7 +145,7 @@ class SnapshotViewModel : ViewModel() {
         return@forEach
       }
       try {
-        val newInfo = convertToSnapshotItem(packageManager, packageInfo)
+        val newInfo = snapshotItemFactory.create(packageManager, packageInfo)
         diffList.add(generateSnapshotDiffItem(null, newInfo, trackPackageNames)!!)
       } catch (e: Exception) {
         Timber.e(e)
@@ -229,7 +228,7 @@ class SnapshotViewModel : ViewModel() {
     ) {
       return null
     }
-    return generateSnapshotDiffItem(dbItem, convertToSnapshotItem(packageManager, packageInfo), trackPackageNames)
+    return generateSnapshotDiffItem(dbItem, snapshotItemFactory.create(packageManager, packageInfo), trackPackageNames)
   }
 
   private fun compareDiffWithSnapshotList(preTimeStamp: Long, currTimeStamp: Long) = runBlocking {
@@ -320,7 +319,7 @@ class SnapshotViewModel : ViewModel() {
     val presentInfo = runCatching {
       val flags = PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS
       PackageUtils.getPackageInfo(packageName, flags)
-    }.getOrNull()?.let { convertToSnapshotItem(packageManager, it) }
+    }.getOrNull()?.let { snapshotItemFactory.create(packageManager, it) }
     val snapshotInfo = repository.getSnapshot(timeStamp, packageName)
     val trackPackageNames = repository.getTrackItems()
       .asSequence()
@@ -333,52 +332,6 @@ class SnapshotViewModel : ViewModel() {
     } ?: run {
       removeDiffItem(packageName)
     }
-  }
-
-  private fun convertToSnapshotItem(packageManager: PackageManager, packageInfo: PackageInfo): SnapshotItem {
-    val flaggedPi = PackageUtils.getPackageInfo(
-      packageInfo.packageName,
-      PackageManager.GET_SERVICES or PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS or PackageManager.GET_PERMISSIONS or PackageManager.GET_META_DATA
-    )
-    return SnapshotItem(
-      id = null,
-      packageName = packageInfo.packageName,
-      timeStamp = 0,
-      installedTime = packageInfo.firstInstallTime,
-      lastUpdatedTime = packageInfo.lastUpdateTime,
-      label = packageInfo.getAppName(packageManager).toString(),
-      versionName = packageInfo.versionName.toString(),
-      versionCode = packageInfo.getVersionCode(),
-      abi = PackageUtils.getAbi(packageInfo).toShort(),
-      targetApi = packageInfo.applicationInfo?.targetSdkVersion?.toShort() ?: 0,
-      compileSdk = packageInfo.getCompileSdkVersion().toShort(),
-      minSdk = packageInfo.applicationInfo?.minSdkVersion?.toShort() ?: 0,
-      nativeLibs = PackageUtils.getNativeDirLibs(packageInfo).toJson().orEmpty(),
-      services = PackageUtils.getComponentStringList(
-        flaggedPi,
-        SERVICE,
-        false
-      ).toJson().orEmpty(),
-      activities = PackageUtils.getComponentStringList(
-        packageInfo.packageName,
-        ACTIVITY,
-        false
-      ).toJson().orEmpty(),
-      receivers = PackageUtils.getComponentStringList(
-        flaggedPi,
-        RECEIVER,
-        false
-      ).toJson().orEmpty(),
-      providers = PackageUtils.getComponentStringList(
-        flaggedPi,
-        PROVIDER,
-        false
-      ).toJson().orEmpty(),
-      permissions = flaggedPi.getPermissionsList().toJson().orEmpty(),
-      metadata = PackageUtils.getMetaDataItems(flaggedPi).toJson().orEmpty(),
-      packageSize = packageInfo.getPackageSize(true),
-      isSystem = (packageInfo.applicationInfo!!.flags and ApplicationInfo.FLAG_SYSTEM) > 0
-    )
   }
 
   private fun generateSnapshotDiffItem(

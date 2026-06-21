@@ -28,7 +28,6 @@ import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -80,6 +79,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import rikka.widget.borderview.BorderView
 import timber.log.Timber
 
@@ -90,7 +90,7 @@ class SnapshotFragment :
   BaseListControllerFragment<FragmentSnapshotBinding>(),
   SearchView.OnQueryTextListener {
 
-  private val viewModel: SnapshotViewModel by activityViewModels()
+  private val viewModel: SnapshotViewModel by activityViewModel()
   private val adapter = SnapshotAdapter()
   private val particleItemAnimator = ParticleRemoveItemAnimator()
   private val pendingParticleRemovePackageNames = linkedSetOf<String>()

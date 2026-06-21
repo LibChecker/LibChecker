@@ -8,7 +8,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.activity.viewModels
 import androidx.core.view.MenuProvider
 import androidx.core.view.descendants
 import androidx.core.view.isVisible
@@ -68,6 +67,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import me.zhanghai.android.appiconloader.AppIconLoader
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import rikka.core.util.ClipboardUtils
 
 const val EXTRA_ENTITY = "EXTRA_ENTITY"
@@ -80,7 +80,7 @@ class SnapshotDetailActivity :
   private lateinit var entity: SnapshotDiffItem
 
   private val adapter = SnapshotDetailAdapter()
-  private val viewModel: SnapshotViewModel by viewModels()
+  private val viewModel: SnapshotViewModel by viewModel()
   private val _entity by unsafeLazy {
     IntentCompat.getSerializableExtra<SnapshotDiffItem>(
       intent,

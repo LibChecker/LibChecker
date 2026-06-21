@@ -3,7 +3,6 @@ package com.absinthe.libchecker.features.snapshot.ui
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.core.os.BundleCompat
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
@@ -23,12 +22,13 @@ import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 const val EXTRA_TOP_APPS = "EXTRA_TOP_APPS"
 
 class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<TimeNodeBottomSheetView>() {
 
-  private val viewModel: SnapshotViewModel by activityViewModels()
+  private val viewModel: SnapshotViewModel by activityViewModel()
   private var itemClickAction: ((position: Int) -> Unit)? = null
   private var customTitle: String? = null
   private var isCompareMode: Boolean = false
