@@ -43,6 +43,7 @@ import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageSizeUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageUseCase
 import com.absinthe.libchecker.domain.app.GetAppManifestPropertiesUseCase
+import com.absinthe.libchecker.domain.app.GetArchivePackageInfoUseCase
 import com.absinthe.libchecker.domain.app.GetInstalledAppComparisonPackageUseCase
 import com.absinthe.libchecker.domain.app.HasInstalledStaticLibrariesUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildPackageComparisonSnapshotItemUseCase
@@ -112,6 +113,7 @@ class DetailViewModel(
   private val getAppBundleItemsUseCase: GetAppBundleItemsUseCase,
   private val getAppDetailPackageSizeUseCase: GetAppDetailPackageSizeUseCase,
   private val getAppManifestPropertiesUseCase: GetAppManifestPropertiesUseCase,
+  private val getArchivePackageInfoUseCase: GetArchivePackageInfoUseCase,
   private val getInstalledAppComparisonPackageUseCase: GetInstalledAppComparisonPackageUseCase,
   private val hasInstalledStaticLibrariesUseCase: HasInstalledStaticLibrariesUseCase,
   private val buildPackageComparisonSnapshotItemUseCase: BuildPackageComparisonSnapshotItemUseCase
@@ -189,6 +191,12 @@ class DetailViewModel(
   ): List<AppManifestProperty> {
     return withContext(Dispatchers.IO) {
       getAppManifestPropertiesUseCase(packageInfo, properties)
+    }
+  }
+
+  suspend fun getArchivePackageInfo(file: File): PackageInfo? {
+    return withContext(Dispatchers.IO) {
+      getArchivePackageInfoUseCase(file)
     }
   }
 
