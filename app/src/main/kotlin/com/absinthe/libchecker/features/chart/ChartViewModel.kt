@@ -11,6 +11,8 @@ import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.BuildAppListItemViewStatesUseCase
 import com.absinthe.libchecker.domain.statistics.BuildApiLevelChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildDetailedAbiChartDataUseCase
+import com.absinthe.libchecker.domain.statistics.BuildPageSize16KBChartDataUseCase
+import com.absinthe.libchecker.domain.statistics.PageSize16KBChartData
 import com.absinthe.libchecker.features.chart.impl.MarketDistributionChartDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -27,7 +29,8 @@ class ChartViewModel(
   appListRepository: AppListRepository,
   private val buildAppListItemViewStatesUseCase: BuildAppListItemViewStatesUseCase,
   private val buildApiLevelChartDataUseCase: BuildApiLevelChartDataUseCase,
-  private val buildDetailedAbiChartDataUseCase: BuildDetailedAbiChartDataUseCase
+  private val buildDetailedAbiChartDataUseCase: BuildDetailedAbiChartDataUseCase,
+  private val buildPageSize16KBChartDataUseCase: BuildPageSize16KBChartDataUseCase
 ) : ViewModel() {
   private var queryJob: Job? = null
 
@@ -89,6 +92,19 @@ class ChartViewModel(
   ): Map<Int, List<LCItem>>? {
     return buildDetailedAbiChartDataUseCase(
       BuildDetailedAbiChartDataUseCase.Request(
+        items = items,
+        showSystemApps = GlobalValues.isShowSystemApps
+      ),
+      onProgress
+    )
+  }
+
+  suspend fun buildPageSize16KBChartData(
+    items: List<LCItem>,
+    onProgress: suspend (Int) -> Unit
+  ): PageSize16KBChartData? {
+    return buildPageSize16KBChartDataUseCase(
+      BuildPageSize16KBChartDataUseCase.Request(
         items = items,
         showSystemApps = GlobalValues.isShowSystemApps
       ),

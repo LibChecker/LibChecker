@@ -332,7 +332,9 @@ class ChartFragment :
 
       ChartType.AAB -> setChartData(::generatePieChartView) { AABChartDataSource(items) }
 
-      ChartType.SUPPORT_16KB -> setChartData(::generatePieChartView) { PageSize16KBChartDataSource(items) }
+      ChartType.SUPPORT_16KB -> setChartData(::generatePieChartView) {
+        PageSize16KBChartDataSource(items, viewModel::buildPageSize16KBChartData)
+      }
     }
     Telemetry.recordEvent(Constants.Event.CHART, mapOf(Telemetry.Param.ITEM_ID to chartType))
   }

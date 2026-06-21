@@ -3,13 +3,12 @@ package com.absinthe.libchecker.features.chart.impl
 import android.content.Context
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.statistics.PageSize16KBChartData
 import com.absinthe.libchecker.features.chart.BaseChartDataSource
 import com.absinthe.libchecker.features.chart.ChartSourceItem
 import com.absinthe.libchecker.features.chart.IHeavyWork
 import com.absinthe.libchecker.utils.OsUtils
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
-import com.absinthe.libchecker.utils.extensions.is16KBAligned
 import info.appdev.charting.charts.PieChart
 import info.appdev.charting.data.PieData
 import info.appdev.charting.data.PieDataSet
@@ -18,12 +17,12 @@ import info.appdev.charting.formatter.PercentFormatter
 import info.appdev.charting.utils.ColorTemplate
 import info.appdev.charting.utils.PointF
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
-class PageSize16KBChartDataSource(items: List<LCItem>) :
-  BaseChartDataSource<PieChart>(items),
+class PageSize16KBChartDataSource(
+  items: List<LCItem>,
+  private val buildPageSize16KBChartData: suspend (List<LCItem>, suspend (Int) -> Unit) -> PageSize16KBChartData?
+) : BaseChartDataSource<PieChart>(items),
   IHeavyWork {
   override val classifiedMap: HashMap<Int, ChartSourceItem> = HashMap(2)
 
@@ -38,31 +37,16 @@ class PageSize16KBChartDataSource(items: List<LCItem>) :
       val entries: ArrayList<PieEntryFloat> = ArrayList()
       val colorOnSurface = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
       val classifiedList = listOf(mutableListOf<LCItem>(), mutableListOf(), mutableListOf())
+      classifiedMap.clear()
+      val chartData = buildPageSize16KBChartData(items) { progress ->
+        withContext(Dispatchers.Main) {
+          onProgressUpdated(progress)
+        }
+      } ?: return@withContext
 
-      val itemCount = filteredList.size
-      var progress = 0
-      filteredList.forEachIndexed { index, item ->
-        if (!isActive) return@withContext
-        try {
-          val pi = PackageUtils.getPackageInfo(item.packageName)
-          if (PackageUtils.hasNoNativeLibs(item.abi.toInt())) {
-            classifiedList[NO_NATIVE_LIBS].add(item)
-          } else if (pi.is16KBAligned()) {
-            classifiedList[SUPPORT_16KB].add(item)
-          } else {
-            classifiedList[NOT_SUPPORT_16KB].add(item)
-          }
-        } catch (e: Exception) {
-          Timber.e(e)
-        }
-        val p = index * 100 / itemCount
-        if (p > progress) {
-          progress = p
-          withContext(Dispatchers.Main) {
-            onProgressUpdated(progress)
-          }
-        }
-      }
+      classifiedList[SUPPORT_16KB].addAll(chartData.support16KB)
+      classifiedList[NOT_SUPPORT_16KB].addAll(chartData.notSupport16KB)
+      classifiedList[NO_NATIVE_LIBS].addAll(chartData.noNativeLibs)
 
       classifiedMap[SUPPORT_16KB] = ChartSourceItem(
         R.drawable.ic_16kb_align,
@@ -82,10 +66,8 @@ class PageSize16KBChartDataSource(items: List<LCItem>) :
 
       // NOTE: The order of the entries when being added to the entries array determines their position around the center of
       // the chart.
-      val legendList = mutableListOf<String>()
       for (i in parties.indices) {
         entries.add(PieEntryFloat(classifiedList[i].size.toFloat(), parties[i % parties.size]))
-        legendList.add(parties[i % parties.size])
       }
       val dataSet = PieDataSet(entries, "").apply {
         isDrawIcons = false
