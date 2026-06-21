@@ -54,6 +54,8 @@ Important `:app` boundaries:
   Keep package-list synchronization rules here instead of in UI controllers.
 - `data/app/` adapts Android package APIs, Room repositories, and local
   package-change sources to the `domain/app/` interfaces.
+- `domain/statistics/` owns statistics/reference computation rules. Keep
+  package scanning and rule-matching loops out of fragments and ViewModels.
 - `compat/` wraps platform/API-level differences. Check here before adding new
   SDK-version branches.
 - `utils/apk`, `utils/manifest`, `utils/dex`, `utils/elf`, `PackageUtils`,

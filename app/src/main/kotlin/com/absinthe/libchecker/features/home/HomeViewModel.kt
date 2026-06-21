@@ -2,10 +2,6 @@ package com.absinthe.libchecker.features.home
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.pm.ApplicationInfo
-import android.content.pm.ComponentInfo
-import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.Drawable
@@ -14,19 +10,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.LibCheckerApp
-import com.absinthe.libchecker.annotation.ACTION
-import com.absinthe.libchecker.annotation.ACTION_IN_RULES
-import com.absinthe.libchecker.annotation.ACTIVITY
-import com.absinthe.libchecker.annotation.DEX
-import com.absinthe.libchecker.annotation.LibType
-import com.absinthe.libchecker.annotation.METADATA
-import com.absinthe.libchecker.annotation.NATIVE
-import com.absinthe.libchecker.annotation.PACKAGE
-import com.absinthe.libchecker.annotation.PERMISSION
-import com.absinthe.libchecker.annotation.PROVIDER
-import com.absinthe.libchecker.annotation.RECEIVER
-import com.absinthe.libchecker.annotation.SERVICE
-import com.absinthe.libchecker.annotation.SHARED_UID
 import com.absinthe.libchecker.annotation.STATUS_INIT_END
 import com.absinthe.libchecker.annotation.STATUS_NOT_START
 import com.absinthe.libchecker.annotation.STATUS_START_INIT
@@ -34,17 +17,17 @@ import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE
 import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE_END
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.LibReferenceOptions
-import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.InitializeAppListUseCase
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.PackageChangeState
 import com.absinthe.libchecker.domain.app.SyncAppListChangesUseCase
+import com.absinthe.libchecker.domain.statistics.ComputeLibReferenceUseCase
+import com.absinthe.libchecker.domain.statistics.LibReferenceItem
 import com.absinthe.libchecker.features.statistics.bean.LibReference
 import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.ui.base.IListController
-import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
@@ -60,7 +43,6 @@ import java.util.Locale
 import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -76,7 +58,8 @@ class HomeViewModel(
   private val installedAppRepository: InstalledAppRepository,
   private val appListRepository: AppListRepository,
   private val initializeAppListUseCase: InitializeAppListUseCase,
-  private val syncAppListChangesUseCase: SyncAppListChangesUseCase
+  private val syncAppListChangesUseCase: SyncAppListChangesUseCase,
+  private val computeLibReferenceUseCase: ComputeLibReferenceUseCase
 ) : ViewModel() {
 
   val dbItemsFlow: Flow<List<LCItem>> = appListRepository.items
@@ -95,7 +78,7 @@ class HomeViewModel(
   val savedRefList: List<LibReference>?
     get() = _savedRefList
 
-  private var referenceMap: HashMap<String, Pair<MutableSet<String>, Int>>? = null
+  private var referenceIndex: ComputeLibReferenceUseCase.ReferenceIndex? = null
   var savedThreshold = GlobalValues.libReferenceThreshold
 
   var controller: IListController? = null
@@ -317,309 +300,52 @@ class HomeViewModel(
   fun computeLibReference() {
     computeLibReferenceJob?.cancel()
     computeLibReferenceJob = viewModelScope.launch(Dispatchers.IO) {
-      computeLibReferenceImpl(installedAppRepository.getApplicationList())
-    }
-  }
-
-  private suspend fun computeLibReferenceImpl(targets: List<PackageInfo>) {
-    referenceMap = null
-    _libReference.emit(null)
-    val map = HashMap<String, Pair<MutableSet<String>, Int>>()
-    val showSystem = GlobalValues.isShowSystemApps
-
-    var progressCount = 0
-    val types = getSelectedLibReferenceTypes()
-    val progressTotal = (targets.size * types.size).coerceAtLeast(1)
-
-    fun updateLibRefProgressImpl() {
-      updateLibRefProgress(progressCount * 100 / progressTotal)
-    }
-
-    suspend fun computeInternal(@LibType type: Int): Boolean {
-      for (target in targets) {
-        if (!currentCoroutineContext().isActive) {
-          return false
-        }
-        val applicationInfo = target.applicationInfo
-        if (applicationInfo == null) {
-          progressCount++
-          updateLibRefProgressImpl()
-          continue
-        }
-        if (!showSystem && (applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) > 0) {
-          progressCount++
-          updateLibRefProgressImpl()
-          continue
-        }
-
-        computeComponentReference(map, target.packageName, type)
-        progressCount++
-        updateLibRefProgressImpl()
-      }
-      return true
-    }
-
-    updateLibRefProgress(0)
-
-    for (type in types) {
-      if (!computeInternal(type)) {
-        return
-      }
-    }
-
-    referenceMap = map
-    matchingRules(map)
-  }
-
-  private fun getSelectedLibReferenceTypes(): List<Int> {
-    val options = GlobalValues.libReferenceOptions
-    return mutableListOf<Int>().apply {
-      if (options and LibReferenceOptions.NATIVE_LIBS > 0) add(NATIVE)
-      if (options and LibReferenceOptions.SERVICES > 0) add(SERVICE)
-      if (options and LibReferenceOptions.ACTIVITIES > 0) add(ACTIVITY)
-      if (options and LibReferenceOptions.RECEIVERS > 0) add(RECEIVER)
-      if (options and LibReferenceOptions.PROVIDERS > 0) add(PROVIDER)
-      if (options and LibReferenceOptions.PERMISSIONS > 0) add(PERMISSION)
-      if (options and LibReferenceOptions.METADATA > 0) add(METADATA)
-      if (options and LibReferenceOptions.PACKAGES > 0) add(PACKAGE)
-      if (options and LibReferenceOptions.SHARED_UID > 0) add(SHARED_UID)
-      if (options and LibReferenceOptions.ACTION > 0) add(ACTION)
-    }
-  }
-
-  private fun computeComponentReference(
-    referenceMap: HashMap<String, Pair<MutableSet<String>, Int>>,
-    packageName: String,
-    @LibType type: Int
-  ) {
-    try {
-      when (type) {
-        NATIVE -> {
-          val packageInfo = PackageUtils.getPackageInfo(packageName)
-          val list = PackageUtils.getNativeDirLibs(packageInfo)
-          val nativeLibNames = list.map { it.name }
-          val mapped =
-            list.asSequence()
-              .filter { RulesRepository.checkNativeLibValidation(packageName, it.name, nativeLibNames) }
-              .map { it.name }
-          computeReferenceInternal(
-            referenceMap,
-            packageName,
-            NATIVE,
-            mapped
-          )
-        }
-
-        SERVICE -> {
-          val packageInfo = PackageUtils.getPackageInfo(
-            packageName,
-            PackageManager.GET_SERVICES
-          )
-          computeComponentReferenceInternal(referenceMap, packageName, type, packageInfo.services)
-        }
-
-        ACTIVITY -> {
-          val packageInfo = PackageUtils.getPackageInfo(
-            packageName,
-            PackageManager.GET_ACTIVITIES
-          )
-          computeComponentReferenceInternal(referenceMap, packageName, type, packageInfo.activities)
-        }
-
-        RECEIVER -> {
-          val packageInfo = PackageUtils.getPackageInfo(
-            packageName,
-            PackageManager.GET_RECEIVERS
-          )
-          computeComponentReferenceInternal(referenceMap, packageName, type, packageInfo.receivers)
-        }
-
-        PROVIDER -> {
-          val packageInfo = PackageUtils.getPackageInfo(
-            packageName,
-            PackageManager.GET_PROVIDERS
-          )
-          computeComponentReferenceInternal(referenceMap, packageName, type, packageInfo.providers)
-        }
-
-        DEX -> {
-          val packageInfo = PackageUtils.getPackageInfo(packageName)
-          val list = PackageUtils.getDexList(packageInfo)
-            .asSequence()
-            .filter { it.name.startsWith(packageName).not() }
-            .map { it.name }
-          computeReferenceInternal(
-            referenceMap,
-            packageName,
-            DEX,
-            list
-          )
-        }
-
-        PERMISSION -> {
-          val packageInfo = PackageUtils.getPackageInfo(
-            packageName,
-            PackageManager.GET_PERMISSIONS
-          )
-          computeReferenceInternal(
-            referenceMap,
-            packageName,
-            PERMISSION,
-            packageInfo.requestedPermissions?.asSequence()
-          )
-        }
-
-        METADATA -> {
-          val packageInfo = PackageUtils.getPackageInfo(
-            packageName,
-            PackageManager.GET_META_DATA
-          )
-          computeReferenceInternal(
-            referenceMap,
-            packageName,
-            METADATA,
-            packageInfo.applicationInfo?.metaData?.keySet()?.asSequence()
-          )
-        }
-
-        PACKAGE -> {
-          val split = packageName.split(".")
-          val packagePrefix = split.subList(0, split.size.coerceAtMost(2)).joinToString(".")
-          if (referenceMap[packagePrefix] == null) {
-            referenceMap[packagePrefix] = HashSet<String>() to PACKAGE
-          }
-          referenceMap[packagePrefix]!!.first.add(packageName)
-        }
-
-        SHARED_UID -> {
-          val packageInfo = PackageUtils.getPackageInfo(packageName)
-          if (packageInfo.sharedUserId?.isNotBlank() == true) {
-            if (referenceMap[packageInfo.sharedUserId] == null) {
-              referenceMap[packageInfo.sharedUserId!!] = HashSet<String>() to SHARED_UID
-            }
-            referenceMap[packageInfo.sharedUserId]!!.first.add(packageName)
-          }
-        }
-
-        ACTION -> {
-          val packageInfo = PackageUtils.getPackageInfo(packageName)
-          val list =
-            IntentFilterUtils.parseComponentsFromApk(packageInfo.applicationInfo!!.sourceDir)
-              .asSequence()
-              .flatMap { component ->
-                component.intentFilters.asSequence()
-                  .flatMap { filter -> filter.actions }
-              }
-          // .filter { !it.startsWith("android.") }
-          computeReferenceInternal(
-            referenceMap,
-            packageName,
-            ACTION,
-            list
-          )
-        }
-
-        else -> {}
-      }
-    } catch (e: Exception) {
-      Timber.e(e)
-    }
-  }
-
-  private fun computeComponentReferenceInternal(
-    referenceMap: HashMap<String, Pair<MutableSet<String>, Int>>,
-    packageName: String,
-    @LibType type: Int,
-    components: Array<out ComponentInfo>?
-  ) {
-    computeReferenceInternal(
-      referenceMap,
-      packageName,
-      type,
-      components.orEmpty()
-        .asSequence()
-        .filter { it.name.startsWith(packageName).not() }
-        .map { it.name }
-    )
-  }
-
-  private fun computeReferenceInternal(
-    referenceMap: HashMap<String, Pair<MutableSet<String>, Int>>,
-    packageName: String,
-    @LibType type: Int,
-    list: Sequence<String>?
-  ) {
-    list?.forEach {
-      referenceMap.getOrPut(it) { HashSet<String>() to type }.first.apply {
-        add(packageName)
-      }
+      referenceIndex?.clear()
+      referenceIndex = null
+      _libReference.emit(null)
+      val index = computeLibReferenceUseCase.buildIndex(
+        ComputeLibReferenceUseCase.ReferenceConfig(
+          showSystemApps = GlobalValues.isShowSystemApps,
+          options = GlobalValues.libReferenceOptions
+        ),
+        ::updateLibRefProgress
+      ) ?: return@launch
+      referenceIndex = index
+      matchingRules(index)
     }
   }
 
   private var matchingJob: Job? = null
 
   fun matchingRules() {
-    val map = referenceMap ?: run {
+    val index = referenceIndex ?: run {
       computeLibReference()
       return
     }
-    matchingRules(map)
+    matchingRules(index)
   }
 
   @SuppressLint("WrongConstant")
-  private fun matchingRules(map: HashMap<String, Pair<MutableSet<String>, Int>>) {
+  private fun matchingRules(index: ComputeLibReferenceUseCase.ReferenceIndex) {
     matchingJob?.cancel()
     matchingJob = viewModelScope.launch(Dispatchers.IO) {
       try {
-        var progressCount = 0
+        val refList = computeLibReferenceUseCase.matchRules(
+          index,
+          ComputeLibReferenceUseCase.MatchConfig(
+            threshold = GlobalValues.libReferenceThreshold,
+            onlyNotMarked = GlobalValues.libReferenceOptions and LibReferenceOptions.ONLY_NOT_MARKED > 0
+          ),
+          ::updateLibRefProgress
+        )?.map { it.toLibReference() } ?: return@launch
 
-        fun updateLibRefProgressImpl() {
-          val size = map.size
-          if (size > 0) {
-            updateLibRefProgress(progressCount * 100 / size)
-          }
-        }
-
-        updateLibRefProgressImpl()
-
-        val refList = mutableListOf<LibReference>()
-        val threshold = GlobalValues.libReferenceThreshold
-        val isOnlyNotMarked =
-          GlobalValues.libReferenceOptions and LibReferenceOptions.ONLY_NOT_MARKED > 0
-
-        for (entry in map) {
-          if (!isActive) return@launch
-          if (entry.value.first.size >= threshold && entry.key.isNotBlank()) {
-            val ruleType = if (entry.value.second == ACTION) ACTION_IN_RULES else entry.value.second
-            val rule = if (entry.value.second != PERMISSION && entry.value.second != METADATA) {
-              RulesRepository.getRule(entry.key, ruleType, true)
-            } else {
-              null
-            }
-
-            if (!isOnlyNotMarked || rule == null) {
-              refList.add(
-                LibReference(
-                  entry.key,
-                  rule,
-                  entry.value.first,
-                  entry.value.second
-                )
-              )
-            }
-          }
-          progressCount++
-          updateLibRefProgressImpl()
-        }
-
-        refList.sortByDescending { it.referredList.size }
         _libReference.emit(refList)
         _savedRefList = refList
       } finally {
-        if (referenceMap === map) {
-          referenceMap = null
+        if (referenceIndex === index) {
+          referenceIndex = null
         }
-        map.clear()
+        index.clear()
       }
     }
   }
@@ -634,6 +360,15 @@ class HomeViewModel(
       val threshold = GlobalValues.libReferenceThreshold
       _libReference.emit(ref.filter { it.referredList.size >= threshold })
     }
+  }
+
+  private fun LibReferenceItem.toLibReference(): LibReference {
+    return LibReference(
+      libName,
+      rule,
+      referredList,
+      type
+    )
   }
 
   private var clearApkCacheJob: Job? = null
