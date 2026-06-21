@@ -36,6 +36,7 @@ import com.absinthe.libchecker.domain.app.AppManifestProperty
 import com.absinthe.libchecker.domain.app.GetApkPreviewInfoUseCase
 import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailComponentChipsUseCase
+import com.absinthe.libchecker.domain.app.GetAppDetailMetadataChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailNativeLibrariesUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageSizeUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageUseCase
@@ -73,7 +74,6 @@ import com.absinthe.libchecker.utils.extensions.isPageSizeCompat
 import com.absinthe.libchecker.utils.extensions.isPlayAppSigning
 import com.absinthe.libchecker.utils.extensions.isUseKMP
 import com.absinthe.libchecker.utils.extensions.isXposedModule
-import com.absinthe.libchecker.utils.extensions.maybeResourceId
 import com.absinthe.libchecker.utils.extensions.toClassDefType
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.rulesbundle.Rule
@@ -99,6 +99,7 @@ class DetailViewModel(
   private val getAppDetailPackage: GetAppDetailPackageUseCase,
   private val getAppBundleItemsUseCase: GetAppBundleItemsUseCase,
   private val getAppDetailComponentChipsUseCase: GetAppDetailComponentChipsUseCase,
+  private val getAppDetailMetadataChipsUseCase: GetAppDetailMetadataChipsUseCase,
   private val getAppDetailNativeLibrariesUseCase: GetAppDetailNativeLibrariesUseCase,
   private val getAppDetailPackageSizeUseCase: GetAppDetailPackageSizeUseCase,
   private val getApkPreviewInfoUseCase: GetApkPreviewInfoUseCase,
@@ -314,7 +315,13 @@ class DetailViewModel(
       return
     }
     initMetaDataJob = viewModelScope.launch(Dispatchers.IO) {
-      metaDataItems.emit(getMetaDataChipList())
+      metaDataItems.emit(
+        getAppDetailMetadataChipsUseCase(
+          packageInfo = packageInfo,
+          apkPreviewInfo = apkPreviewInfo,
+          isApkPreview = isApkPreview
+        )
+      )
     }
   }
 
@@ -453,32 +460,6 @@ class DetailViewModel(
         chipList.sortByDescending { it.rule != null }
       }
     }
-    return chipList
-  }
-
-  private fun getMetaDataChipList(): List<LibStringItemChip> {
-    Timber.d("getMetaDataChipList")
-    val chipList = if (!isApkPreview && apkPreviewInfo == null) {
-      PackageUtils.getMetaDataItems(packageInfo)
-        .map { LibStringItemChip(it, null) }
-    } else {
-      apkPreviewInfo!!.metadata
-        .map {
-          var flag = 0L
-          val value = if (it.value is Long || (it.value as? String)?.maybeResourceId() == true) {
-            flag = -1
-            null
-          } else {
-            it.value.toString()
-          }
-          LibStringItemChip(
-            LibStringItem(it.key, flag, value),
-            null
-          )
-        }
-    }.toMutableList()
-
-    chipList.sortByDescending { it.item.name }
     return chipList
   }
 
