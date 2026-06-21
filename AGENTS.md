@@ -145,7 +145,8 @@ Important `:app` boundaries:
 1. Start with `git status --short`.
 2. Inspect the smallest relevant area with `rg` or `rg --files`.
 3. Read existing local patterns before editing.
-4. Keep edits focused and avoid generated/build-output churn.
+4. For refactors, prioritize high-traffic user-facing flows before low-frequency
+   tooling. Keep edits focused and avoid generated/build-output churn.
 5. Run `spotlessApply` only when formatting needs fixing.
 6. Run the narrowest relevant validation command, then report exactly what
    passed, failed, or was skipped.
