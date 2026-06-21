@@ -1,16 +1,12 @@
 package com.absinthe.libchecker.features.album.comparison.ui
 
 import android.content.Intent
-import android.content.pm.ApplicationInfo
-import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.Menu
@@ -30,14 +26,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.annotation.ACTIVITY
-import com.absinthe.libchecker.annotation.PROVIDER
-import com.absinthe.libchecker.annotation.RECEIVER
-import com.absinthe.libchecker.annotation.SERVICE
-import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.databinding.ActivityComparisonBinding
+import com.absinthe.libchecker.domain.snapshot.ArchiveSnapshotItem
+import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.features.album.comparison.ui.view.ComparisonDashboardView
 import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
@@ -51,31 +44,21 @@ import com.absinthe.libchecker.features.snapshot.ui.adapter.SnapshotAdapter
 import com.absinthe.libchecker.ui.adapter.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
-import com.absinthe.libchecker.utils.apk.APKSParser
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
-import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
-import com.absinthe.libchecker.utils.extensions.getPackageSize
-import com.absinthe.libchecker.utils.extensions.getPermissionsList
-import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.extensions.requireAvailableCacheDir
 import com.absinthe.libchecker.utils.showToast
-import com.absinthe.libchecker.utils.toJson
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import java.io.File
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.zhanghai.android.appiconloader.AppIconLoader
-import okio.buffer
-import okio.sink
-import okio.source
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import rikka.widget.borderview.BorderView
 
@@ -93,8 +76,6 @@ class ComparisonActivity :
   private var isLeftPartChoosing = false
   private var leftUri: Uri? = null
   private var rightUri: Uri? = null
-  private var leftIconOriginal: Bitmap? = null
-  private var rightIconOriginal: Bitmap? = null
 
   private lateinit var chooseApkResultLauncher: ActivityResultLauncher<Array<String>>
 
@@ -411,26 +392,38 @@ class ComparisonActivity :
         it.show()
       }
     }
-    val leftPackage = runCatching {
+    val leftArchive = runCatching {
       if (leftTimeStamp == -1L && leftUri != null) {
-        getSnapshotItemByUri(leftUri!!, Constants.TEMP_PACKAGE)
+        getArchiveSnapshotItemByUri(leftUri!!, Constants.TEMP_PACKAGE)
       } else {
         null
       }
-    }.getOrNull()
-    val rightPackage = runCatching {
+    }.getOrElse {
+      handleArchiveSnapshotFailure(it)
+      null
+    }
+    val rightArchive = runCatching {
       if (rightTimeStamp == -1L && rightUri != null) {
-        getSnapshotItemByUri(rightUri!!, Constants.TEMP_PACKAGE_2)
+        getArchiveSnapshotItemByUri(rightUri!!, Constants.TEMP_PACKAGE_2)
       } else {
         null
       }
-    }.getOrNull()
+    }.getOrElse {
+      handleArchiveSnapshotFailure(it)
+      null
+    }
+    val leftPackage = leftArchive?.snapshotItem
+    val rightPackage = rightArchive?.snapshotItem
 
     withContext(Dispatchers.Main) {
       dialog?.dismiss()
     }
 
-    if (leftPackage != null && rightPackage != null) {
+    if (leftArchive != null && rightArchive != null) {
+      val leftPackage = leftArchive.snapshotItem
+      val rightPackage = rightArchive.snapshotItem
+      val leftIcon = leftArchive.icon
+      val rightIcon = rightArchive.icon
       if (leftPackage.packageName != rightPackage.packageName) {
         withContext(Dispatchers.Main) {
           BaseAlertDialogBuilder(this@ComparisonActivity)
@@ -439,14 +432,16 @@ class ComparisonActivity :
             .setPositiveButton(android.R.string.ok) { _, _ ->
               navigateToSnapshotDetail(
                 leftPackage,
-                rightPackage
+                rightPackage,
+                leftIcon,
+                rightIcon
               )
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()
         }
       } else {
-        navigateToSnapshotDetail(leftPackage, rightPackage)
+        navigateToSnapshotDetail(leftPackage, rightPackage, leftIcon, rightIcon)
       }
       return@launch
     }
@@ -480,7 +475,12 @@ class ComparisonActivity :
     viewModel.compareDiffWithSnapshotList(-1, leftSnapshots, rightSnapshots)
   }
 
-  private fun navigateToSnapshotDetail(left: SnapshotItem, right: SnapshotItem) {
+  private fun navigateToSnapshotDetail(
+    left: SnapshotItem,
+    right: SnapshotItem,
+    leftIcon: Bitmap,
+    rightIcon: Bitmap
+  ) {
     val snapshotDiff = SnapshotDiffItem(
       packageName = "${left.packageName}/${right.packageName}",
       updateTime = -1,
@@ -506,86 +506,33 @@ class ComparisonActivity :
       .putExtras(
         Bundle().apply {
           putSerializable(EXTRA_ENTITY, snapshotDiff)
-          putParcelable(EXTRA_ICON, getIconsCombo(leftIconOriginal!!, rightIconOriginal!!))
+          putParcelable(EXTRA_ICON, getIconsCombo(leftIcon, rightIcon))
         }
       )
     startActivity(intent)
   }
 
-  private fun getSnapshotItemByUri(uri: Uri, fileName: String): SnapshotItem {
-    var pi: PackageInfo? = null
-    File(requireAvailableCacheDir(), fileName).also { tf ->
-      contentResolver.openInputStream(uri)?.use { inputStream ->
-        val fileSize = inputStream.available()
-        val freeSize = Environment.getExternalStorageDirectory().freeSpace
+  private suspend fun getArchiveSnapshotItemByUri(
+    uri: Uri,
+    fileName: String
+  ): ArchiveSnapshotItem {
+    val iconSize = resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size)
+    return viewModel.buildArchiveSnapshotItem(
+      uri = uri,
+      destinationFile = File(requireAvailableCacheDir(), fileName),
+      iconSize = iconSize
+    )
+  }
 
-        if (freeSize > fileSize * 1.5) {
-          tf.sink().buffer().use { sink ->
-            inputStream.source().buffer().use {
-              sink.writeAll(it)
-            }
-          }
-
-          val flag = (
-            PackageManager.GET_SERVICES
-              or PackageManager.GET_ACTIVITIES
-              or PackageManager.GET_RECEIVERS
-              or PackageManager.GET_PROVIDERS
-              or PackageManager.GET_PERMISSIONS
-              or PackageManager.GET_META_DATA
-              or PackageManager.MATCH_DISABLED_COMPONENTS
-              or PackageManager.MATCH_UNINSTALLED_PACKAGES
-            )
-          pi = PackageManagerCompat.getPackageArchiveInfo(tf.path, flag)?.apply {
-            applicationInfo?.sourceDir = tf.path
-            applicationInfo?.publicSourceDir = tf.path
-          } ?: APKSParser(File(tf.path), flag).getPackageInfo()
-
-          pi?.applicationInfo?.let {
-            val iconSize = resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size)
-            val appIconLoader = AppIconLoader(iconSize, false, this)
-            if (fileName == Constants.TEMP_PACKAGE) {
-              leftIconOriginal = appIconLoader.loadIcon(it)
-            } else {
-              rightIconOriginal = appIconLoader.loadIcon(it)
-            }
-          }
-        } else {
-          showToast(R.string.toast_not_enough_storage_space)
-          throw IllegalStateException("Not enough storage space")
-        }
+  private suspend fun handleArchiveSnapshotFailure(throwable: Throwable) {
+    if (throwable is CancellationException) {
+      throw throwable
+    }
+    if (throwable is BuildArchiveSnapshotItemUseCase.NotEnoughStorageSpaceException) {
+      withContext(Dispatchers.Main) {
+        showToast(R.string.toast_not_enough_storage_space)
       }
     }
-
-    pi ?: throw IllegalStateException("PackageInfo is null")
-    val ai = pi.applicationInfo ?: throw IllegalStateException("ApplicationInfo is null")
-    return SnapshotItem(
-      id = null,
-      packageName = pi.packageName,
-      timeStamp = -1L,
-      label = packageManager.getApplicationLabel(ai).toString(),
-      versionName = pi.versionName.toString(),
-      versionCode = pi.getVersionCode(),
-      installedTime = pi.firstInstallTime,
-      lastUpdatedTime = pi.lastUpdateTime,
-      isSystem = (ai.flags and ApplicationInfo.FLAG_SYSTEM) > 0,
-      abi = PackageUtils.getAbi(pi).toShort(),
-      targetApi = ai.targetSdkVersion.toShort(),
-      nativeLibs = PackageUtils.getNativeDirLibs(pi).toJson().orEmpty(),
-      services = PackageUtils.getComponentStringList(pi, SERVICE, false)
-        .toJson().orEmpty(),
-      activities = PackageUtils.getComponentStringList(pi, ACTIVITY, false)
-        .toJson().orEmpty(),
-      receivers = PackageUtils.getComponentStringList(pi, RECEIVER, false)
-        .toJson().orEmpty(),
-      providers = PackageUtils.getComponentStringList(pi, PROVIDER, false)
-        .toJson().orEmpty(),
-      permissions = pi.getPermissionsList().toJson().orEmpty(),
-      metadata = PackageUtils.getMetaDataItems(pi).toJson().orEmpty(),
-      packageSize = pi.getPackageSize(true),
-      compileSdk = pi.getCompileSdkVersion().toShort(),
-      minSdk = ai.minSdkVersion.toShort()
-    )
   }
 
   private fun getSuitableLayoutManager(): RecyclerView.LayoutManager {

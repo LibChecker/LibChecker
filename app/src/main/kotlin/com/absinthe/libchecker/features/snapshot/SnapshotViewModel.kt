@@ -2,6 +2,7 @@ package com.absinthe.libchecker.features.snapshot
 
 import android.content.Context
 import android.content.pm.PackageManager
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.R
@@ -10,6 +11,8 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.domain.app.AppListRepository
+import com.absinthe.libchecker.domain.snapshot.ArchiveSnapshotItem
+import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotDetailItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemWithInstalledAppUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemsUseCase
@@ -24,6 +27,7 @@ import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libraries.utils.manager.TimeRecorder
+import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
 import java.text.SimpleDateFormat
@@ -51,7 +55,8 @@ class SnapshotViewModel(
   private val updateSnapshotTopApps: UpdateSnapshotTopAppsUseCase,
   private val buildSnapshotDetailItems: BuildSnapshotDetailItemsUseCase,
   private val snapshotArchive: SnapshotArchiveUseCase,
-  private val snapshotLibrary: SnapshotLibraryUseCase
+  private val snapshotLibrary: SnapshotLibraryUseCase,
+  private val buildArchiveSnapshotItemUseCase: BuildArchiveSnapshotItemUseCase
 ) : ViewModel() {
 
   val allSnapshots = repository.currentSnapshotCount
@@ -145,6 +150,16 @@ class SnapshotViewModel(
     snapshotDiffItemsFlow.emit(diffList)
     if (diffList.isNotEmpty() && preTimeStamp != -1L) {
       updateSnapshotTopApps(preTimeStamp, diffList.subList(0, (diffList.size - 1).coerceAtMost(5)))
+    }
+  }
+
+  suspend fun buildArchiveSnapshotItem(
+    uri: Uri,
+    destinationFile: File,
+    iconSize: Int
+  ): ArchiveSnapshotItem {
+    return withContext(Dispatchers.IO) {
+      buildArchiveSnapshotItemUseCase(uri, destinationFile, iconSize)
     }
   }
 
