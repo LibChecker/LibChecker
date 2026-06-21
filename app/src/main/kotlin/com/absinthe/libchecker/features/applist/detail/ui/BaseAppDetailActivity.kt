@@ -473,20 +473,15 @@ abstract class BaseAppDetailActivity :
     }
 
     if (sharedLibraryFiles?.isNotEmpty() == true) {
-      lifecycleScope.launch(Dispatchers.IO) {
-        val libs = runCatching {
-          PackageUtils.getStaticLibs(PackageUtils.getPackageInfo(packageName))
-        }.getOrDefault(emptyList())
-        if (libs.isNotEmpty()) {
-          withContext(Dispatchers.Main) {
-            if (uiGeneration != packageUiGeneration || STATIC in typeList) {
-              return@withContext
-            }
-            typeList.add(1, STATIC)
-            tabTitles.add(1, getText(R.string.ref_category_static))
-            binding.viewpager.adapter?.notifyItemInserted(1)
-            onStaticLibsAvailable()
+      lifecycleScope.launch {
+        if (viewModel.hasInstalledStaticLibraries(packageName)) {
+          if (uiGeneration != packageUiGeneration || STATIC in typeList) {
+            return@launch
           }
+          typeList.add(1, STATIC)
+          tabTitles.add(1, getText(R.string.ref_category_static))
+          binding.viewpager.adapter?.notifyItemInserted(1)
+          onStaticLibsAvailable()
         }
       }
     }
