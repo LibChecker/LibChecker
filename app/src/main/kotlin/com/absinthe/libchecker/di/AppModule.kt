@@ -6,6 +6,7 @@ import com.absinthe.libchecker.data.app.LocalAppListRepository
 import com.absinthe.libchecker.data.app.LocalInstalledAppRepository
 import com.absinthe.libchecker.data.snapshot.AndroidSnapshotItemFactory
 import com.absinthe.libchecker.data.snapshot.LocalSnapshotArchiveRepository
+import com.absinthe.libchecker.data.snapshot.ProtoSnapshotArchiveCodec
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.domain.app.AppListExportMetadata
@@ -17,6 +18,7 @@ import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.SyncAppListChangesUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotDetailItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemsUseCase
+import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveCodec
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotItemFactory
@@ -35,13 +37,14 @@ val appModule = module {
   single<AppListExportMetadata> { AndroidAppListExportMetadata(androidContext()) }
   single<SnapshotItemFactory> { AndroidSnapshotItemFactory() }
   single<SnapshotArchiveRepository> { LocalSnapshotArchiveRepository(get()) }
+  single<SnapshotArchiveCodec> { ProtoSnapshotArchiveCodec() }
   factory { InitializeAppListUseCase(get(), get(), get()) }
   factory { SyncAppListChangesUseCase(get(), get(), get()) }
   factory { ComputeLibReferenceUseCase(get()) }
   factory { ExportAppListUseCase(get(), get()) }
   factory { CompareSnapshotItemsUseCase() }
   factory { BuildSnapshotDetailItemsUseCase() }
-  factory { SnapshotArchiveUseCase(get()) }
+  factory { SnapshotArchiveUseCase(get(), get()) }
 
   viewModel { HomeViewModel(get(), get(), get(), get(), get(), get()) }
   viewModel { SnapshotViewModel(get(), get(), get(), get(), get()) }
