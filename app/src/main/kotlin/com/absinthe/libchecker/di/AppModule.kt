@@ -16,6 +16,7 @@ import com.absinthe.libchecker.domain.app.ExportAppListUseCase
 import com.absinthe.libchecker.domain.app.FilterAppListItemsUseCase
 import com.absinthe.libchecker.domain.app.GetApkPreviewInfoUseCase
 import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
+import com.absinthe.libchecker.domain.app.GetAppDetailAbiUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailComponentChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailComponentsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailFeaturesUseCase
@@ -75,6 +76,7 @@ val appModule = module {
   factory { ExportAppListUseCase(get(), get()) }
   factory { FilterAppListItemsUseCase(get()) }
   factory { GetAppBundleItemsUseCase() }
+  factory { GetAppDetailAbiUseCase() }
   factory { GetAppDetailComponentsUseCase() }
   factory { GetAppDetailComponentChipsUseCase(get()) }
   factory { GetAppDetailFeaturesUseCase(get()) }
@@ -105,7 +107,7 @@ val appModule = module {
   factory { SnapshotLibraryUseCase(get()) }
 
   viewModel { ChartViewModel(get()) }
-  viewModel { DetailViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+  viewModel { DetailViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
   viewModel { HomeViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
   viewModel { LibReferenceViewModel(get()) }
   viewModel { SnapshotViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }

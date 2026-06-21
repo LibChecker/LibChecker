@@ -25,12 +25,14 @@ import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppBundleSplitItem
+import com.absinthe.libchecker.domain.app.AppDetailAbi
 import com.absinthe.libchecker.domain.app.AppDetailPackageSize
 import com.absinthe.libchecker.domain.app.AppIconItem
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.AppManifestProperty
 import com.absinthe.libchecker.domain.app.GetApkPreviewInfoUseCase
 import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
+import com.absinthe.libchecker.domain.app.GetAppDetailAbiUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailComponentChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailFeaturesUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailMetadataChipsUseCase
@@ -81,6 +83,7 @@ class DetailViewModel(
   private val appListRepository: AppListRepository,
   private val getAppDetailPackage: GetAppDetailPackageUseCase,
   private val getAppBundleItemsUseCase: GetAppBundleItemsUseCase,
+  private val getAppDetailAbiUseCase: GetAppDetailAbiUseCase,
   private val getAppDetailComponentChipsUseCase: GetAppDetailComponentChipsUseCase,
   private val getAppDetailFeaturesUseCase: GetAppDetailFeaturesUseCase,
   private val getAppDetailMetadataChipsUseCase: GetAppDetailMetadataChipsUseCase,
@@ -128,7 +131,7 @@ class DetailViewModel(
   private val _featuresFlow = MutableSharedFlow<VersionedFeature>()
   val featuresFlow = _featuresFlow.asSharedFlow()
 
-  val abiBundleStateFlow = MutableStateFlow<AbiBundle?>(null)
+  val abiBundleStateFlow = MutableStateFlow<AppDetailAbi?>(null)
 
   init {
     componentsMap.put(SERVICE, MutableStateFlow(null))
@@ -590,36 +593,15 @@ class DetailViewModel(
   }
 
   fun initAbiInfo(packageInfo: PackageInfo, apkAnalyticsMode: Boolean) = viewModelScope.launch(Dispatchers.IO) {
-    val source = runCatching { packageInfo.applicationInfo?.sourceDir }.getOrNull() ?: return@launch
-    val abiSet = PackageUtils.getAbiSet(
-      file = File(source),
-      packageInfo = packageInfo,
-      isApk = apkAnalyticsMode,
-      ignoreArch = true
-    ).toSet()
-    val abi = PackageUtils.getAbi(packageInfo, isApk = apkAnalyticsMode, abiSet = abiSet)
-    abiBundleStateFlow.emit(
-      AbiBundle(
-        abi,
-        abiSet.sortedByDescending {
-          it == abi || PackageUtils.isAbi64Bit(it)
-        }
-      )
-    )
+    getAppDetailAbiUseCase(packageInfo, apkAnalyticsMode)?.let {
+      abiBundleStateFlow.emit(it)
+    }
   }
 
   fun initAbiInfo(apkPreviewInfo: ApkPreviewInfo) = viewModelScope.launch(Dispatchers.IO) {
-    val abiSet = apkPreviewInfo.abiSet
-    if (abiSet.isEmpty()) return@launch
-    val abi = abiSet.first()
-    abiBundleStateFlow.emit(
-      AbiBundle(
-        abi,
-        abiSet.sortedByDescending {
-          it == abi || PackageUtils.isAbi64Bit(it)
-        }
-      )
-    )
+    getAppDetailAbiUseCase(apkPreviewInfo)?.let {
+      abiBundleStateFlow.emit(it)
+    }
   }
 
   fun updateProcessMap(map: Map<String, Int>) = viewModelScope.launch {
@@ -634,6 +616,4 @@ class DetailViewModel(
     itemsCountStateFlow.value = LocatedCount(locate, count)
     itemsCountList[locate] = count
   }
-
-  data class AbiBundle(val abi: Int, val abiSet: Collection<Int>)
 }
