@@ -56,8 +56,6 @@ Important `:app` boundaries:
   package-change sources to the `domain/app/` interfaces.
 - `domain/statistics/` owns statistics/reference computation rules. Keep
   package scanning and rule-matching loops out of fragments and ViewModels.
-- Loading indicators should use `RingDotsView`; do not reintroduce the removed
-  `AppsListLoadingView` or `sphere_texture` preloading path.
 - `compat/` wraps platform/API-level differences. Check here before adding new
   SDK-version branches.
 - `utils/apk`, `utils/manifest`, `utils/dex`, `utils/elf`, `PackageUtils`,
@@ -151,9 +149,10 @@ Important `:app` boundaries:
 5. Run `spotlessApply` only when formatting needs fixing.
 6. Run the narrowest relevant validation command, then report exactly what
    passed, failed, or was skipped.
-7. Before committing code, check whether the task revealed a durable build,
-   test, module-boundary, environment, or NEVER rule worth adding here. Update
-   `AGENTS.md` only when it would make future agent work safer or faster.
+7. Before committing code, consider `AGENTS.md` only for durable, recurring
+   rules. Keep it compact: merge with existing bullets, replace stale guidance,
+   or delete obsolete notes before appending. Put one-off decisions and
+   low-frequency background in commit messages, issues, or Skills instead.
 
 ## Compact instructions
 
