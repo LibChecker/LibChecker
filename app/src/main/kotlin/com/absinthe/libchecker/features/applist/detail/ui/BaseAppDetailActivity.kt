@@ -46,6 +46,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
+import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.features.applist.DetailFragmentManager
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
@@ -53,7 +54,6 @@ import com.absinthe.libchecker.features.applist.detail.AppBarStateChangeListener
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.FeaturesDialog
 import com.absinthe.libchecker.features.applist.detail.IDetailContainer
-import com.absinthe.libchecker.features.applist.detail.VersionedFeature
 import com.absinthe.libchecker.features.applist.detail.bean.AppDetailToolbarItem
 import com.absinthe.libchecker.features.applist.detail.bean.DetailExtraBean
 import com.absinthe.libchecker.features.applist.detail.bean.FeatureItem

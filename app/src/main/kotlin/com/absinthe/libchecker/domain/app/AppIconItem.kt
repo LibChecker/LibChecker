@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.applist.detail.bean
+package com.absinthe.libchecker.domain.app
 
 import android.graphics.drawable.Drawable
 

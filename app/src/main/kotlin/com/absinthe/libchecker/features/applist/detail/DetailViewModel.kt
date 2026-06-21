@@ -1,10 +1,7 @@
 package com.absinthe.libchecker.features.applist.detail
 
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
-import android.graphics.drawable.AdaptiveIconDrawable
 import android.util.SparseArray
 import androidx.core.util.forEach
 import androidx.lifecycle.ViewModel
@@ -22,8 +19,6 @@ import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.LibDetailBean
 import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
 import com.absinthe.libchecker.api.request.LibDetailRequest
-import com.absinthe.libchecker.app.SystemServices
-import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.RulesRepository
@@ -31,11 +26,13 @@ import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppBundleSplitItem
 import com.absinthe.libchecker.domain.app.AppDetailPackageSize
+import com.absinthe.libchecker.domain.app.AppIconItem
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.AppManifestProperty
 import com.absinthe.libchecker.domain.app.GetApkPreviewInfoUseCase
 import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailComponentChipsUseCase
+import com.absinthe.libchecker.domain.app.GetAppDetailFeaturesUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailMetadataChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailNativeLibrariesUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageSizeUseCase
@@ -46,11 +43,11 @@ import com.absinthe.libchecker.domain.app.GetAppManifestPropertiesUseCase
 import com.absinthe.libchecker.domain.app.GetArchivePackageInfoUseCase
 import com.absinthe.libchecker.domain.app.GetInstalledAppComparisonPackageUseCase
 import com.absinthe.libchecker.domain.app.HasInstalledStaticLibrariesUseCase
+import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.domain.snapshot.BuildPackageComparisonSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.features.applist.LocatedCount
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
-import com.absinthe.libchecker.features.applist.detail.bean.AppIconItem
 import com.absinthe.libchecker.features.applist.detail.bean.StatefulComponent
 import com.absinthe.libchecker.features.statistics.bean.DISABLED
 import com.absinthe.libchecker.features.statistics.bean.EXPORTED
@@ -58,23 +55,9 @@ import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.LCAppUtils
-import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
-import com.absinthe.libchecker.utils.extensions.getAGPVersion
-import com.absinthe.libchecker.utils.extensions.getFeatures
-import com.absinthe.libchecker.utils.extensions.getJetpackComposeVersion
-import com.absinthe.libchecker.utils.extensions.getKotlinPluginInfo
-import com.absinthe.libchecker.utils.extensions.getRxAndroidVersion
-import com.absinthe.libchecker.utils.extensions.getRxJavaVersion
-import com.absinthe.libchecker.utils.extensions.getRxKotlinVersion
-import com.absinthe.libchecker.utils.extensions.isPWA
-import com.absinthe.libchecker.utils.extensions.isPageSizeCompat
-import com.absinthe.libchecker.utils.extensions.isPlayAppSigning
-import com.absinthe.libchecker.utils.extensions.isUseKMP
-import com.absinthe.libchecker.utils.extensions.isXposedModule
-import com.absinthe.libchecker.utils.extensions.toClassDefType
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.rulesbundle.Rule
 import java.io.File
@@ -99,6 +82,7 @@ class DetailViewModel(
   private val getAppDetailPackage: GetAppDetailPackageUseCase,
   private val getAppBundleItemsUseCase: GetAppBundleItemsUseCase,
   private val getAppDetailComponentChipsUseCase: GetAppDetailComponentChipsUseCase,
+  private val getAppDetailFeaturesUseCase: GetAppDetailFeaturesUseCase,
   private val getAppDetailMetadataChipsUseCase: GetAppDetailMetadataChipsUseCase,
   private val getAppDetailNativeLibrariesUseCase: GetAppDetailNativeLibrariesUseCase,
   private val getAppDetailPackageSizeUseCase: GetAppDetailPackageSizeUseCase,
@@ -598,76 +582,10 @@ class DetailViewModel(
   fun initFeatures(packageInfo: PackageInfo, features: Int) = viewModelScope.launch(Dispatchers.IO) {
     Timber.d("initFeatures: features = $features")
 
-    _featuresFlow.emit(VersionedFeature(Features.Ext.APPLICATION_PROP))
-
-    if (OsUtils.atLeastR() && !isApk) {
-      runCatching {
-        val info = PackageUtils.getInstallSourceInfo(packageInfo.packageName)
-        if (info?.installingPackageName != null) {
-          _featuresFlow.emit(VersionedFeature(Features.Ext.APPLICATION_INSTALL_SOURCE, info.initiatingPackageName))
-        }
-      }.onFailure {
-        Timber.e(it)
-      }
-    }
-
-    var feat = features
-    if (feat == -1) {
-      feat = packageInfo.getFeatures()
-      appListRepository.updateFeatures(packageInfo.packageName, feat)
-    }
-
-    if ((feat and Features.SPLIT_APKS) > 0) {
-      _featuresFlow.emit(VersionedFeature(Features.SPLIT_APKS))
-    }
-    if ((feat and Features.KOTLIN_USED) > 0) {
-      val versionInfo = packageInfo.getKotlinPluginInfo()
-      _featuresFlow.emit(VersionedFeature(Features.KOTLIN_USED, extras = versionInfo))
-    }
-    if ((feat and Features.AGP) > 0) {
-      val version = packageInfo.getAGPVersion()
-      _featuresFlow.emit(VersionedFeature(Features.AGP, version))
-    }
-    if ((feat and Features.JETPACK_COMPOSE) > 0) {
-      val version = packageInfo.getJetpackComposeVersion()
-      _featuresFlow.emit(VersionedFeature(Features.JETPACK_COMPOSE, version))
-    }
-    if (packageInfo.isXposedModule()) {
-      _featuresFlow.emit(VersionedFeature(Features.XPOSED_MODULE))
-    }
-    if (packageInfo.isPlayAppSigning()) {
-      _featuresFlow.emit(VersionedFeature(Features.PLAY_SIGNING))
-    }
-    if (packageInfo.isPWA()) {
-      _featuresFlow.emit(VersionedFeature(Features.PWA))
-    }
-
-    appIcons = getAllAppIcons(packageInfo)
-    if (appIcons.isNotEmpty()) {
-      _featuresFlow.emit(VersionedFeature(Features.Ext.APPLICATION_ICONS))
-    }
-
-    if (OsUtils.atLeastBaklava() && packageInfo.isPageSizeCompat()) {
-      _featuresFlow.emit(VersionedFeature(Features.Ext.ELF_PAGE_SIZE_16KB_COMPAT))
-    }
-
-    packageInfo.applicationInfo?.sourceDir?.let { sourceDir ->
-      val foundList = getFeaturesFoundDexList(feat, sourceDir)
-      if ((feat and Features.RX_JAVA) > 0) {
-        val version = packageInfo.getRxJavaVersion(foundList)
-        _featuresFlow.emit(VersionedFeature(Features.RX_JAVA, version))
-      }
-      if ((feat and Features.RX_KOTLIN) > 0) {
-        val version = packageInfo.getRxKotlinVersion(foundList)
-        _featuresFlow.emit(VersionedFeature(Features.RX_KOTLIN, version))
-      }
-      if ((feat and Features.RX_ANDROID) > 0) {
-        val version = packageInfo.getRxAndroidVersion(foundList)
-        _featuresFlow.emit(VersionedFeature(Features.RX_ANDROID, version))
-      }
-      if (packageInfo.isUseKMP(foundList)) {
-        _featuresFlow.emit(VersionedFeature(Features.KMP))
-      }
+    val detailFeatures = getAppDetailFeaturesUseCase(packageInfo, features, isApk)
+    appIcons = detailFeatures.appIcons
+    detailFeatures.features.forEach {
+      _featuresFlow.emit(it)
     }
   }
 
@@ -718,91 +636,4 @@ class DetailViewModel(
   }
 
   data class AbiBundle(val abi: Int, val abiSet: Collection<Int>)
-
-  private fun getFeaturesFoundDexList(feat: Int, sourceDir: String): List<String>? {
-    val dexList = mutableListOf<String>()
-    if ((feat and Features.RX_JAVA) > 0) {
-      dexList.addAll(
-        listOf(
-          "rx.schedulers.*".toClassDefType(),
-          "io.reactivex.*".toClassDefType(),
-          "io.reactivex.rxjava3.*".toClassDefType()
-        )
-      )
-    }
-    if ((feat and Features.RX_KOTLIN) > 0) {
-      dexList.addAll(
-        listOf(
-          "io.reactivex.rxjava3.kotlin.*".toClassDefType(),
-          "io.reactivex.rxkotlin".toClassDefType(),
-          "rx.lang.kotlin".toClassDefType()
-        )
-      )
-    }
-    if ((feat and Features.RX_ANDROID) > 0) {
-      dexList.addAll(
-        listOf(
-          "io.reactivex.rxjava3.android.*".toClassDefType(),
-          "io.reactivex.android.*".toClassDefType(),
-          "rx.android.*".toClassDefType()
-        )
-      )
-    }
-    if (dexList.isNotEmpty()) {
-      dexList.add("org.jetbrains.compose.*".toClassDefType())
-    }
-    return if (dexList.isNotEmpty()) {
-      PackageUtils.findDexClasses(File(sourceDir), dexList)
-    } else {
-      null
-    }
-  }
-
-  private fun getAllAppIcons(pi: PackageInfo): List<AppIconItem> {
-    if (!OsUtils.atLeastO()) return emptyList()
-    val ai = pi.applicationInfo ?: return emptyList()
-    val pm = SystemServices.packageManager
-    val icons = mutableListOf<AppIconItem>()
-
-    // Get the icon displayed by the system (potentially themed/overridden by OEM)
-    val mainIcon = pm.getApplicationIcon(ai)
-
-    // Check if the system-returned icon has a monochrome layer
-    var hasAddedMonochrome = false
-    if (OsUtils.atLeastT() && mainIcon is AdaptiveIconDrawable && mainIcon.monochrome != null) {
-      icons.add(AppIconItem(mainIcon, true))
-      hasAddedMonochrome = true
-    }
-
-    // If monochrome is missing (likely due to OEM icon packs),
-    // try loading the raw drawable directly from resources to bypass the theme engine.
-    if (!hasAddedMonochrome && OsUtils.atLeastT() && ai.icon != 0) {
-      try {
-        val res = pm.getResourcesForApplication(ai)
-        // Load the drawable directly using the resource ID, bypassing PM's icon logic
-        val rawIcon = res.getDrawable(ai.icon, null)
-
-        if (rawIcon is AdaptiveIconDrawable && rawIcon.monochrome != null) {
-          icons.add(AppIconItem(rawIcon, true))
-        }
-      } catch (_: Exception) {
-      }
-    }
-
-    val altIconsIntent = Intent(Intent.ACTION_MAIN).apply {
-      addCategory(Intent.CATEGORY_LAUNCHER)
-      setPackage(pi.packageName)
-    }
-    val intents = PackageManagerCompat.queryIntentActivities(altIconsIntent, PackageManager.MATCH_DISABLED_COMPONENTS)
-    val iconResSet = mutableSetOf(ai.icon)
-    intents
-      .asSequence()
-      .filter { !iconResSet.contains(it.iconResource) }
-      .map {
-        iconResSet.add(it.iconResource)
-        it.loadIcon(SystemServices.packageManager)
-      }
-      .forEach { icons.add(AppIconItem(it, false)) }
-    return icons
-  }
 }
