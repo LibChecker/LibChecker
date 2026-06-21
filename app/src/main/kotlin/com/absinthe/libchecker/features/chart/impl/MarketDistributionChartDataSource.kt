@@ -1,48 +1,46 @@
 package com.absinthe.libchecker.features.chart.impl
 
 import android.content.Context
-import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.AndroidDistribution
-import com.absinthe.libchecker.api.request.AndroidDistributionRequest
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.statistics.AndroidDistributionChartData
 import com.absinthe.libchecker.features.chart.BaseVariableChartDataSource
 import com.absinthe.libchecker.features.chart.OsVersionAxisFormatter
 import com.absinthe.libchecker.features.chart.PercentageFormatter
-import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
-import com.absinthe.libchecker.utils.extensions.toPercentage
-import com.absinthe.libchecker.utils.fromJson
-import com.absinthe.libchecker.utils.toJson
 import info.appdev.charting.charts.BarChart
 import info.appdev.charting.data.BarData
 import info.appdev.charting.data.BarDataSet
 import info.appdev.charting.data.BarEntryFloat
-import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-class MarketDistributionChartDataSource(items: List<LCItem>) : BaseVariableChartDataSource<BarChart>(items) {
+class MarketDistributionChartDataSource(
+  items: List<LCItem>,
+  private val getAndroidDistribution: suspend () -> AndroidDistributionChartData?
+) : BaseVariableChartDataSource<BarChart>(items) {
   var distribution: List<AndroidDistribution>? = null
+    private set
+  var lastUpdateTime: String = ""
     private set
 
   override suspend fun fillChartView(chartView: BarChart, onProgressUpdated: (Int) -> Unit) {
     withContext(Dispatchers.Default) {
       val context = chartView.context ?: return@withContext
 
-      distribution = getDistribution(context) ?: let {
+      val chartData = getAndroidDistribution() ?: let {
         Timber.e("Failed to get distribution")
         return@withContext
       }
-      val dist = distribution ?: return@withContext
+      distribution = chartData.distributions
+      lastUpdateTime = chartData.lastUpdateTime
+      val dist = chartData.distributions
       val parties = dist.map { it.name }
       val entries: ArrayList<BarEntryFloat> = ArrayList()
-      val legendList = mutableListOf<String>()
       for (i in parties.indices) {
         entries.add(BarEntryFloat(i.toFloat(), dist[i].distributionPercentage.toFloat()))
-        legendList.add(dist[i].distributionPercentage.toFloat().toPercentage())
       }
       val dataSet = BarDataSet(entries, "").apply {
         isDrawIcons = false
@@ -82,38 +80,10 @@ class MarketDistributionChartDataSource(items: List<LCItem>) : BaseVariableChart
   }
 
   override fun getLabelByXValue(context: Context, x: Int): String {
-    if (classifiedMap.isEmpty()) {
-      return "Load Failed"
-    }
-    return distribution?.get(x)?.name ?: "Unknown"
+    return distribution?.getOrNull(x)?.name ?: "Unknown"
   }
 
   override fun getListKeyByXValue(x: Int): Int? {
-    return distribution?.get(x)?.apiLevel
-  }
-
-  private suspend fun getDistribution(context: Context): List<AndroidDistribution>? = withContext(Dispatchers.IO) {
-    runCatching {
-      val localFile = File(File(context.filesDir, "rules"), "android_distribution.json")
-      if (!localFile.exists() || !DateUtils.isTimestampThisMonth(GlobalValues.distributionUpdateTimestamp)) {
-        val request: AndroidDistributionRequest = ApiManager.create()
-        val response = request.requestDistribution()
-        localFile.parentFile?.mkdirs()
-        if (localFile.exists().not()) {
-          localFile.createNewFile()
-        }
-        localFile.writeText(response.toJson().orEmpty())
-        GlobalValues.distributionUpdateTimestamp = System.currentTimeMillis()
-        return@withContext response
-      }
-
-      val json = localFile.readText()
-      return@withContext json.fromJson<List<AndroidDistribution>>(
-        List::class.java,
-        AndroidDistribution::class.java
-      )
-    }.onFailure {
-      Timber.e(it)
-    }.getOrNull()
+    return distribution?.getOrNull(x)?.apiLevel
   }
 }

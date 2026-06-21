@@ -8,6 +8,7 @@ import com.absinthe.libchecker.data.app.RemoteLibraryDetailRepository
 import com.absinthe.libchecker.data.snapshot.AndroidSnapshotItemFactory
 import com.absinthe.libchecker.data.snapshot.LocalSnapshotRepository
 import com.absinthe.libchecker.data.snapshot.ProtoSnapshotArchiveCodec
+import com.absinthe.libchecker.data.statistics.CachedAndroidDistributionRepository
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.domain.app.AppListExportMetadata
@@ -56,12 +57,14 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotItemFactory
 import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotTopAppsUseCase
+import com.absinthe.libchecker.domain.statistics.AndroidDistributionRepository
 import com.absinthe.libchecker.domain.statistics.BuildAbiChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildApiLevelChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildDetailedAbiChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildFeatureFlagChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildPageSize16KBChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.ComputeLibReferenceUseCase
+import com.absinthe.libchecker.domain.statistics.GetAndroidDistributionUseCase
 import com.absinthe.libchecker.domain.statistics.GetLibReferenceAppsUseCase
 import com.absinthe.libchecker.features.album.track.TrackViewModel
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
@@ -78,6 +81,7 @@ val appModule = module {
   single<InstalledAppRepository> { LocalInstalledAppRepository }
   single<AppListRepository> { LocalAppListRepository }
   single<LibraryDetailRepository> { RemoteLibraryDetailRepository }
+  single<AndroidDistributionRepository> { CachedAndroidDistributionRepository(androidContext()) }
   single<AppListItemFactory> { AndroidAppListItemFactory(androidContext()) }
   single<AppListExportMetadata> { AndroidAppListExportMetadata(androidContext()) }
   single<SnapshotItemFactory> { AndroidSnapshotItemFactory() }
@@ -91,6 +95,7 @@ val appModule = module {
   factory { BuildFeatureFlagChartDataUseCase() }
   factory { BuildPageSize16KBChartDataUseCase(get()) }
   factory { ComputeLibReferenceUseCase(get()) }
+  factory { GetAndroidDistributionUseCase(get()) }
   factory { GetLibReferenceAppsUseCase() }
   factory { ExportAppListUseCase(get(), get()) }
   factory { FilterAppListItemsUseCase(get()) }
@@ -137,7 +142,8 @@ val appModule = module {
       buildApiLevelChartDataUseCase = get(),
       buildDetailedAbiChartDataUseCase = get(),
       buildFeatureFlagChartDataUseCase = get(),
-      buildPageSize16KBChartDataUseCase = get()
+      buildPageSize16KBChartDataUseCase = get(),
+      getAndroidDistributionUseCase = get()
     )
   }
   viewModel {

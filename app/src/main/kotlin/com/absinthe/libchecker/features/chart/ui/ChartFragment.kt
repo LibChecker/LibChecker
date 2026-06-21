@@ -345,7 +345,9 @@ class ChartFragment :
         }
       }
 
-      ChartType.MARKET_DISTRIBUTION -> setChartData(::generateBarChartView) { MarketDistributionChartDataSource(items) }
+      ChartType.MARKET_DISTRIBUTION -> setChartData(::generateBarChartView) {
+        MarketDistributionChartDataSource(items, viewModel::getAndroidDistribution)
+      }
 
       ChartType.AAB -> setChartData(::generatePieChartView) {
         AABChartDataSource(items) { chartItems ->

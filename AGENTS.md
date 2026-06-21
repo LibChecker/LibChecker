@@ -60,6 +60,8 @@ Important `:app` boundaries:
 - `domain/statistics/` owns statistics/reference computation rules. Keep
   package scanning, package-info lookups, and rule-matching loops out of
   fragments, ViewModels, and chart data sources.
+- `data/statistics/` adapts remote or cached statistics sources, such as Android
+  version distribution, to `domain/statistics/` interfaces.
 - `domain/snapshot/` owns snapshot models, archive, capture, and diff seams;
   keep package-to-snapshot conversion and diff rules out of UI controllers.
 - `data/snapshot/` adapts Android, protobuf archive format, and local snapshot
