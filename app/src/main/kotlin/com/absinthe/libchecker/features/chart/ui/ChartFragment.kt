@@ -18,6 +18,7 @@ import com.absinthe.libchecker.constant.GlobalFeatures
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentPieChartBinding
+import com.absinthe.libchecker.domain.statistics.BuildApiLevelChartDataUseCase
 import com.absinthe.libchecker.features.chart.BaseChartDataSource
 import com.absinthe.libchecker.features.chart.BaseVariableChartDataSource
 import com.absinthe.libchecker.features.chart.ChartViewModel
@@ -29,14 +30,12 @@ import com.absinthe.libchecker.features.chart.LOADING_PROGRESS_INFINITY
 import com.absinthe.libchecker.features.chart.LOADING_PROGRESS_MAX
 import com.absinthe.libchecker.features.chart.impl.AABChartDataSource
 import com.absinthe.libchecker.features.chart.impl.ABIChartDataSource
-import com.absinthe.libchecker.features.chart.impl.CompileApiChartDataSource
+import com.absinthe.libchecker.features.chart.impl.ApiLevelChartDataSource
 import com.absinthe.libchecker.features.chart.impl.DetailedABIChartDataSource
 import com.absinthe.libchecker.features.chart.impl.JetpackComposeChartDataSource
 import com.absinthe.libchecker.features.chart.impl.KotlinChartDataSource
 import com.absinthe.libchecker.features.chart.impl.MarketDistributionChartDataSource
-import com.absinthe.libchecker.features.chart.impl.MinApiChartDataSource
 import com.absinthe.libchecker.features.chart.impl.PageSize16KBChartDataSource
-import com.absinthe.libchecker.features.chart.impl.TargetApiChartDataSource
 import com.absinthe.libchecker.features.chart.ui.view.ChartDetailItemView
 import com.absinthe.libchecker.features.chart.ui.view.ExpandingView
 import com.absinthe.libchecker.features.chart.ui.view.MarketDistributionDashboardView
@@ -301,11 +300,29 @@ class ChartFragment :
 
       ChartType.KOTLIN -> setChartData(::generatePieChartView) { KotlinChartDataSource(items) }
 
-      ChartType.TARGET_SDK -> setChartData(::generateBarChartView) { TargetApiChartDataSource(items) }
+      ChartType.TARGET_SDK -> setChartData(::generateBarChartView) {
+        ApiLevelChartDataSource(
+          items,
+          BuildApiLevelChartDataUseCase.Kind.TargetSdk,
+          viewModel::buildApiLevelChartData
+        )
+      }
 
-      ChartType.MIN_SDK -> setChartData(::generateBarChartView) { MinApiChartDataSource(items) }
+      ChartType.MIN_SDK -> setChartData(::generateBarChartView) {
+        ApiLevelChartDataSource(
+          items,
+          BuildApiLevelChartDataUseCase.Kind.MinSdk,
+          viewModel::buildApiLevelChartData
+        )
+      }
 
-      ChartType.COMPILE_SDK -> setChartData(::generateBarChartView) { CompileApiChartDataSource(items) }
+      ChartType.COMPILE_SDK -> setChartData(::generateBarChartView) {
+        ApiLevelChartDataSource(
+          items,
+          BuildApiLevelChartDataUseCase.Kind.CompileSdk,
+          viewModel::buildApiLevelChartData
+        )
+      }
 
       ChartType.JETPACK_COMPOSE -> setChartData(::generatePieChartView) { JetpackComposeChartDataSource(items) }
 

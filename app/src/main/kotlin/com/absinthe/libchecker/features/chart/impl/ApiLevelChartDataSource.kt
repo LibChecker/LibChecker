@@ -1,71 +1,54 @@
 package com.absinthe.libchecker.features.chart.impl
 
 import android.content.Context
-import android.content.pm.PackageInfo
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.statistics.BuildApiLevelChartDataUseCase
 import com.absinthe.libchecker.features.chart.BaseVariableChartDataSource
 import com.absinthe.libchecker.features.chart.IAndroidSDKChart
 import com.absinthe.libchecker.features.chart.IntegerFormatter
 import com.absinthe.libchecker.features.chart.OsVersionAxisFormatter
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
-import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import info.appdev.charting.charts.BarChart
 import info.appdev.charting.data.BarData
 import info.appdev.charting.data.BarDataSet
 import info.appdev.charting.data.BarEntryFloat
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
-class CompileApiChartDataSource(items: List<LCItem>) :
-  BaseVariableChartDataSource<BarChart>(items),
+class ApiLevelChartDataSource(
+  items: List<LCItem>,
+  private val kind: BuildApiLevelChartDataUseCase.Kind,
+  private val buildApiLevelChartData: suspend (List<LCItem>, BuildApiLevelChartDataUseCase.Kind) -> Map<Int, List<LCItem>>
+) : BaseVariableChartDataSource<BarChart>(items),
   IAndroidSDKChart {
+
   override suspend fun fillChartView(chartView: BarChart, onProgressUpdated: (Int) -> Unit) {
     withContext(Dispatchers.Default) {
       val context = chartView.context ?: return@withContext
-      val entries: ArrayList<BarEntryFloat> = ArrayList()
-
-      var packageInfo: PackageInfo
-      var compileSdk: Int
-      for (item in filteredList) {
-        if (!isActive) {
-          return@withContext
-        }
-        try {
-          packageInfo = PackageUtils.getPackageInfo(item.packageName)
-          compileSdk = packageInfo.getCompileSdkVersion()
-          if (classifiedMap[compileSdk] == null) {
-            classifiedMap[compileSdk] = mutableListOf()
-          }
-          classifiedMap[compileSdk]?.add(item)
-        } catch (e: Exception) {
-          Timber.e(e)
-        }
+      classifiedMap.clear()
+      buildApiLevelChartData(items, kind).forEach { (apiLevel, items) ->
+        classifiedMap[apiLevel] = items.toMutableList()
       }
 
-      val legendList = mutableListOf<String>()
+      val entries = ArrayList<BarEntryFloat>()
       var index = 0
       classifiedMap.forEach { entry ->
         entries.add(BarEntryFloat(index.toFloat(), entry.value.size.toFloat()))
-        legendList.add(entry.key.toString())
         index++
       }
+
       val dataSet = BarDataSet(entries, "").apply {
         isDrawIcons = false
         valueFormatter = IntegerFormatter()
       }
 
-      // add a lot of colors
-      val colors: ArrayList<Int> = ArrayList()
+      val colors = ArrayList<Int>()
       (0..classifiedMap.size).forEach { _ ->
         colors.add(UiUtils.getRandomColor())
       }
 
       dataSet.setColors(colors)
-      // dataSet.setSelectionShift(0f);
       val data = BarData(dataSet).apply {
         setValueTextSize(10f)
         setValueTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
@@ -94,6 +77,13 @@ class CompileApiChartDataSource(items: List<LCItem>) :
   }
 
   override fun getLabelByXValue(context: Context, x: Int): String {
-    return "Compile SDK ${classifiedMap.entries.elementAtOrNull(x)?.key ?: "?"}"
+    return "${kind.label} ${classifiedMap.entries.elementAtOrNull(x)?.key ?: "?"}"
   }
 }
+
+private val BuildApiLevelChartDataUseCase.Kind.label: String
+  get() = when (this) {
+    BuildApiLevelChartDataUseCase.Kind.TargetSdk -> "Target SDK"
+    BuildApiLevelChartDataUseCase.Kind.MinSdk -> "Min SDK"
+    BuildApiLevelChartDataUseCase.Kind.CompileSdk -> "Compile SDK"
+  }
