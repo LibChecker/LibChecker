@@ -76,7 +76,6 @@ import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ENTITY
 import com.absinthe.libchecker.features.snapshot.detail.ui.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.adapter.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
-import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
@@ -287,34 +286,32 @@ abstract class BaseAppDetailActivity :
               scale(0.8f) {
                 append(" Size: ")
               }
-              var baseApkSize = apkPreviewInfo?.packageSize ?: FileUtils.getFileSize(ai!!.sourceDir)
-              val baseFormattedApkSize = baseApkSize.sizeToString(this@BaseAppDetailActivity, showBytes = false)
+              val packageSize = viewModel.getAppDetailPackageSize(packageInfo)
+              val baseFormattedApkSize = packageSize.baseSize.sizeToString(
+                this@BaseAppDetailActivity,
+                showBytes = false
+              )
+              val splitApkSizeList = packageSize.splitSizes.map {
+                it.sizeToString(this@BaseAppDetailActivity, showBytes = false)
+              }
 
-              if (!viewModel.isApkPreview) {
-                val splitApkSizeList = PackageUtils.getSplitsSourceDir(packageInfo)
-                  ?.map {
-                    val size = FileUtils.getFileSize(it)
-                    baseApkSize += size
-                    size.sizeToString(this@BaseAppDetailActivity, showBytes = false)
-                  }
-                  ?.toMutableList()
-
-                if (splitApkSizeList.isNullOrEmpty()) {
-                  append(baseFormattedApkSize)
-                } else {
-                  splitApkSizeList.add(0, baseFormattedApkSize)
-                  val totalSize =
-                    baseApkSize.sizeToString(this@BaseAppDetailActivity, showBytes = false)
-                  append(
-                    splitApkSizeList.joinToString(
+              if (splitApkSizeList.isEmpty()) {
+                append(baseFormattedApkSize)
+              } else {
+                val totalSize = packageSize.totalSize.sizeToString(
+                  this@BaseAppDetailActivity,
+                  showBytes = false
+                )
+                append(
+                  splitApkSizeList
+                    .toMutableList()
+                    .apply { add(0, baseFormattedApkSize) }
+                    .joinToString(
                       separator = " + ",
                       prefix = "(",
                       postfix = " = $totalSize)"
                     )
-                  )
-                }
-              } else {
-                append(baseFormattedApkSize)
+                )
               }
 
               sharedUserId?.let {
