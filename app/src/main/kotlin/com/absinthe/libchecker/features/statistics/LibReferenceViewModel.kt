@@ -16,7 +16,9 @@ import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.app.AppListItemViewState
 import com.absinthe.libchecker.domain.app.AppListRepository
+import com.absinthe.libchecker.domain.app.BuildAppListItemViewStatesUseCase
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.PackageUtils
@@ -32,7 +34,8 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class LibReferenceViewModel(
-  appListRepository: AppListRepository
+  appListRepository: AppListRepository,
+  private val buildAppListItemViewStatesUseCase: BuildAppListItemViewStatesUseCase
 ) : ViewModel() {
 
   val libRefListFlow: MutableSharedFlow<List<LCItem>> = MutableSharedFlow()
@@ -56,6 +59,18 @@ class LibReferenceViewModel(
 
     val filterList = list.takeIf { GlobalValues.isShowSystemApps } ?: list.filter { !it.isSystem }
     libRefListFlow.emit(filterList)
+  }
+
+  suspend fun buildAppListItemViewStates(
+    items: List<LCItem>,
+    options: Int
+  ): Map<String, AppListItemViewState> {
+    return buildAppListItemViewStatesUseCase(
+      BuildAppListItemViewStatesUseCase.Request(
+        items = items,
+        options = options
+      )
+    )
   }
 
   private suspend fun setDataInternal(lcItems: List<LCItem>, name: String, @LibType type: Int) {

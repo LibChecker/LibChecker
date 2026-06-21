@@ -10,13 +10,12 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.app.AppListItemViewState
 import com.absinthe.libchecker.domain.app.InstalledPackageState
 import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
 import com.absinthe.libchecker.features.applist.ui.view.AppItemView
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
 import com.absinthe.libchecker.ui.animator.ParticleRemoveItemAnimator
-import com.absinthe.libchecker.utils.FreezeUtils
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.addStrikeThroughSpan
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -27,7 +26,7 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
 class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAdapter<LCItem>() {
 
-  private val packageStateCache = mutableMapOf<String, InstalledPackageState>()
+  private val itemViewStateCache = mutableMapOf<String, AppListItemViewState>()
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return createBaseViewHolder(
@@ -52,36 +51,28 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
       }
     }
     root.container.apply {
-      val packageState = getPackageState(item)
-      val packageInfo = packageState.packageInfo
+      val viewState = getItemViewState(item)
+      val packageInfo = viewState.packageInfo
       if (item.packageName != Constants.EXAMPLE_PACKAGE) {
         icon.load(packageInfo)
       }
       setOrHighlightText(appName, item.label)
       setOrHighlightText(packageName, item.packageName)
 
-      if (packageInfo == null && cardMode != CardMode.DEMO) {
+      if (viewState.isPackageMissing && cardMode != CardMode.DEMO) {
         appName.addStrikeThroughSpan()
         packageName.addStrikeThroughSpan()
       }
 
-      versionInfo.text = PackageUtils.getVersionString(item.versionName, item.versionCode)
+      versionInfo.text = viewState.versionInfo
+      setDetachedAbiBadgeLayoutEnabled(viewState.useDetachedAbiBadges)
 
-      val buildVersionsInfo = PackageUtils.getBuildVersionsInfo(packageInfo, item.packageName)
-      val str = StringBuilder()
-        .append(PackageUtils.getAbiString(context, item.abi.toInt(), false))
-        .append(buildVersionsInfo)
-      val abi = item.abi.toInt()
-      val useDetachedAbiBadges = shouldUseDetachedAbiBadges()
-      setDetachedAbiBadgeLayoutEnabled(useDetachedAbiBadges)
-
-      if (useDetachedAbiBadges) {
-        val abiBadgeRes = PackageUtils.getLargeAbiBadgeResource(abi)
-        if (abi != Constants.OVERLAY && abi != Constants.ERROR && abiBadgeRes != 0) {
-          val abiBadge = abiBadgeRes.getDrawable(context)?.mutate()?.apply {
-            setTint(context.getAbiBadgeTint(abi % Constants.MULTI_ARCH))
+      if (viewState.useDetachedAbiBadges) {
+        if (viewState.largeAbiBadgeRes != 0) {
+          val abiBadge = viewState.largeAbiBadgeRes.getDrawable(context)?.mutate()?.apply {
+            setTint(context.getAbiBadgeTint(viewState.isAbiBadge64Bit))
           }
-          val multiArchBadge = if (abi / Constants.MULTI_ARCH == 1) {
+          val multiArchBadge = if (viewState.showMultiArchBadge) {
             R.drawable.ic_abi_label_multi_arch.getDrawable(context)?.mutate()?.apply {
               setTint(context.getMultiArchBadgeTint())
             }
@@ -92,36 +83,22 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
         } else {
           setAbiBadges(null, null)
         }
-        abiInfo.text = str
+        abiInfo.text = viewState.abiInfo
       } else {
         setAbiBadges(null, null)
-        abiInfo.text = context.buildInlineAbiInfo(abi, str)
+        abiInfo.text = context.buildInlineAbiInfo(viewState)
       }
 
-      when {
-        item.packageName == Constants.EXAMPLE_PACKAGE -> {
-          setBadge(null)
-        }
-
-        item.variant == Constants.VARIANT_HAP -> {
-          setBadge(R.drawable.ic_harmony_badge)
-        }
-
-        packageState.isFrozen -> {
-          setBadge(R.drawable.ic_disabled_package)
-        }
-
-        else -> {
-          setBadge(null)
-        }
+      when (viewState.packageBadge) {
+        AppListItemViewState.PackageBadge.Harmony -> setBadge(R.drawable.ic_harmony_badge)
+        AppListItemViewState.PackageBadge.Frozen -> setBadge(R.drawable.ic_disabled_package)
+        null -> setBadge(null)
       }
       root.setItemContentDescription(
         item.label,
         item.packageName,
         versionInfo.text,
-        StringBuilder()
-          .append(PackageUtils.getAbiString(context, item.abi.toInt(), true))
-          .append(buildVersionsInfo)
+        viewState.accessibilityAbiInfo
       )
     }
   }
@@ -133,26 +110,26 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
     return ParticleRemoveItemAnimator.stableItemIdForKey(data[position].packageName)
   }
 
-  fun setPackageStates(packageStates: Map<String, InstalledPackageState>) {
-    packageStateCache.clear()
-    packageStateCache.putAll(packageStates)
+  fun setItemViewStates(itemViewStates: Map<String, AppListItemViewState>) {
+    itemViewStateCache.clear()
+    itemViewStateCache.putAll(itemViewStates)
   }
 
-  fun clearPackageStateCache() {
-    packageStateCache.clear()
+  fun clearItemViewStateCache() {
+    itemViewStateCache.clear()
   }
 
-  private fun getPackageState(item: LCItem): InstalledPackageState {
-    return packageStateCache.getOrPut(item.packageName) {
-      if (item.packageName == Constants.EXAMPLE_PACKAGE) {
-        InstalledPackageState(packageInfo = null, isFrozen = false)
-      } else {
-        val packageInfo = runCatching { PackageUtils.getPackageInfo(item.packageName) }.getOrNull()
-        InstalledPackageState(
-          packageInfo = packageInfo,
-          isFrozen = packageInfo?.applicationInfo?.let { FreezeUtils.isAppFrozen(it) } ?: true
-        )
-      }
+  private fun getItemViewState(item: LCItem): AppListItemViewState {
+    return itemViewStateCache.getOrPut(item.packageName) {
+      AppListItemViewState.create(
+        context = context,
+        item = item,
+        packageState = InstalledPackageState(
+          packageInfo = null,
+          isFrozen = item.packageName != Constants.EXAMPLE_PACKAGE
+        ),
+        options = GlobalValues.advancedOptions
+      )
     }
   }
 
@@ -162,21 +139,12 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
   }
 }
 
-private fun shouldUseDetachedAbiBadges(): Boolean {
-  return listOf(
-    AdvancedOptions.SHOW_ANDROID_VERSION,
-    AdvancedOptions.SHOW_TARGET_API,
-    AdvancedOptions.SHOW_MIN_API,
-    AdvancedOptions.SHOW_COMPILE_API
-  ).count { (GlobalValues.advancedOptions and it) > 0 } >= 4
-}
-
-private fun Context.getAbiBadgeTint(abi: Int): Int {
+private fun Context.getAbiBadgeTint(isAbi64Bit: Boolean): Int {
   if ((GlobalValues.advancedOptions and AdvancedOptions.TINT_ABI_LABEL) == 0) {
     return getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant)
   }
   return getColorByAttr(
-    if (PackageUtils.isAbi64Bit(abi)) {
+    if (isAbi64Bit) {
       androidx.appcompat.R.attr.colorPrimary
     } else {
       com.google.android.material.R.attr.colorTertiary
@@ -184,24 +152,23 @@ private fun Context.getAbiBadgeTint(abi: Int): Int {
   )
 }
 
-private fun Context.buildInlineAbiInfo(abi: Int, text: CharSequence): CharSequence {
-  val abiBadgeRes = PackageUtils.getAbiBadgeResource(abi)
-  if (abi == Constants.OVERLAY || abi == Constants.ERROR || abiBadgeRes == 0) {
-    return text
+private fun Context.buildInlineAbiInfo(viewState: AppListItemViewState): CharSequence {
+  if (viewState.abiBadgeRes == 0) {
+    return viewState.abiInfo
   }
 
-  var paddingString = "  $text"
-  if (abi / Constants.MULTI_ARCH == 1) {
+  var paddingString = "  ${viewState.abiInfo}"
+  if (viewState.showMultiArchBadge) {
     paddingString = "  $paddingString"
   }
   val spanString = SpannableString(paddingString)
 
-  abiBadgeRes.getDrawable(this)?.mutate()?.let {
+  viewState.abiBadgeRes.getDrawable(this)?.mutate()?.let {
     it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
-    it.setTint(getAbiBadgeTint(abi % Constants.MULTI_ARCH))
+    it.setTint(getAbiBadgeTint(viewState.isAbiBadge64Bit))
     spanString.setSpan(CenterAlignImageSpan(it), 0, 1, ImageSpan.ALIGN_BOTTOM)
   }
-  if (abi / Constants.MULTI_ARCH == 1) {
+  if (viewState.showMultiArchBadge) {
     R.drawable.ic_multi_arch.getDrawable(this)?.mutate()?.let {
       it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
       it.setTint(getMultiArchBadgeTint())

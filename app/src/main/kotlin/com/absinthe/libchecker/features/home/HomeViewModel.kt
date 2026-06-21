@@ -13,13 +13,13 @@ import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE_END
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.app.AppListItemViewState
 import com.absinthe.libchecker.domain.app.AppListRepository
+import com.absinthe.libchecker.domain.app.BuildAppListItemViewStatesUseCase
 import com.absinthe.libchecker.domain.app.ExportAppListUseCase
 import com.absinthe.libchecker.domain.app.FilterAppListItemsUseCase
-import com.absinthe.libchecker.domain.app.GetAppListPackageStatesUseCase
 import com.absinthe.libchecker.domain.app.InitializeAppListUseCase
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
-import com.absinthe.libchecker.domain.app.InstalledPackageState
 import com.absinthe.libchecker.domain.app.PackageChangeState
 import com.absinthe.libchecker.domain.app.SyncAppListChangesUseCase
 import com.absinthe.libchecker.domain.statistics.ComputeLibReferenceUseCase
@@ -49,7 +49,7 @@ class HomeViewModel(
   private val computeLibReferenceUseCase: ComputeLibReferenceUseCase,
   private val exportAppListUseCase: ExportAppListUseCase,
   private val filterAppListItemsUseCase: FilterAppListItemsUseCase,
-  private val getAppListPackageStatesUseCase: GetAppListPackageStatesUseCase
+  private val buildAppListItemViewStatesUseCase: BuildAppListItemViewStatesUseCase
 ) : ViewModel() {
 
   val dbItemsFlow: Flow<List<LCItem>> = appListRepository.items
@@ -180,8 +180,16 @@ class HomeViewModel(
     )
   }
 
-  suspend fun getAppListPackageStates(items: List<LCItem>): Map<String, InstalledPackageState> {
-    return getAppListPackageStatesUseCase(items)
+  suspend fun buildAppListItemViewStates(
+    items: List<LCItem>,
+    options: Int
+  ): Map<String, AppListItemViewState> {
+    return buildAppListItemViewStatesUseCase(
+      BuildAppListItemViewStatesUseCase.Request(
+        items = items,
+        options = options
+      )
+    )
   }
 
   suspend fun isOnlySelfAppInDatabase(): Boolean {

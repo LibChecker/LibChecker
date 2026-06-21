@@ -6,7 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.app.AppListItemViewState
 import com.absinthe.libchecker.domain.app.AppListRepository
+import com.absinthe.libchecker.domain.app.BuildAppListItemViewStatesUseCase
 import com.absinthe.libchecker.features.chart.impl.MarketDistributionChartDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -20,7 +22,8 @@ const val LOADING_PROGRESS_INFINITY = -1
 const val LOADING_PROGRESS_MAX = 100
 
 class ChartViewModel(
-  appListRepository: AppListRepository
+  appListRepository: AppListRepository,
+  private val buildAppListItemViewStatesUseCase: BuildAppListItemViewStatesUseCase
 ) : ViewModel() {
   private var queryJob: Job? = null
 
@@ -49,6 +52,18 @@ class ChartViewModel(
 
   fun setDetailAbiSwitchVisibility(isVisible: Boolean) {
     _detailAbiSwitchVisibility.value = isVisible
+  }
+
+  suspend fun buildAppListItemViewStates(
+    items: List<LCItem>,
+    options: Int
+  ): Map<String, AppListItemViewState> {
+    return buildAppListItemViewStatesUseCase(
+      BuildAppListItemViewStatesUseCase.Request(
+        items = items,
+        options = options
+      )
+    )
   }
 
   fun <T : View> applyChartData(

@@ -4,6 +4,7 @@ import android.content.DialogInterface
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.app.AppListItemViewState
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
@@ -13,6 +14,7 @@ class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Clas
   private var _title: String? = null
   private var _androidVersionNode: AndroidVersions.Node? = null
   private var _list: List<LCItem>? = null
+  private var _itemViewStates: Map<String, AppListItemViewState>? = null
 
   override fun initRootView(): ClassifyDialogView = ClassifyDialogView(requireContext(), lifecycleScope)
 
@@ -23,7 +25,7 @@ class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Clas
     root.post {
       _title?.let { setTitle(it) }
       _androidVersionNode?.let { setAndroidVersionLabel(it) }
-      _list?.let { setList(it) }
+      _list?.let { setList(it, _itemViewStates.orEmpty()) }
     }
   }
 
@@ -47,9 +49,14 @@ class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Clas
     }
   }
 
-  fun setList(list: List<LCItem>) {
+  fun setList(
+    list: List<LCItem>,
+    itemViewStates: Map<String, AppListItemViewState> = emptyMap()
+  ) {
     _list = list
+    _itemViewStates = itemViewStates
     runCatching {
+      root.adapter.setItemViewStates(itemViewStates)
       root.adapter.setList(list)
     }
   }

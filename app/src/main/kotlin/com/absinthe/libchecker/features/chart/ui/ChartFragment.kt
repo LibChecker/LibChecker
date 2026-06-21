@@ -80,6 +80,7 @@ class ChartFragment :
   private var dataSource: IChartDataSource<*>? = null
   private var dialog: ClassifyBottomSheetDialogFragment? = null
   private var setDataJob: Job? = null
+  private var showClassifyDialogJob: Job? = null
   private var chartLoadingProgress = LOADING_PROGRESS_MAX
   private var featureInitializationRunning = WorkerService.initializingFeatures
   private var featureInitializationCompleted = WorkerService.featureInitializationState.value.completed
@@ -335,7 +336,7 @@ class ChartFragment :
   }
 
   override fun onValueSelected(entryFloat: EntryFloat, highlight: Highlight) {
-    if (dialog != null) return
+    if (dialog != null || showClassifyDialogJob?.isActive == true) return
     if (dataSource is MarketDistributionChartDataSource) {
       (chartView as? Chart<*>)?.highlightValue(null)
       return
@@ -474,24 +475,36 @@ class ChartFragment :
       chartView.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
     }
 
-    dialog = ClassifyBottomSheetDialogFragment().also {
-      it.setTitle(dataSource?.getLabelByXValue(requireContext(), x).orEmpty())
-      it.setList(dataSource?.getListByXValue(x) ?: emptyList())
+    val source = dataSource ?: return
+    val title = source.getLabelByXValue(requireContext(), x)
+    val items = source.getListByXValue(x)
+    val androidVersionNode = if (source is IAndroidSDKChart) {
+      val index = (source as BaseVariableChartDataSource<*>).getListKeyByXValue(x)
+      AndroidVersions.versions.find { node -> node.version == index }
+    } else {
+      null
+    }
 
-      if (dataSource is IAndroidSDKChart) {
-        val index = (dataSource as BaseVariableChartDataSource<*>).getListKeyByXValue(x)
-        it.setAndroidVersionLabel(AndroidVersions.versions.find { node -> node.version == index })
-      } else {
-        it.setAndroidVersionLabel(null)
+    showClassifyDialogJob = lifecycleScope.launch {
+      val itemViewStates = withContext(Dispatchers.IO) {
+        viewModel.buildAppListItemViewStates(items, GlobalValues.advancedOptions)
+      }
+      val hostActivity = activity
+      if (!isAdded || hostActivity == null || dialog != null) {
+        return@launch
       }
 
-      activity?.let { activity ->
+      dialog = ClassifyBottomSheetDialogFragment().also {
+        it.setTitle(title)
+        it.setList(items, itemViewStates)
+        it.setAndroidVersionLabel(androidVersionNode)
+
         it.setOnDismiss {
           this@ChartFragment.dialog = null
           (chartView as? Chart<*>)?.highlightValue(null)
         }
         it.show(
-          activity.supportFragmentManager,
+          hostActivity.supportFragmentManager,
           ClassifyBottomSheetDialogFragment::class.java.name
         )
       }

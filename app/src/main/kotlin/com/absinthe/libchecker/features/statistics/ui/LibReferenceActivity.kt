@@ -7,6 +7,7 @@ import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
 import com.absinthe.libchecker.features.applist.ui.adapter.AppAdapter
 import com.absinthe.libchecker.features.statistics.LibReferenceViewModel
@@ -14,8 +15,10 @@ import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import rikka.widget.borderview.BorderView
@@ -85,7 +88,11 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
     }
 
     viewModel.libRefListFlow.onEach {
-      adapter.clearPackageStateCache()
+      val itemViewStates = withContext(Dispatchers.IO) {
+        viewModel.buildAppListItemViewStates(it, GlobalValues.advancedOptions)
+      }
+      adapter.clearItemViewStateCache()
+      adapter.setItemViewStates(itemViewStates)
       adapter.setList(it)
       if (binding.vfContainer.displayedChild != 1) {
         binding.vfContainer.displayedChild = 1

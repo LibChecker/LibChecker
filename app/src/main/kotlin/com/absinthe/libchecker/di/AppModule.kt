@@ -13,6 +13,7 @@ import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.domain.app.AppListExportMetadata
 import com.absinthe.libchecker.domain.app.AppListItemFactory
 import com.absinthe.libchecker.domain.app.AppListRepository
+import com.absinthe.libchecker.domain.app.BuildAppListItemViewStatesUseCase
 import com.absinthe.libchecker.domain.app.ExportAppListUseCase
 import com.absinthe.libchecker.domain.app.FilterAppListItemsUseCase
 import com.absinthe.libchecker.domain.app.GetApkPreviewInfoUseCase
@@ -95,6 +96,7 @@ val appModule = module {
   factory { GetAppDetailSignatureChipsUseCase(androidContext()) }
   factory { GetApkPreviewInfoUseCase() }
   factory { GetAppListPackageStatesUseCase(get()) }
+  factory { BuildAppListItemViewStatesUseCase(androidContext(), get()) }
   factory { GetAppManifestPropertiesUseCase() }
   factory { GetArchivePackageInfoUseCase() }
   factory { GetInstalledAppComparisonPackageUseCase(get()) }
@@ -115,7 +117,12 @@ val appModule = module {
   factory { SnapshotArchiveUseCase(get(), get()) }
   factory { SnapshotLibraryUseCase(get()) }
 
-  viewModel { ChartViewModel(get()) }
+  viewModel {
+    ChartViewModel(
+      appListRepository = get(),
+      buildAppListItemViewStatesUseCase = get()
+    )
+  }
   viewModel {
     DetailViewModel(
       appListRepository = get(),
@@ -140,8 +147,24 @@ val appModule = module {
       buildPackageComparisonSnapshotItemUseCase = get()
     )
   }
-  viewModel { HomeViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
-  viewModel { LibReferenceViewModel(get()) }
+  viewModel {
+    HomeViewModel(
+      installedAppRepository = get(),
+      appListRepository = get(),
+      initializeAppListUseCase = get(),
+      syncAppListChangesUseCase = get(),
+      computeLibReferenceUseCase = get(),
+      exportAppListUseCase = get(),
+      filterAppListItemsUseCase = get(),
+      buildAppListItemViewStatesUseCase = get()
+    )
+  }
+  viewModel {
+    LibReferenceViewModel(
+      appListRepository = get(),
+      buildAppListItemViewStatesUseCase = get()
+    )
+  }
   viewModel { SnapshotViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
   viewModel { TrackViewModel(get()) }
 }
