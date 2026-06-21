@@ -18,6 +18,7 @@ import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.SyncAppListChangesUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotDetailItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemsUseCase
+import com.absinthe.libchecker.domain.snapshot.CompareSnapshotListsUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveCodec
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
@@ -43,9 +44,10 @@ val appModule = module {
   factory { ComputeLibReferenceUseCase(get()) }
   factory { ExportAppListUseCase(get(), get()) }
   factory { CompareSnapshotItemsUseCase() }
+  factory { CompareSnapshotListsUseCase(get()) }
   factory { BuildSnapshotDetailItemsUseCase() }
   factory { SnapshotArchiveUseCase(get(), get()) }
 
   viewModel { HomeViewModel(get(), get(), get(), get(), get(), get()) }
-  viewModel { SnapshotViewModel(get(), get(), get(), get(), get()) }
+  viewModel { SnapshotViewModel(get(), get(), get(), get(), get(), get()) }
 }

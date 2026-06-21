@@ -14,6 +14,7 @@ import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotDetailItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemsUseCase
+import com.absinthe.libchecker.domain.snapshot.CompareSnapshotListsUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotItemFactory
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
@@ -47,6 +48,7 @@ class SnapshotViewModel(
   val repository: LCRepository,
   private val snapshotItemFactory: SnapshotItemFactory,
   private val compareSnapshotItems: CompareSnapshotItemsUseCase,
+  private val compareSnapshotLists: CompareSnapshotListsUseCase,
   private val buildSnapshotDetailItems: BuildSnapshotDetailItemsUseCase,
   private val snapshotArchive: SnapshotArchiveUseCase
 ) : ViewModel() {
@@ -226,68 +228,27 @@ class SnapshotViewModel(
       return@runBlocking
     }
 
-    compareDiffWithSnapshotList(preTimeStamp, preMap, currMap)
+    compareDiffWithSnapshotList(preTimeStamp, preMap.values.toList(), currMap.values.toList())
   }
 
   fun compareDiffWithSnapshotList(
     preTimeStamp: Long = -1L,
     preList: List<SnapshotItem>,
     currList: List<SnapshotItem>
-  ) {
-    val preMap = preList.associateBy { it.packageName }
-    if (preMap.isEmpty()) {
-      return
-    }
-
-    val currMap = currList.associateBy { it.packageName }
-    if (currMap.isEmpty()) {
-      return
-    }
-
-    compareDiffWithSnapshotList(preTimeStamp, preMap, currMap)
-  }
-
-  private fun compareDiffWithSnapshotList(
-    preTimeStamp: Long = -1L,
-    preMap: Map<String, SnapshotItem>,
-    currMap: Map<String, SnapshotItem>
   ) = runBlocking {
-    if (preMap.isEmpty()) {
+    if (preList.isEmpty()) {
       return@runBlocking
     }
 
-    if (currMap.isEmpty()) {
+    if (currList.isEmpty()) {
       return@runBlocking
     }
-
-    val diffList = mutableListOf<SnapshotDiffItem>()
 
     val trackPackageNames = repository.getTrackItems()
       .asSequence()
       .map { it.packageName }
       .toSet()
-
-    preMap.forEach { (packageName, preItem) ->
-      if (!isActive) return@runBlocking
-      if (packageName !in currMap) {
-        diffList.add(compareSnapshotItems(preItem, null, trackPackageNames)!!)
-      }
-    }
-
-    currMap.forEach { (packageName, currItem) ->
-      if (!isActive) return@runBlocking
-      if (packageName !in preMap) {
-        diffList.add(compareSnapshotItems(null, currItem, trackPackageNames)!!)
-      }
-    }
-
-    preMap.forEach { (packageName, preItem) ->
-      if (!isActive) return@runBlocking
-      val currItem = currMap[packageName] ?: return@forEach
-      if (currItem.versionCode != preItem.versionCode || currItem.lastUpdatedTime != preItem.lastUpdatedTime) {
-        diffList.add(compareSnapshotItems(preItem, currItem, trackPackageNames)!!)
-      }
-    }
+    val diffList = compareSnapshotLists(preList, currList, trackPackageNames)
 
     snapshotDiffItemsFlow.emit(diffList)
     if (diffList.isNotEmpty() && preTimeStamp != -1L) {
