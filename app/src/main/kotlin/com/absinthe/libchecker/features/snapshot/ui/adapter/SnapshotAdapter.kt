@@ -18,8 +18,8 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.constant.options.SnapshotOptions
 import com.absinthe.libchecker.data.app.LocalAppDataSource
+import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
-import com.absinthe.libchecker.features.snapshot.detail.bean.SnapshotDiffItem
 import com.absinthe.libchecker.features.snapshot.ui.view.SnapshotItemView
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
 import com.absinthe.libchecker.ui.animator.ParticleRemoveItemAnimator

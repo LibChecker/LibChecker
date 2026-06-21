@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.snapshot.detail.bean
+package com.absinthe.libchecker.domain.snapshot.model
 
 import com.squareup.moshi.JsonClass
 import java.io.Serializable

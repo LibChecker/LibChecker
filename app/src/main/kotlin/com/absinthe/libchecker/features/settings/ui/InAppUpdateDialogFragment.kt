@@ -7,8 +7,8 @@ import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.api.bean.GetAppUpdateInfo
 import com.absinthe.libchecker.app.SystemServices
+import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.features.settings.SettingsViewModel
-import com.absinthe.libchecker.features.snapshot.detail.bean.SnapshotDiffItem
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty

@@ -48,6 +48,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
+import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.features.applist.DetailFragmentManager
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
@@ -72,7 +73,6 @@ import com.absinthe.libchecker.features.applist.detail.ui.impl.PermissionAnalysi
 import com.absinthe.libchecker.features.applist.detail.ui.impl.SignaturesAnalysisFragment
 import com.absinthe.libchecker.features.applist.detail.ui.impl.StaticAnalysisFragment
 import com.absinthe.libchecker.features.applist.detail.ui.view.ProcessBarView
-import com.absinthe.libchecker.features.snapshot.detail.bean.SnapshotDiffItem
 import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ENTITY
 import com.absinthe.libchecker.features.snapshot.detail.ui.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.adapter.HorizontalSpacesItemDecoration

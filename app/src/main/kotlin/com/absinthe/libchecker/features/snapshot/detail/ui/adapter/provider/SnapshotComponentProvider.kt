@@ -7,11 +7,11 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.database.RulesRepository
+import com.absinthe.libchecker.domain.snapshot.model.ADDED
+import com.absinthe.libchecker.domain.snapshot.model.CHANGED
+import com.absinthe.libchecker.domain.snapshot.model.MOVED
+import com.absinthe.libchecker.domain.snapshot.model.REMOVED
 import com.absinthe.libchecker.features.applist.detail.ui.LibDetailDialogFragment
-import com.absinthe.libchecker.features.snapshot.detail.bean.ADDED
-import com.absinthe.libchecker.features.snapshot.detail.bean.CHANGED
-import com.absinthe.libchecker.features.snapshot.detail.bean.MOVED
-import com.absinthe.libchecker.features.snapshot.detail.bean.REMOVED
 import com.absinthe.libchecker.features.snapshot.detail.ui.adapter.node.SnapshotComponentNode
 import com.absinthe.libchecker.features.snapshot.detail.ui.view.SnapshotDetailComponentView
 import com.absinthe.libchecker.ui.base.BaseActivity

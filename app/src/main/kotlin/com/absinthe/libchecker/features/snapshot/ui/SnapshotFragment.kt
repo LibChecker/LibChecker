@@ -39,11 +39,11 @@ import com.absinthe.libchecker.constant.LCUris
 import com.absinthe.libchecker.constant.options.SnapshotOptions
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.domain.app.PackageChangeState
+import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.features.album.ui.AlbumActivity
 import com.absinthe.libchecker.features.home.HomeViewModel
 import com.absinthe.libchecker.features.home.INavViewContainer
 import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
-import com.absinthe.libchecker.features.snapshot.detail.bean.SnapshotDiffItem
 import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ENTITY
 import com.absinthe.libchecker.features.snapshot.detail.ui.SnapshotDetailActivity
 import com.absinthe.libchecker.features.snapshot.detail.ui.view.SnapshotEmptyView

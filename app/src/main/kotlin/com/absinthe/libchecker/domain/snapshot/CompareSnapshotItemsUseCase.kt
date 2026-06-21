@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.domain.snapshot
 
 import com.absinthe.libchecker.database.entity.SnapshotItem
-import com.absinthe.libchecker.features.snapshot.detail.bean.SnapshotDiffItem
+import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.utils.fromJson
 

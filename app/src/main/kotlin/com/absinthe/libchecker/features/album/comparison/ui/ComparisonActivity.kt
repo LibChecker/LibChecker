@@ -38,9 +38,9 @@ import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.databinding.ActivityComparisonBinding
+import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.features.album.comparison.ui.view.ComparisonDashboardView
 import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
-import com.absinthe.libchecker.features.snapshot.detail.bean.SnapshotDiffItem
 import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ENTITY
 import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ICON
 import com.absinthe.libchecker.features.snapshot.detail.ui.SnapshotDetailActivity
