@@ -46,7 +46,6 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
-import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.features.applist.DetailFragmentManager
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
@@ -88,8 +87,6 @@ import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersionString
-import com.absinthe.libchecker.utils.extensions.getPackageSize
-import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getTargetApiString
 import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.extensions.getVersionString
@@ -98,7 +95,6 @@ import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
-import com.absinthe.libchecker.utils.toJson
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.tabs.TabLayout
@@ -939,116 +935,16 @@ abstract class BaseAppDetailActivity :
   private fun navigateToSnapshotDetailPage(basePackage: PackageInfo, analysisPackage: PackageInfo) = lifecycleScope.launch(Dispatchers.Main) {
     val dialog = UiUtils.createLoadingDialog(this@BaseAppDetailActivity)
     dialog.show()
-    withContext(Dispatchers.IO) {
-      val diff = SnapshotDiffItem(
-        packageName = basePackage.packageName,
-        updateTime = basePackage.lastUpdateTime,
-        labelDiff = SnapshotDiffItem.DiffNode(
-          basePackage.getAppName(packageManager).toString(),
-          analysisPackage.getAppName(packageManager).toString()
-        ),
-        versionNameDiff = SnapshotDiffItem.DiffNode(
-          basePackage.versionName.toString(),
-          analysisPackage.versionName
-        ),
-        versionCodeDiff = SnapshotDiffItem.DiffNode(
-          basePackage.getVersionCode(),
-          analysisPackage.getVersionCode()
-        ),
-        abiDiff = SnapshotDiffItem.DiffNode(
-          PackageUtils.getAbi(basePackage).toShort(),
-          PackageUtils.getAbi(analysisPackage).toShort()
-        ),
-        targetApiDiff = SnapshotDiffItem.DiffNode(
-          basePackage.applicationInfo?.targetSdkVersion?.toShort() ?: 0,
-          analysisPackage.applicationInfo?.targetSdkVersion?.toShort()
-        ),
-        compileSdkDiff = SnapshotDiffItem.DiffNode(
-          basePackage.getCompileSdkVersion().toShort(),
-          analysisPackage.getCompileSdkVersion().toShort()
-        ),
-        minSdkDiff = SnapshotDiffItem.DiffNode(
-          basePackage.applicationInfo?.minSdkVersion?.toShort() ?: 0,
-          analysisPackage.applicationInfo?.minSdkVersion?.toShort()
-        ),
-        nativeLibsDiff = SnapshotDiffItem.DiffNode(
-          PackageUtils.getNativeDirLibs(basePackage).toJson().orEmpty(),
-          PackageUtils.getNativeDirLibs(analysisPackage).toJson().orEmpty()
-        ),
-        servicesDiff = SnapshotDiffItem.DiffNode(
-          PackageUtils.getComponentStringList(
-            basePackage,
-            SERVICE,
-            false
-          ).toJson().orEmpty(),
-          PackageUtils.getComponentStringList(
-            analysisPackage,
-            SERVICE,
-            false
-          ).toJson().orEmpty()
-        ),
-        activitiesDiff = SnapshotDiffItem.DiffNode(
-          PackageUtils.getComponentStringList(
-            basePackage,
-            ACTIVITY,
-            false
-          ).toJson().orEmpty(),
-          PackageUtils.getComponentStringList(
-            analysisPackage,
-            ACTIVITY,
-            false
-          ).toJson().orEmpty()
-        ),
-        receiversDiff = SnapshotDiffItem.DiffNode(
-          PackageUtils.getComponentStringList(
-            basePackage,
-            RECEIVER,
-            false
-          ).toJson().orEmpty(),
-          PackageUtils.getComponentStringList(
-            analysisPackage,
-            RECEIVER,
-            false
-          ).toJson().orEmpty()
-        ),
-        providersDiff = SnapshotDiffItem.DiffNode(
-          PackageUtils.getComponentStringList(
-            basePackage,
-            PROVIDER,
-            false
-          ).toJson().orEmpty(),
-          PackageUtils.getComponentStringList(
-            analysisPackage,
-            PROVIDER,
-            false
-          ).toJson().orEmpty()
-        ),
-        permissionsDiff = SnapshotDiffItem.DiffNode(
-          basePackage.getPermissionsList().toJson().orEmpty(),
-          analysisPackage.getPermissionsList().toJson().orEmpty()
-        ),
-        metadataDiff = SnapshotDiffItem.DiffNode(
-          PackageUtils.getMetaDataItems(basePackage).toJson().orEmpty(),
-          PackageUtils.getMetaDataItems(analysisPackage).toJson().orEmpty()
-        ),
-        packageSizeDiff = SnapshotDiffItem.DiffNode(
-          basePackage.getPackageSize(true),
-          analysisPackage.getPackageSize(true)
-        )
+    val diff = viewModel.buildPackageComparisonSnapshotItem(basePackage, analysisPackage)
+    dialog.dismiss()
+
+    val intent = Intent(this@BaseAppDetailActivity, SnapshotDetailActivity::class.java)
+      .putExtras(
+        Bundle().apply {
+          putSerializable(EXTRA_ENTITY, diff)
+        }
       )
-
-      withContext(Dispatchers.Main) {
-        dialog.dismiss()
-
-        val intent = Intent(this@BaseAppDetailActivity, SnapshotDetailActivity::class.java)
-          .putExtras(
-            Bundle().apply {
-              putSerializable(EXTRA_ENTITY, diff)
-            }
-          )
-        startActivity(intent)
-      }
-    }
+    startActivity(intent)
   }
 
   private fun initProcessBarView() {

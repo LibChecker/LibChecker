@@ -24,6 +24,7 @@ import com.absinthe.libchecker.domain.app.HasInstalledStaticLibrariesUseCase
 import com.absinthe.libchecker.domain.app.InitializeAppListUseCase
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.SyncAppListChangesUseCase
+import com.absinthe.libchecker.domain.snapshot.BuildPackageComparisonSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotDetailItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemWithInstalledAppUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemsUseCase
@@ -68,6 +69,7 @@ val appModule = module {
   factory { GetAppManifestPropertiesUseCase() }
   factory { GetInstalledAppComparisonPackageUseCase(get()) }
   factory { HasInstalledStaticLibrariesUseCase(get()) }
+  factory { BuildPackageComparisonSnapshotItemUseCase(androidContext().packageManager) }
   factory { CompareSnapshotItemsUseCase() }
   factory { CompareSnapshotListsUseCase(get()) }
   factory { CompareSnapshotWithInstalledAppsUseCase(get(), get(), get(), get()) }
@@ -79,7 +81,7 @@ val appModule = module {
   factory { SnapshotLibraryUseCase(get()) }
 
   viewModel { ChartViewModel(get()) }
-  viewModel { DetailViewModel(get(), get(), get(), get(), get(), get(), get()) }
+  viewModel { DetailViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
   viewModel { HomeViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
   viewModel { LibReferenceViewModel(get()) }
   viewModel { SnapshotViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
