@@ -41,12 +41,13 @@ fun Project.setupAppModule(block: ApplicationExtension.() -> Unit = {}) {
         )
       }
     }
-    val releaseSigning = if (project.hasProperty("releaseStoreFile")) {
+    val releaseStoreFile = providers.gradleProperty("releaseStoreFile")
+    val releaseSigning = if (releaseStoreFile.isPresent) {
       signingConfigs.create("release") {
-        storeFile = File(project.properties["releaseStoreFile"] as String)
-        storePassword = project.properties["releaseStorePassword"] as String
-        keyAlias = project.properties["releaseKeyAlias"] as String
-        keyPassword = project.properties["releaseKeyPassword"] as String
+        storeFile = File(releaseStoreFile.get())
+        storePassword = providers.gradleProperty("releaseStorePassword").get()
+        keyAlias = providers.gradleProperty("releaseKeyAlias").get()
+        keyPassword = providers.gradleProperty("releaseKeyPassword").get()
       }
     } else {
       signingConfigs.getByName("debug")

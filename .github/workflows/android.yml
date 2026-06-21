@@ -45,7 +45,7 @@ jobs:
           distribution: 'zulu'
           java-version: 25
       - uses: gradle/actions/setup-gradle@v6
-      - run: ./gradlew spotlessCheck
+      - run: ./gradlew --non-interactive spotlessCheck
 
   build:
     name: Build
@@ -83,9 +83,9 @@ jobs:
           fi
       - name: Clean build
         if: steps.version-check.outputs.is_dev == 'false'
-        run: ./gradlew clean
+        run: ./gradlew --non-interactive clean
       - name: Build with Gradle
-        run: ./gradlew app:assembleRelease
+        run: ./gradlew --non-interactive app:assembleRelease
       - name: Upload built Foss apk
         if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
         uses: actions/upload-artifact@v7
