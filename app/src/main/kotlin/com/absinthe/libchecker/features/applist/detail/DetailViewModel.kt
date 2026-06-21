@@ -39,6 +39,7 @@ import com.absinthe.libchecker.domain.app.GetAppDetailComponentChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailNativeLibrariesUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageSizeUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageUseCase
+import com.absinthe.libchecker.domain.app.GetAppDetailPermissionChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppManifestPropertiesUseCase
 import com.absinthe.libchecker.domain.app.GetArchivePackageInfoUseCase
 import com.absinthe.libchecker.domain.app.GetInstalledAppComparisonPackageUseCase
@@ -67,7 +68,6 @@ import com.absinthe.libchecker.utils.extensions.getRxAndroidVersion
 import com.absinthe.libchecker.utils.extensions.getRxJavaVersion
 import com.absinthe.libchecker.utils.extensions.getRxKotlinVersion
 import com.absinthe.libchecker.utils.extensions.getSignatures
-import com.absinthe.libchecker.utils.extensions.getStatefulPermissionsList
 import com.absinthe.libchecker.utils.extensions.isPWA
 import com.absinthe.libchecker.utils.extensions.isPageSizeCompat
 import com.absinthe.libchecker.utils.extensions.isPlayAppSigning
@@ -102,6 +102,7 @@ class DetailViewModel(
   private val getAppDetailNativeLibrariesUseCase: GetAppDetailNativeLibrariesUseCase,
   private val getAppDetailPackageSizeUseCase: GetAppDetailPackageSizeUseCase,
   private val getApkPreviewInfoUseCase: GetApkPreviewInfoUseCase,
+  private val getAppDetailPermissionChipsUseCase: GetAppDetailPermissionChipsUseCase,
   private val getAppManifestPropertiesUseCase: GetAppManifestPropertiesUseCase,
   private val getArchivePackageInfoUseCase: GetArchivePackageInfoUseCase,
   private val getInstalledAppComparisonPackageUseCase: GetInstalledAppComparisonPackageUseCase,
@@ -324,10 +325,15 @@ class DetailViewModel(
       return
     }
     initPermissionJob = viewModelScope.launch(Dispatchers.IO) {
-      val permissions = getPermissionChipList()
-      permissionsItems.emit(permissions)
+      val permissions = getAppDetailPermissionChipsUseCase(
+        packageInfo = packageInfo,
+        apkPreviewInfo = apkPreviewInfo,
+        isApk = isApk,
+        isApkPreview = isApkPreview
+      )
+      permissionsItems.emit(permissions.items)
 
-      if (permissions.any { it.item.name == "android.permission.POST_PROMOTED_NOTIFICATIONS" }) {
+      if (permissions.hasLiveUpdateNotification) {
         _featuresFlow.emit(VersionedFeature(Features.LIVE_UPDATE_NOTIFICATION))
       }
     }
@@ -474,34 +480,6 @@ class DetailViewModel(
 
     chipList.sortByDescending { it.item.name }
     return chipList
-  }
-
-  private fun getPermissionChipList(): List<LibStringItemChip> {
-    Timber.d("getPermissionChipList")
-    val list = if (!isApkPreview && apkPreviewInfo == null) {
-      packageInfo.getStatefulPermissionsList().asSequence()
-        .map { perm ->
-          LibStringItemChip(
-            LibStringItem(
-              name = perm.first,
-              size = if (perm.second && !isApk) PackageInfo.REQUESTED_PERMISSION_GRANTED.toLong() else 0,
-              source = if (perm.first.contains("maxSdkVersion")) DISABLED else null,
-              process = if (perm.second && !isApk) PackageInfo.REQUESTED_PERMISSION_GRANTED.toString() else null
-            ),
-            null
-          )
-        }
-    } else {
-      apkPreviewInfo!!.permissions.asSequence()
-        .map { perm ->
-          LibStringItemChip(
-            LibStringItem(name = perm, size = 0, source = null, process = null),
-            null
-          )
-        }
-    }.toMutableList()
-    list.sortByDescending { it.item.name }
-    return list
   }
 
   private suspend fun getDexChipList(): List<LibStringItemChip> {
