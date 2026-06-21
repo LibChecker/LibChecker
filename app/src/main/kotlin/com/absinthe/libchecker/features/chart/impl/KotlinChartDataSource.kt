@@ -3,8 +3,8 @@ package com.absinthe.libchecker.features.chart.impl
 import android.content.Context
 import androidx.core.graphics.toColorInt
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.statistics.FeatureFlagChartData
 import com.absinthe.libchecker.features.chart.BaseChartDataSource
 import com.absinthe.libchecker.features.chart.ChartSourceItem
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -17,7 +17,10 @@ import info.appdev.charting.utils.PointF
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class KotlinChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>(items) {
+class KotlinChartDataSource(
+  items: List<LCItem>,
+  private val buildKotlinChartData: suspend (List<LCItem>) -> FeatureFlagChartData?
+) : BaseChartDataSource<PieChart>(items) {
   override val classifiedMap: HashMap<Int, ChartSourceItem> = HashMap(2)
 
   override suspend fun fillChartView(chartView: PieChart, onProgressUpdated: (Int) -> Unit) {
@@ -30,14 +33,12 @@ class KotlinChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>
       val entries: ArrayList<PieEntryFloat> = ArrayList()
       val colorOnSurface = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
       val classifiedList = listOf(mutableListOf<LCItem>(), mutableListOf())
+      classifiedMap.clear()
+      val chartData = buildKotlinChartData(items) ?: return@withContext
 
-      for (item in filteredList) {
-        if ((item.features and Features.KOTLIN_USED) > 0) {
-          classifiedList[KOTLIN_USED].add(item)
-        } else {
-          classifiedList[KOTLIN_UNUSED].add(item)
-        }
-      }
+      classifiedList[KOTLIN_USED].addAll(chartData.matched)
+      classifiedList[KOTLIN_UNUSED].addAll(chartData.unmatched)
+
       classifiedMap[KOTLIN_USED] = ChartSourceItem(
         com.absinthe.lc.rulesbundle.R.drawable.ic_lib_kotlin,
         false,

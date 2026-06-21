@@ -19,6 +19,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentPieChartBinding
 import com.absinthe.libchecker.domain.statistics.BuildApiLevelChartDataUseCase
+import com.absinthe.libchecker.domain.statistics.BuildFeatureFlagChartDataUseCase
 import com.absinthe.libchecker.features.chart.BaseChartDataSource
 import com.absinthe.libchecker.features.chart.BaseVariableChartDataSource
 import com.absinthe.libchecker.features.chart.ChartViewModel
@@ -302,7 +303,14 @@ class ChartFragment :
         }
       }
 
-      ChartType.KOTLIN -> setChartData(::generatePieChartView) { KotlinChartDataSource(items) }
+      ChartType.KOTLIN -> setChartData(::generatePieChartView) {
+        KotlinChartDataSource(items) { chartItems ->
+          viewModel.buildFeatureFlagChartData(
+            chartItems,
+            BuildFeatureFlagChartDataUseCase.Kind.Kotlin
+          )
+        }
+      }
 
       ChartType.TARGET_SDK -> setChartData(::generateBarChartView) {
         ApiLevelChartDataSource(
@@ -328,11 +336,25 @@ class ChartFragment :
         )
       }
 
-      ChartType.JETPACK_COMPOSE -> setChartData(::generatePieChartView) { JetpackComposeChartDataSource(items) }
+      ChartType.JETPACK_COMPOSE -> setChartData(::generatePieChartView) {
+        JetpackComposeChartDataSource(items) { chartItems ->
+          viewModel.buildFeatureFlagChartData(
+            chartItems,
+            BuildFeatureFlagChartDataUseCase.Kind.JetpackCompose
+          )
+        }
+      }
 
       ChartType.MARKET_DISTRIBUTION -> setChartData(::generateBarChartView) { MarketDistributionChartDataSource(items) }
 
-      ChartType.AAB -> setChartData(::generatePieChartView) { AABChartDataSource(items) }
+      ChartType.AAB -> setChartData(::generatePieChartView) {
+        AABChartDataSource(items) { chartItems ->
+          viewModel.buildFeatureFlagChartData(
+            chartItems,
+            BuildFeatureFlagChartDataUseCase.Kind.AppBundle
+          )
+        }
+      }
 
       ChartType.SUPPORT_16KB -> setChartData(::generatePieChartView) {
         PageSize16KBChartDataSource(items, viewModel::buildPageSize16KBChartData)

@@ -59,6 +59,7 @@ import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotTopAppsUseCase
 import com.absinthe.libchecker.domain.statistics.BuildAbiChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildApiLevelChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildDetailedAbiChartDataUseCase
+import com.absinthe.libchecker.domain.statistics.BuildFeatureFlagChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildPageSize16KBChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.ComputeLibReferenceUseCase
 import com.absinthe.libchecker.domain.statistics.GetLibReferenceAppsUseCase
@@ -87,6 +88,7 @@ val appModule = module {
   factory { BuildAbiChartDataUseCase() }
   factory { BuildApiLevelChartDataUseCase(get()) }
   factory { BuildDetailedAbiChartDataUseCase(get()) }
+  factory { BuildFeatureFlagChartDataUseCase() }
   factory { BuildPageSize16KBChartDataUseCase(get()) }
   factory { ComputeLibReferenceUseCase(get()) }
   factory { GetLibReferenceAppsUseCase() }
@@ -134,6 +136,7 @@ val appModule = module {
       buildAbiChartDataUseCase = get(),
       buildApiLevelChartDataUseCase = get(),
       buildDetailedAbiChartDataUseCase = get(),
+      buildFeatureFlagChartDataUseCase = get(),
       buildPageSize16KBChartDataUseCase = get()
     )
   }

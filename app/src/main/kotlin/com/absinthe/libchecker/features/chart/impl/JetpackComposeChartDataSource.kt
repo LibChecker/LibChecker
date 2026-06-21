@@ -3,8 +3,8 @@ package com.absinthe.libchecker.features.chart.impl
 import android.content.Context
 import androidx.core.graphics.toColorInt
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.statistics.FeatureFlagChartData
 import com.absinthe.libchecker.features.chart.BaseChartDataSource
 import com.absinthe.libchecker.features.chart.ChartSourceItem
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -17,7 +17,10 @@ import info.appdev.charting.utils.PointF
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class JetpackComposeChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>(items) {
+class JetpackComposeChartDataSource(
+  items: List<LCItem>,
+  private val buildComposeChartData: suspend (List<LCItem>) -> FeatureFlagChartData?
+) : BaseChartDataSource<PieChart>(items) {
   override val classifiedMap: HashMap<Int, ChartSourceItem> = HashMap(2)
 
   override suspend fun fillChartView(chartView: PieChart, onProgressUpdated: (Int) -> Unit) {
@@ -30,14 +33,11 @@ class JetpackComposeChartDataSource(items: List<LCItem>) : BaseChartDataSource<P
       val entries: ArrayList<PieEntryFloat> = ArrayList()
       val colorOnSurface = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
       val classifiedList = listOf(mutableListOf<LCItem>(), mutableListOf())
+      classifiedMap.clear()
+      val chartData = buildComposeChartData(items) ?: return@withContext
 
-      for (item in filteredList) {
-        if ((item.features and Features.JETPACK_COMPOSE) > 0) {
-          classifiedList[COMPOSE_USED].add(item)
-        } else {
-          classifiedList[COMPOSE_UNUSED].add(item)
-        }
-      }
+      classifiedList[COMPOSE_USED].addAll(chartData.matched)
+      classifiedList[COMPOSE_UNUSED].addAll(chartData.unmatched)
 
       classifiedMap[COMPOSE_USED] = ChartSourceItem(
         com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetpack_compose,

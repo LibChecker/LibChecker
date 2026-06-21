@@ -3,8 +3,8 @@ package com.absinthe.libchecker.features.chart.impl
 import android.content.Context
 import androidx.core.graphics.toColorInt
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.statistics.FeatureFlagChartData
 import com.absinthe.libchecker.features.chart.BaseChartDataSource
 import com.absinthe.libchecker.features.chart.ChartSourceItem
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -17,7 +17,10 @@ import info.appdev.charting.utils.PointF
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class AABChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>(items) {
+class AABChartDataSource(
+  items: List<LCItem>,
+  private val buildAabChartData: suspend (List<LCItem>) -> FeatureFlagChartData?
+) : BaseChartDataSource<PieChart>(items) {
   override val classifiedMap: HashMap<Int, ChartSourceItem> = HashMap(2)
 
   override suspend fun fillChartView(chartView: PieChart, onProgressUpdated: (Int) -> Unit) {
@@ -30,14 +33,12 @@ class AABChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>(it
       val entries: ArrayList<PieEntryFloat> = ArrayList()
       val colorOnSurface = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
       val classifiedList = listOf(mutableListOf<LCItem>(), mutableListOf())
+      classifiedMap.clear()
+      val chartData = buildAabChartData(items) ?: return@withContext
 
-      for (item in filteredList) {
-        if ((item.features and Features.SPLIT_APKS) > 0) {
-          classifiedList[AAB].add(item)
-        } else {
-          classifiedList[APK].add(item)
-        }
-      }
+      classifiedList[AAB].addAll(chartData.matched)
+      classifiedList[APK].addAll(chartData.unmatched)
+
       classifiedMap[AAB] = ChartSourceItem(
         R.drawable.ic_aab,
         false,

@@ -13,7 +13,9 @@ import com.absinthe.libchecker.domain.statistics.AbiChartData
 import com.absinthe.libchecker.domain.statistics.BuildAbiChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildApiLevelChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildDetailedAbiChartDataUseCase
+import com.absinthe.libchecker.domain.statistics.BuildFeatureFlagChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildPageSize16KBChartDataUseCase
+import com.absinthe.libchecker.domain.statistics.FeatureFlagChartData
 import com.absinthe.libchecker.domain.statistics.PageSize16KBChartData
 import com.absinthe.libchecker.features.chart.impl.MarketDistributionChartDataSource
 import kotlinx.coroutines.Dispatchers
@@ -33,6 +35,7 @@ class ChartViewModel(
   private val buildAbiChartDataUseCase: BuildAbiChartDataUseCase,
   private val buildApiLevelChartDataUseCase: BuildApiLevelChartDataUseCase,
   private val buildDetailedAbiChartDataUseCase: BuildDetailedAbiChartDataUseCase,
+  private val buildFeatureFlagChartDataUseCase: BuildFeatureFlagChartDataUseCase,
   private val buildPageSize16KBChartDataUseCase: BuildPageSize16KBChartDataUseCase
 ) : ViewModel() {
   private var queryJob: Job? = null
@@ -108,6 +111,19 @@ class ChartViewModel(
         showSystemApps = GlobalValues.isShowSystemApps
       ),
       onProgress
+    )
+  }
+
+  suspend fun buildFeatureFlagChartData(
+    items: List<LCItem>,
+    kind: BuildFeatureFlagChartDataUseCase.Kind
+  ): FeatureFlagChartData? {
+    return buildFeatureFlagChartDataUseCase(
+      BuildFeatureFlagChartDataUseCase.Request(
+        items = items,
+        kind = kind,
+        showSystemApps = GlobalValues.isShowSystemApps
+      )
     )
   }
 
