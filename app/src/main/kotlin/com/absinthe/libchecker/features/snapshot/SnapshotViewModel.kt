@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.data.app.LocalAppDataSource
-import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.SnapshotDiffStoringItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
@@ -20,6 +19,7 @@ import com.absinthe.libchecker.domain.snapshot.CompareSnapshotListsUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotItemFactory
 import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
+import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
@@ -48,7 +48,7 @@ import timber.log.Timber
 const val CURRENT_SNAPSHOT = -1L
 
 class SnapshotViewModel(
-  private val repository: LCRepository,
+  private val repository: SnapshotRepository,
   private val appListRepository: AppListRepository,
   private val snapshotItemFactory: SnapshotItemFactory,
   private val compareSnapshotItems: CompareSnapshotItemsUseCase,
@@ -58,7 +58,7 @@ class SnapshotViewModel(
   private val snapshotLibrary: SnapshotLibraryUseCase
 ) : ViewModel() {
 
-  val allSnapshots = repository.allSnapshotItemsFlow
+  val allSnapshots = repository.currentSnapshotCount
   val snapshotDiffItemsFlow: MutableSharedFlow<List<SnapshotDiffItem>> = MutableSharedFlow()
   val snapshotDetailItemsFlow: MutableSharedFlow<List<SnapshotDetailItem>> = MutableSharedFlow()
 
@@ -157,7 +157,7 @@ class SnapshotViewModel(
             diffList.add(item)
 
             snapshotDiffContent = item.toJson().orEmpty()
-            repository.insertSnapshotDiffItems(
+            repository.insertSnapshotDiff(
               SnapshotDiffStoringItem(
                 packageName = presentItem.packageName,
                 lastUpdatedTime = presentItem.lastUpdateTime,
@@ -182,7 +182,7 @@ class SnapshotViewModel(
               diffList.add(item)
 
               snapshotDiffContent = item.toJson().orEmpty()
-              repository.insertSnapshotDiffItems(
+              repository.insertSnapshotDiff(
                 SnapshotDiffStoringItem(
                   packageName = presentItem.packageName,
                   lastUpdatedTime = presentItem.lastUpdateTime,
@@ -290,7 +290,7 @@ class SnapshotViewModel(
       .map { it.packageName }
       .filter { PackageUtils.isAppInstalled(it) }
       .toList()
-    repository.updateTimeStampItem(TimeStampItem(timestamp, appsList.toJson(), systemProps))
+    repository.updateTimeStamp(TimeStampItem(timestamp, appsList.toJson(), systemProps))
   }
 
   fun computeDiffDetail(context: Context, entity: SnapshotDiffItem) = viewModelScope.launch(Dispatchers.IO) {

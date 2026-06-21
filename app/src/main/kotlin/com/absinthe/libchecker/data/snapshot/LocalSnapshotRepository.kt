@@ -1,14 +1,18 @@
 package com.absinthe.libchecker.data.snapshot
 
 import com.absinthe.libchecker.database.LCRepository
+import com.absinthe.libchecker.database.entity.SnapshotDiffStoringItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.database.entity.TrackItem
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
+import kotlinx.coroutines.flow.Flow
 
 class LocalSnapshotRepository(
   private val repository: LCRepository
 ) : SnapshotRepository {
+
+  override val currentSnapshotCount: Flow<Int> = repository.allSnapshotItemsFlow
 
   override fun getTimeStamps(): List<TimeStampItem> {
     return repository.getTimeStamps()
@@ -26,6 +30,10 @@ class LocalSnapshotRepository(
     return repository.getSnapshot(timestamp, packageName)
   }
 
+  override suspend fun getSnapshotDiff(packageName: String): SnapshotDiffStoringItem? {
+    return repository.getSnapshotDiff(packageName)
+  }
+
   override suspend fun getTrackItems(): List<TrackItem> {
     return repository.getTrackItems()
   }
@@ -38,8 +46,16 @@ class LocalSnapshotRepository(
     repository.insert(item)
   }
 
+  override suspend fun insertSnapshotDiff(item: SnapshotDiffStoringItem) {
+    repository.insertSnapshotDiffItems(item)
+  }
+
   override suspend fun insertTrackItem(item: TrackItem) {
     repository.insert(item)
+  }
+
+  override suspend fun updateTimeStamp(item: TimeStampItem) {
+    repository.updateTimeStampItem(item)
   }
 
   override suspend fun deleteSnapshotsAndTimeStamp(timestamp: Long) {
