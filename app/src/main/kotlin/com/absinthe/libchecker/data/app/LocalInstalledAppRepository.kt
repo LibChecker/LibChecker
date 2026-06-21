@@ -25,8 +25,14 @@ object LocalInstalledAppRepository : InstalledAppRepository {
     return LocalAppDataSource.getApplicationCount(forceUpdate)
   }
 
-  override fun getPackageInfo(packageName: String, flags: Int): PackageInfo? {
-    return runCatching { PackageUtils.getPackageInfo(packageName, flags) }.getOrNull()
+  override fun getPackageInfo(
+    packageName: String,
+    flags: Int,
+    resolveFrozenArchiveInfo: Boolean
+  ): PackageInfo? {
+    return runCatching {
+      PackageUtils.getPackageInfo(packageName, flags, resolveFrozenArchiveInfo)
+    }.getOrNull()
   }
 
   override fun isPackageInstalled(packageName: String): Boolean {

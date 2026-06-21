@@ -13,7 +13,11 @@ interface InstalledAppRepository {
 
   fun getApplicationCount(forceUpdate: Boolean = false): Int
 
-  fun getPackageInfo(packageName: String, flags: Int = 0): PackageInfo?
+  fun getPackageInfo(
+    packageName: String,
+    flags: Int = 0,
+    resolveFrozenArchiveInfo: Boolean = true
+  ): PackageInfo?
 
   fun isPackageInstalled(packageName: String): Boolean
 

@@ -36,6 +36,7 @@ import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppListRepository
+import com.absinthe.libchecker.domain.app.GetAppDetailPackageUseCase
 import com.absinthe.libchecker.features.applist.LocatedCount
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.features.applist.detail.bean.AppIconItem
@@ -96,7 +97,8 @@ private const val ZYGOTE_PRELOAD_NATIVE_LIB_PROPERTY = "zygotePreloadNativeLib"
 private const val ZYGOTE_PRELOAD_NATIVE_LIB_LABEL = "PRELOAD"
 
 class DetailViewModel(
-  private val appListRepository: AppListRepository
+  private val appListRepository: AppListRepository,
+  private val getAppDetailPackage: GetAppDetailPackageUseCase
 ) : ViewModel() {
   private var allNativeLibItems: Map<String, List<LibStringItem>> = emptyMap()
   val nativeLibTabs: MutableStateFlow<Collection<String>?> = MutableStateFlow(null)
@@ -149,6 +151,10 @@ class DetailViewModel(
 
   fun isPackageInfoAvailable(): Boolean {
     return this::packageInfo.isInitialized
+  }
+
+  suspend fun loadAppDetailPackage(packageName: String): GetAppDetailPackageUseCase.Result {
+    return getAppDetailPackage(packageName)
   }
 
   fun reset() {
