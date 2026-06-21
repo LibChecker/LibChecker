@@ -57,6 +57,7 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotTopAppsUseCase
 import com.absinthe.libchecker.domain.statistics.ComputeLibReferenceUseCase
+import com.absinthe.libchecker.domain.statistics.GetLibReferenceAppsUseCase
 import com.absinthe.libchecker.features.album.track.TrackViewModel
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.chart.ChartViewModel
@@ -80,6 +81,7 @@ val appModule = module {
   factory { InitializeAppListUseCase(get(), get(), get()) }
   factory { SyncAppListChangesUseCase(get(), get(), get()) }
   factory { ComputeLibReferenceUseCase(get()) }
+  factory { GetLibReferenceAppsUseCase() }
   factory { ExportAppListUseCase(get(), get()) }
   factory { FilterAppListItemsUseCase(get()) }
   factory { GetAppBundleItemsUseCase() }
@@ -162,7 +164,8 @@ val appModule = module {
   viewModel {
     LibReferenceViewModel(
       appListRepository = get(),
-      buildAppListItemViewStatesUseCase = get()
+      buildAppListItemViewStatesUseCase = get(),
+      getLibReferenceAppsUseCase = get()
     )
   }
   viewModel { SnapshotViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }

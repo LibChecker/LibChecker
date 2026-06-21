@@ -105,8 +105,7 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
       }
       val item = adapter.getItem(position)
       val (name, type) = if (refType == ACTION) {
-        val pair = viewModel.actionMap[item.packageName]
-          ?: viewModel.getActionPair(item.packageName, refName.orEmpty())
+        val pair = viewModel.getActionTarget(item.packageName)
         (pair?.first ?: item.packageName) to (pair?.second ?: ACTION)
       } else {
         refName to refType
@@ -118,7 +117,7 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
 
   private fun initData() {
     this.refName?.let { name ->
-      refList?.toList()?.let(viewModel::setData) ?: viewModel.setData(name, refType)
+      refList?.toList()?.let { viewModel.setData(name, refType, it) } ?: viewModel.setData(name, refType)
     } ?: finish()
   }
 }
