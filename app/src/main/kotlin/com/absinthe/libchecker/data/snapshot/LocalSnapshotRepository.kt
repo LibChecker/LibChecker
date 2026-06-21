@@ -3,6 +3,7 @@ package com.absinthe.libchecker.data.snapshot
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
+import com.absinthe.libchecker.database.entity.TrackItem
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 
 class LocalSnapshotRepository(
@@ -25,6 +26,10 @@ class LocalSnapshotRepository(
     return repository.getSnapshot(timestamp, packageName)
   }
 
+  override suspend fun getTrackItems(): List<TrackItem> {
+    return repository.getTrackItems()
+  }
+
   override suspend fun insertSnapshots(items: List<SnapshotItem>) {
     repository.insertSnapshots(items)
   }
@@ -33,8 +38,16 @@ class LocalSnapshotRepository(
     repository.insert(item)
   }
 
+  override suspend fun insertTrackItem(item: TrackItem) {
+    repository.insert(item)
+  }
+
   override suspend fun deleteSnapshotsAndTimeStamp(timestamp: Long) {
     repository.deleteSnapshotsAndTimeStamp(timestamp)
+  }
+
+  override suspend fun deleteTrackItem(item: TrackItem) {
+    repository.delete(item)
   }
 
   override suspend fun retainLatestSnapshots(count: Int) {
@@ -46,6 +59,10 @@ class LocalSnapshotRepository(
 
   override suspend fun deleteDuplicateSnapshotItems() {
     repository.deleteDuplicateSnapshotItems()
+  }
+
+  override suspend fun deleteSnapshotDiff(packageName: String) {
+    repository.deleteSnapshotDiff(packageName)
   }
 
   override suspend fun deleteAllSnapshotDiffItems() {

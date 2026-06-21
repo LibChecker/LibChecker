@@ -25,6 +25,7 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotItemFactory
 import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.statistics.ComputeLibReferenceUseCase
+import com.absinthe.libchecker.features.album.track.TrackViewModel
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.chart.ChartViewModel
 import com.absinthe.libchecker.features.home.HomeViewModel
@@ -58,4 +59,5 @@ val appModule = module {
   viewModel { HomeViewModel(get(), get(), get(), get(), get(), get()) }
   viewModel { LibReferenceViewModel(get()) }
   viewModel { SnapshotViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
+  viewModel { TrackViewModel(get()) }
 }

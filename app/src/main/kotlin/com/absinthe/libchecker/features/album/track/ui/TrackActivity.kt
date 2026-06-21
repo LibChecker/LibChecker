@@ -16,11 +16,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.data.app.LocalAppDataSource
-import com.absinthe.libchecker.database.Repositories
-import com.absinthe.libchecker.database.entity.TrackItem
 import com.absinthe.libchecker.databinding.ActivityTrackBinding
+import com.absinthe.libchecker.features.album.track.TrackViewModel
 import com.absinthe.libchecker.features.album.track.bean.TrackListItem
 import com.absinthe.libchecker.features.album.track.ui.adapter.TrackAdapter
 import com.absinthe.libchecker.features.album.track.ui.adapter.TrackListDiff
@@ -34,6 +32,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import rikka.widget.borderview.BorderView
 
 class TrackActivity :
@@ -41,7 +40,7 @@ class TrackActivity :
   SearchView.OnQueryTextListener,
   MenuProvider {
 
-  private val repository = Repositories.lcRepository
+  private val viewModel: TrackViewModel by viewModel()
   private val adapter = TrackAdapter()
   private val list = mutableListOf<TrackListItem>()
   private var menu: Menu? = null
@@ -73,17 +72,9 @@ class TrackActivity :
       setDiffCallback(TrackListDiff())
 
       fun doSaveItemState(pos: Int, state: Boolean) {
-        lifecycleScope.launch {
-          val item = TrackItem(data[pos].packageName)
-          if (state) {
-            repository.insert(item)
-          } else {
-            repository.delete(item)
-            repository.deleteSnapshotDiff(item.packageName)
-          }
-          list.find { it.packageName == data[pos].packageName }?.switchState = state
-        }
-        GlobalValues.trackItemsChanged = true
+        val packageName = data[pos].packageName
+        viewModel.setPackageTracked(packageName, state)
+        list.find { it.packageName == packageName }?.switchState = state
       }
 
       setOnItemClickListener { _, view, position ->
@@ -102,14 +93,14 @@ class TrackActivity :
     }
 
     lifecycleScope.launch(Dispatchers.IO) {
-      val trackedList = repository.getTrackItems()
+      val trackedPackageNames = viewModel.getTrackedPackageNames()
       list += LocalAppDataSource.getApplicationList()
         .asSequence()
         .map {
           TrackListItem(
             label = it.getAppName(packageManager).toString(),
             packageName = it.packageName,
-            switchState = trackedList.any { trackItem -> trackItem.packageName == it.packageName }
+            switchState = it.packageName in trackedPackageNames
           )
         }
         .sortedByDescending { it.switchState }
