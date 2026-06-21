@@ -56,6 +56,7 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotItemFactory
 import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotTopAppsUseCase
+import com.absinthe.libchecker.domain.statistics.BuildAbiChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildApiLevelChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildDetailedAbiChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildPageSize16KBChartDataUseCase
@@ -83,6 +84,7 @@ val appModule = module {
   single<SnapshotArchiveCodec> { ProtoSnapshotArchiveCodec() }
   factory { InitializeAppListUseCase(get(), get(), get()) }
   factory { SyncAppListChangesUseCase(get(), get(), get()) }
+  factory { BuildAbiChartDataUseCase() }
   factory { BuildApiLevelChartDataUseCase(get()) }
   factory { BuildDetailedAbiChartDataUseCase(get()) }
   factory { BuildPageSize16KBChartDataUseCase(get()) }
@@ -129,6 +131,7 @@ val appModule = module {
     ChartViewModel(
       appListRepository = get(),
       buildAppListItemViewStatesUseCase = get(),
+      buildAbiChartDataUseCase = get(),
       buildApiLevelChartDataUseCase = get(),
       buildDetailedAbiChartDataUseCase = get(),
       buildPageSize16KBChartDataUseCase = get()

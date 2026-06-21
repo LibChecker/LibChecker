@@ -296,7 +296,9 @@ class ChartFragment :
             DetailedABIChartDataSource(items, viewModel::buildDetailedAbiChartData)
           }
         } else {
-          setChartData(::generatePieChartView) { ABIChartDataSource(items) }
+          setChartData(::generatePieChartView) {
+            ABIChartDataSource(items, viewModel::buildAbiChartData)
+          }
         }
       }
 

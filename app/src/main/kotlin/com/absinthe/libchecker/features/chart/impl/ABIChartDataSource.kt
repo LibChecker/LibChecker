@@ -2,14 +2,11 @@ package com.absinthe.libchecker.features.chart.impl
 
 import android.content.Context
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.Constants.MULTI_ARCH
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.statistics.AbiChartData
 import com.absinthe.libchecker.features.chart.BaseChartDataSource
 import com.absinthe.libchecker.features.chart.ChartSourceItem
 import com.absinthe.libchecker.utils.OsUtils
-import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.extensions.ABI_32_BIT
-import com.absinthe.libchecker.utils.extensions.ABI_64_BIT
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import info.appdev.charting.charts.PieChart
 import info.appdev.charting.data.PieData
@@ -19,10 +16,12 @@ import info.appdev.charting.formatter.PercentFormatter
 import info.appdev.charting.utils.ColorTemplate
 import info.appdev.charting.utils.PointF
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 
-class ABIChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>(items) {
+class ABIChartDataSource(
+  items: List<LCItem>,
+  private val buildAbiChartData: suspend (List<LCItem>) -> AbiChartData?
+) : BaseChartDataSource<PieChart>(items) {
   override val classifiedMap: HashMap<Int, ChartSourceItem> = HashMap(3)
 
   override suspend fun fillChartView(chartView: PieChart, onProgressUpdated: (Int) -> Unit) {
@@ -40,19 +39,12 @@ class ABIChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>(it
         mutableListOf(),
         mutableListOf()
       )
+      classifiedMap.clear()
+      val chartData = buildAbiChartData(items) ?: return@withContext
 
-      for (item in filteredList) {
-        if (!isActive) return@withContext
-        if (PackageUtils.hasNoNativeLibs(item.abi.toInt())) {
-          classifiedList[NO_LIBS].add(item)
-        } else {
-          when (item.abi % MULTI_ARCH) {
-            in ABI_64_BIT -> classifiedList[IS_64_BIT].add(item)
-            in ABI_32_BIT -> classifiedList[IS_32_BIT].add(item)
-            else -> classifiedList[NO_LIBS].add(item)
-          }
-        }
-      }
+      classifiedList[IS_64_BIT].addAll(chartData.is64Bit)
+      classifiedList[IS_32_BIT].addAll(chartData.is32Bit)
+      classifiedList[NO_LIBS].addAll(chartData.noNativeLibs)
 
       classifiedMap[IS_64_BIT] = ChartSourceItem(R.drawable.ic_abi_label_64bit, false, classifiedList[IS_64_BIT])
       classifiedMap[IS_32_BIT] = ChartSourceItem(R.drawable.ic_abi_label_32bit, false, classifiedList[IS_32_BIT])
@@ -60,10 +52,8 @@ class ABIChartDataSource(items: List<LCItem>) : BaseChartDataSource<PieChart>(it
 
       // NOTE: The order of the entries when being added to the entries array determines their position around the center of
       // the chart.
-      val legendList = mutableListOf<String>()
       for (i in parties.indices) {
         entries.add(PieEntryFloat(classifiedList[i].size.toFloat(), parties[i % parties.size]))
-        legendList.add(parties[i % parties.size])
       }
       val dataSet = PieDataSet(entries, "").apply {
         isDrawIcons = false

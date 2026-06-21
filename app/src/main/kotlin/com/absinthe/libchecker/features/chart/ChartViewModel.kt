@@ -9,6 +9,8 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppListItemViewState
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.BuildAppListItemViewStatesUseCase
+import com.absinthe.libchecker.domain.statistics.AbiChartData
+import com.absinthe.libchecker.domain.statistics.BuildAbiChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildApiLevelChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildDetailedAbiChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildPageSize16KBChartDataUseCase
@@ -28,6 +30,7 @@ const val LOADING_PROGRESS_MAX = 100
 class ChartViewModel(
   appListRepository: AppListRepository,
   private val buildAppListItemViewStatesUseCase: BuildAppListItemViewStatesUseCase,
+  private val buildAbiChartDataUseCase: BuildAbiChartDataUseCase,
   private val buildApiLevelChartDataUseCase: BuildApiLevelChartDataUseCase,
   private val buildDetailedAbiChartDataUseCase: BuildDetailedAbiChartDataUseCase,
   private val buildPageSize16KBChartDataUseCase: BuildPageSize16KBChartDataUseCase
@@ -69,6 +72,15 @@ class ChartViewModel(
       BuildAppListItemViewStatesUseCase.Request(
         items = items,
         options = options
+      )
+    )
+  }
+
+  suspend fun buildAbiChartData(items: List<LCItem>): AbiChartData? {
+    return buildAbiChartDataUseCase(
+      BuildAbiChartDataUseCase.Request(
+        items = items,
+        showSystemApps = GlobalValues.isShowSystemApps
       )
     )
   }
