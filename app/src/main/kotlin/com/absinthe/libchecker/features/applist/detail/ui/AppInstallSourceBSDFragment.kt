@@ -10,11 +10,13 @@ import androidx.annotation.RequiresApi
 import androidx.core.net.toUri
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.URLManager
-import com.absinthe.libchecker.database.Repositories
+import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppDexoptItemView
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppInstallSourceBottomSheetView
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppInstallSourceItemView
@@ -32,11 +34,15 @@ import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import java.text.SimpleDateFormat
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 @RequiresApi(Build.VERSION_CODES.R)
 class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstallSourceBottomSheetView>() {
 
+  private val viewModel: DetailViewModel by activityViewModel()
   private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
   private var packageInfo: PackageInfo? = null
   private var binderReceivedHandle: ShizukuManager.ListenerHandle? = null
@@ -212,14 +218,32 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
       return
     }
 
-    val targetLCItem = runBlocking { Repositories.lcRepository.getItem(packageName) } ?: run {
-      item.isGone = true
-      return
-    }
+    lifecycleScope.launch {
+      val target = loadPackageListItem(packageName) ?: run {
+        item.isGone = true
+        return@launch
+      }
+      val targetLCItem = target.item
+      val pi = target.packageInfo
 
+      bindAppInstallSourceItemView(item, packageName, targetLCItem, pi)
+    }
+  }
+
+  private suspend fun loadPackageListItem(packageName: String): PackageListItem? = withContext(Dispatchers.IO) {
+    val targetLCItem = viewModel.getAppListItem(packageName) ?: return@withContext null
     val pi = runCatching {
       PackageUtils.getPackageInfo(packageName)
     }.getOrNull()
+    PackageListItem(targetLCItem, pi)
+  }
+
+  private fun bindAppInstallSourceItemView(
+    item: AppInstallSourceItemView,
+    packageName: String,
+    targetLCItem: LCItem,
+    pi: PackageInfo?
+  ) {
     item.packageView.container.also {
       it.icon.load(pi)
       it.appName.text = targetLCItem.label
@@ -267,6 +291,11 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
       activity?.launchDetailPage(targetLCItem)
     }
   }
+
+  private data class PackageListItem(
+    val item: LCItem,
+    val packageInfo: PackageInfo?
+  )
 
   private fun initAppInstalledTimeItemView(item: AppInstallTimeItemView, pi: PackageInfo) {
     if (context == null || FreezeUtils.isAppFrozen(pi.packageName)) {

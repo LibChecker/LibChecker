@@ -34,6 +34,7 @@ import com.absinthe.libchecker.constant.GlobalFeatures
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.database.entity.Features
+import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.features.applist.LocatedCount
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
@@ -810,6 +811,10 @@ class DetailViewModel(
 
   fun emitFeature(feature: VersionedFeature) = viewModelScope.launch {
     _featuresFlow.emit(feature)
+  }
+
+  suspend fun getAppListItem(packageName: String): LCItem? {
+    return appListRepository.getItem(packageName)
   }
 
   fun initFeatures(packageInfo: PackageInfo, features: Int) = viewModelScope.launch(Dispatchers.IO) {
