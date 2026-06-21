@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.features.snapshot
 
 import android.content.Context
-import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,13 +8,13 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.database.entity.SnapshotDiffStoringItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotDetailItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotListsUseCase
+import com.absinthe.libchecker.domain.snapshot.CompareSnapshotWithInstalledAppsUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotItemFactory
 import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
@@ -24,12 +23,8 @@ import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.extensions.getPackageSize
-import com.absinthe.libchecker.utils.extensions.getVersionCode
-import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libchecker.utils.toJson
 import com.absinthe.libraries.utils.manager.TimeRecorder
-import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.text.SimpleDateFormat
@@ -41,7 +36,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -53,6 +47,7 @@ class SnapshotViewModel(
   private val snapshotItemFactory: SnapshotItemFactory,
   private val compareSnapshotItems: CompareSnapshotItemsUseCase,
   private val compareSnapshotLists: CompareSnapshotListsUseCase,
+  private val compareSnapshotWithInstalledApps: CompareSnapshotWithInstalledAppsUseCase,
   private val buildSnapshotDetailItems: BuildSnapshotDetailItemsUseCase,
   private val snapshotArchive: SnapshotArchiveUseCase,
   private val snapshotLibrary: SnapshotLibraryUseCase
@@ -90,7 +85,7 @@ class SnapshotViewModel(
       }
 
       if (currTimeStamp == CURRENT_SNAPSHOT) {
-        compareDiffWithApplicationList(context, preTimeStamp)
+        compareDiffWithInstalledApps(context, preTimeStamp)
       } else {
         compareDiffWithSnapshotList(preTimeStamp, currTimeStamp)
       }
@@ -101,152 +96,43 @@ class SnapshotViewModel(
     }
   }
 
-  private fun compareDiffWithApplicationList(context: Context, preTimeStamp: Long) = runBlocking {
-    val preMap = repository.getSnapshots(preTimeStamp).associateBy { it.packageName }
-
-    if (preMap.isEmpty() || preTimeStamp == 0L) {
-      snapshotDiffItemsFlow.emit(emptyList())
-      return@runBlocking
-    }
-
-    val packageManager = context.packageManager
-    val currMap = LocalAppDataSource.getApplicationMap(true)
-
-    val diffList = mutableListOf<SnapshotDiffItem>()
-    val trackPackageNames = repository.getTrackItems()
-      .asSequence()
-      .map { it.packageName }
-      .toSet()
-    val size = currMap.size
-
-    var count = 0
-    var snapshotDiffStoringItem: SnapshotDiffStoringItem?
-    var snapshotDiffContent: String
-
-    preMap.forEach { (packageName, snapshotItem) ->
-      if (!isActive) return@runBlocking
-      if (packageName !in currMap) {
-        diffList.add(compareSnapshotItems(snapshotItem, null, trackPackageNames)!!)
-      }
-    }
-
-    currMap.forEach { (packageName, packageInfo) ->
-      if (!isActive) return@runBlocking
-      if (packageName in preMap) {
-        return@forEach
-      }
-      try {
-        val newInfo = snapshotItemFactory.create(packageManager, packageInfo)
-        diffList.add(compareSnapshotItems(null, newInfo, trackPackageNames)!!)
-      } catch (e: Exception) {
-        Timber.e(e)
-      } finally {
-        count++
-        changeComparingProgress(count * 100 / size)
-      }
-    }
-
-    preMap.forEach { (packageName, snapshotItem) ->
-      if (!isActive) return@runBlocking
-      val presentItem = currMap[packageName] ?: return@forEach
-      try {
-        snapshotDiffStoringItem = repository.getSnapshotDiff(snapshotItem.packageName)
-
-        if (snapshotDiffStoringItem?.lastUpdatedTime != presentItem.lastUpdateTime) {
-          getDiffItemByComparingDBWithLocal(packageManager, snapshotItem, presentItem, trackPackageNames)?.let { item ->
-            diffList.add(item)
-
-            snapshotDiffContent = item.toJson().orEmpty()
-            repository.insertSnapshotDiff(
-              SnapshotDiffStoringItem(
-                packageName = presentItem.packageName,
-                lastUpdatedTime = presentItem.lastUpdateTime,
-                diffContent = snapshotDiffContent
-              )
-            )
-          }
-        } else {
-          try {
-            snapshotDiffStoringItem.diffContent.fromJson<SnapshotDiffItem>()?.let { item ->
-              diffList.add(item)
-            }
-          } catch (e: IOException) {
-            Timber.e(e, "diffContent parsing failed")
-
-            getDiffItemByComparingDBWithLocal(
-              packageManager,
-              snapshotItem,
-              presentItem,
-              trackPackageNames
-            )?.let { item ->
-              diffList.add(item)
-
-              snapshotDiffContent = item.toJson().orEmpty()
-              repository.insertSnapshotDiff(
-                SnapshotDiffStoringItem(
-                  packageName = presentItem.packageName,
-                  lastUpdatedTime = presentItem.lastUpdateTime,
-                  diffContent = snapshotDiffContent
-                )
-              )
-            }
-          }
-        }
-      } catch (e: Exception) {
-        Timber.e(e)
-      } finally {
-        count++
-        changeComparingProgress(count * 100 / size)
-      }
-    }
-
+  private suspend fun compareDiffWithInstalledApps(context: Context, preTimeStamp: Long) {
+    val diffList = compareSnapshotWithInstalledApps(
+      packageManager = context.packageManager,
+      timestamp = preTimeStamp,
+      onProgress = ::changeComparingProgress
+    ) ?: return
     snapshotDiffItemsFlow.emit(diffList)
     if (diffList.isNotEmpty()) {
       updateTopApps(preTimeStamp, diffList.subList(0, (diffList.size - 1).coerceAtMost(5)))
     }
   }
 
-  private fun getDiffItemByComparingDBWithLocal(
-    packageManager: PackageManager,
-    dbItem: SnapshotItem,
-    packageInfo: PackageInfo,
-    trackPackageNames: Set<String>
-  ): SnapshotDiffItem? {
-    if (packageInfo.getVersionCode() == dbItem.versionCode &&
-      packageInfo.lastUpdateTime == dbItem.lastUpdatedTime &&
-      packageInfo.getPackageSize(true) == dbItem.packageSize &&
-      dbItem.packageName !in trackPackageNames
-    ) {
-      return null
-    }
-    return compareSnapshotItems(dbItem, snapshotItemFactory.create(packageManager, packageInfo), trackPackageNames)
-  }
-
-  private fun compareDiffWithSnapshotList(preTimeStamp: Long, currTimeStamp: Long) = runBlocking {
+  private suspend fun compareDiffWithSnapshotList(preTimeStamp: Long, currTimeStamp: Long) {
     val preMap = repository.getSnapshots(preTimeStamp).associateBy { it.packageName }
     if (preMap.isEmpty()) {
-      return@runBlocking
+      return
     }
 
     val currMap = repository.getSnapshots(currTimeStamp).associateBy { it.packageName }
     if (currMap.isEmpty()) {
-      return@runBlocking
+      return
     }
 
     compareDiffWithSnapshotList(preTimeStamp, preMap.values.toList(), currMap.values.toList())
   }
 
-  fun compareDiffWithSnapshotList(
+  suspend fun compareDiffWithSnapshotList(
     preTimeStamp: Long = -1L,
     preList: List<SnapshotItem>,
     currList: List<SnapshotItem>
-  ) = runBlocking {
+  ) {
     if (preList.isEmpty()) {
-      return@runBlocking
+      return
     }
 
     if (currList.isEmpty()) {
-      return@runBlocking
+      return
     }
 
     val trackPackageNames = repository.getTrackItems()
