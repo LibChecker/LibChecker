@@ -51,5 +51,5 @@ val appModule = module {
   factory { SnapshotLibraryUseCase(get()) }
 
   viewModel { HomeViewModel(get(), get(), get(), get(), get(), get()) }
-  viewModel { SnapshotViewModel(get(), get(), get(), get(), get(), get(), get()) }
+  viewModel { SnapshotViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
 }

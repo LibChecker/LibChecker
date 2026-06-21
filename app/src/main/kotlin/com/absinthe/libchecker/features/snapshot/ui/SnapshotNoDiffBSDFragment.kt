@@ -4,8 +4,8 @@ import androidx.core.os.BundleCompat
 import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
+import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
 import com.absinthe.libchecker.features.snapshot.detail.ui.view.SnapshotNoDiffBSView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.LCAppUtils
@@ -15,10 +15,13 @@ import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.launch
 import me.zhanghai.android.appiconloader.AppIconLoader
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 const val EXTRA_DIFF_ITEM = "EXTRA_DIFF_ITEM"
 
 class SnapshotNoDiffBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotNoDiffBSView>() {
+
+  private val viewModel: SnapshotViewModel by activityViewModel()
 
   override fun initRootView(): SnapshotNoDiffBSView = SnapshotNoDiffBSView(requireContext())
 
@@ -45,7 +48,7 @@ class SnapshotNoDiffBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotNoDi
             load(icon)
             setOnClickListener {
               lifecycleScope.launch {
-                val lcItem = Repositories.lcRepository.getItem(item.packageName) ?: return@launch
+                val lcItem = viewModel.getAppListItem(item.packageName) ?: return@launch
                 activity?.launchDetailPage(lcItem)
               }
             }

@@ -28,7 +28,6 @@ import com.absinthe.libchecker.annotation.isComponentType
 import com.absinthe.libchecker.compat.IntentCompat
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
 import com.absinthe.libchecker.domain.snapshot.model.ADDED
 import com.absinthe.libchecker.domain.snapshot.model.CHANGED
@@ -168,7 +167,7 @@ class SnapshotDetailActivity :
         }
         setOnClickListener {
           lifecycleScope.launch {
-            val lcItem = Repositories.lcRepository.getItem(entity.packageName) ?: return@launch
+            val lcItem = viewModel.getAppListItem(entity.packageName) ?: return@launch
             launchDetailPage(lcItem)
           }
         }
@@ -233,7 +232,7 @@ class SnapshotDetailActivity :
       }
 
       lifecycleScope.launch {
-        val lcItem = Repositories.lcRepository.getItem(entity.packageName) ?: return@launch
+        val lcItem = viewModel.getAppListItem(entity.packageName) ?: return@launch
         launchDetailPage(
           item = lcItem,
           refName = item.name,

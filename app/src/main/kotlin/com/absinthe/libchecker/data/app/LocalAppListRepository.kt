@@ -13,6 +13,10 @@ object LocalAppListRepository : AppListRepository {
     return Repositories.lcRepository.getLCItems()
   }
 
+  override suspend fun getItem(packageName: String): LCItem? {
+    return Repositories.lcRepository.getItem(packageName)
+  }
+
   override fun clearItems() {
     Repositories.lcRepository.deleteAllItems()
   }

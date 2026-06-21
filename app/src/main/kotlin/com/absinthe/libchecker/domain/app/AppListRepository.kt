@@ -9,6 +9,8 @@ interface AppListRepository {
 
   suspend fun getItems(): List<LCItem>
 
+  suspend fun getItem(packageName: String): LCItem?
+
   fun clearItems()
 
   suspend fun insertItem(item: LCItem)

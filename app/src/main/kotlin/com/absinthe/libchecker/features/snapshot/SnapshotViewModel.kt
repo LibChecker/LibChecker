@@ -9,9 +9,11 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.database.LCRepository
+import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.SnapshotDiffStoringItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
+import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotDetailItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotListsUseCase
@@ -47,6 +49,7 @@ const val CURRENT_SNAPSHOT = -1L
 
 class SnapshotViewModel(
   private val repository: LCRepository,
+  private val appListRepository: AppListRepository,
   private val snapshotItemFactory: SnapshotItemFactory,
   private val compareSnapshotItems: CompareSnapshotItemsUseCase,
   private val compareSnapshotLists: CompareSnapshotListsUseCase,
@@ -300,6 +303,10 @@ class SnapshotViewModel(
 
   suspend fun getSnapshots(timestamp: Long, packageName: String? = null): List<SnapshotItem> {
     return snapshotLibrary.getSnapshots(timestamp, packageName)
+  }
+
+  suspend fun getAppListItem(packageName: String): LCItem? {
+    return appListRepository.getItem(packageName)
   }
 
   suspend fun getTimeStampSystemProps(timestamp: Long): String? {
