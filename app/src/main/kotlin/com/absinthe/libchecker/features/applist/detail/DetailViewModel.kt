@@ -6,19 +6,14 @@ import android.util.SparseArray
 import androidx.core.util.forEach
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.LibType
-import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.annotation.STATIC
-import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.LibDetailBean
-import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
-import com.absinthe.libchecker.api.request.LibDetailRequest
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.RulesRepository
@@ -44,6 +39,7 @@ import com.absinthe.libchecker.domain.app.GetAppDetailSignatureChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppManifestPropertiesUseCase
 import com.absinthe.libchecker.domain.app.GetArchivePackageInfoUseCase
 import com.absinthe.libchecker.domain.app.GetInstalledAppComparisonPackageUseCase
+import com.absinthe.libchecker.domain.app.GetLibraryDetailUseCase
 import com.absinthe.libchecker.domain.app.HasInstalledStaticLibrariesUseCase
 import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.domain.snapshot.BuildPackageComparisonSnapshotItemUseCase
@@ -55,7 +51,6 @@ import com.absinthe.libchecker.features.statistics.bean.DISABLED
 import com.absinthe.libchecker.features.statistics.bean.EXPORTED
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
-import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
@@ -63,8 +58,6 @@ import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.rulesbundle.Rule
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -76,7 +69,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ohos.bundle.AbilityInfo
 import ohos.bundle.IBundleManager
-import retrofit2.HttpException
 import timber.log.Timber
 
 class DetailViewModel(
@@ -96,6 +88,7 @@ class DetailViewModel(
   private val getArchivePackageInfoUseCase: GetArchivePackageInfoUseCase,
   private val getInstalledAppComparisonPackageUseCase: GetInstalledAppComparisonPackageUseCase,
   private val hasInstalledStaticLibrariesUseCase: HasInstalledStaticLibrariesUseCase,
+  private val getLibraryDetailUseCase: GetLibraryDetailUseCase,
   private val buildPackageComparisonSnapshotItemUseCase: BuildPackageComparisonSnapshotItemUseCase
 ) : ViewModel() {
   private var allNativeLibItems: Map<String, List<LibStringItem>> = emptyMap()
@@ -394,40 +387,11 @@ class DetailViewModel(
     componentsMap[PROVIDER]?.emit(components.providers)
   }
 
-  private val request: LibDetailRequest = ApiManager.create()
-
   suspend fun requestLibDetail(
     libName: String,
     @LibType type: Int,
     isRegex: Boolean = false
-  ): LibDetailBean? {
-    var categoryDir = when (type) {
-      NATIVE -> "native-libs"
-      SERVICE -> "services-libs"
-      ACTIVITY -> "activities-libs"
-      RECEIVER -> "receivers-libs"
-      PROVIDER -> "providers-libs"
-      DEX -> "dex-libs"
-      STATIC -> "static-libs"
-      ACTION -> "actions-libs"
-      else -> throw IllegalArgumentException("Illegal LibType: $type.")
-    }
-    if (isRegex) {
-      categoryDir += "/regex"
-    }
-    val libPath = if (type in listOf(SERVICE, ACTIVITY, RECEIVER, PROVIDER, STATIC)) {
-      libName.replace(".", "/")
-    } else {
-      libName
-    }
-    Timber.d("requestLibDetail: categoryDir = $categoryDir, libPath = $libPath")
-
-    return runCatching {
-      request.requestLibDetail(categoryDir, libPath)
-    }.onFailure {
-      Timber.w(it, "Failed to request lib detail: $categoryDir/$libPath")
-    }.getOrNull()
-  }
+  ): LibDetailBean? = getLibraryDetailUseCase(libName, type, isRegex)
 
   private suspend fun getStaticChipList(): List<LibStringItemChip> {
     Timber.d("getStaticChipList")
@@ -561,17 +525,7 @@ class DetailViewModel(
   }
 
   suspend fun getRepoUpdatedTime(owner: String, repo: String): String? {
-    val request: CloudRuleBundleRequest = ApiManager.create()
-    val result = runCatching {
-      request.requestRepoInfo(owner, repo) ?: return null
-    }.onFailure {
-      if (it is HttpException) {
-        GlobalValues.isGitHubReachable = false
-      }
-    }.getOrNull() ?: return null
-    val pushedAt = DateUtils.parseIso8601DateTime(result.pushedAt) ?: return null
-    val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-    return formatter.format(pushedAt)
+    return getLibraryDetailUseCase.getRepoUpdatedTime(owner, repo)
   }
 
   fun emitFeature(feature: VersionedFeature) = viewModelScope.launch {

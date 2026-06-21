@@ -4,6 +4,7 @@ import com.absinthe.libchecker.data.app.AndroidAppListExportMetadata
 import com.absinthe.libchecker.data.app.AndroidAppListItemFactory
 import com.absinthe.libchecker.data.app.LocalAppListRepository
 import com.absinthe.libchecker.data.app.LocalInstalledAppRepository
+import com.absinthe.libchecker.data.app.RemoteLibraryDetailRepository
 import com.absinthe.libchecker.data.snapshot.AndroidSnapshotItemFactory
 import com.absinthe.libchecker.data.snapshot.LocalSnapshotRepository
 import com.absinthe.libchecker.data.snapshot.ProtoSnapshotArchiveCodec
@@ -30,9 +31,11 @@ import com.absinthe.libchecker.domain.app.GetAppListPackageStatesUseCase
 import com.absinthe.libchecker.domain.app.GetAppManifestPropertiesUseCase
 import com.absinthe.libchecker.domain.app.GetArchivePackageInfoUseCase
 import com.absinthe.libchecker.domain.app.GetInstalledAppComparisonPackageUseCase
+import com.absinthe.libchecker.domain.app.GetLibraryDetailUseCase
 import com.absinthe.libchecker.domain.app.HasInstalledStaticLibrariesUseCase
 import com.absinthe.libchecker.domain.app.InitializeAppListUseCase
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.LibraryDetailRepository
 import com.absinthe.libchecker.domain.app.SyncAppListChangesUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildPackageComparisonSnapshotItemUseCase
@@ -65,6 +68,7 @@ val appModule = module {
   single<LCRepository> { Repositories.lcRepository }
   single<InstalledAppRepository> { LocalInstalledAppRepository }
   single<AppListRepository> { LocalAppListRepository }
+  single<LibraryDetailRepository> { RemoteLibraryDetailRepository }
   single<AppListItemFactory> { AndroidAppListItemFactory(androidContext()) }
   single<AppListExportMetadata> { AndroidAppListExportMetadata(androidContext()) }
   single<SnapshotItemFactory> { AndroidSnapshotItemFactory() }
@@ -91,6 +95,7 @@ val appModule = module {
   factory { GetAppManifestPropertiesUseCase() }
   factory { GetArchivePackageInfoUseCase() }
   factory { GetInstalledAppComparisonPackageUseCase(get()) }
+  factory { GetLibraryDetailUseCase(get()) }
   factory { HasInstalledStaticLibrariesUseCase(get()) }
   factory { BuildArchiveSnapshotItemUseCase(androidContext()) }
   factory { BuildPackageComparisonSnapshotItemUseCase(androidContext().packageManager) }
@@ -107,7 +112,7 @@ val appModule = module {
   factory { SnapshotLibraryUseCase(get()) }
 
   viewModel { ChartViewModel(get()) }
-  viewModel { DetailViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+  viewModel { DetailViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
   viewModel { HomeViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
   viewModel { LibReferenceViewModel(get()) }
   viewModel { SnapshotViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
