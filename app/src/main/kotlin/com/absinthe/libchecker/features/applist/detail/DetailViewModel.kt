@@ -38,9 +38,11 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppBundleSplitItem
 import com.absinthe.libchecker.domain.app.AppDetailPackageSize
 import com.absinthe.libchecker.domain.app.AppListRepository
+import com.absinthe.libchecker.domain.app.AppManifestProperty
 import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageSizeUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageUseCase
+import com.absinthe.libchecker.domain.app.GetAppManifestPropertiesUseCase
 import com.absinthe.libchecker.features.applist.LocatedCount
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.features.applist.detail.bean.AppIconItem
@@ -104,7 +106,8 @@ class DetailViewModel(
   private val appListRepository: AppListRepository,
   private val getAppDetailPackage: GetAppDetailPackageUseCase,
   private val getAppBundleItemsUseCase: GetAppBundleItemsUseCase,
-  private val getAppDetailPackageSizeUseCase: GetAppDetailPackageSizeUseCase
+  private val getAppDetailPackageSizeUseCase: GetAppDetailPackageSizeUseCase,
+  private val getAppManifestPropertiesUseCase: GetAppManifestPropertiesUseCase
 ) : ViewModel() {
   private var allNativeLibItems: Map<String, List<LibStringItem>> = emptyMap()
   val nativeLibTabs: MutableStateFlow<Collection<String>?> = MutableStateFlow(null)
@@ -170,6 +173,15 @@ class DetailViewModel(
   suspend fun getAppBundleItems(packageInfo: PackageInfo): List<AppBundleSplitItem> {
     return withContext(Dispatchers.IO) {
       getAppBundleItemsUseCase(packageInfo)
+    }
+  }
+
+  suspend fun getAppManifestProperties(
+    packageInfo: PackageInfo?,
+    properties: Map<String, String>?
+  ): List<AppManifestProperty> {
+    return withContext(Dispatchers.IO) {
+      getAppManifestPropertiesUseCase(packageInfo, properties)
     }
   }
 
