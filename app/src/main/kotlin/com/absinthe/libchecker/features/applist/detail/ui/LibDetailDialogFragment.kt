@@ -2,7 +2,6 @@ package com.absinthe.libchecker.features.applist.detail.ui
 
 import android.content.DialogInterface
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.absinthe.libchecker.R
@@ -23,6 +22,7 @@ import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import timber.log.Timber
 
 const val EXTRA_LIB_NAME = "EXTRA_LIB_NAME"
@@ -36,7 +36,7 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
   private val type by lazy { arguments?.getInt(EXTRA_LIB_TYPE) ?: NATIVE }
   private val regexName by lazy { arguments?.getString(EXTRA_REGEX_NAME) }
   private val isValidLib by lazy { arguments?.getBoolean(EXTRA_IS_VALID_LIB) != false }
-  private val viewModel: DetailViewModel by activityViewModels()
+  private val viewModel: DetailViewModel by activityViewModel()
   private var isStickyEventReceived = false
 
   override fun initRootView(): LibDetailBottomSheetView = LibDetailBottomSheetView(requireContext())

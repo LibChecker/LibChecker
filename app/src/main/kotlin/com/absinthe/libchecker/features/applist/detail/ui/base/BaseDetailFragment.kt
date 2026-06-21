@@ -10,7 +10,6 @@ import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -69,6 +68,7 @@ import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import rikka.core.util.ClipboardUtils
 import timber.log.Timber
 
@@ -85,7 +85,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   BaseFragment<T>(),
   Sortable {
 
-  protected val viewModel: DetailViewModel by activityViewModels()
+  protected val viewModel: DetailViewModel by activityViewModel()
   protected val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME).orEmpty() }
   protected val type by lazy { arguments?.getInt(EXTRA_TYPE) ?: NATIVE }
   protected val adapter by lazy { LibStringAdapter(packageName, type, childFragmentManager) }

@@ -17,6 +17,10 @@ object LocalAppListRepository : AppListRepository {
     return Repositories.lcRepository.getItem(packageName)
   }
 
+  override suspend fun getUninitializedFeaturePackageNames(): List<String> {
+    return Repositories.lcRepository.getUninitializedFeaturePackageNames()
+  }
+
   override fun clearItems() {
     Repositories.lcRepository.deleteAllItems()
   }
@@ -31,6 +35,14 @@ object LocalAppListRepository : AppListRepository {
 
   override suspend fun updateItem(item: LCItem) {
     Repositories.lcRepository.update(item)
+  }
+
+  override fun updateFeatures(packageName: String, features: Int) {
+    Repositories.lcRepository.updateFeatures(packageName, features)
+  }
+
+  override fun updateFeatures(featuresMap: Map<String, Int>) {
+    Repositories.lcRepository.updateFeatures(featuresMap)
   }
 
   override fun deleteItemByPackageName(packageName: String) {

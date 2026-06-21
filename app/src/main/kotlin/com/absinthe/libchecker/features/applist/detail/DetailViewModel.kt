@@ -32,9 +32,9 @@ import com.absinthe.libchecker.constant.Constants.NO_LIBS
 import com.absinthe.libchecker.constant.Constants.OVERLAY
 import com.absinthe.libchecker.constant.GlobalFeatures
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.database.entity.Features
+import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.features.applist.LocatedCount
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.features.applist.detail.bean.AppIconItem
@@ -94,7 +94,9 @@ private const val NATIVE_ACTIVITY_LABEL = "NativeActivity"
 private const val ZYGOTE_PRELOAD_NATIVE_LIB_PROPERTY = "zygotePreloadNativeLib"
 private const val ZYGOTE_PRELOAD_NATIVE_LIB_LABEL = "PRELOAD"
 
-class DetailViewModel : ViewModel() {
+class DetailViewModel(
+  private val appListRepository: AppListRepository
+) : ViewModel() {
   private var allNativeLibItems: Map<String, List<LibStringItem>> = emptyMap()
   val nativeLibTabs: MutableStateFlow<Collection<String>?> = MutableStateFlow(null)
   val nativeLibItems: MutableStateFlow<List<LibStringItemChip>?> = MutableStateFlow(null)
@@ -829,7 +831,7 @@ class DetailViewModel : ViewModel() {
     var feat = features
     if (feat == -1) {
       feat = packageInfo.getFeatures()
-      Repositories.lcRepository.updateFeatures(packageInfo.packageName, feat)
+      appListRepository.updateFeatures(packageInfo.packageName, feat)
     }
 
     if ((feat and Features.SPLIT_APKS) > 0) {

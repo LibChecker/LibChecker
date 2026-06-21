@@ -8,7 +8,7 @@ import android.os.RemoteException
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.data.app.LocalAppDataSource
-import com.absinthe.libchecker.database.Repositories
+import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getFeatures
 import java.lang.ref.WeakReference
@@ -17,10 +17,12 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 import timber.log.Timber
 
 class WorkerService : LifecycleService() {
 
+  private val appListRepository: AppListRepository by inject()
   private val listenerList = RemoteCallbackList<OnWorkerListener>()
   private val binder by lazy { WorkerBinder(this) }
   private var initFeaturesJob: Job? = null
@@ -90,14 +92,14 @@ class WorkerService : LifecycleService() {
   }
 
   private suspend fun initPendingFeatures() {
-    val pendingPackages = Repositories.lcRepository.getUninitializedFeaturePackageNames()
+    val pendingPackages = appListRepository.getUninitializedFeaturePackageNames()
     val featuresMap = HashMap<String, Int>(FEATURE_UPDATE_BATCH_SIZE)
 
     fun flushFeatures() {
       if (featuresMap.isEmpty()) {
         return
       }
-      Repositories.lcRepository.updateFeatures(featuresMap)
+      appListRepository.updateFeatures(featuresMap)
       featuresMap.clear()
     }
 

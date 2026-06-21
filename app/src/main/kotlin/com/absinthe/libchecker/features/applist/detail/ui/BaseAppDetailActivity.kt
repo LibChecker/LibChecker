@@ -14,7 +14,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
@@ -115,6 +114,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.appiconloader.AppIconLoader
 import ohos.bundle.IBundleManager
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 abstract class BaseAppDetailActivity :
@@ -123,7 +123,7 @@ abstract class BaseAppDetailActivity :
   SearchView.OnQueryTextListener,
   MenuProvider {
 
-  protected val viewModel: DetailViewModel by viewModels()
+  protected val viewModel: DetailViewModel by viewModel()
   protected var typeList = mutableListOf<Int>()
 
   override var detailFragmentManager: DetailFragmentManager = DetailFragmentManager()
