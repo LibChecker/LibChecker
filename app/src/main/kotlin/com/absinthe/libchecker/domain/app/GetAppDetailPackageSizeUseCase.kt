@@ -2,10 +2,11 @@ package com.absinthe.libchecker.domain.app
 
 import android.content.pm.PackageInfo
 import com.absinthe.libchecker.utils.FileUtils
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
 
-class GetAppDetailPackageSizeUseCase {
+class GetAppDetailPackageSizeUseCase(
+  private val getAppBundleItems: GetAppBundleItemsUseCase
+) {
 
   operator fun invoke(
     packageInfo: PackageInfo,
@@ -17,9 +18,7 @@ class GetAppDetailPackageSizeUseCase {
     val splitSizes = if (isApkPreview) {
       emptyList()
     } else {
-      PackageUtils.getSplitsSourceDir(packageInfo)
-        ?.map { FileUtils.getFileSize(it) }
-        .orEmpty()
+      getAppBundleItems(packageInfo).map { it.size }
     }
 
     return AppDetailPackageSize(baseSize, splitSizes)

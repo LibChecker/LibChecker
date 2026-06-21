@@ -35,8 +35,10 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.app.AppBundleSplitItem
 import com.absinthe.libchecker.domain.app.AppDetailPackageSize
 import com.absinthe.libchecker.domain.app.AppListRepository
+import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageSizeUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageUseCase
 import com.absinthe.libchecker.features.applist.LocatedCount
@@ -101,6 +103,7 @@ private const val ZYGOTE_PRELOAD_NATIVE_LIB_LABEL = "PRELOAD"
 class DetailViewModel(
   private val appListRepository: AppListRepository,
   private val getAppDetailPackage: GetAppDetailPackageUseCase,
+  private val getAppBundleItemsUseCase: GetAppBundleItemsUseCase,
   private val getAppDetailPackageSizeUseCase: GetAppDetailPackageSizeUseCase
 ) : ViewModel() {
   private var allNativeLibItems: Map<String, List<LibStringItem>> = emptyMap()
@@ -162,6 +165,12 @@ class DetailViewModel(
 
   fun getAppDetailPackageSize(packageInfo: PackageInfo): AppDetailPackageSize {
     return getAppDetailPackageSizeUseCase(packageInfo, apkPreviewInfo, isApkPreview)
+  }
+
+  suspend fun getAppBundleItems(packageInfo: PackageInfo): List<AppBundleSplitItem> {
+    return withContext(Dispatchers.IO) {
+      getAppBundleItemsUseCase(packageInfo)
+    }
   }
 
   fun reset() {

@@ -2,20 +2,21 @@ package com.absinthe.libchecker.features.applist.detail.ui
 
 import android.content.pm.PackageInfo
 import androidx.core.os.BundleCompat
+import androidx.lifecycle.lifecycleScope
+import com.absinthe.libchecker.domain.app.AppBundleSplitKind
+import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.bean.AppBundleItem
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppBundleBottomSheetView
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppBundleItemView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
-import com.absinthe.libchecker.utils.FileUtils
-import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.extensions.STRING_ABI_MAP
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
-import java.io.File
-import java.util.Locale
+import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 class AppBundleBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppBundleBottomSheetView>() {
 
   private val packageInfo by lazy { BundleCompat.getParcelable(requireArguments(), EXTRA_PACKAGE_INFO, PackageInfo::class.java) }
+  private val viewModel: DetailViewModel by activityViewModel()
 
   override fun initRootView(): AppBundleBottomSheetView = AppBundleBottomSheetView(requireContext())
 
@@ -23,25 +24,26 @@ class AppBundleBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<App
 
   override fun init() {
     maxPeekHeightPercentage = 0.67f
-    packageInfo?.let {
-      val list = PackageUtils.getSplitsSourceDir(it)
-      val localeList by lazy { Locale.getISOLanguages() }
-      val bundleList = if (list.isNullOrEmpty()) {
-        emptyList()
-      } else {
-        list.map { split ->
-          val name = split.substringAfterLast(File.separator)
-          val middleName = name.removeSurrounding("split_config.", ".apk")
-          val type = when {
-            STRING_ABI_MAP.keys.any { arch -> middleName.contains(arch) } -> AppBundleItemView.IconType.TYPE_NATIVE_LIBS
-            middleName.endsWith("dpi") -> AppBundleItemView.IconType.TYPE_MATERIALS
-            localeList.contains(middleName) -> AppBundleItemView.IconType.TYPE_STRINGS
-            else -> AppBundleItemView.IconType.TYPE_OTHERS
-          }
-          AppBundleItem(name = name, size = FileUtils.getFileSize(split), type = type)
+    packageInfo?.let { pi ->
+      lifecycleScope.launch {
+        val bundleList = viewModel.getAppBundleItems(pi).map { split ->
+          AppBundleItem(
+            name = split.name,
+            size = split.size,
+            type = split.kind.toIconType()
+          )
         }
+        root.adapter.setList(bundleList)
       }
-      root.adapter.setList(bundleList)
+    }
+  }
+
+  private fun AppBundleSplitKind.toIconType(): Int {
+    return when (this) {
+      AppBundleSplitKind.NativeLibs -> AppBundleItemView.IconType.TYPE_NATIVE_LIBS
+      AppBundleSplitKind.Materials -> AppBundleItemView.IconType.TYPE_MATERIALS
+      AppBundleSplitKind.Strings -> AppBundleItemView.IconType.TYPE_STRINGS
+      AppBundleSplitKind.Others -> AppBundleItemView.IconType.TYPE_OTHERS
     }
   }
 }
