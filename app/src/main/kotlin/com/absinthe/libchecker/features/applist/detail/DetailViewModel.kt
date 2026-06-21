@@ -26,11 +26,6 @@ import com.absinthe.libchecker.api.request.LibDetailRequest
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.constant.AbilityType
-import com.absinthe.libchecker.constant.Constants.ERROR
-import com.absinthe.libchecker.constant.Constants.MULTI_ARCH
-import com.absinthe.libchecker.constant.Constants.NO_LIBS
-import com.absinthe.libchecker.constant.Constants.OVERLAY
-import com.absinthe.libchecker.constant.GlobalFeatures
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.database.entity.Features
@@ -42,6 +37,7 @@ import com.absinthe.libchecker.domain.app.AppManifestProperty
 import com.absinthe.libchecker.domain.app.GetApkPreviewInfoUseCase
 import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailComponentsUseCase
+import com.absinthe.libchecker.domain.app.GetAppDetailNativeLibrariesUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageSizeUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageUseCase
 import com.absinthe.libchecker.domain.app.GetAppManifestPropertiesUseCase
@@ -64,7 +60,6 @@ import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
-import com.absinthe.libchecker.utils.extensions.ABI_STRING_MAP
 import com.absinthe.libchecker.utils.extensions.getAGPVersion
 import com.absinthe.libchecker.utils.extensions.getFeatures
 import com.absinthe.libchecker.utils.extensions.getJetpackComposeVersion
@@ -74,7 +69,6 @@ import com.absinthe.libchecker.utils.extensions.getRxJavaVersion
 import com.absinthe.libchecker.utils.extensions.getRxKotlinVersion
 import com.absinthe.libchecker.utils.extensions.getSignatures
 import com.absinthe.libchecker.utils.extensions.getStatefulPermissionsList
-import com.absinthe.libchecker.utils.extensions.is16KBAligned
 import com.absinthe.libchecker.utils.extensions.isPWA
 import com.absinthe.libchecker.utils.extensions.isPageSizeCompat
 import com.absinthe.libchecker.utils.extensions.isPlayAppSigning
@@ -83,7 +77,6 @@ import com.absinthe.libchecker.utils.extensions.isXposedModule
 import com.absinthe.libchecker.utils.extensions.maybeResourceId
 import com.absinthe.libchecker.utils.extensions.toClassDefType
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
-import com.absinthe.libchecker.utils.manifest.ApplicationReader
 import com.absinthe.rulesbundle.Rule
 import java.io.File
 import java.text.SimpleDateFormat
@@ -102,17 +95,12 @@ import ohos.bundle.IBundleManager
 import retrofit2.HttpException
 import timber.log.Timber
 
-private const val NATIVE_ACTIVITY_CLASS_NAME = "android.app.NativeActivity"
-private const val NATIVE_ACTIVITY_LIB_NAME_METADATA = "android.app.lib_name"
-private const val NATIVE_ACTIVITY_LABEL = "NativeActivity"
-private const val ZYGOTE_PRELOAD_NATIVE_LIB_PROPERTY = "zygotePreloadNativeLib"
-private const val ZYGOTE_PRELOAD_NATIVE_LIB_LABEL = "PRELOAD"
-
 class DetailViewModel(
   private val appListRepository: AppListRepository,
   private val getAppDetailPackage: GetAppDetailPackageUseCase,
   private val getAppBundleItemsUseCase: GetAppBundleItemsUseCase,
   private val getAppDetailComponentsUseCase: GetAppDetailComponentsUseCase,
+  private val getAppDetailNativeLibrariesUseCase: GetAppDetailNativeLibrariesUseCase,
   private val getAppDetailPackageSizeUseCase: GetAppDetailPackageSizeUseCase,
   private val getApkPreviewInfoUseCase: GetApkPreviewInfoUseCase,
   private val getAppManifestPropertiesUseCase: GetAppManifestPropertiesUseCase,
@@ -271,42 +259,23 @@ class DetailViewModel(
       return
     }
     initSoAnalysisJob = viewModelScope.launch(Dispatchers.IO) {
-      val sourceSet = hashSetOf<String>()
-
       val abi = (abiBundleStateFlow.value ?: abiBundleStateFlow.filterNotNull().first()).abi
-      val specifiedAbi = if (abi == ERROR || abi == NO_LIBS || abi == OVERLAY) abi else null
-      val parseElf = GlobalFeatures.ENABLE_DETECTING_16KB_PAGE_ALIGNMENT && !isApkPreview
-      allNativeLibItems = if (!isApkPreview && apkPreviewInfo == null) {
-        PackageUtils.getSourceLibs(packageInfo, specifiedAbi = specifiedAbi, parseElf = parseElf)
-      } else {
-        apkPreviewInfo!!.nativeLibs.map {
-          ABI_STRING_MAP[it.key]!! to it.value.map { value ->
-            LibStringItem(
-              name = value.first,
-              size = value.second.toLong()
-            )
-          }
-        }.toMap()
-      }
-
-      // TODO
-      val sourceMap = sourceSet.filter { source -> source.isNotEmpty() }
-        .associateWith { UiUtils.getRandomColor() }
-      nativeSourceMap = sourceMap
-
-      if (sourceMap.isNotEmpty()) {
-        processMapStateFlow.emit(sourceMap)
-      }
+      val nativeLibraries = getAppDetailNativeLibrariesUseCase(
+        packageInfo = packageInfo,
+        apkPreviewInfo = apkPreviewInfo,
+        isApk = isApk,
+        isApkPreview = isApkPreview,
+        abi = abi
+      )
+      allNativeLibItems = nativeLibraries.itemsByAbi
 
       nativeLibTabs.emit(allNativeLibItems.keys)
       if (allNativeLibItems.isEmpty()) {
         nativeLibItems.emit(emptyList())
       }
 
-      allNativeLibItems[ABI_STRING_MAP[abi % MULTI_ARCH]]?.let {
-        if (!isApkPreview && packageInfo.is16KBAligned(libs = it, isApk = isApk)) {
-          _featuresFlow.emit(VersionedFeature(Features.Ext.ELF_PAGE_SIZE_16KB))
-        }
+      if (nativeLibraries.selectedAbiSupports16KbPageSize) {
+        _featuresFlow.emit(VersionedFeature(Features.Ext.ELF_PAGE_SIZE_16KB))
       }
     }
   }
@@ -314,7 +283,15 @@ class DetailViewModel(
   fun loadSoAnalysisData(tab: String) {
     allNativeLibItems[tab]?.let {
       viewModelScope.launch(Dispatchers.IO) {
-        nativeLibItems.emit(getNativeChipList(it))
+        nativeLibItems.emit(
+          getAppDetailNativeLibrariesUseCase.buildChipList(
+            packageInfo = packageInfo,
+            apkPreviewInfo = apkPreviewInfo,
+            isApkPreview = isApkPreview,
+            items = it,
+            sortBySize = GlobalValues.libSortMode == MODE_SORT_BY_SIZE
+          )
+        )
       }
     }
   }
@@ -539,92 +516,6 @@ class DetailViewModel(
     }.onFailure {
       Timber.w(it, "Failed to request lib detail: $categoryDir/$libPath")
     }.getOrNull()
-  }
-
-  private suspend fun getNativeChipList(list: List<LibStringItem>): List<LibStringItemChip> {
-    val chipList = mutableListOf<LibStringItemChip>()
-    var rule: Rule?
-
-    if (list.isEmpty()) {
-      return chipList
-    } else {
-      val packageName = apkPreviewInfo?.packageName ?: packageInfo.packageName
-      val nativeActivityLibNames = getNativeActivityLibNames()
-      val preloadNativeLibNames = getZygotePreloadNativeLibNames()
-      val nativeLibNames = list.map { it.name }
-      list.forEach {
-        rule = RulesRepository.getRuleWithRegex(it.name, NATIVE, packageName, nativeLibNames)
-        val labels = mutableListOf<String>().apply {
-          if (it.name in nativeActivityLibNames) {
-            add(NATIVE_ACTIVITY_LABEL)
-          }
-          if (it.name in preloadNativeLibNames) {
-            add(ZYGOTE_PRELOAD_NATIVE_LIB_LABEL)
-          }
-        }
-        chipList.add(LibStringItemChip(it, rule, labels))
-      }
-      if (GlobalValues.libSortMode == MODE_SORT_BY_SIZE) {
-        chipList.sortByDescending { it.item.size }
-      } else {
-        chipList.sortWith(compareByDescending<LibStringItemChip> { it.rule != null }.thenByDescending { it.item.size })
-      }
-    }
-    return chipList
-  }
-
-  private fun getNativeActivityLibNames(): Set<String> {
-    if (isApkPreview) {
-      return emptySet()
-    }
-    val activityPackageInfo = if (packageInfo.activities != null) {
-      packageInfo
-    } else {
-      runCatching {
-        PackageUtils.getPackageInfo(
-          packageInfo.packageName,
-          PackageManager.GET_ACTIVITIES or PackageManager.GET_META_DATA,
-          false
-        )
-      }.getOrNull()
-    } ?: return emptySet()
-
-    return activityPackageInfo.activities.orEmpty()
-      .asSequence()
-      .filter { it.name == NATIVE_ACTIVITY_CLASS_NAME }
-      .mapNotNull { it.metaData?.getString(NATIVE_ACTIVITY_LIB_NAME_METADATA) }
-      .filter { it.isNotBlank() }
-      .map { it.toNativeLibFileName() }
-      .toSet()
-  }
-
-  private fun String.toNativeLibFileName(): String {
-    val normalizedName = trim()
-      .substringAfterLast('/')
-      .removePrefix("lib")
-      .removeSuffix(".so")
-    return "lib$normalizedName.so"
-  }
-
-  private fun getZygotePreloadNativeLibNames(): Set<String> {
-    if (!OsUtils.atLeastCinnamonBun()) {
-      return emptySet()
-    }
-
-    val preloadNativeLib = apkPreviewInfo?.appProps?.get(ZYGOTE_PRELOAD_NATIVE_LIB_PROPERTY)
-      ?: packageInfo.applicationInfo?.sourceDir?.let { sourceDir ->
-        runCatching {
-          ApplicationReader.getManifestProperties(File(sourceDir))[ZYGOTE_PRELOAD_NATIVE_LIB_PROPERTY]?.toString()
-        }.onFailure {
-          Timber.e(it)
-        }.getOrNull()
-      }
-      ?: return emptySet()
-
-    return preloadNativeLib
-      .takeIf { it.isNotBlank() }
-      ?.let { setOf(it.toNativeLibFileName()) }
-      ?: emptySet()
   }
 
   private suspend fun getStaticChipList(): List<LibStringItemChip> {
