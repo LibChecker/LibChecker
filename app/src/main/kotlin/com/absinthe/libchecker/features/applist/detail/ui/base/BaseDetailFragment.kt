@@ -29,7 +29,6 @@ import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.compat.ZipFileCompat
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.features.applist.DetailFragmentManager
-import com.absinthe.libchecker.features.applist.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.features.applist.Referable
 import com.absinthe.libchecker.features.applist.Sortable
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
@@ -197,37 +196,16 @@ abstract class BaseDetailFragment<T : ViewBinding> :
         null
       }
 
-    if (GlobalValues.libSortMode == MODE_SORT_BY_LIB) {
-      if (type == NATIVE) {
-        list.sortByDescending { it.item.size }
-      } else {
-        list.sortByDescending { it.item.name }
-      }
-    } else {
-      list.sortWith(compareByDescending<LibStringItemChip> { it.rule != null }.thenBy { it.item.name })
-    }
+    val sortedList = viewModel.sortDetailItems(list, type)
 
     if (itemChip != null) {
-      val newHighlightPosition = list.indexOf(itemChip)
+      val newHighlightPosition = sortedList.indexOf(itemChip)
       adapter.setHighlightBackgroundItem(newHighlightPosition)
     }
 
     withContext(Dispatchers.Main) {
-      adapter.setDiffNewData(list)
+      adapter.setDiffNewData(sortedList.toMutableList())
     }
-  }
-
-  private fun sortedList(origin: MutableList<LibStringItemChip>): MutableList<LibStringItemChip> {
-    if (GlobalValues.libSortMode == MODE_SORT_BY_LIB) {
-      if (type == NATIVE) {
-        origin.sortByDescending { it.item.size }
-      } else {
-        origin.sortByDescending { it.item.name }
-      }
-    } else {
-      origin.sortWith(compareByDescending<LibStringItemChip> { it.rule != null }.thenBy { it.item.name })
-    }
-    return origin
   }
 
   protected open fun filterItems(
@@ -269,7 +247,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
 
   private suspend fun updateItemsWithFilterResult(items: List<LibStringItemChip>?) {
     items?.let {
-      val sortedList = sortedList(it.toMutableList())
+      val sortedList = viewModel.sortDetailItems(it, type)
       withContext(Dispatchers.Main) {
         if (isDetached || !isBindingInitialized()) return@withContext
         if (sortedList.isEmpty()) {
@@ -282,7 +260,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
             getRecyclerView().addItemDecoration(dividerItemDecoration)
           }
         }
-        adapter.setDiffNewData(sortedList) {
+        adapter.setDiffNewData(sortedList.toMutableList()) {
           afterListReadyTask?.run()
           viewModel.updateItemsCountStateFlow(type, sortedList.size)
         }

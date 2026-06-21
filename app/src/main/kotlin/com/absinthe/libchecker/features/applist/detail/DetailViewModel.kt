@@ -41,10 +41,12 @@ import com.absinthe.libchecker.domain.app.GetArchivePackageInfoUseCase
 import com.absinthe.libchecker.domain.app.GetInstalledAppComparisonPackageUseCase
 import com.absinthe.libchecker.domain.app.GetLibraryDetailUseCase
 import com.absinthe.libchecker.domain.app.HasInstalledStaticLibrariesUseCase
+import com.absinthe.libchecker.domain.app.SortAppDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.domain.snapshot.BuildPackageComparisonSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.features.applist.LocatedCount
+import com.absinthe.libchecker.features.applist.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.features.applist.detail.bean.StatefulComponent
 import com.absinthe.libchecker.features.statistics.bean.DISABLED
@@ -89,6 +91,7 @@ class DetailViewModel(
   private val getInstalledAppComparisonPackageUseCase: GetInstalledAppComparisonPackageUseCase,
   private val hasInstalledStaticLibrariesUseCase: HasInstalledStaticLibrariesUseCase,
   private val getLibraryDetailUseCase: GetLibraryDetailUseCase,
+  private val sortAppDetailItemsUseCase: SortAppDetailItemsUseCase,
   private val buildPackageComparisonSnapshotItemUseCase: BuildPackageComparisonSnapshotItemUseCase
 ) : ViewModel() {
   private var allNativeLibItems: Map<String, List<LibStringItem>> = emptyMap()
@@ -552,5 +555,9 @@ class DetailViewModel(
   fun updateItemsCountStateFlow(locate: Int, count: Int) = viewModelScope.launch {
     itemsCountStateFlow.value = LocatedCount(locate, count)
     itemsCountList[locate] = count
+  }
+
+  fun sortDetailItems(items: List<LibStringItemChip>, @LibType type: Int): List<LibStringItemChip> {
+    return sortAppDetailItemsUseCase(items, type, GlobalValues.libSortMode == MODE_SORT_BY_LIB)
   }
 }
