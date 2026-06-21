@@ -7,6 +7,7 @@ import com.absinthe.libchecker.domain.app.AppListItemFactory
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.InitializeAppListUseCase
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.SyncAppListChangesUseCase
 import com.absinthe.libchecker.features.home.HomeViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
@@ -17,6 +18,7 @@ val appModule = module {
   single<AppListRepository> { LocalAppListRepository }
   single<AppListItemFactory> { AndroidAppListItemFactory(androidContext()) }
   factory { InitializeAppListUseCase(get(), get(), get()) }
+  factory { SyncAppListChangesUseCase(get(), get(), get()) }
 
   viewModel { HomeViewModel(get(), get(), get(), get()) }
 }

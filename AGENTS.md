@@ -50,6 +50,10 @@ Important `:app` boundaries:
 
 - `features/*` owns user-facing feature flows. Add code near the feature that
   owns the behavior.
+- `domain/app/` owns app-list use cases and repository/factory interfaces.
+  Keep package-list synchronization rules here instead of in UI controllers.
+- `data/app/` adapts Android package APIs, Room repositories, and local
+  package-change sources to the `domain/app/` interfaces.
 - `compat/` wraps platform/API-level differences. Check here before adding new
   SDK-version branches.
 - `utils/apk`, `utils/manifest`, `utils/dex`, `utils/elf`, `PackageUtils`,

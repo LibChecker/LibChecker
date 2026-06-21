@@ -36,11 +36,11 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.AppListItemFactory
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.InitializeAppListUseCase
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.PackageChangeState
+import com.absinthe.libchecker.domain.app.SyncAppListChangesUseCase
 import com.absinthe.libchecker.features.statistics.bean.LibReference
 import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.ui.base.IListController
@@ -50,9 +50,7 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
-import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.extensions.requireAvailableCacheDir
-import com.absinthe.libraries.utils.manager.TimeRecorder
 import com.absinthe.rulesbundle.IconResMap
 import java.io.File
 import java.io.OutputStream
@@ -77,8 +75,8 @@ import timber.log.Timber
 class HomeViewModel(
   private val installedAppRepository: InstalledAppRepository,
   private val appListRepository: AppListRepository,
-  private val appListItemFactory: AppListItemFactory,
-  private val initializeAppListUseCase: InitializeAppListUseCase
+  private val initializeAppListUseCase: InitializeAppListUseCase,
+  private val syncAppListChangesUseCase: SyncAppListChangesUseCase
 ) : ViewModel() {
 
   val dbItemsFlow: Flow<List<LCItem>> = appListRepository.items
@@ -110,6 +108,7 @@ class HomeViewModel(
   var currentSearchQuery: String = ""
 
   private val pendingChangedPackages = ArrayDeque<PackageChangeState>()
+  private val pendingChangedPackagesLock = Any()
   private var pendingFeatureInitializationRequest = false
 
   fun reloadApps() {
@@ -227,7 +226,7 @@ class HomeViewModel(
         Timber.d("Request change canceled: STATUS_START_INIT")
         return@launch
       }
-      packageChangeState?.let { pendingChangedPackages.add(it) }
+      packageChangeState?.let(::addPendingChangedPackage)
       val generation = requestChangeGeneration.incrementAndGet()
       requestChangeJob?.cancel()
       requestChangeJob = requestChangeImpl(packageChangeState == null, generation)
@@ -248,92 +247,36 @@ class HomeViewModel(
       return@launch
     }
 
-    Timber.d("Request change: START")
-    val timeRecorder = TimeRecorder()
-
-    timeRecorder.start()
     _isRequestChangeRunning.value = true
     updateAppListStatus(STATUS_START_REQUEST_CHANGE)
 
     try {
-      if (!forceUpdate) {
-        while (pendingChangedPackages.isNotEmpty() && isActive) {
-          val currentState = pendingChangedPackages.removeFirst()
-          val currentPackageName = currentState.packageName
-
-          if (pendingChangedPackages.none { it.packageName == currentPackageName }) {
-            when (currentState) {
-              is PackageChangeState.Added -> {
-                val packageInfo = getChangedPackageInfo(currentPackageName) ?: continue
-                appListRepository.insertItem(appListItemFactory.create(packageInfo, true))
-              }
-
-              is PackageChangeState.Removed -> {
-                appListRepository.deleteItemByPackageName(currentPackageName)
-              }
-
-              is PackageChangeState.Replaced -> {
-                val packageInfo = getChangedPackageInfo(currentPackageName) ?: continue
-                appListRepository.updateItem(appListItemFactory.create(packageInfo, true))
-              }
-            }
-          }
-        }
+      val syncRequest = if (forceUpdate) {
+        SyncAppListChangesUseCase.Request.RefreshAll
       } else {
-        val dbItemMap = dbItems.associateBy { it.packageName }
-        var applications = installedAppRepository.getApplicationMap(true)
+        SyncAppListChangesUseCase.Request.ApplyPackageChanges(snapshotPendingChangedPackages())
+      }
 
-        /*
-         * The application list returned with a probability only contains system applications.
-         * When the difference is greater than a certain threshold, we re-request the list.
-         */
-        if (hasLargeApplicationDiff(applications, dbItemMap)) {
-          Timber.w("Request change canceled because of large diff, re-request appMap")
-          applications = installedAppRepository.getApplicationMap(true)
+      if (syncAppListChangesUseCase(syncRequest, dbItems) == SyncAppListChangesUseCase.Result.Canceled) {
+        return@launch
+      }
+
+      if (requestChangeGeneration.get() == generation) {
+        when (syncRequest) {
+          is SyncAppListChangesUseCase.Request.ApplyPackageChanges -> {
+            removePendingChangedPackages(syncRequest.changes.size)
+          }
+
+          SyncAppListChangesUseCase.Request.RefreshAll -> {
+            clearPendingChangedPackages()
+          }
         }
-
-        applications.values.asSequence()
-          .filter { it.packageName !in dbItemMap }
-          .forEach {
-            if (!isActive) return@launch
-            runCatching {
-              appListRepository.insertItem(appListItemFactory.create(it, true))
-            }.onFailure { e ->
-              Timber.e(e, "requestChange: ${it.packageName}")
-            }
-          }
-
-        dbItemMap.keys.asSequence()
-          .filter { it !in applications }
-          .forEach {
-            if (!isActive) return@launch
-            appListRepository.deleteItemByPackageName(it)
-          }
-
-        applications.values.asSequence()
-          .mapNotNull { packageInfo ->
-            dbItemMap[packageInfo.packageName]?.let { dbItem -> packageInfo to dbItem }
-          }
-          .filter { (packageInfo, dbItem) ->
-            dbItem.versionCode != packageInfo.getVersionCode() ||
-              packageInfo.lastUpdateTime != dbItem.lastUpdatedTime ||
-              dbItem.lastUpdatedTime == 0L
-          }.forEach { (packageInfo, _) ->
-            if (!isActive) return@launch
-            runCatching {
-              appListRepository.updateItem(appListItemFactory.create(packageInfo, true))
-            }.onFailure { e ->
-              Timber.e(e, "requestChange: ${packageInfo.packageName}")
-            }
-          }
       }
 
       refreshList()
 
       updateAppListStatus(STATUS_START_REQUEST_CHANGE_END)
     } finally {
-      timeRecorder.end()
-      Timber.d("Request change: END, $timeRecorder")
       if (requestChangeGeneration.get() == generation) {
         updateAppListStatus(STATUS_NOT_START)
         _isRequestChangeRunning.value = false
@@ -343,16 +286,30 @@ class HomeViewModel(
     }
   }
 
-  private fun hasLargeApplicationDiff(
-    applications: Map<String, PackageInfo>,
-    dbItemMap: Map<String, LCItem>
-  ): Boolean {
-    return applications.keys.count { it !in dbItemMap } > 30 ||
-      dbItemMap.keys.count { it !in applications } > 30
+  private fun addPendingChangedPackage(packageChangeState: PackageChangeState) {
+    synchronized(pendingChangedPackagesLock) {
+      pendingChangedPackages.add(packageChangeState)
+    }
   }
 
-  private fun getChangedPackageInfo(packageName: String): PackageInfo? {
-    return installedAppRepository.getPackageInfo(packageName)
+  private fun snapshotPendingChangedPackages(): List<PackageChangeState> {
+    return synchronized(pendingChangedPackagesLock) {
+      pendingChangedPackages.toList()
+    }
+  }
+
+  private fun removePendingChangedPackages(count: Int) {
+    synchronized(pendingChangedPackagesLock) {
+      repeat(count.coerceAtMost(pendingChangedPackages.size)) {
+        pendingChangedPackages.removeFirst()
+      }
+    }
+  }
+
+  private fun clearPendingChangedPackages() {
+    synchronized(pendingChangedPackagesLock) {
+      pendingChangedPackages.clear()
+    }
   }
 
   private var computeLibReferenceJob: Job? = null
