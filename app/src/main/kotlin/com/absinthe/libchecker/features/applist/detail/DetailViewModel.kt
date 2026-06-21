@@ -10,7 +10,6 @@ import androidx.core.util.forEach
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.annotation.ACTION
-import com.absinthe.libchecker.annotation.ACTION_IN_RULES
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.LibType
@@ -36,7 +35,7 @@ import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.AppManifestProperty
 import com.absinthe.libchecker.domain.app.GetApkPreviewInfoUseCase
 import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
-import com.absinthe.libchecker.domain.app.GetAppDetailComponentsUseCase
+import com.absinthe.libchecker.domain.app.GetAppDetailComponentChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailNativeLibrariesUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageSizeUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageUseCase
@@ -99,7 +98,7 @@ class DetailViewModel(
   private val appListRepository: AppListRepository,
   private val getAppDetailPackage: GetAppDetailPackageUseCase,
   private val getAppBundleItemsUseCase: GetAppBundleItemsUseCase,
-  private val getAppDetailComponentsUseCase: GetAppDetailComponentsUseCase,
+  private val getAppDetailComponentChipsUseCase: GetAppDetailComponentChipsUseCase,
   private val getAppDetailNativeLibrariesUseCase: GetAppDetailNativeLibrariesUseCase,
   private val getAppDetailPackageSizeUseCase: GetAppDetailPackageSizeUseCase,
   private val getApkPreviewInfoUseCase: GetApkPreviewInfoUseCase,
@@ -372,76 +371,13 @@ class DetailViewModel(
       return
     }
     initComponentsJob = viewModelScope.launch(Dispatchers.IO) {
-      val processesSet = hashSetOf<String>()
       try {
-        packageInfo.let { packageInfo ->
-          val components = getAppDetailComponentsUseCase(packageInfo, isApk)
-          val services = components.services
-          val activities = components.activities
-          val receivers = components.receivers
-          val providers = components.providers
-
-          val ruleCache = mutableMapOf<String, Rule?>()
-          suspend fun getRuleCached(name: String, @LibType type: Int, regex: Boolean): Rule? {
-            val key = "$type:$regex:$name"
-            if (ruleCache.containsKey(key)) {
-              return ruleCache[key]
-            }
-            return RulesRepository.getRule(name, type, regex).also {
-              ruleCache[key] = it
-            }
-          }
-
-          val transform: suspend (StatefulComponent, Int) -> LibStringItemChip =
-            { item, componentType ->
-              var rule = if (!item.componentName.startsWith(".")) {
-                getRuleCached(item.componentName, componentType, true)
-              } else {
-                null
-              }
-              if (rule == null) {
-                val fullComponentName = if (item.componentName.startsWith(".")) {
-                  packageInfo.packageName + item.componentName
-                } else {
-                  item.componentName
-                }
-                components.intentFiltersByClassName[fullComponentName]?.let { filters ->
-                  for (filter in filters) {
-                    for (action in filter.actions) {
-                      rule = getRuleCached(action, ACTION_IN_RULES, false)
-                      if (rule != null) break
-                    }
-                    if (rule != null) break
-                  }
-                }
-              }
-
-              val source = when {
-                !item.enabled -> DISABLED
-                item.exported -> EXPORTED
-                else -> null
-              }
-
-              LibStringItemChip(
-                LibStringItem(
-                  name = item.componentName,
-                  source = source,
-                  process = item.processName.takeIf { it.isNotEmpty() }
-                ),
-                rule
-              )
-            }
-          services.forEach { sc -> processesSet.add(sc.processName) }
-          activities.forEach { sc -> processesSet.add(sc.processName) }
-          receivers.forEach { sc -> processesSet.add(sc.processName) }
-          providers.forEach { sc -> processesSet.add(sc.processName) }
-          processesMap =
-            processesSet.filter { it.isNotEmpty() }.associateWith { UiUtils.getRandomColor() }
-          componentsMap[SERVICE]?.emit(services.map { transform(it, SERVICE) })
-          componentsMap[ACTIVITY]?.emit(activities.map { transform(it, ACTIVITY) })
-          componentsMap[RECEIVER]?.emit(receivers.map { transform(it, RECEIVER) })
-          componentsMap[PROVIDER]?.emit(providers.map { transform(it, PROVIDER) })
-        }
+        val components = getAppDetailComponentChipsUseCase(packageInfo, isApk)
+        processesMap = components.processNames.associateWith { UiUtils.getRandomColor() }
+        componentsMap[SERVICE]?.emit(components.services)
+        componentsMap[ACTIVITY]?.emit(components.activities)
+        componentsMap[RECEIVER]?.emit(components.receivers)
+        componentsMap[PROVIDER]?.emit(components.providers)
       } catch (e: Exception) {
         Timber.e(e)
       }
@@ -450,37 +386,11 @@ class DetailViewModel(
 
   fun initComponentsDataInPreview() = viewModelScope.launch(Dispatchers.IO) {
     val previewInfo = apkPreviewInfo ?: return@launch
-    val components = getAppDetailComponentsUseCase(previewInfo)
-    val services = components.services
-    val activities = components.activities
-    val receivers = components.receivers
-    val providers = components.providers
-
-    val transform: suspend (StatefulComponent, Int) -> LibStringItemChip =
-      { item, componentType ->
-        val rule = RulesRepository.getRule(item.componentName, componentType, true)
-          .takeIf { !item.componentName.startsWith(".") }
-
-        val source = when {
-          !item.enabled -> DISABLED
-          item.exported -> EXPORTED
-          else -> null
-        }
-
-        LibStringItemChip(
-          LibStringItem(
-            name = item.componentName,
-            source = source,
-            process = item.processName.takeIf { it.isNotEmpty() }
-          ),
-          rule
-        )
-      }
-
-    componentsMap[SERVICE]?.emit(services.map { transform(it, SERVICE) })
-    componentsMap[ACTIVITY]?.emit(activities.map { transform(it, ACTIVITY) })
-    componentsMap[RECEIVER]?.emit(receivers.map { transform(it, RECEIVER) })
-    componentsMap[PROVIDER]?.emit(providers.map { transform(it, PROVIDER) })
+    val components = getAppDetailComponentChipsUseCase(previewInfo)
+    componentsMap[SERVICE]?.emit(components.services)
+    componentsMap[ACTIVITY]?.emit(components.activities)
+    componentsMap[RECEIVER]?.emit(components.receivers)
+    componentsMap[PROVIDER]?.emit(components.providers)
   }
 
   private val request: LibDetailRequest = ApiManager.create()

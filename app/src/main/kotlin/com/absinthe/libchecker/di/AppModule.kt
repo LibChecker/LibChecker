@@ -16,6 +16,7 @@ import com.absinthe.libchecker.domain.app.ExportAppListUseCase
 import com.absinthe.libchecker.domain.app.FilterAppListItemsUseCase
 import com.absinthe.libchecker.domain.app.GetApkPreviewInfoUseCase
 import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
+import com.absinthe.libchecker.domain.app.GetAppDetailComponentChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailComponentsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailNativeLibrariesUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageSizeUseCase
@@ -71,6 +72,7 @@ val appModule = module {
   factory { FilterAppListItemsUseCase(get()) }
   factory { GetAppBundleItemsUseCase() }
   factory { GetAppDetailComponentsUseCase() }
+  factory { GetAppDetailComponentChipsUseCase(get()) }
   factory { GetAppDetailNativeLibrariesUseCase() }
   factory { GetAppDetailPackageUseCase(get()) }
   factory { GetAppDetailPackageSizeUseCase(get()) }
