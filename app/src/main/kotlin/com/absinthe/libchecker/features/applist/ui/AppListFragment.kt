@@ -385,7 +385,7 @@ class AppListFragment :
       returnTopOfList()
     } else {
       flip(VF_LOADING)
-      context?.let { context -> homeViewModel.requestChange(context) }
+      homeViewModel.requestChange()
     }
   }
 
@@ -405,7 +405,7 @@ class AppListFragment :
           }
 
           is HomeViewModel.Effect.PackageChanged -> {
-            context?.let { context -> homeViewModel.requestChange(context, it.packageChangeState) }
+            homeViewModel.requestChange(it.packageChangeState)
           }
 
           is HomeViewModel.Effect.UpdateAppListStatus -> {
@@ -463,7 +463,7 @@ class AppListFragment :
           updateItems()
           if (hasPackageChanged() || isFirstRequestChange) {
             isFirstRequestChange = false
-            context?.let { context -> homeViewModel.requestChange(context) }
+            homeViewModel.requestChange()
           }
         }
       }.launchIn(lifecycleScope)
@@ -656,7 +656,7 @@ class AppListFragment :
     flip(VF_INIT)
     activity?.let {
       it.removeMenuProvider(this)
-      homeViewModel.initItems(it)
+      homeViewModel.initItems()
     }
   }
 

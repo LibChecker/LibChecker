@@ -32,31 +32,26 @@ import com.absinthe.libchecker.annotation.STATUS_NOT_START
 import com.absinthe.libchecker.annotation.STATUS_START_INIT
 import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE
 import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE_END
-import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.LibReferenceOptions
-import com.absinthe.libchecker.data.app.LocalAppDataSource
-import com.absinthe.libchecker.data.app.PackageChangeState
-import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.app.AppListItemFactory
+import com.absinthe.libchecker.domain.app.AppListRepository
+import com.absinthe.libchecker.domain.app.InitializeAppListUseCase
+import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.PackageChangeState
 import com.absinthe.libchecker.features.statistics.bean.LibReference
 import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.ui.base.IListController
 import com.absinthe.libchecker.utils.IntentFilterUtils
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
-import com.absinthe.libchecker.utils.extensions.getFeatures
 import com.absinthe.libchecker.utils.extensions.getVersionCode
-import com.absinthe.libchecker.utils.extensions.isArchivedPackage
 import com.absinthe.libchecker.utils.extensions.requireAvailableCacheDir
-import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
-import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import com.absinthe.rulesbundle.IconResMap
 import java.io.File
@@ -75,14 +70,19 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import ohos.bundle.IBundleManager
 import okio.buffer
 import okio.sink
 import timber.log.Timber
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel(
+  private val installedAppRepository: InstalledAppRepository,
+  private val appListRepository: AppListRepository,
+  private val appListItemFactory: AppListItemFactory,
+  private val initializeAppListUseCase: InitializeAppListUseCase
+) : ViewModel() {
 
-  val dbItemsFlow: Flow<List<LCItem>> = Repositories.lcRepository.allLCItemsFlow
+  val dbItemsFlow: Flow<List<LCItem>> = appListRepository.items
+  val packageChanges = installedAppRepository.packageChanges
 
   private val _effect: MutableSharedFlow<Effect> = MutableSharedFlow()
   val effect = _effect.asSharedFlow()
@@ -196,61 +196,24 @@ class HomeViewModel : ViewModel() {
 
   private var initJob: Job? = null
 
-  fun initItems(context: Context) {
+  fun initItems() {
     if (initJob?.isActive == true) {
       return
     }
     initJob = viewModelScope.launch(Dispatchers.IO) {
       try {
-        initItemsImpl(context, LocalAppDataSource.getApplicationList(true))
+        initItemsImpl()
       } finally {
         initJob = null
       }
     }
   }
 
-  private val bundleManager by lazy { ApplicationDelegate(LibCheckerApp.app).iBundleManager }
-
-  private suspend fun initItemsImpl(context: Context, appList: List<PackageInfo>) {
-    Timber.d("initItems: START")
-
-    val packageManager = context.packageManager
-    val timeRecorder = TimeRecorder()
-    timeRecorder.start()
-
+  private suspend fun initItemsImpl() {
     updateAppListStatus(STATUS_START_INIT)
-    Repositories.lcRepository.deleteAllItems()
-    updateInitProgress(0)
-
-    val lcItems = mutableListOf<LCItem>()
-    val isHarmony = HarmonyOsUtil.isHarmonyOs()
-    var progressCount = 0
-
-    for (info in appList) {
-      try {
-        lcItems.add(generateLCItemFromPackageInfo(packageManager, info, isHarmony, true))
-        progressCount++
-        updateInitProgress(progressCount * 100 / appList.size)
-      } catch (e: Throwable) {
-        Timber.e(e, "initItems: ${info.packageName}")
-        continue
-      }
-
-      if (lcItems.size == 50) {
-        insert(lcItems)
-        lcItems.clear()
-      }
-
-      if (!currentCoroutineContext().isActive) return
-    }
-
-    if (lcItems.isNotEmpty()) {
-      insert(lcItems)
-    }
+    if (!initializeAppListUseCase(::updateInitProgress)) return
     updateAppListStatus(STATUS_INIT_END)
 
-    timeRecorder.end()
-    Timber.d("initItems: END, $timeRecorder")
     updateAppListStatus(STATUS_NOT_START)
     requestFeatureInitialization()
   }
@@ -258,7 +221,7 @@ class HomeViewModel : ViewModel() {
   private var requestChangeJob: Job? = null
   private val requestChangeGeneration = AtomicInteger()
 
-  fun requestChange(context: Context, packageChangeState: PackageChangeState? = null) {
+  fun requestChange(packageChangeState: PackageChangeState? = null) {
     viewModelScope.launch {
       if (appListStatus == STATUS_START_INIT) {
         Timber.d("Request change canceled: STATUS_START_INIT")
@@ -267,16 +230,15 @@ class HomeViewModel : ViewModel() {
       packageChangeState?.let { pendingChangedPackages.add(it) }
       val generation = requestChangeGeneration.incrementAndGet()
       requestChangeJob?.cancel()
-      requestChangeJob = requestChangeImpl(context, packageChangeState == null, generation)
+      requestChangeJob = requestChangeImpl(packageChangeState == null, generation)
     }
   }
 
   private fun requestChangeImpl(
-    context: Context,
     forceUpdate: Boolean,
     generation: Int
   ) = viewModelScope.launch(Dispatchers.IO) {
-    val dbItems = Repositories.lcRepository.getLCItems()
+    val dbItems = appListRepository.getItems()
     if (dbItems.isEmpty()) {
       if (requestChangeGeneration.get() == generation) {
         _isRequestChangeRunning.value = false
@@ -288,15 +250,12 @@ class HomeViewModel : ViewModel() {
 
     Timber.d("Request change: START")
     val timeRecorder = TimeRecorder()
-    val packageManager = context.packageManager
 
     timeRecorder.start()
     _isRequestChangeRunning.value = true
     updateAppListStatus(STATUS_START_REQUEST_CHANGE)
 
     try {
-      val isHarmony = HarmonyOsUtil.isHarmonyOs()
-
       if (!forceUpdate) {
         while (pendingChangedPackages.isNotEmpty() && isActive) {
           val currentState = pendingChangedPackages.removeFirst()
@@ -306,25 +265,23 @@ class HomeViewModel : ViewModel() {
             when (currentState) {
               is PackageChangeState.Added -> {
                 val packageInfo = getChangedPackageInfo(currentPackageName) ?: continue
-                val item = generateLCItemFromPackageInfo(packageManager, packageInfo, isHarmony, true)
-                insert(item)
+                appListRepository.insertItem(appListItemFactory.create(packageInfo, true))
               }
 
               is PackageChangeState.Removed -> {
-                Repositories.lcRepository.deleteLCItemByPackageName(currentPackageName)
+                appListRepository.deleteItemByPackageName(currentPackageName)
               }
 
               is PackageChangeState.Replaced -> {
                 val packageInfo = getChangedPackageInfo(currentPackageName) ?: continue
-                val item = generateLCItemFromPackageInfo(packageManager, packageInfo, isHarmony, true)
-                update(item)
+                appListRepository.updateItem(appListItemFactory.create(packageInfo, true))
               }
             }
           }
         }
       } else {
         val dbItemMap = dbItems.associateBy { it.packageName }
-        var applications = LocalAppDataSource.getApplicationMap(true)
+        var applications = installedAppRepository.getApplicationMap(true)
 
         /*
          * The application list returned with a probability only contains system applications.
@@ -332,7 +289,7 @@ class HomeViewModel : ViewModel() {
          */
         if (hasLargeApplicationDiff(applications, dbItemMap)) {
           Timber.w("Request change canceled because of large diff, re-request appMap")
-          applications = LocalAppDataSource.getApplicationMap(true)
+          applications = installedAppRepository.getApplicationMap(true)
         }
 
         applications.values.asSequence()
@@ -340,7 +297,7 @@ class HomeViewModel : ViewModel() {
           .forEach {
             if (!isActive) return@launch
             runCatching {
-              insert(generateLCItemFromPackageInfo(packageManager, it, isHarmony, true))
+              appListRepository.insertItem(appListItemFactory.create(it, true))
             }.onFailure { e ->
               Timber.e(e, "requestChange: ${it.packageName}")
             }
@@ -350,7 +307,7 @@ class HomeViewModel : ViewModel() {
           .filter { it !in applications }
           .forEach {
             if (!isActive) return@launch
-            Repositories.lcRepository.deleteLCItemByPackageName(it)
+            appListRepository.deleteItemByPackageName(it)
           }
 
         applications.values.asSequence()
@@ -364,7 +321,7 @@ class HomeViewModel : ViewModel() {
           }.forEach { (packageInfo, _) ->
             if (!isActive) return@launch
             runCatching {
-              update(generateLCItemFromPackageInfo(packageManager, packageInfo, isHarmony, true))
+              appListRepository.updateItem(appListItemFactory.create(packageInfo, true))
             }.onFailure { e ->
               Timber.e(e, "requestChange: ${packageInfo.packageName}")
             }
@@ -395,38 +352,7 @@ class HomeViewModel : ViewModel() {
   }
 
   private fun getChangedPackageInfo(packageName: String): PackageInfo? {
-    return runCatching { PackageUtils.getPackageInfo(packageName) }.getOrNull()
-  }
-
-  private fun generateLCItemFromPackageInfo(
-    packageManager: PackageManager,
-    pi: PackageInfo,
-    isHarmony: Boolean,
-    delayInitFeatures: Boolean = false
-  ): LCItem {
-    val variant = if (
-      isHarmony &&
-      bundleManager?.getBundleInfo(pi.packageName, IBundleManager.GET_BUNDLE_DEFAULT) != null
-    ) {
-      Constants.VARIANT_HAP
-    } else {
-      Constants.VARIANT_APK
-    }
-
-    val ai = pi.applicationInfo ?: throw IllegalArgumentException("ApplicationInfo is null")
-    return LCItem(
-      pi.packageName,
-      pi.getAppName(packageManager).toString(),
-      if (pi.isArchivedPackage()) "Archived" else pi.versionName.toString(),
-      pi.getVersionCode(),
-      pi.firstInstallTime,
-      pi.lastUpdateTime,
-      (ai.flags and ApplicationInfo.FLAG_SYSTEM) > 0,
-      PackageUtils.getAbi(pi).toShort(),
-      if (delayInitFeatures) -1 else pi.getFeatures(),
-      ai.targetSdkVersion.toShort(),
-      variant
-    )
+    return installedAppRepository.getPackageInfo(packageName)
   }
 
   private var computeLibReferenceJob: Job? = null
@@ -434,7 +360,7 @@ class HomeViewModel : ViewModel() {
   fun computeLibReference() {
     computeLibReferenceJob?.cancel()
     computeLibReferenceJob = viewModelScope.launch(Dispatchers.IO) {
-      computeLibReferenceImpl(LocalAppDataSource.getApplicationList())
+      computeLibReferenceImpl(installedAppRepository.getApplicationList())
     }
   }
 
@@ -763,14 +689,6 @@ class HomeViewModel : ViewModel() {
     }
   }
 
-  private suspend fun insert(item: LCItem) = Repositories.lcRepository.insert(item)
-
-  private suspend fun insert(list: List<LCItem>) = Repositories.lcRepository.insert(list)
-
-  private suspend fun update(item: LCItem) = Repositories.lcRepository.update(item)
-
-  private suspend fun delete(item: LCItem) = Repositories.lcRepository.delete(item)
-
   sealed class Effect {
     data class ReloadApps(val obj: Any? = null) : Effect()
     data class UpdateInitProgress(val progress: Int) : Effect()
@@ -789,7 +707,7 @@ class HomeViewModel : ViewModel() {
         it.writeUtf8("Generated by LibChecker ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})${System.lineSeparator()}")
         it.writeUtf8("Generated at ${formattedTime}${System.lineSeparator()}")
         it.writeUtf8(System.lineSeparator())
-        val list = Repositories.lcRepository.getLCItems()
+        val list = appListRepository.getItems()
 
         if (saveAsMarkDown) {
           it.writeUtf8("| Package Name | App Name | Version Name | Version Code | System App | Abi | Target SDK | Play Store Link | F-Droid Link |${System.lineSeparator()}")
@@ -842,7 +760,7 @@ class HomeViewModel : ViewModel() {
       // Apps icons
       val defaultIcon = context.packageManager.defaultActivityIcon
       val defaultMonoIcon = if (OsUtils.atLeastT() && defaultIcon is AdaptiveIconDrawable) defaultIcon.monochrome else null
-      LocalAppDataSource.getApplicationList().forEach {
+      installedAppRepository.getApplicationList().forEach {
         if (icons.size >= 75) return@forEach
         val icon = context.packageManager.getApplicationIcon(it.applicationInfo!!)
         val result = if (OsUtils.atLeastT()) {

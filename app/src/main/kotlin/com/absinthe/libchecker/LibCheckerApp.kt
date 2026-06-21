@@ -13,6 +13,7 @@ import coil.ImageLoader
 import com.absinthe.libchecker.app.MainLooperFilter
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.RulesRepository
+import com.absinthe.libchecker.di.appModule
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.UiUtils
@@ -30,6 +31,9 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import me.zhanghai.android.appiconloader.coil.AppIconFetcher
 import me.zhanghai.android.appiconloader.coil.AppIconKeyer
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.startKoin
 import org.lsposed.hiddenapibypass.HiddenApiBypass
 import timber.log.Timber
 
@@ -54,6 +58,11 @@ class LibCheckerApp : Application() {
       Timber.plant(ReleaseTree())
     }
     Timber.plant(FileLoggingTree(this))
+    startKoin {
+      androidLogger()
+      androidContext(this@LibCheckerApp)
+      modules(appModule)
+    }
     Telemetry.setEnable(GlobalValues.isAnonymousAnalyticsEnabled)
     RulesRepository.init(this)
     Utility.init(this)

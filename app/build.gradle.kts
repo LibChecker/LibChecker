@@ -114,6 +114,8 @@ dependencies {
   compileOnly(dependencies.project(":hidden-api"))
 
   implementation(libs.kotlinX.coroutines)
+  implementation(platform(libs.koin.bom))
+  implementation(libs.koin.android)
   // implementation(libs.androidX.appCompat)
   implementation(libs.androidX.core)
   implementation(libs.androidX.activity)

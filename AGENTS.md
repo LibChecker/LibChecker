@@ -17,6 +17,9 @@ Use the Gradle wrapper from the repository root. On macOS/Linux use
 - Release/R8/package validation: `./gradlew :app:assembleRelease`
 - Market R8 rule check when full signing is blocked:
   `./gradlew :app:minifyMarketReleaseWithR8`
+- Device UI validation: prefer AndroMeld MCP Phone Screen sessions for visible
+  launch, navigation, and UI-state checks. Use Gradle/adb for install and
+  package-state operations only when needed.
 
 For docs-only changes, a Gradle build is usually unnecessary. For source
 changes, run the narrowest command that covers the touched files plus
@@ -74,6 +77,9 @@ Important `:app` boundaries:
 - Use XML layouts and ViewBinding, not Jetpack Compose UI.
 - Activities/fragments should follow existing `BaseActivity<VB>`,
   `BaseFragment<VB>`, and `IBinding` patterns.
+- Dependency injection uses Koin. Put app-wide bindings in `di/AppModule.kt`;
+  inject ViewModels through Koin instead of default-constructing repositories,
+  use cases, or platform adapters inside ViewModels.
 - Use `Timber` instead of Android `Log`.
 - Follow existing resource prefixes such as `activity_*`, `fragment_*`,
   `item_*`, `layout_*`, `ic_*`, and `bg_*`.

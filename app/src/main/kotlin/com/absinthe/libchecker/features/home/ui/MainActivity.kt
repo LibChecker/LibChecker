@@ -10,7 +10,6 @@ import android.view.Gravity
 import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -31,7 +30,6 @@ import com.absinthe.libchecker.annotation.STATUS_INIT_END
 import com.absinthe.libchecker.annotation.STATUS_START_INIT
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.OnceTag
-import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.features.applist.ui.AppListFragment
@@ -61,6 +59,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 const val PAGE_TRANSFORM_DURATION = 300L
@@ -71,7 +70,7 @@ class MainActivity :
   INavViewContainer,
   IAppBarContainer {
 
-  private val appViewModel: HomeViewModel by viewModels()
+  private val appViewModel: HomeViewModel by viewModel()
 
   @Suppress("DEPRECATION")
   private val navViewBehavior by lazy { HideBottomViewOnScrollBehavior<BottomNavigationView>() }
@@ -328,7 +327,7 @@ class MainActivity :
         ) == PackageManager.PERMISSION_GRANTED
       if (granted) {
         appViewModel.checkPackagesPermission = false
-        appViewModel.initItems(this)
+        appViewModel.initItems()
       }
     }
   }
@@ -372,7 +371,7 @@ class MainActivity :
   private fun initObserver() {
     appViewModel.apply {
       if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
-        initItems(this@MainActivity)
+        initItems()
       }
 
       effect.onEach {
@@ -409,7 +408,7 @@ class MainActivity :
         toolbarTitleView.setLoading(it)
       }.launchIn(lifecycleScope)
     }
-    LocalAppDataSource.packageChangeFlow.onEach {
+    appViewModel.packageChanges.onEach {
       Timber.d("MainActivity received package change: $it")
       appViewModel.packageChanged(it)
     }.launchIn(lifecycleScope)

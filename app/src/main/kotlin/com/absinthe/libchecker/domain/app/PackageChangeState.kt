@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.data.app
+package com.absinthe.libchecker.domain.app
 
 sealed class PackageChangeState {
   abstract val packageName: String
