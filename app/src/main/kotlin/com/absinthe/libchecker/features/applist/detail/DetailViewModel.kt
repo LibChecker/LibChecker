@@ -39,6 +39,7 @@ import com.absinthe.libchecker.domain.app.AppBundleSplitItem
 import com.absinthe.libchecker.domain.app.AppDetailPackageSize
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.AppManifestProperty
+import com.absinthe.libchecker.domain.app.GetApkPreviewInfoUseCase
 import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageSizeUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageUseCase
@@ -112,6 +113,7 @@ class DetailViewModel(
   private val getAppDetailPackage: GetAppDetailPackageUseCase,
   private val getAppBundleItemsUseCase: GetAppBundleItemsUseCase,
   private val getAppDetailPackageSizeUseCase: GetAppDetailPackageSizeUseCase,
+  private val getApkPreviewInfoUseCase: GetApkPreviewInfoUseCase,
   private val getAppManifestPropertiesUseCase: GetAppManifestPropertiesUseCase,
   private val getArchivePackageInfoUseCase: GetArchivePackageInfoUseCase,
   private val getInstalledAppComparisonPackageUseCase: GetInstalledAppComparisonPackageUseCase,
@@ -182,6 +184,12 @@ class DetailViewModel(
   suspend fun getAppBundleItems(packageInfo: PackageInfo): List<AppBundleSplitItem> {
     return withContext(Dispatchers.IO) {
       getAppBundleItemsUseCase(packageInfo)
+    }
+  }
+
+  suspend fun getApkPreviewInfo(url: String): Result<ApkPreviewInfo> {
+    return withContext(Dispatchers.IO) {
+      getApkPreviewInfoUseCase(url)
     }
   }
 

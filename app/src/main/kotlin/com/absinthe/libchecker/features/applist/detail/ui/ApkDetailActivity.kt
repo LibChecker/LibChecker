@@ -13,7 +13,6 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.features.applist.detail.IDetailContainer
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.UiUtils
-import com.absinthe.libchecker.utils.apk.ApkPreview
 import com.absinthe.libchecker.utils.extensions.requireAvailableCacheDir
 import com.absinthe.libchecker.utils.showToast
 import java.io.File
@@ -140,20 +139,17 @@ class ApkDetailActivity :
     val dialog = UiUtils.createLoadingDialog(this)
     dialog.show()
 
-    lifecycleScope.launch(Dispatchers.IO) {
-      val previewInfo = ApkPreview(url).parse().onFailure {
+    lifecycleScope.launch {
+      val previewInfo = viewModel.getApkPreviewInfo(url).onFailure {
         Timber.w(it, "Failed to preview APK from URL: $url")
-        withContext(Dispatchers.Main) {
-          Toasty.showLong(this@ApkDetailActivity, it.toString())
-          finish()
-        }
+        dialog.dismiss()
+        Toasty.showLong(this@ApkDetailActivity, it.toString())
+        finish()
       }.getOrNull() ?: return@launch
       viewModel.apkPreviewInfo = previewInfo
 
-      withContext(Dispatchers.Main) {
-        onPackageInfoAvailable(PackageInfo(), null)
-        dialog.dismiss()
-      }
+      onPackageInfoAvailable(PackageInfo(), null)
+      dialog.dismiss()
     }
   }
 }
