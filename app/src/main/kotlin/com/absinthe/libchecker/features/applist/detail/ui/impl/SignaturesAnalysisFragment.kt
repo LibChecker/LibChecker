@@ -70,12 +70,12 @@ class SignaturesAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
     viewModel.apply {
       packageInfoStateFlow.onEach {
         if (it != null) {
-          viewModel.initSignatures(requireContext())
+          viewModel.initSignatures()
         }
       }.launchIn(lifecycleScope)
 
       packageInfoStateFlow.value?.run {
-        signaturesLibItems.value ?: run { initSignatures(requireContext()) }
+        signaturesLibItems.value ?: run { initSignatures() }
       }
     }
   }

@@ -41,6 +41,7 @@ import com.absinthe.libchecker.domain.app.GetAppDetailNativeLibrariesUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageSizeUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPermissionChipsUseCase
+import com.absinthe.libchecker.domain.app.GetAppDetailSignatureChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppManifestPropertiesUseCase
 import com.absinthe.libchecker.domain.app.GetArchivePackageInfoUseCase
 import com.absinthe.libchecker.domain.app.GetInstalledAppComparisonPackageUseCase
@@ -68,7 +69,6 @@ import com.absinthe.libchecker.utils.extensions.getKotlinPluginInfo
 import com.absinthe.libchecker.utils.extensions.getRxAndroidVersion
 import com.absinthe.libchecker.utils.extensions.getRxJavaVersion
 import com.absinthe.libchecker.utils.extensions.getRxKotlinVersion
-import com.absinthe.libchecker.utils.extensions.getSignatures
 import com.absinthe.libchecker.utils.extensions.isPWA
 import com.absinthe.libchecker.utils.extensions.isPageSizeCompat
 import com.absinthe.libchecker.utils.extensions.isPlayAppSigning
@@ -104,6 +104,7 @@ class DetailViewModel(
   private val getAppDetailPackageSizeUseCase: GetAppDetailPackageSizeUseCase,
   private val getApkPreviewInfoUseCase: GetApkPreviewInfoUseCase,
   private val getAppDetailPermissionChipsUseCase: GetAppDetailPermissionChipsUseCase,
+  private val getAppDetailSignatureChipsUseCase: GetAppDetailSignatureChipsUseCase,
   private val getAppManifestPropertiesUseCase: GetAppManifestPropertiesUseCase,
   private val getArchivePackageInfoUseCase: GetArchivePackageInfoUseCase,
   private val getInstalledAppComparisonPackageUseCase: GetInstalledAppComparisonPackageUseCase,
@@ -360,12 +361,12 @@ class DetailViewModel(
 
   private var initSignaturesJob: Job? = null
 
-  fun initSignatures(context: Context) {
+  fun initSignatures() {
     if (initSignaturesJob?.isActive == true || signaturesLibItems.value != null) {
       return
     }
     initSignaturesJob = viewModelScope.launch {
-      signaturesLibItems.emit(getSignatureChipList(context))
+      signaturesLibItems.emit(getAppDetailSignatureChipsUseCase(packageInfo, isApk))
     }
   }
 
@@ -488,24 +489,6 @@ class DetailViewModel(
       }
     }
     return chipList
-  }
-
-  private suspend fun getSignatureChipList(context: Context): List<LibStringItemChip> = withContext(Dispatchers.IO) {
-    // lazy load signatures
-    runCatching {
-      @Suppress("InlinedApi", "DEPRECATION")
-      val flags = PackageManager.GET_SIGNATURES or PackageManager.GET_SIGNING_CERTIFICATES
-      if (!isApk) {
-        PackageUtils.getPackageInfo(packageInfo.packageName, flags).getSignatures(context)
-      } else {
-        PackageManagerCompat.getPackageArchiveInfo(packageInfo.applicationInfo!!.sourceDir, flags)!!.getSignatures(context)
-      }
-    }.onFailure {
-      Timber.e(it)
-    }.getOrDefault(emptySequence())
-      .map {
-        LibStringItemChip(it, null)
-      }.toList()
   }
 
   fun initAbilities(context: Context, packageName: String) = viewModelScope.launch(Dispatchers.IO) {
