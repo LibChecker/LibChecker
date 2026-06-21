@@ -41,6 +41,7 @@ import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.AppManifestProperty
 import com.absinthe.libchecker.domain.app.GetApkPreviewInfoUseCase
 import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
+import com.absinthe.libchecker.domain.app.GetAppDetailComponentsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageSizeUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageUseCase
 import com.absinthe.libchecker.domain.app.GetAppManifestPropertiesUseCase
@@ -58,7 +59,6 @@ import com.absinthe.libchecker.features.statistics.bean.EXPORTED
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.DateUtils
-import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
@@ -112,6 +112,7 @@ class DetailViewModel(
   private val appListRepository: AppListRepository,
   private val getAppDetailPackage: GetAppDetailPackageUseCase,
   private val getAppBundleItemsUseCase: GetAppBundleItemsUseCase,
+  private val getAppDetailComponentsUseCase: GetAppDetailComponentsUseCase,
   private val getAppDetailPackageSizeUseCase: GetAppDetailPackageSizeUseCase,
   private val getApkPreviewInfoUseCase: GetApkPreviewInfoUseCase,
   private val getAppManifestPropertiesUseCase: GetAppManifestPropertiesUseCase,
@@ -397,62 +398,11 @@ class DetailViewModel(
       val processesSet = hashSetOf<String>()
       try {
         packageInfo.let { packageInfo ->
-          val parsedActionsMap = IntentFilterUtils.parseComponentsFromApk(packageInfo.applicationInfo!!.sourceDir)
-            .asSequence()
-            .map { item -> item.className to item.intentFilters }
-            .toMap()
-
-          val componentPackageInfo = if (
-            !isApk && (
-              packageInfo.services.isNullOrEmpty() ||
-                packageInfo.activities.isNullOrEmpty() ||
-                packageInfo.receivers.isNullOrEmpty() ||
-                packageInfo.providers.isNullOrEmpty()
-              )
-          ) {
-            runCatching {
-              PackageUtils.getPackageInfo(
-                packageInfo.packageName,
-                PackageManager.GET_SERVICES
-                  or PackageManager.GET_ACTIVITIES
-                  or PackageManager.GET_RECEIVERS
-                  or PackageManager.GET_PROVIDERS
-              )
-            }.onFailure {
-              Timber.e(it)
-            }.getOrNull()
-          } else {
-            packageInfo
-          }
-
-          val services = if (packageInfo.services?.isNotEmpty() == true || isApk) {
-            packageInfo.services
-          } else {
-            componentPackageInfo?.services
-          }.let { list ->
-            PackageUtils.getComponentList(packageInfo.packageName, list, true)
-          }
-          val activities = if (packageInfo.activities?.isNotEmpty() == true || isApk) {
-            packageInfo.activities
-          } else {
-            componentPackageInfo?.activities
-          }.let { list ->
-            PackageUtils.getComponentList(packageInfo.packageName, list, true)
-          }
-          val receivers = if (packageInfo.receivers?.isNotEmpty() == true || isApk) {
-            packageInfo.receivers
-          } else {
-            componentPackageInfo?.receivers
-          }.let { list ->
-            PackageUtils.getComponentList(packageInfo.packageName, list, true)
-          }
-          val providers = if (packageInfo.providers?.isNotEmpty() == true || isApk) {
-            packageInfo.providers
-          } else {
-            componentPackageInfo?.providers
-          }.let { list ->
-            PackageUtils.getComponentList(packageInfo.packageName, list, true)
-          }
+          val components = getAppDetailComponentsUseCase(packageInfo, isApk)
+          val services = components.services
+          val activities = components.activities
+          val receivers = components.receivers
+          val providers = components.providers
 
           val ruleCache = mutableMapOf<String, Rule?>()
           suspend fun getRuleCached(name: String, @LibType type: Int, regex: Boolean): Rule? {
@@ -478,7 +428,7 @@ class DetailViewModel(
                 } else {
                   item.componentName
                 }
-                parsedActionsMap[fullComponentName]?.let { filters ->
+                components.intentFiltersByClassName[fullComponentName]?.let { filters ->
                   for (filter in filters) {
                     for (action in filter.actions) {
                       rule = getRuleCached(action, ACTION_IN_RULES, false)
@@ -523,10 +473,11 @@ class DetailViewModel(
 
   fun initComponentsDataInPreview() = viewModelScope.launch(Dispatchers.IO) {
     val previewInfo = apkPreviewInfo ?: return@launch
-    val services = PackageUtils.getComponentList(previewInfo.packageName, previewInfo.services, true)
-    val activities = PackageUtils.getComponentList(previewInfo.packageName, previewInfo.activities, true)
-    val receivers = PackageUtils.getComponentList(previewInfo.packageName, previewInfo.receivers, true)
-    val providers = PackageUtils.getComponentList(previewInfo.packageName, previewInfo.providers, true)
+    val components = getAppDetailComponentsUseCase(previewInfo)
+    val services = components.services
+    val activities = components.activities
+    val receivers = components.receivers
+    val providers = components.providers
 
     val transform: suspend (StatefulComponent, Int) -> LibStringItemChip =
       { item, componentType ->
