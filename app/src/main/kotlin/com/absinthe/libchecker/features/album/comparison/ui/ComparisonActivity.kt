@@ -444,34 +444,20 @@ class ComparisonActivity :
       }
       return@launch
     }
-    val leftSnapshots: List<SnapshotItem> = if (leftPackage != null) {
-      listOf(leftPackage)
-    } else if (leftTimeStamp > 0) {
-      if (rightPackage != null) {
-        viewModel.getSnapshots(leftTimeStamp, rightPackage.packageName)
-      } else {
-        viewModel.getSnapshots(leftTimeStamp)
+    val comparisonLists = viewModel.buildSnapshotComparisonLists(
+      leftTimeStamp = leftTimeStamp,
+      leftPackage = leftPackage,
+      rightTimeStamp = rightTimeStamp,
+      rightPackage = rightPackage
+    ) ?: run {
+      withContext(Dispatchers.Main) {
+        showToast(R.string.album_item_comparison_invalid_compare)
       }
-    } else {
-      showToast(R.string.album_item_comparison_invalid_compare)
-      return@launch
-    }
-
-    val rightSnapshots: List<SnapshotItem> = if (rightPackage != null) {
-      listOf(rightPackage)
-    } else if (rightTimeStamp > 0) {
-      if (leftPackage != null) {
-        viewModel.getSnapshots(rightTimeStamp, leftPackage.packageName)
-      } else {
-        viewModel.getSnapshots(rightTimeStamp)
-      }
-    } else {
-      showToast(R.string.album_item_comparison_invalid_compare)
       return@launch
     }
 
     flip(VF_LOADING)
-    viewModel.compareDiffWithSnapshotList(-1, leftSnapshots, rightSnapshots)
+    viewModel.compareDiffWithSnapshotList(-1, comparisonLists.left, comparisonLists.right)
   }
 
   private fun navigateToSnapshotDetail(

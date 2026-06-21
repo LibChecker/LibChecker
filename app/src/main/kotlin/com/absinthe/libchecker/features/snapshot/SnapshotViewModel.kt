@@ -13,6 +13,7 @@ import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.snapshot.ArchiveSnapshotItem
 import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
+import com.absinthe.libchecker.domain.snapshot.BuildSnapshotComparisonListsUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotDetailItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotPairDiffUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemWithInstalledAppUseCase
@@ -21,6 +22,7 @@ import com.absinthe.libchecker.domain.snapshot.CompareSnapshotListsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotWithInstalledAppsUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
+import com.absinthe.libchecker.domain.snapshot.SnapshotComparisonLists
 import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotTopAppsUseCase
@@ -58,7 +60,8 @@ class SnapshotViewModel(
   private val snapshotArchive: SnapshotArchiveUseCase,
   private val snapshotLibrary: SnapshotLibraryUseCase,
   private val buildArchiveSnapshotItemUseCase: BuildArchiveSnapshotItemUseCase,
-  private val buildSnapshotPairDiffUseCase: BuildSnapshotPairDiffUseCase
+  private val buildSnapshotPairDiffUseCase: BuildSnapshotPairDiffUseCase,
+  private val buildSnapshotComparisonListsUseCase: BuildSnapshotComparisonListsUseCase
 ) : ViewModel() {
 
   val allSnapshots = repository.currentSnapshotCount
@@ -167,6 +170,22 @@ class SnapshotViewModel(
 
   fun buildSnapshotPairDiff(left: SnapshotItem, right: SnapshotItem): SnapshotDiffItem {
     return buildSnapshotPairDiffUseCase(left, right)
+  }
+
+  suspend fun buildSnapshotComparisonLists(
+    leftTimeStamp: Long,
+    leftPackage: SnapshotItem?,
+    rightTimeStamp: Long,
+    rightPackage: SnapshotItem?
+  ): SnapshotComparisonLists? {
+    return withContext(Dispatchers.IO) {
+      buildSnapshotComparisonListsUseCase(
+        leftTimeStamp = leftTimeStamp,
+        leftPackage = leftPackage,
+        rightTimeStamp = rightTimeStamp,
+        rightPackage = rightPackage
+      )
+    }
   }
 
   suspend fun compareItemDiff(
