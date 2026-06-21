@@ -14,55 +14,30 @@ import info.appdev.charting.charts.BarChart
 import info.appdev.charting.data.BarData
 import info.appdev.charting.data.BarDataSet
 import info.appdev.charting.data.BarEntryFloat
-import java.io.File
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
-class DetailedABIChartDataSource(items: List<LCItem>) :
-  BaseVariableChartDataSource<BarChart>(items),
+class DetailedABIChartDataSource(
+  items: List<LCItem>,
+  private val buildDetailedAbiChartData: suspend (List<LCItem>, suspend (Int) -> Unit) -> Map<Int, List<LCItem>>?
+) : BaseVariableChartDataSource<BarChart>(items),
   IHeavyWork {
   override suspend fun fillChartView(chartView: BarChart, onProgressUpdated: (Int) -> Unit) {
     withContext(Dispatchers.Default) {
       val context = chartView.context ?: return@withContext
       val entries: ArrayList<BarEntryFloat> = ArrayList()
-
-      val itemCount = filteredList.size
-      var progress = 0
-      filteredList.forEachIndexed { index, item ->
-        if (!isActive) return@withContext
-        try {
-          val pi = PackageUtils.getPackageInfo(item.packageName)
-          val abiSet = PackageUtils.getAbiSet(
-            file = File(pi.applicationInfo!!.sourceDir),
-            packageInfo = pi,
-            isApk = false,
-            ignoreArch = true
-          )
-          abiSet.forEach {
-            if (classifiedMap[it] == null) {
-              classifiedMap[it] = mutableListOf()
-            }
-            classifiedMap[it]?.add(item)
-          }
-        } catch (e: Exception) {
-          Timber.e(e)
+      classifiedMap.clear()
+      buildDetailedAbiChartData(items) { progress ->
+        withContext(Dispatchers.Main) {
+          onProgressUpdated(progress)
         }
-        val p = index * 100 / itemCount
-        if (p > progress) {
-          progress = p
-          withContext(Dispatchers.Main) {
-            onProgressUpdated(progress)
-          }
-        }
-      }
+      }?.forEach { (abi, items) ->
+        classifiedMap[abi] = items.toMutableList()
+      } ?: return@withContext
 
-      val legendList = mutableListOf<String>()
       var index = 0
       classifiedMap.forEach { entry ->
         entries.add(BarEntryFloat(index.toFloat(), entry.value.size.toFloat()))
-        legendList.add(entry.key.toString())
         index++
       }
       val dataSet = BarDataSet(entries, "").apply {

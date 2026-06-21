@@ -292,7 +292,9 @@ class ChartFragment :
     when (chartType) {
       ChartType.ABI -> {
         if (GlobalValues.isDetailedAbiChart) {
-          setChartData(::generateBarChartView) { DetailedABIChartDataSource(items) }
+          setChartData(::generateBarChartView) {
+            DetailedABIChartDataSource(items, viewModel::buildDetailedAbiChartData)
+          }
         } else {
           setChartData(::generatePieChartView) { ABIChartDataSource(items) }
         }

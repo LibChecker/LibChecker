@@ -10,6 +10,7 @@ import com.absinthe.libchecker.domain.app.AppListItemViewState
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.BuildAppListItemViewStatesUseCase
 import com.absinthe.libchecker.domain.statistics.BuildApiLevelChartDataUseCase
+import com.absinthe.libchecker.domain.statistics.BuildDetailedAbiChartDataUseCase
 import com.absinthe.libchecker.features.chart.impl.MarketDistributionChartDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -25,7 +26,8 @@ const val LOADING_PROGRESS_MAX = 100
 class ChartViewModel(
   appListRepository: AppListRepository,
   private val buildAppListItemViewStatesUseCase: BuildAppListItemViewStatesUseCase,
-  private val buildApiLevelChartDataUseCase: BuildApiLevelChartDataUseCase
+  private val buildApiLevelChartDataUseCase: BuildApiLevelChartDataUseCase,
+  private val buildDetailedAbiChartDataUseCase: BuildDetailedAbiChartDataUseCase
 ) : ViewModel() {
   private var queryJob: Job? = null
 
@@ -78,6 +80,19 @@ class ChartViewModel(
         kind = kind,
         showSystemApps = GlobalValues.isShowSystemApps
       )
+    )
+  }
+
+  suspend fun buildDetailedAbiChartData(
+    items: List<LCItem>,
+    onProgress: suspend (Int) -> Unit
+  ): Map<Int, List<LCItem>>? {
+    return buildDetailedAbiChartDataUseCase(
+      BuildDetailedAbiChartDataUseCase.Request(
+        items = items,
+        showSystemApps = GlobalValues.isShowSystemApps
+      ),
+      onProgress
     )
   }
 
