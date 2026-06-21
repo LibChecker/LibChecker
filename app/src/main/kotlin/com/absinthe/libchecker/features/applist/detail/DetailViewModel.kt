@@ -43,6 +43,7 @@ import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageSizeUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageUseCase
 import com.absinthe.libchecker.domain.app.GetAppManifestPropertiesUseCase
+import com.absinthe.libchecker.domain.app.GetInstalledAppComparisonPackageUseCase
 import com.absinthe.libchecker.features.applist.LocatedCount
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.features.applist.detail.bean.AppIconItem
@@ -107,7 +108,8 @@ class DetailViewModel(
   private val getAppDetailPackage: GetAppDetailPackageUseCase,
   private val getAppBundleItemsUseCase: GetAppBundleItemsUseCase,
   private val getAppDetailPackageSizeUseCase: GetAppDetailPackageSizeUseCase,
-  private val getAppManifestPropertiesUseCase: GetAppManifestPropertiesUseCase
+  private val getAppManifestPropertiesUseCase: GetAppManifestPropertiesUseCase,
+  private val getInstalledAppComparisonPackageUseCase: GetInstalledAppComparisonPackageUseCase
 ) : ViewModel() {
   private var allNativeLibItems: Map<String, List<LibStringItem>> = emptyMap()
   val nativeLibTabs: MutableStateFlow<Collection<String>?> = MutableStateFlow(null)
@@ -182,6 +184,18 @@ class DetailViewModel(
   ): List<AppManifestProperty> {
     return withContext(Dispatchers.IO) {
       getAppManifestPropertiesUseCase(packageInfo, properties)
+    }
+  }
+
+  suspend fun isInstalledAppComparisonAvailable(packageName: String): Boolean {
+    return withContext(Dispatchers.IO) {
+      getInstalledAppComparisonPackageUseCase.isAvailable(packageName)
+    }
+  }
+
+  suspend fun loadInstalledAppComparisonPackage(packageName: String): PackageInfo? {
+    return withContext(Dispatchers.IO) {
+      getInstalledAppComparisonPackageUseCase(packageName)
     }
   }
 

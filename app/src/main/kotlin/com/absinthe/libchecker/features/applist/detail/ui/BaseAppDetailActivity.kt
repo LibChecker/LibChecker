@@ -3,7 +3,6 @@ package com.absinthe.libchecker.features.applist.detail.ui
 import android.animation.ValueAnimator
 import android.content.Intent
 import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.Drawable
@@ -373,26 +372,27 @@ abstract class BaseAppDetailActivity :
           }
         )
       }
-      if (apkAnalyticsMode && !viewModel.isApkPreview && PackageUtils.isAppInstalled(packageName)) {
-        toolbarAdapter.addData(
-          AppDetailToolbarItem(R.drawable.ic_compare, R.string.compare_with_current) {
-            runCatching {
-              val basePackage = PackageUtils.getPackageInfo(
-                packageName,
-                PackageManager.GET_ACTIVITIES
-                  or PackageManager.GET_RECEIVERS
-                  or PackageManager.GET_SERVICES
-                  or PackageManager.GET_PROVIDERS
-                  or PackageManager.GET_META_DATA
-                  or PackageManager.GET_PERMISSIONS
-              )
-              navigateToSnapshotDetailPage(basePackage, viewModel.packageInfo)
-            }.onFailure {
-              Toasty.showLong(this@BaseAppDetailActivity, it.toString())
-              Timber.e(it)
-            }
+      if (apkAnalyticsMode && !viewModel.isApkPreview) {
+        lifecycleScope.launch {
+          if (!viewModel.isInstalledAppComparisonAvailable(packageName)) {
+            return@launch
           }
-        )
+          if (uiGeneration != packageUiGeneration) {
+            return@launch
+          }
+          toolbarAdapter.addData(
+            AppDetailToolbarItem(R.drawable.ic_compare, R.string.compare_with_current) {
+              lifecycleScope.launch {
+                val basePackage = viewModel.loadInstalledAppComparisonPackage(packageName)
+                if (basePackage == null) {
+                  Toasty.showLong(this@BaseAppDetailActivity, getString(R.string.toast_cant_open_app))
+                  return@launch
+                }
+                navigateToSnapshotDetailPage(basePackage, viewModel.packageInfo)
+              }
+            }
+          )
+        }
       }
 
       rvToolbar.apply {

@@ -14,6 +14,9 @@ Use the Gradle wrapper from the repository root. On macOS/Linux use
 - Build a runnable debug APK: `./gradlew :app:assembleFossDebug`
 - Install the default debug flavor on a connected device:
   `./gradlew :app:installFossDebug`
+- Manual device launch after installing debug should target
+  `com.absinthe.libchecker.debug`; `com.absinthe.libchecker` may be a separate
+  release install used for snapshot export/import checks.
 - Release/R8/package validation: `./gradlew :app:assembleRelease`
 - Market R8 rule check when full signing is blocked:
   `./gradlew :app:minifyMarketReleaseWithR8`
