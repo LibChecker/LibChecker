@@ -4,9 +4,9 @@ import android.content.pm.ApplicationInfo
 import android.graphics.Bitmap
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.OvalShape
+import android.os.Bundle
 import android.view.ViewGroup
 import androidx.core.graphics.drawable.toBitmap
-import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import com.absinthe.libchecker.R
@@ -109,9 +109,9 @@ class AppPropsAdapter(
                 appResources.getXml(item.value.toInt()).let {
                   val text = ResourceParser(it).setMarkColor(true).parse()
                   XmlBSDFragment().apply {
-                    arguments = bundleOf(
-                      EXTRA_TEXT to text
-                    )
+                    arguments = Bundle().apply {
+                      putCharSequence(EXTRA_TEXT, text)
+                    }
                     show(fragMgr, XmlBSDFragment::class.java.name)
                   }
                 }

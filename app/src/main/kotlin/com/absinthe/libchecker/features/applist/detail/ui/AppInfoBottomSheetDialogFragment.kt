@@ -7,12 +7,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.os.Bundle
 import android.provider.Settings
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
-import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.absinthe.libchecker.BuildConfig
@@ -131,9 +131,9 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
       } catch (_: Exception) {
         activity?.let {
           AlternativeLaunchBSDFragment().apply {
-            arguments = bundleOf(
-              EXTRA_PACKAGE_NAME to packageName
-            )
+            arguments = Bundle().apply {
+              putString(EXTRA_PACKAGE_NAME, packageName)
+            }
             show(it.supportFragmentManager, AlternativeLaunchBSDFragment::class.java.name)
           }
         }

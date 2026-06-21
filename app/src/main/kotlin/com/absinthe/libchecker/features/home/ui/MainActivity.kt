@@ -72,6 +72,8 @@ class MainActivity :
   IAppBarContainer {
 
   private val appViewModel: HomeViewModel by viewModels()
+
+  @Suppress("DEPRECATION")
   private val navViewBehavior by lazy { HideBottomViewOnScrollBehavior<BottomNavigationView>() }
   private val toolbarTitleView by lazy { HomeToolbarTitleView(this) }
   private val workerServiceConnection = object : ServiceConnection {

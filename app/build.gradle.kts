@@ -111,7 +111,7 @@ configurations.configureEach {
 }
 
 dependencies {
-  compileOnly(projects.hiddenApi)
+  compileOnly(dependencies.project(":hidden-api"))
 
   implementation(libs.kotlinX.coroutines)
   // implementation(libs.androidX.appCompat)

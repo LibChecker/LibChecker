@@ -32,6 +32,7 @@ import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import timber.log.Timber
 
 object AboutPageBuilder {
+  @Suppress("DEPRECATION")
   fun start(context: Context) {
     LibsBuilder()
       .withAboutIconShown(true)

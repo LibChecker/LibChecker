@@ -7,6 +7,7 @@ import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.TransitionDrawable
 import android.graphics.drawable.shapes.OvalShape
 import android.graphics.text.LineBreaker
+import android.os.Bundle
 import android.text.Layout
 import android.text.Spannable
 import android.text.Spanned
@@ -16,7 +17,6 @@ import android.text.style.StyleSpan
 import android.view.ViewGroup
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.drawable.toDrawable
-import androidx.core.os.bundleOf
 import androidx.core.text.bold
 import androidx.core.text.buildSpannedString
 import androidx.core.text.inSpans
@@ -388,9 +388,9 @@ class LibStringAdapter(
                       res.getXml(item.item.size.toInt()).let {
                         val text = ResourceParser(it).setMarkColor(true).parse()
                         XmlBSDFragment().apply {
-                          arguments = bundleOf(
-                            EXTRA_TEXT to text
-                          )
+                          arguments = Bundle().apply {
+                            putCharSequence(EXTRA_TEXT, text)
+                          }
                           show(fm, XmlBSDFragment::class.java.name)
                         }
                       }

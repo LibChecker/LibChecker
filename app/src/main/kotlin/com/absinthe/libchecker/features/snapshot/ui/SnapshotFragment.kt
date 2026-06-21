@@ -11,6 +11,7 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.net.Uri
 import android.os.Build
+import android.os.Bundle
 import android.os.IBinder
 import android.util.TypedValue
 import android.view.Gravity
@@ -26,7 +27,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
-import androidx.core.os.bundleOf
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -232,7 +232,11 @@ class SnapshotFragment :
           }
         } else {
           val intent = Intent(context, SnapshotDetailActivity::class.java)
-            .putExtras(bundleOf(EXTRA_ENTITY to item))
+            .putExtras(
+              Bundle().apply {
+                putSerializable(EXTRA_ENTITY, item)
+              }
+            )
           startActivity(intent)
         }
       }

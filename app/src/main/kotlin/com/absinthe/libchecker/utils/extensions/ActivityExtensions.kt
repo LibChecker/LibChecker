@@ -2,8 +2,8 @@ package com.absinthe.libchecker.utils.extensions
 
 import android.app.Activity
 import android.content.Intent
+import android.os.Bundle
 import android.view.View
-import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.FragmentActivity
@@ -27,9 +27,9 @@ fun FragmentActivity.launchDetailPage(item: LCItem, refName: String? = null, ref
   findViewById<View>(androidx.appcompat.R.id.search_src_text)?.clearFocus()
   if (item.abi.toInt() == Constants.OVERLAY && !forceDetail) {
     OverlayDetailBottomSheetDialogFragment().apply {
-      arguments = bundleOf(
-        EXTRA_LC_ITEM to item
-      )
+      arguments = Bundle().apply {
+        putParcelable(EXTRA_LC_ITEM, item)
+      }
       show(
         supportFragmentManager,
         OverlayDetailBottomSheetDialogFragment::class.java.name
@@ -38,15 +38,18 @@ fun FragmentActivity.launchDetailPage(item: LCItem, refName: String? = null, ref
   } else {
     val intent = Intent(this, AppDetailActivity::class.java)
       .putExtras(
-        bundleOf(
-          EXTRA_PACKAGE_NAME to item.packageName,
-          EXTRA_REF_NAME to refName,
-          EXTRA_REF_TYPE to refType,
-          EXTRA_DETAIL_BEAN to DetailExtraBean(
-            item.features,
-            item.variant
+        Bundle().apply {
+          putString(EXTRA_PACKAGE_NAME, item.packageName)
+          putString(EXTRA_REF_NAME, refName)
+          putInt(EXTRA_REF_TYPE, refType)
+          putParcelable(
+            EXTRA_DETAIL_BEAN,
+            DetailExtraBean(
+              item.features,
+              item.variant
+            )
           )
-        )
+        }
       )
     runCatching {
       startActivity(intent)
@@ -64,12 +67,12 @@ fun Activity.launchLibReferencePage(
 ) {
   val intent = Intent(this, LibReferenceActivity::class.java)
     .putExtras(
-      bundleOf(
-        EXTRA_REF_NAME to refName,
-        EXTRA_REF_LABEL to refLabel,
-        EXTRA_REF_TYPE to refType,
-        EXTRA_REF_LIST to refList
-      )
+      Bundle().apply {
+        putString(EXTRA_REF_NAME, refName)
+        putString(EXTRA_REF_LABEL, refLabel)
+        putInt(EXTRA_REF_TYPE, refType)
+        putStringArray(EXTRA_REF_LIST, refList)
+      }
     )
   startActivity(intent)
 }

@@ -24,7 +24,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.createBitmap
 import androidx.core.os.BundleCompat
-import androidx.core.os.bundleOf
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -281,7 +280,11 @@ class ComparisonActivity :
         }
 
         val intent = Intent(this@ComparisonActivity, SnapshotDetailActivity::class.java)
-          .putExtras(bundleOf(EXTRA_ENTITY to getItem(position)))
+          .putExtras(
+            Bundle().apply {
+              putSerializable(EXTRA_ENTITY, getItem(position))
+            }
+          )
 
         startActivity(intent)
       }
@@ -503,10 +506,10 @@ class ComparisonActivity :
 
     val intent = Intent(this, SnapshotDetailActivity::class.java)
       .putExtras(
-        bundleOf(
-          EXTRA_ENTITY to snapshotDiff,
-          EXTRA_ICON to getIconsCombo(leftIconOriginal!!, rightIconOriginal!!)
-        )
+        Bundle().apply {
+          putSerializable(EXTRA_ENTITY, snapshotDiff)
+          putParcelable(EXTRA_ICON, getIconsCombo(leftIconOriginal!!, rightIconOriginal!!))
+        }
       )
     startActivity(intent)
   }

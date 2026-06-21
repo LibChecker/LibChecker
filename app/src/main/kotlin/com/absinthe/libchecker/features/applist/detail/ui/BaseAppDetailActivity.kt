@@ -19,7 +19,6 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.graphics.toColorInt
-import androidx.core.os.bundleOf
 import androidx.core.text.buildSpannedString
 import androidx.core.text.scale
 import androidx.core.view.MenuProvider
@@ -231,9 +230,9 @@ abstract class BaseAppDetailActivity :
                   return@setOnClickListener
                 }
                 AppInfoBottomSheetDialogFragment().apply {
-                  arguments = bundleOf(
-                    EXTRA_PACKAGE_NAME to packageName
-                  )
+                  arguments = Bundle().apply {
+                    putString(EXTRA_PACKAGE_NAME, packageName)
+                  }
                   show(supportFragmentManager, AppInfoBottomSheetDialogFragment::class.java.name)
                 }
               }
@@ -922,9 +921,9 @@ abstract class BaseAppDetailActivity :
     AppDetailToolbarItem(R.drawable.ic_launch, R.string.further_operation) {
       if (viewModel.isPackageInfoAvailable()) {
         AppInfoBottomSheetDialogFragment().apply {
-          arguments = bundleOf(
-            EXTRA_PACKAGE_NAME to viewModel.packageInfo.packageName
-          )
+          arguments = Bundle().apply {
+            putString(EXTRA_PACKAGE_NAME, viewModel.packageInfo.packageName)
+          }
           show(supportFragmentManager, AppInfoBottomSheetDialogFragment::class.java.name)
         }
       }
@@ -1050,7 +1049,11 @@ abstract class BaseAppDetailActivity :
         dialog.dismiss()
 
         val intent = Intent(this@BaseAppDetailActivity, SnapshotDetailActivity::class.java)
-          .putExtras(bundleOf(EXTRA_ENTITY to diff))
+          .putExtras(
+            Bundle().apply {
+              putSerializable(EXTRA_ENTITY, diff)
+            }
+          )
         startActivity(intent)
       }
     }

@@ -414,7 +414,7 @@ class ChartFragment :
       setMaxVisibleValueCount(50)
       setDrawGridBackground(false)
       setDrawBorders(false)
-      setDrawMarkers(false)
+      isDrawMarkersEnabled = false
       setExtraOffsets(12f, 0f, 24f, 0f)
       setNoDataText(getString(R.string.loading))
       setNoDataTextColor(colorOnSurface)

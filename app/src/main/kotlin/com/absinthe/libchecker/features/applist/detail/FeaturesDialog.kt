@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.PackageInfo
 import android.graphics.drawable.Drawable
 import android.os.Build
+import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -18,7 +19,6 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
-import androidx.core.os.bundleOf
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.FragmentActivity
 import com.absinthe.libchecker.R
@@ -53,9 +53,9 @@ object FeaturesDialog {
 
   fun showSplitApksDialog(activity: FragmentActivity, packageInfo: PackageInfo) {
     AppBundleBottomSheetDialogFragment().apply {
-      arguments = bundleOf(
-        EXTRA_PACKAGE_INFO to packageInfo
-      )
+      arguments = Bundle().apply {
+        putParcelable(EXTRA_PACKAGE_INFO, packageInfo)
+      }
       show(activity.supportFragmentManager, AppBundleBottomSheetDialogFragment::class.java.name)
     }
   }
@@ -185,18 +185,18 @@ object FeaturesDialog {
     val pi = packageInfo ?: return
 
     AppPropBottomSheetDialogFragment().apply {
-      arguments = bundleOf(
-        EXTRA_PACKAGE_INFO to pi
-      )
+      arguments = Bundle().apply {
+        putParcelable(EXTRA_PACKAGE_INFO, pi)
+      }
       show(activity.supportFragmentManager, AppPropBottomSheetDialogFragment::class.java.name)
     }
   }
 
   fun showAppPropDialog(activity: FragmentActivity, props: Map<String, String>) {
     AppPropBottomSheetDialogFragment().apply {
-      arguments = bundleOf(
-        EXTRA_PROPS to props.toJson()
-      )
+      arguments = Bundle().apply {
+        putString(EXTRA_PROPS, props.toJson())
+      }
       show(activity.supportFragmentManager, AppPropBottomSheetDialogFragment::class.java.name)
     }
   }
@@ -204,9 +204,9 @@ object FeaturesDialog {
   @RequiresApi(Build.VERSION_CODES.R)
   fun showAppInstallSourceDialog(activity: FragmentActivity, packageName: String) {
     AppInstallSourceBSDFragment().apply {
-      arguments = bundleOf(
-        EXTRA_PACKAGE_NAME to packageName
-      )
+      arguments = Bundle().apply {
+        putString(EXTRA_PACKAGE_NAME, packageName)
+      }
       show(activity.supportFragmentManager, AppInstallSourceBSDFragment::class.java.name)
     }
   }
