@@ -24,7 +24,6 @@ import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
-import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
@@ -37,11 +36,9 @@ import com.absinthe.libchecker.ui.animator.ParticleRemoveItemAnimator
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseListControllerFragment
 import com.absinthe.libchecker.ui.base.IAppBarContainer
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.extensions.isPreinstalled
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
@@ -512,56 +509,13 @@ class AppListFragment :
       return@launch
     }
 
-    val isNonNativeLibApp64Bit = android.os.Process.is64Bit()
-    val options = GlobalValues.advancedOptions
-    var filterSequence = dbItems.asSequence()
-    if ((options and AdvancedOptions.SHOW_SYSTEM_APPS) == 0) {
-      filterSequence = filterSequence.filter { !it.isSystem }
-    }
-    if ((options and AdvancedOptions.SHOW_SYSTEM_FRAMEWORK_APPS) == 0) {
-      filterSequence = filterSequence.filter {
-        (!it.packageName.startsWith("com.android.") && it.packageName != "android") ||
-          runCatching {
-            PackageUtils.getPackageInfo(it.packageName).isPreinstalled()
-          }.getOrDefault(false).not()
-      }
-    }
-    if ((options and AdvancedOptions.SHOW_OVERLAYS) == 0) {
-      filterSequence = filterSequence.filter { it.abi.toInt() != Constants.OVERLAY }
-    }
-    if ((options and AdvancedOptions.SHOW_64_BIT_APPS) == 0) {
-      filterSequence = filterSequence.filter {
-        val trueAbi = it.abi.mod(Constants.MULTI_ARCH)
-        it.abi.toInt() == Constants.OVERLAY || !PackageUtils.isAbi64Bit(trueAbi) || (trueAbi == Constants.NO_LIBS && !isNonNativeLibApp64Bit)
-      }
-    }
-    if ((options and AdvancedOptions.SHOW_32_BIT_APPS) == 0) {
-      filterSequence = filterSequence.filter {
-        val trueAbi = it.abi.mod(Constants.MULTI_ARCH)
-        it.abi.toInt() == Constants.OVERLAY || PackageUtils.isAbi64Bit(trueAbi) || (trueAbi == Constants.NO_LIBS && isNonNativeLibApp64Bit)
-      }
-    }
-
     val keyword = appAdapter.highlightText
-    if (keyword.isNotEmpty()) {
-      filterSequence = filterSequence.filter {
-        it.label.contains(keyword, ignoreCase = true) ||
-          it.packageName.contains(keyword, ignoreCase = true)
-      }
-
-      if (HarmonyOsUtil.isHarmonyOs() && keyword.contains("Harmony", true)) {
-        filterSequence = filterSequence.filter { it.variant == Constants.VARIANT_HAP }
-      }
-    }
-
-    val filterList = filterSequence.toMutableList()
-    if ((options and AdvancedOptions.SORT_BY_NAME) > 0) {
-      filterList.sortWith(compareBy({ it.abi }, { it.label }))
-    } else if ((options and AdvancedOptions.SORT_BY_UPDATE_TIME) > 0) {
-      filterList.sortByDescending { it.lastUpdatedTime }
-    } else if ((options and AdvancedOptions.SORT_BY_TARGET_API) > 0) {
-      filterList.sortByDescending { it.targetApi }
-    }
+    val filterList = homeViewModel.filterAppListItems(
+      items = dbItems,
+      options = GlobalValues.advancedOptions,
+      keyword = keyword,
+      isCurrentProcess64Bit = android.os.Process.is64Bit()
+    ).toMutableList()
 
     if (!isActive) {
       return@launch

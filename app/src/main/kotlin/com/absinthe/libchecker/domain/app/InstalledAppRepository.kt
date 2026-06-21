@@ -16,4 +16,6 @@ interface InstalledAppRepository {
   fun getPackageInfo(packageName: String, flags: Int = 0): PackageInfo?
 
   fun isPackageInstalled(packageName: String): Boolean
+
+  fun isPackagePreinstalled(packageName: String): Boolean
 }

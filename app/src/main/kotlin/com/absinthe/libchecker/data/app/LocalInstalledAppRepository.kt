@@ -4,6 +4,7 @@ import android.content.pm.PackageInfo
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.PackageChangeState
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.isPreinstalled
 import kotlinx.coroutines.flow.SharedFlow
 
 object LocalInstalledAppRepository : InstalledAppRepository {
@@ -28,5 +29,9 @@ object LocalInstalledAppRepository : InstalledAppRepository {
 
   override fun isPackageInstalled(packageName: String): Boolean {
     return PackageUtils.isAppInstalled(packageName)
+  }
+
+  override fun isPackagePreinstalled(packageName: String): Boolean {
+    return getPackageInfo(packageName)?.isPreinstalled() == true
   }
 }
