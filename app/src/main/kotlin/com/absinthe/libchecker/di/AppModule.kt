@@ -17,14 +17,17 @@ import com.absinthe.libchecker.domain.app.InitializeAppListUseCase
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.SyncAppListChangesUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotDetailItemsUseCase
+import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemWithInstalledAppUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotListsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotWithInstalledAppsUseCase
+import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveCodec
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotItemFactory
 import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
+import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotTopAppsUseCase
 import com.absinthe.libchecker.domain.statistics.ComputeLibReferenceUseCase
 import com.absinthe.libchecker.features.album.track.TrackViewModel
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
@@ -52,6 +55,9 @@ val appModule = module {
   factory { CompareSnapshotItemsUseCase() }
   factory { CompareSnapshotListsUseCase(get()) }
   factory { CompareSnapshotWithInstalledAppsUseCase(get(), get(), get(), get()) }
+  factory { CompareSnapshotItemWithInstalledAppUseCase(get(), get(), get(), get()) }
+  factory { GetSnapshotDashboardCountUseCase(get(), get()) }
+  factory { UpdateSnapshotTopAppsUseCase(get(), get()) }
   factory { BuildSnapshotDetailItemsUseCase() }
   factory { SnapshotArchiveUseCase(get(), get()) }
   factory { SnapshotLibraryUseCase(get()) }
@@ -60,6 +66,6 @@ val appModule = module {
   viewModel { DetailViewModel(get()) }
   viewModel { HomeViewModel(get(), get(), get(), get(), get(), get()) }
   viewModel { LibReferenceViewModel(get()) }
-  viewModel { SnapshotViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+  viewModel { SnapshotViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
   viewModel { TrackViewModel(get()) }
 }

@@ -11,5 +11,9 @@ interface InstalledAppRepository {
 
   fun getApplicationMap(forceUpdate: Boolean = false): Map<String, PackageInfo>
 
-  fun getPackageInfo(packageName: String): PackageInfo?
+  fun getApplicationCount(forceUpdate: Boolean = false): Int
+
+  fun getPackageInfo(packageName: String, flags: Int = 0): PackageInfo?
+
+  fun isPackageInstalled(packageName: String): Boolean
 }

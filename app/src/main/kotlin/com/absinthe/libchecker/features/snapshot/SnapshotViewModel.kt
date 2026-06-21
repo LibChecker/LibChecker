@@ -6,24 +6,23 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotDetailItemsUseCase
+import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemWithInstalledAppUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotListsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotWithInstalledAppsUseCase
+import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
-import com.absinthe.libchecker.domain.snapshot.SnapshotItemFactory
 import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
+import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotTopAppsUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
-import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.toJson
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import java.io.InputStream
 import java.io.OutputStream
@@ -44,10 +43,12 @@ const val CURRENT_SNAPSHOT = -1L
 class SnapshotViewModel(
   private val repository: SnapshotRepository,
   private val appListRepository: AppListRepository,
-  private val snapshotItemFactory: SnapshotItemFactory,
   private val compareSnapshotItems: CompareSnapshotItemsUseCase,
   private val compareSnapshotLists: CompareSnapshotListsUseCase,
   private val compareSnapshotWithInstalledApps: CompareSnapshotWithInstalledAppsUseCase,
+  private val compareSnapshotItemWithInstalledApp: CompareSnapshotItemWithInstalledAppUseCase,
+  private val getSnapshotDashboardCount: GetSnapshotDashboardCountUseCase,
+  private val updateSnapshotTopApps: UpdateSnapshotTopAppsUseCase,
   private val buildSnapshotDetailItems: BuildSnapshotDetailItemsUseCase,
   private val snapshotArchive: SnapshotArchiveUseCase,
   private val snapshotLibrary: SnapshotLibraryUseCase
@@ -104,7 +105,7 @@ class SnapshotViewModel(
     ) ?: return
     snapshotDiffItemsFlow.emit(diffList)
     if (diffList.isNotEmpty()) {
-      updateTopApps(preTimeStamp, diffList.subList(0, (diffList.size - 1).coerceAtMost(5)))
+      updateSnapshotTopApps(preTimeStamp, diffList.subList(0, (diffList.size - 1).coerceAtMost(5)))
     }
   }
 
@@ -143,7 +144,7 @@ class SnapshotViewModel(
 
     snapshotDiffItemsFlow.emit(diffList)
     if (diffList.isNotEmpty() && preTimeStamp != -1L) {
-      updateTopApps(preTimeStamp, diffList.subList(0, (diffList.size - 1).coerceAtMost(5)))
+      updateSnapshotTopApps(preTimeStamp, diffList.subList(0, (diffList.size - 1).coerceAtMost(5)))
     }
   }
 
@@ -152,31 +153,13 @@ class SnapshotViewModel(
     timeStamp: Long = GlobalValues.snapshotTimestamp,
     packageName: String
   ) {
-    val presentInfo = runCatching {
-      val flags = PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS
-      PackageUtils.getPackageInfo(packageName, flags)
-    }.getOrNull()?.let { snapshotItemFactory.create(packageManager, it) }
-    val snapshotInfo = repository.getSnapshot(timeStamp, packageName)
-    val trackPackageNames = repository.getTrackItems()
-      .asSequence()
-      .map { it.packageName }
-      .toSet()
-    val diffItem = compareSnapshotItems(snapshotInfo, presentInfo, trackPackageNames)
+    val diffItem = compareSnapshotItemWithInstalledApp(packageManager, timeStamp, packageName)
 
     diffItem?.let {
       changeDiffItem(it)
     } ?: run {
       removeDiffItem(packageName)
     }
-  }
-
-  private suspend fun updateTopApps(timestamp: Long, list: List<SnapshotDiffItem>) {
-    val systemProps = repository.getTimeStamp(timestamp)?.systemProps
-    val appsList = list.asSequence()
-      .map { it.packageName }
-      .filter { PackageUtils.isAppInstalled(it) }
-      .toList()
-    repository.updateTimeStamp(TimeStampItem(timestamp, appsList.toJson(), systemProps))
   }
 
   fun computeDiffDetail(context: Context, entity: SnapshotDiffItem) = viewModelScope.launch(Dispatchers.IO) {
@@ -280,10 +263,9 @@ class SnapshotViewModel(
 
   fun getDashboardCount(timestamp: Long, isLeft: Boolean) = viewModelScope.launch(Dispatchers.IO) {
     Timber.d("getDashboardCount: $timestamp, $isLeft")
-    val snapshotCount = repository.getSnapshots(timestamp).size
-    val appCount = LocalAppDataSource.getApplicationCount()
+    val count = getSnapshotDashboardCount(timestamp)
     setEffect {
-      Effect.DashboardCountChange(snapshotCount, appCount, isLeft)
+      Effect.DashboardCountChange(count.snapshotCount, count.appCount, isLeft)
     }
   }
 
