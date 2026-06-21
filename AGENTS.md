@@ -56,7 +56,7 @@ Important `:app` boundaries:
   package-change sources to the `domain/app/` interfaces.
 - `domain/statistics/` owns statistics/reference computation rules. Keep
   package scanning and rule-matching loops out of fragments and ViewModels.
-- `domain/snapshot/` owns snapshot models, capture, and diff-use-case seams;
+- `domain/snapshot/` owns snapshot models, archive, capture, and diff seams;
   keep package-to-snapshot conversion and diff rules out of UI controllers.
 - `compat/` wraps platform/API-level differences. Check here before adding new
   SDK-version branches.

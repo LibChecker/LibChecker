@@ -14,10 +14,10 @@ import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotDetailItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemsUseCase
+import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotItemFactory
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
-import com.absinthe.libchecker.protocol.Snapshot
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getPackageSize
@@ -47,7 +47,8 @@ class SnapshotViewModel(
   val repository: LCRepository,
   private val snapshotItemFactory: SnapshotItemFactory,
   private val compareSnapshotItems: CompareSnapshotItemsUseCase,
-  private val buildSnapshotDetailItems: BuildSnapshotDetailItemsUseCase
+  private val buildSnapshotDetailItems: BuildSnapshotDetailItemsUseCase,
+  private val snapshotArchive: SnapshotArchiveUseCase
 ) : ViewModel() {
 
   val allSnapshots = repository.allSnapshotItemsFlow
@@ -330,48 +331,8 @@ class SnapshotViewModel(
     snapshotDetailItemsFlow.emit(buildSnapshotDetailItems(context, entity))
   }
 
-  private fun insertTimeStamp(timestamp: Long) = viewModelScope.launch(Dispatchers.IO) {
-    if (timestamp == 0L) {
-      return@launch
-    }
-    repository.insert(TimeStampItem(timestamp, null, null))
-  }
-
   fun backup(os: OutputStream, resultAction: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
-    os.use { os ->
-      val snapshotBuilder: Snapshot.Builder = Snapshot.newBuilder()
-      repository.getTimeStamps().forEach { (timestamp, _, _) ->
-        val backupList = repository.getSnapshots(timestamp)
-        Timber.d("backup: timestamps=$timestamp, count=${backupList.size}")
-        backupList.forEach {
-          snapshotBuilder.apply {
-            packageName = it.packageName
-            timeStamp = it.timeStamp
-            label = it.label
-            versionName = it.versionName
-            versionCode = it.versionCode
-            installedTime = it.installedTime
-            lastUpdatedTime = it.lastUpdatedTime
-            isSystem = it.isSystem
-            abi = it.abi.toInt()
-            targetApi = it.targetApi.toInt()
-            nativeLibs = it.nativeLibs
-            services = it.services
-            activities = it.activities
-            receivers = it.receivers
-            providers = it.providers
-            permissions = it.permissions
-            metadata = it.metadata
-            packageSize = it.packageSize
-            compileSdk = it.compileSdk.toInt()
-            minSdk = it.minSdk.toInt()
-          }
-
-          snapshotBuilder.build().writeDelimitedTo(os)
-        }
-      }
-    }
-
+    snapshotArchive.backup(os)
     withContext(Dispatchers.Main) {
       resultAction()
     }
@@ -383,53 +344,22 @@ class SnapshotViewModel(
     resultAction: (success: Boolean) -> Unit
   ) {
     viewModelScope.launch(Dispatchers.IO) {
-      inputStream.use { stream ->
-        val list = mutableListOf<Snapshot>()
-        val timeStampMap = mutableMapOf<Long, Int>()
-
-        runCatching {
-          while (true) {
-            val snapshot = Snapshot.parseDelimitedFrom(stream) ?: break
-            list.add(snapshot)
-            timeStampMap[snapshot.timeStamp] = timeStampMap.getOrDefault(snapshot.timeStamp, 0) + 1
-            if (list.size == 200) {
-              restoreImpl(list)
-              list.clear()
-            }
-          }
-          restoreImpl(list)
-          list.clear()
-        }.onFailure {
-          Timber.e("restore with new format failed: $it")
-          withContext(Dispatchers.Main) {
-            resultAction(false)
-          }
-          return@launch
-          // runCatching {
-          //   val list: SnapshotList = SnapshotList.parseFrom(stream)
-          //   Timber.d("restore with old format: ${list.snapshotsList.size}")
-          //   list.snapshotsList.forEach {
-          //     timeStampMap[it.timeStamp] = timeStampMap.getOrDefault(it.timeStamp, 0) + 1
-          //   }
-          //   restoreImpl(list.snapshotsList)
-          // }.onFailure {
-          //   Timber.e("restore with old format failed: $it")
-          //   withContext(Dispatchers.Main) {
-          //     resultAction(false)
-          //   }
-          //   return@launch
-          // }
+      runCatching {
+        snapshotArchive.restore(inputStream)
+      }.onFailure {
+        Timber.e("restore with new format failed: $it")
+        withContext(Dispatchers.Main) {
+          resultAction(false)
         }
-
-        repository.deleteDuplicateSnapshotItems()
-        timeStampMap.forEach { insertTimeStamp(it.key) }
-        timeStampMap.keys.maxOrNull()?.let { GlobalValues.snapshotTimestamp = it }
+        return@launch
+      }.onSuccess { result ->
+        result.latestTimeStamp?.let { GlobalValues.snapshotTimestamp = it }
         withContext(Dispatchers.Main) {
           resultAction(true)
         }
 
         val message = buildString {
-          timeStampMap.forEach {
+          result.timeStampCounts.forEach {
             append(
               context.getString(
                 R.string.album_restore_detail,
@@ -451,36 +381,6 @@ class SnapshotViewModel(
             .show()
         }
       }
-    }
-  }
-
-  private suspend fun restoreImpl(list: List<Snapshot>) {
-    list.map {
-      SnapshotItem(
-        null,
-        it.packageName,
-        it.timeStamp,
-        it.label,
-        it.versionName,
-        it.versionCode,
-        it.installedTime,
-        it.lastUpdatedTime,
-        it.isSystem,
-        it.abi.toShort(),
-        it.targetApi.toShort(),
-        it.nativeLibs,
-        it.services,
-        it.activities,
-        it.receivers,
-        it.providers,
-        it.permissions,
-        it.metadata,
-        it.packageSize,
-        it.compileSdk.toShort(),
-        it.minSdk.toShort()
-      )
-    }.let {
-      repository.insertSnapshots(it)
     }
   }
 
