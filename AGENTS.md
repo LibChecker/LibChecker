@@ -98,6 +98,9 @@ Important `:app` boundaries:
 
 - Room schema changes require a database version bump, migration or
   auto-migration, and updated `app/schemas/`.
+- UI controllers should not call `Repositories.lcRepository` directly for new
+  or refactored paths; route persistence through ViewModels and domain use
+  cases/repositories.
 - Heavy package scanning, zip reads, DEX parsing, ELF parsing, database writes,
   and network calls must run off the main thread.
 - Package analysis must keep working for installed apps, APK, split APK, APKS,

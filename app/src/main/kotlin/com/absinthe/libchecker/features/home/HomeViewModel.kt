@@ -3,6 +3,7 @@ package com.absinthe.libchecker.features.home
 import android.annotation.SuppressLint
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.annotation.STATUS_INIT_END
 import com.absinthe.libchecker.annotation.STATUS_NOT_START
@@ -152,6 +153,18 @@ class HomeViewModel(
     viewModelScope.launch {
       _effect.emit(newEffect)
     }
+  }
+
+  suspend fun getAppListItems(): List<LCItem> {
+    return appListRepository.getItems()
+  }
+
+  suspend fun isOnlySelfAppInDatabase(): Boolean {
+    return isOnlySelfApp(appListRepository.getItems())
+  }
+
+  fun isOnlySelfApp(items: Collection<LCItem>): Boolean {
+    return items.size == 1 && items.first().packageName == BuildConfig.APPLICATION_ID
   }
 
   private var initJob: Job? = null

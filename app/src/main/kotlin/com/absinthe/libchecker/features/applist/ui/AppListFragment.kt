@@ -16,7 +16,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.STATUS_INIT_END
 import com.absinthe.libchecker.annotation.STATUS_NOT_START
@@ -26,7 +25,6 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.constant.options.AdvancedOptions
-import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
@@ -418,8 +416,7 @@ class AppListFragment :
 
               STATUS_INIT_END -> {
                 if (isFirstLaunch) {
-                  val apps = Repositories.lcRepository.getLCItems()
-                  if (isOnlyAppItself(apps)) {
+                  if (homeViewModel.isOnlySelfAppInDatabase()) {
                     Timber.d("Only the app itself")
                     flip(VF_REJECT)
                   } else {
@@ -503,10 +500,10 @@ class AppListFragment :
   private fun updateItemsImpl(highlightRefresh: Boolean = false) = lifecycleScope.launch(Dispatchers.IO) {
     delay(250)
     Timber.d("updateItemsImpl")
-    val dbItems = Repositories.lcRepository.getLCItems()
+    val dbItems = homeViewModel.getAppListItems()
     val dbPackageNames = dbItems.mapTo(mutableSetOf()) { it.packageName }
 
-    if (isOnlyAppItself(dbItems)) {
+    if (homeViewModel.isOnlySelfApp(dbItems)) {
       Timber.d("updateItemsImpl: only the app itself")
       if (homeViewModel.appListStatus == STATUS_NOT_START) {
         Once.clearDone(OnceTag.FIRST_LAUNCH)
@@ -658,9 +655,5 @@ class AppListFragment :
       it.removeMenuProvider(this)
       homeViewModel.initItems()
     }
-  }
-
-  private fun isOnlyAppItself(list: Collection<LCItem>): Boolean {
-    return list.size == 1 && list.first().packageName == BuildConfig.APPLICATION_ID
   }
 }
