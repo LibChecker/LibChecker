@@ -14,9 +14,9 @@ import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.PackageUtils
@@ -31,10 +31,12 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class LibReferenceViewModel : ViewModel() {
+class LibReferenceViewModel(
+  appListRepository: AppListRepository
+) : ViewModel() {
 
   val libRefListFlow: MutableSharedFlow<List<LCItem>> = MutableSharedFlow()
-  val dbItemsFlow: Flow<List<LCItem>> = Repositories.lcRepository.allLCItemsFlow
+  val dbItemsFlow: Flow<List<LCItem>> = appListRepository.items
   val actionMap: MutableMap<String, Pair<String, Int>> = mutableMapOf()
 
   fun setData(name: String, @LibType type: Int) = viewModelScope.launch(Dispatchers.IO) {

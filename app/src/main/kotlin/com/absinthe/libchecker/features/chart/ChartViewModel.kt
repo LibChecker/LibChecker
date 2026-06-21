@@ -5,9 +5,12 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.features.chart.impl.MarketDistributionChartDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -16,8 +19,12 @@ import kotlinx.coroutines.withContext
 const val LOADING_PROGRESS_INFINITY = -1
 const val LOADING_PROGRESS_MAX = 100
 
-class ChartViewModel : ViewModel() {
+class ChartViewModel(
+  appListRepository: AppListRepository
+) : ViewModel() {
   private var queryJob: Job? = null
+
+  val appListItems: Flow<List<LCItem>> = appListRepository.items
 
   private val _loadingProgress = MutableStateFlow(LOADING_PROGRESS_MAX)
   val loadingProgress = _loadingProgress.asStateFlow()

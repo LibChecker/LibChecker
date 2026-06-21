@@ -5,7 +5,6 @@ import android.os.Build
 import android.view.HapticFeedbackConstants
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -17,7 +16,6 @@ import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalFeatures
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentPieChartBinding
 import com.absinthe.libchecker.features.chart.BaseChartDataSource
@@ -68,6 +66,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import rikka.core.util.ClipboardUtils
 import timber.log.Timber
 
@@ -75,7 +74,7 @@ class ChartFragment :
   BaseFragment<FragmentPieChartBinding>(),
   OnChartValueSelectedListener {
 
-  private val viewModel: ChartViewModel by activityViewModels()
+  private val viewModel: ChartViewModel by activityViewModel()
   private lateinit var chartView: ViewGroup
   private lateinit var allLCItemsStateFlow: StateFlow<List<LCItem>>
   private var dataSource: IChartDataSource<*>? = null
@@ -133,7 +132,7 @@ class ChartFragment :
     updateProgressIndicator()
 
     lifecycleScope.launch {
-      allLCItemsStateFlow = Repositories.lcRepository.allLCItemsFlow.onEach {
+      allLCItemsStateFlow = viewModel.appListItems.onEach {
         hasReceivedLCItems = true
         hasUninitializedFeatureItems = it.any { item -> item.features == FEATURES_NOT_INITIALIZED }
         featureInitializationCompleted =

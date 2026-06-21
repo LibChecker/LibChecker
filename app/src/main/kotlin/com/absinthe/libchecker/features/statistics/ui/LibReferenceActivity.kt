@@ -3,7 +3,6 @@ package com.absinthe.libchecker.features.statistics.ui
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.ViewGroup
-import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTION
@@ -18,6 +17,7 @@ import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import rikka.widget.borderview.BorderView
 
 const val EXTRA_REF_NAME = "REF_NAME"
@@ -28,7 +28,7 @@ const val EXTRA_REF_LIST = "REF_LIST"
 class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
 
   private val adapter = AppAdapter()
-  private val viewModel: LibReferenceViewModel by viewModels()
+  private val viewModel: LibReferenceViewModel by viewModel()
   private val refName by lazy { intent.extras?.getString(EXTRA_REF_NAME) }
   private val refLabel by lazy { intent.extras?.getString(EXTRA_REF_LABEL) }
   private val refType by lazy { intent.extras?.getInt(EXTRA_REF_TYPE) ?: NATIVE }

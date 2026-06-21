@@ -9,7 +9,6 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.ViewGroup
-import androidx.activity.viewModels
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
@@ -24,11 +23,12 @@ import com.absinthe.libchecker.services.WorkerService
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.google.android.material.materialswitch.MaterialSwitch
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ChartActivity :
   BaseActivity<ActivityChartBinding>(),
   MenuProvider {
-  private val viewModel by viewModels<ChartViewModel>()
+  private val viewModel: ChartViewModel by viewModel()
   private var detailedAbiSwitch: MaterialSwitch? = null
   private var isWorkerServiceBound = false
   private var workerBinder: IWorkerService? = null
