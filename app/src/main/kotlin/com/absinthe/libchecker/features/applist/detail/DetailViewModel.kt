@@ -22,6 +22,7 @@ import com.absinthe.libchecker.domain.app.AppDetailPackageSize
 import com.absinthe.libchecker.domain.app.AppIconItem
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.AppManifestProperty
+import com.absinthe.libchecker.domain.app.GetAlternativeLaunchItemsUseCase
 import com.absinthe.libchecker.domain.app.GetApkPreviewInfoUseCase
 import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailAbiUseCase
@@ -80,6 +81,7 @@ import timber.log.Timber
 class DetailViewModel(
   private val appListRepository: AppListRepository,
   private val getAppDetailPackage: GetAppDetailPackageUseCase,
+  private val getAlternativeLaunchItemsUseCase: GetAlternativeLaunchItemsUseCase,
   private val getAppInfoActionsUseCase: GetAppInfoActionsUseCase,
   private val getAppBundleItemsUseCase: GetAppBundleItemsUseCase,
   private val getAppDetailAbiUseCase: GetAppDetailAbiUseCase,
@@ -174,6 +176,10 @@ class DetailViewModel(
 
   suspend fun getAppInfoActions(packageName: String) = withContext(Dispatchers.IO) {
     getAppInfoActionsUseCase(packageName)
+  }
+
+  suspend fun getAlternativeLaunchItems(packageName: String) = withContext(Dispatchers.IO) {
+    getAlternativeLaunchItemsUseCase(packageName)
   }
 
   suspend fun getAppInstallSourceDetails(packageName: String) = withContext(Dispatchers.IO) {
