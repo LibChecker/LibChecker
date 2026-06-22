@@ -3,21 +3,23 @@ package com.absinthe.libchecker.features.applist.detail.ui
 import android.content.DialogInterface
 import androidx.core.text.buildSpannedString
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.app.SystemServices
+import com.absinthe.libchecker.domain.app.AppPermissionDetail
+import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.ui.view.PermissionInfoBottomSheetView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
-import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
-import timber.log.Timber
+import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 const val EXTRA_ORIG_PERM_NAME = "EXTRA_ORIG_PERM_NAME"
 
 class PermissionDetailDialogFragment : BaseBottomSheetViewDialogFragment<PermissionInfoBottomSheetView>() {
 
+  private val viewModel: DetailViewModel by activityViewModel()
   private val origPermName by lazy {
     arguments?.getString(EXTRA_ORIG_PERM_NAME).orEmpty()
       .substringBefore(" ") // remove maxSdkVersion suffix
@@ -26,48 +28,33 @@ class PermissionDetailDialogFragment : BaseBottomSheetViewDialogFragment<Permiss
   override fun initRootView(): PermissionInfoBottomSheetView = PermissionInfoBottomSheetView(requireContext())
 
   override fun init() {
-    val pm = SystemServices.packageManager
     root.apply {
       icon.load(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_android)
+      title.text = origPermName
       permissionContentView.label.text.text = context.getText(R.string.not_found)
       permissionContentView.description.text.text = context.getText(R.string.not_found)
-
-      val permissionInfo = runCatching {
-        pm.getPermissionInfo(origPermName, 0)
-      }.onFailure {
-        Timber.e(it)
-      }.getOrNull()
-
-      if (permissionInfo == null || permissionInfo.icon == 0) {
-        icon.load(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_android)
-      } else {
-        icon.load(permissionInfo.loadIcon(pm))
-      }
-
-      val titleText = buildSpannedString {
-        append(origPermName)
-
-        val targetPi = runCatching { PackageUtils.getPackageInfo(permissionInfo?.packageName.orEmpty()) }.getOrNull()
-        if (permissionInfo != null && targetPi != null) {
-          appendLine()
-          append(
-            String.format(
-              getString(R.string.lib_permission_provided_by_format),
-              targetPi.getAppName(context.packageManager)
-            )
-          )
-        }
-      }
-      title.text = titleText
-
-      if (permissionInfo != null) {
-        permissionInfo.loadLabel(pm).let { if (it.isNotEmpty()) permissionContentView.label.text.text = it }
-        permissionInfo.loadDescription(pm)
-          ?.let { if (it.isNotEmpty()) permissionContentView.description.text.text = it }
-      }
       permissionContentView.label.updateContentDescription()
       permissionContentView.description.updateContentDescription()
     }
+
+    lifecycleScope.launch {
+      renderPermissionDetail(viewModel.getPermissionDetail(origPermName))
+    }
+  }
+
+  private fun renderPermissionDetail(detail: AppPermissionDetail) = root.apply {
+    icon.load(detail.icon ?: com.absinthe.lc.rulesbundle.R.drawable.ic_lib_android)
+    title.text = buildSpannedString {
+      append(detail.name)
+      detail.providerAppName?.let {
+        appendLine()
+        append(getString(R.string.lib_permission_provided_by_format, it))
+      }
+    }
+    detail.label?.let { permissionContentView.label.text.text = it }
+    detail.description?.let { permissionContentView.description.text.text = it }
+    permissionContentView.label.updateContentDescription()
+    permissionContentView.description.updateContentDescription()
   }
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()

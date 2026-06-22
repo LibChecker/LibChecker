@@ -41,6 +41,7 @@ import com.absinthe.libchecker.domain.app.GetArchivePackageInfoUseCase
 import com.absinthe.libchecker.domain.app.GetElfDetailUseCase
 import com.absinthe.libchecker.domain.app.GetInstalledAppComparisonPackageUseCase
 import com.absinthe.libchecker.domain.app.GetLibraryDetailDialogDataUseCase
+import com.absinthe.libchecker.domain.app.GetPermissionDetailUseCase
 import com.absinthe.libchecker.domain.app.GetRelatedAppListItemUseCase
 import com.absinthe.libchecker.domain.app.HasInstalledStaticLibrariesUseCase
 import com.absinthe.libchecker.domain.app.PrepareAppPackageShareFileUseCase
@@ -99,6 +100,7 @@ class DetailViewModel(
   private val getInstalledAppComparisonPackageUseCase: GetInstalledAppComparisonPackageUseCase,
   private val hasInstalledStaticLibrariesUseCase: HasInstalledStaticLibrariesUseCase,
   private val getLibraryDetailDialogDataUseCase: GetLibraryDetailDialogDataUseCase,
+  private val getPermissionDetailUseCase: GetPermissionDetailUseCase,
   private val getRelatedAppListItemUseCase: GetRelatedAppListItemUseCase,
   private val sortAppDetailItemsUseCase: SortAppDetailItemsUseCase,
   private val buildPackageComparisonSnapshotItemUseCase: BuildPackageComparisonSnapshotItemUseCase
@@ -448,6 +450,10 @@ class DetailViewModel(
         isValidLib = isValidLib
       )
     )
+  }
+
+  suspend fun getPermissionDetail(permissionName: String) = withContext(Dispatchers.IO) {
+    getPermissionDetailUseCase(permissionName)
   }
 
   private suspend fun getDexChipList(): List<LibStringItemChip> {

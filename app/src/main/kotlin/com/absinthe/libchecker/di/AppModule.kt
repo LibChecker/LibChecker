@@ -42,6 +42,7 @@ import com.absinthe.libchecker.domain.app.GetElfDetailUseCase
 import com.absinthe.libchecker.domain.app.GetInstalledAppComparisonPackageUseCase
 import com.absinthe.libchecker.domain.app.GetLibraryDetailDialogDataUseCase
 import com.absinthe.libchecker.domain.app.GetLibraryDetailUseCase
+import com.absinthe.libchecker.domain.app.GetPermissionDetailUseCase
 import com.absinthe.libchecker.domain.app.GetRelatedAppListItemUseCase
 import com.absinthe.libchecker.domain.app.HasInstalledStaticLibrariesUseCase
 import com.absinthe.libchecker.domain.app.InitializeAppListUseCase
@@ -134,6 +135,7 @@ val appModule = module {
   factory { GetInstalledAppComparisonPackageUseCase(get()) }
   factory { GetLibraryDetailUseCase(get()) }
   factory { GetLibraryDetailDialogDataUseCase(get()) }
+  factory { GetPermissionDetailUseCase(androidContext().packageManager, get()) }
   factory { GetRelatedAppListItemUseCase(get(), get()) }
   factory { HasInstalledStaticLibrariesUseCase(get()) }
   factory { SortAppDetailItemsUseCase() }
@@ -187,6 +189,7 @@ val appModule = module {
       getInstalledAppComparisonPackageUseCase = get(),
       hasInstalledStaticLibrariesUseCase = get(),
       getLibraryDetailDialogDataUseCase = get(),
+      getPermissionDetailUseCase = get(),
       getRelatedAppListItemUseCase = get(),
       sortAppDetailItemsUseCase = get(),
       buildPackageComparisonSnapshotItemUseCase = get()
