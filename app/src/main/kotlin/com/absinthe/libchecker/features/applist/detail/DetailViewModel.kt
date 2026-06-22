@@ -43,6 +43,7 @@ import com.absinthe.libchecker.domain.app.GetInstalledAppComparisonPackageUseCas
 import com.absinthe.libchecker.domain.app.GetLibraryDetailUseCase
 import com.absinthe.libchecker.domain.app.GetRelatedAppListItemUseCase
 import com.absinthe.libchecker.domain.app.HasInstalledStaticLibrariesUseCase
+import com.absinthe.libchecker.domain.app.PrepareAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.RelatedAppListItem
 import com.absinthe.libchecker.domain.app.SortAppDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.VersionedFeature
@@ -88,6 +89,7 @@ class DetailViewModel(
   private val getAppDetailNativeLibrariesUseCase: GetAppDetailNativeLibrariesUseCase,
   private val getAppDetailStaticLibraryChipsUseCase: GetAppDetailStaticLibraryChipsUseCase,
   private val getAppDetailPackageSizeUseCase: GetAppDetailPackageSizeUseCase,
+  private val prepareAppPackageShareFileUseCase: PrepareAppPackageShareFileUseCase,
   private val getApkPreviewInfoUseCase: GetApkPreviewInfoUseCase,
   private val getAppDetailPermissionChipsUseCase: GetAppDetailPermissionChipsUseCase,
   private val getAppDetailSignatureChipsUseCase: GetAppDetailSignatureChipsUseCase,
@@ -173,6 +175,10 @@ class DetailViewModel(
 
   suspend fun getAppInstallSourceDetails(packageName: String) = withContext(Dispatchers.IO) {
     getAppInstallSourceDetailsUseCase(packageName)
+  }
+
+  suspend fun prepareAppPackageShareFile(cacheDir: File, packageName: String) = withContext(Dispatchers.IO) {
+    prepareAppPackageShareFileUseCase(cacheDir, packageName)
   }
 
   suspend fun getApkPreviewInfo(url: String): Result<ApkPreviewInfo> {

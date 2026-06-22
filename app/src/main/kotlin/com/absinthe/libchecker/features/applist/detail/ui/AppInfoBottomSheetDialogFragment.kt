@@ -1,10 +1,7 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.Settings
 import android.view.ViewGroup
@@ -26,17 +23,10 @@ import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.extensions.getAppName
-import com.absinthe.libchecker.utils.extensions.getVersionCode
-import com.absinthe.libchecker.utils.extensions.isSplitsApk
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
-import java.io.BufferedOutputStream
 import java.io.File
-import java.io.FileOutputStream
-import java.util.zip.ZipEntry
-import java.util.zip.ZipOutputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -50,15 +40,12 @@ import timber.log.Timber
  * </pre>
  */
 
-const val MIMETYPE_APK = "application/vnd.android.package-archive"
-
 class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppInfoBottomSheetView>() {
 
   private val viewModel: DetailViewModel by activityViewModel()
   private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
   private val aiAdapter = AppInfoAdapter()
   private var pendingExportApkFile: File? = null
-  private val illegalFilenameChars = Regex("""[\\/:*?"<>|]""")
 
   private val exportApkLauncher =
     registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -179,23 +166,22 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
         lifecycleScope.launch {
           val shareResult = runCatching {
             withContext(Dispatchers.IO) {
-              val apkFile = prepareApkFile(ctx, pkg)
+              val shareFile = viewModel.prepareAppPackageShareFile(ctx.cacheDir, pkg)
               val uri = FileProvider.getUriForFile(
                 ctx,
                 "${BuildConfig.APPLICATION_ID}.fileprovider",
-                apkFile
+                shareFile.file
               )
-              Pair(apkFile, uri)
+              Pair(shareFile, uri)
             }
           }
           withContext(Dispatchers.Main) {
             loading.dismiss()
           }
 
-          shareResult.onSuccess { (file, uri) ->
-            val mimeType = inferMimeType(file)
+          shareResult.onSuccess { (shareFile, uri) ->
             val shareIntent = Intent(Intent.ACTION_SEND).apply {
-              type = mimeType
+              type = shareFile.mimeType
               putExtra(Intent.EXTRA_STREAM, uri)
               addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
@@ -234,20 +220,19 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
           loading.show()
           val fileResult = runCatching {
             withContext(Dispatchers.IO) {
-              prepareApkFile(ctx, pkg)
+              viewModel.prepareAppPackageShareFile(ctx.cacheDir, pkg)
             }
           }
           withContext(Dispatchers.Main) {
             loading.dismiss()
           }
 
-          fileResult.onSuccess { file ->
-            pendingExportApkFile = file
-            val mimeType = inferMimeType(file)
+          fileResult.onSuccess { shareFile ->
+            pendingExportApkFile = shareFile.file
             val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
               addCategory(Intent.CATEGORY_OPENABLE)
-              type = mimeType
-              putExtra(Intent.EXTRA_TITLE, file.name)
+              type = shareFile.mimeType
+              putExtra(Intent.EXTRA_TITLE, shareFile.file.name)
             }
 
             runCatching {
@@ -292,96 +277,6 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
       lifecycleScope.launch {
         aiAdapter.setList(viewModel.getAppInfoActions(pkg))
       }
-    }
-  }
-
-  private fun prepareApkFile(context: Context, pkg: String): File {
-    val packageInfo = PackageUtils.getPackageInfo(pkg)
-    val applicationInfo = packageInfo.applicationInfo
-      ?: error("No ApplicationInfo")
-    val sourceDir = applicationInfo.sourceDir
-      ?: error("No sourceDir")
-    val sourceFile = File(sourceDir)
-    val splitFiles = PackageUtils.getSplitsSourceDir(packageInfo)
-      ?.map { path -> File(path) }
-      ?.filter { it.exists() }
-      ?: emptyList()
-    val hasSplits = packageInfo.isSplitsApk() && splitFiles.isNotEmpty()
-    val targetDir = File(context.cacheDir, "shared_apk")
-    if (!targetDir.exists()) {
-      targetDir.mkdirs()
-    }
-    val targetFile = File(targetDir, buildSuggestedPackageFileName(context.packageManager, packageInfo, hasSplits))
-    val latestSourceTimestamp = (listOf(sourceFile) + splitFiles).maxOf { it.lastModified() }
-    val needRebuild = !targetFile.exists() ||
-      targetFile.lastModified() < latestSourceTimestamp ||
-      (!hasSplits && targetFile.length() != sourceFile.length()) ||
-      (hasSplits && targetFile.length() == 0L)
-
-    if (needRebuild) {
-      if (targetFile.exists()) {
-        targetFile.delete()
-      }
-      if (hasSplits) {
-        buildApksArchive(targetFile, sourceFile, splitFiles)
-      } else {
-        sourceFile.inputStream().use { input ->
-          targetFile.outputStream().use { output ->
-            input.copyTo(output)
-          }
-        }
-      }
-      targetFile.setLastModified(latestSourceTimestamp)
-    }
-
-    return targetFile
-  }
-
-  private fun buildSuggestedPackageFileName(
-    packageManager: PackageManager,
-    packageInfo: PackageInfo,
-    hasSplits: Boolean
-  ): String {
-    val appName = packageInfo.getAppName(packageManager).takeUnless { it.isNullOrBlank() }
-      ?: packageInfo.packageName
-    val versionName = packageInfo.versionName.orEmpty()
-    val versionCode = packageInfo.getVersionCode()
-    val raw = "${appName}_${versionName}_$versionCode"
-    val sanitized = raw.replace(illegalFilenameChars, "_")
-    val extension = if (hasSplits) "apks" else "apk"
-    return "$sanitized.$extension"
-  }
-
-  private fun buildApksArchive(targetFile: File, baseApk: File, splits: List<File>) {
-    val tempFile = File(targetFile.parentFile, "${targetFile.name}.tmp")
-    ZipOutputStream(BufferedOutputStream(FileOutputStream(tempFile))).use { zos ->
-      fun putFile(file: File) {
-        val entry = ZipEntry(file.name)
-        entry.time = file.lastModified()
-        zos.putNextEntry(entry)
-        file.inputStream().use { input ->
-          input.copyTo(zos)
-        }
-        zos.closeEntry()
-      }
-      putFile(baseApk)
-      splits.forEach { split ->
-        putFile(split)
-      }
-    }
-
-    if (!tempFile.renameTo(targetFile)) {
-      targetFile.delete()
-      tempFile.copyTo(targetFile, overwrite = true)
-      tempFile.delete()
-    }
-  }
-
-  private fun inferMimeType(file: File): String {
-    return if (file.extension.equals("apks", ignoreCase = true)) {
-      "application/octet-stream"
-    } else {
-      MIMETYPE_APK
     }
   }
 }
