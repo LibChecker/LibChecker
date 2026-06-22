@@ -113,6 +113,9 @@ Important `:app` boundaries:
   and network calls must run off the main thread.
 - Package analysis must keep working for installed apps, APK, split APK, APKS,
   XAPK, HAP, missing icons/labels, corrupted archives, and OEM/API differences.
+- Prefer `FileProvider` for sharing/exporting app files. The app-info source
+  action is the only `file://` path; keep it behind `GetAppInfoActionsUseCase`
+  and `AllowFileUriExposureUseCase`.
 - Keep `foss` free of market-only Google/Firebase behavior.
 - Review manifests carefully when changing exported activities, deep links,
   FileProvider, Shizuku provider authorities, package visibility, foreground

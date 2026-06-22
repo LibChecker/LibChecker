@@ -10,7 +10,8 @@ import java.io.File
 
 class GetAppInfoActionsUseCase(
   private val ownPackageName: String,
-  private val installedAppRepository: InstalledAppRepository
+  private val installedAppRepository: InstalledAppRepository,
+  private val allowFileUriExposure: AllowFileUriExposureUseCase
 ) {
 
   operator fun invoke(packageName: String): List<AppInfoActionItem> {
@@ -39,6 +40,7 @@ class GetAppInfoActionsUseCase(
       ?.applicationInfo
       ?.sourceDir
       ?: return emptyList()
+    allowFileUriExposure()
     val sourcePath = runCatching { File(source) }.getOrNull() ?: return emptyList()
 
     return PackageManagerCompat.queryIntentActivities(

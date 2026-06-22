@@ -12,6 +12,7 @@ import com.absinthe.libchecker.data.snapshot.ProtoSnapshotArchiveCodec
 import com.absinthe.libchecker.data.statistics.CachedAndroidDistributionRepository
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.Repositories
+import com.absinthe.libchecker.domain.app.AllowFileUriExposureUseCase
 import com.absinthe.libchecker.domain.app.AppListExportMetadata
 import com.absinthe.libchecker.domain.app.AppListItemFactory
 import com.absinthe.libchecker.domain.app.AppListRepository
@@ -92,6 +93,7 @@ val appModule = module {
   single<SnapshotItemFactory> { AndroidSnapshotItemFactory() }
   single<SnapshotRepository> { LocalSnapshotRepository(get()) }
   single<SnapshotArchiveCodec> { ProtoSnapshotArchiveCodec() }
+  single { AllowFileUriExposureUseCase() }
   factory { InitializeAppListUseCase(get(), get(), get()) }
   factory { SyncAppListChangesUseCase(get(), get(), get()) }
   factory { BuildAbiChartDataUseCase() }
@@ -109,7 +111,7 @@ val appModule = module {
   factory { GetAppDetailComponentsUseCase() }
   factory { GetAppDetailComponentChipsUseCase(get()) }
   factory { GetAppDetailFeaturesUseCase(get(), get()) }
-  factory { GetAppInfoActionsUseCase(BuildConfig.APPLICATION_ID, get()) }
+  factory { GetAppInfoActionsUseCase(BuildConfig.APPLICATION_ID, get(), get()) }
   factory { GetAppInstallSourceDetailsUseCase(get()) }
   factory { GetAppDetailMetadataChipsUseCase() }
   factory { GetAppDetailNativeLibrariesUseCase() }

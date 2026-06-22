@@ -3,7 +3,6 @@ package com.absinthe.libchecker
 import android.app.Application
 import android.content.Context
 import android.content.pm.PackageParser
-import android.os.StrictMode
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import androidx.window.embedding.RuleController
@@ -125,13 +124,6 @@ class LibCheckerApp : Application() {
       }
     }.onFailure {
       Timber.w("bypass [PackageParser check] failed")
-    }
-
-    runCatching {
-      StrictMode::class.java.getDeclaredMethod("disableDeathOnFileUriExposure").invoke(null)
-      Timber.i("StrictMode: disableDeathOnFileUriExposure")
-    }.onFailure {
-      Timber.w("bypass [StrictMode: disableDeathOnFileUriExposure] failed")
     }
   }
 
