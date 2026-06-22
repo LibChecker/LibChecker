@@ -63,6 +63,10 @@ object LocalInstalledAppRepository : InstalledAppRepository {
     }.getOrNull()
   }
 
+  override fun getPermissions(packageName: String): List<String> {
+    return PackageUtils.getPermissionsList(packageName)
+  }
+
   override fun getPackageState(packageName: String): InstalledPackageState {
     val packageInfo = getPackageInfo(packageName)
     return InstalledPackageState(

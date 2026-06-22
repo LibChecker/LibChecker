@@ -1,8 +1,6 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
-import android.Manifest
 import android.app.Activity
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
@@ -17,9 +15,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.AppInfoAdapter
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppInfoBottomSheetView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
@@ -42,6 +40,7 @@ import java.util.zip.ZipOutputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import timber.log.Timber
 
 /**
@@ -55,6 +54,7 @@ const val MIMETYPE_APK = "application/vnd.android.package-archive"
 
 class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppInfoBottomSheetView>() {
 
+  private val viewModel: DetailViewModel by activityViewModel()
   private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
   private val aiAdapter = AppInfoAdapter()
   private var pendingExportApkFile: File? = null
@@ -275,17 +275,10 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
     }
 
     aiAdapter.also { adapter ->
-      val list = (getShowAppInfoList() + getShowAppSourceList() + getShowMarketList())
-        .distinctBy { it.pii.packageName }
-      adapter.setList(list)
       adapter.setOnItemClickListener { _, _, position ->
         adapter.data[position].let {
           runCatching {
             startActivity(it.intent)
-            // Telemetry.recordEvent(
-            //   Constants.Event.APP_INFO_BOTTOM_SHEET,
-            //   mapOf(Telemetry.Param.CONTENT to packageName.toString(), "Action" to it.pii.packageName)
-            // )
           }.onFailure {
             context?.let { ctx ->
               Toasty.showShort(ctx, R.string.toast_cant_open_app)
@@ -295,63 +288,11 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
         dismiss()
       }
     }
-  }
-
-  private fun getShowAppInfoList(): List<AppInfoAdapter.AppInfoItem> {
-    return PackageManagerCompat.queryIntentActivities(
-      Intent(Intent.ACTION_SHOW_APP_INFO),
-      PackageManager.MATCH_DEFAULT_ONLY
-    ).filter { it.activityInfo.packageName != BuildConfig.APPLICATION_ID }
-      .map {
-        AppInfoAdapter.AppInfoItem(
-          it.activityInfo,
-          Intent(Intent.ACTION_SHOW_APP_INFO)
-            .setComponent(ComponentName(it.activityInfo.packageName, it.activityInfo.name))
-            .putExtra(Intent.EXTRA_PACKAGE_NAME, packageName)
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        )
+    packageName?.let { pkg ->
+      lifecycleScope.launch {
+        aiAdapter.setList(viewModel.getAppInfoActions(pkg))
       }
-  }
-
-  private fun getShowAppSourceList(): List<AppInfoAdapter.AppInfoItem> {
-    val pkg = packageName ?: return emptyList()
-    val source = runCatching { PackageUtils.getPackageInfo(pkg).applicationInfo?.sourceDir }.getOrNull() ?: return emptyList()
-    val sourcePath = runCatching { File(source) }.getOrNull() ?: return emptyList()
-
-    return PackageManagerCompat.queryIntentActivities(
-      Intent(Intent.ACTION_VIEW).also {
-        it.setDataAndType(sourcePath.toUri(), MIMETYPE_APK)
-      },
-      PackageManager.MATCH_DEFAULT_ONLY
-    )
-      .filter { isFileManager(it.activityInfo.packageName) }
-      .map {
-        AppInfoAdapter.AppInfoItem(
-          it.activityInfo,
-          Intent(Intent.ACTION_VIEW)
-            .setPackage(it.activityInfo.packageName)
-            .setDataAndType(sourcePath.toUri(), MIMETYPE_APK)
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        )
-      }
-  }
-
-  private fun getShowMarketList(): List<AppInfoAdapter.AppInfoItem> {
-    return PackageManagerCompat.queryIntentActivities(
-      Intent(Intent.ACTION_VIEW).also {
-        it.data = "market://details?id=$packageName".toUri()
-      },
-      PackageManager.MATCH_DEFAULT_ONLY
-    ).filter { it.activityInfo.packageName != BuildConfig.APPLICATION_ID }
-      .map {
-        AppInfoAdapter.AppInfoItem(
-          it.activityInfo,
-          Intent(Intent.ACTION_VIEW)
-            .setData("market://details?id=$packageName".toUri())
-            .setComponent(ComponentName(it.activityInfo.packageName, it.activityInfo.name))
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        )
-      }
+    }
   }
 
   private fun prepareApkFile(context: Context, pkg: String): File {
@@ -442,42 +383,5 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
     } else {
       MIMETYPE_APK
     }
-  }
-
-  private fun isFileManager(packageName: String): Boolean {
-    val viewIntent = Intent(Intent.ACTION_VIEW).apply {
-      setDataAndType("file:///".toUri(), "*/*")
-      setPackage(packageName)
-    }
-    val canHandleFiles = PackageManagerCompat.queryIntentActivities(
-      viewIntent,
-      PackageManager.MATCH_DEFAULT_ONLY
-    ).any { it.activityInfo.packageName == packageName }
-
-    val permissions = PackageUtils.getPermissionsList(packageName)
-    val hasStoragePermission = permissions.any {
-      it == "android.permission.MANAGE_EXTERNAL_STORAGE" ||
-        it == Manifest.permission.READ_EXTERNAL_STORAGE ||
-        it == Manifest.permission.WRITE_EXTERNAL_STORAGE
-    }
-
-    val getContentIntent = Intent(Intent.ACTION_GET_CONTENT).apply {
-      type = "*/*"
-      setPackage(packageName)
-    }
-    val canPickFiles = PackageManagerCompat.queryIntentActivities(
-      getContentIntent,
-      PackageManager.MATCH_DEFAULT_ONLY
-    ).any { it.activityInfo.packageName == packageName }
-
-    val openTreeIntent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
-      setPackage(packageName)
-    }
-    val canManageDirectories = PackageManagerCompat.queryIntentActivities(
-      openTreeIntent,
-      PackageManager.MATCH_DEFAULT_ONLY
-    ).any { it.activityInfo.packageName == packageName }
-
-    return (canHandleFiles || canPickFiles || canManageDirectories) && hasStoragePermission
   }
 }

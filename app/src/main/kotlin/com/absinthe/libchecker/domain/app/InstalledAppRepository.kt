@@ -25,5 +25,7 @@ interface InstalledAppRepository {
 
   fun getInstallSource(packageName: String): AppInstallSource?
 
+  fun getPermissions(packageName: String): List<String>
+
   fun getPackageState(packageName: String): InstalledPackageState
 }
