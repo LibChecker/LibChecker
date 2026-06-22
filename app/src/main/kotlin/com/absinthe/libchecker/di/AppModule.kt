@@ -118,7 +118,9 @@ val appModule = module {
   factory { GetAppDetailComponentsUseCase() }
   factory { GetAppDetailComponentChipsUseCase(get()) }
   factory { GetAppDetailFeaturesUseCase(get(), get()) }
-  factory { GetAppInfoActionsUseCase(BuildConfig.APPLICATION_ID, get(), get()) }
+  factory {
+    GetAppInfoActionsUseCase(BuildConfig.APPLICATION_ID, androidContext().packageManager, get(), get())
+  }
   factory { GetAppInstallSourceDetailsUseCase(get()) }
   factory { GetAppLaunchActionUseCase() }
   factory { GetAppDetailMetadataChipsUseCase() }

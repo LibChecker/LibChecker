@@ -3,20 +3,23 @@ package com.absinthe.libchecker.domain.app
 import android.Manifest
 import android.content.ComponentName
 import android.content.Intent
+import android.content.pm.PackageItemInfo
 import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
 import androidx.core.net.toUri
 import com.absinthe.libchecker.compat.PackageManagerCompat
 import java.io.File
 
 class GetAppInfoActionsUseCase(
   private val ownPackageName: String,
+  private val packageManager: PackageManager,
   private val installedAppRepository: InstalledAppRepository,
   private val allowFileUriExposure: AllowFileUriExposureUseCase
 ) {
 
   operator fun invoke(packageName: String): List<AppInfoActionItem> {
     return (getShowAppInfoList(packageName) + getShowAppSourceList(packageName) + getShowMarketList(packageName))
-      .distinctBy { it.packageItemInfo.packageName }
+      .distinctBy { it.packageName }
   }
 
   private fun getShowAppInfoList(packageName: String): List<AppInfoActionItem> {
@@ -25,7 +28,7 @@ class GetAppInfoActionsUseCase(
       PackageManager.MATCH_DEFAULT_ONLY
     ).filter { it.activityInfo.packageName != ownPackageName }
       .map {
-        AppInfoActionItem(
+        toActionItem(
           packageItemInfo = it.activityInfo,
           intent = Intent(Intent.ACTION_SHOW_APP_INFO)
             .setComponent(ComponentName(it.activityInfo.packageName, it.activityInfo.name))
@@ -51,7 +54,7 @@ class GetAppInfoActionsUseCase(
     )
       .filter { isFileManager(it.activityInfo.packageName) }
       .map {
-        AppInfoActionItem(
+        toActionItem(
           packageItemInfo = it.activityInfo,
           intent = Intent(Intent.ACTION_VIEW)
             .setPackage(it.activityInfo.packageName)
@@ -69,7 +72,7 @@ class GetAppInfoActionsUseCase(
       PackageManager.MATCH_DEFAULT_ONLY
     ).filter { it.activityInfo.packageName != ownPackageName }
       .map {
-        AppInfoActionItem(
+        toActionItem(
           packageItemInfo = it.activityInfo,
           intent = Intent(Intent.ACTION_VIEW)
             .setData("market://details?id=$packageName".toUri())
@@ -114,6 +117,23 @@ class GetAppInfoActionsUseCase(
     ).any { it.activityInfo.packageName == packageName }
 
     return (canHandleFiles || canPickFiles || canManageDirectories) && hasStoragePermission
+  }
+
+  private fun toActionItem(packageItemInfo: PackageItemInfo, intent: Intent): AppInfoActionItem {
+    return AppInfoActionItem(
+      packageName = packageItemInfo.packageName,
+      label = packageItemInfo.loadLabel(packageManager),
+      icon = getAppIcon(packageItemInfo.packageName),
+      intent = intent
+    )
+  }
+
+  private fun getAppIcon(packageName: String): Drawable? {
+    return runCatching {
+      installedAppRepository.getPackageInfo(packageName)
+        ?.applicationInfo
+        ?.loadIcon(packageManager)
+    }.getOrNull()
   }
 
   private companion object {

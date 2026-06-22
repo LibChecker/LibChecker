@@ -131,6 +131,9 @@ Important `:app` boundaries:
   `ANDROID_USER_HOME=/private/tmp/libchecker-android-home`
   `-Dorg.gradle.vfs.watch=false`
   `-Dkotlin.compiler.execution.strategy=in-process`
+- Keep `ANDROID_USER_HOME` stable across debug installs. Switching debug
+  keystores can cause `INSTALL_FAILED_UPDATE_INCOMPATIBLE`; prefer the existing
+  temp Android home before uninstalling debug.
 - Do not treat every Gradle deprecation trace as repo-owned. Recent AGP traces
   such as `VariantDependenciesBuilder.createTestComponents` were upstream/plugin
   noise, not a reason to rewrite project dependency access.

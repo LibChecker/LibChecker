@@ -1,9 +1,11 @@
 package com.absinthe.libchecker.domain.app
 
 import android.content.Intent
-import android.content.pm.PackageItemInfo
+import android.graphics.drawable.Drawable
 
 data class AppInfoActionItem(
-  val packageItemInfo: PackageItemInfo,
+  val packageName: String,
+  val label: CharSequence,
+  val icon: Drawable?,
   val intent: Intent
 )
