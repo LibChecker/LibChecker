@@ -37,6 +37,7 @@ import com.absinthe.libchecker.domain.app.GetAppDetailSignatureChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailStaticLibraryChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppInfoActionsUseCase
 import com.absinthe.libchecker.domain.app.GetAppInstallSourceDetailsUseCase
+import com.absinthe.libchecker.domain.app.GetAppLaunchActionUseCase
 import com.absinthe.libchecker.domain.app.GetAppManifestPropertiesUseCase
 import com.absinthe.libchecker.domain.app.GetArchivePackageInfoUseCase
 import com.absinthe.libchecker.domain.app.GetElfDetailUseCase
@@ -83,6 +84,7 @@ class DetailViewModel(
   private val getAppDetailPackage: GetAppDetailPackageUseCase,
   private val getAlternativeLaunchItemsUseCase: GetAlternativeLaunchItemsUseCase,
   private val getAppInfoActionsUseCase: GetAppInfoActionsUseCase,
+  private val getAppLaunchActionUseCase: GetAppLaunchActionUseCase,
   private val getAppBundleItemsUseCase: GetAppBundleItemsUseCase,
   private val getAppDetailAbiUseCase: GetAppDetailAbiUseCase,
   private val getAppInstallSourceDetailsUseCase: GetAppInstallSourceDetailsUseCase,
@@ -176,6 +178,10 @@ class DetailViewModel(
 
   suspend fun getAppInfoActions(packageName: String) = withContext(Dispatchers.IO) {
     getAppInfoActionsUseCase(packageName)
+  }
+
+  suspend fun getAppLaunchAction(packageName: String?) = withContext(Dispatchers.IO) {
+    getAppLaunchActionUseCase(packageName)
   }
 
   suspend fun getAlternativeLaunchItems(packageName: String) = withContext(Dispatchers.IO) {

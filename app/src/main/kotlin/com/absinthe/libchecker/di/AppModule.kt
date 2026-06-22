@@ -35,6 +35,7 @@ import com.absinthe.libchecker.domain.app.GetAppDetailSignatureChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailStaticLibraryChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppInfoActionsUseCase
 import com.absinthe.libchecker.domain.app.GetAppInstallSourceDetailsUseCase
+import com.absinthe.libchecker.domain.app.GetAppLaunchActionUseCase
 import com.absinthe.libchecker.domain.app.GetAppListContentUseCase
 import com.absinthe.libchecker.domain.app.GetAppListPackageStatesUseCase
 import com.absinthe.libchecker.domain.app.GetAppManifestPropertiesUseCase
@@ -119,6 +120,7 @@ val appModule = module {
   factory { GetAppDetailFeaturesUseCase(get(), get()) }
   factory { GetAppInfoActionsUseCase(BuildConfig.APPLICATION_ID, get(), get()) }
   factory { GetAppInstallSourceDetailsUseCase(get()) }
+  factory { GetAppLaunchActionUseCase() }
   factory { GetAppDetailMetadataChipsUseCase() }
   factory { GetAppDetailNativeLibrariesUseCase() }
   factory { GetAppDetailStaticLibraryChipsUseCase() }
@@ -173,6 +175,7 @@ val appModule = module {
       getAppDetailPackage = get(),
       getAlternativeLaunchItemsUseCase = get(),
       getAppInfoActionsUseCase = get(),
+      getAppLaunchActionUseCase = get(),
       getAppBundleItemsUseCase = get(),
       getAppDetailAbiUseCase = get(),
       getAppInstallSourceDetailsUseCase = get(),

@@ -18,7 +18,6 @@ import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.AppInfoAdapter
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppInfoBottomSheetView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.UiUtils
@@ -109,31 +108,39 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
       setPadding(24.dp, 16.dp, 24.dp, 0)
     }
     root.launch.setOnClickListener {
-      try {
+      lifecycleScope.launch {
         if (packageName == BuildConfig.APPLICATION_ID) {
           Toasty.showShort(requireContext(), "But why…")
-        } else {
-          PackageUtils.startLaunchAppActivity(requireContext(), packageName)
+          dismiss()
+          return@launch
         }
-      } catch (_: Exception) {
-        activity?.let {
-          AlternativeLaunchBSDFragment().apply {
-            arguments = Bundle().apply {
-              putString(EXTRA_PACKAGE_NAME, packageName)
-            }
-            show(it.supportFragmentManager, AlternativeLaunchBSDFragment::class.java.name)
-          }
+
+        val launchAction = viewModel.getAppLaunchAction(packageName)
+        if (launchAction == null) {
+          showAlternativeLaunchDialog()
+          dismiss()
+          return@launch
         }
-      } finally {
-        dismiss()
+
+        runCatching {
+          startActivity(launchAction.intent)
+        }.onFailure {
+          showAlternativeLaunchDialog()
+        }.also {
+          dismiss()
+        }
       }
     }
-    packageName?.let {
-      root.launch.setLongClickCopiedToClipboard(PackageUtils.getLauncherActivity(it))
-      Telemetry.recordEvent(
-        Constants.Event.APP_INFO_BOTTOM_SHEET,
-        mapOf(Telemetry.Param.CONTENT to "Unknown", "Action" to "Launch")
-      )
+    packageName?.let { pkg ->
+      lifecycleScope.launch {
+        viewModel.getAppLaunchAction(pkg)?.launcherActivity?.let {
+          root.launch.setLongClickCopiedToClipboard(it)
+        }
+        Telemetry.recordEvent(
+          Constants.Event.APP_INFO_BOTTOM_SHEET,
+          mapOf(Telemetry.Param.CONTENT to "Unknown", "Action" to "Launch")
+        )
+      }
     }
     root.setting.setOnClickListener {
       try {
@@ -276,6 +283,17 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
     packageName?.let { pkg ->
       lifecycleScope.launch {
         aiAdapter.setList(viewModel.getAppInfoActions(pkg))
+      }
+    }
+  }
+
+  private fun showAlternativeLaunchDialog() {
+    activity?.let {
+      AlternativeLaunchBSDFragment().apply {
+        arguments = Bundle().apply {
+          putString(EXTRA_PACKAGE_NAME, packageName)
+        }
+        show(it.supportFragmentManager, AlternativeLaunchBSDFragment::class.java.name)
       }
     }
   }
