@@ -12,7 +12,6 @@ import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
-import com.absinthe.libchecker.api.bean.LibDetailBean
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.RulesRepository
@@ -41,7 +40,7 @@ import com.absinthe.libchecker.domain.app.GetAppManifestPropertiesUseCase
 import com.absinthe.libchecker.domain.app.GetArchivePackageInfoUseCase
 import com.absinthe.libchecker.domain.app.GetElfDetailUseCase
 import com.absinthe.libchecker.domain.app.GetInstalledAppComparisonPackageUseCase
-import com.absinthe.libchecker.domain.app.GetLibraryDetailUseCase
+import com.absinthe.libchecker.domain.app.GetLibraryDetailDialogDataUseCase
 import com.absinthe.libchecker.domain.app.GetRelatedAppListItemUseCase
 import com.absinthe.libchecker.domain.app.HasInstalledStaticLibrariesUseCase
 import com.absinthe.libchecker.domain.app.PrepareAppPackageShareFileUseCase
@@ -99,7 +98,7 @@ class DetailViewModel(
   private val getElfDetailUseCase: GetElfDetailUseCase,
   private val getInstalledAppComparisonPackageUseCase: GetInstalledAppComparisonPackageUseCase,
   private val hasInstalledStaticLibrariesUseCase: HasInstalledStaticLibrariesUseCase,
-  private val getLibraryDetailUseCase: GetLibraryDetailUseCase,
+  private val getLibraryDetailDialogDataUseCase: GetLibraryDetailDialogDataUseCase,
   private val getRelatedAppListItemUseCase: GetRelatedAppListItemUseCase,
   private val sortAppDetailItemsUseCase: SortAppDetailItemsUseCase,
   private val buildPackageComparisonSnapshotItemUseCase: BuildPackageComparisonSnapshotItemUseCase
@@ -421,11 +420,35 @@ class DetailViewModel(
     componentsMap[PROVIDER]?.emit(components.providers)
   }
 
-  suspend fun requestLibDetail(
+  suspend fun getLibraryDetailDialogHeader(
     libName: String,
     @LibType type: Int,
-    isRegex: Boolean = false
-  ): LibDetailBean? = getLibraryDetailUseCase(libName, type, isRegex)
+    isValidLib: Boolean
+  ) = withContext(Dispatchers.IO) {
+    getLibraryDetailDialogDataUseCase.getHeader(
+      GetLibraryDetailDialogDataUseCase.HeaderRequest(
+        libName = libName,
+        type = type,
+        isValidLib = isValidLib
+      )
+    )
+  }
+
+  suspend fun getLibraryDetailDialogData(
+    libName: String,
+    @LibType type: Int,
+    regexName: String?,
+    isValidLib: Boolean
+  ) = withContext(Dispatchers.IO) {
+    getLibraryDetailDialogDataUseCase(
+      GetLibraryDetailDialogDataUseCase.Request(
+        libName = libName,
+        type = type,
+        regexName = regexName,
+        isValidLib = isValidLib
+      )
+    )
+  }
 
   private suspend fun getDexChipList(): List<LibStringItemChip> {
     Timber.d("getDexChipList")
@@ -534,10 +557,6 @@ class DetailViewModel(
     } catch (e: Exception) {
       Timber.e(e)
     }
-  }
-
-  suspend fun getRepoUpdatedTime(owner: String, repo: String): String? {
-    return getLibraryDetailUseCase.getRepoUpdatedTime(owner, repo)
   }
 
   fun emitFeature(feature: VersionedFeature) = viewModelScope.launch {

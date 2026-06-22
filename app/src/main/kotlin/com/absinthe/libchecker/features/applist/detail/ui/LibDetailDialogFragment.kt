@@ -9,9 +9,7 @@ import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.URLManager
-import com.absinthe.libchecker.database.RulesRepository
+import com.absinthe.libchecker.domain.app.GetLibraryDetailDialogDataUseCase
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.ui.view.LibDetailBottomSheetView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
@@ -19,9 +17,7 @@ import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import timber.log.Timber
 
@@ -46,14 +42,13 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
       maxPeekHeightPercentage = 0.8f
       title.text = if (type == ACTION) "< $libName >" else libName
       lifecycleScope.launch {
-        val rule = if (isValidLib) {
-          RulesRepository.getRule(libName, type, true)
-        } else {
-          null
-        }
-        val iconRes = rule?.iconRes ?: com.absinthe.lc.rulesbundle.R.drawable.ic_sdk_placeholder
-        setLoadingIcon(iconRes, rule?.isSimpleColorIcon == true)
-        icon.load(iconRes) {
+        val header = viewModel.getLibraryDetailDialogHeader(
+          libName = libName,
+          type = type,
+          isValidLib = isValidLib
+        )
+        setLoadingIcon(header.iconRes, header.isSimpleColorIcon)
+        icon.load(header.iconRes) {
           crossfade(true)
           placeholder(R.drawable.ic_logo)
         }
@@ -69,39 +64,26 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
       root.showNotFound()
       return
     }
-    lifecycleScope.launch(Dispatchers.IO) {
+    lifecycleScope.launch {
       runCatching {
-        val detail = if (regexName.isNullOrEmpty()) {
-          viewModel.requestLibDetail(libName, type)
-        } else {
-          viewModel.requestLibDetail(regexName!!, type, true)
-        }
-        if (detail != null) {
-          root.apply {
-            withContext(Dispatchers.Main) {
-              setLibDetailBean(detail)
+        when (
+          val result = viewModel.getLibraryDetailDialogData(
+            libName = libName,
+            type = type,
+            regexName = regexName,
+            isValidLib = isValidLib
+          )
+        ) {
+          is GetLibraryDetailDialogDataUseCase.Result.Found -> {
+            root.apply {
+              setLibDetailBean(result.detail)
               showContent()
-            }
-
-            val sourceLink = detail.data[0].data.source_link
-            if (sourceLink.startsWith(URLManager.GITHUB_HOST) && GlobalValues.isGitHubReachable) {
-              val splits = sourceLink.removePrefix(URLManager.GITHUB_HOST).split("/")
-              if (splits.size < 2) {
-                return@launch
-              }
-              val date = viewModel.getRepoUpdatedTime(splits[0], splits[1]) ?: return@launch
-              withContext(Dispatchers.Main) {
-                root.setUpdateTIme(date)
-              }
+              result.repoUpdatedTime?.let(::setUpdateTIme)
             }
           }
-        } else {
-          if (isStickyEventReceived) {
-            withContext(Dispatchers.Main) {
-              root.showNotFound()
-            }
-          } else {
-            isStickyEventReceived = true
+
+          GetLibraryDetailDialogDataUseCase.Result.NotFound -> {
+            showNotFoundAfterStickyEvent()
           }
         }
       }.onFailure {
@@ -117,6 +99,14 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
           )
         )
       }
+    }
+  }
+
+  private fun showNotFoundAfterStickyEvent() {
+    if (isStickyEventReceived) {
+      root.showNotFound()
+    } else {
+      isStickyEventReceived = true
     }
   }
 
