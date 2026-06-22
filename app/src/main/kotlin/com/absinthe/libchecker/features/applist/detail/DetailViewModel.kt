@@ -39,6 +39,7 @@ import com.absinthe.libchecker.domain.app.GetAppInfoActionsUseCase
 import com.absinthe.libchecker.domain.app.GetAppInstallSourceDetailsUseCase
 import com.absinthe.libchecker.domain.app.GetAppManifestPropertiesUseCase
 import com.absinthe.libchecker.domain.app.GetArchivePackageInfoUseCase
+import com.absinthe.libchecker.domain.app.GetElfDetailUseCase
 import com.absinthe.libchecker.domain.app.GetInstalledAppComparisonPackageUseCase
 import com.absinthe.libchecker.domain.app.GetLibraryDetailUseCase
 import com.absinthe.libchecker.domain.app.GetRelatedAppListItemUseCase
@@ -95,6 +96,7 @@ class DetailViewModel(
   private val getAppDetailSignatureChipsUseCase: GetAppDetailSignatureChipsUseCase,
   private val getAppManifestPropertiesUseCase: GetAppManifestPropertiesUseCase,
   private val getArchivePackageInfoUseCase: GetArchivePackageInfoUseCase,
+  private val getElfDetailUseCase: GetElfDetailUseCase,
   private val getInstalledAppComparisonPackageUseCase: GetInstalledAppComparisonPackageUseCase,
   private val hasInstalledStaticLibrariesUseCase: HasInstalledStaticLibrariesUseCase,
   private val getLibraryDetailUseCase: GetLibraryDetailUseCase,
@@ -200,6 +202,10 @@ class DetailViewModel(
     return withContext(Dispatchers.IO) {
       getArchivePackageInfoUseCase(file)
     }
+  }
+
+  suspend fun getElfDetail(packageName: String, elfPath: String) = withContext(Dispatchers.IO) {
+    getElfDetailUseCase(packageName, elfPath)
   }
 
   suspend fun isInstalledAppComparisonAvailable(packageName: String): Boolean {
