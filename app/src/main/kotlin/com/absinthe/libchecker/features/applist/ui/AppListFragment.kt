@@ -26,6 +26,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
+import com.absinthe.libchecker.domain.app.GetAppListContentUseCase
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.features.applist.ui.adapter.AppAdapter
 import com.absinthe.libchecker.features.applist.ui.adapter.AppListDiffUtil
@@ -497,27 +498,25 @@ class AppListFragment :
   private fun updateItemsImpl(highlightRefresh: Boolean = false) = lifecycleScope.launch(Dispatchers.IO) {
     delay(250)
     Timber.d("updateItemsImpl")
-    val dbItems = homeViewModel.getAppListItems()
-    val dbPackageNames = dbItems.mapTo(mutableSetOf()) { it.packageName }
-
-    if (homeViewModel.isOnlySelfApp(dbItems)) {
-      Timber.d("updateItemsImpl: only the app itself")
-      if (homeViewModel.appListStatus == STATUS_NOT_START) {
-        Once.clearDone(OnceTag.FIRST_LAUNCH)
-        flip(VF_REJECT)
-      }
-      return@launch
-    }
-
     val keyword = appAdapter.highlightText
     val options = GlobalValues.advancedOptions
-    val filterList = homeViewModel.filterAppListItems(
-      items = dbItems,
+    val content = homeViewModel.getAppListContent(
       options = options,
       keyword = keyword,
       isCurrentProcess64Bit = android.os.Process.is64Bit()
-    ).toMutableList()
-    val itemViewStates = homeViewModel.buildAppListItemViewStates(filterList, options)
+    )
+    when (content) {
+      GetAppListContentUseCase.Result.OnlySelf -> {
+        Timber.d("updateItemsImpl: only the app itself")
+        if (homeViewModel.appListStatus == STATUS_NOT_START) {
+          Once.clearDone(OnceTag.FIRST_LAUNCH)
+          flip(VF_REJECT)
+        }
+        return@launch
+      }
+
+      is GetAppListContentUseCase.Result.Content -> Unit
+    }
 
     if (!isActive) {
       return@launch
@@ -525,15 +524,15 @@ class AppListFragment :
     withContext(Dispatchers.Main) {
       appAdapter.apply {
         // Only apps that disappeared from the backing database get the particle effect.
-        // Newly added apps are present in filterList but absent from current adapter data,
+        // Newly added apps are present in the content list but absent from current adapter data,
         // so they go through RecyclerView's normal add path instead.
         particleItemAnimator.prepareParticleRemovals(
           data.asSequence()
-            .filter { it.packageName !in dbPackageNames }
+            .filter { it.packageName !in content.backingPackageNames }
             .map { ParticleRemoveItemAnimator.stableItemIdForKey(it.packageName) }
             .toList()
         )
-        setItemViewStates(itemViewStates)
+        setItemViewStates(content.itemViewStates)
         val shouldReturnTopAfterRequestChange = pendingReturnTopAfterRequestChange &&
           !highlightRefresh &&
           !hasUserScrolledList &&
@@ -542,7 +541,7 @@ class AppListFragment :
           pendingReturnTopAfterRequestChange = false
         }
 
-        setDiffNewData(filterList) {
+        setDiffNewData(content.items.toMutableList()) {
           if (isDetached || !isBindingInitialized()) {
             return@setDiffNewData
           }

@@ -3,7 +3,6 @@ package com.absinthe.libchecker.features.home
 import android.annotation.SuppressLint
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.annotation.STATUS_INIT_END
 import com.absinthe.libchecker.annotation.STATUS_NOT_START
@@ -13,11 +12,9 @@ import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE_END
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.AppListItemViewState
 import com.absinthe.libchecker.domain.app.AppListRepository
-import com.absinthe.libchecker.domain.app.BuildAppListItemViewStatesUseCase
 import com.absinthe.libchecker.domain.app.ExportAppListUseCase
-import com.absinthe.libchecker.domain.app.FilterAppListItemsUseCase
+import com.absinthe.libchecker.domain.app.GetAppListContentUseCase
 import com.absinthe.libchecker.domain.app.InitializeAppListUseCase
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.PackageChangeState
@@ -48,8 +45,7 @@ class HomeViewModel(
   private val syncAppListChangesUseCase: SyncAppListChangesUseCase,
   private val computeLibReferenceUseCase: ComputeLibReferenceUseCase,
   private val exportAppListUseCase: ExportAppListUseCase,
-  private val filterAppListItemsUseCase: FilterAppListItemsUseCase,
-  private val buildAppListItemViewStatesUseCase: BuildAppListItemViewStatesUseCase
+  private val getAppListContentUseCase: GetAppListContentUseCase
 ) : ViewModel() {
 
   val dbItemsFlow: Flow<List<LCItem>> = appListRepository.items
@@ -160,19 +156,13 @@ class HomeViewModel(
     }
   }
 
-  suspend fun getAppListItems(): List<LCItem> {
-    return appListRepository.getItems()
-  }
-
-  suspend fun filterAppListItems(
-    items: List<LCItem>,
+  suspend fun getAppListContent(
     options: Int,
     keyword: String,
     isCurrentProcess64Bit: Boolean
-  ): List<LCItem> {
-    return filterAppListItemsUseCase(
-      FilterAppListItemsUseCase.Request(
-        items = items,
+  ): GetAppListContentUseCase.Result {
+    return getAppListContentUseCase(
+      GetAppListContentUseCase.Request(
         options = options,
         keyword = keyword,
         isCurrentProcess64Bit = isCurrentProcess64Bit
@@ -180,24 +170,8 @@ class HomeViewModel(
     )
   }
 
-  suspend fun buildAppListItemViewStates(
-    items: List<LCItem>,
-    options: Int
-  ): Map<String, AppListItemViewState> {
-    return buildAppListItemViewStatesUseCase(
-      BuildAppListItemViewStatesUseCase.Request(
-        items = items,
-        options = options
-      )
-    )
-  }
-
   suspend fun isOnlySelfAppInDatabase(): Boolean {
-    return isOnlySelfApp(appListRepository.getItems())
-  }
-
-  fun isOnlySelfApp(items: Collection<LCItem>): Boolean {
-    return items.size == 1 && items.first().packageName == BuildConfig.APPLICATION_ID
+    return getAppListContentUseCase.isOnlySelfAppInDatabase()
   }
 
   private var initJob: Job? = null

@@ -34,6 +34,7 @@ import com.absinthe.libchecker.domain.app.GetAppDetailSignatureChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailStaticLibraryChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppInfoActionsUseCase
 import com.absinthe.libchecker.domain.app.GetAppInstallSourceDetailsUseCase
+import com.absinthe.libchecker.domain.app.GetAppListContentUseCase
 import com.absinthe.libchecker.domain.app.GetAppListPackageStatesUseCase
 import com.absinthe.libchecker.domain.app.GetAppManifestPropertiesUseCase
 import com.absinthe.libchecker.domain.app.GetArchivePackageInfoUseCase
@@ -122,6 +123,7 @@ val appModule = module {
   factory { GetAppDetailSignatureChipsUseCase(androidContext()) }
   factory { PrepareAppPackageShareFileUseCase(androidContext().packageManager, get()) }
   factory { GetApkPreviewInfoUseCase() }
+  factory { GetAppListContentUseCase(BuildConfig.APPLICATION_ID, get(), get(), get()) }
   factory { GetAppListPackageStatesUseCase(get()) }
   factory { BuildAppListItemViewStatesUseCase(androidContext(), get()) }
   factory { GetAppManifestPropertiesUseCase() }
@@ -193,8 +195,7 @@ val appModule = module {
       syncAppListChangesUseCase = get(),
       computeLibReferenceUseCase = get(),
       exportAppListUseCase = get(),
-      filterAppListItemsUseCase = get(),
-      buildAppListItemViewStatesUseCase = get()
+      getAppListContentUseCase = get()
     )
   }
   viewModel {
