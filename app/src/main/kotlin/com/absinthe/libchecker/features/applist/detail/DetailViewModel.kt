@@ -30,6 +30,7 @@ import com.absinthe.libchecker.domain.app.BuildRelatedAppDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.BuildSignatureDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.ExportAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.ExtractNativeLibraryUseCase
+import com.absinthe.libchecker.domain.app.FilterAppDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.GetAlternativeLaunchItemsUseCase
 import com.absinthe.libchecker.domain.app.GetApkPreviewInfoUseCase
 import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
@@ -89,6 +90,7 @@ class DetailViewModel(
   private val getAppInfoActionsUseCase: GetAppInfoActionsUseCase,
   private val getAppLaunchActionUseCase: GetAppLaunchActionUseCase,
   private val getAppBundleItemsUseCase: GetAppBundleItemsUseCase,
+  private val filterAppDetailItemsUseCase: FilterAppDetailItemsUseCase,
   private val getAppDetailAbiUseCase: GetAppDetailAbiUseCase,
   private val getAppDetailAbilityChipsUseCase: GetAppDetailAbilityChipsUseCase,
   private val getAppInstallSourceDetailsUseCase: GetAppInstallSourceDetailsUseCase,
@@ -598,6 +600,22 @@ class DetailViewModel(
   fun updateItemsCountStateFlow(locate: Int, count: Int) = viewModelScope.launch {
     itemsCountStateFlow.value = LocatedCount(locate, count)
     itemsCountList[locate] = count
+  }
+
+  fun filterDetailItems(
+    items: List<LibStringItemChip>,
+    searchWords: String?,
+    process: String?
+  ): List<LibStringItemChip> {
+    return filterAppDetailItemsUseCase(items, searchWords, process)
+  }
+
+  fun filterPermissionDetailItems(
+    items: List<LibStringItemChip>,
+    searchWords: String?,
+    process: String?
+  ): List<LibStringItemChip> {
+    return filterAppDetailItemsUseCase.filterPermissions(items, searchWords, process)
   }
 
   fun sortDetailItems(items: List<LibStringItemChip>, @LibType type: Int): List<LibStringItemChip> {

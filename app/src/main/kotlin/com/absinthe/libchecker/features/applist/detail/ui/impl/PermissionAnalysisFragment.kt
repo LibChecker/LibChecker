@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.features.applist.detail.ui.impl
 
-import android.content.pm.PackageInfo
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.PERMISSION
@@ -80,10 +79,7 @@ class PermissionAnalysisFragment :
     searchWords: String?,
     process: String?
   ): List<LibStringItemChip> {
-    return items.asSequence()
-      .filter { searchWords == null || it.item.name.contains(searchWords, true) || it.item.source?.contains(searchWords, true) == true }
-      .filter { process == null || it.item.process != PackageInfo.REQUESTED_PERMISSION_GRANTED.toString() }
-      .toList()
+    return viewModel.filterPermissionDetailItems(items, searchWords, process)
   }
 
   companion object {

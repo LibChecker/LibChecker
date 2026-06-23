@@ -218,15 +218,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     searchWords: String?,
     process: String?
   ): List<LibStringItemChip> {
-    return items.asSequence()
-      .filter {
-        searchWords == null || it.item.name.contains(
-          searchWords,
-          true
-        ) || it.item.source?.contains(searchWords, true) == true
-      }
-      .filter { process == null || it.item.process == process }
-      .toList()
+    return viewModel.filterDetailItems(items, searchWords, process)
   }
 
   protected open suspend fun getFilterList(

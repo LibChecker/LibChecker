@@ -29,6 +29,7 @@ import com.absinthe.libchecker.domain.app.CheckRequiredPackageAvailabilityUseCas
 import com.absinthe.libchecker.domain.app.ExportAppListUseCase
 import com.absinthe.libchecker.domain.app.ExportAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.ExtractNativeLibraryUseCase
+import com.absinthe.libchecker.domain.app.FilterAppDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.FilterAppListItemsUseCase
 import com.absinthe.libchecker.domain.app.GetAlternativeLaunchItemsUseCase
 import com.absinthe.libchecker.domain.app.GetApkPreviewInfoUseCase
@@ -136,6 +137,7 @@ val appModule = module {
   factory { GetLibReferenceIconPackagesUseCase(get()) }
   factory { GetLibReferenceAppsUseCase(get()) }
   factory { ExportAppListUseCase(get(), get()) }
+  factory { FilterAppDetailItemsUseCase() }
   factory { FilterAppListItemsUseCase(get()) }
   factory { GetAlternativeLaunchItemsUseCase(androidContext().packageManager, get()) }
   factory { GetAppBundleItemsUseCase() }
@@ -227,6 +229,7 @@ val appModule = module {
       getAppInfoActionsUseCase = get(),
       getAppLaunchActionUseCase = get(),
       getAppBundleItemsUseCase = get(),
+      filterAppDetailItemsUseCase = get(),
       getAppDetailAbiUseCase = get(),
       getAppDetailAbilityChipsUseCase = get(),
       getAppInstallSourceDetailsUseCase = get(),
