@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.data.app
 
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import androidx.lifecycle.LifecycleOwner
 import com.absinthe.libchecker.domain.app.AppInstallSource
@@ -27,6 +28,10 @@ object LocalInstalledAppRepository : InstalledAppRepository {
 
   override fun getApplicationCount(forceUpdate: Boolean): Int {
     return LocalAppDataSource.getApplicationCount(forceUpdate)
+  }
+
+  override fun getRandomApplicationInfo(forceUpdate: Boolean): ApplicationInfo? {
+    return LocalAppDataSource.getRandomApplicationInfo(forceUpdate)
   }
 
   override fun getApexPackageNames(): Set<String> {

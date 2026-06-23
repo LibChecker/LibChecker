@@ -54,6 +54,7 @@ import com.absinthe.libchecker.domain.app.GetLibraryDetailDialogDataUseCase
 import com.absinthe.libchecker.domain.app.GetLibraryDetailUseCase
 import com.absinthe.libchecker.domain.app.GetOverlayDetailUseCase
 import com.absinthe.libchecker.domain.app.GetPermissionDetailUseCase
+import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.app.GetRelatedAppListItemUseCase
 import com.absinthe.libchecker.domain.app.GetXposedModuleInfoUseCase
 import com.absinthe.libchecker.domain.app.HasInstalledStaticLibrariesUseCase
@@ -167,6 +168,7 @@ val appModule = module {
   factory { GetLibraryDetailDialogDataUseCase(get()) }
   factory { GetOverlayDetailUseCase(androidContext(), get()) }
   factory { GetPermissionDetailUseCase(androidContext().packageManager, get()) }
+  factory { GetRandomAppIconUseCase(androidContext().packageManager, get()) }
   factory { GetRelatedAppListItemUseCase(get(), get()) }
   factory { GetXposedModuleInfoUseCase(androidContext().packageManager, get()) }
   factory { HasInstalledStaticLibrariesUseCase(get()) }

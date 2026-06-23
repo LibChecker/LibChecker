@@ -53,6 +53,8 @@ Important `:app` boundaries:
 
 - `features/*` owns user-facing feature flows. Add code near the feature that
   owns the behavior.
+- Shared `view/` widgets own rendering and animation only; pass feature/domain
+  data in through providers instead of importing `data/*`.
 - `domain/app/` owns app-list use cases and repository/factory interfaces.
   Keep package-list synchronization rules here instead of in UI controllers.
 - `data/app/` adapts Android package APIs, Room repositories, and local

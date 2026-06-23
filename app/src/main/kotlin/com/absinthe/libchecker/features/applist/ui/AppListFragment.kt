@@ -27,6 +27,7 @@ import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.domain.app.GetAppListContentUseCase
+import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.features.applist.ui.adapter.AppAdapter
 import com.absinthe.libchecker.features.applist.ui.adapter.AppListDiffUtil
@@ -59,6 +60,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
+import org.koin.android.ext.android.inject
 import rikka.widget.borderview.BorderView
 import timber.log.Timber
 
@@ -72,6 +74,7 @@ class AppListFragment :
   SearchView.OnQueryTextListener {
 
   private val isFirstLaunch get() = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
+  private val getRandomAppIcon: GetRandomAppIconUseCase by inject()
   private val appAdapter = AppAdapter()
   private val particleItemAnimator = ParticleRemoveItemAnimator()
   private var updateItemsJob: Job? = null
@@ -193,7 +196,7 @@ class AppListFragment :
           Timber.e(e)
         }
       }
-      initView.loadingView.setAppIconHighlightProvider()
+      initView.loadingView.setAppIconHighlightProvider { getRandomAppIcon() }
     }
 
     initObserver()

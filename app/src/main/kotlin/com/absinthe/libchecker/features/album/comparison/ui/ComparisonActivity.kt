@@ -29,6 +29,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.databinding.ActivityComparisonBinding
+import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.snapshot.ArchiveSnapshotItem
 import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
 import com.absinthe.libchecker.features.album.comparison.ui.view.ComparisonDashboardView
@@ -58,6 +59,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import rikka.widget.borderview.BorderView
 
@@ -69,6 +71,7 @@ class ComparisonActivity :
   MenuProvider {
 
   private val viewModel: SnapshotViewModel by viewModel()
+  private val getRandomAppIcon: GetRandomAppIconUseCase by inject()
   private val adapter = SnapshotAdapter()
   private var leftTimeStamp = 0L
   private var rightTimeStamp = 0L
@@ -237,7 +240,7 @@ class ComparisonActivity :
         setOutAnimation(this@ComparisonActivity, R.anim.anim_fade_out)
         displayedChild = VF_LIST
       }
-      loading.setAppIconHighlightProvider()
+      loading.setAppIconHighlightProvider { getRandomAppIcon() }
     }
 
     adapter.apply {

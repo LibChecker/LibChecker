@@ -38,6 +38,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.LCUris
 import com.absinthe.libchecker.constant.options.SnapshotOptions
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
+import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.app.PackageChangeState
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.features.album.ui.AlbumActivity
@@ -79,6 +80,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import rikka.widget.borderview.BorderView
 import timber.log.Timber
@@ -91,6 +93,7 @@ class SnapshotFragment :
   SearchView.OnQueryTextListener {
 
   private val viewModel: SnapshotViewModel by activityViewModel()
+  private val getRandomAppIcon: GetRandomAppIconUseCase by inject()
   private val adapter = SnapshotAdapter()
   private val particleItemAnimator = ParticleRemoveItemAnimator()
   private val pendingParticleRemovePackageNames = linkedSetOf<String>()
@@ -267,7 +270,7 @@ class SnapshotFragment :
           adapter.setSpaceFooterView()
         }
       }
-      loading.setAppIconHighlightProvider()
+      loading.setAppIconHighlightProvider { getRandomAppIcon() }
     }
 
     viewModel.apply {

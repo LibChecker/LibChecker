@@ -17,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.ActivityTrackBinding
+import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.snapshot.TrackedAppListItem
 import com.absinthe.libchecker.features.album.track.TrackViewModel
 import com.absinthe.libchecker.features.album.track.ui.adapter.TrackAdapter
@@ -30,6 +31,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import rikka.widget.borderview.BorderView
 
@@ -39,6 +41,7 @@ class TrackActivity :
   MenuProvider {
 
   private val viewModel: TrackViewModel by viewModel()
+  private val getRandomAppIcon: GetRandomAppIconUseCase by inject()
   private val adapter = TrackAdapter()
   private val list = mutableListOf<TrackedAppListItem>()
   private var menu: Menu? = null
@@ -86,7 +89,7 @@ class TrackActivity :
           doSaveItemState(position, (view as Checkable).isChecked)
         }
       }
-      stateView = TrackLoadingView(this@TrackActivity)
+      stateView = TrackLoadingView(this@TrackActivity) { getRandomAppIcon() }
       isStateViewEnable = true
     }
 

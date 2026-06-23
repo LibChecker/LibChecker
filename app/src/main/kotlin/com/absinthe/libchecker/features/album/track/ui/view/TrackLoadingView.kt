@@ -1,12 +1,16 @@
 package com.absinthe.libchecker.features.album.track.ui.view
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.app.RingDotsView
 
-class TrackLoadingView(context: Context) : AViewGroup(context) {
+class TrackLoadingView(
+  context: Context,
+  private val loadRandomAppIcon: suspend () -> Drawable?
+) : AViewGroup(context) {
 
   private val loading = RingDotsView(context).apply {
     val size = context.getDimensionPixelSize(R.dimen.general_loading_size)
@@ -15,7 +19,7 @@ class TrackLoadingView(context: Context) : AViewGroup(context) {
 
   init {
     addView(loading)
-    loading.setAppIconHighlightProvider()
+    loading.setAppIconHighlightProvider(loadRandomAppIcon)
   }
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
