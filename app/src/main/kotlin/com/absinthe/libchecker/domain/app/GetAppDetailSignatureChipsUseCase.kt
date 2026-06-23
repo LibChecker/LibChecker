@@ -5,14 +5,14 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getSignatures
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class GetAppDetailSignatureChipsUseCase(
-  private val context: Context
+  private val context: Context,
+  private val installedAppRepository: InstalledAppRepository
 ) {
 
   suspend operator fun invoke(packageInfo: PackageInfo, isApk: Boolean): List<LibStringItemChip> {
@@ -21,7 +21,9 @@ class GetAppDetailSignatureChipsUseCase(
         @Suppress("InlinedApi", "DEPRECATION")
         val flags = PackageManager.GET_SIGNATURES or PackageManager.GET_SIGNING_CERTIFICATES
         if (!isApk) {
-          PackageUtils.getPackageInfo(packageInfo.packageName, flags).getSignatures(context)
+          installedAppRepository.getPackageInfo(packageInfo.packageName, flags)
+            ?.getSignatures(context)
+            ?: emptySequence()
         } else {
           PackageManagerCompat.getPackageArchiveInfo(packageInfo.applicationInfo!!.sourceDir, flags)!!
             .getSignatures(context)

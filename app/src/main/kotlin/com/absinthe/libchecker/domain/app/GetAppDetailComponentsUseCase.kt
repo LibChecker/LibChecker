@@ -11,9 +11,10 @@ import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.ParsedIntentFilter
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
-import timber.log.Timber
 
-class GetAppDetailComponentsUseCase {
+class GetAppDetailComponentsUseCase(
+  private val installedAppRepository: InstalledAppRepository
+) {
 
   operator fun invoke(
     packageInfo: PackageInfo,
@@ -77,17 +78,13 @@ class GetAppDetailComponentsUseCase {
       return this
     }
 
-    return runCatching {
-      PackageUtils.getPackageInfo(
-        packageName,
-        PackageManager.GET_SERVICES or
-          PackageManager.GET_ACTIVITIES or
-          PackageManager.GET_RECEIVERS or
-          PackageManager.GET_PROVIDERS
-      )
-    }.onFailure {
-      Timber.e(it)
-    }.getOrNull()
+    return installedAppRepository.getPackageInfo(
+      packageName,
+      PackageManager.GET_SERVICES or
+        PackageManager.GET_ACTIVITIES or
+        PackageManager.GET_RECEIVERS or
+        PackageManager.GET_PROVIDERS
+    )
   }
 
   private fun PackageInfo.getComponents(

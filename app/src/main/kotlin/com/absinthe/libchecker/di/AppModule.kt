@@ -129,7 +129,7 @@ val appModule = module {
   factory { GetAlternativeLaunchItemsUseCase(androidContext().packageManager, get()) }
   factory { GetAppBundleItemsUseCase() }
   factory { GetAppDetailAbiUseCase() }
-  factory { GetAppDetailComponentsUseCase() }
+  factory { GetAppDetailComponentsUseCase(get()) }
   factory { GetAppDetailComponentChipsUseCase(get()) }
   factory { GetAppDetailDexChipsUseCase() }
   factory { GetAppDetailFeaturesUseCase(get(), get()) }
@@ -145,7 +145,7 @@ val appModule = module {
   factory { GetAppDetailPackageSizeUseCase(get()) }
   factory { ExtractNativeLibraryUseCase(androidContext(), BuildConfig.APPLICATION_ID) }
   factory { GetAppDetailPermissionChipsUseCase() }
-  factory { GetAppDetailSignatureChipsUseCase(androidContext()) }
+  factory { GetAppDetailSignatureChipsUseCase(androidContext(), get()) }
   factory { PrepareAppPackageShareFileUseCase(androidContext().packageManager, get()) }
   factory { GetApkPreviewInfoUseCase() }
   factory { GetAppListContentUseCase(BuildConfig.APPLICATION_ID, get(), get(), get()) }
