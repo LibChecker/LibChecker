@@ -16,10 +16,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.databinding.ActivityTrackBinding
+import com.absinthe.libchecker.domain.snapshot.TrackedAppListItem
 import com.absinthe.libchecker.features.album.track.TrackViewModel
-import com.absinthe.libchecker.features.album.track.bean.TrackListItem
 import com.absinthe.libchecker.features.album.track.ui.adapter.TrackAdapter
 import com.absinthe.libchecker.features.album.track.ui.adapter.TrackListDiff
 import com.absinthe.libchecker.features.album.track.ui.view.TrackItemView
@@ -27,7 +26,6 @@ import com.absinthe.libchecker.features.album.track.ui.view.TrackLoadingView
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
-import com.absinthe.libchecker.utils.extensions.getAppName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -42,7 +40,7 @@ class TrackActivity :
 
   private val viewModel: TrackViewModel by viewModel()
   private val adapter = TrackAdapter()
-  private val list = mutableListOf<TrackListItem>()
+  private val list = mutableListOf<TrackedAppListItem>()
   private var menu: Menu? = null
   private var isListReady = false
 
@@ -93,18 +91,7 @@ class TrackActivity :
     }
 
     lifecycleScope.launch(Dispatchers.IO) {
-      val trackedPackageNames = viewModel.getTrackedPackageNames()
-      list += LocalAppDataSource.getApplicationList()
-        .asSequence()
-        .map {
-          TrackListItem(
-            label = it.getAppName(packageManager).toString(),
-            packageName = it.packageName,
-            switchState = it.packageName in trackedPackageNames
-          )
-        }
-        .sortedByDescending { it.switchState }
-        .toList()
+      list += viewModel.getTrackListItems()
 
       withContext(Dispatchers.Main) {
         adapter.setList(list)

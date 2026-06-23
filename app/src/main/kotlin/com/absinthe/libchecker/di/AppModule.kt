@@ -72,6 +72,7 @@ import com.absinthe.libchecker.domain.snapshot.CompareSnapshotListsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotWithInstalledAppsUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotPackageIconSourcesUseCase
+import com.absinthe.libchecker.domain.snapshot.GetTrackListItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveCodec
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotItemFactory
@@ -172,6 +173,7 @@ val appModule = module {
   factory { CompareSnapshotItemWithInstalledAppUseCase(get(), get(), get(), get()) }
   factory { GetSnapshotDashboardCountUseCase(get(), get()) }
   factory { GetSnapshotPackageIconSourcesUseCase(get()) }
+  factory { GetTrackListItemsUseCase(androidContext().packageManager, get(), get()) }
   factory { UpdateSnapshotTopAppsUseCase(get(), get()) }
   factory { BuildSnapshotDetailItemsUseCase() }
   factory { SnapshotArchiveUseCase(get(), get()) }
@@ -265,5 +267,5 @@ val appModule = module {
       getSnapshotPackageIconSourcesUseCase = get()
     )
   }
-  viewModel { TrackViewModel(get()) }
+  viewModel { TrackViewModel(get(), get()) }
 }

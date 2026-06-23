@@ -4,14 +4,13 @@ import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.features.album.track.bean.TrackListItem
+import com.absinthe.libchecker.domain.snapshot.TrackedAppListItem
 import com.absinthe.libchecker.features.album.track.ui.view.TrackItemView
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
-class TrackAdapter : BaseQuickAdapter<TrackListItem, BaseViewHolder>(0) {
+class TrackAdapter : BaseQuickAdapter<TrackedAppListItem, BaseViewHolder>(0) {
 
   init {
     addChildClickViewIds(android.R.id.toggle)
@@ -31,13 +30,9 @@ class TrackAdapter : BaseQuickAdapter<TrackListItem, BaseViewHolder>(0) {
     )
   }
 
-  override fun convert(holder: BaseViewHolder, item: TrackListItem) {
+  override fun convert(holder: BaseViewHolder, item: TrackedAppListItem) {
     (holder.itemView as TrackItemView).container.apply {
-      val packageInfo = runCatching {
-        PackageUtils.getPackageInfo(item.packageName)
-      }.getOrNull() ?: return
-
-      icon.load(packageInfo)
+      icon.load(item.packageInfo)
       appName.text = item.label
       packageName.text = item.packageName
       switch.isChecked = item.switchState
