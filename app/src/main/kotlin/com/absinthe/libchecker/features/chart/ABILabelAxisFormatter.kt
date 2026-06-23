@@ -1,13 +1,11 @@
 package com.absinthe.libchecker.features.chart
 
-import android.content.Context
-import com.absinthe.libchecker.utils.PackageUtils
 import info.appdev.charting.components.AxisBase
 import info.appdev.charting.formatter.IAxisValueFormatter
 
-class ABILabelAxisFormatter(private val context: Context, private val abis: List<Int>) : IAxisValueFormatter {
+class ABILabelAxisFormatter(private val labels: List<String>) : IAxisValueFormatter {
 
   override fun getFormattedValue(value: Float, axis: AxisBase?): String {
-    return PackageUtils.getAbiString(context, abis[value.toInt()], false)
+    return labels.getOrElse(value.toInt()) { "" }
   }
 }

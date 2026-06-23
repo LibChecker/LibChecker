@@ -1,38 +1,42 @@
 package com.absinthe.libchecker.features.chart.impl
 
 import android.content.Context
-import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.statistics.DetailedAbiChartData
 import com.absinthe.libchecker.features.chart.ABILabelAxisFormatter
 import com.absinthe.libchecker.features.chart.BaseVariableChartDataSource
 import com.absinthe.libchecker.features.chart.IHeavyWork
 import com.absinthe.libchecker.features.chart.IntegerFormatter
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import info.appdev.charting.charts.BarChart
 import info.appdev.charting.data.BarData
 import info.appdev.charting.data.BarDataSet
 import info.appdev.charting.data.BarEntryFloat
+import java.util.TreeMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class DetailedABIChartDataSource(
   items: List<LCItem>,
-  private val buildDetailedAbiChartData: suspend (List<LCItem>, suspend (Int) -> Unit) -> Map<Int, List<LCItem>>?
+  private val buildDetailedAbiChartData: suspend (List<LCItem>, suspend (Int) -> Unit) -> DetailedAbiChartData?
 ) : BaseVariableChartDataSource<BarChart>(items),
   IHeavyWork {
+  private val classifiedLabels: MutableMap<Int, String> = TreeMap()
+
   override suspend fun fillChartView(chartView: BarChart, onProgressUpdated: (Int) -> Unit) {
     withContext(Dispatchers.Default) {
       val context = chartView.context ?: return@withContext
       val entries: ArrayList<BarEntryFloat> = ArrayList()
       classifiedMap.clear()
+      classifiedLabels.clear()
       buildDetailedAbiChartData(items) { progress ->
         withContext(Dispatchers.Main) {
           onProgressUpdated(progress)
         }
-      }?.forEach { (abi, items) ->
-        classifiedMap[abi] = items.toMutableList()
+      }?.groups?.forEach { group ->
+        classifiedMap[group.abi] = group.items.toMutableList()
+        classifiedLabels[group.abi] = group.label
       } ?: return@withContext
 
       var index = 0
@@ -61,7 +65,7 @@ class DetailedABIChartDataSource(
       withContext(Dispatchers.Main) {
         chartView.apply {
           xAxis.apply {
-            valueFormatter = ABILabelAxisFormatter(context, classifiedMap.map { entry -> entry.key })
+            valueFormatter = ABILabelAxisFormatter(classifiedLabels.map { entry -> entry.value })
             setLabelCount(classifiedMap.size, false)
           }
           this.data = data
@@ -81,7 +85,6 @@ class DetailedABIChartDataSource(
   }
 
   override fun getLabelByXValue(context: Context, x: Int): String {
-    val abi = classifiedMap.entries.elementAtOrNull(x)?.key ?: Constants.ERROR
-    return PackageUtils.getAbiString(context, abi, showExtraInfo = false)
+    return classifiedLabels.entries.elementAtOrNull(x)?.value.orEmpty()
   }
 }

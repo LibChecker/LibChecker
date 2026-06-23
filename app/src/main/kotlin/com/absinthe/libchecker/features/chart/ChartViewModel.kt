@@ -16,6 +16,7 @@ import com.absinthe.libchecker.domain.statistics.BuildApiLevelChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildDetailedAbiChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildFeatureFlagChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildPageSize16KBChartDataUseCase
+import com.absinthe.libchecker.domain.statistics.DetailedAbiChartData
 import com.absinthe.libchecker.domain.statistics.FeatureFlagChartData
 import com.absinthe.libchecker.domain.statistics.GetAndroidDistributionUseCase
 import com.absinthe.libchecker.domain.statistics.PageSize16KBChartData
@@ -107,7 +108,7 @@ class ChartViewModel(
   suspend fun buildDetailedAbiChartData(
     items: List<LCItem>,
     onProgress: suspend (Int) -> Unit
-  ): Map<Int, List<LCItem>>? {
+  ): DetailedAbiChartData? {
     return buildDetailedAbiChartDataUseCase(
       BuildDetailedAbiChartDataUseCase.Request(
         items = items,

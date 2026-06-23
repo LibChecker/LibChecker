@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.domain.statistics
 
+import android.content.Context
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.utils.PackageUtils
@@ -10,13 +11,14 @@ import kotlinx.coroutines.isActive
 import timber.log.Timber
 
 class BuildDetailedAbiChartDataUseCase(
+  private val context: Context,
   private val installedAppRepository: InstalledAppRepository
 ) {
 
   suspend operator fun invoke(
     request: Request,
     onProgress: suspend (Int) -> Unit
-  ): Map<Int, List<LCItem>>? {
+  ): DetailedAbiChartData? {
     val targets = if (request.showSystemApps) {
       request.items
     } else {
@@ -56,7 +58,15 @@ class BuildDetailedAbiChartDataUseCase(
       }
     }
 
-    return result
+    return DetailedAbiChartData(
+      groups = result.map { (abi, items) ->
+        DetailedAbiChartGroup(
+          abi = abi,
+          label = PackageUtils.getAbiString(context, abi, showExtraInfo = false),
+          items = items
+        )
+      }
+    )
   }
 
   data class Request(
@@ -64,3 +74,13 @@ class BuildDetailedAbiChartDataUseCase(
     val showSystemApps: Boolean
   )
 }
+
+data class DetailedAbiChartData(
+  val groups: List<DetailedAbiChartGroup>
+)
+
+data class DetailedAbiChartGroup(
+  val abi: Int,
+  val label: String,
+  val items: List<LCItem>
+)

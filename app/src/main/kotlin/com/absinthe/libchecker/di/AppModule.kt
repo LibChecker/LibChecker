@@ -123,7 +123,7 @@ val appModule = module {
   factory { SyncAppListChangesUseCase(get(), get(), get()) }
   factory { BuildAbiChartDataUseCase() }
   factory { BuildApiLevelChartDataUseCase(get()) }
-  factory { BuildDetailedAbiChartDataUseCase(get()) }
+  factory { BuildDetailedAbiChartDataUseCase(androidContext(), get()) }
   factory { BuildFeatureFlagChartDataUseCase() }
   factory { BuildPageSize16KBChartDataUseCase(get()) }
   factory { ComputeLibReferenceUseCase(get()) }

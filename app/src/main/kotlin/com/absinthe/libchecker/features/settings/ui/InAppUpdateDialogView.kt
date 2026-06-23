@@ -23,8 +23,7 @@ import com.google.android.material.loadingindicator.LoadingIndicator
 class InAppUpdateDialogView(
   context: Context,
   buildSnapshotAbiDisplayData: BuildSnapshotAbiDisplayDataUseCase
-) :
-  LinearLayout(context),
+) : LinearLayout(context),
   IHeaderView {
 
   private val header = BottomSheetHeaderView(context).apply {
