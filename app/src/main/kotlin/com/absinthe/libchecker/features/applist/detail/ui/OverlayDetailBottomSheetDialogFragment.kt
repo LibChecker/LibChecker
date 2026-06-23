@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
-import android.content.pm.PackageInfo
 import android.content.pm.PackageInfoHidden
 import android.content.pm.PackageManager
 import android.text.SpannableString
@@ -13,6 +12,7 @@ import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.app.RelatedAppDisplayData
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
 import com.absinthe.libchecker.features.applist.detail.ui.view.OverlayDetailBottomSheetView
@@ -119,7 +119,10 @@ class OverlayDetailBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment
               addFloatView(targetPackage)
               return@launch
             }
-            bindTargetPackageView(lcItem, targetPackage, target.item, target.packageInfo)
+            bindTargetPackageView(
+              lcItem = lcItem,
+              data = viewModel.buildRelatedAppDisplayData(targetPackage, target)
+            )
           }
         }
       }
@@ -132,42 +135,32 @@ class OverlayDetailBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment
 
   private fun bindTargetPackageView(
     lcItem: LCItem,
-    targetPackage: String,
-    targetLCItem: LCItem,
-    pi: PackageInfo?
+    data: RelatedAppDisplayData
   ) {
     val context = requireContext()
     root.targetPackageView.container.let {
-      it.icon.load(pi)
-      it.appName.text = targetLCItem.label
-      it.packageName.text = targetPackage
-      it.versionInfo.text =
-        PackageUtils.getVersionString(targetLCItem.versionName, targetLCItem.versionCode)
+      it.icon.load(data.packageInfo)
+      it.appName.text = data.label
+      it.packageName.text = data.packageName
+      it.versionInfo.text = data.versionInfo
 
-      val str = StringBuilder()
-        .append(PackageUtils.getAbiString(context, targetLCItem.abi.toInt(), true))
-        .append(PackageUtils.getBuildVersionsInfo(pi, targetPackage))
-        .toString()
-      val spanString: SpannableString
-      val abiBadgeRes = PackageUtils.getAbiBadgeResource(targetLCItem.abi.toInt())
-
-      if (targetLCItem.abi.toInt() != Constants.OVERLAY && targetLCItem.abi.toInt() != Constants.ERROR && abiBadgeRes != 0) {
-        spanString = SpannableString("  $str")
-        abiBadgeRes.getDrawable(context)?.let { drawable ->
+      if (data.abiBadgeRes != null) {
+        val spanString = SpannableString("  ${data.abiInfo}")
+        data.abiBadgeRes.getDrawable(context)?.let { drawable ->
           drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
           val span = CenterAlignImageSpan(drawable)
           spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
         }
         it.abiInfo.text = spanString
       } else {
-        it.abiInfo.text = str
+        it.abiInfo.text = data.abiInfo
       }
       root.targetPackageView.setItemContentDescription(
         root.targetTitleView.text,
-        targetLCItem.label,
-        targetPackage,
+        data.label,
+        data.packageName,
         it.versionInfo.text,
-        str
+        data.abiInfo
       )
 
       if (lcItem.variant == Constants.VARIANT_HAP) {
@@ -177,7 +170,7 @@ class OverlayDetailBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment
       }
 
       root.targetPackageView.setOnClickListener {
-        activity?.launchDetailPage(targetLCItem)
+        activity?.launchDetailPage(data.item)
       }
     }
   }
