@@ -140,7 +140,7 @@ val appModule = module {
   factory { GetAppListContentUseCase(BuildConfig.APPLICATION_ID, get(), get(), get()) }
   factory { GetAppListPackageStatesUseCase(get()) }
   factory { BuildAppListItemViewStatesUseCase(androidContext(), get()) }
-  factory { GetAppManifestPropertiesUseCase() }
+  factory { GetAppManifestPropertiesUseCase(androidContext().packageManager) }
   factory { GetArchivePackageInfoUseCase() }
   factory { GetElfDetailUseCase(get()) }
   factory { GetInstalledAppComparisonPackageUseCase(get()) }

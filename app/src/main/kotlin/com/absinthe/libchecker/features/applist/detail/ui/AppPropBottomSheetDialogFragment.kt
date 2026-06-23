@@ -41,7 +41,10 @@ class AppPropBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppPr
         .map { property ->
           AppPropItem(
             key = property.key,
-            value = property.value
+            value = property.value,
+            displayValue = property.displayValue,
+            resourceId = property.resourceId,
+            resourceType = property.resourceType
           )
         }
       root.adapter.setList(propertyList)

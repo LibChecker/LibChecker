@@ -15,8 +15,6 @@ import com.absinthe.libchecker.features.applist.detail.bean.AppPropItem
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_TEXT
 import com.absinthe.libchecker.features.applist.detail.ui.XmlBSDFragment
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppPropItemView
-import com.absinthe.libchecker.utils.extensions.maybeResourceId
-import com.absinthe.libchecker.utils.manifest.PropertiesMap
 import com.absinthe.libchecker.utils.manifest.ResourceParser
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
@@ -42,7 +40,7 @@ class AppPropsAdapter(
       // TODO
       // setTipText("TODO")
       key.text = item.key
-      value.text = parseValue(item)
+      value.text = item.displayValue
       contentDescription = buildItemDescription(key.text, value.text)
       initLinkBtn(this, item)
     }
@@ -50,63 +48,50 @@ class AppPropsAdapter(
 
   private val linkable = setOf("array", "bool", "color", "dimen", "drawable", "integer", "mipmap", "string", "xml")
 
-  private fun parseValue(item: AppPropItem): String {
-    if (appResources != null && item.value.maybeResourceId()) {
-      runCatching {
-        return appResources!!.getResourceName(item.value.toInt())
-      }
-    }
-    return PropertiesMap.parseProperty(item.key, item.value)
-  }
-
   private fun initLinkBtn(itemView: AppPropItemView, item: AppPropItem) {
-    val appResources = this.appResources ?: return
-    if (!item.value.maybeResourceId()) {
+    val resourceId = item.resourceId
+    val type = item.resourceType
+    if (resourceId == null || type == null || !linkable.contains(type)) {
       itemView.linkToIcon.isVisible = false
-      return
-    }
-
-    val type = runCatching {
-      appResources.getResourceTypeName(item.value.toInt())
-    }.getOrDefault("null")
-    if (!linkable.contains(type)) {
-      itemView.linkToIcon.isVisible = false
+      itemView.linkToIcon.setTag(R.id.resource_transformed_id, false)
       return
     }
 
     itemView.linkToIcon.apply {
       isVisible = true
       setImageResource(R.drawable.ic_outline_change_circle_24)
+      setTag(R.id.resource_transformed_id, false)
       setOnClickListener {
         val transformed = getTag(R.id.resource_transformed_id) as? Boolean == true
         if (transformed) {
-          itemView.value.text = parseValue(item)
+          itemView.value.text = item.displayValue
           itemView.contentDescription = buildItemDescription(itemView.key.text, itemView.value.text)
           setImageResource(R.drawable.ic_outline_change_circle_24)
           setTag(R.id.resource_transformed_id, false)
         } else {
+          val appResources = this@AppPropsAdapter.appResources ?: return@setOnClickListener
           var clickedTag = false
           Timber.d("type: $type")
           runCatching {
             when (type) {
               "string" -> {
-                itemView.value.text = appResources.getString(item.value.toInt())
+                itemView.value.text = appResources.getString(resourceId)
                 clickedTag = true
               }
 
               "array" -> {
                 itemView.value.text =
-                  appResources.getStringArray(item.value.toInt()).contentToString()
+                  appResources.getStringArray(resourceId).contentToString()
                 clickedTag = true
               }
 
               "bool" -> {
-                itemView.value.text = appResources.getBoolean(item.value.toInt()).toString()
+                itemView.value.text = appResources.getBoolean(resourceId).toString()
                 clickedTag = true
               }
 
               "xml" -> {
-                appResources.getXml(item.value.toInt()).let {
+                appResources.getXml(resourceId).let {
                   val text = ResourceParser(it).setMarkColor(true).parse()
                   XmlBSDFragment().apply {
                     arguments = Bundle().apply {
@@ -119,7 +104,7 @@ class AppPropsAdapter(
               }
 
               "drawable", "mipmap" -> {
-                appResources.getDrawable(item.value.toInt(), null)?.let { drawable ->
+                appResources.getDrawable(resourceId, null)?.let { drawable ->
                   val bitmap = drawable.toBitmap(
                     itemView.linkToIcon.measuredWidth,
                     itemView.linkToIcon.measuredHeight,
@@ -131,7 +116,7 @@ class AppPropsAdapter(
               }
 
               "color" -> {
-                appResources.getColor(item.value.toInt(), null).let { colorInt ->
+                appResources.getColor(resourceId, null).let { colorInt ->
                   val bitmap = ShapeDrawable(OvalShape()).apply {
                     paint.color = colorInt
                   }.toBitmap(
@@ -145,12 +130,12 @@ class AppPropsAdapter(
               }
 
               "dimen" -> {
-                itemView.value.text = appResources.getDimension(item.value.toInt()).toString()
+                itemView.value.text = appResources.getDimension(resourceId).toString()
                 clickedTag = true
               }
 
               "integer" -> {
-                itemView.value.text = appResources.getInteger(item.value.toInt()).toString()
+                itemView.value.text = appResources.getInteger(resourceId).toString()
                 clickedTag = true
               }
 
