@@ -49,6 +49,7 @@ import com.absinthe.libchecker.domain.app.GetElfDetailUseCase
 import com.absinthe.libchecker.domain.app.GetInstalledAppComparisonPackageUseCase
 import com.absinthe.libchecker.domain.app.GetLibraryDetailDialogDataUseCase
 import com.absinthe.libchecker.domain.app.GetLibraryDetailUseCase
+import com.absinthe.libchecker.domain.app.GetOverlayDetailUseCase
 import com.absinthe.libchecker.domain.app.GetPermissionDetailUseCase
 import com.absinthe.libchecker.domain.app.GetRelatedAppListItemUseCase
 import com.absinthe.libchecker.domain.app.GetXposedModuleInfoUseCase
@@ -152,6 +153,7 @@ val appModule = module {
   factory { GetInstalledAppComparisonPackageUseCase(get()) }
   factory { GetLibraryDetailUseCase(get()) }
   factory { GetLibraryDetailDialogDataUseCase(get()) }
+  factory { GetOverlayDetailUseCase(androidContext(), get()) }
   factory { GetPermissionDetailUseCase(androidContext().packageManager, get()) }
   factory { GetRelatedAppListItemUseCase(get(), get()) }
   factory { GetXposedModuleInfoUseCase(androidContext().packageManager, get()) }
@@ -212,6 +214,7 @@ val appModule = module {
       getInstalledAppComparisonPackageUseCase = get(),
       hasInstalledStaticLibrariesUseCase = get(),
       getLibraryDetailDialogDataUseCase = get(),
+      getOverlayDetailUseCase = get(),
       getPermissionDetailUseCase = get(),
       getRelatedAppListItemUseCase = get(),
       buildRelatedAppDisplayDataUseCase = get(),

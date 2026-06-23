@@ -14,6 +14,7 @@ import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.Features
+import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppBundleSplitItem
 import com.absinthe.libchecker.domain.app.AppDetailAbi
 import com.absinthe.libchecker.domain.app.AppDetailAbiLabelData
@@ -46,6 +47,7 @@ import com.absinthe.libchecker.domain.app.GetArchivePackageInfoUseCase
 import com.absinthe.libchecker.domain.app.GetElfDetailUseCase
 import com.absinthe.libchecker.domain.app.GetInstalledAppComparisonPackageUseCase
 import com.absinthe.libchecker.domain.app.GetLibraryDetailDialogDataUseCase
+import com.absinthe.libchecker.domain.app.GetOverlayDetailUseCase
 import com.absinthe.libchecker.domain.app.GetPermissionDetailUseCase
 import com.absinthe.libchecker.domain.app.GetRelatedAppListItemUseCase
 import com.absinthe.libchecker.domain.app.GetXposedModuleInfoUseCase
@@ -109,6 +111,7 @@ class DetailViewModel(
   private val getInstalledAppComparisonPackageUseCase: GetInstalledAppComparisonPackageUseCase,
   private val hasInstalledStaticLibrariesUseCase: HasInstalledStaticLibrariesUseCase,
   private val getLibraryDetailDialogDataUseCase: GetLibraryDetailDialogDataUseCase,
+  private val getOverlayDetailUseCase: GetOverlayDetailUseCase,
   private val getPermissionDetailUseCase: GetPermissionDetailUseCase,
   private val getRelatedAppListItemUseCase: GetRelatedAppListItemUseCase,
   private val buildRelatedAppDisplayDataUseCase: BuildRelatedAppDisplayDataUseCase,
@@ -500,6 +503,10 @@ class DetailViewModel(
         isValidLib = isValidLib
       )
     )
+  }
+
+  suspend fun getOverlayDetail(item: LCItem) = withContext(Dispatchers.IO) {
+    getOverlayDetailUseCase(item)
   }
 
   suspend fun getPermissionDetail(permissionName: String) = withContext(Dispatchers.IO) {
