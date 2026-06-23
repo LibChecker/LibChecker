@@ -5,24 +5,17 @@ import android.content.Intent
 import android.content.pm.PackageInfo
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.IntentCompat
-import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.domain.app.PrepareApkAnalysisPackageUseCase
 import com.absinthe.libchecker.features.applist.detail.IDetailContainer
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.requireAvailableCacheDir
 import com.absinthe.libchecker.utils.showToast
 import java.io.File
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import okio.buffer
-import okio.sink
-import okio.source
 import timber.log.Timber
 
 class ApkDetailActivity :
@@ -85,47 +78,32 @@ class ApkDetailActivity :
     val dialog = UiUtils.createLoadingDialog(this)
     dialog.show()
 
-    lifecycleScope.launch(Dispatchers.IO) {
-      tempFile = File(requireAvailableCacheDir(), Constants.TEMP_PACKAGE).also { tf ->
-        if (tf.exists()) tf.delete()
-        val inputStream = runCatching { contentResolver.openInputStream(uri) }.getOrNull() ?: run {
-          withContext(Dispatchers.Main) {
-            dialog.dismiss()
-            showToast(R.string.toast_use_another_file_manager)
-            finish()
-          }
-          return@launch
+    lifecycleScope.launch {
+      when (val result = viewModel.prepareApkAnalysisPackage(requireAvailableCacheDir(), uri)) {
+        is PrepareApkAnalysisPackageUseCase.Result.Available -> {
+          tempFile = result.file
+          isPackageReady = true
+          dialog.dismiss()
+          onPackageInfoAvailable(result.packageInfo, null)
         }
-        inputStream.use {
-          val fileSize = inputStream.available()
-          val freeSize = Environment.getExternalStorageDirectory().freeSpace
-          Timber.d("fileSize=$fileSize, freeSize=$freeSize")
 
-          if (freeSize > fileSize * 1.5) {
-            tf.sink().buffer().use { sink ->
-              inputStream.source().buffer().use {
-                sink.writeAll(it)
-              }
-            }
-            isPackageReady = true
+        is PrepareApkAnalysisPackageUseCase.Result.InvalidPackage -> {
+          tempFile = result.file
+          dialog.dismiss()
+          showToast(R.string.toast_use_another_file_manager)
+          finish()
+        }
 
-            val packageInfo = viewModel.getArchivePackageInfo(tf)
-            withContext(Dispatchers.Main) {
-              dialog.dismiss()
-              if (packageInfo != null) {
-                onPackageInfoAvailable(packageInfo, null)
-              } else {
-                showToast(R.string.toast_use_another_file_manager)
-                finish()
-              }
-            }
-          } else {
-            withContext(Dispatchers.Main) {
-              dialog.dismiss()
-              showToast(R.string.toast_not_enough_storage_space)
-              finish()
-            }
-          }
+        PrepareApkAnalysisPackageUseCase.Result.Unreadable -> {
+          dialog.dismiss()
+          showToast(R.string.toast_use_another_file_manager)
+          finish()
+        }
+
+        PrepareApkAnalysisPackageUseCase.Result.NotEnoughStorage -> {
+          dialog.dismiss()
+          showToast(R.string.toast_not_enough_storage_space)
+          finish()
         }
       }
     }

@@ -49,7 +49,6 @@ import com.absinthe.libchecker.domain.app.GetAppInfoActionsUseCase
 import com.absinthe.libchecker.domain.app.GetAppInstallSourceDetailsUseCase
 import com.absinthe.libchecker.domain.app.GetAppLaunchActionUseCase
 import com.absinthe.libchecker.domain.app.GetAppManifestPropertiesUseCase
-import com.absinthe.libchecker.domain.app.GetArchivePackageInfoUseCase
 import com.absinthe.libchecker.domain.app.GetElfDetailUseCase
 import com.absinthe.libchecker.domain.app.GetInstalledAppComparisonPackageUseCase
 import com.absinthe.libchecker.domain.app.GetLibraryDetailDialogDataUseCase
@@ -58,6 +57,7 @@ import com.absinthe.libchecker.domain.app.GetPermissionDetailUseCase
 import com.absinthe.libchecker.domain.app.GetRelatedAppListItemUseCase
 import com.absinthe.libchecker.domain.app.GetXposedModuleInfoUseCase
 import com.absinthe.libchecker.domain.app.HasInstalledStaticLibrariesUseCase
+import com.absinthe.libchecker.domain.app.PrepareApkAnalysisPackageUseCase
 import com.absinthe.libchecker.domain.app.PrepareAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.RelatedAppListItem
 import com.absinthe.libchecker.domain.app.SortAppDetailItemsUseCase
@@ -110,7 +110,7 @@ class DetailViewModel(
   private val getAppDetailPermissionChipsUseCase: GetAppDetailPermissionChipsUseCase,
   private val getAppDetailSignatureChipsUseCase: GetAppDetailSignatureChipsUseCase,
   private val getAppManifestPropertiesUseCase: GetAppManifestPropertiesUseCase,
-  private val getArchivePackageInfoUseCase: GetArchivePackageInfoUseCase,
+  private val prepareApkAnalysisPackageUseCase: PrepareApkAnalysisPackageUseCase,
   private val getElfDetailUseCase: GetElfDetailUseCase,
   private val getInstalledAppComparisonPackageUseCase: GetInstalledAppComparisonPackageUseCase,
   private val hasInstalledStaticLibrariesUseCase: HasInstalledStaticLibrariesUseCase,
@@ -270,9 +270,12 @@ class DetailViewModel(
     }
   }
 
-  suspend fun getArchivePackageInfo(file: File): PackageInfo? {
+  suspend fun prepareApkAnalysisPackage(
+    cacheDir: File,
+    uri: Uri
+  ): PrepareApkAnalysisPackageUseCase.Result {
     return withContext(Dispatchers.IO) {
-      getArchivePackageInfoUseCase(file)
+      prepareApkAnalysisPackageUseCase(cacheDir, uri)
     }
   }
 
