@@ -22,6 +22,7 @@ import com.absinthe.libchecker.domain.app.AppDetailPackageSize
 import com.absinthe.libchecker.domain.app.AppIconItem
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.AppManifestProperty
+import com.absinthe.libchecker.domain.app.ExtractNativeLibraryUseCase
 import com.absinthe.libchecker.domain.app.GetAlternativeLaunchItemsUseCase
 import com.absinthe.libchecker.domain.app.GetApkPreviewInfoUseCase
 import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
@@ -95,6 +96,7 @@ class DetailViewModel(
   private val getAppDetailNativeLibrariesUseCase: GetAppDetailNativeLibrariesUseCase,
   private val getAppDetailStaticLibraryChipsUseCase: GetAppDetailStaticLibraryChipsUseCase,
   private val getAppDetailPackageSizeUseCase: GetAppDetailPackageSizeUseCase,
+  private val extractNativeLibraryUseCase: ExtractNativeLibraryUseCase,
   private val prepareAppPackageShareFileUseCase: PrepareAppPackageShareFileUseCase,
   private val getApkPreviewInfoUseCase: GetApkPreviewInfoUseCase,
   private val getAppDetailPermissionChipsUseCase: GetAppDetailPermissionChipsUseCase,
@@ -196,6 +198,10 @@ class DetailViewModel(
 
   suspend fun getXposedModuleInfo(packageName: String) = withContext(Dispatchers.IO) {
     getXposedModuleInfoUseCase(packageName)
+  }
+
+  suspend fun extractNativeLibrary(item: LibStringItem) = withContext(Dispatchers.IO) {
+    extractNativeLibraryUseCase(packageInfo, item, isApkPreview)
   }
 
   suspend fun prepareAppPackageShareFile(cacheDir: File, packageName: String) = withContext(Dispatchers.IO) {
