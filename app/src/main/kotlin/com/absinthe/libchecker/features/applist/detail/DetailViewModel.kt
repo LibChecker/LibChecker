@@ -45,6 +45,7 @@ import com.absinthe.libchecker.domain.app.GetInstalledAppComparisonPackageUseCas
 import com.absinthe.libchecker.domain.app.GetLibraryDetailDialogDataUseCase
 import com.absinthe.libchecker.domain.app.GetPermissionDetailUseCase
 import com.absinthe.libchecker.domain.app.GetRelatedAppListItemUseCase
+import com.absinthe.libchecker.domain.app.GetXposedModuleInfoUseCase
 import com.absinthe.libchecker.domain.app.HasInstalledStaticLibrariesUseCase
 import com.absinthe.libchecker.domain.app.PrepareAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.RelatedAppListItem
@@ -106,6 +107,7 @@ class DetailViewModel(
   private val getLibraryDetailDialogDataUseCase: GetLibraryDetailDialogDataUseCase,
   private val getPermissionDetailUseCase: GetPermissionDetailUseCase,
   private val getRelatedAppListItemUseCase: GetRelatedAppListItemUseCase,
+  private val getXposedModuleInfoUseCase: GetXposedModuleInfoUseCase,
   private val sortAppDetailItemsUseCase: SortAppDetailItemsUseCase,
   private val buildPackageComparisonSnapshotItemUseCase: BuildPackageComparisonSnapshotItemUseCase
 ) : ViewModel() {
@@ -190,6 +192,10 @@ class DetailViewModel(
 
   suspend fun getAppInstallSourceDetails(packageName: String) = withContext(Dispatchers.IO) {
     getAppInstallSourceDetailsUseCase(packageName)
+  }
+
+  suspend fun getXposedModuleInfo(packageName: String) = withContext(Dispatchers.IO) {
+    getXposedModuleInfoUseCase(packageName)
   }
 
   suspend fun prepareAppPackageShareFile(cacheDir: File, packageName: String) = withContext(Dispatchers.IO) {
