@@ -51,8 +51,9 @@ or release behavior changes, run the matching assemble/minify task.
 
 Important `:app` boundaries:
 
-- `features/*` owns user-facing feature flows. Add code near the feature that
-  owns the behavior.
+- `features/*` owns user-facing feature flows. Keep view constants, spans, and
+  adapter-only icon types in UI; move reusable parsing/data preparation to use
+  cases.
 - Shared `view/` widgets own rendering and animation only; pass feature/domain
   data in through providers instead of importing `data/*`.
 - `domain/app/` owns app-list use cases and repository/factory interfaces.

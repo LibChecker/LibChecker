@@ -4,15 +4,14 @@ import android.content.DialogInterface
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.compat.VersionCompat
-import com.absinthe.libchecker.features.applist.detail.bean.SignatureDetailItem
+import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.ui.view.SignatureDetailBottomSheetView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import rikka.core.util.ClipboardUtils
 
 const val EXTRA_SIGNATURE_DETAIL = "EXTRA_SIGNATURE_DETAIL"
@@ -20,6 +19,7 @@ const val EXTRA_SIGNATURE_DETAIL = "EXTRA_SIGNATURE_DETAIL"
 class SignatureDetailBSDFragment : BaseBottomSheetViewDialogFragment<SignatureDetailBottomSheetView>() {
 
   private val detail by unsafeLazy { arguments?.getString(EXTRA_SIGNATURE_DETAIL).orEmpty() }
+  private val viewModel: DetailViewModel by activityViewModel()
 
   override fun initRootView(): SignatureDetailBottomSheetView = SignatureDetailBottomSheetView(requireContext())
 
@@ -33,15 +33,7 @@ class SignatureDetailBSDFragment : BaseBottomSheetViewDialogFragment<SignatureDe
       true
     }
     lifecycleScope.launch {
-      val data = withContext(Dispatchers.IO) {
-        detail.lines().map {
-          val values = it.split(":", limit = 2)
-          SignatureDetailItem(
-            values.getOrNull(0).orEmpty(),
-            values.getOrNull(1).orEmpty()
-          )
-        }.toMutableList()
-      }
+      val data = viewModel.buildSignatureDetailItems(detail).toMutableList()
       root.adapter.setNewInstance(data)
     }
   }

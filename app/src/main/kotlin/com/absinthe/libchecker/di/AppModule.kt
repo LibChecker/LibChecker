@@ -24,6 +24,7 @@ import com.absinthe.libchecker.domain.app.BuildAppListItemViewStatesUseCase
 import com.absinthe.libchecker.domain.app.BuildInAppUpdateDiffDataUseCase
 import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.BuildRelatedAppDisplayDataUseCase
+import com.absinthe.libchecker.domain.app.BuildSignatureDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.CheckRequiredPackageAvailabilityUseCase
 import com.absinthe.libchecker.domain.app.ExportAppListUseCase
 import com.absinthe.libchecker.domain.app.ExportAppPackageShareFileUseCase
@@ -171,6 +172,7 @@ val appModule = module {
   factory { BuildInAppUpdateDiffDataUseCase(BuildConfig.APPLICATION_ID, androidContext().packageManager, get()) }
   factory { BuildNativeLibraryItemDisplayDataUseCase(androidContext()) }
   factory { BuildRelatedAppDisplayDataUseCase(androidContext()) }
+  factory { BuildSignatureDetailItemsUseCase() }
   factory { CheckRequiredPackageAvailabilityUseCase(get()) }
   factory { GetAppManifestPropertiesUseCase(androidContext().packageManager) }
   factory { GetArchivePackageInfoUseCase() }
@@ -253,6 +255,7 @@ val appModule = module {
       getPermissionDetailUseCase = get(),
       getRelatedAppListItemUseCase = get(),
       buildRelatedAppDisplayDataUseCase = get(),
+      buildSignatureDetailItemsUseCase = get(),
       getXposedModuleInfoUseCase = get(),
       sortAppDetailItemsUseCase = get(),
       buildPackageComparisonSnapshotItemUseCase = get()

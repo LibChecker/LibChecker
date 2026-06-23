@@ -27,6 +27,7 @@ import com.absinthe.libchecker.domain.app.BuildAppDetailAbiLabelDataUseCase
 import com.absinthe.libchecker.domain.app.BuildAppDetailHeaderExtraInfoUseCase
 import com.absinthe.libchecker.domain.app.BuildAppDetailHeaderTitleDataUseCase
 import com.absinthe.libchecker.domain.app.BuildRelatedAppDisplayDataUseCase
+import com.absinthe.libchecker.domain.app.BuildSignatureDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.ExportAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.ExtractNativeLibraryUseCase
 import com.absinthe.libchecker.domain.app.GetAlternativeLaunchItemsUseCase
@@ -116,6 +117,7 @@ class DetailViewModel(
   private val getPermissionDetailUseCase: GetPermissionDetailUseCase,
   private val getRelatedAppListItemUseCase: GetRelatedAppListItemUseCase,
   private val buildRelatedAppDisplayDataUseCase: BuildRelatedAppDisplayDataUseCase,
+  private val buildSignatureDetailItemsUseCase: BuildSignatureDetailItemsUseCase,
   private val getXposedModuleInfoUseCase: GetXposedModuleInfoUseCase,
   private val sortAppDetailItemsUseCase: SortAppDetailItemsUseCase,
   private val buildPackageComparisonSnapshotItemUseCase: BuildPackageComparisonSnapshotItemUseCase
@@ -558,6 +560,10 @@ class DetailViewModel(
   }
 
   fun buildRelatedAppDisplayData(packageName: String, relatedApp: RelatedAppListItem) = buildRelatedAppDisplayDataUseCase(packageName, relatedApp)
+
+  suspend fun buildSignatureDetailItems(detail: String) = withContext(Dispatchers.IO) {
+    buildSignatureDetailItemsUseCase(detail)
+  }
 
   fun initFeatures(packageInfo: PackageInfo, features: Int) = viewModelScope.launch(Dispatchers.IO) {
     Timber.d("initFeatures: features = $features")
