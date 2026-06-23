@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.features.home.ui.adapter.AdvancedMenuAdapter
 import com.absinthe.libchecker.features.snapshot.ui.adapter.SnapshotAdapter
@@ -21,7 +22,10 @@ import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.flexbox.JustifyContent
 
-class SnapshotMenuBSDView(context: Context) :
+class SnapshotMenuBSDView(
+  context: Context,
+  buildSnapshotAbiDisplayData: BuildSnapshotAbiDisplayDataUseCase
+) :
   LinearLayout(context),
   IHeaderView {
 
@@ -32,7 +36,10 @@ class SnapshotMenuBSDView(context: Context) :
   }
 
   private val adapter = AdvancedMenuAdapter()
-  private val demoAdapter = SnapshotAdapter(SnapshotAdapter.CardMode.DEMO)
+  private val demoAdapter = SnapshotAdapter(
+    buildSnapshotAbiDisplayData,
+    SnapshotAdapter.CardMode.DEMO
+  )
 
   private val demoView = RecyclerView(context).apply {
     layoutParams = LayoutParams(

@@ -13,10 +13,11 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.constant.options.SnapshotOptions
+import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCase
+import com.absinthe.libchecker.domain.snapshot.SnapshotAbiDisplayItem
 import com.absinthe.libchecker.domain.snapshot.SnapshotPackageIconSource
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
@@ -25,7 +26,6 @@ import com.absinthe.libchecker.ui.adapter.HighlightAdapter
 import com.absinthe.libchecker.ui.animator.ParticleRemoveItemAnimator
 import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.LCAppUtils
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.PREINSTALLED_TIMESTAMP
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -41,7 +41,10 @@ import kotlin.math.abs
 
 const val ARROW = "→"
 const val ARROW_REVERT = "←"
-class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAdapter<SnapshotDiffItem>() {
+class SnapshotAdapter(
+  private val buildSnapshotAbiDisplayData: BuildSnapshotAbiDisplayDataUseCase,
+  private val cardMode: CardMode = CardMode.NORMAL
+) : HighlightAdapter<SnapshotDiffItem>() {
 
   init {
     setHasStableIds(true)
@@ -242,72 +245,14 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
         }
       }
 
-      val oldAbiString = PackageUtils.getAbiString(context, item.abiDiff.old.toInt(), false)
-      val oldAbiSpanString: SpannableString
-      var abiBadgeRes = PackageUtils.getAbiBadgeResource(item.abiDiff.old.toInt())
-      if (item.abiDiff.old.toInt() != Constants.ERROR && item.abiDiff.old.toInt() != Constants.OVERLAY && abiBadgeRes != 0) {
-        var oldPaddingString = "  $oldAbiString"
-        if (item.abiDiff.old / Constants.MULTI_ARCH == 1) {
-          oldPaddingString = "  $oldPaddingString"
-        }
-        oldAbiSpanString = SpannableString(oldPaddingString)
-        abiBadgeRes.getDrawable(context)?.let {
-          it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
-          val span = CenterAlignImageSpan(it)
-          oldAbiSpanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
-        }
-        if (item.abiDiff.old / Constants.MULTI_ARCH == 1) {
-          R.drawable.ic_multi_arch.getDrawable(context)?.let {
-            it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
-            val span = CenterAlignImageSpan(it)
-            oldAbiSpanString.setSpan(span, 2, 3, ImageSpan.ALIGN_BOTTOM)
-          }
-        }
-      } else {
-        oldAbiSpanString = SpannableString(oldAbiString)
-      }
+      val abiDisplayData = buildSnapshotAbiDisplayData(item.abiDiff)
+      val oldAbiSpanString = buildAbiSpanString(abiDisplayData.old, tintBadge = false)
       val builder = SpannableStringBuilder(oldAbiSpanString)
 
-      val newAbiSpanString: SpannableString
-      if (item.abiDiff.new != null) {
-        val newAbiString =
-          PackageUtils.getAbiString(context, item.abiDiff.new.toInt(), false)
-        abiBadgeRes = PackageUtils.getAbiBadgeResource(item.abiDiff.new.toInt())
-        if (item.abiDiff.new.toInt() != Constants.ERROR && item.abiDiff.new.toInt() != Constants.OVERLAY && abiBadgeRes != 0) {
-          var newPaddingString = "  $newAbiString"
-          if (item.abiDiff.new / Constants.MULTI_ARCH == 1) {
-            newPaddingString = "  $newPaddingString"
-          }
-          newAbiSpanString = SpannableString(newPaddingString)
-          abiBadgeRes.getDrawable(context)?.let {
-            if ((GlobalValues.advancedOptions and AdvancedOptions.TINT_ABI_LABEL) > 0) {
-              if (abiBadgeRes == R.drawable.ic_abi_label_64bit) {
-                it.setTint(context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary))
-              } else {
-                it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorTertiary))
-              }
-            } else {
-              it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
-            }
-            it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
-            val span = CenterAlignImageSpan(it)
-            newAbiSpanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
-          }
-          if (item.abiDiff.new / Constants.MULTI_ARCH == 1) {
-            R.drawable.ic_multi_arch.getDrawable(context)?.let {
-              it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
-              val span = CenterAlignImageSpan(it)
-              newAbiSpanString.setSpan(span, 2, 3, ImageSpan.ALIGN_BOTTOM)
-            }
-          }
-        } else {
-          newAbiSpanString = SpannableString(newAbiString)
-        }
-      } else {
-        newAbiSpanString = SpannableString("")
-      }
-
       if (item.abiDiff.new != null && item.abiDiff.old != item.abiDiff.new) {
+        val newAbiSpanString = abiDisplayData.new?.let {
+          buildAbiSpanString(it, tintBadge = true)
+        } ?: SpannableString("")
         builder.append(" $ARROW ").append(newAbiSpanString)
       }
       abiInfo.text = builder
@@ -346,6 +291,42 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
       return Long.MIN_VALUE + position
     }
     return stableItemIdFor(data[position])
+  }
+
+  private fun buildAbiSpanString(
+    item: SnapshotAbiDisplayItem,
+    tintBadge: Boolean
+  ): SpannableString {
+    val badgeRes = item.badgeRes ?: return SpannableString(item.text)
+    var paddingString = "  ${item.text}"
+    if (item.isMultiArch) {
+      paddingString = "  $paddingString"
+    }
+    val spanString = SpannableString(paddingString)
+    badgeRes.getDrawable(context)?.let {
+      if (tintBadge) {
+        if ((GlobalValues.advancedOptions and AdvancedOptions.TINT_ABI_LABEL) > 0) {
+          if (badgeRes == R.drawable.ic_abi_label_64bit) {
+            it.setTint(context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary))
+          } else {
+            it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorTertiary))
+          }
+        } else {
+          it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
+        }
+      }
+      it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+      val span = CenterAlignImageSpan(it)
+      spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
+    }
+    if (item.isMultiArch) {
+      R.drawable.ic_multi_arch.getDrawable(context)?.let {
+        it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+        val span = CenterAlignImageSpan(it)
+        spanString.setSpan(span, 2, 3, ImageSpan.ALIGN_BOTTOM)
+      }
+    }
+    return spanString
   }
 
   companion object {

@@ -32,6 +32,7 @@ import com.absinthe.libchecker.databinding.ActivityComparisonBinding
 import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.snapshot.ArchiveSnapshotItem
 import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
+import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCase
 import com.absinthe.libchecker.features.album.comparison.ui.view.ComparisonDashboardView
 import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
 import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ENTITY
@@ -72,7 +73,10 @@ class ComparisonActivity :
 
   private val viewModel: SnapshotViewModel by viewModel()
   private val getRandomAppIcon: GetRandomAppIconUseCase by inject()
-  private val adapter = SnapshotAdapter()
+  private val buildSnapshotAbiDisplayData: BuildSnapshotAbiDisplayDataUseCase by inject()
+  private val adapter by lazy(LazyThreadSafetyMode.NONE) {
+    SnapshotAdapter(buildSnapshotAbiDisplayData)
+  }
   private var leftTimeStamp = 0L
   private var rightTimeStamp = 0L
   private var isLeftPartChoosing = false

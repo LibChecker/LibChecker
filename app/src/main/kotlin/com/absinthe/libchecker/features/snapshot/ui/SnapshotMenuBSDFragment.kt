@@ -4,20 +4,26 @@ import android.content.DialogInterface
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.SnapshotOptions
+import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCase
 import com.absinthe.libchecker.features.snapshot.ui.view.SnapshotMenuBSDView
 import com.absinthe.libchecker.features.snapshot.ui.view.SnapshotMenuItemView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.extensions.supportIECUnit
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
+import org.koin.android.ext.android.inject
 
 class SnapshotMenuBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotMenuBSDView>() {
 
+  private val buildSnapshotAbiDisplayData: BuildSnapshotAbiDisplayDataUseCase by inject()
   private val previousAdvancedOptions = GlobalValues.snapshotOptions
   private val optionsViewMap = mutableMapOf<Int, SnapshotMenuItemView>()
 
   private var onDismissCallback: (optionsDiff: Int) -> Unit = {}
 
-  override fun initRootView(): SnapshotMenuBSDView = SnapshotMenuBSDView(requireContext())
+  override fun initRootView(): SnapshotMenuBSDView = SnapshotMenuBSDView(
+    requireContext(),
+    buildSnapshotAbiDisplayData
+  )
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 

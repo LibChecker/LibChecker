@@ -8,6 +8,7 @@ import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.features.snapshot.ui.adapter.SnapshotAdapter
 import com.absinthe.libchecker.utils.extensions.dp
@@ -19,7 +20,10 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.loadingindicator.LoadingIndicator
 
-class InAppUpdateDialogView(context: Context) :
+class InAppUpdateDialogView(
+  context: Context,
+  buildSnapshotAbiDisplayData: BuildSnapshotAbiDisplayDataUseCase
+) :
   LinearLayout(context),
   IHeaderView {
 
@@ -51,7 +55,10 @@ class InAppUpdateDialogView(context: Context) :
     check(R.id.in_app_update_chip_stable)
   }
 
-  private val demoAdapter = SnapshotAdapter(SnapshotAdapter.CardMode.GET_APP_UPDATE)
+  private val demoAdapter = SnapshotAdapter(
+    buildSnapshotAbiDisplayData,
+    SnapshotAdapter.CardMode.GET_APP_UPDATE
+  )
 
   private val demoView = RecyclerView(context).apply {
     layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
