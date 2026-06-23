@@ -23,6 +23,7 @@ import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.isComponentType
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCase
 import com.absinthe.libchecker.features.applist.DetailFragmentManager
 import com.absinthe.libchecker.features.applist.Referable
 import com.absinthe.libchecker.features.applist.Sortable
@@ -59,6 +60,7 @@ import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import rikka.core.util.ClipboardUtils
 import timber.log.Timber
@@ -77,9 +79,12 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   Sortable {
 
   protected val viewModel: DetailViewModel by activityViewModel()
+  private val buildNativeLibraryItemDisplayData: BuildNativeLibraryItemDisplayDataUseCase by inject()
   protected val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME).orEmpty() }
   protected val type by lazy { arguments?.getInt(EXTRA_TYPE) ?: NATIVE }
-  protected val adapter by lazy { LibStringAdapter(packageName, type, childFragmentManager) }
+  protected val adapter by lazy {
+    LibStringAdapter(packageName, type, childFragmentManager, buildNativeLibraryItemDisplayData)
+  }
   protected val emptyView by unsafeLazy {
     EmptyListView(requireContext()).apply {
       layoutParams = FrameLayout.LayoutParams(

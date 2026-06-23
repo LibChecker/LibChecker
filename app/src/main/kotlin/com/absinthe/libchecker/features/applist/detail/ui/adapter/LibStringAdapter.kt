@@ -25,9 +25,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.annotation.ET_DYN
-import com.absinthe.libchecker.annotation.ET_NOT_ELF
-import com.absinthe.libchecker.annotation.ET_NOT_SET
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
@@ -35,6 +32,7 @@ import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.AdvancedOptions
+import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCase
 import com.absinthe.libchecker.features.applist.detail.bean.StaticLibItem
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_TEXT
 import com.absinthe.libchecker.features.applist.detail.ui.XmlBSDFragment
@@ -49,9 +47,7 @@ import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
 import com.absinthe.libchecker.utils.OsUtils
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
-import com.absinthe.libchecker.utils.extensions.PAGE_SIZE_16_KB
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -67,7 +63,8 @@ private const val HIGHLIGHT_TRANSITION_DURATION = 250
 class LibStringAdapter(
   val packageName: String,
   @LibType val type: Int,
-  private val fragmentManager: FragmentManager? = null
+  private val fragmentManager: FragmentManager? = null,
+  private val buildNativeLibraryItemDisplayData: BuildNativeLibraryItemDisplayDataUseCase? = null
 ) : HighlightAdapter<LibStringItemChip>() {
 
   var highlightPosition: Int = -1
@@ -236,37 +233,14 @@ class LibStringAdapter(
   }
 
   private fun getNativeSizeText(item: LibStringItemChip): CharSequence = nativeSizeTextCache.getOrPut(item.item to item.labels) {
+    val displayData = checkNotNull(buildNativeLibraryItemDisplayData) {
+      "BuildNativeLibraryItemDisplayDataUseCase is required for native library rows."
+    }(item.item, item.labels)
     buildSpannedString {
-      append(PackageUtils.sizeToString(context, item.item))
-      val elfInfo = item.item.elfInfo
-      if (elfInfo.elfType != ET_NOT_SET && elfInfo.elfType != ET_DYN) {
-        val text = PackageUtils.elfTypeToString(elfInfo.elfType)
-        append(createNativeLabelSpan(text))
-      }
-      if (elfInfo.elfType != ET_NOT_ELF) {
-        if (elfInfo.pageSize > 0 && elfInfo.pageSize % PAGE_SIZE_16_KB == 0) {
-          val text = "16 KB"
-          append(createNativeLabelSpan(text))
-        }
-        getZipAlignmentText(elfInfo.zipAlignment)?.let { zipAlignmentText ->
-          val text = zipAlignmentText
-          append(createNativeLabelSpan(text))
-        }
-      }
-      item.labels.forEach { label ->
+      append(displayData.sizeText)
+      displayData.labels.forEach { label ->
         append(createNativeLabelSpan(label))
       }
-    }
-  }
-
-  private fun getZipAlignmentText(zipAlignment: Long): String? {
-    if (zipAlignment <= 0L || zipAlignment >= PAGE_SIZE_16_KB) {
-      return null
-    }
-    return if (zipAlignment >= 1024L && zipAlignment % 1024L == 0L) {
-      "${zipAlignment / 1024}KB ZIPALIGN"
-    } else {
-      "${zipAlignment}B ZIPALIGN"
     }
   }
 
