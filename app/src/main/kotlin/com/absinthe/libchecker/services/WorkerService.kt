@@ -1,16 +1,13 @@
 package com.absinthe.libchecker.services
 
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.IBinder
 import android.os.RemoteCallbackList
 import android.os.RemoteException
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.data.app.LocalAppDataSource
-import com.absinthe.libchecker.domain.app.AppListRepository
-import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.extensions.getFeatures
+import com.absinthe.libchecker.domain.app.InitializePendingAppFeaturesUseCase
 import java.lang.ref.WeakReference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -22,7 +19,7 @@ import timber.log.Timber
 
 class WorkerService : LifecycleService() {
 
-  private val appListRepository: AppListRepository by inject()
+  private val initializePendingAppFeatures: InitializePendingAppFeaturesUseCase by inject()
   private val listenerList = RemoteCallbackList<OnWorkerListener>()
   private val binder by lazy { WorkerBinder(this) }
   private var initFeaturesJob: Job? = null
@@ -92,29 +89,7 @@ class WorkerService : LifecycleService() {
   }
 
   private suspend fun initPendingFeatures() {
-    val pendingPackages = appListRepository.getUninitializedFeaturePackageNames()
-    val featuresMap = HashMap<String, Int>(FEATURE_UPDATE_BATCH_SIZE)
-
-    fun flushFeatures() {
-      if (featuresMap.isEmpty()) {
-        return
-      }
-      appListRepository.updateFeatures(featuresMap)
-      featuresMap.clear()
-    }
-
-    pendingPackages.forEach { packageName ->
-      runCatching {
-        val packageInfo = PackageUtils.getPackageInfo(packageName, PackageManager.GET_META_DATA)
-        featuresMap[packageName] = packageInfo.getFeatures()
-        if (featuresMap.size >= FEATURE_UPDATE_BATCH_SIZE) {
-          flushFeatures()
-        }
-      }.onFailure { e ->
-        Timber.w(e)
-      }
-    }
-    flushFeatures()
+    initializePendingAppFeatures()
   }
 
   @Synchronized
@@ -154,8 +129,6 @@ class WorkerService : LifecycleService() {
   }
 
   companion object {
-    private const val FEATURE_UPDATE_BATCH_SIZE = 32
-
     data class FeatureInitializationState(
       val running: Boolean = false,
       val completed: Boolean = false
