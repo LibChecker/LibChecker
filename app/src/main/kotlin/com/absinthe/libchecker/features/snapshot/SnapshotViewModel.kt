@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
@@ -25,13 +24,13 @@ import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotPackageIconSourcesUseCase
 import com.absinthe.libchecker.domain.snapshot.PrepareRoomBackupRestoreFileUseCase
 import com.absinthe.libchecker.domain.snapshot.RestoreSnapshotArchiveFromUriUseCase
+import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotComparisonLists
 import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotTopAppsUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
-import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import java.io.File
 import java.text.SimpleDateFormat
@@ -258,9 +257,8 @@ class SnapshotViewModel(
   }
 
   fun restore(
-    context: Context,
     uri: Uri,
-    resultAction: (success: Boolean) -> Unit
+    resultAction: (SnapshotArchiveUseCase.RestoreResult?) -> Unit
   ) {
     viewModelScope.launch(Dispatchers.IO) {
       runCatching {
@@ -268,42 +266,19 @@ class SnapshotViewModel(
       }.onFailure {
         Timber.e("restore with new format failed: $it")
         withContext(Dispatchers.Main) {
-          resultAction(false)
+          resultAction(null)
         }
         return@launch
       }.onSuccess { result ->
         if (result == null) {
           withContext(Dispatchers.Main) {
-            resultAction(false)
+            resultAction(null)
           }
           return@launch
         }
         result.latestTimeStamp?.let { GlobalValues.snapshotTimestamp = it }
         withContext(Dispatchers.Main) {
-          resultAction(true)
-        }
-
-        val message = buildString {
-          result.timeStampCounts.forEach {
-            append(
-              context.getString(
-                R.string.album_restore_detail,
-                getFormatDateString(it.key),
-                it.value.toString()
-              )
-            )
-          }
-        }
-
-        withContext(Dispatchers.Main) {
-          BaseAlertDialogBuilder(context)
-            .setTitle(R.string.album_restore)
-            .setMessage(message)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-              resultAction(true)
-            }
-            .setCancelable(true)
-            .show()
+          resultAction(result)
         }
       }
     }

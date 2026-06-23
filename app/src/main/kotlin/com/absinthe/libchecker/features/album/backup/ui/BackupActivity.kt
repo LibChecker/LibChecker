@@ -33,9 +33,11 @@ import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.database.backup.RoomBackup
 import com.absinthe.libchecker.databinding.ActivityBackupBinding
+import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
 import com.absinthe.libchecker.features.home.ui.MainActivity
 import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
 import com.absinthe.libchecker.ui.base.BaseActivity
+import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.StorageUtils
 import com.absinthe.libchecker.utils.UiUtils
@@ -388,17 +390,41 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
                 .restore()
             }
           } else {
-            viewModel.restore(requireContext(), uri) { success ->
-              if (!success) {
+            viewModel.restore(uri) { result ->
+              if (result == null) {
                 context?.showToast("Backup file error")
+                dialog.dismiss()
+                return@restore
               }
               dialog.dismiss()
+              showRestoreResultDialog(result)
             }
           }
         }.onFailure { t ->
           Timber.e(t)
         }
       }
+    }
+
+    private fun showRestoreResultDialog(result: SnapshotArchiveUseCase.RestoreResult) {
+      val fragmentContext = context ?: return
+      val message = buildString {
+        result.timeStampCounts.forEach {
+          append(
+            fragmentContext.getString(
+              R.string.album_restore_detail,
+              viewModel.getFormatDateString(it.key),
+              it.value.toString()
+            )
+          )
+        }
+      }
+      BaseAlertDialogBuilder(fragmentContext)
+        .setTitle(R.string.album_restore)
+        .setMessage(message)
+        .setPositiveButton(android.R.string.ok) { _, _ -> }
+        .setCancelable(true)
+        .show()
     }
   }
 }
