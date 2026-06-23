@@ -12,13 +12,17 @@ import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
 import timber.log.Timber
 
-class GetLibReferenceAppsUseCase {
+class GetLibReferenceAppsUseCase(
+  private val installedAppRepository: InstalledAppRepository
+) {
 
   suspend operator fun invoke(request: Request): Result {
     val targets = request.packageNames?.let { packageNames ->
@@ -93,7 +97,7 @@ class GetLibReferenceAppsUseCase {
 
   private fun LCItem.hasNativeReference(name: String): Boolean {
     return runCatching {
-      val packageInfo = PackageUtils.getPackageInfo(packageName)
+      val packageInfo = installedAppRepository.getPackageInfo(packageName) ?: return@runCatching false
       PackageUtils.getNativeDirLibs(packageInfo).any {
         it.name == name && RulesRepository.checkNativeLibValidation(packageName, name)
       }
@@ -104,7 +108,9 @@ class GetLibReferenceAppsUseCase {
 
   private fun LCItem.hasComponentReference(name: String, @LibType type: Int): Boolean {
     return runCatching {
-      PackageUtils.getComponentStringList(packageName, type, false).contains(name)
+      val packageInfo = installedAppRepository.getPackageInfo(packageName, componentFlags(type))
+        ?: return@runCatching false
+      PackageUtils.getComponentStringList(packageInfo, type, false).contains(name)
     }.onFailure {
       Timber.e(it)
     }.getOrDefault(false)
@@ -112,7 +118,9 @@ class GetLibReferenceAppsUseCase {
 
   private fun LCItem.hasPermissionReference(name: String): Boolean {
     return runCatching {
-      PackageUtils.getPermissionsList(packageName).contains(name)
+      val packageInfo = installedAppRepository.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
+        ?: return@runCatching false
+      packageInfo.getPermissionsList().contains(name)
     }.onFailure {
       Timber.e(it)
     }.getOrDefault(false)
@@ -120,7 +128,8 @@ class GetLibReferenceAppsUseCase {
 
   private fun LCItem.hasMetadataReference(name: String): Boolean {
     return runCatching {
-      val packageInfo = PackageUtils.getPackageInfo(packageName, PackageManager.GET_META_DATA)
+      val packageInfo = installedAppRepository.getPackageInfo(packageName, PackageManager.GET_META_DATA)
+        ?: return@runCatching false
       PackageUtils.getMetaDataItems(packageInfo).any { it.name == name }
     }.onFailure {
       Timber.e(it, "Failed to retrieve package info for $packageName")
@@ -128,11 +137,8 @@ class GetLibReferenceAppsUseCase {
   }
 
   private fun resolveActionTarget(packageName: String, actionName: String): ActionTarget? {
-    val packageInfo = runCatching {
-      PackageUtils.getPackageInfo(packageName, PackageManager.GET_META_DATA)
-    }.onFailure {
-      Timber.e(it, "Failed to retrieve package info for $packageName")
-    }.getOrNull() ?: return null
+    val packageInfo = installedAppRepository.getPackageInfo(packageName, PackageManager.GET_META_DATA)
+      ?: return null
 
     return runCatching {
       IntentFilterUtils.parseComponentsFromApk(packageInfo.applicationInfo!!.sourceDir)
@@ -149,6 +155,16 @@ class GetLibReferenceAppsUseCase {
     }.onFailure {
       Timber.e(it, "Failed to parse intent filters for $packageName")
     }.getOrNull()
+  }
+
+  private fun componentFlags(@LibType type: Int): Int {
+    return when (type) {
+      SERVICE -> PackageManager.GET_SERVICES
+      ACTIVITY -> PackageManager.GET_ACTIVITIES
+      RECEIVER -> PackageManager.GET_RECEIVERS
+      PROVIDER -> PackageManager.GET_PROVIDERS
+      else -> 0
+    }
   }
 
   data class Request(

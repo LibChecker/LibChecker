@@ -123,7 +123,7 @@ val appModule = module {
   factory { ComputeLibReferenceUseCase(get()) }
   factory { GetAndroidDistributionUseCase(get()) }
   factory { GetLibReferenceIconPackagesUseCase(get()) }
-  factory { GetLibReferenceAppsUseCase() }
+  factory { GetLibReferenceAppsUseCase(get()) }
   factory { ExportAppListUseCase(get(), get()) }
   factory { FilterAppListItemsUseCase(get()) }
   factory { GetAlternativeLaunchItemsUseCase(androidContext().packageManager, get()) }
