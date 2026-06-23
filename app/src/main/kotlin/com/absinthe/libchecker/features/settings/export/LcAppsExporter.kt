@@ -16,7 +16,7 @@ import android.os.SystemClock
 import androidx.core.graphics.drawable.toBitmap
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.ZipFileCompat
-import com.absinthe.libchecker.data.app.LocalAppDataSource
+import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.features.applist.detail.bean.KotlinToolingMetadata
 import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.PackageUtils
@@ -78,12 +78,13 @@ object LcAppsExporter {
 
   suspend fun export(
     context: Context,
+    installedAppRepository: InstalledAppRepository,
     outputStream: OutputStream,
     progress: suspend (Int) -> Unit
   ): ExportResult = withContext(Dispatchers.IO) {
     val exportStartedAt = SystemClock.elapsedRealtime()
     val appContext = context.applicationContext
-    val packages = LocalAppDataSource.getApplicationList()
+    val packages = installedAppRepository.getApplicationList()
     val profiler = ExportProfiler(packages.size)
     val totalSteps = (packages.size * 2).coerceAtLeast(1)
     var completedSteps = 0
@@ -114,7 +115,14 @@ object LcAppsExporter {
         val reports = coroutineScope {
           batch.map { packageInfo ->
             async {
-              buildReport(appContext, packageInfo, iconEntries[packageInfo.packageName], analyzedAt, profiler)
+              buildReport(
+                context = appContext,
+                installedAppRepository = installedAppRepository,
+                basePackageInfo = packageInfo,
+                iconEntry = iconEntries[packageInfo.packageName],
+                analyzedAt = analyzedAt,
+                profiler = profiler
+              )
             }
           }.awaitAll()
         }
@@ -209,6 +217,7 @@ object LcAppsExporter {
 
   private suspend fun buildReport(
     context: Context,
+    installedAppRepository: InstalledAppRepository,
     basePackageInfo: PackageInfo,
     iconEntry: IconEntry?,
     analyzedAt: String,
@@ -217,7 +226,7 @@ object LcAppsExporter {
     val startedAt = SystemClock.elapsedRealtime()
     val packageProfile = PackageExportProfile(basePackageInfo.packageName)
     val packageInfo = profiler.measure(ExportStage.LOAD_PACKAGE_INFO, packageProfile) {
-      loadExportPackageInfo(basePackageInfo)
+      loadExportPackageInfo(installedAppRepository, basePackageInfo)
     }
     val packageManager = context.packageManager
     val unknown = context.getString(R.string.unknown)
@@ -286,12 +295,12 @@ object LcAppsExporter {
     )
   }
 
-  private fun loadExportPackageInfo(basePackageInfo: PackageInfo): PackageInfo {
-    return runCatching {
-      PackageUtils.getPackageInfo(basePackageInfo.packageName, exportPackageFlags())
-    }.onFailure {
-      Timber.w(it, "Failed to load full package info: ${basePackageInfo.packageName}")
-    }.getOrDefault(basePackageInfo)
+  private fun loadExportPackageInfo(
+    installedAppRepository: InstalledAppRepository,
+    basePackageInfo: PackageInfo
+  ): PackageInfo {
+    return installedAppRepository.getPackageInfo(basePackageInfo.packageName, exportPackageFlags())
+      ?: basePackageInfo
   }
 
   @Suppress("DEPRECATION")
