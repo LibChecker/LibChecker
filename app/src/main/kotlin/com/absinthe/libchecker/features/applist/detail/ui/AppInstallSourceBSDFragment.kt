@@ -15,9 +15,9 @@ import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.URLManager
-import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppInstallSource
 import com.absinthe.libchecker.domain.app.AppInstallSourceDetails
+import com.absinthe.libchecker.domain.app.RelatedAppDisplayData
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppDexoptItemView
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppInstallSourceBottomSheetView
@@ -230,55 +230,45 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
         item.isGone = true
         return@launch
       }
-      val targetLCItem = target.item
-      val pi = target.packageInfo
-
-      bindAppInstallSourceItemView(item, packageName, targetLCItem, pi)
+      bindAppInstallSourceItemView(
+        item = item,
+        data = viewModel.buildRelatedAppDisplayData(packageName, target)
+      )
     }
   }
 
   private fun bindAppInstallSourceItemView(
     item: AppInstallSourceItemView,
-    packageName: String,
-    targetLCItem: LCItem,
-    pi: PackageInfo?
+    data: RelatedAppDisplayData
   ) {
     item.packageView.container.also {
-      it.icon.load(pi)
-      it.appName.text = targetLCItem.label
-      it.packageName.text = packageName
-      it.versionInfo.text =
-        PackageUtils.getVersionString(targetLCItem.versionName, targetLCItem.versionCode)
+      it.icon.load(data.packageInfo)
+      it.appName.text = data.label
+      it.packageName.text = data.packageName
+      it.versionInfo.text = data.versionInfo
     }
 
-    val str = StringBuilder()
-      .append(PackageUtils.getAbiString(requireContext(), targetLCItem.abi.toInt(), true))
-      .append(PackageUtils.getBuildVersionsInfo(pi, packageName))
-      .toString()
-    val spanString: SpannableString
-    val abiBadgeRes = PackageUtils.getAbiBadgeResource(targetLCItem.abi.toInt())
-
-    if (targetLCItem.abi.toInt() != Constants.OVERLAY && targetLCItem.abi.toInt() != Constants.ERROR && abiBadgeRes != 0) {
-      spanString = SpannableString("  $str")
-      abiBadgeRes.getDrawable(requireContext())?.let { drawable ->
+    if (data.abiBadgeRes != null) {
+      val spanString = SpannableString("  ${data.abiInfo}")
+      data.abiBadgeRes.getDrawable(requireContext())?.let { drawable ->
         drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
         val span = CenterAlignImageSpan(drawable)
         spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
       }
       item.packageView.container.abiInfo.text = spanString
     } else {
-      item.packageView.container.abiInfo.text = str
+      item.packageView.container.abiInfo.text = data.abiInfo
     }
     item.packageView.container.abiInfo.isVisible = true
     item.packageView.setItemContentDescription(
       item.titleView.text,
-      targetLCItem.label,
-      packageName,
+      data.label,
+      data.packageName,
       item.packageView.container.versionInfo.text,
-      str
+      data.abiInfo
     )
 
-    if (targetLCItem.variant == Constants.VARIANT_HAP) {
+    if (data.isHarmony) {
       item.packageView.container.setBadge(R.drawable.ic_harmony_badge)
     } else {
       item.packageView.container.setBadge(null)
@@ -287,7 +277,7 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
     item.packageView.setOnClickListener {
       activity?.finish()
       dismiss()
-      activity?.launchDetailPage(targetLCItem)
+      activity?.launchDetailPage(data.item)
     }
   }
 

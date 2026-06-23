@@ -17,6 +17,7 @@ import com.absinthe.libchecker.domain.app.AppListExportMetadata
 import com.absinthe.libchecker.domain.app.AppListItemFactory
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.BuildAppListItemViewStatesUseCase
+import com.absinthe.libchecker.domain.app.BuildRelatedAppDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.ExportAppListUseCase
 import com.absinthe.libchecker.domain.app.ExtractNativeLibraryUseCase
 import com.absinthe.libchecker.domain.app.FilterAppListItemsUseCase
@@ -140,6 +141,7 @@ val appModule = module {
   factory { GetAppListContentUseCase(BuildConfig.APPLICATION_ID, get(), get(), get()) }
   factory { GetAppListPackageStatesUseCase(get()) }
   factory { BuildAppListItemViewStatesUseCase(androidContext(), get()) }
+  factory { BuildRelatedAppDisplayDataUseCase(androidContext()) }
   factory { GetAppManifestPropertiesUseCase(androidContext().packageManager) }
   factory { GetArchivePackageInfoUseCase() }
   factory { GetElfDetailUseCase(get()) }
@@ -207,6 +209,7 @@ val appModule = module {
       getLibraryDetailDialogDataUseCase = get(),
       getPermissionDetailUseCase = get(),
       getRelatedAppListItemUseCase = get(),
+      buildRelatedAppDisplayDataUseCase = get(),
       getXposedModuleInfoUseCase = get(),
       sortAppDetailItemsUseCase = get(),
       buildPackageComparisonSnapshotItemUseCase = get()

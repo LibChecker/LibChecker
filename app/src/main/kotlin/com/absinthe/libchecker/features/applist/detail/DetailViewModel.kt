@@ -20,6 +20,7 @@ import com.absinthe.libchecker.domain.app.AppDetailPackageSize
 import com.absinthe.libchecker.domain.app.AppIconItem
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.AppManifestProperty
+import com.absinthe.libchecker.domain.app.BuildRelatedAppDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.ExtractNativeLibraryUseCase
 import com.absinthe.libchecker.domain.app.GetAlternativeLaunchItemsUseCase
 import com.absinthe.libchecker.domain.app.GetApkPreviewInfoUseCase
@@ -107,6 +108,7 @@ class DetailViewModel(
   private val getLibraryDetailDialogDataUseCase: GetLibraryDetailDialogDataUseCase,
   private val getPermissionDetailUseCase: GetPermissionDetailUseCase,
   private val getRelatedAppListItemUseCase: GetRelatedAppListItemUseCase,
+  private val buildRelatedAppDisplayDataUseCase: BuildRelatedAppDisplayDataUseCase,
   private val getXposedModuleInfoUseCase: GetXposedModuleInfoUseCase,
   private val sortAppDetailItemsUseCase: SortAppDetailItemsUseCase,
   private val buildPackageComparisonSnapshotItemUseCase: BuildPackageComparisonSnapshotItemUseCase
@@ -572,6 +574,8 @@ class DetailViewModel(
       getRelatedAppListItemUseCase(packageName)
     }
   }
+
+  fun buildRelatedAppDisplayData(packageName: String, relatedApp: RelatedAppListItem) = buildRelatedAppDisplayDataUseCase(packageName, relatedApp)
 
   fun initFeatures(packageInfo: PackageInfo, features: Int) = viewModelScope.launch(Dispatchers.IO) {
     Timber.d("initFeatures: features = $features")
