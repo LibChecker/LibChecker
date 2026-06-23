@@ -15,7 +15,6 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.node.AbiLabelNode
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
@@ -102,17 +101,14 @@ class DetailsTitleView(
         }
         v.scaleType = ImageView.ScaleType.CENTER_CROP
         v.setImageResource(res)
-        v.contentDescription = when (it.abi) {
-          Constants.MULTI_ARCH -> context.getString(R.string.multiArch)
-          else -> PackageUtils.getAbiString(context, it.abi, showExtraInfo = false)
-        }
+        v.contentDescription = it.contentDescription
         v.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
         v.alpha = if (it.active) 1f else 0.5f
         it.action?.let { action ->
           v.setOnClickListener { action.invoke() }
         }
         if ((GlobalValues.advancedOptions and AdvancedOptions.TINT_ABI_LABEL) > 0) {
-          if (PackageUtils.isAbi64Bit(it.abi)) {
+          if (it.is64Bit) {
             v.drawable.setTint(context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary))
           } else {
             v.drawable.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorTertiary))

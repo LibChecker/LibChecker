@@ -156,7 +156,7 @@ val appModule = module {
   factory { GetApkPreviewInfoUseCase() }
   factory { GetAppListContentUseCase(BuildConfig.APPLICATION_ID, get(), get(), get()) }
   factory { GetAppListPackageStatesUseCase(get()) }
-  factory { BuildAppDetailAbiLabelDataUseCase() }
+  factory { BuildAppDetailAbiLabelDataUseCase(androidContext()) }
   factory { BuildAppDetailHeaderExtraInfoUseCase(androidContext(), get()) }
   factory { BuildAppDetailHeaderTitleDataUseCase(androidContext(), get()) }
   factory { BuildAppExportNativeLibrariesUseCase() }

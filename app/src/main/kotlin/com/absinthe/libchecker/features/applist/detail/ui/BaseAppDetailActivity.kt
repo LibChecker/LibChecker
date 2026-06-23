@@ -951,13 +951,18 @@ abstract class BaseAppDetailActivity :
     }
 
     val abiLabelsList = abiLabelData.labels.map { label ->
-      if (label.opensMultiArchInfo) {
-        AbiLabelNode(label.abi, label.isActive) {
-          FeaturesDialog.showMultiArchDialog(this)
-        }
+      val action = if (label.opensMultiArchInfo) {
+        { FeaturesDialog.showMultiArchDialog(this) }
       } else {
-        AbiLabelNode(label.abi, label.isActive)
+        null
       }
+      AbiLabelNode(
+        abi = label.abi,
+        active = label.isActive,
+        contentDescription = label.contentDescription,
+        is64Bit = label.is64Bit,
+        action = action
+      )
     }
     if (abiLabelsList.isNotEmpty()) {
       binding.detailsTitle.setAbiLabels(abiLabelsList)
