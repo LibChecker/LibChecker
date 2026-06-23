@@ -21,6 +21,7 @@ import com.absinthe.libchecker.domain.app.BuildAppDetailHeaderExtraInfoUseCase
 import com.absinthe.libchecker.domain.app.BuildAppDetailHeaderTitleDataUseCase
 import com.absinthe.libchecker.domain.app.BuildAppListItemViewStatesUseCase
 import com.absinthe.libchecker.domain.app.BuildRelatedAppDisplayDataUseCase
+import com.absinthe.libchecker.domain.app.CheckRequiredPackageAvailabilityUseCase
 import com.absinthe.libchecker.domain.app.ExportAppListUseCase
 import com.absinthe.libchecker.domain.app.ExtractNativeLibraryUseCase
 import com.absinthe.libchecker.domain.app.FilterAppListItemsUseCase
@@ -155,6 +156,7 @@ val appModule = module {
   factory { BuildAppDetailHeaderTitleDataUseCase(androidContext(), get()) }
   factory { BuildAppListItemViewStatesUseCase(androidContext(), get()) }
   factory { BuildRelatedAppDisplayDataUseCase(androidContext()) }
+  factory { CheckRequiredPackageAvailabilityUseCase(get()) }
   factory { GetAppManifestPropertiesUseCase(androidContext().packageManager) }
   factory { GetArchivePackageInfoUseCase() }
   factory { GetElfDetailUseCase(get()) }
