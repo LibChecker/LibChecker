@@ -4,12 +4,12 @@ import androidx.core.os.BundleCompat
 import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.snapshot.SnapshotPackageIconSource
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
 import com.absinthe.libchecker.features.snapshot.detail.ui.view.SnapshotNoDiffBSView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.LCAppUtils
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
@@ -33,29 +33,8 @@ class SnapshotNoDiffBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotNoDi
       return
     }
     BundleCompat.getSerializable(arg, EXTRA_DIFF_ITEM, SnapshotDiffItem::class.java)?.let { item ->
-      val packageInfo = runCatching { PackageUtils.getPackageInfo(item.packageName) }.getOrNull()
       root.title.apply {
-        iconView.apply {
-          packageInfo?.let { pi ->
-            val appIconLoader = AppIconLoader(
-              resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size),
-              false,
-              requireContext()
-            )
-            val icon = runCatching {
-              appIconLoader.loadIcon(pi.applicationInfo!!)
-            }.getOrNull()
-            load(icon)
-            setOnClickListener {
-              lifecycleScope.launch {
-                val lcItem = viewModel.getAppListItem(item.packageName) ?: return@launch
-                activity?.launchDetailPage(lcItem)
-              }
-            }
-          } ?: run {
-            setImageResource(R.drawable.ic_icon_blueprint)
-          }
-        }
+        bindIcon(item)
         val isNewOrDeleted = item.deleted || item.newInstalled
         appNameView.text = LCAppUtils.getDiffString(item.labelDiff, isNewOrDeleted)
         iconView.contentDescription = appNameView.text
@@ -88,6 +67,40 @@ class SnapshotNoDiffBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotNoDi
       }
     } ?: run {
       dismiss()
+    }
+  }
+
+  private fun bindIcon(item: SnapshotDiffItem) {
+    root.title.iconView.apply {
+      setImageResource(R.drawable.ic_icon_blueprint)
+      setOnClickListener(null)
+    }
+    lifecycleScope.launch {
+      when (val iconSource = viewModel.getSnapshotPackageIconSources(listOf(item.packageName))[item.packageName]) {
+        is SnapshotPackageIconSource.InstalledPackage -> {
+          val ctx = context ?: return@launch
+          val appIconLoader = AppIconLoader(
+            resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size),
+            false,
+            ctx
+          )
+          val icon = iconSource.packageInfo.applicationInfo?.let { applicationInfo ->
+            runCatching {
+              appIconLoader.loadIcon(applicationInfo)
+            }.getOrNull()
+          }
+          root.title.iconView.load(icon)
+          root.title.iconView.setOnClickListener {
+            lifecycleScope.launch {
+              val lcItem = viewModel.getAppListItem(item.packageName) ?: return@launch
+              activity?.launchDetailPage(lcItem)
+            }
+          }
+        }
+
+        SnapshotPackageIconSource.Fallback,
+        null -> root.title.iconView.setImageResource(R.drawable.ic_icon_blueprint)
+      }
     }
   }
 

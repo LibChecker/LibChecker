@@ -85,6 +85,7 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
     (holder.itemView as SnapshotItemView).container.apply {
       when (val iconSource = packageIconSources[item.packageName]) {
         is SnapshotPackageIconSource.InstalledPackage -> icon.load(iconSource.packageInfo)
+
         SnapshotPackageIconSource.Fallback,
         null -> icon.load(R.drawable.ic_icon_blueprint)
       }
