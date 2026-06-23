@@ -65,7 +65,8 @@ Important `:app` boundaries:
 - `data/statistics/` adapts remote or cached statistics sources, such as Android
   version distribution, to `domain/statistics/` interfaces.
 - `domain/snapshot/` owns snapshot models, archive, capture, and diff seams;
-  keep package-to-snapshot conversion and diff rules out of UI controllers.
+  keep package-to-snapshot conversion and diff rules out of UI controllers and
+  services.
 - `data/snapshot/` adapts Android, protobuf archive format, and local snapshot
   storage to `domain/snapshot/` interfaces.
 - `compat/` wraps platform/API-level differences. Check here before adding new

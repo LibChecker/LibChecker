@@ -66,6 +66,7 @@ import com.absinthe.libchecker.domain.app.PrepareAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.SortAppDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.SyncAppListChangesUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
+import com.absinthe.libchecker.domain.snapshot.BuildInstalledSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildPackageComparisonSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotComparisonListsUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotDetailItemsUseCase
@@ -176,6 +177,7 @@ val appModule = module {
   factory { SortAppDetailItemsUseCase() }
   factory { GetApexPackageNamesUseCase(get()) }
   factory { BuildArchiveSnapshotItemUseCase(androidContext()) }
+  factory { BuildInstalledSnapshotItemUseCase(get()) }
   factory { BuildPackageComparisonSnapshotItemUseCase(androidContext().packageManager) }
   factory { BuildSnapshotComparisonListsUseCase(get()) }
   factory { BuildSnapshotPairDiffUseCase() }
