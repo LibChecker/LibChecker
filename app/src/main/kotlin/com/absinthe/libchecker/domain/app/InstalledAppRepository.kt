@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.domain.app
 
 import android.content.pm.PackageInfo
+import androidx.lifecycle.LifecycleOwner
 import kotlinx.coroutines.flow.SharedFlow
 
 interface InstalledAppRepository {
@@ -14,6 +15,10 @@ interface InstalledAppRepository {
   fun getApplicationCount(forceUpdate: Boolean = false): Int
 
   fun getApexPackageNames(): Set<String>
+
+  fun startPackageChangeMonitoring(owner: LifecycleOwner)
+
+  fun stopPackageChangeMonitoring(owner: LifecycleOwner)
 
   fun getPackageInfo(
     packageName: String,

@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.data.app
 
 import android.content.pm.PackageInfo
+import androidx.lifecycle.LifecycleOwner
 import com.absinthe.libchecker.domain.app.AppInstallSource
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.InstalledPackageState
@@ -30,6 +31,14 @@ object LocalInstalledAppRepository : InstalledAppRepository {
 
   override fun getApexPackageNames(): Set<String> {
     return LocalAppDataSource.apexPackageSet
+  }
+
+  override fun startPackageChangeMonitoring(owner: LifecycleOwner) {
+    LocalAppDataSource.addLifecycleOwner(owner)
+  }
+
+  override fun stopPackageChangeMonitoring(owner: LifecycleOwner) {
+    LocalAppDataSource.removeLifecycleOwner(owner)
   }
 
   override fun getPackageInfo(

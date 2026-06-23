@@ -6,8 +6,8 @@ import android.os.RemoteCallbackList
 import android.os.RemoteException
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
-import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.domain.app.InitializePendingAppFeaturesUseCase
+import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import java.lang.ref.WeakReference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -20,6 +20,7 @@ import timber.log.Timber
 class WorkerService : LifecycleService() {
 
   private val initializePendingAppFeatures: InitializePendingAppFeaturesUseCase by inject()
+  private val installedAppRepository: InstalledAppRepository by inject()
   private val listenerList = RemoteCallbackList<OnWorkerListener>()
   private val binder by lazy { WorkerBinder(this) }
   private var initFeaturesJob: Job? = null
@@ -34,7 +35,7 @@ class WorkerService : LifecycleService() {
     super.onCreate()
     Timber.d("onCreate")
     updateFeatureInitializationState(running = false)
-    LocalAppDataSource.addLifecycleOwner(this)
+    installedAppRepository.startPackageChangeMonitoring(this)
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -46,7 +47,7 @@ class WorkerService : LifecycleService() {
 
   override fun onDestroy() {
     Timber.d("onDestroy")
-    LocalAppDataSource.removeLifecycleOwner(this)
+    installedAppRepository.stopPackageChangeMonitoring(this)
     super.onDestroy()
   }
 
