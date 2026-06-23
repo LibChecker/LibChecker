@@ -945,28 +945,25 @@ abstract class BaseAppDetailActivity :
   }
 
   private fun initAbiView(abi: Int, abiSet: Collection<Int>) {
-    val trueAbi = abi.mod(Constants.MULTI_ARCH)
+    val abiLabelData = viewModel.buildAppDetailAbiLabelData(
+      abi = abi,
+      abiSet = abiSet,
+      apkAnalyticsMode = apkAnalyticsMode
+    )
     lifecycleScope.launch {
-      viewModel.is64Bit.emit(PackageUtils.isAbi64Bit(trueAbi))
+      viewModel.is64Bit.emit(abiLabelData.is64Bit)
     }
 
-    if (abiSet.isNotEmpty() && !abiSet.contains(Constants.OVERLAY) && !abiSet.contains(Constants.ERROR)) {
-      val abiLabelsList = mutableListOf<AbiLabelNode>()
-
-      if (abi >= Constants.MULTI_ARCH) {
-        abiLabelsList.add(
-          AbiLabelNode(Constants.MULTI_ARCH, true) {
-            FeaturesDialog.showMultiArchDialog(this)
-          }
-        )
-      }
-
-      abiSet.forEach {
-        if (it != Constants.NO_LIBS) {
-          val isActive = apkAnalyticsMode || it == abi % Constants.MULTI_ARCH
-          abiLabelsList.add(AbiLabelNode(it, isActive))
+    val abiLabelsList = abiLabelData.labels.map { label ->
+      if (label.opensMultiArchInfo) {
+        AbiLabelNode(label.abi, label.isActive) {
+          FeaturesDialog.showMultiArchDialog(this)
         }
+      } else {
+        AbiLabelNode(label.abi, label.isActive)
       }
+    }
+    if (abiLabelsList.isNotEmpty()) {
       binding.detailsTitle.setAbiLabels(abiLabelsList)
     }
   }

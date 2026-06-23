@@ -16,10 +16,12 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.domain.app.AppBundleSplitItem
 import com.absinthe.libchecker.domain.app.AppDetailAbi
+import com.absinthe.libchecker.domain.app.AppDetailAbiLabelData
 import com.absinthe.libchecker.domain.app.AppDetailHeaderExtraInfo
 import com.absinthe.libchecker.domain.app.AppIconItem
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.AppManifestProperty
+import com.absinthe.libchecker.domain.app.BuildAppDetailAbiLabelDataUseCase
 import com.absinthe.libchecker.domain.app.BuildAppDetailHeaderExtraInfoUseCase
 import com.absinthe.libchecker.domain.app.BuildRelatedAppDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.ExtractNativeLibraryUseCase
@@ -94,6 +96,7 @@ class DetailViewModel(
   private val getAppDetailMetadataChipsUseCase: GetAppDetailMetadataChipsUseCase,
   private val getAppDetailNativeLibrariesUseCase: GetAppDetailNativeLibrariesUseCase,
   private val getAppDetailStaticLibraryChipsUseCase: GetAppDetailStaticLibraryChipsUseCase,
+  private val buildAppDetailAbiLabelDataUseCase: BuildAppDetailAbiLabelDataUseCase,
   private val buildAppDetailHeaderExtraInfoUseCase: BuildAppDetailHeaderExtraInfoUseCase,
   private val extractNativeLibraryUseCase: ExtractNativeLibraryUseCase,
   private val prepareAppPackageShareFileUseCase: PrepareAppPackageShareFileUseCase,
@@ -168,6 +171,18 @@ class DetailViewModel(
 
   suspend fun loadAppDetailPackage(packageName: String): GetAppDetailPackageUseCase.Result {
     return getAppDetailPackage(packageName)
+  }
+
+  fun buildAppDetailAbiLabelData(
+    abi: Int,
+    abiSet: Collection<Int>,
+    apkAnalyticsMode: Boolean
+  ): AppDetailAbiLabelData {
+    return buildAppDetailAbiLabelDataUseCase(
+      abi = abi,
+      abiSet = abiSet,
+      apkAnalyticsMode = apkAnalyticsMode
+    )
   }
 
   fun buildAppDetailHeaderExtraInfo(
