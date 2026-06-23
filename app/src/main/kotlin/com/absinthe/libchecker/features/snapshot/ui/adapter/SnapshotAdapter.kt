@@ -18,6 +18,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.constant.options.SnapshotOptions
 import com.absinthe.libchecker.data.app.LocalAppDataSource
+import com.absinthe.libchecker.domain.snapshot.SnapshotPackageIconSource
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
 import com.absinthe.libchecker.features.snapshot.ui.view.SnapshotItemView
@@ -54,6 +55,11 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
   private val formatterToday by unsafeLazy {
     SimpleDateFormat("HH:mm:ss", Locale.getDefault())
   }
+  private var packageIconSources: Map<String, SnapshotPackageIconSource> = emptyMap()
+
+  fun setPackageIconSources(packageIconSources: Map<String, SnapshotPackageIconSource>) {
+    this.packageIconSources = packageIconSources
+  }
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return createBaseViewHolder(
@@ -77,14 +83,10 @@ class SnapshotAdapter(private val cardMode: CardMode = CardMode.NORMAL) : Highli
       }
     }
     (holder.itemView as SnapshotItemView).container.apply {
-      val packageInfo = runCatching {
-        PackageUtils.getPackageInfo(item.packageName)
-      }.getOrNull()
-
-      if (packageInfo == null) {
-        icon.load(R.drawable.ic_icon_blueprint)
-      } else {
-        icon.load(packageInfo)
+      when (val iconSource = packageIconSources[item.packageName]) {
+        is SnapshotPackageIconSource.InstalledPackage -> icon.load(iconSource.packageInfo)
+        SnapshotPackageIconSource.Fallback,
+        null -> icon.load(R.drawable.ic_icon_blueprint)
       }
 
       if (item.deleted) {

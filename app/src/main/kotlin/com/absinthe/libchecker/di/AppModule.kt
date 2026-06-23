@@ -70,6 +70,7 @@ import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotListsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotWithInstalledAppsUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
+import com.absinthe.libchecker.domain.snapshot.GetSnapshotPackageIconSourcesUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveCodec
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotItemFactory
@@ -168,6 +169,7 @@ val appModule = module {
   factory { CompareSnapshotWithInstalledAppsUseCase(get(), get(), get(), get()) }
   factory { CompareSnapshotItemWithInstalledAppUseCase(get(), get(), get(), get()) }
   factory { GetSnapshotDashboardCountUseCase(get(), get()) }
+  factory { GetSnapshotPackageIconSourcesUseCase(get()) }
   factory { UpdateSnapshotTopAppsUseCase(get(), get()) }
   factory { BuildSnapshotDetailItemsUseCase() }
   factory { SnapshotArchiveUseCase(get(), get()) }
@@ -241,6 +243,24 @@ val appModule = module {
       getLibReferenceAppsUseCase = get()
     )
   }
-  viewModel { SnapshotViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+  viewModel {
+    SnapshotViewModel(
+      repository = get(),
+      appListRepository = get(),
+      compareSnapshotItems = get(),
+      compareSnapshotLists = get(),
+      compareSnapshotWithInstalledApps = get(),
+      compareSnapshotItemWithInstalledApp = get(),
+      getSnapshotDashboardCount = get(),
+      updateSnapshotTopApps = get(),
+      buildSnapshotDetailItems = get(),
+      snapshotArchive = get(),
+      snapshotLibrary = get(),
+      buildArchiveSnapshotItemUseCase = get(),
+      buildSnapshotPairDiffUseCase = get(),
+      buildSnapshotComparisonListsUseCase = get(),
+      getSnapshotPackageIconSourcesUseCase = get()
+    )
+  }
   viewModel { TrackViewModel(get()) }
 }

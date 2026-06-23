@@ -725,7 +725,9 @@ class SnapshotFragment :
       pendingParticleRemovePackageNames.removeAll(consumedRemovePackageNames)
     }
     adapter.setDiffNewData(
-      sortedList
+      sortedList.also {
+        adapter.setPackageIconSources(viewModel.getSnapshotPackageIconSources(it.map(SnapshotDiffItem::packageName)))
+      }
     ) {
       if (isDetached) {
         return@setDiffNewData
