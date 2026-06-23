@@ -20,6 +20,7 @@ import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemWithInstalledA
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotListsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotWithInstalledAppsUseCase
+import com.absinthe.libchecker.domain.snapshot.GetApexPackageNamesUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotPackageIconSourcesUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
@@ -63,7 +64,8 @@ class SnapshotViewModel(
   private val buildArchiveSnapshotItemUseCase: BuildArchiveSnapshotItemUseCase,
   private val buildSnapshotPairDiffUseCase: BuildSnapshotPairDiffUseCase,
   private val buildSnapshotComparisonListsUseCase: BuildSnapshotComparisonListsUseCase,
-  private val getSnapshotPackageIconSourcesUseCase: GetSnapshotPackageIconSourcesUseCase
+  private val getSnapshotPackageIconSourcesUseCase: GetSnapshotPackageIconSourcesUseCase,
+  private val getApexPackageNamesUseCase: GetApexPackageNamesUseCase
 ) : ViewModel() {
 
   val allSnapshots = repository.currentSnapshotCount
@@ -222,6 +224,10 @@ class SnapshotViewModel(
 
   suspend fun getSnapshotPackageIconSources(packageNames: Collection<String>) = withContext(Dispatchers.IO) {
     getSnapshotPackageIconSourcesUseCase(packageNames)
+  }
+
+  suspend fun getApexPackageNames(): Set<String> = withContext(Dispatchers.IO) {
+    getApexPackageNamesUseCase()
   }
 
   suspend fun getTimeStampSystemProps(timestamp: Long): String? {

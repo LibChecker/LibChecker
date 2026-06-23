@@ -13,6 +13,8 @@ interface InstalledAppRepository {
 
   fun getApplicationCount(forceUpdate: Boolean = false): Int
 
+  fun getApexPackageNames(): Set<String>
+
   fun getPackageInfo(
     packageName: String,
     flags: Int = 0,

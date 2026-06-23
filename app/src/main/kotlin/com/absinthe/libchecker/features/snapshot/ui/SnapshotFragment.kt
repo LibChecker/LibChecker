@@ -724,11 +724,10 @@ class SnapshotFragment :
       )
       pendingParticleRemovePackageNames.removeAll(consumedRemovePackageNames)
     }
-    adapter.setDiffNewData(
-      sortedList.also {
-        adapter.setPackageIconSources(viewModel.getSnapshotPackageIconSources(it.map(SnapshotDiffItem::packageName)))
-      }
-    ) {
+    val packageNames = sortedList.map(SnapshotDiffItem::packageName)
+    adapter.setPackageIconSources(viewModel.getSnapshotPackageIconSources(packageNames))
+    adapter.setApexPackageNames(viewModel.getApexPackageNames())
+    adapter.setDiffNewData(sortedList) {
       if (isDetached) {
         return@setDiffNewData
       }

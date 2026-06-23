@@ -70,6 +70,7 @@ import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemWithInstalledA
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotListsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotWithInstalledAppsUseCase
+import com.absinthe.libchecker.domain.snapshot.GetApexPackageNamesUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotPackageIconSourcesUseCase
 import com.absinthe.libchecker.domain.snapshot.GetTrackListItemsUseCase
@@ -165,6 +166,7 @@ val appModule = module {
   factory { GetXposedModuleInfoUseCase(androidContext().packageManager, get()) }
   factory { HasInstalledStaticLibrariesUseCase(get()) }
   factory { SortAppDetailItemsUseCase() }
+  factory { GetApexPackageNamesUseCase(get()) }
   factory { BuildArchiveSnapshotItemUseCase(androidContext()) }
   factory { BuildPackageComparisonSnapshotItemUseCase(androidContext().packageManager) }
   factory { BuildSnapshotComparisonListsUseCase(get()) }
@@ -267,7 +269,8 @@ val appModule = module {
       buildArchiveSnapshotItemUseCase = get(),
       buildSnapshotPairDiffUseCase = get(),
       buildSnapshotComparisonListsUseCase = get(),
-      getSnapshotPackageIconSourcesUseCase = get()
+      getSnapshotPackageIconSourcesUseCase = get(),
+      getApexPackageNamesUseCase = get()
     )
   }
   viewModel { TrackViewModel(get(), get()) }

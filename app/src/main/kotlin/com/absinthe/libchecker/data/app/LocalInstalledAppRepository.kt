@@ -28,6 +28,10 @@ object LocalInstalledAppRepository : InstalledAppRepository {
     return LocalAppDataSource.getApplicationCount(forceUpdate)
   }
 
+  override fun getApexPackageNames(): Set<String> {
+    return LocalAppDataSource.apexPackageSet
+  }
+
   override fun getPackageInfo(
     packageName: String,
     flags: Int,
