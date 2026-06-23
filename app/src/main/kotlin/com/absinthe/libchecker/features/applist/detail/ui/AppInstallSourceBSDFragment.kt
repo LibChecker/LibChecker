@@ -25,8 +25,6 @@ import com.absinthe.libchecker.features.applist.detail.ui.view.AppInstallSourceI
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppInstallTimeItemView
 import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
-import com.absinthe.libchecker.utils.FreezeUtils
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.ShizukuManager
 import com.absinthe.libchecker.utils.ShizukuManager.Availability
 import com.absinthe.libchecker.utils.extensions.PREINSTALLED_TIMESTAMP
@@ -62,7 +60,11 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
 
   private fun bindAppInstallSourceDetails(details: AppInstallSourceDetails) {
     bindAppInstallSourceItems(details.installSource)
-    initAppInstalledTimeItemView(root.installedTimeView, details.packageInfo)
+    initAppInstalledTimeItemView(
+      item = root.installedTimeView,
+      pi = details.packageInfo,
+      showInstalledTime = details.showInstalledTime
+    )
     initDexoptItemView(root.dexoptView, details.packageInfo)
   }
 
@@ -154,8 +156,12 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
         item.packageView.container.versionInfo.text =
           getString(R.string.lib_detail_app_install_source_shizuku_not_running_detail)
         item.packageView.setOnClickListener {
-          PackageUtils.startLaunchAppActivity(requireContext(), Constants.PackageNames.SHIZUKU)
-          registerBinderReceivedRefresh()
+          lifecycleScope.launch {
+            viewModel.getAppLaunchAction(Constants.PackageNames.SHIZUKU)?.let {
+              startActivity(it.intent)
+            }
+            registerBinderReceivedRefresh()
+          }
         }
       }
 
@@ -281,8 +287,12 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
     }
   }
 
-  private fun initAppInstalledTimeItemView(item: AppInstallTimeItemView, pi: PackageInfo) {
-    if (context == null || FreezeUtils.isAppFrozen(pi.packageName)) {
+  private fun initAppInstalledTimeItemView(
+    item: AppInstallTimeItemView,
+    pi: PackageInfo,
+    showInstalledTime: Boolean
+  ) {
+    if (context == null || !showInstalledTime) {
       item.isGone = true
       return
     }

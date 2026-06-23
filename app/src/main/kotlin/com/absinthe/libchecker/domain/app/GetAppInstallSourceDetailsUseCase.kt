@@ -8,7 +8,8 @@ class GetAppInstallSourceDetailsUseCase(
     val packageInfo = installedAppRepository.getPackageInfo(packageName) ?: return null
     return AppInstallSourceDetails(
       packageInfo = packageInfo,
-      installSource = installedAppRepository.getInstallSource(packageName)
+      installSource = installedAppRepository.getInstallSource(packageName),
+      showInstalledTime = !installedAppRepository.getPackageState(packageName).isFrozen
     )
   }
 }

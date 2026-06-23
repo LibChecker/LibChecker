@@ -110,8 +110,9 @@ Important `:app` boundaries:
 - UI controllers should not call `Repositories.lcRepository` directly for new
   or refactored paths; route persistence through ViewModels and domain use
   cases/repositories.
-- Avoid package-manager, archive, or freeze-state lookups in RecyclerView/view
-  binding; precompute through ViewModels/use cases on a background thread.
+- Avoid package-manager, archive, or freeze-state lookups in UI controllers or
+  RecyclerView/view binding; precompute through ViewModels/use cases on a
+  background thread.
 - Heavy package scanning, zip reads, DEX parsing, ELF parsing, database writes,
   and network calls must run off the main thread.
 - Package analysis must keep working for installed apps, APK, split APK, APKS,
