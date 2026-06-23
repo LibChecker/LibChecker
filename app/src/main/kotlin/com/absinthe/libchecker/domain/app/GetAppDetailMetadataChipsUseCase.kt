@@ -50,24 +50,32 @@ class GetAppDetailMetadataChipsUseCase(
       .map { key ->
         @Suppress("DEPRECATION")
         val value = metadata.get(key).toString()
-        val resourceId = value.takeIf(String::maybeResourceId)?.toLongOrNull()
+        val resourceId = value.toResourceIdOrNull()
         val displayValue = resourceId?.let { id ->
           runCatching {
-            appResources?.getResourceName(id.toInt())
+            appResources?.getResourceName(id)
           }.getOrNull()
         } ?: value
         val resourceType = resourceId?.let { id ->
           runCatching {
-            appResources?.getResourceTypeName(id.toInt())
+            appResources?.getResourceTypeName(id)
           }.getOrNull()
         }
 
         LibStringItemChip(
-          LibStringItem(key, resourceId ?: 0L, displayValue),
+          LibStringItem(key, resourceId?.toLong() ?: 0L, displayValue),
           null,
           listOfNotNull(resourceType)
         )
       }
       .toList()
+  }
+
+  private fun String.toResourceIdOrNull(): Int? {
+    return takeIf(String::maybeResourceId)
+      ?.toLongOrNull()
+      ?.takeIf { id -> id in Int.MIN_VALUE..Int.MAX_VALUE }
+      ?.toInt()
+      ?.takeIf { id -> id ushr 24 != 0 }
   }
 }
