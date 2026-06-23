@@ -2,6 +2,7 @@ package com.absinthe.libchecker.features.applist.detail
 
 import android.content.Context
 import android.content.pm.PackageInfo
+import android.net.Uri
 import android.util.SparseArray
 import androidx.core.util.forEach
 import androidx.lifecycle.ViewModel
@@ -21,11 +22,13 @@ import com.absinthe.libchecker.domain.app.AppDetailAbiLabelData
 import com.absinthe.libchecker.domain.app.AppDetailHeaderExtraInfo
 import com.absinthe.libchecker.domain.app.AppIconItem
 import com.absinthe.libchecker.domain.app.AppListRepository
+import com.absinthe.libchecker.domain.app.AppPackageShareFile
 import com.absinthe.libchecker.domain.app.AppManifestProperty
 import com.absinthe.libchecker.domain.app.BuildAppDetailAbiLabelDataUseCase
 import com.absinthe.libchecker.domain.app.BuildAppDetailHeaderExtraInfoUseCase
 import com.absinthe.libchecker.domain.app.BuildAppDetailHeaderTitleDataUseCase
 import com.absinthe.libchecker.domain.app.BuildRelatedAppDisplayDataUseCase
+import com.absinthe.libchecker.domain.app.ExportAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.ExtractNativeLibraryUseCase
 import com.absinthe.libchecker.domain.app.GetAlternativeLaunchItemsUseCase
 import com.absinthe.libchecker.domain.app.GetApkPreviewInfoUseCase
@@ -104,6 +107,7 @@ class DetailViewModel(
   private val buildAppDetailHeaderTitleDataUseCase: BuildAppDetailHeaderTitleDataUseCase,
   private val extractNativeLibraryUseCase: ExtractNativeLibraryUseCase,
   private val prepareAppPackageShareFileUseCase: PrepareAppPackageShareFileUseCase,
+  private val exportAppPackageShareFileUseCase: ExportAppPackageShareFileUseCase,
   private val getApkPreviewInfoUseCase: GetApkPreviewInfoUseCase,
   private val getAppDetailPermissionChipsUseCase: GetAppDetailPermissionChipsUseCase,
   private val getAppDetailSignatureChipsUseCase: GetAppDetailSignatureChipsUseCase,
@@ -243,6 +247,13 @@ class DetailViewModel(
 
   suspend fun prepareAppPackageShareFile(cacheDir: File, packageName: String) = withContext(Dispatchers.IO) {
     prepareAppPackageShareFileUseCase(cacheDir, packageName)
+  }
+
+  suspend fun exportAppPackageShareFile(
+    shareFile: AppPackageShareFile,
+    destinationUri: Uri
+  ) = withContext(Dispatchers.IO) {
+    exportAppPackageShareFileUseCase(shareFile, destinationUri)
   }
 
   suspend fun getApkPreviewInfo(url: String): Result<ApkPreviewInfo> {

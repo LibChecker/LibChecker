@@ -25,6 +25,7 @@ import com.absinthe.libchecker.domain.app.BuildInAppUpdateDiffDataUseCase
 import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.BuildRelatedAppDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.CheckRequiredPackageAvailabilityUseCase
+import com.absinthe.libchecker.domain.app.ExportAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.ExportAppListUseCase
 import com.absinthe.libchecker.domain.app.ExtractNativeLibraryUseCase
 import com.absinthe.libchecker.domain.app.FilterAppListItemsUseCase
@@ -153,7 +154,8 @@ val appModule = module {
   factory { ExtractNativeLibraryUseCase(androidContext(), BuildConfig.APPLICATION_ID) }
   factory { GetAppDetailPermissionChipsUseCase() }
   factory { GetAppDetailSignatureChipsUseCase(androidContext(), get()) }
-  factory { PrepareAppPackageShareFileUseCase(androidContext().packageManager, get()) }
+  factory { PrepareAppPackageShareFileUseCase(androidContext(), BuildConfig.APPLICATION_ID, get()) }
+  factory { ExportAppPackageShareFileUseCase(androidContext().contentResolver) }
   factory { GetApkPreviewInfoUseCase() }
   factory { GetAppListContentUseCase(BuildConfig.APPLICATION_ID, get(), get(), get()) }
   factory { GetAppListPackageStatesUseCase(get()) }
@@ -232,6 +234,7 @@ val appModule = module {
       buildAppDetailHeaderTitleDataUseCase = get(),
       extractNativeLibraryUseCase = get(),
       prepareAppPackageShareFileUseCase = get(),
+      exportAppPackageShareFileUseCase = get(),
       getApkPreviewInfoUseCase = get(),
       getAppDetailPermissionChipsUseCase = get(),
       getAppDetailSignatureChipsUseCase = get(),

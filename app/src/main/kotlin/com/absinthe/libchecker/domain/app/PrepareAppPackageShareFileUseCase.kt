@@ -1,7 +1,8 @@
 package com.absinthe.libchecker.domain.app
 
+import android.content.Context
 import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
+import androidx.core.content.FileProvider
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getVersionCode
@@ -13,10 +14,12 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 class PrepareAppPackageShareFileUseCase(
-  private val packageManager: PackageManager,
+  private val context: Context,
+  private val applicationId: String,
   private val installedAppRepository: InstalledAppRepository
 ) {
 
+  private val packageManager = context.packageManager
   private val illegalFilenameChars = Regex("""[\\/:*?"<>|]""")
 
   operator fun invoke(cacheDir: File, packageName: String): AppPackageShareFile {
@@ -62,7 +65,12 @@ class PrepareAppPackageShareFileUseCase(
 
     return AppPackageShareFile(
       file = targetFile,
-      mimeType = inferMimeType(targetFile)
+      mimeType = inferMimeType(targetFile),
+      contentUri = FileProvider.getUriForFile(
+        context,
+        "$applicationId.fileprovider",
+        targetFile
+      )
     )
   }
 
