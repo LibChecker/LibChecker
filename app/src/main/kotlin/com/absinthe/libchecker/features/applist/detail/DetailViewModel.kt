@@ -24,6 +24,7 @@ import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.AppManifestProperty
 import com.absinthe.libchecker.domain.app.BuildAppDetailAbiLabelDataUseCase
 import com.absinthe.libchecker.domain.app.BuildAppDetailHeaderExtraInfoUseCase
+import com.absinthe.libchecker.domain.app.BuildAppDetailHeaderTitleDataUseCase
 import com.absinthe.libchecker.domain.app.BuildRelatedAppDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.ExtractNativeLibraryUseCase
 import com.absinthe.libchecker.domain.app.GetAlternativeLaunchItemsUseCase
@@ -100,6 +101,7 @@ class DetailViewModel(
   private val getAppDetailStaticLibraryChipsUseCase: GetAppDetailStaticLibraryChipsUseCase,
   private val buildAppDetailAbiLabelDataUseCase: BuildAppDetailAbiLabelDataUseCase,
   private val buildAppDetailHeaderExtraInfoUseCase: BuildAppDetailHeaderExtraInfoUseCase,
+  private val buildAppDetailHeaderTitleDataUseCase: BuildAppDetailHeaderTitleDataUseCase,
   private val extractNativeLibraryUseCase: ExtractNativeLibraryUseCase,
   private val prepareAppPackageShareFileUseCase: PrepareAppPackageShareFileUseCase,
   private val getApkPreviewInfoUseCase: GetApkPreviewInfoUseCase,
@@ -199,6 +201,15 @@ class DetailViewModel(
       showAndroidVersion = showAndroidVersion
     )
   }
+
+  fun buildAppDetailHeaderTitleData(
+    packageInfo: PackageInfo,
+    apkAnalyticsMode: Boolean
+  ) = buildAppDetailHeaderTitleDataUseCase(
+    packageInfo = packageInfo,
+    apkPreviewInfo = apkPreviewInfo,
+    apkAnalyticsMode = apkAnalyticsMode
+  )
 
   suspend fun getAppBundleItems(packageInfo: PackageInfo): List<AppBundleSplitItem> {
     return withContext(Dispatchers.IO) {

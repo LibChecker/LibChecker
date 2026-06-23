@@ -74,7 +74,6 @@ import com.absinthe.libchecker.features.snapshot.detail.ui.SnapshotDetailActivit
 import com.absinthe.libchecker.ui.adapter.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.utils.OsUtils
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.addBackStateHandler
@@ -82,10 +81,8 @@ import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.copyToClipboard
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getVersionCode
-import com.absinthe.libchecker.utils.extensions.getVersionString
 import com.absinthe.libchecker.utils.extensions.isKeyboardShowing
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
@@ -177,9 +174,8 @@ abstract class BaseAppDetailActivity :
       viewModel.initAbiInfo(packageInfo, apkAnalyticsMode)
     }
 
-    val packageName = apkPreviewInfo?.packageName ?: packageInfo.packageName
-    val appName = apkPreviewInfo?.let { getString(R.string.apk_preview) } ?: packageInfo.getAppName(packageManager)
-    val versionString = apkPreviewInfo?.let { "${it.versionName} (${it.versionCode})" } ?: packageInfo.getVersionString()
+    val headerTitleData = viewModel.buildAppDetailHeaderTitleData(packageInfo, apkAnalyticsMode)
+    val packageName = headerTitleData.packageName
     val sharedLibraryFiles = ai?.sharedLibraryFiles
 
     binding.apply {
@@ -187,7 +183,7 @@ abstract class BaseAppDetailActivity :
         supportActionBar?.title = null
         collapsingToolbar.also {
           it.setOnApplyWindowInsetsListener(null)
-          it.title = appName ?: getString(R.string.detail_label)
+          it.title = headerTitleData.title
         }
         headerLayout.addOnOffsetChangedListener(object : AppBarStateChangeListener() {
           override fun onStateChanged(appBarLayout: AppBarLayout, state: State) {
@@ -201,13 +197,13 @@ abstract class BaseAppDetailActivity :
               false,
               this@BaseAppDetailActivity
             )
-            contentDescription = appName ?: getString(R.string.detail_label)
+            contentDescription = headerTitleData.title
             ai?.let {
               load(appIconLoader.loadIcon(it))
             } ?: run {
               load(R.drawable.ic_icon_blueprint)
             }
-            if (!apkAnalyticsMode || PackageUtils.isAppInstalled(packageName)) {
+            if (headerTitleData.isAppInfoAvailable) {
               setOnClickListener {
                 if (AntiShakeUtils.isInvalidClick(it)) {
                   return@setOnClickListener
@@ -228,7 +224,7 @@ abstract class BaseAppDetailActivity :
             }
           }
           appNameView.apply {
-            text = appName
+            text = headerTitleData.appName
             setLongClickCopiedToClipboard(text)
           }
           packageNameView.apply {
@@ -236,7 +232,7 @@ abstract class BaseAppDetailActivity :
             setLongClickCopiedToClipboard(text)
           }
           versionInfoView.apply {
-            text = versionString
+            text = headerTitleData.versionInfo
             setLongClickCopiedToClipboard(text)
           }
         }
