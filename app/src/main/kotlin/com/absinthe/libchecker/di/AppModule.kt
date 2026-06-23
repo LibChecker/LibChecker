@@ -26,6 +26,7 @@ import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailAbiUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailComponentChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailComponentsUseCase
+import com.absinthe.libchecker.domain.app.GetAppDetailDexChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailFeaturesUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailMetadataChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailNativeLibrariesUseCase
@@ -119,6 +120,7 @@ val appModule = module {
   factory { GetAppDetailAbiUseCase() }
   factory { GetAppDetailComponentsUseCase() }
   factory { GetAppDetailComponentChipsUseCase(get()) }
+  factory { GetAppDetailDexChipsUseCase() }
   factory { GetAppDetailFeaturesUseCase(get(), get()) }
   factory {
     GetAppInfoActionsUseCase(BuildConfig.APPLICATION_ID, androidContext().packageManager, get(), get())
@@ -186,6 +188,7 @@ val appModule = module {
       getAppDetailAbiUseCase = get(),
       getAppInstallSourceDetailsUseCase = get(),
       getAppDetailComponentChipsUseCase = get(),
+      getAppDetailDexChipsUseCase = get(),
       getAppDetailFeaturesUseCase = get(),
       getAppDetailMetadataChipsUseCase = get(),
       getAppDetailNativeLibrariesUseCase = get(),

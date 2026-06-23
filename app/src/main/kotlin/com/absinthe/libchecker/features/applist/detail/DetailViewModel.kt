@@ -7,14 +7,12 @@ import androidx.core.util.forEach
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.annotation.ACTIVITY
-import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.domain.app.AppBundleSplitItem
 import com.absinthe.libchecker.domain.app.AppDetailAbi
@@ -28,6 +26,7 @@ import com.absinthe.libchecker.domain.app.GetApkPreviewInfoUseCase
 import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailAbiUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailComponentChipsUseCase
+import com.absinthe.libchecker.domain.app.GetAppDetailDexChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailFeaturesUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailMetadataChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailNativeLibrariesUseCase
@@ -62,11 +61,9 @@ import com.absinthe.libchecker.features.statistics.bean.DISABLED
 import com.absinthe.libchecker.features.statistics.bean.EXPORTED
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
-import com.absinthe.rulesbundle.Rule
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -91,6 +88,7 @@ class DetailViewModel(
   private val getAppDetailAbiUseCase: GetAppDetailAbiUseCase,
   private val getAppInstallSourceDetailsUseCase: GetAppInstallSourceDetailsUseCase,
   private val getAppDetailComponentChipsUseCase: GetAppDetailComponentChipsUseCase,
+  private val getAppDetailDexChipsUseCase: GetAppDetailDexChipsUseCase,
   private val getAppDetailFeaturesUseCase: GetAppDetailFeaturesUseCase,
   private val getAppDetailMetadataChipsUseCase: GetAppDetailMetadataChipsUseCase,
   private val getAppDetailNativeLibrariesUseCase: GetAppDetailNativeLibrariesUseCase,
@@ -393,7 +391,10 @@ class DetailViewModel(
       return
     }
     initDexJob = viewModelScope.launch(Dispatchers.IO) {
-      val list = getDexChipList()
+      val list = getAppDetailDexChipsUseCase(
+        packageInfo = packageInfo,
+        sortBySizeMode = GlobalValues.libSortMode == MODE_SORT_BY_SIZE
+      )
       dexLibItems.emit(list)
     }
   }
@@ -478,33 +479,6 @@ class DetailViewModel(
 
   suspend fun getPermissionDetail(permissionName: String) = withContext(Dispatchers.IO) {
     getPermissionDetailUseCase(permissionName)
-  }
-
-  private suspend fun getDexChipList(): List<LibStringItemChip> {
-    Timber.d("getDexChipList")
-    val list = try {
-      PackageUtils.getDexList(packageInfo)
-    } catch (e: Exception) {
-      Timber.e(e)
-      emptyList()
-    }
-    val chipList = mutableListOf<LibStringItemChip>()
-    var rule: Rule?
-
-    if (list.isEmpty()) {
-      return chipList
-    } else {
-      list.forEach {
-        rule = RulesRepository.getRule(it.name, DEX, true)
-        chipList.add(LibStringItemChip(it, rule))
-      }
-      if (GlobalValues.libSortMode == MODE_SORT_BY_SIZE) {
-        chipList.sortByDescending { it.item.name }
-      } else {
-        chipList.sortByDescending { it.rule != null }
-      }
-    }
-    return chipList
   }
 
   fun initAbilities(context: Context, packageName: String) = viewModelScope.launch(Dispatchers.IO) {
