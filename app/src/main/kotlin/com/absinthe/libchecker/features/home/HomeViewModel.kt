@@ -20,6 +20,7 @@ import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.PackageChangeState
 import com.absinthe.libchecker.domain.app.SyncAppListChangesUseCase
 import com.absinthe.libchecker.domain.statistics.ComputeLibReferenceUseCase
+import com.absinthe.libchecker.domain.statistics.GetLibReferenceIconPackagesUseCase
 import com.absinthe.libchecker.domain.statistics.LibReferenceItem
 import com.absinthe.libchecker.features.statistics.bean.LibReference
 import com.absinthe.libchecker.services.IWorkerService
@@ -45,7 +46,8 @@ class HomeViewModel(
   private val syncAppListChangesUseCase: SyncAppListChangesUseCase,
   private val computeLibReferenceUseCase: ComputeLibReferenceUseCase,
   private val exportAppListUseCase: ExportAppListUseCase,
-  private val getAppListContentUseCase: GetAppListContentUseCase
+  private val getAppListContentUseCase: GetAppListContentUseCase,
+  private val getLibReferenceIconPackagesUseCase: GetLibReferenceIconPackagesUseCase
 ) : ViewModel() {
 
   val dbItemsFlow: Flow<List<LCItem>> = appListRepository.items
@@ -365,7 +367,8 @@ class HomeViewModel(
       libName,
       rule,
       referredList,
-      type
+      type,
+      iconPackages = getLibReferenceIconPackagesUseCase(referredList)
     )
   }
 

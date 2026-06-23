@@ -1,13 +1,13 @@
 package com.absinthe.libchecker.features.statistics.ui.view
 
 import android.content.Context
+import android.content.pm.PackageInfo
 import android.graphics.Outline
 import android.graphics.Rect
 import android.view.View
 import android.view.ViewOutlineProvider
 import androidx.appcompat.widget.AppCompatImageView
 import coil.load
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.view.AViewGroup
 
@@ -29,7 +29,7 @@ class MultipleAppsIconView(context: Context) : AViewGroup(context) {
     importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
   }
 
-  fun setIcons(packages: Iterable<String>) {
+  fun setIcons(packages: Iterable<PackageInfo>) {
     if (icons.isNotEmpty()) {
       removeAllViews()
       icons.clear()
@@ -37,13 +37,8 @@ class MultipleAppsIconView(context: Context) : AViewGroup(context) {
     val iterator = packages.iterator()
     while (icons.size < 4 && iterator.hasNext()) {
       val icon = AppCompatImageView(context).also {
-        val packageName = iterator.next()
-        val packageInfo = runCatching {
-          PackageUtils.getPackageInfo(packageName)
-        }.getOrNull() ?: return
-
         it.importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
-        it.load(packageInfo)
+        it.load(iterator.next())
       }
       icons.add(icon)
       addView(icon)

@@ -88,6 +88,7 @@ import com.absinthe.libchecker.domain.statistics.BuildPageSize16KBChartDataUseCa
 import com.absinthe.libchecker.domain.statistics.ComputeLibReferenceUseCase
 import com.absinthe.libchecker.domain.statistics.GetAndroidDistributionUseCase
 import com.absinthe.libchecker.domain.statistics.GetLibReferenceAppsUseCase
+import com.absinthe.libchecker.domain.statistics.GetLibReferenceIconPackagesUseCase
 import com.absinthe.libchecker.features.album.track.TrackViewModel
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.chart.ChartViewModel
@@ -119,6 +120,7 @@ val appModule = module {
   factory { BuildPageSize16KBChartDataUseCase(get()) }
   factory { ComputeLibReferenceUseCase(get()) }
   factory { GetAndroidDistributionUseCase(get()) }
+  factory { GetLibReferenceIconPackagesUseCase(get()) }
   factory { GetLibReferenceAppsUseCase() }
   factory { ExportAppListUseCase(get(), get()) }
   factory { FilterAppListItemsUseCase(get()) }
@@ -238,7 +240,8 @@ val appModule = module {
       syncAppListChangesUseCase = get(),
       computeLibReferenceUseCase = get(),
       exportAppListUseCase = get(),
-      getAppListContentUseCase = get()
+      getAppListContentUseCase = get(),
+      getLibReferenceIconPackagesUseCase = get()
     )
   }
   viewModel {

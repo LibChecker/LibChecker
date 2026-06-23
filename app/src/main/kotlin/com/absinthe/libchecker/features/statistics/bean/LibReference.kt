@@ -1,9 +1,11 @@
 package com.absinthe.libchecker.features.statistics.bean
 
+import android.content.pm.PackageInfo
 import android.os.Parcelable
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.rulesbundle.Rule
 import com.chad.library.adapter.base.entity.node.BaseNode
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.RawValue
 
@@ -13,6 +15,8 @@ data class LibReference(
   val rule: Rule?,
   val referredList: Set<String>,
   @LibType val type: Int,
+  @IgnoredOnParcel
+  val iconPackages: List<PackageInfo> = emptyList(),
   override val childNode: @RawValue MutableList<BaseNode>? = null
 ) : BaseNode(),
   Parcelable
