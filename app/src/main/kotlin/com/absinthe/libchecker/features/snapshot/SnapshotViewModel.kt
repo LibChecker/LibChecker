@@ -11,6 +11,7 @@ import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.snapshot.ArchiveSnapshotItem
+import com.absinthe.libchecker.domain.snapshot.BackupSnapshotArchiveToUriUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotComparisonListsUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotDetailItemsUseCase
@@ -22,7 +23,7 @@ import com.absinthe.libchecker.domain.snapshot.CompareSnapshotWithInstalledAppsU
 import com.absinthe.libchecker.domain.snapshot.GetApexPackageNamesUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotPackageIconSourcesUseCase
-import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
+import com.absinthe.libchecker.domain.snapshot.RestoreSnapshotArchiveFromUriUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotComparisonLists
 import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
@@ -32,8 +33,6 @@ import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import java.io.File
-import java.io.InputStream
-import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -58,7 +57,8 @@ class SnapshotViewModel(
   private val getSnapshotDashboardCount: GetSnapshotDashboardCountUseCase,
   private val updateSnapshotTopApps: UpdateSnapshotTopAppsUseCase,
   private val buildSnapshotDetailItems: BuildSnapshotDetailItemsUseCase,
-  private val snapshotArchive: SnapshotArchiveUseCase,
+  private val backupSnapshotArchiveToUriUseCase: BackupSnapshotArchiveToUriUseCase,
+  private val restoreSnapshotArchiveFromUriUseCase: RestoreSnapshotArchiveFromUriUseCase,
   private val snapshotLibrary: SnapshotLibraryUseCase,
   private val buildArchiveSnapshotItemUseCase: BuildArchiveSnapshotItemUseCase,
   private val buildSnapshotPairDiffUseCase: BuildSnapshotPairDiffUseCase,
@@ -238,8 +238,12 @@ class SnapshotViewModel(
     return snapshotLibrary.retainLatestSnapshotsAndGetTimeStamps(count)
   }
 
-  fun backup(os: OutputStream, resultAction: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
-    snapshotArchive.backup(os)
+  fun backup(uri: Uri, resultAction: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
+    runCatching {
+      backupSnapshotArchiveToUriUseCase(uri)
+    }.onFailure {
+      Timber.e(it)
+    }
     withContext(Dispatchers.Main) {
       resultAction()
     }
@@ -247,12 +251,12 @@ class SnapshotViewModel(
 
   fun restore(
     context: Context,
-    inputStream: InputStream,
+    uri: Uri,
     resultAction: (success: Boolean) -> Unit
   ) {
     viewModelScope.launch(Dispatchers.IO) {
       runCatching {
-        snapshotArchive.restore(inputStream)
+        restoreSnapshotArchiveFromUriUseCase(uri)
       }.onFailure {
         Timber.e("restore with new format failed: $it")
         withContext(Dispatchers.Main) {
@@ -260,6 +264,12 @@ class SnapshotViewModel(
         }
         return@launch
       }.onSuccess { result ->
+        if (result == null) {
+          withContext(Dispatchers.Main) {
+            resultAction(false)
+          }
+          return@launch
+        }
         result.latestTimeStamp?.let { GlobalValues.snapshotTimestamp = it }
         withContext(Dispatchers.Main) {
           resultAction(true)

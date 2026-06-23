@@ -74,6 +74,7 @@ import com.absinthe.libchecker.domain.app.PrepareAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
 import com.absinthe.libchecker.domain.app.SortAppDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.SyncAppListChangesUseCase
+import com.absinthe.libchecker.domain.snapshot.BackupSnapshotArchiveToUriUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildInstalledSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildPackageComparisonSnapshotItemUseCase
@@ -89,6 +90,7 @@ import com.absinthe.libchecker.domain.snapshot.GetApexPackageNamesUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotPackageIconSourcesUseCase
 import com.absinthe.libchecker.domain.snapshot.GetTrackListItemsUseCase
+import com.absinthe.libchecker.domain.snapshot.RestoreSnapshotArchiveFromUriUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveCodec
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotItemFactory
@@ -211,6 +213,8 @@ val appModule = module {
   factory { UpdateSnapshotTopAppsUseCase(get(), get()) }
   factory { BuildSnapshotDetailItemsUseCase() }
   factory { SnapshotArchiveUseCase(get(), get()) }
+  factory { BackupSnapshotArchiveToUriUseCase(androidContext().contentResolver, get()) }
+  factory { RestoreSnapshotArchiveFromUriUseCase(androidContext().contentResolver, get()) }
   factory { SnapshotLibraryUseCase(get()) }
 
   viewModel {
@@ -298,7 +302,8 @@ val appModule = module {
       getSnapshotDashboardCount = get(),
       updateSnapshotTopApps = get(),
       buildSnapshotDetailItems = get(),
-      snapshotArchive = get(),
+      backupSnapshotArchiveToUriUseCase = get(),
+      restoreSnapshotArchiveFromUriUseCase = get(),
       snapshotLibrary = get(),
       buildArchiveSnapshotItemUseCase = get(),
       buildSnapshotPairDiffUseCase = get(),

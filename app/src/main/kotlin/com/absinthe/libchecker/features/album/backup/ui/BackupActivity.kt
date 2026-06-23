@@ -134,11 +134,8 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
               runCatching {
                 val dialog = UiUtils.createLoadingDialog(activity)
                 dialog.show()
-                activity.contentResolver.openOutputStream(it)?.let { os ->
-                  Timber.d("backupResultLauncher: openOutputStream")
-                  viewModel.backup(os) {
-                    dialog.dismiss()
-                  }
+                viewModel.backup(it) {
+                  dialog.dismiss()
                 }
               }.onFailure { t ->
                 Timber.e(t)
@@ -360,11 +357,11 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
     private fun restoreDatabase(uri: Uri) {
       activity?.let { activity ->
         runCatching {
-          activity.contentResolver.openInputStream(uri)
-            ?.let { inputStream ->
-              val dialog = UiUtils.createLoadingDialog(activity)
-              dialog.show()
-              if (uri.toString().endsWith(".sqlite3")) {
+          val dialog = UiUtils.createLoadingDialog(activity)
+          dialog.show()
+          if (uri.toString().endsWith(".sqlite3")) {
+            activity.contentResolver.openInputStream(uri)
+              ?.let { inputStream ->
                 lifecycleScope.launch(Dispatchers.IO) {
                   val restoreFile = File(activity.requireAvailableCacheDir(), "restore.sqlite3")
                   inputStream.source().buffer().use { source ->
@@ -389,18 +386,18 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
                           dialog.dismiss()
                         }
                       }
-                    }
+                  }
                     .restore()
                 }
-              } else {
-                viewModel.restore(requireContext(), inputStream) { success ->
-                  if (!success) {
-                    context?.showToast("Backup file error")
-                  }
-                  dialog.dismiss()
-                }
+              } ?: dialog.dismiss()
+          } else {
+            viewModel.restore(requireContext(), uri) { success ->
+              if (!success) {
+                context?.showToast("Backup file error")
               }
+              dialog.dismiss()
             }
+          }
         }.onFailure { t ->
           Timber.e(t)
         }
