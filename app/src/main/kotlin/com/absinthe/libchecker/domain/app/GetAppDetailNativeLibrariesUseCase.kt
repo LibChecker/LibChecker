@@ -26,7 +26,9 @@ private const val NATIVE_ACTIVITY_LABEL = "NativeActivity"
 private const val ZYGOTE_PRELOAD_NATIVE_LIB_PROPERTY = "zygotePreloadNativeLib"
 private const val ZYGOTE_PRELOAD_NATIVE_LIB_LABEL = "PRELOAD"
 
-class GetAppDetailNativeLibrariesUseCase {
+class GetAppDetailNativeLibrariesUseCase(
+  private val installedAppRepository: InstalledAppRepository
+) {
 
   operator fun invoke(
     packageInfo: PackageInfo,
@@ -102,13 +104,11 @@ class GetAppDetailNativeLibrariesUseCase {
     val activityPackageInfo = if (packageInfo.activities != null) {
       packageInfo
     } else {
-      runCatching {
-        PackageUtils.getPackageInfo(
-          packageInfo.packageName,
-          PackageManager.GET_ACTIVITIES or PackageManager.GET_META_DATA,
-          false
-        )
-      }.getOrNull()
+      installedAppRepository.getPackageInfo(
+        packageInfo.packageName,
+        PackageManager.GET_ACTIVITIES or PackageManager.GET_META_DATA,
+        resolveFrozenArchiveInfo = false
+      )
     } ?: return emptySet()
 
     return activityPackageInfo.activities.orEmpty()

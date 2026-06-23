@@ -139,7 +139,7 @@ val appModule = module {
   factory { GetAppInstallSourceDetailsUseCase(get()) }
   factory { GetAppLaunchActionUseCase() }
   factory { GetAppDetailMetadataChipsUseCase() }
-  factory { GetAppDetailNativeLibrariesUseCase() }
+  factory { GetAppDetailNativeLibrariesUseCase(get()) }
   factory { GetAppDetailStaticLibraryChipsUseCase() }
   factory { GetAppDetailPackageUseCase(get()) }
   factory { GetAppDetailPackageSizeUseCase(get()) }
