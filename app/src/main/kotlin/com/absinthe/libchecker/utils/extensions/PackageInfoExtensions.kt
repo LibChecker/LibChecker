@@ -39,7 +39,7 @@ import com.absinthe.libchecker.constant.Constants.X86_STRING
 import com.absinthe.libchecker.constant.GlobalFeatures
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.Features
-import com.absinthe.libchecker.features.applist.detail.bean.KotlinToolingMetadata
+import com.absinthe.libchecker.domain.app.KotlinToolingMetadata
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.OsUtils

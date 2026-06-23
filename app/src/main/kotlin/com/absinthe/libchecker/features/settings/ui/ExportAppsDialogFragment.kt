@@ -4,9 +4,7 @@ import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.app.BuildAppExportNativeLibrariesUseCase
-import com.absinthe.libchecker.domain.app.InstalledAppRepository
-import com.absinthe.libchecker.features.settings.export.LcAppsExporter
+import com.absinthe.libchecker.domain.app.ExportInstalledAppsToUriUseCase
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
@@ -23,8 +21,7 @@ import timber.log.Timber
 
 class ExportAppsDialogFragment : BaseBottomSheetViewDialogFragment<ExportAppsDialogView>() {
 
-  private val installedAppRepository: InstalledAppRepository by inject()
-  private val buildAppExportNativeLibraries: BuildAppExportNativeLibrariesUseCase by inject()
+  private val exportInstalledAppsToUriUseCase: ExportInstalledAppsToUriUseCase by inject()
   private var exportJob: Job? = null
   private var isExporting = false
 
@@ -59,27 +56,14 @@ class ExportAppsDialogFragment : BaseBottomSheetViewDialogFragment<ExportAppsDia
   }
 
   private fun startExport(uri: Uri) {
-    val appContext = requireContext().applicationContext
-    val contentResolver = requireContext().contentResolver
     exportJob?.cancel()
     exportJob = viewLifecycleOwner.lifecycleScope.launch {
       isExporting = true
       root.showExporting()
       try {
-        val result = withContext(Dispatchers.IO) {
-          val outputStream = contentResolver.openOutputStream(uri)
-            ?: error("Unable to open output stream")
-          outputStream.use { stream ->
-            LcAppsExporter.export(
-              context = appContext,
-              installedAppRepository = installedAppRepository,
-              buildAppExportNativeLibraries = buildAppExportNativeLibraries,
-              outputStream = stream
-            ) { progress ->
-              withContext(Dispatchers.Main) {
-                root.setProgress(progress)
-              }
-            }
+        val result = exportInstalledAppsToUriUseCase(uri) { progress ->
+          withContext(Dispatchers.Main) {
+            root.setProgress(progress)
           }
         }
         root.showDone()

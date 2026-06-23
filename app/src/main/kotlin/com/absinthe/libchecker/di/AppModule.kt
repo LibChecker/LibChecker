@@ -26,9 +26,10 @@ import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCa
 import com.absinthe.libchecker.domain.app.BuildRelatedAppDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.BuildSignatureDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.CheckRequiredPackageAvailabilityUseCase
-import com.absinthe.libchecker.domain.app.ExportAppListUseCase
 import com.absinthe.libchecker.domain.app.ExportAppListToUriUseCase
+import com.absinthe.libchecker.domain.app.ExportAppListUseCase
 import com.absinthe.libchecker.domain.app.ExportAppPackageShareFileUseCase
+import com.absinthe.libchecker.domain.app.ExportInstalledAppsToUriUseCase
 import com.absinthe.libchecker.domain.app.ExtractNativeLibraryUseCase
 import com.absinthe.libchecker.domain.app.FilterAppDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.FilterAppListItemsUseCase
@@ -176,6 +177,9 @@ val appModule = module {
   factory { BuildAppDetailHeaderExtraInfoUseCase(androidContext(), get()) }
   factory { BuildAppDetailHeaderTitleDataUseCase(androidContext(), get()) }
   factory { BuildAppExportNativeLibrariesUseCase() }
+  factory {
+    ExportInstalledAppsToUriUseCase(androidContext(), androidContext().contentResolver, get(), get())
+  }
   factory { BuildAppListItemViewStatesUseCase(androidContext(), get()) }
   factory { BuildInAppUpdateDiffDataUseCase(BuildConfig.APPLICATION_ID, androidContext().packageManager, get()) }
   factory { BuildNativeLibraryItemDisplayDataUseCase(androidContext()) }

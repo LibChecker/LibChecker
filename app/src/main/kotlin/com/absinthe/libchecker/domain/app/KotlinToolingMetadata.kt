@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.applist.detail.bean
+package com.absinthe.libchecker.domain.app
 
 import com.squareup.moshi.JsonClass
 
