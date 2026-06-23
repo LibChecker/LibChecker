@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
 import android.content.Intent
-import android.content.pm.PackageInfo
 import android.os.Build
 import android.text.SpannableString
 import android.text.style.ImageSpan
@@ -15,6 +14,7 @@ import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.URLManager
+import com.absinthe.libchecker.domain.app.AppInstalledTimeDisplayData
 import com.absinthe.libchecker.domain.app.AppInstallSource
 import com.absinthe.libchecker.domain.app.AppInstallSourceDetails
 import com.absinthe.libchecker.domain.app.RelatedAppDisplayData
@@ -27,13 +27,11 @@ import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageS
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.ShizukuManager
 import com.absinthe.libchecker.utils.ShizukuManager.Availability
-import com.absinthe.libchecker.utils.extensions.PREINSTALLED_TIMESTAMP
-import com.absinthe.libchecker.utils.extensions.getDexFileOptimizationInfo
+import com.absinthe.libchecker.utils.extensions.DexFileOptimizationInfo
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
-import java.text.SimpleDateFormat
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
@@ -62,10 +60,9 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
     bindAppInstallSourceItems(details.installSource)
     initAppInstalledTimeItemView(
       item = root.installedTimeView,
-      pi = details.packageInfo,
-      showInstalledTime = details.showInstalledTime
+      installedTime = details.installedTime
     )
-    initDexoptItemView(root.dexoptView, details.packageInfo)
+    initDexoptItemView(root.dexoptView, details.dexoptInfo)
   }
 
   private fun bindAppInstallSourceItems(installSource: AppInstallSource?) {
@@ -107,14 +104,11 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
     }
   }
 
-  private fun initDexoptItemView(item: AppDexoptItemView, pi: PackageInfo) {
-    if (context == null) {
-      item.isGone = true
-      return
-    }
-
-    val dexoptInfo = pi.getDexFileOptimizationInfo()
-    if (dexoptInfo == null) {
+  private fun initDexoptItemView(
+    item: AppDexoptItemView,
+    dexoptInfo: DexFileOptimizationInfo?
+  ) {
+    if (context == null || dexoptInfo == null) {
       item.isGone = true
       return
     }
@@ -289,29 +283,16 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
 
   private fun initAppInstalledTimeItemView(
     item: AppInstallTimeItemView,
-    pi: PackageInfo,
-    showInstalledTime: Boolean
+    installedTime: AppInstalledTimeDisplayData?
   ) {
-    if (context == null || !showInstalledTime) {
+    if (context == null || installedTime == null) {
       item.isGone = true
       return
     }
 
-    val firstInstalledTime = pi.firstInstallTime
-    val lastUpdatedTime = pi.lastUpdateTime
     item.contentView.apply {
-      if (firstInstalledTime <= PREINSTALLED_TIMESTAMP) {
-        firstInstalledView.libSize.text = getString(R.string.snapshot_preinstalled_app)
-      } else {
-        firstInstalledView.libSize.text =
-          SimpleDateFormat.getDateTimeInstance().format(firstInstalledTime)
-      }
-      if (lastUpdatedTime <= PREINSTALLED_TIMESTAMP) {
-        lastUpdatedView.libSize.text = getString(R.string.snapshot_preinstalled_app)
-      } else {
-        lastUpdatedView.libSize.text =
-          SimpleDateFormat.getDateTimeInstance().format(lastUpdatedTime)
-      }
+      firstInstalledView.libSize.text = installedTime.firstInstalledTime
+      lastUpdatedView.libSize.text = installedTime.lastUpdatedTime
       (parent as? View)?.setLongClickCopiedToClipboard(item.contentView.getAllContentText())
     }
   }

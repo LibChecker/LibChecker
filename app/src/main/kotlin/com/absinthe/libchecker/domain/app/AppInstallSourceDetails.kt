@@ -1,9 +1,14 @@
 package com.absinthe.libchecker.domain.app
 
-import android.content.pm.PackageInfo
+import com.absinthe.libchecker.utils.extensions.DexFileOptimizationInfo
 
 data class AppInstallSourceDetails(
-  val packageInfo: PackageInfo,
   val installSource: AppInstallSource?,
-  val showInstalledTime: Boolean
+  val installedTime: AppInstalledTimeDisplayData?,
+  val dexoptInfo: DexFileOptimizationInfo?
+)
+
+data class AppInstalledTimeDisplayData(
+  val firstInstalledTime: String,
+  val lastUpdatedTime: String
 )
