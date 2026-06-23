@@ -7,22 +7,23 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.utils.PackageUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class BuildAppListItemViewStatesUseCase(
   private val context: Context,
   private val getAppListPackageStatesUseCase: GetAppListPackageStatesUseCase
 ) {
 
-  suspend operator fun invoke(request: Request): Map<String, AppListItemViewState> {
+  suspend operator fun invoke(request: Request): Map<String, AppListItemViewState> = withContext(Dispatchers.IO) {
     val packageStates = getAppListPackageStatesUseCase(request.items)
-    return request.items.associate { item ->
+    request.items.associate { item ->
       item.packageName to AppListItemViewState.create(
         context = context,
         item = item,
         packageState = packageStates.getValue(item.packageName),
         options = request.options
       )
-    }
   }
 
   data class Request(

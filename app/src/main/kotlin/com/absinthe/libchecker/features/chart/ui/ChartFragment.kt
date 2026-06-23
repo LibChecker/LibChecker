@@ -533,9 +533,7 @@ class ChartFragment :
     }
 
     showClassifyDialogJob = lifecycleScope.launch {
-      val itemViewStates = withContext(Dispatchers.IO) {
-        viewModel.buildAppListItemViewStates(items, GlobalValues.advancedOptions)
-      }
+      val itemViewStates = viewModel.buildAppListItemViewStates(items)
       val hostActivity = activity
       if (!isAdded || hostActivity == null || dialog != null) {
         return@launch

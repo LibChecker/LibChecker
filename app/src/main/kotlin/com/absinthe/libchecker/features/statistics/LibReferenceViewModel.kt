@@ -48,14 +48,11 @@ class LibReferenceViewModel(
     emitLibReferenceApps(dbItems, name, type, packagesList)
   }
 
-  suspend fun buildAppListItemViewStates(
-    items: List<LCItem>,
-    options: Int
-  ): Map<String, AppListItemViewState> {
+  suspend fun buildAppListItemViewStates(items: List<LCItem>): Map<String, AppListItemViewState> {
     return buildAppListItemViewStatesUseCase(
       BuildAppListItemViewStatesUseCase.Request(
         items = items,
-        options = options
+        options = GlobalValues.advancedOptions
       )
     )
   }
