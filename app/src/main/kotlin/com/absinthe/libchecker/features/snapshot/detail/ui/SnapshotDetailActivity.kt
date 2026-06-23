@@ -105,7 +105,7 @@ class SnapshotDetailActivity :
     if (_entity != null) {
       entity = _entity!!
       initView()
-      viewModel.computeDiffDetail(this, entity)
+      viewModel.computeDiffDetail(entity)
     } else {
       finish()
     }

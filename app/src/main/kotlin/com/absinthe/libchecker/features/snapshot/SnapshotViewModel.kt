@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.features.snapshot
 
-import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -203,8 +202,8 @@ class SnapshotViewModel(
     }
   }
 
-  fun computeDiffDetail(context: Context, entity: SnapshotDiffItem) = viewModelScope.launch(Dispatchers.IO) {
-    snapshotDetailItemsFlow.emit(buildSnapshotDetailItems(context, entity))
+  fun computeDiffDetail(entity: SnapshotDiffItem) = viewModelScope.launch(Dispatchers.IO) {
+    snapshotDetailItemsFlow.emit(buildSnapshotDetailItems(entity))
   }
 
   fun getTimeStamps(): List<TimeStampItem> {

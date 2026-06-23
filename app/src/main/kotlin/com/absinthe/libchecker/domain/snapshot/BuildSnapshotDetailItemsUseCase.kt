@@ -27,14 +27,15 @@ import com.absinthe.libchecker.utils.fromJson
 import java.util.Locale
 import kotlin.math.abs
 
-class BuildSnapshotDetailItemsUseCase {
+class BuildSnapshotDetailItemsUseCase(
+  private val context: Context
+) {
 
-  operator fun invoke(context: Context, item: SnapshotDiffItem): List<SnapshotDetailItem> {
+  operator fun invoke(item: SnapshotDiffItem): List<SnapshotDetailItem> {
     val list = mutableListOf<SnapshotDetailItem>()
 
     list.addAll(
       getNativeDiffList(
-        context,
         item.nativeLibsDiff.old.fromJson<List<LibStringItem>>(
           List::class.java,
           LibStringItem::class.java
@@ -92,7 +93,6 @@ class BuildSnapshotDetailItemsUseCase {
   }
 
   private fun getNativeDiffList(
-    context: Context,
     oldList: List<LibStringItem>,
     newList: List<LibStringItem>?
   ): List<SnapshotDetailItem> {

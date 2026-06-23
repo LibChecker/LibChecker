@@ -216,7 +216,7 @@ val appModule = module {
   factory { GetSnapshotPackageIconSourcesUseCase(get()) }
   factory { GetTrackListItemsUseCase(androidContext().packageManager, get(), get()) }
   factory { UpdateSnapshotTopAppsUseCase(get(), get()) }
-  factory { BuildSnapshotDetailItemsUseCase() }
+  factory { BuildSnapshotDetailItemsUseCase(androidContext()) }
   factory { SnapshotArchiveUseCase(get(), get()) }
   factory { BackupSnapshotArchiveToUriUseCase(androidContext().contentResolver, get()) }
   factory { PrepareRoomBackupRestoreFileUseCase(androidContext().contentResolver) }
