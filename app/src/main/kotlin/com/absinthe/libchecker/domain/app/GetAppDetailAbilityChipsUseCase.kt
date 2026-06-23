@@ -20,18 +20,17 @@ class GetAppDetailAbilityChipsUseCase(
     )?.abilityInfos ?: return emptyMap()
 
     return mapOf(
-      AbilityType.PAGE to abilities.toChips(AbilityInfo.AbilityType.PAGE),
-      AbilityType.SERVICE to abilities.toChips(AbilityInfo.AbilityType.SERVICE),
-      AbilityType.WEB to abilities.toChips(AbilityInfo.AbilityType.WEB),
-      AbilityType.DATA to abilities.toChips(AbilityInfo.AbilityType.DATA)
+      AbilityType.PAGE to abilities.asSequence().toChips(AbilityInfo.AbilityType.PAGE),
+      AbilityType.SERVICE to abilities.asSequence().toChips(AbilityInfo.AbilityType.SERVICE),
+      AbilityType.WEB to abilities.asSequence().toChips(AbilityInfo.AbilityType.WEB),
+      AbilityType.DATA to abilities.asSequence().toChips(AbilityInfo.AbilityType.DATA)
     )
   }
 
-  private fun Iterable<AbilityInfo>.toChips(
+  private fun Sequence<AbilityInfo>.toChips(
     abilityType: AbilityInfo.AbilityType
   ): List<LibStringItemChip> {
-    return asSequence()
-      .filter { it.type == abilityType }
+    return filter { it.type == abilityType }
       .map { ability ->
         LibStringItemChip(
           LibStringItem(

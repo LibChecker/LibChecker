@@ -33,6 +33,8 @@ import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCase
+import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
+import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase.AppResourceValue
 import com.absinthe.libchecker.features.applist.detail.bean.StaticLibItem
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_TEXT
 import com.absinthe.libchecker.features.applist.detail.ui.XmlBSDFragment
@@ -53,10 +55,8 @@ import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.utils.fromJson
-import com.absinthe.libchecker.utils.manifest.ResourceParser
 import com.absinthe.libchecker.view.drawable.CapsuleDrawable
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
-import timber.log.Timber
 
 private const val HIGHLIGHT_TRANSITION_DURATION = 250
 
@@ -64,19 +64,14 @@ class LibStringAdapter(
   val packageName: String,
   @LibType val type: Int,
   private val fragmentManager: FragmentManager? = null,
-  private val buildNativeLibraryItemDisplayData: BuildNativeLibraryItemDisplayDataUseCase? = null
+  private val buildNativeLibraryItemDisplayData: BuildNativeLibraryItemDisplayDataUseCase? = null,
+  private val resolveAppResourceValue: ResolveAppResourceValueUseCase? = null
 ) : HighlightAdapter<LibStringItemChip>() {
 
   var highlightPosition: Int = -1
     private set
 
   var processMap: Map<String, Int> = mapOf()
-
-  private val appResources by lazy {
-    runCatching {
-      context.packageManager.getResourcesForApplication(packageName)
-    }.getOrNull()
-  }
 
   private var processMode: Boolean = false
   private var is64Bit: Boolean = false
@@ -298,8 +293,6 @@ class LibStringAdapter(
     )
   }
 
-  private val metadataLinkable = setOf("string", "array", "bool", "xml", "drawable", "mipmap", "color", "dimen")
-
   private fun setMetadataContent(
     itemView: MetadataLibItemView,
     item: LibStringItemChip,
@@ -315,10 +308,9 @@ class LibStringAdapter(
     }
 
     setOrHighlightText(itemView.libSize, item.item.source.orEmpty())
-    val type = runCatching {
-      appResources?.getResourceTypeName(item.item.size.toInt())
-    }.getOrDefault("null")
-    itemView.linkToIcon.isVisible = metadataLinkable.contains(type)
+    val resourceType = item.labels.firstOrNull()
+    itemView.linkToIcon.isVisible = ResolveAppResourceValueUseCase.isLinkableType(resourceType) &&
+      resolveAppResourceValue != null
 
     if (itemView.linkToIcon.isVisible) {
       itemView.linkToIcon.setOnClickListener {
@@ -329,88 +321,57 @@ class LibStringAdapter(
           itemView.linkToIcon.setTag(R.id.resource_transformed_id, false)
           itemView.contentDescription = buildItemDescription(itemName, itemView.libSize.text)
         } else {
-          var clickedTag = false
-          item.item.source?.let {
-            Timber.d("type: $type")
+          val clickedTag = when (
+            val resourceValue = resolveAppResourceValue?.invoke(
+              ResolveAppResourceValueUseCase.Request(
+                packageName = packageName,
+                resourceId = item.item.size.toInt(),
+                resourceType = resourceType
+              )
+            )
+          ) {
+            is AppResourceValue.Text -> {
+              itemView.libSize.text = resourceValue.value
+              true
+            }
 
-            runCatching {
-              when (type) {
-                "string" -> {
-                  appResources?.let { res ->
-                    itemView.libSize.text = res.getString(item.item.size.toInt())
+            is AppResourceValue.Xml -> {
+              fragmentManager?.let { fm ->
+                XmlBSDFragment().apply {
+                  arguments = Bundle().apply {
+                    putCharSequence(EXTRA_TEXT, resourceValue.value)
                   }
-                  clickedTag = true
-                }
-
-                "array" -> {
-                  appResources?.let { res ->
-                    itemView.libSize.text =
-                      res.getStringArray(item.item.size.toInt()).contentToString()
-                  }
-                  clickedTag = true
-                }
-
-                "bool" -> {
-                  appResources?.let { res ->
-                    itemView.libSize.text = res.getBoolean(item.item.size.toInt()).toString()
-                  }
-                }
-
-                "xml" -> {
-                  fragmentManager?.let { fm ->
-                    appResources?.let { res ->
-                      res.getXml(item.item.size.toInt()).let {
-                        val text = ResourceParser(it).setMarkColor(true).parse()
-                        XmlBSDFragment().apply {
-                          arguments = Bundle().apply {
-                            putCharSequence(EXTRA_TEXT, text)
-                          }
-                          show(fm, XmlBSDFragment::class.java.name)
-                        }
-                      }
-                    }
-                  }
-                  clickedTag = false
-                }
-
-                "drawable", "mipmap" -> {
-                  appResources?.getDrawable(item.item.size.toInt(), null)?.let { drawable ->
-                    val bitmap = drawable.toBitmap(
-                      itemView.linkToIcon.measuredWidth,
-                      itemView.linkToIcon.measuredHeight,
-                      Bitmap.Config.ARGB_8888
-                    )
-                    itemView.linkToIcon.load(bitmap)
-                  }
-                  clickedTag = true
-                }
-
-                "color" -> {
-                  appResources?.getColor(item.item.size.toInt(), null)?.let { colorInt ->
-                    itemView.linkToIcon.load(
-                      ShapeDrawable(OvalShape()).apply {
-                        paint.color = colorInt
-                      }.toBitmap(
-                        itemView.linkToIcon.measuredWidth,
-                        itemView.linkToIcon.measuredHeight,
-                        Bitmap.Config.ARGB_8888
-                      )
-                    )
-                  }
-                  clickedTag = true
-                }
-
-                "dimen" -> {
-                  appResources?.let { res ->
-                    itemView.libSize.text = res.getDimension(item.item.size.toInt()).toString()
-                  }
-                  clickedTag = true
-                }
-
-                else -> {
-                  clickedTag = false
+                  show(fm, XmlBSDFragment::class.java.name)
                 }
               }
+              false
+            }
+
+            is AppResourceValue.DrawablePreview -> {
+              val bitmap = resourceValue.drawable.toBitmap(
+                itemView.linkToIcon.measuredWidth,
+                itemView.linkToIcon.measuredHeight,
+                Bitmap.Config.ARGB_8888
+              )
+              itemView.linkToIcon.load(bitmap)
+              true
+            }
+
+            is AppResourceValue.ColorPreview -> {
+              itemView.linkToIcon.load(
+                ShapeDrawable(OvalShape()).apply {
+                  paint.color = resourceValue.color
+                }.toBitmap(
+                  itemView.linkToIcon.measuredWidth,
+                  itemView.linkToIcon.measuredHeight,
+                  Bitmap.Config.ARGB_8888
+                )
+              )
+              true
+            }
+
+            null -> {
+              false
             }
           }
           itemView.linkToIcon.setTag(R.id.resource_transformed_id, clickedTag)

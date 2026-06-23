@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.URLManager
+import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.AppPropsAdapter
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.utils.Toasty
@@ -28,14 +29,18 @@ import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import timber.log.Timber
 
-class AppPropsBottomSheetView(context: Context, packageInfo: PackageInfo?) :
-  LinearLayout(context),
+class AppPropsBottomSheetView(
+  context: Context,
+  packageInfo: PackageInfo?,
+  resolveAppResourceValue: ResolveAppResourceValueUseCase
+) : LinearLayout(context),
   IHeaderView {
 
   val adapter by unsafeLazy {
     AppPropsAdapter(
       packageInfo?.applicationInfo,
-      (context as FragmentActivity).supportFragmentManager
+      (context as FragmentActivity).supportFragmentManager,
+      resolveAppResourceValue
     )
   }
 

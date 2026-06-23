@@ -25,8 +25,8 @@ import com.absinthe.libchecker.domain.app.BuildInAppUpdateDiffDataUseCase
 import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.BuildRelatedAppDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.CheckRequiredPackageAvailabilityUseCase
-import com.absinthe.libchecker.domain.app.ExportAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.ExportAppListUseCase
+import com.absinthe.libchecker.domain.app.ExportAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.ExtractNativeLibraryUseCase
 import com.absinthe.libchecker.domain.app.FilterAppListItemsUseCase
 import com.absinthe.libchecker.domain.app.GetAlternativeLaunchItemsUseCase
@@ -67,6 +67,7 @@ import com.absinthe.libchecker.domain.app.InitializePendingAppFeaturesUseCase
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.LibraryDetailRepository
 import com.absinthe.libchecker.domain.app.PrepareAppPackageShareFileUseCase
+import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
 import com.absinthe.libchecker.domain.app.SortAppDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.SyncAppListChangesUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
@@ -148,7 +149,7 @@ val appModule = module {
   }
   factory { GetAppInstallSourceDetailsUseCase(get()) }
   factory { GetAppLaunchActionUseCase() }
-  factory { GetAppDetailMetadataChipsUseCase() }
+  factory { GetAppDetailMetadataChipsUseCase(androidContext().packageManager) }
   factory { GetAppDetailNativeLibrariesUseCase(get()) }
   factory { GetAppDetailStaticLibraryChipsUseCase() }
   factory { GetAppDetailPackageUseCase(get()) }
@@ -158,6 +159,7 @@ val appModule = module {
   factory { GetAppDetailSignatureChipsUseCase(androidContext(), get()) }
   factory { PrepareAppPackageShareFileUseCase(androidContext(), BuildConfig.APPLICATION_ID, get()) }
   factory { ExportAppPackageShareFileUseCase(androidContext().contentResolver) }
+  factory { ResolveAppResourceValueUseCase(androidContext().packageManager) }
   factory { GetApkPreviewInfoUseCase() }
   factory { GetAppListContentUseCase(BuildConfig.APPLICATION_ID, get(), get(), get()) }
   factory { GetAppListPackageStatesUseCase(get()) }
