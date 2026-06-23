@@ -40,7 +40,6 @@ import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.annotation.SIGNATURES
 import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.constant.AbilityType
-import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.AdvancedOptions
@@ -85,14 +84,10 @@ import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
-import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
-import com.absinthe.libchecker.utils.extensions.getCompileSdkVersionString
-import com.absinthe.libchecker.utils.extensions.getTargetApiString
 import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.extensions.getVersionString
 import com.absinthe.libchecker.utils.extensions.isKeyboardShowing
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
-import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -185,12 +180,6 @@ abstract class BaseAppDetailActivity :
     val packageName = apkPreviewInfo?.packageName ?: packageInfo.packageName
     val appName = apkPreviewInfo?.let { getString(R.string.apk_preview) } ?: packageInfo.getAppName(packageManager)
     val versionString = apkPreviewInfo?.let { "${it.versionName} (${it.versionCode})" } ?: packageInfo.getVersionString()
-    val targetSdkVersionString = apkPreviewInfo?.targetSdkVersion?.toString() ?: packageInfo.getTargetApiString()
-    val targetSdkVersion = apkPreviewInfo?.targetSdkVersion ?: ai!!.targetSdkVersion
-    val minSdkVersion = apkPreviewInfo?.minSdkVersion ?: ai!!.minSdkVersion
-    val compileSdkVersionString = apkPreviewInfo?.compileSdkVersion?.toString() ?: packageInfo.getCompileSdkVersionString()
-    val compileSdkVersion = apkPreviewInfo?.compileSdkVersion ?: packageInfo.getCompileSdkVersion()
-    val sharedUserId = packageInfo.sharedUserId
     val sharedLibraryFiles = ai?.sharedLibraryFiles
 
     binding.apply {
@@ -257,59 +246,28 @@ abstract class BaseAppDetailActivity :
             (GlobalValues.advancedOptions and AdvancedOptions.SHOW_ANDROID_VERSION) > 0
           val versionInfo = buildSpannedString {
             if (!isHarmonyMode) {
+              val headerExtraInfo = viewModel.buildAppDetailHeaderExtraInfo(
+                packageInfo = packageInfo,
+                showAndroidVersion = showAndroidVersion
+              )
               scale(0.8f) {
                 append("Target: ")
               }
-              append(targetSdkVersionString)
-              if (showAndroidVersion) {
-                append(" (${AndroidVersions.simpleVersions[targetSdkVersion]})")
-              }
+              append(headerExtraInfo.targetSdkInfo)
               scale(0.8f) {
                 append(" Min: ")
               }
-              append(minSdkVersion.toString())
-              if (showAndroidVersion) {
-                append(" (${AndroidVersions.simpleVersions[minSdkVersion]})")
-              }
+              append(headerExtraInfo.minSdkInfo)
               scale(0.8f) {
                 append(" Compile: ")
               }
-              append(compileSdkVersionString)
-              if (showAndroidVersion) {
-                append(" (${AndroidVersions.simpleVersions[compileSdkVersion]})")
-              }
+              append(headerExtraInfo.compileSdkInfo)
               scale(0.8f) {
                 append(" Size: ")
               }
-              val packageSize = viewModel.getAppDetailPackageSize(packageInfo)
-              val baseFormattedApkSize = packageSize.baseSize.sizeToString(
-                this@BaseAppDetailActivity,
-                showBytes = false
-              )
-              val splitApkSizeList = packageSize.splitSizes.map {
-                it.sizeToString(this@BaseAppDetailActivity, showBytes = false)
-              }
+              append(headerExtraInfo.sizeInfo)
 
-              if (splitApkSizeList.isEmpty()) {
-                append(baseFormattedApkSize)
-              } else {
-                val totalSize = packageSize.totalSize.sizeToString(
-                  this@BaseAppDetailActivity,
-                  showBytes = false
-                )
-                append(
-                  splitApkSizeList
-                    .toMutableList()
-                    .apply { add(0, baseFormattedApkSize) }
-                    .joinToString(
-                      separator = " + ",
-                      prefix = "(",
-                      postfix = " = $totalSize)"
-                    )
-                )
-              }
-
-              sharedUserId?.let {
+              headerExtraInfo.sharedUserId?.let {
                 appendLine().append("sharedUserId = $it")
               }
             } else {

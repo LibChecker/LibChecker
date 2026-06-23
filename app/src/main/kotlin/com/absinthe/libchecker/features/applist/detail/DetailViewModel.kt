@@ -16,10 +16,11 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.domain.app.AppBundleSplitItem
 import com.absinthe.libchecker.domain.app.AppDetailAbi
-import com.absinthe.libchecker.domain.app.AppDetailPackageSize
+import com.absinthe.libchecker.domain.app.AppDetailHeaderExtraInfo
 import com.absinthe.libchecker.domain.app.AppIconItem
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.AppManifestProperty
+import com.absinthe.libchecker.domain.app.BuildAppDetailHeaderExtraInfoUseCase
 import com.absinthe.libchecker.domain.app.BuildRelatedAppDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.ExtractNativeLibraryUseCase
 import com.absinthe.libchecker.domain.app.GetAlternativeLaunchItemsUseCase
@@ -31,7 +32,6 @@ import com.absinthe.libchecker.domain.app.GetAppDetailDexChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailFeaturesUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailMetadataChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailNativeLibrariesUseCase
-import com.absinthe.libchecker.domain.app.GetAppDetailPackageSizeUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPermissionChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailSignatureChipsUseCase
@@ -94,7 +94,7 @@ class DetailViewModel(
   private val getAppDetailMetadataChipsUseCase: GetAppDetailMetadataChipsUseCase,
   private val getAppDetailNativeLibrariesUseCase: GetAppDetailNativeLibrariesUseCase,
   private val getAppDetailStaticLibraryChipsUseCase: GetAppDetailStaticLibraryChipsUseCase,
-  private val getAppDetailPackageSizeUseCase: GetAppDetailPackageSizeUseCase,
+  private val buildAppDetailHeaderExtraInfoUseCase: BuildAppDetailHeaderExtraInfoUseCase,
   private val extractNativeLibraryUseCase: ExtractNativeLibraryUseCase,
   private val prepareAppPackageShareFileUseCase: PrepareAppPackageShareFileUseCase,
   private val getApkPreviewInfoUseCase: GetApkPreviewInfoUseCase,
@@ -170,8 +170,16 @@ class DetailViewModel(
     return getAppDetailPackage(packageName)
   }
 
-  fun getAppDetailPackageSize(packageInfo: PackageInfo): AppDetailPackageSize {
-    return getAppDetailPackageSizeUseCase(packageInfo, apkPreviewInfo, isApkPreview)
+  fun buildAppDetailHeaderExtraInfo(
+    packageInfo: PackageInfo,
+    showAndroidVersion: Boolean
+  ): AppDetailHeaderExtraInfo {
+    return buildAppDetailHeaderExtraInfoUseCase(
+      packageInfo = packageInfo,
+      apkPreviewInfo = apkPreviewInfo,
+      isApkPreview = isApkPreview,
+      showAndroidVersion = showAndroidVersion
+    )
   }
 
   suspend fun getAppBundleItems(packageInfo: PackageInfo): List<AppBundleSplitItem> {
