@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.features.applist.detail
 
-import android.content.Context
 import android.content.pm.PackageInfo
 import android.net.Uri
 import android.util.SparseArray
@@ -22,8 +21,8 @@ import com.absinthe.libchecker.domain.app.AppDetailAbiLabelData
 import com.absinthe.libchecker.domain.app.AppDetailHeaderExtraInfo
 import com.absinthe.libchecker.domain.app.AppIconItem
 import com.absinthe.libchecker.domain.app.AppListRepository
-import com.absinthe.libchecker.domain.app.AppPackageShareFile
 import com.absinthe.libchecker.domain.app.AppManifestProperty
+import com.absinthe.libchecker.domain.app.AppPackageShareFile
 import com.absinthe.libchecker.domain.app.BuildAppDetailAbiLabelDataUseCase
 import com.absinthe.libchecker.domain.app.BuildAppDetailHeaderExtraInfoUseCase
 import com.absinthe.libchecker.domain.app.BuildAppDetailHeaderTitleDataUseCase
@@ -34,6 +33,7 @@ import com.absinthe.libchecker.domain.app.GetAlternativeLaunchItemsUseCase
 import com.absinthe.libchecker.domain.app.GetApkPreviewInfoUseCase
 import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailAbiUseCase
+import com.absinthe.libchecker.domain.app.GetAppDetailAbilityChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailComponentChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailDexChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailFeaturesUseCase
@@ -65,14 +65,10 @@ import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.features.applist.LocatedCount
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
-import com.absinthe.libchecker.features.applist.detail.bean.StatefulComponent
-import com.absinthe.libchecker.features.statistics.bean.DISABLED
-import com.absinthe.libchecker.features.statistics.bean.EXPORTED
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
-import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -83,8 +79,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import ohos.bundle.AbilityInfo
-import ohos.bundle.IBundleManager
 import timber.log.Timber
 
 class DetailViewModel(
@@ -95,6 +89,7 @@ class DetailViewModel(
   private val getAppLaunchActionUseCase: GetAppLaunchActionUseCase,
   private val getAppBundleItemsUseCase: GetAppBundleItemsUseCase,
   private val getAppDetailAbiUseCase: GetAppDetailAbiUseCase,
+  private val getAppDetailAbilityChipsUseCase: GetAppDetailAbilityChipsUseCase,
   private val getAppInstallSourceDetailsUseCase: GetAppInstallSourceDetailsUseCase,
   private val getAppDetailComponentChipsUseCase: GetAppDetailComponentChipsUseCase,
   private val getAppDetailDexChipsUseCase: GetAppDetailDexChipsUseCase,
@@ -535,85 +530,20 @@ class DetailViewModel(
     getPermissionDetailUseCase(permissionName)
   }
 
-  fun initAbilities(context: Context, packageName: String) = viewModelScope.launch(Dispatchers.IO) {
+  fun initAbilities(packageName: String) = viewModelScope.launch(Dispatchers.IO) {
     abilitiesMap.put(AbilityType.PAGE, MutableStateFlow(null))
     abilitiesMap.put(AbilityType.SERVICE, MutableStateFlow(null))
     abilitiesMap.put(AbilityType.WEB, MutableStateFlow(null))
     abilitiesMap.put(AbilityType.DATA, MutableStateFlow(null))
 
-    try {
-      ApplicationDelegate(context).iBundleManager?.getBundleInfo(
-        packageName,
-        IBundleManager.GET_BUNDLE_WITH_ABILITIES
-      )?.abilityInfos?.let { abilities ->
-        val pages = abilities.asSequence()
-          .filter { it.type == AbilityInfo.AbilityType.PAGE }
-          .map {
-            StatefulComponent(
-              it.className,
-              it.enabled,
-              false,
-              it.process.removePrefix((it.bundleName))
-            )
-          }
-          .toList()
-        val services = abilities.asSequence()
-          .filter { it.type == AbilityInfo.AbilityType.SERVICE }
-          .map {
-            StatefulComponent(
-              it.className,
-              it.enabled,
-              false,
-              it.process.removePrefix((it.bundleName))
-            )
-          }
-          .toList()
-        val webs = abilities.asSequence()
-          .filter { it.type == AbilityInfo.AbilityType.WEB }
-          .map {
-            StatefulComponent(
-              it.className,
-              it.enabled,
-              false,
-              it.process.removePrefix((it.bundleName))
-            )
-          }
-          .toList()
-        val datas = abilities.asSequence()
-          .filter { it.type == AbilityInfo.AbilityType.DATA }
-          .map {
-            StatefulComponent(
-              it.className,
-              it.enabled,
-              false,
-              it.process.removePrefix((it.bundleName))
-            )
-          }
-          .toList()
-
-        val transform: suspend (StatefulComponent) -> LibStringItemChip =
-          { item ->
-            val source = when {
-              !item.enabled -> DISABLED
-              item.exported -> EXPORTED
-              else -> null
-            }
-
-            LibStringItemChip(
-              LibStringItem(
-                name = item.componentName,
-                source = source
-              ),
-              null
-            )
-          }
-        abilitiesMap[AbilityType.PAGE]?.emit(pages.map { transform(it) })
-        abilitiesMap[AbilityType.SERVICE]?.emit(services.map { transform(it) })
-        abilitiesMap[AbilityType.WEB]?.emit(webs.map { transform(it) })
-        abilitiesMap[AbilityType.DATA]?.emit(datas.map { transform(it) })
+    runCatching {
+      getAppDetailAbilityChipsUseCase(packageName)
+    }.onSuccess { abilityChips ->
+      abilityChips.forEach { (type, items) ->
+        abilitiesMap[type]?.emit(items)
       }
-    } catch (e: Exception) {
-      Timber.e(e)
+    }.onFailure {
+      Timber.e(it)
     }
   }
 

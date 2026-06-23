@@ -531,7 +531,7 @@ abstract class BaseAppDetailActivity :
         viewModel.initComponentsData()
       }
     } else {
-      viewModel.initAbilities(this, packageName)
+      viewModel.initAbilities(packageName)
     }
 
     // Detect Live Update notification
