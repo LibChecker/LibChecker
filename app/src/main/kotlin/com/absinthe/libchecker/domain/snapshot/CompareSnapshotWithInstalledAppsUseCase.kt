@@ -16,6 +16,7 @@ import kotlinx.coroutines.isActive
 import timber.log.Timber
 
 class CompareSnapshotWithInstalledAppsUseCase(
+  private val packageManager: PackageManager,
   private val snapshotRepository: SnapshotRepository,
   private val installedAppRepository: InstalledAppRepository,
   private val snapshotItemFactory: SnapshotItemFactory,
@@ -23,7 +24,6 @@ class CompareSnapshotWithInstalledAppsUseCase(
 ) {
 
   suspend operator fun invoke(
-    packageManager: PackageManager,
     timestamp: Long,
     onProgress: (Int) -> Unit
   ): List<SnapshotDiffItem>? {

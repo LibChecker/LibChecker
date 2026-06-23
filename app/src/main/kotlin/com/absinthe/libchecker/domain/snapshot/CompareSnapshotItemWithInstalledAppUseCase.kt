@@ -5,6 +5,7 @@ import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 
 class CompareSnapshotItemWithInstalledAppUseCase(
+  private val packageManager: PackageManager,
   private val snapshotRepository: SnapshotRepository,
   private val installedAppRepository: InstalledAppRepository,
   private val snapshotItemFactory: SnapshotItemFactory,
@@ -12,7 +13,6 @@ class CompareSnapshotItemWithInstalledAppUseCase(
 ) {
 
   suspend operator fun invoke(
-    packageManager: PackageManager,
     timestamp: Long,
     packageName: String
   ): SnapshotDiffItem? {

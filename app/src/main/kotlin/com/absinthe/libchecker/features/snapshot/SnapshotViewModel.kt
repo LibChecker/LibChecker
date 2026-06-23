@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.features.snapshot
 
 import android.content.Context
-import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -83,7 +82,6 @@ class SnapshotViewModel(
   fun isComparingActive(): Boolean = compareDiffJob == null || compareDiffJob?.isActive == true
 
   fun compareDiff(
-    context: Context,
     preTimeStamp: Long,
     currTimeStamp: Long = CURRENT_SNAPSHOT,
     shouldClearDiff: Boolean = false
@@ -100,7 +98,7 @@ class SnapshotViewModel(
       }
 
       if (currTimeStamp == CURRENT_SNAPSHOT) {
-        compareDiffWithInstalledApps(context, preTimeStamp)
+        compareDiffWithInstalledApps(preTimeStamp)
       } else {
         compareDiffWithSnapshotList(preTimeStamp, currTimeStamp)
       }
@@ -111,9 +109,8 @@ class SnapshotViewModel(
     }
   }
 
-  private suspend fun compareDiffWithInstalledApps(context: Context, preTimeStamp: Long) {
+  private suspend fun compareDiffWithInstalledApps(preTimeStamp: Long) {
     val diffList = compareSnapshotWithInstalledApps(
-      packageManager = context.packageManager,
       timestamp = preTimeStamp,
       onProgress = ::changeComparingProgress
     ) ?: return
@@ -193,11 +190,10 @@ class SnapshotViewModel(
   }
 
   suspend fun compareItemDiff(
-    packageManager: PackageManager,
     timeStamp: Long = GlobalValues.snapshotTimestamp,
     packageName: String
   ) {
-    val diffItem = compareSnapshotItemWithInstalledApp(packageManager, timeStamp, packageName)
+    val diffItem = compareSnapshotItemWithInstalledApp(timeStamp, packageName)
 
     diffItem?.let {
       changeDiffItem(it)

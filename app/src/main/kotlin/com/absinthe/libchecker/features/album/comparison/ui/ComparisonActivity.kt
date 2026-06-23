@@ -128,7 +128,6 @@ class ComparisonActivity :
           return false
         }
         viewModel.compareDiff(
-          this,
           leftTimeStamp.coerceAtMost(rightTimeStamp),
           leftTimeStamp.coerceAtLeast(rightTimeStamp)
         )

@@ -181,7 +181,7 @@ class SnapshotFragment :
                   flip(VF_LOADING)
                   dismiss()
                 }
-                viewModel.compareDiff(context, item.timestamp, shouldClearDiff = true)
+                viewModel.compareDiff(item.timestamp, shouldClearDiff = true)
               }
             }
           dialog.show(
@@ -407,13 +407,13 @@ class SnapshotFragment :
     if (GlobalValues.trackItemsChanged) {
       GlobalValues.trackItemsChanged = false
       flip(VF_LOADING)
-      viewModel.compareDiff(context, GlobalValues.snapshotTimestamp)
+      viewModel.compareDiff(GlobalValues.snapshotTimestamp)
     }
 
     if (viewModel.currentTimeStamp != GlobalValues.snapshotTimestamp) {
       viewModel.changeTimeStamp(GlobalValues.snapshotTimestamp)
       flip(VF_LOADING)
-      viewModel.compareDiff(context, GlobalValues.snapshotTimestamp, shouldClearDiff = true)
+      viewModel.compareDiff(GlobalValues.snapshotTimestamp, shouldClearDiff = true)
     }
 
     if (shouldCompare) {
@@ -425,7 +425,7 @@ class SnapshotFragment :
     }
 
     if (hasPackageChanged()) {
-      viewModel.compareDiff(context, GlobalValues.snapshotTimestamp)
+      viewModel.compareDiff(GlobalValues.snapshotTimestamp)
     }
     (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(binding.list)
 
@@ -631,12 +631,11 @@ class SnapshotFragment :
   }
 
   private fun compareDiff() {
-    val context = context ?: return
     viewModel.changeTimeStamp(GlobalValues.snapshotTimestamp)
     isSnapshotDatabaseItemsReady = true
 
     viewModel.getDashboardCount(GlobalValues.snapshotTimestamp, true)
-    viewModel.compareDiff(context, GlobalValues.snapshotTimestamp)
+    viewModel.compareDiff(GlobalValues.snapshotTimestamp)
     isSnapshotDatabaseItemsReady = false
   }
 
@@ -649,8 +648,7 @@ class SnapshotFragment :
         packageQueue.take()?.let {
           Timber.d("Dequeue package: $it")
           val packageName = it.packageName
-          val packageManager = context?.packageManager ?: return@let
-          viewModel.compareItemDiff(packageManager, GlobalValues.snapshotTimestamp, packageName)
+          viewModel.compareItemDiff(GlobalValues.snapshotTimestamp, packageName)
         }
       }
     }
@@ -676,7 +674,7 @@ class SnapshotFragment :
       binding.list.smoothScrollToPosition(0)
     } else {
       flip(VF_LOADING)
-      viewModel.compareDiff(context, GlobalValues.snapshotTimestamp)
+      viewModel.compareDiff(GlobalValues.snapshotTimestamp)
     }
   }
 

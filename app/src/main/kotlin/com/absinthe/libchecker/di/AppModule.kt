@@ -189,8 +189,8 @@ val appModule = module {
   factory { BuildSnapshotPairDiffUseCase() }
   factory { CompareSnapshotItemsUseCase() }
   factory { CompareSnapshotListsUseCase(get()) }
-  factory { CompareSnapshotWithInstalledAppsUseCase(get(), get(), get(), get()) }
-  factory { CompareSnapshotItemWithInstalledAppUseCase(get(), get(), get(), get()) }
+  factory { CompareSnapshotWithInstalledAppsUseCase(androidContext().packageManager, get(), get(), get(), get()) }
+  factory { CompareSnapshotItemWithInstalledAppUseCase(androidContext().packageManager, get(), get(), get(), get()) }
   factory { GetSnapshotDashboardCountUseCase(get(), get()) }
   factory { GetSnapshotPackageIconSourcesUseCase(get()) }
   factory { GetTrackListItemsUseCase(androidContext().packageManager, get(), get()) }
