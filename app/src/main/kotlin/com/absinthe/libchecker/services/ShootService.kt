@@ -29,9 +29,9 @@ import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
-import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
+import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.features.home.ui.MainActivity
 import com.absinthe.libchecker.utils.OsUtils
@@ -66,6 +66,7 @@ class ShootService : LifecycleService() {
   private val builder by lazy { NotificationCompat.Builder(this, SHOOT_CHANNEL_ID) }
   private val notificationManager by lazy { NotificationManagerCompat.from(this) }
   private val snapshotRepository: SnapshotRepository by inject()
+  private val installedAppRepository: InstalledAppRepository by inject()
   private val listenerList = RemoteCallbackList<OnShootListener>()
 
   private val binder by lazy { ShootBinder(this) }
@@ -162,7 +163,7 @@ class ShootService : LifecycleService() {
   }
 
   private fun computeSnapshots(dropPrevious: Boolean = false, stopWhenFinish: Boolean = false) = lifecycleScope.launch(Dispatchers.IO) {
-    computeSnapshotsImpl(LocalAppDataSource.getApplicationList(true), dropPrevious, stopWhenFinish)
+    computeSnapshotsImpl(installedAppRepository.getApplicationList(true), dropPrevious, stopWhenFinish)
   }
 
   private suspend fun computeSnapshotsImpl(appList: List<PackageInfo>, dropPrevious: Boolean = false, stopWhenFinish: Boolean = false) {
@@ -231,10 +232,11 @@ class ShootService : LifecycleService() {
           }
         )
       } else {
-        val activitiesPi = runCatching { PackageUtils.getPackageInfo(info.packageName, PackageManager.GET_ACTIVITIES) }.getOrElse { continue }
-        val othersPi = runCatching {
-          PackageUtils.getPackageInfo(info.packageName, PackageManager.GET_SERVICES or PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS or PackageManager.GET_PERMISSIONS or PackageManager.GET_META_DATA)
-        }.getOrElse { continue }
+        val activitiesPi = installedAppRepository.getPackageInfo(info.packageName, PackageManager.GET_ACTIVITIES) ?: continue
+        val othersPi = installedAppRepository.getPackageInfo(
+          info.packageName,
+          PackageManager.GET_SERVICES or PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS or PackageManager.GET_PERMISSIONS or PackageManager.GET_META_DATA
+        ) ?: continue
         val abi = PackageUtils.getAbi(info)
         if (abi != Constants.ERROR) {
           dbList.add(
