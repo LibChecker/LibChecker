@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.features.home
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.LibCheckerApp
@@ -14,6 +15,7 @@ import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.ExportAppListUseCase
+import com.absinthe.libchecker.domain.app.ExportAppListToUriUseCase
 import com.absinthe.libchecker.domain.app.GetAppListContentUseCase
 import com.absinthe.libchecker.domain.app.InitializeAppListUseCase
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
@@ -26,7 +28,6 @@ import com.absinthe.libchecker.features.statistics.bean.LibReference
 import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.ui.base.IListController
 import com.absinthe.libchecker.utils.extensions.requireAvailableCacheDir
-import java.io.OutputStream
 import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -45,7 +46,7 @@ class HomeViewModel(
   private val initializeAppListUseCase: InitializeAppListUseCase,
   private val syncAppListChangesUseCase: SyncAppListChangesUseCase,
   private val computeLibReferenceUseCase: ComputeLibReferenceUseCase,
-  private val exportAppListUseCase: ExportAppListUseCase,
+  private val exportAppListToUriUseCase: ExportAppListToUriUseCase,
   private val getAppListContentUseCase: GetAppListContentUseCase,
   private val getLibReferenceIconPackagesUseCase: GetLibReferenceIconPackagesUseCase
 ) : ViewModel() {
@@ -391,14 +392,18 @@ class HomeViewModel(
     data class UpdateLibRefProgress(val progress: Int) : Effect()
   }
 
-  fun dumpAppsInfo(os: OutputStream, saveAsMarkDown: Boolean) {
+  fun dumpAppsInfo(uri: Uri, saveAsMarkDown: Boolean) {
     viewModelScope.launch(Dispatchers.IO) {
       val format = if (saveAsMarkDown) {
         ExportAppListUseCase.Format.Markdown
       } else {
         ExportAppListUseCase.Format.PlainText
       }
-      exportAppListUseCase(os, format)
+      runCatching {
+        exportAppListToUriUseCase(uri, format)
+      }.onFailure {
+        Timber.e(it)
+      }
     }
   }
 

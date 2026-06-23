@@ -207,15 +207,7 @@ class AppListFragment :
     dumpAppsInfoResultLauncher =
       registerForActivityResult(ActivityResultContracts.CreateDocument("*/*")) {
         it?.let {
-          activity?.let { activity ->
-            runCatching {
-              activity.contentResolver.openOutputStream(it)?.let { os ->
-                homeViewModel.dumpAppsInfo(os, dumpAppsInfoAsMarkDown)
-              }
-            }.onFailure { t ->
-              Timber.e(t)
-            }
-          }
+          homeViewModel.dumpAppsInfo(it, dumpAppsInfoAsMarkDown)
         }
       }
     queryAllPackagesPermissionLauncher =
