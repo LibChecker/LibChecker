@@ -56,9 +56,6 @@ import java.util.Locale
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import okio.buffer
-import okio.sink
-import okio.source
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import rikka.recyclerview.fixEdgeEffect
 import rikka.widget.borderview.BorderRecyclerView
@@ -360,36 +357,36 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
           val dialog = UiUtils.createLoadingDialog(activity)
           dialog.show()
           if (uri.toString().endsWith(".sqlite3")) {
-            activity.contentResolver.openInputStream(uri)
-              ?.let { inputStream ->
-                lifecycleScope.launch(Dispatchers.IO) {
-                  val restoreFile = File(activity.requireAvailableCacheDir(), "restore.sqlite3")
-                  inputStream.source().buffer().use { source ->
-                    restoreFile.outputStream().sink().buffer().use { sink ->
-                      source.readAll(sink)
+            lifecycleScope.launch(Dispatchers.IO) {
+              val restoreFile = viewModel.prepareRoomBackupRestoreFile(
+                uri,
+                File(activity.requireAvailableCacheDir(), "restore.sqlite3")
+              ) ?: run {
+                lifecycleScope.launch(Dispatchers.Main) {
+                  dialog.dismiss()
+                }
+                return@launch
+              }
+              roomBackup
+                .database(LCDatabase.getDatabase())
+                .enableLogDebug(true)
+                .backupLocation(RoomBackup.BACKUP_FILE_LOCATION_CUSTOM_FILE)
+                .backupLocationCustomFile(restoreFile)
+                .apply {
+                  onCompleteListener { success, message, exitCode ->
+                    Timber.d("success: $success, message: $message, exitCode: $exitCode")
+                    if (success) {
+                      restoreFile.delete()
+                      Once.clearDone(OnceTag.FIRST_LAUNCH)
+                      ProcessPhoenix.triggerRebirth(LibCheckerApp.app)
+                    }
+                    lifecycleScope.launch(Dispatchers.Main) {
+                      dialog.dismiss()
                     }
                   }
-                  roomBackup
-                    .database(LCDatabase.getDatabase())
-                    .enableLogDebug(true)
-                    .backupLocation(RoomBackup.BACKUP_FILE_LOCATION_CUSTOM_FILE)
-                    .backupLocationCustomFile(restoreFile)
-                    .apply {
-                      onCompleteListener { success, message, exitCode ->
-                        Timber.d("success: $success, message: $message, exitCode: $exitCode")
-                        if (success) {
-                          restoreFile.delete()
-                          Once.clearDone(OnceTag.FIRST_LAUNCH)
-                          ProcessPhoenix.triggerRebirth(LibCheckerApp.app)
-                        }
-                        lifecycleScope.launch(Dispatchers.Main) {
-                          dialog.dismiss()
-                        }
-                      }
-                  }
-                    .restore()
                 }
-              } ?: dialog.dismiss()
+                .restore()
+            }
           } else {
             viewModel.restore(requireContext(), uri) { success ->
               if (!success) {

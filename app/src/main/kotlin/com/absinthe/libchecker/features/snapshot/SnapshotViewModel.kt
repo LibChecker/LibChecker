@@ -23,6 +23,7 @@ import com.absinthe.libchecker.domain.snapshot.CompareSnapshotWithInstalledAppsU
 import com.absinthe.libchecker.domain.snapshot.GetApexPackageNamesUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotPackageIconSourcesUseCase
+import com.absinthe.libchecker.domain.snapshot.PrepareRoomBackupRestoreFileUseCase
 import com.absinthe.libchecker.domain.snapshot.RestoreSnapshotArchiveFromUriUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotComparisonLists
 import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
@@ -59,6 +60,7 @@ class SnapshotViewModel(
   private val buildSnapshotDetailItems: BuildSnapshotDetailItemsUseCase,
   private val backupSnapshotArchiveToUriUseCase: BackupSnapshotArchiveToUriUseCase,
   private val restoreSnapshotArchiveFromUriUseCase: RestoreSnapshotArchiveFromUriUseCase,
+  private val prepareRoomBackupRestoreFileUseCase: PrepareRoomBackupRestoreFileUseCase,
   private val snapshotLibrary: SnapshotLibraryUseCase,
   private val buildArchiveSnapshotItemUseCase: BuildArchiveSnapshotItemUseCase,
   private val buildSnapshotPairDiffUseCase: BuildSnapshotPairDiffUseCase,
@@ -236,6 +238,12 @@ class SnapshotViewModel(
 
   suspend fun retainLatestSnapshotsAndGetTimeStamps(count: Int): List<TimeStampItem> {
     return snapshotLibrary.retainLatestSnapshotsAndGetTimeStamps(count)
+  }
+
+  suspend fun prepareRoomBackupRestoreFile(uri: Uri, restoreFile: File): File? {
+    return withContext(Dispatchers.IO) {
+      prepareRoomBackupRestoreFileUseCase(uri, restoreFile)
+    }
   }
 
   fun backup(uri: Uri, resultAction: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
