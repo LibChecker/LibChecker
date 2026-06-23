@@ -5,6 +5,7 @@ import android.view.Gravity
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import com.absinthe.libchecker.database.entity.TimeStampItem
+import com.absinthe.libchecker.domain.snapshot.SnapshotPackageIconSource
 import com.absinthe.libchecker.features.snapshot.ui.view.TimeNodeItemView
 import com.absinthe.libchecker.utils.fromJson
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -16,6 +17,12 @@ import java.util.Locale
 import timber.log.Timber
 
 class TimeNodeAdapter : BaseQuickAdapter<TimeStampItem, BaseViewHolder>(0) {
+
+  private var packageIconSources: Map<String, SnapshotPackageIconSource> = emptyMap()
+
+  fun setPackageIconSources(packageIconSources: Map<String, SnapshotPackageIconSource>) {
+    this.packageIconSources = packageIconSources
+  }
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return BaseViewHolder(TimeNodeItemView(context))
@@ -31,6 +38,7 @@ class TimeNodeAdapter : BaseQuickAdapter<TimeStampItem, BaseViewHolder>(0) {
             List::class.java,
             String::class.java
           )
+          adapter.setPackageIconSources(packageIconSources)
           adapter.setList(list)
           if ((list?.size ?: 0) <= 5) {
             adapter.removeAllFooterView()

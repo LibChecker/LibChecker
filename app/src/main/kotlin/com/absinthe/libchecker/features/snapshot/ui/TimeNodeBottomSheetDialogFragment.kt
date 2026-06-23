@@ -18,6 +18,7 @@ import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.putArguments
+import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -101,11 +102,7 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
                             loadingDialog = UiUtils.createLoadingDialog(ctw).also { it.show() }
                           }
                           val timestampList = viewModel.retainLatestSnapshotsAndGetTimeStamps(threshold)
-                          withContext(Dispatchers.Main) {
-                            if (this@TimeNodeBottomSheetDialogFragment.context != null) {
-                              root.adapter.setList(timestampList)
-                            }
-                          }
+                          bindTimeStampItems(timestampList)
                         } finally {
                           withContext(Dispatchers.Main) {
                             loadingDialog?.dismiss()
@@ -130,7 +127,9 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
     arguments?.let {
       BundleCompat.getParcelableArrayList(it, EXTRA_TOP_APPS, TimeStampItem::class.java)
         ?.let { topApps ->
-          root.adapter.setList(topApps)
+          lifecycleScope.launch {
+            bindTimeStampItems(topApps)
+          }
         }
     }
   }
@@ -149,6 +148,33 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
 
   fun setOnItemClickListener(action: (position: Int) -> Unit) {
     itemClickAction = action
+  }
+
+  private suspend fun bindTimeStampItems(items: List<TimeStampItem>) {
+    val packageIconSources = viewModel.getSnapshotPackageIconSources(getTopAppPackageNames(items))
+    withContext(Dispatchers.Main) {
+      if (context == null) {
+        return@withContext
+      }
+      root.adapter.setPackageIconSources(packageIconSources)
+      root.adapter.setList(items)
+    }
+  }
+
+  private fun getTopAppPackageNames(items: List<TimeStampItem>): List<String> {
+    return items.asSequence()
+      .mapNotNull(TimeStampItem::topApps)
+      .flatMap { topApps ->
+        runCatching {
+          topApps.fromJson<List<String>>(
+            List::class.java,
+            String::class.java
+          ).orEmpty()
+            .asSequence()
+        }.getOrDefault(emptySequence())
+      }
+      .distinct()
+      .toList()
   }
 
   companion object {

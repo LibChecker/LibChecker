@@ -5,12 +5,18 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.domain.snapshot.SnapshotPackageIconSource
 import com.absinthe.libchecker.utils.extensions.dp
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
 class TimeNodeItemAdapter : BaseQuickAdapter<String, BaseViewHolder>(0) {
+
+  private var packageIconSources: Map<String, SnapshotPackageIconSource> = emptyMap()
+
+  fun setPackageIconSources(packageIconSources: Map<String, SnapshotPackageIconSource>) {
+    this.packageIconSources = packageIconSources
+  }
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return BaseViewHolder(
@@ -24,10 +30,11 @@ class TimeNodeItemAdapter : BaseQuickAdapter<String, BaseViewHolder>(0) {
 
   override fun convert(holder: BaseViewHolder, item: String) {
     (holder.itemView as AppCompatImageView).also { imageView ->
-      runCatching {
-        imageView.load(PackageUtils.getPackageInfo(item))
-      }.onFailure {
-        imageView.load(R.drawable.ic_icon_blueprint)
+      when (val iconSource = packageIconSources[item]) {
+        is SnapshotPackageIconSource.InstalledPackage -> imageView.load(iconSource.packageInfo)
+
+        SnapshotPackageIconSource.Fallback,
+        null -> imageView.load(R.drawable.ic_icon_blueprint)
       }
     }
   }
