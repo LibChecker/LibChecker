@@ -29,6 +29,7 @@ import com.absinthe.libchecker.compat.IntentCompat
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
+import com.absinthe.libchecker.domain.snapshot.SnapshotPackageIconSource
 import com.absinthe.libchecker.domain.snapshot.model.ADDED
 import com.absinthe.libchecker.domain.snapshot.model.CHANGED
 import com.absinthe.libchecker.domain.snapshot.model.MOVED
@@ -49,7 +50,6 @@ import com.absinthe.libchecker.features.snapshot.ui.adapter.ARROW
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.utils.LCAppUtils
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
@@ -154,17 +154,7 @@ class SnapshotDetailActivity :
       val isNewOrDeleted = entity.deleted || entity.newInstalled
 
       snapshotTitle.iconView.apply {
-        val appIconLoader = AppIconLoader(
-          resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size),
-          false,
-          this@SnapshotDetailActivity
-        )
-        runCatching {
-          val icon = _icon?.takeIf { entity.packageName.contains("/") } ?: appIconLoader.loadIcon(
-            PackageUtils.getPackageInfo(entity.packageName).applicationInfo!!
-          )
-          load(icon)
-        }
+        bindSnapshotIcon()
         setOnClickListener {
           lifecycleScope.launch {
             val lcItem = viewModel.getAppListItem(entity.packageName) ?: return@launch
@@ -337,6 +327,36 @@ class SnapshotDetailActivity :
     }
 
     return returnList
+  }
+
+  private fun bindSnapshotIcon() {
+    val snapshotIcon = _icon?.takeIf { entity.packageName.contains("/") }
+    if (snapshotIcon != null) {
+      binding.snapshotTitle.iconView.load(snapshotIcon)
+      return
+    }
+
+    binding.snapshotTitle.iconView.setImageResource(R.drawable.ic_icon_blueprint)
+    lifecycleScope.launch {
+      when (val iconSource = viewModel.getSnapshotPackageIconSources(listOf(entity.packageName))[entity.packageName]) {
+        is SnapshotPackageIconSource.InstalledPackage -> {
+          val appIconLoader = AppIconLoader(
+            resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size),
+            false,
+            this@SnapshotDetailActivity
+          )
+          val icon = iconSource.packageInfo.applicationInfo?.let { applicationInfo ->
+            runCatching {
+              appIconLoader.loadIcon(applicationInfo)
+            }.getOrNull()
+          }
+          binding.snapshotTitle.iconView.load(icon)
+        }
+
+        SnapshotPackageIconSource.Fallback,
+        null -> binding.snapshotTitle.iconView.setImageResource(R.drawable.ic_icon_blueprint)
+      }
+    }
   }
 
   private fun generateReport() {
