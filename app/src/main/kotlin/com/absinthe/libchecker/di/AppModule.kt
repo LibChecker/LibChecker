@@ -19,6 +19,7 @@ import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.BuildAppDetailAbiLabelDataUseCase
 import com.absinthe.libchecker.domain.app.BuildAppDetailHeaderExtraInfoUseCase
 import com.absinthe.libchecker.domain.app.BuildAppDetailHeaderTitleDataUseCase
+import com.absinthe.libchecker.domain.app.BuildAppExportNativeLibrariesUseCase
 import com.absinthe.libchecker.domain.app.BuildAppListItemViewStatesUseCase
 import com.absinthe.libchecker.domain.app.BuildInAppUpdateDiffDataUseCase
 import com.absinthe.libchecker.domain.app.BuildRelatedAppDisplayDataUseCase
@@ -157,6 +158,7 @@ val appModule = module {
   factory { BuildAppDetailAbiLabelDataUseCase() }
   factory { BuildAppDetailHeaderExtraInfoUseCase(androidContext(), get()) }
   factory { BuildAppDetailHeaderTitleDataUseCase(androidContext(), get()) }
+  factory { BuildAppExportNativeLibrariesUseCase() }
   factory { BuildAppListItemViewStatesUseCase(androidContext(), get()) }
   factory { BuildInAppUpdateDiffDataUseCase(BuildConfig.APPLICATION_ID, androidContext().packageManager, get()) }
   factory { BuildRelatedAppDisplayDataUseCase(androidContext()) }

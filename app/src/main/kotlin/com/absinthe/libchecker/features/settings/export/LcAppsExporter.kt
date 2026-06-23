@@ -16,10 +16,10 @@ import android.os.SystemClock
 import androidx.core.graphics.drawable.toBitmap
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.ZipFileCompat
+import com.absinthe.libchecker.domain.app.BuildAppExportNativeLibrariesUseCase
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.features.applist.detail.bean.KotlinToolingMetadata
 import com.absinthe.libchecker.utils.IntentFilterUtils
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.apk.ApkSignatureSchemeDetector
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPackageSize
@@ -79,6 +79,7 @@ object LcAppsExporter {
   suspend fun export(
     context: Context,
     installedAppRepository: InstalledAppRepository,
+    buildAppExportNativeLibraries: BuildAppExportNativeLibrariesUseCase,
     outputStream: OutputStream,
     progress: suspend (Int) -> Unit
   ): ExportResult = withContext(Dispatchers.IO) {
@@ -118,6 +119,7 @@ object LcAppsExporter {
               buildReport(
                 context = appContext,
                 installedAppRepository = installedAppRepository,
+                buildAppExportNativeLibraries = buildAppExportNativeLibraries,
                 basePackageInfo = packageInfo,
                 iconEntry = iconEntries[packageInfo.packageName],
                 analyzedAt = analyzedAt,
@@ -218,6 +220,7 @@ object LcAppsExporter {
   private suspend fun buildReport(
     context: Context,
     installedAppRepository: InstalledAppRepository,
+    buildAppExportNativeLibraries: BuildAppExportNativeLibrariesUseCase,
     basePackageInfo: PackageInfo,
     iconEntry: IconEntry?,
     analyzedAt: String,
@@ -238,7 +241,7 @@ object LcAppsExporter {
     val sourceFileName = "${packageInfo.packageName}.apk"
 
     val nativeLibraries = profiler.measure(ExportStage.NATIVE_LIBS, packageProfile) {
-      buildNativeLibraries(packageInfo)
+      buildNativeLibraries(buildAppExportNativeLibraries, packageInfo)
     }
     val parsedActions = profiler.measure(ExportStage.INTENT_ACTIONS, packageProfile) {
       parseIntentActions(packageInfo)
@@ -319,28 +322,19 @@ object LcAppsExporter {
       }
   }
 
-  private fun buildNativeLibraries(packageInfo: PackageInfo): List<NativeLibraryExport> {
-    val sourceLibs = runCatching {
-      PackageUtils.getSourceLibs(
-        packageInfo = packageInfo,
-        includeNativeLibsDir = true,
-        parseElf = false
+  private fun buildNativeLibraries(
+    buildAppExportNativeLibraries: BuildAppExportNativeLibrariesUseCase,
+    packageInfo: PackageInfo
+  ): List<NativeLibraryExport> {
+    return buildAppExportNativeLibraries(packageInfo).map {
+      NativeLibraryExport(
+        abi = it.abi,
+        name = it.name,
+        path = it.path,
+        size = it.size,
+        sdk = null
       )
-    }.onFailure {
-      Timber.w(it, "Failed to read native libraries: ${packageInfo.packageName}")
-    }.getOrDefault(emptyMap())
-
-    return sourceLibs.flatMap { (abi, libs) ->
-      libs.map { item ->
-        NativeLibraryExport(
-          abi = abi,
-          name = item.name,
-          path = "lib/$abi/${item.name}",
-          size = item.size,
-          sdk = null
-        )
-      }
-    }.sortedWith(compareBy<NativeLibraryExport> { it.abi }.thenBy { it.name }.thenBy { it.path })
+    }
   }
 
   private fun parseIntentActions(packageInfo: PackageInfo): Map<String, List<String>> {

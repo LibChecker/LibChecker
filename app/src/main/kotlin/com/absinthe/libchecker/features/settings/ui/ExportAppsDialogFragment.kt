@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.BuildAppExportNativeLibrariesUseCase
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.features.settings.export.LcAppsExporter
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
@@ -23,6 +24,7 @@ import timber.log.Timber
 class ExportAppsDialogFragment : BaseBottomSheetViewDialogFragment<ExportAppsDialogView>() {
 
   private val installedAppRepository: InstalledAppRepository by inject()
+  private val buildAppExportNativeLibraries: BuildAppExportNativeLibrariesUseCase by inject()
   private var exportJob: Job? = null
   private var isExporting = false
 
@@ -68,7 +70,12 @@ class ExportAppsDialogFragment : BaseBottomSheetViewDialogFragment<ExportAppsDia
           val outputStream = contentResolver.openOutputStream(uri)
             ?: error("Unable to open output stream")
           outputStream.use { stream ->
-            LcAppsExporter.export(appContext, installedAppRepository, stream) { progress ->
+            LcAppsExporter.export(
+              context = appContext,
+              installedAppRepository = installedAppRepository,
+              buildAppExportNativeLibraries = buildAppExportNativeLibraries,
+              outputStream = stream
+            ) { progress ->
               withContext(Dispatchers.Main) {
                 root.setProgress(progress)
               }
