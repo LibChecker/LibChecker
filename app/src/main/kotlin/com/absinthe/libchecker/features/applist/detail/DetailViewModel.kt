@@ -72,6 +72,8 @@ import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
 import java.io.File
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -304,13 +306,10 @@ class DetailViewModel(
   private var initSoAnalysisJob: Job? = null
 
   fun initSoAnalysisData() {
-    if (initSoAnalysisJob?.isActive == true) {
-      return
-    }
-    if (nativeLibItems.value != null) {
-      return
-    }
-    initSoAnalysisJob = viewModelScope.launch(Dispatchers.IO) {
+    initSoAnalysisJob = launchDetailDataJob(
+      currentJob = initSoAnalysisJob,
+      hasData = nativeLibItems.value != null
+    ) {
       val abi = (abiBundleStateFlow.value ?: abiBundleStateFlow.filterNotNull().first()).abi
       val nativeLibraries = getAppDetailNativeLibrariesUseCase(
         packageInfo = packageInfo,
@@ -351,10 +350,10 @@ class DetailViewModel(
   private var initStaticJob: Job? = null
 
   fun initStaticData() {
-    if (initStaticJob?.isActive == true || staticLibItems.value != null) {
-      return
-    }
-    initStaticJob = viewModelScope.launch(Dispatchers.IO) {
+    initStaticJob = launchDetailDataJob(
+      currentJob = initStaticJob,
+      hasData = staticLibItems.value != null
+    ) {
       staticLibItems.emit(
         getAppDetailStaticLibraryChipsUseCase(
           packageInfo = packageInfo,
@@ -367,10 +366,10 @@ class DetailViewModel(
   private var initMetaDataJob: Job? = null
 
   fun initMetaDataData() {
-    if (initMetaDataJob?.isActive == true || metaDataItems.value != null) {
-      return
-    }
-    initMetaDataJob = viewModelScope.launch(Dispatchers.IO) {
+    initMetaDataJob = launchDetailDataJob(
+      currentJob = initMetaDataJob,
+      hasData = metaDataItems.value != null
+    ) {
       metaDataItems.emit(
         getAppDetailMetadataChipsUseCase(
           packageInfo = packageInfo,
@@ -384,10 +383,10 @@ class DetailViewModel(
   private var initPermissionJob: Job? = null
 
   fun initPermissionData() {
-    if (initPermissionJob?.isActive == true || permissionsItems.value != null) {
-      return
-    }
-    initPermissionJob = viewModelScope.launch(Dispatchers.IO) {
+    initPermissionJob = launchDetailDataJob(
+      currentJob = initPermissionJob,
+      hasData = permissionsItems.value != null
+    ) {
       val permissions = getAppDetailPermissionChipsUseCase(
         packageInfo = packageInfo,
         apkPreviewInfo = apkPreviewInfo,
@@ -405,10 +404,10 @@ class DetailViewModel(
   var initDexJob: Job? = null
 
   fun initDexData() {
-    if (initDexJob?.isActive == true || dexLibItems.value != null) {
-      return
-    }
-    initDexJob = viewModelScope.launch(Dispatchers.IO) {
+    initDexJob = launchDetailDataJob(
+      currentJob = initDexJob,
+      hasData = dexLibItems.value != null
+    ) {
       val list = getAppDetailDexChipsUseCase(
         packageInfo = packageInfo,
         sortBySizeMode = appDetailSettingsRepository.sortMode == MODE_SORT_BY_SIZE
@@ -420,10 +419,10 @@ class DetailViewModel(
   private var initSignaturesJob: Job? = null
 
   fun initSignatures() {
-    if (initSignaturesJob?.isActive == true || signaturesLibItems.value != null) {
-      return
-    }
-    initSignaturesJob = viewModelScope.launch {
+    initSignaturesJob = launchDetailDataJob(
+      currentJob = initSignaturesJob,
+      hasData = signaturesLibItems.value != null
+    ) {
       signaturesLibItems.emit(getAppDetailSignatureChipsUseCase(packageInfo, isApk))
     }
   }
@@ -431,18 +430,10 @@ class DetailViewModel(
   private var initComponentsJob: Job? = null
 
   fun initComponentsData() {
-    if (initComponentsJob?.isActive == true) {
-      return
-    }
-    if (
-      componentsMap[SERVICE]?.value != null &&
-      componentsMap[ACTIVITY]?.value != null &&
-      componentsMap[RECEIVER]?.value != null &&
-      componentsMap[PROVIDER]?.value != null
+    initComponentsJob = launchDetailDataJob(
+      currentJob = initComponentsJob,
+      hasData = hasComponentsData()
     ) {
-      return
-    }
-    initComponentsJob = viewModelScope.launch(Dispatchers.IO) {
       try {
         val components = getAppDetailComponentChipsUseCase(packageInfo, isApk)
         processesMap = components.processNames.associateWith { UiUtils.getRandomColor() }
@@ -454,6 +445,25 @@ class DetailViewModel(
         Timber.e(e)
       }
     }
+  }
+
+  private fun hasComponentsData(): Boolean {
+    return componentsMap[SERVICE]?.value != null &&
+      componentsMap[ACTIVITY]?.value != null &&
+      componentsMap[RECEIVER]?.value != null &&
+      componentsMap[PROVIDER]?.value != null
+  }
+
+  private fun launchDetailDataJob(
+    currentJob: Job?,
+    hasData: Boolean,
+    dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    block: suspend CoroutineScope.() -> Unit
+  ): Job? {
+    if (currentJob?.isActive == true || hasData) {
+      return currentJob
+    }
+    return viewModelScope.launch(dispatcher, block = block)
   }
 
   fun initComponentsDataInPreview() = viewModelScope.launch(Dispatchers.IO) {
