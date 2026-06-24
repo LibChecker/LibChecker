@@ -34,8 +34,12 @@ class LibReferenceMenuBSDView(context: Context) :
     flexDirection = FlexDirection.ROW
   }
 
-  fun addOptionItemView(labelRes: Int, option: Int) = LibReferenceMenuItemView(context).apply {
-    setOption(labelRes, option)
+  fun addOptionItemView(
+    labelRes: Int,
+    option: Int,
+    currentOptions: Int
+  ) = LibReferenceMenuItemView(context).apply {
+    setOption(labelRes, option, currentOptions)
     flexLayout.addView(this)
   }
 

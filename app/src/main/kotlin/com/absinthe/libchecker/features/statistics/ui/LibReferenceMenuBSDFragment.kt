@@ -2,17 +2,21 @@ package com.absinthe.libchecker.features.statistics.ui
 
 import android.content.DialogInterface
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.LibReferenceOptions
+import com.absinthe.libchecker.domain.statistics.LibReferenceSettingsRepository
 import com.absinthe.libchecker.features.statistics.ui.view.LibReferenceMenuBSDView
 import com.absinthe.libchecker.features.statistics.ui.view.LibReferenceMenuItemView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
+import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
+import org.koin.android.ext.android.inject
 
 class LibReferenceMenuBSDFragment : BaseBottomSheetViewDialogFragment<LibReferenceMenuBSDView>() {
 
-  private val previousAdvancedOptions = GlobalValues.libReferenceOptions
+  private val libReferenceSettingsRepository: LibReferenceSettingsRepository by inject()
   private val optionsViewMap = mutableMapOf<Int, LibReferenceMenuItemView>()
+  private var previousAdvancedOptions: Int = 0
 
   private var onDismissCallback: (optionsDiff: Int) -> Unit = {}
 
@@ -22,20 +26,21 @@ class LibReferenceMenuBSDFragment : BaseBottomSheetViewDialogFragment<LibReferen
 
   override fun init() {
     maxPeekHeightPercentage = 0.8f
-    optionsViewMap[LibReferenceOptions.NATIVE_LIBS] = root.addOptionItemView(R.string.ref_category_native, LibReferenceOptions.NATIVE_LIBS)
-    optionsViewMap[LibReferenceOptions.SERVICES] = root.addOptionItemView(R.string.ref_category_service, LibReferenceOptions.SERVICES)
-    optionsViewMap[LibReferenceOptions.ACTIVITIES] = root.addOptionItemView(R.string.ref_category_activity, LibReferenceOptions.ACTIVITIES)
-    optionsViewMap[LibReferenceOptions.RECEIVERS] = root.addOptionItemView(R.string.ref_category_br, LibReferenceOptions.RECEIVERS)
-    optionsViewMap[LibReferenceOptions.PROVIDERS] = root.addOptionItemView(R.string.ref_category_cp, LibReferenceOptions.PROVIDERS)
-    optionsViewMap[LibReferenceOptions.ACTION] = root.addOptionItemView(R.string.ref_category_action, LibReferenceOptions.ACTION)
-    optionsViewMap[LibReferenceOptions.PERMISSIONS] = root.addOptionItemView(R.string.ref_category_perm, LibReferenceOptions.PERMISSIONS)
-    optionsViewMap[LibReferenceOptions.METADATA] = root.addOptionItemView(R.string.ref_category_metadata, LibReferenceOptions.METADATA)
-    optionsViewMap[LibReferenceOptions.PACKAGES] = root.addOptionItemView(R.string.ref_category_package, LibReferenceOptions.PACKAGES)
-    optionsViewMap[LibReferenceOptions.SHARED_UID] = root.addOptionItemView(R.string.ref_category_shared_uid, LibReferenceOptions.SHARED_UID)
-    optionsViewMap[LibReferenceOptions.ONLY_NOT_MARKED] = root.addOptionItemView(R.string.ref_category_only_not_marked, LibReferenceOptions.ONLY_NOT_MARKED)
+    previousAdvancedOptions = libReferenceSettingsRepository.options
+    addOptionItemView(R.string.ref_category_native, LibReferenceOptions.NATIVE_LIBS)
+    addOptionItemView(R.string.ref_category_service, LibReferenceOptions.SERVICES)
+    addOptionItemView(R.string.ref_category_activity, LibReferenceOptions.ACTIVITIES)
+    addOptionItemView(R.string.ref_category_br, LibReferenceOptions.RECEIVERS)
+    addOptionItemView(R.string.ref_category_cp, LibReferenceOptions.PROVIDERS)
+    addOptionItemView(R.string.ref_category_action, LibReferenceOptions.ACTION)
+    addOptionItemView(R.string.ref_category_perm, LibReferenceOptions.PERMISSIONS)
+    addOptionItemView(R.string.ref_category_metadata, LibReferenceOptions.METADATA)
+    addOptionItemView(R.string.ref_category_package, LibReferenceOptions.PACKAGES)
+    addOptionItemView(R.string.ref_category_shared_uid, LibReferenceOptions.SHARED_UID)
+    addOptionItemView(R.string.ref_category_only_not_marked, LibReferenceOptions.ONLY_NOT_MARKED)
 
     dialog?.setOnDismissListener {
-      onDismissCallback(previousAdvancedOptions.xor(GlobalValues.libReferenceOptions))
+      onDismissCallback(previousAdvancedOptions.xor(libReferenceSettingsRepository.options))
     }
   }
 
@@ -53,5 +58,27 @@ class LibReferenceMenuBSDFragment : BaseBottomSheetViewDialogFragment<LibReferen
 
   fun setOnDismissListener(action: (optionsDiff: Int) -> Unit) {
     onDismissCallback = action
+  }
+
+  private fun addOptionItemView(labelRes: Int, option: Int) {
+    optionsViewMap[option] =
+      root.addOptionItemView(labelRes, option, previousAdvancedOptions).apply {
+        setOnCheckedChangeCallback { isChecked ->
+          updateOption(labelRes, option, isChecked)
+        }
+      }
+  }
+
+  private fun updateOption(labelRes: Int, option: Int, isChecked: Boolean) {
+    val newOptions = if (isChecked) {
+      libReferenceSettingsRepository.options or option
+    } else {
+      libReferenceSettingsRepository.options and option.inv()
+    }
+    libReferenceSettingsRepository.options = newOptions
+    Telemetry.recordEvent(
+      Constants.Event.LIB_REF_ADVANCED_MENU_ITEM_CHANGED,
+      mapOf(Telemetry.Param.CONTENT to getString(labelRes), Telemetry.Param.VALUE to isChecked)
+    )
   }
 }

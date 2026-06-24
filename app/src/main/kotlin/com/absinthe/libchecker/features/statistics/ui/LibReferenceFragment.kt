@@ -19,6 +19,7 @@ import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
 import com.absinthe.libchecker.domain.app.AppListSettingsRepository
+import com.absinthe.libchecker.domain.statistics.LibReferenceSettingsRepository
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.features.applist.ui.AdvancedMenuBSDFragment
 import com.absinthe.libchecker.features.chart.ui.ChartActivity
@@ -57,6 +58,7 @@ class LibReferenceFragment :
   SearchView.OnQueryTextListener {
 
   private val appListSettingsRepository: AppListSettingsRepository by inject()
+  private val libReferenceSettingsRepository: LibReferenceSettingsRepository by inject()
   private val refAdapter by lazy { LibReferenceAdapter(appListSettingsRepository.colorfulRuleIcon) }
   private var delayShowNavigationJob: Job? = null
   private var searchUpdateJob: Job? = null
@@ -289,7 +291,7 @@ class LibReferenceFragment :
       Constants.Event.LIB_REFERENCE_FILTER_TYPE,
       mapOf(
         Telemetry.Param.CONTENT_TYPE to
-          LibReferenceOptions.getOptionsString(GlobalValues.libReferenceOptions)
+          LibReferenceOptions.getOptionsString(libReferenceSettingsRepository.options)
       )
     )
   }

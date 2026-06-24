@@ -10,8 +10,11 @@ class GlobalLibReferenceSettingsRepository : LibReferenceSettingsRepository {
   override val threshold: Int
     get() = GlobalValues.libReferenceThreshold
 
-  override val options: Int
+  override var options: Int
     get() = GlobalValues.libReferenceOptions
+    set(value) {
+      GlobalValues.libReferenceOptions = value
+    }
 
   override val showSystemApps: Boolean
     get() = GlobalValues.isShowSystemApps
