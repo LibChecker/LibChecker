@@ -501,7 +501,7 @@ abstract class BaseAppDetailActivity :
       addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
         override fun onTabSelected(tab: TabLayout.Tab) {
           val type = typeList.getOrNull(tab.position) ?: return
-          val count = viewModel.itemsCountList[type]
+          val count = viewModel.filterState.itemsCountList[type]
           if (detailFragmentManager.currentItemsCount != count) {
             binding.tsComponentCount.setText(count.toString())
             detailFragmentManager.currentItemsCount = count
@@ -586,7 +586,7 @@ abstract class BaseAppDetailActivity :
   }
 
   override fun onQueryTextChange(newText: String): Boolean {
-    viewModel.queriedText = newText
+    viewModel.filterState.queriedText = newText
     detailFragmentManager.deliverFilterItemsByText(newText, lifecycleScope)
     return false
   }
@@ -597,14 +597,14 @@ abstract class BaseAppDetailActivity :
 
   private fun initObserver() {
     viewModel.also {
-      it.itemsCountStateFlow.onEach { live ->
+      it.filterState.itemsCountStateFlow.onEach { live ->
         val position = binding.tabLayout.selectedTabPosition
         if (position >= 0 && detailFragmentManager.currentItemsCount != live.count && typeList[position] == live.locate) {
           binding.tsComponentCount.setText(live.count.toString())
           detailFragmentManager.currentItemsCount = live.count
         }
       }.launchIn(lifecycleScope)
-      it.processToolIconVisibilityStateFlow.onEach { visible ->
+      it.filterState.processToolIconVisibilityStateFlow.onEach { visible ->
         if (visible) {
           if (!toolbarAdapter.data.contains(toolbarProcessItem)) {
             toolbarAdapter.addData(toolbarProcessItem)
@@ -615,7 +615,7 @@ abstract class BaseAppDetailActivity :
           }
         }
       }.launchIn(lifecycleScope)
-      it.processMapStateFlow.onEach { map ->
+      it.filterState.processMapStateFlow.onEach { map ->
         val list = map.map { mapItem ->
           ProcessBarAdapter.ProcessBarItem(
             mapItem.key,
@@ -884,7 +884,7 @@ abstract class BaseAppDetailActivity :
       toggleProcessBarViewVisibility()
       if (!processMode) {
         doOnMainThreadIdle {
-          viewModel.queriedProcess = null
+          viewModel.filterState.queriedProcess = null
           detailFragmentManager.deliverFilterItems(null, null, lifecycleScope)
         }
       }
@@ -914,11 +914,11 @@ abstract class BaseAppDetailActivity :
       )
       it.setOnItemClickListener { isSelected, process ->
         if (isSelected) {
-          viewModel.queriedProcess = process
+          viewModel.filterState.queriedProcess = process
         } else {
-          viewModel.queriedProcess = null
+          viewModel.filterState.queriedProcess = null
         }
-        detailFragmentManager.deliverFilterItems(null, viewModel.queriedProcess, lifecycleScope)
+        detailFragmentManager.deliverFilterItems(null, viewModel.filterState.queriedProcess, lifecycleScope)
       }
     }
     binding.detailToolbarContainer.addView(processBarView)

@@ -105,12 +105,12 @@ class NativeAnalysisFragment :
     } else {
       adapter.processMap = viewModel.nativeSourceMap
       lifecycleScope.launch(Dispatchers.IO) {
-        setItemsWithFilter(list, viewModel.queriedText, viewModel.queriedProcess)
+        setItemsWithFilter(list, viewModel.filterState.queriedText, viewModel.filterState.queriedProcess)
       }
     }
 
     if (!isListReady) {
-      viewModel.updateItemsCountStateFlow(type, list.size)
+      viewModel.filterState.updateItemsCount(type, list.size)
       isListReady = true
     }
   }

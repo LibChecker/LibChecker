@@ -34,12 +34,12 @@ class StaticAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>()
       emptyView.text.text = getString(R.string.empty_list)
     } else {
       lifecycleScope.launch(Dispatchers.IO) {
-        setItemsWithFilter(items, viewModel.queriedText, null)
+        setItemsWithFilter(items, viewModel.filterState.queriedText, null)
       }
     }
 
     if (!isListReady) {
-      viewModel.updateItemsCountStateFlow(type, items.size)
+      viewModel.filterState.updateItemsCount(type, items.size)
       isListReady = true
     }
   }

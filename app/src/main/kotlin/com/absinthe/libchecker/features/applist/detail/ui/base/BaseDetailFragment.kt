@@ -190,8 +190,8 @@ abstract class BaseDetailFragment<T : ViewBinding> :
       } else {
         emptyMap()
       }
-      viewModel.updateProcessMap(processMap)
-      viewModel.updateProcessToolIconVisibility(processMap.isNotEmpty() && !hasNonGrantedPermissions())
+      viewModel.filterState.updateProcessMap(processMap)
+      viewModel.filterState.updateProcessToolIconVisibility(processMap.isNotEmpty() && !hasNonGrantedPermissions())
     }
   }
 
@@ -264,7 +264,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
         }
         adapter.setDiffNewData(sortedList.toMutableList()) {
           afterListReadyTask?.run()
-          viewModel.updateItemsCountStateFlow(type, sortedList.size)
+          viewModel.filterState.updateItemsCount(type, sortedList.size)
         }
       }
     }

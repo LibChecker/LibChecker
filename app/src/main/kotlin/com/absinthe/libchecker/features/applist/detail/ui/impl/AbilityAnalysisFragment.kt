@@ -31,11 +31,11 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
       emptyView.text.text = getString(R.string.empty_list)
     } else {
       lifecycleScope.launch(Dispatchers.IO) {
-        setItemsWithFilter(items, viewModel.queriedText, viewModel.queriedProcess)
+        setItemsWithFilter(items, viewModel.filterState.queriedText, viewModel.filterState.queriedProcess)
       }
     }
     if (!isListReady) {
-      viewModel.updateItemsCountStateFlow(type, items.size)
+      viewModel.filterState.updateItemsCount(type, items.size)
       isListReady = true
     }
   }

@@ -36,12 +36,12 @@ class SignaturesAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
       emptyView.text.text = getString(R.string.uncharted_territory)
     } else {
       lifecycleScope.launch(Dispatchers.IO) {
-        setItemsWithFilter(items, viewModel.queriedText, null)
+        setItemsWithFilter(items, viewModel.filterState.queriedText, null)
       }
     }
 
     if (!isListReady) {
-      viewModel.updateItemsCountStateFlow(type, items.size)
+      viewModel.filterState.updateItemsCount(type, items.size)
       isListReady = true
     }
   }

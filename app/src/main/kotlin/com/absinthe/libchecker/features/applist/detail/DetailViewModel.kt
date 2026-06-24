@@ -64,7 +64,6 @@ import com.absinthe.libchecker.domain.app.SortAppDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.domain.snapshot.BuildPackageComparisonSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
-import com.absinthe.libchecker.features.applist.LocatedCount
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
@@ -136,17 +135,12 @@ class DetailViewModel(
   val signaturesLibItems: MutableStateFlow<List<LibStringItemChip>?> = MutableStateFlow(null)
   val componentsMap = SparseArray<MutableStateFlow<List<LibStringItemChip>?>>()
   val abilitiesMap = SparseArray<MutableStateFlow<List<LibStringItemChip>?>>()
-  val itemsCountStateFlow: MutableStateFlow<LocatedCount> = MutableStateFlow(LocatedCount(0, 0))
-  val processToolIconVisibilityStateFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
-  val processMapStateFlow = MutableStateFlow<Map<String, Int>>(emptyMap())
-  val itemsCountList = MutableList(12) { 0 }
+  val filterState = DetailFilterState()
   val is64Bit = MutableStateFlow<Boolean?>(null)
 
   var isApk = false
   var isApkPreview = false
 
-  var queriedText: String? = null
-  var queriedProcess: String? = null
   var processesMap: Map<String, Int> = mapOf()
   var nativeSourceMap: Map<String, Int> = mapOf()
   var appIcons: List<AppIconItem> = listOf()
@@ -297,10 +291,7 @@ class DetailViewModel(
     signaturesLibItems.value = null
     componentsMap.forEach { key, value -> value.value = null }
     abilitiesMap.forEach { key, value -> value.value = null }
-    itemsCountStateFlow.value = LocatedCount(0, 0)
-    processToolIconVisibilityStateFlow.value = false
-    processMapStateFlow.value = emptyMap()
-    itemsCountList.fill(0)
+    filterState.reset()
   }
 
   private var initSoAnalysisJob: Job? = null
@@ -554,19 +545,6 @@ class DetailViewModel(
     getAppDetailAbiUseCase(apkPreviewInfo)?.let {
       abiBundleStateFlow.emit(it)
     }
-  }
-
-  fun updateProcessMap(map: Map<String, Int>) = viewModelScope.launch {
-    processMapStateFlow.emit(map)
-  }
-
-  fun updateProcessToolIconVisibility(visible: Boolean) = viewModelScope.launch {
-    processToolIconVisibilityStateFlow.emit(visible)
-  }
-
-  fun updateItemsCountStateFlow(locate: Int, count: Int) = viewModelScope.launch {
-    itemsCountStateFlow.value = LocatedCount(locate, count)
-    itemsCountList[locate] = count
   }
 
   fun filterDetailItems(

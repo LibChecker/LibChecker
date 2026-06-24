@@ -35,11 +35,11 @@ class ComponentsAnalysisFragment :
     } else {
       adapter.processMap = viewModel.processesMap
       lifecycleScope.launch(Dispatchers.IO) {
-        setItemsWithFilter(items, viewModel.queriedText, viewModel.queriedProcess)
+        setItemsWithFilter(items, viewModel.filterState.queriedText, viewModel.filterState.queriedProcess)
       }
     }
     if (!isListReady) {
-      viewModel.updateItemsCountStateFlow(type, items.size)
+      viewModel.filterState.updateItemsCount(type, items.size)
       isListReady = true
     }
   }
