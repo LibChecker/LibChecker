@@ -77,10 +77,6 @@ class LibStringAdapter(
   private var is64Bit: Boolean = false
   private val nativeSizeTextCache = mutableMapOf<Pair<LibStringItem, List<String>>, CharSequence>()
 
-  fun switchProcessMode() {
-    setProcessMode(!processMode)
-  }
-
   fun setProcessMode(isProcessMode: Boolean) {
     processMode = isProcessMode
     //noinspection NotifyDataSetChanged

@@ -50,9 +50,9 @@ class DetailFragmentManager {
     }
   }
 
-  fun deliverSwitchProcessMode() {
+  fun deliverProcessMode(processMode: Boolean) {
     map.forEach { _, value ->
-      value.switchProcessMode()
+      value.setProcessMode(processMode)
     }
   }
 

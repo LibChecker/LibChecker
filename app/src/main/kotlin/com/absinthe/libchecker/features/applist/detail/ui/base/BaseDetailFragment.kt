@@ -22,7 +22,7 @@ import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.isComponentType
 import com.absinthe.libchecker.compat.VersionCompat
-import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
@@ -81,6 +81,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   Sortable {
 
   protected val viewModel: DetailViewModel by activityViewModel()
+  private val appDetailSettingsRepository: AppDetailSettingsRepository by inject()
   private val appListSettingsRepository: AppListSettingsRepository by inject()
   private val buildNativeLibraryItemDisplayData: BuildNativeLibraryItemDisplayDataUseCase by inject()
   private val resolveAppResourceValue: ResolveAppResourceValueUseCase by inject()
@@ -161,7 +162,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
         doOnLongClick(context, getItem(position), position)
         true
       }
-      setProcessMode(GlobalValues.processMode)
+      setProcessMode(appDetailSettingsRepository.processMode)
     }
   }
 
@@ -268,9 +269,9 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     }
   }
 
-  fun switchProcessMode() {
+  fun setProcessMode(processMode: Boolean) {
     if (isComponentFragment() || isNativeSourceAvailable()) {
-      adapter.switchProcessMode()
+      adapter.setProcessMode(processMode)
     }
   }
 

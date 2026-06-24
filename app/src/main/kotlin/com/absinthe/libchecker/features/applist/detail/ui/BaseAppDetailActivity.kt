@@ -41,10 +41,11 @@ import com.absinthe.libchecker.annotation.SIGNATURES
 import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
+import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
+import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.features.applist.DetailFragmentManager
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_LIB
@@ -100,6 +101,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.appiconloader.AppIconLoader
 import ohos.bundle.IBundleManager
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
@@ -110,6 +112,8 @@ abstract class BaseAppDetailActivity :
   MenuProvider {
 
   protected val viewModel: DetailViewModel by viewModel()
+  private val appDetailSettingsRepository: AppDetailSettingsRepository by inject()
+  private val appListSettingsRepository: AppListSettingsRepository by inject()
   protected var typeList = mutableListOf<Int>()
 
   override var detailFragmentManager: DetailFragmentManager = DetailFragmentManager()
@@ -239,7 +243,7 @@ abstract class BaseAppDetailActivity :
 
         lifecycleScope.launch(Dispatchers.IO) {
           val showAndroidVersion =
-            (GlobalValues.advancedOptions and AdvancedOptions.SHOW_ANDROID_VERSION) > 0
+            (appListSettingsRepository.displayOptions and AdvancedOptions.SHOW_ANDROID_VERSION) > 0
           val versionInfo = buildSpannedString {
             if (!isHarmonyMode) {
               val headerExtraInfo = viewModel.buildAppDetailHeaderExtraInfo(
@@ -306,11 +310,12 @@ abstract class BaseAppDetailActivity :
 
       toolbarAdapter.addData(
         AppDetailToolbarItem(R.drawable.ic_lib_sort, R.string.menu_sort) {
-          GlobalValues.libSortMode = if (GlobalValues.libSortMode == MODE_SORT_BY_LIB) {
+          val sortMode = if (appDetailSettingsRepository.sortMode == MODE_SORT_BY_LIB) {
             MODE_SORT_BY_SIZE
           } else {
             MODE_SORT_BY_LIB
           }
+          appDetailSettingsRepository.setSortMode(sortMode)
           detailFragmentManager.sortAll(lifecycleScope)
         }
       )
@@ -873,11 +878,12 @@ abstract class BaseAppDetailActivity :
   }
   private val toolbarProcessItem by unsafeLazy {
     AppDetailToolbarItem(R.drawable.ic_processes, R.string.menu_process) {
-      detailFragmentManager.deliverSwitchProcessMode()
-      GlobalValues.processMode = !GlobalValues.processMode
+      val processMode = !appDetailSettingsRepository.processMode
+      appDetailSettingsRepository.setProcessMode(processMode)
+      detailFragmentManager.deliverProcessMode(processMode)
 
       toggleProcessBarViewVisibility()
-      if (!GlobalValues.processMode) {
+      if (!processMode) {
         doOnMainThreadIdle {
           viewModel.queriedProcess = null
           detailFragmentManager.deliverFilterItems(null, null, lifecycleScope)
@@ -936,7 +942,7 @@ abstract class BaseAppDetailActivity :
 
   private fun toggleProcessBarViewVisibility() {
     processBarView?.isGone =
-      !GlobalValues.processMode &&
+      !appDetailSettingsRepository.processMode &&
       detailFragmentManager.currentFragment?.hasNonGrantedPermissions() == false
   }
 
