@@ -181,8 +181,6 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     if (visible) {
       val processMap = if (isComponentFragment()) {
         viewModel.processesMap
-      } else if (isNativeSourceAvailable()) {
-        viewModel.nativeSourceMap
       } else if (hasNonGrantedPermissions()) {
         val label = requireContext().getString(R.string.permission_not_granted)
         val color = R.color.material_red_400.getColor(requireContext())
@@ -271,7 +269,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   }
 
   fun setProcessMode(processMode: Boolean) {
-    if (isComponentFragment() || isNativeSourceAvailable()) {
+    if (isComponentFragment()) {
       adapter.setProcessMode(processMode)
     }
   }
@@ -348,10 +346,6 @@ abstract class BaseDetailFragment<T : ViewBinding> :
 
   fun isComponentFragment(): Boolean {
     return isComponentType(type)
-  }
-
-  fun isNativeSourceAvailable(): Boolean {
-    return type == NATIVE && viewModel.nativeSourceMap.isNotEmpty()
   }
 
   fun hasNonGrantedPermissions(): Boolean {

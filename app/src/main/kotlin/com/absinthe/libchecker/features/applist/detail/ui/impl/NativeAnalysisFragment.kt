@@ -103,7 +103,6 @@ class NativeAnalysisFragment :
     if (list.isEmpty()) {
       emptyView.text.text = getString(R.string.empty_list)
     } else {
-      adapter.processMap = viewModel.nativeSourceMap
       lifecycleScope.launch(Dispatchers.IO) {
         setItemsWithFilter(list, viewModel.filterState.queriedText, viewModel.filterState.queriedProcess)
       }

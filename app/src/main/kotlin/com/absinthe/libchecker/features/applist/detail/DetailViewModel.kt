@@ -140,7 +140,6 @@ class DetailViewModel(
   var isApkPreview = false
 
   var processesMap: Map<String, Int> = mapOf()
-  var nativeSourceMap: Map<String, Int> = mapOf()
   var appIcons: List<AppIconItem> = listOf()
 
   lateinit var packageInfo: PackageInfo
