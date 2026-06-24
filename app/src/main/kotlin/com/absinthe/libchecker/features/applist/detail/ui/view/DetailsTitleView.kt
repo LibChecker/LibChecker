@@ -12,8 +12,6 @@ import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.node.AbiLabelNode
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
@@ -78,7 +76,7 @@ class DetailsTitleView(
     addView(this)
   }
 
-  fun setAbiLabels(abis: List<AbiLabelNode>) {
+  fun setAbiLabels(abis: List<AbiLabelNode>, tintAbiLabels: Boolean) {
     abiLabelsFlexLayout.removeAllViews()
     abis.forEach {
       val res = when (it.abi) {
@@ -107,7 +105,7 @@ class DetailsTitleView(
         it.action?.let { action ->
           v.setOnClickListener { action.invoke() }
         }
-        if ((GlobalValues.advancedOptions and AdvancedOptions.TINT_ABI_LABEL) > 0) {
+        if (tintAbiLabels) {
           if (it.is64Bit) {
             v.drawable.setTint(context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary))
           } else {

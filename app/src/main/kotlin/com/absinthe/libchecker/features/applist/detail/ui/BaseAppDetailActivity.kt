@@ -242,8 +242,7 @@ abstract class BaseAppDetailActivity :
         }
 
         lifecycleScope.launch(Dispatchers.IO) {
-          val showAndroidVersion =
-            (appListSettingsRepository.displayOptions and AdvancedOptions.SHOW_ANDROID_VERSION) > 0
+          val showAndroidVersion = isDisplayOptionEnabled(AdvancedOptions.SHOW_ANDROID_VERSION)
           val versionInfo = buildSpannedString {
             if (!isHarmonyMode) {
               val headerExtraInfo = viewModel.buildAppDetailHeaderExtraInfo(
@@ -971,8 +970,15 @@ abstract class BaseAppDetailActivity :
       )
     }
     if (abiLabelsList.isNotEmpty()) {
-      binding.detailsTitle.setAbiLabels(abiLabelsList)
+      binding.detailsTitle.setAbiLabels(
+        abiLabelsList,
+        tintAbiLabels = isDisplayOptionEnabled(AdvancedOptions.TINT_ABI_LABEL)
+      )
     }
+  }
+
+  private fun isDisplayOptionEnabled(option: Int): Boolean {
+    return (appListSettingsRepository.displayOptions and option) > 0
   }
 
   @RequiresApi(Build.VERSION_CODES.TIRAMISU)
