@@ -11,9 +11,20 @@ class GlobalAppListSettingsRepository : AppListSettingsRepository {
   override val displayOptions: Int
     get() = GlobalValues.advancedOptions
 
+  override val itemDisplayOptions: Int
+    get() = GlobalValues.itemAdvancedOptions
+
   override val displayOptionsChanges: Flow<Int> = GlobalValues.preferencesFlow
     .filter { it.first == Constants.PREF_ADVANCED_OPTIONS }
     .map { it.second as Int }
+
+  override fun setDisplayOptions(options: Int) {
+    GlobalValues.advancedOptions = options
+  }
+
+  override fun setItemDisplayOptions(options: Int) {
+    GlobalValues.itemAdvancedOptions = options
+  }
 
   override suspend fun notifyDisplayOptionsChanged(diff: Int) {
     GlobalValues.preferencesFlow.emit(Constants.PREF_ADVANCED_OPTIONS to diff)

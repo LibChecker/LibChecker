@@ -39,8 +39,11 @@ enum class AdvancedMenuSection {
   View
 }
 
-class AdvancedMenuBSDView(context: Context, displayOptions: Int) :
-  LinearLayout(context),
+class AdvancedMenuBSDView(
+  context: Context,
+  displayOptions: Int,
+  onSortOptionsChanged: (Int) -> Unit
+) : LinearLayout(context),
   IHeaderView {
 
   private val header = BottomSheetHeaderView(context).apply {
@@ -81,7 +84,7 @@ class AdvancedMenuBSDView(context: Context, displayOptions: Int) :
     )
   }
 
-  private val sortView = AdvancedMenuSortView(context).apply {
+  private val sortView = AdvancedMenuSortView(context, displayOptions, onSortOptionsChanged).apply {
     layoutParams = LayoutParams(
       LayoutParams.MATCH_PARENT,
       LayoutParams.WRAP_CONTENT
@@ -226,25 +229,38 @@ class AdvancedMenuBSDView(context: Context, displayOptions: Int) :
   }
 
   /** Add an option item to the [Filter][AdvancedMenuSection.Filter] section. */
-  fun addOptionItemView(labelRes: Int, option: Int): AdvancedMenuItemView {
-    return addOptionItemView(labelRes, option, AdvancedMenuSection.Filter)
+  fun addOptionItemView(
+    labelRes: Int,
+    isChecked: Boolean,
+    onCheckedChanged: (Boolean) -> Unit
+  ): AdvancedMenuItemView {
+    return addOptionItemView(labelRes, isChecked, AdvancedMenuSection.Filter, onCheckedChanged)
   }
 
-  fun addOptionItemView(labelRes: Int, option: Int, section: AdvancedMenuSection): AdvancedMenuItemView {
+  fun addOptionItemView(
+    labelRes: Int,
+    isChecked: Boolean,
+    section: AdvancedMenuSection,
+    onCheckedChanged: (Boolean) -> Unit
+  ): AdvancedMenuItemView {
     val flexLayout = when (section) {
       AdvancedMenuSection.Filter -> flexLayout
       AdvancedMenuSection.View -> flexLayout2
     }
     val view = AdvancedMenuItemView(context).apply {
-      setOption(labelRes, option)
+      setOption(labelRes, isChecked, onCheckedChanged)
     }
     flexLayout.addView(view)
     return view
   }
 
-  fun addOptionItemViewForItem(labelRes: Int, option: Int): AdvancedMenuItemView {
+  fun addOptionItemViewForItem(
+    labelRes: Int,
+    isChecked: Boolean,
+    onCheckedChanged: (Boolean) -> Unit
+  ): AdvancedMenuItemView {
     val view = AdvancedMenuItemView(context).apply {
-      setItemOption(labelRes, option)
+      setOption(labelRes, isChecked, onCheckedChanged)
     }
     itemFlexLayout.addView(view)
     return view

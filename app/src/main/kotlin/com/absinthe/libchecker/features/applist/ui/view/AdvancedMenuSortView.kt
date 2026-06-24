@@ -7,15 +7,19 @@ import android.widget.LinearLayout
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.AppCompatTextView
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.utils.extensions.dp
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 
-class AdvancedMenuSortView(context: Context) :
-  LinearLayout(context),
+class AdvancedMenuSortView(
+  context: Context,
+  displayOptions: Int,
+  private val onDisplayOptionsChanged: (Int) -> Unit
+) : LinearLayout(context),
   MaterialButtonToggleGroup.OnButtonCheckedListener {
+
+  private var currentOptions = displayOptions
 
   private val title = AppCompatTextView(context).apply {
     layoutParams = LayoutParams(
@@ -33,15 +37,6 @@ class AdvancedMenuSortView(context: Context) :
     )
     isSelectionRequired = true
     isSingleSelection = true
-    addOnButtonCheckedListener(this@AdvancedMenuSortView)
-
-    if ((GlobalValues.advancedOptions and AdvancedOptions.SORT_BY_NAME) > 0) {
-      check(R.id.sort_by_name)
-    } else if ((GlobalValues.advancedOptions and AdvancedOptions.SORT_BY_UPDATE_TIME) > 0) {
-      check(R.id.sort_by_time)
-    } else if ((GlobalValues.advancedOptions and AdvancedOptions.SORT_BY_TARGET_API) > 0) {
-      check(R.id.sort_by_target_version)
-    }
   }
 
   private val group = HorizontalScrollView(context).apply {
@@ -62,6 +57,8 @@ class AdvancedMenuSortView(context: Context) :
     addButton(context, R.string.adv_sort_by_name, R.id.sort_by_name)
     addButton(context, R.string.adv_sort_by_time, R.id.sort_by_time)
     addButton(context, R.string.adv_sort_by_target_version, R.id.sort_by_target_version)
+    toggleGroup.check(currentOptions.toSortButtonId())
+    toggleGroup.addOnButtonCheckedListener(this)
   }
 
   private fun addButton(context: Context, titleRes: Int, viewId: Int) {
@@ -83,32 +80,42 @@ class AdvancedMenuSortView(context: Context) :
     checkedId: Int,
     isChecked: Boolean
   ) {
-    var options = GlobalValues.advancedOptions
-    when (checkedId) {
-      R.id.sort_by_name -> {
-        options = if (isChecked) {
-          options or AdvancedOptions.SORT_BY_NAME
-        } else {
-          options and AdvancedOptions.SORT_BY_NAME.inv()
-        }
-      }
-
-      R.id.sort_by_time -> {
-        options = if (isChecked) {
-          options or AdvancedOptions.SORT_BY_UPDATE_TIME
-        } else {
-          options and AdvancedOptions.SORT_BY_UPDATE_TIME.inv()
-        }
-      }
-
-      R.id.sort_by_target_version -> {
-        options = if (isChecked) {
-          options or AdvancedOptions.SORT_BY_TARGET_API
-        } else {
-          options and AdvancedOptions.SORT_BY_TARGET_API.inv()
-        }
-      }
+    if (!isChecked) {
+      return
     }
-    GlobalValues.advancedOptions = options
+    currentOptions = currentOptions
+      .clearSortOptions()
+      .or(checkedId.toSortOption())
+    onDisplayOptionsChanged(currentOptions)
+  }
+
+  override fun onDetachedFromWindow() {
+    super.onDetachedFromWindow()
+    toggleGroup.removeOnButtonCheckedListener(this)
+  }
+
+  private fun Int.toSortButtonId(): Int {
+    return when {
+      (this and AdvancedOptions.SORT_BY_NAME) > 0 -> R.id.sort_by_name
+      (this and AdvancedOptions.SORT_BY_UPDATE_TIME) > 0 -> R.id.sort_by_time
+      (this and AdvancedOptions.SORT_BY_TARGET_API) > 0 -> R.id.sort_by_target_version
+      else -> R.id.sort_by_name
+    }
+  }
+
+  private fun Int.clearSortOptions(): Int {
+    return this and (
+      AdvancedOptions.SORT_BY_NAME or
+        AdvancedOptions.SORT_BY_UPDATE_TIME or
+        AdvancedOptions.SORT_BY_TARGET_API
+      ).inv()
+  }
+
+  private fun Int.toSortOption(): Int {
+    return when (this) {
+      R.id.sort_by_time -> AdvancedOptions.SORT_BY_UPDATE_TIME
+      R.id.sort_by_target_version -> AdvancedOptions.SORT_BY_TARGET_API
+      else -> AdvancedOptions.SORT_BY_NAME
+    }
   }
 }
