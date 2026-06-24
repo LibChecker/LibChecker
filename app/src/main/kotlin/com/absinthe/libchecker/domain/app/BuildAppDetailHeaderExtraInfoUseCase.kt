@@ -8,25 +8,27 @@ import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersionString
 import com.absinthe.libchecker.utils.extensions.getTargetApiString
 import com.absinthe.libchecker.utils.extensions.sizeToString
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class BuildAppDetailHeaderExtraInfoUseCase(
   private val context: Context,
   private val getAppDetailPackageSize: GetAppDetailPackageSizeUseCase
 ) {
 
-  operator fun invoke(
+  suspend operator fun invoke(
     packageInfo: PackageInfo,
     apkPreviewInfo: ApkPreviewInfo?,
     isApkPreview: Boolean,
     showAndroidVersion: Boolean
-  ): AppDetailHeaderExtraInfo {
+  ): AppDetailHeaderExtraInfo = withContext(Dispatchers.IO) {
     val applicationInfo = packageInfo.applicationInfo!!
     val targetSdkVersion = apkPreviewInfo?.targetSdkVersion ?: applicationInfo.targetSdkVersion
     val minSdkVersion = apkPreviewInfo?.minSdkVersion ?: applicationInfo.minSdkVersion
     val compileSdkVersion = apkPreviewInfo?.compileSdkVersion ?: packageInfo.getCompileSdkVersion()
     val packageSize = getAppDetailPackageSize(packageInfo, apkPreviewInfo, isApkPreview)
 
-    return AppDetailHeaderExtraInfo(
+    AppDetailHeaderExtraInfo(
       targetSdkInfo = formatSdkInfo(
         value = apkPreviewInfo?.targetSdkVersion?.toString() ?: packageInfo.getTargetApiString(),
         version = targetSdkVersion,

@@ -80,7 +80,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class DetailViewModel(
@@ -193,7 +192,7 @@ class DetailViewModel(
     )
   }
 
-  fun buildAppDetailHeaderExtraInfo(
+  suspend fun buildAppDetailHeaderExtraInfo(
     packageInfo: PackageInfo,
     showAndroidVersion: Boolean
   ): AppDetailHeaderExtraInfo {
@@ -215,9 +214,7 @@ class DetailViewModel(
   )
 
   suspend fun getAppBundleItems(packageInfo: PackageInfo): List<AppBundleSplitItem> {
-    return withContext(Dispatchers.IO) {
-      getAppBundleItemsUseCase(packageInfo)
-    }
+    return getAppBundleItemsUseCase(packageInfo)
   }
 
   suspend fun getAppInfoActions(packageName: String) = getAppInfoActionsUseCase(packageName)
@@ -529,9 +526,7 @@ class DetailViewModel(
 
   fun buildRelatedAppDisplayData(packageName: String, relatedApp: RelatedAppListItem) = buildRelatedAppDisplayDataUseCase(packageName, relatedApp)
 
-  suspend fun buildSignatureDetailItems(detail: String) = withContext(Dispatchers.IO) {
-    buildSignatureDetailItemsUseCase(detail)
-  }
+  fun buildSignatureDetailItems(detail: String) = buildSignatureDetailItemsUseCase(detail)
 
   fun initFeatures(packageInfo: PackageInfo, features: Int) = viewModelScope.launch(Dispatchers.IO) {
     Timber.d("initFeatures: features = $features")
