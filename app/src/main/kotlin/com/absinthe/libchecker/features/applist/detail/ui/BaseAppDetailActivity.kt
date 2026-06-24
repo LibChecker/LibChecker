@@ -1,11 +1,7 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
 import android.content.pm.PackageInfo
-import android.graphics.drawable.AdaptiveIconDrawable
-import android.graphics.drawable.Drawable
-import android.os.Build
 import android.os.Bundle
-import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Lifecycle
@@ -28,12 +24,9 @@ import com.absinthe.libchecker.features.applist.detail.IDetailContainer
 import com.absinthe.libchecker.features.applist.detail.bean.DetailExtraBean
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.utils.Toasty
-import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.addBackStateHandler
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
-import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.extensions.isKeyboardShowing
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
@@ -68,6 +61,9 @@ abstract class BaseAppDetailActivity :
   }
 
   private val bundleManager by unsafeLazy { ApplicationDelegate(this).iBundleManager }
+  private val appIconDrawableBuilder by unsafeLazy {
+    DetailAppIconDrawableBuilder(this)
+  }
   private val featureItemBuilder by unsafeLazy {
     DetailFeatureItemBuilder(
       activity = this,
@@ -76,7 +72,7 @@ abstract class BaseAppDetailActivity :
       apkPreviewInfo = { viewModel.apkPreviewInfo },
       apkAnalyticsMode = { apkAnalyticsMode },
       appIcons = { viewModel.featureState.appIcons },
-      appIconDrawables = ::prepareAppIconDrawables
+      appIconDrawables = appIconDrawableBuilder::build
     )
   }
   private val featureListController by unsafeLazy {
@@ -423,38 +419,5 @@ abstract class BaseAppDetailActivity :
 
   private fun isDisplayOptionEnabled(option: Int): Boolean {
     return (appListSettingsRepository.displayOptions and option) > 0
-  }
-
-  @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-  private fun prepareAppIconDrawables(): List<Drawable> {
-    val firstIcon = viewModel.featureState.appIcons[0]
-    val drawables = viewModel.featureState.appIcons.map { it.drawable }.toMutableList()
-
-    val processedDrawable = when {
-      firstIcon.isMonochrome && firstIcon.drawable is AdaptiveIconDrawable -> {
-        createMonochromeIconWithBackground(firstIcon.drawable)
-      }
-
-      else -> firstIcon.drawable
-    }
-
-    processedDrawable?.let {
-      drawables[0] = it
-    } ?: drawables.removeAt(0)
-
-    return drawables
-  }
-
-  @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-  private fun createMonochromeIconWithBackground(adaptiveIcon: AdaptiveIconDrawable): Drawable? {
-    return adaptiveIcon.monochrome?.apply {
-      setTint(getColorByAttr(androidx.appcompat.R.attr.colorPrimary))
-    }?.let { foreground ->
-      UiUtils.addCircleBackground(
-        this,
-        foreground,
-        getColorByAttr(com.google.android.material.R.attr.colorSecondaryContainer)
-      )
-    }
   }
 }

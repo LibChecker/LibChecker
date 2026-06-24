@@ -21,7 +21,7 @@ class DetailFeatureItemBuilder(
   private val apkPreviewInfo: () -> ApkPreviewInfo?,
   private val apkAnalyticsMode: () -> Boolean,
   private val appIcons: () -> List<AppIconItem>,
-  private val appIconDrawables: () -> List<Drawable>
+  private val appIconDrawables: (List<AppIconItem>) -> List<Drawable>
 ) {
 
   fun build(feature: VersionedFeature, currentFeatureCount: Int): DetailFeatureItem? {
@@ -156,7 +156,7 @@ class DetailFeatureItemBuilder(
       return null
     }
 
-    val drawables = appIconDrawables()
+    val drawables = appIconDrawables(appIcons)
     if (drawables.isEmpty()) {
       return null
     }
