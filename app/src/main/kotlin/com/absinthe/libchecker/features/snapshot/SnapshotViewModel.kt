@@ -27,6 +27,7 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotComparisonLists
 import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
+import com.absinthe.libchecker.domain.snapshot.SnapshotTrackChangeRepository
 import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotTopAppsUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
@@ -65,7 +66,8 @@ class SnapshotViewModel(
   private val buildSnapshotComparisonListsUseCase: BuildSnapshotComparisonListsUseCase,
   private val getSnapshotPackageIconSourcesUseCase: GetSnapshotPackageIconSourcesUseCase,
   private val getApexPackageNamesUseCase: GetApexPackageNamesUseCase,
-  private val snapshotSelectionUseCase: SnapshotSelectionUseCase
+  private val snapshotSelectionUseCase: SnapshotSelectionUseCase,
+  private val snapshotTrackChangeRepository: SnapshotTrackChangeRepository
 ) : ViewModel() {
 
   val allSnapshots = repository.currentSnapshotCount
@@ -288,6 +290,10 @@ class SnapshotViewModel(
     setEffect {
       Effect.ChooseComparedApk(isLeftPart)
     }
+  }
+
+  fun consumeTrackItemsChanged(): Boolean {
+    return snapshotTrackChangeRepository.consumeChanged()
   }
 
   fun changeTimeStamp(timestamp: Long) {

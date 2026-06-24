@@ -403,8 +403,7 @@ class SnapshotFragment :
       }
     }
 
-    if (GlobalValues.trackItemsChanged) {
-      GlobalValues.trackItemsChanged = false
+    if (viewModel.consumeTrackItemsChanged()) {
       flip(VF_LOADING)
       viewModel.compareDiff(viewModel.selectedSnapshotTimestamp)
     }

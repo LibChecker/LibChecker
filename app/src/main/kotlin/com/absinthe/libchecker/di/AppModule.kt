@@ -9,6 +9,7 @@ import com.absinthe.libchecker.data.app.LocalInstalledAppRepository
 import com.absinthe.libchecker.data.app.RemoteLibraryDetailRepository
 import com.absinthe.libchecker.data.snapshot.AndroidSnapshotItemFactory
 import com.absinthe.libchecker.data.snapshot.GlobalSnapshotSelectionRepository
+import com.absinthe.libchecker.data.snapshot.GlobalSnapshotTrackChangeRepository
 import com.absinthe.libchecker.data.snapshot.LocalSnapshotRepository
 import com.absinthe.libchecker.data.snapshot.ProtoSnapshotArchiveCodec
 import com.absinthe.libchecker.data.statistics.CachedAndroidDistributionRepository
@@ -106,6 +107,7 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
+import com.absinthe.libchecker.domain.snapshot.SnapshotTrackChangeRepository
 import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotTopAppsUseCase
 import com.absinthe.libchecker.domain.statistics.AndroidDistributionRepository
 import com.absinthe.libchecker.domain.statistics.BuildAbiChartDataUseCase
@@ -141,6 +143,7 @@ val appModule = module {
   single<AppListExportMetadata> { AndroidAppListExportMetadata(androidContext()) }
   single<SnapshotItemFactory> { AndroidSnapshotItemFactory() }
   single<SnapshotSelectionRepository> { GlobalSnapshotSelectionRepository() }
+  single<SnapshotTrackChangeRepository> { GlobalSnapshotTrackChangeRepository() }
   single<SnapshotRepository> { LocalSnapshotRepository(get(), get()) }
   single<SnapshotArchiveCodec> { ProtoSnapshotArchiveCodec() }
   single<ChartSettingsRepository> { GlobalChartSettingsRepository() }
@@ -340,8 +343,9 @@ val appModule = module {
       buildSnapshotComparisonListsUseCase = get(),
       getSnapshotPackageIconSourcesUseCase = get(),
       getApexPackageNamesUseCase = get(),
-      snapshotSelectionUseCase = get()
+      snapshotSelectionUseCase = get(),
+      snapshotTrackChangeRepository = get()
     )
   }
-  viewModel { TrackViewModel(get(), get()) }
+  viewModel { TrackViewModel(get(), get(), get()) }
 }
