@@ -26,7 +26,9 @@ import kotlinx.coroutines.withContext
 
 const val SNAPSHOT_NATIVE_PROVIDER = 2
 
-class SnapshotNativeProvider : BaseNodeProvider() {
+class SnapshotNativeProvider(
+  private val colorfulRuleIcon: Boolean
+) : BaseNodeProvider() {
 
   override val itemViewType: Int = SNAPSHOT_NATIVE_PROVIDER
   override val layoutId: Int = 0
@@ -83,7 +85,7 @@ class SnapshotNativeProvider : BaseNodeProvider() {
         val rule = RulesRepository.getRule(snapshotItem.name, snapshotItem.itemType, true)
 
         withContext(Dispatchers.Main) {
-          setChip(rule, alphaColor)
+          setChip(rule, alphaColor, colorfulRuleIcon)
           helper.itemView.contentDescription = buildItemDescription(
             getStatusLabel(snapshotItem.diffType),
             snapshotItem.title,

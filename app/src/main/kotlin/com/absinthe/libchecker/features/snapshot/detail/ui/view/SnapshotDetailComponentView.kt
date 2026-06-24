@@ -15,7 +15,6 @@ import androidx.core.view.children
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
@@ -74,7 +73,7 @@ class SnapshotDetailComponentView(context: Context) : MaterialCardView(context) 
       chip?.setOnClickListener(listener)
     }
 
-    fun setChip(rule: Rule?, color: Int) {
+    fun setChip(rule: Rule?, color: Int, colorfulIcon: Boolean) {
       if (rule == null) {
         if (chip != null) {
           removeView(chip)
@@ -102,7 +101,7 @@ class SnapshotDetailComponentView(context: Context) : MaterialCardView(context) 
           text = rule.label
           chipBackgroundColor = ColorStateList.valueOf(color)
 
-          if (!GlobalValues.isColorfulIcon && !rule.isSimpleColorIcon) {
+          if (!colorfulIcon && !rule.isSimpleColorIcon) {
             val icon = chipIcon
             icon?.let {
               it.mutate().colorFilter =

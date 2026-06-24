@@ -29,6 +29,7 @@ import com.absinthe.libchecker.compat.IntentCompat
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
+import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotPackageIconSource
 import com.absinthe.libchecker.domain.snapshot.model.ADDED
 import com.absinthe.libchecker.domain.snapshot.model.CHANGED
@@ -66,6 +67,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import me.zhanghai.android.appiconloader.AppIconLoader
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import rikka.core.util.ClipboardUtils
 
@@ -78,7 +80,10 @@ class SnapshotDetailActivity :
 
   private lateinit var entity: SnapshotDiffItem
 
-  private val adapter = SnapshotDetailAdapter()
+  private val appListSettingsRepository: AppListSettingsRepository by inject()
+  private val adapter by lazy {
+    SnapshotDetailAdapter(appListSettingsRepository.colorfulRuleIcon)
+  }
   private val viewModel: SnapshotViewModel by viewModel()
   private val _entity by unsafeLazy {
     IntentCompat.getSerializableExtra<SnapshotDiffItem>(
