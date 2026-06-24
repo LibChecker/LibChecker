@@ -130,6 +130,7 @@ import com.absinthe.libchecker.features.album.track.TrackViewModel
 import com.absinthe.libchecker.features.applist.detail.DetailActionLoader
 import com.absinthe.libchecker.features.applist.detail.DetailContentLoader
 import com.absinthe.libchecker.features.applist.detail.DetailFeatureLoader
+import com.absinthe.libchecker.features.applist.detail.DetailPackageLoader
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.chart.ChartViewModel
 import com.absinthe.libchecker.features.home.HomeViewModel
@@ -274,6 +275,15 @@ val appModule = module {
       hasInstalledStaticLibrariesUseCase = get()
     )
   }
+  factory {
+    DetailPackageLoader(
+      getAppDetailPackage = get(),
+      getApkPreviewInfoUseCase = get(),
+      prepareApkAnalysisPackageUseCase = get(),
+      getInstalledAppComparisonPackageUseCase = get(),
+      buildPackageComparisonSnapshotItemUseCase = get()
+    )
+  }
   factory { GetApexPackageNamesUseCase(get()) }
   factory { BuildArchiveSnapshotItemUseCase(androidContext()) }
   factory { BuildInstalledSnapshotItemUseCase(get()) }
@@ -312,17 +322,13 @@ val appModule = module {
   }
   viewModel {
     DetailViewModel(
-      getAppDetailPackage = get(),
       filterAppDetailItemsUseCase = get(),
-      getApkPreviewInfoUseCase = get(),
-      prepareApkAnalysisPackageUseCase = get(),
-      getInstalledAppComparisonPackageUseCase = get(),
       sortAppDetailItemsUseCase = get(),
       appDetailSettingsRepository = get(),
       detailActionLoader = get(),
       detailContentLoader = get(),
       detailFeatureLoader = get(),
-      buildPackageComparisonSnapshotItemUseCase = get()
+      detailPackageLoader = get()
     )
   }
   viewModel {
