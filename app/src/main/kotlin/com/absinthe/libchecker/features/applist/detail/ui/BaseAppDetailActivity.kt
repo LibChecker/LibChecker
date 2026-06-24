@@ -14,8 +14,6 @@ import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
-import androidx.core.text.buildSpannedString
-import androidx.core.text.scale
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -70,7 +68,6 @@ import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.extensions.isKeyboardShowing
-import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.google.android.material.appbar.AppBarLayout
@@ -147,6 +144,9 @@ abstract class BaseAppDetailActivity :
       onAppInfoClick = ::showAppInfoDialog
     )
   }
+  private val headerExtraInfoBinder by unsafeLazy {
+    DetailHeaderExtraInfoBinder(binding.detailsTitle)
+  }
   private val toolbarAdapter by unsafeLazy { AppDetailToolbarAdapter() }
 
   private var isHarmonyMode = false
@@ -216,61 +216,27 @@ abstract class BaseAppDetailActivity :
 
         lifecycleScope.launch(Dispatchers.IO) {
           val showAndroidVersion = isDisplayOptionEnabled(AdvancedOptions.SHOW_ANDROID_VERSION)
-          val versionInfo = buildSpannedString {
-            if (!isHarmonyMode) {
-              val headerExtraInfo = viewModel.buildAppDetailHeaderExtraInfo(
-                packageInfo = packageInfo,
-                showAndroidVersion = showAndroidVersion
+          val versionInfo = if (!isHarmonyMode) {
+            val headerExtraInfo = viewModel.buildAppDetailHeaderExtraInfo(
+              packageInfo = packageInfo,
+              showAndroidVersion = showAndroidVersion
+            )
+            headerExtraInfoBinder.format(headerExtraInfo)
+          } else {
+            if (extraBean?.variant == Constants.VARIANT_HAP) {
+              headerExtraInfoBinder.formatHarmony(
+                bundleManager?.getBundleInfo(
+                  packageName,
+                  IBundleManager.GET_BUNDLE_DEFAULT
+                )
               )
-              scale(0.8f) {
-                append("Target: ")
-              }
-              append(headerExtraInfo.targetSdkInfo)
-              scale(0.8f) {
-                append(" Min: ")
-              }
-              append(headerExtraInfo.minSdkInfo)
-              scale(0.8f) {
-                append(" Compile: ")
-              }
-              append(headerExtraInfo.compileSdkInfo)
-              scale(0.8f) {
-                append(" Size: ")
-              }
-              append(headerExtraInfo.sizeInfo)
-
-              headerExtraInfo.sharedUserId?.let {
-                appendLine().append("sharedUserId = $it")
-              }
             } else {
-              if (extraBean?.variant == Constants.VARIANT_HAP) {
-                bundleManager?.let {
-                  val hapBundle = it.getBundleInfo(
-                    packageName,
-                    IBundleManager.GET_BUNDLE_DEFAULT
-                  )
-                  scale(0.8f) {
-                    append("Target: ")
-                  }
-                  append(hapBundle.targetVersion.toString())
-                  scale(0.8f) {
-                    append("Min: ")
-                  }
-                  append(hapBundle.minSdkVersion.toString())
-
-                  if (!hapBundle.jointUserId.isNullOrEmpty()) {
-                    appendLine().append("jointUserId = ${hapBundle.jointUserId}")
-                  }
-                }
-              }
+              ""
             }
           }
 
           withContext(Dispatchers.Main) {
-            detailsTitle.extraInfoView.apply {
-              text = versionInfo
-              setLongClickCopiedToClipboard(text)
-            }
+            headerExtraInfoBinder.bind(versionInfo)
           }
         }
       } catch (e: Exception) {
