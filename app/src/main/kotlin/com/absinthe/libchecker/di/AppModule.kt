@@ -132,6 +132,7 @@ import com.absinthe.libchecker.features.applist.detail.DetailComponentContentLoa
 import com.absinthe.libchecker.features.applist.detail.DetailContentLoader
 import com.absinthe.libchecker.features.applist.detail.DetailFeatureLoader
 import com.absinthe.libchecker.features.applist.detail.DetailFilterController
+import com.absinthe.libchecker.features.applist.detail.DetailNativeLibContentLoader
 import com.absinthe.libchecker.features.applist.detail.DetailPackageLoader
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.chart.ChartViewModel
@@ -260,15 +261,20 @@ val appModule = module {
     )
   }
   factory {
+    DetailNativeLibContentLoader(
+      getAppDetailNativeLibrariesUseCase = get()
+    )
+  }
+  factory {
     DetailContentLoader(
       getAppDetailAbilityChipsUseCase = get(),
       getAppDetailDexChipsUseCase = get(),
       getAppDetailMetadataChipsUseCase = get(),
-      getAppDetailNativeLibrariesUseCase = get(),
       getAppDetailPermissionChipsUseCase = get(),
       getAppDetailSignatureChipsUseCase = get(),
       getAppDetailStaticLibraryChipsUseCase = get(),
       detailComponentContentLoader = get(),
+      detailNativeLibContentLoader = get(),
       appDetailSettingsRepository = get()
     )
   }

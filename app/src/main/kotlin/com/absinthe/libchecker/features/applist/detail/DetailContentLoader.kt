@@ -5,7 +5,6 @@ import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.GetAppDetailAbilityChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailDexChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailMetadataChipsUseCase
-import com.absinthe.libchecker.domain.app.GetAppDetailNativeLibrariesUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPermissionChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailSignatureChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailStaticLibraryChipsUseCase
@@ -13,8 +12,6 @@ import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -22,11 +19,11 @@ class DetailContentLoader(
   private val getAppDetailAbilityChipsUseCase: GetAppDetailAbilityChipsUseCase,
   private val getAppDetailDexChipsUseCase: GetAppDetailDexChipsUseCase,
   private val getAppDetailMetadataChipsUseCase: GetAppDetailMetadataChipsUseCase,
-  private val getAppDetailNativeLibrariesUseCase: GetAppDetailNativeLibrariesUseCase,
   private val getAppDetailPermissionChipsUseCase: GetAppDetailPermissionChipsUseCase,
   private val getAppDetailSignatureChipsUseCase: GetAppDetailSignatureChipsUseCase,
   private val getAppDetailStaticLibraryChipsUseCase: GetAppDetailStaticLibraryChipsUseCase,
   private val detailComponentContentLoader: DetailComponentContentLoader,
+  private val detailNativeLibContentLoader: DetailNativeLibContentLoader,
   private val appDetailSettingsRepository: AppDetailSettingsRepository
 ) {
   val contentState = DetailContentState()
@@ -46,27 +43,13 @@ class DetailContentLoader(
     featureState: DetailFeatureState,
     packageState: DetailPackageState
   ) {
-    loadJobsState.launchIfNeeded(
-      key = DetailLoadJobsState.Key.NATIVE_LIBS,
+    detailNativeLibContentLoader.initSoAnalysisData(
       scope = scope,
-      hasData = contentState.nativeLibItems.value != null
-    ) {
-      val abiBundle = featureState.abiBundleStateFlow.value
-        ?: featureState.abiBundleStateFlow.filterNotNull().first()
-      val nativeLibraries = getAppDetailNativeLibrariesUseCase(
-        packageInfo = packageState.packageInfo,
-        apkPreviewInfo = packageState.apkPreviewInfo,
-        isApk = packageState.isApk,
-        isApkPreview = packageState.isApkPreview,
-        abi = abiBundle.abi
-      )
-
-      contentState.emitNativeLibTabs(nativeLibraries.itemsByAbi)
-
-      if (nativeLibraries.selectedAbiSupports16KbPageSize) {
-        featureState.emitFeature(VersionedFeature(Features.Ext.ELF_PAGE_SIZE_16KB))
-      }
-    }
+      contentState = contentState,
+      featureState = featureState,
+      loadJobsState = loadJobsState,
+      packageState = packageState
+    )
   }
 
   fun loadSoAnalysisData(
@@ -74,19 +57,13 @@ class DetailContentLoader(
     packageState: DetailPackageState,
     tab: String
   ) {
-    contentState.nativeLibItemsFor(tab)?.let {
-      scope.launch(Dispatchers.IO) {
-        contentState.nativeLibItems.emit(
-          getAppDetailNativeLibrariesUseCase.buildChipList(
-            packageInfo = packageState.packageInfo,
-            apkPreviewInfo = packageState.apkPreviewInfo,
-            isApkPreview = packageState.isApkPreview,
-            items = it,
-            sortBySize = isSortBySizeMode()
-          )
-        )
-      }
-    }
+    detailNativeLibContentLoader.loadSoAnalysisData(
+      scope = scope,
+      contentState = contentState,
+      packageState = packageState,
+      tab = tab,
+      sortBySizeMode = isSortBySizeMode()
+    )
   }
 
   fun initStaticData(
