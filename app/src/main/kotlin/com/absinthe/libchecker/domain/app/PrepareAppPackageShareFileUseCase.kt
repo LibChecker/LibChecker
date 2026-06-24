@@ -12,6 +12,8 @@ import java.io.File
 import java.io.FileOutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class PrepareAppPackageShareFileUseCase(
   private val context: Context,
@@ -22,7 +24,10 @@ class PrepareAppPackageShareFileUseCase(
   private val packageManager = context.packageManager
   private val illegalFilenameChars = Regex("""[\\/:*?"<>|]""")
 
-  operator fun invoke(cacheDir: File, packageName: String): AppPackageShareFile {
+  suspend operator fun invoke(
+    cacheDir: File,
+    packageName: String
+  ): AppPackageShareFile = withContext(Dispatchers.IO) {
     val packageInfo = installedAppRepository.getPackageInfo(packageName)
       ?: error("PackageInfo not found for $packageName")
     val applicationInfo = packageInfo.applicationInfo
@@ -63,7 +68,7 @@ class PrepareAppPackageShareFileUseCase(
       targetFile.setLastModified(latestSourceTimestamp)
     }
 
-    return AppPackageShareFile(
+    AppPackageShareFile(
       file = targetFile,
       mimeType = inferMimeType(targetFile),
       contentUri = FileProvider.getUriForFile(

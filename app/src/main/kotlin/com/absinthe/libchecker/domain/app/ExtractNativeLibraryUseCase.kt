@@ -10,6 +10,8 @@ import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.utils.OsUtils
 import java.io.File
 import java.io.InputStream
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class ExtractNativeLibraryUseCase(
@@ -17,14 +19,14 @@ class ExtractNativeLibraryUseCase(
   private val applicationId: String
 ) {
 
-  operator fun invoke(
+  suspend operator fun invoke(
     packageInfo: PackageInfo,
     item: LibStringItem,
     isApkPreview: Boolean
-  ): Result<Unit> {
+  ): Result<Unit> = withContext(Dispatchers.IO) {
     Timber.d("Extract ELF: $item")
 
-    return runCatching {
+    runCatching {
       if (isApkPreview) {
         error("not available in apk preview mode")
       }

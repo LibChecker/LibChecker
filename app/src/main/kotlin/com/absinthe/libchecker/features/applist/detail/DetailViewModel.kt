@@ -220,40 +220,26 @@ class DetailViewModel(
     }
   }
 
-  suspend fun getAppInfoActions(packageName: String) = withContext(Dispatchers.IO) {
-    getAppInfoActionsUseCase(packageName)
-  }
+  suspend fun getAppInfoActions(packageName: String) = getAppInfoActionsUseCase(packageName)
 
-  suspend fun getAppLaunchAction(packageName: String?) = withContext(Dispatchers.IO) {
-    getAppLaunchActionUseCase(packageName)
-  }
+  suspend fun getAppLaunchAction(packageName: String?) = getAppLaunchActionUseCase(packageName)
 
-  suspend fun getAlternativeLaunchItems(packageName: String) = withContext(Dispatchers.IO) {
-    getAlternativeLaunchItemsUseCase(packageName)
-  }
+  suspend fun getAlternativeLaunchItems(packageName: String) = getAlternativeLaunchItemsUseCase(packageName)
 
-  suspend fun getAppInstallSourceDetails(packageName: String) = withContext(Dispatchers.IO) {
-    getAppInstallSourceDetailsUseCase(packageName)
-  }
+  suspend fun getAppInstallSourceDetails(packageName: String) = getAppInstallSourceDetailsUseCase(packageName)
 
-  suspend fun getXposedModuleInfo(packageName: String) = withContext(Dispatchers.IO) {
-    getXposedModuleInfoUseCase(packageName)
-  }
+  suspend fun getXposedModuleInfo(packageName: String) = getXposedModuleInfoUseCase(packageName)
 
-  suspend fun extractNativeLibrary(item: LibStringItem) = withContext(Dispatchers.IO) {
+  suspend fun extractNativeLibrary(item: LibStringItem) =
     extractNativeLibraryUseCase(packageInfo, item, isApkPreview)
-  }
 
-  suspend fun prepareAppPackageShareFile(cacheDir: File, packageName: String) = withContext(Dispatchers.IO) {
+  suspend fun prepareAppPackageShareFile(cacheDir: File, packageName: String) =
     prepareAppPackageShareFileUseCase(cacheDir, packageName)
-  }
 
   suspend fun exportAppPackageShareFile(
     shareFile: AppPackageShareFile,
     destinationUri: Uri
-  ) = withContext(Dispatchers.IO) {
-    exportAppPackageShareFileUseCase(shareFile, destinationUri)
-  }
+  ) = exportAppPackageShareFileUseCase(shareFile, destinationUri)
 
   suspend fun getApkPreviewInfo(url: String): Result<ApkPreviewInfo> {
     return withContext(Dispatchers.IO) {

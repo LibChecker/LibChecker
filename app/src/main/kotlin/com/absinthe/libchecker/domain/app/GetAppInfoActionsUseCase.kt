@@ -9,6 +9,8 @@ import android.graphics.drawable.Drawable
 import androidx.core.net.toUri
 import com.absinthe.libchecker.compat.PackageManagerCompat
 import java.io.File
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class GetAppInfoActionsUseCase(
   private val ownPackageName: String,
@@ -17,10 +19,16 @@ class GetAppInfoActionsUseCase(
   private val allowFileUriExposure: AllowFileUriExposureUseCase
 ) {
 
-  operator fun invoke(packageName: String): List<AppInfoActionItem> {
-    return (getShowAppInfoList(packageName) + getShowAppSourceList(packageName) + getShowMarketList(packageName))
-      .distinctBy { it.packageName }
-  }
+  suspend operator fun invoke(packageName: String): List<AppInfoActionItem> =
+    withContext(Dispatchers.IO) {
+      listOf(
+        getShowAppInfoList(packageName),
+        getShowAppSourceList(packageName),
+        getShowMarketList(packageName)
+      )
+        .flatten()
+        .distinctBy { it.packageName }
+    }
 
   private fun getShowAppInfoList(packageName: String): List<AppInfoActionItem> {
     return PackageManagerCompat.queryIntentActivities(

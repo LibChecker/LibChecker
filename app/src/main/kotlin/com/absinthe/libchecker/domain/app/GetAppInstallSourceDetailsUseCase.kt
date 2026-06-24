@@ -6,22 +6,25 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.PREINSTALLED_TIMESTAMP
 import com.absinthe.libchecker.utils.extensions.getDexFileOptimizationInfo
 import java.text.SimpleDateFormat
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class GetAppInstallSourceDetailsUseCase(
   private val context: Context,
   private val installedAppRepository: InstalledAppRepository
 ) {
 
-  operator fun invoke(packageName: String): AppInstallSourceDetails? {
-    val packageInfo = installedAppRepository.getPackageInfo(packageName) ?: return null
-    return AppInstallSourceDetails(
-      installSource = installedAppRepository.getInstallSource(packageName),
-      installedTime = packageInfo.getInstalledTimeDisplayData(
-        showInstalledTime = !installedAppRepository.getPackageState(packageName).isFrozen
-      ),
-      dexoptInfo = packageInfo.getDexFileOptimizationInfo()
-    )
-  }
+  suspend operator fun invoke(packageName: String): AppInstallSourceDetails? =
+    withContext(Dispatchers.IO) {
+      val packageInfo = installedAppRepository.getPackageInfo(packageName) ?: return@withContext null
+      AppInstallSourceDetails(
+        installSource = installedAppRepository.getInstallSource(packageName),
+        installedTime = packageInfo.getInstalledTimeDisplayData(
+          showInstalledTime = !installedAppRepository.getPackageState(packageName).isFrozen
+        ),
+        dexoptInfo = packageInfo.getDexFileOptimizationInfo()
+      )
+    }
 
   private fun PackageInfo.getInstalledTimeDisplayData(
     showInstalledTime: Boolean
