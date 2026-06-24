@@ -15,7 +15,6 @@ import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalFeatures
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentPieChartBinding
 import com.absinthe.libchecker.domain.statistics.BuildApiLevelChartDataUseCase
@@ -292,7 +291,7 @@ class ChartFragment :
 
     when (chartType) {
       ChartType.ABI -> {
-        if (GlobalValues.isDetailedAbiChart) {
+        if (viewModel.isDetailedAbiChart) {
           setChartData(::generateBarChartView) {
             DetailedABIChartDataSource(items, viewModel::buildDetailedAbiChartData)
           }

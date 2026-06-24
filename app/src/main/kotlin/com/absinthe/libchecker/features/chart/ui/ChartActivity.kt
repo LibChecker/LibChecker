@@ -15,7 +15,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityChartBinding
 import com.absinthe.libchecker.features.chart.ChartViewModel
 import com.absinthe.libchecker.services.IWorkerService
@@ -57,6 +56,11 @@ class ChartActivity :
         viewModel.detailAbiSwitchVisibility.collect {
           detailedAbiSwitch?.isVisible = it
         }
+      }
+    }
+    lifecycleScope.launch {
+      lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewModel.detailAbiSwitch.collect(::syncDetailedAbiSwitch)
       }
     }
 
@@ -104,8 +108,18 @@ class ChartActivity :
       button.text =
         if (isChecked) getString(R.string.chart_abi_detailed) else getString(R.string.chart_abi_concise)
     }
-    switch.isChecked = GlobalValues.isDetailedAbiChart
+    syncDetailedAbiSwitch(viewModel.isDetailedAbiChart)
   }
 
   override fun onMenuItemSelected(menuItem: MenuItem) = false
+
+  private fun syncDetailedAbiSwitch(isDetailedAbiChart: Boolean) {
+    detailedAbiSwitch?.let {
+      if (it.isChecked != isDetailedAbiChart) {
+        it.isChecked = isDetailedAbiChart
+      }
+      it.text =
+        if (isDetailedAbiChart) getString(R.string.chart_abi_detailed) else getString(R.string.chart_abi_concise)
+    }
+  }
 }

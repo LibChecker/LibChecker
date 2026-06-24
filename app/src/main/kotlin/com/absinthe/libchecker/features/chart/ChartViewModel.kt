@@ -55,6 +55,8 @@ class ChartViewModel(
 
   private val _detailAbiSwitch = MutableStateFlow(chartSettingsRepository.isDetailedAbiChart)
   val detailAbiSwitch = _detailAbiSwitch.asStateFlow()
+  val isDetailedAbiChart: Boolean
+    get() = _detailAbiSwitch.value
 
   private val _detailAbiSwitchVisibility = MutableStateFlow(true)
   val detailAbiSwitchVisibility = _detailAbiSwitchVisibility.asStateFlow()
