@@ -58,9 +58,6 @@ Important `:app` boundaries:
   data in through providers instead of importing `data/*`.
 - `domain/app/` owns app-list use cases and repository/factory interfaces.
   Keep package-list synchronization rules here instead of in UI controllers.
-- When a `domain/*` package becomes crowded, split by durable capability or
-  seam in a package-move slice; keep package moves separate from behavior
-  changes.
 - `data/app/` adapts Android package APIs, Room repositories, and local
   package-change sources to the `domain/app/` interfaces.
 - `domain/statistics/` owns statistics/reference computation rules. Keep
@@ -121,9 +118,9 @@ Important `:app` boundaries:
   and network calls must run off the main thread.
 - Package analysis must keep working for installed apps, APK, split APK, APKS,
   XAPK, HAP, missing icons/labels, corrupted archives, and OEM/API differences.
-- Prefer `FileProvider` for sharing/exporting app files. The app-info source
-  action is the only `file://` path; keep it behind `GetAppInfoActionsUseCase`
-  and `AllowFileUriExposureUseCase`.
+- Prefer `FileProvider` for sharing/exporting app files. Any legacy `file://`
+  exposure must stay narrowly scoped and idempotent; new paths should not
+  expand it.
 - Keep `foss` free of market-only Google/Firebase behavior.
 - Review manifests carefully when changing exported activities, deep links,
   FileProvider, Shizuku provider authorities, package visibility, foreground

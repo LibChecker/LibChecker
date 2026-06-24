@@ -7,7 +7,7 @@ import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.constant.AbilityType
-import com.absinthe.libchecker.domain.app.AppDetailComponentChips
+import com.absinthe.libchecker.domain.app.detail.AppDetailComponentChips
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import kotlinx.coroutines.flow.MutableStateFlow

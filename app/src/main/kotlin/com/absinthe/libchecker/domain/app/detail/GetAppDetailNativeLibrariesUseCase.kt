@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.app
+package com.absinthe.libchecker.domain.app.detail
 
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
@@ -9,6 +9,7 @@ import com.absinthe.libchecker.constant.Constants.NO_LIBS
 import com.absinthe.libchecker.constant.Constants.OVERLAY
 import com.absinthe.libchecker.constant.GlobalFeatures
 import com.absinthe.libchecker.database.RulesRepository
+import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.OsUtils
