@@ -7,6 +7,9 @@ import com.absinthe.libchecker.domain.app.GetAppDetailMetadataChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailSignatureChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailStaticLibraryChipsUseCase
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
+import com.absinthe.libchecker.features.applist.detail.content.DetailComponentContentLoader
+import com.absinthe.libchecker.features.applist.detail.content.DetailNativeLibContentLoader
+import com.absinthe.libchecker.features.applist.detail.content.DetailPermissionContentLoader
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

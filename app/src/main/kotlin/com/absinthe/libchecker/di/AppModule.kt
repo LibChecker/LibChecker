@@ -128,14 +128,14 @@ import com.absinthe.libchecker.domain.statistics.GetLibReferenceIconPackagesUseC
 import com.absinthe.libchecker.domain.statistics.LibReferenceSettingsRepository
 import com.absinthe.libchecker.features.album.track.TrackViewModel
 import com.absinthe.libchecker.features.applist.detail.DetailActionLoader
-import com.absinthe.libchecker.features.applist.detail.DetailComponentContentLoader
 import com.absinthe.libchecker.features.applist.detail.DetailContentLoader
 import com.absinthe.libchecker.features.applist.detail.DetailFeatureLoader
 import com.absinthe.libchecker.features.applist.detail.DetailFilterController
-import com.absinthe.libchecker.features.applist.detail.DetailNativeLibContentLoader
 import com.absinthe.libchecker.features.applist.detail.DetailPackageLoader
-import com.absinthe.libchecker.features.applist.detail.DetailPermissionContentLoader
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
+import com.absinthe.libchecker.features.applist.detail.content.DetailComponentContentLoader
+import com.absinthe.libchecker.features.applist.detail.content.DetailNativeLibContentLoader
+import com.absinthe.libchecker.features.applist.detail.content.DetailPermissionContentLoader
 import com.absinthe.libchecker.features.chart.ChartViewModel
 import com.absinthe.libchecker.features.home.HomeViewModel
 import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
