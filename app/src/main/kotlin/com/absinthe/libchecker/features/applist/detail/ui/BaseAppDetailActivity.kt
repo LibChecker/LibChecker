@@ -2,20 +2,13 @@ package com.absinthe.libchecker.features.applist.detail.ui
 
 import android.content.Intent
 import android.content.pm.PackageInfo
-import android.graphics.Color
 import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
-import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
-import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
@@ -61,9 +54,7 @@ import timber.log.Timber
 
 abstract class BaseAppDetailActivity :
   CheckPackageOnResumingActivity<ActivityAppDetailBinding>(),
-  IDetailContainer,
-  SearchView.OnQueryTextListener,
-  MenuProvider {
+  IDetailContainer {
 
   protected val viewModel: DetailViewModel by viewModel()
   private val appDetailSettingsRepository: AppDetailSettingsRepository by inject()
@@ -141,6 +132,14 @@ abstract class BaseAppDetailActivity :
       onProcessClick = ::toggleProcessMode
     )
   }
+  private val menuController by unsafeLazy {
+    DetailMenuController(
+      context = this,
+      toolbar = binding.toolbar,
+      onNavigateUp = ::finish,
+      onQueryTextChanged = ::onSearchTextChanged
+    )
+  }
 
   private var isHarmonyMode = false
   private var packageUiGeneration = 0
@@ -149,7 +148,7 @@ abstract class BaseAppDetailActivity :
     binding = ActivityAppDetailBinding.inflate(layoutInflater)
     super.onCreate(savedInstanceState)
     binding.viewpager.isSaveEnabled = false
-    addMenuProvider(this, this, Lifecycle.State.CREATED)
+    addMenuProvider(menuController, this, Lifecycle.State.CREATED)
     setSupportActionBar(getToolbar())
     binding.toolbar.isBackInvokedCallbackEnabled = false
     supportActionBar?.apply {
@@ -158,8 +157,8 @@ abstract class BaseAppDetailActivity :
     }
     onBackPressedDispatcher.addBackStateHandler(
       lifecycleOwner = this,
-      enabledState = { !isKeyboardShowing() && binding.toolbar.hasExpandedActionView() },
-      handler = { binding.toolbar.collapseActionView() }
+      enabledState = { !isKeyboardShowing() && menuController.hasExpandedActionView() },
+      handler = { menuController.collapseActionView() }
     )
     initObserver()
   }
@@ -329,41 +328,9 @@ abstract class BaseAppDetailActivity :
     }
   }
 
-  override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-    if (menuItem.itemId == android.R.id.home) {
-      finish()
-    }
-    return true
-  }
-
-  override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-    menuInflater.inflate(R.menu.app_detail_menu, menu)
-
-    val searchView = SearchView(this).apply {
-      setIconifiedByDefault(false)
-      setOnQueryTextListener(this@BaseAppDetailActivity)
-      queryHint = getText(R.string.search_hint)
-      isQueryRefinementEnabled = true
-
-      findViewById<View>(androidx.appcompat.R.id.search_plate).apply {
-        setBackgroundColor(Color.TRANSPARENT)
-      }
-    }
-
-    menu.findItem(R.id.search).apply {
-      setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW or MenuItem.SHOW_AS_ACTION_IF_ROOM)
-      actionView = searchView
-    }
-  }
-
-  override fun onQueryTextSubmit(query: String?): Boolean {
-    return false
-  }
-
-  override fun onQueryTextChange(newText: String): Boolean {
+  private fun onSearchTextChanged(newText: String) {
     viewModel.filterState.queriedText = newText
     detailFragmentManager.deliverFilterItemsByText(newText, lifecycleScope)
-    return false
   }
 
   override fun collapseAppBar() {
