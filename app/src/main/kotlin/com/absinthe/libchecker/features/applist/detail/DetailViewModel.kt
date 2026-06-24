@@ -30,7 +30,7 @@ class DetailViewModel(
   private val detailPackageLoader: DetailPackageLoader
 ) : ViewModel() {
   val contentState = DetailContentState()
-  val featureState = DetailFeatureState()
+  val featureState = detailFeatureLoader.featureState
   val filterState = detailFilterController.filterState
   private val packageState: DetailPackageState
     get() = detailPackageLoader.packageState
@@ -228,7 +228,7 @@ class DetailViewModel(
   }
 
   fun emitFeature(feature: VersionedFeature) {
-    detailFeatureLoader.emitFeature(viewModelScope, featureState, feature)
+    detailFeatureLoader.emitFeature(viewModelScope, feature)
   }
 
   suspend fun getRelatedAppListItem(packageName: String): RelatedAppListItem? {
@@ -240,15 +240,15 @@ class DetailViewModel(
   fun buildSignatureDetailItems(detail: String) = detailActionLoader.buildSignatureDetailItems(detail)
 
   fun initFeatures(packageInfo: PackageInfo, features: Int) {
-    detailFeatureLoader.initFeatures(viewModelScope, featureState, packageState, packageInfo, features)
+    detailFeatureLoader.initFeatures(viewModelScope, packageState, packageInfo, features)
   }
 
   fun initAbiInfo(packageInfo: PackageInfo, apkAnalyticsMode: Boolean) {
-    detailFeatureLoader.initAbiInfo(viewModelScope, featureState, packageInfo, apkAnalyticsMode)
+    detailFeatureLoader.initAbiInfo(viewModelScope, packageInfo, apkAnalyticsMode)
   }
 
   fun initAbiInfo(apkPreviewInfo: ApkPreviewInfo) {
-    detailFeatureLoader.initAbiInfo(viewModelScope, featureState, apkPreviewInfo)
+    detailFeatureLoader.initAbiInfo(viewModelScope, apkPreviewInfo)
   }
 
   fun filterDetailItems(

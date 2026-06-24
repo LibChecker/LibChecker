@@ -24,6 +24,8 @@ class DetailFeatureLoader(
   private val buildAppDetailHeaderTitleDataUseCase: BuildAppDetailHeaderTitleDataUseCase,
   private val hasInstalledStaticLibrariesUseCase: HasInstalledStaticLibrariesUseCase
 ) {
+  val featureState = DetailFeatureState()
+
   fun buildAppDetailAbiLabelData(
     abi: Int,
     abiSet: Collection<Int>,
@@ -65,7 +67,6 @@ class DetailFeatureLoader(
 
   fun emitFeature(
     scope: CoroutineScope,
-    featureState: DetailFeatureState,
     feature: VersionedFeature
   ) = scope.launch {
     featureState.emitFeature(feature)
@@ -73,7 +74,6 @@ class DetailFeatureLoader(
 
   fun initFeatures(
     scope: CoroutineScope,
-    featureState: DetailFeatureState,
     packageState: DetailPackageState,
     packageInfo: PackageInfo,
     features: Int
@@ -86,7 +86,6 @@ class DetailFeatureLoader(
 
   fun initAbiInfo(
     scope: CoroutineScope,
-    featureState: DetailFeatureState,
     packageInfo: PackageInfo,
     apkAnalyticsMode: Boolean
   ) = scope.launch(Dispatchers.IO) {
@@ -97,7 +96,6 @@ class DetailFeatureLoader(
 
   fun initAbiInfo(
     scope: CoroutineScope,
-    featureState: DetailFeatureState,
     apkPreviewInfo: ApkPreviewInfo
   ) = scope.launch(Dispatchers.IO) {
     getAppDetailAbiUseCase(apkPreviewInfo)?.let {
