@@ -9,8 +9,6 @@ import com.absinthe.libchecker.annotation.STATUS_NOT_START
 import com.absinthe.libchecker.annotation.STATUS_START_INIT
 import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE
 import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE_END
-import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.ClearApkCacheUseCase
@@ -22,6 +20,7 @@ import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.PackageChangeState
 import com.absinthe.libchecker.domain.app.SyncAppListChangesUseCase
 import com.absinthe.libchecker.domain.statistics.ComputeLibReferenceUseCase
+import com.absinthe.libchecker.domain.statistics.GetLibReferenceConfigUseCase
 import com.absinthe.libchecker.domain.statistics.GetLibReferenceIconPackagesUseCase
 import com.absinthe.libchecker.domain.statistics.LibReferenceItem
 import com.absinthe.libchecker.features.statistics.bean.LibReference
@@ -48,6 +47,7 @@ class HomeViewModel(
   private val exportAppListToUriUseCase: ExportAppListToUriUseCase,
   private val getAppListContentUseCase: GetAppListContentUseCase,
   private val getLibReferenceIconPackagesUseCase: GetLibReferenceIconPackagesUseCase,
+  private val getLibReferenceConfigUseCase: GetLibReferenceConfigUseCase,
   private val clearApkCacheUseCase: ClearApkCacheUseCase
 ) : ViewModel() {
 
@@ -68,7 +68,7 @@ class HomeViewModel(
     get() = _savedRefList
 
   private var referenceIndex: ComputeLibReferenceUseCase.ReferenceIndex? = null
-  var savedThreshold = GlobalValues.libReferenceThreshold
+  var savedThreshold = getLibReferenceConfigUseCase.threshold
 
   var controller: IListController? = null
   var appListStatus: Int = STATUS_NOT_START
@@ -305,10 +305,7 @@ class HomeViewModel(
       referenceIndex = null
       _libReference.emit(null)
       val index = computeLibReferenceUseCase.buildIndex(
-        ComputeLibReferenceUseCase.ReferenceConfig(
-          showSystemApps = GlobalValues.isShowSystemApps,
-          options = GlobalValues.libReferenceOptions
-        ),
+        getLibReferenceConfigUseCase.getReferenceConfig(),
         ::updateLibRefProgress
       ) ?: return@launch
       referenceIndex = index
@@ -333,10 +330,7 @@ class HomeViewModel(
       try {
         val refList = computeLibReferenceUseCase.matchRules(
           index,
-          ComputeLibReferenceUseCase.MatchConfig(
-            threshold = GlobalValues.libReferenceThreshold,
-            onlyNotMarked = GlobalValues.libReferenceOptions and LibReferenceOptions.ONLY_NOT_MARKED > 0
-          ),
+          getLibReferenceConfigUseCase.getMatchConfig(),
           ::updateLibRefProgress
         )?.map { it.toLibReference() } ?: return@launch
 
@@ -358,7 +352,7 @@ class HomeViewModel(
 
   fun refreshRef() = viewModelScope.launch(Dispatchers.IO) {
     _savedRefList?.let { ref ->
-      val threshold = GlobalValues.libReferenceThreshold
+      val threshold = getLibReferenceConfigUseCase.threshold
       _libReference.emit(ref.filter { it.referredList.size >= threshold })
     }
   }

@@ -11,6 +11,7 @@ import com.absinthe.libchecker.data.snapshot.GlobalSnapshotSelectionRepository
 import com.absinthe.libchecker.data.snapshot.LocalSnapshotRepository
 import com.absinthe.libchecker.data.snapshot.ProtoSnapshotArchiveCodec
 import com.absinthe.libchecker.data.statistics.CachedAndroidDistributionRepository
+import com.absinthe.libchecker.data.statistics.GlobalLibReferenceSettingsRepository
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.domain.app.AllowFileUriExposureUseCase
@@ -112,7 +113,9 @@ import com.absinthe.libchecker.domain.statistics.BuildPageSize16KBChartDataUseCa
 import com.absinthe.libchecker.domain.statistics.ComputeLibReferenceUseCase
 import com.absinthe.libchecker.domain.statistics.GetAndroidDistributionUseCase
 import com.absinthe.libchecker.domain.statistics.GetLibReferenceAppsUseCase
+import com.absinthe.libchecker.domain.statistics.GetLibReferenceConfigUseCase
 import com.absinthe.libchecker.domain.statistics.GetLibReferenceIconPackagesUseCase
+import com.absinthe.libchecker.domain.statistics.LibReferenceSettingsRepository
 import com.absinthe.libchecker.features.album.track.TrackViewModel
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.chart.ChartViewModel
@@ -135,6 +138,7 @@ val appModule = module {
   single<SnapshotSelectionRepository> { GlobalSnapshotSelectionRepository() }
   single<SnapshotRepository> { LocalSnapshotRepository(get(), get()) }
   single<SnapshotArchiveCodec> { ProtoSnapshotArchiveCodec() }
+  single<LibReferenceSettingsRepository> { GlobalLibReferenceSettingsRepository() }
   single { AllowFileUriExposureUseCase() }
   factory { InitializeAppListUseCase(get(), get(), get()) }
   factory { SyncAppListChangesUseCase(get(), get(), get()) }
@@ -145,6 +149,7 @@ val appModule = module {
   factory { BuildPageSize16KBChartDataUseCase(get()) }
   factory { ComputeLibReferenceUseCase(get()) }
   factory { GetAndroidDistributionUseCase(get()) }
+  factory { GetLibReferenceConfigUseCase(get()) }
   factory { GetLibReferenceIconPackagesUseCase(get()) }
   factory { GetLibReferenceAppsUseCase(get()) }
   factory { ExportAppListUseCase(get(), get()) }
@@ -295,6 +300,7 @@ val appModule = module {
       exportAppListToUriUseCase = get(),
       getAppListContentUseCase = get(),
       getLibReferenceIconPackagesUseCase = get(),
+      getLibReferenceConfigUseCase = get(),
       clearApkCacheUseCase = get()
     )
   }
