@@ -29,7 +29,7 @@ class DetailViewModel(
   private val detailFeatureLoader: DetailFeatureLoader,
   private val detailPackageLoader: DetailPackageLoader
 ) : ViewModel() {
-  val contentState = DetailContentState()
+  val contentState = detailContentLoader.contentState
   val featureState = detailFeatureLoader.featureState
   val filterState = detailFilterController.filterState
   private val packageState: DetailPackageState
@@ -163,33 +163,32 @@ class DetailViewModel(
 
   fun reset() {
     Timber.d("reset")
-    detailContentLoader.cancelAll()
-    contentState.reset()
+    detailContentLoader.reset()
     detailFilterController.reset()
   }
 
   fun initSoAnalysisData() {
-    detailContentLoader.initSoAnalysisData(viewModelScope, contentState, featureState, packageState)
+    detailContentLoader.initSoAnalysisData(viewModelScope, featureState, packageState)
   }
 
   fun loadSoAnalysisData(tab: String) {
-    detailContentLoader.loadSoAnalysisData(viewModelScope, contentState, packageState, tab)
+    detailContentLoader.loadSoAnalysisData(viewModelScope, packageState, tab)
   }
 
   fun initStaticData() {
-    detailContentLoader.initStaticData(viewModelScope, contentState, packageState)
+    detailContentLoader.initStaticData(viewModelScope, packageState)
   }
 
   fun initMetaDataData() {
-    detailContentLoader.initMetaDataData(viewModelScope, contentState, packageState)
+    detailContentLoader.initMetaDataData(viewModelScope, packageState)
   }
 
   fun initPermissionData() {
-    detailContentLoader.initPermissionData(viewModelScope, contentState, featureState, packageState)
+    detailContentLoader.initPermissionData(viewModelScope, featureState, packageState)
   }
 
   fun initDexData() {
-    detailContentLoader.initDexData(viewModelScope, contentState, packageState)
+    detailContentLoader.initDexData(viewModelScope, packageState)
   }
 
   fun cancelInitDexDataJob() {
@@ -197,14 +196,14 @@ class DetailViewModel(
   }
 
   fun initSignatures() {
-    detailContentLoader.initSignatures(viewModelScope, contentState, packageState)
+    detailContentLoader.initSignatures(viewModelScope, packageState)
   }
 
   fun initComponentsData() {
-    detailContentLoader.initComponentsData(viewModelScope, contentState, packageState)
+    detailContentLoader.initComponentsData(viewModelScope, packageState)
   }
 
-  fun initComponentsDataInPreview() = detailContentLoader.initComponentsDataInPreview(viewModelScope, contentState, packageState)
+  fun initComponentsDataInPreview() = detailContentLoader.initComponentsDataInPreview(viewModelScope, packageState)
 
   suspend fun getLibraryDetailDialogHeader(
     libName: String,
@@ -224,7 +223,7 @@ class DetailViewModel(
   suspend fun getPermissionDetail(permissionName: String) = detailActionLoader.getPermissionDetail(permissionName)
 
   fun initAbilities(packageName: String) {
-    detailContentLoader.initAbilities(viewModelScope, contentState, packageName)
+    detailContentLoader.initAbilities(viewModelScope, packageName)
   }
 
   fun emitFeature(feature: VersionedFeature) {

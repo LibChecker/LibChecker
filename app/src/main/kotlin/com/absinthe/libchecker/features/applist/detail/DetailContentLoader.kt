@@ -33,15 +33,20 @@ class DetailContentLoader(
   private val getAppDetailStaticLibraryChipsUseCase: GetAppDetailStaticLibraryChipsUseCase,
   private val appDetailSettingsRepository: AppDetailSettingsRepository
 ) {
+  val contentState = DetailContentState()
   private val loadJobsState = DetailLoadJobsState()
 
-  fun cancelAll() {
+  private fun cancelAll() {
     loadJobsState.cancelAll()
+  }
+
+  fun reset() {
+    cancelAll()
+    contentState.reset()
   }
 
   fun initSoAnalysisData(
     scope: CoroutineScope,
-    contentState: DetailContentState,
     featureState: DetailFeatureState,
     packageState: DetailPackageState
   ) {
@@ -70,7 +75,6 @@ class DetailContentLoader(
 
   fun loadSoAnalysisData(
     scope: CoroutineScope,
-    contentState: DetailContentState,
     packageState: DetailPackageState,
     tab: String
   ) {
@@ -91,7 +95,6 @@ class DetailContentLoader(
 
   fun initStaticData(
     scope: CoroutineScope,
-    contentState: DetailContentState,
     packageState: DetailPackageState
   ) {
     loadJobsState.initStaticJob = launchDetailDataJob(
@@ -110,7 +113,6 @@ class DetailContentLoader(
 
   fun initMetaDataData(
     scope: CoroutineScope,
-    contentState: DetailContentState,
     packageState: DetailPackageState
   ) {
     loadJobsState.initMetaDataJob = launchDetailDataJob(
@@ -130,7 +132,6 @@ class DetailContentLoader(
 
   fun initPermissionData(
     scope: CoroutineScope,
-    contentState: DetailContentState,
     featureState: DetailFeatureState,
     packageState: DetailPackageState
   ) {
@@ -155,7 +156,6 @@ class DetailContentLoader(
 
   fun initDexData(
     scope: CoroutineScope,
-    contentState: DetailContentState,
     packageState: DetailPackageState
   ) {
     loadJobsState.initDexJob = launchDetailDataJob(
@@ -177,7 +177,6 @@ class DetailContentLoader(
 
   fun initSignatures(
     scope: CoroutineScope,
-    contentState: DetailContentState,
     packageState: DetailPackageState
   ) {
     loadJobsState.initSignaturesJob = launchDetailDataJob(
@@ -196,7 +195,6 @@ class DetailContentLoader(
 
   fun initComponentsData(
     scope: CoroutineScope,
-    contentState: DetailContentState,
     packageState: DetailPackageState
   ) {
     loadJobsState.initComponentsJob = launchDetailDataJob(
@@ -218,7 +216,6 @@ class DetailContentLoader(
 
   fun initComponentsDataInPreview(
     scope: CoroutineScope,
-    contentState: DetailContentState,
     packageState: DetailPackageState
   ) = scope.launch(Dispatchers.IO) {
     val previewInfo = packageState.apkPreviewInfo ?: return@launch
@@ -228,7 +225,6 @@ class DetailContentLoader(
 
   fun initAbilities(
     scope: CoroutineScope,
-    contentState: DetailContentState,
     packageName: String
   ) = scope.launch(Dispatchers.IO) {
     contentState.resetAbilities()
