@@ -14,8 +14,8 @@ import com.absinthe.libchecker.annotation.SIGNATURES
 import com.absinthe.libchecker.constant.AbilityType
 
 data class DetailTabSpec(
-  val types: MutableList<Int>,
-  val titles: MutableList<CharSequence>
+  val types: List<Int>,
+  val titles: List<CharSequence>
 )
 
 class DetailTabSpecBuilder(private val context: Context) {
@@ -33,8 +33,8 @@ class DetailTabSpecBuilder(private val context: Context) {
     }
 
     return DetailTabSpec(
-      types = visibleItems.mapTo(mutableListOf()) { it.type },
-      titles = visibleItems.mapTo(mutableListOf()) { context.getText(it.titleRes) }
+      types = visibleItems.map { it.type },
+      titles = visibleItems.map { context.getText(it.titleRes) }
     )
   }
 

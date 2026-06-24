@@ -12,22 +12,15 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import androidx.annotation.RequiresApi
+import androidx.annotation.StringRes
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.MenuProvider
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager2.adapter.FragmentStateAdapter
-import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.annotation.METADATA
-import com.absinthe.libchecker.annotation.NATIVE
-import com.absinthe.libchecker.annotation.PERMISSION
-import com.absinthe.libchecker.annotation.SIGNATURES
-import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.database.entity.Features
@@ -44,13 +37,6 @@ import com.absinthe.libchecker.features.applist.detail.IDetailContainer
 import com.absinthe.libchecker.features.applist.detail.bean.AppDetailToolbarItem
 import com.absinthe.libchecker.features.applist.detail.bean.DetailExtraBean
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.AppDetailToolbarAdapter
-import com.absinthe.libchecker.features.applist.detail.ui.impl.AbilityAnalysisFragment
-import com.absinthe.libchecker.features.applist.detail.ui.impl.ComponentsAnalysisFragment
-import com.absinthe.libchecker.features.applist.detail.ui.impl.MetaDataAnalysisFragment
-import com.absinthe.libchecker.features.applist.detail.ui.impl.NativeAnalysisFragment
-import com.absinthe.libchecker.features.applist.detail.ui.impl.PermissionAnalysisFragment
-import com.absinthe.libchecker.features.applist.detail.ui.impl.SignaturesAnalysisFragment
-import com.absinthe.libchecker.features.applist.detail.ui.impl.StaticAnalysisFragment
 import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ENTITY
 import com.absinthe.libchecker.features.snapshot.detail.ui.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
@@ -66,8 +52,6 @@ import com.absinthe.libchecker.utils.extensions.isKeyboardShowing
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
 import kotlin.math.abs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -89,7 +73,8 @@ abstract class BaseAppDetailActivity :
   protected val viewModel: DetailViewModel by viewModel()
   private val appDetailSettingsRepository: AppDetailSettingsRepository by inject()
   private val appListSettingsRepository: AppListSettingsRepository by inject()
-  protected var typeList = mutableListOf<Int>()
+  protected val typeList: List<Int>
+    get() = tabController.types
 
   override var detailFragmentManager: DetailFragmentManager = DetailFragmentManager()
 
@@ -143,12 +128,19 @@ abstract class BaseAppDetailActivity :
     DetailHeaderExtraInfoBinder(binding.detailsTitle)
   }
   private val tabSpecBuilder by unsafeLazy { DetailTabSpecBuilder(this) }
+  private val tabController by unsafeLazy {
+    DetailTabController(
+      activity = this,
+      viewPager = binding.viewpager,
+      tabLayout = binding.tabLayout,
+      onTabSelected = ::onDetailTabSelected,
+      onProcessTooltipTextChanged = ::updateProcessToolbarTooltip
+    )
+  }
   private val toolbarAdapter by unsafeLazy { AppDetailToolbarAdapter() }
 
   private var isHarmonyMode = false
   private var isToolbarCollapsed = false
-  private var tabLayoutMediator: TabLayoutMediator? = null
-  private var pageChangeCallback: ViewPager2.OnPageChangeCallback? = null
   private var packageUiGeneration = 0
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -171,10 +163,7 @@ abstract class BaseAppDetailActivity :
   }
 
   override fun onDestroy() {
-    tabLayoutMediator?.detach()
-    tabLayoutMediator = null
-    pageChangeCallback?.let { binding.viewpager.unregisterOnPageChangeCallback(it) }
-    pageChangeCallback = null
+    tabController.reset()
     super.onDestroy()
   }
 
@@ -314,102 +303,24 @@ abstract class BaseAppDetailActivity :
       isHarmonyMode = isHarmonyMode,
       isApkPreview = viewModel.isApkPreview
     )
-    typeList = tabSpec.types
-    val tabTitles = tabSpec.titles
+    tabController.setup(
+      packageName = packageName,
+      isHarmonyMode = isHarmonyMode,
+      tabSpec = tabSpec
+    )
 
     if (sharedLibraryFiles?.isNotEmpty() == true) {
       lifecycleScope.launch {
         if (viewModel.hasInstalledStaticLibraries(packageName)) {
-          if (uiGeneration != packageUiGeneration || STATIC in typeList) {
+          if (uiGeneration != packageUiGeneration) {
             return@launch
           }
-          typeList.add(1, STATIC)
-          tabTitles.add(1, getText(R.string.ref_category_static))
-          binding.viewpager.adapter?.notifyItemInserted(1)
-          onStaticLibsAvailable()
+          if (tabController.insertStaticLibraryTab(getText(R.string.ref_category_static))) {
+            onStaticLibsAvailable()
+          }
         }
       }
     }
-
-    binding.viewpager.apply {
-      adapter = object : FragmentStateAdapter(this@BaseAppDetailActivity) {
-        override fun getItemCount(): Int {
-          return typeList.size
-        }
-
-        override fun createFragment(position: Int): Fragment {
-          return when (val type = typeList.getOrElse(position) { NATIVE }) {
-            NATIVE -> NativeAnalysisFragment.newInstance(packageName)
-
-            STATIC -> StaticAnalysisFragment.newInstance(packageName)
-
-            PERMISSION -> PermissionAnalysisFragment.newInstance(packageName)
-
-            METADATA -> MetaDataAnalysisFragment.newInstance(packageName)
-
-            // DEX -> DexAnalysisFragment.newInstance(packageName)
-
-            SIGNATURES -> SignaturesAnalysisFragment.newInstance(packageName)
-
-            else -> if (!isHarmonyMode) {
-              ComponentsAnalysisFragment.newInstance(type)
-            } else {
-              AbilityAnalysisFragment.newInstance(type)
-            }
-          }
-        }
-
-        override fun getItemId(position: Int): Long {
-          return typeList.getOrElse(position) { NATIVE }.toLong()
-        }
-
-        override fun containsItem(itemId: Long): Boolean {
-          return typeList.any { it.toLong() == itemId }
-        }
-      }
-      pageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
-        override fun onPageSelected(position: Int) {
-          super.onPageSelected(position)
-          val tooltipTextRes = if (typeList.getOrNull(position) == NATIVE) {
-            R.string.menu_split
-          } else {
-            R.string.menu_process
-          }
-          if (toolbarProcessItem.tooltipTextRes != tooltipTextRes) {
-            toolbarProcessItem.tooltipTextRes = tooltipTextRes
-            toolbarAdapter.data.indexOf(toolbarProcessItem).takeIf { it >= 0 }?.let {
-              toolbarAdapter.notifyItemChanged(it)
-            }
-          }
-        }
-      }.also { registerOnPageChangeCallback(it) }
-    }
-    binding.tabLayout.apply {
-      removeAllTabs()
-      tabTitles.forEach {
-        addTab(newTab().apply { text = it })
-      }
-      addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-        override fun onTabSelected(tab: TabLayout.Tab) {
-          val type = typeList.getOrNull(tab.position) ?: return
-          val count = viewModel.filterState.itemsCountList[type]
-          if (detailFragmentManager.currentItemsCount != count) {
-            binding.tsComponentCount.setText(count.toString())
-            detailFragmentManager.currentItemsCount = count
-          }
-          detailFragmentManager.selectedPosition = type
-        }
-
-        override fun onTabUnselected(tab: TabLayout.Tab?) {}
-
-        override fun onTabReselected(tab: TabLayout.Tab?) {}
-      })
-    }
-
-    tabLayoutMediator =
-      TabLayoutMediator(binding.tabLayout, binding.viewpager) { tab, position ->
-        tab.text = tabTitles.getOrNull(position)
-      }.also { it.attach() }
 
     if (!featureListController.isInitialized) {
       if (viewModel.isApkPreview) {
@@ -498,10 +409,8 @@ abstract class BaseAppDetailActivity :
   private fun initObserver() {
     viewModel.also {
       it.filterState.itemsCountStateFlow.onEach { live ->
-        val position = binding.tabLayout.selectedTabPosition
-        if (position >= 0 && detailFragmentManager.currentItemsCount != live.count && typeList[position] == live.locate) {
-          binding.tsComponentCount.setText(live.count.toString())
-          detailFragmentManager.currentItemsCount = live.count
+        if (detailFragmentManager.currentItemsCount != live.count && tabController.selectedType == live.locate) {
+          updateCurrentItemsCount(live.count)
         }
       }.launchIn(lifecycleScope)
       it.filterState.processToolIconVisibilityStateFlow.onEach { visible ->
@@ -539,14 +448,31 @@ abstract class BaseAppDetailActivity :
   }
 
   private fun resetUiState() {
-    tabLayoutMediator?.detach()
-    tabLayoutMediator = null
-    pageChangeCallback?.let { binding.viewpager.unregisterOnPageChangeCallback(it) }
-    pageChangeCallback = null
-    binding.viewpager.adapter = null
-    binding.tabLayout.clearOnTabSelectedListeners()
+    tabController.reset()
     featureListController.reset()
     toolbarAdapter.setList(emptyList())
+  }
+
+  private fun onDetailTabSelected(type: Int) {
+    val count = viewModel.filterState.itemsCountList[type]
+    if (detailFragmentManager.currentItemsCount != count) {
+      updateCurrentItemsCount(count)
+    }
+    detailFragmentManager.selectedPosition = type
+  }
+
+  private fun updateCurrentItemsCount(count: Int) {
+    binding.tsComponentCount.setText(count.toString())
+    detailFragmentManager.currentItemsCount = count
+  }
+
+  private fun updateProcessToolbarTooltip(@StringRes tooltipTextRes: Int) {
+    if (toolbarProcessItem.tooltipTextRes != tooltipTextRes) {
+      toolbarProcessItem.tooltipTextRes = tooltipTextRes
+      toolbarAdapter.data.indexOf(toolbarProcessItem).takeIf { it >= 0 }?.let {
+        toolbarAdapter.notifyItemChanged(it)
+      }
+    }
   }
 
   private val toolbarQuicklyLaunchItem by unsafeLazy {
