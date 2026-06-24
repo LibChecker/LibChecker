@@ -8,10 +8,9 @@ class HasInstalledStaticLibrariesUseCase(
   private val installedAppRepository: InstalledAppRepository
 ) {
 
-  suspend operator fun invoke(packageName: String): Boolean =
-    withContext(Dispatchers.IO) {
-      val packageInfo = installedAppRepository.getPackageInfo(packageName)
-        ?: return@withContext false
-      PackageUtils.getStaticLibs(packageInfo).isNotEmpty()
-    }
+  suspend operator fun invoke(packageName: String): Boolean = withContext(Dispatchers.IO) {
+    val packageInfo = installedAppRepository.getPackageInfo(packageName)
+      ?: return@withContext false
+    PackageUtils.getStaticLibs(packageInfo).isNotEmpty()
+  }
 }

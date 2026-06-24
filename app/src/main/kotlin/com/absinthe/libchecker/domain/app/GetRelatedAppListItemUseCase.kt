@@ -8,12 +8,11 @@ class GetRelatedAppListItemUseCase(
   private val installedAppRepository: InstalledAppRepository
 ) {
 
-  suspend operator fun invoke(packageName: String): RelatedAppListItem? =
-    withContext(Dispatchers.IO) {
-      val item = appListRepository.getItem(packageName) ?: return@withContext null
-      RelatedAppListItem(
-        item = item,
-        packageInfo = installedAppRepository.getPackageInfo(packageName)
-      )
-    }
+  suspend operator fun invoke(packageName: String): RelatedAppListItem? = withContext(Dispatchers.IO) {
+    val item = appListRepository.getItem(packageName) ?: return@withContext null
+    RelatedAppListItem(
+      item = item,
+      packageInfo = installedAppRepository.getPackageInfo(packageName)
+    )
+  }
 }

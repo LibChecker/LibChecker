@@ -228,11 +228,9 @@ class DetailViewModel(
 
   suspend fun getXposedModuleInfo(packageName: String) = getXposedModuleInfoUseCase(packageName)
 
-  suspend fun extractNativeLibrary(item: LibStringItem) =
-    extractNativeLibraryUseCase(packageInfo, item, isApkPreview)
+  suspend fun extractNativeLibrary(item: LibStringItem) = extractNativeLibraryUseCase(packageInfo, item, isApkPreview)
 
-  suspend fun prepareAppPackageShareFile(cacheDir: File, packageName: String) =
-    prepareAppPackageShareFileUseCase(cacheDir, packageName)
+  suspend fun prepareAppPackageShareFile(cacheDir: File, packageName: String) = prepareAppPackageShareFileUseCase(cacheDir, packageName)
 
   suspend fun exportAppPackageShareFile(
     shareFile: AppPackageShareFile,
@@ -257,8 +255,7 @@ class DetailViewModel(
     return prepareApkAnalysisPackageUseCase(cacheDir, uri)
   }
 
-  suspend fun getElfDetail(packageName: String, elfPath: String) =
-    getElfDetailUseCase(packageName, elfPath)
+  suspend fun getElfDetail(packageName: String, elfPath: String) = getElfDetailUseCase(packageName, elfPath)
 
   suspend fun isInstalledAppComparisonAvailable(packageName: String): Boolean {
     return getInstalledAppComparisonPackageUseCase.isAvailable(packageName)
@@ -472,29 +469,27 @@ class DetailViewModel(
     libName: String,
     @LibType type: Int,
     isValidLib: Boolean
-  ) =
-    getLibraryDetailDialogDataUseCase.getHeader(
-      GetLibraryDetailDialogDataUseCase.HeaderRequest(
-        libName = libName,
-        type = type,
-        isValidLib = isValidLib
-      )
+  ) = getLibraryDetailDialogDataUseCase.getHeader(
+    GetLibraryDetailDialogDataUseCase.HeaderRequest(
+      libName = libName,
+      type = type,
+      isValidLib = isValidLib
     )
+  )
 
   suspend fun getLibraryDetailDialogData(
     libName: String,
     @LibType type: Int,
     regexName: String?,
     isValidLib: Boolean
-  ) =
-    getLibraryDetailDialogDataUseCase(
-      GetLibraryDetailDialogDataUseCase.Request(
-        libName = libName,
-        type = type,
-        regexName = regexName,
-        isValidLib = isValidLib
-      )
+  ) = getLibraryDetailDialogDataUseCase(
+    GetLibraryDetailDialogDataUseCase.Request(
+      libName = libName,
+      type = type,
+      regexName = regexName,
+      isValidLib = isValidLib
     )
+  )
 
   suspend fun getOverlayDetail(item: LCItem) = getOverlayDetailUseCase(item)
 

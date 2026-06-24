@@ -10,23 +10,22 @@ class GetAlternativeLaunchItemsUseCase(
   private val installedAppRepository: InstalledAppRepository
 ) {
 
-  suspend operator fun invoke(packageName: String): List<AlternativeLaunchItem> =
-    withContext(Dispatchers.IO) {
-      val activities = installedAppRepository.getPackageInfo(
-        packageName = packageName,
-        flags = PackageManager.GET_ACTIVITIES
-      )?.activities ?: return@withContext emptyList()
+  suspend operator fun invoke(packageName: String): List<AlternativeLaunchItem> = withContext(Dispatchers.IO) {
+    val activities = installedAppRepository.getPackageInfo(
+      packageName = packageName,
+      flags = PackageManager.GET_ACTIVITIES
+    )?.activities ?: return@withContext emptyList()
 
-      activities.asSequence()
-        .filter(ActivityInfo::exported)
-        .map {
-          AlternativeLaunchItem(
-            label = it.loadLabelOrName(),
-            className = it.name
-          )
-        }
-        .toList()
-    }
+    activities.asSequence()
+      .filter(ActivityInfo::exported)
+      .map {
+        AlternativeLaunchItem(
+          label = it.loadLabelOrName(),
+          className = it.name
+        )
+      }
+      .toList()
+  }
 
   private fun ActivityInfo.loadLabelOrName(): String {
     return runCatching {

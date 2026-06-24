@@ -220,8 +220,7 @@ class SnapshotViewModel(
     return appListRepository.getItem(packageName)
   }
 
-  suspend fun getSnapshotPackageIconSources(packageNames: Collection<String>) =
-    getSnapshotPackageIconSourcesUseCase(packageNames)
+  suspend fun getSnapshotPackageIconSources(packageNames: Collection<String>) = getSnapshotPackageIconSourcesUseCase(packageNames)
 
   suspend fun getApexPackageNames(): Set<String> = getApexPackageNamesUseCase()
 

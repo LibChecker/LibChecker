@@ -19,16 +19,15 @@ class GetAppInfoActionsUseCase(
   private val allowFileUriExposure: AllowFileUriExposureUseCase
 ) {
 
-  suspend operator fun invoke(packageName: String): List<AppInfoActionItem> =
-    withContext(Dispatchers.IO) {
-      listOf(
-        getShowAppInfoList(packageName),
-        getShowAppSourceList(packageName),
-        getShowMarketList(packageName)
-      )
-        .flatten()
-        .distinctBy { it.packageName }
-    }
+  suspend operator fun invoke(packageName: String): List<AppInfoActionItem> = withContext(Dispatchers.IO) {
+    listOf(
+      getShowAppInfoList(packageName),
+      getShowAppSourceList(packageName),
+      getShowMarketList(packageName)
+    )
+      .flatten()
+      .distinctBy { it.packageName }
+  }
 
   private fun getShowAppInfoList(packageName: String): List<AppInfoActionItem> {
     return PackageManagerCompat.queryIntentActivities(

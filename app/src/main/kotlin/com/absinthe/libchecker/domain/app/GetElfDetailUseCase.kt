@@ -11,10 +11,9 @@ class GetElfDetailUseCase(
   private val installedAppRepository: InstalledAppRepository
 ) {
 
-  suspend operator fun invoke(packageName: String, elfPath: String): AppElfDetail? =
-    withContext(Dispatchers.IO) {
-      getElfDetail(packageName, elfPath)
-    }
+  suspend operator fun invoke(packageName: String, elfPath: String): AppElfDetail? = withContext(Dispatchers.IO) {
+    getElfDetail(packageName, elfPath)
+  }
 
   private fun getElfDetail(packageName: String, elfPath: String): AppElfDetail? {
     val packageInfo = installedAppRepository.getPackageInfo(packageName) ?: return null

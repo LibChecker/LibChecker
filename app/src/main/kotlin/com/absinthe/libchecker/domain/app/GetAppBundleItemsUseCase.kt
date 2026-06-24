@@ -13,29 +13,28 @@ class GetAppBundleItemsUseCase {
 
   private val localeCodes by lazy { Locale.getISOLanguages().toSet() }
 
-  suspend operator fun invoke(packageInfo: PackageInfo): List<AppBundleSplitItem> =
-    withContext(Dispatchers.IO) {
-      PackageUtils.getSplitsSourceDir(packageInfo)
-        ?.map { split ->
-          val name = split.substringAfterLast(File.separator)
-          val middleName = name.removeSurrounding("split_config.", ".apk")
-          AppBundleSplitItem(
-            name = name,
-            size = FileUtils.getFileSize(split),
-            kind = when {
-              STRING_ABI_MAP.keys.any { arch -> middleName.contains(arch) } ->
-                AppBundleSplitKind.NativeLibs
+  suspend operator fun invoke(packageInfo: PackageInfo): List<AppBundleSplitItem> = withContext(Dispatchers.IO) {
+    PackageUtils.getSplitsSourceDir(packageInfo)
+      ?.map { split ->
+        val name = split.substringAfterLast(File.separator)
+        val middleName = name.removeSurrounding("split_config.", ".apk")
+        AppBundleSplitItem(
+          name = name,
+          size = FileUtils.getFileSize(split),
+          kind = when {
+            STRING_ABI_MAP.keys.any { arch -> middleName.contains(arch) } ->
+              AppBundleSplitKind.NativeLibs
 
-              middleName.endsWith("dpi") -> AppBundleSplitKind.Materials
+            middleName.endsWith("dpi") -> AppBundleSplitKind.Materials
 
-              localeCodes.contains(middleName) -> AppBundleSplitKind.Strings
+            localeCodes.contains(middleName) -> AppBundleSplitKind.Strings
 
-              else -> AppBundleSplitKind.Others
-            }
-          )
-        }
-        .orEmpty()
-    }
+            else -> AppBundleSplitKind.Others
+          }
+        )
+      }
+      .orEmpty()
+  }
 }
 
 data class AppBundleSplitItem(

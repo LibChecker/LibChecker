@@ -14,17 +14,16 @@ class GetAppInstallSourceDetailsUseCase(
   private val installedAppRepository: InstalledAppRepository
 ) {
 
-  suspend operator fun invoke(packageName: String): AppInstallSourceDetails? =
-    withContext(Dispatchers.IO) {
-      val packageInfo = installedAppRepository.getPackageInfo(packageName) ?: return@withContext null
-      AppInstallSourceDetails(
-        installSource = installedAppRepository.getInstallSource(packageName),
-        installedTime = packageInfo.getInstalledTimeDisplayData(
-          showInstalledTime = !installedAppRepository.getPackageState(packageName).isFrozen
-        ),
-        dexoptInfo = packageInfo.getDexFileOptimizationInfo()
-      )
-    }
+  suspend operator fun invoke(packageName: String): AppInstallSourceDetails? = withContext(Dispatchers.IO) {
+    val packageInfo = installedAppRepository.getPackageInfo(packageName) ?: return@withContext null
+    AppInstallSourceDetails(
+      installSource = installedAppRepository.getInstallSource(packageName),
+      installedTime = packageInfo.getInstalledTimeDisplayData(
+        showInstalledTime = !installedAppRepository.getPackageState(packageName).isFrozen
+      ),
+      dexoptInfo = packageInfo.getDexFileOptimizationInfo()
+    )
+  }
 
   private fun PackageInfo.getInstalledTimeDisplayData(
     showInstalledTime: Boolean

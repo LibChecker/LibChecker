@@ -13,37 +13,35 @@ class GetLibraryDetailDialogDataUseCase(
   private val getLibraryDetailUseCase: GetLibraryDetailUseCase
 ) {
 
-  suspend fun getHeader(request: HeaderRequest): LibraryDetailDialogHeader =
-    withContext(Dispatchers.IO) {
-      val rule = if (request.isValidLib) {
-        RulesRepository.getRule(request.libName, request.type, true)
-      } else {
-        null
-      }
-      LibraryDetailDialogHeader(
-        iconRes = rule?.iconRes ?: com.absinthe.lc.rulesbundle.R.drawable.ic_sdk_placeholder,
-        isSimpleColorIcon = rule?.isSimpleColorIcon == true
-      )
+  suspend fun getHeader(request: HeaderRequest): LibraryDetailDialogHeader = withContext(Dispatchers.IO) {
+    val rule = if (request.isValidLib) {
+      RulesRepository.getRule(request.libName, request.type, true)
+    } else {
+      null
+    }
+    LibraryDetailDialogHeader(
+      iconRes = rule?.iconRes ?: com.absinthe.lc.rulesbundle.R.drawable.ic_sdk_placeholder,
+      isSimpleColorIcon = rule?.isSimpleColorIcon == true
+    )
+  }
+
+  suspend operator fun invoke(request: Request): Result = withContext(Dispatchers.IO) {
+    if (!request.isValidLib) {
+      return@withContext Result.NotFound
     }
 
-  suspend operator fun invoke(request: Request): Result =
-    withContext(Dispatchers.IO) {
-      if (!request.isValidLib) {
-        return@withContext Result.NotFound
-      }
+    val regexName = request.regexName?.takeIf { it.isNotEmpty() }
+    val detail = getLibraryDetailUseCase(
+      libName = regexName ?: request.libName,
+      type = request.type,
+      isRegex = regexName != null
+    ) ?: return@withContext Result.NotFound
 
-      val regexName = request.regexName?.takeIf { it.isNotEmpty() }
-      val detail = getLibraryDetailUseCase(
-        libName = regexName ?: request.libName,
-        type = request.type,
-        isRegex = regexName != null
-      ) ?: return@withContext Result.NotFound
-
-      Result.Found(
-        detail = detail,
-        repoUpdatedTime = detail.getRepoUpdatedTime()
-      )
-    }
+    Result.Found(
+      detail = detail,
+      repoUpdatedTime = detail.getRepoUpdatedTime()
+    )
+  }
 
   private suspend fun LibDetailBean.getRepoUpdatedTime(): String? {
     if (!GlobalValues.isGitHubReachable) {

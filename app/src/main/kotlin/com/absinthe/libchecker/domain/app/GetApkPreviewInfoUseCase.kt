@@ -7,8 +7,7 @@ import kotlinx.coroutines.withContext
 
 class GetApkPreviewInfoUseCase {
 
-  suspend operator fun invoke(url: String): Result<ApkPreviewInfo> =
-    withContext(Dispatchers.IO) {
-      ApkPreview(url).parse()
-    }
+  suspend operator fun invoke(url: String): Result<ApkPreviewInfo> = withContext(Dispatchers.IO) {
+    ApkPreview(url).parse()
+  }
 }

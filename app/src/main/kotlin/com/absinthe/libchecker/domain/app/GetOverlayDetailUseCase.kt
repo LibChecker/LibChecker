@@ -20,30 +20,29 @@ class GetOverlayDetailUseCase(
   private val installedAppRepository: InstalledAppRepository
 ) {
 
-  suspend operator fun invoke(lcItem: LCItem): Result =
-    withContext(Dispatchers.IO) {
-      val packageInfo = installedAppRepository.getPackageInfo(lcItem.packageName)
-        ?: return@withContext Result.NotFound
-      val applicationInfo = packageInfo.applicationInfo ?: return@withContext Result.NotFound
-      Result.Available(
-        OverlayDetailData(
-          item = lcItem,
-          packageInfo = packageInfo,
-          packageName = lcItem.packageName,
-          appName = packageInfo.getAppName(context.packageManager),
-          versionInfo = packageInfo.getVersionString(),
-          extraInfo = OverlayDetailExtraInfo(
-            type = Constants.OVERLAY_STRING,
-            targetSdkInfo = packageInfo.getTargetApiString(),
-            minSdkInfo = applicationInfo.minSdkVersion.toString(),
-            compileSdkInfo = packageInfo.getCompileSdkVersionString(),
-            sizeInfo = FileUtils.getFileSize(applicationInfo.sourceDir)
-              .sizeToString(context, showBytes = false)
-          ),
-          targetPackageName = Refine.unsafeCast<PackageInfoHidden>(packageInfo).overlayTarget
-        )
+  suspend operator fun invoke(lcItem: LCItem): Result = withContext(Dispatchers.IO) {
+    val packageInfo = installedAppRepository.getPackageInfo(lcItem.packageName)
+      ?: return@withContext Result.NotFound
+    val applicationInfo = packageInfo.applicationInfo ?: return@withContext Result.NotFound
+    Result.Available(
+      OverlayDetailData(
+        item = lcItem,
+        packageInfo = packageInfo,
+        packageName = lcItem.packageName,
+        appName = packageInfo.getAppName(context.packageManager),
+        versionInfo = packageInfo.getVersionString(),
+        extraInfo = OverlayDetailExtraInfo(
+          type = Constants.OVERLAY_STRING,
+          targetSdkInfo = packageInfo.getTargetApiString(),
+          minSdkInfo = applicationInfo.minSdkVersion.toString(),
+          compileSdkInfo = packageInfo.getCompileSdkVersionString(),
+          sizeInfo = FileUtils.getFileSize(applicationInfo.sourceDir)
+            .sizeToString(context, showBytes = false)
+        ),
+        targetPackageName = Refine.unsafeCast<PackageInfoHidden>(packageInfo).overlayTarget
       )
-    }
+    )
+  }
 
   sealed interface Result {
     data class Available(val data: OverlayDetailData) : Result

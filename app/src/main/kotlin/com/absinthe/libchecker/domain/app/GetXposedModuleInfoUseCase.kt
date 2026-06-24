@@ -16,29 +16,28 @@ class GetXposedModuleInfoUseCase(
   private val installedAppRepository: InstalledAppRepository
 ) {
 
-  suspend operator fun invoke(packageName: String): XposedModuleInfo? =
-    withContext(Dispatchers.IO) {
-      val packageInfo = installedAppRepository.getPackageInfo(packageName, PackageManager.GET_META_DATA)
-        ?: return@withContext null
-      val applicationInfo = packageInfo.applicationInfo
-      val metadataBundle = PackageUtils.getMetaDataItems(packageInfo).associateBy { it.name }
-      val sourceDir = applicationInfo?.sourceDir
-      val zipInfo = sourceDir?.let(::readZipInfo)
+  suspend operator fun invoke(packageName: String): XposedModuleInfo? = withContext(Dispatchers.IO) {
+    val packageInfo = installedAppRepository.getPackageInfo(packageName, PackageManager.GET_META_DATA)
+      ?: return@withContext null
+    val applicationInfo = packageInfo.applicationInfo
+    val metadataBundle = PackageUtils.getMetaDataItems(packageInfo).associateBy { it.name }
+    val sourceDir = applicationInfo?.sourceDir
+    val zipInfo = sourceDir?.let(::readZipInfo)
 
-      val moduleProp = zipInfo?.moduleProp
-      XposedModuleInfo(
-        appName = packageInfo.getAppName(packageManager).orEmpty(),
-        settingsIntent = getSettingsIntent(packageName),
-        minVersion = getMinVersion(moduleProp, metadataBundle["xposedminversion"]?.source),
-        targetVersion = moduleProp?.getProperty("targetApiVersion")?.takeIf(String::isNotBlank),
-        staticScope = moduleProp?.getProperty("staticScope") == "true",
-        defaultScope = getDefaultScope(zipInfo?.defaultScope, packageName, metadataBundle["xposedscope"]?.size),
-        javaInitClasses = zipInfo?.javaInitClasses,
-        nativeInitLibraries = zipInfo?.nativeInitLibraries,
-        legacyInitClass = zipInfo?.legacyInitClass,
-        description = getDescription(applicationInfo, moduleProp, metadataBundle["xposeddescription"]?.source)
-      )
-    }
+    val moduleProp = zipInfo?.moduleProp
+    XposedModuleInfo(
+      appName = packageInfo.getAppName(packageManager).orEmpty(),
+      settingsIntent = getSettingsIntent(packageName),
+      minVersion = getMinVersion(moduleProp, metadataBundle["xposedminversion"]?.source),
+      targetVersion = moduleProp?.getProperty("targetApiVersion")?.takeIf(String::isNotBlank),
+      staticScope = moduleProp?.getProperty("staticScope") == "true",
+      defaultScope = getDefaultScope(zipInfo?.defaultScope, packageName, metadataBundle["xposedscope"]?.size),
+      javaInitClasses = zipInfo?.javaInitClasses,
+      nativeInitLibraries = zipInfo?.nativeInitLibraries,
+      legacyInitClass = zipInfo?.legacyInitClass,
+      description = getDescription(applicationInfo, moduleProp, metadataBundle["xposeddescription"]?.source)
+    )
+  }
 
   private fun getSettingsIntent(packageName: String): Intent? {
     val intent = Intent(Intent.ACTION_MAIN).also {
