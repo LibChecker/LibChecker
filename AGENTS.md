@@ -58,6 +58,9 @@ Important `:app` boundaries:
   data in through providers instead of importing `data/*`.
 - `domain/app/` owns app-list use cases and repository/factory interfaces.
   Keep package-list synchronization rules here instead of in UI controllers.
+- When a `domain/*` package becomes crowded, split by durable capability or
+  seam in a package-move slice; keep package moves separate from behavior
+  changes.
 - `data/app/` adapts Android package APIs, Room repositories, and local
   package-change sources to the `domain/app/` interfaces.
 - `domain/statistics/` owns statistics/reference computation rules. Keep

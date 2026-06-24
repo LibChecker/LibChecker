@@ -20,7 +20,6 @@ import com.absinthe.libchecker.domain.app.AppDetailAbiLabelData
 import com.absinthe.libchecker.domain.app.AppDetailHeaderExtraInfo
 import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.AppIconItem
-import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.AppManifestProperty
 import com.absinthe.libchecker.domain.app.AppPackageShareFile
 import com.absinthe.libchecker.domain.app.BuildAppDetailAbiLabelDataUseCase
@@ -84,7 +83,6 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class DetailViewModel(
-  private val appListRepository: AppListRepository,
   private val getAppDetailPackage: GetAppDetailPackageUseCase,
   private val getAlternativeLaunchItemsUseCase: GetAlternativeLaunchItemsUseCase,
   private val getAppInfoActionsUseCase: GetAppInfoActionsUseCase,

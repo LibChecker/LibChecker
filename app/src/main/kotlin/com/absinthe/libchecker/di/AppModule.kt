@@ -265,7 +265,6 @@ val appModule = module {
   }
   viewModel {
     DetailViewModel(
-      appListRepository = get(),
       getAppDetailPackage = get(),
       getAlternativeLaunchItemsUseCase = get(),
       getAppInfoActionsUseCase = get(),
