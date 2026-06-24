@@ -43,6 +43,7 @@ class AdvancedMenuBSDView(
   context: Context,
   displayOptions: Int,
   itemDisplayOptions: Int,
+  colorfulRuleIcon: Boolean,
   onSortOptionsChanged: (Int) -> Unit
 ) : LinearLayout(context),
   IHeaderView {
@@ -58,7 +59,8 @@ class AdvancedMenuBSDView(
   private val itemAdapter = LibStringAdapter(
     packageName = Constants.EXAMPLE_PACKAGE,
     type = ACTIVITY,
-    itemDisplayOptions = itemDisplayOptions
+    itemDisplayOptions = itemDisplayOptions,
+    colorfulRuleIcon = colorfulRuleIcon
   )
 
   private val demoView = RecyclerView(context).apply {

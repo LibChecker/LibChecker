@@ -63,6 +63,7 @@ class LibStringAdapter(
   val packageName: String,
   @LibType val type: Int,
   private var itemDisplayOptions: Int = AdvancedOptions.ITEM_DEFAULT_OPTIONS,
+  private val colorfulRuleIcon: Boolean = true,
   private val fragmentManager: FragmentManager? = null,
   private val buildNativeLibraryItemDisplayData: BuildNativeLibraryItemDisplayDataUseCase? = null,
   private val resolveAppResourceValue: ResolveAppResourceValueUseCase? = null
@@ -163,9 +164,9 @@ class LibStringAdapter(
             ?.let { processMap[it] ?: UiUtils.getRandomColor() } ?: -1
           setOrHighlightText(libName, itemName)
           if (isItemOptionEnabled(AdvancedOptions.SHOW_MARKED_LIB)) {
-            setChip(item.rule)
+            setChip(item.rule, colorfulRuleIcon)
           } else {
-            setChip(null)
+            setChip(null, colorfulRuleIcon)
           }
           contentDescription = buildItemDescription(
             itemName,
@@ -221,9 +222,9 @@ class LibStringAdapter(
     setOrHighlightText(itemView.libName, itemName)
     itemView.libSize.text = getNativeSizeText(item)
     if (isItemOptionEnabled(AdvancedOptions.SHOW_MARKED_LIB)) {
-      itemView.setChip(item.rule)
+      itemView.setChip(item.rule, colorfulRuleIcon)
     } else {
-      itemView.setChip(null)
+      itemView.setChip(null, colorfulRuleIcon)
     }
     itemView.contentDescription = buildItemDescription(
       itemName,
@@ -270,9 +271,9 @@ class LibStringAdapter(
       }
     }
     if (isItemOptionEnabled(AdvancedOptions.SHOW_MARKED_LIB)) {
-      itemView.setChip(item.rule)
+      itemView.setChip(item.rule, colorfulRuleIcon)
     } else {
-      itemView.setChip(null)
+      itemView.setChip(null, colorfulRuleIcon)
     }
     itemView.contentDescription = buildItemDescription(
       itemName,

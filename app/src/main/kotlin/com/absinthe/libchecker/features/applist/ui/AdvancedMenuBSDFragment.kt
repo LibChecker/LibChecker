@@ -36,6 +36,7 @@ class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBS
       context = requireContext(),
       displayOptions = currentAdvancedOptions,
       itemDisplayOptions = currentItemAdvancedOptions,
+      colorfulRuleIcon = appListSettingsRepository.colorfulRuleIcon,
       onSortOptionsChanged = ::setAdvancedOptions
     )
   }

@@ -14,6 +14,9 @@ class GlobalAppListSettingsRepository : AppListSettingsRepository {
   override val itemDisplayOptions: Int
     get() = GlobalValues.itemAdvancedOptions
 
+  override val colorfulRuleIcon: Boolean
+    get() = GlobalValues.isColorfulIcon
+
   override val displayOptionsChanges: Flow<Int> = GlobalValues.preferencesFlow
     .filter { it.first == Constants.PREF_ADVANCED_OPTIONS }
     .map { it.second as Int }

@@ -92,6 +92,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
       packageName = packageName,
       type = type,
       itemDisplayOptions = appListSettingsRepository.itemDisplayOptions,
+      colorfulRuleIcon = appListSettingsRepository.colorfulRuleIcon,
       fragmentManager = childFragmentManager,
       buildNativeLibraryItemDisplayData = buildNativeLibraryItemDisplayData,
       resolveAppResourceValue = resolveAppResourceValue

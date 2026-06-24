@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.children
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.extensions.displayWidth
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
@@ -53,10 +52,9 @@ class StaticLibItemView(context: Context) : AViewGroup(context) {
 
   private var chip: Chip? = null
   private var chipRule: Rule? = null
-  private var chipColorfulIcon = GlobalValues.isColorfulIcon
+  private var chipColorfulIcon: Boolean? = null
 
-  fun setChip(rule: Rule?) {
-    val colorfulIcon = GlobalValues.isColorfulIcon
+  fun setChip(rule: Rule?, colorfulIcon: Boolean) {
     if (chipRule == rule && chipColorfulIcon == colorfulIcon) {
       return
     }
@@ -67,7 +65,7 @@ class StaticLibItemView(context: Context) : AViewGroup(context) {
         text = it.label
         setChipIconResource(it.iconRes)
 
-        if (!GlobalValues.isColorfulIcon && !it.isSimpleColorIcon) {
+        if (!colorfulIcon && !it.isSimpleColorIcon) {
           chipIcon?.let { icon ->
             icon.colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
             chipIcon = icon
