@@ -48,12 +48,10 @@ import com.absinthe.libchecker.features.applist.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.features.applist.detail.AppBarStateChangeListener
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
-import com.absinthe.libchecker.features.applist.detail.FeaturesDialog
 import com.absinthe.libchecker.features.applist.detail.IDetailContainer
 import com.absinthe.libchecker.features.applist.detail.bean.AppDetailToolbarItem
 import com.absinthe.libchecker.features.applist.detail.bean.DetailExtraBean
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.AppDetailToolbarAdapter
-import com.absinthe.libchecker.features.applist.detail.ui.adapter.node.AbiLabelNode
 import com.absinthe.libchecker.features.applist.detail.ui.impl.AbilityAnalysisFragment
 import com.absinthe.libchecker.features.applist.detail.ui.impl.ComponentsAnalysisFragment
 import com.absinthe.libchecker.features.applist.detail.ui.impl.MetaDataAnalysisFragment
@@ -138,6 +136,13 @@ abstract class BaseAppDetailActivity :
         viewModel.filterState.queriedProcess = process
         detailFragmentManager.deliverFilterItems(null, process, lifecycleScope)
       }
+    )
+  }
+  private val abiLabelBinder by unsafeLazy {
+    DetailAbiLabelBinder(
+      activity = this,
+      detailsTitleView = binding.detailsTitle,
+      tintAbiLabels = { isDisplayOptionEnabled(AdvancedOptions.TINT_ABI_LABEL) }
     )
   }
   private val toolbarAdapter by unsafeLazy { AppDetailToolbarAdapter() }
@@ -713,26 +718,7 @@ abstract class BaseAppDetailActivity :
       viewModel.featureState.set64Bit(abiLabelData.is64Bit)
     }
 
-    val abiLabelsList = abiLabelData.labels.map { label ->
-      val action = if (label.opensMultiArchInfo) {
-        { FeaturesDialog.showMultiArchDialog(this) }
-      } else {
-        null
-      }
-      AbiLabelNode(
-        abi = label.abi,
-        active = label.isActive,
-        contentDescription = label.contentDescription,
-        is64Bit = label.is64Bit,
-        action = action
-      )
-    }
-    if (abiLabelsList.isNotEmpty()) {
-      binding.detailsTitle.setAbiLabels(
-        abiLabelsList,
-        tintAbiLabels = isDisplayOptionEnabled(AdvancedOptions.TINT_ABI_LABEL)
-      )
-    }
+    abiLabelBinder.bind(abiLabelData)
   }
 
   private fun isDisplayOptionEnabled(option: Int): Boolean {
