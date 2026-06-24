@@ -24,6 +24,7 @@ class BuildAppListItemViewStatesUseCase(
         packageState = packageStates.getValue(item.packageName),
         options = request.options
       )
+    }
   }
 
   data class Request(
