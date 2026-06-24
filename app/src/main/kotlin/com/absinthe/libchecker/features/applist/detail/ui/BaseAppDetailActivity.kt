@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
-import android.animation.ValueAnimator
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.graphics.Color
@@ -56,7 +55,6 @@ import com.absinthe.libchecker.features.applist.detail.IDetailContainer
 import com.absinthe.libchecker.features.applist.detail.bean.AppDetailToolbarItem
 import com.absinthe.libchecker.features.applist.detail.bean.DetailExtraBean
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.AppDetailToolbarAdapter
-import com.absinthe.libchecker.features.applist.detail.ui.adapter.FeatureAdapter
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.ProcessBarAdapter
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.node.AbiLabelNode
 import com.absinthe.libchecker.features.applist.detail.ui.impl.AbilityAnalysisFragment
@@ -69,7 +67,6 @@ import com.absinthe.libchecker.features.applist.detail.ui.impl.StaticAnalysisFra
 import com.absinthe.libchecker.features.applist.detail.ui.view.ProcessBarView
 import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ENTITY
 import com.absinthe.libchecker.features.snapshot.detail.ui.SnapshotDetailActivity
-import com.absinthe.libchecker.ui.adapter.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.UiUtils
@@ -122,7 +119,6 @@ abstract class BaseAppDetailActivity :
   }
 
   private val bundleManager by unsafeLazy { ApplicationDelegate(this).iBundleManager }
-  private val featureAdapter by unsafeLazy { FeatureAdapter() }
   private val featureItemBuilder by unsafeLazy {
     DetailFeatureItemBuilder(
       activity = this,
@@ -134,11 +130,13 @@ abstract class BaseAppDetailActivity :
       appIconDrawables = ::prepareAppIconDrawables
     )
   }
+  private val featureListController by unsafeLazy {
+    DetailFeatureListController(binding.headerContentLayout)
+  }
   private val toolbarAdapter by unsafeLazy { AppDetailToolbarAdapter() }
 
   private var isHarmonyMode = false
   private var isToolbarCollapsed = false
-  private var featureListView: RecyclerView? = null
   private var processBarView: ProcessBarView? = null
   private var tabLayoutMediator: TabLayoutMediator? = null
   private var pageChangeCallback: ViewPager2.OnPageChangeCallback? = null
@@ -527,7 +525,7 @@ abstract class BaseAppDetailActivity :
         tab.text = tabTitles.getOrNull(position)
       }.also { it.attach() }
 
-    if (featureListView == null) {
+    if (!featureListController.isInitialized) {
       if (viewModel.isApkPreview) {
         viewModel.emitFeature(VersionedFeature(Features.Ext.APPLICATION_PROP))
       } else {
@@ -632,7 +630,6 @@ abstract class BaseAppDetailActivity :
         setupProcessBarView(list)
       }.launchIn(lifecycleScope)
       it.featureState.featuresFlow.onEach { feat ->
-        initFeatureListView()
         addFeatureItem(feat)
       }.launchIn(lifecycleScope)
       it.featureState.abiBundleStateFlow.onEach { bundle ->
@@ -640,29 +637,7 @@ abstract class BaseAppDetailActivity :
           initAbiView(bundle.abi, bundle.abiSet)
 
           doOnMainThreadIdle {
-            initFeatureListView()
-            if (featureListView?.parent != null) {
-              return@doOnMainThreadIdle
-            }
-            val oldContainerHeight = binding.headerContentLayout.height
-            val newContainerHeight = oldContainerHeight + 40.dp
-            val params = binding.headerContentLayout.layoutParams
-
-            binding.headerContentLayout.addView(featureListView)
-            ValueAnimator.ofInt(oldContainerHeight, newContainerHeight).also { anim ->
-              anim.addUpdateListener { valueAnimator ->
-                val height = valueAnimator.animatedValue as Int
-
-                if (valueAnimator.animatedFraction == 1f || featureAdapter.data.isEmpty()) {
-                  params.height = ViewGroup.LayoutParams.WRAP_CONTENT
-                } else {
-                  params.height = height
-                }
-                binding.headerContentLayout.layoutParams = params
-              }
-              anim.duration = 250
-              anim.start()
-            }
+            featureListController.attachWithAnimation()
           }
         }
       }.launchIn(lifecycleScope)
@@ -670,13 +645,8 @@ abstract class BaseAppDetailActivity :
   }
 
   private fun addFeatureItem(feature: VersionedFeature) {
-    val featureItem = featureItemBuilder.build(feature, featureAdapter.data.size) ?: return
-    val position = featureItem.position
-    if (position == null) {
-      featureAdapter.addData(featureItem.item)
-    } else {
-      featureAdapter.addData(position, featureItem.item)
-    }
+    val featureItem = featureItemBuilder.build(feature, featureListController.itemCount) ?: return
+    featureListController.addItem(featureItem)
   }
 
   private fun resetUiState() {
@@ -686,40 +656,8 @@ abstract class BaseAppDetailActivity :
     pageChangeCallback = null
     binding.viewpager.adapter = null
     binding.tabLayout.clearOnTabSelectedListeners()
-    removeFeatureListView()
-    featureAdapter.setList(emptyList())
+    featureListController.reset()
     toolbarAdapter.setList(emptyList())
-  }
-
-  private fun initFeatureListView() {
-    if (featureListView != null) {
-      return
-    }
-
-    featureListView = RecyclerView(this).also {
-      it.layoutParams = ViewGroup.MarginLayoutParams(
-        ViewGroup.LayoutParams.MATCH_PARENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
-      ).also { lp ->
-        lp.topMargin = 4.dp
-      }
-      it.addItemDecoration(HorizontalSpacesItemDecoration(4.dp))
-      it.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-      it.adapter = featureAdapter
-      it.itemAnimator = null
-      it.clipChildren = false
-      it.clipToPadding = false
-      it.overScrollMode = View.OVER_SCROLL_NEVER
-    }
-  }
-
-  private fun removeFeatureListView() {
-    featureListView?.let {
-      if (it.parent != null) {
-        (it.parent as? ViewGroup)?.removeView(it)
-      }
-    }
-    featureListView = null
   }
 
   private val toolbarQuicklyLaunchItem by unsafeLazy {
