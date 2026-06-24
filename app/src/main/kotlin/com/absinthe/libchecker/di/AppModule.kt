@@ -127,6 +127,7 @@ import com.absinthe.libchecker.domain.statistics.GetLibReferenceConfigUseCase
 import com.absinthe.libchecker.domain.statistics.GetLibReferenceIconPackagesUseCase
 import com.absinthe.libchecker.domain.statistics.LibReferenceSettingsRepository
 import com.absinthe.libchecker.features.album.track.TrackViewModel
+import com.absinthe.libchecker.features.applist.detail.DetailActionLoader
 import com.absinthe.libchecker.features.applist.detail.DetailContentLoader
 import com.absinthe.libchecker.features.applist.detail.DetailFeatureLoader
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
@@ -230,6 +231,27 @@ val appModule = module {
   factory { InitializePendingAppFeaturesUseCase(get(), get()) }
   factory { SortAppDetailItemsUseCase() }
   factory {
+    DetailActionLoader(
+      getAlternativeLaunchItemsUseCase = get(),
+      getAppBundleItemsUseCase = get(),
+      getAppInfoActionsUseCase = get(),
+      getAppInstallSourceDetailsUseCase = get(),
+      getAppLaunchActionUseCase = get(),
+      getAppManifestPropertiesUseCase = get(),
+      getElfDetailUseCase = get(),
+      getLibraryDetailDialogDataUseCase = get(),
+      getOverlayDetailUseCase = get(),
+      getPermissionDetailUseCase = get(),
+      getRelatedAppListItemUseCase = get(),
+      getXposedModuleInfoUseCase = get(),
+      buildRelatedAppDisplayDataUseCase = get(),
+      buildSignatureDetailItemsUseCase = get(),
+      extractNativeLibraryUseCase = get(),
+      prepareAppPackageShareFileUseCase = get(),
+      exportAppPackageShareFileUseCase = get()
+    )
+  }
+  factory {
     DetailContentLoader(
       getAppDetailAbilityChipsUseCase = get(),
       getAppDetailComponentChipsUseCase = get(),
@@ -291,29 +313,13 @@ val appModule = module {
   viewModel {
     DetailViewModel(
       getAppDetailPackage = get(),
-      getAlternativeLaunchItemsUseCase = get(),
-      getAppInfoActionsUseCase = get(),
-      getAppLaunchActionUseCase = get(),
-      getAppBundleItemsUseCase = get(),
       filterAppDetailItemsUseCase = get(),
-      getAppInstallSourceDetailsUseCase = get(),
-      extractNativeLibraryUseCase = get(),
-      prepareAppPackageShareFileUseCase = get(),
-      exportAppPackageShareFileUseCase = get(),
       getApkPreviewInfoUseCase = get(),
-      getAppManifestPropertiesUseCase = get(),
       prepareApkAnalysisPackageUseCase = get(),
-      getElfDetailUseCase = get(),
       getInstalledAppComparisonPackageUseCase = get(),
-      getLibraryDetailDialogDataUseCase = get(),
-      getOverlayDetailUseCase = get(),
-      getPermissionDetailUseCase = get(),
-      getRelatedAppListItemUseCase = get(),
-      buildRelatedAppDisplayDataUseCase = get(),
-      buildSignatureDetailItemsUseCase = get(),
-      getXposedModuleInfoUseCase = get(),
       sortAppDetailItemsUseCase = get(),
       appDetailSettingsRepository = get(),
+      detailActionLoader = get(),
       detailContentLoader = get(),
       detailFeatureLoader = get(),
       buildPackageComparisonSnapshotItemUseCase = get()
