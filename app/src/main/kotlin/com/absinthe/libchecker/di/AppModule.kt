@@ -4,6 +4,7 @@ import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.data.app.AndroidAppListExportMetadata
 import com.absinthe.libchecker.data.app.AndroidAppListItemFactory
 import com.absinthe.libchecker.data.app.GlobalAppDetailSettingsRepository
+import com.absinthe.libchecker.data.app.GlobalAppListSettingsRepository
 import com.absinthe.libchecker.data.app.LocalAppListRepository
 import com.absinthe.libchecker.data.app.LocalInstalledAppRepository
 import com.absinthe.libchecker.data.app.RemoteLibraryDetailRepository
@@ -22,6 +23,7 @@ import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.AppListExportMetadata
 import com.absinthe.libchecker.domain.app.AppListItemFactory
 import com.absinthe.libchecker.domain.app.AppListRepository
+import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.BuildAppDetailAbiLabelDataUseCase
 import com.absinthe.libchecker.domain.app.BuildAppDetailHeaderExtraInfoUseCase
 import com.absinthe.libchecker.domain.app.BuildAppDetailHeaderTitleDataUseCase
@@ -135,6 +137,7 @@ import org.koin.dsl.module
 val appModule = module {
   single<LCRepository> { Repositories.lcRepository }
   single<AppDetailSettingsRepository> { GlobalAppDetailSettingsRepository() }
+  single<AppListSettingsRepository> { GlobalAppListSettingsRepository() }
   single<InstalledAppRepository> { LocalInstalledAppRepository }
   single<AppListRepository> { LocalAppListRepository }
   single<LibraryDetailRepository> { RemoteLibraryDetailRepository }
@@ -190,7 +193,7 @@ val appModule = module {
   factory { ExportAppPackageShareFileUseCase(androidContext().contentResolver) }
   factory { ResolveAppResourceValueUseCase(androidContext().packageManager) }
   factory { GetApkPreviewInfoUseCase() }
-  factory { GetAppListContentUseCase(BuildConfig.APPLICATION_ID, get(), get(), get()) }
+  factory { GetAppListContentUseCase(BuildConfig.APPLICATION_ID, get(), get(), get(), get()) }
   factory { GetAppListPackageStatesUseCase(get()) }
   factory { BuildAppDetailAbiLabelDataUseCase(androidContext()) }
   factory { BuildAppDetailHeaderExtraInfoUseCase(androidContext(), get()) }

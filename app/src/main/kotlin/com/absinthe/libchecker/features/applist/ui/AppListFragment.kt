@@ -494,9 +494,7 @@ class AppListFragment :
     delay(250)
     Timber.d("updateItemsImpl")
     val keyword = appAdapter.highlightText
-    val options = GlobalValues.advancedOptions
     val content = homeViewModel.getAppListContent(
-      options = options,
       keyword = keyword,
       isCurrentProcess64Bit = android.os.Process.is64Bit()
     )

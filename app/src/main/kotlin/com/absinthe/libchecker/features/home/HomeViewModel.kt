@@ -160,13 +160,11 @@ class HomeViewModel(
   }
 
   suspend fun getAppListContent(
-    options: Int,
     keyword: String,
     isCurrentProcess64Bit: Boolean
   ): GetAppListContentUseCase.Result {
     return getAppListContentUseCase(
       GetAppListContentUseCase.Request(
-        options = options,
         keyword = keyword,
         isCurrentProcess64Bit = isCurrentProcess64Bit
       )
