@@ -1,6 +1,8 @@
 package com.absinthe.libchecker.domain.snapshot
 
 import com.absinthe.libchecker.database.entity.SnapshotItem
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class BuildSnapshotComparisonListsUseCase(
   private val repository: SnapshotRepository
@@ -11,18 +13,18 @@ class BuildSnapshotComparisonListsUseCase(
     leftPackage: SnapshotItem?,
     rightTimeStamp: Long,
     rightPackage: SnapshotItem?
-  ): SnapshotComparisonLists? {
+  ): SnapshotComparisonLists? = withContext(Dispatchers.IO) {
     val leftSnapshots = when {
       leftPackage != null -> listOf(leftPackage)
       leftTimeStamp > 0 -> getSnapshots(leftTimeStamp, rightPackage?.packageName)
-      else -> return null
+      else -> return@withContext null
     }
     val rightSnapshots = when {
       rightPackage != null -> listOf(rightPackage)
       rightTimeStamp > 0 -> getSnapshots(rightTimeStamp, leftPackage?.packageName)
-      else -> return null
+      else -> return@withContext null
     }
-    return SnapshotComparisonLists(leftSnapshots, rightSnapshots)
+    SnapshotComparisonLists(leftSnapshots, rightSnapshots)
   }
 
   private suspend fun getSnapshots(

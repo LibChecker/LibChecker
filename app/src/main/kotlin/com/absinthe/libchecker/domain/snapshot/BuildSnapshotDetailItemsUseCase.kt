@@ -26,12 +26,14 @@ import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.fromJson
 import java.util.Locale
 import kotlin.math.abs
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class BuildSnapshotDetailItemsUseCase(
   private val context: Context
 ) {
 
-  operator fun invoke(item: SnapshotDiffItem): List<SnapshotDetailItem> {
+  suspend operator fun invoke(item: SnapshotDiffItem): List<SnapshotDetailItem> = withContext(Dispatchers.IO) {
     val list = mutableListOf<SnapshotDetailItem>()
 
     list.addAll(
@@ -77,7 +79,7 @@ class BuildSnapshotDetailItemsUseCase(
       )
     )
 
-    return list
+    list
   }
 
   private fun addComponentDiffInfoFromJson(

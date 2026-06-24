@@ -20,6 +20,8 @@ import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.toJson
 import java.io.File
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import me.zhanghai.android.appiconloader.AppIconLoader
 import okio.buffer
 import okio.sink
@@ -29,11 +31,11 @@ class BuildArchiveSnapshotItemUseCase(
   private val context: Context
 ) {
 
-  operator fun invoke(
+  suspend operator fun invoke(
     uri: Uri,
     destinationFile: File,
     iconSize: Int
-  ): ArchiveSnapshotItem {
+  ): ArchiveSnapshotItem = withContext(Dispatchers.IO) {
     var packageInfo = context.contentResolver.openInputStream(uri)?.use { inputStream ->
       val fileSize = inputStream.available()
       val freeSize = Environment.getExternalStorageDirectory().freeSpace
@@ -59,7 +61,7 @@ class BuildArchiveSnapshotItemUseCase(
 
     val applicationInfo = packageInfo.applicationInfo ?: throw IllegalStateException("ApplicationInfo is null")
     val appIconLoader = AppIconLoader(iconSize, false, context)
-    return ArchiveSnapshotItem(
+    ArchiveSnapshotItem(
       snapshotItem = packageInfo.toSnapshotItem(applicationInfo),
       icon = appIconLoader.loadIcon(applicationInfo)
     )

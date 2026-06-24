@@ -164,9 +164,7 @@ class SnapshotViewModel(
     destinationFile: File,
     iconSize: Int
   ): ArchiveSnapshotItem {
-    return withContext(Dispatchers.IO) {
-      buildArchiveSnapshotItemUseCase(uri, destinationFile, iconSize)
-    }
+    return buildArchiveSnapshotItemUseCase(uri, destinationFile, iconSize)
   }
 
   fun buildSnapshotPairDiff(left: SnapshotItem, right: SnapshotItem): SnapshotDiffItem {
@@ -179,14 +177,12 @@ class SnapshotViewModel(
     rightTimeStamp: Long,
     rightPackage: SnapshotItem?
   ): SnapshotComparisonLists? {
-    return withContext(Dispatchers.IO) {
-      buildSnapshotComparisonListsUseCase(
-        leftTimeStamp = leftTimeStamp,
-        leftPackage = leftPackage,
-        rightTimeStamp = rightTimeStamp,
-        rightPackage = rightPackage
-      )
-    }
+    return buildSnapshotComparisonListsUseCase(
+      leftTimeStamp = leftTimeStamp,
+      leftPackage = leftPackage,
+      rightTimeStamp = rightTimeStamp,
+      rightPackage = rightPackage
+    )
   }
 
   suspend fun compareItemDiff(
@@ -202,7 +198,7 @@ class SnapshotViewModel(
     }
   }
 
-  fun computeDiffDetail(entity: SnapshotDiffItem) = viewModelScope.launch(Dispatchers.IO) {
+  fun computeDiffDetail(entity: SnapshotDiffItem) = viewModelScope.launch {
     snapshotDetailItemsFlow.emit(buildSnapshotDetailItems(entity))
   }
 
@@ -218,13 +214,10 @@ class SnapshotViewModel(
     return appListRepository.getItem(packageName)
   }
 
-  suspend fun getSnapshotPackageIconSources(packageNames: Collection<String>) = withContext(Dispatchers.IO) {
+  suspend fun getSnapshotPackageIconSources(packageNames: Collection<String>) =
     getSnapshotPackageIconSourcesUseCase(packageNames)
-  }
 
-  suspend fun getApexPackageNames(): Set<String> = withContext(Dispatchers.IO) {
-    getApexPackageNamesUseCase()
-  }
+  suspend fun getApexPackageNames(): Set<String> = getApexPackageNamesUseCase()
 
   suspend fun getTimeStampSystemProps(timestamp: Long): String? {
     return snapshotLibrary.getSystemProps(timestamp)
@@ -239,9 +232,7 @@ class SnapshotViewModel(
   }
 
   suspend fun prepareRoomBackupRestoreFile(uri: Uri, restoreFile: File): File? {
-    return withContext(Dispatchers.IO) {
-      prepareRoomBackupRestoreFileUseCase(uri, restoreFile)
-    }
+    return prepareRoomBackupRestoreFileUseCase(uri, restoreFile)
   }
 
   fun backup(uri: Uri, resultAction: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
