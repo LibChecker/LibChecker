@@ -127,6 +127,7 @@ import com.absinthe.libchecker.domain.statistics.GetLibReferenceConfigUseCase
 import com.absinthe.libchecker.domain.statistics.GetLibReferenceIconPackagesUseCase
 import com.absinthe.libchecker.domain.statistics.LibReferenceSettingsRepository
 import com.absinthe.libchecker.features.album.track.TrackViewModel
+import com.absinthe.libchecker.features.applist.detail.DetailContentLoader
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.chart.ChartViewModel
 import com.absinthe.libchecker.features.home.HomeViewModel
@@ -227,6 +228,19 @@ val appModule = module {
   factory { HasInstalledStaticLibrariesUseCase(get()) }
   factory { InitializePendingAppFeaturesUseCase(get(), get()) }
   factory { SortAppDetailItemsUseCase() }
+  factory {
+    DetailContentLoader(
+      getAppDetailAbilityChipsUseCase = get(),
+      getAppDetailComponentChipsUseCase = get(),
+      getAppDetailDexChipsUseCase = get(),
+      getAppDetailMetadataChipsUseCase = get(),
+      getAppDetailNativeLibrariesUseCase = get(),
+      getAppDetailPermissionChipsUseCase = get(),
+      getAppDetailSignatureChipsUseCase = get(),
+      getAppDetailStaticLibraryChipsUseCase = get(),
+      appDetailSettingsRepository = get()
+    )
+  }
   factory { GetApexPackageNamesUseCase(get()) }
   factory { BuildArchiveSnapshotItemUseCase(androidContext()) }
   factory { BuildInstalledSnapshotItemUseCase(get()) }
@@ -272,14 +286,8 @@ val appModule = module {
       getAppBundleItemsUseCase = get(),
       filterAppDetailItemsUseCase = get(),
       getAppDetailAbiUseCase = get(),
-      getAppDetailAbilityChipsUseCase = get(),
       getAppInstallSourceDetailsUseCase = get(),
-      getAppDetailComponentChipsUseCase = get(),
-      getAppDetailDexChipsUseCase = get(),
       getAppDetailFeaturesUseCase = get(),
-      getAppDetailMetadataChipsUseCase = get(),
-      getAppDetailNativeLibrariesUseCase = get(),
-      getAppDetailStaticLibraryChipsUseCase = get(),
       buildAppDetailAbiLabelDataUseCase = get(),
       buildAppDetailHeaderExtraInfoUseCase = get(),
       buildAppDetailHeaderTitleDataUseCase = get(),
@@ -287,8 +295,6 @@ val appModule = module {
       prepareAppPackageShareFileUseCase = get(),
       exportAppPackageShareFileUseCase = get(),
       getApkPreviewInfoUseCase = get(),
-      getAppDetailPermissionChipsUseCase = get(),
-      getAppDetailSignatureChipsUseCase = get(),
       getAppManifestPropertiesUseCase = get(),
       prepareApkAnalysisPackageUseCase = get(),
       getElfDetailUseCase = get(),
@@ -303,6 +309,7 @@ val appModule = module {
       getXposedModuleInfoUseCase = get(),
       sortAppDetailItemsUseCase = get(),
       appDetailSettingsRepository = get(),
+      detailContentLoader = get(),
       buildPackageComparisonSnapshotItemUseCase = get()
     )
   }

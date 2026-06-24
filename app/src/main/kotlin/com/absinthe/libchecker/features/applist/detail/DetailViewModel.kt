@@ -5,7 +5,6 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.annotation.LibType
-import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppBundleSplitItem
 import com.absinthe.libchecker.domain.app.AppDetailAbiLabelData
@@ -25,16 +24,8 @@ import com.absinthe.libchecker.domain.app.GetAlternativeLaunchItemsUseCase
 import com.absinthe.libchecker.domain.app.GetApkPreviewInfoUseCase
 import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailAbiUseCase
-import com.absinthe.libchecker.domain.app.GetAppDetailAbilityChipsUseCase
-import com.absinthe.libchecker.domain.app.GetAppDetailComponentChipsUseCase
-import com.absinthe.libchecker.domain.app.GetAppDetailDexChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailFeaturesUseCase
-import com.absinthe.libchecker.domain.app.GetAppDetailMetadataChipsUseCase
-import com.absinthe.libchecker.domain.app.GetAppDetailNativeLibrariesUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageUseCase
-import com.absinthe.libchecker.domain.app.GetAppDetailPermissionChipsUseCase
-import com.absinthe.libchecker.domain.app.GetAppDetailSignatureChipsUseCase
-import com.absinthe.libchecker.domain.app.GetAppDetailStaticLibraryChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppInfoActionsUseCase
 import com.absinthe.libchecker.domain.app.GetAppInstallSourceDetailsUseCase
 import com.absinthe.libchecker.domain.app.GetAppLaunchActionUseCase
@@ -55,18 +46,11 @@ import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.domain.snapshot.BuildPackageComparisonSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_LIB
-import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
-import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
 import java.io.File
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -78,14 +62,8 @@ class DetailViewModel(
   private val getAppBundleItemsUseCase: GetAppBundleItemsUseCase,
   private val filterAppDetailItemsUseCase: FilterAppDetailItemsUseCase,
   private val getAppDetailAbiUseCase: GetAppDetailAbiUseCase,
-  private val getAppDetailAbilityChipsUseCase: GetAppDetailAbilityChipsUseCase,
   private val getAppInstallSourceDetailsUseCase: GetAppInstallSourceDetailsUseCase,
-  private val getAppDetailComponentChipsUseCase: GetAppDetailComponentChipsUseCase,
-  private val getAppDetailDexChipsUseCase: GetAppDetailDexChipsUseCase,
   private val getAppDetailFeaturesUseCase: GetAppDetailFeaturesUseCase,
-  private val getAppDetailMetadataChipsUseCase: GetAppDetailMetadataChipsUseCase,
-  private val getAppDetailNativeLibrariesUseCase: GetAppDetailNativeLibrariesUseCase,
-  private val getAppDetailStaticLibraryChipsUseCase: GetAppDetailStaticLibraryChipsUseCase,
   private val buildAppDetailAbiLabelDataUseCase: BuildAppDetailAbiLabelDataUseCase,
   private val buildAppDetailHeaderExtraInfoUseCase: BuildAppDetailHeaderExtraInfoUseCase,
   private val buildAppDetailHeaderTitleDataUseCase: BuildAppDetailHeaderTitleDataUseCase,
@@ -93,8 +71,6 @@ class DetailViewModel(
   private val prepareAppPackageShareFileUseCase: PrepareAppPackageShareFileUseCase,
   private val exportAppPackageShareFileUseCase: ExportAppPackageShareFileUseCase,
   private val getApkPreviewInfoUseCase: GetApkPreviewInfoUseCase,
-  private val getAppDetailPermissionChipsUseCase: GetAppDetailPermissionChipsUseCase,
-  private val getAppDetailSignatureChipsUseCase: GetAppDetailSignatureChipsUseCase,
   private val getAppManifestPropertiesUseCase: GetAppManifestPropertiesUseCase,
   private val prepareApkAnalysisPackageUseCase: PrepareApkAnalysisPackageUseCase,
   private val getElfDetailUseCase: GetElfDetailUseCase,
@@ -109,13 +85,13 @@ class DetailViewModel(
   private val getXposedModuleInfoUseCase: GetXposedModuleInfoUseCase,
   private val sortAppDetailItemsUseCase: SortAppDetailItemsUseCase,
   private val appDetailSettingsRepository: AppDetailSettingsRepository,
+  private val detailContentLoader: DetailContentLoader,
   private val buildPackageComparisonSnapshotItemUseCase: BuildPackageComparisonSnapshotItemUseCase
 ) : ViewModel() {
   val contentState = DetailContentState()
   val featureState = DetailFeatureState()
   val filterState = DetailFilterState()
   private val packageState = DetailPackageState()
-  private val loadJobsState = DetailLoadJobsState()
 
   val isApk: Boolean
     get() = packageState.isApk
@@ -262,163 +238,48 @@ class DetailViewModel(
 
   fun reset() {
     Timber.d("reset")
-    loadJobsState.cancelAll()
+    detailContentLoader.cancelAll()
     contentState.reset()
     filterState.reset()
   }
 
   fun initSoAnalysisData() {
-    loadJobsState.initSoAnalysisJob = launchDetailDataJob(
-      currentJob = loadJobsState.initSoAnalysisJob,
-      hasData = contentState.nativeLibItems.value != null
-    ) {
-      val abiBundle = featureState.abiBundleStateFlow.value
-        ?: featureState.abiBundleStateFlow.filterNotNull().first()
-      val nativeLibraries = getAppDetailNativeLibrariesUseCase(
-        packageInfo = packageState.packageInfo,
-        apkPreviewInfo = packageState.apkPreviewInfo,
-        isApk = packageState.isApk,
-        isApkPreview = packageState.isApkPreview,
-        abi = abiBundle.abi
-      )
-
-      contentState.emitNativeLibTabs(nativeLibraries.itemsByAbi)
-
-      if (nativeLibraries.selectedAbiSupports16KbPageSize) {
-        featureState.emitFeature(VersionedFeature(Features.Ext.ELF_PAGE_SIZE_16KB))
-      }
-    }
+    detailContentLoader.initSoAnalysisData(viewModelScope, contentState, featureState, packageState)
   }
 
   fun loadSoAnalysisData(tab: String) {
-    contentState.nativeLibItemsFor(tab)?.let {
-      viewModelScope.launch(Dispatchers.IO) {
-        contentState.nativeLibItems.emit(
-          getAppDetailNativeLibrariesUseCase.buildChipList(
-            packageInfo = packageState.packageInfo,
-            apkPreviewInfo = packageState.apkPreviewInfo,
-            isApkPreview = packageState.isApkPreview,
-            items = it,
-            sortBySize = isSortBySizeMode()
-          )
-        )
-      }
-    }
+    detailContentLoader.loadSoAnalysisData(viewModelScope, contentState, packageState, tab)
   }
 
   fun initStaticData() {
-    loadJobsState.initStaticJob = launchDetailDataJob(
-      currentJob = loadJobsState.initStaticJob,
-      hasData = contentState.staticLibItems.value != null
-    ) {
-      contentState.staticLibItems.emit(
-        getAppDetailStaticLibraryChipsUseCase(
-          packageInfo = packageState.packageInfo,
-          sortBySizeMode = isSortBySizeMode()
-        )
-      )
-    }
+    detailContentLoader.initStaticData(viewModelScope, contentState, packageState)
   }
 
   fun initMetaDataData() {
-    loadJobsState.initMetaDataJob = launchDetailDataJob(
-      currentJob = loadJobsState.initMetaDataJob,
-      hasData = contentState.metaDataItems.value != null
-    ) {
-      contentState.metaDataItems.emit(
-        getAppDetailMetadataChipsUseCase(
-          packageInfo = packageState.packageInfo,
-          apkPreviewInfo = packageState.apkPreviewInfo,
-          isApkPreview = packageState.isApkPreview
-        )
-      )
-    }
+    detailContentLoader.initMetaDataData(viewModelScope, contentState, packageState)
   }
 
   fun initPermissionData() {
-    loadJobsState.initPermissionJob = launchDetailDataJob(
-      currentJob = loadJobsState.initPermissionJob,
-      hasData = contentState.permissionsItems.value != null
-    ) {
-      val permissions = getAppDetailPermissionChipsUseCase(
-        packageInfo = packageState.packageInfo,
-        apkPreviewInfo = packageState.apkPreviewInfo,
-        isApk = packageState.isApk,
-        isApkPreview = packageState.isApkPreview
-      )
-      contentState.permissionsItems.emit(permissions.items)
-
-      if (permissions.hasLiveUpdateNotification) {
-        featureState.emitFeature(VersionedFeature(Features.LIVE_UPDATE_NOTIFICATION))
-      }
-    }
+    detailContentLoader.initPermissionData(viewModelScope, contentState, featureState, packageState)
   }
 
   fun initDexData() {
-    loadJobsState.initDexJob = launchDetailDataJob(
-      currentJob = loadJobsState.initDexJob,
-      hasData = contentState.dexLibItems.value != null
-    ) {
-      val list = getAppDetailDexChipsUseCase(
-        packageInfo = packageState.packageInfo,
-        sortBySizeMode = isSortBySizeMode()
-      )
-      contentState.dexLibItems.emit(list)
-    }
+    detailContentLoader.initDexData(viewModelScope, contentState, packageState)
   }
 
   fun cancelInitDexDataJob() {
-    loadJobsState.initDexJob?.cancel()
+    detailContentLoader.cancelInitDexDataJob()
   }
 
   fun initSignatures() {
-    loadJobsState.initSignaturesJob = launchDetailDataJob(
-      currentJob = loadJobsState.initSignaturesJob,
-      hasData = contentState.signaturesLibItems.value != null
-    ) {
-      contentState.signaturesLibItems.emit(
-        getAppDetailSignatureChipsUseCase(
-          packageState.packageInfo,
-          packageState.isApk
-        )
-      )
-    }
+    detailContentLoader.initSignatures(viewModelScope, contentState, packageState)
   }
 
   fun initComponentsData() {
-    loadJobsState.initComponentsJob = launchDetailDataJob(
-      currentJob = loadJobsState.initComponentsJob,
-      hasData = contentState.hasComponentsData()
-    ) {
-      try {
-        val components = getAppDetailComponentChipsUseCase(
-          packageState.packageInfo,
-          packageState.isApk
-        )
-        contentState.emitComponents(components) { UiUtils.getRandomColor() }
-      } catch (e: Exception) {
-        Timber.e(e)
-      }
-    }
+    detailContentLoader.initComponentsData(viewModelScope, contentState, packageState)
   }
 
-  private fun launchDetailDataJob(
-    currentJob: Job?,
-    hasData: Boolean,
-    dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    block: suspend CoroutineScope.() -> Unit
-  ): Job? {
-    if (currentJob?.isActive == true || hasData) {
-      return currentJob
-    }
-    return viewModelScope.launch(dispatcher, block = block)
-  }
-
-  fun initComponentsDataInPreview() = viewModelScope.launch(Dispatchers.IO) {
-    val previewInfo = packageState.apkPreviewInfo ?: return@launch
-    val components = getAppDetailComponentChipsUseCase(previewInfo)
-    contentState.emitComponentItems(components)
-  }
+  fun initComponentsDataInPreview() = detailContentLoader.initComponentsDataInPreview(viewModelScope, contentState, packageState)
 
   suspend fun getLibraryDetailDialogHeader(
     libName: String,
@@ -450,16 +311,8 @@ class DetailViewModel(
 
   suspend fun getPermissionDetail(permissionName: String) = getPermissionDetailUseCase(permissionName)
 
-  fun initAbilities(packageName: String) = viewModelScope.launch(Dispatchers.IO) {
-    contentState.resetAbilities()
-
-    runCatching {
-      getAppDetailAbilityChipsUseCase(packageName)
-    }.onSuccess { abilityChips ->
-      contentState.emitAbilities(abilityChips)
-    }.onFailure {
-      Timber.e(it)
-    }
+  fun initAbilities(packageName: String) {
+    detailContentLoader.initAbilities(viewModelScope, contentState, packageName)
   }
 
   fun emitFeature(feature: VersionedFeature) = viewModelScope.launch {
@@ -515,9 +368,5 @@ class DetailViewModel(
 
   private fun isSortByLibMode(): Boolean {
     return appDetailSettingsRepository.sortMode == MODE_SORT_BY_LIB
-  }
-
-  private fun isSortBySizeMode(): Boolean {
-    return appDetailSettingsRepository.sortMode == MODE_SORT_BY_SIZE
   }
 }
