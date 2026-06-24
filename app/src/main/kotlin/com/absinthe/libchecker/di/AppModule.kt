@@ -133,6 +133,7 @@ import com.absinthe.libchecker.features.applist.detail.DetailFeatureLoader
 import com.absinthe.libchecker.features.applist.detail.DetailFilterController
 import com.absinthe.libchecker.features.applist.detail.DetailPackageLoader
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
+import com.absinthe.libchecker.features.applist.detail.content.DetailChipContentLoader
 import com.absinthe.libchecker.features.applist.detail.content.DetailComponentContentLoader
 import com.absinthe.libchecker.features.applist.detail.content.DetailNativeLibContentLoader
 import com.absinthe.libchecker.features.applist.detail.content.DetailPermissionContentLoader
@@ -257,6 +258,14 @@ val appModule = module {
     )
   }
   factory {
+    DetailChipContentLoader(
+      getAppDetailDexChipsUseCase = get(),
+      getAppDetailMetadataChipsUseCase = get(),
+      getAppDetailSignatureChipsUseCase = get(),
+      getAppDetailStaticLibraryChipsUseCase = get()
+    )
+  }
+  factory {
     DetailComponentContentLoader(
       getAppDetailComponentChipsUseCase = get()
     )
@@ -274,10 +283,7 @@ val appModule = module {
   factory {
     DetailContentLoader(
       getAppDetailAbilityChipsUseCase = get(),
-      getAppDetailDexChipsUseCase = get(),
-      getAppDetailMetadataChipsUseCase = get(),
-      getAppDetailSignatureChipsUseCase = get(),
-      getAppDetailStaticLibraryChipsUseCase = get(),
+      detailChipContentLoader = get(),
       detailComponentContentLoader = get(),
       detailNativeLibContentLoader = get(),
       detailPermissionContentLoader = get(),

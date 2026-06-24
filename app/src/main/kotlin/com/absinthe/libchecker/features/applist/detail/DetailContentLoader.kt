@@ -2,11 +2,8 @@ package com.absinthe.libchecker.features.applist.detail
 
 import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.GetAppDetailAbilityChipsUseCase
-import com.absinthe.libchecker.domain.app.GetAppDetailDexChipsUseCase
-import com.absinthe.libchecker.domain.app.GetAppDetailMetadataChipsUseCase
-import com.absinthe.libchecker.domain.app.GetAppDetailSignatureChipsUseCase
-import com.absinthe.libchecker.domain.app.GetAppDetailStaticLibraryChipsUseCase
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
+import com.absinthe.libchecker.features.applist.detail.content.DetailChipContentLoader
 import com.absinthe.libchecker.features.applist.detail.content.DetailComponentContentLoader
 import com.absinthe.libchecker.features.applist.detail.content.DetailNativeLibContentLoader
 import com.absinthe.libchecker.features.applist.detail.content.DetailPermissionContentLoader
@@ -17,10 +14,7 @@ import timber.log.Timber
 
 class DetailContentLoader(
   private val getAppDetailAbilityChipsUseCase: GetAppDetailAbilityChipsUseCase,
-  private val getAppDetailDexChipsUseCase: GetAppDetailDexChipsUseCase,
-  private val getAppDetailMetadataChipsUseCase: GetAppDetailMetadataChipsUseCase,
-  private val getAppDetailSignatureChipsUseCase: GetAppDetailSignatureChipsUseCase,
-  private val getAppDetailStaticLibraryChipsUseCase: GetAppDetailStaticLibraryChipsUseCase,
+  private val detailChipContentLoader: DetailChipContentLoader,
   private val detailComponentContentLoader: DetailComponentContentLoader,
   private val detailNativeLibContentLoader: DetailNativeLibContentLoader,
   private val detailPermissionContentLoader: DetailPermissionContentLoader,
@@ -70,37 +64,25 @@ class DetailContentLoader(
     scope: CoroutineScope,
     packageState: DetailPackageState
   ) {
-    loadJobsState.launchIfNeeded(
-      key = DetailLoadJobsState.Key.STATIC_LIBS,
+    detailChipContentLoader.initStaticData(
       scope = scope,
-      hasData = contentState.staticLibItems.value != null
-    ) {
-      contentState.staticLibItems.emit(
-        getAppDetailStaticLibraryChipsUseCase(
-          packageInfo = packageState.packageInfo,
-          sortBySizeMode = isSortBySizeMode()
-        )
-      )
-    }
+      contentState = contentState,
+      loadJobsState = loadJobsState,
+      packageState = packageState,
+      sortBySizeMode = isSortBySizeMode()
+    )
   }
 
   fun initMetaDataData(
     scope: CoroutineScope,
     packageState: DetailPackageState
   ) {
-    loadJobsState.launchIfNeeded(
-      key = DetailLoadJobsState.Key.METADATA,
+    detailChipContentLoader.initMetaDataData(
       scope = scope,
-      hasData = contentState.metaDataItems.value != null
-    ) {
-      contentState.metaDataItems.emit(
-        getAppDetailMetadataChipsUseCase(
-          packageInfo = packageState.packageInfo,
-          apkPreviewInfo = packageState.apkPreviewInfo,
-          isApkPreview = packageState.isApkPreview
-        )
-      )
-    }
+      contentState = contentState,
+      loadJobsState = loadJobsState,
+      packageState = packageState
+    )
   }
 
   fun initPermissionData(
@@ -121,17 +103,13 @@ class DetailContentLoader(
     scope: CoroutineScope,
     packageState: DetailPackageState
   ) {
-    loadJobsState.launchIfNeeded(
-      key = DetailLoadJobsState.Key.DEX,
+    detailChipContentLoader.initDexData(
       scope = scope,
-      hasData = contentState.dexLibItems.value != null
-    ) {
-      val list = getAppDetailDexChipsUseCase(
-        packageInfo = packageState.packageInfo,
-        sortBySizeMode = isSortBySizeMode()
-      )
-      contentState.dexLibItems.emit(list)
-    }
+      contentState = contentState,
+      loadJobsState = loadJobsState,
+      packageState = packageState,
+      sortBySizeMode = isSortBySizeMode()
+    )
   }
 
   fun cancelInitDexDataJob() {
@@ -142,18 +120,12 @@ class DetailContentLoader(
     scope: CoroutineScope,
     packageState: DetailPackageState
   ) {
-    loadJobsState.launchIfNeeded(
-      key = DetailLoadJobsState.Key.SIGNATURES,
+    detailChipContentLoader.initSignatures(
       scope = scope,
-      hasData = contentState.signaturesLibItems.value != null
-    ) {
-      contentState.signaturesLibItems.emit(
-        getAppDetailSignatureChipsUseCase(
-          packageState.packageInfo,
-          packageState.isApk
-        )
-      )
-    }
+      contentState = contentState,
+      loadJobsState = loadJobsState,
+      packageState = packageState
+    )
   }
 
   fun initComponentsData(
