@@ -13,10 +13,8 @@ import com.absinthe.libchecker.domain.app.GetAppDetailStaticLibraryChipsUseCase
 import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.UiUtils
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -50,9 +48,9 @@ class DetailContentLoader(
     featureState: DetailFeatureState,
     packageState: DetailPackageState
   ) {
-    loadJobsState.initSoAnalysisJob = launchDetailDataJob(
+    loadJobsState.launchIfNeeded(
+      key = DetailLoadJobsState.Key.NATIVE_LIBS,
       scope = scope,
-      currentJob = loadJobsState.initSoAnalysisJob,
       hasData = contentState.nativeLibItems.value != null
     ) {
       val abiBundle = featureState.abiBundleStateFlow.value
@@ -97,9 +95,9 @@ class DetailContentLoader(
     scope: CoroutineScope,
     packageState: DetailPackageState
   ) {
-    loadJobsState.initStaticJob = launchDetailDataJob(
+    loadJobsState.launchIfNeeded(
+      key = DetailLoadJobsState.Key.STATIC_LIBS,
       scope = scope,
-      currentJob = loadJobsState.initStaticJob,
       hasData = contentState.staticLibItems.value != null
     ) {
       contentState.staticLibItems.emit(
@@ -115,9 +113,9 @@ class DetailContentLoader(
     scope: CoroutineScope,
     packageState: DetailPackageState
   ) {
-    loadJobsState.initMetaDataJob = launchDetailDataJob(
+    loadJobsState.launchIfNeeded(
+      key = DetailLoadJobsState.Key.METADATA,
       scope = scope,
-      currentJob = loadJobsState.initMetaDataJob,
       hasData = contentState.metaDataItems.value != null
     ) {
       contentState.metaDataItems.emit(
@@ -135,9 +133,9 @@ class DetailContentLoader(
     featureState: DetailFeatureState,
     packageState: DetailPackageState
   ) {
-    loadJobsState.initPermissionJob = launchDetailDataJob(
+    loadJobsState.launchIfNeeded(
+      key = DetailLoadJobsState.Key.PERMISSIONS,
       scope = scope,
-      currentJob = loadJobsState.initPermissionJob,
       hasData = contentState.permissionsItems.value != null
     ) {
       val permissions = getAppDetailPermissionChipsUseCase(
@@ -158,9 +156,9 @@ class DetailContentLoader(
     scope: CoroutineScope,
     packageState: DetailPackageState
   ) {
-    loadJobsState.initDexJob = launchDetailDataJob(
+    loadJobsState.launchIfNeeded(
+      key = DetailLoadJobsState.Key.DEX,
       scope = scope,
-      currentJob = loadJobsState.initDexJob,
       hasData = contentState.dexLibItems.value != null
     ) {
       val list = getAppDetailDexChipsUseCase(
@@ -172,16 +170,16 @@ class DetailContentLoader(
   }
 
   fun cancelInitDexDataJob() {
-    loadJobsState.initDexJob?.cancel()
+    loadJobsState.cancel(DetailLoadJobsState.Key.DEX)
   }
 
   fun initSignatures(
     scope: CoroutineScope,
     packageState: DetailPackageState
   ) {
-    loadJobsState.initSignaturesJob = launchDetailDataJob(
+    loadJobsState.launchIfNeeded(
+      key = DetailLoadJobsState.Key.SIGNATURES,
       scope = scope,
-      currentJob = loadJobsState.initSignaturesJob,
       hasData = contentState.signaturesLibItems.value != null
     ) {
       contentState.signaturesLibItems.emit(
@@ -197,9 +195,9 @@ class DetailContentLoader(
     scope: CoroutineScope,
     packageState: DetailPackageState
   ) {
-    loadJobsState.initComponentsJob = launchDetailDataJob(
+    loadJobsState.launchIfNeeded(
+      key = DetailLoadJobsState.Key.COMPONENTS,
       scope = scope,
-      currentJob = loadJobsState.initComponentsJob,
       hasData = contentState.hasComponentsData()
     ) {
       try {
@@ -236,19 +234,6 @@ class DetailContentLoader(
     }.onFailure {
       Timber.e(it)
     }
-  }
-
-  private fun launchDetailDataJob(
-    scope: CoroutineScope,
-    currentJob: Job?,
-    hasData: Boolean,
-    dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    block: suspend CoroutineScope.() -> Unit
-  ): Job? {
-    if (currentJob?.isActive == true || hasData) {
-      return currentJob
-    }
-    return scope.launch(dispatcher, block = block)
   }
 
   private fun isSortBySizeMode(): Boolean {
