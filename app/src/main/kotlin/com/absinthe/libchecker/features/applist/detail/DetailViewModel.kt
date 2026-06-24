@@ -12,13 +12,13 @@ import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.constant.AbilityType
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppBundleSplitItem
 import com.absinthe.libchecker.domain.app.AppDetailAbi
 import com.absinthe.libchecker.domain.app.AppDetailAbiLabelData
 import com.absinthe.libchecker.domain.app.AppDetailHeaderExtraInfo
+import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.AppIconItem
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.AppManifestProperty
@@ -121,6 +121,7 @@ class DetailViewModel(
   private val buildSignatureDetailItemsUseCase: BuildSignatureDetailItemsUseCase,
   private val getXposedModuleInfoUseCase: GetXposedModuleInfoUseCase,
   private val sortAppDetailItemsUseCase: SortAppDetailItemsUseCase,
+  private val appDetailSettingsRepository: AppDetailSettingsRepository,
   private val buildPackageComparisonSnapshotItemUseCase: BuildPackageComparisonSnapshotItemUseCase
 ) : ViewModel() {
   private var allNativeLibItems: Map<String, List<LibStringItem>> = emptyMap()
@@ -343,7 +344,7 @@ class DetailViewModel(
             apkPreviewInfo = apkPreviewInfo,
             isApkPreview = isApkPreview,
             items = it,
-            sortBySize = GlobalValues.libSortMode == MODE_SORT_BY_SIZE
+            sortBySize = appDetailSettingsRepository.sortMode == MODE_SORT_BY_SIZE
           )
         )
       }
@@ -360,7 +361,7 @@ class DetailViewModel(
       staticLibItems.emit(
         getAppDetailStaticLibraryChipsUseCase(
           packageInfo = packageInfo,
-          sortBySizeMode = GlobalValues.libSortMode == MODE_SORT_BY_SIZE
+          sortBySizeMode = appDetailSettingsRepository.sortMode == MODE_SORT_BY_SIZE
         )
       )
     }
@@ -413,7 +414,7 @@ class DetailViewModel(
     initDexJob = viewModelScope.launch(Dispatchers.IO) {
       val list = getAppDetailDexChipsUseCase(
         packageInfo = packageInfo,
-        sortBySizeMode = GlobalValues.libSortMode == MODE_SORT_BY_SIZE
+        sortBySizeMode = appDetailSettingsRepository.sortMode == MODE_SORT_BY_SIZE
       )
       dexLibItems.emit(list)
     }
@@ -580,6 +581,6 @@ class DetailViewModel(
   }
 
   fun sortDetailItems(items: List<LibStringItemChip>, @LibType type: Int): List<LibStringItemChip> {
-    return sortAppDetailItemsUseCase(items, type, GlobalValues.libSortMode == MODE_SORT_BY_LIB)
+    return sortAppDetailItemsUseCase(items, type, appDetailSettingsRepository.sortMode == MODE_SORT_BY_LIB)
   }
 }

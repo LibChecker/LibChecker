@@ -3,6 +3,7 @@ package com.absinthe.libchecker.di
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.data.app.AndroidAppListExportMetadata
 import com.absinthe.libchecker.data.app.AndroidAppListItemFactory
+import com.absinthe.libchecker.data.app.GlobalAppDetailSettingsRepository
 import com.absinthe.libchecker.data.app.LocalAppListRepository
 import com.absinthe.libchecker.data.app.LocalInstalledAppRepository
 import com.absinthe.libchecker.data.app.RemoteLibraryDetailRepository
@@ -16,6 +17,7 @@ import com.absinthe.libchecker.data.statistics.GlobalLibReferenceSettingsReposit
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.domain.app.AllowFileUriExposureUseCase
+import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.AppListExportMetadata
 import com.absinthe.libchecker.domain.app.AppListItemFactory
 import com.absinthe.libchecker.domain.app.AppListRepository
@@ -130,6 +132,7 @@ import org.koin.dsl.module
 
 val appModule = module {
   single<LCRepository> { Repositories.lcRepository }
+  single<AppDetailSettingsRepository> { GlobalAppDetailSettingsRepository() }
   single<InstalledAppRepository> { LocalInstalledAppRepository }
   single<AppListRepository> { LocalAppListRepository }
   single<LibraryDetailRepository> { RemoteLibraryDetailRepository }
@@ -291,6 +294,7 @@ val appModule = module {
       buildSignatureDetailItemsUseCase = get(),
       getXposedModuleInfoUseCase = get(),
       sortAppDetailItemsUseCase = get(),
+      appDetailSettingsRepository = get(),
       buildPackageComparisonSnapshotItemUseCase = get()
     )
   }
