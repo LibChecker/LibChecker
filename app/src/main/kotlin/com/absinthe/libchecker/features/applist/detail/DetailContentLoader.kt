@@ -1,14 +1,11 @@
 package com.absinthe.libchecker.features.applist.detail
 
-import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.GetAppDetailAbilityChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailDexChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailMetadataChipsUseCase
-import com.absinthe.libchecker.domain.app.GetAppDetailPermissionChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailSignatureChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailStaticLibraryChipsUseCase
-import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,11 +16,11 @@ class DetailContentLoader(
   private val getAppDetailAbilityChipsUseCase: GetAppDetailAbilityChipsUseCase,
   private val getAppDetailDexChipsUseCase: GetAppDetailDexChipsUseCase,
   private val getAppDetailMetadataChipsUseCase: GetAppDetailMetadataChipsUseCase,
-  private val getAppDetailPermissionChipsUseCase: GetAppDetailPermissionChipsUseCase,
   private val getAppDetailSignatureChipsUseCase: GetAppDetailSignatureChipsUseCase,
   private val getAppDetailStaticLibraryChipsUseCase: GetAppDetailStaticLibraryChipsUseCase,
   private val detailComponentContentLoader: DetailComponentContentLoader,
   private val detailNativeLibContentLoader: DetailNativeLibContentLoader,
+  private val detailPermissionContentLoader: DetailPermissionContentLoader,
   private val appDetailSettingsRepository: AppDetailSettingsRepository
 ) {
   val contentState = DetailContentState()
@@ -108,23 +105,13 @@ class DetailContentLoader(
     featureState: DetailFeatureState,
     packageState: DetailPackageState
   ) {
-    loadJobsState.launchIfNeeded(
-      key = DetailLoadJobsState.Key.PERMISSIONS,
+    detailPermissionContentLoader.initPermissionData(
       scope = scope,
-      hasData = contentState.permissionsItems.value != null
-    ) {
-      val permissions = getAppDetailPermissionChipsUseCase(
-        packageInfo = packageState.packageInfo,
-        apkPreviewInfo = packageState.apkPreviewInfo,
-        isApk = packageState.isApk,
-        isApkPreview = packageState.isApkPreview
-      )
-      contentState.permissionsItems.emit(permissions.items)
-
-      if (permissions.hasLiveUpdateNotification) {
-        featureState.emitFeature(VersionedFeature(Features.LIVE_UPDATE_NOTIFICATION))
-      }
-    }
+      contentState = contentState,
+      featureState = featureState,
+      loadJobsState = loadJobsState,
+      packageState = packageState
+    )
   }
 
   fun initDexData(

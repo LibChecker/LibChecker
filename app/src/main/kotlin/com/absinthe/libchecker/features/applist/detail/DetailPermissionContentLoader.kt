@@ -1,0 +1,36 @@
+package com.absinthe.libchecker.features.applist.detail
+
+import com.absinthe.libchecker.database.entity.Features
+import com.absinthe.libchecker.domain.app.GetAppDetailPermissionChipsUseCase
+import com.absinthe.libchecker.domain.app.VersionedFeature
+import kotlinx.coroutines.CoroutineScope
+
+class DetailPermissionContentLoader(
+  private val getAppDetailPermissionChipsUseCase: GetAppDetailPermissionChipsUseCase
+) {
+  fun initPermissionData(
+    scope: CoroutineScope,
+    contentState: DetailContentState,
+    featureState: DetailFeatureState,
+    loadJobsState: DetailLoadJobsState,
+    packageState: DetailPackageState
+  ) {
+    loadJobsState.launchIfNeeded(
+      key = DetailLoadJobsState.Key.PERMISSIONS,
+      scope = scope,
+      hasData = contentState.permissionsItems.value != null
+    ) {
+      val permissions = getAppDetailPermissionChipsUseCase(
+        packageInfo = packageState.packageInfo,
+        apkPreviewInfo = packageState.apkPreviewInfo,
+        isApk = packageState.isApk,
+        isApkPreview = packageState.isApkPreview
+      )
+      contentState.permissionsItems.emit(permissions.items)
+
+      if (permissions.hasLiveUpdateNotification) {
+        featureState.emitFeature(VersionedFeature(Features.LIVE_UPDATE_NOTIFICATION))
+      }
+    }
+  }
+}
