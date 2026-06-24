@@ -16,7 +16,6 @@ import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
-import androidx.core.graphics.toColorInt
 import androidx.core.text.buildSpannedString
 import androidx.core.text.scale
 import androidx.core.view.MenuProvider
@@ -56,8 +55,6 @@ import com.absinthe.libchecker.features.applist.detail.FeaturesDialog
 import com.absinthe.libchecker.features.applist.detail.IDetailContainer
 import com.absinthe.libchecker.features.applist.detail.bean.AppDetailToolbarItem
 import com.absinthe.libchecker.features.applist.detail.bean.DetailExtraBean
-import com.absinthe.libchecker.features.applist.detail.bean.FeatureItem
-import com.absinthe.libchecker.features.applist.detail.bean.FeaturePriority
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.AppDetailToolbarAdapter
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.FeatureAdapter
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.ProcessBarAdapter
@@ -74,7 +71,6 @@ import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ENTITY
 import com.absinthe.libchecker.features.snapshot.detail.ui.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.adapter.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
-import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.addBackStateHandler
@@ -127,6 +123,17 @@ abstract class BaseAppDetailActivity :
 
   private val bundleManager by unsafeLazy { ApplicationDelegate(this).iBundleManager }
   private val featureAdapter by unsafeLazy { FeatureAdapter() }
+  private val featureItemBuilder by unsafeLazy {
+    DetailFeatureItemBuilder(
+      activity = this,
+      packageInfo = { viewModel.packageInfo },
+      isApkPreview = { viewModel.isApkPreview },
+      apkPreviewInfo = { viewModel.apkPreviewInfo },
+      apkAnalyticsMode = { apkAnalyticsMode },
+      appIcons = { viewModel.featureState.appIcons },
+      appIconDrawables = ::prepareAppIconDrawables
+    )
+  }
   private val toolbarAdapter by unsafeLazy { AppDetailToolbarAdapter() }
 
   private var isHarmonyMode = false
@@ -626,166 +633,7 @@ abstract class BaseAppDetailActivity :
       }.launchIn(lifecycleScope)
       it.featureState.featuresFlow.onEach { feat ->
         initFeatureListView()
-
-        when (feat.featureType) {
-          Features.SPLIT_APKS -> {
-            featureAdapter.addData(
-              FeatureItem(R.drawable.ic_aab, R.string.app_bundle) {
-                FeaturesDialog.showSplitApksDialog(this, viewModel.packageInfo)
-              }
-            )
-          }
-
-          Features.KOTLIN_USED -> {
-            featureAdapter.addData(
-              FeatureItem(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_kotlin, R.string.kotlin_string) {
-                FeaturesDialog.showKotlinDialog(this, feat.extras)
-              }
-            )
-          }
-
-          Features.RX_JAVA -> {
-            featureAdapter.addData(
-              FeatureItem(R.drawable.ic_reactivex, R.string.rxjava) {
-                FeaturesDialog.showRxJavaDialog(this, feat.version)
-              }
-            )
-          }
-
-          Features.RX_KOTLIN -> {
-            featureAdapter.addData(
-              FeatureItem(R.drawable.ic_reactivex, R.string.rxkotlin, colorFilterInt = "#7F52FF".toColorInt()) {
-                FeaturesDialog.showRxKotlinDialog(this, feat.version)
-              }
-            )
-          }
-
-          Features.RX_ANDROID -> {
-            featureAdapter.addData(
-              FeatureItem(R.drawable.ic_reactivex, R.string.rxandroid, colorFilterInt = "#3DDC84".toColorInt()) {
-                FeaturesDialog.showRxAndroidDialog(this, feat.version)
-              }
-            )
-          }
-
-          Features.AGP -> {
-            featureAdapter.addData(
-              FeatureItem(R.drawable.ic_gradle, R.string.agp) {
-                FeaturesDialog.showAGPDialog(this, feat.version)
-              }
-            )
-          }
-
-          Features.XPOSED_MODULE -> {
-            featureAdapter.addData(
-              FeatureItem(R.drawable.ic_xposed, R.string.xposed_module) {
-                XposedInfoDialogFragment.newInstance(viewModel.packageInfo.packageName)
-                  .show(supportFragmentManager, XposedInfoDialogFragment::class.java.name)
-              }
-            )
-          }
-
-          Features.PLAY_SIGNING -> {
-            featureAdapter.addData(
-              FeatureItem(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_play_store, R.string.play_app_signing) {
-                FeaturesDialog.showPlayAppSigningDialog(this)
-              }
-            )
-          }
-
-          Features.PWA -> {
-            featureAdapter.addData(
-              FeatureItem(R.drawable.ic_pwa, R.string.pwa) {
-                FeaturesDialog.showPWADialog(this)
-              }
-            )
-          }
-
-          Features.JETPACK_COMPOSE -> {
-            featureAdapter.addData(
-              FeatureItem(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetpack_compose, R.string.jetpack_compose) {
-                FeaturesDialog.showJetpackComposeDialog(this, feat.version)
-              }
-            )
-          }
-
-          Features.KMP -> {
-            featureAdapter.addData(
-              FeatureItem(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetbrain_kmp, R.string.jetbrain_kmp) {
-                FeaturesDialog.showKMPDialog(this, feat.version)
-              }
-            )
-          }
-
-          Features.LIVE_UPDATE_NOTIFICATION -> {
-            featureAdapter.addData(
-              FeatureItem(R.drawable.ic_feature_live_update, R.string.feature_live_update_notification) {
-                FeaturesDialog.showLiveUpdateNotificationDialog(this)
-              }
-            )
-          }
-
-          Features.Ext.APPLICATION_PROP -> {
-            val position = featureAdapter.data.size.coerceAtMost(FeaturePriority.PRIORITY_APP_PROP)
-            featureAdapter.addData(
-              position,
-              FeatureItem(R.drawable.ic_app_prop, R.string.lib_detail_app_props_title) {
-                val previewInfo = viewModel.apkPreviewInfo
-                if (viewModel.isApkPreview && previewInfo != null) {
-                  FeaturesDialog.showAppPropDialog(this, previewInfo.appProps)
-                } else {
-                  FeaturesDialog.showAppPropDialog(this, viewModel.packageInfo)
-                }
-              }
-            )
-          }
-
-          Features.Ext.APPLICATION_INSTALL_SOURCE -> {
-            val position = featureAdapter.data.size.coerceAtMost(FeaturePriority.PRIORITY_APP_INSTALL_SOURCE)
-            if (OsUtils.atLeastR() && !apkAnalyticsMode) {
-              featureAdapter.addData(
-                position,
-                FeatureItem(R.drawable.ic_install_source, R.string.lib_detail_app_install_source_title) {
-                  FeaturesDialog.showAppInstallSourceDialog(this, viewModel.packageInfo.packageName)
-                }
-              )
-            }
-          }
-
-          Features.Ext.ELF_PAGE_SIZE_16KB -> {
-            val position = featureAdapter.data.size.coerceAtMost(FeaturePriority.PRIORITY_16_KB_PAGE_SIZE)
-            featureAdapter.addData(
-              position,
-              FeatureItem(R.drawable.ic_16kb_align, R.string.lib_detail_dialog_title_16kb_page_size) {
-                FeaturesDialog.show16KBAlignDialog(this)
-              }
-            )
-          }
-
-          Features.Ext.ELF_PAGE_SIZE_16KB_COMPAT -> {
-            val position = featureAdapter.data.size.coerceAtMost(FeaturePriority.PRIORITY_16_KB_PAGE_SIZE_COMPAT)
-            featureAdapter.addData(
-              position,
-              FeatureItem(R.drawable.ic_16kb_compat, R.string.lib_detail_dialog_title_16kb_page_size_compat) {
-                FeaturesDialog.show16KBCompatDialog(this)
-              }
-            )
-          }
-
-          Features.Ext.APPLICATION_ICONS -> {
-            if (OsUtils.atLeastT() && viewModel.featureState.appIcons.isNotEmpty()) {
-              val isFirstMonochrome = viewModel.featureState.appIcons[0].isMonochrome
-              val drawables = prepareAppIconDrawables()
-              if (drawables.isNotEmpty()) {
-                featureAdapter.addData(
-                  FeatureItem(-1, R.string.dialog_themed_and_alternative_app_icons, drawables = drawables) {
-                    FeaturesDialog.showAppIconsDialog(this, drawables, isFirstMonochrome)
-                  }
-                )
-              }
-            }
-          }
-        }
+        addFeatureItem(feat)
       }.launchIn(lifecycleScope)
       it.featureState.abiBundleStateFlow.onEach { bundle ->
         if (bundle != null) {
@@ -818,6 +666,16 @@ abstract class BaseAppDetailActivity :
           }
         }
       }.launchIn(lifecycleScope)
+    }
+  }
+
+  private fun addFeatureItem(feature: VersionedFeature) {
+    val featureItem = featureItemBuilder.build(feature, featureAdapter.data.size) ?: return
+    val position = featureItem.position
+    if (position == null) {
+      featureAdapter.addData(featureItem.item)
+    } else {
+      featureAdapter.addData(position, featureItem.item)
     }
   }
 
