@@ -7,6 +7,7 @@ import com.absinthe.libchecker.data.app.LocalAppListRepository
 import com.absinthe.libchecker.data.app.LocalInstalledAppRepository
 import com.absinthe.libchecker.data.app.RemoteLibraryDetailRepository
 import com.absinthe.libchecker.data.snapshot.AndroidSnapshotItemFactory
+import com.absinthe.libchecker.data.snapshot.GlobalSnapshotSelectionRepository
 import com.absinthe.libchecker.data.snapshot.LocalSnapshotRepository
 import com.absinthe.libchecker.data.snapshot.ProtoSnapshotArchiveCodec
 import com.absinthe.libchecker.data.statistics.CachedAndroidDistributionRepository
@@ -99,6 +100,8 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotItemFactory
 import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
+import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionRepository
+import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
 import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotTopAppsUseCase
 import com.absinthe.libchecker.domain.statistics.AndroidDistributionRepository
 import com.absinthe.libchecker.domain.statistics.BuildAbiChartDataUseCase
@@ -129,7 +132,8 @@ val appModule = module {
   single<AppListItemFactory> { AndroidAppListItemFactory(androidContext()) }
   single<AppListExportMetadata> { AndroidAppListExportMetadata(androidContext()) }
   single<SnapshotItemFactory> { AndroidSnapshotItemFactory() }
-  single<SnapshotRepository> { LocalSnapshotRepository(get()) }
+  single<SnapshotSelectionRepository> { GlobalSnapshotSelectionRepository() }
+  single<SnapshotRepository> { LocalSnapshotRepository(get(), get()) }
   single<SnapshotArchiveCodec> { ProtoSnapshotArchiveCodec() }
   single { AllowFileUriExposureUseCase() }
   factory { InitializeAppListUseCase(get(), get(), get()) }
@@ -224,6 +228,7 @@ val appModule = module {
   factory { PrepareRoomBackupRestoreFileUseCase(androidContext().contentResolver) }
   factory { RestoreSnapshotArchiveFromUriUseCase(androidContext().contentResolver, get()) }
   factory { SnapshotLibraryUseCase(get()) }
+  factory { SnapshotSelectionUseCase(get()) }
 
   viewModel {
     ChartViewModel(
@@ -319,7 +324,8 @@ val appModule = module {
       buildSnapshotPairDiffUseCase = get(),
       buildSnapshotComparisonListsUseCase = get(),
       getSnapshotPackageIconSourcesUseCase = get(),
-      getApexPackageNamesUseCase = get()
+      getApexPackageNamesUseCase = get(),
+      snapshotSelectionUseCase = get()
     )
   }
   viewModel { TrackViewModel(get(), get()) }

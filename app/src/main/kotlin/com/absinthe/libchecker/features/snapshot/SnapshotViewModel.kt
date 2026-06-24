@@ -3,7 +3,6 @@ package com.absinthe.libchecker.features.snapshot
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
@@ -27,6 +26,7 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotComparisonLists
 import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
+import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
 import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotTopAppsUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
@@ -64,7 +64,8 @@ class SnapshotViewModel(
   private val buildSnapshotPairDiffUseCase: BuildSnapshotPairDiffUseCase,
   private val buildSnapshotComparisonListsUseCase: BuildSnapshotComparisonListsUseCase,
   private val getSnapshotPackageIconSourcesUseCase: GetSnapshotPackageIconSourcesUseCase,
-  private val getApexPackageNamesUseCase: GetApexPackageNamesUseCase
+  private val getApexPackageNamesUseCase: GetApexPackageNamesUseCase,
+  private val snapshotSelectionUseCase: SnapshotSelectionUseCase
 ) : ViewModel() {
 
   val allSnapshots = repository.currentSnapshotCount
@@ -76,7 +77,10 @@ class SnapshotViewModel(
 
   private var compareDiffJob: Job? = null
 
-  var currentTimeStamp: Long = GlobalValues.snapshotTimestamp
+  val selectedSnapshotTimestamp: Long
+    get() = snapshotSelectionUseCase.getCurrentTimestamp()
+
+  var currentTimeStamp: Long = selectedSnapshotTimestamp
     private set
 
   fun isComparingActive(): Boolean = compareDiffJob == null || compareDiffJob?.isActive == true
@@ -186,7 +190,7 @@ class SnapshotViewModel(
   }
 
   suspend fun compareItemDiff(
-    timeStamp: Long = GlobalValues.snapshotTimestamp,
+    timeStamp: Long = selectedSnapshotTimestamp,
     packageName: String
   ) {
     val diffItem = compareSnapshotItemWithInstalledApp(timeStamp, packageName)
@@ -266,7 +270,7 @@ class SnapshotViewModel(
           }
           return@launch
         }
-        result.latestTimeStamp?.let { GlobalValues.snapshotTimestamp = it }
+        result.latestTimeStamp?.let(::setSelectedSnapshotTimestamp)
         withContext(Dispatchers.Main) {
           resultAction(result)
         }
@@ -287,9 +291,15 @@ class SnapshotViewModel(
   }
 
   fun changeTimeStamp(timestamp: Long) {
+    setSelectedSnapshotTimestamp(timestamp)
     setEffect {
       Effect.TimeStampChange(timestamp)
     }
+  }
+
+  fun selectLatestSnapshotTimestamp(timeStamps: List<TimeStampItem>) {
+    snapshotSelectionUseCase.selectLatestOrNone(timeStamps)
+    currentTimeStamp = selectedSnapshotTimestamp
   }
 
   fun getDashboardCount(timestamp: Long, isLeft: Boolean) = viewModelScope.launch(Dispatchers.IO) {
@@ -316,6 +326,11 @@ class SnapshotViewModel(
     setEffect {
       Effect.ComparingProgressChange(progress)
     }
+  }
+
+  private fun setSelectedSnapshotTimestamp(timestamp: Long) {
+    snapshotSelectionUseCase.setCurrentTimestamp(timestamp)
+    currentTimeStamp = timestamp
   }
 
   private fun setEffect(builder: () -> Effect) {

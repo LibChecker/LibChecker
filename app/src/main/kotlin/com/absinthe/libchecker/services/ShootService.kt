@@ -29,6 +29,7 @@ import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.snapshot.BuildInstalledSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
+import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
 import com.absinthe.libchecker.features.home.ui.MainActivity
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -60,6 +61,7 @@ class ShootService : LifecycleService() {
   private val snapshotRepository: SnapshotRepository by inject()
   private val installedAppRepository: InstalledAppRepository by inject()
   private val buildInstalledSnapshotItem: BuildInstalledSnapshotItemUseCase by inject()
+  private val snapshotSelectionUseCase: SnapshotSelectionUseCase by inject()
   private val listenerList = RemoteCallbackList<OnShootListener>()
 
   private val binder by lazy { ShootBinder(this) }
@@ -194,7 +196,7 @@ class ShootService : LifecycleService() {
 
     val size = appList.size
     val dbList = mutableListOf<SnapshotItem>()
-    val currentSnapshotTimestamp = GlobalValues.snapshotTimestamp
+    val currentSnapshotTimestamp = snapshotSelectionUseCase.getCurrentTimestamp()
     var count = 0
 
     if (areNotificationsEnabled) {
@@ -259,8 +261,8 @@ class ShootService : LifecycleService() {
     snapshotRepository.insertTimeStamp(TimeStampItem(ts, null, systemProps.toJson()))
 
     if (dropPrevious) {
-      Timber.i("deleteSnapshotsAndTimeStamp: ${GlobalValues.snapshotTimestamp}")
-      snapshotRepository.deleteSnapshotsAndTimeStamp(GlobalValues.snapshotTimestamp)
+      Timber.i("deleteSnapshotsAndTimeStamp: $currentSnapshotTimestamp")
+      snapshotRepository.deleteSnapshotsAndTimeStamp(currentSnapshotTimestamp)
     }
 
     if (GlobalValues.snapshotAutoRemoveThreshold > 0) {
@@ -284,7 +286,7 @@ class ShootService : LifecycleService() {
     timer.end()
     Timber.d("computeSnapshots: $timer")
 
-    GlobalValues.snapshotTimestamp = ts
+    snapshotSelectionUseCase.setCurrentTimestamp(ts)
     _isShooting = false
     notifyFinished(ts)
     ServiceCompat.stopForeground(this@ShootService, ServiceCompat.STOP_FOREGROUND_REMOVE)

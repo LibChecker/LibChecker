@@ -10,7 +10,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityAlbumBinding
 import com.absinthe.libchecker.features.album.backup.ui.BackupActivity
 import com.absinthe.libchecker.features.album.comparison.ui.ComparisonActivity
@@ -129,11 +128,7 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
                       if (position < timeStampList.size) {
                         timeStampList.removeAt(position)
                       }
-                      GlobalValues.snapshotTimestamp = if (timeStampList.isEmpty()) {
-                        0L
-                      } else {
-                        timeStampList[0].timestamp
-                      }
+                      viewModel.selectLatestSnapshotTimestamp(timeStampList)
                       withContext(Dispatchers.Main) {
                         root.adapter.remove(item)
                         dialog.dismiss()

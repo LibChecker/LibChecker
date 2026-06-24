@@ -6,13 +6,16 @@ import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.database.entity.TrackItem
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
+import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionRepository
 import kotlinx.coroutines.flow.Flow
 
 class LocalSnapshotRepository(
-  private val repository: LCRepository
+  private val repository: LCRepository,
+  private val selectionRepository: SnapshotSelectionRepository
 ) : SnapshotRepository {
 
-  override val currentSnapshotCount: Flow<Int> = repository.allSnapshotItemsFlow
+  override val currentSnapshotCount: Flow<Int> =
+    repository.getSnapshotsCountFlow(selectionRepository.currentTimestamp)
 
   override fun getTimeStamps(): List<TimeStampItem> {
     return repository.getTimeStamps()
