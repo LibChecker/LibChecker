@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
@@ -12,22 +11,18 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.domain.app.AppPackageShareFile
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.AppInfoAdapter
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppInfoBottomSheetView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.Toasty
-import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
-import timber.log.Timber
 
 /**
  * <pre>
@@ -41,49 +36,20 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
   private val viewModel: DetailViewModel by activityViewModel()
   private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
   private val aiAdapter = AppInfoAdapter()
-  private var pendingExportShareFile: AppPackageShareFile? = null
 
   private val exportApkLauncher =
     registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-      if (result.resultCode != Activity.RESULT_OK) {
-        pendingExportShareFile = null
-        return@registerForActivityResult
-      }
-      val uri = result.data?.data ?: run {
-        pendingExportShareFile = null
-        return@registerForActivityResult
-      }
-      val shareFile = pendingExportShareFile ?: run {
-        pendingExportShareFile = null
-        return@registerForActivityResult
-      }
-      val ctx = context ?: run {
-        pendingExportShareFile = null
-        return@registerForActivityResult
-      }
-
-      lifecycleScope.launch {
-        runCatching {
-          viewModel.exportAppPackageShareFile(shareFile, uri)
-        }.onSuccess {
-          pendingExportShareFile = null
-          Telemetry.recordEvent(
-            Constants.Event.APP_INFO_BOTTOM_SHEET,
-            mapOf(
-              Telemetry.Param.CONTENT to "Unknown",
-              "Action" to "Export APK"
-            )
-          )
-          Timber.i("Exported APK for %s to %s", shareFile.file.name, uri)
-        }.onFailure { throwable ->
-          pendingExportShareFile = null
-          Timber.e(throwable, "Failed to export APK for %s", shareFile.file.name)
-          if (isAdded) {
-            Toasty.showShort(ctx, R.string.toast_cant_open_app)
-          }
-        }
-      }
+      shareController.onExportResult(result.resultCode, result.data?.data)
     }
+  private val shareController: AppInfoPackageShareController by lazy {
+    AppInfoPackageShareController(
+      fragment = this,
+      viewModel = viewModel,
+      coroutineScope = lifecycleScope,
+      exportDocument = { intent -> exportApkLauncher.launch(intent) },
+      dismiss = ::dismiss
+    )
+  }
 
   override fun initRootView(): AppInfoBottomSheetView = AppInfoBottomSheetView(requireContext())
 
@@ -154,87 +120,10 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
     }
     root.share.apply {
       setOnClickListener { view ->
-        val pkg = packageName ?: run {
-          Timber.e("package name is null")
-          return@setOnClickListener
-        }
-        val ctx = view.context as Activity
-        val loading = UiUtils.createLoadingDialog(ctx)
-        loading.show()
-        lifecycleScope.launch {
-          val shareResult = runCatching {
-            viewModel.prepareAppPackageShareFile(ctx.cacheDir, pkg)
-          }
-          loading.dismiss()
-
-          shareResult.onSuccess { shareFile ->
-            val shareIntent = Intent(Intent.ACTION_SEND).apply {
-              type = shareFile.mimeType
-              putExtra(Intent.EXTRA_STREAM, shareFile.contentUri)
-              addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            }
-            if (!GlobalValues.longTapShareButtonTip) {
-              Toasty.showLong(view.context, R.string.toast_long_tap_share_button_tip)
-            }
-            runCatching {
-              startActivity(Intent.createChooser(shareIntent, null))
-              Telemetry.recordEvent(
-                Constants.Event.APP_INFO_BOTTOM_SHEET,
-                mapOf(
-                  Telemetry.Param.CONTENT to "Unknown",
-                  "Action" to "Share"
-                )
-              )
-              dismiss()
-            }.onFailure { throwable ->
-              Timber.e(throwable)
-              Toasty.showShort(ctx, throwable.toString())
-            }
-          }.onFailure { throwable ->
-            Timber.e(throwable)
-            Toasty.showShort(ctx, throwable.toString())
-          }
-        }
+        shareController.sharePackage(view, packageName)
       }
       setOnLongClickListener { view ->
-        val pkg = packageName ?: run {
-          Timber.e("package name is null")
-          return@setOnLongClickListener true
-        }
-
-        lifecycleScope.launch {
-          val ctx = view.context as Activity
-          val loading = UiUtils.createLoadingDialog(ctx)
-          loading.show()
-          val fileResult = runCatching {
-            viewModel.prepareAppPackageShareFile(ctx.cacheDir, pkg)
-          }
-          loading.dismiss()
-
-          fileResult.onSuccess { shareFile ->
-            pendingExportShareFile = shareFile
-            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-              addCategory(Intent.CATEGORY_OPENABLE)
-              type = shareFile.mimeType
-              putExtra(Intent.EXTRA_TITLE, shareFile.file.name)
-            }
-
-            runCatching {
-              exportApkLauncher.launch(intent)
-            }.onFailure { throwable ->
-              pendingExportShareFile = null
-              Timber.e(throwable)
-              Toasty.showShort(ctx, throwable.toString())
-            }.onSuccess {
-              GlobalValues.longTapShareButtonTip = true
-            }
-          }.onFailure { throwable ->
-            Timber.e(throwable)
-            Toasty.showShort(ctx, throwable.toString())
-          }
-        }
-
-        true
+        shareController.exportPackage(view, packageName)
       }
     }
     root.list.apply {
