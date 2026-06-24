@@ -10,11 +10,25 @@ import com.absinthe.libchecker.features.statistics.ui.adapter.provider.MultipleA
 import com.chad.library.adapter.base.BaseNodeAdapter
 import com.chad.library.adapter.base.entity.node.BaseNode
 
-class LibReferenceAdapter : BaseNodeAdapter() {
+class LibReferenceAdapter(
+  initialColorfulRuleIcon: Boolean = true
+) : BaseNodeAdapter() {
+
+  var colorfulRuleIcon: Boolean = initialColorfulRuleIcon
+    private set
 
   init {
-    addNodeProvider(LibReferenceProvider())
+    addNodeProvider(LibReferenceProvider { colorfulRuleIcon })
     addNodeProvider(MultipleAppsIconProvider())
+  }
+
+  fun updateColorfulRuleIcon(enabled: Boolean) {
+    if (colorfulRuleIcon == enabled) {
+      return
+    }
+    colorfulRuleIcon = enabled
+    // noinspection NotifyDataSetChanged
+    notifyDataSetChanged()
   }
 
   override fun getItemType(data: List<BaseNode>, position: Int): Int {

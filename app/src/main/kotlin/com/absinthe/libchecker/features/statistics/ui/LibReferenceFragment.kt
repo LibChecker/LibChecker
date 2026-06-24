@@ -18,6 +18,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
+import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.features.applist.ui.AdvancedMenuBSDFragment
 import com.absinthe.libchecker.features.chart.ui.ChartActivity
@@ -44,6 +45,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
+import org.koin.android.ext.android.inject
 import rikka.widget.borderview.BorderView
 
 const val VF_LOADING = 0
@@ -54,7 +56,8 @@ class LibReferenceFragment :
   BaseListControllerFragment<FragmentLibReferenceBinding>(),
   SearchView.OnQueryTextListener {
 
-  private val refAdapter = LibReferenceAdapter()
+  private val appListSettingsRepository: AppListSettingsRepository by inject()
+  private val refAdapter by lazy { LibReferenceAdapter(appListSettingsRepository.colorfulRuleIcon) }
   private var delayShowNavigationJob: Job? = null
   private var searchUpdateJob: Job? = null
   private var advancedMenuBSDFragment: LibReferenceMenuBSDFragment? = null
@@ -203,8 +206,7 @@ class LibReferenceFragment :
         }
 
         Constants.PREF_COLORFUL_ICON -> {
-          // noinspection NotifyDataSetChanged
-          refAdapter.notifyDataSetChanged()
+          refAdapter.updateColorfulRuleIcon(it.second as Boolean)
         }
 
         Constants.PREF_LIB_REF_THRESHOLD -> {

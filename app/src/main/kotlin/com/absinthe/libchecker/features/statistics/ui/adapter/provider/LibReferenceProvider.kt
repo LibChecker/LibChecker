@@ -14,7 +14,6 @@ import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.isComponentType
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.features.applist.detail.ui.LibDetailDialogFragment
 import com.absinthe.libchecker.features.statistics.bean.LibReference
@@ -33,7 +32,9 @@ import kotlinx.coroutines.withContext
 
 const val LIB_REFERENCE_PROVIDER = 0
 
-class LibReferenceProvider : BaseNodeProvider() {
+class LibReferenceProvider(
+  private val colorfulRuleIcon: () -> Boolean
+) : BaseNodeProvider() {
 
   override val itemViewType: Int = LIB_REFERENCE_PROVIDER
   override val layoutId: Int = 0
@@ -76,7 +77,7 @@ class LibReferenceProvider : BaseNodeProvider() {
           setImageResource(it.iconRes)
           contentDescription = it.label
 
-          if (!GlobalValues.isColorfulIcon && !it.isSimpleColorIcon) {
+          if (!colorfulRuleIcon() && !it.isSimpleColorIcon) {
             this.drawable.mutate().colorFilter =
               ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
           }
