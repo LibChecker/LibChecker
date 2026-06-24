@@ -4,9 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
-import android.widget.ArrayAdapter
 import android.widget.FrameLayout
-import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,55 +14,35 @@ import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.ACTION_IN_RULES
-import com.absinthe.libchecker.annotation.ACTIVITY
-import com.absinthe.libchecker.annotation.ET_NOT_ELF
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.isComponentType
-import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
 import com.absinthe.libchecker.features.applist.DetailFragmentManager
-import com.absinthe.libchecker.features.applist.Referable
 import com.absinthe.libchecker.features.applist.Sortable
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.IDetailContainer
-import com.absinthe.libchecker.features.applist.detail.ui.ELFDetailDialogFragment
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.features.applist.detail.ui.LibDetailDialogFragment
 import com.absinthe.libchecker.features.applist.detail.ui.PermissionDetailDialogFragment
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibStringAdapter
-import com.absinthe.libchecker.features.applist.detail.ui.impl.ComponentsAnalysisFragment
-import com.absinthe.libchecker.features.applist.detail.ui.impl.MetaDataAnalysisFragment
-import com.absinthe.libchecker.features.applist.detail.ui.impl.NativeAnalysisFragment
-import com.absinthe.libchecker.features.applist.detail.ui.impl.PermissionAnalysisFragment
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
-import com.absinthe.libchecker.integrations.anywhere.AnywhereManager
-import com.absinthe.libchecker.integrations.blocker.BlockerManager
-import com.absinthe.libchecker.integrations.monkeyking.MonkeyKingManager
-import com.absinthe.libchecker.integrations.monkeyking.ShareCmpInfo
-import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.base.BaseFragment
-import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColor
-import com.absinthe.libchecker.utils.extensions.launchLibReferencePage
-import com.absinthe.libchecker.utils.extensions.reverseStrikeThroughAnimation
-import com.absinthe.libchecker.utils.extensions.startStrikeThroughAnimation
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
-import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
-import rikka.core.util.ClipboardUtils
 import timber.log.Timber
 
 /**
@@ -118,8 +96,16 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   }
   protected var isListReady = false
   private var afterListReadyTask: Runnable? = null
-  private var integrationMonkeyKingBlockList: List<ShareCmpInfo.Component>? = null
-  private var integrationBlockerList: List<ShareCmpInfo.Component>? = null
+  private val longClickController by unsafeLazy {
+    DetailItemLongClickController(
+      fragment = this,
+      viewModel = viewModel,
+      adapter = adapter,
+      coroutineScope = lifecycleScope,
+      packageName = { packageName },
+      type = { type }
+    )
+  }
 
   abstract fun getRecyclerView(): RecyclerView
 
@@ -160,7 +146,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
         }
       }
       setOnItemLongClickListener { _, _, position ->
-        doOnLongClick(context, getItem(position), position)
+        longClickController.onLongClick(getItem(position), position)
         true
       }
       setProcessMode(appDetailSettingsRepository.processMode)
@@ -350,167 +336,5 @@ abstract class BaseDetailFragment<T : ViewBinding> :
 
   fun hasNonGrantedPermissions(): Boolean {
     return type == PERMISSION && viewModel.contentState.permissionsItems.value?.any { it.item.size == 0L } == true
-  }
-
-  private fun doOnLongClick(context: Context, item: LibStringItemChip, position: Int) {
-    val packageName = viewModel.packageName()
-    val actionMap = mutableMapOf<Int, () -> Unit>()
-    val arrayAdapter = ArrayAdapter<String>(context, android.R.layout.simple_list_item_1)
-    var componentName = item.item.name
-    if (this is PermissionAnalysisFragment) {
-      componentName = componentName.substringBefore(" ")
-    }
-    val fullComponentName = if (componentName.startsWith(".")) {
-      packageName + componentName
-    } else {
-      componentName
-    }
-
-    // Copy
-    arrayAdapter.add(getString(android.R.string.copy))
-    actionMap[arrayAdapter.count - 1] = {
-      if (this is MetaDataAnalysisFragment) {
-        ClipboardUtils.put(context, componentName + ": " + item.item.source)
-      } else {
-        ClipboardUtils.put(context, componentName)
-      }
-      VersionCompat.showCopiedOnClipboardToast(context)
-    }
-
-    // ELF info
-    if (!viewModel.isApkPreview && this is NativeAnalysisFragment) {
-      arrayAdapter.add(getString(R.string.lib_detail_elf_extract))
-      actionMap[arrayAdapter.count - 1] = {
-        val loading = UiUtils.createLoadingDialog(requireActivity())
-        lifecycleScope.launch {
-          withContext(Dispatchers.Main) {
-            loading.show()
-          }
-
-          val result = viewModel.extractNativeLibrary(item.item)
-
-          withContext(Dispatchers.Main) {
-            loading.dismiss()
-            result.onSuccess {
-              context.showToast(R.string.lib_detail_elf_extract_success)
-            }.onFailure { e ->
-              Timber.e(e, "Failed to extract ELF: ${item.item}")
-              context.showToast(R.string.lib_detail_elf_extract_failed)
-            }
-          }
-        }
-      }
-
-      if (item.item.elfInfo.elfType != ET_NOT_ELF) {
-        arrayAdapter.add(getString(R.string.lib_detail_elf_info))
-        actionMap[arrayAdapter.count - 1] = {
-          ELFDetailDialogFragment.newInstance(
-            packageName = packageName,
-            elfPath = item.item.source.orEmpty(),
-            ruleIcon = item.rule?.iconRes
-              ?: com.absinthe.lc.rulesbundle.R.drawable.ic_sdk_placeholder
-          ).show(childFragmentManager, ELFDetailDialogFragment::class.java.name)
-        }
-      }
-    }
-
-    // Reference
-    if (this is Referable && !componentName.startsWith(".")) {
-      arrayAdapter.add(getString(R.string.tab_lib_reference_statistics))
-      actionMap[arrayAdapter.count - 1] = {
-        val refName = item.rule?.libName ?: componentName
-        val libType = if (item.rule?.libType == ACTION_IN_RULES) ACTION else type
-        activity?.launchLibReferencePage(refName, item.rule?.label, libType, null)
-      }
-    }
-
-    if (!viewModel.isApk && !viewModel.isApkPreview) {
-      // Blocker
-      if (this is ComponentsAnalysisFragment && BlockerManager.isSupportInteraction) {
-        if (integrationBlockerList == null) {
-          integrationBlockerList =
-            BlockerManager().queryBlockedComponent(context, packageName)
-        }
-        val blockerShouldBlock =
-          integrationBlockerList?.any { it.name == fullComponentName } == false
-        val blockStr = if (blockerShouldBlock) {
-          R.string.integration_blocker_menu_block
-        } else {
-          R.string.integration_blocker_menu_unblock
-        }
-        arrayAdapter.add(getString(blockStr))
-        actionMap[arrayAdapter.count - 1] = {
-          BlockerManager().apply {
-            addBlockedComponent(
-              context,
-              packageName,
-              componentName,
-              type,
-              blockerShouldBlock
-            )
-            integrationBlockerList =
-              queryBlockedComponent(context, packageName)
-            val shouldTurnToDisable =
-              integrationBlockerList?.any { it.name == fullComponentName } == true && blockerShouldBlock
-            animateTvTitle(position, shouldTurnToDisable)
-          }
-        }
-      }
-
-      // MonkeyKing Purify
-      if (this is ComponentsAnalysisFragment && MonkeyKingManager.isSupportInteraction) {
-        if (integrationMonkeyKingBlockList == null) {
-          integrationMonkeyKingBlockList =
-            MonkeyKingManager().queryBlockedComponent(context, packageName)
-        }
-        val monkeyKingShouldBlock =
-          integrationMonkeyKingBlockList?.any { it.name == componentName } == false
-        if (monkeyKingShouldBlock) {
-          arrayAdapter.add(getString(R.string.integration_monkey_king_menu_block))
-        } else {
-          arrayAdapter.add(getString(R.string.integration_monkey_king_menu_unblock))
-        }
-        actionMap[arrayAdapter.count - 1] = {
-          MonkeyKingManager().apply {
-            addBlockedComponent(
-              context,
-              packageName,
-              componentName,
-              type,
-              monkeyKingShouldBlock
-            )
-            integrationMonkeyKingBlockList =
-              queryBlockedComponent(context, packageName)
-            val shouldTurnToDisable =
-              integrationMonkeyKingBlockList?.any { it.name == fullComponentName } == true && monkeyKingShouldBlock
-            animateTvTitle(position, shouldTurnToDisable)
-          }
-        }
-      }
-
-      // Anywhere-
-      if (type == ACTIVITY && AnywhereManager.isSupportInteraction) {
-        arrayAdapter.add(getString(R.string.integration_anywhere_menu_editor))
-        actionMap[arrayAdapter.count - 1] = {
-          AnywhereManager().launchActivityEditor(
-            context,
-            packageName,
-            componentName
-          )
-        }
-      }
-    }
-
-    BaseAlertDialogBuilder(context)
-      .setAdapter(arrayAdapter) { _, which ->
-        actionMap[which]?.invoke()
-      }
-      .show()
-  }
-
-  private fun animateTvTitle(position: Int, shouldTurnToDisable: Boolean) {
-    (adapter.getViewByPosition(position, android.R.id.title) as? TextView)?.run {
-      if (shouldTurnToDisable) startStrikeThroughAnimation() else reverseStrikeThroughAnimation()
-    }
   }
 }
