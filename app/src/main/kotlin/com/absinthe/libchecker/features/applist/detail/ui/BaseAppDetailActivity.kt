@@ -23,16 +23,11 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PERMISSION
-import com.absinthe.libchecker.annotation.PROVIDER
-import com.absinthe.libchecker.annotation.RECEIVER
-import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.annotation.SIGNATURES
 import com.absinthe.libchecker.annotation.STATIC
-import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.database.entity.Features
@@ -147,6 +142,7 @@ abstract class BaseAppDetailActivity :
   private val headerExtraInfoBinder by unsafeLazy {
     DetailHeaderExtraInfoBinder(binding.detailsTitle)
   }
+  private val tabSpecBuilder by unsafeLazy { DetailTabSpecBuilder(this) }
   private val toolbarAdapter by unsafeLazy { AppDetailToolbarAdapter() }
 
   private var isHarmonyMode = false
@@ -314,56 +310,12 @@ abstract class BaseAppDetailActivity :
       }
     }
 
-    typeList = if (!isHarmonyMode) {
-      mutableListOf(
-        NATIVE,
-        SERVICE,
-        ACTIVITY,
-        RECEIVER,
-        PROVIDER,
-        PERMISSION,
-        METADATA,
-        // DEX,
-        SIGNATURES
-      )
-    } else {
-      mutableListOf(
-        NATIVE,
-        AbilityType.PAGE,
-        AbilityType.SERVICE,
-        AbilityType.WEB,
-        AbilityType.DATA,
-        // DEX,
-        SIGNATURES
-      )
-    }
-    val tabTitles = if (!isHarmonyMode) {
-      mutableListOf(
-        getText(R.string.ref_category_native),
-        getText(R.string.ref_category_service),
-        getText(R.string.ref_category_activity),
-        getText(R.string.ref_category_br),
-        getText(R.string.ref_category_cp),
-        getText(R.string.ref_category_perm),
-        getText(R.string.ref_category_metadata),
-        // getText(R.string.ref_category_dex),
-        getText(R.string.ref_category_signatures)
-      )
-    } else {
-      mutableListOf(
-        getText(R.string.ref_category_native),
-        getText(R.string.ability_page),
-        getText(R.string.ability_service),
-        getText(R.string.ability_web),
-        getText(R.string.ability_data),
-        // getText(R.string.ref_category_dex),
-        getText(R.string.ref_category_signatures)
-      )
-    }
-    if (viewModel.isApkPreview) {
-      typeList.remove(SIGNATURES)
-      tabTitles.remove(getText(R.string.ref_category_signatures))
-    }
+    val tabSpec = tabSpecBuilder.build(
+      isHarmonyMode = isHarmonyMode,
+      isApkPreview = viewModel.isApkPreview
+    )
+    typeList = tabSpec.types
+    val tabTitles = tabSpec.titles
 
     if (sharedLibraryFiles?.isNotEmpty() == true) {
       lifecycleScope.launch {
