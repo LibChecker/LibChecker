@@ -128,6 +128,7 @@ import com.absinthe.libchecker.domain.statistics.GetLibReferenceIconPackagesUseC
 import com.absinthe.libchecker.domain.statistics.LibReferenceSettingsRepository
 import com.absinthe.libchecker.features.album.track.TrackViewModel
 import com.absinthe.libchecker.features.applist.detail.DetailActionLoader
+import com.absinthe.libchecker.features.applist.detail.DetailComponentContentLoader
 import com.absinthe.libchecker.features.applist.detail.DetailContentLoader
 import com.absinthe.libchecker.features.applist.detail.DetailFeatureLoader
 import com.absinthe.libchecker.features.applist.detail.DetailFilterController
@@ -254,15 +255,20 @@ val appModule = module {
     )
   }
   factory {
+    DetailComponentContentLoader(
+      getAppDetailComponentChipsUseCase = get()
+    )
+  }
+  factory {
     DetailContentLoader(
       getAppDetailAbilityChipsUseCase = get(),
-      getAppDetailComponentChipsUseCase = get(),
       getAppDetailDexChipsUseCase = get(),
       getAppDetailMetadataChipsUseCase = get(),
       getAppDetailNativeLibrariesUseCase = get(),
       getAppDetailPermissionChipsUseCase = get(),
       getAppDetailSignatureChipsUseCase = get(),
       getAppDetailStaticLibraryChipsUseCase = get(),
+      detailComponentContentLoader = get(),
       appDetailSettingsRepository = get()
     )
   }

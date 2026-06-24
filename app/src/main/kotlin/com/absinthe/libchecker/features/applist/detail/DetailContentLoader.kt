@@ -3,7 +3,6 @@ package com.absinthe.libchecker.features.applist.detail
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.GetAppDetailAbilityChipsUseCase
-import com.absinthe.libchecker.domain.app.GetAppDetailComponentChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailDexChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailMetadataChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailNativeLibrariesUseCase
@@ -12,7 +11,6 @@ import com.absinthe.libchecker.domain.app.GetAppDetailSignatureChipsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailStaticLibraryChipsUseCase
 import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
-import com.absinthe.libchecker.utils.UiUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
@@ -22,13 +20,13 @@ import timber.log.Timber
 
 class DetailContentLoader(
   private val getAppDetailAbilityChipsUseCase: GetAppDetailAbilityChipsUseCase,
-  private val getAppDetailComponentChipsUseCase: GetAppDetailComponentChipsUseCase,
   private val getAppDetailDexChipsUseCase: GetAppDetailDexChipsUseCase,
   private val getAppDetailMetadataChipsUseCase: GetAppDetailMetadataChipsUseCase,
   private val getAppDetailNativeLibrariesUseCase: GetAppDetailNativeLibrariesUseCase,
   private val getAppDetailPermissionChipsUseCase: GetAppDetailPermissionChipsUseCase,
   private val getAppDetailSignatureChipsUseCase: GetAppDetailSignatureChipsUseCase,
   private val getAppDetailStaticLibraryChipsUseCase: GetAppDetailStaticLibraryChipsUseCase,
+  private val detailComponentContentLoader: DetailComponentContentLoader,
   private val appDetailSettingsRepository: AppDetailSettingsRepository
 ) {
   val contentState = DetailContentState()
@@ -195,31 +193,22 @@ class DetailContentLoader(
     scope: CoroutineScope,
     packageState: DetailPackageState
   ) {
-    loadJobsState.launchIfNeeded(
-      key = DetailLoadJobsState.Key.COMPONENTS,
+    detailComponentContentLoader.initComponentsData(
       scope = scope,
-      hasData = contentState.hasComponentsData()
-    ) {
-      try {
-        val components = getAppDetailComponentChipsUseCase(
-          packageState.packageInfo,
-          packageState.isApk
-        )
-        contentState.emitComponents(components) { UiUtils.getRandomColor() }
-      } catch (e: Exception) {
-        Timber.e(e)
-      }
-    }
+      contentState = contentState,
+      loadJobsState = loadJobsState,
+      packageState = packageState
+    )
   }
 
   fun initComponentsDataInPreview(
     scope: CoroutineScope,
     packageState: DetailPackageState
-  ) = scope.launch(Dispatchers.IO) {
-    val previewInfo = packageState.apkPreviewInfo ?: return@launch
-    val components = getAppDetailComponentChipsUseCase(previewInfo)
-    contentState.emitComponentItems(components)
-  }
+  ) = detailComponentContentLoader.initComponentsDataInPreview(
+    scope = scope,
+    contentState = contentState,
+    packageState = packageState
+  )
 
   fun initAbilities(
     scope: CoroutineScope,
