@@ -174,8 +174,10 @@ Important `:app` boundaries:
 4. For refactors, prioritize high-traffic user-facing flows before low-frequency
    tooling. Keep edits focused and avoid generated/build-output churn.
 5. Run `spotlessApply` only when formatting needs fixing.
-6. Run the narrowest relevant validation command, then report exactly what
-   passed, failed, or was skipped.
+6. Run the narrowest relevant validation command. If adapters, view-state
+   mapping, menus, navigation, or visible strings changed, add a focused
+   AndroMeld smoke on the affected flow when a device is available. Report
+   exactly what passed, failed, or was skipped.
 7. Before committing code, consider `AGENTS.md` only for durable, recurring
    rules. Keep it compact: merge with existing bullets, replace stale guidance,
    or delete obsolete notes before appending. Put one-off decisions and

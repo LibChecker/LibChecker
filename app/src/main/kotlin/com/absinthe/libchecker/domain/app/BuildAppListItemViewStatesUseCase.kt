@@ -44,6 +44,7 @@ data class AppListItemViewState(
   @DrawableRes val largeAbiBadgeRes: Int,
   val isAbiBadge64Bit: Boolean,
   val showMultiArchBadge: Boolean,
+  val tintAbiLabels: Boolean,
   val packageBadge: PackageBadge?
 ) {
 
@@ -80,6 +81,7 @@ data class AppListItemViewState(
         largeAbiBadgeRes = getLargeAbiBadgeResource(abi),
         isAbiBadge64Bit = PackageUtils.isAbi64Bit(baseAbi),
         showMultiArchBadge = abi / Constants.MULTI_ARCH == 1,
+        tintAbiLabels = (options and AdvancedOptions.TINT_ABI_LABEL) > 0,
         packageBadge = when {
           item.packageName == Constants.EXAMPLE_PACKAGE -> null
           item.variant == Constants.VARIANT_HAP -> PackageBadge.Harmony

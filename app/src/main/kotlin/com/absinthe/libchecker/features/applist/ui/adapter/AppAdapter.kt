@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppListItemViewState
@@ -24,7 +23,10 @@ import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
-class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAdapter<LCItem>() {
+class AppAdapter(
+  private val cardMode: CardMode = CardMode.NORMAL,
+  private var fallbackDisplayOptions: Int = AdvancedOptions.DEFAULT_OPTIONS
+) : HighlightAdapter<LCItem>() {
 
   private val itemViewStateCache = mutableMapOf<String, AppListItemViewState>()
 
@@ -70,11 +72,11 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
       if (viewState.useDetachedAbiBadges) {
         if (viewState.largeAbiBadgeRes != 0) {
           val abiBadge = viewState.largeAbiBadgeRes.getDrawable(context)?.mutate()?.apply {
-            setTint(context.getAbiBadgeTint(viewState.isAbiBadge64Bit))
+            setTint(context.getAbiBadgeTint(viewState.isAbiBadge64Bit, viewState.tintAbiLabels))
           }
           val multiArchBadge = if (viewState.showMultiArchBadge) {
             R.drawable.ic_abi_label_multi_arch.getDrawable(context)?.mutate()?.apply {
-              setTint(context.getMultiArchBadgeTint())
+              setTint(context.getMultiArchBadgeTint(viewState.tintAbiLabels))
             }
           } else {
             null
@@ -119,6 +121,11 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
     itemViewStateCache.clear()
   }
 
+  fun setFallbackDisplayOptions(options: Int) {
+    fallbackDisplayOptions = options
+    clearItemViewStateCache()
+  }
+
   private fun getItemViewState(item: LCItem): AppListItemViewState {
     return itemViewStateCache.getOrPut(item.packageName) {
       AppListItemViewState.create(
@@ -128,7 +135,7 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
           packageInfo = null,
           isFrozen = item.packageName != Constants.EXAMPLE_PACKAGE
         ),
-        options = GlobalValues.advancedOptions
+        options = fallbackDisplayOptions
       )
     }
   }
@@ -139,8 +146,8 @@ class AppAdapter(private val cardMode: CardMode = CardMode.NORMAL) : HighlightAd
   }
 }
 
-private fun Context.getAbiBadgeTint(isAbi64Bit: Boolean): Int {
-  if ((GlobalValues.advancedOptions and AdvancedOptions.TINT_ABI_LABEL) == 0) {
+private fun Context.getAbiBadgeTint(isAbi64Bit: Boolean, tintAbiLabels: Boolean): Int {
+  if (!tintAbiLabels) {
     return getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant)
   }
   return getColorByAttr(
@@ -165,13 +172,13 @@ private fun Context.buildInlineAbiInfo(viewState: AppListItemViewState): CharSeq
 
   viewState.abiBadgeRes.getDrawable(this)?.mutate()?.let {
     it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
-    it.setTint(getAbiBadgeTint(viewState.isAbiBadge64Bit))
+    it.setTint(getAbiBadgeTint(viewState.isAbiBadge64Bit, viewState.tintAbiLabels))
     spanString.setSpan(CenterAlignImageSpan(it), 0, 1, ImageSpan.ALIGN_BOTTOM)
   }
   if (viewState.showMultiArchBadge) {
     R.drawable.ic_multi_arch.getDrawable(this)?.mutate()?.let {
       it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
-      it.setTint(getMultiArchBadgeTint())
+      it.setTint(getMultiArchBadgeTint(viewState.tintAbiLabels))
       spanString.setSpan(CenterAlignImageSpan(it), 2, 3, ImageSpan.ALIGN_BOTTOM)
     }
   }
@@ -179,9 +186,9 @@ private fun Context.buildInlineAbiInfo(viewState: AppListItemViewState): CharSeq
   return spanString
 }
 
-private fun Context.getMultiArchBadgeTint(): Int {
+private fun Context.getMultiArchBadgeTint(tintAbiLabels: Boolean): Int {
   return getColorByAttr(
-    if ((GlobalValues.advancedOptions and AdvancedOptions.TINT_ABI_LABEL) > 0) {
+    if (tintAbiLabels) {
       com.google.android.material.R.attr.colorSecondary
     } else {
       com.google.android.material.R.attr.colorOnSurfaceVariant

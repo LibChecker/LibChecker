@@ -19,7 +19,7 @@ class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBS
 
   private var onDismissCallback: ((advancedDiff: Int, itemAdvancedDiff: Int) -> Unit)? = null
 
-  override fun initRootView(): AdvancedMenuBSDView = AdvancedMenuBSDView(requireContext())
+  override fun initRootView(): AdvancedMenuBSDView = AdvancedMenuBSDView(requireContext(), GlobalValues.advancedOptions)
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
@@ -37,19 +37,19 @@ class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBS
     optionsViewMap[AdvancedOptions.TINT_ABI_LABEL] = root.addOptionItemView(R.string.adv_tint_abi_label, AdvancedOptions.TINT_ABI_LABEL, AdvancedMenuSection.View)
 
     optionsViewMap[AdvancedOptions.SHOW_ANDROID_VERSION]?.setOnCheckedChangeCallback {
-      root.updateDemoView()
+      root.updateDemoView(GlobalValues.advancedOptions)
     }
     optionsViewMap[AdvancedOptions.SHOW_TARGET_API]?.setOnCheckedChangeCallback {
-      root.updateDemoView()
+      root.updateDemoView(GlobalValues.advancedOptions)
     }
     optionsViewMap[AdvancedOptions.SHOW_MIN_API]?.setOnCheckedChangeCallback {
-      root.updateDemoView()
+      root.updateDemoView(GlobalValues.advancedOptions)
     }
     optionsViewMap[AdvancedOptions.SHOW_COMPILE_API]?.setOnCheckedChangeCallback {
-      root.updateDemoView()
+      root.updateDemoView(GlobalValues.advancedOptions)
     }
     optionsViewMap[AdvancedOptions.TINT_ABI_LABEL]?.setOnCheckedChangeCallback {
-      root.updateDemoView()
+      root.updateDemoView(GlobalValues.advancedOptions)
     }
 
     itemOptionsViewMap[AdvancedOptions.MARK_EXPORTED] =
