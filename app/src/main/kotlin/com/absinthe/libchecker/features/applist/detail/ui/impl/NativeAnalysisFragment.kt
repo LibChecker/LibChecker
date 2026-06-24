@@ -68,7 +68,7 @@ class NativeAnalysisFragment :
           viewModel.initSoAnalysisData()
         }
       }.launchIn(lifecycleScope)
-      is64Bit.onEach {
+      featureState.is64Bit.onEach {
         if (it != null) {
           adapter.set64Bit(it)
         }
@@ -80,7 +80,7 @@ class NativeAnalysisFragment :
         }
         binding.tabLayout.isVisible = binding.tabLayout.tabCount > 1
         lifecycleScope.launch(Dispatchers.IO) {
-          val flow = viewModel.abiBundleStateFlow
+          val flow = viewModel.featureState.abiBundleStateFlow
           val abi = (flow.value ?: flow.filterNotNull().first()).abi
           withContext(Dispatchers.Main) {
             selectTabByAbi(abi)

@@ -8,11 +8,9 @@ import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppBundleSplitItem
-import com.absinthe.libchecker.domain.app.AppDetailAbi
 import com.absinthe.libchecker.domain.app.AppDetailAbiLabelData
 import com.absinthe.libchecker.domain.app.AppDetailHeaderExtraInfo
 import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
-import com.absinthe.libchecker.domain.app.AppIconItem
 import com.absinthe.libchecker.domain.app.AppManifestProperty
 import com.absinthe.libchecker.domain.app.AppPackageShareFile
 import com.absinthe.libchecker.domain.app.BuildAppDetailAbiLabelDataUseCase
@@ -67,9 +65,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -117,23 +113,16 @@ class DetailViewModel(
   private val buildPackageComparisonSnapshotItemUseCase: BuildPackageComparisonSnapshotItemUseCase
 ) : ViewModel() {
   val contentState = DetailContentState()
+  val featureState = DetailFeatureState()
   val filterState = DetailFilterState()
-  val is64Bit = MutableStateFlow<Boolean?>(null)
 
   var isApk = false
   var isApkPreview = false
-
-  var appIcons: List<AppIconItem> = listOf()
 
   lateinit var packageInfo: PackageInfo
     private set
   var apkPreviewInfo: ApkPreviewInfo? = null
   val packageInfoStateFlow = MutableStateFlow<PackageInfo?>(null)
-
-  private val _featuresFlow = MutableSharedFlow<VersionedFeature>()
-  val featuresFlow = _featuresFlow.asSharedFlow()
-
-  val abiBundleStateFlow = MutableStateFlow<AppDetailAbi?>(null)
 
   fun initPackageInfo(pi: PackageInfo) {
     packageInfo = pi
@@ -265,19 +254,20 @@ class DetailViewModel(
       currentJob = initSoAnalysisJob,
       hasData = contentState.nativeLibItems.value != null
     ) {
-      val abi = (abiBundleStateFlow.value ?: abiBundleStateFlow.filterNotNull().first()).abi
+      val abiBundle = featureState.abiBundleStateFlow.value
+        ?: featureState.abiBundleStateFlow.filterNotNull().first()
       val nativeLibraries = getAppDetailNativeLibrariesUseCase(
         packageInfo = packageInfo,
         apkPreviewInfo = apkPreviewInfo,
         isApk = isApk,
         isApkPreview = isApkPreview,
-        abi = abi
+        abi = abiBundle.abi
       )
 
       contentState.emitNativeLibTabs(nativeLibraries.itemsByAbi)
 
       if (nativeLibraries.selectedAbiSupports16KbPageSize) {
-        _featuresFlow.emit(VersionedFeature(Features.Ext.ELF_PAGE_SIZE_16KB))
+        featureState.emitFeature(VersionedFeature(Features.Ext.ELF_PAGE_SIZE_16KB))
       }
     }
   }
@@ -347,7 +337,7 @@ class DetailViewModel(
       contentState.permissionsItems.emit(permissions.items)
 
       if (permissions.hasLiveUpdateNotification) {
-        _featuresFlow.emit(VersionedFeature(Features.LIVE_UPDATE_NOTIFICATION))
+        featureState.emitFeature(VersionedFeature(Features.LIVE_UPDATE_NOTIFICATION))
       }
     }
   }
@@ -455,7 +445,7 @@ class DetailViewModel(
   }
 
   fun emitFeature(feature: VersionedFeature) = viewModelScope.launch {
-    _featuresFlow.emit(feature)
+    featureState.emitFeature(feature)
   }
 
   suspend fun getRelatedAppListItem(packageName: String): RelatedAppListItem? {
@@ -470,21 +460,18 @@ class DetailViewModel(
     Timber.d("initFeatures: features = $features")
 
     val detailFeatures = getAppDetailFeaturesUseCase(packageInfo, features, isApk)
-    appIcons = detailFeatures.appIcons
-    detailFeatures.features.forEach {
-      _featuresFlow.emit(it)
-    }
+    featureState.emitFeatures(detailFeatures)
   }
 
   fun initAbiInfo(packageInfo: PackageInfo, apkAnalyticsMode: Boolean) = viewModelScope.launch(Dispatchers.IO) {
     getAppDetailAbiUseCase(packageInfo, apkAnalyticsMode)?.let {
-      abiBundleStateFlow.emit(it)
+      featureState.emitAbiBundle(it)
     }
   }
 
   fun initAbiInfo(apkPreviewInfo: ApkPreviewInfo) = viewModelScope.launch(Dispatchers.IO) {
     getAppDetailAbiUseCase(apkPreviewInfo)?.let {
-      abiBundleStateFlow.emit(it)
+      featureState.emitAbiBundle(it)
     }
   }
 

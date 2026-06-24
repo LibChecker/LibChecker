@@ -624,7 +624,7 @@ abstract class BaseAppDetailActivity :
         }
         setupProcessBarView(list)
       }.launchIn(lifecycleScope)
-      it.featuresFlow.onEach { feat ->
+      it.featureState.featuresFlow.onEach { feat ->
         initFeatureListView()
 
         when (feat.featureType) {
@@ -772,8 +772,8 @@ abstract class BaseAppDetailActivity :
           }
 
           Features.Ext.APPLICATION_ICONS -> {
-            if (OsUtils.atLeastT() && viewModel.appIcons.isNotEmpty()) {
-              val isFirstMonochrome = viewModel.appIcons[0].isMonochrome
+            if (OsUtils.atLeastT() && viewModel.featureState.appIcons.isNotEmpty()) {
+              val isFirstMonochrome = viewModel.featureState.appIcons[0].isMonochrome
               val drawables = prepareAppIconDrawables()
               if (drawables.isNotEmpty()) {
                 featureAdapter.addData(
@@ -786,7 +786,7 @@ abstract class BaseAppDetailActivity :
           }
         }
       }.launchIn(lifecycleScope)
-      it.abiBundleStateFlow.onEach { bundle ->
+      it.featureState.abiBundleStateFlow.onEach { bundle ->
         if (bundle != null) {
           initAbiView(bundle.abi, bundle.abiSet)
 
@@ -952,7 +952,7 @@ abstract class BaseAppDetailActivity :
       apkAnalyticsMode = apkAnalyticsMode
     )
     lifecycleScope.launch {
-      viewModel.is64Bit.emit(abiLabelData.is64Bit)
+      viewModel.featureState.set64Bit(abiLabelData.is64Bit)
     }
 
     val abiLabelsList = abiLabelData.labels.map { label ->
@@ -983,8 +983,8 @@ abstract class BaseAppDetailActivity :
 
   @RequiresApi(Build.VERSION_CODES.TIRAMISU)
   private fun prepareAppIconDrawables(): List<Drawable> {
-    val firstIcon = viewModel.appIcons[0]
-    val drawables = viewModel.appIcons.map { it.drawable }.toMutableList()
+    val firstIcon = viewModel.featureState.appIcons[0]
+    val drawables = viewModel.featureState.appIcons.map { it.drawable }.toMutableList()
 
     val processedDrawable = when {
       firstIcon.isMonochrome && firstIcon.drawable is AdaptiveIconDrawable -> {
