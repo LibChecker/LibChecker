@@ -2,10 +2,6 @@ package com.absinthe.libchecker.features.snapshot.ui.view
 
 import android.content.Context
 import android.widget.FrameLayout
-import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.view.app.CheckableChipView
 
@@ -25,25 +21,12 @@ class SnapshotMenuItemView(context: Context) : FrameLayout(context) {
     addView(chip)
   }
 
-  fun setOption(labelRes: Int, option: Int) {
+  fun setOption(labelRes: Int, option: Int, currentOptions: Int) {
     chip.apply {
       text = context.getString(labelRes)
-      isChecked = (GlobalValues.snapshotOptions and option) > 0
+      isChecked = (currentOptions and option) > 0
       onCheckedChangeListener = { _: CheckableChipView, isChecked: Boolean ->
-        val newOptions = if (isChecked) {
-          GlobalValues.snapshotOptions or option
-        } else {
-          GlobalValues.snapshotOptions and option.inv()
-        }
-        GlobalValues.snapshotOptions = newOptions
         onCheckedChangeCallback?.invoke(isChecked)
-        Telemetry.recordEvent(
-          Constants.Event.SNAPSHOT_ADVANCED_MENU_ITEM_CHANGED,
-          mapOf(
-            Telemetry.Param.CONTENT to text,
-            Telemetry.Param.VALUE to isChecked
-          )
-        )
       }
     }
   }

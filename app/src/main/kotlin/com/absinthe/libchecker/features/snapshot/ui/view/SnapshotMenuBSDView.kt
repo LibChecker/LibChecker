@@ -110,9 +110,13 @@ class SnapshotMenuBSDView(
     }
   }
 
-  fun addOptionItemView(labelRes: Int, option: Int): SnapshotMenuItemView {
+  fun addOptionItemView(
+    labelRes: Int,
+    option: Int,
+    currentOptions: Int
+  ): SnapshotMenuItemView {
     val view = SnapshotMenuItemView(context).apply {
-      setOption(labelRes, option)
+      setOption(labelRes, option, currentOptions)
     }
     flexLayout.addView(view)
     return view
