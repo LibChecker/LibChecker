@@ -2,16 +2,9 @@ package com.absinthe.libchecker.features.applist.detail
 
 import android.content.pm.PackageInfo
 import android.net.Uri
-import android.util.SparseArray
-import androidx.core.util.forEach
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.LibType
-import com.absinthe.libchecker.annotation.PROVIDER
-import com.absinthe.libchecker.annotation.RECEIVER
-import com.absinthe.libchecker.annotation.SERVICE
-import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppBundleSplitItem
@@ -123,23 +116,13 @@ class DetailViewModel(
   private val appDetailSettingsRepository: AppDetailSettingsRepository,
   private val buildPackageComparisonSnapshotItemUseCase: BuildPackageComparisonSnapshotItemUseCase
 ) : ViewModel() {
-  private var allNativeLibItems: Map<String, List<LibStringItem>> = emptyMap()
-  val nativeLibTabs: MutableStateFlow<Collection<String>?> = MutableStateFlow(null)
-  val nativeLibItems: MutableStateFlow<List<LibStringItemChip>?> = MutableStateFlow(null)
-  val staticLibItems: MutableStateFlow<List<LibStringItemChip>?> = MutableStateFlow(null)
-  val metaDataItems: MutableStateFlow<List<LibStringItemChip>?> = MutableStateFlow(null)
-  val permissionsItems: MutableStateFlow<List<LibStringItemChip>?> = MutableStateFlow(null)
-  val dexLibItems: MutableStateFlow<List<LibStringItemChip>?> = MutableStateFlow(null)
-  val signaturesLibItems: MutableStateFlow<List<LibStringItemChip>?> = MutableStateFlow(null)
-  val componentsMap = SparseArray<MutableStateFlow<List<LibStringItemChip>?>>()
-  val abilitiesMap = SparseArray<MutableStateFlow<List<LibStringItemChip>?>>()
+  val contentState = DetailContentState()
   val filterState = DetailFilterState()
   val is64Bit = MutableStateFlow<Boolean?>(null)
 
   var isApk = false
   var isApkPreview = false
 
-  var processesMap: Map<String, Int> = mapOf()
   var appIcons: List<AppIconItem> = listOf()
 
   lateinit var packageInfo: PackageInfo
@@ -151,13 +134,6 @@ class DetailViewModel(
   val featuresFlow = _featuresFlow.asSharedFlow()
 
   val abiBundleStateFlow = MutableStateFlow<AppDetailAbi?>(null)
-
-  init {
-    componentsMap.put(SERVICE, MutableStateFlow(null))
-    componentsMap.put(ACTIVITY, MutableStateFlow(null))
-    componentsMap.put(RECEIVER, MutableStateFlow(null))
-    componentsMap.put(PROVIDER, MutableStateFlow(null))
-  }
 
   fun initPackageInfo(pi: PackageInfo) {
     packageInfo = pi
@@ -278,16 +254,7 @@ class DetailViewModel(
     initDexJob?.cancel()
     initSignaturesJob?.cancel()
     initComponentsJob?.cancel()
-    allNativeLibItems = emptyMap()
-    nativeLibTabs.value = null
-    nativeLibItems.value = null
-    staticLibItems.value = null
-    metaDataItems.value = null
-    permissionsItems.value = null
-    dexLibItems.value = null
-    signaturesLibItems.value = null
-    componentsMap.forEach { key, value -> value.value = null }
-    abilitiesMap.forEach { key, value -> value.value = null }
+    contentState.reset()
     filterState.reset()
   }
 
@@ -296,7 +263,7 @@ class DetailViewModel(
   fun initSoAnalysisData() {
     initSoAnalysisJob = launchDetailDataJob(
       currentJob = initSoAnalysisJob,
-      hasData = nativeLibItems.value != null
+      hasData = contentState.nativeLibItems.value != null
     ) {
       val abi = (abiBundleStateFlow.value ?: abiBundleStateFlow.filterNotNull().first()).abi
       val nativeLibraries = getAppDetailNativeLibrariesUseCase(
@@ -306,12 +273,8 @@ class DetailViewModel(
         isApkPreview = isApkPreview,
         abi = abi
       )
-      allNativeLibItems = nativeLibraries.itemsByAbi
 
-      nativeLibTabs.emit(allNativeLibItems.keys)
-      if (allNativeLibItems.isEmpty()) {
-        nativeLibItems.emit(emptyList())
-      }
+      contentState.emitNativeLibTabs(nativeLibraries.itemsByAbi)
 
       if (nativeLibraries.selectedAbiSupports16KbPageSize) {
         _featuresFlow.emit(VersionedFeature(Features.Ext.ELF_PAGE_SIZE_16KB))
@@ -320,9 +283,9 @@ class DetailViewModel(
   }
 
   fun loadSoAnalysisData(tab: String) {
-    allNativeLibItems[tab]?.let {
+    contentState.nativeLibItemsFor(tab)?.let {
       viewModelScope.launch(Dispatchers.IO) {
-        nativeLibItems.emit(
+        contentState.nativeLibItems.emit(
           getAppDetailNativeLibrariesUseCase.buildChipList(
             packageInfo = packageInfo,
             apkPreviewInfo = apkPreviewInfo,
@@ -340,9 +303,9 @@ class DetailViewModel(
   fun initStaticData() {
     initStaticJob = launchDetailDataJob(
       currentJob = initStaticJob,
-      hasData = staticLibItems.value != null
+      hasData = contentState.staticLibItems.value != null
     ) {
-      staticLibItems.emit(
+      contentState.staticLibItems.emit(
         getAppDetailStaticLibraryChipsUseCase(
           packageInfo = packageInfo,
           sortBySizeMode = appDetailSettingsRepository.sortMode == MODE_SORT_BY_SIZE
@@ -356,9 +319,9 @@ class DetailViewModel(
   fun initMetaDataData() {
     initMetaDataJob = launchDetailDataJob(
       currentJob = initMetaDataJob,
-      hasData = metaDataItems.value != null
+      hasData = contentState.metaDataItems.value != null
     ) {
-      metaDataItems.emit(
+      contentState.metaDataItems.emit(
         getAppDetailMetadataChipsUseCase(
           packageInfo = packageInfo,
           apkPreviewInfo = apkPreviewInfo,
@@ -373,7 +336,7 @@ class DetailViewModel(
   fun initPermissionData() {
     initPermissionJob = launchDetailDataJob(
       currentJob = initPermissionJob,
-      hasData = permissionsItems.value != null
+      hasData = contentState.permissionsItems.value != null
     ) {
       val permissions = getAppDetailPermissionChipsUseCase(
         packageInfo = packageInfo,
@@ -381,7 +344,7 @@ class DetailViewModel(
         isApk = isApk,
         isApkPreview = isApkPreview
       )
-      permissionsItems.emit(permissions.items)
+      contentState.permissionsItems.emit(permissions.items)
 
       if (permissions.hasLiveUpdateNotification) {
         _featuresFlow.emit(VersionedFeature(Features.LIVE_UPDATE_NOTIFICATION))
@@ -394,13 +357,13 @@ class DetailViewModel(
   fun initDexData() {
     initDexJob = launchDetailDataJob(
       currentJob = initDexJob,
-      hasData = dexLibItems.value != null
+      hasData = contentState.dexLibItems.value != null
     ) {
       val list = getAppDetailDexChipsUseCase(
         packageInfo = packageInfo,
         sortBySizeMode = appDetailSettingsRepository.sortMode == MODE_SORT_BY_SIZE
       )
-      dexLibItems.emit(list)
+      contentState.dexLibItems.emit(list)
     }
   }
 
@@ -409,9 +372,9 @@ class DetailViewModel(
   fun initSignatures() {
     initSignaturesJob = launchDetailDataJob(
       currentJob = initSignaturesJob,
-      hasData = signaturesLibItems.value != null
+      hasData = contentState.signaturesLibItems.value != null
     ) {
-      signaturesLibItems.emit(getAppDetailSignatureChipsUseCase(packageInfo, isApk))
+      contentState.signaturesLibItems.emit(getAppDetailSignatureChipsUseCase(packageInfo, isApk))
     }
   }
 
@@ -420,26 +383,15 @@ class DetailViewModel(
   fun initComponentsData() {
     initComponentsJob = launchDetailDataJob(
       currentJob = initComponentsJob,
-      hasData = hasComponentsData()
+      hasData = contentState.hasComponentsData()
     ) {
       try {
         val components = getAppDetailComponentChipsUseCase(packageInfo, isApk)
-        processesMap = components.processNames.associateWith { UiUtils.getRandomColor() }
-        componentsMap[SERVICE]?.emit(components.services)
-        componentsMap[ACTIVITY]?.emit(components.activities)
-        componentsMap[RECEIVER]?.emit(components.receivers)
-        componentsMap[PROVIDER]?.emit(components.providers)
+        contentState.emitComponents(components) { UiUtils.getRandomColor() }
       } catch (e: Exception) {
         Timber.e(e)
       }
     }
-  }
-
-  private fun hasComponentsData(): Boolean {
-    return componentsMap[SERVICE]?.value != null &&
-      componentsMap[ACTIVITY]?.value != null &&
-      componentsMap[RECEIVER]?.value != null &&
-      componentsMap[PROVIDER]?.value != null
   }
 
   private fun launchDetailDataJob(
@@ -457,10 +409,7 @@ class DetailViewModel(
   fun initComponentsDataInPreview() = viewModelScope.launch(Dispatchers.IO) {
     val previewInfo = apkPreviewInfo ?: return@launch
     val components = getAppDetailComponentChipsUseCase(previewInfo)
-    componentsMap[SERVICE]?.emit(components.services)
-    componentsMap[ACTIVITY]?.emit(components.activities)
-    componentsMap[RECEIVER]?.emit(components.receivers)
-    componentsMap[PROVIDER]?.emit(components.providers)
+    contentState.emitComponentItems(components)
   }
 
   suspend fun getLibraryDetailDialogHeader(
@@ -494,17 +443,12 @@ class DetailViewModel(
   suspend fun getPermissionDetail(permissionName: String) = getPermissionDetailUseCase(permissionName)
 
   fun initAbilities(packageName: String) = viewModelScope.launch(Dispatchers.IO) {
-    abilitiesMap.put(AbilityType.PAGE, MutableStateFlow(null))
-    abilitiesMap.put(AbilityType.SERVICE, MutableStateFlow(null))
-    abilitiesMap.put(AbilityType.WEB, MutableStateFlow(null))
-    abilitiesMap.put(AbilityType.DATA, MutableStateFlow(null))
+    contentState.resetAbilities()
 
     runCatching {
       getAppDetailAbilityChipsUseCase(packageName)
     }.onSuccess { abilityChips ->
-      abilityChips.forEach { (type, items) ->
-        abilitiesMap[type]?.emit(items)
-      }
+      contentState.emitAbilities(abilityChips)
     }.onFailure {
       Timber.e(it)
     }

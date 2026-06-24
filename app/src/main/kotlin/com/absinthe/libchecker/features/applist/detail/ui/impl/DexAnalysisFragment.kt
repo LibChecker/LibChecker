@@ -23,7 +23,7 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
   override val needShowLibDetailDialog = false
 
   override suspend fun getItems(): List<LibStringItemChip> {
-    val flow = viewModel.dexLibItems
+    val flow = viewModel.contentState.dexLibItems
     return flow.value ?: flow.filterNotNull().first()
   }
 
@@ -63,7 +63,7 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
 
     viewModel.apply {
       packageInfoStateFlow.value?.run {
-        dexLibItems.value ?: run { initDexData() }
+        contentState.dexLibItems.value ?: run { initDexData() }
       }
     }
   }

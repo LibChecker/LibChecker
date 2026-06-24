@@ -27,7 +27,7 @@ class PermissionAnalysisFragment :
   override val needShowLibDetailDialog = true
 
   override suspend fun getItems(): List<LibStringItemChip> {
-    val flow = viewModel.permissionsItems
+    val flow = viewModel.contentState.permissionsItems
     return flow.value ?: flow.filterNotNull().first()
   }
 
@@ -69,7 +69,7 @@ class PermissionAnalysisFragment :
       }.launchIn(lifecycleScope)
 
       packageInfoStateFlow.value?.run {
-        permissionsItems.value ?: run { initPermissionData() }
+        contentState.permissionsItems.value ?: run { initPermissionData() }
       }
     }
   }

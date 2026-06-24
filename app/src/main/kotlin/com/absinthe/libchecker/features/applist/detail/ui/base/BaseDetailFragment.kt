@@ -180,7 +180,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     super.onVisibilityChanged(visible)
     if (visible) {
       val processMap = if (isComponentFragment()) {
-        viewModel.processesMap
+        viewModel.contentState.processesMap
       } else if (hasNonGrantedPermissions()) {
         val label = requireContext().getString(R.string.permission_not_granted)
         val color = R.color.material_red_400.getColor(requireContext())
@@ -349,7 +349,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   }
 
   fun hasNonGrantedPermissions(): Boolean {
-    return type == PERMISSION && viewModel.permissionsItems.value?.any { it.item.size == 0L } == true
+    return type == PERMISSION && viewModel.contentState.permissionsItems.value?.any { it.item.size == 0L } == true
   }
 
   private fun doOnLongClick(context: Context, item: LibStringItemChip, position: Int) {

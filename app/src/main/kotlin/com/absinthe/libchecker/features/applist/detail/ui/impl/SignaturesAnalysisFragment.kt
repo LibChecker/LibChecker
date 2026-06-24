@@ -27,7 +27,7 @@ class SignaturesAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
   override val needShowLibDetailDialog = false
 
   override suspend fun getItems(): List<LibStringItemChip> {
-    val flow = viewModel.signaturesLibItems
+    val flow = viewModel.contentState.signaturesLibItems
     return flow.value ?: flow.filterNotNull().first()
   }
 
@@ -75,7 +75,7 @@ class SignaturesAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
       }.launchIn(lifecycleScope)
 
       packageInfoStateFlow.value?.run {
-        signaturesLibItems.value ?: run { initSignatures() }
+        contentState.signaturesLibItems.value ?: run { initSignatures() }
       }
     }
   }

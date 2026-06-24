@@ -32,7 +32,7 @@ class NativeAnalysisFragment :
   override val autoLoadItems = false
 
   override suspend fun getItems(): List<LibStringItemChip> {
-    val flow = viewModel.nativeLibItems
+    val flow = viewModel.contentState.nativeLibItems
     return flow.value ?: flow.filterNotNull().first()
   }
 
@@ -73,7 +73,7 @@ class NativeAnalysisFragment :
           adapter.set64Bit(it)
         }
       }.launchIn(lifecycleScope)
-      nativeLibTabs.onEach {
+      contentState.nativeLibTabs.onEach {
         binding.tabLayout.removeAllTabs()
         it?.forEach { title ->
           binding.tabLayout.addTab(binding.tabLayout.newTab().setText(title), false)
@@ -87,14 +87,14 @@ class NativeAnalysisFragment :
           }
         }
       }.launchIn(lifecycleScope)
-      nativeLibItems.onEach {
+      contentState.nativeLibItems.onEach {
         if (it != null) {
           setItems(it)
         }
       }.launchIn(lifecycleScope)
 
       packageInfoStateFlow.value?.run {
-        nativeLibItems.value ?: run { initSoAnalysisData() }
+        contentState.nativeLibItems.value ?: run { initSoAnalysisData() }
       }
     }
   }

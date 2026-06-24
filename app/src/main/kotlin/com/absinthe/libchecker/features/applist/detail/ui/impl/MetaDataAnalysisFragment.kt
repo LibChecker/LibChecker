@@ -24,7 +24,7 @@ class MetaDataAnalysisFragment :
   override val needShowLibDetailDialog = false
 
   override suspend fun getItems(): List<LibStringItemChip> {
-    val flow = viewModel.metaDataItems
+    val flow = viewModel.contentState.metaDataItems
     return flow.value ?: flow.filterNotNull().first()
   }
 
@@ -59,7 +59,7 @@ class MetaDataAnalysisFragment :
 
     viewModel.apply {
       packageInfoStateFlow.value?.run {
-        metaDataItems.value ?: run { initMetaDataData() }
+        contentState.metaDataItems.value ?: run { initMetaDataData() }
       }
     }
   }

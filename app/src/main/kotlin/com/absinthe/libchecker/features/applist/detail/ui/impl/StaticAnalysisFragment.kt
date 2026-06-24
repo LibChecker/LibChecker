@@ -25,7 +25,7 @@ class StaticAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>()
   override val needShowLibDetailDialog = true
 
   override suspend fun getItems(): List<LibStringItemChip> {
-    val flow = viewModel.staticLibItems
+    val flow = viewModel.contentState.staticLibItems
     return flow.value ?: flow.filterNotNull().first()
   }
 
@@ -71,7 +71,7 @@ class StaticAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>()
       }.launchIn(lifecycleScope)
 
       packageInfoStateFlow.value?.run {
-        staticLibItems.value ?: run { initStaticData() }
+        contentState.staticLibItems.value ?: run { initStaticData() }
       }
     }
   }

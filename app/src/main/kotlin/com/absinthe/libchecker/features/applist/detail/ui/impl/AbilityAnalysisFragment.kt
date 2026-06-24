@@ -22,7 +22,7 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
   override val needShowLibDetailDialog = false
 
   override suspend fun getItems(): List<LibStringItemChip> {
-    val flow = viewModel.abilitiesMap[adapter.type]
+    val flow = viewModel.contentState.abilitiesMap[adapter.type]
     return flow.value ?: flow.filterNotNull().first()
   }
 
@@ -46,7 +46,7 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
         adapter = this@AbilityAnalysisFragment.adapter
       }
     }
-    val flow = viewModel.abilitiesMap[adapter.type]
+    val flow = viewModel.contentState.abilitiesMap[adapter.type]
 
     adapter.apply {
       setOnItemLongClickListener { _, _, position ->
