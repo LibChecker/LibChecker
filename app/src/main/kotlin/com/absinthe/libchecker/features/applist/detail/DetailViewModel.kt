@@ -12,9 +12,6 @@ import com.absinthe.libchecker.domain.app.AppDetailHeaderExtraInfo
 import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.AppManifestProperty
 import com.absinthe.libchecker.domain.app.AppPackageShareFile
-import com.absinthe.libchecker.domain.app.BuildAppDetailAbiLabelDataUseCase
-import com.absinthe.libchecker.domain.app.BuildAppDetailHeaderExtraInfoUseCase
-import com.absinthe.libchecker.domain.app.BuildAppDetailHeaderTitleDataUseCase
 import com.absinthe.libchecker.domain.app.BuildRelatedAppDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.BuildSignatureDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.ExportAppPackageShareFileUseCase
@@ -23,8 +20,6 @@ import com.absinthe.libchecker.domain.app.FilterAppDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.GetAlternativeLaunchItemsUseCase
 import com.absinthe.libchecker.domain.app.GetApkPreviewInfoUseCase
 import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
-import com.absinthe.libchecker.domain.app.GetAppDetailAbiUseCase
-import com.absinthe.libchecker.domain.app.GetAppDetailFeaturesUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageUseCase
 import com.absinthe.libchecker.domain.app.GetAppInfoActionsUseCase
 import com.absinthe.libchecker.domain.app.GetAppInstallSourceDetailsUseCase
@@ -37,7 +32,6 @@ import com.absinthe.libchecker.domain.app.GetOverlayDetailUseCase
 import com.absinthe.libchecker.domain.app.GetPermissionDetailUseCase
 import com.absinthe.libchecker.domain.app.GetRelatedAppListItemUseCase
 import com.absinthe.libchecker.domain.app.GetXposedModuleInfoUseCase
-import com.absinthe.libchecker.domain.app.HasInstalledStaticLibrariesUseCase
 import com.absinthe.libchecker.domain.app.PrepareApkAnalysisPackageUseCase
 import com.absinthe.libchecker.domain.app.PrepareAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.RelatedAppListItem
@@ -50,8 +44,6 @@ import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
 import java.io.File
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class DetailViewModel(
@@ -61,12 +53,7 @@ class DetailViewModel(
   private val getAppLaunchActionUseCase: GetAppLaunchActionUseCase,
   private val getAppBundleItemsUseCase: GetAppBundleItemsUseCase,
   private val filterAppDetailItemsUseCase: FilterAppDetailItemsUseCase,
-  private val getAppDetailAbiUseCase: GetAppDetailAbiUseCase,
   private val getAppInstallSourceDetailsUseCase: GetAppInstallSourceDetailsUseCase,
-  private val getAppDetailFeaturesUseCase: GetAppDetailFeaturesUseCase,
-  private val buildAppDetailAbiLabelDataUseCase: BuildAppDetailAbiLabelDataUseCase,
-  private val buildAppDetailHeaderExtraInfoUseCase: BuildAppDetailHeaderExtraInfoUseCase,
-  private val buildAppDetailHeaderTitleDataUseCase: BuildAppDetailHeaderTitleDataUseCase,
   private val extractNativeLibraryUseCase: ExtractNativeLibraryUseCase,
   private val prepareAppPackageShareFileUseCase: PrepareAppPackageShareFileUseCase,
   private val exportAppPackageShareFileUseCase: ExportAppPackageShareFileUseCase,
@@ -75,7 +62,6 @@ class DetailViewModel(
   private val prepareApkAnalysisPackageUseCase: PrepareApkAnalysisPackageUseCase,
   private val getElfDetailUseCase: GetElfDetailUseCase,
   private val getInstalledAppComparisonPackageUseCase: GetInstalledAppComparisonPackageUseCase,
-  private val hasInstalledStaticLibrariesUseCase: HasInstalledStaticLibrariesUseCase,
   private val getLibraryDetailDialogDataUseCase: GetLibraryDetailDialogDataUseCase,
   private val getOverlayDetailUseCase: GetOverlayDetailUseCase,
   private val getPermissionDetailUseCase: GetPermissionDetailUseCase,
@@ -86,6 +72,7 @@ class DetailViewModel(
   private val sortAppDetailItemsUseCase: SortAppDetailItemsUseCase,
   private val appDetailSettingsRepository: AppDetailSettingsRepository,
   private val detailContentLoader: DetailContentLoader,
+  private val detailFeatureLoader: DetailFeatureLoader,
   private val buildPackageComparisonSnapshotItemUseCase: BuildPackageComparisonSnapshotItemUseCase
 ) : ViewModel() {
   val contentState = DetailContentState()
@@ -142,33 +129,20 @@ class DetailViewModel(
     abiSet: Collection<Int>,
     apkAnalyticsMode: Boolean
   ): AppDetailAbiLabelData {
-    return buildAppDetailAbiLabelDataUseCase(
-      abi = abi,
-      abiSet = abiSet,
-      apkAnalyticsMode = apkAnalyticsMode
-    )
+    return detailFeatureLoader.buildAppDetailAbiLabelData(abi, abiSet, apkAnalyticsMode)
   }
 
   suspend fun buildAppDetailHeaderExtraInfo(
     packageInfo: PackageInfo,
     showAndroidVersion: Boolean
   ): AppDetailHeaderExtraInfo {
-    return buildAppDetailHeaderExtraInfoUseCase(
-      packageInfo = packageInfo,
-      apkPreviewInfo = packageState.apkPreviewInfo,
-      isApkPreview = packageState.isApkPreview,
-      showAndroidVersion = showAndroidVersion
-    )
+    return detailFeatureLoader.buildAppDetailHeaderExtraInfo(packageState, packageInfo, showAndroidVersion)
   }
 
   fun buildAppDetailHeaderTitleData(
     packageInfo: PackageInfo,
     apkAnalyticsMode: Boolean
-  ) = buildAppDetailHeaderTitleDataUseCase(
-    packageInfo = packageInfo,
-    apkPreviewInfo = packageState.apkPreviewInfo,
-    apkAnalyticsMode = apkAnalyticsMode
-  )
+  ) = detailFeatureLoader.buildAppDetailHeaderTitleData(packageState, packageInfo, apkAnalyticsMode)
 
   suspend fun getAppBundleItems(packageInfo: PackageInfo): List<AppBundleSplitItem> {
     return getAppBundleItemsUseCase(packageInfo)
@@ -222,7 +196,7 @@ class DetailViewModel(
   }
 
   suspend fun hasInstalledStaticLibraries(packageName: String): Boolean {
-    return hasInstalledStaticLibrariesUseCase(packageName)
+    return detailFeatureLoader.hasInstalledStaticLibraries(packageName)
   }
 
   suspend fun loadInstalledAppComparisonPackage(packageName: String): PackageInfo? {
@@ -315,8 +289,8 @@ class DetailViewModel(
     detailContentLoader.initAbilities(viewModelScope, contentState, packageName)
   }
 
-  fun emitFeature(feature: VersionedFeature) = viewModelScope.launch {
-    featureState.emitFeature(feature)
+  fun emitFeature(feature: VersionedFeature) {
+    detailFeatureLoader.emitFeature(viewModelScope, featureState, feature)
   }
 
   suspend fun getRelatedAppListItem(packageName: String): RelatedAppListItem? {
@@ -327,23 +301,16 @@ class DetailViewModel(
 
   fun buildSignatureDetailItems(detail: String) = buildSignatureDetailItemsUseCase(detail)
 
-  fun initFeatures(packageInfo: PackageInfo, features: Int) = viewModelScope.launch(Dispatchers.IO) {
-    Timber.d("initFeatures: features = $features")
-
-    val detailFeatures = getAppDetailFeaturesUseCase(packageInfo, features, packageState.isApk)
-    featureState.emitFeatures(detailFeatures)
+  fun initFeatures(packageInfo: PackageInfo, features: Int) {
+    detailFeatureLoader.initFeatures(viewModelScope, featureState, packageState, packageInfo, features)
   }
 
-  fun initAbiInfo(packageInfo: PackageInfo, apkAnalyticsMode: Boolean) = viewModelScope.launch(Dispatchers.IO) {
-    getAppDetailAbiUseCase(packageInfo, apkAnalyticsMode)?.let {
-      featureState.emitAbiBundle(it)
-    }
+  fun initAbiInfo(packageInfo: PackageInfo, apkAnalyticsMode: Boolean) {
+    detailFeatureLoader.initAbiInfo(viewModelScope, featureState, packageInfo, apkAnalyticsMode)
   }
 
-  fun initAbiInfo(apkPreviewInfo: ApkPreviewInfo) = viewModelScope.launch(Dispatchers.IO) {
-    getAppDetailAbiUseCase(apkPreviewInfo)?.let {
-      featureState.emitAbiBundle(it)
-    }
+  fun initAbiInfo(apkPreviewInfo: ApkPreviewInfo) {
+    detailFeatureLoader.initAbiInfo(viewModelScope, featureState, apkPreviewInfo)
   }
 
   fun filterDetailItems(

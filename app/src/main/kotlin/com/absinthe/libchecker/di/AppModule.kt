@@ -128,6 +128,7 @@ import com.absinthe.libchecker.domain.statistics.GetLibReferenceIconPackagesUseC
 import com.absinthe.libchecker.domain.statistics.LibReferenceSettingsRepository
 import com.absinthe.libchecker.features.album.track.TrackViewModel
 import com.absinthe.libchecker.features.applist.detail.DetailContentLoader
+import com.absinthe.libchecker.features.applist.detail.DetailFeatureLoader
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.chart.ChartViewModel
 import com.absinthe.libchecker.features.home.HomeViewModel
@@ -241,6 +242,16 @@ val appModule = module {
       appDetailSettingsRepository = get()
     )
   }
+  factory {
+    DetailFeatureLoader(
+      getAppDetailAbiUseCase = get(),
+      getAppDetailFeaturesUseCase = get(),
+      buildAppDetailAbiLabelDataUseCase = get(),
+      buildAppDetailHeaderExtraInfoUseCase = get(),
+      buildAppDetailHeaderTitleDataUseCase = get(),
+      hasInstalledStaticLibrariesUseCase = get()
+    )
+  }
   factory { GetApexPackageNamesUseCase(get()) }
   factory { BuildArchiveSnapshotItemUseCase(androidContext()) }
   factory { BuildInstalledSnapshotItemUseCase(get()) }
@@ -285,12 +296,7 @@ val appModule = module {
       getAppLaunchActionUseCase = get(),
       getAppBundleItemsUseCase = get(),
       filterAppDetailItemsUseCase = get(),
-      getAppDetailAbiUseCase = get(),
       getAppInstallSourceDetailsUseCase = get(),
-      getAppDetailFeaturesUseCase = get(),
-      buildAppDetailAbiLabelDataUseCase = get(),
-      buildAppDetailHeaderExtraInfoUseCase = get(),
-      buildAppDetailHeaderTitleDataUseCase = get(),
       extractNativeLibraryUseCase = get(),
       prepareAppPackageShareFileUseCase = get(),
       exportAppPackageShareFileUseCase = get(),
@@ -299,7 +305,6 @@ val appModule = module {
       prepareApkAnalysisPackageUseCase = get(),
       getElfDetailUseCase = get(),
       getInstalledAppComparisonPackageUseCase = get(),
-      hasInstalledStaticLibrariesUseCase = get(),
       getLibraryDetailDialogDataUseCase = get(),
       getOverlayDetailUseCase = get(),
       getPermissionDetailUseCase = get(),
@@ -310,6 +315,7 @@ val appModule = module {
       sortAppDetailItemsUseCase = get(),
       appDetailSettingsRepository = get(),
       detailContentLoader = get(),
+      detailFeatureLoader = get(),
       buildPackageComparisonSnapshotItemUseCase = get()
     )
   }
