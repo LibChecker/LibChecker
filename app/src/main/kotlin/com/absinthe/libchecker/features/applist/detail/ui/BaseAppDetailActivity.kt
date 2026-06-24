@@ -14,9 +14,6 @@ import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.features.applist.DetailFragmentManager
-import com.absinthe.libchecker.features.applist.LocatedCount
-import com.absinthe.libchecker.features.applist.MODE_SORT_BY_LIB
-import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.IDetailContainer
 import com.absinthe.libchecker.features.applist.detail.bean.DetailExtraBean
@@ -76,8 +73,7 @@ abstract class BaseAppDetailActivity :
       processMode = { appDetailSettingsRepository.processMode },
       hasNonGrantedPermissions = { detailFragmentManager.currentFragment?.hasNonGrantedPermissions() },
       onProcessFilterChanged = { process ->
-        viewModel.filterState.queriedProcess = process
-        detailFragmentManager.deliverFilterItems(null, process, lifecycleScope)
+        listInteractionController.onProcessFilterChanged(process)
       }
     )
   }
@@ -117,13 +113,26 @@ abstract class BaseAppDetailActivity :
     )
   }
   private val tabSpecBuilder by unsafeLazy { DetailTabSpecBuilder(this) }
-  private val tabController by unsafeLazy {
+  private val tabController: DetailTabController by unsafeLazy {
     DetailTabController(
       activity = this,
       viewPager = binding.viewpager,
       tabLayout = binding.tabLayout,
-      onTabSelected = ::onDetailTabSelected,
+      onTabSelected = { type -> listInteractionController.onDetailTabSelected(type) },
       onProcessTooltipTextChanged = ::updateProcessToolbarTooltip
+    )
+  }
+  private val listInteractionController: DetailListInteractionController by unsafeLazy {
+    DetailListInteractionController(
+      viewModel = viewModel,
+      detailFragmentManager = detailFragmentManager,
+      appDetailSettingsRepository = appDetailSettingsRepository,
+      selectedType = { tabController.selectedType },
+      processBarController = processBarController,
+      coroutineScope = lifecycleScope,
+      onCurrentItemsCountChanged = { count ->
+        binding.tsComponentCount.setText(count.toString())
+      }
     )
   }
   private val packageContentController by unsafeLazy {
@@ -143,9 +152,9 @@ abstract class BaseAppDetailActivity :
     DetailToolbarController(
       toolbarView = binding.rvToolbar,
       appBarLayout = binding.headerLayout,
-      onSortClick = ::toggleSortMode,
+      onSortClick = { listInteractionController.toggleSortMode() },
       onQuickLaunchClick = ::showCurrentAppInfoDialog,
-      onProcessClick = ::toggleProcessMode
+      onProcessClick = { listInteractionController.toggleProcessMode() }
     )
   }
   private val menuController by unsafeLazy {
@@ -153,7 +162,7 @@ abstract class BaseAppDetailActivity :
       context = this,
       toolbar = binding.toolbar,
       onNavigateUp = ::finish,
-      onQueryTextChanged = ::onSearchTextChanged
+      onQueryTextChanged = { text -> listInteractionController.onSearchTextChanged(text) }
     )
   }
   private val packageComparisonController by unsafeLazy {
@@ -169,7 +178,7 @@ abstract class BaseAppDetailActivity :
     DetailStateObserverController(
       viewModel = viewModel,
       coroutineScope = lifecycleScope,
-      onItemsCountChanged = ::onItemsCountChanged,
+      onItemsCountChanged = { live -> listInteractionController.onItemsCountChanged(live) },
       onProcessToolIconVisibilityChanged = toolbarController::setProcessActionVisible,
       onProcessMapChanged = processBarController::setData,
       onFeatureAdded = ::addFeatureItem,
@@ -259,19 +268,8 @@ abstract class BaseAppDetailActivity :
     }
   }
 
-  private fun onSearchTextChanged(newText: String) {
-    viewModel.filterState.queriedText = newText
-    detailFragmentManager.deliverFilterItemsByText(newText, lifecycleScope)
-  }
-
   override fun collapseAppBar() {
     binding.headerLayout.setExpanded(false, true)
-  }
-
-  private fun onItemsCountChanged(live: LocatedCount) {
-    if (detailFragmentManager.currentItemsCount != live.count && tabController.selectedType == live.locate) {
-      updateCurrentItemsCount(live.count)
-    }
   }
 
   private fun addFeatureItem(feature: VersionedFeature) {
@@ -283,19 +281,6 @@ abstract class BaseAppDetailActivity :
     tabController.reset()
     featureListController.reset()
     toolbarController.reset()
-  }
-
-  private fun onDetailTabSelected(type: Int) {
-    val count = viewModel.filterState.itemsCountList[type]
-    if (detailFragmentManager.currentItemsCount != count) {
-      updateCurrentItemsCount(count)
-    }
-    detailFragmentManager.selectedPosition = type
-  }
-
-  private fun updateCurrentItemsCount(count: Int) {
-    binding.tsComponentCount.setText(count.toString())
-    detailFragmentManager.currentItemsCount = count
   }
 
   private fun updateProcessToolbarTooltip(@StringRes tooltipTextRes: Int) {
@@ -314,30 +299,6 @@ abstract class BaseAppDetailActivity :
     if (viewModel.isPackageInfoAvailable()) {
       showAppInfoDialog(viewModel.packageInfo.packageName)
     }
-  }
-
-  private fun toggleProcessMode() {
-    val processMode = !appDetailSettingsRepository.processMode
-    appDetailSettingsRepository.setProcessMode(processMode)
-    detailFragmentManager.deliverProcessMode(processMode)
-
-    processBarController.refreshVisibility()
-    if (!processMode) {
-      doOnMainThreadIdle {
-        viewModel.filterState.queriedProcess = null
-        detailFragmentManager.deliverFilterItems(null, null, lifecycleScope)
-      }
-    }
-  }
-
-  private fun toggleSortMode() {
-    val sortMode = if (appDetailSettingsRepository.sortMode == MODE_SORT_BY_LIB) {
-      MODE_SORT_BY_SIZE
-    } else {
-      MODE_SORT_BY_LIB
-    }
-    appDetailSettingsRepository.setSortMode(sortMode)
-    detailFragmentManager.sortAll(lifecycleScope)
   }
 
   private fun initAbiView(abi: Int, abiSet: Collection<Int>) {
