@@ -35,6 +35,7 @@ class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBS
     return AdvancedMenuBSDView(
       context = requireContext(),
       displayOptions = currentAdvancedOptions,
+      itemDisplayOptions = currentItemAdvancedOptions,
       onSortOptionsChanged = ::setAdvancedOptions
     )
   }
@@ -91,7 +92,7 @@ class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBS
     ) { isChecked ->
       currentItemAdvancedOptions = currentItemAdvancedOptions.withOption(option, isChecked)
       appListSettingsRepository.setItemDisplayOptions(currentItemAdvancedOptions)
-      root.updateItemDemoView()
+      root.updateItemDemoView(currentItemAdvancedOptions)
       Telemetry.recordEvent(
         Constants.Event.APP_LIST_ADVANCED_MENU_ITEM_CHANGED,
         mapOf(Telemetry.Param.CONTENT to getString(labelRes), Telemetry.Param.VALUE to isChecked)

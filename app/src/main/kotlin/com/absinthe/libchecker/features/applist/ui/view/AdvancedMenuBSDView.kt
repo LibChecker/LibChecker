@@ -42,6 +42,7 @@ enum class AdvancedMenuSection {
 class AdvancedMenuBSDView(
   context: Context,
   displayOptions: Int,
+  itemDisplayOptions: Int,
   onSortOptionsChanged: (Int) -> Unit
 ) : LinearLayout(context),
   IHeaderView {
@@ -54,7 +55,11 @@ class AdvancedMenuBSDView(
 
   private val adapter = AdvancedMenuAdapter()
   private val demoAdapter = AppAdapter(AppAdapter.CardMode.DEMO, displayOptions)
-  private val itemAdapter = LibStringAdapter(Constants.EXAMPLE_PACKAGE, ACTIVITY)
+  private val itemAdapter = LibStringAdapter(
+    packageName = Constants.EXAMPLE_PACKAGE,
+    type = ACTIVITY,
+    itemDisplayOptions = itemDisplayOptions
+  )
 
   private val demoView = RecyclerView(context).apply {
     layoutParams = LayoutParams(
@@ -271,10 +276,8 @@ class AdvancedMenuBSDView(
     demoAdapter.notifyItemChanged(0)
   }
 
-  fun updateItemDemoView() {
-    itemAdapter.notifyItemChanged(0)
-    itemAdapter.notifyItemChanged(1)
-    itemAdapter.notifyItemChanged(2)
+  fun updateItemDemoView(itemDisplayOptions: Int) {
+    itemAdapter.setItemDisplayOptions(itemDisplayOptions)
   }
 
   init {

@@ -23,6 +23,7 @@ import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.isComponentType
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
 import com.absinthe.libchecker.features.applist.DetailFragmentManager
@@ -80,17 +81,19 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   Sortable {
 
   protected val viewModel: DetailViewModel by activityViewModel()
+  private val appListSettingsRepository: AppListSettingsRepository by inject()
   private val buildNativeLibraryItemDisplayData: BuildNativeLibraryItemDisplayDataUseCase by inject()
   private val resolveAppResourceValue: ResolveAppResourceValueUseCase by inject()
   protected val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME).orEmpty() }
   protected val type by lazy { arguments?.getInt(EXTRA_TYPE) ?: NATIVE }
   protected val adapter by lazy {
     LibStringAdapter(
-      packageName,
-      type,
-      childFragmentManager,
-      buildNativeLibraryItemDisplayData,
-      resolveAppResourceValue
+      packageName = packageName,
+      type = type,
+      itemDisplayOptions = appListSettingsRepository.itemDisplayOptions,
+      fragmentManager = childFragmentManager,
+      buildNativeLibraryItemDisplayData = buildNativeLibraryItemDisplayData,
+      resolveAppResourceValue = resolveAppResourceValue
     )
   }
   protected val emptyView by unsafeLazy {

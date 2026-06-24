@@ -30,7 +30,6 @@ import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.STATIC
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
@@ -63,6 +62,7 @@ private const val HIGHLIGHT_TRANSITION_DURATION = 250
 class LibStringAdapter(
   val packageName: String,
   @LibType val type: Int,
+  private var itemDisplayOptions: Int = AdvancedOptions.ITEM_DEFAULT_OPTIONS,
   private val fragmentManager: FragmentManager? = null,
   private val buildNativeLibraryItemDisplayData: BuildNativeLibraryItemDisplayDataUseCase? = null,
   private val resolveAppResourceValue: ResolveAppResourceValueUseCase? = null
@@ -93,6 +93,15 @@ class LibStringAdapter(
     notifyDataSetChanged()
   }
 
+  fun setItemDisplayOptions(options: Int) {
+    if (itemDisplayOptions == options) {
+      return
+    }
+    itemDisplayOptions = options
+    //noinspection NotifyDataSetChanged
+    notifyDataSetChanged()
+  }
+
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     val itemView = when (type) {
       NATIVE -> NativeLibItemView(context)
@@ -107,7 +116,7 @@ class LibStringAdapter(
   override fun convert(holder: BaseViewHolder, item: LibStringItemChip) {
     val itemName = when (item.item.source) {
       DISABLED -> {
-        if ((GlobalValues.itemAdvancedOptions and AdvancedOptions.MARK_DISABLED) > 0 || type == PERMISSION) {
+        if (isItemOptionEnabled(AdvancedOptions.MARK_DISABLED) || type == PERMISSION) {
           buildSpannedString {
             strikeThrough {
               inSpans(StyleSpan(Typeface.BOLD_ITALIC)) {
@@ -123,7 +132,7 @@ class LibStringAdapter(
       }
 
       EXPORTED -> {
-        if ((GlobalValues.itemAdvancedOptions and AdvancedOptions.MARK_EXPORTED) > 0) {
+        if (isItemOptionEnabled(AdvancedOptions.MARK_EXPORTED)) {
           buildSpannedString {
             append(item.item.name)
             setSpan(
@@ -157,14 +166,14 @@ class LibStringAdapter(
           processLabelColor = item.item.process.takeIf { !it.isNullOrEmpty() && processMode }
             ?.let { processMap[it] ?: UiUtils.getRandomColor() } ?: -1
           setOrHighlightText(libName, itemName)
-          if ((GlobalValues.itemAdvancedOptions and AdvancedOptions.SHOW_MARKED_LIB) > 0) {
+          if (isItemOptionEnabled(AdvancedOptions.SHOW_MARKED_LIB)) {
             setChip(item.rule)
           } else {
             setChip(null)
           }
           contentDescription = buildItemDescription(
             itemName,
-            item.rule?.label.takeIf { (GlobalValues.itemAdvancedOptions and AdvancedOptions.SHOW_MARKED_LIB) > 0 },
+            item.rule?.label.takeIf { isItemOptionEnabled(AdvancedOptions.SHOW_MARKED_LIB) },
             item.item.process.takeIf { !it.isNullOrEmpty() && processMode }
           )
         }
@@ -215,7 +224,7 @@ class LibStringAdapter(
     itemView.processLabelColor = -1
     setOrHighlightText(itemView.libName, itemName)
     itemView.libSize.text = getNativeSizeText(item)
-    if ((GlobalValues.itemAdvancedOptions and AdvancedOptions.SHOW_MARKED_LIB) > 0) {
+    if (isItemOptionEnabled(AdvancedOptions.SHOW_MARKED_LIB)) {
       itemView.setChip(item.rule)
     } else {
       itemView.setChip(null)
@@ -223,7 +232,7 @@ class LibStringAdapter(
     itemView.contentDescription = buildItemDescription(
       itemName,
       itemView.libSize.text,
-      item.rule?.label.takeIf { (GlobalValues.itemAdvancedOptions and AdvancedOptions.SHOW_MARKED_LIB) > 0 }
+      item.rule?.label.takeIf { isItemOptionEnabled(AdvancedOptions.SHOW_MARKED_LIB) }
     )
   }
 
@@ -264,7 +273,7 @@ class LibStringAdapter(
         }
       }
     }
-    if ((GlobalValues.itemAdvancedOptions and AdvancedOptions.SHOW_MARKED_LIB) > 0) {
+    if (isItemOptionEnabled(AdvancedOptions.SHOW_MARKED_LIB)) {
       itemView.setChip(item.rule)
     } else {
       itemView.setChip(null)
@@ -272,8 +281,12 @@ class LibStringAdapter(
     itemView.contentDescription = buildItemDescription(
       itemName,
       itemView.libDetail.text,
-      item.rule?.label.takeIf { (GlobalValues.itemAdvancedOptions and AdvancedOptions.SHOW_MARKED_LIB) > 0 }
+      item.rule?.label.takeIf { isItemOptionEnabled(AdvancedOptions.SHOW_MARKED_LIB) }
     )
+  }
+
+  private fun isItemOptionEnabled(option: Int): Boolean {
+    return (itemDisplayOptions and option) > 0
   }
 
   private fun setPermissionContent(
