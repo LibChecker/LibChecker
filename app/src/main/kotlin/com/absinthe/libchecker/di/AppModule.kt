@@ -33,8 +33,8 @@ import com.absinthe.libchecker.domain.app.BuildInAppUpdateDiffDataUseCase
 import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.BuildRelatedAppDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.BuildSignatureDetailItemsUseCase
-import com.absinthe.libchecker.domain.app.ClearApkCacheUseCase
 import com.absinthe.libchecker.domain.app.CheckRequiredPackageAvailabilityUseCase
+import com.absinthe.libchecker.domain.app.ClearApkCacheUseCase
 import com.absinthe.libchecker.domain.app.ExportAppListToUriUseCase
 import com.absinthe.libchecker.domain.app.ExportAppListUseCase
 import com.absinthe.libchecker.domain.app.ExportAppPackageShareFileUseCase
@@ -315,6 +315,7 @@ val appModule = module {
       getAppListContentUseCase = get(),
       getLibReferenceIconPackagesUseCase = get(),
       getLibReferenceConfigUseCase = get(),
+      appListSettingsRepository = get(),
       clearApkCacheUseCase = get()
     )
   }

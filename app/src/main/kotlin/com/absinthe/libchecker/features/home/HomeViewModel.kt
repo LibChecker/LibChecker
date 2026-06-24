@@ -11,6 +11,7 @@ import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE
 import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE_END
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppListRepository
+import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.ClearApkCacheUseCase
 import com.absinthe.libchecker.domain.app.ExportAppListToUriUseCase
 import com.absinthe.libchecker.domain.app.ExportAppListUseCase
@@ -48,11 +49,13 @@ class HomeViewModel(
   private val getAppListContentUseCase: GetAppListContentUseCase,
   private val getLibReferenceIconPackagesUseCase: GetLibReferenceIconPackagesUseCase,
   private val getLibReferenceConfigUseCase: GetLibReferenceConfigUseCase,
+  private val appListSettingsRepository: AppListSettingsRepository,
   private val clearApkCacheUseCase: ClearApkCacheUseCase
 ) : ViewModel() {
 
   val dbItemsFlow: Flow<List<LCItem>> = appListRepository.items
   val packageChanges = installedAppRepository.packageChanges
+  val appListDisplayOptionsChanges = appListSettingsRepository.displayOptionsChanges
 
   private val _effect: MutableSharedFlow<Effect> = MutableSharedFlow()
   val effect = _effect.asSharedFlow()
@@ -173,6 +176,10 @@ class HomeViewModel(
 
   suspend fun isOnlySelfAppInDatabase(): Boolean {
     return getAppListContentUseCase.isOnlySelfAppInDatabase()
+  }
+
+  suspend fun notifyAppListDisplayOptionsChanged(diff: Int) {
+    appListSettingsRepository.notifyDisplayOptionsChanged(diff)
   }
 
   private var initJob: Job? = null

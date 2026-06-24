@@ -340,7 +340,7 @@ class AppListFragment :
             setOnDismissListener { advancedDiff, itemAdvancedDiff ->
               if (advancedDiff > 0) {
                 lifecycleScope.launch {
-                  GlobalValues.preferencesFlow.emit(Constants.PREF_ADVANCED_OPTIONS to advancedDiff)
+                  homeViewModel.notifyAppListDisplayOptionsChanged(advancedDiff)
                 }
               }
 
@@ -459,11 +459,9 @@ class AppListFragment :
       }.launchIn(lifecycleScope)
     }
 
-    GlobalValues.preferencesFlow.onEach {
-      if (it.first == Constants.PREF_ADVANCED_OPTIONS) {
-        if (isListReady) {
-          updateItems()
-        }
+    homeViewModel.appListDisplayOptionsChanges.onEach {
+      if (isListReady) {
+        updateItems()
       }
     }.launchIn(lifecycleScope)
   }
