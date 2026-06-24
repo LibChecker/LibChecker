@@ -24,7 +24,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
-import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.METADATA
@@ -66,7 +65,6 @@ import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.addBackStateHandler
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
-import com.absinthe.libchecker.utils.extensions.copyToClipboard
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -75,7 +73,6 @@ import com.absinthe.libchecker.utils.extensions.isKeyboardShowing
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
-import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -86,7 +83,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.zhanghai.android.appiconloader.AppIconLoader
 import ohos.bundle.IBundleManager
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -143,6 +139,12 @@ abstract class BaseAppDetailActivity :
       activity = this,
       detailsTitleView = binding.detailsTitle,
       tintAbiLabels = { isDisplayOptionEnabled(AdvancedOptions.TINT_ABI_LABEL) }
+    )
+  }
+  private val headerTitleBinder by unsafeLazy {
+    DetailHeaderTitleBinder(
+      detailsTitleView = binding.detailsTitle,
+      onAppInfoClick = ::showAppInfoDialog
     )
   }
   private val toolbarAdapter by unsafeLazy { AppDetailToolbarAdapter() }
@@ -210,52 +212,7 @@ abstract class BaseAppDetailActivity :
             collapsingToolbar.isTitleEnabled = state == State.COLLAPSED
           }
         })
-        detailsTitle.apply {
-          iconView.apply {
-            val appIconLoader = AppIconLoader(
-              resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size),
-              false,
-              this@BaseAppDetailActivity
-            )
-            contentDescription = headerTitleData.title
-            ai?.let {
-              load(appIconLoader.loadIcon(it))
-            } ?: run {
-              load(R.drawable.ic_icon_blueprint)
-            }
-            if (headerTitleData.isAppInfoAvailable) {
-              setOnClickListener {
-                if (AntiShakeUtils.isInvalidClick(it)) {
-                  return@setOnClickListener
-                }
-                AppInfoBottomSheetDialogFragment().apply {
-                  arguments = Bundle().apply {
-                    putString(EXTRA_PACKAGE_NAME, packageName)
-                  }
-                  show(supportFragmentManager, AppInfoBottomSheetDialogFragment::class.java.name)
-                }
-              }
-            } else {
-              setOnClickListener(null)
-            }
-            setOnLongClickListener {
-              copyToClipboard()
-              true
-            }
-          }
-          appNameView.apply {
-            text = headerTitleData.appName
-            setLongClickCopiedToClipboard(text)
-          }
-          packageNameView.apply {
-            text = packageName
-            setLongClickCopiedToClipboard(text)
-          }
-          versionInfoView.apply {
-            text = headerTitleData.versionInfo
-            setLongClickCopiedToClipboard(text)
-          }
-        }
+        headerTitleBinder.bind(headerTitleData, ai)
 
         lifecycleScope.launch(Dispatchers.IO) {
           val showAndroidVersion = isDisplayOptionEnabled(AdvancedOptions.SHOW_ANDROID_VERSION)
@@ -570,6 +527,15 @@ abstract class BaseAppDetailActivity :
 
   protected open fun onStaticLibsAvailable() {}
 
+  private fun showAppInfoDialog(packageName: String) {
+    AppInfoBottomSheetDialogFragment().apply {
+      arguments = Bundle().apply {
+        putString(EXTRA_PACKAGE_NAME, packageName)
+      }
+      show(supportFragmentManager, AppInfoBottomSheetDialogFragment::class.java.name)
+    }
+  }
+
   override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
     if (menuItem.itemId == android.R.id.home) {
       finish()
@@ -668,12 +634,7 @@ abstract class BaseAppDetailActivity :
   private val toolbarQuicklyLaunchItem by unsafeLazy {
     AppDetailToolbarItem(R.drawable.ic_launch, R.string.further_operation) {
       if (viewModel.isPackageInfoAvailable()) {
-        AppInfoBottomSheetDialogFragment().apply {
-          arguments = Bundle().apply {
-            putString(EXTRA_PACKAGE_NAME, viewModel.packageInfo.packageName)
-          }
-          show(supportFragmentManager, AppInfoBottomSheetDialogFragment::class.java.name)
-        }
+        showAppInfoDialog(viewModel.packageInfo.packageName)
       }
     }
   }
