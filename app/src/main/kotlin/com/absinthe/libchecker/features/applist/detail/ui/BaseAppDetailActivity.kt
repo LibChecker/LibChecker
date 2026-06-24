@@ -9,7 +9,6 @@ import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.AdvancedOptions
-import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.AppListSettingsRepository
@@ -29,10 +28,7 @@ import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.extensions.isKeyboardShowing
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import ohos.bundle.IBundleManager
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -130,6 +126,19 @@ abstract class BaseAppDetailActivity :
       onProcessTooltipTextChanged = ::updateProcessToolbarTooltip
     )
   }
+  private val packageContentController by unsafeLazy {
+    DetailPackageContentController(
+      viewModel = viewModel,
+      coroutineScope = lifecycleScope,
+      tabSpecBuilder = tabSpecBuilder,
+      tabController = tabController,
+      featureListController = featureListController,
+      currentUiGeneration = { packageUiGeneration },
+      staticLibraryTitle = { getText(R.string.ref_category_static) },
+      onStaticLibsAvailable = ::onStaticLibsAvailable,
+      onPostPackageInfoAvailable = ::onPostPackageInfoAvailable
+    )
+  }
   private val toolbarController by unsafeLazy {
     DetailToolbarController(
       toolbarView = binding.rvToolbar,
@@ -200,7 +209,6 @@ abstract class BaseAppDetailActivity :
     val uiGeneration = ++packageUiGeneration
     resetUiState()
     viewModel.reset()
-    val ai = packageInfo.applicationInfo
     val apkPreviewInfo = viewModel.apkPreviewInfo
 
     viewModel.initPackageInfo(packageInfo)
@@ -217,7 +225,6 @@ abstract class BaseAppDetailActivity :
       apkAnalyticsMode = apkAnalyticsMode
     ) ?: return
     val packageName = headerResult.packageName
-    val sharedLibraryFiles = ai?.sharedLibraryFiles
 
     toolbarController.setupBaseActions(
       showHarmonyToggle = extraBean?.variant == Constants.VARIANT_HAP,
@@ -230,57 +237,13 @@ abstract class BaseAppDetailActivity :
       packageComparisonController.setupIfAvailable(packageName, uiGeneration)
     }
 
-    val tabSpec = tabSpecBuilder.build(
-      isHarmonyMode = isHarmonyMode,
-      isApkPreview = viewModel.isApkPreview
-    )
-    tabController.setup(
+    packageContentController.bind(
+      packageInfo = packageInfo,
+      extraBean = extraBean,
       packageName = packageName,
       isHarmonyMode = isHarmonyMode,
-      tabSpec = tabSpec
+      uiGeneration = uiGeneration
     )
-
-    if (sharedLibraryFiles?.isNotEmpty() == true) {
-      lifecycleScope.launch {
-        if (viewModel.hasInstalledStaticLibraries(packageName)) {
-          if (uiGeneration != packageUiGeneration) {
-            return@launch
-          }
-          if (tabController.insertStaticLibraryTab(getText(R.string.ref_category_static))) {
-            onStaticLibsAvailable()
-          }
-        }
-      }
-    }
-
-    if (!featureListController.isInitialized) {
-      if (viewModel.isApkPreview) {
-        viewModel.emitFeature(VersionedFeature(Features.Ext.APPLICATION_PROP))
-      } else {
-        viewModel.initFeatures(packageInfo, extraBean?.features ?: -1)
-      }
-    }
-
-    if (!isHarmonyMode) {
-      if (viewModel.isApkPreview) {
-        viewModel.initComponentsDataInPreview()
-      } else {
-        viewModel.initComponentsData()
-      }
-    } else {
-      viewModel.initAbilities(packageName)
-    }
-
-    // Detect Live Update notification
-    viewModel.initPermissionData()
-
-    // To ensure onPostPackageInfoAvailable() is executed at the end of ui thread
-    lifecycleScope.launch(Dispatchers.IO) {
-      withContext(Dispatchers.Main) {
-        delay(1L)
-        onPostPackageInfoAvailable()
-      }
-    }
   }
 
   protected open fun onPostPackageInfoAvailable() {}
