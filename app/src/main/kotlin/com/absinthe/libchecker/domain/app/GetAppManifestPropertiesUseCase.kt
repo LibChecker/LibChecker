@@ -6,16 +6,18 @@ import com.absinthe.libchecker.utils.extensions.maybeResourceId
 import com.absinthe.libchecker.utils.manifest.ApplicationReader
 import com.absinthe.libchecker.utils.manifest.PropertiesMap
 import java.io.File
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import pxb.android.axml.ValueWrapper
 
 class GetAppManifestPropertiesUseCase(
   private val packageManager: PackageManager
 ) {
 
-  operator fun invoke(
+  suspend operator fun invoke(
     packageInfo: PackageInfo?,
     properties: Map<String, *>? = null
-  ): List<AppManifestProperty> {
+  ): List<AppManifestProperty> = withContext(Dispatchers.IO) {
     val propertyMap = properties ?: packageInfo?.applicationInfo?.sourceDir
       ?.let { sourceDir ->
         runCatching {
@@ -28,7 +30,7 @@ class GetAppManifestPropertiesUseCase(
       }.getOrNull()
     }
 
-    return propertyMap.orEmpty()
+    propertyMap.orEmpty()
       .map { property ->
         val value = property.value.toPropertyValue()
         val resourceId = value.toResourceIdOrNull()

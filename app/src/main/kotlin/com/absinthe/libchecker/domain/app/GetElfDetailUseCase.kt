@@ -3,13 +3,20 @@ package com.absinthe.libchecker.domain.app
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.elf.ElfParser
 import java.io.File
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.apache.commons.compress.archivers.zip.ZipFile
 
 class GetElfDetailUseCase(
   private val installedAppRepository: InstalledAppRepository
 ) {
 
-  operator fun invoke(packageName: String, elfPath: String): AppElfDetail? {
+  suspend operator fun invoke(packageName: String, elfPath: String): AppElfDetail? =
+    withContext(Dispatchers.IO) {
+      getElfDetail(packageName, elfPath)
+    }
+
+  private fun getElfDetail(packageName: String, elfPath: String): AppElfDetail? {
     val packageInfo = installedAppRepository.getPackageInfo(packageName) ?: return null
     val nativePath = packageInfo.applicationInfo?.nativeLibraryDir
     if (nativePath != null) {

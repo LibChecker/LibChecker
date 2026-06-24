@@ -242,58 +242,43 @@ class DetailViewModel(
   ) = exportAppPackageShareFileUseCase(shareFile, destinationUri)
 
   suspend fun getApkPreviewInfo(url: String): Result<ApkPreviewInfo> {
-    return withContext(Dispatchers.IO) {
-      getApkPreviewInfoUseCase(url)
-    }
+    return getApkPreviewInfoUseCase(url)
   }
 
   suspend fun getAppManifestProperties(
     packageInfo: PackageInfo?,
     properties: Map<String, String>?
   ): List<AppManifestProperty> {
-    return withContext(Dispatchers.IO) {
-      getAppManifestPropertiesUseCase(packageInfo, properties)
-    }
+    return getAppManifestPropertiesUseCase(packageInfo, properties)
   }
 
   suspend fun prepareApkAnalysisPackage(
     cacheDir: File,
     uri: Uri
   ): PrepareApkAnalysisPackageUseCase.Result {
-    return withContext(Dispatchers.IO) {
-      prepareApkAnalysisPackageUseCase(cacheDir, uri)
-    }
+    return prepareApkAnalysisPackageUseCase(cacheDir, uri)
   }
 
-  suspend fun getElfDetail(packageName: String, elfPath: String) = withContext(Dispatchers.IO) {
+  suspend fun getElfDetail(packageName: String, elfPath: String) =
     getElfDetailUseCase(packageName, elfPath)
-  }
 
   suspend fun isInstalledAppComparisonAvailable(packageName: String): Boolean {
-    return withContext(Dispatchers.IO) {
-      getInstalledAppComparisonPackageUseCase.isAvailable(packageName)
-    }
+    return getInstalledAppComparisonPackageUseCase.isAvailable(packageName)
   }
 
   suspend fun hasInstalledStaticLibraries(packageName: String): Boolean {
-    return withContext(Dispatchers.IO) {
-      hasInstalledStaticLibrariesUseCase(packageName)
-    }
+    return hasInstalledStaticLibrariesUseCase(packageName)
   }
 
   suspend fun loadInstalledAppComparisonPackage(packageName: String): PackageInfo? {
-    return withContext(Dispatchers.IO) {
-      getInstalledAppComparisonPackageUseCase(packageName)
-    }
+    return getInstalledAppComparisonPackageUseCase(packageName)
   }
 
   suspend fun buildPackageComparisonSnapshotItem(
     basePackage: PackageInfo,
     analysisPackage: PackageInfo
   ): SnapshotDiffItem {
-    return withContext(Dispatchers.IO) {
-      buildPackageComparisonSnapshotItemUseCase(basePackage, analysisPackage)
-    }
+    return buildPackageComparisonSnapshotItemUseCase(basePackage, analysisPackage)
   }
 
   fun reset() {

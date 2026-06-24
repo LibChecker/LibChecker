@@ -6,6 +6,8 @@ import android.net.Uri
 import android.os.Environment
 import com.absinthe.libchecker.constant.Constants
 import java.io.File
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okio.buffer
 import okio.sink
 import okio.source
@@ -16,7 +18,10 @@ class PrepareApkAnalysisPackageUseCase(
   private val getArchivePackageInfo: GetArchivePackageInfoUseCase
 ) {
 
-  operator fun invoke(cacheDir: File, uri: Uri): Result {
+  suspend operator fun invoke(
+    cacheDir: File,
+    uri: Uri
+  ): Result = withContext(Dispatchers.IO) {
     val targetFile = File(cacheDir, Constants.TEMP_PACKAGE)
     if (targetFile.exists()) {
       targetFile.delete()
@@ -24,7 +29,7 @@ class PrepareApkAnalysisPackageUseCase(
 
     val inputStream = runCatching {
       contentResolver.openInputStream(uri)
-    }.getOrNull() ?: return Result.Unreadable
+    }.getOrNull() ?: return@withContext Result.Unreadable
 
     inputStream.use { input ->
       val fileSize = input.available()
@@ -32,7 +37,7 @@ class PrepareApkAnalysisPackageUseCase(
       Timber.d("fileSize=$fileSize, freeSize=$freeSize")
 
       if (freeSize <= fileSize * MIN_FREE_SPACE_RATIO) {
-        return Result.NotEnoughStorage
+        return@withContext Result.NotEnoughStorage
       }
 
       targetFile.sink().buffer().use { sink ->
@@ -43,8 +48,8 @@ class PrepareApkAnalysisPackageUseCase(
     }
 
     val packageInfo = getArchivePackageInfo(targetFile)
-      ?: return Result.InvalidPackage(targetFile)
-    return Result.Available(targetFile, packageInfo)
+      ?: return@withContext Result.InvalidPackage(targetFile)
+    Result.Available(targetFile, packageInfo)
   }
 
   sealed interface Result {

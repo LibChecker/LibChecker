@@ -15,16 +15,18 @@ import com.absinthe.libchecker.utils.extensions.getPackageSize
 import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.toJson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class BuildPackageComparisonSnapshotItemUseCase(
   private val packageManager: PackageManager
 ) {
 
-  operator fun invoke(
+  suspend operator fun invoke(
     basePackage: PackageInfo,
     analysisPackage: PackageInfo
-  ): SnapshotDiffItem {
-    return SnapshotDiffItem(
+  ): SnapshotDiffItem = withContext(Dispatchers.IO) {
+    SnapshotDiffItem(
       packageName = basePackage.packageName,
       updateTime = basePackage.lastUpdateTime,
       labelDiff = SnapshotDiffItem.DiffNode(
