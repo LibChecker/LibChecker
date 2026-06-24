@@ -18,12 +18,10 @@ import com.absinthe.libchecker.features.applist.DetailFragmentManager
 import com.absinthe.libchecker.features.applist.LocatedCount
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
-import com.absinthe.libchecker.features.applist.detail.AppBarStateChangeListener
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.IDetailContainer
 import com.absinthe.libchecker.features.applist.detail.bean.DetailExtraBean
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
-import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.addBackStateHandler
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
@@ -31,7 +29,6 @@ import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.extensions.isKeyboardShowing
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
-import com.google.android.material.appbar.AppBarLayout
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -39,7 +36,6 @@ import kotlinx.coroutines.withContext
 import ohos.bundle.IBundleManager
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import timber.log.Timber
 
 abstract class BaseAppDetailActivity :
   CheckPackageOnResumingActivity<ActivityAppDetailBinding>(),
@@ -104,6 +100,25 @@ abstract class BaseAppDetailActivity :
   }
   private val headerExtraInfoBinder by unsafeLazy {
     DetailHeaderExtraInfoBinder(binding.detailsTitle)
+  }
+  private val headerController by unsafeLazy {
+    DetailHeaderController(
+      activity = this,
+      supportActionBar = { supportActionBar },
+      collapsingToolbar = binding.collapsingToolbar,
+      headerLayout = binding.headerLayout,
+      headerTitleBinder = headerTitleBinder,
+      headerExtraInfoBinder = headerExtraInfoBinder,
+      viewModel = viewModel,
+      coroutineScope = lifecycleScope,
+      isDisplayOptionEnabled = ::isDisplayOptionEnabled,
+      harmonyBundleInfo = { packageName ->
+        bundleManager?.getBundleInfo(
+          packageName,
+          IBundleManager.GET_BUNDLE_DEFAULT
+        )
+      }
+    )
   }
   private val tabSpecBuilder by unsafeLazy { DetailTabSpecBuilder(this) }
   private val tabController by unsafeLazy {
@@ -195,66 +210,24 @@ abstract class BaseAppDetailActivity :
       viewModel.initAbiInfo(packageInfo, apkAnalyticsMode)
     }
 
-    val headerTitleData = viewModel.buildAppDetailHeaderTitleData(packageInfo, apkAnalyticsMode)
-    val packageName = headerTitleData.packageName
+    val headerResult = headerController.bind(
+      packageInfo = packageInfo,
+      extraBean = extraBean,
+      isHarmonyMode = isHarmonyMode,
+      apkAnalyticsMode = apkAnalyticsMode
+    ) ?: return
+    val packageName = headerResult.packageName
     val sharedLibraryFiles = ai?.sharedLibraryFiles
 
-    binding.apply {
-      try {
-        supportActionBar?.title = null
-        collapsingToolbar.also {
-          it.setOnApplyWindowInsetsListener(null)
-          it.title = headerTitleData.title
-        }
-        headerLayout.addOnOffsetChangedListener(object : AppBarStateChangeListener() {
-          override fun onStateChanged(appBarLayout: AppBarLayout, state: State) {
-            collapsingToolbar.isTitleEnabled = state == State.COLLAPSED
-          }
-        })
-        headerTitleBinder.bind(headerTitleData, ai)
-
-        lifecycleScope.launch(Dispatchers.IO) {
-          val showAndroidVersion = isDisplayOptionEnabled(AdvancedOptions.SHOW_ANDROID_VERSION)
-          val versionInfo = if (!isHarmonyMode) {
-            val headerExtraInfo = viewModel.buildAppDetailHeaderExtraInfo(
-              packageInfo = packageInfo,
-              showAndroidVersion = showAndroidVersion
-            )
-            headerExtraInfoBinder.format(headerExtraInfo)
-          } else {
-            if (extraBean?.variant == Constants.VARIANT_HAP) {
-              headerExtraInfoBinder.formatHarmony(
-                bundleManager?.getBundleInfo(
-                  packageName,
-                  IBundleManager.GET_BUNDLE_DEFAULT
-                )
-              )
-            } else {
-              ""
-            }
-          }
-
-          withContext(Dispatchers.Main) {
-            headerExtraInfoBinder.bind(versionInfo)
-          }
-        }
-      } catch (e: Exception) {
-        Timber.e(e)
-        Toasty.showLong(this@BaseAppDetailActivity, e.toString())
-        finish()
-        return
+    toolbarController.setupBaseActions(
+      showHarmonyToggle = extraBean?.variant == Constants.VARIANT_HAP,
+      onHarmonyToggle = {
+        isHarmonyMode = !isHarmonyMode
+        onPackageInfoAvailable(packageInfo, extraBean)
       }
-
-      toolbarController.setupBaseActions(
-        showHarmonyToggle = extraBean?.variant == Constants.VARIANT_HAP,
-        onHarmonyToggle = {
-          isHarmonyMode = !isHarmonyMode
-          onPackageInfoAvailable(packageInfo, extraBean)
-        }
-      )
-      if (apkAnalyticsMode && !viewModel.isApkPreview) {
-        packageComparisonController.setupIfAvailable(packageName, uiGeneration)
-      }
+    )
+    if (apkAnalyticsMode && !viewModel.isApkPreview) {
+      packageComparisonController.setupIfAvailable(packageName, uiGeneration)
     }
 
     val tabSpec = tabSpecBuilder.build(
