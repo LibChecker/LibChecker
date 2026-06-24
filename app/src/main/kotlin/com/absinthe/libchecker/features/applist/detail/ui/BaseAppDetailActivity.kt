@@ -19,6 +19,7 @@ import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.features.applist.DetailFragmentManager
+import com.absinthe.libchecker.features.applist.LocatedCount
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.features.applist.detail.AppBarStateChangeListener
@@ -40,8 +41,6 @@ import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.google.android.material.appbar.AppBarLayout
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ohos.bundle.IBundleManager
@@ -146,6 +145,17 @@ abstract class BaseAppDetailActivity :
       currentUiGeneration = { packageUiGeneration }
     )
   }
+  private val stateObserverController by unsafeLazy {
+    DetailStateObserverController(
+      viewModel = viewModel,
+      coroutineScope = lifecycleScope,
+      onItemsCountChanged = ::onItemsCountChanged,
+      onProcessToolIconVisibilityChanged = toolbarController::setProcessActionVisible,
+      onProcessMapChanged = processBarController::setData,
+      onFeatureAdded = ::addFeatureItem,
+      onAbiBundleChanged = ::onAbiBundleChanged
+    )
+  }
 
   private var isHarmonyMode = false
   private var packageUiGeneration = 0
@@ -166,7 +176,7 @@ abstract class BaseAppDetailActivity :
       enabledState = { !isKeyboardShowing() && menuController.hasExpandedActionView() },
       handler = { menuController.collapseActionView() }
     )
-    initObserver()
+    stateObserverController.observe()
   }
 
   override fun onDestroy() {
@@ -326,31 +336,9 @@ abstract class BaseAppDetailActivity :
     binding.headerLayout.setExpanded(false, true)
   }
 
-  private fun initObserver() {
-    viewModel.also {
-      it.filterState.itemsCountStateFlow.onEach { live ->
-        if (detailFragmentManager.currentItemsCount != live.count && tabController.selectedType == live.locate) {
-          updateCurrentItemsCount(live.count)
-        }
-      }.launchIn(lifecycleScope)
-      it.filterState.processToolIconVisibilityStateFlow.onEach { visible ->
-        toolbarController.setProcessActionVisible(visible)
-      }.launchIn(lifecycleScope)
-      it.filterState.processMapStateFlow.onEach { map ->
-        processBarController.setData(map)
-      }.launchIn(lifecycleScope)
-      it.featureState.featuresFlow.onEach { feat ->
-        addFeatureItem(feat)
-      }.launchIn(lifecycleScope)
-      it.featureState.abiBundleStateFlow.onEach { bundle ->
-        if (bundle != null) {
-          initAbiView(bundle.abi, bundle.abiSet)
-
-          doOnMainThreadIdle {
-            featureListController.attachWithAnimation()
-          }
-        }
-      }.launchIn(lifecycleScope)
+  private fun onItemsCountChanged(live: LocatedCount) {
+    if (detailFragmentManager.currentItemsCount != live.count && tabController.selectedType == live.locate) {
+      updateCurrentItemsCount(live.count)
     }
   }
 
@@ -380,6 +368,14 @@ abstract class BaseAppDetailActivity :
 
   private fun updateProcessToolbarTooltip(@StringRes tooltipTextRes: Int) {
     toolbarController.updateProcessTooltip(tooltipTextRes)
+  }
+
+  private fun onAbiBundleChanged(abi: Int, abiSet: Collection<Int>) {
+    initAbiView(abi, abiSet)
+
+    doOnMainThreadIdle {
+      featureListController.attachWithAnimation()
+    }
   }
 
   private fun showCurrentAppInfoDialog() {
