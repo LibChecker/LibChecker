@@ -18,8 +18,6 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.AdvancedOptions
@@ -34,9 +32,7 @@ import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.features.applist.detail.AppBarStateChangeListener
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.IDetailContainer
-import com.absinthe.libchecker.features.applist.detail.bean.AppDetailToolbarItem
 import com.absinthe.libchecker.features.applist.detail.bean.DetailExtraBean
-import com.absinthe.libchecker.features.applist.detail.ui.adapter.AppDetailToolbarAdapter
 import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ENTITY
 import com.absinthe.libchecker.features.snapshot.detail.ui.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
@@ -52,7 +48,6 @@ import com.absinthe.libchecker.utils.extensions.isKeyboardShowing
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.google.android.material.appbar.AppBarLayout
-import kotlin.math.abs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
@@ -137,10 +132,17 @@ abstract class BaseAppDetailActivity :
       onProcessTooltipTextChanged = ::updateProcessToolbarTooltip
     )
   }
-  private val toolbarAdapter by unsafeLazy { AppDetailToolbarAdapter() }
+  private val toolbarController by unsafeLazy {
+    DetailToolbarController(
+      toolbarView = binding.rvToolbar,
+      appBarLayout = binding.headerLayout,
+      onSortClick = ::toggleSortMode,
+      onQuickLaunchClick = ::showCurrentAppInfoDialog,
+      onProcessClick = ::toggleProcessMode
+    )
+  }
 
   private var isHarmonyMode = false
-  private var isToolbarCollapsed = false
   private var packageUiGeneration = 0
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -164,6 +166,7 @@ abstract class BaseAppDetailActivity :
 
   override fun onDestroy() {
     tabController.reset()
+    toolbarController.release()
     super.onDestroy()
   }
 
@@ -231,25 +234,13 @@ abstract class BaseAppDetailActivity :
         return
       }
 
-      toolbarAdapter.addData(
-        AppDetailToolbarItem(R.drawable.ic_lib_sort, R.string.menu_sort) {
-          val sortMode = if (appDetailSettingsRepository.sortMode == MODE_SORT_BY_LIB) {
-            MODE_SORT_BY_SIZE
-          } else {
-            MODE_SORT_BY_LIB
-          }
-          appDetailSettingsRepository.setSortMode(sortMode)
-          detailFragmentManager.sortAll(lifecycleScope)
+      toolbarController.setupBaseActions(
+        showHarmonyToggle = extraBean?.variant == Constants.VARIANT_HAP,
+        onHarmonyToggle = {
+          isHarmonyMode = !isHarmonyMode
+          onPackageInfoAvailable(packageInfo, extraBean)
         }
       )
-      if (extraBean?.variant == Constants.VARIANT_HAP) {
-        toolbarAdapter.addData(
-          AppDetailToolbarItem(R.drawable.ic_harmonyos_logo, R.string.ability) {
-            isHarmonyMode = !isHarmonyMode
-            onPackageInfoAvailable(packageInfo, extraBean)
-          }
-        )
-      }
       if (apkAnalyticsMode && !viewModel.isApkPreview) {
         lifecycleScope.launch {
           if (!viewModel.isInstalledAppComparisonAvailable(packageName)) {
@@ -258,43 +249,16 @@ abstract class BaseAppDetailActivity :
           if (uiGeneration != packageUiGeneration) {
             return@launch
           }
-          toolbarAdapter.addData(
-            AppDetailToolbarItem(R.drawable.ic_compare, R.string.compare_with_current) {
-              lifecycleScope.launch {
-                val basePackage = viewModel.loadInstalledAppComparisonPackage(packageName)
-                if (basePackage == null) {
-                  Toasty.showLong(this@BaseAppDetailActivity, getString(R.string.toast_cant_open_app))
-                  return@launch
-                }
-                navigateToSnapshotDetailPage(basePackage, viewModel.packageInfo)
+          toolbarController.addCompareAction {
+            lifecycleScope.launch {
+              val basePackage = viewModel.loadInstalledAppComparisonPackage(packageName)
+              if (basePackage == null) {
+                Toasty.showLong(this@BaseAppDetailActivity, getString(R.string.toast_cant_open_app))
+                return@launch
               }
+              navigateToSnapshotDetailPage(basePackage, viewModel.packageInfo)
             }
-          )
-        }
-      }
-
-      rvToolbar.apply {
-        if (adapter != toolbarAdapter) {
-          adapter = toolbarAdapter
-          layoutManager =
-            LinearLayoutManager(this@BaseAppDetailActivity, RecyclerView.HORIZONTAL, false)
-          itemAnimator = null
-        }
-      }
-
-      headerLayout.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
-        isToolbarCollapsed = if (abs(verticalOffset) - appBarLayout.totalScrollRange == 0) {
-          // Collapsed
-          if (!isToolbarCollapsed && !toolbarAdapter.data.contains(toolbarQuicklyLaunchItem)) {
-            toolbarAdapter.addData(toolbarQuicklyLaunchItem)
           }
-          true
-        } else {
-          // Expanded
-          if (isToolbarCollapsed && toolbarAdapter.data.contains(toolbarQuicklyLaunchItem)) {
-            toolbarAdapter.remove(toolbarQuicklyLaunchItem)
-          }
-          false
         }
       }
     }
@@ -414,15 +378,7 @@ abstract class BaseAppDetailActivity :
         }
       }.launchIn(lifecycleScope)
       it.filterState.processToolIconVisibilityStateFlow.onEach { visible ->
-        if (visible) {
-          if (!toolbarAdapter.data.contains(toolbarProcessItem)) {
-            toolbarAdapter.addData(toolbarProcessItem)
-          }
-        } else {
-          if (toolbarAdapter.data.contains(toolbarProcessItem)) {
-            toolbarAdapter.remove(toolbarProcessItem)
-          }
-        }
+        toolbarController.setProcessActionVisible(visible)
       }.launchIn(lifecycleScope)
       it.filterState.processMapStateFlow.onEach { map ->
         processBarController.setData(map)
@@ -450,7 +406,7 @@ abstract class BaseAppDetailActivity :
   private fun resetUiState() {
     tabController.reset()
     featureListController.reset()
-    toolbarAdapter.setList(emptyList())
+    toolbarController.reset()
   }
 
   private fun onDetailTabSelected(type: Int) {
@@ -467,35 +423,37 @@ abstract class BaseAppDetailActivity :
   }
 
   private fun updateProcessToolbarTooltip(@StringRes tooltipTextRes: Int) {
-    if (toolbarProcessItem.tooltipTextRes != tooltipTextRes) {
-      toolbarProcessItem.tooltipTextRes = tooltipTextRes
-      toolbarAdapter.data.indexOf(toolbarProcessItem).takeIf { it >= 0 }?.let {
-        toolbarAdapter.notifyItemChanged(it)
+    toolbarController.updateProcessTooltip(tooltipTextRes)
+  }
+
+  private fun showCurrentAppInfoDialog() {
+    if (viewModel.isPackageInfoAvailable()) {
+      showAppInfoDialog(viewModel.packageInfo.packageName)
+    }
+  }
+
+  private fun toggleProcessMode() {
+    val processMode = !appDetailSettingsRepository.processMode
+    appDetailSettingsRepository.setProcessMode(processMode)
+    detailFragmentManager.deliverProcessMode(processMode)
+
+    processBarController.refreshVisibility()
+    if (!processMode) {
+      doOnMainThreadIdle {
+        viewModel.filterState.queriedProcess = null
+        detailFragmentManager.deliverFilterItems(null, null, lifecycleScope)
       }
     }
   }
 
-  private val toolbarQuicklyLaunchItem by unsafeLazy {
-    AppDetailToolbarItem(R.drawable.ic_launch, R.string.further_operation) {
-      if (viewModel.isPackageInfoAvailable()) {
-        showAppInfoDialog(viewModel.packageInfo.packageName)
-      }
+  private fun toggleSortMode() {
+    val sortMode = if (appDetailSettingsRepository.sortMode == MODE_SORT_BY_LIB) {
+      MODE_SORT_BY_SIZE
+    } else {
+      MODE_SORT_BY_LIB
     }
-  }
-  private val toolbarProcessItem by unsafeLazy {
-    AppDetailToolbarItem(R.drawable.ic_processes, R.string.menu_process) {
-      val processMode = !appDetailSettingsRepository.processMode
-      appDetailSettingsRepository.setProcessMode(processMode)
-      detailFragmentManager.deliverProcessMode(processMode)
-
-      processBarController.refreshVisibility()
-      if (!processMode) {
-        doOnMainThreadIdle {
-          viewModel.filterState.queriedProcess = null
-          detailFragmentManager.deliverFilterItems(null, null, lifecycleScope)
-        }
-      }
-    }
+    appDetailSettingsRepository.setSortMode(sortMode)
+    detailFragmentManager.sortAll(lifecycleScope)
   }
 
   private fun navigateToSnapshotDetailPage(basePackage: PackageInfo, analysisPackage: PackageInfo) = lifecycleScope.launch(Dispatchers.Main) {
