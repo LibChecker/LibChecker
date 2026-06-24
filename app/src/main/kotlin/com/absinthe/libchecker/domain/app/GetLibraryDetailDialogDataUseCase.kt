@@ -6,40 +6,44 @@ import com.absinthe.libchecker.api.bean.LibDetailBean
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.database.RulesRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class GetLibraryDetailDialogDataUseCase(
   private val getLibraryDetailUseCase: GetLibraryDetailUseCase
 ) {
 
-  suspend fun getHeader(request: HeaderRequest): LibraryDetailDialogHeader {
-    val rule = if (request.isValidLib) {
-      RulesRepository.getRule(request.libName, request.type, true)
-    } else {
-      null
-    }
-    return LibraryDetailDialogHeader(
-      iconRes = rule?.iconRes ?: com.absinthe.lc.rulesbundle.R.drawable.ic_sdk_placeholder,
-      isSimpleColorIcon = rule?.isSimpleColorIcon == true
-    )
-  }
-
-  suspend operator fun invoke(request: Request): Result {
-    if (!request.isValidLib) {
-      return Result.NotFound
+  suspend fun getHeader(request: HeaderRequest): LibraryDetailDialogHeader =
+    withContext(Dispatchers.IO) {
+      val rule = if (request.isValidLib) {
+        RulesRepository.getRule(request.libName, request.type, true)
+      } else {
+        null
+      }
+      LibraryDetailDialogHeader(
+        iconRes = rule?.iconRes ?: com.absinthe.lc.rulesbundle.R.drawable.ic_sdk_placeholder,
+        isSimpleColorIcon = rule?.isSimpleColorIcon == true
+      )
     }
 
-    val regexName = request.regexName?.takeIf { it.isNotEmpty() }
-    val detail = getLibraryDetailUseCase(
-      libName = regexName ?: request.libName,
-      type = request.type,
-      isRegex = regexName != null
-    ) ?: return Result.NotFound
+  suspend operator fun invoke(request: Request): Result =
+    withContext(Dispatchers.IO) {
+      if (!request.isValidLib) {
+        return@withContext Result.NotFound
+      }
 
-    return Result.Found(
-      detail = detail,
-      repoUpdatedTime = detail.getRepoUpdatedTime()
-    )
-  }
+      val regexName = request.regexName?.takeIf { it.isNotEmpty() }
+      val detail = getLibraryDetailUseCase(
+        libName = regexName ?: request.libName,
+        type = request.type,
+        isRegex = regexName != null
+      ) ?: return@withContext Result.NotFound
+
+      Result.Found(
+        detail = detail,
+        repoUpdatedTime = detail.getRepoUpdatedTime()
+      )
+    }
 
   private suspend fun LibDetailBean.getRepoUpdatedTime(): String? {
     if (!GlobalValues.isGitHubReachable) {

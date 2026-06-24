@@ -474,7 +474,7 @@ class DetailViewModel(
     libName: String,
     @LibType type: Int,
     isValidLib: Boolean
-  ) = withContext(Dispatchers.IO) {
+  ) =
     getLibraryDetailDialogDataUseCase.getHeader(
       GetLibraryDetailDialogDataUseCase.HeaderRequest(
         libName = libName,
@@ -482,14 +482,13 @@ class DetailViewModel(
         isValidLib = isValidLib
       )
     )
-  }
 
   suspend fun getLibraryDetailDialogData(
     libName: String,
     @LibType type: Int,
     regexName: String?,
     isValidLib: Boolean
-  ) = withContext(Dispatchers.IO) {
+  ) =
     getLibraryDetailDialogDataUseCase(
       GetLibraryDetailDialogDataUseCase.Request(
         libName = libName,
@@ -498,15 +497,10 @@ class DetailViewModel(
         isValidLib = isValidLib
       )
     )
-  }
 
-  suspend fun getOverlayDetail(item: LCItem) = withContext(Dispatchers.IO) {
-    getOverlayDetailUseCase(item)
-  }
+  suspend fun getOverlayDetail(item: LCItem) = getOverlayDetailUseCase(item)
 
-  suspend fun getPermissionDetail(permissionName: String) = withContext(Dispatchers.IO) {
-    getPermissionDetailUseCase(permissionName)
-  }
+  suspend fun getPermissionDetail(permissionName: String) = getPermissionDetailUseCase(permissionName)
 
   fun initAbilities(packageName: String) = viewModelScope.launch(Dispatchers.IO) {
     abilitiesMap.put(AbilityType.PAGE, MutableStateFlow(null))
@@ -530,9 +524,7 @@ class DetailViewModel(
   }
 
   suspend fun getRelatedAppListItem(packageName: String): RelatedAppListItem? {
-    return withContext(Dispatchers.IO) {
-      getRelatedAppListItemUseCase(packageName)
-    }
+    return getRelatedAppListItemUseCase(packageName)
   }
 
   fun buildRelatedAppDisplayData(packageName: String, relatedApp: RelatedAppListItem) = buildRelatedAppDisplayDataUseCase(packageName, relatedApp)
