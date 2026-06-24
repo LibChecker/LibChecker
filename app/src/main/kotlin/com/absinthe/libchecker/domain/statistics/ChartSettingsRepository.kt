@@ -1,8 +1,7 @@
 package com.absinthe.libchecker.domain.statistics
 
-interface LibReferenceSettingsRepository {
+interface ChartSettingsRepository {
   val appListDisplayOptions: Int
-  val threshold: Int
-  val options: Int
   val showSystemApps: Boolean
+  var isDetailedAbiChart: Boolean
 }

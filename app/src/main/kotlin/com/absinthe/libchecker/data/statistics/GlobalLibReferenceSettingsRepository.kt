@@ -4,6 +4,9 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.domain.statistics.LibReferenceSettingsRepository
 
 class GlobalLibReferenceSettingsRepository : LibReferenceSettingsRepository {
+  override val appListDisplayOptions: Int
+    get() = GlobalValues.advancedOptions
+
   override val threshold: Int
     get() = GlobalValues.libReferenceThreshold
 

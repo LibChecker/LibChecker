@@ -11,6 +11,7 @@ import com.absinthe.libchecker.data.snapshot.GlobalSnapshotSelectionRepository
 import com.absinthe.libchecker.data.snapshot.LocalSnapshotRepository
 import com.absinthe.libchecker.data.snapshot.ProtoSnapshotArchiveCodec
 import com.absinthe.libchecker.data.statistics.CachedAndroidDistributionRepository
+import com.absinthe.libchecker.data.statistics.GlobalChartSettingsRepository
 import com.absinthe.libchecker.data.statistics.GlobalLibReferenceSettingsRepository
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.Repositories
@@ -110,6 +111,7 @@ import com.absinthe.libchecker.domain.statistics.BuildApiLevelChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildDetailedAbiChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildFeatureFlagChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildPageSize16KBChartDataUseCase
+import com.absinthe.libchecker.domain.statistics.ChartSettingsRepository
 import com.absinthe.libchecker.domain.statistics.ComputeLibReferenceUseCase
 import com.absinthe.libchecker.domain.statistics.GetAndroidDistributionUseCase
 import com.absinthe.libchecker.domain.statistics.GetLibReferenceAppsUseCase
@@ -138,6 +140,7 @@ val appModule = module {
   single<SnapshotSelectionRepository> { GlobalSnapshotSelectionRepository() }
   single<SnapshotRepository> { LocalSnapshotRepository(get(), get()) }
   single<SnapshotArchiveCodec> { ProtoSnapshotArchiveCodec() }
+  single<ChartSettingsRepository> { GlobalChartSettingsRepository() }
   single<LibReferenceSettingsRepository> { GlobalLibReferenceSettingsRepository() }
   single { AllowFileUriExposureUseCase() }
   factory { InitializeAppListUseCase(get(), get(), get()) }
@@ -244,7 +247,8 @@ val appModule = module {
       buildDetailedAbiChartDataUseCase = get(),
       buildFeatureFlagChartDataUseCase = get(),
       buildPageSize16KBChartDataUseCase = get(),
-      getAndroidDistributionUseCase = get()
+      getAndroidDistributionUseCase = get(),
+      chartSettingsRepository = get()
     )
   }
   viewModel {
@@ -308,7 +312,8 @@ val appModule = module {
     LibReferenceViewModel(
       appListRepository = get(),
       buildAppListItemViewStatesUseCase = get(),
-      getLibReferenceAppsUseCase = get()
+      getLibReferenceAppsUseCase = get(),
+      libReferenceSettingsRepository = get()
     )
   }
   viewModel {

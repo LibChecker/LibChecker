@@ -4,12 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.LibType
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppListItemViewState
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.BuildAppListItemViewStatesUseCase
 import com.absinthe.libchecker.domain.statistics.GetLibReferenceAppsUseCase
+import com.absinthe.libchecker.domain.statistics.LibReferenceSettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -23,7 +23,8 @@ import kotlinx.coroutines.launch
 class LibReferenceViewModel(
   appListRepository: AppListRepository,
   private val buildAppListItemViewStatesUseCase: BuildAppListItemViewStatesUseCase,
-  private val getLibReferenceAppsUseCase: GetLibReferenceAppsUseCase
+  private val getLibReferenceAppsUseCase: GetLibReferenceAppsUseCase,
+  private val libReferenceSettingsRepository: LibReferenceSettingsRepository
 ) : ViewModel() {
 
   val libRefListFlow: MutableSharedFlow<List<LCItem>> = MutableSharedFlow()
@@ -52,7 +53,7 @@ class LibReferenceViewModel(
     return buildAppListItemViewStatesUseCase(
       BuildAppListItemViewStatesUseCase.Request(
         items = items,
-        options = GlobalValues.advancedOptions
+        options = libReferenceSettingsRepository.appListDisplayOptions
       )
     )
   }
@@ -73,7 +74,7 @@ class LibReferenceViewModel(
         items = items,
         name = name,
         type = type,
-        showSystemApps = GlobalValues.isShowSystemApps,
+        showSystemApps = libReferenceSettingsRepository.showSystemApps,
         packageNames = packageNames
       )
     )

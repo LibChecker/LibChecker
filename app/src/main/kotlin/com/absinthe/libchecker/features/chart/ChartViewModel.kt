@@ -4,7 +4,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppListItemViewState
 import com.absinthe.libchecker.domain.app.AppListRepository
@@ -16,6 +15,7 @@ import com.absinthe.libchecker.domain.statistics.BuildApiLevelChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildDetailedAbiChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildFeatureFlagChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildPageSize16KBChartDataUseCase
+import com.absinthe.libchecker.domain.statistics.ChartSettingsRepository
 import com.absinthe.libchecker.domain.statistics.DetailedAbiChartData
 import com.absinthe.libchecker.domain.statistics.FeatureFlagChartData
 import com.absinthe.libchecker.domain.statistics.GetAndroidDistributionUseCase
@@ -40,7 +40,8 @@ class ChartViewModel(
   private val buildDetailedAbiChartDataUseCase: BuildDetailedAbiChartDataUseCase,
   private val buildFeatureFlagChartDataUseCase: BuildFeatureFlagChartDataUseCase,
   private val buildPageSize16KBChartDataUseCase: BuildPageSize16KBChartDataUseCase,
-  private val getAndroidDistributionUseCase: GetAndroidDistributionUseCase
+  private val getAndroidDistributionUseCase: GetAndroidDistributionUseCase,
+  private val chartSettingsRepository: ChartSettingsRepository
 ) : ViewModel() {
   private var queryJob: Job? = null
 
@@ -52,7 +53,7 @@ class ChartViewModel(
   private val _distributionLastUpdateTime = MutableStateFlow("")
   val distributionLastUpdateTime = _distributionLastUpdateTime.asStateFlow()
 
-  private val _detailAbiSwitch = MutableStateFlow(GlobalValues.isDetailedAbiChart)
+  private val _detailAbiSwitch = MutableStateFlow(chartSettingsRepository.isDetailedAbiChart)
   val detailAbiSwitch = _detailAbiSwitch.asStateFlow()
 
   private val _detailAbiSwitchVisibility = MutableStateFlow(true)
@@ -63,7 +64,7 @@ class ChartViewModel(
   }
 
   fun setDetailAbiSwitch(isDetailedAbiChart: Boolean) {
-    GlobalValues.isDetailedAbiChart = isDetailedAbiChart
+    chartSettingsRepository.isDetailedAbiChart = isDetailedAbiChart
     _detailAbiSwitch.value = isDetailedAbiChart
   }
 
@@ -75,7 +76,7 @@ class ChartViewModel(
     return buildAppListItemViewStatesUseCase(
       BuildAppListItemViewStatesUseCase.Request(
         items = items,
-        options = GlobalValues.advancedOptions
+        options = chartSettingsRepository.appListDisplayOptions
       )
     )
   }
@@ -84,7 +85,7 @@ class ChartViewModel(
     return buildAbiChartDataUseCase(
       BuildAbiChartDataUseCase.Request(
         items = items,
-        showSystemApps = GlobalValues.isShowSystemApps
+        showSystemApps = chartSettingsRepository.showSystemApps
       )
     )
   }
@@ -97,7 +98,7 @@ class ChartViewModel(
       BuildApiLevelChartDataUseCase.Request(
         items = items,
         kind = kind,
-        showSystemApps = GlobalValues.isShowSystemApps
+        showSystemApps = chartSettingsRepository.showSystemApps
       )
     )
   }
@@ -109,7 +110,7 @@ class ChartViewModel(
     return buildDetailedAbiChartDataUseCase(
       BuildDetailedAbiChartDataUseCase.Request(
         items = items,
-        showSystemApps = GlobalValues.isShowSystemApps
+        showSystemApps = chartSettingsRepository.showSystemApps
       ),
       onProgress
     )
@@ -123,7 +124,7 @@ class ChartViewModel(
       BuildFeatureFlagChartDataUseCase.Request(
         items = items,
         kind = kind,
-        showSystemApps = GlobalValues.isShowSystemApps
+        showSystemApps = chartSettingsRepository.showSystemApps
       )
     )
   }
@@ -135,7 +136,7 @@ class ChartViewModel(
     return buildPageSize16KBChartDataUseCase(
       BuildPageSize16KBChartDataUseCase.Request(
         items = items,
-        showSystemApps = GlobalValues.isShowSystemApps
+        showSystemApps = chartSettingsRepository.showSystemApps
       ),
       onProgress
     )
