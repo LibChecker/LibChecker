@@ -51,13 +51,8 @@ class DetailPackageContentController(
     packageName: String,
     uiGeneration: Int
   ) {
-    val sharedLibraryFiles = packageInfo.applicationInfo?.sharedLibraryFiles
-    if (sharedLibraryFiles?.isNotEmpty() != true) {
-      return
-    }
-
     coroutineScope.launch {
-      if (viewModel.hasInstalledStaticLibraries(packageName)) {
+      if (viewModel.shouldShowStaticLibraryTab(packageInfo, packageName)) {
         if (uiGeneration != currentUiGeneration()) {
           return@launch
         }

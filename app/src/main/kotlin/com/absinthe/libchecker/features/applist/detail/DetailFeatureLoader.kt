@@ -8,8 +8,8 @@ import com.absinthe.libchecker.domain.app.BuildAppDetailHeaderExtraInfoUseCase
 import com.absinthe.libchecker.domain.app.BuildAppDetailHeaderTitleDataUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailAbiUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailFeaturesUseCase
-import com.absinthe.libchecker.domain.app.HasInstalledStaticLibrariesUseCase
 import com.absinthe.libchecker.domain.app.VersionedFeature
+import com.absinthe.libchecker.domain.app.detail.ShouldShowStaticLibraryTabUseCase
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +22,7 @@ class DetailFeatureLoader(
   private val buildAppDetailAbiLabelDataUseCase: BuildAppDetailAbiLabelDataUseCase,
   private val buildAppDetailHeaderExtraInfoUseCase: BuildAppDetailHeaderExtraInfoUseCase,
   private val buildAppDetailHeaderTitleDataUseCase: BuildAppDetailHeaderTitleDataUseCase,
-  private val hasInstalledStaticLibrariesUseCase: HasInstalledStaticLibrariesUseCase
+  private val shouldShowStaticLibraryTabUseCase: ShouldShowStaticLibraryTabUseCase
 ) {
   val featureState = DetailFeatureState()
 
@@ -61,8 +61,11 @@ class DetailFeatureLoader(
     apkAnalyticsMode = apkAnalyticsMode
   )
 
-  suspend fun hasInstalledStaticLibraries(packageName: String): Boolean {
-    return hasInstalledStaticLibrariesUseCase(packageName)
+  suspend fun shouldShowStaticLibraryTab(
+    packageInfo: PackageInfo,
+    packageName: String
+  ): Boolean {
+    return shouldShowStaticLibraryTabUseCase(packageInfo, packageName)
   }
 
   fun emitFeature(

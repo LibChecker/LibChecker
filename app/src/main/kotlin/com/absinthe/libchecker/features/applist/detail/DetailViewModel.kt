@@ -146,8 +146,11 @@ class DetailViewModel(
     return detailPackageLoader.isInstalledAppComparisonAvailable(packageName)
   }
 
-  suspend fun hasInstalledStaticLibraries(packageName: String): Boolean {
-    return detailFeatureLoader.hasInstalledStaticLibraries(packageName)
+  suspend fun shouldShowStaticLibraryTab(
+    packageInfo: PackageInfo,
+    packageName: String
+  ): Boolean {
+    return detailFeatureLoader.shouldShowStaticLibraryTab(packageInfo, packageName)
   }
 
   suspend fun loadInstalledAppComparisonPackage(packageName: String): PackageInfo? {
