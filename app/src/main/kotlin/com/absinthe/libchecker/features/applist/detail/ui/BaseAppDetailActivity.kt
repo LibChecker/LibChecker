@@ -631,7 +631,7 @@ abstract class BaseAppDetailActivity :
           Features.SPLIT_APKS -> {
             featureAdapter.addData(
               FeatureItem(R.drawable.ic_aab, R.string.app_bundle) {
-                FeaturesDialog.showSplitApksDialog(this, it.packageInfo)
+                FeaturesDialog.showSplitApksDialog(this, viewModel.packageInfo)
               }
             )
           }
@@ -679,7 +679,7 @@ abstract class BaseAppDetailActivity :
           Features.XPOSED_MODULE -> {
             featureAdapter.addData(
               FeatureItem(R.drawable.ic_xposed, R.string.xposed_module) {
-                XposedInfoDialogFragment.newInstance(it.packageInfo.packageName)
+                XposedInfoDialogFragment.newInstance(viewModel.packageInfo.packageName)
                   .show(supportFragmentManager, XposedInfoDialogFragment::class.java.name)
               }
             )
@@ -730,10 +730,11 @@ abstract class BaseAppDetailActivity :
             featureAdapter.addData(
               position,
               FeatureItem(R.drawable.ic_app_prop, R.string.lib_detail_app_props_title) {
-                if (viewModel.isApkPreview && viewModel.apkPreviewInfo != null) {
-                  FeaturesDialog.showAppPropDialog(this, viewModel.apkPreviewInfo!!.appProps)
+                val previewInfo = viewModel.apkPreviewInfo
+                if (viewModel.isApkPreview && previewInfo != null) {
+                  FeaturesDialog.showAppPropDialog(this, previewInfo.appProps)
                 } else {
-                  FeaturesDialog.showAppPropDialog(this, it.packageInfo)
+                  FeaturesDialog.showAppPropDialog(this, viewModel.packageInfo)
                 }
               }
             )
@@ -745,7 +746,7 @@ abstract class BaseAppDetailActivity :
               featureAdapter.addData(
                 position,
                 FeatureItem(R.drawable.ic_install_source, R.string.lib_detail_app_install_source_title) {
-                  FeaturesDialog.showAppInstallSourceDialog(this, it.packageInfo.packageName)
+                  FeaturesDialog.showAppInstallSourceDialog(this, viewModel.packageInfo.packageName)
                 }
               )
             }

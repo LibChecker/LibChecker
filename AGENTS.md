@@ -176,7 +176,8 @@ Important `:app` boundaries:
 3. Read existing local patterns before editing.
 4. For refactors, prioritize high-traffic flows and oversized legacy
    ViewModels/controllers before low-frequency tooling. Keep edits focused and
-   avoid generated/build-output churn.
+   keep domain package-layout cleanup separate from behavior changes. Avoid
+   generated/build-output churn.
 5. Run `spotlessApply` only when formatting needs fixing.
 6. Run the narrowest relevant validation command. If adapters, view-state
    mapping, menus, navigation, or visible strings changed, add a focused

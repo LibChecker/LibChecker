@@ -30,7 +30,8 @@ class ApkDetailActivity :
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    viewModel.isApk = true
+    viewModel.startApkMode()
+    viewModel.clearApkPreviewInfo()
     resolveIntent(intent)
   }
 
@@ -75,6 +76,9 @@ class ApkDetailActivity :
   }
 
   private fun initPackage(uri: Uri) {
+    viewModel.startApkMode()
+    viewModel.clearApkPreviewInfo()
+
     val dialog = UiUtils.createLoadingDialog(this)
     dialog.show()
 
@@ -111,8 +115,7 @@ class ApkDetailActivity :
 
   private fun initAPKPreview(url: String) {
     Timber.d("initAPKPreview: $url")
-    viewModel.isApk = false
-    viewModel.isApkPreview = true
+    viewModel.startApkPreviewMode()
 
     val dialog = UiUtils.createLoadingDialog(this)
     dialog.show()
@@ -124,7 +127,7 @@ class ApkDetailActivity :
         Toasty.showLong(this@ApkDetailActivity, it.toString())
         finish()
       }.getOrNull() ?: return@launch
-      viewModel.apkPreviewInfo = previewInfo
+      viewModel.setApkPreviewInfo(previewInfo)
 
       onPackageInfoAvailable(PackageInfo(), null)
       dialog.dismiss()

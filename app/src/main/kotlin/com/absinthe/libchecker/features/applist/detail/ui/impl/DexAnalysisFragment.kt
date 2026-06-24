@@ -70,7 +70,7 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
 
   override fun onDetach() {
     super.onDetach()
-    viewModel.initDexJob?.cancel()
+    viewModel.cancelInitDexDataJob()
   }
 
   companion object {

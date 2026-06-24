@@ -353,7 +353,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   }
 
   private fun doOnLongClick(context: Context, item: LibStringItemChip, position: Int) {
-    val packageName = viewModel.apkPreviewInfo?.packageName ?: viewModel.packageInfo.packageName
+    val packageName = viewModel.packageName()
     val actionMap = mutableMapOf<Int, () -> Unit>()
     val arrayAdapter = ArrayAdapter<String>(context, android.R.layout.simple_list_item_1)
     var componentName = item.item.name

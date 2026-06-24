@@ -65,7 +65,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -115,24 +114,47 @@ class DetailViewModel(
   val contentState = DetailContentState()
   val featureState = DetailFeatureState()
   val filterState = DetailFilterState()
+  private val packageState = DetailPackageState()
+  private val loadJobsState = DetailLoadJobsState()
 
-  var isApk = false
-  var isApkPreview = false
+  val isApk: Boolean
+    get() = packageState.isApk
 
-  lateinit var packageInfo: PackageInfo
-    private set
-  var apkPreviewInfo: ApkPreviewInfo? = null
-  val packageInfoStateFlow = MutableStateFlow<PackageInfo?>(null)
+  val isApkPreview: Boolean
+    get() = packageState.isApkPreview
+
+  val packageInfo: PackageInfo
+    get() = packageState.packageInfo
+
+  val apkPreviewInfo: ApkPreviewInfo?
+    get() = packageState.apkPreviewInfo
+
+  val packageInfoStateFlow = packageState.packageInfoStateFlow
+
+  fun packageName(): String = packageState.packageName()
 
   fun initPackageInfo(pi: PackageInfo) {
-    packageInfo = pi
-    viewModelScope.launch {
-      packageInfoStateFlow.emit(pi)
-    }
+    packageState.setPackageInfo(pi)
+  }
+
+  fun startApkMode() {
+    packageState.startApkMode()
+  }
+
+  fun startApkPreviewMode() {
+    packageState.startApkPreviewMode()
+  }
+
+  fun setApkPreviewInfo(apkPreviewInfo: ApkPreviewInfo) {
+    packageState.apkPreviewInfo = apkPreviewInfo
+  }
+
+  fun clearApkPreviewInfo() {
+    packageState.clearApkPreviewInfo()
   }
 
   fun isPackageInfoAvailable(): Boolean {
-    return this::packageInfo.isInitialized
+    return packageState.hasPackageInfo()
   }
 
   suspend fun loadAppDetailPackage(packageName: String): GetAppDetailPackageUseCase.Result {
@@ -157,8 +179,8 @@ class DetailViewModel(
   ): AppDetailHeaderExtraInfo {
     return buildAppDetailHeaderExtraInfoUseCase(
       packageInfo = packageInfo,
-      apkPreviewInfo = apkPreviewInfo,
-      isApkPreview = isApkPreview,
+      apkPreviewInfo = packageState.apkPreviewInfo,
+      isApkPreview = packageState.isApkPreview,
       showAndroidVersion = showAndroidVersion
     )
   }
@@ -168,7 +190,7 @@ class DetailViewModel(
     apkAnalyticsMode: Boolean
   ) = buildAppDetailHeaderTitleDataUseCase(
     packageInfo = packageInfo,
-    apkPreviewInfo = apkPreviewInfo,
+    apkPreviewInfo = packageState.apkPreviewInfo,
     apkAnalyticsMode = apkAnalyticsMode
   )
 
@@ -186,7 +208,11 @@ class DetailViewModel(
 
   suspend fun getXposedModuleInfo(packageName: String) = getXposedModuleInfoUseCase(packageName)
 
-  suspend fun extractNativeLibrary(item: LibStringItem) = extractNativeLibraryUseCase(packageInfo, item, isApkPreview)
+  suspend fun extractNativeLibrary(item: LibStringItem) = extractNativeLibraryUseCase(
+    packageState.packageInfo,
+    item,
+    packageState.isApkPreview
+  )
 
   suspend fun prepareAppPackageShareFile(cacheDir: File, packageName: String) = prepareAppPackageShareFileUseCase(cacheDir, packageName)
 
@@ -236,31 +262,23 @@ class DetailViewModel(
 
   fun reset() {
     Timber.d("reset")
-    initSoAnalysisJob?.cancel()
-    initStaticJob?.cancel()
-    initMetaDataJob?.cancel()
-    initPermissionJob?.cancel()
-    initDexJob?.cancel()
-    initSignaturesJob?.cancel()
-    initComponentsJob?.cancel()
+    loadJobsState.cancelAll()
     contentState.reset()
     filterState.reset()
   }
 
-  private var initSoAnalysisJob: Job? = null
-
   fun initSoAnalysisData() {
-    initSoAnalysisJob = launchDetailDataJob(
-      currentJob = initSoAnalysisJob,
+    loadJobsState.initSoAnalysisJob = launchDetailDataJob(
+      currentJob = loadJobsState.initSoAnalysisJob,
       hasData = contentState.nativeLibItems.value != null
     ) {
       val abiBundle = featureState.abiBundleStateFlow.value
         ?: featureState.abiBundleStateFlow.filterNotNull().first()
       val nativeLibraries = getAppDetailNativeLibrariesUseCase(
-        packageInfo = packageInfo,
-        apkPreviewInfo = apkPreviewInfo,
-        isApk = isApk,
-        isApkPreview = isApkPreview,
+        packageInfo = packageState.packageInfo,
+        apkPreviewInfo = packageState.apkPreviewInfo,
+        isApk = packageState.isApk,
+        isApkPreview = packageState.isApkPreview,
         abi = abiBundle.abi
       )
 
@@ -277,62 +295,56 @@ class DetailViewModel(
       viewModelScope.launch(Dispatchers.IO) {
         contentState.nativeLibItems.emit(
           getAppDetailNativeLibrariesUseCase.buildChipList(
-            packageInfo = packageInfo,
-            apkPreviewInfo = apkPreviewInfo,
-            isApkPreview = isApkPreview,
+            packageInfo = packageState.packageInfo,
+            apkPreviewInfo = packageState.apkPreviewInfo,
+            isApkPreview = packageState.isApkPreview,
             items = it,
-            sortBySize = appDetailSettingsRepository.sortMode == MODE_SORT_BY_SIZE
+            sortBySize = isSortBySizeMode()
           )
         )
       }
     }
   }
 
-  private var initStaticJob: Job? = null
-
   fun initStaticData() {
-    initStaticJob = launchDetailDataJob(
-      currentJob = initStaticJob,
+    loadJobsState.initStaticJob = launchDetailDataJob(
+      currentJob = loadJobsState.initStaticJob,
       hasData = contentState.staticLibItems.value != null
     ) {
       contentState.staticLibItems.emit(
         getAppDetailStaticLibraryChipsUseCase(
-          packageInfo = packageInfo,
-          sortBySizeMode = appDetailSettingsRepository.sortMode == MODE_SORT_BY_SIZE
+          packageInfo = packageState.packageInfo,
+          sortBySizeMode = isSortBySizeMode()
         )
       )
     }
   }
 
-  private var initMetaDataJob: Job? = null
-
   fun initMetaDataData() {
-    initMetaDataJob = launchDetailDataJob(
-      currentJob = initMetaDataJob,
+    loadJobsState.initMetaDataJob = launchDetailDataJob(
+      currentJob = loadJobsState.initMetaDataJob,
       hasData = contentState.metaDataItems.value != null
     ) {
       contentState.metaDataItems.emit(
         getAppDetailMetadataChipsUseCase(
-          packageInfo = packageInfo,
-          apkPreviewInfo = apkPreviewInfo,
-          isApkPreview = isApkPreview
+          packageInfo = packageState.packageInfo,
+          apkPreviewInfo = packageState.apkPreviewInfo,
+          isApkPreview = packageState.isApkPreview
         )
       )
     }
   }
 
-  private var initPermissionJob: Job? = null
-
   fun initPermissionData() {
-    initPermissionJob = launchDetailDataJob(
-      currentJob = initPermissionJob,
+    loadJobsState.initPermissionJob = launchDetailDataJob(
+      currentJob = loadJobsState.initPermissionJob,
       hasData = contentState.permissionsItems.value != null
     ) {
       val permissions = getAppDetailPermissionChipsUseCase(
-        packageInfo = packageInfo,
-        apkPreviewInfo = apkPreviewInfo,
-        isApk = isApk,
-        isApkPreview = isApkPreview
+        packageInfo = packageState.packageInfo,
+        apkPreviewInfo = packageState.apkPreviewInfo,
+        isApk = packageState.isApk,
+        isApkPreview = packageState.isApkPreview
       )
       contentState.permissionsItems.emit(permissions.items)
 
@@ -342,41 +354,47 @@ class DetailViewModel(
     }
   }
 
-  var initDexJob: Job? = null
-
   fun initDexData() {
-    initDexJob = launchDetailDataJob(
-      currentJob = initDexJob,
+    loadJobsState.initDexJob = launchDetailDataJob(
+      currentJob = loadJobsState.initDexJob,
       hasData = contentState.dexLibItems.value != null
     ) {
       val list = getAppDetailDexChipsUseCase(
-        packageInfo = packageInfo,
-        sortBySizeMode = appDetailSettingsRepository.sortMode == MODE_SORT_BY_SIZE
+        packageInfo = packageState.packageInfo,
+        sortBySizeMode = isSortBySizeMode()
       )
       contentState.dexLibItems.emit(list)
     }
   }
 
-  private var initSignaturesJob: Job? = null
+  fun cancelInitDexDataJob() {
+    loadJobsState.initDexJob?.cancel()
+  }
 
   fun initSignatures() {
-    initSignaturesJob = launchDetailDataJob(
-      currentJob = initSignaturesJob,
+    loadJobsState.initSignaturesJob = launchDetailDataJob(
+      currentJob = loadJobsState.initSignaturesJob,
       hasData = contentState.signaturesLibItems.value != null
     ) {
-      contentState.signaturesLibItems.emit(getAppDetailSignatureChipsUseCase(packageInfo, isApk))
+      contentState.signaturesLibItems.emit(
+        getAppDetailSignatureChipsUseCase(
+          packageState.packageInfo,
+          packageState.isApk
+        )
+      )
     }
   }
 
-  private var initComponentsJob: Job? = null
-
   fun initComponentsData() {
-    initComponentsJob = launchDetailDataJob(
-      currentJob = initComponentsJob,
+    loadJobsState.initComponentsJob = launchDetailDataJob(
+      currentJob = loadJobsState.initComponentsJob,
       hasData = contentState.hasComponentsData()
     ) {
       try {
-        val components = getAppDetailComponentChipsUseCase(packageInfo, isApk)
+        val components = getAppDetailComponentChipsUseCase(
+          packageState.packageInfo,
+          packageState.isApk
+        )
         contentState.emitComponents(components) { UiUtils.getRandomColor() }
       } catch (e: Exception) {
         Timber.e(e)
@@ -397,7 +415,7 @@ class DetailViewModel(
   }
 
   fun initComponentsDataInPreview() = viewModelScope.launch(Dispatchers.IO) {
-    val previewInfo = apkPreviewInfo ?: return@launch
+    val previewInfo = packageState.apkPreviewInfo ?: return@launch
     val components = getAppDetailComponentChipsUseCase(previewInfo)
     contentState.emitComponentItems(components)
   }
@@ -459,7 +477,7 @@ class DetailViewModel(
   fun initFeatures(packageInfo: PackageInfo, features: Int) = viewModelScope.launch(Dispatchers.IO) {
     Timber.d("initFeatures: features = $features")
 
-    val detailFeatures = getAppDetailFeaturesUseCase(packageInfo, features, isApk)
+    val detailFeatures = getAppDetailFeaturesUseCase(packageInfo, features, packageState.isApk)
     featureState.emitFeatures(detailFeatures)
   }
 
@@ -492,6 +510,14 @@ class DetailViewModel(
   }
 
   fun sortDetailItems(items: List<LibStringItemChip>, @LibType type: Int): List<LibStringItemChip> {
-    return sortAppDetailItemsUseCase(items, type, appDetailSettingsRepository.sortMode == MODE_SORT_BY_LIB)
+    return sortAppDetailItemsUseCase(items, type, isSortByLibMode())
+  }
+
+  private fun isSortByLibMode(): Boolean {
+    return appDetailSettingsRepository.sortMode == MODE_SORT_BY_LIB
+  }
+
+  private fun isSortBySizeMode(): Boolean {
+    return appDetailSettingsRepository.sortMode == MODE_SORT_BY_SIZE
   }
 }
