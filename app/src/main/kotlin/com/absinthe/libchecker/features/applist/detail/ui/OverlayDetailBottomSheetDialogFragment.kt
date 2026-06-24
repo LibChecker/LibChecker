@@ -1,7 +1,5 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
-import android.text.SpannableString
-import android.text.style.ImageSpan
 import androidx.core.os.BundleCompat
 import androidx.core.text.buildSpannedString
 import androidx.core.text.scale
@@ -15,12 +13,10 @@ import com.absinthe.libchecker.domain.app.OverlayDetailData
 import com.absinthe.libchecker.domain.app.OverlayDetailExtraInfo
 import com.absinthe.libchecker.domain.app.RelatedAppDisplayData
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
-import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
 import com.absinthe.libchecker.features.applist.detail.ui.view.OverlayDetailBottomSheetView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.copyToClipboard
-import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
@@ -33,6 +29,7 @@ const val EXTRA_LC_ITEM = "EXTRA_LC_ITEM"
 class OverlayDetailBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<OverlayDetailBottomSheetView>() {
 
   private val viewModel: DetailViewModel by activityViewModel()
+  private val relatedAppItemBinder = RelatedAppItemBinder()
 
   override fun initRootView(): OverlayDetailBottomSheetView = OverlayDetailBottomSheetView(requireContext())
 
@@ -130,41 +127,13 @@ class OverlayDetailBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment
     lcItem: LCItem,
     data: RelatedAppDisplayData
   ) {
-    val context = requireContext()
-    root.targetPackageView.container.let {
-      it.icon.load(data.packageInfo)
-      it.appName.text = data.label
-      it.packageName.text = data.packageName
-      it.versionInfo.text = data.versionInfo
-
-      if (data.abiBadgeRes != null) {
-        val spanString = SpannableString("  ${data.abiInfo}")
-        data.abiBadgeRes.getDrawable(context)?.let { drawable ->
-          drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
-          val span = CenterAlignImageSpan(drawable)
-          spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
-        }
-        it.abiInfo.text = spanString
-      } else {
-        it.abiInfo.text = data.abiInfo
-      }
-      root.targetPackageView.setItemContentDescription(
-        root.targetTitleView.text,
-        data.label,
-        data.packageName,
-        it.versionInfo.text,
-        data.abiInfo
-      )
-
-      if (lcItem.variant == Constants.VARIANT_HAP) {
-        it.setBadge(R.drawable.ic_harmony_badge)
-      } else {
-        it.setBadge(null)
-      }
-
-      root.targetPackageView.setOnClickListener {
-        activity?.launchDetailPage(data.item)
-      }
+    relatedAppItemBinder.bind(
+      appItemView = root.targetPackageView,
+      title = root.targetTitleView.text,
+      data = data,
+      showHarmonyBadge = lcItem.variant == Constants.VARIANT_HAP
+    ) {
+      activity?.launchDetailPage(data.item)
     }
   }
 }
