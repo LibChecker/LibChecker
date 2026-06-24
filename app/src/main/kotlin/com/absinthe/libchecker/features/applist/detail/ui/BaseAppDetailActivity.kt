@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
-import android.content.Intent
 import android.content.pm.PackageInfo
 import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.Drawable
@@ -26,8 +25,6 @@ import com.absinthe.libchecker.features.applist.detail.AppBarStateChangeListener
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.IDetailContainer
 import com.absinthe.libchecker.features.applist.detail.bean.DetailExtraBean
-import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ENTITY
-import com.absinthe.libchecker.features.snapshot.detail.ui.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.UiUtils
@@ -140,6 +137,15 @@ abstract class BaseAppDetailActivity :
       onQueryTextChanged = ::onSearchTextChanged
     )
   }
+  private val packageComparisonController by unsafeLazy {
+    DetailPackageComparisonController(
+      activity = this,
+      viewModel = viewModel,
+      toolbarController = toolbarController,
+      coroutineScope = lifecycleScope,
+      currentUiGeneration = { packageUiGeneration }
+    )
+  }
 
   private var isHarmonyMode = false
   private var packageUiGeneration = 0
@@ -241,24 +247,7 @@ abstract class BaseAppDetailActivity :
         }
       )
       if (apkAnalyticsMode && !viewModel.isApkPreview) {
-        lifecycleScope.launch {
-          if (!viewModel.isInstalledAppComparisonAvailable(packageName)) {
-            return@launch
-          }
-          if (uiGeneration != packageUiGeneration) {
-            return@launch
-          }
-          toolbarController.addCompareAction {
-            lifecycleScope.launch {
-              val basePackage = viewModel.loadInstalledAppComparisonPackage(packageName)
-              if (basePackage == null) {
-                Toasty.showLong(this@BaseAppDetailActivity, getString(R.string.toast_cant_open_app))
-                return@launch
-              }
-              navigateToSnapshotDetailPage(basePackage, viewModel.packageInfo)
-            }
-          }
-        }
+        packageComparisonController.setupIfAvailable(packageName, uiGeneration)
       }
     }
 
@@ -421,21 +410,6 @@ abstract class BaseAppDetailActivity :
     }
     appDetailSettingsRepository.setSortMode(sortMode)
     detailFragmentManager.sortAll(lifecycleScope)
-  }
-
-  private fun navigateToSnapshotDetailPage(basePackage: PackageInfo, analysisPackage: PackageInfo) = lifecycleScope.launch(Dispatchers.Main) {
-    val dialog = UiUtils.createLoadingDialog(this@BaseAppDetailActivity)
-    dialog.show()
-    val diff = viewModel.buildPackageComparisonSnapshotItem(basePackage, analysisPackage)
-    dialog.dismiss()
-
-    val intent = Intent(this@BaseAppDetailActivity, SnapshotDetailActivity::class.java)
-      .putExtras(
-        Bundle().apply {
-          putSerializable(EXTRA_ENTITY, diff)
-        }
-      )
-    startActivity(intent)
   }
 
   private fun initAbiView(abi: Int, abiSet: Collection<Int>) {
