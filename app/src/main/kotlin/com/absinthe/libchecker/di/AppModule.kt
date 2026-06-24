@@ -130,6 +130,7 @@ import com.absinthe.libchecker.features.album.track.TrackViewModel
 import com.absinthe.libchecker.features.applist.detail.DetailActionLoader
 import com.absinthe.libchecker.features.applist.detail.DetailContentLoader
 import com.absinthe.libchecker.features.applist.detail.DetailFeatureLoader
+import com.absinthe.libchecker.features.applist.detail.DetailFilterController
 import com.absinthe.libchecker.features.applist.detail.DetailPackageLoader
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.chart.ChartViewModel
@@ -266,6 +267,13 @@ val appModule = module {
     )
   }
   factory {
+    DetailFilterController(
+      filterAppDetailItemsUseCase = get(),
+      sortAppDetailItemsUseCase = get(),
+      appDetailSettingsRepository = get()
+    )
+  }
+  factory {
     DetailFeatureLoader(
       getAppDetailAbiUseCase = get(),
       getAppDetailFeaturesUseCase = get(),
@@ -322,11 +330,9 @@ val appModule = module {
   }
   viewModel {
     DetailViewModel(
-      filterAppDetailItemsUseCase = get(),
-      sortAppDetailItemsUseCase = get(),
-      appDetailSettingsRepository = get(),
       detailActionLoader = get(),
       detailContentLoader = get(),
+      detailFilterController = get(),
       detailFeatureLoader = get(),
       detailPackageLoader = get()
     )

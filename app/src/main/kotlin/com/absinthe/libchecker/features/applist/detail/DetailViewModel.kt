@@ -9,17 +9,13 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppBundleSplitItem
 import com.absinthe.libchecker.domain.app.AppDetailAbiLabelData
 import com.absinthe.libchecker.domain.app.AppDetailHeaderExtraInfo
-import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.AppManifestProperty
 import com.absinthe.libchecker.domain.app.AppPackageShareFile
-import com.absinthe.libchecker.domain.app.FilterAppDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageUseCase
 import com.absinthe.libchecker.domain.app.PrepareApkAnalysisPackageUseCase
 import com.absinthe.libchecker.domain.app.RelatedAppListItem
-import com.absinthe.libchecker.domain.app.SortAppDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
-import com.absinthe.libchecker.features.applist.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
@@ -27,17 +23,15 @@ import java.io.File
 import timber.log.Timber
 
 class DetailViewModel(
-  private val filterAppDetailItemsUseCase: FilterAppDetailItemsUseCase,
-  private val sortAppDetailItemsUseCase: SortAppDetailItemsUseCase,
-  private val appDetailSettingsRepository: AppDetailSettingsRepository,
   private val detailActionLoader: DetailActionLoader,
   private val detailContentLoader: DetailContentLoader,
+  private val detailFilterController: DetailFilterController,
   private val detailFeatureLoader: DetailFeatureLoader,
   private val detailPackageLoader: DetailPackageLoader
 ) : ViewModel() {
   val contentState = DetailContentState()
   val featureState = DetailFeatureState()
-  val filterState = DetailFilterState()
+  val filterState = detailFilterController.filterState
   private val packageState: DetailPackageState
     get() = detailPackageLoader.packageState
 
@@ -171,7 +165,7 @@ class DetailViewModel(
     Timber.d("reset")
     detailContentLoader.cancelAll()
     contentState.reset()
-    filterState.reset()
+    detailFilterController.reset()
   }
 
   fun initSoAnalysisData() {
@@ -262,7 +256,7 @@ class DetailViewModel(
     searchWords: String?,
     process: String?
   ): List<LibStringItemChip> {
-    return filterAppDetailItemsUseCase(items, searchWords, process)
+    return detailFilterController.filterDetailItems(items, searchWords, process)
   }
 
   fun filterPermissionDetailItems(
@@ -270,14 +264,10 @@ class DetailViewModel(
     searchWords: String?,
     process: String?
   ): List<LibStringItemChip> {
-    return filterAppDetailItemsUseCase.filterPermissions(items, searchWords, process)
+    return detailFilterController.filterPermissionDetailItems(items, searchWords, process)
   }
 
   fun sortDetailItems(items: List<LibStringItemChip>, @LibType type: Int): List<LibStringItemChip> {
-    return sortAppDetailItemsUseCase(items, type, isSortByLibMode())
-  }
-
-  private fun isSortByLibMode(): Boolean {
-    return appDetailSettingsRepository.sortMode == MODE_SORT_BY_LIB
+    return detailFilterController.sortDetailItems(items, type)
   }
 }
