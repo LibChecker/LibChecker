@@ -11,14 +11,12 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.text.buildSpannedString
 import androidx.core.text.scale
 import androidx.core.view.MenuProvider
-import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -55,7 +53,6 @@ import com.absinthe.libchecker.features.applist.detail.IDetailContainer
 import com.absinthe.libchecker.features.applist.detail.bean.AppDetailToolbarItem
 import com.absinthe.libchecker.features.applist.detail.bean.DetailExtraBean
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.AppDetailToolbarAdapter
-import com.absinthe.libchecker.features.applist.detail.ui.adapter.ProcessBarAdapter
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.node.AbiLabelNode
 import com.absinthe.libchecker.features.applist.detail.ui.impl.AbilityAnalysisFragment
 import com.absinthe.libchecker.features.applist.detail.ui.impl.ComponentsAnalysisFragment
@@ -64,7 +61,6 @@ import com.absinthe.libchecker.features.applist.detail.ui.impl.NativeAnalysisFra
 import com.absinthe.libchecker.features.applist.detail.ui.impl.PermissionAnalysisFragment
 import com.absinthe.libchecker.features.applist.detail.ui.impl.SignaturesAnalysisFragment
 import com.absinthe.libchecker.features.applist.detail.ui.impl.StaticAnalysisFragment
-import com.absinthe.libchecker.features.applist.detail.ui.view.ProcessBarView
 import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ENTITY
 import com.absinthe.libchecker.features.snapshot.detail.ui.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
@@ -133,11 +129,21 @@ abstract class BaseAppDetailActivity :
   private val featureListController by unsafeLazy {
     DetailFeatureListController(binding.headerContentLayout)
   }
+  private val processBarController by unsafeLazy {
+    DetailProcessBarController(
+      container = binding.detailToolbarContainer,
+      processMode = { appDetailSettingsRepository.processMode },
+      hasNonGrantedPermissions = { detailFragmentManager.currentFragment?.hasNonGrantedPermissions() },
+      onProcessFilterChanged = { process ->
+        viewModel.filterState.queriedProcess = process
+        detailFragmentManager.deliverFilterItems(null, process, lifecycleScope)
+      }
+    )
+  }
   private val toolbarAdapter by unsafeLazy { AppDetailToolbarAdapter() }
 
   private var isHarmonyMode = false
   private var isToolbarCollapsed = false
-  private var processBarView: ProcessBarView? = null
   private var tabLayoutMediator: TabLayoutMediator? = null
   private var pageChangeCallback: ViewPager2.OnPageChangeCallback? = null
   private var packageUiGeneration = 0
@@ -621,13 +627,7 @@ abstract class BaseAppDetailActivity :
         }
       }.launchIn(lifecycleScope)
       it.filterState.processMapStateFlow.onEach { map ->
-        val list = map.map { mapItem ->
-          ProcessBarAdapter.ProcessBarItem(
-            mapItem.key,
-            mapItem.value
-          )
-        }
-        setupProcessBarView(list)
+        processBarController.setData(map)
       }.launchIn(lifecycleScope)
       it.featureState.featuresFlow.onEach { feat ->
         addFeatureItem(feat)
@@ -678,7 +678,7 @@ abstract class BaseAppDetailActivity :
       appDetailSettingsRepository.setProcessMode(processMode)
       detailFragmentManager.deliverProcessMode(processMode)
 
-      toggleProcessBarViewVisibility()
+      processBarController.refreshVisibility()
       if (!processMode) {
         doOnMainThreadIdle {
           viewModel.filterState.queriedProcess = null
@@ -701,45 +701,6 @@ abstract class BaseAppDetailActivity :
         }
       )
     startActivity(intent)
-  }
-
-  private fun initProcessBarView() {
-    processBarView = ProcessBarView(this@BaseAppDetailActivity).also {
-      it.layoutParams = ViewGroup.LayoutParams(
-        ViewGroup.LayoutParams.MATCH_PARENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
-      )
-      it.setOnItemClickListener { isSelected, process ->
-        if (isSelected) {
-          viewModel.filterState.queriedProcess = process
-        } else {
-          viewModel.filterState.queriedProcess = null
-        }
-        detailFragmentManager.deliverFilterItems(null, viewModel.filterState.queriedProcess, lifecycleScope)
-      }
-    }
-    binding.detailToolbarContainer.addView(processBarView)
-  }
-
-  private fun setupProcessBarView(list: List<ProcessBarAdapter.ProcessBarItem>) {
-    if (list.isEmpty()) {
-      if (processBarView?.parent != null) {
-        (processBarView?.parent as? ViewGroup)?.removeView(processBarView)
-        processBarView = null
-      }
-    } else {
-      if (processBarView == null) {
-        initProcessBarView()
-      }
-      toggleProcessBarViewVisibility()
-      processBarView?.setData(list)
-    }
-  }
-
-  private fun toggleProcessBarViewVisibility() {
-    processBarView?.isGone =
-      !appDetailSettingsRepository.processMode &&
-      detailFragmentManager.currentFragment?.hasNonGrantedPermissions() == false
   }
 
   private fun initAbiView(abi: Int, abiSet: Collection<Int>) {
