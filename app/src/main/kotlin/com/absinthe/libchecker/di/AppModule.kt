@@ -114,6 +114,7 @@ import com.absinthe.libchecker.domain.snapshot.GetSnapshotPackageIconSourcesUseC
 import com.absinthe.libchecker.domain.snapshot.GetTrackListItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.PrepareRoomBackupRestoreFileUseCase
 import com.absinthe.libchecker.domain.snapshot.RestoreSnapshotArchiveFromUriUseCase
+import com.absinthe.libchecker.domain.snapshot.SetPackageTrackedUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveCodec
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotItemFactory
@@ -357,6 +358,7 @@ val appModule = module {
   factory { GetSnapshotDashboardCountUseCase(get(), get()) }
   factory { GetSnapshotPackageIconSourcesUseCase(get()) }
   factory { GetTrackListItemsUseCase(androidContext().packageManager, get(), get()) }
+  factory { SetPackageTrackedUseCase(get(), get()) }
   factory { UpdateSnapshotTopAppsUseCase(get(), get()) }
   factory { BuildSnapshotDetailItemsUseCase(androidContext()) }
   factory { SnapshotArchiveUseCase(get(), get()) }
@@ -434,5 +436,5 @@ val appModule = module {
       snapshotTrackChangeRepository = get()
     )
   }
-  viewModel { TrackViewModel(get(), get(), get()) }
+  viewModel { TrackViewModel(get(), get()) }
 }
