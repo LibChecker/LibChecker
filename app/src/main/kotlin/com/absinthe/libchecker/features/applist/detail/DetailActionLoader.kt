@@ -7,7 +7,6 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppBundleSplitItem
 import com.absinthe.libchecker.domain.app.AppManifestProperty
 import com.absinthe.libchecker.domain.app.AppPackageShareFile
-import com.absinthe.libchecker.domain.app.BuildRelatedAppDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.BuildSignatureDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.ExportAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.ExtractNativeLibraryUseCase
@@ -21,10 +20,9 @@ import com.absinthe.libchecker.domain.app.GetElfDetailUseCase
 import com.absinthe.libchecker.domain.app.GetLibraryDetailDialogDataUseCase
 import com.absinthe.libchecker.domain.app.GetOverlayDetailUseCase
 import com.absinthe.libchecker.domain.app.GetPermissionDetailUseCase
-import com.absinthe.libchecker.domain.app.GetRelatedAppListItemUseCase
 import com.absinthe.libchecker.domain.app.GetXposedModuleInfoUseCase
 import com.absinthe.libchecker.domain.app.PrepareAppPackageShareFileUseCase
-import com.absinthe.libchecker.domain.app.RelatedAppListItem
+import com.absinthe.libchecker.domain.app.detail.GetRelatedAppDisplayDataUseCase
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import java.io.File
 
@@ -39,9 +37,8 @@ class DetailActionLoader(
   private val getLibraryDetailDialogDataUseCase: GetLibraryDetailDialogDataUseCase,
   private val getOverlayDetailUseCase: GetOverlayDetailUseCase,
   private val getPermissionDetailUseCase: GetPermissionDetailUseCase,
-  private val getRelatedAppListItemUseCase: GetRelatedAppListItemUseCase,
+  private val getRelatedAppDisplayDataUseCase: GetRelatedAppDisplayDataUseCase,
   private val getXposedModuleInfoUseCase: GetXposedModuleInfoUseCase,
-  private val buildRelatedAppDisplayDataUseCase: BuildRelatedAppDisplayDataUseCase,
   private val buildSignatureDetailItemsUseCase: BuildSignatureDetailItemsUseCase,
   private val extractNativeLibraryUseCase: ExtractNativeLibraryUseCase,
   private val prepareAppPackageShareFileUseCase: PrepareAppPackageShareFileUseCase,
@@ -119,14 +116,7 @@ class DetailActionLoader(
 
   suspend fun getPermissionDetail(permissionName: String) = getPermissionDetailUseCase(permissionName)
 
-  suspend fun getRelatedAppListItem(packageName: String): RelatedAppListItem? {
-    return getRelatedAppListItemUseCase(packageName)
-  }
-
-  fun buildRelatedAppDisplayData(
-    packageName: String,
-    relatedApp: RelatedAppListItem
-  ) = buildRelatedAppDisplayDataUseCase(packageName, relatedApp)
+  suspend fun getRelatedAppDisplayData(packageName: String) = getRelatedAppDisplayDataUseCase(packageName)
 
   fun buildSignatureDetailItems(detail: String) = buildSignatureDetailItemsUseCase(detail)
 }

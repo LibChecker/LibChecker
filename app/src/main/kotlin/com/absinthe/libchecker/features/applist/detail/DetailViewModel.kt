@@ -11,7 +11,6 @@ import com.absinthe.libchecker.domain.app.AppManifestProperty
 import com.absinthe.libchecker.domain.app.AppPackageShareFile
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageUseCase
 import com.absinthe.libchecker.domain.app.PrepareApkAnalysisPackageUseCase
-import com.absinthe.libchecker.domain.app.RelatedAppListItem
 import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.domain.app.detail.AppDetailAbiLabelData
 import com.absinthe.libchecker.domain.app.detail.AppDetailHeaderExtraInfo
@@ -233,11 +232,7 @@ class DetailViewModel(
     detailFeatureLoader.emitFeature(viewModelScope, feature)
   }
 
-  suspend fun getRelatedAppListItem(packageName: String): RelatedAppListItem? {
-    return detailActionLoader.getRelatedAppListItem(packageName)
-  }
-
-  fun buildRelatedAppDisplayData(packageName: String, relatedApp: RelatedAppListItem) = detailActionLoader.buildRelatedAppDisplayData(packageName, relatedApp)
+  suspend fun getRelatedAppDisplayData(packageName: String) = detailActionLoader.getRelatedAppDisplayData(packageName)
 
   fun buildSignatureDetailItems(detail: String) = detailActionLoader.buildSignatureDetailItems(detail)
 

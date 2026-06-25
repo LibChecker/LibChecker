@@ -1,10 +1,11 @@
-package com.absinthe.libchecker.domain.app
+package com.absinthe.libchecker.domain.app.detail
 
 import android.content.Context
 import android.content.pm.PackageInfo
 import androidx.annotation.DrawableRes
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.app.RelatedAppListItem
 import com.absinthe.libchecker.utils.PackageUtils
 
 class BuildRelatedAppDisplayDataUseCase(

@@ -5,7 +5,7 @@ import android.text.style.ImageSpan
 import androidx.core.view.isVisible
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.app.RelatedAppDisplayData
+import com.absinthe.libchecker.domain.app.detail.RelatedAppDisplayData
 import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
 import com.absinthe.libchecker.features.applist.ui.view.AppItemView
 import com.absinthe.libchecker.utils.extensions.getDrawable

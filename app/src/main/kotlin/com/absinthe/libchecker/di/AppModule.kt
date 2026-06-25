@@ -29,7 +29,6 @@ import com.absinthe.libchecker.domain.app.BuildAppExportNativeLibrariesUseCase
 import com.absinthe.libchecker.domain.app.BuildAppListItemViewStatesUseCase
 import com.absinthe.libchecker.domain.app.BuildInAppUpdateDiffDataUseCase
 import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCase
-import com.absinthe.libchecker.domain.app.BuildRelatedAppDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.BuildSignatureDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.CheckRequiredPackageAvailabilityUseCase
 import com.absinthe.libchecker.domain.app.ClearApkCacheUseCase
@@ -72,9 +71,11 @@ import com.absinthe.libchecker.domain.app.SyncAppListChangesUseCase
 import com.absinthe.libchecker.domain.app.detail.BuildAppDetailAbiLabelDataUseCase
 import com.absinthe.libchecker.domain.app.detail.BuildAppDetailHeaderExtraInfoUseCase
 import com.absinthe.libchecker.domain.app.detail.BuildAppDetailHeaderTitleDataUseCase
+import com.absinthe.libchecker.domain.app.detail.BuildRelatedAppDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.detail.GetAppDetailAbiUseCase
 import com.absinthe.libchecker.domain.app.detail.GetAppDetailFeaturesUseCase
 import com.absinthe.libchecker.domain.app.detail.GetAppDetailPackageSizeUseCase
+import com.absinthe.libchecker.domain.app.detail.GetRelatedAppDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.detail.ShouldShowStaticLibraryTabUseCase
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailAbilityChipsUseCase
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailComponentChipsUseCase
@@ -232,6 +233,7 @@ val appModule = module {
   factory { GetPermissionDetailUseCase(androidContext().packageManager, get()) }
   factory { GetRandomAppIconUseCase(androidContext().packageManager, get()) }
   factory { GetRelatedAppListItemUseCase(get(), get()) }
+  factory { GetRelatedAppDisplayDataUseCase(get(), get()) }
   factory { GetXposedModuleInfoUseCase(androidContext().packageManager, get()) }
   factory { ShouldShowStaticLibraryTabUseCase(get()) }
   factory { InitializePendingAppFeaturesUseCase(get(), get()) }
@@ -248,9 +250,8 @@ val appModule = module {
       getLibraryDetailDialogDataUseCase = get(),
       getOverlayDetailUseCase = get(),
       getPermissionDetailUseCase = get(),
-      getRelatedAppListItemUseCase = get(),
+      getRelatedAppDisplayDataUseCase = get(),
       getXposedModuleInfoUseCase = get(),
-      buildRelatedAppDisplayDataUseCase = get(),
       buildSignatureDetailItemsUseCase = get(),
       extractNativeLibraryUseCase = get(),
       prepareAppPackageShareFileUseCase = get(),

@@ -11,7 +11,7 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.GetOverlayDetailUseCase
 import com.absinthe.libchecker.domain.app.OverlayDetailData
 import com.absinthe.libchecker.domain.app.OverlayDetailExtraInfo
-import com.absinthe.libchecker.domain.app.RelatedAppDisplayData
+import com.absinthe.libchecker.domain.app.detail.RelatedAppDisplayData
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.ui.view.OverlayDetailBottomSheetView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
@@ -51,13 +51,13 @@ class OverlayDetailBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment
           val data = result.data
           bindOverlayDetail(data)
           val targetPackage = data.targetPackageName ?: return@launch
-          val target = viewModel.getRelatedAppListItem(targetPackage) ?: run {
+          val targetData = viewModel.getRelatedAppDisplayData(targetPackage) ?: run {
             root.targetPackageView.addFloatView(targetPackage)
             return@launch
           }
           bindTargetPackageView(
             lcItem = data.item,
-            data = viewModel.buildRelatedAppDisplayData(targetPackage, target)
+            data = targetData
           )
         }
       }

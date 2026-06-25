@@ -15,7 +15,7 @@ import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.domain.app.AppInstallSource
 import com.absinthe.libchecker.domain.app.AppInstallSourceDetails
 import com.absinthe.libchecker.domain.app.AppInstalledTimeDisplayData
-import com.absinthe.libchecker.domain.app.RelatedAppDisplayData
+import com.absinthe.libchecker.domain.app.detail.RelatedAppDisplayData
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppDexoptItemView
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppInstallSourceBottomSheetView
@@ -223,13 +223,13 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
     }
 
     lifecycleScope.launch {
-      val target = viewModel.getRelatedAppListItem(packageName) ?: run {
+      val data = viewModel.getRelatedAppDisplayData(packageName) ?: run {
         item.isGone = true
         return@launch
       }
       bindAppInstallSourceItemView(
         item = item,
-        data = viewModel.buildRelatedAppDisplayData(packageName, target)
+        data = data
       )
     }
   }
