@@ -1,16 +1,12 @@
 package com.absinthe.libchecker.features.snapshot.ui
 
 import android.Manifest
-import android.app.Service
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
-import android.os.IBinder
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.Menu
@@ -52,7 +48,6 @@ import com.absinthe.libchecker.features.snapshot.ui.adapter.ARROW
 import com.absinthe.libchecker.features.snapshot.ui.adapter.SnapshotAdapter
 import com.absinthe.libchecker.features.snapshot.ui.adapter.SnapshotDiffUtil
 import com.absinthe.libchecker.features.snapshot.ui.view.SnapshotDashboardView
-import com.absinthe.libchecker.services.IShootService
 import com.absinthe.libchecker.services.OnShootListener
 import com.absinthe.libchecker.services.ShootService
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
@@ -103,11 +98,9 @@ class SnapshotFragment :
   private var isSnapshotDatabaseItemsReady = false
   private var dropPrevious = false
   private var shouldCompare = true and ShootService.isComputing.not()
-  private var shootServiceStarted = false
   private var keyword: String = ""
   private var items = emptyList<SnapshotDiffItem>()
 
-  private var shootBinder: IShootService? = null
   private val shootListener = object : OnShootListener.Stub() {
     override fun onShootFinished(timestamp: Long) {
       lifecycleScope.launch(Dispatchers.Main) {
@@ -126,20 +119,8 @@ class SnapshotFragment :
       }
     }
   }
-  private val shootServiceConnection = object : ServiceConnection {
-    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-      shootServiceStarted = true
-      if (shootBinder == null && service?.pingBinder() == true) {
-        shootBinder = IShootService.Stub.asInterface(service).also {
-          it.registerOnShootOverListener(shootListener)
-        }
-      }
-    }
-
-    override fun onServiceDisconnected(name: ComponentName?) {
-      shootServiceStarted = false
-      shootBinder = null
-    }
+  private val shootServiceController by lazy(LazyThreadSafetyMode.NONE) {
+    SnapshotShootServiceController(shootListener)
   }
   private val packageQueue by lazy { LinkedBlockingQueue<PackageChangeState>() }
   private var dequeuePackagesJob: Job? = null
@@ -382,24 +363,8 @@ class SnapshotFragment :
     super.onResume()
     val context = context ?: return
 
-    if (!shootServiceStarted && isFragmentVisible()) {
-      context.applicationContext?.also {
-        runCatching {
-          val intent = Intent(it, ShootService::class.java).apply {
-            setPackage(it.packageName)
-          }
-          it.startService(intent)
-          it.bindService(
-            intent,
-            shootServiceConnection,
-            Service.BIND_AUTO_CREATE
-          )
-        }.onFailure { t ->
-          Timber.e(t)
-        }.onSuccess {
-          shootServiceStarted = true
-        }
-      }
+    if (!shootServiceController.isStarted && isFragmentVisible()) {
+      shootServiceController.startAndBind(context)
     }
 
     if (viewModel.consumeTrackItemsChanged()) {
@@ -440,24 +405,10 @@ class SnapshotFragment :
 
   override fun onDestroyView() {
     super.onDestroyView()
-    shootBinder?.let {
-      context?.applicationContext?.let { ctx ->
-        it.unregisterOnShootOverListener(shootListener)
-        if (ShootService.isComputing.not()) {
-          runCatching {
-            ctx.unbindService(shootServiceConnection)
-            ctx.stopService(
-              Intent(
-                ctx,
-                ShootService::class.java
-              )
-            )
-          }
-        }
-      }
-      shootBinder = null
-      dequeuePackagesJob?.cancel()
+    context?.applicationContext?.let {
+      shootServiceController.release(it)
     }
+    dequeuePackagesJob?.cancel()
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {
@@ -495,20 +446,15 @@ class SnapshotFragment :
   override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
     val context = (this.context as? BaseActivity<*>) ?: return false
     if (menuItem.itemId == R.id.save) {
-      if (viewModel.isComparingActive() || shootBinder?.isShooting == true) {
+      if (viewModel.isComparingActive() || shootServiceController.isShooting) {
         return false
       }
       fun computeNewSnapshot(dropPrevious: Boolean = false) {
         flip(VF_LOADING)
         (context as INavViewContainer).showNavigationView()
         this@SnapshotFragment.dropPrevious = dropPrevious
-        runCatching {
-          context.startService(Intent(context, ShootService::class.java))
-        }.onFailure {
-          Timber.w(it, "Failed to start snapshot service")
-        }
-        shootBinder?.computeSnapshot(dropPrevious) ?: run {
-          Timber.w("shoot binder is null")
+        shootServiceController.start(context)
+        if (!shootServiceController.computeSnapshot(dropPrevious)) {
           Toasty.showShort(context, "Snapshot service error")
         }
         shouldCompare = false
