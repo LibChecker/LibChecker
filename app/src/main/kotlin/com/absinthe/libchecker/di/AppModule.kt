@@ -167,6 +167,8 @@ import com.absinthe.libchecker.features.applist.detail.content.DetailChipContent
 import com.absinthe.libchecker.features.applist.detail.content.DetailComponentContentLoader
 import com.absinthe.libchecker.features.applist.detail.content.DetailNativeLibContentLoader
 import com.absinthe.libchecker.features.applist.detail.content.DetailPermissionContentLoader
+import com.absinthe.libchecker.features.chart.ChartDataProvider
+import com.absinthe.libchecker.features.chart.ChartDataSourceFactory
 import com.absinthe.libchecker.features.chart.ChartViewModel
 import com.absinthe.libchecker.features.home.HomeViewModel
 import com.absinthe.libchecker.features.settings.SettingsViewModel
@@ -417,10 +419,8 @@ val appModule = module {
   factory { RestoreSnapshotArchiveFromUriUseCase(androidContext().contentResolver, get()) }
   factory { SnapshotLibraryUseCase(get()) }
   factory { SnapshotSelectionUseCase(get()) }
-
-  viewModel {
-    ChartViewModel(
-      appListRepository = get(),
+  factory {
+    ChartDataProvider(
       buildAppListItemViewStatesUseCase = get(),
       buildAbiChartDataUseCase = get(),
       buildApiLevelChartDataUseCase = get(),
@@ -428,6 +428,16 @@ val appModule = module {
       buildFeatureFlagChartDataUseCase = get(),
       buildPageSize16KBChartDataUseCase = get(),
       getAndroidDistributionUseCase = get(),
+      chartSettingsRepository = get()
+    )
+  }
+  factory { ChartDataSourceFactory(get()) }
+
+  viewModel {
+    ChartViewModel(
+      appListRepository = get(),
+      chartDataProvider = get(),
+      chartDataSourceFactory = get(),
       chartSettingsRepository = get()
     )
   }

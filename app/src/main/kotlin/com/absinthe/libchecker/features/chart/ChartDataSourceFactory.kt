@@ -15,7 +15,7 @@ import info.appdev.charting.charts.BarChart
 import info.appdev.charting.charts.PieChart
 
 internal class ChartDataSourceFactory(
-  private val viewModel: ChartViewModel
+  private val chartDataProvider: ChartDataProvider
 ) {
 
   fun create(
@@ -27,11 +27,11 @@ internal class ChartDataSourceFactory(
       ChartType.ABI -> {
         if (useDetailedAbiChart) {
           ChartDataSourcePlan.Bar(
-            DetailedABIChartDataSource(items, viewModel::buildDetailedAbiChartData)
+            DetailedABIChartDataSource(items, chartDataProvider::buildDetailedAbiChartData)
           )
         } else {
           ChartDataSourcePlan.Pie(
-            ABIChartDataSource(items, viewModel::buildAbiChartData)
+            ABIChartDataSource(items, chartDataProvider::buildAbiChartData)
           )
         }
       }
@@ -39,7 +39,7 @@ internal class ChartDataSourceFactory(
       ChartType.KOTLIN -> {
         ChartDataSourcePlan.Pie(
           KotlinChartDataSource(items) { chartItems ->
-            viewModel.buildFeatureFlagChartData(
+            chartDataProvider.buildFeatureFlagChartData(
               chartItems,
               BuildFeatureFlagChartDataUseCase.Kind.Kotlin
             )
@@ -52,7 +52,7 @@ internal class ChartDataSourceFactory(
           ApiLevelChartDataSource(
             items,
             BuildApiLevelChartDataUseCase.Kind.TargetSdk,
-            viewModel::buildApiLevelChartData
+            chartDataProvider::buildApiLevelChartData
           )
         )
       }
@@ -62,7 +62,7 @@ internal class ChartDataSourceFactory(
           ApiLevelChartDataSource(
             items,
             BuildApiLevelChartDataUseCase.Kind.MinSdk,
-            viewModel::buildApiLevelChartData
+            chartDataProvider::buildApiLevelChartData
           )
         )
       }
@@ -72,7 +72,7 @@ internal class ChartDataSourceFactory(
           ApiLevelChartDataSource(
             items,
             BuildApiLevelChartDataUseCase.Kind.CompileSdk,
-            viewModel::buildApiLevelChartData
+            chartDataProvider::buildApiLevelChartData
           )
         )
       }
@@ -80,7 +80,7 @@ internal class ChartDataSourceFactory(
       ChartType.JETPACK_COMPOSE -> {
         ChartDataSourcePlan.Pie(
           JetpackComposeChartDataSource(items) { chartItems ->
-            viewModel.buildFeatureFlagChartData(
+            chartDataProvider.buildFeatureFlagChartData(
               chartItems,
               BuildFeatureFlagChartDataUseCase.Kind.JetpackCompose
             )
@@ -90,14 +90,14 @@ internal class ChartDataSourceFactory(
 
       ChartType.MARKET_DISTRIBUTION -> {
         ChartDataSourcePlan.Bar(
-          MarketDistributionChartDataSource(items, viewModel::getAndroidDistribution)
+          MarketDistributionChartDataSource(items, chartDataProvider::getAndroidDistribution)
         )
       }
 
       ChartType.AAB -> {
         ChartDataSourcePlan.Pie(
           AABChartDataSource(items) { chartItems ->
-            viewModel.buildFeatureFlagChartData(
+            chartDataProvider.buildFeatureFlagChartData(
               chartItems,
               BuildFeatureFlagChartDataUseCase.Kind.AppBundle
             )
@@ -107,7 +107,7 @@ internal class ChartDataSourceFactory(
 
       ChartType.SUPPORT_16KB -> {
         ChartDataSourcePlan.Pie(
-          PageSize16KBChartDataSource(items, viewModel::buildPageSize16KBChartData)
+          PageSize16KBChartDataSource(items, chartDataProvider::buildPageSize16KBChartData)
         )
       }
     }
