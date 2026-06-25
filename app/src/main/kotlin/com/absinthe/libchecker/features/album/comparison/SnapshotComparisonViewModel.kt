@@ -36,6 +36,8 @@ class SnapshotComparisonViewModel(
 ) : ViewModel() {
 
   val snapshotDiffItemsFlow: MutableSharedFlow<List<SnapshotDiffItem>> = MutableSharedFlow()
+  internal var inputs: SnapshotComparisonInputs = SnapshotComparisonInputs()
+    private set
 
   private val _effect: MutableSharedFlow<Effect> = MutableSharedFlow()
   val effect = _effect.asSharedFlow()
@@ -93,18 +95,25 @@ class SnapshotComparisonViewModel(
     return buildSnapshotPairDiffUseCase(left, right)
   }
 
-  suspend fun buildSnapshotComparisonPlan(
-    leftTimeStamp: Long,
+  internal suspend fun buildSnapshotComparisonPlan(
+    inputs: SnapshotComparisonInputs,
     leftArchive: ArchiveSnapshotItem?,
-    rightTimeStamp: Long,
     rightArchive: ArchiveSnapshotItem?
   ): SnapshotComparisonPlan? {
     return buildSnapshotComparisonPlanUseCase(
-      leftTimeStamp = leftTimeStamp,
+      leftTimeStamp = inputs.left.timestamp,
       leftArchive = leftArchive,
-      rightTimeStamp = rightTimeStamp,
+      rightTimeStamp = inputs.right.timestamp,
       rightArchive = rightArchive
     )
+  }
+
+  internal fun selectSnapshot(side: SnapshotComparisonSide, timestamp: Long) {
+    inputs = inputs.selectSnapshot(side, timestamp)
+  }
+
+  internal fun selectArchive(side: SnapshotComparisonSide, uri: Uri) {
+    inputs = inputs.selectArchive(side, uri)
   }
 
   fun getTimeStamps(): List<TimeStampItem> {

@@ -33,6 +33,8 @@ import com.absinthe.libchecker.domain.snapshot.ArchiveSnapshotItem
 import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotComparisonPlan
+import com.absinthe.libchecker.features.album.comparison.SnapshotComparisonInput
+import com.absinthe.libchecker.features.album.comparison.SnapshotComparisonSide
 import com.absinthe.libchecker.features.album.comparison.SnapshotComparisonViewModel
 import com.absinthe.libchecker.features.album.comparison.ui.view.ComparisonDashboardHalfView
 import com.absinthe.libchecker.features.album.comparison.ui.view.ComparisonDashboardView
@@ -78,11 +80,7 @@ class ComparisonActivity :
   private val adapter by lazy(LazyThreadSafetyMode.NONE) {
     SnapshotAdapter(buildSnapshotAbiDisplayData)
   }
-  private var leftTimeStamp = 0L
-  private var rightTimeStamp = 0L
-  private var isLeftPartChoosing = false
-  private var leftUri: Uri? = null
-  private var rightUri: Uri? = null
+  private var archiveChoosingSide = SnapshotComparisonSide.LEFT
 
   private lateinit var chooseApkResultLauncher: ActivityResultLauncher<Array<String>>
 
@@ -101,7 +99,7 @@ class ComparisonActivity :
 
   override fun onDestroy() {
     super.onDestroy()
-    if (leftTimeStamp == -1L || rightTimeStamp == -1L) {
+    if (viewModel.inputs.hasArchiveInput) {
       externalCacheDir?.let { cacheDir ->
         File(cacheDir, Constants.TEMP_PACKAGE).delete()
         File(cacheDir, Constants.TEMP_PACKAGE_2).delete()
@@ -119,7 +117,7 @@ class ComparisonActivity :
       if (binding.vfContainer.displayedChild == VF_LOADING) {
         return false
       }
-      if (leftTimeStamp == 0L || rightTimeStamp == 0L) {
+      if (!viewModel.inputs.canCompare) {
         showToast(R.string.album_item_comparison_invalid_compare)
         return false
       }
@@ -141,13 +139,7 @@ class ComparisonActivity :
         if (uri == null) {
           return@registerForActivityResult
         }
-        if (isLeftPartChoosing) {
-          leftTimeStamp = -1
-          leftUri = uri
-        } else {
-          rightTimeStamp = -1
-          rightUri = uri
-        }
+        viewModel.selectArchive(archiveChoosingSide, uri)
         invalidateDashboard()
       }
   }
@@ -169,23 +161,7 @@ class ComparisonActivity :
           if (AntiShakeUtils.isInvalidClick(it)) {
             return@setOnClickListener
           }
-          lifecycleScope.launch(Dispatchers.IO) {
-            val timeStampList = viewModel.getTimeStamps()
-            val dialog = TimeNodeBottomSheetDialogFragment
-              .newInstance(ArrayList(timeStampList))
-              .apply {
-                setCompareMode(true)
-                setLeftMode(true)
-                setOnAddApkClickListener(::chooseApk)
-                setOnItemClickListener { position ->
-                  val item = timeStampList[position]
-                  leftTimeStamp = item.timestamp
-                  invalidateDashboard()
-                  dismiss()
-                }
-              }
-            dialog.show(supportFragmentManager, TimeNodeBottomSheetDialogFragment::class.java.name)
-          }
+          showTimeNodePicker(SnapshotComparisonSide.LEFT)
         }
       }
       container.rightPart.apply {
@@ -193,23 +169,7 @@ class ComparisonActivity :
           if (AntiShakeUtils.isInvalidClick(it)) {
             return@setOnClickListener
           }
-          lifecycleScope.launch(Dispatchers.IO) {
-            val timeStampList = viewModel.getTimeStamps()
-            val dialog = TimeNodeBottomSheetDialogFragment
-              .newInstance(ArrayList(timeStampList))
-              .apply {
-                setCompareMode(true)
-                setLeftMode(false)
-                setOnAddApkClickListener(::chooseApk)
-                setOnItemClickListener { position ->
-                  val item = timeStampList[position]
-                  rightTimeStamp = item.timestamp
-                  invalidateDashboard()
-                  dismiss()
-                }
-              }
-            dialog.show(supportFragmentManager, TimeNodeBottomSheetDialogFragment::class.java.name)
-          }
+          showTimeNodePicker(SnapshotComparisonSide.RIGHT)
         }
       }
     }
@@ -293,8 +253,30 @@ class ComparisonActivity :
     }
   }
 
+  private fun showTimeNodePicker(side: SnapshotComparisonSide) {
+    lifecycleScope.launch(Dispatchers.IO) {
+      val timeStampList = viewModel.getTimeStamps()
+      withContext(Dispatchers.Main) {
+        TimeNodeBottomSheetDialogFragment
+          .newInstance(ArrayList(timeStampList))
+          .apply {
+            setCompareMode(true)
+            setLeftMode(side == SnapshotComparisonSide.LEFT)
+            setOnAddApkClickListener(::chooseApk)
+            setOnItemClickListener { position ->
+              val item = timeStampList[position]
+              viewModel.selectSnapshot(side, item.timestamp)
+              invalidateDashboard()
+              dismiss()
+            }
+          }
+          .show(supportFragmentManager, TimeNodeBottomSheetDialogFragment::class.java.name)
+      }
+    }
+  }
+
   private fun chooseApk(isLeft: Boolean) {
-    isLeftPartChoosing = isLeft
+    archiveChoosingSide = SnapshotComparisonSide.fromIsLeft(isLeft)
     chooseApkResultLauncher.launch(
       arrayOf("application/vnd.android.package-archive", "application/octet-stream")
     )
@@ -310,12 +292,10 @@ class ComparisonActivity :
 
       is ComparisonShareIntentParser.Result.PackagePair -> {
         result.leftUri?.let {
-          leftTimeStamp = -1
-          leftUri = it
+          viewModel.selectArchive(SnapshotComparisonSide.LEFT, it)
         }
         result.rightUri?.let {
-          rightTimeStamp = -1
-          rightUri = it
+          viewModel.selectArchive(SnapshotComparisonSide.RIGHT, it)
         }
         repeat(result.invalidItemCount) {
           showToast(R.string.album_item_comparison_invalid_shared_items)
@@ -331,16 +311,14 @@ class ComparisonActivity :
       it.post {
         it.leftPart.applyDashboardSideState(
           ComparisonDashboardStatePlanner.planSideState(
-            timestamp = leftTimeStamp,
-            uri = leftUri,
+            input = viewModel.inputs.left,
             formatTimestamp = viewModel::getFormatDateString
           ),
           isLeft = true
         )
         it.rightPart.applyDashboardSideState(
           ComparisonDashboardStatePlanner.planSideState(
-            timestamp = rightTimeStamp,
-            uri = rightUri,
+            input = viewModel.inputs.right,
             formatTimestamp = viewModel::getFormatDateString
           ),
           isLeft = false
@@ -360,9 +338,9 @@ class ComparisonActivity :
   }
 
   private fun compareSelectedItems() = lifecycleScope.launch(Dispatchers.IO) {
-    val hasArchiveInput = leftTimeStamp == -1L || rightTimeStamp == -1L
+    val inputs = viewModel.inputs
     var dialog: AlertDialog? = null
-    if (hasArchiveInput) {
+    if (inputs.hasArchiveInput) {
       withContext(Dispatchers.Main) {
         dialog = UiUtils.createLoadingDialog(this@ComparisonActivity).also {
           it.show()
@@ -371,13 +349,11 @@ class ComparisonActivity :
     }
 
     val leftArchive = buildSelectedArchiveSnapshotItem(
-      timeStamp = leftTimeStamp,
-      uri = leftUri,
+      input = inputs.left,
       fileName = Constants.TEMP_PACKAGE
     )
     val rightArchive = buildSelectedArchiveSnapshotItem(
-      timeStamp = rightTimeStamp,
-      uri = rightUri,
+      input = inputs.right,
       fileName = Constants.TEMP_PACKAGE_2
     )
 
@@ -387,9 +363,8 @@ class ComparisonActivity :
 
     when (
       val plan = viewModel.buildSnapshotComparisonPlan(
-        leftTimeStamp = leftTimeStamp,
+        inputs = inputs,
         leftArchive = leftArchive,
-        rightTimeStamp = rightTimeStamp,
         rightArchive = rightArchive
       )
     ) {
@@ -418,13 +393,12 @@ class ComparisonActivity :
   }
 
   private suspend fun buildSelectedArchiveSnapshotItem(
-    timeStamp: Long,
-    uri: Uri?,
+    input: SnapshotComparisonInput,
     fileName: String
   ): ArchiveSnapshotItem? {
     return runCatching {
-      if (timeStamp == -1L && uri != null) {
-        getArchiveSnapshotItemByUri(uri, fileName)
+      if (input.isArchive && input.uri != null) {
+        getArchiveSnapshotItemByUri(input.uri, fileName)
       } else {
         null
       }

@@ -1,24 +1,24 @@
 package com.absinthe.libchecker.features.album.comparison.ui
 
 import android.net.Uri
+import com.absinthe.libchecker.features.album.comparison.SnapshotComparisonInput
 import java.io.File
 
 internal object ComparisonDashboardStatePlanner {
 
   fun planSideState(
-    timestamp: Long,
-    uri: Uri?,
+    input: SnapshotComparisonInput,
     formatTimestamp: (Long) -> String
   ): SideState {
     return when {
-      timestamp == ARCHIVE_TIMESTAMP -> SideState(
-        timestampText = uri?.encodedPath?.toFileName(),
+      input.isArchive -> SideState(
+        timestampText = input.uri?.encodedPath?.toFileName(),
         appsCountText = ARCHIVE_APPS_COUNT
       )
 
-      timestamp > 0 -> SideState(
-        timestampText = formatTimestamp(timestamp),
-        dashboardCountTimestamp = timestamp
+      input.isSnapshot -> SideState(
+        timestampText = formatTimestamp(input.timestamp),
+        dashboardCountTimestamp = input.timestamp
       )
 
       else -> SideState()
@@ -35,6 +35,5 @@ internal object ComparisonDashboardStatePlanner {
     val dashboardCountTimestamp: Long? = null
   )
 
-  private const val ARCHIVE_TIMESTAMP = -1L
   private const val ARCHIVE_APPS_COUNT = "1"
 }
