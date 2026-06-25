@@ -1,13 +1,23 @@
 package com.absinthe.libchecker.features.chart
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppListItemViewState
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.statistics.ChartSettingsRepository
+import com.absinthe.libchecker.services.WorkerService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 
 const val LOADING_PROGRESS_INFINITY = -1
 const val LOADING_PROGRESS_MAX = 100
@@ -18,7 +28,18 @@ class ChartViewModel internal constructor(
   private val chartDataSourceFactory: ChartDataSourceFactory,
   private val chartSettingsRepository: ChartSettingsRepository
 ) : ViewModel() {
-  val appListItems: Flow<List<LCItem>> = appListRepository.items
+  private val appListItemsState = appListRepository.items
+    .map<List<LCItem>, List<LCItem>?> { it }
+    .stateIn(
+      scope = viewModelScope,
+      started = SharingStarted.WhileSubscribed(5_000),
+      initialValue = null
+    )
+  val appListItems: Flow<List<LCItem>> = appListItemsState.filterNotNull()
+  val featureInitializationPlans: Flow<ChartFeatureInitializationPlan> =
+    buildFeatureInitializationPlans()
+  val initialFeatureInitializationPending: Boolean
+    get() = WorkerService.featureInitializationState.value.running
 
   private val _loadingProgress = MutableStateFlow(LOADING_PROGRESS_MAX)
   val loadingProgress = _loadingProgress.asStateFlow()
@@ -65,4 +86,32 @@ class ChartViewModel internal constructor(
   suspend fun buildAppListItemViewStates(items: List<LCItem>): Map<String, AppListItemViewState> {
     return chartDataProvider.buildAppListItemViewStates(items)
   }
+
+  private fun buildFeatureInitializationPlans(): Flow<ChartFeatureInitializationPlan> = flow {
+    var previousPending = initialFeatureInitializationPending
+    combine(
+      appListItemsState,
+      WorkerService.featureInitializationState
+    ) { items, state ->
+      val hasUninitializedFeatureItems = items?.any { item -> item.features == FEATURES_NOT_INITIALIZED } == true
+      state.running || (items != null && !state.completed && hasUninitializedFeatureItems)
+    }.distinctUntilChanged().collect { isPending ->
+      emit(
+        ChartFeatureInitializationPlan(
+          isPending = isPending,
+          shouldRefreshData = previousPending && !isPending
+        )
+      )
+      previousPending = isPending
+    }
+  }
+
+  private companion object {
+    const val FEATURES_NOT_INITIALIZED = -1
+  }
 }
+
+data class ChartFeatureInitializationPlan(
+  val isPending: Boolean,
+  val shouldRefreshData: Boolean
+)

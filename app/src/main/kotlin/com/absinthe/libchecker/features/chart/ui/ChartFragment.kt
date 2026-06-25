@@ -30,7 +30,6 @@ import com.absinthe.libchecker.features.chart.impl.MarketDistributionChartDataSo
 import com.absinthe.libchecker.features.chart.ui.view.ChartDetailItemView
 import com.absinthe.libchecker.features.chart.ui.view.ExpandingView
 import com.absinthe.libchecker.features.chart.ui.view.MarketDistributionDashboardView
-import com.absinthe.libchecker.services.WorkerService
 import com.absinthe.libchecker.ui.base.BaseFragment
 import com.absinthe.libchecker.ui.base.SaturationTransformation
 import com.absinthe.libchecker.utils.OsUtils
@@ -73,22 +72,15 @@ class ChartFragment :
   private var setDataJob: Job? = null
   private var showClassifyDialogJob: Job? = null
   private var chartLoadingProgress = LOADING_PROGRESS_MAX
-  private var featureInitializationRunning = WorkerService.initializingFeatures
-  private var featureInitializationCompleted = WorkerService.featureInitializationState.value.completed
   private lateinit var chartDataRenderer: ChartDataRenderer
-  private var hasReceivedLCItems = false
-  private var hasUninitializedFeatureItems = false
-  private val isFeatureInitializationPending: Boolean
-    get() = featureInitializationRunning ||
-      (hasReceivedLCItems && !featureInitializationCompleted && hasUninitializedFeatureItems)
+  private var featureInitializationPending = false
   private val chartUiStatePlanner = ChartUiStatePlanner()
   private var currentChartType = ChartType.ABI
   private var currentExpandingView: ExpandingView? = null
 
   override fun init() {
     binding.root.applySystemBarsPadding(top = true, bottom = true)
-    featureInitializationRunning = WorkerService.featureInitializationState.value.running
-    featureInitializationCompleted = WorkerService.featureInitializationState.value.completed
+    featureInitializationPending = viewModel.initialFeatureInitializationPending
     chartDataRenderer = ChartDataRenderer(
       scope = viewLifecycleOwner.lifecycleScope,
       onLoadingProgressChanged = viewModel::setLoadingProgress,
@@ -102,13 +94,6 @@ class ChartFragment :
 
     lifecycleScope.launch {
       allLCItemsStateFlow = viewModel.appListItems.onEach {
-        hasReceivedLCItems = true
-        hasUninitializedFeatureItems = it.any { item -> item.features == FEATURES_NOT_INITIALIZED }
-        featureInitializationCompleted =
-          !hasUninitializedFeatureItems || WorkerService.featureInitializationState.value.completed
-        renderChartTypeSelector()
-        updateProgressIndicator()
-
         setDataJob?.cancel()
         setDataJob = lifecycleScope.launch(Dispatchers.IO) {
           if (dataSource != null) {
@@ -137,15 +122,12 @@ class ChartFragment :
     }
     lifecycleScope.launch {
       lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
-        WorkerService.featureInitializationState.collect { state ->
-          val wasPending = isFeatureInitializationPending
-          featureInitializationRunning = state.running
-          featureInitializationCompleted =
-            state.completed || (hasReceivedLCItems && !hasUninitializedFeatureItems)
+        viewModel.featureInitializationPlans.collect { plan ->
+          featureInitializationPending = plan.isPending
           renderChartTypeSelector()
           updateProgressIndicator()
 
-          if (wasPending && !isFeatureInitializationPending && this@ChartFragment::allLCItemsStateFlow.isInitialized) {
+          if (plan.shouldRefreshData && this@ChartFragment::allLCItemsStateFlow.isInitialized) {
             setData(allLCItemsStateFlow.value)
           }
         }
@@ -172,7 +154,7 @@ class ChartFragment :
   }
 
   private fun renderChartTypeSelector() {
-    val featureChartsAvailable = !isFeatureInitializationPending
+    val featureChartsAvailable = !featureInitializationPending
     val selectorPlan = chartUiStatePlanner.planChartTypes(
       currentChartType = currentChartType,
       featureChartsAvailable = featureChartsAvailable
@@ -212,7 +194,7 @@ class ChartFragment :
   private fun updateProgressIndicator() {
     val progressPlan = chartUiStatePlanner.planProgress(
       chartLoadingProgress = chartLoadingProgress,
-      featureInitializationPending = isFeatureInitializationPending
+      featureInitializationPending = featureInitializationPending
     )
 
     binding.progressHorizontal.let { indicator ->
@@ -454,9 +436,5 @@ class ChartFragment :
       }
     }
     return getString(R.string.android_dist_subtitle_format, time) + System.lineSeparator() + "API ${Build.VERSION.SDK_INT} (Android $androidVersion)"
-  }
-
-  companion object {
-    private const val FEATURES_NOT_INITIALIZED = -1
   }
 }
