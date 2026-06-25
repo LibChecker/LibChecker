@@ -20,6 +20,7 @@ import com.absinthe.libchecker.domain.app.InitializeAppListUseCase
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.PackageChangeState
 import com.absinthe.libchecker.domain.app.SyncAppListChangesUseCase
+import com.absinthe.libchecker.domain.app.sync.AppListChangeRequestQueue
 import com.absinthe.libchecker.domain.statistics.ComputeLibReferenceUseCase
 import com.absinthe.libchecker.domain.statistics.GetLibReferenceConfigUseCase
 import com.absinthe.libchecker.domain.statistics.GetLibReferenceIconPackagesUseCase
@@ -27,7 +28,6 @@ import com.absinthe.libchecker.domain.statistics.LibReferenceItem
 import com.absinthe.libchecker.features.statistics.bean.LibReference
 import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.ui.base.IListController
-import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -82,8 +82,7 @@ class HomeViewModel(
   var isSearchMenuExpanded: Boolean = false
   var currentSearchQuery: String = ""
 
-  private val pendingChangedPackages = ArrayDeque<PackageChangeState>()
-  private val pendingChangedPackagesLock = Any()
+  private val appListChangeRequestQueue = AppListChangeRequestQueue()
   private var pendingFeatureInitializationRequest = false
 
   fun reloadApps() {
@@ -207,7 +206,6 @@ class HomeViewModel(
   }
 
   private var requestChangeJob: Job? = null
-  private val requestChangeGeneration = AtomicInteger()
 
   fun requestChange(packageChangeState: PackageChangeState? = null) {
     viewModelScope.launch {
@@ -215,20 +213,18 @@ class HomeViewModel(
         Timber.d("Request change canceled: STATUS_START_INIT")
         return@launch
       }
-      packageChangeState?.let(::addPendingChangedPackage)
-      val generation = requestChangeGeneration.incrementAndGet()
+      val changeRequest = appListChangeRequestQueue.start(packageChangeState)
       requestChangeJob?.cancel()
-      requestChangeJob = requestChangeImpl(packageChangeState == null, generation)
+      requestChangeJob = requestChangeImpl(changeRequest)
     }
   }
 
   private fun requestChangeImpl(
-    forceUpdate: Boolean,
-    generation: Int
+    changeRequest: AppListChangeRequestQueue.ChangeRequest
   ) = viewModelScope.launch(Dispatchers.IO) {
     val dbItems = appListRepository.getItems()
     if (dbItems.isEmpty()) {
-      if (requestChangeGeneration.get() == generation) {
+      if (appListChangeRequestQueue.isCurrent(changeRequest)) {
         _isRequestChangeRunning.value = false
         updateAppListStatus(STATUS_NOT_START)
         requestChangeJob = null
@@ -240,64 +236,24 @@ class HomeViewModel(
     updateAppListStatus(STATUS_START_REQUEST_CHANGE)
 
     try {
-      val syncRequest = if (forceUpdate) {
-        SyncAppListChangesUseCase.Request.RefreshAll
-      } else {
-        SyncAppListChangesUseCase.Request.ApplyPackageChanges(snapshotPendingChangedPackages())
-      }
+      val syncRequest = appListChangeRequestQueue.buildSyncRequest(changeRequest)
 
       if (syncAppListChangesUseCase(syncRequest, dbItems) == SyncAppListChangesUseCase.Result.Canceled) {
         return@launch
       }
 
-      if (requestChangeGeneration.get() == generation) {
-        when (syncRequest) {
-          is SyncAppListChangesUseCase.Request.ApplyPackageChanges -> {
-            removePendingChangedPackages(syncRequest.changes.size)
-          }
-
-          SyncAppListChangesUseCase.Request.RefreshAll -> {
-            clearPendingChangedPackages()
-          }
-        }
-      }
+      appListChangeRequestQueue.consumeSyncedRequest(changeRequest, syncRequest)
 
       refreshList()
 
       updateAppListStatus(STATUS_START_REQUEST_CHANGE_END)
     } finally {
-      if (requestChangeGeneration.get() == generation) {
+      if (appListChangeRequestQueue.isCurrent(changeRequest)) {
         updateAppListStatus(STATUS_NOT_START)
         _isRequestChangeRunning.value = false
         requestChangeJob = null
         requestFeatureInitialization()
       }
-    }
-  }
-
-  private fun addPendingChangedPackage(packageChangeState: PackageChangeState) {
-    synchronized(pendingChangedPackagesLock) {
-      pendingChangedPackages.add(packageChangeState)
-    }
-  }
-
-  private fun snapshotPendingChangedPackages(): List<PackageChangeState> {
-    return synchronized(pendingChangedPackagesLock) {
-      pendingChangedPackages.toList()
-    }
-  }
-
-  private fun removePendingChangedPackages(count: Int) {
-    synchronized(pendingChangedPackagesLock) {
-      repeat(count.coerceAtMost(pendingChangedPackages.size)) {
-        pendingChangedPackages.removeFirst()
-      }
-    }
-  }
-
-  private fun clearPendingChangedPackages() {
-    synchronized(pendingChangedPackagesLock) {
-      pendingChangedPackages.clear()
     }
   }
 
