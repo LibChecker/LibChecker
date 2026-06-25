@@ -2,6 +2,7 @@ package com.absinthe.libchecker.di
 
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.LibCheckerApp
+import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.data.app.AndroidAppListExportMetadata
 import com.absinthe.libchecker.data.app.AndroidAppListItemFactory
@@ -10,6 +11,7 @@ import com.absinthe.libchecker.data.app.GlobalAppListSettingsRepository
 import com.absinthe.libchecker.data.app.LocalAppListRepository
 import com.absinthe.libchecker.data.app.LocalInstalledAppRepository
 import com.absinthe.libchecker.data.app.RemoteLibraryDetailRepository
+import com.absinthe.libchecker.data.app.update.AndroidAppUpdateRepository
 import com.absinthe.libchecker.data.snapshot.AndroidSnapshotItemFactory
 import com.absinthe.libchecker.data.snapshot.GlobalSnapshotSelectionRepository
 import com.absinthe.libchecker.data.snapshot.GlobalSnapshotSettingsRepository
@@ -32,7 +34,6 @@ import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.BuildAppExportNativeLibrariesUseCase
 import com.absinthe.libchecker.domain.app.BuildAppListItemViewStatesUseCase
-import com.absinthe.libchecker.domain.app.BuildInAppUpdateDiffDataUseCase
 import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.CheckRequiredPackageAvailabilityUseCase
 import com.absinthe.libchecker.domain.app.ClearApkCacheUseCase
@@ -101,6 +102,8 @@ import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailStaticLibra
 import com.absinthe.libchecker.domain.app.detail.content.SortAppDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.detail.feature.BuildAppDetailFeatureItemUseCase
 import com.absinthe.libchecker.domain.app.detail.navigation.BuildDetailReferenceNavigationUseCase
+import com.absinthe.libchecker.domain.app.update.AppUpdateRepository
+import com.absinthe.libchecker.domain.app.update.BuildInAppUpdateDiffDataUseCase
 import com.absinthe.libchecker.domain.snapshot.BackupSnapshotArchiveToUriUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildInstalledSnapshotItemUseCase
@@ -163,6 +166,7 @@ import com.absinthe.libchecker.features.applist.detail.content.DetailNativeLibCo
 import com.absinthe.libchecker.features.applist.detail.content.DetailPermissionContentLoader
 import com.absinthe.libchecker.features.chart.ChartViewModel
 import com.absinthe.libchecker.features.home.HomeViewModel
+import com.absinthe.libchecker.features.settings.SettingsViewModel
 import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
 import com.absinthe.libchecker.features.statistics.LibReferenceViewModel
 import com.jakewharton.processphoenix.ProcessPhoenix
@@ -178,6 +182,7 @@ val appModule = module {
   single<InstalledAppRepository> { LocalInstalledAppRepository }
   single<AppListRepository> { LocalAppListRepository }
   single<LibraryDetailRepository> { RemoteLibraryDetailRepository }
+  single<AppUpdateRepository> { AndroidAppUpdateRepository(SystemServices.downloadManager) }
   single<AndroidDistributionRepository> { CachedAndroidDistributionRepository(androidContext()) }
   single<AppListItemFactory> { AndroidAppListItemFactory(androidContext()) }
   single<AppListExportMetadata> { AndroidAppListExportMetadata(androidContext()) }
@@ -450,6 +455,11 @@ val appModule = module {
       buildAppListItemViewStatesUseCase = get(),
       getLibReferenceAppsUseCase = get(),
       libReferenceSettingsRepository = get()
+    )
+  }
+  viewModel {
+    SettingsViewModel(
+      appUpdateRepository = get()
     )
   }
   viewModel {

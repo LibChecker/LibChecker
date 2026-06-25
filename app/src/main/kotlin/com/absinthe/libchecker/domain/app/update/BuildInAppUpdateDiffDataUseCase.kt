@@ -1,7 +1,8 @@
-package com.absinthe.libchecker.domain.app
+package com.absinthe.libchecker.domain.app.update
 
 import android.content.pm.PackageManager
 import com.absinthe.libchecker.api.bean.GetAppUpdateInfo
+import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
