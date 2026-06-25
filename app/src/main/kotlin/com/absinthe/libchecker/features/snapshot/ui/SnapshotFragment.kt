@@ -40,6 +40,7 @@ import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.features.album.ui.AlbumActivity
 import com.absinthe.libchecker.features.home.HomeViewModel
 import com.absinthe.libchecker.features.home.INavViewContainer
+import com.absinthe.libchecker.features.snapshot.SnapshotPackageChangeProcessor
 import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
 import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ENTITY
 import com.absinthe.libchecker.features.snapshot.detail.ui.SnapshotDetailActivity
@@ -66,13 +67,10 @@ import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import java.util.Locale
-import java.util.concurrent.LinkedBlockingQueue
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
@@ -122,8 +120,11 @@ class SnapshotFragment :
   private val shootServiceController by lazy(LazyThreadSafetyMode.NONE) {
     SnapshotShootServiceController(shootListener)
   }
-  private val packageQueue by lazy { LinkedBlockingQueue<PackageChangeState>() }
-  private var dequeuePackagesJob: Job? = null
+  private val packageChangeProcessor by lazy(LazyThreadSafetyMode.NONE) {
+    SnapshotPackageChangeProcessor { packageChangeState ->
+      viewModel.compareItemDiff(packageName = packageChangeState.packageName)
+    }
+  }
   private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
   private var advancedMenuBSDFragment: SnapshotMenuBSDFragment? = null
 
@@ -287,8 +288,7 @@ class SnapshotFragment :
             if (packageChangeState is PackageChangeState.Removed) {
               pendingParticleRemovePackageNames += packageChangeState.packageName
             }
-            packageQueue.offer(packageChangeState)
-            dequeuePackages()
+            packageChangeProcessor.enqueue(lifecycleScope, packageChangeState)
             viewModel.getDashboardCount(viewModel.selectedSnapshotTimestamp, true)
           }
         }
@@ -408,7 +408,7 @@ class SnapshotFragment :
     context?.applicationContext?.let {
       shootServiceController.release(it)
     }
-    dequeuePackagesJob?.cancel()
+    packageChangeProcessor.cancel()
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {
@@ -568,21 +568,6 @@ class SnapshotFragment :
     viewModel.getDashboardCount(viewModel.selectedSnapshotTimestamp, true)
     viewModel.compareDiff(viewModel.selectedSnapshotTimestamp)
     isSnapshotDatabaseItemsReady = false
-  }
-
-  private fun dequeuePackages() {
-    if (dequeuePackagesJob?.isActive == true) {
-      return
-    }
-    dequeuePackagesJob = lifecycleScope.launch(Dispatchers.IO) {
-      while (isActive) {
-        packageQueue.take()?.let {
-          Timber.d("Dequeue package: $it")
-          val packageName = it.packageName
-          viewModel.compareItemDiff(packageName = packageName)
-        }
-      }
-    }
   }
 
   override fun getSuitableLayoutManager() = binding.list.layoutManager
