@@ -18,10 +18,6 @@ class SnapshotLibraryUseCase(
     } ?: snapshots
   }
 
-  suspend fun getSystemProps(timestamp: Long): String? {
-    return repository.getTimeStamp(timestamp)?.systemProps
-  }
-
   suspend fun deleteTimeStamp(timestamp: Long) {
     repository.deleteSnapshotsAndTimeStamp(timestamp)
   }

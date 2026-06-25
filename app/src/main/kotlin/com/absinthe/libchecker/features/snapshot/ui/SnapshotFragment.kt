@@ -10,7 +10,6 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Color
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.util.TypedValue
@@ -41,6 +40,7 @@ import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.app.PackageChangeState
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCase
+import com.absinthe.libchecker.domain.snapshot.SnapshotSystemProp
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.features.album.ui.AlbumActivity
 import com.absinthe.libchecker.features.home.HomeViewModel
@@ -70,7 +70,6 @@ import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
-import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import java.util.Locale
 import java.util.concurrent.LinkedBlockingQueue
@@ -752,36 +751,20 @@ class SnapshotFragment :
 
   private fun updateSystemProps(dashboard: SnapshotDashboardView, timestamp: Long) {
     lifecycleScope.launch(Dispatchers.IO) {
-      val systemProps = runCatching {
-        viewModel.getTimeStampSystemProps(timestamp)?.fromJson<Map<String, String>>()
-      }.getOrNull()
-      if (systemProps.isNullOrEmpty()) {
-        dashboard.container.setSystemProps(emptyList())
-      } else {
-        val displayedSystemProps = mutableListOf<Pair<String, String>>()
-        systemProps[Constants.SystemProps.RO_BUILD_ID]?.let {
-          val currentBuildId = Build.ID
-
-          if (it != currentBuildId) {
-            displayedSystemProps.add(
-              getString(R.string.snapshot_build_id) to "$it $ARROW $currentBuildId"
-            )
-          }
+      val displayedSystemProps = viewModel.getSystemPropDiffs(timestamp)
+        .map { diff ->
+          getSystemPropLabel(diff.prop) to "${diff.previous} $ARROW ${diff.current}"
         }
-        systemProps[Constants.SystemProps.RO_BUILD_VERSION_SECURITY_PATCH]?.let {
-          val currentSecurityPatch = Build.VERSION.SECURITY_PATCH
-
-          if (it != currentSecurityPatch) {
-            displayedSystemProps.add(
-              getString(R.string.snapshot_build_security_patch) to "$it $ARROW $currentSecurityPatch"
-            )
-          }
-        }
-
-        launch(Dispatchers.Main) {
-          dashboard.container.setSystemProps(displayedSystemProps)
-        }
+      launch(Dispatchers.Main) {
+        dashboard.container.setSystemProps(displayedSystemProps)
       }
+    }
+  }
+
+  private fun getSystemPropLabel(prop: SnapshotSystemProp): String {
+    return when (prop) {
+      SnapshotSystemProp.BUILD_ID -> getString(R.string.snapshot_build_id)
+      SnapshotSystemProp.SECURITY_PATCH -> getString(R.string.snapshot_build_security_patch)
     }
   }
 

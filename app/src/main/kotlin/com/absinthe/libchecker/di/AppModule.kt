@@ -113,6 +113,7 @@ import com.absinthe.libchecker.domain.snapshot.CompareTrackedSnapshotListsUseCas
 import com.absinthe.libchecker.domain.snapshot.GetApexPackageNamesUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotPackageIconSourcesUseCase
+import com.absinthe.libchecker.domain.snapshot.GetSnapshotSystemPropDiffsUseCase
 import com.absinthe.libchecker.domain.snapshot.GetTrackListItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.PrepareRoomBackupRestoreFileUseCase
 import com.absinthe.libchecker.domain.snapshot.RestoreSnapshotArchiveFromUriUseCase
@@ -361,6 +362,7 @@ val appModule = module {
   factory { CompareSnapshotItemWithInstalledAppUseCase(androidContext().packageManager, get(), get(), get(), get()) }
   factory { GetSnapshotDashboardCountUseCase(get(), get()) }
   factory { GetSnapshotPackageIconSourcesUseCase(get()) }
+  factory { GetSnapshotSystemPropDiffsUseCase(get()) }
   factory { GetTrackListItemsUseCase(androidContext().packageManager, get(), get()) }
   factory { SetPackageTrackedUseCase(get(), get()) }
   factory { UpdateSnapshotTopAppsUseCase(get(), get()) }
@@ -435,6 +437,7 @@ val appModule = module {
       buildSnapshotPairDiffUseCase = get(),
       buildSnapshotComparisonPlanUseCase = get(),
       getSnapshotPackageIconSourcesUseCase = get(),
+      getSnapshotSystemPropDiffsUseCase = get(),
       getApexPackageNamesUseCase = get(),
       snapshotSelectionUseCase = get(),
       snapshotTrackChangeRepository = get()

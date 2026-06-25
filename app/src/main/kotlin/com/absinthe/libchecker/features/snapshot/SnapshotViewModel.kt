@@ -19,6 +19,7 @@ import com.absinthe.libchecker.domain.snapshot.CompareTrackedSnapshotListsUseCas
 import com.absinthe.libchecker.domain.snapshot.GetApexPackageNamesUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotPackageIconSourcesUseCase
+import com.absinthe.libchecker.domain.snapshot.GetSnapshotSystemPropDiffsUseCase
 import com.absinthe.libchecker.domain.snapshot.PrepareRoomBackupRestoreFileUseCase
 import com.absinthe.libchecker.domain.snapshot.RestoreSnapshotArchiveFromUriUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
@@ -26,6 +27,7 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotComparisonPlan
 import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
+import com.absinthe.libchecker.domain.snapshot.SnapshotSystemPropDiff
 import com.absinthe.libchecker.domain.snapshot.SnapshotTrackChangeRepository
 import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotTopAppsUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
@@ -63,6 +65,7 @@ class SnapshotViewModel(
   private val buildSnapshotPairDiffUseCase: BuildSnapshotPairDiffUseCase,
   private val buildSnapshotComparisonPlanUseCase: BuildSnapshotComparisonPlanUseCase,
   private val getSnapshotPackageIconSourcesUseCase: GetSnapshotPackageIconSourcesUseCase,
+  private val getSnapshotSystemPropDiffsUseCase: GetSnapshotSystemPropDiffsUseCase,
   private val getApexPackageNamesUseCase: GetApexPackageNamesUseCase,
   private val snapshotSelectionUseCase: SnapshotSelectionUseCase,
   private val snapshotTrackChangeRepository: SnapshotTrackChangeRepository
@@ -212,8 +215,8 @@ class SnapshotViewModel(
 
   suspend fun getApexPackageNames(): Set<String> = getApexPackageNamesUseCase()
 
-  suspend fun getTimeStampSystemProps(timestamp: Long): String? {
-    return snapshotLibrary.getSystemProps(timestamp)
+  suspend fun getSystemPropDiffs(timestamp: Long): List<SnapshotSystemPropDiff> {
+    return getSnapshotSystemPropDiffsUseCase(timestamp)
   }
 
   suspend fun deleteSnapshotsAndTimeStamp(timestamp: Long) {
