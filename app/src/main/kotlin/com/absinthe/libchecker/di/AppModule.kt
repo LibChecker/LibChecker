@@ -16,6 +16,7 @@ import com.absinthe.libchecker.data.app.update.AndroidAppUpdateRepository
 import com.absinthe.libchecker.data.rules.AndroidCloudRulesRepository
 import com.absinthe.libchecker.data.rules.GlobalRuleSettingsRepository
 import com.absinthe.libchecker.data.settings.GlobalAppearanceSettingsRepository
+import com.absinthe.libchecker.data.settings.GlobalDeveloperSettingsRepository
 import com.absinthe.libchecker.data.snapshot.AndroidSnapshotItemFactory
 import com.absinthe.libchecker.data.snapshot.GlobalSnapshotSelectionRepository
 import com.absinthe.libchecker.data.snapshot.GlobalSnapshotSettingsRepository
@@ -114,6 +115,7 @@ import com.absinthe.libchecker.domain.app.update.BuildInAppUpdateDiffDataUseCase
 import com.absinthe.libchecker.domain.rules.CloudRulesRepository
 import com.absinthe.libchecker.domain.rules.RuleSettingsRepository
 import com.absinthe.libchecker.domain.settings.AppearanceSettingsRepository
+import com.absinthe.libchecker.domain.settings.DeveloperSettingsRepository
 import com.absinthe.libchecker.domain.settings.SelectDarkModeUseCase
 import com.absinthe.libchecker.domain.snapshot.BackupSnapshotArchiveToUriUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
@@ -211,6 +213,7 @@ val appModule = module {
   single<CloudRulesRepository> { AndroidCloudRulesRepository(androidContext()) }
   single<RuleSettingsRepository> { GlobalRuleSettingsRepository() }
   single<AppearanceSettingsRepository> { GlobalAppearanceSettingsRepository() }
+  single<DeveloperSettingsRepository> { GlobalDeveloperSettingsRepository() }
   single<AppUpdateRepository> { AndroidAppUpdateRepository(SystemServices.downloadManager) }
   single<AndroidDistributionRepository> { CachedAndroidDistributionRepository(androidContext()) }
   single<AppListItemFactory> { AndroidAppListItemFactory(androidContext()) }

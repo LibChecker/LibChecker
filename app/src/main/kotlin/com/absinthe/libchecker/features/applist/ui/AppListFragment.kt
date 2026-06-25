@@ -22,12 +22,12 @@ import com.absinthe.libchecker.annotation.STATUS_NOT_START
 import com.absinthe.libchecker.annotation.STATUS_START_INIT
 import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.domain.app.GetAppListContentUseCase
 import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
+import com.absinthe.libchecker.domain.settings.DeveloperSettingsRepository
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.features.applist.ui.adapter.AppAdapter
 import com.absinthe.libchecker.features.applist.ui.adapter.AppListDiffUtil
@@ -75,6 +75,7 @@ class AppListFragment :
 
   private val isFirstLaunch get() = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
   private val getRandomAppIcon: GetRandomAppIconUseCase by inject()
+  private val developerSettingsRepository: DeveloperSettingsRepository by inject()
   private val appAdapter = AppAdapter()
   private val appListUpdatePlanner = AppListUpdatePlanner()
   private val particleItemAnimator = ParticleRemoveItemAnimator()
@@ -266,12 +267,12 @@ class AppListFragment :
         }
 
         newText == Constants.COMMAND_DEBUG_MODE -> {
-          GlobalValues.debugMode = true
+          developerSettingsRepository.debugMode = true
           context?.showToast("DEBUG MODE")
         }
 
         newText == Constants.COMMAND_USER_MODE -> {
-          GlobalValues.debugMode = false
+          developerSettingsRepository.debugMode = false
           context?.showToast("USER MODE")
         }
 
