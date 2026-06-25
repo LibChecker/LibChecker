@@ -116,6 +116,7 @@ import com.absinthe.libchecker.domain.snapshot.BuildSnapshotCapturePlanUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotComparisonListsUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotComparisonPlanUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotDetailItemsUseCase
+import com.absinthe.libchecker.domain.snapshot.BuildSnapshotListUpdatePlanUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotPairDiffUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotSystemPropDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.CaptureInstalledSnapshotUseCase
@@ -386,6 +387,7 @@ val appModule = module {
   factory { BuildSnapshotCapturePlanUseCase() }
   factory { BuildSnapshotComparisonListsUseCase(get()) }
   factory { BuildSnapshotComparisonPlanUseCase(get()) }
+  factory { BuildSnapshotListUpdatePlanUseCase(get(), get(), get()) }
   factory { BuildSnapshotPairDiffUseCase() }
   factory { CaptureInstalledSnapshotUseCase(androidContext().packageManager, get(), get(), get()) }
   factory { CompareSnapshotItemsUseCase() }
@@ -501,8 +503,8 @@ val appModule = module {
       snapshotLibrary = get(),
       buildSnapshotCapturePlanUseCase = get(),
       getSnapshotPackageIconSourcesUseCase = get(),
+      buildSnapshotListUpdatePlanUseCase = get(),
       buildSnapshotSystemPropDisplayDataUseCase = get(),
-      getApexPackageNamesUseCase = get(),
       deleteSnapshotTimeStampUseCase = get(),
       snapshotSelectionUseCase = get(),
       snapshotTrackChangeRepository = get()

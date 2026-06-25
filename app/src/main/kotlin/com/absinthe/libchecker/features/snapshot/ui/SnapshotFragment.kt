@@ -28,8 +28,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.options.SnapshotOptions
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.app.PackageChangeState
@@ -89,7 +87,6 @@ class SnapshotFragment :
   private val adapter by lazy(LazyThreadSafetyMode.NONE) {
     SnapshotAdapter(buildSnapshotAbiDisplayData)
   }
-  private val snapshotListUpdatePlanner = SnapshotListUpdatePlanner()
   private val particleItemAnimator = ParticleRemoveItemAnimator()
   private val pendingParticleRemovePackageNames = linkedSetOf<String>()
   private var isSnapshotDatabaseItemsReady = false
@@ -608,22 +605,18 @@ class SnapshotFragment :
   }
 
   private fun updateItems(highlightRefresh: Boolean = false) = lifecycleScope.launch(Dispatchers.Main) {
-    val updatePlan = snapshotListUpdatePlanner.plan(
-      SnapshotListUpdatePlanner.Request(
-        currentItems = adapter.data,
-        sourceItems = items,
-        searchKeyword = keyword,
-        pendingRemovePackageNames = pendingParticleRemovePackageNames.toSet(),
-        hideNoComponentChanges = GlobalValues.snapshotOptions.and(SnapshotOptions.HIDE_NO_COMPONENT_CHANGES) != 0,
-        highlightRefresh = highlightRefresh
-      )
+    val updatePlan = viewModel.buildSnapshotListUpdatePlan(
+      currentItems = adapter.data,
+      sourceItems = items,
+      searchKeyword = keyword,
+      pendingRemovePackageNames = pendingParticleRemovePackageNames.toSet(),
+      highlightRefresh = highlightRefresh
     )
     particleItemAnimator.prepareParticleRemovals(updatePlan.particleRemovalItemIds)
     pendingParticleRemovePackageNames.removeAll(updatePlan.consumedRemovePackageNames)
 
-    val packageNames = updatePlan.items.map(SnapshotDiffItem::packageName)
-    adapter.setPackageIconSources(viewModel.getSnapshotPackageIconSources(packageNames))
-    adapter.setApexPackageNames(viewModel.getApexPackageNames())
+    adapter.setPackageIconSources(updatePlan.packageIconSources)
+    adapter.setApexPackageNames(updatePlan.apexPackageNames)
     adapter.setDiffNewData(updatePlan.items.toMutableList()) {
       if (isDetached) {
         return@setDiffNewData

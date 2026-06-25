@@ -20,10 +20,10 @@ import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCas
 import com.absinthe.libchecker.domain.snapshot.SnapshotAbiDisplayItem
 import com.absinthe.libchecker.domain.snapshot.SnapshotPackageIconSource
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
+import com.absinthe.libchecker.domain.snapshot.stableSnapshotDiffItemIdFor
 import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
 import com.absinthe.libchecker.features.snapshot.ui.view.SnapshotItemView
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
-import com.absinthe.libchecker.ui.animator.ParticleRemoveItemAnimator
 import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.PREINSTALLED_TIMESTAMP
@@ -290,7 +290,7 @@ class SnapshotAdapter(
     if (position !in data.indices) {
       return Long.MIN_VALUE + position
     }
-    return stableItemIdFor(data[position])
+    return stableSnapshotDiffItemIdFor(data[position])
   }
 
   private fun buildAbiSpanString(
@@ -327,17 +327,6 @@ class SnapshotAdapter(
       }
     }
     return spanString
-  }
-
-  companion object {
-    fun stableItemIdFor(item: SnapshotDiffItem): Long {
-      val state = when {
-        item.deleted -> "deleted"
-        item.newInstalled -> "new"
-        else -> "normal"
-      }
-      return ParticleRemoveItemAnimator.stableItemIdForKey("${item.packageName}:$state")
-    }
   }
 
   enum class CardMode {

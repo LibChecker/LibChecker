@@ -8,11 +8,11 @@ import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotCapturePlanUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotDetailItemsUseCase
+import com.absinthe.libchecker.domain.snapshot.BuildSnapshotListUpdatePlanUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotSystemPropDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotDiffsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemWithInstalledAppUseCase
 import com.absinthe.libchecker.domain.snapshot.DeleteSnapshotTimeStampUseCase
-import com.absinthe.libchecker.domain.snapshot.GetApexPackageNamesUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotPackageIconSourcesUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotCapturePlan
@@ -46,8 +46,8 @@ class SnapshotViewModel(
   private val snapshotLibrary: SnapshotLibraryUseCase,
   private val buildSnapshotCapturePlanUseCase: BuildSnapshotCapturePlanUseCase,
   private val getSnapshotPackageIconSourcesUseCase: GetSnapshotPackageIconSourcesUseCase,
+  private val buildSnapshotListUpdatePlanUseCase: BuildSnapshotListUpdatePlanUseCase,
   private val buildSnapshotSystemPropDisplayDataUseCase: BuildSnapshotSystemPropDisplayDataUseCase,
-  private val getApexPackageNamesUseCase: GetApexPackageNamesUseCase,
   private val deleteSnapshotTimeStampUseCase: DeleteSnapshotTimeStampUseCase,
   private val snapshotSelectionUseCase: SnapshotSelectionUseCase,
   private val snapshotTrackChangeRepository: SnapshotTrackChangeRepository
@@ -133,7 +133,23 @@ class SnapshotViewModel(
 
   suspend fun getSnapshotPackageIconSources(packageNames: Collection<String>) = getSnapshotPackageIconSourcesUseCase(packageNames)
 
-  suspend fun getApexPackageNames(): Set<String> = getApexPackageNamesUseCase()
+  suspend fun buildSnapshotListUpdatePlan(
+    currentItems: List<SnapshotDiffItem>,
+    sourceItems: List<SnapshotDiffItem>,
+    searchKeyword: String,
+    pendingRemovePackageNames: Set<String>,
+    highlightRefresh: Boolean
+  ): BuildSnapshotListUpdatePlanUseCase.Plan {
+    return buildSnapshotListUpdatePlanUseCase(
+      BuildSnapshotListUpdatePlanUseCase.Request(
+        currentItems = currentItems,
+        sourceItems = sourceItems,
+        searchKeyword = searchKeyword,
+        pendingRemovePackageNames = pendingRemovePackageNames,
+        highlightRefresh = highlightRefresh
+      )
+    )
+  }
 
   suspend fun getSystemPropDisplayData(timestamp: Long): List<SnapshotSystemPropDisplayData> {
     return buildSnapshotSystemPropDisplayDataUseCase(timestamp)

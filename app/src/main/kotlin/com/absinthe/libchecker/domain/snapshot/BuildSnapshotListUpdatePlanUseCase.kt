@@ -1,14 +1,34 @@
-package com.absinthe.libchecker.features.snapshot.ui
+package com.absinthe.libchecker.domain.snapshot
 
+import com.absinthe.libchecker.constant.options.SnapshotOptions
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
-import com.absinthe.libchecker.features.snapshot.ui.adapter.SnapshotAdapter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
-class SnapshotListUpdatePlanner {
+class BuildSnapshotListUpdatePlanUseCase(
+  private val getSnapshotPackageIconSources: GetSnapshotPackageIconSourcesUseCase,
+  private val getApexPackageNames: GetApexPackageNamesUseCase,
+  private val snapshotSettingsRepository: SnapshotSettingsRepository
+) {
 
-  fun plan(request: Request): Plan {
+  suspend operator fun invoke(request: Request): Plan {
+    val displayPlan = withContext(Dispatchers.Default) {
+      buildDisplayPlan(request)
+    }
+    val packageNames = displayPlan.items.map(SnapshotDiffItem::packageName)
+
+    return displayPlan.copy(
+      packageIconSources = getSnapshotPackageIconSources(packageNames),
+      apexPackageNames = getApexPackageNames()
+    )
+  }
+
+  private fun buildDisplayPlan(request: Request): Plan {
+    val hideNoComponentChanges =
+      snapshotSettingsRepository.options.and(SnapshotOptions.HIDE_NO_COMPONENT_CHANGES) != 0
     val sortedItems = request.sourceItems.asSequence()
       .filter { it.matchesSearchKeyword(request.searchKeyword) }
-      .filterNot { request.hideNoComponentChanges && it.isNothingChanged() }
+      .filterNot { hideNoComponentChanges && it.isNothingChanged() }
       .sortedByDescending { it.updateTime }
       .toList()
 
@@ -35,7 +55,7 @@ class SnapshotListUpdatePlanner {
         }
         shouldAnimate
       }
-      .map { SnapshotAdapter.stableItemIdFor(it) }
+      .map(::stableSnapshotDiffItemIdFor)
       .toList()
 
     return Plan(
@@ -59,13 +79,23 @@ class SnapshotListUpdatePlanner {
     val sourceItems: List<SnapshotDiffItem>,
     val searchKeyword: String,
     val pendingRemovePackageNames: Set<String>,
-    val hideNoComponentChanges: Boolean,
     val highlightRefresh: Boolean
   )
 
   data class Plan(
     val items: List<SnapshotDiffItem>,
     val particleRemovalItemIds: List<Long>,
-    val consumedRemovePackageNames: Set<String>
+    val consumedRemovePackageNames: Set<String>,
+    val packageIconSources: Map<String, SnapshotPackageIconSource> = emptyMap(),
+    val apexPackageNames: Set<String> = emptySet()
   )
+}
+
+fun stableSnapshotDiffItemIdFor(item: SnapshotDiffItem): Long {
+  val state = when {
+    item.deleted -> "deleted"
+    item.newInstalled -> "new"
+    else -> "normal"
+  }
+  return "${item.packageName}:$state".hashCode().toLong()
 }
