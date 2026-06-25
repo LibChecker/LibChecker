@@ -33,6 +33,7 @@ import com.absinthe.libchecker.domain.snapshot.ArchiveSnapshotItem
 import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotComparisonPlan
+import com.absinthe.libchecker.features.album.comparison.ui.view.ComparisonDashboardHalfView
 import com.absinthe.libchecker.features.album.comparison.ui.view.ComparisonDashboardView
 import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
 import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ENTITY
@@ -338,38 +339,34 @@ class ComparisonActivity :
   private fun invalidateDashboard() {
     dashboardView.container.let {
       it.post {
-        if (leftTimeStamp == -1L) {
-          leftUri?.encodedPath?.let { path ->
-            it.leftPart.tvSnapshotTimestampText.text = getUriFileName(path)
-          }
-          it.leftPart.tvSnapshotAppsCountText.text = 1.toString()
-        } else if (leftTimeStamp > 0) {
-          it.leftPart.tvSnapshotTimestampText.text = viewModel.getFormatDateString(leftTimeStamp)
-          viewModel.getDashboardCount(leftTimeStamp, true)
-        }
-        it.leftPart.updateContentDescription()
-
-        if (rightTimeStamp == -1L) {
-          rightUri?.encodedPath?.let { path ->
-            it.rightPart.tvSnapshotTimestampText.text = getUriFileName(path)
-          }
-          it.rightPart.tvSnapshotAppsCountText.text = 1.toString()
-        } else if (rightTimeStamp > 0) {
-          it.rightPart.tvSnapshotTimestampText.text = viewModel.getFormatDateString(rightTimeStamp)
-          viewModel.getDashboardCount(rightTimeStamp, false)
-        }
-        it.rightPart.updateContentDescription()
+        it.leftPart.applyDashboardSideState(
+          ComparisonDashboardStatePlanner.planSideState(
+            timestamp = leftTimeStamp,
+            uri = leftUri,
+            formatTimestamp = viewModel::getFormatDateString
+          ),
+          isLeft = true
+        )
+        it.rightPart.applyDashboardSideState(
+          ComparisonDashboardStatePlanner.planSideState(
+            timestamp = rightTimeStamp,
+            uri = rightUri,
+            formatTimestamp = viewModel::getFormatDateString
+          ),
+          isLeft = false
+        )
       }
     }
   }
 
-  private fun getUriFileName(path: String): String {
-    val decode = Uri.decode(path)
-    return if (decode.contains(File.separator)) {
-      getUriFileName(decode.split(File.separator).last())
-    } else {
-      decode
-    }
+  private fun ComparisonDashboardHalfView.applyDashboardSideState(
+    sideState: ComparisonDashboardStatePlanner.SideState,
+    isLeft: Boolean
+  ) {
+    sideState.timestampText?.let { tvSnapshotTimestampText.text = it }
+    sideState.appsCountText?.let { tvSnapshotAppsCountText.text = it }
+    sideState.dashboardCountTimestamp?.let { viewModel.getDashboardCount(it, isLeft) }
+    updateContentDescription()
   }
 
   private fun compareSelectedItems() = lifecycleScope.launch(Dispatchers.IO) {
