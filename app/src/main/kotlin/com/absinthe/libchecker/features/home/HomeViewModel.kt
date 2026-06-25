@@ -75,7 +75,6 @@ class HomeViewModel(
 
   var controller: IListController? = null
   var appListStatus: Int = STATUS_NOT_START
-  var workerBinder: IWorkerService? = null
   var checkPackagesPermission: Boolean = false
 
   // Simple menu state management
@@ -83,7 +82,7 @@ class HomeViewModel(
   var currentSearchQuery: String = ""
 
   private val appListChangeRequestQueue = AppListChangeRequestQueue()
-  private var pendingFeatureInitializationRequest = false
+  private val featureInitializationController = WorkerFeatureInitializationController()
 
   fun reloadApps() {
     if (appListStatus != STATUS_NOT_START || (initJob?.isActive == false && requestChangeJob?.isActive == false)) {
@@ -108,31 +107,19 @@ class HomeViewModel(
   }
 
   fun connectWorkerBinder(binder: IWorkerService) {
-    workerBinder = binder
-    if (pendingFeatureInitializationRequest) {
-      requestFeatureInitialization()
-    }
+    featureInitializationController.connect(binder, appListStatus)
   }
 
   fun disconnectWorkerBinder() {
-    workerBinder = null
+    featureInitializationController.disconnect()
   }
 
   fun requestFeatureInitialization() {
-    val binder = workerBinder ?: run {
-      pendingFeatureInitializationRequest = true
-      return
-    }
-    if (appListStatus == STATUS_START_INIT || appListStatus == STATUS_START_REQUEST_CHANGE) {
-      pendingFeatureInitializationRequest = true
-      return
-    }
-    pendingFeatureInitializationRequest = false
-    runCatching {
-      binder.initFeatures()
-    }.onFailure {
-      Timber.w(it, "requestFeatureInitialization failed")
-    }
+    featureInitializationController.request(appListStatus)
+  }
+
+  fun getWorkerLastPackageChangedTime(): Long? {
+    return featureInitializationController.getLastPackageChangedTime()
   }
 
   private fun updateInitProgress(progress: Int) {

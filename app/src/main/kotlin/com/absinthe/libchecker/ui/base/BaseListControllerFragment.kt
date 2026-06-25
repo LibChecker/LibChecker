@@ -85,9 +85,7 @@ abstract class BaseListControllerFragment<T : ViewBinding> :
   }
 
   protected fun hasPackageChanged(): Boolean {
-    homeViewModel.workerBinder?.let {
-      val serverLastPackageChangedTime =
-        runCatching { it.lastPackageChangedTime }.getOrElse { return false }
+    homeViewModel.getWorkerLastPackageChangedTime()?.let { serverLastPackageChangedTime ->
       if (lastPackageChangedTime < serverLastPackageChangedTime) {
         lastPackageChangedTime = serverLastPackageChangedTime
         return true
