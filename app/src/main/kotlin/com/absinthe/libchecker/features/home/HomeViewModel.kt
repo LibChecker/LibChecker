@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.features.home
 
-import android.annotation.SuppressLint
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -21,10 +20,7 @@ import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.PackageChangeState
 import com.absinthe.libchecker.domain.app.SyncAppListChangesUseCase
 import com.absinthe.libchecker.domain.app.sync.AppListChangeRequestQueue
-import com.absinthe.libchecker.domain.statistics.ComputeLibReferenceUseCase
-import com.absinthe.libchecker.domain.statistics.GetLibReferenceConfigUseCase
-import com.absinthe.libchecker.domain.statistics.GetLibReferenceIconPackagesUseCase
-import com.absinthe.libchecker.domain.statistics.LibReferenceItem
+import com.absinthe.libchecker.features.statistics.LibReferenceComputationController
 import com.absinthe.libchecker.features.statistics.bean.LibReference
 import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.ui.base.IListController
@@ -35,7 +31,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -44,11 +39,9 @@ class HomeViewModel(
   private val appListRepository: AppListRepository,
   private val initializeAppListUseCase: InitializeAppListUseCase,
   private val syncAppListChangesUseCase: SyncAppListChangesUseCase,
-  private val computeLibReferenceUseCase: ComputeLibReferenceUseCase,
   private val exportAppListToUriUseCase: ExportAppListToUriUseCase,
   private val getAppListContentUseCase: GetAppListContentUseCase,
-  private val getLibReferenceIconPackagesUseCase: GetLibReferenceIconPackagesUseCase,
-  private val getLibReferenceConfigUseCase: GetLibReferenceConfigUseCase,
+  libReferenceComputationControllerFactory: LibReferenceComputationController.Factory,
   private val appListSettingsRepository: AppListSettingsRepository,
   private val clearApkCacheUseCase: ClearApkCacheUseCase
 ) : ViewModel() {
@@ -60,18 +53,21 @@ class HomeViewModel(
   private val _effect: MutableSharedFlow<Effect> = MutableSharedFlow()
   val effect = _effect.asSharedFlow()
 
-  private val _libReference: MutableSharedFlow<List<LibReference>?> = MutableSharedFlow()
-  val libReference = _libReference.asSharedFlow()
-
   private val _isRequestChangeRunning = MutableStateFlow(false)
   val isRequestChangeRunning = _isRequestChangeRunning.asStateFlow()
 
-  private var _savedRefList: List<LibReference>? = null
-  val savedRefList: List<LibReference>?
-    get() = _savedRefList
+  private val libReferenceComputationController =
+    libReferenceComputationControllerFactory.create(viewModelScope, ::updateLibRefProgress)
+  val libReference = libReferenceComputationController.libReference
 
-  private var referenceIndex: ComputeLibReferenceUseCase.ReferenceIndex? = null
-  var savedThreshold = getLibReferenceConfigUseCase.threshold
+  val savedRefList: List<LibReference>?
+    get() = libReferenceComputationController.savedRefList
+
+  var savedThreshold: Int
+    get() = libReferenceComputationController.savedThreshold
+    set(value) {
+      libReferenceComputationController.savedThreshold = value
+    }
 
   var controller: IListController? = null
   var appListStatus: Int = STATUS_NOT_START
@@ -244,75 +240,20 @@ class HomeViewModel(
     }
   }
 
-  private var computeLibReferenceJob: Job? = null
-
   fun computeLibReference() {
-    computeLibReferenceJob?.cancel()
-    computeLibReferenceJob = viewModelScope.launch(Dispatchers.IO) {
-      referenceIndex?.clear()
-      referenceIndex = null
-      _libReference.emit(null)
-      val index = computeLibReferenceUseCase.buildIndex(
-        getLibReferenceConfigUseCase.getReferenceConfig(),
-        ::updateLibRefProgress
-      ) ?: return@launch
-      referenceIndex = index
-      matchingRules(index)
-    }
+    libReferenceComputationController.compute()
   }
-
-  private var matchingJob: Job? = null
 
   fun matchingRules() {
-    val index = referenceIndex ?: run {
-      computeLibReference()
-      return
-    }
-    matchingRules(index)
-  }
-
-  @SuppressLint("WrongConstant")
-  private fun matchingRules(index: ComputeLibReferenceUseCase.ReferenceIndex) {
-    matchingJob?.cancel()
-    matchingJob = viewModelScope.launch(Dispatchers.IO) {
-      try {
-        val refList = computeLibReferenceUseCase.matchRules(
-          index,
-          getLibReferenceConfigUseCase.getMatchConfig(),
-          ::updateLibRefProgress
-        )?.map { it.toLibReference() } ?: return@launch
-
-        _libReference.emit(refList)
-        _savedRefList = refList
-      } finally {
-        if (referenceIndex === index) {
-          referenceIndex = null
-        }
-        index.clear()
-      }
-    }
+    libReferenceComputationController.match()
   }
 
   fun cancelMatchingJob() {
-    matchingJob?.cancel()
-    matchingJob = null
+    libReferenceComputationController.cancelMatchingJob()
   }
 
-  fun refreshRef() = viewModelScope.launch(Dispatchers.IO) {
-    _savedRefList?.let { ref ->
-      val threshold = getLibReferenceConfigUseCase.threshold
-      _libReference.emit(ref.filter { it.referredList.size >= threshold })
-    }
-  }
-
-  private fun LibReferenceItem.toLibReference(): LibReference {
-    return LibReference(
-      libName,
-      rule,
-      referredList,
-      type,
-      iconPackages = getLibReferenceIconPackagesUseCase(referredList)
-    )
+  fun refreshRef() {
+    libReferenceComputationController.refresh()
   }
 
   private var clearApkCacheJob: Job? = null

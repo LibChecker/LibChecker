@@ -169,6 +169,7 @@ import com.absinthe.libchecker.features.chart.ChartViewModel
 import com.absinthe.libchecker.features.home.HomeViewModel
 import com.absinthe.libchecker.features.settings.SettingsViewModel
 import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
+import com.absinthe.libchecker.features.statistics.LibReferenceComputationController
 import com.absinthe.libchecker.features.statistics.LibReferenceViewModel
 import com.jakewharton.processphoenix.ProcessPhoenix
 import jonathanfinerty.once.Once
@@ -208,6 +209,7 @@ val appModule = module {
   factory { GetLibReferenceConfigUseCase(get()) }
   factory { GetLibReferenceIconPackagesUseCase(get()) }
   factory { GetLibReferenceAppsUseCase(get()) }
+  factory { LibReferenceComputationController.Factory(get(), get(), get()) }
   factory { ExportAppListUseCase(get(), get()) }
   factory { ExportAppListToUriUseCase(androidContext().contentResolver, get()) }
   factory { BuildAppDetailContentInitPlanUseCase() }
@@ -442,11 +444,9 @@ val appModule = module {
       appListRepository = get(),
       initializeAppListUseCase = get(),
       syncAppListChangesUseCase = get(),
-      computeLibReferenceUseCase = get(),
       exportAppListToUriUseCase = get(),
       getAppListContentUseCase = get(),
-      getLibReferenceIconPackagesUseCase = get(),
-      getLibReferenceConfigUseCase = get(),
+      libReferenceComputationControllerFactory = get(),
       appListSettingsRepository = get(),
       clearApkCacheUseCase = get()
     )
