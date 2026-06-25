@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +11,6 @@ import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.FileProvider
-import androidx.core.content.edit
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
@@ -31,12 +29,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.SetApkAnalysisEnabledUseCase
 import com.absinthe.libchecker.domain.rules.RuleSettingsRepository
+import com.absinthe.libchecker.domain.settings.BuildLocalePreferenceDataUseCase
+import com.absinthe.libchecker.domain.settings.LocalePreferenceSummary
 import com.absinthe.libchecker.domain.settings.SelectDarkModeUseCase
+import com.absinthe.libchecker.domain.settings.SelectLocaleUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.features.about.AboutPageBuilder
 import com.absinthe.libchecker.features.home.HomeViewModel
@@ -44,7 +44,6 @@ import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.base.IAppBarContainer
 import com.absinthe.libchecker.ui.base.IListController
 import com.absinthe.libchecker.ui.base.IListControllerHost
-import com.absinthe.libchecker.utils.LocaleUtils
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.Toasty
@@ -55,7 +54,6 @@ import com.absinthe.libraries.utils.extensions.getBoolean
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.google.android.material.card.MaterialCardView
 import java.io.File
-import java.util.Locale
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import rikka.recyclerview.fixEdgeEffect
@@ -84,8 +82,10 @@ class SettingsFragment :
   private val appListSettingsRepository: AppListSettingsRepository by inject()
   private val ruleSettingsRepository: RuleSettingsRepository by inject()
   private val snapshotSettingsRepository: SnapshotSettingsRepository by inject()
+  private val buildLocalePreferenceData: BuildLocalePreferenceDataUseCase by inject()
   private val setApkAnalysisEnabled: SetApkAnalysisEnabledUseCase by inject()
   private val selectDarkMode: SelectDarkModeUseCase by inject()
+  private val selectLocale: SelectLocaleUseCase by inject()
 
   override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
     setPreferencesFromResource(R.xml.settings, null)
@@ -123,14 +123,7 @@ class SettingsFragment :
         isVisible = !OsUtils.atLeastT()
         setOnPreferenceChangeListener { _, newValue ->
           if (newValue is String) {
-            val locale: Locale = if ("SYSTEM" == newValue) {
-              LocaleUtils.systemLocale
-            } else {
-              Locale.forLanguageTag(newValue)
-            }
-            preferenceManager.sharedPreferences?.edit {
-              putString(Constants.PREF_LOCALE, newValue)
-            }
+            val locale = selectLocale(newValue)
             Timber.d("Locale = $locale")
             activity?.recreate()
           }
@@ -350,50 +343,37 @@ class SettingsFragment :
       isVisible = getBoolean(R.bool.is_foss).not()
     }
 
-    val tag = languagePreference.value
-    val index = listOf(*languagePreference.entryValues).indexOf(tag)
-    Timber.d("Locale = $tag, index = $index, entries = ${listOf(*languagePreference.entryValues)}")
-    val localeName: MutableList<String> = ArrayList()
-    val localeNameUser: MutableList<String> = ArrayList()
-    val userLocale = GlobalValues.locale
-    for (i in 1 until languagePreference.entries.size) {
-      val locale = Locale.forLanguageTag(languagePreference.entries[i].toString())
-      localeName.add(
-        if (!TextUtils.isEmpty(locale.script)) {
-          locale.getDisplayScript(locale)
-        } else {
-          locale.getDisplayName(locale)
-        }
-      )
-      localeNameUser.add(
-        if (!TextUtils.isEmpty(locale.script)) {
-          locale.getDisplayScript(userLocale)
-        } else {
-          locale.getDisplayName(userLocale)
-        }
-      )
-    }
+    bindLocalePreference(languagePreference)
+  }
 
-    for (i in 1 until languagePreference.entries.size) {
-      if (index != i) {
-        languagePreference.entries[i] = HtmlCompat.fromHtml(
-          String.format(
-            "%s - %s",
-            localeName[i - 1],
-            localeNameUser[i - 1]
-          ),
-          HtmlCompat.FROM_HTML_MODE_LEGACY
-        )
+  private fun bindLocalePreference(languagePreference: ListPreference) {
+    val tag = languagePreference.value
+    val displayData = buildLocalePreferenceData(
+      entries = languagePreference.entries.toList(),
+      entryValues = languagePreference.entryValues.toList(),
+      selectedTag = tag
+    )
+    Timber.d(
+      "Locale = $tag, index = ${languagePreference.entryValues.indexOf(tag)}, " +
+        "entries = ${languagePreference.entryValues.toList()}"
+    )
+    displayData.entries.forEach { entry ->
+      languagePreference.entries[entry.index] = if (entry.selected) {
+        entry.label
       } else {
-        languagePreference.entries[i] = localeNameUser[i - 1]
+        HtmlCompat.fromHtml(entry.label, HtmlCompat.FROM_HTML_MODE_LEGACY)
       }
     }
+    when (val summary = displayData.summary) {
+      LocalePreferenceSummary.FollowSystem -> {
+        languagePreference.summary = getString(rikka.core.R.string.follow_system)
+      }
 
-    if (TextUtils.isEmpty(tag) || "SYSTEM" == tag) {
-      languagePreference.summary = getString(rikka.core.R.string.follow_system)
-    } else if (index != -1) {
-      val name = localeNameUser[index - 1]
-      languagePreference.summary = name
+      is LocalePreferenceSummary.LocaleName -> {
+        languagePreference.summary = summary.name
+      }
+
+      LocalePreferenceSummary.Unchanged -> Unit
     }
   }
 

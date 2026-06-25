@@ -115,8 +115,10 @@ import com.absinthe.libchecker.domain.app.update.BuildInAppUpdateDiffDataUseCase
 import com.absinthe.libchecker.domain.rules.CloudRulesRepository
 import com.absinthe.libchecker.domain.rules.RuleSettingsRepository
 import com.absinthe.libchecker.domain.settings.AppearanceSettingsRepository
+import com.absinthe.libchecker.domain.settings.BuildLocalePreferenceDataUseCase
 import com.absinthe.libchecker.domain.settings.DeveloperSettingsRepository
 import com.absinthe.libchecker.domain.settings.SelectDarkModeUseCase
+import com.absinthe.libchecker.domain.settings.SelectLocaleUseCase
 import com.absinthe.libchecker.domain.snapshot.BackupSnapshotArchiveToUriUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildInstalledSnapshotItemUseCase
@@ -318,7 +320,9 @@ val appModule = module {
       ApkDetailActivity::class.java.name
     )
   }
+  factory { BuildLocalePreferenceDataUseCase(get()) }
   factory { SelectDarkModeUseCase(get()) }
+  factory { SelectLocaleUseCase(get()) }
   factory { ShouldShowStaticLibraryTabUseCase(get()) }
   factory { InitializePendingAppFeaturesUseCase(get(), get()) }
   factory { SortAppDetailItemsUseCase() }
