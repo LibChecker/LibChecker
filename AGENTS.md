@@ -177,7 +177,9 @@ Important `:app` boundaries:
    ViewModels/controllers before low-frequency tooling. Keep edits focused and
    keep domain package-layout cleanup separate from behavior changes. When a
    domain package gets crowded, group use cases, interfaces, and models in a
-   dedicated mechanical slice. Avoid generated/build-output churn.
+   dedicated mechanical slice. Avoid thin pass-through extractions; add a new
+   use case only when it owns reusable decisions, parsing, display data, or
+   side-effect setup. Avoid generated/build-output churn.
 5. Run `spotlessApply` only when formatting needs fixing.
 6. Run the narrowest relevant validation command. If adapters, view-state
    mapping, menus, navigation, or visible strings changed, add a focused

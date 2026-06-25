@@ -1,8 +1,9 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
 import android.content.pm.PackageInfo
-import com.absinthe.libchecker.database.entity.Features
-import com.absinthe.libchecker.domain.app.VersionedFeature
+import com.absinthe.libchecker.domain.app.detail.content.AppDetailAnalysisInitAction
+import com.absinthe.libchecker.domain.app.detail.content.AppDetailFeatureInitAction
+import com.absinthe.libchecker.domain.app.detail.content.BuildAppDetailContentInitPlanUseCase
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.bean.DetailExtraBean
 import kotlinx.coroutines.CoroutineScope
@@ -14,6 +15,7 @@ import kotlinx.coroutines.withContext
 class DetailPackageContentController(
   private val viewModel: DetailViewModel,
   private val coroutineScope: CoroutineScope,
+  private val buildAppDetailContentInitPlan: BuildAppDetailContentInitPlanUseCase,
   private val tabSpecBuilder: DetailTabSpecBuilder,
   private val tabController: DetailTabController,
   private val featureListController: DetailFeatureListController,
@@ -34,6 +36,11 @@ class DetailPackageContentController(
       isHarmonyMode = isHarmonyMode,
       isApkPreview = viewModel.isApkPreview
     )
+    val contentInitPlan = buildAppDetailContentInitPlan(
+      isHarmonyMode = isHarmonyMode,
+      isApkPreview = viewModel.isApkPreview,
+      featureMask = extraBean?.features ?: -1
+    )
     tabController.setup(
       packageName = packageName,
       isHarmonyMode = isHarmonyMode,
@@ -41,8 +48,12 @@ class DetailPackageContentController(
     )
 
     insertStaticLibraryTabIfAvailable(packageInfo, packageName, uiGeneration)
-    initFeatureItems(packageInfo, extraBean)
-    initAnalysisContent(packageName, isHarmonyMode)
+    initFeatureItems(packageInfo, contentInitPlan.featureAction)
+    initAnalysisContent(packageName, contentInitPlan.analysisAction)
+    if (contentInitPlan.shouldInitPermissions) {
+      // Detect Live Update notification
+      viewModel.initPermissionData()
+    }
     schedulePostPackageInfoAvailable()
   }
 
@@ -63,31 +74,29 @@ class DetailPackageContentController(
     }
   }
 
-  private fun initFeatureItems(packageInfo: PackageInfo, extraBean: DetailExtraBean?) {
+  private fun initFeatureItems(
+    packageInfo: PackageInfo,
+    featureAction: AppDetailFeatureInitAction
+  ) {
     if (featureListController.isInitialized) {
       return
     }
 
-    if (viewModel.isApkPreview) {
-      viewModel.emitFeature(VersionedFeature(Features.Ext.APPLICATION_PROP))
-    } else {
-      viewModel.initFeatures(packageInfo, extraBean?.features ?: -1)
+    when (featureAction) {
+      is AppDetailFeatureInitAction.Emit -> viewModel.emitFeature(featureAction.feature)
+      is AppDetailFeatureInitAction.LoadPackageFeatures -> viewModel.initFeatures(packageInfo, featureAction.featureMask)
     }
   }
 
-  private fun initAnalysisContent(packageName: String, isHarmonyMode: Boolean) {
-    if (!isHarmonyMode) {
-      if (viewModel.isApkPreview) {
-        viewModel.initComponentsDataInPreview()
-      } else {
-        viewModel.initComponentsData()
-      }
-    } else {
-      viewModel.initAbilities(packageName)
+  private fun initAnalysisContent(
+    packageName: String,
+    analysisAction: AppDetailAnalysisInitAction
+  ) {
+    when (analysisAction) {
+      AppDetailAnalysisInitAction.Abilities -> viewModel.initAbilities(packageName)
+      AppDetailAnalysisInitAction.Components -> viewModel.initComponentsData()
+      AppDetailAnalysisInitAction.PreviewComponents -> viewModel.initComponentsDataInPreview()
     }
-
-    // Detect Live Update notification
-    viewModel.initPermissionData()
   }
 
   private fun schedulePostPackageInfoAvailable() {
