@@ -100,6 +100,7 @@ import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildInstalledSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildPackageComparisonSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCase
+import com.absinthe.libchecker.domain.snapshot.BuildSnapshotCapturePlanUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotComparisonListsUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotComparisonPlanUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotDetailItemsUseCase
@@ -351,6 +352,7 @@ val appModule = module {
   factory { BuildInstalledSnapshotItemUseCase(get()) }
   factory { BuildPackageComparisonSnapshotItemUseCase(androidContext().packageManager) }
   factory { BuildSnapshotAbiDisplayDataUseCase(androidContext()) }
+  factory { BuildSnapshotCapturePlanUseCase() }
   factory { BuildSnapshotComparisonListsUseCase(get()) }
   factory { BuildSnapshotComparisonPlanUseCase(get()) }
   factory { BuildSnapshotPairDiffUseCase() }
@@ -434,6 +436,7 @@ val appModule = module {
       prepareRoomBackupRestoreFileUseCase = get(),
       snapshotLibrary = get(),
       buildArchiveSnapshotItemUseCase = get(),
+      buildSnapshotCapturePlanUseCase = get(),
       buildSnapshotPairDiffUseCase = get(),
       buildSnapshotComparisonPlanUseCase = get(),
       getSnapshotPackageIconSourcesUseCase = get(),

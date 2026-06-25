@@ -9,7 +9,6 @@ import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Color
-import android.net.Uri
 import android.os.Bundle
 import android.os.IBinder
 import android.util.TypedValue
@@ -34,12 +33,12 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.LCUris
 import com.absinthe.libchecker.constant.options.SnapshotOptions
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.app.PackageChangeState
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCase
+import com.absinthe.libchecker.domain.snapshot.SnapshotCapturePlan
 import com.absinthe.libchecker.domain.snapshot.SnapshotSystemProp
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.features.album.ui.AlbumActivity
@@ -531,50 +530,25 @@ class SnapshotFragment :
         )
       }
 
-      if (viewModel.selectedSnapshotTimestamp == 0L) {
-        computeNewSnapshot()
-      } else {
-        val scheme = Uri.Builder().scheme(LCUris.SCHEME)
-          .authority(LCUris.Bridge.AUTHORITY)
-          .appendQueryParameter(LCUris.Bridge.PARAM_ACTION, LCUris.Bridge.ACTION_SHOOT)
-          .appendQueryParameter(
-            LCUris.Bridge.PARAM_AUTHORITY,
-            GlobalValues.generateAuthKey().toString()
-          )
-          .appendQueryParameter(LCUris.Bridge.PARAM_DROP_PREVIOUS, false.toString())
-          .build()
-          .toString()
-        val tipView = TextView(context).also {
-          it.layoutParams = ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-          )
-          it.setPadding(24.dp, 0, 24.dp, 0)
-          it.text =
-            HtmlCompat.fromHtml(getString(R.string.snapshot_scheme_tip, scheme), 0)
-          it.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
-          it.setLongClickCopiedToClipboard(scheme)
-        }
-        when (GlobalValues.snapshotKeep) {
-          Constants.SNAPSHOT_DEFAULT -> {
-            BaseAlertDialogBuilder(context)
-              .setTitle(R.string.dialog_title_keep_previous_snapshot)
-              .setMessage(R.string.dialog_message_keep_previous_snapshot)
-              .setView(tipView)
-              .setPositiveButton(R.string.btn_keep) { _, _ ->
-                computeNewSnapshot(false)
-              }
-              .setNegativeButton(R.string.btn_drop) { _, _ ->
-                computeNewSnapshot(true)
-              }
-              .setNeutralButton(android.R.string.cancel, null)
-              .show()
-          }
+      when (val plan = viewModel.buildSnapshotCapturePlan()) {
+        is SnapshotCapturePlan.Capture -> computeNewSnapshot(plan.dropPrevious)
 
-          Constants.SNAPSHOT_KEEP -> computeNewSnapshot(false)
-
-          Constants.SNAPSHOT_DISCARD -> computeNewSnapshot(true)
+        is SnapshotCapturePlan.ConfirmKeepPrevious -> {
+          BaseAlertDialogBuilder(context)
+            .setTitle(R.string.dialog_title_keep_previous_snapshot)
+            .setMessage(R.string.dialog_message_keep_previous_snapshot)
+            .setView(buildSnapshotSchemeTipView(context, plan.bridgeUri))
+            .setPositiveButton(R.string.btn_keep) { _, _ ->
+              computeNewSnapshot(false)
+            }
+            .setNegativeButton(R.string.btn_drop) { _, _ ->
+              computeNewSnapshot(true)
+            }
+            .setNeutralButton(android.R.string.cancel, null)
+            .show()
         }
+
+        SnapshotCapturePlan.NoAction -> Unit
       }
     } else if (menuItem.itemId == R.id.advanced) {
       activity?.let {
@@ -594,6 +568,19 @@ class SnapshotFragment :
       }
     }
     return true
+  }
+
+  private fun buildSnapshotSchemeTipView(context: Context, scheme: String): TextView {
+    return TextView(context).also {
+      it.layoutParams = ViewGroup.LayoutParams(
+        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
+      )
+      it.setPadding(24.dp, 0, 24.dp, 0)
+      it.text = HtmlCompat.fromHtml(getString(R.string.snapshot_scheme_tip, scheme), 0)
+      it.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
+      it.setLongClickCopiedToClipboard(scheme)
+    }
   }
 
   override fun onVisibilityChanged(visible: Boolean) {

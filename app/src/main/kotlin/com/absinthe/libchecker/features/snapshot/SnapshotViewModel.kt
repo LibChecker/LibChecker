@@ -10,6 +10,7 @@ import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.snapshot.ArchiveSnapshotItem
 import com.absinthe.libchecker.domain.snapshot.BackupSnapshotArchiveToUriUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
+import com.absinthe.libchecker.domain.snapshot.BuildSnapshotCapturePlanUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotComparisonPlanUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotDetailItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotPairDiffUseCase
@@ -23,6 +24,7 @@ import com.absinthe.libchecker.domain.snapshot.GetSnapshotSystemPropDiffsUseCase
 import com.absinthe.libchecker.domain.snapshot.PrepareRoomBackupRestoreFileUseCase
 import com.absinthe.libchecker.domain.snapshot.RestoreSnapshotArchiveFromUriUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
+import com.absinthe.libchecker.domain.snapshot.SnapshotCapturePlan
 import com.absinthe.libchecker.domain.snapshot.SnapshotComparisonPlan
 import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
@@ -62,6 +64,7 @@ class SnapshotViewModel(
   private val prepareRoomBackupRestoreFileUseCase: PrepareRoomBackupRestoreFileUseCase,
   private val snapshotLibrary: SnapshotLibraryUseCase,
   private val buildArchiveSnapshotItemUseCase: BuildArchiveSnapshotItemUseCase,
+  private val buildSnapshotCapturePlanUseCase: BuildSnapshotCapturePlanUseCase,
   private val buildSnapshotPairDiffUseCase: BuildSnapshotPairDiffUseCase,
   private val buildSnapshotComparisonPlanUseCase: BuildSnapshotComparisonPlanUseCase,
   private val getSnapshotPackageIconSourcesUseCase: GetSnapshotPackageIconSourcesUseCase,
@@ -166,6 +169,10 @@ class SnapshotViewModel(
 
   fun buildSnapshotPairDiff(left: SnapshotItem, right: SnapshotItem): SnapshotDiffItem {
     return buildSnapshotPairDiffUseCase(left, right)
+  }
+
+  fun buildSnapshotCapturePlan(): SnapshotCapturePlan {
+    return buildSnapshotCapturePlanUseCase(selectedSnapshotTimestamp)
   }
 
   suspend fun buildSnapshotComparisonPlan(
