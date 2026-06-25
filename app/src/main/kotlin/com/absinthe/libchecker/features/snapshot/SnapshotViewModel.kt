@@ -8,7 +8,6 @@ import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.snapshot.ArchiveSnapshotItem
-import com.absinthe.libchecker.domain.snapshot.BackupSnapshotArchiveToUriUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotCapturePlanUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotComparisonPlanUseCase
@@ -20,8 +19,6 @@ import com.absinthe.libchecker.domain.snapshot.GetApexPackageNamesUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotPackageIconSourcesUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotSystemPropDiffsUseCase
-import com.absinthe.libchecker.domain.snapshot.RestoreSnapshotArchiveFromUriUseCase
-import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotCapturePlan
 import com.absinthe.libchecker.domain.snapshot.SnapshotComparisonPlan
 import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
@@ -41,7 +38,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 const val CURRENT_SNAPSHOT = -1L
@@ -53,8 +49,6 @@ class SnapshotViewModel(
   private val compareSnapshotItemWithInstalledApp: CompareSnapshotItemWithInstalledAppUseCase,
   private val getSnapshotDashboardCount: GetSnapshotDashboardCountUseCase,
   private val buildSnapshotDetailItems: BuildSnapshotDetailItemsUseCase,
-  private val backupSnapshotArchiveToUriUseCase: BackupSnapshotArchiveToUriUseCase,
-  private val restoreSnapshotArchiveFromUriUseCase: RestoreSnapshotArchiveFromUriUseCase,
   private val snapshotLibrary: SnapshotLibraryUseCase,
   private val buildArchiveSnapshotItemUseCase: BuildArchiveSnapshotItemUseCase,
   private val buildSnapshotCapturePlanUseCase: BuildSnapshotCapturePlanUseCase,
@@ -206,45 +200,6 @@ class SnapshotViewModel(
 
   suspend fun retainLatestSnapshotsAndGetTimeStamps(count: Int): List<TimeStampItem> {
     return snapshotLibrary.retainLatestSnapshotsAndGetTimeStamps(count)
-  }
-
-  fun backup(uri: Uri, resultAction: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
-    runCatching {
-      backupSnapshotArchiveToUriUseCase(uri)
-    }.onFailure {
-      Timber.e(it)
-    }
-    withContext(Dispatchers.Main) {
-      resultAction()
-    }
-  }
-
-  fun restore(
-    uri: Uri,
-    resultAction: (SnapshotArchiveUseCase.RestoreResult?) -> Unit
-  ) {
-    viewModelScope.launch(Dispatchers.IO) {
-      runCatching {
-        restoreSnapshotArchiveFromUriUseCase(uri)
-      }.onFailure {
-        Timber.e("restore with new format failed: $it")
-        withContext(Dispatchers.Main) {
-          resultAction(null)
-        }
-        return@launch
-      }.onSuccess { result ->
-        if (result == null) {
-          withContext(Dispatchers.Main) {
-            resultAction(null)
-          }
-          return@launch
-        }
-        result.latestTimeStamp?.let(::setSelectedSnapshotTimestamp)
-        withContext(Dispatchers.Main) {
-          resultAction(result)
-        }
-      }
-    }
   }
 
   fun getFormatDateString(timestamp: Long): String {

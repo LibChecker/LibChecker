@@ -32,8 +32,8 @@ import com.absinthe.libchecker.databinding.ActivityBackupBinding
 import com.absinthe.libchecker.domain.snapshot.CreateSnapshotDatabaseBackupUseCase
 import com.absinthe.libchecker.domain.snapshot.RestoreSnapshotDatabaseBackupUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
+import com.absinthe.libchecker.features.album.backup.SnapshotBackupViewModel
 import com.absinthe.libchecker.features.home.ui.MainActivity
-import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.utils.FileUtils
@@ -100,7 +100,7 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
 
   class BackupFragment : PreferenceFragmentCompat() {
 
-    private val viewModel: SnapshotViewModel by viewModel()
+    private val viewModel: SnapshotBackupViewModel by viewModel()
 
     private lateinit var backupResultLauncher: ActivityResultLauncher<String>
     private lateinit var restoreResultLauncher: ActivityResultLauncher<String>

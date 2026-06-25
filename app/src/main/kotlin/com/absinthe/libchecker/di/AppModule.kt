@@ -154,6 +154,7 @@ import com.absinthe.libchecker.domain.statistics.GetLibReferenceAppsUseCase
 import com.absinthe.libchecker.domain.statistics.GetLibReferenceConfigUseCase
 import com.absinthe.libchecker.domain.statistics.GetLibReferenceIconPackagesUseCase
 import com.absinthe.libchecker.domain.statistics.LibReferenceSettingsRepository
+import com.absinthe.libchecker.features.album.backup.SnapshotBackupViewModel
 import com.absinthe.libchecker.features.album.track.TrackViewModel
 import com.absinthe.libchecker.features.applist.detail.DetailActionLoader
 import com.absinthe.libchecker.features.applist.detail.DetailContentLoader
@@ -472,8 +473,6 @@ val appModule = module {
       compareSnapshotItemWithInstalledApp = get(),
       getSnapshotDashboardCount = get(),
       buildSnapshotDetailItems = get(),
-      backupSnapshotArchiveToUriUseCase = get(),
-      restoreSnapshotArchiveFromUriUseCase = get(),
       snapshotLibrary = get(),
       buildArchiveSnapshotItemUseCase = get(),
       buildSnapshotCapturePlanUseCase = get(),
@@ -484,6 +483,13 @@ val appModule = module {
       getApexPackageNamesUseCase = get(),
       snapshotSelectionUseCase = get(),
       snapshotTrackChangeRepository = get()
+    )
+  }
+  viewModel {
+    SnapshotBackupViewModel(
+      backupSnapshotArchiveToUriUseCase = get(),
+      restoreSnapshotArchiveFromUriUseCase = get(),
+      snapshotSelectionUseCase = get()
     )
   }
   viewModel { TrackViewModel(get(), get()) }
