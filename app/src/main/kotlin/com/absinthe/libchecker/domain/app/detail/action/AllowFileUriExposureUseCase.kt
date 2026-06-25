@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.app
+package com.absinthe.libchecker.domain.app.detail.action
 
 import android.os.StrictMode
 import java.util.concurrent.atomic.AtomicBoolean

@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.app
+package com.absinthe.libchecker.domain.app.detail.action
 
 import android.Manifest
 import android.content.ComponentName
@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import androidx.core.net.toUri
 import com.absinthe.libchecker.compat.PackageManagerCompat
+import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

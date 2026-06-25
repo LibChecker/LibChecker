@@ -13,9 +13,9 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.domain.app.AppInstallSource
-import com.absinthe.libchecker.domain.app.AppInstallSourceDetails
-import com.absinthe.libchecker.domain.app.AppInstalledTimeDisplayData
 import com.absinthe.libchecker.domain.app.detail.RelatedAppDisplayData
+import com.absinthe.libchecker.domain.app.detail.action.AppInstallSourceDetails
+import com.absinthe.libchecker.domain.app.detail.action.AppInstalledTimeDisplayData
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppDexoptItemView
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppInstallSourceBottomSheetView
