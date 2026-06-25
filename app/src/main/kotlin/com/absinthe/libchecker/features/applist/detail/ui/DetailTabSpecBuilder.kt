@@ -12,56 +12,58 @@ import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.annotation.SIGNATURES
 import com.absinthe.libchecker.constant.AbilityType
+import com.absinthe.libchecker.domain.app.detail.content.BuildAppDetailTabTypesUseCase
 
 data class DetailTabSpec(
   val types: List<Int>,
   val titles: List<CharSequence>
 )
 
-class DetailTabSpecBuilder(private val context: Context) {
+class DetailTabSpecBuilder(
+  private val context: Context,
+  private val buildAppDetailTabTypes: BuildAppDetailTabTypesUseCase
+) {
 
   fun build(isHarmonyMode: Boolean, isApkPreview: Boolean): DetailTabSpec {
-    val items = if (!isHarmonyMode) {
-      normalItems
-    } else {
-      harmonyItems
-    }
-    val visibleItems = if (isApkPreview) {
-      items.filterNot { it.type == SIGNATURES }
-    } else {
-      items
-    }
+    val types = buildAppDetailTabTypes(
+      isHarmonyMode = isHarmonyMode,
+      isApkPreview = isApkPreview
+    )
 
     return DetailTabSpec(
-      types = visibleItems.map { it.type },
-      titles = visibleItems.map { context.getText(it.titleRes) }
+      types = types,
+      titles = types.map { context.getText(titleResOf(it, isHarmonyMode)) }
     )
   }
 
-  private data class Item(
-    val type: Int,
-    @StringRes val titleRes: Int
-  )
+  @StringRes
+  private fun titleResOf(type: Int, isHarmonyMode: Boolean): Int {
+    return if (isHarmonyMode) {
+      harmonyTitleResByType[type]
+    } else {
+      normalTitleResByType[type]
+    } ?: R.string.ref_category_native
+  }
 
   private companion object {
-    val normalItems = listOf(
-      Item(NATIVE, R.string.ref_category_native),
-      Item(SERVICE, R.string.ref_category_service),
-      Item(ACTIVITY, R.string.ref_category_activity),
-      Item(RECEIVER, R.string.ref_category_br),
-      Item(PROVIDER, R.string.ref_category_cp),
-      Item(PERMISSION, R.string.ref_category_perm),
-      Item(METADATA, R.string.ref_category_metadata),
-      Item(SIGNATURES, R.string.ref_category_signatures)
+    val normalTitleResByType = mapOf(
+      NATIVE to R.string.ref_category_native,
+      SERVICE to R.string.ref_category_service,
+      ACTIVITY to R.string.ref_category_activity,
+      RECEIVER to R.string.ref_category_br,
+      PROVIDER to R.string.ref_category_cp,
+      PERMISSION to R.string.ref_category_perm,
+      METADATA to R.string.ref_category_metadata,
+      SIGNATURES to R.string.ref_category_signatures
     )
 
-    val harmonyItems = listOf(
-      Item(NATIVE, R.string.ref_category_native),
-      Item(AbilityType.PAGE, R.string.ability_page),
-      Item(AbilityType.SERVICE, R.string.ability_service),
-      Item(AbilityType.WEB, R.string.ability_web),
-      Item(AbilityType.DATA, R.string.ability_data),
-      Item(SIGNATURES, R.string.ref_category_signatures)
+    val harmonyTitleResByType = mapOf(
+      NATIVE to R.string.ref_category_native,
+      AbilityType.PAGE to R.string.ability_page,
+      AbilityType.SERVICE to R.string.ability_service,
+      AbilityType.WEB to R.string.ability_web,
+      AbilityType.DATA to R.string.ability_data,
+      SIGNATURES to R.string.ref_category_signatures
     )
   }
 }

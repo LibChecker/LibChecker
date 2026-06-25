@@ -13,6 +13,7 @@ import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.VersionedFeature
+import com.absinthe.libchecker.domain.app.detail.content.BuildAppDetailTabTypesUseCase
 import com.absinthe.libchecker.features.applist.DetailFragmentManager
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.IDetailContainer
@@ -37,6 +38,7 @@ abstract class BaseAppDetailActivity :
   protected val viewModel: DetailViewModel by viewModel()
   private val appDetailSettingsRepository: AppDetailSettingsRepository by inject()
   private val appListSettingsRepository: AppListSettingsRepository by inject()
+  private val buildAppDetailTabTypes: BuildAppDetailTabTypesUseCase by inject()
   protected val typeList: List<Int>
     get() = tabController.types
 
@@ -112,7 +114,9 @@ abstract class BaseAppDetailActivity :
       }
     )
   }
-  private val tabSpecBuilder by unsafeLazy { DetailTabSpecBuilder(this) }
+  private val tabSpecBuilder by unsafeLazy {
+    DetailTabSpecBuilder(this, buildAppDetailTabTypes)
+  }
   private val tabController: DetailTabController by unsafeLazy {
     DetailTabController(
       activity = this,

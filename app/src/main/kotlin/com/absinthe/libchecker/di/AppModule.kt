@@ -79,6 +79,7 @@ import com.absinthe.libchecker.domain.app.detail.action.GetPermissionDetailUseCa
 import com.absinthe.libchecker.domain.app.detail.action.GetXposedModuleInfoUseCase
 import com.absinthe.libchecker.domain.app.detail.action.PrepareAppPackageShareActionUseCase
 import com.absinthe.libchecker.domain.app.detail.action.PrepareAppPackageShareFileUseCase
+import com.absinthe.libchecker.domain.app.detail.content.BuildAppDetailTabTypesUseCase
 import com.absinthe.libchecker.domain.app.detail.content.BuildDetailProcessFilterDataUseCase
 import com.absinthe.libchecker.domain.app.detail.content.FilterAppDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailAbilityChipsUseCase
@@ -186,6 +187,7 @@ val appModule = module {
   factory { GetLibReferenceAppsUseCase(get()) }
   factory { ExportAppListUseCase(get(), get()) }
   factory { ExportAppListToUriUseCase(androidContext().contentResolver, get()) }
+  factory { BuildAppDetailTabTypesUseCase() }
   factory { BuildDetailProcessFilterDataUseCase() }
   factory { FilterAppDetailItemsUseCase() }
   factory { FilterAppListItemsUseCase(get()) }
