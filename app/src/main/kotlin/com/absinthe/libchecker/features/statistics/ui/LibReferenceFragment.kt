@@ -20,6 +20,7 @@ import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
 import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.statistics.LibReferenceSettingsRepository
+import com.absinthe.libchecker.features.applist.detail.ui.LibDetailDialogFragment
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.features.applist.ui.AdvancedMenuBSDFragment
 import com.absinthe.libchecker.features.chart.ui.ChartActivity
@@ -62,7 +63,12 @@ class LibReferenceFragment :
   private val appListSettingsRepository: AppListSettingsRepository by inject()
   private val libReferenceSettingsRepository: LibReferenceSettingsRepository by inject()
   private val libReferenceViewModel: LibReferenceViewModel by viewModel()
-  private val refAdapter by lazy { LibReferenceAdapter(appListSettingsRepository.colorfulRuleIcon) }
+  private val refAdapter by lazy {
+    LibReferenceAdapter(
+      initialColorfulRuleIcon = appListSettingsRepository.colorfulRuleIcon,
+      onDetailIconClick = ::showLibReferenceDetail
+    )
+  }
   private var delayShowNavigationJob: Job? = null
   private var searchUpdateJob: Job? = null
   private var advancedMenuBSDFragment: LibReferenceMenuBSDFragment? = null
@@ -320,6 +326,16 @@ class LibReferenceFragment :
 
   override fun onQueryTextSubmit(query: String?): Boolean {
     return false
+  }
+
+  private fun showLibReferenceDetail(ref: LibReference) {
+    val context = (context as? BaseActivity<*>) ?: return
+    lifecycleScope.launch {
+      val request = libReferenceViewModel.buildDetailDialogRequest(ref.libName, ref.type) ?: return@launch
+      context.findViewById<View>(androidx.appcompat.R.id.search_src_text)?.clearFocus()
+      LibDetailDialogFragment.newInstance(request.name, request.type, request.regexName)
+        .show(context.supportFragmentManager, LibDetailDialogFragment::class.java.name)
+    }
   }
 
   override fun onQueryTextChange(newText: String): Boolean {

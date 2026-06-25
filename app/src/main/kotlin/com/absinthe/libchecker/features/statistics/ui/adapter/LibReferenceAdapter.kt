@@ -11,14 +11,20 @@ import com.chad.library.adapter.base.BaseNodeAdapter
 import com.chad.library.adapter.base.entity.node.BaseNode
 
 class LibReferenceAdapter(
-  initialColorfulRuleIcon: Boolean = true
+  initialColorfulRuleIcon: Boolean = true,
+  private val onDetailIconClick: (LibReference) -> Unit
 ) : BaseNodeAdapter() {
 
   var colorfulRuleIcon: Boolean = initialColorfulRuleIcon
     private set
 
   init {
-    addNodeProvider(LibReferenceProvider { colorfulRuleIcon })
+    addNodeProvider(
+      LibReferenceProvider(
+        colorfulRuleIcon = { colorfulRuleIcon },
+        onDetailIconClick = onDetailIconClick
+      )
+    )
     addNodeProvider(MultipleAppsIconProvider())
   }
 

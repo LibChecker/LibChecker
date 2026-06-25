@@ -8,7 +8,9 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppListItemViewState
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.BuildAppListItemViewStatesUseCase
+import com.absinthe.libchecker.domain.statistics.BuildLibReferenceDetailDialogRequestUseCase
 import com.absinthe.libchecker.domain.statistics.GetLibReferenceAppsUseCase
+import com.absinthe.libchecker.domain.statistics.LibReferenceDetailDialogRequest
 import com.absinthe.libchecker.domain.statistics.LibReferenceSettingsRepository
 import com.absinthe.libchecker.features.statistics.bean.LibReference
 import kotlinx.coroutines.Dispatchers
@@ -26,6 +28,7 @@ class LibReferenceViewModel(
   appListRepository: AppListRepository,
   private val buildAppListItemViewStatesUseCase: BuildAppListItemViewStatesUseCase,
   private val getLibReferenceAppsUseCase: GetLibReferenceAppsUseCase,
+  private val buildLibReferenceDetailDialogRequestUseCase: BuildLibReferenceDetailDialogRequestUseCase,
   private val libReferenceSettingsRepository: LibReferenceSettingsRepository,
   libReferenceComputationControllerFactory: LibReferenceComputationController.Factory
 ) : ViewModel() {
@@ -133,6 +136,13 @@ class LibReferenceViewModel(
   fun getActionTarget(packageName: String): Pair<String, Int>? {
     val target = actionTargets[packageName] ?: return null
     return target.name to target.type
+  }
+
+  suspend fun buildDetailDialogRequest(
+    name: String,
+    @LibType type: Int
+  ): LibReferenceDetailDialogRequest? {
+    return buildLibReferenceDetailDialogRequestUseCase(name, type)
   }
 
   private fun computeLibReference() {

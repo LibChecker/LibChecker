@@ -154,6 +154,7 @@ import com.absinthe.libchecker.domain.statistics.BuildAbiChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildApiLevelChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildDetailedAbiChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildFeatureFlagChartDataUseCase
+import com.absinthe.libchecker.domain.statistics.BuildLibReferenceDetailDialogRequestUseCase
 import com.absinthe.libchecker.domain.statistics.BuildPageSize16KBChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.ChartSettingsRepository
 import com.absinthe.libchecker.domain.statistics.ComputeLibReferenceUseCase
@@ -223,6 +224,7 @@ val appModule = module {
   factory { GetLibReferenceConfigUseCase(get()) }
   factory { GetLibReferenceIconPackagesUseCase(get()) }
   factory { GetLibReferenceAppsUseCase(get()) }
+  factory { BuildLibReferenceDetailDialogRequestUseCase() }
   factory { LibReferenceComputationController.Factory(get(), get(), get()) }
   factory { ExportAppListUseCase(get(), get()) }
   factory { ExportAppListToUriUseCase(androidContext().contentResolver, get()) }
@@ -483,6 +485,7 @@ val appModule = module {
       appListRepository = get(),
       buildAppListItemViewStatesUseCase = get(),
       getLibReferenceAppsUseCase = get(),
+      buildLibReferenceDetailDialogRequestUseCase = get(),
       libReferenceSettingsRepository = get(),
       libReferenceComputationControllerFactory = get()
     )

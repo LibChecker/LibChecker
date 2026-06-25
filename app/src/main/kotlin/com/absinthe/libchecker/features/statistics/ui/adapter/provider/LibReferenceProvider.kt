@@ -7,33 +7,26 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.text.buildSpannedString
 import androidx.core.text.italic
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.isComponentType
-import com.absinthe.libchecker.database.RulesRepository
-import com.absinthe.libchecker.features.applist.detail.ui.LibDetailDialogFragment
 import com.absinthe.libchecker.features.statistics.bean.LibReference
 import com.absinthe.libchecker.features.statistics.ui.adapter.LibReferenceAdapter
 import com.absinthe.libchecker.features.statistics.ui.view.LibReferenceItemView
-import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.tintHighlightText
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.chad.library.adapter.base.provider.BaseNodeProvider
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import java.text.NumberFormat
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 const val LIB_REFERENCE_PROVIDER = 0
 
 class LibReferenceProvider(
-  private val colorfulRuleIcon: () -> Boolean
+  private val colorfulRuleIcon: () -> Boolean,
+  private val onDetailIconClick: (LibReference) -> Unit
 ) : BaseNodeProvider() {
 
   override val itemViewType: Int = LIB_REFERENCE_PROVIDER
@@ -115,17 +108,7 @@ class LibReferenceProvider(
     if (view.id == android.R.id.icon) {
       val ref = data as? LibReference ?: return
       if (ref.type == NATIVE || isComponentType(ref.type) || ref.type == ACTION) {
-        val name = ref.libName
-
-        (context as? LifecycleOwner)?.lifecycleScope?.launch(Dispatchers.IO) {
-          val regexName = RulesRepository.getRule(name, ref.type, true)?.regexName
-
-          withContext(Dispatchers.Main) {
-            (context as BaseActivity<*>).findViewById<View>(androidx.appcompat.R.id.search_src_text)?.clearFocus()
-            LibDetailDialogFragment.newInstance(name, ref.type, regexName)
-              .show((context as BaseActivity<*>).supportFragmentManager, LibDetailDialogFragment::class.java.name)
-          }
-        }
+        onDetailIconClick(ref)
       }
     }
   }
