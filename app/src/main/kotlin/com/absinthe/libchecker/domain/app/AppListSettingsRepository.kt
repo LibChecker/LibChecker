@@ -7,9 +7,11 @@ interface AppListSettingsRepository {
   val itemDisplayOptions: Int
   val colorfulRuleIcon: Boolean
   val displayOptionsChanges: Flow<Int>
+  val colorfulRuleIconChanges: Flow<Boolean>
 
   fun setDisplayOptions(options: Int)
   fun setItemDisplayOptions(options: Int)
 
   suspend fun notifyDisplayOptionsChanged(diff: Int)
+  suspend fun notifyColorfulRuleIconChanged(enabled: Boolean)
 }

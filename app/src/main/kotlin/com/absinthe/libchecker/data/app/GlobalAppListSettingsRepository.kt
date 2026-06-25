@@ -21,6 +21,10 @@ class GlobalAppListSettingsRepository : AppListSettingsRepository {
     .filter { it.first == Constants.PREF_ADVANCED_OPTIONS }
     .map { it.second as Int }
 
+  override val colorfulRuleIconChanges: Flow<Boolean> = GlobalValues.preferencesFlow
+    .filter { it.first == Constants.PREF_COLORFUL_ICON }
+    .map { it.second as Boolean }
+
   override fun setDisplayOptions(options: Int) {
     GlobalValues.advancedOptions = options
   }
@@ -31,5 +35,9 @@ class GlobalAppListSettingsRepository : AppListSettingsRepository {
 
   override suspend fun notifyDisplayOptionsChanged(diff: Int) {
     GlobalValues.preferencesFlow.emit(Constants.PREF_ADVANCED_OPTIONS to diff)
+  }
+
+  override suspend fun notifyColorfulRuleIconChanged(enabled: Boolean) {
+    GlobalValues.preferencesFlow.emit(Constants.PREF_COLORFUL_ICON to enabled)
   }
 }

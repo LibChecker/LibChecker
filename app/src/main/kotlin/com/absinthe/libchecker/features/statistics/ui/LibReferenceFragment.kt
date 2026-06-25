@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
@@ -200,28 +199,20 @@ class LibReferenceFragment :
         isListReady = true
       }.launchIn(lifecycleScope)
     }
-    GlobalValues.preferencesFlow.onEach {
-      when (it.first) {
-        Constants.PREF_ADVANCED_OPTIONS -> {
-          val options = it.second as Int
-          if (options and AdvancedOptions.SHOW_SYSTEM_APPS > 0) {
-            requestComputeRef(true)
-          }
-        }
-
-        Constants.PREF_COLORFUL_ICON -> {
-          refAdapter.updateColorfulRuleIcon(it.second as Boolean)
-        }
-
-        Constants.PREF_LIB_REF_THRESHOLD -> {
-          val threshold = it.second as Int
-          if (threshold < libReferenceViewModel.savedThreshold) {
-            requestMatchRules(true)
-            libReferenceViewModel.savedThreshold = threshold
-          } else {
-            libReferenceViewModel.refreshRef()
-          }
-        }
+    appListSettingsRepository.displayOptionsChanges.onEach { options ->
+      if (options and AdvancedOptions.SHOW_SYSTEM_APPS > 0) {
+        requestComputeRef(true)
+      }
+    }.launchIn(lifecycleScope)
+    appListSettingsRepository.colorfulRuleIconChanges.onEach { enabled ->
+      refAdapter.updateColorfulRuleIcon(enabled)
+    }.launchIn(lifecycleScope)
+    libReferenceSettingsRepository.thresholdChanges.onEach { threshold ->
+      if (threshold < libReferenceViewModel.savedThreshold) {
+        requestMatchRules(true)
+        libReferenceViewModel.savedThreshold = threshold
+      } else {
+        libReferenceViewModel.refreshRef()
       }
     }.launchIn(lifecycleScope)
   }

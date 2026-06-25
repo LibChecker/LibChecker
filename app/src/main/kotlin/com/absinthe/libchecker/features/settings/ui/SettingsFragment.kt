@@ -37,6 +37,7 @@ import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
+import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.rules.RuleSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.features.about.AboutPageBuilder
@@ -84,6 +85,7 @@ class SettingsFragment :
   private lateinit var borderViewDelegate: BorderViewDelegate
   private lateinit var prefRecyclerView: RecyclerView
   private val viewModel: HomeViewModel by activityViewModels()
+  private val appListSettingsRepository: AppListSettingsRepository by inject()
   private val ruleSettingsRepository: RuleSettingsRepository by inject()
   private val snapshotSettingsRepository: SnapshotSettingsRepository by inject()
 
@@ -114,8 +116,10 @@ class SettingsFragment :
       }
     }
     findPreference<TwoStatePreference>(Constants.PREF_COLORFUL_ICON)?.apply {
-      setOnPreferenceChangeListener { pref, newValue ->
-        emitPrefChange(pref.key, newValue)
+      setOnPreferenceChangeListener { _, newValue ->
+        lifecycleScope.launch {
+          appListSettingsRepository.notifyColorfulRuleIconChanged(newValue as Boolean)
+        }
         recordPreferenceEvent(Constants.PREF_COLORFUL_ICON, newValue)
         true
       }
@@ -474,12 +478,6 @@ class SettingsFragment :
   override fun getBorderViewDelegate(): BorderViewDelegate = borderViewDelegate
   override fun isAllowRefreshing(): Boolean = true
   override fun getSuitableLayoutManager(): RecyclerView.LayoutManager? = null
-
-  private fun emitPrefChange(key: String, value: Any) {
-    lifecycleScope.launch {
-      GlobalValues.preferencesFlow.emit(key to value)
-    }
-  }
 
   private fun Preference.applyM3eLayoutResources() {
     when (this) {
