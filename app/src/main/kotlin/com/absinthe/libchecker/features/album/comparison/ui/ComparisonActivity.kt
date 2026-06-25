@@ -33,6 +33,7 @@ import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.snapshot.ArchiveSnapshotItem
 import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCase
+import com.absinthe.libchecker.domain.snapshot.SnapshotComparisonPlan
 import com.absinthe.libchecker.features.album.comparison.ui.view.ComparisonDashboardView
 import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
 import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ENTITY
@@ -122,19 +123,7 @@ class ComparisonActivity :
         showToast(R.string.album_item_comparison_invalid_compare)
         return false
       }
-      if (leftTimeStamp != -1L && rightTimeStamp != -1L) {
-        if (leftTimeStamp == rightTimeStamp) {
-          showToast(R.string.album_item_comparison_invalid_compare)
-          return false
-        }
-        viewModel.compareDiff(
-          leftTimeStamp.coerceAtMost(rightTimeStamp),
-          leftTimeStamp.coerceAtLeast(rightTimeStamp)
-        )
-        flip(VF_LOADING)
-      } else {
-        compareDiffContainsApk()
-      }
+      compareSelectedItems()
     }
     return true
   }
@@ -345,7 +334,7 @@ class ComparisonActivity :
           }
 
           invalidateDashboard()
-          compareDiffContainsApk()
+          compareSelectedItems()
         } else {
           showToast(R.string.album_item_comparison_invalid_shared_items)
         }
@@ -390,80 +379,106 @@ class ComparisonActivity :
     }
   }
 
-  private fun compareDiffContainsApk() = lifecycleScope.launch(Dispatchers.IO) {
-    var dialog: AlertDialog?
-    withContext(Dispatchers.Main) {
-      dialog = UiUtils.createLoadingDialog(this@ComparisonActivity).also {
-        it.show()
+  private fun compareSelectedItems() = lifecycleScope.launch(Dispatchers.IO) {
+    val hasArchiveInput = leftTimeStamp == -1L || rightTimeStamp == -1L
+    var dialog: AlertDialog? = null
+    if (hasArchiveInput) {
+      withContext(Dispatchers.Main) {
+        dialog = UiUtils.createLoadingDialog(this@ComparisonActivity).also {
+          it.show()
+        }
       }
     }
-    val leftArchive = runCatching {
-      if (leftTimeStamp == -1L && leftUri != null) {
-        getArchiveSnapshotItemByUri(leftUri!!, Constants.TEMP_PACKAGE)
-      } else {
-        null
-      }
-    }.getOrElse {
-      handleArchiveSnapshotFailure(it)
-      null
-    }
-    val rightArchive = runCatching {
-      if (rightTimeStamp == -1L && rightUri != null) {
-        getArchiveSnapshotItemByUri(rightUri!!, Constants.TEMP_PACKAGE_2)
-      } else {
-        null
-      }
-    }.getOrElse {
-      handleArchiveSnapshotFailure(it)
-      null
-    }
-    val leftPackage = leftArchive?.snapshotItem
-    val rightPackage = rightArchive?.snapshotItem
+
+    val leftArchive = buildSelectedArchiveSnapshotItem(
+      timeStamp = leftTimeStamp,
+      uri = leftUri,
+      fileName = Constants.TEMP_PACKAGE
+    )
+    val rightArchive = buildSelectedArchiveSnapshotItem(
+      timeStamp = rightTimeStamp,
+      uri = rightUri,
+      fileName = Constants.TEMP_PACKAGE_2
+    )
 
     withContext(Dispatchers.Main) {
       dialog?.dismiss()
     }
 
-    if (leftArchive != null && rightArchive != null) {
-      val leftPackage = leftArchive.snapshotItem
-      val rightPackage = rightArchive.snapshotItem
-      val leftIcon = leftArchive.icon
-      val rightIcon = rightArchive.icon
-      if (leftPackage.packageName != rightPackage.packageName) {
+    when (
+      val plan = viewModel.buildSnapshotComparisonPlan(
+        leftTimeStamp = leftTimeStamp,
+        leftArchive = leftArchive,
+        rightTimeStamp = rightTimeStamp,
+        rightArchive = rightArchive
+      )
+    ) {
+      null -> {
         withContext(Dispatchers.Main) {
-          BaseAlertDialogBuilder(this@ComparisonActivity)
-            .setTitle(R.string.dialog_title_compare_diff_apk)
-            .setMessage(R.string.dialog_message_compare_diff_apk)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-              navigateToSnapshotDetail(
-                leftPackage,
-                rightPackage,
-                leftIcon,
-                rightIcon
-              )
-            }
-            .setNegativeButton(android.R.string.cancel, null)
-            .show()
+          showToast(R.string.album_item_comparison_invalid_compare)
         }
+      }
+
+      is SnapshotComparisonPlan.TimestampRange -> {
+        withContext(Dispatchers.Main) {
+          viewModel.compareDiff(plan.previousTimestamp, plan.currentTimestamp)
+          flip(VF_LOADING)
+        }
+      }
+
+      is SnapshotComparisonPlan.ArchivePair -> {
+        showArchiveComparison(plan)
+      }
+
+      is SnapshotComparisonPlan.SnapshotLists -> {
+        flip(VF_LOADING)
+        viewModel.compareDiffWithSnapshotList(-1, plan.lists.left, plan.lists.right)
+      }
+    }
+  }
+
+  private suspend fun buildSelectedArchiveSnapshotItem(
+    timeStamp: Long,
+    uri: Uri?,
+    fileName: String
+  ): ArchiveSnapshotItem? {
+    return runCatching {
+      if (timeStamp == -1L && uri != null) {
+        getArchiveSnapshotItemByUri(uri, fileName)
+      } else {
+        null
+      }
+    }.getOrElse {
+      handleArchiveSnapshotFailure(it)
+      null
+    }
+  }
+
+  private suspend fun showArchiveComparison(plan: SnapshotComparisonPlan.ArchivePair) {
+    val leftPackage = plan.left.snapshotItem
+    val rightPackage = plan.right.snapshotItem
+    val leftIcon = plan.left.icon
+    val rightIcon = plan.right.icon
+
+    withContext(Dispatchers.Main) {
+      if (plan.requiresDifferentPackageConfirmation) {
+        BaseAlertDialogBuilder(this@ComparisonActivity)
+          .setTitle(R.string.dialog_title_compare_diff_apk)
+          .setMessage(R.string.dialog_message_compare_diff_apk)
+          .setPositiveButton(android.R.string.ok) { _, _ ->
+            navigateToSnapshotDetail(
+              leftPackage,
+              rightPackage,
+              leftIcon,
+              rightIcon
+            )
+          }
+          .setNegativeButton(android.R.string.cancel, null)
+          .show()
       } else {
         navigateToSnapshotDetail(leftPackage, rightPackage, leftIcon, rightIcon)
       }
-      return@launch
     }
-    val comparisonLists = viewModel.buildSnapshotComparisonLists(
-      leftTimeStamp = leftTimeStamp,
-      leftPackage = leftPackage,
-      rightTimeStamp = rightTimeStamp,
-      rightPackage = rightPackage
-    ) ?: run {
-      withContext(Dispatchers.Main) {
-        showToast(R.string.album_item_comparison_invalid_compare)
-      }
-      return@launch
-    }
-
-    flip(VF_LOADING)
-    viewModel.compareDiffWithSnapshotList(-1, comparisonLists.left, comparisonLists.right)
   }
 
   private fun navigateToSnapshotDetail(

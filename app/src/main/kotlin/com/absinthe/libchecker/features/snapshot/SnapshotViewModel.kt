@@ -10,7 +10,7 @@ import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.snapshot.ArchiveSnapshotItem
 import com.absinthe.libchecker.domain.snapshot.BackupSnapshotArchiveToUriUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
-import com.absinthe.libchecker.domain.snapshot.BuildSnapshotComparisonListsUseCase
+import com.absinthe.libchecker.domain.snapshot.BuildSnapshotComparisonPlanUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotDetailItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotPairDiffUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemWithInstalledAppUseCase
@@ -22,7 +22,7 @@ import com.absinthe.libchecker.domain.snapshot.GetSnapshotPackageIconSourcesUseC
 import com.absinthe.libchecker.domain.snapshot.PrepareRoomBackupRestoreFileUseCase
 import com.absinthe.libchecker.domain.snapshot.RestoreSnapshotArchiveFromUriUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
-import com.absinthe.libchecker.domain.snapshot.SnapshotComparisonLists
+import com.absinthe.libchecker.domain.snapshot.SnapshotComparisonPlan
 import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
@@ -61,7 +61,7 @@ class SnapshotViewModel(
   private val snapshotLibrary: SnapshotLibraryUseCase,
   private val buildArchiveSnapshotItemUseCase: BuildArchiveSnapshotItemUseCase,
   private val buildSnapshotPairDiffUseCase: BuildSnapshotPairDiffUseCase,
-  private val buildSnapshotComparisonListsUseCase: BuildSnapshotComparisonListsUseCase,
+  private val buildSnapshotComparisonPlanUseCase: BuildSnapshotComparisonPlanUseCase,
   private val getSnapshotPackageIconSourcesUseCase: GetSnapshotPackageIconSourcesUseCase,
   private val getApexPackageNamesUseCase: GetApexPackageNamesUseCase,
   private val snapshotSelectionUseCase: SnapshotSelectionUseCase,
@@ -165,17 +165,17 @@ class SnapshotViewModel(
     return buildSnapshotPairDiffUseCase(left, right)
   }
 
-  suspend fun buildSnapshotComparisonLists(
+  suspend fun buildSnapshotComparisonPlan(
     leftTimeStamp: Long,
-    leftPackage: SnapshotItem?,
+    leftArchive: ArchiveSnapshotItem?,
     rightTimeStamp: Long,
-    rightPackage: SnapshotItem?
-  ): SnapshotComparisonLists? {
-    return buildSnapshotComparisonListsUseCase(
+    rightArchive: ArchiveSnapshotItem?
+  ): SnapshotComparisonPlan? {
+    return buildSnapshotComparisonPlanUseCase(
       leftTimeStamp = leftTimeStamp,
-      leftPackage = leftPackage,
+      leftArchive = leftArchive,
       rightTimeStamp = rightTimeStamp,
-      rightPackage = rightPackage
+      rightArchive = rightArchive
     )
   }
 
