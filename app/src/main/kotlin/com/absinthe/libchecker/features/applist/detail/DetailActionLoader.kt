@@ -7,16 +7,17 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppBundleSplitItem
 import com.absinthe.libchecker.domain.app.AppManifestProperty
 import com.absinthe.libchecker.domain.app.ExtractNativeLibraryUseCase
-import com.absinthe.libchecker.domain.app.GetAlternativeLaunchItemsUseCase
 import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
 import com.absinthe.libchecker.domain.app.GetAppInfoActionsUseCase
 import com.absinthe.libchecker.domain.app.GetAppInstallSourceDetailsUseCase
-import com.absinthe.libchecker.domain.app.GetAppLaunchActionUseCase
 import com.absinthe.libchecker.domain.app.GetAppManifestPropertiesUseCase
 import com.absinthe.libchecker.domain.app.detail.GetRelatedAppDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.detail.action.AppPackageShareFile
 import com.absinthe.libchecker.domain.app.detail.action.BuildSignatureDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.detail.action.ExportAppPackageShareFileUseCase
+import com.absinthe.libchecker.domain.app.detail.action.GetAlternativeLaunchItemsUseCase
+import com.absinthe.libchecker.domain.app.detail.action.GetAppInfoPrimaryActionsUseCase
+import com.absinthe.libchecker.domain.app.detail.action.GetAppLaunchActionUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetElfDetailUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetLibraryDetailDialogDataUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetOverlayDetailUseCase
@@ -30,6 +31,7 @@ class DetailActionLoader(
   private val getAlternativeLaunchItemsUseCase: GetAlternativeLaunchItemsUseCase,
   private val getAppBundleItemsUseCase: GetAppBundleItemsUseCase,
   private val getAppInfoActionsUseCase: GetAppInfoActionsUseCase,
+  private val getAppInfoPrimaryActionsUseCase: GetAppInfoPrimaryActionsUseCase,
   private val getAppInstallSourceDetailsUseCase: GetAppInstallSourceDetailsUseCase,
   private val getAppLaunchActionUseCase: GetAppLaunchActionUseCase,
   private val getAppManifestPropertiesUseCase: GetAppManifestPropertiesUseCase,
@@ -49,6 +51,8 @@ class DetailActionLoader(
   }
 
   suspend fun getAppInfoActions(packageName: String) = getAppInfoActionsUseCase(packageName)
+
+  suspend fun getAppInfoPrimaryActions(packageName: String?) = getAppInfoPrimaryActionsUseCase(packageName)
 
   suspend fun getAppLaunchAction(packageName: String?) = getAppLaunchActionUseCase(packageName)
 

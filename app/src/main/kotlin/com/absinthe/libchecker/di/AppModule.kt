@@ -37,13 +37,11 @@ import com.absinthe.libchecker.domain.app.ExportInstalledAppsToUriUseCase
 import com.absinthe.libchecker.domain.app.ExtractNativeLibraryUseCase
 import com.absinthe.libchecker.domain.app.FilterAppDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.FilterAppListItemsUseCase
-import com.absinthe.libchecker.domain.app.GetAlternativeLaunchItemsUseCase
 import com.absinthe.libchecker.domain.app.GetApkPreviewInfoUseCase
 import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageUseCase
 import com.absinthe.libchecker.domain.app.GetAppInfoActionsUseCase
 import com.absinthe.libchecker.domain.app.GetAppInstallSourceDetailsUseCase
-import com.absinthe.libchecker.domain.app.GetAppLaunchActionUseCase
 import com.absinthe.libchecker.domain.app.GetAppListContentUseCase
 import com.absinthe.libchecker.domain.app.GetAppListPackageStatesUseCase
 import com.absinthe.libchecker.domain.app.GetAppManifestPropertiesUseCase
@@ -71,6 +69,9 @@ import com.absinthe.libchecker.domain.app.detail.GetRelatedAppDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.detail.ShouldShowStaticLibraryTabUseCase
 import com.absinthe.libchecker.domain.app.detail.action.BuildSignatureDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.detail.action.ExportAppPackageShareFileUseCase
+import com.absinthe.libchecker.domain.app.detail.action.GetAlternativeLaunchItemsUseCase
+import com.absinthe.libchecker.domain.app.detail.action.GetAppInfoPrimaryActionsUseCase
+import com.absinthe.libchecker.domain.app.detail.action.GetAppLaunchActionUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetElfDetailUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetLibraryDetailDialogDataUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetOverlayDetailUseCase
@@ -195,6 +196,7 @@ val appModule = module {
   }
   factory { GetAppInstallSourceDetailsUseCase(androidContext(), get()) }
   factory { GetAppLaunchActionUseCase() }
+  factory { GetAppInfoPrimaryActionsUseCase(BuildConfig.APPLICATION_ID, get()) }
   factory { GetAppDetailMetadataChipsUseCase(androidContext().packageManager) }
   factory { GetAppDetailNativeLibrariesUseCase(get()) }
   factory { GetAppDetailStaticLibraryChipsUseCase() }
@@ -245,6 +247,7 @@ val appModule = module {
       getAlternativeLaunchItemsUseCase = get(),
       getAppBundleItemsUseCase = get(),
       getAppInfoActionsUseCase = get(),
+      getAppInfoPrimaryActionsUseCase = get(),
       getAppInstallSourceDetailsUseCase = get(),
       getAppLaunchActionUseCase = get(),
       getAppManifestPropertiesUseCase = get(),

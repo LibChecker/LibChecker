@@ -1,13 +1,10 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
-import android.content.Intent
 import android.os.Bundle
-import android.provider.Settings
-import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
-import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.domain.app.detail.action.AppInfoLaunchAction
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppInfoBottomSheetView
 import com.absinthe.libchecker.utils.Telemetry
@@ -31,8 +28,10 @@ class AppInfoPrimaryActionController(
     }
     packageName?.let { pkg ->
       coroutineScope.launch {
-        viewModel.getAppLaunchAction(pkg)?.launcherActivity?.let {
-          root.launch.setLongClickCopiedToClipboard(it)
+        val actions = viewModel.getAppInfoPrimaryActions(pkg)
+        val launchAction = actions.launchAction
+        if (launchAction is AppInfoLaunchAction.Available) {
+          root.launch.setLongClickCopiedToClipboard(launchAction.action.launcherActivity)
         }
         Telemetry.recordEvent(
           Constants.Event.APP_INFO_BOTTOM_SHEET,
@@ -41,39 +40,40 @@ class AppInfoPrimaryActionController(
       }
     }
     root.setting.setOnClickListener {
-      openSettings(packageName)
+      coroutineScope.launch {
+        openSettings(packageName)
+      }
     }
   }
 
   private suspend fun launchApp(packageName: String?) {
-    if (packageName == BuildConfig.APPLICATION_ID) {
-      Toasty.showShort(fragment.requireContext(), "But why…")
-      dismiss()
-      return
-    }
+    when (val launchAction = viewModel.getAppInfoPrimaryActions(packageName).launchAction) {
+      AppInfoLaunchAction.Self -> {
+        Toasty.showShort(fragment.requireContext(), "But why…")
+        dismiss()
+      }
 
-    val launchAction = viewModel.getAppLaunchAction(packageName)
-    if (launchAction == null) {
-      showAlternativeLaunchDialog(packageName)
-      dismiss()
-      return
-    }
+      AppInfoLaunchAction.Alternative -> {
+        showAlternativeLaunchDialog(packageName)
+        dismiss()
+      }
 
-    runCatching {
-      fragment.startActivity(launchAction.intent)
-    }.onFailure {
-      showAlternativeLaunchDialog(packageName)
-    }.also {
-      dismiss()
+      is AppInfoLaunchAction.Available -> {
+        runCatching {
+          fragment.startActivity(launchAction.action.intent)
+        }.onFailure {
+          showAlternativeLaunchDialog(packageName)
+        }.also {
+          dismiss()
+        }
+      }
     }
   }
 
-  private fun openSettings(packageName: String?) {
+  private suspend fun openSettings(packageName: String?) {
     try {
-      val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-        .setData("package:$packageName".toUri())
-        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-      fragment.startActivity(intent)
+      val actions = viewModel.getAppInfoPrimaryActions(packageName)
+      fragment.startActivity(actions.settingsIntent)
       Telemetry.recordEvent(
         Constants.Event.APP_INFO_BOTTOM_SHEET,
         mapOf(

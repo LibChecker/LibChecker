@@ -104,6 +104,8 @@ class DetailViewModel(
 
   suspend fun getAppInfoActions(packageName: String) = detailActionLoader.getAppInfoActions(packageName)
 
+  suspend fun getAppInfoPrimaryActions(packageName: String?) = detailActionLoader.getAppInfoPrimaryActions(packageName)
+
   suspend fun getAppLaunchAction(packageName: String?) = detailActionLoader.getAppLaunchAction(packageName)
 
   suspend fun getAlternativeLaunchItems(packageName: String) = detailActionLoader.getAlternativeLaunchItems(packageName)
