@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.snapshot
+package com.absinthe.libchecker.domain.snapshot.sync
 
 import com.absinthe.libchecker.domain.app.PackageChangeState
 import kotlinx.coroutines.CoroutineScope

@@ -34,10 +34,10 @@ import com.absinthe.libchecker.domain.app.PackageChangeState
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotCapturePlan
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
+import com.absinthe.libchecker.domain.snapshot.sync.SnapshotPackageChangeProcessor
 import com.absinthe.libchecker.features.album.ui.AlbumActivity
 import com.absinthe.libchecker.features.home.HomeViewModel
 import com.absinthe.libchecker.features.home.INavViewContainer
-import com.absinthe.libchecker.features.snapshot.SnapshotPackageChangeProcessor
 import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
 import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ENTITY
 import com.absinthe.libchecker.features.snapshot.detail.ui.SnapshotDetailActivity
