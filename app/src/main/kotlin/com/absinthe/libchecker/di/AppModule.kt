@@ -170,6 +170,7 @@ import com.absinthe.libchecker.domain.statistics.BuildDetailedAbiChartDataUseCas
 import com.absinthe.libchecker.domain.statistics.BuildFeatureFlagChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildLibReferenceDetailDialogRequestUseCase
 import com.absinthe.libchecker.domain.statistics.BuildPageSize16KBChartDataUseCase
+import com.absinthe.libchecker.domain.statistics.ChartDataProvider
 import com.absinthe.libchecker.domain.statistics.ChartSettingsRepository
 import com.absinthe.libchecker.domain.statistics.ComputeLibReferenceUseCase
 import com.absinthe.libchecker.domain.statistics.GetAndroidDistributionUseCase
@@ -193,7 +194,6 @@ import com.absinthe.libchecker.features.applist.detail.content.DetailComponentCo
 import com.absinthe.libchecker.features.applist.detail.content.DetailNativeLibContentLoader
 import com.absinthe.libchecker.features.applist.detail.content.DetailPermissionContentLoader
 import com.absinthe.libchecker.features.applist.detail.ui.ApkDetailActivity
-import com.absinthe.libchecker.features.chart.ChartDataProvider
 import com.absinthe.libchecker.features.chart.ChartDataSourceFactory
 import com.absinthe.libchecker.features.chart.ChartViewModel
 import com.absinthe.libchecker.features.home.HomeViewModel

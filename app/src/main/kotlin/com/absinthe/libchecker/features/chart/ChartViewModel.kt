@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppListItemViewState
 import com.absinthe.libchecker.domain.app.AppListRepository
+import com.absinthe.libchecker.domain.statistics.ChartDataProvider
 import com.absinthe.libchecker.domain.statistics.ChartFeatureInitializationPlan
 import com.absinthe.libchecker.domain.statistics.ChartSettingsRepository
 import com.absinthe.libchecker.domain.statistics.ObserveChartFeatureInitializationPlansUseCase

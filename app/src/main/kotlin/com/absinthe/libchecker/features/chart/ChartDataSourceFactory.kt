@@ -3,6 +3,7 @@ package com.absinthe.libchecker.features.chart
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.statistics.BuildApiLevelChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildFeatureFlagChartDataUseCase
+import com.absinthe.libchecker.domain.statistics.ChartDataProvider
 import com.absinthe.libchecker.features.chart.impl.AABChartDataSource
 import com.absinthe.libchecker.features.chart.impl.ABIChartDataSource
 import com.absinthe.libchecker.features.chart.impl.ApiLevelChartDataSource
