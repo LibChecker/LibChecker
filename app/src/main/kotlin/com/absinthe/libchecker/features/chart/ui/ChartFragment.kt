@@ -14,13 +14,14 @@ import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.GlobalFeatures
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentPieChartBinding
 import com.absinthe.libchecker.domain.statistics.BuildApiLevelChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildFeatureFlagChartDataUseCase
 import com.absinthe.libchecker.features.chart.BaseChartDataSource
 import com.absinthe.libchecker.features.chart.BaseVariableChartDataSource
+import com.absinthe.libchecker.features.chart.ChartType
+import com.absinthe.libchecker.features.chart.ChartUiStatePlanner
 import com.absinthe.libchecker.features.chart.ChartViewModel
 import com.absinthe.libchecker.features.chart.IAndroidSDKChart
 import com.absinthe.libchecker.features.chart.IChartDataSource
@@ -88,38 +89,9 @@ class ChartFragment :
   private val isFeatureInitializationPending: Boolean
     get() = featureInitializationRunning ||
       (hasReceivedLCItems && !featureInitializationCompleted && hasUninitializedFeatureItems)
-
-  private enum class ChartType {
-    ABI,
-    KOTLIN,
-    TARGET_SDK,
-    MIN_SDK,
-    COMPILE_SDK,
-    JETPACK_COMPOSE,
-    MARKET_DISTRIBUTION,
-    AAB,
-    SUPPORT_16KB
-  }
-
-  private val chartTypeToIconRes = mutableMapOf(
-    ChartType.ABI to (R.drawable.ic_logo to R.string.abi_string),
-    ChartType.KOTLIN to (com.absinthe.lc.rulesbundle.R.drawable.ic_lib_kotlin to R.string.kotlin_string),
-    ChartType.TARGET_SDK to (R.drawable.ic_label_target_sdk to R.string.target_sdk_string),
-    ChartType.MIN_SDK to (R.drawable.ic_label_min_sdk to R.string.min_sdk_string),
-    ChartType.COMPILE_SDK to (R.drawable.ic_label_compile_sdk to R.string.compile_sdk_string),
-    ChartType.JETPACK_COMPOSE to (com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetpack_compose to R.string.jetpack_compose_short),
-    ChartType.MARKET_DISTRIBUTION to (com.absinthe.lc.rulesbundle.R.drawable.ic_lib_android to R.string.android_dist_label),
-    ChartType.AAB to (R.drawable.ic_aab to R.string.app_bundle)
-  )
+  private val chartUiStatePlanner = ChartUiStatePlanner()
   private var currentChartType = ChartType.ABI
   private var currentExpandingView: ExpandingView? = null
-
-  init {
-    if (GlobalFeatures.ENABLE_DETECTING_16KB_PAGE_ALIGNMENT) {
-      chartTypeToIconRes[ChartType.SUPPORT_16KB] =
-        (R.drawable.ic_16kb_align to R.string.lib_detail_dialog_title_16kb_page_size)
-    }
-  }
 
   override fun init() {
     binding.root.applySystemBarsPadding(top = true, bottom = true)
@@ -204,25 +176,21 @@ class ChartFragment :
 
   private fun renderChartTypeSelector() {
     val featureChartsAvailable = !isFeatureInitializationPending
-    if (!featureChartsAvailable && currentChartType.requiresFeatureInitialization()) {
-      currentChartType = ChartType.ABI
-    }
+    val selectorPlan = chartUiStatePlanner.planChartTypes(
+      currentChartType = currentChartType,
+      featureChartsAvailable = featureChartsAvailable
+    )
+    currentChartType = selectorPlan.selectedType
 
     binding.featuresContainer.removeAllViews()
     currentExpandingView = null
 
-    var firstView: ExpandingView? = null
-    var firstType: ChartType? = null
-    chartTypeToIconRes.forEach { (chartType, content) ->
-      if (chartType.requiresFeatureInitialization() && !featureChartsAvailable) {
-        return@forEach
-      }
-
+    selectorPlan.visibleTypes.forEach { chartType ->
       val view = ExpandingView(requireContext()).apply {
         layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).also { lp ->
           lp.setMargins(4.dp, 4.dp, 4.dp, 4.dp)
         }
-        setContent(content.first, getString(content.second))
+        setContent(chartType.iconRes, getString(chartType.titleRes))
         setOnClickListener {
           if (currentChartType == chartType || !this@ChartFragment::allLCItemsStateFlow.isInitialized) {
             return@setOnClickListener
@@ -236,43 +204,27 @@ class ChartFragment :
         }
       }
 
-      if (firstView == null) {
-        firstView = view
-        firstType = chartType
-      }
       if (currentChartType == chartType) {
         currentExpandingView = view
         view.toggle()
       }
       binding.featuresContainer.addView(view)
     }
-
-    if (currentExpandingView == null) {
-      currentExpandingView = firstView
-      firstType?.let { currentChartType = it }
-      firstView?.toggle()
-    }
-  }
-
-  private fun ChartType.requiresFeatureInitialization(): Boolean {
-    return this == ChartType.KOTLIN || this == ChartType.JETPACK_COMPOSE
   }
 
   private fun updateProgressIndicator() {
-    val progress = when {
-      chartLoadingProgress < LOADING_PROGRESS_MAX -> chartLoadingProgress
-      isFeatureInitializationPending -> LOADING_PROGRESS_INFINITY
-      else -> LOADING_PROGRESS_MAX
-    }
+    val progressPlan = chartUiStatePlanner.planProgress(
+      chartLoadingProgress = chartLoadingProgress,
+      featureInitializationPending = isFeatureInitializationPending
+    )
 
     binding.progressHorizontal.let { indicator ->
-      if (progress < LOADING_PROGRESS_MAX) {
-        if (progress <= 0) {
-          indicator.isIndeterminate = progress == LOADING_PROGRESS_INFINITY
+      if (progressPlan.isVisible) {
+        indicator.isIndeterminate = progressPlan.isIndeterminate
+        if (progressPlan.isIndeterminate || progressPlan.progress == 0) {
           indicator.progress = 0
         } else {
-          indicator.isIndeterminate = false
-          indicator.setProgressCompat(progress, true)
+          indicator.setProgressCompat(progressPlan.progress, true)
         }
         indicator.show()
       } else {
