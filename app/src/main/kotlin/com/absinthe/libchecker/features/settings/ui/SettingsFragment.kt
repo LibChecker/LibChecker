@@ -38,6 +38,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.database.RulesRepository
+import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.features.about.AboutPageBuilder
 import com.absinthe.libchecker.features.applist.detail.ui.ApkDetailActivity
 import com.absinthe.libchecker.features.home.HomeViewModel
@@ -59,6 +60,7 @@ import com.google.android.material.card.MaterialCardView
 import java.io.File
 import java.util.Locale
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 import rikka.recyclerview.fixEdgeEffect
 import rikka.widget.borderview.BorderRecyclerView
 import rikka.widget.borderview.BorderView
@@ -82,6 +84,7 @@ class SettingsFragment :
   private lateinit var borderViewDelegate: BorderViewDelegate
   private lateinit var prefRecyclerView: RecyclerView
   private val viewModel: HomeViewModel by activityViewModels()
+  private val snapshotSettingsRepository: SnapshotSettingsRepository by inject()
 
   override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
     setPreferencesFromResource(R.xml.settings, null)
@@ -147,7 +150,7 @@ class SettingsFragment :
     findPreference<ListPreference>(Constants.PREF_SNAPSHOT_KEEP)?.apply {
       summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
       setOnPreferenceChangeListener { _, newValue ->
-        GlobalValues.snapshotKeep = newValue.toString()
+        snapshotSettingsRepository.keepRule = newValue.toString()
         true
       }
     }

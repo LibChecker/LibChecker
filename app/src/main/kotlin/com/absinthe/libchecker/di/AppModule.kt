@@ -388,7 +388,7 @@ val appModule = module {
   factory { BuildInstalledSnapshotItemUseCase(get()) }
   factory { BuildPackageComparisonSnapshotItemUseCase(androidContext().packageManager) }
   factory { BuildSnapshotAbiDisplayDataUseCase(androidContext()) }
-  factory { BuildSnapshotCapturePlanUseCase() }
+  factory { BuildSnapshotCapturePlanUseCase(get()) }
   factory { BuildSnapshotComparisonListsUseCase(get()) }
   factory { BuildSnapshotComparisonPlanUseCase(get()) }
   factory { BuildSnapshotListUpdatePlanUseCase(get(), get(), get()) }

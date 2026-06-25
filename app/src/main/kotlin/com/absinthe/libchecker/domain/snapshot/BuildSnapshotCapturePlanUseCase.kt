@@ -6,7 +6,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.LCUris
 
 class BuildSnapshotCapturePlanUseCase(
-  private val snapshotKeep: () -> String = { GlobalValues.snapshotKeep },
+  private val snapshotSettingsRepository: SnapshotSettingsRepository,
   private val authKey: () -> Int = GlobalValues::generateAuthKey
 ) {
 
@@ -15,7 +15,7 @@ class BuildSnapshotCapturePlanUseCase(
       return SnapshotCapturePlan.Capture(dropPrevious = false)
     }
 
-    return when (snapshotKeep()) {
+    return when (snapshotSettingsRepository.keepRule) {
       Constants.SNAPSHOT_DEFAULT -> SnapshotCapturePlan.ConfirmKeepPrevious(
         bridgeUri = buildShootBridgeUri(dropPrevious = false)
       )
