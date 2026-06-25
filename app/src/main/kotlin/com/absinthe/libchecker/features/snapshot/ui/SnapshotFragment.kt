@@ -264,7 +264,7 @@ class SnapshotFragment :
       }.launchIn(lifecycleScope)
       snapshotDiffItemsFlow.onEach {
         items = it
-        updateItems(it)
+        updateItems()
 
         lifecycleScope.launch(Dispatchers.IO) {
           delay(250)
@@ -322,19 +322,19 @@ class SnapshotFragment :
           if (it.item.deleted) {
             pendingParticleRemovePackageNames += it.item.packageName
           }
-          val newItems = adapter.data.toMutableList()
+          val newItems = items.toMutableList()
           newItems.removeIf { item -> item.packageName == it.item.packageName }
           newItems.add(it.item)
           items = newItems
-          updateItems(newItems)
+          updateItems()
         }
 
         is SnapshotViewModel.Effect.DiffItemRemove -> {
           pendingParticleRemovePackageNames += it.packageName
-          val newItems = adapter.data.toMutableList()
+          val newItems = items.toMutableList()
           newItems.removeIf { item -> item.packageName == it.packageName }
           items = newItems
-          updateItems(newItems)
+          updateItems()
         }
 
         is SnapshotViewModel.Effect.ComparingProgressChange -> {
@@ -503,7 +503,7 @@ class SnapshotFragment :
         advancedMenuBSDFragment = SnapshotMenuBSDFragment().apply {
           setOnDismissListener { optionsDiff ->
             if (optionsDiff > 0) {
-              updateItems(adapter.data, true)
+              updateItems(highlightRefresh = true)
             }
             advancedMenuBSDFragment = null
           }
@@ -617,26 +617,17 @@ class SnapshotFragment :
     if (keyword != newText) {
       keyword = newText.orEmpty()
       adapter.highlightText = keyword
-      val list = if (keyword.isEmpty()) {
-        items
-      } else {
-        items.asSequence()
-          .filter {
-            it.packageName.contains(keyword, ignoreCase = true) ||
-              it.labelDiff.old.contains(keyword, ignoreCase = true) ||
-              it.labelDiff.new?.contains(keyword, ignoreCase = true) == true
-          }.toList()
-      }
-      updateItems(list, true)
+      updateItems(highlightRefresh = true)
     }
     return false
   }
 
-  private fun updateItems(list: List<SnapshotDiffItem>, highlightRefresh: Boolean = false) = lifecycleScope.launch(Dispatchers.Main) {
+  private fun updateItems(highlightRefresh: Boolean = false) = lifecycleScope.launch(Dispatchers.Main) {
     val updatePlan = snapshotListUpdatePlanner.plan(
       SnapshotListUpdatePlanner.Request(
         currentItems = adapter.data,
-        sourceItems = list,
+        sourceItems = items,
+        searchKeyword = keyword,
         pendingRemovePackageNames = pendingParticleRemovePackageNames.toSet(),
         hideNoComponentChanges = GlobalValues.snapshotOptions.and(SnapshotOptions.HIDE_NO_COMPONENT_CHANGES) != 0,
         highlightRefresh = highlightRefresh

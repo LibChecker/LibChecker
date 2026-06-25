@@ -7,6 +7,7 @@ class SnapshotListUpdatePlanner {
 
   fun plan(request: Request): Plan {
     val sortedItems = request.sourceItems.asSequence()
+      .filter { it.matchesSearchKeyword(request.searchKeyword) }
       .filterNot { request.hideNoComponentChanges && it.isNothingChanged() }
       .sortedByDescending { it.updateTime }
       .toList()
@@ -44,9 +45,19 @@ class SnapshotListUpdatePlanner {
     )
   }
 
+  private fun SnapshotDiffItem.matchesSearchKeyword(keyword: String): Boolean {
+    if (keyword.isEmpty()) {
+      return true
+    }
+    return packageName.contains(keyword, ignoreCase = true) ||
+      labelDiff.old.contains(keyword, ignoreCase = true) ||
+      labelDiff.new?.contains(keyword, ignoreCase = true) == true
+  }
+
   data class Request(
     val currentItems: List<SnapshotDiffItem>,
     val sourceItems: List<SnapshotDiffItem>,
+    val searchKeyword: String,
     val pendingRemovePackageNames: Set<String>,
     val hideNoComponentChanges: Boolean,
     val highlightRefresh: Boolean
