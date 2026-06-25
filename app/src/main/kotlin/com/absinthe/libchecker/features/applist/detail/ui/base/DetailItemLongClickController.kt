@@ -2,19 +2,14 @@ package com.absinthe.libchecker.features.applist.detail.ui.base
 
 import android.widget.ArrayAdapter
 import android.widget.TextView
-import com.absinthe.libchecker.annotation.ACTION
-import com.absinthe.libchecker.annotation.ACTION_IN_RULES
 import com.absinthe.libchecker.annotation.ACTIVITY
-import com.absinthe.libchecker.annotation.ET_NOT_ELF
 import com.absinthe.libchecker.compat.VersionCompat
+import com.absinthe.libchecker.domain.app.detail.action.DetailItemLongClickActions
 import com.absinthe.libchecker.features.applist.Referable
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.ui.ELFDetailDialogFragment
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibStringAdapter
 import com.absinthe.libchecker.features.applist.detail.ui.impl.ComponentsAnalysisFragment
-import com.absinthe.libchecker.features.applist.detail.ui.impl.MetaDataAnalysisFragment
-import com.absinthe.libchecker.features.applist.detail.ui.impl.NativeAnalysisFragment
-import com.absinthe.libchecker.features.applist.detail.ui.impl.PermissionAnalysisFragment
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.integrations.anywhere.AnywhereManager
 import com.absinthe.libchecker.integrations.blocker.BlockerManager
@@ -49,20 +44,17 @@ class DetailItemLongClickController(
     val packageName = packageName()
     val actionMap = mutableMapOf<Int, () -> Unit>()
     val arrayAdapter = ArrayAdapter<String>(context, android.R.layout.simple_list_item_1)
-    var componentName = item.item.name
-    if (fragment is PermissionAnalysisFragment) {
-      componentName = componentName.substringBefore(" ")
-    }
-    val fullComponentName = if (componentName.startsWith(".")) {
-      packageName + componentName
-    } else {
-      componentName
-    }
+    val actions = viewModel.buildDetailItemLongClickActions(
+      item = item,
+      packageName = packageName,
+      detailType = type(),
+      canReference = fragment is Referable
+    )
 
-    addCopyAction(arrayAdapter, actionMap, componentName, item)
-    addElfActions(arrayAdapter, actionMap, packageName, item)
-    addReferenceAction(arrayAdapter, actionMap, componentName, item)
-    addIntegrationActions(arrayAdapter, actionMap, packageName, componentName, fullComponentName, position)
+    addCopyAction(arrayAdapter, actionMap, actions)
+    addElfActions(arrayAdapter, actionMap, item, actions)
+    addReferenceAction(arrayAdapter, actionMap, actions)
+    addIntegrationActions(arrayAdapter, actionMap, actions, position)
 
     BaseAlertDialogBuilder(context)
       .setAdapter(arrayAdapter) { _, which ->
@@ -74,17 +66,12 @@ class DetailItemLongClickController(
   private fun addCopyAction(
     arrayAdapter: ArrayAdapter<String>,
     actionMap: MutableMap<Int, () -> Unit>,
-    componentName: String,
-    item: LibStringItemChip
+    actions: DetailItemLongClickActions
   ) {
     val context = fragment.requireContext()
     arrayAdapter.add(fragment.getString(android.R.string.copy))
     actionMap[arrayAdapter.count - 1] = {
-      if (fragment is MetaDataAnalysisFragment) {
-        ClipboardUtils.put(context, componentName + ": " + item.item.source)
-      } else {
-        ClipboardUtils.put(context, componentName)
-      }
+      ClipboardUtils.put(context, actions.copyText)
       VersionCompat.showCopiedOnClipboardToast(context)
     }
   }
@@ -92,10 +79,10 @@ class DetailItemLongClickController(
   private fun addElfActions(
     arrayAdapter: ArrayAdapter<String>,
     actionMap: MutableMap<Int, () -> Unit>,
-    packageName: String,
-    item: LibStringItemChip
+    item: LibStringItemChip,
+    actions: DetailItemLongClickActions
   ) {
-    if (viewModel.isApkPreview || fragment !is NativeAnalysisFragment) {
+    if (!actions.elfExtractAvailable) {
       return
     }
 
@@ -122,14 +109,13 @@ class DetailItemLongClickController(
       }
     }
 
-    if (item.item.elfInfo.elfType != ET_NOT_ELF) {
+    actions.elfInfo?.let { elfInfo ->
       arrayAdapter.add(fragment.getString(com.absinthe.libchecker.R.string.lib_detail_elf_info))
       actionMap[arrayAdapter.count - 1] = {
         ELFDetailDialogFragment.newInstance(
-          packageName = packageName,
-          elfPath = item.item.source.orEmpty(),
-          ruleIcon = item.rule?.iconRes
-            ?: com.absinthe.lc.rulesbundle.R.drawable.ic_sdk_placeholder
+          packageName = elfInfo.packageName,
+          elfPath = elfInfo.elfPath,
+          ruleIcon = elfInfo.ruleIcon
         ).show(fragment.childFragmentManager, ELFDetailDialogFragment::class.java.name)
       }
     }
@@ -138,44 +124,35 @@ class DetailItemLongClickController(
   private fun addReferenceAction(
     arrayAdapter: ArrayAdapter<String>,
     actionMap: MutableMap<Int, () -> Unit>,
-    componentName: String,
-    item: LibStringItemChip
+    actions: DetailItemLongClickActions
   ) {
-    if (fragment !is Referable || componentName.startsWith(".")) {
-      return
-    }
+    val reference = actions.reference ?: return
 
     arrayAdapter.add(fragment.getString(com.absinthe.libchecker.R.string.tab_lib_reference_statistics))
     actionMap[arrayAdapter.count - 1] = {
-      val refName = item.rule?.libName ?: componentName
-      val libType = if (item.rule?.libType == ACTION_IN_RULES) ACTION else type()
-      fragment.activity?.launchLibReferencePage(refName, item.rule?.label, libType, null)
+      fragment.activity?.launchLibReferencePage(reference.refName, reference.label, reference.type, null)
     }
   }
 
   private fun addIntegrationActions(
     arrayAdapter: ArrayAdapter<String>,
     actionMap: MutableMap<Int, () -> Unit>,
-    packageName: String,
-    componentName: String,
-    fullComponentName: String,
+    actions: DetailItemLongClickActions,
     position: Int
   ) {
-    if (viewModel.isApk || viewModel.isApkPreview) {
+    if (!actions.integrationsAvailable) {
       return
     }
 
-    addBlockerAction(arrayAdapter, actionMap, packageName, componentName, fullComponentName, position)
-    addMonkeyKingAction(arrayAdapter, actionMap, packageName, componentName, fullComponentName, position)
-    addAnywhereAction(arrayAdapter, actionMap, packageName, componentName)
+    addBlockerAction(arrayAdapter, actionMap, actions, position)
+    addMonkeyKingAction(arrayAdapter, actionMap, actions, position)
+    addAnywhereAction(arrayAdapter, actionMap, actions)
   }
 
   private fun addBlockerAction(
     arrayAdapter: ArrayAdapter<String>,
     actionMap: MutableMap<Int, () -> Unit>,
-    packageName: String,
-    componentName: String,
-    fullComponentName: String,
+    actions: DetailItemLongClickActions,
     position: Int
   ) {
     if (fragment !is ComponentsAnalysisFragment || !BlockerManager.isSupportInteraction) {
@@ -184,9 +161,9 @@ class DetailItemLongClickController(
 
     val context = fragment.requireContext()
     if (integrationBlockerList == null) {
-      integrationBlockerList = BlockerManager().queryBlockedComponent(context, packageName)
+      integrationBlockerList = BlockerManager().queryBlockedComponent(context, actions.packageName)
     }
-    val blockerShouldBlock = integrationBlockerList?.any { it.name == fullComponentName } == false
+    val blockerShouldBlock = integrationBlockerList?.any { it.name == actions.fullComponentName } == false
     val blockStr = if (blockerShouldBlock) {
       com.absinthe.libchecker.R.string.integration_blocker_menu_block
     } else {
@@ -197,14 +174,14 @@ class DetailItemLongClickController(
       BlockerManager().apply {
         addBlockedComponent(
           context,
-          packageName,
-          componentName,
+          actions.packageName,
+          actions.componentName,
           type(),
           blockerShouldBlock
         )
-        integrationBlockerList = queryBlockedComponent(context, packageName)
+        integrationBlockerList = queryBlockedComponent(context, actions.packageName)
         val shouldTurnToDisable =
-          integrationBlockerList?.any { it.name == fullComponentName } == true && blockerShouldBlock
+          integrationBlockerList?.any { it.name == actions.fullComponentName } == true && blockerShouldBlock
         animateTvTitle(position, shouldTurnToDisable)
       }
     }
@@ -213,9 +190,7 @@ class DetailItemLongClickController(
   private fun addMonkeyKingAction(
     arrayAdapter: ArrayAdapter<String>,
     actionMap: MutableMap<Int, () -> Unit>,
-    packageName: String,
-    componentName: String,
-    fullComponentName: String,
+    actions: DetailItemLongClickActions,
     position: Int
   ) {
     if (fragment !is ComponentsAnalysisFragment || !MonkeyKingManager.isSupportInteraction) {
@@ -224,9 +199,9 @@ class DetailItemLongClickController(
 
     val context = fragment.requireContext()
     if (integrationMonkeyKingBlockList == null) {
-      integrationMonkeyKingBlockList = MonkeyKingManager().queryBlockedComponent(context, packageName)
+      integrationMonkeyKingBlockList = MonkeyKingManager().queryBlockedComponent(context, actions.packageName)
     }
-    val monkeyKingShouldBlock = integrationMonkeyKingBlockList?.any { it.name == componentName } == false
+    val monkeyKingShouldBlock = integrationMonkeyKingBlockList?.any { it.name == actions.componentName } == false
     val actionTitle = if (monkeyKingShouldBlock) {
       com.absinthe.libchecker.R.string.integration_monkey_king_menu_block
     } else {
@@ -237,14 +212,14 @@ class DetailItemLongClickController(
       MonkeyKingManager().apply {
         addBlockedComponent(
           context,
-          packageName,
-          componentName,
+          actions.packageName,
+          actions.componentName,
           type(),
           monkeyKingShouldBlock
         )
-        integrationMonkeyKingBlockList = queryBlockedComponent(context, packageName)
+        integrationMonkeyKingBlockList = queryBlockedComponent(context, actions.packageName)
         val shouldTurnToDisable =
-          integrationMonkeyKingBlockList?.any { it.name == fullComponentName } == true && monkeyKingShouldBlock
+          integrationMonkeyKingBlockList?.any { it.name == actions.fullComponentName } == true && monkeyKingShouldBlock
         animateTvTitle(position, shouldTurnToDisable)
       }
     }
@@ -253,8 +228,7 @@ class DetailItemLongClickController(
   private fun addAnywhereAction(
     arrayAdapter: ArrayAdapter<String>,
     actionMap: MutableMap<Int, () -> Unit>,
-    packageName: String,
-    componentName: String
+    actions: DetailItemLongClickActions
   ) {
     if (type() != ACTIVITY || !AnywhereManager.isSupportInteraction) {
       return
@@ -264,8 +238,8 @@ class DetailItemLongClickController(
     actionMap[arrayAdapter.count - 1] = {
       AnywhereManager().launchActivityEditor(
         fragment.requireContext(),
-        packageName,
-        componentName
+        actions.packageName,
+        actions.componentName
       )
     }
   }

@@ -10,7 +10,9 @@ import com.absinthe.libchecker.domain.app.detail.GetRelatedAppDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.detail.action.AppManifestProperty
 import com.absinthe.libchecker.domain.app.detail.action.AppPackageShareFile
 import com.absinthe.libchecker.domain.app.detail.action.BuildDetailItemDialogRequestUseCase
+import com.absinthe.libchecker.domain.app.detail.action.BuildDetailItemLongClickActionsUseCase
 import com.absinthe.libchecker.domain.app.detail.action.BuildSignatureDetailItemsUseCase
+import com.absinthe.libchecker.domain.app.detail.action.DetailItemLongClickActionRequest
 import com.absinthe.libchecker.domain.app.detail.action.ExportAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.detail.action.ExtractNativeLibraryUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetAlternativeLaunchItemsUseCase
@@ -44,6 +46,7 @@ class DetailActionLoader(
   private val getRelatedAppDisplayDataUseCase: GetRelatedAppDisplayDataUseCase,
   private val getXposedModuleInfoUseCase: GetXposedModuleInfoUseCase,
   private val buildDetailItemDialogRequestUseCase: BuildDetailItemDialogRequestUseCase,
+  private val buildDetailItemLongClickActionsUseCase: BuildDetailItemLongClickActionsUseCase,
   private val buildSignatureDetailItemsUseCase: BuildSignatureDetailItemsUseCase,
   private val extractNativeLibraryUseCase: ExtractNativeLibraryUseCase,
   private val prepareAppPackageShareActionUseCase: PrepareAppPackageShareActionUseCase,
@@ -129,6 +132,24 @@ class DetailActionLoader(
     item: LibStringItemChip,
     @LibType detailType: Int
   ) = buildDetailItemDialogRequestUseCase(item, detailType)
+
+  fun buildDetailItemLongClickActions(
+    item: LibStringItemChip,
+    packageName: String,
+    @LibType detailType: Int,
+    canReference: Boolean,
+    isApk: Boolean,
+    isApkPreview: Boolean
+  ) = buildDetailItemLongClickActionsUseCase(
+    DetailItemLongClickActionRequest(
+      item = item,
+      packageName = packageName,
+      detailType = detailType,
+      canReference = canReference,
+      isApk = isApk,
+      isApkPreview = isApkPreview
+    )
+  )
 
   fun buildSignatureDetailItems(detail: String) = buildSignatureDetailItemsUseCase(detail)
 }

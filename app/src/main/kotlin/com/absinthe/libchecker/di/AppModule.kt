@@ -62,6 +62,7 @@ import com.absinthe.libchecker.domain.app.detail.GetRelatedAppDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.detail.ShouldShowStaticLibraryTabUseCase
 import com.absinthe.libchecker.domain.app.detail.action.AllowFileUriExposureUseCase
 import com.absinthe.libchecker.domain.app.detail.action.BuildDetailItemDialogRequestUseCase
+import com.absinthe.libchecker.domain.app.detail.action.BuildDetailItemLongClickActionsUseCase
 import com.absinthe.libchecker.domain.app.detail.action.BuildSignatureDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.detail.action.ExportAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.detail.action.ExtractNativeLibraryUseCase
@@ -227,6 +228,7 @@ val appModule = module {
   factory { BuildNativeLibraryItemDisplayDataUseCase(androidContext()) }
   factory { BuildRelatedAppDisplayDataUseCase(androidContext()) }
   factory { BuildDetailItemDialogRequestUseCase() }
+  factory { BuildDetailItemLongClickActionsUseCase() }
   factory { BuildSignatureDetailItemsUseCase() }
   factory { ClearApkCacheUseCase(androidContext()) }
   factory { CheckRequiredPackageAvailabilityUseCase(get()) }
@@ -262,6 +264,7 @@ val appModule = module {
       getRelatedAppDisplayDataUseCase = get(),
       getXposedModuleInfoUseCase = get(),
       buildDetailItemDialogRequestUseCase = get(),
+      buildDetailItemLongClickActionsUseCase = get(),
       buildSignatureDetailItemsUseCase = get(),
       extractNativeLibraryUseCase = get(),
       prepareAppPackageShareActionUseCase = get(),
