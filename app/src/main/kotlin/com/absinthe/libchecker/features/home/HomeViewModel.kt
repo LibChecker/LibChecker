@@ -14,10 +14,10 @@ import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.ClearApkCacheUseCase
 import com.absinthe.libchecker.domain.app.ExportAppListToUriUseCase
 import com.absinthe.libchecker.domain.app.ExportAppListUseCase
-import com.absinthe.libchecker.domain.app.FeatureInitializationRepository
 import com.absinthe.libchecker.domain.app.GetAppListContentUseCase
 import com.absinthe.libchecker.domain.app.InitializeAppListUseCase
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.ObserveAppListLoadingUseCase
 import com.absinthe.libchecker.domain.app.PackageChangeState
 import com.absinthe.libchecker.domain.app.SyncAppListChangesUseCase
 import com.absinthe.libchecker.domain.app.sync.AppListChangeRequestQueue
@@ -29,8 +29,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -43,7 +41,7 @@ class HomeViewModel(
   private val getAppListContentUseCase: GetAppListContentUseCase,
   private val appListSettingsRepository: AppListSettingsRepository,
   private val clearApkCacheUseCase: ClearApkCacheUseCase,
-  featureInitializationRepository: FeatureInitializationRepository
+  observeAppListLoadingUseCase: ObserveAppListLoadingUseCase
 ) : ViewModel() {
 
   val dbItemsFlow: Flow<List<LCItem>> = appListRepository.items
@@ -55,15 +53,7 @@ class HomeViewModel(
 
   private val _isRequestChangeRunning = MutableStateFlow(false)
   private val isRequestChangeRunning = _isRequestChangeRunning.asStateFlow()
-  val toolbarLoading: Flow<Boolean> = combine(
-    isRequestChangeRunning,
-    featureInitializationRepository.state,
-    dbItemsFlow
-  ) { requestChangeRunning, featureInitializationState, dbItems ->
-    requestChangeRunning ||
-      featureInitializationState.running ||
-      dbItems.any { item -> item.features == FEATURES_NOT_INITIALIZED }
-  }.distinctUntilChanged()
+  val toolbarLoading: Flow<Boolean> = observeAppListLoadingUseCase(isRequestChangeRunning, dbItemsFlow)
 
   var appListStatus: Int = STATUS_NOT_START
   var checkPackagesPermission: Boolean = false
@@ -264,9 +254,5 @@ class HomeViewModel(
   fun clearMenuState() {
     isSearchMenuExpanded = false
     currentSearchQuery = ""
-  }
-
-  private companion object {
-    const val FEATURES_NOT_INITIALIZED = -1
   }
 }

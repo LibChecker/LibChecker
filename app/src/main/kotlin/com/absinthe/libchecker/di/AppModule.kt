@@ -62,6 +62,7 @@ import com.absinthe.libchecker.domain.app.InitializeAppListUseCase
 import com.absinthe.libchecker.domain.app.InitializePendingAppFeaturesUseCase
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.LibraryDetailRepository
+import com.absinthe.libchecker.domain.app.ObserveAppListLoadingUseCase
 import com.absinthe.libchecker.domain.app.PrepareApkAnalysisPackageUseCase
 import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
 import com.absinthe.libchecker.domain.app.SetApkAnalysisEnabledUseCase
@@ -233,6 +234,7 @@ val appModule = module {
   single<LibReferenceSettingsRepository> { GlobalLibReferenceSettingsRepository() }
   single { AllowFileUriExposureUseCase() }
   factory { InitializeAppListUseCase(get(), get(), get()) }
+  factory { ObserveAppListLoadingUseCase(get()) }
   factory { SyncAppListChangesUseCase(get(), get(), get()) }
   factory { BuildAbiChartDataUseCase() }
   factory { BuildApiLevelChartDataUseCase(get()) }
@@ -510,7 +512,7 @@ val appModule = module {
       getAppListContentUseCase = get(),
       appListSettingsRepository = get(),
       clearApkCacheUseCase = get(),
-      featureInitializationRepository = get()
+      observeAppListLoadingUseCase = get()
     )
   }
   viewModel {
