@@ -24,9 +24,6 @@ import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -116,7 +113,7 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
                 val item = timeStampList[position]
                 BaseAlertDialogBuilder(this@AlbumActivity)
                   .setTitle(R.string.dialog_title_confirm_to_delete)
-                  .setMessage(getFormatDateString(item.timestamp))
+                  .setMessage(viewModel.getFormatDateString(item.timestamp))
                   .setPositiveButton(android.R.string.ok) { _, _ ->
                     lifecycleScope.launch(Dispatchers.IO) {
                       val dialog: AlertDialog
@@ -124,11 +121,9 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
                         dialog = com.absinthe.libchecker.utils.UiUtils.createLoadingDialog(this@AlbumActivity)
                         dialog.show()
                       }
-                      viewModel.deleteSnapshotsAndTimeStamp(item.timestamp)
-                      if (position < timeStampList.size) {
-                        timeStampList.removeAt(position)
-                      }
-                      viewModel.selectLatestSnapshotTimestamp(timeStampList)
+                      val remainingTimeStamps = viewModel.deleteSnapshotTimeStamp(item.timestamp)
+                      timeStampList.clear()
+                      timeStampList.addAll(remainingTimeStamps)
                       withContext(Dispatchers.Main) {
                         root.adapter.remove(item)
                         dialog.dismiss()
@@ -184,11 +179,5 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
       subtitle.text = getString(subtitleRes)
     }
     contentDescription = listOf(getString(titleRes), getString(subtitleRes)).joinToString()
-  }
-
-  private fun getFormatDateString(timestamp: Long): String {
-    val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd, HH:mm:ss", Locale.getDefault())
-    val date = Date(timestamp)
-    return simpleDateFormat.format(date)
   }
 }

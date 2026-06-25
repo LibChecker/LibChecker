@@ -123,6 +123,7 @@ import com.absinthe.libchecker.domain.snapshot.CompareSnapshotListsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotWithInstalledAppsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareTrackedSnapshotListsUseCase
 import com.absinthe.libchecker.domain.snapshot.CreateSnapshotDatabaseBackupUseCase
+import com.absinthe.libchecker.domain.snapshot.DeleteSnapshotTimeStampUseCase
 import com.absinthe.libchecker.domain.snapshot.GetApexPackageNamesUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotBackupTargetUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
@@ -395,6 +396,7 @@ val appModule = module {
   factory { GetSnapshotSystemPropDiffsUseCase(get()) }
   factory { GetTrackListItemsUseCase(androidContext().packageManager, get(), get()) }
   factory { SetPackageTrackedUseCase(get(), get()) }
+  factory { DeleteSnapshotTimeStampUseCase(get(), get()) }
   factory { UpdateSnapshotTopAppsUseCase(get(), get()) }
   factory { BuildSnapshotDetailItemsUseCase(androidContext()) }
   factory { SnapshotArchiveUseCase(get(), get()) }
@@ -494,6 +496,7 @@ val appModule = module {
       getSnapshotPackageIconSourcesUseCase = get(),
       getSnapshotSystemPropDiffsUseCase = get(),
       getApexPackageNamesUseCase = get(),
+      deleteSnapshotTimeStampUseCase = get(),
       snapshotSelectionUseCase = get(),
       snapshotTrackChangeRepository = get()
     )

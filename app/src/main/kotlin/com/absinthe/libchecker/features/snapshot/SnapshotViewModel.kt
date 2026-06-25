@@ -10,6 +10,7 @@ import com.absinthe.libchecker.domain.snapshot.BuildSnapshotCapturePlanUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotDetailItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotDiffsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemWithInstalledAppUseCase
+import com.absinthe.libchecker.domain.snapshot.DeleteSnapshotTimeStampUseCase
 import com.absinthe.libchecker.domain.snapshot.GetApexPackageNamesUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotPackageIconSourcesUseCase
@@ -47,6 +48,7 @@ class SnapshotViewModel(
   private val getSnapshotPackageIconSourcesUseCase: GetSnapshotPackageIconSourcesUseCase,
   private val getSnapshotSystemPropDiffsUseCase: GetSnapshotSystemPropDiffsUseCase,
   private val getApexPackageNamesUseCase: GetApexPackageNamesUseCase,
+  private val deleteSnapshotTimeStampUseCase: DeleteSnapshotTimeStampUseCase,
   private val snapshotSelectionUseCase: SnapshotSelectionUseCase,
   private val snapshotTrackChangeRepository: SnapshotTrackChangeRepository
 ) : ViewModel() {
@@ -137,8 +139,10 @@ class SnapshotViewModel(
     return getSnapshotSystemPropDiffsUseCase(timestamp)
   }
 
-  suspend fun deleteSnapshotsAndTimeStamp(timestamp: Long) {
-    snapshotLibrary.deleteTimeStamp(timestamp)
+  suspend fun deleteSnapshotTimeStamp(timestamp: Long): List<TimeStampItem> {
+    val result = deleteSnapshotTimeStampUseCase(timestamp)
+    currentTimeStamp = result.selectedTimestamp
+    return result.remainingTimeStamps
   }
 
   suspend fun retainLatestSnapshotsAndGetTimeStamps(count: Int): List<TimeStampItem> {
@@ -160,11 +164,6 @@ class SnapshotViewModel(
     setEffect {
       Effect.TimeStampChange(timestamp)
     }
-  }
-
-  fun selectLatestSnapshotTimestamp(timeStamps: List<TimeStampItem>) {
-    snapshotSelectionUseCase.selectLatestOrNone(timeStamps)
-    currentTimeStamp = selectedSnapshotTimestamp
   }
 
   fun getDashboardCount(timestamp: Long, isLeft: Boolean) = viewModelScope.launch(Dispatchers.IO) {
