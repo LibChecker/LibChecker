@@ -56,8 +56,8 @@ abstract class BaseAppDetailActivity :
   private val featureItemBuilder by unsafeLazy {
     DetailFeatureItemBuilder(
       activity = this,
+      viewModel = viewModel,
       packageInfo = { viewModel.packageInfo },
-      isApkPreview = { viewModel.isApkPreview },
       apkPreviewInfo = { viewModel.apkPreviewInfo },
       apkAnalyticsMode = { apkAnalyticsMode },
       appIcons = { viewModel.featureState.appIcons },

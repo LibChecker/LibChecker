@@ -16,6 +16,7 @@ import com.absinthe.libchecker.domain.app.detail.action.AppManifestProperty
 import com.absinthe.libchecker.domain.app.detail.action.AppPackageShareFile
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemDialogRequest
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemLongClickActions
+import com.absinthe.libchecker.domain.app.detail.feature.AppDetailFeatureItemData
 import com.absinthe.libchecker.domain.app.detail.navigation.DetailReferenceNavigation
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
@@ -100,6 +101,22 @@ class DetailViewModel(
     packageInfo: PackageInfo,
     apkAnalyticsMode: Boolean
   ) = detailFeatureLoader.buildAppDetailHeaderTitleData(packageState, packageInfo, apkAnalyticsMode)
+
+  fun buildAppDetailFeatureItem(
+    feature: VersionedFeature,
+    currentFeatureCount: Int,
+    apkAnalyticsMode: Boolean,
+    canShowInstallSource: Boolean,
+    canShowAppIcons: Boolean
+  ): AppDetailFeatureItemData? {
+    return detailFeatureLoader.buildAppDetailFeatureItem(
+      feature = feature,
+      currentFeatureCount = currentFeatureCount,
+      apkAnalyticsMode = apkAnalyticsMode,
+      canShowInstallSource = canShowInstallSource,
+      canShowAppIcons = canShowAppIcons
+    )
+  }
 
   suspend fun getAppBundleItems(packageInfo: PackageInfo): List<AppBundleSplitItem> {
     return detailActionLoader.getAppBundleItems(packageInfo)

@@ -91,6 +91,7 @@ import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailPermissionC
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailSignatureChipsUseCase
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailStaticLibraryChipsUseCase
 import com.absinthe.libchecker.domain.app.detail.content.SortAppDetailItemsUseCase
+import com.absinthe.libchecker.domain.app.detail.feature.BuildAppDetailFeatureItemUseCase
 import com.absinthe.libchecker.domain.app.detail.navigation.BuildDetailReferenceNavigationUseCase
 import com.absinthe.libchecker.domain.snapshot.BackupSnapshotArchiveToUriUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
@@ -218,6 +219,7 @@ val appModule = module {
   factory { GetAppListContentUseCase(BuildConfig.APPLICATION_ID, get(), get(), get(), get()) }
   factory { GetAppListPackageStatesUseCase(get()) }
   factory { BuildAppDetailAbiLabelDataUseCase(androidContext()) }
+  factory { BuildAppDetailFeatureItemUseCase() }
   factory { BuildAppDetailHeaderExtraInfoUseCase(androidContext(), get()) }
   factory { BuildAppDetailHeaderTitleDataUseCase(androidContext(), get()) }
   factory { BuildAppExportNativeLibrariesUseCase() }
@@ -322,6 +324,7 @@ val appModule = module {
       buildAppDetailAbiLabelDataUseCase = get(),
       buildAppDetailHeaderExtraInfoUseCase = get(),
       buildAppDetailHeaderTitleDataUseCase = get(),
+      buildAppDetailFeatureItemUseCase = get(),
       shouldShowStaticLibraryTabUseCase = get()
     )
   }
