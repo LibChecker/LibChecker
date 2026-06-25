@@ -103,6 +103,7 @@ import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCas
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotComparisonListsUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotDetailItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotPairDiffUseCase
+import com.absinthe.libchecker.domain.snapshot.CaptureInstalledSnapshotUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemWithInstalledAppUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotListsUseCase
@@ -350,6 +351,7 @@ val appModule = module {
   factory { BuildSnapshotAbiDisplayDataUseCase(androidContext()) }
   factory { BuildSnapshotComparisonListsUseCase(get()) }
   factory { BuildSnapshotPairDiffUseCase() }
+  factory { CaptureInstalledSnapshotUseCase(androidContext().packageManager, get(), get(), get()) }
   factory { CompareSnapshotItemsUseCase() }
   factory { CompareSnapshotListsUseCase(get()) }
   factory { CompareTrackedSnapshotListsUseCase(get(), get()) }

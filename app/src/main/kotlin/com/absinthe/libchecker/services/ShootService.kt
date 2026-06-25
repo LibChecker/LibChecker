@@ -24,18 +24,11 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
-import com.absinthe.libchecker.database.entity.SnapshotItem
-import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
-import com.absinthe.libchecker.domain.snapshot.BuildInstalledSnapshotItemUseCase
-import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
-import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
+import com.absinthe.libchecker.domain.snapshot.CaptureInstalledSnapshotUseCase
 import com.absinthe.libchecker.features.home.ui.MainActivity
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
-import com.absinthe.libchecker.utils.extensions.getPackageSize
-import com.absinthe.libchecker.utils.extensions.getVersionCode
-import com.absinthe.libchecker.utils.toJson
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import java.lang.ref.WeakReference
 import java.text.SimpleDateFormat
@@ -58,10 +51,8 @@ class ShootService : LifecycleService() {
   private val notificationIdShootSuccess = notificationIdShoot + 1
   private val builder by lazy { NotificationCompat.Builder(this, SHOOT_CHANNEL_ID) }
   private val notificationManager by lazy { NotificationManagerCompat.from(this) }
-  private val snapshotRepository: SnapshotRepository by inject()
   private val installedAppRepository: InstalledAppRepository by inject()
-  private val buildInstalledSnapshotItem: BuildInstalledSnapshotItemUseCase by inject()
-  private val snapshotSelectionUseCase: SnapshotSelectionUseCase by inject()
+  private val captureInstalledSnapshot: CaptureInstalledSnapshotUseCase by inject()
   private val listenerList = RemoteCallbackList<OnShootListener>()
 
   private val binder by lazy { ShootBinder(this) }
@@ -190,92 +181,38 @@ class ShootService : LifecycleService() {
     val timer = TimeRecorder().also {
       it.start()
     }
-    val ts = System.currentTimeMillis()
-
-    snapshotRepository.deleteAllSnapshotDiffItems()
-
-    val size = appList.size
-    val dbList = mutableListOf<SnapshotItem>()
-    val currentSnapshotTimestamp = snapshotSelectionUseCase.getCurrentTimestamp()
-    var count = 0
-
     if (areNotificationsEnabled) {
-      builder.setProgress(size, count, false)
+      builder.setProgress(appList.size, 0, false)
       notificationManager.notify(notificationIdShoot, builder.build())
     }
 
-    var currentProgress: Int
-    var lastProgress = 0
-    var dbSnapshotItem: SnapshotItem?
     val shouldSaveFullSnapshot = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.SHOULD_SAVE_FULL_SNAPSHOT)
-
-    for (info in appList) {
-      if (info.applicationInfo == null) {
-        continue
-      }
-      dbSnapshotItem = snapshotRepository.getSnapshot(currentSnapshotTimestamp, info.packageName)
-
-      if (dbSnapshotItem?.versionCode == info.getVersionCode() &&
-        dbSnapshotItem.lastUpdatedTime == info.lastUpdateTime &&
-        dbSnapshotItem.packageSize == info.getPackageSize(true) &&
-        !shouldSaveFullSnapshot
-      ) {
-        Timber.d("computeSnapshots: ${info.packageName} is up to date")
-        dbList.add(
-          dbSnapshotItem.copy().also {
-            it.id = null
-            it.timeStamp = ts
-          }
-        )
-      } else {
-        buildInstalledSnapshotItem(packageManager, info, ts)?.let(dbList::add)
-      }
-
-      count++
-      currentProgress = count * 100 / size
-      if (currentProgress > lastProgress) {
-        lastProgress = currentProgress
-        notifyProgress(currentProgress)
-      }
-
-      if (dbList.size >= 50) {
-        if (areNotificationsEnabled) {
-          builder.setProgress(size, count, false)
-          notificationManager.notify(notificationIdShoot, builder.build())
-        }
-        snapshotRepository.insertSnapshots(dbList)
-        dbList.clear()
+    val result = captureInstalledSnapshot(
+      CaptureInstalledSnapshotUseCase.Request(
+        appList = appList,
+        dropPrevious = dropPrevious,
+        autoRemoveThreshold = GlobalValues.snapshotAutoRemoveThreshold,
+        shouldSaveFullSnapshot = shouldSaveFullSnapshot,
+        systemProps = getSystemProps()
+      )
+    ) { progress ->
+      notifyProgress(progress.percent)
+      if (areNotificationsEnabled) {
+        builder.setProgress(progress.total, progress.count, false)
+        notificationManager.notify(notificationIdShoot, builder.build())
       }
     }
+    val timestamp = result.timestamp
 
     if (areNotificationsEnabled) {
-      builder.setProgress(size, count, false)
+      builder.setProgress(result.total, result.processedCount, false)
       notificationManager.notify(notificationIdShoot, builder.build())
-    }
-    snapshotRepository.insertSnapshots(dbList)
-
-    val systemProps = mutableMapOf<String, String>()
-    systemProps[Constants.SystemProps.RO_BUILD_VERSION_SECURITY_PATCH] = Build.VERSION.SECURITY_PATCH
-    systemProps[Constants.SystemProps.RO_BUILD_ID] = Build.ID
-
-    snapshotRepository.insertTimeStamp(TimeStampItem(ts, null, systemProps.toJson()))
-
-    if (dropPrevious) {
-      Timber.i("deleteSnapshotsAndTimeStamp: $currentSnapshotTimestamp")
-      snapshotRepository.deleteSnapshotsAndTimeStamp(currentSnapshotTimestamp)
-    }
-
-    if (GlobalValues.snapshotAutoRemoveThreshold > 0) {
-      snapshotRepository.retainLatestSnapshots(GlobalValues.snapshotAutoRemoveThreshold)
-    }
-
-    if (areNotificationsEnabled) {
       notificationManager.cancel(notificationIdShoot)
 
       builder.setProgress(0, 0, false)
         .setOngoing(false)
         .setContentTitle(getString(R.string.noti_shoot_title_saved))
-        .setContentText(getFormatDateString(ts))
+        .setContentText(getFormatDateString(timestamp))
       notificationManager.notify(notificationIdShootSuccess, builder.build())
     }
 
@@ -286,9 +223,8 @@ class ShootService : LifecycleService() {
     timer.end()
     Timber.d("computeSnapshots: $timer")
 
-    snapshotSelectionUseCase.setCurrentTimestamp(ts)
     _isShooting = false
-    notifyFinished(ts)
+    notifyFinished(timestamp)
     ServiceCompat.stopForeground(this@ShootService, ServiceCompat.STOP_FOREGROUND_REMOVE)
     Timber.i("computeSnapshots end")
     isComputing = false
@@ -296,6 +232,13 @@ class ShootService : LifecycleService() {
     if (stopWhenFinish) {
       stopSelf()
     }
+  }
+
+  private fun getSystemProps(): Map<String, String> {
+    return mapOf(
+      Constants.SystemProps.RO_BUILD_VERSION_SECURITY_PATCH to Build.VERSION.SECURITY_PATCH,
+      Constants.SystemProps.RO_BUILD_ID to Build.ID
+    )
   }
 
   private fun getFormatDateString(timestamp: Long): String {
