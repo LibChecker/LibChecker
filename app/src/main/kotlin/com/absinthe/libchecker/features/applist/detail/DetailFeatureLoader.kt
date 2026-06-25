@@ -1,14 +1,14 @@
 package com.absinthe.libchecker.features.applist.detail
 
 import android.content.pm.PackageInfo
-import com.absinthe.libchecker.domain.app.AppDetailAbiLabelData
-import com.absinthe.libchecker.domain.app.AppDetailHeaderExtraInfo
-import com.absinthe.libchecker.domain.app.BuildAppDetailAbiLabelDataUseCase
-import com.absinthe.libchecker.domain.app.BuildAppDetailHeaderExtraInfoUseCase
-import com.absinthe.libchecker.domain.app.BuildAppDetailHeaderTitleDataUseCase
-import com.absinthe.libchecker.domain.app.GetAppDetailAbiUseCase
-import com.absinthe.libchecker.domain.app.GetAppDetailFeaturesUseCase
 import com.absinthe.libchecker.domain.app.VersionedFeature
+import com.absinthe.libchecker.domain.app.detail.AppDetailAbiLabelData
+import com.absinthe.libchecker.domain.app.detail.AppDetailHeaderExtraInfo
+import com.absinthe.libchecker.domain.app.detail.BuildAppDetailAbiLabelDataUseCase
+import com.absinthe.libchecker.domain.app.detail.BuildAppDetailHeaderExtraInfoUseCase
+import com.absinthe.libchecker.domain.app.detail.BuildAppDetailHeaderTitleDataUseCase
+import com.absinthe.libchecker.domain.app.detail.GetAppDetailAbiUseCase
+import com.absinthe.libchecker.domain.app.detail.GetAppDetailFeaturesUseCase
 import com.absinthe.libchecker.domain.app.detail.ShouldShowStaticLibraryTabUseCase
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
 import kotlinx.coroutines.CoroutineScope

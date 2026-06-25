@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
 import androidx.fragment.app.FragmentActivity
-import com.absinthe.libchecker.domain.app.AppDetailAbiLabelData
+import com.absinthe.libchecker.domain.app.detail.AppDetailAbiLabelData
 import com.absinthe.libchecker.features.applist.detail.FeaturesDialog
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.node.AbiLabelNode
 import com.absinthe.libchecker.features.applist.detail.ui.view.DetailsTitleView

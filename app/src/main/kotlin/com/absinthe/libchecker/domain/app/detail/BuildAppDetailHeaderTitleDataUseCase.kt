@@ -1,8 +1,9 @@
-package com.absinthe.libchecker.domain.app
+package com.absinthe.libchecker.domain.app.detail
 
 import android.content.Context
 import android.content.pm.PackageInfo
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
 import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getVersionString
