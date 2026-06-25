@@ -62,6 +62,7 @@ import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.LibraryDetailRepository
 import com.absinthe.libchecker.domain.app.PrepareApkAnalysisPackageUseCase
 import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
+import com.absinthe.libchecker.domain.app.SetApkAnalysisEnabledUseCase
 import com.absinthe.libchecker.domain.app.SyncAppListChangesUseCase
 import com.absinthe.libchecker.domain.app.detail.BuildAppDetailAbiLabelDataUseCase
 import com.absinthe.libchecker.domain.app.detail.BuildAppDetailHeaderExtraInfoUseCase
@@ -182,6 +183,7 @@ import com.absinthe.libchecker.features.applist.detail.content.DetailChipContent
 import com.absinthe.libchecker.features.applist.detail.content.DetailComponentContentLoader
 import com.absinthe.libchecker.features.applist.detail.content.DetailNativeLibContentLoader
 import com.absinthe.libchecker.features.applist.detail.content.DetailPermissionContentLoader
+import com.absinthe.libchecker.features.applist.detail.ui.ApkDetailActivity
 import com.absinthe.libchecker.features.chart.ChartDataProvider
 import com.absinthe.libchecker.features.chart.ChartDataSourceFactory
 import com.absinthe.libchecker.features.chart.ChartViewModel
@@ -302,6 +304,13 @@ val appModule = module {
   factory { GetRelatedAppListItemUseCase(get(), get()) }
   factory { GetRelatedAppDisplayDataUseCase(get(), get()) }
   factory { GetXposedModuleInfoUseCase(androidContext().packageManager, get()) }
+  factory {
+    SetApkAnalysisEnabledUseCase(
+      BuildConfig.APPLICATION_ID,
+      androidContext().packageManager,
+      ApkDetailActivity::class.java.name
+    )
+  }
   factory { ShouldShowStaticLibraryTabUseCase(get()) }
   factory { InitializePendingAppFeaturesUseCase(get(), get()) }
   factory { SortAppDetailItemsUseCase() }

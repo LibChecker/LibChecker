@@ -2,11 +2,8 @@ package com.absinthe.libchecker.features.settings.ui
 
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
-import android.content.ComponentName
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.RemoteException
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
@@ -33,15 +30,14 @@ import androidx.preference.TwoStatePreference
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.domain.app.AppListSettingsRepository
+import com.absinthe.libchecker.domain.app.SetApkAnalysisEnabledUseCase
 import com.absinthe.libchecker.domain.rules.RuleSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.features.about.AboutPageBuilder
-import com.absinthe.libchecker.features.applist.detail.ui.ApkDetailActivity
 import com.absinthe.libchecker.features.home.HomeViewModel
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.base.IAppBarContainer
@@ -88,6 +84,7 @@ class SettingsFragment :
   private val appListSettingsRepository: AppListSettingsRepository by inject()
   private val ruleSettingsRepository: RuleSettingsRepository by inject()
   private val snapshotSettingsRepository: SnapshotSettingsRepository by inject()
+  private val setApkAnalysisEnabled: SetApkAnalysisEnabledUseCase by inject()
 
   override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
     setPreferencesFromResource(R.xml.settings, null)
@@ -95,19 +92,7 @@ class SettingsFragment :
 
     findPreference<TwoStatePreference>(Constants.PREF_APK_ANALYTICS)?.apply {
       setOnPreferenceChangeListener { _, newValue ->
-        val flag = if (newValue as Boolean) {
-          PackageManager.COMPONENT_ENABLED_STATE_ENABLED
-        } else {
-          PackageManager.COMPONENT_ENABLED_STATE_DISABLED
-        }
-
-        try {
-          SystemServices.packageManager.setComponentEnabledSetting(
-            ComponentName(BuildConfig.APPLICATION_ID, ApkDetailActivity::class.java.name),
-            flag,
-            PackageManager.DONT_KILL_APP
-          )
-        } catch (e: RemoteException) {
+        setApkAnalysisEnabled(newValue as Boolean).onFailure { e ->
           Timber.e(e)
           Toasty.showShort(requireContext(), e.toString())
         }
