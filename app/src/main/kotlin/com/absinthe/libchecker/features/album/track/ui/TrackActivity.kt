@@ -14,11 +14,12 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.ActivityTrackBinding
 import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
-import com.absinthe.libchecker.domain.snapshot.TrackedAppListItem
+import com.absinthe.libchecker.features.album.track.TrackListUiState
 import com.absinthe.libchecker.features.album.track.TrackViewModel
 import com.absinthe.libchecker.features.album.track.ui.adapter.TrackAdapter
 import com.absinthe.libchecker.features.album.track.ui.adapter.TrackListDiff
@@ -27,9 +28,7 @@ import com.absinthe.libchecker.features.album.track.ui.view.TrackLoadingView
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -43,13 +42,14 @@ class TrackActivity :
   private val viewModel: TrackViewModel by viewModel()
   private val getRandomAppIcon: GetRandomAppIconUseCase by inject()
   private val adapter = TrackAdapter()
-  private val list = mutableListOf<TrackedAppListItem>()
   private var menu: Menu? = null
-  private var isListReady = false
+  private var isEmptyStateViewReady = false
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     initView()
+    observeTrackList()
+    viewModel.loadTrackList()
   }
 
   private fun initView() {
@@ -75,7 +75,6 @@ class TrackActivity :
       fun doSaveItemState(pos: Int, state: Boolean) {
         val packageName = data[pos].packageName
         viewModel.setPackageTracked(packageName, state)
-        list.find { it.packageName == packageName }?.switchState = state
       }
 
       setOnItemClickListener { _, view, position ->
@@ -92,26 +91,32 @@ class TrackActivity :
       stateView = TrackLoadingView(this@TrackActivity) { getRandomAppIcon() }
       isStateViewEnable = true
     }
+  }
 
-    lifecycleScope.launch(Dispatchers.IO) {
-      list += viewModel.getTrackListItems()
-
-      withContext(Dispatchers.Main) {
-        adapter.setList(list)
-        menu?.findItem(R.id.search)?.isVisible = true
-        isListReady = true
-        adapter.stateView =
-          EmptyListView(this@TrackActivity).apply {
-            layoutParams = FrameLayout.LayoutParams(
-              FrameLayout.LayoutParams.MATCH_PARENT,
-              FrameLayout.LayoutParams.MATCH_PARENT
-            ).also {
-              it.gravity = Gravity.CENTER
-            }
-          }
-        adapter.isStateViewEnable = true
+  private fun observeTrackList() {
+    lifecycleScope.launch {
+      lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewModel.uiState.collect(::renderTrackList)
       }
     }
+  }
+
+  private fun renderTrackList(state: TrackListUiState) {
+    menu?.findItem(R.id.search)?.isVisible = state.isSearchVisible
+    if (!state.isLoading && !isEmptyStateViewReady) {
+      adapter.stateView =
+        EmptyListView(this@TrackActivity).apply {
+          layoutParams = FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.MATCH_PARENT
+          ).also {
+            it.gravity = Gravity.CENTER
+          }
+        }
+      adapter.isStateViewEnable = true
+      isEmptyStateViewReady = true
+    }
+    adapter.setDiffNewData(state.items.toMutableList())
   }
 
   override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -133,7 +138,7 @@ class TrackActivity :
       setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW or MenuItem.SHOW_AS_ACTION_IF_ROOM)
       actionView = searchView
 
-      if (!isListReady) {
+      if (!viewModel.uiState.value.isSearchVisible) {
         isVisible = false
       }
     }
@@ -151,12 +156,7 @@ class TrackActivity :
   }
 
   override fun onQueryTextChange(newText: String): Boolean {
-    adapter.setDiffNewData(
-      list.asSequence()
-        .filter { it.label.contains(newText, true) || it.packageName.contains(newText) }
-        .sortedByDescending { it.switchState }
-        .toMutableList()
-    )
+    viewModel.setQuery(newText)
     return false
   }
 }

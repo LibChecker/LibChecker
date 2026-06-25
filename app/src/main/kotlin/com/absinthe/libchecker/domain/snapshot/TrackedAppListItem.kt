@@ -6,5 +6,5 @@ data class TrackedAppListItem(
   val packageInfo: PackageInfo,
   val label: String,
   val packageName: String,
-  var switchState: Boolean = false
+  val switchState: Boolean = false
 )
