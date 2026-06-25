@@ -6,7 +6,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.app.AppPermissionDetail
+import com.absinthe.libchecker.domain.app.detail.action.AppPermissionDetail
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.ui.view.PermissionInfoBottomSheetView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment

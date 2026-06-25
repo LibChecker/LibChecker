@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.app
+package com.absinthe.libchecker.domain.app.detail.action
 
 import androidx.annotation.DrawableRes
 import com.absinthe.libchecker.annotation.LibType
@@ -6,6 +6,7 @@ import com.absinthe.libchecker.api.bean.LibDetailBean
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.database.RulesRepository
+import com.absinthe.libchecker.domain.app.GetLibraryDetailUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

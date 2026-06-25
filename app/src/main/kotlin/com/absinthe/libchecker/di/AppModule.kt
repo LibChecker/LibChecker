@@ -29,7 +29,6 @@ import com.absinthe.libchecker.domain.app.BuildAppExportNativeLibrariesUseCase
 import com.absinthe.libchecker.domain.app.BuildAppListItemViewStatesUseCase
 import com.absinthe.libchecker.domain.app.BuildInAppUpdateDiffDataUseCase
 import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCase
-import com.absinthe.libchecker.domain.app.BuildSignatureDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.CheckRequiredPackageAvailabilityUseCase
 import com.absinthe.libchecker.domain.app.ClearApkCacheUseCase
 import com.absinthe.libchecker.domain.app.ExportAppListToUriUseCase
@@ -50,15 +49,10 @@ import com.absinthe.libchecker.domain.app.GetAppListContentUseCase
 import com.absinthe.libchecker.domain.app.GetAppListPackageStatesUseCase
 import com.absinthe.libchecker.domain.app.GetAppManifestPropertiesUseCase
 import com.absinthe.libchecker.domain.app.GetArchivePackageInfoUseCase
-import com.absinthe.libchecker.domain.app.GetElfDetailUseCase
 import com.absinthe.libchecker.domain.app.GetInstalledAppComparisonPackageUseCase
-import com.absinthe.libchecker.domain.app.GetLibraryDetailDialogDataUseCase
 import com.absinthe.libchecker.domain.app.GetLibraryDetailUseCase
-import com.absinthe.libchecker.domain.app.GetOverlayDetailUseCase
-import com.absinthe.libchecker.domain.app.GetPermissionDetailUseCase
 import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.app.GetRelatedAppListItemUseCase
-import com.absinthe.libchecker.domain.app.GetXposedModuleInfoUseCase
 import com.absinthe.libchecker.domain.app.InitializeAppListUseCase
 import com.absinthe.libchecker.domain.app.InitializePendingAppFeaturesUseCase
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
@@ -77,6 +71,12 @@ import com.absinthe.libchecker.domain.app.detail.GetAppDetailFeaturesUseCase
 import com.absinthe.libchecker.domain.app.detail.GetAppDetailPackageSizeUseCase
 import com.absinthe.libchecker.domain.app.detail.GetRelatedAppDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.detail.ShouldShowStaticLibraryTabUseCase
+import com.absinthe.libchecker.domain.app.detail.action.BuildSignatureDetailItemsUseCase
+import com.absinthe.libchecker.domain.app.detail.action.GetElfDetailUseCase
+import com.absinthe.libchecker.domain.app.detail.action.GetLibraryDetailDialogDataUseCase
+import com.absinthe.libchecker.domain.app.detail.action.GetOverlayDetailUseCase
+import com.absinthe.libchecker.domain.app.detail.action.GetPermissionDetailUseCase
+import com.absinthe.libchecker.domain.app.detail.action.GetXposedModuleInfoUseCase
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailAbilityChipsUseCase
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailComponentChipsUseCase
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailComponentsUseCase

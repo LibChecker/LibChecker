@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.app
+package com.absinthe.libchecker.domain.app.detail.action
 
 import com.absinthe.libchecker.features.applist.detail.bean.SignatureDetailItem
 

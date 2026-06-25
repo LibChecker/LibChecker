@@ -8,10 +8,10 @@ import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.GetOverlayDetailUseCase
-import com.absinthe.libchecker.domain.app.OverlayDetailData
-import com.absinthe.libchecker.domain.app.OverlayDetailExtraInfo
 import com.absinthe.libchecker.domain.app.detail.RelatedAppDisplayData
+import com.absinthe.libchecker.domain.app.detail.action.GetOverlayDetailUseCase
+import com.absinthe.libchecker.domain.app.detail.action.OverlayDetailData
+import com.absinthe.libchecker.domain.app.detail.action.OverlayDetailExtraInfo
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.ui.view.OverlayDetailBottomSheetView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment

@@ -7,7 +7,6 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppBundleSplitItem
 import com.absinthe.libchecker.domain.app.AppManifestProperty
 import com.absinthe.libchecker.domain.app.AppPackageShareFile
-import com.absinthe.libchecker.domain.app.BuildSignatureDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.ExportAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.ExtractNativeLibraryUseCase
 import com.absinthe.libchecker.domain.app.GetAlternativeLaunchItemsUseCase
@@ -16,13 +15,14 @@ import com.absinthe.libchecker.domain.app.GetAppInfoActionsUseCase
 import com.absinthe.libchecker.domain.app.GetAppInstallSourceDetailsUseCase
 import com.absinthe.libchecker.domain.app.GetAppLaunchActionUseCase
 import com.absinthe.libchecker.domain.app.GetAppManifestPropertiesUseCase
-import com.absinthe.libchecker.domain.app.GetElfDetailUseCase
-import com.absinthe.libchecker.domain.app.GetLibraryDetailDialogDataUseCase
-import com.absinthe.libchecker.domain.app.GetOverlayDetailUseCase
-import com.absinthe.libchecker.domain.app.GetPermissionDetailUseCase
-import com.absinthe.libchecker.domain.app.GetXposedModuleInfoUseCase
 import com.absinthe.libchecker.domain.app.PrepareAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.detail.GetRelatedAppDisplayDataUseCase
+import com.absinthe.libchecker.domain.app.detail.action.BuildSignatureDetailItemsUseCase
+import com.absinthe.libchecker.domain.app.detail.action.GetElfDetailUseCase
+import com.absinthe.libchecker.domain.app.detail.action.GetLibraryDetailDialogDataUseCase
+import com.absinthe.libchecker.domain.app.detail.action.GetOverlayDetailUseCase
+import com.absinthe.libchecker.domain.app.detail.action.GetPermissionDetailUseCase
+import com.absinthe.libchecker.domain.app.detail.action.GetXposedModuleInfoUseCase
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import java.io.File
 

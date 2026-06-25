@@ -5,7 +5,7 @@ import android.content.DialogInterface
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.app.XposedModuleInfo
+import com.absinthe.libchecker.domain.app.detail.action.XposedModuleInfo
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.FeaturesDialog
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.node.XposedDetailItem
