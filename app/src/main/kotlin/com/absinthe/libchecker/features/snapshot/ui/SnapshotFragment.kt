@@ -72,6 +72,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import rikka.widget.borderview.BorderView
@@ -102,8 +103,7 @@ class SnapshotFragment :
   private val shootListener = object : OnShootListener.Stub() {
     override fun onShootFinished(timestamp: Long) {
       lifecycleScope.launch(Dispatchers.Main) {
-        viewModel.changeTimeStamp(timestamp)
-        compareDiff()
+        refreshSnapshotTimestamp(timestamp)
         shouldCompare = true
       }
     }
@@ -152,22 +152,21 @@ class SnapshotFragment :
       fun changeTimeNode() {
         lifecycleScope.launch(Dispatchers.IO) {
           val timeStampList = viewModel.getTimeStamps()
-          val dialog = TimeNodeBottomSheetDialogFragment.newInstance(ArrayList(timeStampList))
-            .apply {
-              setOnItemClickListener { position ->
-                val item = timeStampList[position]
-                lifecycleScope.launch(Dispatchers.Main) {
-                  viewModel.changeTimeStamp(item.timestamp)
+          withContext(Dispatchers.Main) {
+            TimeNodeBottomSheetDialogFragment.newInstance(ArrayList(timeStampList))
+              .apply {
+                setOnItemClickListener { position ->
+                  val item = timeStampList[position]
+                  refreshSnapshotTimestamp(item.timestamp, shouldClearDiff = true)
                   flip(VF_LOADING)
                   dismiss()
                 }
-                viewModel.compareDiff(item.timestamp, shouldClearDiff = true)
               }
-            }
-          dialog.show(
-            context.supportFragmentManager,
-            TimeNodeBottomSheetDialogFragment::class.java.name
-          )
+              .show(
+                context.supportFragmentManager,
+                TimeNodeBottomSheetDialogFragment::class.java.name
+              )
+          }
         }
       }
 
@@ -260,7 +259,7 @@ class SnapshotFragment :
     viewModel.apply {
       allSnapshots.onEach {
         if (shouldCompare) {
-          compareDiff()
+          refreshSelectedSnapshot()
         }
       }.launchIn(lifecycleScope)
       snapshotDiffItemsFlow.onEach {
@@ -371,9 +370,8 @@ class SnapshotFragment :
     }
 
     if (viewModel.currentTimeStamp != viewModel.selectedSnapshotTimestamp) {
-      viewModel.changeTimeStamp(viewModel.selectedSnapshotTimestamp)
       flip(VF_LOADING)
-      viewModel.compareDiff(viewModel.selectedSnapshotTimestamp, shouldClearDiff = true)
+      refreshSelectedSnapshot(shouldClearDiff = true)
     }
 
     if (shouldCompare) {
@@ -559,12 +557,18 @@ class SnapshotFragment :
     binding.vfContainer.displayedChild = child
   }
 
-  private fun compareDiff() {
-    viewModel.changeTimeStamp(viewModel.selectedSnapshotTimestamp)
+  private fun refreshSelectedSnapshot(shouldClearDiff: Boolean = false) {
     isSnapshotDatabaseItemsReady = true
+    viewModel.refreshSelectedSnapshot(shouldClearDiff)
+    isSnapshotDatabaseItemsReady = false
+  }
 
-    viewModel.getDashboardCount(viewModel.selectedSnapshotTimestamp, true)
-    viewModel.compareDiff(viewModel.selectedSnapshotTimestamp)
+  private fun refreshSnapshotTimestamp(
+    timestamp: Long,
+    shouldClearDiff: Boolean = false
+  ) {
+    isSnapshotDatabaseItemsReady = true
+    viewModel.refreshSnapshotTimestamp(timestamp, shouldClearDiff)
     isSnapshotDatabaseItemsReady = false
   }
 

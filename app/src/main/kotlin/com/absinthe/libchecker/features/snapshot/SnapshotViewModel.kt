@@ -166,6 +166,19 @@ class SnapshotViewModel(
     }
   }
 
+  fun refreshSelectedSnapshot(shouldClearDiff: Boolean = false) {
+    refreshSnapshotTimestamp(selectedSnapshotTimestamp, shouldClearDiff)
+  }
+
+  fun refreshSnapshotTimestamp(
+    timestamp: Long,
+    shouldClearDiff: Boolean = false
+  ) {
+    changeTimeStamp(timestamp)
+    getDashboardCount(timestamp, true)
+    compareDiff(timestamp, shouldClearDiff = shouldClearDiff)
+  }
+
   fun getDashboardCount(timestamp: Long, isLeft: Boolean) = viewModelScope.launch(Dispatchers.IO) {
     Timber.d("getDashboardCount: $timestamp, $isLeft")
     val count = getSnapshotDashboardCount(timestamp)
