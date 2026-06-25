@@ -24,15 +24,13 @@ import androidx.preference.PreferenceGroupAdapter
 import androidx.preference.SwitchPreferenceCompat
 import androidx.preference.TwoStatePreference
 import androidx.recyclerview.widget.RecyclerView
-import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.LCDatabase
-import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.database.backup.RoomBackup
 import com.absinthe.libchecker.databinding.ActivityBackupBinding
+import com.absinthe.libchecker.domain.snapshot.RestoreSnapshotDatabaseBackupUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
 import com.absinthe.libchecker.features.home.ui.MainActivity
 import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
@@ -50,15 +48,16 @@ import com.absinthe.libchecker.utils.extensions.requireAvailableCacheDir
 import com.absinthe.libchecker.utils.extensions.setBottomPaddingSpace
 import com.absinthe.libchecker.utils.showToast
 import com.google.android.material.card.MaterialCardView
-import com.jakewharton.processphoenix.ProcessPhoenix
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.getKoin
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 import rikka.recyclerview.fixEdgeEffect
 import rikka.widget.borderview.BorderRecyclerView
 import rikka.widget.borderview.BorderView
@@ -106,6 +105,7 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
     private lateinit var backupResultLauncher: ActivityResultLauncher<String>
     private lateinit var restoreResultLauncher: ActivityResultLauncher<String>
     private lateinit var roomBackup: RoomBackup
+    private lateinit var restoreSnapshotDatabaseBackup: RestoreSnapshotDatabaseBackupUseCase
     private var loadingDialog: AlertDialog? = null
 
     override fun onCreateView(
@@ -149,6 +149,9 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
           }
         }
       roomBackup = RoomBackup(context)
+      restoreSnapshotDatabaseBackup = getKoin().get {
+        parametersOf(roomBackup)
+      }
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -360,34 +363,23 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
           dialog.show()
           if (uri.toString().endsWith(".sqlite3")) {
             lifecycleScope.launch(Dispatchers.IO) {
-              val restoreFile = viewModel.prepareRoomBackupRestoreFile(
-                uri,
-                File(activity.requireAvailableCacheDir(), "restore.sqlite3")
-              ) ?: run {
-                lifecycleScope.launch(Dispatchers.Main) {
-                  dialog.dismiss()
+              runCatching {
+                restoreSnapshotDatabaseBackup(
+                  uri,
+                  File(activity.requireAvailableCacheDir(), "restore.sqlite3")
+                )
+              }.onSuccess { result ->
+                result?.let {
+                  Timber.d(
+                    "success: ${it.success}, message: ${it.message}, exitCode: ${it.exitCode}"
+                  )
                 }
-                return@launch
+              }.onFailure {
+                Timber.e(it)
               }
-              roomBackup
-                .database(LCDatabase.getDatabase())
-                .enableLogDebug(true)
-                .backupLocation(RoomBackup.BACKUP_FILE_LOCATION_CUSTOM_FILE)
-                .backupLocationCustomFile(restoreFile)
-                .apply {
-                  onCompleteListener { success, message, exitCode ->
-                    Timber.d("success: $success, message: $message, exitCode: $exitCode")
-                    if (success) {
-                      restoreFile.delete()
-                      Once.clearDone(OnceTag.FIRST_LAUNCH)
-                      ProcessPhoenix.triggerRebirth(LibCheckerApp.app)
-                    }
-                    lifecycleScope.launch(Dispatchers.Main) {
-                      dialog.dismiss()
-                    }
-                  }
-                }
-                .restore()
+              withContext(Dispatchers.Main) {
+                dialog.dismiss()
+              }
             }
           } else {
             viewModel.restore(uri) { result ->

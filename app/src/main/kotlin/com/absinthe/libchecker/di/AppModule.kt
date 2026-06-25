@@ -1,6 +1,8 @@
 package com.absinthe.libchecker.di
 
 import com.absinthe.libchecker.BuildConfig
+import com.absinthe.libchecker.LibCheckerApp
+import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.data.app.AndroidAppListExportMetadata
 import com.absinthe.libchecker.data.app.AndroidAppListItemFactory
 import com.absinthe.libchecker.data.app.GlobalAppDetailSettingsRepository
@@ -12,13 +14,16 @@ import com.absinthe.libchecker.data.snapshot.AndroidSnapshotItemFactory
 import com.absinthe.libchecker.data.snapshot.GlobalSnapshotSelectionRepository
 import com.absinthe.libchecker.data.snapshot.GlobalSnapshotSettingsRepository
 import com.absinthe.libchecker.data.snapshot.GlobalSnapshotTrackChangeRepository
+import com.absinthe.libchecker.data.snapshot.LocalSnapshotDatabaseBackupRestorer
 import com.absinthe.libchecker.data.snapshot.LocalSnapshotRepository
 import com.absinthe.libchecker.data.snapshot.ProtoSnapshotArchiveCodec
 import com.absinthe.libchecker.data.statistics.CachedAndroidDistributionRepository
 import com.absinthe.libchecker.data.statistics.GlobalChartSettingsRepository
 import com.absinthe.libchecker.data.statistics.GlobalLibReferenceSettingsRepository
+import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.Repositories
+import com.absinthe.libchecker.database.backup.RoomBackup
 import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.AppListExportMetadata
 import com.absinthe.libchecker.domain.app.AppListItemFactory
@@ -118,6 +123,7 @@ import com.absinthe.libchecker.domain.snapshot.GetSnapshotSystemPropDiffsUseCase
 import com.absinthe.libchecker.domain.snapshot.GetTrackListItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.PrepareRoomBackupRestoreFileUseCase
 import com.absinthe.libchecker.domain.snapshot.RestoreSnapshotArchiveFromUriUseCase
+import com.absinthe.libchecker.domain.snapshot.RestoreSnapshotDatabaseBackupUseCase
 import com.absinthe.libchecker.domain.snapshot.SetPackageTrackedUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveCodec
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
@@ -157,6 +163,8 @@ import com.absinthe.libchecker.features.chart.ChartViewModel
 import com.absinthe.libchecker.features.home.HomeViewModel
 import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
 import com.absinthe.libchecker.features.statistics.LibReferenceViewModel
+import com.jakewharton.processphoenix.ProcessPhoenix
+import jonathanfinerty.once.Once
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -372,6 +380,19 @@ val appModule = module {
   factory { SnapshotArchiveUseCase(get(), get()) }
   factory { BackupSnapshotArchiveToUriUseCase(androidContext().contentResolver, get()) }
   factory { PrepareRoomBackupRestoreFileUseCase(androidContext().contentResolver) }
+  factory { (roomBackup: RoomBackup) ->
+    RestoreSnapshotDatabaseBackupUseCase(
+      prepareRoomBackupRestoreFile = get(),
+      databaseBackupRestorer = LocalSnapshotDatabaseBackupRestorer(
+        roomBackup = roomBackup,
+        database = { LCDatabase.getDatabase() }
+      ),
+      onSuccessfulRestore = {
+        Once.clearDone(OnceTag.FIRST_LAUNCH)
+        ProcessPhoenix.triggerRebirth(LibCheckerApp.app)
+      }
+    )
+  }
   factory { RestoreSnapshotArchiveFromUriUseCase(androidContext().contentResolver, get()) }
   factory { SnapshotLibraryUseCase(get()) }
   factory { SnapshotSelectionUseCase(get()) }
@@ -433,7 +454,6 @@ val appModule = module {
       buildSnapshotDetailItems = get(),
       backupSnapshotArchiveToUriUseCase = get(),
       restoreSnapshotArchiveFromUriUseCase = get(),
-      prepareRoomBackupRestoreFileUseCase = get(),
       snapshotLibrary = get(),
       buildArchiveSnapshotItemUseCase = get(),
       buildSnapshotCapturePlanUseCase = get(),
