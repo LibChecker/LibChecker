@@ -75,6 +75,7 @@ class ChartFragment :
   private var chartLoadingProgress = LOADING_PROGRESS_MAX
   private var featureInitializationRunning = WorkerService.initializingFeatures
   private var featureInitializationCompleted = WorkerService.featureInitializationState.value.completed
+  private lateinit var chartDataRenderer: ChartDataRenderer
   private var hasReceivedLCItems = false
   private var hasUninitializedFeatureItems = false
   private val isFeatureInitializationPending: Boolean
@@ -88,6 +89,11 @@ class ChartFragment :
     binding.root.applySystemBarsPadding(top = true, bottom = true)
     featureInitializationRunning = WorkerService.featureInitializationState.value.running
     featureInitializationCompleted = WorkerService.featureInitializationState.value.completed
+    chartDataRenderer = ChartDataRenderer(
+      scope = viewLifecycleOwner.lifecycleScope,
+      onLoadingProgressChanged = viewModel::setLoadingProgress,
+      onDistributionLastUpdateTimeChanged = viewModel::setDistributionLastUpdateTime
+    )
 
     chartView = generatePieChartView()
     binding.root.addView(chartView, -1)
@@ -245,7 +251,7 @@ class ChartFragment :
   ) {
     val newChartView = generateChartView()
     viewModel.setLoadingProgress(plan.initialLoadingProgress)
-    viewModel.applyChartData(binding.root, chartView, newChartView, plan.dataSource)
+    chartDataRenderer.render(binding.root, chartView, newChartView, plan.dataSource)
     chartView = newChartView
     dataSource = plan.dataSource
   }
@@ -256,7 +262,7 @@ class ChartFragment :
   ) {
     val newChartView = generateChartView()
     viewModel.setLoadingProgress(plan.initialLoadingProgress)
-    viewModel.applyChartData(binding.root, chartView, newChartView, plan.dataSource)
+    chartDataRenderer.render(binding.root, chartView, newChartView, plan.dataSource)
     chartView = newChartView
     dataSource = plan.dataSource
   }

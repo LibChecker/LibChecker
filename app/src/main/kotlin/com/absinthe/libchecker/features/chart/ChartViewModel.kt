@@ -1,21 +1,13 @@
 package com.absinthe.libchecker.features.chart
 
-import android.view.View
-import android.view.ViewGroup
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppListItemViewState
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.statistics.ChartSettingsRepository
-import com.absinthe.libchecker.features.chart.impl.MarketDistributionChartDataSource
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 const val LOADING_PROGRESS_INFINITY = -1
 const val LOADING_PROGRESS_MAX = 100
@@ -26,8 +18,6 @@ class ChartViewModel internal constructor(
   private val chartDataSourceFactory: ChartDataSourceFactory,
   private val chartSettingsRepository: ChartSettingsRepository
 ) : ViewModel() {
-  private var queryJob: Job? = null
-
   val appListItems: Flow<List<LCItem>> = appListRepository.items
 
   private val _loadingProgress = MutableStateFlow(LOADING_PROGRESS_MAX)
@@ -46,6 +36,10 @@ class ChartViewModel internal constructor(
 
   fun setLoadingProgress(progress: Int) {
     _loadingProgress.value = progress
+  }
+
+  fun setDistributionLastUpdateTime(time: String) {
+    _distributionLastUpdateTime.value = time
   }
 
   fun setDetailAbiSwitch(isDetailedAbiChart: Boolean) {
@@ -70,32 +64,5 @@ class ChartViewModel internal constructor(
 
   suspend fun buildAppListItemViewStates(items: List<LCItem>): Map<String, AppListItemViewState> {
     return chartDataProvider.buildAppListItemViewStates(items)
-  }
-
-  fun <T : View> applyChartData(
-    root: ViewGroup,
-    currentChartView: View?,
-    newChartView: T,
-    source: IChartDataSource<T>
-  ) {
-    queryJob?.cancel()
-    queryJob = viewModelScope.launch(Dispatchers.Default) {
-      source.fillChartView(newChartView) {
-        setLoadingProgress(it)
-      }
-
-      withContext(Dispatchers.Main) {
-        if (currentChartView != null) {
-          root.removeView(currentChartView)
-        }
-        root.addView(newChartView)
-        if (source.getData().isNotEmpty()) {
-          setLoadingProgress(LOADING_PROGRESS_MAX)
-        }
-        if (source is MarketDistributionChartDataSource) {
-          _distributionLastUpdateTime.value = source.lastUpdateTime
-        }
-      }
-    }
   }
 }
