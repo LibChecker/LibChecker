@@ -13,6 +13,7 @@ import com.absinthe.libchecker.data.app.LocalInstalledAppRepository
 import com.absinthe.libchecker.data.app.RemoteLibraryDetailRepository
 import com.absinthe.libchecker.data.app.WorkerFeatureInitializationRepository
 import com.absinthe.libchecker.data.app.update.AndroidAppUpdateRepository
+import com.absinthe.libchecker.data.rules.GlobalRuleSettingsRepository
 import com.absinthe.libchecker.data.snapshot.AndroidSnapshotItemFactory
 import com.absinthe.libchecker.data.snapshot.GlobalSnapshotSelectionRepository
 import com.absinthe.libchecker.data.snapshot.GlobalSnapshotSettingsRepository
@@ -107,6 +108,7 @@ import com.absinthe.libchecker.domain.app.detail.feature.BuildAppDetailFeatureIt
 import com.absinthe.libchecker.domain.app.detail.navigation.BuildDetailReferenceNavigationUseCase
 import com.absinthe.libchecker.domain.app.update.AppUpdateRepository
 import com.absinthe.libchecker.domain.app.update.BuildInAppUpdateDiffDataUseCase
+import com.absinthe.libchecker.domain.rules.RuleSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.BackupSnapshotArchiveToUriUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildInstalledSnapshotItemUseCase
@@ -198,6 +200,7 @@ val appModule = module {
   single<InstalledAppRepository> { LocalInstalledAppRepository }
   single<AppListRepository> { LocalAppListRepository }
   single<LibraryDetailRepository> { RemoteLibraryDetailRepository }
+  single<RuleSettingsRepository> { GlobalRuleSettingsRepository() }
   single<AppUpdateRepository> { AndroidAppUpdateRepository(SystemServices.downloadManager) }
   single<AndroidDistributionRepository> { CachedAndroidDistributionRepository(androidContext()) }
   single<AppListItemFactory> { AndroidAppListItemFactory(androidContext()) }

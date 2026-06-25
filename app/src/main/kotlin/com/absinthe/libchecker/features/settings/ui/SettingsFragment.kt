@@ -37,7 +37,7 @@ import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
-import com.absinthe.libchecker.database.RulesRepository
+import com.absinthe.libchecker.domain.rules.RuleSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.features.about.AboutPageBuilder
 import com.absinthe.libchecker.features.applist.detail.ui.ApkDetailActivity
@@ -84,6 +84,7 @@ class SettingsFragment :
   private lateinit var borderViewDelegate: BorderViewDelegate
   private lateinit var prefRecyclerView: RecyclerView
   private val viewModel: HomeViewModel by activityViewModels()
+  private val ruleSettingsRepository: RuleSettingsRepository by inject()
   private val snapshotSettingsRepository: SnapshotSettingsRepository by inject()
 
   override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -122,8 +123,7 @@ class SettingsFragment :
     findPreference<ListPreference>(Constants.PREF_RULES_REPO)?.apply {
       summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
       setOnPreferenceChangeListener { _, newValue ->
-        GlobalValues.repo = newValue as String
-        RulesRepository.setRemoteRepo(GlobalValues.repo)
+        ruleSettingsRepository.selectRemoteRepository(newValue.toString())
         recordPreferenceEvent(Constants.PREF_RULES_REPO, newValue)
         true
       }
