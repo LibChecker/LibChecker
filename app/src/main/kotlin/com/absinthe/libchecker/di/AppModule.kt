@@ -18,6 +18,7 @@ import com.absinthe.libchecker.data.snapshot.GlobalSnapshotSettingsRepository
 import com.absinthe.libchecker.data.snapshot.GlobalSnapshotTrackChangeRepository
 import com.absinthe.libchecker.data.snapshot.LocalSnapshotDatabaseBackupExporter
 import com.absinthe.libchecker.data.snapshot.LocalSnapshotDatabaseBackupRestorer
+import com.absinthe.libchecker.data.snapshot.LocalSnapshotDatabaseFileRepository
 import com.absinthe.libchecker.data.snapshot.LocalSnapshotRepository
 import com.absinthe.libchecker.data.snapshot.ProtoSnapshotArchiveCodec
 import com.absinthe.libchecker.data.statistics.CachedAndroidDistributionRepository
@@ -123,6 +124,7 @@ import com.absinthe.libchecker.domain.snapshot.CompareSnapshotWithInstalledAppsU
 import com.absinthe.libchecker.domain.snapshot.CompareTrackedSnapshotListsUseCase
 import com.absinthe.libchecker.domain.snapshot.CreateSnapshotDatabaseBackupUseCase
 import com.absinthe.libchecker.domain.snapshot.GetApexPackageNamesUseCase
+import com.absinthe.libchecker.domain.snapshot.GetSnapshotBackupTargetUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotPackageIconSourcesUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotSystemPropDiffsUseCase
@@ -133,6 +135,7 @@ import com.absinthe.libchecker.domain.snapshot.RestoreSnapshotDatabaseBackupUseC
 import com.absinthe.libchecker.domain.snapshot.SetPackageTrackedUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveCodec
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
+import com.absinthe.libchecker.domain.snapshot.SnapshotDatabaseFileRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotItemFactory
 import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
@@ -196,6 +199,7 @@ val appModule = module {
   single<SnapshotSelectionRepository> { GlobalSnapshotSelectionRepository() }
   single<SnapshotSettingsRepository> { GlobalSnapshotSettingsRepository() }
   single<SnapshotTrackChangeRepository> { GlobalSnapshotTrackChangeRepository() }
+  single<SnapshotDatabaseFileRepository> { LocalSnapshotDatabaseFileRepository() }
   single<SnapshotRepository> { LocalSnapshotRepository(get(), get()) }
   single<SnapshotArchiveCodec> { ProtoSnapshotArchiveCodec() }
   single<ChartSettingsRepository> { GlobalChartSettingsRepository() }
@@ -387,6 +391,7 @@ val appModule = module {
   factory { CompareSnapshotItemWithInstalledAppUseCase(androidContext().packageManager, get(), get(), get(), get()) }
   factory { GetSnapshotDashboardCountUseCase(get(), get()) }
   factory { GetSnapshotPackageIconSourcesUseCase(get()) }
+  factory { GetSnapshotBackupTargetUseCase(get()) }
   factory { GetSnapshotSystemPropDiffsUseCase(get()) }
   factory { GetTrackListItemsUseCase(androidContext().packageManager, get(), get()) }
   factory { SetPackageTrackedUseCase(get(), get()) }
@@ -497,6 +502,7 @@ val appModule = module {
     SnapshotBackupViewModel(
       backupSnapshotArchiveToUriUseCase = get(),
       restoreSnapshotArchiveFromUriUseCase = get(),
+      getSnapshotBackupTargetUseCase = get(),
       snapshotSelectionUseCase = get()
     )
   }

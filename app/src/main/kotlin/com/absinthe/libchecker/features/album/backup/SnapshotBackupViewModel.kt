@@ -4,8 +4,10 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.domain.snapshot.BackupSnapshotArchiveToUriUseCase
+import com.absinthe.libchecker.domain.snapshot.GetSnapshotBackupTargetUseCase
 import com.absinthe.libchecker.domain.snapshot.RestoreSnapshotArchiveFromUriUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
+import com.absinthe.libchecker.domain.snapshot.SnapshotBackupTarget
 import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -18,8 +20,11 @@ import timber.log.Timber
 class SnapshotBackupViewModel(
   private val backupSnapshotArchiveToUriUseCase: BackupSnapshotArchiveToUriUseCase,
   private val restoreSnapshotArchiveFromUriUseCase: RestoreSnapshotArchiveFromUriUseCase,
+  private val getSnapshotBackupTargetUseCase: GetSnapshotBackupTargetUseCase,
   private val snapshotSelectionUseCase: SnapshotSelectionUseCase
 ) : ViewModel() {
+
+  fun getBackupTarget(): SnapshotBackupTarget = getSnapshotBackupTargetUseCase()
 
   fun backup(uri: Uri, resultAction: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
     runCatching {

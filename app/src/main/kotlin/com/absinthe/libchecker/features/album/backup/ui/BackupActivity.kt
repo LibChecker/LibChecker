@@ -26,17 +26,16 @@ import androidx.preference.TwoStatePreference
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.database.backup.RoomBackup
 import com.absinthe.libchecker.databinding.ActivityBackupBinding
 import com.absinthe.libchecker.domain.snapshot.CreateSnapshotDatabaseBackupUseCase
 import com.absinthe.libchecker.domain.snapshot.RestoreSnapshotDatabaseBackupUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
+import com.absinthe.libchecker.domain.snapshot.SnapshotBackupTarget
 import com.absinthe.libchecker.features.album.backup.SnapshotBackupViewModel
 import com.absinthe.libchecker.features.home.ui.MainActivity
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
-import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.StorageUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.addBackStateHandler
@@ -48,10 +47,6 @@ import com.absinthe.libchecker.utils.extensions.requireAvailableCacheDir
 import com.absinthe.libchecker.utils.extensions.setBottomPaddingSpace
 import com.absinthe.libchecker.utils.showToast
 import com.google.android.material.card.MaterialCardView
-import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -164,31 +159,10 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
 
       findPreference<Preference>(Constants.PREF_LOCAL_BACKUP)?.apply {
         setOnPreferenceClickListener {
-          val simpleDateFormat =
-            SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.getDefault())
-          val date = Date()
-          val formatted = simpleDateFormat.format(date)
-
           if (StorageUtils.isExternalStorageWritable) {
-            if (FileUtils.getFileSize(RulesRepository.getDatabaseFile()) > 100 * 1024 * 1024) {
-              loadingDialog = UiUtils.createLoadingDialog(requireActivity())
-              loadingDialog?.show()
-              createSnapshotDatabaseBackup { result ->
-                Timber.d(
-                  "success: ${result.success}, message: ${result.message}, exitCode: ${result.exitCode}"
-                )
-                lifecycleScope.launch(Dispatchers.Main) {
-                  loadingDialog?.dismiss()
-                  loadingDialog = null
-                }
-              }
-            } else {
-              runCatching {
-                backupResultLauncher.launch("LibChecker-Snapshot-Backups-$formatted.lcss")
-              }.onFailure {
-                Timber.e(it)
-                context.showToast("Document API not working")
-              }
+            when (val target = viewModel.getBackupTarget()) {
+              is SnapshotBackupTarget.Archive -> launchArchiveBackup(target.fileName)
+              SnapshotBackupTarget.Database -> createDatabaseBackup()
             }
           } else {
             context.showToast("External storage is not writable")
@@ -363,7 +337,7 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
               runCatching {
                 restoreSnapshotDatabaseBackup(
                   uri,
-                  File(activity.requireAvailableCacheDir(), "restore.sqlite3")
+                  activity.requireAvailableCacheDir()
                 )
               }.onSuccess { result ->
                 result?.let {
@@ -391,6 +365,29 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
           }
         }.onFailure { t ->
           Timber.e(t)
+        }
+      }
+    }
+
+    private fun launchArchiveBackup(fileName: String) {
+      runCatching {
+        backupResultLauncher.launch(fileName)
+      }.onFailure {
+        Timber.e(it)
+        context?.showToast("Document API not working")
+      }
+    }
+
+    private fun createDatabaseBackup() {
+      loadingDialog = UiUtils.createLoadingDialog(requireActivity())
+      loadingDialog?.show()
+      createSnapshotDatabaseBackup { result ->
+        Timber.d(
+          "success: ${result.success}, message: ${result.message}, exitCode: ${result.exitCode}"
+        )
+        lifecycleScope.launch(Dispatchers.Main) {
+          loadingDialog?.dismiss()
+          loadingDialog = null
         }
       }
     }

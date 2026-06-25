@@ -11,8 +11,9 @@ class RestoreSnapshotDatabaseBackupUseCase(
 
   suspend operator fun invoke(
     uri: Uri,
-    restoreFile: File
+    cacheDir: File
   ): SnapshotDatabaseBackupRestoreResult? {
+    val restoreFile = File(cacheDir, RESTORE_FILE_NAME)
     val preparedRestoreFile = prepareRoomBackupRestoreFile(uri, restoreFile) ?: return null
     val result = databaseBackupRestorer.restore(preparedRestoreFile)
     if (result.success) {
@@ -20,5 +21,9 @@ class RestoreSnapshotDatabaseBackupUseCase(
       onSuccessfulRestore()
     }
     return result
+  }
+
+  private companion object {
+    private const val RESTORE_FILE_NAME = "restore.sqlite3"
   }
 }
