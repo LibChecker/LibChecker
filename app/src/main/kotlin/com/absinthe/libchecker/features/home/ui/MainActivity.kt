@@ -30,8 +30,8 @@ import com.absinthe.libchecker.annotation.STATUS_INIT_END
 import com.absinthe.libchecker.annotation.STATUS_START_INIT
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.OnceTag
-import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.databinding.ActivityMainBinding
+import com.absinthe.libchecker.domain.rules.CloudRulesRepository
 import com.absinthe.libchecker.features.home.HomeViewModel
 import com.absinthe.libchecker.features.home.INavViewContainer
 import com.absinthe.libchecker.features.home.ui.view.HomeToolbarTitleView
@@ -56,6 +56,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
@@ -68,6 +69,7 @@ class MainActivity :
   IListControllerHost {
 
   private val appViewModel: HomeViewModel by viewModel()
+  private val cloudRulesRepository: CloudRulesRepository by inject()
   private var listController: IListController? = null
 
   @Suppress("DEPRECATION")
@@ -91,7 +93,7 @@ class MainActivity :
 
     if (intent.getBooleanExtra(Constants.PP_FROM_CLOUD_RULES_UPDATE, false)) {
       Timber.w("Reinitializing updated rule database")
-      RulesRepository.reinitialize()
+      cloudRulesRepository.reinitializeRules()
     }
 
     initView()

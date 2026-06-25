@@ -8,6 +8,8 @@ interface CloudRulesRepository {
   fun getDownloadRequest(): CloudRulesDownloadRequest
 
   fun installDownloadedRules(downloadRequest: CloudRulesDownloadRequest, remoteVersion: Int): Boolean
+
+  fun reinitializeRules()
 }
 
 data class CloudRulesVersionInfo(

@@ -37,4 +37,8 @@ class AndroidCloudRulesRepository(
     RulesRepository.setLocalVersion(appContext, remoteVersion)
     return true
   }
+
+  override fun reinitializeRules() {
+    RulesRepository.reinitialize()
+  }
 }
