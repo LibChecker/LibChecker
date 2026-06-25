@@ -36,6 +36,7 @@ import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.SetApkAnalysisEnabledUseCase
 import com.absinthe.libchecker.domain.rules.RuleSettingsRepository
+import com.absinthe.libchecker.domain.settings.SelectDarkModeUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.features.about.AboutPageBuilder
 import com.absinthe.libchecker.features.home.HomeViewModel
@@ -47,7 +48,6 @@ import com.absinthe.libchecker.utils.LocaleUtils
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.Toasty
-import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.setBottomPaddingSpace
@@ -85,6 +85,7 @@ class SettingsFragment :
   private val ruleSettingsRepository: RuleSettingsRepository by inject()
   private val snapshotSettingsRepository: SnapshotSettingsRepository by inject()
   private val setApkAnalysisEnabled: SetApkAnalysisEnabledUseCase by inject()
+  private val selectDarkMode: SelectDarkModeUseCase by inject()
 
   override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
     setPreferencesFromResource(R.xml.settings, null)
@@ -146,8 +147,7 @@ class SettingsFragment :
     findPreference<ListPreference>(Constants.PREF_DARK_MODE)?.apply {
       summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
       setOnPreferenceChangeListener { _, newValue ->
-        GlobalValues.darkMode = newValue.toString()
-        AppCompatDelegate.setDefaultNightMode(UiUtils.getNightMode())
+        AppCompatDelegate.setDefaultNightMode(selectDarkMode(newValue.toString()))
         activity?.recreate()
         true
       }

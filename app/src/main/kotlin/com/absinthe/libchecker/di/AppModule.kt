@@ -15,6 +15,7 @@ import com.absinthe.libchecker.data.app.WorkerFeatureInitializationRepository
 import com.absinthe.libchecker.data.app.update.AndroidAppUpdateRepository
 import com.absinthe.libchecker.data.rules.AndroidCloudRulesRepository
 import com.absinthe.libchecker.data.rules.GlobalRuleSettingsRepository
+import com.absinthe.libchecker.data.settings.GlobalAppearanceSettingsRepository
 import com.absinthe.libchecker.data.snapshot.AndroidSnapshotItemFactory
 import com.absinthe.libchecker.data.snapshot.GlobalSnapshotSelectionRepository
 import com.absinthe.libchecker.data.snapshot.GlobalSnapshotSettingsRepository
@@ -112,6 +113,8 @@ import com.absinthe.libchecker.domain.app.update.AppUpdateRepository
 import com.absinthe.libchecker.domain.app.update.BuildInAppUpdateDiffDataUseCase
 import com.absinthe.libchecker.domain.rules.CloudRulesRepository
 import com.absinthe.libchecker.domain.rules.RuleSettingsRepository
+import com.absinthe.libchecker.domain.settings.AppearanceSettingsRepository
+import com.absinthe.libchecker.domain.settings.SelectDarkModeUseCase
 import com.absinthe.libchecker.domain.snapshot.BackupSnapshotArchiveToUriUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildInstalledSnapshotItemUseCase
@@ -207,6 +210,7 @@ val appModule = module {
   single<LibraryDetailRepository> { RemoteLibraryDetailRepository }
   single<CloudRulesRepository> { AndroidCloudRulesRepository(androidContext()) }
   single<RuleSettingsRepository> { GlobalRuleSettingsRepository() }
+  single<AppearanceSettingsRepository> { GlobalAppearanceSettingsRepository() }
   single<AppUpdateRepository> { AndroidAppUpdateRepository(SystemServices.downloadManager) }
   single<AndroidDistributionRepository> { CachedAndroidDistributionRepository(androidContext()) }
   single<AppListItemFactory> { AndroidAppListItemFactory(androidContext()) }
@@ -311,6 +315,7 @@ val appModule = module {
       ApkDetailActivity::class.java.name
     )
   }
+  factory { SelectDarkModeUseCase(get()) }
   factory { ShouldShowStaticLibraryTabUseCase(get()) }
   factory { InitializePendingAppFeaturesUseCase(get(), get()) }
   factory { SortAppDetailItemsUseCase() }

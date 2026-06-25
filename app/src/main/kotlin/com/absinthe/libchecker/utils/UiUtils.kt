@@ -16,7 +16,6 @@ import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.DrawableCompat
@@ -25,8 +24,8 @@ import androidx.core.graphics.toColorInt
 import androidx.core.graphics.withClip
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.app.SystemServices
-import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.domain.settings.NightModeResolver
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libraries.utils.utils.UiUtils
@@ -58,12 +57,7 @@ object UiUtils {
   }
 
   fun getNightMode(): Int {
-    return when (GlobalValues.darkMode) {
-      Constants.DARK_MODE_OFF -> AppCompatDelegate.MODE_NIGHT_NO
-      Constants.DARK_MODE_ON -> AppCompatDelegate.MODE_NIGHT_YES
-      Constants.DARK_MODE_FOLLOW_SYSTEM -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-      else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-    }
+    return NightModeResolver.resolve(GlobalValues.darkMode)
   }
 
   fun isSoftInputOpen(): Boolean {
