@@ -33,9 +33,9 @@ import com.absinthe.libchecker.domain.snapshot.ArchiveSnapshotItem
 import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotComparisonPlan
+import com.absinthe.libchecker.features.album.comparison.SnapshotComparisonViewModel
 import com.absinthe.libchecker.features.album.comparison.ui.view.ComparisonDashboardHalfView
 import com.absinthe.libchecker.features.album.comparison.ui.view.ComparisonDashboardView
-import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
 import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ENTITY
 import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ICON
 import com.absinthe.libchecker.features.snapshot.detail.ui.SnapshotDetailActivity
@@ -72,7 +72,7 @@ class ComparisonActivity :
   BaseActivity<ActivityComparisonBinding>(),
   MenuProvider {
 
-  private val viewModel: SnapshotViewModel by viewModel()
+  private val viewModel: SnapshotComparisonViewModel by viewModel()
   private val getRandomAppIcon: GetRandomAppIconUseCase by inject()
   private val buildSnapshotAbiDisplayData: BuildSnapshotAbiDisplayDataUseCase by inject()
   private val adapter by lazy(LazyThreadSafetyMode.NONE) {
@@ -137,13 +137,16 @@ class ComparisonActivity :
 
   private fun registerCallbacks() {
     chooseApkResultLauncher =
-      registerForActivityResult(ActivityResultContracts.OpenDocument()) {
+      registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri == null) {
+          return@registerForActivityResult
+        }
         if (isLeftPartChoosing) {
           leftTimeStamp = -1
-          leftUri = it
+          leftUri = uri
         } else {
           rightTimeStamp = -1
-          rightUri = it
+          rightUri = uri
         }
         invalidateDashboard()
       }
@@ -173,6 +176,7 @@ class ComparisonActivity :
               .apply {
                 setCompareMode(true)
                 setLeftMode(true)
+                setOnAddApkClickListener(::chooseApk)
                 setOnItemClickListener { position ->
                   val item = timeStampList[position]
                   leftTimeStamp = item.timestamp
@@ -196,6 +200,7 @@ class ComparisonActivity :
               .apply {
                 setCompareMode(true)
                 setLeftMode(false)
+                setOnAddApkClickListener(::chooseApk)
                 setOnItemClickListener { position ->
                   val item = timeStampList[position]
                   rightTimeStamp = item.timestamp
@@ -272,12 +277,7 @@ class ComparisonActivity :
       }.launchIn(lifecycleScope)
       effect.onEach {
         when (it) {
-          is SnapshotViewModel.Effect.ChooseComparedApk -> {
-            isLeftPartChoosing = it.isLeftPart
-            chooseApkResultLauncher.launch(arrayOf("application/vnd.android.package-archive", "application/octet-stream"))
-          }
-
-          is SnapshotViewModel.Effect.DashboardCountChange -> {
+          is SnapshotComparisonViewModel.Effect.DashboardCountChange -> {
             if (it.isLeft) {
               dashboardView.container.leftPart.tvSnapshotAppsCountText.text =
                 it.snapshotCount.toString()
@@ -288,26 +288,16 @@ class ComparisonActivity :
               dashboardView.container.rightPart.updateContentDescription()
             }
           }
-
-          is SnapshotViewModel.Effect.DiffItemChange -> {
-            val newItems = adapter.data
-              .asSequence()
-              .map { i ->
-                if (i.packageName == it.item.packageName) {
-                  it.item
-                } else {
-                  i
-                }
-              }
-              .toList()
-            adapter.setList(newItems.sortedByDescending { item -> item.updateTime })
-            flip(VF_LIST)
-          }
-
-          else -> {}
         }
       }.launchIn(lifecycleScope)
     }
+  }
+
+  private fun chooseApk(isLeft: Boolean) {
+    isLeftPartChoosing = isLeft
+    chooseApkResultLauncher.launch(
+      arrayOf("application/vnd.android.package-archive", "application/octet-stream")
+    )
   }
 
   private fun parseIntent(intent: Intent) {
@@ -422,7 +412,7 @@ class ComparisonActivity :
 
       is SnapshotComparisonPlan.SnapshotLists -> {
         flip(VF_LOADING)
-        viewModel.compareDiffWithSnapshotList(-1, plan.lists.left, plan.lists.right)
+        viewModel.compareDiffWithSnapshotList(plan.lists.left, plan.lists.right)
       }
     }
   }

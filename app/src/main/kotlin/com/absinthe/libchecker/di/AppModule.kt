@@ -155,6 +155,7 @@ import com.absinthe.libchecker.domain.statistics.GetLibReferenceConfigUseCase
 import com.absinthe.libchecker.domain.statistics.GetLibReferenceIconPackagesUseCase
 import com.absinthe.libchecker.domain.statistics.LibReferenceSettingsRepository
 import com.absinthe.libchecker.features.album.backup.SnapshotBackupViewModel
+import com.absinthe.libchecker.features.album.comparison.SnapshotComparisonViewModel
 import com.absinthe.libchecker.features.album.track.TrackViewModel
 import com.absinthe.libchecker.features.applist.detail.DetailActionLoader
 import com.absinthe.libchecker.features.applist.detail.DetailContentLoader
@@ -474,10 +475,7 @@ val appModule = module {
       getSnapshotDashboardCount = get(),
       buildSnapshotDetailItems = get(),
       snapshotLibrary = get(),
-      buildArchiveSnapshotItemUseCase = get(),
       buildSnapshotCapturePlanUseCase = get(),
-      buildSnapshotPairDiffUseCase = get(),
-      buildSnapshotComparisonPlanUseCase = get(),
       getSnapshotPackageIconSourcesUseCase = get(),
       getSnapshotSystemPropDiffsUseCase = get(),
       getApexPackageNamesUseCase = get(),
@@ -490,6 +488,16 @@ val appModule = module {
       backupSnapshotArchiveToUriUseCase = get(),
       restoreSnapshotArchiveFromUriUseCase = get(),
       snapshotSelectionUseCase = get()
+    )
+  }
+  viewModel {
+    SnapshotComparisonViewModel(
+      compareSnapshotDiffs = get(),
+      getSnapshotDashboardCount = get(),
+      snapshotLibrary = get(),
+      buildArchiveSnapshotItemUseCase = get(),
+      buildSnapshotPairDiffUseCase = get(),
+      buildSnapshotComparisonPlanUseCase = get()
     )
   }
   viewModel { TrackViewModel(get(), get()) }

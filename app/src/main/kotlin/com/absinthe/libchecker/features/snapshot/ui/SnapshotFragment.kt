@@ -340,8 +340,6 @@ class SnapshotFragment :
         is SnapshotViewModel.Effect.ComparingProgressChange -> {
           binding.progressIndicator.setProgressCompat(it.progress, it.progress != 1)
         }
-
-        else -> {}
       }
     }.launchIn(lifecycleScope)
 

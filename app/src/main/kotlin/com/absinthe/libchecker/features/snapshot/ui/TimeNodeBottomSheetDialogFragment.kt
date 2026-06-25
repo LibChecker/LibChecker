@@ -31,6 +31,7 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
 
   private val viewModel: SnapshotViewModel by activityViewModel()
   private var itemClickAction: ((position: Int) -> Unit)? = null
+  private var addApkClickAction: ((isLeft: Boolean) -> Unit)? = null
   private var customTitle: String? = null
   private var isCompareMode: Boolean = false
   private var isLeftMode: Boolean = false
@@ -61,7 +62,7 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
         root.adapter.addHeaderView(
           TimeNodeAddApkView(requireContext()).also {
             it.setOnClickListener {
-              viewModel.chooseComparedApk(isLeftMode)
+              addApkClickAction?.invoke(isLeftMode)
               dismiss()
             }
           }
@@ -148,6 +149,10 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
 
   fun setOnItemClickListener(action: (position: Int) -> Unit) {
     itemClickAction = action
+  }
+
+  fun setOnAddApkClickListener(action: (isLeft: Boolean) -> Unit) {
+    addApkClickAction = action
   }
 
   private suspend fun bindTimeStampItems(items: List<TimeStampItem>) {
