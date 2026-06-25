@@ -16,27 +16,17 @@ import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentPieChartBinding
-import com.absinthe.libchecker.domain.statistics.BuildApiLevelChartDataUseCase
-import com.absinthe.libchecker.domain.statistics.BuildFeatureFlagChartDataUseCase
 import com.absinthe.libchecker.features.chart.BaseChartDataSource
 import com.absinthe.libchecker.features.chart.BaseVariableChartDataSource
+import com.absinthe.libchecker.features.chart.ChartDataSourcePlan
 import com.absinthe.libchecker.features.chart.ChartType
 import com.absinthe.libchecker.features.chart.ChartUiStatePlanner
 import com.absinthe.libchecker.features.chart.ChartViewModel
 import com.absinthe.libchecker.features.chart.IAndroidSDKChart
 import com.absinthe.libchecker.features.chart.IChartDataSource
-import com.absinthe.libchecker.features.chart.IHeavyWork
 import com.absinthe.libchecker.features.chart.IntegerFormatter
-import com.absinthe.libchecker.features.chart.LOADING_PROGRESS_INFINITY
 import com.absinthe.libchecker.features.chart.LOADING_PROGRESS_MAX
-import com.absinthe.libchecker.features.chart.impl.AABChartDataSource
-import com.absinthe.libchecker.features.chart.impl.ABIChartDataSource
-import com.absinthe.libchecker.features.chart.impl.ApiLevelChartDataSource
-import com.absinthe.libchecker.features.chart.impl.DetailedABIChartDataSource
-import com.absinthe.libchecker.features.chart.impl.JetpackComposeChartDataSource
-import com.absinthe.libchecker.features.chart.impl.KotlinChartDataSource
 import com.absinthe.libchecker.features.chart.impl.MarketDistributionChartDataSource
-import com.absinthe.libchecker.features.chart.impl.PageSize16KBChartDataSource
 import com.absinthe.libchecker.features.chart.ui.view.ChartDetailItemView
 import com.absinthe.libchecker.features.chart.ui.view.ExpandingView
 import com.absinthe.libchecker.features.chart.ui.view.MarketDistributionDashboardView
@@ -50,6 +40,7 @@ import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import info.appdev.charting.animation.Easing
+import info.appdev.charting.charts.BarChart
 import info.appdev.charting.charts.Chart
 import info.appdev.charting.charts.HorizontalBarChart
 import info.appdev.charting.charts.PieChart
@@ -241,92 +232,33 @@ class ChartFragment :
       binding.root.removeView(chartView)
     }
 
-    when (chartType) {
-      ChartType.ABI -> {
-        if (viewModel.isDetailedAbiChart) {
-          setChartData(::generateBarChartView) {
-            DetailedABIChartDataSource(items, viewModel::buildDetailedAbiChartData)
-          }
-        } else {
-          setChartData(::generatePieChartView) {
-            ABIChartDataSource(items, viewModel::buildAbiChartData)
-          }
-        }
-      }
-
-      ChartType.KOTLIN -> setChartData(::generatePieChartView) {
-        KotlinChartDataSource(items) { chartItems ->
-          viewModel.buildFeatureFlagChartData(
-            chartItems,
-            BuildFeatureFlagChartDataUseCase.Kind.Kotlin
-          )
-        }
-      }
-
-      ChartType.TARGET_SDK -> setChartData(::generateBarChartView) {
-        ApiLevelChartDataSource(
-          items,
-          BuildApiLevelChartDataUseCase.Kind.TargetSdk,
-          viewModel::buildApiLevelChartData
-        )
-      }
-
-      ChartType.MIN_SDK -> setChartData(::generateBarChartView) {
-        ApiLevelChartDataSource(
-          items,
-          BuildApiLevelChartDataUseCase.Kind.MinSdk,
-          viewModel::buildApiLevelChartData
-        )
-      }
-
-      ChartType.COMPILE_SDK -> setChartData(::generateBarChartView) {
-        ApiLevelChartDataSource(
-          items,
-          BuildApiLevelChartDataUseCase.Kind.CompileSdk,
-          viewModel::buildApiLevelChartData
-        )
-      }
-
-      ChartType.JETPACK_COMPOSE -> setChartData(::generatePieChartView) {
-        JetpackComposeChartDataSource(items) { chartItems ->
-          viewModel.buildFeatureFlagChartData(
-            chartItems,
-            BuildFeatureFlagChartDataUseCase.Kind.JetpackCompose
-          )
-        }
-      }
-
-      ChartType.MARKET_DISTRIBUTION -> setChartData(::generateBarChartView) {
-        MarketDistributionChartDataSource(items, viewModel::getAndroidDistribution)
-      }
-
-      ChartType.AAB -> setChartData(::generatePieChartView) {
-        AABChartDataSource(items) { chartItems ->
-          viewModel.buildFeatureFlagChartData(
-            chartItems,
-            BuildFeatureFlagChartDataUseCase.Kind.AppBundle
-          )
-        }
-      }
-
-      ChartType.SUPPORT_16KB -> setChartData(::generatePieChartView) {
-        PageSize16KBChartDataSource(items, viewModel::buildPageSize16KBChartData)
-      }
+    when (val plan = viewModel.createChartDataSourcePlan(items, chartType)) {
+      is ChartDataSourcePlan.Pie -> setChartData(::generatePieChartView, plan)
+      is ChartDataSourcePlan.Bar -> setChartData(::generateBarChartView, plan)
     }
     Telemetry.recordEvent(Constants.Event.CHART, mapOf(Telemetry.Param.ITEM_ID to chartType))
   }
 
-  private fun <T : Chart<*>> setChartData(
-    generateChartView: () -> T,
-    dataSourceProvider: () -> IChartDataSource<T>
+  private fun setChartData(
+    generateChartView: () -> PieChart,
+    plan: ChartDataSourcePlan.Pie
   ) {
     val newChartView = generateChartView()
-    val ds = dataSourceProvider()
-    val loadingProgress = if (ds is IHeavyWork) 0 else LOADING_PROGRESS_INFINITY
-    viewModel.setLoadingProgress(loadingProgress)
-    viewModel.applyChartData(binding.root, chartView, newChartView, ds)
+    viewModel.setLoadingProgress(plan.initialLoadingProgress)
+    viewModel.applyChartData(binding.root, chartView, newChartView, plan.dataSource)
     chartView = newChartView
-    dataSource = ds
+    dataSource = plan.dataSource
+  }
+
+  private fun setChartData(
+    generateChartView: () -> BarChart,
+    plan: ChartDataSourcePlan.Bar
+  ) {
+    val newChartView = generateChartView()
+    viewModel.setLoadingProgress(plan.initialLoadingProgress)
+    viewModel.applyChartData(binding.root, chartView, newChartView, plan.dataSource)
+    chartView = newChartView
+    dataSource = plan.dataSource
   }
 
   override fun onNothingSelected() {

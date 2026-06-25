@@ -44,6 +44,7 @@ class ChartViewModel(
   private val chartSettingsRepository: ChartSettingsRepository
 ) : ViewModel() {
   private var queryJob: Job? = null
+  private val chartDataSourceFactory = ChartDataSourceFactory(this)
 
   val appListItems: Flow<List<LCItem>> = appListRepository.items
 
@@ -72,6 +73,17 @@ class ChartViewModel(
 
   fun setDetailAbiSwitchVisibility(isVisible: Boolean) {
     _detailAbiSwitchVisibility.value = isVisible
+  }
+
+  internal fun createChartDataSourcePlan(
+    items: List<LCItem>,
+    chartType: ChartType
+  ): ChartDataSourcePlan {
+    return chartDataSourceFactory.create(
+      items = items,
+      chartType = chartType,
+      useDetailedAbiChart = isDetailedAbiChart
+    )
   }
 
   suspend fun buildAppListItemViewStates(items: List<LCItem>): Map<String, AppListItemViewState> {
