@@ -32,13 +32,9 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.databinding.ActivityMainBinding
-import com.absinthe.libchecker.features.applist.ui.AppListFragment
 import com.absinthe.libchecker.features.home.HomeViewModel
 import com.absinthe.libchecker.features.home.INavViewContainer
 import com.absinthe.libchecker.features.home.ui.view.HomeToolbarTitleView
-import com.absinthe.libchecker.features.settings.ui.SettingsFragment
-import com.absinthe.libchecker.features.snapshot.ui.SnapshotFragment
-import com.absinthe.libchecker.features.statistics.ui.LibReferenceFragment
 import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.services.WorkerService
 import com.absinthe.libchecker.ui.base.BaseActivity
@@ -218,16 +214,11 @@ class MainActivity :
       viewpager.apply {
         adapter = object : FragmentStateAdapter(this@MainActivity) {
           override fun getItemCount(): Int {
-            return 4
+            return HomeDestination.pageCount
           }
 
           override fun createFragment(position: Int): Fragment {
-            return when (position) {
-              0 -> AppListFragment()
-              1 -> LibReferenceFragment()
-              2 -> SnapshotFragment()
-              else -> SettingsFragment()
-            }
+            return HomeDestination.requirePageIndex(position).createFragment()
           }
         }
 
@@ -235,7 +226,7 @@ class MainActivity :
         registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
           override fun onPageSelected(position: Int) {
             super.onPageSelected(position)
-            navView.menu[position].isChecked = true
+            navView.menu.findItem(HomeDestination.requirePageIndex(position).navigationItemId).isChecked = true
             appViewModel.clearMenuState()
           }
         })
@@ -276,13 +267,10 @@ class MainActivity :
             }
           }
 
-          when (it.itemId) {
-            R.id.navigation_app_list -> performClickNavigationItem(0)
-            R.id.navigation_classify -> performClickNavigationItem(1)
-            R.id.navigation_snapshot -> performClickNavigationItem(2)
-            R.id.navigation_settings -> performClickNavigationItem(3)
-          }
-          true
+          HomeDestination.fromNavigationItemId(it.itemId)?.let { destination ->
+            performClickNavigationItem(destination.pageIndex)
+            true
+          } ?: false
         }
         importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
         if (this is BottomNavigationView) {
@@ -356,11 +344,8 @@ class MainActivity :
   }
 
   private fun handleIntent(intent: Intent) {
-    when (intent.action) {
-      Constants.ACTION_APP_LIST -> binding.viewpager.setCurrentItem(0, false)
-      Constants.ACTION_STATISTICS -> binding.viewpager.setCurrentItem(1, false)
-      Constants.ACTION_SNAPSHOT -> binding.viewpager.setCurrentItem(2, false)
-      Intent.ACTION_APPLICATION_PREFERENCES -> binding.viewpager.setCurrentItem(3, false)
+    HomeDestination.fromLaunchAction(intent.action)?.let {
+      binding.viewpager.setCurrentItem(it.pageIndex, false)
     }
     Telemetry.recordEvent(
       Constants.Event.LAUNCH_ACTION,
@@ -377,7 +362,7 @@ class MainActivity :
       effect.onEach {
         when (it) {
           is HomeViewModel.Effect.ReloadApps -> {
-            binding.viewpager.setCurrentItem(0, true)
+            binding.viewpager.setCurrentItem(HomeDestination.APP_LIST.pageIndex, true)
           }
 
           is HomeViewModel.Effect.UpdateAppListStatus -> {
