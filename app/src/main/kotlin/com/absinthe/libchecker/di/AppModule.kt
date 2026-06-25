@@ -11,6 +11,7 @@ import com.absinthe.libchecker.data.app.GlobalAppListSettingsRepository
 import com.absinthe.libchecker.data.app.LocalAppListRepository
 import com.absinthe.libchecker.data.app.LocalInstalledAppRepository
 import com.absinthe.libchecker.data.app.RemoteLibraryDetailRepository
+import com.absinthe.libchecker.data.app.WorkerFeatureInitializationRepository
 import com.absinthe.libchecker.data.app.update.AndroidAppUpdateRepository
 import com.absinthe.libchecker.data.snapshot.AndroidSnapshotItemFactory
 import com.absinthe.libchecker.data.snapshot.GlobalSnapshotSelectionRepository
@@ -41,6 +42,7 @@ import com.absinthe.libchecker.domain.app.ClearApkCacheUseCase
 import com.absinthe.libchecker.domain.app.ExportAppListToUriUseCase
 import com.absinthe.libchecker.domain.app.ExportAppListUseCase
 import com.absinthe.libchecker.domain.app.ExportInstalledAppsToUriUseCase
+import com.absinthe.libchecker.domain.app.FeatureInitializationRepository
 import com.absinthe.libchecker.domain.app.FilterAppListItemsUseCase
 import com.absinthe.libchecker.domain.app.GetApkPreviewInfoUseCase
 import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
@@ -197,6 +199,7 @@ val appModule = module {
   single<AndroidDistributionRepository> { CachedAndroidDistributionRepository(androidContext()) }
   single<AppListItemFactory> { AndroidAppListItemFactory(androidContext()) }
   single<AppListExportMetadata> { AndroidAppListExportMetadata(androidContext()) }
+  single<FeatureInitializationRepository> { WorkerFeatureInitializationRepository() }
   single<SnapshotItemFactory> { AndroidSnapshotItemFactory() }
   single<SnapshotSelectionRepository> { GlobalSnapshotSelectionRepository() }
   single<SnapshotSettingsRepository> { GlobalSnapshotSettingsRepository() }
@@ -447,7 +450,8 @@ val appModule = module {
       appListRepository = get(),
       chartDataProvider = get(),
       chartDataSourceFactory = get(),
-      chartSettingsRepository = get()
+      chartSettingsRepository = get(),
+      featureInitializationRepository = get()
     )
   }
   viewModel {
@@ -468,7 +472,8 @@ val appModule = module {
       exportAppListToUriUseCase = get(),
       getAppListContentUseCase = get(),
       appListSettingsRepository = get(),
-      clearApkCacheUseCase = get()
+      clearApkCacheUseCase = get(),
+      featureInitializationRepository = get()
     )
   }
   viewModel {

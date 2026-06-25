@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppListItemViewState
 import com.absinthe.libchecker.domain.app.AppListRepository
+import com.absinthe.libchecker.domain.app.FeatureInitializationRepository
 import com.absinthe.libchecker.domain.statistics.ChartSettingsRepository
-import com.absinthe.libchecker.services.WorkerService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -26,7 +26,8 @@ class ChartViewModel internal constructor(
   appListRepository: AppListRepository,
   private val chartDataProvider: ChartDataProvider,
   private val chartDataSourceFactory: ChartDataSourceFactory,
-  private val chartSettingsRepository: ChartSettingsRepository
+  private val chartSettingsRepository: ChartSettingsRepository,
+  private val featureInitializationRepository: FeatureInitializationRepository
 ) : ViewModel() {
   private val appListItemsState = appListRepository.items
     .map<List<LCItem>, List<LCItem>?> { it }
@@ -39,7 +40,7 @@ class ChartViewModel internal constructor(
   val featureInitializationPlans: Flow<ChartFeatureInitializationPlan> =
     buildFeatureInitializationPlans()
   val initialFeatureInitializationPending: Boolean
-    get() = WorkerService.featureInitializationState.value.running
+    get() = featureInitializationRepository.isRunning
 
   private val _loadingProgress = MutableStateFlow(LOADING_PROGRESS_MAX)
   val loadingProgress = _loadingProgress.asStateFlow()
@@ -91,7 +92,7 @@ class ChartViewModel internal constructor(
     var previousPending = initialFeatureInitializationPending
     combine(
       appListItemsState,
-      WorkerService.featureInitializationState
+      featureInitializationRepository.state
     ) { items, state ->
       val hasUninitializedFeatureItems = items?.any { item -> item.features == FEATURES_NOT_INITIALIZED } == true
       state.running || (items != null && !state.completed && hasUninitializedFeatureItems)

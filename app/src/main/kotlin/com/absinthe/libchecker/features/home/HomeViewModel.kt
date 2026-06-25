@@ -14,6 +14,7 @@ import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.ClearApkCacheUseCase
 import com.absinthe.libchecker.domain.app.ExportAppListToUriUseCase
 import com.absinthe.libchecker.domain.app.ExportAppListUseCase
+import com.absinthe.libchecker.domain.app.FeatureInitializationRepository
 import com.absinthe.libchecker.domain.app.GetAppListContentUseCase
 import com.absinthe.libchecker.domain.app.InitializeAppListUseCase
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
@@ -21,7 +22,6 @@ import com.absinthe.libchecker.domain.app.PackageChangeState
 import com.absinthe.libchecker.domain.app.SyncAppListChangesUseCase
 import com.absinthe.libchecker.domain.app.sync.AppListChangeRequestQueue
 import com.absinthe.libchecker.services.IWorkerService
-import com.absinthe.libchecker.services.WorkerService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -42,7 +42,8 @@ class HomeViewModel(
   private val exportAppListToUriUseCase: ExportAppListToUriUseCase,
   private val getAppListContentUseCase: GetAppListContentUseCase,
   private val appListSettingsRepository: AppListSettingsRepository,
-  private val clearApkCacheUseCase: ClearApkCacheUseCase
+  private val clearApkCacheUseCase: ClearApkCacheUseCase,
+  featureInitializationRepository: FeatureInitializationRepository
 ) : ViewModel() {
 
   val dbItemsFlow: Flow<List<LCItem>> = appListRepository.items
@@ -56,7 +57,7 @@ class HomeViewModel(
   private val isRequestChangeRunning = _isRequestChangeRunning.asStateFlow()
   val toolbarLoading: Flow<Boolean> = combine(
     isRequestChangeRunning,
-    WorkerService.featureInitializationState,
+    featureInitializationRepository.state,
     dbItemsFlow
   ) { requestChangeRunning, featureInitializationState, dbItems ->
     requestChangeRunning ||
