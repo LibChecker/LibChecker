@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.browser.customtabs.CustomTabsIntent
-import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
@@ -34,6 +33,7 @@ import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.SetApkAnalysisEnabledUseCase
 import com.absinthe.libchecker.domain.rules.RuleSettingsRepository
 import com.absinthe.libchecker.domain.settings.BuildLocalePreferenceDataUseCase
+import com.absinthe.libchecker.domain.settings.BuildLogShareIntentUseCase
 import com.absinthe.libchecker.domain.settings.LocalePreferenceSummary
 import com.absinthe.libchecker.domain.settings.SelectDarkModeUseCase
 import com.absinthe.libchecker.domain.settings.SelectLocaleUseCase
@@ -53,7 +53,6 @@ import com.absinthe.libchecker.utils.extensions.setBottomPaddingSpace
 import com.absinthe.libraries.utils.extensions.getBoolean
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.google.android.material.card.MaterialCardView
-import java.io.File
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import rikka.recyclerview.fixEdgeEffect
@@ -82,6 +81,7 @@ class SettingsFragment :
   private val appListSettingsRepository: AppListSettingsRepository by inject()
   private val ruleSettingsRepository: RuleSettingsRepository by inject()
   private val snapshotSettingsRepository: SnapshotSettingsRepository by inject()
+  private val buildLogShareIntent: BuildLogShareIntentUseCase by inject()
   private val buildLocalePreferenceData: BuildLocalePreferenceDataUseCase by inject()
   private val setApkAnalysisEnabled: SetApkAnalysisEnabledUseCase by inject()
   private val selectDarkMode: SelectDarkModeUseCase by inject()
@@ -197,38 +197,22 @@ class SettingsFragment :
         if (AntiShakeUtils.isInvalidClick(prefRecyclerView)) {
           false
         } else {
-          val logDir = File(requireContext().cacheDir, "logs")
-          if (!logDir.exists() || !logDir.isDirectory) {
-            return@setOnPreferenceClickListener true
-          }
+          lifecycleScope.launch {
+            val logShareIntent = buildLogShareIntent().getOrElse { e ->
+              Timber.e(e)
+              Toasty.showShort(requireContext(), e.toString())
+              recordPreferenceEvent(Constants.PREF_EXPORT_LOG)
+              return@launch
+            } ?: return@launch
 
-          val latestLogFile = logDir.listFiles()
-            ?.filter { it.isFile && it.name.endsWith(".log") }
-            ?.maxByOrNull { it.lastModified() }
-
-          if (latestLogFile == null) {
-            return@setOnPreferenceClickListener true
-          }
-
-          Timber.d("Latest log file: ${latestLogFile.absolutePath}")
-          try {
-            val uri = FileProvider.getUriForFile(
-              requireContext(),
-              "${BuildConfig.APPLICATION_ID}.fileprovider",
-              latestLogFile
-            )
-            val intent = Intent(Intent.ACTION_SEND).apply {
-              type = "text/plain"
-              putExtra(Intent.EXTRA_STREAM, uri)
-              addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            runCatching {
+              startActivity(Intent.createChooser(logShareIntent, getString(R.string.export_log)))
+            }.onFailure { e ->
+              Timber.e(e)
+              Toasty.showShort(requireContext(), e.toString())
             }
-            startActivity(Intent.createChooser(intent, getString(R.string.export_log)))
-          } catch (e: Exception) {
-            Timber.e(e)
-            Toasty.showShort(requireContext(), e.toString())
+            recordPreferenceEvent(Constants.PREF_EXPORT_LOG)
           }
-
-          recordPreferenceEvent(Constants.PREF_EXPORT_LOG)
           true
         }
       }

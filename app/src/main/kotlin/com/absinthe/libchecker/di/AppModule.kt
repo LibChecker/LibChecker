@@ -117,6 +117,7 @@ import com.absinthe.libchecker.domain.rules.CloudRulesRepository
 import com.absinthe.libchecker.domain.rules.RuleSettingsRepository
 import com.absinthe.libchecker.domain.settings.AppearanceSettingsRepository
 import com.absinthe.libchecker.domain.settings.BuildLocalePreferenceDataUseCase
+import com.absinthe.libchecker.domain.settings.BuildLogShareIntentUseCase
 import com.absinthe.libchecker.domain.settings.DeveloperSettingsRepository
 import com.absinthe.libchecker.domain.settings.SelectDarkModeUseCase
 import com.absinthe.libchecker.domain.settings.SelectLocaleUseCase
@@ -325,6 +326,7 @@ val appModule = module {
     )
   }
   factory { BuildLocalePreferenceDataUseCase(get()) }
+  factory { BuildLogShareIntentUseCase(androidContext(), BuildConfig.APPLICATION_ID) }
   factory { SelectDarkModeUseCase(get()) }
   factory { SelectLocaleUseCase(get()) }
   factory { ShouldShowStaticLibraryTabUseCase(get()) }
