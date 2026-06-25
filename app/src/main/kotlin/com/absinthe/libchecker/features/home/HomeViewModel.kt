@@ -20,8 +20,6 @@ import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.PackageChangeState
 import com.absinthe.libchecker.domain.app.SyncAppListChangesUseCase
 import com.absinthe.libchecker.domain.app.sync.AppListChangeRequestQueue
-import com.absinthe.libchecker.features.statistics.LibReferenceComputationController
-import com.absinthe.libchecker.features.statistics.bean.LibReference
 import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.ui.base.IListController
 import kotlinx.coroutines.Dispatchers
@@ -41,7 +39,6 @@ class HomeViewModel(
   private val syncAppListChangesUseCase: SyncAppListChangesUseCase,
   private val exportAppListToUriUseCase: ExportAppListToUriUseCase,
   private val getAppListContentUseCase: GetAppListContentUseCase,
-  libReferenceComputationControllerFactory: LibReferenceComputationController.Factory,
   private val appListSettingsRepository: AppListSettingsRepository,
   private val clearApkCacheUseCase: ClearApkCacheUseCase
 ) : ViewModel() {
@@ -55,19 +52,6 @@ class HomeViewModel(
 
   private val _isRequestChangeRunning = MutableStateFlow(false)
   val isRequestChangeRunning = _isRequestChangeRunning.asStateFlow()
-
-  private val libReferenceComputationController =
-    libReferenceComputationControllerFactory.create(viewModelScope, ::updateLibRefProgress)
-  val libReference = libReferenceComputationController.libReference
-
-  val savedRefList: List<LibReference>?
-    get() = libReferenceComputationController.savedRefList
-
-  var savedThreshold: Int
-    get() = libReferenceComputationController.savedThreshold
-    set(value) {
-      libReferenceComputationController.savedThreshold = value
-    }
 
   var controller: IListController? = null
   var appListStatus: Int = STATUS_NOT_START
@@ -129,12 +113,6 @@ class HomeViewModel(
       Effect.UpdateAppListStatus(status)
     }
     appListStatus = status
-  }
-
-  private fun updateLibRefProgress(progress: Int) {
-    setEffect {
-      Effect.UpdateLibRefProgress(progress)
-    }
   }
 
   private fun setEffect(builder: () -> Effect) {
@@ -240,22 +218,6 @@ class HomeViewModel(
     }
   }
 
-  fun computeLibReference() {
-    libReferenceComputationController.compute()
-  }
-
-  fun matchingRules() {
-    libReferenceComputationController.match()
-  }
-
-  fun cancelMatchingJob() {
-    libReferenceComputationController.cancelMatchingJob()
-  }
-
-  fun refreshRef() {
-    libReferenceComputationController.refresh()
-  }
-
   private var clearApkCacheJob: Job? = null
 
   fun clearApkCache() {
@@ -271,7 +233,6 @@ class HomeViewModel(
     data class UpdateAppListStatus(val status: Int) : Effect()
     data class PackageChanged(val packageChangeState: PackageChangeState) : Effect()
     data class RefreshList(val obj: Any? = null) : Effect()
-    data class UpdateLibRefProgress(val progress: Int) : Effect()
   }
 
   fun dumpAppsInfo(uri: Uri, saveAsMarkDown: Boolean) {

@@ -25,6 +25,7 @@ import com.absinthe.libchecker.features.applist.ui.AdvancedMenuBSDFragment
 import com.absinthe.libchecker.features.chart.ui.ChartActivity
 import com.absinthe.libchecker.features.home.HomeViewModel
 import com.absinthe.libchecker.features.home.INavViewContainer
+import com.absinthe.libchecker.features.statistics.LibReferenceViewModel
 import com.absinthe.libchecker.features.statistics.bean.LibReference
 import com.absinthe.libchecker.features.statistics.ui.adapter.LibReferenceAdapter
 import com.absinthe.libchecker.features.statistics.ui.adapter.RefListDiffUtil
@@ -47,6 +48,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import rikka.widget.borderview.BorderView
 
 const val VF_LOADING = 0
@@ -59,6 +61,7 @@ class LibReferenceFragment :
 
   private val appListSettingsRepository: AppListSettingsRepository by inject()
   private val libReferenceSettingsRepository: LibReferenceSettingsRepository by inject()
+  private val libReferenceViewModel: LibReferenceViewModel by viewModel()
   private val refAdapter by lazy { LibReferenceAdapter(appListSettingsRepository.colorfulRuleIcon) }
   private var delayShowNavigationJob: Job? = null
   private var searchUpdateJob: Job? = null
@@ -177,21 +180,22 @@ class LibReferenceFragment :
             requestComputeRef(false)
           }
 
-          is HomeViewModel.Effect.UpdateLibRefProgress -> {
-            binding.loadingView.progressIndicator.setProgressCompat(
-              it.progress,
-              it.progress > 0
-            )
-          }
-
           else -> {}
         }
       }.launchIn(lifecycleScope)
-      libReference.onEach {
-        if (it == null) {
+    }
+    libReferenceViewModel.apply {
+      progress.onEach {
+        binding.loadingView.progressIndicator.setProgressCompat(
+          it,
+          it > 0
+        )
+      }.launchIn(lifecycleScope)
+      libReference.onEach { references ->
+        if (references == null) {
           return@onEach
         }
-        refAdapter.setList(it)
+        refAdapter.setList(references)
 
         flip(VF_LIST)
         refAdapter.setSpaceFooterView()
@@ -213,11 +217,11 @@ class LibReferenceFragment :
 
         Constants.PREF_LIB_REF_THRESHOLD -> {
           val threshold = it.second as Int
-          if (threshold < homeViewModel.savedThreshold) {
+          if (threshold < libReferenceViewModel.savedThreshold) {
             requestMatchRules(true)
-            homeViewModel.savedThreshold = threshold
+            libReferenceViewModel.savedThreshold = threshold
           } else {
-            homeViewModel.refreshRef()
+            libReferenceViewModel.refreshRef()
           }
         }
       }
@@ -341,7 +345,7 @@ class LibReferenceFragment :
     if (needShowLoading) {
       flip(VF_LOADING)
     }
-    homeViewModel.computeLibReference()
+    libReferenceViewModel.computeLibReference()
   }
 
   private fun matchRules(needShowLoading: Boolean) {
@@ -349,8 +353,8 @@ class LibReferenceFragment :
     if (needShowLoading) {
       flip(VF_LOADING)
     }
-    homeViewModel.cancelMatchingJob()
-    homeViewModel.matchingRules()
+    libReferenceViewModel.cancelMatchingJob()
+    libReferenceViewModel.matchingRules()
   }
 
   override fun onQueryTextSubmit(query: String?): Boolean {
@@ -373,7 +377,7 @@ class LibReferenceFragment :
             (activity as? INavViewContainer)?.showProgressBar()
             progressBarShown = true
           }
-          val savedRefList = homeViewModel.savedRefList ?: return@launch
+          val savedRefList = libReferenceViewModel.savedRefList ?: return@launch
           val filter = withContext(Dispatchers.Default) {
             if (newText.isEmpty()) {
               savedRefList

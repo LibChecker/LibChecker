@@ -446,7 +446,6 @@ val appModule = module {
       syncAppListChangesUseCase = get(),
       exportAppListToUriUseCase = get(),
       getAppListContentUseCase = get(),
-      libReferenceComputationControllerFactory = get(),
       appListSettingsRepository = get(),
       clearApkCacheUseCase = get()
     )
@@ -456,7 +455,8 @@ val appModule = module {
       appListRepository = get(),
       buildAppListItemViewStatesUseCase = get(),
       getLibReferenceAppsUseCase = get(),
-      libReferenceSettingsRepository = get()
+      libReferenceSettingsRepository = get(),
+      libReferenceComputationControllerFactory = get()
     )
   }
   viewModel {

@@ -10,10 +10,12 @@ import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.BuildAppListItemViewStatesUseCase
 import com.absinthe.libchecker.domain.statistics.GetLibReferenceAppsUseCase
 import com.absinthe.libchecker.domain.statistics.LibReferenceSettingsRepository
+import com.absinthe.libchecker.features.statistics.bean.LibReference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -24,12 +26,44 @@ class LibReferenceViewModel(
   appListRepository: AppListRepository,
   private val buildAppListItemViewStatesUseCase: BuildAppListItemViewStatesUseCase,
   private val getLibReferenceAppsUseCase: GetLibReferenceAppsUseCase,
-  private val libReferenceSettingsRepository: LibReferenceSettingsRepository
+  private val libReferenceSettingsRepository: LibReferenceSettingsRepository,
+  libReferenceComputationControllerFactory: LibReferenceComputationController.Factory
 ) : ViewModel() {
 
   val libRefListFlow: MutableSharedFlow<List<LCItem>> = MutableSharedFlow()
   val dbItemsFlow: Flow<List<LCItem>> = appListRepository.items
+  private val _progress = MutableSharedFlow<Int>()
+  val progress = _progress.asSharedFlow()
+  private val libReferenceComputationController =
+    libReferenceComputationControllerFactory.create(viewModelScope, ::updateProgress)
+  val libReference = libReferenceComputationController.libReference
+
+  val savedRefList: List<LibReference>?
+    get() = libReferenceComputationController.savedRefList
+
+  var savedThreshold: Int
+    get() = libReferenceComputationController.savedThreshold
+    set(value) {
+      libReferenceComputationController.savedThreshold = value
+    }
+
   private var actionTargets: Map<String, GetLibReferenceAppsUseCase.ActionTarget> = emptyMap()
+
+  fun computeLibReference() {
+    libReferenceComputationController.compute()
+  }
+
+  fun matchingRules() {
+    libReferenceComputationController.match()
+  }
+
+  fun cancelMatchingJob() {
+    libReferenceComputationController.cancelMatchingJob()
+  }
+
+  fun refreshRef() {
+    libReferenceComputationController.refresh()
+  }
 
   fun setData(name: String, @LibType type: Int) = viewModelScope.launch(Dispatchers.IO) {
     dbItemsFlow.collectLatest {
@@ -61,6 +95,12 @@ class LibReferenceViewModel(
   fun getActionTarget(packageName: String): Pair<String, Int>? {
     val target = actionTargets[packageName] ?: return null
     return target.name to target.type
+  }
+
+  private fun updateProgress(progress: Int) {
+    viewModelScope.launch {
+      _progress.emit(progress)
+    }
   }
 
   private suspend fun emitLibReferenceApps(

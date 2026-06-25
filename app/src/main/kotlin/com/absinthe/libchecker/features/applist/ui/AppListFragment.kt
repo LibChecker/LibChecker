@@ -440,8 +440,6 @@ class AppListFragment :
             pendingReturnTopAfterRequestChange = true
             updateItems()
           }
-
-          else -> {}
         }
       }.launchIn(lifecycleScope)
       dbItemsFlow.distinctUntilChanged(::areAppListItemsTheSame).onEach {
