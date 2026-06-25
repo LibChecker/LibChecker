@@ -26,10 +26,10 @@ import androidx.preference.TwoStatePreference
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.database.backup.RoomBackup
 import com.absinthe.libchecker.databinding.ActivityBackupBinding
+import com.absinthe.libchecker.domain.snapshot.CreateSnapshotDatabaseBackupUseCase
 import com.absinthe.libchecker.domain.snapshot.RestoreSnapshotDatabaseBackupUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
 import com.absinthe.libchecker.features.home.ui.MainActivity
@@ -105,6 +105,7 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
     private lateinit var backupResultLauncher: ActivityResultLauncher<String>
     private lateinit var restoreResultLauncher: ActivityResultLauncher<String>
     private lateinit var roomBackup: RoomBackup
+    private lateinit var createSnapshotDatabaseBackup: CreateSnapshotDatabaseBackupUseCase
     private lateinit var restoreSnapshotDatabaseBackup: RestoreSnapshotDatabaseBackupUseCase
     private var loadingDialog: AlertDialog? = null
 
@@ -149,6 +150,9 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
           }
         }
       roomBackup = RoomBackup(context)
+      createSnapshotDatabaseBackup = getKoin().get {
+        parametersOf(roomBackup)
+      }
       restoreSnapshotDatabaseBackup = getKoin().get {
         parametersOf(roomBackup)
       }
@@ -169,22 +173,15 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
             if (FileUtils.getFileSize(RulesRepository.getDatabaseFile()) > 100 * 1024 * 1024) {
               loadingDialog = UiUtils.createLoadingDialog(requireActivity())
               loadingDialog?.show()
-              roomBackup
-                .database(LCDatabase.getDatabase())
-                .enableLogDebug(true)
-                .backupLocation(RoomBackup.BACKUP_FILE_LOCATION_CUSTOM_DIALOG)
-                .customBackupFileName("LibChecker-Snapshot-Backups-$formatted.sqlite3")
-                .maxFileCount(5)
-                .apply {
-                  onCompleteListener { success, message, exitCode ->
-                    Timber.d("success: $success, message: $message, exitCode: $exitCode")
-                    lifecycleScope.launch(Dispatchers.Main) {
-                      loadingDialog?.dismiss()
-                      loadingDialog = null
-                    }
-                  }
+              createSnapshotDatabaseBackup { result ->
+                Timber.d(
+                  "success: ${result.success}, message: ${result.message}, exitCode: ${result.exitCode}"
+                )
+                lifecycleScope.launch(Dispatchers.Main) {
+                  loadingDialog?.dismiss()
+                  loadingDialog = null
                 }
-                .backup()
+              }
             } else {
               runCatching {
                 backupResultLauncher.launch("LibChecker-Snapshot-Backups-$formatted.lcss")

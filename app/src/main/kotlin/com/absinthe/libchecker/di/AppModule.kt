@@ -14,6 +14,7 @@ import com.absinthe.libchecker.data.snapshot.AndroidSnapshotItemFactory
 import com.absinthe.libchecker.data.snapshot.GlobalSnapshotSelectionRepository
 import com.absinthe.libchecker.data.snapshot.GlobalSnapshotSettingsRepository
 import com.absinthe.libchecker.data.snapshot.GlobalSnapshotTrackChangeRepository
+import com.absinthe.libchecker.data.snapshot.LocalSnapshotDatabaseBackupExporter
 import com.absinthe.libchecker.data.snapshot.LocalSnapshotDatabaseBackupRestorer
 import com.absinthe.libchecker.data.snapshot.LocalSnapshotRepository
 import com.absinthe.libchecker.data.snapshot.ProtoSnapshotArchiveCodec
@@ -116,6 +117,7 @@ import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotListsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotWithInstalledAppsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareTrackedSnapshotListsUseCase
+import com.absinthe.libchecker.domain.snapshot.CreateSnapshotDatabaseBackupUseCase
 import com.absinthe.libchecker.domain.snapshot.GetApexPackageNamesUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotPackageIconSourcesUseCase
@@ -379,6 +381,14 @@ val appModule = module {
   factory { BuildSnapshotDetailItemsUseCase(androidContext()) }
   factory { SnapshotArchiveUseCase(get(), get()) }
   factory { BackupSnapshotArchiveToUriUseCase(androidContext().contentResolver, get()) }
+  factory { (roomBackup: RoomBackup) ->
+    CreateSnapshotDatabaseBackupUseCase(
+      databaseBackupExporter = LocalSnapshotDatabaseBackupExporter(
+        roomBackup = roomBackup,
+        database = { LCDatabase.getDatabase() }
+      )
+    )
+  }
   factory { PrepareRoomBackupRestoreFileUseCase(androidContext().contentResolver) }
   factory { (roomBackup: RoomBackup) ->
     RestoreSnapshotDatabaseBackupUseCase(
