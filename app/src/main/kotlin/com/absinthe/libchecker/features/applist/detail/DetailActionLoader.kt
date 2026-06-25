@@ -6,8 +6,6 @@ import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppBundleSplitItem
 import com.absinthe.libchecker.domain.app.AppManifestProperty
-import com.absinthe.libchecker.domain.app.AppPackageShareFile
-import com.absinthe.libchecker.domain.app.ExportAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.ExtractNativeLibraryUseCase
 import com.absinthe.libchecker.domain.app.GetAlternativeLaunchItemsUseCase
 import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
@@ -15,14 +13,16 @@ import com.absinthe.libchecker.domain.app.GetAppInfoActionsUseCase
 import com.absinthe.libchecker.domain.app.GetAppInstallSourceDetailsUseCase
 import com.absinthe.libchecker.domain.app.GetAppLaunchActionUseCase
 import com.absinthe.libchecker.domain.app.GetAppManifestPropertiesUseCase
-import com.absinthe.libchecker.domain.app.PrepareAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.detail.GetRelatedAppDisplayDataUseCase
+import com.absinthe.libchecker.domain.app.detail.action.AppPackageShareFile
 import com.absinthe.libchecker.domain.app.detail.action.BuildSignatureDetailItemsUseCase
+import com.absinthe.libchecker.domain.app.detail.action.ExportAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetElfDetailUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetLibraryDetailDialogDataUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetOverlayDetailUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetPermissionDetailUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetXposedModuleInfoUseCase
+import com.absinthe.libchecker.domain.app.detail.action.PrepareAppPackageShareActionUseCase
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import java.io.File
 
@@ -41,7 +41,7 @@ class DetailActionLoader(
   private val getXposedModuleInfoUseCase: GetXposedModuleInfoUseCase,
   private val buildSignatureDetailItemsUseCase: BuildSignatureDetailItemsUseCase,
   private val extractNativeLibraryUseCase: ExtractNativeLibraryUseCase,
-  private val prepareAppPackageShareFileUseCase: PrepareAppPackageShareFileUseCase,
+  private val prepareAppPackageShareActionUseCase: PrepareAppPackageShareActionUseCase,
   private val exportAppPackageShareFileUseCase: ExportAppPackageShareFileUseCase
 ) {
   suspend fun getAppBundleItems(packageInfo: PackageInfo): List<AppBundleSplitItem> {
@@ -67,10 +67,10 @@ class DetailActionLoader(
     packageState.isApkPreview
   )
 
-  suspend fun prepareAppPackageShareFile(
+  suspend fun prepareAppPackageShareAction(
     cacheDir: File,
     packageName: String
-  ) = prepareAppPackageShareFileUseCase(cacheDir, packageName)
+  ) = prepareAppPackageShareActionUseCase(cacheDir, packageName)
 
   suspend fun exportAppPackageShareFile(
     shareFile: AppPackageShareFile,

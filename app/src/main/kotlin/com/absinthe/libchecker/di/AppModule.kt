@@ -33,7 +33,6 @@ import com.absinthe.libchecker.domain.app.CheckRequiredPackageAvailabilityUseCas
 import com.absinthe.libchecker.domain.app.ClearApkCacheUseCase
 import com.absinthe.libchecker.domain.app.ExportAppListToUriUseCase
 import com.absinthe.libchecker.domain.app.ExportAppListUseCase
-import com.absinthe.libchecker.domain.app.ExportAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.ExportInstalledAppsToUriUseCase
 import com.absinthe.libchecker.domain.app.ExtractNativeLibraryUseCase
 import com.absinthe.libchecker.domain.app.FilterAppDetailItemsUseCase
@@ -58,7 +57,6 @@ import com.absinthe.libchecker.domain.app.InitializePendingAppFeaturesUseCase
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.LibraryDetailRepository
 import com.absinthe.libchecker.domain.app.PrepareApkAnalysisPackageUseCase
-import com.absinthe.libchecker.domain.app.PrepareAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
 import com.absinthe.libchecker.domain.app.SortAppDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.SyncAppListChangesUseCase
@@ -72,11 +70,14 @@ import com.absinthe.libchecker.domain.app.detail.GetAppDetailPackageSizeUseCase
 import com.absinthe.libchecker.domain.app.detail.GetRelatedAppDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.detail.ShouldShowStaticLibraryTabUseCase
 import com.absinthe.libchecker.domain.app.detail.action.BuildSignatureDetailItemsUseCase
+import com.absinthe.libchecker.domain.app.detail.action.ExportAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetElfDetailUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetLibraryDetailDialogDataUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetOverlayDetailUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetPermissionDetailUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetXposedModuleInfoUseCase
+import com.absinthe.libchecker.domain.app.detail.action.PrepareAppPackageShareActionUseCase
+import com.absinthe.libchecker.domain.app.detail.action.PrepareAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailAbilityChipsUseCase
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailComponentChipsUseCase
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailComponentsUseCase
@@ -203,6 +204,7 @@ val appModule = module {
   factory { GetAppDetailPermissionChipsUseCase() }
   factory { GetAppDetailSignatureChipsUseCase(androidContext(), get()) }
   factory { PrepareAppPackageShareFileUseCase(androidContext(), BuildConfig.APPLICATION_ID, get()) }
+  factory { PrepareAppPackageShareActionUseCase(get()) }
   factory { ExportAppPackageShareFileUseCase(androidContext().contentResolver) }
   factory { ResolveAppResourceValueUseCase(androidContext().packageManager) }
   factory { GetApkPreviewInfoUseCase() }
@@ -254,7 +256,7 @@ val appModule = module {
       getXposedModuleInfoUseCase = get(),
       buildSignatureDetailItemsUseCase = get(),
       extractNativeLibraryUseCase = get(),
-      prepareAppPackageShareFileUseCase = get(),
+      prepareAppPackageShareActionUseCase = get(),
       exportAppPackageShareFileUseCase = get()
     )
   }

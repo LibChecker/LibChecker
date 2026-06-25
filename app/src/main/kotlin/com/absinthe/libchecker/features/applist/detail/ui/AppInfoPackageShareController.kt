@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.domain.app.AppPackageShareFile
+import com.absinthe.libchecker.domain.app.detail.action.AppPackageShareFile
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.Toasty
@@ -72,22 +72,17 @@ class AppInfoPackageShareController(
     val loading = UiUtils.createLoadingDialog(activity)
     loading.show()
     coroutineScope.launch {
-      val shareResult = runCatching {
-        viewModel.prepareAppPackageShareFile(activity.cacheDir, pkg)
+      val shareActionResult = runCatching {
+        viewModel.prepareAppPackageShareAction(activity.cacheDir, pkg)
       }
       loading.dismiss()
 
-      shareResult.onSuccess { shareFile ->
-        val shareIntent = Intent(Intent.ACTION_SEND).apply {
-          type = shareFile.mimeType
-          putExtra(Intent.EXTRA_STREAM, shareFile.contentUri)
-          addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
+      shareActionResult.onSuccess { shareAction ->
         if (!GlobalValues.longTapShareButtonTip) {
           Toasty.showLong(view.context, R.string.toast_long_tap_share_button_tip)
         }
         runCatching {
-          fragment.startActivity(Intent.createChooser(shareIntent, null))
+          fragment.startActivity(Intent.createChooser(shareAction.shareIntent, null))
           Telemetry.recordEvent(
             Constants.Event.APP_INFO_BOTTOM_SHEET,
             mapOf(
@@ -117,21 +112,15 @@ class AppInfoPackageShareController(
       val activity = view.context as Activity
       val loading = UiUtils.createLoadingDialog(activity)
       loading.show()
-      val fileResult = runCatching {
-        viewModel.prepareAppPackageShareFile(activity.cacheDir, pkg)
+      val shareActionResult = runCatching {
+        viewModel.prepareAppPackageShareAction(activity.cacheDir, pkg)
       }
       loading.dismiss()
 
-      fileResult.onSuccess { shareFile ->
-        pendingExportShareFile = shareFile
-        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-          addCategory(Intent.CATEGORY_OPENABLE)
-          type = shareFile.mimeType
-          putExtra(Intent.EXTRA_TITLE, shareFile.file.name)
-        }
-
+      shareActionResult.onSuccess { shareAction ->
+        pendingExportShareFile = shareAction.shareFile
         runCatching {
-          exportDocument(intent)
+          exportDocument(shareAction.exportIntent)
         }.onFailure { throwable ->
           pendingExportShareFile = null
           Timber.e(throwable)
