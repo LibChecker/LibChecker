@@ -33,7 +33,6 @@ import com.absinthe.libchecker.domain.app.ClearApkCacheUseCase
 import com.absinthe.libchecker.domain.app.ExportAppListToUriUseCase
 import com.absinthe.libchecker.domain.app.ExportAppListUseCase
 import com.absinthe.libchecker.domain.app.ExportInstalledAppsToUriUseCase
-import com.absinthe.libchecker.domain.app.FilterAppDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.FilterAppListItemsUseCase
 import com.absinthe.libchecker.domain.app.GetApkPreviewInfoUseCase
 import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
@@ -51,7 +50,6 @@ import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.LibraryDetailRepository
 import com.absinthe.libchecker.domain.app.PrepareApkAnalysisPackageUseCase
 import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
-import com.absinthe.libchecker.domain.app.SortAppDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.SyncAppListChangesUseCase
 import com.absinthe.libchecker.domain.app.detail.BuildAppDetailAbiLabelDataUseCase
 import com.absinthe.libchecker.domain.app.detail.BuildAppDetailHeaderExtraInfoUseCase
@@ -79,6 +77,8 @@ import com.absinthe.libchecker.domain.app.detail.action.GetPermissionDetailUseCa
 import com.absinthe.libchecker.domain.app.detail.action.GetXposedModuleInfoUseCase
 import com.absinthe.libchecker.domain.app.detail.action.PrepareAppPackageShareActionUseCase
 import com.absinthe.libchecker.domain.app.detail.action.PrepareAppPackageShareFileUseCase
+import com.absinthe.libchecker.domain.app.detail.content.BuildDetailProcessFilterDataUseCase
+import com.absinthe.libchecker.domain.app.detail.content.FilterAppDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailAbilityChipsUseCase
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailComponentChipsUseCase
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailComponentsUseCase
@@ -88,6 +88,7 @@ import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailNativeLibra
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailPermissionChipsUseCase
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailSignatureChipsUseCase
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailStaticLibraryChipsUseCase
+import com.absinthe.libchecker.domain.app.detail.content.SortAppDetailItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.BackupSnapshotArchiveToUriUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildInstalledSnapshotItemUseCase
@@ -181,6 +182,7 @@ val appModule = module {
   factory { GetLibReferenceAppsUseCase(get()) }
   factory { ExportAppListUseCase(get(), get()) }
   factory { ExportAppListToUriUseCase(androidContext().contentResolver, get()) }
+  factory { BuildDetailProcessFilterDataUseCase() }
   factory { FilterAppDetailItemsUseCase() }
   factory { FilterAppListItemsUseCase(get()) }
   factory { GetAlternativeLaunchItemsUseCase(androidContext().packageManager, get()) }
@@ -300,6 +302,7 @@ val appModule = module {
     DetailFilterController(
       filterAppDetailItemsUseCase = get(),
       sortAppDetailItemsUseCase = get(),
+      buildDetailProcessFilterDataUseCase = get(),
       appDetailSettingsRepository = get()
     )
   }

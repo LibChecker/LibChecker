@@ -2,14 +2,16 @@ package com.absinthe.libchecker.features.applist.detail
 
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
-import com.absinthe.libchecker.domain.app.FilterAppDetailItemsUseCase
-import com.absinthe.libchecker.domain.app.SortAppDetailItemsUseCase
+import com.absinthe.libchecker.domain.app.detail.content.BuildDetailProcessFilterDataUseCase
+import com.absinthe.libchecker.domain.app.detail.content.FilterAppDetailItemsUseCase
+import com.absinthe.libchecker.domain.app.detail.content.SortAppDetailItemsUseCase
 import com.absinthe.libchecker.features.applist.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 
 class DetailFilterController(
   private val filterAppDetailItemsUseCase: FilterAppDetailItemsUseCase,
   private val sortAppDetailItemsUseCase: SortAppDetailItemsUseCase,
+  private val buildDetailProcessFilterDataUseCase: BuildDetailProcessFilterDataUseCase,
   private val appDetailSettingsRepository: AppDetailSettingsRepository
 ) {
   val filterState = DetailFilterState()
@@ -36,6 +38,28 @@ class DetailFilterController(
 
   fun sortDetailItems(items: List<LibStringItemChip>, @LibType type: Int): List<LibStringItemChip> {
     return sortAppDetailItemsUseCase(items, type, isSortByLibMode())
+  }
+
+  fun buildProcessFilterData(
+    @LibType type: Int,
+    componentProcessesMap: Map<String, Int>,
+    permissionItems: List<LibStringItemChip>?,
+    permissionNotGrantedLabel: String,
+    permissionNotGrantedColor: Int
+  ) = buildDetailProcessFilterDataUseCase(
+    type = type,
+    componentProcessesMap = componentProcessesMap,
+    permissionItems = permissionItems,
+    permissionNotGrantedLabel = permissionNotGrantedLabel,
+    permissionNotGrantedColor = permissionNotGrantedColor
+  )
+
+  fun isComponentDetailType(@LibType type: Int): Boolean {
+    return buildDetailProcessFilterDataUseCase.isComponentDetailType(type)
+  }
+
+  fun hasNonGrantedPermissions(@LibType type: Int, permissionItems: List<LibStringItemChip>?): Boolean {
+    return buildDetailProcessFilterDataUseCase.hasNonGrantedPermissions(type, permissionItems)
   }
 
   private fun isSortByLibMode(): Boolean {

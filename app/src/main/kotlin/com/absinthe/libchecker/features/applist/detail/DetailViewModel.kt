@@ -269,4 +269,24 @@ class DetailViewModel(
   fun sortDetailItems(items: List<LibStringItemChip>, @LibType type: Int): List<LibStringItemChip> {
     return detailFilterController.sortDetailItems(items, type)
   }
+
+  fun buildProcessFilterData(
+    @LibType type: Int,
+    permissionNotGrantedLabel: String,
+    permissionNotGrantedColor: Int
+  ) = detailFilterController.buildProcessFilterData(
+    type = type,
+    componentProcessesMap = contentState.processesMap,
+    permissionItems = contentState.permissionsItems.value,
+    permissionNotGrantedLabel = permissionNotGrantedLabel,
+    permissionNotGrantedColor = permissionNotGrantedColor
+  )
+
+  fun isComponentDetailType(@LibType type: Int): Boolean {
+    return detailFilterController.isComponentDetailType(type)
+  }
+
+  fun hasNonGrantedPermissions(@LibType type: Int): Boolean {
+    return detailFilterController.hasNonGrantedPermissions(type, contentState.permissionsItems.value)
+  }
 }

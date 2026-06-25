@@ -16,7 +16,6 @@ import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.ACTION_IN_RULES
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PERMISSION
-import com.absinthe.libchecker.annotation.isComponentType
 import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCase
@@ -165,17 +164,13 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   override fun onVisibilityChanged(visible: Boolean) {
     super.onVisibilityChanged(visible)
     if (visible) {
-      val processMap = if (isComponentFragment()) {
-        viewModel.contentState.processesMap
-      } else if (hasNonGrantedPermissions()) {
-        val label = requireContext().getString(R.string.permission_not_granted)
-        val color = R.color.material_red_400.getColor(requireContext())
-        mapOf(label to color)
-      } else {
-        emptyMap()
-      }
-      viewModel.filterState.updateProcessMap(processMap)
-      viewModel.filterState.updateProcessToolIconVisibility(processMap.isNotEmpty() && !hasNonGrantedPermissions())
+      viewModel.filterState.updateProcessFilterData(
+        viewModel.buildProcessFilterData(
+          type = type,
+          permissionNotGrantedLabel = getString(R.string.permission_not_granted),
+          permissionNotGrantedColor = R.color.material_red_400.getColor(requireContext())
+        )
+      )
     }
   }
 
@@ -331,10 +326,10 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   }
 
   fun isComponentFragment(): Boolean {
-    return isComponentType(type)
+    return viewModel.isComponentDetailType(type)
   }
 
   fun hasNonGrantedPermissions(): Boolean {
-    return type == PERMISSION && viewModel.contentState.permissionsItems.value?.any { it.item.size == 0L } == true
+    return viewModel.hasNonGrantedPermissions(type)
   }
 }
