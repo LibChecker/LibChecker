@@ -14,6 +14,7 @@ import com.absinthe.libchecker.domain.app.detail.AppDetailAbiLabelData
 import com.absinthe.libchecker.domain.app.detail.AppDetailHeaderExtraInfo
 import com.absinthe.libchecker.domain.app.detail.action.AppManifestProperty
 import com.absinthe.libchecker.domain.app.detail.action.AppPackageShareFile
+import com.absinthe.libchecker.domain.app.detail.action.DetailItemDialogRequest
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
@@ -237,6 +238,13 @@ class DetailViewModel(
   suspend fun getRelatedAppDisplayData(packageName: String) = detailActionLoader.getRelatedAppDisplayData(packageName)
 
   fun buildSignatureDetailItems(detail: String) = detailActionLoader.buildSignatureDetailItems(detail)
+
+  fun buildDetailItemDialogRequest(
+    item: LibStringItemChip,
+    @LibType detailType: Int
+  ): DetailItemDialogRequest {
+    return detailActionLoader.buildDetailItemDialogRequest(item, detailType)
+  }
 
   fun initFeatures(packageInfo: PackageInfo, features: Int) {
     detailFeatureLoader.initFeatures(viewModelScope, packageState, packageInfo, features)

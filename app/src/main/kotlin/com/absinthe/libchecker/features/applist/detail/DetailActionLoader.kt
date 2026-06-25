@@ -9,6 +9,7 @@ import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
 import com.absinthe.libchecker.domain.app.detail.GetRelatedAppDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.detail.action.AppManifestProperty
 import com.absinthe.libchecker.domain.app.detail.action.AppPackageShareFile
+import com.absinthe.libchecker.domain.app.detail.action.BuildDetailItemDialogRequestUseCase
 import com.absinthe.libchecker.domain.app.detail.action.BuildSignatureDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.detail.action.ExportAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.detail.action.ExtractNativeLibraryUseCase
@@ -25,6 +26,7 @@ import com.absinthe.libchecker.domain.app.detail.action.GetPermissionDetailUseCa
 import com.absinthe.libchecker.domain.app.detail.action.GetXposedModuleInfoUseCase
 import com.absinthe.libchecker.domain.app.detail.action.PrepareAppPackageShareActionUseCase
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
+import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import java.io.File
 
 class DetailActionLoader(
@@ -41,6 +43,7 @@ class DetailActionLoader(
   private val getPermissionDetailUseCase: GetPermissionDetailUseCase,
   private val getRelatedAppDisplayDataUseCase: GetRelatedAppDisplayDataUseCase,
   private val getXposedModuleInfoUseCase: GetXposedModuleInfoUseCase,
+  private val buildDetailItemDialogRequestUseCase: BuildDetailItemDialogRequestUseCase,
   private val buildSignatureDetailItemsUseCase: BuildSignatureDetailItemsUseCase,
   private val extractNativeLibraryUseCase: ExtractNativeLibraryUseCase,
   private val prepareAppPackageShareActionUseCase: PrepareAppPackageShareActionUseCase,
@@ -121,6 +124,11 @@ class DetailActionLoader(
   suspend fun getPermissionDetail(permissionName: String) = getPermissionDetailUseCase(permissionName)
 
   suspend fun getRelatedAppDisplayData(packageName: String) = getRelatedAppDisplayDataUseCase(packageName)
+
+  fun buildDetailItemDialogRequest(
+    item: LibStringItemChip,
+    @LibType detailType: Int
+  ) = buildDetailItemDialogRequestUseCase(item, detailType)
 
   fun buildSignatureDetailItems(detail: String) = buildSignatureDetailItemsUseCase(detail)
 }

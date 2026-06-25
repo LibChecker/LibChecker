@@ -12,14 +12,12 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.annotation.ACTION
-import com.absinthe.libchecker.annotation.ACTION_IN_RULES
 import com.absinthe.libchecker.annotation.NATIVE
-import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
+import com.absinthe.libchecker.domain.app.detail.action.DetailItemDialogRequest
 import com.absinthe.libchecker.features.applist.DetailFragmentManager
 import com.absinthe.libchecker.features.applist.Sortable
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
@@ -304,22 +302,14 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     if (position < 0 || position >= adapter.itemCount) {
       return
     }
-    val item = adapter.getItem(position)
-    val isValidLib = item.rule != null
+    when (val request = viewModel.buildDetailItemDialogRequest(adapter.getItem(position), adapter.type)) {
+      is DetailItemDialogRequest.Permission -> {
+        PermissionDetailDialogFragment.newInstance(request.permissionName)
+          .show(childFragmentManager, PermissionDetailDialogFragment::class.java.name)
+      }
 
-    if (adapter.type == PERMISSION) {
-      PermissionDetailDialogFragment.newInstance(item.item.name)
-        .show(childFragmentManager, PermissionDetailDialogFragment::class.java.name)
-      return
-    }
-
-    lifecycleScope.launch(Dispatchers.IO) {
-      val name = item.rule?.libName ?: item.item.name
-      val regexName = item.rule?.regexName
-      val libType = if (item.rule?.libType == ACTION_IN_RULES) ACTION else adapter.type
-
-      withContext(Dispatchers.Main) {
-        LibDetailDialogFragment.newInstance(name, libType, regexName, isValidLib)
+      is DetailItemDialogRequest.Library -> {
+        LibDetailDialogFragment.newInstance(request.name, request.type, request.regexName, request.isValidLib)
           .show(childFragmentManager, LibDetailDialogFragment::class.java.name)
       }
     }
