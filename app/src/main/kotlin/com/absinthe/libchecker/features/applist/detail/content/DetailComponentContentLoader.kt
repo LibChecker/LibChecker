@@ -1,6 +1,6 @@
 package com.absinthe.libchecker.features.applist.detail.content
 
-import com.absinthe.libchecker.domain.app.detail.GetAppDetailComponentChipsUseCase
+import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailComponentChipsUseCase
 import com.absinthe.libchecker.features.applist.detail.DetailContentState
 import com.absinthe.libchecker.features.applist.detail.DetailLoadJobsState
 import com.absinthe.libchecker.features.applist.detail.DetailPackageState

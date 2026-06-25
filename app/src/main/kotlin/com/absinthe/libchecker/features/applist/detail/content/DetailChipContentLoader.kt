@@ -1,9 +1,9 @@
 package com.absinthe.libchecker.features.applist.detail.content
 
-import com.absinthe.libchecker.domain.app.detail.GetAppDetailDexChipsUseCase
-import com.absinthe.libchecker.domain.app.detail.GetAppDetailMetadataChipsUseCase
-import com.absinthe.libchecker.domain.app.detail.GetAppDetailSignatureChipsUseCase
-import com.absinthe.libchecker.domain.app.detail.GetAppDetailStaticLibraryChipsUseCase
+import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailDexChipsUseCase
+import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailMetadataChipsUseCase
+import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailSignatureChipsUseCase
+import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailStaticLibraryChipsUseCase
 import com.absinthe.libchecker.features.applist.detail.DetailContentState
 import com.absinthe.libchecker.features.applist.detail.DetailLoadJobsState
 import com.absinthe.libchecker.features.applist.detail.DetailPackageState

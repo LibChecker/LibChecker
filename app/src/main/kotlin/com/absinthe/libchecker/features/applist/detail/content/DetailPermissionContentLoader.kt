@@ -2,7 +2,7 @@ package com.absinthe.libchecker.features.applist.detail.content
 
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.domain.app.VersionedFeature
-import com.absinthe.libchecker.domain.app.detail.GetAppDetailPermissionChipsUseCase
+import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailPermissionChipsUseCase
 import com.absinthe.libchecker.features.applist.detail.DetailContentState
 import com.absinthe.libchecker.features.applist.detail.DetailFeatureState
 import com.absinthe.libchecker.features.applist.detail.DetailLoadJobsState
