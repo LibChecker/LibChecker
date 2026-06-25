@@ -97,6 +97,7 @@ class SnapshotFragment :
   private val adapter by lazy(LazyThreadSafetyMode.NONE) {
     SnapshotAdapter(buildSnapshotAbiDisplayData)
   }
+  private val snapshotListUpdatePlanner = SnapshotListUpdatePlanner()
   private val particleItemAnimator = ParticleRemoveItemAnimator()
   private val pendingParticleRemovePackageNames = linkedSetOf<String>()
   private var isSnapshotDatabaseItemsReady = false
@@ -686,37 +687,22 @@ class SnapshotFragment :
   }
 
   private fun updateItems(list: List<SnapshotDiffItem>, highlightRefresh: Boolean = false) = lifecycleScope.launch(Dispatchers.Main) {
-    val filterList = list.toMutableList()
-    filterList.removeAll(::shouldHideSnapshotItem)
-    val sortedList = filterList.sortedByDescending { it.updateTime }.toMutableList()
-    if (highlightRefresh) {
-      particleItemAnimator.prepareParticleRemovals(emptyList())
-    } else {
-      val newPackageNames = sortedList.mapTo(mutableSetOf()) { it.packageName }
-      val pendingRemovePackageNames = pendingParticleRemovePackageNames.toSet()
-      val deletedReplacementPackageNames = sortedList.asSequence()
-        .filter { it.deleted && it.packageName in pendingRemovePackageNames }
-        .mapTo(mutableSetOf()) { it.packageName }
-      val consumedRemovePackageNames = mutableSetOf<String>()
-      particleItemAnimator.prepareParticleRemovals(
-        adapter.data.asSequence()
-          .filter {
-            val shouldAnimate = it.packageName !in newPackageNames ||
-              it.packageName in deletedReplacementPackageNames
-            if (shouldAnimate) {
-              consumedRemovePackageNames += it.packageName
-            }
-            shouldAnimate
-          }
-          .map { SnapshotAdapter.stableItemIdFor(it) }
-          .toList()
+    val updatePlan = snapshotListUpdatePlanner.plan(
+      SnapshotListUpdatePlanner.Request(
+        currentItems = adapter.data,
+        sourceItems = list,
+        pendingRemovePackageNames = pendingParticleRemovePackageNames.toSet(),
+        hideNoComponentChanges = GlobalValues.snapshotOptions.and(SnapshotOptions.HIDE_NO_COMPONENT_CHANGES) != 0,
+        highlightRefresh = highlightRefresh
       )
-      pendingParticleRemovePackageNames.removeAll(consumedRemovePackageNames)
-    }
-    val packageNames = sortedList.map(SnapshotDiffItem::packageName)
+    )
+    particleItemAnimator.prepareParticleRemovals(updatePlan.particleRemovalItemIds)
+    pendingParticleRemovePackageNames.removeAll(updatePlan.consumedRemovePackageNames)
+
+    val packageNames = updatePlan.items.map(SnapshotDiffItem::packageName)
     adapter.setPackageIconSources(viewModel.getSnapshotPackageIconSources(packageNames))
     adapter.setApexPackageNames(viewModel.getApexPackageNames())
-    adapter.setDiffNewData(sortedList) {
+    adapter.setDiffNewData(updatePlan.items.toMutableList()) {
       if (isDetached) {
         return@setDiffNewData
       }
@@ -729,11 +715,6 @@ class SnapshotFragment :
         adapter.notifyDataSetChanged()
       }
     }
-  }
-
-  private fun shouldHideSnapshotItem(item: SnapshotDiffItem): Boolean {
-    return GlobalValues.snapshotOptions.and(SnapshotOptions.HIDE_NO_COMPONENT_CHANGES) != 0 &&
-      item.isNothingChanged()
   }
 
   private fun updateSystemProps(dashboard: SnapshotDashboardView, timestamp: Long) {
