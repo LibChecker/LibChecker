@@ -5,4 +5,6 @@ interface LibReferenceSettingsRepository {
   val threshold: Int
   var options: Int
   val showSystemApps: Boolean
+
+  suspend fun setThreshold(threshold: Int)
 }

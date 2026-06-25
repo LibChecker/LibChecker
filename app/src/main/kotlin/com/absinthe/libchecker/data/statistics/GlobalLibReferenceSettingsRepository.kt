@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.data.statistics
 
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.domain.statistics.LibReferenceSettingsRepository
 
@@ -18,4 +19,9 @@ class GlobalLibReferenceSettingsRepository : LibReferenceSettingsRepository {
 
   override val showSystemApps: Boolean
     get() = GlobalValues.isShowSystemApps
+
+  override suspend fun setThreshold(threshold: Int) {
+    GlobalValues.libReferenceThreshold = threshold
+    GlobalValues.preferencesFlow.emit(Constants.PREF_LIB_REF_THRESHOLD to threshold)
+  }
 }

@@ -163,6 +163,7 @@ import com.absinthe.libchecker.domain.statistics.GetLibReferenceAppsUseCase
 import com.absinthe.libchecker.domain.statistics.GetLibReferenceConfigUseCase
 import com.absinthe.libchecker.domain.statistics.GetLibReferenceIconPackagesUseCase
 import com.absinthe.libchecker.domain.statistics.LibReferenceSettingsRepository
+import com.absinthe.libchecker.domain.statistics.UpdateLibReferenceThresholdUseCase
 import com.absinthe.libchecker.features.album.backup.SnapshotBackupViewModel
 import com.absinthe.libchecker.features.album.comparison.SnapshotComparisonViewModel
 import com.absinthe.libchecker.features.album.track.TrackViewModel
@@ -225,6 +226,7 @@ val appModule = module {
   factory { GetLibReferenceIconPackagesUseCase(get()) }
   factory { GetLibReferenceAppsUseCase(get()) }
   factory { BuildLibReferenceDetailDialogRequestUseCase() }
+  factory { UpdateLibReferenceThresholdUseCase(get()) }
   factory { LibReferenceComputationController.Factory(get(), get(), get()) }
   factory { ExportAppListUseCase(get(), get()) }
   factory { ExportAppListToUriUseCase(androidContext().contentResolver, get()) }

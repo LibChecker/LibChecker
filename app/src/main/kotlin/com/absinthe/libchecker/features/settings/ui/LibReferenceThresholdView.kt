@@ -9,13 +9,15 @@ import android.view.HapticFeedbackConstants
 import android.view.ViewGroup
 import android.widget.EditText
 import androidx.core.widget.doOnTextChanged
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.removeNonDigits
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.slider.Slider
 
-class LibReferenceThresholdView(context: Context) : AViewGroup(context) {
+class LibReferenceThresholdView(
+  context: Context,
+  private val initialThreshold: Int
+) : AViewGroup(context) {
 
   private var initialized = false
   private var sliderChanging = false
@@ -27,7 +29,7 @@ class LibReferenceThresholdView(context: Context) : AViewGroup(context) {
     valueFrom = 1f
     valueTo = 50f
     stepSize = 1f
-    value = GlobalValues.libReferenceThreshold.toFloat()
+    value = initialThreshold.toFloat()
     addView(this)
   }
   val count: EditText = EditText(context).apply {
@@ -85,6 +87,7 @@ class LibReferenceThresholdView(context: Context) : AViewGroup(context) {
         sliderChanging = false
       }
     }
+    count.setText(initialThreshold.toString())
   }
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

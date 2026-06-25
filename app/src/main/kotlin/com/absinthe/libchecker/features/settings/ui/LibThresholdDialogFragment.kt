@@ -6,16 +6,22 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.domain.statistics.LibReferenceSettingsRepository
+import com.absinthe.libchecker.domain.statistics.UpdateLibReferenceThresholdUseCase
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.utils.Telemetry
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 
 class LibThresholdDialogFragment : DialogFragment() {
+  private val libReferenceSettingsRepository: LibReferenceSettingsRepository by inject()
+  private val updateLibReferenceThresholdUseCase: UpdateLibReferenceThresholdUseCase by inject()
 
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-    val view = LibReferenceThresholdView(requireContext())
-    view.count.setText(GlobalValues.libReferenceThreshold.toString())
+    val view = LibReferenceThresholdView(
+      requireContext(),
+      libReferenceSettingsRepository.threshold
+    )
 
     return BaseAlertDialogBuilder(requireContext())
       .setView(view)
@@ -23,8 +29,7 @@ class LibThresholdDialogFragment : DialogFragment() {
       .setPositiveButton(android.R.string.ok) { _, _ ->
         val threshold = view.slider.value.toInt()
         lifecycleScope.launch {
-          GlobalValues.libReferenceThreshold = threshold
-          GlobalValues.preferencesFlow.emit(Constants.PREF_LIB_REF_THRESHOLD to threshold)
+          updateLibReferenceThresholdUseCase(threshold)
         }
         Telemetry.recordEvent(
           Constants.Event.SETTINGS,
