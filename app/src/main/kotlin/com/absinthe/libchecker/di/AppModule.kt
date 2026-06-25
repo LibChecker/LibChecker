@@ -107,6 +107,7 @@ import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemWithInstalledA
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotListsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotWithInstalledAppsUseCase
+import com.absinthe.libchecker.domain.snapshot.CompareTrackedSnapshotListsUseCase
 import com.absinthe.libchecker.domain.snapshot.GetApexPackageNamesUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotPackageIconSourcesUseCase
@@ -350,6 +351,7 @@ val appModule = module {
   factory { BuildSnapshotPairDiffUseCase() }
   factory { CompareSnapshotItemsUseCase() }
   factory { CompareSnapshotListsUseCase(get()) }
+  factory { CompareTrackedSnapshotListsUseCase(get(), get()) }
   factory { CompareSnapshotWithInstalledAppsUseCase(androidContext().packageManager, get(), get(), get(), get()) }
   factory { CompareSnapshotItemWithInstalledAppUseCase(androidContext().packageManager, get(), get(), get(), get()) }
   factory { GetSnapshotDashboardCountUseCase(get(), get()) }
@@ -413,8 +415,7 @@ val appModule = module {
     SnapshotViewModel(
       repository = get(),
       appListRepository = get(),
-      compareSnapshotItems = get(),
-      compareSnapshotLists = get(),
+      compareTrackedSnapshotLists = get(),
       compareSnapshotWithInstalledApps = get(),
       compareSnapshotItemWithInstalledApp = get(),
       getSnapshotDashboardCount = get(),
