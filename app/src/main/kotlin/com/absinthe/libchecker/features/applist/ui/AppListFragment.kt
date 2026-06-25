@@ -76,6 +76,7 @@ class AppListFragment :
   private val isFirstLaunch get() = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
   private val getRandomAppIcon: GetRandomAppIconUseCase by inject()
   private val appAdapter = AppAdapter()
+  private val appListUpdatePlanner = AppListUpdatePlanner()
   private val particleItemAnimator = ParticleRemoveItemAnimator()
   private var updateItemsJob: Job? = null
   private var delayShowNavigationJob: Job? = null
@@ -513,26 +514,23 @@ class AppListFragment :
       return@launch
     }
     withContext(Dispatchers.Main) {
-      appAdapter.apply {
-        // Only apps that disappeared from the backing database get the particle effect.
-        // Newly added apps are present in the content list but absent from current adapter data,
-        // so they go through RecyclerView's normal add path instead.
-        particleItemAnimator.prepareParticleRemovals(
-          data.asSequence()
-            .filter { it.packageName !in content.backingPackageNames }
-            .map { ParticleRemoveItemAnimator.stableItemIdForKey(it.packageName) }
-            .toList()
+      val updatePlan = appListUpdatePlanner.plan(
+        AppListUpdatePlanner.Request(
+          currentItems = appAdapter.data,
+          content = content,
+          pendingReturnTopAfterRequestChange = pendingReturnTopAfterRequestChange,
+          highlightRefresh = highlightRefresh,
+          hasUserScrolledList = hasUserScrolledList
         )
-        setItemViewStates(content.itemViewStates)
-        val shouldReturnTopAfterRequestChange = pendingReturnTopAfterRequestChange &&
-          !highlightRefresh &&
-          !hasUserScrolledList &&
-          data.isNotEmpty()
-        if (pendingReturnTopAfterRequestChange && !highlightRefresh) {
+      )
+      appAdapter.apply {
+        particleItemAnimator.prepareParticleRemovals(updatePlan.particleRemovalItemIds)
+        setItemViewStates(updatePlan.content.itemViewStates)
+        if (updatePlan.shouldClearPendingReturnTopAfterRequestChange) {
           pendingReturnTopAfterRequestChange = false
         }
 
-        setDiffNewData(content.items.toMutableList()) {
+        setDiffNewData(updatePlan.content.items.toMutableList()) {
           if (isDetached || !isBindingInitialized()) {
             return@setDiffNewData
           }
@@ -544,7 +542,7 @@ class AppListFragment :
           }
 
           setSpaceFooterView()
-          if (shouldReturnTopAfterRequestChange) {
+          if (updatePlan.shouldReturnTopAfterRequestChange) {
             returnTopOfList()
           }
         }
