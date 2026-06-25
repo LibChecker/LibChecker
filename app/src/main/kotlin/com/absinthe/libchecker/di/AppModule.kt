@@ -91,6 +91,7 @@ import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailPermissionC
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailSignatureChipsUseCase
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailStaticLibraryChipsUseCase
 import com.absinthe.libchecker.domain.app.detail.content.SortAppDetailItemsUseCase
+import com.absinthe.libchecker.domain.app.detail.navigation.BuildDetailReferenceNavigationUseCase
 import com.absinthe.libchecker.domain.snapshot.BackupSnapshotArchiveToUriUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildInstalledSnapshotItemUseCase
@@ -229,6 +230,7 @@ val appModule = module {
   factory { BuildRelatedAppDisplayDataUseCase(androidContext()) }
   factory { BuildDetailItemDialogRequestUseCase() }
   factory { BuildDetailItemLongClickActionsUseCase() }
+  factory { BuildDetailReferenceNavigationUseCase() }
   factory { BuildSignatureDetailItemsUseCase() }
   factory { ClearApkCacheUseCase(androidContext()) }
   factory { CheckRequiredPackageAvailabilityUseCase(get()) }
@@ -268,7 +270,8 @@ val appModule = module {
       buildSignatureDetailItemsUseCase = get(),
       extractNativeLibraryUseCase = get(),
       prepareAppPackageShareActionUseCase = get(),
-      exportAppPackageShareFileUseCase = get()
+      exportAppPackageShareFileUseCase = get(),
+      buildDetailReferenceNavigationUseCase = get()
     )
   }
   factory {

@@ -16,6 +16,7 @@ import com.absinthe.libchecker.domain.app.detail.action.AppManifestProperty
 import com.absinthe.libchecker.domain.app.detail.action.AppPackageShareFile
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemDialogRequest
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemLongClickActions
+import com.absinthe.libchecker.domain.app.detail.navigation.DetailReferenceNavigation
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
@@ -260,6 +261,20 @@ class DetailViewModel(
       canReference = canReference,
       isApk = isApk,
       isApkPreview = isApkPreview
+    )
+  }
+
+  fun buildDetailReferenceNavigation(
+    packageName: String?,
+    refName: String?,
+    @LibType refType: Int,
+    visibleTypes: List<Int>
+  ): DetailReferenceNavigation? {
+    return detailActionLoader.buildDetailReferenceNavigation(
+      packageName = packageName,
+      refName = refName,
+      refType = refType,
+      visibleTypes = visibleTypes
     )
   }
 

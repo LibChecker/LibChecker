@@ -27,6 +27,8 @@ import com.absinthe.libchecker.domain.app.detail.action.GetOverlayDetailUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetPermissionDetailUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetXposedModuleInfoUseCase
 import com.absinthe.libchecker.domain.app.detail.action.PrepareAppPackageShareActionUseCase
+import com.absinthe.libchecker.domain.app.detail.navigation.BuildDetailReferenceNavigationUseCase
+import com.absinthe.libchecker.domain.app.detail.navigation.DetailReferenceNavigationRequest
 import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import java.io.File
@@ -50,7 +52,8 @@ class DetailActionLoader(
   private val buildSignatureDetailItemsUseCase: BuildSignatureDetailItemsUseCase,
   private val extractNativeLibraryUseCase: ExtractNativeLibraryUseCase,
   private val prepareAppPackageShareActionUseCase: PrepareAppPackageShareActionUseCase,
-  private val exportAppPackageShareFileUseCase: ExportAppPackageShareFileUseCase
+  private val exportAppPackageShareFileUseCase: ExportAppPackageShareFileUseCase,
+  private val buildDetailReferenceNavigationUseCase: BuildDetailReferenceNavigationUseCase
 ) {
   suspend fun getAppBundleItems(packageInfo: PackageInfo): List<AppBundleSplitItem> {
     return getAppBundleItemsUseCase(packageInfo)
@@ -152,4 +155,18 @@ class DetailActionLoader(
   )
 
   fun buildSignatureDetailItems(detail: String) = buildSignatureDetailItemsUseCase(detail)
+
+  fun buildDetailReferenceNavigation(
+    packageName: String?,
+    refName: String?,
+    @LibType refType: Int,
+    visibleTypes: List<Int>
+  ) = buildDetailReferenceNavigationUseCase(
+    DetailReferenceNavigationRequest(
+      packageName = packageName,
+      refName = refName,
+      refType = refType,
+      visibleTypes = visibleTypes
+    )
+  )
 }

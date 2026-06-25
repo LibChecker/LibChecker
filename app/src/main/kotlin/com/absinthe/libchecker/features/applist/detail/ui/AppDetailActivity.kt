@@ -9,9 +9,9 @@ import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ALL
-import com.absinthe.libchecker.annotation.isComponentType
 import com.absinthe.libchecker.compat.IntentCompat
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageUseCase
+import com.absinthe.libchecker.domain.app.detail.navigation.DetailReferenceNavigation
 import com.absinthe.libchecker.features.applist.detail.IDetailContainer
 import com.absinthe.libchecker.features.applist.detail.bean.DetailExtraBean
 import com.absinthe.libchecker.features.statistics.ui.EXTRA_REF_NAME
@@ -106,32 +106,26 @@ class AppDetailActivity :
   }
 
   private fun resolveReferenceExtras() {
-    if (pkgName == null || refName == null || refType == ALL) {
-      return
-    }
-    navigateToReferenceComponentPosition(pkgName!!, refName!!)
+    val navigation = viewModel.buildDetailReferenceNavigation(
+      packageName = pkgName,
+      refName = refName,
+      refType = refType ?: ALL,
+      visibleTypes = typeList
+    ) ?: return
+
+    navigateToReferenceComponentPosition(navigation)
   }
 
-  private fun navigateToReferenceComponentPosition(packageName: String, refName: String) {
-    val refType = refType ?: return
-    val position = typeList.indexOf(refType)
-    if (position < 0) {
-      return
-    }
-    binding.viewpager.currentItem = position
+  private fun navigateToReferenceComponentPosition(navigation: DetailReferenceNavigation) {
+    binding.viewpager.currentItem = navigation.tabPosition
     binding.tabLayout.post {
-      val targetTab = binding.tabLayout.getTabAt(position)
+      val targetTab = binding.tabLayout.getTabAt(navigation.tabPosition)
       if (targetTab?.isSelected == false) {
         targetTab.select()
       }
     }
 
-    val componentName = if (isComponentType(refType)) {
-      refName.removePrefix(packageName)
-    } else {
-      refName
-    }
-    detailFragmentManager.navigateToComponent(refType, componentName)
+    detailFragmentManager.navigateToComponent(navigation.type, navigation.targetName)
   }
 
   private val requestPackageReceiver = object : BroadcastReceiver() {
