@@ -271,7 +271,7 @@ class SnapshotFragment :
           delay(250)
 
           doOnMainThreadIdle {
-            if (this@SnapshotFragment == homeViewModel.controller &&
+            if (listControllerHost?.isCurrentListController(this@SnapshotFragment) == true &&
               !binding.list.canScrollVertically(-1)
             ) {
               (activity as? INavViewContainer)?.showNavigationView()

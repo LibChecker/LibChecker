@@ -21,7 +21,6 @@ import com.absinthe.libchecker.domain.app.PackageChangeState
 import com.absinthe.libchecker.domain.app.SyncAppListChangesUseCase
 import com.absinthe.libchecker.domain.app.sync.AppListChangeRequestQueue
 import com.absinthe.libchecker.services.IWorkerService
-import com.absinthe.libchecker.ui.base.IListController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -53,7 +52,6 @@ class HomeViewModel(
   private val _isRequestChangeRunning = MutableStateFlow(false)
   val isRequestChangeRunning = _isRequestChangeRunning.asStateFlow()
 
-  var controller: IListController? = null
   var appListStatus: Int = STATUS_NOT_START
   var checkPackagesPermission: Boolean = false
 

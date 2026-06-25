@@ -36,9 +36,7 @@ abstract class BaseListControllerFragment<T : ViewBinding> :
       }
 
       override fun onStop(owner: LifecycleOwner) {
-        if (this == homeViewModel.controller) {
-          homeViewModel.controller = null
-        }
+        listControllerHost?.clearListController(this@BaseListControllerFragment)
       }
     })
   }
@@ -46,11 +44,12 @@ abstract class BaseListControllerFragment<T : ViewBinding> :
   override fun onVisibilityChanged(visible: Boolean) {
     super.onVisibilityChanged(visible)
     if (visible) {
-      if (this != homeViewModel.controller) {
-        homeViewModel.controller = this
-      }
+      listControllerHost?.setListController(this)
     }
   }
+
+  protected val listControllerHost: IListControllerHost?
+    get() = activity as? IListControllerHost
 
   override fun getBorderViewDelegate(): BorderViewDelegate? = borderDelegate
 

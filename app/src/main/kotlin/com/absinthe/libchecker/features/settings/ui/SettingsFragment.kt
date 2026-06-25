@@ -44,6 +44,7 @@ import com.absinthe.libchecker.features.home.HomeViewModel
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.base.IAppBarContainer
 import com.absinthe.libchecker.ui.base.IListController
+import com.absinthe.libchecker.ui.base.IListControllerHost
 import com.absinthe.libchecker.utils.LocaleUtils
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.Telemetry
@@ -407,9 +408,7 @@ class SettingsFragment :
   override fun onResume() {
     super.onResume()
     val container = (activity as? IAppBarContainer) ?: return
-    if (this != viewModel.controller) {
-      viewModel.controller = this
-    }
+    (activity as? IListControllerHost)?.setListController(this)
     scheduleAppbarRaisingStatus(!getBorderViewDelegate().isShowingTopBorder)
     container.setLiftOnScrollTargetView(prefRecyclerView)
   }
@@ -462,9 +461,7 @@ class SettingsFragment :
 
   override fun onDetach() {
     super.onDetach()
-    if (this == viewModel.controller) {
-      viewModel.controller = null
-    }
+    (activity as? IListControllerHost)?.clearListController(this)
   }
 
   override fun onReturnTop() {

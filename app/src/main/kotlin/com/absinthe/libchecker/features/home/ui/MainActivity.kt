@@ -39,6 +39,8 @@ import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.services.WorkerService
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.IAppBarContainer
+import com.absinthe.libchecker.ui.base.IListController
+import com.absinthe.libchecker.ui.base.IListControllerHost
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.addBackStateHandler
@@ -64,9 +66,11 @@ private const val FEATURES_NOT_INITIALIZED = -1
 class MainActivity :
   BaseActivity<ActivityMainBinding>(),
   INavViewContainer,
-  IAppBarContainer {
+  IAppBarContainer,
+  IListControllerHost {
 
   private val appViewModel: HomeViewModel by viewModel()
+  private var listController: IListController? = null
 
   @Suppress("DEPRECATION")
   private val navViewBehavior by lazy { HideBottomViewOnScrollBehavior<BottomNavigationView>() }
@@ -195,6 +199,20 @@ class MainActivity :
     binding.progressHorizontal.hide()
   }
 
+  override fun setListController(controller: IListController) {
+    listController = controller
+  }
+
+  override fun clearListController(controller: IListController) {
+    if (listController === controller) {
+      listController = null
+    }
+  }
+
+  override fun isCurrentListController(controller: IListController): Boolean {
+    return listController === controller
+  }
+
   override fun scheduleAppbarLiftingStatus(isLifted: Boolean) {
     binding.appbar.isLifted = isLifted
   }
@@ -261,8 +279,8 @@ class MainActivity :
                   delay(200)
                   binding.viewpager.setTag(R.id.viewpager_tab_click, false)
                 }
-              } else if (appViewModel.controller?.isAllowRefreshing() == true) {
-                appViewModel.controller?.onReturnTop()
+              } else if (listController?.isAllowRefreshing() == true) {
+                listController?.onReturnTop()
               }
             }
           }
