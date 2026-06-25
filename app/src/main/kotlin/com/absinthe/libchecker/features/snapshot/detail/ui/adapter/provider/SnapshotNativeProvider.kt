@@ -6,7 +6,7 @@ import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.database.RulesRepository
+import com.absinthe.libchecker.domain.snapshot.GetSnapshotRuleUseCase
 import com.absinthe.libchecker.domain.snapshot.model.ADDED
 import com.absinthe.libchecker.domain.snapshot.model.CHANGED
 import com.absinthe.libchecker.domain.snapshot.model.REMOVED
@@ -20,14 +20,13 @@ import com.absinthe.libraries.utils.utils.UiUtils
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.chad.library.adapter.base.provider.BaseNodeProvider
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 const val SNAPSHOT_NATIVE_PROVIDER = 2
 
 class SnapshotNativeProvider(
-  private val colorfulRuleIcon: Boolean
+  private val colorfulRuleIcon: Boolean,
+  private val getSnapshotRuleUseCase: GetSnapshotRuleUseCase
 ) : BaseNodeProvider() {
 
   override val itemViewType: Int = SNAPSHOT_NATIVE_PROVIDER
@@ -81,31 +80,29 @@ class SnapshotNativeProvider(
       val alphaColor = (baseColor and 0x00FFFFFF) or (alpha shl 24)
       background = alphaColor.toDrawable()
 
-      (this@SnapshotNativeProvider.context as? LifecycleOwner)?.lifecycleScope?.launch(Dispatchers.IO) {
-        val rule = RulesRepository.getRule(snapshotItem.name, snapshotItem.itemType, true)
+      (this@SnapshotNativeProvider.context as? LifecycleOwner)?.lifecycleScope?.launch {
+        val rule = getSnapshotRuleUseCase(snapshotItem)
 
-        withContext(Dispatchers.Main) {
-          setChip(rule, alphaColor, colorfulRuleIcon)
-          helper.itemView.contentDescription = buildItemDescription(
-            getStatusLabel(snapshotItem.diffType),
-            snapshotItem.title,
-            snapshotItem.extra,
-            rule?.label
-          )
-          if (rule != null) {
-            setChipOnClickListener {
-              if (AntiShakeUtils.isInvalidClick(it)) {
-                return@setChipOnClickListener
-              }
-              val name = item.item.name
-              val fragmentManager =
-                (this@SnapshotNativeProvider.context as BaseActivity<*>).supportFragmentManager
-              LibDetailDialogFragment.newInstance(name, item.item.itemType, rule.regexName)
-                .show(fragmentManager, LibDetailDialogFragment::class.java.name)
+        setChip(rule, alphaColor, colorfulRuleIcon)
+        helper.itemView.contentDescription = buildItemDescription(
+          getStatusLabel(snapshotItem.diffType),
+          snapshotItem.title,
+          snapshotItem.extra,
+          rule?.label
+        )
+        if (rule != null) {
+          setChipOnClickListener {
+            if (AntiShakeUtils.isInvalidClick(it)) {
+              return@setChipOnClickListener
             }
-          } else {
-            setChipOnClickListener(null)
+            val name = item.item.name
+            val fragmentManager =
+              (this@SnapshotNativeProvider.context as BaseActivity<*>).supportFragmentManager
+            LibDetailDialogFragment.newInstance(name, item.item.itemType, rule.regexName)
+              .show(fragmentManager, LibDetailDialogFragment::class.java.name)
           }
+        } else {
+          setChipOnClickListener(null)
         }
       }
     }

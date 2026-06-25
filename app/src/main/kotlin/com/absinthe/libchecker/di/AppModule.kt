@@ -136,6 +136,7 @@ import com.absinthe.libchecker.domain.snapshot.GetApexPackageNamesUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotBackupTargetUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotPackageIconSourcesUseCase
+import com.absinthe.libchecker.domain.snapshot.GetSnapshotRuleUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotSystemPropDiffsUseCase
 import com.absinthe.libchecker.domain.snapshot.GetTrackListItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.PrepareRoomBackupRestoreFileUseCase
@@ -408,6 +409,7 @@ val appModule = module {
   factory { CompareSnapshotItemWithInstalledAppUseCase(androidContext().packageManager, get(), get(), get(), get()) }
   factory { GetSnapshotDashboardCountUseCase(get(), get()) }
   factory { GetSnapshotPackageIconSourcesUseCase(get()) }
+  factory { GetSnapshotRuleUseCase() }
   factory { GetSnapshotBackupTargetUseCase(get()) }
   factory { GetSnapshotSystemPropDiffsUseCase(get()) }
   factory { BuildSnapshotSystemPropDisplayDataUseCase(androidContext(), get()) }
