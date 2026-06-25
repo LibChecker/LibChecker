@@ -18,7 +18,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.createBitmap
-import androidx.core.os.BundleCompat
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -311,33 +310,27 @@ class ComparisonActivity :
   }
 
   private fun parseIntent(intent: Intent) {
-    if (intent.action == Intent.ACTION_SEND_MULTIPLE) {
-      intent.extras?.let {
-        val uriList = BundleCompat.getParcelableArrayList(it, Intent.EXTRA_STREAM, Uri::class.java)
-        if (uriList?.size == 2) {
-          if (uriList[0].encodedPath?.endsWith(".apk") == true ||
-            uriList[0].encodedPath?.endsWith(".apks") == true
-          ) {
-            leftTimeStamp = -1
-            leftUri = uriList[0]
-          } else {
-            showToast(R.string.album_item_comparison_invalid_shared_items)
-          }
+    when (val result = ComparisonShareIntentParser.parse(intent)) {
+      ComparisonShareIntentParser.Result.None -> Unit
 
-          if (uriList[1].encodedPath?.endsWith(".apk") == true ||
-            uriList[1].encodedPath?.endsWith(".apks") == true
-          ) {
-            rightTimeStamp = -1
-            rightUri = uriList[1]
-          } else {
-            showToast(R.string.album_item_comparison_invalid_shared_items)
-          }
+      ComparisonShareIntentParser.Result.InvalidSharedItems -> {
+        showToast(R.string.album_item_comparison_invalid_shared_items)
+      }
 
-          invalidateDashboard()
-          compareSelectedItems()
-        } else {
+      is ComparisonShareIntentParser.Result.PackagePair -> {
+        result.leftUri?.let {
+          leftTimeStamp = -1
+          leftUri = it
+        }
+        result.rightUri?.let {
+          rightTimeStamp = -1
+          rightUri = it
+        }
+        repeat(result.invalidItemCount) {
           showToast(R.string.album_item_comparison_invalid_shared_items)
         }
+        invalidateDashboard()
+        compareSelectedItems()
       }
     }
   }
