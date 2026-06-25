@@ -21,6 +21,7 @@ import com.absinthe.libchecker.domain.app.PackageChangeState
 import com.absinthe.libchecker.domain.app.SyncAppListChangesUseCase
 import com.absinthe.libchecker.domain.app.sync.AppListChangeRequestQueue
 import com.absinthe.libchecker.services.IWorkerService
+import com.absinthe.libchecker.services.WorkerService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -28,6 +29,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -50,7 +53,16 @@ class HomeViewModel(
   val effect = _effect.asSharedFlow()
 
   private val _isRequestChangeRunning = MutableStateFlow(false)
-  val isRequestChangeRunning = _isRequestChangeRunning.asStateFlow()
+  private val isRequestChangeRunning = _isRequestChangeRunning.asStateFlow()
+  val toolbarLoading: Flow<Boolean> = combine(
+    isRequestChangeRunning,
+    WorkerService.featureInitializationState,
+    dbItemsFlow
+  ) { requestChangeRunning, featureInitializationState, dbItems ->
+    requestChangeRunning ||
+      featureInitializationState.running ||
+      dbItems.any { item -> item.features == FEATURES_NOT_INITIALIZED }
+  }.distinctUntilChanged()
 
   var appListStatus: Int = STATUS_NOT_START
   var checkPackagesPermission: Boolean = false
@@ -251,5 +263,9 @@ class HomeViewModel(
   fun clearMenuState() {
     isSearchMenuExpanded = false
     currentSearchQuery = ""
+  }
+
+  private companion object {
+    const val FEATURES_NOT_INITIALIZED = -1
   }
 }

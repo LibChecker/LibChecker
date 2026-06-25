@@ -53,7 +53,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -61,7 +60,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 const val PAGE_TRANSFORM_DURATION = 300L
-private const val FEATURES_NOT_INITIALIZED = -1
 
 class MainActivity :
   BaseActivity<ActivityMainBinding>(),
@@ -399,15 +397,7 @@ class MainActivity :
         }
       }.launchIn(lifecycleScope)
 
-      combine(
-        isRequestChangeRunning,
-        WorkerService.featureInitializationState,
-        dbItemsFlow
-      ) { requestChangeRunning, featureInitializationState, dbItems ->
-        requestChangeRunning ||
-          featureInitializationState.running ||
-          dbItems.any { item -> item.features == FEATURES_NOT_INITIALIZED }
-      }.onEach {
+      toolbarLoading.onEach {
         toolbarTitleView.setLoading(it)
       }.launchIn(lifecycleScope)
     }
