@@ -14,9 +14,8 @@ import com.absinthe.libchecker.domain.snapshot.BuildSnapshotCapturePlanUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotComparisonPlanUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotDetailItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotPairDiffUseCase
+import com.absinthe.libchecker.domain.snapshot.CompareSnapshotDiffsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemWithInstalledAppUseCase
-import com.absinthe.libchecker.domain.snapshot.CompareSnapshotWithInstalledAppsUseCase
-import com.absinthe.libchecker.domain.snapshot.CompareTrackedSnapshotListsUseCase
 import com.absinthe.libchecker.domain.snapshot.GetApexPackageNamesUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotPackageIconSourcesUseCase
@@ -30,7 +29,6 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotSystemPropDiff
 import com.absinthe.libchecker.domain.snapshot.SnapshotTrackChangeRepository
-import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotTopAppsUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libraries.utils.manager.TimeRecorder
@@ -42,7 +40,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -52,11 +49,9 @@ const val CURRENT_SNAPSHOT = -1L
 class SnapshotViewModel(
   private val repository: SnapshotRepository,
   private val appListRepository: AppListRepository,
-  private val compareTrackedSnapshotLists: CompareTrackedSnapshotListsUseCase,
-  private val compareSnapshotWithInstalledApps: CompareSnapshotWithInstalledAppsUseCase,
+  private val compareSnapshotDiffs: CompareSnapshotDiffsUseCase,
   private val compareSnapshotItemWithInstalledApp: CompareSnapshotItemWithInstalledAppUseCase,
   private val getSnapshotDashboardCount: GetSnapshotDashboardCountUseCase,
-  private val updateSnapshotTopApps: UpdateSnapshotTopAppsUseCase,
   private val buildSnapshotDetailItems: BuildSnapshotDetailItemsUseCase,
   private val backupSnapshotArchiveToUriUseCase: BackupSnapshotArchiveToUriUseCase,
   private val restoreSnapshotArchiveFromUriUseCase: RestoreSnapshotArchiveFromUriUseCase,
@@ -101,38 +96,19 @@ class SnapshotViewModel(
       currentTimeStamp = preTimeStamp
       val timer = TimeRecorder().apply { start() }
 
-      if (shouldClearDiff) {
-        repository.deleteAllSnapshotDiffItems()
-      }
-
-      if (currTimeStamp == CURRENT_SNAPSHOT) {
-        compareDiffWithInstalledApps(preTimeStamp)
-      } else {
-        compareDiffWithSnapshotList(preTimeStamp, currTimeStamp)
+      val diffItems = compareSnapshotDiffs(
+        previousTimestamp = preTimeStamp,
+        currentTimestamp = currTimeStamp.takeUnless { it == CURRENT_SNAPSHOT },
+        shouldClearDiff = shouldClearDiff,
+        onProgress = ::changeComparingProgress
+      )
+      if (diffItems != null) {
+        snapshotDiffItemsFlow.emit(diffItems)
       }
       timer.end()
       Timber.d("compareDiff: $timer")
     }.also {
       it.start()
-    }
-  }
-
-  private suspend fun compareDiffWithInstalledApps(preTimeStamp: Long) {
-    val diffList = compareSnapshotWithInstalledApps(
-      timestamp = preTimeStamp,
-      onProgress = ::changeComparingProgress
-    ) ?: return
-    snapshotDiffItemsFlow.emit(diffList)
-    if (diffList.isNotEmpty()) {
-      updateSnapshotTopApps(preTimeStamp, diffList.subList(0, (diffList.size - 1).coerceAtMost(5)))
-    }
-  }
-
-  private suspend fun compareDiffWithSnapshotList(preTimeStamp: Long, currTimeStamp: Long) {
-    val diffList = compareTrackedSnapshotLists.byTimestamp(preTimeStamp, currTimeStamp) ?: return
-    snapshotDiffItemsFlow.emit(diffList)
-    if (diffList.isNotEmpty()) {
-      updateSnapshotTopApps(preTimeStamp, diffList.subList(0, (diffList.size - 1).coerceAtMost(5)))
     }
   }
 
@@ -149,12 +125,12 @@ class SnapshotViewModel(
       return
     }
 
-    val diffList = compareTrackedSnapshotLists(preList, currList) ?: return
-
+    val diffList = compareSnapshotDiffs.compareLists(
+      previousTimestamp = preTimeStamp,
+      previousItems = preList,
+      currentItems = currList
+    ) ?: return
     snapshotDiffItemsFlow.emit(diffList)
-    if (diffList.isNotEmpty() && preTimeStamp != -1L) {
-      updateSnapshotTopApps(preTimeStamp, diffList.subList(0, (diffList.size - 1).coerceAtMost(5)))
-    }
   }
 
   suspend fun buildArchiveSnapshotItem(
