@@ -617,6 +617,7 @@ class SnapshotFragment :
 
     adapter.setPackageIconSources(updatePlan.packageIconSources)
     adapter.setApexPackageNames(updatePlan.apexPackageNames)
+    adapter.setDisplayOptions(updatePlan.displayOptions)
     adapter.setDiffNewData(updatePlan.items.toMutableList()) {
       if (isDetached) {
         return@setDiffNewData

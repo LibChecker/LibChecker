@@ -1,6 +1,9 @@
 package com.absinthe.libchecker.data.snapshot
 
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.options.AdvancedOptions
+import com.absinthe.libchecker.constant.options.SnapshotOptions
+import com.absinthe.libchecker.domain.snapshot.SnapshotListDisplayOptions
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 
 class GlobalSnapshotSettingsRepository : SnapshotSettingsRepository {
@@ -9,4 +12,11 @@ class GlobalSnapshotSettingsRepository : SnapshotSettingsRepository {
     set(value) {
       GlobalValues.snapshotOptions = value
     }
+
+  override val listDisplayOptions: SnapshotListDisplayOptions
+    get() = SnapshotListDisplayOptions(
+      highlightDiffs = (GlobalValues.snapshotOptions and SnapshotOptions.DIFF_HIGHLIGHT) > 0,
+      showUpdateTime = (GlobalValues.snapshotOptions and SnapshotOptions.SHOW_UPDATE_TIME) > 0,
+      tintAbiLabels = (GlobalValues.advancedOptions and AdvancedOptions.TINT_ABI_LABEL) > 0
+    )
 }

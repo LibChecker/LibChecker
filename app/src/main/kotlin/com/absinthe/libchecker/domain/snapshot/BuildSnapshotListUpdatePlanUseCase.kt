@@ -26,6 +26,7 @@ class BuildSnapshotListUpdatePlanUseCase(
   private fun buildDisplayPlan(request: Request): Plan {
     val hideNoComponentChanges =
       snapshotSettingsRepository.options.and(SnapshotOptions.HIDE_NO_COMPONENT_CHANGES) != 0
+    val displayOptions = snapshotSettingsRepository.listDisplayOptions
     val sortedItems = request.sourceItems.asSequence()
       .filter { it.matchesSearchKeyword(request.searchKeyword) }
       .filterNot { hideNoComponentChanges && it.isNothingChanged() }
@@ -35,6 +36,7 @@ class BuildSnapshotListUpdatePlanUseCase(
     if (request.highlightRefresh) {
       return Plan(
         items = sortedItems,
+        displayOptions = displayOptions,
         particleRemovalItemIds = emptyList(),
         consumedRemovePackageNames = emptySet()
       )
@@ -60,6 +62,7 @@ class BuildSnapshotListUpdatePlanUseCase(
 
     return Plan(
       items = sortedItems,
+      displayOptions = displayOptions,
       particleRemovalItemIds = particleRemovalItemIds,
       consumedRemovePackageNames = consumedRemovePackageNames
     )
@@ -84,6 +87,7 @@ class BuildSnapshotListUpdatePlanUseCase(
 
   data class Plan(
     val items: List<SnapshotDiffItem>,
+    val displayOptions: SnapshotListDisplayOptions,
     val particleRemovalItemIds: List<Long>,
     val consumedRemovePackageNames: Set<String>,
     val packageIconSources: Map<String, SnapshotPackageIconSource> = emptyMap(),

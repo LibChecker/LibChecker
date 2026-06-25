@@ -13,11 +13,9 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.options.AdvancedOptions
-import com.absinthe.libchecker.constant.options.SnapshotOptions
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotAbiDisplayItem
+import com.absinthe.libchecker.domain.snapshot.SnapshotListDisplayOptions
 import com.absinthe.libchecker.domain.snapshot.SnapshotPackageIconSource
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.stableSnapshotDiffItemIdFor
@@ -56,8 +54,13 @@ class SnapshotAdapter(
   private val formatterToday by unsafeLazy {
     SimpleDateFormat("HH:mm:ss", Locale.getDefault())
   }
+  private var displayOptions = SnapshotListDisplayOptions()
   private var packageIconSources: Map<String, SnapshotPackageIconSource> = emptyMap()
   private var apexPackageNames: Set<String> = emptySet()
+
+  fun setDisplayOptions(displayOptions: SnapshotListDisplayOptions) {
+    this.displayOptions = displayOptions
+  }
 
   fun setPackageIconSources(packageIconSources: Map<String, SnapshotPackageIconSource>) {
     this.packageIconSources = packageIconSources
@@ -103,7 +106,7 @@ class SnapshotAdapter(
       }
 
       val isNewOrDeleted = item.deleted || item.newInstalled
-      val highlightDiffColor = if ((GlobalValues.snapshotOptions and SnapshotOptions.DIFF_HIGHLIGHT) > 0) {
+      val highlightDiffColor = if (displayOptions.highlightDiffs) {
         context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary)
       } else {
         null
@@ -257,7 +260,7 @@ class SnapshotAdapter(
       }
       abiInfo.text = builder
 
-      updateTime.isVisible = (GlobalValues.snapshotOptions and SnapshotOptions.SHOW_UPDATE_TIME) > 0 && cardMode != CardMode.GET_APP_UPDATE
+      updateTime.isVisible = displayOptions.showUpdateTime && cardMode != CardMode.GET_APP_UPDATE
       if (updateTime.isVisible) {
         val timeText = if (DateUtils.isTimestampToday(item.updateTime)) {
           formatterToday.format(item.updateTime)
@@ -305,7 +308,7 @@ class SnapshotAdapter(
     val spanString = SpannableString(paddingString)
     badgeRes.getDrawable(context)?.let {
       if (tintBadge) {
-        if ((GlobalValues.advancedOptions and AdvancedOptions.TINT_ABI_LABEL) > 0) {
+        if (displayOptions.tintAbiLabels) {
           if (badgeRes == R.drawable.ic_abi_label_64bit) {
             it.setTint(context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary))
           } else {
