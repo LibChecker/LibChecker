@@ -13,6 +13,12 @@ class GlobalSnapshotSettingsRepository : SnapshotSettingsRepository {
       GlobalValues.snapshotOptions = value
     }
 
+  override var autoRemoveThreshold: Int
+    get() = GlobalValues.snapshotAutoRemoveThreshold
+    set(value) {
+      GlobalValues.snapshotAutoRemoveThreshold = value
+    }
+
   override val listDisplayOptions: SnapshotListDisplayOptions
     get() = SnapshotListDisplayOptions(
       highlightDiffs = (GlobalValues.snapshotOptions and SnapshotOptions.DIFF_HIGHLIGHT) > 0,

@@ -6,8 +6,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.os.BundleCompat
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.TimeStampItem
+import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
 import com.absinthe.libchecker.features.snapshot.ui.view.TimeNodeAddApkView
@@ -23,6 +23,7 @@ import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 const val EXTRA_TOP_APPS = "EXTRA_TOP_APPS"
@@ -30,6 +31,7 @@ const val EXTRA_TOP_APPS = "EXTRA_TOP_APPS"
 class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<TimeNodeBottomSheetView>() {
 
   private val viewModel: SnapshotViewModel by activityViewModel()
+  private val snapshotSettingsRepository: SnapshotSettingsRepository by inject()
   private var itemClickAction: ((position: Int) -> Unit)? = null
   private var addApkClickAction: ((isLeft: Boolean) -> Unit)? = null
   private var customTitle: String? = null
@@ -69,7 +71,10 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
         )
       } else {
         root.adapter.addHeaderView(
-          TimeNodeAutoRemoveView(requireContext()).also { autoRemoveView ->
+          TimeNodeAutoRemoveView(
+            requireContext(),
+            snapshotSettingsRepository.autoRemoveThreshold
+          ).also { autoRemoveView ->
             fun recordChanged(checked: Boolean) {
               Telemetry.recordEvent(
                 Constants.Event.SNAPSHOT_ADVANCED_MENU_ITEM_CHANGED,
@@ -85,16 +90,24 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
               if (checked) {
                 val ctw = context as? ContextThemeWrapper
                 if (ctw == null) {
-                  autoRemoveView.syncWithAutoRemoveThreshold()
+                  autoRemoveView.syncWithAutoRemoveThreshold(
+                    snapshotSettingsRepository.autoRemoveThreshold
+                  )
                 } else {
                   var confirmedThreshold: Int? = null
-                  val dialog = UiUtils.createSnapshotAutoRemoveThresholdDialog(ctw) { threshold ->
+                  val dialog = UiUtils.createSnapshotAutoRemoveThresholdDialog(
+                    ctw,
+                    snapshotSettingsRepository.autoRemoveThreshold
+                  ) { threshold ->
                     confirmedThreshold = threshold
-                    autoRemoveView.invalidateText()
+                    snapshotSettingsRepository.autoRemoveThreshold = threshold
+                    autoRemoveView.setAutoRemoveThreshold(threshold)
                     recordChanged(true)
                   }
                   dialog.setOnDismissListener {
-                    autoRemoveView.syncWithAutoRemoveThreshold()
+                    autoRemoveView.syncWithAutoRemoveThreshold(
+                      snapshotSettingsRepository.autoRemoveThreshold
+                    )
                     confirmedThreshold?.let { threshold ->
                       lifecycleScope.launch(Dispatchers.IO) {
                         var loadingDialog: AlertDialog? = null
@@ -115,8 +128,8 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
                   dialog.show()
                 }
               } else {
-                GlobalValues.snapshotAutoRemoveThreshold = -1
-                autoRemoveView.invalidateText()
+                snapshotSettingsRepository.autoRemoveThreshold = -1
+                autoRemoveView.setAutoRemoveThreshold(-1)
                 recordChanged(false)
               }
             }

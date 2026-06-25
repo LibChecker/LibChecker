@@ -4,11 +4,13 @@ import android.content.Context
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.app.CheckableChipView
 
-class TimeNodeAutoRemoveView(context: Context) : AViewGroup(context) {
+class TimeNodeAutoRemoveView(
+  context: Context,
+  private var autoRemoveThreshold: Int
+) : AViewGroup(context) {
 
   val chip = CheckableChipView(context).also {
     it.layoutParams = MarginLayoutParams(
@@ -17,7 +19,7 @@ class TimeNodeAutoRemoveView(context: Context) : AViewGroup(context) {
     ).also { lp ->
       lp.setMargins(4.dp, 4.dp, 4.dp, 4.dp)
     }
-    it.isChecked = GlobalValues.snapshotAutoRemoveThreshold > 0
+    it.isChecked = autoRemoveThreshold > 0
   }
 
   init {
@@ -27,20 +29,26 @@ class TimeNodeAutoRemoveView(context: Context) : AViewGroup(context) {
   }
 
   fun invalidateText() {
-    if (GlobalValues.snapshotAutoRemoveThreshold <= 0) {
+    if (autoRemoveThreshold <= 0) {
       chip.text = context.getString(R.string.album_item_management_snapshot_auto_remove_default_title)
     } else {
       chip.text = context.getString(
         R.string.album_item_management_snapshot_auto_remove_specific_title,
-        GlobalValues.snapshotAutoRemoveThreshold
+        autoRemoveThreshold
       )
     }
   }
 
-  fun syncWithAutoRemoveThreshold() {
+  fun setAutoRemoveThreshold(threshold: Int) {
+    autoRemoveThreshold = threshold
+    invalidateText()
+  }
+
+  fun syncWithAutoRemoveThreshold(threshold: Int) {
+    autoRemoveThreshold = threshold
     val listener = chip.onCheckedChangeListener
     chip.onCheckedChangeListener = null
-    chip.isChecked = GlobalValues.snapshotAutoRemoveThreshold > 0
+    chip.isChecked = autoRemoveThreshold > 0
     chip.onCheckedChangeListener = listener
     invalidateText()
   }

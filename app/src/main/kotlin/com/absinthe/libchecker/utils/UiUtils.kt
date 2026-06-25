@@ -111,9 +111,10 @@ object UiUtils {
 
   fun createSnapshotAutoRemoveThresholdDialog(
     context: ContextThemeWrapper,
+    initialThreshold: Int,
     onThresholdConfirmed: ((threshold: Int) -> Unit)? = null
   ): AlertDialog {
-    val threshold = GlobalValues.snapshotAutoRemoveThreshold.takeIf { it > 0 } ?: 5
+    val threshold = initialThreshold.takeIf { it > 0 } ?: 5
     val slider = Slider(ContextThemeWrapper(context, R.style.App_Widget_M3E_Slider)).apply {
       layoutParams =
         ViewGroup.MarginLayoutParams(200.dp, ViewGroup.LayoutParams.WRAP_CONTENT).also {
@@ -136,7 +137,6 @@ object UiUtils {
       .setCancelable(false)
       .setPositiveButton(android.R.string.ok) { _, _ ->
         val confirmedThreshold = slider.value.toInt()
-        GlobalValues.snapshotAutoRemoveThreshold = confirmedThreshold
         onThresholdConfirmed?.invoke(confirmedThreshold)
       }
       .setNegativeButton(android.R.string.cancel, null)

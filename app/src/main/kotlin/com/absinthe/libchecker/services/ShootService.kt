@@ -22,10 +22,10 @@ import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.snapshot.CaptureInstalledSnapshotUseCase
+import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.features.home.ui.MainActivity
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -53,6 +53,7 @@ class ShootService : LifecycleService() {
   private val notificationManager by lazy { NotificationManagerCompat.from(this) }
   private val installedAppRepository: InstalledAppRepository by inject()
   private val captureInstalledSnapshot: CaptureInstalledSnapshotUseCase by inject()
+  private val snapshotSettingsRepository: SnapshotSettingsRepository by inject()
   private val listenerList = RemoteCallbackList<OnShootListener>()
 
   private val binder by lazy { ShootBinder(this) }
@@ -191,7 +192,7 @@ class ShootService : LifecycleService() {
       CaptureInstalledSnapshotUseCase.Request(
         appList = appList,
         dropPrevious = dropPrevious,
-        autoRemoveThreshold = GlobalValues.snapshotAutoRemoveThreshold,
+        autoRemoveThreshold = snapshotSettingsRepository.autoRemoveThreshold,
         shouldSaveFullSnapshot = shouldSaveFullSnapshot,
         systemProps = getSystemProps()
       )
