@@ -10,6 +10,7 @@ import androidx.core.view.marginTop
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.snapshot.SnapshotSystemPropDisplayData
 import com.absinthe.libchecker.features.snapshot.detail.ui.view.SnapshotTypeIndicatorView
 import com.absinthe.libchecker.features.snapshot.ui.adapter.SystemPropsAdapter
 import com.absinthe.libchecker.utils.extensions.dp
@@ -106,7 +107,7 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context, null, 
       layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
     }
 
-    fun setSystemProps(props: List<Pair<String, String>>) {
+    fun setSystemProps(props: List<SnapshotSystemPropDisplayData>) {
       post { systemPropAdapter.setList(props) }
     }
 

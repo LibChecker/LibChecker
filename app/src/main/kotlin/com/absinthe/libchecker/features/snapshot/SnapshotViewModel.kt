@@ -8,18 +8,18 @@ import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotCapturePlanUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotDetailItemsUseCase
+import com.absinthe.libchecker.domain.snapshot.BuildSnapshotSystemPropDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotDiffsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemWithInstalledAppUseCase
 import com.absinthe.libchecker.domain.snapshot.DeleteSnapshotTimeStampUseCase
 import com.absinthe.libchecker.domain.snapshot.GetApexPackageNamesUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotPackageIconSourcesUseCase
-import com.absinthe.libchecker.domain.snapshot.GetSnapshotSystemPropDiffsUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotCapturePlan
 import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
-import com.absinthe.libchecker.domain.snapshot.SnapshotSystemPropDiff
+import com.absinthe.libchecker.domain.snapshot.SnapshotSystemPropDisplayData
 import com.absinthe.libchecker.domain.snapshot.SnapshotTrackChangeRepository
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
@@ -46,7 +46,7 @@ class SnapshotViewModel(
   private val snapshotLibrary: SnapshotLibraryUseCase,
   private val buildSnapshotCapturePlanUseCase: BuildSnapshotCapturePlanUseCase,
   private val getSnapshotPackageIconSourcesUseCase: GetSnapshotPackageIconSourcesUseCase,
-  private val getSnapshotSystemPropDiffsUseCase: GetSnapshotSystemPropDiffsUseCase,
+  private val buildSnapshotSystemPropDisplayDataUseCase: BuildSnapshotSystemPropDisplayDataUseCase,
   private val getApexPackageNamesUseCase: GetApexPackageNamesUseCase,
   private val deleteSnapshotTimeStampUseCase: DeleteSnapshotTimeStampUseCase,
   private val snapshotSelectionUseCase: SnapshotSelectionUseCase,
@@ -135,8 +135,8 @@ class SnapshotViewModel(
 
   suspend fun getApexPackageNames(): Set<String> = getApexPackageNamesUseCase()
 
-  suspend fun getSystemPropDiffs(timestamp: Long): List<SnapshotSystemPropDiff> {
-    return getSnapshotSystemPropDiffsUseCase(timestamp)
+  suspend fun getSystemPropDisplayData(timestamp: Long): List<SnapshotSystemPropDisplayData> {
+    return buildSnapshotSystemPropDisplayDataUseCase(timestamp)
   }
 
   suspend fun deleteSnapshotTimeStamp(timestamp: Long): List<TimeStampItem> {

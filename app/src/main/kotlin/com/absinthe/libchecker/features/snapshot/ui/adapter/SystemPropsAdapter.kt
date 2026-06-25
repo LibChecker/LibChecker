@@ -1,11 +1,12 @@
 package com.absinthe.libchecker.features.snapshot.ui.adapter
 
 import android.view.ViewGroup
+import com.absinthe.libchecker.domain.snapshot.SnapshotSystemPropDisplayData
 import com.absinthe.libchecker.features.snapshot.ui.view.SystemPropItemView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
-class SystemPropsAdapter : BaseQuickAdapter<(Pair<String, String>), BaseViewHolder>(0) {
+class SystemPropsAdapter : BaseQuickAdapter<SnapshotSystemPropDisplayData, BaseViewHolder>(0) {
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return BaseViewHolder(
@@ -18,11 +19,11 @@ class SystemPropsAdapter : BaseQuickAdapter<(Pair<String, String>), BaseViewHold
     )
   }
 
-  override fun convert(holder: BaseViewHolder, item: Pair<String, String>) {
+  override fun convert(holder: BaseViewHolder, item: SnapshotSystemPropDisplayData) {
     (holder.itemView as SystemPropItemView).also {
-      it.tvTitle.text = item.first
-      it.tvText.text = item.second
-      it.contentDescription = listOf(item.first, item.second).joinToString()
+      it.tvTitle.text = item.label
+      it.tvText.text = item.displayValue
+      it.contentDescription = listOf(item.label, item.displayValue).joinToString()
     }
   }
 }

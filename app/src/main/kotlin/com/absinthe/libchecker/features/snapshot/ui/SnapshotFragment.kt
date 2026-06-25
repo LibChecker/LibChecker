@@ -35,7 +35,6 @@ import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.app.PackageChangeState
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotCapturePlan
-import com.absinthe.libchecker.domain.snapshot.SnapshotSystemProp
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.features.album.ui.AlbumActivity
 import com.absinthe.libchecker.features.home.HomeViewModel
@@ -45,7 +44,6 @@ import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
 import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ENTITY
 import com.absinthe.libchecker.features.snapshot.detail.ui.SnapshotDetailActivity
 import com.absinthe.libchecker.features.snapshot.detail.ui.view.SnapshotEmptyView
-import com.absinthe.libchecker.features.snapshot.ui.adapter.ARROW
 import com.absinthe.libchecker.features.snapshot.ui.adapter.SnapshotAdapter
 import com.absinthe.libchecker.features.snapshot.ui.adapter.SnapshotDiffUtil
 import com.absinthe.libchecker.features.snapshot.ui.view.SnapshotDashboardView
@@ -643,20 +641,10 @@ class SnapshotFragment :
 
   private fun updateSystemProps(dashboard: SnapshotDashboardView, timestamp: Long) {
     lifecycleScope.launch(Dispatchers.IO) {
-      val displayedSystemProps = viewModel.getSystemPropDiffs(timestamp)
-        .map { diff ->
-          getSystemPropLabel(diff.prop) to "${diff.previous} $ARROW ${diff.current}"
-        }
+      val displayedSystemProps = viewModel.getSystemPropDisplayData(timestamp)
       launch(Dispatchers.Main) {
         dashboard.container.setSystemProps(displayedSystemProps)
       }
-    }
-  }
-
-  private fun getSystemPropLabel(prop: SnapshotSystemProp): String {
-    return when (prop) {
-      SnapshotSystemProp.BUILD_ID -> getString(R.string.snapshot_build_id)
-      SnapshotSystemProp.SECURITY_PATCH -> getString(R.string.snapshot_build_security_patch)
     }
   }
 
