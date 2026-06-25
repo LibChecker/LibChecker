@@ -68,14 +68,6 @@ class LibReferenceFragment :
   private var advancedMenuBSDFragment: LibReferenceMenuBSDFragment? = null
   private var firstScrollFlag = false
   private var isSearchTextClearOnce = false
-  private var hasRequestedInitialCompute = false
-  private var deferredReferenceWork: DeferredReferenceWork? = null
-  private var deferredReferenceWorkNeedsLoading = false
-
-  private enum class DeferredReferenceWork {
-    COMPUTE,
-    MATCH
-  }
 
   override fun init() {
     val context = (context as? BaseActivity<*>) ?: return
@@ -301,60 +293,29 @@ class LibReferenceFragment :
   }
 
   private fun requestComputeRef(needShowLoading: Boolean) {
-    if (!isFragmentVisible()) {
-      deferReferenceWork(DeferredReferenceWork.COMPUTE, needShowLoading)
-      return
-    }
-    hasRequestedInitialCompute = true
-    computeRef(needShowLoading)
+    applyReferenceWork(
+      libReferenceViewModel.requestComputeReference(
+        isVisible = isFragmentVisible(),
+        needShowLoading = needShowLoading
+      )
+    )
   }
 
   private fun requestMatchRules(needShowLoading: Boolean) {
-    if (!isFragmentVisible()) {
-      deferReferenceWork(DeferredReferenceWork.MATCH, needShowLoading)
-      return
-    }
-    hasRequestedInitialCompute = true
-    matchRules(needShowLoading)
+    applyReferenceWork(
+      libReferenceViewModel.requestMatchRules(
+        isVisible = isFragmentVisible(),
+        needShowLoading = needShowLoading
+      )
+    )
   }
 
-  private fun deferReferenceWork(work: DeferredReferenceWork, needShowLoading: Boolean) {
-    deferredReferenceWork = when {
-      work == DeferredReferenceWork.COMPUTE -> DeferredReferenceWork.COMPUTE
-      deferredReferenceWork == DeferredReferenceWork.COMPUTE -> DeferredReferenceWork.COMPUTE
-      else -> work
-    }
-    deferredReferenceWorkNeedsLoading = deferredReferenceWorkNeedsLoading || needShowLoading
-  }
-
-  private fun runDeferredReferenceWork() {
-    val work = deferredReferenceWork ?: return
-    val needShowLoading = deferredReferenceWorkNeedsLoading || refAdapter.data.isEmpty()
-    deferredReferenceWork = null
-    deferredReferenceWorkNeedsLoading = false
-    hasRequestedInitialCompute = true
-
-    when (work) {
-      DeferredReferenceWork.COMPUTE -> computeRef(needShowLoading)
-      DeferredReferenceWork.MATCH -> matchRules(needShowLoading)
-    }
-  }
-
-  private fun computeRef(needShowLoading: Boolean) {
+  private fun applyReferenceWork(plan: LibReferenceViewModel.ReferenceWorkPlan?) {
+    plan ?: return
     isListReady = false
-    if (needShowLoading) {
+    if (plan.shouldShowLoading) {
       flip(VF_LOADING)
     }
-    libReferenceViewModel.computeLibReference()
-  }
-
-  private fun matchRules(needShowLoading: Boolean) {
-    isListReady = false
-    if (needShowLoading) {
-      flip(VF_LOADING)
-    }
-    libReferenceViewModel.cancelMatchingJob()
-    libReferenceViewModel.matchingRules()
   }
 
   override fun onQueryTextSubmit(query: String?): Boolean {
@@ -422,12 +383,9 @@ class LibReferenceFragment :
     super.onVisibilityChanged(visible)
     if (visible) {
       refAdapter.setSpaceFooterView()
-      if (!hasRequestedInitialCompute && refAdapter.data.isEmpty()) {
-        hasRequestedInitialCompute = true
-        computeRef(true)
-      } else {
-        runDeferredReferenceWork()
-      }
+      applyReferenceWork(
+        libReferenceViewModel.onReferencePageVisible(hasDisplayedReferences = refAdapter.data.isNotEmpty())
+      )
     }
   }
 
