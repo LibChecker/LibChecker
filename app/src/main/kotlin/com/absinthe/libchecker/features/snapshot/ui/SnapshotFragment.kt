@@ -313,22 +313,15 @@ class SnapshotFragment :
         }
 
         is SnapshotViewModel.Effect.DiffItemChange -> {
-          if (it.item.deleted) {
-            pendingParticleRemovePackageNames += it.item.packageName
+          viewModel.applySnapshotDiffItemChange(items, it.item).also { update ->
+            applySnapshotDiffItemsUpdate(update.items, update.pendingRemovePackageNames)
           }
-          val newItems = items.toMutableList()
-          newItems.removeIf { item -> item.packageName == it.item.packageName }
-          newItems.add(it.item)
-          items = newItems
-          updateItems()
         }
 
         is SnapshotViewModel.Effect.DiffItemRemove -> {
-          pendingParticleRemovePackageNames += it.packageName
-          val newItems = items.toMutableList()
-          newItems.removeIf { item -> item.packageName == it.packageName }
-          items = newItems
-          updateItems()
+          viewModel.applySnapshotDiffItemRemove(items, it.packageName).also { update ->
+            applySnapshotDiffItemsUpdate(update.items, update.pendingRemovePackageNames)
+          }
         }
 
         is SnapshotViewModel.Effect.ComparingProgressChange -> {
@@ -338,6 +331,15 @@ class SnapshotFragment :
     }.launchIn(lifecycleScope)
 
     viewModel.changeTimeStamp(viewModel.selectedSnapshotTimestamp)
+  }
+
+  private fun applySnapshotDiffItemsUpdate(
+    newItems: List<SnapshotDiffItem>,
+    pendingRemovePackageNames: Set<String>
+  ) {
+    pendingParticleRemovePackageNames += pendingRemovePackageNames
+    items = newItems
+    updateItems()
   }
 
   override fun onAttach(context: Context) {

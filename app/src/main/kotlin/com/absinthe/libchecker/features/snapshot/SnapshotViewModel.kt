@@ -21,6 +21,7 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotSystemPropDisplayData
 import com.absinthe.libchecker.domain.snapshot.SnapshotTrackChangeRepository
+import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotDiffItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libraries.utils.manager.TimeRecorder
@@ -50,6 +51,7 @@ class SnapshotViewModel(
   private val buildSnapshotSystemPropDisplayDataUseCase: BuildSnapshotSystemPropDisplayDataUseCase,
   private val deleteSnapshotTimeStampUseCase: DeleteSnapshotTimeStampUseCase,
   private val snapshotSelectionUseCase: SnapshotSelectionUseCase,
+  private val updateSnapshotDiffItemsUseCase: UpdateSnapshotDiffItemsUseCase,
   private val snapshotTrackChangeRepository: SnapshotTrackChangeRepository
 ) : ViewModel() {
 
@@ -149,6 +151,20 @@ class SnapshotViewModel(
         highlightRefresh = highlightRefresh
       )
     )
+  }
+
+  fun applySnapshotDiffItemChange(
+    currentItems: List<SnapshotDiffItem>,
+    changedItem: SnapshotDiffItem
+  ): UpdateSnapshotDiffItemsUseCase.Result {
+    return updateSnapshotDiffItemsUseCase.applyChange(currentItems, changedItem)
+  }
+
+  fun applySnapshotDiffItemRemove(
+    currentItems: List<SnapshotDiffItem>,
+    packageName: String
+  ): UpdateSnapshotDiffItemsUseCase.Result {
+    return updateSnapshotDiffItemsUseCase.applyRemove(currentItems, packageName)
   }
 
   suspend fun getSystemPropDisplayData(timestamp: Long): List<SnapshotSystemPropDisplayData> {

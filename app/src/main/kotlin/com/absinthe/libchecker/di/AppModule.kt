@@ -165,6 +165,7 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotTrackChangeRepository
+import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotDiffItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotTopAppsUseCase
 import com.absinthe.libchecker.domain.snapshot.backup.BuildSnapshotRestorePlanUseCase
 import com.absinthe.libchecker.domain.snapshot.comparison.PrepareSnapshotComparisonArchivesUseCase
@@ -451,6 +452,7 @@ val appModule = module {
   factory { GetTrackListItemsUseCase(androidContext().packageManager, get(), get()) }
   factory { SetPackageTrackedUseCase(get(), get()) }
   factory { DeleteSnapshotTimeStampUseCase(get(), get()) }
+  factory { UpdateSnapshotDiffItemsUseCase() }
   factory { UpdateSnapshotTopAppsUseCase(get(), get()) }
   factory { BuildSnapshotDetailItemsUseCase(androidContext()) }
   factory { SnapshotArchiveUseCase(get(), get()) }
@@ -556,6 +558,7 @@ val appModule = module {
       buildSnapshotSystemPropDisplayDataUseCase = get(),
       deleteSnapshotTimeStampUseCase = get(),
       snapshotSelectionUseCase = get(),
+      updateSnapshotDiffItemsUseCase = get(),
       snapshotTrackChangeRepository = get()
     )
   }
