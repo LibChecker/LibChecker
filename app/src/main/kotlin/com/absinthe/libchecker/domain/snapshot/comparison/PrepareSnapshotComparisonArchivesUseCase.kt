@@ -32,6 +32,12 @@ class PrepareSnapshotComparisonArchivesUseCase(
     )
   }
 
+  fun clearCache(cacheDir: File) {
+    File(cacheDir, Constants.TEMP_PACKAGE).delete()
+    File(cacheDir, Constants.TEMP_PACKAGE_2).delete()
+    File(cacheDir, ARCHIVE_PACKAGE_DIR).deleteRecursively()
+  }
+
   private suspend fun buildArchiveOrNull(
     input: SnapshotComparisonInput,
     destinationFile: File,
@@ -52,6 +58,10 @@ class PrepareSnapshotComparisonArchivesUseCase(
     } catch (_: Exception) {
       null
     }
+  }
+
+  private companion object {
+    const val ARCHIVE_PACKAGE_DIR = "apks"
   }
 
   data class Request(

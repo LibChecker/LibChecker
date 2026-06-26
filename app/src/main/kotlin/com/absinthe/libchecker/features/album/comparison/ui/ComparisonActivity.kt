@@ -24,7 +24,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.databinding.ActivityComparisonBinding
 import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
@@ -52,7 +51,6 @@ import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.requireAvailableCacheDir
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -94,13 +92,7 @@ class ComparisonActivity :
 
   override fun onDestroy() {
     super.onDestroy()
-    if (viewModel.inputs.hasArchiveInput) {
-      externalCacheDir?.let { cacheDir ->
-        File(cacheDir, Constants.TEMP_PACKAGE).delete()
-        File(cacheDir, Constants.TEMP_PACKAGE_2).delete()
-        File(cacheDir, "apks").deleteRecursively()
-      }
-    }
+    viewModel.clearSnapshotComparisonArchiveCache(externalCacheDir)
   }
 
   override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {

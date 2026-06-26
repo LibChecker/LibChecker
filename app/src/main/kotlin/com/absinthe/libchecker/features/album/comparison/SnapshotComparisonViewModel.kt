@@ -98,6 +98,13 @@ class SnapshotComparisonViewModel(
     )
   }
 
+  fun clearSnapshotComparisonArchiveCache(cacheDir: File?) {
+    if (!inputs.hasArchiveInput || cacheDir == null) {
+      return
+    }
+    prepareSnapshotComparisonArchivesUseCase.clearCache(cacheDir)
+  }
+
   fun buildSnapshotPairDiff(left: SnapshotItem, right: SnapshotItem): SnapshotDiffItem {
     return buildSnapshotPairDiffUseCase(left, right)
   }
