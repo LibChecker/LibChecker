@@ -46,6 +46,7 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
     maxPeekHeightPercentage = 0.67f
     customTitle?.let { getHeaderView().title.text = it }
     root.adapter.apply {
+      setTimestampFormatter(viewModel::getFormatDateString)
       setOnItemClickListener { _, _, position ->
         itemClickAction?.invoke(position)
       }

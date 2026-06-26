@@ -13,6 +13,7 @@ import com.absinthe.libchecker.domain.snapshot.BuildSnapshotSystemPropDisplayDat
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotDiffsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemWithInstalledAppUseCase
 import com.absinthe.libchecker.domain.snapshot.DeleteSnapshotTimeStampUseCase
+import com.absinthe.libchecker.domain.snapshot.FormatSnapshotTimestampUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotPackageIconSourcesUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotCapturePlan
@@ -26,9 +27,6 @@ import com.absinthe.libchecker.domain.snapshot.detail.BuildSnapshotDetailSection
 import com.absinthe.libchecker.domain.snapshot.detail.SnapshotDetailSection
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libraries.utils.manager.TimeRecorder
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -52,6 +50,7 @@ class SnapshotViewModel(
   private val buildSnapshotListUpdatePlanUseCase: BuildSnapshotListUpdatePlanUseCase,
   private val buildSnapshotSystemPropDisplayDataUseCase: BuildSnapshotSystemPropDisplayDataUseCase,
   private val deleteSnapshotTimeStampUseCase: DeleteSnapshotTimeStampUseCase,
+  private val formatSnapshotTimestampUseCase: FormatSnapshotTimestampUseCase,
   private val snapshotSelectionUseCase: SnapshotSelectionUseCase,
   private val updateSnapshotDiffItemsUseCase: UpdateSnapshotDiffItemsUseCase,
   private val snapshotTrackChangeRepository: SnapshotTrackChangeRepository
@@ -185,9 +184,7 @@ class SnapshotViewModel(
   }
 
   fun getFormatDateString(timestamp: Long): String {
-    val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd, HH:mm:ss", Locale.getDefault())
-    val date = Date(timestamp)
-    return simpleDateFormat.format(date)
+    return formatSnapshotTimestampUseCase(timestamp)
   }
 
   fun consumeTrackItemsChanged(): Boolean {

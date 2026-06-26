@@ -9,6 +9,7 @@ import com.absinthe.libchecker.domain.snapshot.ArchiveSnapshotItem
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotComparisonPlanUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotPairDiffUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotDiffsUseCase
+import com.absinthe.libchecker.domain.snapshot.FormatSnapshotTimestampUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotComparisonPlan
 import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
@@ -18,9 +19,6 @@ import com.absinthe.libchecker.domain.snapshot.comparison.SnapshotComparisonSide
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -34,6 +32,7 @@ class SnapshotComparisonViewModel(
   private val snapshotLibrary: SnapshotLibraryUseCase,
   private val buildSnapshotPairDiffUseCase: BuildSnapshotPairDiffUseCase,
   private val buildSnapshotComparisonPlanUseCase: BuildSnapshotComparisonPlanUseCase,
+  private val formatSnapshotTimestampUseCase: FormatSnapshotTimestampUseCase,
   private val prepareSnapshotComparisonArchivesUseCase: PrepareSnapshotComparisonArchivesUseCase
 ) : ViewModel() {
 
@@ -135,9 +134,7 @@ class SnapshotComparisonViewModel(
   }
 
   fun getFormatDateString(timestamp: Long): String {
-    val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd, HH:mm:ss", Locale.getDefault())
-    val date = Date(timestamp)
-    return simpleDateFormat.format(date)
+    return formatSnapshotTimestampUseCase(timestamp)
   }
 
   fun getDashboardCount(timestamp: Long, isLeft: Boolean) = viewModelScope.launch(Dispatchers.IO) {

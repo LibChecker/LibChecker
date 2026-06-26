@@ -144,6 +144,7 @@ import com.absinthe.libchecker.domain.snapshot.CompareSnapshotWithInstalledAppsU
 import com.absinthe.libchecker.domain.snapshot.CompareTrackedSnapshotListsUseCase
 import com.absinthe.libchecker.domain.snapshot.CreateSnapshotDatabaseBackupUseCase
 import com.absinthe.libchecker.domain.snapshot.DeleteSnapshotTimeStampUseCase
+import com.absinthe.libchecker.domain.snapshot.FormatSnapshotTimestampUseCase
 import com.absinthe.libchecker.domain.snapshot.GetApexPackageNamesUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotBackupTargetUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
@@ -444,6 +445,7 @@ val appModule = module {
   factory { CompareSnapshotWithInstalledAppsUseCase(androidContext().packageManager, get(), get(), get(), get()) }
   factory { CompareSnapshotDiffsUseCase(get(), get(), get(), get()) }
   factory { CompareSnapshotItemWithInstalledAppUseCase(androidContext().packageManager, get(), get(), get(), get()) }
+  factory { FormatSnapshotTimestampUseCase() }
   factory { GetSnapshotDashboardCountUseCase(get(), get()) }
   factory { GetSnapshotPackageIconSourcesUseCase(get()) }
   factory { GetSnapshotRuleUseCase() }
@@ -560,6 +562,7 @@ val appModule = module {
       buildSnapshotListUpdatePlanUseCase = get(),
       buildSnapshotSystemPropDisplayDataUseCase = get(),
       deleteSnapshotTimeStampUseCase = get(),
+      formatSnapshotTimestampUseCase = get(),
       snapshotSelectionUseCase = get(),
       updateSnapshotDiffItemsUseCase = get(),
       snapshotTrackChangeRepository = get()
@@ -571,6 +574,7 @@ val appModule = module {
       restoreSnapshotArchiveFromUriUseCase = get(),
       getSnapshotBackupTargetUseCase = get(),
       buildSnapshotRestorePlanUseCase = get(),
+      formatSnapshotTimestampUseCase = get(),
       snapshotSelectionUseCase = get()
     )
   }
@@ -581,6 +585,7 @@ val appModule = module {
       snapshotLibrary = get(),
       buildSnapshotPairDiffUseCase = get(),
       buildSnapshotComparisonPlanUseCase = get(),
+      formatSnapshotTimestampUseCase = get(),
       prepareSnapshotComparisonArchivesUseCase = get()
     )
   }

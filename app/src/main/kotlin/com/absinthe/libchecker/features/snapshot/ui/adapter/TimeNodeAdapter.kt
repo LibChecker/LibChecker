@@ -5,23 +5,27 @@ import android.view.Gravity
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import com.absinthe.libchecker.database.entity.TimeStampItem
+import com.absinthe.libchecker.domain.snapshot.FormatSnapshotTimestampUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotPackageIconSource
 import com.absinthe.libchecker.features.snapshot.ui.view.TimeNodeItemView
 import com.absinthe.libchecker.utils.fromJson
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import java.io.IOException
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import timber.log.Timber
 
-class TimeNodeAdapter : BaseQuickAdapter<TimeStampItem, BaseViewHolder>(0) {
+class TimeNodeAdapter(
+  private var formatTimestamp: (Long) -> String = FormatSnapshotTimestampUseCase()::invoke
+) : BaseQuickAdapter<TimeStampItem, BaseViewHolder>(0) {
 
   private var packageIconSources: Map<String, SnapshotPackageIconSource> = emptyMap()
 
   fun setPackageIconSources(packageIconSources: Map<String, SnapshotPackageIconSource>) {
     this.packageIconSources = packageIconSources
+  }
+
+  fun setTimestampFormatter(formatTimestamp: (Long) -> String) {
+    this.formatTimestamp = formatTimestamp
   }
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
@@ -30,7 +34,7 @@ class TimeNodeAdapter : BaseQuickAdapter<TimeStampItem, BaseViewHolder>(0) {
 
   override fun convert(holder: BaseViewHolder, item: TimeStampItem) {
     (holder.itemView as TimeNodeItemView).apply {
-      name.text = getFormatDateString(item.timestamp)
+      name.text = formatTimestamp(item.timestamp)
       contentDescription = name.text
       try {
         item.topApps?.let {
@@ -62,11 +66,5 @@ class TimeNodeAdapter : BaseQuickAdapter<TimeStampItem, BaseViewHolder>(0) {
         Timber.e(e)
       }
     }
-  }
-
-  private fun getFormatDateString(timestamp: Long): String {
-    val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd, HH:mm:ss", Locale.getDefault())
-    val date = Date(timestamp)
-    return simpleDateFormat.format(date)
   }
 }
