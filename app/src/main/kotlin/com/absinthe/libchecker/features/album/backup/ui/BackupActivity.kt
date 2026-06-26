@@ -32,6 +32,7 @@ import com.absinthe.libchecker.domain.snapshot.CreateSnapshotDatabaseBackupUseCa
 import com.absinthe.libchecker.domain.snapshot.RestoreSnapshotDatabaseBackupUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotBackupTarget
+import com.absinthe.libchecker.domain.snapshot.backup.SnapshotRestorePlan
 import com.absinthe.libchecker.features.album.backup.SnapshotBackupViewModel
 import com.absinthe.libchecker.features.home.ui.MainActivity
 import com.absinthe.libchecker.ui.base.BaseActivity
@@ -141,7 +142,7 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
       restoreResultLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { result ->
           result?.let {
-            restoreDatabase(it)
+            restoreBackup(it)
           }
         }
       roomBackup = RoomBackup(context)
@@ -183,8 +184,8 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
       }
 
       activity?.intent?.data?.let { uri ->
-        if (uri.scheme == "content" && uri.path?.endsWith(".lcss") == true) {
-          restoreDatabase(uri)
+        if (viewModel.shouldRestoreFromLaunchUri(uri)) {
+          restoreBackup(uri)
         }
       }
     }
@@ -327,45 +328,64 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
         .joinToString()
     }
 
-    private fun restoreDatabase(uri: Uri) {
+    private fun restoreBackup(uri: Uri) {
       activity?.let { activity ->
         runCatching {
           val dialog = UiUtils.createLoadingDialog(activity)
           dialog.show()
-          if (uri.toString().endsWith(".sqlite3")) {
-            lifecycleScope.launch(Dispatchers.IO) {
-              runCatching {
-                restoreSnapshotDatabaseBackup(
-                  uri,
-                  activity.requireAvailableCacheDir()
-                )
-              }.onSuccess { result ->
-                result?.let {
-                  Timber.d(
-                    "success: ${it.success}, message: ${it.message}, exitCode: ${it.exitCode}"
-                  )
-                }
-              }.onFailure {
-                Timber.e(it)
-              }
-              withContext(Dispatchers.Main) {
-                dialog.dismiss()
-              }
+          when (viewModel.getRestorePlan(uri)) {
+            SnapshotRestorePlan.DatabaseBackup -> {
+              restoreDatabaseBackup(uri, activity, dialog)
             }
-          } else {
-            viewModel.restore(uri) { result ->
-              if (result == null) {
-                context?.showToast("Backup file error")
-                dialog.dismiss()
-                return@restore
-              }
-              dialog.dismiss()
-              showRestoreResultDialog(result)
+
+            SnapshotRestorePlan.ArchiveBackup -> {
+              restoreArchiveBackup(uri, dialog)
             }
           }
         }.onFailure { t ->
           Timber.e(t)
         }
+      }
+    }
+
+    private fun restoreDatabaseBackup(
+      uri: Uri,
+      context: Context,
+      dialog: AlertDialog
+    ) {
+      lifecycleScope.launch(Dispatchers.IO) {
+        runCatching {
+          restoreSnapshotDatabaseBackup(
+            uri,
+            context.requireAvailableCacheDir()
+          )
+        }.onSuccess { result ->
+          result?.let {
+            Timber.d(
+              "success: ${it.success}, message: ${it.message}, exitCode: ${it.exitCode}"
+            )
+          }
+        }.onFailure {
+          Timber.e(it)
+        }
+        withContext(Dispatchers.Main) {
+          dialog.dismiss()
+        }
+      }
+    }
+
+    private fun restoreArchiveBackup(
+      uri: Uri,
+      dialog: AlertDialog
+    ) {
+      viewModel.restore(uri) { result ->
+        if (result == null) {
+          context?.showToast("Backup file error")
+          dialog.dismiss()
+          return@restore
+        }
+        dialog.dismiss()
+        showRestoreResultDialog(result)
       }
     }
 

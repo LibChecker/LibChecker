@@ -165,6 +165,7 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotTrackChangeRepository
 import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotTopAppsUseCase
+import com.absinthe.libchecker.domain.snapshot.backup.BuildSnapshotRestorePlanUseCase
 import com.absinthe.libchecker.domain.snapshot.comparison.PrepareSnapshotComparisonArchivesUseCase
 import com.absinthe.libchecker.domain.statistics.AndroidDistributionRepository
 import com.absinthe.libchecker.domain.statistics.BuildAbiChartDataUseCase
@@ -429,6 +430,7 @@ val appModule = module {
   factory { BuildSnapshotCapturePlanUseCase(get()) }
   factory { BuildSnapshotComparisonListsUseCase(get()) }
   factory { BuildSnapshotComparisonPlanUseCase(get()) }
+  factory { BuildSnapshotRestorePlanUseCase() }
   factory { BuildSnapshotListUpdatePlanUseCase(get(), get(), get()) }
   factory { BuildSnapshotPairDiffUseCase() }
   factory { CaptureInstalledSnapshotUseCase(androidContext().packageManager, get(), get(), get()) }
@@ -559,6 +561,7 @@ val appModule = module {
       backupSnapshotArchiveToUriUseCase = get(),
       restoreSnapshotArchiveFromUriUseCase = get(),
       getSnapshotBackupTargetUseCase = get(),
+      buildSnapshotRestorePlanUseCase = get(),
       snapshotSelectionUseCase = get()
     )
   }

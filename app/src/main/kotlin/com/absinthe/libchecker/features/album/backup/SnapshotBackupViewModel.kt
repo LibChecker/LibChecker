@@ -9,6 +9,8 @@ import com.absinthe.libchecker.domain.snapshot.RestoreSnapshotArchiveFromUriUseC
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotBackupTarget
 import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
+import com.absinthe.libchecker.domain.snapshot.backup.BuildSnapshotRestorePlanUseCase
+import com.absinthe.libchecker.domain.snapshot.backup.SnapshotRestorePlan
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -21,10 +23,17 @@ class SnapshotBackupViewModel(
   private val backupSnapshotArchiveToUriUseCase: BackupSnapshotArchiveToUriUseCase,
   private val restoreSnapshotArchiveFromUriUseCase: RestoreSnapshotArchiveFromUriUseCase,
   private val getSnapshotBackupTargetUseCase: GetSnapshotBackupTargetUseCase,
+  private val buildSnapshotRestorePlanUseCase: BuildSnapshotRestorePlanUseCase,
   private val snapshotSelectionUseCase: SnapshotSelectionUseCase
 ) : ViewModel() {
 
   fun getBackupTarget(): SnapshotBackupTarget = getSnapshotBackupTargetUseCase()
+
+  fun getRestorePlan(uri: Uri): SnapshotRestorePlan = buildSnapshotRestorePlanUseCase(uri)
+
+  fun shouldRestoreFromLaunchUri(uri: Uri): Boolean {
+    return buildSnapshotRestorePlanUseCase.shouldRestoreFromLaunchUri(uri)
+  }
 
   fun backup(uri: Uri, resultAction: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
     runCatching {
