@@ -40,6 +40,7 @@ import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.BuildAppExportNativeLibrariesUseCase
 import com.absinthe.libchecker.domain.app.BuildAppListItemViewStatesUseCase
+import com.absinthe.libchecker.domain.app.BuildAppListUpdatePlanUseCase
 import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.CheckRequiredPackageAvailabilityUseCase
 import com.absinthe.libchecker.domain.app.ClearApkCacheUseCase
@@ -297,6 +298,7 @@ val appModule = module {
     ExportInstalledAppsToUriUseCase(androidContext(), androidContext().contentResolver, get(), get())
   }
   factory { BuildAppListItemViewStatesUseCase(androidContext(), get()) }
+  factory { BuildAppListUpdatePlanUseCase() }
   factory { BuildInAppUpdateDiffDataUseCase(BuildConfig.APPLICATION_ID, androidContext().packageManager, get()) }
   factory { BuildNativeLibraryItemDisplayDataUseCase(androidContext()) }
   factory { BuildRelatedAppDisplayDataUseCase(androidContext()) }

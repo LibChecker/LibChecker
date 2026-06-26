@@ -25,6 +25,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
+import com.absinthe.libchecker.domain.app.BuildAppListUpdatePlanUseCase
 import com.absinthe.libchecker.domain.app.GetAppListContentUseCase
 import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.settings.DeveloperSettingsRepository
@@ -76,8 +77,8 @@ class AppListFragment :
   private val isFirstLaunch get() = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
   private val getRandomAppIcon: GetRandomAppIconUseCase by inject()
   private val developerSettingsRepository: DeveloperSettingsRepository by inject()
+  private val buildAppListUpdatePlan: BuildAppListUpdatePlanUseCase by inject()
   private val appAdapter = AppAdapter()
-  private val appListUpdatePlanner = AppListUpdatePlanner()
   private val particleItemAnimator = ParticleRemoveItemAnimator()
   private var updateItemsJob: Job? = null
   private var delayShowNavigationJob: Job? = null
@@ -513,8 +514,8 @@ class AppListFragment :
       return@launch
     }
     withContext(Dispatchers.Main) {
-      val updatePlan = appListUpdatePlanner.plan(
-        AppListUpdatePlanner.Request(
+      val updatePlan = buildAppListUpdatePlan(
+        BuildAppListUpdatePlanUseCase.Request(
           currentItems = appAdapter.data,
           content = content,
           pendingReturnTopAfterRequestChange = pendingReturnTopAfterRequestChange,

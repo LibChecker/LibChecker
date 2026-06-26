@@ -1,12 +1,10 @@
-package com.absinthe.libchecker.features.applist.ui
+package com.absinthe.libchecker.domain.app
 
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.GetAppListContentUseCase
-import com.absinthe.libchecker.ui.animator.ParticleRemoveItemAnimator
 
-class AppListUpdatePlanner {
+class BuildAppListUpdatePlanUseCase {
 
-  fun plan(request: Request): Plan {
+  operator fun invoke(request: Request): Plan {
     return Plan(
       content = request.content,
       particleRemovalItemIds = buildParticleRemovalItemIds(
@@ -30,7 +28,7 @@ class AppListUpdatePlanner {
     // Newly added apps go through RecyclerView's normal add path instead.
     return currentItems.asSequence()
       .filter { it.packageName !in backingPackageNames }
-      .map { ParticleRemoveItemAnimator.stableItemIdForKey(it.packageName) }
+      .map { stableAppListItemIdForKey(it.packageName) }
       .toList()
   }
 

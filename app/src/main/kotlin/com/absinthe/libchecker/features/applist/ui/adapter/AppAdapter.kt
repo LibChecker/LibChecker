@@ -11,10 +11,10 @@ import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppListItemViewState
 import com.absinthe.libchecker.domain.app.InstalledPackageState
+import com.absinthe.libchecker.domain.app.stableAppListItemIdForKey
 import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
 import com.absinthe.libchecker.features.applist.ui.view.AppItemView
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
-import com.absinthe.libchecker.ui.animator.ParticleRemoveItemAnimator
 import com.absinthe.libchecker.utils.extensions.addStrikeThroughSpan
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -109,7 +109,7 @@ class AppAdapter(
     if (data.isEmpty() || position >= data.size) {
       return super.getItemId(position)
     }
-    return ParticleRemoveItemAnimator.stableItemIdForKey(data[position].packageName)
+    return stableAppListItemIdForKey(data[position].packageName)
   }
 
   fun setItemViewStates(itemViewStates: Map<String, AppListItemViewState>) {
