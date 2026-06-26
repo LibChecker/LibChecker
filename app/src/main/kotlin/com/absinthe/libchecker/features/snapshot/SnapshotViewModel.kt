@@ -26,6 +26,7 @@ import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotDiffItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.detail.BuildSnapshotDetailSectionsUseCase
 import com.absinthe.libchecker.domain.snapshot.detail.SnapshotDetailSection
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
+import com.absinthe.libchecker.domain.snapshot.timenode.BuildSnapshotTimeNodeItemsUseCase
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -49,6 +50,7 @@ class SnapshotViewModel(
   private val getSnapshotPackageIconSourcesUseCase: GetSnapshotPackageIconSourcesUseCase,
   private val buildSnapshotListUpdatePlanUseCase: BuildSnapshotListUpdatePlanUseCase,
   private val buildSnapshotSystemPropDisplayDataUseCase: BuildSnapshotSystemPropDisplayDataUseCase,
+  private val buildSnapshotTimeNodeItemsUseCase: BuildSnapshotTimeNodeItemsUseCase,
   private val deleteSnapshotTimeStampUseCase: DeleteSnapshotTimeStampUseCase,
   private val formatSnapshotTimestampUseCase: FormatSnapshotTimestampUseCase,
   private val snapshotSelectionUseCase: SnapshotSelectionUseCase,
@@ -136,6 +138,12 @@ class SnapshotViewModel(
   }
 
   suspend fun getSnapshotPackageIconSources(packageNames: Collection<String>) = getSnapshotPackageIconSourcesUseCase(packageNames)
+
+  suspend fun buildSnapshotTimeNodeItems(
+    timeStamps: List<TimeStampItem>
+  ): BuildSnapshotTimeNodeItemsUseCase.Result {
+    return buildSnapshotTimeNodeItemsUseCase(timeStamps)
+  }
 
   suspend fun buildSnapshotListUpdatePlan(
     currentItems: List<SnapshotDiffItem>,

@@ -171,6 +171,7 @@ import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotTopAppsUseCase
 import com.absinthe.libchecker.domain.snapshot.backup.BuildSnapshotRestorePlanUseCase
 import com.absinthe.libchecker.domain.snapshot.comparison.PrepareSnapshotComparisonArchivesUseCase
 import com.absinthe.libchecker.domain.snapshot.detail.BuildSnapshotDetailSectionsUseCase
+import com.absinthe.libchecker.domain.snapshot.timenode.BuildSnapshotTimeNodeItemsUseCase
 import com.absinthe.libchecker.domain.statistics.AndroidDistributionRepository
 import com.absinthe.libchecker.domain.statistics.BuildAbiChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildApiLevelChartDataUseCase
@@ -452,6 +453,7 @@ val appModule = module {
   factory { GetSnapshotBackupTargetUseCase(get()) }
   factory { GetSnapshotSystemPropDiffsUseCase(get()) }
   factory { BuildSnapshotSystemPropDisplayDataUseCase(androidContext(), get()) }
+  factory { BuildSnapshotTimeNodeItemsUseCase() }
   factory { GetTrackListItemsUseCase(androidContext().packageManager, get(), get()) }
   factory { SetPackageTrackedUseCase(get(), get()) }
   factory { DeleteSnapshotTimeStampUseCase(get(), get()) }
@@ -561,6 +563,7 @@ val appModule = module {
       getSnapshotPackageIconSourcesUseCase = get(),
       buildSnapshotListUpdatePlanUseCase = get(),
       buildSnapshotSystemPropDisplayDataUseCase = get(),
+      buildSnapshotTimeNodeItemsUseCase = get(),
       deleteSnapshotTimeStampUseCase = get(),
       formatSnapshotTimestampUseCase = get(),
       snapshotSelectionUseCase = get(),

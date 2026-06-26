@@ -125,7 +125,7 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
                       timeStampList.clear()
                       timeStampList.addAll(remainingTimeStamps)
                       withContext(Dispatchers.Main) {
-                        root.adapter.remove(item)
+                        root.adapter.removeAt(position)
                         dialog.dismiss()
 
                         if (timeStampList.isEmpty()) {
