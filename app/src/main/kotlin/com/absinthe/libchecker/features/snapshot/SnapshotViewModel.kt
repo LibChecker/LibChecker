@@ -22,7 +22,8 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotSystemPropDisplayData
 import com.absinthe.libchecker.domain.snapshot.SnapshotTrackChangeRepository
 import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotDiffItemsUseCase
-import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
+import com.absinthe.libchecker.domain.snapshot.detail.BuildSnapshotDetailSectionsUseCase
+import com.absinthe.libchecker.domain.snapshot.detail.SnapshotDetailSection
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import java.text.SimpleDateFormat
@@ -44,6 +45,7 @@ class SnapshotViewModel(
   private val compareSnapshotItemWithInstalledApp: CompareSnapshotItemWithInstalledAppUseCase,
   private val getSnapshotDashboardCount: GetSnapshotDashboardCountUseCase,
   private val buildSnapshotDetailItems: BuildSnapshotDetailItemsUseCase,
+  private val buildSnapshotDetailSections: BuildSnapshotDetailSectionsUseCase,
   private val snapshotLibrary: SnapshotLibraryUseCase,
   private val buildSnapshotCapturePlanUseCase: BuildSnapshotCapturePlanUseCase,
   private val getSnapshotPackageIconSourcesUseCase: GetSnapshotPackageIconSourcesUseCase,
@@ -57,7 +59,7 @@ class SnapshotViewModel(
 
   val allSnapshots = repository.currentSnapshotCount
   val snapshotDiffItemsFlow: MutableSharedFlow<List<SnapshotDiffItem>> = MutableSharedFlow()
-  val snapshotDetailItemsFlow: MutableSharedFlow<List<SnapshotDetailItem>> = MutableSharedFlow()
+  val snapshotDetailSectionsFlow: MutableSharedFlow<List<SnapshotDetailSection>> = MutableSharedFlow()
 
   private val _effect: MutableSharedFlow<Effect> = MutableSharedFlow()
   val effect = _effect.asSharedFlow()
@@ -118,7 +120,8 @@ class SnapshotViewModel(
   }
 
   fun computeDiffDetail(entity: SnapshotDiffItem) = viewModelScope.launch {
-    snapshotDetailItemsFlow.emit(buildSnapshotDetailItems(entity))
+    val details = buildSnapshotDetailItems(entity)
+    snapshotDetailSectionsFlow.emit(buildSnapshotDetailSections(details))
   }
 
   fun getTimeStamps(): List<TimeStampItem> {

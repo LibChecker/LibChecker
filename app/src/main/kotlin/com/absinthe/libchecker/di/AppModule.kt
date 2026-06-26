@@ -169,6 +169,7 @@ import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotDiffItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotTopAppsUseCase
 import com.absinthe.libchecker.domain.snapshot.backup.BuildSnapshotRestorePlanUseCase
 import com.absinthe.libchecker.domain.snapshot.comparison.PrepareSnapshotComparisonArchivesUseCase
+import com.absinthe.libchecker.domain.snapshot.detail.BuildSnapshotDetailSectionsUseCase
 import com.absinthe.libchecker.domain.statistics.AndroidDistributionRepository
 import com.absinthe.libchecker.domain.statistics.BuildAbiChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildApiLevelChartDataUseCase
@@ -455,6 +456,7 @@ val appModule = module {
   factory { UpdateSnapshotDiffItemsUseCase() }
   factory { UpdateSnapshotTopAppsUseCase(get(), get()) }
   factory { BuildSnapshotDetailItemsUseCase(androidContext()) }
+  factory { BuildSnapshotDetailSectionsUseCase() }
   factory { SnapshotArchiveUseCase(get(), get()) }
   factory { BackupSnapshotArchiveToUriUseCase(androidContext().contentResolver, get()) }
   factory { (roomBackup: RoomBackup) ->
@@ -551,6 +553,7 @@ val appModule = module {
       compareSnapshotItemWithInstalledApp = get(),
       getSnapshotDashboardCount = get(),
       buildSnapshotDetailItems = get(),
+      buildSnapshotDetailSections = get(),
       snapshotLibrary = get(),
       buildSnapshotCapturePlanUseCase = get(),
       getSnapshotPackageIconSourcesUseCase = get(),

@@ -32,11 +32,11 @@ import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
 import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotRuleUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotPackageIconSource
+import com.absinthe.libchecker.domain.snapshot.detail.SnapshotDetailSection
 import com.absinthe.libchecker.domain.snapshot.model.ADDED
 import com.absinthe.libchecker.domain.snapshot.model.CHANGED
 import com.absinthe.libchecker.domain.snapshot.model.MOVED
 import com.absinthe.libchecker.domain.snapshot.model.REMOVED
-import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.features.applist.detail.AppBarStateChangeListener
 import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
@@ -250,72 +250,8 @@ class SnapshotDetailActivity :
       true
     }
 
-    viewModel.snapshotDetailItemsFlow.onEach { details ->
-      val titleList = mutableListOf<SnapshotTitleNode>()
-
-      getNodeList(details.filter { it.itemType == NATIVE }).apply {
-        if (isNotEmpty()) {
-          titleList.add(SnapshotTitleNode(this, NATIVE))
-          Telemetry.recordEvent(
-            Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT,
-            mapOf("Native" to this.size.toLong())
-          )
-        }
-      }
-      getNodeList(details.filter { it.itemType == SERVICE }).apply {
-        if (isNotEmpty()) {
-          titleList.add(SnapshotTitleNode(this, SERVICE))
-          Telemetry.recordEvent(
-            Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT,
-            mapOf("Service" to this.size.toLong())
-          )
-        }
-      }
-      getNodeList(details.filter { it.itemType == ACTIVITY }).apply {
-        if (isNotEmpty()) {
-          titleList.add(SnapshotTitleNode(this, ACTIVITY))
-          Telemetry.recordEvent(
-            Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT,
-            mapOf("Activity" to this.size.toLong())
-          )
-        }
-      }
-      getNodeList(details.filter { it.itemType == RECEIVER }).apply {
-        if (isNotEmpty()) {
-          titleList.add(SnapshotTitleNode(this, RECEIVER))
-          Telemetry.recordEvent(
-            Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT,
-            mapOf("Receiver" to this.size.toLong())
-          )
-        }
-      }
-      getNodeList(details.filter { it.itemType == PROVIDER }).apply {
-        if (isNotEmpty()) {
-          titleList.add(SnapshotTitleNode(this, PROVIDER))
-          Telemetry.recordEvent(
-            Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT,
-            mapOf("Provider" to this.size.toLong())
-          )
-        }
-      }
-      getNodeList(details.filter { it.itemType == PERMISSION }).apply {
-        if (isNotEmpty()) {
-          titleList.add(SnapshotTitleNode(this, PERMISSION))
-          Telemetry.recordEvent(
-            Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT,
-            mapOf("Permission" to this.size.toLong())
-          )
-        }
-      }
-      getNodeList(details.filter { it.itemType == METADATA }).apply {
-        if (isNotEmpty()) {
-          titleList.add(SnapshotTitleNode(this, METADATA))
-          Telemetry.recordEvent(
-            Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT,
-            mapOf("Metadata" to this.size.toLong())
-          )
-        }
-      }
+    viewModel.snapshotDetailSectionsFlow.onEach { sections ->
+      val titleList = sections.map(::buildSnapshotTitleNode)
 
       if (titleList.isNotEmpty()) {
         adapter.setList(titleList)
@@ -323,17 +259,35 @@ class SnapshotDetailActivity :
     }.launchIn(lifecycleScope)
   }
 
-  private fun getNodeList(list: List<SnapshotDetailItem>): MutableList<BaseNode> {
-    val returnList = mutableListOf<BaseNode>()
-
-    if (list.isEmpty()) return returnList
-
-    when (list[0].itemType) {
-      NATIVE, METADATA -> list.forEach { returnList.add(SnapshotNativeNode(it)) }
-      else -> list.forEach { returnList.add(SnapshotComponentNode(it)) }
+  private fun buildSnapshotTitleNode(section: SnapshotDetailSection): SnapshotTitleNode {
+    val nodes = section.items.mapTo(mutableListOf<BaseNode>()) { item ->
+      when (section.type) {
+        NATIVE, METADATA -> SnapshotNativeNode(item)
+        else -> SnapshotComponentNode(item)
+      }
     }
+    recordDetailComponentCount(section.type, nodes.size)
+    return SnapshotTitleNode(nodes, section.type)
+  }
 
-    return returnList
+  private fun recordDetailComponentCount(@LibType type: Int, count: Int) {
+    Telemetry.recordEvent(
+      Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT,
+      mapOf(getTelemetryComponentName(type) to count.toLong())
+    )
+  }
+
+  private fun getTelemetryComponentName(@LibType type: Int): String {
+    return when (type) {
+      NATIVE -> "Native"
+      SERVICE -> "Service"
+      ACTIVITY -> "Activity"
+      RECEIVER -> "Receiver"
+      PROVIDER -> "Provider"
+      PERMISSION -> "Permission"
+      METADATA -> "Metadata"
+      else -> "Unknown"
+    }
   }
 
   private fun bindSnapshotIcon() {
