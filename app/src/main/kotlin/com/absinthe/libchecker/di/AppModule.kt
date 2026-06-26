@@ -164,6 +164,7 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotTrackChangeRepository
 import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotTopAppsUseCase
+import com.absinthe.libchecker.domain.snapshot.comparison.PrepareSnapshotComparisonArchivesUseCase
 import com.absinthe.libchecker.domain.statistics.AndroidDistributionRepository
 import com.absinthe.libchecker.domain.statistics.BuildAbiChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildApiLevelChartDataUseCase
@@ -419,6 +420,7 @@ val appModule = module {
   }
   factory { GetApexPackageNamesUseCase(get()) }
   factory { BuildArchiveSnapshotItemUseCase(androidContext()) }
+  factory { PrepareSnapshotComparisonArchivesUseCase(get()) }
   factory { BuildInstalledSnapshotItemUseCase(get()) }
   factory { BuildPackageComparisonSnapshotItemUseCase(androidContext().packageManager) }
   factory { BuildSnapshotAbiDisplayDataUseCase(androidContext()) }
@@ -563,9 +565,9 @@ val appModule = module {
       compareSnapshotDiffs = get(),
       getSnapshotDashboardCount = get(),
       snapshotLibrary = get(),
-      buildArchiveSnapshotItemUseCase = get(),
       buildSnapshotPairDiffUseCase = get(),
-      buildSnapshotComparisonPlanUseCase = get()
+      buildSnapshotComparisonPlanUseCase = get(),
+      prepareSnapshotComparisonArchivesUseCase = get()
     )
   }
   viewModel { TrackViewModel(get(), get()) }

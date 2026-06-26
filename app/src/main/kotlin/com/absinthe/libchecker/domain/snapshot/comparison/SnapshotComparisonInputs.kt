@@ -1,8 +1,8 @@
-package com.absinthe.libchecker.features.album.comparison
+package com.absinthe.libchecker.domain.snapshot.comparison
 
 import android.net.Uri
 
-internal data class SnapshotComparisonInputs(
+data class SnapshotComparisonInputs(
   val left: SnapshotComparisonInput = SnapshotComparisonInput(),
   val right: SnapshotComparisonInput = SnapshotComparisonInput()
 ) {
@@ -32,7 +32,7 @@ internal data class SnapshotComparisonInputs(
   }
 }
 
-internal data class SnapshotComparisonInput(
+data class SnapshotComparisonInput(
   val timestamp: Long = UNSELECTED_TIMESTAMP,
   val uri: Uri? = null
 ) {
@@ -60,7 +60,7 @@ internal data class SnapshotComparisonInput(
   }
 }
 
-internal enum class SnapshotComparisonSide {
+enum class SnapshotComparisonSide {
   LEFT,
   RIGHT;
 

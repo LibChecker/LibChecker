@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.features.album.comparison.ui
 
 import android.net.Uri
-import com.absinthe.libchecker.features.album.comparison.SnapshotComparisonInput
+import com.absinthe.libchecker.domain.snapshot.comparison.SnapshotComparisonInput
 import java.io.File
 
 internal object ComparisonDashboardStatePlanner {

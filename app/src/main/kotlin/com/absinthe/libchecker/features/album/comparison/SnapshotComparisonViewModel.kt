@@ -6,13 +6,15 @@ import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.domain.snapshot.ArchiveSnapshotItem
-import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotComparisonPlanUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotPairDiffUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotDiffsUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotComparisonPlan
 import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
+import com.absinthe.libchecker.domain.snapshot.comparison.PrepareSnapshotComparisonArchivesUseCase
+import com.absinthe.libchecker.domain.snapshot.comparison.SnapshotComparisonInputs
+import com.absinthe.libchecker.domain.snapshot.comparison.SnapshotComparisonSide
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import java.io.File
@@ -30,9 +32,9 @@ class SnapshotComparisonViewModel(
   private val compareSnapshotDiffs: CompareSnapshotDiffsUseCase,
   private val getSnapshotDashboardCount: GetSnapshotDashboardCountUseCase,
   private val snapshotLibrary: SnapshotLibraryUseCase,
-  private val buildArchiveSnapshotItemUseCase: BuildArchiveSnapshotItemUseCase,
   private val buildSnapshotPairDiffUseCase: BuildSnapshotPairDiffUseCase,
-  private val buildSnapshotComparisonPlanUseCase: BuildSnapshotComparisonPlanUseCase
+  private val buildSnapshotComparisonPlanUseCase: BuildSnapshotComparisonPlanUseCase,
+  private val prepareSnapshotComparisonArchivesUseCase: PrepareSnapshotComparisonArchivesUseCase
 ) : ViewModel() {
 
   val snapshotDiffItemsFlow: MutableSharedFlow<List<SnapshotDiffItem>> = MutableSharedFlow()
@@ -83,12 +85,17 @@ class SnapshotComparisonViewModel(
     snapshotDiffItemsFlow.emit(diffItems)
   }
 
-  suspend fun buildArchiveSnapshotItem(
-    uri: Uri,
-    destinationFile: File,
+  suspend fun prepareSnapshotComparisonArchives(
+    cacheDir: File,
     iconSize: Int
-  ): ArchiveSnapshotItem {
-    return buildArchiveSnapshotItemUseCase(uri, destinationFile, iconSize)
+  ): PrepareSnapshotComparisonArchivesUseCase.Result {
+    return prepareSnapshotComparisonArchivesUseCase(
+      PrepareSnapshotComparisonArchivesUseCase.Request(
+        inputs = inputs,
+        cacheDir = cacheDir,
+        iconSize = iconSize
+      )
+    )
   }
 
   fun buildSnapshotPairDiff(left: SnapshotItem, right: SnapshotItem): SnapshotDiffItem {

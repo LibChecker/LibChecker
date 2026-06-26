@@ -5,7 +5,6 @@ import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.net.Uri
 import android.os.Bundle
 import android.view.ContextThemeWrapper
 import android.view.Gravity
@@ -29,12 +28,9 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.databinding.ActivityComparisonBinding
 import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
-import com.absinthe.libchecker.domain.snapshot.ArchiveSnapshotItem
-import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotComparisonPlan
-import com.absinthe.libchecker.features.album.comparison.SnapshotComparisonInput
-import com.absinthe.libchecker.features.album.comparison.SnapshotComparisonSide
+import com.absinthe.libchecker.domain.snapshot.comparison.SnapshotComparisonSide
 import com.absinthe.libchecker.features.album.comparison.SnapshotComparisonViewModel
 import com.absinthe.libchecker.features.album.comparison.ui.view.ComparisonDashboardHalfView
 import com.absinthe.libchecker.features.album.comparison.ui.view.ComparisonDashboardView
@@ -57,7 +53,6 @@ import com.absinthe.libchecker.utils.extensions.requireAvailableCacheDir
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import java.io.File
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -348,24 +343,27 @@ class ComparisonActivity :
       }
     }
 
-    val leftArchive = buildSelectedArchiveSnapshotItem(
-      input = inputs.left,
-      fileName = Constants.TEMP_PACKAGE
-    )
-    val rightArchive = buildSelectedArchiveSnapshotItem(
-      input = inputs.right,
-      fileName = Constants.TEMP_PACKAGE_2
-    )
+    val archiveResult = if (inputs.hasArchiveInput) {
+      viewModel.prepareSnapshotComparisonArchives(
+        cacheDir = requireAvailableCacheDir(),
+        iconSize = resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size)
+      )
+    } else {
+      null
+    }
 
     withContext(Dispatchers.Main) {
       dialog?.dismiss()
+      if (archiveResult?.hasNotEnoughStorageSpace == true) {
+        showToast(R.string.toast_not_enough_storage_space)
+      }
     }
 
     when (
       val plan = viewModel.buildSnapshotComparisonPlan(
         inputs = inputs,
-        leftArchive = leftArchive,
-        rightArchive = rightArchive
+        leftArchive = archiveResult?.leftArchive,
+        rightArchive = archiveResult?.rightArchive
       )
     ) {
       null -> {
@@ -389,22 +387,6 @@ class ComparisonActivity :
         flip(VF_LOADING)
         viewModel.compareDiffWithSnapshotList(plan.lists.left, plan.lists.right)
       }
-    }
-  }
-
-  private suspend fun buildSelectedArchiveSnapshotItem(
-    input: SnapshotComparisonInput,
-    fileName: String
-  ): ArchiveSnapshotItem? {
-    return runCatching {
-      if (input.isArchive && input.uri != null) {
-        getArchiveSnapshotItemByUri(input.uri, fileName)
-      } else {
-        null
-      }
-    }.getOrElse {
-      handleArchiveSnapshotFailure(it)
-      null
     }
   }
 
@@ -449,29 +431,6 @@ class ComparisonActivity :
         }
       )
     startActivity(intent)
-  }
-
-  private suspend fun getArchiveSnapshotItemByUri(
-    uri: Uri,
-    fileName: String
-  ): ArchiveSnapshotItem {
-    val iconSize = resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size)
-    return viewModel.buildArchiveSnapshotItem(
-      uri = uri,
-      destinationFile = File(requireAvailableCacheDir(), fileName),
-      iconSize = iconSize
-    )
-  }
-
-  private suspend fun handleArchiveSnapshotFailure(throwable: Throwable) {
-    if (throwable is CancellationException) {
-      throw throwable
-    }
-    if (throwable is BuildArchiveSnapshotItemUseCase.NotEnoughStorageSpaceException) {
-      withContext(Dispatchers.Main) {
-        showToast(R.string.toast_not_enough_storage_space)
-      }
-    }
   }
 
   private fun getSuitableLayoutManager(): RecyclerView.LayoutManager {
