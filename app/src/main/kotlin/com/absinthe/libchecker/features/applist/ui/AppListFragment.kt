@@ -23,7 +23,6 @@ import com.absinthe.libchecker.annotation.STATUS_START_INIT
 import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.OnceTag
-import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.domain.app.BuildAppListUpdatePlanUseCase
 import com.absinthe.libchecker.domain.app.GetAppListContentUseCase
@@ -54,7 +53,6 @@ import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
@@ -444,7 +442,7 @@ class AppListFragment :
           }
         }
       }.launchIn(lifecycleScope)
-      dbItemsFlow.distinctUntilChanged(::areAppListItemsTheSame).onEach {
+      displayItemsFlow.onEach {
         if (it.isEmpty() || (isFirstLaunch && !hasInitializedItems)) {
           initApps()
         } else if (
@@ -465,23 +463,6 @@ class AppListFragment :
         updateItems()
       }
     }.launchIn(lifecycleScope)
-  }
-
-  private fun areAppListItemsTheSame(old: List<LCItem>, new: List<LCItem>): Boolean {
-    if (old.size != new.size) {
-      return false
-    }
-    return old.zip(new).all { (oldItem, newItem) ->
-      oldItem.packageName == newItem.packageName &&
-        oldItem.label == newItem.label &&
-        oldItem.versionName == newItem.versionName &&
-        oldItem.versionCode == newItem.versionCode &&
-        oldItem.lastUpdatedTime == newItem.lastUpdatedTime &&
-        oldItem.isSystem == newItem.isSystem &&
-        oldItem.abi == newItem.abi &&
-        oldItem.targetApi == newItem.targetApi &&
-        oldItem.variant == newItem.variant
-    }
   }
 
   private fun updateItems(highlightRefresh: Boolean = false) {

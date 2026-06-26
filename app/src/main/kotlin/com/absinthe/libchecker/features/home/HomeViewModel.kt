@@ -9,6 +9,7 @@ import com.absinthe.libchecker.annotation.STATUS_START_INIT
 import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE
 import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE_END
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.app.AppListItemsEquivalenceUseCase
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.ClearApkCacheUseCase
@@ -29,6 +30,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -41,10 +43,13 @@ class HomeViewModel(
   private val getAppListContentUseCase: GetAppListContentUseCase,
   private val appListSettingsRepository: AppListSettingsRepository,
   private val clearApkCacheUseCase: ClearApkCacheUseCase,
+  appListItemsEquivalenceUseCase: AppListItemsEquivalenceUseCase,
   observeAppListLoadingUseCase: ObserveAppListLoadingUseCase
 ) : ViewModel() {
 
   val dbItemsFlow: Flow<List<LCItem>> = appListRepository.items
+  val displayItemsFlow: Flow<List<LCItem>> =
+    appListRepository.items.distinctUntilChanged(appListItemsEquivalenceUseCase::invoke)
   val packageChanges = installedAppRepository.packageChanges
   val appListDisplayOptionsChanges = appListSettingsRepository.displayOptionsChanges
 

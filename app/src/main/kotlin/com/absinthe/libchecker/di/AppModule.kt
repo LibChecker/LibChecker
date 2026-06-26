@@ -36,6 +36,7 @@ import com.absinthe.libchecker.database.backup.RoomBackup
 import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.AppListExportMetadata
 import com.absinthe.libchecker.domain.app.AppListItemFactory
+import com.absinthe.libchecker.domain.app.AppListItemsEquivalenceUseCase
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.BuildAppExportNativeLibrariesUseCase
@@ -298,6 +299,7 @@ val appModule = module {
   factory {
     ExportInstalledAppsToUriUseCase(androidContext(), androidContext().contentResolver, get(), get())
   }
+  factory { AppListItemsEquivalenceUseCase() }
   factory { BuildAppListItemViewStatesUseCase(androidContext(), get()) }
   factory { BuildAppListUpdatePlanUseCase() }
   factory { BuildInAppUpdateDiffDataUseCase(BuildConfig.APPLICATION_ID, androidContext().packageManager, get()) }
@@ -520,6 +522,7 @@ val appModule = module {
       getAppListContentUseCase = get(),
       appListSettingsRepository = get(),
       clearApkCacheUseCase = get(),
+      appListItemsEquivalenceUseCase = get(),
       observeAppListLoadingUseCase = get()
     )
   }
