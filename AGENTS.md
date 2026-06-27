@@ -131,6 +131,8 @@ Important `:app` boundaries:
 - Review manifests carefully when changing exported activities, deep links,
   FileProvider, Shizuku provider authorities, package visibility, foreground
   services, or sensitive permissions.
+- When moving UI component packages, update manifest entries, direct intent
+  refs, layout `tools:context`, and split/window embedding configs together.
 - Update keep rules when adding reflection, generated binding entry points,
   JavaScript interfaces, Parcelable creators, or hidden/private API access.
 

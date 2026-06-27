@@ -1,7 +1,7 @@
-package com.absinthe.libchecker.features.album.track.ui.adapter
+package com.absinthe.libchecker.domain.snapshot.track.ui.adapter
 
 import androidx.recyclerview.widget.DiffUtil
-import com.absinthe.libchecker.domain.snapshot.TrackedAppListItem
+import com.absinthe.libchecker.domain.snapshot.track.model.TrackedAppListItem
 
 class TrackListDiff : DiffUtil.ItemCallback<TrackedAppListItem>() {
 

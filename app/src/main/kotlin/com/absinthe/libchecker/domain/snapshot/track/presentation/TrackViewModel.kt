@@ -1,10 +1,10 @@
-package com.absinthe.libchecker.features.album.track
+package com.absinthe.libchecker.domain.snapshot.track.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.absinthe.libchecker.domain.snapshot.GetTrackListItemsUseCase
-import com.absinthe.libchecker.domain.snapshot.SetPackageTrackedUseCase
-import com.absinthe.libchecker.domain.snapshot.TrackedAppListItem
+import com.absinthe.libchecker.domain.snapshot.track.model.TrackedAppListItem
+import com.absinthe.libchecker.domain.snapshot.track.usecase.GetTrackListItemsUseCase
+import com.absinthe.libchecker.domain.snapshot.track.usecase.SetPackageTrackedUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow

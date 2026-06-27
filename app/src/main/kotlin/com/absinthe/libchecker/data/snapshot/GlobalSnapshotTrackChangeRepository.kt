@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.data.snapshot
 
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.domain.snapshot.SnapshotTrackChangeRepository
+import com.absinthe.libchecker.domain.snapshot.track.repository.SnapshotTrackChangeRepository
 
 class GlobalSnapshotTrackChangeRepository : SnapshotTrackChangeRepository {
 

@@ -123,7 +123,7 @@
       </intent-filter>
     </activity>
     <activity
-      android:name=".features.album.track.ui.TrackActivity"
+      android:name=".domain.snapshot.track.ui.TrackActivity"
       android:label="@string/album_item_track_title" />
     <activity
       android:name=".features.statistics.ui.LibReferenceActivity"

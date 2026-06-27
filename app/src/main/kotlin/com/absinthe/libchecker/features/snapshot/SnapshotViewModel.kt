@@ -24,7 +24,6 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSystemPropDisplayData
-import com.absinthe.libchecker.domain.snapshot.SnapshotTrackChangeRepository
 import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotDiffItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.detail.BuildSnapshotDetailSectionsUseCase
 import com.absinthe.libchecker.domain.snapshot.detail.SnapshotDetailSection
@@ -33,6 +32,7 @@ import com.absinthe.libchecker.domain.snapshot.sync.SnapshotPackageChangeProcess
 import com.absinthe.libchecker.domain.snapshot.timenode.BuildSnapshotTimeNodeItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.timenode.SnapshotTimeNodeItem
 import com.absinthe.libchecker.domain.snapshot.timenode.UpdateSnapshotAutoRemoveThresholdUseCase
+import com.absinthe.libchecker.domain.snapshot.track.repository.SnapshotTrackChangeRepository
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

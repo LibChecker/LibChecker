@@ -1,11 +1,11 @@
-package com.absinthe.libchecker.features.album.track.ui.adapter
+package com.absinthe.libchecker.domain.snapshot.track.ui.adapter
 
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.snapshot.TrackedAppListItem
-import com.absinthe.libchecker.features.album.track.ui.view.TrackItemView
+import com.absinthe.libchecker.domain.snapshot.track.model.TrackedAppListItem
+import com.absinthe.libchecker.domain.snapshot.track.ui.view.TrackItemView
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder

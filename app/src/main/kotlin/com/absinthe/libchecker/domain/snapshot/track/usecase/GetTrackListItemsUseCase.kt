@@ -1,7 +1,9 @@
-package com.absinthe.libchecker.domain.snapshot
+package com.absinthe.libchecker.domain.snapshot.track.usecase
 
 import android.content.pm.PackageManager
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
+import com.absinthe.libchecker.domain.snapshot.track.model.TrackedAppListItem
 import com.absinthe.libchecker.utils.extensions.getAppName
 
 class GetTrackListItemsUseCase(

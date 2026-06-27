@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.snapshot
+package com.absinthe.libchecker.domain.snapshot.track.model
 
 import android.content.pm.PackageInfo
 

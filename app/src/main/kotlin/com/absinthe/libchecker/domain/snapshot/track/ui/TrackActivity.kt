@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.album.track.ui
+package com.absinthe.libchecker.domain.snapshot.track.ui
 
 import android.graphics.Color
 import android.os.Bundle
@@ -19,12 +19,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.ActivityTrackBinding
 import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
-import com.absinthe.libchecker.features.album.track.TrackListUiState
-import com.absinthe.libchecker.features.album.track.TrackViewModel
-import com.absinthe.libchecker.features.album.track.ui.adapter.TrackAdapter
-import com.absinthe.libchecker.features.album.track.ui.adapter.TrackListDiff
-import com.absinthe.libchecker.features.album.track.ui.view.TrackItemView
-import com.absinthe.libchecker.features.album.track.ui.view.TrackLoadingView
+import com.absinthe.libchecker.domain.snapshot.track.presentation.TrackListUiState
+import com.absinthe.libchecker.domain.snapshot.track.presentation.TrackViewModel
+import com.absinthe.libchecker.domain.snapshot.track.ui.adapter.TrackAdapter
+import com.absinthe.libchecker.domain.snapshot.track.ui.adapter.TrackListDiff
+import com.absinthe.libchecker.domain.snapshot.track.ui.view.TrackItemView
+import com.absinthe.libchecker.domain.snapshot.track.ui.view.TrackLoadingView
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding

@@ -143,7 +143,6 @@ import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemWithInstalledA
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotListsUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotWithInstalledAppsUseCase
-import com.absinthe.libchecker.domain.snapshot.CompareTrackedSnapshotListsUseCase
 import com.absinthe.libchecker.domain.snapshot.DeleteSnapshotTimeStampUseCase
 import com.absinthe.libchecker.domain.snapshot.FormatSnapshotTimestampUseCase
 import com.absinthe.libchecker.domain.snapshot.GetApexPackageNamesUseCase
@@ -151,8 +150,6 @@ import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotPackageIconSourcesUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotRuleUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotSystemPropDiffsUseCase
-import com.absinthe.libchecker.domain.snapshot.GetTrackListItemsUseCase
-import com.absinthe.libchecker.domain.snapshot.SetPackageTrackedUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveCodec
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotCaptureStateRepository
@@ -163,7 +160,6 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
-import com.absinthe.libchecker.domain.snapshot.SnapshotTrackChangeRepository
 import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotDiffItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotTopAppsUseCase
 import com.absinthe.libchecker.domain.snapshot.backup.presentation.SnapshotBackupViewModel
@@ -180,6 +176,11 @@ import com.absinthe.libchecker.domain.snapshot.detail.BuildSnapshotDetailSection
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.timenode.BuildSnapshotTimeNodeItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.timenode.UpdateSnapshotAutoRemoveThresholdUseCase
+import com.absinthe.libchecker.domain.snapshot.track.presentation.TrackViewModel
+import com.absinthe.libchecker.domain.snapshot.track.repository.SnapshotTrackChangeRepository
+import com.absinthe.libchecker.domain.snapshot.track.usecase.CompareTrackedSnapshotListsUseCase
+import com.absinthe.libchecker.domain.snapshot.track.usecase.GetTrackListItemsUseCase
+import com.absinthe.libchecker.domain.snapshot.track.usecase.SetPackageTrackedUseCase
 import com.absinthe.libchecker.domain.statistics.AndroidDistributionRepository
 import com.absinthe.libchecker.domain.statistics.BuildAbiChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildApiLevelChartDataUseCase
@@ -197,7 +198,6 @@ import com.absinthe.libchecker.domain.statistics.GetLibReferenceIconPackagesUseC
 import com.absinthe.libchecker.domain.statistics.LibReferenceSettingsRepository
 import com.absinthe.libchecker.domain.statistics.ObserveChartFeatureInitializationPlansUseCase
 import com.absinthe.libchecker.domain.statistics.UpdateLibReferenceThresholdUseCase
-import com.absinthe.libchecker.features.album.track.TrackViewModel
 import com.absinthe.libchecker.features.applist.detail.DetailActionLoader
 import com.absinthe.libchecker.features.applist.detail.DetailContentLoader
 import com.absinthe.libchecker.features.applist.detail.DetailFeatureLoader

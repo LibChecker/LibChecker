@@ -1,6 +1,8 @@
-package com.absinthe.libchecker.domain.snapshot
+package com.absinthe.libchecker.domain.snapshot.track.usecase
 
 import com.absinthe.libchecker.database.entity.TrackItem
+import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
+import com.absinthe.libchecker.domain.snapshot.track.repository.SnapshotTrackChangeRepository
 
 class SetPackageTrackedUseCase(
   private val snapshotRepository: SnapshotRepository,

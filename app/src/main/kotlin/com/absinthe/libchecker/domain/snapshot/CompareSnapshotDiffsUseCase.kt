@@ -2,6 +2,7 @@ package com.absinthe.libchecker.domain.snapshot
 
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
+import com.absinthe.libchecker.domain.snapshot.track.usecase.CompareTrackedSnapshotListsUseCase
 
 private const val NO_TIMESTAMP = -1L
 private const val TOP_APPS_LIMIT = 5

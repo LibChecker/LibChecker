@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.album.track.ui.view
+package com.absinthe.libchecker.domain.snapshot.track.ui.view
 
 import android.content.Context
 import android.graphics.drawable.Drawable
