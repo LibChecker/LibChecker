@@ -11,6 +11,7 @@ import android.widget.FrameLayout
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.doOnNextLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,6 +24,7 @@ import com.absinthe.libchecker.annotation.STATUS_START_INIT
 import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.OnceTag
+import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.app.list.ui.adapter.AppAdapter
@@ -71,6 +73,8 @@ class AppListFragment :
   private val appAdapter = AppAdapter()
   private val particleItemAnimator = ParticleRemoveItemAnimator()
   private var updateItemsJob: Job? = null
+  private var itemViewStatesJob: Job? = null
+  private var itemViewStatesGeneration = 0
   private var delayShowNavigationJob: Job? = null
   private var advancedMenuBSDFragment: AdvancedMenuBSDFragment? = null
   private var isFirstRequestChange = true
@@ -450,11 +454,16 @@ class AppListFragment :
   }
 
   private fun updateItems(highlightRefresh: Boolean = false) {
+    val generation = ++itemViewStatesGeneration
+    itemViewStatesJob?.cancel()
     updateItemsJob?.cancel()
-    updateItemsJob = updateItemsImpl(highlightRefresh)
+    updateItemsJob = updateItemsImpl(highlightRefresh, generation)
   }
 
-  private fun updateItemsImpl(highlightRefresh: Boolean = false) = lifecycleScope.launch(Dispatchers.IO) {
+  private fun updateItemsImpl(
+    highlightRefresh: Boolean = false,
+    generation: Int
+  ) = lifecycleScope.launch(Dispatchers.IO) {
     delay(250)
     Timber.d("updateItemsImpl")
     val currentItems = withContext(Dispatchers.Main) {
@@ -482,9 +491,12 @@ class AppListFragment :
       return@launch
     }
     withContext(Dispatchers.Main) {
+      if (generation != itemViewStatesGeneration) {
+        return@withContext
+      }
       appAdapter.apply {
         particleItemAnimator.prepareParticleRemovals(updatePlan.particleRemovalItemIds)
-        setItemViewStates(updatePlan.content.itemViewStates)
+        setItemViewStates(updatePlan.content.initialItemViewStates)
         homeViewModel.onAppListUpdatePlanApplied(updatePlan)
 
         setDiffNewData(updatePlan.content.items.toMutableList()) {
@@ -493,6 +505,13 @@ class AppListFragment :
           }
           flip(VF_LIST)
           isListReady = true
+          binding.list.doOnNextLayout {
+            updateRemainingItemViewStates(
+              items = updatePlan.content.items,
+              initialItemViewStateCount = updatePlan.content.initialItemViewStates.size,
+              updateGeneration = generation
+            )
+          }
 
           if (highlightRefresh) {
             notifyItemRangeChanged(0, data.size)
@@ -505,6 +524,50 @@ class AppListFragment :
         }
       }
     }
+  }
+
+  private fun updateRemainingItemViewStates(
+    items: List<LCItem>,
+    initialItemViewStateCount: Int,
+    updateGeneration: Int
+  ) {
+    if (updateGeneration != itemViewStatesGeneration) {
+      return
+    }
+    itemViewStatesGeneration++
+    itemViewStatesJob?.cancel()
+    if (items.isEmpty() || initialItemViewStateCount >= items.size) {
+      return
+    }
+
+    val generation = itemViewStatesGeneration
+    val packageNames = items.map { it.packageName }
+    itemViewStatesJob = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+      val itemViewStates = homeViewModel.buildAppListItemViewStates(items)
+      if (!isActive) {
+        return@launch
+      }
+      withContext(Dispatchers.Main) {
+        if (
+          generation != itemViewStatesGeneration ||
+          isDetached ||
+          !isBindingInitialized() ||
+          !hasSameAppList(packageNames)
+        ) {
+          return@withContext
+        }
+        appAdapter.setItemViewStates(itemViewStates)
+        val changedStart = initialItemViewStateCount.coerceAtMost(appAdapter.data.size)
+        if (changedStart < appAdapter.data.size) {
+          appAdapter.notifyItemRangeChanged(changedStart, appAdapter.data.size - changedStart)
+        }
+      }
+    }
+  }
+
+  private fun hasSameAppList(packageNames: List<String>): Boolean {
+    return appAdapter.data.size == packageNames.size &&
+      packageNames.indices.all { index -> appAdapter.data[index].packageName == packageNames[index] }
   }
 
   private fun returnTopOfList() {

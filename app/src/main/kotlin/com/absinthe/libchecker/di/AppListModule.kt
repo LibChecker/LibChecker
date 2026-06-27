@@ -75,6 +75,7 @@ val appListModule = module {
       syncAppListChangesUseCase = get(),
       exportAppListToUriUseCase = get(),
       getAppListContentUseCase = get(),
+      buildAppListItemViewStatesUseCase = get(),
       buildAppListUpdatePlanUseCase = get(),
       handleAppListSearchCommandUseCase = get(),
       appListSettingsRepository = get(),

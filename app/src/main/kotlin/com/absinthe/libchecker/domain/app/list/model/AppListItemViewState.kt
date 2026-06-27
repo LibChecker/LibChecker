@@ -66,6 +66,25 @@ data class AppListItemViewState(
       )
     }
 
+    fun createPending(
+      context: Context,
+      item: LCItem,
+      options: Int
+    ): AppListItemViewState {
+      return create(
+        context = context,
+        item = item,
+        packageState = InstalledPackageState(
+          packageInfo = null,
+          isFrozen = false
+        ),
+        options = options
+      ).copy(
+        isPackageMissing = false,
+        packageBadge = null
+      )
+    }
+
     private fun shouldUseDetachedAbiBadges(options: Int): Boolean {
       return listOf(
         AdvancedOptions.SHOW_ANDROID_VERSION,

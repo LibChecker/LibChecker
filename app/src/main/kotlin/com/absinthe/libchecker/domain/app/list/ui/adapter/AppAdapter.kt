@@ -10,7 +10,6 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.list.model.AppListItemViewState
-import com.absinthe.libchecker.domain.app.list.model.InstalledPackageState
 import com.absinthe.libchecker.domain.app.list.ui.view.AppItemView
 import com.absinthe.libchecker.domain.app.stableAppListItemIdForKey
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
@@ -128,13 +127,9 @@ class AppAdapter(
 
   private fun getItemViewState(item: LCItem): AppListItemViewState {
     return itemViewStateCache.getOrPut(item.packageName) {
-      AppListItemViewState.create(
+      AppListItemViewState.createPending(
         context = context,
         item = item,
-        packageState = InstalledPackageState(
-          packageInfo = null,
-          isFrozen = item.packageName != Constants.EXAMPLE_PACKAGE
-        ),
         options = fallbackDisplayOptions
       )
     }

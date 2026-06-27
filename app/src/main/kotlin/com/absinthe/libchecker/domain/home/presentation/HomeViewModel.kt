@@ -16,7 +16,9 @@ import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.PackageChangeState
 import com.absinthe.libchecker.domain.app.list.export.ExportAppListToUriUseCase
 import com.absinthe.libchecker.domain.app.list.export.ExportAppListUseCase
+import com.absinthe.libchecker.domain.app.list.model.AppListItemViewState
 import com.absinthe.libchecker.domain.app.list.usecase.AppListItemsEquivalenceUseCase
+import com.absinthe.libchecker.domain.app.list.usecase.BuildAppListItemViewStatesUseCase
 import com.absinthe.libchecker.domain.app.list.usecase.BuildAppListUpdatePlanUseCase
 import com.absinthe.libchecker.domain.app.list.usecase.GetAppListContentUseCase
 import com.absinthe.libchecker.domain.app.list.usecase.InitializeAppListUseCase
@@ -43,6 +45,7 @@ class HomeViewModel(
   private val syncAppListChangesUseCase: SyncAppListChangesUseCase,
   private val exportAppListToUriUseCase: ExportAppListToUriUseCase,
   private val getAppListContentUseCase: GetAppListContentUseCase,
+  private val buildAppListItemViewStatesUseCase: BuildAppListItemViewStatesUseCase,
   private val buildAppListUpdatePlanUseCase: BuildAppListUpdatePlanUseCase,
   private val handleAppListSearchCommandUseCase: HandleAppListSearchCommandUseCase,
   private val appListSettingsRepository: AppListSettingsRepository,
@@ -166,6 +169,15 @@ class HomeViewModel(
 
   suspend fun isOnlySelfAppInDatabase(): Boolean {
     return getAppListContentUseCase.isOnlySelfAppInDatabase()
+  }
+
+  suspend fun buildAppListItemViewStates(items: List<LCItem>): Map<String, AppListItemViewState> {
+    return buildAppListItemViewStatesUseCase(
+      BuildAppListItemViewStatesUseCase.Request(
+        items = items,
+        options = appListSettingsRepository.displayOptions
+      )
+    )
   }
 
   fun onAppListUserScrolled() {

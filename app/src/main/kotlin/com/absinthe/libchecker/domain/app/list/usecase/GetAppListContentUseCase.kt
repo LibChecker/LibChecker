@@ -30,7 +30,7 @@ class GetAppListContentUseCase(
     )
     val itemViewStates = buildAppListItemViewStatesUseCase(
       BuildAppListItemViewStatesUseCase.Request(
-        items = filteredItems,
+        items = filteredItems.take(request.initialItemViewStateCount),
         options = displayOptions
       )
     )
@@ -38,7 +38,7 @@ class GetAppListContentUseCase(
     return Result.Content(
       backingPackageNames = dbItems.mapTo(mutableSetOf()) { it.packageName },
       items = filteredItems,
-      itemViewStates = itemViewStates
+      initialItemViewStates = itemViewStates
     )
   }
 
@@ -52,7 +52,8 @@ class GetAppListContentUseCase(
 
   data class Request(
     val keyword: String,
-    val isCurrentProcess64Bit: Boolean
+    val isCurrentProcess64Bit: Boolean,
+    val initialItemViewStateCount: Int = INITIAL_ITEM_VIEW_STATE_COUNT
   )
 
   sealed interface Result {
@@ -61,7 +62,11 @@ class GetAppListContentUseCase(
     data class Content(
       val backingPackageNames: Set<String>,
       val items: List<LCItem>,
-      val itemViewStates: Map<String, AppListItemViewState>
+      val initialItemViewStates: Map<String, AppListItemViewState>
     ) : Result
+  }
+
+  private companion object {
+    private const val INITIAL_ITEM_VIEW_STATE_COUNT = 32
   }
 }
