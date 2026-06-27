@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppListItemViewState
 import com.absinthe.libchecker.domain.app.AppListRepository
@@ -41,6 +42,7 @@ class LibReferenceViewModel(
   private val libReferenceComputationController =
     libReferenceComputationControllerFactory.create(viewModelScope, ::updateProgress)
   val libReference = libReferenceComputationController.libReference
+  val thresholdChanges: Flow<Int> = libReferenceSettingsRepository.thresholdChanges
 
   private val savedRefList: List<LibReference>?
     get() = libReferenceComputationController.savedRefList
@@ -49,7 +51,7 @@ class LibReferenceViewModel(
   private var deferredReferenceWork: DeferredReferenceWork? = null
   private var deferredReferenceWorkNeedsLoading = false
 
-  var savedThreshold: Int
+  private var savedThreshold: Int
     get() = libReferenceComputationController.savedThreshold
     set(value) {
       libReferenceComputationController.savedThreshold = value
@@ -105,6 +107,40 @@ class LibReferenceViewModel(
 
   fun refreshRef() {
     libReferenceComputationController.refresh()
+  }
+
+  fun getLibReferenceOptions(): Int {
+    return libReferenceSettingsRepository.options
+  }
+
+  fun setLibReferenceOption(option: Int, enabled: Boolean): Int {
+    val newOptions = if (enabled) {
+      libReferenceSettingsRepository.options or option
+    } else {
+      libReferenceSettingsRepository.options and option.inv()
+    }
+    libReferenceSettingsRepository.options = newOptions
+    return newOptions
+  }
+
+  fun getLibReferenceOptionsString(): String {
+    return LibReferenceOptions.getOptionsString(libReferenceSettingsRepository.options)
+  }
+
+  fun onThresholdChanged(
+    threshold: Int,
+    isVisible: Boolean
+  ): ReferenceWorkPlan? {
+    if (threshold < savedThreshold) {
+      val plan = requestMatchRules(
+        isVisible = isVisible,
+        needShowLoading = true
+      )
+      savedThreshold = threshold
+      return plan
+    }
+    refreshRef()
+    return null
   }
 
   fun setData(name: String, @LibType type: Int) = viewModelScope.launch(Dispatchers.IO) {

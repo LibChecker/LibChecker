@@ -4,21 +4,26 @@ import android.content.DialogInterface
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.LibReferenceOptions
-import com.absinthe.libchecker.domain.statistics.LibReferenceSettingsRepository
 import com.absinthe.libchecker.features.statistics.ui.view.LibReferenceMenuBSDView
 import com.absinthe.libchecker.features.statistics.ui.view.LibReferenceMenuItemView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
-import org.koin.android.ext.android.inject
 
 class LibReferenceMenuBSDFragment : BaseBottomSheetViewDialogFragment<LibReferenceMenuBSDView>() {
 
-  private val libReferenceSettingsRepository: LibReferenceSettingsRepository by inject()
   private val optionsViewMap = mutableMapOf<Int, LibReferenceMenuItemView>()
   private var previousAdvancedOptions: Int = 0
+  private var currentAdvancedOptions: Int = 0
 
   private var onDismissCallback: (optionsDiff: Int) -> Unit = {}
+  private var onOptionChanged: (option: Int, isChecked: Boolean) -> Int = { option, isChecked ->
+    if (isChecked) {
+      currentAdvancedOptions or option
+    } else {
+      currentAdvancedOptions and option.inv()
+    }
+  }
 
   override fun initRootView(): LibReferenceMenuBSDView = LibReferenceMenuBSDView(requireContext())
 
@@ -26,7 +31,6 @@ class LibReferenceMenuBSDFragment : BaseBottomSheetViewDialogFragment<LibReferen
 
   override fun init() {
     maxPeekHeightPercentage = 0.8f
-    previousAdvancedOptions = libReferenceSettingsRepository.options
     addOptionItemView(R.string.ref_category_native, LibReferenceOptions.NATIVE_LIBS)
     addOptionItemView(R.string.ref_category_service, LibReferenceOptions.SERVICES)
     addOptionItemView(R.string.ref_category_activity, LibReferenceOptions.ACTIVITIES)
@@ -40,7 +44,7 @@ class LibReferenceMenuBSDFragment : BaseBottomSheetViewDialogFragment<LibReferen
     addOptionItemView(R.string.ref_category_only_not_marked, LibReferenceOptions.ONLY_NOT_MARKED)
 
     dialog?.setOnDismissListener {
-      onDismissCallback(previousAdvancedOptions.xor(libReferenceSettingsRepository.options))
+      onDismissCallback(previousAdvancedOptions.xor(currentAdvancedOptions))
     }
   }
 
@@ -60,6 +64,15 @@ class LibReferenceMenuBSDFragment : BaseBottomSheetViewDialogFragment<LibReferen
     onDismissCallback = action
   }
 
+  fun setOptionChangeListener(
+    initialOptions: Int,
+    onOptionChanged: (option: Int, isChecked: Boolean) -> Int
+  ) {
+    previousAdvancedOptions = initialOptions
+    currentAdvancedOptions = initialOptions
+    this.onOptionChanged = onOptionChanged
+  }
+
   private fun addOptionItemView(labelRes: Int, option: Int) {
     optionsViewMap[option] =
       root.addOptionItemView(labelRes, option, previousAdvancedOptions).apply {
@@ -70,12 +83,7 @@ class LibReferenceMenuBSDFragment : BaseBottomSheetViewDialogFragment<LibReferen
   }
 
   private fun updateOption(labelRes: Int, option: Int, isChecked: Boolean) {
-    val newOptions = if (isChecked) {
-      libReferenceSettingsRepository.options or option
-    } else {
-      libReferenceSettingsRepository.options and option.inv()
-    }
-    libReferenceSettingsRepository.options = newOptions
+    currentAdvancedOptions = onOptionChanged(option, isChecked)
     Telemetry.recordEvent(
       Constants.Event.LIB_REF_ADVANCED_MENU_ITEM_CHANGED,
       mapOf(Telemetry.Param.CONTENT to getString(labelRes), Telemetry.Param.VALUE to isChecked)

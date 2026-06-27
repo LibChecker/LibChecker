@@ -15,10 +15,8 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.AdvancedOptions
-import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
 import com.absinthe.libchecker.domain.app.AppListSettingsRepository
-import com.absinthe.libchecker.domain.statistics.LibReferenceSettingsRepository
 import com.absinthe.libchecker.features.applist.detail.ui.LibDetailDialogFragment
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.features.applist.ui.AdvancedMenuBSDFragment
@@ -60,7 +58,6 @@ class LibReferenceFragment :
   SearchView.OnQueryTextListener {
 
   private val appListSettingsRepository: AppListSettingsRepository by inject()
-  private val libReferenceSettingsRepository: LibReferenceSettingsRepository by inject()
   private val libReferenceViewModel: LibReferenceViewModel by viewModel()
   private val refAdapter by lazy {
     LibReferenceAdapter(
@@ -207,13 +204,13 @@ class LibReferenceFragment :
     appListSettingsRepository.colorfulRuleIconChanges.onEach { enabled ->
       refAdapter.updateColorfulRuleIcon(enabled)
     }.launchIn(lifecycleScope)
-    libReferenceSettingsRepository.thresholdChanges.onEach { threshold ->
-      if (threshold < libReferenceViewModel.savedThreshold) {
-        requestMatchRules(true)
-        libReferenceViewModel.savedThreshold = threshold
-      } else {
-        libReferenceViewModel.refreshRef()
-      }
+    libReferenceViewModel.thresholdChanges.onEach { threshold ->
+      applyReferenceWork(
+        libReferenceViewModel.onThresholdChanged(
+          threshold = threshold,
+          isVisible = isFragmentVisible()
+        )
+      )
     }.launchIn(lifecycleScope)
   }
 
@@ -264,6 +261,10 @@ class LibReferenceFragment :
     if (menuItem.itemId == R.id.filter) {
       advancedMenuBSDFragment?.dismiss()
       advancedMenuBSDFragment = LibReferenceMenuBSDFragment().apply {
+        setOptionChangeListener(
+          initialOptions = libReferenceViewModel.getLibReferenceOptions(),
+          onOptionChanged = libReferenceViewModel::setLibReferenceOption
+        )
         setOnDismissListener { optionsDiff ->
           if (optionsDiff > 0) {
             refreshList()
@@ -284,7 +285,7 @@ class LibReferenceFragment :
       Constants.Event.LIB_REFERENCE_FILTER_TYPE,
       mapOf(
         Telemetry.Param.CONTENT_TYPE to
-          LibReferenceOptions.getOptionsString(libReferenceSettingsRepository.options)
+          libReferenceViewModel.getLibReferenceOptionsString()
       )
     )
   }
@@ -292,15 +293,6 @@ class LibReferenceFragment :
   private fun requestComputeRef(needShowLoading: Boolean) {
     applyReferenceWork(
       libReferenceViewModel.requestComputeReference(
-        isVisible = isFragmentVisible(),
-        needShowLoading = needShowLoading
-      )
-    )
-  }
-
-  private fun requestMatchRules(needShowLoading: Boolean) {
-    applyReferenceWork(
-      libReferenceViewModel.requestMatchRules(
         isVisible = isFragmentVisible(),
         needShowLoading = needShowLoading
       )
