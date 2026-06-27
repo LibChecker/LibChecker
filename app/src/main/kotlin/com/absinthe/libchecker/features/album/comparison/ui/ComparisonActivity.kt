@@ -212,7 +212,7 @@ class ComparisonActivity :
 
     viewModel.apply {
       snapshotDiffItemsFlow.onEach {
-        adapter.setList(it.sortedByDescending { item -> item.updateTime })
+        adapter.setList(it)
         flip(VF_LIST)
       }.launchIn(lifecycleScope)
       effect.onEach {

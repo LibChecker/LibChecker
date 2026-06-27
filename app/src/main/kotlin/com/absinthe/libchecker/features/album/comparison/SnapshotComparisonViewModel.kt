@@ -22,6 +22,7 @@ import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -36,7 +37,8 @@ class SnapshotComparisonViewModel(
   private val prepareSnapshotComparisonArchivesUseCase: PrepareSnapshotComparisonArchivesUseCase
 ) : ViewModel() {
 
-  val snapshotDiffItemsFlow: MutableSharedFlow<List<SnapshotDiffItem>> = MutableSharedFlow()
+  private val _snapshotDiffItemsFlow: MutableSharedFlow<List<SnapshotDiffItem>> = MutableSharedFlow()
+  val snapshotDiffItemsFlow: SharedFlow<List<SnapshotDiffItem>> = _snapshotDiffItemsFlow.asSharedFlow()
   private var inputs: SnapshotComparisonInputs = SnapshotComparisonInputs()
 
   private val _effect: MutableSharedFlow<Effect> = MutableSharedFlow()
@@ -59,7 +61,7 @@ class SnapshotComparisonViewModel(
         onProgress = {}
       )
       if (diffItems != null) {
-        snapshotDiffItemsFlow.emit(diffItems)
+        emitSnapshotDiffItems(diffItems)
       }
       timer.end()
       Timber.d("compareSelectedSnapshotDiff: $timer")
@@ -80,7 +82,7 @@ class SnapshotComparisonViewModel(
       previousItems = previousItems,
       currentItems = currentItems
     ) ?: return
-    snapshotDiffItemsFlow.emit(diffItems)
+    emitSnapshotDiffItems(diffItems)
   }
 
   private suspend fun prepareSnapshotComparisonArchives(
@@ -188,6 +190,10 @@ class SnapshotComparisonViewModel(
     setEffect {
       Effect.DashboardCountChange(count.snapshotCount, isLeft)
     }
+  }
+
+  private suspend fun emitSnapshotDiffItems(items: List<SnapshotDiffItem>) {
+    _snapshotDiffItemsFlow.emit(items.sortedByDescending { it.updateTime })
   }
 
   private fun setEffect(builder: () -> Effect) {
