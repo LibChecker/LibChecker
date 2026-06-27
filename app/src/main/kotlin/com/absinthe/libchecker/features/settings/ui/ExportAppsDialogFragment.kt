@@ -4,24 +4,21 @@ import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.app.ExportInstalledAppsToUriUseCase
+import com.absinthe.libchecker.features.settings.SettingsViewModel
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 class ExportAppsDialogFragment : BaseBottomSheetViewDialogFragment<ExportAppsDialogView>() {
 
-  private val exportInstalledAppsToUriUseCase: ExportInstalledAppsToUriUseCase by inject()
+  private val viewModel: SettingsViewModel by viewModel(ownerProducer = { requireParentFragment() })
   private var exportJob: Job? = null
   private var isExporting = false
 
@@ -44,7 +41,7 @@ class ExportAppsDialogFragment : BaseBottomSheetViewDialogFragment<ExportAppsDia
       }
       root.showPreparing()
       isCancelable = false
-      createDocumentLauncher.launch(buildDefaultFileName())
+      createDocumentLauncher.launch(viewModel.buildInstalledAppsExportFileName())
     }
   }
 
@@ -61,7 +58,7 @@ class ExportAppsDialogFragment : BaseBottomSheetViewDialogFragment<ExportAppsDia
       isExporting = true
       root.showExporting()
       try {
-        val result = exportInstalledAppsToUriUseCase(uri) { progress ->
+        val result = viewModel.exportInstalledApps(uri) { progress ->
           withContext(Dispatchers.Main) {
             root.setProgress(progress)
           }
@@ -80,7 +77,7 @@ class ExportAppsDialogFragment : BaseBottomSheetViewDialogFragment<ExportAppsDia
           }
           root.showPreparing()
           isCancelable = false
-          createDocumentLauncher.launch(buildDefaultFileName())
+          createDocumentLauncher.launch(viewModel.buildInstalledAppsExportFileName())
         }
         Toasty.showShort(
           requireContext(),
@@ -91,11 +88,6 @@ class ExportAppsDialogFragment : BaseBottomSheetViewDialogFragment<ExportAppsDia
         isCancelable = true
       }
     }
-  }
-
-  private fun buildDefaultFileName(): String {
-    val timestamp = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(Date())
-    return "LibChecker-$timestamp.lcapps"
   }
 
   private companion object {

@@ -1,10 +1,12 @@
 package com.absinthe.libchecker.features.settings
 
 import android.content.Intent
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.api.bean.GetAppUpdateInfo
 import com.absinthe.libchecker.domain.app.AppListSettingsRepository
+import com.absinthe.libchecker.domain.app.ExportInstalledAppsToUriUseCase
 import com.absinthe.libchecker.domain.app.SetApkAnalysisEnabledUseCase
 import com.absinthe.libchecker.domain.app.update.AppUpdateChannel
 import com.absinthe.libchecker.domain.app.update.AppUpdateRepository
@@ -22,6 +24,8 @@ import com.absinthe.libchecker.domain.settings.SelectLocaleUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.domain.statistics.LibReferenceSettingsRepository
 import com.absinthe.libchecker.domain.statistics.UpdateLibReferenceThresholdUseCase
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -40,6 +44,7 @@ class SettingsViewModel(
   private val buildGetUpdatesItemsUseCase: BuildGetUpdatesItemsUseCase,
   private val buildLocalePreferenceDataUseCase: BuildLocalePreferenceDataUseCase,
   private val buildLogShareIntentUseCase: BuildLogShareIntentUseCase,
+  private val exportInstalledAppsToUriUseCase: ExportInstalledAppsToUriUseCase,
   private val selectDarkModeUseCase: SelectDarkModeUseCase,
   private val selectLocaleUseCase: SelectLocaleUseCase,
   private val setApkAnalysisEnabledUseCase: SetApkAnalysisEnabledUseCase,
@@ -132,5 +137,22 @@ class SettingsViewModel(
 
   suspend fun buildLogShareIntent(): Result<Intent?> {
     return buildLogShareIntentUseCase()
+  }
+
+  fun buildInstalledAppsExportFileName(timestampMillis: Long = System.currentTimeMillis()): String {
+    val timestamp = SimpleDateFormat(EXPORT_APPS_TIMESTAMP_PATTERN, Locale.US)
+      .format(Date(timestampMillis))
+    return "LibChecker-$timestamp.lcapps"
+  }
+
+  suspend fun exportInstalledApps(
+    uri: Uri,
+    progress: suspend (Int) -> Unit
+  ): ExportInstalledAppsToUriUseCase.Result {
+    return exportInstalledAppsToUriUseCase(uri, progress)
+  }
+
+  private companion object {
+    const val EXPORT_APPS_TIMESTAMP_PATTERN = "yyyyMMdd-HHmmss"
   }
 }

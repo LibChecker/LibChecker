@@ -568,6 +568,7 @@ val appModule = module {
       buildGetUpdatesItemsUseCase = get(),
       buildLocalePreferenceDataUseCase = get(),
       buildLogShareIntentUseCase = get(),
+      exportInstalledAppsToUriUseCase = get(),
       selectDarkModeUseCase = get(),
       selectLocaleUseCase = get(),
       setApkAnalysisEnabledUseCase = get(),
