@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.domain.snapshot.backup.usecase
 
-import com.absinthe.libchecker.domain.snapshot.SnapshotDatabaseFileRepository
 import com.absinthe.libchecker.domain.snapshot.backup.model.SnapshotBackupTarget
+import com.absinthe.libchecker.domain.snapshot.backup.repository.SnapshotDatabaseFileRepository
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

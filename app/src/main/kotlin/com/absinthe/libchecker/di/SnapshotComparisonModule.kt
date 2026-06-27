@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.di
 
+import com.absinthe.libchecker.domain.snapshot.comparison.archive.PrepareSnapshotComparisonArchivesUseCase
 import com.absinthe.libchecker.domain.snapshot.comparison.presentation.SnapshotComparisonViewModel
 import com.absinthe.libchecker.domain.snapshot.comparison.usecase.BuildPackageComparisonSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.comparison.usecase.BuildSnapshotComparisonPlanUseCase
@@ -9,7 +10,6 @@ import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapsho
 import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotListsUseCase
 import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotWithInstalledAppsUseCase
-import com.absinthe.libchecker.domain.snapshot.comparison.usecase.PrepareSnapshotComparisonArchivesUseCase
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module

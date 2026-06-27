@@ -24,8 +24,8 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.home.ui.MainActivity
-import com.absinthe.libchecker.domain.snapshot.CaptureInstalledSnapshotUseCase
 import com.absinthe.libchecker.domain.snapshot.display.FormatSnapshotTimestampUseCase
+import com.absinthe.libchecker.domain.snapshot.list.capture.CaptureInstalledSnapshotUseCase
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libraries.utils.manager.TimeRecorder

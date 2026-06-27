@@ -1,8 +1,8 @@
 package com.absinthe.libchecker.domain.snapshot.comparison.usecase
 
 import com.absinthe.libchecker.database.entity.SnapshotItem
-import com.absinthe.libchecker.domain.snapshot.ArchiveSnapshotItem
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
+import com.absinthe.libchecker.domain.snapshot.comparison.archive.ArchiveSnapshotItem
 import com.absinthe.libchecker.domain.snapshot.comparison.model.SnapshotComparisonLists
 import com.absinthe.libchecker.domain.snapshot.comparison.model.SnapshotComparisonPlan
 import kotlinx.coroutines.Dispatchers

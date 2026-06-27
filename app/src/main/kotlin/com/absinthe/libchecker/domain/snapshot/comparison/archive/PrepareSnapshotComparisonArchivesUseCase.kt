@@ -1,8 +1,6 @@
-package com.absinthe.libchecker.domain.snapshot.comparison.usecase
+package com.absinthe.libchecker.domain.snapshot.comparison.archive
 
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.domain.snapshot.ArchiveSnapshotItem
-import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.comparison.model.SnapshotComparisonInput
 import com.absinthe.libchecker.domain.snapshot.comparison.model.SnapshotComparisonInputs
 import java.io.File

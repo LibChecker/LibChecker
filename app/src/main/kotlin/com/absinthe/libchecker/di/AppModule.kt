@@ -120,12 +120,7 @@ import com.absinthe.libchecker.domain.app.update.BuildInAppUpdateDiffDataUseCase
 import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
 import com.absinthe.libchecker.domain.rules.CloudRulesRepository
 import com.absinthe.libchecker.domain.rules.RuleSettingsRepository
-import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
-import com.absinthe.libchecker.domain.snapshot.CaptureInstalledSnapshotUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
-import com.absinthe.libchecker.domain.snapshot.GetSnapshotRuleUseCase
-import com.absinthe.libchecker.domain.snapshot.SnapshotCaptureStateRepository
-import com.absinthe.libchecker.domain.snapshot.SnapshotDatabaseFileRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotItemFactory
 import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
@@ -134,7 +129,11 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.backup.archive.SnapshotArchiveCodec
 import com.absinthe.libchecker.domain.snapshot.backup.archive.SnapshotArchiveUseCase
+import com.absinthe.libchecker.domain.snapshot.backup.repository.SnapshotDatabaseFileRepository
+import com.absinthe.libchecker.domain.snapshot.comparison.archive.BuildArchiveSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.SnapshotDetailSectionBuilder
+import com.absinthe.libchecker.domain.snapshot.list.capture.CaptureInstalledSnapshotUseCase
+import com.absinthe.libchecker.domain.snapshot.list.capture.SnapshotCaptureStateRepository
 import com.absinthe.libchecker.domain.statistics.chart.presentation.ChartViewModel
 import com.absinthe.libchecker.domain.statistics.chart.repository.AndroidDistributionRepository
 import com.absinthe.libchecker.domain.statistics.chart.repository.ChartSettingsRepository
@@ -363,8 +362,7 @@ val appModule = module {
   factory { BuildArchiveSnapshotItemUseCase(androidContext()) }
   factory { CaptureInstalledSnapshotUseCase(androidContext().packageManager, get(), get(), get(), get(), get()) }
   factory { GetSnapshotDashboardCountUseCase(get(), get()) }
-  factory { GetSnapshotRuleUseCase() }
-  factory { SnapshotDetailSectionBuilder(androidContext(), get(), get()) }
+  factory { SnapshotDetailSectionBuilder(androidContext(), get()) }
   factory { SnapshotArchiveUseCase(get(), get()) }
   factory { SnapshotLibraryUseCase(get()) }
   factory { SnapshotSelectionUseCase(get()) }

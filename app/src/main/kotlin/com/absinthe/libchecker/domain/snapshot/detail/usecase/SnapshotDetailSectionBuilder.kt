@@ -14,9 +14,9 @@ import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
+import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
-import com.absinthe.libchecker.domain.snapshot.GetSnapshotRuleUseCase
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSection
 import com.absinthe.libchecker.domain.snapshot.model.ADDED
@@ -36,8 +36,7 @@ import kotlinx.coroutines.withContext
 
 class SnapshotDetailSectionBuilder(
   private val context: Context,
-  private val appListSettingsRepository: AppListSettingsRepository,
-  private val getSnapshotRule: GetSnapshotRuleUseCase
+  private val appListSettingsRepository: AppListSettingsRepository
 ) {
 
   suspend operator fun invoke(item: SnapshotDiffItem): List<SnapshotDetailSection> = withContext(Dispatchers.IO) {
@@ -98,7 +97,7 @@ class SnapshotDetailSectionBuilder(
       if (ruleCache.containsKey(key)) {
         return ruleCache[key]
       }
-      return getSnapshotRule(item).also {
+      return getRule(item).also {
         ruleCache[key] = it
       }
     }
@@ -119,6 +118,10 @@ class SnapshotDetailSectionBuilder(
         SnapshotDetailSection(type, sectionItems)
       }
     }
+  }
+
+  private suspend fun getRule(item: SnapshotDetailItem): Rule? = withContext(Dispatchers.IO) {
+    RulesRepository.getRule(item.name, item.itemType, true)
   }
 
   private fun addComponentDiffInfoFromJson(

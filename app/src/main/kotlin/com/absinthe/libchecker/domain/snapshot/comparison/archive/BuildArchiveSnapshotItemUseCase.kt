@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.snapshot
+package com.absinthe.libchecker.domain.snapshot.comparison.archive
 
 import android.content.Context
 import android.content.pm.ApplicationInfo

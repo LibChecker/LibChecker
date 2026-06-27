@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.data.snapshot
 
 import com.absinthe.libchecker.constant.OnceTag
-import com.absinthe.libchecker.domain.snapshot.SnapshotCaptureStateRepository
+import com.absinthe.libchecker.domain.snapshot.list.capture.SnapshotCaptureStateRepository
 import jonathanfinerty.once.Once
 
 class OnceSnapshotCaptureStateRepository : SnapshotCaptureStateRepository {

@@ -1,6 +1,6 @@
 package com.absinthe.libchecker.domain.snapshot.comparison.model
 
-import com.absinthe.libchecker.domain.snapshot.ArchiveSnapshotItem
+import com.absinthe.libchecker.domain.snapshot.comparison.archive.ArchiveSnapshotItem
 
 sealed interface SnapshotComparisonPlan {
 

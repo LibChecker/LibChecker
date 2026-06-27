@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.snapshot
+package com.absinthe.libchecker.domain.snapshot.list.capture
 
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
@@ -11,6 +11,9 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
+import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
+import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
