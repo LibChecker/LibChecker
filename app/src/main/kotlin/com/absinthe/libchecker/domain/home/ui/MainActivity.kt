@@ -243,7 +243,6 @@ class MainActivity :
 
         // 禁止左右滑动
         isUserInputEnabled = false
-        offscreenPageLimit = 2
         fixViewPager2Insets(this)
       }
 
