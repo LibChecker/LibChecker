@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.applist.detail.ui.view
+package com.absinthe.libchecker.domain.app.detail.ui.view
 
 import android.content.Context
 import android.view.ContextThemeWrapper
@@ -11,7 +11,7 @@ import androidx.core.view.marginStart
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.features.applist.detail.ui.adapter.ProcessBarAdapter
+import com.absinthe.libchecker.domain.app.detail.ui.adapter.ProcessBarAdapter
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.utils.extensions.tintTextToPrimary

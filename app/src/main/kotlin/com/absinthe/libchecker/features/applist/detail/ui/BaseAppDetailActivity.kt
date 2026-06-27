@@ -22,6 +22,7 @@ import com.absinthe.libchecker.domain.app.detail.ui.DetailFragmentManager
 import com.absinthe.libchecker.domain.app.detail.ui.DetailHeaderExtraInfoBinder
 import com.absinthe.libchecker.domain.app.detail.ui.DetailHeaderTitleBinder
 import com.absinthe.libchecker.domain.app.detail.ui.DetailMenuController
+import com.absinthe.libchecker.domain.app.detail.ui.DetailProcessBarController
 import com.absinthe.libchecker.domain.app.detail.ui.DetailTabSpecBuilder
 import com.absinthe.libchecker.domain.app.detail.ui.DetailToolbarController
 import com.absinthe.libchecker.domain.app.detail.ui.IDetailContainer

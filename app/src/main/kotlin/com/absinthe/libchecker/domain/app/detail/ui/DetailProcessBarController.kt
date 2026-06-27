@@ -1,9 +1,9 @@
-package com.absinthe.libchecker.features.applist.detail.ui
+package com.absinthe.libchecker.domain.app.detail.ui
 
 import android.view.ViewGroup
 import androidx.core.view.isGone
-import com.absinthe.libchecker.features.applist.detail.ui.adapter.ProcessBarAdapter
-import com.absinthe.libchecker.features.applist.detail.ui.view.ProcessBarView
+import com.absinthe.libchecker.domain.app.detail.ui.adapter.ProcessBarAdapter
+import com.absinthe.libchecker.domain.app.detail.ui.view.ProcessBarView
 
 class DetailProcessBarController(
   private val container: ViewGroup,

@@ -3,6 +3,7 @@ package com.absinthe.libchecker.features.applist.detail.ui
 import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.detail.model.LocatedCount
 import com.absinthe.libchecker.domain.app.detail.ui.DetailFragmentManager
+import com.absinthe.libchecker.domain.app.detail.ui.DetailProcessBarController
 import com.absinthe.libchecker.domain.app.detail.ui.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.domain.app.detail.ui.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
