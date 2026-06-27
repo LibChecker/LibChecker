@@ -1,9 +1,9 @@
-package com.absinthe.libchecker.features.applist.detail.ui.adapter
+package com.absinthe.libchecker.domain.app.detail.ui.adapter
 
 import android.text.method.LinkMovementMethod
 import android.view.ViewGroup
 import androidx.core.text.HtmlCompat
-import com.absinthe.libchecker.features.applist.detail.ui.adapter.node.LibDetailItem
+import com.absinthe.libchecker.domain.app.detail.ui.adapter.node.LibDetailItem
 import com.absinthe.libchecker.features.applist.detail.ui.view.LibDetailBottomSheetView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder

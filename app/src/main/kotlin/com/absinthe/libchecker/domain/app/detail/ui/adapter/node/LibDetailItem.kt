@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.applist.detail.ui.adapter.node
+package com.absinthe.libchecker.domain.app.detail.ui.adapter.node
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes

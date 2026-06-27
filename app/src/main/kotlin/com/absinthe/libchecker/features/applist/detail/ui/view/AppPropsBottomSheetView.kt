@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
-import com.absinthe.libchecker.features.applist.detail.ui.adapter.AppPropsAdapter
+import com.absinthe.libchecker.domain.app.detail.ui.adapter.AppPropsAdapter
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.dp

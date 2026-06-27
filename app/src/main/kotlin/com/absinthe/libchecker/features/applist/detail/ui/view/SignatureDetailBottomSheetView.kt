@@ -6,7 +6,7 @@ import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.features.applist.detail.ui.adapter.SignatureDetailAdapter
+import com.absinthe.libchecker.domain.app.detail.ui.adapter.SignatureDetailAdapter
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.dp

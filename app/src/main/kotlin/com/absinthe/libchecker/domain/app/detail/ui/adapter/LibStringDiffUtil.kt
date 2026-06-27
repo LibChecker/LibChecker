@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.applist.detail.ui.adapter
+package com.absinthe.libchecker.domain.app.detail.ui.adapter
 
 import androidx.recyclerview.widget.DiffUtil
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip

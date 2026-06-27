@@ -5,8 +5,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.detail.ui.adapter.AppInfoAdapter
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
-import com.absinthe.libchecker.features.applist.detail.ui.adapter.AppInfoAdapter
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppInfoBottomSheetView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Toasty

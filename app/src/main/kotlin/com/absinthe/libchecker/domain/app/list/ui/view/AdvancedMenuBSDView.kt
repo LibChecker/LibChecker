@@ -14,9 +14,9 @@ import com.absinthe.libchecker.domain.app.detail.model.DISABLED
 import com.absinthe.libchecker.domain.app.detail.model.EXPORTED
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
+import com.absinthe.libchecker.domain.app.detail.ui.adapter.LibStringAdapter
 import com.absinthe.libchecker.domain.app.list.ui.adapter.AppAdapter
 import com.absinthe.libchecker.domain.home.ui.adapter.AdvancedMenuAdapter
-import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibStringAdapter
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr

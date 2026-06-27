@@ -7,7 +7,7 @@ import android.widget.FrameLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.annotation.ACTIVITY
-import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibStringAdapter
+import com.absinthe.libchecker.domain.app.detail.ui.adapter.LibStringAdapter
 
 class ProcessIndicatorView(
   context: Context,

@@ -22,11 +22,11 @@ import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.ui.DetailFragmentManager
 import com.absinthe.libchecker.domain.app.detail.ui.IDetailContainer
 import com.absinthe.libchecker.domain.app.detail.ui.Sortable
+import com.absinthe.libchecker.domain.app.detail.ui.adapter.LibStringAdapter
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.features.applist.detail.ui.LibDetailDialogFragment
 import com.absinthe.libchecker.features.applist.detail.ui.PermissionDetailDialogFragment
-import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibStringAdapter
 import com.absinthe.libchecker.ui.base.BaseFragment
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
