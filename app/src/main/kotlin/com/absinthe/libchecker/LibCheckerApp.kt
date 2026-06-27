@@ -13,6 +13,7 @@ import com.absinthe.libchecker.app.MainLooperFilter
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.di.appModule
+import com.absinthe.libchecker.di.settingsModule
 import com.absinthe.libchecker.di.snapshotBackupModule
 import com.absinthe.libchecker.di.snapshotComparisonModule
 import com.absinthe.libchecker.di.snapshotListModule
@@ -71,7 +72,8 @@ class LibCheckerApp : Application() {
         snapshotBackupModule,
         snapshotListModule,
         snapshotTimeNodeModule,
-        snapshotTrackModule
+        snapshotTrackModule,
+        settingsModule
       )
     }
     Telemetry.setEnable(GlobalValues.isAnonymousAnalyticsEnabled)

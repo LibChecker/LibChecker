@@ -13,8 +13,6 @@ import com.absinthe.libchecker.data.app.WorkerFeatureInitializationRepository
 import com.absinthe.libchecker.data.app.update.AndroidAppUpdateRepository
 import com.absinthe.libchecker.data.rules.AndroidCloudRulesRepository
 import com.absinthe.libchecker.data.rules.GlobalRuleSettingsRepository
-import com.absinthe.libchecker.data.settings.GlobalAppearanceSettingsRepository
-import com.absinthe.libchecker.data.settings.GlobalDeveloperSettingsRepository
 import com.absinthe.libchecker.data.snapshot.AndroidSnapshotItemFactory
 import com.absinthe.libchecker.data.snapshot.GlobalSnapshotSelectionRepository
 import com.absinthe.libchecker.data.snapshot.GlobalSnapshotSettingsRepository
@@ -124,14 +122,6 @@ import com.absinthe.libchecker.domain.app.update.BuildInAppUpdateDiffDataUseCase
 import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
 import com.absinthe.libchecker.domain.rules.CloudRulesRepository
 import com.absinthe.libchecker.domain.rules.RuleSettingsRepository
-import com.absinthe.libchecker.domain.settings.presentation.SettingsViewModel
-import com.absinthe.libchecker.domain.settings.repository.AppearanceSettingsRepository
-import com.absinthe.libchecker.domain.settings.repository.DeveloperSettingsRepository
-import com.absinthe.libchecker.domain.settings.usecase.BuildGetUpdatesItemsUseCase
-import com.absinthe.libchecker.domain.settings.usecase.BuildLocalePreferenceDataUseCase
-import com.absinthe.libchecker.domain.settings.usecase.BuildLogShareIntentUseCase
-import com.absinthe.libchecker.domain.settings.usecase.SelectDarkModeUseCase
-import com.absinthe.libchecker.domain.settings.usecase.SelectLocaleUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildInstalledSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCase
@@ -188,8 +178,6 @@ val appModule = module {
   single<LibraryDetailRepository> { RemoteLibraryDetailRepository }
   single<CloudRulesRepository> { AndroidCloudRulesRepository(androidContext()) }
   single<RuleSettingsRepository> { GlobalRuleSettingsRepository() }
-  single<AppearanceSettingsRepository> { GlobalAppearanceSettingsRepository() }
-  single<DeveloperSettingsRepository> { GlobalDeveloperSettingsRepository() }
   single<AppUpdateRepository> { AndroidAppUpdateRepository(SystemServices.downloadManager) }
   single<AndroidDistributionRepository> { CachedAndroidDistributionRepository(androidContext()) }
   single<AppListItemFactory> { AndroidAppListItemFactory(androidContext()) }
@@ -299,11 +287,6 @@ val appModule = module {
       ApkDetailActivity::class.java.name
     )
   }
-  factory { BuildGetUpdatesItemsUseCase(androidContext()) }
-  factory { BuildLocalePreferenceDataUseCase(get()) }
-  factory { BuildLogShareIntentUseCase(androidContext(), BuildConfig.APPLICATION_ID) }
-  factory { SelectDarkModeUseCase(get()) }
-  factory { SelectLocaleUseCase(get()) }
   factory { ShouldShowStaticLibraryTabUseCase(get()) }
   factory { InitializePendingAppFeaturesUseCase(get(), get()) }
   factory { SortAppDetailItemsUseCase() }
@@ -462,24 +445,6 @@ val appModule = module {
       buildLibReferenceDetailDialogRequestUseCase = get(),
       libReferenceSettingsRepository = get(),
       libReferenceComputationControllerFactory = get()
-    )
-  }
-  viewModel {
-    SettingsViewModel(
-      appUpdateRepository = get(),
-      appListSettingsRepository = get(),
-      cloudRulesRepository = get(),
-      ruleSettingsRepository = get(),
-      snapshotSettingsRepository = get(),
-      buildGetUpdatesItemsUseCase = get(),
-      buildLocalePreferenceDataUseCase = get(),
-      buildLogShareIntentUseCase = get(),
-      exportInstalledAppsToUriUseCase = get(),
-      selectDarkModeUseCase = get(),
-      selectLocaleUseCase = get(),
-      setApkAnalysisEnabledUseCase = get(),
-      libReferenceSettingsRepository = get(),
-      updateLibReferenceThresholdUseCase = get()
     )
   }
 }
