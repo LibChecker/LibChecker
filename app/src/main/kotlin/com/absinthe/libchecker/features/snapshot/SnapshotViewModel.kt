@@ -6,6 +6,7 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.domain.app.AppListRepository
+import com.absinthe.libchecker.domain.app.PackageChangeState
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotCapturePlanUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotDetailItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotListUpdatePlanUseCase
@@ -27,6 +28,7 @@ import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotDiffItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.detail.BuildSnapshotDetailSectionsUseCase
 import com.absinthe.libchecker.domain.snapshot.detail.SnapshotDetailSection
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
+import com.absinthe.libchecker.domain.snapshot.sync.SnapshotPackageChangeProcessor
 import com.absinthe.libchecker.domain.snapshot.timenode.BuildSnapshotTimeNodeItemsUseCase
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import kotlinx.coroutines.Dispatchers
@@ -68,6 +70,7 @@ class SnapshotViewModel(
   val effect = _effect.asSharedFlow()
 
   private var compareDiffJob: Job? = null
+  private val packageChangeProcessor = SnapshotPackageChangeProcessor(::processPackageChange)
 
   val selectedSnapshotTimestamp: Long
     get() = snapshotSelectionUseCase.getCurrentTimestamp()
@@ -146,6 +149,10 @@ class SnapshotViewModel(
     } ?: run {
       removeDiffItem(packageName)
     }
+  }
+
+  fun handlePackageChanged(packageChangeState: PackageChangeState) {
+    packageChangeProcessor.enqueue(viewModelScope, packageChangeState)
   }
 
   fun computeDiffDetail(entity: SnapshotDiffItem) = viewModelScope.launch {
@@ -248,6 +255,20 @@ class SnapshotViewModel(
   }
 
   fun getDashboardCount(timestamp: Long, isLeft: Boolean) = viewModelScope.launch(Dispatchers.IO) {
+    emitDashboardCount(timestamp, isLeft)
+  }
+
+  override fun onCleared() {
+    super.onCleared()
+    packageChangeProcessor.cancel()
+  }
+
+  private suspend fun processPackageChange(packageChangeState: PackageChangeState) {
+    compareItemDiff(packageName = packageChangeState.packageName)
+    emitDashboardCount(selectedSnapshotTimestamp, true)
+  }
+
+  private suspend fun emitDashboardCount(timestamp: Long, isLeft: Boolean) {
     Timber.d("getDashboardCount: $timestamp, $isLeft")
     val count = getSnapshotDashboardCount(timestamp)
     setEffect {

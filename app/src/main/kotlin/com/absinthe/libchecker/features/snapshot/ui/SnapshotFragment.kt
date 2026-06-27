@@ -30,12 +30,10 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
-import com.absinthe.libchecker.domain.app.PackageChangeState
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotCapturePlan
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
-import com.absinthe.libchecker.domain.snapshot.sync.SnapshotPackageChangeProcessor
 import com.absinthe.libchecker.features.album.ui.AlbumActivity
 import com.absinthe.libchecker.features.home.HomeViewModel
 import com.absinthe.libchecker.features.home.INavViewContainer
@@ -115,11 +113,6 @@ class SnapshotFragment :
   }
   private val shootServiceController by lazy(LazyThreadSafetyMode.NONE) {
     SnapshotShootServiceController(shootListener)
-  }
-  private val packageChangeProcessor by lazy(LazyThreadSafetyMode.NONE) {
-    SnapshotPackageChangeProcessor { packageChangeState ->
-      viewModel.compareItemDiff(packageName = packageChangeState.packageName)
-    }
   }
   private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
   private var advancedMenuBSDFragment: SnapshotMenuBSDFragment? = null
@@ -271,12 +264,7 @@ class SnapshotFragment :
       when (it) {
         is HomeViewModel.Effect.PackageChanged -> {
           if (allowRefreshing) {
-            val packageChangeState = it.packageChangeState
-            if (packageChangeState is PackageChangeState.Removed) {
-              pendingParticleRemovePackageNames += packageChangeState.packageName
-            }
-            packageChangeProcessor.enqueue(lifecycleScope, packageChangeState)
-            viewModel.getDashboardCount(viewModel.selectedSnapshotTimestamp, true)
+            viewModel.handlePackageChanged(it.packageChangeState)
           }
         }
 
@@ -390,7 +378,6 @@ class SnapshotFragment :
     context?.applicationContext?.let {
       shootServiceController.release(it)
     }
-    packageChangeProcessor.cancel()
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {
