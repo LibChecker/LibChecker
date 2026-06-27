@@ -13,7 +13,8 @@ class CaptureInstalledSnapshotUseCase(
   private val snapshotRepository: SnapshotRepository,
   private val buildInstalledSnapshotItem: BuildInstalledSnapshotItemUseCase,
   private val snapshotSelectionUseCase: SnapshotSelectionUseCase,
-  private val snapshotSettingsRepository: SnapshotSettingsRepository
+  private val snapshotSettingsRepository: SnapshotSettingsRepository,
+  private val snapshotCaptureStateRepository: SnapshotCaptureStateRepository
 ) {
 
   suspend operator fun invoke(
@@ -26,6 +27,7 @@ class CaptureInstalledSnapshotUseCase(
     val total = request.appList.size
     val snapshotItems = mutableListOf<SnapshotItem>()
     val currentSnapshotTimestamp = snapshotSelectionUseCase.getCurrentTimestamp()
+    val shouldSaveFullSnapshot = snapshotCaptureStateRepository.shouldSaveFullSnapshot()
     var count = 0
     var lastProgress = 0
 
@@ -36,7 +38,7 @@ class CaptureInstalledSnapshotUseCase(
 
       val previousSnapshotItem = snapshotRepository.getSnapshot(currentSnapshotTimestamp, packageInfo.packageName)
       val snapshotItem = previousSnapshotItem
-        ?.takeIf { it.isReusableFor(packageInfo, request.shouldSaveFullSnapshot) }
+        ?.takeIf { it.isReusableFor(packageInfo, shouldSaveFullSnapshot) }
         ?.copy()
         ?.also {
           it.id = null
@@ -70,6 +72,10 @@ class CaptureInstalledSnapshotUseCase(
       snapshotRepository.retainLatestSnapshots(autoRemoveThreshold)
     }
 
+    if (shouldSaveFullSnapshot) {
+      snapshotCaptureStateRepository.markFullSnapshotSaved()
+    }
+
     snapshotSelectionUseCase.setCurrentTimestamp(timestamp)
     return Result(
       timestamp = timestamp,
@@ -91,7 +97,6 @@ class CaptureInstalledSnapshotUseCase(
   data class Request(
     val appList: List<PackageInfo>,
     val dropPrevious: Boolean,
-    val shouldSaveFullSnapshot: Boolean,
     val systemProps: Map<String, String>,
     val timestamp: Long = System.currentTimeMillis()
   )

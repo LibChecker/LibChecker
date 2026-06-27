@@ -25,6 +25,7 @@ import com.absinthe.libchecker.data.snapshot.LocalSnapshotDatabaseBackupExporter
 import com.absinthe.libchecker.data.snapshot.LocalSnapshotDatabaseBackupRestorer
 import com.absinthe.libchecker.data.snapshot.LocalSnapshotDatabaseFileRepository
 import com.absinthe.libchecker.data.snapshot.LocalSnapshotRepository
+import com.absinthe.libchecker.data.snapshot.OnceSnapshotCaptureStateRepository
 import com.absinthe.libchecker.data.snapshot.ProtoSnapshotArchiveCodec
 import com.absinthe.libchecker.data.statistics.CachedAndroidDistributionRepository
 import com.absinthe.libchecker.data.statistics.GlobalChartSettingsRepository
@@ -159,6 +160,7 @@ import com.absinthe.libchecker.domain.snapshot.RestoreSnapshotDatabaseBackupUseC
 import com.absinthe.libchecker.domain.snapshot.SetPackageTrackedUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveCodec
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
+import com.absinthe.libchecker.domain.snapshot.SnapshotCaptureStateRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotDatabaseFileRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotItemFactory
 import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
@@ -236,6 +238,7 @@ val appModule = module {
   single<AppListExportMetadata> { AndroidAppListExportMetadata(androidContext()) }
   single<FeatureInitializationRepository> { WorkerFeatureInitializationRepository() }
   single<SnapshotItemFactory> { AndroidSnapshotItemFactory() }
+  single<SnapshotCaptureStateRepository> { OnceSnapshotCaptureStateRepository() }
   single<SnapshotSelectionRepository> { GlobalSnapshotSelectionRepository() }
   single<SnapshotSettingsRepository> { GlobalSnapshotSettingsRepository() }
   single<SnapshotTrackChangeRepository> { GlobalSnapshotTrackChangeRepository() }
@@ -444,7 +447,7 @@ val appModule = module {
   factory { BuildSnapshotListUpdatePlanUseCase(get(), get(), get()) }
   factory { BuildSnapshotUpdateTimeDisplayDataUseCase() }
   factory { BuildSnapshotPairDiffUseCase() }
-  factory { CaptureInstalledSnapshotUseCase(androidContext().packageManager, get(), get(), get(), get()) }
+  factory { CaptureInstalledSnapshotUseCase(androidContext().packageManager, get(), get(), get(), get(), get()) }
   factory { CompareSnapshotItemsUseCase() }
   factory { CompareSnapshotListsUseCase(get()) }
   factory { CompareTrackedSnapshotListsUseCase(get(), get()) }
