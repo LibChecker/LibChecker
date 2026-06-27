@@ -1,10 +1,10 @@
-package com.absinthe.libchecker.features.applist.detail.ui.view
+package com.absinthe.libchecker.domain.app.detail.ui.view
 
 import android.content.Context
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.features.applist.detail.ui.adapter.AppBundleAdapter
+import com.absinthe.libchecker.domain.app.detail.ui.adapter.AppBundleAdapter
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.dp
