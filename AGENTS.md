@@ -20,9 +20,13 @@ Use the Gradle wrapper from the repository root. On macOS/Linux use
 - Release/R8/package validation: `./gradlew :app:assembleRelease`
 - Market R8 rule check when full signing is blocked:
   `./gradlew :app:minifyMarketReleaseWithR8`
+- Jetpack Macrobenchmark startup smoke:
+  `ANDROID_SERIAL=<serial> ./gradlew :macrobenchmark:connectedFossBenchmarkAndroidTest --no-configuration-cache`
 - Device UI validation: prefer AndroMeld MCP Phone Screen sessions for visible
   launch, navigation, and UI-state checks. Use Gradle/adb for install and
   package-state operations only when needed.
+- For snapshot checks, prefer importing an existing backup from the device
+  `Download` directory before exporting a new snapshot.
 
 For docs-only changes, a Gradle build is usually unnecessary. For source
 changes, run the narrowest command that covers the touched files plus
@@ -47,6 +51,8 @@ or release behavior changes, run the matching assemble/minify task.
 - `:app` is the Android application. Put product behavior here.
 - `:hidden-api` is compile-only hidden platform API stubs and Rikka Refine
   annotations. Never put runtime app logic here.
+- `:macrobenchmark` owns Jetpack Macrobenchmark tests for release-like app
+  performance checks. Keep scenarios focused on stable, high-value user flows.
 - `build-logic/` owns shared Gradle conventions and custom plugins.
 
 Important `:app` boundaries:
@@ -155,6 +161,8 @@ Important `:app` boundaries:
 - Release signing may fail locally because debug/release keystore creation is
   blocked. For R8 rule proof, inspect generated
   `app/build/outputs/mapping/*/configuration.txt` and `mapping.txt`.
+- Disable or whitelist device freezer/background-management tools before
+  macrobenchmark runs; they can kill freshly installed instrumentation packages.
 
 ## NEVER
 

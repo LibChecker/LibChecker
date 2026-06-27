@@ -3,6 +3,8 @@ agp = "9.2.1"
 aboutlibraries = "14.2.1"
 androidX-lifecycle = "2.11.0"
 androidX-room = "2.8.4"
+androidX-benchmark = "1.4.1"
+androidX-collection = "1.5.0"
 firebase-bom = "34.15.0"
 hiddenApiRefine = "4.4.0"
 kotlin = "2.4.0"
@@ -16,6 +18,7 @@ zhaobozhen = "1.1.8"
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
+android-test = { id = "com.android.test", version.ref = "agp" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.7" }
 gms = { id = "com.google.gms.google-services", version = "4.5.0" }
 hiddenApiRefine = { id = "dev.rikka.tools.refine", version.ref = "hiddenApiRefine" }
@@ -37,7 +40,9 @@ koin-android = { module = "io.insert-koin:koin-android" }
 
 androidX-activity = "androidx.activity:activity-ktx:1.13.0"
 androidX-annotation = "androidx.annotation:annotation:1.10.0"
+androidX-benchmark-macro-junit4 = { module = "androidx.benchmark:benchmark-macro-junit4", version.ref = "androidX-benchmark" }
 androidX-browser = "androidx.browser:browser:1.10.0"
+androidX-collection = { module = "androidx.collection:collection", version.ref = "androidX-collection" }
 androidX-constraintLayout = "androidx.constraintlayout:constraintlayout:2.2.1"
 androidX-core = "androidx.core:core-ktx:1.19.0"
 androidX-fragment = "androidx.fragment:fragment-ktx:1.8.9"
@@ -49,6 +54,9 @@ androidX-room-compiler = { module = "androidx.room:room-compiler", version.ref =
 androidX-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidX-room" }
 androidX-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidX-room" }
 androidX-security = "androidx.security:security-crypto:1.1.0"
+androidX-test-ext-junit = "androidx.test.ext:junit:1.3.0"
+androidX-test-runner = "androidx.test:runner:1.7.0"
+androidX-test-uiautomator = "androidx.test.uiautomator:uiautomator:2.3.0"
 androidX-viewPager2 = "androidx.viewpager2:viewpager2:1.1.0"
 androidX-window = "androidx.window:window:1.5.1"
 

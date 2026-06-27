@@ -49,6 +49,13 @@ setupAppModule {
         }
       }
     }
+    create("benchmark") {
+      initWith(getByName("release"))
+      applicationIdSuffix = ".debug"
+      matchingFallbacks += listOf("release")
+      proguardFiles("src/benchmark/keepRules/proguard-rules.keep")
+      signingConfig = signingConfigs.getByName("debug")
+    }
   }
 
   productFlavors {
