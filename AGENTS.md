@@ -51,9 +51,12 @@ or release behavior changes, run the matching assemble/minify task.
 
 Important `:app` boundaries:
 
-- `features/*` owns user-facing feature flows. Keep view constants, spans, and
-  adapter-only icon types in UI; move reusable parsing/data preparation to use
-  cases.
+- `features/*` is legacy user-facing flow structure. When touching it for
+  refactors, prefer migrating a focused vertical slice into the matching
+  `domain/*` product package with clear `presentation`, `ui`, `model`,
+  `usecase`, and `repository` subpackages. Keep view constants, spans, and
+  adapter-only icon types in UI; move reusable parsing/data preparation behind
+  deeper workflow modules instead of many thin use cases.
 - Shared `view/` widgets own rendering, accessibility metadata, and animation
   only; pass feature/domain data in through providers instead of importing
   `data/*`.

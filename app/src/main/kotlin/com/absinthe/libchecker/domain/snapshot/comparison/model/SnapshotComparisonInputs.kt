@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.snapshot.comparison
+package com.absinthe.libchecker.domain.snapshot.comparison.model
 
 import android.net.Uri
 

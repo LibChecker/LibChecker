@@ -113,7 +113,7 @@
       </intent-filter>
     </activity>
     <activity
-      android:name=".features.album.comparison.ui.ComparisonActivity"
+      android:name=".domain.snapshot.comparison.ui.ComparisonActivity"
       android:exported="true"
       android:label="@string/album_item_comparison_title">
       <intent-filter>

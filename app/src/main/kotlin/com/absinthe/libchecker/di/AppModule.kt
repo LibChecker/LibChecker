@@ -173,7 +173,8 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotTrackChangeRepository
 import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotDiffItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotTopAppsUseCase
 import com.absinthe.libchecker.domain.snapshot.backup.BuildSnapshotRestorePlanUseCase
-import com.absinthe.libchecker.domain.snapshot.comparison.PrepareSnapshotComparisonArchivesUseCase
+import com.absinthe.libchecker.domain.snapshot.comparison.presentation.SnapshotComparisonViewModel
+import com.absinthe.libchecker.domain.snapshot.comparison.usecase.PrepareSnapshotComparisonArchivesUseCase
 import com.absinthe.libchecker.domain.snapshot.detail.BuildSnapshotDetailSectionsUseCase
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.timenode.BuildSnapshotTimeNodeItemsUseCase
@@ -196,7 +197,6 @@ import com.absinthe.libchecker.domain.statistics.LibReferenceSettingsRepository
 import com.absinthe.libchecker.domain.statistics.ObserveChartFeatureInitializationPlansUseCase
 import com.absinthe.libchecker.domain.statistics.UpdateLibReferenceThresholdUseCase
 import com.absinthe.libchecker.features.album.backup.SnapshotBackupViewModel
-import com.absinthe.libchecker.features.album.comparison.SnapshotComparisonViewModel
 import com.absinthe.libchecker.features.album.track.TrackViewModel
 import com.absinthe.libchecker.features.applist.detail.DetailActionLoader
 import com.absinthe.libchecker.features.applist.detail.DetailContentLoader

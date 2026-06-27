@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.album.comparison
+package com.absinthe.libchecker.domain.snapshot.comparison.presentation
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel
@@ -13,9 +13,9 @@ import com.absinthe.libchecker.domain.snapshot.FormatSnapshotTimestampUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotComparisonPlan
 import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
-import com.absinthe.libchecker.domain.snapshot.comparison.PrepareSnapshotComparisonArchivesUseCase
-import com.absinthe.libchecker.domain.snapshot.comparison.SnapshotComparisonInputs
-import com.absinthe.libchecker.domain.snapshot.comparison.SnapshotComparisonSide
+import com.absinthe.libchecker.domain.snapshot.comparison.model.SnapshotComparisonInputs
+import com.absinthe.libchecker.domain.snapshot.comparison.model.SnapshotComparisonSide
+import com.absinthe.libchecker.domain.snapshot.comparison.usecase.PrepareSnapshotComparisonArchivesUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import java.io.File

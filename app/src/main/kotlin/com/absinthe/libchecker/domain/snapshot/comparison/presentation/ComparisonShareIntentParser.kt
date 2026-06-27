@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.album.comparison
+package com.absinthe.libchecker.domain.snapshot.comparison.presentation
 
 import android.content.Intent
 import android.net.Uri

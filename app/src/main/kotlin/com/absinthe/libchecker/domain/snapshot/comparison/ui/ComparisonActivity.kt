@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.album.comparison.ui
+package com.absinthe.libchecker.domain.snapshot.comparison.ui
 
 import android.content.Intent
 import android.content.res.Configuration
@@ -29,12 +29,12 @@ import com.absinthe.libchecker.databinding.ActivityComparisonBinding
 import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotComparisonPlan
-import com.absinthe.libchecker.domain.snapshot.comparison.SnapshotComparisonSide
+import com.absinthe.libchecker.domain.snapshot.comparison.model.SnapshotComparisonSide
+import com.absinthe.libchecker.domain.snapshot.comparison.presentation.ComparisonDashboardStatePlanner
+import com.absinthe.libchecker.domain.snapshot.comparison.presentation.ComparisonShareIntentParser
+import com.absinthe.libchecker.domain.snapshot.comparison.presentation.SnapshotComparisonViewModel
+import com.absinthe.libchecker.domain.snapshot.comparison.ui.view.ComparisonDashboardView
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
-import com.absinthe.libchecker.features.album.comparison.ComparisonDashboardStatePlanner
-import com.absinthe.libchecker.features.album.comparison.ComparisonShareIntentParser
-import com.absinthe.libchecker.features.album.comparison.SnapshotComparisonViewModel
-import com.absinthe.libchecker.features.album.comparison.ui.view.ComparisonDashboardView
 import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ENTITY
 import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ICON
 import com.absinthe.libchecker.features.snapshot.detail.ui.SnapshotDetailActivity
