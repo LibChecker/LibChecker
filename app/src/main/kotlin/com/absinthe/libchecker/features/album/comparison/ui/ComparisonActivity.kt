@@ -105,7 +105,7 @@ class ComparisonActivity :
       if (binding.vfContainer.displayedChild == VF_LOADING) {
         return false
       }
-      if (!viewModel.inputs.canCompare) {
+      if (!viewModel.canCompare()) {
         showToast(R.string.album_item_comparison_invalid_compare)
         return false
       }
@@ -309,9 +309,8 @@ class ComparisonActivity :
   }
 
   private fun compareSelectedItems() = lifecycleScope.launch(Dispatchers.IO) {
-    val inputs = viewModel.inputs
     var dialog: AlertDialog? = null
-    if (inputs.hasArchiveInput) {
+    if (viewModel.needsArchivePreparation()) {
       withContext(Dispatchers.Main) {
         dialog = UiUtils.createLoadingDialog(this@ComparisonActivity).also {
           it.show()
@@ -319,35 +318,31 @@ class ComparisonActivity :
       }
     }
 
-    val archiveResult = if (inputs.hasArchiveInput) {
-      viewModel.prepareSnapshotComparisonArchives(
-        cacheDir = requireAvailableCacheDir(),
-        iconSize = resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size)
-      )
-    } else {
-      null
-    }
+    val compareAction = viewModel.buildCompareAction(
+      cacheDir = requireAvailableCacheDir(),
+      iconSize = resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size)
+    )
 
     withContext(Dispatchers.Main) {
       dialog?.dismiss()
-      if (archiveResult?.hasNotEnoughStorageSpace == true) {
+      if (compareAction.hasNotEnoughStorageSpace) {
         showToast(R.string.toast_not_enough_storage_space)
       }
     }
 
-    when (
-      val plan = viewModel.buildSnapshotComparisonPlan(
-        inputs = inputs,
-        leftArchive = archiveResult?.leftArchive,
-        rightArchive = archiveResult?.rightArchive
-      )
-    ) {
-      null -> {
+    when (compareAction) {
+      is SnapshotComparisonViewModel.CompareAction.Invalid -> {
         withContext(Dispatchers.Main) {
           showToast(R.string.album_item_comparison_invalid_compare)
         }
       }
 
+      is SnapshotComparisonViewModel.CompareAction.Ready -> handleComparePlan(compareAction.plan)
+    }
+  }
+
+  private suspend fun handleComparePlan(plan: SnapshotComparisonPlan) {
+    when (plan) {
       is SnapshotComparisonPlan.TimestampRange -> {
         withContext(Dispatchers.Main) {
           viewModel.compareDiff(plan.previousTimestamp, plan.currentTimestamp)

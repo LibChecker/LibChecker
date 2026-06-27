@@ -84,7 +84,8 @@ class SnapshotComparisonViewModel(
     snapshotDiffItemsFlow.emit(diffItems)
   }
 
-  suspend fun prepareSnapshotComparisonArchives(
+  private suspend fun prepareSnapshotComparisonArchives(
+    inputs: SnapshotComparisonInputs,
     cacheDir: File,
     iconSize: Int
   ): PrepareSnapshotComparisonArchivesUseCase.Result {
@@ -95,6 +96,43 @@ class SnapshotComparisonViewModel(
         iconSize = iconSize
       )
     )
+  }
+
+  fun canCompare(): Boolean {
+    return inputs.canCompare
+  }
+
+  fun needsArchivePreparation(): Boolean {
+    return inputs.hasArchiveInput
+  }
+
+  suspend fun buildCompareAction(
+    cacheDir: File,
+    iconSize: Int
+  ): CompareAction {
+    val currentInputs = inputs
+    val archiveResult = if (currentInputs.hasArchiveInput) {
+      prepareSnapshotComparisonArchives(
+        inputs = currentInputs,
+        cacheDir = cacheDir,
+        iconSize = iconSize
+      )
+    } else {
+      null
+    }
+
+    val plan = buildSnapshotComparisonPlan(
+      inputs = currentInputs,
+      leftArchive = archiveResult?.leftArchive,
+      rightArchive = archiveResult?.rightArchive
+    )
+    val hasNotEnoughStorageSpace = archiveResult?.hasNotEnoughStorageSpace == true
+
+    return if (plan == null) {
+      CompareAction.Invalid(hasNotEnoughStorageSpace)
+    } else {
+      CompareAction.Ready(plan, hasNotEnoughStorageSpace)
+    }
   }
 
   fun clearSnapshotComparisonArchiveCache(cacheDir: File?) {
@@ -108,7 +146,7 @@ class SnapshotComparisonViewModel(
     return buildSnapshotPairDiffUseCase(left, right)
   }
 
-  internal suspend fun buildSnapshotComparisonPlan(
+  private suspend fun buildSnapshotComparisonPlan(
     inputs: SnapshotComparisonInputs,
     leftArchive: ArchiveSnapshotItem?,
     rightArchive: ArchiveSnapshotItem?
@@ -150,6 +188,19 @@ class SnapshotComparisonViewModel(
     viewModelScope.launch {
       _effect.emit(newEffect)
     }
+  }
+
+  sealed interface CompareAction {
+    val hasNotEnoughStorageSpace: Boolean
+
+    data class Invalid(
+      override val hasNotEnoughStorageSpace: Boolean
+    ) : CompareAction
+
+    data class Ready(
+      val plan: SnapshotComparisonPlan,
+      override val hasNotEnoughStorageSpace: Boolean
+    ) : CompareAction
   }
 
   sealed class Effect {
