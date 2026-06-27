@@ -32,6 +32,7 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotComparisonPlan
 import com.absinthe.libchecker.domain.snapshot.comparison.SnapshotComparisonSide
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
 import com.absinthe.libchecker.features.album.comparison.ComparisonDashboardStatePlanner
+import com.absinthe.libchecker.features.album.comparison.ComparisonShareIntentParser
 import com.absinthe.libchecker.features.album.comparison.SnapshotComparisonViewModel
 import com.absinthe.libchecker.features.album.comparison.ui.view.ComparisonDashboardView
 import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ENTITY
