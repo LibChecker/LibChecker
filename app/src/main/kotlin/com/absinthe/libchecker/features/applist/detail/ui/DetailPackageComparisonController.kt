@@ -5,6 +5,7 @@ import android.content.pm.PackageInfo
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.detail.ui.DetailToolbarController
 import com.absinthe.libchecker.domain.snapshot.detail.ui.EXTRA_ENTITY
 import com.absinthe.libchecker.domain.snapshot.detail.ui.SnapshotDetailActivity
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel

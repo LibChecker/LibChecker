@@ -17,6 +17,7 @@ import com.absinthe.libchecker.domain.app.detail.content.BuildAppDetailContentIn
 import com.absinthe.libchecker.domain.app.detail.content.BuildAppDetailTabTypesUseCase
 import com.absinthe.libchecker.domain.app.detail.model.DetailExtraBean
 import com.absinthe.libchecker.domain.app.detail.ui.DetailFragmentManager
+import com.absinthe.libchecker.domain.app.detail.ui.DetailToolbarController
 import com.absinthe.libchecker.domain.app.detail.ui.IDetailContainer
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity

@@ -1,11 +1,11 @@
-package com.absinthe.libchecker.features.applist.detail.ui
+package com.absinthe.libchecker.domain.app.detail.ui
 
 import androidx.annotation.StringRes
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.model.AppDetailToolbarItem
-import com.absinthe.libchecker.features.applist.detail.ui.adapter.AppDetailToolbarAdapter
+import com.absinthe.libchecker.domain.app.detail.ui.adapter.AppDetailToolbarAdapter
 import com.google.android.material.appbar.AppBarLayout
 import kotlin.math.abs
 
