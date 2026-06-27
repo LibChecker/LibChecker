@@ -31,6 +31,7 @@ import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCas
 import com.absinthe.libchecker.domain.snapshot.SnapshotComparisonPlan
 import com.absinthe.libchecker.domain.snapshot.comparison.SnapshotComparisonSide
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
+import com.absinthe.libchecker.features.album.comparison.ComparisonDashboardStatePlanner
 import com.absinthe.libchecker.features.album.comparison.SnapshotComparisonViewModel
 import com.absinthe.libchecker.features.album.comparison.ui.view.ComparisonDashboardView
 import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ENTITY
@@ -283,17 +284,11 @@ class ComparisonActivity :
     dashboardView.post {
       applyDashboardSideState(
         side = SnapshotComparisonSide.LEFT,
-        sideState = ComparisonDashboardStatePlanner.planSideState(
-          input = viewModel.inputs.left,
-          formatTimestamp = viewModel::getFormatDateString
-        )
+        sideState = viewModel.buildDashboardSideState(SnapshotComparisonSide.LEFT)
       )
       applyDashboardSideState(
         side = SnapshotComparisonSide.RIGHT,
-        sideState = ComparisonDashboardStatePlanner.planSideState(
-          input = viewModel.inputs.right,
-          formatTimestamp = viewModel::getFormatDateString
-        )
+        sideState = viewModel.buildDashboardSideState(SnapshotComparisonSide.RIGHT)
       )
     }
   }

@@ -37,8 +37,7 @@ class SnapshotComparisonViewModel(
 ) : ViewModel() {
 
   val snapshotDiffItemsFlow: MutableSharedFlow<List<SnapshotDiffItem>> = MutableSharedFlow()
-  internal var inputs: SnapshotComparisonInputs = SnapshotComparisonInputs()
-    private set
+  private var inputs: SnapshotComparisonInputs = SnapshotComparisonInputs()
 
   private val _effect: MutableSharedFlow<Effect> = MutableSharedFlow()
   val effect = _effect.asSharedFlow()
@@ -144,6 +143,14 @@ class SnapshotComparisonViewModel(
 
   fun buildSnapshotPairDiff(left: SnapshotItem, right: SnapshotItem): SnapshotDiffItem {
     return buildSnapshotPairDiffUseCase(left, right)
+  }
+
+  internal fun buildDashboardSideState(side: SnapshotComparisonSide): ComparisonDashboardStatePlanner.SideState {
+    val input = when (side) {
+      SnapshotComparisonSide.LEFT -> inputs.left
+      SnapshotComparisonSide.RIGHT -> inputs.right
+    }
+    return ComparisonDashboardStatePlanner.planSideState(input, ::getFormatDateString)
   }
 
   private suspend fun buildSnapshotComparisonPlan(

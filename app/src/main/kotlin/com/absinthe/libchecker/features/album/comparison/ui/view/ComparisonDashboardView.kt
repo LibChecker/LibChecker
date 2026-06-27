@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.comparison.SnapshotComparisonSide
-import com.absinthe.libchecker.features.album.comparison.ui.ComparisonDashboardStatePlanner
+import com.absinthe.libchecker.features.album.comparison.ComparisonDashboardStatePlanner
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize

@@ -10,7 +10,7 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.features.album.comparison.ui.ComparisonDashboardStatePlanner
+import com.absinthe.libchecker.features.album.comparison.ComparisonDashboardStatePlanner
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
