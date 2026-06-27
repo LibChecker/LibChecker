@@ -9,7 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.IntentCompat
 import com.absinthe.libchecker.domain.app.PrepareApkAnalysisPackageUseCase
-import com.absinthe.libchecker.features.applist.detail.IDetailContainer
+import com.absinthe.libchecker.domain.app.detail.ui.IDetailContainer
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.requireAvailableCacheDir

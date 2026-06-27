@@ -6,7 +6,7 @@ import androidx.fragment.app.FragmentActivity
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.domain.app.detail.model.DetailExtraBean
-import com.absinthe.libchecker.features.applist.detail.AppBarStateChangeListener
+import com.absinthe.libchecker.domain.app.detail.ui.AppBarStateChangeListener
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.utils.Toasty
 import com.google.android.material.appbar.AppBarLayout

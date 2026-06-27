@@ -1,6 +1,4 @@
-package com.absinthe.libchecker.features.applist.detail
-
-import com.absinthe.libchecker.domain.app.detail.ui.DetailFragmentManager
+package com.absinthe.libchecker.domain.app.detail.ui
 
 /**
  * <pre>

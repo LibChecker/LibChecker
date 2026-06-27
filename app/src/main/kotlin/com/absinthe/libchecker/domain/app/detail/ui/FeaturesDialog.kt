@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.applist.detail
+package com.absinthe.libchecker.domain.app.detail.ui
 
 import android.content.Context
 import android.content.Intent
@@ -24,7 +24,6 @@ import androidx.fragment.app.FragmentActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.URLManager.ANDROID_DEV_HOST
-import com.absinthe.libchecker.features.applist.detail.FeaturesDialog.commonShowDialogImpl
 import com.absinthe.libchecker.features.applist.detail.ui.AppBundleBottomSheetDialogFragment
 import com.absinthe.libchecker.features.applist.detail.ui.AppInstallSourceBSDFragment
 import com.absinthe.libchecker.features.applist.detail.ui.AppPropBottomSheetDialogFragment
