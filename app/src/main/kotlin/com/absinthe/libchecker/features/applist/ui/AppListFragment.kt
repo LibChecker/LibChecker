@@ -25,7 +25,6 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
-import com.absinthe.libchecker.domain.app.search.HandleAppListSearchCommandUseCase
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.features.applist.ui.adapter.AppAdapter
 import com.absinthe.libchecker.features.applist.ui.adapter.AppListDiffUtil
@@ -69,7 +68,6 @@ class AppListFragment :
 
   private val isFirstLaunch get() = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
   private val getRandomAppIcon: GetRandomAppIconUseCase by inject()
-  private val handleAppListSearchCommand: HandleAppListSearchCommandUseCase by inject()
   private val appAdapter = AppAdapter()
   private val particleItemAnimator = ParticleRemoveItemAnimator()
   private var updateItemsJob: Job? = null
@@ -85,7 +83,6 @@ class AppListFragment :
   private lateinit var layoutManager: RecyclerView.LayoutManager
   private lateinit var dumpAppsInfoResultLauncher: ActivityResultLauncher<String>
   private lateinit var queryAllPackagesPermissionLauncher: ActivityResultLauncher<String>
-  private var dumpAppsInfoAsMarkDown = false
 
   override fun init() {
     val context = (context as? BaseActivity<*>) ?: return
@@ -202,7 +199,7 @@ class AppListFragment :
     dumpAppsInfoResultLauncher =
       registerForActivityResult(ActivityResultContracts.CreateDocument("*/*")) {
         it?.let {
-          homeViewModel.dumpAppsInfo(it, dumpAppsInfoAsMarkDown)
+          homeViewModel.dumpAppsInfo(it)
         }
       }
     queryAllPackagesPermissionLauncher =
@@ -250,10 +247,10 @@ class AppListFragment :
       appAdapter.highlightText = newText
       updateItems(highlightRefresh = true)
 
-      when (val result = handleAppListSearchCommand(newText)) {
-        HandleAppListSearchCommandUseCase.Result.None -> Unit
+      when (val action = homeViewModel.handleAppListSearchQuery(newText)) {
+        HomeViewModel.AppListSearchCommandAction.None -> Unit
 
-        HandleAppListSearchCommandUseCase.Result.EasterEgg -> {
+        HomeViewModel.AppListSearchCommandAction.EasterEgg -> {
           context?.showToast("🥚")
           Telemetry.recordEvent(
             Constants.Event.EASTER_EGG,
@@ -261,18 +258,17 @@ class AppListFragment :
           )
         }
 
-        HandleAppListSearchCommandUseCase.Result.DebugModeEnabled -> {
+        HomeViewModel.AppListSearchCommandAction.DebugModeEnabled -> {
           context?.showToast("DEBUG MODE")
         }
 
-        HandleAppListSearchCommandUseCase.Result.UserModeEnabled -> {
+        HomeViewModel.AppListSearchCommandAction.UserModeEnabled -> {
           context?.showToast("USER MODE")
         }
 
-        is HandleAppListSearchCommandUseCase.Result.DumpAppsInfo -> {
-          dumpAppsInfoAsMarkDown = result.saveAsMarkDown
+        is HomeViewModel.AppListSearchCommandAction.DumpAppsInfo -> {
           runCatching {
-            dumpAppsInfoResultLauncher.launch(result.fileName)
+            dumpAppsInfoResultLauncher.launch(action.fileName)
           }.onFailure {
             Timber.e(it)
             context?.showToast("Document API not working")

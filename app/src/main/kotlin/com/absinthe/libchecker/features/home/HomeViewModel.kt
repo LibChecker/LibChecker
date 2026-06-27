@@ -22,6 +22,7 @@ import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.ObserveAppListLoadingUseCase
 import com.absinthe.libchecker.domain.app.PackageChangeState
 import com.absinthe.libchecker.domain.app.SyncAppListChangesUseCase
+import com.absinthe.libchecker.domain.app.search.HandleAppListSearchCommandUseCase
 import com.absinthe.libchecker.domain.app.sync.AppListChangeRequestQueue
 import com.absinthe.libchecker.services.IWorkerService
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +44,7 @@ class HomeViewModel(
   private val exportAppListToUriUseCase: ExportAppListToUriUseCase,
   private val getAppListContentUseCase: GetAppListContentUseCase,
   private val buildAppListUpdatePlanUseCase: BuildAppListUpdatePlanUseCase,
+  private val handleAppListSearchCommandUseCase: HandleAppListSearchCommandUseCase,
   private val appListSettingsRepository: AppListSettingsRepository,
   private val clearApkCacheUseCase: ClearApkCacheUseCase,
   appListItemsEquivalenceUseCase: AppListItemsEquivalenceUseCase,
@@ -68,6 +70,7 @@ class HomeViewModel(
   // Simple menu state management
   var isSearchMenuExpanded: Boolean = false
   var currentSearchQuery: String = ""
+  private var pendingDumpAppsInfoFormat: ExportAppListUseCase.Format = ExportAppListUseCase.Format.PlainText
 
   private val appListChangeRequestQueue = AppListChangeRequestQueue()
   private val featureInitializationController = WorkerFeatureInitializationController()
@@ -284,6 +287,27 @@ class HomeViewModel(
     }
   }
 
+  fun handleAppListSearchQuery(query: String): AppListSearchCommandAction {
+    return when (val result = handleAppListSearchCommandUseCase(query)) {
+      HandleAppListSearchCommandUseCase.Result.None -> AppListSearchCommandAction.None
+
+      HandleAppListSearchCommandUseCase.Result.EasterEgg -> AppListSearchCommandAction.EasterEgg
+
+      HandleAppListSearchCommandUseCase.Result.DebugModeEnabled -> AppListSearchCommandAction.DebugModeEnabled
+
+      HandleAppListSearchCommandUseCase.Result.UserModeEnabled -> AppListSearchCommandAction.UserModeEnabled
+
+      is HandleAppListSearchCommandUseCase.Result.DumpAppsInfo -> {
+        pendingDumpAppsInfoFormat = if (result.saveAsMarkDown) {
+          ExportAppListUseCase.Format.Markdown
+        } else {
+          ExportAppListUseCase.Format.PlainText
+        }
+        AppListSearchCommandAction.DumpAppsInfo(result.fileName)
+      }
+    }
+  }
+
   sealed class Effect {
     data class ReloadApps(val obj: Any? = null) : Effect()
     data class UpdateInitProgress(val progress: Int) : Effect()
@@ -307,15 +331,18 @@ class HomeViewModel(
     data class Content(val plan: BuildAppListUpdatePlanUseCase.Plan) : AppListUpdate
   }
 
-  fun dumpAppsInfo(uri: Uri, saveAsMarkDown: Boolean) {
+  sealed interface AppListSearchCommandAction {
+    data object None : AppListSearchCommandAction
+    data object EasterEgg : AppListSearchCommandAction
+    data object DebugModeEnabled : AppListSearchCommandAction
+    data object UserModeEnabled : AppListSearchCommandAction
+    data class DumpAppsInfo(val fileName: String) : AppListSearchCommandAction
+  }
+
+  fun dumpAppsInfo(uri: Uri) {
     viewModelScope.launch(Dispatchers.IO) {
-      val format = if (saveAsMarkDown) {
-        ExportAppListUseCase.Format.Markdown
-      } else {
-        ExportAppListUseCase.Format.PlainText
-      }
       runCatching {
-        exportAppListToUriUseCase(uri, format)
+        exportAppListToUriUseCase(uri, pendingDumpAppsInfoFormat)
       }.onFailure {
         Timber.e(it)
       }
