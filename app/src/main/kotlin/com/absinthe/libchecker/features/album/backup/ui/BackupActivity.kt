@@ -28,7 +28,6 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.backup.RoomBackup
 import com.absinthe.libchecker.databinding.ActivityBackupBinding
-import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotBackupTarget
 import com.absinthe.libchecker.features.album.backup.SnapshotBackupViewModel
 import com.absinthe.libchecker.features.home.ui.MainActivity
@@ -329,11 +328,11 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
               SnapshotBackupViewModel.RestoreBackupResult.DatabaseBackup -> Unit
 
               is SnapshotBackupViewModel.RestoreBackupResult.ArchiveBackup -> {
-                val restoreResult = result.result
-                if (restoreResult == null) {
+                val summary = result.summary
+                if (summary == null) {
                   context?.showToast("Backup file error")
                 } else {
-                  showRestoreResultDialog(restoreResult)
+                  showRestoreResultDialog(summary)
                 }
               }
             }
@@ -370,15 +369,15 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
       }
     }
 
-    private fun showRestoreResultDialog(result: SnapshotArchiveUseCase.RestoreResult) {
+    private fun showRestoreResultDialog(summary: SnapshotBackupViewModel.ArchiveRestoreSummary) {
       val fragmentContext = context ?: return
       val message = buildString {
-        result.timeStampCounts.forEach {
+        summary.items.forEach {
           append(
             fragmentContext.getString(
               R.string.album_restore_detail,
-              viewModel.getFormatDateString(it.key),
-              it.value.toString()
+              it.formattedTimestamp,
+              it.count.toString()
             )
           )
         }

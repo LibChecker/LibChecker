@@ -81,9 +81,7 @@ class SnapshotBackupViewModel(
           RestoreBackupResult.DatabaseBackup
         }
 
-        SnapshotRestorePlan.ArchiveBackup -> RestoreBackupResult.ArchiveBackup(
-          restoreArchive(uri)
-        )
+        SnapshotRestorePlan.ArchiveBackup -> RestoreBackupResult.ArchiveBackup(restoreArchive(uri))
       }
 
       withContext(Dispatchers.Main) {
@@ -103,7 +101,7 @@ class SnapshotBackupViewModel(
     }
   }
 
-  private suspend fun restoreArchive(uri: Uri): SnapshotArchiveUseCase.RestoreResult? {
+  private suspend fun restoreArchive(uri: Uri): ArchiveRestoreSummary? {
     val result = runCatching {
       restoreSnapshotArchiveFromUriUseCase(uri)
     }.onFailure {
@@ -111,11 +109,18 @@ class SnapshotBackupViewModel(
     }.getOrNull() ?: return null
 
     result.latestTimeStamp?.let(snapshotSelectionUseCase::setCurrentTimestamp)
-    return result
+    return result.toArchiveRestoreSummary()
   }
 
-  fun getFormatDateString(timestamp: Long): String {
-    return formatSnapshotTimestampUseCase(timestamp)
+  private fun SnapshotArchiveUseCase.RestoreResult.toArchiveRestoreSummary(): ArchiveRestoreSummary {
+    return ArchiveRestoreSummary(
+      items = timeStampCounts.map { (timestamp, count) ->
+        ArchiveRestoreSummaryItem(
+          formattedTimestamp = formatSnapshotTimestampUseCase(timestamp),
+          count = count
+        )
+      }
+    )
   }
 
   private fun getRestorePlan(uri: Uri): SnapshotRestorePlan = buildSnapshotRestorePlanUseCase(uri)
@@ -124,7 +129,16 @@ class SnapshotBackupViewModel(
     data object DatabaseBackup : RestoreBackupResult
 
     data class ArchiveBackup(
-      val result: SnapshotArchiveUseCase.RestoreResult?
+      val summary: ArchiveRestoreSummary?
     ) : RestoreBackupResult
   }
+
+  data class ArchiveRestoreSummary(
+    val items: List<ArchiveRestoreSummaryItem>
+  )
+
+  data class ArchiveRestoreSummaryItem(
+    val formattedTimestamp: String,
+    val count: Int
+  )
 }
