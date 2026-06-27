@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.snapshot
+package com.absinthe.libchecker.domain.snapshot.display
 
 import android.content.Context
 import androidx.annotation.DrawableRes

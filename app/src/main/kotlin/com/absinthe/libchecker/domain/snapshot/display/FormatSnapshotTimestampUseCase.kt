@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.snapshot
+package com.absinthe.libchecker.domain.snapshot.display
 
 import java.text.SimpleDateFormat
 import java.util.Date

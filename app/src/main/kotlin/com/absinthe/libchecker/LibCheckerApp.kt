@@ -16,6 +16,7 @@ import com.absinthe.libchecker.di.appModule
 import com.absinthe.libchecker.di.settingsModule
 import com.absinthe.libchecker.di.snapshotBackupModule
 import com.absinthe.libchecker.di.snapshotComparisonModule
+import com.absinthe.libchecker.di.snapshotDisplayModule
 import com.absinthe.libchecker.di.snapshotListModule
 import com.absinthe.libchecker.di.snapshotTimeNodeModule
 import com.absinthe.libchecker.di.snapshotTrackModule
@@ -70,6 +71,7 @@ class LibCheckerApp : Application() {
         appModule,
         snapshotComparisonModule,
         snapshotBackupModule,
+        snapshotDisplayModule,
         snapshotListModule,
         snapshotTimeNodeModule,
         snapshotTrackModule,
