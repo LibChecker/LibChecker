@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.features.album.comparison.ui.ComparisonDashboardStatePlanner
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
@@ -29,7 +30,7 @@ class ComparisonDashboardHalfView(
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
     }
 
-  val tvSnapshotTimestampText =
+  private val tvSnapshotTimestampText =
     AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifBlack)).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -54,7 +55,7 @@ class ComparisonDashboardHalfView(
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
     }
 
-  val tvSnapshotAppsCountText =
+  private val tvSnapshotAppsCountText =
     AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifBlack)).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -84,7 +85,18 @@ class ComparisonDashboardHalfView(
       tvSnapshotAppsCountText.gravity = field
     }
 
-  fun updateContentDescription() {
+  internal fun applySideState(sideState: ComparisonDashboardStatePlanner.SideState) {
+    sideState.timestampText?.let { tvSnapshotTimestampText.text = it }
+    sideState.appsCountText?.let { tvSnapshotAppsCountText.text = it }
+    updateContentDescription()
+  }
+
+  fun setAppsCountText(text: CharSequence) {
+    tvSnapshotAppsCountText.text = text
+    updateContentDescription()
+  }
+
+  private fun updateContentDescription() {
     contentDescription = listOf(
       tvSnapshotTimestampTitle.text,
       tvSnapshotTimestampText.text,

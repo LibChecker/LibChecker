@@ -32,7 +32,6 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotComparisonPlan
 import com.absinthe.libchecker.domain.snapshot.comparison.SnapshotComparisonSide
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
 import com.absinthe.libchecker.features.album.comparison.SnapshotComparisonViewModel
-import com.absinthe.libchecker.features.album.comparison.ui.view.ComparisonDashboardHalfView
 import com.absinthe.libchecker.features.album.comparison.ui.view.ComparisonDashboardView
 import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ENTITY
 import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ICON
@@ -145,21 +144,11 @@ class ComparisonActivity :
         ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
-      container.leftPart.apply {
-        setOnClickListener {
-          if (AntiShakeUtils.isInvalidClick(it)) {
-            return@setOnClickListener
-          }
-          showTimeNodePicker(SnapshotComparisonSide.LEFT)
+      setOnSideClickListener { view, side ->
+        if (AntiShakeUtils.isInvalidClick(view)) {
+          return@setOnSideClickListener
         }
-      }
-      container.rightPart.apply {
-        setOnClickListener {
-          if (AntiShakeUtils.isInvalidClick(it)) {
-            return@setOnClickListener
-          }
-          showTimeNodePicker(SnapshotComparisonSide.RIGHT)
-        }
+        showTimeNodePicker(side)
       }
     }
 
@@ -227,15 +216,10 @@ class ComparisonActivity :
       effect.onEach {
         when (it) {
           is SnapshotComparisonViewModel.Effect.DashboardCountChange -> {
-            if (it.isLeft) {
-              dashboardView.container.leftPart.tvSnapshotAppsCountText.text =
-                it.snapshotCount.toString()
-              dashboardView.container.leftPart.updateContentDescription()
-            } else {
-              dashboardView.container.rightPart.tvSnapshotAppsCountText.text =
-                it.snapshotCount.toString()
-              dashboardView.container.rightPart.updateContentDescription()
-            }
+            dashboardView.setAppsCount(
+              SnapshotComparisonSide.fromIsLeft(it.isLeft),
+              it.snapshotCount
+            )
           }
         }
       }.launchIn(lifecycleScope)
@@ -296,34 +280,32 @@ class ComparisonActivity :
   }
 
   private fun invalidateDashboard() {
-    dashboardView.container.let {
-      it.post {
-        it.leftPart.applyDashboardSideState(
-          ComparisonDashboardStatePlanner.planSideState(
-            input = viewModel.inputs.left,
-            formatTimestamp = viewModel::getFormatDateString
-          ),
-          isLeft = true
+    dashboardView.post {
+      applyDashboardSideState(
+        side = SnapshotComparisonSide.LEFT,
+        sideState = ComparisonDashboardStatePlanner.planSideState(
+          input = viewModel.inputs.left,
+          formatTimestamp = viewModel::getFormatDateString
         )
-        it.rightPart.applyDashboardSideState(
-          ComparisonDashboardStatePlanner.planSideState(
-            input = viewModel.inputs.right,
-            formatTimestamp = viewModel::getFormatDateString
-          ),
-          isLeft = false
+      )
+      applyDashboardSideState(
+        side = SnapshotComparisonSide.RIGHT,
+        sideState = ComparisonDashboardStatePlanner.planSideState(
+          input = viewModel.inputs.right,
+          formatTimestamp = viewModel::getFormatDateString
         )
-      }
+      )
     }
   }
 
-  private fun ComparisonDashboardHalfView.applyDashboardSideState(
-    sideState: ComparisonDashboardStatePlanner.SideState,
-    isLeft: Boolean
+  private fun applyDashboardSideState(
+    side: SnapshotComparisonSide,
+    sideState: ComparisonDashboardStatePlanner.SideState
   ) {
-    sideState.timestampText?.let { tvSnapshotTimestampText.text = it }
-    sideState.appsCountText?.let { tvSnapshotAppsCountText.text = it }
-    sideState.dashboardCountTimestamp?.let { viewModel.getDashboardCount(it, isLeft) }
-    updateContentDescription()
+    dashboardView.applySideState(side, sideState)
+    sideState.dashboardCountTimestamp?.let {
+      viewModel.getDashboardCount(it, side == SnapshotComparisonSide.LEFT)
+    }
   }
 
   private fun compareSelectedItems() = lifecycleScope.launch(Dispatchers.IO) {

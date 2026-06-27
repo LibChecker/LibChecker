@@ -2,8 +2,11 @@ package com.absinthe.libchecker.features.album.comparison.ui.view
 
 import android.content.Context
 import android.view.Gravity
+import android.view.View
 import android.view.ViewGroup
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.snapshot.comparison.SnapshotComparisonSide
+import com.absinthe.libchecker.features.album.comparison.ui.ComparisonDashboardStatePlanner
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
@@ -14,7 +17,7 @@ import com.google.android.material.divider.MaterialDivider
 
 class ComparisonDashboardView(context: Context) : MaterialCardView(context, null, R.style.AlbumMaterialCard) {
 
-  val container = SnapshotDashboardContainerView(context).apply {
+  private val container = SnapshotDashboardContainerView(context).apply {
     layoutParams = ViewGroup.LayoutParams(
       LayoutParams.MATCH_PARENT,
       LayoutParams.WRAP_CONTENT
@@ -34,9 +37,24 @@ class ComparisonDashboardView(context: Context) : MaterialCardView(context, null
     addView(container)
   }
 
-  class SnapshotDashboardContainerView(context: Context) : AViewGroup(context) {
+  fun setOnSideClickListener(listener: (View, SnapshotComparisonSide) -> Unit) {
+    container.setOnSideClickListener(listener)
+  }
 
-    val leftPart = ComparisonDashboardHalfView(context).apply {
+  internal fun applySideState(
+    side: SnapshotComparisonSide,
+    sideState: ComparisonDashboardStatePlanner.SideState
+  ) {
+    container.applySideState(side, sideState)
+  }
+
+  fun setAppsCount(side: SnapshotComparisonSide, snapshotCount: Int) {
+    container.setAppsCount(side, snapshotCount)
+  }
+
+  private class SnapshotDashboardContainerView(context: Context) : AViewGroup(context) {
+
+    private val leftPart = ComparisonDashboardHalfView(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
@@ -44,7 +62,7 @@ class ComparisonDashboardView(context: Context) : MaterialCardView(context, null
       horizontalGravity = Gravity.START
     }
 
-    val rightPart = ComparisonDashboardHalfView(context).apply {
+    private val rightPart = ComparisonDashboardHalfView(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
@@ -64,6 +82,29 @@ class ComparisonDashboardView(context: Context) : MaterialCardView(context, null
       addView(leftPart)
       addView(rightPart)
       addView(divider)
+    }
+
+    fun setOnSideClickListener(listener: (View, SnapshotComparisonSide) -> Unit) {
+      leftPart.setOnClickListener { listener(it, SnapshotComparisonSide.LEFT) }
+      rightPart.setOnClickListener { listener(it, SnapshotComparisonSide.RIGHT) }
+    }
+
+    fun applySideState(
+      side: SnapshotComparisonSide,
+      sideState: ComparisonDashboardStatePlanner.SideState
+    ) {
+      getPart(side).applySideState(sideState)
+    }
+
+    fun setAppsCount(side: SnapshotComparisonSide, snapshotCount: Int) {
+      getPart(side).setAppsCountText(snapshotCount.toString())
+    }
+
+    private fun getPart(side: SnapshotComparisonSide): ComparisonDashboardHalfView {
+      return when (side) {
+        SnapshotComparisonSide.LEFT -> leftPart
+        SnapshotComparisonSide.RIGHT -> rightPart
+      }
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
