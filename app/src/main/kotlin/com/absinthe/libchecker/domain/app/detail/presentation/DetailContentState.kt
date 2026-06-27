@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.applist.detail
+package com.absinthe.libchecker.domain.app.detail.presentation
 
 import android.util.SparseArray
 import androidx.core.util.forEach

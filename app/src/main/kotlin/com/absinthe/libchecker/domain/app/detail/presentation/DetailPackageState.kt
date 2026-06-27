@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.applist.detail
+package com.absinthe.libchecker.domain.app.detail.presentation
 
 import android.content.pm.PackageInfo
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo

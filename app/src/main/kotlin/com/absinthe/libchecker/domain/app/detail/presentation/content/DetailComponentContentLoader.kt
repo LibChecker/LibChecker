@@ -1,9 +1,9 @@
-package com.absinthe.libchecker.features.applist.detail.content
+package com.absinthe.libchecker.domain.app.detail.presentation.content
 
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailComponentChipsUseCase
-import com.absinthe.libchecker.features.applist.detail.DetailContentState
-import com.absinthe.libchecker.features.applist.detail.DetailLoadJobsState
-import com.absinthe.libchecker.features.applist.detail.DetailPackageState
+import com.absinthe.libchecker.domain.app.detail.presentation.DetailContentState
+import com.absinthe.libchecker.domain.app.detail.presentation.DetailLoadJobsState
+import com.absinthe.libchecker.domain.app.detail.presentation.DetailPackageState
 import com.absinthe.libchecker.utils.UiUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

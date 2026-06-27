@@ -1,12 +1,12 @@
-package com.absinthe.libchecker.features.applist.detail.content
+package com.absinthe.libchecker.domain.app.detail.presentation.content
 
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailDexChipsUseCase
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailMetadataChipsUseCase
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailSignatureChipsUseCase
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailStaticLibraryChipsUseCase
-import com.absinthe.libchecker.features.applist.detail.DetailContentState
-import com.absinthe.libchecker.features.applist.detail.DetailLoadJobsState
-import com.absinthe.libchecker.features.applist.detail.DetailPackageState
+import com.absinthe.libchecker.domain.app.detail.presentation.DetailContentState
+import com.absinthe.libchecker.domain.app.detail.presentation.DetailLoadJobsState
+import com.absinthe.libchecker.domain.app.detail.presentation.DetailPackageState
 import kotlinx.coroutines.CoroutineScope
 
 class DetailChipContentLoader(
