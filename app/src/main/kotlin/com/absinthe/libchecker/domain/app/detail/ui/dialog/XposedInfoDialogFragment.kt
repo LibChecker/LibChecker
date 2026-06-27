@@ -7,10 +7,10 @@ import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.action.XposedModuleInfo
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
+import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
 import com.absinthe.libchecker.domain.app.detail.ui.FeaturesDialog
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.node.XposedDetailItem
 import com.absinthe.libchecker.domain.app.detail.ui.view.XposedInfoBottomSheetView
-import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr

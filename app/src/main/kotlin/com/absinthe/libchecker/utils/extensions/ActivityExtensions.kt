@@ -14,13 +14,13 @@ import com.absinthe.libchecker.domain.app.detail.model.DetailExtraBean
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_DETAIL_BEAN
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_LC_ITEM
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
+import com.absinthe.libchecker.domain.app.detail.ui.AppDetailActivity
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.OverlayDetailBottomSheetDialogFragment
 import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_LABEL
 import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_LIST
 import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_NAME
 import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_TYPE
 import com.absinthe.libchecker.domain.statistics.reference.ui.LibReferenceActivity
-import com.absinthe.libchecker.features.applist.detail.ui.AppDetailActivity
 import com.absinthe.libchecker.utils.Toasty
 
 fun FragmentActivity.launchDetailPage(item: LCItem, refName: String? = null, refType: Int = NATIVE, forceDetail: Boolean = false) {

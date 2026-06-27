@@ -6,9 +6,9 @@ import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.domain.app.AppBundleSplitKind
 import com.absinthe.libchecker.domain.app.detail.model.AppBundleItem
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_INFO
+import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
 import com.absinthe.libchecker.domain.app.detail.ui.view.AppBundleBottomSheetView
 import com.absinthe.libchecker.domain.app.detail.ui.view.AppBundleItemView
-import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.launch

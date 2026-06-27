@@ -17,12 +17,12 @@ import com.absinthe.libchecker.domain.app.detail.RelatedAppDisplayData
 import com.absinthe.libchecker.domain.app.detail.action.AppInstallSourceDetails
 import com.absinthe.libchecker.domain.app.detail.action.AppInstalledTimeDisplayData
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
+import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
 import com.absinthe.libchecker.domain.app.detail.ui.binder.RelatedAppItemBinder
 import com.absinthe.libchecker.domain.app.detail.ui.view.AppDexoptItemView
 import com.absinthe.libchecker.domain.app.detail.ui.view.AppInstallSourceBottomSheetView
 import com.absinthe.libchecker.domain.app.detail.ui.view.AppInstallSourceItemView
 import com.absinthe.libchecker.domain.app.detail.ui.view.AppInstallTimeItemView
-import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.ShizukuManager
 import com.absinthe.libchecker.utils.ShizukuManager.Availability

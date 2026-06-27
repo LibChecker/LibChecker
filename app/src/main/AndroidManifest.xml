@@ -54,7 +54,7 @@
         android:resource="@xml/shortcuts" />
     </activity>
     <activity
-      android:name=".features.applist.detail.ui.AppDetailActivity"
+      android:name=".domain.app.detail.ui.AppDetailActivity"
       android:configChanges="orientation"
       android:exported="true"
       android:launchMode="singleTask">
@@ -75,7 +75,7 @@
       </intent-filter>
     </activity>
     <activity
-      android:name=".features.applist.detail.ui.ApkDetailActivity"
+      android:name=".domain.app.detail.ui.ApkDetailActivity"
       android:configChanges="orientation"
       android:exported="true"
       android:label="@string/detail_label"

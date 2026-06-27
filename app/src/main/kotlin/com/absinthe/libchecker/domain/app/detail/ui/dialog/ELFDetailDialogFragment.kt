@@ -6,8 +6,8 @@ import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
+import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
 import com.absinthe.libchecker.domain.app.detail.ui.view.ELFInfoBottomSheetView
-import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView

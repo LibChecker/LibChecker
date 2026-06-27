@@ -8,7 +8,7 @@
     window:clearTop="true">
     <SplitPairFilter
       window:primaryActivityName="com.absinthe.libchecker.domain.home.ui.MainActivity"
-      window:secondaryActivityName="com.absinthe.libchecker.features.applist.detail.ui.AppDetailActivity" />
+      window:secondaryActivityName="com.absinthe.libchecker.domain.app.detail.ui.AppDetailActivity" />
     <SplitPairFilter
       window:primaryActivityName="com.absinthe.libchecker.domain.home.ui.MainActivity"
       window:secondaryActivityName="com.absinthe.libchecker.domain.statistics.reference.ui.LibReferenceActivity" />
@@ -24,10 +24,10 @@
 
     <SplitPairFilter
       window:primaryActivityName="com.absinthe.libchecker.domain.statistics.reference.ui.LibReferenceActivity"
-      window:secondaryActivityName="com.absinthe.libchecker.features.applist.detail.ui.AppDetailActivity" />
+      window:secondaryActivityName="com.absinthe.libchecker.domain.app.detail.ui.AppDetailActivity" />
     <SplitPairFilter
       window:primaryActivityName="com.absinthe.libchecker.domain.snapshot.detail.ui.SnapshotDetailActivity"
-      window:secondaryActivityName="com.absinthe.libchecker.features.applist.detail.ui.AppDetailActivity" />
+      window:secondaryActivityName="com.absinthe.libchecker.domain.app.detail.ui.AppDetailActivity" />
 
     <SplitPairFilter
       window:primaryActivityName="com.absinthe.libchecker.domain.snapshot.album.ui.AlbumActivity"

@@ -2,11 +2,11 @@ package com.absinthe.libchecker.domain.app.detail.ui.controller
 
 import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.detail.model.LocatedCount
+import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
 import com.absinthe.libchecker.domain.app.detail.ui.DetailFragmentManager
 import com.absinthe.libchecker.domain.app.detail.ui.DetailProcessBarController
 import com.absinthe.libchecker.domain.app.detail.ui.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.domain.app.detail.ui.MODE_SORT_BY_SIZE
-import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import kotlinx.coroutines.CoroutineScope
 

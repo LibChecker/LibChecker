@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.applist.detail.ui
+package com.absinthe.libchecker.domain.app.detail.ui
 
 import android.content.pm.PackageInfo
 import android.os.Bundle
@@ -17,6 +17,7 @@ import com.absinthe.libchecker.domain.app.detail.content.BuildAppDetailContentIn
 import com.absinthe.libchecker.domain.app.detail.content.BuildAppDetailTabTypesUseCase
 import com.absinthe.libchecker.domain.app.detail.model.DetailExtraBean
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
+import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
 import com.absinthe.libchecker.domain.app.detail.ui.DetailAbiLabelBinder
 import com.absinthe.libchecker.domain.app.detail.ui.DetailFeatureListController
 import com.absinthe.libchecker.domain.app.detail.ui.DetailFragmentManager
@@ -36,7 +37,6 @@ import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailPackageCont
 import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailStateObserverController
 import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailTabController
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.AppInfoBottomSheetDialogFragment
-import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.utils.extensions.addBackStateHandler
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
