@@ -76,8 +76,6 @@ class AppListFragment :
   private var isFirstRequestChange = true
   private var isSearchTextClearOnce = false
   private var firstScrollFlag = false
-  private var hasUserScrolledList = false
-  private var pendingReturnTopAfterRequestChange = false
   private var hasInitializedItems = false
 
   private lateinit var layoutManager: RecyclerView.LayoutManager
@@ -86,6 +84,7 @@ class AppListFragment :
 
   override fun init() {
     val context = (context as? BaseActivity<*>) ?: return
+    homeViewModel.onAppListViewCreated()
     appAdapter.also {
       it.setOnItemClickListener { _, view, position ->
         if (AntiShakeUtils.isInvalidClick(view)) {
@@ -125,7 +124,7 @@ class AppListFragment :
         addOnScrollListener(object : RecyclerView.OnScrollListener() {
           override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
-              hasUserScrolledList = true
+              homeViewModel.onAppListUserScrolled()
             }
           }
 
@@ -416,7 +415,6 @@ class AppListFragment :
           }
 
           is HomeViewModel.Effect.RefreshList -> {
-            pendingReturnTopAfterRequestChange = true
             updateItems()
           }
         }
@@ -460,9 +458,7 @@ class AppListFragment :
       keyword = keyword,
       isCurrentProcess64Bit = android.os.Process.is64Bit(),
       currentItems = currentItems,
-      pendingReturnTopAfterRequestChange = pendingReturnTopAfterRequestChange,
-      highlightRefresh = highlightRefresh,
-      hasUserScrolledList = hasUserScrolledList
+      highlightRefresh = highlightRefresh
     )
     val updatePlan = when (update) {
       HomeViewModel.AppListUpdate.OnlySelf -> {
@@ -484,9 +480,7 @@ class AppListFragment :
       appAdapter.apply {
         particleItemAnimator.prepareParticleRemovals(updatePlan.particleRemovalItemIds)
         setItemViewStates(updatePlan.content.itemViewStates)
-        if (updatePlan.shouldClearPendingReturnTopAfterRequestChange) {
-          pendingReturnTopAfterRequestChange = false
-        }
+        homeViewModel.onAppListUpdatePlanApplied(updatePlan)
 
         setDiffNewData(updatePlan.content.items.toMutableList()) {
           if (isDetached || !isBindingInitialized()) {

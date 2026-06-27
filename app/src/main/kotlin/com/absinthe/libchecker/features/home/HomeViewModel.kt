@@ -71,6 +71,8 @@ class HomeViewModel(
   var isSearchMenuExpanded: Boolean = false
   var currentSearchQuery: String = ""
   private var pendingDumpAppsInfoFormat: ExportAppListUseCase.Format = ExportAppListUseCase.Format.PlainText
+  private var pendingReturnTopAfterRequestChange = false
+  private var hasUserScrolledAppList = false
 
   private val appListChangeRequestQueue = AppListChangeRequestQueue()
   private val featureInitializationController = WorkerFeatureInitializationController()
@@ -86,6 +88,7 @@ class HomeViewModel(
   }
 
   private fun refreshList() {
+    pendingReturnTopAfterRequestChange = true
     setEffect {
       Effect.RefreshList()
     }
@@ -137,9 +140,7 @@ class HomeViewModel(
     keyword: String,
     isCurrentProcess64Bit: Boolean,
     currentItems: List<LCItem>,
-    pendingReturnTopAfterRequestChange: Boolean,
-    highlightRefresh: Boolean,
-    hasUserScrolledList: Boolean
+    highlightRefresh: Boolean
   ): AppListUpdate {
     val content = getAppListContentUseCase(
       GetAppListContentUseCase.Request(
@@ -158,7 +159,7 @@ class HomeViewModel(
               content = content,
               pendingReturnTopAfterRequestChange = pendingReturnTopAfterRequestChange,
               highlightRefresh = highlightRefresh,
-              hasUserScrolledList = hasUserScrolledList
+              hasUserScrolledList = hasUserScrolledAppList
             )
           )
         )
@@ -168,6 +169,21 @@ class HomeViewModel(
 
   suspend fun isOnlySelfAppInDatabase(): Boolean {
     return getAppListContentUseCase.isOnlySelfAppInDatabase()
+  }
+
+  fun onAppListUserScrolled() {
+    hasUserScrolledAppList = true
+  }
+
+  fun onAppListViewCreated() {
+    pendingReturnTopAfterRequestChange = false
+    hasUserScrolledAppList = false
+  }
+
+  fun onAppListUpdatePlanApplied(plan: BuildAppListUpdatePlanUseCase.Plan) {
+    if (plan.shouldClearPendingReturnTopAfterRequestChange) {
+      pendingReturnTopAfterRequestChange = false
+    }
   }
 
   fun getAppListAdvancedMenuState(): AppListAdvancedMenuState {
