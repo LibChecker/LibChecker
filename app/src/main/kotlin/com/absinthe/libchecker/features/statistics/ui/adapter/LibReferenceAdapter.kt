@@ -15,6 +15,7 @@ class LibReferenceAdapter(
   private val onDetailIconClick: (LibReference) -> Unit
 ) : BaseNodeAdapter() {
 
+  var highlightText: String = ""
   var colorfulRuleIcon: Boolean = initialColorfulRuleIcon
     private set
 
@@ -22,10 +23,11 @@ class LibReferenceAdapter(
     addNodeProvider(
       LibReferenceProvider(
         colorfulRuleIcon = { colorfulRuleIcon },
+        highlightText = { highlightText },
         onDetailIconClick = onDetailIconClick
       )
     )
-    addNodeProvider(MultipleAppsIconProvider())
+    addNodeProvider(MultipleAppsIconProvider(highlightText = { highlightText }))
   }
 
   fun updateColorfulRuleIcon(enabled: Boolean) {
@@ -43,9 +45,5 @@ class LibReferenceAdapter(
       PACKAGE, SHARED_UID -> MULTIPLE_APPS_ICON_PROVIDER
       else -> LIB_REFERENCE_PROVIDER
     }
-  }
-
-  companion object {
-    var highlightText: String = String()
   }
 }

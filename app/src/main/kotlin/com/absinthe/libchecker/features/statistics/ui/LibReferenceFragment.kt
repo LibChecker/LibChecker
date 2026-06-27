@@ -318,9 +318,9 @@ class LibReferenceFragment :
   }
 
   override fun onQueryTextChange(newText: String): Boolean {
-    if (LibReferenceAdapter.highlightText != newText) {
+    if (refAdapter.highlightText != newText) {
       isSearchTextClearOnce = newText.isEmpty()
-      LibReferenceAdapter.highlightText = newText
+      refAdapter.highlightText = newText
 
       searchUpdateJob?.cancel()
       searchUpdateJob = lifecycleScope.launch {
@@ -334,7 +334,7 @@ class LibReferenceFragment :
             progressBarShown = true
           }
           val searchResult = libReferenceViewModel.buildSearchResult(newText) ?: return@launch
-          LibReferenceAdapter.highlightText = newText
+          refAdapter.highlightText = newText
 
           if (!isActive) {
             return@launch

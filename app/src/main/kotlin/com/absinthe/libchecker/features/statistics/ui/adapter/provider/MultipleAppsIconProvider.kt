@@ -8,7 +8,6 @@ import androidx.core.text.italic
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.PACKAGE
 import com.absinthe.libchecker.features.statistics.bean.LibReference
-import com.absinthe.libchecker.features.statistics.ui.adapter.LibReferenceAdapter
 import com.absinthe.libchecker.features.statistics.ui.view.MultipleAppsIconItemView
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.tintHighlightText
@@ -18,7 +17,9 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
 const val MULTIPLE_APPS_ICON_PROVIDER = 1
 
-class MultipleAppsIconProvider : BaseNodeProvider() {
+class MultipleAppsIconProvider(
+  private val highlightText: () -> String
+) : BaseNodeProvider() {
 
   override val itemViewType: Int = MULTIPLE_APPS_ICON_PROVIDER
   override val layoutId: Int = 0
@@ -68,8 +69,9 @@ class MultipleAppsIconProvider : BaseNodeProvider() {
   }
 
   private fun setOrHighlightText(view: TextView, text: CharSequence) {
-    if (LibReferenceAdapter.highlightText.isNotBlank()) {
-      view.tintHighlightText(LibReferenceAdapter.highlightText, text)
+    val keyword = highlightText()
+    if (keyword.isNotBlank()) {
+      view.tintHighlightText(keyword, text)
     } else {
       view.text = text
     }

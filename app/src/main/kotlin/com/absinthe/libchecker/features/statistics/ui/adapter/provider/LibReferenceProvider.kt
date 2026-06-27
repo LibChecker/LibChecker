@@ -13,7 +13,6 @@ import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.isComponentType
 import com.absinthe.libchecker.features.statistics.bean.LibReference
-import com.absinthe.libchecker.features.statistics.ui.adapter.LibReferenceAdapter
 import com.absinthe.libchecker.features.statistics.ui.view.LibReferenceItemView
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.tintHighlightText
@@ -26,6 +25,7 @@ const val LIB_REFERENCE_PROVIDER = 0
 
 class LibReferenceProvider(
   private val colorfulRuleIcon: () -> Boolean,
+  private val highlightText: () -> String,
   private val onDetailIconClick: (LibReference) -> Unit
 ) : BaseNodeProvider() {
 
@@ -114,8 +114,9 @@ class LibReferenceProvider(
   }
 
   private fun setOrHighlightText(view: TextView, text: CharSequence) {
-    if (LibReferenceAdapter.highlightText.isNotBlank()) {
-      view.tintHighlightText(LibReferenceAdapter.highlightText, text)
+    val keyword = highlightText()
+    if (keyword.isNotBlank()) {
+      view.tintHighlightText(keyword, text)
     } else {
       view.text = text
     }
