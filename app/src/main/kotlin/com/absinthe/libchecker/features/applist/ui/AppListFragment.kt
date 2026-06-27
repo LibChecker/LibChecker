@@ -27,7 +27,7 @@ import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.domain.app.BuildAppListUpdatePlanUseCase
 import com.absinthe.libchecker.domain.app.GetAppListContentUseCase
 import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
-import com.absinthe.libchecker.domain.settings.DeveloperSettingsRepository
+import com.absinthe.libchecker.domain.app.search.HandleAppListSearchCommandUseCase
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.features.applist.ui.adapter.AppAdapter
 import com.absinthe.libchecker.features.applist.ui.adapter.AppListDiffUtil
@@ -46,9 +46,6 @@ import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -74,7 +71,7 @@ class AppListFragment :
 
   private val isFirstLaunch get() = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
   private val getRandomAppIcon: GetRandomAppIconUseCase by inject()
-  private val developerSettingsRepository: DeveloperSettingsRepository by inject()
+  private val handleAppListSearchCommand: HandleAppListSearchCommandUseCase by inject()
   private val buildAppListUpdatePlan: BuildAppListUpdatePlanUseCase by inject()
   private val appAdapter = AppAdapter()
   private val particleItemAnimator = ParticleRemoveItemAnimator()
@@ -256,8 +253,10 @@ class AppListFragment :
       appAdapter.highlightText = newText
       updateItems(highlightRefresh = true)
 
-      when {
-        newText.equals("Easter Egg", true) -> {
+      when (val result = handleAppListSearchCommand(newText)) {
+        HandleAppListSearchCommandUseCase.Result.None -> Unit
+
+        HandleAppListSearchCommandUseCase.Result.EasterEgg -> {
           context?.showToast("🥚")
           Telemetry.recordEvent(
             Constants.Event.EASTER_EGG,
@@ -265,41 +264,22 @@ class AppListFragment :
           )
         }
 
-        newText == Constants.COMMAND_DEBUG_MODE -> {
-          developerSettingsRepository.debugMode = true
+        HandleAppListSearchCommandUseCase.Result.DebugModeEnabled -> {
           context?.showToast("DEBUG MODE")
         }
 
-        newText == Constants.COMMAND_USER_MODE -> {
-          developerSettingsRepository.debugMode = false
+        HandleAppListSearchCommandUseCase.Result.UserModeEnabled -> {
           context?.showToast("USER MODE")
         }
 
-        newText == Constants.COMMAND_DUMP_APPS_INFO_TXT -> {
-          dumpAppsInfoAsMarkDown = false
+        is HandleAppListSearchCommandUseCase.Result.DumpAppsInfo -> {
+          dumpAppsInfoAsMarkDown = result.saveAsMarkDown
           runCatching {
-            val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd, HH:mm:ss", Locale.getDefault())
-            val formattedTime = simpleDateFormat.format(Date(System.currentTimeMillis()))
-            dumpAppsInfoResultLauncher.launch("LibChecker-Dump-Apps-Info-$formattedTime.txt")
+            dumpAppsInfoResultLauncher.launch(result.fileName)
           }.onFailure {
             Timber.e(it)
             context?.showToast("Document API not working")
           }
-        }
-
-        newText == Constants.COMMAND_DUMP_APPS_INFO_MD -> {
-          dumpAppsInfoAsMarkDown = true
-          runCatching {
-            val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd, HH:mm:ss", Locale.getDefault())
-            val formattedTime = simpleDateFormat.format(Date(System.currentTimeMillis()))
-            dumpAppsInfoResultLauncher.launch("LibChecker-Dump-Apps-Info-$formattedTime.md")
-          }.onFailure {
-            Timber.e(it)
-            context?.showToast("Document API not working")
-          }
-        }
-
-        else -> {
         }
       }
     }

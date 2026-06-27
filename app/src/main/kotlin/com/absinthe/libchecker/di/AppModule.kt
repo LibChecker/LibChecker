@@ -113,6 +113,7 @@ import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailStaticLibra
 import com.absinthe.libchecker.domain.app.detail.content.SortAppDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.detail.feature.BuildAppDetailFeatureItemUseCase
 import com.absinthe.libchecker.domain.app.detail.navigation.BuildDetailReferenceNavigationUseCase
+import com.absinthe.libchecker.domain.app.search.HandleAppListSearchCommandUseCase
 import com.absinthe.libchecker.domain.app.update.AppUpdateRepository
 import com.absinthe.libchecker.domain.app.update.BuildInAppUpdateDiffDataUseCase
 import com.absinthe.libchecker.domain.rules.CloudRulesRepository
@@ -295,6 +296,7 @@ val appModule = module {
   factory { ResolveAppResourceValueUseCase(androidContext().packageManager) }
   factory { GetApkPreviewInfoUseCase() }
   factory { GetAppListContentUseCase(BuildConfig.APPLICATION_ID, get(), get(), get(), get()) }
+  factory { HandleAppListSearchCommandUseCase(get()) }
   factory { GetAppListPackageStatesUseCase(get()) }
   factory { BuildAppDetailAbiLabelDataUseCase(androidContext()) }
   factory { BuildAppDetailFeatureItemUseCase() }
