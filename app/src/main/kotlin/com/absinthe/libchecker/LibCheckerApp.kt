@@ -21,6 +21,8 @@ import com.absinthe.libchecker.di.snapshotDisplayModule
 import com.absinthe.libchecker.di.snapshotListModule
 import com.absinthe.libchecker.di.snapshotTimeNodeModule
 import com.absinthe.libchecker.di.snapshotTrackModule
+import com.absinthe.libchecker.di.statisticsChartModule
+import com.absinthe.libchecker.di.statisticsReferenceModule
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.UiUtils
@@ -77,6 +79,8 @@ class LibCheckerApp : Application() {
         snapshotListModule,
         snapshotTimeNodeModule,
         snapshotTrackModule,
+        statisticsChartModule,
+        statisticsReferenceModule,
         settingsModule
       )
     }

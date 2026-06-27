@@ -13,9 +13,6 @@ import com.absinthe.libchecker.data.app.WorkerFeatureInitializationRepository
 import com.absinthe.libchecker.data.app.update.AndroidAppUpdateRepository
 import com.absinthe.libchecker.data.rules.AndroidCloudRulesRepository
 import com.absinthe.libchecker.data.rules.GlobalRuleSettingsRepository
-import com.absinthe.libchecker.data.statistics.CachedAndroidDistributionRepository
-import com.absinthe.libchecker.data.statistics.GlobalChartSettingsRepository
-import com.absinthe.libchecker.data.statistics.GlobalLibReferenceSettingsRepository
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
@@ -113,27 +110,6 @@ import com.absinthe.libchecker.domain.app.update.BuildInAppUpdateDiffDataUseCase
 import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
 import com.absinthe.libchecker.domain.rules.CloudRulesRepository
 import com.absinthe.libchecker.domain.rules.RuleSettingsRepository
-import com.absinthe.libchecker.domain.statistics.chart.presentation.ChartViewModel
-import com.absinthe.libchecker.domain.statistics.chart.repository.AndroidDistributionRepository
-import com.absinthe.libchecker.domain.statistics.chart.repository.ChartSettingsRepository
-import com.absinthe.libchecker.domain.statistics.chart.source.ChartDataProvider
-import com.absinthe.libchecker.domain.statistics.chart.source.ChartDataSourceFactory
-import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildAbiChartDataUseCase
-import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildApiLevelChartDataUseCase
-import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildDetailedAbiChartDataUseCase
-import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildFeatureFlagChartDataUseCase
-import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildPageSize16KBChartDataUseCase
-import com.absinthe.libchecker.domain.statistics.chart.usecase.GetAndroidDistributionUseCase
-import com.absinthe.libchecker.domain.statistics.chart.usecase.ObserveChartFeatureInitializationPlansUseCase
-import com.absinthe.libchecker.domain.statistics.reference.presentation.LibReferenceComputationController
-import com.absinthe.libchecker.domain.statistics.reference.presentation.LibReferenceViewModel
-import com.absinthe.libchecker.domain.statistics.reference.repository.LibReferenceSettingsRepository
-import com.absinthe.libchecker.domain.statistics.reference.usecase.BuildLibReferenceDetailDialogRequestUseCase
-import com.absinthe.libchecker.domain.statistics.reference.usecase.ComputeLibReferenceUseCase
-import com.absinthe.libchecker.domain.statistics.reference.usecase.GetLibReferenceAppsUseCase
-import com.absinthe.libchecker.domain.statistics.reference.usecase.GetLibReferenceConfigUseCase
-import com.absinthe.libchecker.domain.statistics.reference.usecase.GetLibReferenceIconPackagesUseCase
-import com.absinthe.libchecker.domain.statistics.reference.usecase.UpdateLibReferenceThresholdUseCase
 import jonathanfinerty.once.Once
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
@@ -149,30 +125,13 @@ val appModule = module {
   single<CloudRulesRepository> { AndroidCloudRulesRepository(androidContext()) }
   single<RuleSettingsRepository> { GlobalRuleSettingsRepository() }
   single<AppUpdateRepository> { AndroidAppUpdateRepository(SystemServices.downloadManager) }
-  single<AndroidDistributionRepository> { CachedAndroidDistributionRepository(androidContext()) }
   single<AppListItemFactory> { AndroidAppListItemFactory(androidContext()) }
   single<AppListExportMetadata> { AndroidAppListExportMetadata(androidContext()) }
   single<FeatureInitializationRepository> { WorkerFeatureInitializationRepository() }
-  single<ChartSettingsRepository> { GlobalChartSettingsRepository() }
-  single<LibReferenceSettingsRepository> { GlobalLibReferenceSettingsRepository() }
   single { AllowFileUriExposureUseCase() }
   factory { InitializeAppListUseCase(get(), get(), get()) }
   factory { ObserveAppListLoadingUseCase(get()) }
   factory { SyncAppListChangesUseCase(get(), get(), get()) }
-  factory { BuildAbiChartDataUseCase() }
-  factory { BuildApiLevelChartDataUseCase(get()) }
-  factory { BuildDetailedAbiChartDataUseCase(androidContext(), get()) }
-  factory { BuildFeatureFlagChartDataUseCase() }
-  factory { BuildPageSize16KBChartDataUseCase(get()) }
-  factory { ComputeLibReferenceUseCase(get()) }
-  factory { GetAndroidDistributionUseCase(get()) }
-  factory { GetLibReferenceConfigUseCase(get()) }
-  factory { GetLibReferenceIconPackagesUseCase(get()) }
-  factory { GetLibReferenceAppsUseCase(get()) }
-  factory { BuildLibReferenceDetailDialogRequestUseCase() }
-  factory { ObserveChartFeatureInitializationPlansUseCase(get()) }
-  factory { UpdateLibReferenceThresholdUseCase(get()) }
-  factory { LibReferenceComputationController.Factory(get(), get(), get()) }
   factory { ExportAppListUseCase(get(), get()) }
   factory { ExportAppListToUriUseCase(androidContext().contentResolver, get()) }
   factory { BuildAppDetailContentInitPlanUseCase() }
@@ -331,29 +290,6 @@ val appModule = module {
       buildPackageComparisonSnapshotItemUseCase = get()
     )
   }
-  factory {
-    ChartDataProvider(
-      buildAppListItemViewStatesUseCase = get(),
-      buildAbiChartDataUseCase = get(),
-      buildApiLevelChartDataUseCase = get(),
-      buildDetailedAbiChartDataUseCase = get(),
-      buildFeatureFlagChartDataUseCase = get(),
-      buildPageSize16KBChartDataUseCase = get(),
-      getAndroidDistributionUseCase = get(),
-      chartSettingsRepository = get()
-    )
-  }
-  factory { ChartDataSourceFactory(get()) }
-
-  viewModel {
-    ChartViewModel(
-      appListRepository = get(),
-      chartDataProvider = get(),
-      chartDataSourceFactory = get(),
-      chartSettingsRepository = get(),
-      observeChartFeatureInitializationPlans = get()
-    )
-  }
   viewModel {
     DetailViewModel(
       detailActionLoader = get(),
@@ -377,16 +313,6 @@ val appModule = module {
       clearApkCacheUseCase = get(),
       appListItemsEquivalenceUseCase = get(),
       observeAppListLoadingUseCase = get()
-    )
-  }
-  viewModel {
-    LibReferenceViewModel(
-      appListRepository = get(),
-      buildAppListItemViewStatesUseCase = get(),
-      getLibReferenceAppsUseCase = get(),
-      buildLibReferenceDetailDialogRequestUseCase = get(),
-      libReferenceSettingsRepository = get(),
-      libReferenceComputationControllerFactory = get()
     )
   }
 }
