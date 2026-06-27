@@ -144,8 +144,36 @@ class HomeViewModel(
     return getAppListContentUseCase.isOnlySelfAppInDatabase()
   }
 
-  suspend fun notifyAppListDisplayOptionsChanged(diff: Int) {
-    appListSettingsRepository.notifyDisplayOptionsChanged(diff)
+  fun getAppListAdvancedMenuState(): AppListAdvancedMenuState {
+    return AppListAdvancedMenuState(
+      displayOptions = appListSettingsRepository.displayOptions,
+      itemDisplayOptions = appListSettingsRepository.itemDisplayOptions,
+      colorfulRuleIcon = appListSettingsRepository.colorfulRuleIcon
+    )
+  }
+
+  fun setAppListDisplayOptions(options: Int): Int {
+    appListSettingsRepository.setDisplayOptions(options)
+    return options
+  }
+
+  fun setAppListItemDisplayOptions(options: Int): Int {
+    appListSettingsRepository.setItemDisplayOptions(options)
+    return options
+  }
+
+  fun onAppListAdvancedMenuDismissed(
+    displayOptionsDiff: Int,
+    itemDisplayOptionsDiff: Int
+  ): AppListAdvancedMenuDismissPlan {
+    if (displayOptionsDiff > 0) {
+      viewModelScope.launch {
+        appListSettingsRepository.notifyDisplayOptionsChanged(displayOptionsDiff)
+      }
+    }
+    return AppListAdvancedMenuDismissPlan(
+      shouldRefreshItems = displayOptionsDiff > 0 || itemDisplayOptionsDiff > 0
+    )
   }
 
   private var initJob: Job? = null
@@ -240,6 +268,16 @@ class HomeViewModel(
     data class PackageChanged(val packageChangeState: PackageChangeState) : Effect()
     data class RefreshList(val obj: Any? = null) : Effect()
   }
+
+  data class AppListAdvancedMenuState(
+    val displayOptions: Int,
+    val itemDisplayOptions: Int,
+    val colorfulRuleIcon: Boolean
+  )
+
+  data class AppListAdvancedMenuDismissPlan(
+    val shouldRefreshItems: Boolean
+  )
 
   fun dumpAppsInfo(uri: Uri, saveAsMarkDown: Boolean) {
     viewModelScope.launch(Dispatchers.IO) {

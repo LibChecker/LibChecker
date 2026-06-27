@@ -318,14 +318,20 @@ class AppListFragment :
         activity?.let {
           advancedMenuBSDFragment?.dismiss()
           advancedMenuBSDFragment = AdvancedMenuBSDFragment().apply {
+            val menuState = homeViewModel.getAppListAdvancedMenuState()
+            setOptionChangeListener(
+              displayOptions = menuState.displayOptions,
+              itemDisplayOptions = menuState.itemDisplayOptions,
+              colorfulRuleIcon = menuState.colorfulRuleIcon,
+              onDisplayOptionsChanged = homeViewModel::setAppListDisplayOptions,
+              onItemDisplayOptionsChanged = homeViewModel::setAppListItemDisplayOptions
+            )
             setOnDismissListener { advancedDiff, itemAdvancedDiff ->
-              if (advancedDiff > 0) {
-                lifecycleScope.launch {
-                  homeViewModel.notifyAppListDisplayOptionsChanged(advancedDiff)
-                }
-              }
-
-              if (advancedDiff > 0 || itemAdvancedDiff > 0) {
+              val dismissPlan = homeViewModel.onAppListAdvancedMenuDismissed(
+                displayOptionsDiff = advancedDiff,
+                itemDisplayOptionsDiff = itemAdvancedDiff
+              )
+              if (dismissPlan.shouldRefreshItems) {
                 //noinspection NotifyDataSetChanged
                 appAdapter.notifyDataSetChanged()
               }

@@ -4,18 +4,14 @@ import android.content.DialogInterface
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.AdvancedOptions
-import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.features.applist.ui.view.AdvancedMenuBSDView
 import com.absinthe.libchecker.features.applist.ui.view.AdvancedMenuItemView
 import com.absinthe.libchecker.features.applist.ui.view.AdvancedMenuSection
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
-import org.koin.android.ext.android.inject
 
 class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBSDView>() {
-
-  private val appListSettingsRepository: AppListSettingsRepository by inject()
 
   private var previousAdvancedOptions = 0
   private var previousItemAdvancedOptions = 0
@@ -25,18 +21,22 @@ class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBS
   private val itemOptionsViewMap = mutableMapOf<Int, AdvancedMenuItemView>()
 
   private var onDismissCallback: ((advancedDiff: Int, itemAdvancedDiff: Int) -> Unit)? = null
+  private var currentColorfulRuleIcon = true
+  private var onDisplayOptionsChanged: (Int) -> Int = {
+    currentAdvancedOptions = it
+    it
+  }
+  private var onItemDisplayOptionsChanged: (Int) -> Int = {
+    currentItemAdvancedOptions = it
+    it
+  }
 
   override fun initRootView(): AdvancedMenuBSDView {
-    currentAdvancedOptions = appListSettingsRepository.displayOptions
-    currentItemAdvancedOptions = appListSettingsRepository.itemDisplayOptions
-    previousAdvancedOptions = currentAdvancedOptions
-    previousItemAdvancedOptions = currentItemAdvancedOptions
-
     return AdvancedMenuBSDView(
       context = requireContext(),
       displayOptions = currentAdvancedOptions,
       itemDisplayOptions = currentItemAdvancedOptions,
-      colorfulRuleIcon = appListSettingsRepository.colorfulRuleIcon,
+      colorfulRuleIcon = currentColorfulRuleIcon,
       onSortOptionsChanged = ::setAdvancedOptions
     )
   }
@@ -92,7 +92,7 @@ class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBS
       isChecked = currentItemAdvancedOptions.hasOption(option)
     ) { isChecked ->
       currentItemAdvancedOptions = currentItemAdvancedOptions.withOption(option, isChecked)
-      appListSettingsRepository.setItemDisplayOptions(currentItemAdvancedOptions)
+      currentItemAdvancedOptions = onItemDisplayOptionsChanged(currentItemAdvancedOptions)
       root.updateItemDemoView(currentItemAdvancedOptions)
       Telemetry.recordEvent(
         Constants.Event.APP_LIST_ADVANCED_MENU_ITEM_CHANGED,
@@ -102,8 +102,7 @@ class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBS
   }
 
   private fun setAdvancedOptions(options: Int) {
-    currentAdvancedOptions = options
-    appListSettingsRepository.setDisplayOptions(options)
+    currentAdvancedOptions = onDisplayOptionsChanged(options)
   }
 
   override fun onDestroyView() {
@@ -121,6 +120,22 @@ class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBS
 
   fun setOnDismissListener(action: (advancedDiff: Int, itemAdvancedDiff: Int) -> Unit) {
     onDismissCallback = action
+  }
+
+  fun setOptionChangeListener(
+    displayOptions: Int,
+    itemDisplayOptions: Int,
+    colorfulRuleIcon: Boolean,
+    onDisplayOptionsChanged: (Int) -> Int,
+    onItemDisplayOptionsChanged: (Int) -> Int
+  ) {
+    previousAdvancedOptions = displayOptions
+    previousItemAdvancedOptions = itemDisplayOptions
+    currentAdvancedOptions = displayOptions
+    currentItemAdvancedOptions = itemDisplayOptions
+    currentColorfulRuleIcon = colorfulRuleIcon
+    this.onDisplayOptionsChanged = onDisplayOptionsChanged
+    this.onItemDisplayOptionsChanged = onItemDisplayOptionsChanged
   }
 }
 
