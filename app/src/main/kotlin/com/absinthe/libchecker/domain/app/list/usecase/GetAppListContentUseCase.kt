@@ -1,8 +1,9 @@
-package com.absinthe.libchecker.domain.app
+package com.absinthe.libchecker.domain.app.list.usecase
 
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.app.AppListRepository
+import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.list.model.AppListItemViewState
-import com.absinthe.libchecker.domain.app.list.usecase.BuildAppListItemViewStatesUseCase
 
 class GetAppListContentUseCase(
   private val ownPackageName: String,

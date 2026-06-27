@@ -37,11 +37,9 @@ import com.absinthe.libchecker.database.backup.RoomBackup
 import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.AppListExportMetadata
 import com.absinthe.libchecker.domain.app.AppListItemFactory
-import com.absinthe.libchecker.domain.app.AppListItemsEquivalenceUseCase
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.BuildAppExportNativeLibrariesUseCase
-import com.absinthe.libchecker.domain.app.BuildAppListUpdatePlanUseCase
 import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.CheckRequiredPackageAvailabilityUseCase
 import com.absinthe.libchecker.domain.app.ClearApkCacheUseCase
@@ -49,11 +47,9 @@ import com.absinthe.libchecker.domain.app.ExportAppListToUriUseCase
 import com.absinthe.libchecker.domain.app.ExportAppListUseCase
 import com.absinthe.libchecker.domain.app.ExportInstalledAppsToUriUseCase
 import com.absinthe.libchecker.domain.app.FeatureInitializationRepository
-import com.absinthe.libchecker.domain.app.FilterAppListItemsUseCase
 import com.absinthe.libchecker.domain.app.GetApkPreviewInfoUseCase
 import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageUseCase
-import com.absinthe.libchecker.domain.app.GetAppListContentUseCase
 import com.absinthe.libchecker.domain.app.GetArchivePackageInfoUseCase
 import com.absinthe.libchecker.domain.app.GetInstalledAppComparisonPackageUseCase
 import com.absinthe.libchecker.domain.app.GetLibraryDetailUseCase
@@ -121,7 +117,11 @@ import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailComp
 import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailContentLoader
 import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailNativeLibContentLoader
 import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailPermissionContentLoader
+import com.absinthe.libchecker.domain.app.list.usecase.AppListItemsEquivalenceUseCase
 import com.absinthe.libchecker.domain.app.list.usecase.BuildAppListItemViewStatesUseCase
+import com.absinthe.libchecker.domain.app.list.usecase.BuildAppListUpdatePlanUseCase
+import com.absinthe.libchecker.domain.app.list.usecase.FilterAppListItemsUseCase
+import com.absinthe.libchecker.domain.app.list.usecase.GetAppListContentUseCase
 import com.absinthe.libchecker.domain.app.list.usecase.GetAppListPackageStatesUseCase
 import com.absinthe.libchecker.domain.app.search.HandleAppListSearchCommandUseCase
 import com.absinthe.libchecker.domain.app.update.AppUpdateRepository
