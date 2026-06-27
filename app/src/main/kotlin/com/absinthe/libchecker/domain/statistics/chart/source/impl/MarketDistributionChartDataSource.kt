@@ -3,10 +3,10 @@ package com.absinthe.libchecker.domain.statistics.chart.source.impl
 import android.content.Context
 import com.absinthe.libchecker.api.bean.AndroidDistribution
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.statistics.AndroidDistributionChartData
 import com.absinthe.libchecker.domain.statistics.chart.source.BaseVariableChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.source.OsVersionAxisFormatter
 import com.absinthe.libchecker.domain.statistics.chart.source.PercentageFormatter
+import com.absinthe.libchecker.domain.statistics.chart.usecase.AndroidDistributionChartData
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import info.appdev.charting.charts.BarChart

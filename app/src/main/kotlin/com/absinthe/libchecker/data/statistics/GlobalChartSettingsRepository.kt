@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.data.statistics
 
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.domain.statistics.ChartSettingsRepository
+import com.absinthe.libchecker.domain.statistics.chart.repository.ChartSettingsRepository
 
 class GlobalChartSettingsRepository : ChartSettingsRepository {
   override val appListDisplayOptions: Int

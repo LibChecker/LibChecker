@@ -1,9 +1,6 @@
 package com.absinthe.libchecker.domain.statistics.chart.source
 
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.statistics.BuildApiLevelChartDataUseCase
-import com.absinthe.libchecker.domain.statistics.BuildFeatureFlagChartDataUseCase
-import com.absinthe.libchecker.domain.statistics.ChartDataProvider
 import com.absinthe.libchecker.domain.statistics.chart.model.ChartType
 import com.absinthe.libchecker.domain.statistics.chart.model.LOADING_PROGRESS_INFINITY
 import com.absinthe.libchecker.domain.statistics.chart.source.impl.AABChartDataSource
@@ -14,6 +11,8 @@ import com.absinthe.libchecker.domain.statistics.chart.source.impl.JetpackCompos
 import com.absinthe.libchecker.domain.statistics.chart.source.impl.KotlinChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.source.impl.MarketDistributionChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.source.impl.PageSize16KBChartDataSource
+import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildApiLevelChartDataUseCase
+import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildFeatureFlagChartDataUseCase
 import info.appdev.charting.charts.BarChart
 import info.appdev.charting.charts.PieChart
 

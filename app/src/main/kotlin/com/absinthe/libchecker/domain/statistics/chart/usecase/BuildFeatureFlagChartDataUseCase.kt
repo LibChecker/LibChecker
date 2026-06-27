@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.statistics
+package com.absinthe.libchecker.domain.statistics.chart.usecase
 
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.database.entity.LCItem

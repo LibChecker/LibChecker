@@ -1,6 +1,7 @@
-package com.absinthe.libchecker.domain.statistics
+package com.absinthe.libchecker.domain.statistics.chart.usecase
 
 import com.absinthe.libchecker.api.bean.AndroidDistribution
+import com.absinthe.libchecker.domain.statistics.chart.repository.AndroidDistributionRepository
 
 class GetAndroidDistributionUseCase(
   private val androidDistributionRepository: AndroidDistributionRepository

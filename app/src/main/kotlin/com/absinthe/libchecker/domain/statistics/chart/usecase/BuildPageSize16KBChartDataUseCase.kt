@@ -1,30 +1,29 @@
-package com.absinthe.libchecker.domain.statistics
+package com.absinthe.libchecker.domain.statistics.chart.usecase
 
-import android.content.Context
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.utils.PackageUtils
-import java.io.File
-import java.util.TreeMap
+import com.absinthe.libchecker.utils.extensions.is16KBAligned
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
 import timber.log.Timber
 
-class BuildDetailedAbiChartDataUseCase(
-  private val context: Context,
+class BuildPageSize16KBChartDataUseCase(
   private val installedAppRepository: InstalledAppRepository
 ) {
 
   suspend operator fun invoke(
     request: Request,
     onProgress: suspend (Int) -> Unit
-  ): DetailedAbiChartData? {
+  ): PageSize16KBChartData? {
     val targets = if (request.showSystemApps) {
       request.items
     } else {
       request.items.filter { !it.isSystem }
     }
-    val result = TreeMap<Int, MutableList<LCItem>>()
+    val support16KB = mutableListOf<LCItem>()
+    val notSupport16KB = mutableListOf<LCItem>()
+    val noNativeLibs = mutableListOf<LCItem>()
     val coroutineContext = currentCoroutineContext()
     val itemCount = targets.size
     var progress = 0
@@ -36,14 +35,12 @@ class BuildDetailedAbiChartDataUseCase(
 
       runCatching {
         val packageInfo = installedAppRepository.getPackageInfo(item.packageName) ?: return@runCatching
-        val source = packageInfo.applicationInfo?.sourceDir ?: return@runCatching
-        PackageUtils.getAbiSet(
-          file = File(source),
-          packageInfo = packageInfo,
-          isApk = false,
-          ignoreArch = true
-        ).forEach { abi ->
-          result.getOrPut(abi) { mutableListOf() }.add(item)
+        if (PackageUtils.hasNoNativeLibs(item.abi.toInt())) {
+          noNativeLibs.add(item)
+        } else if (packageInfo.is16KBAligned()) {
+          support16KB.add(item)
+        } else {
+          notSupport16KB.add(item)
         }
       }.onFailure {
         Timber.e(it)
@@ -58,14 +55,10 @@ class BuildDetailedAbiChartDataUseCase(
       }
     }
 
-    return DetailedAbiChartData(
-      groups = result.map { (abi, items) ->
-        DetailedAbiChartGroup(
-          abi = abi,
-          label = PackageUtils.getAbiString(context, abi, showExtraInfo = false),
-          items = items
-        )
-      }
+    return PageSize16KBChartData(
+      support16KB = support16KB,
+      notSupport16KB = notSupport16KB,
+      noNativeLibs = noNativeLibs
     )
   }
 
@@ -75,12 +68,8 @@ class BuildDetailedAbiChartDataUseCase(
   )
 }
 
-data class DetailedAbiChartData(
-  val groups: List<DetailedAbiChartGroup>
-)
-
-data class DetailedAbiChartGroup(
-  val abi: Int,
-  val label: String,
-  val items: List<LCItem>
+data class PageSize16KBChartData(
+  val support16KB: List<LCItem>,
+  val notSupport16KB: List<LCItem>,
+  val noNativeLibs: List<LCItem>
 )

@@ -28,6 +28,7 @@ import com.absinthe.libchecker.domain.statistics.chart.source.impl.MarketDistrib
 import com.absinthe.libchecker.domain.statistics.chart.ui.view.ChartDetailItemView
 import com.absinthe.libchecker.domain.statistics.chart.ui.view.ExpandingView
 import com.absinthe.libchecker.domain.statistics.chart.ui.view.MarketDistributionDashboardView
+import com.absinthe.libchecker.domain.statistics.chart.usecase.ChartFeatureInitializationPlan
 import com.absinthe.libchecker.ui.base.BaseFragment
 import com.absinthe.libchecker.ui.base.SaturationTransformation
 import com.absinthe.libchecker.utils.OsUtils

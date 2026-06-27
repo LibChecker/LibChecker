@@ -5,7 +5,7 @@ import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.AndroidDistribution
 import com.absinthe.libchecker.api.request.AndroidDistributionRequest
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.domain.statistics.AndroidDistributionRepository
+import com.absinthe.libchecker.domain.statistics.chart.repository.AndroidDistributionRepository
 import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libchecker.utils.toJson

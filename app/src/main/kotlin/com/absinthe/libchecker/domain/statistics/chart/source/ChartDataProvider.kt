@@ -1,8 +1,20 @@
-package com.absinthe.libchecker.domain.statistics
+package com.absinthe.libchecker.domain.statistics.chart.source
 
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppListItemViewState
 import com.absinthe.libchecker.domain.app.BuildAppListItemViewStatesUseCase
+import com.absinthe.libchecker.domain.statistics.chart.repository.ChartSettingsRepository
+import com.absinthe.libchecker.domain.statistics.chart.usecase.AbiChartData
+import com.absinthe.libchecker.domain.statistics.chart.usecase.AndroidDistributionChartData
+import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildAbiChartDataUseCase
+import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildApiLevelChartDataUseCase
+import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildDetailedAbiChartDataUseCase
+import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildFeatureFlagChartDataUseCase
+import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildPageSize16KBChartDataUseCase
+import com.absinthe.libchecker.domain.statistics.chart.usecase.DetailedAbiChartData
+import com.absinthe.libchecker.domain.statistics.chart.usecase.FeatureFlagChartData
+import com.absinthe.libchecker.domain.statistics.chart.usecase.GetAndroidDistributionUseCase
+import com.absinthe.libchecker.domain.statistics.chart.usecase.PageSize16KBChartData
 
 class ChartDataProvider(
   private val buildAppListItemViewStatesUseCase: BuildAppListItemViewStatesUseCase,

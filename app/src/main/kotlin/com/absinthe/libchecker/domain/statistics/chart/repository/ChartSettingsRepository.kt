@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.statistics
+package com.absinthe.libchecker.domain.statistics.chart.repository
 
 interface ChartSettingsRepository {
   val appListDisplayOptions: Int

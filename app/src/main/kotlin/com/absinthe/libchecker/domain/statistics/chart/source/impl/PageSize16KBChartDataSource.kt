@@ -3,10 +3,10 @@ package com.absinthe.libchecker.domain.statistics.chart.source.impl
 import android.content.Context
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.statistics.PageSize16KBChartData
 import com.absinthe.libchecker.domain.statistics.chart.model.ChartSourceItem
 import com.absinthe.libchecker.domain.statistics.chart.source.BaseChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.source.IHeavyWork
+import com.absinthe.libchecker.domain.statistics.chart.usecase.PageSize16KBChartData
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import info.appdev.charting.charts.PieChart
