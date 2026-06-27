@@ -4,7 +4,7 @@ import android.content.DialogInterface
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.AppListItemViewState
+import com.absinthe.libchecker.domain.app.list.model.AppListItemViewState
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 

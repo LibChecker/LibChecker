@@ -6,9 +6,9 @@ import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.AppListItemViewState
 import com.absinthe.libchecker.domain.app.AppListRepository
-import com.absinthe.libchecker.domain.app.BuildAppListItemViewStatesUseCase
+import com.absinthe.libchecker.domain.app.list.model.AppListItemViewState
+import com.absinthe.libchecker.domain.app.list.usecase.BuildAppListItemViewStatesUseCase
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReference
 import com.absinthe.libchecker.domain.statistics.reference.repository.LibReferenceSettingsRepository
 import com.absinthe.libchecker.domain.statistics.reference.usecase.BuildLibReferenceDetailDialogRequestUseCase

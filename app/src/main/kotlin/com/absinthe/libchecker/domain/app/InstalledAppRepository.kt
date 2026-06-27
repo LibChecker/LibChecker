@@ -3,6 +3,7 @@ package com.absinthe.libchecker.domain.app
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import androidx.lifecycle.LifecycleOwner
+import com.absinthe.libchecker.domain.app.list.model.InstalledPackageState
 import kotlinx.coroutines.flow.SharedFlow
 
 interface InstalledAppRepository {

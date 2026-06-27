@@ -9,8 +9,8 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.AppListItemViewState
-import com.absinthe.libchecker.domain.app.InstalledPackageState
+import com.absinthe.libchecker.domain.app.list.model.AppListItemViewState
+import com.absinthe.libchecker.domain.app.list.model.InstalledPackageState
 import com.absinthe.libchecker.domain.app.list.ui.view.AppItemView
 import com.absinthe.libchecker.domain.app.stableAppListItemIdForKey
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter

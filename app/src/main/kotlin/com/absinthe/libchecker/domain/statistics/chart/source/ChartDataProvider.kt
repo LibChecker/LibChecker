@@ -1,8 +1,8 @@
 package com.absinthe.libchecker.domain.statistics.chart.source
 
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.AppListItemViewState
-import com.absinthe.libchecker.domain.app.BuildAppListItemViewStatesUseCase
+import com.absinthe.libchecker.domain.app.list.model.AppListItemViewState
+import com.absinthe.libchecker.domain.app.list.usecase.BuildAppListItemViewStatesUseCase
 import com.absinthe.libchecker.domain.statistics.chart.repository.ChartSettingsRepository
 import com.absinthe.libchecker.domain.statistics.chart.usecase.AbiChartData
 import com.absinthe.libchecker.domain.statistics.chart.usecase.AndroidDistributionChartData
