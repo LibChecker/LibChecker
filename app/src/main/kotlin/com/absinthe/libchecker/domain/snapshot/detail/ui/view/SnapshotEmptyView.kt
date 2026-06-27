@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.snapshot.detail.ui.view
+package com.absinthe.libchecker.domain.snapshot.detail.ui.view
 
 import android.content.Context
 import android.view.ContextThemeWrapper
@@ -10,29 +10,32 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 
-class SnapshotDetailNewInstallView(context: Context) : AViewGroup(context) {
+class SnapshotEmptyView(context: Context) : AViewGroup(context) {
 
   private val image = ImageView(context).apply {
-    layoutParams = LayoutParams(150.dp, 150.dp)
-    setImageResource(R.drawable.ic_yes)
+    layoutParams = LayoutParams(200.dp, 200.dp)
+    setImageResource(R.drawable.ic_notebook)
     importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     addView(this)
   }
 
-  private val text =
-    AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
-      layoutParams = LayoutParams(
-        ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
-      ).also {
-        it.topMargin = 16.dp
-      }
-      text = context.getString(R.string.snapshot_detail_new_install_title)
-      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleLarge))
-      addView(this)
+  val text = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
+    layoutParams = LayoutParams(
+      ViewGroup.LayoutParams.WRAP_CONTENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
+    ).also {
+      it.topMargin = (-16).dp
     }
+    text = context.getString(R.string.snapshot_empty_list_title)
+    setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadlineSmall))
+    addView(this)
+  }
 
   init {
+    updateContentDescription()
+  }
+
+  fun updateContentDescription() {
     contentDescription = text.text
   }
 

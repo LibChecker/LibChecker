@@ -34,11 +34,11 @@ import com.absinthe.libchecker.domain.snapshot.comparison.presentation.Compariso
 import com.absinthe.libchecker.domain.snapshot.comparison.presentation.ComparisonShareIntentParser
 import com.absinthe.libchecker.domain.snapshot.comparison.presentation.SnapshotComparisonViewModel
 import com.absinthe.libchecker.domain.snapshot.comparison.ui.view.ComparisonDashboardView
+import com.absinthe.libchecker.domain.snapshot.detail.ui.EXTRA_ENTITY
+import com.absinthe.libchecker.domain.snapshot.detail.ui.EXTRA_ICON
+import com.absinthe.libchecker.domain.snapshot.detail.ui.SnapshotDetailActivity
+import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotEmptyView
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
-import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ENTITY
-import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ICON
-import com.absinthe.libchecker.features.snapshot.detail.ui.SnapshotDetailActivity
-import com.absinthe.libchecker.features.snapshot.detail.ui.view.SnapshotEmptyView
 import com.absinthe.libchecker.features.snapshot.ui.TimeNodeBottomSheetDialogFragment
 import com.absinthe.libchecker.features.snapshot.ui.VF_LIST
 import com.absinthe.libchecker.features.snapshot.ui.adapter.SnapshotAdapter

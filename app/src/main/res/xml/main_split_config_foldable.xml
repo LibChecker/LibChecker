@@ -17,7 +17,7 @@
       window:secondaryActivityName="com.absinthe.libchecker.domain.statistics.chart.ui.ChartActivity" />
     <SplitPairFilter
       window:primaryActivityName="com.absinthe.libchecker.features.home.ui.main.MainActivity"
-      window:secondaryActivityName="com.absinthe.libchecker.features.snapshot.detail.ui.SnapshotDetailActivity" />
+      window:secondaryActivityName="com.absinthe.libchecker.domain.snapshot.detail.ui.SnapshotDetailActivity" />
     <SplitPairFilter
       window:primaryActivityName="com.absinthe.libchecker.features.home.ui.main.MainActivity"
       window:secondaryActivityName="com.absinthe.libchecker.features.about.ui.AboutActivity" />
@@ -26,7 +26,7 @@
       window:primaryActivityName="com.absinthe.libchecker.domain.statistics.reference.ui.LibReferenceActivity"
       window:secondaryActivityName="com.absinthe.libchecker.features.applist.detail.ui.AppDetailActivity" />
     <SplitPairFilter
-      window:primaryActivityName="com.absinthe.libchecker.features.snapshot.detail.ui.SnapshotDetailActivity"
+      window:primaryActivityName="com.absinthe.libchecker.domain.snapshot.detail.ui.SnapshotDetailActivity"
       window:secondaryActivityName="com.absinthe.libchecker.features.applist.detail.ui.AppDetailActivity" />
 
     <SplitPairFilter

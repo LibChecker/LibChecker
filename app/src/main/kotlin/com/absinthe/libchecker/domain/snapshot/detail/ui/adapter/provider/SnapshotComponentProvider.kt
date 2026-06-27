@@ -1,15 +1,16 @@
-package com.absinthe.libchecker.features.snapshot.detail.ui.adapter.provider
+package com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.provider
 
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.core.graphics.drawable.toDrawable
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotComponentNode
+import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailComponentView
 import com.absinthe.libchecker.domain.snapshot.model.ADDED
 import com.absinthe.libchecker.domain.snapshot.model.CHANGED
+import com.absinthe.libchecker.domain.snapshot.model.MOVED
 import com.absinthe.libchecker.domain.snapshot.model.REMOVED
 import com.absinthe.libchecker.features.applist.detail.ui.LibDetailDialogFragment
-import com.absinthe.libchecker.features.snapshot.detail.ui.adapter.node.SnapshotNativeNode
-import com.absinthe.libchecker.features.snapshot.detail.ui.view.SnapshotDetailNativeView
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -18,16 +19,16 @@ import com.chad.library.adapter.base.entity.node.BaseNode
 import com.chad.library.adapter.base.provider.BaseNodeProvider
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
-const val SNAPSHOT_NATIVE_PROVIDER = 2
+const val SNAPSHOT_COMPONENT_PROVIDER = 3
 
-class SnapshotNativeProvider : BaseNodeProvider() {
+class SnapshotComponentProvider : BaseNodeProvider() {
 
-  override val itemViewType: Int = SNAPSHOT_NATIVE_PROVIDER
+  override val itemViewType: Int = SNAPSHOT_COMPONENT_PROVIDER
   override val layoutId: Int = 0
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return BaseViewHolder(
-      SnapshotDetailNativeView(ContextThemeWrapper(context, R.style.AppListMaterialCard)).also {
+      SnapshotDetailComponentView(ContextThemeWrapper(context, R.style.AppListMaterialCard)).also {
         it.layoutParams = ViewGroup.LayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT,
           ViewGroup.LayoutParams.WRAP_CONTENT
@@ -37,17 +38,17 @@ class SnapshotNativeProvider : BaseNodeProvider() {
   }
 
   override fun convert(helper: BaseViewHolder, item: BaseNode) {
-    (helper.itemView as SnapshotDetailNativeView).container.apply {
-      val node = item as SnapshotNativeNode
+    (helper.itemView as SnapshotDetailComponentView).container.apply {
+      val node = item as SnapshotComponentNode
       val snapshotItem = node.item
 
       name.text = snapshotItem.title
-      libSize.text = snapshotItem.extra
 
       val colorRes = when (snapshotItem.diffType) {
         ADDED -> R.color.material_green_300
         REMOVED -> R.color.material_red_300
         CHANGED -> R.color.material_yellow_300
+        MOVED -> R.color.material_blue_300
         else -> throw IllegalArgumentException("wrong diff type")
       }
 
@@ -56,13 +57,13 @@ class SnapshotNativeProvider : BaseNodeProvider() {
           ADDED -> R.drawable.ic_add
           REMOVED -> R.drawable.ic_remove
           CHANGED -> R.drawable.ic_changed
+          MOVED -> R.drawable.ic_move
           else -> throw IllegalArgumentException("wrong diff type")
         }
       )
       helper.itemView.contentDescription = buildItemDescription(
         getStatusLabel(snapshotItem.diffType),
-        snapshotItem.title,
-        snapshotItem.extra
+        snapshotItem.title
       )
 
       val baseColor = colorRes.getColor(context)
@@ -79,7 +80,6 @@ class SnapshotNativeProvider : BaseNodeProvider() {
       helper.itemView.contentDescription = buildItemDescription(
         getStatusLabel(snapshotItem.diffType),
         snapshotItem.title,
-        snapshotItem.extra,
         rule?.label
       )
       if (rule != null) {
@@ -89,7 +89,7 @@ class SnapshotNativeProvider : BaseNodeProvider() {
           }
           val name = node.item.name
           val fragmentManager =
-            (this@SnapshotNativeProvider.context as BaseActivity<*>).supportFragmentManager
+            (this@SnapshotComponentProvider.context as BaseActivity<*>).supportFragmentManager
           LibDetailDialogFragment.newInstance(name, node.item.itemType, rule.regexName)
             .show(fragmentManager, LibDetailDialogFragment::class.java.name)
         }
@@ -111,6 +111,7 @@ class SnapshotNativeProvider : BaseNodeProvider() {
         ADDED -> R.string.snapshot_indicator_added
         REMOVED -> R.string.snapshot_indicator_removed
         CHANGED -> R.string.snapshot_indicator_changed
+        MOVED -> R.string.snapshot_indicator_moved
         else -> android.R.string.untitled
       }
     )

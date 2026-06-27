@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.snapshot.detail.ui.adapter.provider
+package com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.provider
 
 import android.animation.ObjectAnimator
 import android.util.SparseArray
@@ -16,15 +16,15 @@ import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.SnapshotDetailCountAdapter
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.BaseSnapshotNode
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotDetailCountNode
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotTitleNode
+import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailTitleView
 import com.absinthe.libchecker.domain.snapshot.model.ADDED
 import com.absinthe.libchecker.domain.snapshot.model.CHANGED
 import com.absinthe.libchecker.domain.snapshot.model.MOVED
 import com.absinthe.libchecker.domain.snapshot.model.REMOVED
-import com.absinthe.libchecker.features.snapshot.detail.ui.adapter.SnapshotDetailCountAdapter
-import com.absinthe.libchecker.features.snapshot.detail.ui.adapter.node.BaseSnapshotNode
-import com.absinthe.libchecker.features.snapshot.detail.ui.adapter.node.SnapshotDetailCountNode
-import com.absinthe.libchecker.features.snapshot.detail.ui.adapter.node.SnapshotTitleNode
-import com.absinthe.libchecker.features.snapshot.detail.ui.view.SnapshotDetailTitleView
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.chad.library.adapter.base.provider.BaseNodeProvider
 import com.chad.library.adapter.base.viewholder.BaseViewHolder

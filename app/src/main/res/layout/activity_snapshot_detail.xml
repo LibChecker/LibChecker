@@ -4,7 +4,7 @@
   xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  tools:context=".features.snapshot.detail.ui.SnapshotDetailActivity">
+  tools:context=".domain.snapshot.detail.ui.SnapshotDetailActivity">
 
   <com.google.android.material.appbar.AppBarLayout
     android:id="@+id/header_layout"
@@ -23,7 +23,7 @@
       app:expandedTitleTextAppearance="?attr/textAppearanceHeadlineMedium"
       app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
-      <com.absinthe.libchecker.features.snapshot.detail.ui.view.SnapshotTitleView
+      <com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotTitleView
         android:id="@+id/snapshot_title"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

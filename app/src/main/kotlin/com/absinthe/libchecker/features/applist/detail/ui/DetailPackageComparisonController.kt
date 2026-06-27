@@ -5,9 +5,9 @@ import android.content.pm.PackageInfo
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.snapshot.detail.ui.EXTRA_ENTITY
+import com.absinthe.libchecker.domain.snapshot.detail.ui.SnapshotDetailActivity
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
-import com.absinthe.libchecker.features.snapshot.detail.ui.EXTRA_ENTITY
-import com.absinthe.libchecker.features.snapshot.detail.ui.SnapshotDetailActivity
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.UiUtils
 import kotlinx.coroutines.CoroutineScope

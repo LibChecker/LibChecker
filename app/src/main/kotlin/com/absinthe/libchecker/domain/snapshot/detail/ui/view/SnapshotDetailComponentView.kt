@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.snapshot.detail.ui.view
+package com.absinthe.libchecker.domain.snapshot.detail.ui.view
 
 import android.content.Context
 import android.content.res.ColorStateList
@@ -19,28 +19,23 @@ import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
 import com.absinthe.libchecker.utils.extensions.toColorStateList
-import com.absinthe.libchecker.utils.extensions.visibleHeight
 import com.absinthe.libchecker.view.AViewGroup
-import com.absinthe.libraries.utils.utils.UiUtils
 import com.absinthe.rulesbundle.Rule
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
 
-class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
+class SnapshotDetailComponentView(context: Context) : MaterialCardView(context) {
 
-  val container = SnapshotDetailNativeContainerView(context).apply {
+  val container = SnapshotDetailComponentContainerView(context).apply {
     layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
   }
 
   init {
-    if (UiUtils.isDarkMode()) {
-      strokeColor = Color.TRANSPARENT
-    }
     setSmoothRoundCorner(16.dp)
     addView(container)
   }
 
-  class SnapshotDetailNativeContainerView(context: Context) : AViewGroup(context) {
+  class SnapshotDetailComponentContainerView(context: Context) : AViewGroup(context) {
 
     init {
       clipToPadding = false
@@ -72,21 +67,6 @@ class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
       addView(this)
     }
 
-    val libSize = AppCompatTextView(
-      ContextThemeWrapper(
-        context,
-        R.style.TextView_SansSerifCondensed
-      )
-    ).apply {
-      layoutParams = LayoutParams(
-        ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
-      )
-      setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
-      setTextColor(Color.BLACK)
-      addView(this)
-    }
-
     private var chip: Chip? = null
 
     fun setChipOnClickListener(listener: OnClickListener?) {
@@ -105,7 +85,9 @@ class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
             layoutParams = LayoutParams(
               ViewGroup.LayoutParams.WRAP_CONTENT,
               ViewGroup.LayoutParams.WRAP_CONTENT
-            )
+            ).also {
+              it.topMargin = 4.dp
+            }
             setTextColor(Color.BLACK)
             chipStrokeColor = ColorStateList.valueOf(("#20000000".toColorInt()))
             chipStrokeWidth = 1.dp.toFloat()
@@ -140,30 +122,22 @@ class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
       children.forEach {
         it.autoMeasure()
       }
-      val textWidth =
-        (measuredWidth - paddingStart - typeIcon.measuredWidth - name.marginStart - paddingEnd)
+      val textWidth = measuredWidth - paddingStart - typeIcon.measuredWidth - name.marginStart - paddingEnd
       if (name.measuredWidth > textWidth) {
         name.measure(textWidth.toExactlyMeasureSpec(), name.defaultHeightMeasureSpec(this))
-      }
-      if (libSize.measuredWidth > textWidth) {
-        libSize.measure(textWidth.toExactlyMeasureSpec(), libSize.defaultHeightMeasureSpec(this))
       }
       val chipHeight = chip?.let { it.measuredHeight + it.marginTop } ?: 0
       setMeasuredDimension(
         measuredWidth,
-        paddingTop + name.measuredHeight + libSize.measuredHeight + chipHeight + paddingBottom
+        paddingTop + name.measuredHeight.coerceAtLeast(typeIcon.measuredHeight) + chipHeight + paddingBottom
       )
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
       typeIcon.layout(paddingStart, typeIcon.toVerticalCenter(this))
       val nameXOffset = paddingStart + typeIcon.measuredWidth + name.marginStart
-      name.layout(
-        nameXOffset,
-        (measuredHeight - name.measuredHeight - libSize.measuredHeight - chip.visibleHeight()) / 2
-      )
-      libSize.layout(nameXOffset, name.bottom)
-      chip?.layout(nameXOffset, libSize.bottom + chip!!.marginTop)
+      name.layout(nameXOffset, paddingTop)
+      chip?.layout(nameXOffset, name.bottom + chip!!.marginTop)
     }
   }
 }

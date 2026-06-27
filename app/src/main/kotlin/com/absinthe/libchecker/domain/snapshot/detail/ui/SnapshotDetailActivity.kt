@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.snapshot.detail.ui
+package com.absinthe.libchecker.domain.snapshot.detail.ui
 
 import android.graphics.Bitmap
 import android.os.Bundle
@@ -30,7 +30,15 @@ import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
 import com.absinthe.libchecker.domain.snapshot.SnapshotPackageIconSource
-import com.absinthe.libchecker.domain.snapshot.detail.SnapshotDetailSection
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSection
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.SnapshotDetailAdapter
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.BaseSnapshotNode
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotComponentNode
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotNativeNode
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotTitleNode
+import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailDeletedView
+import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailNewInstallView
+import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotEmptyView
 import com.absinthe.libchecker.domain.snapshot.model.ADDED
 import com.absinthe.libchecker.domain.snapshot.model.CHANGED
 import com.absinthe.libchecker.domain.snapshot.model.MOVED
@@ -38,14 +46,6 @@ import com.absinthe.libchecker.domain.snapshot.model.REMOVED
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.features.applist.detail.AppBarStateChangeListener
 import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
-import com.absinthe.libchecker.features.snapshot.detail.ui.adapter.SnapshotDetailAdapter
-import com.absinthe.libchecker.features.snapshot.detail.ui.adapter.node.BaseSnapshotNode
-import com.absinthe.libchecker.features.snapshot.detail.ui.adapter.node.SnapshotComponentNode
-import com.absinthe.libchecker.features.snapshot.detail.ui.adapter.node.SnapshotNativeNode
-import com.absinthe.libchecker.features.snapshot.detail.ui.adapter.node.SnapshotTitleNode
-import com.absinthe.libchecker.features.snapshot.detail.ui.view.SnapshotDetailDeletedView
-import com.absinthe.libchecker.features.snapshot.detail.ui.view.SnapshotDetailNewInstallView
-import com.absinthe.libchecker.features.snapshot.detail.ui.view.SnapshotEmptyView
 import com.absinthe.libchecker.features.snapshot.ui.adapter.ARROW
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity

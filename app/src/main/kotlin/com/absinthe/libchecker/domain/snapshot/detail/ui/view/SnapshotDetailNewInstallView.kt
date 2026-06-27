@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.snapshot.detail.ui.view
+package com.absinthe.libchecker.domain.snapshot.detail.ui.view
 
 import android.content.Context
 import android.view.ContextThemeWrapper
@@ -10,11 +10,11 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 
-class SnapshotDetailDeletedView(context: Context) : AViewGroup(context) {
+class SnapshotDetailNewInstallView(context: Context) : AViewGroup(context) {
 
   private val image = ImageView(context).apply {
     layoutParams = LayoutParams(150.dp, 150.dp)
-    setImageResource(R.drawable.ic_no)
+    setImageResource(R.drawable.ic_yes)
     importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     addView(this)
   }
@@ -27,7 +27,7 @@ class SnapshotDetailDeletedView(context: Context) : AViewGroup(context) {
       ).also {
         it.topMargin = 16.dp
       }
-      text = context.getString(R.string.snapshot_detail_deleted_title)
+      text = context.getString(R.string.snapshot_detail_new_install_title)
       setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleLarge))
       addView(this)
     }

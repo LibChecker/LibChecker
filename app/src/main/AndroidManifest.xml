@@ -94,7 +94,7 @@
       </intent-filter>
     </activity>
     <activity
-      android:name=".features.snapshot.detail.ui.SnapshotDetailActivity"
+      android:name=".domain.snapshot.detail.ui.SnapshotDetailActivity"
       android:configChanges="orientation" />
     <activity
       android:name=".domain.snapshot.album.ui.AlbumActivity"

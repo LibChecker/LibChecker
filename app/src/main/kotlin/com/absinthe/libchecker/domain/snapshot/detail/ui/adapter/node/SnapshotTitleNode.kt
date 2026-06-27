@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.snapshot.detail.ui.adapter.node
+package com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node
 
 import com.absinthe.libchecker.annotation.LibType
 import com.chad.library.adapter.base.entity.node.BaseExpandNode

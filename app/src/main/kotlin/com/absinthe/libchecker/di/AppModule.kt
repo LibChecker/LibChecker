@@ -134,7 +134,6 @@ import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCas
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotCapturePlanUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotComparisonListsUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotComparisonPlanUseCase
-import com.absinthe.libchecker.domain.snapshot.BuildSnapshotDetailItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotListUpdatePlanUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotPairDiffUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotSystemPropDisplayDataUseCase
@@ -173,7 +172,8 @@ import com.absinthe.libchecker.domain.snapshot.backup.usecase.RestoreSnapshotArc
 import com.absinthe.libchecker.domain.snapshot.backup.usecase.RestoreSnapshotDatabaseBackupUseCase
 import com.absinthe.libchecker.domain.snapshot.comparison.presentation.SnapshotComparisonViewModel
 import com.absinthe.libchecker.domain.snapshot.comparison.usecase.PrepareSnapshotComparisonArchivesUseCase
-import com.absinthe.libchecker.domain.snapshot.detail.BuildSnapshotDetailSectionsUseCase
+import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotDetailItemsUseCase
+import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotDetailSectionsUseCase
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.timenode.BuildSnapshotTimeNodeItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.timenode.UpdateSnapshotAutoRemoveThresholdUseCase

@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.snapshot
+package com.absinthe.libchecker.domain.snapshot.detail.usecase
 
 import android.content.Context
 import android.graphics.Color

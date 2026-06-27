@@ -1,13 +1,13 @@
-package com.absinthe.libchecker.features.snapshot.detail.ui.adapter
+package com.absinthe.libchecker.domain.snapshot.detail.ui.adapter
 
 import android.view.ViewGroup
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotDetailCountNode
+import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailCountView
 import com.absinthe.libchecker.domain.snapshot.model.ADDED
 import com.absinthe.libchecker.domain.snapshot.model.CHANGED
 import com.absinthe.libchecker.domain.snapshot.model.MOVED
 import com.absinthe.libchecker.domain.snapshot.model.REMOVED
-import com.absinthe.libchecker.features.snapshot.detail.ui.adapter.node.SnapshotDetailCountNode
-import com.absinthe.libchecker.features.snapshot.detail.ui.view.SnapshotDetailCountView
 import com.absinthe.libchecker.utils.extensions.toColorStateList
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder

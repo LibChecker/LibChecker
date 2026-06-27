@@ -8,7 +8,6 @@ import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.PackageChangeState
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotCapturePlanUseCase
-import com.absinthe.libchecker.domain.snapshot.BuildSnapshotDetailItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotListUpdatePlanUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotSystemPropDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.CompareSnapshotDiffsUseCase
@@ -25,8 +24,9 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSystemPropDisplayData
 import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotDiffItemsUseCase
-import com.absinthe.libchecker.domain.snapshot.detail.BuildSnapshotDetailSectionsUseCase
-import com.absinthe.libchecker.domain.snapshot.detail.SnapshotDetailSection
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSection
+import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotDetailItemsUseCase
+import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotDetailSectionsUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.sync.SnapshotPackageChangeProcessor
 import com.absinthe.libchecker.domain.snapshot.timenode.BuildSnapshotTimeNodeItemsUseCase

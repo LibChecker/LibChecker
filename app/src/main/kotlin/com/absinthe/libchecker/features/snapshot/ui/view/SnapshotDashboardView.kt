@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.SnapshotSystemPropDisplayData
-import com.absinthe.libchecker.features.snapshot.detail.ui.view.SnapshotTypeIndicatorView
+import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotTypeIndicatorView
 import com.absinthe.libchecker.features.snapshot.ui.adapter.SystemPropsAdapter
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColor

@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.snapshot.detail
+package com.absinthe.libchecker.domain.snapshot.detail.usecase
 
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.LibType
@@ -10,6 +10,8 @@ import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotRuleUseCase
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemDisplayData
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSection
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
 import com.absinthe.rulesbundle.Rule
 
@@ -54,14 +56,3 @@ class BuildSnapshotDetailSectionsUseCase(
     val orderedTypes = listOf(NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER, PERMISSION, METADATA)
   }
 }
-
-data class SnapshotDetailSection(
-  @LibType val type: Int,
-  val items: List<SnapshotDetailItemDisplayData>
-)
-
-data class SnapshotDetailItemDisplayData(
-  val item: SnapshotDetailItem,
-  val rule: Rule?,
-  val colorfulRuleIcon: Boolean
-)
