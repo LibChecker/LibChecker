@@ -1,8 +1,9 @@
-package com.absinthe.libchecker.domain.snapshot
+package com.absinthe.libchecker.domain.snapshot.display
 
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 
-class GetSnapshotDashboardCountUseCase(
+class SnapshotDashboardCounter(
   private val snapshotRepository: SnapshotRepository,
   private val installedAppRepository: InstalledAppRepository
 ) {

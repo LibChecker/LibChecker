@@ -7,16 +7,15 @@ import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.PackageChangeState
-import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
-import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
-import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotDiffsUseCase
 import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotItemWithInstalledAppUseCase
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSection
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.SnapshotDetailSectionBuilder
 import com.absinthe.libchecker.domain.snapshot.display.FormatSnapshotTimestampUseCase
+import com.absinthe.libchecker.domain.snapshot.display.SnapshotDashboardCounter
+import com.absinthe.libchecker.domain.snapshot.library.SnapshotLibrary
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotCapturePlan
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotSystemPropDisplayData
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotTimeNodeListData
@@ -28,6 +27,7 @@ import com.absinthe.libchecker.domain.snapshot.list.usecase.DeleteSnapshotTimeSt
 import com.absinthe.libchecker.domain.snapshot.list.usecase.GetSnapshotPackageIconSourcesUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.UpdateSnapshotDiffItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
+import com.absinthe.libchecker.domain.snapshot.selection.SnapshotSelection
 import com.absinthe.libchecker.domain.snapshot.sync.SnapshotPackageChangeProcessor
 import com.absinthe.libchecker.domain.snapshot.timenode.usecase.UpdateSnapshotAutoRemoveThresholdUseCase
 import com.absinthe.libchecker.domain.snapshot.track.repository.SnapshotTrackChangeRepository
@@ -46,9 +46,9 @@ class SnapshotViewModel(
   private val appListRepository: AppListRepository,
   private val compareSnapshotDiffs: CompareSnapshotDiffsUseCase,
   private val compareSnapshotItemWithInstalledApp: CompareSnapshotItemWithInstalledAppUseCase,
-  private val getSnapshotDashboardCount: GetSnapshotDashboardCountUseCase,
+  private val snapshotDashboardCounter: SnapshotDashboardCounter,
   private val snapshotDetailSectionBuilder: SnapshotDetailSectionBuilder,
-  private val snapshotLibrary: SnapshotLibraryUseCase,
+  private val snapshotLibrary: SnapshotLibrary,
   private val buildSnapshotCapturePlanUseCase: BuildSnapshotCapturePlanUseCase,
   private val getSnapshotPackageIconSourcesUseCase: GetSnapshotPackageIconSourcesUseCase,
   private val buildSnapshotListUpdatePlanUseCase: BuildSnapshotListUpdatePlanUseCase,
@@ -56,7 +56,7 @@ class SnapshotViewModel(
   private val buildSnapshotTimeNodeListDataUseCase: BuildSnapshotTimeNodeListDataUseCase,
   private val deleteSnapshotTimeStampUseCase: DeleteSnapshotTimeStampUseCase,
   private val formatSnapshotTimestampUseCase: FormatSnapshotTimestampUseCase,
-  private val snapshotSelectionUseCase: SnapshotSelectionUseCase,
+  private val snapshotSelection: SnapshotSelection,
   private val snapshotSettingsRepository: SnapshotSettingsRepository,
   private val updateSnapshotAutoRemoveThresholdUseCase: UpdateSnapshotAutoRemoveThresholdUseCase,
   private val updateSnapshotDiffItemsUseCase: UpdateSnapshotDiffItemsUseCase,
@@ -79,7 +79,7 @@ class SnapshotViewModel(
   private val packageChangeProcessor = SnapshotPackageChangeProcessor(::processPackageChange)
 
   val selectedSnapshotTimestamp: Long
-    get() = snapshotSelectionUseCase.getCurrentTimestamp()
+    get() = snapshotSelection.getCurrentTimestamp()
 
   var currentTimeStamp: Long = selectedSnapshotTimestamp
     private set
@@ -287,7 +287,7 @@ class SnapshotViewModel(
 
   private suspend fun emitDashboardCount(timestamp: Long, isLeft: Boolean) {
     Timber.d("getDashboardCount: $timestamp, $isLeft")
-    val count = getSnapshotDashboardCount(timestamp)
+    val count = snapshotDashboardCounter(timestamp)
     setEffect {
       Effect.DashboardCountChange(count.snapshotCount, count.appCount, isLeft)
     }
@@ -310,7 +310,7 @@ class SnapshotViewModel(
   }
 
   private fun setSelectedSnapshotTimestamp(timestamp: Long) {
-    snapshotSelectionUseCase.setCurrentTimestamp(timestamp)
+    snapshotSelection.setCurrentTimestamp(timestamp)
     currentTimeStamp = timestamp
   }
 

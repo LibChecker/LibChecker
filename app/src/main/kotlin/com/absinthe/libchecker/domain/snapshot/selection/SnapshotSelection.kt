@@ -1,8 +1,8 @@
-package com.absinthe.libchecker.domain.snapshot
+package com.absinthe.libchecker.domain.snapshot.selection
 
 import com.absinthe.libchecker.database.entity.TimeStampItem
 
-class SnapshotSelectionUseCase(
+class SnapshotSelection(
   private val repository: SnapshotSelectionRepository
 ) {
 

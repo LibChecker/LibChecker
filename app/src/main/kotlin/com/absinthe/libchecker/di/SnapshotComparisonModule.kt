@@ -30,7 +30,7 @@ val snapshotComparisonModule = module {
   viewModel {
     SnapshotComparisonViewModel(
       compareSnapshotDiffs = get(),
-      getSnapshotDashboardCount = get(),
+      snapshotDashboardCounter = get(),
       snapshotLibrary = get(),
       buildSnapshotPairDiffUseCase = get(),
       buildSnapshotComparisonPlanUseCase = get(),

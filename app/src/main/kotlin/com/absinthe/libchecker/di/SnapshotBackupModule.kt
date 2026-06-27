@@ -75,7 +75,7 @@ val snapshotBackupModule = module {
         }
       },
       formatSnapshotTimestampUseCase = get(),
-      snapshotSelectionUseCase = get()
+      snapshotSelection = get()
     )
   }
 }

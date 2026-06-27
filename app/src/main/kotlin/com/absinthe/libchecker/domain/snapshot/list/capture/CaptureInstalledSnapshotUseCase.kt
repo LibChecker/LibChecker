@@ -12,8 +12,8 @@ import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
-import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
+import com.absinthe.libchecker.domain.snapshot.selection.SnapshotSelection
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
@@ -26,7 +26,7 @@ class CaptureInstalledSnapshotUseCase(
   private val packageManager: PackageManager,
   private val snapshotRepository: SnapshotRepository,
   private val installedAppRepository: InstalledAppRepository,
-  private val snapshotSelectionUseCase: SnapshotSelectionUseCase,
+  private val snapshotSelection: SnapshotSelection,
   private val snapshotSettingsRepository: SnapshotSettingsRepository,
   private val snapshotCaptureStateRepository: SnapshotCaptureStateRepository
 ) {
@@ -40,7 +40,7 @@ class CaptureInstalledSnapshotUseCase(
 
     val total = request.appList.size
     val snapshotItems = mutableListOf<SnapshotItem>()
-    val currentSnapshotTimestamp = snapshotSelectionUseCase.getCurrentTimestamp()
+    val currentSnapshotTimestamp = snapshotSelection.getCurrentTimestamp()
     val shouldSaveFullSnapshot = snapshotCaptureStateRepository.shouldSaveFullSnapshot()
     var count = 0
     var lastProgress = 0
@@ -90,7 +90,7 @@ class CaptureInstalledSnapshotUseCase(
       snapshotCaptureStateRepository.markFullSnapshotSaved()
     }
 
-    snapshotSelectionUseCase.setCurrentTimestamp(timestamp)
+    snapshotSelection.setCurrentTimestamp(timestamp)
     return Result(
       timestamp = timestamp,
       processedCount = count,

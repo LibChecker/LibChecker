@@ -6,7 +6,7 @@ import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.database.entity.TrackItem
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
-import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionRepository
+import com.absinthe.libchecker.domain.snapshot.selection.SnapshotSelectionRepository
 import kotlinx.coroutines.flow.Flow
 
 class LocalSnapshotRepository(

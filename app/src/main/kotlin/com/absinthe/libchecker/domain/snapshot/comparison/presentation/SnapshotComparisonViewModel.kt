@@ -5,8 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
-import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
-import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
 import com.absinthe.libchecker.domain.snapshot.comparison.archive.ArchiveSnapshotItem
 import com.absinthe.libchecker.domain.snapshot.comparison.archive.PrepareSnapshotComparisonArchivesUseCase
 import com.absinthe.libchecker.domain.snapshot.comparison.model.SnapshotComparisonInputs
@@ -16,6 +14,8 @@ import com.absinthe.libchecker.domain.snapshot.comparison.usecase.BuildSnapshotC
 import com.absinthe.libchecker.domain.snapshot.comparison.usecase.BuildSnapshotPairDiffUseCase
 import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotDiffsUseCase
 import com.absinthe.libchecker.domain.snapshot.display.FormatSnapshotTimestampUseCase
+import com.absinthe.libchecker.domain.snapshot.display.SnapshotDashboardCounter
+import com.absinthe.libchecker.domain.snapshot.library.SnapshotLibrary
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import java.io.File
@@ -29,8 +29,8 @@ import timber.log.Timber
 
 class SnapshotComparisonViewModel(
   private val compareSnapshotDiffs: CompareSnapshotDiffsUseCase,
-  private val getSnapshotDashboardCount: GetSnapshotDashboardCountUseCase,
-  private val snapshotLibrary: SnapshotLibraryUseCase,
+  private val snapshotDashboardCounter: SnapshotDashboardCounter,
+  private val snapshotLibrary: SnapshotLibrary,
   private val buildSnapshotPairDiffUseCase: BuildSnapshotPairDiffUseCase,
   private val buildSnapshotComparisonPlanUseCase: BuildSnapshotComparisonPlanUseCase,
   private val formatSnapshotTimestampUseCase: FormatSnapshotTimestampUseCase,
@@ -186,7 +186,7 @@ class SnapshotComparisonViewModel(
 
   fun getDashboardCount(timestamp: Long, isLeft: Boolean) = viewModelScope.launch(Dispatchers.IO) {
     Timber.d("getComparisonDashboardCount: $timestamp, $isLeft")
-    val count = getSnapshotDashboardCount(timestamp)
+    val count = snapshotDashboardCounter(timestamp)
     setEffect {
       Effect.DashboardCountChange(count.snapshotCount, isLeft)
     }

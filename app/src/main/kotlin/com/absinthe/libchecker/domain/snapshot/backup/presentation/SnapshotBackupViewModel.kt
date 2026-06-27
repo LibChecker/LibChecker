@@ -4,7 +4,6 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.database.backup.RoomBackup
-import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
 import com.absinthe.libchecker.domain.snapshot.backup.archive.SnapshotArchiveUseCase
 import com.absinthe.libchecker.domain.snapshot.backup.model.SnapshotBackupTarget
 import com.absinthe.libchecker.domain.snapshot.backup.repository.SnapshotDatabaseBackupExportResult
@@ -16,6 +15,7 @@ import com.absinthe.libchecker.domain.snapshot.backup.usecase.RestoreSnapshotArc
 import com.absinthe.libchecker.domain.snapshot.backup.usecase.RestoreSnapshotDatabaseBackupUseCase
 import com.absinthe.libchecker.domain.snapshot.backup.usecase.SnapshotRestorePlan
 import com.absinthe.libchecker.domain.snapshot.display.FormatSnapshotTimestampUseCase
+import com.absinthe.libchecker.domain.snapshot.selection.SnapshotSelection
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,7 +30,7 @@ class SnapshotBackupViewModel(
   private val createSnapshotDatabaseBackupUseCaseFactory: (RoomBackup) -> CreateSnapshotDatabaseBackupUseCase,
   private val restoreSnapshotDatabaseBackupUseCaseFactory: (RoomBackup) -> RestoreSnapshotDatabaseBackupUseCase,
   private val formatSnapshotTimestampUseCase: FormatSnapshotTimestampUseCase,
-  private val snapshotSelectionUseCase: SnapshotSelectionUseCase
+  private val snapshotSelection: SnapshotSelection
 ) : ViewModel() {
 
   fun onLocalBackupRequested(isExternalStorageWritable: Boolean): LocalBackupAction {
@@ -117,7 +117,7 @@ class SnapshotBackupViewModel(
       Timber.e("restore with new format failed: $it")
     }.getOrNull() ?: return null
 
-    result.latestTimeStamp?.let(snapshotSelectionUseCase::setCurrentTimestamp)
+    result.latestTimeStamp?.let(snapshotSelection::setCurrentTimestamp)
     return result.toArchiveRestoreSummary()
   }
 
