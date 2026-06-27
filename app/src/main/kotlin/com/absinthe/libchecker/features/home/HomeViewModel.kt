@@ -71,6 +71,7 @@ class HomeViewModel(
   private var pendingDumpAppsInfoFormat: ExportAppListUseCase.Format = ExportAppListUseCase.Format.PlainText
   private var pendingReturnTopAfterRequestChange = false
   private var hasUserScrolledAppList = false
+  private var appListSearchKeyword: String = ""
 
   private val appListChangeRequestQueue = AppListChangeRequestQueue()
   private val featureInitializationController = WorkerFeatureInitializationController()
@@ -135,14 +136,13 @@ class HomeViewModel(
   }
 
   suspend fun buildAppListUpdate(
-    keyword: String,
     isCurrentProcess64Bit: Boolean,
     currentItems: List<LCItem>,
     highlightRefresh: Boolean
   ): AppListUpdate {
     val content = getAppListContentUseCase(
       GetAppListContentUseCase.Request(
-        keyword = keyword,
+        keyword = appListSearchKeyword,
         isCurrentProcess64Bit = isCurrentProcess64Bit
       )
     )
@@ -327,7 +327,21 @@ class HomeViewModel(
     }
   }
 
-  fun handleAppListSearchQuery(query: String): AppListSearchCommandAction {
+  fun onAppListSearchQueryChanged(query: String): AppListSearchQueryChange {
+    if (appListSearchKeyword == query) {
+      return AppListSearchQueryChange(
+        shouldRefreshItems = false,
+        action = AppListSearchCommandAction.None
+      )
+    }
+    appListSearchKeyword = query
+    return AppListSearchQueryChange(
+      shouldRefreshItems = true,
+      action = handleAppListSearchQuery(query)
+    )
+  }
+
+  private fun handleAppListSearchQuery(query: String): AppListSearchCommandAction {
     return when (val result = handleAppListSearchCommandUseCase(query)) {
       HandleAppListSearchCommandUseCase.Result.None -> AppListSearchCommandAction.None
 
@@ -369,6 +383,11 @@ class HomeViewModel(
   data class ToolbarSearchMenuState(
     val isExpanded: Boolean = false,
     val query: String = ""
+  )
+
+  data class AppListSearchQueryChange(
+    val shouldRefreshItems: Boolean,
+    val action: AppListSearchCommandAction
   )
 
   sealed interface AppListUpdate {

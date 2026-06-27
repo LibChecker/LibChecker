@@ -238,12 +238,14 @@ class AppListFragment :
   }
 
   override fun onQueryTextChange(newText: String): Boolean {
-    if (appAdapter.highlightText != newText) {
+    val shouldSyncHighlight = appAdapter.highlightText != newText
+    val searchChange = homeViewModel.onAppListSearchQueryChanged(newText)
+    if (searchChange.shouldRefreshItems || shouldSyncHighlight) {
       isSearchTextClearOnce = newText.isEmpty()
       appAdapter.highlightText = newText
       updateItems(highlightRefresh = true)
 
-      when (val action = homeViewModel.handleAppListSearchQuery(newText)) {
+      when (val action = searchChange.action) {
         HomeViewModel.AppListSearchCommandAction.None -> Unit
 
         HomeViewModel.AppListSearchCommandAction.EasterEgg -> {
@@ -447,12 +449,10 @@ class AppListFragment :
   private fun updateItemsImpl(highlightRefresh: Boolean = false) = lifecycleScope.launch(Dispatchers.IO) {
     delay(250)
     Timber.d("updateItemsImpl")
-    val keyword = appAdapter.highlightText
     val currentItems = withContext(Dispatchers.Main) {
       appAdapter.data.toList()
     }
     val update = homeViewModel.buildAppListUpdate(
-      keyword = keyword,
       isCurrentProcess64Bit = android.os.Process.is64Bit(),
       currentItems = currentItems,
       highlightRefresh = highlightRefresh
