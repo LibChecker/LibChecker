@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
 import android.view.ViewGroup
-import com.absinthe.libchecker.features.applist.detail.ui.view.XmlBottomSheetView
+import com.absinthe.libchecker.domain.app.detail.ui.view.XmlBottomSheetView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView

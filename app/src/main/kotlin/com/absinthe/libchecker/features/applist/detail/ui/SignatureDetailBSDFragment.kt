@@ -4,8 +4,8 @@ import android.content.DialogInterface
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.compat.VersionCompat
+import com.absinthe.libchecker.domain.app.detail.ui.view.SignatureDetailBottomSheetView
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
-import com.absinthe.libchecker.features.applist.detail.ui.view.SignatureDetailBottomSheetView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.utils.extensions.unsafeLazy

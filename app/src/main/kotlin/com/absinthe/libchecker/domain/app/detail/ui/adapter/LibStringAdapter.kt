@@ -39,12 +39,12 @@ import com.absinthe.libchecker.domain.app.detail.model.EXPORTED
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.model.StaticLibItem
+import com.absinthe.libchecker.domain.app.detail.ui.view.ComponentLibItemView
+import com.absinthe.libchecker.domain.app.detail.ui.view.MetadataLibItemView
+import com.absinthe.libchecker.domain.app.detail.ui.view.NativeLibItemView
+import com.absinthe.libchecker.domain.app.detail.ui.view.StaticLibItemView
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_TEXT
 import com.absinthe.libchecker.features.applist.detail.ui.XmlBSDFragment
-import com.absinthe.libchecker.features.applist.detail.ui.view.ComponentLibItemView
-import com.absinthe.libchecker.features.applist.detail.ui.view.MetadataLibItemView
-import com.absinthe.libchecker.features.applist.detail.ui.view.NativeLibItemView
-import com.absinthe.libchecker.features.applist.detail.ui.view.StaticLibItemView
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.UiUtils

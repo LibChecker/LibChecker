@@ -12,8 +12,8 @@ import com.absinthe.libchecker.domain.app.detail.RelatedAppDisplayData
 import com.absinthe.libchecker.domain.app.detail.action.GetOverlayDetailUseCase
 import com.absinthe.libchecker.domain.app.detail.action.OverlayDetailData
 import com.absinthe.libchecker.domain.app.detail.action.OverlayDetailExtraInfo
+import com.absinthe.libchecker.domain.app.detail.ui.view.OverlayDetailBottomSheetView
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
-import com.absinthe.libchecker.features.applist.detail.ui.view.OverlayDetailBottomSheetView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.copyToClipboard

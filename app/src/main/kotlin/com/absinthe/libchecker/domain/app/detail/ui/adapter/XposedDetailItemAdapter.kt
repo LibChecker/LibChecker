@@ -2,7 +2,7 @@ package com.absinthe.libchecker.domain.app.detail.ui.adapter
 
 import android.view.ViewGroup
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.node.XposedDetailItem
-import com.absinthe.libchecker.features.applist.detail.ui.view.XposedInfoBottomSheetView
+import com.absinthe.libchecker.domain.app.detail.ui.view.XposedInfoBottomSheetView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 

@@ -4,7 +4,7 @@ import android.graphics.Color
 import android.view.ViewGroup
 import androidx.core.graphics.drawable.toDrawable
 import com.absinthe.libchecker.domain.app.detail.action.AppInfoActionItem
-import com.absinthe.libchecker.features.applist.detail.ui.view.AppInfoItemView
+import com.absinthe.libchecker.domain.app.detail.ui.view.AppInfoItemView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 

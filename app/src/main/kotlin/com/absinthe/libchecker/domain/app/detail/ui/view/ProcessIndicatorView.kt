@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.applist.detail.ui.view
+package com.absinthe.libchecker.domain.app.detail.ui.view
 
 import android.animation.ValueAnimator
 import android.content.Context
