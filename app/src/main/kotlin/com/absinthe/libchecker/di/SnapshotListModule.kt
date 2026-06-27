@@ -2,6 +2,7 @@ package com.absinthe.libchecker.di
 
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.SnapshotDetailSectionBuilder
 import com.absinthe.libchecker.domain.snapshot.list.capture.CaptureInstalledSnapshotUseCase
+import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotListWorkflow
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotCapturePlanUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotListUpdatePlanUseCase
@@ -28,9 +29,8 @@ val snapshotListModule = module {
   factory { BuildSnapshotTimeNodeListDataUseCase(get()) }
   factory { DeleteSnapshotTimeStampUseCase(get(), get()) }
   factory { UpdateSnapshotDiffItemsUseCase() }
-
-  viewModel {
-    SnapshotViewModel(
+  factory {
+    SnapshotListWorkflow(
       repository = get(),
       appListRepository = get(),
       compareSnapshotDiffs = get(),
@@ -50,6 +50,12 @@ val snapshotListModule = module {
       updateSnapshotAutoRemoveThresholdUseCase = get(),
       updateSnapshotDiffItemsUseCase = get(),
       snapshotTrackChangeRepository = get()
+    )
+  }
+
+  viewModel {
+    SnapshotViewModel(
+      snapshotListWorkflow = get()
     )
   }
 }
