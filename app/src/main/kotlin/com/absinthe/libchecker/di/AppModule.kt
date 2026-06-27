@@ -18,7 +18,6 @@ import com.absinthe.libchecker.data.settings.GlobalDeveloperSettingsRepository
 import com.absinthe.libchecker.data.snapshot.AndroidSnapshotItemFactory
 import com.absinthe.libchecker.data.snapshot.GlobalSnapshotSelectionRepository
 import com.absinthe.libchecker.data.snapshot.GlobalSnapshotSettingsRepository
-import com.absinthe.libchecker.data.snapshot.GlobalSnapshotTrackChangeRepository
 import com.absinthe.libchecker.data.snapshot.LocalSnapshotDatabaseFileRepository
 import com.absinthe.libchecker.data.snapshot.LocalSnapshotRepository
 import com.absinthe.libchecker.data.snapshot.OnceSnapshotCaptureStateRepository
@@ -156,11 +155,6 @@ import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotDetai
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.timenode.usecase.BuildSnapshotTimeNodeItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.timenode.usecase.UpdateSnapshotAutoRemoveThresholdUseCase
-import com.absinthe.libchecker.domain.snapshot.track.presentation.TrackViewModel
-import com.absinthe.libchecker.domain.snapshot.track.repository.SnapshotTrackChangeRepository
-import com.absinthe.libchecker.domain.snapshot.track.usecase.CompareTrackedSnapshotListsUseCase
-import com.absinthe.libchecker.domain.snapshot.track.usecase.GetTrackListItemsUseCase
-import com.absinthe.libchecker.domain.snapshot.track.usecase.SetPackageTrackedUseCase
 import com.absinthe.libchecker.domain.statistics.chart.presentation.ChartViewModel
 import com.absinthe.libchecker.domain.statistics.chart.repository.AndroidDistributionRepository
 import com.absinthe.libchecker.domain.statistics.chart.repository.ChartSettingsRepository
@@ -207,7 +201,6 @@ val appModule = module {
   single<SnapshotCaptureStateRepository> { OnceSnapshotCaptureStateRepository() }
   single<SnapshotSelectionRepository> { GlobalSnapshotSelectionRepository() }
   single<SnapshotSettingsRepository> { GlobalSnapshotSettingsRepository() }
-  single<SnapshotTrackChangeRepository> { GlobalSnapshotTrackChangeRepository() }
   single<SnapshotDatabaseFileRepository> { LocalSnapshotDatabaseFileRepository() }
   single<SnapshotRepository> { LocalSnapshotRepository(get(), get()) }
   single<SnapshotArchiveCodec> { ProtoSnapshotArchiveCodec() }
@@ -406,13 +399,10 @@ val appModule = module {
   factory { BuildSnapshotAbiDisplayDataUseCase(androidContext()) }
   factory { BuildSnapshotUpdateTimeDisplayDataUseCase() }
   factory { CaptureInstalledSnapshotUseCase(androidContext().packageManager, get(), get(), get(), get(), get()) }
-  factory { CompareTrackedSnapshotListsUseCase(get(), get()) }
   factory { FormatSnapshotTimestampUseCase() }
   factory { GetSnapshotDashboardCountUseCase(get(), get()) }
   factory { GetSnapshotRuleUseCase() }
   factory { BuildSnapshotTimeNodeItemsUseCase() }
-  factory { GetTrackListItemsUseCase(androidContext().packageManager, get(), get()) }
-  factory { SetPackageTrackedUseCase(get(), get()) }
   factory { UpdateSnapshotAutoRemoveThresholdUseCase(get(), get()) }
   factory { UpdateSnapshotTopAppsUseCase(get(), get()) }
   factory { BuildSnapshotDetailItemsUseCase(androidContext()) }
@@ -496,5 +486,4 @@ val appModule = module {
       updateLibReferenceThresholdUseCase = get()
     )
   }
-  viewModel { TrackViewModel(get(), get()) }
 }
