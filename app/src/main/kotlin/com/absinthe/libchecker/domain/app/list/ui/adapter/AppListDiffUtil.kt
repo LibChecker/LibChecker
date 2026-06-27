@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.applist.ui.adapter
+package com.absinthe.libchecker.domain.app.list.ui.adapter
 
 import androidx.recyclerview.widget.DiffUtil
 import com.absinthe.libchecker.database.entity.LCItem

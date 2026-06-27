@@ -1,12 +1,12 @@
-package com.absinthe.libchecker.features.applist.ui
+package com.absinthe.libchecker.domain.app.list.ui
 
 import android.content.DialogInterface
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.AdvancedOptions
-import com.absinthe.libchecker.features.applist.ui.view.AdvancedMenuBSDView
-import com.absinthe.libchecker.features.applist.ui.view.AdvancedMenuItemView
-import com.absinthe.libchecker.features.applist.ui.view.AdvancedMenuSection
+import com.absinthe.libchecker.domain.app.list.ui.view.AdvancedMenuBSDView
+import com.absinthe.libchecker.domain.app.list.ui.view.AdvancedMenuItemView
+import com.absinthe.libchecker.domain.app.list.ui.view.AdvancedMenuSection
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView

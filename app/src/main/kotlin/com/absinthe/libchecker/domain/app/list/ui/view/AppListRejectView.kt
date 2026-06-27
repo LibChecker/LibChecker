@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.applist.ui.view
+package com.absinthe.libchecker.domain.app.list.ui.view
 
 import android.content.Context
 import android.util.AttributeSet
