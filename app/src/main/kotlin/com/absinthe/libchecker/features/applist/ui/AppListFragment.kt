@@ -77,6 +77,7 @@ class AppListFragment :
   private var isSearchTextClearOnce = false
   private var firstScrollFlag = false
   private var hasInitializedItems = false
+  private var pendingDumpAppsInfoAction: HomeViewModel.AppListSearchCommandAction.DumpAppsInfo? = null
 
   private lateinit var layoutManager: RecyclerView.LayoutManager
   private lateinit var dumpAppsInfoResultLauncher: ActivityResultLauncher<String>
@@ -197,8 +198,13 @@ class AppListFragment :
     super.onAttach(context)
     dumpAppsInfoResultLauncher =
       registerForActivityResult(ActivityResultContracts.CreateDocument("*/*")) {
-        it?.let {
-          homeViewModel.dumpAppsInfo(it)
+        val action = pendingDumpAppsInfoAction
+        pendingDumpAppsInfoAction = null
+        if (it != null && action != null) {
+          homeViewModel.dumpAppsInfo(
+            uri = it,
+            format = action.format
+          )
         }
       }
     queryAllPackagesPermissionLauncher =
@@ -265,9 +271,11 @@ class AppListFragment :
         }
 
         is HomeViewModel.AppListSearchCommandAction.DumpAppsInfo -> {
+          pendingDumpAppsInfoAction = action
           runCatching {
             dumpAppsInfoResultLauncher.launch(action.fileName)
           }.onFailure {
+            pendingDumpAppsInfoAction = null
             Timber.e(it)
             context?.showToast("Document API not working")
           }

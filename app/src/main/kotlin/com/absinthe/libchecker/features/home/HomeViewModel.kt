@@ -68,7 +68,6 @@ class HomeViewModel(
 
   private var toolbarSearchMenuState = ToolbarSearchMenuState()
   private var pendingPackagesPermissionCheck = false
-  private var pendingDumpAppsInfoFormat: ExportAppListUseCase.Format = ExportAppListUseCase.Format.PlainText
   private var pendingReturnTopAfterRequestChange = false
   private var hasUserScrolledAppList = false
   private var appListSearchKeyword: String = ""
@@ -352,12 +351,10 @@ class HomeViewModel(
       HandleAppListSearchCommandUseCase.Result.UserModeEnabled -> AppListSearchCommandAction.UserModeEnabled
 
       is HandleAppListSearchCommandUseCase.Result.DumpAppsInfo -> {
-        pendingDumpAppsInfoFormat = if (result.saveAsMarkDown) {
-          ExportAppListUseCase.Format.Markdown
-        } else {
-          ExportAppListUseCase.Format.PlainText
-        }
-        AppListSearchCommandAction.DumpAppsInfo(result.fileName)
+        AppListSearchCommandAction.DumpAppsInfo(
+          fileName = result.fileName,
+          format = result.format
+        )
       }
     }
   }
@@ -400,13 +397,19 @@ class HomeViewModel(
     data object EasterEgg : AppListSearchCommandAction
     data object DebugModeEnabled : AppListSearchCommandAction
     data object UserModeEnabled : AppListSearchCommandAction
-    data class DumpAppsInfo(val fileName: String) : AppListSearchCommandAction
+    data class DumpAppsInfo(
+      val fileName: String,
+      val format: ExportAppListUseCase.Format
+    ) : AppListSearchCommandAction
   }
 
-  fun dumpAppsInfo(uri: Uri) {
+  fun dumpAppsInfo(
+    uri: Uri,
+    format: ExportAppListUseCase.Format
+  ) {
     viewModelScope.launch(Dispatchers.IO) {
       runCatching {
-        exportAppListToUriUseCase(uri, pendingDumpAppsInfoFormat)
+        exportAppListToUriUseCase(uri, format)
       }.onFailure {
         Timber.e(it)
       }

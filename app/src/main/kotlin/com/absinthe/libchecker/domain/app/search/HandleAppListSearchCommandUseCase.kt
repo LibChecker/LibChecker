@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.domain.app.search
 
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.domain.app.ExportAppListUseCase
 import com.absinthe.libchecker.domain.settings.DeveloperSettingsRepository
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -31,7 +32,7 @@ class HandleAppListSearchCommandUseCase(
 
       query == Constants.COMMAND_DUMP_APPS_INFO_TXT -> {
         Result.DumpAppsInfo(
-          saveAsMarkDown = false,
+          format = ExportAppListUseCase.Format.PlainText,
           fileName = buildDumpAppsInfoFileName(
             timestampMillis = timestampMillis,
             extension = "txt"
@@ -41,7 +42,7 @@ class HandleAppListSearchCommandUseCase(
 
       query == Constants.COMMAND_DUMP_APPS_INFO_MD -> {
         Result.DumpAppsInfo(
-          saveAsMarkDown = true,
+          format = ExportAppListUseCase.Format.Markdown,
           fileName = buildDumpAppsInfoFileName(
             timestampMillis = timestampMillis,
             extension = "md"
@@ -71,7 +72,7 @@ class HandleAppListSearchCommandUseCase(
     data object UserModeEnabled : Result
 
     data class DumpAppsInfo(
-      val saveAsMarkDown: Boolean,
+      val format: ExportAppListUseCase.Format,
       val fileName: String
     ) : Result
   }
