@@ -2,8 +2,6 @@ package com.absinthe.libchecker.domain.snapshot.list.usecase
 
 import android.content.Context
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.snapshot.GetSnapshotSystemPropDiffsUseCase
-import com.absinthe.libchecker.domain.snapshot.SnapshotSystemProp
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotSystemPropDisplayData
 
 class BuildSnapshotSystemPropDisplayDataUseCase(

@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.snapshot
+package com.absinthe.libchecker.domain.snapshot.list.usecase
 
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import kotlinx.coroutines.Dispatchers

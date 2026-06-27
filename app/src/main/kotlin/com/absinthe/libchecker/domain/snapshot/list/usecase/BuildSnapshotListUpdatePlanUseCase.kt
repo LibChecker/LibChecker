@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.domain.snapshot.list.usecase
 
 import com.absinthe.libchecker.constant.options.SnapshotOptions
-import com.absinthe.libchecker.domain.snapshot.GetApexPackageNamesUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotListDisplayOptions
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem

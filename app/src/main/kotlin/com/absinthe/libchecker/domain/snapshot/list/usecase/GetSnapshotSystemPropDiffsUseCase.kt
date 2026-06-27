@@ -1,7 +1,8 @@
-package com.absinthe.libchecker.domain.snapshot
+package com.absinthe.libchecker.domain.snapshot.list.usecase
 
 import android.os.Build
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.utils.fromJson
 
 class GetSnapshotSystemPropDiffsUseCase(

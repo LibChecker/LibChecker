@@ -1,6 +1,8 @@
-package com.absinthe.libchecker.domain.snapshot
+package com.absinthe.libchecker.domain.snapshot.list.usecase
 
 import com.absinthe.libchecker.database.entity.TimeStampItem
+import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
+import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
 
 class DeleteSnapshotTimeStampUseCase(
   private val snapshotLibrary: SnapshotLibraryUseCase,
