@@ -29,17 +29,14 @@ import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.URLManager
-import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.SetApkAnalysisEnabledUseCase
-import com.absinthe.libchecker.domain.rules.RuleSettingsRepository
 import com.absinthe.libchecker.domain.settings.BuildLocalePreferenceDataUseCase
-import com.absinthe.libchecker.domain.settings.BuildLogShareIntentUseCase
 import com.absinthe.libchecker.domain.settings.LocalePreferenceSummary
 import com.absinthe.libchecker.domain.settings.SelectDarkModeUseCase
 import com.absinthe.libchecker.domain.settings.SelectLocaleUseCase
-import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.features.about.AboutPageBuilder
 import com.absinthe.libchecker.features.home.HomeViewModel
+import com.absinthe.libchecker.features.settings.SettingsViewModel
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.base.IAppBarContainer
 import com.absinthe.libchecker.ui.base.IListController
@@ -55,6 +52,7 @@ import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import rikka.recyclerview.fixEdgeEffect
 import rikka.widget.borderview.BorderRecyclerView
 import rikka.widget.borderview.BorderView
@@ -77,11 +75,8 @@ class SettingsFragment :
 
   private lateinit var borderViewDelegate: BorderViewDelegate
   private lateinit var prefRecyclerView: RecyclerView
-  private val viewModel: HomeViewModel by activityViewModels()
-  private val appListSettingsRepository: AppListSettingsRepository by inject()
-  private val ruleSettingsRepository: RuleSettingsRepository by inject()
-  private val snapshotSettingsRepository: SnapshotSettingsRepository by inject()
-  private val buildLogShareIntent: BuildLogShareIntentUseCase by inject()
+  private val homeViewModel: HomeViewModel by activityViewModels()
+  private val settingsViewModel: SettingsViewModel by viewModel()
   private val buildLocalePreferenceData: BuildLocalePreferenceDataUseCase by inject()
   private val setApkAnalysisEnabled: SetApkAnalysisEnabledUseCase by inject()
   private val selectDarkMode: SelectDarkModeUseCase by inject()
@@ -103,9 +98,7 @@ class SettingsFragment :
     }
     findPreference<TwoStatePreference>(Constants.PREF_COLORFUL_ICON)?.apply {
       setOnPreferenceChangeListener { _, newValue ->
-        lifecycleScope.launch {
-          appListSettingsRepository.notifyColorfulRuleIconChanged(newValue as Boolean)
-        }
+        settingsViewModel.setColorfulRuleIcon(newValue as Boolean)
         recordPreferenceEvent(Constants.PREF_COLORFUL_ICON, newValue)
         true
       }
@@ -113,7 +106,7 @@ class SettingsFragment :
     findPreference<ListPreference>(Constants.PREF_RULES_REPO)?.apply {
       summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
       setOnPreferenceChangeListener { _, newValue ->
-        ruleSettingsRepository.selectRemoteRepository(newValue.toString())
+        settingsViewModel.selectRemoteRulesRepository(newValue.toString())
         recordPreferenceEvent(Constants.PREF_RULES_REPO, newValue)
         true
       }
@@ -133,7 +126,7 @@ class SettingsFragment :
     findPreference<ListPreference>(Constants.PREF_SNAPSHOT_KEEP)?.apply {
       summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
       setOnPreferenceChangeListener { _, newValue ->
-        snapshotSettingsRepository.keepRule = newValue.toString()
+        settingsViewModel.setSnapshotKeepRule(newValue.toString())
         true
       }
     }
@@ -181,7 +174,7 @@ class SettingsFragment :
             .setTitle(R.string.dialog_title_reload_apps)
             .setMessage(R.string.dialog_subtitle_reload_apps)
             .setPositiveButton(android.R.string.ok) { _, _ ->
-              viewModel.reloadApps()
+              homeViewModel.reloadApps()
               recordPreferenceEvent(Constants.PREF_RELOAD_APPS)
             }
             .setNegativeButton(android.R.string.cancel, null)
@@ -198,7 +191,7 @@ class SettingsFragment :
           false
         } else {
           lifecycleScope.launch {
-            val logShareIntent = buildLogShareIntent().getOrElse { e ->
+            val logShareIntent = settingsViewModel.buildLogShareIntent().getOrElse { e ->
               Timber.e(e)
               Toasty.showShort(requireContext(), e.toString())
               recordPreferenceEvent(Constants.PREF_EXPORT_LOG)

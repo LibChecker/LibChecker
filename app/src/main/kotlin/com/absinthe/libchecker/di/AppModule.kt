@@ -550,7 +550,11 @@ val appModule = module {
   }
   viewModel {
     SettingsViewModel(
-      appUpdateRepository = get()
+      appUpdateRepository = get(),
+      appListSettingsRepository = get(),
+      ruleSettingsRepository = get(),
+      snapshotSettingsRepository = get(),
+      buildLogShareIntentUseCase = get()
     )
   }
   viewModel {
