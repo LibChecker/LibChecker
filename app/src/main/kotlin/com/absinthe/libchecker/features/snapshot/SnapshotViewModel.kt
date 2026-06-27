@@ -65,7 +65,7 @@ class SnapshotViewModel(
 ) : ViewModel() {
 
   val allSnapshots = repository.currentSnapshotCount
-  private val _snapshotDiffItemsUpdates: MutableSharedFlow<SnapshotDiffItemsUpdate> = MutableSharedFlow()
+  private val _snapshotDiffItemsUpdates: MutableSharedFlow<Unit> = MutableSharedFlow()
   val snapshotDiffItemsUpdates = _snapshotDiffItemsUpdates.asSharedFlow()
   val snapshotDetailSectionsFlow: MutableSharedFlow<List<SnapshotDetailSection>> = MutableSharedFlow()
 
@@ -73,6 +73,8 @@ class SnapshotViewModel(
   val effect = _effect.asSharedFlow()
 
   private var snapshotDiffItems: List<SnapshotDiffItem> = emptyList()
+  private val pendingParticleRemovePackageNames = linkedSetOf<String>()
+  private var snapshotSearchKeyword: String = ""
   private var compareDiffJob: Job? = null
   private val packageChangeProcessor = SnapshotPackageChangeProcessor(::processPackageChange)
 
@@ -188,22 +190,29 @@ class SnapshotViewModel(
     return buildSnapshotTimeNodeItemsUseCase(timeStamps)
   }
 
+  fun updateSnapshotSearchKeyword(keyword: String): Boolean {
+    if (snapshotSearchKeyword == keyword) {
+      return false
+    }
+    snapshotSearchKeyword = keyword
+    return true
+  }
+
   suspend fun buildSnapshotListUpdatePlan(
     currentItems: List<SnapshotDiffItem>,
-    sourceItems: List<SnapshotDiffItem>,
-    searchKeyword: String,
-    pendingRemovePackageNames: Set<String>,
     highlightRefresh: Boolean
   ): BuildSnapshotListUpdatePlanUseCase.Plan {
-    return buildSnapshotListUpdatePlanUseCase(
+    val plan = buildSnapshotListUpdatePlanUseCase(
       BuildSnapshotListUpdatePlanUseCase.Request(
         currentItems = currentItems,
-        sourceItems = sourceItems,
-        searchKeyword = searchKeyword,
-        pendingRemovePackageNames = pendingRemovePackageNames,
+        sourceItems = snapshotDiffItems,
+        searchKeyword = snapshotSearchKeyword,
+        pendingRemovePackageNames = pendingParticleRemovePackageNames.toSet(),
         highlightRefresh = highlightRefresh
       )
     )
+    pendingParticleRemovePackageNames.removeAll(plan.consumedRemovePackageNames)
+    return plan
   }
 
   suspend fun getSystemPropDisplayData(timestamp: Long): List<SnapshotSystemPropDisplayData> {
@@ -303,18 +312,9 @@ class SnapshotViewModel(
     pendingRemovePackageNames: Set<String> = emptySet()
   ) {
     snapshotDiffItems = items
-    _snapshotDiffItemsUpdates.emit(
-      SnapshotDiffItemsUpdate(
-        items = items,
-        pendingRemovePackageNames = pendingRemovePackageNames
-      )
-    )
+    pendingParticleRemovePackageNames += pendingRemovePackageNames
+    _snapshotDiffItemsUpdates.emit(Unit)
   }
-
-  data class SnapshotDiffItemsUpdate(
-    val items: List<SnapshotDiffItem>,
-    val pendingRemovePackageNames: Set<String>
-  )
 
   sealed class Effect {
     data class DashboardCountChange(

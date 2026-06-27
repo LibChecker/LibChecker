@@ -87,10 +87,7 @@ class SnapshotFragment :
     SnapshotAdapter(buildSnapshotAbiDisplayData, buildSnapshotUpdateTimeDisplayData)
   }
   private val particleItemAnimator = ParticleRemoveItemAnimator()
-  private val pendingParticleRemovePackageNames = linkedSetOf<String>()
   private var shouldCompare = true and ShootService.isComputing.not()
-  private var keyword: String = ""
-  private var items = emptyList<SnapshotDiffItem>()
 
   private val shootListener = object : OnShootListener.Stub() {
     override fun onShootFinished(timestamp: Long) {
@@ -242,7 +239,7 @@ class SnapshotFragment :
         }
       }.launchIn(lifecycleScope)
       snapshotDiffItemsUpdates.onEach {
-        applySnapshotDiffItemsUpdate(it.items, it.pendingRemovePackageNames)
+        updateItems()
 
         lifecycleScope.launch(Dispatchers.IO) {
           delay(250)
@@ -293,15 +290,6 @@ class SnapshotFragment :
     }.launchIn(lifecycleScope)
 
     viewModel.changeTimeStamp(viewModel.selectedSnapshotTimestamp)
-  }
-
-  private fun applySnapshotDiffItemsUpdate(
-    newItems: List<SnapshotDiffItem>,
-    pendingRemovePackageNames: Set<String>
-  ) {
-    pendingParticleRemovePackageNames += pendingRemovePackageNames
-    items = newItems
-    updateItems()
   }
 
   override fun onAttach(context: Context) {
@@ -543,8 +531,8 @@ class SnapshotFragment :
   }
 
   override fun onQueryTextChange(newText: String?): Boolean {
-    if (keyword != newText) {
-      keyword = newText.orEmpty()
+    val keyword = newText.orEmpty()
+    if (viewModel.updateSnapshotSearchKeyword(keyword)) {
       adapter.highlightText = keyword
       updateItems(highlightRefresh = true)
     }
@@ -554,13 +542,9 @@ class SnapshotFragment :
   private fun updateItems(highlightRefresh: Boolean = false) = lifecycleScope.launch(Dispatchers.Main) {
     val updatePlan = viewModel.buildSnapshotListUpdatePlan(
       currentItems = adapter.data,
-      sourceItems = items,
-      searchKeyword = keyword,
-      pendingRemovePackageNames = pendingParticleRemovePackageNames.toSet(),
       highlightRefresh = highlightRefresh
     )
     particleItemAnimator.prepareParticleRemovals(updatePlan.particleRemovalItemIds)
-    pendingParticleRemovePackageNames.removeAll(updatePlan.consumedRemovePackageNames)
 
     adapter.setPackageIconSources(updatePlan.packageIconSources)
     adapter.setApexPackageNames(updatePlan.apexPackageNames)
