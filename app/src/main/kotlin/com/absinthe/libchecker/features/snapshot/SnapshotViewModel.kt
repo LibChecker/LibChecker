@@ -20,6 +20,7 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotCapturePlan
 import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
+import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSystemPropDisplayData
 import com.absinthe.libchecker.domain.snapshot.SnapshotTrackChangeRepository
 import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotDiffItemsUseCase
@@ -54,6 +55,7 @@ class SnapshotViewModel(
   private val deleteSnapshotTimeStampUseCase: DeleteSnapshotTimeStampUseCase,
   private val formatSnapshotTimestampUseCase: FormatSnapshotTimestampUseCase,
   private val snapshotSelectionUseCase: SnapshotSelectionUseCase,
+  private val snapshotSettingsRepository: SnapshotSettingsRepository,
   private val updateSnapshotDiffItemsUseCase: UpdateSnapshotDiffItemsUseCase,
   private val snapshotTrackChangeRepository: SnapshotTrackChangeRepository
 ) : ViewModel() {
@@ -105,6 +107,32 @@ class SnapshotViewModel(
 
   fun buildSnapshotCapturePlan(): SnapshotCapturePlan {
     return buildSnapshotCapturePlanUseCase(selectedSnapshotTimestamp)
+  }
+
+  fun getSnapshotOptions(): Int {
+    return snapshotSettingsRepository.options
+  }
+
+  fun getSnapshotOptionsDiff(previousOptions: Int): Int {
+    return previousOptions.xor(snapshotSettingsRepository.options)
+  }
+
+  fun setSnapshotOption(option: Int, enabled: Boolean): Int {
+    val newOptions = if (enabled) {
+      snapshotSettingsRepository.options or option
+    } else {
+      snapshotSettingsRepository.options and option.inv()
+    }
+    snapshotSettingsRepository.options = newOptions
+    return newOptions
+  }
+
+  fun getSnapshotAutoRemoveThreshold(): Int {
+    return snapshotSettingsRepository.autoRemoveThreshold
+  }
+
+  fun setSnapshotAutoRemoveThreshold(threshold: Int) {
+    snapshotSettingsRepository.autoRemoveThreshold = threshold
   }
 
   suspend fun compareItemDiff(

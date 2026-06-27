@@ -579,6 +579,7 @@ val appModule = module {
       deleteSnapshotTimeStampUseCase = get(),
       formatSnapshotTimestampUseCase = get(),
       snapshotSelectionUseCase = get(),
+      snapshotSettingsRepository = get(),
       updateSnapshotDiffItemsUseCase = get(),
       snapshotTrackChangeRepository = get()
     )
