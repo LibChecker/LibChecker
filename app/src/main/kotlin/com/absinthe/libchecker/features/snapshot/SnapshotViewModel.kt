@@ -75,6 +75,7 @@ class SnapshotViewModel(
   private var snapshotDiffItems: List<SnapshotDiffItem> = emptyList()
   private val pendingParticleRemovePackageNames = linkedSetOf<String>()
   private var snapshotSearchKeyword: String = ""
+  private var snapshotAutoCompareEnabled = true
   private var compareDiffJob: Job? = null
   private val packageChangeProcessor = SnapshotPackageChangeProcessor(::processPackageChange)
 
@@ -85,6 +86,21 @@ class SnapshotViewModel(
     private set
 
   fun isComparingActive(): Boolean = compareDiffJob == null || compareDiffJob?.isActive == true
+
+  fun shouldAutoCompareSnapshot(): Boolean = snapshotAutoCompareEnabled
+
+  fun onSnapshotServiceStateObserved(isComputing: Boolean) {
+    snapshotAutoCompareEnabled = !isComputing
+  }
+
+  fun onSnapshotCaptureStarted() {
+    snapshotAutoCompareEnabled = false
+  }
+
+  fun onSnapshotCaptureFinished(timestamp: Long) {
+    refreshSnapshotTimestamp(timestamp)
+    snapshotAutoCompareEnabled = true
+  }
 
   fun compareDiff(
     preTimeStamp: Long,

@@ -87,13 +87,11 @@ class SnapshotFragment :
     SnapshotAdapter(buildSnapshotAbiDisplayData, buildSnapshotUpdateTimeDisplayData)
   }
   private val particleItemAnimator = ParticleRemoveItemAnimator()
-  private var shouldCompare = true and ShootService.isComputing.not()
 
   private val shootListener = object : OnShootListener.Stub() {
     override fun onShootFinished(timestamp: Long) {
       lifecycleScope.launch(Dispatchers.Main) {
-        viewModel.refreshSnapshotTimestamp(timestamp)
-        shouldCompare = true
+        viewModel.onSnapshotCaptureFinished(timestamp)
       }
     }
 
@@ -116,6 +114,7 @@ class SnapshotFragment :
 
   override fun init() {
     val context = (this.context as? BaseActivity<*>) ?: return
+    viewModel.onSnapshotServiceStateObserved(ShootService.isComputing)
 
     val dashboard =
       SnapshotDashboardView(ContextThemeWrapper(context, R.style.AlbumMaterialCard)).apply {
@@ -234,7 +233,7 @@ class SnapshotFragment :
 
     viewModel.apply {
       allSnapshots.onEach {
-        if (shouldCompare) {
+        if (viewModel.shouldAutoCompareSnapshot()) {
           viewModel.refreshSelectedSnapshot()
         }
       }.launchIn(lifecycleScope)
@@ -321,7 +320,7 @@ class SnapshotFragment :
       viewModel.refreshSelectedSnapshot(shouldClearDiff = true)
     }
 
-    if (shouldCompare) {
+    if (viewModel.shouldAutoCompareSnapshot()) {
       if (!viewModel.isComparingActive()) {
         flip(VF_LIST)
       } else {
@@ -398,7 +397,7 @@ class SnapshotFragment :
         if (!shootServiceController.computeSnapshot(dropPrevious)) {
           Toasty.showShort(context, "Snapshot service error")
         }
-        shouldCompare = false
+        viewModel.onSnapshotCaptureStarted()
 
         if (OsUtils.atLeastT()) {
           if (ContextCompat.checkSelfPermission(
