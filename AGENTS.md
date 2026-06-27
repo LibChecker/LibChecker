@@ -198,6 +198,9 @@ Important `:app` boundaries:
    mapping, menus, navigation, or visible strings changed, add a focused
    AndroMeld smoke on the affected flow when a device is available. Report
    exactly what passed, failed, or was skipped.
+   For performance or detail-flow smoke samples, prefer complex real-world
+   packages; if the intended sample is missing and Play Store is available,
+   install it there instead of substituting a trivial app.
 7. Before committing code, consider `AGENTS.md` only for durable, recurring
    rules. Keep it compact: merge with existing bullets, replace stale guidance,
    or delete obsolete notes before appending. Put one-off decisions and

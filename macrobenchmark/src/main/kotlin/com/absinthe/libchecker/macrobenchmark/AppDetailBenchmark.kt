@@ -55,9 +55,64 @@ class AppDetailBenchmark {
     }
   }
 
+  @Test
+  fun openGooglePlayServicesDetail() = benchmarkRule.measureRepeated(
+    packageName = TARGET_PACKAGE,
+    metrics = listOf(FrameTimingMetric()),
+    compilationMode = CompilationMode.None(),
+    iterations = 5,
+    setupBlock = {
+      pressHome()
+    }
+  ) {
+    startActivityAndWait(
+      Intent(Intent.ACTION_SHOW_APP_INFO).apply {
+        setClassName(TARGET_PACKAGE, APP_DETAIL_ACTIVITY)
+        putExtra(Intent.EXTRA_PACKAGE_NAME, GOOGLE_PLAY_SERVICES_PACKAGE)
+        flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+      }
+    )
+    check(
+      device.wait(
+        Until.hasObject(By.pkg(TARGET_PACKAGE).text(GOOGLE_PLAY_SERVICES_LABEL)),
+        UI_TIMEOUT_MS
+      )
+    ) {
+      "App detail page did not show $GOOGLE_PLAY_SERVICES_LABEL"
+    }
+    check(
+      device.wait(
+        Until.hasObject(By.pkg(TARGET_PACKAGE).text(GOOGLE_PLAY_SERVICES_PACKAGE)),
+        UI_TIMEOUT_MS
+      )
+    ) {
+      "App detail page did not show $GOOGLE_PLAY_SERVICES_PACKAGE"
+    }
+    check(
+      device.wait(
+        Until.hasObject(By.res(TARGET_PACKAGE, "tab_layout")),
+        UI_TIMEOUT_MS
+      )
+    ) {
+      "App detail page did not open"
+    }
+    check(
+      device.wait(
+        Until.hasObject(By.pkg(TARGET_PACKAGE).textStartsWith(NATIVE_LIBRARY_PREFIX)),
+        UI_TIMEOUT_MS
+      )
+    ) {
+      "App detail native library list did not load"
+    }
+  }
+
   private companion object {
     private const val TARGET_PACKAGE = "com.absinthe.libchecker.debug"
+    private const val APP_DETAIL_ACTIVITY = "com.absinthe.libchecker.domain.app.detail.ui.AppDetailActivity"
     private const val ANDROID_AUTO_LABEL = "Android Auto"
+    private const val GOOGLE_PLAY_SERVICES_LABEL = "Google Play 服务"
+    private const val GOOGLE_PLAY_SERVICES_PACKAGE = "com.google.android.gms"
+    private const val NATIVE_LIBRARY_PREFIX = "lib"
     private const val UI_TIMEOUT_MS = 15_000L
   }
 }
