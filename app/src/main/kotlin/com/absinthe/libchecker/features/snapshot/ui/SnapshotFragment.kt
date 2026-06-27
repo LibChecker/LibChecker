@@ -88,8 +88,6 @@ class SnapshotFragment :
   }
   private val particleItemAnimator = ParticleRemoveItemAnimator()
   private val pendingParticleRemovePackageNames = linkedSetOf<String>()
-  private var isSnapshotDatabaseItemsReady = false
-  private var dropPrevious = false
   private var shouldCompare = true and ShootService.isComputing.not()
   private var keyword: String = ""
   private var items = emptyList<SnapshotDiffItem>()
@@ -97,7 +95,7 @@ class SnapshotFragment :
   private val shootListener = object : OnShootListener.Stub() {
     override fun onShootFinished(timestamp: Long) {
       lifecycleScope.launch(Dispatchers.Main) {
-        refreshSnapshotTimestamp(timestamp)
+        viewModel.refreshSnapshotTimestamp(timestamp)
         shouldCompare = true
       }
     }
@@ -145,7 +143,7 @@ class SnapshotFragment :
               .apply {
                 setOnItemClickListener { position ->
                   val item = timeStampList[position]
-                  refreshSnapshotTimestamp(item.timestamp, shouldClearDiff = true)
+                  viewModel.refreshSnapshotTimestamp(item.timestamp, shouldClearDiff = true)
                   flip(VF_LOADING)
                   dismiss()
                 }
@@ -240,7 +238,7 @@ class SnapshotFragment :
     viewModel.apply {
       allSnapshots.onEach {
         if (shouldCompare) {
-          refreshSelectedSnapshot()
+          viewModel.refreshSelectedSnapshot()
         }
       }.launchIn(lifecycleScope)
       snapshotDiffItemsUpdates.onEach {
@@ -332,7 +330,7 @@ class SnapshotFragment :
 
     if (viewModel.currentTimeStamp != viewModel.selectedSnapshotTimestamp) {
       flip(VF_LOADING)
-      refreshSelectedSnapshot(shouldClearDiff = true)
+      viewModel.refreshSelectedSnapshot(shouldClearDiff = true)
     }
 
     if (shouldCompare) {
@@ -408,7 +406,6 @@ class SnapshotFragment :
       fun computeNewSnapshot(dropPrevious: Boolean = false) {
         flip(VF_LOADING)
         (context as INavViewContainer).showNavigationView()
-        this@SnapshotFragment.dropPrevious = dropPrevious
         shootServiceController.start(context)
         if (!shootServiceController.computeSnapshot(dropPrevious)) {
           Toasty.showShort(context, "Snapshot service error")
@@ -515,21 +512,6 @@ class SnapshotFragment :
     }
 
     binding.vfContainer.displayedChild = child
-  }
-
-  private fun refreshSelectedSnapshot(shouldClearDiff: Boolean = false) {
-    isSnapshotDatabaseItemsReady = true
-    viewModel.refreshSelectedSnapshot(shouldClearDiff)
-    isSnapshotDatabaseItemsReady = false
-  }
-
-  private fun refreshSnapshotTimestamp(
-    timestamp: Long,
-    shouldClearDiff: Boolean = false
-  ) {
-    isSnapshotDatabaseItemsReady = true
-    viewModel.refreshSnapshotTimestamp(timestamp, shouldClearDiff)
-    isSnapshotDatabaseItemsReady = false
   }
 
   override fun getSuitableLayoutManager() = binding.list.layoutManager
