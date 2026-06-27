@@ -24,7 +24,9 @@ Use the Gradle wrapper from the repository root. On macOS/Linux use
   `ANDROID_SERIAL=<serial> ./gradlew :macrobenchmark:connectedFossBenchmarkAndroidTest --no-configuration-cache`
 - Device UI validation: prefer AndroMeld MCP Phone Screen sessions for visible
   launch, navigation, and UI-state checks. Use Gradle/adb for install and
-  package-state operations only when needed.
+  package-state operations only when needed. For performance/detail checks, use
+  complex real apps such as GMS, Android Auto, or Bilibili; install from Play
+  Store if absent.
 - For snapshot checks, prefer importing an existing backup from the device
   `Download` directory before exporting a new snapshot.
 

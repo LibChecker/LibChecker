@@ -1,16 +1,19 @@
 package com.absinthe.libchecker.domain.app.detail.ui.controller
 
 import android.content.pm.PackageInfo
+import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.domain.app.detail.content.AppDetailAnalysisInitAction
 import com.absinthe.libchecker.domain.app.detail.content.AppDetailFeatureInitAction
 import com.absinthe.libchecker.domain.app.detail.content.BuildAppDetailContentInitPlanUseCase
 import com.absinthe.libchecker.domain.app.detail.model.DetailExtraBean
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
-import com.absinthe.libchecker.domain.app.detail.ui.DetailFeatureListController
+import com.absinthe.libchecker.domain.app.detail.ui.DetailTabSpec
 import com.absinthe.libchecker.domain.app.detail.ui.DetailTabSpecBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -20,7 +23,6 @@ class DetailPackageContentController(
   private val buildAppDetailContentInitPlan: BuildAppDetailContentInitPlanUseCase,
   private val tabSpecBuilder: DetailTabSpecBuilder,
   private val tabController: DetailTabController,
-  private val featureListController: DetailFeatureListController,
   private val currentUiGeneration: () -> Int,
   private val staticLibraryTitle: () -> CharSequence,
   private val onStaticLibsAvailable: () -> Unit,
@@ -50,7 +52,7 @@ class DetailPackageContentController(
     )
 
     insertStaticLibraryTabIfAvailable(packageName, uiGeneration)
-    initFeatureItems(packageInfo, contentInitPlan.featureAction)
+    initFeatureItems(packageInfo, contentInitPlan.featureAction, tabSpec, uiGeneration)
     initAnalysisContent(packageName, contentInitPlan.analysisAction)
     if (contentInitPlan.shouldInitPermissions) {
       // Detect Live Update notification
@@ -77,15 +79,23 @@ class DetailPackageContentController(
 
   private fun initFeatureItems(
     packageInfo: PackageInfo,
-    featureAction: AppDetailFeatureInitAction
+    featureAction: AppDetailFeatureInitAction,
+    tabSpec: DetailTabSpec,
+    uiGeneration: Int
   ) {
-    if (featureListController.isInitialized) {
-      return
-    }
-
     when (featureAction) {
       is AppDetailFeatureInitAction.Emit -> viewModel.emitFeature(featureAction.feature)
-      is AppDetailFeatureInitAction.LoadPackageFeatures -> viewModel.initFeatures(packageInfo, featureAction.featureMask)
+
+      is AppDetailFeatureInitAction.LoadPackageFeatures -> {
+        coroutineScope.launch {
+          if (NATIVE in tabSpec.types) {
+            viewModel.contentState.nativeLibTabs.filterNotNull().first()
+          }
+          if (uiGeneration == currentUiGeneration()) {
+            viewModel.initFeatures(packageInfo, featureAction.featureMask)
+          }
+        }
+      }
     }
   }
 

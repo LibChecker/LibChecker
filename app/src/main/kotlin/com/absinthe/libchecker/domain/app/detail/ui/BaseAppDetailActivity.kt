@@ -166,7 +166,6 @@ abstract class BaseAppDetailActivity :
       buildAppDetailContentInitPlan = buildAppDetailContentInitPlan,
       tabSpecBuilder = tabSpecBuilder,
       tabController = tabController,
-      featureListController = featureListController,
       currentUiGeneration = { packageUiGeneration },
       staticLibraryTitle = { getText(R.string.ref_category_static) },
       onStaticLibsAvailable = ::onStaticLibsAvailable,
