@@ -13,6 +13,7 @@ import com.absinthe.libchecker.app.MainLooperFilter
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.di.appModule
+import com.absinthe.libchecker.di.snapshotBackupModule
 import com.absinthe.libchecker.di.snapshotComparisonModule
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.Telemetry
@@ -61,7 +62,7 @@ class LibCheckerApp : Application() {
     startKoin {
       androidLogger()
       androidContext(this@LibCheckerApp)
-      modules(appModule, snapshotComparisonModule)
+      modules(appModule, snapshotComparisonModule, snapshotBackupModule)
     }
     Telemetry.setEnable(GlobalValues.isAnonymousAnalyticsEnabled)
     RulesRepository.init(this)

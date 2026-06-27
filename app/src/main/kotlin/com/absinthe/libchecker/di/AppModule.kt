@@ -1,9 +1,7 @@
 package com.absinthe.libchecker.di
 
 import com.absinthe.libchecker.BuildConfig
-import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.app.SystemServices
-import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.data.app.AndroidAppListExportMetadata
 import com.absinthe.libchecker.data.app.AndroidAppListItemFactory
 import com.absinthe.libchecker.data.app.GlobalAppDetailSettingsRepository
@@ -21,8 +19,6 @@ import com.absinthe.libchecker.data.snapshot.AndroidSnapshotItemFactory
 import com.absinthe.libchecker.data.snapshot.GlobalSnapshotSelectionRepository
 import com.absinthe.libchecker.data.snapshot.GlobalSnapshotSettingsRepository
 import com.absinthe.libchecker.data.snapshot.GlobalSnapshotTrackChangeRepository
-import com.absinthe.libchecker.data.snapshot.LocalSnapshotDatabaseBackupExporter
-import com.absinthe.libchecker.data.snapshot.LocalSnapshotDatabaseBackupRestorer
 import com.absinthe.libchecker.data.snapshot.LocalSnapshotDatabaseFileRepository
 import com.absinthe.libchecker.data.snapshot.LocalSnapshotRepository
 import com.absinthe.libchecker.data.snapshot.OnceSnapshotCaptureStateRepository
@@ -30,10 +26,8 @@ import com.absinthe.libchecker.data.snapshot.ProtoSnapshotArchiveCodec
 import com.absinthe.libchecker.data.statistics.CachedAndroidDistributionRepository
 import com.absinthe.libchecker.data.statistics.GlobalChartSettingsRepository
 import com.absinthe.libchecker.data.statistics.GlobalLibReferenceSettingsRepository
-import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.Repositories
-import com.absinthe.libchecker.database.backup.RoomBackup
 import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.AppListItemFactory
 import com.absinthe.libchecker.domain.app.AppListRepository
@@ -160,14 +154,6 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotTopAppsUseCase
-import com.absinthe.libchecker.domain.snapshot.backup.presentation.SnapshotBackupViewModel
-import com.absinthe.libchecker.domain.snapshot.backup.usecase.BackupSnapshotArchiveToUriUseCase
-import com.absinthe.libchecker.domain.snapshot.backup.usecase.BuildSnapshotRestorePlanUseCase
-import com.absinthe.libchecker.domain.snapshot.backup.usecase.CreateSnapshotDatabaseBackupUseCase
-import com.absinthe.libchecker.domain.snapshot.backup.usecase.GetSnapshotBackupTargetUseCase
-import com.absinthe.libchecker.domain.snapshot.backup.usecase.PrepareRoomBackupRestoreFileUseCase
-import com.absinthe.libchecker.domain.snapshot.backup.usecase.RestoreSnapshotArchiveFromUriUseCase
-import com.absinthe.libchecker.domain.snapshot.backup.usecase.RestoreSnapshotDatabaseBackupUseCase
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotDetailItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotDetailSectionsUseCase
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
@@ -205,11 +191,9 @@ import com.absinthe.libchecker.domain.statistics.reference.usecase.GetLibReferen
 import com.absinthe.libchecker.domain.statistics.reference.usecase.GetLibReferenceConfigUseCase
 import com.absinthe.libchecker.domain.statistics.reference.usecase.GetLibReferenceIconPackagesUseCase
 import com.absinthe.libchecker.domain.statistics.reference.usecase.UpdateLibReferenceThresholdUseCase
-import com.jakewharton.processphoenix.ProcessPhoenix
 import jonathanfinerty.once.Once
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
-import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
 
 val appModule = module {
@@ -431,7 +415,6 @@ val appModule = module {
   factory { BuildInstalledSnapshotItemUseCase(get()) }
   factory { BuildSnapshotAbiDisplayDataUseCase(androidContext()) }
   factory { BuildSnapshotCapturePlanUseCase(get()) }
-  factory { BuildSnapshotRestorePlanUseCase() }
   factory { BuildSnapshotListUpdatePlanUseCase(get(), get(), get()) }
   factory { BuildSnapshotUpdateTimeDisplayDataUseCase() }
   factory { CaptureInstalledSnapshotUseCase(androidContext().packageManager, get(), get(), get(), get(), get()) }
@@ -440,7 +423,6 @@ val appModule = module {
   factory { GetSnapshotDashboardCountUseCase(get(), get()) }
   factory { GetSnapshotPackageIconSourcesUseCase(get()) }
   factory { GetSnapshotRuleUseCase() }
-  factory { GetSnapshotBackupTargetUseCase(get()) }
   factory { GetSnapshotSystemPropDiffsUseCase(get()) }
   factory { BuildSnapshotSystemPropDisplayDataUseCase(androidContext(), get()) }
   factory { BuildSnapshotTimeNodeItemsUseCase() }
@@ -453,30 +435,6 @@ val appModule = module {
   factory { BuildSnapshotDetailItemsUseCase(androidContext()) }
   factory { BuildSnapshotDetailSectionsUseCase(get(), get()) }
   factory { SnapshotArchiveUseCase(get(), get()) }
-  factory { BackupSnapshotArchiveToUriUseCase(androidContext().contentResolver, get()) }
-  factory { (roomBackup: RoomBackup) ->
-    CreateSnapshotDatabaseBackupUseCase(
-      databaseBackupExporter = LocalSnapshotDatabaseBackupExporter(
-        roomBackup = roomBackup,
-        database = { LCDatabase.getDatabase() }
-      )
-    )
-  }
-  factory { PrepareRoomBackupRestoreFileUseCase(androidContext().contentResolver) }
-  factory { (roomBackup: RoomBackup) ->
-    RestoreSnapshotDatabaseBackupUseCase(
-      prepareRoomBackupRestoreFile = get(),
-      databaseBackupRestorer = LocalSnapshotDatabaseBackupRestorer(
-        roomBackup = roomBackup,
-        database = { LCDatabase.getDatabase() }
-      ),
-      onSuccessfulRestore = {
-        Once.clearDone(OnceTag.FIRST_LAUNCH)
-        ProcessPhoenix.triggerRebirth(LibCheckerApp.app)
-      }
-    )
-  }
-  factory { RestoreSnapshotArchiveFromUriUseCase(androidContext().contentResolver, get()) }
   factory { SnapshotLibraryUseCase(get()) }
   factory { SnapshotSelectionUseCase(get()) }
   factory {
@@ -577,26 +535,6 @@ val appModule = module {
       updateSnapshotAutoRemoveThresholdUseCase = get(),
       updateSnapshotDiffItemsUseCase = get(),
       snapshotTrackChangeRepository = get()
-    )
-  }
-  viewModel {
-    SnapshotBackupViewModel(
-      backupSnapshotArchiveToUriUseCase = get(),
-      restoreSnapshotArchiveFromUriUseCase = get(),
-      getSnapshotBackupTargetUseCase = get(),
-      buildSnapshotRestorePlanUseCase = get(),
-      createSnapshotDatabaseBackupUseCaseFactory = { roomBackup ->
-        get {
-          parametersOf(roomBackup)
-        }
-      },
-      restoreSnapshotDatabaseBackupUseCaseFactory = { roomBackup ->
-        get {
-          parametersOf(roomBackup)
-        }
-      },
-      formatSnapshotTimestampUseCase = get(),
-      snapshotSelectionUseCase = get()
     )
   }
   viewModel { TrackViewModel(get(), get()) }
