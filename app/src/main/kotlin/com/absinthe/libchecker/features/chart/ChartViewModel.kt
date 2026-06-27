@@ -27,6 +27,10 @@ class ChartViewModel internal constructor(
   private val chartSettingsRepository: ChartSettingsRepository,
   private val observeChartFeatureInitializationPlans: ObserveChartFeatureInitializationPlansUseCase
 ) : ViewModel() {
+  private val chartUiStatePlanner = ChartUiStatePlanner()
+  private var selectedChartType = ChartType.ABI
+  private var featureInitializationPending = observeChartFeatureInitializationPlans.initialPending
+
   private val appListItemsState = appListRepository.items
     .map<List<LCItem>, List<LCItem>?> { it }
     .stateIn(
@@ -37,8 +41,8 @@ class ChartViewModel internal constructor(
   val appListItems: Flow<List<LCItem>> = appListItemsState.filterNotNull()
   val featureInitializationPlans: Flow<ChartFeatureInitializationPlan> =
     observeChartFeatureInitializationPlans(appListItemsState)
-  val initialFeatureInitializationPending: Boolean
-    get() = observeChartFeatureInitializationPlans.initialPending
+  val currentChartType: ChartType
+    get() = selectedChartType
 
   private val _loadingProgress = MutableStateFlow(LOADING_PROGRESS_MAX)
   val loadingProgress = _loadingProgress.asStateFlow()
@@ -71,13 +75,43 @@ class ChartViewModel internal constructor(
     _detailAbiSwitchVisibility.value = isVisible
   }
 
+  fun updateFeatureInitializationPlan(
+    plan: ChartFeatureInitializationPlan
+  ): ChartTypeSelectorPlan {
+    featureInitializationPending = plan.isPending
+    return createChartTypeSelectorPlan()
+  }
+
+  fun selectChartType(chartType: ChartType): ChartTypeSelectorPlan {
+    selectedChartType = chartType
+    return createChartTypeSelectorPlan()
+  }
+
+  fun createChartTypeSelectorPlan(): ChartTypeSelectorPlan {
+    val plan = chartUiStatePlanner.planChartTypes(
+      currentChartType = selectedChartType,
+      featureChartsAvailable = !featureInitializationPending
+    )
+    selectedChartType = plan.selectedType
+    setDetailAbiSwitchVisibility(selectedChartType == ChartType.ABI)
+    return plan
+  }
+
+  fun createProgressPlan(): ChartProgressPlan {
+    return chartUiStatePlanner.planProgress(
+      chartLoadingProgress = loadingProgress.value,
+      featureInitializationPending = featureInitializationPending
+    )
+  }
+
   internal fun createChartDataSourcePlan(
     items: List<LCItem>,
-    chartType: ChartType
+    chartType: ChartType = currentChartType
   ): ChartDataSourcePlan {
+    val selectedType = selectChartType(chartType).selectedType
     return chartDataSourceFactory.create(
       items = items,
-      chartType = chartType,
+      chartType = selectedType,
       useDetailedAbiChart = isDetailedAbiChart
     )
   }

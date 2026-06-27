@@ -20,7 +20,7 @@ import com.absinthe.libchecker.features.chart.BaseChartDataSource
 import com.absinthe.libchecker.features.chart.BaseVariableChartDataSource
 import com.absinthe.libchecker.features.chart.ChartDataSourcePlan
 import com.absinthe.libchecker.features.chart.ChartType
-import com.absinthe.libchecker.features.chart.ChartUiStatePlanner
+import com.absinthe.libchecker.features.chart.ChartTypeSelectorPlan
 import com.absinthe.libchecker.features.chart.ChartViewModel
 import com.absinthe.libchecker.features.chart.IAndroidSDKChart
 import com.absinthe.libchecker.features.chart.IChartDataSource
@@ -35,7 +35,6 @@ import com.absinthe.libchecker.ui.base.SaturationTransformation
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
-import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import info.appdev.charting.animation.Easing
@@ -71,16 +70,11 @@ class ChartFragment :
   private var dialog: ClassifyBottomSheetDialogFragment? = null
   private var setDataJob: Job? = null
   private var showClassifyDialogJob: Job? = null
-  private var chartLoadingProgress = LOADING_PROGRESS_MAX
   private lateinit var chartDataRenderer: ChartDataRenderer
-  private var featureInitializationPending = false
-  private val chartUiStatePlanner = ChartUiStatePlanner()
-  private var currentChartType = ChartType.ABI
   private var currentExpandingView: ExpandingView? = null
 
   override fun init() {
     binding.root.applySystemBarsPadding(top = true, bottom = true)
-    featureInitializationPending = viewModel.initialFeatureInitializationPending
     chartDataRenderer = ChartDataRenderer(
       scope = viewLifecycleOwner.lifecycleScope,
       onLoadingProgressChanged = viewModel::setLoadingProgress,
@@ -112,7 +106,6 @@ class ChartFragment :
     lifecycleScope.launch {
       lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
         viewModel.loadingProgress.collect { progress ->
-          chartLoadingProgress = progress
           if (progress >= LOADING_PROGRESS_MAX) {
             applyDashboardView()
           }
@@ -123,8 +116,7 @@ class ChartFragment :
     lifecycleScope.launch {
       lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
         viewModel.featureInitializationPlans.collect { plan ->
-          featureInitializationPending = plan.isPending
-          renderChartTypeSelector()
+          renderChartTypeSelector(viewModel.updateFeatureInitializationPlan(plan))
           updateProgressIndicator()
 
           if (plan.shouldRefreshData && this@ChartFragment::allLCItemsStateFlow.isInitialized) {
@@ -145,7 +137,7 @@ class ChartFragment :
     lifecycleScope.launch {
       lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
         viewModel.detailAbiSwitch.collect {
-          if (currentChartType == ChartType.ABI && this@ChartFragment::allLCItemsStateFlow.isInitialized) {
+          if (viewModel.currentChartType == ChartType.ABI && this@ChartFragment::allLCItemsStateFlow.isInitialized) {
             setData(allLCItemsStateFlow.value)
           }
         }
@@ -153,14 +145,9 @@ class ChartFragment :
     }
   }
 
-  private fun renderChartTypeSelector() {
-    val featureChartsAvailable = !featureInitializationPending
-    val selectorPlan = chartUiStatePlanner.planChartTypes(
-      currentChartType = currentChartType,
-      featureChartsAvailable = featureChartsAvailable
-    )
-    currentChartType = selectorPlan.selectedType
-
+  private fun renderChartTypeSelector(
+    selectorPlan: ChartTypeSelectorPlan = viewModel.createChartTypeSelectorPlan()
+  ) {
     binding.featuresContainer.removeAllViews()
     currentExpandingView = null
 
@@ -171,19 +158,15 @@ class ChartFragment :
         }
         setContent(chartType.iconRes, getString(chartType.titleRes))
         setOnClickListener {
-          if (currentChartType == chartType || !this@ChartFragment::allLCItemsStateFlow.isInitialized) {
+          if (viewModel.currentChartType == chartType || !this@ChartFragment::allLCItemsStateFlow.isInitialized) {
             return@setOnClickListener
           }
           setData(allLCItemsStateFlow.value, chartType)
-          doOnMainThreadIdle {
-            currentExpandingView?.toggle()
-            toggle()
-            currentExpandingView = this
-          }
+          renderChartTypeSelector()
         }
       }
 
-      if (currentChartType == chartType) {
+      if (selectorPlan.selectedType == chartType) {
         currentExpandingView = view
         view.toggle()
       }
@@ -192,10 +175,7 @@ class ChartFragment :
   }
 
   private fun updateProgressIndicator() {
-    val progressPlan = chartUiStatePlanner.planProgress(
-      chartLoadingProgress = chartLoadingProgress,
-      featureInitializationPending = featureInitializationPending
-    )
+    val progressPlan = viewModel.createProgressPlan()
 
     binding.progressHorizontal.let { indicator ->
       if (progressPlan.isVisible) {
@@ -212,10 +192,8 @@ class ChartFragment :
     }
   }
 
-  private fun setData(items: List<LCItem>, chartType: ChartType = currentChartType) {
+  private fun setData(items: List<LCItem>, chartType: ChartType = viewModel.currentChartType) {
     context ?: return
-    currentChartType = chartType
-    viewModel.setDetailAbiSwitchVisibility(chartType == ChartType.ABI)
     if (chartView.parent != null) {
       binding.root.removeView(chartView)
     }
@@ -224,7 +202,7 @@ class ChartFragment :
       is ChartDataSourcePlan.Pie -> setChartData(::generatePieChartView, plan)
       is ChartDataSourcePlan.Bar -> setChartData(::generateBarChartView, plan)
     }
-    Telemetry.recordEvent(Constants.Event.CHART, mapOf(Telemetry.Param.ITEM_ID to chartType))
+    Telemetry.recordEvent(Constants.Event.CHART, mapOf(Telemetry.Param.ITEM_ID to viewModel.currentChartType))
   }
 
   private fun setChartData(
@@ -342,7 +320,7 @@ class ChartFragment :
 
   private fun applyDashboardView() {
     binding.dashboardContainer.removeAllViews()
-    if (currentChartType == ChartType.MARKET_DISTRIBUTION) {
+    if (viewModel.currentChartType == ChartType.MARKET_DISTRIBUTION) {
       val view = MarketDistributionDashboardView(requireContext()).apply {
         layoutParams = ViewGroup.LayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT,
