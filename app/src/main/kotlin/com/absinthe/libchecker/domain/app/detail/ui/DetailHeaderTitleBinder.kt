@@ -1,10 +1,10 @@
-package com.absinthe.libchecker.features.applist.detail.ui
+package com.absinthe.libchecker.domain.app.detail.ui
 
 import android.content.pm.ApplicationInfo
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.AppDetailHeaderTitleData
-import com.absinthe.libchecker.features.applist.detail.ui.view.DetailsTitleView
+import com.absinthe.libchecker.domain.app.detail.ui.view.DetailsTitleView
 import com.absinthe.libchecker.utils.extensions.copyToClipboard
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libraries.utils.utils.AntiShakeUtils

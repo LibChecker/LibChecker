@@ -1,10 +1,10 @@
-package com.absinthe.libchecker.features.applist.detail.ui
+package com.absinthe.libchecker.domain.app.detail.ui
 
 import android.text.SpannableStringBuilder
 import androidx.core.text.buildSpannedString
 import androidx.core.text.scale
 import com.absinthe.libchecker.domain.app.detail.AppDetailHeaderExtraInfo
-import com.absinthe.libchecker.features.applist.detail.ui.view.DetailsTitleView
+import com.absinthe.libchecker.domain.app.detail.ui.view.DetailsTitleView
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import ohos.bundle.BundleInfo
 

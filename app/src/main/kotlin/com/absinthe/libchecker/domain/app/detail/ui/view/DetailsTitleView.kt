@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.applist.detail.ui.view
+package com.absinthe.libchecker.domain.app.detail.ui.view
 
 import android.content.Context
 import android.util.AttributeSet
@@ -12,7 +12,7 @@ import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.features.applist.detail.ui.adapter.node.AbiLabelNode
+import com.absinthe.libchecker.domain.app.detail.ui.adapter.node.AbiLabelNode
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr

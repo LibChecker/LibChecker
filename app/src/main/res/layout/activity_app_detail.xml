@@ -37,7 +37,7 @@
         android:paddingTop="?attr/actionBarSize"
         app:layout_collapseMode="parallax">
 
-        <com.absinthe.libchecker.features.applist.detail.ui.view.DetailsTitleView
+        <com.absinthe.libchecker.domain.app.detail.ui.view.DetailsTitleView
           android:id="@+id/details_title"
           android:layout_width="match_parent"
           android:layout_height="wrap_content" />

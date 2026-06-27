@@ -16,7 +16,10 @@ import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.domain.app.detail.content.BuildAppDetailContentInitPlanUseCase
 import com.absinthe.libchecker.domain.app.detail.content.BuildAppDetailTabTypesUseCase
 import com.absinthe.libchecker.domain.app.detail.model.DetailExtraBean
+import com.absinthe.libchecker.domain.app.detail.ui.DetailAbiLabelBinder
 import com.absinthe.libchecker.domain.app.detail.ui.DetailFragmentManager
+import com.absinthe.libchecker.domain.app.detail.ui.DetailHeaderExtraInfoBinder
+import com.absinthe.libchecker.domain.app.detail.ui.DetailHeaderTitleBinder
 import com.absinthe.libchecker.domain.app.detail.ui.DetailToolbarController
 import com.absinthe.libchecker.domain.app.detail.ui.IDetailContainer
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
