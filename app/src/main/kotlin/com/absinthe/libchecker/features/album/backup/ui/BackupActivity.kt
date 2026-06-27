@@ -30,7 +30,6 @@ import com.absinthe.libchecker.database.backup.RoomBackup
 import com.absinthe.libchecker.databinding.ActivityBackupBinding
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotBackupTarget
-import com.absinthe.libchecker.domain.snapshot.backup.SnapshotRestorePlan
 import com.absinthe.libchecker.features.album.backup.SnapshotBackupViewModel
 import com.absinthe.libchecker.features.home.ui.MainActivity
 import com.absinthe.libchecker.ui.base.BaseActivity
@@ -320,47 +319,28 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
         runCatching {
           val dialog = UiUtils.createLoadingDialog(activity)
           dialog.show()
-          when (viewModel.getRestorePlan(uri)) {
-            SnapshotRestorePlan.DatabaseBackup -> {
-              restoreDatabaseBackup(uri, activity, dialog)
-            }
+          viewModel.restoreBackup(
+            roomBackup = roomBackup,
+            uri = uri,
+            cacheDir = activity.requireAvailableCacheDir()
+          ) { result ->
+            dialog.dismiss()
+            when (result) {
+              SnapshotBackupViewModel.RestoreBackupResult.DatabaseBackup -> Unit
 
-            SnapshotRestorePlan.ArchiveBackup -> {
-              restoreArchiveBackup(uri, dialog)
+              is SnapshotBackupViewModel.RestoreBackupResult.ArchiveBackup -> {
+                val restoreResult = result.result
+                if (restoreResult == null) {
+                  context?.showToast("Backup file error")
+                } else {
+                  showRestoreResultDialog(restoreResult)
+                }
+              }
             }
           }
         }.onFailure { t ->
           Timber.e(t)
         }
-      }
-    }
-
-    private fun restoreDatabaseBackup(
-      uri: Uri,
-      context: Context,
-      dialog: AlertDialog
-    ) {
-      viewModel.restoreDatabaseBackup(
-        roomBackup = roomBackup,
-        uri = uri,
-        cacheDir = context.requireAvailableCacheDir()
-      ) {
-        dialog.dismiss()
-      }
-    }
-
-    private fun restoreArchiveBackup(
-      uri: Uri,
-      dialog: AlertDialog
-    ) {
-      viewModel.restore(uri) { result ->
-        if (result == null) {
-          context?.showToast("Backup file error")
-          dialog.dismiss()
-          return@restore
-        }
-        dialog.dismiss()
-        showRestoreResultDialog(result)
       }
     }
 

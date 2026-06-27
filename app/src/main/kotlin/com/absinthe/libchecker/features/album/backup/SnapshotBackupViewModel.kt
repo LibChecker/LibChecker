@@ -13,7 +13,6 @@ import com.absinthe.libchecker.domain.snapshot.RestoreSnapshotDatabaseBackupUseC
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotBackupTarget
 import com.absinthe.libchecker.domain.snapshot.SnapshotDatabaseBackupExportResult
-import com.absinthe.libchecker.domain.snapshot.SnapshotDatabaseBackupRestoreResult
 import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
 import com.absinthe.libchecker.domain.snapshot.backup.BuildSnapshotRestorePlanUseCase
 import com.absinthe.libchecker.domain.snapshot.backup.SnapshotRestorePlan
@@ -36,8 +35,6 @@ class SnapshotBackupViewModel(
 
   fun getBackupTarget(): SnapshotBackupTarget = getSnapshotBackupTargetUseCase()
 
-  fun getRestorePlan(uri: Uri): SnapshotRestorePlan = buildSnapshotRestorePlanUseCase(uri)
-
   fun shouldRestoreFromLaunchUri(uri: Uri): Boolean {
     return buildSnapshotRestorePlanUseCase.shouldRestoreFromLaunchUri(uri)
   }
@@ -53,24 +50,41 @@ class SnapshotBackupViewModel(
     }
   }
 
-  fun restoreDatabaseBackup(
+  private suspend fun restoreDatabaseBackup(
+    roomBackup: RoomBackup,
+    uri: Uri,
+    cacheDir: File
+  ) {
+    runCatching {
+      restoreSnapshotDatabaseBackupUseCaseFactory(roomBackup)(uri, cacheDir)
+    }.onSuccess { result ->
+      result?.let {
+        Timber.d(
+          "success: ${it.success}, message: ${it.message}, exitCode: ${it.exitCode}"
+        )
+      }
+    }.onFailure {
+      Timber.e(it)
+    }
+  }
+
+  fun restoreBackup(
     roomBackup: RoomBackup,
     uri: Uri,
     cacheDir: File,
-    resultAction: (SnapshotDatabaseBackupRestoreResult?) -> Unit
+    resultAction: (RestoreBackupResult) -> Unit
   ) {
     viewModelScope.launch(Dispatchers.IO) {
-      val result = runCatching {
-        restoreSnapshotDatabaseBackupUseCaseFactory(roomBackup)(uri, cacheDir)
-      }.onSuccess { result ->
-        result?.let {
-          Timber.d(
-            "success: ${it.success}, message: ${it.message}, exitCode: ${it.exitCode}"
-          )
+      val result = when (getRestorePlan(uri)) {
+        SnapshotRestorePlan.DatabaseBackup -> {
+          restoreDatabaseBackup(roomBackup, uri, cacheDir)
+          RestoreBackupResult.DatabaseBackup
         }
-      }.onFailure {
-        Timber.e(it)
-      }.getOrNull()
+
+        SnapshotRestorePlan.ArchiveBackup -> RestoreBackupResult.ArchiveBackup(
+          restoreArchive(uri)
+        )
+      }
 
       withContext(Dispatchers.Main) {
         resultAction(result)
@@ -89,35 +103,28 @@ class SnapshotBackupViewModel(
     }
   }
 
-  fun restore(
-    uri: Uri,
-    resultAction: (SnapshotArchiveUseCase.RestoreResult?) -> Unit
-  ) {
-    viewModelScope.launch(Dispatchers.IO) {
-      runCatching {
-        restoreSnapshotArchiveFromUriUseCase(uri)
-      }.onFailure {
-        Timber.e("restore with new format failed: $it")
-        withContext(Dispatchers.Main) {
-          resultAction(null)
-        }
-        return@launch
-      }.onSuccess { result ->
-        if (result == null) {
-          withContext(Dispatchers.Main) {
-            resultAction(null)
-          }
-          return@launch
-        }
-        result.latestTimeStamp?.let(snapshotSelectionUseCase::setCurrentTimestamp)
-        withContext(Dispatchers.Main) {
-          resultAction(result)
-        }
-      }
-    }
+  private suspend fun restoreArchive(uri: Uri): SnapshotArchiveUseCase.RestoreResult? {
+    val result = runCatching {
+      restoreSnapshotArchiveFromUriUseCase(uri)
+    }.onFailure {
+      Timber.e("restore with new format failed: $it")
+    }.getOrNull() ?: return null
+
+    result.latestTimeStamp?.let(snapshotSelectionUseCase::setCurrentTimestamp)
+    return result
   }
 
   fun getFormatDateString(timestamp: Long): String {
     return formatSnapshotTimestampUseCase(timestamp)
+  }
+
+  private fun getRestorePlan(uri: Uri): SnapshotRestorePlan = buildSnapshotRestorePlanUseCase(uri)
+
+  sealed interface RestoreBackupResult {
+    data object DatabaseBackup : RestoreBackupResult
+
+    data class ArchiveBackup(
+      val result: SnapshotArchiveUseCase.RestoreResult?
+    ) : RestoreBackupResult
   }
 }
