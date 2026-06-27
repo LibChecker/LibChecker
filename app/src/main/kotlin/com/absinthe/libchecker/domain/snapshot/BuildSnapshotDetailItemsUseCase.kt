@@ -14,13 +14,13 @@ import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.snapshot.model.ADDED
 import com.absinthe.libchecker.domain.snapshot.model.CHANGED
 import com.absinthe.libchecker.domain.snapshot.model.MOVED
 import com.absinthe.libchecker.domain.snapshot.model.REMOVED
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
-import com.absinthe.libchecker.features.statistics.bean.LibStringItem
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.fromJson

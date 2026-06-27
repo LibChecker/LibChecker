@@ -8,8 +8,8 @@ import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.domain.app.detail.content.AppDetailComponentChips
-import com.absinthe.libchecker.features.statistics.bean.LibStringItem
-import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class DetailContentState {

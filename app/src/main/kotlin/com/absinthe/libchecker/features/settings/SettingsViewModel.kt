@@ -22,8 +22,8 @@ import com.absinthe.libchecker.domain.settings.LocalePreferenceDisplayData
 import com.absinthe.libchecker.domain.settings.SelectDarkModeUseCase
 import com.absinthe.libchecker.domain.settings.SelectLocaleUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
-import com.absinthe.libchecker.domain.statistics.LibReferenceSettingsRepository
-import com.absinthe.libchecker.domain.statistics.UpdateLibReferenceThresholdUseCase
+import com.absinthe.libchecker.domain.statistics.reference.repository.LibReferenceSettingsRepository
+import com.absinthe.libchecker.domain.statistics.reference.usecase.UpdateLibReferenceThresholdUseCase
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

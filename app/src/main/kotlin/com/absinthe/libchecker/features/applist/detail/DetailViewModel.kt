@@ -17,10 +17,10 @@ import com.absinthe.libchecker.domain.app.detail.action.AppPackageShareFile
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemDialogRequest
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemLongClickActions
 import com.absinthe.libchecker.domain.app.detail.feature.AppDetailFeatureItemData
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.navigation.DetailReferenceNavigation
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
-import com.absinthe.libchecker.features.statistics.bean.LibStringItem
-import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
 import java.io.File
 import timber.log.Timber

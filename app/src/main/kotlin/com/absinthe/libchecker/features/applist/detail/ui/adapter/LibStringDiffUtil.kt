@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.features.applist.detail.ui.adapter
 
 import androidx.recyclerview.widget.DiffUtil
-import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 
 class LibStringDiffUtil : DiffUtil.ItemCallback<LibStringItemChip>() {
 

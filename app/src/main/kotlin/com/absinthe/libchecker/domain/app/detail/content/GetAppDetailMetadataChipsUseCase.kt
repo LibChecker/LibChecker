@@ -2,8 +2,8 @@ package com.absinthe.libchecker.domain.app.detail.content
 
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import com.absinthe.libchecker.features.statistics.bean.LibStringItem
-import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
 import com.absinthe.libchecker.utils.extensions.maybeResourceId
 

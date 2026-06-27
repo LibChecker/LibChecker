@@ -3,7 +3,7 @@ package com.absinthe.libchecker.domain.app.detail.content
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.isComponentType
-import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 
 class BuildDetailProcessFilterDataUseCase {
 

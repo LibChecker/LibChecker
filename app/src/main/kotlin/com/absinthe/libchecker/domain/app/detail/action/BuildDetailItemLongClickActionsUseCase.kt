@@ -8,7 +8,7 @@ import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PERMISSION
-import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 
 class BuildDetailItemLongClickActionsUseCase {
 

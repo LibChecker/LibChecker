@@ -4,7 +4,7 @@ import android.content.Context
 import com.absinthe.libchecker.annotation.ET_DYN
 import com.absinthe.libchecker.annotation.ET_NOT_ELF
 import com.absinthe.libchecker.annotation.ET_NOT_SET
-import com.absinthe.libchecker.features.statistics.bean.LibStringItem
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.PAGE_SIZE_16_KB
 

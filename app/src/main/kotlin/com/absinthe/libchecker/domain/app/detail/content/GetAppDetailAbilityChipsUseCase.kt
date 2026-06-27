@@ -2,9 +2,9 @@ package com.absinthe.libchecker.domain.app.detail.content
 
 import android.content.Context
 import com.absinthe.libchecker.constant.AbilityType
-import com.absinthe.libchecker.features.statistics.bean.DISABLED
-import com.absinthe.libchecker.features.statistics.bean.LibStringItem
-import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
+import com.absinthe.libchecker.domain.app.detail.model.DISABLED
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import ohos.bundle.AbilityInfo
 import ohos.bundle.IBundleManager

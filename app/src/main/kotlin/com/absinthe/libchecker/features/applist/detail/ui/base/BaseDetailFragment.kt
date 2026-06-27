@@ -18,6 +18,7 @@ import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemDialogRequest
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.features.applist.DetailFragmentManager
 import com.absinthe.libchecker.features.applist.Sortable
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
@@ -27,7 +28,6 @@ import com.absinthe.libchecker.features.applist.detail.ui.LibDetailDialogFragmen
 import com.absinthe.libchecker.features.applist.detail.ui.PermissionDetailDialogFragment
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibStringAdapter
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
-import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.ui.base.BaseFragment
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle

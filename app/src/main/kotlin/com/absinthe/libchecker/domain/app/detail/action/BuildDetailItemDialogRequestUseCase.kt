@@ -4,7 +4,7 @@ import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.ACTION_IN_RULES
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.PERMISSION
-import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 
 class BuildDetailItemDialogRequestUseCase {
 

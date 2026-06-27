@@ -5,12 +5,12 @@ import android.widget.TextView
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemLongClickActions
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.features.applist.Referable
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.ui.ELFDetailDialogFragment
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibStringAdapter
 import com.absinthe.libchecker.features.applist.detail.ui.impl.ComponentsAnalysisFragment
-import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.integrations.anywhere.AnywhereManager
 import com.absinthe.libchecker.integrations.blocker.BlockerManager
 import com.absinthe.libchecker.integrations.monkeyking.MonkeyKingManager

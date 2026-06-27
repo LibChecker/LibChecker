@@ -34,6 +34,10 @@ import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
 import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase.AppResourceValue
+import com.absinthe.libchecker.domain.app.detail.model.DISABLED
+import com.absinthe.libchecker.domain.app.detail.model.EXPORTED
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.features.applist.detail.bean.StaticLibItem
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_TEXT
 import com.absinthe.libchecker.features.applist.detail.ui.XmlBSDFragment
@@ -42,10 +46,6 @@ import com.absinthe.libchecker.features.applist.detail.ui.view.ComponentLibItemV
 import com.absinthe.libchecker.features.applist.detail.ui.view.MetadataLibItemView
 import com.absinthe.libchecker.features.applist.detail.ui.view.NativeLibItemView
 import com.absinthe.libchecker.features.applist.detail.ui.view.StaticLibItemView
-import com.absinthe.libchecker.features.statistics.bean.DISABLED
-import com.absinthe.libchecker.features.statistics.bean.EXPORTED
-import com.absinthe.libchecker.features.statistics.bean.LibStringItem
-import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.UiUtils

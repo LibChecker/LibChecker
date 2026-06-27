@@ -4,7 +4,7 @@
   xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  tools:context=".features.statistics.ui.LibReferenceActivity">
+  tools:context=".domain.statistics.reference.ui.LibReferenceActivity">
 
   <com.google.android.material.appbar.AppBarLayout
     android:id="@+id/appbar"

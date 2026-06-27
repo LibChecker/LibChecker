@@ -10,17 +10,17 @@ import androidx.fragment.app.FragmentActivity
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_LABEL
+import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_LIST
+import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_NAME
+import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_TYPE
+import com.absinthe.libchecker.domain.statistics.reference.ui.LibReferenceActivity
 import com.absinthe.libchecker.features.applist.detail.bean.DetailExtraBean
 import com.absinthe.libchecker.features.applist.detail.ui.AppDetailActivity
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_DETAIL_BEAN
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_LC_ITEM
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.features.applist.detail.ui.OverlayDetailBottomSheetDialogFragment
-import com.absinthe.libchecker.features.statistics.ui.EXTRA_REF_LABEL
-import com.absinthe.libchecker.features.statistics.ui.EXTRA_REF_LIST
-import com.absinthe.libchecker.features.statistics.ui.EXTRA_REF_NAME
-import com.absinthe.libchecker.features.statistics.ui.EXTRA_REF_TYPE
-import com.absinthe.libchecker.features.statistics.ui.LibReferenceActivity
 import com.absinthe.libchecker.utils.Toasty
 
 fun FragmentActivity.launchDetailPage(item: LCItem, refName: String? = null, refType: Int = NATIVE, forceDetail: Boolean = false) {

@@ -10,8 +10,8 @@ import com.absinthe.libchecker.constant.Constants.OVERLAY
 import com.absinthe.libchecker.constant.GlobalFeatures
 import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
-import com.absinthe.libchecker.features.statistics.bean.LibStringItem
-import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo

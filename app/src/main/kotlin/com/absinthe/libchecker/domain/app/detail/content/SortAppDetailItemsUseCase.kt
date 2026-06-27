@@ -2,7 +2,7 @@ package com.absinthe.libchecker.domain.app.detail.content
 
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
-import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 
 class SortAppDetailItemsUseCase {
 

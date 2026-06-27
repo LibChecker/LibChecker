@@ -8,11 +8,11 @@ import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.database.RulesRepository
+import com.absinthe.libchecker.domain.app.detail.model.DISABLED
+import com.absinthe.libchecker.domain.app.detail.model.EXPORTED
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.features.applist.detail.bean.StatefulComponent
-import com.absinthe.libchecker.features.statistics.bean.DISABLED
-import com.absinthe.libchecker.features.statistics.bean.EXPORTED
-import com.absinthe.libchecker.features.statistics.bean.LibStringItem
-import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
 import com.absinthe.rulesbundle.Rule
 

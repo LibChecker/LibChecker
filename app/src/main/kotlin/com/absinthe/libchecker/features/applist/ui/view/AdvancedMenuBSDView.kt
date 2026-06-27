@@ -10,13 +10,13 @@ import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.app.detail.model.DISABLED
+import com.absinthe.libchecker.domain.app.detail.model.EXPORTED
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.LibStringAdapter
 import com.absinthe.libchecker.features.applist.ui.adapter.AppAdapter
 import com.absinthe.libchecker.features.home.ui.adapter.AdvancedMenuAdapter
-import com.absinthe.libchecker.features.statistics.bean.DISABLED
-import com.absinthe.libchecker.features.statistics.bean.EXPORTED
-import com.absinthe.libchecker.features.statistics.bean.LibStringItem
-import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr

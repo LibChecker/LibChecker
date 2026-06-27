@@ -3,7 +3,7 @@ package com.absinthe.libchecker.domain.app.detail.content
 import android.content.pm.PackageInfo
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.database.RulesRepository
-import com.absinthe.libchecker.features.statistics.bean.LibStringItemChip
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.utils.PackageUtils
 import timber.log.Timber
 

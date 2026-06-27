@@ -126,7 +126,7 @@
       android:name=".domain.snapshot.track.ui.TrackActivity"
       android:label="@string/album_item_track_title" />
     <activity
-      android:name=".features.statistics.ui.LibReferenceActivity"
+      android:name=".domain.statistics.reference.ui.LibReferenceActivity"
       android:configChanges="orientation"
       android:label="@string/tab_lib_reference_statistics"
       android:launchMode="singleTask" />

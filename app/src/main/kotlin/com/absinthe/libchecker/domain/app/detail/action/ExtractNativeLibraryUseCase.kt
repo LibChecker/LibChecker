@@ -6,7 +6,7 @@ import android.content.pm.PackageInfo
 import android.os.Environment
 import android.provider.MediaStore
 import com.absinthe.libchecker.compat.ZipFileCompat
-import com.absinthe.libchecker.features.statistics.bean.LibStringItem
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.utils.OsUtils
 import java.io.File
 import java.io.InputStream
