@@ -15,10 +15,10 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
+import com.absinthe.libchecker.domain.statistics.chart.ui.ChartActivity
 import com.absinthe.libchecker.features.applist.detail.ui.LibDetailDialogFragment
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.features.applist.ui.AdvancedMenuBSDFragment
-import com.absinthe.libchecker.features.chart.ui.ChartActivity
 import com.absinthe.libchecker.features.home.HomeViewModel
 import com.absinthe.libchecker.features.home.INavViewContainer
 import com.absinthe.libchecker.features.statistics.LibReferenceViewModel

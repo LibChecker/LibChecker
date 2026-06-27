@@ -14,7 +14,7 @@
       window:secondaryActivityName="com.absinthe.libchecker.features.statistics.ui.LibReferenceActivity" />
     <SplitPairFilter
       window:primaryActivityName="com.absinthe.libchecker.features.home.ui.main.MainActivity"
-      window:secondaryActivityName="com.absinthe.libchecker.features.chart.ui.ChartActivity" />
+      window:secondaryActivityName="com.absinthe.libchecker.domain.statistics.chart.ui.ChartActivity" />
     <SplitPairFilter
       window:primaryActivityName="com.absinthe.libchecker.features.home.ui.main.MainActivity"
       window:secondaryActivityName="com.absinthe.libchecker.features.snapshot.detail.ui.SnapshotDetailActivity" />

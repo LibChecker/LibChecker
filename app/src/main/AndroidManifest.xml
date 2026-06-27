@@ -131,7 +131,7 @@
       android:label="@string/tab_lib_reference_statistics"
       android:launchMode="singleTask" />
     <activity
-      android:name=".features.chart.ui.ChartActivity"
+      android:name=".domain.statistics.chart.ui.ChartActivity"
       android:label="@string/tab_chart" />
     <activity
       android:name=".ui.bridge.BridgeActivity"

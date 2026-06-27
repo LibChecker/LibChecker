@@ -198,6 +198,8 @@ import com.absinthe.libchecker.domain.statistics.GetLibReferenceIconPackagesUseC
 import com.absinthe.libchecker.domain.statistics.LibReferenceSettingsRepository
 import com.absinthe.libchecker.domain.statistics.ObserveChartFeatureInitializationPlansUseCase
 import com.absinthe.libchecker.domain.statistics.UpdateLibReferenceThresholdUseCase
+import com.absinthe.libchecker.domain.statistics.chart.presentation.ChartViewModel
+import com.absinthe.libchecker.domain.statistics.chart.source.ChartDataSourceFactory
 import com.absinthe.libchecker.features.applist.detail.DetailActionLoader
 import com.absinthe.libchecker.features.applist.detail.DetailContentLoader
 import com.absinthe.libchecker.features.applist.detail.DetailFeatureLoader
@@ -209,8 +211,6 @@ import com.absinthe.libchecker.features.applist.detail.content.DetailComponentCo
 import com.absinthe.libchecker.features.applist.detail.content.DetailNativeLibContentLoader
 import com.absinthe.libchecker.features.applist.detail.content.DetailPermissionContentLoader
 import com.absinthe.libchecker.features.applist.detail.ui.ApkDetailActivity
-import com.absinthe.libchecker.features.chart.ChartDataSourceFactory
-import com.absinthe.libchecker.features.chart.ChartViewModel
 import com.absinthe.libchecker.features.home.HomeViewModel
 import com.absinthe.libchecker.features.settings.SettingsViewModel
 import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
