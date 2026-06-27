@@ -35,8 +35,9 @@ class LibReferenceViewModel(
   libReferenceComputationControllerFactory: LibReferenceComputationController.Factory
 ) : ViewModel() {
 
-  val libRefListFlow: MutableSharedFlow<List<LCItem>> = MutableSharedFlow()
-  val dbItemsFlow: Flow<List<LCItem>> = appListRepository.items
+  private val _libRefListFlow = MutableSharedFlow<List<LCItem>>()
+  val libRefListFlow = _libRefListFlow.asSharedFlow()
+  private val dbItemsFlow: Flow<List<LCItem>> = appListRepository.items
   private val _progress = MutableSharedFlow<Int>()
   val progress = _progress.asSharedFlow()
   private val libReferenceComputationController =
@@ -255,7 +256,7 @@ class LibReferenceViewModel(
       )
     )
     actionTargets = result.actionTargets.takeIf { type == ACTION }.orEmpty()
-    libRefListFlow.emit(result.items)
+    _libRefListFlow.emit(result.items)
   }
 
   data class ReferenceWorkPlan(
