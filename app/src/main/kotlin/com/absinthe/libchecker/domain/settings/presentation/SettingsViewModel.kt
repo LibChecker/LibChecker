@@ -6,8 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.api.bean.GetAppUpdateInfo
 import com.absinthe.libchecker.domain.app.AppListSettingsRepository
-import com.absinthe.libchecker.domain.app.ExportInstalledAppsToUriUseCase
 import com.absinthe.libchecker.domain.app.SetApkAnalysisEnabledUseCase
+import com.absinthe.libchecker.domain.app.list.export.ExportInstalledAppsToUriUseCase
 import com.absinthe.libchecker.domain.app.update.AppUpdateChannel
 import com.absinthe.libchecker.domain.app.update.AppUpdateRepository
 import com.absinthe.libchecker.domain.rules.CloudRulesDownloadRequest

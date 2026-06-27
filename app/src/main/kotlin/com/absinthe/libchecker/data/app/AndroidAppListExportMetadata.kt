@@ -2,7 +2,7 @@ package com.absinthe.libchecker.data.app
 
 import android.content.Context
 import com.absinthe.libchecker.BuildConfig
-import com.absinthe.libchecker.domain.app.AppListExportMetadata
+import com.absinthe.libchecker.domain.app.list.export.AppListExportMetadata
 import com.absinthe.libchecker.utils.PackageUtils
 
 class AndroidAppListExportMetadata(context: Context) : AppListExportMetadata {

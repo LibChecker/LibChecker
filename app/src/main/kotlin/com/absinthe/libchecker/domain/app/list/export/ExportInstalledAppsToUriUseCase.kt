@@ -1,8 +1,9 @@
-package com.absinthe.libchecker.domain.app
+package com.absinthe.libchecker.domain.app.list.export
 
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
+import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.domain.app.search
 
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.domain.app.ExportAppListUseCase
+import com.absinthe.libchecker.domain.app.list.export.ExportAppListUseCase
 import com.absinthe.libchecker.domain.settings.repository.DeveloperSettingsRepository
 import java.text.SimpleDateFormat
 import java.util.Date

@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.app
+package com.absinthe.libchecker.domain.app.list.export
 
 interface AppListExportMetadata {
   val versionName: String

@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.app
+package com.absinthe.libchecker.domain.app.list.export
 
 import android.content.Context
 import android.content.pm.ActivityInfo
@@ -16,6 +16,8 @@ import android.os.SystemClock
 import androidx.core.graphics.drawable.toBitmap
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.ZipFileCompat
+import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.KotlinToolingMetadata
 import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.apk.ApkSignatureSchemeDetector
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
