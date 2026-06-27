@@ -2,6 +2,7 @@ package com.absinthe.libchecker.domain.app.detail.content
 
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import com.absinthe.libchecker.annotation.ET_NOT_SET
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.constant.Constants.ERROR
 import com.absinthe.libchecker.constant.Constants.MULTI_ARCH
@@ -17,6 +18,7 @@ import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
 import com.absinthe.libchecker.utils.extensions.ABI_STRING_MAP
+import com.absinthe.libchecker.utils.extensions.STRING_ABI_MAP
 import com.absinthe.libchecker.utils.extensions.is16KBAligned
 import com.absinthe.libchecker.utils.manifest.ApplicationReader
 import java.io.File
@@ -43,7 +45,7 @@ class GetAppDetailNativeLibrariesUseCase(
     val specifiedAbi = if (abi == ERROR || abi == NO_LIBS || abi == OVERLAY) abi else null
     val parseElf = GlobalFeatures.ENABLE_DETECTING_16KB_PAGE_ALIGNMENT && !isApkPreview
     val itemsByAbi = if (!isApkPreview && apkPreviewInfo == null) {
-      PackageUtils.getSourceLibs(packageInfo, specifiedAbi = specifiedAbi, parseElf = parseElf)
+      PackageUtils.getSourceLibs(packageInfo, specifiedAbi = specifiedAbi, parseElf = false)
     } else {
       apkPreviewInfo!!.nativeLibs.map {
         ABI_STRING_MAP[it.key]!! to it.value.map { value ->
@@ -54,10 +56,19 @@ class GetAppDetailNativeLibrariesUseCase(
         }
       }.toMap()
     }
+    val selectedAbiTab = ABI_STRING_MAP[abi % MULTI_ARCH]
+    val resolvedItemsByAbi = if (parseElf && specifiedAbi == null && selectedAbiTab != null) {
+      itemsByAbi.withParsedAbiItems(
+        packageInfo = packageInfo,
+        tab = selectedAbiTab
+      )
+    } else {
+      itemsByAbi
+    }
 
-    val selectedAbiItems = itemsByAbi[ABI_STRING_MAP[abi % MULTI_ARCH]]
+    val selectedAbiItems = resolvedItemsByAbi[selectedAbiTab]
     return AppDetailNativeLibraries(
-      itemsByAbi = itemsByAbi,
+      itemsByAbi = resolvedItemsByAbi,
       selectedAbiSupports16KbPageSize = selectedAbiItems?.let {
         !isApkPreview && packageInfo.is16KBAligned(libs = it, isApk = isApk)
       } ?: false
@@ -68,18 +79,26 @@ class GetAppDetailNativeLibrariesUseCase(
     packageInfo: PackageInfo,
     apkPreviewInfo: ApkPreviewInfo?,
     isApkPreview: Boolean,
+    tab: String,
     items: List<LibStringItem>,
     sortBySize: Boolean
   ): List<LibStringItemChip> {
-    if (items.isEmpty()) {
+    val resolvedItems = resolveNativeLibItemsForTab(
+      packageInfo = packageInfo,
+      apkPreviewInfo = apkPreviewInfo,
+      isApkPreview = isApkPreview,
+      tab = tab,
+      items = items
+    )
+    if (resolvedItems.isEmpty()) {
       return emptyList()
     }
 
     val packageName = apkPreviewInfo?.packageName ?: packageInfo.packageName
     val nativeActivityLibNames = getNativeActivityLibNames(packageInfo, isApkPreview)
     val preloadNativeLibNames = getZygotePreloadNativeLibNames(packageInfo, apkPreviewInfo)
-    val nativeLibNames = items.map { it.name }
-    val chipList = items.map {
+    val nativeLibNames = resolvedItems.map { it.name }
+    val chipList = resolvedItems.map {
       val rule = RulesRepository.getRuleWithRegex(it.name, NATIVE, packageName, nativeLibNames)
       val labels = mutableListOf<String>().apply {
         if (it.name in nativeActivityLibNames) {
@@ -103,6 +122,48 @@ class GetAppDetailNativeLibrariesUseCase(
       chipList.sortWith(compareByDescending<LibStringItemChip> { it.rule != null }.thenByDescending { it.item.size })
     }
     return chipList
+  }
+
+  private fun Map<String, List<LibStringItem>>.withParsedAbiItems(
+    packageInfo: PackageInfo,
+    tab: String
+  ): Map<String, List<LibStringItem>> {
+    val abi = STRING_ABI_MAP[tab] ?: return this
+    val parsedItems = PackageUtils.getSourceLibs(
+      packageInfo = packageInfo,
+      specifiedAbi = abi,
+      parseElf = true
+    )[tab].orEmpty()
+    if (parsedItems.isEmpty()) {
+      return this
+    }
+    return toMutableMap().apply {
+      put(tab, parsedItems)
+    }
+  }
+
+  private fun resolveNativeLibItemsForTab(
+    packageInfo: PackageInfo,
+    apkPreviewInfo: ApkPreviewInfo?,
+    isApkPreview: Boolean,
+    tab: String,
+    items: List<LibStringItem>
+  ): List<LibStringItem> {
+    if (
+      isApkPreview ||
+      apkPreviewInfo != null ||
+      GlobalFeatures.ENABLE_DETECTING_16KB_PAGE_ALIGNMENT.not() ||
+      items.none { it.elfInfo.elfType == ET_NOT_SET }
+    ) {
+      return items
+    }
+
+    val abi = STRING_ABI_MAP[tab] ?: return items
+    return PackageUtils.getSourceLibs(
+      packageInfo = packageInfo,
+      specifiedAbi = abi,
+      parseElf = true
+    )[tab]?.takeIf { it.isNotEmpty() } ?: items
   }
 
   private fun getNativeActivityLibNames(packageInfo: PackageInfo, isApkPreview: Boolean): Set<String> {

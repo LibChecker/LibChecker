@@ -60,6 +60,7 @@ class DetailNativeLibContentLoader(
             packageInfo = packageState.packageInfo,
             apkPreviewInfo = packageState.apkPreviewInfo,
             isApkPreview = packageState.isApkPreview,
+            tab = tab,
             items = it,
             sortBySize = sortBySizeMode
           )
