@@ -123,7 +123,6 @@ import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
 import com.absinthe.libchecker.domain.rules.CloudRulesRepository
 import com.absinthe.libchecker.domain.rules.RuleSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
-import com.absinthe.libchecker.domain.snapshot.BuildInstalledSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.CaptureInstalledSnapshotUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotRuleUseCase
@@ -372,7 +371,6 @@ val appModule = module {
     )
   }
   factory { BuildArchiveSnapshotItemUseCase(androidContext()) }
-  factory { BuildInstalledSnapshotItemUseCase(get()) }
   factory { CaptureInstalledSnapshotUseCase(androidContext().packageManager, get(), get(), get(), get(), get()) }
   factory { GetSnapshotDashboardCountUseCase(get(), get()) }
   factory { GetSnapshotRuleUseCase() }
