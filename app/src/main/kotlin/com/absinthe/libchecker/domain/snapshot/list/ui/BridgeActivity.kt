@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.ui.bridge
+package com.absinthe.libchecker.domain.snapshot.list.ui
 
 import android.app.Activity
 import android.content.Intent

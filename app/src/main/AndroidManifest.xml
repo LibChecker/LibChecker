@@ -134,7 +134,7 @@
       android:name=".domain.statistics.chart.ui.ChartActivity"
       android:label="@string/tab_chart" />
     <activity
-      android:name=".ui.bridge.BridgeActivity"
+      android:name=".domain.snapshot.list.ui.BridgeActivity"
       android:exported="true"
       android:theme="@style/Transparent">
 
