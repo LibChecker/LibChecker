@@ -185,7 +185,9 @@ class LibReferenceFragment :
         if (references == null) {
           return@onEach
         }
-        refAdapter.setList(references)
+        val searchResult = libReferenceViewModel.onReferenceListChanged(references)
+        refAdapter.highlightText = searchResult.query
+        refAdapter.setList(searchResult.references)
 
         flip(VF_LIST)
         refAdapter.setSpaceFooterView()
@@ -318,7 +320,9 @@ class LibReferenceFragment :
   }
 
   override fun onQueryTextChange(newText: String): Boolean {
-    if (refAdapter.highlightText != newText) {
+    val shouldSyncHighlight = refAdapter.highlightText != newText
+    val searchChange = libReferenceViewModel.onSearchQueryChanged(newText)
+    if (searchChange.shouldRefreshItems || shouldSyncHighlight) {
       isSearchTextClearOnce = newText.isEmpty()
       refAdapter.highlightText = newText
 
@@ -333,8 +337,8 @@ class LibReferenceFragment :
             (activity as? INavViewContainer)?.showProgressBar()
             progressBarShown = true
           }
-          val searchResult = libReferenceViewModel.buildSearchResult(newText) ?: return@launch
-          refAdapter.highlightText = newText
+          val searchResult = libReferenceViewModel.buildCurrentSearchResult() ?: return@launch
+          refAdapter.highlightText = searchResult.query
 
           if (!isActive) {
             return@launch
@@ -344,7 +348,7 @@ class LibReferenceFragment :
             refAdapter.setSpaceFooterView()
           }
 
-          if (searchResult.shouldShowEasterEgg) {
+          if (searchChange.shouldRefreshItems && searchResult.shouldShowEasterEgg) {
             context?.showToast("🥚")
             Telemetry.recordEvent(
               Constants.Event.EASTER_EGG,

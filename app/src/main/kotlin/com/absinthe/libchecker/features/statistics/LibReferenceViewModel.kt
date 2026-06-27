@@ -56,6 +56,8 @@ class LibReferenceViewModel(
   private var hasRequestedInitialCompute = false
   private var deferredReferenceWork: DeferredReferenceWork? = null
   private var deferredReferenceWorkNeedsLoading = false
+  private var searchQuery: String = ""
+  private var searchableReferences: List<LibReference>? = null
 
   private var savedThreshold: Int
     get() = libReferenceComputationController.savedThreshold
@@ -195,8 +197,26 @@ class LibReferenceViewModel(
     return buildLibReferenceDetailDialogRequestUseCase(name, type)
   }
 
-  suspend fun buildSearchResult(query: String): SearchResult? {
-    val references = savedRefList ?: return null
+  fun onSearchQueryChanged(query: String): SearchQueryChange {
+    if (searchQuery == query) {
+      return SearchQueryChange(shouldRefreshItems = false)
+    }
+    searchQuery = query
+    return SearchQueryChange(shouldRefreshItems = true)
+  }
+
+  suspend fun buildCurrentSearchResult(): SearchResult? {
+    val references = searchableReferences ?: savedRefList ?: return null
+    return buildSearchResult(references)
+  }
+
+  suspend fun onReferenceListChanged(references: List<LibReference>): SearchResult {
+    searchableReferences = references
+    return buildSearchResult(references)
+  }
+
+  private suspend fun buildSearchResult(references: List<LibReference>): SearchResult {
+    val query = searchQuery
     val filteredReferences = withContext(Dispatchers.Default) {
       if (query.isEmpty()) {
         references
@@ -211,6 +231,7 @@ class LibReferenceViewModel(
       }
     }
     return SearchResult(
+      query = query,
       references = filteredReferences,
       shouldShowEasterEgg = query.equals(EASTER_EGG_QUERY, ignoreCase = true)
     )
@@ -263,7 +284,12 @@ class LibReferenceViewModel(
     val shouldShowLoading: Boolean
   )
 
+  data class SearchQueryChange(
+    val shouldRefreshItems: Boolean
+  )
+
   data class SearchResult(
+    val query: String,
     val references: List<LibReference>,
     val shouldShowEasterEgg: Boolean
   )
