@@ -444,7 +444,7 @@ val appModule = module {
   factory { BuildSnapshotListUpdatePlanUseCase(get(), get(), get()) }
   factory { BuildSnapshotUpdateTimeDisplayDataUseCase() }
   factory { BuildSnapshotPairDiffUseCase() }
-  factory { CaptureInstalledSnapshotUseCase(androidContext().packageManager, get(), get(), get()) }
+  factory { CaptureInstalledSnapshotUseCase(androidContext().packageManager, get(), get(), get(), get()) }
   factory { CompareSnapshotItemsUseCase() }
   factory { CompareSnapshotListsUseCase(get()) }
   factory { CompareTrackedSnapshotListsUseCase(get(), get()) }

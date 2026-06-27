@@ -26,7 +26,6 @@ import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.snapshot.CaptureInstalledSnapshotUseCase
 import com.absinthe.libchecker.domain.snapshot.FormatSnapshotTimestampUseCase
-import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.features.home.ui.MainActivity
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -52,7 +51,6 @@ class ShootService : LifecycleService() {
   private val installedAppRepository: InstalledAppRepository by inject()
   private val captureInstalledSnapshot: CaptureInstalledSnapshotUseCase by inject()
   private val formatSnapshotTimestamp: FormatSnapshotTimestampUseCase by inject()
-  private val snapshotSettingsRepository: SnapshotSettingsRepository by inject()
   private val listenerList = RemoteCallbackList<OnShootListener>()
 
   private val binder by lazy { ShootBinder(this) }
@@ -191,7 +189,6 @@ class ShootService : LifecycleService() {
       CaptureInstalledSnapshotUseCase.Request(
         appList = appList,
         dropPrevious = dropPrevious,
-        autoRemoveThreshold = snapshotSettingsRepository.autoRemoveThreshold,
         shouldSaveFullSnapshot = shouldSaveFullSnapshot,
         systemProps = getSystemProps()
       )

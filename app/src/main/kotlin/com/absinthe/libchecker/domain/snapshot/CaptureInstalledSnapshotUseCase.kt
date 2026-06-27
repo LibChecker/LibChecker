@@ -12,7 +12,8 @@ class CaptureInstalledSnapshotUseCase(
   private val packageManager: PackageManager,
   private val snapshotRepository: SnapshotRepository,
   private val buildInstalledSnapshotItem: BuildInstalledSnapshotItemUseCase,
-  private val snapshotSelectionUseCase: SnapshotSelectionUseCase
+  private val snapshotSelectionUseCase: SnapshotSelectionUseCase,
+  private val snapshotSettingsRepository: SnapshotSettingsRepository
 ) {
 
   suspend operator fun invoke(
@@ -64,8 +65,9 @@ class CaptureInstalledSnapshotUseCase(
       snapshotRepository.deleteSnapshotsAndTimeStamp(currentSnapshotTimestamp)
     }
 
-    if (request.autoRemoveThreshold > 0) {
-      snapshotRepository.retainLatestSnapshots(request.autoRemoveThreshold)
+    val autoRemoveThreshold = snapshotSettingsRepository.autoRemoveThreshold
+    if (autoRemoveThreshold > 0) {
+      snapshotRepository.retainLatestSnapshots(autoRemoveThreshold)
     }
 
     snapshotSelectionUseCase.setCurrentTimestamp(timestamp)
@@ -89,7 +91,6 @@ class CaptureInstalledSnapshotUseCase(
   data class Request(
     val appList: List<PackageInfo>,
     val dropPrevious: Boolean,
-    val autoRemoveThreshold: Int,
     val shouldSaveFullSnapshot: Boolean,
     val systemProps: Map<String, String>,
     val timestamp: Long = System.currentTimeMillis()
