@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.applist.detail.ui.base
+package com.absinthe.libchecker.domain.app.detail.ui.base
 
 import android.content.Context
 import android.os.Bundle
@@ -19,8 +19,8 @@ import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCa
 import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemDialogRequest
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
-import com.absinthe.libchecker.features.applist.DetailFragmentManager
-import com.absinthe.libchecker.features.applist.Sortable
+import com.absinthe.libchecker.domain.app.detail.ui.DetailFragmentManager
+import com.absinthe.libchecker.domain.app.detail.ui.Sortable
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.IDetailContainer
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_PACKAGE_NAME

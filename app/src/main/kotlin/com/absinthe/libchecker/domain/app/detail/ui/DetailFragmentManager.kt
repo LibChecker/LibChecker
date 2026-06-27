@@ -1,9 +1,9 @@
-package com.absinthe.libchecker.features.applist
+package com.absinthe.libchecker.domain.app.detail.ui
 
 import android.util.SparseArray
 import androidx.core.util.forEach
 import com.absinthe.libchecker.annotation.LibType
-import com.absinthe.libchecker.features.applist.detail.ui.base.BaseDetailFragment
+import com.absinthe.libchecker.domain.app.detail.ui.base.BaseDetailFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

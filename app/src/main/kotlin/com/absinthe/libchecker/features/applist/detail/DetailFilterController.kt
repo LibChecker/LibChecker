@@ -6,7 +6,7 @@ import com.absinthe.libchecker.domain.app.detail.content.BuildDetailProcessFilte
 import com.absinthe.libchecker.domain.app.detail.content.FilterAppDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.detail.content.SortAppDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
-import com.absinthe.libchecker.features.applist.MODE_SORT_BY_LIB
+import com.absinthe.libchecker.domain.app.detail.ui.MODE_SORT_BY_LIB
 
 class DetailFilterController(
   private val filterAppDetailItemsUseCase: FilterAppDetailItemsUseCase,

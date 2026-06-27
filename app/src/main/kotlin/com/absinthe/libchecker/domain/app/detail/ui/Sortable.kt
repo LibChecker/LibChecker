@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.applist
+package com.absinthe.libchecker.domain.app.detail.ui
 
 interface Sortable {
   suspend fun sort()

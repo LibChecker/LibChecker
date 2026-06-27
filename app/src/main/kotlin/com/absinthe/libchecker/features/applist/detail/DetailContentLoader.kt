@@ -2,7 +2,7 @@ package com.absinthe.libchecker.features.applist.detail
 
 import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailAbilityChipsUseCase
-import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
+import com.absinthe.libchecker.domain.app.detail.ui.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.features.applist.detail.content.DetailChipContentLoader
 import com.absinthe.libchecker.features.applist.detail.content.DetailComponentContentLoader
 import com.absinthe.libchecker.features.applist.detail.content.DetailNativeLibContentLoader

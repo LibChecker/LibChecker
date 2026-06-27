@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.features.applist.detail.ui
 
 import com.absinthe.libchecker.domain.app.VersionedFeature
-import com.absinthe.libchecker.features.applist.LocatedCount
+import com.absinthe.libchecker.domain.app.detail.model.LocatedCount
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
