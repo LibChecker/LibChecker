@@ -3,6 +3,7 @@ package com.absinthe.libchecker.di
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.data.settings.GlobalAppearanceSettingsRepository
 import com.absinthe.libchecker.data.settings.GlobalDeveloperSettingsRepository
+import com.absinthe.libchecker.domain.app.detail.ui.ApkDetailActivity
 import com.absinthe.libchecker.domain.settings.presentation.SettingsViewModel
 import com.absinthe.libchecker.domain.settings.repository.AppearanceSettingsRepository
 import com.absinthe.libchecker.domain.settings.repository.DeveloperSettingsRepository
@@ -11,6 +12,7 @@ import com.absinthe.libchecker.domain.settings.usecase.BuildLocalePreferenceData
 import com.absinthe.libchecker.domain.settings.usecase.BuildLogShareIntentUseCase
 import com.absinthe.libchecker.domain.settings.usecase.SelectDarkModeUseCase
 import com.absinthe.libchecker.domain.settings.usecase.SelectLocaleUseCase
+import com.absinthe.libchecker.domain.settings.usecase.SetApkAnalysisEnabledUseCase
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -24,6 +26,13 @@ val settingsModule = module {
   factory { BuildLogShareIntentUseCase(androidContext(), BuildConfig.APPLICATION_ID) }
   factory { SelectDarkModeUseCase(get()) }
   factory { SelectLocaleUseCase(get()) }
+  factory {
+    SetApkAnalysisEnabledUseCase(
+      BuildConfig.APPLICATION_ID,
+      androidContext().packageManager,
+      ApkDetailActivity::class.java.name
+    )
+  }
 
   viewModel {
     SettingsViewModel(
