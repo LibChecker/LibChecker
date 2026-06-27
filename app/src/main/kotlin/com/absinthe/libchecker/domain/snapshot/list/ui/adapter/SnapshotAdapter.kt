@@ -22,7 +22,6 @@ import com.absinthe.libchecker.domain.snapshot.list.ui.view.SnapshotItemView
 import com.absinthe.libchecker.domain.snapshot.list.usecase.stableSnapshotDiffItemIdFor
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
-import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.dp
@@ -31,6 +30,7 @@ import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.setAlphaForAll
 import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
 import com.absinthe.libchecker.utils.extensions.sizeToString
+import com.absinthe.libchecker.view.span.CenterAlignImageSpan
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import java.util.Locale
 import kotlin.math.abs

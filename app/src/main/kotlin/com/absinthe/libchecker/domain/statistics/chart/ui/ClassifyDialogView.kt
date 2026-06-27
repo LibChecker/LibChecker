@@ -11,11 +11,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.domain.app.list.ui.adapter.AppAdapter
 import com.absinthe.libchecker.domain.statistics.chart.ui.view.AndroidVersionLabelView
-import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
+import com.absinthe.libchecker.view.app.EmptyListView
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import java.text.SimpleDateFormat

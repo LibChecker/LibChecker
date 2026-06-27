@@ -11,12 +11,12 @@ import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewMod
 import com.absinthe.libchecker.domain.snapshot.timenode.ui.view.TimeNodeAddApkView
 import com.absinthe.libchecker.domain.snapshot.timenode.ui.view.TimeNodeAutoRemoveView
 import com.absinthe.libchecker.domain.snapshot.timenode.ui.view.TimeNodeBottomSheetView
-import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.putArguments
+import com.absinthe.libchecker.view.app.EmptyListView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.applist.detail.ui.view
+package com.absinthe.libchecker.view.app
 
 import android.content.Context
 import android.view.ContextThemeWrapper

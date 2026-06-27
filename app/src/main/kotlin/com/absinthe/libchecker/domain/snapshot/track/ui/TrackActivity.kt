@@ -25,9 +25,9 @@ import com.absinthe.libchecker.domain.snapshot.track.ui.adapter.TrackAdapter
 import com.absinthe.libchecker.domain.snapshot.track.ui.adapter.TrackListDiff
 import com.absinthe.libchecker.domain.snapshot.track.ui.view.TrackItemView
 import com.absinthe.libchecker.domain.snapshot.track.ui.view.TrackLoadingView
-import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
+import com.absinthe.libchecker.view.app.EmptyListView
 import kotlinx.coroutines.launch
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import org.koin.android.ext.android.inject

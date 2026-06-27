@@ -13,7 +13,6 @@ import com.absinthe.libchecker.domain.app.AppListItemViewState
 import com.absinthe.libchecker.domain.app.InstalledPackageState
 import com.absinthe.libchecker.domain.app.list.ui.view.AppItemView
 import com.absinthe.libchecker.domain.app.stableAppListItemIdForKey
-import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
 import com.absinthe.libchecker.utils.extensions.addStrikeThroughSpan
 import com.absinthe.libchecker.utils.extensions.dp
@@ -21,6 +20,7 @@ import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
+import com.absinthe.libchecker.view.span.CenterAlignImageSpan
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
 class AppAdapter(

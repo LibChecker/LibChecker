@@ -26,6 +26,7 @@ import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.paddingBottomCompat
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.app.IHeaderView
+import com.absinthe.libchecker.view.span.CenterAlignImageSpan
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import timber.log.Timber
 

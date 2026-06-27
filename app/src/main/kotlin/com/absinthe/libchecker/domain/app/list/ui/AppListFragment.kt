@@ -29,7 +29,6 @@ import com.absinthe.libchecker.domain.app.list.ui.adapter.AppAdapter
 import com.absinthe.libchecker.domain.app.list.ui.adapter.AppListDiffUtil
 import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
 import com.absinthe.libchecker.domain.home.ui.INavViewContainer
-import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.ui.animator.ParticleRemoveItemAnimator
 import com.absinthe.libchecker.ui.base.BaseActivity
@@ -42,6 +41,7 @@ import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libchecker.utils.showToast
+import com.absinthe.libchecker.view.app.EmptyListView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers

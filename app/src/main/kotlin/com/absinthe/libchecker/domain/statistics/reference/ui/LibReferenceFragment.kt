@@ -24,7 +24,6 @@ import com.absinthe.libchecker.domain.statistics.reference.presentation.LibRefer
 import com.absinthe.libchecker.domain.statistics.reference.ui.adapter.LibReferenceAdapter
 import com.absinthe.libchecker.domain.statistics.reference.ui.adapter.RefListDiffUtil
 import com.absinthe.libchecker.features.applist.detail.ui.LibDetailDialogFragment
-import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseListControllerFragment
 import com.absinthe.libchecker.ui.base.IAppBarContainer
@@ -33,6 +32,7 @@ import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.launchLibReferencePage
 import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libchecker.utils.showToast
+import com.absinthe.libchecker.view.app.EmptyListView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

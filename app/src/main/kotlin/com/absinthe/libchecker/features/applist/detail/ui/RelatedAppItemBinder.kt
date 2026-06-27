@@ -7,8 +7,8 @@ import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.RelatedAppDisplayData
 import com.absinthe.libchecker.domain.app.list.ui.view.AppItemView
-import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
 import com.absinthe.libchecker.utils.extensions.getDrawable
+import com.absinthe.libchecker.view.span.CenterAlignImageSpan
 
 class RelatedAppItemBinder {
 

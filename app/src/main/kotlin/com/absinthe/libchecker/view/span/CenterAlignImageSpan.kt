@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.applist.detail.ui.view
+package com.absinthe.libchecker.view.span
 
 import android.graphics.Canvas
 import android.graphics.Paint
