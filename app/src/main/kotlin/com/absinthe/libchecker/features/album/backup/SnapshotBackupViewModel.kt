@@ -33,7 +33,16 @@ class SnapshotBackupViewModel(
   private val snapshotSelectionUseCase: SnapshotSelectionUseCase
 ) : ViewModel() {
 
-  fun getBackupTarget(): SnapshotBackupTarget = getSnapshotBackupTargetUseCase()
+  fun onLocalBackupRequested(isExternalStorageWritable: Boolean): LocalBackupAction {
+    if (!isExternalStorageWritable) {
+      return LocalBackupAction.StorageUnavailable
+    }
+
+    return when (val target = getSnapshotBackupTargetUseCase()) {
+      is SnapshotBackupTarget.Archive -> LocalBackupAction.CreateArchive(target.fileName)
+      SnapshotBackupTarget.Database -> LocalBackupAction.CreateDatabase
+    }
+  }
 
   fun shouldRestoreFromLaunchUri(uri: Uri): Boolean {
     return buildSnapshotRestorePlanUseCase.shouldRestoreFromLaunchUri(uri)
@@ -141,4 +150,10 @@ class SnapshotBackupViewModel(
     val formattedTimestamp: String,
     val count: Int
   )
+
+  sealed interface LocalBackupAction {
+    data class CreateArchive(val fileName: String) : LocalBackupAction
+    data object CreateDatabase : LocalBackupAction
+    data object StorageUnavailable : LocalBackupAction
+  }
 }

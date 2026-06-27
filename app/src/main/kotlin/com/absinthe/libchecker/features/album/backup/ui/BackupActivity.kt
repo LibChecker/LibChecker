@@ -28,7 +28,6 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.backup.RoomBackup
 import com.absinthe.libchecker.databinding.ActivityBackupBinding
-import com.absinthe.libchecker.domain.snapshot.SnapshotBackupTarget
 import com.absinthe.libchecker.features.album.backup.SnapshotBackupViewModel
 import com.absinthe.libchecker.features.home.ui.MainActivity
 import com.absinthe.libchecker.ui.base.BaseActivity
@@ -145,13 +144,14 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
 
       findPreference<Preference>(Constants.PREF_LOCAL_BACKUP)?.apply {
         setOnPreferenceClickListener {
-          if (StorageUtils.isExternalStorageWritable) {
-            when (val target = viewModel.getBackupTarget()) {
-              is SnapshotBackupTarget.Archive -> launchArchiveBackup(target.fileName)
-              SnapshotBackupTarget.Database -> createDatabaseBackup()
-            }
-          } else {
-            context.showToast("External storage is not writable")
+          val action = viewModel.onLocalBackupRequested(StorageUtils.isExternalStorageWritable)
+          when (action) {
+            is SnapshotBackupViewModel.LocalBackupAction.CreateArchive -> launchArchiveBackup(action.fileName)
+
+            SnapshotBackupViewModel.LocalBackupAction.CreateDatabase -> createDatabaseBackup()
+
+            SnapshotBackupViewModel.LocalBackupAction.StorageUnavailable ->
+              context.showToast("External storage is not writable")
           }
           true
         }
