@@ -168,16 +168,6 @@ import com.absinthe.libchecker.domain.snapshot.backup.usecase.GetSnapshotBackupT
 import com.absinthe.libchecker.domain.snapshot.backup.usecase.PrepareRoomBackupRestoreFileUseCase
 import com.absinthe.libchecker.domain.snapshot.backup.usecase.RestoreSnapshotArchiveFromUriUseCase
 import com.absinthe.libchecker.domain.snapshot.backup.usecase.RestoreSnapshotDatabaseBackupUseCase
-import com.absinthe.libchecker.domain.snapshot.comparison.presentation.SnapshotComparisonViewModel
-import com.absinthe.libchecker.domain.snapshot.comparison.usecase.BuildPackageComparisonSnapshotItemUseCase
-import com.absinthe.libchecker.domain.snapshot.comparison.usecase.BuildSnapshotComparisonPlanUseCase
-import com.absinthe.libchecker.domain.snapshot.comparison.usecase.BuildSnapshotPairDiffUseCase
-import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotDiffsUseCase
-import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotItemWithInstalledAppUseCase
-import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotItemsUseCase
-import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotListsUseCase
-import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotWithInstalledAppsUseCase
-import com.absinthe.libchecker.domain.snapshot.comparison.usecase.PrepareSnapshotComparisonArchivesUseCase
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotDetailItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotDetailSectionsUseCase
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
@@ -438,23 +428,14 @@ val appModule = module {
   }
   factory { GetApexPackageNamesUseCase(get()) }
   factory { BuildArchiveSnapshotItemUseCase(androidContext()) }
-  factory { PrepareSnapshotComparisonArchivesUseCase(get()) }
   factory { BuildInstalledSnapshotItemUseCase(get()) }
-  factory { BuildPackageComparisonSnapshotItemUseCase(androidContext().packageManager) }
   factory { BuildSnapshotAbiDisplayDataUseCase(androidContext()) }
   factory { BuildSnapshotCapturePlanUseCase(get()) }
-  factory { BuildSnapshotComparisonPlanUseCase(get()) }
   factory { BuildSnapshotRestorePlanUseCase() }
   factory { BuildSnapshotListUpdatePlanUseCase(get(), get(), get()) }
   factory { BuildSnapshotUpdateTimeDisplayDataUseCase() }
-  factory { BuildSnapshotPairDiffUseCase() }
   factory { CaptureInstalledSnapshotUseCase(androidContext().packageManager, get(), get(), get(), get(), get()) }
-  factory { CompareSnapshotItemsUseCase() }
-  factory { CompareSnapshotListsUseCase(get()) }
   factory { CompareTrackedSnapshotListsUseCase(get(), get()) }
-  factory { CompareSnapshotWithInstalledAppsUseCase(androidContext().packageManager, get(), get(), get(), get()) }
-  factory { CompareSnapshotDiffsUseCase(get(), get(), get(), get()) }
-  factory { CompareSnapshotItemWithInstalledAppUseCase(androidContext().packageManager, get(), get(), get(), get()) }
   factory { FormatSnapshotTimestampUseCase() }
   factory { GetSnapshotDashboardCountUseCase(get(), get()) }
   factory { GetSnapshotPackageIconSourcesUseCase(get()) }
@@ -616,17 +597,6 @@ val appModule = module {
       },
       formatSnapshotTimestampUseCase = get(),
       snapshotSelectionUseCase = get()
-    )
-  }
-  viewModel {
-    SnapshotComparisonViewModel(
-      compareSnapshotDiffs = get(),
-      getSnapshotDashboardCount = get(),
-      snapshotLibrary = get(),
-      buildSnapshotPairDiffUseCase = get(),
-      buildSnapshotComparisonPlanUseCase = get(),
-      formatSnapshotTimestampUseCase = get(),
-      prepareSnapshotComparisonArchivesUseCase = get()
     )
   }
   viewModel { TrackViewModel(get(), get()) }
