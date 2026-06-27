@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.applist.detail.ui
+package com.absinthe.libchecker.domain.app.detail.ui.dialog
 
 import android.content.Context
 import android.content.DialogInterface
@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.action.XposedModuleInfo
+import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.domain.app.detail.ui.FeaturesDialog
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.node.XposedDetailItem
 import com.absinthe.libchecker.domain.app.detail.ui.view.XposedInfoBottomSheetView

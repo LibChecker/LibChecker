@@ -1,10 +1,11 @@
-package com.absinthe.libchecker.features.applist.detail.ui
+package com.absinthe.libchecker.domain.app.detail.ui.dialog
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.domain.app.detail.action.AppInfoLaunchAction
+import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.domain.app.detail.ui.view.AppInfoBottomSheetView
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.utils.Telemetry

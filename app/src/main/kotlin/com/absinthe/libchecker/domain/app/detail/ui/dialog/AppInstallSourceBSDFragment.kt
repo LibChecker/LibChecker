@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.applist.detail.ui
+package com.absinthe.libchecker.domain.app.detail.ui.dialog
 
 import android.content.Intent
 import android.os.Build
@@ -16,6 +16,8 @@ import com.absinthe.libchecker.domain.app.AppInstallSource
 import com.absinthe.libchecker.domain.app.detail.RelatedAppDisplayData
 import com.absinthe.libchecker.domain.app.detail.action.AppInstallSourceDetails
 import com.absinthe.libchecker.domain.app.detail.action.AppInstalledTimeDisplayData
+import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
+import com.absinthe.libchecker.domain.app.detail.ui.binder.RelatedAppItemBinder
 import com.absinthe.libchecker.domain.app.detail.ui.view.AppDexoptItemView
 import com.absinthe.libchecker.domain.app.detail.ui.view.AppInstallSourceBottomSheetView
 import com.absinthe.libchecker.domain.app.detail.ui.view.AppInstallSourceItemView

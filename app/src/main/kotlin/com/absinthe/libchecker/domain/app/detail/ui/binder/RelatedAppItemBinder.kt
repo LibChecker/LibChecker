@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.applist.detail.ui
+package com.absinthe.libchecker.domain.app.detail.ui.binder
 
 import android.text.SpannableString
 import android.text.style.ImageSpan

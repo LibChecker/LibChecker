@@ -1,12 +1,11 @@
-package com.absinthe.libchecker.features.applist.detail.ui
+package com.absinthe.libchecker.domain.app.detail.ui.dialog
 
 import android.view.ViewGroup
+import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_TEXT
 import com.absinthe.libchecker.domain.app.detail.ui.view.XmlBottomSheetView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
-
-const val EXTRA_TEXT = "text"
 
 class XmlBSDFragment : BaseBottomSheetViewDialogFragment<XmlBottomSheetView>() {
 

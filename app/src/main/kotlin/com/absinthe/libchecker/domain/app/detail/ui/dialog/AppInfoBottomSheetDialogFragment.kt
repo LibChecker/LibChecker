@@ -1,10 +1,11 @@
-package com.absinthe.libchecker.features.applist.detail.ui
+package com.absinthe.libchecker.domain.app.detail.ui.dialog
 
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.AppInfoAdapter
 import com.absinthe.libchecker.domain.app.detail.ui.view.AppInfoBottomSheetView
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel

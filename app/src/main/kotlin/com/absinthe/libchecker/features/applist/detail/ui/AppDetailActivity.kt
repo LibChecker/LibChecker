@@ -13,6 +13,8 @@ import com.absinthe.libchecker.compat.IntentCompat
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageUseCase
 import com.absinthe.libchecker.domain.app.detail.model.DetailExtraBean
 import com.absinthe.libchecker.domain.app.detail.navigation.DetailReferenceNavigation
+import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_DETAIL_BEAN
+import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.domain.app.detail.ui.IDetailContainer
 import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_NAME
 import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_TYPE
@@ -22,9 +24,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-
-const val EXTRA_PACKAGE_NAME = Intent.EXTRA_PACKAGE_NAME
-const val EXTRA_DETAIL_BEAN = "EXTRA_DETAIL_BEAN"
 
 class AppDetailActivity :
   BaseAppDetailActivity(),

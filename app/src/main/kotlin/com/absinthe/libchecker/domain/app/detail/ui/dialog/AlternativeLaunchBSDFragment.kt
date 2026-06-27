@@ -1,10 +1,11 @@
-package com.absinthe.libchecker.features.applist.detail.ui
+package com.absinthe.libchecker.domain.app.detail.ui.dialog
 
 import android.content.ComponentName
 import android.content.Intent
 import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.domain.app.detail.ui.view.AlternativeLaunchBSDView
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment

@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.applist.detail.ui
+package com.absinthe.libchecker.domain.app.detail.ui.dialog
 
 import androidx.core.os.BundleCompat
 import androidx.core.text.buildSpannedString
@@ -12,6 +12,8 @@ import com.absinthe.libchecker.domain.app.detail.RelatedAppDisplayData
 import com.absinthe.libchecker.domain.app.detail.action.GetOverlayDetailUseCase
 import com.absinthe.libchecker.domain.app.detail.action.OverlayDetailData
 import com.absinthe.libchecker.domain.app.detail.action.OverlayDetailExtraInfo
+import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_LC_ITEM
+import com.absinthe.libchecker.domain.app.detail.ui.binder.RelatedAppItemBinder
 import com.absinthe.libchecker.domain.app.detail.ui.view.OverlayDetailBottomSheetView
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
@@ -23,8 +25,6 @@ import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.launch
 import me.zhanghai.android.appiconloader.AppIconLoader
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
-
-const val EXTRA_LC_ITEM = "EXTRA_LC_ITEM"
 
 class OverlayDetailBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<OverlayDetailBottomSheetView>() {
 
