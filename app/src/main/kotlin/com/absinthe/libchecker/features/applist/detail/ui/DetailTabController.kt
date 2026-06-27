@@ -11,6 +11,7 @@ import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.SIGNATURES
 import com.absinthe.libchecker.annotation.STATIC
+import com.absinthe.libchecker.domain.app.detail.ui.DetailTabSpec
 import com.absinthe.libchecker.features.applist.detail.ui.impl.AbilityAnalysisFragment
 import com.absinthe.libchecker.features.applist.detail.ui.impl.ComponentsAnalysisFragment
 import com.absinthe.libchecker.features.applist.detail.ui.impl.MetaDataAnalysisFragment
