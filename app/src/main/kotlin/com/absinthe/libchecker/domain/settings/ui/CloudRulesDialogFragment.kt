@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.settings.ui
+package com.absinthe.libchecker.domain.settings.ui
 
 import android.os.Bundle
 import android.view.View
@@ -9,7 +9,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.domain.rules.CloudRulesVersionInfo
-import com.absinthe.libchecker.features.settings.SettingsViewModel
+import com.absinthe.libchecker.domain.settings.presentation.SettingsViewModel
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.DownloadUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop

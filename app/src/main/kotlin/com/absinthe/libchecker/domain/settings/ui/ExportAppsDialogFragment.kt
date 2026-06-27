@@ -1,10 +1,10 @@
-package com.absinthe.libchecker.features.settings.ui
+package com.absinthe.libchecker.domain.settings.ui
 
 import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.features.settings.SettingsViewModel
+import com.absinthe.libchecker.domain.settings.presentation.SettingsViewModel
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView

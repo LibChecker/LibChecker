@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.settings.ui
+package com.absinthe.libchecker.domain.settings.ui
 
 import android.app.Dialog
 import android.os.Bundle

@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.settings
+package com.absinthe.libchecker.domain.settings.presentation
 
 import android.content.Intent
 import android.net.Uri
@@ -14,13 +14,13 @@ import com.absinthe.libchecker.domain.rules.CloudRulesDownloadRequest
 import com.absinthe.libchecker.domain.rules.CloudRulesRepository
 import com.absinthe.libchecker.domain.rules.CloudRulesVersionInfo
 import com.absinthe.libchecker.domain.rules.RuleSettingsRepository
-import com.absinthe.libchecker.domain.settings.BuildGetUpdatesItemsUseCase
-import com.absinthe.libchecker.domain.settings.BuildLocalePreferenceDataUseCase
-import com.absinthe.libchecker.domain.settings.BuildLogShareIntentUseCase
-import com.absinthe.libchecker.domain.settings.GetUpdatesItem
-import com.absinthe.libchecker.domain.settings.LocalePreferenceDisplayData
-import com.absinthe.libchecker.domain.settings.SelectDarkModeUseCase
-import com.absinthe.libchecker.domain.settings.SelectLocaleUseCase
+import com.absinthe.libchecker.domain.settings.model.GetUpdatesItem
+import com.absinthe.libchecker.domain.settings.model.LocalePreferenceDisplayData
+import com.absinthe.libchecker.domain.settings.usecase.BuildGetUpdatesItemsUseCase
+import com.absinthe.libchecker.domain.settings.usecase.BuildLocalePreferenceDataUseCase
+import com.absinthe.libchecker.domain.settings.usecase.BuildLogShareIntentUseCase
+import com.absinthe.libchecker.domain.settings.usecase.SelectDarkModeUseCase
+import com.absinthe.libchecker.domain.settings.usecase.SelectLocaleUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.domain.statistics.reference.repository.LibReferenceSettingsRepository
 import com.absinthe.libchecker.domain.statistics.reference.usecase.UpdateLibReferenceThresholdUseCase

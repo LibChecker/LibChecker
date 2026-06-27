@@ -1,9 +1,9 @@
-package com.absinthe.libchecker.features.settings.ui.adapter
+package com.absinthe.libchecker.domain.settings.ui.adapter
 
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import com.absinthe.libchecker.domain.settings.GetUpdatesAction
-import com.absinthe.libchecker.domain.settings.GetUpdatesItem
+import com.absinthe.libchecker.domain.settings.model.GetUpdatesAction
+import com.absinthe.libchecker.domain.settings.model.GetUpdatesItem
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.google.android.material.button.MaterialButton

@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.data.settings
 
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.domain.settings.DeveloperSettingsRepository
+import com.absinthe.libchecker.domain.settings.repository.DeveloperSettingsRepository
 
 class GlobalDeveloperSettingsRepository : DeveloperSettingsRepository {
   override var debugMode: Boolean

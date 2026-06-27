@@ -3,7 +3,7 @@ package com.absinthe.libchecker.data.settings
 import androidx.core.content.edit
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.domain.settings.AppearanceSettingsRepository
+import com.absinthe.libchecker.domain.settings.repository.AppearanceSettingsRepository
 import com.absinthe.libchecker.utils.SPUtils
 import java.util.Locale
 

@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.settings
+package com.absinthe.libchecker.domain.settings.usecase
 
 import android.content.Context
 import android.content.Intent

@@ -56,7 +56,7 @@ Important `:app` boundaries:
   `domain/*` product package with clear `presentation`, `ui`, `model`,
   `usecase`, and `repository` subpackages. Keep view constants, spans, and
   adapter-only icon types in UI; move reusable parsing/data preparation behind
-  deeper workflow modules instead of many thin use cases.
+  workflow-focused modules instead of flat directories of tiny use cases.
 - Shared `view/` widgets own rendering, accessibility metadata, and animation
   only; pass feature/domain data in through providers instead of importing
   `data/*`.

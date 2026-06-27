@@ -1,5 +1,6 @@
-package com.absinthe.libchecker.domain.settings
+package com.absinthe.libchecker.domain.settings.usecase
 
+import com.absinthe.libchecker.domain.settings.repository.AppearanceSettingsRepository
 import java.util.Locale
 
 class SelectLocaleUseCase(

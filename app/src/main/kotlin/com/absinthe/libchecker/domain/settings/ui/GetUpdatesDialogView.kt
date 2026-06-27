@@ -1,13 +1,13 @@
-package com.absinthe.libchecker.features.settings.ui
+package com.absinthe.libchecker.domain.settings.ui
 
 import android.content.Context
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.settings.GetUpdatesAction
-import com.absinthe.libchecker.domain.settings.GetUpdatesItem
-import com.absinthe.libchecker.features.settings.ui.adapter.GetUpdatesAdapter
+import com.absinthe.libchecker.domain.settings.model.GetUpdatesAction
+import com.absinthe.libchecker.domain.settings.model.GetUpdatesItem
+import com.absinthe.libchecker.domain.settings.ui.adapter.GetUpdatesAdapter
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView

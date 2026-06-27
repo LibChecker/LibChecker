@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.settings.ui
+package com.absinthe.libchecker.domain.settings.ui
 
 import android.content.Context
 import android.graphics.Typeface

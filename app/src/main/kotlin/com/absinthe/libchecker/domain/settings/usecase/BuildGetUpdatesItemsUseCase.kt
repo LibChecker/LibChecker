@@ -1,9 +1,10 @@
-package com.absinthe.libchecker.domain.settings
+package com.absinthe.libchecker.domain.settings.usecase
 
 import android.content.Context
-import androidx.annotation.DrawableRes
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.URLManager
+import com.absinthe.libchecker.domain.settings.model.GetUpdatesAction
+import com.absinthe.libchecker.domain.settings.model.GetUpdatesItem
 
 class BuildGetUpdatesItemsUseCase(
   private val context: Context
@@ -43,15 +44,4 @@ class BuildGetUpdatesItemsUseCase(
       items
     }
   }
-}
-
-data class GetUpdatesItem(
-  val text: String,
-  @DrawableRes val iconRes: Int,
-  val action: GetUpdatesAction
-)
-
-sealed interface GetUpdatesAction {
-  data class OpenUri(val uri: String) : GetUpdatesAction
-  data object OpenInAppUpdate : GetUpdatesAction
 }
