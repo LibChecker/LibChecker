@@ -1,9 +1,11 @@
-package com.absinthe.libchecker.features.about
+package com.absinthe.libchecker.domain.about.ui.view
 
 import android.content.Context
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.absinthe.libchecker.domain.about.model.DeveloperInfo
+import com.absinthe.libchecker.domain.about.ui.adapter.DeveloperInfoAdapter
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.view.app.IHeaderView

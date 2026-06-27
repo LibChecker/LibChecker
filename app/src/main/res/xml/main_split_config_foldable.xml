@@ -20,7 +20,7 @@
       window:secondaryActivityName="com.absinthe.libchecker.domain.snapshot.detail.ui.SnapshotDetailActivity" />
     <SplitPairFilter
       window:primaryActivityName="com.absinthe.libchecker.features.home.ui.main.MainActivity"
-      window:secondaryActivityName="com.absinthe.libchecker.features.about.ui.AboutActivity" />
+      window:secondaryActivityName="com.absinthe.libchecker.domain.about.ui.AboutActivity" />
 
     <SplitPairFilter
       window:primaryActivityName="com.absinthe.libchecker.domain.statistics.reference.ui.LibReferenceActivity"

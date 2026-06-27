@@ -1,9 +1,11 @@
-package com.absinthe.libchecker.features.about
+package com.absinthe.libchecker.domain.about.ui
 
 import android.os.Bundle
 import android.view.View
 import androidx.core.net.toUri
 import com.absinthe.libchecker.constant.URLManager
+import com.absinthe.libchecker.domain.about.model.DeveloperInfo
+import com.absinthe.libchecker.domain.about.ui.view.DevelopersDialogView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp

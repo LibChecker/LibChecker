@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.about
+package com.absinthe.libchecker.domain.about.ui
 
 import android.content.Context
 import android.content.Intent

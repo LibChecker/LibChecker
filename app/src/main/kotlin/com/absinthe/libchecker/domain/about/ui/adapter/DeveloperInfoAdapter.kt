@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.about
+package com.absinthe.libchecker.domain.about.ui.adapter
 
 import android.content.Intent
 import android.view.ViewGroup
@@ -7,6 +7,8 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import coil.load
 import coil.transform.CircleCropTransformation
+import com.absinthe.libchecker.domain.about.model.DeveloperInfo
+import com.absinthe.libchecker.domain.about.ui.view.DeveloperItemView
 import com.absinthe.libchecker.utils.Toasty
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
