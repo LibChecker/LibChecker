@@ -28,8 +28,6 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.backup.RoomBackup
 import com.absinthe.libchecker.databinding.ActivityBackupBinding
-import com.absinthe.libchecker.domain.snapshot.CreateSnapshotDatabaseBackupUseCase
-import com.absinthe.libchecker.domain.snapshot.RestoreSnapshotDatabaseBackupUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotBackupTarget
 import com.absinthe.libchecker.domain.snapshot.backup.SnapshotRestorePlan
@@ -50,10 +48,7 @@ import com.absinthe.libchecker.utils.showToast
 import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.koin.android.ext.android.getKoin
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.koin.core.parameter.parametersOf
 import rikka.recyclerview.fixEdgeEffect
 import rikka.widget.borderview.BorderRecyclerView
 import rikka.widget.borderview.BorderView
@@ -101,8 +96,6 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
     private lateinit var backupResultLauncher: ActivityResultLauncher<String>
     private lateinit var restoreResultLauncher: ActivityResultLauncher<String>
     private lateinit var roomBackup: RoomBackup
-    private lateinit var createSnapshotDatabaseBackup: CreateSnapshotDatabaseBackupUseCase
-    private lateinit var restoreSnapshotDatabaseBackup: RestoreSnapshotDatabaseBackupUseCase
     private var loadingDialog: AlertDialog? = null
 
     override fun onCreateView(
@@ -146,12 +139,6 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
           }
         }
       roomBackup = RoomBackup(context)
-      createSnapshotDatabaseBackup = getKoin().get {
-        parametersOf(roomBackup)
-      }
-      restoreSnapshotDatabaseBackup = getKoin().get {
-        parametersOf(roomBackup)
-      }
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -353,24 +340,12 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
       context: Context,
       dialog: AlertDialog
     ) {
-      lifecycleScope.launch(Dispatchers.IO) {
-        runCatching {
-          restoreSnapshotDatabaseBackup(
-            uri,
-            context.requireAvailableCacheDir()
-          )
-        }.onSuccess { result ->
-          result?.let {
-            Timber.d(
-              "success: ${it.success}, message: ${it.message}, exitCode: ${it.exitCode}"
-            )
-          }
-        }.onFailure {
-          Timber.e(it)
-        }
-        withContext(Dispatchers.Main) {
-          dialog.dismiss()
-        }
+      viewModel.restoreDatabaseBackup(
+        roomBackup = roomBackup,
+        uri = uri,
+        cacheDir = context.requireAvailableCacheDir()
+      ) {
+        dialog.dismiss()
       }
     }
 
@@ -401,7 +376,7 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
     private fun createDatabaseBackup() {
       loadingDialog = UiUtils.createLoadingDialog(requireActivity())
       loadingDialog?.show()
-      createSnapshotDatabaseBackup { result ->
+      viewModel.createDatabaseBackup(roomBackup) { result ->
         Timber.d(
           "success: ${result.success}, message: ${result.message}, exitCode: ${result.exitCode}"
         )
@@ -409,6 +384,9 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
           loadingDialog?.dismiss()
           loadingDialog = null
         }
+      }.onFailure {
+        loadingDialog?.dismiss()
+        loadingDialog = null
       }
     }
 

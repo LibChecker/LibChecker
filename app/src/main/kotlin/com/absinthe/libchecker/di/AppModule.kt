@@ -216,6 +216,7 @@ import com.jakewharton.processphoenix.ProcessPhoenix
 import jonathanfinerty.once.Once
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
+import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
 
 val appModule = module {
@@ -590,6 +591,16 @@ val appModule = module {
       restoreSnapshotArchiveFromUriUseCase = get(),
       getSnapshotBackupTargetUseCase = get(),
       buildSnapshotRestorePlanUseCase = get(),
+      createSnapshotDatabaseBackupUseCaseFactory = { roomBackup ->
+        get {
+          parametersOf(roomBackup)
+        }
+      },
+      restoreSnapshotDatabaseBackupUseCaseFactory = { roomBackup ->
+        get {
+          parametersOf(roomBackup)
+        }
+      },
       formatSnapshotTimestampUseCase = get(),
       snapshotSelectionUseCase = get()
     )
