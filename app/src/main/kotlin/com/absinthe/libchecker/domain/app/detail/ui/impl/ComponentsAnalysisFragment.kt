@@ -54,6 +54,13 @@ class ComponentsAnalysisFragment :
     }
   }
 
+  override fun onVisibilityChanged(visible: Boolean) {
+    super.onVisibilityChanged(visible)
+    if (visible && viewModel.contentState.componentsMap[type]?.value == null && viewModel.packageInfoStateFlow.value != null) {
+      viewModel.initComponentsData()
+    }
+  }
+
   companion object {
     fun newInstance(@LibType type: Int): ComponentsAnalysisFragment {
       return ComponentsAnalysisFragment().putArguments(EXTRA_TYPE to type)

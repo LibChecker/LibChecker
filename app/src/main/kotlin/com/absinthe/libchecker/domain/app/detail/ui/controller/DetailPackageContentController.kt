@@ -105,7 +105,7 @@ class DetailPackageContentController(
   ) {
     when (analysisAction) {
       AppDetailAnalysisInitAction.Abilities -> viewModel.initAbilities(packageName)
-      AppDetailAnalysisInitAction.Components -> viewModel.initComponentsData()
+      AppDetailAnalysisInitAction.Components -> Unit
       AppDetailAnalysisInitAction.PreviewComponents -> viewModel.initComponentsDataInPreview()
     }
   }
