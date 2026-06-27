@@ -54,8 +54,9 @@ Important `:app` boundaries:
 - `features/*` owns user-facing feature flows. Keep view constants, spans, and
   adapter-only icon types in UI; move reusable parsing/data preparation to use
   cases.
-- Shared `view/` widgets own rendering and animation only; pass feature/domain
-  data in through providers instead of importing `data/*`.
+- Shared `view/` widgets own rendering, accessibility metadata, and animation
+  only; pass feature/domain data in through providers instead of importing
+  `data/*`.
 - `domain/app/` owns app-list use cases and repository/factory interfaces.
   Keep package-list synchronization rules here instead of in UI controllers.
   Put feature-specific app-domain use cases and display models in focused

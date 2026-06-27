@@ -2,6 +2,7 @@ package com.absinthe.libchecker.features.snapshot.ui.view
 
 import android.content.Context
 import android.view.ContextThemeWrapper
+import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
@@ -23,10 +24,11 @@ import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.card.MaterialCardView
+import java.util.Locale
 
 class SnapshotDashboardView(context: Context) : MaterialCardView(context, null, R.style.AlbumMaterialCard) {
 
-  val container = SnapshotDashboardContainerView(context).apply {
+  private val container = SnapshotDashboardContainerView(context).apply {
     val padding = context.getDimensionPixelSize(R.dimen.normal_padding)
     setPadding(padding, padding, padding, padding)
     clipToPadding = false
@@ -40,9 +42,51 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context, null, 
     setSmoothRoundCorner(12.dp)
     setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSurfaceContainerHigh))
     addView(container)
+    updateContentDescription()
   }
 
-  class SnapshotDashboardContainerView(context: Context) : AViewGroup(context) {
+  fun setOnTimestampClickListener(listener: View.OnClickListener) {
+    container.setOnTimestampClickListener(listener)
+  }
+
+  fun setTimestampText(text: CharSequence) {
+    container.setTimestampText(text)
+    updateContentDescription()
+  }
+
+  fun setNoSnapshotTimestamp() {
+    setTimestampText(context.getString(R.string.snapshot_none))
+  }
+
+  fun setAppsCount(snapshotCount: Int, appCount: Int) {
+    container.setAppsCount(snapshotCount, appCount)
+    updateContentDescription()
+  }
+
+  fun setSystemProps(props: List<SnapshotSystemPropDisplayData>) {
+    container.setSystemProps(props)
+  }
+
+  private fun updateContentDescription() {
+    contentDescription = listOf(
+      context.getString(R.string.snapshot_current_timestamp),
+      container.timestampText,
+      context.getString(R.string.snapshot_apps_count),
+      container.appsCountText
+    )
+      .mapNotNull { it.toString().trim().takeIf(String::isNotEmpty) }
+      .joinToString()
+
+    val timestampContentDescription = listOf(
+      context.getString(R.string.dialog_title_change_timestamp),
+      container.timestampText
+    )
+      .mapNotNull { it.toString().trim().takeIf(String::isNotEmpty) }
+      .joinToString()
+    container.setTimestampContentDescription(timestampContentDescription)
+  }
+
+  private inner class SnapshotDashboardContainerView(context: Context) : AViewGroup(context) {
 
     private val tvSnapshotTimestampTitle =
       AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
@@ -53,7 +97,7 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context, null, 
         text = context.getString(R.string.snapshot_current_timestamp)
       }
 
-    val tvSnapshotTimestampText =
+    private val tvSnapshotTimestampText =
       AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifBlack)).apply {
         layoutParams = LayoutParams(
           ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -63,7 +107,7 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context, null, 
         setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackgroundBorderless))
       }
 
-    val arrow = AppCompatImageView(context).apply {
+    private val arrow = AppCompatImageView(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
@@ -84,7 +128,7 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context, null, 
         text = context.getString(R.string.snapshot_apps_count)
       }
 
-    val tvSnapshotAppsCountText =
+    private val tvSnapshotAppsCountText =
       AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifBlack)).apply {
         layoutParams = LayoutParams(
           ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -94,6 +138,12 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context, null, 
       }
 
     private val systemPropAdapter = SystemPropsAdapter()
+
+    val timestampText: CharSequence
+      get() = tvSnapshotTimestampText.text
+
+    val appsCountText: CharSequence
+      get() = tvSnapshotAppsCountText.text
 
     private val propsRecyclerView = RecyclerView(context).apply {
       layoutParams = LayoutParams(
@@ -105,6 +155,24 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context, null, 
       adapter = systemPropAdapter
       overScrollMode = OVER_SCROLL_NEVER
       layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+    }
+
+    fun setOnTimestampClickListener(listener: View.OnClickListener) {
+      tvSnapshotTimestampText.setOnClickListener(listener)
+      arrow.setOnClickListener(listener)
+    }
+
+    fun setTimestampText(text: CharSequence) {
+      tvSnapshotTimestampText.text = text
+    }
+
+    fun setTimestampContentDescription(description: CharSequence) {
+      tvSnapshotTimestampText.contentDescription = description
+      arrow.contentDescription = description
+    }
+
+    fun setAppsCount(snapshotCount: Int, appCount: Int) {
+      tvSnapshotAppsCountText.text = String.format(Locale.getDefault(), "%d / %d", snapshotCount, appCount)
     }
 
     fun setSystemProps(props: List<SnapshotSystemPropDisplayData>) {
