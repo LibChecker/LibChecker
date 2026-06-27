@@ -35,7 +35,6 @@ import com.absinthe.libchecker.domain.app.ClearApkCacheUseCase
 import com.absinthe.libchecker.domain.app.FeatureInitializationRepository
 import com.absinthe.libchecker.domain.app.GetApkPreviewInfoUseCase
 import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
-import com.absinthe.libchecker.domain.app.GetAppDetailPackageUseCase
 import com.absinthe.libchecker.domain.app.GetArchivePackageInfoUseCase
 import com.absinthe.libchecker.domain.app.GetInstalledAppComparisonPackageUseCase
 import com.absinthe.libchecker.domain.app.GetLibraryDetailUseCase
@@ -89,6 +88,7 @@ import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailStaticLibra
 import com.absinthe.libchecker.domain.app.detail.content.SortAppDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.detail.feature.BuildAppDetailFeatureItemUseCase
 import com.absinthe.libchecker.domain.app.detail.navigation.BuildDetailReferenceNavigationUseCase
+import com.absinthe.libchecker.domain.app.detail.packageinfo.GetAppDetailPackageUseCase
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailActionLoader
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailFeatureLoader
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailFilterController

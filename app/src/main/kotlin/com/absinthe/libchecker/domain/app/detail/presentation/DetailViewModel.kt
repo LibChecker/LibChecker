@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppBundleSplitItem
-import com.absinthe.libchecker.domain.app.GetAppDetailPackageUseCase
 import com.absinthe.libchecker.domain.app.PrepareApkAnalysisPackageUseCase
 import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.domain.app.detail.AppDetailAbiLabelData
@@ -20,6 +19,7 @@ import com.absinthe.libchecker.domain.app.detail.feature.AppDetailFeatureItemDat
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.navigation.DetailReferenceNavigation
+import com.absinthe.libchecker.domain.app.detail.packageinfo.GetAppDetailPackageUseCase
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailActionLoader
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailFeatureLoader
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailFilterController

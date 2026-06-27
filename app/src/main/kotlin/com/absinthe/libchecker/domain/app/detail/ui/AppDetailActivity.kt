@@ -10,11 +10,11 @@ import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ALL
 import com.absinthe.libchecker.compat.IntentCompat
-import com.absinthe.libchecker.domain.app.GetAppDetailPackageUseCase
 import com.absinthe.libchecker.domain.app.detail.model.DetailExtraBean
 import com.absinthe.libchecker.domain.app.detail.navigation.DetailReferenceNavigation
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_DETAIL_BEAN
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
+import com.absinthe.libchecker.domain.app.detail.packageinfo.GetAppDetailPackageUseCase
 import com.absinthe.libchecker.domain.app.detail.ui.IDetailContainer
 import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_NAME
 import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_TYPE

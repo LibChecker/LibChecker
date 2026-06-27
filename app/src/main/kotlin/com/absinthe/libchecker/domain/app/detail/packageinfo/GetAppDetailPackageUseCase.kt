@@ -1,7 +1,8 @@
-package com.absinthe.libchecker.domain.app
+package com.absinthe.libchecker.domain.app.detail.packageinfo
 
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.utils.extensions.isArchivedPackage
 
 class GetAppDetailPackageUseCase(
