@@ -154,15 +154,6 @@ import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotTopAppsUseCase
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotDetailItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotDetailSectionsUseCase
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
-import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
-import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotCapturePlanUseCase
-import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotListUpdatePlanUseCase
-import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotSystemPropDisplayDataUseCase
-import com.absinthe.libchecker.domain.snapshot.list.usecase.DeleteSnapshotTimeStampUseCase
-import com.absinthe.libchecker.domain.snapshot.list.usecase.GetApexPackageNamesUseCase
-import com.absinthe.libchecker.domain.snapshot.list.usecase.GetSnapshotPackageIconSourcesUseCase
-import com.absinthe.libchecker.domain.snapshot.list.usecase.GetSnapshotSystemPropDiffsUseCase
-import com.absinthe.libchecker.domain.snapshot.list.usecase.UpdateSnapshotDiffItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.timenode.usecase.BuildSnapshotTimeNodeItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.timenode.usecase.UpdateSnapshotAutoRemoveThresholdUseCase
 import com.absinthe.libchecker.domain.snapshot.track.presentation.TrackViewModel
@@ -410,27 +401,19 @@ val appModule = module {
       buildPackageComparisonSnapshotItemUseCase = get()
     )
   }
-  factory { GetApexPackageNamesUseCase(get()) }
   factory { BuildArchiveSnapshotItemUseCase(androidContext()) }
   factory { BuildInstalledSnapshotItemUseCase(get()) }
   factory { BuildSnapshotAbiDisplayDataUseCase(androidContext()) }
-  factory { BuildSnapshotCapturePlanUseCase(get()) }
-  factory { BuildSnapshotListUpdatePlanUseCase(get(), get(), get()) }
   factory { BuildSnapshotUpdateTimeDisplayDataUseCase() }
   factory { CaptureInstalledSnapshotUseCase(androidContext().packageManager, get(), get(), get(), get(), get()) }
   factory { CompareTrackedSnapshotListsUseCase(get(), get()) }
   factory { FormatSnapshotTimestampUseCase() }
   factory { GetSnapshotDashboardCountUseCase(get(), get()) }
-  factory { GetSnapshotPackageIconSourcesUseCase(get()) }
   factory { GetSnapshotRuleUseCase() }
-  factory { GetSnapshotSystemPropDiffsUseCase(get()) }
-  factory { BuildSnapshotSystemPropDisplayDataUseCase(androidContext(), get()) }
   factory { BuildSnapshotTimeNodeItemsUseCase() }
   factory { GetTrackListItemsUseCase(androidContext().packageManager, get(), get()) }
   factory { SetPackageTrackedUseCase(get(), get()) }
-  factory { DeleteSnapshotTimeStampUseCase(get(), get()) }
   factory { UpdateSnapshotAutoRemoveThresholdUseCase(get(), get()) }
-  factory { UpdateSnapshotDiffItemsUseCase() }
   factory { UpdateSnapshotTopAppsUseCase(get(), get()) }
   factory { BuildSnapshotDetailItemsUseCase(androidContext()) }
   factory { BuildSnapshotDetailSectionsUseCase(get(), get()) }
@@ -511,30 +494,6 @@ val appModule = module {
       setApkAnalysisEnabledUseCase = get(),
       libReferenceSettingsRepository = get(),
       updateLibReferenceThresholdUseCase = get()
-    )
-  }
-  viewModel {
-    SnapshotViewModel(
-      repository = get(),
-      appListRepository = get(),
-      compareSnapshotDiffs = get(),
-      compareSnapshotItemWithInstalledApp = get(),
-      getSnapshotDashboardCount = get(),
-      buildSnapshotDetailItems = get(),
-      buildSnapshotDetailSections = get(),
-      snapshotLibrary = get(),
-      buildSnapshotCapturePlanUseCase = get(),
-      getSnapshotPackageIconSourcesUseCase = get(),
-      buildSnapshotListUpdatePlanUseCase = get(),
-      buildSnapshotSystemPropDisplayDataUseCase = get(),
-      buildSnapshotTimeNodeItemsUseCase = get(),
-      deleteSnapshotTimeStampUseCase = get(),
-      formatSnapshotTimestampUseCase = get(),
-      snapshotSelectionUseCase = get(),
-      snapshotSettingsRepository = get(),
-      updateSnapshotAutoRemoveThresholdUseCase = get(),
-      updateSnapshotDiffItemsUseCase = get(),
-      snapshotTrackChangeRepository = get()
     )
   }
   viewModel { TrackViewModel(get(), get()) }
