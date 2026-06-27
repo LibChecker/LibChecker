@@ -6,8 +6,8 @@ import android.os.RemoteCallbackList
 import android.os.RemoteException
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
-import com.absinthe.libchecker.domain.app.InitializePendingAppFeaturesUseCase
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.list.usecase.InitializePendingAppFeaturesUseCase
 import java.lang.ref.WeakReference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

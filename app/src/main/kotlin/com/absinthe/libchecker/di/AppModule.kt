@@ -41,7 +41,6 @@ import com.absinthe.libchecker.domain.app.GetInstalledAppComparisonPackageUseCas
 import com.absinthe.libchecker.domain.app.GetLibraryDetailUseCase
 import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.app.GetRelatedAppListItemUseCase
-import com.absinthe.libchecker.domain.app.InitializePendingAppFeaturesUseCase
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.LibraryDetailRepository
 import com.absinthe.libchecker.domain.app.PrepareApkAnalysisPackageUseCase
@@ -114,6 +113,7 @@ import com.absinthe.libchecker.domain.app.list.usecase.FilterAppListItemsUseCase
 import com.absinthe.libchecker.domain.app.list.usecase.GetAppListContentUseCase
 import com.absinthe.libchecker.domain.app.list.usecase.GetAppListPackageStatesUseCase
 import com.absinthe.libchecker.domain.app.list.usecase.InitializeAppListUseCase
+import com.absinthe.libchecker.domain.app.list.usecase.InitializePendingAppFeaturesUseCase
 import com.absinthe.libchecker.domain.app.list.usecase.ObserveAppListLoadingUseCase
 import com.absinthe.libchecker.domain.app.search.HandleAppListSearchCommandUseCase
 import com.absinthe.libchecker.domain.app.sync.SyncAppListChangesUseCase

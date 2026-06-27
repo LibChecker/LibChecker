@@ -1,6 +1,8 @@
-package com.absinthe.libchecker.domain.app
+package com.absinthe.libchecker.domain.app.list.usecase
 
 import android.content.pm.PackageManager
+import com.absinthe.libchecker.domain.app.AppListRepository
+import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.utils.extensions.getFeatures
 import timber.log.Timber
 
