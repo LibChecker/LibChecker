@@ -19,17 +19,16 @@ import com.absinthe.libchecker.domain.snapshot.detail.usecase.SnapshotDetailSect
 import com.absinthe.libchecker.domain.snapshot.display.FormatSnapshotTimestampUseCase
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotCapturePlan
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotSystemPropDisplayData
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotTimeNodeListData
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotCapturePlanUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotListUpdatePlanUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotSystemPropDisplayDataUseCase
+import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotTimeNodeListDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.DeleteSnapshotTimeStampUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.GetSnapshotPackageIconSourcesUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.UpdateSnapshotDiffItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
-import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.domain.snapshot.sync.SnapshotPackageChangeProcessor
-import com.absinthe.libchecker.domain.snapshot.timenode.model.SnapshotTimeNodeItem
-import com.absinthe.libchecker.domain.snapshot.timenode.usecase.BuildSnapshotTimeNodeItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.timenode.usecase.UpdateSnapshotAutoRemoveThresholdUseCase
 import com.absinthe.libchecker.domain.snapshot.track.repository.SnapshotTrackChangeRepository
 import com.absinthe.libraries.utils.manager.TimeRecorder
@@ -54,7 +53,7 @@ class SnapshotViewModel(
   private val getSnapshotPackageIconSourcesUseCase: GetSnapshotPackageIconSourcesUseCase,
   private val buildSnapshotListUpdatePlanUseCase: BuildSnapshotListUpdatePlanUseCase,
   private val buildSnapshotSystemPropDisplayDataUseCase: BuildSnapshotSystemPropDisplayDataUseCase,
-  private val buildSnapshotTimeNodeItemsUseCase: BuildSnapshotTimeNodeItemsUseCase,
+  private val buildSnapshotTimeNodeListDataUseCase: BuildSnapshotTimeNodeListDataUseCase,
   private val deleteSnapshotTimeStampUseCase: DeleteSnapshotTimeStampUseCase,
   private val formatSnapshotTimestampUseCase: FormatSnapshotTimestampUseCase,
   private val snapshotSelectionUseCase: SnapshotSelectionUseCase,
@@ -202,11 +201,7 @@ class SnapshotViewModel(
   suspend fun buildSnapshotTimeNodeListData(
     timeStamps: List<TimeStampItem>
   ): SnapshotTimeNodeListData {
-    val result = buildSnapshotTimeNodeItemsUseCase(timeStamps)
-    return SnapshotTimeNodeListData(
-      items = result.items,
-      packageIconSources = getSnapshotPackageIconSourcesUseCase(result.topAppPackageNames)
-    )
+    return buildSnapshotTimeNodeListDataUseCase(timeStamps)
   }
 
   fun updateSnapshotSearchKeyword(keyword: String): Boolean {
@@ -345,9 +340,4 @@ class SnapshotViewModel(
     data class TimeStampChange(val timestamp: Long) : Effect()
     data class ComparingProgressChange(val progress: Int) : Effect()
   }
-
-  data class SnapshotTimeNodeListData(
-    val items: List<SnapshotTimeNodeItem>,
-    val packageIconSources: Map<String, SnapshotPackageIconSource>
-  )
 }
