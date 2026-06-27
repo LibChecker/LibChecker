@@ -11,11 +11,11 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ALL
 import com.absinthe.libchecker.compat.IntentCompat
 import com.absinthe.libchecker.domain.app.GetAppDetailPackageUseCase
+import com.absinthe.libchecker.domain.app.detail.model.DetailExtraBean
 import com.absinthe.libchecker.domain.app.detail.navigation.DetailReferenceNavigation
 import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_NAME
 import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_TYPE
 import com.absinthe.libchecker.features.applist.detail.IDetailContainer
-import com.absinthe.libchecker.features.applist.detail.bean.DetailExtraBean
 import com.absinthe.libchecker.utils.Toasty
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

@@ -4,7 +4,7 @@ import androidx.annotation.StringRes
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.features.applist.detail.bean.AppDetailToolbarItem
+import com.absinthe.libchecker.domain.app.detail.model.AppDetailToolbarItem
 import com.absinthe.libchecker.features.applist.detail.ui.adapter.AppDetailToolbarAdapter
 import com.google.android.material.appbar.AppBarLayout
 import kotlin.math.abs

@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.features.applist.detail.ui.adapter
 
 import android.view.ViewGroup
-import com.absinthe.libchecker.features.applist.detail.bean.SignatureDetailItem
+import com.absinthe.libchecker.domain.app.detail.model.SignatureDetailItem
 import com.absinthe.libchecker.features.applist.detail.ui.view.SignatureDetailItemView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder

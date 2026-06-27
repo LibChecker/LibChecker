@@ -4,8 +4,8 @@ import android.content.pm.PackageInfo
 import com.absinthe.libchecker.domain.app.detail.content.AppDetailAnalysisInitAction
 import com.absinthe.libchecker.domain.app.detail.content.AppDetailFeatureInitAction
 import com.absinthe.libchecker.domain.app.detail.content.BuildAppDetailContentInitPlanUseCase
+import com.absinthe.libchecker.domain.app.detail.model.DetailExtraBean
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
-import com.absinthe.libchecker.features.applist.detail.bean.DetailExtraBean
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

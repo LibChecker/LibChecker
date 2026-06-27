@@ -38,7 +38,7 @@ import com.absinthe.libchecker.domain.app.detail.model.DISABLED
 import com.absinthe.libchecker.domain.app.detail.model.EXPORTED
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
-import com.absinthe.libchecker.features.applist.detail.bean.StaticLibItem
+import com.absinthe.libchecker.domain.app.detail.model.StaticLibItem
 import com.absinthe.libchecker.features.applist.detail.ui.EXTRA_TEXT
 import com.absinthe.libchecker.features.applist.detail.ui.XmlBSDFragment
 import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan

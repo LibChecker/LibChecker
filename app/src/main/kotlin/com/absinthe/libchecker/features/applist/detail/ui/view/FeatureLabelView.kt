@@ -5,7 +5,7 @@ import android.graphics.drawable.Drawable
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageButton
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.features.applist.detail.bean.FeatureItem
+import com.absinthe.libchecker.domain.app.detail.model.FeatureItem
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.animatedBlurAction
 import com.absinthe.libchecker.utils.extensions.dp

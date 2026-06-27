@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.applist.detail.bean
+package com.absinthe.libchecker.domain.app.detail.model
 
 data class AppDetailToolbarItem(
   val icon: Int,

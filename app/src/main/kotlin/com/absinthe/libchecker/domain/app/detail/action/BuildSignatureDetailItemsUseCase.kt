@@ -1,6 +1,6 @@
 package com.absinthe.libchecker.domain.app.detail.action
 
-import com.absinthe.libchecker.features.applist.detail.bean.SignatureDetailItem
+import com.absinthe.libchecker.domain.app.detail.model.SignatureDetailItem
 
 class BuildSignatureDetailItemsUseCase {
 

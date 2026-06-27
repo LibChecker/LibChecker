@@ -12,7 +12,7 @@ import com.absinthe.libchecker.domain.app.detail.model.DISABLED
 import com.absinthe.libchecker.domain.app.detail.model.EXPORTED
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
-import com.absinthe.libchecker.features.applist.detail.bean.StatefulComponent
+import com.absinthe.libchecker.domain.app.detail.model.StatefulComponent
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
 import com.absinthe.rulesbundle.Rule
 

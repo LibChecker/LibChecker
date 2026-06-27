@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.applist.detail.bean
+package com.absinthe.libchecker.domain.app.detail.model
 
 object FeaturePriority {
   const val PRIORITY_APP_PROP = 0

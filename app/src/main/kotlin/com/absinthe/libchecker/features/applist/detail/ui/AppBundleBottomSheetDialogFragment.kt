@@ -4,8 +4,8 @@ import android.content.pm.PackageInfo
 import androidx.core.os.BundleCompat
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.domain.app.AppBundleSplitKind
+import com.absinthe.libchecker.domain.app.detail.model.AppBundleItem
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
-import com.absinthe.libchecker.features.applist.detail.bean.AppBundleItem
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppBundleBottomSheetView
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppBundleItemView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment

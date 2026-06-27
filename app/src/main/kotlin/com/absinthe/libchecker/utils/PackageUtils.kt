@@ -54,7 +54,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
-import com.absinthe.libchecker.features.applist.detail.bean.StatefulComponent
+import com.absinthe.libchecker.domain.app.detail.model.StatefulComponent
 import com.absinthe.libchecker.utils.dex.FastDexFileFactory
 import com.absinthe.libchecker.utils.elf.ElfInfo
 import com.absinthe.libchecker.utils.elf.ElfParser
