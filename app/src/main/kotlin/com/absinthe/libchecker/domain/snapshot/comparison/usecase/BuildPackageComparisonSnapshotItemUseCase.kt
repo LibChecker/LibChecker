@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.snapshot
+package com.absinthe.libchecker.domain.snapshot.comparison.usecase
 
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager

@@ -1,8 +1,8 @@
 package com.absinthe.libchecker.domain.snapshot.track.usecase
 
 import com.absinthe.libchecker.database.entity.SnapshotItem
-import com.absinthe.libchecker.domain.snapshot.CompareSnapshotListsUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
+import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotListsUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 
 class CompareTrackedSnapshotListsUseCase(

@@ -141,17 +141,8 @@ import com.absinthe.libchecker.domain.settings.usecase.SelectDarkModeUseCase
 import com.absinthe.libchecker.domain.settings.usecase.SelectLocaleUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildInstalledSnapshotItemUseCase
-import com.absinthe.libchecker.domain.snapshot.BuildPackageComparisonSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCase
-import com.absinthe.libchecker.domain.snapshot.BuildSnapshotComparisonListsUseCase
-import com.absinthe.libchecker.domain.snapshot.BuildSnapshotComparisonPlanUseCase
-import com.absinthe.libchecker.domain.snapshot.BuildSnapshotPairDiffUseCase
 import com.absinthe.libchecker.domain.snapshot.CaptureInstalledSnapshotUseCase
-import com.absinthe.libchecker.domain.snapshot.CompareSnapshotDiffsUseCase
-import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemWithInstalledAppUseCase
-import com.absinthe.libchecker.domain.snapshot.CompareSnapshotItemsUseCase
-import com.absinthe.libchecker.domain.snapshot.CompareSnapshotListsUseCase
-import com.absinthe.libchecker.domain.snapshot.CompareSnapshotWithInstalledAppsUseCase
 import com.absinthe.libchecker.domain.snapshot.DeleteSnapshotTimeStampUseCase
 import com.absinthe.libchecker.domain.snapshot.FormatSnapshotTimestampUseCase
 import com.absinthe.libchecker.domain.snapshot.GetApexPackageNamesUseCase
@@ -178,6 +169,14 @@ import com.absinthe.libchecker.domain.snapshot.backup.usecase.PrepareRoomBackupR
 import com.absinthe.libchecker.domain.snapshot.backup.usecase.RestoreSnapshotArchiveFromUriUseCase
 import com.absinthe.libchecker.domain.snapshot.backup.usecase.RestoreSnapshotDatabaseBackupUseCase
 import com.absinthe.libchecker.domain.snapshot.comparison.presentation.SnapshotComparisonViewModel
+import com.absinthe.libchecker.domain.snapshot.comparison.usecase.BuildPackageComparisonSnapshotItemUseCase
+import com.absinthe.libchecker.domain.snapshot.comparison.usecase.BuildSnapshotComparisonPlanUseCase
+import com.absinthe.libchecker.domain.snapshot.comparison.usecase.BuildSnapshotPairDiffUseCase
+import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotDiffsUseCase
+import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotItemWithInstalledAppUseCase
+import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotItemsUseCase
+import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotListsUseCase
+import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotWithInstalledAppsUseCase
 import com.absinthe.libchecker.domain.snapshot.comparison.usecase.PrepareSnapshotComparisonArchivesUseCase
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotDetailItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotDetailSectionsUseCase
@@ -444,7 +443,6 @@ val appModule = module {
   factory { BuildPackageComparisonSnapshotItemUseCase(androidContext().packageManager) }
   factory { BuildSnapshotAbiDisplayDataUseCase(androidContext()) }
   factory { BuildSnapshotCapturePlanUseCase(get()) }
-  factory { BuildSnapshotComparisonListsUseCase(get()) }
   factory { BuildSnapshotComparisonPlanUseCase(get()) }
   factory { BuildSnapshotRestorePlanUseCase() }
   factory { BuildSnapshotListUpdatePlanUseCase(get(), get(), get()) }

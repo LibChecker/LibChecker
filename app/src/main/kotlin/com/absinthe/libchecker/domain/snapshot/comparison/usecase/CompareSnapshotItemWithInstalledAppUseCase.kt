@@ -1,7 +1,9 @@
-package com.absinthe.libchecker.domain.snapshot
+package com.absinthe.libchecker.domain.snapshot.comparison.usecase
 
 import android.content.pm.PackageManager
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.snapshot.SnapshotItemFactory
+import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 
 class CompareSnapshotItemWithInstalledAppUseCase(
