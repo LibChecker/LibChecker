@@ -1,19 +1,21 @@
 package com.absinthe.libchecker.domain.snapshot.comparison.usecase
 
 import com.absinthe.libchecker.database.entity.SnapshotItem
+import com.absinthe.libchecker.database.entity.TimeStampItem
+import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
-import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotTopAppsUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.track.usecase.CompareTrackedSnapshotListsUseCase
+import com.absinthe.libchecker.utils.toJson
 
 private const val NO_TIMESTAMP = -1L
 private const val TOP_APPS_LIMIT = 5
 
 class CompareSnapshotDiffsUseCase(
   private val snapshotRepository: SnapshotRepository,
+  private val installedAppRepository: InstalledAppRepository,
   private val compareTrackedSnapshotLists: CompareTrackedSnapshotListsUseCase,
-  private val compareSnapshotWithInstalledApps: CompareSnapshotWithInstalledAppsUseCase,
-  private val updateSnapshotTopApps: UpdateSnapshotTopAppsUseCase
+  private val compareSnapshotWithInstalledApps: CompareSnapshotWithInstalledAppsUseCase
 ) {
 
   suspend operator fun invoke(
@@ -52,7 +54,13 @@ class CompareSnapshotDiffsUseCase(
     if (isEmpty()) {
       return
     }
-    updateSnapshotTopApps(timestamp, topAppsForSnapshotSummary())
+    val systemProps = snapshotRepository.getTimeStamp(timestamp)?.systemProps
+    val appsList = topAppsForSnapshotSummary()
+      .asSequence()
+      .map { it.packageName }
+      .filter { installedAppRepository.isPackageInstalled(it) }
+      .toList()
+    snapshotRepository.updateTimeStamp(TimeStampItem(timestamp, appsList.toJson(), systemProps))
   }
 
   private fun List<SnapshotDiffItem>.topAppsForSnapshotSummary(): List<SnapshotDiffItem> {

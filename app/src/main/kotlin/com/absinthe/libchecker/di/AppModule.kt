@@ -136,7 +136,6 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
-import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotTopAppsUseCase
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.SnapshotDetailSectionBuilder
 import com.absinthe.libchecker.domain.statistics.chart.presentation.ChartViewModel
 import com.absinthe.libchecker.domain.statistics.chart.repository.AndroidDistributionRepository
@@ -374,7 +373,6 @@ val appModule = module {
   factory { CaptureInstalledSnapshotUseCase(androidContext().packageManager, get(), get(), get(), get(), get()) }
   factory { GetSnapshotDashboardCountUseCase(get(), get()) }
   factory { GetSnapshotRuleUseCase() }
-  factory { UpdateSnapshotTopAppsUseCase(get(), get()) }
   factory { SnapshotDetailSectionBuilder(androidContext(), get(), get()) }
   factory { SnapshotArchiveUseCase(get(), get()) }
   factory { SnapshotLibraryUseCase(get()) }
