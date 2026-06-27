@@ -203,11 +203,8 @@ class AppListFragment :
       }
     queryAllPackagesPermissionLauncher =
       registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-        if (isGranted) {
-          homeViewModel.checkPackagesPermission = false
-          if (isAdded) {
-            initApps()
-          }
+        if (homeViewModel.onPackagesPermissionResult(isGranted) && isAdded) {
+          initApps()
         }
       }
   }
@@ -528,7 +525,7 @@ class AppListFragment :
 
   private fun flip(page: Int) = lifecycleScope.launch(Dispatchers.Main) {
     allowRefreshing = page == VF_LIST
-    homeViewModel.checkPackagesPermission = page == VF_REJECT
+    homeViewModel.setPackagesPermissionCheckPending(page == VF_REJECT)
     if (binding.vfContainer.displayedChild != page) {
       Timber.d("flip to $page")
       binding.vfContainer.displayedChild = page

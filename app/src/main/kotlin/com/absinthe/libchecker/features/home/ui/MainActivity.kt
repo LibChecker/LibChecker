@@ -128,21 +128,13 @@ class MainActivity :
     if (!isBindingInitialized()) {
       return
     }
-    if (binding.toolbar.hasExpandedActionView()) {
-      binding.toolbar.menu?.findItem(R.id.search)?.let { searchItem ->
-        val searchView = searchItem.actionView as? SearchView
-        searchView?.let {
-          if (searchItem.isActionViewExpanded) {
-            appViewModel.isSearchMenuExpanded = true
-            it.query?.toString()?.let { query ->
-              appViewModel.currentSearchQuery = query
-            }
-          }
-        }
-      }
-    } else {
-      appViewModel.isSearchMenuExpanded = false
-    }
+    val searchItem = binding.toolbar.menu?.findItem(R.id.search)
+    val searchView = searchItem?.actionView as? SearchView
+    val isExpanded = binding.toolbar.hasExpandedActionView() && searchItem?.isActionViewExpanded == true
+    appViewModel.saveToolbarSearchMenuState(
+      isExpanded = isExpanded,
+      query = searchView?.query?.toString().orEmpty()
+    )
   }
 
   override fun addMenuProvider(provider: MenuProvider) {
@@ -325,14 +317,14 @@ class MainActivity :
 
   override fun onResume() {
     super.onResume()
-    if (appViewModel.checkPackagesPermission) {
+    if (appViewModel.shouldCheckPackagesPermissionOnResume()) {
       val granted =
         ContextCompat.checkSelfPermission(
           this,
           Constants.GET_INSTALLED_APPS
         ) == PackageManager.PERMISSION_GRANTED
       if (granted) {
-        appViewModel.checkPackagesPermission = false
+        appViewModel.onPackagesPermissionResult(isGranted = true)
         appViewModel.initItems()
       }
     }
@@ -422,13 +414,14 @@ class MainActivity :
     // Only restore state if menu exists and has search item
     binding.toolbar.post {
       val searchItem = binding.toolbar.menu?.findItem(R.id.search)
-      if (appViewModel.isSearchMenuExpanded) {
+      val searchMenuState = appViewModel.getToolbarSearchMenuState()
+      if (searchMenuState.isExpanded) {
         val searchView = searchItem?.actionView as? SearchView
         searchView?.let {
           if (!searchItem.isActionViewExpanded) {
             searchItem.expandActionView()
-            if (appViewModel.currentSearchQuery.isNotEmpty()) {
-              it.setQuery(appViewModel.currentSearchQuery, false)
+            if (searchMenuState.query.isNotEmpty()) {
+              it.setQuery(searchMenuState.query, false)
             }
           }
         }

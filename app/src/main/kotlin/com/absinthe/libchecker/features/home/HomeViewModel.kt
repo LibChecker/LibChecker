@@ -65,11 +65,9 @@ class HomeViewModel(
   val toolbarLoading: Flow<Boolean> = observeAppListLoadingUseCase(isRequestChangeRunning, dbItemsFlow)
 
   var appListStatus: Int = STATUS_NOT_START
-  var checkPackagesPermission: Boolean = false
 
-  // Simple menu state management
-  var isSearchMenuExpanded: Boolean = false
-  var currentSearchQuery: String = ""
+  private var toolbarSearchMenuState = ToolbarSearchMenuState()
+  private var pendingPackagesPermissionCheck = false
   private var pendingDumpAppsInfoFormat: ExportAppListUseCase.Format = ExportAppListUseCase.Format.PlainText
   private var pendingReturnTopAfterRequestChange = false
   private var hasUserScrolledAppList = false
@@ -184,6 +182,32 @@ class HomeViewModel(
     if (plan.shouldClearPendingReturnTopAfterRequestChange) {
       pendingReturnTopAfterRequestChange = false
     }
+  }
+
+  fun setPackagesPermissionCheckPending(pending: Boolean) {
+    pendingPackagesPermissionCheck = pending
+  }
+
+  fun shouldCheckPackagesPermissionOnResume(): Boolean {
+    return pendingPackagesPermissionCheck
+  }
+
+  fun onPackagesPermissionResult(isGranted: Boolean): Boolean {
+    if (isGranted) {
+      pendingPackagesPermissionCheck = false
+    }
+    return isGranted
+  }
+
+  fun saveToolbarSearchMenuState(isExpanded: Boolean, query: String) {
+    toolbarSearchMenuState = ToolbarSearchMenuState(
+      isExpanded = isExpanded,
+      query = if (isExpanded) query else ""
+    )
+  }
+
+  fun getToolbarSearchMenuState(): ToolbarSearchMenuState {
+    return toolbarSearchMenuState
   }
 
   fun getAppListAdvancedMenuState(): AppListAdvancedMenuState {
@@ -342,6 +366,11 @@ class HomeViewModel(
     val shouldRefreshItems: Boolean
   )
 
+  data class ToolbarSearchMenuState(
+    val isExpanded: Boolean = false,
+    val query: String = ""
+  )
+
   sealed interface AppListUpdate {
     data object OnlySelf : AppListUpdate
     data class Content(val plan: BuildAppListUpdatePlanUseCase.Plan) : AppListUpdate
@@ -366,7 +395,6 @@ class HomeViewModel(
   }
 
   fun clearMenuState() {
-    isSearchMenuExpanded = false
-    currentSearchQuery = ""
+    toolbarSearchMenuState = ToolbarSearchMenuState()
   }
 }
