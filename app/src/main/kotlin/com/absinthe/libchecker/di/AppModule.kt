@@ -13,13 +13,6 @@ import com.absinthe.libchecker.data.app.WorkerFeatureInitializationRepository
 import com.absinthe.libchecker.data.app.update.AndroidAppUpdateRepository
 import com.absinthe.libchecker.data.rules.AndroidCloudRulesRepository
 import com.absinthe.libchecker.data.rules.GlobalRuleSettingsRepository
-import com.absinthe.libchecker.data.snapshot.AndroidSnapshotItemFactory
-import com.absinthe.libchecker.data.snapshot.GlobalSnapshotSelectionRepository
-import com.absinthe.libchecker.data.snapshot.GlobalSnapshotSettingsRepository
-import com.absinthe.libchecker.data.snapshot.LocalSnapshotDatabaseFileRepository
-import com.absinthe.libchecker.data.snapshot.LocalSnapshotRepository
-import com.absinthe.libchecker.data.snapshot.OnceSnapshotCaptureStateRepository
-import com.absinthe.libchecker.data.snapshot.ProtoSnapshotArchiveCodec
 import com.absinthe.libchecker.data.statistics.CachedAndroidDistributionRepository
 import com.absinthe.libchecker.data.statistics.GlobalChartSettingsRepository
 import com.absinthe.libchecker.data.statistics.GlobalLibReferenceSettingsRepository
@@ -120,20 +113,6 @@ import com.absinthe.libchecker.domain.app.update.BuildInAppUpdateDiffDataUseCase
 import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
 import com.absinthe.libchecker.domain.rules.CloudRulesRepository
 import com.absinthe.libchecker.domain.rules.RuleSettingsRepository
-import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
-import com.absinthe.libchecker.domain.snapshot.SnapshotItemFactory
-import com.absinthe.libchecker.domain.snapshot.SnapshotLibraryUseCase
-import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
-import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionRepository
-import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
-import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
-import com.absinthe.libchecker.domain.snapshot.backup.archive.SnapshotArchiveCodec
-import com.absinthe.libchecker.domain.snapshot.backup.archive.SnapshotArchiveUseCase
-import com.absinthe.libchecker.domain.snapshot.backup.repository.SnapshotDatabaseFileRepository
-import com.absinthe.libchecker.domain.snapshot.comparison.archive.BuildArchiveSnapshotItemUseCase
-import com.absinthe.libchecker.domain.snapshot.detail.usecase.SnapshotDetailSectionBuilder
-import com.absinthe.libchecker.domain.snapshot.list.capture.CaptureInstalledSnapshotUseCase
-import com.absinthe.libchecker.domain.snapshot.list.capture.SnapshotCaptureStateRepository
 import com.absinthe.libchecker.domain.statistics.chart.presentation.ChartViewModel
 import com.absinthe.libchecker.domain.statistics.chart.repository.AndroidDistributionRepository
 import com.absinthe.libchecker.domain.statistics.chart.repository.ChartSettingsRepository
@@ -174,13 +153,6 @@ val appModule = module {
   single<AppListItemFactory> { AndroidAppListItemFactory(androidContext()) }
   single<AppListExportMetadata> { AndroidAppListExportMetadata(androidContext()) }
   single<FeatureInitializationRepository> { WorkerFeatureInitializationRepository() }
-  single<SnapshotItemFactory> { AndroidSnapshotItemFactory() }
-  single<SnapshotCaptureStateRepository> { OnceSnapshotCaptureStateRepository() }
-  single<SnapshotSelectionRepository> { GlobalSnapshotSelectionRepository() }
-  single<SnapshotSettingsRepository> { GlobalSnapshotSettingsRepository() }
-  single<SnapshotDatabaseFileRepository> { LocalSnapshotDatabaseFileRepository() }
-  single<SnapshotRepository> { LocalSnapshotRepository(get(), get()) }
-  single<SnapshotArchiveCodec> { ProtoSnapshotArchiveCodec() }
   single<ChartSettingsRepository> { GlobalChartSettingsRepository() }
   single<LibReferenceSettingsRepository> { GlobalLibReferenceSettingsRepository() }
   single { AllowFileUriExposureUseCase() }
@@ -359,13 +331,6 @@ val appModule = module {
       buildPackageComparisonSnapshotItemUseCase = get()
     )
   }
-  factory { BuildArchiveSnapshotItemUseCase(androidContext()) }
-  factory { CaptureInstalledSnapshotUseCase(androidContext().packageManager, get(), get(), get(), get(), get()) }
-  factory { GetSnapshotDashboardCountUseCase(get(), get()) }
-  factory { SnapshotDetailSectionBuilder(androidContext(), get()) }
-  factory { SnapshotArchiveUseCase(get(), get()) }
-  factory { SnapshotLibraryUseCase(get()) }
-  factory { SnapshotSelectionUseCase(get()) }
   factory {
     ChartDataProvider(
       buildAppListItemViewStatesUseCase = get(),

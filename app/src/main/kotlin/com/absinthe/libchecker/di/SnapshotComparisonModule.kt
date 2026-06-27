@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.di
 
+import com.absinthe.libchecker.domain.snapshot.comparison.archive.BuildArchiveSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.comparison.archive.PrepareSnapshotComparisonArchivesUseCase
 import com.absinthe.libchecker.domain.snapshot.comparison.presentation.SnapshotComparisonViewModel
 import com.absinthe.libchecker.domain.snapshot.comparison.usecase.BuildPackageComparisonSnapshotItemUseCase
@@ -15,6 +16,7 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val snapshotComparisonModule = module {
+  factory { BuildArchiveSnapshotItemUseCase(androidContext()) }
   factory { PrepareSnapshotComparisonArchivesUseCase(get()) }
   factory { BuildPackageComparisonSnapshotItemUseCase(androidContext().packageManager) }
   factory { BuildSnapshotComparisonPlanUseCase(get()) }

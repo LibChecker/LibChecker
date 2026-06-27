@@ -1,5 +1,7 @@
 package com.absinthe.libchecker.di
 
+import com.absinthe.libchecker.domain.snapshot.detail.usecase.SnapshotDetailSectionBuilder
+import com.absinthe.libchecker.domain.snapshot.list.capture.CaptureInstalledSnapshotUseCase
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotCapturePlanUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotListUpdatePlanUseCase
@@ -15,6 +17,8 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val snapshotListModule = module {
+  factory { CaptureInstalledSnapshotUseCase(androidContext().packageManager, get(), get(), get(), get(), get()) }
+  factory { SnapshotDetailSectionBuilder(androidContext(), get()) }
   factory { GetApexPackageNamesUseCase(get()) }
   factory { BuildSnapshotCapturePlanUseCase(get()) }
   factory { BuildSnapshotListUpdatePlanUseCase(get(), get(), get()) }

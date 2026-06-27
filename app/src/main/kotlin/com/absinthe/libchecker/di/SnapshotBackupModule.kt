@@ -4,9 +4,14 @@ import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.data.snapshot.LocalSnapshotDatabaseBackupExporter
 import com.absinthe.libchecker.data.snapshot.LocalSnapshotDatabaseBackupRestorer
+import com.absinthe.libchecker.data.snapshot.LocalSnapshotDatabaseFileRepository
+import com.absinthe.libchecker.data.snapshot.ProtoSnapshotArchiveCodec
 import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.backup.RoomBackup
+import com.absinthe.libchecker.domain.snapshot.backup.archive.SnapshotArchiveCodec
+import com.absinthe.libchecker.domain.snapshot.backup.archive.SnapshotArchiveUseCase
 import com.absinthe.libchecker.domain.snapshot.backup.presentation.SnapshotBackupViewModel
+import com.absinthe.libchecker.domain.snapshot.backup.repository.SnapshotDatabaseFileRepository
 import com.absinthe.libchecker.domain.snapshot.backup.usecase.BackupSnapshotArchiveToUriUseCase
 import com.absinthe.libchecker.domain.snapshot.backup.usecase.BuildSnapshotRestorePlanUseCase
 import com.absinthe.libchecker.domain.snapshot.backup.usecase.CreateSnapshotDatabaseBackupUseCase
@@ -22,6 +27,10 @@ import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
 
 val snapshotBackupModule = module {
+  single<SnapshotDatabaseFileRepository> { LocalSnapshotDatabaseFileRepository() }
+  single<SnapshotArchiveCodec> { ProtoSnapshotArchiveCodec() }
+
+  factory { SnapshotArchiveUseCase(get(), get()) }
   factory { BuildSnapshotRestorePlanUseCase() }
   factory { GetSnapshotBackupTargetUseCase(get()) }
   factory { BackupSnapshotArchiveToUriUseCase(androidContext().contentResolver, get()) }

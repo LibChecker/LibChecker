@@ -179,14 +179,12 @@ Important `:app` boundaries:
 1. Start with `git status --short`.
 2. Inspect the smallest relevant area with `rg` or `rg --files`.
 3. Read existing local patterns before editing.
-4. For refactors, prioritize high-traffic flows and oversized legacy
-   ViewModels/controllers before low-frequency tooling. Keep edits focused and
-   move on once an improved area is no longer the main risk. Keep domain
-   package-layout cleanup separate from behavior changes. When a domain package
-   gets crowded, group use cases, interfaces, and models in a dedicated
-   mechanical slice. Avoid thin pass-through extractions; add a new use case
-   only when it owns reusable decisions, parsing, display data, or side-effect
-   setup. Avoid generated/build-output churn.
+4. For refactors, prefer cohesive batches that move an entire boundary before
+   polishing details. Prioritize high-traffic flows and oversized controllers
+   before low-frequency tooling. Keep domain package-layout cleanup separate
+   from behavior changes; group crowded use-case/interface/model packages in a
+   mechanical slice. Avoid thin pass-through extractions and
+   generated/build-output churn.
 5. Run `spotlessApply` only when formatting needs fixing.
 6. Run the narrowest relevant validation command. If adapters, view-state
    mapping, menus, navigation, or visible strings changed, add a focused
