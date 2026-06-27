@@ -27,6 +27,14 @@ import com.absinthe.libchecker.domain.app.detail.ui.DetailProcessBarController
 import com.absinthe.libchecker.domain.app.detail.ui.DetailTabSpecBuilder
 import com.absinthe.libchecker.domain.app.detail.ui.DetailToolbarController
 import com.absinthe.libchecker.domain.app.detail.ui.IDetailContainer
+import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailAppIconDrawableBuilder
+import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailFeatureItemBuilder
+import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailHeaderController
+import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailListInteractionController
+import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailPackageComparisonController
+import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailPackageContentController
+import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailStateObserverController
+import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailTabController
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.AppInfoBottomSheetDialogFragment
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
