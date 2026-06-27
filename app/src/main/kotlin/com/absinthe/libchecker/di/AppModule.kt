@@ -47,7 +47,6 @@ import com.absinthe.libchecker.domain.app.LibraryDetailRepository
 import com.absinthe.libchecker.domain.app.PrepareApkAnalysisPackageUseCase
 import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
 import com.absinthe.libchecker.domain.app.SetApkAnalysisEnabledUseCase
-import com.absinthe.libchecker.domain.app.SyncAppListChangesUseCase
 import com.absinthe.libchecker.domain.app.detail.BuildAppDetailAbiLabelDataUseCase
 import com.absinthe.libchecker.domain.app.detail.BuildAppDetailHeaderExtraInfoUseCase
 import com.absinthe.libchecker.domain.app.detail.BuildAppDetailHeaderTitleDataUseCase
@@ -117,6 +116,7 @@ import com.absinthe.libchecker.domain.app.list.usecase.GetAppListPackageStatesUs
 import com.absinthe.libchecker.domain.app.list.usecase.InitializeAppListUseCase
 import com.absinthe.libchecker.domain.app.list.usecase.ObserveAppListLoadingUseCase
 import com.absinthe.libchecker.domain.app.search.HandleAppListSearchCommandUseCase
+import com.absinthe.libchecker.domain.app.sync.SyncAppListChangesUseCase
 import com.absinthe.libchecker.domain.app.update.AppUpdateRepository
 import com.absinthe.libchecker.domain.app.update.BuildInAppUpdateDiffDataUseCase
 import com.absinthe.libchecker.domain.home.presentation.HomeViewModel

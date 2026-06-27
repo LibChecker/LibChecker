@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.domain.app.sync
 
 import com.absinthe.libchecker.domain.app.PackageChangeState
-import com.absinthe.libchecker.domain.app.SyncAppListChangesUseCase
 import java.util.concurrent.atomic.AtomicInteger
 
 internal class AppListChangeRequestQueue {
