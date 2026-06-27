@@ -1,11 +1,12 @@
-package com.absinthe.libchecker.features.applist.detail.ui
+package com.absinthe.libchecker.domain.app.detail.ui
 
 import android.animation.ValueAnimator
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.absinthe.libchecker.features.applist.detail.ui.adapter.FeatureAdapter
+import com.absinthe.libchecker.domain.app.detail.model.DetailFeatureItem
+import com.absinthe.libchecker.domain.app.detail.ui.adapter.FeatureAdapter
 import com.absinthe.libchecker.ui.adapter.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.utils.extensions.dp
 

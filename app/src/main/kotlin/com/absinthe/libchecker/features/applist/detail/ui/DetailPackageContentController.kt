@@ -5,6 +5,7 @@ import com.absinthe.libchecker.domain.app.detail.content.AppDetailAnalysisInitAc
 import com.absinthe.libchecker.domain.app.detail.content.AppDetailFeatureInitAction
 import com.absinthe.libchecker.domain.app.detail.content.BuildAppDetailContentInitPlanUseCase
 import com.absinthe.libchecker.domain.app.detail.model.DetailExtraBean
+import com.absinthe.libchecker.domain.app.detail.ui.DetailFeatureListController
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

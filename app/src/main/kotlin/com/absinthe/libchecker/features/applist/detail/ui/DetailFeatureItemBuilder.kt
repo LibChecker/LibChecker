@@ -7,6 +7,7 @@ import com.absinthe.libchecker.domain.app.AppIconItem
 import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.domain.app.detail.feature.AppDetailFeatureAction
 import com.absinthe.libchecker.domain.app.detail.feature.AppDetailFeatureItemData
+import com.absinthe.libchecker.domain.app.detail.model.DetailFeatureItem
 import com.absinthe.libchecker.domain.app.detail.model.FeatureItem
 import com.absinthe.libchecker.domain.app.detail.ui.FeaturesDialog
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
@@ -105,8 +106,3 @@ class DetailFeatureItemBuilder(
     }
   }
 }
-
-data class DetailFeatureItem(
-  val item: FeatureItem,
-  val position: Int? = null
-)
