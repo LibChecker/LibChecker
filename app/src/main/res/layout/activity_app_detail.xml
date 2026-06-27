@@ -101,7 +101,7 @@
             android:textColor="?attr/colorControlNormal"
             app:layout_constraintStart_toStartOf="parent" />
 
-          <com.absinthe.libchecker.features.applist.detail.ui.view.TextSwitcherView
+          <com.absinthe.libchecker.domain.app.detail.ui.view.TextSwitcherView
             android:id="@+id/ts_component_count"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
