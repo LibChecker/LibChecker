@@ -29,11 +29,7 @@ import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.URLManager
-import com.absinthe.libchecker.domain.app.SetApkAnalysisEnabledUseCase
-import com.absinthe.libchecker.domain.settings.BuildLocalePreferenceDataUseCase
 import com.absinthe.libchecker.domain.settings.LocalePreferenceSummary
-import com.absinthe.libchecker.domain.settings.SelectDarkModeUseCase
-import com.absinthe.libchecker.domain.settings.SelectLocaleUseCase
 import com.absinthe.libchecker.features.about.AboutPageBuilder
 import com.absinthe.libchecker.features.home.HomeViewModel
 import com.absinthe.libchecker.features.settings.SettingsViewModel
@@ -51,7 +47,6 @@ import com.absinthe.libraries.utils.extensions.getBoolean
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.launch
-import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import rikka.recyclerview.fixEdgeEffect
 import rikka.widget.borderview.BorderRecyclerView
@@ -77,10 +72,6 @@ class SettingsFragment :
   private lateinit var prefRecyclerView: RecyclerView
   private val homeViewModel: HomeViewModel by activityViewModels()
   private val settingsViewModel: SettingsViewModel by viewModel()
-  private val buildLocalePreferenceData: BuildLocalePreferenceDataUseCase by inject()
-  private val setApkAnalysisEnabled: SetApkAnalysisEnabledUseCase by inject()
-  private val selectDarkMode: SelectDarkModeUseCase by inject()
-  private val selectLocale: SelectLocaleUseCase by inject()
 
   override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
     setPreferencesFromResource(R.xml.settings, null)
@@ -88,7 +79,7 @@ class SettingsFragment :
 
     findPreference<TwoStatePreference>(Constants.PREF_APK_ANALYTICS)?.apply {
       setOnPreferenceChangeListener { _, newValue ->
-        setApkAnalysisEnabled(newValue as Boolean).onFailure { e ->
+        settingsViewModel.setApkAnalysisEnabled(newValue as Boolean).onFailure { e ->
           Timber.e(e)
           Toasty.showShort(requireContext(), e.toString())
         }
@@ -116,7 +107,7 @@ class SettingsFragment :
         isVisible = !OsUtils.atLeastT()
         setOnPreferenceChangeListener { _, newValue ->
           if (newValue is String) {
-            val locale = selectLocale(newValue)
+            val locale = settingsViewModel.selectLocale(newValue)
             Timber.d("Locale = $locale")
             activity?.recreate()
           }
@@ -133,7 +124,9 @@ class SettingsFragment :
     findPreference<ListPreference>(Constants.PREF_DARK_MODE)?.apply {
       summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
       setOnPreferenceChangeListener { _, newValue ->
-        AppCompatDelegate.setDefaultNightMode(selectDarkMode(newValue.toString()))
+        AppCompatDelegate.setDefaultNightMode(
+          settingsViewModel.selectDarkMode(newValue.toString())
+        )
         activity?.recreate()
         true
       }
@@ -325,7 +318,7 @@ class SettingsFragment :
 
   private fun bindLocalePreference(languagePreference: ListPreference) {
     val tag = languagePreference.value
-    val displayData = buildLocalePreferenceData(
+    val displayData = settingsViewModel.buildLocalePreferenceData(
       entries = languagePreference.entries.toList(),
       entryValues = languagePreference.entryValues.toList(),
       selectedTag = tag

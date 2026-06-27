@@ -554,7 +554,11 @@ val appModule = module {
       appListSettingsRepository = get(),
       ruleSettingsRepository = get(),
       snapshotSettingsRepository = get(),
-      buildLogShareIntentUseCase = get()
+      buildLocalePreferenceDataUseCase = get(),
+      buildLogShareIntentUseCase = get(),
+      selectDarkModeUseCase = get(),
+      selectLocaleUseCase = get(),
+      setApkAnalysisEnabledUseCase = get()
     )
   }
   viewModel {
