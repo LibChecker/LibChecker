@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.applist.detail.ui.impl
+package com.absinthe.libchecker.domain.app.detail.ui.impl
 
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R

@@ -12,13 +12,13 @@ import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.SIGNATURES
 import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.domain.app.detail.ui.DetailTabSpec
-import com.absinthe.libchecker.features.applist.detail.ui.impl.AbilityAnalysisFragment
-import com.absinthe.libchecker.features.applist.detail.ui.impl.ComponentsAnalysisFragment
-import com.absinthe.libchecker.features.applist.detail.ui.impl.MetaDataAnalysisFragment
-import com.absinthe.libchecker.features.applist.detail.ui.impl.NativeAnalysisFragment
-import com.absinthe.libchecker.features.applist.detail.ui.impl.PermissionAnalysisFragment
-import com.absinthe.libchecker.features.applist.detail.ui.impl.SignaturesAnalysisFragment
-import com.absinthe.libchecker.features.applist.detail.ui.impl.StaticAnalysisFragment
+import com.absinthe.libchecker.domain.app.detail.ui.impl.AbilityAnalysisFragment
+import com.absinthe.libchecker.domain.app.detail.ui.impl.ComponentsAnalysisFragment
+import com.absinthe.libchecker.domain.app.detail.ui.impl.MetaDataAnalysisFragment
+import com.absinthe.libchecker.domain.app.detail.ui.impl.NativeAnalysisFragment
+import com.absinthe.libchecker.domain.app.detail.ui.impl.PermissionAnalysisFragment
+import com.absinthe.libchecker.domain.app.detail.ui.impl.SignaturesAnalysisFragment
+import com.absinthe.libchecker.domain.app.detail.ui.impl.StaticAnalysisFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 

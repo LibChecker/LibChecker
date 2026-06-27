@@ -1,8 +1,8 @@
-package com.absinthe.libchecker.features.applist.detail.ui.impl
+package com.absinthe.libchecker.domain.app.detail.ui.impl
 
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.annotation.PERMISSION
+import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.ui.Referable
@@ -14,25 +14,21 @@ import com.absinthe.libchecker.utils.extensions.putArguments
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
-class PermissionAnalysisFragment :
+class MetaDataAnalysisFragment :
   BaseDetailFragment<FragmentLibComponentBinding>(),
   Referable {
 
   override fun getRecyclerView() = binding.list
-  override val needShowLibDetailDialog = true
+  override val needShowLibDetailDialog = false
 
   override suspend fun getItems(): List<LibStringItemChip> {
-    val flow = viewModel.contentState.permissionsItems
+    val flow = viewModel.contentState.metaDataItems
     return flow.value ?: flow.filterNotNull().first()
   }
 
   override fun onItemsAvailable(items: List<LibStringItemChip>) {
-    Timber.d("onItemsAvailable: ${items.size}")
     if (items.isEmpty()) {
       emptyView.text.text = getString(R.string.empty_list)
     } else {
@@ -50,43 +46,29 @@ class PermissionAnalysisFragment :
   override fun init() {
     binding.apply {
       list.apply {
-        adapter = this@PermissionAnalysisFragment.adapter
+        adapter = this@MetaDataAnalysisFragment.adapter
       }
     }
 
     adapter.apply {
       animationEnable = false
       setDiffCallback(LibStringDiffUtil())
-      stateView = this@PermissionAnalysisFragment.emptyView
+      stateView = this@MetaDataAnalysisFragment.emptyView
       isStateViewEnable = true
     }
 
     viewModel.apply {
-      packageInfoStateFlow.onEach {
-        if (it != null) {
-          viewModel.initPermissionData()
-        }
-      }.launchIn(lifecycleScope)
-
       packageInfoStateFlow.value?.run {
-        contentState.permissionsItems.value ?: run { initPermissionData() }
+        contentState.metaDataItems.value ?: run { initMetaDataData() }
       }
     }
   }
 
-  override fun filterItems(
-    items: List<LibStringItemChip>,
-    searchWords: String?,
-    process: String?
-  ): List<LibStringItemChip> {
-    return viewModel.filterPermissionDetailItems(items, searchWords, process)
-  }
-
   companion object {
-    fun newInstance(packageName: String): PermissionAnalysisFragment {
-      return PermissionAnalysisFragment().putArguments(
+    fun newInstance(packageName: String): MetaDataAnalysisFragment {
+      return MetaDataAnalysisFragment().putArguments(
         EXTRA_PACKAGE_NAME to packageName,
-        EXTRA_TYPE to PERMISSION
+        EXTRA_TYPE to METADATA
       )
     }
   }
