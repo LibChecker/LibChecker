@@ -20,8 +20,8 @@ import com.absinthe.libchecker.domain.app.detail.BuildRelatedAppDisplayDataUseCa
 import com.absinthe.libchecker.domain.app.detail.GetAppDetailAbiUseCase
 import com.absinthe.libchecker.domain.app.detail.GetAppDetailFeaturesUseCase
 import com.absinthe.libchecker.domain.app.detail.GetAppDetailPackageSizeUseCase
+import com.absinthe.libchecker.domain.app.detail.GetAppDetailStaticLibraryTabItemsUseCase
 import com.absinthe.libchecker.domain.app.detail.GetRelatedAppDisplayDataUseCase
-import com.absinthe.libchecker.domain.app.detail.ShouldShowStaticLibraryTabUseCase
 import com.absinthe.libchecker.domain.app.detail.action.AllowFileUriExposureUseCase
 import com.absinthe.libchecker.domain.app.detail.action.BuildDetailItemDialogRequestUseCase
 import com.absinthe.libchecker.domain.app.detail.action.BuildDetailItemLongClickActionsUseCase
@@ -128,7 +128,7 @@ val appDetailModule = module {
   factory { GetPermissionDetailUseCase(androidContext().packageManager, get()) }
   factory { GetRelatedAppDisplayDataUseCase(get(), get()) }
   factory { GetXposedModuleInfoUseCase(androidContext().packageManager, get()) }
-  factory { ShouldShowStaticLibraryTabUseCase(get()) }
+  factory { GetAppDetailStaticLibraryTabItemsUseCase(get(), get()) }
   factory { SortAppDetailItemsUseCase() }
   factory {
     DetailActionLoader(
@@ -180,6 +180,7 @@ val appDetailModule = module {
   factory {
     DetailContentLoader(
       getAppDetailAbilityChipsUseCase = get(),
+      getAppDetailStaticLibraryTabItemsUseCase = get(),
       detailChipContentLoader = get(),
       detailComponentContentLoader = get(),
       detailNativeLibContentLoader = get(),
@@ -202,8 +203,7 @@ val appDetailModule = module {
       buildAppDetailAbiLabelDataUseCase = get(),
       buildAppDetailHeaderExtraInfoUseCase = get(),
       buildAppDetailHeaderTitleDataUseCase = get(),
-      buildAppDetailFeatureItemUseCase = get(),
-      shouldShowStaticLibraryTabUseCase = get()
+      buildAppDetailFeatureItemUseCase = get()
     )
   }
   factory {

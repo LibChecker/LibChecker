@@ -49,7 +49,7 @@ class DetailPackageContentController(
       tabSpec = tabSpec
     )
 
-    insertStaticLibraryTabIfAvailable(packageInfo, packageName, uiGeneration)
+    insertStaticLibraryTabIfAvailable(packageName, uiGeneration)
     initFeatureItems(packageInfo, contentInitPlan.featureAction)
     initAnalysisContent(packageName, contentInitPlan.analysisAction)
     if (contentInitPlan.shouldInitPermissions) {
@@ -60,18 +60,17 @@ class DetailPackageContentController(
   }
 
   private fun insertStaticLibraryTabIfAvailable(
-    packageInfo: PackageInfo,
     packageName: String,
     uiGeneration: Int
   ) {
     coroutineScope.launch {
-      if (viewModel.shouldShowStaticLibraryTab(packageInfo, packageName)) {
-        if (uiGeneration != currentUiGeneration()) {
-          return@launch
-        }
-        if (tabController.insertStaticLibraryTab(staticLibraryTitle())) {
-          onStaticLibsAvailable()
-        }
+      val staticLibItems = viewModel.loadStaticLibraryTabItems(packageName)
+      if (staticLibItems.isEmpty() || uiGeneration != currentUiGeneration()) {
+        return@launch
+      }
+      viewModel.emitStaticLibItems(staticLibItems)
+      if (tabController.insertStaticLibraryTab(staticLibraryTitle())) {
+        onStaticLibsAvailable()
       }
     }
   }

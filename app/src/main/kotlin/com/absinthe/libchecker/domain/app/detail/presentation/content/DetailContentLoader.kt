@@ -1,7 +1,9 @@
 package com.absinthe.libchecker.domain.app.detail.presentation.content
 
 import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
+import com.absinthe.libchecker.domain.app.detail.GetAppDetailStaticLibraryTabItemsUseCase
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailAbilityChipsUseCase
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailContentState
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailFeatureState
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailLoadJobsState
@@ -14,6 +16,7 @@ import timber.log.Timber
 
 class DetailContentLoader(
   private val getAppDetailAbilityChipsUseCase: GetAppDetailAbilityChipsUseCase,
+  private val getAppDetailStaticLibraryTabItemsUseCase: GetAppDetailStaticLibraryTabItemsUseCase,
   private val detailChipContentLoader: DetailChipContentLoader,
   private val detailComponentContentLoader: DetailComponentContentLoader,
   private val detailNativeLibContentLoader: DetailNativeLibContentLoader,
@@ -71,6 +74,21 @@ class DetailContentLoader(
       packageState = packageState,
       sortBySizeMode = isSortBySizeMode()
     )
+  }
+
+  suspend fun loadStaticLibraryTabItems(
+    packageState: DetailPackageState,
+    packageName: String
+  ): List<LibStringItemChip> {
+    return getAppDetailStaticLibraryTabItemsUseCase(
+      packageInfo = packageState.packageInfo,
+      packageName = packageName,
+      sortBySizeMode = isSortBySizeMode()
+    )
+  }
+
+  suspend fun emitStaticLibItems(items: List<LibStringItemChip>) {
+    contentState.emitStaticLibItems(items)
   }
 
   fun initMetaDataData(

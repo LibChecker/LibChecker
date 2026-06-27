@@ -6,17 +6,16 @@ import android.content.pm.PackageManager
 import android.graphics.drawable.AdaptiveIconDrawable
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.compat.PackageManagerCompat
+import com.absinthe.libchecker.compat.ZipFileCompat
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.domain.app.AppIconItem
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.KotlinToolingMetadata
 import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.extensions.getAGPVersion
 import com.absinthe.libchecker.utils.extensions.getFeatures
-import com.absinthe.libchecker.utils.extensions.getJetpackComposeVersion
-import com.absinthe.libchecker.utils.extensions.getKotlinPluginInfo
 import com.absinthe.libchecker.utils.extensions.getRxAndroidVersion
 import com.absinthe.libchecker.utils.extensions.getRxJavaVersion
 import com.absinthe.libchecker.utils.extensions.getRxKotlinVersion
@@ -24,9 +23,11 @@ import com.absinthe.libchecker.utils.extensions.isPWA
 import com.absinthe.libchecker.utils.extensions.isPageSizeCompat
 import com.absinthe.libchecker.utils.extensions.isPlayAppSigning
 import com.absinthe.libchecker.utils.extensions.isUseKMP
-import com.absinthe.libchecker.utils.extensions.isXposedModule
 import com.absinthe.libchecker.utils.extensions.toClassDefType
+import com.absinthe.libchecker.utils.fromJson
 import java.io.File
+import java.io.InputStreamReader
+import java.util.Properties
 
 class GetAppDetailFeaturesUseCase(
   private val appListRepository: AppListRepository,
@@ -57,19 +58,24 @@ class GetAppDetailFeaturesUseCase(
     if ((feat and Features.SPLIT_APKS) > 0) {
       features.add(VersionedFeature(Features.SPLIT_APKS))
     }
+    val hasXposedMetadata = packageInfo.hasXposedModuleMetadata()
+    val apkMetadata = readFeatureApkMetadata(
+      packageInfo = packageInfo,
+      readKotlin = (feat and Features.KOTLIN_USED) > 0,
+      readAgp = (feat and Features.AGP) > 0,
+      readCompose = (feat and Features.JETPACK_COMPOSE) > 0,
+      readXposedMarker = !hasXposedMetadata
+    )
     if ((feat and Features.KOTLIN_USED) > 0) {
-      val versionInfo = packageInfo.getKotlinPluginInfo()
-      features.add(VersionedFeature(Features.KOTLIN_USED, extras = versionInfo))
+      features.add(VersionedFeature(Features.KOTLIN_USED, extras = apkMetadata.kotlinPluginInfo))
     }
     if ((feat and Features.AGP) > 0) {
-      val version = packageInfo.getAGPVersion()
-      features.add(VersionedFeature(Features.AGP, version))
+      features.add(VersionedFeature(Features.AGP, apkMetadata.agpVersion))
     }
     if ((feat and Features.JETPACK_COMPOSE) > 0) {
-      val version = packageInfo.getJetpackComposeVersion()
-      features.add(VersionedFeature(Features.JETPACK_COMPOSE, version))
+      features.add(VersionedFeature(Features.JETPACK_COMPOSE, apkMetadata.composeVersion))
     }
-    if (packageInfo.isXposedModule()) {
+    if (hasXposedMetadata || apkMetadata.hasXposedModuleProp) {
       features.add(VersionedFeature(Features.XPOSED_MODULE))
     }
     if (packageInfo.isPlayAppSigning()) {
@@ -108,6 +114,92 @@ class GetAppDetailFeaturesUseCase(
     }
 
     return AppDetailFeatures(features, appIcons)
+  }
+
+  private fun readFeatureApkMetadata(
+    packageInfo: PackageInfo,
+    readKotlin: Boolean,
+    readAgp: Boolean,
+    readCompose: Boolean,
+    readXposedMarker: Boolean
+  ): DetailFeatureApkMetadata {
+    if (!readKotlin && !readAgp && !readCompose && !readXposedMarker) {
+      return DetailFeatureApkMetadata()
+    }
+
+    val sourceDir = packageInfo.applicationInfo?.sourceDir ?: return DetailFeatureApkMetadata()
+    return runCatching {
+      ZipFileCompat(File(sourceDir)).use { zip ->
+        DetailFeatureApkMetadata(
+          kotlinPluginInfo = if (readKotlin) readKotlinPluginInfo(zip) else DEFAULT_KOTLIN_PLUGIN_INFO,
+          agpVersion = if (readAgp) readAgpVersion(zip) else null,
+          composeVersion = if (readCompose) readFirstPresentLine(zip, COMPOSE_VERSION_ENTRIES) else null,
+          hasXposedModuleProp = readXposedMarker && zip.getEntry(XPOSED_MODULE_PROP_ENTRY) != null
+        )
+      }
+    }.getOrDefault(DetailFeatureApkMetadata())
+  }
+
+  private fun readKotlinPluginInfo(zip: ZipFileCompat): Map<String, String?> {
+    val map = DEFAULT_KOTLIN_PLUGIN_INFO.toMutableMap()
+    val entry = zip.getEntry(KOTLIN_TOOLING_METADATA_ENTRY) ?: return map
+    return runCatching {
+      val json = InputStreamReader(zip.getInputStream(entry), Charsets.UTF_8).use { it.readText() }
+      val metadata = json.fromJson<KotlinToolingMetadata>() ?: return@runCatching map
+      val kotlinAndroidTarget =
+        metadata.projectTargets?.find { target -> target.target == KOTLIN_ANDROID_TARGET }
+
+      map["Kotlin"] =
+        metadata.buildPluginVersion.takeIf { metadata.buildPlugin == KOTLIN_ANDROID_PLUGIN || kotlinAndroidTarget != null }
+      if (metadata.buildSystem == GRADLE_BUILD_SYSTEM && metadata.buildSystemVersion.isNotEmpty()) {
+        map["Gradle"] = metadata.buildSystemVersion
+      }
+
+      val sourceCompatibility = kotlinAndroidTarget?.extras?.android?.sourceCompatibility
+      if (kotlinAndroidTarget != null && sourceCompatibility?.all { it.isDigit() } == true) {
+        map["Java"] = sourceCompatibility
+      }
+      map
+    }.getOrDefault(DEFAULT_KOTLIN_PLUGIN_INFO)
+  }
+
+  private fun readAgpVersion(zip: ZipFileCompat): String? {
+    zip.getEntry(AGP_METADATA_ENTRY)?.let { entry ->
+      runCatching {
+        Properties().apply {
+          load(zip.getInputStream(entry))
+        }.getProperty(AGP_KEYWORD)?.takeIf { it.isNotBlank() }
+      }.getOrNull()?.let { return it }
+    }
+
+    zip.getEntry(MANIFEST_MF_ENTRY)?.let { entry ->
+      runCatching {
+        InputStreamReader(zip.getInputStream(entry), Charsets.UTF_8).buffered().useLines { lines ->
+          lines.firstOrNull { it.startsWith(AGP_MANIFEST_PREFIX) }
+            ?.removePrefix(AGP_MANIFEST_PREFIX)
+            ?.takeIf { version -> version.isNotBlank() }
+        }
+      }.getOrNull()?.let { return it }
+    }
+
+    return readFirstPresentLine(zip, DATA_BINDING_VERSION_ENTRIES)
+  }
+
+  private fun readFirstPresentLine(zip: ZipFileCompat, entries: Array<String>): String? {
+    entries.forEach { name ->
+      zip.getEntry(name)?.let { entry ->
+        runCatching {
+          InputStreamReader(zip.getInputStream(entry), Charsets.UTF_8).buffered().use { it.readLine() }
+            ?.takeIf { line -> line.isNotBlank() }
+        }.getOrNull()?.let { return it }
+      }
+    }
+    return null
+  }
+
+  private fun PackageInfo.hasXposedModuleMetadata(): Boolean {
+    val metaData = applicationInfo?.metaData ?: return false
+    return metaData.getBoolean("xposedmodule") || metaData.containsKey("xposedminversion")
   }
 
   private fun getFeaturesFoundDexList(feat: Int, sourceDir: String): List<String>? {
@@ -196,4 +288,37 @@ class GetAppDetailFeaturesUseCase(
 data class AppDetailFeatures(
   val features: List<VersionedFeature>,
   val appIcons: List<AppIconItem>
+)
+
+private data class DetailFeatureApkMetadata(
+  val kotlinPluginInfo: Map<String, String?> = DEFAULT_KOTLIN_PLUGIN_INFO,
+  val agpVersion: String? = null,
+  val composeVersion: String? = null,
+  val hasXposedModuleProp: Boolean = false
+)
+
+private val DEFAULT_KOTLIN_PLUGIN_INFO: Map<String, String?> = mapOf("Kotlin" to null)
+
+private const val KOTLIN_TOOLING_METADATA_ENTRY = "kotlin-tooling-metadata.json"
+private const val KOTLIN_ANDROID_TARGET = "org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget"
+private const val KOTLIN_ANDROID_PLUGIN = "org.jetbrains.kotlin.gradle.plugin.KotlinAndroidPluginWrapper"
+private const val GRADLE_BUILD_SYSTEM = "Gradle"
+private const val AGP_METADATA_ENTRY = "META-INF/com/android/build/gradle/app-metadata.properties"
+private const val AGP_KEYWORD = "androidGradlePluginVersion"
+private const val MANIFEST_MF_ENTRY = "META-INF/MANIFEST.MF"
+private const val AGP_MANIFEST_PREFIX = "Created-By: Android Gradle "
+private const val XPOSED_MODULE_PROP_ENTRY = "META-INF/xposed/module.prop"
+
+private val DATA_BINDING_VERSION_ENTRIES = arrayOf(
+  "META-INF/androidx.databinding_viewbinding.version",
+  "META-INF/androidx.databinding_databindingKtx.version",
+  "META-INF/androidx.databinding_library.version"
+)
+
+private val COMPOSE_VERSION_ENTRIES = arrayOf(
+  "META-INF/androidx.compose.runtime_runtime.version",
+  "META-INF/androidx.compose.ui_ui.version",
+  "META-INF/androidx.compose.ui_ui-tooling-preview.version",
+  "META-INF/androidx.compose.foundation_foundation.version",
+  "META-INF/androidx.compose.animation_animation.version"
 )

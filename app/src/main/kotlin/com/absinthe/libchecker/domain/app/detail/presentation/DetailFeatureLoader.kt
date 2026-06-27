@@ -9,7 +9,6 @@ import com.absinthe.libchecker.domain.app.detail.BuildAppDetailHeaderExtraInfoUs
 import com.absinthe.libchecker.domain.app.detail.BuildAppDetailHeaderTitleDataUseCase
 import com.absinthe.libchecker.domain.app.detail.GetAppDetailAbiUseCase
 import com.absinthe.libchecker.domain.app.detail.GetAppDetailFeaturesUseCase
-import com.absinthe.libchecker.domain.app.detail.ShouldShowStaticLibraryTabUseCase
 import com.absinthe.libchecker.domain.app.detail.feature.AppDetailFeatureItemRequest
 import com.absinthe.libchecker.domain.app.detail.feature.BuildAppDetailFeatureItemUseCase
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
@@ -24,8 +23,7 @@ class DetailFeatureLoader(
   private val buildAppDetailAbiLabelDataUseCase: BuildAppDetailAbiLabelDataUseCase,
   private val buildAppDetailHeaderExtraInfoUseCase: BuildAppDetailHeaderExtraInfoUseCase,
   private val buildAppDetailHeaderTitleDataUseCase: BuildAppDetailHeaderTitleDataUseCase,
-  private val buildAppDetailFeatureItemUseCase: BuildAppDetailFeatureItemUseCase,
-  private val shouldShowStaticLibraryTabUseCase: ShouldShowStaticLibraryTabUseCase
+  private val buildAppDetailFeatureItemUseCase: BuildAppDetailFeatureItemUseCase
 ) {
   val featureState = DetailFeatureState()
 
@@ -80,13 +78,6 @@ class DetailFeatureLoader(
       appIcons = featureState.appIcons
     )
   )
-
-  suspend fun shouldShowStaticLibraryTab(
-    packageInfo: PackageInfo,
-    packageName: String
-  ): Boolean {
-    return shouldShowStaticLibraryTabUseCase(packageInfo, packageName)
-  }
 
   fun emitFeature(
     scope: CoroutineScope,
