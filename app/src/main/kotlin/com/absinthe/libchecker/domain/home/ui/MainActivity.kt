@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.home.ui
+package com.absinthe.libchecker.domain.home.ui
 
 import android.content.ComponentName
 import android.content.Intent
@@ -31,10 +31,10 @@ import com.absinthe.libchecker.annotation.STATUS_START_INIT
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.databinding.ActivityMainBinding
+import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
+import com.absinthe.libchecker.domain.home.ui.INavViewContainer
+import com.absinthe.libchecker.domain.home.ui.view.HomeToolbarTitleView
 import com.absinthe.libchecker.domain.rules.CloudRulesRepository
-import com.absinthe.libchecker.features.home.HomeViewModel
-import com.absinthe.libchecker.features.home.INavViewContainer
-import com.absinthe.libchecker.features.home.ui.view.HomeToolbarTitleView
 import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.services.WorkerService
 import com.absinthe.libchecker.ui.base.BaseActivity

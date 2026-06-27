@@ -117,6 +117,7 @@ import com.absinthe.libchecker.domain.app.detail.navigation.BuildDetailReference
 import com.absinthe.libchecker.domain.app.search.HandleAppListSearchCommandUseCase
 import com.absinthe.libchecker.domain.app.update.AppUpdateRepository
 import com.absinthe.libchecker.domain.app.update.BuildInAppUpdateDiffDataUseCase
+import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
 import com.absinthe.libchecker.domain.rules.CloudRulesRepository
 import com.absinthe.libchecker.domain.rules.RuleSettingsRepository
 import com.absinthe.libchecker.domain.settings.presentation.SettingsViewModel
@@ -215,7 +216,6 @@ import com.absinthe.libchecker.features.applist.detail.content.DetailComponentCo
 import com.absinthe.libchecker.features.applist.detail.content.DetailNativeLibContentLoader
 import com.absinthe.libchecker.features.applist.detail.content.DetailPermissionContentLoader
 import com.absinthe.libchecker.features.applist.detail.ui.ApkDetailActivity
-import com.absinthe.libchecker.features.home.HomeViewModel
 import com.jakewharton.processphoenix.ProcessPhoenix
 import jonathanfinerty.once.Once
 import org.koin.android.ext.koin.androidContext

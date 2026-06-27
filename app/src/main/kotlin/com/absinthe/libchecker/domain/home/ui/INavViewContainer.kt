@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.home
+package com.absinthe.libchecker.domain.home.ui
 
 interface INavViewContainer {
   fun showNavigationView()

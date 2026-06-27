@@ -36,7 +36,7 @@
     tools:targetApi="36">
 
     <activity
-      android:name=".features.home.ui.MainActivity"
+      android:name=".domain.home.ui.MainActivity"
       android:configChanges="orientation"
       android:exported="true"
       android:launchMode="singleTop">

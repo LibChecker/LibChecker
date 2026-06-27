@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.home
+package com.absinthe.libchecker.domain.home.presentation
 
 import com.absinthe.libchecker.annotation.STATUS_START_INIT
 import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE

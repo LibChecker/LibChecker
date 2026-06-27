@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.home.ui.adapter
+package com.absinthe.libchecker.domain.home.ui.adapter
 
 import android.view.View
 import android.view.ViewGroup

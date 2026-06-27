@@ -7,19 +7,19 @@
     window:splitRatio="0.5"
     window:clearTop="true">
     <SplitPairFilter
-      window:primaryActivityName="com.absinthe.libchecker.features.home.ui.main.MainActivity"
+      window:primaryActivityName="com.absinthe.libchecker.domain.home.ui.MainActivity"
       window:secondaryActivityName="com.absinthe.libchecker.features.applist.detail.ui.AppDetailActivity" />
     <SplitPairFilter
-      window:primaryActivityName="com.absinthe.libchecker.features.home.ui.main.MainActivity"
+      window:primaryActivityName="com.absinthe.libchecker.domain.home.ui.MainActivity"
       window:secondaryActivityName="com.absinthe.libchecker.domain.statistics.reference.ui.LibReferenceActivity" />
     <SplitPairFilter
-      window:primaryActivityName="com.absinthe.libchecker.features.home.ui.main.MainActivity"
+      window:primaryActivityName="com.absinthe.libchecker.domain.home.ui.MainActivity"
       window:secondaryActivityName="com.absinthe.libchecker.domain.statistics.chart.ui.ChartActivity" />
     <SplitPairFilter
-      window:primaryActivityName="com.absinthe.libchecker.features.home.ui.main.MainActivity"
+      window:primaryActivityName="com.absinthe.libchecker.domain.home.ui.MainActivity"
       window:secondaryActivityName="com.absinthe.libchecker.domain.snapshot.detail.ui.SnapshotDetailActivity" />
     <SplitPairFilter
-      window:primaryActivityName="com.absinthe.libchecker.features.home.ui.main.MainActivity"
+      window:primaryActivityName="com.absinthe.libchecker.domain.home.ui.MainActivity"
       window:secondaryActivityName="com.absinthe.libchecker.domain.about.ui.AboutActivity" />
 
     <SplitPairFilter

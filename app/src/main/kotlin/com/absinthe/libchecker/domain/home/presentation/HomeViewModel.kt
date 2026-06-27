@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.home
+package com.absinthe.libchecker.domain.home.presentation
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel

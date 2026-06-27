@@ -30,9 +30,9 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.domain.about.ui.AboutPageBuilder
+import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
 import com.absinthe.libchecker.domain.settings.model.LocalePreferenceSummary
 import com.absinthe.libchecker.domain.settings.presentation.SettingsViewModel
-import com.absinthe.libchecker.features.home.HomeViewModel
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.base.IAppBarContainer
 import com.absinthe.libchecker.ui.base.IListController

@@ -11,7 +11,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewbinding.ViewBinding
-import com.absinthe.libchecker.features.home.HomeViewModel
+import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
 import rikka.widget.borderview.BorderViewDelegate
 
 abstract class BaseListControllerFragment<T : ViewBinding> :

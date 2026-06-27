@@ -30,6 +30,8 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
+import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
+import com.absinthe.libchecker.domain.home.ui.INavViewContainer
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.album.ui.AlbumActivity
 import com.absinthe.libchecker.domain.snapshot.detail.ui.EXTRA_ENTITY
@@ -43,8 +45,6 @@ import com.absinthe.libchecker.domain.snapshot.list.ui.adapter.SnapshotDiffUtil
 import com.absinthe.libchecker.domain.snapshot.list.ui.view.SnapshotDashboardView
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.timenode.ui.TimeNodeBottomSheetDialogFragment
-import com.absinthe.libchecker.features.home.HomeViewModel
-import com.absinthe.libchecker.features.home.INavViewContainer
 import com.absinthe.libchecker.services.OnShootListener
 import com.absinthe.libchecker.services.ShootService
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration

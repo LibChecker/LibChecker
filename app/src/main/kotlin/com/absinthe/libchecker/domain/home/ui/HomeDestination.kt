@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.home.ui
+package com.absinthe.libchecker.domain.home.ui
 
 import android.content.Intent
 import androidx.annotation.IdRes
