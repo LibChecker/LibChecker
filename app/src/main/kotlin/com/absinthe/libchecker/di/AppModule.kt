@@ -120,6 +120,7 @@ import com.absinthe.libchecker.domain.app.update.BuildInAppUpdateDiffDataUseCase
 import com.absinthe.libchecker.domain.rules.CloudRulesRepository
 import com.absinthe.libchecker.domain.rules.RuleSettingsRepository
 import com.absinthe.libchecker.domain.settings.AppearanceSettingsRepository
+import com.absinthe.libchecker.domain.settings.BuildGetUpdatesItemsUseCase
 import com.absinthe.libchecker.domain.settings.BuildLocalePreferenceDataUseCase
 import com.absinthe.libchecker.domain.settings.BuildLogShareIntentUseCase
 import com.absinthe.libchecker.domain.settings.DeveloperSettingsRepository
@@ -343,6 +344,7 @@ val appModule = module {
       ApkDetailActivity::class.java.name
     )
   }
+  factory { BuildGetUpdatesItemsUseCase(androidContext()) }
   factory { BuildLocalePreferenceDataUseCase(get()) }
   factory { BuildLogShareIntentUseCase(androidContext(), BuildConfig.APPLICATION_ID) }
   factory { SelectDarkModeUseCase(get()) }
@@ -563,6 +565,7 @@ val appModule = module {
       cloudRulesRepository = get(),
       ruleSettingsRepository = get(),
       snapshotSettingsRepository = get(),
+      buildGetUpdatesItemsUseCase = get(),
       buildLocalePreferenceDataUseCase = get(),
       buildLogShareIntentUseCase = get(),
       selectDarkModeUseCase = get(),

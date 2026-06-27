@@ -4,18 +4,19 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.core.net.toUri
-import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.URLManager
-import com.absinthe.libchecker.features.settings.bean.GetUpdatesItem
+import com.absinthe.libchecker.domain.settings.GetUpdatesAction
+import com.absinthe.libchecker.features.settings.SettingsViewModel
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libraries.utils.extensions.getBoolean
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 class GetUpdatesDialogFragment : BaseBottomSheetViewDialogFragment<GetUpdatesDialogView>() {
+
+  private val viewModel: SettingsViewModel by viewModel(ownerProducer = { requireParentFragment() })
 
   override fun initRootView(): GetUpdatesDialogView = GetUpdatesDialogView(requireContext())
 
@@ -27,45 +28,20 @@ class GetUpdatesDialogFragment : BaseBottomSheetViewDialogFragment<GetUpdatesDia
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    var items = listOf(
-      GetUpdatesItem(
-        "GitHub",
-        R.drawable.ic_github
-      ) {
-        launchUri(URLManager.GITHUB_REPO_PAGE)
-      },
-      GetUpdatesItem(
-        "Google Play",
-        com.absinthe.lc.rulesbundle.R.drawable.ic_lib_google
-      ) {
-        launchUri(URLManager.PLAY_STORE_DETAIL_PAGE)
-      },
-      GetUpdatesItem(
-        "Telegram",
-        com.absinthe.lc.rulesbundle.R.drawable.ic_lib_telegram
-      ) {
-        launchUri(URLManager.TELEGRAM_RELEASES)
-      },
-      GetUpdatesItem(
-        "F-Droid",
-        R.drawable.ic_fdroid
-      ) {
-        launchUri(URLManager.FDROID_PAGE)
+    root.setItems(viewModel.buildGetUpdatesItems(), ::handleAction)
+  }
+
+  private fun handleAction(action: GetUpdatesAction) {
+    when (action) {
+      is GetUpdatesAction.OpenUri -> launchUri(action.uri)
+
+      GetUpdatesAction.OpenInAppUpdate -> {
+        InAppUpdateDialogFragment().show(
+          childFragmentManager,
+          InAppUpdateDialogFragment::class.java.simpleName
+        )
       }
-    )
-    if (getBoolean(R.bool.is_foss)) {
-      items = items +
-        GetUpdatesItem(
-          getString(R.string.settings_get_updates_in_app),
-          R.drawable.ic_logo
-        ) {
-          InAppUpdateDialogFragment().show(
-            childFragmentManager,
-            InAppUpdateDialogFragment::class.java.simpleName
-          )
-        }
     }
-    root.setItems(items)
   }
 
   private fun launchUri(uri: String) {

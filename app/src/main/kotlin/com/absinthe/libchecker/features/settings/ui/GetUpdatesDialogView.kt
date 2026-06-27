@@ -5,7 +5,8 @@ import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.features.settings.bean.GetUpdatesItem
+import com.absinthe.libchecker.domain.settings.GetUpdatesAction
+import com.absinthe.libchecker.domain.settings.GetUpdatesItem
 import com.absinthe.libchecker.features.settings.ui.adapter.GetUpdatesAdapter
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.view.app.IHeaderView
@@ -41,7 +42,11 @@ class GetUpdatesDialogView(context: Context) :
     return header
   }
 
-  fun setItems(items: List<GetUpdatesItem>) {
+  fun setItems(
+    items: List<GetUpdatesItem>,
+    onActionClick: (GetUpdatesAction) -> Unit
+  ) {
+    _adapter.setOnActionClickListener(onActionClick)
     _adapter.setList(items)
   }
 }

@@ -12,8 +12,10 @@ import com.absinthe.libchecker.domain.rules.CloudRulesDownloadRequest
 import com.absinthe.libchecker.domain.rules.CloudRulesRepository
 import com.absinthe.libchecker.domain.rules.CloudRulesVersionInfo
 import com.absinthe.libchecker.domain.rules.RuleSettingsRepository
+import com.absinthe.libchecker.domain.settings.BuildGetUpdatesItemsUseCase
 import com.absinthe.libchecker.domain.settings.BuildLocalePreferenceDataUseCase
 import com.absinthe.libchecker.domain.settings.BuildLogShareIntentUseCase
+import com.absinthe.libchecker.domain.settings.GetUpdatesItem
 import com.absinthe.libchecker.domain.settings.LocalePreferenceDisplayData
 import com.absinthe.libchecker.domain.settings.SelectDarkModeUseCase
 import com.absinthe.libchecker.domain.settings.SelectLocaleUseCase
@@ -35,6 +37,7 @@ class SettingsViewModel(
   private val cloudRulesRepository: CloudRulesRepository,
   private val ruleSettingsRepository: RuleSettingsRepository,
   private val snapshotSettingsRepository: SnapshotSettingsRepository,
+  private val buildGetUpdatesItemsUseCase: BuildGetUpdatesItemsUseCase,
   private val buildLocalePreferenceDataUseCase: BuildLocalePreferenceDataUseCase,
   private val buildLogShareIntentUseCase: BuildLogShareIntentUseCase,
   private val selectDarkModeUseCase: SelectDarkModeUseCase,
@@ -101,6 +104,10 @@ class SettingsViewModel(
 
   fun setSnapshotKeepRule(rule: String) {
     snapshotSettingsRepository.keepRule = rule
+  }
+
+  fun buildGetUpdatesItems(): List<GetUpdatesItem> {
+    return buildGetUpdatesItemsUseCase()
   }
 
   fun getLibReferenceThreshold(): Int {
