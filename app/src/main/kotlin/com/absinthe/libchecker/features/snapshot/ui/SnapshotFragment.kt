@@ -243,9 +243,8 @@ class SnapshotFragment :
           refreshSelectedSnapshot()
         }
       }.launchIn(lifecycleScope)
-      snapshotDiffItemsFlow.onEach {
-        items = it
-        updateItems()
+      snapshotDiffItemsUpdates.onEach {
+        applySnapshotDiffItemsUpdate(it.items, it.pendingRemovePackageNames)
 
         lifecycleScope.launch(Dispatchers.IO) {
           delay(250)
@@ -284,20 +283,8 @@ class SnapshotFragment :
           } else {
             dashboard.setNoSnapshotTimestamp()
             dashboard.setSystemProps(emptyList())
-            viewModel.snapshotDiffItemsFlow.emit(emptyList())
+            viewModel.clearSnapshotDiffItems()
             flip(VF_LIST)
-          }
-        }
-
-        is SnapshotViewModel.Effect.DiffItemChange -> {
-          viewModel.applySnapshotDiffItemChange(items, it.item).also { update ->
-            applySnapshotDiffItemsUpdate(update.items, update.pendingRemovePackageNames)
-          }
-        }
-
-        is SnapshotViewModel.Effect.DiffItemRemove -> {
-          viewModel.applySnapshotDiffItemRemove(items, it.packageName).also { update ->
-            applySnapshotDiffItemsUpdate(update.items, update.pendingRemovePackageNames)
           }
         }
 

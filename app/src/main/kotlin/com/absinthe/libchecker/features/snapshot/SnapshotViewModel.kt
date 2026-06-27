@@ -65,12 +65,14 @@ class SnapshotViewModel(
 ) : ViewModel() {
 
   val allSnapshots = repository.currentSnapshotCount
-  val snapshotDiffItemsFlow: MutableSharedFlow<List<SnapshotDiffItem>> = MutableSharedFlow()
+  private val _snapshotDiffItemsUpdates: MutableSharedFlow<SnapshotDiffItemsUpdate> = MutableSharedFlow()
+  val snapshotDiffItemsUpdates = _snapshotDiffItemsUpdates.asSharedFlow()
   val snapshotDetailSectionsFlow: MutableSharedFlow<List<SnapshotDetailSection>> = MutableSharedFlow()
 
   private val _effect: MutableSharedFlow<Effect> = MutableSharedFlow()
   val effect = _effect.asSharedFlow()
 
+  private var snapshotDiffItems: List<SnapshotDiffItem> = emptyList()
   private var compareDiffJob: Job? = null
   private val packageChangeProcessor = SnapshotPackageChangeProcessor(::processPackageChange)
 
@@ -101,7 +103,7 @@ class SnapshotViewModel(
         onProgress = ::changeComparingProgress
       )
       if (diffItems != null) {
-        snapshotDiffItemsFlow.emit(diffItems)
+        emitSnapshotDiffItemsUpdate(diffItems)
       }
       timer.end()
       Timber.d("compareDiff: $timer")
@@ -204,22 +206,12 @@ class SnapshotViewModel(
     )
   }
 
-  fun applySnapshotDiffItemChange(
-    currentItems: List<SnapshotDiffItem>,
-    changedItem: SnapshotDiffItem
-  ): UpdateSnapshotDiffItemsUseCase.Result {
-    return updateSnapshotDiffItemsUseCase.applyChange(currentItems, changedItem)
-  }
-
-  fun applySnapshotDiffItemRemove(
-    currentItems: List<SnapshotDiffItem>,
-    packageName: String
-  ): UpdateSnapshotDiffItemsUseCase.Result {
-    return updateSnapshotDiffItemsUseCase.applyRemove(currentItems, packageName)
-  }
-
   suspend fun getSystemPropDisplayData(timestamp: Long): List<SnapshotSystemPropDisplayData> {
     return buildSnapshotSystemPropDisplayDataUseCase(timestamp)
+  }
+
+  suspend fun clearSnapshotDiffItems() {
+    emitSnapshotDiffItemsUpdate(emptyList())
   }
 
   suspend fun deleteSnapshotTimeStamp(timestamp: Long): List<TimeStampItem> {
@@ -278,16 +270,14 @@ class SnapshotViewModel(
     }
   }
 
-  private fun changeDiffItem(item: SnapshotDiffItem) {
-    setEffect {
-      Effect.DiffItemChange(item)
-    }
+  private suspend fun changeDiffItem(item: SnapshotDiffItem) {
+    val update = updateSnapshotDiffItemsUseCase.applyChange(snapshotDiffItems, item)
+    emitSnapshotDiffItemsUpdate(update.items, update.pendingRemovePackageNames)
   }
 
-  private fun removeDiffItem(packageName: String) {
-    setEffect {
-      Effect.DiffItemRemove(packageName)
-    }
+  private suspend fun removeDiffItem(packageName: String) {
+    val update = updateSnapshotDiffItemsUseCase.applyRemove(snapshotDiffItems, packageName)
+    emitSnapshotDiffItemsUpdate(update.items, update.pendingRemovePackageNames)
   }
 
   private fun changeComparingProgress(progress: Int) {
@@ -308,6 +298,24 @@ class SnapshotViewModel(
     }
   }
 
+  private suspend fun emitSnapshotDiffItemsUpdate(
+    items: List<SnapshotDiffItem>,
+    pendingRemovePackageNames: Set<String> = emptySet()
+  ) {
+    snapshotDiffItems = items
+    _snapshotDiffItemsUpdates.emit(
+      SnapshotDiffItemsUpdate(
+        items = items,
+        pendingRemovePackageNames = pendingRemovePackageNames
+      )
+    )
+  }
+
+  data class SnapshotDiffItemsUpdate(
+    val items: List<SnapshotDiffItem>,
+    val pendingRemovePackageNames: Set<String>
+  )
+
   sealed class Effect {
     data class DashboardCountChange(
       val snapshotCount: Int,
@@ -315,8 +323,6 @@ class SnapshotViewModel(
       val isLeft: Boolean
     ) : Effect()
 
-    data class DiffItemChange(val item: SnapshotDiffItem) : Effect()
-    data class DiffItemRemove(val packageName: String) : Effect()
     data class TimeStampChange(val timestamp: Long) : Effect()
     data class ComparingProgressChange(val progress: Int) : Effect()
   }
