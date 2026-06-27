@@ -167,14 +167,13 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
   }
 
   private suspend fun bindTimeStampItems(items: List<TimeStampItem>) {
-    val timeNodeItemsResult = viewModel.buildSnapshotTimeNodeItems(items)
-    val packageIconSources = viewModel.getSnapshotPackageIconSources(timeNodeItemsResult.topAppPackageNames)
+    val timeNodeListData = viewModel.buildSnapshotTimeNodeListData(items)
     withContext(Dispatchers.Main) {
       if (context == null) {
         return@withContext
       }
-      root.adapter.setPackageIconSources(packageIconSources)
-      root.adapter.setList(timeNodeItemsResult.items)
+      root.adapter.setPackageIconSources(timeNodeListData.packageIconSources)
+      root.adapter.setList(timeNodeListData.items)
     }
   }
 
