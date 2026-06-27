@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.album.backup.ui
+package com.absinthe.libchecker.domain.snapshot.backup.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -28,7 +28,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.backup.RoomBackup
 import com.absinthe.libchecker.databinding.ActivityBackupBinding
-import com.absinthe.libchecker.features.album.backup.SnapshotBackupViewModel
+import com.absinthe.libchecker.domain.snapshot.backup.presentation.SnapshotBackupViewModel
 import com.absinthe.libchecker.features.home.ui.MainActivity
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder

@@ -1,5 +1,7 @@
-package com.absinthe.libchecker.domain.snapshot
+package com.absinthe.libchecker.domain.snapshot.backup.usecase
 
+import com.absinthe.libchecker.domain.snapshot.SnapshotDatabaseFileRepository
+import com.absinthe.libchecker.domain.snapshot.backup.model.SnapshotBackupTarget
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -27,9 +29,4 @@ class GetSnapshotBackupTargetUseCase(
   private companion object {
     private const val LARGE_DATABASE_THRESHOLD_BYTES = 100L * 1024 * 1024
   }
-}
-
-sealed interface SnapshotBackupTarget {
-  data class Archive(val fileName: String) : SnapshotBackupTarget
-  data object Database : SnapshotBackupTarget
 }

@@ -1,6 +1,8 @@
-package com.absinthe.libchecker.domain.snapshot
+package com.absinthe.libchecker.domain.snapshot.backup.usecase
 
 import android.net.Uri
+import com.absinthe.libchecker.domain.snapshot.backup.repository.SnapshotDatabaseBackupRestoreResult
+import com.absinthe.libchecker.domain.snapshot.backup.repository.SnapshotDatabaseBackupRestorer
 import java.io.File
 
 class RestoreSnapshotDatabaseBackupUseCase(

@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.snapshot.backup
+package com.absinthe.libchecker.domain.snapshot.backup.usecase
 
 import android.content.ContentResolver
 import android.net.Uri

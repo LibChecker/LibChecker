@@ -2,8 +2,8 @@ package com.absinthe.libchecker.data.snapshot
 
 import androidx.room.RoomDatabase
 import com.absinthe.libchecker.database.backup.RoomBackup
-import com.absinthe.libchecker.domain.snapshot.SnapshotDatabaseBackupRestoreResult
-import com.absinthe.libchecker.domain.snapshot.SnapshotDatabaseBackupRestorer
+import com.absinthe.libchecker.domain.snapshot.backup.repository.SnapshotDatabaseBackupRestoreResult
+import com.absinthe.libchecker.domain.snapshot.backup.repository.SnapshotDatabaseBackupRestorer
 import java.io.File
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException

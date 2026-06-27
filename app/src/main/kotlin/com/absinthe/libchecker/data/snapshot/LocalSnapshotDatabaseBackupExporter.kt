@@ -2,8 +2,8 @@ package com.absinthe.libchecker.data.snapshot
 
 import androidx.room.RoomDatabase
 import com.absinthe.libchecker.database.backup.RoomBackup
-import com.absinthe.libchecker.domain.snapshot.SnapshotDatabaseBackupExportResult
-import com.absinthe.libchecker.domain.snapshot.SnapshotDatabaseBackupExporter
+import com.absinthe.libchecker.domain.snapshot.backup.repository.SnapshotDatabaseBackupExportResult
+import com.absinthe.libchecker.domain.snapshot.backup.repository.SnapshotDatabaseBackupExporter
 
 class LocalSnapshotDatabaseBackupExporter(
   private val roomBackup: RoomBackup,

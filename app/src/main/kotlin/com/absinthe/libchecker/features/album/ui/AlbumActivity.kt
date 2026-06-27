@@ -11,8 +11,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.ActivityAlbumBinding
+import com.absinthe.libchecker.domain.snapshot.backup.ui.BackupActivity
 import com.absinthe.libchecker.domain.snapshot.comparison.ui.ComparisonActivity
-import com.absinthe.libchecker.features.album.backup.ui.BackupActivity
 import com.absinthe.libchecker.features.album.track.ui.TrackActivity
 import com.absinthe.libchecker.features.album.ui.adapter.AlbumAdapter
 import com.absinthe.libchecker.features.album.ui.view.AlbumItemView

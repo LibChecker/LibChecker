@@ -1,7 +1,8 @@
-package com.absinthe.libchecker.domain.snapshot
+package com.absinthe.libchecker.domain.snapshot.backup.usecase
 
 import android.content.ContentResolver
 import android.net.Uri
+import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
 
 class BackupSnapshotArchiveToUriUseCase(
   private val contentResolver: ContentResolver,
