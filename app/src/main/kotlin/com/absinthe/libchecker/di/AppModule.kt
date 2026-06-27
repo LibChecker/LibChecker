@@ -124,8 +124,6 @@ import com.absinthe.libchecker.domain.snapshot.BuildArchiveSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.CaptureInstalledSnapshotUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotDashboardCountUseCase
 import com.absinthe.libchecker.domain.snapshot.GetSnapshotRuleUseCase
-import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveCodec
-import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotCaptureStateRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotDatabaseFileRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotItemFactory
@@ -134,6 +132,8 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
+import com.absinthe.libchecker.domain.snapshot.backup.archive.SnapshotArchiveCodec
+import com.absinthe.libchecker.domain.snapshot.backup.archive.SnapshotArchiveUseCase
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.SnapshotDetailSectionBuilder
 import com.absinthe.libchecker.domain.statistics.chart.presentation.ChartViewModel
 import com.absinthe.libchecker.domain.statistics.chart.repository.AndroidDistributionRepository

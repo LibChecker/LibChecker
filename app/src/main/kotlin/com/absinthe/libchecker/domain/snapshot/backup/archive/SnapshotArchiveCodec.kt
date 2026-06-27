@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.snapshot
+package com.absinthe.libchecker.domain.snapshot.backup.archive
 
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import java.io.InputStream

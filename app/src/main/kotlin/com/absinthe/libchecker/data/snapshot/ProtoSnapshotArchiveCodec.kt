@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.data.snapshot
 
 import com.absinthe.libchecker.database.entity.SnapshotItem
-import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveCodec
+import com.absinthe.libchecker.domain.snapshot.backup.archive.SnapshotArchiveCodec
 import com.absinthe.libchecker.protocol.Snapshot
 import java.io.InputStream
 import java.io.OutputStream

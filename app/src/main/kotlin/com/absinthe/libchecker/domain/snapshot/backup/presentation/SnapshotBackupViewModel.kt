@@ -4,8 +4,8 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.database.backup.RoomBackup
-import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotSelectionUseCase
+import com.absinthe.libchecker.domain.snapshot.backup.archive.SnapshotArchiveUseCase
 import com.absinthe.libchecker.domain.snapshot.backup.model.SnapshotBackupTarget
 import com.absinthe.libchecker.domain.snapshot.backup.repository.SnapshotDatabaseBackupExportResult
 import com.absinthe.libchecker.domain.snapshot.backup.usecase.BackupSnapshotArchiveToUriUseCase

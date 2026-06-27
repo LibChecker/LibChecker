@@ -2,7 +2,7 @@ package com.absinthe.libchecker.domain.snapshot.backup.usecase
 
 import android.content.ContentResolver
 import android.net.Uri
-import com.absinthe.libchecker.domain.snapshot.SnapshotArchiveUseCase
+import com.absinthe.libchecker.domain.snapshot.backup.archive.SnapshotArchiveUseCase
 
 class BackupSnapshotArchiveToUriUseCase(
   private val contentResolver: ContentResolver,
