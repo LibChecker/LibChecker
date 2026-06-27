@@ -553,6 +553,7 @@ val appModule = module {
     SettingsViewModel(
       appUpdateRepository = get(),
       appListSettingsRepository = get(),
+      cloudRulesRepository = get(),
       ruleSettingsRepository = get(),
       snapshotSettingsRepository = get(),
       buildLocalePreferenceDataUseCase = get(),

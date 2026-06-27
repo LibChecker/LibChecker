@@ -8,6 +8,9 @@ import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.SetApkAnalysisEnabledUseCase
 import com.absinthe.libchecker.domain.app.update.AppUpdateChannel
 import com.absinthe.libchecker.domain.app.update.AppUpdateRepository
+import com.absinthe.libchecker.domain.rules.CloudRulesDownloadRequest
+import com.absinthe.libchecker.domain.rules.CloudRulesRepository
+import com.absinthe.libchecker.domain.rules.CloudRulesVersionInfo
 import com.absinthe.libchecker.domain.rules.RuleSettingsRepository
 import com.absinthe.libchecker.domain.settings.BuildLocalePreferenceDataUseCase
 import com.absinthe.libchecker.domain.settings.BuildLogShareIntentUseCase
@@ -23,11 +26,13 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class SettingsViewModel(
   private val appUpdateRepository: AppUpdateRepository,
   private val appListSettingsRepository: AppListSettingsRepository,
+  private val cloudRulesRepository: CloudRulesRepository,
   private val ruleSettingsRepository: RuleSettingsRepository,
   private val snapshotSettingsRepository: SnapshotSettingsRepository,
   private val buildLocalePreferenceDataUseCase: BuildLocalePreferenceDataUseCase,
@@ -69,6 +74,21 @@ class SettingsViewModel(
 
   fun selectRemoteRulesRepository(repository: String) {
     ruleSettingsRepository.selectRemoteRepository(repository)
+  }
+
+  suspend fun getCloudRulesVersionInfo(): CloudRulesVersionInfo? = withContext(Dispatchers.IO) {
+    cloudRulesRepository.getVersionInfo()
+  }
+
+  fun getCloudRulesDownloadRequest(): CloudRulesDownloadRequest {
+    return cloudRulesRepository.getDownloadRequest()
+  }
+
+  fun installDownloadedCloudRules(
+    downloadRequest: CloudRulesDownloadRequest,
+    remoteVersion: Int
+  ): Boolean {
+    return cloudRulesRepository.installDownloadedRules(downloadRequest, remoteVersion)
   }
 
   fun selectDarkMode(darkMode: String): Int {

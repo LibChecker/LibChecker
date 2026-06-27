@@ -8,8 +8,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.domain.rules.CloudRulesRepository
 import com.absinthe.libchecker.domain.rules.CloudRulesVersionInfo
+import com.absinthe.libchecker.features.settings.SettingsViewModel
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.DownloadUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
@@ -17,15 +17,13 @@ import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.jakewharton.processphoenix.ProcessPhoenix
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDialogView>() {
 
-  private val cloudRulesRepository: CloudRulesRepository by inject()
+  private val viewModel: SettingsViewModel by viewModel(ownerProducer = { requireParentFragment() })
   private var versionInfo: CloudRulesVersionInfo? = null
 
   override fun initRootView(): CloudRulesDialogView = CloudRulesDialogView(requireContext())
@@ -44,9 +42,7 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
     lifecycleScope.launch {
       lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
         try {
-          withContext(Dispatchers.IO) {
-            cloudRulesRepository.getVersionInfo()
-          }?.let {
+          viewModel.getCloudRulesVersionInfo()?.let {
             versionInfo = it
             try {
               root.cloudRulesContentView.localVersion.version.text =
@@ -70,14 +66,14 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
 
   private fun requestBundle() {
     val remoteVersion = versionInfo?.remoteVersion ?: return showUpdateErrorToast()
-    val downloadRequest = cloudRulesRepository.getDownloadRequest()
+    val downloadRequest = viewModel.getCloudRulesDownloadRequest()
     DownloadUtils.download(
       downloadRequest.url,
       downloadRequest.destination,
       object : DownloadUtils.OnDownloadListener {
         override fun onDownloadSuccess() {
-          if (cloudRulesRepository.installDownloadedRules(downloadRequest, remoteVersion)) {
-            lifecycleScope.launch(Dispatchers.Main) {
+          if (viewModel.installDownloadedCloudRules(downloadRequest, remoteVersion)) {
+            lifecycleScope.launch {
               root.cloudRulesContentView.localVersion.version.text = remoteVersion.toString()
               root.cloudRulesContentView.localVersion.updateContentDescription()
               root.cloudRulesContentView.setUpdateButtonStatus(false)
@@ -108,7 +104,7 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
   }
 
   private fun showUpdateErrorToast() {
-    lifecycleScope.launch(Dispatchers.Main) {
+    lifecycleScope.launch {
       context?.showToast(R.string.toast_cloud_rules_update_error)
     }
   }
