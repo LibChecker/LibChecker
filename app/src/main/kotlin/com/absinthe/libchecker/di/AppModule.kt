@@ -559,7 +559,9 @@ val appModule = module {
       buildLogShareIntentUseCase = get(),
       selectDarkModeUseCase = get(),
       selectLocaleUseCase = get(),
-      setApkAnalysisEnabledUseCase = get()
+      setApkAnalysisEnabledUseCase = get(),
+      libReferenceSettingsRepository = get(),
+      updateLibReferenceThresholdUseCase = get()
     )
   }
   viewModel {

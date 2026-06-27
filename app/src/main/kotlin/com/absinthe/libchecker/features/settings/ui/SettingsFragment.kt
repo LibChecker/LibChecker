@@ -150,10 +150,15 @@ class SettingsFragment :
         if (AntiShakeUtils.isInvalidClick(prefRecyclerView)) {
           false
         } else {
-          LibThresholdDialogFragment().show(
-            requireActivity().supportFragmentManager,
-            LibThresholdDialogFragment::class.java.name
-          )
+          LibThresholdDialogFragment
+            .newInstance(settingsViewModel.getLibReferenceThreshold())
+            .apply {
+              setOnThresholdSelectedListener(settingsViewModel::setLibReferenceThreshold)
+            }
+            .show(
+              requireActivity().supportFragmentManager,
+              LibThresholdDialogFragment::class.java.name
+            )
           true
         }
       }

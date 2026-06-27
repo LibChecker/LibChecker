@@ -3,24 +3,19 @@ package com.absinthe.libchecker.features.settings.ui
 import android.app.Dialog
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.domain.statistics.LibReferenceSettingsRepository
-import com.absinthe.libchecker.domain.statistics.UpdateLibReferenceThresholdUseCase
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.utils.Telemetry
-import kotlinx.coroutines.launch
-import org.koin.android.ext.android.inject
+import com.absinthe.libchecker.utils.extensions.putArguments
 
 class LibThresholdDialogFragment : DialogFragment() {
-  private val libReferenceSettingsRepository: LibReferenceSettingsRepository by inject()
-  private val updateLibReferenceThresholdUseCase: UpdateLibReferenceThresholdUseCase by inject()
+  private var onThresholdSelected: (Int) -> Unit = {}
 
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     val view = LibReferenceThresholdView(
       requireContext(),
-      libReferenceSettingsRepository.threshold
+      arguments?.getInt(EXTRA_THRESHOLD) ?: DEFAULT_THRESHOLD
     )
 
     return BaseAlertDialogBuilder(requireContext())
@@ -28,9 +23,7 @@ class LibThresholdDialogFragment : DialogFragment() {
       .setTitle(R.string.lib_ref_threshold)
       .setPositiveButton(android.R.string.ok) { _, _ ->
         val threshold = view.slider.value.toInt()
-        lifecycleScope.launch {
-          updateLibReferenceThresholdUseCase(threshold)
-        }
+        onThresholdSelected(threshold)
         Telemetry.recordEvent(
           Constants.Event.SETTINGS,
           mapOf(Telemetry.Param.CONTENT to Constants.PREF_LIB_REF_THRESHOLD, Telemetry.Param.VALUE to threshold.toLong())
@@ -38,5 +31,18 @@ class LibThresholdDialogFragment : DialogFragment() {
       }
       .setNegativeButton(android.R.string.cancel, null)
       .create()
+  }
+
+  fun setOnThresholdSelectedListener(action: (Int) -> Unit) {
+    onThresholdSelected = action
+  }
+
+  companion object {
+    private const val EXTRA_THRESHOLD = "EXTRA_THRESHOLD"
+    private const val DEFAULT_THRESHOLD = 2
+
+    fun newInstance(threshold: Int): LibThresholdDialogFragment {
+      return LibThresholdDialogFragment().putArguments(EXTRA_THRESHOLD to threshold)
+    }
   }
 }
