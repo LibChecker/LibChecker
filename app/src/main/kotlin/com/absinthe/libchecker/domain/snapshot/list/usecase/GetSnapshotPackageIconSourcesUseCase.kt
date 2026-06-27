@@ -1,7 +1,7 @@
-package com.absinthe.libchecker.domain.snapshot
+package com.absinthe.libchecker.domain.snapshot.list.usecase
 
-import android.content.pm.PackageInfo
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -20,9 +20,4 @@ class GetSnapshotPackageIconSourcesUseCase(
           ?: SnapshotPackageIconSource.Fallback
       }
   }
-}
-
-sealed interface SnapshotPackageIconSource {
-  data class InstalledPackage(val packageInfo: PackageInfo) : SnapshotPackageIconSource
-  data object Fallback : SnapshotPackageIconSource
 }

@@ -1,7 +1,10 @@
-package com.absinthe.libchecker.domain.snapshot
+package com.absinthe.libchecker.domain.snapshot.list.usecase
 
 import android.content.Context
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.snapshot.GetSnapshotSystemPropDiffsUseCase
+import com.absinthe.libchecker.domain.snapshot.SnapshotSystemProp
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotSystemPropDisplayData
 
 class BuildSnapshotSystemPropDisplayDataUseCase(
   private val context: Context,
@@ -28,8 +31,3 @@ class BuildSnapshotSystemPropDisplayDataUseCase(
     const val ARROW = "→"
   }
 }
-
-data class SnapshotSystemPropDisplayData(
-  val label: String,
-  val displayValue: String
-)

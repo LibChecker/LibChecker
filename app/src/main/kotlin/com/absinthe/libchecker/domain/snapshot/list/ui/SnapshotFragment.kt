@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.snapshot.ui
+package com.absinthe.libchecker.domain.snapshot.list.ui
 
 import android.Manifest
 import android.content.Context
@@ -31,20 +31,20 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCase
-import com.absinthe.libchecker.domain.snapshot.SnapshotCapturePlan
 import com.absinthe.libchecker.domain.snapshot.album.ui.AlbumActivity
 import com.absinthe.libchecker.domain.snapshot.detail.ui.EXTRA_ENTITY
 import com.absinthe.libchecker.domain.snapshot.detail.ui.SnapshotDetailActivity
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotEmptyView
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotCapturePlan
+import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
+import com.absinthe.libchecker.domain.snapshot.list.ui.adapter.SnapshotAdapter
+import com.absinthe.libchecker.domain.snapshot.list.ui.adapter.SnapshotDiffUtil
+import com.absinthe.libchecker.domain.snapshot.list.ui.view.SnapshotDashboardView
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.timenode.ui.TimeNodeBottomSheetDialogFragment
 import com.absinthe.libchecker.features.home.HomeViewModel
 import com.absinthe.libchecker.features.home.INavViewContainer
-import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
-import com.absinthe.libchecker.features.snapshot.ui.adapter.SnapshotAdapter
-import com.absinthe.libchecker.features.snapshot.ui.adapter.SnapshotDiffUtil
-import com.absinthe.libchecker.features.snapshot.ui.view.SnapshotDashboardView
 import com.absinthe.libchecker.services.OnShootListener
 import com.absinthe.libchecker.services.ShootService
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration

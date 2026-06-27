@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.snapshot.ui.adapter
+package com.absinthe.libchecker.domain.snapshot.list.ui.adapter
 
 import androidx.recyclerview.widget.DiffUtil
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem

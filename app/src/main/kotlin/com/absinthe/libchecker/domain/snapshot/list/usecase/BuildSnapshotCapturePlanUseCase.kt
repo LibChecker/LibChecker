@@ -1,9 +1,11 @@
-package com.absinthe.libchecker.domain.snapshot
+package com.absinthe.libchecker.domain.snapshot.list.usecase
 
 import android.net.Uri
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.LCUris
+import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotCapturePlan
 
 class BuildSnapshotCapturePlanUseCase(
   private val snapshotSettingsRepository: SnapshotSettingsRepository,
@@ -37,17 +39,4 @@ class BuildSnapshotCapturePlanUseCase(
       .build()
       .toString()
   }
-}
-
-sealed interface SnapshotCapturePlan {
-
-  data class Capture(
-    val dropPrevious: Boolean
-  ) : SnapshotCapturePlan
-
-  data class ConfirmKeepPrevious(
-    val bridgeUri: String
-  ) : SnapshotCapturePlan
-
-  data object NoAction : SnapshotCapturePlan
 }

@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.snapshot.ui.adapter
+package com.absinthe.libchecker.domain.snapshot.list.ui.adapter
 
 import android.graphics.Color
 import android.text.Spannable
@@ -16,13 +16,13 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotAbiDisplayItem
 import com.absinthe.libchecker.domain.snapshot.SnapshotListDisplayOptions
-import com.absinthe.libchecker.domain.snapshot.SnapshotPackageIconSource
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotUpdateTimeText
+import com.absinthe.libchecker.domain.snapshot.list.ui.view.SnapshotItemView
+import com.absinthe.libchecker.domain.snapshot.list.usecase.stableSnapshotDiffItemIdFor
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
-import com.absinthe.libchecker.domain.snapshot.stableSnapshotDiffItemIdFor
+import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
-import com.absinthe.libchecker.features.snapshot.ui.view.SnapshotItemView
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.dp

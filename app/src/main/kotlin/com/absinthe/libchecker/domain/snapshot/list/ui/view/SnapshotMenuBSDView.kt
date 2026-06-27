@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.snapshot.ui.view
+package com.absinthe.libchecker.domain.snapshot.list.ui.view
 
 import android.content.Context
 import android.os.Build
@@ -10,9 +10,9 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
+import com.absinthe.libchecker.domain.snapshot.list.ui.adapter.SnapshotAdapter
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.features.home.ui.adapter.AdvancedMenuAdapter
-import com.absinthe.libchecker.features.snapshot.ui.adapter.SnapshotAdapter
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.extensions.dp

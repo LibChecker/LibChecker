@@ -7,11 +7,11 @@ import androidx.core.os.BundleCompat
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.TimeStampItem
+import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
 import com.absinthe.libchecker.domain.snapshot.timenode.ui.view.TimeNodeAddApkView
 import com.absinthe.libchecker.domain.snapshot.timenode.ui.view.TimeNodeAutoRemoveView
 import com.absinthe.libchecker.domain.snapshot.timenode.ui.view.TimeNodeBottomSheetView
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
-import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.UiUtils

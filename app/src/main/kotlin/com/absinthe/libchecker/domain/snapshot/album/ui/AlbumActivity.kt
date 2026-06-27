@@ -15,9 +15,9 @@ import com.absinthe.libchecker.domain.snapshot.album.ui.adapter.AlbumAdapter
 import com.absinthe.libchecker.domain.snapshot.album.ui.view.AlbumItemView
 import com.absinthe.libchecker.domain.snapshot.backup.ui.BackupActivity
 import com.absinthe.libchecker.domain.snapshot.comparison.ui.ComparisonActivity
+import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
 import com.absinthe.libchecker.domain.snapshot.timenode.ui.TimeNodeBottomSheetDialogFragment
 import com.absinthe.libchecker.domain.snapshot.track.ui.TrackActivity
-import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding

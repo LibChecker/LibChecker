@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.snapshot.ui
+package com.absinthe.libchecker.domain.snapshot.list.ui
 
 import android.app.Service
 import android.content.ComponentName

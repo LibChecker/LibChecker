@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.snapshot.ui
+package com.absinthe.libchecker.domain.snapshot.list.ui
 
 import android.content.DialogInterface
 import com.absinthe.libchecker.R
@@ -6,9 +6,9 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.SnapshotOptions
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
-import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
-import com.absinthe.libchecker.features.snapshot.ui.view.SnapshotMenuBSDView
-import com.absinthe.libchecker.features.snapshot.ui.view.SnapshotMenuItemView
+import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
+import com.absinthe.libchecker.domain.snapshot.list.ui.view.SnapshotMenuBSDView
+import com.absinthe.libchecker.domain.snapshot.list.ui.view.SnapshotMenuItemView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.supportIECUnit

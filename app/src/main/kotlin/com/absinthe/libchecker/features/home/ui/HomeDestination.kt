@@ -6,9 +6,9 @@ import androidx.fragment.app.Fragment
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.domain.settings.ui.SettingsFragment
+import com.absinthe.libchecker.domain.snapshot.list.ui.SnapshotFragment
 import com.absinthe.libchecker.domain.statistics.reference.ui.LibReferenceFragment
 import com.absinthe.libchecker.features.applist.ui.AppListFragment
-import com.absinthe.libchecker.features.snapshot.ui.SnapshotFragment
 
 enum class HomeDestination(
   val pageIndex: Int,

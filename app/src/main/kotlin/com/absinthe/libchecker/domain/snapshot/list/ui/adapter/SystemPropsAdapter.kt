@@ -1,8 +1,8 @@
-package com.absinthe.libchecker.features.snapshot.ui.adapter
+package com.absinthe.libchecker.domain.snapshot.list.ui.adapter
 
 import android.view.ViewGroup
-import com.absinthe.libchecker.domain.snapshot.SnapshotSystemPropDisplayData
-import com.absinthe.libchecker.features.snapshot.ui.view.SystemPropItemView
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotSystemPropDisplayData
+import com.absinthe.libchecker.domain.snapshot.list.ui.view.SystemPropItemView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
