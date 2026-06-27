@@ -14,7 +14,11 @@ import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
+import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
+import com.absinthe.libchecker.domain.snapshot.GetSnapshotRuleUseCase
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemDisplayData
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSection
 import com.absinthe.libchecker.domain.snapshot.model.ADDED
 import com.absinthe.libchecker.domain.snapshot.model.CHANGED
 import com.absinthe.libchecker.domain.snapshot.model.MOVED
@@ -24,16 +28,19 @@ import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.fromJson
+import com.absinthe.rulesbundle.Rule
 import java.util.Locale
 import kotlin.math.abs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class BuildSnapshotDetailItemsUseCase(
-  private val context: Context
+class SnapshotDetailSectionBuilder(
+  private val context: Context,
+  private val appListSettingsRepository: AppListSettingsRepository,
+  private val getSnapshotRule: GetSnapshotRuleUseCase
 ) {
 
-  suspend operator fun invoke(item: SnapshotDiffItem): List<SnapshotDetailItem> = withContext(Dispatchers.IO) {
+  suspend operator fun invoke(item: SnapshotDiffItem): List<SnapshotDetailSection> = withContext(Dispatchers.IO) {
     val list = mutableListOf<SnapshotDetailItem>()
 
     list.addAll(
@@ -79,7 +86,39 @@ class BuildSnapshotDetailItemsUseCase(
       )
     )
 
-    list
+    buildSections(list)
+  }
+
+  private suspend fun buildSections(items: List<SnapshotDetailItem>): List<SnapshotDetailSection> {
+    val colorfulRuleIcon = appListSettingsRepository.colorfulRuleIcon
+    val ruleCache = mutableMapOf<String, Rule?>()
+
+    suspend fun getRuleCached(item: SnapshotDetailItem): Rule? {
+      val key = "${item.itemType}:${item.name}"
+      if (ruleCache.containsKey(key)) {
+        return ruleCache[key]
+      }
+      return getSnapshotRule(item).also {
+        ruleCache[key] = it
+      }
+    }
+
+    return orderedTypes.mapNotNull { type ->
+      val sectionItems = items
+        .filter { it.itemType == type }
+        .map { item ->
+          SnapshotDetailItemDisplayData(
+            item = item,
+            rule = getRuleCached(item),
+            colorfulRuleIcon = colorfulRuleIcon
+          )
+        }
+      if (sectionItems.isEmpty()) {
+        null
+      } else {
+        SnapshotDetailSection(type, sectionItems)
+      }
+    }
   }
 
   private fun addComponentDiffInfoFromJson(
@@ -303,5 +342,6 @@ class BuildSnapshotDetailItemsUseCase(
 
   private companion object {
     const val ARROW = "→"
+    val orderedTypes = listOf(NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER, PERMISSION, METADATA)
   }
 }

@@ -15,8 +15,7 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotDiffsUseCase
 import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotItemWithInstalledAppUseCase
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSection
-import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotDetailItemsUseCase
-import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotDetailSectionsUseCase
+import com.absinthe.libchecker.domain.snapshot.detail.usecase.SnapshotDetailSectionBuilder
 import com.absinthe.libchecker.domain.snapshot.display.FormatSnapshotTimestampUseCase
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotCapturePlan
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotSystemPropDisplayData
@@ -49,8 +48,7 @@ class SnapshotViewModel(
   private val compareSnapshotDiffs: CompareSnapshotDiffsUseCase,
   private val compareSnapshotItemWithInstalledApp: CompareSnapshotItemWithInstalledAppUseCase,
   private val getSnapshotDashboardCount: GetSnapshotDashboardCountUseCase,
-  private val buildSnapshotDetailItems: BuildSnapshotDetailItemsUseCase,
-  private val buildSnapshotDetailSections: BuildSnapshotDetailSectionsUseCase,
+  private val snapshotDetailSectionBuilder: SnapshotDetailSectionBuilder,
   private val snapshotLibrary: SnapshotLibraryUseCase,
   private val buildSnapshotCapturePlanUseCase: BuildSnapshotCapturePlanUseCase,
   private val getSnapshotPackageIconSourcesUseCase: GetSnapshotPackageIconSourcesUseCase,
@@ -184,8 +182,7 @@ class SnapshotViewModel(
   }
 
   fun computeDiffDetail(entity: SnapshotDiffItem) = viewModelScope.launch {
-    val details = buildSnapshotDetailItems(entity)
-    snapshotDetailSectionsFlow.emit(buildSnapshotDetailSections(details))
+    snapshotDetailSectionsFlow.emit(snapshotDetailSectionBuilder(entity))
   }
 
   fun getTimeStamps(): List<TimeStampItem> {
