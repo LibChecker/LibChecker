@@ -97,22 +97,23 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
                     viewModel.getSnapshotAutoRemoveThreshold()
                   ) { threshold ->
                     confirmedThreshold = threshold
-                    viewModel.setSnapshotAutoRemoveThreshold(threshold)
                     autoRemoveView.setAutoRemoveThreshold(threshold)
                     recordChanged(true)
                   }
                   dialog.setOnDismissListener {
-                    autoRemoveView.syncWithAutoRemoveThreshold(
-                      viewModel.getSnapshotAutoRemoveThreshold()
-                    )
-                    confirmedThreshold?.let { threshold ->
+                    val threshold = confirmedThreshold
+                    if (threshold == null) {
+                      autoRemoveView.syncWithAutoRemoveThreshold(
+                        viewModel.getSnapshotAutoRemoveThreshold()
+                      )
+                    } else {
                       lifecycleScope.launch(Dispatchers.IO) {
                         var loadingDialog: AlertDialog? = null
                         try {
                           withContext(Dispatchers.Main) {
                             loadingDialog = UiUtils.createLoadingDialog(ctw).also { it.show() }
                           }
-                          val timestampList = viewModel.retainLatestSnapshotsAndGetTimeStamps(threshold)
+                          val timestampList = viewModel.enableSnapshotAutoRemoveAndRetainLatest(threshold)
                           bindTimeStampItems(timestampList)
                         } finally {
                           withContext(Dispatchers.Main) {
@@ -125,7 +126,7 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
                   dialog.show()
                 }
               } else {
-                viewModel.setSnapshotAutoRemoveThreshold(-1)
+                viewModel.disableSnapshotAutoRemoveThreshold()
                 autoRemoveView.setAutoRemoveThreshold(-1)
                 recordChanged(false)
               }

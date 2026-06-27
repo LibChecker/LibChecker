@@ -30,6 +30,7 @@ import com.absinthe.libchecker.domain.snapshot.detail.SnapshotDetailSection
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.sync.SnapshotPackageChangeProcessor
 import com.absinthe.libchecker.domain.snapshot.timenode.BuildSnapshotTimeNodeItemsUseCase
+import com.absinthe.libchecker.domain.snapshot.timenode.UpdateSnapshotAutoRemoveThresholdUseCase
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -58,6 +59,7 @@ class SnapshotViewModel(
   private val formatSnapshotTimestampUseCase: FormatSnapshotTimestampUseCase,
   private val snapshotSelectionUseCase: SnapshotSelectionUseCase,
   private val snapshotSettingsRepository: SnapshotSettingsRepository,
+  private val updateSnapshotAutoRemoveThresholdUseCase: UpdateSnapshotAutoRemoveThresholdUseCase,
   private val updateSnapshotDiffItemsUseCase: UpdateSnapshotDiffItemsUseCase,
   private val snapshotTrackChangeRepository: SnapshotTrackChangeRepository
 ) : ViewModel() {
@@ -131,11 +133,15 @@ class SnapshotViewModel(
   }
 
   fun getSnapshotAutoRemoveThreshold(): Int {
-    return snapshotSettingsRepository.autoRemoveThreshold
+    return updateSnapshotAutoRemoveThresholdUseCase.currentThreshold
   }
 
-  fun setSnapshotAutoRemoveThreshold(threshold: Int) {
-    snapshotSettingsRepository.autoRemoveThreshold = threshold
+  fun disableSnapshotAutoRemoveThreshold() {
+    updateSnapshotAutoRemoveThresholdUseCase.disable()
+  }
+
+  suspend fun enableSnapshotAutoRemoveAndRetainLatest(threshold: Int): List<TimeStampItem> {
+    return updateSnapshotAutoRemoveThresholdUseCase.enableAndRetainLatest(threshold)
   }
 
   suspend fun compareItemDiff(
@@ -220,10 +226,6 @@ class SnapshotViewModel(
     val result = deleteSnapshotTimeStampUseCase(timestamp)
     currentTimeStamp = result.selectedTimestamp
     return result.remainingTimeStamps
-  }
-
-  suspend fun retainLatestSnapshotsAndGetTimeStamps(count: Int): List<TimeStampItem> {
-    return snapshotLibrary.retainLatestSnapshotsAndGetTimeStamps(count)
   }
 
   fun getFormatDateString(timestamp: Long): String {

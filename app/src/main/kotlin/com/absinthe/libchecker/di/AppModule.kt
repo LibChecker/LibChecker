@@ -176,6 +176,7 @@ import com.absinthe.libchecker.domain.snapshot.comparison.PrepareSnapshotCompari
 import com.absinthe.libchecker.domain.snapshot.detail.BuildSnapshotDetailSectionsUseCase
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.timenode.BuildSnapshotTimeNodeItemsUseCase
+import com.absinthe.libchecker.domain.snapshot.timenode.UpdateSnapshotAutoRemoveThresholdUseCase
 import com.absinthe.libchecker.domain.statistics.AndroidDistributionRepository
 import com.absinthe.libchecker.domain.statistics.BuildAbiChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.BuildApiLevelChartDataUseCase
@@ -465,6 +466,7 @@ val appModule = module {
   factory { GetTrackListItemsUseCase(androidContext().packageManager, get(), get()) }
   factory { SetPackageTrackedUseCase(get(), get()) }
   factory { DeleteSnapshotTimeStampUseCase(get(), get()) }
+  factory { UpdateSnapshotAutoRemoveThresholdUseCase(get(), get()) }
   factory { UpdateSnapshotDiffItemsUseCase() }
   factory { UpdateSnapshotTopAppsUseCase(get(), get()) }
   factory { BuildSnapshotDetailItemsUseCase(androidContext()) }
@@ -588,6 +590,7 @@ val appModule = module {
       formatSnapshotTimestampUseCase = get(),
       snapshotSelectionUseCase = get(),
       snapshotSettingsRepository = get(),
+      updateSnapshotAutoRemoveThresholdUseCase = get(),
       updateSnapshotDiffItemsUseCase = get(),
       snapshotTrackChangeRepository = get()
     )
