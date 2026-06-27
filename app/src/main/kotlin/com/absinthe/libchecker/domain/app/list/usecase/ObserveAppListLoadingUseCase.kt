@@ -1,6 +1,7 @@
-package com.absinthe.libchecker.domain.app
+package com.absinthe.libchecker.domain.app.list.usecase
 
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.app.FeatureInitializationRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged

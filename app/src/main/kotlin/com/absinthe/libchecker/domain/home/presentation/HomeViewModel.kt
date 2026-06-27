@@ -12,9 +12,7 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.ClearApkCacheUseCase
-import com.absinthe.libchecker.domain.app.InitializeAppListUseCase
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
-import com.absinthe.libchecker.domain.app.ObserveAppListLoadingUseCase
 import com.absinthe.libchecker.domain.app.PackageChangeState
 import com.absinthe.libchecker.domain.app.SyncAppListChangesUseCase
 import com.absinthe.libchecker.domain.app.list.export.ExportAppListToUriUseCase
@@ -22,6 +20,8 @@ import com.absinthe.libchecker.domain.app.list.export.ExportAppListUseCase
 import com.absinthe.libchecker.domain.app.list.usecase.AppListItemsEquivalenceUseCase
 import com.absinthe.libchecker.domain.app.list.usecase.BuildAppListUpdatePlanUseCase
 import com.absinthe.libchecker.domain.app.list.usecase.GetAppListContentUseCase
+import com.absinthe.libchecker.domain.app.list.usecase.InitializeAppListUseCase
+import com.absinthe.libchecker.domain.app.list.usecase.ObserveAppListLoadingUseCase
 import com.absinthe.libchecker.domain.app.search.HandleAppListSearchCommandUseCase
 import com.absinthe.libchecker.domain.app.sync.AppListChangeRequestQueue
 import com.absinthe.libchecker.services.IWorkerService
