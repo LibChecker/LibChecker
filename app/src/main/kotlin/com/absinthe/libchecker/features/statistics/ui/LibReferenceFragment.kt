@@ -345,31 +345,18 @@ class LibReferenceFragment :
             (activity as? INavViewContainer)?.showProgressBar()
             progressBarShown = true
           }
-          val savedRefList = libReferenceViewModel.savedRefList ?: return@launch
-          val filter = withContext(Dispatchers.Default) {
-            if (newText.isEmpty()) {
-              savedRefList
-            } else {
-              savedRefList.filter {
-                it.libName.contains(newText, ignoreCase = true) ||
-                  it.rule?.label?.contains(
-                    newText,
-                    ignoreCase = true
-                  ) == true
-              }
-            }
-          }
+          val searchResult = libReferenceViewModel.buildSearchResult(newText) ?: return@launch
           LibReferenceAdapter.highlightText = newText
 
           if (!isActive) {
             return@launch
           }
-          refAdapter.setList(filter)
+          refAdapter.setList(searchResult.references)
           doOnMainThreadIdle {
             refAdapter.setSpaceFooterView()
           }
 
-          if (newText.equals("Easter Egg", true)) {
+          if (searchResult.shouldShowEasterEgg) {
             context?.showToast("🥚")
             Telemetry.recordEvent(
               Constants.Event.EASTER_EGG,

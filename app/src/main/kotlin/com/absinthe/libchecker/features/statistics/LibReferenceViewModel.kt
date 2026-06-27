@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class LibReferenceViewModel(
   appListRepository: AppListRepository,
@@ -41,7 +42,7 @@ class LibReferenceViewModel(
     libReferenceComputationControllerFactory.create(viewModelScope, ::updateProgress)
   val libReference = libReferenceComputationController.libReference
 
-  val savedRefList: List<LibReference>?
+  private val savedRefList: List<LibReference>?
     get() = libReferenceComputationController.savedRefList
 
   private var hasRequestedInitialCompute = false
@@ -145,6 +146,27 @@ class LibReferenceViewModel(
     return buildLibReferenceDetailDialogRequestUseCase(name, type)
   }
 
+  suspend fun buildSearchResult(query: String): SearchResult? {
+    val references = savedRefList ?: return null
+    val filteredReferences = withContext(Dispatchers.Default) {
+      if (query.isEmpty()) {
+        references
+      } else {
+        references.filter {
+          it.libName.contains(query, ignoreCase = true) ||
+            it.rule?.label?.contains(
+              query,
+              ignoreCase = true
+            ) == true
+        }
+      }
+    }
+    return SearchResult(
+      references = filteredReferences,
+      shouldShowEasterEgg = query.equals(EASTER_EGG_QUERY, ignoreCase = true)
+    )
+  }
+
   private fun computeLibReference() {
     libReferenceComputationController.compute()
   }
@@ -192,8 +214,17 @@ class LibReferenceViewModel(
     val shouldShowLoading: Boolean
   )
 
+  data class SearchResult(
+    val references: List<LibReference>,
+    val shouldShowEasterEgg: Boolean
+  )
+
   private enum class DeferredReferenceWork {
     COMPUTE,
     MATCH
+  }
+
+  private companion object {
+    private const val EASTER_EGG_QUERY = "Easter Egg"
   }
 }
