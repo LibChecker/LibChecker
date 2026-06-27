@@ -33,6 +33,7 @@ import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.app.PackageChangeState
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotCapturePlan
+import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.sync.SnapshotPackageChangeProcessor
 import com.absinthe.libchecker.features.album.ui.AlbumActivity
@@ -84,8 +85,9 @@ class SnapshotFragment :
   private val viewModel: SnapshotViewModel by activityViewModel()
   private val getRandomAppIcon: GetRandomAppIconUseCase by inject()
   private val buildSnapshotAbiDisplayData: BuildSnapshotAbiDisplayDataUseCase by inject()
+  private val buildSnapshotUpdateTimeDisplayData: BuildSnapshotUpdateTimeDisplayDataUseCase by inject()
   private val adapter by lazy(LazyThreadSafetyMode.NONE) {
-    SnapshotAdapter(buildSnapshotAbiDisplayData)
+    SnapshotAdapter(buildSnapshotAbiDisplayData, buildSnapshotUpdateTimeDisplayData)
   }
   private val particleItemAnimator = ParticleRemoveItemAnimator()
   private val pendingParticleRemovePackageNames = linkedSetOf<String>()

@@ -6,6 +6,7 @@ import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.api.bean.GetAppUpdateInfo
 import com.absinthe.libchecker.domain.app.update.BuildInAppUpdateDiffDataUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCase
+import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
 import com.absinthe.libchecker.features.settings.SettingsViewModel
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Toasty
@@ -22,12 +23,14 @@ class InAppUpdateDialogFragment : BaseBottomSheetViewDialogFragment<InAppUpdateD
 
   private val buildInAppUpdateDiffData: BuildInAppUpdateDiffDataUseCase by inject()
   private val buildSnapshotAbiDisplayData: BuildSnapshotAbiDisplayDataUseCase by inject()
+  private val buildSnapshotUpdateTimeDisplayData: BuildSnapshotUpdateTimeDisplayDataUseCase by inject()
   private val viewModel: SettingsViewModel by viewModel()
   private var getAppUpdateInfo: GetAppUpdateInfo? = null
 
   override fun initRootView(): InAppUpdateDialogView = InAppUpdateDialogView(
     requireContext(),
-    buildSnapshotAbiDisplayData
+    buildSnapshotAbiDisplayData,
+    buildSnapshotUpdateTimeDisplayData
   )
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()

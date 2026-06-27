@@ -17,23 +17,21 @@ import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCas
 import com.absinthe.libchecker.domain.snapshot.SnapshotAbiDisplayItem
 import com.absinthe.libchecker.domain.snapshot.SnapshotListDisplayOptions
 import com.absinthe.libchecker.domain.snapshot.SnapshotPackageIconSource
+import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
+import com.absinthe.libchecker.domain.snapshot.display.SnapshotUpdateTimeText
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.stableSnapshotDiffItemIdFor
 import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
 import com.absinthe.libchecker.features.snapshot.ui.view.SnapshotItemView
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
-import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.LCAppUtils
-import com.absinthe.libchecker.utils.extensions.PREINSTALLED_TIMESTAMP
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.setAlphaForAll
 import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
 import com.absinthe.libchecker.utils.extensions.sizeToString
-import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
-import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlin.math.abs
 
@@ -41,6 +39,7 @@ const val ARROW = "→"
 const val ARROW_REVERT = "←"
 class SnapshotAdapter(
   private val buildSnapshotAbiDisplayData: BuildSnapshotAbiDisplayDataUseCase,
+  private val buildSnapshotUpdateTimeDisplayData: BuildSnapshotUpdateTimeDisplayDataUseCase,
   private val cardMode: CardMode = CardMode.NORMAL
 ) : HighlightAdapter<SnapshotDiffItem>() {
 
@@ -48,12 +47,6 @@ class SnapshotAdapter(
     setHasStableIds(true)
   }
 
-  private val formatter by unsafeLazy {
-    SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-  }
-  private val formatterToday by unsafeLazy {
-    SimpleDateFormat("HH:mm:ss", Locale.getDefault())
-  }
   private var displayOptions = SnapshotListDisplayOptions()
   private var packageIconSources: Map<String, SnapshotPackageIconSource> = emptyMap()
   private var apexPackageNames: Set<String> = emptySet()
@@ -260,19 +253,22 @@ class SnapshotAdapter(
       }
       abiInfo.text = builder
 
-      updateTime.isVisible = displayOptions.showUpdateTime && cardMode != CardMode.GET_APP_UPDATE
-      if (updateTime.isVisible) {
-        val timeText = if (DateUtils.isTimestampToday(item.updateTime)) {
-          formatterToday.format(item.updateTime)
-        } else {
-          formatter.format(item.updateTime)
+      val updateTimeDisplayData = buildSnapshotUpdateTimeDisplayData(
+        BuildSnapshotUpdateTimeDisplayDataUseCase.Request(
+          updateTime = item.updateTime,
+          isVisible = displayOptions.showUpdateTime && cardMode != CardMode.GET_APP_UPDATE,
+          isApexPackage = item.packageName in apexPackageNames
+        )
+      )
+      updateTime.isVisible = updateTimeDisplayData != null
+      updateTimeDisplayData?.let { data ->
+        updateTime.text = when (val text = data.text) {
+          SnapshotUpdateTimeText.Preinstalled -> context.getString(R.string.snapshot_preinstalled_app)
+
+          is SnapshotUpdateTimeText.LastUpdated ->
+            context.getString(R.string.format_last_updated).format(text.timeText)
         }
-        updateTime.text = if (item.updateTime <= PREINSTALLED_TIMESTAMP) {
-          context.getString(R.string.snapshot_preinstalled_app)
-        } else {
-          context.getString(R.string.format_last_updated).format(timeText)
-        }
-        if (item.packageName in apexPackageNames) {
+        if (data.isApexPackage) {
           updateTime.append(", APEX")
         }
       }

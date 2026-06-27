@@ -171,6 +171,7 @@ import com.absinthe.libchecker.domain.snapshot.UpdateSnapshotTopAppsUseCase
 import com.absinthe.libchecker.domain.snapshot.backup.BuildSnapshotRestorePlanUseCase
 import com.absinthe.libchecker.domain.snapshot.comparison.PrepareSnapshotComparisonArchivesUseCase
 import com.absinthe.libchecker.domain.snapshot.detail.BuildSnapshotDetailSectionsUseCase
+import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.timenode.BuildSnapshotTimeNodeItemsUseCase
 import com.absinthe.libchecker.domain.statistics.AndroidDistributionRepository
 import com.absinthe.libchecker.domain.statistics.BuildAbiChartDataUseCase
@@ -438,6 +439,7 @@ val appModule = module {
   factory { BuildSnapshotComparisonPlanUseCase(get()) }
   factory { BuildSnapshotRestorePlanUseCase() }
   factory { BuildSnapshotListUpdatePlanUseCase(get(), get(), get()) }
+  factory { BuildSnapshotUpdateTimeDisplayDataUseCase() }
   factory { BuildSnapshotPairDiffUseCase() }
   factory { CaptureInstalledSnapshotUseCase(androidContext().packageManager, get(), get(), get()) }
   factory { CompareSnapshotItemsUseCase() }

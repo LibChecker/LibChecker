@@ -30,6 +30,7 @@ import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotComparisonPlan
 import com.absinthe.libchecker.domain.snapshot.comparison.SnapshotComparisonSide
+import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
 import com.absinthe.libchecker.features.album.comparison.SnapshotComparisonViewModel
 import com.absinthe.libchecker.features.album.comparison.ui.view.ComparisonDashboardHalfView
 import com.absinthe.libchecker.features.album.comparison.ui.view.ComparisonDashboardView
@@ -70,8 +71,9 @@ class ComparisonActivity :
   private val viewModel: SnapshotComparisonViewModel by viewModel()
   private val getRandomAppIcon: GetRandomAppIconUseCase by inject()
   private val buildSnapshotAbiDisplayData: BuildSnapshotAbiDisplayDataUseCase by inject()
+  private val buildSnapshotUpdateTimeDisplayData: BuildSnapshotUpdateTimeDisplayDataUseCase by inject()
   private val adapter by lazy(LazyThreadSafetyMode.NONE) {
-    SnapshotAdapter(buildSnapshotAbiDisplayData)
+    SnapshotAdapter(buildSnapshotAbiDisplayData, buildSnapshotUpdateTimeDisplayData)
   }
   private var archiveChoosingSide = SnapshotComparisonSide.LEFT
 
