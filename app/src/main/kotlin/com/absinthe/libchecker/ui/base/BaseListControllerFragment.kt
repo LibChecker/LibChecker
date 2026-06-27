@@ -11,7 +11,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewbinding.ViewBinding
-import com.absinthe.libchecker.features.home.HomeViewModel
+import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
 import rikka.widget.borderview.BorderViewDelegate
 
 abstract class BaseListControllerFragment<T : ViewBinding> :
@@ -36,9 +36,7 @@ abstract class BaseListControllerFragment<T : ViewBinding> :
       }
 
       override fun onStop(owner: LifecycleOwner) {
-        if (this == homeViewModel.controller) {
-          homeViewModel.controller = null
-        }
+        listControllerHost?.clearListController(this@BaseListControllerFragment)
       }
     })
   }
@@ -46,11 +44,12 @@ abstract class BaseListControllerFragment<T : ViewBinding> :
   override fun onVisibilityChanged(visible: Boolean) {
     super.onVisibilityChanged(visible)
     if (visible) {
-      if (this != homeViewModel.controller) {
-        homeViewModel.controller = this
-      }
+      listControllerHost?.setListController(this)
     }
   }
+
+  protected val listControllerHost: IListControllerHost?
+    get() = activity as? IListControllerHost
 
   override fun getBorderViewDelegate(): BorderViewDelegate? = borderDelegate
 
@@ -85,9 +84,7 @@ abstract class BaseListControllerFragment<T : ViewBinding> :
   }
 
   protected fun hasPackageChanged(): Boolean {
-    homeViewModel.workerBinder?.let {
-      val serverLastPackageChangedTime =
-        runCatching { it.lastPackageChangedTime }.getOrElse { return false }
+    homeViewModel.getWorkerLastPackageChangedTime()?.let { serverLastPackageChangedTime ->
       if (lastPackageChangedTime < serverLastPackageChangedTime) {
         lastPackageChangedTime = serverLastPackageChangedTime
         return true

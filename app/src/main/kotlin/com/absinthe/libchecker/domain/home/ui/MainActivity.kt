@@ -1,0 +1,431 @@
+package com.absinthe.libchecker.domain.home.ui
+
+import android.content.ComponentName
+import android.content.Intent
+import android.content.ServiceConnection
+import android.content.pm.PackageManager
+import android.os.Bundle
+import android.os.IBinder
+import android.view.Gravity
+import android.view.Menu
+import android.view.View
+import android.view.ViewGroup
+import androidx.appcompat.widget.SearchView
+import androidx.appcompat.widget.Toolbar
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.content.ContextCompat
+import androidx.core.view.MenuProvider
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.get
+import androidx.core.view.updatePadding
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
+import com.absinthe.libchecker.R
+import com.absinthe.libchecker.annotation.STATUS_INIT_END
+import com.absinthe.libchecker.annotation.STATUS_START_INIT
+import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.OnceTag
+import com.absinthe.libchecker.databinding.ActivityMainBinding
+import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
+import com.absinthe.libchecker.domain.home.ui.INavViewContainer
+import com.absinthe.libchecker.domain.home.ui.view.HomeToolbarTitleView
+import com.absinthe.libchecker.domain.rules.CloudRulesRepository
+import com.absinthe.libchecker.services.IWorkerService
+import com.absinthe.libchecker.services.WorkerService
+import com.absinthe.libchecker.ui.base.BaseActivity
+import com.absinthe.libchecker.ui.base.IAppBarContainer
+import com.absinthe.libchecker.ui.base.IListController
+import com.absinthe.libchecker.ui.base.IListControllerHost
+import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.Telemetry
+import com.absinthe.libchecker.utils.extensions.addBackStateHandler
+import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
+import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
+import com.absinthe.libchecker.utils.extensions.isKeyboardShowing
+import com.absinthe.libchecker.utils.extensions.setCurrentItem
+import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.navigation.NavigationBarView
+import jonathanfinerty.once.Once
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import timber.log.Timber
+
+const val PAGE_TRANSFORM_DURATION = 300L
+
+class MainActivity :
+  BaseActivity<ActivityMainBinding>(),
+  INavViewContainer,
+  IAppBarContainer,
+  IListControllerHost {
+
+  private val appViewModel: HomeViewModel by viewModel()
+  private val cloudRulesRepository: CloudRulesRepository by inject()
+  private var listController: IListController? = null
+
+  @Suppress("DEPRECATION")
+  private val navViewBehavior by lazy { HideBottomViewOnScrollBehavior<BottomNavigationView>() }
+  private val toolbarTitleView by lazy { HomeToolbarTitleView(this) }
+  private val workerServiceConnection = object : ServiceConnection {
+    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+      if (service?.pingBinder() == true) {
+        appViewModel.connectWorkerBinder(IWorkerService.Stub.asInterface(service))
+      }
+    }
+
+    override fun onServiceDisconnected(name: ComponentName?) {
+      appViewModel.disconnectWorkerBinder()
+    }
+  }
+  private val _menuProviders = hashSetOf<MenuProvider>()
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+
+    if (intent.getBooleanExtra(Constants.PP_FROM_CLOUD_RULES_UPDATE, false)) {
+      Timber.w("Reinitializing updated rule database")
+      cloudRulesRepository.reinitializeRules()
+    }
+
+    initView()
+    initObserver()
+    bindService(
+      Intent(this, WorkerService::class.java).apply {
+        setPackage(packageName)
+      },
+      workerServiceConnection,
+      BIND_AUTO_CREATE
+    )
+    appViewModel.clearApkCache()
+    handleIntent(intent)
+  }
+
+  override fun onNewIntent(intent: Intent) {
+    super.onNewIntent(intent)
+    handleIntent(intent)
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    unbindService(workerServiceConnection)
+  }
+
+  override fun onPause() {
+    super.onPause()
+    saveToolbarMenuState()
+  }
+
+  private fun saveToolbarMenuState() {
+    if (!isBindingInitialized()) {
+      return
+    }
+    val searchItem = binding.toolbar.menu?.findItem(R.id.search)
+    val searchView = searchItem?.actionView as? SearchView
+    val isExpanded = binding.toolbar.hasExpandedActionView() && searchItem?.isActionViewExpanded == true
+    appViewModel.saveToolbarSearchMenuState(
+      isExpanded = isExpanded,
+      query = searchView?.query?.toString().orEmpty()
+    )
+  }
+
+  override fun addMenuProvider(provider: MenuProvider) {
+    if (_menuProviders.contains(provider)) {
+      super.removeMenuProvider(provider)
+    }
+    super.addMenuProvider(provider)
+  }
+
+  override fun addMenuProvider(provider: MenuProvider, owner: LifecycleOwner) {
+    if (_menuProviders.contains(provider)) {
+      super.removeMenuProvider(provider)
+    }
+    super.addMenuProvider(provider, owner)
+  }
+
+  override fun addMenuProvider(
+    provider: MenuProvider,
+    owner: LifecycleOwner,
+    state: Lifecycle.State
+  ) {
+    if (_menuProviders.contains(provider)) {
+      super.removeMenuProvider(provider)
+    }
+    super.addMenuProvider(provider, owner, state)
+  }
+
+  override fun removeMenuProvider(provider: MenuProvider) {
+    super.removeMenuProvider(provider)
+    _menuProviders.remove(provider)
+  }
+
+  override fun showNavigationView() {
+    // NavigationRailView 不需要隐藏，所以不需要显示
+    if (binding.navView is BottomNavigationView) {
+      navViewBehavior.slideUp(binding.navView as BottomNavigationView)
+    }
+  }
+
+  override fun hideNavigationView() {
+    // NavigationRailView 不需要隐藏
+    if (binding.navView is BottomNavigationView) {
+      navViewBehavior.slideDown(binding.navView as BottomNavigationView)
+    }
+  }
+
+  override fun showProgressBar() {
+    Timber.d("showProgressBar")
+    binding.progressHorizontal.show()
+  }
+
+  override fun hideProgressBar() {
+    Timber.d("hideProgressBar")
+    binding.progressHorizontal.hide()
+  }
+
+  override fun setListController(controller: IListController) {
+    listController = controller
+  }
+
+  override fun clearListController(controller: IListController) {
+    if (listController === controller) {
+      listController = null
+    }
+  }
+
+  override fun isCurrentListController(controller: IListController): Boolean {
+    return listController === controller
+  }
+
+  override fun scheduleAppbarLiftingStatus(isLifted: Boolean) {
+    binding.appbar.isLifted = isLifted
+  }
+
+  override fun setLiftOnScrollTargetView(targetView: View) {
+    binding.appbar.setLiftOnScrollTargetView(targetView)
+  }
+
+  private fun initView() {
+    val navView = binding.navView as NavigationBarView
+    setSupportActionBar(binding.toolbar)
+    binding.toolbar.isBackInvokedCallbackEnabled = false
+    setupToolbarTitle()
+
+    binding.apply {
+      container.bringChildToFront(binding.appbar)
+      viewpager.apply {
+        adapter = object : FragmentStateAdapter(this@MainActivity) {
+          override fun getItemCount(): Int {
+            return HomeDestination.pageCount
+          }
+
+          override fun createFragment(position: Int): Fragment {
+            return HomeDestination.requirePageIndex(position).createFragment()
+          }
+        }
+
+        // 当ViewPager切换页面时，改变底部导航栏的状态
+        registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+          override fun onPageSelected(position: Int) {
+            super.onPageSelected(position)
+            navView.menu.findItem(HomeDestination.requirePageIndex(position).navigationItemId).isChecked = true
+            appViewModel.clearMenuState()
+          }
+        })
+
+        // 禁止左右滑动
+        isUserInputEnabled = false
+        offscreenPageLimit = 2
+        fixViewPager2Insets(this)
+      }
+
+      navView.apply {
+        if (this is BottomNavigationView) {
+          (layoutParams as CoordinatorLayout.LayoutParams).also {
+            it.behavior = navViewBehavior
+          }
+        }
+        requestLayout()
+        // 当 ViewPager 切换页面时，改变 ViewPager 的显示
+        setOnItemSelectedListener {
+          fun performClickNavigationItem(index: Int) {
+            if (binding.viewpager.currentItem != index) {
+              if (!binding.viewpager.isFakeDragging) {
+                binding.viewpager.setCurrentItem(index, PAGE_TRANSFORM_DURATION)
+              }
+            } else {
+              val clickFlag =
+                binding.viewpager.getTag(R.id.viewpager_tab_click) as? Boolean == true
+              if (!clickFlag) {
+                binding.viewpager.setTag(R.id.viewpager_tab_click, true)
+
+                lifecycleScope.launch {
+                  delay(200)
+                  binding.viewpager.setTag(R.id.viewpager_tab_click, false)
+                }
+              } else if (listController?.isAllowRefreshing() == true) {
+                listController?.onReturnTop()
+              }
+            }
+          }
+
+          HomeDestination.fromNavigationItemId(it.itemId)?.let { destination ->
+            performClickNavigationItem(destination.pageIndex)
+            true
+          } ?: false
+        }
+        importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        if (this is BottomNavigationView) {
+          fixBottomNavigationViewInsets(this)
+        } else {
+          applySystemBarsPadding(top = true, bottom = true)
+        }
+      }
+    }
+
+    onBackPressedDispatcher.addBackStateHandler(
+      lifecycleOwner = this,
+      enabledState = { !isKeyboardShowing() && binding.toolbar.hasExpandedActionView() },
+      handler = { binding.toolbar.collapseActionView() }
+    )
+  }
+
+  private fun setupToolbarTitle() {
+    supportActionBar?.title = null
+    binding.toolbar.title = null
+    toolbarTitleView.setTitle(LCAppUtils.setTitle(this))
+    if (toolbarTitleView.parent == null) {
+      binding.toolbar.addView(
+        toolbarTitleView,
+        Toolbar.LayoutParams(
+          ViewGroup.LayoutParams.WRAP_CONTENT,
+          ViewGroup.LayoutParams.MATCH_PARENT
+        ).apply {
+          gravity = Gravity.START or Gravity.CENTER_VERTICAL
+        }
+      )
+    }
+  }
+
+  override fun onResume() {
+    super.onResume()
+    if (appViewModel.shouldCheckPackagesPermissionOnResume()) {
+      val granted =
+        ContextCompat.checkSelfPermission(
+          this,
+          Constants.GET_INSTALLED_APPS
+        ) == PackageManager.PERMISSION_GRANTED
+      if (granted) {
+        appViewModel.onPackagesPermissionResult(isGranted = true)
+        appViewModel.initItems()
+      }
+    }
+  }
+
+  /**
+   * 覆盖掉 BottomNavigationView 内部的 OnApplyWindowInsetsListener 并避免其被软键盘顶起来
+   * @see BottomNavigationView.applyWindowInsets
+   */
+  private fun fixBottomNavigationViewInsets(view: BottomNavigationView) {
+    ViewCompat.setOnApplyWindowInsetsListener(view) { _, windowInsets ->
+      // 这里不直接使用 windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars())
+      // 因为它的结果可能受到 insets 传播链上层某环节的影响，出现了错误的 navigationBarsInsets
+      // 使用 WindowInsetsCompat.Type.systemBars() 以适配如 HyperOS Freeform 之类的奇怪的东西
+      val navigationBarsInsets =
+        ViewCompat.getRootWindowInsets(view)!!.getInsets(WindowInsetsCompat.Type.systemBars())
+      view.updatePadding(bottom = navigationBarsInsets.bottom)
+      windowInsets
+    }
+  }
+
+  private fun fixViewPager2Insets(view: ViewPager2) {
+    ViewCompat.setOnApplyWindowInsetsListener(view) { _, windowInsets ->
+      /* Do nothing */
+      windowInsets
+    }
+  }
+
+  private fun handleIntent(intent: Intent) {
+    HomeDestination.fromLaunchAction(intent.action)?.let {
+      binding.viewpager.setCurrentItem(it.pageIndex, false)
+    }
+    Telemetry.recordEvent(
+      Constants.Event.LAUNCH_ACTION,
+      mapOf(Telemetry.Param.VALUE to intent.action.toString())
+    )
+  }
+
+  private fun initObserver() {
+    appViewModel.apply {
+      if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
+        initItems()
+      }
+
+      effect.onEach {
+        when (it) {
+          is HomeViewModel.Effect.ReloadApps -> {
+            binding.viewpager.setCurrentItem(HomeDestination.APP_LIST.pageIndex, true)
+          }
+
+          is HomeViewModel.Effect.UpdateAppListStatus -> {
+            if (it.status == STATUS_START_INIT) {
+              doOnMainThreadIdle {
+                hideNavigationView()
+              }
+            } else if (it.status == STATUS_INIT_END) {
+              doOnMainThreadIdle {
+                showNavigationView()
+              }
+            }
+          }
+
+          else -> {}
+        }
+      }.launchIn(lifecycleScope)
+
+      toolbarLoading.onEach {
+        toolbarTitleView.setLoading(it)
+      }.launchIn(lifecycleScope)
+    }
+    appViewModel.packageChanges.onEach {
+      Timber.d("MainActivity received package change: $it")
+      appViewModel.packageChanged(it)
+    }.launchIn(lifecycleScope)
+  }
+
+  override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+    val result = super.onPrepareOptionsMenu(menu)
+    restoreToolbarMenuState()
+    return result
+  }
+
+  private fun restoreToolbarMenuState() {
+    if (!isBindingInitialized()) {
+      return
+    }
+    // Only restore state if menu exists and has search item
+    binding.toolbar.post {
+      val searchItem = binding.toolbar.menu?.findItem(R.id.search)
+      val searchMenuState = appViewModel.getToolbarSearchMenuState()
+      if (searchMenuState.isExpanded) {
+        val searchView = searchItem?.actionView as? SearchView
+        searchView?.let {
+          if (!searchItem.isActionViewExpanded) {
+            searchItem.expandActionView()
+            if (searchMenuState.query.isNotEmpty()) {
+              it.setQuery(searchMenuState.query, false)
+            }
+          }
+        }
+      }
+    }
+  }
+}

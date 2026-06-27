@@ -8,6 +8,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
+import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.LinearInterpolator
@@ -18,7 +19,6 @@ import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.withTranslation
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.UiUtils.toCircularBitmap
 import com.absinthe.libchecker.utils.extensions.dpToDimension
@@ -864,24 +864,22 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
     notifyBitmapQueueAvailable()
   }
 
-  fun setAppIconHighlightProvider() {
+  fun setAppIconHighlightProvider(loadIcon: suspend () -> Drawable?) {
     setHighlightIconProvider(object : HighlightIconProvider {
       override suspend fun produce(emitter: HighlightIconEmitter) {
-        val packageManager = context.packageManager
-        val defaultIcon = packageManager.defaultActivityIcon
+        val defaultIcon = context.packageManager.defaultActivityIcon
         var misses = 0
         while (true) {
           currentCoroutineContext().ensureActive()
           if (!isHighlightAnimationAvailable()) {
             break
           }
-          val ai = LocalAppDataSource.getRandomApplicationInfo()
-          if (ai == null) {
+          val icon = loadIcon()
+          if (icon == null) {
             delay(HIGHLIGHT_PROVIDER_RETRY_DELAY_MS)
             continue
           }
-          val drawable = ai.loadIcon(packageManager)
-            ?.takeIf { icon -> !UiUtils.drawablesAreEqual(icon, defaultIcon) }
+          val drawable = icon.takeIf { !UiUtils.drawablesAreEqual(it, defaultIcon) }
           if (drawable == null) {
             misses++
             if (misses >= HIGHLIGHT_PROVIDER_MAX_MISSES) {

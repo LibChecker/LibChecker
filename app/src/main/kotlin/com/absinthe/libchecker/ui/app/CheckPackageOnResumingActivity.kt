@@ -1,13 +1,14 @@
 package com.absinthe.libchecker.ui.app
 
 import androidx.viewbinding.ViewBinding
-import com.absinthe.libchecker.compat.PackageManagerCompat
-import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.domain.app.CheckRequiredPackageAvailabilityUseCase
 import com.absinthe.libchecker.ui.base.BaseActivity
-import com.absinthe.libchecker.utils.PackageUtils
+import org.koin.android.ext.android.inject
 import timber.log.Timber
 
 abstract class CheckPackageOnResumingActivity<VB : ViewBinding> : BaseActivity<VB>() {
+  private val checkRequiredPackageAvailability: CheckRequiredPackageAvailabilityUseCase by inject()
+
   abstract fun requirePackageName(): String?
   protected var isPackageReady: Boolean = false
 
@@ -15,14 +16,8 @@ abstract class CheckPackageOnResumingActivity<VB : ViewBinding> : BaseActivity<V
     super.onResume()
     if (isPackageReady) {
       requirePackageName()?.let { pkgName ->
-        runCatching {
-          if (pkgName.endsWith(Constants.TEMP_PACKAGE)) {
-            PackageManagerCompat.getPackageArchiveInfo(pkgName, 0)
-          } else {
-            PackageUtils.getPackageInfo(pkgName)
-          }
-        }.onFailure {
-          Timber.d("requirePackageName: $pkgName failed" + it.message)
+        if (!checkRequiredPackageAvailability(pkgName)) {
+          Timber.d("requirePackageName: $pkgName failed")
           finish()
         }
       }

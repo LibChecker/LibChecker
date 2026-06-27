@@ -1,197 +1,210 @@
 # AGENTS.md
 
-This guide applies to the whole repository. It is written for coding agents that
-need to make focused, buildable changes without rediscovering the project shape
-each time.
+Root instructions for coding agents in this repository. Keep this file short,
+operational, and focused on decisions that are easy to get wrong.
 
-## Project Snapshot
+## Core commands
 
-LibChecker is a Kotlin Android app for inspecting installed apps and external
-APK/APKS/XAPK/HAP files. It surfaces native libraries, DEX/static libraries,
-components, permissions, signatures, SDK metadata, snapshots, rule matches, and
-statistics. The README lists support for Android 7.0 through Android 16.
+Use the Gradle wrapper from the repository root. On macOS/Linux use
+`./gradlew`; on Windows use `.\gradlew.bat`. CI uses `./gradlew`.
 
-The Gradle build has two included modules:
-
-- `:app` is the Android application.
-- `:hidden-api` is a compile-only Android library containing hidden platform API
-  stubs and Rikka Refine annotations. Do not put runtime app logic here.
-
-The included `build-logic` build defines shared Android conventions and custom
-plugins used by the main build.
-
-## Repository Map
-
-- `app/src/main/kotlin/com/absinthe/libchecker/` is the app source root.
-- `app/src/main/res/` contains XML layouts, menus, themes, drawables, strings,
-  preferences, backup rules, FileProvider paths, and split-window rules.
-- `app/src/main/proto/LibChecker.proto` drives protobuf-generated code.
-- `app/src/main/aidl/` defines IPC interfaces for app services.
-- `app/src/foss/` and `app/src/market/` are flavor source sets. Keep matching
-  APIs in both flavors when touching telemetry or HarmonyOS delegates.
-- `app/schemas/` stores exported Room schemas. Update it when Room schema changes.
-- `app/proguard-rules.pro` and `app/aapt2-resources.cfg` affect release builds.
-- `app/foss/`, `app/market/`, `app/build/`, `build/`, `.gradle/`, and `.kotlin/`
-  are build outputs or local state unless a task explicitly targets artifacts.
-- `gradle/libs.versions.toml` is the dependency and plugin version catalog.
-- `.github/workflows/android.yml` runs formatting and release build checks.
-- `.github/copilot-instructions.md` has additional high-level AI guidance, but
-  this file is the practical root guide for agent work.
-
-## Build And Validation
-
-Use the Gradle wrapper. On this Windows workspace, prefer `.\gradlew.bat`; CI
-uses `./gradlew`.
-
-Common commands:
-
-- `.\gradlew.bat spotlessCheck` checks formatting and is the fast CI gate.
-- `.\gradlew.bat spotlessApply` formats Kotlin and Gradle Kotlin files.
-- `.\gradlew.bat :app:compileFossDebugKotlin` is a quick Kotlin compile check.
-- `.\gradlew.bat :app:assembleFossDebug` is useful after resource, manifest, or
-  packaging changes.
-- `.\gradlew.bat :app:assembleRelease` matches the CI build path for both
-  flavors and should be used for release, flavor, R8, ProGuard, or packaging
-  changes when feasible.
-
-Important build facts:
-
-- Java toolchain: 25.
-- Kotlin is configured through Gradle and the version catalog.
-- `compileSdk = 37`, `targetSdk = 37`, `minSdk = 24`.
-- `foss` is the default flavor. `market` adds Google/Firebase integrations and
-  market-specific source.
-- Version name and code are computed in `build-logic/src/main/kotlin/Projects.kt`
-  from `baseVersionName` and git history, so builds expect a real git checkout.
-- There are currently no dedicated unit-test dependencies configured. If tests
-  are introduced, put JVM tests under `src/test` and instrumented tests under
-  `src/androidTest`.
+- Format check: `./gradlew spotlessCheck`
+- Apply Kotlin/Gradle formatting: `./gradlew spotlessApply`
+- Fast Kotlin compile: `./gradlew :app:compileFossDebugKotlin`
+- Build a runnable debug APK: `./gradlew :app:assembleFossDebug`
+- Install the default debug flavor on a connected device:
+  `./gradlew :app:installFossDebug`
+- Manual device launch after installing debug should target
+  `com.absinthe.libchecker.debug`; `com.absinthe.libchecker` may be a separate
+  release install used for snapshot export/import checks.
+- Release/R8/package validation: `./gradlew :app:assembleRelease`
+- Market R8 rule check when full signing is blocked:
+  `./gradlew :app:minifyMarketReleaseWithR8`
+- Device UI validation: prefer AndroMeld MCP Phone Screen sessions for visible
+  launch, navigation, and UI-state checks. Use Gradle/adb for install and
+  package-state operations only when needed.
 
 For docs-only changes, a Gradle build is usually unnecessary. For source
-changes, run the narrowest relevant command plus `spotlessCheck` when practical.
+changes, run the narrowest command that covers the touched files plus
+`spotlessCheck` when practical. For resource, manifest, packaging, R8, flavor,
+or release behavior changes, run the matching assemble/minify task.
 
-## Code Style
+## Build facts
 
-- Follow `.editorconfig`: UTF-8, 2-space indentation, final newline, and no
-  trailing whitespace.
-- Kotlin and `.gradle.kts` formatting is enforced by Spotless with ktlint.
-- Trailing commas are disabled for Kotlin.
-- Keep dependency versions in `gradle/libs.versions.toml`; avoid inline versions
-  in module build files.
-- Repositories are centralized in `settings.gradle.kts`; do not add project-level
-  repositories.
-- Prefer Kotlin for app code. Java is present for low-level parsers and platform
-  stubs; keep it when extending those existing areas.
+- Java toolchain: 25.
+- SDK levels are configured in `build-logic/src/main/kotlin/Projects.kt`
+  (`compileSdk = 37`, `targetSdk = 37`, `minSdk = 24`).
+- `foss` is the default flavor. `market` adds Google/Firebase integrations.
+- There is no dedicated unit-test gate today. If tests are added, put JVM tests
+  under `src/test` and instrumented tests under `src/androidTest`.
+- Version name/code come from `baseVersionName` plus git state in
+  `build-logic/src/main/kotlin/Projects.kt`; build from a real git checkout.
+- CI runs `./gradlew --non-interactive spotlessCheck` and
+  `./gradlew --non-interactive app:assembleRelease`.
 
-## App Architecture
+## Module boundaries
 
-Main packages under `com.absinthe.libchecker`:
+- `:app` is the Android application. Put product behavior here.
+- `:hidden-api` is compile-only hidden platform API stubs and Rikka Refine
+  annotations. Never put runtime app logic here.
+- `build-logic/` owns shared Gradle conventions and custom plugins.
 
-- `LibCheckerApp.kt` initializes hidden API bypasses, Timber, telemetry, LCRules,
-  repositories, Dynamic Colors, split-window rules, Coil app-icon loading, and
-  cache cleanup.
-- `features/home/` contains the main activity and `HomeViewModel`.
-- `features/applist/` contains the app list and app/APK detail surfaces.
-  `DetailViewModel` coordinates native, static, DEX, component, permission,
-  metadata, signature, and Harmony ability analysis.
-- `features/snapshot/` and `features/album/` cover snapshots, diffs, backups,
-  comparisons, and package tracking.
-- `features/statistics/` and `features/chart/` build library reference and chart
-  views from collected app data.
-- `database/` contains `LCDatabase`, `LCDao`, `LCRepository`, Room entities,
-  migrations, and backup helpers.
-- `data/app/` is the installed-app data source and package-change flow.
-- `api/` holds Retrofit/OkHttp requests and endpoint switching.
-- `services/` contains `ShootService`, `WorkerService`, and their AIDL contracts.
-- `ui/base/`, `ui/app/`, `ui/adapter/`, and `view/` hold shared UI base classes,
-  custom views, drawables, spans, and RecyclerView helpers.
-- `utils/` contains APK/APKS/XAPK parsing, manifest readers, DEX helpers, ELF
-  parsing, package utilities, OS/version compatibility helpers, preferences,
-  logging trees, and extension functions.
+Important `:app` boundaries:
+
+- `features/*` is legacy user-facing flow structure. When touching it for
+  refactors, prefer migrating a focused vertical slice into the matching
+  `domain/*` product package with clear `presentation`, `ui`, `model`,
+  `usecase`, and `repository` subpackages. Keep view constants, spans, and
+  adapter-only icon types in UI; move reusable parsing/data preparation behind
+  workflow-focused modules instead of flat directories of tiny use cases.
+- Shared `view/` widgets own rendering, accessibility metadata, and animation
+  only; pass feature/domain data in through providers instead of importing
+  `data/*`.
+- `domain/app/` owns app-list use cases and repository/factory interfaces.
+  Keep package-list synchronization rules here instead of in UI controllers.
+  Put feature-specific app-domain use cases and display models in focused
+  subpackages instead of growing the root package by default.
+- `data/app/` adapts Android package APIs, Room repositories, and local
+  package-change sources to the `domain/app/` interfaces.
+- `domain/statistics/` owns statistics/reference computation rules. Keep
+  package scanning, package-info lookups, and rule-matching loops out of
+  fragments, ViewModels, and chart data sources.
+- `data/statistics/` adapts remote or cached statistics sources, such as Android
+  version distribution, to `domain/statistics/` interfaces.
+- `domain/snapshot/` owns snapshot models, archive, capture, and diff seams;
+  keep package-to-snapshot conversion and diff rules out of UI controllers and
+  services.
+- `data/snapshot/` adapts Android, protobuf archive format, and local snapshot
+  storage to `domain/snapshot/` interfaces.
 - `compat/` wraps platform/API-level differences. Check here before adding new
-  direct SDK-version branches.
+  SDK-version branches.
+- `utils/apk`, `utils/manifest`, `utils/dex`, `utils/elf`, `PackageUtils`,
+  `PackageManagerCompat`, and `PackageInfoExtensions` own package parsing and
+  package-manager helpers. Reuse them before adding another parser.
+- `database/` owns Room entities, DAO, repository, migrations, schemas, and
+  backup helpers.
+- `app/src/foss/` and `app/src/market/` are flavor source sets. Keep matching
+  APIs when touching flavor delegates.
+- `app/src/main/res/values/strings.xml` is for user-facing strings.
+  `values/untranslatable.xml` is only for strings that should not go through
+  Crowdin.
 
-Prefer adding code near the feature or utility that already owns the behavior.
-Avoid broad refactors while fixing a narrow issue.
+## Style and naming
 
-## UI Patterns
+- Follow `.editorconfig`: UTF-8, 2-space indentation, final newline, no trailing
+  whitespace.
+- Kotlin and `.gradle.kts` formatting is enforced by Spotless/ktlint.
+- Kotlin trailing commas are disabled.
+- Keep dependency versions in `gradle/libs.versions.toml`; wire them through
+  catalog aliases.
+- Repositories are centralized in `settings.gradle.kts`; do not add module-level
+  repositories.
+- Prefer Kotlin for app code. Keep Java in existing Java-heavy parser/stub areas.
+- Use XML layouts and ViewBinding, not Jetpack Compose UI.
+- Activities/fragments should follow existing `BaseActivity<VB>`,
+  `BaseFragment<VB>`, and `IBinding` patterns.
+- Dependency injection uses Koin. Put app-wide bindings in `di/AppModule.kt`;
+  inject ViewModels through Koin instead of default-constructing repositories,
+  use cases, or platform adapters inside ViewModels.
+- Use `Timber` instead of Android `Log`.
+- Follow existing resource prefixes such as `activity_*`, `fragment_*`,
+  `item_*`, `layout_*`, `ic_*`, and `bg_*`.
 
-- The app uses XML layouts and ViewBinding, not Jetpack Compose UI.
-- Activities generally extend `BaseActivity<VB>` and fragments extend
-  `BaseFragment<VB>` or related base classes. Implement `inflateBinding` through
-  the existing `IBinding` pattern.
-- `BaseActivity` handles theme application, locale wrapping, edge-to-edge setup,
-  and common inset padding. Reuse existing inset extension helpers.
-- `BaseFragment` owns a nullable binding and clears it in `onDestroyView`; do not
-  keep view references past the fragment view lifecycle.
-- Keep UI work on the main thread and heavy parsing/database work on
-  `Dispatchers.IO` or `Dispatchers.Default`.
-- Prefer existing adapter, node/provider, and custom view patterns in the target
-  feature before introducing new UI infrastructure.
-- Use `Timber` for logging instead of Android `Log`.
+## Data, UI, and release constraints
 
-## Data, Parsing, And Rules
+- Room schema changes require a database version bump, migration or
+  auto-migration, and updated `app/schemas/`.
+- UI controllers should not call `Repositories.lcRepository` directly for new
+  or refactored paths; route persistence through ViewModels and domain use
+  cases/repositories.
+- Avoid package-manager, archive, or freeze-state lookups in UI controllers or
+  RecyclerView/view binding; precompute through ViewModels/use cases on a
+  background thread.
+- Heavy package scanning, zip reads, DEX parsing, ELF parsing, database writes,
+  and network calls must run off the main thread.
+- Package analysis must keep working for installed apps, APK, split APK, APKS,
+  XAPK, HAP, missing icons/labels, corrupted archives, and OEM/API differences.
+- Prefer `FileProvider` for sharing/exporting app files. Any legacy `file://`
+  exposure must stay narrowly scoped and idempotent; new paths should not
+  expand it.
+- Keep `foss` free of market-only Google/Firebase behavior.
+- Review manifests carefully when changing exported activities, deep links,
+  FileProvider, Shizuku provider authorities, package visibility, foreground
+  services, or sensitive permissions.
+- When moving UI component packages, update manifest entries, direct intent
+  refs, layout `tools:context`, and split/window embedding configs together.
+- Update keep rules when adding reflection, generated binding entry points,
+  JavaScript interfaces, Parcelable creators, or hidden/private API access.
 
-- Room app data lives in `LCDatabase`. When changing entities or DAO schema:
-  bump the database version, add a migration or auto-migration, and update
-  `app/schemas/`.
-- `LCRepository` is the main app database repository. `Repositories` owns app-wide
-  repository/database access and rules database file cleanup.
-- Library matching is provided by the external LCRules/rules bundle dependency.
-  Avoid duplicating rule matching logic in UI code.
-- Package analysis must handle installed apps, split APKs, APKS/XAPK archives,
-  external APK files, Harmony/HAP metadata, missing icons/labels, corrupted
-  archives, and OEM/API-level behavior differences.
-- Use existing helpers such as `PackageUtils`, `PackageManagerCompat`,
-  `PackageInfoExtensions`, `utils/apk`, `utils/manifest`, `utils/dex`, and
-  `utils/elf` before adding another parser.
-- Never block the main thread with package scanning, zip reads, DEX parsing, ELF
-  parsing, database writes, or network calls.
+## Environment gotchas
 
-## Flavors, Permissions, And Release Behavior
+- If Gradle/Kotlin validation fails because local writes under `~/.gradle`,
+  `~/.android`, file watchers, or the Kotlin daemon are blocked, retry with:
+  `GRADLE_USER_HOME=/private/tmp/libchecker-gradle-home`
+  `ANDROID_USER_HOME=/private/tmp/libchecker-android-home`
+  `-Dorg.gradle.vfs.watch=false`
+  `-Dkotlin.compiler.execution.strategy=in-process`
+- Keep `ANDROID_USER_HOME` stable across debug installs. Switching debug
+  keystores can cause `INSTALL_FAILED_UPDATE_INCOMPATIBLE`; prefer the existing
+  temp Android home before uninstalling debug.
+- Do not treat every Gradle deprecation trace as repo-owned. Recent AGP traces
+  such as `VariantDependenciesBuilder.createTestComponents` were upstream/plugin
+  noise, not a reason to rewrite project dependency access.
+- Keep `TYPESAFE_PROJECT_ACCESSORS` while `app/build.gradle.kts` uses
+  `projects.hiddenApi`.
+- Release signing may fail locally because debug/release keystore creation is
+  blocked. For R8 rule proof, inspect generated
+  `app/build/outputs/mapping/*/configuration.txt` and `mapping.txt`.
 
-- Keep `foss` free of market-only Google/Firebase behavior. The FOSS source set
-  contains stubs for APIs that the market flavor implements differently.
-- `market` includes Firebase/Crashlytics and Google services dependencies.
-- Manifest changes can affect exported activities, deep links, FileProvider,
-  Shizuku provider authorities, package visibility, and foreground services.
-  Review `app/src/main/AndroidManifest.xml` plus flavor/debug manifests.
-- Be conservative with permissions, especially `QUERY_ALL_PACKAGES`, notification,
-  foreground service, package installer, file URI, and Shizuku-related behavior.
-- Release builds use R8/resource shrinking and custom AAPT2 resource optimization.
-  Update `app/proguard-rules.pro` when adding reflection, generated binding entry
-  points, Javascript interfaces, Parcelable creators, or hidden/private API access.
+## NEVER
 
-## Resources And Localization
+- Never revert or overwrite user changes unless explicitly asked.
+- Never commit generated build output, `.gradle/`, `.kotlin/`, `app/build/`,
+  `app/foss/`, or `app/market/`.
+- Never move runtime logic into `:hidden-api`.
+- Never add Google/Firebase behavior to `foss`.
+- Never hand-update all translated `values-*` resources unless explicitly asked;
+  Crowdin handles synchronization.
+- Never block the main thread with package parsing, database, zip, DEX, ELF, or
+  network work.
+- Never add inline dependency versions or project-level repositories.
+- Never broaden a narrow bug fix into an unrelated refactor.
+- Never remove `projects.hiddenApi` or `TYPESAFE_PROJECT_ACCESSORS` just because
+  of an upstream Gradle/AGP warning.
+- Never use destructive git commands such as `git reset --hard`, `git clean`, or
+  checkout-based reverts unless the user explicitly requests them.
 
-- Add new user-facing strings to `app/src/main/res/values/strings.xml`.
-- Use `app/src/main/res/values/untranslatable.xml` only for strings that should
-  not go through Crowdin.
-- Do not hand-update every translated `values-*` file unless the task explicitly
-  asks for translations; Crowdin handles synchronization.
-- Follow existing resource naming: `activity_*`, `fragment_*`, `item_*`,
-  `layout_*`, `ic_*`, and `bg_*`.
-- Prefer existing theme colors, dimensions, and styles instead of hardcoded
-  colors or sizes in layouts.
+## Agent workflow
 
-## Dependency Changes
+1. Start with `git status --short`.
+2. Inspect the smallest relevant area with `rg` or `rg --files`.
+3. Read existing local patterns before editing.
+4. For refactors, prefer cohesive batches that move an entire boundary before
+   polishing details. Prioritize high-traffic flows and oversized controllers
+   before low-frequency tooling. Keep domain package-layout cleanup separate
+   from behavior changes; group crowded use-case/interface/model packages in a
+   mechanical slice. Avoid thin pass-through extractions and
+   generated/build-output churn.
+5. Run `spotlessApply` only when formatting needs fixing.
+6. Run the narrowest relevant validation command. If adapters, view-state
+   mapping, menus, navigation, or visible strings changed, add a focused
+   AndroMeld smoke on the affected flow when a device is available. Report
+   exactly what passed, failed, or was skipped.
+7. Before committing code, consider `AGENTS.md` only for durable, recurring
+   rules. Keep it compact: merge with existing bullets, replace stale guidance,
+   or delete obsolete notes before appending. Put one-off decisions and
+   low-frequency background in commit messages, issues, or Skills instead.
 
-- Add or update libraries in `gradle/libs.versions.toml` first.
-- Wire dependencies through `app/build.gradle.kts` using catalog aliases.
-- Put flavor-only dependencies in the matching configuration, for example
-  `marketImplementation` or `marketCompileOnly`.
-- Keep KSP arguments in sync with processors. Room schemas currently write to
-  `app/schemas`.
+## Compact instructions
 
-## Suggested Agent Workflow
+If context is compacted, preserve these facts:
 
-1. Start with `git status --short` and inspect the smallest relevant area with
-   `rg` or `rg --files`.
-2. Read the existing feature code before editing; this project has many local
-   patterns that are cheaper to reuse than replace.
-3. Keep edits focused and avoid generated/build output churn.
-4. After Kotlin or Gradle changes, run `spotlessApply` if needed, then
-   `spotlessCheck`.
-5. Run the narrowest compile/build task that covers the files touched.
-6. If a validation command is skipped, state why in the final response.
-
+- Current user request and any exact issue/PR/comment/commit links.
+- Files already read and files changed.
+- Commands run and their pass/fail/blocker results.
+- Any user constraints, especially flavor, release, R8, accessibility, or
+  copyability requirements.
+- Current git status and whether changes are user-owned or agent-owned.
+- Environment workaround state, including temp Gradle/Android homes and Kotlin
+  in-process/VFS flags.
+- Any unresolved decision that must not be guessed after compaction.

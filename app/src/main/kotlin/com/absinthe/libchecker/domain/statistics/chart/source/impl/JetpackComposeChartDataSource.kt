@@ -1,0 +1,107 @@
+package com.absinthe.libchecker.domain.statistics.chart.source.impl
+
+import android.content.Context
+import androidx.core.graphics.toColorInt
+import com.absinthe.libchecker.R
+import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.statistics.chart.model.ChartSourceItem
+import com.absinthe.libchecker.domain.statistics.chart.source.BaseChartDataSource
+import com.absinthe.libchecker.domain.statistics.chart.usecase.FeatureFlagChartData
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
+import info.appdev.charting.charts.PieChart
+import info.appdev.charting.data.PieData
+import info.appdev.charting.data.PieDataSet
+import info.appdev.charting.data.PieEntryFloat
+import info.appdev.charting.formatter.PercentFormatter
+import info.appdev.charting.utils.PointF
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+class JetpackComposeChartDataSource(
+  items: List<LCItem>,
+  private val buildComposeChartData: suspend (List<LCItem>) -> FeatureFlagChartData?
+) : BaseChartDataSource<PieChart>(items) {
+  override val classifiedMap: HashMap<Int, ChartSourceItem> = HashMap(2)
+
+  override suspend fun fillChartView(chartView: PieChart, onProgressUpdated: (Int) -> Unit) {
+    withContext(Dispatchers.Default) {
+      val context = chartView.context ?: return@withContext
+      val parties = listOf(
+        context.resources.getString(R.string.string_compose_used),
+        context.resources.getString(R.string.string_compose_unused)
+      )
+      val entries: ArrayList<PieEntryFloat> = ArrayList()
+      val colorOnSurface = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
+      val classifiedList = listOf(mutableListOf<LCItem>(), mutableListOf())
+      classifiedMap.clear()
+      val chartData = buildComposeChartData(items) ?: return@withContext
+
+      classifiedList[COMPOSE_USED].addAll(chartData.matched)
+      classifiedList[COMPOSE_UNUSED].addAll(chartData.unmatched)
+
+      classifiedMap[COMPOSE_USED] = ChartSourceItem(
+        com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetpack_compose,
+        false,
+        classifiedList[COMPOSE_USED]
+      )
+      classifiedMap[COMPOSE_UNUSED] = ChartSourceItem(
+        com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetpack_compose,
+        true,
+        classifiedList[COMPOSE_UNUSED]
+      )
+
+      // NOTE: The order of the entries when being added to the entries array determines their position around the center of
+      // the chart.
+      val legendList = mutableListOf<String>()
+      for (i in parties.indices) {
+        entries.add(PieEntryFloat(classifiedList[i].size.toFloat(), parties[i % parties.size]))
+        legendList.add(parties[i % parties.size])
+      }
+      val dataSet = PieDataSet(entries, "").apply {
+        isDrawIcons = false
+        sliceSpace = 3f
+        iconsOffset = PointF(0f, 40f)
+        selectionShift = 5f
+        xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+        yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+        valueLineColor = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
+      }
+
+      // add a lot of colors
+      val colors = arrayListOf(
+        "#37bf6e".toColorInt(),
+        "#073042".toColorInt()
+      )
+
+      dataSet.setColors(colors)
+      // dataSet.setSelectionShift(0f);
+      val data = PieData(dataSet).apply {
+        setValueFormatter(PercentFormatter())
+        setValueTextSize(10f)
+        setValueTextColor(colorOnSurface)
+      }
+
+      withContext(Dispatchers.Main) {
+        chartView.apply {
+          this.data = data
+          setEntryLabelColor(colorOnSurface)
+          highlightValues(null)
+          invalidate()
+        }
+      }
+    }
+  }
+
+  override fun getLabelByXValue(context: Context, x: Int): String {
+    return when (x) {
+      COMPOSE_USED -> context.getString(R.string.string_compose_used)
+      COMPOSE_UNUSED -> context.getString(R.string.string_compose_unused)
+      else -> ""
+    }
+  }
+
+  companion object {
+    const val COMPOSE_USED = 0
+    const val COMPOSE_UNUSED = 1
+  }
+}

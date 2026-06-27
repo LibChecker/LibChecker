@@ -36,7 +36,7 @@
     tools:targetApi="36">
 
     <activity
-      android:name=".features.home.ui.MainActivity"
+      android:name=".domain.home.ui.MainActivity"
       android:configChanges="orientation"
       android:exported="true"
       android:launchMode="singleTop">
@@ -54,7 +54,7 @@
         android:resource="@xml/shortcuts" />
     </activity>
     <activity
-      android:name=".features.applist.detail.ui.AppDetailActivity"
+      android:name=".domain.app.detail.ui.AppDetailActivity"
       android:configChanges="orientation"
       android:exported="true"
       android:launchMode="singleTask">
@@ -75,7 +75,7 @@
       </intent-filter>
     </activity>
     <activity
-      android:name=".features.applist.detail.ui.ApkDetailActivity"
+      android:name=".domain.app.detail.ui.ApkDetailActivity"
       android:configChanges="orientation"
       android:exported="true"
       android:label="@string/detail_label"
@@ -94,14 +94,14 @@
       </intent-filter>
     </activity>
     <activity
-      android:name=".features.snapshot.detail.ui.SnapshotDetailActivity"
+      android:name=".domain.snapshot.detail.ui.SnapshotDetailActivity"
       android:configChanges="orientation" />
     <activity
-      android:name=".features.album.ui.AlbumActivity"
+      android:name=".domain.snapshot.album.ui.AlbumActivity"
       android:configChanges="orientation"
       android:label="@string/title_album" />
     <activity
-      android:name=".features.album.backup.ui.BackupActivity"
+      android:name=".domain.snapshot.backup.ui.BackupActivity"
       android:exported="true"
       android:label="@string/album_item_backup_restore_title">
       <intent-filter>
@@ -113,7 +113,7 @@
       </intent-filter>
     </activity>
     <activity
-      android:name=".features.album.comparison.ui.ComparisonActivity"
+      android:name=".domain.snapshot.comparison.ui.ComparisonActivity"
       android:exported="true"
       android:label="@string/album_item_comparison_title">
       <intent-filter>
@@ -123,18 +123,18 @@
       </intent-filter>
     </activity>
     <activity
-      android:name=".features.album.track.ui.TrackActivity"
+      android:name=".domain.snapshot.track.ui.TrackActivity"
       android:label="@string/album_item_track_title" />
     <activity
-      android:name=".features.statistics.ui.LibReferenceActivity"
+      android:name=".domain.statistics.reference.ui.LibReferenceActivity"
       android:configChanges="orientation"
       android:label="@string/tab_lib_reference_statistics"
       android:launchMode="singleTask" />
     <activity
-      android:name=".features.chart.ui.ChartActivity"
+      android:name=".domain.statistics.chart.ui.ChartActivity"
       android:label="@string/tab_chart" />
     <activity
-      android:name=".ui.bridge.BridgeActivity"
+      android:name=".domain.snapshot.list.ui.BridgeActivity"
       android:exported="true"
       android:theme="@style/Transparent">
 

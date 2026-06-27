@@ -1,8 +1,8 @@
 package com.absinthe.libchecker.integrations.blocker
 
 import android.content.Context
+import android.os.Bundle
 import androidx.core.net.toUri
-import androidx.core.os.bundleOf
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.PROVIDER
@@ -59,9 +59,9 @@ class BlockerManager {
         )
       )
     )
-    val bundle = bundleOf(
-      "cmp_list" to shareCmpInfo.toJson()
-    )
+    val bundle = Bundle().apply {
+      putString("cmp_list", shareCmpInfo.toJson())
+    }
     try {
       context.contentResolver.call(URI_AUTHORIZATION.toUri(), "blocks", packageName, bundle)
     } catch (e: Exception) {

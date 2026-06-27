@@ -7,6 +7,7 @@ firebase-bom = "34.15.0"
 hiddenApiRefine = "4.4.0"
 kotlin = "2.4.0"
 ktlint = "1.8.0"
+koin-bom = "4.1.1"
 protoc = "4.35.1"
 shizuku = "13.1.5"
 square-retrofit = "3.0.0"
@@ -31,6 +32,8 @@ gradlePlugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", ve
 gradlePlugin-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradle", version = "8.7.0" }
 
 kotlinX-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0"
+koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin-bom" }
+koin-android = { module = "io.insert-koin:koin-android" }
 
 androidX-activity = "androidx.activity:activity-ktx:1.13.0"
 androidX-annotation = "androidx.annotation:annotation:1.10.0"
