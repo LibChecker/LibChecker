@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.snapshot.ui.view
+package com.absinthe.libchecker.domain.snapshot.timenode.ui.view
 
 import android.content.Context
 import android.text.style.ImageSpan

@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.snapshot.ui.adapter
+package com.absinthe.libchecker.domain.snapshot.timenode.ui.adapter
 
 import android.util.TypedValue
 import android.view.Gravity
@@ -6,8 +6,8 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import com.absinthe.libchecker.domain.snapshot.FormatSnapshotTimestampUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotPackageIconSource
-import com.absinthe.libchecker.domain.snapshot.timenode.SnapshotTimeNodeItem
-import com.absinthe.libchecker.features.snapshot.ui.view.TimeNodeItemView
+import com.absinthe.libchecker.domain.snapshot.timenode.model.SnapshotTimeNodeItem
+import com.absinthe.libchecker.domain.snapshot.timenode.ui.view.TimeNodeItemView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 

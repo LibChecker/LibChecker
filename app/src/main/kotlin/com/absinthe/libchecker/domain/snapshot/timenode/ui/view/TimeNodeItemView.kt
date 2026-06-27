@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.snapshot.ui.view
+package com.absinthe.libchecker.domain.snapshot.timenode.ui.view
 
 import android.content.Context
 import android.util.TypedValue
@@ -10,7 +10,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.features.snapshot.ui.adapter.TimeNodeItemAdapter
+import com.absinthe.libchecker.domain.snapshot.timenode.ui.adapter.TimeNodeItemAdapter
 import com.absinthe.libchecker.view.AViewGroup
 
 class TimeNodeItemView(context: Context) : AViewGroup(context) {

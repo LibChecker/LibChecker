@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.snapshot.ui.adapter
+package com.absinthe.libchecker.domain.snapshot.timenode.ui.adapter
 
 import android.view.View
 import android.view.ViewGroup

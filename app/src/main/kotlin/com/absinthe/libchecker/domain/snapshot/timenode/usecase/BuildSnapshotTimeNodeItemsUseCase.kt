@@ -1,6 +1,7 @@
-package com.absinthe.libchecker.domain.snapshot.timenode
+package com.absinthe.libchecker.domain.snapshot.timenode.usecase
 
 import com.absinthe.libchecker.database.entity.TimeStampItem
+import com.absinthe.libchecker.domain.snapshot.timenode.model.SnapshotTimeNodeItem
 import com.absinthe.libchecker.utils.fromJson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -32,8 +33,3 @@ class BuildSnapshotTimeNodeItemsUseCase {
     val topAppPackageNames: List<String>
   )
 }
-
-data class SnapshotTimeNodeItem(
-  val timestamp: Long,
-  val topAppPackageNames: List<String>
-)
