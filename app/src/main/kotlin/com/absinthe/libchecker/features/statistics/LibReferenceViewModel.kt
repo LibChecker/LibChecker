@@ -43,6 +43,11 @@ class LibReferenceViewModel(
     libReferenceComputationControllerFactory.create(viewModelScope, ::updateProgress)
   val libReference = libReferenceComputationController.libReference
   val thresholdChanges: Flow<Int> = libReferenceSettingsRepository.thresholdChanges
+  val showSystemAppsChanges: Flow<Unit> = libReferenceSettingsRepository.showSystemAppsChanges
+  val colorfulRuleIconChanges: Flow<Boolean> = libReferenceSettingsRepository.colorfulRuleIconChanges
+
+  val colorfulRuleIcon: Boolean
+    get() = libReferenceSettingsRepository.colorfulRuleIcon
 
   private val savedRefList: List<LibReference>?
     get() = libReferenceComputationController.savedRefList
@@ -141,6 +146,13 @@ class LibReferenceViewModel(
     }
     refreshRef()
     return null
+  }
+
+  fun onShowSystemAppsChanged(isVisible: Boolean): ReferenceWorkPlan? {
+    return requestComputeReference(
+      isVisible = isVisible,
+      needShowLoading = true
+    )
   }
 
   fun setData(name: String, @LibType type: Int) = viewModelScope.launch(Dispatchers.IO) {

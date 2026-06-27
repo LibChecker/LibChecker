@@ -14,9 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
-import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.features.applist.detail.ui.LibDetailDialogFragment
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
 import com.absinthe.libchecker.features.applist.ui.AdvancedMenuBSDFragment
@@ -45,7 +43,6 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
-import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import rikka.widget.borderview.BorderView
 
@@ -57,11 +54,10 @@ class LibReferenceFragment :
   BaseListControllerFragment<FragmentLibReferenceBinding>(),
   SearchView.OnQueryTextListener {
 
-  private val appListSettingsRepository: AppListSettingsRepository by inject()
   private val libReferenceViewModel: LibReferenceViewModel by viewModel()
   private val refAdapter by lazy {
     LibReferenceAdapter(
-      initialColorfulRuleIcon = appListSettingsRepository.colorfulRuleIcon,
+      initialColorfulRuleIcon = libReferenceViewModel.colorfulRuleIcon,
       onDetailIconClick = ::showLibReferenceDetail
     )
   }
@@ -195,23 +191,23 @@ class LibReferenceFragment :
         refAdapter.setSpaceFooterView()
         isListReady = true
       }.launchIn(lifecycleScope)
-    }
-    appListSettingsRepository.displayOptionsChanges.onEach { options ->
-      if (options and AdvancedOptions.SHOW_SYSTEM_APPS > 0) {
-        requestComputeRef(true)
-      }
-    }.launchIn(lifecycleScope)
-    appListSettingsRepository.colorfulRuleIconChanges.onEach { enabled ->
-      refAdapter.updateColorfulRuleIcon(enabled)
-    }.launchIn(lifecycleScope)
-    libReferenceViewModel.thresholdChanges.onEach { threshold ->
-      applyReferenceWork(
-        libReferenceViewModel.onThresholdChanged(
-          threshold = threshold,
-          isVisible = isFragmentVisible()
+      showSystemAppsChanges.onEach {
+        applyReferenceWork(
+          onShowSystemAppsChanged(isVisible = isFragmentVisible())
         )
-      )
-    }.launchIn(lifecycleScope)
+      }.launchIn(lifecycleScope)
+      colorfulRuleIconChanges.onEach { enabled ->
+        refAdapter.updateColorfulRuleIcon(enabled)
+      }.launchIn(lifecycleScope)
+      thresholdChanges.onEach { threshold ->
+        applyReferenceWork(
+          onThresholdChanged(
+            threshold = threshold,
+            isVisible = isFragmentVisible()
+          )
+        )
+      }.launchIn(lifecycleScope)
+    }
   }
 
   override fun onResume() {

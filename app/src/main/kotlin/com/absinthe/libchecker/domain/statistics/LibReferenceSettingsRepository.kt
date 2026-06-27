@@ -7,7 +7,10 @@ interface LibReferenceSettingsRepository {
   val threshold: Int
   var options: Int
   val showSystemApps: Boolean
+  val colorfulRuleIcon: Boolean
   val thresholdChanges: Flow<Int>
+  val showSystemAppsChanges: Flow<Unit>
+  val colorfulRuleIconChanges: Flow<Boolean>
 
   suspend fun setThreshold(threshold: Int)
 }
