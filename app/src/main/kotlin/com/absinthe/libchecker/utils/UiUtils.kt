@@ -25,7 +25,7 @@ import androidx.core.graphics.withClip
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.domain.settings.usecase.NightModeResolver
+import com.absinthe.libchecker.domain.settings.appearance.NightModeResolver
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libraries.utils.utils.UiUtils

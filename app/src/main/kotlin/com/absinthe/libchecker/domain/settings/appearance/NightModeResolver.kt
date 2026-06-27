@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.settings.usecase
+package com.absinthe.libchecker.domain.settings.appearance
 
 import androidx.appcompat.app.AppCompatDelegate
 import com.absinthe.libchecker.constant.Constants

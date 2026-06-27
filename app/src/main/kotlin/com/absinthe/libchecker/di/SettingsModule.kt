@@ -9,14 +9,9 @@ import com.absinthe.libchecker.domain.app.detail.ui.ApkDetailActivity
 import com.absinthe.libchecker.domain.app.update.AppUpdateRepository
 import com.absinthe.libchecker.domain.app.update.BuildInAppUpdateDiffDataUseCase
 import com.absinthe.libchecker.domain.settings.presentation.SettingsViewModel
+import com.absinthe.libchecker.domain.settings.presentation.SettingsWorkflow
 import com.absinthe.libchecker.domain.settings.repository.AppearanceSettingsRepository
 import com.absinthe.libchecker.domain.settings.repository.DeveloperSettingsRepository
-import com.absinthe.libchecker.domain.settings.usecase.BuildGetUpdatesItemsUseCase
-import com.absinthe.libchecker.domain.settings.usecase.BuildLocalePreferenceDataUseCase
-import com.absinthe.libchecker.domain.settings.usecase.BuildLogShareIntentUseCase
-import com.absinthe.libchecker.domain.settings.usecase.SelectDarkModeUseCase
-import com.absinthe.libchecker.domain.settings.usecase.SelectLocaleUseCase
-import com.absinthe.libchecker.domain.settings.usecase.SetApkAnalysisEnabledUseCase
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -27,35 +22,26 @@ val settingsModule = module {
   single<AppUpdateRepository> { AndroidAppUpdateRepository(SystemServices.downloadManager) }
 
   factory { BuildInAppUpdateDiffDataUseCase(BuildConfig.APPLICATION_ID, androidContext().packageManager, get()) }
-  factory { BuildGetUpdatesItemsUseCase(androidContext()) }
-  factory { BuildLocalePreferenceDataUseCase(get()) }
-  factory { BuildLogShareIntentUseCase(androidContext(), BuildConfig.APPLICATION_ID) }
-  factory { SelectDarkModeUseCase(get()) }
-  factory { SelectLocaleUseCase(get()) }
   factory {
-    SetApkAnalysisEnabledUseCase(
-      BuildConfig.APPLICATION_ID,
-      androidContext().packageManager,
-      ApkDetailActivity::class.java.name
+    SettingsWorkflow(
+      context = androidContext(),
+      applicationId = BuildConfig.APPLICATION_ID,
+      apkAnalysisActivityClassName = ApkDetailActivity::class.java.name,
+      appUpdateRepository = get(),
+      appListSettingsRepository = get(),
+      appearanceSettingsRepository = get(),
+      cloudRulesRepository = get(),
+      ruleSettingsRepository = get(),
+      snapshotSettingsRepository = get(),
+      exportInstalledAppsToUriUseCase = get(),
+      libReferenceSettingsRepository = get(),
+      updateLibReferenceThresholdUseCase = get()
     )
   }
 
   viewModel {
     SettingsViewModel(
-      appUpdateRepository = get(),
-      appListSettingsRepository = get(),
-      cloudRulesRepository = get(),
-      ruleSettingsRepository = get(),
-      snapshotSettingsRepository = get(),
-      buildGetUpdatesItemsUseCase = get(),
-      buildLocalePreferenceDataUseCase = get(),
-      buildLogShareIntentUseCase = get(),
-      exportInstalledAppsToUriUseCase = get(),
-      selectDarkModeUseCase = get(),
-      selectLocaleUseCase = get(),
-      setApkAnalysisEnabledUseCase = get(),
-      libReferenceSettingsRepository = get(),
-      updateLibReferenceThresholdUseCase = get()
+      settingsWorkflow = get()
     )
   }
 }
