@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.album.ui
+package com.absinthe.libchecker.domain.snapshot.album.ui
 
 import android.content.Intent
 import android.os.Bundle
@@ -11,11 +11,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.ActivityAlbumBinding
+import com.absinthe.libchecker.domain.snapshot.album.ui.adapter.AlbumAdapter
+import com.absinthe.libchecker.domain.snapshot.album.ui.view.AlbumItemView
 import com.absinthe.libchecker.domain.snapshot.backup.ui.BackupActivity
 import com.absinthe.libchecker.domain.snapshot.comparison.ui.ComparisonActivity
 import com.absinthe.libchecker.domain.snapshot.track.ui.TrackActivity
-import com.absinthe.libchecker.features.album.ui.adapter.AlbumAdapter
-import com.absinthe.libchecker.features.album.ui.view.AlbumItemView
 import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
 import com.absinthe.libchecker.features.snapshot.ui.TimeNodeBottomSheetDialogFragment
 import com.absinthe.libchecker.ui.base.BaseActivity

@@ -30,10 +30,10 @@
       window:secondaryActivityName="com.absinthe.libchecker.features.applist.detail.ui.AppDetailActivity" />
 
     <SplitPairFilter
-      window:primaryActivityName="com.absinthe.libchecker.features.album.ui.AlbumActivity"
-      window:secondaryActivityName="com.absinthe.libchecker.features.album.backup.ui.BackupActivity" />
+      window:primaryActivityName="com.absinthe.libchecker.domain.snapshot.album.ui.AlbumActivity"
+      window:secondaryActivityName="com.absinthe.libchecker.domain.snapshot.backup.ui.BackupActivity" />
     <SplitPairFilter
-      window:primaryActivityName="com.absinthe.libchecker.features.album.ui.AlbumActivity"
+      window:primaryActivityName="com.absinthe.libchecker.domain.snapshot.album.ui.AlbumActivity"
       window:secondaryActivityName="com.absinthe.libchecker.domain.snapshot.track.ui.TrackActivity" />
   </SplitPairRule>
 

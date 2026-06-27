@@ -97,7 +97,7 @@
       android:name=".features.snapshot.detail.ui.SnapshotDetailActivity"
       android:configChanges="orientation" />
     <activity
-      android:name=".features.album.ui.AlbumActivity"
+      android:name=".domain.snapshot.album.ui.AlbumActivity"
       android:configChanges="orientation"
       android:label="@string/title_album" />
     <activity

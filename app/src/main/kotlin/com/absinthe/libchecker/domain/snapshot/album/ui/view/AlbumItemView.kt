@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.album.ui.view
+package com.absinthe.libchecker.domain.snapshot.album.ui.view
 
 import android.content.Context
 import android.view.ViewGroup

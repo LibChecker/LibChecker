@@ -1,8 +1,8 @@
-package com.absinthe.libchecker.features.album.ui.adapter
+package com.absinthe.libchecker.domain.snapshot.album.ui.adapter
 
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import com.absinthe.libchecker.features.album.ui.view.AlbumItemView
+import com.absinthe.libchecker.domain.snapshot.album.ui.view.AlbumItemView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 

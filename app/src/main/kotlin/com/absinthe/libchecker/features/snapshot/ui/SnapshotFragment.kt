@@ -32,9 +32,9 @@ import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.snapshot.BuildSnapshotAbiDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotCapturePlan
+import com.absinthe.libchecker.domain.snapshot.album.ui.AlbumActivity
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
-import com.absinthe.libchecker.features.album.ui.AlbumActivity
 import com.absinthe.libchecker.features.home.HomeViewModel
 import com.absinthe.libchecker.features.home.INavViewContainer
 import com.absinthe.libchecker.features.snapshot.SnapshotViewModel
