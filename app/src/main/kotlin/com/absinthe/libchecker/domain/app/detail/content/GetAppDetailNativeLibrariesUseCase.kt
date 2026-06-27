@@ -9,6 +9,7 @@ import com.absinthe.libchecker.constant.Constants.NO_LIBS
 import com.absinthe.libchecker.constant.Constants.OVERLAY
 import com.absinthe.libchecker.constant.GlobalFeatures
 import com.absinthe.libchecker.database.RulesRepository
+import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
@@ -28,7 +29,8 @@ private const val ZYGOTE_PRELOAD_NATIVE_LIB_PROPERTY = "zygotePreloadNativeLib"
 private const val ZYGOTE_PRELOAD_NATIVE_LIB_LABEL = "PRELOAD"
 
 class GetAppDetailNativeLibrariesUseCase(
-  private val installedAppRepository: InstalledAppRepository
+  private val installedAppRepository: InstalledAppRepository,
+  private val buildNativeLibraryItemDisplayData: BuildNativeLibraryItemDisplayDataUseCase
 ) {
 
   operator fun invoke(
@@ -87,7 +89,12 @@ class GetAppDetailNativeLibrariesUseCase(
           add(ZYGOTE_PRELOAD_NATIVE_LIB_LABEL)
         }
       }
-      LibStringItemChip(it, rule, labels)
+      LibStringItemChip(
+        item = it,
+        rule = rule,
+        labels = labels,
+        nativeDisplayData = buildNativeLibraryItemDisplayData(it, labels)
+      )
     }.toMutableList()
 
     if (sortBySize) {

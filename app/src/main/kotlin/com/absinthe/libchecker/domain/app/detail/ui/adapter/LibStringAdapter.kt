@@ -38,6 +38,7 @@ import com.absinthe.libchecker.domain.app.detail.model.DISABLED
 import com.absinthe.libchecker.domain.app.detail.model.EXPORTED
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
+import com.absinthe.libchecker.domain.app.detail.model.NativeLibraryItemDisplayData
 import com.absinthe.libchecker.domain.app.detail.model.StaticLibItem
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_TEXT
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.XmlBSDFragment
@@ -233,11 +234,17 @@ class LibStringAdapter(
     )
   }
 
-  private fun getNativeSizeText(item: LibStringItemChip): CharSequence = nativeSizeTextCache.getOrPut(item.item to item.labels) {
-    val displayData = checkNotNull(buildNativeLibraryItemDisplayData) {
-      "BuildNativeLibraryItemDisplayDataUseCase is required for native library rows."
-    }(item.item, item.labels)
-    buildSpannedString {
+  private fun getNativeSizeText(item: LibStringItemChip): CharSequence {
+    return nativeSizeTextCache.getOrPut(item.item to item.labels) {
+      val displayData = item.nativeDisplayData ?: checkNotNull(buildNativeLibraryItemDisplayData) {
+        "BuildNativeLibraryItemDisplayDataUseCase is required for native library rows."
+      }(item.item, item.labels)
+      buildNativeSizeText(displayData)
+    }
+  }
+
+  private fun buildNativeSizeText(displayData: NativeLibraryItemDisplayData): CharSequence {
+    return buildSpannedString {
       append(displayData.sizeText)
       displayData.labels.forEach { label ->
         append(createNativeLabelSpan(label))
