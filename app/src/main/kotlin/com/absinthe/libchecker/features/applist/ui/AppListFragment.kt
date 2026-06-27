@@ -24,8 +24,6 @@ import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
-import com.absinthe.libchecker.domain.app.BuildAppListUpdatePlanUseCase
-import com.absinthe.libchecker.domain.app.GetAppListContentUseCase
 import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.app.search.HandleAppListSearchCommandUseCase
 import com.absinthe.libchecker.features.applist.detail.ui.view.EmptyListView
@@ -72,7 +70,6 @@ class AppListFragment :
   private val isFirstLaunch get() = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
   private val getRandomAppIcon: GetRandomAppIconUseCase by inject()
   private val handleAppListSearchCommand: HandleAppListSearchCommandUseCase by inject()
-  private val buildAppListUpdatePlan: BuildAppListUpdatePlanUseCase by inject()
   private val appAdapter = AppAdapter()
   private val particleItemAnimator = ParticleRemoveItemAnimator()
   private var updateItemsJob: Job? = null
@@ -460,12 +457,19 @@ class AppListFragment :
     delay(250)
     Timber.d("updateItemsImpl")
     val keyword = appAdapter.highlightText
-    val content = homeViewModel.getAppListContent(
+    val currentItems = withContext(Dispatchers.Main) {
+      appAdapter.data.toList()
+    }
+    val update = homeViewModel.buildAppListUpdate(
       keyword = keyword,
-      isCurrentProcess64Bit = android.os.Process.is64Bit()
+      isCurrentProcess64Bit = android.os.Process.is64Bit(),
+      currentItems = currentItems,
+      pendingReturnTopAfterRequestChange = pendingReturnTopAfterRequestChange,
+      highlightRefresh = highlightRefresh,
+      hasUserScrolledList = hasUserScrolledList
     )
-    when (content) {
-      GetAppListContentUseCase.Result.OnlySelf -> {
+    val updatePlan = when (update) {
+      HomeViewModel.AppListUpdate.OnlySelf -> {
         Timber.d("updateItemsImpl: only the app itself")
         if (homeViewModel.appListStatus == STATUS_NOT_START) {
           Once.clearDone(OnceTag.FIRST_LAUNCH)
@@ -474,22 +478,13 @@ class AppListFragment :
         return@launch
       }
 
-      is GetAppListContentUseCase.Result.Content -> Unit
+      is HomeViewModel.AppListUpdate.Content -> update.plan
     }
 
     if (!isActive) {
       return@launch
     }
     withContext(Dispatchers.Main) {
-      val updatePlan = buildAppListUpdatePlan(
-        BuildAppListUpdatePlanUseCase.Request(
-          currentItems = appAdapter.data,
-          content = content,
-          pendingReturnTopAfterRequestChange = pendingReturnTopAfterRequestChange,
-          highlightRefresh = highlightRefresh,
-          hasUserScrolledList = hasUserScrolledList
-        )
-      )
       appAdapter.apply {
         particleItemAnimator.prepareParticleRemovals(updatePlan.particleRemovalItemIds)
         setItemViewStates(updatePlan.content.itemViewStates)

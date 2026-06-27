@@ -12,6 +12,7 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppListItemsEquivalenceUseCase
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.AppListSettingsRepository
+import com.absinthe.libchecker.domain.app.BuildAppListUpdatePlanUseCase
 import com.absinthe.libchecker.domain.app.ClearApkCacheUseCase
 import com.absinthe.libchecker.domain.app.ExportAppListToUriUseCase
 import com.absinthe.libchecker.domain.app.ExportAppListUseCase
@@ -41,6 +42,7 @@ class HomeViewModel(
   private val syncAppListChangesUseCase: SyncAppListChangesUseCase,
   private val exportAppListToUriUseCase: ExportAppListToUriUseCase,
   private val getAppListContentUseCase: GetAppListContentUseCase,
+  private val buildAppListUpdatePlanUseCase: BuildAppListUpdatePlanUseCase,
   private val appListSettingsRepository: AppListSettingsRepository,
   private val clearApkCacheUseCase: ClearApkCacheUseCase,
   appListItemsEquivalenceUseCase: AppListItemsEquivalenceUseCase,
@@ -128,16 +130,37 @@ class HomeViewModel(
     }
   }
 
-  suspend fun getAppListContent(
+  suspend fun buildAppListUpdate(
     keyword: String,
-    isCurrentProcess64Bit: Boolean
-  ): GetAppListContentUseCase.Result {
-    return getAppListContentUseCase(
+    isCurrentProcess64Bit: Boolean,
+    currentItems: List<LCItem>,
+    pendingReturnTopAfterRequestChange: Boolean,
+    highlightRefresh: Boolean,
+    hasUserScrolledList: Boolean
+  ): AppListUpdate {
+    val content = getAppListContentUseCase(
       GetAppListContentUseCase.Request(
         keyword = keyword,
         isCurrentProcess64Bit = isCurrentProcess64Bit
       )
     )
+    return when (content) {
+      GetAppListContentUseCase.Result.OnlySelf -> AppListUpdate.OnlySelf
+
+      is GetAppListContentUseCase.Result.Content -> {
+        AppListUpdate.Content(
+          buildAppListUpdatePlanUseCase(
+            BuildAppListUpdatePlanUseCase.Request(
+              currentItems = currentItems,
+              content = content,
+              pendingReturnTopAfterRequestChange = pendingReturnTopAfterRequestChange,
+              highlightRefresh = highlightRefresh,
+              hasUserScrolledList = hasUserScrolledList
+            )
+          )
+        )
+      }
+    }
   }
 
   suspend fun isOnlySelfAppInDatabase(): Boolean {
@@ -278,6 +301,11 @@ class HomeViewModel(
   data class AppListAdvancedMenuDismissPlan(
     val shouldRefreshItems: Boolean
   )
+
+  sealed interface AppListUpdate {
+    data object OnlySelf : AppListUpdate
+    data class Content(val plan: BuildAppListUpdatePlanUseCase.Plan) : AppListUpdate
+  }
 
   fun dumpAppsInfo(uri: Uri, saveAsMarkDown: Boolean) {
     viewModelScope.launch(Dispatchers.IO) {
