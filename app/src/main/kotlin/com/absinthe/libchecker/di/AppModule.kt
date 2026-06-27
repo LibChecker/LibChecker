@@ -470,7 +470,7 @@ val appModule = module {
   factory { UpdateSnapshotDiffItemsUseCase() }
   factory { UpdateSnapshotTopAppsUseCase(get(), get()) }
   factory { BuildSnapshotDetailItemsUseCase(androidContext()) }
-  factory { BuildSnapshotDetailSectionsUseCase() }
+  factory { BuildSnapshotDetailSectionsUseCase(get(), get()) }
   factory { SnapshotArchiveUseCase(get(), get()) }
   factory { BackupSnapshotArchiveToUriUseCase(androidContext().contentResolver, get()) }
   factory { (roomBackup: RoomBackup) ->

@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.features.snapshot.detail.ui.adapter
 
-import com.absinthe.libchecker.domain.snapshot.GetSnapshotRuleUseCase
 import com.absinthe.libchecker.features.snapshot.detail.ui.adapter.node.SnapshotComponentNode
 import com.absinthe.libchecker.features.snapshot.detail.ui.adapter.node.SnapshotNativeNode
 import com.absinthe.libchecker.features.snapshot.detail.ui.adapter.node.SnapshotTitleNode
@@ -13,15 +12,12 @@ import com.absinthe.libchecker.features.snapshot.detail.ui.adapter.provider.Snap
 import com.chad.library.adapter.base.BaseNodeAdapter
 import com.chad.library.adapter.base.entity.node.BaseNode
 
-class SnapshotDetailAdapter(
-  private val colorfulRuleIcon: Boolean,
-  private val getSnapshotRuleUseCase: GetSnapshotRuleUseCase
-) : BaseNodeAdapter() {
+class SnapshotDetailAdapter : BaseNodeAdapter() {
 
   init {
     addNodeProvider(SnapshotTitleProvider())
-    addNodeProvider(SnapshotNativeProvider(colorfulRuleIcon, getSnapshotRuleUseCase))
-    addNodeProvider(SnapshotComponentProvider(colorfulRuleIcon, getSnapshotRuleUseCase))
+    addNodeProvider(SnapshotNativeProvider())
+    addNodeProvider(SnapshotComponentProvider())
   }
 
   override fun getItemType(data: List<BaseNode>, position: Int): Int {

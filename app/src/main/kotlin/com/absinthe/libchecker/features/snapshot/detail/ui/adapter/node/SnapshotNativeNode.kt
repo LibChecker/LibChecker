@@ -1,5 +1,5 @@
 package com.absinthe.libchecker.features.snapshot.detail.ui.adapter.node
 
-import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
+import com.absinthe.libchecker.domain.snapshot.detail.SnapshotDetailItemDisplayData
 
-class SnapshotNativeNode(item: SnapshotDetailItem) : BaseSnapshotNode(item)
+class SnapshotNativeNode(displayData: SnapshotDetailItemDisplayData) : BaseSnapshotNode(displayData)

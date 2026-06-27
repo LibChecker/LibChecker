@@ -29,8 +29,6 @@ import com.absinthe.libchecker.compat.IntentCompat
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
-import com.absinthe.libchecker.domain.app.AppListSettingsRepository
-import com.absinthe.libchecker.domain.snapshot.GetSnapshotRuleUseCase
 import com.absinthe.libchecker.domain.snapshot.SnapshotPackageIconSource
 import com.absinthe.libchecker.domain.snapshot.detail.SnapshotDetailSection
 import com.absinthe.libchecker.domain.snapshot.model.ADDED
@@ -81,11 +79,7 @@ class SnapshotDetailActivity :
 
   private lateinit var entity: SnapshotDiffItem
 
-  private val appListSettingsRepository: AppListSettingsRepository by inject()
-  private val getSnapshotRuleUseCase: GetSnapshotRuleUseCase by inject()
-  private val adapter by lazy {
-    SnapshotDetailAdapter(appListSettingsRepository.colorfulRuleIcon, getSnapshotRuleUseCase)
-  }
+  private val adapter by lazy { SnapshotDetailAdapter() }
   private val viewModel: SnapshotViewModel by viewModel()
   private val _entity by unsafeLazy {
     IntentCompat.getSerializableExtra<SnapshotDiffItem>(

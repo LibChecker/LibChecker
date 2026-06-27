@@ -8,13 +8,40 @@ import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
+import com.absinthe.libchecker.domain.app.AppListSettingsRepository
+import com.absinthe.libchecker.domain.snapshot.GetSnapshotRuleUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
+import com.absinthe.rulesbundle.Rule
 
-class BuildSnapshotDetailSectionsUseCase {
+class BuildSnapshotDetailSectionsUseCase(
+  private val appListSettingsRepository: AppListSettingsRepository,
+  private val getSnapshotRule: GetSnapshotRuleUseCase
+) {
 
-  operator fun invoke(items: List<SnapshotDetailItem>): List<SnapshotDetailSection> {
+  suspend operator fun invoke(items: List<SnapshotDetailItem>): List<SnapshotDetailSection> {
+    val colorfulRuleIcon = appListSettingsRepository.colorfulRuleIcon
+    val ruleCache = mutableMapOf<String, Rule?>()
+
+    suspend fun getRuleCached(item: SnapshotDetailItem): Rule? {
+      val key = "${item.itemType}:${item.name}"
+      if (ruleCache.containsKey(key)) {
+        return ruleCache[key]
+      }
+      return getSnapshotRule(item).also {
+        ruleCache[key] = it
+      }
+    }
+
     return orderedTypes.mapNotNull { type ->
-      val sectionItems = items.filter { it.itemType == type }
+      val sectionItems = items
+        .filter { it.itemType == type }
+        .map { item ->
+          SnapshotDetailItemDisplayData(
+            item = item,
+            rule = getRuleCached(item),
+            colorfulRuleIcon = colorfulRuleIcon
+          )
+        }
       if (sectionItems.isEmpty()) {
         null
       } else {
@@ -30,5 +57,11 @@ class BuildSnapshotDetailSectionsUseCase {
 
 data class SnapshotDetailSection(
   @LibType val type: Int,
-  val items: List<SnapshotDetailItem>
+  val items: List<SnapshotDetailItemDisplayData>
+)
+
+data class SnapshotDetailItemDisplayData(
+  val item: SnapshotDetailItem,
+  val rule: Rule?,
+  val colorfulRuleIcon: Boolean
 )
