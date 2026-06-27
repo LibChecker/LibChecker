@@ -17,12 +17,10 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentPieChartBinding
 import com.absinthe.libchecker.features.chart.BaseChartDataSource
-import com.absinthe.libchecker.features.chart.BaseVariableChartDataSource
 import com.absinthe.libchecker.features.chart.ChartDataSourcePlan
 import com.absinthe.libchecker.features.chart.ChartType
 import com.absinthe.libchecker.features.chart.ChartTypeSelectorPlan
 import com.absinthe.libchecker.features.chart.ChartViewModel
-import com.absinthe.libchecker.features.chart.IAndroidSDKChart
 import com.absinthe.libchecker.features.chart.IChartDataSource
 import com.absinthe.libchecker.features.chart.IntegerFormatter
 import com.absinthe.libchecker.features.chart.LOADING_PROGRESS_MAX
@@ -373,25 +371,18 @@ class ChartFragment :
 
     val source = dataSource ?: return
     val title = source.getLabelByXValue(requireContext(), x)
-    val items = source.getListByXValue(x)
-    val androidVersionNode = if (source is IAndroidSDKChart) {
-      val index = (source as BaseVariableChartDataSource<*>).getListKeyByXValue(x)
-      AndroidVersions.versions.find { node -> node.version == index }
-    } else {
-      null
-    }
 
     showClassifyDialogJob = lifecycleScope.launch {
-      val itemViewStates = viewModel.buildAppListItemViewStates(items)
+      val plan = viewModel.buildClassifyDialogPlan(source, x, title)
       val hostActivity = activity
       if (!isAdded || hostActivity == null || dialog != null) {
         return@launch
       }
 
       dialog = ClassifyBottomSheetDialogFragment().also {
-        it.setTitle(title)
-        it.setList(items, itemViewStates)
-        it.setAndroidVersionLabel(androidVersionNode)
+        it.setTitle(plan.title)
+        it.setList(plan.items, plan.itemViewStates)
+        it.setAndroidVersionLabel(plan.androidVersionNode)
 
         it.setOnDismiss {
           this@ChartFragment.dialog = null

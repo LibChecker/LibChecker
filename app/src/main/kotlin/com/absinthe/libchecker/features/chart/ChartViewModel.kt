@@ -2,6 +2,7 @@ package com.absinthe.libchecker.features.chart
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppListItemViewState
 import com.absinthe.libchecker.domain.app.AppListRepository
@@ -116,7 +117,32 @@ class ChartViewModel internal constructor(
     )
   }
 
-  suspend fun buildAppListItemViewStates(items: List<LCItem>): Map<String, AppListItemViewState> {
-    return chartDataProvider.buildAppListItemViewStates(items)
+  suspend fun buildClassifyDialogPlan(
+    source: IChartDataSource<*>,
+    x: Int,
+    title: String
+  ): ChartClassifyDialogPlan {
+    val items = source.getListByXValue(x)
+    return ChartClassifyDialogPlan(
+      title = title,
+      items = items,
+      itemViewStates = chartDataProvider.buildAppListItemViewStates(items),
+      androidVersionNode = source.getAndroidVersionNodeByXValue(x)
+    )
   }
+
+  private fun IChartDataSource<*>.getAndroidVersionNodeByXValue(x: Int): AndroidVersions.Node? {
+    if (this !is IAndroidSDKChart) {
+      return null
+    }
+    val version = (this as? BaseVariableChartDataSource<*>)?.getListKeyByXValue(x) ?: return null
+    return AndroidVersions.versions.find { node -> node.version == version }
+  }
+
+  data class ChartClassifyDialogPlan(
+    val title: String,
+    val items: List<LCItem>,
+    val itemViewStates: Map<String, AppListItemViewState>,
+    val androidVersionNode: AndroidVersions.Node?
+  )
 }
