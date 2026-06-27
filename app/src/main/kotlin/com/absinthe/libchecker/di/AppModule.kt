@@ -2,35 +2,20 @@ package com.absinthe.libchecker.di
 
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.app.SystemServices
-import com.absinthe.libchecker.data.app.AndroidAppListExportMetadata
-import com.absinthe.libchecker.data.app.AndroidAppListItemFactory
 import com.absinthe.libchecker.data.app.GlobalAppDetailSettingsRepository
-import com.absinthe.libchecker.data.app.GlobalAppListSettingsRepository
-import com.absinthe.libchecker.data.app.LocalAppListRepository
-import com.absinthe.libchecker.data.app.LocalInstalledAppRepository
 import com.absinthe.libchecker.data.app.RemoteLibraryDetailRepository
-import com.absinthe.libchecker.data.app.WorkerFeatureInitializationRepository
 import com.absinthe.libchecker.data.app.update.AndroidAppUpdateRepository
 import com.absinthe.libchecker.data.rules.AndroidCloudRulesRepository
 import com.absinthe.libchecker.data.rules.GlobalRuleSettingsRepository
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
-import com.absinthe.libchecker.domain.app.AppListItemFactory
-import com.absinthe.libchecker.domain.app.AppListRepository
-import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCase
-import com.absinthe.libchecker.domain.app.CheckRequiredPackageAvailabilityUseCase
-import com.absinthe.libchecker.domain.app.ClearApkCacheUseCase
-import com.absinthe.libchecker.domain.app.FeatureInitializationRepository
 import com.absinthe.libchecker.domain.app.GetApkPreviewInfoUseCase
 import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
 import com.absinthe.libchecker.domain.app.GetArchivePackageInfoUseCase
 import com.absinthe.libchecker.domain.app.GetInstalledAppComparisonPackageUseCase
 import com.absinthe.libchecker.domain.app.GetLibraryDetailUseCase
-import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
-import com.absinthe.libchecker.domain.app.GetRelatedAppListItemUseCase
-import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.LibraryDetailRepository
 import com.absinthe.libchecker.domain.app.PrepareApkAnalysisPackageUseCase
 import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
@@ -89,28 +74,10 @@ import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailComp
 import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailContentLoader
 import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailNativeLibContentLoader
 import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailPermissionContentLoader
-import com.absinthe.libchecker.domain.app.list.export.AppListExportMetadata
-import com.absinthe.libchecker.domain.app.list.export.BuildAppExportNativeLibrariesUseCase
-import com.absinthe.libchecker.domain.app.list.export.ExportAppListToUriUseCase
-import com.absinthe.libchecker.domain.app.list.export.ExportAppListUseCase
-import com.absinthe.libchecker.domain.app.list.export.ExportInstalledAppsToUriUseCase
-import com.absinthe.libchecker.domain.app.list.usecase.AppListItemsEquivalenceUseCase
-import com.absinthe.libchecker.domain.app.list.usecase.BuildAppListItemViewStatesUseCase
-import com.absinthe.libchecker.domain.app.list.usecase.BuildAppListUpdatePlanUseCase
-import com.absinthe.libchecker.domain.app.list.usecase.FilterAppListItemsUseCase
-import com.absinthe.libchecker.domain.app.list.usecase.GetAppListContentUseCase
-import com.absinthe.libchecker.domain.app.list.usecase.GetAppListPackageStatesUseCase
-import com.absinthe.libchecker.domain.app.list.usecase.InitializeAppListUseCase
-import com.absinthe.libchecker.domain.app.list.usecase.InitializePendingAppFeaturesUseCase
-import com.absinthe.libchecker.domain.app.list.usecase.ObserveAppListLoadingUseCase
-import com.absinthe.libchecker.domain.app.search.HandleAppListSearchCommandUseCase
-import com.absinthe.libchecker.domain.app.sync.SyncAppListChangesUseCase
 import com.absinthe.libchecker.domain.app.update.AppUpdateRepository
 import com.absinthe.libchecker.domain.app.update.BuildInAppUpdateDiffDataUseCase
-import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
 import com.absinthe.libchecker.domain.rules.CloudRulesRepository
 import com.absinthe.libchecker.domain.rules.RuleSettingsRepository
-import jonathanfinerty.once.Once
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -118,27 +85,15 @@ import org.koin.dsl.module
 val appModule = module {
   single<LCRepository> { Repositories.lcRepository }
   single<AppDetailSettingsRepository> { GlobalAppDetailSettingsRepository() }
-  single<AppListSettingsRepository> { GlobalAppListSettingsRepository() }
-  single<InstalledAppRepository> { LocalInstalledAppRepository }
-  single<AppListRepository> { LocalAppListRepository }
   single<LibraryDetailRepository> { RemoteLibraryDetailRepository }
   single<CloudRulesRepository> { AndroidCloudRulesRepository(androidContext()) }
   single<RuleSettingsRepository> { GlobalRuleSettingsRepository() }
   single<AppUpdateRepository> { AndroidAppUpdateRepository(SystemServices.downloadManager) }
-  single<AppListItemFactory> { AndroidAppListItemFactory(androidContext()) }
-  single<AppListExportMetadata> { AndroidAppListExportMetadata(androidContext()) }
-  single<FeatureInitializationRepository> { WorkerFeatureInitializationRepository() }
   single { AllowFileUriExposureUseCase() }
-  factory { InitializeAppListUseCase(get(), get(), get()) }
-  factory { ObserveAppListLoadingUseCase(get()) }
-  factory { SyncAppListChangesUseCase(get(), get(), get()) }
-  factory { ExportAppListUseCase(get(), get()) }
-  factory { ExportAppListToUriUseCase(androidContext().contentResolver, get()) }
   factory { BuildAppDetailContentInitPlanUseCase() }
   factory { BuildAppDetailTabTypesUseCase() }
   factory { BuildDetailProcessFilterDataUseCase() }
   factory { FilterAppDetailItemsUseCase() }
-  factory { FilterAppListItemsUseCase(get()) }
   factory { GetAlternativeLaunchItemsUseCase(androidContext().packageManager, get()) }
   factory { GetAppBundleItemsUseCase() }
   factory { GetAppDetailAbiUseCase() }
@@ -166,20 +121,10 @@ val appModule = module {
   factory { ExportAppPackageShareFileUseCase(androidContext().contentResolver) }
   factory { ResolveAppResourceValueUseCase(androidContext().packageManager) }
   factory { GetApkPreviewInfoUseCase() }
-  factory { GetAppListContentUseCase(BuildConfig.APPLICATION_ID, get(), get(), get(), get()) }
-  factory { HandleAppListSearchCommandUseCase(get()) }
-  factory { GetAppListPackageStatesUseCase(get()) }
   factory { BuildAppDetailAbiLabelDataUseCase(androidContext()) }
   factory { BuildAppDetailFeatureItemUseCase() }
   factory { BuildAppDetailHeaderExtraInfoUseCase(androidContext(), get()) }
   factory { BuildAppDetailHeaderTitleDataUseCase(androidContext(), get()) }
-  factory { BuildAppExportNativeLibrariesUseCase() }
-  factory {
-    ExportInstalledAppsToUriUseCase(androidContext(), androidContext().contentResolver, get(), get())
-  }
-  factory { AppListItemsEquivalenceUseCase() }
-  factory { BuildAppListItemViewStatesUseCase(androidContext(), get()) }
-  factory { BuildAppListUpdatePlanUseCase() }
   factory { BuildInAppUpdateDiffDataUseCase(BuildConfig.APPLICATION_ID, androidContext().packageManager, get()) }
   factory { BuildNativeLibraryItemDisplayDataUseCase(androidContext()) }
   factory { BuildRelatedAppDisplayDataUseCase(androidContext()) }
@@ -187,8 +132,6 @@ val appModule = module {
   factory { BuildDetailItemLongClickActionsUseCase() }
   factory { BuildDetailReferenceNavigationUseCase() }
   factory { BuildSignatureDetailItemsUseCase() }
-  factory { ClearApkCacheUseCase(androidContext()) }
-  factory { CheckRequiredPackageAvailabilityUseCase(get()) }
   factory { GetAppManifestPropertiesUseCase(androidContext().packageManager) }
   factory { GetArchivePackageInfoUseCase() }
   factory { PrepareApkAnalysisPackageUseCase(androidContext().contentResolver, get()) }
@@ -198,12 +141,9 @@ val appModule = module {
   factory { GetLibraryDetailDialogDataUseCase(get()) }
   factory { GetOverlayDetailUseCase(androidContext(), get()) }
   factory { GetPermissionDetailUseCase(androidContext().packageManager, get()) }
-  factory { GetRandomAppIconUseCase(androidContext().packageManager, get()) }
-  factory { GetRelatedAppListItemUseCase(get(), get()) }
   factory { GetRelatedAppDisplayDataUseCase(get(), get()) }
   factory { GetXposedModuleInfoUseCase(androidContext().packageManager, get()) }
   factory { ShouldShowStaticLibraryTabUseCase(get()) }
-  factory { InitializePendingAppFeaturesUseCase(get(), get()) }
   factory { SortAppDetailItemsUseCase() }
   factory {
     DetailActionLoader(
@@ -297,22 +237,6 @@ val appModule = module {
       detailFilterController = get(),
       detailFeatureLoader = get(),
       detailPackageLoader = get()
-    )
-  }
-  viewModel {
-    HomeViewModel(
-      installedAppRepository = get(),
-      appListRepository = get(),
-      initializeAppListUseCase = get(),
-      syncAppListChangesUseCase = get(),
-      exportAppListToUriUseCase = get(),
-      getAppListContentUseCase = get(),
-      buildAppListUpdatePlanUseCase = get(),
-      handleAppListSearchCommandUseCase = get(),
-      appListSettingsRepository = get(),
-      clearApkCacheUseCase = get(),
-      appListItemsEquivalenceUseCase = get(),
-      observeAppListLoadingUseCase = get()
     )
   }
 }

@@ -12,6 +12,7 @@ import coil.ImageLoader
 import com.absinthe.libchecker.app.MainLooperFilter
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.RulesRepository
+import com.absinthe.libchecker.di.appListModule
 import com.absinthe.libchecker.di.appModule
 import com.absinthe.libchecker.di.settingsModule
 import com.absinthe.libchecker.di.snapshotBackupModule
@@ -72,6 +73,7 @@ class LibCheckerApp : Application() {
       androidContext(this@LibCheckerApp)
       modules(
         appModule,
+        appListModule,
         snapshotCoreModule,
         snapshotComparisonModule,
         snapshotBackupModule,
