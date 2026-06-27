@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.features.applist.detail
+package com.absinthe.libchecker.domain.app.detail.presentation
 
 import android.content.pm.PackageInfo
 import android.net.Uri
@@ -31,7 +31,6 @@ import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.navigation.BuildDetailReferenceNavigationUseCase
 import com.absinthe.libchecker.domain.app.detail.navigation.DetailReferenceNavigationRequest
-import com.absinthe.libchecker.domain.app.detail.presentation.DetailPackageState
 import java.io.File
 
 class DetailActionLoader(

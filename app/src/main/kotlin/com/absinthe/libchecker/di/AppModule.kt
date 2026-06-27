@@ -114,6 +114,10 @@ import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailStaticLibra
 import com.absinthe.libchecker.domain.app.detail.content.SortAppDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.detail.feature.BuildAppDetailFeatureItemUseCase
 import com.absinthe.libchecker.domain.app.detail.navigation.BuildDetailReferenceNavigationUseCase
+import com.absinthe.libchecker.domain.app.detail.presentation.DetailActionLoader
+import com.absinthe.libchecker.domain.app.detail.presentation.DetailFeatureLoader
+import com.absinthe.libchecker.domain.app.detail.presentation.DetailFilterController
+import com.absinthe.libchecker.domain.app.detail.presentation.DetailPackageLoader
 import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailChipContentLoader
 import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailComponentContentLoader
 import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailContentLoader
@@ -210,10 +214,6 @@ import com.absinthe.libchecker.domain.statistics.reference.usecase.GetLibReferen
 import com.absinthe.libchecker.domain.statistics.reference.usecase.GetLibReferenceConfigUseCase
 import com.absinthe.libchecker.domain.statistics.reference.usecase.GetLibReferenceIconPackagesUseCase
 import com.absinthe.libchecker.domain.statistics.reference.usecase.UpdateLibReferenceThresholdUseCase
-import com.absinthe.libchecker.features.applist.detail.DetailActionLoader
-import com.absinthe.libchecker.features.applist.detail.DetailFeatureLoader
-import com.absinthe.libchecker.features.applist.detail.DetailFilterController
-import com.absinthe.libchecker.features.applist.detail.DetailPackageLoader
 import com.absinthe.libchecker.features.applist.detail.DetailViewModel
 import com.absinthe.libchecker.features.applist.detail.ui.ApkDetailActivity
 import com.jakewharton.processphoenix.ProcessPhoenix

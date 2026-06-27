@@ -20,6 +20,10 @@ import com.absinthe.libchecker.domain.app.detail.feature.AppDetailFeatureItemDat
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.navigation.DetailReferenceNavigation
+import com.absinthe.libchecker.domain.app.detail.presentation.DetailActionLoader
+import com.absinthe.libchecker.domain.app.detail.presentation.DetailFeatureLoader
+import com.absinthe.libchecker.domain.app.detail.presentation.DetailFilterController
+import com.absinthe.libchecker.domain.app.detail.presentation.DetailPackageLoader
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailPackageState
 import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailContentLoader
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
