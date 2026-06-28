@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.view.children
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.dp
@@ -208,8 +207,8 @@ class AppItemView(
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
       super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-      children.forEach {
-        it.autoMeasure()
+      for (index in 0 until childCount) {
+        getChildAt(index).autoMeasure()
       }
       measureAbiBadges()
       val textWidth =
@@ -310,23 +309,26 @@ class AppItemView(
     }
 
     private fun measureAbiBadges() {
-      val badges = listOfNotNull(abiBadge, multiArchBadge)
-      if (badges.isEmpty()) {
+      val abiBadge = abiBadge
+      val multiArchBadge = multiArchBadge
+      if (abiBadge == null && multiArchBadge == null) {
         return
       }
-      val badgeWidth = if (badges.size == 1) {
+      val badgeWidth = if (abiBadge == null || multiArchBadge == null) {
         (icon.measuredWidth * abiBadgeWidthRatio).toInt().coerceAtLeast(1)
       } else {
         ((icon.measuredWidth - abiBadgeGap) / 2).coerceAtLeast(1)
       }
-      badges.forEach {
-        val drawable = it.drawable
-        val badgeHeight = badgeWidth.toIntrinsicRatioHeight(drawable)
-        it.measure(
-          badgeWidth.toExactlyMeasureSpec(),
-          badgeHeight.toExactlyMeasureSpec()
-        )
-      }
+      abiBadge?.measureToBadgeSize(badgeWidth)
+      multiArchBadge?.measureToBadgeSize(badgeWidth)
+    }
+
+    private fun AppCompatImageView.measureToBadgeSize(width: Int) {
+      val badgeHeight = width.toIntrinsicRatioHeight(drawable)
+      measure(
+        width.toExactlyMeasureSpec(),
+        badgeHeight.toExactlyMeasureSpec()
+      )
     }
 
     private fun Int.toIntrinsicRatioHeight(drawable: Drawable?): Int {

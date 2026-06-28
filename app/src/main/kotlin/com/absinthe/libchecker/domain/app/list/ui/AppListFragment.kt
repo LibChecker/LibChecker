@@ -519,7 +519,7 @@ class AppListFragment :
           }
 
           if (highlightRefresh) {
-            notifyItemRangeChanged(0, data.size)
+            notifyHighlightTextChanged()
           }
 
           setSpaceFooterView()

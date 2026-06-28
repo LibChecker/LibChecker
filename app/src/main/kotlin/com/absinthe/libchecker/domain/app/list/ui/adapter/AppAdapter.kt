@@ -58,13 +58,7 @@ class AppAdapter(
       if (item.packageName != Constants.EXAMPLE_PACKAGE) {
         icon.load(packageInfo)
       }
-      setOrHighlightText(appName, item.label)
-      setOrHighlightText(packageName, item.packageName)
-
-      if (viewState.isPackageMissing && cardMode != CardMode.DEMO) {
-        appName.addStrikeThroughSpan()
-        packageName.addStrikeThroughSpan()
-      }
+      bindIdentityText(root, item, viewState)
 
       versionInfo.text = viewState.versionInfo
       setDetachedAbiBadgeLayoutEnabled(viewState.useDetachedAbiBadges)
@@ -96,12 +90,15 @@ class AppAdapter(
         AppListItemViewState.PackageBadge.Frozen -> setBadge(R.drawable.ic_disabled_package)
         null -> setBadge(null)
       }
-      root.setItemContentDescription(
-        item.label,
-        item.packageName,
-        versionInfo.text,
-        viewState.accessibilityAbiInfo
-      )
+    }
+  }
+
+  override fun convert(holder: BaseViewHolder, item: LCItem, payloads: List<Any>) {
+    if (payloads.any { it === HIGHLIGHT_TEXT_PAYLOAD }) {
+      val root = holder.itemView as AppItemView
+      bindIdentityText(root, item, getItemViewState(item))
+    } else {
+      convert(holder, item)
     }
   }
 
@@ -125,6 +122,12 @@ class AppAdapter(
     itemViewStateCache.clear()
   }
 
+  fun notifyHighlightTextChanged() {
+    if (data.isNotEmpty()) {
+      notifyItemRangeChanged(0, data.size, HIGHLIGHT_TEXT_PAYLOAD)
+    }
+  }
+
   fun setFallbackDisplayOptions(options: Int) {
     fallbackDisplayOptions = options
     clearItemViewStateCache()
@@ -146,9 +149,35 @@ class AppAdapter(
     }
   }
 
+  private fun bindIdentityText(
+    root: AppItemView,
+    item: LCItem,
+    viewState: AppListItemViewState
+  ) {
+    root.container.apply {
+      setOrHighlightText(appName, item.label)
+      setOrHighlightText(packageName, item.packageName)
+
+      if (viewState.isPackageMissing && cardMode != CardMode.DEMO) {
+        appName.addStrikeThroughSpan()
+        packageName.addStrikeThroughSpan()
+      }
+    }
+    root.setItemContentDescription(
+      item.label,
+      item.packageName,
+      viewState.versionInfo,
+      viewState.accessibilityAbiInfo
+    )
+  }
+
   enum class CardMode {
     NORMAL,
     DEMO
+  }
+
+  private companion object {
+    private val HIGHLIGHT_TEXT_PAYLOAD = Any()
   }
 }
 
