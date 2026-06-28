@@ -214,7 +214,6 @@ abstract class BaseAppDetailActivity :
   private var packageUiGeneration = 0
 
   override fun onCreate(savedInstanceState: Bundle?) {
-    binding = ActivityAppDetailBinding.inflate(layoutInflater)
     super.onCreate(savedInstanceState)
     binding.viewpager.isSaveEnabled = false
     addMenuProvider(menuController, this, Lifecycle.State.CREATED)
