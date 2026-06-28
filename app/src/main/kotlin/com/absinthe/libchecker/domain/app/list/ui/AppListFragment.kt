@@ -542,8 +542,9 @@ class AppListFragment :
 
     val generation = itemViewStatesGeneration
     val packageNames = items.map { it.packageName }
+    val remainingItems = items.drop(initialItemViewStateCount)
     itemViewStatesJob = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-      val itemViewStates = homeViewModel.buildAppListItemViewStates(items)
+      val itemViewStates = homeViewModel.buildAppListItemViewStates(remainingItems)
       if (!isActive) {
         return@launch
       }
@@ -556,7 +557,7 @@ class AppListFragment :
         ) {
           return@withContext
         }
-        appAdapter.setItemViewStates(itemViewStates)
+        appAdapter.putItemViewStates(itemViewStates)
         val changedStart = initialItemViewStateCount.coerceAtMost(appAdapter.data.size)
         if (changedStart < appAdapter.data.size) {
           appAdapter.notifyItemRangeChanged(changedStart, appAdapter.data.size - changedStart)

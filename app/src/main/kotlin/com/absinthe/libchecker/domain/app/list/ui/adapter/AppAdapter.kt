@@ -116,6 +116,10 @@ class AppAdapter(
     itemViewStateCache.putAll(itemViewStates)
   }
 
+  fun putItemViewStates(itemViewStates: Map<String, AppListItemViewState>) {
+    itemViewStateCache.putAll(itemViewStates)
+  }
+
   fun clearItemViewStateCache() {
     itemViewStateCache.clear()
   }
