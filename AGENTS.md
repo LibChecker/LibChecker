@@ -201,10 +201,7 @@ Important `:app` boundaries:
 6. Run the narrowest relevant validation command. If adapters, view-state
    mapping, menus, navigation, or visible strings changed, add a focused
    AndroMeld smoke on the affected flow when a device is available. Report
-   exactly what passed, failed, or was skipped. For performance/detail smoke,
-   prefer complex real-world packages such as GMS and Bilibili; if a sample is
-   missing and Play Store is available, install it there before falling back to
-   a simple app.
+   exactly what passed, failed, or was skipped.
 7. Before committing code, consider `AGENTS.md` only for durable, recurring
    rules. Keep it compact: merge with existing bullets, replace stale guidance,
    or delete obsolete notes before appending. Put one-off decisions and
