@@ -51,6 +51,10 @@ class ChartViewModel internal constructor(
 
   private val _loadingProgress = MutableStateFlow(LOADING_PROGRESS_MAX)
   val loadingProgress = _loadingProgress.asStateFlow()
+  val isChartLoading: Boolean
+    get() = loadingProgress.value < LOADING_PROGRESS_MAX
+  val showSystemApps: Boolean
+    get() = chartSettingsRepository.showSystemApps
 
   private val _distributionLastUpdateTime = MutableStateFlow("")
   val distributionLastUpdateTime = _distributionLastUpdateTime.asStateFlow()
@@ -63,8 +67,11 @@ class ChartViewModel internal constructor(
   private val _detailAbiSwitchVisibility = MutableStateFlow(true)
   val detailAbiSwitchVisibility = _detailAbiSwitchVisibility.asStateFlow()
 
-  fun setLoadingProgress(progress: Int) {
-    _loadingProgress.value = progress
+  fun setLoadingProgress(progress: Int, allowDecrease: Boolean = false) {
+    val currentProgress = _loadingProgress.value
+    if (allowDecrease || currentProgress >= LOADING_PROGRESS_MAX || progress >= currentProgress) {
+      _loadingProgress.value = progress
+    }
   }
 
   fun setDistributionLastUpdateTime(time: String) {

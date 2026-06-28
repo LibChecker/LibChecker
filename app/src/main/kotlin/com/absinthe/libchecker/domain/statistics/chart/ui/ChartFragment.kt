@@ -199,11 +199,15 @@ class ChartFragment :
     val requestKey = ChartRequestKey(
       chartType = selectedChartType,
       useDetailedAbiChart = selectedChartType == ChartType.ABI && viewModel.isDetailedAbiChart,
+      showSystemApps = viewModel.showSystemApps,
       itemsHash = items.chartRequestHash(selectedChartType)
     )
     if (requestKey == currentChartRequestKey) {
       return
     }
+    val canContinueLoadingProgress = currentChartRequestKey
+      ?.canContinueLoadingProgress(requestKey) == true
+    val shouldResetLoadingProgress = !canContinueLoadingProgress || !viewModel.isChartLoading
     currentChartRequestKey = requestKey
 
     if (chartView.parent != null) {
@@ -211,18 +215,19 @@ class ChartFragment :
     }
 
     when (plan) {
-      is ChartDataSourcePlan.Pie -> setChartData(::generatePieChartView, plan)
-      is ChartDataSourcePlan.Bar -> setChartData(::generateBarChartView, plan)
+      is ChartDataSourcePlan.Pie -> setChartData(::generatePieChartView, plan, shouldResetLoadingProgress)
+      is ChartDataSourcePlan.Bar -> setChartData(::generateBarChartView, plan, shouldResetLoadingProgress)
     }
     Telemetry.recordEvent(Constants.Event.CHART, mapOf(Telemetry.Param.ITEM_ID to selectedChartType))
   }
 
   private fun setChartData(
     generateChartView: () -> PieChart,
-    plan: ChartDataSourcePlan.Pie
+    plan: ChartDataSourcePlan.Pie,
+    shouldResetLoadingProgress: Boolean
   ) {
     val newChartView = generateChartView()
-    viewModel.setLoadingProgress(plan.initialLoadingProgress)
+    viewModel.setLoadingProgress(plan.initialLoadingProgress, allowDecrease = shouldResetLoadingProgress)
     chartDataRenderer.render(binding.root, chartView, newChartView, plan.dataSource)
     chartView = newChartView
     dataSource = plan.dataSource
@@ -230,10 +235,11 @@ class ChartFragment :
 
   private fun setChartData(
     generateChartView: () -> BarChart,
-    plan: ChartDataSourcePlan.Bar
+    plan: ChartDataSourcePlan.Bar,
+    shouldResetLoadingProgress: Boolean
   ) {
     val newChartView = generateChartView()
-    viewModel.setLoadingProgress(plan.initialLoadingProgress)
+    viewModel.setLoadingProgress(plan.initialLoadingProgress, allowDecrease = shouldResetLoadingProgress)
     chartDataRenderer.render(binding.root, chartView, newChartView, plan.dataSource)
     chartView = newChartView
     dataSource = plan.dataSource
@@ -425,17 +431,39 @@ class ChartFragment :
 private data class ChartRequestKey(
   val chartType: ChartType,
   val useDetailedAbiChart: Boolean,
+  val showSystemApps: Boolean,
   val itemsHash: Int
-)
-
-private fun List<LCItem>.chartRequestHash(chartType: ChartType): Int {
-  val includeFeatures = chartType.requiresFeatureInitialization
-  return fold(1) { result, item ->
-    31 * result + item.chartRequestHash(includeFeatures)
+) {
+  fun canContinueLoadingProgress(other: ChartRequestKey): Boolean {
+    return chartType == other.chartType &&
+      useDetailedAbiChart == other.useDetailedAbiChart &&
+      showSystemApps == other.showSystemApps
   }
 }
 
-private fun LCItem.chartRequestHash(includeFeatures: Boolean): Int {
+private fun List<LCItem>.chartRequestHash(chartType: ChartType): Int {
+  return fold(1) { result, item ->
+    31 * result + item.chartRequestHash(chartType)
+  }
+}
+
+private fun LCItem.chartRequestHash(chartType: ChartType): Int {
+  if (chartType == ChartType.SUPPORT_16KB) {
+    return chart16KBRequestHash()
+  }
+  return fullChartRequestHash(includeFeatures = chartType.requiresFeatureInitialization)
+}
+
+private fun LCItem.chart16KBRequestHash(): Int {
+  var result = packageName.hashCode()
+  result = 31 * result + isSystem.hashCode()
+  result = 31 * result + abi.hashCode()
+  result = 31 * result + versionCode.hashCode()
+  result = 31 * result + lastUpdatedTime.hashCode()
+  return result
+}
+
+private fun LCItem.fullChartRequestHash(includeFeatures: Boolean): Int {
   var result = packageName.hashCode()
   result = 31 * result + label.hashCode()
   result = 31 * result + versionName.hashCode()
