@@ -27,21 +27,21 @@ class SyncAppListChangesUseCase(
     timeRecorder.start()
 
     return try {
-      val isSynced = when (request) {
+      when (request) {
         is Request.ApplyPackageChanges -> syncChangedPackages(request.changes)
         Request.RefreshAll -> refreshAll(currentItems)
       }
-      if (isSynced) Result.Synced else Result.Canceled
     } finally {
       timeRecorder.end()
       Timber.d("Request change: END, $timeRecorder")
     }
   }
 
-  private suspend fun syncChangedPackages(changes: List<PackageChangeState>): Boolean {
+  private suspend fun syncChangedPackages(changes: List<PackageChangeState>): Result {
+    var changed = false
     for (currentState in changes.latestByPackage()) {
       if (!currentCoroutineContext().isActive) {
-        return false
+        return Result.Canceled
       }
 
       when (currentState) {
@@ -49,6 +49,8 @@ class SyncAppListChangesUseCase(
           val packageInfo = installedAppRepository.getPackageInfo(currentState.packageName) ?: continue
           runCatching {
             appListRepository.insertItem(appListItemFactory.create(packageInfo, true))
+          }.onSuccess {
+            changed = true
           }.onFailure { e ->
             Timber.e(e, "requestChange: ${currentState.packageName}")
           }
@@ -56,24 +58,28 @@ class SyncAppListChangesUseCase(
 
         is PackageChangeState.Removed -> {
           appListRepository.deleteItemByPackageName(currentState.packageName)
+          changed = true
         }
 
         is PackageChangeState.Replaced -> {
           val packageInfo = installedAppRepository.getPackageInfo(currentState.packageName) ?: continue
           runCatching {
             appListRepository.updateItem(appListItemFactory.create(packageInfo, true))
+          }.onSuccess {
+            changed = true
           }.onFailure { e ->
             Timber.e(e, "requestChange: ${currentState.packageName}")
           }
         }
       }
     }
-    return true
+    return if (changed) Result.Changed else Result.NoChanges
   }
 
-  private suspend fun refreshAll(currentItems: List<LCItem>): Boolean {
+  private suspend fun refreshAll(currentItems: List<LCItem>): Result {
     val dbItemMap = currentItems.associateBy { it.packageName }
     var applications = installedAppRepository.getApplicationMap(true)
+    var changed = false
 
     /*
      * The application list returned with a probability only contains system applications.
@@ -86,10 +92,12 @@ class SyncAppListChangesUseCase(
 
     for (packageInfo in applications.values) {
       if (packageInfo.packageName in dbItemMap) continue
-      if (!currentCoroutineContext().isActive) return false
+      if (!currentCoroutineContext().isActive) return Result.Canceled
 
       runCatching {
         appListRepository.insertItem(appListItemFactory.create(packageInfo, true))
+      }.onSuccess {
+        changed = true
       }.onFailure { e ->
         Timber.e(e, "requestChange: ${packageInfo.packageName}")
       }
@@ -97,24 +105,27 @@ class SyncAppListChangesUseCase(
 
     for (packageName in dbItemMap.keys) {
       if (packageName in applications) continue
-      if (!currentCoroutineContext().isActive) return false
+      if (!currentCoroutineContext().isActive) return Result.Canceled
 
       appListRepository.deleteItemByPackageName(packageName)
+      changed = true
     }
 
     for (packageInfo in applications.values) {
       val dbItem = dbItemMap[packageInfo.packageName] ?: continue
       if (!isItemOutdated(packageInfo, dbItem)) continue
-      if (!currentCoroutineContext().isActive) return false
+      if (!currentCoroutineContext().isActive) return Result.Canceled
 
       runCatching {
         appListRepository.updateItem(appListItemFactory.create(packageInfo, true))
+      }.onSuccess {
+        changed = true
       }.onFailure { e ->
         Timber.e(e, "requestChange: ${packageInfo.packageName}")
       }
     }
 
-    return true
+    return if (changed) Result.Changed else Result.NoChanges
   }
 
   private fun hasLargeApplicationDiff(
@@ -144,7 +155,8 @@ class SyncAppListChangesUseCase(
   }
 
   enum class Result {
-    Synced,
+    Changed,
+    NoChanges,
     Canceled
   }
 

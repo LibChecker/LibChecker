@@ -21,6 +21,7 @@ import com.absinthe.libchecker.domain.app.list.usecase.AppListItemsEquivalenceUs
 import com.absinthe.libchecker.domain.app.list.usecase.BuildAppListItemViewStatesUseCase
 import com.absinthe.libchecker.domain.app.list.usecase.BuildAppListUpdatePlanUseCase
 import com.absinthe.libchecker.domain.app.list.usecase.GetAppListContentUseCase
+import com.absinthe.libchecker.domain.app.list.usecase.GetAppListPackageStatesUseCase
 import com.absinthe.libchecker.domain.app.list.usecase.InitializeAppListUseCase
 import com.absinthe.libchecker.domain.app.list.usecase.ObserveAppListLoadingUseCase
 import com.absinthe.libchecker.domain.app.search.HandleAppListSearchCommandUseCase
@@ -171,11 +172,15 @@ class HomeViewModel(
     return getAppListContentUseCase.isOnlySelfAppInDatabase()
   }
 
-  suspend fun buildAppListItemViewStates(items: List<LCItem>): Map<String, AppListItemViewState> {
+  suspend fun buildAppListItemViewStates(
+    items: List<LCItem>,
+    packageStateSnapshot: GetAppListPackageStatesUseCase.PackageStateSnapshot? = null
+  ): Map<String, AppListItemViewState> {
     return buildAppListItemViewStatesUseCase(
       BuildAppListItemViewStatesUseCase.Request(
         items = items,
-        options = appListSettingsRepository.displayOptions
+        options = appListSettingsRepository.displayOptions,
+        packageStateSnapshot = packageStateSnapshot
       )
     )
   }
@@ -310,13 +315,16 @@ class HomeViewModel(
     try {
       val syncRequest = appListChangeRequestQueue.buildSyncRequest(changeRequest)
 
-      if (syncAppListChangesUseCase(syncRequest, dbItems) == SyncAppListChangesUseCase.Result.Canceled) {
+      val syncResult = syncAppListChangesUseCase(syncRequest, dbItems)
+      if (syncResult == SyncAppListChangesUseCase.Result.Canceled) {
         return@launch
       }
 
       appListChangeRequestQueue.consumeSyncedRequest(changeRequest, syncRequest)
 
-      refreshList()
+      if (syncResult == SyncAppListChangesUseCase.Result.Changed) {
+        refreshList()
+      }
 
       updateAppListStatus(STATUS_START_REQUEST_CHANGE_END)
     } finally {

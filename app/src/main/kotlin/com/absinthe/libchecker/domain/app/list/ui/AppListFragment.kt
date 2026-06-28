@@ -27,8 +27,13 @@ import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
+import com.absinthe.libchecker.domain.app.list.TRACE_APP_LIST_APPLY_UPDATE_MAIN
+import com.absinthe.libchecker.domain.app.list.TRACE_APP_LIST_REMAINING_ITEM_VIEW_STATES
+import com.absinthe.libchecker.domain.app.list.traceAppListSection
+import com.absinthe.libchecker.domain.app.list.traceAppListSuspendSection
 import com.absinthe.libchecker.domain.app.list.ui.adapter.AppAdapter
 import com.absinthe.libchecker.domain.app.list.ui.adapter.AppListDiffUtil
+import com.absinthe.libchecker.domain.app.list.usecase.GetAppListPackageStatesUseCase
 import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
 import com.absinthe.libchecker.domain.home.ui.INavViewContainer
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
@@ -499,32 +504,35 @@ class AppListFragment :
       if (generation != itemViewStatesGeneration) {
         return@withContext
       }
-      appAdapter.apply {
-        particleItemAnimator.prepareParticleRemovals(updatePlan.particleRemovalItemIds)
-        setItemViewStates(updatePlan.content.initialItemViewStates)
-        homeViewModel.onAppListUpdatePlanApplied(updatePlan)
+      traceAppListSection(TRACE_APP_LIST_APPLY_UPDATE_MAIN) {
+        appAdapter.apply {
+          particleItemAnimator.prepareParticleRemovals(updatePlan.particleRemovalItemIds)
+          setItemViewStates(updatePlan.content.initialItemViewStates)
+          homeViewModel.onAppListUpdatePlanApplied(updatePlan)
 
-        setDiffNewData(updatePlan.content.items.toMutableList()) {
-          if (isDetached || !isBindingInitialized()) {
-            return@setDiffNewData
-          }
-          flip(VF_LIST)
-          isListReady = true
-          binding.list.doOnNextLayout {
-            updateRemainingItemViewStates(
-              items = updatePlan.content.items,
-              initialItemViewStateCount = updatePlan.content.initialItemViewStates.size,
-              updateGeneration = generation
-            )
-          }
+          setDiffNewData(updatePlan.content.items.toMutableList()) {
+            if (isDetached || !isBindingInitialized()) {
+              return@setDiffNewData
+            }
+            flip(VF_LIST)
+            isListReady = true
+            binding.list.doOnNextLayout {
+              updateRemainingItemViewStates(
+                items = updatePlan.content.items,
+                initialItemViewStateCount = updatePlan.content.initialItemViewStates.size,
+                packageStateSnapshot = updatePlan.content.packageStateSnapshot,
+                updateGeneration = generation
+              )
+            }
 
-          if (highlightRefresh) {
-            notifyHighlightTextChanged()
-          }
+            if (highlightRefresh) {
+              notifyHighlightTextChanged()
+            }
 
-          setSpaceFooterView()
-          if (updatePlan.shouldReturnTopAfterRequestChange) {
-            returnTopOfList()
+            setSpaceFooterView()
+            if (updatePlan.shouldReturnTopAfterRequestChange) {
+              returnTopOfList()
+            }
           }
         }
       }
@@ -534,6 +542,7 @@ class AppListFragment :
   private fun updateRemainingItemViewStates(
     items: List<LCItem>,
     initialItemViewStateCount: Int,
+    packageStateSnapshot: GetAppListPackageStatesUseCase.PackageStateSnapshot,
     updateGeneration: Int
   ) {
     if (updateGeneration != itemViewStatesGeneration) {
@@ -549,7 +558,9 @@ class AppListFragment :
     val packageNames = items.map { it.packageName }
     val remainingItems = items.drop(initialItemViewStateCount)
     itemViewStatesJob = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-      val itemViewStates = homeViewModel.buildAppListItemViewStates(remainingItems)
+      val itemViewStates = traceAppListSuspendSection(TRACE_APP_LIST_REMAINING_ITEM_VIEW_STATES) {
+        homeViewModel.buildAppListItemViewStates(remainingItems, packageStateSnapshot)
+      }
       if (!isActive) {
         return@launch
       }

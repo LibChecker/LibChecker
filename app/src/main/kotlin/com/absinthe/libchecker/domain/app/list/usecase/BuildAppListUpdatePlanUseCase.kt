@@ -1,24 +1,28 @@
 package com.absinthe.libchecker.domain.app.list.usecase
 
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.app.list.TRACE_APP_LIST_BUILD_UPDATE_PLAN
+import com.absinthe.libchecker.domain.app.list.traceAppListSection
 import com.absinthe.libchecker.domain.app.stableAppListItemIdForKey
 
 class BuildAppListUpdatePlanUseCase {
 
   operator fun invoke(request: Request): Plan {
-    return Plan(
-      content = request.content,
-      particleRemovalItemIds = buildParticleRemovalItemIds(
-        currentItems = request.currentItems,
-        backingPackageNames = request.content.backingPackageNames
-      ),
-      shouldClearPendingReturnTopAfterRequestChange = request.pendingReturnTopAfterRequestChange &&
-        !request.highlightRefresh,
-      shouldReturnTopAfterRequestChange = request.pendingReturnTopAfterRequestChange &&
-        !request.highlightRefresh &&
-        !request.hasUserScrolledList &&
-        request.currentItems.isNotEmpty()
-    )
+    return traceAppListSection(TRACE_APP_LIST_BUILD_UPDATE_PLAN) {
+      Plan(
+        content = request.content,
+        particleRemovalItemIds = buildParticleRemovalItemIds(
+          currentItems = request.currentItems,
+          backingPackageNames = request.content.backingPackageNames
+        ),
+        shouldClearPendingReturnTopAfterRequestChange = request.pendingReturnTopAfterRequestChange &&
+          !request.highlightRefresh,
+        shouldReturnTopAfterRequestChange = request.pendingReturnTopAfterRequestChange &&
+          !request.highlightRefresh &&
+          !request.hasUserScrolledList &&
+          request.currentItems.isNotEmpty()
+      )
+    }
   }
 
   private fun buildParticleRemovalItemIds(
