@@ -88,6 +88,42 @@ class AppDetailBenchmark {
   }
 
   @Test
+  fun scrollGooglePlayServicesNativeList() = benchmarkRule.measureRepeated(
+    packageName = TARGET_PACKAGE,
+    metrics = listOf(FrameTimingMetric()),
+    compilationMode = CompilationMode.None(),
+    iterations = 5,
+    setupBlock = {
+      pressHome()
+      openGooglePlayServicesDetailScreen()
+      waitForTextStartsWith(NATIVE_LIBRARY_PREFIX, "native library list")
+      check(
+        device.wait(
+          Until.hasObject(By.res(ANDROID_PACKAGE, APP_LIST_RES_ID)),
+          UI_TIMEOUT_MS
+        )
+      ) {
+        "Native library list did not show a RecyclerView"
+      }
+      device.waitForIdle()
+    }
+  ) {
+    val width = device.displayWidth
+    val height = device.displayHeight
+    repeat(DETAIL_SCROLL_REPEAT_COUNT) {
+      device.swipe(
+        width / 2,
+        (height * 0.78f).toInt(),
+        width / 2,
+        (height * 0.32f).toInt(),
+        DETAIL_SCROLL_STEPS
+      )
+      device.waitForIdle()
+    }
+    waitForTextStartsWith(NATIVE_LIBRARY_PREFIX, "native library list")
+  }
+
+  @Test
   fun switchGooglePlayServicesDetailTabs() = benchmarkRule.measureRepeated(
     packageName = TARGET_PACKAGE,
     metrics = listOf(FrameTimingMetric()),
@@ -193,6 +229,7 @@ class AppDetailBenchmark {
 
   private companion object {
     private const val TARGET_PACKAGE = "com.absinthe.libchecker.debug"
+    private const val ANDROID_PACKAGE = "android"
     private const val APP_DETAIL_ACTIVITY = "com.absinthe.libchecker.domain.app.detail.ui.AppDetailActivity"
     private const val ANDROID_AUTO_LABEL = "Android Auto"
     private const val GOOGLE_PLAY_SERVICES_LABEL = "Google Play 服务"
@@ -212,6 +249,9 @@ class AppDetailBenchmark {
     private const val PROVIDER_CONTENT_TEXT = "Provider"
     private const val PERMISSION_CONTENT_TEXT = "permission"
     private const val METADATA_CONTENT_TEXT = "stamp"
+    private const val APP_LIST_RES_ID = "list"
     private const val UI_TIMEOUT_MS = 15_000L
+    private const val DETAIL_SCROLL_REPEAT_COUNT = 4
+    private const val DETAIL_SCROLL_STEPS = 24
   }
 }
