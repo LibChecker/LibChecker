@@ -299,6 +299,7 @@ object PackageUtils {
   }
 
   private const val ENABLE_GET_APK_FILE_LIBS_LOG = true
+  private const val APK_ENTRY_SEPARATOR = '/'
 
   private fun getApkFileLibs(file: File, specifiedAbi: Int? = null, parseElf: Boolean): Map<String, MutableList<LibStringItem>> {
     if (file.exists().not() || file.canRead().not()) {
@@ -324,9 +325,8 @@ object PackageUtils {
           .asSequence()
           .filter { !it.isDirectory && it.name.endsWith(".so") && (sourceDir == null || it.name.startsWith(sourceDir)) }
           .forEach { entry ->
-            val pathFirst = entry.name.split(File.separator).first()
-            val dir = STRING_ABI_MAP.keys.find { entry.name.startsWith(libDir + File.separator + it) }
-              ?: if (pathFirst == assetsDir) assetsDir else return@forEach
+            val entryName = entry.name
+            val dir = getApkLibEntryDir(entryName, libDir, assetsDir) ?: return@forEach
             val offset = getDataOffsetMethod.invoke(zipFile, entry) as Long
 
             val currentEntryZipAlignment = if (entry.method == ZipEntry.STORED) {
@@ -342,14 +342,14 @@ object PackageUtils {
             }.getOrNull()
 
             val item = LibStringItem(
-              name = entry.name.split(File.separator).last(),
+              name = getApkLibEntryFileName(entryName),
               size = entry.size,
               elfInfo = ElfInfo(
                 elfParser?.getEType() ?: ET_NOT_ELF,
                 elfParser?.getMinPageSize() ?: -1,
                 zipAlignment = currentEntryZipAlignment
               ),
-              source = entry.name,
+              source = entryName,
               process = file.name
             )
             map.getOrPut(dir) { mutableListOf() }.add(item)
@@ -393,11 +393,10 @@ object PackageUtils {
             it.isDirectory.not() && it.name.endsWith(".so") && (sourceDir == null || it.name.startsWith(sourceDir))
           }
           .forEach { entry ->
-            val pathFirst = entry.name.split(File.separator).first()
-            val dir = STRING_ABI_MAP.keys.find { entry.name.startsWith(libDir + File.separator + it) }
-              ?: if (pathFirst == assetsDir) assetsDir else return@forEach
+            val entryName = entry.name
+            val dir = getApkLibEntryDir(entryName, libDir, assetsDir) ?: return@forEach
             val item = LibStringItem(
-              name = entry.name.split(File.separator).last(),
+              name = getApkLibEntryFileName(entryName),
               size = entry.size,
               elfInfo = ElfInfo()
             )
@@ -413,6 +412,34 @@ object PackageUtils {
     }
 
     return map
+  }
+
+  private fun getApkLibEntryDir(
+    entryName: String,
+    libDir: String,
+    assetsDir: String
+  ): String? {
+    val firstSeparator = entryName.indexOf(APK_ENTRY_SEPARATOR)
+    val firstSegment = if (firstSeparator >= 0) {
+      entryName.substring(0, firstSeparator)
+    } else {
+      entryName
+    }
+
+    return when (firstSegment) {
+      assetsDir -> assetsDir
+      libDir -> STRING_ABI_MAP.keys.find { entryName.startsWith("$libDir$APK_ENTRY_SEPARATOR$it") }
+      else -> null
+    }
+  }
+
+  private fun getApkLibEntryFileName(entryName: String): String {
+    val lastSeparator = entryName.lastIndexOf(APK_ENTRY_SEPARATOR)
+    return if (lastSeparator >= 0) {
+      entryName.substring(lastSeparator + 1)
+    } else {
+      entryName
+    }
   }
 
   private fun logApkFileLibsFailure(file: File, parseElf: Boolean, throwable: Throwable) {
