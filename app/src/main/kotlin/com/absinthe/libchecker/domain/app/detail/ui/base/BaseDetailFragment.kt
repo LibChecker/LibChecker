@@ -190,6 +190,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
       adapter.setHighlightBackgroundItem(newHighlightPosition)
     }
 
+    adapter.preloadRuleChipIcons(sortedList)
     withContext(Dispatchers.Main) {
       adapter.setDiffNewData(sortedList.toMutableList())
     }
@@ -227,6 +228,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   private suspend fun updateItemsWithFilterResult(items: List<LibStringItemChip>?) {
     items?.let {
       val sortedList = viewModel.sortDetailItems(it, type)
+      adapter.preloadRuleChipIcons(sortedList)
       withContext(Dispatchers.Main) {
         if (isDetached || !isBindingInitialized()) return@withContext
         if (sortedList.isEmpty()) {

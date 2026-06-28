@@ -13,10 +13,15 @@ internal object RuleChipIconCache {
     ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
   }
 
+  fun preload(context: Context, rules: Sequence<Rule>) {
+    rules
+      .map { it.iconRes }
+      .distinct()
+      .forEach { getOrLoadConstantState(context, it) }
+  }
+
   fun newDrawable(context: Context, rule: Rule, colorfulIcon: Boolean): Drawable? {
-    val drawable = iconStates.getOrPut(rule.iconRes) {
-      rule.iconRes.getDrawable(context)?.constantState
-    }?.newDrawable(context.resources, context.theme)
+    val drawable = getOrLoadConstantState(context, rule.iconRes)?.newDrawable(context.resources, context.theme)
       ?: rule.iconRes.getDrawable(context)
 
     return drawable?.mutate()?.apply {
@@ -25,6 +30,19 @@ internal object RuleChipIconCache {
       } else {
         null
       }
+    }
+  }
+
+  private fun getOrLoadConstantState(context: Context, iconRes: Int): Drawable.ConstantState? {
+    synchronized(iconStates) {
+      if (iconStates.containsKey(iconRes)) {
+        return iconStates[iconRes]
+      }
+    }
+
+    val constantState = iconRes.getDrawable(context)?.constantState
+    synchronized(iconStates) {
+      return iconStates.getOrPut(iconRes) { constantState }
     }
   }
 }

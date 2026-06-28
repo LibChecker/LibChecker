@@ -45,6 +45,7 @@ import com.absinthe.libchecker.domain.app.detail.ui.dialog.XmlBSDFragment
 import com.absinthe.libchecker.domain.app.detail.ui.view.ComponentLibItemView
 import com.absinthe.libchecker.domain.app.detail.ui.view.MetadataLibItemView
 import com.absinthe.libchecker.domain.app.detail.ui.view.NativeLibItemView
+import com.absinthe.libchecker.domain.app.detail.ui.view.RuleChipIconCache
 import com.absinthe.libchecker.domain.app.detail.ui.view.StaticLibItemView
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
 import com.absinthe.libchecker.utils.OsUtils
@@ -99,6 +100,12 @@ class LibStringAdapter(
     itemDisplayOptions = options
     //noinspection NotifyDataSetChanged
     notifyDataSetChanged()
+  }
+
+  fun preloadRuleChipIcons(items: List<LibStringItemChip>) {
+    if (isItemOptionEnabled(AdvancedOptions.SHOW_MARKED_LIB)) {
+      RuleChipIconCache.preload(context, items.asSequence().mapNotNull { it.rule })
+    }
   }
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
