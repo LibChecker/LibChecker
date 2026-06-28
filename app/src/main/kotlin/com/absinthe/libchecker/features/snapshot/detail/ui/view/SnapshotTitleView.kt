@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.features.snapshot.detail.ui.view
 
 import android.content.Context
+import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
@@ -25,6 +26,8 @@ class SnapshotTitleView(
   context: Context,
   attributeSet: AttributeSet? = null
 ) : AViewGroup(context, attributeSet) {
+
+  private val condensedTypeface = Typeface.create("sans-serif-condensed", Typeface.NORMAL)
 
   val iconView = AppCompatImageView(context).apply {
     val iconSize = context.getDimensionPixelSize(R.dimen.lib_detail_icon_size)
@@ -62,6 +65,8 @@ class SnapshotTitleView(
     )
     setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBodySmall))
     setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
+    typeface = condensedTypeface
+    letterSpacing = 0f
     addView(this)
   }
 
@@ -72,6 +77,8 @@ class SnapshotTitleView(
     )
     setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBodySmall))
     setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
+    typeface = condensedTypeface
+    letterSpacing = 0f
     addView(this)
   }
 
@@ -82,6 +89,8 @@ class SnapshotTitleView(
     )
     setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBodySmall))
     setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
+    typeface = condensedTypeface
+    letterSpacing = 0f
     addView(this)
   }
 

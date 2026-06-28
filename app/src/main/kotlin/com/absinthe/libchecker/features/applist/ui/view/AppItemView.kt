@@ -2,6 +2,7 @@ package com.absinthe.libchecker.features.applist.ui.view
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.text.TextUtils
 import android.view.Gravity
@@ -69,6 +70,7 @@ class AppItemView(context: Context) : MaterialCardView(context) {
     private val iconBadgeGap = 4.dp
     private val abiBadgeGap = 1.dp
     private val abiBadgeWidthRatio = 0.75f
+    private val condensedTypeface = Typeface.create("sans-serif-condensed", Typeface.NORMAL)
 
     val icon = AppCompatImageView(context).apply {
       val iconSize = context.getDimensionPixelSize(R.dimen.app_icon_size)
@@ -111,6 +113,8 @@ class AppItemView(context: Context) : MaterialCardView(context) {
       )
       setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBodySmall))
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
+      typeface = condensedTypeface
+      letterSpacing = 0f
       maxLines = 1
       ellipsize = TextUtils.TruncateAt.END
       addView(this)
@@ -124,6 +128,8 @@ class AppItemView(context: Context) : MaterialCardView(context) {
       setPadding(0, 0, 0, 2.dp)
       setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceLabelSmall))
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
+      typeface = condensedTypeface
+      letterSpacing = 0f
       maxLines = 1
       ellipsize = TextUtils.TruncateAt.END
       addView(this)
