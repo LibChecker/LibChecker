@@ -10,7 +10,6 @@ import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.view.children
 import androidx.core.view.marginEnd
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.UiUtils
@@ -95,14 +94,11 @@ class NativeLibItemView(context: Context) : AViewGroup(context) {
       it.autoMeasure()
       return@let it.measuredWidth + libName.marginEnd
     } ?: 0
-    val maxWidth = measuredWidth - paddingStart - paddingEnd - libName.marginEnd - chipWidth
+    val textWidth =
+      (measuredWidth - paddingStart - paddingEnd - libName.marginEnd - chipWidth).coerceAtLeast(0)
 
-    children.filter { it != chip }.forEach {
-      it.autoMeasure()
-      if (it.measuredWidth > maxWidth) {
-        it.measure(maxWidth.toExactlyMeasureSpec(), it.defaultHeightMeasureSpec(this))
-      }
-    }
+    libName.measure(textWidth.toAtMostMeasureSpec(), libName.defaultHeightMeasureSpec(this))
+    libSize.measure(textWidth.toAtMostMeasureSpec(), libSize.defaultHeightMeasureSpec(this))
 
     setMeasuredDimension(
       measuredWidth,
