@@ -200,9 +200,9 @@ Important `:app` boundaries:
 5. Run `spotlessApply` only when formatting needs fixing.
 6. Run the narrowest relevant validation command. If adapters, view-state
    mapping, menus, navigation, visible strings, or performance-sensitive paths
-   changed, add a focused AndroMeld smoke on complex real apps such as GMS or
-   Bilibili when a device is available; installing missing samples from Play
-   Store is acceptable. Report exactly what passed, failed, or was skipped.
+   changed, add a focused AndroMeld smoke on an affected complex real-app flow
+   when a device is available. Report exactly what passed, failed, or was
+   skipped.
 7. Before committing code, consider `AGENTS.md` only for durable, recurring
    rules. Keep it compact: merge with existing bullets, replace stale guidance,
    or delete obsolete notes before appending. Put one-off decisions and
