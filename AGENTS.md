@@ -130,6 +130,8 @@ Important `:app` boundaries:
 - Avoid package-manager, archive, or freeze-state lookups in UI controllers or
   RecyclerView/view binding; precompute through ViewModels/use cases on a
   background thread.
+- Avoid broad `PackageInfo` flag combinations for huge apps; prefer focused
+  lookups that keep Binder payloads below transaction limits.
 - Heavy package scanning, zip reads, DEX parsing, ELF parsing, database writes,
   and network calls must run off the main thread.
 - Package analysis must keep working for installed apps, APK, split APK, APKS,

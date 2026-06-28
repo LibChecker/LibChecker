@@ -49,6 +49,7 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
     val flow = viewModel.contentState.abilitiesMap[adapter.type]
 
     adapter.apply {
+      animationEnable = false
       setOnItemLongClickListener { _, _, position ->
         doOnLongClick(getItem(position).item.name)
         true

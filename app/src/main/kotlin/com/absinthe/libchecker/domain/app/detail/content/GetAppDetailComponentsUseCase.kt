@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.domain.app.detail.content
 
+import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import com.absinthe.libchecker.annotation.ACTIVITY
@@ -30,26 +31,20 @@ class GetAppDetailComponentsUseCase(
       }
       .orEmpty()
 
-    val componentPackageInfo = packageInfo.getCompleteComponentPackageInfo(isApk)
-
     return AppDetailComponents(
       services = packageInfo.getComponents(
-        fallbackPackageInfo = componentPackageInfo,
         isApk = isApk,
         type = SERVICE
       ),
       activities = packageInfo.getComponents(
-        fallbackPackageInfo = componentPackageInfo,
         isApk = isApk,
         type = ACTIVITY
       ),
       receivers = packageInfo.getComponents(
-        fallbackPackageInfo = componentPackageInfo,
         isApk = isApk,
         type = RECEIVER
       ),
       providers = packageInfo.getComponents(
-        fallbackPackageInfo = componentPackageInfo,
         isApk = isApk,
         type = PROVIDER
       ),
@@ -66,56 +61,41 @@ class GetAppDetailComponentsUseCase(
     )
   }
 
-  private fun PackageInfo.getCompleteComponentPackageInfo(isApk: Boolean): PackageInfo? {
-    if (
-      isApk ||
-      (
-        services?.isNotEmpty() == true &&
-          activities?.isNotEmpty() == true &&
-          receivers?.isNotEmpty() == true &&
-          providers?.isNotEmpty() == true
-        )
-    ) {
-      return this
-    }
-
-    return installedAppRepository.getPackageInfo(
-      packageName,
-      PackageManager.GET_SERVICES or
-        PackageManager.GET_ACTIVITIES or
-        PackageManager.GET_RECEIVERS or
-        PackageManager.GET_PROVIDERS
-    )
-  }
-
   private fun PackageInfo.getComponents(
-    fallbackPackageInfo: PackageInfo?,
     isApk: Boolean,
     type: Int
   ): List<StatefulComponent> {
-    val components = when (type) {
+    val components = componentInfoList(type)
+    val source = if (components?.isNotEmpty() == true || isApk) {
+      components
+    } else {
+      // Do not combine component flags here: huge apps can exceed Binder's
+      // transaction limit when a single PackageInfo carries every component.
+      installedAppRepository.getPackageInfo(packageName, componentFlag(type))
+        ?.componentInfoList(type)
+    }
+
+    return PackageUtils.getComponentList(packageName, source, true)
+  }
+
+  private fun PackageInfo.componentInfoList(type: Int): Array<out ComponentInfo>? {
+    return when (type) {
       SERVICE -> services
       ACTIVITY -> activities
       RECEIVER -> receivers
       PROVIDER -> providers
       else -> null
     }
+  }
 
-    val fallbackComponents = when (type) {
-      SERVICE -> fallbackPackageInfo?.services
-      ACTIVITY -> fallbackPackageInfo?.activities
-      RECEIVER -> fallbackPackageInfo?.receivers
-      PROVIDER -> fallbackPackageInfo?.providers
-      else -> null
+  private fun componentFlag(type: Int): Int {
+    return when (type) {
+      SERVICE -> PackageManager.GET_SERVICES
+      ACTIVITY -> PackageManager.GET_ACTIVITIES
+      RECEIVER -> PackageManager.GET_RECEIVERS
+      PROVIDER -> PackageManager.GET_PROVIDERS
+      else -> 0
     }
-
-    val source = if (components?.isNotEmpty() == true || isApk) {
-      components
-    } else {
-      fallbackComponents
-    }
-
-    return PackageUtils.getComponentList(packageName, source, true)
   }
 }
 

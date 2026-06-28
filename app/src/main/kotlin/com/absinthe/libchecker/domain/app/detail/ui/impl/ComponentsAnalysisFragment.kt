@@ -48,6 +48,7 @@ class ComponentsAnalysisFragment :
     binding.list.adapter = adapter
 
     adapter.apply {
+      animationEnable = false
       setDiffCallback(LibStringDiffUtil())
       stateView = this@ComponentsAnalysisFragment.emptyView
       isStateViewEnable = true
