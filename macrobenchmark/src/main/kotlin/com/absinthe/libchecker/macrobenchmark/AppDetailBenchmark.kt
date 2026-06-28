@@ -71,6 +71,23 @@ class AppDetailBenchmark {
   }
 
   @Test
+  fun openYouTubeDetail() = benchmarkRule.measureRepeated(
+    packageName = TARGET_PACKAGE,
+    metrics = listOf(FrameTimingMetric()),
+    compilationMode = CompilationMode.None(),
+    iterations = 5,
+    setupBlock = {
+      pressHome()
+    }
+  ) {
+    openPackageDetailScreen(
+      packageName = YOUTUBE_PACKAGE,
+      label = YOUTUBE_LABEL
+    )
+    waitForTextStartsWith(NATIVE_LIBRARY_PREFIX, "native library list")
+  }
+
+  @Test
   fun switchGooglePlayServicesDetailTabs() = benchmarkRule.measureRepeated(
     packageName = TARGET_PACKAGE,
     metrics = listOf(FrameTimingMetric()),
@@ -103,15 +120,25 @@ class AppDetailBenchmark {
   }
 
   private fun MacrobenchmarkScope.openGooglePlayServicesDetailScreen() {
+    openPackageDetailScreen(
+      packageName = GOOGLE_PLAY_SERVICES_PACKAGE,
+      label = GOOGLE_PLAY_SERVICES_LABEL
+    )
+  }
+
+  private fun MacrobenchmarkScope.openPackageDetailScreen(
+    packageName: String,
+    label: String
+  ) {
     startActivityAndWait(
       Intent(Intent.ACTION_SHOW_APP_INFO).apply {
         setClassName(TARGET_PACKAGE, APP_DETAIL_ACTIVITY)
-        putExtra(Intent.EXTRA_PACKAGE_NAME, GOOGLE_PLAY_SERVICES_PACKAGE)
+        putExtra(Intent.EXTRA_PACKAGE_NAME, packageName)
         flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
       }
     )
-    waitForText(GOOGLE_PLAY_SERVICES_LABEL, "app label")
-    waitForText(GOOGLE_PLAY_SERVICES_PACKAGE, "package name")
+    waitForText(label, "app label")
+    waitForText(packageName, "package name")
     check(
       device.wait(
         Until.hasObject(By.res(TARGET_PACKAGE, "tab_layout")),
@@ -170,6 +197,8 @@ class AppDetailBenchmark {
     private const val ANDROID_AUTO_LABEL = "Android Auto"
     private const val GOOGLE_PLAY_SERVICES_LABEL = "Google Play 服务"
     private const val GOOGLE_PLAY_SERVICES_PACKAGE = "com.google.android.gms"
+    private const val YOUTUBE_LABEL = "YouTube"
+    private const val YOUTUBE_PACKAGE = "com.google.android.youtube"
     private const val NATIVE_LIBRARY_PREFIX = "lib"
     private const val SERVICE_TAB_TITLE = "服务"
     private const val ACTIVITY_TAB_TITLE = "活动"

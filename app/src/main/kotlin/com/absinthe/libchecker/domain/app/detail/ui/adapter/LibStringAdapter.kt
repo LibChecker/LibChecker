@@ -78,6 +78,7 @@ class LibStringAdapter(
   private var processMode: Boolean = false
   private var is64Bit: Boolean = false
   private val nativeSizeTextCache = mutableMapOf<Pair<LibStringItem, List<String>>, CharSequence>()
+  private val nativeLabelSpanCache = mutableMapOf<String, SpannedString>()
 
   fun setProcessMode(isProcessMode: Boolean) {
     processMode = isProcessMode
@@ -405,20 +406,22 @@ class LibStringAdapter(
       .joinToString()
   }
 
-  private fun createNativeLabelSpan(text: String): SpannedString = buildSpannedString {
-    append(" $text ")
-    val capsuleDrawable = CapsuleDrawable(
-      context = context,
-      text = text,
-      textSize = 10.dp.toFloat(),
-      textColor = context.getColorByAttr(com.google.android.material.R.attr.colorOnSecondaryFixed),
-      backgroundColor = context.getColorByAttr(com.google.android.material.R.attr.colorSecondaryFixed),
-      borderColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutlineVariant),
-      borderWidth = 1f,
-      cornerRadius = 5.dp.toFloat()
-    )
-    capsuleDrawable.setBounds(0, 0, capsuleDrawable.intrinsicWidth, capsuleDrawable.intrinsicHeight)
-    val span = CenterAlignImageSpan(capsuleDrawable)
-    setSpan(span, 1, 1 + text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+  private fun createNativeLabelSpan(text: String): SpannedString = nativeLabelSpanCache.getOrPut(text) {
+    buildSpannedString {
+      append(" $text ")
+      val capsuleDrawable = CapsuleDrawable(
+        context = context,
+        text = text,
+        textSize = 10.dp.toFloat(),
+        textColor = context.getColorByAttr(com.google.android.material.R.attr.colorOnSecondaryFixed),
+        backgroundColor = context.getColorByAttr(com.google.android.material.R.attr.colorSecondaryFixed),
+        borderColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutlineVariant),
+        borderWidth = 1f,
+        cornerRadius = 5.dp.toFloat()
+      )
+      capsuleDrawable.setBounds(0, 0, capsuleDrawable.intrinsicWidth, capsuleDrawable.intrinsicHeight)
+      val span = CenterAlignImageSpan(capsuleDrawable)
+      setSpan(span, 1, 1 + text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+    }
   }
 }
