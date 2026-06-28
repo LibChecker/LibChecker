@@ -9,11 +9,12 @@ class GetLibReferenceIconPackagesUseCase(
 
   operator fun invoke(
     packageNames: Iterable<String>,
+    packageInfoByName: Map<String, PackageInfo>,
     limit: Int = DEFAULT_LIMIT
   ): List<PackageInfo> {
     return packageNames.asSequence()
       .distinct()
-      .mapNotNull(installedAppRepository::getPackageInfo)
+      .mapNotNull { packageInfoByName[it] ?: installedAppRepository.getPackageInfo(it) }
       .take(limit)
       .toList()
   }

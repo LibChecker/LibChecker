@@ -36,7 +36,8 @@ class ComputeLibReferenceUseCase(
     onProgress: (Int) -> Unit
   ): ReferenceIndex? {
     val targets = installedAppRepository.getApplicationList()
-    val index = ReferenceIndex()
+    val packageInfoByName = targets.associateByTo(HashMap(targets.size)) { it.packageName }
+    val index = ReferenceIndex(packageInfoByName)
     val types = getSelectedLibReferenceTypes(config.options)
     val basePackageInfoCache = HashMap<String, PackageInfo>()
     val progressTotal = (targets.size * types.size).coerceAtLeast(1)
@@ -48,8 +49,9 @@ class ComputeLibReferenceUseCase(
 
     fun getBasePackageInfo(packageName: String): PackageInfo? {
       basePackageInfoCache[packageName]?.let { return it }
-      return installedAppRepository.getPackageInfo(packageName)
-        ?.also { basePackageInfoCache[packageName] = it }
+      return packageInfoByName[packageName]
+        ?: installedAppRepository.getPackageInfo(packageName)
+          ?.also { basePackageInfoCache[packageName] = it }
     }
 
     suspend fun computeInternal(@LibType type: Int): Boolean {
@@ -330,7 +332,9 @@ class ComputeLibReferenceUseCase(
     val onlyNotMarked: Boolean
   )
 
-  class ReferenceIndex internal constructor() {
+  class ReferenceIndex internal constructor(
+    internal val packageInfoByName: Map<String, PackageInfo>
+  ) {
     internal val references = HashMap<String, Pair<MutableSet<String>, Int>>()
 
     fun clear() {

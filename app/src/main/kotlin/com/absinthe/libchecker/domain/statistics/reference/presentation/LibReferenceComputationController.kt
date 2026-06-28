@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.domain.statistics.reference.presentation
 
+import android.content.pm.PackageInfo
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReference
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceItem
 import com.absinthe.libchecker.domain.statistics.reference.usecase.ComputeLibReferenceUseCase
@@ -75,7 +76,7 @@ class LibReferenceComputationController(
           index,
           getLibReferenceConfigUseCase.getMatchConfig(),
           updateProgress
-        )?.map { it.toLibReference() } ?: return@launch
+        )?.map { it.toLibReference(index.packageInfoByName) } ?: return@launch
 
         _libReference.emit(refList)
         _savedRefList = refList
@@ -88,13 +89,13 @@ class LibReferenceComputationController(
     }
   }
 
-  private fun LibReferenceItem.toLibReference(): LibReference {
+  private fun LibReferenceItem.toLibReference(packageInfoByName: Map<String, PackageInfo>): LibReference {
     return LibReference(
       libName,
       rule,
       referredList,
       type,
-      iconPackages = getLibReferenceIconPackagesUseCase(referredList)
+      iconPackages = getLibReferenceIconPackagesUseCase(referredList, packageInfoByName)
     )
   }
 
