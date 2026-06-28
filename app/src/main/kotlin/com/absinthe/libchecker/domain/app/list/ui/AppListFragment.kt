@@ -63,6 +63,7 @@ const val VF_LOADING = 0
 const val VF_LIST = 1
 const val VF_INIT = 2
 const val VF_REJECT = 3
+private const val APP_LIST_UPDATE_DEBOUNCE_MS = 250L
 
 class AppListFragment :
   BaseListControllerFragment<FragmentAppListBinding>(),
@@ -455,16 +456,20 @@ class AppListFragment :
 
   private fun updateItems(highlightRefresh: Boolean = false) {
     val generation = ++itemViewStatesGeneration
+    val shouldDebounce = highlightRefresh || isListReady || appAdapter.data.isNotEmpty()
     itemViewStatesJob?.cancel()
     updateItemsJob?.cancel()
-    updateItemsJob = updateItemsImpl(highlightRefresh, generation)
+    updateItemsJob = updateItemsImpl(highlightRefresh, generation, shouldDebounce)
   }
 
   private fun updateItemsImpl(
     highlightRefresh: Boolean = false,
-    generation: Int
+    generation: Int,
+    shouldDebounce: Boolean
   ) = lifecycleScope.launch(Dispatchers.IO) {
-    delay(250)
+    if (shouldDebounce) {
+      delay(APP_LIST_UPDATE_DEBOUNCE_MS)
+    }
     Timber.d("updateItemsImpl")
     val currentItems = withContext(Dispatchers.Main) {
       appAdapter.data.toList()
