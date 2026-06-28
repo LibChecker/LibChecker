@@ -20,8 +20,10 @@ Use the Gradle wrapper from the repository root. On macOS/Linux use
 - Release/R8/package validation: `./gradlew :app:assembleRelease`
 - Market R8 rule check when full signing is blocked:
   `./gradlew :app:minifyMarketReleaseWithR8`
-- Jetpack Macrobenchmark startup smoke:
+- Jetpack Macrobenchmark targeted smoke:
   `ANDROID_SERIAL=<serial> ./gradlew :macrobenchmark:connectedFossBenchmarkAndroidTest --no-configuration-cache`
+  Add `-Pandroid.testInstrumentationRunnerArguments.class=<BenchmarkClass#method>`
+  to run one startup, app-list, or detail scenario.
 - Device UI validation: prefer AndroMeld MCP Phone Screen sessions for visible
   launch, navigation, and UI-state checks. Use Gradle/adb for install and
   package-state operations only when needed. For performance/detail checks, use
