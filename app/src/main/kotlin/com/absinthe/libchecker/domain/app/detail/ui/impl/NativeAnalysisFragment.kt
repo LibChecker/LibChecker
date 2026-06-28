@@ -6,8 +6,10 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.constant.Constants.MULTI_ARCH
 import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
+import com.absinthe.libchecker.domain.app.detail.TRACE_DETAIL_NATIVE_SET_ITEMS
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
+import com.absinthe.libchecker.domain.app.detail.traceDetailSuspendSection
 import com.absinthe.libchecker.domain.app.detail.ui.Referable
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.LibStringDiffUtil
 import com.absinthe.libchecker.domain.app.detail.ui.base.BaseDetailFragment
@@ -104,7 +106,9 @@ class NativeAnalysisFragment :
       emptyView.text.text = getString(R.string.empty_list)
     } else {
       lifecycleScope.launch(Dispatchers.IO) {
-        setItemsWithFilter(list, viewModel.filterState.queriedText, viewModel.filterState.queriedProcess)
+        traceDetailSuspendSection(TRACE_DETAIL_NATIVE_SET_ITEMS) {
+          setItemsWithFilter(list, viewModel.filterState.queriedText, viewModel.filterState.queriedProcess)
+        }
       }
     }
 

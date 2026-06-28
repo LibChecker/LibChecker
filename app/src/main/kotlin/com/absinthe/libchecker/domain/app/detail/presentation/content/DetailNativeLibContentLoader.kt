@@ -2,11 +2,13 @@ package com.absinthe.libchecker.domain.app.detail.presentation.content
 
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.domain.app.VersionedFeature
+import com.absinthe.libchecker.domain.app.detail.TRACE_DETAIL_NATIVE_INIT_USE_CASE
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailNativeLibrariesUseCase
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailContentState
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailFeatureState
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailLoadJobsState
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailPackageState
+import com.absinthe.libchecker.domain.app.detail.traceDetailSection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
@@ -30,13 +32,15 @@ class DetailNativeLibContentLoader(
     ) {
       val abiBundle = featureState.abiBundleStateFlow.value
         ?: featureState.abiBundleStateFlow.filterNotNull().first()
-      val nativeLibraries = getAppDetailNativeLibrariesUseCase(
-        packageInfo = packageState.packageInfo,
-        apkPreviewInfo = packageState.apkPreviewInfo,
-        isApk = packageState.isApk,
-        isApkPreview = packageState.isApkPreview,
-        abi = abiBundle.abi
-      )
+      val nativeLibraries = traceDetailSection(TRACE_DETAIL_NATIVE_INIT_USE_CASE) {
+        getAppDetailNativeLibrariesUseCase(
+          packageInfo = packageState.packageInfo,
+          apkPreviewInfo = packageState.apkPreviewInfo,
+          isApk = packageState.isApk,
+          isApkPreview = packageState.isApkPreview,
+          abi = abiBundle.abi
+        )
+      }
 
       contentState.emitNativeLibTabs(nativeLibraries.itemsByAbi)
 

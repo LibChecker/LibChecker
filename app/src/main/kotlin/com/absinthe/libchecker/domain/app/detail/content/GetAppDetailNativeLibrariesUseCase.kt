@@ -12,8 +12,18 @@ import com.absinthe.libchecker.constant.GlobalFeatures
 import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.detail.TRACE_DETAIL_NATIVE_ACTIVITY_NAMES
+import com.absinthe.libchecker.domain.app.detail.TRACE_DETAIL_NATIVE_CHIP_LIST
+import com.absinthe.libchecker.domain.app.detail.TRACE_DETAIL_NATIVE_LIBS
+import com.absinthe.libchecker.domain.app.detail.TRACE_DETAIL_NATIVE_RULE_MATCH
+import com.absinthe.libchecker.domain.app.detail.TRACE_DETAIL_PARSE_SELECTED_ABI
+import com.absinthe.libchecker.domain.app.detail.TRACE_DETAIL_PRELOAD_NATIVE_LIB_NAMES
+import com.absinthe.libchecker.domain.app.detail.TRACE_DETAIL_SOURCE_LIBS
+import com.absinthe.libchecker.domain.app.detail.TRACE_DETAIL_SUPPORTS_16KB
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
+import com.absinthe.libchecker.domain.app.detail.traceDetailSection
+import com.absinthe.libchecker.domain.app.detail.traceDetailSuspendSection
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
@@ -41,37 +51,42 @@ class GetAppDetailNativeLibrariesUseCase(
     isApk: Boolean,
     isApkPreview: Boolean,
     abi: Int
-  ): AppDetailNativeLibraries {
+  ): AppDetailNativeLibraries = traceDetailSection(TRACE_DETAIL_NATIVE_LIBS) {
     val specifiedAbi = if (abi == ERROR || abi == NO_LIBS || abi == OVERLAY) abi else null
     val parseElf = GlobalFeatures.ENABLE_DETECTING_16KB_PAGE_ALIGNMENT && !isApkPreview
-    val itemsByAbi = if (!isApkPreview && apkPreviewInfo == null) {
-      PackageUtils.getSourceLibs(packageInfo, specifiedAbi = specifiedAbi, parseElf = false)
-    } else {
-      apkPreviewInfo!!.nativeLibs.map {
-        ABI_STRING_MAP[it.key]!! to it.value.map { value ->
-          LibStringItem(
-            name = value.first,
-            size = value.second.toLong()
-          )
-        }
-      }.toMap()
+    val itemsByAbi = traceDetailSection(TRACE_DETAIL_SOURCE_LIBS) {
+      if (!isApkPreview && apkPreviewInfo == null) {
+        PackageUtils.getSourceLibs(packageInfo, specifiedAbi = specifiedAbi, parseElf = false)
+      } else {
+        apkPreviewInfo!!.nativeLibs.map {
+          ABI_STRING_MAP[it.key]!! to it.value.map { value ->
+            LibStringItem(
+              name = value.first,
+              size = value.second.toLong()
+            )
+          }
+        }.toMap()
+      }
     }
     val selectedAbiTab = ABI_STRING_MAP[abi % MULTI_ARCH]
     val resolvedItemsByAbi = if (parseElf && specifiedAbi == null && selectedAbiTab != null) {
-      itemsByAbi.withParsedAbiItems(
-        packageInfo = packageInfo,
-        tab = selectedAbiTab
-      )
+      traceDetailSection(TRACE_DETAIL_PARSE_SELECTED_ABI) {
+        itemsByAbi.withParsedAbiItems(
+          packageInfo = packageInfo,
+          tab = selectedAbiTab
+        )
+      }
     } else {
       itemsByAbi
     }
-
     val selectedAbiItems = resolvedItemsByAbi[selectedAbiTab]
-    return AppDetailNativeLibraries(
+    AppDetailNativeLibraries(
       itemsByAbi = resolvedItemsByAbi,
-      selectedAbiSupports16KbPageSize = selectedAbiItems?.let {
-        !isApkPreview && packageInfo.is16KBAligned(libs = it, isApk = isApk)
-      } ?: false
+      selectedAbiSupports16KbPageSize = traceDetailSection(TRACE_DETAIL_SUPPORTS_16KB) {
+        selectedAbiItems?.let {
+          !isApkPreview && packageInfo.is16KBAligned(libs = it, isApk = isApk)
+        } ?: false
+      }
     )
   }
 
@@ -82,7 +97,7 @@ class GetAppDetailNativeLibrariesUseCase(
     tab: String,
     items: List<LibStringItem>,
     sortBySize: Boolean
-  ): List<LibStringItemChip> {
+  ): List<LibStringItemChip> = traceDetailSuspendSection(TRACE_DETAIL_NATIVE_CHIP_LIST) {
     val resolvedItems = resolveNativeLibItemsForTab(
       packageInfo = packageInfo,
       apkPreviewInfo = apkPreviewInfo,
@@ -91,15 +106,21 @@ class GetAppDetailNativeLibrariesUseCase(
       items = items
     )
     if (resolvedItems.isEmpty()) {
-      return emptyList()
+      return@traceDetailSuspendSection emptyList()
     }
 
     val packageName = apkPreviewInfo?.packageName ?: packageInfo.packageName
-    val nativeActivityLibNames = getNativeActivityLibNames(packageInfo, isApkPreview)
-    val preloadNativeLibNames = getZygotePreloadNativeLibNames(packageInfo, apkPreviewInfo)
+    val nativeActivityLibNames = traceDetailSection(TRACE_DETAIL_NATIVE_ACTIVITY_NAMES) {
+      getNativeActivityLibNames(packageInfo, isApkPreview)
+    }
+    val preloadNativeLibNames = traceDetailSection(TRACE_DETAIL_PRELOAD_NATIVE_LIB_NAMES) {
+      getZygotePreloadNativeLibNames(packageInfo, apkPreviewInfo)
+    }
     val nativeLibNames = resolvedItems.map { it.name }
     val chipList = resolvedItems.map {
-      val rule = RulesRepository.getRuleWithRegex(it.name, NATIVE, packageName, nativeLibNames)
+      val rule = traceDetailSuspendSection(TRACE_DETAIL_NATIVE_RULE_MATCH) {
+        RulesRepository.getRuleWithRegex(it.name, NATIVE, packageName, nativeLibNames)
+      }
       val labels = mutableListOf<String>().apply {
         if (it.name in nativeActivityLibNames) {
           add(NATIVE_ACTIVITY_LABEL)
@@ -121,7 +142,7 @@ class GetAppDetailNativeLibrariesUseCase(
     } else {
       chipList.sortWith(compareByDescending<LibStringItemChip> { it.rule != null }.thenByDescending { it.item.size })
     }
-    return chipList
+    chipList
   }
 
   private fun Map<String, List<LibStringItem>>.withParsedAbiItems(
@@ -159,11 +180,13 @@ class GetAppDetailNativeLibrariesUseCase(
     }
 
     val abi = STRING_ABI_MAP[tab] ?: return items
-    return PackageUtils.getSourceLibs(
-      packageInfo = packageInfo,
-      specifiedAbi = abi,
-      parseElf = true
-    )[tab]?.takeIf { it.isNotEmpty() } ?: items
+    return traceDetailSection(TRACE_DETAIL_PARSE_SELECTED_ABI) {
+      PackageUtils.getSourceLibs(
+        packageInfo = packageInfo,
+        specifiedAbi = abi,
+        parseElf = true
+      )[tab]?.takeIf { it.isNotEmpty() } ?: items
+    }
   }
 
   private fun getNativeActivityLibNames(packageInfo: PackageInfo, isApkPreview: Boolean): Set<String> {

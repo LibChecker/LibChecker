@@ -2,8 +2,10 @@ package com.absinthe.libchecker.macrobenchmark
 
 import android.content.Intent
 import androidx.benchmark.macro.CompilationMode
+import androidx.benchmark.macro.ExperimentalMetricApi
 import androidx.benchmark.macro.FrameTimingMetric
 import androidx.benchmark.macro.MacrobenchmarkScope
+import androidx.benchmark.macro.TraceSectionMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -71,9 +73,30 @@ class AppDetailBenchmark {
   }
 
   @Test
+  @OptIn(ExperimentalMetricApi::class)
   fun coldOpenGooglePlayServicesDetail() = benchmarkRule.measureRepeated(
     packageName = TARGET_PACKAGE,
-    metrics = listOf(FrameTimingMetric()),
+    metrics = listOf(
+      FrameTimingMetric(),
+      TraceSectionMetric(TRACE_DETAIL_GET_PACKAGE_INFO),
+      TraceSectionMetric(TRACE_DETAIL_LOAD_PACKAGE),
+      TraceSectionMetric(TRACE_DETAIL_NATIVE_ACTIVITY_NAMES),
+      TraceSectionMetric(TRACE_DETAIL_NATIVE_CHIP_LIST),
+      TraceSectionMetric(TRACE_DETAIL_NATIVE_INIT_USE_CASE),
+      TraceSectionMetric(TRACE_DETAIL_NATIVE_LIBS),
+      TraceSectionMetric(TRACE_DETAIL_NATIVE_RULE_MATCH),
+      TraceSectionMetric(TRACE_DETAIL_NATIVE_SET_ITEMS),
+      TraceSectionMetric(TRACE_DETAIL_PARSE_SELECTED_ABI),
+      TraceSectionMetric(TRACE_DETAIL_PRELOAD_NATIVE_LIB_NAMES),
+      TraceSectionMetric(TRACE_DETAIL_SOURCE_LIBS),
+      TraceSectionMetric(TRACE_DETAIL_SUPPORTS_16KB),
+      TraceSectionMetric(TRACE_PACKAGE_UTILS_APK_LIBS_DATA_OFFSET),
+      TraceSectionMetric(TRACE_PACKAGE_UTILS_APK_LIBS_MATCH_ENTRIES),
+      TraceSectionMetric(TRACE_PACKAGE_UTILS_APK_LIBS_OPEN_ZIP),
+      TraceSectionMetric(TRACE_PACKAGE_UTILS_APK_LIBS_PARSE_ELF),
+      TraceSectionMetric(TRACE_ZIP_DATA_OFFSET_APACHE),
+      TraceSectionMetric(TRACE_ZIP_DATA_OFFSET_CENTRAL)
+    ),
     compilationMode = CompilationMode.None(),
     iterations = 5,
     setupBlock = {
@@ -287,5 +310,23 @@ class AppDetailBenchmark {
     private const val UI_TIMEOUT_MS = 15_000L
     private const val DETAIL_SCROLL_REPEAT_COUNT = 4
     private const val DETAIL_SCROLL_STEPS = 24
+    private const val TRACE_DETAIL_GET_PACKAGE_INFO = "LC Detail getPackageInfo"
+    private const val TRACE_DETAIL_LOAD_PACKAGE = "LC Detail loadPackage"
+    private const val TRACE_DETAIL_NATIVE_ACTIVITY_NAMES = "LC Detail nativeActivityNames"
+    private const val TRACE_DETAIL_NATIVE_CHIP_LIST = "LC Detail nativeChipList"
+    private const val TRACE_DETAIL_NATIVE_INIT_USE_CASE = "LC Detail nativeInitUseCase"
+    private const val TRACE_DETAIL_NATIVE_LIBS = "LC Detail nativeLibs"
+    private const val TRACE_DETAIL_NATIVE_RULE_MATCH = "LC Detail nativeRuleMatch"
+    private const val TRACE_DETAIL_NATIVE_SET_ITEMS = "LC Detail nativeSetItems"
+    private const val TRACE_DETAIL_PARSE_SELECTED_ABI = "LC Detail parseSelectedAbi"
+    private const val TRACE_DETAIL_PRELOAD_NATIVE_LIB_NAMES = "LC Detail preloadNativeLibNames"
+    private const val TRACE_DETAIL_SOURCE_LIBS = "LC Detail sourceLibs"
+    private const val TRACE_DETAIL_SUPPORTS_16KB = "LC Detail supports16KB"
+    private const val TRACE_PACKAGE_UTILS_APK_LIBS_DATA_OFFSET = "LC PackageUtils apkLibsDataOffset"
+    private const val TRACE_PACKAGE_UTILS_APK_LIBS_MATCH_ENTRIES = "LC PackageUtils apkLibsMatchEntries"
+    private const val TRACE_PACKAGE_UTILS_APK_LIBS_OPEN_ZIP = "LC PackageUtils apkLibsOpenZip"
+    private const val TRACE_PACKAGE_UTILS_APK_LIBS_PARSE_ELF = "LC PackageUtils apkLibsParseElf"
+    private const val TRACE_ZIP_DATA_OFFSET_APACHE = "LC ZipDataOffset apache"
+    private const val TRACE_ZIP_DATA_OFFSET_CENTRAL = "LC ZipDataOffset central"
   }
 }

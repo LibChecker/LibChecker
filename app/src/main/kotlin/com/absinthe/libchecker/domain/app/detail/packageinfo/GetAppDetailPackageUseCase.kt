@@ -3,6 +3,9 @@ package com.absinthe.libchecker.domain.app.detail.packageinfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.detail.TRACE_DETAIL_GET_PACKAGE_INFO
+import com.absinthe.libchecker.domain.app.detail.TRACE_DETAIL_LOAD_PACKAGE
+import com.absinthe.libchecker.domain.app.detail.traceDetailSuspendSection
 import com.absinthe.libchecker.utils.extensions.isArchivedPackage
 
 class GetAppDetailPackageUseCase(
@@ -10,16 +13,20 @@ class GetAppDetailPackageUseCase(
 ) {
 
   suspend operator fun invoke(packageName: String): Result {
-    val packageInfo = installedAppRepository.getPackageInfo(
-      packageName = packageName,
-      flags = PackageManager.GET_PERMISSIONS or PackageManager.GET_META_DATA,
-      resolveFrozenArchiveInfo = false
-    ) ?: return Result.NotFound
+    return traceDetailSuspendSection(TRACE_DETAIL_LOAD_PACKAGE) {
+      val packageInfo = traceDetailSuspendSection(TRACE_DETAIL_GET_PACKAGE_INFO) {
+        installedAppRepository.getPackageInfo(
+          packageName = packageName,
+          flags = PackageManager.GET_PERMISSIONS or PackageManager.GET_META_DATA,
+          resolveFrozenArchiveInfo = false
+        )
+      } ?: return@traceDetailSuspendSection Result.NotFound
 
-    return if (packageInfo.isArchivedPackage()) {
-      Result.Archived
-    } else {
-      Result.Available(packageInfo)
+      if (packageInfo.isArchivedPackage()) {
+        Result.Archived
+      } else {
+        Result.Available(packageInfo)
+      }
     }
   }
 
