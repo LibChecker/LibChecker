@@ -5,11 +5,11 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.PointF
+import android.text.TextUtils
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.view.isGone
 import androidx.core.view.marginEnd
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.UiUtils
@@ -18,6 +18,7 @@ import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.rulesbundle.Rule
+import com.google.android.material.chip.Chip
 
 class NativeLibItemView(context: Context) : AViewGroup(context) {
 
@@ -56,13 +57,7 @@ class NativeLibItemView(context: Context) : AViewGroup(context) {
       addView(this)
     }
 
-  private val chip =
-    RuleChipView(context).apply {
-      layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 48.dp)
-      maxWidth = (context.displayWidth * 0.45f).toInt()
-      isGone = true
-      addView(this)
-    }
+  private var chip: Chip? = null
   private var chipRule: Rule? = null
   private var chipColorfulIcon: Boolean? = null
 
@@ -72,23 +67,33 @@ class NativeLibItemView(context: Context) : AViewGroup(context) {
     }
     chipRule = rule
     chipColorfulIcon = colorfulIcon
-    if (rule != null) {
-      chip.bind(rule, colorfulIcon)
-      chip.isGone = false
-    } else {
-      chip.clear()
-      chip.isGone = true
+    chip = rule?.let {
+      getOrCreateChip().apply {
+        text = it.label
+        chipIcon = RuleChipIconCache.newDrawable(context, it, colorfulIcon)
+      }
+    } ?: run {
+      chip?.let { removeView(it) }
+      null
     }
+  }
+
+  private fun getOrCreateChip() = chip ?: Chip(context).apply {
+    isClickable = false
+    isFocusable = false
+    importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
+    layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 48.dp)
+    maxWidth = (context.displayWidth * 0.45f).toInt()
+    ellipsize = TextUtils.TruncateAt.MIDDLE
+    addView(this)
   }
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-    val chipWidth = if (chip.isGone) {
-      0
-    } else {
-      chip.autoMeasure()
-      chip.measuredWidth + libName.marginEnd
-    }
+    val chipWidth = chip?.let {
+      it.autoMeasure()
+      return@let it.measuredWidth + libName.marginEnd
+    } ?: 0
     val textWidth =
       (measuredWidth - paddingStart - paddingEnd - libName.marginEnd - chipWidth).coerceAtLeast(0)
 
@@ -106,9 +111,7 @@ class NativeLibItemView(context: Context) : AViewGroup(context) {
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     libName.layout(paddingStart, paddingTop)
     libSize.layout(paddingStart, libName.bottom)
-    if (!chip.isGone) {
-      chip.layout(paddingEnd, chip.toVerticalCenter(this), fromRight = true)
-    }
+    chip?.let { it.layout(paddingEnd, it.toVerticalCenter(this), fromRight = true) }
   }
 
   var processLabelColor: Int = -1
