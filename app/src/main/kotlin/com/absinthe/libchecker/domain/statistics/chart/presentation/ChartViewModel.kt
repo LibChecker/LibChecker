@@ -67,9 +67,9 @@ class ChartViewModel internal constructor(
   private val _detailAbiSwitchVisibility = MutableStateFlow(true)
   val detailAbiSwitchVisibility = _detailAbiSwitchVisibility.asStateFlow()
 
-  fun setLoadingProgress(progress: Int, allowDecrease: Boolean = false) {
+  fun setLoadingProgress(progress: Int) {
     val currentProgress = _loadingProgress.value
-    if (allowDecrease || progress >= currentProgress) {
+    if (currentProgress >= LOADING_PROGRESS_MAX || progress >= currentProgress) {
       _loadingProgress.value = progress
     }
   }

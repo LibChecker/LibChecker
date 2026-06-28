@@ -228,9 +228,6 @@ class ChartFragment :
     if (requestKey == currentChartRequestKey) {
       return
     }
-    val canContinueLoadingProgress = currentChartRequestKey
-      ?.canContinueLoadingProgress(requestKey) == true
-    val shouldResetLoadingProgress = !canContinueLoadingProgress
     currentChartRequestKey = requestKey
 
     if (chartView.parent != null) {
@@ -238,19 +235,18 @@ class ChartFragment :
     }
 
     when (plan) {
-      is ChartDataSourcePlan.Pie -> setChartData(::generatePieChartView, plan, shouldResetLoadingProgress)
-      is ChartDataSourcePlan.Bar -> setChartData(::generateBarChartView, plan, shouldResetLoadingProgress)
+      is ChartDataSourcePlan.Pie -> setChartData(::generatePieChartView, plan)
+      is ChartDataSourcePlan.Bar -> setChartData(::generateBarChartView, plan)
     }
     Telemetry.recordEvent(Constants.Event.CHART, mapOf(Telemetry.Param.ITEM_ID to selectedChartType))
   }
 
   private fun setChartData(
     generateChartView: () -> PieChart,
-    plan: ChartDataSourcePlan.Pie,
-    shouldResetLoadingProgress: Boolean
+    plan: ChartDataSourcePlan.Pie
   ) {
     val newChartView = generateChartView()
-    viewModel.setLoadingProgress(plan.initialLoadingProgress, allowDecrease = shouldResetLoadingProgress)
+    viewModel.setLoadingProgress(plan.initialLoadingProgress)
     chartDataRenderer.render(binding.root, chartView, newChartView, plan.dataSource)
     chartView = newChartView
     dataSource = plan.dataSource
@@ -258,11 +254,10 @@ class ChartFragment :
 
   private fun setChartData(
     generateChartView: () -> BarChart,
-    plan: ChartDataSourcePlan.Bar,
-    shouldResetLoadingProgress: Boolean
+    plan: ChartDataSourcePlan.Bar
   ) {
     val newChartView = generateChartView()
-    viewModel.setLoadingProgress(plan.initialLoadingProgress, allowDecrease = shouldResetLoadingProgress)
+    viewModel.setLoadingProgress(plan.initialLoadingProgress)
     chartDataRenderer.render(binding.root, chartView, newChartView, plan.dataSource)
     chartView = newChartView
     dataSource = plan.dataSource
@@ -456,13 +451,7 @@ private data class ChartRequestKey(
   val useDetailedAbiChart: Boolean,
   val showSystemApps: Boolean,
   val itemsHash: Int
-) {
-  fun canContinueLoadingProgress(other: ChartRequestKey): Boolean {
-    return chartType == other.chartType &&
-      useDetailedAbiChart == other.useDetailedAbiChart &&
-      showSystemApps == other.showSystemApps
-  }
-}
+)
 
 private fun List<LCItem>.chartRequestHash(chartType: ChartType): Int {
   return fold(1) { result, item ->
