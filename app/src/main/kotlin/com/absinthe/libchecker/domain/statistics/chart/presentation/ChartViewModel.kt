@@ -69,7 +69,7 @@ class ChartViewModel internal constructor(
 
   fun setLoadingProgress(progress: Int, allowDecrease: Boolean = false) {
     val currentProgress = _loadingProgress.value
-    if (allowDecrease || currentProgress >= LOADING_PROGRESS_MAX || progress >= currentProgress) {
+    if (allowDecrease || progress >= currentProgress) {
       _loadingProgress.value = progress
     }
   }
