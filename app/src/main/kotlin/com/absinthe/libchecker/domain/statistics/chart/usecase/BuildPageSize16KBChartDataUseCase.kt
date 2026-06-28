@@ -13,6 +13,7 @@ import com.absinthe.libchecker.utils.extensions.ABI_VALUE_TO_INSTRUCTION_SET_MAP
 import com.absinthe.libchecker.utils.extensions.PAGE_SIZE_16_KB
 import java.io.File
 import java.util.zip.ZipEntry
+import java.util.zip.ZipFile as JavaZipFile
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
@@ -109,15 +110,24 @@ class BuildPageSize16KBChartDataUseCase(
     sourceFile: File
   ): Boolean {
     return traceSection(TRACE_CHECK_SOURCE) {
-      when (val baseResult = checkApk16KBAlignment(sourceFile, abi)) {
+      val abiSplitFiles = getAbiSplitFiles(packageInfo, abi)
+      when (
+        val baseResult = traceSection(TRACE_CHECK_BASE_SOURCE) {
+          checkApk16KBAlignment(
+            file = sourceFile,
+            abi = abi,
+            precheckNoNativeLibs = abiSplitFiles.isNotEmpty()
+          )
+        }
+      ) {
         PageSize16KBScanResult.Compatible -> return@traceSection true
         PageSize16KBScanResult.Incompatible -> return@traceSection false
         PageSize16KBScanResult.NoNativeLibs -> Unit
       }
 
       var hasSplitNativeLibs = false
-      getAbiSplitFiles(packageInfo, abi).forEach { split ->
-        when (checkApk16KBAlignment(split, abi)) {
+      abiSplitFiles.forEach { split ->
+        when (traceSection(TRACE_CHECK_SPLIT_SOURCE) { checkApk16KBAlignment(split, abi) }) {
           PageSize16KBScanResult.Compatible -> hasSplitNativeLibs = true
           PageSize16KBScanResult.Incompatible -> return@traceSection false
           PageSize16KBScanResult.NoNativeLibs -> Unit
@@ -141,41 +151,51 @@ class BuildPageSize16KBChartDataUseCase(
       .orEmpty()
   }
 
-  private fun checkApk16KBAlignment(file: File, abi: Int): PageSize16KBScanResult {
+  private fun checkApk16KBAlignment(
+    file: File,
+    abi: Int,
+    precheckNoNativeLibs: Boolean = false
+  ): PageSize16KBScanResult {
+    if (file.exists().not() || file.canRead().not()) {
+      return PageSize16KBScanResult.NoNativeLibs
+    }
+    val abiString = ABI_STRING_MAP[abi % MULTI_ARCH] ?: return PageSize16KBScanResult.NoNativeLibs
+    val sourceDir = "lib$APK_ENTRY_SEPARATOR$abiString"
+    if (precheckNoNativeLibs && hasMatchingNativeLibEntry(file, sourceDir) == false) {
+      return PageSize16KBScanResult.NoNativeLibs
+    }
     return traceSection(TRACE_SCAN_APK) {
-      if (file.exists().not() || file.canRead().not()) {
-        return@traceSection PageSize16KBScanResult.NoNativeLibs
-      }
-      val abiString = ABI_STRING_MAP[abi % MULTI_ARCH] ?: return@traceSection PageSize16KBScanResult.NoNativeLibs
-      val sourceDir = "lib$APK_ENTRY_SEPARATOR$abiString"
       var hasNativeLibs = false
 
       try {
-        ZipFile.Builder().setFile(file).get().use { zipFile ->
-          zipFile.entries.asSequence()
-            .filter { entry ->
-              !entry.isDirectory &&
-                entry.name.endsWith(".so") &&
-                entry.name.startsWith(sourceDir)
+        traceSection(TRACE_OPEN_ZIP) { ZipFile.Builder().setFile(file).get() }.use { zipFile ->
+          val nativeEntries = traceSection(TRACE_MATCH_ZIP_ENTRIES) {
+            zipFile.entries.asSequence()
+              .filter { entry ->
+                !entry.isDirectory &&
+                  entry.name.endsWith(".so") &&
+                  entry.name.startsWith(sourceDir)
+              }
+              .toList()
+          }
+          nativeEntries.forEach { entry ->
+            val pageSize = parseElfMinPageSize(zipFile, entry)
+            if (pageSize <= 0) {
+              return@forEach
             }
-            .forEach { entry ->
-              val pageSize = parseElfMinPageSize(zipFile, entry)
-              if (pageSize <= 0) {
-                return@forEach
-              }
-              hasNativeLibs = true
-              if (pageSize % PAGE_SIZE_16_KB != 0) {
-                return@traceSection PageSize16KBScanResult.Incompatible
-              }
-              val zipAlignment = if (entry.method == ZipEntry.STORED) {
-                getZipAlignment(zipFile, entry)
-              } else {
-                -1L
-              }
-              if (zipAlignment > 0L && zipAlignment < PAGE_SIZE_16_KB) {
-                return@traceSection PageSize16KBScanResult.Incompatible
-              }
+            hasNativeLibs = true
+            if (pageSize % PAGE_SIZE_16_KB != 0) {
+              return@traceSection PageSize16KBScanResult.Incompatible
             }
+            val zipAlignment = if (entry.method == ZipEntry.STORED) {
+              getZipAlignment(zipFile, entry)
+            } else {
+              -1L
+            }
+            if (zipAlignment > 0L && zipAlignment < PAGE_SIZE_16_KB) {
+              return@traceSection PageSize16KBScanResult.Incompatible
+            }
+          }
         }
       } catch (e: OutOfMemoryError) {
         Timber.w(e, "Failed to check 16 KB page-size alignment from ${file.absolutePath}")
@@ -190,6 +210,29 @@ class BuildPageSize16KBChartDataUseCase(
       } else {
         PageSize16KBScanResult.NoNativeLibs
       }
+    }
+  }
+
+  private fun hasMatchingNativeLibEntry(file: File, sourceDir: String): Boolean? {
+    return traceSection(TRACE_PRECHECK_BASE_APK) {
+      runCatching {
+        JavaZipFile(file).use { zipFile ->
+          val entries = zipFile.entries()
+          while (entries.hasMoreElements()) {
+            val entry = entries.nextElement()
+            if (
+              !entry.isDirectory &&
+              entry.name.endsWith(".so") &&
+              entry.name.startsWith(sourceDir)
+            ) {
+              return@traceSection true
+            }
+          }
+        }
+        false
+      }.onFailure {
+        Timber.w(it, "Failed to precheck 16 KB page-size native entries from ${file.absolutePath}")
+      }.getOrNull()
     }
   }
 
@@ -271,7 +314,12 @@ class BuildPageSize16KBChartDataUseCase(
     private const val APK_ENTRY_SEPARATOR = '/'
     private const val TRACE_GET_PACKAGE_INFO = "LC 16KB getPackageInfo"
     private const val TRACE_CHECK_SOURCE = "LC 16KB checkSource"
+    private const val TRACE_CHECK_BASE_SOURCE = "LC 16KB checkBaseSource"
+    private const val TRACE_CHECK_SPLIT_SOURCE = "LC 16KB checkSplitSource"
+    private const val TRACE_PRECHECK_BASE_APK = "LC 16KB precheckBaseApk"
     private const val TRACE_SCAN_APK = "LC 16KB scanApk"
+    private const val TRACE_OPEN_ZIP = "LC 16KB openZip"
+    private const val TRACE_MATCH_ZIP_ENTRIES = "LC 16KB matchZipEntries"
     private const val TRACE_PARSE_ELF = "LC 16KB parseElf"
     private const val TRACE_ZIP_ALIGNMENT = "LC 16KB zipAlign"
     private const val TRACE_NATIVE_DIR = "LC 16KB nativeDir"

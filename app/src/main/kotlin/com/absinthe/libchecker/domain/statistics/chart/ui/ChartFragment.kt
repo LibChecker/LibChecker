@@ -207,7 +207,7 @@ class ChartFragment :
     }
     val canContinueLoadingProgress = currentChartRequestKey
       ?.canContinueLoadingProgress(requestKey) == true
-    val shouldResetLoadingProgress = !canContinueLoadingProgress || !viewModel.isChartLoading
+    val shouldResetLoadingProgress = !canContinueLoadingProgress
     currentChartRequestKey = requestKey
 
     if (chartView.parent != null) {

@@ -31,7 +31,12 @@ class ChartBenchmark {
       FrameTimingMetric(),
       TraceSectionMetric(TRACE_16KB_GET_PACKAGE_INFO),
       TraceSectionMetric(TRACE_16KB_CHECK_SOURCE),
+      TraceSectionMetric(TRACE_16KB_CHECK_BASE_SOURCE),
+      TraceSectionMetric(TRACE_16KB_CHECK_SPLIT_SOURCE),
+      TraceSectionMetric(TRACE_16KB_PRECHECK_BASE_APK),
       TraceSectionMetric(TRACE_16KB_SCAN_APK),
+      TraceSectionMetric(TRACE_16KB_OPEN_ZIP),
+      TraceSectionMetric(TRACE_16KB_MATCH_ZIP_ENTRIES),
       TraceSectionMetric(TRACE_16KB_PARSE_ELF),
       TraceSectionMetric(TRACE_16KB_ZIP_ALIGNMENT),
       TraceSectionMetric(TRACE_16KB_NATIVE_DIR)
@@ -120,7 +125,12 @@ class ChartBenchmark {
     private const val UI_TIMEOUT_MS = 60_000L
     private const val TRACE_16KB_GET_PACKAGE_INFO = "LC 16KB getPackageInfo"
     private const val TRACE_16KB_CHECK_SOURCE = "LC 16KB checkSource"
+    private const val TRACE_16KB_CHECK_BASE_SOURCE = "LC 16KB checkBaseSource"
+    private const val TRACE_16KB_CHECK_SPLIT_SOURCE = "LC 16KB checkSplitSource"
+    private const val TRACE_16KB_PRECHECK_BASE_APK = "LC 16KB precheckBaseApk"
     private const val TRACE_16KB_SCAN_APK = "LC 16KB scanApk"
+    private const val TRACE_16KB_OPEN_ZIP = "LC 16KB openZip"
+    private const val TRACE_16KB_MATCH_ZIP_ENTRIES = "LC 16KB matchZipEntries"
     private const val TRACE_16KB_PARSE_ELF = "LC 16KB parseElf"
     private const val TRACE_16KB_ZIP_ALIGNMENT = "LC 16KB zipAlign"
     private const val TRACE_16KB_NATIVE_DIR = "LC 16KB nativeDir"
