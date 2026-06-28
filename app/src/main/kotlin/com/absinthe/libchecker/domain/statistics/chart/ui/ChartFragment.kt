@@ -18,6 +18,7 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentPieChartBinding
 import com.absinthe.libchecker.domain.statistics.chart.model.ChartType
 import com.absinthe.libchecker.domain.statistics.chart.model.LOADING_PROGRESS_MAX
+import com.absinthe.libchecker.domain.statistics.chart.presentation.ChartProgressPlan
 import com.absinthe.libchecker.domain.statistics.chart.presentation.ChartTypeSelectorPlan
 import com.absinthe.libchecker.domain.statistics.chart.presentation.ChartViewModel
 import com.absinthe.libchecker.domain.statistics.chart.source.BaseChartDataSource
@@ -72,6 +73,7 @@ class ChartFragment :
   private lateinit var chartDataRenderer: ChartDataRenderer
   private var currentExpandingView: ExpandingView? = null
   private var currentChartRequestKey: ChartRequestKey? = null
+  private var currentProgressPlan: ChartProgressPlan? = null
 
   override fun init() {
     binding.root.applySystemBarsPadding(top = true, bottom = true)
@@ -176,18 +178,39 @@ class ChartFragment :
 
   private fun updateProgressIndicator() {
     val progressPlan = viewModel.createProgressPlan()
+    val previousPlan = currentProgressPlan
+    currentProgressPlan = progressPlan
 
     binding.progressHorizontal.let { indicator ->
-      if (progressPlan.isVisible) {
-        indicator.isIndeterminate = progressPlan.isIndeterminate
-        if (progressPlan.isIndeterminate || progressPlan.progress == 0) {
-          indicator.progress = 0
-        } else {
-          indicator.setProgressCompat(progressPlan.progress, true)
+      if (!progressPlan.isVisible) {
+        if (previousPlan?.isVisible != false) {
+          indicator.hide()
         }
+        return@let
+      }
+
+      val wasVisible = previousPlan?.isVisible == true
+      if (previousPlan?.isIndeterminate != progressPlan.isIndeterminate) {
+        indicator.isIndeterminate = progressPlan.isIndeterminate
+      }
+
+      if (progressPlan.isIndeterminate) {
+        if (previousPlan?.isIndeterminate != true && indicator.progress != 0) {
+          indicator.progress = 0
+        }
+      } else if (progressPlan.progress == 0) {
+        if (previousPlan?.progress != 0 || indicator.progress != 0) {
+          indicator.progress = 0
+        }
+      } else if (
+        previousPlan?.progress != progressPlan.progress ||
+        previousPlan.isIndeterminateOrHidden()
+      ) {
+        indicator.setProgressCompat(progressPlan.progress, wasVisible)
+      }
+
+      if (!wasVisible) {
         indicator.show()
-      } else {
-        indicator.hide()
       }
     }
   }
@@ -476,4 +499,8 @@ private fun LCItem.fullChartRequestHash(includeFeatures: Boolean): Int {
   result = 31 * result + targetApi.hashCode()
   result = 31 * result + variant.hashCode()
   return result
+}
+
+private fun ChartProgressPlan?.isIndeterminateOrHidden(): Boolean {
+  return this == null || !isVisible || isIndeterminate
 }
