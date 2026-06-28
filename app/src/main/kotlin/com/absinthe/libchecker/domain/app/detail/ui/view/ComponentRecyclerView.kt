@@ -22,6 +22,10 @@ class ComponentRecyclerView : BorderRecyclerView {
   private var lastX = 0f
   private var lastY = 0f
 
+  init {
+    setHasFixedSize(true)
+  }
+
   override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
     when (ev.action) {
       MotionEvent.ACTION_DOWN -> {
