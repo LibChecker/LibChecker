@@ -71,6 +71,7 @@ class ChartFragment :
   private var showClassifyDialogJob: Job? = null
   private lateinit var chartDataRenderer: ChartDataRenderer
   private var currentExpandingView: ExpandingView? = null
+  private var currentChartRequestKey: ChartRequestKey? = null
 
   override fun init() {
     binding.root.applySystemBarsPadding(top = true, bottom = true)
@@ -193,15 +194,27 @@ class ChartFragment :
 
   private fun setData(items: List<LCItem>, chartType: ChartType = viewModel.currentChartType) {
     context ?: return
+    val plan = viewModel.createChartDataSourcePlan(items, chartType)
+    val selectedChartType = viewModel.currentChartType
+    val requestKey = ChartRequestKey(
+      chartType = selectedChartType,
+      useDetailedAbiChart = selectedChartType == ChartType.ABI && viewModel.isDetailedAbiChart,
+      itemsHash = items.chartRequestHash(selectedChartType)
+    )
+    if (requestKey == currentChartRequestKey) {
+      return
+    }
+    currentChartRequestKey = requestKey
+
     if (chartView.parent != null) {
       binding.root.removeView(chartView)
     }
 
-    when (val plan = viewModel.createChartDataSourcePlan(items, chartType)) {
+    when (plan) {
       is ChartDataSourcePlan.Pie -> setChartData(::generatePieChartView, plan)
       is ChartDataSourcePlan.Bar -> setChartData(::generateBarChartView, plan)
     }
-    Telemetry.recordEvent(Constants.Event.CHART, mapOf(Telemetry.Param.ITEM_ID to viewModel.currentChartType))
+    Telemetry.recordEvent(Constants.Event.CHART, mapOf(Telemetry.Param.ITEM_ID to selectedChartType))
   }
 
   private fun setChartData(
@@ -407,4 +420,32 @@ class ChartFragment :
     }
     return getString(R.string.android_dist_subtitle_format, time) + System.lineSeparator() + "API ${Build.VERSION.SDK_INT} (Android $androidVersion)"
   }
+}
+
+private data class ChartRequestKey(
+  val chartType: ChartType,
+  val useDetailedAbiChart: Boolean,
+  val itemsHash: Int
+)
+
+private fun List<LCItem>.chartRequestHash(chartType: ChartType): Int {
+  val includeFeatures = chartType.requiresFeatureInitialization
+  return fold(1) { result, item ->
+    31 * result + item.chartRequestHash(includeFeatures)
+  }
+}
+
+private fun LCItem.chartRequestHash(includeFeatures: Boolean): Int {
+  var result = packageName.hashCode()
+  result = 31 * result + label.hashCode()
+  result = 31 * result + versionName.hashCode()
+  result = 31 * result + versionCode.hashCode()
+  result = 31 * result + installedTime.hashCode()
+  result = 31 * result + lastUpdatedTime.hashCode()
+  result = 31 * result + isSystem.hashCode()
+  result = 31 * result + abi.hashCode()
+  result = 31 * result + if (includeFeatures) features else 0
+  result = 31 * result + targetApi.hashCode()
+  result = 31 * result + variant.hashCode()
+  return result
 }

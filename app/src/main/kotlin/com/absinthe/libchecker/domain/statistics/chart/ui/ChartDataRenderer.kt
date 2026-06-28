@@ -17,6 +17,7 @@ internal class ChartDataRenderer(
   private val onDistributionLastUpdateTimeChanged: (String) -> Unit
 ) {
   private var queryJob: Job? = null
+  private var renderGeneration = 0
 
   fun <T : View> render(
     root: ViewGroup,
@@ -24,13 +25,19 @@ internal class ChartDataRenderer(
     newChartView: T,
     source: IChartDataSource<T>
   ) {
+    val generation = ++renderGeneration
     queryJob?.cancel()
     queryJob = scope.launch(Dispatchers.Default) {
       source.fillChartView(newChartView) { progress ->
-        onLoadingProgressChanged(progress)
+        if (generation == renderGeneration) {
+          onLoadingProgressChanged(progress)
+        }
       }
 
       withContext(Dispatchers.Main) {
+        if (generation != renderGeneration) {
+          return@withContext
+        }
         if (currentChartView != null) {
           root.removeView(currentChartView)
         }
