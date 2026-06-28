@@ -71,6 +71,39 @@ class AppDetailBenchmark {
   }
 
   @Test
+  fun coldOpenGooglePlayServicesDetail() = benchmarkRule.measureRepeated(
+    packageName = TARGET_PACKAGE,
+    metrics = listOf(FrameTimingMetric()),
+    compilationMode = CompilationMode.None(),
+    iterations = 5,
+    setupBlock = {
+      killProcess()
+      pressHome()
+    }
+  ) {
+    openGooglePlayServicesDetailScreen()
+    waitForTextStartsWith(NATIVE_LIBRARY_PREFIX, "native library list")
+  }
+
+  @Test
+  fun coldOpenAndroidAutoDetail() = benchmarkRule.measureRepeated(
+    packageName = TARGET_PACKAGE,
+    metrics = listOf(FrameTimingMetric()),
+    compilationMode = CompilationMode.None(),
+    iterations = 5,
+    setupBlock = {
+      killProcess()
+      pressHome()
+    }
+  ) {
+    openPackageDetailScreen(
+      packageName = ANDROID_AUTO_PACKAGE,
+      label = ANDROID_AUTO_LABEL
+    )
+    waitForTextStartsWith(NATIVE_LIBRARY_PREFIX, "native library list")
+  }
+
+  @Test
   fun openYouTubeDetail() = benchmarkRule.measureRepeated(
     packageName = TARGET_PACKAGE,
     metrics = listOf(FrameTimingMetric()),
@@ -232,6 +265,7 @@ class AppDetailBenchmark {
     private const val ANDROID_PACKAGE = "android"
     private const val APP_DETAIL_ACTIVITY = "com.absinthe.libchecker.domain.app.detail.ui.AppDetailActivity"
     private const val ANDROID_AUTO_LABEL = "Android Auto"
+    private const val ANDROID_AUTO_PACKAGE = "com.google.android.projection.gearhead"
     private const val GOOGLE_PLAY_SERVICES_LABEL = "Google Play 服务"
     private const val GOOGLE_PLAY_SERVICES_PACKAGE = "com.google.android.gms"
     private const val YOUTUBE_LABEL = "YouTube"
