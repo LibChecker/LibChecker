@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.loadingindicator.LoadingIndicator xmlns:android="http://schemas.android.com/apk/res/android"
+  android:id="@+id/loading_view"
+  style="@style/App.Widget.M3E.LoadingIndicator.Contained"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content" />
