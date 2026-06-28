@@ -111,8 +111,7 @@ class ChartViewModel internal constructor(
 
   fun createProgressPlan(): ChartProgressPlan {
     return chartUiStatePlanner.planProgress(
-      chartLoadingProgress = loadingProgress.value,
-      featureInitializationPending = featureInitializationPending
+      chartLoadingProgress = loadingProgress.value
     )
   }
 

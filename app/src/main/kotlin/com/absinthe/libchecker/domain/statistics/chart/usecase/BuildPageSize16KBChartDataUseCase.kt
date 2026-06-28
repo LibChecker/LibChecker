@@ -46,12 +46,16 @@ class BuildPageSize16KBChartDataUseCase(
       }
 
       runCatching {
+        val abi = item.abi.toInt()
+        if (PackageUtils.hasNoNativeLibs(abi)) {
+          noNativeLibs.add(item)
+          return@runCatching
+        }
+
         val packageInfo = traceSection(TRACE_GET_PACKAGE_INFO) {
           installedAppRepository.getPackageInfo(item.packageName)
         } ?: return@runCatching
-        if (PackageUtils.hasNoNativeLibs(item.abi.toInt())) {
-          noNativeLibs.add(item)
-        } else if (is16KBAligned(packageInfo, item.abi.toInt())) {
+        if (is16KBAligned(packageInfo, abi)) {
           support16KB.add(item)
         } else {
           notSupport16KB.add(item)

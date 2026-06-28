@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.domain.statistics.chart.presentation
 
 import com.absinthe.libchecker.domain.statistics.chart.model.ChartType
-import com.absinthe.libchecker.domain.statistics.chart.model.LOADING_PROGRESS_INFINITY
 import com.absinthe.libchecker.domain.statistics.chart.model.LOADING_PROGRESS_MAX
 
 class ChartUiStatePlanner {
@@ -21,20 +20,13 @@ class ChartUiStatePlanner {
   }
 
   fun planProgress(
-    chartLoadingProgress: Int,
-    featureInitializationPending: Boolean
+    chartLoadingProgress: Int
   ): ChartProgressPlan {
-    val progress = when {
-      chartLoadingProgress < LOADING_PROGRESS_MAX -> chartLoadingProgress
-      featureInitializationPending -> LOADING_PROGRESS_INFINITY
-      else -> LOADING_PROGRESS_MAX
-    }
-
-    return if (progress < LOADING_PROGRESS_MAX) {
+    return if (chartLoadingProgress < LOADING_PROGRESS_MAX) {
       ChartProgressPlan(
         isVisible = true,
-        isIndeterminate = progress == LOADING_PROGRESS_INFINITY,
-        progress = progress.coerceAtLeast(0)
+        isIndeterminate = chartLoadingProgress < 0,
+        progress = chartLoadingProgress.coerceAtLeast(0)
       )
     } else {
       ChartProgressPlan(
