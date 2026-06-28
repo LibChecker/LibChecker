@@ -38,6 +38,7 @@ class ChartBenchmark {
       TraceSectionMetric(TRACE_16KB_OPEN_ZIP),
       TraceSectionMetric(TRACE_16KB_MATCH_ZIP_ENTRIES),
       TraceSectionMetric(TRACE_16KB_PARSE_ELF),
+      TraceSectionMetric(TRACE_16KB_ZIP_DATA_OFFSET),
       TraceSectionMetric(TRACE_16KB_ZIP_ALIGNMENT),
       TraceSectionMetric(TRACE_16KB_NATIVE_DIR)
     ),
@@ -132,6 +133,7 @@ class ChartBenchmark {
     private const val TRACE_16KB_OPEN_ZIP = "LC 16KB openZip"
     private const val TRACE_16KB_MATCH_ZIP_ENTRIES = "LC 16KB matchZipEntries"
     private const val TRACE_16KB_PARSE_ELF = "LC 16KB parseElf"
+    private const val TRACE_16KB_ZIP_DATA_OFFSET = "LC 16KB zipDataOffset"
     private const val TRACE_16KB_ZIP_ALIGNMENT = "LC 16KB zipAlign"
     private const val TRACE_16KB_NATIVE_DIR = "LC 16KB nativeDir"
 
