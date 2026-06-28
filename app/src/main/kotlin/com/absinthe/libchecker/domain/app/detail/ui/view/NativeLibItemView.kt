@@ -2,8 +2,6 @@ package com.absinthe.libchecker.domain.app.detail.ui.view
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.ColorMatrix
-import android.graphics.ColorMatrixColorFilter
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.PointF
@@ -73,14 +71,7 @@ class NativeLibItemView(context: Context) : AViewGroup(context) {
     chip = rule?.let {
       getOrCreateChip().apply {
         text = it.label
-        setChipIconResource(it.iconRes)
-
-        if (!colorfulIcon && !it.isSimpleColorIcon) {
-          chipIcon?.let { icon ->
-            icon.colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
-            chipIcon = icon
-          }
-        }
+        chipIcon = RuleChipIconCache.newDrawable(context, it, colorfulIcon)
       }
     } ?: run {
       chip?.let { removeView(it) }
