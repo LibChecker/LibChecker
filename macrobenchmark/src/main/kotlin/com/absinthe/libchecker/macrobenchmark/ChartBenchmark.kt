@@ -2,8 +2,10 @@ package com.absinthe.libchecker.macrobenchmark
 
 import android.content.Intent
 import androidx.benchmark.macro.CompilationMode
+import androidx.benchmark.macro.ExperimentalMetricApi
 import androidx.benchmark.macro.FrameTimingMetric
 import androidx.benchmark.macro.MacrobenchmarkScope
+import androidx.benchmark.macro.TraceSectionMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -22,9 +24,18 @@ class ChartBenchmark {
   val benchmarkRule = MacrobenchmarkRule()
 
   @Test
+  @OptIn(ExperimentalMetricApi::class)
   fun show16KBPageSizeChart() = benchmarkRule.measureRepeated(
     packageName = TARGET_PACKAGE,
-    metrics = listOf(FrameTimingMetric()),
+    metrics = listOf(
+      FrameTimingMetric(),
+      TraceSectionMetric(TRACE_16KB_GET_PACKAGE_INFO),
+      TraceSectionMetric(TRACE_16KB_CHECK_SOURCE),
+      TraceSectionMetric(TRACE_16KB_SCAN_APK),
+      TraceSectionMetric(TRACE_16KB_PARSE_ELF),
+      TraceSectionMetric(TRACE_16KB_ZIP_ALIGNMENT),
+      TraceSectionMetric(TRACE_16KB_NATIVE_DIR)
+    ),
     compilationMode = CompilationMode.None(),
     iterations = 5,
     setupBlock = {
@@ -107,6 +118,12 @@ class ChartBenchmark {
     private const val APP_LIST_RES_ID = "list"
     private const val PACKAGE_NAME_PREFIX = "com."
     private const val UI_TIMEOUT_MS = 60_000L
+    private const val TRACE_16KB_GET_PACKAGE_INFO = "LC 16KB getPackageInfo"
+    private const val TRACE_16KB_CHECK_SOURCE = "LC 16KB checkSource"
+    private const val TRACE_16KB_SCAN_APK = "LC 16KB scanApk"
+    private const val TRACE_16KB_PARSE_ELF = "LC 16KB parseElf"
+    private const val TRACE_16KB_ZIP_ALIGNMENT = "LC 16KB zipAlign"
+    private const val TRACE_16KB_NATIVE_DIR = "LC 16KB nativeDir"
 
     private val CHART_16KB_SELECTOR_TEXT_PATTERN: Pattern = Pattern.compile(
       ".*16\\s*KB.*",
