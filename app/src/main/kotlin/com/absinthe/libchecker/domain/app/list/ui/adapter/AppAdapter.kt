@@ -28,10 +28,11 @@ class AppAdapter(
 ) : HighlightAdapter<LCItem>() {
 
   private val itemViewStateCache = mutableMapOf<String, AppListItemViewState>()
+  private var itemViewStyle: AppItemView.Style? = null
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return createBaseViewHolder(
-      AppItemView(context).apply {
+      AppItemView(context, getItemViewStyle(context)).apply {
         layoutParams = ViewGroup.MarginLayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT,
           ViewGroup.LayoutParams.WRAP_CONTENT
@@ -136,6 +137,12 @@ class AppAdapter(
         item = item,
         options = fallbackDisplayOptions
       )
+    }
+  }
+
+  private fun getItemViewStyle(context: Context): AppItemView.Style {
+    return itemViewStyle ?: AppItemView.Style.create(context).also {
+      itemViewStyle = it
     }
   }
 

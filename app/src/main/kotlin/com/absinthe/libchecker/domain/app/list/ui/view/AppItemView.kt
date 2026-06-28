@@ -20,11 +20,13 @@ import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.card.MaterialCardView
 
-class AppItemView(context: Context) : MaterialCardView(context) {
+class AppItemView(
+  context: Context,
+  private val style: Style = Style.create(context)
+) : MaterialCardView(context) {
 
-  val container = AppItemContainerView(context).apply {
-    val padding = context.getDimensionPixelSize(R.dimen.main_card_padding)
-    setPadding(padding, padding, padding, padding)
+  val container = AppItemContainerView(context, style).apply {
+    setPadding(style.cardPadding, style.cardPadding, style.cardPadding, style.cardPadding)
   }
 
   private val floatView by lazy {
@@ -37,8 +39,8 @@ class AppItemView(context: Context) : MaterialCardView(context) {
         it.topMargin = 24.dp
         it.bottomMargin = 24.dp
       }
-      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceLabelLarge))
-      setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
+      setTextAppearance(style.labelLargeTextAppearance)
+      setTextColor(style.onSurfaceVariantColor)
     }
   }
 
@@ -64,16 +66,18 @@ class AppItemView(context: Context) : MaterialCardView(context) {
       .joinToString()
   }
 
-  class AppItemContainerView(context: Context) : AViewGroup(context) {
+  class AppItemContainerView(
+    context: Context,
+    private val style: Style = Style.create(context)
+  ) : AViewGroup(context) {
 
     private val iconBadgeGap = 4.dp
     private val abiBadgeGap = 1.dp
     private val abiBadgeWidthRatio = 0.75f
 
     val icon = AppCompatImageView(context).apply {
-      val iconSize = context.getDimensionPixelSize(R.dimen.app_icon_size)
-      layoutParams = LayoutParams(iconSize, iconSize)
-      setImageResource(R.drawable.ic_icon_blueprint)
+      layoutParams = LayoutParams(style.iconSize, style.iconSize)
+      setImageDrawable(style.newIconPlaceholder(context))
       importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
       addView(this)
     }
@@ -85,8 +89,8 @@ class AppItemView(context: Context) : MaterialCardView(context) {
       ).also {
         it.marginStart = 8.dp
       }
-      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleMedium))
-      setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
+      setTextAppearance(style.titleMediumTextAppearance)
+      setTextColor(style.onSurfaceColor)
       maxLines = 1
       ellipsize = TextUtils.TruncateAt.END
       addView(this)
@@ -97,8 +101,8 @@ class AppItemView(context: Context) : MaterialCardView(context) {
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
-      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBodyMedium))
-      setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
+      setTextAppearance(style.bodyMediumTextAppearance)
+      setTextColor(style.onSurfaceVariantColor)
       maxLines = 1
       ellipsize = TextUtils.TruncateAt.END
       addView(this)
@@ -109,8 +113,8 @@ class AppItemView(context: Context) : MaterialCardView(context) {
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
-      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBodySmall))
-      setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
+      setTextAppearance(style.bodySmallTextAppearance)
+      setTextColor(style.onSurfaceVariantColor)
       maxLines = 1
       ellipsize = TextUtils.TruncateAt.END
       addView(this)
@@ -122,8 +126,8 @@ class AppItemView(context: Context) : MaterialCardView(context) {
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
       setPadding(0, 0, 0, 2.dp)
-      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceLabelSmall))
-      setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
+      setTextAppearance(style.labelSmallTextAppearance)
+      setTextColor(style.onSurfaceVariantColor)
       maxLines = 1
       ellipsize = TextUtils.TruncateAt.END
       addView(this)
@@ -332,6 +336,54 @@ class AppItemView(context: Context) : MaterialCardView(context) {
         return this
       }
       return (this * intrinsicHeight.toFloat() / intrinsicWidth).toInt().coerceAtLeast(1)
+    }
+  }
+
+  class Style private constructor(
+    val cardPadding: Int,
+    val iconSize: Int,
+    val titleMediumTextAppearance: Int,
+    val bodyMediumTextAppearance: Int,
+    val bodySmallTextAppearance: Int,
+    val labelSmallTextAppearance: Int,
+    val labelLargeTextAppearance: Int,
+    val onSurfaceColor: Int,
+    val onSurfaceVariantColor: Int,
+    private val iconPlaceholderState: Drawable.ConstantState?
+  ) {
+
+    fun newIconPlaceholder(context: Context): Drawable? {
+      return iconPlaceholderState?.newDrawable(context.resources)
+        ?: R.drawable.ic_icon_blueprint.getDrawable(context)
+    }
+
+    companion object {
+      fun create(context: Context): Style {
+        return Style(
+          cardPadding = context.getDimensionPixelSize(R.dimen.main_card_padding),
+          iconSize = context.getDimensionPixelSize(R.dimen.app_icon_size),
+          titleMediumTextAppearance = context.getResourceIdByAttr(
+            com.google.android.material.R.attr.textAppearanceTitleMedium
+          ),
+          bodyMediumTextAppearance = context.getResourceIdByAttr(
+            com.google.android.material.R.attr.textAppearanceBodyMedium
+          ),
+          bodySmallTextAppearance = context.getResourceIdByAttr(
+            com.google.android.material.R.attr.textAppearanceBodySmall
+          ),
+          labelSmallTextAppearance = context.getResourceIdByAttr(
+            com.google.android.material.R.attr.textAppearanceLabelSmall
+          ),
+          labelLargeTextAppearance = context.getResourceIdByAttr(
+            com.google.android.material.R.attr.textAppearanceLabelLarge
+          ),
+          onSurfaceColor = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface),
+          onSurfaceVariantColor = context.getColorByAttr(
+            com.google.android.material.R.attr.colorOnSurfaceVariant
+          ),
+          iconPlaceholderState = R.drawable.ic_icon_blueprint.getDrawable(context)?.constantState
+        )
+      }
     }
   }
 }
