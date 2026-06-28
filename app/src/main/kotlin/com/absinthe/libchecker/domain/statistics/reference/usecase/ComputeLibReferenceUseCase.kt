@@ -2,6 +2,7 @@ package com.absinthe.libchecker.domain.statistics.reference.usecase
 
 import android.content.pm.ApplicationInfo
 import android.content.pm.ComponentInfo
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.ACTION_IN_RULES
@@ -37,11 +38,18 @@ class ComputeLibReferenceUseCase(
     val targets = installedAppRepository.getApplicationList()
     val index = ReferenceIndex()
     val types = getSelectedLibReferenceTypes(config.options)
+    val basePackageInfoCache = HashMap<String, PackageInfo>()
     val progressTotal = (targets.size * types.size).coerceAtLeast(1)
     var progressCount = 0
 
     fun updateProgress() {
       onProgress(progressCount * 100 / progressTotal)
+    }
+
+    fun getBasePackageInfo(packageName: String): PackageInfo? {
+      basePackageInfoCache[packageName]?.let { return it }
+      return installedAppRepository.getPackageInfo(packageName)
+        ?.also { basePackageInfoCache[packageName] = it }
     }
 
     suspend fun computeInternal(@LibType type: Int): Boolean {
@@ -62,7 +70,7 @@ class ComputeLibReferenceUseCase(
           continue
         }
 
-        computeComponentReference(index, target.packageName, type)
+        computeComponentReference(index, target.packageName, type, ::getBasePackageInfo)
         progressCount++
         updateProgress()
       }
@@ -151,12 +159,13 @@ class ComputeLibReferenceUseCase(
   private fun computeComponentReference(
     index: ReferenceIndex,
     packageName: String,
-    @LibType type: Int
+    @LibType type: Int,
+    getBasePackageInfo: (String) -> PackageInfo?
   ) {
     try {
       when (type) {
         NATIVE -> {
-          val packageInfo = installedAppRepository.getPackageInfo(packageName) ?: return
+          val packageInfo = getBasePackageInfo(packageName) ?: return
           val list = PackageUtils.getNativeDirLibs(packageInfo)
           val nativeLibNames = list.map { it.name }
           val mapped =
@@ -204,7 +213,7 @@ class ComputeLibReferenceUseCase(
         }
 
         DEX -> {
-          val packageInfo = installedAppRepository.getPackageInfo(packageName) ?: return
+          val packageInfo = getBasePackageInfo(packageName) ?: return
           val list = PackageUtils.getDexList(packageInfo)
             .asSequence()
             .filter { it.name.startsWith(packageName).not() }
@@ -250,7 +259,7 @@ class ComputeLibReferenceUseCase(
         }
 
         SHARED_UID -> {
-          val packageInfo = installedAppRepository.getPackageInfo(packageName) ?: return
+          val packageInfo = getBasePackageInfo(packageName) ?: return
           if (packageInfo.sharedUserId?.isNotBlank() == true) {
             index.references.getOrPut(packageInfo.sharedUserId!!) {
               HashSet<String>() to SHARED_UID
@@ -259,7 +268,7 @@ class ComputeLibReferenceUseCase(
         }
 
         ACTION -> {
-          val packageInfo = installedAppRepository.getPackageInfo(packageName) ?: return
+          val packageInfo = getBasePackageInfo(packageName) ?: return
           val list =
             IntentFilterUtils.parseComponentsFromApk(packageInfo.applicationInfo!!.sourceDir)
               .asSequence()
