@@ -48,7 +48,8 @@ develocity {
 
 enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+enableFeaturePreview("NO_IMPLICIT_LOOKUP_IN_PARENT_PROJECTS")
 
-include(":app", ":hidden-api")
+include(":app", ":compat", ":hidden-api", ":macrobenchmark")
 
 rootProject.name = "LibChecker"

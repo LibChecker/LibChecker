@@ -286,10 +286,6 @@ class ParticleRemoveItemAnimator : DefaultItemAnimator() {
     private const val PARTICLE_FADE_IN_END = 0.08f
     private const val FORCE_CLEAN_UP_DELAY = 300L
 
-    fun stableItemIdForKey(key: String): Long {
-      return key.hashCode().toLong()
-    }
-
     private fun createParticles(bitmap: Bitmap, density: Float, seed: Long): List<Particle> {
       val random = Random(seed.toInt())
       val minCellSize = (1f * density).roundToInt().coerceAtLeast(1)

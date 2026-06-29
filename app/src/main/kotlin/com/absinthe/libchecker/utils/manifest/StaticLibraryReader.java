@@ -4,7 +4,7 @@ import androidx.collection.ArrayMap;
 
 import com.absinthe.libchecker.compat.IZipFile;
 import com.absinthe.libchecker.compat.ZipFileCompat;
-import com.absinthe.libchecker.features.applist.detail.bean.StaticLibItem;
+import com.absinthe.libchecker.domain.app.detail.model.StaticLibItem;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

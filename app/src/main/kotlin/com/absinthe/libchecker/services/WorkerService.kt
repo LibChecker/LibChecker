@@ -1,26 +1,26 @@
 package com.absinthe.libchecker.services
 
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.IBinder
 import android.os.RemoteCallbackList
 import android.os.RemoteException
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
-import com.absinthe.libchecker.data.app.LocalAppDataSource
-import com.absinthe.libchecker.database.Repositories
-import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.extensions.getFeatures
+import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.list.usecase.InitializePendingAppFeaturesUseCase
 import java.lang.ref.WeakReference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 import timber.log.Timber
 
 class WorkerService : LifecycleService() {
 
+  private val initializePendingAppFeatures: InitializePendingAppFeaturesUseCase by inject()
+  private val installedAppRepository: InstalledAppRepository by inject()
   private val listenerList = RemoteCallbackList<OnWorkerListener>()
   private val binder by lazy { WorkerBinder(this) }
   private var initFeaturesJob: Job? = null
@@ -35,7 +35,7 @@ class WorkerService : LifecycleService() {
     super.onCreate()
     Timber.d("onCreate")
     updateFeatureInitializationState(running = false)
-    LocalAppDataSource.addLifecycleOwner(this)
+    installedAppRepository.startPackageChangeMonitoring(this)
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -47,7 +47,7 @@ class WorkerService : LifecycleService() {
 
   override fun onDestroy() {
     Timber.d("onDestroy")
-    LocalAppDataSource.removeLifecycleOwner(this)
+    installedAppRepository.stopPackageChangeMonitoring(this)
     super.onDestroy()
   }
 
@@ -90,29 +90,7 @@ class WorkerService : LifecycleService() {
   }
 
   private suspend fun initPendingFeatures() {
-    val pendingPackages = Repositories.lcRepository.getUninitializedFeaturePackageNames()
-    val featuresMap = HashMap<String, Int>(FEATURE_UPDATE_BATCH_SIZE)
-
-    fun flushFeatures() {
-      if (featuresMap.isEmpty()) {
-        return
-      }
-      Repositories.lcRepository.updateFeatures(featuresMap)
-      featuresMap.clear()
-    }
-
-    pendingPackages.forEach { packageName ->
-      runCatching {
-        val packageInfo = PackageUtils.getPackageInfo(packageName, PackageManager.GET_META_DATA)
-        featuresMap[packageName] = packageInfo.getFeatures()
-        if (featuresMap.size >= FEATURE_UPDATE_BATCH_SIZE) {
-          flushFeatures()
-        }
-      }.onFailure { e ->
-        Timber.w(e)
-      }
-    }
-    flushFeatures()
+    initializePendingAppFeatures()
   }
 
   @Synchronized
@@ -152,8 +130,6 @@ class WorkerService : LifecycleService() {
   }
 
   companion object {
-    private const val FEATURE_UPDATE_BATCH_SIZE = 32
-
     data class FeatureInitializationState(
       val running: Boolean = false,
       val completed: Boolean = false

@@ -1,0 +1,20 @@
+package com.absinthe.libchecker.domain.snapshot.selection
+
+import com.absinthe.libchecker.database.entity.TimeStampItem
+
+class SnapshotSelection(
+  private val repository: SnapshotSelectionRepository
+) {
+
+  fun getCurrentTimestamp(): Long {
+    return repository.currentTimestamp
+  }
+
+  fun setCurrentTimestamp(timestamp: Long) {
+    repository.currentTimestamp = timestamp
+  }
+
+  fun selectLatestOrNone(timeStamps: List<TimeStampItem>) {
+    setCurrentTimestamp(timeStamps.firstOrNull()?.timestamp ?: 0L)
+  }
+}

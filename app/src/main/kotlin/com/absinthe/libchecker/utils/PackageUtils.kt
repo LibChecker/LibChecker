@@ -12,6 +12,7 @@ import android.content.pm.PackageManager
 import android.content.pm.Signature
 import android.os.Build
 import android.os.Process
+import android.os.Trace
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.core.text.buildSpannedString
@@ -53,8 +54,9 @@ import com.absinthe.libchecker.constant.Constants.X86_64
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.data.app.LocalAppDataSource
-import com.absinthe.libchecker.features.applist.detail.bean.StatefulComponent
-import com.absinthe.libchecker.features.statistics.bean.LibStringItem
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
+import com.absinthe.libchecker.domain.app.detail.model.StatefulComponent
+import com.absinthe.libchecker.utils.apk.ZipDataOffsetReader
 import com.absinthe.libchecker.utils.dex.FastDexFileFactory
 import com.absinthe.libchecker.utils.elf.ElfInfo
 import com.absinthe.libchecker.utils.elf.ElfParser
@@ -88,9 +90,8 @@ import java.security.interfaces.DSAPublicKey
 import java.security.interfaces.RSAPublicKey
 import java.text.DateFormat
 import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
 import javax.security.cert.X509Certificate
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
-import org.apache.commons.compress.archivers.zip.ZipFile
 import timber.log.Timber
 
 object PackageUtils {
@@ -299,6 +300,11 @@ object PackageUtils {
   }
 
   private const val ENABLE_GET_APK_FILE_LIBS_LOG = true
+  private const val APK_ENTRY_SEPARATOR = '/'
+  private const val TRACE_APK_LIBS_DATA_OFFSET = "LC PackageUtils apkLibsDataOffset"
+  private const val TRACE_APK_LIBS_MATCH_ENTRIES = "LC PackageUtils apkLibsMatchEntries"
+  private const val TRACE_APK_LIBS_OPEN_ZIP = "LC PackageUtils apkLibsOpenZip"
+  private const val TRACE_APK_LIBS_PARSE_ELF = "LC PackageUtils apkLibsParseElf"
 
   private fun getApkFileLibs(file: File, specifiedAbi: Int? = null, parseElf: Boolean): Map<String, MutableList<LibStringItem>> {
     if (file.exists().not() || file.canRead().not()) {
@@ -316,44 +322,51 @@ object PackageUtils {
 
     if (ENABLE_GET_APK_FILE_LIBS_LOG) timeRecorder.start()
     try {
-      val getDataOffsetMethod = ZipFile::class.java.getDeclaredMethod("getDataOffset", ZipArchiveEntry::class.java).apply {
-        isAccessible = true
-      }
-      ZipFile.Builder().setFile(file).get().use { zipFile ->
-        zipFile.entries
+      tracePackageUtilsSection(TRACE_APK_LIBS_OPEN_ZIP) { ZipFile(file) }.use { zipFile ->
+        val nativeEntries = tracePackageUtilsSection(TRACE_APK_LIBS_MATCH_ENTRIES) {
+          zipFile.entries().asSequence()
+            .filter { !it.isDirectory && it.name.endsWith(".so") && (sourceDir == null || it.name.startsWith(sourceDir)) }
+            .toList()
+        }
+        val storedEntryNames = nativeEntries
           .asSequence()
-          .filter { !it.isDirectory && it.name.endsWith(".so") && (sourceDir == null || it.name.startsWith(sourceDir)) }
-          .forEach { entry ->
-            val pathFirst = entry.name.split(File.separator).first()
-            val dir = STRING_ABI_MAP.keys.find { entry.name.startsWith(libDir + File.separator + it) }
-              ?: if (pathFirst == assetsDir) assetsDir else return@forEach
-            val offset = getDataOffsetMethod.invoke(zipFile, entry) as Long
+          .filter { it.method == ZipEntry.STORED }
+          .map { it.name }
+          .toSet()
+        val storedEntryOffsets by lazy {
+          loadStoredEntryOffsets(file, storedEntryNames)
+        }
+        nativeEntries.forEach { entry ->
+          val entryName = entry.name
+          val dir = getApkLibEntryDir(entryName, libDir, assetsDir) ?: return@forEach
 
-            val currentEntryZipAlignment = if (entry.method == ZipEntry.STORED) {
-              getZipAlignment(offset)
-            } else {
-              -1
-            }
-            val elfParser = runCatching {
+          val currentEntryZipAlignment = if (entry.method == ZipEntry.STORED) {
+            getZipAlignment(storedEntryOffsets[entryName] ?: -1L)
+          } else {
+            -1
+          }
+          val elfParser = tracePackageUtilsSection(TRACE_APK_LIBS_PARSE_ELF) {
+            runCatching {
               ElfParser(zipFile.getInputStream(entry)).use { parser ->
                 parser.parseHeader()
                 parser
               }
             }.getOrNull()
-
-            val item = LibStringItem(
-              name = entry.name.split(File.separator).last(),
-              size = entry.size,
-              elfInfo = ElfInfo(
-                elfParser?.getEType() ?: ET_NOT_ELF,
-                elfParser?.getMinPageSize() ?: -1,
-                zipAlignment = currentEntryZipAlignment
-              ),
-              source = entry.name,
-              process = file.name
-            )
-            map.getOrPut(dir) { mutableListOf() }.add(item)
           }
+
+          val item = LibStringItem(
+            name = getApkLibEntryFileName(entryName),
+            size = entry.size,
+            elfInfo = ElfInfo(
+              elfParser?.getEType() ?: ET_NOT_ELF,
+              elfParser?.getMinPageSize() ?: -1,
+              zipAlignment = currentEntryZipAlignment
+            ),
+            source = entryName,
+            process = file.name
+          )
+          map.getOrPut(dir) { mutableListOf() }.add(item)
+        }
       }
     } catch (e: OutOfMemoryError) {
       logApkFileLibsFailure(file, parseElf = true, e)
@@ -376,6 +389,25 @@ object PackageUtils {
     return java.lang.Long.lowestOneBit(offset)
   }
 
+  private fun loadStoredEntryOffsets(file: File, entryNames: Set<String>): Map<String, Long> {
+    return tracePackageUtilsSection(TRACE_APK_LIBS_DATA_OFFSET) {
+      ZipDataOffsetReader.read(file, entryNames).also { offsets ->
+        check(offsets.keys.containsAll(entryNames)) {
+          "ZIP data offsets are incomplete for ${file.absolutePath}"
+        }
+      }
+    }
+  }
+
+  private inline fun <T> tracePackageUtilsSection(sectionName: String, block: () -> T): T {
+    Trace.beginSection(sectionName)
+    return try {
+      block()
+    } finally {
+      Trace.endSection()
+    }
+  }
+
   private fun getApkFileLibsWithoutParsingElf(file: File, specifiedAbi: Int? = null): Map<String, MutableList<LibStringItem>> {
     if (file.exists().not()) {
       return emptyMap()
@@ -393,11 +425,10 @@ object PackageUtils {
             it.isDirectory.not() && it.name.endsWith(".so") && (sourceDir == null || it.name.startsWith(sourceDir))
           }
           .forEach { entry ->
-            val pathFirst = entry.name.split(File.separator).first()
-            val dir = STRING_ABI_MAP.keys.find { entry.name.startsWith(libDir + File.separator + it) }
-              ?: if (pathFirst == assetsDir) assetsDir else return@forEach
+            val entryName = entry.name
+            val dir = getApkLibEntryDir(entryName, libDir, assetsDir) ?: return@forEach
             val item = LibStringItem(
-              name = entry.name.split(File.separator).last(),
+              name = getApkLibEntryFileName(entryName),
               size = entry.size,
               elfInfo = ElfInfo()
             )
@@ -413,6 +444,34 @@ object PackageUtils {
     }
 
     return map
+  }
+
+  private fun getApkLibEntryDir(
+    entryName: String,
+    libDir: String,
+    assetsDir: String
+  ): String? {
+    val firstSeparator = entryName.indexOf(APK_ENTRY_SEPARATOR)
+    val firstSegment = if (firstSeparator >= 0) {
+      entryName.substring(0, firstSeparator)
+    } else {
+      entryName
+    }
+
+    return when (firstSegment) {
+      assetsDir -> assetsDir
+      libDir -> STRING_ABI_MAP.keys.find { entryName.startsWith("$libDir$APK_ENTRY_SEPARATOR$it") }
+      else -> null
+    }
+  }
+
+  private fun getApkLibEntryFileName(entryName: String): String {
+    val lastSeparator = entryName.lastIndexOf(APK_ENTRY_SEPARATOR)
+    return if (lastSeparator >= 0) {
+      entryName.substring(lastSeparator + 1)
+    } else {
+      entryName
+    }
   }
 
   private fun logApkFileLibsFailure(file: File, parseElf: Boolean, throwable: Throwable) {

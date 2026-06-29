@@ -1,0 +1,156 @@
+package com.absinthe.libchecker.domain.app.detail.ui
+
+import android.app.ComponentCaller
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.os.Bundle
+import androidx.lifecycle.lifecycleScope
+import com.absinthe.libchecker.R
+import com.absinthe.libchecker.annotation.ALL
+import com.absinthe.libchecker.compat.IntentCompat
+import com.absinthe.libchecker.domain.app.detail.model.DetailExtraBean
+import com.absinthe.libchecker.domain.app.detail.navigation.DetailReferenceNavigation
+import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_DETAIL_BEAN
+import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
+import com.absinthe.libchecker.domain.app.detail.packageinfo.GetAppDetailPackageUseCase
+import com.absinthe.libchecker.domain.app.detail.ui.IDetailContainer
+import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_NAME
+import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_TYPE
+import com.absinthe.libchecker.utils.Toasty
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import timber.log.Timber
+
+class AppDetailActivity :
+  BaseAppDetailActivity(),
+  IDetailContainer {
+
+  private var pkgName: String? = null
+  private var refName: String? = null
+  private var refType: Int? = null
+  private var extraBean: DetailExtraBean? = null
+  private var initPackageJob: Job? = null
+
+  override val apkAnalyticsMode: Boolean = false
+  override fun requirePackageName() = pkgName
+  override fun getToolbar() = binding.toolbar
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    isPackageReady = true
+    initPackage(intent)
+  }
+
+  override fun onNewIntent(intent: Intent, caller: ComponentCaller) {
+    super.onNewIntent(intent, caller)
+    initPackage(intent)
+  }
+
+  override fun onPostPackageInfoAvailable() {
+    resolveReferenceExtras()
+  }
+
+  override fun onStart() {
+    super.onStart()
+    registerPackageBroadcast()
+  }
+
+  override fun onStop() {
+    super.onStop()
+    unregisterPackageBroadcast()
+  }
+
+  private fun initPackage(intent: Intent) {
+    pkgName = intent.getStringExtra(EXTRA_PACKAGE_NAME) ?: let {
+      intent.data?.let { uri ->
+        uri.getQueryParameter("id").takeIf { uri.scheme == "market" && uri.host == "details" }
+      }
+    }
+    refName = intent.getStringExtra(EXTRA_REF_NAME)
+    refType = intent.getIntExtra(EXTRA_REF_TYPE, ALL)
+    extraBean = IntentCompat.getParcelableExtra<DetailExtraBean>(intent, EXTRA_DETAIL_BEAN)
+
+    Timber.d("packageName: $pkgName")
+    val packageName = pkgName ?: return
+    val detailExtraBean = extraBean
+    initPackageJob?.cancel()
+    initPackageJob = lifecycleScope.launch(Dispatchers.IO) {
+      when (val result = viewModel.loadAppDetailPackage(packageName)) {
+        is GetAppDetailPackageUseCase.Result.Available -> {
+          withContext(Dispatchers.Main) {
+            onPackageInfoAvailable(result.packageInfo, detailExtraBean)
+          }
+        }
+
+        GetAppDetailPackageUseCase.Result.Archived -> {
+          withContext(Dispatchers.Main) {
+            Timber.w("isArchivedPackage: $packageName")
+            Toasty.showLong(this@AppDetailActivity, R.string.archived_app)
+            finish()
+          }
+        }
+
+        GetAppDetailPackageUseCase.Result.NotFound -> {
+          Timber.d("getPackageInfo: $packageName failed")
+          withContext(Dispatchers.Main) {
+            finish()
+          }
+        }
+      }
+    }
+  }
+
+  private fun resolveReferenceExtras() {
+    val navigation = viewModel.buildDetailReferenceNavigation(
+      packageName = pkgName,
+      refName = refName,
+      refType = refType ?: ALL,
+      visibleTypes = typeList
+    ) ?: return
+
+    navigateToReferenceComponentPosition(navigation)
+  }
+
+  private fun navigateToReferenceComponentPosition(navigation: DetailReferenceNavigation) {
+    binding.viewpager.currentItem = navigation.tabPosition
+    binding.tabLayout.post {
+      val targetTab = binding.tabLayout.getTabAt(navigation.tabPosition)
+      if (targetTab?.isSelected == false) {
+        targetTab.select()
+      }
+    }
+
+    detailFragmentManager.navigateToComponent(navigation.type, navigation.targetName)
+  }
+
+  private val requestPackageReceiver = object : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+      val pkg = intent.data?.schemeSpecificPart.orEmpty()
+      if (pkg == pkgName) {
+        if (intent.action == Intent.ACTION_PACKAGE_REMOVED) {
+          finish()
+        } else {
+          recreate()
+        }
+      }
+    }
+  }
+
+  private fun registerPackageBroadcast() {
+    val intentFilter = IntentFilter().apply {
+      addAction(Intent.ACTION_PACKAGE_REPLACED)
+      addAction(Intent.ACTION_PACKAGE_REMOVED)
+      addDataScheme("package")
+    }
+
+    registerReceiver(requestPackageReceiver, intentFilter)
+  }
+
+  private fun unregisterPackageBroadcast() {
+    unregisterReceiver(requestPackageReceiver)
+  }
+}

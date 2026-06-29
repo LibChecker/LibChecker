@@ -4,37 +4,10 @@
 # Preserve some attributes that may be required for reflection.
 -keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod
 
--keep class * extends androidx.fragment.app.Fragment{}
-
-# For native methods, see http://proguard.sourceforge.net/manual/examples.html#native
--keepclasseswithmembernames class * {
-    native <methods>;
-}
-
-# Keep setters in Views so that animations can still work.
--keepclassmembers public class * extends android.view.View {
-    void set*(***);
-    *** get*();
-}
-
 # We want to keep methods in Activity that could be used in the XML attribute onClick.
 # -keepclassmembers class * extends android.app.Activity {
 #     public void *(android.view.View);
 # }
-
-# For enumeration classes, see http://proguard.sourceforge.net/manual/examples.html#enumerations
--keepclassmembers enum * {
-    public static **[] values();
-    public static ** valueOf(java.lang.String);
-}
-
--keepclassmembers class * implements android.os.Parcelable {
-    public static final android.os.Parcelable$Creator CREATOR;
-}
-
--keepclassmembers class **.R$* {
-    public static <fields>;
-}
 
 # Preserve annotated Javascript interface methods.
 -keepclassmembers class * {
@@ -48,22 +21,8 @@
 -dontwarn android.support.**
 
 -dontwarn javax.annotation.**
-
-# Understand the @Keep support annotation.
--keep class androidx.annotation.Keep
--keep @androidx.annotation.Keep class * {*;}
-
--keepclasseswithmembers class * {
-    @androidx.annotation.Keep <methods>;
-}
-
--keepclasseswithmembers class * {
-    @androidx.annotation.Keep <fields>;
-}
-
--keepclasseswithmembers class * {
-    @androidx.annotation.Keep <init>(...);
-}
+-dontwarn org.xmlpull.v1.XmlPullParser
+-dontwarn org.xmlpull.v1.XmlSerializer
 
 -assumenosideeffects class kotlin.jvm.internal.Intrinsics {
     public static void check*(...);
@@ -73,27 +32,6 @@
 -assumenosideeffects class java.util.Objects {
     ** requireNonNull(...);
 }
-
--dontwarn org.xmlpull.v1.XmlPullParser
--dontwarn org.xmlpull.v1.XmlSerializer
--keep class org.xmlpull.v1.* {*;}
-
-## Android architecture components: Lifecycle
-# LifecycleObserver's empty constructor is considered to be unused by proguard
--keepclassmembers class * implements androidx.lifecycle.LifecycleObserver {
-    <init>(...);
-}
-# ViewModel's empty constructor is considered to be unused by proguard
--keepclassmembers class * extends androidx.lifecycle.ViewModel {
-    <init>(...);
-}
-# keep methods annotated with @OnLifecycleEvent even if they seem to be unused
-# (Mostly for LiveData.LifecycleBoundObserver.onStateChange(), but who knows)
--keepclassmembers class * {
-    @androidx.lifecycle.OnLifecycleEvent *;
-}
-
--keep public class com.absinthe.libchecker.protocol.*  { *; }
 
 # Gson uses generic type information stored in a class file when working with fields. Proguard
 # removes such information by default, so configure it to keep all of it.
@@ -106,15 +44,9 @@
   public static * inflate(android.view.LayoutInflater);
 }
 
-
 # BottomSheetBehavior
 -keepclassmembers public class com.google.android.material.bottomsheet.BottomSheetBehavior {
   void setStateInternal(int);
-}
-
-# MPAndroidChart
--keep public class com.github.mikephil.charting.animation.* {
-    public protected *;
 }
 
 # R8 full mode
@@ -125,15 +57,18 @@
 -keep,allowobfuscation,allowshrinking class com.absinthe.libchecker.ui.base.BaseActivity
 -keep,allowobfuscation,allowshrinking class * extends com.absinthe.libchecker.ui.base.BaseActivity
 
-# org.apache.commons:commons-compress
--keep,allowoptimization class org.apache.commons.compress.archivers.zip.**
-
 # exclude com.google.android.gms:play-services-ads-identifier
 -dontwarn com.google.android.gms.ads.identifier.AdvertisingIdClient$Info
 -dontwarn com.google.android.gms.ads.identifier.AdvertisingIdClient
 
+# org.apache.commons:commons-compress
 -keepclassmembers class org.apache.commons.compress.archivers.zip.ZipFile {
     private long getDataOffset(org.apache.commons.compress.archivers.zip.ZipArchiveEntry);
+}
+
+# Protobuf javalite reflects generated message fields by their original names.
+-keepclassmembers,allowoptimization class com.absinthe.libchecker.protocol.** extends com.google.protobuf.GeneratedMessageLite {
+    <fields>;
 }
 
 # androidx.appcompat.widget.Toolbar

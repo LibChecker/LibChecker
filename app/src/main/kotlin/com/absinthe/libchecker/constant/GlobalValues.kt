@@ -9,7 +9,7 @@ import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.constant.options.SnapshotOptions
-import com.absinthe.libchecker.features.applist.MODE_SORT_BY_SIZE
+import com.absinthe.libchecker.domain.app.detail.ui.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils

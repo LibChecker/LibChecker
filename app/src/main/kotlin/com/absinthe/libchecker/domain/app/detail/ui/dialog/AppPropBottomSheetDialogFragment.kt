@@ -1,0 +1,59 @@
+package com.absinthe.libchecker.domain.app.detail.ui.dialog
+
+import android.content.pm.PackageInfo
+import androidx.core.os.BundleCompat
+import androidx.lifecycle.lifecycleScope
+import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
+import com.absinthe.libchecker.domain.app.detail.model.AppPropItem
+import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_INFO
+import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PROPS
+import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
+import com.absinthe.libchecker.domain.app.detail.ui.view.AppPropsBottomSheetView
+import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
+import com.absinthe.libchecker.utils.fromJson
+import com.absinthe.libraries.utils.view.BottomSheetHeaderView
+import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
+
+class AppPropBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppPropsBottomSheetView>() {
+
+  private val viewModel: DetailViewModel by activityViewModel()
+  private val resolveAppResourceValue: ResolveAppResourceValueUseCase by inject()
+  private val packageInfo by lazy {
+    BundleCompat.getParcelable(
+      requireArguments(),
+      EXTRA_PACKAGE_INFO,
+      PackageInfo::class.java
+    )
+  }
+
+  private val props by lazy {
+    requireArguments().getString(EXTRA_PROPS)?.fromJson<Map<String, String>>()
+  }
+
+  override fun initRootView(): AppPropsBottomSheetView = AppPropsBottomSheetView(
+    requireContext(),
+    packageInfo,
+    resolveAppResourceValue
+  )
+
+  override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
+
+  override fun init() {
+    maxPeekHeightPercentage = 0.67f
+    lifecycleScope.launch {
+      val propertyList = viewModel.getAppManifestProperties(packageInfo, props)
+        .map { property ->
+          AppPropItem(
+            key = property.key,
+            value = property.value,
+            displayValue = property.displayValue,
+            resourceId = property.resourceId,
+            resourceType = property.resourceType
+          )
+        }
+      root.adapter.setList(propertyList)
+    }
+  }
+}
