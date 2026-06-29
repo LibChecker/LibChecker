@@ -2,6 +2,7 @@ package com.absinthe.libchecker.domain.app.list.ui.view
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.text.TextUtils
 import android.view.Gravity
@@ -73,6 +74,7 @@ class AppItemView(
     private val iconBadgeGap = 4.dp
     private val abiBadgeGap = 1.dp
     private val abiBadgeWidthRatio = 0.75f
+    private val condensedTypeface = Typeface.create("sans-serif-condensed", Typeface.NORMAL)
 
     val icon = AppCompatImageView(context).apply {
       layoutParams = LayoutParams(style.iconSize, style.iconSize)
@@ -114,6 +116,8 @@ class AppItemView(
       )
       setTextAppearance(style.bodySmallTextAppearance)
       setTextColor(style.onSurfaceVariantColor)
+      typeface = condensedTypeface
+      letterSpacing = 0f
       maxLines = 1
       ellipsize = TextUtils.TruncateAt.END
       addView(this)
@@ -127,6 +131,8 @@ class AppItemView(
       setPadding(0, 0, 0, 2.dp)
       setTextAppearance(style.labelSmallTextAppearance)
       setTextColor(style.onSurfaceVariantColor)
+      typeface = condensedTypeface
+      letterSpacing = 0f
       maxLines = 1
       ellipsize = TextUtils.TruncateAt.END
       addView(this)
