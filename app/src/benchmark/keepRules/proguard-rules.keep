@@ -1,0 +1,3 @@
+# Keep benchmark-target startup support classes out of release rules.
+-keep class androidx.arch.core.executor.** { *; }
+-keep class androidx.arch.core.internal.** { *; }

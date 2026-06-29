@@ -1,0 +1,113 @@
+package com.absinthe.libchecker.domain.app.list.model
+
+import android.content.Context
+import android.content.pm.PackageInfo
+import androidx.annotation.DrawableRes
+import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.options.AdvancedOptions
+import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.utils.PackageUtils
+
+data class AppListItemViewState(
+  val packageInfo: PackageInfo?,
+  val isPackageMissing: Boolean,
+  val versionInfo: String,
+  val abiInfo: CharSequence,
+  val accessibilityAbiInfo: CharSequence,
+  val useDetachedAbiBadges: Boolean,
+  @DrawableRes val abiBadgeRes: Int,
+  @DrawableRes val largeAbiBadgeRes: Int,
+  val isAbiBadge64Bit: Boolean,
+  val showMultiArchBadge: Boolean,
+  val tintAbiLabels: Boolean,
+  val packageBadge: PackageBadge?
+) {
+
+  enum class PackageBadge {
+    Harmony,
+    Frozen
+  }
+
+  companion object {
+    fun create(
+      context: Context,
+      item: LCItem,
+      packageState: InstalledPackageState,
+      options: Int
+    ): AppListItemViewState {
+      val abi = item.abi.toInt()
+      val baseAbi = abi % Constants.MULTI_ARCH
+      val buildVersionsInfo = PackageUtils.getBuildVersionsInfo(packageState.packageInfo, item.packageName)
+      val abiInfo = StringBuilder()
+        .append(PackageUtils.getAbiString(context, abi, false))
+        .append(buildVersionsInfo)
+      val accessibilityAbiInfo = StringBuilder()
+        .append(PackageUtils.getAbiString(context, abi, true))
+        .append(buildVersionsInfo)
+
+      return AppListItemViewState(
+        packageInfo = packageState.packageInfo,
+        isPackageMissing = packageState.packageInfo == null && item.packageName != Constants.EXAMPLE_PACKAGE,
+        versionInfo = PackageUtils.getVersionString(item.versionName, item.versionCode),
+        abiInfo = abiInfo,
+        accessibilityAbiInfo = accessibilityAbiInfo,
+        useDetachedAbiBadges = shouldUseDetachedAbiBadges(options),
+        abiBadgeRes = getAbiBadgeResource(abi),
+        largeAbiBadgeRes = getLargeAbiBadgeResource(abi),
+        isAbiBadge64Bit = PackageUtils.isAbi64Bit(baseAbi),
+        showMultiArchBadge = abi / Constants.MULTI_ARCH == 1,
+        tintAbiLabels = (options and AdvancedOptions.TINT_ABI_LABEL) > 0,
+        packageBadge = when {
+          item.packageName == Constants.EXAMPLE_PACKAGE -> null
+          item.variant == Constants.VARIANT_HAP -> PackageBadge.Harmony
+          packageState.isFrozen -> PackageBadge.Frozen
+          else -> null
+        }
+      )
+    }
+
+    fun createPending(
+      context: Context,
+      item: LCItem,
+      options: Int
+    ): AppListItemViewState {
+      return create(
+        context = context,
+        item = item,
+        packageState = InstalledPackageState(
+          packageInfo = null,
+          isFrozen = false
+        ),
+        options = options
+      ).copy(
+        isPackageMissing = false,
+        packageBadge = null
+      )
+    }
+
+    private fun shouldUseDetachedAbiBadges(options: Int): Boolean {
+      return listOf(
+        AdvancedOptions.SHOW_ANDROID_VERSION,
+        AdvancedOptions.SHOW_TARGET_API,
+        AdvancedOptions.SHOW_MIN_API,
+        AdvancedOptions.SHOW_COMPILE_API
+      ).count { (options and it) > 0 } >= 4
+    }
+
+    private fun getAbiBadgeResource(abi: Int): Int {
+      return if (abi == Constants.OVERLAY || abi == Constants.ERROR) {
+        0
+      } else {
+        PackageUtils.getAbiBadgeResource(abi)
+      }
+    }
+
+    private fun getLargeAbiBadgeResource(abi: Int): Int {
+      return if (abi == Constants.OVERLAY || abi == Constants.ERROR) {
+        0
+      } else {
+        PackageUtils.getLargeAbiBadgeResource(abi)
+      }
+    }
+  }
+}

@@ -252,6 +252,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
   /**
    * Init vars, and return true if no error occurred
    */
+  @Suppress("DEPRECATION")
   private fun initRoomBackup(): Boolean {
     if (roomDatabase == null) {
       if (enableLogDebug) Timber.d("roomDatabase is missing")

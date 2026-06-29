@@ -49,6 +49,13 @@ setupAppModule {
         }
       }
     }
+    create("benchmark") {
+      initWith(getByName("release"))
+      applicationIdSuffix = ".debug"
+      matchingFallbacks += listOf("release")
+      proguardFiles("src/benchmark/keepRules/proguard-rules.keep")
+      signingConfig = signingConfigs.getByName("debug")
+    }
   }
 
   productFlavors {
@@ -111,9 +118,12 @@ configurations.configureEach {
 }
 
 dependencies {
-  compileOnly(projects.hiddenApi)
+  compileOnly(dependencies.project(":hidden-api"))
 
+  implementation(projects.compat)
   implementation(libs.kotlinX.coroutines)
+  implementation(platform(libs.koin.bom))
+  implementation(libs.koin.android)
   // implementation(libs.androidX.appCompat)
   implementation(libs.androidX.core)
   implementation(libs.androidX.activity)

@@ -38,44 +38,49 @@ class CapsuleDrawable(
   }
 
   private val padding: Float = this@CapsuleDrawable.cornerRadius // Padding around the text inside the capsule
+  private val textWidth = textPaint.measureText(text)
+  private val textHeight = StaticLayout.Builder.obtain(text, 0, text.length, textPaint, 1000)
+    .setAlignment(Layout.Alignment.ALIGN_NORMAL)
+    .build()
+    .height
+    .toFloat()
+  private val intrinsicWidth = (textWidth + padding * 2).toInt()
+  private val intrinsicHeight = textHeight.toInt()
+  private val drawLayout = StaticLayout.Builder.obtain(
+    text,
+    0,
+    text.length,
+    textPaint,
+    intrinsicWidth
+  )
+    .setAlignment(Layout.Alignment.ALIGN_CENTER)
+    .setMaxLines(1)
+    .setEllipsize(TextUtils.TruncateAt.END)
+    .build()
 
   override fun draw(canvas: Canvas) {
-    val textWidth = getTextWidth()
-    val textHeight = getTextHeight()
-
-    // Calculate the bounds for the capsule, ensuring padding around the text
-    val width = textWidth + padding * 2
-    val height = textHeight
-
     // Set the bounds for the capsule drawable
-    capsuleDrawable.setBounds(0, 0, width.toInt(), height.toInt())
+    capsuleDrawable.setBounds(0, 0, intrinsicWidth, intrinsicHeight)
 
     // Draw the capsule background
     capsuleDrawable.draw(canvas)
 
     // Positioning for the text
     val x = 0f
-    val y = (height - textHeight) / 2
-
-    // Create StaticLayout for proper text alignment and wrapping
-    val staticLayout = StaticLayout.Builder.obtain(text, 0, text.length, textPaint, width.toInt())
-      .setAlignment(Layout.Alignment.ALIGN_CENTER)
-      .setMaxLines(1)
-      .setEllipsize(TextUtils.TruncateAt.END)
-      .build()
+    val y = (intrinsicHeight - textHeight) / 2
 
     // Draw the text centered inside the capsule
     canvas.withTranslation(x, y) {
-      staticLayout.draw(this)
+      drawLayout.draw(this)
     }
   }
 
   override fun getIntrinsicWidth(): Int {
-    return (getTextWidth() + padding * 2).toInt()
+    return intrinsicWidth
   }
 
   override fun getIntrinsicHeight(): Int {
-    return getTextHeight().toInt()
+    return intrinsicHeight
   }
 
   override fun setAlpha(alpha: Int) {
@@ -98,18 +103,5 @@ class CapsuleDrawable(
   // Helper method to convert dp to pixels
   private fun dpToPx(dp: Float): Float {
     return dp * context.resources.displayMetrics.density
-  }
-
-  // Helper methods to get the width and height of the text
-  private fun getTextWidth(): Float {
-    return textPaint.measureText(text)
-  }
-
-  private fun getTextHeight(): Float {
-    // Create a single line StaticLayout to measure text height
-    val staticLayout = StaticLayout.Builder.obtain(text, 0, text.length, textPaint, 1000) // Max width
-      .setAlignment(Layout.Alignment.ALIGN_NORMAL)
-      .build()
-    return staticLayout.height.toFloat()
   }
 }

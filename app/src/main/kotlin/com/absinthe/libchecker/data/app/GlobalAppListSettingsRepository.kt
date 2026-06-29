@@ -1,0 +1,43 @@
+package com.absinthe.libchecker.data.app
+
+import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.domain.app.AppListSettingsRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
+
+class GlobalAppListSettingsRepository : AppListSettingsRepository {
+  override val displayOptions: Int
+    get() = GlobalValues.advancedOptions
+
+  override val itemDisplayOptions: Int
+    get() = GlobalValues.itemAdvancedOptions
+
+  override val colorfulRuleIcon: Boolean
+    get() = GlobalValues.isColorfulIcon
+
+  override val displayOptionsChanges: Flow<Int> = GlobalValues.preferencesFlow
+    .filter { it.first == Constants.PREF_ADVANCED_OPTIONS }
+    .map { it.second as Int }
+
+  override val colorfulRuleIconChanges: Flow<Boolean> = GlobalValues.preferencesFlow
+    .filter { it.first == Constants.PREF_COLORFUL_ICON }
+    .map { it.second as Boolean }
+
+  override fun setDisplayOptions(options: Int) {
+    GlobalValues.advancedOptions = options
+  }
+
+  override fun setItemDisplayOptions(options: Int) {
+    GlobalValues.itemAdvancedOptions = options
+  }
+
+  override suspend fun notifyDisplayOptionsChanged(diff: Int) {
+    GlobalValues.preferencesFlow.emit(Constants.PREF_ADVANCED_OPTIONS to diff)
+  }
+
+  override suspend fun notifyColorfulRuleIconChanged(enabled: Boolean) {
+    GlobalValues.preferencesFlow.emit(Constants.PREF_COLORFUL_ICON to enabled)
+  }
+}

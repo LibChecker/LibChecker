@@ -3,7 +3,6 @@ package com.absinthe.libchecker.database
 import android.database.sqlite.SQLiteBlobTooBigException
 import android.view.ContextThemeWrapper
 import androidx.appcompat.app.AlertDialog
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.SnapshotDiffStoringItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
@@ -17,8 +16,10 @@ import timber.log.Timber
 
 class LCRepository(private val lcDao: LCDao) {
   val allLCItemsFlow: Flow<List<LCItem>> = lcDao.getItemsFlow()
-  val allSnapshotItemsFlow: Flow<Int> =
-    lcDao.getSnapshotsCountFlow(GlobalValues.snapshotTimestamp)
+
+  fun getSnapshotsCountFlow(timestamp: Long): Flow<Int> {
+    return lcDao.getSnapshotsCountFlow(timestamp)
+  }
 
   private fun checkDatabaseStatus(): Boolean {
     if (LCDatabase.isClosed()) {

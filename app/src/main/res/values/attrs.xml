@@ -23,13 +23,6 @@
     <attr name="ccv_clearIcon" format="reference"/>
   </declare-styleable>
 
-  <declare-styleable name="AppsListLoadingView">
-    <attr name="alvSurfaceSrc" format="reference" />
-    <attr name="alvRotationDuration" format="integer" />
-    <attr name="alvHighlightStrength" format="float" />
-    <attr name="alvAxisTilt" format="float" />
-  </declare-styleable>
-
   <declare-styleable name="IconCarouselView">
     <attr name="icvAutoStart" format="boolean" />
     <attr name="icvReverse" format="boolean" />
