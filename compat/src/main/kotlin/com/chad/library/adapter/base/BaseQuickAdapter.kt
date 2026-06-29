@@ -21,9 +21,6 @@ abstract class BaseQuickAdapter<T : Any, VH : RecyclerView.ViewHolder>(
 
   val data: MutableList<T> = AdapterDataList(this)
 
-  @Suppress("MemberVisibilityCanBePrivate")
-  var headerWithEmptyEnable: Boolean = false
-
   private val childClickViewIds = linkedSetOf<Int>()
   private val childLongClickViewIds = linkedSetOf<Int>()
   private var legacyChildClickListener: ((BaseQuickAdapter<T, VH>, View, Int) -> Unit)? = null
@@ -34,13 +31,8 @@ abstract class BaseQuickAdapter<T : Any, VH : RecyclerView.ViewHolder>(
   private var concatAdapter: ConcatAdapter? = null
   private var syncingHeaderFooter = false
 
-  val recyclerViewOrNull: RecyclerView?
+  override val recyclerViewOrNull: RecyclerView?
     get() = runCatching { recyclerView }.getOrNull()
-
-  override val legacyRecyclerViewOrNull: RecyclerView?
-    get() = recyclerViewOrNull
-
-  override fun legacyItemCount(): Int = headerAdapters.size + itemCount + footerAdapters.size
 
   protected open fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): VH {
     check(layoutResId != 0) {
@@ -87,14 +79,6 @@ abstract class BaseQuickAdapter<T : Any, VH : RecyclerView.ViewHolder>(
     submitList(list?.toList().orEmpty())
   }
 
-  fun setNewInstance(list: MutableList<T>?) {
-    setList(list)
-  }
-
-  fun setData(position: Int, item: T) {
-    set(position, item)
-  }
-
   fun addData(item: T) {
     add(item)
   }
@@ -113,14 +97,6 @@ abstract class BaseQuickAdapter<T : Any, VH : RecyclerView.ViewHolder>(
 
   fun setDiffNewData(list: Collection<T>?, commitCallback: Runnable? = null) {
     submitList(list?.toList().orEmpty(), commitCallback)
-  }
-
-  fun setOnItemClickListener(
-    listener: com.chad.library.adapter.base.listener.OnItemClickListener?
-  ) = apply {
-    super.setOnItemClickListener { _, view, position ->
-      listener?.onItemClick(this, view, position)
-    }
   }
 
   fun addChildClickViewIds(@IdRes vararg ids: Int) {
@@ -200,7 +176,7 @@ abstract class BaseQuickAdapter<T : Any, VH : RecyclerView.ViewHolder>(
       ?.findViewById(viewId)
   }
 
-  override fun setFooterView(view: View) {
+  fun setFooterView(view: View) {
     removeAllFooterView()
     val adapter = SingleViewAdapter(view)
     footerAdapters += adapter
@@ -211,14 +187,12 @@ abstract class BaseQuickAdapter<T : Any, VH : RecyclerView.ViewHolder>(
     }
   }
 
-  override fun removeAllFooterView() {
+  fun removeAllFooterView() {
     concatAdapter?.let { concat ->
       footerAdapters.forEach { concat.removeAdapter(it) }
     }
     footerAdapters.clear()
   }
-
-  override fun hasFooterLayout(): Boolean = footerAdapters.isNotEmpty()
 
   private fun ensureHeaderFooterAdapter(): ConcatAdapter? {
     if (headerAdapters.isEmpty() && footerAdapters.isEmpty()) return concatAdapter

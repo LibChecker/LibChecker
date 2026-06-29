@@ -21,22 +21,14 @@ abstract class BaseNodeAdapter(
   val data: List<BaseNode>
     get() = items.filterIsInstance<BaseNode>()
 
-  @Suppress("MemberVisibilityCanBePrivate")
-  var headerWithEmptyEnable: Boolean = false
-
   private val providers = linkedMapOf<Int, BaseNodeProvider>()
   private val headerAdapters = mutableListOf<SingleViewAdapter>()
   private val footerAdapters = mutableListOf<SingleViewAdapter>()
   private var concatAdapter: ConcatAdapter? = null
   private var syncingHeaderFooter = false
 
-  val recyclerViewOrNull: RecyclerView?
+  override val recyclerViewOrNull: RecyclerView?
     get() = runCatching { recyclerView }.getOrNull()
-
-  override val legacyRecyclerViewOrNull: RecyclerView?
-    get() = recyclerViewOrNull
-
-  override fun legacyItemCount(): Int = headerAdapters.size + itemCount + footerAdapters.size
 
   abstract fun getItemType(data: List<BaseNode>, position: Int): Int
 
@@ -87,7 +79,7 @@ abstract class BaseNodeAdapter(
     headerAdapters.clear()
   }
 
-  override fun setFooterView(view: View) {
+  fun setFooterView(view: View) {
     removeAllFooterView()
     val adapter = SingleViewAdapter(view)
     footerAdapters += adapter
@@ -98,14 +90,12 @@ abstract class BaseNodeAdapter(
     }
   }
 
-  override fun removeAllFooterView() {
+  fun removeAllFooterView() {
     concatAdapter?.let { concat ->
       footerAdapters.forEach { concat.removeAdapter(it) }
     }
     footerAdapters.clear()
   }
-
-  override fun hasFooterLayout(): Boolean = footerAdapters.isNotEmpty()
 
   override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
     super.onAttachedToRecyclerView(recyclerView)

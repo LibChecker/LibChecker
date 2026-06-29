@@ -181,7 +181,6 @@ class ComparisonActivity :
     }
 
     adapter.apply {
-      headerWithEmptyEnable = true
       val emptyView = SnapshotEmptyView(this@ComparisonActivity).apply {
         layoutParams = FrameLayout.LayoutParams(
           FrameLayout.LayoutParams.MATCH_PARENT,

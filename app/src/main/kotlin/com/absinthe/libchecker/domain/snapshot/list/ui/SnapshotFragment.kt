@@ -174,7 +174,6 @@ class SnapshotFragment :
     }
 
     adapter.apply {
-      headerWithEmptyEnable = true
       dashboard.also {
         setHeaderView(it)
       }

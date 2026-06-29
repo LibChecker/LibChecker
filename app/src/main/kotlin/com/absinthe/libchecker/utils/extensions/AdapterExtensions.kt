@@ -5,7 +5,7 @@ import com.absinthe.libchecker.R
 import com.chad.library.adapter.base.HeaderFooterSupport
 
 fun HeaderFooterSupport.setSpaceFooterView() {
-  legacyRecyclerViewOrNull?.setBottomPaddingSpace()
+  recyclerViewOrNull?.setBottomPaddingSpace()
 }
 
 fun RecyclerView.setBottomPaddingSpace() {
