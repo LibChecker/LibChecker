@@ -371,8 +371,10 @@ class AppListFragment :
     if (binding.list.canScrollVertically(-1)) {
       returnTopOfList()
     } else {
-      flip(VF_LOADING)
-      homeViewModel.requestChange()
+      if (!isListReady || appAdapter.data.isEmpty()) {
+        flip(VF_LOADING)
+      }
+      homeViewModel.requestChange(showLoadingFeedback = true)
     }
   }
 

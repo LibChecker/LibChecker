@@ -30,6 +30,7 @@ import com.absinthe.libchecker.domain.app.sync.SyncAppListChangesUseCase
 import com.absinthe.libchecker.services.IWorkerService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -284,7 +285,10 @@ class HomeViewModel(
 
   private var requestChangeJob: Job? = null
 
-  fun requestChange(packageChangeState: PackageChangeState? = null) {
+  fun requestChange(
+    packageChangeState: PackageChangeState? = null,
+    showLoadingFeedback: Boolean = false
+  ) {
     viewModelScope.launch {
       if (appListStatus == STATUS_START_INIT) {
         Timber.d("Request change canceled: STATUS_START_INIT")
@@ -292,13 +296,18 @@ class HomeViewModel(
       }
       val changeRequest = appListChangeRequestQueue.start(packageChangeState)
       requestChangeJob?.cancel()
-      requestChangeJob = requestChangeImpl(changeRequest)
+      requestChangeJob = requestChangeImpl(changeRequest, showLoadingFeedback)
     }
   }
 
   private fun requestChangeImpl(
-    changeRequest: AppListChangeRequestQueue.ChangeRequest
+    changeRequest: AppListChangeRequestQueue.ChangeRequest,
+    showLoadingFeedback: Boolean
   ) = viewModelScope.launch(Dispatchers.IO) {
+    val loadingStartedAt = System.currentTimeMillis()
+    if (showLoadingFeedback) {
+      _isRequestChangeRunning.value = true
+    }
     val dbItems = appListRepository.getItems()
     if (dbItems.isEmpty()) {
       if (appListChangeRequestQueue.isCurrent(changeRequest)) {
@@ -329,11 +338,24 @@ class HomeViewModel(
       updateAppListStatus(STATUS_START_REQUEST_CHANGE_END)
     } finally {
       if (appListChangeRequestQueue.isCurrent(changeRequest)) {
+        if (showLoadingFeedback) {
+          delayManualRefreshLoadingFeedback(loadingStartedAt)
+        }
+        if (!appListChangeRequestQueue.isCurrent(changeRequest)) {
+          return@launch
+        }
         updateAppListStatus(STATUS_NOT_START)
         _isRequestChangeRunning.value = false
         requestChangeJob = null
         requestFeatureInitialization()
       }
+    }
+  }
+
+  private suspend fun delayManualRefreshLoadingFeedback(startedAt: Long) {
+    val remaining = MANUAL_REFRESH_LOADING_MIN_DURATION_MS - (System.currentTimeMillis() - startedAt)
+    if (remaining > 0L) {
+      delay(remaining)
     }
   }
 
@@ -440,3 +462,5 @@ class HomeViewModel(
     toolbarSearchMenuState = ToolbarSearchMenuState()
   }
 }
+
+private const val MANUAL_REFRESH_LOADING_MIN_DURATION_MS = 450L
