@@ -289,9 +289,13 @@
   <string name="album_item_track_subtitle">Select apps to show a comparison change</string>
   <string name="album_backup">Backup</string>
   <string name="album_backup_summary">Backup all snapshots</string>
+  <string name="album_backup_detail">Backed up %1$d items</string>
+  <string name="album_backup_database_detail">Database backup completed</string>
   <string name="album_restore">Restore</string>
   <string name="album_restore_summary">Restore snapshots from a backup file</string>
   <string name="album_restore_detail">%1$s: %2$s items in total\n</string>
+  <string name="album_restore_result_summary">Restored %1$d items from %2$d snapshot points</string>
+  <string name="album_restore_result_item_count">%1$d items</string>
   <string name="album_click_to_choose">Click to choose</string>
   <string name="album_dialog_delete_snapshot_message">Processing…</string>
   <string name="album_snapshot_top_apps_not_initialized">Not loaded yet</string>

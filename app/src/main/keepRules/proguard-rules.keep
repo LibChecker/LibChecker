@@ -66,6 +66,11 @@
     private long getDataOffset(org.apache.commons.compress.archivers.zip.ZipArchiveEntry);
 }
 
+# Protobuf javalite reflects generated message fields by their original names.
+-keepclassmembers,allowoptimization class com.absinthe.libchecker.protocol.** extends com.google.protobuf.GeneratedMessageLite {
+    <fields>;
+}
+
 # androidx.appcompat.widget.Toolbar
 -keepclassmembers class androidx.appcompat.widget.Toolbar {
     java.util.ArrayList mHiddenViews;
