@@ -34,6 +34,7 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> :
   var animationDuration = 350L
   var maxPeekHeightPercentage = 0f
   var maxPeekSize: Int = 0
+  var isInitialLandscapeExpansionEnabled = true
 
   private var _root: T? = null
   private var isHandlerActivated = false
@@ -137,7 +138,7 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> :
       ViewTreeObserver.OnGlobalLayoutListener {
       override fun onGlobalLayout() {
         view.viewTreeObserver.removeOnGlobalLayoutListener(this)
-        activity?.window?.takeIf { isLandscape(it) }?.run {
+        activity?.window?.takeIf { isInitialLandscapeExpansionEnabled && isLandscape(it) }?.run {
           behavior.setState(BottomSheetBehavior.STATE_EXPANDED)
         }
       }

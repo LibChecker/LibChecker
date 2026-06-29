@@ -40,6 +40,7 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
 
   override fun init() {
     maxPeekHeightPercentage = 0.67f
+    isInitialLandscapeExpansionEnabled = false
     customTitle?.let { getHeaderView().title.text = it }
     root.adapter.apply {
       setTimestampFormatter(viewModel::getFormatDateString)
