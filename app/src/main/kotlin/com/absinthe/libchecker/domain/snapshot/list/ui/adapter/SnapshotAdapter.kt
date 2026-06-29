@@ -41,7 +41,7 @@ class SnapshotAdapter(
   private val buildSnapshotAbiDisplayData: BuildSnapshotAbiDisplayDataUseCase,
   private val buildSnapshotUpdateTimeDisplayData: BuildSnapshotUpdateTimeDisplayDataUseCase,
   private val cardMode: CardMode = CardMode.NORMAL
-) : HighlightAdapter<SnapshotDiffItem>() {
+) : HighlightAdapter<SnapshotDiffItem>(SnapshotDiffUtil()) {
 
   init {
     setHasStableIds(true)

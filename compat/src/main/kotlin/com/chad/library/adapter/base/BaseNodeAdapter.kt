@@ -3,6 +3,7 @@ package com.chad.library.adapter.base
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.AsyncDifferConfig
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -12,30 +13,22 @@ import com.chad.library.adapter.base.provider.BaseNodeProvider
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.chad.library.adapter4.BaseNodeAdapter as BaseNodeAdapter4
 
-abstract class BaseNodeAdapter :
-  BaseNodeAdapter4(),
+abstract class BaseNodeAdapter(
+  diffCallback: DiffUtil.ItemCallback<BaseNode>? = null
+) : BaseNodeAdapter4(diffCallback?.let { AsyncDifferConfig.Builder(it.asAnyNodeDiffCallback()).build() }),
   HeaderFooterSupport {
 
   val data: List<BaseNode>
     get() = items.filterIsInstance<BaseNode>()
-
-  @Suppress("MemberVisibilityCanBePrivate")
-  var headerWithEmptyEnable: Boolean = false
 
   private val providers = linkedMapOf<Int, BaseNodeProvider>()
   private val headerAdapters = mutableListOf<SingleViewAdapter>()
   private val footerAdapters = mutableListOf<SingleViewAdapter>()
   private var concatAdapter: ConcatAdapter? = null
   private var syncingHeaderFooter = false
-  private var diffCallback: DiffUtil.ItemCallback<BaseNode>? = null
 
-  val recyclerViewOrNull: RecyclerView?
+  override val recyclerViewOrNull: RecyclerView?
     get() = runCatching { recyclerView }.getOrNull()
-
-  override val legacyRecyclerViewOrNull: RecyclerView?
-    get() = recyclerViewOrNull
-
-  override fun legacyItemCount(): Int = headerAdapters.size + itemCount + footerAdapters.size
 
   abstract fun getItemType(data: List<BaseNode>, position: Int): Int
 
@@ -48,41 +41,8 @@ abstract class BaseNodeAdapter :
   }
 
   fun setDiffNewData(list: Collection<BaseNode>?, commitCallback: Runnable? = null) {
-    val callback = diffCallback
     val newList = list?.toList().orEmpty()
-    val oldList = data.toList()
-    val hasTreeNodes =
-      oldList.any { it.childNode?.isNotEmpty() == true } ||
-        newList.any { it.childNode?.isNotEmpty() == true }
-    if (callback == null || hasTreeNodes || displayEmptyView() || displayEmptyView(newList)) {
-      submitList(newList, clearOpenStates = false, commitCallback)
-      return
-    }
-
-    val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-      override fun getOldListSize(): Int = oldList.size
-
-      override fun getNewListSize(): Int = newList.size
-
-      override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return callback.areItemsTheSame(oldList[oldItemPosition], newList[newItemPosition])
-      }
-
-      override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return callback.areContentsTheSame(oldList[oldItemPosition], newList[newItemPosition])
-      }
-
-      override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
-        return callback.getChangePayload(oldList[oldItemPosition], newList[newItemPosition])
-      }
-    })
-    items = newList
-    diffResult.dispatchUpdatesTo(this)
-    commitCallback?.run()
-  }
-
-  fun setDiffCallback(diffCallback: DiffUtil.ItemCallback<BaseNode>) {
-    this.diffCallback = diffCallback
+    submitList(newList, clearOpenStates = false, commitCallback)
   }
 
   fun expandOrCollapse(position: Int): Boolean {
@@ -119,7 +79,7 @@ abstract class BaseNodeAdapter :
     headerAdapters.clear()
   }
 
-  override fun setFooterView(view: View) {
+  fun setFooterView(view: View) {
     removeAllFooterView()
     val adapter = SingleViewAdapter(view)
     footerAdapters += adapter
@@ -130,14 +90,12 @@ abstract class BaseNodeAdapter :
     }
   }
 
-  override fun removeAllFooterView() {
+  fun removeAllFooterView() {
     concatAdapter?.let { concat ->
       footerAdapters.forEach { concat.removeAdapter(it) }
     }
     footerAdapters.clear()
   }
-
-  override fun hasFooterLayout(): Boolean = footerAdapters.isNotEmpty()
 
   override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
     super.onAttachedToRecyclerView(recyclerView)
@@ -220,5 +178,29 @@ abstract class BaseNodeAdapter :
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) = Unit
 
     override fun getItemCount(): Int = 1
+  }
+}
+
+private fun DiffUtil.ItemCallback<BaseNode>.asAnyNodeDiffCallback(): DiffUtil.ItemCallback<Any> {
+  return object : DiffUtil.ItemCallback<Any>() {
+    override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
+      return oldItem is BaseNode &&
+        newItem is BaseNode &&
+        this@asAnyNodeDiffCallback.areItemsTheSame(oldItem, newItem)
+    }
+
+    override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {
+      return oldItem is BaseNode &&
+        newItem is BaseNode &&
+        this@asAnyNodeDiffCallback.areContentsTheSame(oldItem, newItem)
+    }
+
+    override fun getChangePayload(oldItem: Any, newItem: Any): Any? {
+      return if (oldItem is BaseNode && newItem is BaseNode) {
+        this@asAnyNodeDiffCallback.getChangePayload(oldItem, newItem)
+      } else {
+        null
+      }
+    }
   }
 }

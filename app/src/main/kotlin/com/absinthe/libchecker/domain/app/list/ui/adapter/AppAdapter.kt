@@ -25,7 +25,7 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 class AppAdapter(
   private val cardMode: CardMode = CardMode.NORMAL,
   private var fallbackDisplayOptions: Int = AdvancedOptions.DEFAULT_OPTIONS
-) : HighlightAdapter<LCItem>() {
+) : HighlightAdapter<LCItem>(AppListDiffUtil()) {
 
   private val itemViewStateCache = mutableMapOf<String, AppListItemViewState>()
   private var itemViewStyle: AppItemView.Style? = null

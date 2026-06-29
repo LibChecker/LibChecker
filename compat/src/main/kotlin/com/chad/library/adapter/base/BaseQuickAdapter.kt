@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
+import androidx.recyclerview.widget.AsyncDifferConfig
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -13,14 +14,12 @@ import com.chad.library.adapter4.BaseQuickAdapter as BaseQuickAdapter4
 import java.util.concurrent.atomic.AtomicLong
 
 abstract class BaseQuickAdapter<T : Any, VH : RecyclerView.ViewHolder>(
-  @LayoutRes private val layoutResId: Int = 0
-) : BaseQuickAdapter4<T, VH>(),
+  @LayoutRes private val layoutResId: Int = 0,
+  diffCallback: DiffUtil.ItemCallback<T>? = null
+) : BaseQuickAdapter4<T, VH>(diffCallback?.let { AsyncDifferConfig.Builder(it).build() }),
   HeaderFooterSupport {
 
   val data: MutableList<T> = AdapterDataList(this)
-
-  @Suppress("MemberVisibilityCanBePrivate")
-  var headerWithEmptyEnable: Boolean = false
 
   private val childClickViewIds = linkedSetOf<Int>()
   private val childLongClickViewIds = linkedSetOf<Int>()
@@ -31,15 +30,9 @@ abstract class BaseQuickAdapter<T : Any, VH : RecyclerView.ViewHolder>(
   private val footerAdapters = mutableListOf<SingleViewAdapter>()
   private var concatAdapter: ConcatAdapter? = null
   private var syncingHeaderFooter = false
-  private var diffCallback: DiffUtil.ItemCallback<T>? = null
 
-  val recyclerViewOrNull: RecyclerView?
+  override val recyclerViewOrNull: RecyclerView?
     get() = runCatching { recyclerView }.getOrNull()
-
-  override val legacyRecyclerViewOrNull: RecyclerView?
-    get() = recyclerViewOrNull
-
-  override fun legacyItemCount(): Int = headerAdapters.size + itemCount + footerAdapters.size
 
   protected open fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): VH {
     check(layoutResId != 0) {
@@ -86,14 +79,6 @@ abstract class BaseQuickAdapter<T : Any, VH : RecyclerView.ViewHolder>(
     submitList(list?.toList().orEmpty())
   }
 
-  fun setNewInstance(list: MutableList<T>?) {
-    setList(list)
-  }
-
-  fun setData(position: Int, item: T) {
-    set(position, item)
-  }
-
   fun addData(item: T) {
     add(item)
   }
@@ -110,47 +95,8 @@ abstract class BaseQuickAdapter<T : Any, VH : RecyclerView.ViewHolder>(
     addAll(position, collection)
   }
 
-  fun setDiffCallback(diffCallback: DiffUtil.ItemCallback<T>) {
-    this.diffCallback = diffCallback
-  }
-
   fun setDiffNewData(list: Collection<T>?, commitCallback: Runnable? = null) {
-    val callback = diffCallback
-    val newList = list?.toList().orEmpty()
-    if (callback == null || displayEmptyView() || displayEmptyView(newList)) {
-      submitList(newList, commitCallback)
-      return
-    }
-
-    val oldList = items.toList()
-    val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-      override fun getOldListSize(): Int = oldList.size
-
-      override fun getNewListSize(): Int = newList.size
-
-      override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return callback.areItemsTheSame(oldList[oldItemPosition], newList[newItemPosition])
-      }
-
-      override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return callback.areContentsTheSame(oldList[oldItemPosition], newList[newItemPosition])
-      }
-
-      override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
-        return callback.getChangePayload(oldList[oldItemPosition], newList[newItemPosition])
-      }
-    })
-    items = newList
-    diffResult.dispatchUpdatesTo(this)
-    commitCallback?.run()
-  }
-
-  fun setOnItemClickListener(
-    listener: com.chad.library.adapter.base.listener.OnItemClickListener?
-  ) = apply {
-    super.setOnItemClickListener { _, view, position ->
-      listener?.onItemClick(this, view, position)
-    }
+    submitList(list?.toList().orEmpty(), commitCallback)
   }
 
   fun addChildClickViewIds(@IdRes vararg ids: Int) {
@@ -230,7 +176,7 @@ abstract class BaseQuickAdapter<T : Any, VH : RecyclerView.ViewHolder>(
       ?.findViewById(viewId)
   }
 
-  override fun setFooterView(view: View) {
+  fun setFooterView(view: View) {
     removeAllFooterView()
     val adapter = SingleViewAdapter(view)
     footerAdapters += adapter
@@ -241,14 +187,12 @@ abstract class BaseQuickAdapter<T : Any, VH : RecyclerView.ViewHolder>(
     }
   }
 
-  override fun removeAllFooterView() {
+  fun removeAllFooterView() {
     concatAdapter?.let { concat ->
       footerAdapters.forEach { concat.removeAdapter(it) }
     }
     footerAdapters.clear()
   }
-
-  override fun hasFooterLayout(): Boolean = footerAdapters.isNotEmpty()
 
   private fun ensureHeaderFooterAdapter(): ConcatAdapter? {
     if (headerAdapters.isEmpty() && footerAdapters.isEmpty()) return concatAdapter

@@ -7,7 +7,6 @@ import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.domain.app.detail.ui.Referable
-import com.absinthe.libchecker.domain.app.detail.ui.adapter.LibStringDiffUtil
 import com.absinthe.libchecker.domain.app.detail.ui.base.BaseDetailFragment
 import com.absinthe.libchecker.domain.app.detail.ui.base.EXTRA_TYPE
 import com.absinthe.libchecker.utils.extensions.putArguments
@@ -52,7 +51,6 @@ class MetaDataAnalysisFragment :
 
     adapter.apply {
       animationEnable = false
-      setDiffCallback(LibStringDiffUtil())
       stateView = this@MetaDataAnalysisFragment.emptyView
       isStateViewEnable = true
     }

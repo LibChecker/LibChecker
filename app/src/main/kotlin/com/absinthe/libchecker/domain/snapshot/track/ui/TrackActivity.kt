@@ -22,7 +22,6 @@ import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.snapshot.track.presentation.TrackListUiState
 import com.absinthe.libchecker.domain.snapshot.track.presentation.TrackViewModel
 import com.absinthe.libchecker.domain.snapshot.track.ui.adapter.TrackAdapter
-import com.absinthe.libchecker.domain.snapshot.track.ui.adapter.TrackListDiff
 import com.absinthe.libchecker.domain.snapshot.track.ui.view.TrackItemView
 import com.absinthe.libchecker.domain.snapshot.track.ui.view.TrackLoadingView
 import com.absinthe.libchecker.ui.base.BaseActivity
@@ -70,8 +69,6 @@ class TrackActivity :
       FastScrollerBuilder(this).useMd2Style().build()
     }
     adapter.apply {
-      setDiffCallback(TrackListDiff())
-
       fun doSaveItemState(pos: Int, state: Boolean) {
         val packageName = data[pos].packageName
         viewModel.setPackageTracked(packageName, state)

@@ -34,7 +34,7 @@ class SignatureDetailBSDFragment : BaseBottomSheetViewDialogFragment<SignatureDe
     }
     lifecycleScope.launch {
       val data = viewModel.buildSignatureDetailItems(detail).toMutableList()
-      root.adapter.setNewInstance(data)
+      root.adapter.setList(data)
     }
   }
 
