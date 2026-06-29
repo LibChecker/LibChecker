@@ -43,8 +43,8 @@ class ComputeLibReferenceUseCase(
     val progressTotal = (targets.size * types.size).coerceAtLeast(1)
     var progressCount = 0
 
-    fun updateProgress() {
-      onProgress(progressCount * 100 / progressTotal)
+    fun updateProgress(count: Int = progressCount, allowComplete: Boolean = true) {
+      onProgress(toProgressPercent(count, progressTotal, allowComplete))
     }
 
     fun getBasePackageInfo(packageName: String): PackageInfo? {
@@ -72,6 +72,7 @@ class ComputeLibReferenceUseCase(
           continue
         }
 
+        updateProgress(progressCount + 1, allowComplete = false)
         computeComponentReference(index, target.packageName, type, ::getBasePackageInfo)
         progressCount++
         updateProgress()
@@ -99,10 +100,10 @@ class ComputeLibReferenceUseCase(
     val refList = mutableListOf<LibReferenceItem>()
     var progressCount = 0
 
-    fun updateProgress() {
+    fun updateProgress(count: Int = progressCount, allowComplete: Boolean = true) {
       val size = references.size
       if (size > 0) {
-        onProgress(progressCount * 100 / size)
+        onProgress(toProgressPercent(count, size, allowComplete))
       }
     }
 
@@ -113,6 +114,7 @@ class ComputeLibReferenceUseCase(
         return null
       }
 
+      updateProgress(progressCount + 1, allowComplete = false)
       val libName = entry.key
       val referredList = entry.value.first
       val type = entry.value.second
@@ -156,6 +158,16 @@ class ComputeLibReferenceUseCase(
       if (options and LibReferenceOptions.SHARED_UID > 0) add(SHARED_UID)
       if (options and LibReferenceOptions.ACTION > 0) add(ACTION)
     }
+  }
+
+  private fun toProgressPercent(count: Int, total: Int, allowComplete: Boolean): Int {
+    if (count <= 0) {
+      return 0
+    }
+    if (count >= total) {
+      return if (allowComplete) 100 else 99
+    }
+    return (((count * 100) + total - 1) / total).coerceAtMost(99)
   }
 
   private fun computeComponentReference(

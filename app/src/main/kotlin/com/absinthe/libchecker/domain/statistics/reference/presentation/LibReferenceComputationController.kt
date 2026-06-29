@@ -35,6 +35,7 @@ class LibReferenceComputationController(
 
   fun compute() {
     computeLibReferenceJob?.cancel()
+    cancelMatchingJob()
     computeLibReferenceJob = scope.launch(Dispatchers.IO) {
       referenceIndex?.clear()
       referenceIndex = null

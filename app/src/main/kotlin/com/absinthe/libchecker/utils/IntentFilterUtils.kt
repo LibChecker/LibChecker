@@ -34,7 +34,7 @@ object IntentFilterUtils {
     return runCatching {
       parseComponentsFromManifest(apkPath)
     }.onFailure {
-      Timber.w(it, "Failed to parse intent filters from manifest: $apkPath")
+      logParseFailure("manifest", apkPath, it)
     }.getOrElse {
       parseComponentsWithPackageParser(apkPath)
     }
@@ -69,7 +69,7 @@ object IntentFilterUtils {
         PackageManager.GET_ACTIVITIES or PackageManager.GET_RECEIVERS or PackageManager.GET_SERVICES
       )
     }.onFailure {
-      Timber.w(it, "Failed to parse intent filters from APK: $apkPath")
+      logParseFailure("APK", apkPath, it)
     }.getOrNull() ?: return emptyList()
 
     val allComponents = mutableListOf<Pair<Int, List<PackageParser.Component<*>>>>()
@@ -268,6 +268,13 @@ object IntentFilterUtils {
       packageName.isNotBlank() -> "$packageName.$className"
       else -> className
     }
+  }
+
+  private fun logParseFailure(source: String, apkPath: String, throwable: Throwable) {
+    Timber.d(
+      "Failed to parse intent filters from $source: $apkPath " +
+        "(${throwable::class.java.simpleName}: ${throwable.message})"
+    )
   }
 
   private fun Res_value?.asString(raw: String?): String? {
