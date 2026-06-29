@@ -207,7 +207,7 @@ class SnapshotDetailActivity :
           addPaddingTop(96.dp)
         }
       }
-    adapter.isStateViewEnable = true
+    adapter.isStateViewEnable = entity.newInstalled || entity.deleted
     adapter.setOnItemClickListener { _, view, position ->
       if (adapter.data[position] is SnapshotTitleNode) {
         adapter.expandOrCollapse(position)
@@ -247,9 +247,8 @@ class SnapshotDetailActivity :
     viewModel.snapshotDetailSectionsFlow.onEach { sections ->
       val titleList = sections.map(::buildSnapshotTitleNode)
 
-      if (titleList.isNotEmpty()) {
-        adapter.setList(titleList)
-      }
+      adapter.isStateViewEnable = titleList.isEmpty()
+      adapter.setList(titleList)
     }.launchIn(lifecycleScope)
   }
 
