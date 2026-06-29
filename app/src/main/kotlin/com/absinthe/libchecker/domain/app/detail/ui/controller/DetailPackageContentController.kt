@@ -87,6 +87,7 @@ class DetailPackageContentController(
       is AppDetailFeatureInitAction.Emit -> viewModel.emitFeature(featureAction.feature)
 
       is AppDetailFeatureInitAction.LoadPackageFeatures -> {
+        viewModel.setFeatureLoading(true)
         coroutineScope.launch {
           if (NATIVE in tabSpec.types) {
             viewModel.contentState.nativeLibTabs.filterNotNull().first()

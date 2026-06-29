@@ -5,16 +5,20 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.model.DetailFeatureItem
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.FeatureAdapter
 import com.absinthe.libchecker.ui.adapter.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.view.app.ToolbarConnectionLoadingView
 
 class DetailFeatureListController(
   private val headerContentLayout: ViewGroup
 ) {
   private val adapter = FeatureAdapter()
   private var featureListView: RecyclerView? = null
+  private var loadingView: ToolbarConnectionLoadingView? = null
+  private var isLoading = false
 
   val itemCount: Int
     get() = adapter.data.size
@@ -29,6 +33,23 @@ class DetailFeatureListController(
       adapter.addData(featureItem.item)
     } else {
       adapter.addData(position, featureItem.item)
+    }
+  }
+
+  fun setLoading(loading: Boolean) {
+    if (isLoading == loading) {
+      return
+    }
+    isLoading = loading
+
+    if (loading) {
+      ensureListView()
+      val view = ensureLoadingView()
+      adapter.setFooterView(view)
+      view.start()
+    } else {
+      loadingView?.stop()
+      adapter.removeAllFooterView()
     }
   }
 
@@ -48,7 +69,7 @@ class DetailFeatureListController(
       anim.addUpdateListener { valueAnimator ->
         val height = valueAnimator.animatedValue as Int
 
-        if (valueAnimator.animatedFraction == 1f || adapter.data.isEmpty()) {
+        if (valueAnimator.animatedFraction == 1f || (adapter.data.isEmpty() && !isLoading)) {
           params.height = ViewGroup.LayoutParams.WRAP_CONTENT
         } else {
           params.height = height
@@ -61,6 +82,9 @@ class DetailFeatureListController(
   }
 
   fun reset() {
+    isLoading = false
+    loadingView?.stop()
+    adapter.removeAllFooterView()
     featureListView?.let {
       if (it.parent != null) {
         (it.parent as? ViewGroup)?.removeView(it)
@@ -89,6 +113,15 @@ class DetailFeatureListController(
       it.clipChildren = false
       it.clipToPadding = false
       it.overScrollMode = View.OVER_SCROLL_NEVER
+    }
+  }
+
+  private fun ensureLoadingView(): ToolbarConnectionLoadingView {
+    return loadingView ?: ToolbarConnectionLoadingView(headerContentLayout.context).apply {
+      layoutParams = RecyclerView.LayoutParams(34.dp, 36.dp)
+      contentDescription = context.getString(R.string.loading)
+    }.also {
+      loadingView = it
     }
   }
 }

@@ -14,6 +14,7 @@ class DetailStateObserverController(
   private val onProcessToolIconVisibilityChanged: (Boolean) -> Unit,
   private val onProcessMapChanged: (Map<String, Int>) -> Unit,
   private val onFeatureAdded: (VersionedFeature) -> Unit,
+  private val onFeatureLoadingChanged: (Boolean) -> Unit,
   private val onAbiBundleChanged: (abi: Int, abiSet: Collection<Int>) -> Unit
 ) {
 
@@ -29,6 +30,9 @@ class DetailStateObserverController(
     }.launchIn(coroutineScope)
     viewModel.featureState.featuresFlow.onEach { feature ->
       onFeatureAdded(feature)
+    }.launchIn(coroutineScope)
+    viewModel.featureState.isLoading.onEach { loading ->
+      onFeatureLoadingChanged(loading)
     }.launchIn(coroutineScope)
     viewModel.featureState.abiBundleStateFlow.onEach { bundle ->
       if (bundle != null) {

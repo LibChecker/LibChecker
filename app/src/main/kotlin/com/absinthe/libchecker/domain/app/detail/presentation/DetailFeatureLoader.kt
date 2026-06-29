@@ -27,6 +27,10 @@ class DetailFeatureLoader(
 ) {
   val featureState = DetailFeatureState()
 
+  fun reset() {
+    featureState.reset()
+  }
+
   fun buildAppDetailAbiLabelData(
     abi: Int,
     abiSet: Collection<Int>,
@@ -86,16 +90,28 @@ class DetailFeatureLoader(
     featureState.emitFeature(feature)
   }
 
+  fun setLoading(
+    scope: CoroutineScope,
+    loading: Boolean
+  ) = scope.launch {
+    featureState.setLoading(loading)
+  }
+
   fun initFeatures(
     scope: CoroutineScope,
     packageState: DetailPackageState,
     packageInfo: PackageInfo,
     features: Int
   ) = scope.launch(Dispatchers.IO) {
-    Timber.d("initFeatures: features = $features")
+    featureState.setLoading(true)
+    try {
+      Timber.d("initFeatures: features = $features")
 
-    val detailFeatures = getAppDetailFeaturesUseCase(packageInfo, features, packageState.isApk)
-    featureState.emitFeatures(detailFeatures)
+      val detailFeatures = getAppDetailFeaturesUseCase(packageInfo, features, packageState.isApk)
+      featureState.emitFeatures(detailFeatures)
+    } finally {
+      featureState.setLoading(false)
+    }
   }
 
   fun initAbiInfo(

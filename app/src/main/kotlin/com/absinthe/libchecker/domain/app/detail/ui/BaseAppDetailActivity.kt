@@ -206,6 +206,7 @@ abstract class BaseAppDetailActivity :
       onProcessToolIconVisibilityChanged = toolbarController::setProcessActionVisible,
       onProcessMapChanged = processBarController::setData,
       onFeatureAdded = ::addFeatureItem,
+      onFeatureLoadingChanged = ::onFeatureLoadingChanged,
       onAbiBundleChanged = ::onAbiBundleChanged
     )
   }
@@ -298,6 +299,15 @@ abstract class BaseAppDetailActivity :
   private fun addFeatureItem(feature: VersionedFeature) {
     val featureItem = featureItemBuilder.build(feature, featureListController.itemCount) ?: return
     featureListController.addItem(featureItem)
+  }
+
+  private fun onFeatureLoadingChanged(loading: Boolean) {
+    featureListController.setLoading(loading)
+    if (loading) {
+      doOnMainThreadIdle {
+        featureListController.attachWithAnimation()
+      }
+    }
   }
 
   private fun resetUiState() {

@@ -19,6 +19,9 @@ class DetailFeatureState {
   private val _is64Bit = MutableStateFlow<Boolean?>(null)
   val is64Bit = _is64Bit.asStateFlow()
 
+  private val _isLoading = MutableStateFlow(false)
+  val isLoading = _isLoading.asStateFlow()
+
   var appIcons: List<AppIconItem> = emptyList()
     private set
 
@@ -39,5 +42,16 @@ class DetailFeatureState {
 
   suspend fun set64Bit(is64Bit: Boolean) {
     _is64Bit.emit(is64Bit)
+  }
+
+  suspend fun setLoading(isLoading: Boolean) {
+    _isLoading.emit(isLoading)
+  }
+
+  fun reset() {
+    appIcons = emptyList()
+    _abiBundleStateFlow.value = null
+    _is64Bit.value = null
+    _isLoading.value = false
   }
 }

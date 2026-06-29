@@ -196,6 +196,7 @@ class DetailViewModel(
     Timber.d("reset")
     detailContentLoader.reset()
     detailFilterController.reset()
+    detailFeatureLoader.reset()
   }
 
   fun initSoAnalysisData() {
@@ -259,6 +260,10 @@ class DetailViewModel(
 
   fun emitFeature(feature: VersionedFeature) {
     detailFeatureLoader.emitFeature(viewModelScope, feature)
+  }
+
+  fun setFeatureLoading(loading: Boolean) {
+    detailFeatureLoader.setLoading(viewModelScope, loading)
   }
 
   suspend fun getRelatedAppDisplayData(packageName: String) = detailActionLoader.getRelatedAppDisplayData(packageName)

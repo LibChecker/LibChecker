@@ -17,6 +17,9 @@ Use the Gradle wrapper from the repository root. On macOS/Linux use
 - Manual device launch after installing debug should target
   `com.absinthe.libchecker.debug`; `com.absinthe.libchecker` may be a separate
   release install used for snapshot export/import checks.
+- When launching the installed debug app for UI validation, explicitly start
+  `com.absinthe.libchecker.debug/com.absinthe.libchecker.domain.home.ui.MainActivity`;
+  launching only the package can resume LeakCanary instead of LibChecker's home.
 - Release/R8/package validation: `./gradlew :app:assembleRelease`
 - Market R8 rule check when full signing is blocked:
   `./gradlew :app:minifyMarketReleaseWithR8`
