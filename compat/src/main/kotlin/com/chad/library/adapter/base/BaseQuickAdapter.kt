@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
+import androidx.recyclerview.widget.AsyncDifferConfig
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -13,8 +14,9 @@ import com.chad.library.adapter4.BaseQuickAdapter as BaseQuickAdapter4
 import java.util.concurrent.atomic.AtomicLong
 
 abstract class BaseQuickAdapter<T : Any, VH : RecyclerView.ViewHolder>(
-  @LayoutRes private val layoutResId: Int = 0
-) : BaseQuickAdapter4<T, VH>(),
+  @LayoutRes private val layoutResId: Int = 0,
+  diffCallback: DiffUtil.ItemCallback<T>? = null
+) : BaseQuickAdapter4<T, VH>(diffCallback?.let { AsyncDifferConfig.Builder(it).build() }),
   HeaderFooterSupport {
 
   val data: MutableList<T> = AdapterDataList(this)
@@ -31,7 +33,6 @@ abstract class BaseQuickAdapter<T : Any, VH : RecyclerView.ViewHolder>(
   private val footerAdapters = mutableListOf<SingleViewAdapter>()
   private var concatAdapter: ConcatAdapter? = null
   private var syncingHeaderFooter = false
-  private var diffCallback: DiffUtil.ItemCallback<T>? = null
 
   val recyclerViewOrNull: RecyclerView?
     get() = runCatching { recyclerView }.getOrNull()
@@ -110,39 +111,8 @@ abstract class BaseQuickAdapter<T : Any, VH : RecyclerView.ViewHolder>(
     addAll(position, collection)
   }
 
-  fun setDiffCallback(diffCallback: DiffUtil.ItemCallback<T>) {
-    this.diffCallback = diffCallback
-  }
-
   fun setDiffNewData(list: Collection<T>?, commitCallback: Runnable? = null) {
-    val callback = diffCallback
-    val newList = list?.toList().orEmpty()
-    if (callback == null || displayEmptyView() || displayEmptyView(newList)) {
-      submitList(newList, commitCallback)
-      return
-    }
-
-    val oldList = items.toList()
-    val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-      override fun getOldListSize(): Int = oldList.size
-
-      override fun getNewListSize(): Int = newList.size
-
-      override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return callback.areItemsTheSame(oldList[oldItemPosition], newList[newItemPosition])
-      }
-
-      override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return callback.areContentsTheSame(oldList[oldItemPosition], newList[newItemPosition])
-      }
-
-      override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
-        return callback.getChangePayload(oldList[oldItemPosition], newList[newItemPosition])
-      }
-    })
-    items = newList
-    diffResult.dispatchUpdatesTo(this)
-    commitCallback?.run()
+    submitList(list?.toList().orEmpty(), commitCallback)
   }
 
   fun setOnItemClickListener(

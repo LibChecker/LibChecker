@@ -69,7 +69,7 @@ class LibStringAdapter(
   private val fragmentManager: FragmentManager? = null,
   private val buildNativeLibraryItemDisplayData: BuildNativeLibraryItemDisplayDataUseCase? = null,
   private val resolveAppResourceValue: ResolveAppResourceValueUseCase? = null
-) : HighlightAdapter<LibStringItemChip>() {
+) : HighlightAdapter<LibStringItemChip>(LibStringDiffUtil()) {
 
   var highlightPosition: Int = -1
     private set

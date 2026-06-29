@@ -11,7 +11,6 @@ import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.domain.app.detail.traceDetailSuspendSection
 import com.absinthe.libchecker.domain.app.detail.ui.Referable
-import com.absinthe.libchecker.domain.app.detail.ui.adapter.LibStringDiffUtil
 import com.absinthe.libchecker.domain.app.detail.ui.base.BaseDetailFragment
 import com.absinthe.libchecker.domain.app.detail.ui.base.EXTRA_TYPE
 import com.absinthe.libchecker.utils.extensions.ABI_STRING_MAP
@@ -59,7 +58,6 @@ class NativeAnalysisFragment :
 
     adapter.apply {
       animationEnable = false
-      setDiffCallback(LibStringDiffUtil())
       stateView = this@NativeAnalysisFragment.emptyView
       isStateViewEnable = true
     }

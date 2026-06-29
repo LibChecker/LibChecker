@@ -7,7 +7,6 @@ import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
-import com.absinthe.libchecker.domain.app.detail.ui.adapter.LibStringDiffUtil
 import com.absinthe.libchecker.domain.app.detail.ui.base.BaseDetailFragment
 import com.absinthe.libchecker.domain.app.detail.ui.base.EXTRA_TYPE
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.SignatureDetailBSDFragment
@@ -62,7 +61,6 @@ class SignaturesAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
         VersionCompat.showCopiedOnClipboardToast(context)
         true
       }
-      setDiffCallback(LibStringDiffUtil())
       stateView = this@SignaturesAnalysisFragment.emptyView
       isStateViewEnable = true
     }

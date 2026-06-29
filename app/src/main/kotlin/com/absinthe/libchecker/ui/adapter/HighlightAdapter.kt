@@ -1,11 +1,14 @@
 package com.absinthe.libchecker.ui.adapter
 
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
 import com.absinthe.libchecker.utils.extensions.tintHighlightText
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
-abstract class HighlightAdapter<T : Any> : BaseQuickAdapter<T, BaseViewHolder>(0) {
+abstract class HighlightAdapter<T : Any>(
+  diffCallback: DiffUtil.ItemCallback<T>? = null
+) : BaseQuickAdapter<T, BaseViewHolder>(0, diffCallback) {
 
   var highlightText: String = ""
 

@@ -41,7 +41,6 @@ import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDi
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotCapturePlan
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
 import com.absinthe.libchecker.domain.snapshot.list.ui.adapter.SnapshotAdapter
-import com.absinthe.libchecker.domain.snapshot.list.ui.adapter.SnapshotDiffUtil
 import com.absinthe.libchecker.domain.snapshot.list.ui.view.SnapshotDashboardView
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.timenode.ui.TimeNodeBottomSheetDialogFragment
@@ -181,7 +180,6 @@ class SnapshotFragment :
       }
       stateView = emptyView
       isStateViewEnable = true
-      setDiffCallback(SnapshotDiffUtil())
       setOnItemClickListener { _, view, position ->
         if (AntiShakeUtils.isInvalidClick(view)) {
           return@setOnItemClickListener

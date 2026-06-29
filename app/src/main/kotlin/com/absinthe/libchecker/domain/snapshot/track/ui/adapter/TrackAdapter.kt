@@ -10,7 +10,7 @@ import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
-class TrackAdapter : BaseQuickAdapter<TrackedAppListItem, BaseViewHolder>(0) {
+class TrackAdapter : BaseQuickAdapter<TrackedAppListItem, BaseViewHolder>(0, TrackListDiff()) {
 
   init {
     addChildClickViewIds(android.R.id.toggle)

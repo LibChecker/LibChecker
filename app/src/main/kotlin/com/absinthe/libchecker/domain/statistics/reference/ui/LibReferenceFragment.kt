@@ -23,7 +23,6 @@ import com.absinthe.libchecker.domain.statistics.chart.ui.ChartActivity
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReference
 import com.absinthe.libchecker.domain.statistics.reference.presentation.LibReferenceViewModel
 import com.absinthe.libchecker.domain.statistics.reference.ui.adapter.LibReferenceAdapter
-import com.absinthe.libchecker.domain.statistics.reference.ui.adapter.RefListDiffUtil
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseListControllerFragment
 import com.absinthe.libchecker.ui.base.IAppBarContainer
@@ -138,7 +137,6 @@ class LibReferenceFragment :
 
     refAdapter.apply {
       animationEnable = true
-      setDiffCallback(RefListDiffUtil())
       setOnItemClickListener { _, view, position ->
         if (AntiShakeUtils.isInvalidClick(view)) {
           return@setOnItemClickListener

@@ -32,7 +32,6 @@ import com.absinthe.libchecker.domain.app.list.TRACE_APP_LIST_REMAINING_ITEM_VIE
 import com.absinthe.libchecker.domain.app.list.traceAppListSection
 import com.absinthe.libchecker.domain.app.list.traceAppListSuspendSection
 import com.absinthe.libchecker.domain.app.list.ui.adapter.AppAdapter
-import com.absinthe.libchecker.domain.app.list.ui.adapter.AppListDiffUtil
 import com.absinthe.libchecker.domain.app.list.usecase.GetAppListPackageStatesUseCase
 import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
 import com.absinthe.libchecker.domain.home.ui.INavViewContainer
@@ -103,7 +102,6 @@ class AppListFragment :
         }
         activity?.launchDetailPage(it.getItem(position))
       }
-      it.setDiffCallback(AppListDiffUtil())
       it.setHasStableIds(true)
       it.stateView =
         EmptyListView(context).apply {

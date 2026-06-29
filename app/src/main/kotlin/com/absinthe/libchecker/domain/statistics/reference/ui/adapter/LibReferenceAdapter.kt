@@ -13,7 +13,7 @@ import com.chad.library.adapter.base.entity.node.BaseNode
 class LibReferenceAdapter(
   initialColorfulRuleIcon: Boolean = true,
   private val onDetailIconClick: (LibReference) -> Unit
-) : BaseNodeAdapter() {
+) : BaseNodeAdapter(RefListDiffUtil()) {
 
   var highlightText: String = ""
   var colorfulRuleIcon: Boolean = initialColorfulRuleIcon
