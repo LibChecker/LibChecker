@@ -32,7 +32,7 @@ val snapshotBackupModule = module {
 
   factory { SnapshotArchiveUseCase(get(), get()) }
   factory { BuildSnapshotRestorePlanUseCase() }
-  factory { GetSnapshotBackupTargetUseCase(get()) }
+  factory { GetSnapshotBackupTargetUseCase(get(), get()) }
   factory { BackupSnapshotArchiveToUriUseCase(androidContext().contentResolver, get()) }
   factory { (roomBackup: RoomBackup) ->
     CreateSnapshotDatabaseBackupUseCase(

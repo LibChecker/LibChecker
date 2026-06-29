@@ -11,15 +11,19 @@ class SnapshotArchiveUseCase(
   private val codec: SnapshotArchiveCodec
 ) {
 
-  suspend fun backup(outputStream: OutputStream) {
+  suspend fun backup(outputStream: OutputStream): Int {
+    var itemCount = 0
     outputStream.use { os ->
       repository.getTimeStamps().forEach { (timestamp, _, _) ->
         val backupList = repository.getSnapshots(timestamp)
         backupList.forEach {
           codec.write(it, os)
+          itemCount++
         }
       }
+      os.flush()
     }
+    return itemCount
   }
 
   suspend fun restore(inputStream: InputStream): RestoreResult {

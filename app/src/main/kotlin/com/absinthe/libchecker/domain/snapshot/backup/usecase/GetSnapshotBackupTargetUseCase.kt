@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.domain.snapshot.backup.usecase
 
+import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.backup.model.SnapshotBackupTarget
 import com.absinthe.libchecker.domain.snapshot.backup.repository.SnapshotDatabaseFileRepository
 import java.text.SimpleDateFormat
@@ -7,10 +8,15 @@ import java.util.Date
 import java.util.Locale
 
 class GetSnapshotBackupTargetUseCase(
-  private val databaseFileRepository: SnapshotDatabaseFileRepository
+  private val databaseFileRepository: SnapshotDatabaseFileRepository,
+  private val snapshotRepository: SnapshotRepository
 ) {
 
   operator fun invoke(): SnapshotBackupTarget {
+    if (snapshotRepository.getTimeStamps().isEmpty()) {
+      return SnapshotBackupTarget.Empty
+    }
+
     return if (databaseFileRepository.getDatabaseSizeBytes() > LARGE_DATABASE_THRESHOLD_BYTES) {
       SnapshotBackupTarget.Database
     } else {

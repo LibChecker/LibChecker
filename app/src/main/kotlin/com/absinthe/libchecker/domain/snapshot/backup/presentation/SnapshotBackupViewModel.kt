@@ -13,6 +13,7 @@ import com.absinthe.libchecker.domain.snapshot.backup.usecase.CreateSnapshotData
 import com.absinthe.libchecker.domain.snapshot.backup.usecase.GetSnapshotBackupTargetUseCase
 import com.absinthe.libchecker.domain.snapshot.backup.usecase.RestoreSnapshotArchiveFromUriUseCase
 import com.absinthe.libchecker.domain.snapshot.backup.usecase.RestoreSnapshotDatabaseBackupUseCase
+import com.absinthe.libchecker.domain.snapshot.backup.usecase.SnapshotArchiveBackupResult
 import com.absinthe.libchecker.domain.snapshot.backup.usecase.SnapshotRestorePlan
 import com.absinthe.libchecker.domain.snapshot.display.FormatSnapshotTimestampUseCase
 import com.absinthe.libchecker.domain.snapshot.selection.SnapshotSelection
@@ -33,14 +34,15 @@ class SnapshotBackupViewModel(
   private val snapshotSelection: SnapshotSelection
 ) : ViewModel() {
 
-  fun onLocalBackupRequested(isExternalStorageWritable: Boolean): LocalBackupAction {
+  suspend fun onLocalBackupRequested(isExternalStorageWritable: Boolean): LocalBackupAction = withContext(Dispatchers.IO) {
     if (!isExternalStorageWritable) {
-      return LocalBackupAction.StorageUnavailable
+      return@withContext LocalBackupAction.StorageUnavailable
     }
 
-    return when (val target = getSnapshotBackupTargetUseCase()) {
+    when (val target = getSnapshotBackupTargetUseCase()) {
       is SnapshotBackupTarget.Archive -> LocalBackupAction.CreateArchive(target.fileName)
       SnapshotBackupTarget.Database -> LocalBackupAction.CreateDatabase
+      SnapshotBackupTarget.Empty -> LocalBackupAction.NoSnapshot
     }
   }
 
@@ -99,14 +101,14 @@ class SnapshotBackupViewModel(
     }
   }
 
-  fun backup(uri: Uri, resultAction: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
-    runCatching {
+  fun backup(uri: Uri, resultAction: (SnapshotArchiveBackupResult) -> Unit) = viewModelScope.launch(Dispatchers.IO) {
+    val result = runCatching {
       backupSnapshotArchiveToUriUseCase(uri)
     }.onFailure {
       Timber.e(it)
-    }
+    }.getOrDefault(SnapshotArchiveBackupResult.Failed)
     withContext(Dispatchers.Main) {
-      resultAction()
+      resultAction(result)
     }
   }
 
@@ -155,5 +157,6 @@ class SnapshotBackupViewModel(
     data class CreateArchive(val fileName: String) : LocalBackupAction
     data object CreateDatabase : LocalBackupAction
     data object StorageUnavailable : LocalBackupAction
+    data object NoSnapshot : LocalBackupAction
   }
 }

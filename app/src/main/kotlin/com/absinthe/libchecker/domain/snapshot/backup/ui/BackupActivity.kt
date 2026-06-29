@@ -30,6 +30,7 @@ import com.absinthe.libchecker.database.backup.RoomBackup
 import com.absinthe.libchecker.databinding.ActivityBackupBinding
 import com.absinthe.libchecker.domain.home.ui.MainActivity
 import com.absinthe.libchecker.domain.snapshot.backup.presentation.SnapshotBackupViewModel
+import com.absinthe.libchecker.domain.snapshot.backup.usecase.SnapshotArchiveBackupResult
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.utils.StorageUtils
@@ -120,8 +121,13 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
               runCatching {
                 val dialog = UiUtils.createLoadingDialog(activity)
                 dialog.show()
-                viewModel.backup(it) {
+                viewModel.backup(it) { result ->
                   dialog.dismiss()
+                  when (result) {
+                    is SnapshotArchiveBackupResult.Success -> Unit
+                    SnapshotArchiveBackupResult.Empty -> context.showToast(R.string.snapshot_no_snapshot)
+                    SnapshotArchiveBackupResult.Failed -> context.showToast("Backup file error")
+                  }
                 }
               }.onFailure { t ->
                 Timber.e(t)
@@ -144,14 +150,19 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
 
       findPreference<Preference>(Constants.PREF_LOCAL_BACKUP)?.apply {
         setOnPreferenceClickListener {
-          val action = viewModel.onLocalBackupRequested(StorageUtils.isExternalStorageWritable)
-          when (action) {
-            is SnapshotBackupViewModel.LocalBackupAction.CreateArchive -> launchArchiveBackup(action.fileName)
+          lifecycleScope.launch {
+            val action = viewModel.onLocalBackupRequested(StorageUtils.isExternalStorageWritable)
+            when (action) {
+              is SnapshotBackupViewModel.LocalBackupAction.CreateArchive -> launchArchiveBackup(action.fileName)
 
-            SnapshotBackupViewModel.LocalBackupAction.CreateDatabase -> createDatabaseBackup()
+              SnapshotBackupViewModel.LocalBackupAction.CreateDatabase -> createDatabaseBackup()
 
-            SnapshotBackupViewModel.LocalBackupAction.StorageUnavailable ->
-              context.showToast("External storage is not writable")
+              SnapshotBackupViewModel.LocalBackupAction.StorageUnavailable ->
+                context.showToast("External storage is not writable")
+
+              SnapshotBackupViewModel.LocalBackupAction.NoSnapshot ->
+                context.showToast(R.string.snapshot_no_snapshot)
+            }
           }
           true
         }
