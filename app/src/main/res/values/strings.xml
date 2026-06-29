@@ -217,6 +217,8 @@
   <string name="lib_detail_elf_extract">Extract</string>
   <string name="lib_detail_elf_extract_success">ELF file saved to Downloads</string>
   <string name="lib_detail_elf_extract_failed">Failed to extract ELF file</string>
+  <string name="lib_detail_permission_providers">Provider reference</string>
+  <string name="lib_detail_permission_providers_empty">No content provider uses this permission</string>
   <string name="lib_detail_dependency_tip">Dependencies</string>
   <string name="lib_detail_entry_points_tip">Entry points</string>
   <string name="lib_detail_optimization_tip">Optimization</string>

@@ -35,6 +35,7 @@ import com.absinthe.libchecker.domain.app.detail.action.GetAppInstallSourceDetai
 import com.absinthe.libchecker.domain.app.detail.action.GetAppLaunchActionUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetAppManifestPropertiesUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetElfDetailUseCase
+import com.absinthe.libchecker.domain.app.detail.action.GetPermissionProvidersUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetLibraryDetailDialogDataUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetOverlayDetailUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetPermissionDetailUseCase
@@ -115,6 +116,7 @@ val appDetailModule = module {
   factory { BuildRelatedAppDisplayDataUseCase(androidContext()) }
   factory { BuildDetailItemDialogRequestUseCase() }
   factory { BuildDetailItemLongClickActionsUseCase() }
+  factory { GetPermissionProvidersUseCase(get()) }
   factory { BuildDetailReferenceNavigationUseCase() }
   factory { BuildSignatureDetailItemsUseCase() }
   factory { GetAppManifestPropertiesUseCase(androidContext().packageManager) }
