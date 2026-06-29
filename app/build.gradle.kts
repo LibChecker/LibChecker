@@ -120,6 +120,7 @@ configurations.configureEach {
 dependencies {
   compileOnly(dependencies.project(":hidden-api"))
 
+  implementation(projects.compat)
   implementation(libs.kotlinX.coroutines)
   implementation(platform(libs.koin.bom))
   implementation(libs.koin.android)

@@ -56,6 +56,9 @@ or release behavior changes, run the matching assemble/minify task.
 ## Module boundaries
 
 - `:app` is the Android application. Put product behavior here.
+- `:compat` owns in-repo compatibility shims, shaded/stubbed third-party API
+  surfaces, and source-level workarounds that must keep their original package
+  names. Do not put product behavior here.
 - `:hidden-api` is compile-only hidden platform API stubs and Rikka Refine
   annotations. Never put runtime app logic here.
 - `:macrobenchmark` owns Jetpack Macrobenchmark tests for release-like app
