@@ -183,7 +183,10 @@ class ChartFragment :
 
     binding.progressHorizontal.let { indicator ->
       if (!progressPlan.isVisible) {
-        if (previousPlan?.isVisible != false) {
+        if (previousPlan?.isVisible != false || indicator.isShown) {
+          indicator.isIndeterminate = false
+          indicator.setProgressCompat(progressPlan.progress, false)
+          indicator.jumpDrawablesToCurrentState()
           indicator.hide()
         }
         return@let
@@ -228,6 +231,9 @@ class ChartFragment :
     if (requestKey == currentChartRequestKey) {
       return
     }
+    val canContinueLoadingProgress = currentChartRequestKey
+      ?.canContinueLoadingProgress(requestKey) == true
+    val shouldResetLoadingProgress = !canContinueLoadingProgress || !viewModel.isChartLoading
     currentChartRequestKey = requestKey
 
     if (chartView.parent != null) {
@@ -235,18 +241,19 @@ class ChartFragment :
     }
 
     when (plan) {
-      is ChartDataSourcePlan.Pie -> setChartData(::generatePieChartView, plan)
-      is ChartDataSourcePlan.Bar -> setChartData(::generateBarChartView, plan)
+      is ChartDataSourcePlan.Pie -> setChartData(::generatePieChartView, plan, shouldResetLoadingProgress)
+      is ChartDataSourcePlan.Bar -> setChartData(::generateBarChartView, plan, shouldResetLoadingProgress)
     }
     Telemetry.recordEvent(Constants.Event.CHART, mapOf(Telemetry.Param.ITEM_ID to selectedChartType))
   }
 
   private fun setChartData(
     generateChartView: () -> PieChart,
-    plan: ChartDataSourcePlan.Pie
+    plan: ChartDataSourcePlan.Pie,
+    shouldResetLoadingProgress: Boolean
   ) {
     val newChartView = generateChartView()
-    viewModel.setLoadingProgress(plan.initialLoadingProgress)
+    viewModel.setLoadingProgress(plan.initialLoadingProgress, allowDecrease = shouldResetLoadingProgress)
     chartDataRenderer.render(binding.root, chartView, newChartView, plan.dataSource)
     chartView = newChartView
     dataSource = plan.dataSource
@@ -254,10 +261,11 @@ class ChartFragment :
 
   private fun setChartData(
     generateChartView: () -> BarChart,
-    plan: ChartDataSourcePlan.Bar
+    plan: ChartDataSourcePlan.Bar,
+    shouldResetLoadingProgress: Boolean
   ) {
     val newChartView = generateChartView()
-    viewModel.setLoadingProgress(plan.initialLoadingProgress)
+    viewModel.setLoadingProgress(plan.initialLoadingProgress, allowDecrease = shouldResetLoadingProgress)
     chartDataRenderer.render(binding.root, chartView, newChartView, plan.dataSource)
     chartView = newChartView
     dataSource = plan.dataSource
@@ -451,7 +459,13 @@ private data class ChartRequestKey(
   val useDetailedAbiChart: Boolean,
   val showSystemApps: Boolean,
   val itemsHash: Int
-)
+) {
+  fun canContinueLoadingProgress(other: ChartRequestKey): Boolean {
+    return chartType == other.chartType &&
+      useDetailedAbiChart == other.useDetailedAbiChart &&
+      showSystemApps == other.showSystemApps
+  }
+}
 
 private fun List<LCItem>.chartRequestHash(chartType: ChartType): Int {
   return fold(1) { result, item ->

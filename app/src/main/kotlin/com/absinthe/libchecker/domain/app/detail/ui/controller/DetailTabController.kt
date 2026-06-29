@@ -94,7 +94,7 @@ class DetailTabController(
     })
 
     tabLayoutMediator =
-      TabLayoutMediator(tabLayout, viewPager, true, false) { tab, position ->
+      TabLayoutMediator(tabLayout, viewPager, true, true) { tab, position ->
         tab.text = titles.getOrNull(position)
       }.also { it.attach() }
   }
