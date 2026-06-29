@@ -146,6 +146,7 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> :
 
   override fun onStart() {
     super.onStart()
+    updateMaxPeekSize()
     behavior.addBottomSheetCallback(bottomSheetCallback)
     root.addOnLayoutChangeListener(this)
   }
@@ -189,20 +190,32 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> :
     oldRight: Int,
     oldBottom: Int
   ) {
-    if ((bottom - top) != (oldBottom - oldTop)) {
-      enqueueAnimation {
-        animateHeight(from = oldBottom - oldTop, to = bottom - top, onEnd = { })
-      }
+    val height = bottom - top
+    val oldHeight = oldBottom - oldTop
+    if (height == oldHeight) return
+
+    if (oldHeight == 0) {
+      updateMaxPeekSize()
+      setClippedHeight(height)
+      return
+    }
+
+    enqueueAnimation {
+      animateHeight(from = oldHeight, to = height, onEnd = { })
     }
   }
 
   private fun applyRootView(root: T) {
     root.post {
-      if (maxPeekHeightPercentage >= 0f) {
-        maxPeekSize = ((dialog?.window?.decorView?.height ?: 0) * maxPeekHeightPercentage).toInt()
-      } else {
-        throw IllegalArgumentException("maxPeekHeightPercentage must be greater than 0")
-      }
+      updateMaxPeekSize()
+    }
+  }
+
+  private fun updateMaxPeekSize() {
+    if (maxPeekHeightPercentage >= 0f) {
+      maxPeekSize = ((dialog?.window?.decorView?.height ?: 0) * maxPeekHeightPercentage).toInt()
+    } else {
+      throw IllegalArgumentException("maxPeekHeightPercentage must be greater than 0")
     }
   }
 
@@ -255,8 +268,13 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> :
   }
 
   private fun setClippedHeight(newHeight: Int) {
-    if (newHeight <= maxPeekSize || maxPeekSize == 0) {
-      behavior.peekHeight = newHeight
+    val clippedHeight = if (maxPeekSize > 0) {
+      newHeight.coerceAtMost(maxPeekSize)
+    } else {
+      newHeight
+    }
+    if (behavior.peekHeight != clippedHeight) {
+      behavior.peekHeight = clippedHeight
     }
   }
 

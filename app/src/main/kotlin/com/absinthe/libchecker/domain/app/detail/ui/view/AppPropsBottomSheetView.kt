@@ -14,12 +14,12 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.AppPropsAdapter
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
+import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getDrawable
@@ -88,10 +88,10 @@ class AppPropsBottomSheetView(
     }
   }
 
-  private val list = RecyclerView(context).apply {
+  private val list = BottomSheetRecyclerView(context).apply {
     layoutParams = LayoutParams(
       LayoutParams.MATCH_PARENT,
-      LayoutParams.WRAP_CONTENT
+      (resources.displayMetrics.heightPixels * APP_PROPS_LIST_HEIGHT_PERCENTAGE).toInt()
     ).also {
       it.topMargin = 24.dp
     }
@@ -101,7 +101,7 @@ class AppPropsBottomSheetView(
     isVerticalScrollBarEnabled = false
     clipToPadding = false
     clipChildren = false
-    isNestedScrollingEnabled = true
+    isNestedScrollingEnabled = false
     setHasFixedSize(true)
     addItemDecoration(VerticalSpacesItemDecoration(4.dp))
     paddingBottomCompat = 16.dp
@@ -118,5 +118,9 @@ class AppPropsBottomSheetView(
 
   override fun getHeaderView(): BottomSheetHeaderView {
     return header
+  }
+
+  private companion object {
+    const val APP_PROPS_LIST_HEIGHT_PERCENTAGE = 0.5f
   }
 }
