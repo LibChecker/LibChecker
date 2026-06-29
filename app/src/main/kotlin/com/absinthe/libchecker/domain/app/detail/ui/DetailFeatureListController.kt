@@ -20,6 +20,10 @@ class DetailFeatureListController(
   private var loadingView: ToolbarConnectionLoadingView? = null
   private var isLoading = false
 
+  init {
+    adapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+  }
+
   val itemCount: Int
     get() = adapter.data.size
 
@@ -28,11 +32,15 @@ class DetailFeatureListController(
 
   fun addItem(featureItem: DetailFeatureItem) {
     ensureListView()
+    val wasEmpty = adapter.data.isEmpty()
     val position = featureItem.position
     if (position == null) {
       adapter.addData(featureItem.item)
     } else {
       adapter.addData(position, featureItem.item)
+    }
+    if (wasEmpty || position == 0) {
+      alignListStart()
     }
   }
 
@@ -50,6 +58,9 @@ class DetailFeatureListController(
     } else {
       loadingView?.stop()
       adapter.removeAllFooterView()
+      if (adapter.data.isNotEmpty()) {
+        alignListStart()
+      }
     }
   }
 
@@ -86,6 +97,7 @@ class DetailFeatureListController(
     loadingView?.stop()
     adapter.removeAllFooterView()
     featureListView?.let {
+      (it.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(0, 0)
       if (it.parent != null) {
         (it.parent as? ViewGroup)?.removeView(it)
       }
@@ -113,6 +125,15 @@ class DetailFeatureListController(
       it.clipChildren = false
       it.clipToPadding = false
       it.overScrollMode = View.OVER_SCROLL_NEVER
+    }
+  }
+
+  private fun alignListStart() {
+    featureListView?.let { view ->
+      view.post {
+        (view.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(0, 0)
+        view.invalidateItemDecorations()
+      }
     }
   }
 

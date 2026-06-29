@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.domain.app.detail.ui.controller
 
 import android.content.pm.PackageInfo
-import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.domain.app.detail.content.AppDetailAnalysisInitAction
 import com.absinthe.libchecker.domain.app.detail.content.AppDetailFeatureInitAction
 import com.absinthe.libchecker.domain.app.detail.content.BuildAppDetailContentInitPlanUseCase
@@ -12,8 +11,6 @@ import com.absinthe.libchecker.domain.app.detail.ui.DetailTabSpecBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -52,7 +49,7 @@ class DetailPackageContentController(
     )
 
     insertStaticLibraryTabIfAvailable(packageName, uiGeneration)
-    initFeatureItems(packageInfo, contentInitPlan.featureAction, tabSpec, uiGeneration)
+    initFeatureItems(packageInfo, contentInitPlan.featureAction, uiGeneration)
     initAnalysisContent(packageName, contentInitPlan.analysisAction)
     if (contentInitPlan.shouldInitPermissions) {
       // Detect Live Update notification
@@ -80,7 +77,6 @@ class DetailPackageContentController(
   private fun initFeatureItems(
     packageInfo: PackageInfo,
     featureAction: AppDetailFeatureInitAction,
-    tabSpec: DetailTabSpec,
     uiGeneration: Int
   ) {
     when (featureAction) {
@@ -88,13 +84,8 @@ class DetailPackageContentController(
 
       is AppDetailFeatureInitAction.LoadPackageFeatures -> {
         viewModel.setFeatureLoading(true)
-        coroutineScope.launch {
-          if (NATIVE in tabSpec.types) {
-            viewModel.contentState.nativeLibTabs.filterNotNull().first()
-          }
-          if (uiGeneration == currentUiGeneration()) {
-            viewModel.initFeatures(packageInfo, featureAction.featureMask)
-          }
+        if (uiGeneration == currentUiGeneration()) {
+          viewModel.initFeatures(packageInfo, featureAction.featureMask)
         }
       }
     }

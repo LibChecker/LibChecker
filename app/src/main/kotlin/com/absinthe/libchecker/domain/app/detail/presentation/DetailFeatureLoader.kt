@@ -107,8 +107,13 @@ class DetailFeatureLoader(
     try {
       Timber.d("initFeatures: features = $features")
 
-      val detailFeatures = getAppDetailFeaturesUseCase(packageInfo, features, packageState.isApk)
-      featureState.emitFeatures(detailFeatures)
+      getAppDetailFeaturesUseCase(
+        packageInfo = packageInfo,
+        cachedFeatures = features,
+        isApk = packageState.isApk,
+        onFeature = featureState::emitFeature,
+        onAppIcons = featureState::setAppIcons
+      )
     } finally {
       featureState.setLoading(false)
     }
