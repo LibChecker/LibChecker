@@ -51,7 +51,13 @@ class DetailViewModel(
   val filterState = detailFilterController.filterState
   private val _packageLoadResults = MutableSharedFlow<PackageLoadResult>()
   val packageLoadResults: SharedFlow<PackageLoadResult> = _packageLoadResults.asSharedFlow()
+  private val _apkAnalysisPackageResults = MutableSharedFlow<ApkAnalysisPackageResult>()
+  val apkAnalysisPackageResults: SharedFlow<ApkAnalysisPackageResult> = _apkAnalysisPackageResults.asSharedFlow()
+  private val _apkPreviewResults = MutableSharedFlow<ApkPreviewResult>()
+  val apkPreviewResults: SharedFlow<ApkPreviewResult> = _apkPreviewResults.asSharedFlow()
   private var packageLoadJob: Job? = null
+  private var apkAnalysisPackageJob: Job? = null
+  private var apkPreviewJob: Job? = null
   private val packageState: DetailPackageState
     get() = detailPackageLoader.packageState
 
@@ -75,22 +81,6 @@ class DetailViewModel(
     detailPackageLoader.initPackageInfo(pi)
   }
 
-  fun startApkMode() {
-    detailPackageLoader.startApkMode()
-  }
-
-  fun startApkPreviewMode() {
-    detailPackageLoader.startApkPreviewMode()
-  }
-
-  fun setApkPreviewInfo(apkPreviewInfo: ApkPreviewInfo) {
-    detailPackageLoader.setApkPreviewInfo(apkPreviewInfo)
-  }
-
-  fun clearApkPreviewInfo() {
-    detailPackageLoader.clearApkPreviewInfo()
-  }
-
   fun isPackageInfoAvailable(): Boolean {
     return detailPackageLoader.isPackageInfoAvailable()
   }
@@ -110,6 +100,41 @@ class DetailViewModel(
   data class PackageLoadResult(
     val packageName: String,
     val result: GetAppDetailPackageUseCase.Result
+  )
+
+  fun loadApkAnalysisPackage(cacheDir: File, uri: Uri) {
+    apkAnalysisPackageJob?.cancel()
+    apkPreviewJob?.cancel()
+    detailPackageLoader.startApkMode()
+    detailPackageLoader.clearApkPreviewInfo()
+    apkAnalysisPackageJob = viewModelScope.launch {
+      _apkAnalysisPackageResults.emit(
+        ApkAnalysisPackageResult(
+          result = detailPackageLoader.prepareApkAnalysisPackage(cacheDir, uri)
+        )
+      )
+    }
+  }
+
+  data class ApkAnalysisPackageResult(
+    val result: PrepareApkAnalysisPackageUseCase.Result
+  )
+
+  fun loadApkPreview(url: String) {
+    apkPreviewJob?.cancel()
+    apkAnalysisPackageJob?.cancel()
+    detailPackageLoader.startApkPreviewMode()
+    detailPackageLoader.clearApkPreviewInfo()
+    apkPreviewJob = viewModelScope.launch {
+      val result = detailPackageLoader.getApkPreviewInfo(url)
+      result.getOrNull()?.let(detailPackageLoader::setApkPreviewInfo)
+      _apkPreviewResults.emit(ApkPreviewResult(url, result))
+    }
+  }
+
+  data class ApkPreviewResult(
+    val url: String,
+    val result: Result<ApkPreviewInfo>
   )
 
   fun buildAppDetailAbiLabelData(
@@ -173,22 +198,11 @@ class DetailViewModel(
     destinationUri: Uri
   ) = detailActionLoader.exportAppPackageShareFile(shareFile, destinationUri)
 
-  suspend fun getApkPreviewInfo(url: String): Result<ApkPreviewInfo> {
-    return detailPackageLoader.getApkPreviewInfo(url)
-  }
-
   suspend fun getAppManifestProperties(
     packageInfo: PackageInfo?,
     properties: Map<String, String>?
   ): List<AppManifestProperty> {
     return detailActionLoader.getAppManifestProperties(packageInfo, properties)
-  }
-
-  suspend fun prepareApkAnalysisPackage(
-    cacheDir: File,
-    uri: Uri
-  ): PrepareApkAnalysisPackageUseCase.Result {
-    return detailPackageLoader.prepareApkAnalysisPackage(cacheDir, uri)
   }
 
   suspend fun getElfDetail(packageName: String, elfPath: String) = detailActionLoader.getElfDetail(packageName, elfPath)

@@ -5,10 +5,13 @@ import android.content.Intent
 import android.content.pm.PackageInfo
 import android.net.Uri
 import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.IntentCompat
 import com.absinthe.libchecker.domain.app.PrepareApkAnalysisPackageUseCase
+import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel.ApkAnalysisPackageResult
+import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel.ApkPreviewResult
 import com.absinthe.libchecker.domain.app.detail.ui.IDetailContainer
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.UiUtils
@@ -23,6 +26,7 @@ class ApkDetailActivity :
   IDetailContainer {
 
   private var tempFile: File? = null
+  private var loadingDialog: AlertDialog? = null
 
   override val apkAnalyticsMode: Boolean = true
   override fun requirePackageName() = tempFile?.path
@@ -30,8 +34,8 @@ class ApkDetailActivity :
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    viewModel.startApkMode()
-    viewModel.clearApkPreviewInfo()
+    collectApkAnalysisPackageResults()
+    collectApkPreviewResults()
     resolveIntent(intent)
   }
 
@@ -42,12 +46,14 @@ class ApkDetailActivity :
   }
 
   override fun onDestroy() {
+    dismissLoadingDialog()
     tempFile?.delete()
     super.onDestroy()
   }
 
   private fun resolveIntent(intent: Intent?) {
     tempFile?.delete()
+    tempFile = null
     intent?.let { i ->
       when {
         i.action == Intent.ACTION_SEND -> {
@@ -76,61 +82,79 @@ class ApkDetailActivity :
   }
 
   private fun initPackage(uri: Uri) {
-    viewModel.startApkMode()
-    viewModel.clearApkPreviewInfo()
-
-    val dialog = UiUtils.createLoadingDialog(this)
-    dialog.show()
-
-    lifecycleScope.launch {
-      when (val result = viewModel.prepareApkAnalysisPackage(requireAvailableCacheDir(), uri)) {
-        is PrepareApkAnalysisPackageUseCase.Result.Available -> {
-          tempFile = result.file
-          isPackageReady = true
-          dialog.dismiss()
-          onPackageInfoAvailable(result.packageInfo, null)
-        }
-
-        is PrepareApkAnalysisPackageUseCase.Result.InvalidPackage -> {
-          tempFile = result.file
-          dialog.dismiss()
-          showToast(R.string.toast_use_another_file_manager)
-          finish()
-        }
-
-        PrepareApkAnalysisPackageUseCase.Result.Unreadable -> {
-          dialog.dismiss()
-          showToast(R.string.toast_use_another_file_manager)
-          finish()
-        }
-
-        PrepareApkAnalysisPackageUseCase.Result.NotEnoughStorage -> {
-          dialog.dismiss()
-          showToast(R.string.toast_not_enough_storage_space)
-          finish()
-        }
-      }
-    }
+    showLoadingDialog()
+    viewModel.loadApkAnalysisPackage(requireAvailableCacheDir(), uri)
   }
 
   private fun initAPKPreview(url: String) {
     Timber.d("initAPKPreview: $url")
-    viewModel.startApkPreviewMode()
+    showLoadingDialog()
+    viewModel.loadApkPreview(url)
+  }
 
-    val dialog = UiUtils.createLoadingDialog(this)
-    dialog.show()
-
+  private fun collectApkAnalysisPackageResults() {
     lifecycleScope.launch {
-      val previewInfo = viewModel.getApkPreviewInfo(url).onFailure {
-        Timber.w(it, "Failed to preview APK from URL: $url")
-        dialog.dismiss()
-        Toasty.showLong(this@ApkDetailActivity, it.toString())
-        finish()
-      }.getOrNull() ?: return@launch
-      viewModel.setApkPreviewInfo(previewInfo)
-
-      onPackageInfoAvailable(PackageInfo(), null)
-      dialog.dismiss()
+      viewModel.apkAnalysisPackageResults.collect(::handleApkAnalysisPackageResult)
     }
+  }
+
+  private fun handleApkAnalysisPackageResult(loadResult: ApkAnalysisPackageResult) {
+    when (val result = loadResult.result) {
+      is PrepareApkAnalysisPackageUseCase.Result.Available -> {
+        tempFile = result.file
+        isPackageReady = true
+        dismissLoadingDialog()
+        onPackageInfoAvailable(result.packageInfo, null)
+      }
+
+      is PrepareApkAnalysisPackageUseCase.Result.InvalidPackage -> {
+        tempFile = result.file
+        dismissLoadingDialog()
+        showToast(R.string.toast_use_another_file_manager)
+        finish()
+      }
+
+      PrepareApkAnalysisPackageUseCase.Result.Unreadable -> {
+        dismissLoadingDialog()
+        showToast(R.string.toast_use_another_file_manager)
+        finish()
+      }
+
+      PrepareApkAnalysisPackageUseCase.Result.NotEnoughStorage -> {
+        dismissLoadingDialog()
+        showToast(R.string.toast_not_enough_storage_space)
+        finish()
+      }
+    }
+  }
+
+  private fun collectApkPreviewResults() {
+    lifecycleScope.launch {
+      viewModel.apkPreviewResults.collect(::handleApkPreviewResult)
+    }
+  }
+
+  private fun handleApkPreviewResult(loadResult: ApkPreviewResult) {
+    loadResult.result.onFailure {
+      Timber.w(it, "Failed to preview APK from URL: ${loadResult.url}")
+      dismissLoadingDialog()
+      Toasty.showLong(this@ApkDetailActivity, it.toString())
+      finish()
+    }.getOrNull() ?: return
+
+    onPackageInfoAvailable(PackageInfo(), null)
+    dismissLoadingDialog()
+  }
+
+  private fun showLoadingDialog() {
+    dismissLoadingDialog()
+    loadingDialog = UiUtils.createLoadingDialog(this).also {
+      it.show()
+    }
+  }
+
+  private fun dismissLoadingDialog() {
+    loadingDialog?.dismiss()
+    loadingDialog = null
   }
 }
