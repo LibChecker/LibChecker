@@ -263,19 +263,22 @@ object PackageUtils {
     }
 
     val map = mutableMapOf<String, MutableList<LibStringItem>>()
-    splitList.filter {
-      val fileName = it.split(File.separator).last()
-      val specifiedAvailable = specifiedAbi != null && fileName.contains(ABI_VALUE_TO_INSTRUCTION_SET_MAP[specifiedAbi].toString())
-      val isAbiSplitFile = specifiedAbi == null && INSTRUCTION_SET_MAP_TO_ABI_VALUE.keys.any { key -> fileName.contains(key) }
-      specifiedAvailable || isAbiSplitFile
-    }.forEach { split ->
-      val splitMap = getApkFileLibs(File(split), parseElf = parseElf)
-      for ((key, newList) in splitMap) {
-        map.merge(key, newList) { existingList, _ ->
-          existingList.apply { addAll(newList) }
+    splitList.asSequence()
+      .filter {
+        val fileName = it.substringAfterLast(File.separator)
+        val specifiedAvailable = specifiedAbi != null &&
+          fileName.contains(ABI_VALUE_TO_INSTRUCTION_SET_MAP[specifiedAbi].toString())
+        val isAbiSplitFile = specifiedAbi == null &&
+          INSTRUCTION_SET_MAP_TO_ABI_VALUE.keys.any { key -> fileName.contains(key) }
+        specifiedAvailable || isAbiSplitFile
+      }.forEach { split ->
+        val splitMap = getApkFileLibs(File(split), parseElf = parseElf)
+        for ((key, newList) in splitMap) {
+          map.merge(key, newList) { existingList, _ ->
+            existingList.apply { addAll(newList) }
+          }
         }
       }
-    }
 
     return map
   }
@@ -323,20 +326,11 @@ object PackageUtils {
     if (ENABLE_GET_APK_FILE_LIBS_LOG) timeRecorder.start()
     try {
       tracePackageUtilsSection(TRACE_APK_LIBS_OPEN_ZIP) { ZipFile(file) }.use { zipFile ->
-        val nativeEntries = tracePackageUtilsSection(TRACE_APK_LIBS_MATCH_ENTRIES) {
-          zipFile.entries().asSequence()
-            .filter { !it.isDirectory && it.name.endsWith(".so") && (sourceDir == null || it.name.startsWith(sourceDir)) }
-            .toList()
-        }
-        val storedEntryNames = nativeEntries
-          .asSequence()
-          .filter { it.method == ZipEntry.STORED }
-          .map { it.name }
-          .toSet()
+        val nativeEntries = collectNativeZipEntries(zipFile, sourceDir)
         val storedEntryOffsets by lazy {
-          loadStoredEntryOffsets(file, storedEntryNames)
+          loadStoredEntryOffsets(file, nativeEntries.storedEntryNames)
         }
-        nativeEntries.forEach { entry ->
+        nativeEntries.entries.forEach { entry ->
           val entryName = entry.name
           val dir = getApkLibEntryDir(entryName, libDir, assetsDir) ?: return@forEach
 
@@ -382,6 +376,31 @@ object PackageUtils {
     return map
   }
 
+  private fun collectNativeZipEntries(
+    zipFile: ZipFile,
+    sourceDir: String?
+  ): NativeZipEntries {
+    return tracePackageUtilsSection(TRACE_APK_LIBS_MATCH_ENTRIES) {
+      val entries = mutableListOf<ZipEntry>()
+      val storedEntryNames = mutableSetOf<String>()
+      val zipEntries = zipFile.entries()
+      while (zipEntries.hasMoreElements()) {
+        val entry = zipEntries.nextElement()
+        if (
+          !entry.isDirectory &&
+          entry.name.endsWith(".so") &&
+          (sourceDir == null || entry.name.startsWith(sourceDir))
+        ) {
+          entries.add(entry)
+          if (entry.method == ZipEntry.STORED) {
+            storedEntryNames.add(entry.name)
+          }
+        }
+      }
+      NativeZipEntries(entries, storedEntryNames)
+    }
+  }
+
   private fun getZipAlignment(offset: Long): Long {
     if (offset <= 0L) {
       return -1
@@ -398,6 +417,11 @@ object PackageUtils {
       }
     }
   }
+
+  private data class NativeZipEntries(
+    val entries: List<ZipEntry>,
+    val storedEntryNames: Set<String>
+  )
 
   private inline fun <T> tracePackageUtilsSection(sectionName: String, block: () -> T): T {
     Trace.beginSection(sectionName)

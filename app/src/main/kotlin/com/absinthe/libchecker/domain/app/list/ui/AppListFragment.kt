@@ -555,8 +555,7 @@ class AppListFragment :
     }
 
     val generation = itemViewStatesGeneration
-    val packageNames = items.map { it.packageName }
-    val remainingItems = items.drop(initialItemViewStateCount)
+    val remainingItems = items.subList(initialItemViewStateCount, items.size)
     itemViewStatesJob = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
       val itemViewStates = traceAppListSuspendSection(TRACE_APP_LIST_REMAINING_ITEM_VIEW_STATES) {
         homeViewModel.buildAppListItemViewStates(remainingItems, packageStateSnapshot)
@@ -569,7 +568,7 @@ class AppListFragment :
           generation != itemViewStatesGeneration ||
           isDetached ||
           !isBindingInitialized() ||
-          !hasSameAppList(packageNames)
+          !hasSameAppList(items)
         ) {
           return@withContext
         }
@@ -582,9 +581,9 @@ class AppListFragment :
     }
   }
 
-  private fun hasSameAppList(packageNames: List<String>): Boolean {
-    return appAdapter.data.size == packageNames.size &&
-      packageNames.indices.all { index -> appAdapter.data[index].packageName == packageNames[index] }
+  private fun hasSameAppList(items: List<LCItem>): Boolean {
+    return appAdapter.data.size == items.size &&
+      items.indices.all { index -> appAdapter.data[index].packageName == items[index].packageName }
   }
 
   private fun returnTopOfList() {
