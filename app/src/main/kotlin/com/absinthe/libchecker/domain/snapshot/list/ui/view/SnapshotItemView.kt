@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.domain.snapshot.list.ui.view
 
 import android.content.Context
-import android.graphics.Typeface
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
@@ -32,9 +31,6 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
   }
 
   class SnapshotItemContainerView(context: Context) : AViewGroup(context) {
-
-    private val condensedTypeface = Typeface.create("sans-serif-condensed", Typeface.NORMAL)
-    private val condensedMediumTypeface = Typeface.create("sans-serif-condensed-medium", Typeface.NORMAL)
 
     val icon = AppCompatImageView(context).apply {
       val iconSize = context.getDimensionPixelSize(R.dimen.app_icon_size)
@@ -72,7 +68,6 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       )
       setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceLabelSmall))
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
-      typeface = condensedTypeface
       letterSpacing = 0f
       addView(this)
     }
@@ -84,7 +79,6 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       )
       setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceLabelSmall))
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
-      typeface = condensedTypeface
       letterSpacing = 0f
       addView(this)
     }
@@ -96,7 +90,6 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       )
       setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceLabelSmall))
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
-      typeface = condensedTypeface
       letterSpacing = 0f
       addView(this)
     }
@@ -109,7 +102,6 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       clipChildren = false
       setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceLabelSmall))
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
-      typeface = condensedMediumTypeface
       letterSpacing = 0f
       addView(this)
     }
@@ -121,7 +113,6 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       )
       setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceLabelSmall))
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
-      typeface = condensedTypeface
       letterSpacing = 0f
       addView(this)
     }

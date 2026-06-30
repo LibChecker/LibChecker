@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.domain.app.detail.ui.view
 
 import android.content.Context
-import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
@@ -28,8 +27,6 @@ class DetailsTitleView(
   context: Context,
   attributeSet: AttributeSet? = null
 ) : AViewGroup(context, attributeSet) {
-
-  private val condensedTypeface = Typeface.create("sans-serif-condensed", Typeface.NORMAL)
 
   val iconView = AppCompatImageView(context).apply {
     val iconSize = context.getDimensionPixelSize(R.dimen.lib_detail_icon_size)
@@ -66,7 +63,6 @@ class DetailsTitleView(
     )
     setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBodySmall))
     setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
-    typeface = condensedTypeface
     letterSpacing = 0f
     addView(this)
   }
@@ -78,7 +74,6 @@ class DetailsTitleView(
     )
     setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBodySmall))
     setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
-    typeface = condensedTypeface
     letterSpacing = 0f
     addView(this)
   }
