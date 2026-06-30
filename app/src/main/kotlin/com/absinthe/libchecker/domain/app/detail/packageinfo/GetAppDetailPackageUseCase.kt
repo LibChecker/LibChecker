@@ -7,13 +7,15 @@ import com.absinthe.libchecker.domain.app.detail.TRACE_DETAIL_GET_PACKAGE_INFO
 import com.absinthe.libchecker.domain.app.detail.TRACE_DETAIL_LOAD_PACKAGE
 import com.absinthe.libchecker.domain.app.detail.traceDetailSuspendSection
 import com.absinthe.libchecker.utils.extensions.isArchivedPackage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class GetAppDetailPackageUseCase(
   private val installedAppRepository: InstalledAppRepository
 ) {
 
-  suspend operator fun invoke(packageName: String): Result {
-    return traceDetailSuspendSection(TRACE_DETAIL_LOAD_PACKAGE) {
+  suspend operator fun invoke(packageName: String): Result = withContext(Dispatchers.IO) {
+    traceDetailSuspendSection(TRACE_DETAIL_LOAD_PACKAGE) {
       val packageInfo = traceDetailSuspendSection(TRACE_DETAIL_GET_PACKAGE_INFO) {
         installedAppRepository.getPackageInfo(
           packageName = packageName,

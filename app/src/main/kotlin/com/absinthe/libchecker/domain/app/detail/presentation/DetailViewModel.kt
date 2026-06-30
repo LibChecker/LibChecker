@@ -29,6 +29,11 @@ import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailCont
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
 import java.io.File
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class DetailViewModel(
@@ -41,6 +46,9 @@ class DetailViewModel(
   val contentState = detailContentLoader.contentState
   val featureState = detailFeatureLoader.featureState
   val filterState = detailFilterController.filterState
+  private val _packageLoadResults = MutableSharedFlow<PackageLoadResult>()
+  val packageLoadResults: SharedFlow<PackageLoadResult> = _packageLoadResults.asSharedFlow()
+  private var packageLoadJob: Job? = null
   private val packageState: DetailPackageState
     get() = detailPackageLoader.packageState
 
@@ -84,9 +92,22 @@ class DetailViewModel(
     return detailPackageLoader.isPackageInfoAvailable()
   }
 
-  suspend fun loadAppDetailPackage(packageName: String): GetAppDetailPackageUseCase.Result {
-    return detailPackageLoader.loadAppDetailPackage(packageName)
+  fun loadAppDetailPackage(packageName: String) {
+    packageLoadJob?.cancel()
+    packageLoadJob = viewModelScope.launch {
+      _packageLoadResults.emit(
+        PackageLoadResult(
+          packageName = packageName,
+          result = detailPackageLoader.loadAppDetailPackage(packageName)
+        )
+      )
+    }
   }
+
+  data class PackageLoadResult(
+    val packageName: String,
+    val result: GetAppDetailPackageUseCase.Result
+  )
 
   fun buildAppDetailAbiLabelData(
     abi: Int,
