@@ -70,6 +70,9 @@ class DetailViewModel(
   private val _appPackageShareExportResults = MutableSharedFlow<AppPackageShareExportResult>()
   val appPackageShareExportResults: SharedFlow<AppPackageShareExportResult> =
     _appPackageShareExportResults.asSharedFlow()
+  private val _nativeLibraryExtractionResults = MutableSharedFlow<NativeLibraryExtractionResult>()
+  val nativeLibraryExtractionResults: SharedFlow<NativeLibraryExtractionResult> =
+    _nativeLibraryExtractionResults.asSharedFlow()
   private var packageLoadJob: Job? = null
   private var apkAnalysisPackageJob: Job? = null
   private var apkPreviewJob: Job? = null
@@ -77,6 +80,7 @@ class DetailViewModel(
   private var appLaunchActionJob: Job? = null
   private var appPackageShareActionJob: Job? = null
   private var appPackageShareExportJob: Job? = null
+  private var nativeLibraryExtractionJob: Job? = null
   private val packageState: DetailPackageState
     get() = detailPackageLoader.packageState
 
@@ -255,6 +259,23 @@ class DetailViewModel(
     val result: Result<Unit>
   )
 
+  fun extractNativeLibrary(item: LibStringItem) {
+    nativeLibraryExtractionJob?.cancel()
+    nativeLibraryExtractionJob = viewModelScope.launch {
+      _nativeLibraryExtractionResults.emit(
+        NativeLibraryExtractionResult(
+          item = item,
+          result = detailActionLoader.extractNativeLibrary(packageState, item)
+        )
+      )
+    }
+  }
+
+  data class NativeLibraryExtractionResult(
+    val item: LibStringItem,
+    val result: Result<Unit>
+  )
+
   fun buildAppDetailAbiLabelData(
     abi: Int,
     abiSet: Collection<Int>,
@@ -306,8 +327,6 @@ class DetailViewModel(
   suspend fun getAppInstallSourceDetails(packageName: String) = detailActionLoader.getAppInstallSourceDetails(packageName)
 
   suspend fun getXposedModuleInfo(packageName: String) = detailActionLoader.getXposedModuleInfo(packageName)
-
-  suspend fun extractNativeLibrary(item: LibStringItem) = detailActionLoader.extractNativeLibrary(packageState, item)
 
   suspend fun getAppManifestProperties(
     packageInfo: PackageInfo?,

@@ -93,7 +93,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   }
   protected var isListReady = false
   private var afterListReadyTask: Runnable? = null
-  private val longClickController by unsafeLazy {
+  private val longClickControllerDelegate = unsafeLazy {
     DetailItemLongClickController(
       fragment = this,
       viewModel = viewModel,
@@ -103,6 +103,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
       type = { type }
     )
   }
+  private val longClickController by longClickControllerDelegate
 
   abstract fun getRecyclerView(): RecyclerView
 
@@ -155,6 +156,13 @@ abstract class BaseDetailFragment<T : ViewBinding> :
         (it as IDetailContainer).detailFragmentManager.unregister(type)
       }
     }
+  }
+
+  override fun onDestroyView() {
+    if (longClickControllerDelegate.isInitialized()) {
+      longClickController.clear()
+    }
+    super.onDestroyView()
   }
 
   override fun onVisibilityChanged(visible: Boolean) {
