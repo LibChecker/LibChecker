@@ -193,6 +193,31 @@ Important `:app` boundaries:
 - Never use destructive git commands such as `git reset --hard`, `git clean`, or
   checkout-based reverts unless the user explicitly requests them.
 
+## Agent roles for complex tasks
+
+When the user asks to use the `explorer/implementer/verifier/scribe` flow,
+prefer reusing project context and keep each role's scope separate:
+
+- `explorer`: read-only scanning only. Find feasible approaches, risks, and
+  exact change points.
+- `implementer`: make the smallest implementation that follows the explorer's
+  conclusion.
+- `verifier`: only run builds, tests, device checks, or browser validation.
+- `scribe`: summarize the thread, update durable project notes such as
+  `AGENTS.md` or task records when warranted, and recommend threads to archive.
+
+Use this split for complex tasks so exploration, implementation, validation,
+and cleanup do not muddy a single working context.
+
+## Thread management
+
+- Keep one fixed main thread for this long-running project. Use it only for
+  background, current status, and next steps.
+- Open separate task threads for concrete implementation work. Archive them
+  after the task is complete and any durable context has been written back.
+- Use separate verification threads for Android device, Playwright, MCP, or
+  other environment/tooling checks so project context stays clean.
+
 ## Agent workflow
 
 1. Start with `git status --short`.
