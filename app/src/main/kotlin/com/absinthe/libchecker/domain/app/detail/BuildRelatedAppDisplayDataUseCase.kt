@@ -5,17 +5,24 @@ import android.content.pm.PackageInfo
 import androidx.annotation.DrawableRes
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.RelatedAppListItem
 import com.absinthe.libchecker.utils.PackageUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class BuildRelatedAppDisplayDataUseCase(
-  private val context: Context
+  private val context: Context,
+  private val installedAppRepository: InstalledAppRepository
 ) {
 
-  operator fun invoke(
+  suspend operator fun invoke(
     packageName: String,
     relatedApp: RelatedAppListItem
   ): RelatedAppDisplayData {
+    val isApexPackage = withContext(Dispatchers.IO) {
+      packageName in installedAppRepository.getApexPackageNames()
+    }
     val item = relatedApp.item
     val packageInfo = relatedApp.packageInfo
     val abi = item.abi.toInt()
@@ -30,7 +37,13 @@ class BuildRelatedAppDisplayDataUseCase(
       versionInfo = PackageUtils.getVersionString(item.versionName, item.versionCode),
       abiInfo = buildString {
         append(PackageUtils.getAbiString(context, abi, true))
-        append(PackageUtils.getBuildVersionsInfo(packageInfo, packageName))
+        append(
+          PackageUtils.getBuildVersionsInfo(
+            packageInfo = packageInfo,
+            packageName = packageName,
+            isApexPackage = isApexPackage
+          )
+        )
       },
       abiBadgeRes = abiBadgeRes,
       isHarmony = item.variant == Constants.VARIANT_HAP

@@ -14,14 +14,14 @@ import kotlin.concurrent.read
 import kotlin.concurrent.write
 import timber.log.Timber
 
-object LocalAppDataSource : AppDataSource {
+class LocalAppDataSource : AppDataSource {
 
   private val applicationsLock = ReentrantReadWriteLock()
   private val applicationMap: MutableMap<String, PackageInfo> = linkedMapOf()
   private var applicationListSnapshot: List<PackageInfo> = emptyList()
   private var applicationMapSnapshot: Map<String, PackageInfo> = emptyMap()
   private var applicationsLoaded: Boolean = false
-  val apexPackageSet: Set<String> by lazy { loadApexPackageSet() }
+  private val apexPackageSet: Set<String> by lazy { loadApexPackageSet() }
 
   override fun getApplicationList(forceUpdate: Boolean): List<PackageInfo> {
     ensureApplicationsLoaded(forceUpdate)
@@ -37,18 +37,22 @@ object LocalAppDataSource : AppDataSource {
     }
   }
 
-  fun getApplicationCount(forceUpdate: Boolean = false): Int {
+  override fun getApplicationCount(forceUpdate: Boolean): Int {
     ensureApplicationsLoaded(forceUpdate)
     return applicationsLock.read {
       applicationMap.size
     }
   }
 
-  fun getRandomApplicationInfo(forceUpdate: Boolean = false): ApplicationInfo? {
+  override fun getRandomApplicationInfo(forceUpdate: Boolean): ApplicationInfo? {
     ensureApplicationsLoaded(forceUpdate)
     return applicationsLock.read {
       applicationListSnapshot.randomOrNull()?.applicationInfo
     }
+  }
+
+  override fun getApexPackageNames(): Set<String> {
+    return apexPackageSet
   }
 
   private fun ensureApplicationsLoaded(forceUpdate: Boolean = false) {
@@ -112,7 +116,7 @@ object LocalAppDataSource : AppDataSource {
     return emptySet()
   }
 
-  fun updateApplications(state: PackageChangeState) {
+  override fun updateApplications(state: PackageChangeState) {
     applicationsLock.write {
       if (!applicationsLoaded) {
         refreshApplicationsLocked()

@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import timber.log.Timber
 
 class LocalInstalledAppRepository(
-  private val appDataSource: LocalAppDataSource,
+  private val appDataSource: AppDataSource,
   private val packageChangeObserver: LocalPackageChangeObserver
 ) : InstalledAppRepository {
 
@@ -38,7 +38,7 @@ class LocalInstalledAppRepository(
   }
 
   override fun getApexPackageNames(): Set<String> {
-    return appDataSource.apexPackageSet
+    return appDataSource.getApexPackageNames()
   }
 
   override fun startPackageChangeMonitoring(owner: LifecycleOwner) {

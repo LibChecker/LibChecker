@@ -53,7 +53,6 @@ import com.absinthe.libchecker.constant.Constants.X86
 import com.absinthe.libchecker.constant.Constants.X86_64
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.AdvancedOptions
-import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.StatefulComponent
 import com.absinthe.libchecker.utils.apk.ZipDataOffsetReader
@@ -1249,7 +1248,11 @@ object PackageUtils {
     context.startActivity(launchIntent)
   }
 
-  fun getBuildVersionsInfo(packageInfo: PackageInfo?, packageName: String): CharSequence {
+  fun getBuildVersionsInfo(
+    packageInfo: PackageInfo?,
+    packageName: String,
+    isApexPackage: Boolean = false
+  ): CharSequence {
     if (packageInfo == null && packageName != Constants.EXAMPLE_PACKAGE) {
       return ""
     }
@@ -1266,7 +1269,7 @@ object PackageUtils {
     val compile = packageInfo?.getCompileSdkVersion() ?: Build.VERSION.SDK_INT
 
     return buildSpannedString {
-      if (OsUtils.atLeastQ() && LocalAppDataSource.apexPackageSet.contains(packageName)) {
+      if (OsUtils.atLeastQ() && isApexPackage) {
         append(", APEX")
       }
       if (showTarget) {

@@ -3,6 +3,7 @@ package com.absinthe.libchecker.di
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.data.app.AndroidAppListExportMetadata
 import com.absinthe.libchecker.data.app.AndroidAppListItemFactory
+import com.absinthe.libchecker.data.app.AppDataSource
 import com.absinthe.libchecker.data.app.GlobalAppListSettingsRepository
 import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.data.app.LocalAppListRepository
@@ -41,7 +42,7 @@ import org.koin.dsl.module
 
 val appListModule = module {
   single<AppListSettingsRepository> { GlobalAppListSettingsRepository() }
-  single { LocalAppDataSource }
+  single<AppDataSource> { LocalAppDataSource() }
   single { LocalPackageChangeObserver() }
   single<InstalledAppRepository> { LocalInstalledAppRepository(get(), get()) }
   single<AppListRepository> { LocalAppListRepository(get()) }
@@ -63,7 +64,7 @@ val appListModule = module {
     ExportInstalledAppsToUriUseCase(androidContext(), androidContext().contentResolver, get(), get())
   }
   factory { AppListItemsEquivalenceUseCase() }
-  factory { BuildAppListItemViewStatesUseCase(androidContext(), get()) }
+  factory { BuildAppListItemViewStatesUseCase(androidContext(), get(), get()) }
   factory { BuildAppListUpdatePlanUseCase() }
   factory { ClearApkCacheUseCase(androidContext()) }
   factory { CheckRequiredPackageAvailabilityUseCase(get()) }
