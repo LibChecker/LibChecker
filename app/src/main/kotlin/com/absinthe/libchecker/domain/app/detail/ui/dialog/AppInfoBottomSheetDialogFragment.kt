@@ -1,6 +1,8 @@
 package com.absinthe.libchecker.domain.app.detail.ui.dialog
 
+import android.content.Intent
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
@@ -29,11 +31,11 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
   private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
   private val aiAdapter = AppInfoAdapter()
 
-  private val exportApkLauncher =
+  private val exportApkLauncher: ActivityResultLauncher<Intent> =
     registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
       shareController.onExportResult(result.resultCode, result.data?.data)
     }
-  private val shareController: AppInfoPackageShareController by lazy {
+  private val shareControllerDelegate: Lazy<AppInfoPackageShareController> = lazy {
     AppInfoPackageShareController(
       fragment = this,
       viewModel = viewModel,
@@ -42,6 +44,7 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
       dismiss = ::dismiss
     )
   }
+  private val shareController: AppInfoPackageShareController by shareControllerDelegate
   private val primaryActionController: AppInfoPrimaryActionController by lazy {
     AppInfoPrimaryActionController(
       fragment = this,
@@ -54,6 +57,13 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
   override fun initRootView(): AppInfoBottomSheetView = AppInfoBottomSheetView(requireContext())
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
+
+  override fun onDestroyView() {
+    if (shareControllerDelegate.isInitialized()) {
+      shareController.clear()
+    }
+    super.onDestroyView()
+  }
 
   override fun init() {
     maxPeekHeightPercentage = 0.67f

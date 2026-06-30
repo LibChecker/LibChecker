@@ -16,6 +16,7 @@ import com.absinthe.libchecker.domain.app.detail.RelatedAppDisplayData
 import com.absinthe.libchecker.domain.app.detail.action.AppInstallSourceDetails
 import com.absinthe.libchecker.domain.app.detail.action.AppLaunchAction
 import com.absinthe.libchecker.domain.app.detail.action.AppManifestProperty
+import com.absinthe.libchecker.domain.app.detail.action.AppPackageShareAction
 import com.absinthe.libchecker.domain.app.detail.action.AppPackageShareFile
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemDialogRequest
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemLongClickActions
@@ -63,11 +64,19 @@ class DetailViewModel(
     _appInstallSourceDetailsResults.asSharedFlow()
   private val _appLaunchActionResults = MutableSharedFlow<AppLaunchActionResult>()
   val appLaunchActionResults: SharedFlow<AppLaunchActionResult> = _appLaunchActionResults.asSharedFlow()
+  private val _appPackageShareActionResults = MutableSharedFlow<AppPackageShareActionResult>()
+  val appPackageShareActionResults: SharedFlow<AppPackageShareActionResult> =
+    _appPackageShareActionResults.asSharedFlow()
+  private val _appPackageShareExportResults = MutableSharedFlow<AppPackageShareExportResult>()
+  val appPackageShareExportResults: SharedFlow<AppPackageShareExportResult> =
+    _appPackageShareExportResults.asSharedFlow()
   private var packageLoadJob: Job? = null
   private var apkAnalysisPackageJob: Job? = null
   private var apkPreviewJob: Job? = null
   private var appInstallSourceDetailsJob: Job? = null
   private var appLaunchActionJob: Job? = null
+  private var appPackageShareActionJob: Job? = null
+  private var appPackageShareExportJob: Job? = null
   private val packageState: DetailPackageState
     get() = detailPackageLoader.packageState
 
@@ -191,6 +200,61 @@ class DetailViewModel(
     val action: AppLaunchAction?
   )
 
+  fun prepareAppPackageShareAction(
+    cacheDir: File,
+    packageName: String,
+    target: AppPackageShareTarget
+  ) {
+    appPackageShareActionJob?.cancel()
+    appPackageShareActionJob = viewModelScope.launch {
+      _appPackageShareActionResults.emit(
+        AppPackageShareActionResult(
+          packageName = packageName,
+          target = target,
+          result = runCatching {
+            detailActionLoader.prepareAppPackageShareAction(cacheDir, packageName)
+          }
+        )
+      )
+    }
+  }
+
+  enum class AppPackageShareTarget {
+    SHARE,
+    EXPORT
+  }
+
+  data class AppPackageShareActionResult(
+    val packageName: String,
+    val target: AppPackageShareTarget,
+    val result: Result<AppPackageShareAction>
+  )
+
+  fun exportAppPackageShareFile(
+    shareFile: AppPackageShareFile,
+    destinationUri: Uri
+  ) {
+    appPackageShareExportJob?.cancel()
+    appPackageShareExportJob = viewModelScope.launch {
+      _appPackageShareExportResults.emit(
+        AppPackageShareExportResult(
+          shareFile = shareFile,
+          destinationUri = destinationUri,
+          result = runCatching {
+            detailActionLoader.exportAppPackageShareFile(shareFile, destinationUri)
+            Unit
+          }
+        )
+      )
+    }
+  }
+
+  data class AppPackageShareExportResult(
+    val shareFile: AppPackageShareFile,
+    val destinationUri: Uri,
+    val result: Result<Unit>
+  )
+
   fun buildAppDetailAbiLabelData(
     abi: Int,
     abiSet: Collection<Int>,
@@ -244,13 +308,6 @@ class DetailViewModel(
   suspend fun getXposedModuleInfo(packageName: String) = detailActionLoader.getXposedModuleInfo(packageName)
 
   suspend fun extractNativeLibrary(item: LibStringItem) = detailActionLoader.extractNativeLibrary(packageState, item)
-
-  suspend fun prepareAppPackageShareAction(cacheDir: File, packageName: String) = detailActionLoader.prepareAppPackageShareAction(cacheDir, packageName)
-
-  suspend fun exportAppPackageShareFile(
-    shareFile: AppPackageShareFile,
-    destinationUri: Uri
-  ) = detailActionLoader.exportAppPackageShareFile(shareFile, destinationUri)
 
   suspend fun getAppManifestProperties(
     packageInfo: PackageInfo?,
