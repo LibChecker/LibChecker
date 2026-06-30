@@ -18,6 +18,8 @@ import com.absinthe.libchecker.domain.app.detail.action.AppInstallSourceDetails
 import com.absinthe.libchecker.domain.app.detail.action.AppInstalledTimeDisplayData
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
+import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel.AppInstallSourceDetailsResult
+import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel.AppLaunchActionResult
 import com.absinthe.libchecker.domain.app.detail.ui.binder.RelatedAppItemBinder
 import com.absinthe.libchecker.domain.app.detail.ui.view.AppDexoptItemView
 import com.absinthe.libchecker.domain.app.detail.ui.view.AppInstallSourceBottomSheetView
@@ -49,14 +51,34 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
   override fun init() {
     maxPeekHeightPercentage = 0.67f
     val packageName = packageName ?: return
+    collectAppInstallSourceDetailsResults()
+    collectAppLaunchActionResults()
+    viewModel.loadAppInstallSourceDetails(packageName)
+  }
+
+  private fun collectAppInstallSourceDetailsResults() {
     lifecycleScope.launch {
-      val details = viewModel.getAppInstallSourceDetails(packageName) ?: return@launch
-      bindAppInstallSourceDetails(details)
+      viewModel.appInstallSourceDetailsResults.collect(::handleAppInstallSourceDetailsResult)
     }
   }
 
-  private fun bindAppInstallSourceDetails(details: AppInstallSourceDetails) {
-    bindAppInstallSourceItems(details.installSource)
+  private fun handleAppInstallSourceDetailsResult(loadResult: AppInstallSourceDetailsResult) {
+    if (loadResult.packageName != packageName) {
+      return
+    }
+    val details = loadResult.details ?: return
+    bindAppInstallSourceDetails(loadResult, details)
+  }
+
+  private fun bindAppInstallSourceDetails(
+    loadResult: AppInstallSourceDetailsResult,
+    details: AppInstallSourceDetails
+  ) {
+    bindAppInstallSourceItems(
+      installSource = details.installSource,
+      originatingApp = loadResult.originatingApp,
+      installingApp = loadResult.installingApp
+    )
     initAppInstalledTimeItemView(
       item = root.installedTimeView,
       installedTime = details.installedTime
@@ -64,10 +86,14 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
     initDexoptItemView(root.dexoptView, details.dexoptInfo)
   }
 
-  private fun bindAppInstallSourceItems(installSource: AppInstallSource?) {
+  private fun bindAppInstallSourceItems(
+    installSource: AppInstallSource?,
+    originatingApp: RelatedAppDisplayData?,
+    installingApp: RelatedAppDisplayData?
+  ) {
     installSource?.let {
-      initOriginatingItemView(root.originatingView, it.originatingPackageName)
-      initAppInstallSourceItemView(root.installingView, it.installingPackageName)
+      initOriginatingItemView(root.originatingView, it.originatingPackageName, originatingApp)
+      initAppInstallSourceItemView(root.installingView, it.installingPackageName, installingApp)
     } ?: run {
       root.originatingView.isGone = true
       root.installingView.isGone = true
@@ -84,7 +110,8 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
 
   private fun initOriginatingItemView(
     item: AppInstallSourceItemView,
-    originatingPackageName: String?
+    originatingPackageName: String?,
+    data: RelatedAppDisplayData?
   ) {
     if (context == null) {
       item.isGone = true
@@ -92,7 +119,7 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
     }
 
     when (val availability = ShizukuManager.getAvailability()) {
-      Availability.Available -> initAppInstallSourceItemView(item, originatingPackageName)
+      Availability.Available -> initAppInstallSourceItemView(item, originatingPackageName, data)
 
       else -> initShizukuPromptItemView(
         item = item,
@@ -149,12 +176,8 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
         item.packageView.container.versionInfo.text =
           getString(R.string.lib_detail_app_install_source_shizuku_not_running_detail)
         item.packageView.setOnClickListener {
-          lifecycleScope.launch {
-            viewModel.getAppLaunchAction(Constants.PackageNames.SHIZUKU)?.let {
-              startActivity(it.intent)
-            }
-            registerBinderReceivedRefresh()
-          }
+          registerBinderReceivedRefresh()
+          viewModel.loadAppLaunchAction(Constants.PackageNames.SHIZUKU)
         }
       }
 
@@ -195,7 +218,8 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
 
   private fun initAppInstallSourceItemView(
     item: AppInstallSourceItemView,
-    packageName: String?
+    packageName: String?,
+    data: RelatedAppDisplayData?
   ) {
     if (context == null) {
       item.isGone = true
@@ -224,16 +248,15 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
       return
     }
 
-    lifecycleScope.launch {
-      val data = viewModel.getRelatedAppDisplayData(packageName) ?: run {
-        item.isGone = true
-        return@launch
-      }
-      bindAppInstallSourceItemView(
-        item = item,
-        data = data
-      )
+    if (data == null) {
+      item.isGone = true
+      return
     }
+
+    bindAppInstallSourceItemView(
+      item = item,
+      data = data
+    )
   }
 
   private fun bindAppInstallSourceItemView(
@@ -291,9 +314,20 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
     }
 
     val packageName = packageName ?: return
+    viewModel.loadAppInstallSourceDetails(packageName)
+  }
+
+  private fun collectAppLaunchActionResults() {
     lifecycleScope.launch {
-      val details = viewModel.getAppInstallSourceDetails(packageName) ?: return@launch
-      bindAppInstallSourceDetails(details)
+      viewModel.appLaunchActionResults.collect(::handleAppLaunchActionResult)
+    }
+  }
+
+  private fun handleAppLaunchActionResult(loadResult: AppLaunchActionResult) {
+    if (loadResult.packageName == Constants.PackageNames.SHIZUKU) {
+      loadResult.action?.let {
+        startActivity(it.intent)
+      }
     }
   }
 

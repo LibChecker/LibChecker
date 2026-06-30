@@ -12,6 +12,9 @@ import com.absinthe.libchecker.domain.app.PrepareApkAnalysisPackageUseCase
 import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.domain.app.detail.AppDetailAbiLabelData
 import com.absinthe.libchecker.domain.app.detail.AppDetailHeaderExtraInfo
+import com.absinthe.libchecker.domain.app.detail.RelatedAppDisplayData
+import com.absinthe.libchecker.domain.app.detail.action.AppInstallSourceDetails
+import com.absinthe.libchecker.domain.app.detail.action.AppLaunchAction
 import com.absinthe.libchecker.domain.app.detail.action.AppManifestProperty
 import com.absinthe.libchecker.domain.app.detail.action.AppPackageShareFile
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemDialogRequest
@@ -55,9 +58,16 @@ class DetailViewModel(
   val apkAnalysisPackageResults: SharedFlow<ApkAnalysisPackageResult> = _apkAnalysisPackageResults.asSharedFlow()
   private val _apkPreviewResults = MutableSharedFlow<ApkPreviewResult>()
   val apkPreviewResults: SharedFlow<ApkPreviewResult> = _apkPreviewResults.asSharedFlow()
+  private val _appInstallSourceDetailsResults = MutableSharedFlow<AppInstallSourceDetailsResult>()
+  val appInstallSourceDetailsResults: SharedFlow<AppInstallSourceDetailsResult> =
+    _appInstallSourceDetailsResults.asSharedFlow()
+  private val _appLaunchActionResults = MutableSharedFlow<AppLaunchActionResult>()
+  val appLaunchActionResults: SharedFlow<AppLaunchActionResult> = _appLaunchActionResults.asSharedFlow()
   private var packageLoadJob: Job? = null
   private var apkAnalysisPackageJob: Job? = null
   private var apkPreviewJob: Job? = null
+  private var appInstallSourceDetailsJob: Job? = null
+  private var appLaunchActionJob: Job? = null
   private val packageState: DetailPackageState
     get() = detailPackageLoader.packageState
 
@@ -135,6 +145,50 @@ class DetailViewModel(
   data class ApkPreviewResult(
     val url: String,
     val result: Result<ApkPreviewInfo>
+  )
+
+  fun loadAppInstallSourceDetails(packageName: String) {
+    appInstallSourceDetailsJob?.cancel()
+    appInstallSourceDetailsJob = viewModelScope.launch {
+      val details = detailActionLoader.getAppInstallSourceDetails(packageName)
+      val installSource = details?.installSource
+      _appInstallSourceDetailsResults.emit(
+        AppInstallSourceDetailsResult(
+          packageName = packageName,
+          details = details,
+          originatingApp = installSource?.originatingPackageName?.let {
+            detailActionLoader.getRelatedAppDisplayData(it)
+          },
+          installingApp = installSource?.installingPackageName?.let {
+            detailActionLoader.getRelatedAppDisplayData(it)
+          }
+        )
+      )
+    }
+  }
+
+  data class AppInstallSourceDetailsResult(
+    val packageName: String,
+    val details: AppInstallSourceDetails?,
+    val originatingApp: RelatedAppDisplayData?,
+    val installingApp: RelatedAppDisplayData?
+  )
+
+  fun loadAppLaunchAction(packageName: String?) {
+    appLaunchActionJob?.cancel()
+    appLaunchActionJob = viewModelScope.launch {
+      _appLaunchActionResults.emit(
+        AppLaunchActionResult(
+          packageName = packageName,
+          action = detailActionLoader.getAppLaunchAction(packageName)
+        )
+      )
+    }
+  }
+
+  data class AppLaunchActionResult(
+    val packageName: String?,
+    val action: AppLaunchAction?
   )
 
   fun buildAppDetailAbiLabelData(
