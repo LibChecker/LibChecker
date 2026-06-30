@@ -1,15 +1,8 @@
 package com.absinthe.libchecker.data.app
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.domain.app.PackageChangeState
@@ -19,13 +12,6 @@ import com.absinthe.libchecker.utils.extensions.isArchivedPackage
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 object LocalAppDataSource : AppDataSource {
@@ -36,73 +22,6 @@ object LocalAppDataSource : AppDataSource {
   private var applicationMapSnapshot: Map<String, PackageInfo> = emptyMap()
   private var applicationsLoaded: Boolean = false
   val apexPackageSet: Set<String> by lazy { loadApexPackageSet() }
-
-  private val _PackageChangeFlow: MutableSharedFlow<PackageChangeState> = MutableSharedFlow()
-  val packageChangeFlow: SharedFlow<PackageChangeState> = _PackageChangeFlow.asSharedFlow()
-
-  private var coroutineScope: CoroutineScope? = null
-  private val pendingIntents = ArrayDeque<PendingPackageIntent>()
-
-  private val packageReceiver by lazy {
-    object : BroadcastReceiver() {
-      override fun onReceive(context: Context, intent: Intent?) {
-        val intent = intent ?: return
-        Timber.d("package receiver received: ${intent.action}, data: ${intent.data}")
-
-        val packageName = intent.data?.encodedSchemeSpecificPart.orEmpty()
-        val action = intent.action ?: return
-        if (packageName.isBlank()) {
-          return
-        }
-
-        pendingIntents.add(PendingPackageIntent(action, packageName))
-
-        coroutineScope?.launch {
-          delay(1000)
-
-          while (pendingIntents.isNotEmpty() && isActive) {
-            val currentIntent = pendingIntents.removeFirst()
-            val currentPackageName = currentIntent.packageName
-
-            if (pendingIntents.none { it.packageName == currentPackageName }) {
-              generatePackageChangeState(currentIntent)?.let { state ->
-                updateApplications(state)
-                _PackageChangeFlow.emit(state)
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  fun addLifecycleOwner(owner: LifecycleOwner) {
-    coroutineScope = owner.lifecycleScope
-
-    runCatching {
-      (owner as? Context)?.let {
-        val intentFilter = IntentFilter().apply {
-          addAction(Intent.ACTION_PACKAGE_ADDED)
-          addAction(Intent.ACTION_PACKAGE_REPLACED)
-          addAction(Intent.ACTION_PACKAGE_REMOVED)
-          addDataScheme("package")
-        }
-        ContextCompat.registerReceiver(
-          it,
-          packageReceiver,
-          intentFilter,
-          ContextCompat.RECEIVER_NOT_EXPORTED
-        )
-      }
-    }
-  }
-
-  fun removeLifecycleOwner(owner: LifecycleOwner) {
-    coroutineScope = null
-    runCatching {
-      (owner as? Context)?.unregisterReceiver(packageReceiver)
-    }
-  }
 
   override fun getApplicationList(forceUpdate: Boolean): List<PackageInfo> {
     ensureApplicationsLoaded(forceUpdate)
@@ -193,7 +112,7 @@ object LocalAppDataSource : AppDataSource {
     return emptySet()
   }
 
-  private fun updateApplications(state: PackageChangeState) {
+  fun updateApplications(state: PackageChangeState) {
     applicationsLock.write {
       if (!applicationsLoaded) {
         refreshApplicationsLocked()
@@ -230,18 +149,4 @@ object LocalAppDataSource : AppDataSource {
     applicationListSnapshot = applicationMap.values.toList()
     applicationMapSnapshot = applicationMap.toMap()
   }
-
-  private fun generatePackageChangeState(intent: PendingPackageIntent): PackageChangeState? {
-    return when (intent.action) {
-      Intent.ACTION_PACKAGE_ADDED -> PackageChangeState.Added(intent.packageName)
-      Intent.ACTION_PACKAGE_REMOVED -> PackageChangeState.Removed(intent.packageName)
-      Intent.ACTION_PACKAGE_REPLACED -> PackageChangeState.Replaced(intent.packageName)
-      else -> null
-    }
-  }
-
-  private data class PendingPackageIntent(
-    val action: String,
-    val packageName: String
-  )
 }

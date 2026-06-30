@@ -4,8 +4,10 @@ import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.data.app.AndroidAppListExportMetadata
 import com.absinthe.libchecker.data.app.AndroidAppListItemFactory
 import com.absinthe.libchecker.data.app.GlobalAppListSettingsRepository
+import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.data.app.LocalAppListRepository
 import com.absinthe.libchecker.data.app.LocalInstalledAppRepository
+import com.absinthe.libchecker.data.app.LocalPackageChangeObserver
 import com.absinthe.libchecker.data.app.WorkerFeatureInitializationRepository
 import com.absinthe.libchecker.domain.app.AppListItemFactory
 import com.absinthe.libchecker.domain.app.AppListRepository
@@ -39,8 +41,10 @@ import org.koin.dsl.module
 
 val appListModule = module {
   single<AppListSettingsRepository> { GlobalAppListSettingsRepository() }
-  single<InstalledAppRepository> { LocalInstalledAppRepository }
-  single<AppListRepository> { LocalAppListRepository }
+  single { LocalAppDataSource }
+  single { LocalPackageChangeObserver() }
+  single<InstalledAppRepository> { LocalInstalledAppRepository(get(), get()) }
+  single<AppListRepository> { LocalAppListRepository(get()) }
   single<AppListItemFactory> { AndroidAppListItemFactory(androidContext()) }
   single<AppListExportMetadata> { AndroidAppListExportMetadata(androidContext()) }
   single<FeatureInitializationRepository> { WorkerFeatureInitializationRepository() }
