@@ -12,12 +12,10 @@ import com.absinthe.libchecker.domain.app.detail.ui.base.EXTRA_TYPE
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.SignatureDetailBSDFragment
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import rikka.core.util.ClipboardUtils
 
 class SignaturesAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
@@ -34,9 +32,7 @@ class SignaturesAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
     if (items.isEmpty()) {
       emptyView.text.text = getString(R.string.uncharted_territory)
     } else {
-      lifecycleScope.launch(Dispatchers.IO) {
-        setItemsWithFilter(items, viewModel.filterState.queriedText, null)
-      }
+      submitItemsWithFilter(items, viewModel.filterState.queriedText, null)
     }
 
     if (!isListReady) {

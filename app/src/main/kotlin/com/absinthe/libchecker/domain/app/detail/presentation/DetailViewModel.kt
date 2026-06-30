@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppBundleSplitItem
 import com.absinthe.libchecker.domain.app.PrepareApkAnalysisPackageUseCase
@@ -29,11 +30,13 @@ import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailCont
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
 import java.io.File
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class DetailViewModel(
@@ -358,6 +361,27 @@ class DetailViewModel(
 
   fun sortDetailItems(items: List<LibStringItemChip>, @LibType type: Int): List<LibStringItemChip> {
     return detailFilterController.sortDetailItems(items, type)
+  }
+
+  suspend fun filterAndSortDetailItems(
+    items: List<LibStringItemChip>,
+    searchWords: String?,
+    process: String?,
+    @LibType type: Int
+  ): List<LibStringItemChip> = withContext(Dispatchers.Default) {
+    val filteredItems = if (type == PERMISSION) {
+      detailFilterController.filterPermissionDetailItems(items, searchWords, process)
+    } else {
+      detailFilterController.filterDetailItems(items, searchWords, process)
+    }
+    detailFilterController.sortDetailItems(filteredItems, type)
+  }
+
+  suspend fun sortDetailItemsForDisplay(
+    items: List<LibStringItemChip>,
+    @LibType type: Int
+  ): List<LibStringItemChip> = withContext(Dispatchers.Default) {
+    detailFilterController.sortDetailItems(items, type)
   }
 
   fun buildProcessFilterData(
