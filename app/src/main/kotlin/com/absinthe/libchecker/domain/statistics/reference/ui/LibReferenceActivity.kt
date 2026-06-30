@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.domain.statistics.reference.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.ViewGroup
@@ -7,6 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
 import com.absinthe.libchecker.domain.app.list.ui.adapter.AppAdapter
 import com.absinthe.libchecker.domain.statistics.reference.presentation.LibReferenceViewModel
@@ -29,14 +31,23 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
 
   private val adapter = AppAdapter()
   private val viewModel: LibReferenceViewModel by viewModel()
-  private val refName by lazy { intent.extras?.getString(EXTRA_REF_NAME) }
-  private val refLabel by lazy { intent.extras?.getString(EXTRA_REF_LABEL) }
-  private val refType by lazy { intent.extras?.getInt(EXTRA_REF_TYPE) ?: NATIVE }
-  private val refList by lazy { intent.extras?.getStringArray(EXTRA_REF_LIST) }
+  private var refName: String? = null
+  private var refLabel: String? = null
+  private var refType: Int = NATIVE
+  private var refList: Array<String>? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    readIntentExtras()
     initView()
+    initData()
+  }
+
+  override fun onNewIntent(intent: Intent) {
+    super.onNewIntent(intent)
+    setIntent(intent)
+    readIntentExtras()
+    updateActionBar()
     initData()
   }
 
@@ -47,14 +58,23 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
     return super.onOptionsItemSelected(item)
   }
 
-  private fun initView() {
-    setSupportActionBar(binding.toolbar)
+  private fun readIntentExtras() {
+    refName = intent.extras?.getString(EXTRA_REF_NAME)
+    refLabel = intent.extras?.getString(EXTRA_REF_LABEL)
+    refType = intent.extras?.getInt(EXTRA_REF_TYPE) ?: NATIVE
+    refList = intent.extras?.getStringArray(EXTRA_REF_LIST)
+  }
+
+  private fun updateActionBar() {
     supportActionBar?.apply {
-      refLabel?.let {
-        title = it
-      }
+      refLabel?.let { title = it }
       subtitle = refName
     }
+  }
+
+  private fun initView() {
+    setSupportActionBar(binding.toolbar)
+    updateActionBar()
     binding.apply {
       supportActionBar?.setDisplayHomeAsUpEnabled(true)
       (root as ViewGroup).bringChildToFront(appbar)
@@ -102,6 +122,11 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
       val (name, type) = if (refType == ACTION) {
         val pair = viewModel.getActionTarget(item.packageName)
         (pair?.first ?: item.packageName) to (pair?.second ?: ACTION)
+      } else if (refList != null && refType == PROVIDER) {
+        val providerName = refList
+          ?.find { it.startsWith(item.packageName + "|") }
+          ?.substringAfter("|")
+        (providerName ?: refName) to refType
       } else {
         refName to refType
       }
@@ -112,7 +137,10 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
 
   private fun initData() {
     this.refName?.let { name ->
-      refList?.toList()?.let { viewModel.setData(name, refType, it) } ?: viewModel.setData(name, refType)
+      refList?.toList()?.let { encodedList ->
+        val pkgNames = encodedList.map { it.substringBefore("|") }
+        viewModel.setData(name, refType, pkgNames)
+      } ?: viewModel.setData(name, refType)
     } ?: finish()
   }
 }

@@ -33,7 +33,8 @@ class BuildDetailItemLongClickActionsUseCase {
       elfExtractAvailable = request.detailType == NATIVE && !request.isApkPreview,
       elfInfo = buildElfInfo(request, item),
       reference = buildReference(request, componentName, item),
-      integrationsAvailable = !request.isApk && !request.isApkPreview
+      integrationsAvailable = !request.isApk && !request.isApkPreview,
+      providerPermissionAvailable = request.detailType == PERMISSION && !request.isApkPreview
     )
   }
 
@@ -98,7 +99,8 @@ data class DetailItemLongClickActions(
   val elfExtractAvailable: Boolean,
   val elfInfo: DetailItemElfInfoAction?,
   val reference: DetailItemReferenceAction?,
-  val integrationsAvailable: Boolean
+  val integrationsAvailable: Boolean,
+  val providerPermissionAvailable: Boolean = false
 )
 
 data class DetailItemElfInfoAction(

@@ -205,6 +205,8 @@
   <string name="lib_detail_elf_extract">提取</string>
   <string name="lib_detail_elf_extract_success">ELF 文件已保存到下载目录</string>
   <string name="lib_detail_elf_extract_failed">提取 ELF 文件失败</string>
+  <string name="lib_detail_permission_providers">提供者引用统计</string>
+  <string name="lib_detail_permission_providers_empty">没有内容提供者使用此权限</string>
   <string name="lib_detail_dependency_tip">依赖</string>
   <string name="lib_detail_entry_points_tip">入口点</string>
   <string name="lib_detail_optimization_tip">优化</string>

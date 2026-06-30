@@ -5,6 +5,7 @@ import android.widget.TextView
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemLongClickActions
+import com.absinthe.libchecker.domain.app.detail.action.GetPermissionProvidersUseCase
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
 import com.absinthe.libchecker.domain.app.detail.ui.Referable
@@ -34,7 +35,8 @@ class DetailItemLongClickController(
   private val adapter: LibStringAdapter,
   private val coroutineScope: CoroutineScope,
   private val packageName: () -> String,
-  private val type: () -> Int
+  private val type: () -> Int,
+  private val getPermissionProvidersUseCase: GetPermissionProvidersUseCase
 ) {
   private var integrationMonkeyKingBlockList: List<ShareCmpInfo.Component>? = null
   private var integrationBlockerList: List<ShareCmpInfo.Component>? = null
@@ -54,6 +56,7 @@ class DetailItemLongClickController(
     addCopyAction(arrayAdapter, actionMap, actions)
     addElfActions(arrayAdapter, actionMap, item, actions)
     addReferenceAction(arrayAdapter, actionMap, actions)
+    addProviderPermissionAction(arrayAdapter, actionMap, actions)
     addIntegrationActions(arrayAdapter, actionMap, actions, position)
 
     BaseAlertDialogBuilder(context)
@@ -131,6 +134,38 @@ class DetailItemLongClickController(
     arrayAdapter.add(fragment.getString(com.absinthe.libchecker.R.string.tab_lib_reference_statistics))
     actionMap[arrayAdapter.count - 1] = {
       fragment.activity?.launchLibReferencePage(reference.refName, reference.label, reference.type, null)
+    }
+  }
+
+  private fun addProviderPermissionAction(
+    arrayAdapter: ArrayAdapter<String>,
+    actionMap: MutableMap<Int, () -> Unit>,
+    actions: DetailItemLongClickActions
+  ) {
+    if (!actions.providerPermissionAvailable) {
+      return
+    }
+
+    val context = fragment.requireContext()
+    arrayAdapter.add(fragment.getString(com.absinthe.libchecker.R.string.lib_detail_permission_providers))
+    actionMap[arrayAdapter.count - 1] = {
+      val loading = UiUtils.createLoadingDialog(fragment.requireActivity())
+      loading.show()
+      coroutineScope.launch {
+        val items = getPermissionProvidersUseCase(actions.componentName)
+        loading.dismiss()
+        if (items.isNotEmpty()) {
+          val encodedList = items.map { "${it.packageName}|${it.providerName}" }.toTypedArray()
+          fragment.activity?.launchLibReferencePage(
+            refName = actions.componentName,
+            refLabel = fragment.getString(com.absinthe.libchecker.R.string.lib_detail_permission_providers),
+            refType = com.absinthe.libchecker.annotation.PROVIDER,
+            refList = encodedList
+          )
+        } else {
+          context.showToast(com.absinthe.libchecker.R.string.lib_detail_permission_providers_empty)
+        }
+      }
     }
   }
 
