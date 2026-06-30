@@ -13,6 +13,7 @@ import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.domain.app.detail.AppDetailAbiLabelData
 import com.absinthe.libchecker.domain.app.detail.AppDetailHeaderExtraInfo
 import com.absinthe.libchecker.domain.app.detail.RelatedAppDisplayData
+import com.absinthe.libchecker.domain.app.detail.action.AppElfDetail
 import com.absinthe.libchecker.domain.app.detail.action.AppInstallSourceDetails
 import com.absinthe.libchecker.domain.app.detail.action.AppLaunchAction
 import com.absinthe.libchecker.domain.app.detail.action.AppManifestProperty
@@ -73,6 +74,8 @@ class DetailViewModel(
   private val _nativeLibraryExtractionResults = MutableSharedFlow<NativeLibraryExtractionResult>()
   val nativeLibraryExtractionResults: SharedFlow<NativeLibraryExtractionResult> =
     _nativeLibraryExtractionResults.asSharedFlow()
+  private val _elfDetailResults = MutableSharedFlow<ElfDetailResult>()
+  val elfDetailResults: SharedFlow<ElfDetailResult> = _elfDetailResults.asSharedFlow()
   private var packageLoadJob: Job? = null
   private var apkAnalysisPackageJob: Job? = null
   private var apkPreviewJob: Job? = null
@@ -81,6 +84,7 @@ class DetailViewModel(
   private var appPackageShareActionJob: Job? = null
   private var appPackageShareExportJob: Job? = null
   private var nativeLibraryExtractionJob: Job? = null
+  private var elfDetailJob: Job? = null
   private val packageState: DetailPackageState
     get() = detailPackageLoader.packageState
 
@@ -276,6 +280,27 @@ class DetailViewModel(
     val result: Result<Unit>
   )
 
+  fun loadElfDetail(packageName: String, elfPath: String) {
+    elfDetailJob?.cancel()
+    elfDetailJob = viewModelScope.launch {
+      _elfDetailResults.emit(
+        ElfDetailResult(
+          packageName = packageName,
+          elfPath = elfPath,
+          result = runCatching {
+            detailActionLoader.getElfDetail(packageName, elfPath)
+          }
+        )
+      )
+    }
+  }
+
+  data class ElfDetailResult(
+    val packageName: String,
+    val elfPath: String,
+    val result: Result<AppElfDetail?>
+  )
+
   fun buildAppDetailAbiLabelData(
     abi: Int,
     abiSet: Collection<Int>,
@@ -334,8 +359,6 @@ class DetailViewModel(
   ): List<AppManifestProperty> {
     return detailActionLoader.getAppManifestProperties(packageInfo, properties)
   }
-
-  suspend fun getElfDetail(packageName: String, elfPath: String) = detailActionLoader.getElfDetail(packageName, elfPath)
 
   suspend fun isInstalledAppComparisonAvailable(packageName: String): Boolean {
     return detailPackageLoader.isInstalledAppComparisonAvailable(packageName)
