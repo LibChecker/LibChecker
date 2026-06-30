@@ -11,6 +11,8 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.utils.extensions.applyCondensedSingleLine
+import com.absinthe.libchecker.utils.extensions.applySingleLineEndEllipsize
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
@@ -102,8 +104,7 @@ class AppItemView(
       )
       setTextAppearance(style.bodyMediumTextAppearance)
       setTextColor(style.onSurfaceVariantColor)
-      maxLines = 1
-      ellipsize = TextUtils.TruncateAt.END
+      applySingleLineEndEllipsize()
       addView(this)
     }
 
@@ -114,9 +115,7 @@ class AppItemView(
       )
       setTextAppearance(style.bodySmallTextAppearance)
       setTextColor(style.onSurfaceVariantColor)
-      letterSpacing = 0f
-      maxLines = 1
-      ellipsize = TextUtils.TruncateAt.END
+      applyCondensedSingleLine()
       addView(this)
     }
 
@@ -128,9 +127,7 @@ class AppItemView(
       setPadding(0, 0, 0, 2.dp)
       setTextAppearance(style.labelSmallTextAppearance)
       setTextColor(style.onSurfaceVariantColor)
-      letterSpacing = 0f
-      maxLines = 1
-      ellipsize = TextUtils.TruncateAt.END
+      applyCondensedSingleLine()
       addView(this)
     }
 

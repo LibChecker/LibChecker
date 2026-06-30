@@ -13,6 +13,8 @@ import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.extensions.applyCondensedSingleLine
+import com.absinthe.libchecker.utils.extensions.applySingleLineEndEllipsize
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
@@ -52,6 +54,7 @@ class SnapshotTitleView(
     )
     setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBodyMedium))
     setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
+    applySingleLineEndEllipsize()
     addView(this)
   }
 
@@ -62,7 +65,7 @@ class SnapshotTitleView(
     )
     setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBodySmall))
     setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
-    letterSpacing = 0f
+    applyCondensedSingleLine()
     addView(this)
   }
 
@@ -73,7 +76,7 @@ class SnapshotTitleView(
     )
     setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBodySmall))
     setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
-    letterSpacing = 0f
+    applyCondensedSingleLine()
     addView(this)
   }
 
@@ -84,7 +87,7 @@ class SnapshotTitleView(
     )
     setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBodySmall))
     setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
-    letterSpacing = 0f
+    applyCondensedSingleLine()
     addView(this)
   }
 
