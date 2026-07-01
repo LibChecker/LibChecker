@@ -13,7 +13,7 @@ ktlint = "1.8.0"
 koin-bom = "4.2.2"
 protoc = "4.35.1"
 shizuku = "13.1.5"
-spotless = "8.7.0"
+spotless = "8.8.0"
 square-retrofit = "3.0.0"
 zhaobozhen = "1.1.8"
 
