@@ -16,13 +16,11 @@ import com.absinthe.libchecker.domain.app.detail.ui.base.EXTRA_TYPE
 import com.absinthe.libchecker.utils.extensions.ABI_STRING_MAP
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.google.android.material.tabs.TabLayout
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class NativeAnalysisFragment :
   BaseDetailFragment<FragmentLibNativeBinding>(),
@@ -79,12 +77,10 @@ class NativeAnalysisFragment :
           binding.tabLayout.addTab(binding.tabLayout.newTab().setText(title), false)
         }
         binding.tabLayout.isVisible = binding.tabLayout.tabCount > 1
-        lifecycleScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch {
           val flow = viewModel.featureState.abiBundleStateFlow
           val abi = (flow.value ?: flow.filterNotNull().first()).abi
-          withContext(Dispatchers.Main) {
-            selectTabByAbi(abi)
-          }
+          selectTabByAbi(abi)
         }
       }.launchIn(lifecycleScope)
       contentState.nativeLibItems.onEach {
@@ -103,7 +99,7 @@ class NativeAnalysisFragment :
     if (list.isEmpty()) {
       emptyView.text.text = getString(R.string.empty_list)
     } else {
-      lifecycleScope.launch(Dispatchers.IO) {
+      lifecycleScope.launch {
         traceDetailSuspendSection(TRACE_DETAIL_NATIVE_SET_ITEMS) {
           setItemsWithFilter(list, viewModel.filterState.queriedText, viewModel.filterState.queriedProcess)
         }

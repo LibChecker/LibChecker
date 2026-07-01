@@ -282,7 +282,7 @@ abstract class LCDatabase : RoomDatabase() {
         db.execSQL(
           "ALTER TABLE snapshot_table ADD COLUMN packageSize INTEGER NOT NULL DEFAULT 0"
         )
-        Repositories.lcRepository.deleteAllSnapshotDiffItems()
+        db.execSQL("DELETE FROM diff_table")
       }
     }
 

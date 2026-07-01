@@ -5,14 +5,17 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.detail.action.AppElfDetail
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
+import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel.ElfDetailResult
 import com.absinthe.libchecker.domain.app.detail.ui.view.ELFInfoBottomSheetView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
+import timber.log.Timber
 
 const val EXTRA_ELF_PATH = "EXTRA_ELF_PATH"
 const val EXTRA_RULE_ICON = "EXTRA_RULE_ICON"
@@ -39,21 +42,38 @@ class ELFDetailDialogFragment : BaseBottomSheetViewDialogFragment<ELFInfoBottomS
         setContent(getString(R.string.loading), getString(R.string.loading), false)
       }
     }
+    collectElfDetailResults()
   }
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun onStart() {
     super.onStart()
+    viewModel.loadElfDetail(packageName, elfPath)
+  }
+
+  private fun collectElfDetailResults() {
     lifecycleScope.launch {
-      val info = viewModel.getElfDetail(packageName, elfPath) ?: return@launch
-      root.apply {
-        setContent(
-          info.deps.joinToString(", "),
-          info.entryPoints.joinToString(System.lineSeparator()) { "◉${Typography.nbsp}$it" },
-          info.isStripped
-        )
-      }
+      viewModel.elfDetailResults.collect(::handleElfDetailResult)
+    }
+  }
+
+  private fun handleElfDetailResult(loadResult: ElfDetailResult) {
+    if (loadResult.packageName != packageName || loadResult.elfPath != elfPath) {
+      return
+    }
+    loadResult.result.onFailure {
+      Timber.e(it, "Failed to load ELF detail: $elfPath")
+    }.getOrNull()?.let(::renderElfDetail)
+  }
+
+  private fun renderElfDetail(info: AppElfDetail) {
+    root.apply {
+      setContent(
+        info.deps.joinToString(", "),
+        info.entryPoints.joinToString(System.lineSeparator()) { "◉${Typography.nbsp}$it" },
+        info.isStripped
+      )
     }
   }
 

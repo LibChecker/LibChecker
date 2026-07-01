@@ -33,11 +33,16 @@ data class AppListItemViewState(
       context: Context,
       item: LCItem,
       packageState: InstalledPackageState,
-      options: Int
+      options: Int,
+      isApexPackage: Boolean = false
     ): AppListItemViewState {
       val abi = item.abi.toInt()
       val baseAbi = abi % Constants.MULTI_ARCH
-      val buildVersionsInfo = PackageUtils.getBuildVersionsInfo(packageState.packageInfo, item.packageName)
+      val buildVersionsInfo = PackageUtils.getBuildVersionsInfo(
+        packageInfo = packageState.packageInfo,
+        packageName = item.packageName,
+        isApexPackage = isApexPackage
+      )
       val abiInfo = StringBuilder()
         .append(PackageUtils.getAbiString(context, abi, false))
         .append(buildVersionsInfo)

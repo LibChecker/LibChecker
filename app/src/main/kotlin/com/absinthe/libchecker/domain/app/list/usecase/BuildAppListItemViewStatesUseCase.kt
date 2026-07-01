@@ -2,6 +2,7 @@ package com.absinthe.libchecker.domain.app.list.usecase
 
 import android.content.Context
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.list.TRACE_APP_LIST_CREATE_ITEM_VIEW_STATES
 import com.absinthe.libchecker.domain.app.list.TRACE_APP_LIST_ITEM_VIEW_STATES
 import com.absinthe.libchecker.domain.app.list.TRACE_APP_LIST_PACKAGE_STATES
@@ -13,7 +14,8 @@ import kotlinx.coroutines.withContext
 
 class BuildAppListItemViewStatesUseCase(
   private val context: Context,
-  private val getAppListPackageStatesUseCase: GetAppListPackageStatesUseCase
+  private val getAppListPackageStatesUseCase: GetAppListPackageStatesUseCase,
+  private val installedAppRepository: InstalledAppRepository
 ) {
 
   fun createPackageStateSnapshot(): GetAppListPackageStatesUseCase.PackageStateSnapshot {
@@ -25,13 +27,15 @@ class BuildAppListItemViewStatesUseCase(
       val packageStates = traceAppListSuspendSection(TRACE_APP_LIST_PACKAGE_STATES) {
         getAppListPackageStatesUseCase(request.items, request.packageStateSnapshot)
       }
+      val apexPackageNames = installedAppRepository.getApexPackageNames()
       traceAppListSection(TRACE_APP_LIST_CREATE_ITEM_VIEW_STATES) {
         request.items.associate { item ->
           item.packageName to AppListItemViewState.create(
             context = context,
             item = item,
             packageState = packageStates.getValue(item.packageName),
-            options = request.options
+            options = request.options,
+            isApexPackage = item.packageName in apexPackageNames
           )
         }
       }

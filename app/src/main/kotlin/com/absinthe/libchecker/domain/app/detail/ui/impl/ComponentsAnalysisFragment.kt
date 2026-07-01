@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.domain.app.detail.ui.impl
 
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
@@ -10,10 +9,8 @@ import com.absinthe.libchecker.domain.app.detail.ui.Referable
 import com.absinthe.libchecker.domain.app.detail.ui.base.BaseDetailFragment
 import com.absinthe.libchecker.domain.app.detail.ui.base.EXTRA_TYPE
 import com.absinthe.libchecker.utils.extensions.putArguments
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 
 class ComponentsAnalysisFragment :
   BaseDetailFragment<FragmentLibComponentBinding>(),
@@ -33,9 +30,7 @@ class ComponentsAnalysisFragment :
       emptyView.text.text = getString(R.string.empty_list)
     } else {
       adapter.processMap = viewModel.contentState.processesMap
-      lifecycleScope.launch(Dispatchers.IO) {
-        setItemsWithFilter(items, viewModel.filterState.queriedText, viewModel.filterState.queriedProcess)
-      }
+      submitItemsWithFilter(items, viewModel.filterState.queriedText, viewModel.filterState.queriedProcess)
     }
     if (!isListReady) {
       viewModel.filterState.updateItemsCount(type, items.size)

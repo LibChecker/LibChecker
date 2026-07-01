@@ -9,10 +9,8 @@ import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
 import com.absinthe.libchecker.domain.app.detail.ui.DetailTabSpec
 import com.absinthe.libchecker.domain.app.detail.ui.DetailTabSpecBuilder
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class DetailPackageContentController(
   private val viewModel: DetailViewModel,
@@ -104,11 +102,9 @@ class DetailPackageContentController(
 
   private fun schedulePostPackageInfoAvailable() {
     // Keep the legacy hook after the current UI-thread work queue.
-    coroutineScope.launch(Dispatchers.IO) {
-      withContext(Dispatchers.Main) {
-        delay(1L)
-        onPostPackageInfoAvailable()
-      }
+    coroutineScope.launch {
+      delay(1L)
+      onPostPackageInfoAvailable()
     }
   }
 }

@@ -15,14 +15,12 @@ import com.absinthe.libchecker.domain.app.detail.navigation.DetailReferenceNavig
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_DETAIL_BEAN
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.domain.app.detail.packageinfo.GetAppDetailPackageUseCase
+import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel.PackageLoadResult
 import com.absinthe.libchecker.domain.app.detail.ui.IDetailContainer
 import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_NAME
 import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.Toasty
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class AppDetailActivity :
@@ -33,7 +31,6 @@ class AppDetailActivity :
   private var refName: String? = null
   private var refType: Int? = null
   private var extraBean: DetailExtraBean? = null
-  private var initPackageJob: Job? = null
 
   override val apkAnalyticsMode: Boolean = false
   override fun requirePackageName() = pkgName
@@ -42,6 +39,7 @@ class AppDetailActivity :
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     isPackageReady = true
+    collectPackageLoadResults()
     initPackage(intent)
   }
 
@@ -76,30 +74,34 @@ class AppDetailActivity :
 
     Timber.d("packageName: $pkgName")
     val packageName = pkgName ?: return
-    val detailExtraBean = extraBean
-    initPackageJob?.cancel()
-    initPackageJob = lifecycleScope.launch(Dispatchers.IO) {
-      when (val result = viewModel.loadAppDetailPackage(packageName)) {
-        is GetAppDetailPackageUseCase.Result.Available -> {
-          withContext(Dispatchers.Main) {
-            onPackageInfoAvailable(result.packageInfo, detailExtraBean)
-          }
-        }
+    viewModel.loadAppDetailPackage(packageName)
+  }
 
-        GetAppDetailPackageUseCase.Result.Archived -> {
-          withContext(Dispatchers.Main) {
-            Timber.w("isArchivedPackage: $packageName")
-            Toasty.showLong(this@AppDetailActivity, R.string.archived_app)
-            finish()
-          }
-        }
+  private fun collectPackageLoadResults() {
+    lifecycleScope.launch {
+      viewModel.packageLoadResults.collect(::handlePackageLoadResult)
+    }
+  }
 
-        GetAppDetailPackageUseCase.Result.NotFound -> {
-          Timber.d("getPackageInfo: $packageName failed")
-          withContext(Dispatchers.Main) {
-            finish()
-          }
-        }
+  private fun handlePackageLoadResult(loadResult: PackageLoadResult) {
+    if (loadResult.packageName != pkgName) {
+      return
+    }
+
+    when (val result = loadResult.result) {
+      is GetAppDetailPackageUseCase.Result.Available -> {
+        onPackageInfoAvailable(result.packageInfo, extraBean)
+      }
+
+      GetAppDetailPackageUseCase.Result.Archived -> {
+        Timber.w("isArchivedPackage: ${loadResult.packageName}")
+        Toasty.showLong(this, R.string.archived_app)
+        finish()
+      }
+
+      GetAppDetailPackageUseCase.Result.NotFound -> {
+        Timber.d("getPackageInfo: ${loadResult.packageName} failed")
+        finish()
       }
     }
   }

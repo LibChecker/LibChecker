@@ -1,4 +1,5 @@
 {
+  dependencyDashboard: true,
   labels: [
     'dependencies',
   ],
@@ -12,6 +13,12 @@
         'com.google.devtools.ksp{/,}**',
         'dev.zacsweers.moshix{/,}**',
         '/org.jetbrains.kotlin.*/',
+      ],
+    },
+    {
+      groupName: 'AndroidX',
+      matchPackageNames: [
+        '/^androidx\\./',
       ],
     },
   ],

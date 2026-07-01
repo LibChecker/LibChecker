@@ -14,9 +14,7 @@ import com.absinthe.libchecker.utils.Toasty
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import ohos.bundle.BundleInfo
 import timber.log.Timber
 
@@ -70,7 +68,7 @@ class DetailHeaderController(
     isHarmonyMode: Boolean,
     packageName: String
   ) {
-    coroutineScope.launch(Dispatchers.IO) {
+    coroutineScope.launch {
       val showAndroidVersion = isDisplayOptionEnabled(AdvancedOptions.SHOW_ANDROID_VERSION)
       val versionInfo = if (!isHarmonyMode) {
         val headerExtraInfo = viewModel.buildAppDetailHeaderExtraInfo(
@@ -86,9 +84,7 @@ class DetailHeaderController(
         }
       }
 
-      withContext(Dispatchers.Main) {
-        headerExtraInfoBinder.bind(versionInfo)
-      }
+      headerExtraInfoBinder.bind(versionInfo)
     }
   }
 }

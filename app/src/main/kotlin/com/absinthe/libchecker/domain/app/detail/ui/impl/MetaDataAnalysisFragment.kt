@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.domain.app.detail.ui.impl
 
-import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
@@ -10,10 +9,8 @@ import com.absinthe.libchecker.domain.app.detail.ui.Referable
 import com.absinthe.libchecker.domain.app.detail.ui.base.BaseDetailFragment
 import com.absinthe.libchecker.domain.app.detail.ui.base.EXTRA_TYPE
 import com.absinthe.libchecker.utils.extensions.putArguments
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 
 class MetaDataAnalysisFragment :
   BaseDetailFragment<FragmentLibComponentBinding>(),
@@ -31,9 +28,7 @@ class MetaDataAnalysisFragment :
     if (items.isEmpty()) {
       emptyView.text.text = getString(R.string.empty_list)
     } else {
-      lifecycleScope.launch(Dispatchers.IO) {
-        setItemsWithFilter(items, viewModel.filterState.queriedText, null)
-      }
+      submitItemsWithFilter(items, viewModel.filterState.queriedText, null)
     }
 
     if (!isListReady) {

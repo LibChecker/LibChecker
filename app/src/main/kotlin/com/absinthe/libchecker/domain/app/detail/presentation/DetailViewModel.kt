@@ -5,13 +5,19 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppBundleSplitItem
 import com.absinthe.libchecker.domain.app.PrepareApkAnalysisPackageUseCase
 import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.domain.app.detail.AppDetailAbiLabelData
 import com.absinthe.libchecker.domain.app.detail.AppDetailHeaderExtraInfo
+import com.absinthe.libchecker.domain.app.detail.RelatedAppDisplayData
+import com.absinthe.libchecker.domain.app.detail.action.AppElfDetail
+import com.absinthe.libchecker.domain.app.detail.action.AppInstallSourceDetails
+import com.absinthe.libchecker.domain.app.detail.action.AppLaunchAction
 import com.absinthe.libchecker.domain.app.detail.action.AppManifestProperty
+import com.absinthe.libchecker.domain.app.detail.action.AppPackageShareAction
 import com.absinthe.libchecker.domain.app.detail.action.AppPackageShareFile
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemDialogRequest
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemLongClickActions
@@ -29,6 +35,13 @@ import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailCont
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
 import java.io.File
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class DetailViewModel(
@@ -41,6 +54,37 @@ class DetailViewModel(
   val contentState = detailContentLoader.contentState
   val featureState = detailFeatureLoader.featureState
   val filterState = detailFilterController.filterState
+  private val _packageLoadResults = MutableSharedFlow<PackageLoadResult>()
+  val packageLoadResults: SharedFlow<PackageLoadResult> = _packageLoadResults.asSharedFlow()
+  private val _apkAnalysisPackageResults = MutableSharedFlow<ApkAnalysisPackageResult>()
+  val apkAnalysisPackageResults: SharedFlow<ApkAnalysisPackageResult> = _apkAnalysisPackageResults.asSharedFlow()
+  private val _apkPreviewResults = MutableSharedFlow<ApkPreviewResult>()
+  val apkPreviewResults: SharedFlow<ApkPreviewResult> = _apkPreviewResults.asSharedFlow()
+  private val _appInstallSourceDetailsResults = MutableSharedFlow<AppInstallSourceDetailsResult>()
+  val appInstallSourceDetailsResults: SharedFlow<AppInstallSourceDetailsResult> =
+    _appInstallSourceDetailsResults.asSharedFlow()
+  private val _appLaunchActionResults = MutableSharedFlow<AppLaunchActionResult>()
+  val appLaunchActionResults: SharedFlow<AppLaunchActionResult> = _appLaunchActionResults.asSharedFlow()
+  private val _appPackageShareActionResults = MutableSharedFlow<AppPackageShareActionResult>()
+  val appPackageShareActionResults: SharedFlow<AppPackageShareActionResult> =
+    _appPackageShareActionResults.asSharedFlow()
+  private val _appPackageShareExportResults = MutableSharedFlow<AppPackageShareExportResult>()
+  val appPackageShareExportResults: SharedFlow<AppPackageShareExportResult> =
+    _appPackageShareExportResults.asSharedFlow()
+  private val _nativeLibraryExtractionResults = MutableSharedFlow<NativeLibraryExtractionResult>()
+  val nativeLibraryExtractionResults: SharedFlow<NativeLibraryExtractionResult> =
+    _nativeLibraryExtractionResults.asSharedFlow()
+  private val _elfDetailResults = MutableSharedFlow<ElfDetailResult>()
+  val elfDetailResults: SharedFlow<ElfDetailResult> = _elfDetailResults.asSharedFlow()
+  private var packageLoadJob: Job? = null
+  private var apkAnalysisPackageJob: Job? = null
+  private var apkPreviewJob: Job? = null
+  private var appInstallSourceDetailsJob: Job? = null
+  private var appLaunchActionJob: Job? = null
+  private var appPackageShareActionJob: Job? = null
+  private var appPackageShareExportJob: Job? = null
+  private var nativeLibraryExtractionJob: Job? = null
+  private var elfDetailJob: Job? = null
   private val packageState: DetailPackageState
     get() = detailPackageLoader.packageState
 
@@ -64,29 +108,198 @@ class DetailViewModel(
     detailPackageLoader.initPackageInfo(pi)
   }
 
-  fun startApkMode() {
-    detailPackageLoader.startApkMode()
-  }
-
-  fun startApkPreviewMode() {
-    detailPackageLoader.startApkPreviewMode()
-  }
-
-  fun setApkPreviewInfo(apkPreviewInfo: ApkPreviewInfo) {
-    detailPackageLoader.setApkPreviewInfo(apkPreviewInfo)
-  }
-
-  fun clearApkPreviewInfo() {
-    detailPackageLoader.clearApkPreviewInfo()
-  }
-
   fun isPackageInfoAvailable(): Boolean {
     return detailPackageLoader.isPackageInfoAvailable()
   }
 
-  suspend fun loadAppDetailPackage(packageName: String): GetAppDetailPackageUseCase.Result {
-    return detailPackageLoader.loadAppDetailPackage(packageName)
+  fun loadAppDetailPackage(packageName: String) {
+    packageLoadJob?.cancel()
+    packageLoadJob = viewModelScope.launch {
+      _packageLoadResults.emit(
+        PackageLoadResult(
+          packageName = packageName,
+          result = detailPackageLoader.loadAppDetailPackage(packageName)
+        )
+      )
+    }
   }
+
+  data class PackageLoadResult(
+    val packageName: String,
+    val result: GetAppDetailPackageUseCase.Result
+  )
+
+  fun loadApkAnalysisPackage(cacheDir: File, uri: Uri) {
+    apkAnalysisPackageJob?.cancel()
+    apkPreviewJob?.cancel()
+    detailPackageLoader.startApkMode()
+    detailPackageLoader.clearApkPreviewInfo()
+    apkAnalysisPackageJob = viewModelScope.launch {
+      _apkAnalysisPackageResults.emit(
+        ApkAnalysisPackageResult(
+          result = detailPackageLoader.prepareApkAnalysisPackage(cacheDir, uri)
+        )
+      )
+    }
+  }
+
+  data class ApkAnalysisPackageResult(
+    val result: PrepareApkAnalysisPackageUseCase.Result
+  )
+
+  fun loadApkPreview(url: String) {
+    apkPreviewJob?.cancel()
+    apkAnalysisPackageJob?.cancel()
+    detailPackageLoader.startApkPreviewMode()
+    detailPackageLoader.clearApkPreviewInfo()
+    apkPreviewJob = viewModelScope.launch {
+      val result = detailPackageLoader.getApkPreviewInfo(url)
+      result.getOrNull()?.let(detailPackageLoader::setApkPreviewInfo)
+      _apkPreviewResults.emit(ApkPreviewResult(url, result))
+    }
+  }
+
+  data class ApkPreviewResult(
+    val url: String,
+    val result: Result<ApkPreviewInfo>
+  )
+
+  fun loadAppInstallSourceDetails(packageName: String) {
+    appInstallSourceDetailsJob?.cancel()
+    appInstallSourceDetailsJob = viewModelScope.launch {
+      val details = detailActionLoader.getAppInstallSourceDetails(packageName)
+      val installSource = details?.installSource
+      _appInstallSourceDetailsResults.emit(
+        AppInstallSourceDetailsResult(
+          packageName = packageName,
+          details = details,
+          originatingApp = installSource?.originatingPackageName?.let {
+            detailActionLoader.getRelatedAppDisplayData(it)
+          },
+          installingApp = installSource?.installingPackageName?.let {
+            detailActionLoader.getRelatedAppDisplayData(it)
+          }
+        )
+      )
+    }
+  }
+
+  data class AppInstallSourceDetailsResult(
+    val packageName: String,
+    val details: AppInstallSourceDetails?,
+    val originatingApp: RelatedAppDisplayData?,
+    val installingApp: RelatedAppDisplayData?
+  )
+
+  fun loadAppLaunchAction(packageName: String?) {
+    appLaunchActionJob?.cancel()
+    appLaunchActionJob = viewModelScope.launch {
+      _appLaunchActionResults.emit(
+        AppLaunchActionResult(
+          packageName = packageName,
+          action = detailActionLoader.getAppLaunchAction(packageName)
+        )
+      )
+    }
+  }
+
+  data class AppLaunchActionResult(
+    val packageName: String?,
+    val action: AppLaunchAction?
+  )
+
+  fun prepareAppPackageShareAction(
+    cacheDir: File,
+    packageName: String,
+    target: AppPackageShareTarget
+  ) {
+    appPackageShareActionJob?.cancel()
+    appPackageShareActionJob = viewModelScope.launch {
+      _appPackageShareActionResults.emit(
+        AppPackageShareActionResult(
+          packageName = packageName,
+          target = target,
+          result = runCatching {
+            detailActionLoader.prepareAppPackageShareAction(cacheDir, packageName)
+          }
+        )
+      )
+    }
+  }
+
+  enum class AppPackageShareTarget {
+    SHARE,
+    EXPORT
+  }
+
+  data class AppPackageShareActionResult(
+    val packageName: String,
+    val target: AppPackageShareTarget,
+    val result: Result<AppPackageShareAction>
+  )
+
+  fun exportAppPackageShareFile(
+    shareFile: AppPackageShareFile,
+    destinationUri: Uri
+  ) {
+    appPackageShareExportJob?.cancel()
+    appPackageShareExportJob = viewModelScope.launch {
+      _appPackageShareExportResults.emit(
+        AppPackageShareExportResult(
+          shareFile = shareFile,
+          destinationUri = destinationUri,
+          result = runCatching {
+            detailActionLoader.exportAppPackageShareFile(shareFile, destinationUri)
+            Unit
+          }
+        )
+      )
+    }
+  }
+
+  data class AppPackageShareExportResult(
+    val shareFile: AppPackageShareFile,
+    val destinationUri: Uri,
+    val result: Result<Unit>
+  )
+
+  fun extractNativeLibrary(item: LibStringItem) {
+    nativeLibraryExtractionJob?.cancel()
+    nativeLibraryExtractionJob = viewModelScope.launch {
+      _nativeLibraryExtractionResults.emit(
+        NativeLibraryExtractionResult(
+          item = item,
+          result = detailActionLoader.extractNativeLibrary(packageState, item)
+        )
+      )
+    }
+  }
+
+  data class NativeLibraryExtractionResult(
+    val item: LibStringItem,
+    val result: Result<Unit>
+  )
+
+  fun loadElfDetail(packageName: String, elfPath: String) {
+    elfDetailJob?.cancel()
+    elfDetailJob = viewModelScope.launch {
+      _elfDetailResults.emit(
+        ElfDetailResult(
+          packageName = packageName,
+          elfPath = elfPath,
+          result = runCatching {
+            detailActionLoader.getElfDetail(packageName, elfPath)
+          }
+        )
+      )
+    }
+  }
+
+  data class ElfDetailResult(
+    val packageName: String,
+    val elfPath: String,
+    val result: Result<AppElfDetail?>
+  )
 
   fun buildAppDetailAbiLabelData(
     abi: Int,
@@ -140,34 +353,12 @@ class DetailViewModel(
 
   suspend fun getXposedModuleInfo(packageName: String) = detailActionLoader.getXposedModuleInfo(packageName)
 
-  suspend fun extractNativeLibrary(item: LibStringItem) = detailActionLoader.extractNativeLibrary(packageState, item)
-
-  suspend fun prepareAppPackageShareAction(cacheDir: File, packageName: String) = detailActionLoader.prepareAppPackageShareAction(cacheDir, packageName)
-
-  suspend fun exportAppPackageShareFile(
-    shareFile: AppPackageShareFile,
-    destinationUri: Uri
-  ) = detailActionLoader.exportAppPackageShareFile(shareFile, destinationUri)
-
-  suspend fun getApkPreviewInfo(url: String): Result<ApkPreviewInfo> {
-    return detailPackageLoader.getApkPreviewInfo(url)
-  }
-
   suspend fun getAppManifestProperties(
     packageInfo: PackageInfo?,
     properties: Map<String, String>?
   ): List<AppManifestProperty> {
     return detailActionLoader.getAppManifestProperties(packageInfo, properties)
   }
-
-  suspend fun prepareApkAnalysisPackage(
-    cacheDir: File,
-    uri: Uri
-  ): PrepareApkAnalysisPackageUseCase.Result {
-    return detailPackageLoader.prepareApkAnalysisPackage(cacheDir, uri)
-  }
-
-  suspend fun getElfDetail(packageName: String, elfPath: String) = detailActionLoader.getElfDetail(packageName, elfPath)
 
   suspend fun isInstalledAppComparisonAvailable(packageName: String): Boolean {
     return detailPackageLoader.isInstalledAppComparisonAvailable(packageName)
@@ -337,6 +528,27 @@ class DetailViewModel(
 
   fun sortDetailItems(items: List<LibStringItemChip>, @LibType type: Int): List<LibStringItemChip> {
     return detailFilterController.sortDetailItems(items, type)
+  }
+
+  suspend fun filterAndSortDetailItems(
+    items: List<LibStringItemChip>,
+    searchWords: String?,
+    process: String?,
+    @LibType type: Int
+  ): List<LibStringItemChip> = withContext(Dispatchers.Default) {
+    val filteredItems = if (type == PERMISSION) {
+      detailFilterController.filterPermissionDetailItems(items, searchWords, process)
+    } else {
+      detailFilterController.filterDetailItems(items, searchWords, process)
+    }
+    detailFilterController.sortDetailItems(filteredItems, type)
+  }
+
+  suspend fun sortDetailItemsForDisplay(
+    items: List<LibStringItemChip>,
+    @LibType type: Int
+  ): List<LibStringItemChip> = withContext(Dispatchers.Default) {
+    detailFilterController.sortDetailItems(items, type)
   }
 
   fun buildProcessFilterData(

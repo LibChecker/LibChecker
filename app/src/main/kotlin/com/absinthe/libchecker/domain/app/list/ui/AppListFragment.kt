@@ -516,10 +516,14 @@ class AppListFragment :
             }
             flip(VF_LIST)
             isListReady = true
+            val initialItemViewStateCount = updatePlan.content.initialItemViewStates.size
+            if (initialItemViewStateCount > 0) {
+              notifyItemRangeChanged(0, initialItemViewStateCount.coerceAtMost(data.size))
+            }
             binding.list.doOnNextLayout {
               updateRemainingItemViewStates(
                 items = updatePlan.content.items,
-                initialItemViewStateCount = updatePlan.content.initialItemViewStates.size,
+                initialItemViewStateCount = initialItemViewStateCount,
                 packageStateSnapshot = updatePlan.content.packageStateSnapshot,
                 updateGeneration = generation
               )
@@ -555,8 +559,7 @@ class AppListFragment :
     }
 
     val generation = itemViewStatesGeneration
-    val packageNames = items.map { it.packageName }
-    val remainingItems = items.drop(initialItemViewStateCount)
+    val remainingItems = items.subList(initialItemViewStateCount, items.size)
     itemViewStatesJob = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
       val itemViewStates = traceAppListSuspendSection(TRACE_APP_LIST_REMAINING_ITEM_VIEW_STATES) {
         homeViewModel.buildAppListItemViewStates(remainingItems, packageStateSnapshot)
@@ -569,7 +572,7 @@ class AppListFragment :
           generation != itemViewStatesGeneration ||
           isDetached ||
           !isBindingInitialized() ||
-          !hasSameAppList(packageNames)
+          !hasSameAppList(items)
         ) {
           return@withContext
         }
@@ -582,9 +585,9 @@ class AppListFragment :
     }
   }
 
-  private fun hasSameAppList(packageNames: List<String>): Boolean {
-    return appAdapter.data.size == packageNames.size &&
-      packageNames.indices.all { index -> appAdapter.data[index].packageName == packageNames[index] }
+  private fun hasSameAppList(items: List<LCItem>): Boolean {
+    return appAdapter.data.size == items.size &&
+      items.indices.all { index -> appAdapter.data[index].packageName == items[index].packageName }
   }
 
   private fun returnTopOfList() {

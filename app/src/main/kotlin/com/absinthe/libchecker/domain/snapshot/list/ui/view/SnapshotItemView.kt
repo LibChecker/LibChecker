@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.domain.snapshot.list.ui.view
 
 import android.content.Context
-import android.graphics.Typeface
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
@@ -9,6 +8,9 @@ import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.snapshot.ui.view.SnapshotPackageSizeLineBreaker
+import com.absinthe.libchecker.utils.extensions.applyCondensedSingleLine
+import com.absinthe.libchecker.utils.extensions.applySingleLineEndEllipsize
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
@@ -32,9 +34,6 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
   }
 
   class SnapshotItemContainerView(context: Context) : AViewGroup(context) {
-
-    private val condensedTypeface = Typeface.create("sans-serif-condensed", Typeface.NORMAL)
-    private val condensedMediumTypeface = Typeface.create("sans-serif-condensed-medium", Typeface.NORMAL)
 
     val icon = AppCompatImageView(context).apply {
       val iconSize = context.getDimensionPixelSize(R.dimen.app_icon_size)
@@ -62,6 +61,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       )
       setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBodySmallEmphasized))
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
+      applySingleLineEndEllipsize()
       addView(this)
     }
 
@@ -72,8 +72,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       )
       setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceLabelSmall))
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
-      typeface = condensedTypeface
-      letterSpacing = 0f
+      applyCondensedSingleLine()
       addView(this)
     }
 
@@ -84,10 +83,14 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       )
       setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceLabelSmall))
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
-      typeface = condensedTypeface
-      letterSpacing = 0f
+      applyCondensedSingleLine()
+      setSingleLine(false)
+      setHorizontallyScrolling(false)
+      maxLines = Int.MAX_VALUE
+      ellipsize = null
       addView(this)
     }
+    private val packageSizeLineBreaker = SnapshotPackageSizeLineBreaker(packageSizeInfo)
 
     val apisInfo = AppCompatTextView(context).apply {
       layoutParams = LayoutParams(
@@ -96,8 +99,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       )
       setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceLabelSmall))
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
-      typeface = condensedTypeface
-      letterSpacing = 0f
+      applyCondensedSingleLine()
       addView(this)
     }
 
@@ -109,8 +111,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       clipChildren = false
       setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceLabelSmall))
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
-      typeface = condensedMediumTypeface
-      letterSpacing = 0f
+      applyCondensedSingleLine()
       addView(this)
     }
 
@@ -121,8 +122,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       )
       setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceLabelSmall))
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
-      typeface = condensedTypeface
-      letterSpacing = 0f
+      applyCondensedSingleLine()
       addView(this)
     }
 
@@ -130,6 +130,14 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       layoutParams = LayoutParams(5.dp, ViewGroup.LayoutParams.MATCH_PARENT)
       importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
       addView(this)
+    }
+
+    fun setPackageSizeText(text: CharSequence, breakStart: Int) {
+      packageSizeLineBreaker.setText(text, breakStart)
+    }
+
+    fun clearPackageSizeText() {
+      packageSizeLineBreaker.clear()
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -148,7 +156,8 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       if (versionInfo.measuredWidth > textWidth) {
         versionInfo.measure(textWidth.toExactlyMeasureSpec(), versionInfo.defaultHeightMeasureSpec(this))
       }
-      if (packageSizeInfo.measuredWidth > textWidth) {
+      if (packageSizeInfo.isVisible) {
+        packageSizeLineBreaker.apply(textWidth)
         packageSizeInfo.measure(textWidth.toExactlyMeasureSpec(), packageSizeInfo.defaultHeightMeasureSpec(this))
       }
       if (apisInfo.measuredWidth > textWidth) {
