@@ -112,15 +112,17 @@ object RulesRepository {
       return ruleEntity
     }
 
-    if (packageName.isTempApk()) {
-      File(packageName)
-    } else {
-      runCatching {
-        File(PackageUtils.getPackageInfo(packageName).applicationInfo!!.sourceDir)
-      }.getOrNull()
-    } ?: return ruleEntity
+    if (!requiresNativeLibValidation(name)) {
+      return ruleEntity
+    }
 
-    if (!checkNativeLibValidation(packageName, name, nativeLibNames)) {
+    if (hasCompanionNativeLibValidation(name, nativeLibNames)) {
+      return ruleEntity
+    }
+
+    val source = getPackageSourceFile(packageName) ?: return ruleEntity
+
+    if (!checkNativeLibValidation(source, name, nativeLibNames)) {
       return null
     }
     return ruleEntity
@@ -132,14 +134,46 @@ object RulesRepository {
   private val NATIVE_SET_UNITY = setOf("libmain.so")
   private val NATIVE_ALL = NATIVE_SET_QIHOO + NATIVE_SET_SECNEO + NATIVE_SET_FLUTTER + NATIVE_SET_UNITY
 
+  private fun requiresNativeLibValidation(nativeLib: String): Boolean {
+    return nativeLib in NATIVE_ALL
+  }
+
+  private fun hasCompanionNativeLibValidation(
+    nativeLib: String,
+    otherNativeLibNames: Collection<String>?
+  ): Boolean {
+    return when {
+      nativeLib in NATIVE_SET_FLUTTER -> otherNativeLibNames?.contains("libflutter.so") == true
+      nativeLib in NATIVE_SET_UNITY -> otherNativeLibNames?.contains("libunity.so") == true
+      else -> false
+    }
+  }
+
+  private fun getPackageSourceFile(packageName: String): File? {
+    return if (packageName.isTempApk()) {
+      File(packageName)
+    } else {
+      runCatching {
+        File(PackageUtils.getPackageInfo(packageName).applicationInfo!!.sourceDir)
+      }.getOrNull()
+    }
+  }
+
   fun checkNativeLibValidation(
     packageName: String,
     nativeLib: String,
     otherNativeLibNames: Collection<String>? = null
   ): Boolean {
-    if (!NATIVE_ALL.contains(nativeLib)) return true
-    val sourceDir = PackageUtils.getPackageInfo(packageName).applicationInfo?.sourceDir ?: return false
-    val source = File(sourceDir)
+    if (!requiresNativeLibValidation(nativeLib)) return true
+    val source = getPackageSourceFile(packageName) ?: return false
+    return checkNativeLibValidation(source, nativeLib, otherNativeLibNames)
+  }
+
+  private fun checkNativeLibValidation(
+    source: File,
+    nativeLib: String,
+    otherNativeLibNames: Collection<String>? = null
+  ): Boolean {
     return when {
       NATIVE_SET_QIHOO.contains(nativeLib) -> {
         runCatching {

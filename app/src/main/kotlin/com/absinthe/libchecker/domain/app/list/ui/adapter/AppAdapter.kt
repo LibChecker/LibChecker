@@ -1,9 +1,13 @@
 package com.absinthe.libchecker.domain.app.list.ui.adapter
 
 import android.content.Context
+import android.content.pm.PackageInfo
+import android.graphics.drawable.Drawable
 import android.text.SpannableString
 import android.text.style.ImageSpan
 import android.view.ViewGroup
+import androidx.appcompat.widget.AppCompatImageView
+import coil.dispose
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
@@ -56,7 +60,7 @@ class AppAdapter(
       val viewState = getItemViewState(item)
       val packageInfo = viewState.packageInfo
       if (item.packageName != Constants.EXAMPLE_PACKAGE) {
-        icon.load(packageInfo)
+        icon.loadAppIcon(packageInfo, getItemViewStyle(context).newIconPlaceholder(context))
       }
       bindIdentityText(root, item, viewState)
 
@@ -178,6 +182,18 @@ class AppAdapter(
 
   private companion object {
     private val HIGHLIGHT_TEXT_PAYLOAD = Any()
+  }
+}
+
+private fun AppCompatImageView.loadAppIcon(packageInfo: PackageInfo?, placeholderDrawable: Drawable?) {
+  if (packageInfo == null) {
+    dispose()
+    setImageDrawable(placeholderDrawable)
+    return
+  }
+  load(packageInfo) {
+    placeholder(placeholderDrawable)
+    error(placeholderDrawable)
   }
 }
 

@@ -113,7 +113,7 @@ val appDetailModule = module {
   factory { BuildAppDetailHeaderExtraInfoUseCase(androidContext(), get()) }
   factory { BuildAppDetailHeaderTitleDataUseCase(androidContext(), get()) }
   factory { BuildNativeLibraryItemDisplayDataUseCase(androidContext()) }
-  factory { BuildRelatedAppDisplayDataUseCase(androidContext()) }
+  factory { BuildRelatedAppDisplayDataUseCase(androidContext(), get()) }
   factory { BuildDetailItemDialogRequestUseCase() }
   factory { BuildDetailItemLongClickActionsUseCase() }
   factory { GetPermissionProvidersUseCase(get()) }

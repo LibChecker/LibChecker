@@ -115,6 +115,8 @@ class ParticleRemoveItemAnimator : DefaultItemAnimator() {
     val itemId = seed
     private val density = recyclerView.resources.displayMetrics.density
     private val particles = createParticles(bitmap, density, seed)
+    private val particleVertices = FloatArray(particles.size * PARTICLE_VERTEX_FLOAT_COUNT)
+    private val particleColors = IntArray(particles.size * PARTICLE_VERTEX_COUNT)
     private val bitmapPaint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
     private val particlePaint = Paint()
     private val dst = RectF()
@@ -177,11 +179,41 @@ class ParticleRemoveItemAnimator : DefaultItemAnimator() {
       val drawOriginTop = originTop + startVerticalScrollOffset - parent.computeVerticalScrollOffset()
 
       drawSnapshot(canvas, drawOriginLeft, drawOriginTop)
+      var vertexOffset = 0
+      var colorOffset = 0
       for (particle in particles) {
-        val localProgress = ((progress - particle.delay) / (1f - particle.delay)).coerceIn(0f, 1f)
+        val localProgress = ((progress - particle.delay) * particle.inverseActiveRange).coerceIn(0f, 1f)
         if (localProgress > 0f) {
-          particle.drawAnimated(canvas, localProgress, drawOriginLeft, drawOriginTop)
+          if (particle.writeAnimatedVertices(
+              localProgress = localProgress,
+              drawOriginLeft = drawOriginLeft,
+              drawOriginTop = drawOriginTop,
+              vertices = particleVertices,
+              vertexOffset = vertexOffset,
+              colors = particleColors,
+              colorOffset = colorOffset
+            )
+          ) {
+            vertexOffset += PARTICLE_VERTEX_FLOAT_COUNT
+            colorOffset += PARTICLE_VERTEX_COUNT
+          }
         }
+      }
+      if (colorOffset > 0) {
+        canvas.drawVertices(
+          Canvas.VertexMode.TRIANGLES,
+          colorOffset,
+          particleVertices,
+          0,
+          null,
+          0,
+          particleColors,
+          0,
+          null,
+          0,
+          0,
+          particlePaint
+        )
       }
     }
 
@@ -207,12 +239,15 @@ class ParticleRemoveItemAnimator : DefaultItemAnimator() {
       canvas.drawBitmap(bitmap, null, dst, bitmapPaint)
     }
 
-    private fun Particle.drawAnimated(
-      canvas: Canvas,
+    private fun Particle.writeAnimatedVertices(
       localProgress: Float,
       drawOriginLeft: Float,
-      drawOriginTop: Float
-    ) {
+      drawOriginTop: Float,
+      vertices: FloatArray,
+      vertexOffset: Int,
+      colors: IntArray,
+      colorOffset: Int
+    ): Boolean {
       val eased = 1f - (1f - localProgress) * (1f - localProgress)
       val radius = radius * (1f - 0.45f * eased)
       val centerX = drawOriginLeft + centerX + velocityX * eased + driftX * localProgress * localProgress
@@ -221,18 +256,34 @@ class ParticleRemoveItemAnimator : DefaultItemAnimator() {
       val alpha = (fadeIn * (1f - localProgress) * (1f - localProgress) * START_ALPHA).roundToInt()
 
       if (alpha <= 0 || radius <= 0f) {
-        return
+        return false
       }
 
-      particlePaint.color = color
-      particlePaint.alpha = alpha
-      canvas.drawRect(
-        centerX - radius,
-        centerY - radius,
-        centerX + radius,
-        centerY + radius,
-        particlePaint
-      )
+      val left = centerX - radius
+      val top = centerY - radius
+      val right = centerX + radius
+      val bottom = centerY + radius
+      vertices[vertexOffset] = left
+      vertices[vertexOffset + 1] = top
+      vertices[vertexOffset + 2] = right
+      vertices[vertexOffset + 3] = top
+      vertices[vertexOffset + 4] = left
+      vertices[vertexOffset + 5] = bottom
+      vertices[vertexOffset + 6] = right
+      vertices[vertexOffset + 7] = top
+      vertices[vertexOffset + 8] = right
+      vertices[vertexOffset + 9] = bottom
+      vertices[vertexOffset + 10] = left
+      vertices[vertexOffset + 11] = bottom
+
+      val animatedColor = (alpha shl 24) or rgbColor
+      colors[colorOffset] = animatedColor
+      colors[colorOffset + 1] = animatedColor
+      colors[colorOffset + 2] = animatedColor
+      colors[colorOffset + 3] = animatedColor
+      colors[colorOffset + 4] = animatedColor
+      colors[colorOffset + 5] = animatedColor
+      return true
     }
 
     private fun cleanUp() {
@@ -268,12 +319,13 @@ class ParticleRemoveItemAnimator : DefaultItemAnimator() {
     val centerX: Float,
     val centerY: Float,
     val radius: Float,
-    val color: Int,
+    val rgbColor: Int,
     val velocityX: Float,
     val velocityY: Float,
     val driftX: Float,
     val gravity: Float,
-    val delay: Float
+    val delay: Float,
+    val inverseActiveRange: Float
   )
 
   companion object {
@@ -285,6 +337,8 @@ class ParticleRemoveItemAnimator : DefaultItemAnimator() {
     private const val SNAPSHOT_FADE_END = 0.24f
     private const val PARTICLE_FADE_IN_END = 0.08f
     private const val FORCE_CLEAN_UP_DELAY = 300L
+    private const val PARTICLE_VERTEX_COUNT = 6
+    private const val PARTICLE_VERTEX_FLOAT_COUNT = PARTICLE_VERTEX_COUNT * 2
 
     private fun createParticles(bitmap: Bitmap, density: Float, seed: Long): List<Particle> {
       val random = Random(seed.toInt())
@@ -333,12 +387,13 @@ class ParticleRemoveItemAnimator : DefaultItemAnimator() {
               (cellWidth.coerceAtMost(cellHeight) * 0.28f).coerceAtLeast(1f),
               (cellWidth.coerceAtMost(cellHeight) * 0.5f).coerceAtLeast(1f)
             ),
-            color = color,
+            rgbColor = color and 0x00ffffff,
             velocityX = velocityX,
             velocityY = velocityY,
             driftX = driftX,
             gravity = gravity,
-            delay = delay
+            delay = delay,
+            inverseActiveRange = 1f / (1f - delay)
           )
         }
       }

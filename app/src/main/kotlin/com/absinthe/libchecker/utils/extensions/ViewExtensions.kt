@@ -8,10 +8,12 @@ import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.RenderEffect
 import android.graphics.Shader
+import android.graphics.Typeface
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.Spanned
+import android.text.TextUtils
 import android.text.style.ForegroundColorSpan
 import android.text.style.StrikethroughSpan
 import android.view.View
@@ -120,6 +122,17 @@ fun TextView.tintTextToPrimary() {
   )
   builder.append(spannableString)
   text = builder
+}
+
+fun TextView.applySingleLineEndEllipsize() {
+  maxLines = 1
+  ellipsize = TextUtils.TruncateAt.END
+}
+
+fun TextView.applyCondensedSingleLine() {
+  applySingleLineEndEllipsize()
+  typeface = Typeface.create("sans-serif-condensed", Typeface.NORMAL)
+  letterSpacing = 0f
 }
 
 fun ViewPager2.setCurrentItem(

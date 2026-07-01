@@ -9,7 +9,6 @@ import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.ui.base.BaseDetailFragment
 import com.absinthe.libchecker.domain.app.detail.ui.base.EXTRA_TYPE
 import com.absinthe.libchecker.utils.extensions.putArguments
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -29,9 +28,7 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
     if (items.isEmpty()) {
       emptyView.text.text = getString(R.string.empty_list)
     } else {
-      lifecycleScope.launch(Dispatchers.IO) {
-        setItemsWithFilter(items, viewModel.filterState.queriedText, viewModel.filterState.queriedProcess)
-      }
+      submitItemsWithFilter(items, viewModel.filterState.queriedText, viewModel.filterState.queriedProcess)
     }
     if (!isListReady) {
       viewModel.filterState.updateItemsCount(type, items.size)

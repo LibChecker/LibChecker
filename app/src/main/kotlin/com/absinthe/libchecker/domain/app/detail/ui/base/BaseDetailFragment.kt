@@ -95,7 +95,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   }
   protected var isListReady = false
   private var afterListReadyTask: Runnable? = null
-  private val longClickController by unsafeLazy {
+  private val longClickControllerDelegate = unsafeLazy {
     DetailItemLongClickController(
       fragment = this,
       viewModel = viewModel,
@@ -106,6 +106,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
       getPermissionProvidersUseCase = getPermissionProvidersUseCase
     )
   }
+  private val longClickController by longClickControllerDelegate
 
   abstract fun getRecyclerView(): RecyclerView
 
@@ -120,11 +121,9 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     if (!autoLoadItems) {
       return
     }
-    lifecycleScope.launch(Dispatchers.IO) {
+    lifecycleScope.launch {
       val items = getItems()
-      withContext(Dispatchers.Main) {
-        onItemsAvailable(items)
-      }
+      onItemsAvailable(items)
     }
   }
 
@@ -162,6 +161,13 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     }
   }
 
+  override fun onDestroyView() {
+    if (longClickControllerDelegate.isInitialized()) {
+      longClickController.clear()
+    }
+    super.onDestroyView()
+  }
+
   override fun onVisibilityChanged(visible: Boolean) {
     super.onVisibilityChanged(visible)
     if (visible) {
@@ -186,7 +192,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
         null
       }
 
-    val sortedList = viewModel.sortDetailItems(list, type)
+    val sortedList = viewModel.sortDetailItemsForDisplay(list, type)
 
     if (itemChip != null) {
       val newHighlightPosition = sortedList.indexOf(itemChip)
@@ -199,19 +205,21 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     }
   }
 
-  protected open fun filterItems(
-    items: List<LibStringItemChip>,
-    searchWords: String?,
-    process: String?
-  ): List<LibStringItemChip> {
-    return viewModel.filterDetailItems(items, searchWords, process)
-  }
-
   protected open suspend fun getFilterList(
     searchWords: String?,
     process: String?
   ): List<LibStringItemChip>? {
-    return filterItems(getItems(), searchWords, process)
+    return viewModel.filterAndSortDetailItems(getItems(), searchWords, process, type)
+  }
+
+  protected fun submitItemsWithFilter(
+    items: List<LibStringItemChip>,
+    searchWords: String?,
+    process: String?
+  ) {
+    lifecycleScope.launch {
+      setItemsWithFilter(items, searchWords, process)
+    }
   }
 
   protected suspend fun setItemsWithFilter(
@@ -220,7 +228,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     process: String?
   ) {
     adapter.highlightText = searchWords.orEmpty()
-    updateItemsWithFilterResult(filterItems(items, searchWords, process))
+    updateItemsWithFilterResult(viewModel.filterAndSortDetailItems(items, searchWords, process, type))
   }
 
   override suspend fun setItemsWithFilter(searchWords: String?, process: String?) {
@@ -228,13 +236,12 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     updateItemsWithFilterResult(getFilterList(searchWords, process))
   }
 
-  private suspend fun updateItemsWithFilterResult(items: List<LibStringItemChip>?) {
-    items?.let {
-      val sortedList = viewModel.sortDetailItems(it, type)
-      adapter.preloadRuleChipIcons(sortedList)
+  private suspend fun updateItemsWithFilterResult(sortedItems: List<LibStringItemChip>?) {
+    sortedItems?.let {
+      adapter.preloadRuleChipIcons(it)
       withContext(Dispatchers.Main) {
         if (isDetached || !isBindingInitialized()) return@withContext
-        if (sortedList.isEmpty()) {
+        if (it.isEmpty()) {
           if (getRecyclerView().itemDecorationCount > 0) {
             getRecyclerView().removeItemDecoration(dividerItemDecoration)
           }
@@ -244,9 +251,9 @@ abstract class BaseDetailFragment<T : ViewBinding> :
             getRecyclerView().addItemDecoration(dividerItemDecoration)
           }
         }
-        adapter.setDiffNewData(sortedList.toMutableList()) {
+        adapter.setDiffNewData(it.toMutableList()) {
           afterListReadyTask?.run()
-          viewModel.filterState.updateItemsCount(type, sortedList.size)
+          viewModel.filterState.updateItemsCount(type, it.size)
         }
       }
     }

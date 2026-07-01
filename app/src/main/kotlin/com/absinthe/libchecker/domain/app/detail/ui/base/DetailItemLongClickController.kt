@@ -2,12 +2,15 @@ package com.absinthe.libchecker.domain.app.detail.ui.base
 
 import android.widget.ArrayAdapter
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemLongClickActions
 import com.absinthe.libchecker.domain.app.detail.action.GetPermissionProvidersUseCase
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
+import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel.NativeLibraryExtractionResult
 import com.absinthe.libchecker.domain.app.detail.ui.Referable
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.LibStringAdapter
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.ELFDetailDialogFragment
@@ -23,9 +26,7 @@ import com.absinthe.libchecker.utils.extensions.reverseStrikeThroughAnimation
 import com.absinthe.libchecker.utils.extensions.startStrikeThroughAnimation
 import com.absinthe.libchecker.utils.showToast
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import rikka.core.util.ClipboardUtils
 import timber.log.Timber
 
@@ -40,6 +41,12 @@ class DetailItemLongClickController(
 ) {
   private var integrationMonkeyKingBlockList: List<ShareCmpInfo.Component>? = null
   private var integrationBlockerList: List<ShareCmpInfo.Component>? = null
+  private var pendingExtractionItem: LibStringItem? = null
+  private var loadingDialog: AlertDialog? = null
+
+  init {
+    collectNativeLibraryExtractionResults()
+  }
 
   fun onLongClick(item: LibStringItemChip, position: Int) {
     val context = fragment.requireContext()
@@ -89,27 +96,11 @@ class DetailItemLongClickController(
       return
     }
 
-    val context = fragment.requireContext()
     arrayAdapter.add(fragment.getString(com.absinthe.libchecker.R.string.lib_detail_elf_extract))
     actionMap[arrayAdapter.count - 1] = {
-      val loading = UiUtils.createLoadingDialog(fragment.requireActivity())
-      coroutineScope.launch {
-        withContext(Dispatchers.Main) {
-          loading.show()
-        }
-
-        val result = viewModel.extractNativeLibrary(item.item)
-
-        withContext(Dispatchers.Main) {
-          loading.dismiss()
-          result.onSuccess {
-            context.showToast(com.absinthe.libchecker.R.string.lib_detail_elf_extract_success)
-          }.onFailure { e ->
-            Timber.e(e, "Failed to extract ELF: ${item.item}")
-            context.showToast(com.absinthe.libchecker.R.string.lib_detail_elf_extract_failed)
-          }
-        }
-      }
+      pendingExtractionItem = item.item
+      showLoading()
+      viewModel.extractNativeLibrary(item.item)
     }
 
     actions.elfInfo?.let { elfInfo ->
@@ -167,6 +158,45 @@ class DetailItemLongClickController(
         }
       }
     }
+  }
+
+  fun clear() {
+    pendingExtractionItem = null
+    dismissLoading()
+  }
+
+  private fun collectNativeLibraryExtractionResults() {
+    coroutineScope.launch {
+      viewModel.nativeLibraryExtractionResults.collect(::handleNativeLibraryExtractionResult)
+    }
+  }
+
+  private fun handleNativeLibraryExtractionResult(extractionResult: NativeLibraryExtractionResult) {
+    if (extractionResult.item != pendingExtractionItem) {
+      return
+    }
+
+    pendingExtractionItem = null
+    dismissLoading()
+    val context = fragment.context ?: return
+    extractionResult.result.onSuccess {
+      context.showToast(com.absinthe.libchecker.R.string.lib_detail_elf_extract_success)
+    }.onFailure { e ->
+      Timber.e(e, "Failed to extract ELF: ${extractionResult.item}")
+      context.showToast(com.absinthe.libchecker.R.string.lib_detail_elf_extract_failed)
+    }
+  }
+
+  private fun showLoading() {
+    dismissLoading()
+    loadingDialog = UiUtils.createLoadingDialog(fragment.requireActivity()).also {
+      it.show()
+    }
+  }
+
+  private fun dismissLoading() {
+    loadingDialog?.dismiss()
+    loadingDialog = null
   }
 
   private fun addIntegrationActions(

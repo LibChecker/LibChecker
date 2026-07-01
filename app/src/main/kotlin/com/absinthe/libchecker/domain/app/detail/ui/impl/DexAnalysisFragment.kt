@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.domain.app.detail.ui.impl
 
-import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.compat.VersionCompat
@@ -10,10 +9,8 @@ import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.domain.app.detail.ui.base.BaseDetailFragment
 import com.absinthe.libchecker.domain.app.detail.ui.base.EXTRA_TYPE
 import com.absinthe.libchecker.utils.extensions.putArguments
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import rikka.core.util.ClipboardUtils
 
 class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
@@ -30,9 +27,7 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
     if (items.isEmpty()) {
       emptyView.text.text = getString(R.string.uncharted_territory)
     } else {
-      lifecycleScope.launch(Dispatchers.IO) {
-        setItemsWithFilter(items, viewModel.filterState.queriedText, null)
-      }
+      submitItemsWithFilter(items, viewModel.filterState.queriedText, null)
     }
 
     if (!isListReady) {

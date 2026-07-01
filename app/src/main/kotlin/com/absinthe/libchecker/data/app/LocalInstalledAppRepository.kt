@@ -14,36 +14,39 @@ import com.absinthe.libchecker.utils.extensions.isPreinstalled
 import kotlinx.coroutines.flow.SharedFlow
 import timber.log.Timber
 
-object LocalInstalledAppRepository : InstalledAppRepository {
+class LocalInstalledAppRepository(
+  private val appDataSource: AppDataSource,
+  private val packageChangeObserver: LocalPackageChangeObserver
+) : InstalledAppRepository {
 
-  override val packageChanges: SharedFlow<PackageChangeState> = LocalAppDataSource.packageChangeFlow
+  override val packageChanges: SharedFlow<PackageChangeState> = packageChangeObserver.packageChanges
 
   override fun getApplicationList(forceUpdate: Boolean): List<PackageInfo> {
-    return LocalAppDataSource.getApplicationList(forceUpdate)
+    return appDataSource.getApplicationList(forceUpdate)
   }
 
   override fun getApplicationMap(forceUpdate: Boolean): Map<String, PackageInfo> {
-    return LocalAppDataSource.getApplicationMap(forceUpdate)
+    return appDataSource.getApplicationMap(forceUpdate)
   }
 
   override fun getApplicationCount(forceUpdate: Boolean): Int {
-    return LocalAppDataSource.getApplicationCount(forceUpdate)
+    return appDataSource.getApplicationCount(forceUpdate)
   }
 
   override fun getRandomApplicationInfo(forceUpdate: Boolean): ApplicationInfo? {
-    return LocalAppDataSource.getRandomApplicationInfo(forceUpdate)
+    return appDataSource.getRandomApplicationInfo(forceUpdate)
   }
 
   override fun getApexPackageNames(): Set<String> {
-    return LocalAppDataSource.apexPackageSet
+    return appDataSource.getApexPackageNames()
   }
 
   override fun startPackageChangeMonitoring(owner: LifecycleOwner) {
-    LocalAppDataSource.addLifecycleOwner(owner)
+    packageChangeObserver.start(owner, appDataSource::updateApplications)
   }
 
   override fun stopPackageChangeMonitoring(owner: LifecycleOwner) {
-    LocalAppDataSource.removeLifecycleOwner(owner)
+    packageChangeObserver.stop(owner)
   }
 
   override fun getPackageInfo(
