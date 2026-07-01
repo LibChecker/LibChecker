@@ -516,10 +516,14 @@ class AppListFragment :
             }
             flip(VF_LIST)
             isListReady = true
+            val initialItemViewStateCount = updatePlan.content.initialItemViewStates.size
+            if (initialItemViewStateCount > 0) {
+              notifyItemRangeChanged(0, initialItemViewStateCount.coerceAtMost(data.size))
+            }
             binding.list.doOnNextLayout {
               updateRemainingItemViewStates(
                 items = updatePlan.content.items,
-                initialItemViewStateCount = updatePlan.content.initialItemViewStates.size,
+                initialItemViewStateCount = initialItemViewStateCount,
                 packageStateSnapshot = updatePlan.content.packageStateSnapshot,
                 updateGeneration = generation
               )
