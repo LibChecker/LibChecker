@@ -168,6 +168,7 @@ class SnapshotAdapter(
           item.packageSizeDiff.old,
           item.packageSizeDiff.new
         )
+        var packageSizeBreakStart = -1
         val diffText = buildSpannedString {
           append(
             LCAppUtils.getDiffString(
@@ -202,15 +203,17 @@ class SnapshotAdapter(
             }
 
             if (diffSize != 0L) {
-              appendLine()
+              append(" ")
+              packageSizeBreakStart = length
               append(diffSizeText)
             }
           }
         }
 
-        packageSizeInfo.text = diffText
+        setPackageSizeText(diffText, packageSizeBreakStart)
       } else {
         packageSizeInfo.isGone = true
+        clearPackageSizeText()
       }
 
       val targetDiff = LCAppUtils.getDiffString(item.targetApiDiff, isNewOrDeleted, highlightDiffColor = highlightDiffColor).takeIf { item.targetApiDiff.old > 0 }

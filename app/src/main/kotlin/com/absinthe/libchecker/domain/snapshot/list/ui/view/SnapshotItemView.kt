@@ -8,6 +8,7 @@ import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.snapshot.ui.view.SnapshotPackageSizeLineBreaker
 import com.absinthe.libchecker.utils.extensions.applyCondensedSingleLine
 import com.absinthe.libchecker.utils.extensions.applySingleLineEndEllipsize
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -83,8 +84,13 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceLabelSmall))
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
       applyCondensedSingleLine()
+      setSingleLine(false)
+      setHorizontallyScrolling(false)
+      maxLines = Int.MAX_VALUE
+      ellipsize = null
       addView(this)
     }
+    private val packageSizeLineBreaker = SnapshotPackageSizeLineBreaker(packageSizeInfo)
 
     val apisInfo = AppCompatTextView(context).apply {
       layoutParams = LayoutParams(
@@ -126,6 +132,14 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       addView(this)
     }
 
+    fun setPackageSizeText(text: CharSequence, breakStart: Int) {
+      packageSizeLineBreaker.setText(text, breakStart)
+    }
+
+    fun clearPackageSizeText() {
+      packageSizeLineBreaker.clear()
+    }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
       super.onMeasure(widthMeasureSpec, heightMeasureSpec)
       children.forEach {
@@ -142,7 +156,8 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       if (versionInfo.measuredWidth > textWidth) {
         versionInfo.measure(textWidth.toExactlyMeasureSpec(), versionInfo.defaultHeightMeasureSpec(this))
       }
-      if (packageSizeInfo.measuredWidth > textWidth) {
+      if (packageSizeInfo.isVisible) {
+        packageSizeLineBreaker.apply(textWidth)
         packageSizeInfo.measure(textWidth.toExactlyMeasureSpec(), packageSizeInfo.defaultHeightMeasureSpec(this))
       }
       if (apisInfo.measuredWidth > textWidth) {

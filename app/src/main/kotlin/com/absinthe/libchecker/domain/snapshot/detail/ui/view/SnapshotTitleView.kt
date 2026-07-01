@@ -12,6 +12,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
+import com.absinthe.libchecker.domain.snapshot.ui.view.SnapshotPackageSizeLineBreaker
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.applyCondensedSingleLine
 import com.absinthe.libchecker.utils.extensions.applySingleLineEndEllipsize
@@ -77,8 +78,13 @@ class SnapshotTitleView(
     setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBodySmall))
     setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
     applyCondensedSingleLine()
+    setSingleLine(false)
+    setHorizontallyScrolling(false)
+    maxLines = Int.MAX_VALUE
+    ellipsize = null
     addView(this)
   }
+  private val packageSizeLineBreaker = SnapshotPackageSizeLineBreaker(packageSizeView)
 
   val apisView = AppCompatTextView(context).apply {
     layoutParams = LayoutParams(
@@ -99,6 +105,7 @@ class SnapshotTitleView(
         item.packageSizeDiff.new?.sizeToString(context)
       )
       val sizeDiffAppend = StringBuilder(LCAppUtils.getDiffString(sizeDiff, isNewOrDeleted))
+      var packageSizeBreakStart = -1
       if (item.packageSizeDiff.new != null) {
         val diffSize = item.packageSizeDiff.new - item.packageSizeDiff.old
         val diffSizeText = buildString {
@@ -107,15 +114,18 @@ class SnapshotTitleView(
         }
 
         if (diffSize != 0L) {
-          sizeDiffAppend.append(", $diffSizeText")
+          sizeDiffAppend.append(" ")
+          packageSizeBreakStart = sizeDiffAppend.length
+          sizeDiffAppend.append(diffSizeText)
         }
       }
       packageSizeView.apply {
-        text = sizeDiffAppend
+        packageSizeLineBreaker.setText(sizeDiffAppend, packageSizeBreakStart)
         setLongClickCopiedToClipboard(text)
       }
     } else {
       packageSizeView.isVisible = false
+      packageSizeLineBreaker.clear()
     }
   }
 
@@ -177,7 +187,8 @@ class SnapshotTitleView(
         versionInfoView.defaultHeightMeasureSpec(this)
       )
     }
-    if (packageSizeView.measuredWidth > textWidth) {
+    if (packageSizeView.isVisible) {
+      packageSizeLineBreaker.apply(textWidth)
       packageSizeView.measure(
         textWidth.toExactlyMeasureSpec(),
         packageSizeView.defaultHeightMeasureSpec(this)
