@@ -57,6 +57,7 @@ object Constants {
   const val PREF_CLOUD_RULES = "cloudRules"
   const val PREF_SNAPSHOT_KEEP = "snapshotKeep"
   const val PREF_GITHUB_API_TOKEN = "githubApiToken"
+  const val PREF_GITHUB_API_TOKEN_VERSION = "githubApiTokenVersion"
 
   const val PREF_LIB_SORT_MODE = "libSortMode"
   const val PREF_PROCESS_MODE = "processMode"

@@ -11,6 +11,7 @@ import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.constant.options.SnapshotOptions
 import com.absinthe.libchecker.domain.app.detail.ui.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.DateUtils
+import com.absinthe.libchecker.utils.GitHubTokenStore
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.SPDelegates
@@ -75,13 +76,53 @@ object GlobalValues {
 
   var preferredRuleLanguage: String by SPDelegates(Constants.PREF_RULE_LANGUAGE, "zh-Hans")
 
-  var githubApiToken: String by SPDelegates(Constants.PREF_GITHUB_API_TOKEN, String())
+  var githubApiTokenVersion: Int by SPDelegates(Constants.PREF_GITHUB_API_TOKEN_VERSION, 0)
 
-  val githubApiAuthorizationHeader: String?
+  var githubApiToken: String
+    get() {
+      val token = GitHubTokenStore.get()
+      if (token.isNotEmpty()) {
+        return token
+      }
+
+      val legacyToken = getPreferences()
+        .getString(Constants.PREF_GITHUB_API_TOKEN, null)
+        ?.trim()
+        .orEmpty()
+      if (legacyToken.isNotEmpty()) {
+        if (GitHubTokenStore.set(legacyToken)) {
+          getPreferences().edit { remove(Constants.PREF_GITHUB_API_TOKEN) }
+          return legacyToken
+        }
+        getPreferences().edit { remove(Constants.PREF_GITHUB_API_TOKEN) }
+        return String()
+      }
+      return String()
+    }
+    set(value) {
+      val token = value.trim()
+      if (token == githubApiToken) {
+        getPreferences().edit { remove(Constants.PREF_GITHUB_API_TOKEN) }
+        return
+      }
+
+      getPreferences().edit { remove(Constants.PREF_GITHUB_API_TOKEN) }
+      if (GitHubTokenStore.set(token)) {
+        githubApiTokenVersion += 1
+      }
+    }
+
+  private const val GITHUB_API_ROOT_URL = "https://api.github.com/"
+
+  private val githubApiAuthorizationHeader: String?
     get() = githubApiToken
       .trim()
       .takeIf { it.isNotEmpty() }
       ?.let { "Bearer $it" }
+
+  fun githubApiAuthorizationHeaderFor(url: String): String? {
+    return githubApiAuthorizationHeader.takeIf { url.startsWith(GITHUB_API_ROOT_URL) }
+  }
 
   val season by unsafeLazy { DateUtils.getCurrentSeason() }
 

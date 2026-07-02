@@ -103,6 +103,7 @@ class LibCheckerApp : Application() {
 
     Coil.setImageLoader {
       ImageLoader.Builder(this)
+        .crossfade(true)
         .components {
           add(AppIconKeyer())
           add(AppIconFetcher.Factory(40.dp, false, this@LibCheckerApp))

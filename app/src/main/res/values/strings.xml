@@ -80,7 +80,7 @@
   <string name="settings_github_token_summary_not_set">Not set</string>
   <string name="settings_github_token_summary_set">Set</string>
   <string name="settings_github_token_dialog_title">GitHub token</string>
-  <string name="settings_github_token_dialog_message">Used only for GitHub API requests to raise the rate limit.</string>
+  <string name="settings_github_token_dialog_message">Used only for official GitHub API requests and stored locally after encryption with a system-protected key. It is not exposed through any other path.</string>
   <string name="settings_github_token_dialog_hint">Personal access token</string>
   <string name="settings_github_token_clear">Clear</string>
   <string name="about_info">This app is used to view the third-party libraries used by applications in your device.</string>
@@ -91,6 +91,9 @@
   <!--  Settings  -->
   <string name="pref_group_normal">Normal</string>
   <string name="pref_group_others">Others</string>
+  <string name="pref_group_rules">Rules and network</string>
+  <string name="pref_group_data">Data and tools</string>
+  <string name="pref_group_about">About and support</string>
 
   <string name="apk_analytics">APK analytics</string>
   <string name="colorful_icon">Colorful icon</string>

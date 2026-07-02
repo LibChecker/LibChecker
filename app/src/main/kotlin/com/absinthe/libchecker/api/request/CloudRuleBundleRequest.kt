@@ -17,7 +17,11 @@ interface CloudRuleBundleRequest {
   @GET("cloud/md5/v$VERSION")
   suspend fun requestCloudRuleInfo(@Header("Referer") referer: String = BuildConfig.APPLICATION_ID): CloudRuleInfo?
 
-  @Headers("Accept: application/vnd.github.v3+json")
+  @Headers(
+    "Accept: application/vnd.github+json",
+    "X-GitHub-Api-Version: 2022-11-28",
+    "User-Agent: LibChecker"
+  )
   @GET(ApiManager.GITHUB_API_REPO_INFO)
   suspend fun requestRepoInfo(
     @Path("owner") owner: String,

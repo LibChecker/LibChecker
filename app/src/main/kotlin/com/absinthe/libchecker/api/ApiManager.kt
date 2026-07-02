@@ -44,6 +44,17 @@ object ApiManager {
       .connectTimeout(30, TimeUnit.SECONDS)
       .readTimeout(30, TimeUnit.SECONDS)
       .writeTimeout(30, TimeUnit.SECONDS)
+      .addInterceptor { chain ->
+        val request = chain.request()
+        val isOfficialGitHubApi =
+          request.url.scheme == "https" && request.url.host == "api.github.com"
+        val safeRequest = if (request.header("Authorization") != null && !isOfficialGitHubApi) {
+          request.newBuilder().removeHeader("Authorization").build()
+        } else {
+          request
+        }
+        chain.proceed(safeRequest)
+      }
       .addInterceptor(AndroidDevelopersInterceptor())
       .build()
   }

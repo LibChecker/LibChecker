@@ -39,8 +39,8 @@ class DevelopersDialogFragment : BaseBottomSheetViewDialogFragment<DevelopersDia
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    val authorization = GlobalValues.githubApiAuthorizationHeader
-    val tokenCacheKey = GlobalValues.githubApiToken.toTokenCacheKey()
+    val authorization = GlobalValues.githubApiAuthorizationHeaderFor(ApiManager.GITHUB_API_REPO_CONTRIBUTORS)
+    val tokenCacheKey = GlobalValues.githubApiTokenVersion.toString()
     val cached = cachedItems
     if (cached != null) {
       root.setItems(cached.items)
@@ -184,14 +184,6 @@ class DevelopersDialogFragment : BaseBottomSheetViewDialogFragment<DevelopersDia
     } else {
       Timber.e(this)
     }
-  }
-
-  private fun String.toTokenCacheKey(): String {
-    return trim()
-      .takeIf { it.isNotEmpty() }
-      ?.hashCode()
-      ?.toString()
-      .orEmpty()
   }
 
   private fun GitHubContributorResp.isBot(): Boolean {

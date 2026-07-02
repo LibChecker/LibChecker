@@ -74,7 +74,7 @@
   <string name="settings_github_token_summary_not_set">未设置</string>
   <string name="settings_github_token_summary_set">已设置</string>
   <string name="settings_github_token_dialog_title">GitHub 令牌</string>
-  <string name="settings_github_token_dialog_message">仅用于 GitHub API 请求，以提高访问频率限制。</string>
+  <string name="settings_github_token_dialog_message">令牌只用于 GitHub 官方 API 请求，并以系统密钥加密后保存在本机；不会被任何其他途径获取到。</string>
   <string name="settings_github_token_dialog_hint">个人访问令牌</string>
   <string name="settings_github_token_clear">清除</string>
   <string name="about_info">本应用用来查看设备上的应用使用到的第三方库的情况。</string>
@@ -84,6 +84,9 @@
   <!--  Settings  -->
   <string name="pref_group_normal">常规</string>
   <string name="pref_group_others">其它</string>
+  <string name="pref_group_rules">规则与网络</string>
+  <string name="pref_group_data">数据与工具</string>
+  <string name="pref_group_about">关于与支持</string>
   <string name="apk_analytics">APK 分析</string>
   <string name="colorful_icon">多彩图标</string>
   <string name="rules_repo_title">规则仓库</string>

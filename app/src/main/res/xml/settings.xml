@@ -6,28 +6,6 @@
     app:key="normalCategory"
     app:title="@string/pref_group_normal">
 
-    <androidx.preference.SwitchPreferenceCompat
-      app:defaultValue="true"
-      app:icon="@drawable/ic_apk_analytics"
-      app:key="apkAnalytics"
-      app:summary="@string/apk_analytics_summary"
-      app:title="@string/apk_analytics" />
-
-    <androidx.preference.SwitchPreferenceCompat
-      app:defaultValue="true"
-      app:icon="@drawable/ic_color_palette"
-      app:key="colorfulIcon"
-      app:summary="@string/colorful_icon_summary"
-      app:title="@string/colorful_icon" />
-
-    <ListPreference
-      app:defaultValue="notify"
-      app:entries="@array/snapshot_keep"
-      app:entryValues="@array/snapshot_keep_value"
-      app:icon="@drawable/ic_outline_save"
-      app:key="snapshotKeep"
-      app:title="@string/snapshot_keep" />
-
     <ListPreference
       app:defaultValue="system"
       app:entries="@array/list_dark_mode"
@@ -37,14 +15,6 @@
       app:title="@string/dark_mode" />
 
     <ListPreference
-      app:defaultValue="gitlab"
-      app:entries="@array/list_repo"
-      app:entryValues="@array/list_repo_value"
-      app:icon="@drawable/ic_repository"
-      app:key="rulesRepository"
-      app:title="@string/rules_repo_title" />
-
-    <ListPreference
       app:defaultValue="SYSTEM"
       app:entries="@array/language"
       app:entryValues="@array/language_value"
@@ -52,17 +22,65 @@
       app:key="locale"
       app:title="@string/languages" />
 
-    <Preference
-      app:icon="@drawable/ic_cloud_rules"
-      app:key="cloudRules"
-      app:summary="@string/cloud_rules_summary"
-      app:title="@string/cloud_rules" />
+    <androidx.preference.SwitchPreferenceCompat
+      app:defaultValue="true"
+      app:icon="@drawable/ic_color_palette"
+      app:key="colorfulIcon"
+      app:summary="@string/colorful_icon_summary"
+      app:title="@string/colorful_icon" />
+
+    <androidx.preference.SwitchPreferenceCompat
+      app:defaultValue="true"
+      app:icon="@drawable/ic_apk_analytics"
+      app:key="apkAnalytics"
+      app:summary="@string/apk_analytics_summary"
+      app:title="@string/apk_analytics" />
+
+    <ListPreference
+      app:defaultValue="notify"
+      app:entries="@array/snapshot_keep"
+      app:entryValues="@array/snapshot_keep_value"
+      app:icon="@drawable/ic_outline_save"
+      app:key="snapshotKeep"
+      app:title="@string/snapshot_keep" />
 
     <Preference
       app:icon="@drawable/ic_threshold"
       app:key="libRefThreshold"
       app:summary="@string/lib_ref_threshold_summary"
       app:title="@string/lib_ref_threshold" />
+
+  </PreferenceCategory>
+
+  <PreferenceCategory
+    app:key="rulesCategory"
+    app:title="@string/pref_group_rules">
+
+    <ListPreference
+      app:defaultValue="gitlab"
+      app:entries="@array/list_repo"
+      app:entryValues="@array/list_repo_value"
+      app:icon="@drawable/ic_repository"
+      app:key="rulesRepository"
+      app:title="@string/rules_repo_title" />
+
+    <Preference
+      app:icon="@drawable/ic_github"
+      app:key="githubApiToken"
+      app:summary="@string/settings_github_token_summary_not_set"
+      app:title="@string/settings_github_token" />
+
+    <Preference
+      app:icon="@drawable/ic_cloud_rules"
+      app:key="cloudRules"
+      app:summary="@string/cloud_rules_summary"
+      app:title="@string/cloud_rules" />
+
+  </PreferenceCategory>
+
+  <PreferenceCategory
+    app:key="dataCategory"
+    app:title="@string/pref_group_data">
 
     <Preference
       app:icon="@drawable/ic_refresh"
@@ -71,30 +89,22 @@
       app:title="@string/reload_apps" />
 
     <Preference
-      app:icon="@drawable/ic_log"
-      app:key="exportLog"
-      app:summary="@string/export_log_summary"
-      app:title="@string/export_log" />
-
-    <Preference
       app:icon="@drawable/ic_app_list"
       app:key="exportApps"
       app:summary="@string/export_apps_webui_tip"
       app:title="@string/export_apps" />
 
+    <Preference
+      app:icon="@drawable/ic_log"
+      app:key="exportLog"
+      app:summary="@string/export_log_summary"
+      app:title="@string/export_log" />
+
   </PreferenceCategory>
 
   <PreferenceCategory
-    app:key="othersCategory"
-    app:title="@string/pref_group_others">
-
-    <Preference
-      app:icon="@drawable/ic_logo"
-      app:key="about"
-      app:summary="@string/settings_about_summary"
-      app:title="@string/settings_about">
-
-    </Preference>
+    app:key="aboutCategory"
+    app:title="@string/pref_group_about">
 
     <Preference
       app:icon="@drawable/ic_upgrade"
@@ -105,16 +115,10 @@
     </Preference>
 
     <Preference
-      app:icon="@drawable/ic_github"
-      app:key="githubApiToken"
-      app:summary="@string/settings_github_token_summary_not_set"
-      app:title="@string/settings_github_token" />
-
-    <Preference
-      app:icon="@drawable/ic_translate"
-      app:key="translation"
-      app:summary="@string/settings_translate_summary"
-      app:title="@string/settings_translate">
+      app:icon="@drawable/ic_logo"
+      app:key="about"
+      app:summary="@string/settings_about_summary"
+      app:title="@string/settings_about">
 
     </Preference>
 
@@ -123,6 +127,14 @@
       app:key="help"
       app:summary="@string/help_docs_summary"
       app:title="@string/help_docs">
+
+    </Preference>
+
+    <Preference
+      app:icon="@drawable/ic_translate"
+      app:key="translation"
+      app:summary="@string/settings_translate_summary"
+      app:title="@string/settings_translate">
 
     </Preference>
 
