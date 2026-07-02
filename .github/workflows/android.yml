@@ -123,12 +123,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: Download Foss APK
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: Foss
           path: artifacts/foss
       - name: Download Market APK
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: Market
           path: artifacts/market
