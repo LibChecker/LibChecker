@@ -24,6 +24,7 @@ object ApiManager {
     "https://github.com/LibChecker/LibChecker-Rules/issues/new?labels=&template=submit_new_rule.yml"
 
   const val GITHUB_API_REPO_INFO = "https://api.github.com/repos/{owner}/{repo}"
+  const val GITHUB_API_REPO_CONTRIBUTORS = "https://api.github.com/repos/{owner}/{repo}/contributors"
 
   const val ANDROID_VERSION_DISTRIBUTION_URL = "https://dl.google.com/android/studio/metadata/distributions.json"
 

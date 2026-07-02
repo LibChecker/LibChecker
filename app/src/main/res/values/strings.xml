@@ -76,6 +76,13 @@
   <string name="settings_get_updates_in_app">In-app</string>
   <string name="settings_get_updates_in_app_chip_stable">Stable</string>
   <string name="settings_get_updates_in_app_chip_ci">CI</string>
+  <string name="settings_github_token">GitHub token</string>
+  <string name="settings_github_token_summary_not_set">Not set</string>
+  <string name="settings_github_token_summary_set">Set</string>
+  <string name="settings_github_token_dialog_title">GitHub token</string>
+  <string name="settings_github_token_dialog_message">Used only for GitHub API requests to raise the rate limit.</string>
+  <string name="settings_github_token_dialog_hint">Personal access token</string>
+  <string name="settings_github_token_clear">Clear</string>
   <string name="about_info">This app is used to view the third-party libraries used by applications in your device.</string>
   <string name="toolbar_rate">Rate</string>
   <string name="resource_declaration">Part of the resources in the application comes from: </string>

@@ -6,6 +6,7 @@ import android.widget.LinearLayout
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import coil.load
+import coil.request.CachePolicy
 import coil.transform.CircleCropTransformation
 import com.absinthe.libchecker.domain.about.model.DeveloperInfo
 import com.absinthe.libchecker.domain.about.ui.view.DeveloperItemView
@@ -29,7 +30,14 @@ class DeveloperInfoAdapter : BaseQuickAdapter<DeveloperInfo, BaseViewHolder>(0) 
 
   override fun convert(holder: BaseViewHolder, item: DeveloperInfo) {
     (holder.itemView as DeveloperItemView).apply {
+      val avatarCacheKey = item.avatarCacheKey()
       container.icon.load(item.avatarUrl) {
+        memoryCacheKey(avatarCacheKey)
+        diskCacheKey(avatarCacheKey)
+        placeholderMemoryCacheKey(avatarCacheKey)
+        memoryCachePolicy(CachePolicy.ENABLED)
+        diskCachePolicy(CachePolicy.ENABLED)
+        networkCachePolicy(CachePolicy.ENABLED)
         transformations(CircleCropTransformation())
       }
       container.name.text = item.name
@@ -54,5 +62,9 @@ class DeveloperInfoAdapter : BaseQuickAdapter<DeveloperInfo, BaseViewHolder>(0) 
         }
       }
     }
+  }
+
+  private fun DeveloperInfo.avatarCacheKey(): String {
+    return "developer_avatar:$avatarUrl"
   }
 }

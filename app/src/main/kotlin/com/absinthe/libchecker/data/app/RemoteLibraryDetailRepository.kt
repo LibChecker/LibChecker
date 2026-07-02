@@ -18,7 +18,11 @@ object RemoteLibraryDetailRepository : LibraryDetailRepository {
 
   override suspend fun getRepoPushedAt(owner: String, repo: String): String? {
     return runCatching {
-      cloudRuleBundleRequest.requestRepoInfo(owner, repo)?.pushedAt
+      cloudRuleBundleRequest.requestRepoInfo(
+        owner = owner,
+        repo = repo,
+        authorization = GlobalValues.githubApiAuthorizationHeader
+      )?.pushedAt
     }.onFailure {
       if (it is HttpException) {
         GlobalValues.isGitHubReachable = false
