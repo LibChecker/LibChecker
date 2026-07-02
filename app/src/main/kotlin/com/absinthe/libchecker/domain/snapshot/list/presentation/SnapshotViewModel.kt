@@ -133,7 +133,7 @@ class SnapshotViewModel(
     snapshotDetailSectionsFlow.emit(snapshotListWorkflow.buildSnapshotDetailSections(entity))
   }
 
-  fun getTimeStamps(): List<TimeStampItem> {
+  suspend fun getTimeStamps(): List<TimeStampItem> {
     return snapshotListWorkflow.getTimeStamps()
   }
 

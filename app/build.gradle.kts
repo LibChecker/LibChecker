@@ -6,6 +6,7 @@ plugins {
   alias(libs.plugins.protobuf)
   alias(libs.plugins.hiddenApiRefine)
   alias(libs.plugins.ksp)
+  alias(libs.plugins.androidX.room3)
   alias(libs.plugins.moshiX)
   alias(libs.plugins.aboutlibraries)
   alias(libs.plugins.gms)
@@ -16,16 +17,17 @@ plugins {
 
 ksp {
   arg("moshi.generated", "javax.annotation.Generated")
-  arg("room.generateKotlin", "true")
-  arg("room.incremental", "true")
-  arg("room.schemaLocation", "$projectDir/schemas")
-  arg("room.expandProjection", "true")
+}
+
+room3 {
+  schemaDirectory("$projectDir/schemas")
 }
 
 setupAppModule {
   namespace = "com.absinthe.libchecker"
   defaultConfig {
     applicationId = "com.absinthe.libchecker"
+    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 
   buildFeatures {
@@ -134,9 +136,8 @@ dependencies {
   implementation(libs.androidX.recyclerView)
   implementation(libs.androidX.preference)
   implementation(libs.androidX.window)
-  implementation(libs.androidX.security)
   implementation(libs.bundles.androidX.lifecycle)
-  implementation(libs.bundles.androidX.room)
+  implementation(libs.bundles.androidX.room3)
   implementation(libs.google.material)
   implementation(libs.coil)
   implementation(libs.square.okHttp)
@@ -151,7 +152,10 @@ dependencies {
   implementation(libs.lc.rules)
   // implementation(files("libs/library-release.aar"))
 
-  ksp(libs.androidX.room.compiler)
+  ksp(libs.androidX.room3.compiler)
+
+  androidTestImplementation(libs.androidX.test.ext.junit)
+  androidTestImplementation(libs.androidX.test.runner)
 
   implementation(libs.aboutlibraries.core)
   implementation(libs.aboutlibraries.ui)

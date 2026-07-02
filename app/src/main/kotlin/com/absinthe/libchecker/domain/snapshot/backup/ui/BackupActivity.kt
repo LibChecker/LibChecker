@@ -348,7 +348,11 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
           ) { result ->
             dialog.dismiss()
             when (result) {
-              SnapshotBackupViewModel.RestoreBackupResult.DatabaseBackup -> Unit
+              is SnapshotBackupViewModel.RestoreBackupResult.DatabaseBackup -> {
+                if (result.success.not()) {
+                  context?.showToast("Backup file error")
+                }
+              }
 
               is SnapshotBackupViewModel.RestoreBackupResult.ArchiveBackup -> {
                 val summary = result.summary

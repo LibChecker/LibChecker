@@ -176,7 +176,7 @@ class SnapshotComparisonViewModel(
     inputs = inputs.selectArchive(side, uri)
   }
 
-  fun getTimeStamps(): List<TimeStampItem> {
+  suspend fun getTimeStamps(): List<TimeStampItem> {
     return snapshotLibrary.getTimeStamps()
   }
 

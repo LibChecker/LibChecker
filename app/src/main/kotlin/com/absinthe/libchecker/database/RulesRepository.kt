@@ -15,9 +15,9 @@ import com.absinthe.libchecker.utils.extensions.md5
 import com.absinthe.libchecker.utils.extensions.toClassDefType
 import com.absinthe.rulesbundle.LCRemoteRepo
 import com.absinthe.rulesbundle.LCRules
-import com.absinthe.rulesbundle.Repositories as RulesBundleRepo
 import com.absinthe.rulesbundle.Rule
 import java.io.File
+import java.util.Properties
 import rikka.core.os.FileUtils as RikkaFileUtils
 import timber.log.Timber
 
@@ -25,12 +25,20 @@ object RulesRepository {
 
   private const val MISSING_RULES_TABLE_MESSAGE = "no such table: rules_table"
   private const val RECOVERY_THROTTLE_MS = 2_000L
+  private const val LEGACY_RULES_DATABASE_NAME = "lcrules_database"
+  private const val LOCAL_RULES_VERSION_FILE = "lcrules/version"
+  private const val RULE_STORE_DIRECTORY_NAME = "lcrules"
+  private const val RULE_STORE_FILE_EXTENSION = ".db"
+  private const val RULE_STORE_FILE_PREFIX = "rules-v"
   private const val RULES_DB_FILE_NAME = "rules.db"
+  private const val RULES_VERSION_ASSET_PATH = "lcrules/version.prop"
+  private const val RULES_VERSION_PROPERTY = "version"
 
   private val recoveryLock = Any()
   private var lastRecoveryUptime = 0L
 
   fun init(context: Context) {
+    migrateLegacyDatabaseIfNeeded(context)
     LCRules.init(context)
     setRemoteRepo(GlobalValues.repo)
   }
@@ -42,24 +50,30 @@ object RulesRepository {
   fun setRemoteRepo(repo: String) {
     LCRules.setRemoteRepo(
       if (repo == Constants.REPO_GITHUB) {
-        LCRemoteRepo.Github
+        LCRemoteRepo.GitHub
       } else {
-        LCRemoteRepo.Gitlab
+        LCRemoteRepo.GitLab
       }
     )
   }
 
   fun getLocalVersion(context: Context): Int {
-    return RulesBundleRepo.getLocalRulesVersion(context)
+    return getStoredLocalVersion(context) ?: getBundledVersion(context)
   }
 
   fun setLocalVersion(context: Context, version: Int) {
-    RulesBundleRepo.setLocalRulesVersion(context, version)
+    val localVersionDir = File(context.filesDir, LOCAL_RULES_VERSION_FILE)
+    if (!localVersionDir.isDirectory) {
+      localVersionDir.delete()
+    }
+    if (!localVersionDir.exists()) {
+      localVersionDir.mkdirs()
+    }
+    File(localVersionDir, version.toString()).createNewFile()
   }
 
   fun getDatabaseFile(context: Context = LibCheckerApp.app): File {
-    val databaseDir = context.getDatabasePath(RulesBundleRepo.RULES_DATABASE_NAME).parent
-    return File(databaseDir, RulesBundleRepo.RULES_DATABASE_NAME)
+    return File(getRuleStoreDirectory(context), "$RULE_STORE_FILE_PREFIX${getBundledVersion(context)}$RULE_STORE_FILE_EXTENSION")
   }
 
   fun getDownloadFile(context: Context): File {
@@ -67,18 +81,17 @@ object RulesRepository {
   }
 
   fun replaceDatabase(source: File, context: Context = LibCheckerApp.app): Boolean {
-    LCRules.closeDb()
+    LCRules.close()
     deleteDatabase(context)
     val target = getDatabaseFile(context)
+    target.parentFile?.mkdirs()
     RikkaFileUtils.copy(source, target)
     return target.md5() == source.md5()
   }
 
   fun deleteDatabase(context: Context = LibCheckerApp.app) {
-    val databaseDir = context.getDatabasePath(RulesBundleRepo.RULES_DATABASE_NAME).parent
-    FileUtils.delete(File(databaseDir, RulesBundleRepo.RULES_DATABASE_NAME))
-    FileUtils.delete(File(databaseDir, "${RulesBundleRepo.RULES_DATABASE_NAME}-shm"))
-    FileUtils.delete(File(databaseDir, "${RulesBundleRepo.RULES_DATABASE_NAME}-wal"))
+    deleteDatabaseFiles(getDatabaseFile(context))
+    deleteDatabaseFiles(getLegacyDatabaseFile(context))
   }
 
   fun isMissingRulesTableStack(stack: String): Boolean {
@@ -237,5 +250,59 @@ object RulesRepository {
       deleteDatabase()
       reinitialize()
     }
+  }
+
+  private fun migrateLegacyDatabaseIfNeeded(context: Context) {
+    val source = getLegacyDatabaseFile(context)
+    val target = getDatabaseFile(context)
+    val localVersion = getStoredLocalVersion(context) ?: return
+    if (localVersion < getBundledVersion(context) || target.exists() || !source.exists() || source.length() == 0L) {
+      return
+    }
+
+    runCatching {
+      target.parentFile?.mkdirs()
+      RikkaFileUtils.copy(source, target)
+    }.onFailure {
+      FileUtils.delete(target)
+      Timber.w(it, "Failed to migrate legacy rules database.")
+    }
+  }
+
+  private fun getLegacyDatabaseFile(context: Context): File {
+    return context.getDatabasePath(LEGACY_RULES_DATABASE_NAME)
+  }
+
+  private fun getRuleStoreDirectory(context: Context): File {
+    return File(context.noBackupFilesDir, RULE_STORE_DIRECTORY_NAME)
+  }
+
+  private fun getStoredLocalVersion(context: Context): Int? {
+    val localVersionDir = File(context.filesDir, LOCAL_RULES_VERSION_FILE)
+    if (!localVersionDir.isDirectory) {
+      return null
+    }
+    return localVersionDir.listFiles()
+      ?.mapNotNull { it.name.toIntOrNull() }
+      ?.maxOrNull()
+  }
+
+  private fun getBundledVersion(context: Context): Int {
+    LCRules.getVersion().takeIf { it > 0 }?.let { return it }
+    return readBundledVersion(context)
+  }
+
+  private fun readBundledVersion(context: Context): Int {
+    return runCatching {
+      context.assets.open(RULES_VERSION_ASSET_PATH).use {
+        Properties().apply { load(it) }
+      }.getProperty(RULES_VERSION_PROPERTY)?.toIntOrNull()
+    }.getOrNull() ?: 0
+  }
+
+  private fun deleteDatabaseFiles(databaseFile: File) {
+    FileUtils.delete(databaseFile)
+    FileUtils.delete(File("${databaseFile.path}-shm"))
+    FileUtils.delete(File("${databaseFile.path}-wal"))
   }
 }

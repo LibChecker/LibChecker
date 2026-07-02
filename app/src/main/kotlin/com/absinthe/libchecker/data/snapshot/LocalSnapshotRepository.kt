@@ -17,7 +17,7 @@ class LocalSnapshotRepository(
   override val currentSnapshotCount: Flow<Int> =
     repository.getSnapshotsCountFlow(selectionRepository.currentTimestamp)
 
-  override fun getTimeStamps(): List<TimeStampItem> {
+  override suspend fun getTimeStamps(): List<TimeStampItem> {
     return repository.getTimeStamps()
   }
 

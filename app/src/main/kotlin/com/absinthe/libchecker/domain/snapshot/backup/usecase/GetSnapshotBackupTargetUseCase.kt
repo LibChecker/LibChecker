@@ -12,7 +12,7 @@ class GetSnapshotBackupTargetUseCase(
   private val snapshotRepository: SnapshotRepository
 ) {
 
-  operator fun invoke(): SnapshotBackupTarget {
+  suspend operator fun invoke(): SnapshotBackupTarget {
     if (snapshotRepository.getTimeStamps().isEmpty()) {
       return SnapshotBackupTarget.Empty
     }

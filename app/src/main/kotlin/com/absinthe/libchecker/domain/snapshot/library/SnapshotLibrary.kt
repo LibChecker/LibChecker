@@ -8,7 +8,7 @@ class SnapshotLibrary(
   private val repository: SnapshotRepository
 ) {
 
-  fun getTimeStamps(): List<TimeStampItem> {
+  suspend fun getTimeStamps(): List<TimeStampItem> {
     return repository.getTimeStamps()
   }
 

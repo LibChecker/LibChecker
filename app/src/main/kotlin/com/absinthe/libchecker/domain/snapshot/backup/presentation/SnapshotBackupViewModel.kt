@@ -7,6 +7,7 @@ import com.absinthe.libchecker.database.backup.RoomBackup
 import com.absinthe.libchecker.domain.snapshot.backup.archive.SnapshotArchiveUseCase
 import com.absinthe.libchecker.domain.snapshot.backup.model.SnapshotBackupTarget
 import com.absinthe.libchecker.domain.snapshot.backup.repository.SnapshotDatabaseBackupExportResult
+import com.absinthe.libchecker.domain.snapshot.backup.repository.SnapshotDatabaseBackupRestoreResult
 import com.absinthe.libchecker.domain.snapshot.backup.usecase.BackupSnapshotArchiveToUriUseCase
 import com.absinthe.libchecker.domain.snapshot.backup.usecase.BuildSnapshotRestorePlanUseCase
 import com.absinthe.libchecker.domain.snapshot.backup.usecase.CreateSnapshotDatabaseBackupUseCase
@@ -65,8 +66,8 @@ class SnapshotBackupViewModel(
     roomBackup: RoomBackup,
     uri: Uri,
     cacheDir: File
-  ) {
-    runCatching {
+  ): SnapshotDatabaseBackupRestoreResult? {
+    return runCatching {
       restoreSnapshotDatabaseBackupUseCaseFactory(roomBackup)(uri, cacheDir)
     }.onSuccess { result ->
       result?.let {
@@ -76,7 +77,7 @@ class SnapshotBackupViewModel(
       }
     }.onFailure {
       Timber.e(it)
-    }
+    }.getOrNull()
   }
 
   fun restoreBackup(
@@ -88,8 +89,8 @@ class SnapshotBackupViewModel(
     viewModelScope.launch(Dispatchers.IO) {
       val result = when (getRestorePlan(uri)) {
         SnapshotRestorePlan.DatabaseBackup -> {
-          restoreDatabaseBackup(roomBackup, uri, cacheDir)
-          RestoreBackupResult.DatabaseBackup
+          val result = restoreDatabaseBackup(roomBackup, uri, cacheDir)
+          RestoreBackupResult.DatabaseBackup(success = result?.success == true)
         }
 
         SnapshotRestorePlan.ArchiveBackup -> RestoreBackupResult.ArchiveBackup(restoreArchive(uri))
@@ -134,10 +135,10 @@ class SnapshotBackupViewModel(
     )
   }
 
-  private fun getRestorePlan(uri: Uri): SnapshotRestorePlan = buildSnapshotRestorePlanUseCase(uri)
+  private suspend fun getRestorePlan(uri: Uri): SnapshotRestorePlan = buildSnapshotRestorePlanUseCase(uri)
 
   sealed interface RestoreBackupResult {
-    data object DatabaseBackup : RestoreBackupResult
+    data class DatabaseBackup(val success: Boolean) : RestoreBackupResult
 
     data class ArchiveBackup(
       val summary: ArchiveRestoreSummary?
