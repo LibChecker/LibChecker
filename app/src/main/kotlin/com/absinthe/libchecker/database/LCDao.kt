@@ -1,12 +1,13 @@
 package com.absinthe.libchecker.database
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Transaction
-import androidx.room.Update
+import androidx.room3.Dao
+import androidx.room3.Delete
+import androidx.room3.Insert
+import androidx.room3.OnConflictStrategy
+import androidx.room3.Query
+import androidx.room3.Transaction
+import androidx.room3.Update
+import androidx.room3.Upsert
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.SnapshotDiffStoringItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
@@ -44,16 +45,16 @@ interface LCDao {
   suspend fun delete(item: LCItem)
 
   @Query("DELETE FROM item_table WHERE packageName = :packageName")
-  fun deleteLCItemByPackageName(packageName: String)
+  suspend fun deleteLCItemByPackageName(packageName: String)
 
   @Query("DELETE FROM item_table")
-  fun deleteAllItems()
+  suspend fun deleteAllItems()
 
   @Query("UPDATE item_table SET features = :features WHERE packageName = :packageName")
-  fun updateFeatures(packageName: String, features: Int)
+  suspend fun updateFeatures(packageName: String, features: Int)
 
   @Transaction
-  fun updateFeatures(map: Map<String, Int>) {
+  suspend fun updateFeatures(map: Map<String, Int>) {
     map.forEach { updateFeatures(it.key, it.value) }
   }
 
@@ -81,10 +82,10 @@ interface LCDao {
   @Query("SELECT COUNT(*) from snapshot_table WHERE timeStamp LIKE :timestamp")
   fun getSnapshotsCountFlow(timestamp: Long): Flow<Int>
 
-  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  @Upsert
   suspend fun insert(item: SnapshotItem)
 
-  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  @Upsert
   suspend fun insertSnapshots(items: List<SnapshotItem>)
 
   @Update
@@ -102,28 +103,28 @@ interface LCDao {
 
   @Transaction
   @Query("DELETE FROM snapshot_table")
-  fun deleteAllSnapshots()
+  suspend fun deleteAllSnapshots()
 
   @Transaction
   @Query("DELETE FROM snapshot_table WHERE timeStamp = :timestamp")
-  fun deleteSnapshots(timestamp: Long)
+  suspend fun deleteSnapshots(timestamp: Long)
 
   @Transaction
   @Delete
-  fun deleteSnapshots(list: List<SnapshotItem>)
+  suspend fun deleteSnapshots(list: List<SnapshotItem>)
 
   // TimeStamp Table
-  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  @Upsert
   suspend fun insert(item: TimeStampItem)
 
   @Query("SELECT * from timestamp_table ORDER BY timestamp DESC")
-  fun getTimeStamps(): List<TimeStampItem>
+  suspend fun getTimeStamps(): List<TimeStampItem>
 
   @Query("SELECT * from timestamp_table WHERE timeStamp LIKE :timestamp")
   suspend fun getTimeStamp(timestamp: Long): TimeStampItem?
 
   @Delete
-  fun delete(item: TimeStampItem)
+  suspend fun delete(item: TimeStampItem)
 
   @Query("DELETE from timestamp_table WHERE timestamp LIKE :timestamp")
   suspend fun deleteByTimeStamp(timestamp: Long)
@@ -142,7 +143,7 @@ interface LCDao {
   suspend fun getTrackItems(): List<TrackItem>
 
   // Diff
-  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  @Upsert
   suspend fun insertSnapshotDiff(item: SnapshotDiffStoringItem)
 
   @Update
@@ -152,7 +153,7 @@ interface LCDao {
   suspend fun deleteSnapshotDiff(packageName: String)
 
   @Query("DELETE FROM diff_table")
-  fun deleteAllSnapshotDiffItems()
+  suspend fun deleteAllSnapshotDiffItems()
 
   @Query("SELECT * from diff_table WHERE packageName LIKE :packageName")
   suspend fun getSnapshotDiff(packageName: String): SnapshotDiffStoringItem?

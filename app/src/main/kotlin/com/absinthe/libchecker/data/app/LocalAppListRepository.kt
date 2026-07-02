@@ -23,7 +23,7 @@ class LocalAppListRepository(
     return lcRepository.getUninitializedFeaturePackageNames()
   }
 
-  override fun clearItems() {
+  override suspend fun clearItems() {
     lcRepository.deleteAllItems()
   }
 
@@ -39,15 +39,15 @@ class LocalAppListRepository(
     lcRepository.update(item)
   }
 
-  override fun updateFeatures(packageName: String, features: Int) {
+  override suspend fun updateFeatures(packageName: String, features: Int) {
     lcRepository.updateFeatures(packageName, features)
   }
 
-  override fun updateFeatures(featuresMap: Map<String, Int>) {
+  override suspend fun updateFeatures(featuresMap: Map<String, Int>) {
     lcRepository.updateFeatures(featuresMap)
   }
 
-  override fun deleteItemByPackageName(packageName: String) {
+  override suspend fun deleteItemByPackageName(packageName: String) {
     lcRepository.deleteLCItemByPackageName(packageName)
   }
 }

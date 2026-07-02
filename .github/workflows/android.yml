@@ -25,9 +25,12 @@ on:
       - 'NOTICE'
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'workflow_dispatch' && github.run_id || github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
+
 env:
   APP_CENTER_SECRET: ${{secrets.APP_CENTER_SECRET}}
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE20: true
 
 jobs:
   check:
@@ -36,15 +39,13 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
-      - name: Skip duplicate actions
-        uses: fkirc/skip-duplicate-actions@v5
-        with:
-          cancel_others: true
       - uses: actions/setup-java@v5
         with:
           distribution: 'zulu'
           java-version: 25
       - uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
       - name: Test Telegram notification script
         run: python3 .github/scripts/test_build_telegram_notification.py
       - run: ./gradlew --non-interactive spotlessCheck
@@ -63,7 +64,7 @@ jobs:
           java-version: 25
       - uses: gradle/actions/setup-gradle@v6
         with:
-          cache-encryption-key: Da25KUVSE5jbGds2zXmfXw==
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
       - name: Detect dev version
         id: version-check
         run: |

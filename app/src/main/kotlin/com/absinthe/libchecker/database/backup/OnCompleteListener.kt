@@ -52,7 +52,7 @@ interface OnCompleteListener {
     /** Cannot encrypt database backup */
     const val EXIT_CODE_ERROR_ENCRYPTION_ERROR = 8
 
-    /** You tried to restore a encrypted backup but [RoomBackup.backupIsEncrypted] is set to false */
+    /** Restore input is encrypted, but encrypted database backups are no longer supported */
     const val EXIT_CODE_ERROR_RESTORE_BACKUP_IS_ENCRYPTED = 9
 
     /** No backups to restore are available in internal/external storage */

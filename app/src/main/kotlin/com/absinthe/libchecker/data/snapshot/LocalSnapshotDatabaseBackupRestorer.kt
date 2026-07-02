@@ -1,6 +1,6 @@
 package com.absinthe.libchecker.data.snapshot
 
-import androidx.room.RoomDatabase
+import androidx.room3.RoomDatabase
 import com.absinthe.libchecker.database.backup.RoomBackup
 import com.absinthe.libchecker.domain.snapshot.backup.repository.SnapshotDatabaseBackupRestoreResult
 import com.absinthe.libchecker.domain.snapshot.backup.repository.SnapshotDatabaseBackupRestorer
@@ -11,6 +11,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 
 class LocalSnapshotDatabaseBackupRestorer(
   private val roomBackup: RoomBackup,
+  private val databaseName: String,
   private val database: () -> RoomDatabase
 ) : SnapshotDatabaseBackupRestorer {
 
@@ -27,7 +28,7 @@ class LocalSnapshotDatabaseBackupRestorer(
 
       try {
         roomBackup
-          .database(database())
+          .database(database(), databaseName)
           .enableLogDebug(true)
           .backupLocation(RoomBackup.BACKUP_FILE_LOCATION_CUSTOM_FILE)
           .backupLocationCustomFile(backupFile)

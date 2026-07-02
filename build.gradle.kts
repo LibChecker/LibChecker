@@ -6,6 +6,7 @@ plugins {
   alias(libs.plugins.protobuf) apply false
   alias(libs.plugins.hiddenApiRefine) apply false
   alias(libs.plugins.ksp) apply false
+  alias(libs.plugins.androidX.room3) apply false
   alias(libs.plugins.moshiX) apply false
   alias(libs.plugins.spotless) apply false
   alias(libs.plugins.aboutlibraries) apply false

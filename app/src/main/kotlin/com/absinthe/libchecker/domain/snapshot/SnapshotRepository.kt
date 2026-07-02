@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 interface SnapshotRepository {
   val currentSnapshotCount: Flow<Int>
 
-  fun getTimeStamps(): List<TimeStampItem>
+  suspend fun getTimeStamps(): List<TimeStampItem>
   suspend fun getTimeStamp(timestamp: Long): TimeStampItem?
   suspend fun getSnapshots(timestamp: Long): List<SnapshotItem>
   suspend fun getSnapshot(timestamp: Long, packageName: String): SnapshotItem?

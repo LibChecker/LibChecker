@@ -31,13 +31,14 @@ val snapshotBackupModule = module {
   single<SnapshotArchiveCodec> { ProtoSnapshotArchiveCodec() }
 
   factory { SnapshotArchiveUseCase(get(), get()) }
-  factory { BuildSnapshotRestorePlanUseCase() }
+  factory { BuildSnapshotRestorePlanUseCase(androidContext().contentResolver) }
   factory { GetSnapshotBackupTargetUseCase(get(), get()) }
   factory { BackupSnapshotArchiveToUriUseCase(androidContext().contentResolver, get()) }
   factory { (roomBackup: RoomBackup) ->
     CreateSnapshotDatabaseBackupUseCase(
       databaseBackupExporter = LocalSnapshotDatabaseBackupExporter(
         roomBackup = roomBackup,
+        databaseName = LCDatabase.DATABASE_NAME,
         database = { LCDatabase.getDatabase() }
       )
     )
@@ -48,6 +49,7 @@ val snapshotBackupModule = module {
       prepareRoomBackupRestoreFile = get(),
       databaseBackupRestorer = LocalSnapshotDatabaseBackupRestorer(
         roomBackup = roomBackup,
+        databaseName = LCDatabase.DATABASE_NAME,
         database = { LCDatabase.getDatabase() }
       ),
       onSuccessfulRestore = {

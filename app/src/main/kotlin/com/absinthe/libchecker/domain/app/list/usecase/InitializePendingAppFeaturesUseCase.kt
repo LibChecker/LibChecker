@@ -15,7 +15,7 @@ class InitializePendingAppFeaturesUseCase(
     val pendingPackages = appListRepository.getUninitializedFeaturePackageNames()
     val featuresMap = HashMap<String, Int>(batchSize)
 
-    fun flushFeatures() {
+    suspend fun flushFeatures() {
       if (featuresMap.isEmpty()) {
         return
       }

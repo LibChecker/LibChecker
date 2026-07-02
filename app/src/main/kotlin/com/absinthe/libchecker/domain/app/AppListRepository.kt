@@ -13,7 +13,7 @@ interface AppListRepository {
 
   suspend fun getUninitializedFeaturePackageNames(): List<String>
 
-  fun clearItems()
+  suspend fun clearItems()
 
   suspend fun insertItem(item: LCItem)
 
@@ -21,9 +21,9 @@ interface AppListRepository {
 
   suspend fun updateItem(item: LCItem)
 
-  fun updateFeatures(packageName: String, features: Int)
+  suspend fun updateFeatures(packageName: String, features: Int)
 
-  fun updateFeatures(featuresMap: Map<String, Int>)
+  suspend fun updateFeatures(featuresMap: Map<String, Int>)
 
-  fun deleteItemByPackageName(packageName: String)
+  suspend fun deleteItemByPackageName(packageName: String)
 }
