@@ -1,9 +1,11 @@
 import importlib.util
 from pathlib import Path
+import sys
 import unittest
 
 
-SCRIPT_PATH = Path(__file__).with_name("build_telegram_notification.py")
+sys.dont_write_bytecode = True
+SCRIPT_PATH = Path(__file__).resolve().parents[1] / "build_telegram_notification.py"
 
 
 def load_module():
