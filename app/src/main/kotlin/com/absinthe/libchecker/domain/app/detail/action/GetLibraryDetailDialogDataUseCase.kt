@@ -2,6 +2,7 @@ package com.absinthe.libchecker.domain.app.detail.action
 
 import androidx.annotation.DrawableRes
 import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.LibDetailBean
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
@@ -45,7 +46,9 @@ class GetLibraryDetailDialogDataUseCase(
   }
 
   private suspend fun LibDetailBean.getRepoUpdatedTime(): String? {
-    if (!GlobalValues.isGitHubReachable) {
+    if (!GlobalValues.isGitHubReachable &&
+      GlobalValues.githubApiAuthorizationHeaderFor(ApiManager.GITHUB_API_REPO_INFO) == null
+    ) {
       return null
     }
 

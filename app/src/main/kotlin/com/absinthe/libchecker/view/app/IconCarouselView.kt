@@ -6,7 +6,6 @@ import android.graphics.RenderEffect
 import android.graphics.Shader
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
-import android.os.Build
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +20,7 @@ import androidx.core.content.res.use
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.isVisible
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.extensions.dpToDimension
 import com.absinthe.libchecker.utils.extensions.dpToDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -410,7 +410,7 @@ class IconCarouselView @JvmOverloads constructor(
     }
 
     fun setBlurRadius(radius: Float) {
-      if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return
+      if (!OsUtils.atLeastS()) return
 
       val bucket = (radius.coerceAtLeast(0f) * 2f).roundToInt()
       if (blurBucket == bucket) return

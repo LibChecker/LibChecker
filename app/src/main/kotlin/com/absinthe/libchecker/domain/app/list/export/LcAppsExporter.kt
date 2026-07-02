@@ -19,6 +19,7 @@ import com.absinthe.libchecker.compat.ZipFileCompat
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.KotlinToolingMetadata
 import com.absinthe.libchecker.utils.IntentFilterUtils
+import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.apk.ApkSignatureSchemeDetector
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPackageSize
@@ -314,7 +315,7 @@ object LcAppsExporter {
       PackageManager.GET_PERMISSIONS or
       PackageManager.GET_META_DATA or
       PackageManager.GET_SIGNATURES or
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+      if (OsUtils.atLeastP()) {
         PackageManager.GET_SIGNING_CERTIFICATES
       } else {
         0
@@ -550,7 +551,7 @@ object LcAppsExporter {
 
   @Suppress("DEPRECATION")
   private fun PackageInfo.readSignatures(): List<Signature> {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && signingInfo != null) {
+    return if (OsUtils.atLeastP() && signingInfo != null) {
       if (signingInfo!!.hasMultipleSigners()) {
         signingInfo!!.apkContentsSigners
       } else {

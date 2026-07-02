@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
   <string-array name="list_repo">
     <item>GitHub</item>
-    <item>GitLab</item>
+    <item>Gitlab</item>
   </string-array>
 
   <string-array name="list_repo_value">

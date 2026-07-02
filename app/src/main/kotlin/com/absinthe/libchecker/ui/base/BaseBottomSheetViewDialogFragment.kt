@@ -3,7 +3,6 @@ package com.absinthe.libchecker.ui.base
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.app.Dialog
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +15,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.FragmentManager
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libraries.utils.R
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
@@ -39,7 +39,7 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> :
   private var _root: T? = null
   private var isHandlerActivated = false
   private var animator: ValueAnimator = ObjectAnimator()
-  private val supportsBlur = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+  private val supportsBlur = OsUtils.atLeastS()
   private val maxBlurRadius = 64
   private var maxDimAmount: Float = 0f
   private var dialogWindow: Window? = null

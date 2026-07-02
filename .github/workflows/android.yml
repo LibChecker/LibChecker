@@ -51,8 +51,20 @@ jobs:
       - run: ./gradlew --non-interactive spotlessCheck
 
   build:
-    name: Build
+    name: Build (${{ matrix.flavor }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - flavor: foss
+            assemble_task: app:assembleFossRelease
+            artifact_name: Foss
+            apk_path: app/build/outputs/apk/foss/release
+          - flavor: market
+            assemble_task: app:assembleMarketRelease
+            artifact_name: Market
+            apk_path: app/build/outputs/apk/market/release
 
     steps:
       - uses: actions/checkout@v7
@@ -88,41 +100,53 @@ jobs:
         if: steps.version-check.outputs.is_dev == 'false'
         run: ./gradlew --non-interactive clean
       - name: Build with Gradle
-        run: ./gradlew --non-interactive app:assembleRelease
-      - name: Upload built Foss apk
+        run: ./gradlew --non-interactive ${{ matrix.assemble_task }}
+      - name: Upload built APK
         if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
         uses: actions/upload-artifact@v7
         with:
-          name: Foss
-          path: ${{ github.workspace }}/app/build/outputs/apk/foss/release
-      - name: Upload built Market apk
-        if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
-        uses: actions/upload-artifact@v7
-        with:
-          name: Market
-          path: ${{ github.workspace }}/app/build/outputs/apk/market/release
+          name: ${{ matrix.artifact_name }}
+          path: ${{ github.workspace }}/${{ matrix.apk_path }}
       - name: Upload mappings
-        if: success() && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+        if: success() && github.event_name != 'pull_request' && github.ref == 'refs/heads/master' && matrix.flavor == 'market'
         uses: actions/upload-artifact@v7
         with:
           name: mappings
           path: "app/build/outputs/mapping/marketRelease"
+
+  publish:
+    name: Publish artifacts
+    runs-on: ubuntu-latest
+    needs: build
+    if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
+
+    steps:
+      - uses: actions/checkout@v7
+      - name: Download Foss APK
+        uses: actions/download-artifact@v7
+        with:
+          name: Foss
+          path: artifacts/foss
+      - name: Download Market APK
+        uses: actions/download-artifact@v7
+        with:
+          name: Market
+          path: artifacts/market
       - name: Set apk path
         id: apk-path
         run: |
-          foss_path=$(find **/build/outputs/apk/foss -name '*.apk' -type f | head -1)
+          foss_path=$(find artifacts/foss -name '*.apk' -type f | head -1)
           echo "foss_path=$foss_path" >> $GITHUB_OUTPUT
-          market_path=$(find **/build/outputs/apk/market -name '*.apk' -type f | head -1)
+          market_path=$(find artifacts/market -name '*.apk' -type f | head -1)
           echo "market_path=$market_path" >> $GITHUB_OUTPUT
       - name: Get apk info
-        if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
         id: apk-info
         uses: zhaobozhen/apk-info-action@v1.1.3
         with:
           apk-path: ${{ steps.apk-path.outputs.foss_path }}
       - name: Build Telegram caption
         id: telegram-caption
-        if: success() && github.repository == 'LibChecker/LibChecker' && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+        if: success() && github.ref == 'refs/heads/master'
         env:
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
           COMMIT_AUTHOR: ${{ github.event.head_commit.author.name }}
@@ -131,7 +155,7 @@ jobs:
           TELEGRAM_TEXT_LIMIT: 1024
         run: python3 .github/scripts/build_telegram_notification.py
       - name: Send commit to telegram
-        if: success() && github.repository == 'LibChecker/LibChecker' && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+        if: success() && github.ref == 'refs/heads/master'
         env:
           CHANNEL_ID: ${{ secrets.TELEGRAM_TO }}
           BOT_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
@@ -155,7 +179,6 @@ jobs:
             -F "media=${MEDIA_JSON}" \
             -F marketRelease="@$MARKET_FILE"
       - name: Checkout assets repository
-        if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
         uses: actions/checkout@v7
         with:
           repository: LibChecker/assets
@@ -163,7 +186,6 @@ jobs:
           path: assets-ci
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
       - name: Commit and push artifacts to assets repo
-        if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           FOSS_FILE: ${{ github.workspace }}/${{ steps.apk-path.outputs.foss_path }}
@@ -180,7 +202,6 @@ jobs:
           git commit -m "Add build artifacts"
           git push origin ci --force
       - name: Checkout assets repository (main branch)
-        if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
         uses: actions/checkout@v7
         with:
           repository: LibChecker/assets
@@ -188,7 +209,6 @@ jobs:
           path: assets-main
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
       - name: Create JSON file
-        if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
         run: |
           cd ${{ github.workspace }}/assets-main
 
