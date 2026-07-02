@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.domain.about.ui.AboutPageBuilder
 import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
@@ -42,6 +43,7 @@ import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.setBottomPaddingSpace
 import com.absinthe.libraries.utils.extensions.getBoolean
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -245,6 +247,7 @@ class SettingsFragment :
         }
       }
     }
+    findPreference<Preference>(Constants.PREF_GITHUB_API_TOKEN)?.let(::bindGitHubTokenPreference)
     findPreference<Preference>(Constants.PREF_TRANSLATION)?.apply {
       setOnPreferenceClickListener {
         runCatching {
@@ -319,6 +322,80 @@ class SettingsFragment :
     }
 
     bindLocalePreference(languagePreference)
+  }
+
+  private fun bindGitHubTokenPreference(preference: Preference) {
+    updateGitHubTokenPreference(preference)
+    preference.setOnPreferenceClickListener {
+      if (AntiShakeUtils.isInvalidClick(prefRecyclerView)) {
+        false
+      } else {
+        showGitHubTokenDialog(preference)
+        true
+      }
+    }
+  }
+
+  private fun showGitHubTokenDialog(preference: Preference) {
+    val tokenTextField = GitHubTokenTextFieldView(requireContext()).apply {
+      layoutParams = FrameLayout.LayoutParams(
+        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
+      )
+      token = GlobalValues.githubApiToken
+    }
+    val container = FrameLayout(requireContext()).apply {
+      setPadding(24.dp, 8.dp, 24.dp, 0)
+      addView(tokenTextField)
+    }
+
+    BaseAlertDialogBuilder(requireContext())
+      .setTitle(R.string.settings_github_token_dialog_title)
+      .setMessage(R.string.settings_github_token_dialog_message)
+      .setView(container)
+      .setPositiveButton(android.R.string.ok) { _, _ ->
+        GlobalValues.githubApiToken = tokenTextField.token
+        updateGitHubTokenPreference(preference)
+        recordPreferenceEvent(
+          Constants.PREF_GITHUB_API_TOKEN,
+          GlobalValues.githubApiToken.isNotEmpty()
+        )
+      }
+      .setNegativeButton(android.R.string.cancel, null)
+      .setNeutralButton(R.string.settings_github_token_clear) { _, _ ->
+        GlobalValues.githubApiToken = String()
+        updateGitHubTokenPreference(preference)
+        recordPreferenceEvent(Constants.PREF_GITHUB_API_TOKEN, false)
+      }
+      .create()
+      .show()
+  }
+
+  private fun updateGitHubTokenPreference(preference: Preference) {
+    preference.summary = getString(
+      if (GlobalValues.githubApiToken.isBlank()) {
+        R.string.settings_github_token_summary_not_set
+      } else {
+        R.string.settings_github_token_summary_set
+      }
+    )
+    updateVisiblePreferenceDescription(preference)
+  }
+
+  @SuppressLint("RestrictedApi")
+  private fun updateVisiblePreferenceDescription(preference: Preference) {
+    if (!::prefRecyclerView.isInitialized) {
+      return
+    }
+
+    prefRecyclerView.post {
+      val adapter = prefRecyclerView.adapter as? PreferenceGroupAdapter ?: return@post
+      val position = (0 until adapter.itemCount)
+        .firstOrNull { adapter.getItem(it) == preference }
+        ?: return@post
+      val itemView = prefRecyclerView.findViewHolderForAdapterPosition(position)?.itemView ?: return@post
+      itemView.contentDescription = buildPreferenceDescription(preference)
+    }
   }
 
   private fun bindLocalePreference(languagePreference: ListPreference) {

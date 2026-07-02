@@ -70,6 +70,13 @@
   <string name="settings_get_updates_in_app">应用内</string>
   <string name="settings_get_updates_in_app_chip_stable">稳定版</string>
   <string name="settings_get_updates_in_app_chip_ci">持续集成</string>
+  <string name="settings_github_token">GitHub 令牌</string>
+  <string name="settings_github_token_summary_not_set">未设置</string>
+  <string name="settings_github_token_summary_set">已设置</string>
+  <string name="settings_github_token_dialog_title">GitHub 令牌</string>
+  <string name="settings_github_token_dialog_message">仅用于 GitHub API 请求，以提高访问频率限制。</string>
+  <string name="settings_github_token_dialog_hint">个人访问令牌</string>
+  <string name="settings_github_token_clear">清除</string>
   <string name="about_info">本应用用来查看设备上的应用使用到的第三方库的情况。</string>
   <string name="toolbar_rate">评分</string>
   <string name="resource_declaration">应用中的部分素材来自：</string>

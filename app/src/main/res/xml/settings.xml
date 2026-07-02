@@ -105,6 +105,12 @@
     </Preference>
 
     <Preference
+      app:icon="@drawable/ic_github"
+      app:key="githubApiToken"
+      app:summary="@string/settings_github_token_summary_not_set"
+      app:title="@string/settings_github_token" />
+
+    <Preference
       app:icon="@drawable/ic_translate"
       app:key="translation"
       app:summary="@string/settings_translate_summary"

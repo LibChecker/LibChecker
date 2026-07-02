@@ -75,6 +75,14 @@ object GlobalValues {
 
   var preferredRuleLanguage: String by SPDelegates(Constants.PREF_RULE_LANGUAGE, "zh-Hans")
 
+  var githubApiToken: String by SPDelegates(Constants.PREF_GITHUB_API_TOKEN, String())
+
+  val githubApiAuthorizationHeader: String?
+    get() = githubApiToken
+      .trim()
+      .takeIf { it.isNotEmpty() }
+      ?.let { "Bearer $it" }
+
   val season by unsafeLazy { DateUtils.getCurrentSeason() }
 
   var locale: Locale = Locale.getDefault()
