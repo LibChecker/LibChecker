@@ -3,8 +3,10 @@ package com.absinthe.libchecker.domain.app.detail.action
 import android.content.ContentValues
 import android.content.Context
 import android.content.pm.PackageInfo
+import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import androidx.annotation.RequiresApi
 import com.absinthe.libchecker.compat.ZipFileCompat
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.utils.OsUtils
@@ -82,6 +84,7 @@ class ExtractNativeLibraryUseCase(
       .joinToString(File.separator)
   }
 
+  @RequiresApi(Build.VERSION_CODES.Q)
   private fun writeElfWithMediaStore(
     dir: String,
     elfFileName: String,

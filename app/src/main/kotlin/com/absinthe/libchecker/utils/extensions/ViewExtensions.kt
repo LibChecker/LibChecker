@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.TimeInterpolator
 import android.animation.ValueAnimator
 import android.content.ClipData
+import android.content.Context
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.RenderEffect
@@ -203,7 +204,11 @@ fun TextView.reverseStrikeThroughAnimation(): ValueAnimator {
 
 fun ImageView.copyToClipboard() {
   val bitmap = runCatching { drawable.toBitmap() }.getOrNull() ?: return
-  val iconFile = File(context.requireAvailableCacheDir(), Constants.TEMP_ICON)
+  context.copyBitmapToClipboard(bitmap)
+}
+
+fun Context.copyBitmapToClipboard(bitmap: Bitmap) {
+  val iconFile = File(requireAvailableCacheDir(), Constants.TEMP_ICON)
   if (!iconFile.exists()) {
     iconFile.createNewFile()
   }
@@ -211,16 +216,16 @@ fun ImageView.copyToClipboard() {
     bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
   }
   val uri = FileProvider.getUriForFile(
-    context,
+    this,
     BuildConfig.APPLICATION_ID + ".fileprovider",
     iconFile
   )
   if (ClipboardUtils.put(
-      context,
-      ClipData.newUri(context.contentResolver, Constants.TEMP_ICON, uri)
+      this,
+      ClipData.newUri(contentResolver, Constants.TEMP_ICON, uri)
     )
   ) {
-    VersionCompat.showCopiedOnClipboardToast(context)
+    VersionCompat.showCopiedOnClipboardToast(this)
   }
 }
 

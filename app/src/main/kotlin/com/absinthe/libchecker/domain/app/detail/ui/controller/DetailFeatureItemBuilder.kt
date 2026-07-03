@@ -86,7 +86,9 @@ class DetailFeatureItemBuilder(
 
       AppDetailFeatureAction.AppProp -> showAppPropDialog()
 
-      AppDetailFeatureAction.InstallSource -> FeaturesDialog.showAppInstallSourceDialog(activity, packageInfo().packageName)
+      AppDetailFeatureAction.InstallSource -> if (OsUtils.atLeastR()) {
+        FeaturesDialog.showAppInstallSourceDialog(activity, packageInfo().packageName)
+      }
 
       AppDetailFeatureAction.ElfPageSize16Kb -> FeaturesDialog.show16KBAlignDialog(activity)
 

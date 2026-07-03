@@ -109,6 +109,7 @@ abstract class BaseAppDetailActivity :
   private val headerTitleBinder by unsafeLazy {
     DetailHeaderTitleBinder(
       detailsTitleView = binding.detailsTitle,
+      blurView = binding.collapsingToolbar,
       onAppInfoClick = ::showAppInfoDialog
     )
   }
