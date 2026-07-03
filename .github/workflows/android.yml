@@ -199,7 +199,7 @@ jobs:
             --min "$MIN_SDK_VERSION" \
             --compile "$COMPILE_SDK_VERSION" \
             --package-size "$APK_FILE_SIZE" \
-            --link "https://jsdelivr.b-cdn.net/gh/LibChecker/assets@ci/app-release.apk"
+            --link "https://gh.absinthe.life/github.com/LibChecker/assets/raw/refs/heads/ci/app-release.apk"
 
           if [ "$IS_STABLE" = "true" ]; then
             python3 "${{ github.workspace }}/.github/scripts/write_assets_metadata.py" \
@@ -210,7 +210,7 @@ jobs:
               --min "$MIN_SDK_VERSION" \
               --compile "$COMPILE_SDK_VERSION" \
               --package-size "$APK_FILE_SIZE" \
-              --link "https://github.com/LibChecker/LibChecker/releases/download/$BASE_VERSION_NAME/$RELEASE_APK_FILE_NAME" \
+              --link "https://gh.absinthe.life/github.com/LibChecker/LibChecker/releases/download/$BASE_VERSION_NAME/$RELEASE_APK_FILE_NAME" \
               --note "https://github.com/LibChecker/LibChecker/releases"
           else
             python3 "${{ github.workspace }}/.github/scripts/sync_latest_stable_metadata.py" \
@@ -259,7 +259,7 @@ jobs:
             --min "$MIN_SDK_VERSION" \
             --compile "$COMPILE_SDK_VERSION" \
             --package-size "$APK_FILE_SIZE" \
-            --link "https://jsdelivr.b-cdn.net/gh/LibChecker/assets@ci/app-release.apk"
+            --link "https://gh.absinthe.life/github.com/LibChecker/assets/raw/refs/heads/ci/app-release.apk"
 
           if [ "$IS_STABLE" = "true" ]; then
             python3 "${{ github.workspace }}/.github/scripts/write_assets_metadata.py" \
@@ -270,7 +270,7 @@ jobs:
               --min "$MIN_SDK_VERSION" \
               --compile "$COMPILE_SDK_VERSION" \
               --package-size "$APK_FILE_SIZE" \
-              --link "https://github.com/LibChecker/LibChecker/releases/download/$BASE_VERSION_NAME/$RELEASE_APK_FILE_NAME" \
+              --link "https://gh.absinthe.life/github.com/LibChecker/LibChecker/releases/download/$BASE_VERSION_NAME/$RELEASE_APK_FILE_NAME" \
               --note "https://github.com/LibChecker/LibChecker/releases"
           else
             python3 "${{ github.workspace }}/.github/scripts/sync_latest_stable_metadata.py" \
