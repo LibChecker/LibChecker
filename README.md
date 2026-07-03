@@ -5,7 +5,7 @@
 [![Discussion](https://img.shields.io/badge/Telegram-Group-blue.svg?logo=telegram)](https://t.me/libcheckerr)
 [![Crowdin](https://badges.crowdin.net/libchecker/localized.svg)](https://crowdin.com/project/libchecker)
 
-![Header](./source/header.png)
+![Header](./source/header.webp)
 
 LibChecker helps you inspect libraries and package details used by Android apps.
 It can analyze installed apps, APK files, split packages, and app snapshots, then
