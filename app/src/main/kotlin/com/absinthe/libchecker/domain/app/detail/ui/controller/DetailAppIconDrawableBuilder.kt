@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.absinthe.libchecker.domain.app.AppIconItem
+import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 
@@ -13,13 +14,12 @@ class DetailAppIconDrawableBuilder(
   private val context: Context
 ) {
 
-  @RequiresApi(Build.VERSION_CODES.TIRAMISU)
   fun build(appIcons: List<AppIconItem>): List<Drawable> {
     val firstIcon = appIcons[0]
     val drawables = appIcons.map { it.drawable }.toMutableList()
 
     val processedDrawable = when {
-      firstIcon.isMonochrome && firstIcon.drawable is AdaptiveIconDrawable -> {
+      OsUtils.atLeastT() && firstIcon.isMonochrome && firstIcon.drawable is AdaptiveIconDrawable -> {
         createMonochromeIconWithBackground(firstIcon.drawable)
       }
 
@@ -33,6 +33,7 @@ class DetailAppIconDrawableBuilder(
     return drawables
   }
 
+  @RequiresApi(Build.VERSION_CODES.TIRAMISU)
   private fun createMonochromeIconWithBackground(adaptiveIcon: AdaptiveIconDrawable): Drawable? {
     return adaptiveIcon.monochrome?.apply {
       setTint(context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary))

@@ -6,7 +6,15 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.pm.ApplicationInfo
 import android.content.res.ColorStateList
+import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.ColorFilter
+import android.graphics.DashPathEffect
+import android.graphics.Matrix
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.PixelFormat
+import android.graphics.RectF
 import android.graphics.RenderEffect
 import android.graphics.RuntimeShader
 import android.graphics.Shader
@@ -24,6 +32,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.doOnPreDraw
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
@@ -36,7 +45,11 @@ import com.absinthe.libchecker.utils.extensions.getColorByAttr
 
 fun ImageView.setDetailIconLongClick(applicationInfo: ApplicationInfo?, blurView: View) {
   setOnLongClickListener {
-    val adaptiveIcon = applicationInfo?.loadAdaptiveIcon(context)
+    if (!OsUtils.atLeastO()) {
+      copyToClipboard()
+      return@setOnLongClickListener true
+    }
+    val adaptiveIcon = applicationInfo?.loadAdaptiveIconOnO(context)
     if (adaptiveIcon == null) {
       copyToClipboard()
     } else {
@@ -64,11 +77,6 @@ private tailrec fun Context.findActivity(): Activity? {
   }
 }
 
-private fun ApplicationInfo.loadAdaptiveIcon(context: Context): AdaptiveIconDrawable? {
-  if (!OsUtils.atLeastO()) return null
-  return loadAdaptiveIconOnO(context)
-}
-
 @RequiresApi(Build.VERSION_CODES.O)
 private fun ApplicationInfo.loadAdaptiveIconOnO(context: Context): AdaptiveIconDrawable? {
   return loadIcon(context.packageManager) as? AdaptiveIconDrawable
@@ -84,8 +92,10 @@ private class AdaptiveIconLayerOverlay(
 
   private val context = activity
   private var itemSize = sourceView.width.takeIf { it > 0 } ?: 56.dp
-  private val gap = 8.dp
+  private val layerGap = 8.dp
+  private val edgePadding = 24.dp
   private val maxBlurRadius = 24f
+  private val originalBlurViewAlpha = blurView.alpha
   private var blurAnimator: ValueAnimator? = null
   private var blurMaskShader: RuntimeShader? = null
   private var currentBlurRadius = 0f
@@ -109,7 +119,7 @@ private class AdaptiveIconLayerOverlay(
     setOnClickListener { }
     setPadding(17.dp, 17.dp, 17.dp, 17.dp)
   }
-  private val backgroundView = createIconView(icon.background.copyDrawable()).apply {
+  private val backgroundView = createIconView(createBackgroundOutlineDrawable()).apply {
     alpha = 0f
   }
   private val plusView = createIconView(
@@ -123,14 +133,26 @@ private class AdaptiveIconLayerOverlay(
   private val foregroundView = createIconView(icon.foreground.copyDrawable()).apply {
     alpha = 0f
   }
+  private val layerViews = listOf(
+    originalView,
+    equalsView,
+    backgroundView,
+    plusView,
+    foregroundView
+  )
 
   init {
-    overlay.addView(originalView)
-    overlay.addView(equalsView)
-    overlay.addView(backgroundView)
-    overlay.addView(plusView)
-    overlay.addView(foregroundView)
+    layerViews.forEach(overlay::addView)
+    bindLayerClickActions()
+  }
 
+  fun show() {
+    val decorView = activity.window.decorView as? ViewGroup ?: return
+    decorView.addView(overlay)
+    overlay.doOnPreDraw { startLayerAnimation() }
+  }
+
+  private fun bindLayerClickActions() {
     originalView.setOnClickListener {
       copyFullIcon()
     }
@@ -145,12 +167,6 @@ private class AdaptiveIconLayerOverlay(
     }
   }
 
-  fun show() {
-    val decorView = activity.window.decorView as? ViewGroup ?: return
-    decorView.addView(overlay)
-    overlay.doOnPreDraw { startLayerAnimation() }
-  }
-
   private fun createIconView(drawable: Drawable): AppCompatImageView {
     return AppCompatImageView(context).apply {
       layoutParams = FrameLayout.LayoutParams(itemSize, itemSize)
@@ -160,73 +176,91 @@ private class AdaptiveIconLayerOverlay(
     }
   }
 
+  private fun createBackgroundOutlineDrawable(): Drawable {
+    val background = icon.background.copyDrawable()
+    return IconMaskOutlineDrawable(
+      background = background,
+      mask = Path(icon.iconMask),
+      outlineColor = background.copyDrawable().chooseVisibleOutlineColor(),
+      strokeWidth = 2.dp.toFloat(),
+      dashLength = 7.dp.toFloat(),
+      dashGap = 5.dp.toFloat()
+    )
+  }
+
   private fun startLayerAnimation() {
+    val sourcePosition = resolveSourcePosition()
+    collapseX = sourcePosition.x
+    collapseY = sourcePosition.y
+
+    applyBlur()
+    updateLayerSize()
+    placeLayersAt(sourcePosition.x, sourcePosition.y)
+    animateLayerRow(sourcePosition.x, sourcePosition.y)
+  }
+
+  private fun resolveSourcePosition(): LayerPosition {
     val rootLocation = IntArray(2)
     val sourceLocation = IntArray(2)
     overlay.getLocationOnScreen(rootLocation)
     sourceView.getLocationOnScreen(sourceLocation)
+    return LayerPosition(
+      x = (sourceLocation[0] - rootLocation[0]).toFloat(),
+      y = (sourceLocation[1] - rootLocation[1]).toFloat()
+    )
+  }
 
-    applyBlur()
-
+  private fun updateLayerSize() {
     itemSize = sourceView.width.coerceAtLeast(1)
-    listOf(originalView, equalsView, backgroundView, plusView, foregroundView).forEach { child ->
+    layerViews.forEach { child ->
       child.layoutParams = FrameLayout.LayoutParams(itemSize, itemSize)
     }
+  }
 
-    val startX = (sourceLocation[0] - rootLocation[0]).toFloat()
-    val startY = (sourceLocation[1] - rootLocation[1]).toFloat()
-    collapseX = startX
-    collapseY = startY
-    val scale = 1f
+  private fun placeLayersAt(x: Float, y: Float) {
+    layerViews.forEach { child ->
+      child.x = x
+      child.y = y
+      child.scaleX = 1f
+      child.scaleY = 1f
+    }
+  }
 
-    val rowWidth = itemSize * 5 + gap * 4
-    val rowStartX = if (startX + rowWidth <= overlay.width - 24.dp) {
+  private fun animateLayerRow(startX: Float, rowY: Float) {
+    val rowWidth = itemSize * layerViews.size + layerGap * (layerViews.size - 1)
+    val rowStartX = if (startX + rowWidth <= overlay.width - edgePadding) {
       startX
     } else {
-      (overlay.width - rowWidth - 24.dp).coerceAtLeast(24.dp).toFloat()
-    }
-    val rowY = startY
-
-    listOf(originalView, equalsView, backgroundView, plusView, foregroundView).forEach { child ->
-      child.x = startX
-      child.y = startY
-      child.scaleX = scale
-      child.scaleY = scale
+      (overlay.width - rowWidth - edgePadding).coerceAtLeast(edgePadding).toFloat()
     }
 
-    animateTo(originalView, rowStartX, rowY, scale, 1f)
-    animateTo(equalsView, rowStartX + itemSize + gap, rowY, scale, 1f)
-    animateTo(backgroundView, rowStartX + (itemSize + gap) * 2, rowY, scale, 1f)
-    animateTo(plusView, rowStartX + (itemSize + gap) * 3, rowY, scale, 1f)
-    animateTo(foregroundView, rowStartX + (itemSize + gap) * 4, rowY, scale, 1f)
+    layerViews.forEachIndexed { index, view ->
+      animateTo(view, rowStartX + (itemSize + layerGap) * index, rowY, 1f)
+    }
   }
 
   private fun animateTo(
     view: View,
     x: Float,
     y: Float,
-    startScale: Float,
     endAlpha: Float
   ) {
     view.animate()
       .x(x)
       .y(y)
-      .scaleX(1f)
-      .scaleY(1f)
       .alpha(endAlpha)
-      .setDuration(350L)
+      .setDuration(ANIMATION_DURATION_MS)
       .setInterpolator(FastOutSlowInInterpolator())
-      .withStartAction {
-        view.scaleX = startScale
-        view.scaleY = startScale
-      }
       .start()
   }
 
   private fun applyBlur() {
-    if (!OsUtils.atLeastS()) return
+    if (shouldHideCollapsingToolbarInsteadOfBlur()) {
+      animateBlurViewAlpha(0f)
+      return
+    }
     blurAnimator = ValueAnimator.ofFloat(0f, maxBlurRadius).apply {
-      duration = 350L
+      duration = ANIMATION_DURATION_MS
       interpolator = FastOutSlowInInterpolator()
       addUpdateListener {
         updateBlurRadius(it.animatedValue as Float)
@@ -240,9 +274,9 @@ private class AdaptiveIconLayerOverlay(
     isClosing = true
     collapseLayers()
     blurAnimator?.cancel()
-    if (OsUtils.atLeastS() && currentBlurRadius > 0f) {
+    if (!shouldHideCollapsingToolbarInsteadOfBlur() && currentBlurRadius > 0f) {
       blurAnimator = ValueAnimator.ofFloat(currentBlurRadius, 0f).apply {
-        duration = 350L
+        duration = ANIMATION_DURATION_MS
         interpolator = FastOutSlowInInterpolator()
         addUpdateListener {
           updateBlurRadius(it.animatedValue as Float)
@@ -254,25 +288,34 @@ private class AdaptiveIconLayerOverlay(
         start()
       }
     } else {
-      overlay.postDelayed({ removeOverlay() }, 350L)
+      animateBlurViewAlpha(originalBlurViewAlpha) {
+        removeOverlay()
+      }
     }
   }
 
   private fun collapseLayers() {
-    listOf(originalView, equalsView, backgroundView, plusView, foregroundView).forEach { child ->
-      child.animate()
-        .x(collapseX)
-        .y(collapseY)
-        .alpha(0f)
-        .setDuration(350L)
-        .setInterpolator(FastOutSlowInInterpolator())
-        .start()
+    originalView.bringToFront()
+    collapseLayer(originalView, ANIMATION_DURATION_MS, 1f)
+    layerViews.drop(1).forEach { child ->
+      collapseLayer(child, COLLAPSING_LAYER_FADE_DURATION_MS, 0f)
     }
+  }
+
+  private fun collapseLayer(view: View, duration: Long, endAlpha: Float) {
+    view.animate().cancel()
+    view.animate()
+      .x(collapseX)
+      .y(collapseY)
+      .alpha(endAlpha)
+      .setDuration(duration)
+      .setInterpolator(FastOutSlowInInterpolator())
+      .start()
   }
 
   private fun updateBlurRadius(radius: Float) {
     currentBlurRadius = radius
-    if (!OsUtils.atLeastS()) return
+    if (shouldHideCollapsingToolbarInsteadOfBlur()) return
     updateBlurView(blurView, radius)
   }
 
@@ -285,7 +328,20 @@ private class AdaptiveIconLayerOverlay(
     context.copyBitmapToClipboard(icon.toBitmap(itemSize, itemSize))
   }
 
+  private fun animateBlurViewAlpha(alpha: Float, endAction: (() -> Unit)? = null) {
+    blurView.animate().cancel()
+    blurView.animate()
+      .alpha(alpha)
+      .setDuration(ANIMATION_DURATION_MS)
+      .setInterpolator(FastOutSlowInInterpolator())
+      .withEndAction {
+        endAction?.invoke()
+      }
+      .start()
+  }
+
   private fun updateBlurView(view: View, radius: Float) {
+    if (!OsUtils.atLeastS()) return
     view.setRenderEffect(
       if (radius > 0f) {
         if (OsUtils.atLeastT()) {
@@ -313,6 +369,18 @@ private class AdaptiveIconLayerOverlay(
   }
 }
 
+private data class LayerPosition(
+  val x: Float,
+  val y: Float
+)
+
+private fun shouldHideCollapsingToolbarInsteadOfBlur(): Boolean {
+  return !OsUtils.atLeastT()
+}
+
+private const val ANIMATION_DURATION_MS = 350L
+private const val COLLAPSING_LAYER_FADE_DURATION_MS = 180L
+
 private const val PROGRESSIVE_BLUR_MASK_SHADER = """
 uniform shader content;
 uniform float2 size;
@@ -324,6 +392,108 @@ half4 main(float2 coord) {
   return content.eval(coord) * mix(1.0, maskAlpha, progress);
 }
 """
+
+private class IconMaskOutlineDrawable(
+  private val background: Drawable,
+  private val mask: Path,
+  outlineColor: Int,
+  strokeWidth: Float,
+  dashLength: Float,
+  dashGap: Float
+) : Drawable() {
+
+  private val sourceBounds = RectF()
+  private val targetBounds = RectF()
+  private val matrix = Matrix()
+  private val outlinePath = Path()
+  private val outlineAlpha = Color.alpha(outlineColor)
+  private var drawableAlpha = 255
+  private val outlinePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    style = Paint.Style.STROKE
+    strokeCap = Paint.Cap.ROUND
+    strokeJoin = Paint.Join.ROUND
+    this.strokeWidth = strokeWidth
+    color = outlineColor
+    pathEffect = DashPathEffect(floatArrayOf(dashLength, dashGap), 0f)
+  }
+
+  override fun draw(canvas: Canvas) {
+    background.bounds = bounds
+    background.draw(canvas)
+    if (bounds.width() <= 0 || bounds.height() <= 0 || mask.isEmpty) return
+
+    mask.computeBounds(sourceBounds, true)
+    if (sourceBounds.width() <= 0f || sourceBounds.height() <= 0f) return
+
+    targetBounds.set(bounds)
+    val inset = outlinePaint.strokeWidth / 2f
+    targetBounds.inset(inset, inset)
+
+    matrix.reset()
+    matrix.setRectToRect(sourceBounds, targetBounds, Matrix.ScaleToFit.CENTER)
+    outlinePath.reset()
+    mask.transform(matrix, outlinePath)
+    outlinePaint.alpha = outlineAlpha * drawableAlpha / 255
+    canvas.drawPath(outlinePath, outlinePaint)
+  }
+
+  override fun setAlpha(alpha: Int) {
+    drawableAlpha = alpha
+    background.alpha = alpha
+    invalidateSelf()
+  }
+
+  override fun setColorFilter(colorFilter: ColorFilter?) {
+    background.colorFilter = colorFilter
+    invalidateSelf()
+  }
+
+  @Suppress("OVERRIDE_DEPRECATION")
+  override fun getOpacity(): Int {
+    return PixelFormat.TRANSLUCENT
+  }
+
+  override fun getIntrinsicWidth(): Int {
+    return background.intrinsicWidth
+  }
+
+  override fun getIntrinsicHeight(): Int {
+    return background.intrinsicHeight
+  }
+}
+
+private fun Drawable.chooseVisibleOutlineColor(): Int {
+  val bitmap = runCatching { toBitmap(24, 24) }.getOrNull() ?: return Color.WHITE
+  var alphaSum = 0L
+  var redSum = 0L
+  var greenSum = 0L
+  var blueSum = 0L
+
+  for (y in 0 until bitmap.height) {
+    for (x in 0 until bitmap.width) {
+      val color = bitmap.getPixel(x, y)
+      val alpha = Color.alpha(color)
+      if (alpha == 0) continue
+      alphaSum += alpha
+      redSum += Color.red(color) * alpha
+      greenSum += Color.green(color) * alpha
+      blueSum += Color.blue(color) * alpha
+    }
+  }
+  if (alphaSum == 0L) return Color.WHITE
+
+  val averageColor = Color.rgb(
+    (redSum / alphaSum).toInt(),
+    (greenSum / alphaSum).toInt(),
+    (blueSum / alphaSum).toInt()
+  )
+  val outlineColor = if (ColorUtils.calculateLuminance(averageColor) > 0.5) {
+    Color.BLACK
+  } else {
+    Color.WHITE
+  }
+  return ColorUtils.setAlphaComponent(outlineColor, 0xE6)
+}
 
 private fun Drawable.copyDrawable(): Drawable {
   return constantState?.newDrawable()?.mutate() ?: mutate()

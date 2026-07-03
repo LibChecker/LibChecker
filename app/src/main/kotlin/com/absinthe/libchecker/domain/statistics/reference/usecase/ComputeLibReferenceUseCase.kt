@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.domain.statistics.reference.usecase
 
+import android.annotation.SuppressLint
 import android.content.pm.ApplicationInfo
 import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
@@ -91,6 +92,7 @@ class ComputeLibReferenceUseCase(
     return index
   }
 
+  @SuppressLint("WrongConstant")
   suspend fun matchRules(
     index: ReferenceIndex,
     config: MatchConfig,
