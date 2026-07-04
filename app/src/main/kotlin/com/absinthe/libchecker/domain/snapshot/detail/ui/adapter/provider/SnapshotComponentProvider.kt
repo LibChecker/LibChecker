@@ -7,10 +7,6 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.LibDetailDialogFragment
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotComponentNode
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailComponentView
-import com.absinthe.libchecker.domain.snapshot.model.ADDED
-import com.absinthe.libchecker.domain.snapshot.model.CHANGED
-import com.absinthe.libchecker.domain.snapshot.model.MOVED
-import com.absinthe.libchecker.domain.snapshot.model.REMOVED
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -40,33 +36,12 @@ class SnapshotComponentProvider : BaseNodeProvider() {
   override fun convert(helper: BaseViewHolder, item: BaseNode) {
     (helper.itemView as SnapshotDetailComponentView).container.apply {
       val node = item as SnapshotComponentNode
-      val snapshotItem = node.item
+      val displayData = node.displayData
 
-      name.text = snapshotItem.title
+      name.text = displayData.title
+      typeIcon.setImageResource(displayData.status.iconRes)
 
-      val colorRes = when (snapshotItem.diffType) {
-        ADDED -> R.color.material_green_300
-        REMOVED -> R.color.material_red_300
-        CHANGED -> R.color.material_yellow_300
-        MOVED -> R.color.material_blue_300
-        else -> throw IllegalArgumentException("wrong diff type")
-      }
-
-      typeIcon.setImageResource(
-        when (snapshotItem.diffType) {
-          ADDED -> R.drawable.ic_add
-          REMOVED -> R.drawable.ic_remove
-          CHANGED -> R.drawable.ic_changed
-          MOVED -> R.drawable.ic_move
-          else -> throw IllegalArgumentException("wrong diff type")
-        }
-      )
-      helper.itemView.contentDescription = buildItemDescription(
-        getStatusLabel(snapshotItem.diffType),
-        snapshotItem.title
-      )
-
-      val baseColor = colorRes.getColor(context)
+      val baseColor = displayData.status.colorRes.getColor(context)
       val alpha = if (UiUtils.isDarkMode()) {
         (0.75f * 255).toInt() and 0xFF
       } else {
@@ -75,11 +50,11 @@ class SnapshotComponentProvider : BaseNodeProvider() {
       val alphaColor = (baseColor and 0x00FFFFFF) or (alpha shl 24)
       background = alphaColor.toDrawable()
 
-      val rule = node.displayData.rule
-      setChip(rule, alphaColor, node.displayData.colorfulRuleIcon)
+      val rule = displayData.rule
+      setChip(rule, alphaColor, displayData.colorfulRuleIcon)
       helper.itemView.contentDescription = buildItemDescription(
-        getStatusLabel(snapshotItem.diffType),
-        snapshotItem.title,
+        context.getString(displayData.status.labelRes),
+        displayData.title,
         rule?.label
       )
       if (rule != null) {
@@ -87,10 +62,10 @@ class SnapshotComponentProvider : BaseNodeProvider() {
           if (AntiShakeUtils.isInvalidClick(it)) {
             return@setChipOnClickListener
           }
-          val name = node.item.name
+          val name = displayData.item.name
           val fragmentManager =
             (this@SnapshotComponentProvider.context as BaseActivity<*>).supportFragmentManager
-          LibDetailDialogFragment.newInstance(name, node.item.itemType, rule.regexName)
+          LibDetailDialogFragment.newInstance(name, displayData.item.itemType, rule.regexName)
             .show(fragmentManager, LibDetailDialogFragment::class.java.name)
         }
       } else {
@@ -103,17 +78,5 @@ class SnapshotComponentProvider : BaseNodeProvider() {
     return parts
       .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
       .joinToString()
-  }
-
-  private fun getStatusLabel(status: Int): String {
-    return context.getString(
-      when (status) {
-        ADDED -> R.string.snapshot_indicator_added
-        REMOVED -> R.string.snapshot_indicator_removed
-        CHANGED -> R.string.snapshot_indicator_changed
-        MOVED -> R.string.snapshot_indicator_moved
-        else -> android.R.string.untitled
-      }
-    )
   }
 }

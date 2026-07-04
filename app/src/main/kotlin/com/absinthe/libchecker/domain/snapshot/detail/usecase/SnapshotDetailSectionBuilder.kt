@@ -6,6 +6,7 @@ import android.text.style.ForegroundColorSpan
 import androidx.core.graphics.ColorUtils
 import androidx.core.text.buildSpannedString
 import androidx.core.text.inSpans
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.METADATA
@@ -18,6 +19,7 @@ import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemDisplayData
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemStatusDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSection
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailStatusCount
 import com.absinthe.libchecker.domain.snapshot.model.ADDED
@@ -109,6 +111,9 @@ class SnapshotDetailSectionBuilder(
         .map { item ->
           SnapshotDetailItemDisplayData(
             item = item,
+            title = item.title,
+            extra = item.extra,
+            status = buildStatusDisplayData(item.diffType),
             rule = getRuleCached(item),
             colorfulRuleIcon = colorfulRuleIcon
           )
@@ -131,6 +136,36 @@ class SnapshotDetailSectionBuilder(
       count.takeIf { it > 0 }?.let {
         SnapshotDetailStatusCount(status, it)
       }
+    }
+  }
+
+  private fun buildStatusDisplayData(status: Int): SnapshotDetailItemStatusDisplayData {
+    return when (status) {
+      ADDED -> SnapshotDetailItemStatusDisplayData(
+        iconRes = R.drawable.ic_add,
+        colorRes = R.color.material_green_300,
+        labelRes = R.string.snapshot_indicator_added
+      )
+
+      REMOVED -> SnapshotDetailItemStatusDisplayData(
+        iconRes = R.drawable.ic_remove,
+        colorRes = R.color.material_red_300,
+        labelRes = R.string.snapshot_indicator_removed
+      )
+
+      CHANGED -> SnapshotDetailItemStatusDisplayData(
+        iconRes = R.drawable.ic_changed,
+        colorRes = R.color.material_yellow_300,
+        labelRes = R.string.snapshot_indicator_changed
+      )
+
+      MOVED -> SnapshotDetailItemStatusDisplayData(
+        iconRes = R.drawable.ic_move,
+        colorRes = R.color.material_blue_300,
+        labelRes = R.string.snapshot_indicator_moved
+      )
+
+      else -> throw IllegalArgumentException("wrong diff type")
     }
   }
 
