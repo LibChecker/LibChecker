@@ -39,8 +39,8 @@ import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotTi
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailDeletedView
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailNewInstallView
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotEmptyView
+import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotTitleDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
-import com.absinthe.libchecker.domain.snapshot.list.ui.adapter.ARROW
 import com.absinthe.libchecker.domain.snapshot.model.ADDED
 import com.absinthe.libchecker.domain.snapshot.model.CHANGED
 import com.absinthe.libchecker.domain.snapshot.model.MOVED
@@ -49,14 +49,12 @@ import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.launchLibReferencePage
-import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.chad.library.adapter.base.entity.node.BaseNode
@@ -81,6 +79,7 @@ class SnapshotDetailActivity :
 
   private val adapter by lazy { SnapshotDetailAdapter() }
   private val viewModel: SnapshotViewModel by viewModel()
+  private val buildSnapshotTitleDisplayData: BuildSnapshotTitleDisplayDataUseCase by inject()
   private val _entity by unsafeLazy {
     IntentCompat.getSerializableExtra<SnapshotDiffItem>(
       intent,
@@ -152,8 +151,6 @@ class SnapshotDetailActivity :
         addItemDecoration(VerticalSpacesItemDecoration(4.dp))
       }
 
-      val isNewOrDeleted = entity.deleted || entity.newInstalled
-
       snapshotTitle.iconView.apply {
         bindSnapshotIcon()
         setOnClickListener {
@@ -163,32 +160,14 @@ class SnapshotDetailActivity :
           }
         }
       }
-      snapshotTitle.apply {
-        appNameView.apply {
-          text = LCAppUtils.getDiffString(entity.labelDiff, isNewOrDeleted)
-          setLongClickCopiedToClipboard(text)
-        }
-        iconView.contentDescription = appNameView.text
-
-        val pkgSplits = entity.packageName.split("/")
-        val first = pkgSplits[0]
-        val second = pkgSplits.getOrNull(1)
-        packageNameView.apply {
-          text = if (second != null && second != first) "$first $ARROW $second" else first
-          setLongClickCopiedToClipboard(text)
-        }
-        versionInfoView.apply {
-          text = LCAppUtils.getDiffString(
-            diff1 = entity.versionNameDiff,
-            diff2 = entity.versionCodeDiff,
-            isNewOrDeleted = isNewOrDeleted
+      snapshotTitle.render(
+        buildSnapshotTitleDisplayData(
+          BuildSnapshotTitleDisplayDataUseCase.Request(
+            item = entity,
+            formatSplitPackageName = true
           )
-          setLongClickCopiedToClipboard(text)
-        }
-
-        setApisText(entity, isNewOrDeleted)
-        setPackageSizeText(entity, isNewOrDeleted)
-      }
+        )
+      )
     }
 
     adapter.stateView =

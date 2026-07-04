@@ -5,16 +5,17 @@ import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotNoDiffBSView
+import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotTitleDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.launch
 import me.zhanghai.android.appiconloader.AppIconLoader
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 const val EXTRA_DIFF_ITEM = "EXTRA_DIFF_ITEM"
@@ -22,6 +23,7 @@ const val EXTRA_DIFF_ITEM = "EXTRA_DIFF_ITEM"
 class SnapshotNoDiffBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotNoDiffBSView>() {
 
   private val viewModel: SnapshotViewModel by activityViewModel()
+  private val buildSnapshotTitleDisplayData: BuildSnapshotTitleDisplayDataUseCase by inject()
 
   override fun initRootView(): SnapshotNoDiffBSView = SnapshotNoDiffBSView(requireContext())
 
@@ -35,17 +37,15 @@ class SnapshotNoDiffBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotNoDi
     BundleCompat.getSerializable(arg, EXTRA_DIFF_ITEM, SnapshotDiffItem::class.java)?.let { item ->
       root.title.apply {
         bindIcon(item)
-        val isNewOrDeleted = item.deleted || item.newInstalled
-        appNameView.text = LCAppUtils.getDiffString(item.labelDiff, isNewOrDeleted)
-        iconView.contentDescription = appNameView.text
-        packageNameView.text = item.packageName
-        versionInfoView.text = LCAppUtils.getDiffString(
-          diff1 = item.versionNameDiff,
-          diff2 = item.versionCodeDiff,
-          isNewOrDeleted = isNewOrDeleted
+        render(
+          data = buildSnapshotTitleDisplayData(
+            BuildSnapshotTitleDisplayDataUseCase.Request(
+              item = item,
+              formatSplitPackageName = false
+            )
+          ),
+          copyPrimaryText = false
         )
-        setApisText(item, isNewOrDeleted)
-        setPackageSizeText(item, isNewOrDeleted)
       }
 
       when {
