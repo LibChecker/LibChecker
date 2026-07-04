@@ -40,6 +40,7 @@ import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.model.NativeLibraryItemDisplayData
 import com.absinthe.libchecker.domain.app.detail.model.StaticLibItem
+import com.absinthe.libchecker.domain.app.detail.model.buildLibStringItemDescription
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_TEXT
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.XmlBSDFragment
 import com.absinthe.libchecker.domain.app.detail.ui.view.ComponentLibItemView
@@ -177,7 +178,7 @@ class LibStringAdapter(
           } else {
             setChip(null, colorfulRuleIcon)
           }
-          contentDescription = buildItemDescription(
+          contentDescription = buildLibStringItemDescription(
             itemName,
             item.rule?.label.takeIf { isItemOptionEnabled(AdvancedOptions.SHOW_MARKED_LIB) },
             item.item.process.takeIf { !it.isNullOrEmpty() && processMode }
@@ -235,7 +236,7 @@ class LibStringAdapter(
     } else {
       itemView.setChip(null, colorfulRuleIcon)
     }
-    itemView.contentDescription = buildItemDescription(
+    itemView.contentDescription = buildLibStringItemDescription(
       itemName,
       itemView.libSize.text,
       item.rule?.label.takeIf { isItemOptionEnabled(AdvancedOptions.SHOW_MARKED_LIB) }
@@ -290,7 +291,7 @@ class LibStringAdapter(
     } else {
       itemView.setChip(null, colorfulRuleIcon)
     }
-    itemView.contentDescription = buildItemDescription(
+    itemView.contentDescription = buildLibStringItemDescription(
       itemName,
       itemView.libDetail.text,
       item.rule?.label.takeIf { isItemOptionEnabled(AdvancedOptions.SHOW_MARKED_LIB) }
@@ -312,7 +313,7 @@ class LibStringAdapter(
       -1
     }
     setOrHighlightText(itemView.libName, itemName)
-    itemView.contentDescription = buildItemDescription(
+    itemView.contentDescription = buildLibStringItemDescription(
       itemName,
       context.getString(R.string.permission_not_granted).takeIf { item.item.size == 0L }
     )
@@ -328,7 +329,7 @@ class LibStringAdapter(
 
     if (isApkPreviewMode) {
       setOrHighlightText(itemView.libSize, "<${context.getString(R.string.apk_preview_item_not_available)}>")
-      itemView.contentDescription = buildItemDescription(itemName, itemView.libSize.text)
+      itemView.contentDescription = buildLibStringItemDescription(itemName, itemView.libSize.text)
       return
     }
 
@@ -344,7 +345,7 @@ class LibStringAdapter(
           itemView.libSize.text = item.item.source
           itemView.linkToIcon.setImageResource(R.drawable.ic_outline_change_circle_24)
           itemView.linkToIcon.setTag(R.id.resource_transformed_id, false)
-          itemView.contentDescription = buildItemDescription(itemName, itemView.libSize.text)
+          itemView.contentDescription = buildLibStringItemDescription(itemName, itemView.libSize.text)
         } else {
           val clickedTag = when (
             val resourceValue = resolveAppResourceValue?.invoke(
@@ -400,17 +401,11 @@ class LibStringAdapter(
             }
           }
           itemView.linkToIcon.setTag(R.id.resource_transformed_id, clickedTag)
-          itemView.contentDescription = buildItemDescription(itemName, itemView.libSize.text)
+          itemView.contentDescription = buildLibStringItemDescription(itemName, itemView.libSize.text)
         }
       }
     }
-    itemView.contentDescription = buildItemDescription(itemName, itemView.libSize.text)
-  }
-
-  private fun buildItemDescription(vararg parts: CharSequence?): String {
-    return parts
-      .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
-      .joinToString()
+    itemView.contentDescription = buildLibStringItemDescription(itemName, itemView.libSize.text)
   }
 
   private fun createNativeLabelSpan(text: String): SpannedString = nativeLabelSpanCache.getOrPut(text) {
