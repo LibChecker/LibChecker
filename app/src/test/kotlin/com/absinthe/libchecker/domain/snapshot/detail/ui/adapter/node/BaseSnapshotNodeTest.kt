@@ -38,6 +38,43 @@ class BaseSnapshotNodeTest {
   }
 
   @Test
+  fun exposesReferenceTargetForExternalComponent() {
+    val node = SnapshotComponentNode(
+      buildDisplayData(
+        name = "androidx.startup.InitializationProvider",
+        ruleChip = SnapshotDetailRuleChipDisplayData(
+          label = "Jetpack App Startup",
+          iconRes = 0,
+          regexName = null,
+          isSimpleColorIcon = false,
+          useColorfulIcon = false
+        )
+      )
+    )
+
+    assertEquals(
+      SnapshotReferenceNavigationTarget(
+        refName = "androidx.startup.InitializationProvider",
+        label = "Jetpack App Startup",
+        refType = SERVICE
+      ),
+      node.referenceTarget(ownerPackageName = "com.example.app")
+    )
+  }
+
+  @Test
+  fun returnsNullReferenceTargetForOwnerComponent() {
+    val node = SnapshotComponentNode(
+      buildDisplayData(
+        name = "com.example.app.SyncService",
+        ruleChip = null
+      )
+    )
+
+    assertNull(node.referenceTarget(ownerPackageName = "com.example.app"))
+  }
+
+  @Test
   fun exposesDetailTargetForNavigableItem() {
     val node = SnapshotComponentNode(
       buildDisplayData(

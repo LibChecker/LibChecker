@@ -21,7 +21,6 @@ import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
-import com.absinthe.libchecker.annotation.isComponentType
 import com.absinthe.libchecker.compat.IntentCompat
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.Constants
@@ -205,14 +204,8 @@ class SnapshotDetailActivity :
     }
     adapter.setOnItemLongClickListener { _, _, position ->
       val node = adapter.data[position] as? BaseSnapshotNode ?: return@setOnItemLongClickListener false
-      val item = node.item
-      // if (item.diffType == REMOVED) {
-      //   return@setOnItemLongClickListener false
-      // }
-      if (isComponentType(item.itemType) && item.name.startsWith(entity.packageName)) {
-        return@setOnItemLongClickListener false
-      }
-      launchLibReferencePage(item.name, node.referenceLabel, item.itemType, null)
+      val target = node.referenceTarget(entity.packageName) ?: return@setOnItemLongClickListener false
+      launchLibReferencePage(target.refName, target.label, target.refType, null)
       true
     }
 
