@@ -4,6 +4,7 @@ import android.content.pm.PackageManager
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.track.model.TrackedAppListItem
+import com.absinthe.libchecker.domain.snapshot.track.model.buildTrackedAppListItemDescription
 import com.absinthe.libchecker.utils.extensions.getAppName
 
 class GetTrackListItemsUseCase(
@@ -21,10 +22,12 @@ class GetTrackListItemsUseCase(
     return installedAppRepository.getApplicationList()
       .asSequence()
       .map {
+        val label = it.getAppName(packageManager).toString()
         TrackedAppListItem(
           packageInfo = it,
-          label = it.getAppName(packageManager).toString(),
+          label = label,
           packageName = it.packageName,
+          description = buildTrackedAppListItemDescription(label, it.packageName),
           switchState = it.packageName in trackedPackageNames
         )
       }
