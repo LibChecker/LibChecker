@@ -13,8 +13,10 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.list.model.AppListItemIdentityText
 import com.absinthe.libchecker.domain.app.list.model.AppListItemViewState
 import com.absinthe.libchecker.domain.app.list.model.buildAppListItemDescription
+import com.absinthe.libchecker.utils.extensions.addStrikeThroughSpan
 import com.absinthe.libchecker.utils.extensions.applyCondensedSingleLine
 import com.absinthe.libchecker.utils.extensions.applySingleLineEndEllipsize
 import com.absinthe.libchecker.utils.extensions.dp
@@ -22,6 +24,7 @@ import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
+import com.absinthe.libchecker.utils.extensions.tintHighlightText
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.span.CenterAlignImageSpan
 import com.google.android.material.card.MaterialCardView
@@ -142,6 +145,18 @@ class AppItemView(
     private var multiArchBadge: AppCompatImageView? = null
     private var badge: AppCompatImageView? = null
     private var useDetachedAbiBadgeLayout = false
+
+    fun setIdentityText(identityText: AppListItemIdentityText, highlightText: String) {
+      appName.setOrHighlightText(identityText.label, highlightText)
+      appName.setItemBackground()
+      packageName.setOrHighlightText(identityText.packageName, highlightText)
+      packageName.setItemBackground()
+
+      if (identityText.showMissingPackageStrikeThrough) {
+        appName.addStrikeThroughSpan()
+        packageName.addStrikeThroughSpan()
+      }
+    }
 
     fun setAppName(text: String) {
       appName.text = text
@@ -437,6 +452,14 @@ private fun TextView.setItemBackground() {
   } else {
     background = null
     alpha = 1f
+  }
+}
+
+private fun TextView.setOrHighlightText(text: CharSequence, highlightText: String) {
+  if (highlightText.isNotBlank()) {
+    tintHighlightText(highlightText, text)
+  } else {
+    this.text = text
   }
 }
 

@@ -10,12 +10,11 @@ import coil.load
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.app.list.model.AppListItemIdentityText
 import com.absinthe.libchecker.domain.app.list.model.AppListItemViewState
-import com.absinthe.libchecker.domain.app.list.model.buildAppListItemDescription
 import com.absinthe.libchecker.domain.app.list.ui.view.AppItemView
 import com.absinthe.libchecker.domain.app.stableAppListItemIdForKey
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
-import com.absinthe.libchecker.utils.extensions.addStrikeThroughSpan
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
@@ -127,23 +126,15 @@ class AppAdapter(
     item: LCItem,
     viewState: AppListItemViewState
   ) {
-    root.container.apply {
-      setOrHighlightText(appName, item.label)
-      setOrHighlightText(packageName, item.packageName)
-
-      if (viewState.isPackageMissing && cardMode != CardMode.DEMO) {
-        appName.addStrikeThroughSpan()
-        packageName.addStrikeThroughSpan()
-      }
-    }
-    root.setItemContentDescription(
-      buildAppListItemDescription(
-        item.label,
-        item.packageName,
-        viewState.versionInfo,
-        viewState.accessibilityAbiInfo
-      )
+    val identityText = AppListItemIdentityText.create(
+      label = item.label,
+      packageName = item.packageName,
+      versionInfo = viewState.versionInfo,
+      accessibilityAbiInfo = viewState.accessibilityAbiInfo,
+      showMissingPackageStrikeThrough = viewState.isPackageMissing && cardMode != CardMode.DEMO
     )
+    root.container.setIdentityText(identityText, highlightText)
+    root.setItemContentDescription(identityText.contentDescription)
   }
 
   enum class CardMode {
