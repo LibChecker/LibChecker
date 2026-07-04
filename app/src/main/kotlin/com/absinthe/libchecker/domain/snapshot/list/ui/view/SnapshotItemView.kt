@@ -52,6 +52,24 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
     addView(container)
   }
 
+  fun setItemContentDescription(
+    added: Int,
+    removed: Int,
+    changed: Int,
+    moved: Int
+  ) {
+    contentDescription = buildItemDescription(
+      container.appName.text,
+      container.packageName.text,
+      container.versionInfo.text,
+      container.packageSizeInfo.text.takeIf { container.packageSizeInfo.isVisible },
+      container.apisInfo.text,
+      container.abiInfo.text,
+      container.updateTime.text.takeIf { container.updateTime.isVisible },
+      buildSnapshotStateDescription(added, removed, changed, moved)
+    )
+  }
+
   enum class PackageStateLabel {
     New,
     Deleted
@@ -440,6 +458,26 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
 }
 
 private const val ABI_CHANGE_ARROW = "→"
+
+private fun SnapshotItemView.buildSnapshotStateDescription(
+  added: Int,
+  removed: Int,
+  changed: Int,
+  moved: Int
+): String {
+  return listOf(
+    added.takeIf { it > 0 }?.let { "${context.getString(R.string.snapshot_indicator_added)} $it" },
+    removed.takeIf { it > 0 }?.let { "${context.getString(R.string.snapshot_indicator_removed)} $it" },
+    changed.takeIf { it > 0 }?.let { "${context.getString(R.string.snapshot_indicator_changed)} $it" },
+    moved.takeIf { it > 0 }?.let { "${context.getString(R.string.snapshot_indicator_moved)} $it" }
+  ).filterNotNull().joinToString()
+}
+
+private fun buildItemDescription(vararg parts: CharSequence?): String {
+  return parts
+    .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
+    .joinToString()
+}
 
 private fun AppCompatTextView.setOrHighlightText(text: CharSequence, highlightText: String) {
   if (highlightText.isNotBlank()) {
