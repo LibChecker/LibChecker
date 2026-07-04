@@ -2,6 +2,8 @@ package com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node
 
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemStatusDisplayData
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailCountRenderState
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailTitleRenderState
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -24,7 +26,12 @@ class SnapshotTitleNodeRenderStateTest {
     assertEquals(
       SnapshotDetailTitleRenderState(
         title = "Native libraries",
-        counts = listOf(count),
+        counts = listOf(
+          SnapshotDetailCountRenderState(
+            text = "2",
+            backgroundTintRes = 12
+          )
+        ),
         contentDescription = "Native libraries, Moved 2, Expanded",
         expanded = true
       ),

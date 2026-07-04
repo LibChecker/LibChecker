@@ -1,16 +1,11 @@
 package com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node
 
-data class SnapshotDetailTitleRenderState(
-  val title: String,
-  val counts: List<SnapshotDetailCountNode>,
-  val contentDescription: String,
-  val expanded: Boolean
-)
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailTitleRenderState
 
 val SnapshotTitleNode.titleRenderState: SnapshotDetailTitleRenderState
   get() = SnapshotDetailTitleRenderState(
     title = title,
-    counts = counts,
+    counts = counts.map { it.countRenderState },
     contentDescription = contentDescription,
     expanded = isExpanded
   )

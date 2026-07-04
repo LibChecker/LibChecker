@@ -1,11 +1,6 @@
 package com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node
 
-import androidx.annotation.ColorRes
-
-data class SnapshotDetailCountRenderState(
-  val text: String,
-  @ColorRes val backgroundTintRes: Int
-)
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailCountRenderState
 
 val SnapshotDetailCountNode.countRenderState: SnapshotDetailCountRenderState
   get() = SnapshotDetailCountRenderState(

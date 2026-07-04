@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node
 
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemStatusDisplayData
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailCountRenderState
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
