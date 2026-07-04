@@ -5,9 +5,12 @@ import com.chad.library.adapter.base.entity.node.BaseNode
 
 open class BaseSnapshotNode(
   val displayData: SnapshotDetailItemDisplayData
-) : BaseNode() {
+) : BaseNode(),
+  SnapshotReportNode {
 
   val item = displayData.item
+  override val reportText: String
+    get() = displayData.reportText
 
   override val childNode: MutableList<BaseNode>? = null
 }

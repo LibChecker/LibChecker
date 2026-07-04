@@ -8,11 +8,12 @@ class SnapshotTitleNode(
   override val childNode: MutableList<BaseNode>,
   @LibType val type: Int,
   val title: String,
-  val reportText: String,
+  override val reportText: String,
   val expandedDescription: String,
   val collapsedDescription: String,
   val counts: List<SnapshotDetailCountNode>
-) : BaseExpandNode() {
+) : BaseExpandNode(),
+  SnapshotReportNode {
 
   val contentDescription: String
     get() = if (isExpanded) {

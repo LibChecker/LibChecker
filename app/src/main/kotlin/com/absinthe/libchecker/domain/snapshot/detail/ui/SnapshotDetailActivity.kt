@@ -37,6 +37,7 @@ import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.BaseSnapsh
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotComponentNode
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotDetailCountNode
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotNativeNode
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotReportNode
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotTitleNode
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailDeletedView
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailNewInstallView
@@ -310,19 +311,9 @@ class SnapshotDetailActivity :
     sb.append(buildSnapshotDetailReportHeader(snapshotTitleDisplayData))
     sb.appendLine()
 
-    adapter.data.forEach {
-      when (it) {
-        is SnapshotTitleNode -> {
-          sb.append(it.reportText)
-        }
-
-        is SnapshotComponentNode -> {
-          sb.append(it.displayData.reportText)
-        }
-
-        is SnapshotNativeNode -> {
-          sb.append(it.displayData.reportText)
-        }
+    adapter.data.forEach { node ->
+      if (node is SnapshotReportNode) {
+        sb.append(node.reportText)
       }
     }
     ClipboardUtils.put(this, sb.toString())
