@@ -29,10 +29,11 @@ import com.absinthe.libchecker.domain.app.detail.ui.AppBarStateChangeListener
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotTitleDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailReportHeader
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.SnapshotDetailAdapter
-import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.BaseSnapshotNode
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotDetailNodeClickAction
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotDetailNodeLongClickAction
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotReportNode
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.clickAction
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.longClickAction
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.toSnapshotTitleNode
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailDeletedView
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailNewInstallView
@@ -204,10 +205,15 @@ class SnapshotDetailActivity :
       }
     }
     adapter.setOnItemLongClickListener { _, _, position ->
-      val node = adapter.data[position] as? BaseSnapshotNode ?: return@setOnItemLongClickListener false
-      val target = node.referenceTarget(entity.packageName) ?: return@setOnItemLongClickListener false
-      launchLibReferencePage(target.refName, target.label, target.refType, null)
-      true
+      when (val action = adapter.data[position].longClickAction(entity.packageName)) {
+        is SnapshotDetailNodeLongClickAction.OpenReference -> {
+          val target = action.target
+          launchLibReferencePage(target.refName, target.label, target.refType, null)
+          true
+        }
+
+        null -> false
+      }
     }
 
     viewModel.snapshotDetailSectionsFlow.onEach { sections ->
