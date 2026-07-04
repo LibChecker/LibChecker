@@ -94,26 +94,23 @@ class SnapshotTitleView(
     addView(this)
   }
 
-  fun render(
-    data: SnapshotTitleRenderState,
-    copyPrimaryText: Boolean = true
-  ) {
+  fun render(data: SnapshotTitleRenderState) {
     appNameView.apply {
       text = data.appName
-      if (copyPrimaryText) {
+      if (data.copyPrimaryText) {
         setLongClickCopiedToClipboard(text)
       }
     }
     iconView.contentDescription = appNameView.text
     packageNameView.apply {
       text = data.packageName
-      if (copyPrimaryText) {
+      if (data.copyPrimaryText) {
         setLongClickCopiedToClipboard(text)
       }
     }
     versionInfoView.apply {
       text = data.versionInfo
-      if (copyPrimaryText) {
+      if (data.copyPrimaryText) {
         setLongClickCopiedToClipboard(text)
       }
     }

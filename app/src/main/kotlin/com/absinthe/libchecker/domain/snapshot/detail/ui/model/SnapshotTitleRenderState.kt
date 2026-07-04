@@ -8,7 +8,8 @@ data class SnapshotTitleRenderState(
   val packageName: CharSequence,
   val versionInfo: CharSequence,
   val packageSize: SnapshotTitlePackageSizeRenderState?,
-  val apis: CharSequence
+  val apis: CharSequence,
+  val copyPrimaryText: Boolean
 )
 
 data class SnapshotTitlePackageSizeRenderState(
@@ -16,13 +17,16 @@ data class SnapshotTitlePackageSizeRenderState(
   val breakStart: Int
 )
 
-fun SnapshotTitleDisplayData.toRenderState(): SnapshotTitleRenderState {
+fun SnapshotTitleDisplayData.toRenderState(
+  copyPrimaryText: Boolean = true
+): SnapshotTitleRenderState {
   return SnapshotTitleRenderState(
     appName = appName,
     packageName = packageName,
     versionInfo = versionInfo,
     packageSize = packageSize?.toRenderState(),
-    apis = apis
+    apis = apis,
+    copyPrimaryText = copyPrimaryText
   )
 }
 

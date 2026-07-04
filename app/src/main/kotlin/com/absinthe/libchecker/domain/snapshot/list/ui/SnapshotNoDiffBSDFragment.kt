@@ -39,13 +39,12 @@ class SnapshotNoDiffBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotNoDi
       root.title.apply {
         bindIcon(item)
         render(
-          data = buildSnapshotTitleDisplayData(
+          buildSnapshotTitleDisplayData(
             BuildSnapshotTitleDisplayDataUseCase.Request(
               item = item,
               formatSplitPackageName = false
             )
-          ).toRenderState(),
-          copyPrimaryText = false
+          ).toRenderState(copyPrimaryText = false)
         )
       }
 

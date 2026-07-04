@@ -30,7 +30,8 @@ class SnapshotTitleRenderStateTest {
           text = "251 MB -> 283 MB\n+32 MB",
           breakStart = 17
         ),
-        apis = "Target: 35  Min: 28  Compile: 36"
+        apis = "Target: 35  Min: 28  Compile: 36",
+        copyPrimaryText = true
       ),
       displayData.toRenderState()
     )
@@ -47,5 +48,18 @@ class SnapshotTitleRenderStateTest {
     )
 
     assertEquals(null, displayData.toRenderState().packageSize)
+  }
+
+  @Test
+  fun mapsCopyPrimaryTextDisabledToRenderState() {
+    val displayData = SnapshotTitleDisplayData(
+      appName = "X",
+      packageName = "com.twitter.android",
+      versionInfo = "12.5.0",
+      packageSize = null,
+      apis = "Target: 35"
+    )
+
+    assertEquals(false, displayData.toRenderState(copyPrimaryText = false).copyPrimaryText)
   }
 }
