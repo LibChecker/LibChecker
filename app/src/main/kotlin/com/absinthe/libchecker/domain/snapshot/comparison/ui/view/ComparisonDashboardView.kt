@@ -48,10 +48,6 @@ class ComparisonDashboardView(context: Context) : MaterialCardView(context, null
     container.applySideState(side, sideState)
   }
 
-  fun setAppsCount(side: SnapshotComparisonSide, snapshotCount: Int) {
-    container.setAppsCount(side, snapshotCount)
-  }
-
   private class SnapshotDashboardContainerView(context: Context) : AViewGroup(context) {
 
     private val leftPart = ComparisonDashboardHalfView(context).apply {
@@ -94,10 +90,6 @@ class ComparisonDashboardView(context: Context) : MaterialCardView(context, null
       sideState: ComparisonDashboardStatePlanner.SideState
     ) {
       getPart(side).applySideState(sideState)
-    }
-
-    fun setAppsCount(side: SnapshotComparisonSide, snapshotCount: Int) {
-      getPart(side).setAppsCountText(snapshotCount.toString())
     }
 
     private fun getPart(side: SnapshotComparisonSide): ComparisonDashboardHalfView {

@@ -147,12 +147,15 @@ class SnapshotComparisonViewModel(
     return buildSnapshotPairDiffUseCase(left, right)
   }
 
-  internal fun buildDashboardSideState(side: SnapshotComparisonSide): ComparisonDashboardStatePlanner.SideState {
+  internal fun buildDashboardSideState(
+    side: SnapshotComparisonSide,
+    labels: ComparisonDashboardStatePlanner.Labels
+  ): ComparisonDashboardStatePlanner.SideState {
     val input = when (side) {
       SnapshotComparisonSide.LEFT -> inputs.left
       SnapshotComparisonSide.RIGHT -> inputs.right
     }
-    return ComparisonDashboardStatePlanner.planSideState(input, ::getFormatDateString)
+    return ComparisonDashboardStatePlanner.planSideState(input, labels, ::getFormatDateString)
   }
 
   private suspend fun buildSnapshotComparisonPlan(

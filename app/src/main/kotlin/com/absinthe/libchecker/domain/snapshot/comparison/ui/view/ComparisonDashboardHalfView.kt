@@ -73,7 +73,6 @@ class ComparisonDashboardHalfView(
     addView(tvSnapshotAppsCountTitle)
     addView(tvSnapshotAppsCountText)
     setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackgroundBorderless))
-    updateContentDescription()
   }
 
   var horizontalGravity: Int = Gravity.START
@@ -86,25 +85,9 @@ class ComparisonDashboardHalfView(
     }
 
   internal fun applySideState(sideState: ComparisonDashboardStatePlanner.SideState) {
-    sideState.timestampText?.let { tvSnapshotTimestampText.text = it }
-    sideState.appsCountText?.let { tvSnapshotAppsCountText.text = it }
-    updateContentDescription()
-  }
-
-  fun setAppsCountText(text: CharSequence) {
-    tvSnapshotAppsCountText.text = text
-    updateContentDescription()
-  }
-
-  private fun updateContentDescription() {
-    contentDescription = listOf(
-      tvSnapshotTimestampTitle.text,
-      tvSnapshotTimestampText.text,
-      tvSnapshotAppsCountTitle.text,
-      tvSnapshotAppsCountText.text
-    )
-      .mapNotNull { it.toString().trim().takeIf(String::isNotEmpty) }
-      .joinToString()
+    tvSnapshotTimestampText.text = sideState.timestampText
+    tvSnapshotAppsCountText.text = sideState.appsCountText
+    contentDescription = sideState.contentDescription
   }
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

@@ -83,6 +83,16 @@ class ComparisonActivity :
       ContextThemeWrapper(this, R.style.AlbumMaterialCard)
     )
   }
+  private val dashboardLabels by lazy(LazyThreadSafetyMode.NONE) {
+    ComparisonDashboardStatePlanner.Labels(
+      timestampTitle = getString(R.string.snapshot_current_timestamp),
+      chooseTimestampText = getString(R.string.album_click_to_choose),
+      appsCountTitle = getString(R.string.comparison_snapshot_apps_count),
+      defaultAppsCountText = DEFAULT_DASHBOARD_APPS_COUNT
+    )
+  }
+  private var leftDashboardSideState: ComparisonDashboardStatePlanner.SideState? = null
+  private var rightDashboardSideState: ComparisonDashboardStatePlanner.SideState? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -215,14 +225,18 @@ class ComparisonActivity :
       effect.onEach {
         when (it) {
           is SnapshotComparisonViewModel.Effect.DashboardCountChange -> {
-            dashboardView.setAppsCount(
-              SnapshotComparisonSide.fromIsLeft(it.isLeft),
-              it.snapshotCount
+            val side = SnapshotComparisonSide.fromIsLeft(it.isLeft)
+            val sideState = getDashboardSideState(side)
+              ?: viewModel.buildDashboardSideState(side, dashboardLabels)
+            renderDashboardSideState(
+              side = side,
+              sideState = sideState.withAppsCountText(it.snapshotCount.toString(), dashboardLabels)
             )
           }
         }
       }.launchIn(lifecycleScope)
     }
+    invalidateDashboard()
   }
 
   private fun showTimeNodePicker(side: SnapshotComparisonSide) {
@@ -282,11 +296,11 @@ class ComparisonActivity :
     dashboardView.post {
       applyDashboardSideState(
         side = SnapshotComparisonSide.LEFT,
-        sideState = viewModel.buildDashboardSideState(SnapshotComparisonSide.LEFT)
+        sideState = viewModel.buildDashboardSideState(SnapshotComparisonSide.LEFT, dashboardLabels)
       )
       applyDashboardSideState(
         side = SnapshotComparisonSide.RIGHT,
-        sideState = viewModel.buildDashboardSideState(SnapshotComparisonSide.RIGHT)
+        sideState = viewModel.buildDashboardSideState(SnapshotComparisonSide.RIGHT, dashboardLabels)
       )
     }
   }
@@ -295,9 +309,27 @@ class ComparisonActivity :
     side: SnapshotComparisonSide,
     sideState: ComparisonDashboardStatePlanner.SideState
   ) {
-    dashboardView.applySideState(side, sideState)
+    renderDashboardSideState(side, sideState)
     sideState.dashboardCountTimestamp?.let {
       viewModel.getDashboardCount(it, side == SnapshotComparisonSide.LEFT)
+    }
+  }
+
+  private fun renderDashboardSideState(
+    side: SnapshotComparisonSide,
+    sideState: ComparisonDashboardStatePlanner.SideState
+  ) {
+    when (side) {
+      SnapshotComparisonSide.LEFT -> leftDashboardSideState = sideState
+      SnapshotComparisonSide.RIGHT -> rightDashboardSideState = sideState
+    }
+    dashboardView.applySideState(side, sideState)
+  }
+
+  private fun getDashboardSideState(side: SnapshotComparisonSide): ComparisonDashboardStatePlanner.SideState? {
+    return when (side) {
+      SnapshotComparisonSide.LEFT -> leftDashboardSideState
+      SnapshotComparisonSide.RIGHT -> rightDashboardSideState
     }
   }
 
@@ -451,3 +483,5 @@ class ComparisonActivity :
     return comboIcon
   }
 }
+
+private const val DEFAULT_DASHBOARD_APPS_COUNT = "0"
