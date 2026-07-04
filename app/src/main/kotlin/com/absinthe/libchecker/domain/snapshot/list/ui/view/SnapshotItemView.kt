@@ -21,6 +21,9 @@ import com.absinthe.libchecker.domain.snapshot.display.SnapshotAbiDisplayData
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotAbiDisplayItem
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotUpdateTimeDisplayData
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotUpdateTimeText
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemCardPresentation
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemDisplayData
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemStateIndicatorData
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.domain.snapshot.ui.view.SnapshotPackageSizeLineBreaker
@@ -58,7 +61,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
     addView(container)
   }
 
-  fun render(data: RenderData) {
+  fun render(data: SnapshotItemDisplayData) {
     val isNewOrDeleted = data.isNewInstalled || data.isDeleted
     setCardPresentation(data.cardPresentation)
     container.apply {
@@ -105,21 +108,21 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
     setItemContentDescription(data.stateIndicator)
   }
 
-  private fun setCardPresentation(cardPresentation: CardPresentation) {
+  private fun setCardPresentation(cardPresentation: SnapshotItemCardPresentation) {
     when (cardPresentation) {
-      CardPresentation.Normal -> {
+      SnapshotItemCardPresentation.Normal -> {
         strokeColor = Color.TRANSPARENT
         radius = 0f
       }
 
-      CardPresentation.Rounded -> {
+      SnapshotItemCardPresentation.Rounded -> {
         setSmoothRoundCorner(16.dp)
         strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutlineVariant)
       }
     }
   }
 
-  private fun setItemContentDescription(stateIndicator: StateIndicatorData) {
+  private fun setItemContentDescription(stateIndicator: SnapshotItemStateIndicatorData) {
     contentDescription = buildItemDescription(
       container.appName.text,
       container.packageName.text,
@@ -137,53 +140,9 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
     )
   }
 
-  data class RenderData(
-    val cardPresentation: CardPresentation,
-    val iconSource: SnapshotPackageIconSource?,
-    val packageName: String,
-    val labelDiff: SnapshotDiffItem.DiffNode<String>,
-    val isTrackItem: Boolean,
-    val isNewInstalled: Boolean,
-    val isDeleted: Boolean,
-    val stateIndicator: StateIndicatorData,
-    val versionNameDiff: SnapshotDiffItem.DiffNode<String>,
-    val versionCodeDiff: SnapshotDiffItem.DiffNode<Long>,
-    val packageSizeDiff: SnapshotDiffItem.DiffNode<Long>,
-    val api: ApiDisplayData,
-    val abi: AbiDisplayData,
-    val updateTimeDisplayData: SnapshotUpdateTimeDisplayData?,
-    val highlightDiffs: Boolean,
-    val highlightText: String
-  )
-
-  data class StateIndicatorData(
-    val added: Int,
-    val removed: Int,
-    val changed: Int,
-    val moved: Int,
-    val animate: Boolean
-  )
-
-  data class ApiDisplayData(
-    val targetApiDiff: SnapshotDiffItem.DiffNode<Short>,
-    val minSdkDiff: SnapshotDiffItem.DiffNode<Short>,
-    val compileSdkDiff: SnapshotDiffItem.DiffNode<Short>
-  )
-
-  data class AbiDisplayData(
-    val abiDisplayData: SnapshotAbiDisplayData,
-    val showChangedAbi: Boolean,
-    val tintChangedAbiBadge: Boolean
-  )
-
   enum class PackageStateLabel {
     New,
     Deleted
-  }
-
-  enum class CardPresentation {
-    Normal,
-    Rounded
   }
 
   class SnapshotItemContainerView(context: Context) : AViewGroup(context) {
@@ -299,7 +258,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
     }
 
     fun setStateIndicator(
-      data: StateIndicatorData,
+      data: SnapshotItemStateIndicatorData,
       isNewOrDeleted: Boolean
     ) {
       if (data.animate) {
@@ -609,7 +568,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
 
 private const val ABI_CHANGE_ARROW = "→"
 
-private val SnapshotItemView.RenderData.packageStateLabel: SnapshotItemView.PackageStateLabel?
+private val SnapshotItemDisplayData.packageStateLabel: SnapshotItemView.PackageStateLabel?
   get() = when {
     isNewInstalled -> SnapshotItemView.PackageStateLabel.New
     isDeleted -> SnapshotItemView.PackageStateLabel.Deleted

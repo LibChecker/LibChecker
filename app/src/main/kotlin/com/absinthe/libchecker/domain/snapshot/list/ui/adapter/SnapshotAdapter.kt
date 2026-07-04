@@ -4,6 +4,11 @@ import android.view.ViewGroup
 import com.absinthe.libchecker.domain.snapshot.SnapshotListDisplayOptions
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotAbiDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemAbiDisplayData
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemApiDisplayData
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemCardPresentation
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemDisplayData
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemStateIndicatorData
 import com.absinthe.libchecker.domain.snapshot.list.ui.view.SnapshotItemView
 import com.absinthe.libchecker.domain.snapshot.list.usecase.stableSnapshotDiffItemIdFor
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
@@ -60,7 +65,7 @@ class SnapshotAdapter(
       )
     )
     itemView.render(
-      SnapshotItemView.RenderData(
+      SnapshotItemDisplayData(
         cardPresentation = cardMode.toCardPresentation(),
         iconSource = packageIconSources[item.packageName],
         packageName = item.packageName,
@@ -68,7 +73,7 @@ class SnapshotAdapter(
         isTrackItem = item.isTrackItem,
         isNewInstalled = item.newInstalled,
         isDeleted = item.deleted,
-        stateIndicator = SnapshotItemView.StateIndicatorData(
+        stateIndicator = SnapshotItemStateIndicatorData(
           added = item.added,
           removed = item.removed,
           changed = item.changed,
@@ -78,12 +83,12 @@ class SnapshotAdapter(
         versionNameDiff = item.versionNameDiff,
         versionCodeDiff = item.versionCodeDiff,
         packageSizeDiff = item.packageSizeDiff,
-        api = SnapshotItemView.ApiDisplayData(
+        api = SnapshotItemApiDisplayData(
           targetApiDiff = item.targetApiDiff,
           minSdkDiff = item.minSdkDiff,
           compileSdkDiff = item.compileSdkDiff
         ),
-        abi = SnapshotItemView.AbiDisplayData(
+        abi = SnapshotItemAbiDisplayData(
           abiDisplayData = buildSnapshotAbiDisplayData(item.abiDiff),
           showChangedAbi = item.abiDiff.new != null && item.abiDiff.old != item.abiDiff.new,
           tintChangedAbiBadge = displayOptions.tintAbiLabels
@@ -109,11 +114,11 @@ class SnapshotAdapter(
   }
 }
 
-private fun SnapshotAdapter.CardMode.toCardPresentation(): SnapshotItemView.CardPresentation {
+private fun SnapshotAdapter.CardMode.toCardPresentation(): SnapshotItemCardPresentation {
   return when (this) {
-    SnapshotAdapter.CardMode.NORMAL -> SnapshotItemView.CardPresentation.Normal
+    SnapshotAdapter.CardMode.NORMAL -> SnapshotItemCardPresentation.Normal
 
     SnapshotAdapter.CardMode.DEMO,
-    SnapshotAdapter.CardMode.GET_APP_UPDATE -> SnapshotItemView.CardPresentation.Rounded
+    SnapshotAdapter.CardMode.GET_APP_UPDATE -> SnapshotItemCardPresentation.Rounded
   }
 }
