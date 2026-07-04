@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.domain.snapshot.list.ui.adapter
 
 import android.graphics.Color
-import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ImageSpan
@@ -131,24 +130,13 @@ class SnapshotAdapter(
       }
 
       setOrHighlightText(appName, appNameLabel)
-
-      if (isNewOrDeleted) {
-        val labelDrawable = if (item.newInstalled) {
-          R.drawable.ic_label_new_package.getDrawable(context)!!
-        } else {
-          R.drawable.ic_label_deleted_package.getDrawable(context)!!
+      appendPackageStateLabel(
+        when {
+          item.newInstalled -> SnapshotItemView.PackageStateLabel.New
+          item.deleted -> SnapshotItemView.PackageStateLabel.Deleted
+          else -> null
         }
-        val sb = SpannableStringBuilder(appName.text)
-        val spanString = SpannableString("   ")
-        val span = CenterAlignImageSpan(
-          labelDrawable.also {
-            it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
-          }
-        )
-        spanString.setSpan(span, 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        sb.append(spanString)
-        appName.text = sb
-      }
+      )
 
       setOrHighlightText(packageName, item.packageName)
       versionInfo.text = LCAppUtils.getDiffString(

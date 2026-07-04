@@ -1,6 +1,9 @@
 package com.absinthe.libchecker.domain.snapshot.list.ui.view
 
 import android.content.Context
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
@@ -13,9 +16,11 @@ import com.absinthe.libchecker.utils.extensions.applyCondensedSingleLine
 import com.absinthe.libchecker.utils.extensions.applySingleLineEndEllipsize
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
+import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.utils.extensions.visibleHeight
 import com.absinthe.libchecker.view.AViewGroup
+import com.absinthe.libchecker.view.span.CenterAlignImageSpan
 import com.google.android.material.card.MaterialCardView
 
 class SnapshotItemView(context: Context) : MaterialCardView(context) {
@@ -31,6 +36,11 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       LayoutParams.WRAP_CONTENT
     )
     addView(container)
+  }
+
+  enum class PackageStateLabel {
+    New,
+    Deleted
   }
 
   class SnapshotItemContainerView(context: Context) : AViewGroup(context) {
@@ -130,6 +140,26 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       layoutParams = LayoutParams(5.dp, ViewGroup.LayoutParams.MATCH_PARENT)
       importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
       addView(this)
+    }
+
+    fun appendPackageStateLabel(packageStateLabel: PackageStateLabel?) {
+      val labelDrawable = when (packageStateLabel) {
+        PackageStateLabel.New -> R.drawable.ic_label_new_package
+        PackageStateLabel.Deleted -> R.drawable.ic_label_deleted_package
+        null -> return
+      }.getDrawable(context) ?: return
+      val spanString = SpannableString("   ")
+      spanString.setSpan(
+        CenterAlignImageSpan(
+          labelDrawable.also {
+            it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+          }
+        ),
+        1,
+        2,
+        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+      )
+      appName.text = SpannableStringBuilder(appName.text).append(spanString)
     }
 
     fun setPackageSizeText(text: CharSequence, breakStart: Int) {

@@ -3,7 +3,9 @@ package com.absinthe.libchecker.domain.app.list.ui.view
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.text.SpannableString
 import android.text.TextUtils
+import android.text.style.ImageSpan
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.TextView
@@ -11,6 +13,7 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.list.model.AppListItemViewState
 import com.absinthe.libchecker.utils.extensions.applyCondensedSingleLine
 import com.absinthe.libchecker.utils.extensions.applySingleLineEndEllipsize
 import com.absinthe.libchecker.utils.extensions.dp
@@ -19,6 +22,7 @@ import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
+import com.absinthe.libchecker.view.span.CenterAlignImageSpan
 import com.google.android.material.card.MaterialCardView
 
 class AppItemView(
@@ -154,6 +158,40 @@ class AppItemView(
     fun setAbiInfo(text: String) {
       abiInfo.text = text
       abiInfo.setItemBackground()
+    }
+
+    fun setAbiDisplay(viewState: AppListItemViewState) {
+      setDetachedAbiBadgeLayoutEnabled(viewState.useDetachedAbiBadges)
+
+      if (viewState.useDetachedAbiBadges) {
+        if (viewState.largeAbiBadgeRes != 0) {
+          val abiBadge = viewState.largeAbiBadgeRes.getDrawable(context)?.mutate()?.apply {
+            setTint(context.getAbiBadgeTint(viewState.isAbiBadge64Bit, viewState.tintAbiLabels))
+          }
+          val multiArchBadge = if (viewState.showMultiArchBadge) {
+            R.drawable.ic_abi_label_multi_arch.getDrawable(context)?.mutate()?.apply {
+              setTint(context.getMultiArchBadgeTint(viewState.tintAbiLabels))
+            }
+          } else {
+            null
+          }
+          setAbiBadges(abiBadge, multiArchBadge)
+        } else {
+          setAbiBadges(null, null)
+        }
+        abiInfo.text = viewState.abiInfo
+      } else {
+        setAbiBadges(null, null)
+        abiInfo.text = context.buildInlineAbiInfo(viewState)
+      }
+    }
+
+    fun setPackageBadge(packageBadge: AppListItemViewState.PackageBadge?) {
+      when (packageBadge) {
+        AppListItemViewState.PackageBadge.Harmony -> setBadge(R.drawable.ic_harmony_badge)
+        AppListItemViewState.PackageBadge.Frozen -> setBadge(R.drawable.ic_disabled_package)
+        null -> setBadge(null)
+      }
     }
 
     fun setDetachedAbiBadgeLayoutEnabled(enabled: Boolean) {
@@ -397,4 +435,54 @@ private fun TextView.setItemBackground() {
     background = null
     alpha = 1f
   }
+}
+
+private fun Context.getAbiBadgeTint(isAbi64Bit: Boolean, tintAbiLabels: Boolean): Int {
+  if (!tintAbiLabels) {
+    return getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant)
+  }
+  return getColorByAttr(
+    if (isAbi64Bit) {
+      androidx.appcompat.R.attr.colorPrimary
+    } else {
+      com.google.android.material.R.attr.colorTertiary
+    }
+  )
+}
+
+private fun Context.buildInlineAbiInfo(viewState: AppListItemViewState): CharSequence {
+  if (viewState.abiBadgeRes == 0) {
+    return viewState.abiInfo
+  }
+
+  var paddingString = "  ${viewState.abiInfo}"
+  if (viewState.showMultiArchBadge) {
+    paddingString = "  $paddingString"
+  }
+  val spanString = SpannableString(paddingString)
+
+  viewState.abiBadgeRes.getDrawable(this)?.mutate()?.let {
+    it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+    it.setTint(getAbiBadgeTint(viewState.isAbiBadge64Bit, viewState.tintAbiLabels))
+    spanString.setSpan(CenterAlignImageSpan(it), 0, 1, ImageSpan.ALIGN_BOTTOM)
+  }
+  if (viewState.showMultiArchBadge) {
+    R.drawable.ic_multi_arch.getDrawable(this)?.mutate()?.let {
+      it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+      it.setTint(getMultiArchBadgeTint(viewState.tintAbiLabels))
+      spanString.setSpan(CenterAlignImageSpan(it), 2, 3, ImageSpan.ALIGN_BOTTOM)
+    }
+  }
+
+  return spanString
+}
+
+private fun Context.getMultiArchBadgeTint(tintAbiLabels: Boolean): Int {
+  return getColorByAttr(
+    if (tintAbiLabels) {
+      com.google.android.material.R.attr.colorSecondary
+    } else {
+      com.google.android.material.R.attr.colorOnSurfaceVariant
+    }
+  )
 }
