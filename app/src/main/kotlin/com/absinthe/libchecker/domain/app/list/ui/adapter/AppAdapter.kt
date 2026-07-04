@@ -4,9 +4,7 @@ import android.content.Context
 import android.view.ViewGroup
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.list.model.AppListItemIconDisplay
-import com.absinthe.libchecker.domain.app.list.model.AppListItemIdentityText
-import com.absinthe.libchecker.domain.app.list.model.AppListItemMetadataDisplay
+import com.absinthe.libchecker.domain.app.list.model.AppListItemDisplay
 import com.absinthe.libchecker.domain.app.list.model.AppListItemViewState
 import com.absinthe.libchecker.domain.app.list.ui.view.AppItemView
 import com.absinthe.libchecker.domain.app.stableAppListItemIdForKey
@@ -47,19 +45,15 @@ class AppAdapter(
         radius = 0f
       }
     }
-    root.container.apply {
-      val viewState = getItemViewState(item)
-      setIconDisplay(AppListItemIconDisplay.create(item.packageName, viewState.packageInfo))
-      bindIdentityText(root, item, viewState)
-
-      setMetadataDisplay(AppListItemMetadataDisplay.create(viewState))
-    }
+    val viewState = getItemViewState(item)
+    root.setItemDisplay(createItemDisplay(item, viewState), highlightText)
   }
 
   override fun convert(holder: BaseViewHolder, item: LCItem, payloads: List<Any>) {
     if (payloads.any { it === HIGHLIGHT_TEXT_PAYLOAD }) {
       val root = holder.itemView as AppItemView
-      bindIdentityText(root, item, getItemViewState(item))
+      val viewState = getItemViewState(item)
+      root.setItemIdentityDisplay(createItemDisplay(item, viewState), highlightText)
     } else {
       convert(holder, item)
     }
@@ -112,20 +106,16 @@ class AppAdapter(
     }
   }
 
-  private fun bindIdentityText(
-    root: AppItemView,
+  private fun createItemDisplay(
     item: LCItem,
     viewState: AppListItemViewState
-  ) {
-    val identityText = AppListItemIdentityText.create(
+  ): AppListItemDisplay {
+    return AppListItemDisplay.create(
       label = item.label,
       packageName = item.packageName,
-      versionInfo = viewState.versionInfo,
-      accessibilityAbiInfo = viewState.accessibilityAbiInfo,
+      viewState = viewState,
       showMissingPackageStrikeThrough = viewState.isPackageMissing && cardMode != CardMode.DEMO
     )
-    root.container.setIdentityText(identityText, highlightText)
-    root.setItemContentDescription(identityText.contentDescription)
   }
 
   enum class CardMode {

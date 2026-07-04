@@ -15,6 +15,7 @@ import androidx.core.view.marginStart
 import coil.dispose
 import coil.load
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.list.model.AppListItemDisplay
 import com.absinthe.libchecker.domain.app.list.model.AppListItemIconDisplay
 import com.absinthe.libchecker.domain.app.list.model.AppListItemIdentityText
 import com.absinthe.libchecker.domain.app.list.model.AppListItemMetadataDisplay
@@ -78,6 +79,17 @@ class AppItemView(
 
   fun setItemContentDescription(description: CharSequence?) {
     contentDescription = description
+  }
+
+  fun setItemDisplay(display: AppListItemDisplay, highlightText: String) {
+    container.setIconDisplay(display.icon)
+    setItemIdentityDisplay(display, highlightText)
+    container.setMetadataDisplay(display.metadata)
+  }
+
+  fun setItemIdentityDisplay(display: AppListItemDisplay, highlightText: String) {
+    container.setIdentityText(display.identity, highlightText)
+    setItemContentDescription(display.identity.contentDescription)
   }
 
   class AppItemContainerView(
