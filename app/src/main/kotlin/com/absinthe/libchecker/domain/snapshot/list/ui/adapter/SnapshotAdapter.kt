@@ -9,7 +9,6 @@ import com.absinthe.libchecker.domain.snapshot.list.usecase.stableSnapshotDiffIt
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
-import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
 const val ARROW = "→"
@@ -56,11 +55,6 @@ class SnapshotAdapter(
     itemView.setCardPresentation(cardMode.toCardPresentation())
     itemView.container.apply {
       val isNewOrDeleted = item.deleted || item.newInstalled
-      val highlightDiffColor = if (displayOptions.highlightDiffs) {
-        context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary)
-      } else {
-        null
-      }
 
       setIconSource(packageIconSources[item.packageName])
       setDeleted(item.deleted)
@@ -82,7 +76,7 @@ class SnapshotAdapter(
           else -> null
         },
         isNewOrDeleted = isNewOrDeleted,
-        highlightDiffColor = highlightDiffColor,
+        highlightDiffs = displayOptions.highlightDiffs,
         highlightText = highlightText
       )
 
@@ -91,13 +85,13 @@ class SnapshotAdapter(
         versionNameDiff = item.versionNameDiff,
         versionCodeDiff = item.versionCodeDiff,
         isNewOrDeleted = isNewOrDeleted,
-        highlightDiffColor = highlightDiffColor
+        highlightDiffs = displayOptions.highlightDiffs
       )
 
       setPackageSizeDisplay(
         packageSizeDiff = item.packageSizeDiff,
         isNewOrDeleted = isNewOrDeleted,
-        highlightDiffColor = highlightDiffColor
+        highlightDiffs = displayOptions.highlightDiffs
       )
 
       setApiDisplay(
@@ -105,7 +99,7 @@ class SnapshotAdapter(
         minSdkDiff = item.minSdkDiff,
         compileSdkDiff = item.compileSdkDiff,
         isNewOrDeleted = isNewOrDeleted,
-        highlightDiffColor = highlightDiffColor
+        highlightDiffs = displayOptions.highlightDiffs
       )
 
       val abiDisplayData = buildSnapshotAbiDisplayData(item.abiDiff)

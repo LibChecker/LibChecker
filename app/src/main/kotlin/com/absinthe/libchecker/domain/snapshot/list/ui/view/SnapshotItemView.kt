@@ -241,9 +241,10 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       isTrackItem: Boolean,
       packageStateLabel: PackageStateLabel?,
       isNewOrDeleted: Boolean,
-      highlightDiffColor: Int?,
+      highlightDiffs: Boolean,
       highlightText: String
     ) {
+      val highlightDiffColor = getHighlightDiffColor(highlightDiffs)
       val appNameLabel = buildSpannedString {
         if (isTrackItem) {
           inSpans(ImageSpan(context, R.drawable.ic_track)) {
@@ -290,13 +291,13 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       versionNameDiff: SnapshotDiffItem.DiffNode<String>,
       versionCodeDiff: SnapshotDiffItem.DiffNode<Long>,
       isNewOrDeleted: Boolean,
-      highlightDiffColor: Int?
+      highlightDiffs: Boolean
     ) {
       versionInfo.text = LCAppUtils.getDiffString(
         diff1 = versionNameDiff,
         diff2 = versionCodeDiff,
         isNewOrDeleted = isNewOrDeleted,
-        highlightDiffColor = highlightDiffColor
+        highlightDiffColor = getHighlightDiffColor(highlightDiffs)
       )
     }
 
@@ -328,7 +329,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
     fun setPackageSizeDisplay(
       packageSizeDiff: SnapshotDiffItem.DiffNode<Long>,
       isNewOrDeleted: Boolean,
-      highlightDiffColor: Int?
+      highlightDiffs: Boolean
     ) {
       if (packageSizeDiff.old <= 0L) {
         packageSizeInfo.isVisible = false
@@ -353,7 +354,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
             diff2 = bytesDiff,
             diff2Suffix = " Bytes",
             isNewOrDeleted = isNewOrDeleted,
-            highlightDiffColor = highlightDiffColor
+            highlightDiffColor = getHighlightDiffColor(highlightDiffs)
           )
         )
 
@@ -375,22 +376,22 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       minSdkDiff: SnapshotDiffItem.DiffNode<Short>,
       compileSdkDiff: SnapshotDiffItem.DiffNode<Short>,
       isNewOrDeleted: Boolean,
-      highlightDiffColor: Int?
+      highlightDiffs: Boolean
     ) {
       val targetDiff = buildApiDiffString(
         diff = targetApiDiff,
         isNewOrDeleted = isNewOrDeleted,
-        highlightDiffColor = highlightDiffColor
+        highlightDiffs = highlightDiffs
       )
       val minDiff = buildApiDiffString(
         diff = minSdkDiff,
         isNewOrDeleted = isNewOrDeleted,
-        highlightDiffColor = highlightDiffColor
+        highlightDiffs = highlightDiffs
       )
       val compileDiff = buildApiDiffString(
         diff = compileSdkDiff,
         isNewOrDeleted = isNewOrDeleted,
-        highlightDiffColor = highlightDiffColor
+        highlightDiffs = highlightDiffs
       )
       apisInfo.text = buildSpannedString {
         targetDiff?.let {
@@ -552,13 +553,21 @@ private fun AppCompatTextView.setOrHighlightText(text: CharSequence, highlightTe
 private fun SnapshotItemView.SnapshotItemContainerView.buildApiDiffString(
   diff: SnapshotDiffItem.DiffNode<Short>,
   isNewOrDeleted: Boolean,
-  highlightDiffColor: Int?
+  highlightDiffs: Boolean
 ): CharSequence? {
   return LCAppUtils.getDiffString(
     diff = diff,
     isNewOrDeleted = isNewOrDeleted,
-    highlightDiffColor = highlightDiffColor
+    highlightDiffColor = getHighlightDiffColor(highlightDiffs)
   ).takeIf { diff.old > 0 }
+}
+
+private fun SnapshotItemView.SnapshotItemContainerView.getHighlightDiffColor(highlightDiffs: Boolean): Int? {
+  return if (highlightDiffs) {
+    context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary)
+  } else {
+    null
+  }
 }
 
 private fun SnapshotItemView.SnapshotItemContainerView.buildPackageSizeChangeText(
