@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.view.MenuProvider
 import androidx.core.view.descendants
-import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -31,6 +30,8 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
 import com.absinthe.libchecker.domain.app.detail.ui.AppBarStateChangeListener
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSection
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotTitleDisplayData
+import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailReportHeader
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.SnapshotDetailAdapter
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.BaseSnapshotNode
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotComponentNode
@@ -77,6 +78,7 @@ class SnapshotDetailActivity :
   MenuProvider {
 
   private lateinit var entity: SnapshotDiffItem
+  private lateinit var snapshotTitleDisplayData: SnapshotTitleDisplayData
 
   private val adapter by lazy { SnapshotDetailAdapter() }
   private val viewModel: SnapshotViewModel by viewModel()
@@ -161,14 +163,13 @@ class SnapshotDetailActivity :
           }
         }
       }
-      snapshotTitle.render(
-        buildSnapshotTitleDisplayData(
-          BuildSnapshotTitleDisplayDataUseCase.Request(
-            item = entity,
-            formatSplitPackageName = true
-          )
+      snapshotTitleDisplayData = buildSnapshotTitleDisplayData(
+        BuildSnapshotTitleDisplayDataUseCase.Request(
+          item = entity,
+          formatSplitPackageName = true
         )
       )
+      snapshotTitle.render(snapshotTitleDisplayData)
     }
 
     adapter.stateView =
@@ -308,15 +309,7 @@ class SnapshotDetailActivity :
 
   private fun generateReport() {
     val sb = StringBuilder()
-    sb.append(binding.snapshotTitle.appNameView.text).appendLine()
-      .append(binding.snapshotTitle.packageNameView.text).appendLine()
-      .append(binding.snapshotTitle.versionInfoView.text).appendLine()
-      .append(binding.snapshotTitle.apisView.text).appendLine()
-
-    if (binding.snapshotTitle.packageSizeView.isVisible) {
-      sb.append(binding.snapshotTitle.packageSizeView.text).appendLine()
-    }
-
+    sb.append(buildSnapshotDetailReportHeader(snapshotTitleDisplayData))
     sb.appendLine()
 
     adapter.data.forEach {

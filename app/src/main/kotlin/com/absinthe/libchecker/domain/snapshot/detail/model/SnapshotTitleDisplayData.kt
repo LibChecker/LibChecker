@@ -12,3 +12,15 @@ data class SnapshotTitlePackageSizeData(
   val text: CharSequence,
   val breakStart: Int
 )
+
+fun buildSnapshotDetailReportHeader(data: SnapshotTitleDisplayData): String {
+  return buildString {
+    appendLine(data.appName)
+    appendLine(data.packageName)
+    appendLine(data.versionInfo)
+    appendLine(data.apis)
+    data.packageSize?.let {
+      appendLine(it.text)
+    }
+  }
+}
