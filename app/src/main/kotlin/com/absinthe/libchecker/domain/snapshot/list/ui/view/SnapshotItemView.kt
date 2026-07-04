@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.text.buildSpannedString
+import androidx.core.text.inSpans
 import androidx.core.text.scale
 import androidx.core.view.children
 import androidx.core.view.isVisible
@@ -28,6 +29,7 @@ import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.utils.extensions.sizeToString
+import com.absinthe.libchecker.utils.extensions.tintHighlightText
 import com.absinthe.libchecker.utils.extensions.visibleHeight
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.span.CenterAlignImageSpan
@@ -154,7 +156,37 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       addView(this)
     }
 
-    fun appendPackageStateLabel(packageStateLabel: PackageStateLabel?) {
+    fun setAppNameDisplay(
+      labelDiff: SnapshotDiffItem.DiffNode<String>,
+      isTrackItem: Boolean,
+      packageStateLabel: PackageStateLabel?,
+      isNewOrDeleted: Boolean,
+      highlightDiffColor: Int?,
+      highlightText: String
+    ) {
+      val appNameLabel = buildSpannedString {
+        if (isTrackItem) {
+          inSpans(ImageSpan(context, R.drawable.ic_track)) {
+            append(" ")
+          }
+        }
+        append(
+          LCAppUtils.getDiffString(
+            diff = labelDiff,
+            isNewOrDeleted = isNewOrDeleted,
+            highlightDiffColor = highlightDiffColor
+          )
+        )
+      }
+      appName.setOrHighlightText(appNameLabel, highlightText)
+      appendPackageStateLabel(packageStateLabel)
+    }
+
+    fun setPackageNameDisplay(text: CharSequence, highlightText: String) {
+      packageName.setOrHighlightText(text, highlightText)
+    }
+
+    private fun appendPackageStateLabel(packageStateLabel: PackageStateLabel?) {
       val labelDrawable = when (packageStateLabel) {
         PackageStateLabel.New -> R.drawable.ic_label_new_package
         PackageStateLabel.Deleted -> R.drawable.ic_label_deleted_package
@@ -408,6 +440,14 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
 }
 
 private const val ABI_CHANGE_ARROW = "→"
+
+private fun AppCompatTextView.setOrHighlightText(text: CharSequence, highlightText: String) {
+  if (highlightText.isNotBlank()) {
+    tintHighlightText(highlightText, text)
+  } else {
+    this.text = text
+  }
+}
 
 private fun SnapshotItemView.SnapshotItemContainerView.buildApiDiffString(
   diff: SnapshotDiffItem.DiffNode<Short>,

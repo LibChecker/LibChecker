@@ -1,10 +1,7 @@
 package com.absinthe.libchecker.domain.snapshot.list.ui.adapter
 
 import android.graphics.Color
-import android.text.style.ImageSpan
 import android.view.ViewGroup
-import androidx.core.text.buildSpannedString
-import androidx.core.text.inSpans
 import androidx.core.view.isVisible
 import coil.load
 import com.absinthe.libchecker.R
@@ -16,7 +13,6 @@ import com.absinthe.libchecker.domain.snapshot.list.usecase.stableSnapshotDiffIt
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.setAlphaForAll
@@ -109,25 +105,20 @@ class SnapshotAdapter(
         }
       }
 
-      val appNameLabel = buildSpannedString {
-        if (item.isTrackItem) {
-          inSpans(ImageSpan(context, R.drawable.ic_track)) {
-            append(" ")
-          }
-        }
-        append(LCAppUtils.getDiffString(item.labelDiff, isNewOrDeleted, highlightDiffColor = highlightDiffColor))
-      }
-
-      setOrHighlightText(appName, appNameLabel)
-      appendPackageStateLabel(
-        when {
+      setAppNameDisplay(
+        labelDiff = item.labelDiff,
+        isTrackItem = item.isTrackItem,
+        packageStateLabel = when {
           item.newInstalled -> SnapshotItemView.PackageStateLabel.New
           item.deleted -> SnapshotItemView.PackageStateLabel.Deleted
           else -> null
-        }
+        },
+        isNewOrDeleted = isNewOrDeleted,
+        highlightDiffColor = highlightDiffColor,
+        highlightText = highlightText
       )
 
-      setOrHighlightText(packageName, item.packageName)
+      setPackageNameDisplay(item.packageName, highlightText)
       setVersionDisplay(
         versionNameDiff = item.versionNameDiff,
         versionCodeDiff = item.versionCodeDiff,
