@@ -14,6 +14,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.list.model.AppListItemViewState
+import com.absinthe.libchecker.domain.app.list.model.buildAppListItemDescription
 import com.absinthe.libchecker.utils.extensions.applyCondensedSingleLine
 import com.absinthe.libchecker.utils.extensions.applySingleLineEndEllipsize
 import com.absinthe.libchecker.utils.extensions.dp
@@ -66,9 +67,11 @@ class AppItemView(
   }
 
   fun setItemContentDescription(vararg parts: CharSequence?) {
-    contentDescription = parts
-      .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
-      .joinToString()
+    setItemContentDescription(buildAppListItemDescription(*parts))
+  }
+
+  fun setItemContentDescription(description: CharSequence?) {
+    contentDescription = description
   }
 
   class AppItemContainerView(

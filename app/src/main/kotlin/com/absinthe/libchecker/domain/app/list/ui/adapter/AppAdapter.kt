@@ -11,6 +11,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.list.model.AppListItemViewState
+import com.absinthe.libchecker.domain.app.list.model.buildAppListItemDescription
 import com.absinthe.libchecker.domain.app.list.ui.view.AppItemView
 import com.absinthe.libchecker.domain.app.stableAppListItemIdForKey
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
@@ -136,10 +137,12 @@ class AppAdapter(
       }
     }
     root.setItemContentDescription(
-      item.label,
-      item.packageName,
-      viewState.versionInfo,
-      viewState.accessibilityAbiInfo
+      buildAppListItemDescription(
+        item.label,
+        item.packageName,
+        viewState.versionInfo,
+        viewState.accessibilityAbiInfo
+      )
     )
   }
 
