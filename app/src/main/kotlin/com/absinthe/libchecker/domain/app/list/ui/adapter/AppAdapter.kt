@@ -11,6 +11,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.list.model.AppListItemIdentityText
+import com.absinthe.libchecker.domain.app.list.model.AppListItemMetadataDisplay
 import com.absinthe.libchecker.domain.app.list.model.AppListItemViewState
 import com.absinthe.libchecker.domain.app.list.ui.view.AppItemView
 import com.absinthe.libchecker.domain.app.stableAppListItemIdForKey
@@ -59,9 +60,7 @@ class AppAdapter(
       }
       bindIdentityText(root, item, viewState)
 
-      versionInfo.text = viewState.versionInfo
-      setAbiDisplay(viewState)
-      setPackageBadge(viewState.packageBadge)
+      setMetadataDisplay(AppListItemMetadataDisplay.create(viewState))
     }
   }
 

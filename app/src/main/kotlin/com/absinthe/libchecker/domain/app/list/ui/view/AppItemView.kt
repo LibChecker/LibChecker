@@ -14,7 +14,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.list.model.AppListItemIdentityText
-import com.absinthe.libchecker.domain.app.list.model.AppListItemViewState
+import com.absinthe.libchecker.domain.app.list.model.AppListItemMetadataDisplay
 import com.absinthe.libchecker.domain.app.list.model.buildAppListItemDescription
 import com.absinthe.libchecker.utils.extensions.addStrikeThroughSpan
 import com.absinthe.libchecker.utils.extensions.applyCondensedSingleLine
@@ -178,17 +178,23 @@ class AppItemView(
       abiInfo.setItemBackground()
     }
 
-    fun setAbiDisplay(viewState: AppListItemViewState) {
-      setDetachedAbiBadgeLayoutEnabled(viewState.useDetachedAbiBadges)
+    fun setMetadataDisplay(display: AppListItemMetadataDisplay) {
+      setVersionInfo(display.versionInfo)
+      setAbiDisplay(display)
+      setPackageBadge(display.packageBadge)
+    }
 
-      if (viewState.useDetachedAbiBadges) {
-        if (viewState.largeAbiBadgeRes != 0) {
-          val abiBadge = viewState.largeAbiBadgeRes.getDrawable(context)?.mutate()?.apply {
-            setTint(context.getAbiBadgeTint(viewState.isAbiBadge64Bit, viewState.tintAbiLabels))
+    private fun setAbiDisplay(display: AppListItemMetadataDisplay) {
+      setDetachedAbiBadgeLayoutEnabled(display.useDetachedAbiBadges)
+
+      if (display.useDetachedAbiBadges) {
+        if (display.largeAbiBadgeRes != 0) {
+          val abiBadge = display.largeAbiBadgeRes.getDrawable(context)?.mutate()?.apply {
+            setTint(context.getAbiBadgeTint(display.isAbiBadge64Bit, display.tintAbiLabels))
           }
-          val multiArchBadge = if (viewState.showMultiArchBadge) {
+          val multiArchBadge = if (display.showMultiArchBadge) {
             R.drawable.ic_abi_label_multi_arch.getDrawable(context)?.mutate()?.apply {
-              setTint(context.getMultiArchBadgeTint(viewState.tintAbiLabels))
+              setTint(context.getMultiArchBadgeTint(display.tintAbiLabels))
             }
           } else {
             null
@@ -197,17 +203,17 @@ class AppItemView(
         } else {
           setAbiBadges(null, null)
         }
-        abiInfo.text = viewState.abiInfo
+        abiInfo.text = display.abiInfo
       } else {
         setAbiBadges(null, null)
-        abiInfo.text = context.buildInlineAbiInfo(viewState)
+        abiInfo.text = context.buildInlineAbiInfo(display)
       }
     }
 
-    fun setPackageBadge(packageBadge: AppListItemViewState.PackageBadge?) {
+    private fun setPackageBadge(packageBadge: AppListItemMetadataDisplay.PackageBadge?) {
       when (packageBadge) {
-        AppListItemViewState.PackageBadge.Harmony -> setBadge(R.drawable.ic_harmony_badge)
-        AppListItemViewState.PackageBadge.Frozen -> setBadge(R.drawable.ic_disabled_package)
+        AppListItemMetadataDisplay.PackageBadge.Harmony -> setBadge(R.drawable.ic_harmony_badge)
+        AppListItemMetadataDisplay.PackageBadge.Frozen -> setBadge(R.drawable.ic_disabled_package)
         null -> setBadge(null)
       }
     }
@@ -476,26 +482,26 @@ private fun Context.getAbiBadgeTint(isAbi64Bit: Boolean, tintAbiLabels: Boolean)
   )
 }
 
-private fun Context.buildInlineAbiInfo(viewState: AppListItemViewState): CharSequence {
-  if (viewState.abiBadgeRes == 0) {
-    return viewState.abiInfo
+private fun Context.buildInlineAbiInfo(display: AppListItemMetadataDisplay): CharSequence {
+  if (display.abiBadgeRes == 0) {
+    return display.abiInfo
   }
 
-  var paddingString = "  ${viewState.abiInfo}"
-  if (viewState.showMultiArchBadge) {
+  var paddingString = "  ${display.abiInfo}"
+  if (display.showMultiArchBadge) {
     paddingString = "  $paddingString"
   }
   val spanString = SpannableString(paddingString)
 
-  viewState.abiBadgeRes.getDrawable(this)?.mutate()?.let {
+  display.abiBadgeRes.getDrawable(this)?.mutate()?.let {
     it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
-    it.setTint(getAbiBadgeTint(viewState.isAbiBadge64Bit, viewState.tintAbiLabels))
+    it.setTint(getAbiBadgeTint(display.isAbiBadge64Bit, display.tintAbiLabels))
     spanString.setSpan(CenterAlignImageSpan(it), 0, 1, ImageSpan.ALIGN_BOTTOM)
   }
-  if (viewState.showMultiArchBadge) {
+  if (display.showMultiArchBadge) {
     R.drawable.ic_multi_arch.getDrawable(this)?.mutate()?.let {
       it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
-      it.setTint(getMultiArchBadgeTint(viewState.tintAbiLabels))
+      it.setTint(getMultiArchBadgeTint(display.tintAbiLabels))
       spanString.setSpan(CenterAlignImageSpan(it), 2, 3, ImageSpan.ALIGN_BOTTOM)
     }
   }
