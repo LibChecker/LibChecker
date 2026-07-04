@@ -52,78 +52,47 @@ class SnapshotAdapter(
 
   override fun convert(holder: BaseViewHolder, item: SnapshotDiffItem) {
     val itemView = holder.itemView as SnapshotItemView
-    itemView.setCardPresentation(cardMode.toCardPresentation())
-    itemView.container.apply {
-      val isNewOrDeleted = item.deleted || item.newInstalled
-
-      setIconSource(packageIconSources[item.packageName])
-      setDeleted(item.deleted)
-      setStateIndicator(
-        added = item.added,
-        removed = item.removed,
-        changed = item.changed,
-        moved = item.moved,
-        isNewOrDeleted = isNewOrDeleted,
-        animate = cardMode == CardMode.DEMO
+    val updateTimeDisplayData = buildSnapshotUpdateTimeDisplayData(
+      BuildSnapshotUpdateTimeDisplayDataUseCase.Request(
+        updateTime = item.updateTime,
+        isVisible = displayOptions.showUpdateTime && cardMode != CardMode.GET_APP_UPDATE,
+        isApexPackage = item.packageName in apexPackageNames
       )
-
-      setAppNameDisplay(
+    )
+    itemView.render(
+      SnapshotItemView.RenderData(
+        cardPresentation = cardMode.toCardPresentation(),
+        iconSource = packageIconSources[item.packageName],
+        packageName = item.packageName,
         labelDiff = item.labelDiff,
         isTrackItem = item.isTrackItem,
-        packageStateLabel = when {
-          item.newInstalled -> SnapshotItemView.PackageStateLabel.New
-          item.deleted -> SnapshotItemView.PackageStateLabel.Deleted
-          else -> null
-        },
-        isNewOrDeleted = isNewOrDeleted,
+        isNewInstalled = item.newInstalled,
+        isDeleted = item.deleted,
+        stateIndicator = SnapshotItemView.StateIndicatorData(
+          added = item.added,
+          removed = item.removed,
+          changed = item.changed,
+          moved = item.moved,
+          animate = cardMode == CardMode.DEMO
+        ),
+        versionNameDiff = item.versionNameDiff,
+        versionCodeDiff = item.versionCodeDiff,
+        packageSizeDiff = item.packageSizeDiff,
+        api = SnapshotItemView.ApiDisplayData(
+          targetApiDiff = item.targetApiDiff,
+          minSdkDiff = item.minSdkDiff,
+          compileSdkDiff = item.compileSdkDiff
+        ),
+        abi = SnapshotItemView.AbiDisplayData(
+          abiDisplayData = buildSnapshotAbiDisplayData(item.abiDiff),
+          showChangedAbi = item.abiDiff.new != null && item.abiDiff.old != item.abiDiff.new,
+          tintChangedAbiBadge = displayOptions.tintAbiLabels
+        ),
+        updateTimeDisplayData = updateTimeDisplayData,
         highlightDiffs = displayOptions.highlightDiffs,
         highlightText = highlightText
       )
-
-      setPackageNameDisplay(item.packageName, highlightText)
-      setVersionDisplay(
-        versionNameDiff = item.versionNameDiff,
-        versionCodeDiff = item.versionCodeDiff,
-        isNewOrDeleted = isNewOrDeleted,
-        highlightDiffs = displayOptions.highlightDiffs
-      )
-
-      setPackageSizeDisplay(
-        packageSizeDiff = item.packageSizeDiff,
-        isNewOrDeleted = isNewOrDeleted,
-        highlightDiffs = displayOptions.highlightDiffs
-      )
-
-      setApiDisplay(
-        targetApiDiff = item.targetApiDiff,
-        minSdkDiff = item.minSdkDiff,
-        compileSdkDiff = item.compileSdkDiff,
-        isNewOrDeleted = isNewOrDeleted,
-        highlightDiffs = displayOptions.highlightDiffs
-      )
-
-      val abiDisplayData = buildSnapshotAbiDisplayData(item.abiDiff)
-      setAbiDisplay(
-        abiDisplayData = abiDisplayData,
-        showChangedAbi = item.abiDiff.new != null && item.abiDiff.old != item.abiDiff.new,
-        tintChangedAbiBadge = displayOptions.tintAbiLabels
-      )
-
-      val updateTimeDisplayData = buildSnapshotUpdateTimeDisplayData(
-        BuildSnapshotUpdateTimeDisplayDataUseCase.Request(
-          updateTime = item.updateTime,
-          isVisible = displayOptions.showUpdateTime && cardMode != CardMode.GET_APP_UPDATE,
-          isApexPackage = item.packageName in apexPackageNames
-        )
-      )
-      setUpdateTimeDisplay(updateTimeDisplayData)
-      itemView.setItemContentDescription(
-        added = item.added,
-        removed = item.removed,
-        changed = item.changed,
-        moved = item.moved
-      )
-    }
+    )
   }
 
   override fun getItemId(position: Int): Long {

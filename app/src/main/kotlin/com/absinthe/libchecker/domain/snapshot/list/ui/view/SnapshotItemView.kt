@@ -45,7 +45,7 @@ import kotlin.math.abs
 
 class SnapshotItemView(context: Context) : MaterialCardView(context) {
 
-  val container = SnapshotItemContainerView(context).apply {
+  private val container = SnapshotItemContainerView(context).apply {
     val padding = context.getDimensionPixelSize(R.dimen.main_card_padding)
     setPadding(padding, padding, padding, padding)
   }
@@ -58,7 +58,54 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
     addView(container)
   }
 
-  fun setCardPresentation(cardPresentation: CardPresentation) {
+  fun render(data: RenderData) {
+    val isNewOrDeleted = data.isNewInstalled || data.isDeleted
+    setCardPresentation(data.cardPresentation)
+    container.apply {
+      setIconSource(data.iconSource)
+      setDeleted(data.isDeleted)
+      setStateIndicator(
+        data = data.stateIndicator,
+        isNewOrDeleted = isNewOrDeleted
+      )
+      setAppNameDisplay(
+        labelDiff = data.labelDiff,
+        isTrackItem = data.isTrackItem,
+        packageStateLabel = data.packageStateLabel,
+        isNewOrDeleted = isNewOrDeleted,
+        highlightDiffs = data.highlightDiffs,
+        highlightText = data.highlightText
+      )
+      setPackageNameDisplay(data.packageName, data.highlightText)
+      setVersionDisplay(
+        versionNameDiff = data.versionNameDiff,
+        versionCodeDiff = data.versionCodeDiff,
+        isNewOrDeleted = isNewOrDeleted,
+        highlightDiffs = data.highlightDiffs
+      )
+      setPackageSizeDisplay(
+        packageSizeDiff = data.packageSizeDiff,
+        isNewOrDeleted = isNewOrDeleted,
+        highlightDiffs = data.highlightDiffs
+      )
+      setApiDisplay(
+        targetApiDiff = data.api.targetApiDiff,
+        minSdkDiff = data.api.minSdkDiff,
+        compileSdkDiff = data.api.compileSdkDiff,
+        isNewOrDeleted = isNewOrDeleted,
+        highlightDiffs = data.highlightDiffs
+      )
+      setAbiDisplay(
+        abiDisplayData = data.abi.abiDisplayData,
+        showChangedAbi = data.abi.showChangedAbi,
+        tintChangedAbiBadge = data.abi.tintChangedAbiBadge
+      )
+      setUpdateTimeDisplay(data.updateTimeDisplayData)
+    }
+    setItemContentDescription(data.stateIndicator)
+  }
+
+  private fun setCardPresentation(cardPresentation: CardPresentation) {
     when (cardPresentation) {
       CardPresentation.Normal -> {
         strokeColor = Color.TRANSPARENT
@@ -72,12 +119,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
     }
   }
 
-  fun setItemContentDescription(
-    added: Int,
-    removed: Int,
-    changed: Int,
-    moved: Int
-  ) {
+  private fun setItemContentDescription(stateIndicator: StateIndicatorData) {
     contentDescription = buildItemDescription(
       container.appName.text,
       container.packageName.text,
@@ -86,9 +128,53 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       container.apisInfo.text,
       container.abiInfo.text,
       container.updateTime.text.takeIf { container.updateTime.isVisible },
-      buildSnapshotStateDescription(added, removed, changed, moved)
+      buildSnapshotStateDescription(
+        stateIndicator.added,
+        stateIndicator.removed,
+        stateIndicator.changed,
+        stateIndicator.moved
+      )
     )
   }
+
+  data class RenderData(
+    val cardPresentation: CardPresentation,
+    val iconSource: SnapshotPackageIconSource?,
+    val packageName: String,
+    val labelDiff: SnapshotDiffItem.DiffNode<String>,
+    val isTrackItem: Boolean,
+    val isNewInstalled: Boolean,
+    val isDeleted: Boolean,
+    val stateIndicator: StateIndicatorData,
+    val versionNameDiff: SnapshotDiffItem.DiffNode<String>,
+    val versionCodeDiff: SnapshotDiffItem.DiffNode<Long>,
+    val packageSizeDiff: SnapshotDiffItem.DiffNode<Long>,
+    val api: ApiDisplayData,
+    val abi: AbiDisplayData,
+    val updateTimeDisplayData: SnapshotUpdateTimeDisplayData?,
+    val highlightDiffs: Boolean,
+    val highlightText: String
+  )
+
+  data class StateIndicatorData(
+    val added: Int,
+    val removed: Int,
+    val changed: Int,
+    val moved: Int,
+    val animate: Boolean
+  )
+
+  data class ApiDisplayData(
+    val targetApiDiff: SnapshotDiffItem.DiffNode<Short>,
+    val minSdkDiff: SnapshotDiffItem.DiffNode<Short>,
+    val compileSdkDiff: SnapshotDiffItem.DiffNode<Short>
+  )
+
+  data class AbiDisplayData(
+    val abiDisplayData: SnapshotAbiDisplayData,
+    val showChangedAbi: Boolean,
+    val tintChangedAbiBadge: Boolean
+  )
 
   enum class PackageStateLabel {
     New,
@@ -213,14 +299,10 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
     }
 
     fun setStateIndicator(
-      added: Int,
-      removed: Int,
-      changed: Int,
-      moved: Int,
-      isNewOrDeleted: Boolean,
-      animate: Boolean
+      data: StateIndicatorData,
+      isNewOrDeleted: Boolean
     ) {
-      if (animate) {
+      if (data.animate) {
         stateIndicator.startDemoAnimation()
         return
       }
@@ -232,7 +314,12 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
         stateIndicator.changed = false
         stateIndicator.moved = false
       } else {
-        stateIndicator.setSnapshotStateCounts(added, removed, changed, moved)
+        stateIndicator.setSnapshotStateCounts(
+          data.added,
+          data.removed,
+          data.changed,
+          data.moved
+        )
       }
     }
 
@@ -521,6 +608,13 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
 }
 
 private const val ABI_CHANGE_ARROW = "→"
+
+private val SnapshotItemView.RenderData.packageStateLabel: SnapshotItemView.PackageStateLabel?
+  get() = when {
+    isNewInstalled -> SnapshotItemView.PackageStateLabel.New
+    isDeleted -> SnapshotItemView.PackageStateLabel.Deleted
+    else -> null
+  }
 
 private fun SnapshotItemView.buildSnapshotStateDescription(
   added: Int,
