@@ -15,6 +15,8 @@ import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotAbiDisplayData
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotAbiDisplayItem
+import com.absinthe.libchecker.domain.snapshot.display.SnapshotUpdateTimeDisplayData
+import com.absinthe.libchecker.domain.snapshot.display.SnapshotUpdateTimeText
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.ui.view.SnapshotPackageSizeLineBreaker
 import com.absinthe.libchecker.utils.LCAppUtils
@@ -239,6 +241,24 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       }
 
       setPackageSizeText(diffText, packageSizeBreakStart)
+    }
+
+    fun setUpdateTimeDisplay(updateTimeDisplayData: SnapshotUpdateTimeDisplayData?) {
+      updateTime.isVisible = updateTimeDisplayData != null
+      if (updateTimeDisplayData == null) {
+        updateTime.text = null
+        return
+      }
+
+      updateTime.text = when (val text = updateTimeDisplayData.text) {
+        SnapshotUpdateTimeText.Preinstalled -> context.getString(R.string.snapshot_preinstalled_app)
+
+        is SnapshotUpdateTimeText.LastUpdated ->
+          context.getString(R.string.format_last_updated).format(text.timeText)
+      }
+      if (updateTimeDisplayData.isApexPackage) {
+        updateTime.append(", APEX")
+      }
     }
 
     fun setPackageSizeText(text: CharSequence, breakStart: Int) {

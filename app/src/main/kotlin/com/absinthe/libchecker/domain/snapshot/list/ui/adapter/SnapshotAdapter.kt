@@ -12,7 +12,6 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.SnapshotListDisplayOptions
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotAbiDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
-import com.absinthe.libchecker.domain.snapshot.display.SnapshotUpdateTimeText
 import com.absinthe.libchecker.domain.snapshot.list.ui.view.SnapshotItemView
 import com.absinthe.libchecker.domain.snapshot.list.usecase.stableSnapshotDiffItemIdFor
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
@@ -185,18 +184,7 @@ class SnapshotAdapter(
           isApexPackage = item.packageName in apexPackageNames
         )
       )
-      updateTime.isVisible = updateTimeDisplayData != null
-      updateTimeDisplayData?.let { data ->
-        updateTime.text = when (val text = data.text) {
-          SnapshotUpdateTimeText.Preinstalled -> context.getString(R.string.snapshot_preinstalled_app)
-
-          is SnapshotUpdateTimeText.LastUpdated ->
-            context.getString(R.string.format_last_updated).format(text.timeText)
-        }
-        if (data.isApexPackage) {
-          updateTime.append(", APEX")
-        }
-      }
+      setUpdateTimeDisplay(updateTimeDisplayData)
       (holder.itemView as SnapshotItemView).contentDescription = buildItemDescription(
         appName.text,
         packageName.text,
