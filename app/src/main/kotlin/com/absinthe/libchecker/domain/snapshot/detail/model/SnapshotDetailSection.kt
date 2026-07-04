@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.domain.snapshot.detail.model
 
+import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -22,8 +23,22 @@ data class SnapshotDetailItemDisplayData(
   val extra: CharSequence,
   val description: String,
   val status: SnapshotDetailItemStatusDisplayData,
+  @ColorInt val backgroundColor: Int,
   val ruleChip: SnapshotDetailRuleChipDisplayData?
 )
+
+@ColorInt
+fun buildSnapshotDetailItemBackgroundColor(
+  @ColorInt baseColor: Int,
+  darkMode: Boolean
+): Int {
+  val alpha = if (darkMode) {
+    (0.75f * 255).toInt() and 0xFF
+  } else {
+    (0.95f * 255).toInt() and 0xFF
+  }
+  return (baseColor and 0x00FFFFFF) or (alpha shl 24)
+}
 
 fun buildSnapshotDetailItemDescription(
   statusLabel: CharSequence?,

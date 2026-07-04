@@ -8,9 +8,7 @@ import com.absinthe.libchecker.domain.app.detail.ui.dialog.LibDetailDialogFragme
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotComponentNode
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailComponentView
 import com.absinthe.libchecker.ui.base.BaseActivity
-import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import com.absinthe.libraries.utils.utils.UiUtils
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.chad.library.adapter.base.provider.BaseNodeProvider
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
@@ -41,17 +39,10 @@ class SnapshotComponentProvider : BaseNodeProvider() {
       name.text = displayData.title
       typeIcon.setImageResource(displayData.status.iconRes)
 
-      val baseColor = displayData.status.colorRes.getColor(context)
-      val alpha = if (UiUtils.isDarkMode()) {
-        (0.75f * 255).toInt() and 0xFF
-      } else {
-        (0.95f * 255).toInt() and 0xFF
-      }
-      val alphaColor = (baseColor and 0x00FFFFFF) or (alpha shl 24)
-      background = alphaColor.toDrawable()
+      background = displayData.backgroundColor.toDrawable()
 
       val ruleChip = displayData.ruleChip
-      setChip(ruleChip, alphaColor)
+      setChip(ruleChip, displayData.backgroundColor)
       helper.itemView.contentDescription = displayData.description
       if (ruleChip != null) {
         setChipOnClickListener {

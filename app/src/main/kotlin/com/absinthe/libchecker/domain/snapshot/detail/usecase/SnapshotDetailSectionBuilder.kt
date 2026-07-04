@@ -23,6 +23,7 @@ import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemDi
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemStatusDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSection
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailStatusCount
+import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailItemBackgroundColor
 import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailItemDescription
 import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailRuleChipDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailSectionDescription
@@ -33,8 +34,10 @@ import com.absinthe.libchecker.domain.snapshot.model.REMOVED
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.fromJson
+import com.absinthe.libraries.utils.utils.UiUtils
 import com.absinthe.rulesbundle.Rule
 import java.text.NumberFormat
 import java.util.Locale
@@ -98,6 +101,7 @@ class SnapshotDetailSectionBuilder(
 
   private suspend fun buildSections(items: List<SnapshotDetailItem>): List<SnapshotDetailSection> {
     val colorfulRuleIcon = appListSettingsRepository.colorfulRuleIcon
+    val darkMode = UiUtils.isDarkMode()
     val ruleCache = mutableMapOf<String, Rule?>()
 
     suspend fun getRuleCached(item: SnapshotDetailItem): Rule? {
@@ -128,6 +132,10 @@ class SnapshotDetailSectionBuilder(
               ruleLabel = ruleChip?.label
             ),
             status = status,
+            backgroundColor = buildSnapshotDetailItemBackgroundColor(
+              baseColor = status.colorRes.getColor(context),
+              darkMode = darkMode
+            ),
             ruleChip = ruleChip
           )
         }
