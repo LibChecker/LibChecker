@@ -6,7 +6,8 @@ import com.chad.library.adapter.base.entity.node.BaseNode
 
 class SnapshotTitleNode(
   override val childNode: MutableList<BaseNode>,
-  @LibType val type: Int
+  @LibType val type: Int,
+  val counts: List<SnapshotDetailCountNode>
 ) : BaseExpandNode() {
 
   init {

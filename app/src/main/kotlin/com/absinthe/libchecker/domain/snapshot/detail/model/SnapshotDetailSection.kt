@@ -6,11 +6,17 @@ import com.absinthe.rulesbundle.Rule
 
 data class SnapshotDetailSection(
   @LibType val type: Int,
-  val items: List<SnapshotDetailItemDisplayData>
+  val items: List<SnapshotDetailItemDisplayData>,
+  val statusCounts: List<SnapshotDetailStatusCount>
 )
 
 data class SnapshotDetailItemDisplayData(
   val item: SnapshotDetailItem,
   val rule: Rule?,
   val colorfulRuleIcon: Boolean
+)
+
+data class SnapshotDetailStatusCount(
+  val status: Int,
+  val count: Int
 )

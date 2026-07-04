@@ -19,6 +19,7 @@ import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSection
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailStatusCount
 import com.absinthe.libchecker.domain.snapshot.model.ADDED
 import com.absinthe.libchecker.domain.snapshot.model.CHANGED
 import com.absinthe.libchecker.domain.snapshot.model.MOVED
@@ -115,7 +116,20 @@ class SnapshotDetailSectionBuilder(
       if (sectionItems.isEmpty()) {
         null
       } else {
-        SnapshotDetailSection(type, sectionItems)
+        SnapshotDetailSection(
+          type = type,
+          items = sectionItems,
+          statusCounts = buildStatusCounts(sectionItems)
+        )
+      }
+    }
+  }
+
+  private fun buildStatusCounts(items: List<SnapshotDetailItemDisplayData>): List<SnapshotDetailStatusCount> {
+    return orderedStatuses.mapNotNull { status ->
+      val count = items.count { it.item.diffType == status }
+      count.takeIf { it > 0 }?.let {
+        SnapshotDetailStatusCount(status, it)
       }
     }
   }
@@ -345,6 +359,7 @@ class SnapshotDetailSectionBuilder(
 
   private companion object {
     const val ARROW = "→"
+    val orderedStatuses = listOf(ADDED, REMOVED, CHANGED, MOVED)
     val orderedTypes = listOf(NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER, PERMISSION, METADATA)
   }
 }

@@ -34,6 +34,7 @@ import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSectio
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.SnapshotDetailAdapter
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.BaseSnapshotNode
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotComponentNode
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotDetailCountNode
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotNativeNode
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotTitleNode
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailDeletedView
@@ -239,7 +240,11 @@ class SnapshotDetailActivity :
       }
     }
     recordDetailComponentCount(section.type, nodes.size)
-    return SnapshotTitleNode(nodes, section.type)
+    return SnapshotTitleNode(
+      childNode = nodes,
+      type = section.type,
+      counts = section.statusCounts.map { SnapshotDetailCountNode(it.count, it.status) }
+    )
   }
 
   private fun recordDetailComponentCount(@LibType type: Int, count: Int) {
