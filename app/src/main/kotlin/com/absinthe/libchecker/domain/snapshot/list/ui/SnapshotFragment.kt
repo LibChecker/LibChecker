@@ -37,9 +37,11 @@ import com.absinthe.libchecker.domain.snapshot.detail.ui.EXTRA_ENTITY
 import com.absinthe.libchecker.domain.snapshot.detail.ui.SnapshotDetailActivity
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotEmptyView
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotCapturePlan
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotSystemPropDisplayData
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
 import com.absinthe.libchecker.domain.snapshot.list.ui.adapter.SnapshotAdapter
 import com.absinthe.libchecker.domain.snapshot.list.ui.view.SnapshotDashboardView
+import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotDashboardDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.timenode.ui.TimeNodeBottomSheetDialogFragment
@@ -81,6 +83,7 @@ class SnapshotFragment :
   private val viewModel: SnapshotViewModel by activityViewModel()
   private val getRandomAppIcon: GetRandomAppIconUseCase by inject()
   private val buildSnapshotItemDisplayData: BuildSnapshotItemDisplayDataUseCase by inject()
+  private val buildSnapshotDashboardDisplayData: BuildSnapshotDashboardDisplayDataUseCase by inject()
   private val adapter by lazy(LazyThreadSafetyMode.NONE) {
     SnapshotAdapter(buildSnapshotItemDisplayData)
   }
@@ -123,6 +126,22 @@ class SnapshotFragment :
           it.setMargins(8.dp, 2.dp, 8.dp, 2.dp)
         }
       }
+
+    var dashboardTimestampText: CharSequence = ""
+    var dashboardAppsCountText: CharSequence = ""
+    var dashboardSystemProps: List<SnapshotSystemPropDisplayData> = emptyList()
+    fun renderDashboard() {
+      dashboard.render(
+        buildSnapshotDashboardDisplayData(
+          BuildSnapshotDashboardDisplayDataUseCase.Request(
+            timestampText = dashboardTimestampText,
+            appsCountText = dashboardAppsCountText,
+            systemProps = dashboardSystemProps
+          )
+        )
+      )
+    }
+    renderDashboard()
 
     dashboard.setOnClickListener {
       startActivity(Intent(context, AlbumActivity::class.java))
@@ -263,16 +282,25 @@ class SnapshotFragment :
     viewModel.effect.onEach {
       when (it) {
         is SnapshotViewModel.Effect.DashboardCountChange -> {
-          dashboard.setAppsCount(it.snapshotCount, it.appCount)
+          dashboardAppsCountText = buildSnapshotDashboardDisplayData.formatAppsCount(
+            snapshotCount = it.snapshotCount,
+            appCount = it.appCount
+          )
+          renderDashboard()
         }
 
         is SnapshotViewModel.Effect.TimeStampChange -> {
           if (it.timestamp != 0L) {
-            dashboard.setTimestampText(viewModel.getFormatDateString(it.timestamp))
-            updateSystemProps(dashboard, it.timestamp)
+            dashboardTimestampText = viewModel.getFormatDateString(it.timestamp)
+            renderDashboard()
+            updateSystemProps(it.timestamp) { props ->
+              dashboardSystemProps = props
+              renderDashboard()
+            }
           } else {
-            dashboard.setNoSnapshotTimestamp()
-            dashboard.setSystemProps(emptyList())
+            dashboardTimestampText = buildSnapshotDashboardDisplayData.noSnapshotTimestampText()
+            dashboardSystemProps = emptyList()
+            renderDashboard()
             viewModel.clearSnapshotDiffItems()
             flip(VF_LIST)
           }
@@ -559,11 +587,14 @@ class SnapshotFragment :
     }
   }
 
-  private fun updateSystemProps(dashboard: SnapshotDashboardView, timestamp: Long) {
+  private fun updateSystemProps(
+    timestamp: Long,
+    onSystemPropsReady: (List<SnapshotSystemPropDisplayData>) -> Unit
+  ) {
     lifecycleScope.launch(Dispatchers.IO) {
       val displayedSystemProps = viewModel.getSystemPropDisplayData(timestamp)
       launch(Dispatchers.Main) {
-        dashboard.setSystemProps(displayedSystemProps)
+        onSystemPropsReady(displayedSystemProps)
       }
     }
   }

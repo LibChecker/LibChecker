@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotTypeIndicatorView
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotDashboardDisplayData
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotSystemPropDisplayData
 import com.absinthe.libchecker.domain.snapshot.list.ui.adapter.SystemPropsAdapter
 import com.absinthe.libchecker.utils.extensions.dp
@@ -24,7 +25,6 @@ import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.card.MaterialCardView
-import java.util.Locale
 
 class SnapshotDashboardView(context: Context) : MaterialCardView(context, null, R.style.AlbumMaterialCard) {
 
@@ -42,48 +42,18 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context, null, 
     setSmoothRoundCorner(12.dp)
     setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSurfaceContainerHigh))
     addView(container)
-    updateContentDescription()
   }
 
   fun setOnTimestampClickListener(listener: View.OnClickListener) {
     container.setOnTimestampClickListener(listener)
   }
 
-  fun setTimestampText(text: CharSequence) {
-    container.setTimestampText(text)
-    updateContentDescription()
-  }
-
-  fun setNoSnapshotTimestamp() {
-    setTimestampText(context.getString(R.string.snapshot_none))
-  }
-
-  fun setAppsCount(snapshotCount: Int, appCount: Int) {
-    container.setAppsCount(snapshotCount, appCount)
-    updateContentDescription()
-  }
-
-  fun setSystemProps(props: List<SnapshotSystemPropDisplayData>) {
-    container.setSystemProps(props)
-  }
-
-  private fun updateContentDescription() {
-    contentDescription = listOf(
-      context.getString(R.string.snapshot_current_timestamp),
-      container.timestampText,
-      context.getString(R.string.snapshot_apps_count),
-      container.appsCountText
-    )
-      .mapNotNull { it.toString().trim().takeIf(String::isNotEmpty) }
-      .joinToString()
-
-    val timestampContentDescription = listOf(
-      context.getString(R.string.dialog_title_change_timestamp),
-      container.timestampText
-    )
-      .mapNotNull { it.toString().trim().takeIf(String::isNotEmpty) }
-      .joinToString()
-    container.setTimestampContentDescription(timestampContentDescription)
+  fun render(data: SnapshotDashboardDisplayData) {
+    container.setTimestampText(data.timestampText)
+    container.setAppsCountText(data.appsCountText)
+    container.setTimestampContentDescription(data.timestampContentDescription)
+    container.setSystemProps(data.systemProps)
+    contentDescription = data.contentDescription
   }
 
   private inner class SnapshotDashboardContainerView(context: Context) : AViewGroup(context) {
@@ -139,12 +109,6 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context, null, 
 
     private val systemPropAdapter = SystemPropsAdapter()
 
-    val timestampText: CharSequence
-      get() = tvSnapshotTimestampText.text
-
-    val appsCountText: CharSequence
-      get() = tvSnapshotAppsCountText.text
-
     private val propsRecyclerView = RecyclerView(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT,
@@ -171,8 +135,8 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context, null, 
       arrow.contentDescription = description
     }
 
-    fun setAppsCount(snapshotCount: Int, appCount: Int) {
-      tvSnapshotAppsCountText.text = String.format(Locale.getDefault(), "%d / %d", snapshotCount, appCount)
+    fun setAppsCountText(text: CharSequence) {
+      tvSnapshotAppsCountText.text = text
     }
 
     fun setSystemProps(props: List<SnapshotSystemPropDisplayData>) {

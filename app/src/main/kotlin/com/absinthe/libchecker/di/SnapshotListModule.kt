@@ -9,6 +9,7 @@ import com.absinthe.libchecker.domain.snapshot.list.capture.CaptureInstalledSnap
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotListWorkflow
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotCapturePlanUseCase
+import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotDashboardDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotListUpdatePlanUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotMenuDemoItemUseCase
@@ -29,6 +30,7 @@ val snapshotListModule = module {
   factory { BuildSnapshotTitleDisplayDataUseCase(androidContext()) }
   factory { GetApexPackageNamesUseCase(get()) }
   factory { BuildSnapshotCapturePlanUseCase(get()) }
+  factory { BuildSnapshotDashboardDisplayDataUseCase(androidContext()) }
   factory { BuildSnapshotItemDisplayDataUseCase(androidContext(), get(), get()) }
   factory { BuildSnapshotMenuDemoItemUseCase(BuildConfig.VERSION_CODE.toLong(), Build.VERSION.SDK_INT) }
   factory { BuildSnapshotListUpdatePlanUseCase(get(), get(), get()) }
