@@ -5,12 +5,9 @@ import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.LinearLayout
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.snapshot.list.ui.adapter.SnapshotAdapter
-import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotItemDisplayDataUseCase
-import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemDisplayData
+import com.absinthe.libchecker.domain.snapshot.list.ui.view.SnapshotItemView
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.manager.SystemBarManager
@@ -22,7 +19,6 @@ import com.google.android.material.loadingindicator.LoadingIndicator
 
 class InAppUpdateDialogView(
   context: Context,
-  buildSnapshotItemDisplayData: BuildSnapshotItemDisplayDataUseCase,
   initialCheckedId: Int = R.id.in_app_update_chip_stable
 ) : LinearLayout(context),
   IHeaderView {
@@ -55,17 +51,11 @@ class InAppUpdateDialogView(
     check(initialCheckedId)
   }
 
-  private val demoAdapter = SnapshotAdapter(
-    buildSnapshotItemDisplayData,
-    SnapshotAdapter.CardMode.GET_APP_UPDATE
-  )
+  private val demoItemView = SnapshotItemView(context)
 
-  private val demoView = RecyclerView(context).apply {
+  private val demoView = FrameLayout(context).apply {
     layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
     setPadding(0, 16.dp, 0, 16.dp)
-    overScrollMode = OVER_SCROLL_NEVER
-    layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-    adapter = demoAdapter
   }
 
   private val viewFlipper = HeightAnimatableViewFlipper(context).apply {
@@ -119,8 +109,12 @@ class InAppUpdateDialogView(
     }
   }
 
-  fun setItem(item: SnapshotDiffItem?) {
-    demoAdapter.setList(item?.let(::listOf).orEmpty())
+  fun setItem(data: SnapshotItemDisplayData?) {
+    demoView.removeAllViews()
+    data ?: return
+
+    demoItemView.render(data)
+    demoView.addView(demoItemView)
   }
 
   override fun getHeaderView(): BottomSheetHeaderView {
