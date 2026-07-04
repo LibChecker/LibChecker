@@ -17,7 +17,8 @@ data class SnapshotItemDisplayData(
   val apiText: CharSequence,
   val abi: SnapshotItemAbiDisplayData,
   val updateTimeDisplayData: SnapshotUpdateTimeDisplayData?,
-  val highlightText: String
+  val highlightText: String,
+  val contentDescription: String
 )
 
 data class SnapshotItemAppNameDisplayData(
@@ -54,4 +55,37 @@ enum class SnapshotItemCardPresentation {
 enum class SnapshotItemPackageStateLabel {
   New,
   Deleted
+}
+
+fun buildSnapshotItemDescription(
+  appName: CharSequence,
+  packageName: CharSequence,
+  versionInfo: CharSequence,
+  packageSize: CharSequence?,
+  apiText: CharSequence,
+  abiText: CharSequence,
+  updateTime: CharSequence?,
+  stateDescription: CharSequence
+): String {
+  return listOf(
+    appName,
+    packageName,
+    versionInfo,
+    packageSize,
+    apiText,
+    abiText,
+    updateTime,
+    stateDescription
+  )
+    .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
+    .joinToString()
+}
+
+fun buildSnapshotItemAbiDescription(data: SnapshotItemAbiDisplayData): String {
+  val oldAbi = data.abiDisplayData.old.text
+  if (!data.showChangedAbi) {
+    return oldAbi
+  }
+  return listOfNotNull(oldAbi, data.abiDisplayData.new?.text)
+    .joinToString(separator = " → ")
 }

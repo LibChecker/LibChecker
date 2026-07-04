@@ -7,6 +7,8 @@ import androidx.core.text.scale
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotAbiDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
+import com.absinthe.libchecker.domain.snapshot.display.SnapshotUpdateTimeDisplayData
+import com.absinthe.libchecker.domain.snapshot.display.SnapshotUpdateTimeText
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemAbiDisplayData
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemAppNameDisplayData
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemCardPresentation
@@ -14,6 +16,8 @@ import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemDisplayDat
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemPackageSizeDisplayData
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemPackageStateLabel
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemStateIndicatorData
+import com.absinthe.libchecker.domain.snapshot.list.model.buildSnapshotItemAbiDescription
+import com.absinthe.libchecker.domain.snapshot.list.model.buildSnapshotItemDescription
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.utils.LCAppUtils
@@ -30,59 +34,76 @@ class BuildSnapshotItemDisplayDataUseCase(
   operator fun invoke(request: Request): SnapshotItemDisplayData {
     val item = request.item
     val isNewOrDeleted = item.newInstalled || item.deleted
+    val appName = SnapshotItemAppNameDisplayData(
+      text = LCAppUtils.getDiffString(
+        diff = item.labelDiff,
+        isNewOrDeleted = isNewOrDeleted,
+        highlightDiffColor = request.highlightDiffColor
+      ),
+      showTrackIcon = item.isTrackItem,
+      packageStateLabel = item.packageStateLabel
+    )
+    val stateIndicator = SnapshotItemStateIndicatorData(
+      added = item.added,
+      removed = item.removed,
+      changed = item.changed,
+      moved = item.moved,
+      stateDescription = buildSnapshotStateDescription(
+        added = item.added,
+        removed = item.removed,
+        changed = item.changed,
+        moved = item.moved
+      ),
+      animate = request.animateStateIndicator
+    )
+    val versionInfo = LCAppUtils.getDiffString(
+      diff1 = item.versionNameDiff,
+      diff2 = item.versionCodeDiff,
+      isNewOrDeleted = isNewOrDeleted,
+      highlightDiffColor = request.highlightDiffColor
+    )
+    val packageSize = buildPackageSizeDisplayData(
+      packageSizeDiff = item.packageSizeDiff,
+      isNewOrDeleted = isNewOrDeleted,
+      highlightDiffColor = request.highlightDiffColor
+    )
+    val apiText = buildApiText(item, isNewOrDeleted, request.highlightDiffColor)
+    val abi = SnapshotItemAbiDisplayData(
+      abiDisplayData = buildSnapshotAbiDisplayData(item.abiDiff),
+      showChangedAbi = item.abiDiff.new != null && item.abiDiff.old != item.abiDiff.new,
+      tintChangedAbiBadge = request.tintChangedAbiBadge
+    )
+    val updateTimeDisplayData = buildSnapshotUpdateTimeDisplayData(
+      BuildSnapshotUpdateTimeDisplayDataUseCase.Request(
+        updateTime = item.updateTime,
+        isVisible = request.showUpdateTime,
+        isApexPackage = request.isApexPackage
+      )
+    )
     return SnapshotItemDisplayData(
       cardPresentation = request.cardPresentation,
       iconSource = request.iconSource,
       packageName = item.packageName,
-      appName = SnapshotItemAppNameDisplayData(
-        text = LCAppUtils.getDiffString(
-          diff = item.labelDiff,
-          isNewOrDeleted = isNewOrDeleted,
-          highlightDiffColor = request.highlightDiffColor
-        ),
-        showTrackIcon = item.isTrackItem,
-        packageStateLabel = item.packageStateLabel
-      ),
+      appName = appName,
       isNewInstalled = item.newInstalled,
       isDeleted = item.deleted,
-      stateIndicator = SnapshotItemStateIndicatorData(
-        added = item.added,
-        removed = item.removed,
-        changed = item.changed,
-        moved = item.moved,
-        stateDescription = buildSnapshotStateDescription(
-          added = item.added,
-          removed = item.removed,
-          changed = item.changed,
-          moved = item.moved
-        ),
-        animate = request.animateStateIndicator
-      ),
-      versionInfo = LCAppUtils.getDiffString(
-        diff1 = item.versionNameDiff,
-        diff2 = item.versionCodeDiff,
-        isNewOrDeleted = isNewOrDeleted,
-        highlightDiffColor = request.highlightDiffColor
-      ),
-      packageSize = buildPackageSizeDisplayData(
-        packageSizeDiff = item.packageSizeDiff,
-        isNewOrDeleted = isNewOrDeleted,
-        highlightDiffColor = request.highlightDiffColor
-      ),
-      apiText = buildApiText(item, isNewOrDeleted, request.highlightDiffColor),
-      abi = SnapshotItemAbiDisplayData(
-        abiDisplayData = buildSnapshotAbiDisplayData(item.abiDiff),
-        showChangedAbi = item.abiDiff.new != null && item.abiDiff.old != item.abiDiff.new,
-        tintChangedAbiBadge = request.tintChangedAbiBadge
-      ),
-      updateTimeDisplayData = buildSnapshotUpdateTimeDisplayData(
-        BuildSnapshotUpdateTimeDisplayDataUseCase.Request(
-          updateTime = item.updateTime,
-          isVisible = request.showUpdateTime,
-          isApexPackage = request.isApexPackage
-        )
-      ),
-      highlightText = request.highlightText
+      stateIndicator = stateIndicator,
+      versionInfo = versionInfo,
+      packageSize = packageSize,
+      apiText = apiText,
+      abi = abi,
+      updateTimeDisplayData = updateTimeDisplayData,
+      highlightText = request.highlightText,
+      contentDescription = buildSnapshotItemDescription(
+        appName = appName.text,
+        packageName = item.packageName,
+        versionInfo = versionInfo,
+        packageSize = packageSize?.text,
+        apiText = apiText,
+        abiText = buildSnapshotItemAbiDescription(abi),
+        updateTime = updateTimeDisplayData?.toDisplayText(),
+        stateDescription = stateIndicator.stateDescription
+      )
     )
   }
 
@@ -220,6 +241,20 @@ class BuildSnapshotItemDisplayDataUseCase(
       } else {
         append(String.format(Locale.getDefault(), "%.1f%%", percentage * 100))
       }
+    }
+  }
+
+  private fun SnapshotUpdateTimeDisplayData.toDisplayText(): String {
+    val displayText = when (val text = text) {
+      SnapshotUpdateTimeText.Preinstalled -> context.getString(R.string.snapshot_preinstalled_app)
+
+      is SnapshotUpdateTimeText.LastUpdated ->
+        context.getString(R.string.format_last_updated).format(text.timeText)
+    }
+    return if (isApexPackage) {
+      "$displayText, APEX"
+    } else {
+      displayText
     }
   }
 

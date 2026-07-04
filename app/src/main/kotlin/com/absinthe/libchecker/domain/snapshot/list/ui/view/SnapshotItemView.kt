@@ -83,7 +83,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       )
       setUpdateTimeDisplay(data.updateTimeDisplayData)
     }
-    setItemContentDescription(data.stateIndicator.stateDescription)
+    contentDescription = data.contentDescription
   }
 
   private fun setCardPresentation(cardPresentation: SnapshotItemCardPresentation) {
@@ -98,19 +98,6 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
         strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutlineVariant)
       }
     }
-  }
-
-  private fun setItemContentDescription(stateDescription: CharSequence) {
-    contentDescription = buildItemDescription(
-      container.appName.text,
-      container.packageName.text,
-      container.versionInfo.text,
-      container.packageSizeInfo.text.takeIf { container.packageSizeInfo.isVisible },
-      container.apisInfo.text,
-      container.abiInfo.text,
-      container.updateTime.text.takeIf { container.updateTime.isVisible },
-      stateDescription
-    )
   }
 
   class SnapshotItemContainerView(context: Context) : AViewGroup(context) {
@@ -436,12 +423,6 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
 }
 
 private const val ABI_CHANGE_ARROW = "→"
-
-private fun buildItemDescription(vararg parts: CharSequence?): String {
-  return parts
-    .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
-    .joinToString()
-}
 
 private fun AppCompatTextView.setOrHighlightText(text: CharSequence, highlightText: String) {
   if (highlightText.isNotBlank()) {
