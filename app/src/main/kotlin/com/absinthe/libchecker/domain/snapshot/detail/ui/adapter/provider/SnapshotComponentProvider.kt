@@ -50,10 +50,10 @@ class SnapshotComponentProvider : BaseNodeProvider() {
       val alphaColor = (baseColor and 0x00FFFFFF) or (alpha shl 24)
       background = alphaColor.toDrawable()
 
-      val rule = displayData.rule
-      setChip(rule, alphaColor, displayData.colorfulRuleIcon)
+      val ruleChip = displayData.ruleChip
+      setChip(ruleChip, alphaColor)
       helper.itemView.contentDescription = displayData.description
-      if (rule != null) {
+      if (ruleChip != null) {
         setChipOnClickListener {
           if (AntiShakeUtils.isInvalidClick(it)) {
             return@setChipOnClickListener
@@ -61,7 +61,7 @@ class SnapshotComponentProvider : BaseNodeProvider() {
           val name = displayData.item.name
           val fragmentManager =
             (this@SnapshotComponentProvider.context as BaseActivity<*>).supportFragmentManager
-          LibDetailDialogFragment.newInstance(name, displayData.item.itemType, rule.regexName)
+          LibDetailDialogFragment.newInstance(name, displayData.item.itemType, ruleChip.regexName)
             .show(fragmentManager, LibDetailDialogFragment::class.java.name)
         }
       } else {

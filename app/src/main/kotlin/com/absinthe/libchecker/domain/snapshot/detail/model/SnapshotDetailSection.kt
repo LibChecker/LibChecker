@@ -22,8 +22,7 @@ data class SnapshotDetailItemDisplayData(
   val extra: CharSequence,
   val description: String,
   val status: SnapshotDetailItemStatusDisplayData,
-  val rule: Rule?,
-  val colorfulRuleIcon: Boolean
+  val ruleChip: SnapshotDetailRuleChipDisplayData?
 )
 
 fun buildSnapshotDetailItemDescription(
@@ -51,11 +50,34 @@ fun buildSnapshotDetailSectionDescription(
     .joinToString()
 }
 
+fun buildSnapshotDetailRuleChipDisplayData(
+  rule: Rule?,
+  colorfulRuleIcon: Boolean
+): SnapshotDetailRuleChipDisplayData? {
+  return rule?.let {
+    SnapshotDetailRuleChipDisplayData(
+      label = it.label,
+      iconRes = it.iconRes,
+      regexName = it.regexName,
+      isSimpleColorIcon = it.isSimpleColorIcon,
+      useColorfulIcon = colorfulRuleIcon
+    )
+  }
+}
+
 data class SnapshotDetailItemStatusDisplayData(
   @DrawableRes val iconRes: Int,
   @ColorRes val colorRes: Int,
   @ColorRes val countColorRes: Int,
   @StringRes val labelRes: Int
+)
+
+data class SnapshotDetailRuleChipDisplayData(
+  val label: String,
+  @DrawableRes val iconRes: Int,
+  val regexName: String?,
+  val isSimpleColorIcon: Boolean,
+  val useColorfulIcon: Boolean
 )
 
 data class SnapshotDetailStatusCount(

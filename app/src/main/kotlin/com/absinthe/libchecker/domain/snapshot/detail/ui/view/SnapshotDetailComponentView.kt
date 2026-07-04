@@ -15,12 +15,12 @@ import androidx.core.view.children
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailRuleChipDisplayData
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
 import com.absinthe.libchecker.utils.extensions.toColorStateList
 import com.absinthe.libchecker.view.AViewGroup
-import com.absinthe.rulesbundle.Rule
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
 
@@ -73,8 +73,8 @@ class SnapshotDetailComponentView(context: Context) : MaterialCardView(context) 
       chip?.setOnClickListener(listener)
     }
 
-    fun setChip(rule: Rule?, color: Int, colorfulIcon: Boolean) {
-      if (rule == null) {
+    fun setChip(ruleChip: SnapshotDetailRuleChipDisplayData?, color: Int) {
+      if (ruleChip == null) {
         if (chip != null) {
           removeView(chip)
           chip = null
@@ -97,21 +97,21 @@ class SnapshotDetailComponentView(context: Context) : MaterialCardView(context) 
             chip = this
           }
           ).apply {
-          setChipIconResource(rule.iconRes)
-          text = rule.label
+          setChipIconResource(ruleChip.iconRes)
+          text = ruleChip.label
           chipBackgroundColor = ColorStateList.valueOf(color)
 
-          if (!colorfulIcon && !rule.isSimpleColorIcon) {
+          if (!ruleChip.useColorfulIcon && !ruleChip.isSimpleColorIcon) {
             val icon = chipIcon
             icon?.let {
               it.mutate().colorFilter =
                 ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
               chipIcon = it
             }
-          } else if (rule.isSimpleColorIcon) {
+          } else if (ruleChip.isSimpleColorIcon) {
             chipIcon?.mutate()?.setTint(Color.BLACK)
           } else {
-            setChipIconResource(rule.iconRes)
+            setChipIconResource(ruleChip.iconRes)
           }
         }
       }
