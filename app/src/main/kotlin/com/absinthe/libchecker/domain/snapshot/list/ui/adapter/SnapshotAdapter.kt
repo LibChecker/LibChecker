@@ -5,7 +5,6 @@ import android.text.style.ImageSpan
 import android.view.ViewGroup
 import androidx.core.text.buildSpannedString
 import androidx.core.text.inSpans
-import androidx.core.text.scale
 import androidx.core.view.isVisible
 import coil.load
 import com.absinthe.libchecker.R
@@ -129,9 +128,9 @@ class SnapshotAdapter(
       )
 
       setOrHighlightText(packageName, item.packageName)
-      versionInfo.text = LCAppUtils.getDiffString(
-        diff1 = item.versionNameDiff,
-        diff2 = item.versionCodeDiff,
+      setVersionDisplay(
+        versionNameDiff = item.versionNameDiff,
+        versionCodeDiff = item.versionCodeDiff,
         isNewOrDeleted = isNewOrDeleted,
         highlightDiffColor = highlightDiffColor
       )
@@ -142,33 +141,13 @@ class SnapshotAdapter(
         highlightDiffColor = highlightDiffColor
       )
 
-      val targetDiff = LCAppUtils.getDiffString(item.targetApiDiff, isNewOrDeleted, highlightDiffColor = highlightDiffColor).takeIf { item.targetApiDiff.old > 0 }
-      val minDiff = LCAppUtils.getDiffString(item.minSdkDiff, isNewOrDeleted, highlightDiffColor = highlightDiffColor).takeIf { item.minSdkDiff.old > 0 }
-      val compileDiff = LCAppUtils.getDiffString(item.compileSdkDiff, isNewOrDeleted, highlightDiffColor = highlightDiffColor).takeIf { item.compileSdkDiff.old > 0 }
-      apisInfo.text = buildSpannedString {
-        targetDiff?.let {
-          scale(1f) {
-            append("Target: ")
-          }
-          append(it)
-          append("  ")
-        }
-
-        minDiff?.let {
-          scale(1f) {
-            append("Min: ")
-          }
-          append(it)
-          append("  ")
-        }
-
-        compileDiff?.let {
-          scale(1f) {
-            append("Compile: ")
-          }
-          append(it)
-        }
-      }
+      setApiDisplay(
+        targetApiDiff = item.targetApiDiff,
+        minSdkDiff = item.minSdkDiff,
+        compileSdkDiff = item.compileSdkDiff,
+        isNewOrDeleted = isNewOrDeleted,
+        highlightDiffColor = highlightDiffColor
+      )
 
       val abiDisplayData = buildSnapshotAbiDisplayData(item.abiDiff)
       setAbiDisplay(

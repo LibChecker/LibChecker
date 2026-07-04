@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.text.buildSpannedString
+import androidx.core.text.scale
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.core.view.marginStart
@@ -173,6 +174,20 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       appName.text = SpannableStringBuilder(appName.text).append(spanString)
     }
 
+    fun setVersionDisplay(
+      versionNameDiff: SnapshotDiffItem.DiffNode<String>,
+      versionCodeDiff: SnapshotDiffItem.DiffNode<Long>,
+      isNewOrDeleted: Boolean,
+      highlightDiffColor: Int?
+    ) {
+      versionInfo.text = LCAppUtils.getDiffString(
+        diff1 = versionNameDiff,
+        diff2 = versionCodeDiff,
+        isNewOrDeleted = isNewOrDeleted,
+        highlightDiffColor = highlightDiffColor
+      )
+    }
+
     fun setAbiDisplay(
       abiDisplayData: SnapshotAbiDisplayData,
       showChangedAbi: Boolean,
@@ -241,6 +256,54 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       }
 
       setPackageSizeText(diffText, packageSizeBreakStart)
+    }
+
+    fun setApiDisplay(
+      targetApiDiff: SnapshotDiffItem.DiffNode<Short>,
+      minSdkDiff: SnapshotDiffItem.DiffNode<Short>,
+      compileSdkDiff: SnapshotDiffItem.DiffNode<Short>,
+      isNewOrDeleted: Boolean,
+      highlightDiffColor: Int?
+    ) {
+      val targetDiff = buildApiDiffString(
+        diff = targetApiDiff,
+        isNewOrDeleted = isNewOrDeleted,
+        highlightDiffColor = highlightDiffColor
+      )
+      val minDiff = buildApiDiffString(
+        diff = minSdkDiff,
+        isNewOrDeleted = isNewOrDeleted,
+        highlightDiffColor = highlightDiffColor
+      )
+      val compileDiff = buildApiDiffString(
+        diff = compileSdkDiff,
+        isNewOrDeleted = isNewOrDeleted,
+        highlightDiffColor = highlightDiffColor
+      )
+      apisInfo.text = buildSpannedString {
+        targetDiff?.let {
+          scale(1f) {
+            append("Target: ")
+          }
+          append(it)
+          append("  ")
+        }
+
+        minDiff?.let {
+          scale(1f) {
+            append("Min: ")
+          }
+          append(it)
+          append("  ")
+        }
+
+        compileDiff?.let {
+          scale(1f) {
+            append("Compile: ")
+          }
+          append(it)
+        }
+      }
     }
 
     fun setUpdateTimeDisplay(updateTimeDisplayData: SnapshotUpdateTimeDisplayData?) {
@@ -345,6 +408,18 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
 }
 
 private const val ABI_CHANGE_ARROW = "→"
+
+private fun SnapshotItemView.SnapshotItemContainerView.buildApiDiffString(
+  diff: SnapshotDiffItem.DiffNode<Short>,
+  isNewOrDeleted: Boolean,
+  highlightDiffColor: Int?
+): CharSequence? {
+  return LCAppUtils.getDiffString(
+    diff = diff,
+    isNewOrDeleted = isNewOrDeleted,
+    highlightDiffColor = highlightDiffColor
+  ).takeIf { diff.old > 0 }
+}
 
 private fun SnapshotItemView.SnapshotItemContainerView.buildPackageSizeChangeText(
   diffSize: Long,
