@@ -38,11 +38,7 @@ class SnapshotTitleProvider : BaseNodeProvider() {
     }
 
     countAdapter.setList(node.counts)
-    helper.itemView.contentDescription = if (node.isExpanded) {
-      node.expandedDescription
-    } else {
-      node.collapsedDescription
-    }
+    helper.itemView.contentDescription = node.contentDescription
 
     onExpansionToggled(itemView.arrow, node.isExpanded)
   }

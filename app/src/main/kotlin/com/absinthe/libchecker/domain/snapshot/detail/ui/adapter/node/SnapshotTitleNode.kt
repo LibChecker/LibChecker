@@ -13,6 +13,13 @@ class SnapshotTitleNode(
   val counts: List<SnapshotDetailCountNode>
 ) : BaseExpandNode() {
 
+  val contentDescription: String
+    get() = if (isExpanded) {
+      expandedDescription
+    } else {
+      collapsedDescription
+    }
+
   init {
     isExpanded = true
   }
