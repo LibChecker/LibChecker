@@ -8,6 +8,7 @@
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
   <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
   <uses-permission android:name="com.android.permission.GET_INSTALLED_APPS" />
+  <uses-permission android:name="android.permission.UPDATE_PACKAGES_WITHOUT_USER_ACTION" />
 
   <permission
     android:name="${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
@@ -152,6 +153,10 @@
       android:foregroundServiceType="shortService"
       android:exported="false" />
     <service android:name=".services.WorkerService" />
+
+    <receiver
+      android:name=".data.app.update.AppUpdateInstallResultReceiver"
+      android:exported="false" />
 
     <provider
       android:name="rikka.shizuku.ShizukuProvider"

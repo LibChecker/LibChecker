@@ -121,9 +121,8 @@ class InAppUpdateDialogView(
     }
   }
 
-  fun setItem(item: SnapshotDiffItem) {
-    demoAdapter.data.clear()
-    demoAdapter.addData(item)
+  fun setItem(item: SnapshotDiffItem?) {
+    demoAdapter.submitList(item?.let(::listOf).orEmpty())
   }
 
   override fun getHeaderView(): BottomSheetHeaderView {

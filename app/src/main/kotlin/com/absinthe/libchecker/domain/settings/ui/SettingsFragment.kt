@@ -44,10 +44,15 @@ import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.setBottomPaddingSpace
 import com.absinthe.libraries.utils.extensions.getBoolean
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
+import com.google.android.material.badge.BadgeDrawable
+import com.google.android.material.badge.BadgeUtils
 import com.google.android.material.card.MaterialCardView
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import rikka.recyclerview.fixEdgeEffect
@@ -74,6 +79,7 @@ class SettingsFragment :
   private lateinit var prefRecyclerView: RecyclerView
   private val homeViewModel: HomeViewModel by activityViewModels()
   private val settingsViewModel: SettingsViewModel by viewModel()
+  private var isGetUpdatesBadgeVisible = false
 
   override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
     setPreferencesFromResource(R.xml.settings, null)
@@ -233,7 +239,7 @@ class SettingsFragment :
         true
       }
     }
-    findPreference<Preference>(Constants.PREF_GET_UPDATES)?.apply {
+    val getUpdatesPreference = findPreference<Preference>(Constants.PREF_GET_UPDATES)?.apply {
       setOnPreferenceClickListener {
         if (AntiShakeUtils.isInvalidClick(prefRecyclerView)) {
           false
@@ -321,7 +327,16 @@ class SettingsFragment :
       isVisible = getBoolean(R.bool.is_foss).not()
     }
 
+    getUpdatesPreference?.let(::bindGetUpdatesBadge)
     bindLocalePreference(languagePreference)
+  }
+
+  private fun bindGetUpdatesBadge(preference: Preference) {
+    settingsViewModel.updateBadgeVisible.onEach { visible ->
+      isGetUpdatesBadgeVisible = visible
+      updateVisibleGetUpdatesBadge(preference)
+      updateVisiblePreferenceDescription(preference)
+    }.launchIn(lifecycleScope)
   }
 
   private fun bindGitHubTokenPreference(preference: Preference) {
@@ -383,6 +398,43 @@ class SettingsFragment :
   }
 
   @SuppressLint("RestrictedApi")
+  private fun updateVisibleGetUpdatesBadge(preference: Preference) {
+    if (!::prefRecyclerView.isInitialized) {
+      return
+    }
+
+    prefRecyclerView.post {
+      val adapter = prefRecyclerView.adapter as? PreferenceGroupAdapter ?: return@post
+      val position = (0 until adapter.itemCount)
+        .firstOrNull { adapter.getItem(it) == preference }
+        ?: return@post
+      val itemView = prefRecyclerView.findViewHolderForAdapterPosition(position)?.itemView ?: return@post
+      bindSettingsPreferenceBadge(itemView, preference)
+    }
+  }
+
+  private fun bindSettingsPreferenceBadge(itemView: View, preference: Preference?) {
+    val iconFrame = itemView.findViewById<FrameLayout>(R.id.icon_frame) ?: return
+    val icon = itemView.findViewById<View>(android.R.id.icon) ?: return
+    (iconFrame.getTag(R.id.settings_preference_update_badge) as? BadgeDrawable)?.let {
+      BadgeUtils.detachBadgeDrawable(it, icon)
+      iconFrame.setTag(R.id.settings_preference_update_badge, null)
+    }
+
+    if (preference?.key != Constants.PREF_GET_UPDATES || !isGetUpdatesBadgeVisible) {
+      return
+    }
+
+    val badge = BadgeDrawable.create(iconFrame.context).apply {
+      backgroundColor = R.color.material_red_500.getColor(iconFrame.context)
+      badgeGravity = BadgeDrawable.TOP_END
+      clearNumber()
+    }
+    BadgeUtils.attachBadgeDrawable(badge, icon, iconFrame)
+    iconFrame.setTag(R.id.settings_preference_update_badge, badge)
+  }
+
+  @SuppressLint("RestrictedApi")
   private fun updateVisiblePreferenceDescription(preference: Preference) {
     if (!::prefRecyclerView.isInitialized) {
       return
@@ -431,6 +483,7 @@ class SettingsFragment :
 
   override fun onResume() {
     super.onResume()
+    settingsViewModel.checkForUpdates()
     val container = (activity as? IAppBarContainer) ?: return
     (activity as? IListControllerHost)?.setListController(this)
     scheduleAppbarRaisingStatus(!getBorderViewDelegate().isShowingTopBorder)
@@ -561,6 +614,7 @@ class SettingsFragment :
     itemView.findViewById<View>(android.R.id.widget_frame)?.isVisible = hasSwitch
     itemView.findViewById<View>(R.id.settings_preference_chevron)?.isVisible =
       preference?.key in NAVIGATION_PREFERENCE_KEYS
+    bindSettingsPreferenceBadge(itemView, preference)
     itemView.findViewById<View>(android.R.id.title)?.importantForAccessibility =
       View.IMPORTANT_FOR_ACCESSIBILITY_NO
     itemView.findViewById<View>(android.R.id.summary)?.importantForAccessibility =
@@ -585,6 +639,9 @@ class SettingsFragment :
           R.string.array_dark_mode_off
         }
       )
+    }
+    if (preference?.key == Constants.PREF_GET_UPDATES && isGetUpdatesBadgeVisible) {
+      parts += getString(R.string.settings_update_available)
     }
     return parts
       .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }

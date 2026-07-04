@@ -67,6 +67,7 @@
   <string name="settings_rate_us_summary">这可以使我们被更多的人发现</string>
   <string name="settings_get_updates">获取更新</string>
   <string name="settings_get_updates_summary">获取更加稳定和功能众多的最新版本</string>
+  <string name="settings_update_available">有可用更新</string>
   <string name="settings_get_updates_in_app">应用内</string>
   <string name="settings_get_updates_in_app_chip_stable">稳定版</string>
   <string name="settings_get_updates_in_app_chip_ci">持续集成</string>
@@ -234,6 +235,11 @@
   <string name="toast_cloud_rules_update_error">云端规则更新失败，请重试</string>
   <string name="toast_not_enough_storage_space">存储空间不足</string>
   <string name="toast_downloading_app">已请求下载</string>
+  <string name="toast_app_update_started">正在准备更新</string>
+  <string name="toast_app_update_installed">更新已完成</string>
+  <string name="toast_app_update_unsupported">此设备暂不支持应用内更新</string>
+  <string name="toast_app_update_pending_user_action">此设备需要确认后才能安装更新</string>
+  <string name="toast_app_update_failed">更新失败：%s</string>
   <string name="toast_long_tap_share_button_tip">长按「分享」按钮以选择位置保存</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">保存当前快照</string>
