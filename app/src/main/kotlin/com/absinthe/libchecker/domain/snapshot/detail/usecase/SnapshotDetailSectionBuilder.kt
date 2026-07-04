@@ -22,6 +22,7 @@ import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemDi
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemStatusDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSection
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailStatusCount
+import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailItemDescription
 import com.absinthe.libchecker.domain.snapshot.model.ADDED
 import com.absinthe.libchecker.domain.snapshot.model.CHANGED
 import com.absinthe.libchecker.domain.snapshot.model.MOVED
@@ -109,12 +110,20 @@ class SnapshotDetailSectionBuilder(
       val sectionItems = items
         .filter { it.itemType == type }
         .map { item ->
+          val status = buildStatusDisplayData(item.diffType)
+          val rule = getRuleCached(item)
           SnapshotDetailItemDisplayData(
             item = item,
             title = item.title,
             extra = item.extra,
-            status = buildStatusDisplayData(item.diffType),
-            rule = getRuleCached(item),
+            description = buildSnapshotDetailItemDescription(
+              statusLabel = context.getString(status.labelRes),
+              title = item.title,
+              extra = item.extra,
+              ruleLabel = rule?.label
+            ),
+            status = status,
+            rule = rule,
             colorfulRuleIcon = colorfulRuleIcon
           )
         }

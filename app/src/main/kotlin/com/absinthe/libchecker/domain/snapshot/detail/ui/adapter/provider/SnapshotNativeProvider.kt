@@ -53,12 +53,7 @@ class SnapshotNativeProvider : BaseNodeProvider() {
 
       val rule = displayData.rule
       setChip(rule, alphaColor, displayData.colorfulRuleIcon)
-      helper.itemView.contentDescription = buildItemDescription(
-        context.getString(displayData.status.labelRes),
-        displayData.title,
-        displayData.extra,
-        rule?.label
-      )
+      helper.itemView.contentDescription = displayData.description
       if (rule != null) {
         setChipOnClickListener {
           if (AntiShakeUtils.isInvalidClick(it)) {
@@ -74,11 +69,5 @@ class SnapshotNativeProvider : BaseNodeProvider() {
         setChipOnClickListener(null)
       }
     }
-  }
-
-  private fun buildItemDescription(vararg parts: CharSequence?): String {
-    return parts
-      .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
-      .joinToString()
   }
 }

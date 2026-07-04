@@ -17,10 +17,22 @@ data class SnapshotDetailItemDisplayData(
   val item: SnapshotDetailItem,
   val title: CharSequence,
   val extra: CharSequence,
+  val description: String,
   val status: SnapshotDetailItemStatusDisplayData,
   val rule: Rule?,
   val colorfulRuleIcon: Boolean
 )
+
+fun buildSnapshotDetailItemDescription(
+  statusLabel: CharSequence?,
+  title: CharSequence?,
+  extra: CharSequence?,
+  ruleLabel: CharSequence?
+): String {
+  return listOf(statusLabel, title, extra, ruleLabel)
+    .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
+    .joinToString()
+}
 
 data class SnapshotDetailItemStatusDisplayData(
   @DrawableRes val iconRes: Int,
