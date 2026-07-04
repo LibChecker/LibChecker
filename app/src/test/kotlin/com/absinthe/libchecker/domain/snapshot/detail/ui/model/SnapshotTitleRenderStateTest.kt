@@ -24,6 +24,7 @@ class SnapshotTitleRenderStateTest {
     assertEquals(
       SnapshotTitleRenderState(
         appName = "X",
+        iconContentDescription = "X",
         packageName = "com.twitter.android",
         versionInfo = "11.98.0 -> 12.5.0",
         packageSize = SnapshotTitlePackageSizeRenderState(
@@ -48,6 +49,19 @@ class SnapshotTitleRenderStateTest {
     )
 
     assertEquals(null, displayData.toRenderState().packageSize)
+  }
+
+  @Test
+  fun mapsAppNameToIconContentDescription() {
+    val displayData = SnapshotTitleDisplayData(
+      appName = "X",
+      packageName = "com.twitter.android",
+      versionInfo = "12.5.0",
+      packageSize = null,
+      apis = "Target: 35"
+    )
+
+    assertEquals("X", displayData.toRenderState().iconContentDescription)
   }
 
   @Test

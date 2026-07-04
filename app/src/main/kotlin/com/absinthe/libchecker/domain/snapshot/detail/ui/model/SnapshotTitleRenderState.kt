@@ -5,6 +5,7 @@ import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotTitlePackage
 
 data class SnapshotTitleRenderState(
   val appName: CharSequence,
+  val iconContentDescription: CharSequence,
   val packageName: CharSequence,
   val versionInfo: CharSequence,
   val packageSize: SnapshotTitlePackageSizeRenderState?,
@@ -22,6 +23,7 @@ fun SnapshotTitleDisplayData.toRenderState(
 ): SnapshotTitleRenderState {
   return SnapshotTitleRenderState(
     appName = appName,
+    iconContentDescription = appName,
     packageName = packageName,
     versionInfo = versionInfo,
     packageSize = packageSize?.toRenderState(),

@@ -101,7 +101,7 @@ class SnapshotTitleView(
         setLongClickCopiedToClipboard(text)
       }
     }
-    iconView.contentDescription = appNameView.text
+    iconView.contentDescription = data.iconContentDescription
     packageNameView.apply {
       text = data.packageName
       if (data.copyPrimaryText) {
