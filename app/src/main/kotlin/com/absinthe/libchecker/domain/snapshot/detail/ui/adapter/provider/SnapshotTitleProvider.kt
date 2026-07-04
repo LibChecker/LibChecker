@@ -17,10 +17,6 @@ import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.SnapshotDetailC
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotDetailCountNode
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotTitleNode
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailTitleView
-import com.absinthe.libchecker.domain.snapshot.model.ADDED
-import com.absinthe.libchecker.domain.snapshot.model.CHANGED
-import com.absinthe.libchecker.domain.snapshot.model.MOVED
-import com.absinthe.libchecker.domain.snapshot.model.REMOVED
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.chad.library.adapter.base.provider.BaseNodeProvider
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
@@ -99,7 +95,7 @@ class SnapshotTitleProvider : BaseNodeProvider() {
   ): String {
     return (
       listOf(title) +
-        counts.map { "${getStatusLabel(it.status)} ${it.count}" } +
+        counts.map { "${context.getString(it.status.labelRes)} ${it.count}" } +
         listOf(
           context.getString(
             if (expanded) R.string.a11y_state_expanded else R.string.a11y_state_collapsed
@@ -109,17 +105,5 @@ class SnapshotTitleProvider : BaseNodeProvider() {
       .map { it.toString().trim() }
       .filter(String::isNotEmpty)
       .joinToString()
-  }
-
-  private fun getStatusLabel(status: Int): String {
-    return context.getString(
-      when (status) {
-        ADDED -> R.string.snapshot_indicator_added
-        REMOVED -> R.string.snapshot_indicator_removed
-        CHANGED -> R.string.snapshot_indicator_changed
-        MOVED -> R.string.snapshot_indicator_moved
-        else -> android.R.string.untitled
-      }
-    )
   }
 }

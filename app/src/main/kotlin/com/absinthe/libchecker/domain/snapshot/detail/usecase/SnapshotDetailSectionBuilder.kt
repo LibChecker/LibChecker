@@ -134,7 +134,10 @@ class SnapshotDetailSectionBuilder(
     return orderedStatuses.mapNotNull { status ->
       val count = items.count { it.item.diffType == status }
       count.takeIf { it > 0 }?.let {
-        SnapshotDetailStatusCount(status, it)
+        SnapshotDetailStatusCount(
+          count = it,
+          status = buildStatusDisplayData(status)
+        )
       }
     }
   }
@@ -144,24 +147,28 @@ class SnapshotDetailSectionBuilder(
       ADDED -> SnapshotDetailItemStatusDisplayData(
         iconRes = R.drawable.ic_add,
         colorRes = R.color.material_green_300,
+        countColorRes = R.color.material_green_200,
         labelRes = R.string.snapshot_indicator_added
       )
 
       REMOVED -> SnapshotDetailItemStatusDisplayData(
         iconRes = R.drawable.ic_remove,
         colorRes = R.color.material_red_300,
+        countColorRes = R.color.material_red_200,
         labelRes = R.string.snapshot_indicator_removed
       )
 
       CHANGED -> SnapshotDetailItemStatusDisplayData(
         iconRes = R.drawable.ic_changed,
         colorRes = R.color.material_yellow_300,
+        countColorRes = R.color.material_yellow_200,
         labelRes = R.string.snapshot_indicator_changed
       )
 
       MOVED -> SnapshotDetailItemStatusDisplayData(
         iconRes = R.drawable.ic_move,
         colorRes = R.color.material_blue_300,
+        countColorRes = R.color.material_blue_200,
         labelRes = R.string.snapshot_indicator_moved
       )
 

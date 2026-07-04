@@ -243,7 +243,12 @@ class SnapshotDetailActivity :
     return SnapshotTitleNode(
       childNode = nodes,
       type = section.type,
-      counts = section.statusCounts.map { SnapshotDetailCountNode(it.count, it.status) }
+      counts = section.statusCounts.map {
+        SnapshotDetailCountNode(
+          count = it.count,
+          status = it.status
+        )
+      }
     )
   }
 

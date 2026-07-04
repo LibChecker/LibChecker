@@ -25,10 +25,11 @@ data class SnapshotDetailItemDisplayData(
 data class SnapshotDetailItemStatusDisplayData(
   @DrawableRes val iconRes: Int,
   @ColorRes val colorRes: Int,
+  @ColorRes val countColorRes: Int,
   @StringRes val labelRes: Int
 )
 
 data class SnapshotDetailStatusCount(
-  val status: Int,
-  val count: Int
+  val count: Int,
+  val status: SnapshotDetailItemStatusDisplayData
 )
