@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.domain.snapshot.list.ui.view
 
 import android.content.Context
+import android.graphics.Color
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
@@ -14,20 +15,25 @@ import androidx.core.text.scale
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.core.view.marginStart
+import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotAbiDisplayData
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotAbiDisplayItem
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotUpdateTimeDisplayData
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotUpdateTimeText
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
+import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.domain.snapshot.ui.view.SnapshotPackageSizeLineBreaker
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.applyCondensedSingleLine
 import com.absinthe.libchecker.utils.extensions.applySingleLineEndEllipsize
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
+import com.absinthe.libchecker.utils.extensions.setAlphaForAll
+import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
 import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.extensions.tintHighlightText
 import com.absinthe.libchecker.utils.extensions.visibleHeight
@@ -52,6 +58,20 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
     addView(container)
   }
 
+  fun setCardPresentation(cardPresentation: CardPresentation) {
+    when (cardPresentation) {
+      CardPresentation.Normal -> {
+        strokeColor = Color.TRANSPARENT
+        radius = 0f
+      }
+
+      CardPresentation.Rounded -> {
+        setSmoothRoundCorner(16.dp)
+        strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutlineVariant)
+      }
+    }
+  }
+
   fun setItemContentDescription(
     added: Int,
     removed: Int,
@@ -73,6 +93,11 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
   enum class PackageStateLabel {
     New,
     Deleted
+  }
+
+  enum class CardPresentation {
+    Normal,
+    Rounded
   }
 
   class SnapshotItemContainerView(context: Context) : AViewGroup(context) {
@@ -172,6 +197,43 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       layoutParams = LayoutParams(5.dp, ViewGroup.LayoutParams.MATCH_PARENT)
       importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
       addView(this)
+    }
+
+    fun setIconSource(iconSource: SnapshotPackageIconSource?) {
+      when (iconSource) {
+        is SnapshotPackageIconSource.InstalledPackage -> icon.load(iconSource.packageInfo)
+
+        SnapshotPackageIconSource.Fallback,
+        null -> icon.load(R.drawable.ic_icon_blueprint)
+      }
+    }
+
+    fun setDeleted(isDeleted: Boolean) {
+      setAlphaForAll(if (isDeleted) 0.7f else 1.0f)
+    }
+
+    fun setStateIndicator(
+      added: Int,
+      removed: Int,
+      changed: Int,
+      moved: Int,
+      isNewOrDeleted: Boolean,
+      animate: Boolean
+    ) {
+      if (animate) {
+        stateIndicator.startDemoAnimation()
+        return
+      }
+
+      stateIndicator.stopDemoAnimation()
+      if (isNewOrDeleted) {
+        stateIndicator.added = false
+        stateIndicator.removed = false
+        stateIndicator.changed = false
+        stateIndicator.moved = false
+      } else {
+        stateIndicator.setSnapshotStateCounts(added, removed, changed, moved)
+      }
     }
 
     fun setAppNameDisplay(

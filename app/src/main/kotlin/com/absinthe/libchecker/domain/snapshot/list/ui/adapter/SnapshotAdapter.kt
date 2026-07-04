@@ -1,10 +1,6 @@
 package com.absinthe.libchecker.domain.snapshot.list.ui.adapter
 
-import android.graphics.Color
 import android.view.ViewGroup
-import androidx.core.view.isVisible
-import coil.load
-import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.SnapshotListDisplayOptions
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotAbiDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
@@ -13,10 +9,7 @@ import com.absinthe.libchecker.domain.snapshot.list.usecase.stableSnapshotDiffIt
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
-import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
-import com.absinthe.libchecker.utils.extensions.setAlphaForAll
-import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
 const val ARROW = "→"
@@ -59,29 +52,9 @@ class SnapshotAdapter(
   }
 
   override fun convert(holder: BaseViewHolder, item: SnapshotDiffItem) {
-    (holder.itemView as SnapshotItemView).apply {
-      if (cardMode == CardMode.DEMO || cardMode == CardMode.GET_APP_UPDATE) {
-        setSmoothRoundCorner(16.dp)
-        strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutlineVariant)
-      } else {
-        strokeColor = Color.TRANSPARENT
-        radius = 0f
-      }
-    }
-    (holder.itemView as SnapshotItemView).container.apply {
-      when (val iconSource = packageIconSources[item.packageName]) {
-        is SnapshotPackageIconSource.InstalledPackage -> icon.load(iconSource.packageInfo)
-
-        SnapshotPackageIconSource.Fallback,
-        null -> icon.load(R.drawable.ic_icon_blueprint)
-      }
-
-      if (item.deleted) {
-        setAlphaForAll(0.7f)
-      } else {
-        setAlphaForAll(1.0f)
-      }
-
+    val itemView = holder.itemView as SnapshotItemView
+    itemView.setCardPresentation(cardMode.toCardPresentation())
+    itemView.container.apply {
       val isNewOrDeleted = item.deleted || item.newInstalled
       val highlightDiffColor = if (displayOptions.highlightDiffs) {
         context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary)
@@ -89,21 +62,16 @@ class SnapshotAdapter(
         null
       }
 
-      stateIndicator.apply {
-        if (cardMode == CardMode.DEMO) {
-          startDemoAnimation()
-        } else {
-          stopDemoAnimation()
-          if (isNewOrDeleted) {
-            added = false
-            removed = false
-            changed = false
-            moved = false
-          } else {
-            setSnapshotStateCounts(item.added, item.removed, item.changed, item.moved)
-          }
-        }
-      }
+      setIconSource(packageIconSources[item.packageName])
+      setDeleted(item.deleted)
+      setStateIndicator(
+        added = item.added,
+        removed = item.removed,
+        changed = item.changed,
+        moved = item.moved,
+        isNewOrDeleted = isNewOrDeleted,
+        animate = cardMode == CardMode.DEMO
+      )
 
       setAppNameDisplay(
         labelDiff = item.labelDiff,
@@ -155,7 +123,7 @@ class SnapshotAdapter(
         )
       )
       setUpdateTimeDisplay(updateTimeDisplayData)
-      (holder.itemView as SnapshotItemView).setItemContentDescription(
+      itemView.setItemContentDescription(
         added = item.added,
         removed = item.removed,
         changed = item.changed,
@@ -175,5 +143,14 @@ class SnapshotAdapter(
     NORMAL,
     DEMO,
     GET_APP_UPDATE
+  }
+}
+
+private fun SnapshotAdapter.CardMode.toCardPresentation(): SnapshotItemView.CardPresentation {
+  return when (this) {
+    SnapshotAdapter.CardMode.NORMAL -> SnapshotItemView.CardPresentation.Normal
+
+    SnapshotAdapter.CardMode.DEMO,
+    SnapshotAdapter.CardMode.GET_APP_UPDATE -> SnapshotItemView.CardPresentation.Rounded
   }
 }
