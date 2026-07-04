@@ -4,6 +4,7 @@ import android.os.Build
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotTitleDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.SnapshotDetailSectionBuilder
+import com.absinthe.libchecker.domain.snapshot.display.FormatSnapshotTimestampUseCase
 import com.absinthe.libchecker.domain.snapshot.list.capture.CaptureInstalledSnapshotUseCase
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotListWorkflow
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
@@ -34,7 +35,7 @@ val snapshotListModule = module {
   factory { GetSnapshotPackageIconSourcesUseCase(get()) }
   factory { GetSnapshotSystemPropDiffsUseCase(get()) }
   factory { BuildSnapshotSystemPropDisplayDataUseCase(androidContext(), get()) }
-  factory { BuildSnapshotTimeNodeListDataUseCase(get()) }
+  factory { BuildSnapshotTimeNodeListDataUseCase(get(), get<FormatSnapshotTimestampUseCase>()::invoke) }
   factory { DeleteSnapshotTimeStampUseCase(get(), get()) }
   factory { UpdateSnapshotDiffItemsUseCase() }
   factory {

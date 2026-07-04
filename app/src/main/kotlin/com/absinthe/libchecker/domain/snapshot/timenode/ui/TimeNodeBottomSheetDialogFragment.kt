@@ -43,7 +43,6 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
     isInitialLandscapeExpansionEnabled = false
     customTitle?.let { getHeaderView().title.text = it }
     root.adapter.apply {
-      setTimestampFormatter(viewModel::getFormatDateString)
       setOnItemClickListener { _, _, position ->
         itemClickAction?.invoke(position)
       }
