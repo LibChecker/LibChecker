@@ -9,6 +9,9 @@ import com.absinthe.rulesbundle.Rule
 
 data class SnapshotDetailSection(
   @LibType val type: Int,
+  val title: String,
+  val expandedDescription: String,
+  val collapsedDescription: String,
   val items: List<SnapshotDetailItemDisplayData>,
   val statusCounts: List<SnapshotDetailStatusCount>
 )
@@ -34,6 +37,20 @@ fun buildSnapshotDetailItemDescription(
     .joinToString()
 }
 
+fun buildSnapshotDetailSectionDescription(
+  title: CharSequence?,
+  statusCounts: List<SnapshotDetailStatusCount>,
+  expansionStateLabel: CharSequence?
+): String {
+  return (
+    listOf(title) +
+      statusCounts.map { "${it.label} ${it.countText}" } +
+      listOf(expansionStateLabel)
+    )
+    .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
+    .joinToString()
+}
+
 data class SnapshotDetailItemStatusDisplayData(
   @DrawableRes val iconRes: Int,
   @ColorRes val colorRes: Int,
@@ -43,5 +60,7 @@ data class SnapshotDetailItemStatusDisplayData(
 
 data class SnapshotDetailStatusCount(
   val count: Int,
+  val countText: String,
+  val label: String,
   val status: SnapshotDetailItemStatusDisplayData
 )

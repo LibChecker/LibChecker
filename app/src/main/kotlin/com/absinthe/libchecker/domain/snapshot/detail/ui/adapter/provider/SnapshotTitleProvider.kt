@@ -5,16 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.absinthe.libchecker.R
-import com.absinthe.libchecker.annotation.ACTIVITY
-import com.absinthe.libchecker.annotation.METADATA
-import com.absinthe.libchecker.annotation.NATIVE
-import com.absinthe.libchecker.annotation.PERMISSION
-import com.absinthe.libchecker.annotation.PROVIDER
-import com.absinthe.libchecker.annotation.RECEIVER
-import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.SnapshotDetailCountAdapter
-import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotDetailCountNode
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotTitleNode
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailTitleView
 import com.chad.library.adapter.base.entity.node.BaseNode
@@ -37,17 +28,7 @@ class SnapshotTitleProvider : BaseNodeProvider() {
     val node = item as SnapshotTitleNode
     val countAdapter = SnapshotDetailCountAdapter()
 
-    val titleRes = when (node.type) {
-      NATIVE -> R.string.ref_category_native
-      SERVICE -> R.string.ref_category_service
-      ACTIVITY -> R.string.ref_category_activity
-      RECEIVER -> R.string.ref_category_br
-      PROVIDER -> R.string.ref_category_cp
-      PERMISSION -> R.string.ref_category_perm
-      METADATA -> R.string.ref_category_metadata
-      else -> android.R.string.untitled
-    }
-    itemView.title.text = context.getString(titleRes)
+    itemView.title.text = node.title
     itemView.list.apply {
       adapter = countAdapter
       layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
@@ -57,11 +38,11 @@ class SnapshotTitleProvider : BaseNodeProvider() {
     }
 
     countAdapter.setList(node.counts)
-    helper.itemView.contentDescription = buildTitleDescription(
-      itemView.title.text,
-      node.counts,
-      node.isExpanded
-    )
+    helper.itemView.contentDescription = if (node.isExpanded) {
+      node.expandedDescription
+    } else {
+      node.collapsedDescription
+    }
 
     onExpansionToggled(itemView.arrow, node.isExpanded)
   }
@@ -86,24 +67,5 @@ class SnapshotTitleProvider : BaseNodeProvider() {
       duration = 200
       start()
     }
-  }
-
-  private fun buildTitleDescription(
-    title: CharSequence,
-    counts: List<SnapshotDetailCountNode>,
-    expanded: Boolean
-  ): String {
-    return (
-      listOf(title) +
-        counts.map { "${context.getString(it.status.labelRes)} ${it.count}" } +
-        listOf(
-          context.getString(
-            if (expanded) R.string.a11y_state_expanded else R.string.a11y_state_collapsed
-          )
-        )
-      )
-      .map { it.toString().trim() }
-      .filter(String::isNotEmpty)
-      .joinToString()
   }
 }

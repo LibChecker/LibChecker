@@ -6,7 +6,6 @@ import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailCoun
 import com.absinthe.libchecker.utils.extensions.toColorStateList
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
-import java.text.NumberFormat
 
 /**
  * <pre>
@@ -22,8 +21,7 @@ class SnapshotDetailCountAdapter : BaseQuickAdapter<SnapshotDetailCountNode, Bas
 
   override fun convert(holder: BaseViewHolder, item: SnapshotDetailCountNode) {
     (holder.itemView as SnapshotDetailCountView).apply {
-      val countText = NumberFormat.getIntegerInstance().format(item.count)
-      text = countText
+      text = item.countText
       backgroundTintList = item.status.countColorRes.toColorStateList(context)
     }
   }

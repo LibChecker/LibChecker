@@ -30,4 +30,29 @@ class SnapshotDetailItemDisplayDataDescriptionTest {
       )
     )
   }
+
+  @Test
+  fun joinsSectionTitleCountsAndExpansionState() {
+    assertEquals(
+      "Native libraries, Added 1, Changed 1, Expanded",
+      buildSnapshotDetailSectionDescription(
+        title = "Native libraries",
+        statusCounts = listOf(
+          SnapshotDetailStatusCount(
+            count = 1,
+            countText = "1",
+            label = "Added",
+            status = SnapshotDetailItemStatusDisplayData(0, 0, 0, 0)
+          ),
+          SnapshotDetailStatusCount(
+            count = 1,
+            countText = "1",
+            label = "Changed",
+            status = SnapshotDetailItemStatusDisplayData(0, 0, 0, 0)
+          )
+        ),
+        expansionStateLabel = "Expanded"
+      )
+    )
+  }
 }

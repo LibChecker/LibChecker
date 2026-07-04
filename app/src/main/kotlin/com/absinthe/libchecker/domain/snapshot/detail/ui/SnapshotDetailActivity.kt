@@ -243,9 +243,13 @@ class SnapshotDetailActivity :
     return SnapshotTitleNode(
       childNode = nodes,
       type = section.type,
+      title = section.title,
+      expandedDescription = section.expandedDescription,
+      collapsedDescription = section.collapsedDescription,
       counts = section.statusCounts.map {
         SnapshotDetailCountNode(
           count = it.count,
+          countText = it.countText,
           status = it.status
         )
       }
@@ -318,7 +322,7 @@ class SnapshotDetailActivity :
     adapter.data.forEach {
       when (it) {
         is SnapshotTitleNode -> {
-          sb.append("[${getComponentName(it.type)}]").appendLine()
+          sb.append("[${it.title}]").appendLine()
         }
 
         is SnapshotComponentNode -> {
@@ -341,20 +345,6 @@ class SnapshotDetailActivity :
     }
     ClipboardUtils.put(this, sb.toString())
     VersionCompat.showCopiedOnClipboardToast(this)
-  }
-
-  private fun getComponentName(@LibType type: Int): String {
-    val titleRes = when (type) {
-      NATIVE -> R.string.ref_category_native
-      SERVICE -> R.string.ref_category_service
-      ACTIVITY -> R.string.ref_category_activity
-      RECEIVER -> R.string.ref_category_br
-      PROVIDER -> R.string.ref_category_cp
-      PERMISSION -> R.string.ref_category_perm
-      METADATA -> R.string.ref_category_metadata
-      else -> android.R.string.untitled
-    }
-    return getString(titleRes)
   }
 
   private fun getDiffTypeLabel(diffType: Int): String {

@@ -3,6 +3,7 @@ package com.absinthe.libchecker.domain.snapshot.detail.usecase
 import android.content.Context
 import android.graphics.Color
 import android.text.style.ForegroundColorSpan
+import androidx.annotation.StringRes
 import androidx.core.graphics.ColorUtils
 import androidx.core.text.buildSpannedString
 import androidx.core.text.inSpans
@@ -23,6 +24,7 @@ import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemSt
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSection
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailStatusCount
 import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailItemDescription
+import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailSectionDescription
 import com.absinthe.libchecker.domain.snapshot.model.ADDED
 import com.absinthe.libchecker.domain.snapshot.model.CHANGED
 import com.absinthe.libchecker.domain.snapshot.model.MOVED
@@ -33,6 +35,7 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.rulesbundle.Rule
+import java.text.NumberFormat
 import java.util.Locale
 import kotlin.math.abs
 import kotlinx.coroutines.Dispatchers
@@ -130,10 +133,23 @@ class SnapshotDetailSectionBuilder(
       if (sectionItems.isEmpty()) {
         null
       } else {
+        val statusCounts = buildStatusCounts(sectionItems)
+        val title = context.getString(getSectionTitleRes(type))
         SnapshotDetailSection(
           type = type,
+          title = title,
+          expandedDescription = buildSnapshotDetailSectionDescription(
+            title = title,
+            statusCounts = statusCounts,
+            expansionStateLabel = context.getString(R.string.a11y_state_expanded)
+          ),
+          collapsedDescription = buildSnapshotDetailSectionDescription(
+            title = title,
+            statusCounts = statusCounts,
+            expansionStateLabel = context.getString(R.string.a11y_state_collapsed)
+          ),
           items = sectionItems,
-          statusCounts = buildStatusCounts(sectionItems)
+          statusCounts = statusCounts
         )
       }
     }
@@ -143,11 +159,28 @@ class SnapshotDetailSectionBuilder(
     return orderedStatuses.mapNotNull { status ->
       val count = items.count { it.item.diffType == status }
       count.takeIf { it > 0 }?.let {
+        val statusDisplayData = buildStatusDisplayData(status)
         SnapshotDetailStatusCount(
           count = it,
-          status = buildStatusDisplayData(status)
+          countText = NumberFormat.getIntegerInstance().format(it),
+          label = context.getString(statusDisplayData.labelRes),
+          status = statusDisplayData
         )
       }
+    }
+  }
+
+  @StringRes
+  private fun getSectionTitleRes(@LibType type: Int): Int {
+    return when (type) {
+      NATIVE -> R.string.ref_category_native
+      SERVICE -> R.string.ref_category_service
+      ACTIVITY -> R.string.ref_category_activity
+      RECEIVER -> R.string.ref_category_br
+      PROVIDER -> R.string.ref_category_cp
+      PERMISSION -> R.string.ref_category_perm
+      METADATA -> R.string.ref_category_metadata
+      else -> android.R.string.untitled
     }
   }
 
