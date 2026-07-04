@@ -4,6 +4,8 @@ import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemStatusDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailRuleChipDisplayData
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailRuleChipIconStyle
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailRuleChipRenderState
 import com.absinthe.libchecker.domain.snapshot.model.MOVED
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
 import org.junit.Assert.assertEquals
@@ -40,7 +42,12 @@ class SnapshotDetailNodeRenderStateTest {
         iconRes = 10,
         backgroundColor = 0x12345678,
         contentDescription = "Changed, libjingle_peerconnection_so.so, (12 MB), WebRTC",
-        ruleChip = ruleChip,
+        ruleChip = SnapshotDetailRuleChipRenderState(
+          label = "WebRTC",
+          iconRes = 20,
+          backgroundColor = 0x12345678,
+          iconStyle = SnapshotDetailRuleChipIconStyle.Original
+        ),
         chipClickAction = SnapshotDetailNodeChipClickAction.OpenLibraryDetail(
           SnapshotDetailLibraryDialogTarget(
             name = "libjingle_peerconnection_so.so",
@@ -76,6 +83,68 @@ class SnapshotDetailNodeRenderStateTest {
     assertEquals("Changed, libplain.so, (4 KB)", renderState.contentDescription)
     assertNull(renderState.ruleChip)
     assertNull(renderState.chipClickAction)
+  }
+
+  @Test
+  fun exposesDesaturatedRuleChipRenderStateWhenColorfulIconIsDisabled() {
+    val node = SnapshotNativeNode(
+      buildDisplayData(
+        name = "libplain.so",
+        title = "libplain.so",
+        extra = "(4 KB)",
+        description = "Changed, libplain.so, (4 KB), Plain",
+        iconRes = 11,
+        backgroundColor = 0x22334455,
+        ruleChip = SnapshotDetailRuleChipDisplayData(
+          label = "Plain",
+          iconRes = 21,
+          regexName = "libplain.*",
+          isSimpleColorIcon = false,
+          useColorfulIcon = false
+        )
+      )
+    )
+
+    assertEquals(
+      SnapshotDetailRuleChipRenderState(
+        label = "Plain",
+        iconRes = 21,
+        backgroundColor = 0x22334455,
+        iconStyle = SnapshotDetailRuleChipIconStyle.Desaturated
+      ),
+      node.itemRenderState.ruleChip
+    )
+  }
+
+  @Test
+  fun exposesBlackTintRuleChipRenderStateForSimpleColorIcon() {
+    val node = SnapshotNativeNode(
+      buildDisplayData(
+        name = "libsimple.so",
+        title = "libsimple.so",
+        extra = "(8 KB)",
+        description = "Changed, libsimple.so, (8 KB), Simple",
+        iconRes = 12,
+        backgroundColor = 0x33445566,
+        ruleChip = SnapshotDetailRuleChipDisplayData(
+          label = "Simple",
+          iconRes = 22,
+          regexName = "libsimple.*",
+          isSimpleColorIcon = true,
+          useColorfulIcon = false
+        )
+      )
+    )
+
+    assertEquals(
+      SnapshotDetailRuleChipRenderState(
+        label = "Simple",
+        iconRes = 22,
+        backgroundColor = 0x33445566,
+        iconStyle = SnapshotDetailRuleChipIconStyle.BlackTint
+      ),
+      node.itemRenderState.ruleChip
+    )
   }
 
   private fun buildDisplayData(

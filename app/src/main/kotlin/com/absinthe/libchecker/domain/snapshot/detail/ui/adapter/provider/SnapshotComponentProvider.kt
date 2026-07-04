@@ -41,7 +41,7 @@ class SnapshotComponentProvider : BaseNodeProvider() {
 
       background = renderState.backgroundColor.toDrawable()
 
-      setChip(renderState.ruleChip, renderState.backgroundColor)
+      setChip(renderState.ruleChip)
       helper.itemView.contentDescription = renderState.contentDescription
       if (chipClickAction is SnapshotDetailNodeChipClickAction.OpenLibraryDetail) {
         setChipOnClickListener {

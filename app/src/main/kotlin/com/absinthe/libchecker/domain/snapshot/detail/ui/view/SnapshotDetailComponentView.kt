@@ -15,7 +15,8 @@ import androidx.core.view.children
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailRuleChipDisplayData
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailRuleChipIconStyle
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailRuleChipRenderState
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
@@ -73,7 +74,7 @@ class SnapshotDetailComponentView(context: Context) : MaterialCardView(context) 
       chip?.setOnClickListener(listener)
     }
 
-    fun setChip(ruleChip: SnapshotDetailRuleChipDisplayData?, color: Int) {
+    fun setChip(ruleChip: SnapshotDetailRuleChipRenderState?) {
       if (ruleChip == null) {
         if (chip != null) {
           removeView(chip)
@@ -99,19 +100,25 @@ class SnapshotDetailComponentView(context: Context) : MaterialCardView(context) 
           ).apply {
           setChipIconResource(ruleChip.iconRes)
           text = ruleChip.label
-          chipBackgroundColor = ColorStateList.valueOf(color)
+          chipBackgroundColor = ColorStateList.valueOf(ruleChip.backgroundColor)
 
-          if (!ruleChip.useColorfulIcon && !ruleChip.isSimpleColorIcon) {
-            val icon = chipIcon
-            icon?.let {
-              it.mutate().colorFilter =
-                ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
-              chipIcon = it
+          when (ruleChip.iconStyle) {
+            SnapshotDetailRuleChipIconStyle.Desaturated -> {
+              val icon = chipIcon
+              icon?.let {
+                it.mutate().colorFilter =
+                  ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
+                chipIcon = it
+              }
             }
-          } else if (ruleChip.isSimpleColorIcon) {
-            chipIcon?.mutate()?.setTint(Color.BLACK)
-          } else {
-            setChipIconResource(ruleChip.iconRes)
+
+            SnapshotDetailRuleChipIconStyle.BlackTint -> {
+              chipIcon?.mutate()?.setTint(Color.BLACK)
+            }
+
+            SnapshotDetailRuleChipIconStyle.Original -> {
+              setChipIconResource(ruleChip.iconRes)
+            }
           }
         }
       }
