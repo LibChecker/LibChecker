@@ -38,6 +38,7 @@ gradlePlugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", ve
 gradlePlugin-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotless" }
 
 kotlinX-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0"
+junit = "junit:junit:4.13.2"
 koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin-bom" }
 koin-android = { module = "io.insert-koin:koin-android" }
 

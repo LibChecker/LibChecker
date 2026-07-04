@@ -157,6 +157,8 @@ dependencies {
 
   ksp(libs.androidX.room3.compiler)
 
+  testImplementation(libs.junit)
+
   androidTestImplementation(libs.androidX.test.ext.junit)
   androidTestImplementation(libs.androidX.test.runner)
 
