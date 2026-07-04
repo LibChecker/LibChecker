@@ -2,7 +2,10 @@ package com.absinthe.libchecker.domain.snapshot.list.ui
 
 import androidx.core.os.BundleCompat
 import androidx.lifecycle.lifecycleScope
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotNoDiffTitleIconRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.toRenderState
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.toSnapshotNoDiffRenderState
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.toSnapshotNoDiffTitleIconRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotNoDiffBSView
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotTitleDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
@@ -32,55 +35,32 @@ class SnapshotNoDiffBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotNoDi
       return
     }
     BundleCompat.getSerializable(arg, EXTRA_DIFF_ITEM, SnapshotDiffItem::class.java)?.let { item ->
-      root.title.apply {
-        bindIcon(item)
-        render(
-          buildSnapshotTitleDisplayData(
-            BuildSnapshotTitleDisplayDataUseCase.Request(
-              item = item,
-              formatSplitPackageName = false
-            )
-          ).toRenderState(copyPrimaryText = false)
+      val titleRenderState = buildSnapshotTitleDisplayData(
+        BuildSnapshotTitleDisplayDataUseCase.Request(
+          item = item,
+          formatSplitPackageName = false
         )
+      ).toRenderState(copyPrimaryText = false)
+      val renderState = item.toSnapshotNoDiffRenderState(titleRenderState) ?: run {
+        dismiss()
+        return@let
       }
-
-      when {
-        item.newInstalled -> {
-          root.setMode(SnapshotNoDiffBSView.Mode.New)
-        }
-
-        item.deleted -> {
-          root.setMode(SnapshotNoDiffBSView.Mode.Deleted)
-        }
-
-        item.isNothingChanged() -> {
-          root.setMode(SnapshotNoDiffBSView.Mode.NothingChanged)
-        }
-
-        else -> {
-          dismiss()
-        }
-      }
+      root.render(renderState)
+      bindIcon(item)
     } ?: run {
       dismiss()
     }
   }
 
   private fun bindIcon(item: SnapshotDiffItem) {
-    root.title.setFallbackIcon()
-    root.title.setIconClickListener(null)
+    root.renderTitleIcon(SnapshotNoDiffTitleIconRenderState.Fallback)
     lifecycleScope.launch {
-      when (val iconSource = viewModel.getSnapshotPackageIconSources(listOf(item.packageName))[item.packageName]) {
-        null -> root.title.setFallbackIcon()
-
-        else -> {
-          root.title.setIconSource(iconSource)
-          root.title.setIconClickListener {
-            lifecycleScope.launch {
-              val lcItem = viewModel.getAppListItem(item.packageName) ?: return@launch
-              activity?.launchDetailPage(lcItem)
-            }
-          }
+      val iconState = viewModel.getSnapshotPackageIconSources(listOf(item.packageName))[item.packageName]
+        .toSnapshotNoDiffTitleIconRenderState()
+      root.renderTitleIcon(iconState) {
+        lifecycleScope.launch {
+          val lcItem = viewModel.getAppListItem(item.packageName) ?: return@launch
+          activity?.launchDetailPage(lcItem)
         }
       }
     }
