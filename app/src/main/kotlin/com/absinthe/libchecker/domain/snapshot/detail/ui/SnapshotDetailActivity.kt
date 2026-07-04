@@ -30,8 +30,9 @@ import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotTitleDisplay
 import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailReportHeader
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.SnapshotDetailAdapter
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.BaseSnapshotNode
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotDetailNodeClickAction
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotReportNode
-import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotTitleNode
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.clickAction
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.toSnapshotTitleNode
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailDeletedView
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailNewInstallView
@@ -179,23 +180,27 @@ class SnapshotDetailActivity :
       }
     adapter.isStateViewEnable = entity.newInstalled || entity.deleted
     adapter.setOnItemClickListener { _, view, position ->
-      if (adapter.data[position] is SnapshotTitleNode) {
-        adapter.expandOrCollapse(position)
-        return@setOnItemClickListener
-      }
-      if (AntiShakeUtils.isInvalidClick(view)) {
-        return@setOnItemClickListener
-      }
+      when (val action = adapter.data[position].clickAction) {
+        SnapshotDetailNodeClickAction.ToggleSection -> {
+          adapter.expandOrCollapse(position)
+          return@setOnItemClickListener
+        }
 
-      val target = (adapter.data[position] as BaseSnapshotNode).detailTarget ?: return@setOnItemClickListener
+        is SnapshotDetailNodeClickAction.OpenDetail -> {
+          if (AntiShakeUtils.isInvalidClick(view)) {
+            return@setOnItemClickListener
+          }
+          lifecycleScope.launch {
+            val lcItem = viewModel.getAppListItem(entity.packageName) ?: return@launch
+            launchDetailPage(
+              item = lcItem,
+              refName = action.target.refName,
+              refType = action.target.refType
+            )
+          }
+        }
 
-      lifecycleScope.launch {
-        val lcItem = viewModel.getAppListItem(entity.packageName) ?: return@launch
-        launchDetailPage(
-          item = lcItem,
-          refName = target.refName,
-          refType = target.refType
-        )
+        null -> return@setOnItemClickListener
       }
     }
     adapter.setOnItemLongClickListener { _, _, position ->
