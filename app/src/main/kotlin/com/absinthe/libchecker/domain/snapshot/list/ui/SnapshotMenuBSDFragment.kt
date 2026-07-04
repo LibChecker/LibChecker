@@ -4,6 +4,8 @@ import android.content.DialogInterface
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.SnapshotOptions
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemCardPresentation
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemDisplayData
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
 import com.absinthe.libchecker.domain.snapshot.list.ui.view.SnapshotMenuBSDView
 import com.absinthe.libchecker.domain.snapshot.list.ui.view.SnapshotMenuItemView
@@ -22,15 +24,14 @@ class SnapshotMenuBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotMenuBS
   private val buildSnapshotItemDisplayData: BuildSnapshotItemDisplayDataUseCase by inject()
   private val buildSnapshotMenuDemoItem: BuildSnapshotMenuDemoItemUseCase by inject()
   private val optionsViewMap = mutableMapOf<Int, SnapshotMenuItemView>()
+  private val demoItem by lazy(LazyThreadSafetyMode.NONE) {
+    buildSnapshotMenuDemoItem()
+  }
   private var previousAdvancedOptions: Int = 0
 
   private var onDismissCallback: (optionsDiff: Int) -> Unit = {}
 
-  override fun initRootView(): SnapshotMenuBSDView = SnapshotMenuBSDView(
-    requireContext(),
-    buildSnapshotItemDisplayData,
-    buildSnapshotMenuDemoItem()
-  )
+  override fun initRootView(): SnapshotMenuBSDView = SnapshotMenuBSDView(requireContext(), buildDemoDisplayData())
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
@@ -69,17 +70,34 @@ class SnapshotMenuBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotMenuBS
     optionsViewMap[option] =
       root.addOptionItemView(labelRes, option, previousAdvancedOptions).apply {
         setOnCheckedChangeCallback { isChecked ->
-          updateOption(labelRes, option, isChecked)
-          root.updateDemoView()
+          val currentOptions = updateOption(labelRes, option, isChecked)
+          root.setDemoDisplayData(buildDemoDisplayData(currentOptions))
         }
       }
   }
 
-  private fun updateOption(labelRes: Int, option: Int, isChecked: Boolean) {
-    viewModel.setSnapshotOption(option, isChecked)
+  private fun updateOption(labelRes: Int, option: Int, isChecked: Boolean): Int {
+    val currentOptions = viewModel.setSnapshotOption(option, isChecked)
     Telemetry.recordEvent(
       Constants.Event.SNAPSHOT_ADVANCED_MENU_ITEM_CHANGED,
       mapOf(Telemetry.Param.CONTENT to getString(labelRes), Telemetry.Param.VALUE to isChecked)
+    )
+    return currentOptions
+  }
+
+  private fun buildDemoDisplayData(options: Int = viewModel.getSnapshotOptions()): SnapshotItemDisplayData {
+    return buildSnapshotItemDisplayData(
+      BuildSnapshotItemDisplayDataUseCase.Request(
+        item = demoItem,
+        cardPresentation = SnapshotItemCardPresentation.Rounded,
+        iconSource = null,
+        showUpdateTime = (options and SnapshotOptions.SHOW_UPDATE_TIME) > 0,
+        isApexPackage = false,
+        animateStateIndicator = true,
+        tintChangedAbiBadge = false,
+        highlightDiffs = (options and SnapshotOptions.DIFF_HIGHLIGHT) > 0,
+        highlightText = ""
+      )
     )
   }
 }

@@ -3,12 +3,9 @@ package com.absinthe.libchecker.domain.snapshot.list.ui.view
 import android.content.Context
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.home.ui.adapter.AdvancedMenuAdapter
-import com.absinthe.libchecker.domain.snapshot.list.ui.adapter.SnapshotAdapter
-import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotItemDisplayDataUseCase
-import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemDisplayData
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.view.app.IHeaderView
@@ -20,8 +17,7 @@ import com.google.android.flexbox.JustifyContent
 
 class SnapshotMenuBSDView(
   context: Context,
-  buildSnapshotItemDisplayData: BuildSnapshotItemDisplayDataUseCase,
-  demoItem: SnapshotDiffItem
+  demoDisplayData: SnapshotItemDisplayData
 ) : LinearLayout(context),
   IHeaderView {
 
@@ -32,23 +28,15 @@ class SnapshotMenuBSDView(
   }
 
   private val adapter = AdvancedMenuAdapter()
-  private val demoAdapter = SnapshotAdapter(
-    buildSnapshotItemDisplayData,
-    SnapshotAdapter.CardMode.DEMO
-  )
 
-  private val demoView = RecyclerView(context).apply {
+  private val demoView = SnapshotItemView(context).apply {
     layoutParams = LayoutParams(
       LayoutParams.MATCH_PARENT,
       LayoutParams.WRAP_CONTENT
     ).also {
       it.topMargin = 24.dp
     }
-    overScrollMode = OVER_SCROLL_NEVER
-    layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-    adapter = demoAdapter
-
-    demoAdapter.addData(demoItem)
+    render(demoDisplayData)
   }
 
   private val flexLayout = FlexboxLayout(context).apply {
@@ -95,8 +83,8 @@ class SnapshotMenuBSDView(
     return view
   }
 
-  fun updateDemoView() {
-    demoAdapter.notifyItemChanged(0)
+  fun setDemoDisplayData(data: SnapshotItemDisplayData) {
+    demoView.render(data)
   }
 
   init {
