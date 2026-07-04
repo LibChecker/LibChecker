@@ -6,10 +6,8 @@ import android.view.Gravity
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
-import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.view.MenuProvider
-import androidx.core.view.descendants
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -59,7 +57,6 @@ import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.chip.Chip
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -210,16 +207,16 @@ class SnapshotDetailActivity :
         )
       }
     }
-    adapter.setOnItemLongClickListener { _, view, position ->
-      val item = (adapter.data[position] as? BaseSnapshotNode)?.item ?: return@setOnItemLongClickListener false
+    adapter.setOnItemLongClickListener { _, _, position ->
+      val node = adapter.data[position] as? BaseSnapshotNode ?: return@setOnItemLongClickListener false
+      val item = node.item
       // if (item.diffType == REMOVED) {
       //   return@setOnItemLongClickListener false
       // }
       if (isComponentType(item.itemType) && item.name.startsWith(entity.packageName)) {
         return@setOnItemLongClickListener false
       }
-      val label = ((view as? ViewGroup)?.descendants?.find { it is Chip } as? Chip)?.text?.toString()
-      launchLibReferencePage(item.name, label, item.itemType, null)
+      launchLibReferencePage(item.name, node.referenceLabel, item.itemType, null)
       true
     }
 

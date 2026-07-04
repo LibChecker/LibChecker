@@ -9,6 +9,8 @@ open class BaseSnapshotNode(
   SnapshotReportNode {
 
   val item = displayData.item
+  val referenceLabel: String?
+    get() = displayData.ruleChip?.label
   override val reportText: String
     get() = displayData.reportText
 
