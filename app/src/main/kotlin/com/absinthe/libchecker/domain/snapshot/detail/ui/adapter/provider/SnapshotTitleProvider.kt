@@ -6,13 +6,12 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.SnapshotDetailCountAdapter
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SNAPSHOT_TITLE_PROVIDER
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotTitleNode
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailTitleView
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.chad.library.adapter.base.provider.BaseNodeProvider
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
-
-const val SNAPSHOT_TITLE_PROVIDER = 1
 
 class SnapshotTitleProvider : BaseNodeProvider() {
 

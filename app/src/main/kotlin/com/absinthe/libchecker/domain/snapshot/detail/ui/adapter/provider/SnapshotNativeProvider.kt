@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.core.graphics.drawable.toDrawable
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.LibDetailDialogFragment
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SNAPSHOT_NATIVE_PROVIDER
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotNativeNode
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailNativeView
 import com.absinthe.libchecker.ui.base.BaseActivity
@@ -12,8 +13,6 @@ import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.chad.library.adapter.base.provider.BaseNodeProvider
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
-
-const val SNAPSHOT_NATIVE_PROVIDER = 2
 
 class SnapshotNativeProvider : BaseNodeProvider() {
 
