@@ -2,6 +2,8 @@ package com.absinthe.libchecker.domain.app.list.ui.view
 
 import android.content.Context
 import android.os.Build
+import android.view.View
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,8 +17,9 @@ import com.absinthe.libchecker.domain.app.detail.model.EXPORTED
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.LibStringAdapter
+import com.absinthe.libchecker.domain.app.list.model.AdvancedMenuLayoutItem
+import com.absinthe.libchecker.domain.app.list.model.buildAdvancedMenuLayoutItems
 import com.absinthe.libchecker.domain.app.list.ui.adapter.AppAdapter
-import com.absinthe.libchecker.domain.home.ui.adapter.AdvancedMenuAdapter
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -25,6 +28,8 @@ import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.absinthe.rulesbundle.Rule
+import com.chad.library.adapter.base.BaseQuickAdapter
+import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayout
@@ -54,7 +59,8 @@ class AdvancedMenuBSDView(
     title.text = context.getString(R.string.advanced_menu)
   }
 
-  private val adapter = AdvancedMenuAdapter()
+  private val adapter = AdvancedMenuLayoutAdapter()
+  private val layoutItems = buildAdvancedMenuLayoutItems()
   private val demoAdapter = AppAdapter(AppAdapter.CardMode.DEMO, displayOptions)
   private val itemAdapter = LibStringAdapter(
     packageName = Constants.EXAMPLE_PACKAGE,
@@ -226,12 +232,7 @@ class AdvancedMenuBSDView(
     setHasFixedSize(true)
 
     this@AdvancedMenuBSDView.adapter.apply {
-      addData(demoView)
-      addData(sortView)
-      addData(flexLayout)
-      addData(flexLayout2)
-      addData(itemView)
-      addData(itemFlexLayout)
+      setList(layoutItems)
     }
   }
 
@@ -292,5 +293,42 @@ class AdvancedMenuBSDView(
 
   override fun getHeaderView(): BottomSheetHeaderView {
     return header
+  }
+
+  private inner class AdvancedMenuLayoutAdapter : BaseQuickAdapter<AdvancedMenuLayoutItem, BaseViewHolder>(0) {
+
+    override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
+      return BaseViewHolder(
+        LinearLayout(context).apply {
+          layoutParams = LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+          )
+          orientation = VERTICAL
+        }
+      )
+    }
+
+    override fun convert(holder: BaseViewHolder, item: AdvancedMenuLayoutItem) {
+      val container = holder.itemView as LinearLayout
+      val child = when (item) {
+        AdvancedMenuLayoutItem.AppDemo -> demoView
+        AdvancedMenuLayoutItem.Sort -> sortView
+        AdvancedMenuLayoutItem.FilterOptions -> flexLayout
+        AdvancedMenuLayoutItem.ViewOptions -> flexLayout2
+        AdvancedMenuLayoutItem.ComponentStyleDemo -> itemView
+        AdvancedMenuLayoutItem.ComponentStyleOptions -> itemFlexLayout
+      }
+      container.setSingleChild(child)
+    }
+
+    private fun LinearLayout.setSingleChild(child: View) {
+      if (childCount == 1 && getChildAt(0) === child) {
+        return
+      }
+      (child.parent as? ViewGroup)?.removeView(child)
+      removeAllViews()
+      addView(child)
+    }
   }
 }
