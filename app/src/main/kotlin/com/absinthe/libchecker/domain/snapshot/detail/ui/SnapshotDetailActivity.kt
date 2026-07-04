@@ -11,7 +11,6 @@ import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.SimpleItemAnimator
-import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.LibType
@@ -42,7 +41,6 @@ import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotEmptyView
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotTitleDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
-import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.utils.Telemetry
@@ -57,7 +55,6 @@ import com.google.android.material.appbar.AppBarLayout
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import me.zhanghai.android.appiconloader.AppIconLoader
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import rikka.core.util.ClipboardUtils
@@ -146,9 +143,9 @@ class SnapshotDetailActivity :
         addItemDecoration(VerticalSpacesItemDecoration(4.dp))
       }
 
-      snapshotTitle.iconView.apply {
+      snapshotTitle.apply {
         bindSnapshotIcon()
-        setOnClickListener {
+        setIconClickListener {
           lifecycleScope.launch {
             val lcItem = viewModel.getAppListItem(entity.packageName) ?: return@launch
             launchDetailPage(lcItem)
@@ -251,29 +248,15 @@ class SnapshotDetailActivity :
   private fun bindSnapshotIcon() {
     val snapshotIcon = _icon?.takeIf { entity.packageName.contains("/") }
     if (snapshotIcon != null) {
-      binding.snapshotTitle.iconView.load(snapshotIcon)
+      binding.snapshotTitle.setIconImage(snapshotIcon)
       return
     }
 
-    binding.snapshotTitle.iconView.setImageResource(R.drawable.ic_icon_blueprint)
+    binding.snapshotTitle.setFallbackIcon()
     lifecycleScope.launch {
       when (val iconSource = viewModel.getSnapshotPackageIconSources(listOf(entity.packageName))[entity.packageName]) {
-        is SnapshotPackageIconSource.InstalledPackage -> {
-          val appIconLoader = AppIconLoader(
-            resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size),
-            false,
-            this@SnapshotDetailActivity
-          )
-          val icon = iconSource.packageInfo.applicationInfo?.let { applicationInfo ->
-            runCatching {
-              appIconLoader.loadIcon(applicationInfo)
-            }.getOrNull()
-          }
-          binding.snapshotTitle.iconView.load(icon)
-        }
-
-        SnapshotPackageIconSource.Fallback,
-        null -> binding.snapshotTitle.iconView.setImageResource(R.drawable.ic_icon_blueprint)
+        null -> binding.snapshotTitle.setFallbackIcon()
+        else -> binding.snapshotTitle.setIconSource(iconSource)
       }
     }
   }

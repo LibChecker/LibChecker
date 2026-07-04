@@ -1,16 +1,20 @@
 package com.absinthe.libchecker.domain.snapshot.detail.ui.view
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.util.AttributeSet
+import android.view.View.OnClickListener
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.core.view.marginStart
+import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotTitlePackageSizeRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotTitleRenderState
+import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.domain.snapshot.ui.view.SnapshotPackageSizeLineBreaker
 import com.absinthe.libchecker.utils.extensions.applyCondensedSingleLine
 import com.absinthe.libchecker.utils.extensions.applySingleLineEndEllipsize
@@ -26,7 +30,7 @@ class SnapshotTitleView(
   attributeSet: AttributeSet? = null
 ) : AViewGroup(context, attributeSet) {
 
-  val iconView = AppCompatImageView(context).apply {
+  private val iconView = AppCompatImageView(context).apply {
     val iconSize = context.getDimensionPixelSize(R.dimen.lib_detail_icon_size)
     layoutParams = LayoutParams(iconSize, iconSize)
     setImageResource(R.drawable.ic_icon_blueprint)
@@ -119,6 +123,31 @@ class SnapshotTitleView(
       text = data.apis
       setLongClickCopiedToClipboard(text)
     }
+  }
+
+  fun setIconImage(bitmap: Bitmap?) {
+    if (bitmap == null) {
+      setFallbackIcon()
+    } else {
+      iconView.load(bitmap)
+    }
+  }
+
+  fun setIconSource(iconSource: SnapshotPackageIconSource?) {
+    when (iconSource) {
+      is SnapshotPackageIconSource.InstalledPackage -> iconView.load(iconSource.packageInfo)
+
+      SnapshotPackageIconSource.Fallback,
+      null -> setFallbackIcon()
+    }
+  }
+
+  fun setFallbackIcon() {
+    iconView.setImageResource(R.drawable.ic_icon_blueprint)
+  }
+
+  fun setIconClickListener(listener: OnClickListener?) {
+    iconView.setOnClickListener(listener)
   }
 
   private fun setPackageSizeText(data: SnapshotTitlePackageSizeRenderState?) {
