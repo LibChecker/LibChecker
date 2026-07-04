@@ -1,15 +1,10 @@
 package com.absinthe.libchecker.domain.app.list.ui.adapter
 
 import android.content.Context
-import android.content.pm.PackageInfo
-import android.graphics.drawable.Drawable
 import android.view.ViewGroup
-import androidx.appcompat.widget.AppCompatImageView
-import coil.dispose
-import coil.load
-import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.app.list.model.AppListItemIconDisplay
 import com.absinthe.libchecker.domain.app.list.model.AppListItemIdentityText
 import com.absinthe.libchecker.domain.app.list.model.AppListItemMetadataDisplay
 import com.absinthe.libchecker.domain.app.list.model.AppListItemViewState
@@ -54,10 +49,7 @@ class AppAdapter(
     }
     root.container.apply {
       val viewState = getItemViewState(item)
-      val packageInfo = viewState.packageInfo
-      if (item.packageName != Constants.EXAMPLE_PACKAGE) {
-        icon.loadAppIcon(packageInfo, getItemViewStyle(context).newIconPlaceholder(context))
-      }
+      setIconDisplay(AppListItemIconDisplay.create(item.packageName, viewState.packageInfo))
       bindIdentityText(root, item, viewState)
 
       setMetadataDisplay(AppListItemMetadataDisplay.create(viewState))
@@ -143,17 +135,5 @@ class AppAdapter(
 
   private companion object {
     private val HIGHLIGHT_TEXT_PAYLOAD = Any()
-  }
-}
-
-private fun AppCompatImageView.loadAppIcon(packageInfo: PackageInfo?, placeholderDrawable: Drawable?) {
-  if (packageInfo == null) {
-    dispose()
-    setImageDrawable(placeholderDrawable)
-    return
-  }
-  load(packageInfo) {
-    placeholder(placeholderDrawable)
-    error(placeholderDrawable)
   }
 }

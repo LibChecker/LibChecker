@@ -12,7 +12,10 @@ import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginStart
+import coil.dispose
+import coil.load
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.list.model.AppListItemIconDisplay
 import com.absinthe.libchecker.domain.app.list.model.AppListItemIdentityText
 import com.absinthe.libchecker.domain.app.list.model.AppListItemMetadataDisplay
 import com.absinthe.libchecker.domain.app.list.model.buildAppListItemDescription
@@ -145,6 +148,18 @@ class AppItemView(
     private var multiArchBadge: AppCompatImageView? = null
     private var badge: AppCompatImageView? = null
     private var useDetachedAbiBadgeLayout = false
+
+    fun setIconDisplay(display: AppListItemIconDisplay) {
+      if (!display.usePackageIcon) {
+        icon.dispose()
+        icon.setImageDrawable(style.newIconPlaceholder(context))
+        return
+      }
+      icon.load(display.packageInfo) {
+        placeholder(style.newIconPlaceholder(context))
+        error(style.newIconPlaceholder(context))
+      }
+    }
 
     fun setIdentityText(identityText: AppListItemIdentityText, highlightText: String) {
       appName.setOrHighlightText(identityText.label, highlightText)
