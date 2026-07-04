@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.SnapshotDetailCountAdapter
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SNAPSHOT_TITLE_PROVIDER
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotTitleNode
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.titleRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailTitleView
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.chad.library.adapter.base.provider.BaseNodeProvider
@@ -25,9 +26,10 @@ class SnapshotTitleProvider : BaseNodeProvider() {
   override fun convert(helper: BaseViewHolder, item: BaseNode) {
     val itemView = (helper.itemView as SnapshotDetailTitleView).container
     val node = item as SnapshotTitleNode
+    val renderState = node.titleRenderState
     val countAdapter = SnapshotDetailCountAdapter()
 
-    itemView.title.text = node.title
+    itemView.title.text = renderState.title
     itemView.list.apply {
       adapter = countAdapter
       layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
@@ -36,10 +38,10 @@ class SnapshotTitleProvider : BaseNodeProvider() {
       }
     }
 
-    countAdapter.setList(node.counts)
-    helper.itemView.contentDescription = node.contentDescription
+    countAdapter.setList(renderState.counts)
+    helper.itemView.contentDescription = renderState.contentDescription
 
-    onExpansionToggled(itemView.arrow, node.isExpanded)
+    onExpansionToggled(itemView.arrow, renderState.expanded)
   }
 
   override fun onClick(helper: BaseViewHolder, view: View, data: BaseNode, position: Int) {
