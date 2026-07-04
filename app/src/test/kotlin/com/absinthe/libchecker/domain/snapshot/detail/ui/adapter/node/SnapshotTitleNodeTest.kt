@@ -26,6 +26,7 @@ class SnapshotTitleNodeTest {
       childNode = mutableListOf(),
       type = 0,
       title = "Services",
+      reportText = "[Services]\n",
       expandedDescription = "Services, Moved 1, Expanded",
       collapsedDescription = "Services, Moved 1, Collapsed",
       counts = emptyList()

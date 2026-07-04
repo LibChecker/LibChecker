@@ -242,6 +242,7 @@ class SnapshotDetailActivity :
       childNode = nodes,
       type = section.type,
       title = section.title,
+      reportText = section.reportText,
       expandedDescription = section.expandedDescription,
       collapsedDescription = section.collapsedDescription,
       counts = section.statusCounts.map {
@@ -312,7 +313,7 @@ class SnapshotDetailActivity :
     adapter.data.forEach {
       when (it) {
         is SnapshotTitleNode -> {
-          sb.append("[${it.title}]").appendLine()
+          sb.append(it.reportText)
         }
 
         is SnapshotComponentNode -> {

@@ -17,6 +17,7 @@ import com.absinthe.rulesbundle.Rule
 data class SnapshotDetailSection(
   @LibType val type: Int,
   val title: String,
+  val reportText: String,
   val expandedDescription: String,
   val collapsedDescription: String,
   val items: List<SnapshotDetailItemDisplayData>,
@@ -33,6 +34,10 @@ data class SnapshotDetailItemDisplayData(
   @ColorInt val backgroundColor: Int,
   val ruleChip: SnapshotDetailRuleChipDisplayData?
 )
+
+fun buildSnapshotDetailReportSectionText(title: CharSequence): String {
+  return "[$title]\n"
+}
 
 fun buildSnapshotDetailReportItemText(item: SnapshotDetailItem): String {
   return buildString {
