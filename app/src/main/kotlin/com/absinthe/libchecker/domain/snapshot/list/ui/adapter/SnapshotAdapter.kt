@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import androidx.core.text.buildSpannedString
 import androidx.core.text.inSpans
 import androidx.core.text.scale
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import coil.load
 import com.absinthe.libchecker.R
@@ -24,10 +23,7 @@ import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.setAlphaForAll
 import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
-import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
-import java.util.Locale
-import kotlin.math.abs
 
 const val ARROW = "→"
 const val ARROW_REVERT = "←"
@@ -141,63 +137,11 @@ class SnapshotAdapter(
         highlightDiffColor = highlightDiffColor
       )
 
-      if (item.packageSizeDiff.old > 0L) {
-        packageSizeInfo.isVisible = true
-        val sizeDiff = SnapshotDiffItem.DiffNode(
-          item.packageSizeDiff.old.sizeToString(context, showBytes = false),
-          item.packageSizeDiff.new?.sizeToString(context, showBytes = false)
-        )
-        val bytesDiff = SnapshotDiffItem.DiffNode(
-          item.packageSizeDiff.old,
-          item.packageSizeDiff.new
-        )
-        var packageSizeBreakStart = -1
-        val diffText = buildSpannedString {
-          append(
-            LCAppUtils.getDiffString(
-              diff1 = sizeDiff,
-              diff2 = bytesDiff,
-              diff2Suffix = " Bytes",
-              isNewOrDeleted = isNewOrDeleted,
-              highlightDiffColor = highlightDiffColor
-            )
-          )
-
-          if (item.packageSizeDiff.new != null) {
-            val diffSize = item.packageSizeDiff.new - item.packageSizeDiff.old
-            val diffSizeText = buildString {
-              if (diffSize > 0) {
-                append("+")
-              }
-              append(diffSize.sizeToString(context))
-              append(", ")
-              if (diffSize > 0) {
-                append("+")
-              }
-              val percentage = (diffSize.toFloat() / item.packageSizeDiff.old)
-              if (abs(percentage) < 0.001f) {
-                if (percentage < 0) {
-                  append("-")
-                }
-                append("<0.1%")
-              } else {
-                append(String.format(Locale.getDefault(), "%.1f%%", percentage * 100))
-              }
-            }
-
-            if (diffSize != 0L) {
-              append(" ")
-              packageSizeBreakStart = length
-              append(diffSizeText)
-            }
-          }
-        }
-
-        setPackageSizeText(diffText, packageSizeBreakStart)
-      } else {
-        packageSizeInfo.isGone = true
-        clearPackageSizeText()
-      }
+      setPackageSizeDisplay(
+        packageSizeDiff = item.packageSizeDiff,
+        isNewOrDeleted = isNewOrDeleted,
+        highlightDiffColor = highlightDiffColor
+      )
 
       val targetDiff = LCAppUtils.getDiffString(item.targetApiDiff, isNewOrDeleted, highlightDiffColor = highlightDiffColor).takeIf { item.targetApiDiff.old > 0 }
       val minDiff = LCAppUtils.getDiffString(item.minSdkDiff, isNewOrDeleted, highlightDiffColor = highlightDiffColor).takeIf { item.minSdkDiff.old > 0 }

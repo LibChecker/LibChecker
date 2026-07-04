@@ -8,23 +8,29 @@ import android.text.style.ImageSpan
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.text.buildSpannedString
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotAbiDisplayData
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotAbiDisplayItem
+import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.ui.view.SnapshotPackageSizeLineBreaker
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.applyCondensedSingleLine
 import com.absinthe.libchecker.utils.extensions.applySingleLineEndEllipsize
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
+import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.extensions.visibleHeight
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.span.CenterAlignImageSpan
 import com.google.android.material.card.MaterialCardView
+import java.util.Locale
+import kotlin.math.abs
 
 class SnapshotItemView(context: Context) : MaterialCardView(context) {
 
@@ -190,6 +196,51 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       abiInfo.text = builder
     }
 
+    fun setPackageSizeDisplay(
+      packageSizeDiff: SnapshotDiffItem.DiffNode<Long>,
+      isNewOrDeleted: Boolean,
+      highlightDiffColor: Int?
+    ) {
+      if (packageSizeDiff.old <= 0L) {
+        packageSizeInfo.isVisible = false
+        clearPackageSizeText()
+        return
+      }
+
+      packageSizeInfo.isVisible = true
+      val sizeDiff = SnapshotDiffItem.DiffNode(
+        packageSizeDiff.old.sizeToString(context, showBytes = false),
+        packageSizeDiff.new?.sizeToString(context, showBytes = false)
+      )
+      val bytesDiff = SnapshotDiffItem.DiffNode(
+        packageSizeDiff.old,
+        packageSizeDiff.new
+      )
+      var packageSizeBreakStart = -1
+      val diffText = buildSpannedString {
+        append(
+          LCAppUtils.getDiffString(
+            diff1 = sizeDiff,
+            diff2 = bytesDiff,
+            diff2Suffix = " Bytes",
+            isNewOrDeleted = isNewOrDeleted,
+            highlightDiffColor = highlightDiffColor
+          )
+        )
+
+        if (packageSizeDiff.new != null) {
+          val diffSize = packageSizeDiff.new - packageSizeDiff.old
+          if (diffSize != 0L) {
+            append(" ")
+            packageSizeBreakStart = length
+            append(buildPackageSizeChangeText(diffSize, packageSizeDiff.old))
+          }
+        }
+      }
+
+      setPackageSizeText(diffText, packageSizeBreakStart)
+    }
+
     fun setPackageSizeText(text: CharSequence, breakStart: Int) {
       packageSizeLineBreaker.setText(text, breakStart)
     }
@@ -274,6 +325,31 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
 }
 
 private const val ABI_CHANGE_ARROW = "→"
+
+private fun SnapshotItemView.SnapshotItemContainerView.buildPackageSizeChangeText(
+  diffSize: Long,
+  oldSize: Long
+): String {
+  return buildString {
+    if (diffSize > 0) {
+      append("+")
+    }
+    append(diffSize.sizeToString(context))
+    append(", ")
+    if (diffSize > 0) {
+      append("+")
+    }
+    val percentage = diffSize.toFloat() / oldSize
+    if (abs(percentage) < 0.001f) {
+      if (percentage < 0) {
+        append("-")
+      }
+      append("<0.1%")
+    } else {
+      append(String.format(Locale.getDefault(), "%.1f%%", percentage * 100))
+    }
+  }
+}
 
 private fun SnapshotItemView.SnapshotItemContainerView.buildAbiSpanString(
   item: SnapshotAbiDisplayItem,
