@@ -26,16 +26,13 @@ import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
 import com.absinthe.libchecker.domain.app.detail.ui.AppBarStateChangeListener
-import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSection
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotTitleDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailReportHeader
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.SnapshotDetailAdapter
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.BaseSnapshotNode
-import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotComponentNode
-import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotDetailCountNode
-import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotNativeNode
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotReportNode
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotTitleNode
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.toSnapshotTitleNode
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailDeletedView
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailNewInstallView
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotEmptyView
@@ -53,7 +50,6 @@ import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.launchLibReferencePage
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import com.chad.library.adapter.base.entity.node.BaseNode
 import com.google.android.material.appbar.AppBarLayout
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -210,36 +206,14 @@ class SnapshotDetailActivity :
     }
 
     viewModel.snapshotDetailSectionsFlow.onEach { sections ->
-      val titleList = sections.map(::buildSnapshotTitleNode)
+      val titleList = sections.map { section ->
+        recordDetailComponentCount(section.type, section.items.size)
+        section.toSnapshotTitleNode()
+      }
 
       adapter.isStateViewEnable = titleList.isEmpty()
       adapter.setList(titleList)
     }.launchIn(lifecycleScope)
-  }
-
-  private fun buildSnapshotTitleNode(section: SnapshotDetailSection): SnapshotTitleNode {
-    val nodes = section.items.mapTo(mutableListOf<BaseNode>()) { item ->
-      when (section.type) {
-        NATIVE, METADATA -> SnapshotNativeNode(item)
-        else -> SnapshotComponentNode(item)
-      }
-    }
-    recordDetailComponentCount(section.type, nodes.size)
-    return SnapshotTitleNode(
-      childNode = nodes,
-      type = section.type,
-      title = section.title,
-      reportText = section.reportText,
-      expandedDescription = section.expandedDescription,
-      collapsedDescription = section.collapsedDescription,
-      counts = section.statusCounts.map {
-        SnapshotDetailCountNode(
-          count = it.count,
-          countText = it.countText,
-          status = it.status
-        )
-      }
-    )
   }
 
   private fun recordDetailComponentCount(@LibType type: Int, count: Int) {
