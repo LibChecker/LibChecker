@@ -7,7 +7,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SNAPSHOT_NATIVE_PROVIDER
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotDetailNodeChipClickAction
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotNativeNode
-import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.chipClickAction
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.itemRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailNativeView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.chad.library.adapter.base.entity.node.BaseNode
@@ -33,18 +33,17 @@ class SnapshotNativeProvider : BaseNodeProvider() {
   override fun convert(helper: BaseViewHolder, item: BaseNode) {
     (helper.itemView as SnapshotDetailNativeView).container.apply {
       val node = item as SnapshotNativeNode
-      val displayData = node.displayData
-      val chipClickAction = node.chipClickAction
+      val renderState = node.itemRenderState
+      val chipClickAction = renderState.chipClickAction
 
-      name.text = displayData.title
-      libSize.text = displayData.extra
-      typeIcon.setImageResource(displayData.status.iconRes)
+      name.text = renderState.title
+      libSize.text = renderState.extra
+      typeIcon.setImageResource(renderState.iconRes)
 
-      background = displayData.backgroundColor.toDrawable()
+      background = renderState.backgroundColor.toDrawable()
 
-      val ruleChip = displayData.ruleChip
-      setChip(ruleChip, displayData.backgroundColor)
-      helper.itemView.contentDescription = displayData.description
+      setChip(renderState.ruleChip, renderState.backgroundColor)
+      helper.itemView.contentDescription = renderState.contentDescription
       if (chipClickAction is SnapshotDetailNodeChipClickAction.OpenLibraryDetail) {
         setChipOnClickListener {
           if (AntiShakeUtils.isInvalidClick(it)) {
