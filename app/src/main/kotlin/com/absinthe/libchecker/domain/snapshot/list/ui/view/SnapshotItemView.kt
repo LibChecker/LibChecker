@@ -11,7 +11,6 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.text.buildSpannedString
 import androidx.core.text.inSpans
-import androidx.core.text.scale
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.core.view.marginStart
@@ -21,13 +20,14 @@ import com.absinthe.libchecker.domain.snapshot.display.SnapshotAbiDisplayData
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotAbiDisplayItem
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotUpdateTimeDisplayData
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotUpdateTimeText
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemAppNameDisplayData
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemCardPresentation
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemDisplayData
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemPackageSizeDisplayData
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemPackageStateLabel
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemStateIndicatorData
-import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.domain.snapshot.ui.view.SnapshotPackageSizeLineBreaker
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.applyCondensedSingleLine
 import com.absinthe.libchecker.utils.extensions.applySingleLineEndEllipsize
 import com.absinthe.libchecker.utils.extensions.dp
@@ -37,14 +37,11 @@ import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.utils.extensions.setAlphaForAll
 import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
-import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.extensions.tintHighlightText
 import com.absinthe.libchecker.utils.extensions.visibleHeight
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.span.CenterAlignImageSpan
 import com.google.android.material.card.MaterialCardView
-import java.util.Locale
-import kotlin.math.abs
 
 class SnapshotItemView(context: Context) : MaterialCardView(context) {
 
@@ -72,32 +69,13 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
         isNewOrDeleted = isNewOrDeleted
       )
       setAppNameDisplay(
-        labelDiff = data.labelDiff,
-        isTrackItem = data.isTrackItem,
-        packageStateLabel = data.packageStateLabel,
-        isNewOrDeleted = isNewOrDeleted,
-        highlightDiffs = data.highlightDiffs,
+        data = data.appName,
         highlightText = data.highlightText
       )
       setPackageNameDisplay(data.packageName, data.highlightText)
-      setVersionDisplay(
-        versionNameDiff = data.versionNameDiff,
-        versionCodeDiff = data.versionCodeDiff,
-        isNewOrDeleted = isNewOrDeleted,
-        highlightDiffs = data.highlightDiffs
-      )
-      setPackageSizeDisplay(
-        packageSizeDiff = data.packageSizeDiff,
-        isNewOrDeleted = isNewOrDeleted,
-        highlightDiffs = data.highlightDiffs
-      )
-      setApiDisplay(
-        targetApiDiff = data.api.targetApiDiff,
-        minSdkDiff = data.api.minSdkDiff,
-        compileSdkDiff = data.api.compileSdkDiff,
-        isNewOrDeleted = isNewOrDeleted,
-        highlightDiffs = data.highlightDiffs
-      )
+      setVersionDisplay(data.versionInfo)
+      setPackageSizeDisplay(data.packageSize)
+      setApiDisplay(data.apiText)
       setAbiDisplay(
         abiDisplayData = data.abi.abiDisplayData,
         showChangedAbi = data.abi.showChangedAbi,
@@ -138,11 +116,6 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
         stateIndicator.moved
       )
     )
-  }
-
-  enum class PackageStateLabel {
-    New,
-    Deleted
   }
 
   class SnapshotItemContainerView(context: Context) : AViewGroup(context) {
@@ -283,40 +256,29 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
     }
 
     fun setAppNameDisplay(
-      labelDiff: SnapshotDiffItem.DiffNode<String>,
-      isTrackItem: Boolean,
-      packageStateLabel: PackageStateLabel?,
-      isNewOrDeleted: Boolean,
-      highlightDiffs: Boolean,
+      data: SnapshotItemAppNameDisplayData,
       highlightText: String
     ) {
-      val highlightDiffColor = getHighlightDiffColor(highlightDiffs)
       val appNameLabel = buildSpannedString {
-        if (isTrackItem) {
+        if (data.showTrackIcon) {
           inSpans(ImageSpan(context, R.drawable.ic_track)) {
             append(" ")
           }
         }
-        append(
-          LCAppUtils.getDiffString(
-            diff = labelDiff,
-            isNewOrDeleted = isNewOrDeleted,
-            highlightDiffColor = highlightDiffColor
-          )
-        )
+        append(data.text)
       }
       appName.setOrHighlightText(appNameLabel, highlightText)
-      appendPackageStateLabel(packageStateLabel)
+      appendPackageStateLabel(data.packageStateLabel)
     }
 
     fun setPackageNameDisplay(text: CharSequence, highlightText: String) {
       packageName.setOrHighlightText(text, highlightText)
     }
 
-    private fun appendPackageStateLabel(packageStateLabel: PackageStateLabel?) {
+    private fun appendPackageStateLabel(packageStateLabel: SnapshotItemPackageStateLabel?) {
       val labelDrawable = when (packageStateLabel) {
-        PackageStateLabel.New -> R.drawable.ic_label_new_package
-        PackageStateLabel.Deleted -> R.drawable.ic_label_deleted_package
+        SnapshotItemPackageStateLabel.New -> R.drawable.ic_label_new_package
+        SnapshotItemPackageStateLabel.Deleted -> R.drawable.ic_label_deleted_package
         null -> return
       }.getDrawable(context) ?: return
       val spanString = SpannableString("   ")
@@ -333,18 +295,8 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       appName.text = SpannableStringBuilder(appName.text).append(spanString)
     }
 
-    fun setVersionDisplay(
-      versionNameDiff: SnapshotDiffItem.DiffNode<String>,
-      versionCodeDiff: SnapshotDiffItem.DiffNode<Long>,
-      isNewOrDeleted: Boolean,
-      highlightDiffs: Boolean
-    ) {
-      versionInfo.text = LCAppUtils.getDiffString(
-        diff1 = versionNameDiff,
-        diff2 = versionCodeDiff,
-        isNewOrDeleted = isNewOrDeleted,
-        highlightDiffColor = getHighlightDiffColor(highlightDiffs)
-      )
+    fun setVersionDisplay(text: CharSequence) {
+      versionInfo.text = text
     }
 
     fun setAbiDisplay(
@@ -372,97 +324,19 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       abiInfo.text = builder
     }
 
-    fun setPackageSizeDisplay(
-      packageSizeDiff: SnapshotDiffItem.DiffNode<Long>,
-      isNewOrDeleted: Boolean,
-      highlightDiffs: Boolean
-    ) {
-      if (packageSizeDiff.old <= 0L) {
+    fun setPackageSizeDisplay(data: SnapshotItemPackageSizeDisplayData?) {
+      if (data == null) {
         packageSizeInfo.isVisible = false
         clearPackageSizeText()
         return
       }
 
       packageSizeInfo.isVisible = true
-      val sizeDiff = SnapshotDiffItem.DiffNode(
-        packageSizeDiff.old.sizeToString(context, showBytes = false),
-        packageSizeDiff.new?.sizeToString(context, showBytes = false)
-      )
-      val bytesDiff = SnapshotDiffItem.DiffNode(
-        packageSizeDiff.old,
-        packageSizeDiff.new
-      )
-      var packageSizeBreakStart = -1
-      val diffText = buildSpannedString {
-        append(
-          LCAppUtils.getDiffString(
-            diff1 = sizeDiff,
-            diff2 = bytesDiff,
-            diff2Suffix = " Bytes",
-            isNewOrDeleted = isNewOrDeleted,
-            highlightDiffColor = getHighlightDiffColor(highlightDiffs)
-          )
-        )
-
-        if (packageSizeDiff.new != null) {
-          val diffSize = packageSizeDiff.new - packageSizeDiff.old
-          if (diffSize != 0L) {
-            append(" ")
-            packageSizeBreakStart = length
-            append(buildPackageSizeChangeText(diffSize, packageSizeDiff.old))
-          }
-        }
-      }
-
-      setPackageSizeText(diffText, packageSizeBreakStart)
+      setPackageSizeText(data.text, data.breakStart)
     }
 
-    fun setApiDisplay(
-      targetApiDiff: SnapshotDiffItem.DiffNode<Short>,
-      minSdkDiff: SnapshotDiffItem.DiffNode<Short>,
-      compileSdkDiff: SnapshotDiffItem.DiffNode<Short>,
-      isNewOrDeleted: Boolean,
-      highlightDiffs: Boolean
-    ) {
-      val targetDiff = buildApiDiffString(
-        diff = targetApiDiff,
-        isNewOrDeleted = isNewOrDeleted,
-        highlightDiffs = highlightDiffs
-      )
-      val minDiff = buildApiDiffString(
-        diff = minSdkDiff,
-        isNewOrDeleted = isNewOrDeleted,
-        highlightDiffs = highlightDiffs
-      )
-      val compileDiff = buildApiDiffString(
-        diff = compileSdkDiff,
-        isNewOrDeleted = isNewOrDeleted,
-        highlightDiffs = highlightDiffs
-      )
-      apisInfo.text = buildSpannedString {
-        targetDiff?.let {
-          scale(1f) {
-            append("Target: ")
-          }
-          append(it)
-          append("  ")
-        }
-
-        minDiff?.let {
-          scale(1f) {
-            append("Min: ")
-          }
-          append(it)
-          append("  ")
-        }
-
-        compileDiff?.let {
-          scale(1f) {
-            append("Compile: ")
-          }
-          append(it)
-        }
-      }
+    fun setApiDisplay(text: CharSequence) {
+      apisInfo.text = text
     }
 
     fun setUpdateTimeDisplay(updateTimeDisplayData: SnapshotUpdateTimeDisplayData?) {
@@ -568,13 +442,6 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
 
 private const val ABI_CHANGE_ARROW = "→"
 
-private val SnapshotItemDisplayData.packageStateLabel: SnapshotItemView.PackageStateLabel?
-  get() = when {
-    isNewInstalled -> SnapshotItemView.PackageStateLabel.New
-    isDeleted -> SnapshotItemView.PackageStateLabel.Deleted
-    else -> null
-  }
-
 private fun SnapshotItemView.buildSnapshotStateDescription(
   added: Int,
   removed: Int,
@@ -600,51 +467,6 @@ private fun AppCompatTextView.setOrHighlightText(text: CharSequence, highlightTe
     tintHighlightText(highlightText, text)
   } else {
     this.text = text
-  }
-}
-
-private fun SnapshotItemView.SnapshotItemContainerView.buildApiDiffString(
-  diff: SnapshotDiffItem.DiffNode<Short>,
-  isNewOrDeleted: Boolean,
-  highlightDiffs: Boolean
-): CharSequence? {
-  return LCAppUtils.getDiffString(
-    diff = diff,
-    isNewOrDeleted = isNewOrDeleted,
-    highlightDiffColor = getHighlightDiffColor(highlightDiffs)
-  ).takeIf { diff.old > 0 }
-}
-
-private fun SnapshotItemView.SnapshotItemContainerView.getHighlightDiffColor(highlightDiffs: Boolean): Int? {
-  return if (highlightDiffs) {
-    context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary)
-  } else {
-    null
-  }
-}
-
-private fun SnapshotItemView.SnapshotItemContainerView.buildPackageSizeChangeText(
-  diffSize: Long,
-  oldSize: Long
-): String {
-  return buildString {
-    if (diffSize > 0) {
-      append("+")
-    }
-    append(diffSize.sizeToString(context))
-    append(", ")
-    if (diffSize > 0) {
-      append("+")
-    }
-    val percentage = diffSize.toFloat() / oldSize
-    if (abs(percentage) < 0.001f) {
-      if (percentage < 0) {
-        append("-")
-      }
-      append("<0.1%")
-    } else {
-      append(String.format(Locale.getDefault(), "%.1f%%", percentage * 100))
-    }
   }
 }
 

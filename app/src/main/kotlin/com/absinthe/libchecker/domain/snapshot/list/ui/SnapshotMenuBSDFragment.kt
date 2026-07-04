@@ -13,6 +13,7 @@ import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotItemDis
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotMenuDemoItemUseCase
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Telemetry
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.supportIECUnit
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import org.koin.android.ext.android.inject
@@ -95,7 +96,11 @@ class SnapshotMenuBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotMenuBS
         isApexPackage = false,
         animateStateIndicator = true,
         tintChangedAbiBadge = false,
-        highlightDiffs = (options and SnapshotOptions.DIFF_HIGHLIGHT) > 0,
+        highlightDiffColor = if ((options and SnapshotOptions.DIFF_HIGHLIGHT) > 0) {
+          requireContext().getColorByAttr(androidx.appcompat.R.attr.colorPrimary)
+        } else {
+          null
+        },
         highlightText = ""
       )
     )

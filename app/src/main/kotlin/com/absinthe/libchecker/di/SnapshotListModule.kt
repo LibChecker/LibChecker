@@ -28,7 +28,7 @@ val snapshotListModule = module {
   factory { BuildSnapshotTitleDisplayDataUseCase(androidContext()) }
   factory { GetApexPackageNamesUseCase(get()) }
   factory { BuildSnapshotCapturePlanUseCase(get()) }
-  factory { BuildSnapshotItemDisplayDataUseCase(get(), get()) }
+  factory { BuildSnapshotItemDisplayDataUseCase(androidContext(), get(), get()) }
   factory { BuildSnapshotMenuDemoItemUseCase(BuildConfig.VERSION_CODE.toLong(), Build.VERSION.SDK_INT) }
   factory { BuildSnapshotListUpdatePlanUseCase(get(), get(), get()) }
   factory { GetSnapshotPackageIconSourcesUseCase(get()) }

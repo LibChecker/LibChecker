@@ -148,7 +148,7 @@ class InAppUpdateDialogFragment : BaseBottomSheetViewDialogFragment<InAppUpdateD
         isApexPackage = false,
         animateStateIndicator = false,
         tintChangedAbiBadge = false,
-        highlightDiffs = false,
+        highlightDiffColor = null,
         highlightText = ""
       )
     )

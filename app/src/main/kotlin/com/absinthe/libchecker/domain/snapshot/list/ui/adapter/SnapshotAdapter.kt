@@ -9,6 +9,7 @@ import com.absinthe.libchecker.domain.snapshot.list.usecase.stableSnapshotDiffIt
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
 const val ARROW = "→"
@@ -61,7 +62,11 @@ class SnapshotAdapter(
           isApexPackage = item.packageName in apexPackageNames,
           animateStateIndicator = cardMode == CardMode.DEMO,
           tintChangedAbiBadge = displayOptions.tintAbiLabels,
-          highlightDiffs = displayOptions.highlightDiffs,
+          highlightDiffColor = if (displayOptions.highlightDiffs) {
+            context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary)
+          } else {
+            null
+          },
           highlightText = highlightText
         )
       )

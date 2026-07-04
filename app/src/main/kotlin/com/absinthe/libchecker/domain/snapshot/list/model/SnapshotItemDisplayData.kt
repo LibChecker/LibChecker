@@ -2,26 +2,28 @@ package com.absinthe.libchecker.domain.snapshot.list.model
 
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotAbiDisplayData
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotUpdateTimeDisplayData
-import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 
 data class SnapshotItemDisplayData(
   val cardPresentation: SnapshotItemCardPresentation,
   val iconSource: SnapshotPackageIconSource?,
   val packageName: String,
-  val labelDiff: SnapshotDiffItem.DiffNode<String>,
-  val isTrackItem: Boolean,
+  val appName: SnapshotItemAppNameDisplayData,
   val isNewInstalled: Boolean,
   val isDeleted: Boolean,
   val stateIndicator: SnapshotItemStateIndicatorData,
-  val versionNameDiff: SnapshotDiffItem.DiffNode<String>,
-  val versionCodeDiff: SnapshotDiffItem.DiffNode<Long>,
-  val packageSizeDiff: SnapshotDiffItem.DiffNode<Long>,
-  val api: SnapshotItemApiDisplayData,
+  val versionInfo: CharSequence,
+  val packageSize: SnapshotItemPackageSizeDisplayData?,
+  val apiText: CharSequence,
   val abi: SnapshotItemAbiDisplayData,
   val updateTimeDisplayData: SnapshotUpdateTimeDisplayData?,
-  val highlightDiffs: Boolean,
   val highlightText: String
+)
+
+data class SnapshotItemAppNameDisplayData(
+  val text: CharSequence,
+  val showTrackIcon: Boolean,
+  val packageStateLabel: SnapshotItemPackageStateLabel?
 )
 
 data class SnapshotItemStateIndicatorData(
@@ -32,10 +34,9 @@ data class SnapshotItemStateIndicatorData(
   val animate: Boolean
 )
 
-data class SnapshotItemApiDisplayData(
-  val targetApiDiff: SnapshotDiffItem.DiffNode<Short>,
-  val minSdkDiff: SnapshotDiffItem.DiffNode<Short>,
-  val compileSdkDiff: SnapshotDiffItem.DiffNode<Short>
+data class SnapshotItemPackageSizeDisplayData(
+  val text: CharSequence,
+  val breakStart: Int
 )
 
 data class SnapshotItemAbiDisplayData(
@@ -47,4 +48,9 @@ data class SnapshotItemAbiDisplayData(
 enum class SnapshotItemCardPresentation {
   Normal,
   Rounded
+}
+
+enum class SnapshotItemPackageStateLabel {
+  New,
+  Deleted
 }
