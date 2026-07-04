@@ -2,14 +2,9 @@ package com.absinthe.libchecker.domain.snapshot.list.ui.adapter
 
 import android.view.ViewGroup
 import com.absinthe.libchecker.domain.snapshot.SnapshotListDisplayOptions
-import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotAbiDisplayDataUseCase
-import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
-import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemAbiDisplayData
-import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemApiDisplayData
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemCardPresentation
-import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemDisplayData
-import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemStateIndicatorData
 import com.absinthe.libchecker.domain.snapshot.list.ui.view.SnapshotItemView
+import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.stableSnapshotDiffItemIdFor
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
@@ -19,8 +14,7 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 const val ARROW = "→"
 const val ARROW_REVERT = "←"
 class SnapshotAdapter(
-  private val buildSnapshotAbiDisplayData: BuildSnapshotAbiDisplayDataUseCase,
-  private val buildSnapshotUpdateTimeDisplayData: BuildSnapshotUpdateTimeDisplayDataUseCase,
+  private val buildSnapshotItemDisplayData: BuildSnapshotItemDisplayDataUseCase,
   private val cardMode: CardMode = CardMode.NORMAL
 ) : HighlightAdapter<SnapshotDiffItem>(SnapshotDiffUtil()) {
 
@@ -57,45 +51,19 @@ class SnapshotAdapter(
 
   override fun convert(holder: BaseViewHolder, item: SnapshotDiffItem) {
     val itemView = holder.itemView as SnapshotItemView
-    val updateTimeDisplayData = buildSnapshotUpdateTimeDisplayData(
-      BuildSnapshotUpdateTimeDisplayDataUseCase.Request(
-        updateTime = item.updateTime,
-        isVisible = displayOptions.showUpdateTime && cardMode != CardMode.GET_APP_UPDATE,
-        isApexPackage = item.packageName in apexPackageNames
-      )
-    )
     itemView.render(
-      SnapshotItemDisplayData(
-        cardPresentation = cardMode.toCardPresentation(),
-        iconSource = packageIconSources[item.packageName],
-        packageName = item.packageName,
-        labelDiff = item.labelDiff,
-        isTrackItem = item.isTrackItem,
-        isNewInstalled = item.newInstalled,
-        isDeleted = item.deleted,
-        stateIndicator = SnapshotItemStateIndicatorData(
-          added = item.added,
-          removed = item.removed,
-          changed = item.changed,
-          moved = item.moved,
-          animate = cardMode == CardMode.DEMO
-        ),
-        versionNameDiff = item.versionNameDiff,
-        versionCodeDiff = item.versionCodeDiff,
-        packageSizeDiff = item.packageSizeDiff,
-        api = SnapshotItemApiDisplayData(
-          targetApiDiff = item.targetApiDiff,
-          minSdkDiff = item.minSdkDiff,
-          compileSdkDiff = item.compileSdkDiff
-        ),
-        abi = SnapshotItemAbiDisplayData(
-          abiDisplayData = buildSnapshotAbiDisplayData(item.abiDiff),
-          showChangedAbi = item.abiDiff.new != null && item.abiDiff.old != item.abiDiff.new,
-          tintChangedAbiBadge = displayOptions.tintAbiLabels
-        ),
-        updateTimeDisplayData = updateTimeDisplayData,
-        highlightDiffs = displayOptions.highlightDiffs,
-        highlightText = highlightText
+      buildSnapshotItemDisplayData(
+        BuildSnapshotItemDisplayDataUseCase.Request(
+          item = item,
+          cardPresentation = cardMode.toCardPresentation(),
+          iconSource = packageIconSources[item.packageName],
+          showUpdateTime = displayOptions.showUpdateTime && cardMode != CardMode.GET_APP_UPDATE,
+          isApexPackage = item.packageName in apexPackageNames,
+          animateStateIndicator = cardMode == CardMode.DEMO,
+          tintChangedAbiBadge = displayOptions.tintAbiLabels,
+          highlightDiffs = displayOptions.highlightDiffs,
+          highlightText = highlightText
+        )
       )
     )
   }

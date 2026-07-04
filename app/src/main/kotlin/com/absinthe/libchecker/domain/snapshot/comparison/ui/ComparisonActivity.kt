@@ -37,10 +37,9 @@ import com.absinthe.libchecker.domain.snapshot.detail.ui.EXTRA_ENTITY
 import com.absinthe.libchecker.domain.snapshot.detail.ui.EXTRA_ICON
 import com.absinthe.libchecker.domain.snapshot.detail.ui.SnapshotDetailActivity
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotEmptyView
-import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotAbiDisplayDataUseCase
-import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.ui.VF_LIST
 import com.absinthe.libchecker.domain.snapshot.list.ui.adapter.SnapshotAdapter
+import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.timenode.ui.TimeNodeBottomSheetDialogFragment
 import com.absinthe.libchecker.ui.adapter.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.ui.base.BaseActivity
@@ -71,10 +70,9 @@ class ComparisonActivity :
 
   private val viewModel: SnapshotComparisonViewModel by viewModel()
   private val getRandomAppIcon: GetRandomAppIconUseCase by inject()
-  private val buildSnapshotAbiDisplayData: BuildSnapshotAbiDisplayDataUseCase by inject()
-  private val buildSnapshotUpdateTimeDisplayData: BuildSnapshotUpdateTimeDisplayDataUseCase by inject()
+  private val buildSnapshotItemDisplayData: BuildSnapshotItemDisplayDataUseCase by inject()
   private val adapter by lazy(LazyThreadSafetyMode.NONE) {
-    SnapshotAdapter(buildSnapshotAbiDisplayData, buildSnapshotUpdateTimeDisplayData)
+    SnapshotAdapter(buildSnapshotItemDisplayData)
   }
   private var archiveChoosingSide = SnapshotComparisonSide.LEFT
 

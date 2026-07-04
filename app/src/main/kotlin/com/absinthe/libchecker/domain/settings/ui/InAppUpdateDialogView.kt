@@ -8,9 +8,8 @@ import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotAbiDisplayDataUseCase
-import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.ui.adapter.SnapshotAdapter
+import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.view.app.IHeaderView
@@ -23,8 +22,7 @@ import com.google.android.material.loadingindicator.LoadingIndicator
 
 class InAppUpdateDialogView(
   context: Context,
-  buildSnapshotAbiDisplayData: BuildSnapshotAbiDisplayDataUseCase,
-  buildSnapshotUpdateTimeDisplayData: BuildSnapshotUpdateTimeDisplayDataUseCase,
+  buildSnapshotItemDisplayData: BuildSnapshotItemDisplayDataUseCase,
   initialCheckedId: Int = R.id.in_app_update_chip_stable
 ) : LinearLayout(context),
   IHeaderView {
@@ -58,8 +56,7 @@ class InAppUpdateDialogView(
   }
 
   private val demoAdapter = SnapshotAdapter(
-    buildSnapshotAbiDisplayData,
-    buildSnapshotUpdateTimeDisplayData,
+    buildSnapshotItemDisplayData,
     SnapshotAdapter.CardMode.GET_APP_UPDATE
   )
 

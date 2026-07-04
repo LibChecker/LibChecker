@@ -5,6 +5,7 @@ import com.absinthe.libchecker.domain.snapshot.list.capture.CaptureInstalledSnap
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotListWorkflow
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotCapturePlanUseCase
+import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotListUpdatePlanUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotSystemPropDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotTimeNodeListDataUseCase
@@ -22,6 +23,7 @@ val snapshotListModule = module {
   factory { SnapshotDetailSectionBuilder(androidContext(), get()) }
   factory { GetApexPackageNamesUseCase(get()) }
   factory { BuildSnapshotCapturePlanUseCase(get()) }
+  factory { BuildSnapshotItemDisplayDataUseCase(get(), get()) }
   factory { BuildSnapshotListUpdatePlanUseCase(get(), get(), get()) }
   factory { GetSnapshotPackageIconSourcesUseCase(get()) }
   factory { GetSnapshotSystemPropDiffsUseCase(get()) }

@@ -9,9 +9,8 @@ import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.domain.home.ui.adapter.AdvancedMenuAdapter
-import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotAbiDisplayDataUseCase
-import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.ui.adapter.SnapshotAdapter
+import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.DateUtils
@@ -25,8 +24,7 @@ import com.google.android.flexbox.JustifyContent
 
 class SnapshotMenuBSDView(
   context: Context,
-  buildSnapshotAbiDisplayData: BuildSnapshotAbiDisplayDataUseCase,
-  buildSnapshotUpdateTimeDisplayData: BuildSnapshotUpdateTimeDisplayDataUseCase
+  buildSnapshotItemDisplayData: BuildSnapshotItemDisplayDataUseCase
 ) : LinearLayout(context),
   IHeaderView {
 
@@ -38,8 +36,7 @@ class SnapshotMenuBSDView(
 
   private val adapter = AdvancedMenuAdapter()
   private val demoAdapter = SnapshotAdapter(
-    buildSnapshotAbiDisplayData,
-    buildSnapshotUpdateTimeDisplayData,
+    buildSnapshotItemDisplayData,
     SnapshotAdapter.CardMode.DEMO
   )
 

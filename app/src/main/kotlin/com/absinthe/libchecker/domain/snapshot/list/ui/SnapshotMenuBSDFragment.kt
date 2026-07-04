@@ -4,11 +4,10 @@ import android.content.DialogInterface
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.SnapshotOptions
-import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotAbiDisplayDataUseCase
-import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
 import com.absinthe.libchecker.domain.snapshot.list.ui.view.SnapshotMenuBSDView
 import com.absinthe.libchecker.domain.snapshot.list.ui.view.SnapshotMenuItemView
+import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotItemDisplayDataUseCase
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.supportIECUnit
@@ -19,8 +18,7 @@ import org.koin.androidx.viewmodel.ext.android.activityViewModel
 class SnapshotMenuBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotMenuBSDView>() {
 
   private val viewModel: SnapshotViewModel by activityViewModel()
-  private val buildSnapshotAbiDisplayData: BuildSnapshotAbiDisplayDataUseCase by inject()
-  private val buildSnapshotUpdateTimeDisplayData: BuildSnapshotUpdateTimeDisplayDataUseCase by inject()
+  private val buildSnapshotItemDisplayData: BuildSnapshotItemDisplayDataUseCase by inject()
   private val optionsViewMap = mutableMapOf<Int, SnapshotMenuItemView>()
   private var previousAdvancedOptions: Int = 0
 
@@ -28,8 +26,7 @@ class SnapshotMenuBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotMenuBS
 
   override fun initRootView(): SnapshotMenuBSDView = SnapshotMenuBSDView(
     requireContext(),
-    buildSnapshotAbiDisplayData,
-    buildSnapshotUpdateTimeDisplayData
+    buildSnapshotItemDisplayData
   )
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()

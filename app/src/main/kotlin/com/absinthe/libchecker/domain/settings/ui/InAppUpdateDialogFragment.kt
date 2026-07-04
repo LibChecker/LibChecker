@@ -10,8 +10,7 @@ import com.absinthe.libchecker.domain.app.update.AppUpdateChannel
 import com.absinthe.libchecker.domain.app.update.AppUpdateInstallResult
 import com.absinthe.libchecker.domain.app.update.BuildInAppUpdateDiffDataUseCase
 import com.absinthe.libchecker.domain.settings.presentation.SettingsViewModel
-import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotAbiDisplayDataUseCase
-import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
+import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotItemDisplayDataUseCase
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
@@ -27,16 +26,14 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class InAppUpdateDialogFragment : BaseBottomSheetViewDialogFragment<InAppUpdateDialogView>() {
 
   private val buildInAppUpdateDiffData: BuildInAppUpdateDiffDataUseCase by inject()
-  private val buildSnapshotAbiDisplayData: BuildSnapshotAbiDisplayDataUseCase by inject()
-  private val buildSnapshotUpdateTimeDisplayData: BuildSnapshotUpdateTimeDisplayDataUseCase by inject()
+  private val buildSnapshotItemDisplayData: BuildSnapshotItemDisplayDataUseCase by inject()
   private val viewModel: SettingsViewModel by viewModel()
   private var getAppUpdateInfo: GetAppUpdateInfo? = null
   private var selectedChannel: AppUpdateChannel = defaultUpdateChannel()
 
   override fun initRootView(): InAppUpdateDialogView = InAppUpdateDialogView(
     requireContext(),
-    buildSnapshotAbiDisplayData,
-    buildSnapshotUpdateTimeDisplayData,
+    buildSnapshotItemDisplayData,
     selectedChannel.toButtonId()
   )
 
