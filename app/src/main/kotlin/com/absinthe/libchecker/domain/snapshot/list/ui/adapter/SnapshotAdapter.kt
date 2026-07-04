@@ -1,8 +1,6 @@
 package com.absinthe.libchecker.domain.snapshot.list.ui.adapter
 
 import android.graphics.Color
-import android.text.SpannableString
-import android.text.SpannableStringBuilder
 import android.text.style.ImageSpan
 import android.view.ViewGroup
 import androidx.core.text.buildSpannedString
@@ -15,7 +13,6 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.SnapshotListDisplayOptions
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotAbiDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
-import com.absinthe.libchecker.domain.snapshot.display.SnapshotAbiDisplayItem
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotUpdateTimeText
 import com.absinthe.libchecker.domain.snapshot.list.ui.view.SnapshotItemView
 import com.absinthe.libchecker.domain.snapshot.list.usecase.stableSnapshotDiffItemIdFor
@@ -25,11 +22,9 @@ import com.absinthe.libchecker.ui.adapter.HighlightAdapter
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
-import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.setAlphaForAll
 import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
 import com.absinthe.libchecker.utils.extensions.sizeToString
-import com.absinthe.libchecker.view.span.CenterAlignImageSpan
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import java.util.Locale
 import kotlin.math.abs
@@ -233,16 +228,11 @@ class SnapshotAdapter(
       }
 
       val abiDisplayData = buildSnapshotAbiDisplayData(item.abiDiff)
-      val oldAbiSpanString = buildAbiSpanString(abiDisplayData.old, tintBadge = false)
-      val builder = SpannableStringBuilder(oldAbiSpanString)
-
-      if (item.abiDiff.new != null && item.abiDiff.old != item.abiDiff.new) {
-        val newAbiSpanString = abiDisplayData.new?.let {
-          buildAbiSpanString(it, tintBadge = true)
-        } ?: SpannableString("")
-        builder.append(" $ARROW ").append(newAbiSpanString)
-      }
-      abiInfo.text = builder
+      setAbiDisplay(
+        abiDisplayData = abiDisplayData,
+        showChangedAbi = item.abiDiff.new != null && item.abiDiff.old != item.abiDiff.new,
+        tintChangedAbiBadge = displayOptions.tintAbiLabels
+      )
 
       val updateTimeDisplayData = buildSnapshotUpdateTimeDisplayData(
         BuildSnapshotUpdateTimeDisplayDataUseCase.Request(
@@ -281,42 +271,6 @@ class SnapshotAdapter(
       return Long.MIN_VALUE + position
     }
     return stableSnapshotDiffItemIdFor(data[position])
-  }
-
-  private fun buildAbiSpanString(
-    item: SnapshotAbiDisplayItem,
-    tintBadge: Boolean
-  ): SpannableString {
-    val badgeRes = item.badgeRes ?: return SpannableString(item.text)
-    var paddingString = "  ${item.text}"
-    if (item.isMultiArch) {
-      paddingString = "  $paddingString"
-    }
-    val spanString = SpannableString(paddingString)
-    badgeRes.getDrawable(context)?.let {
-      if (tintBadge) {
-        if (displayOptions.tintAbiLabels) {
-          if (badgeRes == R.drawable.ic_abi_label_64bit) {
-            it.setTint(context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary))
-          } else {
-            it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorTertiary))
-          }
-        } else {
-          it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
-        }
-      }
-      it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
-      val span = CenterAlignImageSpan(it)
-      spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
-    }
-    if (item.isMultiArch) {
-      R.drawable.ic_multi_arch.getDrawable(context)?.let {
-        it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
-        val span = CenterAlignImageSpan(it)
-        spanString.setSpan(span, 2, 3, ImageSpan.ALIGN_BOTTOM)
-      }
-    }
-    return spanString
   }
 
   enum class CardMode {

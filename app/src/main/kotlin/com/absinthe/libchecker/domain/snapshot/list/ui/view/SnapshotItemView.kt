@@ -4,6 +4,7 @@ import android.content.Context
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
+import android.text.style.ImageSpan
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
@@ -11,6 +12,8 @@ import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.snapshot.display.SnapshotAbiDisplayData
+import com.absinthe.libchecker.domain.snapshot.display.SnapshotAbiDisplayItem
 import com.absinthe.libchecker.domain.snapshot.ui.view.SnapshotPackageSizeLineBreaker
 import com.absinthe.libchecker.utils.extensions.applyCondensedSingleLine
 import com.absinthe.libchecker.utils.extensions.applySingleLineEndEllipsize
@@ -162,6 +165,31 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       appName.text = SpannableStringBuilder(appName.text).append(spanString)
     }
 
+    fun setAbiDisplay(
+      abiDisplayData: SnapshotAbiDisplayData,
+      showChangedAbi: Boolean,
+      tintChangedAbiBadge: Boolean
+    ) {
+      val builder = SpannableStringBuilder(
+        buildAbiSpanString(
+          item = abiDisplayData.old,
+          tintBadge = false,
+          tintAbiLabels = tintChangedAbiBadge
+        )
+      )
+      if (showChangedAbi) {
+        val changedAbiSpanString = abiDisplayData.new?.let {
+          buildAbiSpanString(
+            item = it,
+            tintBadge = true,
+            tintAbiLabels = tintChangedAbiBadge
+          )
+        } ?: SpannableString("")
+        builder.append(" $ABI_CHANGE_ARROW ").append(changedAbiSpanString)
+      }
+      abiInfo.text = builder
+    }
+
     fun setPackageSizeText(text: CharSequence, breakStart: Int) {
       packageSizeLineBreaker.setText(text, breakStart)
     }
@@ -243,4 +271,41 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       )
     }
   }
+}
+
+private const val ABI_CHANGE_ARROW = "→"
+
+private fun SnapshotItemView.SnapshotItemContainerView.buildAbiSpanString(
+  item: SnapshotAbiDisplayItem,
+  tintBadge: Boolean,
+  tintAbiLabels: Boolean
+): SpannableString {
+  val badgeRes = item.badgeRes ?: return SpannableString(item.text)
+  var paddingString = "  ${item.text}"
+  if (item.isMultiArch) {
+    paddingString = "  $paddingString"
+  }
+  val spanString = SpannableString(paddingString)
+  badgeRes.getDrawable(context)?.let {
+    if (tintBadge) {
+      if (tintAbiLabels) {
+        if (badgeRes == R.drawable.ic_abi_label_64bit) {
+          it.setTint(context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary))
+        } else {
+          it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorTertiary))
+        }
+      } else {
+        it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
+      }
+    }
+    it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+    spanString.setSpan(CenterAlignImageSpan(it), 0, 1, ImageSpan.ALIGN_BOTTOM)
+  }
+  if (item.isMultiArch) {
+    R.drawable.ic_multi_arch.getDrawable(context)?.let {
+      it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+      spanString.setSpan(CenterAlignImageSpan(it), 2, 3, ImageSpan.ALIGN_BOTTOM)
+    }
+  }
+  return spanString
 }
