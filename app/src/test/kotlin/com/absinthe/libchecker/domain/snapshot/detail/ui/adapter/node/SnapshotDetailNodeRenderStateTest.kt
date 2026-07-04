@@ -4,6 +4,7 @@ import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemStatusDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailRuleChipDisplayData
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailItemCardRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailRuleChipIconStyle
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailRuleChipRenderState
 import com.absinthe.libchecker.domain.snapshot.model.MOVED
@@ -83,6 +84,44 @@ class SnapshotDetailNodeRenderStateTest {
     assertEquals("Changed, libplain.so, (4 KB)", renderState.contentDescription)
     assertNull(renderState.ruleChip)
     assertNull(renderState.chipClickAction)
+  }
+
+  @Test
+  fun exposesCardRenderStateWithoutActions() {
+    val node = SnapshotNativeNode(
+      buildDisplayData(
+        name = "libjingle_peerconnection_so.so",
+        title = "libjingle_peerconnection_so.so",
+        extra = "(12 MB)",
+        description = "Changed, libjingle_peerconnection_so.so, (12 MB), WebRTC",
+        iconRes = 10,
+        backgroundColor = 0x12345678,
+        ruleChip = SnapshotDetailRuleChipDisplayData(
+          label = "WebRTC",
+          iconRes = 20,
+          regexName = "libjingle_.*",
+          isSimpleColorIcon = false,
+          useColorfulIcon = true
+        )
+      )
+    )
+
+    assertEquals(
+      SnapshotDetailItemCardRenderState(
+        title = "libjingle_peerconnection_so.so",
+        extra = "(12 MB)",
+        iconRes = 10,
+        backgroundColor = 0x12345678,
+        contentDescription = "Changed, libjingle_peerconnection_so.so, (12 MB), WebRTC",
+        ruleChip = SnapshotDetailRuleChipRenderState(
+          label = "WebRTC",
+          iconRes = 20,
+          backgroundColor = 0x12345678,
+          iconStyle = SnapshotDetailRuleChipIconStyle.Original
+        )
+      ),
+      node.itemRenderState.cardRenderState
+    )
   }
 
   @Test

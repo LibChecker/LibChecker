@@ -3,6 +3,7 @@ package com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailRuleChipDisplayData
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailItemCardRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailRuleChipIconStyle
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailRuleChipRenderState
 
@@ -25,6 +26,16 @@ val BaseSnapshotNode.itemRenderState: SnapshotDetailItemRenderState
     contentDescription = displayData.description,
     ruleChip = displayData.ruleChip?.toRenderState(displayData.backgroundColor),
     chipClickAction = chipClickAction
+  )
+
+val SnapshotDetailItemRenderState.cardRenderState: SnapshotDetailItemCardRenderState
+  get() = SnapshotDetailItemCardRenderState(
+    title = title,
+    extra = extra,
+    iconRes = iconRes,
+    backgroundColor = backgroundColor,
+    contentDescription = contentDescription,
+    ruleChip = ruleChip
   )
 
 private fun SnapshotDetailRuleChipDisplayData.toRenderState(

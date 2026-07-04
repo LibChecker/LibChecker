@@ -10,11 +10,13 @@ import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.graphics.drawable.toDrawable
 import androidx.core.graphics.toColorInt
 import androidx.core.view.children
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailItemCardRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailRuleChipIconStyle
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailRuleChipRenderState
 import com.absinthe.libchecker.utils.extensions.dp
@@ -27,13 +29,22 @@ import com.google.android.material.chip.Chip
 
 class SnapshotDetailComponentView(context: Context) : MaterialCardView(context) {
 
-  val container = SnapshotDetailComponentContainerView(context).apply {
+  private val container = SnapshotDetailComponentContainerView(context).apply {
     layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
   }
 
   init {
     setSmoothRoundCorner(16.dp)
     addView(container)
+  }
+
+  fun render(state: SnapshotDetailItemCardRenderState) {
+    contentDescription = state.contentDescription
+    container.render(state)
+  }
+
+  fun setChipOnClickListener(listener: OnClickListener?) {
+    container.setChipOnClickListener(listener)
   }
 
   class SnapshotDetailComponentContainerView(context: Context) : AViewGroup(context) {
@@ -72,6 +83,13 @@ class SnapshotDetailComponentView(context: Context) : MaterialCardView(context) 
 
     fun setChipOnClickListener(listener: OnClickListener?) {
       chip?.setOnClickListener(listener)
+    }
+
+    fun render(state: SnapshotDetailItemCardRenderState) {
+      name.text = state.title
+      typeIcon.setImageResource(state.iconRes)
+      background = state.backgroundColor.toDrawable()
+      setChip(state.ruleChip)
     }
 
     fun setChip(ruleChip: SnapshotDetailRuleChipRenderState?) {
