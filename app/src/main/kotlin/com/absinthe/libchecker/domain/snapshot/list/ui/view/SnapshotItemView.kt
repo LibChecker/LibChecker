@@ -83,7 +83,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       )
       setUpdateTimeDisplay(data.updateTimeDisplayData)
     }
-    setItemContentDescription(data.stateIndicator)
+    setItemContentDescription(data.stateIndicator.stateDescription)
   }
 
   private fun setCardPresentation(cardPresentation: SnapshotItemCardPresentation) {
@@ -100,7 +100,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
     }
   }
 
-  private fun setItemContentDescription(stateIndicator: SnapshotItemStateIndicatorData) {
+  private fun setItemContentDescription(stateDescription: CharSequence) {
     contentDescription = buildItemDescription(
       container.appName.text,
       container.packageName.text,
@@ -109,12 +109,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       container.apisInfo.text,
       container.abiInfo.text,
       container.updateTime.text.takeIf { container.updateTime.isVisible },
-      buildSnapshotStateDescription(
-        stateIndicator.added,
-        stateIndicator.removed,
-        stateIndicator.changed,
-        stateIndicator.moved
-      )
+      stateDescription
     )
   }
 
@@ -441,20 +436,6 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
 }
 
 private const val ABI_CHANGE_ARROW = "→"
-
-private fun SnapshotItemView.buildSnapshotStateDescription(
-  added: Int,
-  removed: Int,
-  changed: Int,
-  moved: Int
-): String {
-  return listOf(
-    added.takeIf { it > 0 }?.let { "${context.getString(R.string.snapshot_indicator_added)} $it" },
-    removed.takeIf { it > 0 }?.let { "${context.getString(R.string.snapshot_indicator_removed)} $it" },
-    changed.takeIf { it > 0 }?.let { "${context.getString(R.string.snapshot_indicator_changed)} $it" },
-    moved.takeIf { it > 0 }?.let { "${context.getString(R.string.snapshot_indicator_moved)} $it" }
-  ).filterNotNull().joinToString()
-}
 
 private fun buildItemDescription(vararg parts: CharSequence?): String {
   return parts

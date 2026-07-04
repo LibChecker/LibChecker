@@ -1,8 +1,10 @@
 package com.absinthe.libchecker.domain.snapshot.list.usecase
 
 import android.content.Context
+import androidx.annotation.StringRes
 import androidx.core.text.buildSpannedString
 import androidx.core.text.scale
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotAbiDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemAbiDisplayData
@@ -48,6 +50,12 @@ class BuildSnapshotItemDisplayDataUseCase(
         removed = item.removed,
         changed = item.changed,
         moved = item.moved,
+        stateDescription = buildSnapshotStateDescription(
+          added = item.added,
+          removed = item.removed,
+          changed = item.changed,
+          moved = item.moved
+        ),
         animate = request.animateStateIndicator
       ),
       versionInfo = LCAppUtils.getDiffString(
@@ -168,6 +176,29 @@ class BuildSnapshotItemDisplayDataUseCase(
       isNewOrDeleted = isNewOrDeleted,
       highlightDiffColor = highlightDiffColor
     ).takeIf { diff.old > 0 }
+  }
+
+  private fun buildSnapshotStateDescription(
+    added: Int,
+    removed: Int,
+    changed: Int,
+    moved: Int
+  ): String {
+    return listOf(
+      buildSnapshotStateDescriptionPart(R.string.snapshot_indicator_added, added),
+      buildSnapshotStateDescriptionPart(R.string.snapshot_indicator_removed, removed),
+      buildSnapshotStateDescriptionPart(R.string.snapshot_indicator_changed, changed),
+      buildSnapshotStateDescriptionPart(R.string.snapshot_indicator_moved, moved)
+    ).filterNotNull().joinToString()
+  }
+
+  private fun buildSnapshotStateDescriptionPart(
+    @StringRes labelRes: Int,
+    count: Int
+  ): String? {
+    return count.takeIf { it > 0 }?.let {
+      "${context.getString(labelRes)} $it"
+    }
   }
 
   private fun buildPackageSizeChangeText(diffSize: Long, oldSize: Long): String {

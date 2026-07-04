@@ -31,6 +31,7 @@ data class SnapshotItemStateIndicatorData(
   val removed: Int,
   val changed: Int,
   val moved: Int,
+  val stateDescription: CharSequence,
   val animate: Boolean
 )
 
