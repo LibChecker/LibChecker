@@ -42,7 +42,6 @@ import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailNewI
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotEmptyView
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotTitleDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
-import com.absinthe.libchecker.domain.snapshot.model.REMOVED
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
@@ -193,17 +192,14 @@ class SnapshotDetailActivity :
         return@setOnItemClickListener
       }
 
-      val item = (adapter.data[position] as BaseSnapshotNode).item
-      if (item.diffType == REMOVED) {
-        return@setOnItemClickListener
-      }
+      val target = (adapter.data[position] as BaseSnapshotNode).detailTarget ?: return@setOnItemClickListener
 
       lifecycleScope.launch {
         val lcItem = viewModel.getAppListItem(entity.packageName) ?: return@launch
         launchDetailPage(
           item = lcItem,
-          refName = item.name,
-          refType = item.itemType
+          refName = target.refName,
+          refType = target.refType
         )
       }
     }

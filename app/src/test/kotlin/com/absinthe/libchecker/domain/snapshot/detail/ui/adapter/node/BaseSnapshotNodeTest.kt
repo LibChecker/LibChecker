@@ -5,6 +5,7 @@ import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemDi
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemStatusDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailRuleChipDisplayData
 import com.absinthe.libchecker.domain.snapshot.model.MOVED
+import com.absinthe.libchecker.domain.snapshot.model.REMOVED
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -36,20 +37,54 @@ class BaseSnapshotNodeTest {
     assertNull(node.referenceLabel)
   }
 
+  @Test
+  fun exposesDetailTargetForNavigableItem() {
+    val node = SnapshotComponentNode(
+      buildDisplayData(
+        name = "com.example.SyncService",
+        diffType = MOVED,
+        ruleChip = null
+      )
+    )
+
+    assertEquals(
+      SnapshotDetailNavigationTarget(
+        refName = "com.example.SyncService",
+        refType = SERVICE
+      ),
+      node.detailTarget
+    )
+  }
+
+  @Test
+  fun returnsNullDetailTargetForRemovedItem() {
+    val node = SnapshotComponentNode(
+      buildDisplayData(
+        name = "com.example.RemovedService",
+        diffType = REMOVED,
+        ruleChip = null
+      )
+    )
+
+    assertNull(node.detailTarget)
+  }
+
   private fun buildDisplayData(
+    name: String = "com.example.SyncService",
+    diffType: Int = MOVED,
     ruleChip: SnapshotDetailRuleChipDisplayData?
   ): SnapshotDetailItemDisplayData {
     return SnapshotDetailItemDisplayData(
       item = SnapshotDetailItem(
-        name = "com.example.SyncService",
-        title = "com.example.SyncService",
+        name = name,
+        title = name,
         extra = "",
-        diffType = MOVED,
+        diffType = diffType,
         itemType = SERVICE
       ),
-      title = "com.example.SyncService",
+      title = name,
       extra = "",
-      description = "com.example.SyncService",
+      description = name,
       reportText = "component report\n",
       status = SnapshotDetailItemStatusDisplayData(
         iconRes = 0,
