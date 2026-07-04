@@ -35,6 +35,7 @@ import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotRe
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.clickAction
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.longClickAction
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.toSnapshotTitleNode
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.toRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailDeletedView
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailNewInstallView
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotEmptyView
@@ -160,7 +161,7 @@ class SnapshotDetailActivity :
           formatSplitPackageName = true
         )
       )
-      snapshotTitle.render(snapshotTitleDisplayData)
+      snapshotTitle.render(snapshotTitleDisplayData.toRenderState())
     }
 
     adapter.stateView =

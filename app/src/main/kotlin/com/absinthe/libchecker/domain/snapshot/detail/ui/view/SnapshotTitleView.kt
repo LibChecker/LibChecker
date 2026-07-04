@@ -9,8 +9,8 @@ import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotTitleDisplayData
-import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotTitlePackageSizeData
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotTitlePackageSizeRenderState
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotTitleRenderState
 import com.absinthe.libchecker.domain.snapshot.ui.view.SnapshotPackageSizeLineBreaker
 import com.absinthe.libchecker.utils.extensions.applyCondensedSingleLine
 import com.absinthe.libchecker.utils.extensions.applySingleLineEndEllipsize
@@ -95,7 +95,7 @@ class SnapshotTitleView(
   }
 
   fun render(
-    data: SnapshotTitleDisplayData,
+    data: SnapshotTitleRenderState,
     copyPrimaryText: Boolean = true
   ) {
     appNameView.apply {
@@ -124,7 +124,7 @@ class SnapshotTitleView(
     }
   }
 
-  private fun setPackageSizeText(data: SnapshotTitlePackageSizeData?) {
+  private fun setPackageSizeText(data: SnapshotTitlePackageSizeRenderState?) {
     if (data == null) {
       packageSizeView.isVisible = false
       packageSizeLineBreaker.clear()

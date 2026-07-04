@@ -4,6 +4,7 @@ import androidx.core.os.BundleCompat
 import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.toRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotNoDiffBSView
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotTitleDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
@@ -43,7 +44,7 @@ class SnapshotNoDiffBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotNoDi
               item = item,
               formatSplitPackageName = false
             )
-          ),
+          ).toRenderState(),
           copyPrimaryText = false
         )
       }
