@@ -1,19 +1,15 @@
 package com.absinthe.libchecker.domain.snapshot.list.ui.view
 
 import android.content.Context
-import android.os.Build
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.domain.home.ui.adapter.AdvancedMenuAdapter
 import com.absinthe.libchecker.domain.snapshot.list.ui.adapter.SnapshotAdapter
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
-import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
@@ -24,7 +20,8 @@ import com.google.android.flexbox.JustifyContent
 
 class SnapshotMenuBSDView(
   context: Context,
-  buildSnapshotItemDisplayData: BuildSnapshotItemDisplayDataUseCase
+  buildSnapshotItemDisplayData: BuildSnapshotItemDisplayDataUseCase,
+  demoItem: SnapshotDiffItem
 ) : LinearLayout(context),
   IHeaderView {
 
@@ -51,31 +48,7 @@ class SnapshotMenuBSDView(
     layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
     adapter = demoAdapter
 
-    demoAdapter.addData(
-      SnapshotDiffItem(
-        packageName = Constants.EXAMPLE_PACKAGE,
-        updateTime = System.currentTimeMillis(),
-        labelDiff = SnapshotDiffItem.DiffNode(DateUtils.getCurrentSeasonString(), DateUtils.getNextSeasonString()),
-        versionNameDiff = SnapshotDiffItem.DiffNode("2020.3.19", DateUtils.getToday()),
-        versionCodeDiff = SnapshotDiffItem.DiffNode(1120, BuildConfig.VERSION_CODE.toLong()),
-        abiDiff = SnapshotDiffItem.DiffNode(Constants.ARMV7.toShort(), Constants.ARMV8.toShort()),
-        targetApiDiff = SnapshotDiffItem.DiffNode((Build.VERSION.SDK_INT - 1).toShort(), Build.VERSION.SDK_INT.toShort()),
-        compileSdkDiff = SnapshotDiffItem.DiffNode((Build.VERSION.SDK_INT - 1).toShort(), Build.VERSION.SDK_INT.toShort()),
-        minSdkDiff = SnapshotDiffItem.DiffNode((Build.VERSION.SDK_INT - 11).toShort(), (Build.VERSION.SDK_INT - 10).toShort()),
-        packageSizeDiff = SnapshotDiffItem.DiffNode(12345678L, 87654321L),
-        nativeLibsDiff = SnapshotDiffItem.DiffNode(""),
-        servicesDiff = SnapshotDiffItem.DiffNode(""),
-        activitiesDiff = SnapshotDiffItem.DiffNode(""),
-        receiversDiff = SnapshotDiffItem.DiffNode(""),
-        providersDiff = SnapshotDiffItem.DiffNode(""),
-        permissionsDiff = SnapshotDiffItem.DiffNode(""),
-        metadataDiff = SnapshotDiffItem.DiffNode(""),
-        added = 100,
-        removed = 100,
-        changed = 100,
-        moved = 100
-      )
-    )
+    demoAdapter.addData(demoItem)
   }
 
   private val flexLayout = FlexboxLayout(context).apply {

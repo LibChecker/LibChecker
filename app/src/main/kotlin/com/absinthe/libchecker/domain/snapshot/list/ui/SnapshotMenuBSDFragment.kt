@@ -8,6 +8,7 @@ import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewMod
 import com.absinthe.libchecker.domain.snapshot.list.ui.view.SnapshotMenuBSDView
 import com.absinthe.libchecker.domain.snapshot.list.ui.view.SnapshotMenuItemView
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotItemDisplayDataUseCase
+import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotMenuDemoItemUseCase
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.supportIECUnit
@@ -19,6 +20,7 @@ class SnapshotMenuBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotMenuBS
 
   private val viewModel: SnapshotViewModel by activityViewModel()
   private val buildSnapshotItemDisplayData: BuildSnapshotItemDisplayDataUseCase by inject()
+  private val buildSnapshotMenuDemoItem: BuildSnapshotMenuDemoItemUseCase by inject()
   private val optionsViewMap = mutableMapOf<Int, SnapshotMenuItemView>()
   private var previousAdvancedOptions: Int = 0
 
@@ -26,7 +28,8 @@ class SnapshotMenuBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotMenuBS
 
   override fun initRootView(): SnapshotMenuBSDView = SnapshotMenuBSDView(
     requireContext(),
-    buildSnapshotItemDisplayData
+    buildSnapshotItemDisplayData,
+    buildSnapshotMenuDemoItem()
   )
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
