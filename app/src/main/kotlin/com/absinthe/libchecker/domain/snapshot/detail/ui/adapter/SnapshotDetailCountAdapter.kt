@@ -2,6 +2,7 @@ package com.absinthe.libchecker.domain.snapshot.detail.ui.adapter
 
 import android.view.ViewGroup
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotDetailCountNode
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.countRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailCountView
 import com.absinthe.libchecker.utils.extensions.toColorStateList
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -20,9 +21,11 @@ class SnapshotDetailCountAdapter : BaseQuickAdapter<SnapshotDetailCountNode, Bas
   }
 
   override fun convert(holder: BaseViewHolder, item: SnapshotDetailCountNode) {
+    val renderState = item.countRenderState
+
     (holder.itemView as SnapshotDetailCountView).apply {
-      text = item.countText
-      backgroundTintList = item.status.countColorRes.toColorStateList(context)
+      text = renderState.text
+      backgroundTintList = renderState.backgroundTintRes.toColorStateList(context)
     }
   }
 }
