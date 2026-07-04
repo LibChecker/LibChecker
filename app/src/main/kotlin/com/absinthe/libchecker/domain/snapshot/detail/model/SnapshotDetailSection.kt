@@ -5,6 +5,12 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.annotation.METADATA
+import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.domain.snapshot.model.ADDED
+import com.absinthe.libchecker.domain.snapshot.model.CHANGED
+import com.absinthe.libchecker.domain.snapshot.model.MOVED
+import com.absinthe.libchecker.domain.snapshot.model.REMOVED
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
 import com.absinthe.rulesbundle.Rule
 
@@ -22,10 +28,35 @@ data class SnapshotDetailItemDisplayData(
   val title: CharSequence,
   val extra: CharSequence,
   val description: String,
+  val reportText: String,
   val status: SnapshotDetailItemStatusDisplayData,
   @ColorInt val backgroundColor: Int,
   val ruleChip: SnapshotDetailRuleChipDisplayData?
 )
+
+fun buildSnapshotDetailReportItemText(item: SnapshotDetailItem): String {
+  return buildString {
+    append(buildSnapshotDetailReportDiffTypeLabel(item.diffType))
+    append(" ")
+    append(item.title)
+    appendLine()
+    if (item.itemType == NATIVE || item.itemType == METADATA) {
+      append("\t")
+      append(item.extra)
+      appendLine()
+    }
+  }
+}
+
+private fun buildSnapshotDetailReportDiffTypeLabel(diffType: Int): String {
+  return when (diffType) {
+    ADDED -> "🟢+"
+    REMOVED -> "🔴-"
+    CHANGED -> "🟡~"
+    MOVED -> "🔵<->"
+    else -> throw IllegalArgumentException("wrong diff type")
+  }
+}
 
 @ColorInt
 fun buildSnapshotDetailItemBackgroundColor(

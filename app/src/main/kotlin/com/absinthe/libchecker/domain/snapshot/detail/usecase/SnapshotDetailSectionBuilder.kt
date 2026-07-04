@@ -25,6 +25,7 @@ import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSectio
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailStatusCount
 import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailItemBackgroundColor
 import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailItemDescription
+import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailReportItemText
 import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailRuleChipDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailSectionDescription
 import com.absinthe.libchecker.domain.snapshot.model.ADDED
@@ -131,6 +132,7 @@ class SnapshotDetailSectionBuilder(
               extra = item.extra,
               ruleLabel = ruleChip?.label
             ),
+            reportText = buildSnapshotDetailReportItemText(item),
             status = status,
             backgroundColor = buildSnapshotDetailItemBackgroundColor(
               baseColor = status.colorRes.getColor(context),

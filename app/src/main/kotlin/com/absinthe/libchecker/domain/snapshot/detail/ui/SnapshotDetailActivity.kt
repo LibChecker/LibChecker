@@ -43,9 +43,6 @@ import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailNewI
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotEmptyView
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotTitleDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
-import com.absinthe.libchecker.domain.snapshot.model.ADDED
-import com.absinthe.libchecker.domain.snapshot.model.CHANGED
-import com.absinthe.libchecker.domain.snapshot.model.MOVED
 import com.absinthe.libchecker.domain.snapshot.model.REMOVED
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
@@ -319,34 +316,15 @@ class SnapshotDetailActivity :
         }
 
         is SnapshotComponentNode -> {
-          sb.append(getDiffTypeLabel(it.item.diffType))
-            .append(" ")
-            .append(it.item.title)
-            .appendLine()
+          sb.append(it.displayData.reportText)
         }
 
         is SnapshotNativeNode -> {
-          sb.append(getDiffTypeLabel(it.item.diffType))
-            .append(" ")
-            .append(it.item.title)
-            .appendLine()
-            .append("\t")
-            .append(it.item.extra)
-            .appendLine()
+          sb.append(it.displayData.reportText)
         }
       }
     }
     ClipboardUtils.put(this, sb.toString())
     VersionCompat.showCopiedOnClipboardToast(this)
-  }
-
-  private fun getDiffTypeLabel(diffType: Int): String {
-    return when (diffType) {
-      ADDED -> "🟢+"
-      REMOVED -> "🔴-"
-      CHANGED -> "🟡~"
-      MOVED -> "🔵<->"
-      else -> throw IllegalArgumentException("wrong diff type")
-    }
   }
 }
