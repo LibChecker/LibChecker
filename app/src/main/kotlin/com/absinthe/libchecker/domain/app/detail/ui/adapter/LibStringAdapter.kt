@@ -38,6 +38,7 @@ import com.absinthe.libchecker.domain.app.detail.model.LibStringComponentItemDis
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemNameDisplay
+import com.absinthe.libchecker.domain.app.detail.model.LibStringPermissionItemDisplay
 import com.absinthe.libchecker.domain.app.detail.model.NativeLibraryItemDisplayData
 import com.absinthe.libchecker.domain.app.detail.model.StaticLibItem
 import com.absinthe.libchecker.domain.app.detail.model.buildLibStringItemDescription
@@ -132,7 +133,14 @@ class LibStringAdapter(
     when (type) {
       NATIVE -> setNativeContent(holder.itemView as NativeLibItemView, item, itemName)
 
-      PERMISSION -> setPermissionContent(holder.itemView as ComponentLibItemView, item, itemName)
+      PERMISSION -> setPermissionContent(
+        itemView = holder.itemView as ComponentLibItemView,
+        display = LibStringPermissionItemDisplay.create(
+          item = item,
+          itemDisplayOptions = itemDisplayOptions,
+          notGrantedLabel = context.getString(R.string.permission_not_granted)
+        )
+      )
 
       METADATA -> setMetadataContent(holder.itemView as MetadataLibItemView, item, itemName)
 
@@ -302,19 +310,15 @@ class LibStringAdapter(
 
   private fun setPermissionContent(
     itemView: ComponentLibItemView,
-    item: LibStringItemChip,
-    itemName: CharSequence
+    display: LibStringPermissionItemDisplay
   ) {
-    itemView.processLabelColor = if (item.item.size == 0L) {
+    itemView.processLabelColor = if (display.showNotGrantedIndicator) {
       R.color.material_red_500.getColor(context)
     } else {
       -1
     }
-    setOrHighlightText(itemView.libName, itemName)
-    itemView.contentDescription = buildLibStringItemDescription(
-      itemName,
-      context.getString(R.string.permission_not_granted).takeIf { item.item.size == 0L }
-    )
+    setOrHighlightText(itemView.libName, renderItemName(display.name))
+    itemView.contentDescription = display.contentDescription
   }
 
   private fun setMetadataContent(
