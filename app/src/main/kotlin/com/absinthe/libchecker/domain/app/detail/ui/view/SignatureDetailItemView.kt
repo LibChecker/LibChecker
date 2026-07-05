@@ -9,6 +9,7 @@ import androidx.core.view.children
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.VersionCompat
+import com.absinthe.libchecker.domain.app.detail.model.SignatureDetailItem
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDrawableByAttr
 import com.absinthe.libchecker.view.AViewGroup
@@ -16,7 +17,7 @@ import rikka.core.util.ClipboardUtils
 
 class SignatureDetailItemView(context: Context) : AViewGroup(context) {
 
-  val type = AppCompatTextView(context).apply {
+  private val type = AppCompatTextView(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.WRAP_CONTENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
@@ -25,7 +26,7 @@ class SignatureDetailItemView(context: Context) : AViewGroup(context) {
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
   }
 
-  val content = AppCompatTextView(context).apply {
+  private val content = AppCompatTextView(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.WRAP_CONTENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
@@ -61,6 +62,12 @@ class SignatureDetailItemView(context: Context) : AViewGroup(context) {
     addView(type)
     addView(copyToClipboard)
     addView(content)
+  }
+
+  fun bind(item: SignatureDetailItem) {
+    type.text = item.type
+    content.text = item.content
+    contentDescription = item.contentDescription
   }
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

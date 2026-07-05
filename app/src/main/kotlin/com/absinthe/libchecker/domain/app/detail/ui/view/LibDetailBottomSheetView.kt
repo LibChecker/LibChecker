@@ -23,6 +23,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.LibDetailBean
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.domain.app.detail.model.buildDetailItemDescription
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.LibDetailItemAdapter
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.node.LibDetailItem
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
@@ -184,12 +185,12 @@ class LibDetailBottomSheetView(context: Context) :
 
   class LibDetailItemView(context: Context) : AViewGroup(context) {
 
-    val icon = AppCompatImageView(context).apply {
+    private val icon = AppCompatImageView(context).apply {
       layoutParams = LayoutParams(24.dp, 24.dp)
       importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     }
 
-    val tip = AppCompatTextView(context).apply {
+    private val tip = AppCompatTextView(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
@@ -200,7 +201,7 @@ class LibDetailBottomSheetView(context: Context) :
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 10f)
     }
 
-    val text = AppCompatTextView(context).apply {
+    private val text = AppCompatTextView(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
@@ -218,11 +219,24 @@ class LibDetailBottomSheetView(context: Context) :
       addView(text)
     }
 
-    fun updateContentDescription() {
-      contentDescription = listOf(tip.text, text.text)
-        .map { it.toString().trim() }
-        .filter(String::isNotEmpty)
-        .joinToString()
+    fun bind(item: LibDetailItem) {
+      icon.setImageResource(item.iconRes)
+      tip.text = context.getString(item.tipRes)
+      text.setTextAppearance(item.textStyleRes)
+      if (item.text.startsWith("<a href")) {
+        text.apply {
+          isClickable = true
+          movementMethod = LinkMovementMethod.getInstance()
+          text = HtmlCompat.fromHtml(item.text, HtmlCompat.FROM_HTML_MODE_COMPACT)
+        }
+      } else {
+        text.apply {
+          isClickable = false
+          movementMethod = null
+          text = item.text
+        }
+      }
+      contentDescription = buildDetailItemDescription(tip.text, text.text)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

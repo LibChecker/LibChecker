@@ -13,7 +13,9 @@ import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.detail.model.buildDetailItemDescription
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.XposedDetailItemAdapter
+import com.absinthe.libchecker.domain.app.detail.ui.adapter.node.XposedDetailItem
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.dp
@@ -82,12 +84,12 @@ class XposedInfoBottomSheetView(context: Context) :
 
   class XposedDetailItemView(context: Context) : AViewGroup(context) {
 
-    val icon = AppCompatImageView(context).apply {
+    private val icon = AppCompatImageView(context).apply {
       layoutParams = LayoutParams(24.dp, 24.dp)
       importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     }
 
-    val tip = AppCompatTextView(context).apply {
+    private val tip = AppCompatTextView(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
@@ -98,7 +100,7 @@ class XposedInfoBottomSheetView(context: Context) :
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 10f)
     }
 
-    val text = AppCompatTextView(context).apply {
+    private val text = AppCompatTextView(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
@@ -116,11 +118,12 @@ class XposedInfoBottomSheetView(context: Context) :
       addView(text)
     }
 
-    fun updateContentDescription() {
-      contentDescription = listOf(tip.text, text.text)
-        .map { it.toString().trim() }
-        .filter(String::isNotEmpty)
-        .joinToString()
+    fun bind(item: XposedDetailItem) {
+      icon.setImageResource(item.iconRes)
+      tip.text = item.tip
+      text.text = item.text
+      text.setTextAppearance(item.textStyleRes)
+      contentDescription = buildDetailItemDescription(tip.text, text.text)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

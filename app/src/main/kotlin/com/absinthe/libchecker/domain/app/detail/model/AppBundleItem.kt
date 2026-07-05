@@ -11,8 +11,5 @@ data class AppBundleItem(
 )
 
 fun buildAppBundleItemDescription(vararg parts: CharSequence?): String {
-  return parts
-    .mapNotNull { it?.toString()?.trim() }
-    .filter(String::isNotEmpty)
-    .joinToString()
+  return buildDetailItemDescription(*parts)
 }

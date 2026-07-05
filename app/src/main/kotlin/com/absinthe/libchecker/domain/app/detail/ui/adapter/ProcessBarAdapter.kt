@@ -12,11 +12,7 @@ class ProcessBarAdapter : BaseQuickAdapter<ProcessBarAdapter.ProcessBarItem, Bas
   }
 
   override fun convert(holder: BaseViewHolder, item: ProcessBarItem) {
-    (holder.itemView as ProcessBarView.ProcessBarItemView).apply {
-      setIndicatorColor(item.color)
-      text.text = item.process
-      contentDescription = item.process
-    }
+    (holder.itemView as ProcessBarView.ProcessBarItemView).bind(item)
   }
 
   data class ProcessBarItem(val process: String, val color: Int)

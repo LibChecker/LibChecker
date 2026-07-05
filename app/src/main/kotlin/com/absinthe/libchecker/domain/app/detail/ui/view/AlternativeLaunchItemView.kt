@@ -7,11 +7,12 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.children
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.detail.action.AlternativeLaunchItem
 import com.absinthe.libchecker.view.AViewGroup
 
 class AlternativeLaunchItemView(context: Context) : AViewGroup(context) {
 
-  val label =
+  private val label =
     AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -22,7 +23,7 @@ class AlternativeLaunchItemView(context: Context) : AViewGroup(context) {
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
     }
 
-  val className = AppCompatTextView(
+  private val className = AppCompatTextView(
     ContextThemeWrapper(
       context,
       R.style.TextView_SansSerifCondensedMedium
@@ -40,6 +41,12 @@ class AlternativeLaunchItemView(context: Context) : AViewGroup(context) {
     setBackgroundResource(R.drawable.bg_lib_detail_item)
     addView(label)
     addView(className)
+  }
+
+  fun bind(item: AlternativeLaunchItem) {
+    label.text = item.label
+    className.text = item.className
+    contentDescription = item.contentDescription
   }
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

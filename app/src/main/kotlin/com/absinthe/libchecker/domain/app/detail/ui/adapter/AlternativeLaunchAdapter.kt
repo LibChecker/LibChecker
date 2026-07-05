@@ -13,10 +13,6 @@ class AlternativeLaunchAdapter : BaseQuickAdapter<AlternativeLaunchItem, BaseVie
   }
 
   override fun convert(holder: BaseViewHolder, item: AlternativeLaunchItem) {
-    (holder.itemView as AlternativeLaunchItemView).apply {
-      label.text = item.label
-      className.text = item.className
-      contentDescription = listOf(item.label, item.className).joinToString()
-    }
+    (holder.itemView as AlternativeLaunchItemView).bind(item)
   }
 }

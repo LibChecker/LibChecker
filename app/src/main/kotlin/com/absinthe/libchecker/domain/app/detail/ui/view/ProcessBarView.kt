@@ -72,7 +72,7 @@ class ProcessBarView(context: Context) : RecyclerView(context) {
       addView(this)
     }
 
-    val text = AppCompatTextView(
+    private val text = AppCompatTextView(
       ContextThemeWrapper(
         context,
         R.style.TextView_SansSerifCondensedMedium
@@ -105,8 +105,14 @@ class ProcessBarView(context: Context) : RecyclerView(context) {
       }
     }
 
-    fun setIndicatorColor(color: Int) {
+    private fun setIndicatorColor(color: Int) {
       colorIndicator.imageTintList = color.toColorStateListByColor()
+    }
+
+    fun bind(item: ProcessBarAdapter.ProcessBarItem) {
+      setIndicatorColor(item.color)
+      text.text = item.process
+      contentDescription = item.process
     }
 
     fun setTarget(target: Boolean) {

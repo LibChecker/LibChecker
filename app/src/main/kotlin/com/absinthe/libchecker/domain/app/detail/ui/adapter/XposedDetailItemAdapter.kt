@@ -13,12 +13,6 @@ class XposedDetailItemAdapter : BaseQuickAdapter<XposedDetailItem, BaseViewHolde
   }
 
   override fun convert(holder: BaseViewHolder, item: XposedDetailItem) {
-    (holder.itemView as XposedInfoBottomSheetView.XposedDetailItemView).apply {
-      icon.setImageResource(item.iconRes)
-      tip.text = item.tip
-      text.text = item.text
-      text.setTextAppearance(item.textStyleRes)
-      updateContentDescription()
-    }
+    (holder.itemView as XposedInfoBottomSheetView.XposedDetailItemView).bind(item)
   }
 }
