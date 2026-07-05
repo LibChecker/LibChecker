@@ -9,6 +9,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.children
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.detail.model.AppBundleItem
 import com.absinthe.libchecker.view.AViewGroup
 
 class AppBundleItemView(context: Context) : AViewGroup(context) {
@@ -50,31 +51,11 @@ class AppBundleItemView(context: Context) : AViewGroup(context) {
     addView(size)
   }
 
-  fun setIcon(type: Int) {
-    when (type) {
-      IconType.TYPE_NATIVE_LIBS -> icon.setImageResource(R.drawable.ic_logo)
-      IconType.TYPE_MATERIALS -> icon.setImageResource(R.drawable.ic_outline_image)
-      IconType.TYPE_STRINGS -> icon.setImageResource(R.drawable.ic_translate)
-      IconType.TYPE_OTHERS -> icon.setImageResource(R.drawable.ic_split)
-      else -> throw IllegalArgumentException("wrong type")
-    }
-  }
-
-  fun setNameText(text: String) {
-    name.text = text
-    updateContentDescription()
-  }
-
-  fun setSizeText(text: String) {
-    size.text = text
-    updateContentDescription()
-  }
-
-  private fun updateContentDescription() {
-    contentDescription = listOf(name.text, size.text)
-      .map { it.toString().trim() }
-      .filter(String::isNotEmpty)
-      .joinToString()
+  fun bind(item: AppBundleItem) {
+    icon.setImageResource(item.iconRes)
+    name.text = item.nameText
+    size.text = item.sizeText
+    contentDescription = item.contentDescription
   }
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -100,14 +81,5 @@ class AppBundleItemView(context: Context) : AViewGroup(context) {
     icon.layout(paddingStart, icon.toVerticalCenter(this))
     name.layout(paddingStart + icon.measuredWidth + name.marginStart, paddingTop)
     size.layout(paddingStart + icon.measuredWidth + name.marginStart, name.bottom)
-  }
-
-  class IconType {
-    companion object {
-      const val TYPE_NATIVE_LIBS = 0
-      const val TYPE_MATERIALS = 1
-      const val TYPE_STRINGS = 2
-      const val TYPE_OTHERS = 3
-    }
   }
 }

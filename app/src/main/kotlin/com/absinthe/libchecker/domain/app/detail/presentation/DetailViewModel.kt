@@ -18,8 +18,8 @@ import com.absinthe.libchecker.domain.app.detail.action.AppPackageShareAction
 import com.absinthe.libchecker.domain.app.detail.action.AppPackageShareFile
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemDialogRequest
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemLongClickActions
-import com.absinthe.libchecker.domain.app.detail.content.AppBundleSplitItem
 import com.absinthe.libchecker.domain.app.detail.feature.AppDetailFeatureItemData
+import com.absinthe.libchecker.domain.app.detail.model.AppBundleItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.navigation.DetailReferenceNavigation
@@ -337,7 +337,7 @@ class DetailViewModel(
     )
   }
 
-  suspend fun getAppBundleItems(packageInfo: PackageInfo): List<AppBundleSplitItem> {
+  suspend fun getAppBundleItems(packageInfo: PackageInfo): List<AppBundleItem> {
     return detailActionLoader.getAppBundleItems(packageInfo)
   }
 

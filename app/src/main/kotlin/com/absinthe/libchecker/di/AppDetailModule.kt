@@ -33,6 +33,7 @@ import com.absinthe.libchecker.domain.app.detail.action.GetPermissionProvidersUs
 import com.absinthe.libchecker.domain.app.detail.action.GetXposedModuleInfoUseCase
 import com.absinthe.libchecker.domain.app.detail.action.PrepareAppPackageShareActionUseCase
 import com.absinthe.libchecker.domain.app.detail.action.PrepareAppPackageShareFileUseCase
+import com.absinthe.libchecker.domain.app.detail.content.BuildAppBundleItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.detail.content.BuildAppDetailContentInitPlanUseCase
 import com.absinthe.libchecker.domain.app.detail.content.BuildAppDetailTabTypesUseCase
 import com.absinthe.libchecker.domain.app.detail.content.BuildDetailProcessFilterDataUseCase
@@ -82,6 +83,7 @@ val appDetailModule = module {
   factory { BuildDetailProcessFilterDataUseCase() }
   factory { FilterAppDetailItemsUseCase() }
   factory { GetAlternativeLaunchItemsUseCase(androidContext().packageManager, get()) }
+  factory { BuildAppBundleItemDisplayDataUseCase(androidContext()) }
   factory { GetAppBundleItemsUseCase() }
   factory { GetAppDetailAbiUseCase() }
   factory { GetAppDetailAbilityChipsUseCase(androidContext()) }
@@ -136,6 +138,7 @@ val appDetailModule = module {
     DetailActionLoader(
       getAlternativeLaunchItemsUseCase = get(),
       getAppBundleItemsUseCase = get(),
+      buildAppBundleItemDisplayDataUseCase = get(),
       getAppInfoActionsUseCase = get(),
       getAppInfoPrimaryActionsUseCase = get(),
       getAppInstallSourceDetailsUseCase = get(),

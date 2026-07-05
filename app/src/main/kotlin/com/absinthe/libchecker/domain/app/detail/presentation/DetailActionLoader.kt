@@ -25,8 +25,9 @@ import com.absinthe.libchecker.domain.app.detail.action.GetOverlayDetailUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetPermissionDetailUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetXposedModuleInfoUseCase
 import com.absinthe.libchecker.domain.app.detail.action.PrepareAppPackageShareActionUseCase
-import com.absinthe.libchecker.domain.app.detail.content.AppBundleSplitItem
+import com.absinthe.libchecker.domain.app.detail.content.BuildAppBundleItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.detail.content.GetAppBundleItemsUseCase
+import com.absinthe.libchecker.domain.app.detail.model.AppBundleItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.navigation.BuildDetailReferenceNavigationUseCase
@@ -36,6 +37,7 @@ import java.io.File
 class DetailActionLoader(
   private val getAlternativeLaunchItemsUseCase: GetAlternativeLaunchItemsUseCase,
   private val getAppBundleItemsUseCase: GetAppBundleItemsUseCase,
+  private val buildAppBundleItemDisplayDataUseCase: BuildAppBundleItemDisplayDataUseCase,
   private val getAppInfoActionsUseCase: GetAppInfoActionsUseCase,
   private val getAppInfoPrimaryActionsUseCase: GetAppInfoPrimaryActionsUseCase,
   private val getAppInstallSourceDetailsUseCase: GetAppInstallSourceDetailsUseCase,
@@ -55,8 +57,8 @@ class DetailActionLoader(
   private val exportAppPackageShareFileUseCase: ExportAppPackageShareFileUseCase,
   private val buildDetailReferenceNavigationUseCase: BuildDetailReferenceNavigationUseCase
 ) {
-  suspend fun getAppBundleItems(packageInfo: PackageInfo): List<AppBundleSplitItem> {
-    return getAppBundleItemsUseCase(packageInfo)
+  suspend fun getAppBundleItems(packageInfo: PackageInfo): List<AppBundleItem> {
+    return buildAppBundleItemDisplayDataUseCase(getAppBundleItemsUseCase(packageInfo))
   }
 
   suspend fun getAppInfoActions(packageName: String) = getAppInfoActionsUseCase(packageName)
