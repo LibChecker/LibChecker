@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.domain.app.detail.content
 
 import com.absinthe.libchecker.database.entity.Features
-import com.absinthe.libchecker.domain.app.VersionedFeature
+import com.absinthe.libchecker.domain.app.model.VersionedFeature
 
 class BuildAppDetailContentInitPlanUseCase {
 

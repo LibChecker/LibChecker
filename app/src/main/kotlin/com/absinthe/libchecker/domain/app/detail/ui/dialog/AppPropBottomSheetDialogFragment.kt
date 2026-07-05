@@ -3,11 +3,11 @@ package com.absinthe.libchecker.domain.app.detail.ui.dialog
 import android.content.pm.PackageInfo
 import androidx.core.os.BundleCompat
 import androidx.lifecycle.lifecycleScope
-import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
 import com.absinthe.libchecker.domain.app.detail.model.AppPropItem
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_INFO
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PROPS
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
+import com.absinthe.libchecker.domain.app.detail.resource.ResolveAppResourceValueUseCase
 import com.absinthe.libchecker.domain.app.detail.ui.view.AppPropsBottomSheetView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.fromJson

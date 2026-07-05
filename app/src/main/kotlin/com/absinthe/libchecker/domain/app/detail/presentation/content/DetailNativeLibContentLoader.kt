@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.domain.app.detail.presentation.content
 
 import com.absinthe.libchecker.database.entity.Features
-import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.domain.app.detail.TRACE_DETAIL_NATIVE_INIT_USE_CASE
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailNativeLibrariesUseCase
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailContentState
@@ -9,6 +8,7 @@ import com.absinthe.libchecker.domain.app.detail.presentation.DetailFeatureState
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailLoadJobsState
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailPackageState
 import com.absinthe.libchecker.domain.app.detail.traceDetailSection
+import com.absinthe.libchecker.domain.app.model.VersionedFeature
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull

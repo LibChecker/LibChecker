@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
-import com.absinthe.libchecker.domain.app.PackageChangeState
+import com.absinthe.libchecker.domain.app.model.PackageChangeState
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSection
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotCapturePlan
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotSystemPropDisplayData

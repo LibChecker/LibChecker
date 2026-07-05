@@ -10,10 +10,10 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
-import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase.AppResourceValue
 import com.absinthe.libchecker.domain.app.detail.model.AppPropItem
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_TEXT
+import com.absinthe.libchecker.domain.app.detail.resource.ResolveAppResourceValueUseCase
+import com.absinthe.libchecker.domain.app.detail.resource.ResolveAppResourceValueUseCase.AppResourceValue
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.XmlBSDFragment
 import com.absinthe.libchecker.domain.app.detail.ui.view.AppPropItemView
 import com.chad.library.adapter.base.BaseQuickAdapter

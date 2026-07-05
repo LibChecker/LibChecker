@@ -8,7 +8,7 @@ import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import androidx.core.net.toUri
 import com.absinthe.libchecker.compat.PackageManagerCompat
-import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

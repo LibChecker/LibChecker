@@ -17,8 +17,8 @@ import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.database.RulesRepository
-import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
+import com.absinthe.libchecker.domain.app.repository.AppListSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemStatusDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSection

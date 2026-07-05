@@ -20,7 +20,7 @@ import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.annotation.SHARED_UID
 import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.database.RulesRepository
-import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceItem
 import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.PackageUtils

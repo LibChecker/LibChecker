@@ -12,7 +12,7 @@ import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getPermissionsList

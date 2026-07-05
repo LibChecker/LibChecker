@@ -3,7 +3,7 @@ package com.absinthe.libchecker.domain.app.detail.action
 import android.content.Context
 import android.content.pm.PackageInfo
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.extensions.PREINSTALLED_TIMESTAMP
 import com.absinthe.libchecker.utils.extensions.getDexFileOptimizationInfo
 import java.text.SimpleDateFormat

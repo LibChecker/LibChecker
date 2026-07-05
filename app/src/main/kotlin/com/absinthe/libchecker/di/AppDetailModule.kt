@@ -3,12 +3,6 @@ package com.absinthe.libchecker.di
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.data.app.GlobalAppDetailSettingsRepository
 import com.absinthe.libchecker.data.app.RemoteLibraryDetailRepository
-import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
-import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCase
-import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
-import com.absinthe.libchecker.domain.app.GetLibraryDetailUseCase
-import com.absinthe.libchecker.domain.app.LibraryDetailRepository
-import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
 import com.absinthe.libchecker.domain.app.detail.BuildAppDetailAbiLabelDataUseCase
 import com.absinthe.libchecker.domain.app.detail.BuildAppDetailHeaderExtraInfoUseCase
 import com.absinthe.libchecker.domain.app.detail.BuildAppDetailHeaderTitleDataUseCase
@@ -32,6 +26,7 @@ import com.absinthe.libchecker.domain.app.detail.action.GetAppLaunchActionUseCas
 import com.absinthe.libchecker.domain.app.detail.action.GetAppManifestPropertiesUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetElfDetailUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetLibraryDetailDialogDataUseCase
+import com.absinthe.libchecker.domain.app.detail.action.GetLibraryDetailUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetOverlayDetailUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetPermissionDetailUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetPermissionProvidersUseCase
@@ -41,7 +36,9 @@ import com.absinthe.libchecker.domain.app.detail.action.PrepareAppPackageShareFi
 import com.absinthe.libchecker.domain.app.detail.content.BuildAppDetailContentInitPlanUseCase
 import com.absinthe.libchecker.domain.app.detail.content.BuildAppDetailTabTypesUseCase
 import com.absinthe.libchecker.domain.app.detail.content.BuildDetailProcessFilterDataUseCase
+import com.absinthe.libchecker.domain.app.detail.content.BuildNativeLibraryItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.detail.content.FilterAppDetailItemsUseCase
+import com.absinthe.libchecker.domain.app.detail.content.GetAppBundleItemsUseCase
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailAbilityChipsUseCase
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailComponentChipsUseCase
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailComponentsUseCase
@@ -65,10 +62,13 @@ import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailComp
 import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailContentLoader
 import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailNativeLibContentLoader
 import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailPermissionContentLoader
+import com.absinthe.libchecker.domain.app.detail.resource.ResolveAppResourceValueUseCase
 import com.absinthe.libchecker.domain.app.packageinfo.GetApkPreviewInfoUseCase
 import com.absinthe.libchecker.domain.app.packageinfo.GetArchivePackageInfoUseCase
 import com.absinthe.libchecker.domain.app.packageinfo.GetInstalledAppComparisonPackageUseCase
 import com.absinthe.libchecker.domain.app.packageinfo.PrepareApkAnalysisPackageUseCase
+import com.absinthe.libchecker.domain.app.repository.AppDetailSettingsRepository
+import com.absinthe.libchecker.domain.app.repository.LibraryDetailRepository
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module

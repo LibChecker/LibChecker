@@ -22,7 +22,7 @@ import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.domain.home.ui.MainActivity
 import com.absinthe.libchecker.domain.snapshot.display.FormatSnapshotTimestampUseCase
 import com.absinthe.libchecker.domain.snapshot.list.capture.CaptureInstalledSnapshotUseCase

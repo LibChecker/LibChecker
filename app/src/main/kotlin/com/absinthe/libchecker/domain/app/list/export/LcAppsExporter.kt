@@ -16,8 +16,8 @@ import android.os.SystemClock
 import androidx.core.graphics.drawable.toBitmap
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.ZipFileCompat
-import com.absinthe.libchecker.domain.app.InstalledAppRepository
-import com.absinthe.libchecker.domain.app.KotlinToolingMetadata
+import com.absinthe.libchecker.domain.app.detail.model.KotlinToolingMetadata
+import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.apk.ApkSignatureSchemeDetector

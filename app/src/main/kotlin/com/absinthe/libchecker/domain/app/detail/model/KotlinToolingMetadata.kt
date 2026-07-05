@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.app
+package com.absinthe.libchecker.domain.app.detail.model
 
 import com.squareup.moshi.JsonClass
 

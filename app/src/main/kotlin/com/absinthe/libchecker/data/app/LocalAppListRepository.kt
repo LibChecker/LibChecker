@@ -2,7 +2,7 @@ package com.absinthe.libchecker.data.app
 
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.AppListRepository
+import com.absinthe.libchecker.domain.app.repository.AppListRepository
 import kotlinx.coroutines.flow.Flow
 
 class LocalAppListRepository(

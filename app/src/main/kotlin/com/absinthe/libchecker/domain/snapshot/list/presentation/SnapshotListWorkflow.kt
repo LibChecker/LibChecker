@@ -3,7 +3,7 @@ package com.absinthe.libchecker.domain.snapshot.list.presentation
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
-import com.absinthe.libchecker.domain.app.AppListRepository
+import com.absinthe.libchecker.domain.app.repository.AppListRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotDiffsUseCase

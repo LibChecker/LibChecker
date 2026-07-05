@@ -7,7 +7,7 @@ import android.content.IntentFilter
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import com.absinthe.libchecker.domain.app.PackageChangeState
+import com.absinthe.libchecker.domain.app.model.PackageChangeState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow

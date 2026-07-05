@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.domain.app.detail.presentation
 
 import android.content.pm.PackageInfo
-import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.domain.app.detail.AppDetailAbiLabelData
 import com.absinthe.libchecker.domain.app.detail.AppDetailHeaderExtraInfo
 import com.absinthe.libchecker.domain.app.detail.BuildAppDetailAbiLabelDataUseCase
@@ -11,6 +10,7 @@ import com.absinthe.libchecker.domain.app.detail.GetAppDetailAbiUseCase
 import com.absinthe.libchecker.domain.app.detail.GetAppDetailFeaturesUseCase
 import com.absinthe.libchecker.domain.app.detail.feature.AppDetailFeatureItemRequest
 import com.absinthe.libchecker.domain.app.detail.feature.BuildAppDetailFeatureItemUseCase
+import com.absinthe.libchecker.domain.app.model.VersionedFeature
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

@@ -1,12 +1,12 @@
 package com.absinthe.libchecker.domain.app.detail.presentation.content
 
 import com.absinthe.libchecker.database.entity.Features
-import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailPermissionChipsUseCase
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailContentState
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailFeatureState
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailLoadJobsState
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailPackageState
+import com.absinthe.libchecker.domain.app.model.VersionedFeature
 import kotlinx.coroutines.CoroutineScope
 
 class DetailPermissionContentLoader(

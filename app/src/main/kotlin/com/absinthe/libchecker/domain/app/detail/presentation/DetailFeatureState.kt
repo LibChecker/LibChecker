@@ -1,8 +1,8 @@
 package com.absinthe.libchecker.domain.app.detail.presentation
 
-import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.domain.app.detail.AppDetailAbi
 import com.absinthe.libchecker.domain.app.detail.model.AppIconItem
+import com.absinthe.libchecker.domain.app.model.VersionedFeature
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow

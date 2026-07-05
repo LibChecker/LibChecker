@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.domain.statistics.chart.usecase
 
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import java.util.TreeMap
 import kotlinx.coroutines.currentCoroutineContext

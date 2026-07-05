@@ -10,12 +10,6 @@ import com.absinthe.libchecker.data.app.LocalAppListRepository
 import com.absinthe.libchecker.data.app.LocalInstalledAppRepository
 import com.absinthe.libchecker.data.app.LocalPackageChangeObserver
 import com.absinthe.libchecker.data.app.WorkerFeatureInitializationRepository
-import com.absinthe.libchecker.domain.app.AppListRepository
-import com.absinthe.libchecker.domain.app.AppListSettingsRepository
-import com.absinthe.libchecker.domain.app.CheckRequiredPackageAvailabilityUseCase
-import com.absinthe.libchecker.domain.app.ClearApkCacheUseCase
-import com.absinthe.libchecker.domain.app.FeatureInitializationRepository
-import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.list.AppListItemFactory
 import com.absinthe.libchecker.domain.app.list.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.app.list.export.AppListExportMetadata
@@ -33,6 +27,12 @@ import com.absinthe.libchecker.domain.app.list.usecase.GetAppListPackageStatesUs
 import com.absinthe.libchecker.domain.app.list.usecase.InitializeAppListUseCase
 import com.absinthe.libchecker.domain.app.list.usecase.InitializePendingAppFeaturesUseCase
 import com.absinthe.libchecker.domain.app.list.usecase.ObserveAppListLoadingUseCase
+import com.absinthe.libchecker.domain.app.maintenance.CheckRequiredPackageAvailabilityUseCase
+import com.absinthe.libchecker.domain.app.maintenance.ClearApkCacheUseCase
+import com.absinthe.libchecker.domain.app.repository.AppListRepository
+import com.absinthe.libchecker.domain.app.repository.AppListSettingsRepository
+import com.absinthe.libchecker.domain.app.repository.FeatureInitializationRepository
+import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.search.HandleAppListSearchCommandUseCase
 import com.absinthe.libchecker.domain.app.sync.SyncAppListChangesUseCase
 import com.absinthe.libchecker.domain.home.presentation.HomeViewModel

@@ -1,8 +1,8 @@
 package com.absinthe.libchecker.domain.app.detail.ui.controller
 
-import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.domain.app.detail.model.LocatedCount
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
+import com.absinthe.libchecker.domain.app.model.VersionedFeature
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach

@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.domain.app.detail.presentation.content
 
-import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.detail.GetAppDetailStaticLibraryTabItemsUseCase
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailAbilityChipsUseCase
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
@@ -9,6 +8,7 @@ import com.absinthe.libchecker.domain.app.detail.presentation.DetailFeatureState
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailLoadJobsState
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailPackageState
 import com.absinthe.libchecker.domain.app.detail.ui.MODE_SORT_BY_SIZE
+import com.absinthe.libchecker.domain.app.repository.AppDetailSettingsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

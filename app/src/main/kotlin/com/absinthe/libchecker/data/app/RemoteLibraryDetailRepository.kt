@@ -5,7 +5,7 @@ import com.absinthe.libchecker.api.bean.LibDetailBean
 import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
 import com.absinthe.libchecker.api.request.LibDetailRequest
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.domain.app.LibraryDetailRepository
+import com.absinthe.libchecker.domain.app.repository.LibraryDetailRepository
 import retrofit2.HttpException
 
 object RemoteLibraryDetailRepository : LibraryDetailRepository {

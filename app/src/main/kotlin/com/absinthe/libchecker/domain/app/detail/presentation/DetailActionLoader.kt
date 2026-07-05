@@ -4,8 +4,6 @@ import android.content.pm.PackageInfo
 import android.net.Uri
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.AppBundleSplitItem
-import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
 import com.absinthe.libchecker.domain.app.detail.GetRelatedAppDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.detail.action.AppManifestProperty
 import com.absinthe.libchecker.domain.app.detail.action.AppPackageShareFile
@@ -27,6 +25,8 @@ import com.absinthe.libchecker.domain.app.detail.action.GetOverlayDetailUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetPermissionDetailUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetXposedModuleInfoUseCase
 import com.absinthe.libchecker.domain.app.detail.action.PrepareAppPackageShareActionUseCase
+import com.absinthe.libchecker.domain.app.detail.content.AppBundleSplitItem
+import com.absinthe.libchecker.domain.app.detail.content.GetAppBundleItemsUseCase
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.navigation.BuildDetailReferenceNavigationUseCase

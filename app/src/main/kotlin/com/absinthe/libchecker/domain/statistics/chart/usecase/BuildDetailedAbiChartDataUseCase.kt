@@ -2,7 +2,7 @@ package com.absinthe.libchecker.domain.statistics.chart.usecase
 
 import android.content.Context
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.PackageUtils
 import java.io.File
 import java.util.TreeMap

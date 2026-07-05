@@ -7,7 +7,7 @@ import com.absinthe.libchecker.api.bean.LibDetailBean
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.database.RulesRepository
-import com.absinthe.libchecker.domain.app.GetLibraryDetailUseCase
+import com.absinthe.libchecker.domain.app.detail.action.GetLibraryDetailUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

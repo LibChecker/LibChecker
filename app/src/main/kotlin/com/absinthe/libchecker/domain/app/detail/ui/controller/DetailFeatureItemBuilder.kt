@@ -3,7 +3,6 @@ package com.absinthe.libchecker.domain.app.detail.ui.controller
 import android.content.pm.PackageInfo
 import android.graphics.drawable.Drawable
 import androidx.fragment.app.FragmentActivity
-import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.domain.app.detail.feature.AppDetailFeatureAction
 import com.absinthe.libchecker.domain.app.detail.feature.AppDetailFeatureItemData
 import com.absinthe.libchecker.domain.app.detail.model.AppIconItem
@@ -12,6 +11,7 @@ import com.absinthe.libchecker.domain.app.detail.model.FeatureItem
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
 import com.absinthe.libchecker.domain.app.detail.ui.FeaturesDialog
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.XposedInfoDialogFragment
+import com.absinthe.libchecker.domain.app.model.VersionedFeature
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
 

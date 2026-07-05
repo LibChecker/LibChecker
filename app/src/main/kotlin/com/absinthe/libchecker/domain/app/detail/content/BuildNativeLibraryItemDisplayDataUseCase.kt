@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.app
+package com.absinthe.libchecker.domain.app.detail.content
 
 import android.content.Context
 import com.absinthe.libchecker.annotation.ET_DYN

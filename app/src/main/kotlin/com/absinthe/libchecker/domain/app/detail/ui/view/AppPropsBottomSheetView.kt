@@ -16,7 +16,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.URLManager
-import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
+import com.absinthe.libchecker.domain.app.detail.resource.ResolveAppResourceValueUseCase
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.AppPropsAdapter
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView

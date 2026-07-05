@@ -5,8 +5,8 @@ import android.content.pm.PackageInfo
 import androidx.annotation.DrawableRes
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.list.related.RelatedAppListItem
+import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.PackageUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

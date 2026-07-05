@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.domain.app.detail.action
 
 import android.content.pm.PackageManager
-import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
 import timber.log.Timber

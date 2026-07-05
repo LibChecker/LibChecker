@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.list.model.AppListItemViewState
+import com.absinthe.libchecker.domain.app.repository.AppListRepository
 import com.absinthe.libchecker.domain.statistics.chart.model.ChartType
 import com.absinthe.libchecker.domain.statistics.chart.model.LOADING_PROGRESS_MAX
 import com.absinthe.libchecker.domain.statistics.chart.repository.ChartSettingsRepository

@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.app
+package com.absinthe.libchecker.domain.app.maintenance
 
 import android.content.Context
 import com.absinthe.libchecker.utils.extensions.requireAvailableCacheDir

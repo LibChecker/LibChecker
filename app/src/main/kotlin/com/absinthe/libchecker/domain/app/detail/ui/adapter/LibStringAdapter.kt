@@ -31,9 +31,7 @@ import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.constant.options.AdvancedOptions
-import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCase
-import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
-import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase.AppResourceValue
+import com.absinthe.libchecker.domain.app.detail.content.BuildNativeLibraryItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.detail.model.LibStringComponentItemDisplay
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
@@ -43,6 +41,8 @@ import com.absinthe.libchecker.domain.app.detail.model.NativeLibraryItemDisplayD
 import com.absinthe.libchecker.domain.app.detail.model.StaticLibItem
 import com.absinthe.libchecker.domain.app.detail.model.buildLibStringItemDescription
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_TEXT
+import com.absinthe.libchecker.domain.app.detail.resource.ResolveAppResourceValueUseCase
+import com.absinthe.libchecker.domain.app.detail.resource.ResolveAppResourceValueUseCase.AppResourceValue
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.XmlBSDFragment
 import com.absinthe.libchecker.domain.app.detail.ui.view.ComponentLibItemView
 import com.absinthe.libchecker.domain.app.detail.ui.view.MetadataLibItemView

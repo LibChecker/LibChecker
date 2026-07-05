@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.domain.app.detail
 
 import android.content.pm.PackageInfo
-import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
+import com.absinthe.libchecker.domain.app.detail.content.GetAppBundleItemsUseCase
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
 import kotlinx.coroutines.Dispatchers

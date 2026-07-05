@@ -3,7 +3,7 @@ package com.absinthe.libchecker.domain.app.detail.action
 import android.content.pm.PackageManager
 import android.content.pm.PermissionInfo
 import android.graphics.drawable.Drawable
-import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.extensions.getAppName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

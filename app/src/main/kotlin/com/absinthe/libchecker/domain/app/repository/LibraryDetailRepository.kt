@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.app
+package com.absinthe.libchecker.domain.app.repository
 
 import com.absinthe.libchecker.api.bean.LibDetailBean
 

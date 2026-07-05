@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.app
+package com.absinthe.libchecker.domain.app.model
 
 data class VersionedFeature(
   val featureType: Int,

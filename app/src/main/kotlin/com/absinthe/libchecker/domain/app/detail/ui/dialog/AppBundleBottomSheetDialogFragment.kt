@@ -3,7 +3,7 @@ package com.absinthe.libchecker.domain.app.detail.ui.dialog
 import android.content.pm.PackageInfo
 import androidx.core.os.BundleCompat
 import androidx.lifecycle.lifecycleScope
-import com.absinthe.libchecker.domain.app.AppBundleSplitKind
+import com.absinthe.libchecker.domain.app.detail.content.AppBundleSplitKind
 import com.absinthe.libchecker.domain.app.detail.model.AppBundleItem
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_INFO
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel

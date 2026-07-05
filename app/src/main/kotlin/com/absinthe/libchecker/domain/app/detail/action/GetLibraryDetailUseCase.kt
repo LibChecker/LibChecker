@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.app
+package com.absinthe.libchecker.domain.app.detail.action
 
 import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.ACTIVITY
@@ -10,6 +10,7 @@ import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.api.bean.LibDetailBean
+import com.absinthe.libchecker.domain.app.repository.LibraryDetailRepository
 import com.absinthe.libchecker.utils.DateUtils
 import java.text.SimpleDateFormat
 import java.util.Locale

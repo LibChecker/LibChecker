@@ -7,8 +7,8 @@ import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
-import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.detail.model.StatefulComponent
+import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.ParsedIntentFilter

@@ -10,9 +10,6 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
-import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
-import com.absinthe.libchecker.domain.app.AppListSettingsRepository
-import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.domain.app.detail.content.BuildAppDetailContentInitPlanUseCase
 import com.absinthe.libchecker.domain.app.detail.content.BuildAppDetailTabTypesUseCase
 import com.absinthe.libchecker.domain.app.detail.model.DetailExtraBean
@@ -37,6 +34,9 @@ import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailPackageCont
 import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailStateObserverController
 import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailTabController
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.AppInfoBottomSheetDialogFragment
+import com.absinthe.libchecker.domain.app.model.VersionedFeature
+import com.absinthe.libchecker.domain.app.repository.AppDetailSettingsRepository
+import com.absinthe.libchecker.domain.app.repository.AppListSettingsRepository
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.utils.extensions.addBackStateHandler
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding

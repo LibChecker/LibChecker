@@ -2,7 +2,7 @@ package com.absinthe.libchecker.domain.app.packageinfo
 
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

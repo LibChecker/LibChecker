@@ -1,6 +1,6 @@
 package com.absinthe.libchecker.domain.app.detail.action
 
-import com.absinthe.libchecker.domain.app.AppInstallSource
+import com.absinthe.libchecker.domain.app.model.AppInstallSource
 import com.absinthe.libchecker.utils.extensions.DexFileOptimizationInfo
 
 data class AppInstallSourceDetails(

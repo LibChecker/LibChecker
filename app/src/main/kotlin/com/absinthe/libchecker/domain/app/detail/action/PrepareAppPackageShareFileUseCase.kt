@@ -3,7 +3,7 @@ package com.absinthe.libchecker.domain.app.detail.action
 import android.content.Context
 import android.content.pm.PackageInfo
 import androidx.core.content.FileProvider
-import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getVersionCode
