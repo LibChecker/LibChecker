@@ -8,7 +8,6 @@ import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.AppBundleSplitItem
-import com.absinthe.libchecker.domain.app.PrepareApkAnalysisPackageUseCase
 import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.domain.app.detail.AppDetailAbiLabelData
 import com.absinthe.libchecker.domain.app.detail.AppDetailHeaderExtraInfo
@@ -32,6 +31,7 @@ import com.absinthe.libchecker.domain.app.detail.presentation.DetailFilterContro
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailPackageLoader
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailPackageState
 import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailContentLoader
+import com.absinthe.libchecker.domain.app.packageinfo.PrepareApkAnalysisPackageUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
 import java.io.File

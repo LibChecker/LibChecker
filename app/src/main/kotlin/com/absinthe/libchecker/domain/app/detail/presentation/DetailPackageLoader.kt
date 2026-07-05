@@ -2,10 +2,10 @@ package com.absinthe.libchecker.domain.app.detail.presentation
 
 import android.content.pm.PackageInfo
 import android.net.Uri
-import com.absinthe.libchecker.domain.app.GetApkPreviewInfoUseCase
-import com.absinthe.libchecker.domain.app.GetInstalledAppComparisonPackageUseCase
-import com.absinthe.libchecker.domain.app.PrepareApkAnalysisPackageUseCase
 import com.absinthe.libchecker.domain.app.detail.packageinfo.GetAppDetailPackageUseCase
+import com.absinthe.libchecker.domain.app.packageinfo.GetApkPreviewInfoUseCase
+import com.absinthe.libchecker.domain.app.packageinfo.GetInstalledAppComparisonPackageUseCase
+import com.absinthe.libchecker.domain.app.packageinfo.PrepareApkAnalysisPackageUseCase
 import com.absinthe.libchecker.domain.snapshot.comparison.usecase.BuildPackageComparisonSnapshotItemUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo

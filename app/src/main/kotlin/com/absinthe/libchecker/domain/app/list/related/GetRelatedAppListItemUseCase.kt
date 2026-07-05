@@ -1,5 +1,7 @@
-package com.absinthe.libchecker.domain.app
+package com.absinthe.libchecker.domain.app.list.related
 
+import com.absinthe.libchecker.domain.app.AppListRepository
+import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

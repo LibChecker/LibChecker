@@ -8,11 +8,11 @@ import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.compat.ZipFileCompat
 import com.absinthe.libchecker.database.entity.Features
-import com.absinthe.libchecker.domain.app.AppIconItem
 import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.KotlinToolingMetadata
 import com.absinthe.libchecker.domain.app.VersionedFeature
+import com.absinthe.libchecker.domain.app.detail.model.AppIconItem
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getFeatures

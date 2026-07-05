@@ -1,7 +1,8 @@
-package com.absinthe.libchecker.domain.app
+package com.absinthe.libchecker.domain.app.list
 
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
+import com.absinthe.libchecker.domain.app.InstalledAppRepository
 
 class GetRandomAppIconUseCase(
   private val packageManager: PackageManager,

@@ -3,10 +3,10 @@ package com.absinthe.libchecker.domain.app.detail.ui.controller
 import android.content.pm.PackageInfo
 import android.graphics.drawable.Drawable
 import androidx.fragment.app.FragmentActivity
-import com.absinthe.libchecker.domain.app.AppIconItem
 import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.domain.app.detail.feature.AppDetailFeatureAction
 import com.absinthe.libchecker.domain.app.detail.feature.AppDetailFeatureItemData
+import com.absinthe.libchecker.domain.app.detail.model.AppIconItem
 import com.absinthe.libchecker.domain.app.detail.model.DetailFeatureItem
 import com.absinthe.libchecker.domain.app.detail.model.FeatureItem
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel

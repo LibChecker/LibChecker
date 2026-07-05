@@ -6,8 +6,8 @@ import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.list.model.AppListItemDisplay
 import com.absinthe.libchecker.domain.app.list.model.AppListItemViewState
+import com.absinthe.libchecker.domain.app.list.stableAppListItemIdForKey
 import com.absinthe.libchecker.domain.app.list.ui.view.AppItemView
-import com.absinthe.libchecker.domain.app.stableAppListItemIdForKey
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr

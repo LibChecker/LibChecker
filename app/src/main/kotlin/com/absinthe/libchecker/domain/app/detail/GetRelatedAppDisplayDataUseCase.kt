@@ -1,6 +1,6 @@
 package com.absinthe.libchecker.domain.app.detail
 
-import com.absinthe.libchecker.domain.app.GetRelatedAppListItemUseCase
+import com.absinthe.libchecker.domain.app.list.related.GetRelatedAppListItemUseCase
 
 class GetRelatedAppDisplayDataUseCase(
   private val getRelatedAppListItemUseCase: GetRelatedAppListItemUseCase,

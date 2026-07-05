@@ -26,7 +26,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.databinding.ActivityComparisonBinding
-import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
+import com.absinthe.libchecker.domain.app.list.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.snapshot.comparison.model.SnapshotComparisonPlan
 import com.absinthe.libchecker.domain.snapshot.comparison.model.SnapshotComparisonSide
 import com.absinthe.libchecker.domain.snapshot.comparison.presentation.ComparisonDashboardStatePlanner

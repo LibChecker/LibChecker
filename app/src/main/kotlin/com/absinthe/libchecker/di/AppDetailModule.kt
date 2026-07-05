@@ -5,13 +5,9 @@ import com.absinthe.libchecker.data.app.GlobalAppDetailSettingsRepository
 import com.absinthe.libchecker.data.app.RemoteLibraryDetailRepository
 import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCase
-import com.absinthe.libchecker.domain.app.GetApkPreviewInfoUseCase
 import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
-import com.absinthe.libchecker.domain.app.GetArchivePackageInfoUseCase
-import com.absinthe.libchecker.domain.app.GetInstalledAppComparisonPackageUseCase
 import com.absinthe.libchecker.domain.app.GetLibraryDetailUseCase
 import com.absinthe.libchecker.domain.app.LibraryDetailRepository
-import com.absinthe.libchecker.domain.app.PrepareApkAnalysisPackageUseCase
 import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
 import com.absinthe.libchecker.domain.app.detail.BuildAppDetailAbiLabelDataUseCase
 import com.absinthe.libchecker.domain.app.detail.BuildAppDetailHeaderExtraInfoUseCase
@@ -69,6 +65,10 @@ import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailComp
 import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailContentLoader
 import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailNativeLibContentLoader
 import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailPermissionContentLoader
+import com.absinthe.libchecker.domain.app.packageinfo.GetApkPreviewInfoUseCase
+import com.absinthe.libchecker.domain.app.packageinfo.GetArchivePackageInfoUseCase
+import com.absinthe.libchecker.domain.app.packageinfo.GetInstalledAppComparisonPackageUseCase
+import com.absinthe.libchecker.domain.app.packageinfo.PrepareApkAnalysisPackageUseCase
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module

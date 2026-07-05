@@ -5,8 +5,8 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.database.entity.Features
-import com.absinthe.libchecker.domain.app.AppIconItem
 import com.absinthe.libchecker.domain.app.VersionedFeature
+import com.absinthe.libchecker.domain.app.detail.model.AppIconItem
 
 class BuildAppDetailFeatureItemUseCase {
 

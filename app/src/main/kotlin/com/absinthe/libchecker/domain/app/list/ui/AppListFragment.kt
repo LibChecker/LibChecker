@@ -26,7 +26,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
-import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
+import com.absinthe.libchecker.domain.app.list.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.app.list.TRACE_APP_LIST_APPLY_UPDATE_MAIN
 import com.absinthe.libchecker.domain.app.list.TRACE_APP_LIST_REMAINING_ITEM_VIEW_STATES
 import com.absinthe.libchecker.domain.app.list.traceAppListSection

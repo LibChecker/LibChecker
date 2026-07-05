@@ -29,7 +29,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
-import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
+import com.absinthe.libchecker.domain.app.list.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
 import com.absinthe.libchecker.domain.home.ui.INavViewContainer
 import com.absinthe.libchecker.domain.snapshot.album.ui.AlbumActivity
