@@ -34,10 +34,9 @@ import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
 import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase.AppResourceValue
-import com.absinthe.libchecker.domain.app.detail.model.DISABLED
-import com.absinthe.libchecker.domain.app.detail.model.EXPORTED
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
+import com.absinthe.libchecker.domain.app.detail.model.LibStringItemNameDisplay
 import com.absinthe.libchecker.domain.app.detail.model.NativeLibraryItemDisplayData
 import com.absinthe.libchecker.domain.app.detail.model.StaticLibItem
 import com.absinthe.libchecker.domain.app.detail.model.buildLibStringItemDescription
@@ -121,43 +120,13 @@ class LibStringAdapter(
   }
 
   override fun convert(holder: BaseViewHolder, item: LibStringItemChip) {
-    val itemName = when (item.item.source) {
-      DISABLED -> {
-        if (isItemOptionEnabled(AdvancedOptions.MARK_DISABLED) || type == PERMISSION) {
-          buildSpannedString {
-            strikeThrough {
-              inSpans(StyleSpan(Typeface.BOLD_ITALIC)) {
-                append(item.item.name)
-              }
-            }
-            // prevent text clipping
-            append(" ")
-          }
-        } else {
-          item.item.name
-        }
-      }
-
-      EXPORTED -> {
-        if (isItemOptionEnabled(AdvancedOptions.MARK_EXPORTED)) {
-          buildSpannedString {
-            append(item.item.name)
-            setSpan(
-              ForegroundColorSpan(context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary)),
-              0,
-              item.item.name.length,
-              Spannable.SPAN_INCLUSIVE_EXCLUSIVE
-            )
-          }
-        } else {
-          item.item.name
-        }
-      }
-
-      else -> {
-        item.item.name
-      }
-    }
+    val itemName = renderItemName(
+      LibStringItemNameDisplay.create(
+        item = item.item,
+        type = type,
+        itemDisplayOptions = itemDisplayOptions
+      )
+    )
 
     when (type) {
       NATIVE -> setNativeContent(holder.itemView as NativeLibItemView, item, itemName)
@@ -206,6 +175,32 @@ class LibStringAdapter(
       if (holder.itemView.background is TransitionDrawable) {
         (holder.itemView.background as TransitionDrawable).startTransition(
           HIGHLIGHT_TRANSITION_DURATION
+        )
+      }
+    }
+  }
+
+  private fun renderItemName(display: LibStringItemNameDisplay): CharSequence {
+    return when (display.decoration) {
+      LibStringItemNameDisplay.Decoration.Plain -> display.text
+
+      LibStringItemNameDisplay.Decoration.Disabled -> buildSpannedString {
+        strikeThrough {
+          inSpans(StyleSpan(Typeface.BOLD_ITALIC)) {
+            append(display.text)
+          }
+        }
+        // prevent text clipping
+        append(" ")
+      }
+
+      LibStringItemNameDisplay.Decoration.Exported -> buildSpannedString {
+        append(display.text)
+        setSpan(
+          ForegroundColorSpan(context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary)),
+          0,
+          display.text.length,
+          Spannable.SPAN_INCLUSIVE_EXCLUSIVE
         )
       }
     }
