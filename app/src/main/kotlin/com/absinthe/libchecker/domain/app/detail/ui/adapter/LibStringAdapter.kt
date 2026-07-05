@@ -34,6 +34,7 @@ import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
 import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase.AppResourceValue
+import com.absinthe.libchecker.domain.app.detail.model.LibStringComponentItemDisplay
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemNameDisplay
@@ -138,20 +139,22 @@ class LibStringAdapter(
       STATIC -> setStaticContent(holder.itemView as StaticLibItemView, item, itemName)
 
       else -> {
+        val display = LibStringComponentItemDisplay.create(
+          item = item,
+          type = type,
+          itemDisplayOptions = itemDisplayOptions,
+          processMode = processMode
+        )
         (holder.itemView as ComponentLibItemView).apply {
-          processLabelColor = item.item.process.takeIf { !it.isNullOrEmpty() && processMode }
+          processLabelColor = display.processName
             ?.let { processMap[it] ?: UiUtils.getRandomColor() } ?: -1
-          setOrHighlightText(libName, itemName)
-          if (isItemOptionEnabled(AdvancedOptions.SHOW_MARKED_LIB)) {
+          setOrHighlightText(libName, renderItemName(display.name))
+          if (display.showRuleChip) {
             setChip(item.rule, colorfulRuleIcon)
           } else {
             setChip(null, colorfulRuleIcon)
           }
-          contentDescription = buildLibStringItemDescription(
-            itemName,
-            item.rule?.label.takeIf { isItemOptionEnabled(AdvancedOptions.SHOW_MARKED_LIB) },
-            item.item.process.takeIf { !it.isNullOrEmpty() && processMode }
-          )
+          contentDescription = display.contentDescription
         }
       }
     }
