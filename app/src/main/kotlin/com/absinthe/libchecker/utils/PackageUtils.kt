@@ -712,7 +712,7 @@ object PackageUtils {
     return list.asSequence()
       .map {
         val name = if (isSimpleName) {
-          it.name.orEmpty().removePrefix(packageName)
+          it.name.orEmpty().shortenComponentName(packageName)
         } else {
           it.name.orEmpty()
         }
@@ -737,7 +737,7 @@ object PackageUtils {
     return list.asSequence()
       .map {
         val name = if (isSimpleName) {
-          it.removePrefix(packageName)
+          it.shortenComponentName(packageName)
         } else {
           it
         }
@@ -764,12 +764,20 @@ object PackageUtils {
     return list.asSequence()
       .map {
         if (isSimpleName) {
-          it.name.removePrefix(packageName)
+          it.name.shortenComponentName(packageName)
         } else {
           it.name
         }
       }
       .toList()
+  }
+
+  private fun String.shortenComponentName(packageName: String): String {
+    return if (packageName.isNotEmpty() && startsWith("$packageName.")) {
+      removePrefix(packageName)
+    } else {
+      this
+    }
   }
 
   /**

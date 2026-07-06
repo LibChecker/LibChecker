@@ -304,7 +304,7 @@ class DetailItemLongClickController(
       AnywhereManager().launchActivityEditor(
         fragment.requireContext(),
         actions.packageName,
-        actions.componentName
+        actions.fullComponentName
       )
     }
   }
