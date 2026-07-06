@@ -5,6 +5,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
+import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.domain.app.detail.ui.Referable
 import com.absinthe.libchecker.domain.app.detail.ui.base.BaseDetailFragment
 import com.absinthe.libchecker.domain.app.detail.ui.base.EXTRA_TYPE
@@ -56,8 +57,11 @@ class ComponentsAnalysisFragment :
   }
 
   companion object {
-    fun newInstance(@LibType type: Int): ComponentsAnalysisFragment {
-      return ComponentsAnalysisFragment().putArguments(EXTRA_TYPE to type)
+    fun newInstance(packageName: String, @LibType type: Int): ComponentsAnalysisFragment {
+      return ComponentsAnalysisFragment().putArguments(
+        EXTRA_PACKAGE_NAME to packageName,
+        EXTRA_TYPE to type
+      )
     }
   }
 }

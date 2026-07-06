@@ -149,7 +149,7 @@ class DetailTabController(
       SIGNATURES -> SignaturesAnalysisFragment.newInstance(packageName)
 
       else -> if (!isHarmonyMode) {
-        ComponentsAnalysisFragment.newInstance(type)
+        ComponentsAnalysisFragment.newInstance(packageName, type)
       } else {
         AbilityAnalysisFragment.newInstance(type)
       }
