@@ -47,6 +47,18 @@ def read_apk_info(apk_path, projects_file=PROJECTS_FILE):
   }
 
 
+def read_update_apk_info(foss_path, market_path=None, projects_file=PROJECTS_FILE):
+  info = read_apk_info(foss_path, projects_file)
+  if market_path:
+    market_info = read_apk_info(market_path, projects_file)
+    info.update({
+      "market-version-name": market_info["version-name"],
+      "market-version-code": market_info["version-code"],
+      "market-file-size": market_info["file-size"]
+    })
+  return info
+
+
 def write_github_outputs(outputs, output_path):
   with Path(output_path).open("a") as output:
     for key, value in outputs.items():
@@ -55,7 +67,7 @@ def write_github_outputs(outputs, output_path):
 
 def main():
   write_github_outputs(
-    read_apk_info(os.environ["FOSS_FILE"]),
+    read_update_apk_info(os.environ["FOSS_FILE"], os.environ.get("MARKET_FILE")),
     os.environ["GITHUB_OUTPUT"]
   )
 

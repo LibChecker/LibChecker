@@ -143,6 +143,7 @@ jobs:
         id: apk-info
         env:
           FOSS_FILE: ${{ steps.apk-path.outputs.foss_path }}
+          MARKET_FILE: ${{ steps.apk-path.outputs.market_path }}
         run: python3 .github/scripts/read_apk_info.py
       - name: Build Telegram caption
         id: telegram-caption
@@ -177,20 +178,26 @@ jobs:
       - name: Update assets ci branch
         env:
           FOSS_FILE: ${{ github.workspace }}/${{ steps.apk-path.outputs.foss_path }}
+          MARKET_FILE: ${{ github.workspace }}/${{ steps.apk-path.outputs.market_path }}
           APK_VERSION_NAME: ${{ steps.apk-info.outputs.version-name }}
           APK_VERSION_CODE: ${{ steps.apk-info.outputs.version-code }}
+          MARKET_APK_VERSION_NAME: ${{ steps.apk-info.outputs.market-version-name }}
+          MARKET_APK_VERSION_CODE: ${{ steps.apk-info.outputs.market-version-code }}
           BASE_VERSION_NAME: ${{ steps.apk-info.outputs.base-version-name }}
-          RELEASE_APK_FILE_NAME: LibChecker-${{ steps.apk-info.outputs.version-name }}-${{ steps.apk-info.outputs.version-code }}-foss-release.apk
+          FOSS_RELEASE_APK_FILE_NAME: LibChecker-${{ steps.apk-info.outputs.version-name }}-${{ steps.apk-info.outputs.version-code }}-foss-release.apk
+          MARKET_RELEASE_APK_FILE_NAME: LibChecker-${{ steps.apk-info.outputs.market-version-name }}-${{ steps.apk-info.outputs.market-version-code }}-market-release.apk
           TARGET_SDK_VERSION: ${{ steps.apk-info.outputs.target-sdk-version }}
           MIN_SDK_VERSION: ${{ steps.apk-info.outputs.min-sdk-version }}
           COMPILE_SDK_VERSION: ${{ steps.apk-info.outputs.compile-sdk-version }}
           APK_FILE_SIZE: ${{ steps.apk-info.outputs.file-size }}
+          MARKET_APK_FILE_SIZE: ${{ steps.apk-info.outputs.market-file-size }}
           IS_STABLE: ${{ steps.apk-info.outputs.is-stable }}
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           cd ${{ github.workspace }}/assets-ci
 
           cp -f "$FOSS_FILE" ./app-release.apk
+          cp -f "$MARKET_FILE" ./app-market-release.apk
           python3 "${{ github.workspace }}/.github/scripts/write_assets_metadata.py" \
             --output ci.json \
             --version "$APK_VERSION_NAME" \
@@ -199,7 +206,11 @@ jobs:
             --min "$MIN_SDK_VERSION" \
             --compile "$COMPILE_SDK_VERSION" \
             --package-size "$APK_FILE_SIZE" \
-            --link "https://gh.absinthe.life/github.com/LibChecker/assets/raw/refs/heads/ci/app-release.apk"
+            --link "https://gh.absinthe.life/github.com/LibChecker/assets/raw/refs/heads/ci/app-release.apk" \
+            --market-version "$MARKET_APK_VERSION_NAME" \
+            --market-version-code "$MARKET_APK_VERSION_CODE" \
+            --market-package-size "$MARKET_APK_FILE_SIZE" \
+            --market-link "https://gh.absinthe.life/github.com/LibChecker/assets/raw/refs/heads/ci/app-market-release.apk"
 
           if [ "$IS_STABLE" = "true" ]; then
             python3 "${{ github.workspace }}/.github/scripts/write_assets_metadata.py" \
@@ -210,8 +221,12 @@ jobs:
               --min "$MIN_SDK_VERSION" \
               --compile "$COMPILE_SDK_VERSION" \
               --package-size "$APK_FILE_SIZE" \
-              --link "https://gh.absinthe.life/github.com/LibChecker/LibChecker/releases/download/$BASE_VERSION_NAME/$RELEASE_APK_FILE_NAME" \
-              --note "https://github.com/LibChecker/LibChecker/releases"
+              --link "https://gh.absinthe.life/github.com/LibChecker/LibChecker/releases/download/$BASE_VERSION_NAME/$FOSS_RELEASE_APK_FILE_NAME" \
+              --note "https://github.com/LibChecker/LibChecker/releases" \
+              --market-version "$BASE_VERSION_NAME" \
+              --market-version-code "$MARKET_APK_VERSION_CODE" \
+              --market-package-size "$MARKET_APK_FILE_SIZE" \
+              --market-link "https://gh.absinthe.life/github.com/LibChecker/LibChecker/releases/download/$BASE_VERSION_NAME/$MARKET_RELEASE_APK_FILE_NAME"
           else
             python3 "${{ github.workspace }}/.github/scripts/sync_latest_stable_metadata.py" \
               --output stable.json \
@@ -222,7 +237,7 @@ jobs:
 
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add app-release.apk ci.json stable.json
+          git add app-release.apk app-market-release.apk ci.json stable.json
           if git diff --cached --quiet; then
             echo "No assets ci changes"
           else
@@ -240,12 +255,16 @@ jobs:
         env:
           APK_VERSION_NAME: ${{ steps.apk-info.outputs.version-name }}
           APK_VERSION_CODE: ${{ steps.apk-info.outputs.version-code }}
+          MARKET_APK_VERSION_NAME: ${{ steps.apk-info.outputs.market-version-name }}
+          MARKET_APK_VERSION_CODE: ${{ steps.apk-info.outputs.market-version-code }}
           BASE_VERSION_NAME: ${{ steps.apk-info.outputs.base-version-name }}
-          RELEASE_APK_FILE_NAME: LibChecker-${{ steps.apk-info.outputs.version-name }}-${{ steps.apk-info.outputs.version-code }}-foss-release.apk
+          FOSS_RELEASE_APK_FILE_NAME: LibChecker-${{ steps.apk-info.outputs.version-name }}-${{ steps.apk-info.outputs.version-code }}-foss-release.apk
+          MARKET_RELEASE_APK_FILE_NAME: LibChecker-${{ steps.apk-info.outputs.market-version-name }}-${{ steps.apk-info.outputs.market-version-code }}-market-release.apk
           TARGET_SDK_VERSION: ${{ steps.apk-info.outputs.target-sdk-version }}
           MIN_SDK_VERSION: ${{ steps.apk-info.outputs.min-sdk-version }}
           COMPILE_SDK_VERSION: ${{ steps.apk-info.outputs.compile-sdk-version }}
           APK_FILE_SIZE: ${{ steps.apk-info.outputs.file-size }}
+          MARKET_APK_FILE_SIZE: ${{ steps.apk-info.outputs.market-file-size }}
           IS_STABLE: ${{ steps.apk-info.outputs.is-stable }}
           GITHUB_TOKEN: ${{ github.token }}
         run: |
@@ -259,7 +278,11 @@ jobs:
             --min "$MIN_SDK_VERSION" \
             --compile "$COMPILE_SDK_VERSION" \
             --package-size "$APK_FILE_SIZE" \
-            --link "https://gh.absinthe.life/github.com/LibChecker/assets/raw/refs/heads/ci/app-release.apk"
+            --link "https://gh.absinthe.life/github.com/LibChecker/assets/raw/refs/heads/ci/app-release.apk" \
+            --market-version "$MARKET_APK_VERSION_NAME" \
+            --market-version-code "$MARKET_APK_VERSION_CODE" \
+            --market-package-size "$MARKET_APK_FILE_SIZE" \
+            --market-link "https://gh.absinthe.life/github.com/LibChecker/assets/raw/refs/heads/ci/app-market-release.apk"
 
           if [ "$IS_STABLE" = "true" ]; then
             python3 "${{ github.workspace }}/.github/scripts/write_assets_metadata.py" \
@@ -270,8 +293,12 @@ jobs:
               --min "$MIN_SDK_VERSION" \
               --compile "$COMPILE_SDK_VERSION" \
               --package-size "$APK_FILE_SIZE" \
-              --link "https://gh.absinthe.life/github.com/LibChecker/LibChecker/releases/download/$BASE_VERSION_NAME/$RELEASE_APK_FILE_NAME" \
-              --note "https://github.com/LibChecker/LibChecker/releases"
+              --link "https://gh.absinthe.life/github.com/LibChecker/LibChecker/releases/download/$BASE_VERSION_NAME/$FOSS_RELEASE_APK_FILE_NAME" \
+              --note "https://github.com/LibChecker/LibChecker/releases" \
+              --market-version "$BASE_VERSION_NAME" \
+              --market-version-code "$MARKET_APK_VERSION_CODE" \
+              --market-package-size "$MARKET_APK_FILE_SIZE" \
+              --market-link "https://gh.absinthe.life/github.com/LibChecker/LibChecker/releases/download/$BASE_VERSION_NAME/$MARKET_RELEASE_APK_FILE_NAME"
           else
             python3 "${{ github.workspace }}/.github/scripts/sync_latest_stable_metadata.py" \
               --output stable.json \

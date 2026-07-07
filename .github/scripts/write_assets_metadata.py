@@ -3,21 +3,54 @@ import json
 from pathlib import Path
 
 
-def build_metadata(args):
+def build_app_metadata(version, version_code, target, min_sdk, compile_sdk, package_size, link, note=None):
   app = {
-    "version": args.version,
-    "versionCode": args.version_code,
+    "version": version,
+    "versionCode": version_code,
     "extra": {
-      "target": args.target,
-      "min": args.min,
-      "compile": args.compile,
-      "packageSize": args.package_size
+      "target": target,
+      "min": min_sdk,
+      "compile": compile_sdk,
+      "packageSize": package_size
     },
-    "link": args.link
+    "link": link
   }
-  if args.note:
-    app["note"] = args.note
-  return {"app": app}
+  if note:
+    app["note"] = note
+  return app
+
+
+def build_metadata(args):
+  foss_app = build_app_metadata(
+    args.version,
+    args.version_code,
+    args.target,
+    args.min,
+    args.compile,
+    args.package_size,
+    args.link,
+    args.note
+  )
+  metadata = {
+    "app": foss_app,
+    "flavors": {
+      "foss": foss_app
+    }
+  }
+
+  market_link = getattr(args, "market_link", None)
+  if market_link:
+    metadata["flavors"]["market"] = build_app_metadata(
+      getattr(args, "market_version", None) or args.version,
+      getattr(args, "market_version_code", None) or args.version_code,
+      args.target,
+      args.min,
+      args.compile,
+      getattr(args, "market_package_size", None) or args.package_size,
+      market_link,
+      args.note
+    )
+  return metadata
 
 
 def parse_args():
@@ -31,6 +64,10 @@ def parse_args():
   parser.add_argument("--package-size", required=True, type=int)
   parser.add_argument("--link", required=True)
   parser.add_argument("--note")
+  parser.add_argument("--market-version")
+  parser.add_argument("--market-version-code", type=int)
+  parser.add_argument("--market-package-size", type=int)
+  parser.add_argument("--market-link")
   return parser.parse_args()
 
 
