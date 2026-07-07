@@ -327,8 +327,12 @@ class SettingsFragment :
       isVisible = getBoolean(R.bool.is_foss).not()
     }
 
-    getUpdatesPreference?.let(::bindGetUpdatesBadge)
     bindLocalePreference(languagePreference)
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    findPreference<Preference>(Constants.PREF_GET_UPDATES)?.let(::bindGetUpdatesBadge)
   }
 
   private fun bindGetUpdatesBadge(preference: Preference) {
