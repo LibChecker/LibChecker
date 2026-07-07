@@ -58,7 +58,12 @@ class InAppUpdateDialogFragment : BaseBottomSheetViewDialogFragment<InAppUpdateD
       }
     }
     root.updateButton.setOnClickListener {
-      getAppUpdateInfo?.app?.link?.let { url ->
+      val url = getAppUpdateInfo?.appForFlavor(BuildConfig.IS_FOSS)?.link
+      if (url == null) {
+        root.updateButton.isEnabled = false
+        root.showLoading()
+        viewModel.requestUpdate(selectedChannel)
+      } else {
         installUpdate(url)
       }
     }

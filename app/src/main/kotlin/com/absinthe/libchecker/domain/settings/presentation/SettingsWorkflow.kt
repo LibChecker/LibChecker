@@ -71,7 +71,10 @@ class SettingsWorkflow(
   }
 
   suspend fun hasAvailableAppUpdate(): Boolean {
-    return requestUpdateInfo(defaultUpdateChannel())?.app?.versionCode
+    if (!AppSelfUpdatePolicy.isSelfUpdateEnabled(BuildConfig.IS_FOSS, BuildConfig.IS_DEV_VERSION)) {
+      return false
+    }
+    return requestUpdateInfo(defaultUpdateChannel())?.appForFlavor(BuildConfig.IS_FOSS)?.versionCode
       ?.let { it > BuildConfig.VERSION_CODE } == true
   }
 
