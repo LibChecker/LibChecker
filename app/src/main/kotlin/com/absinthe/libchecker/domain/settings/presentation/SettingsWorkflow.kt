@@ -6,12 +6,15 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.core.content.FileProvider
+import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.bean.GetAppUpdateInfo
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.list.export.ExportInstalledAppsToUriUseCase
+import com.absinthe.libchecker.domain.app.update.AppSelfUpdatePolicy
 import com.absinthe.libchecker.domain.app.update.AppUpdateChannel
+import com.absinthe.libchecker.domain.app.update.AppUpdateInstallResult
 import com.absinthe.libchecker.domain.app.update.AppUpdateRepository
 import com.absinthe.libchecker.domain.rules.CloudRulesDownloadRequest
 import com.absinthe.libchecker.domain.rules.CloudRulesRepository
@@ -31,6 +34,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -50,21 +54,28 @@ class SettingsWorkflow(
   private val updateLibReferenceThresholdUseCase: UpdateLibReferenceThresholdUseCase
 ) {
 
-  suspend fun requestUpdateInfo(isStableChannel: Boolean): GetAppUpdateInfo? {
-    val channel = if (isStableChannel) {
-      AppUpdateChannel.STABLE
-    } else {
-      AppUpdateChannel.CI
-    }
-    return runCatching {
+  suspend fun requestUpdateInfo(channel: AppUpdateChannel): GetAppUpdateInfo? {
+    return try {
       appUpdateRepository.requestUpdateInfo(channel)
-    }.onFailure { Timber.e("requestUpdateFail: %s", it.stackTraceToString()) }
-      .onSuccess { Timber.d("requestUpdateSuccess: %s", it) }
-      .getOrNull()
+        .also { Timber.d("requestUpdateSuccess: %s", it) }
+    } catch (e: CancellationException) {
+      throw e
+    } catch (e: Throwable) {
+      Timber.e("requestUpdateFail: %s", e.stackTraceToString())
+      null
+    }
   }
 
-  suspend fun downloadApk(url: String) {
-    appUpdateRepository.enqueueApkDownload(url)
+  suspend fun installUpdate(url: String): AppUpdateInstallResult {
+    return appUpdateRepository.installUpdate(url)
+  }
+
+  suspend fun hasAvailableAppUpdate(): Boolean {
+    if (!AppSelfUpdatePolicy.isSelfUpdateEnabled(BuildConfig.IS_FOSS, BuildConfig.IS_DEV_VERSION)) {
+      return false
+    }
+    return requestUpdateInfo(defaultUpdateChannel())?.appForFlavor(BuildConfig.IS_FOSS)?.versionCode
+      ?.let { it > BuildConfig.VERSION_CODE } == true
   }
 
   suspend fun setColorfulRuleIcon(enabled: Boolean) {
@@ -148,7 +159,7 @@ class SettingsWorkflow(
       )
     )
 
-    return if (context.resources.getBoolean(R.bool.is_foss)) {
+    return if (AppSelfUpdatePolicy.isSelfUpdateEnabled(BuildConfig.IS_FOSS, BuildConfig.IS_DEV_VERSION)) {
       items + GetUpdatesItem(
         text = context.getString(R.string.settings_get_updates_in_app),
         iconRes = R.drawable.ic_logo,
@@ -156,6 +167,14 @@ class SettingsWorkflow(
       )
     } else {
       items
+    }
+  }
+
+  private fun defaultUpdateChannel(): AppUpdateChannel {
+    return if (BuildConfig.IS_DEV_VERSION) {
+      AppUpdateChannel.CI
+    } else {
+      AppUpdateChannel.STABLE
     }
   }
 

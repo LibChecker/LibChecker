@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.di
 
 import com.absinthe.libchecker.BuildConfig
-import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.data.app.update.AndroidAppUpdateRepository
 import com.absinthe.libchecker.data.settings.GlobalAppearanceSettingsRepository
 import com.absinthe.libchecker.data.settings.GlobalDeveloperSettingsRepository
@@ -19,7 +18,7 @@ import org.koin.dsl.module
 val settingsModule = module {
   single<AppearanceSettingsRepository> { GlobalAppearanceSettingsRepository() }
   single<DeveloperSettingsRepository> { GlobalDeveloperSettingsRepository() }
-  single<AppUpdateRepository> { AndroidAppUpdateRepository(SystemServices.downloadManager) }
+  single<AppUpdateRepository> { AndroidAppUpdateRepository(androidContext()) }
 
   factory { BuildInAppUpdateDiffDataUseCase(BuildConfig.APPLICATION_ID, androidContext().packageManager, get()) }
   factory {

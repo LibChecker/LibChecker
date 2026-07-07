@@ -6,29 +6,56 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.api.bean.GetAppUpdateInfo
 import com.absinthe.libchecker.domain.app.list.export.ExportInstalledAppsToUriUseCase
+import com.absinthe.libchecker.domain.app.update.AppUpdateChannel
+import com.absinthe.libchecker.domain.app.update.AppUpdateInstallResult
 import com.absinthe.libchecker.domain.rules.CloudRulesDownloadRequest
 import com.absinthe.libchecker.domain.rules.CloudRulesVersionInfo
 import com.absinthe.libchecker.domain.settings.model.GetUpdatesItem
 import com.absinthe.libchecker.domain.settings.model.LocalePreferenceDisplayData
 import java.util.Locale
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
   private val settingsWorkflow: SettingsWorkflow
 ) : ViewModel() {
-  private val _respStateFlow: MutableSharedFlow<GetAppUpdateInfo?> = MutableSharedFlow()
-  val respStateFlow: SharedFlow<GetAppUpdateInfo?> = _respStateFlow.asSharedFlow()
+  private val _respStateFlow: MutableSharedFlow<AppUpdateInfoResult> = MutableSharedFlow()
+  val respStateFlow: SharedFlow<AppUpdateInfoResult> = _respStateFlow.asSharedFlow()
+  private val _updateBadgeVisible = MutableStateFlow(false)
+  val updateBadgeVisible: StateFlow<Boolean> = _updateBadgeVisible.asStateFlow()
+  private var requestUpdateJob: Job? = null
+  private var checkUpdateJob: Job? = null
 
-  fun requestUpdate(isStableChannel: Boolean) = viewModelScope.launch(Dispatchers.IO) {
-    _respStateFlow.emit(settingsWorkflow.requestUpdateInfo(isStableChannel))
+  fun requestUpdate(channel: AppUpdateChannel) {
+    requestUpdateJob?.cancel()
+    requestUpdateJob = viewModelScope.launch(Dispatchers.IO) {
+      _respStateFlow.emit(
+        AppUpdateInfoResult(
+          channel = channel,
+          updateInfo = settingsWorkflow.requestUpdateInfo(channel)
+        )
+      )
+    }
   }
 
-  fun downloadApk(url: String) = viewModelScope.launch(Dispatchers.IO) {
-    settingsWorkflow.downloadApk(url)
+  fun checkForUpdates() {
+    if (checkUpdateJob?.isActive == true) {
+      return
+    }
+    checkUpdateJob = viewModelScope.launch(Dispatchers.IO) {
+      _updateBadgeVisible.value = settingsWorkflow.hasAvailableAppUpdate()
+    }
+  }
+
+  suspend fun installUpdate(url: String): AppUpdateInstallResult {
+    return settingsWorkflow.installUpdate(url)
   }
 
   fun setColorfulRuleIcon(enabled: Boolean) = viewModelScope.launch {
@@ -109,3 +136,8 @@ class SettingsViewModel(
     return settingsWorkflow.exportInstalledApps(uri, progress)
   }
 }
+
+data class AppUpdateInfoResult(
+  val channel: AppUpdateChannel,
+  val updateInfo: GetAppUpdateInfo?
+)

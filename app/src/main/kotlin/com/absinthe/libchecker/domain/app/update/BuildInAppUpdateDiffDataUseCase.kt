@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.domain.app.update
 
 import android.content.pm.PackageManager
+import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.api.bean.GetAppUpdateInfo
 import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
@@ -22,7 +23,7 @@ class BuildInAppUpdateDiffDataUseCase(
     val localVersionCode = packageInfo.getVersionCode()
     val localCompileSdk = packageInfo.getCompileSdkVersion().toShort()
     val localPackageSize = packageInfo.getPackageSize(includeSplits = false)
-    val remoteApp = updateInfo?.app
+    val remoteApp = updateInfo?.appForFlavor(BuildConfig.IS_FOSS)
     val displayedRemoteApp = remoteApp?.takeIf { it.versionCode.toLong() > localVersionCode }
 
     return InAppUpdateDiffData(

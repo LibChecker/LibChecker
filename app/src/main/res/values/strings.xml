@@ -73,6 +73,7 @@
   <string name="settings_rate_us_summary">This can make us be found by more people</string>
   <string name="settings_get_updates">Get updates</string>
   <string name="settings_get_updates_summary">Get the latest version that is more feature-packed and stable</string>
+  <string name="settings_update_available">Update available</string>
   <string name="settings_get_updates_in_app">In-app</string>
   <string name="settings_get_updates_in_app_chip_stable">Stable</string>
   <string name="settings_get_updates_in_app_chip_ci">CI</string>
@@ -246,6 +247,11 @@
   <string name="toast_cloud_rules_update_error">Failed to update cloud rules. Please try again</string>
   <string name="toast_not_enough_storage_space">Not enough storage space</string>
   <string name="toast_downloading_app">Download requested</string>
+  <string name="toast_app_update_started">Preparing update</string>
+  <string name="toast_app_update_installed">Update complete</string>
+  <string name="toast_app_update_unsupported">In-app updates aren’t available on this device</string>
+  <string name="toast_app_update_pending_user_action">This device requires confirmation before installing the update</string>
+  <string name="toast_app_update_failed">Update failed: %s</string>
   <string name="toast_long_tap_share_button_tip">Long press the “Share” button to choose where to save</string>
 
   <!--  Snapshot  -->

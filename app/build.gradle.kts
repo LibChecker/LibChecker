@@ -13,6 +13,7 @@ plugins {
   alias(libs.plugins.firebase.crashlytics)
   id("build-logic")
   id("res-opt")
+  id("market-stable-manifest")
 }
 
 ksp {
@@ -66,12 +67,14 @@ setupAppModule {
     create("foss") {
       isDefault = true
       dimension = flavorDimensions[0]
+      buildConfigField("Boolean", "IS_FOSS", "true")
       configure<CrashlyticsExtension> {
         mappingFileUploadEnabled = false
       }
     }
     create("market") {
       dimension = flavorDimensions[0]
+      buildConfigField("Boolean", "IS_FOSS", "false")
     }
     all {
       manifestPlaceholders["channel"] = this.name
