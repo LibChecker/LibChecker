@@ -3,6 +3,7 @@ package com.absinthe.libchecker.domain.settings.ui
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.lifecycleScope
+import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.bean.GetAppUpdateInfo
 import com.absinthe.libchecker.domain.app.update.AppUpdateChannel
@@ -30,12 +31,13 @@ class InAppUpdateDialogFragment : BaseBottomSheetViewDialogFragment<InAppUpdateD
   private val buildSnapshotUpdateTimeDisplayData: BuildSnapshotUpdateTimeDisplayDataUseCase by inject()
   private val viewModel: SettingsViewModel by viewModel()
   private var getAppUpdateInfo: GetAppUpdateInfo? = null
-  private var selectedChannel: AppUpdateChannel = AppUpdateChannel.STABLE
+  private var selectedChannel: AppUpdateChannel = defaultUpdateChannel()
 
   override fun initRootView(): InAppUpdateDialogView = InAppUpdateDialogView(
     requireContext(),
     buildSnapshotAbiDisplayData,
-    buildSnapshotUpdateTimeDisplayData
+    buildSnapshotUpdateTimeDisplayData,
+    selectedChannel.toButtonId()
   )
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
@@ -85,6 +87,21 @@ class InAppUpdateDialogFragment : BaseBottomSheetViewDialogFragment<InAppUpdateD
       R.id.in_app_update_chip_stable -> AppUpdateChannel.STABLE
       R.id.in_app_update_chip_ci -> AppUpdateChannel.CI
       else -> null
+    }
+  }
+
+  private fun AppUpdateChannel.toButtonId(): Int {
+    return when (this) {
+      AppUpdateChannel.STABLE -> R.id.in_app_update_chip_stable
+      AppUpdateChannel.CI -> R.id.in_app_update_chip_ci
+    }
+  }
+
+  private fun defaultUpdateChannel(): AppUpdateChannel {
+    return if (BuildConfig.IS_DEV_VERSION) {
+      AppUpdateChannel.CI
+    } else {
+      AppUpdateChannel.STABLE
     }
   }
 

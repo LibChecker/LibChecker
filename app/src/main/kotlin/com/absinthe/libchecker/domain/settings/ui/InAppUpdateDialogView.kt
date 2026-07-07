@@ -24,7 +24,8 @@ import com.google.android.material.loadingindicator.LoadingIndicator
 class InAppUpdateDialogView(
   context: Context,
   buildSnapshotAbiDisplayData: BuildSnapshotAbiDisplayDataUseCase,
-  buildSnapshotUpdateTimeDisplayData: BuildSnapshotUpdateTimeDisplayDataUseCase
+  buildSnapshotUpdateTimeDisplayData: BuildSnapshotUpdateTimeDisplayDataUseCase,
+  initialCheckedId: Int = R.id.in_app_update_chip_stable
 ) : LinearLayout(context),
   IHeaderView {
 
@@ -53,7 +54,7 @@ class InAppUpdateDialogView(
         text = context.getString(R.string.settings_get_updates_in_app_chip_ci)
       }
     )
-    check(R.id.in_app_update_chip_stable)
+    check(initialCheckedId)
   }
 
   private val demoAdapter = SnapshotAdapter(
@@ -122,7 +123,7 @@ class InAppUpdateDialogView(
   }
 
   fun setItem(item: SnapshotDiffItem?) {
-    demoAdapter.submitList(item?.let(::listOf).orEmpty())
+    demoAdapter.setList(item?.let(::listOf).orEmpty())
   }
 
   override fun getHeaderView(): BottomSheetHeaderView {

@@ -9,8 +9,11 @@ import org.gradle.api.Project
 import org.w3c.dom.Element
 
 private const val ANDROID_MANIFEST_NAMESPACE = "http://schemas.android.com/apk/res/android"
-private const val SELF_UPDATE_PERMISSION = "android.permission.UPDATE_PACKAGES_WITHOUT_USER_ACTION"
 private const val SELF_UPDATE_RECEIVER = ".data.app.update.AppUpdateInstallResultReceiver"
+private val SELF_UPDATE_PERMISSIONS = setOf(
+  "android.permission.UPDATE_PACKAGES_WITHOUT_USER_ACTION",
+  "android.permission.REQUEST_INSTALL_PACKAGES"
+)
 
 class MarketStableManifestPlugin : Plugin<Project> {
 
@@ -52,7 +55,7 @@ private fun File.removeSelfUpdateEntries() {
   val permissions = document.getElementsByTagName("uses-permission")
   for (index in permissions.length - 1 downTo 0) {
     val element = permissions.item(index) as? Element ?: continue
-    if (element.getAttributeNS(ANDROID_MANIFEST_NAMESPACE, "name") == SELF_UPDATE_PERMISSION) {
+    if (element.getAttributeNS(ANDROID_MANIFEST_NAMESPACE, "name") in SELF_UPDATE_PERMISSIONS) {
       element.parentNode.removeChild(element)
     }
   }

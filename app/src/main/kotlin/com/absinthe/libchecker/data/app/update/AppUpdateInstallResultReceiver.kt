@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInstaller
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.compat.IntentCompat
 import com.absinthe.libchecker.utils.Toasty
 
 class AppUpdateInstallResultReceiver : BroadcastReceiver() {
@@ -16,7 +17,17 @@ class AppUpdateInstallResultReceiver : BroadcastReceiver() {
       }
 
       PackageInstaller.STATUS_PENDING_USER_ACTION -> {
-        Toasty.showLong(context, R.string.toast_app_update_pending_user_action)
+        val confirmationIntent = IntentCompat.getParcelableExtra<Intent>(intent, Intent.EXTRA_INTENT)
+        if (confirmationIntent == null) {
+          Toasty.showLong(context, R.string.toast_app_update_pending_user_action)
+          return
+        }
+        confirmationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        runCatching {
+          context.startActivity(confirmationIntent)
+        }.onFailure {
+          Toasty.showLong(context, R.string.toast_app_update_pending_user_action)
+        }
       }
 
       else -> {

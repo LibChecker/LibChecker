@@ -34,6 +34,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -54,11 +55,15 @@ class SettingsWorkflow(
 ) {
 
   suspend fun requestUpdateInfo(channel: AppUpdateChannel): GetAppUpdateInfo? {
-    return runCatching {
+    return try {
       appUpdateRepository.requestUpdateInfo(channel)
-    }.onFailure { Timber.e("requestUpdateFail: %s", it.stackTraceToString()) }
-      .onSuccess { Timber.d("requestUpdateSuccess: %s", it) }
-      .getOrNull()
+        .also { Timber.d("requestUpdateSuccess: %s", it) }
+    } catch (e: CancellationException) {
+      throw e
+    } catch (e: Throwable) {
+      Timber.e("requestUpdateFail: %s", e.stackTraceToString())
+      null
+    }
   }
 
   suspend fun installUpdate(url: String): AppUpdateInstallResult {

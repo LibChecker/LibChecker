@@ -9,6 +9,9 @@
   <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
   <uses-permission android:name="com.android.permission.GET_INSTALLED_APPS" />
   <uses-permission android:name="android.permission.UPDATE_PACKAGES_WITHOUT_USER_ACTION" />
+  <uses-permission
+    android:name="android.permission.REQUEST_INSTALL_PACKAGES"
+    android:maxSdkVersion="30" />
 
   <permission
     android:name="${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
