@@ -27,14 +27,14 @@ class MarketStableManifestPlugin : Plugin<Project> {
         if (name.startsWith("processMarket") && name.endsWith("MainManifest")) {
           inputs.property("selfUpdateManifestMode", if (isDevVersion) "keep" else "remove")
           if (!isDevVersion) {
-            val variantName = name
-              .removePrefix("process")
-              .removeSuffix("MainManifest")
-              .replaceFirstChar { it.lowercaseChar() }
-            val manifestFile = project.layout.buildDirectory
-              .file("intermediates/merged_manifest/$variantName/$name/AndroidManifest.xml")
             doLast {
-              manifestFile.get().asFile.removeSelfUpdateEntries()
+              val manifestFile = outputs.files.files
+                .asSequence()
+                .filter(File::isFile)
+                .firstOrNull { it.name == "AndroidManifest.xml" }
+                ?: error("Merged manifest output not found for $path")
+
+              manifestFile.removeSelfUpdateEntries()
             }
           }
         }

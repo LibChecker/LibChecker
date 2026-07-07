@@ -336,7 +336,7 @@ class SettingsFragment :
       isGetUpdatesBadgeVisible = visible
       updateVisibleGetUpdatesBadge(preference)
       updateVisiblePreferenceDescription(preference)
-    }.launchIn(lifecycleScope)
+    }.launchIn(viewLifecycleOwner.lifecycleScope)
   }
 
   private fun bindGitHubTokenPreference(preference: Preference) {
