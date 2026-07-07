@@ -32,33 +32,47 @@ def current_stable_version(path):
   return json.loads(path.read_text()).get("app", {}).get("version")
 
 
-def find_foss_apk_asset(release):
+def find_apk_asset(release, flavor, required=True):
+  suffix = f"-{flavor}-release.apk"
   for asset in release.get("assets", []):
     name = asset.get("name", "")
-    if name.startswith("LibChecker-") and name.endswith("-foss-release.apk"):
+    if name.startswith("LibChecker-") and name.endswith(suffix):
       return asset
-  raise ValueError("FOSS release APK asset not found")
+  if required:
+    raise ValueError(f"{flavor} release APK asset not found")
+  return None
 
 
-def version_code_from_asset_name(name):
-  match = re.search(r"-(\d+)-foss-release\.apk$", name)
+def version_code_from_asset_name(name, flavor):
+  match = re.search(rf"-(\d+)-{flavor}-release\.apk$", name)
   if not match:
     raise ValueError(f"versionCode not found in {name}")
   return int(match.group(1))
 
 
 def latest_stable_metadata(release, args):
-  asset = find_foss_apk_asset(release)
-  return build_metadata(argparse.Namespace(
+  foss_asset = find_apk_asset(release, "foss")
+  market_asset = find_apk_asset(release, "market", required=False)
+  metadata_args = argparse.Namespace(
     version=release["tag_name"],
-    version_code=version_code_from_asset_name(asset["name"]),
+    version_code=version_code_from_asset_name(foss_asset["name"], "foss"),
     target=args.target,
     min=args.min,
     compile=args.compile,
-    package_size=asset["size"],
-    link=asset["browser_download_url"],
-    note=RELEASES_NOTE_URL
-  ))
+    package_size=foss_asset["size"],
+    link=foss_asset["browser_download_url"],
+    note=RELEASES_NOTE_URL,
+    market_version=None,
+    market_version_code=None,
+    market_package_size=None,
+    market_link=None
+  )
+  if market_asset:
+    metadata_args.market_version = release["tag_name"]
+    metadata_args.market_version_code = version_code_from_asset_name(market_asset["name"], "market")
+    metadata_args.market_package_size = market_asset["size"]
+    metadata_args.market_link = market_asset["browser_download_url"]
+  return build_metadata(metadata_args)
 
 
 def sync_latest_stable(output, args, release=None):

@@ -14,12 +14,24 @@ SPEC.loader.exec_module(read_apk_info)
 
 
 class ReadApkInfoTest(unittest.TestCase):
-  def test_reads_metadata_and_project_sdks(self):
+  def test_reads_foss_and_market_metadata(self):
     with tempfile.TemporaryDirectory() as directory:
       root = Path(directory)
-      apk = root / "app.apk"
-      apk.write_bytes(b"apk")
-      (root / "output-metadata.json").write_text(json.dumps({
+      foss_dir = root / "foss"
+      market_dir = root / "market"
+      foss_dir.mkdir()
+      market_dir.mkdir()
+      foss_apk = foss_dir / "app.apk"
+      market_apk = market_dir / "app.apk"
+      foss_apk.write_bytes(b"apk")
+      market_apk.write_bytes(b"market")
+      (foss_dir / "output-metadata.json").write_text(json.dumps({
+        "elements": [{
+          "versionName": "2.5.5.dev.test",
+          "versionCode": 2703
+        }]
+      }))
+      (market_dir / "output-metadata.json").write_text(json.dumps({
         "elements": [{
           "versionName": "2.5.5.dev.test",
           "versionCode": 2703
@@ -34,7 +46,7 @@ class ReadApkInfoTest(unittest.TestCase):
       """)
 
       self.assertEqual(
-        read_apk_info.read_apk_info(apk, projects),
+        read_apk_info.read_update_apk_info(foss_apk, market_apk, projects),
         {
           "version-name": "2.5.5.dev.test",
           "version-code": 2703,
@@ -43,6 +55,9 @@ class ReadApkInfoTest(unittest.TestCase):
           "target-sdk-version": "37",
           "compile-sdk-version": "37",
           "file-size": 3,
+          "market-version-name": "2.5.5.dev.test",
+          "market-version-code": 2703,
+          "market-file-size": 6,
           "is-stable": "false"
         }
       )
