@@ -53,6 +53,7 @@ class InAppUpdateDialogFragment : BaseBottomSheetViewDialogFragment<InAppUpdateD
         selectedChannel = checkedId.toAppUpdateChannel() ?: return@addOnButtonCheckedListener
         doOnMainThreadIdle { toggleGroup.isEnabled = false }
         root.updateButton.isEnabled = false
+        root.setItem(null)
         root.showLoading()
         viewModel.requestUpdate(selectedChannel)
       }
