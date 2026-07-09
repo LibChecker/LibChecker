@@ -12,17 +12,22 @@ import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.GetAppUpdateInfo
 import com.absinthe.libchecker.api.request.GetAppUpdateRequest
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.domain.app.update.AppSelfUpdatePolicy
 import com.absinthe.libchecker.domain.app.update.AppUpdateChannel
 import com.absinthe.libchecker.domain.app.update.AppUpdateInstallResult
 import com.absinthe.libchecker.domain.app.update.AppUpdateRepository
+import com.squareup.moshi.JsonDataException
+import com.squareup.moshi.JsonEncodingException
 import java.io.File
+import java.io.IOException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.ResponseBody
+import retrofit2.HttpException
 
 class AndroidAppUpdateRepository(
   private val context: Context,
@@ -33,7 +38,23 @@ class AndroidAppUpdateRepository(
 ) : AppUpdateRepository {
 
   override suspend fun requestUpdateInfo(channel: AppUpdateChannel): GetAppUpdateInfo? {
-    return request.requestAppUpdateInfo(channel.requestValue)
+    val requestValue = channel.requestValue
+    val authorization = GlobalValues.githubApiAuthorizationHeaderFor(ApiManager.ASSETS_REPO_BASE_URL)
+    return try {
+      request.requestAppUpdateInfo(requestValue, authorization)
+    } catch (e: CancellationException) {
+      throw e
+    } catch (e: Throwable) {
+      if (
+        e !is IOException &&
+        e !is HttpException &&
+        e !is JsonDataException &&
+        e !is JsonEncodingException
+      ) {
+        throw e
+      }
+      request.requestFallbackAppUpdateInfo(requestValue)
+    }
   }
 
   override suspend fun installUpdate(url: String): AppUpdateInstallResult = withContext(Dispatchers.IO) {
