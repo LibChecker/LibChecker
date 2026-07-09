@@ -380,6 +380,7 @@ private fun shouldHideCollapsingToolbarInsteadOfBlur(): Boolean {
 
 private const val ANIMATION_DURATION_MS = 350L
 private const val COLLAPSING_LAYER_FADE_DURATION_MS = 180L
+private val adaptiveIconMaskViewport = RectF(0f, 0f, 100f, 100f)
 
 private const val PROGRESSIVE_BLUR_MASK_SHADER = """
 uniform shader content;
@@ -402,7 +403,6 @@ private class IconMaskOutlineDrawable(
   dashGap: Float
 ) : Drawable() {
 
-  private val sourceBounds = RectF()
   private val targetBounds = RectF()
   private val matrix = Matrix()
   private val outlinePath = Path()
@@ -422,15 +422,12 @@ private class IconMaskOutlineDrawable(
     background.draw(canvas)
     if (bounds.width() <= 0 || bounds.height() <= 0 || mask.isEmpty) return
 
-    mask.computeBounds(sourceBounds, true)
-    if (sourceBounds.width() <= 0f || sourceBounds.height() <= 0f) return
-
     targetBounds.set(bounds)
     val inset = outlinePaint.strokeWidth / 2f
     targetBounds.inset(inset, inset)
 
     matrix.reset()
-    matrix.setRectToRect(sourceBounds, targetBounds, Matrix.ScaleToFit.CENTER)
+    matrix.setRectToRect(adaptiveIconMaskViewport, targetBounds, Matrix.ScaleToFit.CENTER)
     outlinePath.reset()
     mask.transform(matrix, outlinePath)
     outlinePaint.alpha = outlineAlpha * drawableAlpha / 255

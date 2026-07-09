@@ -28,7 +28,8 @@ object ApiManager {
 
   const val ANDROID_VERSION_DISTRIBUTION_URL = "https://dl.google.com/android/studio/metadata/distributions.json"
 
-  const val ASSETS_REPO_BASE_URL = "https://gh.absinthe.life/raw.githubusercontent.com/LibChecker/assets/main/"
+  const val ASSETS_REPO_BASE_URL = "https://api.github.com/repos/LibChecker/assets/contents/"
+  const val ASSETS_REPO_FALLBACK_BASE_URL = "https://gh.absinthe.life/raw.githubusercontent.com/LibChecker/assets/main/"
 
   val root
     get() = when (GlobalValues.repo) {
