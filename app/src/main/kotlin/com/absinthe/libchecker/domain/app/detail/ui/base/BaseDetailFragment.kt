@@ -15,17 +15,21 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemDialogRequest
 import com.absinthe.libchecker.domain.app.detail.action.GetPermissionProvidersUseCase
-import com.absinthe.libchecker.domain.app.detail.content.BuildNativeLibraryItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
+import com.absinthe.libchecker.domain.app.detail.model.LibStringMetadataItemDisplay
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
+import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_TEXT
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
+import com.absinthe.libchecker.domain.app.detail.resource.AppResourcePreview
 import com.absinthe.libchecker.domain.app.detail.resource.ResolveAppResourceValueUseCase
+import com.absinthe.libchecker.domain.app.detail.resource.ResolveAppResourceValueUseCase.AppResourceValue
 import com.absinthe.libchecker.domain.app.detail.ui.DetailFragmentManager
 import com.absinthe.libchecker.domain.app.detail.ui.IDetailContainer
 import com.absinthe.libchecker.domain.app.detail.ui.Sortable
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.LibStringAdapter
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.LibDetailDialogFragment
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.PermissionDetailDialogFragment
+import com.absinthe.libchecker.domain.app.detail.ui.dialog.XmlBSDFragment
 import com.absinthe.libchecker.domain.app.repository.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.repository.AppListSettingsRepository
 import com.absinthe.libchecker.ui.base.BaseFragment
@@ -59,20 +63,16 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   protected val viewModel: DetailViewModel by activityViewModel()
   private val appDetailSettingsRepository: AppDetailSettingsRepository by inject()
   private val appListSettingsRepository: AppListSettingsRepository by inject()
-  private val buildNativeLibraryItemDisplayData: BuildNativeLibraryItemDisplayDataUseCase by inject()
   private val resolveAppResourceValue: ResolveAppResourceValueUseCase by inject()
   private val getPermissionProvidersUseCase: GetPermissionProvidersUseCase by inject()
   protected val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME).orEmpty() }
   protected val type by lazy { arguments?.getInt(EXTRA_TYPE) ?: NATIVE }
   protected val adapter by lazy {
     LibStringAdapter(
-      packageName = packageName,
       type = type,
       itemDisplayOptions = appListSettingsRepository.itemDisplayOptions,
       colorfulRuleIcon = appListSettingsRepository.colorfulRuleIcon,
-      fragmentManager = childFragmentManager,
-      buildNativeLibraryItemDisplayData = buildNativeLibraryItemDisplayData,
-      resolveAppResourceValue = resolveAppResourceValue
+      onMetadataResourceClick = ::onMetadataResourceClick
     )
   }
   protected val emptyView by unsafeLazy {
@@ -325,6 +325,59 @@ abstract class BaseDetailFragment<T : ViewBinding> :
           .show(childFragmentManager, LibDetailDialogFragment::class.java.name)
       }
     }
+  }
+
+  private fun onMetadataResourceClick(
+    item: LibStringItemChip,
+    display: LibStringMetadataItemDisplay
+  ) {
+    if (display.isTransformed) {
+      adapter.setMetadataPreview(item, AppResourcePreview.Original)
+      return
+    }
+    val resource = display.resource ?: return
+
+    viewLifecycleOwner.lifecycleScope.launch {
+      when (
+        val resourceValue = withContext(Dispatchers.IO) {
+          resolveAppResourceValue(
+            ResolveAppResourceValueUseCase.Request(
+              packageName = packageName,
+              resourceId = resource.id,
+              resourceType = resource.type
+            )
+          )
+        }
+      ) {
+        is AppResourceValue.Text -> adapter.setMetadataPreview(
+          item,
+          AppResourcePreview.Text(resourceValue.value)
+        )
+
+        is AppResourceValue.Xml -> showXml(resourceValue.value)
+
+        is AppResourceValue.DrawablePreview -> adapter.setMetadataPreview(
+          item,
+          AppResourcePreview.DrawableValue(resourceValue.drawable)
+        )
+
+        is AppResourceValue.ColorPreview -> adapter.setMetadataPreview(
+          item,
+          AppResourcePreview.ColorValue(resourceValue.color)
+        )
+
+        null -> Unit
+      }
+    }
+  }
+
+  private fun showXml(xml: CharSequence) {
+    val fragmentManager = childFragmentManager
+    XmlBSDFragment().apply {
+      arguments = Bundle().apply {
+        putCharSequence(EXTRA_TEXT, xml)
+      }
+    }.show(fragmentManager, XmlBSDFragment::class.java.name)
   }
 
   fun isComponentFragment(): Boolean {

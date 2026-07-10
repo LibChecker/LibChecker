@@ -5,11 +5,11 @@ import android.os.Bundle
 import androidx.core.os.BundleCompat
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.domain.app.detail.model.AppPropItem
-import com.absinthe.libchecker.domain.app.detail.model.AppPropPreview
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_INFO
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PROPS
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_TEXT
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
+import com.absinthe.libchecker.domain.app.detail.resource.AppResourcePreview
 import com.absinthe.libchecker.domain.app.detail.resource.ResolveAppResourceValueUseCase
 import com.absinthe.libchecker.domain.app.detail.resource.ResolveAppResourceValueUseCase.AppResourceValue
 import com.absinthe.libchecker.domain.app.detail.ui.view.AppPropsBottomSheetView
@@ -72,17 +72,17 @@ class AppPropBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppPr
         }
       ) {
         is AppResourceValue.Text -> root.adapter.replace(
-          item.copy(preview = AppPropPreview.Text(resourceValue.value))
+          item.copy(preview = AppResourcePreview.Text(resourceValue.value))
         )
 
         is AppResourceValue.Xml -> showXml(resourceValue.value)
 
         is AppResourceValue.DrawablePreview -> root.adapter.replace(
-          item.copy(preview = AppPropPreview.DrawableValue(resourceValue.drawable))
+          item.copy(preview = AppResourcePreview.DrawableValue(resourceValue.drawable))
         )
 
         is AppResourceValue.ColorPreview -> root.adapter.replace(
-          item.copy(preview = AppPropPreview.ColorValue(resourceValue.color))
+          item.copy(preview = AppResourcePreview.ColorValue(resourceValue.color))
         )
 
         null -> Unit

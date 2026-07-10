@@ -66,11 +66,6 @@ class NativeAnalysisFragment :
           viewModel.initSoAnalysisData()
         }
       }.launchIn(lifecycleScope)
-      featureState.is64Bit.onEach {
-        if (it != null) {
-          adapter.set64Bit(it)
-        }
-      }.launchIn(lifecycleScope)
       contentState.nativeLibTabs.onEach {
         binding.tabLayout.removeAllTabs()
         it?.forEach { title ->

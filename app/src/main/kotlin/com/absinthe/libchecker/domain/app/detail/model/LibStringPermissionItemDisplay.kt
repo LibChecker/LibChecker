@@ -3,11 +3,11 @@ package com.absinthe.libchecker.domain.app.detail.model
 import com.absinthe.libchecker.annotation.PERMISSION
 
 data class LibStringPermissionItemDisplay(
-  val name: LibStringItemNameDisplay,
+  override val name: LibStringItemNameDisplay,
   val showNotGrantedIndicator: Boolean,
   val notGrantedLabel: String?,
-  val contentDescription: String
-) {
+  override val contentDescription: String
+) : LibStringItemDisplay {
 
   companion object {
     fun create(

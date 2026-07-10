@@ -283,11 +283,13 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
       return
     }
 
-    item.contentView.apply {
-      firstInstalledView.libSize.text = installedTime.firstInstalledTime
-      lastUpdatedView.libSize.text = installedTime.lastUpdatedTime
-      (parent as? View)?.setLongClickCopiedToClipboard(item.contentView.getAllContentText())
-    }
+    item.contentView.bind(
+      firstInstalledTime = installedTime.firstInstalledTime,
+      lastUpdatedTime = installedTime.lastUpdatedTime
+    )
+    (item.contentView.parent as? View)?.setLongClickCopiedToClipboard(
+      item.contentView.getAllContentText()
+    )
   }
 
   private fun registerBinderReceivedRefresh() {

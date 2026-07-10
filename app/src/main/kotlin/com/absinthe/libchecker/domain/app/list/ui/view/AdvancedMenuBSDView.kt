@@ -63,7 +63,6 @@ class AdvancedMenuBSDView(
   private val layoutItems = buildAdvancedMenuLayoutItems()
   private val demoAdapter = AppAdapter(AppAdapter.CardMode.DEMO, displayOptions)
   private val itemAdapter = LibStringAdapter(
-    packageName = Constants.EXAMPLE_PACKAGE,
     type = ACTIVITY,
     itemDisplayOptions = itemDisplayOptions,
     colorfulRuleIcon = colorfulRuleIcon

@@ -3,7 +3,7 @@ package com.absinthe.libchecker.domain.app.detail.action
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import com.absinthe.libchecker.domain.app.detail.model.AppPropItem
-import com.absinthe.libchecker.domain.app.detail.model.AppPropResourceReference
+import com.absinthe.libchecker.domain.app.detail.resource.AppResourceReference
 import com.absinthe.libchecker.utils.extensions.maybeResourceId
 import com.absinthe.libchecker.utils.manifest.ApplicationReader
 import com.absinthe.libchecker.utils.manifest.PropertiesMap
@@ -49,7 +49,7 @@ class GetAppManifestPropertiesUseCase(
         AppPropItem(
           key = property.key,
           originalDisplayValue = resourceName ?: PropertiesMap.parseProperty(property.key, value),
-          resource = AppPropResourceReference.create(resourceId, resourceType)
+          resource = AppResourceReference.create(resourceId, resourceType)
         )
       }
       .sortedBy(AppPropItem::key)

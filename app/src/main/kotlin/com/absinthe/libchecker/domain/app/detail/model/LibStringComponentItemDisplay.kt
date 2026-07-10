@@ -2,26 +2,30 @@ package com.absinthe.libchecker.domain.app.detail.model
 
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.constant.options.AdvancedOptions
+import com.absinthe.rulesbundle.Rule
 
 data class LibStringComponentItemDisplay(
-  val name: LibStringItemNameDisplay,
-  val showRuleChip: Boolean,
-  val ruleLabel: String?,
+  override val name: LibStringItemNameDisplay,
+  val rule: Rule?,
   val processName: String?,
-  val contentDescription: String
-) {
+  val processIndicatorColor: Int?,
+  override val contentDescription: String
+) : LibStringItemDisplay {
+
+  val showRuleChip: Boolean = rule != null
+  val ruleLabel: String? = rule?.label
 
   companion object {
     fun create(
       item: LibStringItemChip,
       @LibType type: Int,
       itemDisplayOptions: Int,
-      processMode: Boolean
+      processMode: Boolean,
+      processIndicatorColor: Int? = null
     ): LibStringComponentItemDisplay {
       val markedRule = item.rule.takeIf {
         itemDisplayOptions.isOptionEnabled(AdvancedOptions.SHOW_MARKED_LIB)
       }
-      val showRuleChip = markedRule != null
       val ruleLabel = markedRule?.label
       val processName = item.item.process
         .takeIf { processMode }
@@ -34,9 +38,9 @@ data class LibStringComponentItemDisplay(
 
       return LibStringComponentItemDisplay(
         name = name,
-        showRuleChip = showRuleChip,
-        ruleLabel = ruleLabel,
+        rule = markedRule,
         processName = processName,
+        processIndicatorColor = processIndicatorColor.takeIf { processName != null },
         contentDescription = buildLibStringItemDescription(
           name.text,
           ruleLabel,

@@ -1,97 +1,57 @@
 package com.absinthe.libchecker.domain.app.detail.ui.adapter
 
-import android.graphics.Bitmap
 import android.graphics.Color
-import android.graphics.Typeface
-import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.TransitionDrawable
-import android.graphics.drawable.shapes.OvalShape
-import android.graphics.text.LineBreaker
-import android.os.Bundle
-import android.text.Layout
-import android.text.Spannable
-import android.text.Spanned
-import android.text.SpannedString
-import android.text.style.ForegroundColorSpan
-import android.text.style.StyleSpan
 import android.view.ViewGroup
-import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.drawable.toDrawable
-import androidx.core.text.bold
-import androidx.core.text.buildSpannedString
-import androidx.core.text.inSpans
-import androidx.core.text.strikeThrough
-import androidx.core.view.isVisible
-import androidx.fragment.app.FragmentManager
-import coil.load
-import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.constant.options.AdvancedOptions
-import com.absinthe.libchecker.domain.app.detail.content.BuildNativeLibraryItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.detail.model.LibStringComponentItemDisplay
-import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
-import com.absinthe.libchecker.domain.app.detail.model.LibStringItemNameDisplay
+import com.absinthe.libchecker.domain.app.detail.model.LibStringMetadataItemDisplay
+import com.absinthe.libchecker.domain.app.detail.model.LibStringNativeItemDisplay
 import com.absinthe.libchecker.domain.app.detail.model.LibStringPermissionItemDisplay
-import com.absinthe.libchecker.domain.app.detail.model.NativeLibraryItemDisplayData
-import com.absinthe.libchecker.domain.app.detail.model.StaticLibItem
-import com.absinthe.libchecker.domain.app.detail.model.buildLibStringItemDescription
-import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_TEXT
-import com.absinthe.libchecker.domain.app.detail.resource.ResolveAppResourceValueUseCase
-import com.absinthe.libchecker.domain.app.detail.resource.ResolveAppResourceValueUseCase.AppResourceValue
-import com.absinthe.libchecker.domain.app.detail.ui.dialog.XmlBSDFragment
+import com.absinthe.libchecker.domain.app.detail.model.LibStringStaticItemDisplay
+import com.absinthe.libchecker.domain.app.detail.resource.AppResourcePreview
 import com.absinthe.libchecker.domain.app.detail.ui.view.ComponentLibItemView
 import com.absinthe.libchecker.domain.app.detail.ui.view.MetadataLibItemView
 import com.absinthe.libchecker.domain.app.detail.ui.view.NativeLibItemView
 import com.absinthe.libchecker.domain.app.detail.ui.view.RuleChipIconCache
 import com.absinthe.libchecker.domain.app.detail.ui.view.StaticLibItemView
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
-import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.UiUtils
-import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
-import com.absinthe.libchecker.utils.fromJson
-import com.absinthe.libchecker.view.drawable.CapsuleDrawable
-import com.absinthe.libchecker.view.span.CenterAlignImageSpan
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
 private const val HIGHLIGHT_TRANSITION_DURATION = 250
 
 class LibStringAdapter(
-  val packageName: String,
   @LibType val type: Int,
   private var itemDisplayOptions: Int = AdvancedOptions.ITEM_DEFAULT_OPTIONS,
   private val colorfulRuleIcon: Boolean = true,
-  private val fragmentManager: FragmentManager? = null,
-  private val buildNativeLibraryItemDisplayData: BuildNativeLibraryItemDisplayDataUseCase? = null,
-  private val resolveAppResourceValue: ResolveAppResourceValueUseCase? = null
+  private val onMetadataResourceClick: ((LibStringItemChip, LibStringMetadataItemDisplay) -> Unit)? = null
 ) : HighlightAdapter<LibStringItemChip>(LibStringDiffUtil()) {
 
   var highlightPosition: Int = -1
     private set
 
-  var processMap: Map<String, Int> = mapOf()
+  var processMap: Map<String, Int> = emptyMap()
 
   private var processMode: Boolean = false
-  private var is64Bit: Boolean = false
-  private val nativeSizeTextCache = mutableMapOf<Pair<LibStringItem, List<String>>, CharSequence>()
-  private val nativeLabelSpanCache = mutableMapOf<String, SpannedString>()
+  private val fallbackProcessColors = mutableMapOf<String, Int>()
+  private val metadataPreviews = mutableMapOf<MetadataPreviewKey, AppResourcePreview>()
 
   fun setProcessMode(isProcessMode: Boolean) {
+    if (processMode == isProcessMode) {
+      return
+    }
     processMode = isProcessMode
-    //noinspection NotifyDataSetChanged
-    notifyDataSetChanged()
-  }
-
-  fun set64Bit(is64Bit: Boolean) {
-    this.is64Bit = is64Bit
-    //noinspection NotifyDataSetChanged
+    // noinspection NotifyDataSetChanged
     notifyDataSetChanged()
   }
 
@@ -100,7 +60,7 @@ class LibStringAdapter(
       return
     }
     itemDisplayOptions = options
-    //noinspection NotifyDataSetChanged
+    // noinspection NotifyDataSetChanged
     notifyDataSetChanged()
   }
 
@@ -122,99 +82,34 @@ class LibStringAdapter(
   }
 
   override fun convert(holder: BaseViewHolder, item: LibStringItemChip) {
-    val itemName = renderItemName(
-      LibStringItemNameDisplay.create(
-        item = item.item,
-        type = type,
-        itemDisplayOptions = itemDisplayOptions
-      )
-    )
-
     when (type) {
-      NATIVE -> setNativeContent(holder.itemView as NativeLibItemView, item, itemName)
+      NATIVE -> (holder.itemView as NativeLibItemView).bind(
+        display = LibStringNativeItemDisplay.create(item, itemDisplayOptions),
+        highlightText = highlightText,
+        colorfulRuleIcon = colorfulRuleIcon
+      )
 
-      PERMISSION -> setPermissionContent(
-        itemView = holder.itemView as ComponentLibItemView,
+      PERMISSION -> (holder.itemView as ComponentLibItemView).bind(
         display = LibStringPermissionItemDisplay.create(
           item = item,
           itemDisplayOptions = itemDisplayOptions,
-          notGrantedLabel = context.getString(R.string.permission_not_granted)
-        )
+          notGrantedLabel = context.getString(com.absinthe.libchecker.R.string.permission_not_granted)
+        ),
+        highlightText = highlightText
       )
 
-      METADATA -> setMetadataContent(holder.itemView as MetadataLibItemView, item, itemName)
+      METADATA -> bindMetadata(holder.itemView as MetadataLibItemView, item)
 
-      STATIC -> setStaticContent(holder.itemView as StaticLibItemView, item, itemName)
-
-      else -> {
-        val display = LibStringComponentItemDisplay.create(
-          item = item,
-          type = type,
-          itemDisplayOptions = itemDisplayOptions,
-          processMode = processMode
-        )
-        (holder.itemView as ComponentLibItemView).apply {
-          processLabelColor = display.processName
-            ?.let { processMap[it] ?: UiUtils.getRandomColor() } ?: -1
-          setOrHighlightText(libName, renderItemName(display.name))
-          if (display.showRuleChip) {
-            setChip(item.rule, colorfulRuleIcon)
-          } else {
-            setChip(null, colorfulRuleIcon)
-          }
-          contentDescription = display.contentDescription
-        }
-      }
-    }
-
-    if (highlightPosition == -1 || holder.absoluteAdapterPosition != highlightPosition) {
-      if (holder.itemView.background is TransitionDrawable) {
-        (holder.itemView.background as TransitionDrawable).reverseTransition(
-          HIGHLIGHT_TRANSITION_DURATION
-        )
-        holder.itemView.setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackground))
-      }
-    } else {
-      val drawable = TransitionDrawable(
-        listOf(
-          Color.TRANSPARENT.toDrawable(),
-          context.getColorByAttr(com.google.android.material.R.attr.colorSecondaryContainer)
-            .toDrawable()
-        ).toTypedArray()
+      STATIC -> (holder.itemView as StaticLibItemView).bind(
+        display = LibStringStaticItemDisplay.create(item, itemDisplayOptions),
+        highlightText = highlightText,
+        colorfulRuleIcon = colorfulRuleIcon
       )
-      holder.itemView.background = drawable
-      if (holder.itemView.background is TransitionDrawable) {
-        (holder.itemView.background as TransitionDrawable).startTransition(
-          HIGHLIGHT_TRANSITION_DURATION
-        )
-      }
+
+      else -> bindComponent(holder.itemView as ComponentLibItemView, item)
     }
-  }
 
-  private fun renderItemName(display: LibStringItemNameDisplay): CharSequence {
-    return when (display.decoration) {
-      LibStringItemNameDisplay.Decoration.Plain -> display.text
-
-      LibStringItemNameDisplay.Decoration.Disabled -> buildSpannedString {
-        strikeThrough {
-          inSpans(StyleSpan(Typeface.BOLD_ITALIC)) {
-            append(display.text)
-          }
-        }
-        // prevent text clipping
-        append(" ")
-      }
-
-      LibStringItemNameDisplay.Decoration.Exported -> buildSpannedString {
-        append(display.text)
-        setSpan(
-          ForegroundColorSpan(context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary)),
-          0,
-          display.text.length,
-          Spannable.SPAN_INCLUSIVE_EXCLUSIVE
-        )
-      }
-    }
+    bindHighlightBackground(holder)
   }
 
   fun setHighlightBackgroundItem(position: Int) {
@@ -224,208 +119,104 @@ class LibStringAdapter(
     highlightPosition = position
   }
 
-  private fun setNativeContent(
-    itemView: NativeLibItemView,
+  fun setMetadataPreview(
     item: LibStringItemChip,
-    itemName: CharSequence
+    preview: AppResourcePreview
   ) {
-    // itemView.processLabelColor = if (item.item.process.isNullOrEmpty() || !processMode) {
-    //   -1
-    // } else {
-    //   processMap[item.item.process] ?: UiUtils.getRandomColor()
-    // }
-    itemView.processLabelColor = -1
-    setOrHighlightText(itemView.libName, itemName)
-    itemView.libSize.text = getNativeSizeText(item)
-    if (isItemOptionEnabled(AdvancedOptions.SHOW_MARKED_LIB)) {
-      itemView.setChip(item.rule, colorfulRuleIcon)
+    val key = item.metadataPreviewKey()
+    if (preview == AppResourcePreview.Original) {
+      metadataPreviews.remove(key)
     } else {
-      itemView.setChip(null, colorfulRuleIcon)
+      metadataPreviews[key] = preview
     }
-    itemView.contentDescription = buildLibStringItemDescription(
-      itemName,
-      itemView.libSize.text,
-      item.rule?.label.takeIf { isItemOptionEnabled(AdvancedOptions.SHOW_MARKED_LIB) }
+    data.indexOfFirst { it.metadataPreviewKey() == key }
+      .takeIf { it >= 0 }
+      ?.let(::notifyItemChanged)
+  }
+
+  private fun bindComponent(
+    itemView: ComponentLibItemView,
+    item: LibStringItemChip
+  ) {
+    val processName = item.item.process.takeIf { processMode && !it.isNullOrEmpty() }
+    val processIndicatorColor = processName?.let {
+      processMap[it] ?: fallbackProcessColors.getOrPut(it, UiUtils::getRandomColor)
+    }
+    itemView.bind(
+      display = LibStringComponentItemDisplay.create(
+        item = item,
+        type = type,
+        itemDisplayOptions = itemDisplayOptions,
+        processMode = processMode,
+        processIndicatorColor = processIndicatorColor
+      ),
+      highlightText = highlightText,
+      colorfulRuleIcon = colorfulRuleIcon
     )
   }
 
-  private fun getNativeSizeText(item: LibStringItemChip): CharSequence {
-    return nativeSizeTextCache.getOrPut(item.item to item.labels) {
-      val displayData = item.nativeDisplayData ?: checkNotNull(buildNativeLibraryItemDisplayData) {
-        "BuildNativeLibraryItemDisplayDataUseCase is required for native library rows."
-      }(item.item, item.labels)
-      buildNativeSizeText(displayData)
-    }
-  }
-
-  private fun buildNativeSizeText(displayData: NativeLibraryItemDisplayData): CharSequence {
-    return buildSpannedString {
-      append(displayData.sizeText)
-      displayData.labels.forEach { label ->
-        append(createNativeLabelSpan(label))
-      }
-    }
-  }
-
-  private fun setStaticContent(
-    itemView: StaticLibItemView,
-    item: LibStringItemChip,
-    itemName: CharSequence
+  private fun bindMetadata(
+    itemView: MetadataLibItemView,
+    item: LibStringItemChip
   ) {
-    setOrHighlightText(itemView.libName, itemName)
-    itemView.libDetail.let {
-      if (OsUtils.atLeastQ()) {
-        it.breakStrategy = LineBreaker.BREAK_STRATEGY_SIMPLE
-      } else if (OsUtils.atLeastO()) {
-        // noinspection WrongConstant
-        it.breakStrategy = Layout.BREAK_STRATEGY_SIMPLE
-      }
-
-      item.item.source?.fromJson<StaticLibItem>()?.let { staticLibItem ->
-        it.text = buildSpannedString {
-          bold { append("[Path] ") }
-          append(staticLibItem.path).appendLine()
-          bold { append("[Version Code] ") }
-          append(staticLibItem.version.toString()).appendLine()
-          bold { append("[Cert] ") }
-          append(staticLibItem.certDigest)
-        }
-      }
-    }
-    if (isItemOptionEnabled(AdvancedOptions.SHOW_MARKED_LIB)) {
-      itemView.setChip(item.rule, colorfulRuleIcon)
-    } else {
-      itemView.setChip(null, colorfulRuleIcon)
-    }
-    itemView.contentDescription = buildLibStringItemDescription(
-      itemName,
-      itemView.libDetail.text,
-      item.rule?.label.takeIf { isItemOptionEnabled(AdvancedOptions.SHOW_MARKED_LIB) }
+    val display = LibStringMetadataItemDisplay.create(
+      item = item,
+      itemDisplayOptions = itemDisplayOptions,
+      apkPreviewUnavailableLabel = context.getString(
+        com.absinthe.libchecker.R.string.apk_preview_item_not_available
+      ),
+      preview = metadataPreviews[item.metadataPreviewKey()] ?: AppResourcePreview.Original
     )
+    itemView.bind(
+      display = display,
+      highlightText = highlightText,
+      onResourceClick = onMetadataResourceClick?.let { callback ->
+        { clickedDisplay -> callback(item, clickedDisplay) }
+      }
+    )
+  }
+
+  private fun bindHighlightBackground(holder: BaseViewHolder) {
+    if (highlightPosition == -1 || holder.absoluteAdapterPosition != highlightPosition) {
+      if (holder.itemView.background is TransitionDrawable) {
+        (holder.itemView.background as TransitionDrawable).reverseTransition(
+          HIGHLIGHT_TRANSITION_DURATION
+        )
+        holder.itemView.setBackgroundResource(
+          context.getResourceIdByAttr(android.R.attr.selectableItemBackground)
+        )
+      }
+      return
+    }
+
+    val drawable = TransitionDrawable(
+      listOf(
+        Color.TRANSPARENT.toDrawable(),
+        context.getColorByAttr(com.google.android.material.R.attr.colorSecondaryContainer)
+          .toDrawable()
+      ).toTypedArray()
+    )
+    holder.itemView.background = drawable
+    drawable.startTransition(HIGHLIGHT_TRANSITION_DURATION)
   }
 
   private fun isItemOptionEnabled(option: Int): Boolean {
     return (itemDisplayOptions and option) > 0
   }
 
-  private fun setPermissionContent(
-    itemView: ComponentLibItemView,
-    display: LibStringPermissionItemDisplay
-  ) {
-    itemView.processLabelColor = if (display.showNotGrantedIndicator) {
-      R.color.material_red_500.getColor(context)
-    } else {
-      -1
-    }
-    setOrHighlightText(itemView.libName, renderItemName(display.name))
-    itemView.contentDescription = display.contentDescription
+  private fun LibStringItemChip.metadataPreviewKey(): MetadataPreviewKey {
+    return MetadataPreviewKey(
+      name = item.name,
+      resourceId = item.size,
+      resourceType = labels.firstOrNull(),
+      originalValue = item.source
+    )
   }
 
-  private fun setMetadataContent(
-    itemView: MetadataLibItemView,
-    item: LibStringItemChip,
-    itemName: CharSequence
-  ) {
-    val isApkPreviewMode = item.item.size == -1L
-    setOrHighlightText(itemView.libName, itemName)
-
-    if (isApkPreviewMode) {
-      setOrHighlightText(itemView.libSize, "<${context.getString(R.string.apk_preview_item_not_available)}>")
-      itemView.contentDescription = buildLibStringItemDescription(itemName, itemView.libSize.text)
-      return
-    }
-
-    setOrHighlightText(itemView.libSize, item.item.source.orEmpty())
-    val resourceType = item.labels.firstOrNull()
-    itemView.linkToIcon.isVisible = ResolveAppResourceValueUseCase.isLinkableType(resourceType) &&
-      resolveAppResourceValue != null
-
-    if (itemView.linkToIcon.isVisible) {
-      itemView.linkToIcon.setOnClickListener {
-        val transformed = itemView.linkToIcon.getTag(R.id.resource_transformed_id) as? Boolean == true
-        if (transformed) {
-          itemView.libSize.text = item.item.source
-          itemView.linkToIcon.setImageResource(R.drawable.ic_outline_change_circle_24)
-          itemView.linkToIcon.setTag(R.id.resource_transformed_id, false)
-          itemView.contentDescription = buildLibStringItemDescription(itemName, itemView.libSize.text)
-        } else {
-          val clickedTag = when (
-            val resourceValue = resolveAppResourceValue?.invoke(
-              ResolveAppResourceValueUseCase.Request(
-                packageName = packageName,
-                resourceId = item.item.size.toInt(),
-                resourceType = resourceType
-              )
-            )
-          ) {
-            is AppResourceValue.Text -> {
-              itemView.libSize.text = resourceValue.value
-              true
-            }
-
-            is AppResourceValue.Xml -> {
-              fragmentManager?.let { fm ->
-                XmlBSDFragment().apply {
-                  arguments = Bundle().apply {
-                    putCharSequence(EXTRA_TEXT, resourceValue.value)
-                  }
-                  show(fm, XmlBSDFragment::class.java.name)
-                }
-              }
-              false
-            }
-
-            is AppResourceValue.DrawablePreview -> {
-              val bitmap = resourceValue.drawable.toBitmap(
-                itemView.linkToIcon.measuredWidth,
-                itemView.linkToIcon.measuredHeight,
-                Bitmap.Config.ARGB_8888
-              )
-              itemView.linkToIcon.load(bitmap)
-              true
-            }
-
-            is AppResourceValue.ColorPreview -> {
-              itemView.linkToIcon.load(
-                ShapeDrawable(OvalShape()).apply {
-                  paint.color = resourceValue.color
-                }.toBitmap(
-                  itemView.linkToIcon.measuredWidth,
-                  itemView.linkToIcon.measuredHeight,
-                  Bitmap.Config.ARGB_8888
-                )
-              )
-              true
-            }
-
-            null -> {
-              false
-            }
-          }
-          itemView.linkToIcon.setTag(R.id.resource_transformed_id, clickedTag)
-          itemView.contentDescription = buildLibStringItemDescription(itemName, itemView.libSize.text)
-        }
-      }
-    }
-    itemView.contentDescription = buildLibStringItemDescription(itemName, itemView.libSize.text)
-  }
-
-  private fun createNativeLabelSpan(text: String): SpannedString = nativeLabelSpanCache.getOrPut(text) {
-    buildSpannedString {
-      append(" $text ")
-      val capsuleDrawable = CapsuleDrawable(
-        context = context,
-        text = text,
-        textSize = 10.dp.toFloat(),
-        textColor = context.getColorByAttr(com.google.android.material.R.attr.colorOnSecondaryFixed),
-        backgroundColor = context.getColorByAttr(com.google.android.material.R.attr.colorSecondaryFixed),
-        borderColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutlineVariant),
-        borderWidth = 1f,
-        cornerRadius = 5.dp.toFloat()
-      )
-      capsuleDrawable.setBounds(0, 0, capsuleDrawable.intrinsicWidth, capsuleDrawable.intrinsicHeight)
-      val span = CenterAlignImageSpan(capsuleDrawable)
-      setSpan(span, 1, 1 + text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-    }
-  }
+  private data class MetadataPreviewKey(
+    val name: String,
+    val resourceId: Long,
+    val resourceType: String?,
+    val originalValue: String?
+  )
 }

@@ -3,7 +3,6 @@ package com.absinthe.libchecker.domain.app.detail.resource
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
-import com.absinthe.libchecker.domain.app.detail.model.isAppResourcePreviewSupported
 import com.absinthe.libchecker.utils.manifest.ResourceParser
 
 class ResolveAppResourceValueUseCase(

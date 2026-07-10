@@ -17,7 +17,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.model.AppPropItem
-import com.absinthe.libchecker.domain.app.detail.model.AppPropPreview
+import com.absinthe.libchecker.domain.app.detail.resource.AppResourcePreview
 import com.absinthe.libchecker.utils.extensions.getDrawableByAttr
 import com.absinthe.libchecker.view.AViewGroup
 
@@ -91,7 +91,7 @@ class AppPropItemView(context: Context) : AViewGroup(context) {
       isVisible = item.resource != null
       setOnClickListener(if (item.resource != null) View.OnClickListener { onResourceClick(item) } else null)
       when (val preview = item.preview) {
-        is AppPropPreview.DrawableValue -> setImageBitmap(
+        is AppResourcePreview.DrawableValue -> setImageBitmap(
           preview.drawable.toBitmap(
             previewWidth,
             previewHeight,
@@ -99,7 +99,7 @@ class AppPropItemView(context: Context) : AViewGroup(context) {
           )
         )
 
-        is AppPropPreview.ColorValue -> setImageBitmap(
+        is AppResourcePreview.ColorValue -> setImageBitmap(
           ShapeDrawable(OvalShape()).apply {
             paint.color = preview.color
           }.toBitmap(
@@ -109,8 +109,8 @@ class AppPropItemView(context: Context) : AViewGroup(context) {
           )
         )
 
-        AppPropPreview.Original,
-        is AppPropPreview.Text -> setImageResource(R.drawable.ic_outline_change_circle_24)
+        AppResourcePreview.Original,
+        is AppResourcePreview.Text -> setImageResource(R.drawable.ic_outline_change_circle_24)
       }
     }
   }

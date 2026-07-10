@@ -86,24 +86,29 @@ class AppInstallTimeItemView(context: Context) : AViewGroup(context) {
   }
 
   class ContentView(context: Context) : AViewGroup(context) {
-    val firstInstalledView = NativeLibItemView(context).apply {
+    private val firstInstalledLabel = context.getString(R.string.lib_detail_app_first_installed_time)
+    private val lastUpdatedLabel = context.getString(R.string.lib_detail_app_last_updated_time)
+    private var firstInstalledTime: CharSequence = ""
+    private var lastUpdatedTime: CharSequence = ""
+
+    private val firstInstalledView = NativeLibItemView(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
       isClickable = false
       isLongClickable = false
-      libName.text = context.getString(R.string.lib_detail_app_first_installed_time)
+      bindText(firstInstalledLabel, firstInstalledTime)
     }
 
-    val lastUpdatedView = NativeLibItemView(context).apply {
+    private val lastUpdatedView = NativeLibItemView(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
       isClickable = false
       isLongClickable = false
-      libName.text = context.getString(R.string.lib_detail_app_last_updated_time)
+      bindText(lastUpdatedLabel, lastUpdatedTime)
     }
 
     init {
@@ -112,12 +117,22 @@ class AppInstallTimeItemView(context: Context) : AViewGroup(context) {
       addView(lastUpdatedView)
     }
 
+    fun bind(
+      firstInstalledTime: CharSequence,
+      lastUpdatedTime: CharSequence
+    ) {
+      this.firstInstalledTime = firstInstalledTime
+      this.lastUpdatedTime = lastUpdatedTime
+      firstInstalledView.bindText(firstInstalledLabel, firstInstalledTime)
+      lastUpdatedView.bindText(lastUpdatedLabel, lastUpdatedTime)
+    }
+
     fun getAllContentText(): String {
       return listOf(
-        firstInstalledView.libName.text,
-        firstInstalledView.libSize.text,
-        lastUpdatedView.libName.text,
-        lastUpdatedView.libSize.text
+        firstInstalledLabel,
+        firstInstalledTime,
+        lastUpdatedLabel,
+        lastUpdatedTime
       ).joinToString(System.lineSeparator())
     }
 

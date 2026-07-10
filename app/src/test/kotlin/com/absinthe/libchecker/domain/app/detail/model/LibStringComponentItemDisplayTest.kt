@@ -23,7 +23,8 @@ class LibStringComponentItemDisplayTest {
       ),
       type = SERVICE,
       itemDisplayOptions = AdvancedOptions.SHOW_MARKED_LIB,
-      processMode = true
+      processMode = true,
+      processIndicatorColor = 0xff336699.toInt()
     )
 
     assertEquals(
@@ -36,6 +37,7 @@ class LibStringComponentItemDisplayTest {
     assertTrue(display.showRuleChip)
     assertEquals("Sync SDK", display.ruleLabel)
     assertEquals(":sync", display.processName)
+    assertEquals(0xff336699.toInt(), display.processIndicatorColor)
     assertEquals(
       "com.example.SyncService, Sync SDK, :sync",
       display.contentDescription
@@ -110,6 +112,7 @@ class LibStringComponentItemDisplayTest {
     )
 
     assertNull(display.processName)
+    assertNull(display.processIndicatorColor)
     assertEquals("com.example.SyncService", display.contentDescription)
   }
 
