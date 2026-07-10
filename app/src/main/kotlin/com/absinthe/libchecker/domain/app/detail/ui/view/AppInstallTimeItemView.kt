@@ -9,9 +9,11 @@ import androidx.core.view.isGone
 import androidx.core.view.marginBottom
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.detail.action.AppInstalledTimeDisplayData
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
+import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.card.MaterialCardView
@@ -31,7 +33,7 @@ class AppInstallTimeItemView(context: Context) : AViewGroup(context) {
     text = context.getString(R.string.lib_detail_app_installed_time)
   }
 
-  val contentView = ContentView(context).apply {
+  private val contentView = ContentView(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
@@ -61,6 +63,14 @@ class AppInstallTimeItemView(context: Context) : AViewGroup(context) {
     addView(container)
   }
 
+  fun bind(display: AppInstalledTimeDisplayData) {
+    contentView.bind(
+      firstInstalledTime = display.firstInstalledTime,
+      lastUpdatedTime = display.lastUpdatedTime
+    )
+    container.setLongClickCopiedToClipboard(contentView.getAllContentText())
+  }
+
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     val parent = parent as ViewGroup
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
@@ -85,7 +95,7 @@ class AppInstallTimeItemView(context: Context) : AViewGroup(context) {
     container.layout(paddingStart, titleView.bottom + container.marginTop)
   }
 
-  class ContentView(context: Context) : AViewGroup(context) {
+  private class ContentView(context: Context) : AViewGroup(context) {
     private val firstInstalledLabel = context.getString(R.string.lib_detail_app_first_installed_time)
     private val lastUpdatedLabel = context.getString(R.string.lib_detail_app_last_updated_time)
     private var firstInstalledTime: CharSequence = ""

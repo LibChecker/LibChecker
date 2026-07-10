@@ -9,9 +9,7 @@ import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.detail.AppDetailAbiLabelData
 import com.absinthe.libchecker.domain.app.detail.AppDetailHeaderExtraInfo
-import com.absinthe.libchecker.domain.app.detail.RelatedAppDisplayData
 import com.absinthe.libchecker.domain.app.detail.action.AppElfDetail
-import com.absinthe.libchecker.domain.app.detail.action.AppInstallSourceDetails
 import com.absinthe.libchecker.domain.app.detail.action.AppLaunchAction
 import com.absinthe.libchecker.domain.app.detail.action.AppPackageShareAction
 import com.absinthe.libchecker.domain.app.detail.action.AppPackageShareFile
@@ -19,6 +17,8 @@ import com.absinthe.libchecker.domain.app.detail.action.DetailItemDialogRequest
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemLongClickActions
 import com.absinthe.libchecker.domain.app.detail.feature.AppDetailFeatureItemData
 import com.absinthe.libchecker.domain.app.detail.model.AppBundleItem
+import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceBottomSheetDisplay
+import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceRequesterAccess
 import com.absinthe.libchecker.domain.app.detail.model.AppPropItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
@@ -164,21 +164,19 @@ class DetailViewModel(
     val result: Result<ApkPreviewInfo>
   )
 
-  fun loadAppInstallSourceDetails(packageName: String) {
+  fun loadAppInstallSourceDetails(
+    packageName: String,
+    requesterAccess: AppInstallSourceRequesterAccess
+  ) {
     appInstallSourceDetailsJob?.cancel()
     appInstallSourceDetailsJob = viewModelScope.launch {
-      val details = detailActionLoader.getAppInstallSourceDetails(packageName)
-      val installSource = details?.installSource
       _appInstallSourceDetailsResults.emit(
         AppInstallSourceDetailsResult(
           packageName = packageName,
-          details = details,
-          originatingApp = installSource?.originatingPackageName?.let {
-            detailActionLoader.getRelatedAppDisplayData(it)
-          },
-          installingApp = installSource?.installingPackageName?.let {
-            detailActionLoader.getRelatedAppDisplayData(it)
-          }
+          display = detailActionLoader.getAppInstallSourceBottomSheetDisplay(
+            packageName,
+            requesterAccess
+          )
         )
       )
     }
@@ -186,9 +184,7 @@ class DetailViewModel(
 
   data class AppInstallSourceDetailsResult(
     val packageName: String,
-    val details: AppInstallSourceDetails?,
-    val originatingApp: RelatedAppDisplayData?,
-    val installingApp: RelatedAppDisplayData?
+    val display: AppInstallSourceBottomSheetDisplay?
   )
 
   fun loadAppLaunchAction(packageName: String?) {
@@ -348,8 +344,6 @@ class DetailViewModel(
   suspend fun getAppLaunchAction(packageName: String?) = detailActionLoader.getAppLaunchAction(packageName)
 
   suspend fun getAlternativeLaunchItems(packageName: String) = detailActionLoader.getAlternativeLaunchItems(packageName)
-
-  suspend fun getAppInstallSourceDetails(packageName: String) = detailActionLoader.getAppInstallSourceDetails(packageName)
 
   suspend fun getXposedModuleInfo(packageName: String) = detailActionLoader.getXposedModuleInfo(packageName)
 

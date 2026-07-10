@@ -13,6 +13,7 @@ import com.absinthe.libchecker.domain.app.detail.GetAppDetailPackageSizeUseCase
 import com.absinthe.libchecker.domain.app.detail.GetAppDetailStaticLibraryTabItemsUseCase
 import com.absinthe.libchecker.domain.app.detail.GetRelatedAppDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.detail.action.AllowFileUriExposureUseCase
+import com.absinthe.libchecker.domain.app.detail.action.BuildAppInstallSourceBottomSheetDisplayUseCase
 import com.absinthe.libchecker.domain.app.detail.action.BuildDetailItemDialogRequestUseCase
 import com.absinthe.libchecker.domain.app.detail.action.BuildDetailItemLongClickActionsUseCase
 import com.absinthe.libchecker.domain.app.detail.action.BuildSignatureDetailItemsUseCase
@@ -116,6 +117,7 @@ val appDetailModule = module {
   factory { BuildAppDetailHeaderTitleDataUseCase(androidContext(), get()) }
   factory { BuildNativeLibraryItemDisplayDataUseCase(androidContext()) }
   factory { BuildRelatedAppDisplayDataUseCase(androidContext(), get()) }
+  factory { BuildAppInstallSourceBottomSheetDisplayUseCase(androidContext()) }
   factory { BuildDetailItemDialogRequestUseCase() }
   factory { BuildDetailItemLongClickActionsUseCase() }
   factory { GetPermissionProvidersUseCase(get()) }
@@ -142,6 +144,7 @@ val appDetailModule = module {
       getAppInfoActionsUseCase = get(),
       getAppInfoPrimaryActionsUseCase = get(),
       getAppInstallSourceDetailsUseCase = get(),
+      buildAppInstallSourceBottomSheetDisplayUseCase = get(),
       getAppLaunchActionUseCase = get(),
       getAppManifestPropertiesUseCase = get(),
       getElfDetailUseCase = get(),

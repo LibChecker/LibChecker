@@ -6,6 +6,7 @@ import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.detail.GetRelatedAppDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.detail.action.AppPackageShareFile
+import com.absinthe.libchecker.domain.app.detail.action.BuildAppInstallSourceBottomSheetDisplayUseCase
 import com.absinthe.libchecker.domain.app.detail.action.BuildDetailItemDialogRequestUseCase
 import com.absinthe.libchecker.domain.app.detail.action.BuildDetailItemLongClickActionsUseCase
 import com.absinthe.libchecker.domain.app.detail.action.BuildSignatureDetailItemsUseCase
@@ -27,12 +28,16 @@ import com.absinthe.libchecker.domain.app.detail.action.PrepareAppPackageShareAc
 import com.absinthe.libchecker.domain.app.detail.content.BuildAppBundleItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.detail.content.GetAppBundleItemsUseCase
 import com.absinthe.libchecker.domain.app.detail.model.AppBundleItem
+import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceBottomSheetDisplay
+import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceRequesterAccess
 import com.absinthe.libchecker.domain.app.detail.model.AppPropItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.navigation.BuildDetailReferenceNavigationUseCase
 import com.absinthe.libchecker.domain.app.detail.navigation.DetailReferenceNavigationRequest
 import java.io.File
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 
 class DetailActionLoader(
   private val getAlternativeLaunchItemsUseCase: GetAlternativeLaunchItemsUseCase,
@@ -41,6 +46,7 @@ class DetailActionLoader(
   private val getAppInfoActionsUseCase: GetAppInfoActionsUseCase,
   private val getAppInfoPrimaryActionsUseCase: GetAppInfoPrimaryActionsUseCase,
   private val getAppInstallSourceDetailsUseCase: GetAppInstallSourceDetailsUseCase,
+  private val buildAppInstallSourceBottomSheetDisplayUseCase: BuildAppInstallSourceBottomSheetDisplayUseCase,
   private val getAppLaunchActionUseCase: GetAppLaunchActionUseCase,
   private val getAppManifestPropertiesUseCase: GetAppManifestPropertiesUseCase,
   private val getElfDetailUseCase: GetElfDetailUseCase,
@@ -69,7 +75,37 @@ class DetailActionLoader(
 
   suspend fun getAlternativeLaunchItems(packageName: String) = getAlternativeLaunchItemsUseCase(packageName)
 
-  suspend fun getAppInstallSourceDetails(packageName: String) = getAppInstallSourceDetailsUseCase(packageName)
+  suspend fun getAppInstallSourceBottomSheetDisplay(
+    packageName: String,
+    requesterAccess: AppInstallSourceRequesterAccess
+  ): AppInstallSourceBottomSheetDisplay? {
+    val details = getAppInstallSourceDetailsUseCase(packageName) ?: return null
+    val installSource = details.installSource
+    return coroutineScope {
+      val originatingApp = async {
+        if (requesterAccess == AppInstallSourceRequesterAccess.Available) {
+          installSource?.originatingPackageName?.let {
+            getRelatedAppDisplayDataUseCase(it)
+          }
+        } else {
+          null
+        }
+      }
+      val installingApp = async {
+        installSource?.installingPackageName?.let {
+          getRelatedAppDisplayDataUseCase(it)
+        }
+      }
+      buildAppInstallSourceBottomSheetDisplayUseCase(
+        BuildAppInstallSourceBottomSheetDisplayUseCase.Request(
+          details = details,
+          originatingApp = originatingApp.await(),
+          installingApp = installingApp.await(),
+          requesterAccess = requesterAccess
+        )
+      )
+    }
+  }
 
   suspend fun getXposedModuleInfo(packageName: String) = getXposedModuleInfoUseCase(packageName)
 
