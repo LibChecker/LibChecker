@@ -337,7 +337,7 @@ class DetailViewModel(
     return detailActionLoader.getAppBundleItems(packageInfo)
   }
 
-  suspend fun getAppInfoActions(packageName: String) = detailActionLoader.getAppInfoActions(packageName)
+  suspend fun getAppInfoBottomSheetState(packageName: String?) = detailActionLoader.getAppInfoBottomSheetState(packageName)
 
   suspend fun getAppInfoPrimaryActions(packageName: String?) = detailActionLoader.getAppInfoPrimaryActions(packageName)
 

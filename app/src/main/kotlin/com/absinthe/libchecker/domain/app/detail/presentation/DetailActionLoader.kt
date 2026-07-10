@@ -30,6 +30,7 @@ import com.absinthe.libchecker.domain.app.detail.action.buildOverlayDetailBottom
 import com.absinthe.libchecker.domain.app.detail.content.BuildAppBundleItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.detail.content.GetAppBundleItemsUseCase
 import com.absinthe.libchecker.domain.app.detail.model.AppBundleItem
+import com.absinthe.libchecker.domain.app.detail.model.AppInfoBottomSheetState
 import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceBottomSheetDisplay
 import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceRequesterAccess
 import com.absinthe.libchecker.domain.app.detail.model.AppPropItem
@@ -72,7 +73,23 @@ class DetailActionLoader(
     return buildAppBundleItemDisplayDataUseCase(getAppBundleItemsUseCase(packageInfo))
   }
 
-  suspend fun getAppInfoActions(packageName: String) = getAppInfoActionsUseCase(packageName)
+  suspend fun getAppInfoBottomSheetState(packageName: String?): AppInfoBottomSheetState.Content {
+    return coroutineScope {
+      val primaryActions = async {
+        getAppInfoPrimaryActionsUseCase(packageName)
+      }
+      val externalActions = async {
+        packageName?.let {
+          getAppInfoActionsUseCase(it)
+        }.orEmpty()
+      }
+      AppInfoBottomSheetState.Content(
+        packageName = packageName,
+        primaryActions = primaryActions.await(),
+        externalActions = externalActions.await()
+      )
+    }
+  }
 
   suspend fun getAppInfoPrimaryActions(packageName: String?) = getAppInfoPrimaryActionsUseCase(packageName)
 

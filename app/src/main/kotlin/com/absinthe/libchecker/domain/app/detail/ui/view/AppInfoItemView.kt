@@ -18,7 +18,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.isVisible
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.app.detail.action.AppInfoActionItem
+import com.absinthe.libchecker.domain.app.detail.model.AppInfoActionItem
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr

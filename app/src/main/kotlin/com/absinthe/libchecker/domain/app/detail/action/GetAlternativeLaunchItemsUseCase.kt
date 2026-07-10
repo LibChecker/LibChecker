@@ -2,7 +2,7 @@ package com.absinthe.libchecker.domain.app.detail.action
 
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
-import com.absinthe.libchecker.domain.app.detail.model.buildDetailItemDescription
+import com.absinthe.libchecker.domain.app.detail.model.AlternativeLaunchItem
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -35,9 +35,3 @@ class GetAlternativeLaunchItemsUseCase(
     }.getOrDefault(name)
   }
 }
-
-data class AlternativeLaunchItem(
-  val label: String,
-  val className: String,
-  val contentDescription: String = buildDetailItemDescription(label, className)
-)

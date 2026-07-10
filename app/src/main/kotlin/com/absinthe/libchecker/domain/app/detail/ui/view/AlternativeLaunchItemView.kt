@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.children
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.app.detail.action.AlternativeLaunchItem
+import com.absinthe.libchecker.domain.app.detail.model.AlternativeLaunchItem
 import com.absinthe.libchecker.view.AViewGroup
 
 class AlternativeLaunchItemView(context: Context) : AViewGroup(context) {

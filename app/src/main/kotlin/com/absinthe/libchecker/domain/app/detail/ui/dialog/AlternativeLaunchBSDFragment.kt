@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Intent
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.detail.model.AlternativeLaunchAction
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
 import com.absinthe.libchecker.domain.app.detail.ui.view.AlternativeLaunchBSDView
@@ -18,27 +19,14 @@ class AlternativeLaunchBSDFragment : BaseBottomSheetViewDialogFragment<Alternati
   private val viewModel: DetailViewModel by activityViewModel()
   private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
 
-  override fun initRootView(): AlternativeLaunchBSDView = AlternativeLaunchBSDView(requireContext())
+  override fun initRootView(): AlternativeLaunchBSDView {
+    return AlternativeLaunchBSDView(requireContext())
+  }
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {
     maxPeekHeightPercentage = 0.67f
-    root.adapter.setOnItemClickListener { _, _, position ->
-      val className = root.adapter.data.getOrNull(position)?.className ?: return@setOnItemClickListener
-      val packageName = packageName ?: return@setOnItemClickListener
-      runCatching {
-        startActivity(
-          Intent().also {
-            it.setPackage(packageName)
-            it.component = ComponentName(packageName, className)
-          }
-        )
-      }.onFailure {
-        activity?.showToast(R.string.toast_cant_open_app)
-      }
-    }
-
     lifecycleScope.launch {
       val packageName = packageName ?: run {
         activity?.showToast(R.string.toast_cant_open_app)
@@ -51,7 +39,25 @@ class AlternativeLaunchBSDFragment : BaseBottomSheetViewDialogFragment<Alternati
         dismiss()
         return@launch
       }
-      root.adapter.setList(list)
+      root.bind(list, ::handleAction)
+    }
+  }
+
+  private fun handleAction(action: AlternativeLaunchAction) {
+    when (action) {
+      is AlternativeLaunchAction.OpenActivity -> {
+        val packageName = packageName ?: return
+        runCatching {
+          startActivity(
+            Intent().apply {
+              setPackage(packageName)
+              component = ComponentName(packageName, action.item.className)
+            }
+          )
+        }.onFailure {
+          activity?.showToast(R.string.toast_cant_open_app)
+        }
+      }
     }
   }
 }

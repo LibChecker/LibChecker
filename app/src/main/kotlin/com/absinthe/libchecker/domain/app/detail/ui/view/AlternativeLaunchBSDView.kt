@@ -4,11 +4,12 @@ import android.content.Context
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.detail.model.AlternativeLaunchAction
+import com.absinthe.libchecker.domain.app.detail.model.AlternativeLaunchItem
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.AlternativeLaunchAdapter
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
@@ -16,7 +17,7 @@ class AlternativeLaunchBSDView(context: Context) :
   LinearLayout(context),
   IHeaderView {
 
-  val adapter by unsafeLazy { AlternativeLaunchAdapter() }
+  private val adapter = AlternativeLaunchAdapter()
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =
@@ -50,7 +51,17 @@ class AlternativeLaunchBSDView(context: Context) :
     addView(list)
   }
 
-  override fun getHeaderView(): BottomSheetHeaderView {
-    return header
+  fun bind(
+    items: List<AlternativeLaunchItem>,
+    onAction: (AlternativeLaunchAction) -> Unit
+  ) {
+    adapter.setOnItemClickListener { _, _, position ->
+      adapter.data.getOrNull(position)?.let {
+        onAction(AlternativeLaunchAction.OpenActivity(it))
+      }
+    }
+    adapter.setList(items)
   }
+
+  override fun getHeaderView(): BottomSheetHeaderView = header
 }

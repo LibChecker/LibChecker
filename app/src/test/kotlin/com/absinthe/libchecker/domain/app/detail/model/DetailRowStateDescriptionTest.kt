@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.domain.app.detail.model
 
-import com.absinthe.libchecker.domain.app.detail.action.AlternativeLaunchItem
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
