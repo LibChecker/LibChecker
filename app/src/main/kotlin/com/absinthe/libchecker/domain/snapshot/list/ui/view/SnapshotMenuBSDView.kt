@@ -6,11 +6,13 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemDisplayData
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotMenuAction
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotMenuBottomSheetState
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotMenuLayoutItem
 import com.absinthe.libchecker.domain.snapshot.list.model.buildSnapshotMenuLayoutItems
-import com.absinthe.libchecker.domain.snapshot.list.model.replaceSnapshotMenuDemoDisplayData
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
+import com.absinthe.libchecker.ui.app.MenuOptionItem
+import com.absinthe.libchecker.ui.app.MenuOptionItemView
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
@@ -21,22 +23,20 @@ import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.flexbox.JustifyContent
 
-class SnapshotMenuBSDView(
-  context: Context,
-  demoDisplayData: SnapshotItemDisplayData
-) : LinearLayout(context),
+class SnapshotMenuBSDView(context: Context) :
+  LinearLayout(context),
   IHeaderView {
 
+  private var onAction: (SnapshotMenuAction) -> Unit = {}
+
   private val header = BottomSheetHeaderView(context).apply {
-    layoutParams =
-      LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+    layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
     title.text = context.getString(R.string.advanced_menu)
   }
 
-  private var layoutItems = buildSnapshotMenuLayoutItems(demoDisplayData)
   private val adapter = SnapshotMenuAdapter()
 
-  private val flexLayout = FlexboxLayout(context).apply {
+  private val optionsLayout = FlexboxLayout(context).apply {
     layoutParams = LayoutParams(
       LayoutParams.MATCH_PARENT,
       LayoutParams.WRAP_CONTENT
@@ -61,27 +61,6 @@ class SnapshotMenuBSDView(
     clipChildren = false
     isNestedScrollingEnabled = true
     setHasFixedSize(true)
-
-    this@SnapshotMenuBSDView.adapter.apply {
-      setList(layoutItems)
-    }
-  }
-
-  fun addOptionItemView(
-    labelRes: Int,
-    option: Int,
-    currentOptions: Int
-  ): SnapshotMenuItemView {
-    val view = SnapshotMenuItemView(context).apply {
-      setOption(labelRes, option, currentOptions)
-    }
-    flexLayout.addView(view)
-    return view
-  }
-
-  fun setDemoDisplayData(data: SnapshotItemDisplayData) {
-    layoutItems = layoutItems.replaceSnapshotMenuDemoDisplayData(data)
-    adapter.setList(layoutItems)
   }
 
   init {
@@ -92,8 +71,38 @@ class SnapshotMenuBSDView(
     addView(list)
   }
 
-  override fun getHeaderView(): BottomSheetHeaderView {
-    return header
+  fun bind(
+    state: SnapshotMenuBottomSheetState,
+    onAction: (SnapshotMenuAction) -> Unit
+  ) {
+    this.onAction = onAction
+    optionsLayout.renderOptions(state.options)
+    adapter.setList(buildSnapshotMenuLayoutItems(state.demoDisplayData))
+  }
+
+  override fun getHeaderView(): BottomSheetHeaderView = header
+
+  override fun onDetachedFromWindow() {
+    onAction = {}
+    super.onDetachedFromWindow()
+  }
+
+  private fun FlexboxLayout.renderOptions(items: List<MenuOptionItem>) {
+    removeAllViews()
+    items.forEach { item ->
+      addView(
+        MenuOptionItemView(context).apply {
+          bind(item) { isChecked ->
+            onAction(
+              SnapshotMenuAction.OptionChanged(
+                item = item,
+                isChecked = isChecked
+              )
+            )
+          }
+        }
+      )
+    }
   }
 
   private inner class SnapshotMenuAdapter : BaseQuickAdapter<SnapshotMenuLayoutItem, BaseViewHolder>(0) {
@@ -119,7 +128,7 @@ class SnapshotMenuBSDView(
         }
 
         SnapshotMenuLayoutItem.Options -> {
-          container.setSingleChild(flexLayout)
+          container.setSingleChild(optionsLayout)
         }
       }
     }

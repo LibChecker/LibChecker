@@ -13,13 +13,13 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 
 class AdvancedMenuSortView(
-  context: Context,
-  displayOptions: Int,
-  private val onDisplayOptionsChanged: (Int) -> Unit
+  context: Context
 ) : LinearLayout(context),
   MaterialButtonToggleGroup.OnButtonCheckedListener {
 
-  private var currentOptions = displayOptions
+  private var currentOptions = AdvancedOptions.DEFAULT_OPTIONS
+  private var onDisplayOptionsChanged: (Int) -> Unit = {}
+  private var isListening = false
 
   private val title = AppCompatTextView(context).apply {
     layoutParams = LayoutParams(
@@ -57,8 +57,26 @@ class AdvancedMenuSortView(
     addButton(context, R.string.adv_sort_by_name, R.id.sort_by_name)
     addButton(context, R.string.adv_sort_by_time, R.id.sort_by_time)
     addButton(context, R.string.adv_sort_by_target_version, R.id.sort_by_target_version)
-    toggleGroup.check(currentOptions.toSortButtonId())
-    toggleGroup.addOnButtonCheckedListener(this)
+  }
+
+  fun bind(
+    displayOptions: Int,
+    onDisplayOptionsChanged: (Int) -> Unit
+  ) {
+    currentOptions = displayOptions
+    this.onDisplayOptionsChanged = onDisplayOptionsChanged
+    val checkedId = currentOptions.toSortButtonId()
+    if (toggleGroup.checkedButtonId != checkedId) {
+      if (isListening) {
+        toggleGroup.removeOnButtonCheckedListener(this)
+        isListening = false
+      }
+      toggleGroup.check(checkedId)
+    }
+    if (!isListening) {
+      toggleGroup.addOnButtonCheckedListener(this)
+      isListening = true
+    }
   }
 
   private fun addButton(context: Context, titleRes: Int, viewId: Int) {
@@ -87,11 +105,6 @@ class AdvancedMenuSortView(
       .clearSortOptions()
       .or(checkedId.toSortOption())
     onDisplayOptionsChanged(currentOptions)
-  }
-
-  override fun onDetachedFromWindow() {
-    super.onDetachedFromWindow()
-    toggleGroup.removeOnButtonCheckedListener(this)
   }
 
   private fun Int.toSortButtonId(): Int {

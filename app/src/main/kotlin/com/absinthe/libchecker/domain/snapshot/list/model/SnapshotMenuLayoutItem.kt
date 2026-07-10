@@ -15,14 +15,3 @@ fun buildSnapshotMenuLayoutItems(demoDisplayData: SnapshotItemDisplayData): List
     SnapshotMenuLayoutItem.Options
   )
 }
-
-fun List<SnapshotMenuLayoutItem>.replaceSnapshotMenuDemoDisplayData(
-  demoDisplayData: SnapshotItemDisplayData
-): List<SnapshotMenuLayoutItem> {
-  return map { item ->
-    when (item) {
-      is SnapshotMenuLayoutItem.Demo -> SnapshotMenuLayoutItem.Demo(demoDisplayData)
-      SnapshotMenuLayoutItem.Options -> item
-    }
-  }
-}

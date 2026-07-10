@@ -1,34 +1,54 @@
 package com.absinthe.libchecker.domain.snapshot.list.model
 
+import com.absinthe.libchecker.constant.options.SnapshotOptions
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotAbiDisplayData
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotAbiDisplayItem
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class SnapshotMenuLayoutItemTest {
+class SnapshotMenuBottomSheetStateTest {
 
   @Test
-  fun buildsDemoAndOptionsLayoutItems() {
-    val demoDisplayData = createSnapshotItemDisplayData("Example")
-
-    val items = buildSnapshotMenuLayoutItems(demoDisplayData)
+  fun `builds supported options and current checked state`() {
+    val state = buildSnapshotMenuBottomSheetState(
+      currentOptions = SnapshotOptions.SHOW_UPDATE_TIME,
+      demoDisplayData = createSnapshotItemDisplayData(),
+      includeIecUnits = true
+    )
 
     assertEquals(
       listOf(
-        SnapshotMenuLayoutItem.Demo(demoDisplayData),
-        SnapshotMenuLayoutItem.Options
+        SnapshotOptions.SHOW_UPDATE_TIME,
+        SnapshotOptions.HIDE_NO_COMPONENT_CHANGES,
+        SnapshotOptions.DIFF_HIGHLIGHT,
+        SnapshotOptions.USE_IEC_UNITS
       ),
-      items
+      state.options.map { it.option }
     )
+    assertTrue(state.options.first().isChecked)
+    assertFalse(state.options.last().isChecked)
   }
 
-  private fun createSnapshotItemDisplayData(appName: String): SnapshotItemDisplayData {
+  @Test
+  fun `omits IEC units when unsupported`() {
+    val state = buildSnapshotMenuBottomSheetState(
+      currentOptions = SnapshotOptions.USE_IEC_UNITS,
+      demoDisplayData = createSnapshotItemDisplayData(),
+      includeIecUnits = false
+    )
+
+    assertFalse(state.options.any { it.option == SnapshotOptions.USE_IEC_UNITS })
+  }
+
+  private fun createSnapshotItemDisplayData(): SnapshotItemDisplayData {
     return SnapshotItemDisplayData(
       cardPresentation = SnapshotItemCardPresentation.Rounded,
       iconSource = null,
       packageName = "com.example",
       appName = SnapshotItemAppNameDisplayData(
-        text = appName,
+        text = "Example",
         showTrackIcon = false,
         packageStateLabel = null
       ),
@@ -59,7 +79,7 @@ class SnapshotMenuLayoutItemTest {
       ),
       updateTimeDisplayData = null,
       highlightText = "",
-      contentDescription = appName
+      contentDescription = "Example"
     )
   }
 }
