@@ -438,8 +438,15 @@ class DetailViewModel(
     libName: String,
     @LibType type: Int,
     regexName: String?,
-    isValidLib: Boolean
-  ) = detailActionLoader.getLibraryDetailDialogData(libName, type, regexName, isValidLib)
+    isValidLib: Boolean,
+    preferredLocale: String
+  ) = detailActionLoader.getLibraryDetailDialogData(
+    libName,
+    type,
+    regexName,
+    isValidLib,
+    preferredLocale
+  )
 
   suspend fun getOverlayDetail(item: LCItem) = detailActionLoader.getOverlayDetail(item)
 

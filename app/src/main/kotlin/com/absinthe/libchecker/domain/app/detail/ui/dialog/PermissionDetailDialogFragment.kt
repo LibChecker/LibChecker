@@ -1,12 +1,9 @@
 package com.absinthe.libchecker.domain.app.detail.ui.dialog
 
 import android.content.DialogInterface
-import androidx.core.text.buildSpannedString
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
-import coil.load
-import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.app.detail.action.AppPermissionDetail
+import com.absinthe.libchecker.domain.app.detail.model.PermissionDetailBottomSheetState
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
 import com.absinthe.libchecker.domain.app.detail.ui.view.PermissionInfoBottomSheetView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
@@ -28,33 +25,15 @@ class PermissionDetailDialogFragment : BaseBottomSheetViewDialogFragment<Permiss
   override fun initRootView(): PermissionInfoBottomSheetView = PermissionInfoBottomSheetView(requireContext())
 
   override fun init() {
-    root.apply {
-      icon.load(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_android)
-      title.text = origPermName
-      permissionContentView.label.text.text = context.getText(R.string.not_found)
-      permissionContentView.description.text.text = context.getText(R.string.not_found)
-      permissionContentView.label.updateContentDescription()
-      permissionContentView.description.updateContentDescription()
-    }
+    root.bind(PermissionDetailBottomSheetState.Loading(origPermName))
 
     lifecycleScope.launch {
-      renderPermissionDetail(viewModel.getPermissionDetail(origPermName))
+      root.bind(
+        PermissionDetailBottomSheetState.Content(
+          viewModel.getPermissionDetail(origPermName)
+        )
+      )
     }
-  }
-
-  private fun renderPermissionDetail(detail: AppPermissionDetail) = root.apply {
-    icon.load(detail.icon ?: com.absinthe.lc.rulesbundle.R.drawable.ic_lib_android)
-    title.text = buildSpannedString {
-      append(detail.name)
-      detail.providerAppName?.let {
-        appendLine()
-        append(getString(R.string.lib_permission_provided_by_format, it))
-      }
-    }
-    detail.label?.let { permissionContentView.label.text.text = it }
-    detail.description?.let { permissionContentView.description.text.text = it }
-    permissionContentView.label.updateContentDescription()
-    permissionContentView.description.updateContentDescription()
   }
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()

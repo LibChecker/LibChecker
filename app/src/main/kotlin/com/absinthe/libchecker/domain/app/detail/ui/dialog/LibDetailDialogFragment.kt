@@ -3,13 +3,14 @@ package com.absinthe.libchecker.domain.app.detail.ui.dialog
 import android.content.DialogInterface
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
-import coil.load
-import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.domain.app.detail.action.GetLibraryDetailDialogDataUseCase
+import com.absinthe.libchecker.domain.app.detail.model.LibraryDetailBottomSheetState
+import com.absinthe.libchecker.domain.app.detail.model.LibraryDetailHeaderDisplay
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
 import com.absinthe.libchecker.domain.app.detail.ui.view.LibDetailBottomSheetView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
@@ -17,6 +18,8 @@ import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import timber.log.Timber
@@ -34,26 +37,19 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
   private val isValidLib by lazy { arguments?.getBoolean(EXTRA_IS_VALID_LIB) != false }
   private val viewModel: DetailViewModel by activityViewModel()
   private var isStickyEventReceived = false
+  private val dialogTitle by lazy {
+    if (type == ACTION) "< $libName >" else libName
+  }
 
-  override fun initRootView(): LibDetailBottomSheetView = LibDetailBottomSheetView(requireContext())
+  override fun initRootView(): LibDetailBottomSheetView {
+    return LibDetailBottomSheetView(requireContext()) { locale ->
+      GlobalValues.preferredRuleLanguage = locale
+    }
+  }
 
   override fun init() {
-    root.apply {
-      maxPeekHeightPercentage = 0.8f
-      title.text = if (type == ACTION) "< $libName >" else libName
-      lifecycleScope.launch {
-        val header = viewModel.getLibraryDetailDialogHeader(
-          libName = libName,
-          type = type,
-          isValidLib = isValidLib
-        )
-        setLoadingIcon(header.iconRes, header.isSimpleColorIcon)
-        icon.load(header.iconRes) {
-          crossfade(true)
-          placeholder(R.drawable.ic_logo)
-        }
-      }
-    }
+    maxPeekHeightPercentage = 0.8f
+    root.bind(LibraryDetailBottomSheetState.Loading(dialogTitle))
   }
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
@@ -61,29 +57,51 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
   override fun onStart() {
     super.onStart()
     if (!isValidLib) {
-      root.showNotFound()
+      root.bind(
+        LibraryDetailBottomSheetState.NotFound(
+          title = dialogTitle,
+          header = fallbackHeader
+        )
+      )
       return
     }
     lifecycleScope.launch {
       runCatching {
-        when (
-          val result = viewModel.getLibraryDetailDialogData(
-            libName = libName,
-            type = type,
-            regexName = regexName,
-            isValidLib = isValidLib
-          )
-        ) {
+        coroutineScope {
+          val headerDeferred = async {
+            viewModel.getLibraryDetailDialogHeader(
+              libName = libName,
+              type = type,
+              isValidLib = isValidLib
+            )
+          }
+          val contentDeferred = async {
+            viewModel.getLibraryDetailDialogData(
+              libName = libName,
+              type = type,
+              regexName = regexName,
+              isValidLib = isValidLib,
+              preferredLocale = GlobalValues.preferredRuleLanguage
+            )
+          }
+          val header = headerDeferred.await()
+          root.bind(LibraryDetailBottomSheetState.Loading(dialogTitle, header))
+          header to contentDeferred.await()
+        }
+      }.onSuccess { (header, result) ->
+        when (result) {
           is GetLibraryDetailDialogDataUseCase.Result.Found -> {
-            root.apply {
-              setLibDetailBean(result.detail)
-              showContent()
-              result.repoUpdatedTime?.let(::setUpdateTIme)
-            }
+            root.bind(
+              LibraryDetailBottomSheetState.Content(
+                title = dialogTitle,
+                header = header,
+                content = result.content
+              )
+            )
           }
 
           GetLibraryDetailDialogDataUseCase.Result.NotFound -> {
-            showNotFoundAfterStickyEvent()
+            showNotFoundAfterStickyEvent(header)
           }
         }
       }.onFailure {
@@ -102,9 +120,14 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
     }
   }
 
-  private fun showNotFoundAfterStickyEvent() {
+  private fun showNotFoundAfterStickyEvent(header: LibraryDetailHeaderDisplay) {
     if (isStickyEventReceived) {
-      root.showNotFound()
+      root.bind(
+        LibraryDetailBottomSheetState.NotFound(
+          title = dialogTitle,
+          header = header
+        )
+      )
     } else {
       isStickyEventReceived = true
     }
@@ -123,6 +146,11 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
   }
 
   companion object {
+    private val fallbackHeader = LibraryDetailHeaderDisplay(
+      iconRes = com.absinthe.lc.rulesbundle.R.drawable.ic_sdk_placeholder,
+      isSimpleColorIcon = false
+    )
+
     fun newInstance(
       libName: String,
       @LibType type: Int,

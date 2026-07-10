@@ -117,13 +117,15 @@ class DetailActionLoader(
     libName: String,
     @LibType type: Int,
     regexName: String?,
-    isValidLib: Boolean
+    isValidLib: Boolean,
+    preferredLocale: String
   ) = getLibraryDetailDialogDataUseCase(
     GetLibraryDetailDialogDataUseCase.Request(
       libName = libName,
       type = type,
       regexName = regexName,
-      isValidLib = isValidLib
+      isValidLib = isValidLib,
+      preferredLocale = preferredLocale
     )
   )
 

@@ -14,18 +14,16 @@ import android.widget.TableLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.text.HtmlCompat
-import androidx.core.view.children
-import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import androidx.core.widget.TextViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
-import com.absinthe.libchecker.api.bean.LibDetailBean
-import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.domain.app.detail.model.buildDetailItemDescription
+import com.absinthe.libchecker.domain.app.detail.model.LibraryDetailBottomSheetState
+import com.absinthe.libchecker.domain.app.detail.model.LibraryDetailContentDisplay
+import com.absinthe.libchecker.domain.app.detail.model.LibraryDetailHeaderDisplay
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.LibDetailItemAdapter
-import com.absinthe.libchecker.domain.app.detail.ui.adapter.node.LibDetailItem
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.dp
@@ -38,20 +36,19 @@ import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.absinthe.libraries.utils.view.HeightAnimatableViewFlipper
 import com.google.android.material.tabs.TabLayout
-import java.util.Locale
-import timber.log.Timber
 
-class LibDetailBottomSheetView(context: Context) :
-  LinearLayout(context),
+class LibDetailBottomSheetView(
+  context: Context,
+  private val onLocaleSelected: (String) -> Unit = {}
+) : LinearLayout(context),
   IHeaderView {
 
   private val header = BottomSheetHeaderView(context).apply {
-    layoutParams =
-      LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+    layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
     title.text = context.getString(R.string.lib_detail_dialog_title)
   }
 
-  val icon = AppCompatImageView(context).apply {
+  private val icon = AppCompatImageView(context).apply {
     val iconSize = 48.dp
     layoutParams = LayoutParams(iconSize, iconSize).also {
       it.topMargin = 4.dp
@@ -60,7 +57,7 @@ class LibDetailBottomSheetView(context: Context) :
     importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
   }
 
-  val title = AppCompatTextView(
+  private val title = AppCompatTextView(
     ContextThemeWrapper(
       context,
       R.style.TextView_SansSerifCondensedMedium
@@ -77,14 +74,18 @@ class LibDetailBottomSheetView(context: Context) :
   }
 
   private val viewFlipper = HeightAnimatableViewFlipper(context).apply {
-    layoutParams =
-      LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+    layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
     setInAnimation(context, R.anim.anim_fade_in)
     setOutAnimation(context, R.anim.anim_fade_out)
   }
 
   private val loading = RuleLoadingView(context).apply {
-    layoutParams = createLoadingLayoutParams()
+    layoutParams = FrameLayout.LayoutParams(
+      FrameLayout.LayoutParams.MATCH_PARENT,
+      160.dp
+    ).also {
+      it.gravity = Gravity.CENTER
+    }
   }
 
   private val notFoundView = NotFoundView(context).apply {
@@ -96,7 +97,9 @@ class LibDetailBottomSheetView(context: Context) :
     }
   }
 
-  private var lastSelectedTabPosition = -1
+  private var content: LibraryDetailContentDisplay? = null
+  private var suppressLocaleSelected = false
+
   private val tabLayout = TabLayout(context).apply {
     layoutParams = TableLayout.LayoutParams(
       LayoutParams.MATCH_PARENT,
@@ -106,18 +109,12 @@ class LibDetailBottomSheetView(context: Context) :
     setBackgroundColor(Color.TRANSPARENT)
     addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
       override fun onTabSelected(tab: TabLayout.Tab?) {
-        tab?.let {
-          val libDetailData = libDetailBean?.data?.get(it.position) ?: return
-          if (lastSelectedTabPosition >= 0) {
-            GlobalValues.preferredRuleLanguage = libDetailData.locale
-          }
-          lastSelectedTabPosition = it.position
-          setContent(libDetailData)
-        }
+        tab?.let { bindLocale(it.position, notifySelection = !suppressLocaleSelected) }
       }
 
-      override fun onTabUnselected(tab: TabLayout.Tab?) {}
-      override fun onTabReselected(tab: TabLayout.Tab?) {}
+      override fun onTabUnselected(tab: TabLayout.Tab?) = Unit
+
+      override fun onTabReselected(tab: TabLayout.Tab?) = Unit
     })
   }
 
@@ -125,7 +122,7 @@ class LibDetailBottomSheetView(context: Context) :
     addHeaderView(tabLayout)
   }
 
-  private val libDetailContentView = BottomSheetRecyclerView(context).apply {
+  private val contentView = BottomSheetRecyclerView(context).apply {
     layoutParams = FrameLayout.LayoutParams(
       FrameLayout.LayoutParams.MATCH_PARENT,
       FrameLayout.LayoutParams.WRAP_CONTENT
@@ -155,7 +152,7 @@ class LibDetailBottomSheetView(context: Context) :
     addView(title)
     addView(viewFlipper)
     viewFlipper.addView(loading)
-    viewFlipper.addView(libDetailContentView)
+    viewFlipper.addView(contentView)
     viewFlipper.addView(notFoundView)
   }
 
@@ -166,106 +163,79 @@ class LibDetailBottomSheetView(context: Context) :
     }
   }
 
-  override fun getHeaderView(): BottomSheetHeaderView {
-    return header
-  }
+  fun bind(state: LibraryDetailBottomSheetState) {
+    title.text = state.title
+    val headerDisplay = when (state) {
+      is LibraryDetailBottomSheetState.Loading -> state.header
+      is LibraryDetailBottomSheetState.Content -> state.header
+      is LibraryDetailBottomSheetState.NotFound -> state.header
+    }
+    bindHeader(headerDisplay)
 
-  fun setLoadingIcon(iconRes: Int, isSingleColorIcon: Boolean = false) {
-    loading.setInitialIcon(iconRes, isSingleColorIcon)
-  }
-
-  private fun createLoadingLayoutParams(): FrameLayout.LayoutParams {
-    return FrameLayout.LayoutParams(
-      FrameLayout.LayoutParams.MATCH_PARENT,
-      160.dp
-    ).also {
-      it.gravity = Gravity.CENTER
+    when (state) {
+      is LibraryDetailBottomSheetState.Loading -> showLoading()
+      is LibraryDetailBottomSheetState.Content -> showContent(state.content)
+      is LibraryDetailBottomSheetState.NotFound -> showNotFound()
     }
   }
 
-  class LibDetailItemView(context: Context) : AViewGroup(context) {
-
-    private val icon = AppCompatImageView(context).apply {
-      layoutParams = LayoutParams(24.dp, 24.dp)
-      importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
-    }
-
-    private val tip = AppCompatTextView(context).apply {
-      layoutParams = LayoutParams(
-        ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
-      ).also {
-        it.marginStart = 8.dp
-      }
-      alpha = 0.65f
-      setTextSize(TypedValue.COMPLEX_UNIT_SP, 10f)
-    }
-
-    private val text = AppCompatTextView(context).apply {
-      layoutParams = LayoutParams(
-        ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
-      ).also {
-        it.marginStart = 8.dp
-        it.topMargin = 0
-      }
-    }
-
-    init {
-      setPadding(8.dp, 8.dp, 8.dp, 8.dp)
-      setBackgroundResource(R.drawable.bg_lib_detail_item)
-      addView(icon)
-      addView(tip)
-      addView(text)
-    }
-
-    fun bind(item: LibDetailItem) {
-      icon.setImageResource(item.iconRes)
-      tip.text = context.getString(item.tipRes)
-      text.setTextAppearance(item.textStyleRes)
-      if (item.text.startsWith("<a href")) {
-        text.apply {
-          isClickable = true
-          movementMethod = LinkMovementMethod.getInstance()
-          text = HtmlCompat.fromHtml(item.text, HtmlCompat.FROM_HTML_MODE_COMPACT)
-        }
-      } else {
-        text.apply {
-          isClickable = false
-          movementMethod = null
-          text = item.text
-        }
-      }
-      contentDescription = buildDetailItemDescription(tip.text, text.text)
-    }
-
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-      super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-      children.forEach {
-        it.autoMeasure()
-      }
-      val textWidth =
-        measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - tip.marginStart
-      if (tip.measuredWidth > textWidth) {
-        tip.measure(textWidth.toExactlyMeasureSpec(), tip.defaultHeightMeasureSpec(this))
-      }
-      if (text.measuredWidth > textWidth) {
-        text.measure(textWidth.toExactlyMeasureSpec(), text.defaultHeightMeasureSpec(this))
-      }
-      setMeasuredDimension(
-        measuredWidth,
-        (tip.measuredHeight + text.marginTop + text.measuredHeight).coerceAtLeast(icon.measuredHeight) + paddingTop + paddingBottom
-      )
-    }
-
-    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-      icon.layout(paddingStart, icon.toVerticalCenter(this))
-      tip.layout(paddingStart + icon.measuredWidth + tip.marginStart, paddingTop)
-      text.layout(paddingStart + icon.measuredWidth + tip.marginStart, tip.bottom + text.marginTop)
+  private fun bindHeader(headerDisplay: LibraryDetailHeaderDisplay?) {
+    val iconRes = headerDisplay?.iconRes
+      ?: com.absinthe.lc.rulesbundle.R.drawable.ic_sdk_placeholder
+    loading.setInitialIcon(iconRes, headerDisplay?.isSimpleColorIcon == true)
+    icon.load(iconRes) {
+      crossfade(true)
+      placeholder(R.drawable.ic_logo)
     }
   }
 
-  class NotFoundView(context: Context) : AViewGroup(context) {
+  private fun showLoading() {
+    if (viewFlipper.displayedChildView != loading) {
+      viewFlipper.show(loading)
+    }
+    if (isAttachedToWindow) {
+      loading.start()
+    }
+  }
+
+  private fun showContent(content: LibraryDetailContentDisplay) {
+    this.content = content
+    suppressLocaleSelected = true
+    tabLayout.removeAllTabs()
+    content.locales.forEach { locale ->
+      tabLayout.addTab(tabLayout.newTab().setText(locale.localeName), false)
+    }
+    val selectedPosition = content.locales.indexOfFirst {
+      it.localeTag == content.selectedLocaleTag
+    }
+    tabLayout.selectTab(tabLayout.getTabAt(selectedPosition))
+    suppressLocaleSelected = false
+    bindLocale(selectedPosition, notifySelection = false)
+
+    loading.stop()
+    if (viewFlipper.displayedChildView != contentView) {
+      viewFlipper.show(contentView)
+    }
+  }
+
+  private fun bindLocale(position: Int, notifySelection: Boolean) {
+    val locale = content?.locales?.getOrNull(position) ?: return
+    contentAdapter.setList(locale.items)
+    if (notifySelection) {
+      onLocaleSelected(locale.localeTag)
+    }
+  }
+
+  private fun showNotFound() {
+    loading.stop()
+    if (viewFlipper.displayedChildView != notFoundView) {
+      viewFlipper.show(notFoundView)
+    }
+  }
+
+  override fun getHeaderView(): BottomSheetHeaderView = header
+
+  private class NotFoundView(context: Context) : AViewGroup(context) {
 
     private val icon = AppCompatImageView(context).apply {
       layoutParams = LayoutParams(64.dp, 64.dp)
@@ -294,9 +264,7 @@ class LibDetailBottomSheetView(context: Context) :
       compoundDrawablePadding = 4.dp
       TextViewCompat.setCompoundDrawableTintList(
         this,
-        ColorStateList.valueOf(
-          context.getColorByAttr(android.R.attr.colorControlNormal)
-        )
+        ColorStateList.valueOf(context.getColorByAttr(android.R.attr.colorControlNormal))
       )
       isClickable = true
       movementMethod = LinkMovementMethod.getInstance()
@@ -330,96 +298,6 @@ class LibDetailBottomSheetView(context: Context) :
         createNewIssueText.toHorizontalCenter(this),
         notFoundText.bottom + createNewIssueText.marginTop
       )
-    }
-  }
-
-  private var libDetailBean: LibDetailBean? = null
-  private var updateTime: String? = null
-
-  fun setLibDetailBean(libDetailBean: LibDetailBean) {
-    this.libDetailBean = libDetailBean
-    if (tabLayout.tabCount == 0) {
-      libDetailBean.data.forEach {
-        tabLayout.addTab(tabLayout.newTab().setText(Locale.forLanguageTag(it.locale).displayName))
-      }
-    }
-
-    var index = 0
-    for (i in libDetailBean.data.indices) {
-      if (libDetailBean.data[i].locale == GlobalValues.preferredRuleLanguage) {
-        index = i
-        break
-      }
-    }
-    tabLayout.selectTab(tabLayout.getTabAt(index))
-    setContent(libDetailBean.data[index])
-  }
-
-  private fun setContent(ruleBean: LibDetailBean.Data) {
-    val list = arrayListOf(
-      LibDetailItem(
-        iconRes = R.drawable.ic_label,
-        tipRes = R.string.lib_detail_label_tip,
-        textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleSmall),
-        text = ruleBean.data.label
-      ),
-      LibDetailItem(
-        iconRes = R.drawable.ic_team,
-        tipRes = R.string.lib_detail_develop_team_tip,
-        textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleSmall),
-        text = ruleBean.data.dev_team
-      ),
-      LibDetailItem(
-        iconRes = R.drawable.ic_github,
-        tipRes = R.string.lib_detail_rule_contributors_tip,
-        textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleSmall),
-        text = ruleBean.data.rule_contributors.joinToString(separator = ", ")
-      ),
-      LibDetailItem(
-        iconRes = R.drawable.ic_content,
-        tipRes = R.string.lib_detail_description_tip,
-        textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBodyMedium),
-        text = ruleBean.data.description
-      ),
-      LibDetailItem(
-        iconRes = R.drawable.ic_url,
-        tipRes = R.string.lib_detail_relative_link_tip,
-        textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBodyMedium),
-        text = "<a href='${ruleBean.data.source_link}'> ${ruleBean.data.source_link} </a>"
-      )
-    )
-    updateTime?.let {
-      list.add(
-        LibDetailItem(
-          iconRes = R.drawable.ic_time,
-          tipRes = R.string.lib_detail_last_update_tip,
-          textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBodyMedium),
-          text = it
-        )
-      )
-    }
-    contentAdapter.setList(list)
-  }
-
-  fun setUpdateTIme(time: String) {
-    if (libDetailBean != null) {
-      updateTime = time
-      setContent(libDetailBean!!.data[tabLayout.selectedTabPosition])
-    }
-  }
-
-  fun showContent() {
-    Timber.d("showContent")
-    loading.stop()
-    if (viewFlipper.displayedChildView != libDetailContentView) {
-      viewFlipper.show(libDetailContentView)
-    }
-  }
-
-  fun showNotFound() {
-    loading.stop()
-    if (viewFlipper.displayedChildView != notFoundView) {
-      viewFlipper.show(notFoundView)
     }
   }
 }
