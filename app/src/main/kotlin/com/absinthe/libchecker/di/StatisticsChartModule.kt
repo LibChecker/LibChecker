@@ -8,6 +8,7 @@ import com.absinthe.libchecker.domain.statistics.chart.repository.ChartSettingsR
 import com.absinthe.libchecker.domain.statistics.chart.source.ChartDataProvider
 import com.absinthe.libchecker.domain.statistics.chart.source.ChartDataSourceFactory
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildAbiChartDataUseCase
+import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildAndroidVersionLabelDisplayDataUseCase
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildApiLevelChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildDetailedAbiChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildFeatureFlagChartDataUseCase
@@ -23,6 +24,7 @@ val statisticsChartModule = module {
   single<ChartSettingsRepository> { GlobalChartSettingsRepository() }
 
   factory { BuildAbiChartDataUseCase() }
+  factory { BuildAndroidVersionLabelDisplayDataUseCase() }
   factory { BuildApiLevelChartDataUseCase(get()) }
   factory { BuildDetailedAbiChartDataUseCase(androidContext(), get()) }
   factory { BuildFeatureFlagChartDataUseCase() }
@@ -49,7 +51,8 @@ val statisticsChartModule = module {
       chartDataProvider = get(),
       chartDataSourceFactory = get(),
       chartSettingsRepository = get(),
-      observeChartFeatureInitializationPlans = get()
+      observeChartFeatureInitializationPlans = get(),
+      buildAndroidVersionLabelDisplayData = get()
     )
   }
 }

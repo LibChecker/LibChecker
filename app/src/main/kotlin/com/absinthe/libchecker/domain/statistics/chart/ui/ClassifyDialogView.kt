@@ -1,33 +1,28 @@
 package com.absinthe.libchecker.domain.statistics.chart.ui
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Build
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.domain.app.list.ui.adapter.AppAdapter
+import com.absinthe.libchecker.domain.statistics.chart.model.AndroidVersionLabelDisplayData
+import com.absinthe.libchecker.domain.statistics.chart.model.ClassifyDialogAction
+import com.absinthe.libchecker.domain.statistics.chart.model.ClassifyDialogState
 import com.absinthe.libchecker.domain.statistics.chart.ui.view.AndroidVersionLabelView
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.view.app.EmptyListView
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
-import java.text.SimpleDateFormat
-import java.util.Locale
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 
-@SuppressLint("ViewConstructor")
-class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutineScope) :
+class ClassifyDialogView(context: Context) :
   LinearLayout(context),
   IHeaderView {
 
-  val adapter = AppAdapter()
+  private var onAction: (ClassifyDialogAction) -> Unit = {}
+  private val adapter = AppAdapter()
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =
@@ -58,7 +53,9 @@ class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutin
     addPaddingTop(16.dp)
     adapter.apply {
       setOnItemClickListener { _, _, position ->
-        (context as? FragmentActivity)?.launchDetailPage(adapter.getItem(position))
+        data.getOrNull(position)?.let {
+          onAction(ClassifyDialogAction.OpenApp(it))
+        }
       }
       stateView =
         EmptyListView(context).apply {
@@ -78,23 +75,27 @@ class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutin
     setPadding(0, 4.dp, 0, 4.dp)
   }
 
-  fun addAndroidVersionView(node: AndroidVersions.Node?) {
-    if (androidVersionView.parent == null && node != null) {
-      val iconRes = if (node.version == Build.VERSION_CODES.CUR_DEVELOPMENT) {
-        AndroidVersions.versions.getOrNull(Build.VERSION.SDK_INT + 1)?.iconRes
-      } else {
-        node.iconRes
+  fun bind(
+    state: ClassifyDialogState,
+    onAction: (ClassifyDialogAction) -> Unit
+  ) {
+    this.onAction = onAction
+    header.title.text = state.title
+    bindAndroidVersion(state.androidVersion)
+    adapter.setItemViewStates(state.itemViewStates)
+    adapter.setList(state.items)
+  }
+
+  private fun bindAndroidVersion(data: AndroidVersionLabelDisplayData?) {
+    if (data == null) {
+      if (androidVersionView.parent != null) {
+        removeView(androidVersionView)
       }
-      androidVersionView.setIcon(iconRes)
-      val text = StringBuilder(node.codeName)
-      if (node.versionName.isNotEmpty()) {
-        text.append(", ").append(node.versionName)
+    } else {
+      androidVersionView.bind(data)
+      if (androidVersionView.parent == null) {
+        addView(androidVersionView, 1)
       }
-      text.append(", ")
-      text.append(SimpleDateFormat("yyyy-MM", Locale.getDefault()).format(node.releaseDate))
-      androidVersionView.text.text = text
-      androidVersionView.contentDescription = text
-      addView(androidVersionView, 1)
     }
   }
 

@@ -7,6 +7,7 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.statistics.chart.model.AndroidVersionLabelDisplayData
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 
@@ -15,10 +16,9 @@ class AndroidVersionLabelView(context: Context) : AViewGroup(context) {
   private val icon = AppCompatImageView(context).apply {
     layoutParams = LayoutParams(24.dp, 24.dp)
     importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
-    addView(this)
   }
 
-  val text = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
+  private val text = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.WRAP_CONTENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
@@ -26,15 +26,18 @@ class AndroidVersionLabelView(context: Context) : AViewGroup(context) {
       it.marginStart = 8.dp
     }
     setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleSmall))
-    addView(this)
   }
 
-  fun setIcon(resId: Int?) {
-    val id = resId ?: com.absinthe.lc.rulesbundle.R.drawable.ic_lib_android
+  init {
+    addView(icon)
+    addView(text)
+  }
+
+  fun bind(data: AndroidVersionLabelDisplayData) {
+    val id = data.iconRes ?: com.absinthe.lc.rulesbundle.R.drawable.ic_lib_android
     icon.setImageResource(id)
-    if (icon.parent == null) {
-      addView(icon)
-    }
+    text.text = data.text
+    contentDescription = data.contentDescription
   }
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

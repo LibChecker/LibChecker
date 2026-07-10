@@ -419,16 +419,14 @@ class ChartFragment :
     val title = source.getLabelByXValue(requireContext(), x)
 
     showClassifyDialogJob = lifecycleScope.launch {
-      val plan = viewModel.buildClassifyDialogPlan(source, x, title)
+      val state = viewModel.buildClassifyDialogState(source, x, title)
       val hostActivity = activity
       if (!isAdded || hostActivity == null || dialog != null) {
         return@launch
       }
 
       dialog = ClassifyBottomSheetDialogFragment().also {
-        it.setTitle(plan.title)
-        it.setList(plan.items, plan.itemViewStates)
-        it.setAndroidVersionLabel(plan.androidVersionNode)
+        it.setState(state)
 
         it.setOnDismiss {
           this@ChartFragment.dialog = null
