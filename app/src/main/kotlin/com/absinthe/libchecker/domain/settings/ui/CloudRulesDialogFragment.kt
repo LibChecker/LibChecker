@@ -9,6 +9,9 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.domain.rules.CloudRulesVersionInfo
+import com.absinthe.libchecker.domain.settings.model.CloudRulesDialogAction
+import com.absinthe.libchecker.domain.settings.model.CloudRulesDialogState
+import com.absinthe.libchecker.domain.settings.model.toCloudRulesDialogState
 import com.absinthe.libchecker.domain.settings.presentation.SettingsViewModel
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.DownloadUtils
@@ -32,9 +35,7 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
 
   override fun init() {
     root.addPaddingTop(16.dp)
-    root.cloudRulesContentView.updateButton.setOnClickListener {
-      requestBundle()
-    }
+    root.bind(CloudRulesDialogState.Loading, ::handleAction)
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -45,13 +46,7 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
           viewModel.getCloudRulesVersionInfo()?.let {
             versionInfo = it
             try {
-              root.cloudRulesContentView.localVersion.version.text =
-                it.localVersion.toString()
-              root.cloudRulesContentView.remoteVersion.version.text = it.remoteVersion.toString()
-              root.cloudRulesContentView.localVersion.updateContentDescription()
-              root.cloudRulesContentView.remoteVersion.updateContentDescription()
-              root.cloudRulesContentView.setUpdateButtonStatus(it.updateAvailable)
-              root.showContent()
+              root.bind(it.toCloudRulesDialogState(), ::handleAction)
             } catch (e: Exception) {
               Timber.e(e)
               context?.showToast(R.string.toast_cloud_rules_update_error)
@@ -61,6 +56,12 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
           Timber.e(t)
         }
       }
+    }
+  }
+
+  private fun handleAction(action: CloudRulesDialogAction) {
+    when (action) {
+      CloudRulesDialogAction.Update -> requestBundle()
     }
   }
 
@@ -74,9 +75,14 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
         override fun onDownloadSuccess() {
           if (viewModel.installDownloadedCloudRules(downloadRequest, remoteVersion)) {
             lifecycleScope.launch {
-              root.cloudRulesContentView.localVersion.version.text = remoteVersion.toString()
-              root.cloudRulesContentView.localVersion.updateContentDescription()
-              root.cloudRulesContentView.setUpdateButtonStatus(false)
+              root.bind(
+                CloudRulesDialogState.Content(
+                  localVersion = remoteVersion,
+                  remoteVersion = remoteVersion,
+                  updateAvailable = false
+                ),
+                ::handleAction
+              )
               runCatching {
                 context?.let {
                   val intent = SystemServices.packageManager.getLaunchIntentForPackage(
