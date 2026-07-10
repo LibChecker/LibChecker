@@ -160,7 +160,7 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
                     timeStampList.clear()
                     timeStampList.addAll(remainingTimeStamps)
                     withContext(Dispatchers.Main) {
-                      root.adapter.removeAt(position)
+                      removeItem(position)
                       dialog.dismiss()
 
                       if (timeStampList.isEmpty()) {

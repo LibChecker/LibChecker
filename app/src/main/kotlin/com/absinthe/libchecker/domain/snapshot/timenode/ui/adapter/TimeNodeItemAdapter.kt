@@ -14,8 +14,12 @@ class TimeNodeItemAdapter : BaseQuickAdapter<String, BaseViewHolder>(0) {
 
   private var packageIconSources: Map<String, SnapshotPackageIconSource> = emptyMap()
 
-  fun setPackageIconSources(packageIconSources: Map<String, SnapshotPackageIconSource>) {
+  fun bind(
+    packageNames: List<String>,
+    packageIconSources: Map<String, SnapshotPackageIconSource>
+  ) {
     this.packageIconSources = packageIconSources
+    setList(packageNames)
   }
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
