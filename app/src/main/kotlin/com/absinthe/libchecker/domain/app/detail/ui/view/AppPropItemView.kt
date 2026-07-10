@@ -1,16 +1,23 @@
 package com.absinthe.libchecker.domain.app.detail.ui.view
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.drawable.ShapeDrawable
+import android.graphics.drawable.shapes.OvalShape
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.detail.model.AppPropItem
+import com.absinthe.libchecker.domain.app.detail.model.AppPropPreview
 import com.absinthe.libchecker.utils.extensions.getDrawableByAttr
 import com.absinthe.libchecker.view.AViewGroup
 
@@ -30,7 +37,7 @@ class AppPropItemView(context: Context) : AViewGroup(context) {
     alpha = 0.85f
   }
 
-  val key = AppCompatTextView(
+  private val key = AppCompatTextView(
     ContextThemeWrapper(
       context,
       R.style.TextView_SansSerifCondensedMedium
@@ -43,7 +50,7 @@ class AppPropItemView(context: Context) : AViewGroup(context) {
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
   }
 
-  val value = AppCompatTextView(
+  private val value = AppCompatTextView(
     ContextThemeWrapper(
       context,
       R.style.TextView_SansSerifCondensedMedium
@@ -57,7 +64,7 @@ class AppPropItemView(context: Context) : AViewGroup(context) {
     alpha = 0.65f
   }
 
-  val linkToIcon = AppCompatImageButton(context).apply {
+  private val linkToIcon = AppCompatImageButton(context).apply {
     layoutParams = LayoutParams(24.dp, 24.dp).also {
       it.marginStart = 8.dp
     }
@@ -75,16 +82,44 @@ class AppPropItemView(context: Context) : AViewGroup(context) {
     addView(linkToIcon)
   }
 
-  fun setTipText(text: String) {
-    tip.text = text
-    tip.layoutParams = tip.layoutParams.apply {
-      height = if (text.isEmpty()) {
-        -1
-      } else {
-        ViewGroup.LayoutParams.WRAP_CONTENT
+  fun bind(item: AppPropItem, onResourceClick: (AppPropItem) -> Unit) {
+    key.text = item.key
+    value.text = item.visibleValue
+    contentDescription = item.contentDescription
+
+    linkToIcon.apply {
+      isVisible = item.resource != null
+      setOnClickListener(if (item.resource != null) View.OnClickListener { onResourceClick(item) } else null)
+      when (val preview = item.preview) {
+        is AppPropPreview.DrawableValue -> setImageBitmap(
+          preview.drawable.toBitmap(
+            previewWidth,
+            previewHeight,
+            Bitmap.Config.ARGB_8888
+          )
+        )
+
+        is AppPropPreview.ColorValue -> setImageBitmap(
+          ShapeDrawable(OvalShape()).apply {
+            paint.color = preview.color
+          }.toBitmap(
+            previewWidth,
+            previewHeight,
+            Bitmap.Config.ARGB_8888
+          )
+        )
+
+        AppPropPreview.Original,
+        is AppPropPreview.Text -> setImageResource(R.drawable.ic_outline_change_circle_24)
       }
     }
   }
+
+  private val AppCompatImageButton.previewWidth: Int
+    get() = measuredWidth.takeIf { it > 0 } ?: layoutParams.width
+
+  private val AppCompatImageButton.previewHeight: Int
+    get() = measuredHeight.takeIf { it > 0 } ?: layoutParams.height
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)

@@ -13,13 +13,13 @@ import com.absinthe.libchecker.domain.app.detail.RelatedAppDisplayData
 import com.absinthe.libchecker.domain.app.detail.action.AppElfDetail
 import com.absinthe.libchecker.domain.app.detail.action.AppInstallSourceDetails
 import com.absinthe.libchecker.domain.app.detail.action.AppLaunchAction
-import com.absinthe.libchecker.domain.app.detail.action.AppManifestProperty
 import com.absinthe.libchecker.domain.app.detail.action.AppPackageShareAction
 import com.absinthe.libchecker.domain.app.detail.action.AppPackageShareFile
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemDialogRequest
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemLongClickActions
 import com.absinthe.libchecker.domain.app.detail.feature.AppDetailFeatureItemData
 import com.absinthe.libchecker.domain.app.detail.model.AppBundleItem
+import com.absinthe.libchecker.domain.app.detail.model.AppPropItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.navigation.DetailReferenceNavigation
@@ -356,7 +356,7 @@ class DetailViewModel(
   suspend fun getAppManifestProperties(
     packageInfo: PackageInfo?,
     properties: Map<String, String>?
-  ): List<AppManifestProperty> {
+  ): List<AppPropItem> {
     return detailActionLoader.getAppManifestProperties(packageInfo, properties)
   }
 

@@ -7,6 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.detail.action.AppInfoActionItem
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.AppInfoAdapter
@@ -29,7 +30,7 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
 
   private val viewModel: DetailViewModel by activityViewModel()
   private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
-  private val aiAdapter = AppInfoAdapter()
+  private val aiAdapter = AppInfoAdapter(::openAction)
 
   private val exportApkLauncher: ActivityResultLauncher<Intent> =
     registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -89,24 +90,21 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
       setHasFixedSize(true)
     }
 
-    aiAdapter.also { adapter ->
-      adapter.setOnItemClickListener { _, _, position ->
-        adapter.data[position].let {
-          runCatching {
-            startActivity(it.intent)
-          }.onFailure {
-            context?.let { ctx ->
-              Toasty.showShort(ctx, R.string.toast_cant_open_app)
-            }
-          }
-        }
-        dismiss()
-      }
-    }
     packageName?.let { pkg ->
       lifecycleScope.launch {
         aiAdapter.setList(viewModel.getAppInfoActions(pkg))
       }
     }
+  }
+
+  private fun openAction(item: AppInfoActionItem) {
+    runCatching {
+      startActivity(item.intent)
+    }.onFailure {
+      context?.let { ctx ->
+        Toasty.showShort(ctx, R.string.toast_cant_open_app)
+      }
+    }
+    dismiss()
   }
 }

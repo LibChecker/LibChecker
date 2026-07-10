@@ -3,6 +3,7 @@ package com.absinthe.libchecker.domain.app.detail.resource
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
+import com.absinthe.libchecker.domain.app.detail.model.isAppResourcePreviewSupported
 import com.absinthe.libchecker.utils.manifest.ResourceParser
 
 class ResolveAppResourceValueUseCase(
@@ -63,20 +64,8 @@ class ResolveAppResourceValueUseCase(
   }
 
   companion object {
-    private val LINKABLE_TYPES = setOf(
-      "array",
-      "bool",
-      "color",
-      "dimen",
-      "drawable",
-      "integer",
-      "mipmap",
-      "string",
-      "xml"
-    )
-
     fun isLinkableType(type: String?): Boolean {
-      return type != null && type in LINKABLE_TYPES
+      return isAppResourcePreviewSupported(type)
     }
   }
 }

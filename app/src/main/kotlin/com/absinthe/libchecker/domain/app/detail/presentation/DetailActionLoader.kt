@@ -5,7 +5,6 @@ import android.net.Uri
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.detail.GetRelatedAppDisplayDataUseCase
-import com.absinthe.libchecker.domain.app.detail.action.AppManifestProperty
 import com.absinthe.libchecker.domain.app.detail.action.AppPackageShareFile
 import com.absinthe.libchecker.domain.app.detail.action.BuildDetailItemDialogRequestUseCase
 import com.absinthe.libchecker.domain.app.detail.action.BuildDetailItemLongClickActionsUseCase
@@ -28,6 +27,7 @@ import com.absinthe.libchecker.domain.app.detail.action.PrepareAppPackageShareAc
 import com.absinthe.libchecker.domain.app.detail.content.BuildAppBundleItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.detail.content.GetAppBundleItemsUseCase
 import com.absinthe.libchecker.domain.app.detail.model.AppBundleItem
+import com.absinthe.libchecker.domain.app.detail.model.AppPropItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.navigation.BuildDetailReferenceNavigationUseCase
@@ -95,7 +95,7 @@ class DetailActionLoader(
   suspend fun getAppManifestProperties(
     packageInfo: PackageInfo?,
     properties: Map<String, String>?
-  ): List<AppManifestProperty> {
+  ): List<AppPropItem> {
     return getAppManifestPropertiesUseCase(packageInfo, properties)
   }
 
