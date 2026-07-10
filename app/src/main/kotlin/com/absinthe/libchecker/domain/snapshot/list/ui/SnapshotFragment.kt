@@ -37,6 +37,7 @@ import com.absinthe.libchecker.domain.snapshot.detail.ui.EXTRA_ENTITY
 import com.absinthe.libchecker.domain.snapshot.detail.ui.SnapshotDetailActivity
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotEmptyView
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotCapturePlan
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotDashboardAction
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotSystemPropDisplayData
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
 import com.absinthe.libchecker.domain.snapshot.list.ui.adapter.SnapshotAdapter
@@ -130,51 +131,48 @@ class SnapshotFragment :
     var dashboardTimestampText: CharSequence = ""
     var dashboardAppsCountText: CharSequence = ""
     var dashboardSystemProps: List<SnapshotSystemPropDisplayData> = emptyList()
+    fun changeTimeNode() {
+      lifecycleScope.launch(Dispatchers.IO) {
+        val timeStampList = viewModel.getTimeStamps()
+        withContext(Dispatchers.Main) {
+          TimeNodeBottomSheetDialogFragment.newInstance(ArrayList(timeStampList))
+            .apply {
+              setOnItemClickListener { position ->
+                val item = timeStampList[position]
+                viewModel.refreshSnapshotTimestamp(item.timestamp, shouldClearDiff = true)
+                flip(VF_LOADING)
+                dismiss()
+              }
+            }
+            .show(
+              context.supportFragmentManager,
+              TimeNodeBottomSheetDialogFragment::class.java.name
+            )
+        }
+      }
+    }
+    fun handleDashboardAction(action: SnapshotDashboardAction) {
+      when (action) {
+        SnapshotDashboardAction.OpenAlbum -> {
+          startActivity(Intent(context, AlbumActivity::class.java))
+        }
+
+        SnapshotDashboardAction.ChangeTimestamp -> changeTimeNode()
+      }
+    }
     fun renderDashboard() {
-      dashboard.render(
-        buildSnapshotDashboardDisplayData(
+      dashboard.bind(
+        data = buildSnapshotDashboardDisplayData(
           BuildSnapshotDashboardDisplayDataUseCase.Request(
             timestampText = dashboardTimestampText,
             appsCountText = dashboardAppsCountText,
             systemProps = dashboardSystemProps
           )
-        )
+        ),
+        onAction = ::handleDashboardAction
       )
     }
     renderDashboard()
-
-    dashboard.setOnClickListener {
-      startActivity(Intent(context, AlbumActivity::class.java))
-    }
-
-    dashboard.apply {
-      fun changeTimeNode() {
-        lifecycleScope.launch(Dispatchers.IO) {
-          val timeStampList = viewModel.getTimeStamps()
-          withContext(Dispatchers.Main) {
-            TimeNodeBottomSheetDialogFragment.newInstance(ArrayList(timeStampList))
-              .apply {
-                setOnItemClickListener { position ->
-                  val item = timeStampList[position]
-                  viewModel.refreshSnapshotTimestamp(item.timestamp, shouldClearDiff = true)
-                  flip(VF_LOADING)
-                  dismiss()
-                }
-              }
-              .show(
-                context.supportFragmentManager,
-                TimeNodeBottomSheetDialogFragment::class.java.name
-              )
-          }
-        }
-      }
-      setOnTimestampClickListener {
-        if (AntiShakeUtils.isInvalidClick(it)) {
-          return@setOnTimestampClickListener
-        }
-        changeTimeNode()
-      }
-    }
 
     val emptyView = SnapshotEmptyView(context).apply {
       layoutParams = FrameLayout.LayoutParams(

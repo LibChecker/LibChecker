@@ -12,8 +12,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotTypeIndicatorView
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotDashboardAction
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotDashboardDisplayData
-import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotSystemPropDisplayData
 import com.absinthe.libchecker.domain.snapshot.list.ui.adapter.SystemPropsAdapter
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColor
@@ -24,6 +24,7 @@ import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
 import com.absinthe.libchecker.view.AViewGroup
+import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.google.android.material.card.MaterialCardView
 
 class SnapshotDashboardView(context: Context) : MaterialCardView(context, null, R.style.AlbumMaterialCard) {
@@ -44,15 +45,12 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context, null, 
     addView(container)
   }
 
-  fun setOnTimestampClickListener(listener: View.OnClickListener) {
-    container.setOnTimestampClickListener(listener)
-  }
-
-  fun render(data: SnapshotDashboardDisplayData) {
-    container.setTimestampText(data.timestampText)
-    container.setAppsCountText(data.appsCountText)
-    container.setTimestampContentDescription(data.timestampContentDescription)
-    container.setSystemProps(data.systemProps)
+  fun bind(
+    data: SnapshotDashboardDisplayData,
+    onAction: (SnapshotDashboardAction) -> Unit
+  ) {
+    setOnClickListener { onAction(SnapshotDashboardAction.OpenAlbum) }
+    container.bind(data, onAction)
     contentDescription = data.contentDescription
   }
 
@@ -121,26 +119,22 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context, null, 
       layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
     }
 
-    fun setOnTimestampClickListener(listener: View.OnClickListener) {
-      tvSnapshotTimestampText.setOnClickListener(listener)
-      arrow.setOnClickListener(listener)
-    }
-
-    fun setTimestampText(text: CharSequence) {
-      tvSnapshotTimestampText.text = text
-    }
-
-    fun setTimestampContentDescription(description: CharSequence) {
-      tvSnapshotTimestampText.contentDescription = description
-      arrow.contentDescription = description
-    }
-
-    fun setAppsCountText(text: CharSequence) {
-      tvSnapshotAppsCountText.text = text
-    }
-
-    fun setSystemProps(props: List<SnapshotSystemPropDisplayData>) {
-      post { systemPropAdapter.setList(props) }
+    fun bind(
+      data: SnapshotDashboardDisplayData,
+      onAction: (SnapshotDashboardAction) -> Unit
+    ) {
+      tvSnapshotTimestampText.text = data.timestampText
+      tvSnapshotAppsCountText.text = data.appsCountText
+      tvSnapshotTimestampText.contentDescription = data.timestampContentDescription
+      arrow.contentDescription = data.timestampContentDescription
+      val timestampClickListener = View.OnClickListener {
+        if (!AntiShakeUtils.isInvalidClick(it)) {
+          onAction(SnapshotDashboardAction.ChangeTimestamp)
+        }
+      }
+      tvSnapshotTimestampText.setOnClickListener(timestampClickListener)
+      arrow.setOnClickListener(timestampClickListener)
+      post { systemPropAdapter.setList(data.systemProps) }
     }
 
     private val addedIndicator = SnapshotTypeIndicatorView(context).apply {

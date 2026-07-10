@@ -1,23 +1,39 @@
 package com.absinthe.libchecker.domain.snapshot.comparison.presentation
 
 import android.net.Uri
+import com.absinthe.libchecker.domain.snapshot.comparison.model.ComparisonDashboardLabels
+import com.absinthe.libchecker.domain.snapshot.comparison.model.ComparisonDashboardSideState
+import com.absinthe.libchecker.domain.snapshot.comparison.model.ComparisonDashboardState
 import com.absinthe.libchecker.domain.snapshot.comparison.model.SnapshotComparisonInput
+import com.absinthe.libchecker.domain.snapshot.comparison.model.SnapshotComparisonInputs
+import com.absinthe.libchecker.domain.snapshot.comparison.model.buildComparisonDashboardDescription
 import java.io.File
 
 internal object ComparisonDashboardStatePlanner {
 
+  fun planState(
+    inputs: SnapshotComparisonInputs,
+    labels: ComparisonDashboardLabels,
+    formatTimestamp: (Long) -> String
+  ): ComparisonDashboardState {
+    return ComparisonDashboardState(
+      left = planSideState(inputs.left, labels, formatTimestamp),
+      right = planSideState(inputs.right, labels, formatTimestamp)
+    )
+  }
+
   fun planSideState(
     input: SnapshotComparisonInput,
-    labels: Labels,
+    labels: ComparisonDashboardLabels,
     formatTimestamp: (Long) -> String
-  ): SideState {
+  ): ComparisonDashboardSideState {
     return when {
       input.isArchive -> {
         val timestampText = input.uri?.encodedPath?.toFileName() ?: labels.chooseTimestampText
-        SideState(
+        ComparisonDashboardSideState(
           timestampText = timestampText,
           appsCountText = ARCHIVE_APPS_COUNT,
-          contentDescription = buildContentDescription(
+          contentDescription = buildComparisonDashboardDescription(
             labels = labels,
             timestampText = timestampText,
             appsCountText = ARCHIVE_APPS_COUNT
@@ -27,10 +43,10 @@ internal object ComparisonDashboardStatePlanner {
 
       input.isSnapshot -> {
         val timestampText = formatTimestamp(input.timestamp)
-        SideState(
+        ComparisonDashboardSideState(
           timestampText = timestampText,
           appsCountText = labels.defaultAppsCountText,
-          contentDescription = buildContentDescription(
+          contentDescription = buildComparisonDashboardDescription(
             labels = labels,
             timestampText = timestampText,
             appsCountText = labels.defaultAppsCountText
@@ -39,10 +55,10 @@ internal object ComparisonDashboardStatePlanner {
         )
       }
 
-      else -> SideState(
+      else -> ComparisonDashboardSideState(
         timestampText = labels.chooseTimestampText,
         appsCountText = labels.defaultAppsCountText,
-        contentDescription = buildContentDescription(
+        contentDescription = buildComparisonDashboardDescription(
           labels = labels,
           timestampText = labels.chooseTimestampText,
           appsCountText = labels.defaultAppsCountText
@@ -51,51 +67,8 @@ internal object ComparisonDashboardStatePlanner {
     }
   }
 
-  private fun buildContentDescription(
-    labels: Labels,
-    timestampText: String,
-    appsCountText: String
-  ): String {
-    return listOf(
-      labels.timestampTitle,
-      timestampText,
-      labels.appsCountTitle,
-      appsCountText
-    )
-      .mapNotNull { it.trim().takeIf(String::isNotEmpty) }
-      .joinToString()
-  }
-
   private fun String.toFileName(): String {
     return Uri.decode(this).substringAfterLast(File.separator)
-  }
-
-  data class Labels(
-    val timestampTitle: String,
-    val chooseTimestampText: String,
-    val appsCountTitle: String,
-    val defaultAppsCountText: String
-  )
-
-  data class SideState(
-    val timestampText: String,
-    val appsCountText: String,
-    val contentDescription: String,
-    val dashboardCountTimestamp: Long? = null
-  ) {
-    fun withAppsCountText(
-      appsCountText: String,
-      labels: Labels
-    ): SideState {
-      return copy(
-        appsCountText = appsCountText,
-        contentDescription = buildContentDescription(
-          labels = labels,
-          timestampText = timestampText,
-          appsCountText = appsCountText
-        )
-      )
-    }
   }
 
   private const val ARCHIVE_APPS_COUNT = "1"

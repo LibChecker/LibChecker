@@ -7,6 +7,8 @@ import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.domain.snapshot.comparison.archive.ArchiveSnapshotItem
 import com.absinthe.libchecker.domain.snapshot.comparison.archive.PrepareSnapshotComparisonArchivesUseCase
+import com.absinthe.libchecker.domain.snapshot.comparison.model.ComparisonDashboardLabels
+import com.absinthe.libchecker.domain.snapshot.comparison.model.ComparisonDashboardState
 import com.absinthe.libchecker.domain.snapshot.comparison.model.SnapshotComparisonInputs
 import com.absinthe.libchecker.domain.snapshot.comparison.model.SnapshotComparisonPlan
 import com.absinthe.libchecker.domain.snapshot.comparison.model.SnapshotComparisonSide
@@ -147,15 +149,10 @@ class SnapshotComparisonViewModel(
     return buildSnapshotPairDiffUseCase(left, right)
   }
 
-  internal fun buildDashboardSideState(
-    side: SnapshotComparisonSide,
-    labels: ComparisonDashboardStatePlanner.Labels
-  ): ComparisonDashboardStatePlanner.SideState {
-    val input = when (side) {
-      SnapshotComparisonSide.LEFT -> inputs.left
-      SnapshotComparisonSide.RIGHT -> inputs.right
-    }
-    return ComparisonDashboardStatePlanner.planSideState(input, labels, ::getFormatDateString)
+  internal fun buildDashboardState(
+    labels: ComparisonDashboardLabels
+  ): ComparisonDashboardState {
+    return ComparisonDashboardStatePlanner.planState(inputs, labels, ::getFormatDateString)
   }
 
   private suspend fun buildSnapshotComparisonPlan(

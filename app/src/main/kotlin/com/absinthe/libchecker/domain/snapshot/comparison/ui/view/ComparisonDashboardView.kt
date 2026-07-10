@@ -2,22 +2,23 @@ package com.absinthe.libchecker.domain.snapshot.comparison.ui.view
 
 import android.content.Context
 import android.view.Gravity
-import android.view.View
 import android.view.ViewGroup
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.snapshot.comparison.model.ComparisonDashboardAction
+import com.absinthe.libchecker.domain.snapshot.comparison.model.ComparisonDashboardState
 import com.absinthe.libchecker.domain.snapshot.comparison.model.SnapshotComparisonSide
-import com.absinthe.libchecker.domain.snapshot.comparison.presentation.ComparisonDashboardStatePlanner
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
 import com.absinthe.libchecker.view.AViewGroup
+import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.divider.MaterialDivider
 
 class ComparisonDashboardView(context: Context) : MaterialCardView(context, null, R.style.AlbumMaterialCard) {
 
-  private val container = SnapshotDashboardContainerView(context).apply {
+  private val container = ComparisonDashboardContainerView(context).apply {
     layoutParams = ViewGroup.LayoutParams(
       LayoutParams.MATCH_PARENT,
       LayoutParams.WRAP_CONTENT
@@ -37,33 +38,27 @@ class ComparisonDashboardView(context: Context) : MaterialCardView(context, null
     addView(container)
   }
 
-  fun setOnSideClickListener(listener: (View, SnapshotComparisonSide) -> Unit) {
-    container.setOnSideClickListener(listener)
-  }
-
-  internal fun applySideState(
-    side: SnapshotComparisonSide,
-    sideState: ComparisonDashboardStatePlanner.SideState
+  internal fun bind(
+    state: ComparisonDashboardState,
+    onAction: (ComparisonDashboardAction) -> Unit
   ) {
-    container.applySideState(side, sideState)
+    container.bind(state, onAction)
   }
 
-  private class SnapshotDashboardContainerView(context: Context) : AViewGroup(context) {
+  private class ComparisonDashboardContainerView(context: Context) : AViewGroup(context) {
 
-    private val leftPart = ComparisonDashboardHalfView(context).apply {
+    private val leftPart = ComparisonDashboardHalfView(context, Gravity.START).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
-      horizontalGravity = Gravity.START
     }
 
-    private val rightPart = ComparisonDashboardHalfView(context).apply {
+    private val rightPart = ComparisonDashboardHalfView(context, Gravity.END).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
-      horizontalGravity = Gravity.END
     }
 
     private val divider = MaterialDivider(context).apply {
@@ -80,22 +75,21 @@ class ComparisonDashboardView(context: Context) : MaterialCardView(context, null
       addView(divider)
     }
 
-    fun setOnSideClickListener(listener: (View, SnapshotComparisonSide) -> Unit) {
-      leftPart.setOnClickListener { listener(it, SnapshotComparisonSide.LEFT) }
-      rightPart.setOnClickListener { listener(it, SnapshotComparisonSide.RIGHT) }
-    }
-
-    fun applySideState(
-      side: SnapshotComparisonSide,
-      sideState: ComparisonDashboardStatePlanner.SideState
+    fun bind(
+      state: ComparisonDashboardState,
+      onAction: (ComparisonDashboardAction) -> Unit
     ) {
-      getPart(side).applySideState(sideState)
-    }
-
-    private fun getPart(side: SnapshotComparisonSide): ComparisonDashboardHalfView {
-      return when (side) {
-        SnapshotComparisonSide.LEFT -> leftPart
-        SnapshotComparisonSide.RIGHT -> rightPart
+      leftPart.bind(state.left)
+      rightPart.bind(state.right)
+      leftPart.setOnClickListener {
+        if (!AntiShakeUtils.isInvalidClick(it)) {
+          onAction(ComparisonDashboardAction.SelectSide(SnapshotComparisonSide.LEFT))
+        }
+      }
+      rightPart.setOnClickListener {
+        if (!AntiShakeUtils.isInvalidClick(it)) {
+          onAction(ComparisonDashboardAction.SelectSide(SnapshotComparisonSide.RIGHT))
+        }
       }
     }
 

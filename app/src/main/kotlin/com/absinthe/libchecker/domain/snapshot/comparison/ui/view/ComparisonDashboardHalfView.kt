@@ -2,7 +2,6 @@ package com.absinthe.libchecker.domain.snapshot.comparison.ui.view
 
 import android.content.Context
 import android.text.TextUtils
-import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.Gravity
@@ -10,15 +9,15 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.snapshot.comparison.presentation.ComparisonDashboardStatePlanner
+import com.absinthe.libchecker.domain.snapshot.comparison.model.ComparisonDashboardSideState
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 
 class ComparisonDashboardHalfView(
   context: Context,
-  attributeSet: AttributeSet? = null
-) : AViewGroup(context, attributeSet) {
+  private val horizontalGravity: Int
+) : AViewGroup(context) {
 
   private val tvSnapshotTimestampTitle =
     AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
@@ -68,6 +67,10 @@ class ComparisonDashboardHalfView(
     }
 
   init {
+    tvSnapshotTimestampTitle.gravity = horizontalGravity
+    tvSnapshotTimestampText.gravity = horizontalGravity
+    tvSnapshotAppsCountTitle.gravity = horizontalGravity
+    tvSnapshotAppsCountText.gravity = horizontalGravity
     addView(tvSnapshotTimestampTitle)
     addView(tvSnapshotTimestampText)
     addView(tvSnapshotAppsCountTitle)
@@ -75,16 +78,7 @@ class ComparisonDashboardHalfView(
     setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackgroundBorderless))
   }
 
-  var horizontalGravity: Int = Gravity.START
-    set(value) {
-      field = value
-      tvSnapshotTimestampTitle.gravity = field
-      tvSnapshotTimestampText.gravity = field
-      tvSnapshotAppsCountTitle.gravity = field
-      tvSnapshotAppsCountText.gravity = field
-    }
-
-  internal fun applySideState(sideState: ComparisonDashboardStatePlanner.SideState) {
+  internal fun bind(sideState: ComparisonDashboardSideState) {
     tvSnapshotTimestampText.text = sideState.timestampText
     tvSnapshotAppsCountText.text = sideState.appsCountText
     contentDescription = sideState.contentDescription
