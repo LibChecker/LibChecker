@@ -22,6 +22,7 @@ import com.absinthe.libchecker.domain.rules.CloudRulesVersionInfo
 import com.absinthe.libchecker.domain.rules.RuleSettingsRepository
 import com.absinthe.libchecker.domain.settings.appearance.NightModeResolver
 import com.absinthe.libchecker.domain.settings.model.GetUpdatesAction
+import com.absinthe.libchecker.domain.settings.model.GetUpdatesDialogState
 import com.absinthe.libchecker.domain.settings.model.GetUpdatesItem
 import com.absinthe.libchecker.domain.settings.model.LocalePreferenceDisplayData
 import com.absinthe.libchecker.domain.settings.model.LocalePreferenceEntry
@@ -135,7 +136,7 @@ class SettingsWorkflow(
     snapshotSettingsRepository.keepRule = rule
   }
 
-  fun buildGetUpdatesItems(): List<GetUpdatesItem> {
+  fun buildGetUpdatesDialogState(): GetUpdatesDialogState {
     val items = listOf(
       GetUpdatesItem(
         text = "GitHub",
@@ -159,7 +160,7 @@ class SettingsWorkflow(
       )
     )
 
-    return if (AppSelfUpdatePolicy.isSelfUpdateEnabled(BuildConfig.IS_FOSS, BuildConfig.IS_DEV_VERSION)) {
+    val visibleItems = if (AppSelfUpdatePolicy.isSelfUpdateEnabled(BuildConfig.IS_FOSS, BuildConfig.IS_DEV_VERSION)) {
       items + GetUpdatesItem(
         text = context.getString(R.string.settings_get_updates_in_app),
         iconRes = R.drawable.ic_logo,
@@ -168,6 +169,7 @@ class SettingsWorkflow(
     } else {
       items
     }
+    return GetUpdatesDialogState(visibleItems)
   }
 
   private fun defaultUpdateChannel(): AppUpdateChannel {

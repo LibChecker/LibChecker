@@ -9,7 +9,8 @@ import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.about.model.DeveloperInfo
+import com.absinthe.libchecker.domain.about.model.DevelopersDialogAction
+import com.absinthe.libchecker.domain.about.model.DevelopersDialogState
 import com.absinthe.libchecker.domain.about.ui.adapter.DeveloperInfoAdapter
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.utils.extensions.dp
@@ -50,7 +51,8 @@ class DevelopersDialogView(context: Context) :
     addView(loadingView)
   }
 
-  private val _adapter = DeveloperInfoAdapter()
+  private var onAction: (DevelopersDialogAction) -> Unit = {}
+  private val adapter = DeveloperInfoAdapter { onAction(it) }
   private val visibilityInterpolator = FastOutSlowInInterpolator()
   private var loadingRequested = false
 
@@ -60,7 +62,7 @@ class DevelopersDialogView(context: Context) :
       LayoutParams.WRAP_CONTENT
     )
     setPadding(16.dp, 16.dp, 16.dp, 16.dp)
-    adapter = _adapter
+    adapter = this@DevelopersDialogView.adapter
     layoutManager = LinearLayoutManager(context)
     addItemDecoration(
       VerticalSpacesItemDecoration(4.dp)
@@ -78,11 +80,25 @@ class DevelopersDialogView(context: Context) :
     return header
   }
 
-  fun setItems(items: List<DeveloperInfo>) {
-    _adapter.setList(items)
+  fun bind(
+    state: DevelopersDialogState,
+    onAction: (DevelopersDialogAction) -> Unit
+  ) {
+    this.onAction = onAction
+    when (state) {
+      DevelopersDialogState.Loading -> {
+        adapter.setList(emptyList())
+        renderLoading(true)
+      }
+
+      is DevelopersDialogState.Content -> {
+        adapter.setList(state.items)
+        renderLoading(false)
+      }
+    }
   }
 
-  fun setLoading(loading: Boolean) {
+  private fun renderLoading(loading: Boolean) {
     if (loadingRequested == loading) {
       return
     }

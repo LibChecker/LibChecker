@@ -31,6 +31,7 @@ import com.absinthe.libchecker.annotation.STATUS_START_INIT
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.databinding.ActivityMainBinding
+import com.absinthe.libchecker.domain.home.model.HomeToolbarTitleState
 import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
 import com.absinthe.libchecker.domain.home.ui.INavViewContainer
 import com.absinthe.libchecker.domain.home.ui.view.HomeToolbarTitleView
@@ -75,6 +76,7 @@ class MainActivity :
   @Suppress("DEPRECATION")
   private val navViewBehavior by lazy { HideBottomViewOnScrollBehavior<BottomNavigationView>() }
   private val toolbarTitleView by lazy { HomeToolbarTitleView(this) }
+  private lateinit var toolbarTitleState: HomeToolbarTitleState
   private val workerServiceConnection = object : ServiceConnection {
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
       if (service?.pingBinder() == true) {
@@ -300,7 +302,7 @@ class MainActivity :
   private fun setupToolbarTitle() {
     supportActionBar?.title = null
     binding.toolbar.title = null
-    toolbarTitleView.setTitle(LCAppUtils.setTitle(this))
+    renderToolbarTitle(HomeToolbarTitleState(title = LCAppUtils.buildAppTitle(this)))
     if (toolbarTitleView.parent == null) {
       binding.toolbar.addView(
         toolbarTitleView,
@@ -312,6 +314,11 @@ class MainActivity :
         }
       )
     }
+  }
+
+  private fun renderToolbarTitle(state: HomeToolbarTitleState) {
+    toolbarTitleState = state
+    toolbarTitleView.bind(state)
   }
 
   override fun onResume() {
@@ -391,7 +398,7 @@ class MainActivity :
       }.launchIn(lifecycleScope)
 
       toolbarLoading.onEach {
-        toolbarTitleView.setLoading(it)
+        renderToolbarTitle(toolbarTitleState.withLoading(it))
       }.launchIn(lifecycleScope)
     }
     appViewModel.packageChanges.onEach {

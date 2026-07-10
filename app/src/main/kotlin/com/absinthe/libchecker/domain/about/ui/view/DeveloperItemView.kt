@@ -8,7 +8,11 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.children
 import androidx.core.view.marginLeft
 import androidx.core.view.marginRight
+import coil.load
+import coil.request.CachePolicy
+import coil.transform.CircleCropTransformation
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.about.model.DeveloperInfo
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
@@ -20,7 +24,7 @@ import com.google.android.material.card.MaterialCardView
 
 class DeveloperItemView(context: Context) : MaterialCardView(context) {
 
-  val container = LibReferenceItemContainerView(context).apply {
+  private val container = LibReferenceItemContainerView(context).apply {
     val padding = context.getDimensionPixelSize(R.dimen.main_card_padding)
     setPadding(padding, padding, padding, padding)
   }
@@ -32,7 +36,27 @@ class DeveloperItemView(context: Context) : MaterialCardView(context) {
     addView(container)
   }
 
-  class LibReferenceItemContainerView(context: Context) : AViewGroup(context) {
+  fun bind(
+    item: DeveloperInfo,
+    onClick: () -> Unit
+  ) {
+    val avatarCacheKey = "developer_avatar:${item.avatarUrl}"
+    container.icon.load(item.avatarUrl) {
+      memoryCacheKey(avatarCacheKey)
+      diskCacheKey(avatarCacheKey)
+      placeholderMemoryCacheKey(avatarCacheKey)
+      memoryCachePolicy(CachePolicy.ENABLED)
+      diskCachePolicy(CachePolicy.ENABLED)
+      networkCachePolicy(CachePolicy.ENABLED)
+      transformations(CircleCropTransformation())
+    }
+    container.name.text = item.name
+    container.desc.text = item.desc
+    contentDescription = listOf(item.name, item.desc).joinToString()
+    setOnClickListener { onClick() }
+  }
+
+  private class LibReferenceItemContainerView(context: Context) : AViewGroup(context) {
 
     val icon = AppCompatImageView(context).apply {
       id = android.R.id.icon

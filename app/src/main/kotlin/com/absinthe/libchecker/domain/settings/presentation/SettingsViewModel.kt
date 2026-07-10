@@ -10,7 +10,7 @@ import com.absinthe.libchecker.domain.app.update.AppUpdateChannel
 import com.absinthe.libchecker.domain.app.update.AppUpdateInstallResult
 import com.absinthe.libchecker.domain.rules.CloudRulesDownloadRequest
 import com.absinthe.libchecker.domain.rules.CloudRulesVersionInfo
-import com.absinthe.libchecker.domain.settings.model.GetUpdatesItem
+import com.absinthe.libchecker.domain.settings.model.GetUpdatesDialogState
 import com.absinthe.libchecker.domain.settings.model.LocalePreferenceDisplayData
 import java.util.Locale
 import kotlinx.coroutines.Dispatchers
@@ -97,8 +97,8 @@ class SettingsViewModel(
     settingsWorkflow.setSnapshotKeepRule(rule)
   }
 
-  fun buildGetUpdatesItems(): List<GetUpdatesItem> {
-    return settingsWorkflow.buildGetUpdatesItems()
+  fun buildGetUpdatesDialogState(): GetUpdatesDialogState {
+    return settingsWorkflow.buildGetUpdatesDialogState()
   }
 
   fun getLibReferenceThreshold(): Int {

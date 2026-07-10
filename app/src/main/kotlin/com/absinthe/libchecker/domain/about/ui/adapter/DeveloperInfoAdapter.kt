@@ -1,21 +1,17 @@
 package com.absinthe.libchecker.domain.about.ui.adapter
 
-import android.content.Intent
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import androidx.browser.customtabs.CustomTabsIntent
-import androidx.core.net.toUri
-import coil.load
-import coil.request.CachePolicy
-import coil.transform.CircleCropTransformation
 import com.absinthe.libchecker.domain.about.model.DeveloperInfo
+import com.absinthe.libchecker.domain.about.model.DevelopersDialogAction
+import com.absinthe.libchecker.domain.about.model.toDevelopersDialogAction
 import com.absinthe.libchecker.domain.about.ui.view.DeveloperItemView
-import com.absinthe.libchecker.utils.Toasty
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
-import timber.log.Timber
 
-class DeveloperInfoAdapter : BaseQuickAdapter<DeveloperInfo, BaseViewHolder>(0) {
+class DeveloperInfoAdapter(
+  private val onAction: (DevelopersDialogAction) -> Unit
+) : BaseQuickAdapter<DeveloperInfo, BaseViewHolder>(0) {
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return BaseViewHolder(
@@ -29,42 +25,8 @@ class DeveloperInfoAdapter : BaseQuickAdapter<DeveloperInfo, BaseViewHolder>(0) 
   }
 
   override fun convert(holder: BaseViewHolder, item: DeveloperInfo) {
-    (holder.itemView as DeveloperItemView).apply {
-      val avatarCacheKey = item.avatarCacheKey()
-      container.icon.load(item.avatarUrl) {
-        memoryCacheKey(avatarCacheKey)
-        diskCacheKey(avatarCacheKey)
-        placeholderMemoryCacheKey(avatarCacheKey)
-        memoryCachePolicy(CachePolicy.ENABLED)
-        diskCachePolicy(CachePolicy.ENABLED)
-        networkCachePolicy(CachePolicy.ENABLED)
-        transformations(CircleCropTransformation())
-      }
-      container.name.text = item.name
-      container.desc.text = item.desc
-      contentDescription = listOf(item.name, item.desc).joinToString()
-      setOnClickListener {
-        val context = it.context
-        runCatching {
-          CustomTabsIntent.Builder().build().apply {
-            launchUrl(context, item.github.toUri())
-          }
-        }.onFailure { t ->
-          Timber.e(t)
-          runCatching {
-            val intent = Intent(Intent.ACTION_VIEW)
-              .setData(item.github.toUri())
-            context.startActivity(intent)
-          }.onFailure { inner ->
-            Timber.e(inner)
-            Toasty.showShort(context, "No browser application")
-          }
-        }
-      }
+    (holder.itemView as DeveloperItemView).bind(item) {
+      onAction(item.toDevelopersDialogAction())
     }
-  }
-
-  private fun DeveloperInfo.avatarCacheKey(): String {
-    return "developer_avatar:$avatarUrl"
   }
 }

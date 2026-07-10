@@ -9,6 +9,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.isGone
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.home.model.HomeToolbarTitleState
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
@@ -44,6 +45,7 @@ class HomeToolbarTitleView @JvmOverloads constructor(
   }
 
   private var loadingRequested = false
+  private var renderedState: HomeToolbarTitleState? = null
   private val visibilityInterpolator = FastOutSlowInInterpolator()
 
   init {
@@ -51,12 +53,19 @@ class HomeToolbarTitleView @JvmOverloads constructor(
     addView(loadingView)
   }
 
-  fun setTitle(title: CharSequence) {
-    titleView.text = title
-    requestLayout()
+  fun bind(state: HomeToolbarTitleState) {
+    val previousState = renderedState
+    if (previousState?.title !== state.title) {
+      titleView.text = state.title
+      requestLayout()
+    }
+    if (previousState?.isLoading != state.isLoading) {
+      renderLoading(state.isLoading)
+    }
+    renderedState = state
   }
 
-  fun setLoading(loading: Boolean) {
+  private fun renderLoading(loading: Boolean) {
     if (loadingRequested == loading) {
       return
     }
