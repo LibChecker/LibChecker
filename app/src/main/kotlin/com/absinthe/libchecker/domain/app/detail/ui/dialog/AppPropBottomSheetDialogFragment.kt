@@ -48,13 +48,13 @@ class AppPropBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppPr
   override fun init() {
     maxPeekHeightPercentage = 0.67f
     lifecycleScope.launch {
-      root.adapter.setList(viewModel.getAppManifestProperties(packageInfo, props))
+      root.bind(viewModel.getAppManifestProperties(packageInfo, props))
     }
   }
 
   private fun onResourceClick(item: AppPropItem) {
     if (item.isTransformed) {
-      root.adapter.replace(item.restore())
+      root.updateItem(item.restore())
       return
     }
     val resource = item.resource ?: return
@@ -71,17 +71,17 @@ class AppPropBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppPr
           )
         }
       ) {
-        is AppResourceValue.Text -> root.adapter.replace(
+        is AppResourceValue.Text -> root.updateItem(
           item.copy(preview = AppResourcePreview.Text(resourceValue.value))
         )
 
         is AppResourceValue.Xml -> showXml(resourceValue.value)
 
-        is AppResourceValue.DrawablePreview -> root.adapter.replace(
+        is AppResourceValue.DrawablePreview -> root.updateItem(
           item.copy(preview = AppResourcePreview.DrawableValue(resourceValue.drawable))
         )
 
-        is AppResourceValue.ColorPreview -> root.adapter.replace(
+        is AppResourceValue.ColorPreview -> root.updateItem(
           item.copy(preview = AppResourcePreview.ColorValue(resourceValue.color))
         )
 

@@ -4,11 +4,11 @@ import android.content.Context
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.detail.model.AppBundleItem
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.AppBundleAdapter
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
@@ -17,7 +17,7 @@ class AppBundleBottomSheetView(context: Context) :
   LinearLayout(context),
   IHeaderView {
 
-  val adapter by unsafeLazy { AppBundleAdapter() }
+  private val adapter = AppBundleAdapter()
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =
@@ -54,6 +54,10 @@ class AppBundleBottomSheetView(context: Context) :
     )
     addView(header)
     addView(list)
+  }
+
+  fun bind(items: List<AppBundleItem>) {
+    adapter.setList(items)
   }
 
   override fun getHeaderView(): BottomSheetHeaderView {

@@ -345,7 +345,7 @@ class DetailViewModel(
 
   suspend fun getAlternativeLaunchItems(packageName: String) = detailActionLoader.getAlternativeLaunchItems(packageName)
 
-  suspend fun getXposedModuleInfo(packageName: String) = detailActionLoader.getXposedModuleInfo(packageName)
+  suspend fun getXposedInfoBottomSheetDisplay(packageName: String) = detailActionLoader.getXposedInfoBottomSheetDisplay(packageName)
 
   suspend fun getAppManifestProperties(
     packageInfo: PackageInfo?,
@@ -442,7 +442,7 @@ class DetailViewModel(
     preferredLocale
   )
 
-  suspend fun getOverlayDetail(item: LCItem) = detailActionLoader.getOverlayDetail(item)
+  suspend fun getOverlayDetailBottomSheetResult(item: LCItem) = detailActionLoader.getOverlayDetailBottomSheetResult(item)
 
   suspend fun getPermissionDetail(permissionName: String) = detailActionLoader.getPermissionDetail(permissionName)
 
@@ -457,8 +457,6 @@ class DetailViewModel(
   fun setFeatureLoading(loading: Boolean) {
     detailFeatureLoader.setLoading(viewModelScope, loading)
   }
-
-  suspend fun getRelatedAppDisplayData(packageName: String) = detailActionLoader.getRelatedAppDisplayData(packageName)
 
   fun buildSignatureDetailItems(detail: String) = detailActionLoader.buildSignatureDetailItems(detail)
 

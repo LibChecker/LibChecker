@@ -2,7 +2,6 @@ package com.absinthe.libchecker.domain.app.detail.ui.dialog
 
 import android.content.DialogInterface
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
 import com.absinthe.libchecker.domain.app.detail.ui.view.SignatureDetailBottomSheetView
@@ -10,7 +9,6 @@ import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
-import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import rikka.core.util.ClipboardUtils
 
@@ -27,14 +25,9 @@ class SignatureDetailBSDFragment : BaseBottomSheetViewDialogFragment<SignatureDe
 
   override fun init() {
     maxPeekHeightPercentage = 0.67f
-    root.adapter.setOnItemLongClickListener { _, _, _ ->
+    root.bind(viewModel.buildSignatureDetailItems(detail)) {
       ClipboardUtils.put(requireContext(), detail)
       VersionCompat.showCopiedOnClipboardToast(requireContext())
-      true
-    }
-    lifecycleScope.launch {
-      val data = viewModel.buildSignatureDetailItems(detail).toMutableList()
-      root.adapter.setList(data)
     }
   }
 

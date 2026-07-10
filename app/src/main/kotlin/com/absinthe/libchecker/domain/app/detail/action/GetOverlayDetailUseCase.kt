@@ -5,6 +5,10 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageInfoHidden
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.app.detail.RelatedAppDisplayData
+import com.absinthe.libchecker.domain.app.detail.model.OverlayDetailBottomSheetDisplay
+import com.absinthe.libchecker.domain.app.detail.model.OverlayDetailExtraInfoDisplay
+import com.absinthe.libchecker.domain.app.detail.model.OverlayTargetPackageDisplay
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.extensions.getAppName
@@ -68,3 +72,45 @@ data class OverlayDetailExtraInfo(
   val compileSdkInfo: String,
   val sizeInfo: String
 )
+
+internal fun buildOverlayDetailBottomSheetDisplay(
+  data: OverlayDetailData,
+  targetApp: RelatedAppDisplayData?
+): OverlayDetailBottomSheetDisplay {
+  return OverlayDetailBottomSheetDisplay(
+    item = data.item,
+    applicationInfo = data.packageInfo.applicationInfo,
+    packageName = data.packageName,
+    appName = data.appName,
+    versionInfo = data.versionInfo,
+    extraInfo = OverlayDetailExtraInfoDisplay(
+      type = data.extraInfo.type,
+      targetSdkInfo = data.extraInfo.targetSdkInfo,
+      minSdkInfo = data.extraInfo.minSdkInfo,
+      compileSdkInfo = data.extraInfo.compileSdkInfo,
+      sizeInfo = data.extraInfo.sizeInfo
+    ),
+    target = buildOverlayTargetPackageDisplay(
+      item = data.item,
+      targetPackageName = data.targetPackageName,
+      targetApp = targetApp
+    )
+  )
+}
+
+internal fun buildOverlayTargetPackageDisplay(
+  item: LCItem,
+  targetPackageName: String?,
+  targetApp: RelatedAppDisplayData?
+): OverlayTargetPackageDisplay {
+  return when {
+    targetPackageName == null -> OverlayTargetPackageDisplay.Empty
+
+    targetApp == null -> OverlayTargetPackageDisplay.PackageName(targetPackageName)
+
+    else -> OverlayTargetPackageDisplay.RelatedApp(
+      data = targetApp,
+      showHarmonyBadge = item.variant == Constants.VARIANT_HAP
+    )
+  }
+}

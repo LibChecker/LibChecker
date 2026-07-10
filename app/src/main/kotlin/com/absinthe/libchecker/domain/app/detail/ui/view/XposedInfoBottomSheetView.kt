@@ -13,13 +13,17 @@ import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.detail.model.XposedInfoAction
+import com.absinthe.libchecker.domain.app.detail.model.XposedInfoBottomSheetDisplay
+import com.absinthe.libchecker.domain.app.detail.model.XposedInfoItemDisplay
+import com.absinthe.libchecker.domain.app.detail.model.XposedInfoTextStyle
 import com.absinthe.libchecker.domain.app.detail.model.buildDetailItemDescription
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.XposedDetailItemAdapter
-import com.absinthe.libchecker.domain.app.detail.ui.adapter.node.XposedDetailItem
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
+import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.manager.SystemBarManager
@@ -35,9 +39,9 @@ class XposedInfoBottomSheetView(context: Context) :
     title.text = context.getString(R.string.xposed_module)
   }
 
-  val contentAdapter = XposedDetailItemAdapter()
+  private val contentAdapter = XposedDetailItemAdapter()
 
-  val setting = AppInfoItemView(context).apply {
+  private val setting = AppInfoItemView(context).apply {
     layoutParams = LayoutParams(
       LayoutParams.WRAP_CONTENT,
       LayoutParams.WRAP_CONTENT
@@ -78,9 +82,18 @@ class XposedInfoBottomSheetView(context: Context) :
     addView(xposedDetailContentView)
   }
 
-  override fun getHeaderView(): BottomSheetHeaderView {
-    return header
+  fun bind(
+    display: XposedInfoBottomSheetDisplay,
+    onAction: (XposedInfoAction) -> Unit
+  ) {
+    setting.setText(display.appName)
+    setting.setOnClickListener {
+      onAction(display.settingsAction)
+    }
+    contentAdapter.setList(display.items)
   }
+
+  override fun getHeaderView(): BottomSheetHeaderView = header
 
   class XposedDetailItemView(context: Context) : AViewGroup(context) {
 
@@ -118,11 +131,18 @@ class XposedInfoBottomSheetView(context: Context) :
       addView(text)
     }
 
-    fun bind(item: XposedDetailItem) {
+    fun bind(item: XposedInfoItemDisplay) {
       icon.setImageResource(item.iconRes)
       tip.text = item.tip
       text.text = item.text
-      text.setTextAppearance(item.textStyleRes)
+      text.setTextAppearance(
+        context.getResourceIdByAttr(
+          when (item.textStyle) {
+            XposedInfoTextStyle.Title -> com.google.android.material.R.attr.textAppearanceTitleSmall
+            XposedInfoTextStyle.Body -> com.google.android.material.R.attr.textAppearanceBodyMedium
+          }
+        )
+      )
       contentDescription = buildDetailItemDescription(tip.text, text.text)
     }
 
@@ -140,7 +160,9 @@ class XposedInfoBottomSheetView(context: Context) :
       }
       setMeasuredDimension(
         measuredWidth,
-        (tip.measuredHeight + text.marginTop + text.measuredHeight).coerceAtLeast(icon.measuredHeight) + paddingTop + paddingBottom
+        (tip.measuredHeight + text.marginTop + text.measuredHeight).coerceAtLeast(icon.measuredHeight) +
+          paddingTop +
+          paddingBottom
       )
     }
 

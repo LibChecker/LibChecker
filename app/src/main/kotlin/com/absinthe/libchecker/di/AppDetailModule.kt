@@ -17,6 +17,7 @@ import com.absinthe.libchecker.domain.app.detail.action.BuildAppInstallSourceBot
 import com.absinthe.libchecker.domain.app.detail.action.BuildDetailItemDialogRequestUseCase
 import com.absinthe.libchecker.domain.app.detail.action.BuildDetailItemLongClickActionsUseCase
 import com.absinthe.libchecker.domain.app.detail.action.BuildSignatureDetailItemsUseCase
+import com.absinthe.libchecker.domain.app.detail.action.BuildXposedInfoBottomSheetDisplayUseCase
 import com.absinthe.libchecker.domain.app.detail.action.ExportAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.detail.action.ExtractNativeLibraryUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetAlternativeLaunchItemsUseCase
@@ -120,6 +121,7 @@ val appDetailModule = module {
   factory { BuildAppInstallSourceBottomSheetDisplayUseCase(androidContext()) }
   factory { BuildDetailItemDialogRequestUseCase() }
   factory { BuildDetailItemLongClickActionsUseCase() }
+  factory { BuildXposedInfoBottomSheetDisplayUseCase(androidContext()) }
   factory { GetPermissionProvidersUseCase(get()) }
   factory { BuildDetailReferenceNavigationUseCase() }
   factory { BuildSignatureDetailItemsUseCase() }
@@ -153,6 +155,7 @@ val appDetailModule = module {
       getPermissionDetailUseCase = get(),
       getRelatedAppDisplayDataUseCase = get(),
       getXposedModuleInfoUseCase = get(),
+      buildXposedInfoBottomSheetDisplayUseCase = get(),
       buildDetailItemDialogRequestUseCase = get(),
       buildDetailItemLongClickActionsUseCase = get(),
       buildSignatureDetailItemsUseCase = get(),

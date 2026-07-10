@@ -10,6 +10,7 @@ import com.absinthe.libchecker.domain.app.detail.action.BuildAppInstallSourceBot
 import com.absinthe.libchecker.domain.app.detail.action.BuildDetailItemDialogRequestUseCase
 import com.absinthe.libchecker.domain.app.detail.action.BuildDetailItemLongClickActionsUseCase
 import com.absinthe.libchecker.domain.app.detail.action.BuildSignatureDetailItemsUseCase
+import com.absinthe.libchecker.domain.app.detail.action.BuildXposedInfoBottomSheetDisplayUseCase
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemLongClickActionRequest
 import com.absinthe.libchecker.domain.app.detail.action.ExportAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.detail.action.ExtractNativeLibraryUseCase
@@ -25,6 +26,7 @@ import com.absinthe.libchecker.domain.app.detail.action.GetOverlayDetailUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetPermissionDetailUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetXposedModuleInfoUseCase
 import com.absinthe.libchecker.domain.app.detail.action.PrepareAppPackageShareActionUseCase
+import com.absinthe.libchecker.domain.app.detail.action.buildOverlayDetailBottomSheetDisplay
 import com.absinthe.libchecker.domain.app.detail.content.BuildAppBundleItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.detail.content.GetAppBundleItemsUseCase
 import com.absinthe.libchecker.domain.app.detail.model.AppBundleItem
@@ -33,6 +35,8 @@ import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceRequester
 import com.absinthe.libchecker.domain.app.detail.model.AppPropItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
+import com.absinthe.libchecker.domain.app.detail.model.OverlayDetailBottomSheetResult
+import com.absinthe.libchecker.domain.app.detail.model.XposedInfoBottomSheetDisplay
 import com.absinthe.libchecker.domain.app.detail.navigation.BuildDetailReferenceNavigationUseCase
 import com.absinthe.libchecker.domain.app.detail.navigation.DetailReferenceNavigationRequest
 import java.io.File
@@ -55,6 +59,7 @@ class DetailActionLoader(
   private val getPermissionDetailUseCase: GetPermissionDetailUseCase,
   private val getRelatedAppDisplayDataUseCase: GetRelatedAppDisplayDataUseCase,
   private val getXposedModuleInfoUseCase: GetXposedModuleInfoUseCase,
+  private val buildXposedInfoBottomSheetDisplayUseCase: BuildXposedInfoBottomSheetDisplayUseCase,
   private val buildDetailItemDialogRequestUseCase: BuildDetailItemDialogRequestUseCase,
   private val buildDetailItemLongClickActionsUseCase: BuildDetailItemLongClickActionsUseCase,
   private val buildSignatureDetailItemsUseCase: BuildSignatureDetailItemsUseCase,
@@ -107,7 +112,10 @@ class DetailActionLoader(
     }
   }
 
-  suspend fun getXposedModuleInfo(packageName: String) = getXposedModuleInfoUseCase(packageName)
+  suspend fun getXposedInfoBottomSheetDisplay(packageName: String): XposedInfoBottomSheetDisplay? {
+    return getXposedModuleInfoUseCase(packageName)
+      ?.let(buildXposedInfoBottomSheetDisplayUseCase::invoke)
+  }
 
   suspend fun extractNativeLibrary(
     packageState: DetailPackageState,
@@ -165,11 +173,22 @@ class DetailActionLoader(
     )
   )
 
-  suspend fun getOverlayDetail(item: LCItem) = getOverlayDetailUseCase(item)
+  suspend fun getOverlayDetailBottomSheetResult(item: LCItem): OverlayDetailBottomSheetResult {
+    return when (val result = getOverlayDetailUseCase(item)) {
+      GetOverlayDetailUseCase.Result.NotFound -> OverlayDetailBottomSheetResult.NotFound
+
+      is GetOverlayDetailUseCase.Result.Available -> {
+        val targetApp = result.data.targetPackageName?.let {
+          getRelatedAppDisplayDataUseCase(it)
+        }
+        OverlayDetailBottomSheetResult.Available(
+          buildOverlayDetailBottomSheetDisplay(result.data, targetApp)
+        )
+      }
+    }
+  }
 
   suspend fun getPermissionDetail(permissionName: String) = getPermissionDetailUseCase(permissionName)
-
-  suspend fun getRelatedAppDisplayData(packageName: String) = getRelatedAppDisplayDataUseCase(packageName)
 
   fun buildDetailItemDialogRequest(
     item: LibStringItemChip,

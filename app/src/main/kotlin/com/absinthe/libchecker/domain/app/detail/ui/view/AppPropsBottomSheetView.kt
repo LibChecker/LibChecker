@@ -33,7 +33,7 @@ class AppPropsBottomSheetView(
 ) : LinearLayout(context),
   IHeaderView {
 
-  val adapter = AppPropsAdapter(onResourceClick)
+  private val adapter = AppPropsAdapter(onResourceClick)
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =
@@ -104,6 +104,14 @@ class AppPropsBottomSheetView(
     addView(header)
     addView(tipView)
     addView(list)
+  }
+
+  fun bind(items: List<AppPropItem>) {
+    adapter.setList(items)
+  }
+
+  fun updateItem(item: AppPropItem) {
+    adapter.replace(item)
   }
 
   override fun getHeaderView(): BottomSheetHeaderView {

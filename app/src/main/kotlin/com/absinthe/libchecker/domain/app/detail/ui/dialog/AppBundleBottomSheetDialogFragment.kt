@@ -24,7 +24,7 @@ class AppBundleBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<App
     maxPeekHeightPercentage = 0.67f
     packageInfo?.let { pi ->
       lifecycleScope.launch {
-        root.adapter.setList(viewModel.getAppBundleItems(pi))
+        root.bind(viewModel.getAppBundleItems(pi))
       }
     }
   }
