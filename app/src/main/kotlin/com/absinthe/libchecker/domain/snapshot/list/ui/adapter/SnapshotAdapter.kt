@@ -1,13 +1,12 @@
 package com.absinthe.libchecker.domain.snapshot.list.ui.adapter
 
 import android.view.ViewGroup
-import com.absinthe.libchecker.domain.snapshot.SnapshotListDisplayOptions
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemCardPresentation
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotListRenderState
 import com.absinthe.libchecker.domain.snapshot.list.ui.view.SnapshotItemView
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.stableSnapshotDiffItemIdFor
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
-import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
@@ -23,20 +22,11 @@ class SnapshotAdapter(
     setHasStableIds(true)
   }
 
-  private var displayOptions = SnapshotListDisplayOptions()
-  private var packageIconSources: Map<String, SnapshotPackageIconSource> = emptyMap()
-  private var apexPackageNames: Set<String> = emptySet()
+  private var renderState = SnapshotListRenderState()
 
-  fun setDisplayOptions(displayOptions: SnapshotListDisplayOptions) {
-    this.displayOptions = displayOptions
-  }
-
-  fun setPackageIconSources(packageIconSources: Map<String, SnapshotPackageIconSource>) {
-    this.packageIconSources = packageIconSources
-  }
-
-  fun setApexPackageNames(apexPackageNames: Set<String>) {
-    this.apexPackageNames = apexPackageNames
+  fun bind(state: SnapshotListRenderState) {
+    renderState = state
+    highlightText = state.highlightText
   }
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
@@ -57,12 +47,12 @@ class SnapshotAdapter(
         BuildSnapshotItemDisplayDataUseCase.Request(
           item = item,
           cardPresentation = cardMode.toCardPresentation(),
-          iconSource = packageIconSources[item.packageName],
-          showUpdateTime = displayOptions.showUpdateTime && cardMode != CardMode.GET_APP_UPDATE,
-          isApexPackage = item.packageName in apexPackageNames,
+          iconSource = renderState.packageIconSources[item.packageName],
+          showUpdateTime = renderState.displayOptions.showUpdateTime && cardMode != CardMode.GET_APP_UPDATE,
+          isApexPackage = item.packageName in renderState.apexPackageNames,
           animateStateIndicator = cardMode == CardMode.DEMO,
-          tintChangedAbiBadge = displayOptions.tintAbiLabels,
-          highlightDiffColor = if (displayOptions.highlightDiffs) {
+          tintChangedAbiBadge = renderState.displayOptions.tintAbiLabels,
+          highlightDiffColor = if (renderState.displayOptions.highlightDiffs) {
             context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary)
           } else {
             null

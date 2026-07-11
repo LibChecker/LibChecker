@@ -2,10 +2,10 @@ package com.absinthe.libchecker.domain.app.list.ui.adapter
 
 import android.content.Context
 import android.view.ViewGroup
-import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.list.model.AppListItemDisplay
 import com.absinthe.libchecker.domain.app.list.model.AppListItemViewState
+import com.absinthe.libchecker.domain.app.list.model.AppListRenderState
 import com.absinthe.libchecker.domain.app.list.stableAppListItemIdForKey
 import com.absinthe.libchecker.domain.app.list.ui.view.AppItemView
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
@@ -16,11 +16,11 @@ import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
 class AppAdapter(
-  private val cardMode: CardMode = CardMode.NORMAL,
-  private var fallbackDisplayOptions: Int = AdvancedOptions.DEFAULT_OPTIONS
+  private val cardMode: CardMode = CardMode.NORMAL
 ) : HighlightAdapter<LCItem>(AppListDiffUtil()) {
 
-  private val itemViewStateCache = mutableMapOf<String, AppListItemViewState>()
+  private var renderState = AppListRenderState()
+  private val pendingItemViewStateCache = mutableMapOf<String, AppListItemViewState>()
   private var itemViewStyle: AppItemView.Style? = null
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
@@ -66,17 +66,10 @@ class AppAdapter(
     return stableAppListItemIdForKey(data[position].packageName)
   }
 
-  fun setItemViewStates(itemViewStates: Map<String, AppListItemViewState>) {
-    itemViewStateCache.clear()
-    itemViewStateCache.putAll(itemViewStates)
-  }
-
-  fun putItemViewStates(itemViewStates: Map<String, AppListItemViewState>) {
-    itemViewStateCache.putAll(itemViewStates)
-  }
-
-  fun clearItemViewStateCache() {
-    itemViewStateCache.clear()
+  fun bind(state: AppListRenderState) {
+    renderState = state
+    highlightText = state.highlightText
+    pendingItemViewStateCache.clear()
   }
 
   fun notifyHighlightTextChanged() {
@@ -85,19 +78,15 @@ class AppAdapter(
     }
   }
 
-  fun setFallbackDisplayOptions(options: Int) {
-    fallbackDisplayOptions = options
-    clearItemViewStateCache()
-  }
-
   private fun getItemViewState(item: LCItem): AppListItemViewState {
-    return itemViewStateCache.getOrPut(item.packageName) {
-      AppListItemViewState.createPending(
-        context = context,
-        item = item,
-        options = fallbackDisplayOptions
-      )
-    }
+    return renderState.itemViewStates[item.packageName]
+      ?: pendingItemViewStateCache.getOrPut(item.packageName) {
+        AppListItemViewState.createPending(
+          context = context,
+          item = item,
+          options = renderState.fallbackDisplayOptions
+        )
+      }
   }
 
   private fun getItemViewStyle(context: Context): AppItemView.Style {

@@ -10,6 +10,7 @@ import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
+import com.absinthe.libchecker.domain.app.list.model.AppListRenderState
 import com.absinthe.libchecker.domain.app.list.ui.adapter.AppAdapter
 import com.absinthe.libchecker.domain.statistics.reference.presentation.LibReferenceViewModel
 import com.absinthe.libchecker.ui.base.BaseActivity
@@ -106,8 +107,7 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
 
     viewModel.libRefListFlow.onEach {
       val itemViewStates = viewModel.buildAppListItemViewStates(it)
-      adapter.clearItemViewStateCache()
-      adapter.setItemViewStates(itemViewStates)
+      adapter.bind(AppListRenderState(itemViewStates = itemViewStates))
       adapter.setList(it)
       if (binding.vfContainer.displayedChild != 1) {
         binding.vfContainer.displayedChild = 1

@@ -12,6 +12,7 @@ import com.absinthe.libchecker.domain.app.detail.ui.adapter.LibStringAdapter
 import com.absinthe.libchecker.domain.app.list.model.AdvancedMenuAction
 import com.absinthe.libchecker.domain.app.list.model.AdvancedMenuBottomSheetState
 import com.absinthe.libchecker.domain.app.list.model.AdvancedMenuLayoutItem
+import com.absinthe.libchecker.domain.app.list.model.AppListRenderState
 import com.absinthe.libchecker.domain.app.list.model.buildAdvancedMenuLayoutItems
 import com.absinthe.libchecker.domain.app.list.ui.adapter.AppAdapter
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
@@ -128,7 +129,7 @@ class AdvancedMenuBSDView(context: Context) :
     onAction: (AdvancedMenuAction) -> Unit
   ) {
     this.onAction = onAction
-    demoAdapter.setFallbackDisplayOptions(state.displayOptions)
+    demoAdapter.bind(AppListRenderState(fallbackDisplayOptions = state.displayOptions))
     demoAdapter.setList(listOf(state.demoItem))
     sortView.bind(state.displayOptions) {
       this.onAction(AdvancedMenuAction.SortChanged(it))

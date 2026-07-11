@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.absinthe.libchecker.domain.app.list.model.AppListRenderState
 import com.absinthe.libchecker.domain.app.list.ui.adapter.AppAdapter
 import com.absinthe.libchecker.domain.statistics.chart.model.AndroidVersionLabelDisplayData
 import com.absinthe.libchecker.domain.statistics.chart.model.ClassifyDialogAction
@@ -82,7 +83,7 @@ class ClassifyDialogView(context: Context) :
     this.onAction = onAction
     header.title.text = state.title
     bindAndroidVersion(state.androidVersion)
-    adapter.setItemViewStates(state.itemViewStates)
+    adapter.bind(AppListRenderState(itemViewStates = state.itemViewStates))
     adapter.setList(state.items)
   }
 

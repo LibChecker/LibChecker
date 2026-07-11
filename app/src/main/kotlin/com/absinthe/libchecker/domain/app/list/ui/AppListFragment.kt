@@ -29,6 +29,7 @@ import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.domain.app.list.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.app.list.TRACE_APP_LIST_APPLY_UPDATE_MAIN
 import com.absinthe.libchecker.domain.app.list.TRACE_APP_LIST_REMAINING_ITEM_VIEW_STATES
+import com.absinthe.libchecker.domain.app.list.model.AppListRenderState
 import com.absinthe.libchecker.domain.app.list.traceAppListSection
 import com.absinthe.libchecker.domain.app.list.traceAppListSuspendSection
 import com.absinthe.libchecker.domain.app.list.ui.adapter.AppAdapter
@@ -77,6 +78,7 @@ class AppListFragment :
   private val getRandomAppIcon: GetRandomAppIconUseCase by inject()
   private val appAdapter = AppAdapter()
   private val particleItemAnimator = ParticleRemoveItemAnimator()
+  private var appListRenderState = AppListRenderState()
   private var updateItemsJob: Job? = null
   private var itemViewStatesJob: Job? = null
   private var itemViewStatesGeneration = 0
@@ -252,11 +254,11 @@ class AppListFragment :
   }
 
   override fun onQueryTextChange(newText: String): Boolean {
-    val shouldSyncHighlight = appAdapter.highlightText != newText
+    val shouldSyncHighlight = appListRenderState.highlightText != newText
     val searchChange = homeViewModel.onAppListSearchQueryChanged(newText)
     if (searchChange.shouldRefreshItems || shouldSyncHighlight) {
       isSearchTextClearOnce = newText.isEmpty()
-      appAdapter.highlightText = newText
+      bindAppListRenderState(appListRenderState.copy(highlightText = newText))
       updateItems(highlightRefresh = true)
 
       when (val action = searchChange.action) {
@@ -507,7 +509,7 @@ class AppListFragment :
       traceAppListSection(TRACE_APP_LIST_APPLY_UPDATE_MAIN) {
         appAdapter.apply {
           particleItemAnimator.prepareParticleRemovals(updatePlan.particleRemovalItemIds)
-          setItemViewStates(updatePlan.content.initialItemViewStates)
+          bindAppListRenderState(updatePlan.content.renderState)
           homeViewModel.onAppListUpdatePlanApplied(updatePlan)
 
           setDiffNewData(updatePlan.content.items.toMutableList()) {
@@ -516,7 +518,7 @@ class AppListFragment :
             }
             flip(VF_LIST)
             isListReady = true
-            val initialItemViewStateCount = updatePlan.content.initialItemViewStates.size
+            val initialItemViewStateCount = updatePlan.content.renderState.itemViewStates.size
             if (initialItemViewStateCount > 0) {
               notifyItemRangeChanged(0, initialItemViewStateCount.coerceAtMost(data.size))
             }
@@ -576,7 +578,7 @@ class AppListFragment :
         ) {
           return@withContext
         }
-        appAdapter.putItemViewStates(itemViewStates)
+        bindAppListRenderState(appListRenderState.mergeItemViewStates(itemViewStates))
         val changedStart = initialItemViewStateCount.coerceAtMost(appAdapter.data.size)
         if (changedStart < appAdapter.data.size) {
           appAdapter.notifyItemRangeChanged(changedStart, appAdapter.data.size - changedStart)
@@ -588,6 +590,11 @@ class AppListFragment :
   private fun hasSameAppList(items: List<LCItem>): Boolean {
     return appAdapter.data.size == items.size &&
       items.indices.all { index -> appAdapter.data[index].packageName == items[index].packageName }
+  }
+
+  private fun bindAppListRenderState(state: AppListRenderState) {
+    appListRenderState = state
+    appAdapter.bind(state)
   }
 
   private fun returnTopOfList() {

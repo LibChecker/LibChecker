@@ -554,7 +554,6 @@ class SnapshotFragment :
   override fun onQueryTextChange(newText: String?): Boolean {
     val keyword = newText.orEmpty()
     if (viewModel.updateSnapshotSearchKeyword(keyword)) {
-      adapter.highlightText = keyword
       updateItems(highlightRefresh = true)
     }
     return false
@@ -567,9 +566,7 @@ class SnapshotFragment :
     )
     particleItemAnimator.prepareParticleRemovals(updatePlan.particleRemovalItemIds)
 
-    adapter.setPackageIconSources(updatePlan.packageIconSources)
-    adapter.setApexPackageNames(updatePlan.apexPackageNames)
-    adapter.setDisplayOptions(updatePlan.displayOptions)
+    adapter.bind(updatePlan.renderState)
     adapter.setDiffNewData(updatePlan.items.toMutableList()) {
       if (isDetached) {
         return@setDiffNewData
