@@ -30,16 +30,15 @@ class DetailTabController(
   private val onProcessTooltipTextChanged: (Int) -> Unit
 ) {
 
-  private val mutableTypes = mutableListOf<Int>()
-  private val titles = mutableListOf<CharSequence>()
+  private var state = DetailTabSpec()
   private var tabLayoutMediator: TabLayoutMediator? = null
   private var pageChangeCallback: ViewPager2.OnPageChangeCallback? = null
 
   val types: List<Int>
-    get() = mutableTypes
+    get() = state.types
 
   val selectedType: Int?
-    get() = mutableTypes.getOrNull(tabLayout.selectedTabPosition)
+    get() = state.itemAt(tabLayout.selectedTabPosition)?.type
 
   fun setup(
     packageName: String,
@@ -47,28 +46,27 @@ class DetailTabController(
     tabSpec: DetailTabSpec
   ) {
     reset()
-    mutableTypes.addAll(tabSpec.types)
-    titles.addAll(tabSpec.titles)
+    state = tabSpec
 
     viewPager.adapter = object : FragmentStateAdapter(activity) {
       override fun getItemCount(): Int {
-        return mutableTypes.size
+        return state.items.size
       }
 
       override fun createFragment(position: Int): Fragment {
         return createFragment(
           packageName = packageName,
           isHarmonyMode = isHarmonyMode,
-          type = mutableTypes.getOrElse(position) { NATIVE }
+          type = state.itemAt(position)?.type ?: NATIVE
         )
       }
 
       override fun getItemId(position: Int): Long {
-        return mutableTypes.getOrElse(position) { NATIVE }.toLong()
+        return (state.itemAt(position)?.type ?: NATIVE).toLong()
       }
 
       override fun containsItem(itemId: Long): Boolean {
-        return mutableTypes.any { it.toLong() == itemId }
+        return state.items.any { it.type.toLong() == itemId }
       }
     }
     pageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
@@ -78,13 +76,9 @@ class DetailTabController(
       }
     }.also { viewPager.registerOnPageChangeCallback(it) }
 
-    tabLayout.removeAllTabs()
-    titles.forEach {
-      tabLayout.addTab(tabLayout.newTab().apply { text = it })
-    }
     tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
       override fun onTabSelected(tab: TabLayout.Tab) {
-        val type = mutableTypes.getOrNull(tab.position) ?: return
+        val type = state.itemAt(tab.position)?.type ?: return
         onTabSelected(type)
       }
 
@@ -95,17 +89,18 @@ class DetailTabController(
 
     tabLayoutMediator =
       TabLayoutMediator(tabLayout, viewPager, true, true) { tab, position ->
-        tab.text = titles.getOrNull(position)
+        tab.text = state.itemAt(position)?.title
       }.also { it.attach() }
   }
 
   fun insertStaticLibraryTab(title: CharSequence): Boolean {
-    if (STATIC in mutableTypes) {
+    val newState = state.withStaticLibraryTab(title)
+    if (newState == state) {
       return false
     }
-    mutableTypes.add(1, STATIC)
-    titles.add(1, title)
-    viewPager.adapter?.notifyItemInserted(1)
+    val insertionPosition = newState.items.indexOfFirst { it.type == STATIC }
+    state = newState
+    viewPager.adapter?.notifyItemInserted(insertionPosition)
     return true
   }
 
@@ -117,13 +112,12 @@ class DetailTabController(
     viewPager.adapter = null
     tabLayout.clearOnTabSelectedListeners()
     tabLayout.removeAllTabs()
-    mutableTypes.clear()
-    titles.clear()
+    state = DetailTabSpec()
   }
 
   @StringRes
   private fun getProcessTooltipTextRes(position: Int): Int {
-    return if (mutableTypes.getOrNull(position) == NATIVE) {
+    return if (state.itemAt(position)?.type == NATIVE) {
       R.string.menu_split
     } else {
       R.string.menu_process
