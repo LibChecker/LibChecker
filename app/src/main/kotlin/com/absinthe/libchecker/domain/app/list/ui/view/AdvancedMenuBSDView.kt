@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
+import com.absinthe.libchecker.domain.app.detail.model.LibStringRenderState
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.LibStringAdapter
 import com.absinthe.libchecker.domain.app.list.model.AdvancedMenuAction
 import com.absinthe.libchecker.domain.app.list.model.AdvancedMenuBottomSheetState
@@ -46,8 +47,7 @@ class AdvancedMenuBSDView(context: Context) :
   private val adapter = AdvancedMenuLayoutAdapter()
   private val layoutItems = buildAdvancedMenuLayoutItems()
   private val demoAdapter = AppAdapter(AppAdapter.CardMode.DEMO)
-  private var itemAdapter: LibStringAdapter? = null
-  private var itemAdapterColorfulRuleIcon: Boolean? = null
+  private val itemAdapter = LibStringAdapter(type = ACTIVITY)
 
   private val demoView = RecyclerView(context).apply {
     layoutParams = LayoutParams(
@@ -77,6 +77,7 @@ class AdvancedMenuBSDView(context: Context) :
     setPadding(0, 8.dp, 0, 8.dp)
     overScrollMode = OVER_SCROLL_NEVER
     layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+    adapter = itemAdapter
   }
 
   private val itemView = MaterialCardView(context).apply {
@@ -197,25 +198,13 @@ class AdvancedMenuBSDView(context: Context) :
   }
 
   private fun bindComponentDemo(state: AdvancedMenuBottomSheetState) {
-    val currentAdapter = itemAdapter
-    val adapter = if (
-      currentAdapter == null ||
-      itemAdapterColorfulRuleIcon != state.colorfulRuleIcon
-    ) {
-      LibStringAdapter(
-        type = ACTIVITY,
+    itemAdapter.bind(
+      LibStringRenderState(
         itemDisplayOptions = state.itemDisplayOptions,
         colorfulRuleIcon = state.colorfulRuleIcon
-      ).also {
-        itemAdapter = it
-        itemAdapterColorfulRuleIcon = state.colorfulRuleIcon
-        componentStyleDemoView.adapter = it
-      }
-    } else {
-      currentAdapter
-    }
-    adapter.setItemDisplayOptions(state.itemDisplayOptions)
-    adapter.setList(state.componentDemoItems)
+      )
+    )
+    itemAdapter.setList(state.componentDemoItems)
   }
 
   private inner class AdvancedMenuLayoutAdapter : BaseQuickAdapter<AdvancedMenuLayoutItem, BaseViewHolder>(0) {

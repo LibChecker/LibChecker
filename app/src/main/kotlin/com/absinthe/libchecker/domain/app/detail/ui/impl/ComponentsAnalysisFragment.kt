@@ -22,7 +22,7 @@ class ComponentsAnalysisFragment :
   override fun getRecyclerView(): RecyclerView = binding.list
 
   override suspend fun getItems(): List<LibStringItemChip> {
-    val flow = viewModel.contentState.componentsMap[adapter.type]
+    val flow = viewModel.contentState.componentsMap[type]
     return flow.value ?: flow.filterNotNull().first()
   }
 
@@ -30,7 +30,7 @@ class ComponentsAnalysisFragment :
     if (items.isEmpty()) {
       emptyView.text.text = getString(R.string.empty_list)
     } else {
-      adapter.processMap = viewModel.contentState.processesMap
+      bindProcessColors(viewModel.contentState.processesMap)
       submitItemsWithFilter(items, viewModel.filterState.queriedText, viewModel.filterState.queriedProcess)
     }
     if (!isListReady) {

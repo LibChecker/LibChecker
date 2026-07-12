@@ -15,8 +15,10 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemDialogRequest
 import com.absinthe.libchecker.domain.app.detail.action.GetPermissionProvidersUseCase
+import com.absinthe.libchecker.domain.app.detail.model.LibStringAction
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.model.LibStringMetadataItemDisplay
+import com.absinthe.libchecker.domain.app.detail.model.LibStringRenderState
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_TEXT
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
@@ -67,13 +69,17 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   private val getPermissionProvidersUseCase: GetPermissionProvidersUseCase by inject()
   protected val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME).orEmpty() }
   protected val type by lazy { arguments?.getInt(EXTRA_TYPE) ?: NATIVE }
+  private var listRenderState = LibStringRenderState()
   protected val adapter by lazy {
-    LibStringAdapter(
-      type = type,
+    listRenderState = listRenderState.copy(
       itemDisplayOptions = appListSettingsRepository.itemDisplayOptions,
       colorfulRuleIcon = appListSettingsRepository.colorfulRuleIcon,
-      onMetadataResourceClick = ::onMetadataResourceClick
+      processMode = appDetailSettingsRepository.processMode
     )
+    LibStringAdapter(
+      type = type,
+      onAction = ::onAdapterAction
+    ).apply { bind(listRenderState) }
   }
   protected val emptyView by unsafeLazy {
     EmptyListView(requireContext()).apply {
@@ -148,7 +154,6 @@ abstract class BaseDetailFragment<T : ViewBinding> :
         longClickController.onLongClick(getItem(position), position)
         true
       }
-      setProcessMode(appDetailSettingsRepository.processMode)
     }
   }
 
@@ -185,9 +190,10 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     val list = mutableListOf<LibStringItemChip>().also {
       it += adapter.data
     }
+    val highlightPosition = listRenderState.highlightPosition
     val itemChip =
-      if (adapter.highlightPosition != -1 && adapter.highlightPosition < adapter.data.size) {
-        adapter.data[adapter.highlightPosition]
+      if (highlightPosition != LibStringRenderState.NO_HIGHLIGHT_POSITION && highlightPosition < adapter.data.size) {
+        adapter.data[highlightPosition]
       } else {
         null
       }
@@ -196,7 +202,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
 
     if (itemChip != null) {
       val newHighlightPosition = sortedList.indexOf(itemChip)
-      adapter.setHighlightBackgroundItem(newHighlightPosition)
+      updateListRenderState { it.withHighlightPosition(newHighlightPosition) }
     }
 
     adapter.preloadRuleChipIcons(sortedList)
@@ -227,12 +233,12 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     searchWords: String?,
     process: String?
   ) {
-    adapter.highlightText = searchWords.orEmpty()
+    updateListRenderState { it.copy(highlightText = searchWords.orEmpty()) }
     updateItemsWithFilterResult(viewModel.filterAndSortDetailItems(items, searchWords, process, type))
   }
 
   override suspend fun setItemsWithFilter(searchWords: String?, process: String?) {
-    adapter.highlightText = searchWords.orEmpty()
+    updateListRenderState { it.copy(highlightText = searchWords.orEmpty()) }
     updateItemsWithFilterResult(getFilterList(searchWords, process))
   }
 
@@ -260,9 +266,17 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   }
 
   fun setProcessMode(processMode: Boolean) {
-    if (isComponentFragment()) {
-      adapter.setProcessMode(processMode)
+    if (
+      isComponentFragment() &&
+      updateListRenderState { it.copy(processMode = processMode) }
+    ) {
+      // noinspection NotifyDataSetChanged
+      adapter.notifyDataSetChanged()
     }
+  }
+
+  protected fun bindProcessColors(processColors: Map<String, Int>) {
+    updateListRenderState { it.copy(processColors = processColors) }
   }
 
   fun setupListReadyTask() {
@@ -305,7 +319,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
       }
     }
 
-    adapter.setHighlightBackgroundItem(componentPosition)
+    updateListRenderState { it.withHighlightPosition(componentPosition) }
     //noinspection NotifyDataSetChanged
     adapter.notifyDataSetChanged()
   }
@@ -314,7 +328,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     if (position < 0 || position >= adapter.itemCount) {
       return
     }
-    when (val request = viewModel.buildDetailItemDialogRequest(adapter.getItem(position), adapter.type)) {
+    when (val request = viewModel.buildDetailItemDialogRequest(adapter.getItem(position), type)) {
       is DetailItemDialogRequest.Permission -> {
         PermissionDetailDialogFragment.newInstance(request.permissionName)
           .show(childFragmentManager, PermissionDetailDialogFragment::class.java.name)
@@ -369,6 +383,25 @@ abstract class BaseDetailFragment<T : ViewBinding> :
         null -> Unit
       }
     }
+  }
+
+  private fun onAdapterAction(action: LibStringAction) {
+    when (action) {
+      is LibStringAction.MetadataResourceClicked -> onMetadataResourceClick(action.item, action.display)
+    }
+  }
+
+  private fun updateListRenderState(
+    transform: (LibStringRenderState) -> LibStringRenderState
+  ): Boolean {
+    val currentAdapter = adapter
+    val state = transform(listRenderState)
+    if (state == listRenderState) {
+      return false
+    }
+    listRenderState = state
+    currentAdapter.bind(state)
+    return true
   }
 
   private fun showXml(xml: CharSequence) {

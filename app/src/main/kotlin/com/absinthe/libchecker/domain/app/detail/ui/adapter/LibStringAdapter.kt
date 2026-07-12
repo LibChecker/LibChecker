@@ -10,11 +10,13 @@ import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.constant.options.AdvancedOptions
+import com.absinthe.libchecker.domain.app.detail.model.LibStringAction
 import com.absinthe.libchecker.domain.app.detail.model.LibStringComponentItemDisplay
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.model.LibStringMetadataItemDisplay
 import com.absinthe.libchecker.domain.app.detail.model.LibStringNativeItemDisplay
 import com.absinthe.libchecker.domain.app.detail.model.LibStringPermissionItemDisplay
+import com.absinthe.libchecker.domain.app.detail.model.LibStringRenderState
 import com.absinthe.libchecker.domain.app.detail.model.LibStringStaticItemDisplay
 import com.absinthe.libchecker.domain.app.detail.resource.AppResourcePreview
 import com.absinthe.libchecker.domain.app.detail.ui.view.ComponentLibItemView
@@ -31,37 +33,17 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 private const val HIGHLIGHT_TRANSITION_DURATION = 250
 
 class LibStringAdapter(
-  @LibType val type: Int,
-  private var itemDisplayOptions: Int = AdvancedOptions.ITEM_DEFAULT_OPTIONS,
-  private val colorfulRuleIcon: Boolean = true,
-  private val onMetadataResourceClick: ((LibStringItemChip, LibStringMetadataItemDisplay) -> Unit)? = null
+  @LibType private val type: Int,
+  private val onAction: ((LibStringAction) -> Unit)? = null
 ) : HighlightAdapter<LibStringItemChip>(LibStringDiffUtil()) {
 
-  var highlightPosition: Int = -1
-    private set
-
-  var processMap: Map<String, Int> = emptyMap()
-
-  private var processMode: Boolean = false
+  private var renderState = LibStringRenderState()
   private val fallbackProcessColors = mutableMapOf<String, Int>()
   private val metadataPreviews = mutableMapOf<MetadataPreviewKey, AppResourcePreview>()
 
-  fun setProcessMode(isProcessMode: Boolean) {
-    if (processMode == isProcessMode) {
-      return
-    }
-    processMode = isProcessMode
-    // noinspection NotifyDataSetChanged
-    notifyDataSetChanged()
-  }
-
-  fun setItemDisplayOptions(options: Int) {
-    if (itemDisplayOptions == options) {
-      return
-    }
-    itemDisplayOptions = options
-    // noinspection NotifyDataSetChanged
-    notifyDataSetChanged()
+  fun bind(state: LibStringRenderState) {
+    renderState = state
+    highlightText = state.highlightText
   }
 
   fun preloadRuleChipIcons(items: List<LibStringItemChip>) {
@@ -84,15 +66,15 @@ class LibStringAdapter(
   override fun convert(holder: BaseViewHolder, item: LibStringItemChip) {
     when (type) {
       NATIVE -> (holder.itemView as NativeLibItemView).bind(
-        display = LibStringNativeItemDisplay.create(item, itemDisplayOptions),
+        display = LibStringNativeItemDisplay.create(item, renderState.itemDisplayOptions),
         highlightText = highlightText,
-        colorfulRuleIcon = colorfulRuleIcon
+        colorfulRuleIcon = renderState.colorfulRuleIcon
       )
 
       PERMISSION -> (holder.itemView as ComponentLibItemView).bind(
         display = LibStringPermissionItemDisplay.create(
           item = item,
-          itemDisplayOptions = itemDisplayOptions,
+          itemDisplayOptions = renderState.itemDisplayOptions,
           notGrantedLabel = context.getString(com.absinthe.libchecker.R.string.permission_not_granted)
         ),
         highlightText = highlightText
@@ -101,22 +83,15 @@ class LibStringAdapter(
       METADATA -> bindMetadata(holder.itemView as MetadataLibItemView, item)
 
       STATIC -> (holder.itemView as StaticLibItemView).bind(
-        display = LibStringStaticItemDisplay.create(item, itemDisplayOptions),
+        display = LibStringStaticItemDisplay.create(item, renderState.itemDisplayOptions),
         highlightText = highlightText,
-        colorfulRuleIcon = colorfulRuleIcon
+        colorfulRuleIcon = renderState.colorfulRuleIcon
       )
 
       else -> bindComponent(holder.itemView as ComponentLibItemView, item)
     }
 
     bindHighlightBackground(holder)
-  }
-
-  fun setHighlightBackgroundItem(position: Int) {
-    if (position < 0) {
-      return
-    }
-    highlightPosition = position
   }
 
   fun setMetadataPreview(
@@ -138,20 +113,20 @@ class LibStringAdapter(
     itemView: ComponentLibItemView,
     item: LibStringItemChip
   ) {
-    val processName = item.item.process.takeIf { processMode && !it.isNullOrEmpty() }
+    val processName = item.item.process.takeIf { renderState.processMode && !it.isNullOrEmpty() }
     val processIndicatorColor = processName?.let {
-      processMap[it] ?: fallbackProcessColors.getOrPut(it, UiUtils::getRandomColor)
+      renderState.processColors[it] ?: fallbackProcessColors.getOrPut(it, UiUtils::getRandomColor)
     }
     itemView.bind(
       display = LibStringComponentItemDisplay.create(
         item = item,
         type = type,
-        itemDisplayOptions = itemDisplayOptions,
-        processMode = processMode,
+        itemDisplayOptions = renderState.itemDisplayOptions,
+        processMode = renderState.processMode,
         processIndicatorColor = processIndicatorColor
       ),
       highlightText = highlightText,
-      colorfulRuleIcon = colorfulRuleIcon
+      colorfulRuleIcon = renderState.colorfulRuleIcon
     )
   }
 
@@ -161,7 +136,7 @@ class LibStringAdapter(
   ) {
     val display = LibStringMetadataItemDisplay.create(
       item = item,
-      itemDisplayOptions = itemDisplayOptions,
+      itemDisplayOptions = renderState.itemDisplayOptions,
       apkPreviewUnavailableLabel = context.getString(
         com.absinthe.libchecker.R.string.apk_preview_item_not_available
       ),
@@ -170,14 +145,17 @@ class LibStringAdapter(
     itemView.bind(
       display = display,
       highlightText = highlightText,
-      onResourceClick = onMetadataResourceClick?.let { callback ->
-        { clickedDisplay -> callback(item, clickedDisplay) }
+      onResourceClick = onAction?.let { callback ->
+        { clickedDisplay -> callback(LibStringAction.MetadataResourceClicked(item, clickedDisplay)) }
       }
     )
   }
 
   private fun bindHighlightBackground(holder: BaseViewHolder) {
-    if (highlightPosition == -1 || holder.absoluteAdapterPosition != highlightPosition) {
+    if (
+      renderState.highlightPosition == LibStringRenderState.NO_HIGHLIGHT_POSITION ||
+      holder.absoluteAdapterPosition != renderState.highlightPosition
+    ) {
       if (holder.itemView.background is TransitionDrawable) {
         (holder.itemView.background as TransitionDrawable).reverseTransition(
           HIGHLIGHT_TRANSITION_DURATION
@@ -201,7 +179,7 @@ class LibStringAdapter(
   }
 
   private fun isItemOptionEnabled(option: Int): Boolean {
-    return (itemDisplayOptions and option) > 0
+    return (renderState.itemDisplayOptions and option) > 0
   }
 
   private fun LibStringItemChip.metadataPreviewKey(): MetadataPreviewKey {
