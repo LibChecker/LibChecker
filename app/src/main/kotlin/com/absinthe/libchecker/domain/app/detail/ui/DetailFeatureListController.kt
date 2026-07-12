@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.model.DetailFeatureItem
+import com.absinthe.libchecker.domain.app.detail.model.DetailFeatureListState
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.FeatureAdapter
 import com.absinthe.libchecker.ui.adapter.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.utils.extensions.dp
@@ -15,53 +16,31 @@ import com.absinthe.libchecker.view.app.ToolbarConnectionLoadingView
 class DetailFeatureListController(
   private val headerContentLayout: ViewGroup
 ) {
-  private val adapter = FeatureAdapter()
+  private val adapter = FeatureAdapter { it.action() }
+  private var state = DetailFeatureListState()
   private var featureListView: RecyclerView? = null
   private var loadingView: ToolbarConnectionLoadingView? = null
-  private var isLoading = false
 
   init {
     adapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
   }
 
   val itemCount: Int
-    get() = adapter.data.size
+    get() = state.items.size
 
   val isInitialized: Boolean
     get() = featureListView != null
 
   fun addItem(featureItem: DetailFeatureItem) {
-    ensureListView()
-    val wasEmpty = adapter.data.isEmpty()
-    val position = featureItem.position
-    if (position == null) {
-      adapter.addData(featureItem.item)
-    } else {
-      adapter.addData(position, featureItem.item)
-    }
-    if (wasEmpty || position == 0) {
+    val shouldAlignListStart = state.items.isEmpty() || featureItem.position == 0
+    updateState { it.withItem(featureItem) }
+    if (shouldAlignListStart) {
       alignListStart()
     }
   }
 
   fun setLoading(loading: Boolean) {
-    if (isLoading == loading) {
-      return
-    }
-    isLoading = loading
-
-    if (loading) {
-      ensureListView()
-      val view = ensureLoadingView()
-      adapter.setFooterView(view)
-      view.start()
-    } else {
-      loadingView?.stop()
-      adapter.removeAllFooterView()
-      if (adapter.data.isNotEmpty()) {
-        alignListStart()
-      }
-    }
+    updateState { it.copy(isLoading = loading) }
   }
 
   fun attachWithAnimation() {
@@ -80,7 +59,7 @@ class DetailFeatureListController(
       anim.addUpdateListener { valueAnimator ->
         val height = valueAnimator.animatedValue as Int
 
-        if (valueAnimator.animatedFraction == 1f || (adapter.data.isEmpty() && !isLoading)) {
+        if (valueAnimator.animatedFraction == 1f || (state.items.isEmpty() && !state.isLoading)) {
           params.height = ViewGroup.LayoutParams.WRAP_CONTENT
         } else {
           params.height = height
@@ -93,7 +72,7 @@ class DetailFeatureListController(
   }
 
   fun reset() {
-    isLoading = false
+    state = DetailFeatureListState()
     loadingView?.stop()
     adapter.removeAllFooterView()
     featureListView?.let {
@@ -103,7 +82,44 @@ class DetailFeatureListController(
       }
     }
     featureListView = null
-    adapter.setList(emptyList())
+    adapter.setList(state.items)
+  }
+
+  private fun updateState(
+    transform: (DetailFeatureListState) -> DetailFeatureListState
+  ) {
+    val previousState = state
+    val newState = transform(previousState)
+    if (newState == previousState) return
+
+    state = newState
+    renderState(previousState)
+  }
+
+  private fun renderState(previousState: DetailFeatureListState) {
+    if (state.items.isNotEmpty() || state.isLoading) {
+      ensureListView()
+    }
+    if (state.items != previousState.items) {
+      adapter.setList(state.items)
+    }
+    if (state.isLoading != previousState.isLoading) {
+      renderLoading()
+    }
+  }
+
+  private fun renderLoading() {
+    if (state.isLoading) {
+      val view = ensureLoadingView()
+      adapter.setFooterView(view)
+      view.start()
+    } else {
+      loadingView?.stop()
+      adapter.removeAllFooterView()
+      if (state.items.isNotEmpty()) {
+        alignListStart()
+      }
+    }
   }
 
   private fun ensureListView() {

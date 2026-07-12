@@ -1,11 +1,13 @@
 package com.absinthe.libchecker.domain.app.detail.ui.view
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageButton
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.model.FeatureItem
+import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.animatedBlurAction
 import com.absinthe.libchecker.utils.extensions.dp
@@ -18,9 +20,10 @@ import kotlinx.coroutines.launch
 
 class FeatureLabelView(context: Context) : AppCompatImageButton(context) {
 
-  private var drawables: List<Drawable>? = null
+  private var drawables: List<Drawable> = emptyList()
   private var currentIndex = 0
   private var iconSwitchJob: Job? = null
+  private var iconSwitchAnimator: ValueAnimator? = null
   private val coroutineScope = CoroutineScope(Dispatchers.Main)
   private val innerIconSize = 24.dp
 
@@ -32,7 +35,8 @@ class FeatureLabelView(context: Context) : AppCompatImageButton(context) {
     clipToOutline = false
   }
 
-  fun setFeature(item: FeatureItem) {
+  fun bind(item: FeatureItem, onClick: () -> Unit) {
+    recycle()
     contentDescription = item.titleRes.takeIf { it != 0 }?.let(context::getString)
     item.colorFilterInt?.let {
       val drawable = UiUtils.changeDrawableColor(context, item.res, it)
@@ -44,9 +48,16 @@ class FeatureLabelView(context: Context) : AppCompatImageButton(context) {
         initDrawables(item.drawables)
       }
     }
-    setOnClickListener {
-      item.action()
-    }
+    setOnClickListener { onClick() }
+  }
+
+  fun recycle() {
+    stopIconSwitchTask()
+    drawables = emptyList()
+    currentIndex = 0
+    contentDescription = null
+    setImageDrawable(null)
+    setOnClickListener(null)
   }
 
   private fun initDrawables(drawables: List<Drawable>?) {
@@ -54,13 +65,17 @@ class FeatureLabelView(context: Context) : AppCompatImageButton(context) {
       drawable.mutate().apply {
         setBounds(0, 0, innerIconSize, innerIconSize)
       }
+    }.orEmpty()
+    currentIndex = 0
+    this.drawables.firstOrNull()?.let(::setImageDrawable)
+    if (isAttachedToWindow) {
+      startIconSwitchTask()
     }
-    startIconSwitchTask()
   }
 
   private fun startIconSwitchTask() {
     stopIconSwitchTask()
-    val drawableList = drawables ?: return
+    val drawableList = drawables
     if (drawableList.isEmpty()) return
 
     setImageDrawable(drawableList[0])
@@ -68,11 +83,10 @@ class FeatureLabelView(context: Context) : AppCompatImageButton(context) {
 
     iconSwitchJob = coroutineScope.launch {
       while (isActive) {
-        animatedBlurAction {
+        currentIndex = (currentIndex + 1) % drawableList.size
+        iconSwitchAnimator = animatedBlurAction {
           setImageDrawable(drawableList[currentIndex])
         }
-
-        currentIndex = (currentIndex + 1) % drawableList.size
         delay(3000)
       }
     }
@@ -81,15 +95,22 @@ class FeatureLabelView(context: Context) : AppCompatImageButton(context) {
   private fun stopIconSwitchTask() {
     iconSwitchJob?.cancel()
     iconSwitchJob = null
+    iconSwitchAnimator?.cancel()
+    iconSwitchAnimator = null
+    if (OsUtils.atLeastS()) {
+      setRenderEffect(null)
+    }
+    alpha = 1f
   }
 
   override fun onAttachedToWindow() {
     super.onAttachedToWindow()
-    if (drawables != null) {
+    if (drawables.isNotEmpty()) {
       (parent as? ViewGroup)?.let {
         it.clipChildren = false
         it.clipToPadding = false
       }
+      startIconSwitchTask()
     }
   }
 
