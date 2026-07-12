@@ -2,7 +2,7 @@ package com.absinthe.libchecker.domain.app.detail.model
 
 import android.content.pm.ApplicationInfo
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.detail.RelatedAppDisplayData
+import com.absinthe.libchecker.domain.app.detail.related.RelatedAppDisplayData
 
 data class OverlayDetailBottomSheetDisplay(
   val item: LCItem,

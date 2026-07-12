@@ -2,8 +2,8 @@ package com.absinthe.libchecker.domain.app.detail.action
 
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.detail.RelatedAppDisplayData
 import com.absinthe.libchecker.domain.app.detail.model.OverlayTargetPackageDisplay
+import com.absinthe.libchecker.domain.app.detail.related.RelatedAppDisplayData
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertSame

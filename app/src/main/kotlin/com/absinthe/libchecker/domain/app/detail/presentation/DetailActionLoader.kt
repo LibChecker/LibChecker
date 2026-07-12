@@ -4,7 +4,6 @@ import android.content.pm.PackageInfo
 import android.net.Uri
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.detail.GetRelatedAppDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.detail.action.AppPackageShareFile
 import com.absinthe.libchecker.domain.app.detail.action.BuildAppInstallSourceBottomSheetDisplayUseCase
 import com.absinthe.libchecker.domain.app.detail.action.BuildDetailItemDialogRequestUseCase
@@ -40,6 +39,7 @@ import com.absinthe.libchecker.domain.app.detail.model.OverlayDetailBottomSheetR
 import com.absinthe.libchecker.domain.app.detail.model.XposedInfoBottomSheetDisplay
 import com.absinthe.libchecker.domain.app.detail.navigation.BuildDetailReferenceNavigationUseCase
 import com.absinthe.libchecker.domain.app.detail.navigation.DetailReferenceNavigationRequest
+import com.absinthe.libchecker.domain.app.detail.related.GetRelatedAppDisplayDataUseCase
 import java.io.File
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope

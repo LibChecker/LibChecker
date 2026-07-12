@@ -1,8 +1,10 @@
-package com.absinthe.libchecker.domain.app.detail
+package com.absinthe.libchecker.domain.app.detail.header
 
 import android.content.Context
 import android.content.pm.PackageInfo
 import com.absinthe.libchecker.constant.AndroidVersions
+import com.absinthe.libchecker.domain.app.detail.packageinfo.AppDetailPackageSize
+import com.absinthe.libchecker.domain.app.detail.packageinfo.GetAppDetailPackageSizeUseCase
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersionString

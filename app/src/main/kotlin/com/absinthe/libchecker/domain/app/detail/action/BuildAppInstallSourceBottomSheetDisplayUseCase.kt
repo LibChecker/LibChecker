@@ -2,12 +2,12 @@ package com.absinthe.libchecker.domain.app.detail.action
 
 import android.content.Context
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.app.detail.RelatedAppDisplayData
 import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceAction
 import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceBottomSheetDisplay
 import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceItemContent
 import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceItemDisplay
 import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceRequesterAccess
+import com.absinthe.libchecker.domain.app.detail.related.RelatedAppDisplayData
 import com.absinthe.libchecker.domain.app.list.model.buildAppListItemDescription
 
 class BuildAppInstallSourceBottomSheetDisplayUseCase(

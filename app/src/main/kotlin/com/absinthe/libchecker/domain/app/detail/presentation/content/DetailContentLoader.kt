@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.domain.app.detail.presentation.content
 
-import com.absinthe.libchecker.domain.app.detail.GetAppDetailStaticLibraryTabItemsUseCase
 import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailAbilityChipsUseCase
+import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailStaticLibraryTabItemsUseCase
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailContentState
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailFeatureState

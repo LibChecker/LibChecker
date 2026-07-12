@@ -5,10 +5,10 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageInfoHidden
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.detail.RelatedAppDisplayData
 import com.absinthe.libchecker.domain.app.detail.model.OverlayDetailBottomSheetDisplay
 import com.absinthe.libchecker.domain.app.detail.model.OverlayDetailExtraInfoDisplay
 import com.absinthe.libchecker.domain.app.detail.model.OverlayTargetPackageDisplay
+import com.absinthe.libchecker.domain.app.detail.related.RelatedAppDisplayData
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.extensions.getAppName

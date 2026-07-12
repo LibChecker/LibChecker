@@ -1,10 +1,10 @@
 package com.absinthe.libchecker.domain.app.detail.action
 
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.detail.RelatedAppDisplayData
 import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceAction
 import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceItemContent
 import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceRequesterAccess
+import com.absinthe.libchecker.domain.app.detail.related.RelatedAppDisplayData
 import com.absinthe.libchecker.domain.app.model.AppInstallSource
 import com.absinthe.libchecker.utils.extensions.DexFileOptimizationInfo
 import org.junit.Assert.assertEquals

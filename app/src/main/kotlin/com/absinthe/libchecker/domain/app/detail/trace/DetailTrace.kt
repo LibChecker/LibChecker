@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.app.detail
+package com.absinthe.libchecker.domain.app.detail.trace
 
 import android.os.Trace
 

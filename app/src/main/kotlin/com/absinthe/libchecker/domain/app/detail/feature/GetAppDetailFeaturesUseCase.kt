@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.domain.app.detail
+package com.absinthe.libchecker.domain.app.detail.feature
 
 import android.content.Intent
 import android.content.pm.PackageInfo

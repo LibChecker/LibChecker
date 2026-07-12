@@ -2,8 +2,8 @@ package com.absinthe.libchecker.domain.app.detail.model
 
 import androidx.annotation.DrawableRes
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.detail.RelatedAppDisplayData
 import com.absinthe.libchecker.domain.app.detail.action.AppInstalledTimeDisplayData
+import com.absinthe.libchecker.domain.app.detail.related.RelatedAppDisplayData
 import com.absinthe.libchecker.utils.extensions.DexFileOptimizationInfo
 
 data class AppInstallSourceBottomSheetDisplay(

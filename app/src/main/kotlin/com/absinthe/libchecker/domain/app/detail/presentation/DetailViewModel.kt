@@ -7,8 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.detail.AppDetailAbiLabelData
-import com.absinthe.libchecker.domain.app.detail.AppDetailHeaderExtraInfo
+import com.absinthe.libchecker.domain.app.detail.abi.AppDetailAbiLabelData
 import com.absinthe.libchecker.domain.app.detail.action.AppElfDetail
 import com.absinthe.libchecker.domain.app.detail.action.AppLaunchAction
 import com.absinthe.libchecker.domain.app.detail.action.AppPackageShareAction
@@ -16,6 +15,7 @@ import com.absinthe.libchecker.domain.app.detail.action.AppPackageShareFile
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemDialogRequest
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemLongClickActions
 import com.absinthe.libchecker.domain.app.detail.feature.AppDetailFeatureItemData
+import com.absinthe.libchecker.domain.app.detail.header.AppDetailHeaderExtraInfo
 import com.absinthe.libchecker.domain.app.detail.model.AppBundleItem
 import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceBottomSheetDisplay
 import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceRequesterAccess

@@ -6,10 +6,10 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.constant.Constants.MULTI_ARCH
 import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
-import com.absinthe.libchecker.domain.app.detail.TRACE_DETAIL_NATIVE_SET_ITEMS
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
-import com.absinthe.libchecker.domain.app.detail.traceDetailSuspendSection
+import com.absinthe.libchecker.domain.app.detail.trace.TRACE_DETAIL_NATIVE_SET_ITEMS
+import com.absinthe.libchecker.domain.app.detail.trace.traceDetailSuspendSection
 import com.absinthe.libchecker.domain.app.detail.ui.Referable
 import com.absinthe.libchecker.domain.app.detail.ui.base.BaseDetailFragment
 import com.absinthe.libchecker.domain.app.detail.ui.base.EXTRA_TYPE

@@ -1,7 +1,6 @@
-package com.absinthe.libchecker.domain.app.detail
+package com.absinthe.libchecker.domain.app.detail.content
 
 import android.content.pm.PackageInfo
-import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailStaticLibraryChipsUseCase
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import kotlinx.coroutines.Dispatchers

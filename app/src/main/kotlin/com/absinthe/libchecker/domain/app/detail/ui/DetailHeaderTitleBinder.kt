@@ -4,7 +4,7 @@ import android.content.pm.ApplicationInfo
 import android.view.View
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.app.detail.AppDetailHeaderTitleData
+import com.absinthe.libchecker.domain.app.detail.header.AppDetailHeaderTitleData
 import com.absinthe.libchecker.domain.app.detail.ui.view.DetailsTitleView
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libraries.utils.utils.AntiShakeUtils

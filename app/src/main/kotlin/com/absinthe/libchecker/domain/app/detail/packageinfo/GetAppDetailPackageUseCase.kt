@@ -2,9 +2,9 @@ package com.absinthe.libchecker.domain.app.detail.packageinfo
 
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import com.absinthe.libchecker.domain.app.detail.TRACE_DETAIL_GET_PACKAGE_INFO
-import com.absinthe.libchecker.domain.app.detail.TRACE_DETAIL_LOAD_PACKAGE
-import com.absinthe.libchecker.domain.app.detail.traceDetailSuspendSection
+import com.absinthe.libchecker.domain.app.detail.trace.TRACE_DETAIL_GET_PACKAGE_INFO
+import com.absinthe.libchecker.domain.app.detail.trace.TRACE_DETAIL_LOAD_PACKAGE
+import com.absinthe.libchecker.domain.app.detail.trace.traceDetailSuspendSection
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.extensions.isArchivedPackage
 import kotlinx.coroutines.Dispatchers
