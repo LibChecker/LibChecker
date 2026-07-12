@@ -7,10 +7,14 @@ import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.isGone
 import androidx.core.view.marginStart
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.detail.model.ProcessBarAction
+import com.absinthe.libchecker.domain.app.detail.model.ProcessBarItemRenderState
+import com.absinthe.libchecker.domain.app.detail.model.ProcessBarRenderState
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.ProcessBarAdapter
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
@@ -21,6 +25,7 @@ import com.absinthe.libchecker.view.AViewGroup
 class ProcessBarView(context: Context) : RecyclerView(context) {
 
   private val processBarAdapter = ProcessBarAdapter()
+  private var onAction: (ProcessBarAction) -> Unit = {}
 
   init {
     isHorizontalScrollBarEnabled = false
@@ -29,30 +34,23 @@ class ProcessBarView(context: Context) : RecyclerView(context) {
     setPadding(8.dp, 0, 8.dp, 4.dp)
     clipToPadding = false
     clipChildren = false
-  }
-
-  fun setData(data: List<ProcessBarAdapter.ProcessBarItem>) {
-    processBarAdapter.setList(data)
-  }
-
-  fun setOnItemClickListener(action: (isSelected: Boolean, processName: String) -> Unit) {
-    processBarAdapter.setOnItemClickListener { _, view, position ->
-      view.isSelected = !view.isSelected
-      (view as? ProcessBarItemView)?.setTarget(view.isSelected)
-      action(
-        view.isSelected,
-        processBarAdapter.data[position].process
+    processBarAdapter.setOnItemClickListener { _, _, position ->
+      val item = processBarAdapter.getItem(position)
+      onAction(
+        ProcessBarAction.ProcessSelectionChanged(
+          process = item.process.takeUnless { item.selected }
+        )
       )
-
-      (0 until processBarAdapter.itemCount).forEach {
-        if (it != position) {
-          findViewHolderForLayoutPosition(it)?.itemView?.let { itemView ->
-            isSelected = false
-            (itemView as? ProcessBarItemView)?.setTarget(false)
-          }
-        }
-      }
     }
+  }
+
+  fun bind(
+    state: ProcessBarRenderState,
+    onAction: (ProcessBarAction) -> Unit
+  ) {
+    this.onAction = onAction
+    isGone = !state.visible
+    processBarAdapter.setList(state.items)
   }
 
   class ProcessBarItemView(context: Context) : AViewGroup(context) {
@@ -109,13 +107,15 @@ class ProcessBarView(context: Context) : RecyclerView(context) {
       colorIndicator.imageTintList = color.toColorStateListByColor()
     }
 
-    fun bind(item: ProcessBarAdapter.ProcessBarItem) {
+    fun bind(item: ProcessBarItemRenderState) {
       setIndicatorColor(item.color)
       text.text = item.process
       contentDescription = item.process
+      isSelected = item.selected
+      setTarget(item.selected)
     }
 
-    fun setTarget(target: Boolean) {
+    private fun setTarget(target: Boolean) {
       if (target) {
         colorIndicator.startAnimation(animator)
         text.tintTextToPrimary()

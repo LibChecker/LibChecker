@@ -1,8 +1,8 @@
 package com.absinthe.libchecker.domain.app.detail.ui
 
 import android.view.ViewGroup
-import androidx.core.view.isGone
-import com.absinthe.libchecker.domain.app.detail.ui.adapter.ProcessBarAdapter
+import com.absinthe.libchecker.domain.app.detail.model.ProcessBarAction
+import com.absinthe.libchecker.domain.app.detail.model.ProcessBarRenderState
 import com.absinthe.libchecker.domain.app.detail.ui.view.ProcessBarView
 
 class DetailProcessBarController(
@@ -12,29 +12,28 @@ class DetailProcessBarController(
   private val onProcessFilterChanged: (String?) -> Unit
 ) {
   private var processBarView: ProcessBarView? = null
+  private var processColors: Map<String, Int> = emptyMap()
+  private var selectedProcess: String? = null
+  private var renderState = ProcessBarRenderState()
 
   fun setData(processMap: Map<String, Int>) {
+    processColors = processMap
     if (processMap.isEmpty()) {
-      removeProcessBar()
-      return
+      selectedProcess = null
     }
-
-    ensureProcessBar()
-    refreshVisibility()
-    processBarView?.setData(
-      processMap.map { mapItem ->
-        ProcessBarAdapter.ProcessBarItem(
-          mapItem.key,
-          mapItem.value
-        )
-      }
-    )
+    render()
   }
 
   fun refreshVisibility() {
-    processBarView?.isGone =
-      !processMode() &&
-      hasNonGrantedPermissions() == false
+    render()
+  }
+
+  fun clearSelection() {
+    if (selectedProcess == null) {
+      return
+    }
+    selectedProcess = null
+    render()
   }
 
   private fun ensureProcessBar() {
@@ -47,11 +46,37 @@ class DetailProcessBarController(
         ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
-      it.setOnItemClickListener { isSelected, process ->
-        onProcessFilterChanged(if (isSelected) process else null)
-      }
     }
     container.addView(processBarView)
+  }
+
+  private fun render() {
+    val state = ProcessBarRenderState.create(
+      processColors = processColors,
+      selectedProcess = selectedProcess,
+      processMode = processMode(),
+      hasNonGrantedPermissions = hasNonGrantedPermissions()
+    )
+    if (state == renderState) {
+      return
+    }
+    renderState = state
+    if (state.items.isEmpty()) {
+      removeProcessBar()
+      return
+    }
+    ensureProcessBar()
+    processBarView?.bind(state, ::onAction)
+  }
+
+  private fun onAction(action: ProcessBarAction) {
+    when (action) {
+      is ProcessBarAction.ProcessSelectionChanged -> {
+        selectedProcess = action.process
+        render()
+        onProcessFilterChanged(action.process)
+      }
+    }
   }
 
   private fun removeProcessBar() {

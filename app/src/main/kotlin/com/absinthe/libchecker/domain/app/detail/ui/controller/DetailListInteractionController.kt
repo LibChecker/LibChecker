@@ -49,6 +49,9 @@ class DetailListInteractionController(
     appDetailSettingsRepository.setProcessMode(processMode)
     detailFragmentManager.deliverProcessMode(processMode)
 
+    if (!processMode) {
+      processBarController.clearSelection()
+    }
     processBarController.refreshVisibility()
     if (!processMode) {
       doOnMainThreadIdle {
