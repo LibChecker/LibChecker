@@ -2,15 +2,12 @@ package com.absinthe.libchecker.domain.statistics.reference.ui.adapter.provider
 
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.core.text.buildSpannedString
-import androidx.core.text.italic
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.annotation.PACKAGE
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReference
+import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceListRenderState
+import com.absinthe.libchecker.domain.statistics.reference.model.MultipleAppsIconItemDisplay
 import com.absinthe.libchecker.domain.statistics.reference.ui.view.MultipleAppsIconItemView
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
-import com.absinthe.libchecker.utils.extensions.tintHighlightText
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.chad.library.adapter.base.provider.BaseNodeProvider
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
@@ -18,7 +15,7 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 const val MULTIPLE_APPS_ICON_PROVIDER = 1
 
 class MultipleAppsIconProvider(
-  private val highlightText: () -> String
+  private val renderState: () -> LibReferenceListRenderState
 ) : BaseNodeProvider() {
 
   override val itemViewType: Int = MULTIPLE_APPS_ICON_PROVIDER
@@ -39,41 +36,13 @@ class MultipleAppsIconProvider(
   }
 
   override fun convert(helper: BaseViewHolder, item: BaseNode) {
-    (helper.itemView as MultipleAppsIconItemView).container.apply {
-      val libReferenceItem = item as LibReference
-      icon.setIcons(libReferenceItem.iconPackages)
-      count.text = libReferenceItem.referredList.size.toString()
-      labelName.text = buildSpannedString {
-        italic {
-          append(context.getString(R.string.not_marked_lib))
-        }
-      }
-
-      if (item.type == PACKAGE) {
-        setOrHighlightText(libName, libReferenceItem.libName + ".*")
-      } else {
-        setOrHighlightText(libName, libReferenceItem.libName)
-      }
-      helper.itemView.contentDescription = buildItemDescription(
-        labelName.text,
-        libName.text,
-        count.text
-      )
-    }
-  }
-
-  private fun buildItemDescription(vararg parts: CharSequence?): String {
-    return parts
-      .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
-      .joinToString()
-  }
-
-  private fun setOrHighlightText(view: TextView, text: CharSequence) {
-    val keyword = highlightText()
-    if (keyword.isNotBlank()) {
-      view.tintHighlightText(keyword, text)
-    } else {
-      view.text = text
-    }
+    val state = renderState()
+    (helper.itemView as MultipleAppsIconItemView).bind(
+      display = MultipleAppsIconItemDisplay.create(
+        reference = item as LibReference,
+        notMarkedLabel = context.getString(R.string.not_marked_lib)
+      ),
+      highlightText = state.highlightText
+    )
   }
 }
