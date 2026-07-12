@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.domain.app.detail.model
 
+import com.absinthe.libchecker.domain.app.detail.feature.AppDetailFeatureAction
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -62,8 +63,9 @@ class DetailFeatureListStateTest {
 
   private fun featureItem(res: Int): FeatureItem {
     return FeatureItem(
-      res = res,
-      action = {}
+      titleRes = res,
+      icon = FeatureItemIcon.Resource(res),
+      action = AppDetailFeatureAction.SplitApks
     )
   }
 }

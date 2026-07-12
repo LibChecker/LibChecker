@@ -2,6 +2,7 @@ package com.absinthe.libchecker.domain.app.detail.ui
 
 import androidx.fragment.app.FragmentActivity
 import com.absinthe.libchecker.domain.app.detail.abi.AppDetailAbiLabelData
+import com.absinthe.libchecker.domain.app.detail.feature.multiArchFeatureDialogSpec
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.node.AbiLabelNode
 import com.absinthe.libchecker.domain.app.detail.ui.view.DetailsTitleView
 
@@ -13,7 +14,7 @@ class DetailAbiLabelBinder(
   fun bind(abiLabelData: AppDetailAbiLabelData) {
     val abiLabelsList = abiLabelData.labels.map { label ->
       val action = if (label.opensMultiArchInfo) {
-        { FeaturesDialog.showMultiArchDialog(activity) }
+        { FeaturesDialog.show(activity, multiArchFeatureDialogSpec()) }
       } else {
         null
       }

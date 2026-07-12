@@ -16,9 +16,7 @@ class FeatureAdapter(
   }
 
   override fun convert(holder: BaseViewHolder, item: FeatureItem) {
-    (holder.itemView as FeatureLabelView).bind(item) {
-      onItemClick(item)
-    }
+    (holder.itemView as FeatureLabelView).bind(item, onItemClick)
   }
 
   override fun onViewRecycled(holder: RecyclerView.ViewHolder) {

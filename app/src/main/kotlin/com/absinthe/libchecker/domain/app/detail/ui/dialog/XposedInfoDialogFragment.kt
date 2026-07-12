@@ -4,6 +4,7 @@ import android.content.DialogInterface
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.detail.feature.xposedFeatureDialogSpec
 import com.absinthe.libchecker.domain.app.detail.model.XposedInfoAction
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
@@ -32,7 +33,7 @@ class XposedInfoDialogFragment : BaseBottomSheetViewDialogFragment<XposedInfoBot
       val context = context ?: return@launch
       if (display == null) {
         dismiss()
-        FeaturesDialog.showXPosedDialog(context)
+        FeaturesDialog.show(context, xposedFeatureDialogSpec())
         return@launch
       }
       root.bind(display, ::handleAction)

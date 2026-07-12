@@ -25,7 +25,7 @@ import com.absinthe.libchecker.domain.app.detail.ui.DetailTabSpecBuilder
 import com.absinthe.libchecker.domain.app.detail.ui.DetailToolbarController
 import com.absinthe.libchecker.domain.app.detail.ui.IDetailContainer
 import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailAppIconDrawableBuilder
-import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailFeatureItemBuilder
+import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailFeatureController
 import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailHeaderController
 import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailListInteractionController
 import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailPackageComparisonController
@@ -74,8 +74,8 @@ abstract class BaseAppDetailActivity :
   private val appIconDrawableBuilder by unsafeLazy {
     DetailAppIconDrawableBuilder(this)
   }
-  private val featureItemBuilder by unsafeLazy {
-    DetailFeatureItemBuilder(
+  private val featureController by unsafeLazy {
+    DetailFeatureController(
       activity = this,
       viewModel = viewModel,
       packageInfo = { viewModel.packageInfo },
@@ -86,7 +86,10 @@ abstract class BaseAppDetailActivity :
     )
   }
   private val featureListController by unsafeLazy {
-    DetailFeatureListController(binding.headerContentLayout)
+    DetailFeatureListController(
+      headerContentLayout = binding.headerContentLayout,
+      onItemClick = featureController::onItemClick
+    )
   }
   private val processBarController by unsafeLazy {
     DetailProcessBarController(
@@ -295,7 +298,7 @@ abstract class BaseAppDetailActivity :
   }
 
   private fun addFeatureItem(feature: VersionedFeature) {
-    val featureItem = featureItemBuilder.build(feature, featureListController.itemCount) ?: return
+    val featureItem = featureController.build(feature, featureListController.itemCount) ?: return
     featureListController.addItem(featureItem)
   }
 

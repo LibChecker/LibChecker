@@ -4,10 +4,13 @@ import android.content.pm.PackageInfo
 import android.graphics.drawable.Drawable
 import androidx.fragment.app.FragmentActivity
 import com.absinthe.libchecker.domain.app.detail.feature.AppDetailFeatureAction
+import com.absinthe.libchecker.domain.app.detail.feature.AppDetailFeatureIcon
 import com.absinthe.libchecker.domain.app.detail.feature.AppDetailFeatureItemData
+import com.absinthe.libchecker.domain.app.detail.feature.toDialogSpec
 import com.absinthe.libchecker.domain.app.detail.model.AppIconItem
 import com.absinthe.libchecker.domain.app.detail.model.DetailFeatureItem
 import com.absinthe.libchecker.domain.app.detail.model.FeatureItem
+import com.absinthe.libchecker.domain.app.detail.model.FeatureItemIcon
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
 import com.absinthe.libchecker.domain.app.detail.ui.FeaturesDialog
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.XposedInfoDialogFragment
@@ -15,7 +18,7 @@ import com.absinthe.libchecker.domain.app.model.VersionedFeature
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
 
-class DetailFeatureItemBuilder(
+class DetailFeatureController(
   private val activity: FragmentActivity,
   private val viewModel: DetailViewModel,
   private val packageInfo: () -> PackageInfo,
@@ -41,48 +44,14 @@ class DetailFeatureItemBuilder(
     )
   }
 
-  private fun buildFeatureItem(itemData: AppDetailFeatureItemData): FeatureItem? {
-    val appIconDrawables = if (itemData.action is AppDetailFeatureAction.AppIcons) {
-      appIconDrawables(appIcons()).takeIf { it.isNotEmpty() } ?: return null
-    } else {
-      null
-    }
+  fun onItemClick(item: FeatureItem) {
+    when (val action = item.action) {
+      is AppDetailFeatureAction.Dialog -> FeaturesDialog.show(activity, action.toDialogSpec())
 
-    return FeatureItem(
-      res = itemData.iconRes,
-      titleRes = itemData.titleRes,
-      drawables = appIconDrawables,
-      colorFilterInt = itemData.colorFilterInt,
-      action = { performAction(itemData.action, appIconDrawables) }
-    )
-  }
-
-  private fun performAction(action: AppDetailFeatureAction, appIconDrawables: List<Drawable>?) {
-    when (action) {
       AppDetailFeatureAction.SplitApks -> FeaturesDialog.showSplitApksDialog(activity, packageInfo())
-
-      is AppDetailFeatureAction.Kotlin -> FeaturesDialog.showKotlinDialog(activity, action.extras)
-
-      is AppDetailFeatureAction.RxJava -> FeaturesDialog.showRxJavaDialog(activity, action.version)
-
-      is AppDetailFeatureAction.RxKotlin -> FeaturesDialog.showRxKotlinDialog(activity, action.version)
-
-      is AppDetailFeatureAction.RxAndroid -> FeaturesDialog.showRxAndroidDialog(activity, action.version)
-
-      is AppDetailFeatureAction.Agp -> FeaturesDialog.showAGPDialog(activity, action.version)
 
       AppDetailFeatureAction.XposedModule -> XposedInfoDialogFragment.newInstance(packageInfo().packageName)
         .show(activity.supportFragmentManager, XposedInfoDialogFragment::class.java.name)
-
-      AppDetailFeatureAction.PlaySigning -> FeaturesDialog.showPlayAppSigningDialog(activity)
-
-      AppDetailFeatureAction.Pwa -> FeaturesDialog.showPWADialog(activity)
-
-      is AppDetailFeatureAction.JetpackCompose -> FeaturesDialog.showJetpackComposeDialog(activity, action.version)
-
-      is AppDetailFeatureAction.Kmp -> FeaturesDialog.showKMPDialog(activity, action.version)
-
-      AppDetailFeatureAction.LiveUpdateNotification -> FeaturesDialog.showLiveUpdateNotificationDialog(activity)
 
       AppDetailFeatureAction.AppProp -> showAppPropDialog()
 
@@ -90,14 +59,25 @@ class DetailFeatureItemBuilder(
         FeaturesDialog.showAppInstallSourceDialog(activity, packageInfo().packageName)
       }
 
-      AppDetailFeatureAction.ElfPageSize16Kb -> FeaturesDialog.show16KBAlignDialog(activity)
-
-      AppDetailFeatureAction.ElfPageSize16KbCompat -> FeaturesDialog.show16KBCompatDialog(activity)
-
-      is AppDetailFeatureAction.AppIcons -> appIconDrawables?.let {
-        FeaturesDialog.showAppIconsDialog(activity, it, action.isFirstMonochrome)
+      is AppDetailFeatureAction.AppIcons -> (item.icon as? FeatureItemIcon.Drawables)?.let {
+        FeaturesDialog.showAppIconsDialog(activity, it.values, action.isFirstMonochrome)
       }
     }
+  }
+
+  private fun buildFeatureItem(itemData: AppDetailFeatureItemData): FeatureItem? {
+    val icon = when (val icon = itemData.icon) {
+      is AppDetailFeatureIcon.Resource -> FeatureItemIcon.Resource(icon.res, icon.tint)
+
+      AppDetailFeatureIcon.AppIcons -> FeatureItemIcon.Drawables(
+        appIconDrawables(appIcons()).takeIf { it.isNotEmpty() } ?: return null
+      )
+    }
+    return FeatureItem(
+      titleRes = itemData.titleRes,
+      icon = icon,
+      action = itemData.action
+    )
   }
 
   private fun showAppPropDialog() {

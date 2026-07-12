@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageButton
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.model.FeatureItem
+import com.absinthe.libchecker.domain.app.detail.model.FeatureItemIcon
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.animatedBlurAction
@@ -35,20 +36,19 @@ class FeatureLabelView(context: Context) : AppCompatImageButton(context) {
     clipToOutline = false
   }
 
-  fun bind(item: FeatureItem, onClick: () -> Unit) {
+  fun bind(item: FeatureItem, onClick: (FeatureItem) -> Unit) {
     recycle()
     contentDescription = item.titleRes.takeIf { it != 0 }?.let(context::getString)
-    item.colorFilterInt?.let {
-      val drawable = UiUtils.changeDrawableColor(context, item.res, it)
-      setImageDrawable(drawable)
-    } ?: run {
-      if (item.res != -1) {
-        setImageResource(item.res)
-      } else if (item.drawables != null) {
-        initDrawables(item.drawables)
+    when (val icon = item.icon) {
+      is FeatureItemIcon.Resource -> icon.tint?.let {
+        setImageDrawable(UiUtils.changeDrawableColor(context, icon.res, it))
+      } ?: run {
+        setImageResource(icon.res)
       }
+
+      is FeatureItemIcon.Drawables -> initDrawables(icon.values)
     }
-    setOnClickListener { onClick() }
+    setOnClickListener { onClick(item) }
   }
 
   fun recycle() {
@@ -60,12 +60,12 @@ class FeatureLabelView(context: Context) : AppCompatImageButton(context) {
     setOnClickListener(null)
   }
 
-  private fun initDrawables(drawables: List<Drawable>?) {
-    this.drawables = drawables?.map { drawable ->
+  private fun initDrawables(drawables: List<Drawable>) {
+    this.drawables = drawables.map { drawable ->
       drawable.mutate().apply {
         setBounds(0, 0, innerIconSize, innerIconSize)
       }
-    }.orEmpty()
+    }
     currentIndex = 0
     this.drawables.firstOrNull()?.let(::setImageDrawable)
     if (isAttachedToWindow) {

@@ -8,15 +8,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.model.DetailFeatureItem
 import com.absinthe.libchecker.domain.app.detail.model.DetailFeatureListState
+import com.absinthe.libchecker.domain.app.detail.model.FeatureItem
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.FeatureAdapter
 import com.absinthe.libchecker.ui.adapter.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.view.app.ToolbarConnectionLoadingView
 
 class DetailFeatureListController(
-  private val headerContentLayout: ViewGroup
+  private val headerContentLayout: ViewGroup,
+  onItemClick: (FeatureItem) -> Unit
 ) {
-  private val adapter = FeatureAdapter { it.action() }
+  private val adapter = FeatureAdapter(onItemClick)
   private var state = DetailFeatureListState()
   private var featureListView: RecyclerView? = null
   private var loadingView: ToolbarConnectionLoadingView? = null
