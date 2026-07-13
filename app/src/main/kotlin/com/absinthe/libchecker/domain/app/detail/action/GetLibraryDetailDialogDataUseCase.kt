@@ -50,7 +50,10 @@ class GetLibraryDetailDialogDataUseCase(
       preferredLocale = request.preferredLocale
     ) ?: return@withContext Result.NotFound
 
-    Result.Found(content)
+    Result.Found(
+      content = content,
+      libraryUuid = detail.uuid
+    )
   }
 
   private suspend fun LibDetailBean.getRepoUpdatedTime(): String? {
@@ -90,7 +93,8 @@ class GetLibraryDetailDialogDataUseCase(
     data object NotFound : Result
 
     data class Found(
-      val content: LibraryDetailContentDisplay
+      val content: LibraryDetailContentDisplay,
+      val libraryUuid: String
     ) : Result
   }
 }

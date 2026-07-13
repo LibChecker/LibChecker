@@ -7,6 +7,7 @@ import android.text.method.LinkMovementMethod
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.Gravity
+import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
@@ -14,12 +15,14 @@ import android.widget.TableLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.text.HtmlCompat
+import androidx.core.view.isGone
 import androidx.core.view.marginTop
 import androidx.core.widget.TextViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
+import com.absinthe.libchecker.domain.app.detail.insight.LibraryInsightUiState
 import com.absinthe.libchecker.domain.app.detail.model.LibraryDetailBottomSheetState
 import com.absinthe.libchecker.domain.app.detail.model.LibraryDetailContentDisplay
 import com.absinthe.libchecker.domain.app.detail.model.LibraryDetailHeaderDisplay
@@ -50,9 +53,7 @@ class LibDetailBottomSheetView(
 
   private val icon = AppCompatImageView(context).apply {
     val iconSize = 48.dp
-    layoutParams = LayoutParams(iconSize, iconSize).also {
-      it.topMargin = 4.dp
-    }
+    layoutParams = ViewGroup.MarginLayoutParams(iconSize, iconSize)
     setBackgroundResource(R.drawable.bg_circle_outline)
     importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
   }
@@ -63,7 +64,7 @@ class LibDetailBottomSheetView(
       R.style.TextView_SansSerifCondensedMedium
     )
   ).apply {
-    layoutParams = LayoutParams(
+    layoutParams = ViewGroup.MarginLayoutParams(
       LayoutParams.WRAP_CONTENT,
       LayoutParams.WRAP_CONTENT
     ).also {
@@ -71,6 +72,19 @@ class LibDetailBottomSheetView(
     }
     gravity = Gravity.CENTER
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+  }
+
+  private val extraInfoCard = LibraryExtraInfoCardView(context)
+
+  private val identityAndExtra = IdentityAndExtraView(
+    context = context,
+    icon = icon,
+    title = title,
+    extraInfoCard = extraInfoCard
+  ).apply {
+    layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).also {
+      it.topMargin = 4.dp
+    }
   }
 
   private val viewFlipper = HeightAnimatableViewFlipper(context).apply {
@@ -148,8 +162,7 @@ class LibDetailBottomSheetView(
       (padding - SystemBarManager.navigationBarSize).coerceAtLeast(0)
     )
     addView(header)
-    addView(icon)
-    addView(title)
+    addView(identityAndExtra)
     addView(viewFlipper)
     viewFlipper.addView(loading)
     viewFlipper.addView(contentView)
@@ -186,6 +199,85 @@ class LibDetailBottomSheetView(
     icon.load(iconRes) {
       crossfade(true)
       placeholder(R.drawable.ic_logo)
+    }
+  }
+
+  fun renderLibraryInsight(state: LibraryInsightUiState, onRetry: () -> Unit) {
+    extraInfoCard.render(state, onRetry)
+  }
+
+  private class IdentityAndExtraView(
+    context: Context,
+    private val icon: View,
+    private val title: View,
+    private val extraInfoCard: View
+  ) : AViewGroup(context) {
+
+    private val gap = 8.dp
+    private var useSideBySideLayout = false
+    private var identityWidth = 0
+
+    init {
+      addView(icon)
+      addView(title)
+      addView(extraInfoCard)
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+      val width = MeasureSpec.getSize(widthMeasureSpec)
+      val availableWidth = (width - paddingStart - paddingEnd).coerceAtLeast(0)
+      icon.measure(icon.layoutParams.width.toExactlyMeasureSpec(), icon.layoutParams.height.toExactlyMeasureSpec())
+      useSideBySideLayout = !extraInfoCard.isGone && availableWidth >= 280.dp
+      identityWidth = if (useSideBySideLayout) {
+        (availableWidth * 0.34f).toInt().coerceIn(88.dp, 120.dp)
+      } else {
+        availableWidth
+      }
+      title.measure(identityWidth.toAtMostMeasureSpec(), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED))
+      val identityHeight = icon.measuredHeight + 4.dp + title.measuredHeight
+
+      val desiredHeight = when {
+        extraInfoCard.isGone -> identityHeight
+
+        useSideBySideLayout -> {
+          val cardWidth = (availableWidth - identityWidth - gap).coerceAtLeast(0)
+          extraInfoCard.measure(cardWidth.toExactlyMeasureSpec(), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED))
+          maxOf(identityHeight, extraInfoCard.measuredHeight)
+        }
+
+        else -> {
+          extraInfoCard.measure(availableWidth.toExactlyMeasureSpec(), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED))
+          identityHeight + gap + extraInfoCard.measuredHeight
+        }
+      }
+      setMeasuredDimension(
+        resolveSize(width, widthMeasureSpec),
+        resolveSize(desiredHeight + paddingTop + paddingBottom, heightMeasureSpec)
+      )
+    }
+
+    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+      val identityHeight = icon.measuredHeight + 4.dp + title.measuredHeight
+      val identityTop = if (useSideBySideLayout) {
+        paddingTop + (measuredHeight - paddingTop - paddingBottom - identityHeight) / 2
+      } else {
+        paddingTop
+      }
+      val iconX = paddingStart + (identityWidth - icon.measuredWidth) / 2
+      icon.layout(iconX, identityTop)
+      title.layout(
+        paddingStart + (identityWidth - title.measuredWidth) / 2,
+        icon.bottom + 4.dp
+      )
+      if (extraInfoCard.isGone) return
+      if (useSideBySideLayout) {
+        extraInfoCard.layout(
+          paddingStart + identityWidth + gap,
+          paddingTop + (measuredHeight - paddingTop - paddingBottom - extraInfoCard.measuredHeight) / 2
+        )
+      } else {
+        extraInfoCard.layout(paddingStart, paddingTop + identityHeight + gap)
+      }
     }
   }
 

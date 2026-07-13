@@ -1,8 +1,11 @@
 package com.absinthe.libchecker.di
 
 import com.absinthe.libchecker.BuildConfig
+import com.absinthe.libchecker.api.ApiManager
+import com.absinthe.libchecker.api.request.RulesDocumentRequest
 import com.absinthe.libchecker.data.app.GlobalAppDetailSettingsRepository
 import com.absinthe.libchecker.data.app.RemoteLibraryDetailRepository
+import com.absinthe.libchecker.data.app.insight.RemoteLibraryInsightRepository
 import com.absinthe.libchecker.domain.app.detail.abi.BuildAppDetailAbiLabelDataUseCase
 import com.absinthe.libchecker.domain.app.detail.abi.GetAppDetailAbiUseCase
 import com.absinthe.libchecker.domain.app.detail.action.AllowFileUriExposureUseCase
@@ -50,6 +53,10 @@ import com.absinthe.libchecker.domain.app.detail.feature.BuildAppDetailFeatureIt
 import com.absinthe.libchecker.domain.app.detail.feature.GetAppDetailFeaturesUseCase
 import com.absinthe.libchecker.domain.app.detail.header.BuildAppDetailHeaderExtraInfoUseCase
 import com.absinthe.libchecker.domain.app.detail.header.BuildAppDetailHeaderTitleDataUseCase
+import com.absinthe.libchecker.domain.app.detail.insight.LibraryInsightDefinitionValidator
+import com.absinthe.libchecker.domain.app.detail.insight.LibraryInsightProbeEngine
+import com.absinthe.libchecker.domain.app.detail.insight.LibraryInsightRepository
+import com.absinthe.libchecker.domain.app.detail.insight.ResolveLibraryInsightUseCase
 import com.absinthe.libchecker.domain.app.detail.navigation.BuildDetailReferenceNavigationUseCase
 import com.absinthe.libchecker.domain.app.detail.packageinfo.GetAppDetailPackageSizeUseCase
 import com.absinthe.libchecker.domain.app.detail.packageinfo.GetAppDetailPackageUseCase
@@ -58,6 +65,7 @@ import com.absinthe.libchecker.domain.app.detail.presentation.DetailFeatureLoade
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailFilterController
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailPackageLoader
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
+import com.absinthe.libchecker.domain.app.detail.presentation.LibraryInsightViewModel
 import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailChipContentLoader
 import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailComponentContentLoader
 import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailContentLoader
@@ -79,6 +87,9 @@ import org.koin.dsl.module
 val appDetailModule = module {
   single<AppDetailSettingsRepository> { GlobalAppDetailSettingsRepository() }
   single<LibraryDetailRepository> { RemoteLibraryDetailRepository }
+  single<LibraryInsightRepository> {
+    RemoteLibraryInsightRepository(ApiManager.create<RulesDocumentRequest>())
+  }
   single { AllowFileUriExposureUseCase() }
   factory { BuildAppDetailContentInitPlanUseCase() }
   factory { BuildAppDetailTabTypesUseCase() }
@@ -93,6 +104,9 @@ val appDetailModule = module {
   factory { GetAppDetailComponentChipsUseCase(get()) }
   factory { GetAppDetailDexChipsUseCase() }
   factory { GetAppDetailFeaturesUseCase(get(), get()) }
+  factory { LibraryInsightDefinitionValidator() }
+  factory { LibraryInsightProbeEngine() }
+  factory { ResolveLibraryInsightUseCase(get(), get(), get()) }
   factory {
     GetAppInfoActionsUseCase(BuildConfig.APPLICATION_ID, androidContext().packageManager, get(), get())
   }
@@ -235,4 +249,5 @@ val appDetailModule = module {
       detailPackageLoader = get()
     )
   }
+  viewModel { LibraryInsightViewModel(get()) }
 }
