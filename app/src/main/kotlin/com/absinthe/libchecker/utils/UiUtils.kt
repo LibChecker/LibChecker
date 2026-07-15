@@ -140,7 +140,7 @@ object UiUtils {
       .create()
   }
 
-  fun addCircleBackground(context: Context, drawable: Drawable, circleColor: Int): Drawable {
+  fun addCircleBackground(context: Context, drawable: Drawable, @ColorInt circleColor: Int): Drawable {
     val intrinsicWidth = drawable.intrinsicWidth.takeIf { it > 0 } ?: 100
     val intrinsicHeight = drawable.intrinsicHeight.takeIf { it > 0 } ?: 100
     val scale = min(1f, MAX_CIRCLE_BACKGROUND_SIZE.toFloat() / max(intrinsicWidth, intrinsicHeight))
