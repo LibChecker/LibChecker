@@ -76,6 +76,7 @@ class TimeNodeBottomSheetView(context: Context) :
         }
       }
       isStateViewEnable = true
+      isUseStateViewSize = true
     }
   }
 
