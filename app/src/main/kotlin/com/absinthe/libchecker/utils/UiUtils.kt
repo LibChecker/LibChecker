@@ -33,8 +33,11 @@ import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.slider.Slider
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToInt
 
 object UiUtils {
+  private val MAX_CIRCLE_BACKGROUND_SIZE = 48.dp
+
   fun getRandomColor(): Int {
     val range = if (UiUtils.isDarkMode()) {
       (68..136)
@@ -138,8 +141,11 @@ object UiUtils {
   }
 
   fun addCircleBackground(context: Context, drawable: Drawable, circleColor: Int): Drawable {
-    val width = drawable.intrinsicWidth.takeIf { it > 0 } ?: 100
-    val height = drawable.intrinsicHeight.takeIf { it > 0 } ?: 100
+    val intrinsicWidth = drawable.intrinsicWidth.takeIf { it > 0 } ?: 100
+    val intrinsicHeight = drawable.intrinsicHeight.takeIf { it > 0 } ?: 100
+    val scale = min(1f, MAX_CIRCLE_BACKGROUND_SIZE.toFloat() / max(intrinsicWidth, intrinsicHeight))
+    val width = (intrinsicWidth * scale).roundToInt().coerceAtLeast(1)
+    val height = (intrinsicHeight * scale).roundToInt().coerceAtLeast(1)
 
     val bitmap = createBitmap(width, height)
     val canvas = Canvas(bitmap)
