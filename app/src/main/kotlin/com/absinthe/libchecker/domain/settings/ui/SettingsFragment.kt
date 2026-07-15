@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.domain.settings.ui
 
-import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
@@ -12,17 +11,12 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
-import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.ListPreference
 import androidx.preference.Preference
-import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.PreferenceGroup
 import androidx.preference.PreferenceGroupAdapter
-import androidx.preference.SwitchPreferenceCompat
 import androidx.preference.TwoStatePreference
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.BuildConfig
@@ -38,19 +32,19 @@ import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.base.IAppBarContainer
 import com.absinthe.libchecker.ui.base.IListController
 import com.absinthe.libchecker.ui.base.IListControllerHost
+import com.absinthe.libchecker.ui.preference.applyM3eLayoutResources
+import com.absinthe.libchecker.ui.preference.buildPreferenceItemRenderState
+import com.absinthe.libchecker.ui.preference.findPreferencePosition
+import com.absinthe.libchecker.ui.preference.view.PreferenceItemView
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.setBottomPaddingSpace
 import com.absinthe.libraries.utils.extensions.getBoolean
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import com.google.android.material.badge.BadgeDrawable
-import com.google.android.material.badge.BadgeUtils
-import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -338,8 +332,7 @@ class SettingsFragment :
   private fun bindGetUpdatesBadge(preference: Preference) {
     settingsViewModel.updateBadgeVisible.onEach { visible ->
       isGetUpdatesBadgeVisible = visible
-      updateVisibleGetUpdatesBadge(preference)
-      updateVisiblePreferenceDescription(preference)
+      rebindVisiblePreference(preference)
     }.launchIn(viewLifecycleOwner.lifecycleScope)
   }
 
@@ -398,59 +391,20 @@ class SettingsFragment :
         R.string.settings_github_token_summary_set
       }
     )
-    updateVisiblePreferenceDescription(preference)
+    rebindVisiblePreference(preference)
   }
 
-  @SuppressLint("RestrictedApi")
-  private fun updateVisibleGetUpdatesBadge(preference: Preference) {
+  private fun rebindVisiblePreference(preference: Preference) {
     if (!::prefRecyclerView.isInitialized) {
       return
     }
 
     prefRecyclerView.post {
       val adapter = prefRecyclerView.adapter as? PreferenceGroupAdapter ?: return@post
-      val position = (0 until adapter.itemCount)
-        .firstOrNull { adapter.getItem(it) == preference }
-        ?: return@post
-      val itemView = prefRecyclerView.findViewHolderForAdapterPosition(position)?.itemView ?: return@post
-      bindSettingsPreferenceBadge(itemView, preference)
-    }
-  }
-
-  private fun bindSettingsPreferenceBadge(itemView: View, preference: Preference?) {
-    val iconFrame = itemView.findViewById<FrameLayout>(R.id.icon_frame) ?: return
-    val icon = itemView.findViewById<View>(android.R.id.icon) ?: return
-    (iconFrame.getTag(R.id.settings_preference_update_badge) as? BadgeDrawable)?.let {
-      BadgeUtils.detachBadgeDrawable(it, icon)
-      iconFrame.setTag(R.id.settings_preference_update_badge, null)
-    }
-
-    if (preference?.key != Constants.PREF_GET_UPDATES || !isGetUpdatesBadgeVisible) {
-      return
-    }
-
-    val badge = BadgeDrawable.create(iconFrame.context).apply {
-      backgroundColor = R.color.material_red_500.getColor(iconFrame.context)
-      badgeGravity = BadgeDrawable.TOP_END
-      clearNumber()
-    }
-    BadgeUtils.attachBadgeDrawable(badge, icon, iconFrame)
-    iconFrame.setTag(R.id.settings_preference_update_badge, badge)
-  }
-
-  @SuppressLint("RestrictedApi")
-  private fun updateVisiblePreferenceDescription(preference: Preference) {
-    if (!::prefRecyclerView.isInitialized) {
-      return
-    }
-
-    prefRecyclerView.post {
-      val adapter = prefRecyclerView.adapter as? PreferenceGroupAdapter ?: return@post
-      val position = (0 until adapter.itemCount)
-        .firstOrNull { adapter.getItem(it) == preference }
-        ?: return@post
-      val itemView = prefRecyclerView.findViewHolderForAdapterPosition(position)?.itemView ?: return@post
-      itemView.contentDescription = buildPreferenceDescription(preference)
+      val position = adapter.findPreferencePosition(preference) ?: return@post
+      val itemView = prefRecyclerView.findViewHolderForAdapterPosition(position)?.itemView
+        as? PreferenceItemView ?: return@post
+      bindSettingsPreferenceItem(adapter, position, itemView)
     }
   }
 
@@ -527,7 +481,7 @@ class SettingsFragment :
     recyclerView.addOnChildAttachStateChangeListener(
       object : RecyclerView.OnChildAttachStateChangeListener {
         override fun onChildViewAttachedToWindow(view: View) {
-          styleSettingsPreferenceItem(recyclerView, view)
+          bindSettingsPreferenceItem(recyclerView, view)
         }
 
         override fun onChildViewDetachedFromWindow(view: View) = Unit
@@ -553,103 +507,31 @@ class SettingsFragment :
   override fun isAllowRefreshing(): Boolean = true
   override fun getSuitableLayoutManager(): RecyclerView.LayoutManager? = null
 
-  private fun Preference.applyM3eLayoutResources() {
-    when (this) {
-      is PreferenceCategory -> {
-        layoutResource = R.layout.preference_category_m3e
-        isIconSpaceReserved = false
-      }
-
-      is SwitchPreferenceCompat -> {
-        layoutResource = R.layout.preference_m3e
-        widgetLayoutResource = R.layout.preference_widget_material_switch
-        isIconSpaceReserved = true
-      }
-
-      else -> {
-        layoutResource = R.layout.preference_m3e
-        isIconSpaceReserved = true
-      }
-    }
-
-    if (this is PreferenceGroup) {
-      for (index in 0 until preferenceCount) {
-        getPreference(index).applyM3eLayoutResources()
-      }
-    }
-  }
-
-  @SuppressLint("RestrictedApi")
-  private fun styleSettingsPreferenceItem(recyclerView: RecyclerView, itemView: View) {
+  private fun bindSettingsPreferenceItem(recyclerView: RecyclerView, itemView: View) {
+    val preferenceItemView = itemView as? PreferenceItemView ?: return
     val adapter = recyclerView.adapter as? PreferenceGroupAdapter ?: return
     val position = recyclerView.getChildAdapterPosition(itemView)
     if (position == RecyclerView.NO_POSITION) return
-
-    val preference = adapter.getItem(position)
-    val card = itemView as? MaterialCardView ?: return
-    if (!preference.isSettingsRowPreference()) return
-
-    val previous = if (position > 0) adapter.getItem(position - 1) else null
-    val next = if (position < adapter.itemCount - 1) adapter.getItem(position + 1) else null
-    val isFirstInGroup = !previous.isSettingsRowPreference()
-    val isLastInGroup = !next.isSettingsRowPreference()
-    val outerRadius = resources.getDimension(R.dimen.settings_preference_corner_radius)
-    val innerRadius = resources.getDimension(R.dimen.settings_preference_inner_corner_radius)
-    val topRadius = if (isFirstInGroup) outerRadius else innerRadius
-    val bottomRadius = if (isLastInGroup) outerRadius else innerRadius
-
-    card.shapeAppearanceModel = card.shapeAppearanceModel.toBuilder()
-      .setTopLeftCornerSize(topRadius)
-      .setTopRightCornerSize(topRadius)
-      .setBottomLeftCornerSize(bottomRadius)
-      .setBottomRightCornerSize(bottomRadius)
-      .build()
-
-    itemView.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-      topMargin = if (isFirstInGroup) {
-        0
-      } else {
-        resources.getDimensionPixelSize(R.dimen.settings_preference_card_spacing)
-      }
-      bottomMargin = 0
-    }
-
-    val hasSwitch = preference is TwoStatePreference
-    itemView.findViewById<View>(android.R.id.widget_frame)?.isVisible = hasSwitch
-    itemView.findViewById<View>(R.id.settings_preference_chevron)?.isVisible =
-      preference?.key in NAVIGATION_PREFERENCE_KEYS
-    bindSettingsPreferenceBadge(itemView, preference)
-    itemView.findViewById<View>(android.R.id.title)?.importantForAccessibility =
-      View.IMPORTANT_FOR_ACCESSIBILITY_NO
-    itemView.findViewById<View>(android.R.id.summary)?.importantForAccessibility =
-      View.IMPORTANT_FOR_ACCESSIBILITY_NO
-    itemView.contentDescription = buildPreferenceDescription(preference)
+    bindSettingsPreferenceItem(adapter, position, preferenceItemView)
   }
 
-  private fun Preference?.isSettingsRowPreference(): Boolean {
-    return this != null && this !is PreferenceCategory
-  }
-
-  private fun buildPreferenceDescription(preference: Preference?): String {
-    val parts = mutableListOf<CharSequence?>(
-      preference?.title,
-      preference?.summary
-    )
-    if (preference is TwoStatePreference) {
-      parts += getString(
-        if (preference.isChecked) {
-          R.string.array_dark_mode_on
+  private fun bindSettingsPreferenceItem(
+    adapter: PreferenceGroupAdapter,
+    position: Int,
+    itemView: PreferenceItemView
+  ) {
+    val state = adapter.buildPreferenceItemRenderState(
+      position = position,
+      showChevron = { it.key in NAVIGATION_PREFERENCE_KEYS },
+      badgeDescription = {
+        if (it.key == Constants.PREF_GET_UPDATES && isGetUpdatesBadgeVisible) {
+          getString(R.string.settings_update_available)
         } else {
-          R.string.array_dark_mode_off
+          null
         }
-      )
-    }
-    if (preference?.key == Constants.PREF_GET_UPDATES && isGetUpdatesBadgeVisible) {
-      parts += getString(R.string.settings_update_available)
-    }
-    return parts
-      .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
-      .joinToString()
+      }
+    ) ?: return
+    itemView.bind(state)
   }
 
   private fun recordPreferenceEvent(key: String, value: Any = "") {
