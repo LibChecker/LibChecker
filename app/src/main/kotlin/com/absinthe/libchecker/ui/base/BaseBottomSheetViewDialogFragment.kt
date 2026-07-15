@@ -9,7 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.view.Window
-import android.view.WindowManager
+import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.core.animation.doOnEnd
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -24,7 +24,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
-import kotlin.math.roundToInt
 import timber.log.Timber
 
 abstract class BaseBottomSheetViewDialogFragment<T : View> :
@@ -40,9 +39,11 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> :
   private var isHandlerActivated = false
   private var animator: ValueAnimator = ObjectAnimator()
   private val supportsBlur = OsUtils.atLeastS()
-  private val maxBlurRadius = 64
+  private val maxBlurRadius = 80f
+  private val blurInterpolator = AccelerateDecelerateInterpolator()
   private var maxDimAmount: Float = 0f
   private var dialogWindow: Window? = null
+  private var blurController: WindowBlurCompatController? = null
   private val behavior by lazy { BottomSheetBehavior.from(root.parent as View) }
   private val bottomSheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
     override fun onStateChanged(bottomSheet: View, newState: Int) {
@@ -76,7 +77,7 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> :
         }
 
         BottomSheetBehavior.STATE_HIDDEN -> {
-          resetBlurRadius()
+          finishBlurAnimation()
         }
 
         else -> {
@@ -109,9 +110,11 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> :
         maxDimAmount = it.attributes.dimAmount
 
         if (supportsBlur) {
-          it.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
-          it.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
-          updateBlurAndDimForOffset(1f)
+          blurController?.stop()
+          blurController = WindowBlurCompatController(requireActivity(), it).also { controller ->
+            controller.start()
+          }
+          updateBlurAndDimFraction(1f, animateBlur = true)
         }
       }
 
@@ -159,7 +162,8 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> :
 
   override fun onDetach() {
     animator.cancel()
-    resetBlurRadius()
+    finishBlurAnimation()
+    blurController = null
     dialogWindow = null
     super.onDetach()
   }
@@ -167,7 +171,8 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> :
   override fun onDestroyView() {
     animator.cancel()
     root.removeOnLayoutChangeListener(this)
-    resetBlurRadius()
+    finishBlurAnimation()
+    blurController = null
     _root = null
     super.onDestroyView()
   }
@@ -284,16 +289,20 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> :
     return view.width >= view.height
   }
 
-  private fun updateBlurAndDimFraction(fraction: Float) {
+  private fun updateBlurAndDimFraction(fraction: Float, animateBlur: Boolean = false) {
     if (!supportsBlur) return
     val window = dialogWindow ?: return
     val clamped = fraction.coerceIn(0f, 1f)
-    val targetRadius = (maxBlurRadius * clamped).roundToInt()
+    val targetRadius = maxBlurRadius * blurInterpolator.getInterpolation(clamped)
     val targetDimAmount = maxDimAmount * clamped.coerceAtLeast(0.1f)
 
+    if (animateBlur) {
+      blurController?.animateBlurRadius(targetRadius, animationDuration)
+    } else {
+      blurController?.setBlurRadius(targetRadius)
+    }
     val layoutParams = window.attributes
-    if (layoutParams.blurBehindRadius == targetRadius && layoutParams.dimAmount == targetDimAmount) return
-    layoutParams.blurBehindRadius = targetRadius
+    if (layoutParams.dimAmount == targetDimAmount) return
     layoutParams.dimAmount = targetDimAmount
     window.attributes = layoutParams
   }
@@ -304,7 +313,7 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> :
     updateBlurAndDimFraction(normalized)
   }
 
-  private fun resetBlurRadius() {
-    updateBlurAndDimFraction(0f)
+  private fun finishBlurAnimation() {
+    blurController?.finishWithAnimation(animationDuration)
   }
 }
