@@ -137,7 +137,7 @@ object UiUtils {
       .create()
   }
 
-  fun addCircleBackground(context: Context, drawable: Drawable, circleColor: Int): Drawable {
+  fun addCircleBackground(context: Context, drawable: Drawable, @ColorInt circleColor: Int): Drawable {
     val width = drawable.intrinsicWidth.takeIf { it > 0 } ?: 100
     val height = drawable.intrinsicHeight.takeIf { it > 0 } ?: 100
 

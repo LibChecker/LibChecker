@@ -929,7 +929,7 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
 
           misses = 0
           val icon = if (withCircleBackground) {
-            UiUtils.addCircleBackground(context, drawable, circleBackgroundColorRes)
+            UiUtils.addCircleBackground(context, drawable, ContextCompat.getColor(context, circleBackgroundColorRes))
           } else {
             drawable
           }
