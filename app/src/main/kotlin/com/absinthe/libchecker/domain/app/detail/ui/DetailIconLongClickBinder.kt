@@ -93,6 +93,8 @@ private class AdaptiveIconLayerOverlay(
       ViewGroup.LayoutParams.MATCH_PARENT,
       ViewGroup.LayoutParams.MATCH_PARENT
     )
+    clipChildren = false
+    clipToPadding = false
     setBackgroundColor(Color.TRANSPARENT)
     isClickable = true
     setOnClickListener { close() }
@@ -209,7 +211,7 @@ private class AdaptiveIconLayerOverlay(
         endAlpha = 1f,
         endScale = 1f,
         endAction = if (view === layerCardView) {
-          { layerCardView.animateBackgroundOutsideFade() }
+          { layerCardView.animateBackgroundOutsideDisintegration() }
         } else {
           null
         }
@@ -268,7 +270,7 @@ private class AdaptiveIconLayerOverlay(
     if (isClosing) return
     isClosing = true
     collapseLayers()
-    layerCardView.cancelBackgroundOutsideFade()
+    layerCardView.finishBackgroundOutsideDisintegration()
     blurAnimator?.cancel()
     if (!shouldHideCollapsingToolbarInsteadOfBlur() && currentBlurRadius > 0f) {
       blurAnimator = ValueAnimator.ofFloat(currentBlurRadius, 0f).apply {

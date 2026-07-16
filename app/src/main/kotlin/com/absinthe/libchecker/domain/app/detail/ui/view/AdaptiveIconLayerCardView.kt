@@ -3,6 +3,7 @@ package com.absinthe.libchecker.domain.app.detail.ui.view
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.ColorFilter
@@ -12,6 +13,7 @@ import android.graphics.Outline
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.PixelFormat
+import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.Drawable
@@ -23,19 +25,24 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewOutlineProvider
+import android.view.animation.LinearInterpolator
 import android.widget.ImageView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.animation.doOnEnd
 import androidx.core.graphics.ColorUtils
-import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
+import kotlin.math.PI
+import kotlin.math.cos
 import kotlin.math.min
+import kotlin.math.pow
+import kotlin.math.roundToInt
+import kotlin.math.sin
 
 @RequiresApi(Build.VERSION_CODES.O)
 class AdaptiveIconLayerCardView(
@@ -73,7 +80,7 @@ class AdaptiveIconLayerCardView(
     )
   }
   private val maskedBackgroundDrawable = createMaskedBackgroundDrawable(icon)
-  private var backgroundOutsideFadeAnimator: ValueAnimator? = null
+  private var backgroundOutsideDisintegrationAnimator: ValueAnimator? = null
   private val contentView = ContentView(
     context = context,
     icon = icon,
@@ -87,6 +94,8 @@ class AdaptiveIconLayerCardView(
       ViewGroup.LayoutParams.WRAP_CONTENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     )
+    clipChildren = false
+    clipToPadding = false
     contentView.layoutParams = LayoutParams(
       ViewGroup.LayoutParams.WRAP_CONTENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
@@ -115,25 +124,26 @@ class AdaptiveIconLayerCardView(
     contentView.fitPreviewSize(desiredSize, (maxWidth - bubbleTailWidth).coerceAtLeast(1))
   }
 
-  fun animateBackgroundOutsideFade() {
-    backgroundOutsideFadeAnimator?.cancel()
-    maskedBackgroundDrawable.outsideAlpha = FULL_ALPHA
-    backgroundOutsideFadeAnimator = ValueAnimator.ofInt(FULL_ALPHA, BACKGROUND_OUTSIDE_ALPHA).apply {
-      duration = BACKGROUND_OUTSIDE_FADE_DURATION_MS
-      interpolator = FastOutSlowInInterpolator()
+  fun animateBackgroundOutsideDisintegration() {
+    backgroundOutsideDisintegrationAnimator?.cancel()
+    maskedBackgroundDrawable.disintegrationProgress = 0f
+    backgroundOutsideDisintegrationAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
+      duration = BACKGROUND_DISINTEGRATION_DURATION_MS
+      interpolator = LinearInterpolator()
       addUpdateListener {
-        maskedBackgroundDrawable.outsideAlpha = it.animatedValue as Int
+        maskedBackgroundDrawable.disintegrationProgress = it.animatedValue as Float
       }
       doOnEnd {
-        backgroundOutsideFadeAnimator = null
+        backgroundOutsideDisintegrationAnimator = null
       }
       start()
     }
   }
 
-  fun cancelBackgroundOutsideFade() {
-    backgroundOutsideFadeAnimator?.cancel()
-    backgroundOutsideFadeAnimator = null
+  fun finishBackgroundOutsideDisintegration() {
+    backgroundOutsideDisintegrationAnimator?.cancel()
+    backgroundOutsideDisintegrationAnimator = null
+    maskedBackgroundDrawable.disintegrationProgress = 1f
   }
 
   internal val previewCenterOffset: Int
@@ -163,7 +173,7 @@ class AdaptiveIconLayerCardView(
   }
 
   override fun onDetachedFromWindow() {
-    cancelBackgroundOutsideFade()
+    finishBackgroundOutsideDisintegration()
     super.onDetachedFromWindow()
   }
 
@@ -237,6 +247,8 @@ class AdaptiveIconLayerCardView(
     )
 
     init {
+      clipChildren = false
+      clipToPadding = false
       setPadding(contentPadding, contentPadding, contentPadding, contentPadding)
       addView(backgroundView)
       addView(foregroundView)
@@ -309,6 +321,8 @@ class AdaptiveIconLayerCardView(
     }
 
     init {
+      clipChildren = false
+      clipToPadding = false
       isClickable = true
       isFocusable = true
       contentDescription = actionDescription
@@ -349,25 +363,27 @@ class AdaptiveIconLayerCardView(
 private fun createMaskedBackgroundDrawable(icon: AdaptiveIconDrawable): MaskedBackgroundDrawable {
   return MaskedBackgroundDrawable(
     background = icon.background.copyDrawable(),
-    mask = Path(icon.iconMask),
-    initialOutsideAlpha = FULL_ALPHA
+    mask = Path(icon.iconMask)
   )
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 private class MaskedBackgroundDrawable(
   private val background: Drawable,
-  private val mask: Path,
-  initialOutsideAlpha: Int
+  private val mask: Path
 ) : Drawable() {
 
   private val targetBounds = RectF()
   private val matrix = Matrix()
   private val transformedMask = Path()
+  private val particleClipPath = Path()
+  private val particlePaint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
+  private val particles = mutableListOf<BackgroundParticle>()
+  private var sourceBitmap: Bitmap? = null
   private var drawableAlpha = 255
-  var outsideAlpha = initialOutsideAlpha
+  var disintegrationProgress = PARTICLE_PROGRESS_IDLE
     set(value) {
-      val constrainedValue = value.coerceIn(0, FULL_ALPHA)
+      val constrainedValue = value.coerceIn(PARTICLE_PROGRESS_IDLE, 1f)
       if (field == constrainedValue) return
       field = constrainedValue
       invalidateSelf()
@@ -387,25 +403,139 @@ private class MaskedBackgroundDrawable(
     transformedMask.reset()
     mask.transform(matrix, transformedMask)
 
-    val outsideSaveCount = canvas.saveLayerAlpha(targetBounds, outsideAlpha)
-    canvas.clipOutPath(transformedMask)
-    background.draw(canvas)
-    canvas.restoreToCount(outsideSaveCount)
+    if (disintegrationProgress < 0f) {
+      drawStaticOutside(canvas)
+    } else {
+      drawDisintegratingOutside(canvas)
+    }
 
     val insideSaveCount = canvas.save()
     canvas.clipPath(transformedMask)
+    background.bounds = bounds
     background.alpha = drawableAlpha
     background.draw(canvas)
     canvas.restoreToCount(insideSaveCount)
   }
 
+  private fun drawStaticOutside(canvas: Canvas) {
+    val outsideSaveCount = canvas.save()
+    canvas.clipOutPath(transformedMask)
+    background.draw(canvas)
+    canvas.restoreToCount(outsideSaveCount)
+  }
+
+  private fun drawDisintegratingOutside(canvas: Canvas) {
+    val bitmap = ensureSourceBitmap() ?: return
+    val outsideSaveCount = canvas.save()
+    canvas.clipOutPath(transformedMask)
+    val travelDistance = min(bounds.width(), bounds.height()).toFloat()
+    particles.forEach { particle ->
+      val localProgress = calculateParticleLocalProgress(
+        progress = disintegrationProgress,
+        normalizedX = particle.normalizedX,
+        activationJitter = particle.activationJitter
+      )
+      val alpha = calculateParticleAlpha(localProgress)
+      if (alpha <= 0f) return@forEach
+
+      val progressSquared = localProgress * localProgress
+      val horizontalDirection = if (particle.velocityX >= 0f) 1f else -1f
+      val offsetX = particle.velocityX * localProgress +
+        horizontalDirection * travelDistance * PARTICLE_HORIZONTAL_ACCELERATION * progressSquared
+      val offsetY = particle.velocityY * localProgress -
+        travelDistance * PARTICLE_UPWARD_ACCELERATION * progressSquared
+      val scale = 1f - PARTICLE_SCALE_REDUCTION * localProgress
+      particlePaint.alpha = (drawableAlpha * alpha).roundToInt()
+
+      val particleSaveCount = canvas.save()
+      canvas.translate(offsetX, offsetY)
+      canvas.rotate(
+        particle.rotationDegrees * localProgress,
+        particle.destination.centerX(),
+        particle.destination.centerY()
+      )
+      canvas.scale(
+        scale,
+        scale,
+        particle.destination.centerX(),
+        particle.destination.centerY()
+      )
+      if (localProgress > 0f) {
+        particleClipPath.reset()
+        particleClipPath.addOval(particle.destination, Path.Direction.CW)
+        canvas.clipPath(particleClipPath)
+      }
+      canvas.drawBitmap(bitmap, particle.source, particle.destination, particlePaint)
+      canvas.restoreToCount(particleSaveCount)
+    }
+    canvas.restoreToCount(outsideSaveCount)
+  }
+
+  private fun ensureSourceBitmap(): Bitmap? {
+    val width = bounds.width()
+    val height = bounds.height()
+    if (width <= 0 || height <= 0) return null
+    sourceBitmap?.let { bitmap ->
+      if (bitmap.width == width && bitmap.height == height) return bitmap
+      bitmap.recycle()
+    }
+
+    val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+    background.bounds = Rect(0, 0, width, height)
+    background.alpha = FULL_ALPHA
+    background.draw(Canvas(bitmap))
+    sourceBitmap = bitmap
+    createParticles(width, height)
+    return bitmap
+  }
+
+  private fun createParticles(width: Int, height: Int) {
+    particles.clear()
+    val travelDistance = min(width, height).toFloat()
+    repeat(PARTICLE_GRID_SIZE) { row ->
+      repeat(PARTICLE_GRID_SIZE) { column ->
+        val left = column * width / PARTICLE_GRID_SIZE
+        val top = row * height / PARTICLE_GRID_SIZE
+        val right = (column + 1) * width / PARTICLE_GRID_SIZE
+        val bottom = (row + 1) * height / PARTICLE_GRID_SIZE
+        val normalizedX = (left + right) / 2f / width
+        val direction = particleRandom(column, row, 0) * (2f * PI.toFloat())
+        val speed = travelDistance * (
+          PARTICLE_MIN_SPEED +
+            (PARTICLE_MAX_SPEED - PARTICLE_MIN_SPEED) * particleRandom(column, row, 1)
+          )
+        particles += BackgroundParticle(
+          source = Rect(left, top, right, bottom),
+          destination = RectF(
+            bounds.left + left.toFloat(),
+            bounds.top + top.toFloat(),
+            bounds.left + right.toFloat(),
+            bounds.top + bottom.toFloat()
+          ),
+          normalizedX = normalizedX,
+          activationJitter = (
+            particleRandom(column, row, 2) - 0.5f
+            ) * PARTICLE_ACTIVATION_JITTER,
+          velocityX = cos(direction) * speed,
+          velocityY = sin(direction) * speed,
+          rotationDegrees = (
+            particleRandom(column, row, 3) - 0.5f
+            ) * PARTICLE_ROTATION_RANGE_DEGREES
+        )
+      }
+    }
+  }
+
   override fun setAlpha(alpha: Int) {
-    drawableAlpha = alpha
+    drawableAlpha = alpha.coerceIn(0, FULL_ALPHA)
     invalidateSelf()
   }
 
   override fun setColorFilter(colorFilter: ColorFilter?) {
     background.colorFilter = colorFilter
+    sourceBitmap?.recycle()
+    sourceBitmap = null
+    particles.clear()
     invalidateSelf()
   }
 
@@ -421,6 +551,16 @@ private class MaskedBackgroundDrawable(
   override fun getIntrinsicHeight(): Int {
     return background.intrinsicHeight
   }
+
+  private data class BackgroundParticle(
+    val source: Rect,
+    val destination: RectF,
+    val normalizedX: Float,
+    val activationJitter: Float,
+    val velocityX: Float,
+    val velocityY: Float,
+    val rotationDegrees: Float
+  )
 }
 
 private fun Context.createRoundedRipple(radius: Float): Drawable {
@@ -468,6 +608,30 @@ internal fun calculateInsetTailPlacement(
     topHeight = topHeight,
     bottomHeight = bottomHeight
   )
+}
+
+internal fun calculateParticleLocalProgress(
+  progress: Float,
+  normalizedX: Float,
+  activationJitter: Float
+): Float {
+  val constrainedProgress = progress.coerceIn(0f, 1f)
+  val activationPoint = (
+    normalizedX.coerceIn(0f, 1f) * PARTICLE_ACTIVATION_SPREAD + activationJitter
+    ).coerceIn(0f, PARTICLE_MAX_ACTIVATION_POINT)
+  return ((constrainedProgress - activationPoint) / (1f - activationPoint)).coerceIn(0f, 1f)
+}
+
+internal fun calculateParticleAlpha(localProgress: Float): Float {
+  return (1f - localProgress.coerceIn(0f, 1f)).pow(PARTICLE_ALPHA_EXPONENT)
+}
+
+private fun particleRandom(column: Int, row: Int, salt: Int): Float {
+  var value = column * 73_856_093 xor row * 19_349_663 xor salt * 83_492_791
+  value = value xor (value shl 13)
+  value = value xor (value ushr 17)
+  value = value xor (value shl 5)
+  return (value and Int.MAX_VALUE) / Int.MAX_VALUE.toFloat()
 }
 
 private fun Path.setLayerBubble(
@@ -536,7 +700,18 @@ private const val LAYER_GAP_DP = 20
 private const val DEFAULT_PREVIEW_SIZE_DP = 60
 private const val MIN_PREVIEW_SIZE_DP = 44
 private const val FULL_ALPHA = 0xFF
-private const val BACKGROUND_OUTSIDE_ALPHA = 0x1A
-private const val BACKGROUND_OUTSIDE_FADE_DURATION_MS = 220L
+private const val PARTICLE_PROGRESS_IDLE = -1f
+private const val BACKGROUND_DISINTEGRATION_DURATION_MS = 1_500L
+private const val PARTICLE_GRID_SIZE = 18
+private const val PARTICLE_ACTIVATION_SPREAD = 0.24f
+private const val PARTICLE_ACTIVATION_JITTER = 0.06f
+private const val PARTICLE_MAX_ACTIVATION_POINT = 0.3f
+private const val PARTICLE_MIN_SPEED = 0.1f
+private const val PARTICLE_MAX_SPEED = 0.3f
+private const val PARTICLE_HORIZONTAL_ACCELERATION = 0.18f
+private const val PARTICLE_UPWARD_ACCELERATION = 0.22f
+private const val PARTICLE_SCALE_REDUCTION = 0.35f
+private const val PARTICLE_ROTATION_RANGE_DEGREES = 52f
+private const val PARTICLE_ALPHA_EXPONENT = 1.45f
 private const val LABEL_GAP_DP = 2
 private const val PREVIEW_RADIUS_DP = 12
