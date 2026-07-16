@@ -237,6 +237,11 @@
   <string name="lib_detail_optimization_off">Native symbols are not stripped, preventing app size savings.</string>
   <string name="apk_preview">APK Preview</string>
   <string name="apk_preview_item_not_available">Cannot be displayed in preview mode</string>
+  <string name="adaptive_icon_layer_background">Background</string>
+  <string name="adaptive_icon_layer_foreground">Foreground</string>
+  <string name="adaptive_icon_copy_full">Copy full icon</string>
+  <string name="adaptive_icon_copy_background">Copy background layer</string>
+  <string name="adaptive_icon_copy_foreground">Copy foreground layer</string>
   <string name="feature_live_update_notification">Live Update notification</string>
   <string name="feature_live_update_notification_summary">The system promotes Live Update notifications. Promoted notifications appear more prominently on system surfaces, including at the top of the notification drawer and the lock screen, and as a chip in the status bar.</string>
   <!--  Toast  -->
