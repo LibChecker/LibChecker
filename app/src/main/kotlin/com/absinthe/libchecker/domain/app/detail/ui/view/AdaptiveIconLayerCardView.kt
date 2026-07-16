@@ -44,6 +44,26 @@ class AdaptiveIconLayerCardView(
   onForegroundClick: () -> Unit
 ) : MaterialCardView(context) {
 
+  private val stitchInset = STITCH_INSET_DP.dp.toFloat()
+  private val stitchRadius = STITCH_RADIUS_DP.dp.toFloat()
+  private val stitchBounds = RectF()
+  private val stitchPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    style = Paint.Style.STROKE
+    strokeCap = Paint.Cap.ROUND
+    strokeJoin = Paint.Join.ROUND
+    strokeWidth = STITCH_STROKE_WIDTH_DP.dp.toFloat()
+    color = ColorUtils.setAlphaComponent(
+      context.getColorByAttr(com.google.android.material.R.attr.colorOutline),
+      STITCH_ALPHA
+    )
+    pathEffect = DashPathEffect(
+      floatArrayOf(
+        STITCH_DASH_LENGTH_DP.dp.toFloat(),
+        STITCH_DASH_GAP_DP.dp.toFloat()
+      ),
+      0f
+    )
+  }
   private val contentView = ContentView(
     context = context,
     icon = icon,
@@ -72,6 +92,13 @@ class AdaptiveIconLayerCardView(
     contentView.fitPreviewSize(desiredSize, maxWidth)
   }
 
+  override fun dispatchDraw(canvas: Canvas) {
+    super.dispatchDraw(canvas)
+    val inset = stitchInset + stitchPaint.strokeWidth / 2f
+    stitchBounds.set(inset, inset, width - inset, height - inset)
+    canvas.drawRoundRect(stitchBounds, stitchRadius, stitchRadius, stitchPaint)
+  }
+
   private class ContentView(
     context: Context,
     icon: AdaptiveIconDrawable,
@@ -89,7 +116,6 @@ class AdaptiveIconLayerCardView(
       drawable = createBackgroundOutlineDrawable(icon),
       label = context.getString(R.string.adaptive_icon_layer_background),
       actionDescription = context.getString(R.string.adaptive_icon_copy_background),
-      previewBackgroundColor = null,
       onClick = onBackgroundClick
     )
     private val plusView = AppCompatImageView(context).apply {
@@ -105,7 +131,6 @@ class AdaptiveIconLayerCardView(
       drawable = icon.foreground.copyDrawable(),
       label = context.getString(R.string.adaptive_icon_layer_foreground),
       actionDescription = context.getString(R.string.adaptive_icon_copy_foreground),
-      previewBackgroundColor = icon.foreground.choosePreviewSurfaceColor(context),
       onClick = onForegroundClick
     )
 
@@ -164,7 +189,6 @@ class AdaptiveIconLayerCardView(
     drawable: Drawable,
     label: CharSequence,
     actionDescription: CharSequence,
-    previewBackgroundColor: Int?,
     onClick: () -> Unit
   ) : AViewGroup(context) {
 
@@ -174,10 +198,6 @@ class AdaptiveIconLayerCardView(
       layoutParams = LayoutParams(previewSize, previewSize)
       scaleType = ImageView.ScaleType.FIT_CENTER
       setImageDrawable(drawable)
-      previewBackgroundColor?.let { color ->
-        background = createRoundedRect(color, PREVIEW_RADIUS_DP.dp.toFloat())
-        setPadding(PREVIEW_ICON_PADDING_DP.dp, PREVIEW_ICON_PADDING_DP.dp, PREVIEW_ICON_PADDING_DP.dp, PREVIEW_ICON_PADDING_DP.dp)
-      }
       importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
     }
     private val labelView = AppCompatTextView(context).apply {
@@ -308,17 +328,6 @@ private class IconMaskOutlineDrawable(
   }
 }
 
-private fun Drawable.choosePreviewSurfaceColor(context: Context): Int {
-  val surface = context.getColorByAttr(com.google.android.material.R.attr.colorSurface)
-  val inverseSurface = context.getColorByAttr(com.google.android.material.R.attr.colorSurfaceInverse)
-  val averageColor = calculateAverageColor() ?: return inverseSurface
-  return if (ColorUtils.calculateContrast(averageColor, surface) >= ColorUtils.calculateContrast(averageColor, inverseSurface)) {
-    surface
-  } else {
-    inverseSurface
-  }
-}
-
 private fun Drawable.chooseVisibleOutlineColor(): Int {
   val averageColor = calculateAverageColor() ?: return Color.WHITE
   val outlineColor = if (ColorUtils.calculateLuminance(averageColor) > 0.5) {
@@ -380,11 +389,16 @@ private fun Drawable.copyDrawable(): Drawable {
 private val ADAPTIVE_ICON_MASK_VIEWPORT = RectF(0f, 0f, 100f, 100f)
 private const val CARD_RADIUS_DP = 14
 private const val CARD_ELEVATION_DP = 2
-private const val CONTENT_PADDING_DP = 8
+private const val CONTENT_PADDING_DP = 14
+private const val STITCH_INSET_DP = 5
+private const val STITCH_RADIUS_DP = 9
+private const val STITCH_STROKE_WIDTH_DP = 1
+private const val STITCH_DASH_LENGTH_DP = 4
+private const val STITCH_DASH_GAP_DP = 4
+private const val STITCH_ALPHA = 0xB3
 private const val LAYER_GAP_DP = 8
 private const val PLUS_SIZE_DP = 24
 private const val DEFAULT_PREVIEW_SIZE_DP = 60
 private const val MIN_PREVIEW_SIZE_DP = 44
 private const val LABEL_GAP_DP = 2
 private const val PREVIEW_RADIUS_DP = 12
-private const val PREVIEW_ICON_PADDING_DP = 4
