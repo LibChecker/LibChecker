@@ -31,14 +31,14 @@ class SnapshotDetailNodeViewTypeTest {
   fun returnsNativeProviderTypeForNativeNode() {
     val node = SnapshotNativeNode(buildDisplayData(type = NATIVE))
 
-    assertEquals(SNAPSHOT_NATIVE_PROVIDER, node.providerViewType)
+    assertEquals(SNAPSHOT_ITEM_PROVIDER, node.providerViewType)
   }
 
   @Test
   fun returnsComponentProviderTypeForComponentNode() {
     val node = SnapshotComponentNode(buildDisplayData(type = SERVICE))
 
-    assertEquals(SNAPSHOT_COMPONENT_PROVIDER, node.providerViewType)
+    assertEquals(SNAPSHOT_ITEM_PROVIDER, node.providerViewType)
   }
 
   @Test(expected = IllegalArgumentException::class)
@@ -64,10 +64,8 @@ class SnapshotDetailNodeViewTypeTest {
       status = SnapshotDetailItemStatusDisplayData(
         iconRes = 0,
         colorRes = 0,
-        countColorRes = 0,
         labelRes = 0
       ),
-      backgroundColor = 0,
       ruleChip = null
     )
   }

@@ -8,6 +8,7 @@
   <string name="target_sdk_string" translatable="false">Target SDK</string>
   <string name="min_sdk_string" translatable="false">Min SDK</string>
   <string name="compile_sdk_string" translatable="false">Compile SDK</string>
+  <string name="snapshot_detail_sdk_label" translatable="false">SDK</string>
   <string name="agp" translatable="false">Android Gradle Plugin</string>
   <string name="pwa" translatable="false">Progressive Web Apps</string>
   <string name="jetpack_compose" translatable="false">Jetpack Compose</string>

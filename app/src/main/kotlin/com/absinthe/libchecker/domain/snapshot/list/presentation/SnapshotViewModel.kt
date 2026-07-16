@@ -6,7 +6,7 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.domain.app.model.PackageChangeState
-import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSection
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailContent
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotCapturePlan
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotSystemPropDisplayData
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotTimeNodeListData
@@ -30,7 +30,7 @@ class SnapshotViewModel(
   val allSnapshots = snapshotListWorkflow.currentSnapshotCount
   private val _snapshotDiffItemsUpdates: MutableSharedFlow<Unit> = MutableSharedFlow()
   val snapshotDiffItemsUpdates = _snapshotDiffItemsUpdates.asSharedFlow()
-  val snapshotDetailSectionsFlow: MutableSharedFlow<List<SnapshotDetailSection>> = MutableSharedFlow()
+  val snapshotDetailContentFlow: MutableSharedFlow<SnapshotDetailContent> = MutableSharedFlow()
 
   private val _effect: MutableSharedFlow<Effect> = MutableSharedFlow()
   val effect = _effect.asSharedFlow()
@@ -134,7 +134,7 @@ class SnapshotViewModel(
   }
 
   fun computeDiffDetail(entity: SnapshotDiffItem) = viewModelScope.launch {
-    snapshotDetailSectionsFlow.emit(snapshotListWorkflow.buildSnapshotDetailSections(entity))
+    snapshotDetailContentFlow.emit(snapshotListWorkflow.buildSnapshotDetailContent(entity))
   }
 
   suspend fun getTimeStamps(): List<TimeStampItem> {

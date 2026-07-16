@@ -21,6 +21,7 @@ fun SnapshotDetailSection.toSnapshotTitleNode(): SnapshotTitleNode {
     collapsedDescription = collapsedDescription,
     counts = statusCounts.map {
       SnapshotDetailCountNode(
+        diffType = it.diffType,
         count = it.count,
         countText = it.countText,
         status = it.status

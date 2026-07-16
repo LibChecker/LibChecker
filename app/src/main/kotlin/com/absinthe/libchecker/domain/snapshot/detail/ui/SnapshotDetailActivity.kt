@@ -41,7 +41,6 @@ import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotEmptyView
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotTitleDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
-import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
@@ -140,7 +139,6 @@ class SnapshotDetailActivity :
         adapter = this@SnapshotDetailActivity.adapter
         applySystemBarsPadding(bottom = true)
         (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-        addItemDecoration(VerticalSpacesItemDecoration(4.dp))
       }
 
       snapshotTitle.apply {
@@ -214,8 +212,11 @@ class SnapshotDetailActivity :
       }
     }
 
-    viewModel.snapshotDetailSectionsFlow.onEach { sections ->
-      val titleList = sections.map { section ->
+    viewModel.snapshotDetailContentFlow.onEach { content ->
+      binding.snapshotTitle.render(
+        snapshotTitleDisplayData.toRenderState(summary = content.summary)
+      )
+      val titleList = content.sections.map { section ->
         recordDetailComponentCount(section.type, section.items.size)
         section.toSnapshotTitleNode()
       }
