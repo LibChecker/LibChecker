@@ -31,7 +31,13 @@ class AppUpdateInstallResultReceiver : BroadcastReceiver() {
     when (status) {
       PackageInstaller.STATUS_SUCCESS -> {
         Toasty.showLong(context, R.string.toast_app_update_installed)
-        showInstallSuccessNotification(context)
+        showInstallSuccessNotification(
+          context = context,
+          contentText = buildAppUpdateNotificationContent(
+            previous = intent.getPreviousVersionInfo(),
+            current = context.getAppUpdateNotificationVersionInfo()
+          )
+        )
       }
 
       PackageInstaller.STATUS_PENDING_USER_ACTION -> {
@@ -57,12 +63,24 @@ class AppUpdateInstallResultReceiver : BroadcastReceiver() {
 
   companion object {
     const val EXTRA_SESSION_ID = "session_id"
+    internal const val EXTRA_PREVIOUS_VERSION_NAME = "previous_version_name"
+    internal const val EXTRA_PREVIOUS_VERSION_CODE = "previous_version_code"
+
+    private fun Intent.getPreviousVersionInfo(): AppUpdateNotificationVersionInfo? {
+      return appUpdateNotificationVersionInfo(
+        versionName = getStringExtra(EXTRA_PREVIOUS_VERSION_NAME),
+        versionCode = getLongExtra(EXTRA_PREVIOUS_VERSION_CODE, -1)
+      )
+    }
 
     private fun getPendingUserActionIntent(intent: Intent): Intent? {
       return IntentCompat.getParcelableExtra(intent, Intent.EXTRA_INTENT)
     }
 
-    private fun createInstallSuccessNotification(context: Context): Notification {
+    private fun createInstallSuccessNotification(
+      context: Context,
+      contentText: String?
+    ): Notification {
       val pendingIntent = PendingIntent.getActivity(
         context,
         0,
@@ -71,6 +89,9 @@ class AppUpdateInstallResultReceiver : BroadcastReceiver() {
       )
       return NotificationCompat.Builder(context, APP_UPDATE_CHANNEL_ID)
         .setContentTitle(context.getString(R.string.toast_app_update_installed))
+        .apply {
+          contentText?.let(::setContentText)
+        }
         .setSmallIcon(R.drawable.ic_logo)
         .setLargeIcon(BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher))
         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -80,7 +101,10 @@ class AppUpdateInstallResultReceiver : BroadcastReceiver() {
     }
 
     @SuppressLint("MissingPermission")
-    private fun showInstallSuccessNotification(context: Context) {
+    private fun showInstallSuccessNotification(
+      context: Context,
+      contentText: String?
+    ) {
       val notificationManager = NotificationManagerCompat.from(context)
       ensureInstallSuccessNotificationChannel(context, notificationManager)
       if (!canPostNotifications(context, notificationManager)) {
@@ -90,7 +114,7 @@ class AppUpdateInstallResultReceiver : BroadcastReceiver() {
       runCatching {
         notificationManager.notify(
           APP_UPDATE_SUCCESS_NOTIFICATION_ID,
-          createInstallSuccessNotification(context)
+          createInstallSuccessNotification(context, contentText)
         )
       }
     }

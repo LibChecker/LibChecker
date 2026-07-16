@@ -208,6 +208,11 @@
   <string name="lib_detail_entry_points_tip">入口</string>
   <string name="apk_preview">APK 預覽</string>
   <string name="apk_preview_item_not_available">無法在預覽模式下顯示</string>
+  <string name="adaptive_icon_layer_background">背景</string>
+  <string name="adaptive_icon_layer_foreground">前景</string>
+  <string name="adaptive_icon_copy_full">複製完整圖示</string>
+  <string name="adaptive_icon_copy_background">複製背景圖層</string>
+  <string name="adaptive_icon_copy_foreground">複製前景圖層</string>
   <string name="feature_live_update_notification">即時更新通知</string>
   <string name="feature_live_update_notification_summary">系統會推廣即時更新通知。推廣的通知會在系統介面上更顯眼地顯示，包括顯示於通知抽屜頂端和鎖定畫面，並以狀態列中的晶片形式呈現。</string>
   <!--  Toast  -->
