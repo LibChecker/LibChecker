@@ -203,7 +203,10 @@ private class AdaptiveIconLayerOverlay(
   private fun placeLayersAt(x: Float, y: Float) {
     layerViews.forEach { child ->
       child.x = x
-      child.y = y + (itemSize - child.height) / 2f
+      child.y = resolveLayerTop(child, y)
+      if (child === layerCardView) {
+        child.pivotY = layerCardView.previewCenterOffset.toFloat()
+      }
       val initialScale = if (child === originalView) 1f else 0.92f
       child.scaleX = initialScale
       child.scaleY = initialScale
@@ -223,12 +226,21 @@ private class AdaptiveIconLayerOverlay(
       animateTo(
         view = view,
         x = nextX,
-        y = rowY + (itemSize - view.height) / 2f,
+        y = resolveLayerTop(view, rowY),
         endAlpha = 1f,
         endScale = 1f
       )
       nextX += view.width + layerGap
     }
+  }
+
+  private fun resolveLayerTop(view: View, rowY: Float): Float {
+    val centerOffset = if (view === layerCardView) {
+      layerCardView.previewCenterOffset.toFloat()
+    } else {
+      view.height / 2f
+    }
+    return calculateAlignedLayerTop(rowY, itemSize, centerOffset)
   }
 
   private fun animateTo(
@@ -301,7 +313,7 @@ private class AdaptiveIconLayerOverlay(
     view.animate().cancel()
     view.animate()
       .x(collapseX)
-      .y(collapseY + (itemSize - view.height) / 2f)
+      .y(resolveLayerTop(view, collapseY))
       .alpha(endAlpha)
       .scaleX(if (view === originalView) 1f else 0.92f)
       .scaleY(if (view === originalView) 1f else 0.92f)
@@ -370,6 +382,14 @@ private data class LayerPosition(
   val x: Float,
   val y: Float
 )
+
+internal fun calculateAlignedLayerTop(
+  rowTop: Float,
+  rowHeight: Int,
+  centerOffset: Float
+): Float {
+  return rowTop + rowHeight / 2f - centerOffset
+}
 
 private fun shouldHideCollapsingToolbarInsteadOfBlur(): Boolean {
   return !OsUtils.atLeastT()

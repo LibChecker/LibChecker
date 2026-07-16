@@ -92,6 +92,9 @@ class AdaptiveIconLayerCardView(
     contentView.fitPreviewSize(desiredSize, maxWidth)
   }
 
+  internal val previewCenterOffset: Int
+    get() = contentView.top + contentView.previewCenterOffset
+
   override fun dispatchDraw(canvas: Canvas) {
     super.dispatchDraw(canvas)
     val inset = stitchInset + stitchPaint.strokeWidth / 2f
@@ -107,9 +110,13 @@ class AdaptiveIconLayerCardView(
   ) : AViewGroup(context) {
 
     private val contentPadding = CONTENT_PADDING_DP.dp
-    private val layerGap = LAYER_GAP_DP.dp
+    private val backgroundToPlusGap = BACKGROUND_TO_PLUS_GAP_DP.dp
+    private val plusToForegroundGap = PLUS_TO_FOREGROUND_GAP_DP.dp
     private val plusSize = PLUS_SIZE_DP.dp
     private var previewSize = DEFAULT_PREVIEW_SIZE_DP.dp
+
+    val previewCenterOffset: Int
+      get() = paddingTop + previewSize / 2
 
     private val backgroundView = LayerPreviewView(
       context = context,
@@ -143,7 +150,8 @@ class AdaptiveIconLayerCardView(
     }
 
     fun fitPreviewSize(desiredSize: Int, maxWidth: Int) {
-      val fixedWidth = paddingStart + paddingEnd + plusSize + layerGap * 2
+      val fixedWidth =
+        paddingStart + paddingEnd + plusSize + backgroundToPlusGap + plusToForegroundGap
       val availablePreviewWidth = ((maxWidth - fixedWidth) / 2).coerceAtLeast(MIN_PREVIEW_SIZE_DP.dp)
       updatePreviewSize(min(desiredSize, availablePreviewWidth))
     }
@@ -163,9 +171,9 @@ class AdaptiveIconLayerCardView(
       setMeasuredDimension(
         paddingStart +
           backgroundView.measuredWidth +
-          layerGap +
+          backgroundToPlusGap +
           plusView.measuredWidth +
-          layerGap +
+          plusToForegroundGap +
           foregroundView.measuredWidth +
           paddingEnd,
         paddingTop +
@@ -176,12 +184,11 @@ class AdaptiveIconLayerCardView(
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
       backgroundView.layout(paddingStart, paddingTop)
-      val previewCenterY = paddingTop + previewSize / 2
       plusView.layout(
-        backgroundView.right + layerGap,
-        previewCenterY - plusView.measuredHeight / 2
+        backgroundView.right + backgroundToPlusGap,
+        previewCenterOffset - plusView.measuredHeight / 2
       )
-      foregroundView.layout(plusView.right + layerGap, paddingTop)
+      foregroundView.layout(plusView.right + plusToForegroundGap, paddingTop)
     }
   }
 
@@ -397,7 +404,10 @@ private const val STITCH_STROKE_WIDTH_DP = 1
 private const val STITCH_DASH_LENGTH_DP = 4
 private const val STITCH_DASH_GAP_DP = 4
 private const val STITCH_ALPHA = 0xB3
-private const val LAYER_GAP_DP = 8
+
+// Foreground layers already include a safe-zone inset, so their geometric gap can stay smaller.
+private const val BACKGROUND_TO_PLUS_GAP_DP = 20
+private const val PLUS_TO_FOREGROUND_GAP_DP = 0
 private const val PLUS_SIZE_DP = 24
 private const val DEFAULT_PREVIEW_SIZE_DP = 60
 private const val MIN_PREVIEW_SIZE_DP = 44
