@@ -1,8 +1,7 @@
 package com.absinthe.libchecker.ui.base
 
-import android.animation.ValueAnimator
 import android.content.Context
-import android.view.WindowManager
+import android.view.View
 import androidx.appcompat.app.AlertDialog
 import com.absinthe.libchecker.utils.OsUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -14,32 +13,29 @@ class BaseAlertDialogBuilder : MaterialAlertDialogBuilder {
   override fun create(): AlertDialog {
     return super.create().also { dialog ->
       if (OsUtils.atLeastS()) {
-        dialog.window?.let {
-          it.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
-          it.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+        dialog.window?.let { window ->
+          val blurController = WindowBlurCompatController(dialog.context, window)
 
-          if (OsUtils.atLeastT()) {
-            val animator = ValueAnimator.ofInt(0, 13).apply {
-              duration = 350
-              addUpdateListener { animation ->
-                if (!it.decorView.isAttachedToWindow) {
-                  cancel()
-                  return@addUpdateListener
-                }
-                val blurRadius = animation.animatedValue as Int * 5
-                it.attributes.blurBehindRadius = blurRadius
-                it.attributes = it.attributes
-              }
+          window.decorView.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(view: View) {
+              blurController.start()
             }
 
-            dialog.setOnShowListener {
-              animator.start()
+            override fun onViewDetachedFromWindow(view: View) {
+              blurController.finishWithAnimation(BLUR_ANIMATION_DURATION)
             }
-          } else {
-            it.attributes.blurBehindRadius = 64
+          })
+
+          dialog.setOnShowListener {
+            blurController.animateBlurRadius(MAX_BLUR_RADIUS, BLUR_ANIMATION_DURATION)
           }
         }
       }
     }
+  }
+
+  private companion object {
+    const val MAX_BLUR_RADIUS = 64f
+    const val BLUR_ANIMATION_DURATION = 350L
   }
 }
