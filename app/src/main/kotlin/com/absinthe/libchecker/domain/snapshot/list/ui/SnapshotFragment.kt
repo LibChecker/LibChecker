@@ -265,6 +265,9 @@ class SnapshotFragment :
           }
         }
       }.launchIn(lifecycleScope)
+      comparingProgress.onEach {
+        binding.progressIndicator.setProgressCompat(it, it != 1)
+      }.launchIn(lifecycleScope)
     }
     homeViewModel.effect.onEach {
       when (it) {
@@ -302,10 +305,6 @@ class SnapshotFragment :
             viewModel.clearSnapshotDiffItems()
             flip(VF_LIST)
           }
-        }
-
-        is SnapshotViewModel.Effect.ComparingProgressChange -> {
-          binding.progressIndicator.setProgressCompat(it.progress, it.progress != 1)
         }
       }
     }.launchIn(lifecycleScope)

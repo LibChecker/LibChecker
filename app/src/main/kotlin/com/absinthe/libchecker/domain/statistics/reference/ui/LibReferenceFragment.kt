@@ -190,11 +190,14 @@ class LibReferenceFragment :
         }
         val searchResult = libReferenceViewModel.onReferenceListChanged(references)
         updateListRenderState { it.copy(highlightText = searchResult.query) }
-        refAdapter.setList(searchResult.references)
-
-        flip(VF_LIST)
-        refAdapter.setSpaceFooterView()
-        isListReady = true
+        refAdapter.setDiffNewData(searchResult.references) {
+          if (isDetached) {
+            return@setDiffNewData
+          }
+          flip(VF_LIST)
+          refAdapter.setSpaceFooterView()
+          isListReady = true
+        }
       }.launchIn(lifecycleScope)
       showSystemAppsChanges.onEach {
         applyReferenceWork(

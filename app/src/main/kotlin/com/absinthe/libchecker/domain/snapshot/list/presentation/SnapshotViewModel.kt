@@ -16,7 +16,9 @@ import com.absinthe.libchecker.domain.snapshot.sync.SnapshotPackageChangeProcess
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 const val CURRENT_SNAPSHOT = -1L
@@ -32,6 +34,8 @@ class SnapshotViewModel(
 
   private val _effect: MutableSharedFlow<Effect> = MutableSharedFlow()
   val effect = _effect.asSharedFlow()
+  private val _comparingProgress = MutableStateFlow(0)
+  val comparingProgress = _comparingProgress.asStateFlow()
 
   private var snapshotAutoCompareEnabled = true
   private var compareDiffJob: Job? = null
@@ -242,9 +246,7 @@ class SnapshotViewModel(
   }
 
   private fun changeComparingProgress(progress: Int) {
-    setEffect {
-      Effect.ComparingProgressChange(progress)
-    }
+    _comparingProgress.value = progress
   }
 
   private fun setSelectedSnapshotTimestamp(timestamp: Long) {
@@ -271,6 +273,5 @@ class SnapshotViewModel(
     ) : Effect()
 
     data class TimeStampChange(val timestamp: Long) : Effect()
-    data class ComparingProgressChange(val progress: Int) : Effect()
   }
 }

@@ -257,7 +257,15 @@ abstract class BaseDetailFragment<T : ViewBinding> :
             getRecyclerView().addItemDecoration(dividerItemDecoration)
           }
         }
+        // Prevent BRVAH from inserting the new rows before removing its state view.
+        val shouldRestoreStateView = adapter.data.isEmpty() && it.isNotEmpty() && adapter.isStateViewEnable
+        if (shouldRestoreStateView) {
+          adapter.isStateViewEnable = false
+        }
         adapter.setDiffNewData(it.toMutableList()) {
+          if (shouldRestoreStateView) {
+            adapter.isStateViewEnable = true
+          }
           afterListReadyTask?.run()
           viewModel.filterState.updateItemsCount(type, it.size)
         }
