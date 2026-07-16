@@ -16,11 +16,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
-import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.animation.doOnEnd
-import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.doOnPreDraw
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
@@ -80,9 +78,8 @@ private class AdaptiveIconLayerOverlay(
 
   private val context = activity
   private var itemSize = sourceView.width.takeIf { it > 0 } ?: 56.dp
-  private val layerGap = 8.dp
+  private val layerGap = 6.dp
   private val edgePadding = 16.dp
-  private val operatorSize = 24.dp
   private val maxBlurRadius = 24f
   private val originalBlurViewAlpha = blurView.alpha
   private var blurAnimator: ValueAnimator? = null
@@ -105,10 +102,6 @@ private class AdaptiveIconLayerOverlay(
   ).apply {
     contentDescription = context.getString(R.string.adaptive_icon_copy_full)
   }
-  private val equalsView = createOperatorView(R.drawable.ic_equal).apply {
-    alpha = 0f
-    setOnClickListener { }
-  }
   private val layerCardView = AdaptiveIconLayerCardView(
     context = context,
     icon = icon,
@@ -123,7 +116,6 @@ private class AdaptiveIconLayerOverlay(
   }
   private val layerViews = listOf(
     originalView,
-    equalsView,
     layerCardView
   )
 
@@ -154,17 +146,6 @@ private class AdaptiveIconLayerOverlay(
     }
   }
 
-  private fun createOperatorView(@DrawableRes drawableRes: Int): AppCompatImageView {
-    return AppCompatImageView(context).apply {
-      layoutParams = FrameLayout.LayoutParams(operatorSize, operatorSize)
-      scaleType = ImageView.ScaleType.CENTER_INSIDE
-      setImageDrawable(context.getDrawableCompat(drawableRes))
-      importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
-      isClickable = true
-      isFocusable = false
-    }
-  }
-
   private fun startLayerAnimation() {
     val sourcePosition = resolveSourcePosition()
     collapseX = sourcePosition.x
@@ -189,13 +170,11 @@ private class AdaptiveIconLayerOverlay(
   private fun updateLayerSize(windowWidth: Int) {
     itemSize = sourceView.width.coerceAtLeast(1)
     originalView.layoutParams = FrameLayout.LayoutParams(itemSize, itemSize)
-    equalsView.layoutParams = FrameLayout.LayoutParams(operatorSize, operatorSize)
     val maxCardWidth = (
       windowWidth -
         edgePadding * 2 -
         itemSize -
-        equalsView.layoutParams.width -
-        layerGap * 2
+        layerGap
       ).coerceAtLeast(1)
     layerCardView.fitPreviewSize(itemSize, maxCardWidth)
   }
@@ -228,7 +207,12 @@ private class AdaptiveIconLayerOverlay(
         x = nextX,
         y = resolveLayerTop(view, rowY),
         endAlpha = 1f,
-        endScale = 1f
+        endScale = 1f,
+        endAction = if (view === layerCardView) {
+          { layerCardView.animateBackgroundOutsideFade() }
+        } else {
+          null
+        }
       )
       nextX += view.width + layerGap
     }
@@ -248,9 +232,10 @@ private class AdaptiveIconLayerOverlay(
     x: Float,
     y: Float,
     endAlpha: Float,
-    endScale: Float
+    endScale: Float,
+    endAction: (() -> Unit)? = null
   ) {
-    view.animate()
+    val animator = view.animate()
       .x(x)
       .y(y)
       .alpha(endAlpha)
@@ -258,7 +243,10 @@ private class AdaptiveIconLayerOverlay(
       .scaleY(endScale)
       .setDuration(ANIMATION_DURATION_MS)
       .setInterpolator(FastOutSlowInInterpolator())
-      .start()
+    if (endAction != null) {
+      animator.withEndAction { endAction() }
+    }
+    animator.start()
   }
 
   private fun applyBlur() {
@@ -280,6 +268,7 @@ private class AdaptiveIconLayerOverlay(
     if (isClosing) return
     isClosing = true
     collapseLayers()
+    layerCardView.cancelBackgroundOutsideFade()
     blurAnimator?.cancel()
     if (!shouldHideCollapsingToolbarInsteadOfBlur() && currentBlurRadius > 0f) {
       blurAnimator = ValueAnimator.ofFloat(currentBlurRadius, 0f).apply {
@@ -412,8 +401,4 @@ half4 main(float2 coord) {
 
 private fun Drawable.copyDrawable(): Drawable {
   return constantState?.newDrawable()?.mutate() ?: mutate()
-}
-
-private fun Context.getDrawableCompat(@DrawableRes resId: Int): Drawable {
-  return requireNotNull(ContextCompat.getDrawable(this, resId)).mutate()
 }

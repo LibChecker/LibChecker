@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.domain.app.detail.ui.view
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Canvas
@@ -7,6 +8,7 @@ import android.graphics.Color
 import android.graphics.ColorFilter
 import android.graphics.DashPathEffect
 import android.graphics.Matrix
+import android.graphics.Outline
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.PixelFormat
@@ -20,19 +22,19 @@ import android.text.TextUtils
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewOutlineProvider
 import android.widget.ImageView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.animation.doOnEnd
 import androidx.core.graphics.ColorUtils
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
-import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
-import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
 import com.absinthe.libchecker.view.AViewGroup
-import com.google.android.material.card.MaterialCardView
 import kotlin.math.min
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -41,11 +43,18 @@ class AdaptiveIconLayerCardView(
   icon: AdaptiveIconDrawable,
   onBackgroundClick: () -> Unit,
   onForegroundClick: () -> Unit
-) : MaterialCardView(context) {
+) : AViewGroup(context) {
 
+  private val bubbleTailWidth = BUBBLE_TAIL_WIDTH_DP.dp
+  private val bubblePath = Path()
+  private val stitchPath = Path()
+  private val bubbleBodyBounds = RectF()
+  private val stitchBodyBounds = RectF()
+  private val bubblePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    style = Paint.Style.FILL
+    color = context.getColorByAttr(com.google.android.material.R.attr.colorSurfaceContainerHigh)
+  }
   private val stitchInset = STITCH_INSET_DP.dp.toFloat()
-  private val stitchRadius = STITCH_RADIUS_DP.dp.toFloat()
-  private val stitchBounds = RectF()
   private val stitchPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
     style = Paint.Style.STROKE
     strokeCap = Paint.Cap.ROUND
@@ -63,9 +72,12 @@ class AdaptiveIconLayerCardView(
       0f
     )
   }
+  private val maskedBackgroundDrawable = createMaskedBackgroundDrawable(icon)
+  private var backgroundOutsideFadeAnimator: ValueAnimator? = null
   private val contentView = ContentView(
     context = context,
     icon = icon,
+    maskedBackgroundDrawable = maskedBackgroundDrawable,
     onBackgroundClick = onBackgroundClick,
     onForegroundClick = onForegroundClick
   )
@@ -75,11 +87,23 @@ class AdaptiveIconLayerCardView(
       ViewGroup.LayoutParams.WRAP_CONTENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     )
-    setSmoothRoundCorner(CARD_RADIUS_DP.dp)
-    cardElevation = CARD_ELEVATION_DP.dp.toFloat()
-    setCardBackgroundColor(
-      context.getColorStateListByAttr(com.google.android.material.R.attr.colorSurfaceContainerHigh)
+    contentView.layoutParams = LayoutParams(
+      ViewGroup.LayoutParams.WRAP_CONTENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
     )
+    setWillNotDraw(false)
+    elevation = CARD_ELEVATION_DP.dp.toFloat()
+    outlineProvider = object : ViewOutlineProvider() {
+      override fun getOutline(view: View, outline: Outline) {
+        outline.setRoundRect(
+          bubbleTailWidth,
+          0,
+          view.width,
+          view.height,
+          CARD_RADIUS_DP.dp.toFloat()
+        )
+      }
+    }
     isClickable = true
     isFocusable = false
     importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
@@ -88,30 +112,110 @@ class AdaptiveIconLayerCardView(
   }
 
   fun fitPreviewSize(desiredSize: Int, maxWidth: Int) {
-    contentView.fitPreviewSize(desiredSize, maxWidth)
+    contentView.fitPreviewSize(desiredSize, (maxWidth - bubbleTailWidth).coerceAtLeast(1))
+  }
+
+  fun animateBackgroundOutsideFade() {
+    backgroundOutsideFadeAnimator?.cancel()
+    maskedBackgroundDrawable.outsideAlpha = FULL_ALPHA
+    backgroundOutsideFadeAnimator = ValueAnimator.ofInt(FULL_ALPHA, BACKGROUND_OUTSIDE_ALPHA).apply {
+      duration = BACKGROUND_OUTSIDE_FADE_DURATION_MS
+      interpolator = FastOutSlowInInterpolator()
+      addUpdateListener {
+        maskedBackgroundDrawable.outsideAlpha = it.animatedValue as Int
+      }
+      doOnEnd {
+        backgroundOutsideFadeAnimator = null
+      }
+      start()
+    }
+  }
+
+  fun cancelBackgroundOutsideFade() {
+    backgroundOutsideFadeAnimator?.cancel()
+    backgroundOutsideFadeAnimator = null
   }
 
   internal val previewCenterOffset: Int
     get() = contentView.top + contentView.previewCenterOffset
 
+  override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+    super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+    contentView.autoMeasure()
+    setMeasuredDimension(
+      bubbleTailWidth + contentView.measuredWidth,
+      contentView.measuredHeight
+    )
+  }
+
+  override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+    contentView.layout(bubbleTailWidth, 0)
+    updateBubblePaths()
+  }
+
+  override fun onDraw(canvas: Canvas) {
+    canvas.drawPath(bubblePath, bubblePaint)
+  }
+
   override fun dispatchDraw(canvas: Canvas) {
     super.dispatchDraw(canvas)
-    val inset = stitchInset + stitchPaint.strokeWidth / 2f
-    stitchBounds.set(inset, inset, width - inset, height - inset)
-    canvas.drawRoundRect(stitchBounds, stitchRadius, stitchRadius, stitchPaint)
+    canvas.drawPath(stitchPath, stitchPaint)
+  }
+
+  override fun onDetachedFromWindow() {
+    cancelBackgroundOutsideFade()
+    super.onDetachedFromWindow()
+  }
+
+  private fun updateBubblePaths() {
+    if (width <= bubbleTailWidth || height <= 0) return
+    val tailCenterY = previewCenterOffset.toFloat()
+    bubbleBodyBounds.set(bubbleTailWidth.toFloat(), 0f, width.toFloat(), height.toFloat())
+    bubblePath.setLayerBubble(
+      bodyBounds = bubbleBodyBounds,
+      tipX = 0f,
+      tailCenterY = tailCenterY,
+      tailTopHeight = BUBBLE_TAIL_TOP_HEIGHT_DP.dp.toFloat(),
+      tailBottomHeight = BUBBLE_TAIL_BOTTOM_HEIGHT_DP.dp.toFloat(),
+      radius = CARD_RADIUS_DP.dp.toFloat()
+    )
+
+    val stitchInsetWithStroke = stitchInset + stitchPaint.strokeWidth / 2f
+    val stitchTail = calculateInsetTailPlacement(
+      bodyLeft = bubbleTailWidth.toFloat(),
+      tipX = 0f,
+      centerY = tailCenterY,
+      topHeight = BUBBLE_TAIL_TOP_HEIGHT_DP.dp.toFloat(),
+      bottomHeight = BUBBLE_TAIL_BOTTOM_HEIGHT_DP.dp.toFloat(),
+      inset = stitchInsetWithStroke,
+      verticalOffset = STITCH_TAIL_Y_OFFSET_DP.dp.toFloat()
+    )
+    stitchBodyBounds.set(
+      stitchTail.bodyLeft,
+      stitchInsetWithStroke,
+      width - stitchInsetWithStroke,
+      height - stitchInsetWithStroke
+    )
+    stitchPath.setLayerBubble(
+      bodyBounds = stitchBodyBounds,
+      tipX = stitchTail.tipX,
+      tailCenterY = stitchTail.centerY,
+      tailTopHeight = stitchTail.topHeight,
+      tailBottomHeight = stitchTail.bottomHeight,
+      radius = STITCH_RADIUS_DP.dp.toFloat()
+    )
   }
 
   private class ContentView(
     context: Context,
     icon: AdaptiveIconDrawable,
+    maskedBackgroundDrawable: MaskedBackgroundDrawable,
     onBackgroundClick: () -> Unit,
     onForegroundClick: () -> Unit
   ) : AViewGroup(context) {
 
     private val contentPadding = CONTENT_PADDING_DP.dp
-    private val backgroundToPlusGap = BACKGROUND_TO_PLUS_GAP_DP.dp
-    private val plusToForegroundGap = PLUS_TO_FOREGROUND_GAP_DP.dp
-    private val plusSize = PLUS_SIZE_DP.dp
+    private val layerGap = LAYER_GAP_DP.dp
     private var previewSize = DEFAULT_PREVIEW_SIZE_DP.dp
 
     val previewCenterOffset: Int
@@ -119,19 +223,11 @@ class AdaptiveIconLayerCardView(
 
     private val backgroundView = LayerPreviewView(
       context = context,
-      drawable = createMaskedBackgroundDrawable(icon),
+      drawable = maskedBackgroundDrawable,
       label = context.getString(R.string.adaptive_icon_layer_background),
       actionDescription = context.getString(R.string.adaptive_icon_copy_background),
       onClick = onBackgroundClick
     )
-    private val plusView = AppCompatImageView(context).apply {
-      layoutParams = LayoutParams(plusSize, plusSize)
-      scaleType = ImageView.ScaleType.CENTER_INSIDE
-      setImageResource(R.drawable.ic_add)
-      importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
-      isClickable = false
-      isFocusable = false
-    }
     private val foregroundView = LayerPreviewView(
       context = context,
       drawable = icon.foreground.copyDrawable(),
@@ -143,14 +239,12 @@ class AdaptiveIconLayerCardView(
     init {
       setPadding(contentPadding, contentPadding, contentPadding, contentPadding)
       addView(backgroundView)
-      addView(plusView)
       addView(foregroundView)
       updatePreviewSize(previewSize)
     }
 
     fun fitPreviewSize(desiredSize: Int, maxWidth: Int) {
-      val fixedWidth =
-        paddingStart + paddingEnd + plusSize + backgroundToPlusGap + plusToForegroundGap
+      val fixedWidth = paddingStart + paddingEnd + layerGap
       val availablePreviewWidth = ((maxWidth - fixedWidth) / 2).coerceAtLeast(MIN_PREVIEW_SIZE_DP.dp)
       updatePreviewSize(min(desiredSize, availablePreviewWidth))
     }
@@ -165,29 +259,22 @@ class AdaptiveIconLayerCardView(
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
       super.onMeasure(widthMeasureSpec, heightMeasureSpec)
       backgroundView.autoMeasure()
-      plusView.autoMeasure()
       foregroundView.autoMeasure()
       setMeasuredDimension(
         paddingStart +
           backgroundView.measuredWidth +
-          backgroundToPlusGap +
-          plusView.measuredWidth +
-          plusToForegroundGap +
+          layerGap +
           foregroundView.measuredWidth +
           paddingEnd,
         paddingTop +
-          maxOf(backgroundView.measuredHeight, plusView.measuredHeight, foregroundView.measuredHeight) +
+          maxOf(backgroundView.measuredHeight, foregroundView.measuredHeight) +
           paddingBottom
       )
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
       backgroundView.layout(paddingStart, paddingTop)
-      plusView.layout(
-        backgroundView.right + backgroundToPlusGap,
-        previewCenterOffset - plusView.measuredHeight / 2
-      )
-      foregroundView.layout(plusView.right + plusToForegroundGap, paddingTop)
+      foregroundView.layout(backgroundView.right + layerGap, paddingTop)
     }
   }
 
@@ -259,11 +346,11 @@ class AdaptiveIconLayerCardView(
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-private fun createMaskedBackgroundDrawable(icon: AdaptiveIconDrawable): Drawable {
+private fun createMaskedBackgroundDrawable(icon: AdaptiveIconDrawable): MaskedBackgroundDrawable {
   return MaskedBackgroundDrawable(
     background = icon.background.copyDrawable(),
     mask = Path(icon.iconMask),
-    outsideAlpha = BACKGROUND_OUTSIDE_ALPHA
+    initialOutsideAlpha = FULL_ALPHA
   )
 }
 
@@ -271,18 +358,25 @@ private fun createMaskedBackgroundDrawable(icon: AdaptiveIconDrawable): Drawable
 private class MaskedBackgroundDrawable(
   private val background: Drawable,
   private val mask: Path,
-  private val outsideAlpha: Int
+  initialOutsideAlpha: Int
 ) : Drawable() {
 
   private val targetBounds = RectF()
   private val matrix = Matrix()
   private val transformedMask = Path()
   private var drawableAlpha = 255
+  var outsideAlpha = initialOutsideAlpha
+    set(value) {
+      val constrainedValue = value.coerceIn(0, FULL_ALPHA)
+      if (field == constrainedValue) return
+      field = constrainedValue
+      invalidateSelf()
+    }
 
   override fun draw(canvas: Canvas) {
     background.bounds = bounds
+    background.alpha = drawableAlpha
     if (bounds.width() <= 0 || bounds.height() <= 0 || mask.isEmpty) {
-      background.alpha = drawableAlpha
       background.draw(canvas)
       return
     }
@@ -293,9 +387,8 @@ private class MaskedBackgroundDrawable(
     transformedMask.reset()
     mask.transform(matrix, transformedMask)
 
-    val outsideSaveCount = canvas.save()
+    val outsideSaveCount = canvas.saveLayerAlpha(targetBounds, outsideAlpha)
     canvas.clipOutPath(transformedMask)
-    background.alpha = drawableAlpha * outsideAlpha / 255
     background.draw(canvas)
     canvas.restoreToCount(outsideSaveCount)
 
@@ -351,9 +444,86 @@ private fun Drawable.copyDrawable(): Drawable {
   return constantState?.newDrawable()?.mutate() ?: mutate()
 }
 
+internal data class LayerBubbleTailPlacement(
+  val bodyLeft: Float,
+  val tipX: Float,
+  val centerY: Float,
+  val topHeight: Float,
+  val bottomHeight: Float
+)
+
+internal fun calculateInsetTailPlacement(
+  bodyLeft: Float,
+  tipX: Float,
+  centerY: Float,
+  topHeight: Float,
+  bottomHeight: Float,
+  inset: Float,
+  verticalOffset: Float
+): LayerBubbleTailPlacement {
+  return LayerBubbleTailPlacement(
+    bodyLeft = bodyLeft + inset,
+    tipX = tipX + inset,
+    centerY = centerY + verticalOffset,
+    topHeight = topHeight,
+    bottomHeight = bottomHeight
+  )
+}
+
+private fun Path.setLayerBubble(
+  bodyBounds: RectF,
+  tipX: Float,
+  tailCenterY: Float,
+  tailTopHeight: Float,
+  tailBottomHeight: Float,
+  radius: Float
+) {
+  reset()
+  val cornerRadius = min(radius, min(bodyBounds.width(), bodyBounds.height()) / 2f)
+  val tailWidth = bodyBounds.left - tipX
+  val tailShoulderTop = tailCenterY - tailTopHeight
+  val tailShoulderBottom = tailCenterY + tailBottomHeight
+  val tailArcRadiusX = tailWidth / (1f - TELEGRAM_TAIL_ARC_COS)
+  val tailArcRadiusY = tailTopHeight / TELEGRAM_TAIL_ARC_SIN
+  val tailArcCenterY = tailShoulderTop
+  val tailArcBounds = RectF(
+    bodyBounds.left - tailArcRadiusX * 2f,
+    tailArcCenterY - tailArcRadiusY,
+    bodyBounds.left,
+    tailArcCenterY + tailArcRadiusY
+  )
+
+  moveTo(bodyBounds.left + cornerRadius, bodyBounds.top)
+  lineTo(bodyBounds.right - cornerRadius, bodyBounds.top)
+  quadTo(bodyBounds.right, bodyBounds.top, bodyBounds.right, bodyBounds.top + cornerRadius)
+  lineTo(bodyBounds.right, bodyBounds.bottom - cornerRadius)
+  quadTo(bodyBounds.right, bodyBounds.bottom, bodyBounds.right - cornerRadius, bodyBounds.bottom)
+  lineTo(bodyBounds.left + cornerRadius, bodyBounds.bottom)
+  quadTo(bodyBounds.left, bodyBounds.bottom, bodyBounds.left, bodyBounds.bottom - cornerRadius)
+  lineTo(bodyBounds.left, tailShoulderBottom)
+  cubicTo(
+    bodyBounds.left,
+    tailCenterY + tailBottomHeight * 0.72f,
+    tipX + tailWidth * 0.32f,
+    tailCenterY + tailBottomHeight * 0.52f,
+    tipX,
+    tailCenterY
+  )
+  arcTo(tailArcBounds, TELEGRAM_TAIL_ARC_SWEEP_DEGREES, -TELEGRAM_TAIL_ARC_SWEEP_DEGREES, false)
+  lineTo(bodyBounds.left, bodyBounds.top + cornerRadius)
+  quadTo(bodyBounds.left, bodyBounds.top, bodyBounds.left + cornerRadius, bodyBounds.top)
+  close()
+}
+
 private val ADAPTIVE_ICON_MASK_VIEWPORT = RectF(0f, 0f, 100f, 100f)
 private const val CARD_RADIUS_DP = 14
 private const val CARD_ELEVATION_DP = 2
+private const val BUBBLE_TAIL_WIDTH_DP = 18
+private const val BUBBLE_TAIL_TOP_HEIGHT_DP = 6
+private const val BUBBLE_TAIL_BOTTOM_HEIGHT_DP = 17
+private const val TELEGRAM_TAIL_ARC_SWEEP_DEGREES = 83f
+private const val TELEGRAM_TAIL_ARC_COS = 0.12186934f
+private const val TELEGRAM_TAIL_ARC_SIN = 0.99254614f
 private const val CONTENT_PADDING_DP = 14
 private const val STITCH_INSET_DP = 5
 private const val STITCH_RADIUS_DP = 9
@@ -361,13 +531,12 @@ private const val STITCH_STROKE_WIDTH_DP = 1
 private const val STITCH_DASH_LENGTH_DP = 4
 private const val STITCH_DASH_GAP_DP = 4
 private const val STITCH_ALPHA = 0xB3
-
-// Foreground layers already include a safe-zone inset, so their geometric gap can stay smaller.
-private const val BACKGROUND_TO_PLUS_GAP_DP = 20
-private const val PLUS_TO_FOREGROUND_GAP_DP = 0
-private const val PLUS_SIZE_DP = 24
+private const val STITCH_TAIL_Y_OFFSET_DP = 2
+private const val LAYER_GAP_DP = 20
 private const val DEFAULT_PREVIEW_SIZE_DP = 60
 private const val MIN_PREVIEW_SIZE_DP = 44
+private const val FULL_ALPHA = 0xFF
 private const val BACKGROUND_OUTSIDE_ALPHA = 0x1A
+private const val BACKGROUND_OUTSIDE_FADE_DURATION_MS = 220L
 private const val LABEL_GAP_DP = 2
 private const val PREVIEW_RADIUS_DP = 12
