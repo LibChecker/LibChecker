@@ -368,6 +368,6 @@ private const val PLUS_TO_FOREGROUND_GAP_DP = 0
 private const val PLUS_SIZE_DP = 24
 private const val DEFAULT_PREVIEW_SIZE_DP = 60
 private const val MIN_PREVIEW_SIZE_DP = 44
-private const val BACKGROUND_OUTSIDE_ALPHA = 0x33
+private const val BACKGROUND_OUTSIDE_ALPHA = 0x1A
 private const val LABEL_GAP_DP = 2
 private const val PREVIEW_RADIUS_DP = 12
