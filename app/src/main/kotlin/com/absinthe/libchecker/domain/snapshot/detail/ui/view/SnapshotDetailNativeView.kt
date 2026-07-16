@@ -10,11 +10,15 @@ import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.graphics.drawable.toDrawable
 import androidx.core.graphics.toColorInt
 import androidx.core.view.children
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailItemCardRenderState
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailRuleChipIconStyle
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailRuleChipRenderState
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
@@ -22,13 +26,12 @@ import com.absinthe.libchecker.utils.extensions.toColorStateList
 import com.absinthe.libchecker.utils.extensions.visibleHeight
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libraries.utils.utils.UiUtils
-import com.absinthe.rulesbundle.Rule
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
 
 class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
 
-  val container = SnapshotDetailNativeContainerView(context).apply {
+  private val container = SnapshotDetailNativeContainerView(context).apply {
     layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
   }
 
@@ -38,6 +41,15 @@ class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
     }
     setSmoothRoundCorner(16.dp)
     addView(container)
+  }
+
+  fun render(state: SnapshotDetailItemCardRenderState) {
+    contentDescription = state.contentDescription
+    container.render(state)
+  }
+
+  fun setChipOnClickListener(listener: OnClickListener?) {
+    container.setChipOnClickListener(listener)
   }
 
   class SnapshotDetailNativeContainerView(context: Context) : AViewGroup(context) {
@@ -93,8 +105,16 @@ class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
       chip?.setOnClickListener(listener)
     }
 
-    fun setChip(rule: Rule?, color: Int, colorfulIcon: Boolean) {
-      if (rule == null) {
+    fun render(state: SnapshotDetailItemCardRenderState) {
+      name.text = state.title
+      libSize.text = state.extra
+      typeIcon.setImageResource(state.iconRes)
+      background = state.backgroundColor.toDrawable()
+      setChip(state.ruleChip)
+    }
+
+    fun setChip(ruleChip: SnapshotDetailRuleChipRenderState?) {
+      if (ruleChip == null) {
         if (chip != null) {
           removeView(chip)
           chip = null
@@ -115,21 +135,27 @@ class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
             chip = this
           }
           ).apply {
-          setChipIconResource(rule.iconRes)
-          text = rule.label
-          chipBackgroundColor = ColorStateList.valueOf(color)
+          setChipIconResource(ruleChip.iconRes)
+          text = ruleChip.label
+          chipBackgroundColor = ColorStateList.valueOf(ruleChip.backgroundColor)
 
-          if (!colorfulIcon && !rule.isSimpleColorIcon) {
-            val icon = chipIcon
-            icon?.let {
-              it.mutate().colorFilter =
-                ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
-              chipIcon = it
+          when (ruleChip.iconStyle) {
+            SnapshotDetailRuleChipIconStyle.Desaturated -> {
+              val icon = chipIcon
+              icon?.let {
+                it.mutate().colorFilter =
+                  ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
+                chipIcon = it
+              }
             }
-          } else if (rule.isSimpleColorIcon) {
-            chipIcon?.mutate()?.setTint(Color.BLACK)
-          } else {
-            setChipIconResource(rule.iconRes)
+
+            SnapshotDetailRuleChipIconStyle.BlackTint -> {
+              chipIcon?.mutate()?.setTint(Color.BLACK)
+            }
+
+            SnapshotDetailRuleChipIconStyle.Original -> {
+              setChipIconResource(ruleChip.iconRes)
+            }
           }
         }
       }

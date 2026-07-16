@@ -6,18 +6,22 @@ import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.text.buildSpannedString
+import androidx.core.text.italic
 import androidx.core.view.children
 import androidx.core.view.marginLeft
 import androidx.core.view.marginRight
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.statistics.reference.model.MultipleAppsIconItemDisplay
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
+import com.absinthe.libchecker.utils.extensions.tintHighlightText
 import com.absinthe.libchecker.view.AViewGroup
 
 class MultipleAppsIconItemView(context: Context) : FrameLayout(context) {
 
-  val container = MultipleAppsIconItemContainerView(context).apply {
+  private val container = MultipleAppsIconItemContainerView(context).apply {
     val padding = context.getDimensionPixelSize(R.dimen.main_card_padding)
     setPadding(padding, padding, padding, padding)
     setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackground))
@@ -27,14 +31,22 @@ class MultipleAppsIconItemView(context: Context) : FrameLayout(context) {
     addView(container)
   }
 
+  fun bind(
+    display: MultipleAppsIconItemDisplay,
+    highlightText: String
+  ) {
+    container.bind(display, highlightText)
+    contentDescription = display.contentDescription
+  }
+
   class MultipleAppsIconItemContainerView(context: Context) : AViewGroup(context) {
 
-    val icon = MultipleAppsIconView(context).apply {
+    private val icon = MultipleAppsIconView(context).apply {
       val iconSize = context.getDimensionPixelSize(R.dimen.lib_reference_icon_size)
       layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
     }
 
-    val labelName = AppCompatTextView(
+    private val labelName = AppCompatTextView(
       ContextThemeWrapper(
         context,
         R.style.TextView_SansSerifMedium
@@ -51,7 +63,7 @@ class MultipleAppsIconItemView(context: Context) : FrameLayout(context) {
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
     }
 
-    val libName =
+    private val libName =
       AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
         layoutParams = LayoutParams(
           ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -64,7 +76,7 @@ class MultipleAppsIconItemView(context: Context) : FrameLayout(context) {
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
       }
 
-    val count =
+    private val count =
       AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
         layoutParams = ViewGroup.LayoutParams(
           ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -78,6 +90,22 @@ class MultipleAppsIconItemView(context: Context) : FrameLayout(context) {
       addView(labelName)
       addView(libName)
       addView(count)
+    }
+
+    fun bind(
+      display: MultipleAppsIconItemDisplay,
+      highlightText: String
+    ) {
+      icon.setIcons(display.iconPackages)
+      labelName.text = buildSpannedString {
+        italic { append(display.label) }
+      }
+      if (highlightText.isNotBlank()) {
+        libName.tintHighlightText(highlightText, display.libName)
+      } else {
+        libName.text = display.libName
+      }
+      count.text = display.count
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

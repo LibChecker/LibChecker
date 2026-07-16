@@ -3,6 +3,8 @@ package com.absinthe.libchecker.domain.statistics.reference.ui.adapter
 import com.absinthe.libchecker.annotation.PACKAGE
 import com.absinthe.libchecker.annotation.SHARED_UID
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReference
+import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceAction
+import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceListRenderState
 import com.absinthe.libchecker.domain.statistics.reference.ui.adapter.provider.LIB_REFERENCE_PROVIDER
 import com.absinthe.libchecker.domain.statistics.reference.ui.adapter.provider.LibReferenceProvider
 import com.absinthe.libchecker.domain.statistics.reference.ui.adapter.provider.MULTIPLE_APPS_ICON_PROVIDER
@@ -11,32 +13,23 @@ import com.chad.library.adapter.base.BaseNodeAdapter
 import com.chad.library.adapter.base.entity.node.BaseNode
 
 class LibReferenceAdapter(
-  initialColorfulRuleIcon: Boolean = true,
-  private val onDetailIconClick: (LibReference) -> Unit
+  private val onAction: (LibReferenceAction) -> Unit
 ) : BaseNodeAdapter(RefListDiffUtil()) {
 
-  var highlightText: String = ""
-  var colorfulRuleIcon: Boolean = initialColorfulRuleIcon
-    private set
+  private var renderState = LibReferenceListRenderState()
 
   init {
     addNodeProvider(
       LibReferenceProvider(
-        colorfulRuleIcon = { colorfulRuleIcon },
-        highlightText = { highlightText },
-        onDetailIconClick = onDetailIconClick
+        renderState = { renderState },
+        onAction = onAction
       )
     )
-    addNodeProvider(MultipleAppsIconProvider(highlightText = { highlightText }))
+    addNodeProvider(MultipleAppsIconProvider(renderState = { renderState }))
   }
 
-  fun updateColorfulRuleIcon(enabled: Boolean) {
-    if (colorfulRuleIcon == enabled) {
-      return
-    }
-    colorfulRuleIcon = enabled
-    // noinspection NotifyDataSetChanged
-    notifyDataSetChanged()
+  fun bind(state: LibReferenceListRenderState) {
+    renderState = state
   }
 
   override fun getItemType(data: List<BaseNode>, position: Int): Int {

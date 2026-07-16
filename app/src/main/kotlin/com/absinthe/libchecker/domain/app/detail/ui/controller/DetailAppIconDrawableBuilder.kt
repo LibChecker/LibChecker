@@ -5,7 +5,7 @@ import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.absinthe.libchecker.domain.app.AppIconItem
+import com.absinthe.libchecker.domain.app.detail.model.AppIconItem
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr

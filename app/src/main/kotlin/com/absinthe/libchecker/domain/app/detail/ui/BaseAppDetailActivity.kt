@@ -10,9 +10,6 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
-import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
-import com.absinthe.libchecker.domain.app.AppListSettingsRepository
-import com.absinthe.libchecker.domain.app.VersionedFeature
 import com.absinthe.libchecker.domain.app.detail.content.BuildAppDetailContentInitPlanUseCase
 import com.absinthe.libchecker.domain.app.detail.content.BuildAppDetailTabTypesUseCase
 import com.absinthe.libchecker.domain.app.detail.model.DetailExtraBean
@@ -21,15 +18,14 @@ import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
 import com.absinthe.libchecker.domain.app.detail.ui.DetailAbiLabelBinder
 import com.absinthe.libchecker.domain.app.detail.ui.DetailFeatureListController
 import com.absinthe.libchecker.domain.app.detail.ui.DetailFragmentManager
-import com.absinthe.libchecker.domain.app.detail.ui.DetailHeaderExtraInfoBinder
-import com.absinthe.libchecker.domain.app.detail.ui.DetailHeaderTitleBinder
+import com.absinthe.libchecker.domain.app.detail.ui.DetailHeaderBinder
 import com.absinthe.libchecker.domain.app.detail.ui.DetailMenuController
 import com.absinthe.libchecker.domain.app.detail.ui.DetailProcessBarController
 import com.absinthe.libchecker.domain.app.detail.ui.DetailTabSpecBuilder
 import com.absinthe.libchecker.domain.app.detail.ui.DetailToolbarController
 import com.absinthe.libchecker.domain.app.detail.ui.IDetailContainer
 import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailAppIconDrawableBuilder
-import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailFeatureItemBuilder
+import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailFeatureController
 import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailHeaderController
 import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailListInteractionController
 import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailPackageComparisonController
@@ -37,6 +33,9 @@ import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailPackageCont
 import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailStateObserverController
 import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailTabController
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.AppInfoBottomSheetDialogFragment
+import com.absinthe.libchecker.domain.app.model.VersionedFeature
+import com.absinthe.libchecker.domain.app.repository.AppDetailSettingsRepository
+import com.absinthe.libchecker.domain.app.repository.AppListSettingsRepository
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.utils.extensions.addBackStateHandler
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
@@ -75,8 +74,8 @@ abstract class BaseAppDetailActivity :
   private val appIconDrawableBuilder by unsafeLazy {
     DetailAppIconDrawableBuilder(this)
   }
-  private val featureItemBuilder by unsafeLazy {
-    DetailFeatureItemBuilder(
+  private val featureController by unsafeLazy {
+    DetailFeatureController(
       activity = this,
       viewModel = viewModel,
       packageInfo = { viewModel.packageInfo },
@@ -87,7 +86,10 @@ abstract class BaseAppDetailActivity :
     )
   }
   private val featureListController by unsafeLazy {
-    DetailFeatureListController(binding.headerContentLayout)
+    DetailFeatureListController(
+      headerContentLayout = binding.headerContentLayout,
+      onItemClick = featureController::onItemClick
+    )
   }
   private val processBarController by unsafeLazy {
     DetailProcessBarController(
@@ -106,15 +108,12 @@ abstract class BaseAppDetailActivity :
       tintAbiLabels = { isDisplayOptionEnabled(AdvancedOptions.TINT_ABI_LABEL) }
     )
   }
-  private val headerTitleBinder by unsafeLazy {
-    DetailHeaderTitleBinder(
+  private val headerBinder by unsafeLazy {
+    DetailHeaderBinder(
       detailsTitleView = binding.detailsTitle,
       blurView = binding.collapsingToolbar,
       onAppInfoClick = ::showAppInfoDialog
     )
-  }
-  private val headerExtraInfoBinder by unsafeLazy {
-    DetailHeaderExtraInfoBinder(binding.detailsTitle)
   }
   private val headerController by unsafeLazy {
     DetailHeaderController(
@@ -122,8 +121,7 @@ abstract class BaseAppDetailActivity :
       supportActionBar = { supportActionBar },
       collapsingToolbar = binding.collapsingToolbar,
       headerLayout = binding.headerLayout,
-      headerTitleBinder = headerTitleBinder,
-      headerExtraInfoBinder = headerExtraInfoBinder,
+      headerBinder = headerBinder,
       viewModel = viewModel,
       coroutineScope = lifecycleScope,
       isDisplayOptionEnabled = ::isDisplayOptionEnabled,
@@ -236,6 +234,7 @@ abstract class BaseAppDetailActivity :
   override fun onDestroy() {
     tabController.reset()
     toolbarController.release()
+    headerController.release()
     super.onDestroy()
   }
 
@@ -256,7 +255,8 @@ abstract class BaseAppDetailActivity :
       packageInfo = packageInfo,
       extraBean = extraBean,
       isHarmonyMode = isHarmonyMode,
-      apkAnalyticsMode = apkAnalyticsMode
+      apkAnalyticsMode = apkAnalyticsMode,
+      renderId = uiGeneration
     ) ?: return
     val packageName = headerResult.packageName
 
@@ -298,7 +298,7 @@ abstract class BaseAppDetailActivity :
   }
 
   private fun addFeatureItem(feature: VersionedFeature) {
-    val featureItem = featureItemBuilder.build(feature, featureListController.itemCount) ?: return
+    val featureItem = featureController.build(feature, featureListController.itemCount) ?: return
     featureListController.addItem(featureItem)
   }
 

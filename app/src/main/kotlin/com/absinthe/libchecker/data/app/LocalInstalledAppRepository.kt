@@ -3,10 +3,10 @@ package com.absinthe.libchecker.data.app
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import androidx.lifecycle.LifecycleOwner
-import com.absinthe.libchecker.domain.app.AppInstallSource
-import com.absinthe.libchecker.domain.app.InstalledAppRepository
-import com.absinthe.libchecker.domain.app.PackageChangeState
 import com.absinthe.libchecker.domain.app.list.model.InstalledPackageState
+import com.absinthe.libchecker.domain.app.model.AppInstallSource
+import com.absinthe.libchecker.domain.app.model.PackageChangeState
+import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.FreezeUtils
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils

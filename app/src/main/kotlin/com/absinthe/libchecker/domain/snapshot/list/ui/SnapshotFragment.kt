@@ -29,19 +29,21 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
-import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
+import com.absinthe.libchecker.domain.app.list.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
 import com.absinthe.libchecker.domain.home.ui.INavViewContainer
 import com.absinthe.libchecker.domain.snapshot.album.ui.AlbumActivity
 import com.absinthe.libchecker.domain.snapshot.detail.ui.EXTRA_ENTITY
 import com.absinthe.libchecker.domain.snapshot.detail.ui.SnapshotDetailActivity
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotEmptyView
-import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotAbiDisplayDataUseCase
-import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotCapturePlan
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotDashboardAction
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotSystemPropDisplayData
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
 import com.absinthe.libchecker.domain.snapshot.list.ui.adapter.SnapshotAdapter
 import com.absinthe.libchecker.domain.snapshot.list.ui.view.SnapshotDashboardView
+import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotDashboardDisplayDataUseCase
+import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.timenode.ui.TimeNodeBottomSheetDialogFragment
 import com.absinthe.libchecker.services.OnShootListener
@@ -81,10 +83,10 @@ class SnapshotFragment :
 
   private val viewModel: SnapshotViewModel by activityViewModel()
   private val getRandomAppIcon: GetRandomAppIconUseCase by inject()
-  private val buildSnapshotAbiDisplayData: BuildSnapshotAbiDisplayDataUseCase by inject()
-  private val buildSnapshotUpdateTimeDisplayData: BuildSnapshotUpdateTimeDisplayDataUseCase by inject()
+  private val buildSnapshotItemDisplayData: BuildSnapshotItemDisplayDataUseCase by inject()
+  private val buildSnapshotDashboardDisplayData: BuildSnapshotDashboardDisplayDataUseCase by inject()
   private val adapter by lazy(LazyThreadSafetyMode.NONE) {
-    SnapshotAdapter(buildSnapshotAbiDisplayData, buildSnapshotUpdateTimeDisplayData)
+    SnapshotAdapter(buildSnapshotItemDisplayData)
   }
   private val particleItemAnimator = ParticleRemoveItemAnimator()
 
@@ -126,38 +128,51 @@ class SnapshotFragment :
         }
       }
 
-    dashboard.setOnClickListener {
-      startActivity(Intent(context, AlbumActivity::class.java))
-    }
-
-    dashboard.apply {
-      fun changeTimeNode() {
-        lifecycleScope.launch(Dispatchers.IO) {
-          val timeStampList = viewModel.getTimeStamps()
-          withContext(Dispatchers.Main) {
-            TimeNodeBottomSheetDialogFragment.newInstance(ArrayList(timeStampList))
-              .apply {
-                setOnItemClickListener { position ->
-                  val item = timeStampList[position]
-                  viewModel.refreshSnapshotTimestamp(item.timestamp, shouldClearDiff = true)
-                  flip(VF_LOADING)
-                  dismiss()
-                }
+    var dashboardTimestampText: CharSequence = ""
+    var dashboardAppsCountText: CharSequence = ""
+    var dashboardSystemProps: List<SnapshotSystemPropDisplayData> = emptyList()
+    fun changeTimeNode() {
+      lifecycleScope.launch(Dispatchers.IO) {
+        val timeStampList = viewModel.getTimeStamps()
+        withContext(Dispatchers.Main) {
+          TimeNodeBottomSheetDialogFragment.newInstance(ArrayList(timeStampList))
+            .apply {
+              setOnItemClickListener { position ->
+                val item = timeStampList[position]
+                viewModel.refreshSnapshotTimestamp(item.timestamp, shouldClearDiff = true)
+                flip(VF_LOADING)
+                dismiss()
               }
-              .show(
-                context.supportFragmentManager,
-                TimeNodeBottomSheetDialogFragment::class.java.name
-              )
-          }
+            }
+            .show(
+              context.supportFragmentManager,
+              TimeNodeBottomSheetDialogFragment::class.java.name
+            )
         }
-      }
-      setOnTimestampClickListener {
-        if (AntiShakeUtils.isInvalidClick(it)) {
-          return@setOnTimestampClickListener
-        }
-        changeTimeNode()
       }
     }
+    fun handleDashboardAction(action: SnapshotDashboardAction) {
+      when (action) {
+        SnapshotDashboardAction.OpenAlbum -> {
+          startActivity(Intent(context, AlbumActivity::class.java))
+        }
+
+        SnapshotDashboardAction.ChangeTimestamp -> changeTimeNode()
+      }
+    }
+    fun renderDashboard() {
+      dashboard.bind(
+        data = buildSnapshotDashboardDisplayData(
+          BuildSnapshotDashboardDisplayDataUseCase.Request(
+            timestampText = dashboardTimestampText,
+            appsCountText = dashboardAppsCountText,
+            systemProps = dashboardSystemProps
+          )
+        ),
+        onAction = ::handleDashboardAction
+      )
+    }
+    renderDashboard()
 
     val emptyView = SnapshotEmptyView(context).apply {
       layoutParams = FrameLayout.LayoutParams(
@@ -250,6 +265,9 @@ class SnapshotFragment :
           }
         }
       }.launchIn(lifecycleScope)
+      comparingProgress.onEach {
+        binding.progressIndicator.setProgressCompat(it, it != 1)
+      }.launchIn(lifecycleScope)
     }
     homeViewModel.effect.onEach {
       when (it) {
@@ -265,23 +283,28 @@ class SnapshotFragment :
     viewModel.effect.onEach {
       when (it) {
         is SnapshotViewModel.Effect.DashboardCountChange -> {
-          dashboard.setAppsCount(it.snapshotCount, it.appCount)
+          dashboardAppsCountText = buildSnapshotDashboardDisplayData.formatAppsCount(
+            snapshotCount = it.snapshotCount,
+            appCount = it.appCount
+          )
+          renderDashboard()
         }
 
         is SnapshotViewModel.Effect.TimeStampChange -> {
           if (it.timestamp != 0L) {
-            dashboard.setTimestampText(viewModel.getFormatDateString(it.timestamp))
-            updateSystemProps(dashboard, it.timestamp)
+            dashboardTimestampText = viewModel.getFormatDateString(it.timestamp)
+            renderDashboard()
+            updateSystemProps(it.timestamp) { props ->
+              dashboardSystemProps = props
+              renderDashboard()
+            }
           } else {
-            dashboard.setNoSnapshotTimestamp()
-            dashboard.setSystemProps(emptyList())
+            dashboardTimestampText = buildSnapshotDashboardDisplayData.noSnapshotTimestampText()
+            dashboardSystemProps = emptyList()
+            renderDashboard()
             viewModel.clearSnapshotDiffItems()
             flip(VF_LIST)
           }
-        }
-
-        is SnapshotViewModel.Effect.ComparingProgressChange -> {
-          binding.progressIndicator.setProgressCompat(it.progress, it.progress != 1)
         }
       }
     }.launchIn(lifecycleScope)
@@ -530,7 +553,6 @@ class SnapshotFragment :
   override fun onQueryTextChange(newText: String?): Boolean {
     val keyword = newText.orEmpty()
     if (viewModel.updateSnapshotSearchKeyword(keyword)) {
-      adapter.highlightText = keyword
       updateItems(highlightRefresh = true)
     }
     return false
@@ -543,9 +565,7 @@ class SnapshotFragment :
     )
     particleItemAnimator.prepareParticleRemovals(updatePlan.particleRemovalItemIds)
 
-    adapter.setPackageIconSources(updatePlan.packageIconSources)
-    adapter.setApexPackageNames(updatePlan.apexPackageNames)
-    adapter.setDisplayOptions(updatePlan.displayOptions)
+    adapter.bind(updatePlan.renderState)
     adapter.setDiffNewData(updatePlan.items.toMutableList()) {
       if (isDetached) {
         return@setDiffNewData
@@ -561,11 +581,14 @@ class SnapshotFragment :
     }
   }
 
-  private fun updateSystemProps(dashboard: SnapshotDashboardView, timestamp: Long) {
+  private fun updateSystemProps(
+    timestamp: Long,
+    onSystemPropsReady: (List<SnapshotSystemPropDisplayData>) -> Unit
+  ) {
     lifecycleScope.launch(Dispatchers.IO) {
       val displayedSystemProps = viewModel.getSystemPropDisplayData(timestamp)
       launch(Dispatchers.Main) {
-        dashboard.setSystemProps(displayedSystemProps)
+        onSystemPropsReady(displayedSystemProps)
       }
     }
   }

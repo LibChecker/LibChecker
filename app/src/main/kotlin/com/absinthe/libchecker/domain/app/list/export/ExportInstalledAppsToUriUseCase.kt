@@ -3,7 +3,7 @@ package com.absinthe.libchecker.domain.app.list.export
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
-import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

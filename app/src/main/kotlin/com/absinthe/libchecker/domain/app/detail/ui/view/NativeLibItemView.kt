@@ -1,38 +1,25 @@
 package com.absinthe.libchecker.domain.app.detail.ui.view
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.Path
-import android.graphics.PointF
-import android.text.TextUtils
+import android.text.Spanned
+import android.text.SpannedString
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.text.buildSpannedString
 import androidx.core.view.marginEnd
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.utils.UiUtils
-import com.absinthe.libchecker.utils.extensions.displayWidth
+import com.absinthe.libchecker.domain.app.detail.model.LibStringNativeItemDisplay
+import com.absinthe.libchecker.domain.app.detail.model.buildLibStringItemDescription
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
-import com.absinthe.libchecker.view.AViewGroup
-import com.absinthe.rulesbundle.Rule
-import com.google.android.material.chip.Chip
+import com.absinthe.libchecker.view.drawable.CapsuleDrawable
+import com.absinthe.libchecker.view.span.CenterAlignImageSpan
 
-class NativeLibItemView(context: Context) : AViewGroup(context) {
+class NativeLibItemView(context: Context) : RuleChipItemView(context) {
 
-  init {
-    isClickable = true
-    isFocusable = true
-    clipToPadding = false
-    val horizontalPadding = context.getDimensionPixelSize(R.dimen.normal_padding)
-    val verticalPadding = 4.dp
-    setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding)
-    setWillNotDraw(false)
-  }
-
-  val libName =
+  private val libName =
     AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -45,7 +32,7 @@ class NativeLibItemView(context: Context) : AViewGroup(context) {
       addView(this)
     }
 
-  val libSize =
+  private val libSize =
     AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifCondensed)).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -57,42 +44,66 @@ class NativeLibItemView(context: Context) : AViewGroup(context) {
       addView(this)
     }
 
-  private var chip: Chip? = null
-  private var chipRule: Rule? = null
-  private var chipColorfulIcon: Boolean? = null
+  private val nativeLabelSpanCache = mutableMapOf<String, SpannedString>()
 
-  fun setChip(rule: Rule?, colorfulIcon: Boolean) {
-    if (chipRule == rule && chipColorfulIcon == colorfulIcon) {
-      return
-    }
-    chipRule = rule
-    chipColorfulIcon = colorfulIcon
-    chip = rule?.let {
-      getOrCreateChip().apply {
-        text = it.label
-        chipIcon = RuleChipIconCache.newDrawable(context, it, colorfulIcon)
+  fun bind(
+    display: LibStringNativeItemDisplay,
+    highlightText: String,
+    colorfulRuleIcon: Boolean
+  ) {
+    libName.setLibStringItemName(display.name, highlightText)
+    libSize.text = buildNativeSizeText(display)
+    bindRuleChip(display.rule, colorfulRuleIcon)
+    contentDescription = display.contentDescription
+  }
+
+  fun bindText(
+    name: CharSequence,
+    secondaryText: CharSequence
+  ) {
+    libName.text = name
+    libSize.text = secondaryText
+    bindRuleChip(null, false)
+    contentDescription = buildLibStringItemDescription(name, secondaryText)
+  }
+
+  private fun buildNativeSizeText(display: LibStringNativeItemDisplay): CharSequence {
+    return buildSpannedString {
+      append(display.sizeText)
+      display.labels.forEach { label ->
+        append(createNativeLabelSpan(label))
       }
-    } ?: run {
-      chip?.let { removeView(it) }
-      null
     }
   }
 
-  private fun getOrCreateChip() = chip ?: Chip(context).apply {
-    isClickable = false
-    isFocusable = false
-    importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
-    layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 48.dp)
-    maxWidth = (context.displayWidth * 0.45f).toInt()
-    ellipsize = TextUtils.TruncateAt.MIDDLE
-    addView(this)
+  private fun createNativeLabelSpan(text: String): SpannedString = nativeLabelSpanCache.getOrPut(text) {
+    buildSpannedString {
+      append(" $text ")
+      val capsuleDrawable = CapsuleDrawable(
+        context = context,
+        text = text,
+        textSize = 10.dp.toFloat(),
+        textColor = context.getColorByAttr(com.google.android.material.R.attr.colorOnSecondaryFixed),
+        backgroundColor = context.getColorByAttr(com.google.android.material.R.attr.colorSecondaryFixed),
+        borderColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutlineVariant),
+        borderWidth = 1f,
+        cornerRadius = 5.dp.toFloat()
+      )
+      capsuleDrawable.setBounds(0, 0, capsuleDrawable.intrinsicWidth, capsuleDrawable.intrinsicHeight)
+      setSpan(
+        CenterAlignImageSpan(capsuleDrawable),
+        1,
+        1 + text.length,
+        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+      )
+    }
   }
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-    val chipWidth = chip?.let {
+    val chipWidth = ruleChip?.let {
       it.autoMeasure()
-      return@let it.measuredWidth + libName.marginEnd
+      it.measuredWidth + libName.marginEnd
     } ?: 0
     val textWidth =
       (measuredWidth - paddingStart - paddingEnd - libName.marginEnd - chipWidth).coerceAtLeast(0)
@@ -111,62 +122,6 @@ class NativeLibItemView(context: Context) : AViewGroup(context) {
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     libName.layout(paddingStart, paddingTop)
     libSize.layout(paddingStart, libName.bottom)
-    chip?.let { it.layout(paddingEnd, it.toVerticalCenter(this), fromRight = true) }
-  }
-
-  var processLabelColor: Int = -1
-    set(value) {
-      field = value
-      paint.color = value
-    }
-
-  private val paint = Paint().also {
-    it.color = UiUtils.getRandomColor()
-    it.style = Paint.Style.FILL
-    it.isAntiAlias = true
-  }
-
-  private val topCornerStart = PointF()
-  private val topCornerControl = PointF()
-  private val topCornerEnd = PointF()
-  private val bottomCornerStart = PointF()
-  private val bottomCornerControl = PointF()
-  private val bottomCornerEnd = PointF()
-  private val path = Path()
-
-  override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-    super.onSizeChanged(w, h, oldw, oldh)
-    topCornerStart.set(0f, 0f)
-    topCornerControl.set(5.dp.toFloat(), 1.dp.toFloat())
-    topCornerEnd.set(5.dp.toFloat(), 5.dp.toFloat())
-
-    bottomCornerEnd.set(5.dp.toFloat(), h - 5.dp.toFloat())
-    bottomCornerControl.set(5.dp.toFloat(), h - 1.dp.toFloat())
-    bottomCornerStart.set(0f, h.toFloat())
-  }
-
-  override fun onDraw(canvas: Canvas) {
-    super.onDraw(canvas)
-    if (processLabelColor != -1) {
-      path.apply {
-        reset()
-        moveTo(topCornerStart.x, topCornerStart.y)
-        quadTo(
-          topCornerControl.x,
-          topCornerControl.y,
-          topCornerEnd.x,
-          topCornerEnd.y
-        )
-        lineTo(bottomCornerEnd.x, bottomCornerEnd.y)
-        quadTo(
-          bottomCornerControl.x,
-          bottomCornerControl.y,
-          bottomCornerStart.x,
-          bottomCornerStart.y
-        )
-        close()
-      }
-      canvas.drawPath(path, paint)
-    }
+    ruleChip?.let { it.layout(paddingEnd, it.toVerticalCenter(this), fromRight = true) }
   }
 }

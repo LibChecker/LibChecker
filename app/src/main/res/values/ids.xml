@@ -14,5 +14,4 @@
 
   <item name="in_app_update_chip_stable" type="id" />
   <item name="in_app_update_chip_ci" type="id" />
-  <item name="settings_preference_update_badge" type="id" />
 </resources>

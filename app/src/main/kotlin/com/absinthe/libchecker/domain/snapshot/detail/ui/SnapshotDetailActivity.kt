@@ -6,15 +6,11 @@ import android.view.Gravity
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
-import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.view.MenuProvider
-import androidx.core.view.descendants
-import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.SimpleItemAnimator
-import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.LibType
@@ -24,48 +20,41 @@ import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
-import com.absinthe.libchecker.annotation.isComponentType
 import com.absinthe.libchecker.compat.IntentCompat
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
 import com.absinthe.libchecker.domain.app.detail.ui.AppBarStateChangeListener
-import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSection
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotTitleDisplayData
+import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailReportHeader
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.SnapshotDetailAdapter
-import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.BaseSnapshotNode
-import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotComponentNode
-import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotNativeNode
-import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotTitleNode
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotDetailNodeClickAction
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotDetailNodeLongClickAction
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotReportNode
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.clickAction
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.longClickAction
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.toSnapshotTitleNode
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.toRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailDeletedView
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailNewInstallView
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotEmptyView
+import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotTitleDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
-import com.absinthe.libchecker.domain.snapshot.list.ui.adapter.ARROW
-import com.absinthe.libchecker.domain.snapshot.model.ADDED
-import com.absinthe.libchecker.domain.snapshot.model.CHANGED
-import com.absinthe.libchecker.domain.snapshot.model.MOVED
-import com.absinthe.libchecker.domain.snapshot.model.REMOVED
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
-import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.launchLibReferencePage
-import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import com.chad.library.adapter.base.entity.node.BaseNode
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.chip.Chip
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import me.zhanghai.android.appiconloader.AppIconLoader
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import rikka.core.util.ClipboardUtils
@@ -78,9 +67,11 @@ class SnapshotDetailActivity :
   MenuProvider {
 
   private lateinit var entity: SnapshotDiffItem
+  private lateinit var snapshotTitleDisplayData: SnapshotTitleDisplayData
 
   private val adapter by lazy { SnapshotDetailAdapter() }
   private val viewModel: SnapshotViewModel by viewModel()
+  private val buildSnapshotTitleDisplayData: BuildSnapshotTitleDisplayDataUseCase by inject()
   private val _entity by unsafeLazy {
     IntentCompat.getSerializableExtra<SnapshotDiffItem>(
       intent,
@@ -152,43 +143,22 @@ class SnapshotDetailActivity :
         addItemDecoration(VerticalSpacesItemDecoration(4.dp))
       }
 
-      val isNewOrDeleted = entity.deleted || entity.newInstalled
-
-      snapshotTitle.iconView.apply {
+      snapshotTitle.apply {
         bindSnapshotIcon()
-        setOnClickListener {
+        setIconClickListener {
           lifecycleScope.launch {
             val lcItem = viewModel.getAppListItem(entity.packageName) ?: return@launch
             launchDetailPage(lcItem)
           }
         }
       }
-      snapshotTitle.apply {
-        appNameView.apply {
-          text = LCAppUtils.getDiffString(entity.labelDiff, isNewOrDeleted)
-          setLongClickCopiedToClipboard(text)
-        }
-        iconView.contentDescription = appNameView.text
-
-        val pkgSplits = entity.packageName.split("/")
-        val first = pkgSplits[0]
-        val second = pkgSplits.getOrNull(1)
-        packageNameView.apply {
-          text = if (second != null && second != first) "$first $ARROW $second" else first
-          setLongClickCopiedToClipboard(text)
-        }
-        versionInfoView.apply {
-          text = LCAppUtils.getDiffString(
-            diff1 = entity.versionNameDiff,
-            diff2 = entity.versionCodeDiff,
-            isNewOrDeleted = isNewOrDeleted
-          )
-          setLongClickCopiedToClipboard(text)
-        }
-
-        setApisText(entity, isNewOrDeleted)
-        setPackageSizeText(entity, isNewOrDeleted)
-      }
+      snapshotTitleDisplayData = buildSnapshotTitleDisplayData(
+        BuildSnapshotTitleDisplayDataUseCase.Request(
+          item = entity,
+          formatSplitPackageName = true
+        )
+      )
+      snapshotTitle.render(snapshotTitleDisplayData.toRenderState())
     }
 
     adapter.stateView =
@@ -209,58 +179,50 @@ class SnapshotDetailActivity :
       }
     adapter.isStateViewEnable = entity.newInstalled || entity.deleted
     adapter.setOnItemClickListener { _, view, position ->
-      if (adapter.data[position] is SnapshotTitleNode) {
-        adapter.expandOrCollapse(position)
-        return@setOnItemClickListener
-      }
-      if (AntiShakeUtils.isInvalidClick(view)) {
-        return@setOnItemClickListener
-      }
+      when (val action = adapter.data[position].clickAction) {
+        SnapshotDetailNodeClickAction.ToggleSection -> {
+          adapter.expandOrCollapse(position)
+          return@setOnItemClickListener
+        }
 
-      val item = (adapter.data[position] as BaseSnapshotNode).item
-      if (item.diffType == REMOVED) {
-        return@setOnItemClickListener
-      }
+        is SnapshotDetailNodeClickAction.OpenDetail -> {
+          if (AntiShakeUtils.isInvalidClick(view)) {
+            return@setOnItemClickListener
+          }
+          lifecycleScope.launch {
+            val lcItem = viewModel.getAppListItem(entity.packageName) ?: return@launch
+            launchDetailPage(
+              item = lcItem,
+              refName = action.target.refName,
+              refType = action.target.refType
+            )
+          }
+        }
 
-      lifecycleScope.launch {
-        val lcItem = viewModel.getAppListItem(entity.packageName) ?: return@launch
-        launchDetailPage(
-          item = lcItem,
-          refName = item.name,
-          refType = item.itemType
-        )
+        null -> return@setOnItemClickListener
       }
     }
-    adapter.setOnItemLongClickListener { _, view, position ->
-      val item = (adapter.data[position] as? BaseSnapshotNode)?.item ?: return@setOnItemLongClickListener false
-      // if (item.diffType == REMOVED) {
-      //   return@setOnItemLongClickListener false
-      // }
-      if (isComponentType(item.itemType) && item.name.startsWith(entity.packageName)) {
-        return@setOnItemLongClickListener false
+    adapter.setOnItemLongClickListener { _, _, position ->
+      when (val action = adapter.data[position].longClickAction(entity.packageName)) {
+        is SnapshotDetailNodeLongClickAction.OpenReference -> {
+          val target = action.target
+          launchLibReferencePage(target.refName, target.label, target.refType, null)
+          true
+        }
+
+        null -> false
       }
-      val label = ((view as? ViewGroup)?.descendants?.find { it is Chip } as? Chip)?.text?.toString()
-      launchLibReferencePage(item.name, label, item.itemType, null)
-      true
     }
 
     viewModel.snapshotDetailSectionsFlow.onEach { sections ->
-      val titleList = sections.map(::buildSnapshotTitleNode)
+      val titleList = sections.map { section ->
+        recordDetailComponentCount(section.type, section.items.size)
+        section.toSnapshotTitleNode()
+      }
 
       adapter.isStateViewEnable = titleList.isEmpty()
       adapter.setList(titleList)
     }.launchIn(lifecycleScope)
-  }
-
-  private fun buildSnapshotTitleNode(section: SnapshotDetailSection): SnapshotTitleNode {
-    val nodes = section.items.mapTo(mutableListOf<BaseNode>()) { item ->
-      when (section.type) {
-        NATIVE, METADATA -> SnapshotNativeNode(item)
-        else -> SnapshotComponentNode(item)
-      }
-    }
-    recordDetailComponentCount(section.type, nodes.size)
-    return SnapshotTitleNode(nodes, section.type)
   }
 
   private fun recordDetailComponentCount(@LibType type: Int, count: Int) {
@@ -286,95 +248,30 @@ class SnapshotDetailActivity :
   private fun bindSnapshotIcon() {
     val snapshotIcon = _icon?.takeIf { entity.packageName.contains("/") }
     if (snapshotIcon != null) {
-      binding.snapshotTitle.iconView.load(snapshotIcon)
+      binding.snapshotTitle.setIconImage(snapshotIcon)
       return
     }
 
-    binding.snapshotTitle.iconView.setImageResource(R.drawable.ic_icon_blueprint)
+    binding.snapshotTitle.setFallbackIcon()
     lifecycleScope.launch {
       when (val iconSource = viewModel.getSnapshotPackageIconSources(listOf(entity.packageName))[entity.packageName]) {
-        is SnapshotPackageIconSource.InstalledPackage -> {
-          val appIconLoader = AppIconLoader(
-            resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size),
-            false,
-            this@SnapshotDetailActivity
-          )
-          val icon = iconSource.packageInfo.applicationInfo?.let { applicationInfo ->
-            runCatching {
-              appIconLoader.loadIcon(applicationInfo)
-            }.getOrNull()
-          }
-          binding.snapshotTitle.iconView.load(icon)
-        }
-
-        SnapshotPackageIconSource.Fallback,
-        null -> binding.snapshotTitle.iconView.setImageResource(R.drawable.ic_icon_blueprint)
+        null -> binding.snapshotTitle.setFallbackIcon()
+        else -> binding.snapshotTitle.setIconSource(iconSource)
       }
     }
   }
 
   private fun generateReport() {
     val sb = StringBuilder()
-    sb.append(binding.snapshotTitle.appNameView.text).appendLine()
-      .append(binding.snapshotTitle.packageNameView.text).appendLine()
-      .append(binding.snapshotTitle.versionInfoView.text).appendLine()
-      .append(binding.snapshotTitle.apisView.text).appendLine()
-
-    if (binding.snapshotTitle.packageSizeView.isVisible) {
-      sb.append(binding.snapshotTitle.packageSizeView.text).appendLine()
-    }
-
+    sb.append(buildSnapshotDetailReportHeader(snapshotTitleDisplayData))
     sb.appendLine()
 
-    adapter.data.forEach {
-      when (it) {
-        is SnapshotTitleNode -> {
-          sb.append("[${getComponentName(it.type)}]").appendLine()
-        }
-
-        is SnapshotComponentNode -> {
-          sb.append(getDiffTypeLabel(it.item.diffType))
-            .append(" ")
-            .append(it.item.title)
-            .appendLine()
-        }
-
-        is SnapshotNativeNode -> {
-          sb.append(getDiffTypeLabel(it.item.diffType))
-            .append(" ")
-            .append(it.item.title)
-            .appendLine()
-            .append("\t")
-            .append(it.item.extra)
-            .appendLine()
-        }
+    adapter.data.forEach { node ->
+      if (node is SnapshotReportNode) {
+        sb.append(node.reportText)
       }
     }
     ClipboardUtils.put(this, sb.toString())
     VersionCompat.showCopiedOnClipboardToast(this)
-  }
-
-  private fun getComponentName(@LibType type: Int): String {
-    val titleRes = when (type) {
-      NATIVE -> R.string.ref_category_native
-      SERVICE -> R.string.ref_category_service
-      ACTIVITY -> R.string.ref_category_activity
-      RECEIVER -> R.string.ref_category_br
-      PROVIDER -> R.string.ref_category_cp
-      PERMISSION -> R.string.ref_category_perm
-      METADATA -> R.string.ref_category_metadata
-      else -> android.R.string.untitled
-    }
-    return getString(titleRes)
-  }
-
-  private fun getDiffTypeLabel(diffType: Int): String {
-    return when (diffType) {
-      ADDED -> "🟢+"
-      REMOVED -> "🔴-"
-      CHANGED -> "🟡~"
-      MOVED -> "🔵<->"
-      else -> throw IllegalArgumentException("wrong diff type")
-    }
   }
 }

@@ -3,14 +3,24 @@ package com.absinthe.libchecker.domain.app.list.ui.view
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.text.SpannableString
 import android.text.TextUtils
+import android.text.style.ImageSpan
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginStart
+import coil.dispose
+import coil.load
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.list.model.AppListItemDisplay
+import com.absinthe.libchecker.domain.app.list.model.AppListItemIconDisplay
+import com.absinthe.libchecker.domain.app.list.model.AppListItemIdentityText
+import com.absinthe.libchecker.domain.app.list.model.AppListItemMetadataDisplay
+import com.absinthe.libchecker.domain.app.list.model.buildAppListItemDescription
+import com.absinthe.libchecker.utils.extensions.addStrikeThroughSpan
 import com.absinthe.libchecker.utils.extensions.applyCondensedSingleLine
 import com.absinthe.libchecker.utils.extensions.applySingleLineEndEllipsize
 import com.absinthe.libchecker.utils.extensions.dp
@@ -18,7 +28,9 @@ import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
+import com.absinthe.libchecker.utils.extensions.tintHighlightText
 import com.absinthe.libchecker.view.AViewGroup
+import com.absinthe.libchecker.view.span.CenterAlignImageSpan
 import com.google.android.material.card.MaterialCardView
 
 class AppItemView(
@@ -62,9 +74,22 @@ class AppItemView(
   }
 
   fun setItemContentDescription(vararg parts: CharSequence?) {
-    contentDescription = parts
-      .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
-      .joinToString()
+    setItemContentDescription(buildAppListItemDescription(*parts))
+  }
+
+  fun setItemContentDescription(description: CharSequence?) {
+    contentDescription = description
+  }
+
+  fun setItemDisplay(display: AppListItemDisplay, highlightText: String) {
+    container.setIconDisplay(display.icon)
+    setItemIdentityDisplay(display, highlightText)
+    container.setMetadataDisplay(display.metadata)
+  }
+
+  fun setItemIdentityDisplay(display: AppListItemDisplay, highlightText: String) {
+    container.setIdentityText(display.identity, highlightText)
+    setItemContentDescription(display.identity.contentDescription)
   }
 
   class AppItemContainerView(
@@ -136,6 +161,30 @@ class AppItemView(
     private var badge: AppCompatImageView? = null
     private var useDetachedAbiBadgeLayout = false
 
+    fun setIconDisplay(display: AppListItemIconDisplay) {
+      if (!display.usePackageIcon) {
+        icon.dispose()
+        icon.setImageDrawable(style.newIconPlaceholder(context))
+        return
+      }
+      icon.load(display.packageInfo) {
+        placeholder(style.newIconPlaceholder(context))
+        error(style.newIconPlaceholder(context))
+      }
+    }
+
+    fun setIdentityText(identityText: AppListItemIdentityText, highlightText: String) {
+      appName.setOrHighlightText(identityText.label, highlightText)
+      appName.setItemBackground()
+      packageName.setOrHighlightText(identityText.packageName, highlightText)
+      packageName.setItemBackground()
+
+      if (identityText.showMissingPackageStrikeThrough) {
+        appName.addStrikeThroughSpan()
+        packageName.addStrikeThroughSpan()
+      }
+    }
+
     fun setAppName(text: String) {
       appName.text = text
       appName.setItemBackground()
@@ -154,6 +203,46 @@ class AppItemView(
     fun setAbiInfo(text: String) {
       abiInfo.text = text
       abiInfo.setItemBackground()
+    }
+
+    fun setMetadataDisplay(display: AppListItemMetadataDisplay) {
+      setVersionInfo(display.versionInfo)
+      setAbiDisplay(display)
+      setPackageBadge(display.packageBadge)
+    }
+
+    private fun setAbiDisplay(display: AppListItemMetadataDisplay) {
+      setDetachedAbiBadgeLayoutEnabled(display.useDetachedAbiBadges)
+
+      if (display.useDetachedAbiBadges) {
+        if (display.largeAbiBadgeRes != 0) {
+          val abiBadge = display.largeAbiBadgeRes.getDrawable(context)?.mutate()?.apply {
+            setTint(context.getAbiBadgeTint(display.isAbiBadge64Bit, display.tintAbiLabels))
+          }
+          val multiArchBadge = if (display.showMultiArchBadge) {
+            R.drawable.ic_abi_label_multi_arch.getDrawable(context)?.mutate()?.apply {
+              setTint(context.getMultiArchBadgeTint(display.tintAbiLabels))
+            }
+          } else {
+            null
+          }
+          setAbiBadges(abiBadge, multiArchBadge)
+        } else {
+          setAbiBadges(null, null)
+        }
+        abiInfo.text = display.abiInfo
+      } else {
+        setAbiBadges(null, null)
+        abiInfo.text = context.buildInlineAbiInfo(display)
+      }
+    }
+
+    private fun setPackageBadge(packageBadge: AppListItemMetadataDisplay.PackageBadge?) {
+      when (packageBadge) {
+        AppListItemMetadataDisplay.PackageBadge.Harmony -> setBadge(R.drawable.ic_harmony_badge)
+        AppListItemMetadataDisplay.PackageBadge.Frozen -> setBadge(R.drawable.ic_disabled_package)
+        null -> setBadge(null)
+      }
     }
 
     fun setDetachedAbiBadgeLayoutEnabled(enabled: Boolean) {
@@ -397,4 +486,62 @@ private fun TextView.setItemBackground() {
     background = null
     alpha = 1f
   }
+}
+
+private fun TextView.setOrHighlightText(text: CharSequence, highlightText: String) {
+  if (highlightText.isNotBlank()) {
+    tintHighlightText(highlightText, text)
+  } else {
+    this.text = text
+  }
+}
+
+private fun Context.getAbiBadgeTint(isAbi64Bit: Boolean, tintAbiLabels: Boolean): Int {
+  if (!tintAbiLabels) {
+    return getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant)
+  }
+  return getColorByAttr(
+    if (isAbi64Bit) {
+      androidx.appcompat.R.attr.colorPrimary
+    } else {
+      com.google.android.material.R.attr.colorTertiary
+    }
+  )
+}
+
+private fun Context.buildInlineAbiInfo(display: AppListItemMetadataDisplay): CharSequence {
+  if (display.abiBadgeRes == 0) {
+    return display.abiInfo
+  }
+
+  var paddingString = "  ${display.abiInfo}"
+  if (display.showMultiArchBadge) {
+    paddingString = "  $paddingString"
+  }
+  val spanString = SpannableString(paddingString)
+
+  display.abiBadgeRes.getDrawable(this)?.mutate()?.let {
+    it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+    it.setTint(getAbiBadgeTint(display.isAbiBadge64Bit, display.tintAbiLabels))
+    spanString.setSpan(CenterAlignImageSpan(it), 0, 1, ImageSpan.ALIGN_BOTTOM)
+  }
+  if (display.showMultiArchBadge) {
+    R.drawable.ic_multi_arch.getDrawable(this)?.mutate()?.let {
+      it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+      it.setTint(getMultiArchBadgeTint(display.tintAbiLabels))
+      spanString.setSpan(CenterAlignImageSpan(it), 2, 3, ImageSpan.ALIGN_BOTTOM)
+    }
+  }
+
+  return spanString
+}
+
+private fun Context.getMultiArchBadgeTint(tintAbiLabels: Boolean): Int {
+  return getColorByAttr(
+    if (tintAbiLabels) {
+      com.google.android.material.R.attr.colorSecondary
+    } else {
+      com.google.android.material.R.attr.colorOnSurfaceVariant
+    }
+  )
 }

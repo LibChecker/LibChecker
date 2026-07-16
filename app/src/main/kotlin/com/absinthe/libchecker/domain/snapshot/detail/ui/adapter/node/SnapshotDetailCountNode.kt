@@ -1,5 +1,7 @@
 package com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node
 
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemStatusDisplayData
+
 /**
  * <pre>
  * author : Absinthe
@@ -8,5 +10,6 @@ package com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node
  */
 data class SnapshotDetailCountNode(
   val count: Int,
-  val status: Int
+  val countText: String,
+  val status: SnapshotDetailItemStatusDisplayData
 )

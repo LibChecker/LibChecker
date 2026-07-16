@@ -18,7 +18,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.ActivityTrackBinding
-import com.absinthe.libchecker.domain.app.GetRandomAppIconUseCase
+import com.absinthe.libchecker.domain.app.list.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.snapshot.track.presentation.TrackListUiState
 import com.absinthe.libchecker.domain.snapshot.track.presentation.TrackViewModel
 import com.absinthe.libchecker.domain.snapshot.track.ui.adapter.TrackAdapter

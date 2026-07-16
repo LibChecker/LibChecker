@@ -4,14 +4,12 @@ import android.content.pm.PackageInfo
 import android.net.Uri
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.AppBundleSplitItem
-import com.absinthe.libchecker.domain.app.GetAppBundleItemsUseCase
-import com.absinthe.libchecker.domain.app.detail.GetRelatedAppDisplayDataUseCase
-import com.absinthe.libchecker.domain.app.detail.action.AppManifestProperty
 import com.absinthe.libchecker.domain.app.detail.action.AppPackageShareFile
+import com.absinthe.libchecker.domain.app.detail.action.BuildAppInstallSourceBottomSheetDisplayUseCase
 import com.absinthe.libchecker.domain.app.detail.action.BuildDetailItemDialogRequestUseCase
 import com.absinthe.libchecker.domain.app.detail.action.BuildDetailItemLongClickActionsUseCase
 import com.absinthe.libchecker.domain.app.detail.action.BuildSignatureDetailItemsUseCase
+import com.absinthe.libchecker.domain.app.detail.action.BuildXposedInfoBottomSheetDisplayUseCase
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemLongClickActionRequest
 import com.absinthe.libchecker.domain.app.detail.action.ExportAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.detail.action.ExtractNativeLibraryUseCase
@@ -27,18 +25,33 @@ import com.absinthe.libchecker.domain.app.detail.action.GetOverlayDetailUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetPermissionDetailUseCase
 import com.absinthe.libchecker.domain.app.detail.action.GetXposedModuleInfoUseCase
 import com.absinthe.libchecker.domain.app.detail.action.PrepareAppPackageShareActionUseCase
+import com.absinthe.libchecker.domain.app.detail.action.buildOverlayDetailBottomSheetDisplay
+import com.absinthe.libchecker.domain.app.detail.content.BuildAppBundleItemDisplayDataUseCase
+import com.absinthe.libchecker.domain.app.detail.content.GetAppBundleItemsUseCase
+import com.absinthe.libchecker.domain.app.detail.model.AppBundleItem
+import com.absinthe.libchecker.domain.app.detail.model.AppInfoBottomSheetState
+import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceBottomSheetDisplay
+import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceRequesterAccess
+import com.absinthe.libchecker.domain.app.detail.model.AppPropItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
+import com.absinthe.libchecker.domain.app.detail.model.OverlayDetailBottomSheetResult
+import com.absinthe.libchecker.domain.app.detail.model.XposedInfoBottomSheetDisplay
 import com.absinthe.libchecker.domain.app.detail.navigation.BuildDetailReferenceNavigationUseCase
 import com.absinthe.libchecker.domain.app.detail.navigation.DetailReferenceNavigationRequest
+import com.absinthe.libchecker.domain.app.detail.related.GetRelatedAppDisplayDataUseCase
 import java.io.File
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 
 class DetailActionLoader(
   private val getAlternativeLaunchItemsUseCase: GetAlternativeLaunchItemsUseCase,
   private val getAppBundleItemsUseCase: GetAppBundleItemsUseCase,
+  private val buildAppBundleItemDisplayDataUseCase: BuildAppBundleItemDisplayDataUseCase,
   private val getAppInfoActionsUseCase: GetAppInfoActionsUseCase,
   private val getAppInfoPrimaryActionsUseCase: GetAppInfoPrimaryActionsUseCase,
   private val getAppInstallSourceDetailsUseCase: GetAppInstallSourceDetailsUseCase,
+  private val buildAppInstallSourceBottomSheetDisplayUseCase: BuildAppInstallSourceBottomSheetDisplayUseCase,
   private val getAppLaunchActionUseCase: GetAppLaunchActionUseCase,
   private val getAppManifestPropertiesUseCase: GetAppManifestPropertiesUseCase,
   private val getElfDetailUseCase: GetElfDetailUseCase,
@@ -47,6 +60,7 @@ class DetailActionLoader(
   private val getPermissionDetailUseCase: GetPermissionDetailUseCase,
   private val getRelatedAppDisplayDataUseCase: GetRelatedAppDisplayDataUseCase,
   private val getXposedModuleInfoUseCase: GetXposedModuleInfoUseCase,
+  private val buildXposedInfoBottomSheetDisplayUseCase: BuildXposedInfoBottomSheetDisplayUseCase,
   private val buildDetailItemDialogRequestUseCase: BuildDetailItemDialogRequestUseCase,
   private val buildDetailItemLongClickActionsUseCase: BuildDetailItemLongClickActionsUseCase,
   private val buildSignatureDetailItemsUseCase: BuildSignatureDetailItemsUseCase,
@@ -55,11 +69,27 @@ class DetailActionLoader(
   private val exportAppPackageShareFileUseCase: ExportAppPackageShareFileUseCase,
   private val buildDetailReferenceNavigationUseCase: BuildDetailReferenceNavigationUseCase
 ) {
-  suspend fun getAppBundleItems(packageInfo: PackageInfo): List<AppBundleSplitItem> {
-    return getAppBundleItemsUseCase(packageInfo)
+  suspend fun getAppBundleItems(packageInfo: PackageInfo): List<AppBundleItem> {
+    return buildAppBundleItemDisplayDataUseCase(getAppBundleItemsUseCase(packageInfo))
   }
 
-  suspend fun getAppInfoActions(packageName: String) = getAppInfoActionsUseCase(packageName)
+  suspend fun getAppInfoBottomSheetState(packageName: String?): AppInfoBottomSheetState.Content {
+    return coroutineScope {
+      val primaryActions = async {
+        getAppInfoPrimaryActionsUseCase(packageName)
+      }
+      val externalActions = async {
+        packageName?.let {
+          getAppInfoActionsUseCase(it)
+        }.orEmpty()
+      }
+      AppInfoBottomSheetState.Content(
+        packageName = packageName,
+        primaryActions = primaryActions.await(),
+        externalActions = externalActions.await()
+      )
+    }
+  }
 
   suspend fun getAppInfoPrimaryActions(packageName: String?) = getAppInfoPrimaryActionsUseCase(packageName)
 
@@ -67,9 +97,42 @@ class DetailActionLoader(
 
   suspend fun getAlternativeLaunchItems(packageName: String) = getAlternativeLaunchItemsUseCase(packageName)
 
-  suspend fun getAppInstallSourceDetails(packageName: String) = getAppInstallSourceDetailsUseCase(packageName)
+  suspend fun getAppInstallSourceBottomSheetDisplay(
+    packageName: String,
+    requesterAccess: AppInstallSourceRequesterAccess
+  ): AppInstallSourceBottomSheetDisplay? {
+    val details = getAppInstallSourceDetailsUseCase(packageName) ?: return null
+    val installSource = details.installSource
+    return coroutineScope {
+      val originatingApp = async {
+        if (requesterAccess == AppInstallSourceRequesterAccess.Available) {
+          installSource?.originatingPackageName?.let {
+            getRelatedAppDisplayDataUseCase(it)
+          }
+        } else {
+          null
+        }
+      }
+      val installingApp = async {
+        installSource?.installingPackageName?.let {
+          getRelatedAppDisplayDataUseCase(it)
+        }
+      }
+      buildAppInstallSourceBottomSheetDisplayUseCase(
+        BuildAppInstallSourceBottomSheetDisplayUseCase.Request(
+          details = details,
+          originatingApp = originatingApp.await(),
+          installingApp = installingApp.await(),
+          requesterAccess = requesterAccess
+        )
+      )
+    }
+  }
 
-  suspend fun getXposedModuleInfo(packageName: String) = getXposedModuleInfoUseCase(packageName)
+  suspend fun getXposedInfoBottomSheetDisplay(packageName: String): XposedInfoBottomSheetDisplay? {
+    return getXposedModuleInfoUseCase(packageName)
+      ?.let(buildXposedInfoBottomSheetDisplayUseCase::invoke)
+  }
 
   suspend fun extractNativeLibrary(
     packageState: DetailPackageState,
@@ -93,7 +156,7 @@ class DetailActionLoader(
   suspend fun getAppManifestProperties(
     packageInfo: PackageInfo?,
     properties: Map<String, String>?
-  ): List<AppManifestProperty> {
+  ): List<AppPropItem> {
     return getAppManifestPropertiesUseCase(packageInfo, properties)
   }
 
@@ -115,21 +178,34 @@ class DetailActionLoader(
     libName: String,
     @LibType type: Int,
     regexName: String?,
-    isValidLib: Boolean
+    isValidLib: Boolean,
+    preferredLocale: String
   ) = getLibraryDetailDialogDataUseCase(
     GetLibraryDetailDialogDataUseCase.Request(
       libName = libName,
       type = type,
       regexName = regexName,
-      isValidLib = isValidLib
+      isValidLib = isValidLib,
+      preferredLocale = preferredLocale
     )
   )
 
-  suspend fun getOverlayDetail(item: LCItem) = getOverlayDetailUseCase(item)
+  suspend fun getOverlayDetailBottomSheetResult(item: LCItem): OverlayDetailBottomSheetResult {
+    return when (val result = getOverlayDetailUseCase(item)) {
+      GetOverlayDetailUseCase.Result.NotFound -> OverlayDetailBottomSheetResult.NotFound
+
+      is GetOverlayDetailUseCase.Result.Available -> {
+        val targetApp = result.data.targetPackageName?.let {
+          getRelatedAppDisplayDataUseCase(it)
+        }
+        OverlayDetailBottomSheetResult.Available(
+          buildOverlayDetailBottomSheetDisplay(result.data, targetApp)
+        )
+      }
+    }
+  }
 
   suspend fun getPermissionDetail(permissionName: String) = getPermissionDetailUseCase(permissionName)
-
-  suspend fun getRelatedAppDisplayData(packageName: String) = getRelatedAppDisplayDataUseCase(packageName)
 
   fun buildDetailItemDialogRequest(
     item: LibStringItemChip,

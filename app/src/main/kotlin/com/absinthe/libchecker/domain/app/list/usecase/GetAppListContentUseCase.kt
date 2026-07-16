@@ -1,14 +1,14 @@
 package com.absinthe.libchecker.domain.app.list.usecase
 
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.AppListRepository
-import com.absinthe.libchecker.domain.app.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.list.TRACE_APP_LIST_FILTER_ITEMS
 import com.absinthe.libchecker.domain.app.list.TRACE_APP_LIST_GET_CONTENT
 import com.absinthe.libchecker.domain.app.list.TRACE_APP_LIST_GET_ITEMS
 import com.absinthe.libchecker.domain.app.list.TRACE_APP_LIST_INITIAL_ITEM_VIEW_STATES
-import com.absinthe.libchecker.domain.app.list.model.AppListItemViewState
+import com.absinthe.libchecker.domain.app.list.model.AppListRenderState
 import com.absinthe.libchecker.domain.app.list.traceAppListSuspendSection
+import com.absinthe.libchecker.domain.app.repository.AppListRepository
+import com.absinthe.libchecker.domain.app.repository.AppListSettingsRepository
 
 class GetAppListContentUseCase(
   private val ownPackageName: String,
@@ -52,7 +52,11 @@ class GetAppListContentUseCase(
       Result.Content(
         backingPackageNames = dbItems.mapTo(mutableSetOf()) { it.packageName },
         items = filteredItems,
-        initialItemViewStates = itemViewStates,
+        renderState = AppListRenderState(
+          itemViewStates = itemViewStates,
+          fallbackDisplayOptions = displayOptions,
+          highlightText = request.keyword
+        ),
         packageStateSnapshot = packageStateSnapshot
       )
     }
@@ -78,7 +82,7 @@ class GetAppListContentUseCase(
     data class Content(
       val backingPackageNames: Set<String>,
       val items: List<LCItem>,
-      val initialItemViewStates: Map<String, AppListItemViewState>,
+      val renderState: AppListRenderState,
       val packageStateSnapshot: GetAppListPackageStatesUseCase.PackageStateSnapshot
     ) : Result
   }

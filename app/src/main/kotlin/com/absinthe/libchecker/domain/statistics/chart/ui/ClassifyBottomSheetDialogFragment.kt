@@ -1,32 +1,31 @@
 package com.absinthe.libchecker.domain.statistics.chart.ui
 
 import android.content.DialogInterface
-import androidx.lifecycle.lifecycleScope
-import com.absinthe.libchecker.constant.AndroidVersions
-import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.list.model.AppListItemViewState
+import com.absinthe.libchecker.domain.statistics.chart.model.ClassifyDialogAction
+import com.absinthe.libchecker.domain.statistics.chart.model.ClassifyDialogState
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
+import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
 class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<ClassifyDialogView>() {
 
   private var onDismissAction: (() -> Unit)? = null
-  private var _title: String? = null
-  private var _androidVersionNode: AndroidVersions.Node? = null
-  private var _list: List<LCItem>? = null
-  private var _itemViewStates: Map<String, AppListItemViewState>? = null
+  private var dialogState: ClassifyDialogState? = null
+  private var isViewInitialized = false
 
-  override fun initRootView(): ClassifyDialogView = ClassifyDialogView(requireContext(), lifecycleScope)
+  override fun initRootView(): ClassifyDialogView = ClassifyDialogView(requireContext())
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {
     maxPeekHeightPercentage = 0.67f
-    root.post {
-      _title?.let { setTitle(it) }
-      _androidVersionNode?.let { setAndroidVersionLabel(it) }
-      _list?.let { setList(it, _itemViewStates.orEmpty()) }
-    }
+    isViewInitialized = true
+    dialogState?.let(::render)
+  }
+
+  override fun onDestroyView() {
+    isViewInitialized = false
+    super.onDestroyView()
   }
 
   override fun onDismiss(dialog: DialogInterface) {
@@ -35,33 +34,24 @@ class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Clas
     onDismissAction = null
   }
 
-  fun setTitle(title: String) {
-    _title = title
-    runCatching {
-      root.getHeaderView().title.text = title
-    }
-  }
-
-  fun setAndroidVersionLabel(node: AndroidVersions.Node?) {
-    _androidVersionNode = node
-    runCatching {
-      root.addAndroidVersionView(node)
-    }
-  }
-
-  fun setList(
-    list: List<LCItem>,
-    itemViewStates: Map<String, AppListItemViewState> = emptyMap()
-  ) {
-    _list = list
-    _itemViewStates = itemViewStates
-    runCatching {
-      root.adapter.setItemViewStates(itemViewStates)
-      root.adapter.setList(list)
+  fun setState(state: ClassifyDialogState) {
+    dialogState = state
+    if (isViewInitialized) {
+      render(state)
     }
   }
 
   fun setOnDismiss(action: () -> Unit) {
     onDismissAction = action
+  }
+
+  private fun render(state: ClassifyDialogState) {
+    root.bind(state, ::handleAction)
+  }
+
+  private fun handleAction(action: ClassifyDialogAction) {
+    when (action) {
+      is ClassifyDialogAction.OpenApp -> activity?.launchDetailPage(action.item)
+    }
   }
 }

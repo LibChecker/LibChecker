@@ -1,12 +1,12 @@
 package com.absinthe.libchecker.domain.app.detail.ui.controller
 
-import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.detail.model.LocatedCount
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
 import com.absinthe.libchecker.domain.app.detail.ui.DetailFragmentManager
 import com.absinthe.libchecker.domain.app.detail.ui.DetailProcessBarController
 import com.absinthe.libchecker.domain.app.detail.ui.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.domain.app.detail.ui.MODE_SORT_BY_SIZE
+import com.absinthe.libchecker.domain.app.repository.AppDetailSettingsRepository
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import kotlinx.coroutines.CoroutineScope
 
@@ -49,6 +49,9 @@ class DetailListInteractionController(
     appDetailSettingsRepository.setProcessMode(processMode)
     detailFragmentManager.deliverProcessMode(processMode)
 
+    if (!processMode) {
+      processBarController.clearSelection()
+    }
     processBarController.refreshVisibility()
     if (!processMode) {
       doOnMainThreadIdle {

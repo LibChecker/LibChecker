@@ -9,6 +9,7 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.snapshot.album.model.AlbumItemDisplayData
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
@@ -27,7 +28,7 @@ import com.google.android.material.card.MaterialCardView
  */
 class AlbumItemView(context: Context) : MaterialCardView(context) {
 
-  val container = AlbumItemContainerView(context).apply {
+  private val container = AlbumItemContainerView(context).apply {
     val paddingHorizontal = context.getDimensionPixelSize(R.dimen.album_card_inset_horizontal)
     val paddingVertical = context.getDimensionPixelSize(R.dimen.album_card_inset_vertical)
     setPadding(paddingHorizontal, paddingVertical, paddingHorizontal, paddingVertical)
@@ -37,6 +38,14 @@ class AlbumItemView(context: Context) : MaterialCardView(context) {
     setSmoothRoundCorner(12.dp)
     setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSurfaceContainerHigh))
     addView(container)
+  }
+
+  fun render(data: AlbumItemDisplayData) {
+    container.setIcon(data.iconRes)
+    container.setIconBackgroundColor(data.iconBackgroundColorRes)
+    container.setTitle(data.title)
+    container.setSubtitle(data.subtitle)
+    contentDescription = data.contentDescription
   }
 
   class AlbumItemContainerView(context: Context) : AViewGroup(context) {
@@ -49,7 +58,7 @@ class AlbumItemView(context: Context) : MaterialCardView(context) {
       importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     }
 
-    val title = AppCompatTextView(context).apply {
+    private val title = AppCompatTextView(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
@@ -59,7 +68,7 @@ class AlbumItemView(context: Context) : MaterialCardView(context) {
       setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleLarge))
     }
 
-    val subtitle = AppCompatTextView(context).apply {
+    private val subtitle = AppCompatTextView(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
@@ -81,6 +90,14 @@ class AlbumItemView(context: Context) : MaterialCardView(context) {
 
     fun setIconBackgroundColor(@ColorRes res: Int) {
       icon.backgroundTintList = res.toColorStateList(context)
+    }
+
+    fun setTitle(text: CharSequence) {
+      title.text = text
+    }
+
+    fun setSubtitle(text: CharSequence) {
+      subtitle.text = text
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

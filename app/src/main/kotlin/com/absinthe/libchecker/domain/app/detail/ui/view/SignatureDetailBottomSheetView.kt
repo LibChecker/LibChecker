@@ -6,11 +6,11 @@ import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.detail.model.SignatureDetailItem
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.SignatureDetailAdapter
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
@@ -18,7 +18,7 @@ class SignatureDetailBottomSheetView(context: Context) :
   LinearLayout(context),
   IHeaderView {
 
-  val adapter by unsafeLazy { SignatureDetailAdapter() }
+  private val adapter = SignatureDetailAdapter()
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =
@@ -26,7 +26,7 @@ class SignatureDetailBottomSheetView(context: Context) :
     title.text = context.getString(R.string.signature_detail)
   }
 
-  val icon = AppCompatImageView(context).apply {
+  private val icon = AppCompatImageView(context).apply {
     val iconSize = 48.dp
     layoutParams = LayoutParams(iconSize, iconSize).also {
       it.topMargin = 4.dp
@@ -37,7 +37,7 @@ class SignatureDetailBottomSheetView(context: Context) :
     importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
   }
 
-  val list = BottomSheetRecyclerView(context).apply {
+  private val list = BottomSheetRecyclerView(context).apply {
     layoutParams = LayoutParams(
       LayoutParams.MATCH_PARENT,
       LayoutParams.WRAP_CONTENT
@@ -62,6 +62,17 @@ class SignatureDetailBottomSheetView(context: Context) :
     addView(header)
     addView(icon)
     addView(list)
+  }
+
+  fun bind(
+    items: List<SignatureDetailItem>,
+    onItemLongClick: () -> Unit
+  ) {
+    adapter.setOnItemLongClickListener { _, _, _ ->
+      onItemLongClick()
+      true
+    }
+    adapter.setList(items)
   }
 
   override fun getHeaderView(): BottomSheetHeaderView {

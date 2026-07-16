@@ -76,14 +76,19 @@ internal class WindowBlurCompatController(
 
   fun finishWithAnimation(duration: Long) {
     if (!isStarted || isStopRequested) return
+
+    if (isCrossWindowBlurEnabled) {
+      stop()
+      return
+    }
+
     isStopRequested = true
     windowManager.removeCrossWindowBlurEnabledListener(blurEnabledListener)
 
-    // Keep the host blur alive after the dialog window or fragment view is detached.
-    // This lets the closing animation reach zero instead of being cut off by lifecycle cleanup.
+    // Keep the fallback host blur alive after the dialog window or fragment view is detached.
+    // Switching an enabled cross-window blur to this RenderEffect path causes a visible flash.
     HostViewBlurRegistry.update(hostView, this, blurRadius)
     updateWindowBlurRadius(0f)
-    isCrossWindowBlurEnabled = false
     animateBlurRadiusInternal(0f, duration) {
       completeStop()
     }

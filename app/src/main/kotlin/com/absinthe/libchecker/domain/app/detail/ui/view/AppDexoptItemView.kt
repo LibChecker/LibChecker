@@ -13,6 +13,7 @@ import com.absinthe.libchecker.utils.extensions.DexFileOptimizationInfo
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
+import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.card.MaterialCardView
@@ -32,7 +33,7 @@ class AppDexoptItemView(context: Context) : AViewGroup(context) {
     text = context.getString(R.string.lib_detail_app_dexopt_title)
   }
 
-  val contentView = ContentView(context).apply {
+  private val contentView = ContentView(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
@@ -62,6 +63,11 @@ class AppDexoptItemView(context: Context) : AViewGroup(context) {
     addView(container)
   }
 
+  fun bind(info: DexFileOptimizationInfo) {
+    contentView.bind(info)
+    container.setLongClickCopiedToClipboard(contentView.getAllContentText())
+  }
+
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     val parent = parent as ViewGroup
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
@@ -84,7 +90,7 @@ class AppDexoptItemView(context: Context) : AViewGroup(context) {
     container.layout(paddingStart, titleView.bottom + container.marginTop)
   }
 
-  class ContentView(context: Context) : AViewGroup(context) {
+  private class ContentView(context: Context) : AViewGroup(context) {
 
     private val cardGap = 8.dp
 
@@ -114,7 +120,7 @@ class AppDexoptItemView(context: Context) : AViewGroup(context) {
       addView(reasonCard)
     }
 
-    fun setInfo(info: DexFileOptimizationInfo) {
+    fun bind(info: DexFileOptimizationInfo) {
       statusCard.setValue(info.status)
       reasonCard.setValue(info.reason)
     }

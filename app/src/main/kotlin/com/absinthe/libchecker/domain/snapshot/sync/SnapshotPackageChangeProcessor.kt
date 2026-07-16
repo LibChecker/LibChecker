@@ -1,6 +1,6 @@
 package com.absinthe.libchecker.domain.snapshot.sync
 
-import com.absinthe.libchecker.domain.app.PackageChangeState
+import com.absinthe.libchecker.domain.app.model.PackageChangeState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

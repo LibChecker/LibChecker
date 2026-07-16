@@ -28,7 +28,7 @@ class GetUpdatesDialogFragment : BaseBottomSheetViewDialogFragment<GetUpdatesDia
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    root.setItems(viewModel.buildGetUpdatesItems(), ::handleAction)
+    root.bind(viewModel.buildGetUpdatesDialogState(), ::handleAction)
   }
 
   private fun handleAction(action: GetUpdatesAction) {

@@ -9,6 +9,8 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.settings.model.CloudRulesDialogAction
+import com.absinthe.libchecker.domain.settings.model.CloudRulesDialogState
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.app.IHeaderView
@@ -20,6 +22,8 @@ import com.google.android.material.button.MaterialButton
 class CloudRulesDialogView(context: Context) :
   AViewGroup(context),
   IHeaderView {
+
+  private var onAction: (CloudRulesDialogAction) -> Unit = {}
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =
@@ -40,7 +44,10 @@ class CloudRulesDialogView(context: Context) :
     }
   }
 
-  val cloudRulesContentView = CloudRulesContentView(context).apply {
+  private val cloudRulesContentView = CloudRulesContentView(
+    context = context,
+    onUpdate = { onAction(CloudRulesDialogAction.Update) }
+  ).apply {
     layoutParams = FrameLayout.LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
@@ -66,14 +73,19 @@ class CloudRulesDialogView(context: Context) :
     viewFlipper.layout(0, header.bottom)
   }
 
-  class CloudRulesContentView(context: Context) : AViewGroup(context) {
+  private class CloudRulesContentView(
+    context: Context,
+    onUpdate: () -> Unit
+  ) : AViewGroup(context) {
 
-    val localVersion = CloudRulesVersionView(context).apply {
+    private val localVersion = CloudRulesVersionView(
+      context,
+      context.getString(R.string.rules_local_repo_version)
+    ).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
-      desc.text = context.getString(R.string.rules_local_repo_version)
     }
 
     private val arrow = AppCompatImageView(context).apply {
@@ -82,15 +94,17 @@ class CloudRulesDialogView(context: Context) :
       importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     }
 
-    val remoteVersion = CloudRulesVersionView(context).apply {
+    private val remoteVersion = CloudRulesVersionView(
+      context,
+      context.getString(R.string.rules_remote_repo_version)
+    ).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
-      desc.text = context.getString(R.string.rules_remote_repo_version)
     }
 
-    val updateButton = MaterialButton(context).apply {
+    private val updateButton = MaterialButton(context).apply {
       layoutParams = LayoutParams(300.dp, ViewGroup.LayoutParams.WRAP_CONTENT).also {
         it.topMargin = 48.dp
       }
@@ -105,10 +119,13 @@ class CloudRulesDialogView(context: Context) :
       addView(arrow)
       addView(remoteVersion)
       addView(updateButton)
+      updateButton.setOnClickListener { onUpdate() }
     }
 
-    fun setUpdateButtonStatus(isEnable: Boolean) {
-      if (isEnable) {
+    fun bind(state: CloudRulesDialogState.Content) {
+      localVersion.bind(state.localVersion)
+      remoteVersion.bind(state.remoteVersion)
+      if (state.updateAvailable) {
         updateButton.apply {
           isEnabled = true
           text = context.getString(R.string.rules_btn_restart_to_update)
@@ -147,9 +164,12 @@ class CloudRulesDialogView(context: Context) :
     }
   }
 
-  class CloudRulesVersionView(context: Context) : AViewGroup(context) {
+  private class CloudRulesVersionView(
+    context: Context,
+    description: CharSequence
+  ) : AViewGroup(context) {
 
-    val version = AppCompatTextView(context).apply {
+    private val version = AppCompatTextView(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
@@ -157,7 +177,7 @@ class CloudRulesDialogView(context: Context) :
       setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadlineLarge))
     }
 
-    val desc = AppCompatTextView(
+    private val desc = AppCompatTextView(
       ContextThemeWrapper(
         context,
         R.style.TextView_SansSerifCondensedMedium
@@ -165,6 +185,7 @@ class CloudRulesDialogView(context: Context) :
     ).apply {
       layoutParams = LayoutParams(120.dp, ViewGroup.LayoutParams.WRAP_CONTENT)
       gravity = Gravity.CENTER
+      text = description
     }
 
     init {
@@ -172,7 +193,8 @@ class CloudRulesDialogView(context: Context) :
       addView(desc)
     }
 
-    fun updateContentDescription() {
+    fun bind(value: Int) {
+      version.text = value.toString()
       contentDescription = listOf(desc.text, version.text)
         .map { it.toString().trim() }
         .filter(String::isNotEmpty)
@@ -199,10 +221,26 @@ class CloudRulesDialogView(context: Context) :
     return header
   }
 
-  fun showContent() {
-    loading.stop()
-    if (viewFlipper.displayedChildView != cloudRulesContentView) {
-      viewFlipper.show(cloudRulesContentView)
+  fun bind(
+    state: CloudRulesDialogState,
+    onAction: (CloudRulesDialogAction) -> Unit
+  ) {
+    this.onAction = onAction
+    when (state) {
+      CloudRulesDialogState.Loading -> {
+        loading.start()
+        if (viewFlipper.displayedChildView != loading) {
+          viewFlipper.show(loading)
+        }
+      }
+
+      is CloudRulesDialogState.Content -> {
+        cloudRulesContentView.bind(state)
+        loading.stop()
+        if (viewFlipper.displayedChildView != cloudRulesContentView) {
+          viewFlipper.show(cloudRulesContentView)
+        }
+      }
     }
   }
 }

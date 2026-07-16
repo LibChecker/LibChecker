@@ -2,7 +2,6 @@ package com.absinthe.libchecker.domain.app.detail.ui.view
 
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageInfo
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ImageSpan
@@ -12,11 +11,10 @@ import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
-import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.URLManager
-import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
+import com.absinthe.libchecker.domain.app.detail.model.AppPropItem
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.AppPropsAdapter
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
@@ -24,7 +22,6 @@ import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.paddingBottomCompat
-import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libchecker.view.span.CenterAlignImageSpan
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
@@ -32,18 +29,11 @@ import timber.log.Timber
 
 class AppPropsBottomSheetView(
   context: Context,
-  packageInfo: PackageInfo?,
-  resolveAppResourceValue: ResolveAppResourceValueUseCase
+  onResourceClick: (AppPropItem) -> Unit
 ) : LinearLayout(context),
   IHeaderView {
 
-  val adapter by unsafeLazy {
-    AppPropsAdapter(
-      packageInfo?.applicationInfo,
-      (context as FragmentActivity).supportFragmentManager,
-      resolveAppResourceValue
-    )
-  }
+  private val adapter = AppPropsAdapter(onResourceClick)
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =
@@ -114,6 +104,14 @@ class AppPropsBottomSheetView(
     addView(header)
     addView(tipView)
     addView(list)
+  }
+
+  fun bind(items: List<AppPropItem>) {
+    adapter.setList(items)
+  }
+
+  fun updateItem(item: AppPropItem) {
+    adapter.replace(item)
   }
 
   override fun getHeaderView(): BottomSheetHeaderView {

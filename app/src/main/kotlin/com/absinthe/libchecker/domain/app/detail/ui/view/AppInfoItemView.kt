@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.domain.app.detail.ui.view
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.text.TextUtils
 import android.util.TypedValue
@@ -14,8 +15,10 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.isVisible
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.detail.model.AppInfoActionItem
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
@@ -109,5 +112,11 @@ class AppInfoItemView(context: Context) : LinearLayout(context) {
 
   fun setIconBackgroundTintColor(@ColorRes res: Int) {
     icon.backgroundTintList = res.toColorStateList(context)
+  }
+
+  fun bind(item: AppInfoActionItem, onClick: (AppInfoActionItem) -> Unit) {
+    setIconBackground(item.icon ?: Color.TRANSPARENT.toDrawable())
+    setText(item.label)
+    setOnClickListener { onClick(item) }
   }
 }

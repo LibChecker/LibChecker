@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.domain.statistics.reference.usecase
 
 import android.content.pm.PackageInfo
-import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 
 class GetLibReferenceIconPackagesUseCase(
   private val installedAppRepository: InstalledAppRepository

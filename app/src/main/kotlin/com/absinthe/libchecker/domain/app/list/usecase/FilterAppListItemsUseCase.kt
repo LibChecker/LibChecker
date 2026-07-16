@@ -3,7 +3,7 @@ package com.absinthe.libchecker.domain.app.list.usecase
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 
 class FilterAppListItemsUseCase(

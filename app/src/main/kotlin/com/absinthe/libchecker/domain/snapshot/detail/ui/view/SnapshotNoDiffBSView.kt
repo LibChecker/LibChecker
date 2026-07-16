@@ -2,9 +2,13 @@ package com.absinthe.libchecker.domain.snapshot.detail.ui.view
 
 import android.content.Context
 import android.view.View
+import android.view.View.OnClickListener
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotNoDiffMode
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotNoDiffRenderState
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotNoDiffTitleIconRenderState
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
@@ -19,7 +23,7 @@ class SnapshotNoDiffBSView(context: Context) :
     title.text = context.getString(R.string.detail)
   }
 
-  val title = SnapshotTitleView(context).apply {
+  private val title = SnapshotTitleView(context).apply {
     layoutParams = LayoutParams(
       LayoutParams.MATCH_PARENT,
       LayoutParams.WRAP_CONTENT
@@ -39,28 +43,41 @@ class SnapshotNoDiffBSView(context: Context) :
     addView(title)
   }
 
-  fun setMode(mode: Mode) {
+  fun render(state: SnapshotNoDiffRenderState) {
+    title.render(state.title)
+    setMode(state.mode)
+  }
+
+  fun renderTitleIcon(
+    state: SnapshotNoDiffTitleIconRenderState,
+    onClickListener: OnClickListener? = null
+  ) {
+    title.setIconSource(state.iconSource)
+    title.setIconClickListener(onClickListener.takeIf { state.opensDetailOnClick })
+  }
+
+  private fun setMode(mode: SnapshotNoDiffMode) {
     stubView?.let {
       if (it.parent != null) {
         (it.parent as ViewGroup).removeView(it)
       }
     }
     when (mode) {
-      Mode.New -> {
+      SnapshotNoDiffMode.New -> {
         stubView = SnapshotDetailNewInstallView(context).apply {
           layoutParams =
             LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
         }
       }
 
-      Mode.Deleted -> {
+      SnapshotNoDiffMode.Deleted -> {
         stubView = SnapshotDetailDeletedView(context).apply {
           layoutParams =
             LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
         }
       }
 
-      Mode.NothingChanged -> {
+      SnapshotNoDiffMode.NothingChanged -> {
         stubView = SnapshotEmptyView(context).apply {
           layoutParams =
             LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
@@ -72,11 +89,5 @@ class SnapshotNoDiffBSView(context: Context) :
 
   override fun getHeaderView(): BottomSheetHeaderView {
     return header
-  }
-
-  sealed class Mode {
-    data object New : Mode()
-    data object Deleted : Mode()
-    data object NothingChanged : Mode()
   }
 }

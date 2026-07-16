@@ -2,8 +2,8 @@ package com.absinthe.libchecker.domain.app.list.usecase
 
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.list.TRACE_APP_LIST_BUILD_UPDATE_PLAN
+import com.absinthe.libchecker.domain.app.list.stableAppListItemIdForKey
 import com.absinthe.libchecker.domain.app.list.traceAppListSection
-import com.absinthe.libchecker.domain.app.stableAppListItemIdForKey
 
 class BuildAppListUpdatePlanUseCase {
 

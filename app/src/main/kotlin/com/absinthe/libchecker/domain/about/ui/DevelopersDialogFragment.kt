@@ -1,7 +1,9 @@
 package com.absinthe.libchecker.domain.about.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.api.ApiManager
@@ -11,10 +13,13 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.domain.about.model.CachedDeveloperInfo
 import com.absinthe.libchecker.domain.about.model.DeveloperInfo
+import com.absinthe.libchecker.domain.about.model.DevelopersDialogAction
+import com.absinthe.libchecker.domain.about.model.DevelopersDialogState
 import com.absinthe.libchecker.domain.about.ui.view.DevelopersDialogView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.JsonUtil
 import com.absinthe.libchecker.utils.SPUtils
+import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
@@ -28,6 +33,8 @@ import timber.log.Timber
 
 class DevelopersDialogFragment : BaseBottomSheetViewDialogFragment<DevelopersDialogView>() {
 
+  private var dialogState: DevelopersDialogState? = null
+
   override fun initRootView(): DevelopersDialogView = DevelopersDialogView(requireContext())
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
@@ -39,12 +46,12 @@ class DevelopersDialogFragment : BaseBottomSheetViewDialogFragment<DevelopersDia
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+    dialogState?.let { root.bind(it, ::handleAction) }
     val authorization = GlobalValues.githubApiAuthorizationHeaderFor(ApiManager.GITHUB_API_REPO_CONTRIBUTORS)
     val tokenCacheKey = GlobalValues.githubApiTokenVersion.toString()
     val cached = cachedItems
     if (cached != null) {
-      root.setItems(cached.items)
-      root.setLoading(false)
+      render(DevelopersDialogState.Content(cached.items))
       if (!cached.shouldRefresh(tokenCacheKey)) {
         return
       }
@@ -53,8 +60,7 @@ class DevelopersDialogFragment : BaseBottomSheetViewDialogFragment<DevelopersDia
     val diskCache = if (cached == null) {
       readCachedItems()?.also {
         cachedItems = it
-        root.setItems(it.items)
-        root.setLoading(false)
+        render(DevelopersDialogState.Content(it.items))
       }
     } else {
       null
@@ -66,7 +72,7 @@ class DevelopersDialogFragment : BaseBottomSheetViewDialogFragment<DevelopersDia
     viewLifecycleOwner.lifecycleScope.launch {
       val hasVisibleItems = cached != null || diskCache != null
       if (!hasVisibleItems) {
-        root.setLoading(true)
+        render(DevelopersDialogState.Loading)
       }
       val result = runCatching {
         withContext(Dispatchers.IO) {
@@ -81,18 +87,40 @@ class DevelopersDialogFragment : BaseBottomSheetViewDialogFragment<DevelopersDia
             tokenCacheKey = tokenCacheKey
           )
           cacheItems(it, tokenCacheKey)
-          root.setItems(it)
+          render(DevelopersDialogState.Content(it))
         } else if (!hasVisibleItems) {
-          root.setItems(fallbackItems)
+          render(DevelopersDialogState.Content(fallbackItems))
         }
       }.onFailure {
         it.logGitHubRequestFailure()
         if (!hasVisibleItems) {
-          root.setItems(fallbackItems)
+          render(DevelopersDialogState.Content(fallbackItems))
         }
       }
-      if (!hasVisibleItems) {
-        root.setLoading(false)
+    }
+  }
+
+  private fun render(state: DevelopersDialogState) {
+    dialogState = state
+    root.bind(state, ::handleAction)
+  }
+
+  private fun handleAction(action: DevelopersDialogAction) {
+    when (action) {
+      is DevelopersDialogAction.OpenProfile -> launchProfile(action.url)
+    }
+  }
+
+  private fun launchProfile(url: String) {
+    runCatching {
+      CustomTabsIntent.Builder().build().launchUrl(requireContext(), url.toUri())
+    }.onFailure { throwable ->
+      Timber.e(throwable)
+      runCatching {
+        startActivity(Intent(Intent.ACTION_VIEW).setData(url.toUri()))
+      }.onFailure { inner ->
+        Timber.e(inner)
+        Toasty.showShort(requireContext(), "No browser application")
       }
     }
   }
@@ -262,7 +290,7 @@ class DevelopersDialogFragment : BaseBottomSheetViewDialogFragment<DevelopersDia
       name = displayName,
       desc = toDescription(),
       github = githubUrl,
-      avatarUrl = avatar.toUri()
+      avatarUrl = avatar
     )
   }
 
@@ -276,7 +304,7 @@ class DevelopersDialogFragment : BaseBottomSheetViewDialogFragment<DevelopersDia
       name = name,
       desc = desc,
       github = github,
-      avatarUrl = avatarUrl.toString()
+      avatarUrl = avatarUrl
     )
   }
 
@@ -285,7 +313,7 @@ class DevelopersDialogFragment : BaseBottomSheetViewDialogFragment<DevelopersDia
       name = name,
       desc = desc,
       github = github,
-      avatarUrl = avatarUrl.toUri()
+      avatarUrl = avatarUrl
     )
   }
 
@@ -326,25 +354,25 @@ class DevelopersDialogFragment : BaseBottomSheetViewDialogFragment<DevelopersDia
         "Absinthe",
         "Maintainer",
         "https://github.com/zhaobozhen",
-        "https://avatars.githubusercontent.com/u/25247117".toUri()
+        "https://avatars.githubusercontent.com/u/25247117"
       ),
       DeveloperInfo(
         "Goooler",
         "Code Tidy & Optimize",
         "https://github.com/Goooler",
-        "https://avatars.githubusercontent.com/u/10363352".toUri()
+        "https://avatars.githubusercontent.com/u/10363352"
       ),
       DeveloperInfo(
         "qhy040404",
         "Developer",
         "https://github.com/qhy040404",
-        "https://avatars.githubusercontent.com/u/45379733".toUri()
+        "https://avatars.githubusercontent.com/u/45379733"
       ),
       DeveloperInfo(
         "Source Code",
         URLManager.GITHUB_REPO_PAGE,
         URLManager.GITHUB_REPO_PAGE,
-        "https://avatars.githubusercontent.com/u/116417672".toUri()
+        "https://avatars.githubusercontent.com/u/116417672"
       )
     )
   }

@@ -2,6 +2,8 @@ package com.absinthe.libchecker.domain.app.detail.action
 
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import com.absinthe.libchecker.domain.app.detail.model.AppPropItem
+import com.absinthe.libchecker.domain.app.detail.resource.AppResourceReference
 import com.absinthe.libchecker.utils.extensions.maybeResourceId
 import com.absinthe.libchecker.utils.manifest.ApplicationReader
 import com.absinthe.libchecker.utils.manifest.PropertiesMap
@@ -17,7 +19,7 @@ class GetAppManifestPropertiesUseCase(
   suspend operator fun invoke(
     packageInfo: PackageInfo?,
     properties: Map<String, *>? = null
-  ): List<AppManifestProperty> = withContext(Dispatchers.IO) {
+  ): List<AppPropItem> = withContext(Dispatchers.IO) {
     val propertyMap = properties ?: packageInfo?.applicationInfo?.sourceDir
       ?.let { sourceDir ->
         runCatching {
@@ -44,15 +46,13 @@ class GetAppManifestPropertiesUseCase(
             appResources?.getResourceTypeName(id)
           }.getOrNull()
         }
-        AppManifestProperty(
+        AppPropItem(
           key = property.key,
-          value = value,
-          displayValue = resourceName ?: PropertiesMap.parseProperty(property.key, value),
-          resourceId = resourceId,
-          resourceType = resourceType
+          originalDisplayValue = resourceName ?: PropertiesMap.parseProperty(property.key, value),
+          resource = AppResourceReference.create(resourceId, resourceType)
         )
       }
-      .sortedBy { property -> property.key }
+      .sortedBy(AppPropItem::key)
   }
 
   private fun Any?.toPropertyValue(): String {
@@ -66,11 +66,3 @@ class GetAppManifestPropertiesUseCase(
     return takeIf(String::maybeResourceId)?.toIntOrNull()
   }
 }
-
-data class AppManifestProperty(
-  val key: String,
-  val value: String,
-  val displayValue: String,
-  val resourceId: Int?,
-  val resourceType: String?
-)

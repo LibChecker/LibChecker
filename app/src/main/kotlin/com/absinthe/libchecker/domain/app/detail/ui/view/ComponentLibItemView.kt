@@ -5,34 +5,26 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.PointF
-import android.text.TextUtils
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginEnd
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.detail.model.LibStringComponentItemDisplay
+import com.absinthe.libchecker.domain.app.detail.model.LibStringPermissionItemDisplay
 import com.absinthe.libchecker.utils.UiUtils
-import com.absinthe.libchecker.utils.extensions.displayWidth
+import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
-import com.absinthe.libchecker.view.AViewGroup
-import com.absinthe.rulesbundle.Rule
-import com.google.android.material.chip.Chip
 
-class ComponentLibItemView(context: Context) : AViewGroup(context) {
+class ComponentLibItemView(context: Context) : RuleChipItemView(context) {
 
   init {
-    isClickable = true
-    isFocusable = true
-    clipToPadding = false
-    val horizontalPadding = context.getDimensionPixelSize(R.dimen.normal_padding)
-    val verticalPadding = 4.dp
-    setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding)
     setWillNotDraw(false)
   }
 
-  val libName =
+  private val libName =
     AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)).apply {
       id = android.R.id.title
       layoutParams = LayoutParams(
@@ -46,42 +38,36 @@ class ComponentLibItemView(context: Context) : AViewGroup(context) {
       addView(this)
     }
 
-  private var chip: Chip? = null
-  private var chipRule: Rule? = null
-  private var chipColorfulIcon: Boolean? = null
-
-  fun setChip(rule: Rule?, colorfulIcon: Boolean) {
-    if (chipRule == rule && chipColorfulIcon == colorfulIcon) {
-      return
-    }
-    chipRule = rule
-    chipColorfulIcon = colorfulIcon
-    chip = rule?.let {
-      getOrCreateChip().apply {
-        text = it.label
-        chipIcon = RuleChipIconCache.newDrawable(context, it, colorfulIcon)
-      }
-    } ?: run {
-      chip?.let { removeView(it) }
-      null
-    }
+  fun bind(
+    display: LibStringComponentItemDisplay,
+    highlightText: String,
+    colorfulRuleIcon: Boolean
+  ) {
+    libName.setLibStringItemName(display.name, highlightText)
+    bindRuleChip(display.rule, colorfulRuleIcon)
+    processLabelColor = display.processIndicatorColor ?: -1
+    contentDescription = display.contentDescription
   }
 
-  private fun getOrCreateChip() = chip ?: Chip(context).apply {
-    isClickable = false
-    isFocusable = false
-    importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
-    layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 48.dp)
-    maxWidth = (context.displayWidth * 0.45f).toInt()
-    ellipsize = TextUtils.TruncateAt.MIDDLE
-    addView(this)
+  fun bind(
+    display: LibStringPermissionItemDisplay,
+    highlightText: String
+  ) {
+    libName.setLibStringItemName(display.name, highlightText)
+    bindRuleChip(null, false)
+    processLabelColor = if (display.showNotGrantedIndicator) {
+      R.color.material_red_500.getColor(context)
+    } else {
+      -1
+    }
+    contentDescription = display.contentDescription
   }
 
   private var shouldBreakLines = false
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-    var chipWidth = chip?.apply { autoMeasure() }?.measuredWidth ?: 0
+    var chipWidth = ruleChip?.apply { autoMeasure() }?.measuredWidth ?: 0
 
     if (chipWidth > (measuredWidth * 4 / 7)) {
       chipWidth = 0
@@ -96,7 +82,7 @@ class ComponentLibItemView(context: Context) : AViewGroup(context) {
       libName.measure(libNameWidth.toExactlyMeasureSpec(), libName.defaultHeightMeasureSpec(this))
     }
     val height = if (shouldBreakLines) {
-      libName.measuredHeight + paddingTop + paddingBottom + (chip?.measuredHeight ?: 0)
+      libName.measuredHeight + paddingTop + paddingBottom + (ruleChip?.measuredHeight ?: 0)
     } else {
       libName.measuredHeight + paddingTop + paddingBottom
     }.coerceAtLeast(40.dp)
@@ -106,19 +92,20 @@ class ComponentLibItemView(context: Context) : AViewGroup(context) {
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     if (shouldBreakLines) {
       libName.layout(paddingStart, paddingTop)
-      chip?.layout(paddingStart, libName.bottom)
+      ruleChip?.layout(paddingStart, libName.bottom)
     } else {
       libName.layout(paddingStart, libName.toVerticalCenter(this))
-      chip?.let {
+      ruleChip?.let {
         it.layout(paddingEnd, it.toVerticalCenter(this), fromRight = true)
       }
     }
   }
 
-  var processLabelColor: Int = -1
+  private var processLabelColor: Int = -1
     set(value) {
       field = value
       paint.color = value
+      invalidate()
     }
 
   private val paint = Paint().also {

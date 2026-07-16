@@ -2,10 +2,10 @@ package com.absinthe.libchecker.domain.app.sync
 
 import android.content.pm.PackageInfo
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.AppListItemFactory
-import com.absinthe.libchecker.domain.app.AppListRepository
-import com.absinthe.libchecker.domain.app.InstalledAppRepository
-import com.absinthe.libchecker.domain.app.PackageChangeState
+import com.absinthe.libchecker.domain.app.list.AppListItemFactory
+import com.absinthe.libchecker.domain.app.model.PackageChangeState
+import com.absinthe.libchecker.domain.app.repository.AppListRepository
+import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import kotlinx.coroutines.currentCoroutineContext

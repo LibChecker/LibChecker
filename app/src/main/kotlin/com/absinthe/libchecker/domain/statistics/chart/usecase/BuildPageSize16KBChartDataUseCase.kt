@@ -5,7 +5,7 @@ import android.os.Trace
 import com.absinthe.libchecker.constant.Constants.MULTI_ARCH
 import com.absinthe.libchecker.constant.GlobalFeatures
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.apk.ZipDataOffsetReader
 import com.absinthe.libchecker.utils.elf.ElfParser

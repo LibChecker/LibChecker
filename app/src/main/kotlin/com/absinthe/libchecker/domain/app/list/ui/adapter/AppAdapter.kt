@@ -1,37 +1,26 @@
 package com.absinthe.libchecker.domain.app.list.ui.adapter
 
 import android.content.Context
-import android.content.pm.PackageInfo
-import android.graphics.drawable.Drawable
-import android.text.SpannableString
-import android.text.style.ImageSpan
 import android.view.ViewGroup
-import androidx.appcompat.widget.AppCompatImageView
-import coil.dispose
-import coil.load
-import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.app.list.model.AppListItemDisplay
 import com.absinthe.libchecker.domain.app.list.model.AppListItemViewState
+import com.absinthe.libchecker.domain.app.list.model.AppListRenderState
+import com.absinthe.libchecker.domain.app.list.stableAppListItemIdForKey
 import com.absinthe.libchecker.domain.app.list.ui.view.AppItemView
-import com.absinthe.libchecker.domain.app.stableAppListItemIdForKey
 import com.absinthe.libchecker.ui.adapter.HighlightAdapter
-import com.absinthe.libchecker.utils.extensions.addStrikeThroughSpan
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
-import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
-import com.absinthe.libchecker.view.span.CenterAlignImageSpan
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
 class AppAdapter(
-  private val cardMode: CardMode = CardMode.NORMAL,
-  private var fallbackDisplayOptions: Int = AdvancedOptions.DEFAULT_OPTIONS
+  private val cardMode: CardMode = CardMode.NORMAL
 ) : HighlightAdapter<LCItem>(AppListDiffUtil()) {
 
-  private val itemViewStateCache = mutableMapOf<String, AppListItemViewState>()
+  private var renderState = AppListRenderState()
+  private val pendingItemViewStateCache = mutableMapOf<String, AppListItemViewState>()
   private var itemViewStyle: AppItemView.Style? = null
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
@@ -56,51 +45,15 @@ class AppAdapter(
         radius = 0f
       }
     }
-    root.container.apply {
-      val viewState = getItemViewState(item)
-      val packageInfo = viewState.packageInfo
-      if (item.packageName != Constants.EXAMPLE_PACKAGE) {
-        icon.loadAppIcon(packageInfo, getItemViewStyle(context).newIconPlaceholder(context))
-      }
-      bindIdentityText(root, item, viewState)
-
-      versionInfo.text = viewState.versionInfo
-      setDetachedAbiBadgeLayoutEnabled(viewState.useDetachedAbiBadges)
-
-      if (viewState.useDetachedAbiBadges) {
-        if (viewState.largeAbiBadgeRes != 0) {
-          val abiBadge = viewState.largeAbiBadgeRes.getDrawable(context)?.mutate()?.apply {
-            setTint(context.getAbiBadgeTint(viewState.isAbiBadge64Bit, viewState.tintAbiLabels))
-          }
-          val multiArchBadge = if (viewState.showMultiArchBadge) {
-            R.drawable.ic_abi_label_multi_arch.getDrawable(context)?.mutate()?.apply {
-              setTint(context.getMultiArchBadgeTint(viewState.tintAbiLabels))
-            }
-          } else {
-            null
-          }
-          setAbiBadges(abiBadge, multiArchBadge)
-        } else {
-          setAbiBadges(null, null)
-        }
-        abiInfo.text = viewState.abiInfo
-      } else {
-        setAbiBadges(null, null)
-        abiInfo.text = context.buildInlineAbiInfo(viewState)
-      }
-
-      when (viewState.packageBadge) {
-        AppListItemViewState.PackageBadge.Harmony -> setBadge(R.drawable.ic_harmony_badge)
-        AppListItemViewState.PackageBadge.Frozen -> setBadge(R.drawable.ic_disabled_package)
-        null -> setBadge(null)
-      }
-    }
+    val viewState = getItemViewState(item)
+    root.setItemDisplay(createItemDisplay(item, viewState), highlightText)
   }
 
   override fun convert(holder: BaseViewHolder, item: LCItem, payloads: List<Any>) {
     if (payloads.any { it === HIGHLIGHT_TEXT_PAYLOAD }) {
       val root = holder.itemView as AppItemView
-      bindIdentityText(root, item, getItemViewState(item))
+      val viewState = getItemViewState(item)
+      root.setItemIdentityDisplay(createItemDisplay(item, viewState), highlightText)
     } else {
       convert(holder, item)
     }
@@ -113,17 +66,10 @@ class AppAdapter(
     return stableAppListItemIdForKey(data[position].packageName)
   }
 
-  fun setItemViewStates(itemViewStates: Map<String, AppListItemViewState>) {
-    itemViewStateCache.clear()
-    itemViewStateCache.putAll(itemViewStates)
-  }
-
-  fun putItemViewStates(itemViewStates: Map<String, AppListItemViewState>) {
-    itemViewStateCache.putAll(itemViewStates)
-  }
-
-  fun clearItemViewStateCache() {
-    itemViewStateCache.clear()
+  fun bind(state: AppListRenderState) {
+    renderState = state
+    highlightText = state.highlightText
+    pendingItemViewStateCache.clear()
   }
 
   fun notifyHighlightTextChanged() {
@@ -132,19 +78,15 @@ class AppAdapter(
     }
   }
 
-  fun setFallbackDisplayOptions(options: Int) {
-    fallbackDisplayOptions = options
-    clearItemViewStateCache()
-  }
-
   private fun getItemViewState(item: LCItem): AppListItemViewState {
-    return itemViewStateCache.getOrPut(item.packageName) {
-      AppListItemViewState.createPending(
-        context = context,
-        item = item,
-        options = fallbackDisplayOptions
-      )
-    }
+    return renderState.itemViewStates[item.packageName]
+      ?: pendingItemViewStateCache.getOrPut(item.packageName) {
+        AppListItemViewState.createPending(
+          context = context,
+          item = item,
+          options = renderState.fallbackDisplayOptions
+        )
+      }
   }
 
   private fun getItemViewStyle(context: Context): AppItemView.Style {
@@ -153,25 +95,15 @@ class AppAdapter(
     }
   }
 
-  private fun bindIdentityText(
-    root: AppItemView,
+  private fun createItemDisplay(
     item: LCItem,
     viewState: AppListItemViewState
-  ) {
-    root.container.apply {
-      setOrHighlightText(appName, item.label)
-      setOrHighlightText(packageName, item.packageName)
-
-      if (viewState.isPackageMissing && cardMode != CardMode.DEMO) {
-        appName.addStrikeThroughSpan()
-        packageName.addStrikeThroughSpan()
-      }
-    }
-    root.setItemContentDescription(
-      item.label,
-      item.packageName,
-      viewState.versionInfo,
-      viewState.accessibilityAbiInfo
+  ): AppListItemDisplay {
+    return AppListItemDisplay.create(
+      label = item.label,
+      packageName = item.packageName,
+      viewState = viewState,
+      showMissingPackageStrikeThrough = viewState.isPackageMissing && cardMode != CardMode.DEMO
     )
   }
 
@@ -183,66 +115,4 @@ class AppAdapter(
   private companion object {
     private val HIGHLIGHT_TEXT_PAYLOAD = Any()
   }
-}
-
-private fun AppCompatImageView.loadAppIcon(packageInfo: PackageInfo?, placeholderDrawable: Drawable?) {
-  if (packageInfo == null) {
-    dispose()
-    setImageDrawable(placeholderDrawable)
-    return
-  }
-  load(packageInfo) {
-    placeholder(placeholderDrawable)
-    error(placeholderDrawable)
-  }
-}
-
-private fun Context.getAbiBadgeTint(isAbi64Bit: Boolean, tintAbiLabels: Boolean): Int {
-  if (!tintAbiLabels) {
-    return getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant)
-  }
-  return getColorByAttr(
-    if (isAbi64Bit) {
-      androidx.appcompat.R.attr.colorPrimary
-    } else {
-      com.google.android.material.R.attr.colorTertiary
-    }
-  )
-}
-
-private fun Context.buildInlineAbiInfo(viewState: AppListItemViewState): CharSequence {
-  if (viewState.abiBadgeRes == 0) {
-    return viewState.abiInfo
-  }
-
-  var paddingString = "  ${viewState.abiInfo}"
-  if (viewState.showMultiArchBadge) {
-    paddingString = "  $paddingString"
-  }
-  val spanString = SpannableString(paddingString)
-
-  viewState.abiBadgeRes.getDrawable(this)?.mutate()?.let {
-    it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
-    it.setTint(getAbiBadgeTint(viewState.isAbiBadge64Bit, viewState.tintAbiLabels))
-    spanString.setSpan(CenterAlignImageSpan(it), 0, 1, ImageSpan.ALIGN_BOTTOM)
-  }
-  if (viewState.showMultiArchBadge) {
-    R.drawable.ic_multi_arch.getDrawable(this)?.mutate()?.let {
-      it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
-      it.setTint(getMultiArchBadgeTint(viewState.tintAbiLabels))
-      spanString.setSpan(CenterAlignImageSpan(it), 2, 3, ImageSpan.ALIGN_BOTTOM)
-    }
-  }
-
-  return spanString
-}
-
-private fun Context.getMultiArchBadgeTint(tintAbiLabels: Boolean): Int {
-  return getColorByAttr(
-    if (tintAbiLabels) {
-      com.google.android.material.R.attr.colorSecondary
-    } else {
-      com.google.android.material.R.attr.colorOnSurfaceVariant
-    }
-  )
 }

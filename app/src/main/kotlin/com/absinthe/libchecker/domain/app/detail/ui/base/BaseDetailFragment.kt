@@ -13,21 +13,27 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.NATIVE
-import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
-import com.absinthe.libchecker.domain.app.AppListSettingsRepository
-import com.absinthe.libchecker.domain.app.BuildNativeLibraryItemDisplayDataUseCase
-import com.absinthe.libchecker.domain.app.ResolveAppResourceValueUseCase
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemDialogRequest
 import com.absinthe.libchecker.domain.app.detail.action.GetPermissionProvidersUseCase
+import com.absinthe.libchecker.domain.app.detail.model.LibStringAction
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
+import com.absinthe.libchecker.domain.app.detail.model.LibStringMetadataItemDisplay
+import com.absinthe.libchecker.domain.app.detail.model.LibStringRenderState
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
+import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_TEXT
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
+import com.absinthe.libchecker.domain.app.detail.resource.AppResourcePreview
+import com.absinthe.libchecker.domain.app.detail.resource.ResolveAppResourceValueUseCase
+import com.absinthe.libchecker.domain.app.detail.resource.ResolveAppResourceValueUseCase.AppResourceValue
 import com.absinthe.libchecker.domain.app.detail.ui.DetailFragmentManager
 import com.absinthe.libchecker.domain.app.detail.ui.IDetailContainer
 import com.absinthe.libchecker.domain.app.detail.ui.Sortable
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.LibStringAdapter
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.LibDetailDialogFragment
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.PermissionDetailDialogFragment
+import com.absinthe.libchecker.domain.app.detail.ui.dialog.XmlBSDFragment
+import com.absinthe.libchecker.domain.app.repository.AppDetailSettingsRepository
+import com.absinthe.libchecker.domain.app.repository.AppListSettingsRepository
 import com.absinthe.libchecker.ui.base.BaseFragment
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
@@ -59,21 +65,21 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   protected val viewModel: DetailViewModel by activityViewModel()
   private val appDetailSettingsRepository: AppDetailSettingsRepository by inject()
   private val appListSettingsRepository: AppListSettingsRepository by inject()
-  private val buildNativeLibraryItemDisplayData: BuildNativeLibraryItemDisplayDataUseCase by inject()
   private val resolveAppResourceValue: ResolveAppResourceValueUseCase by inject()
   private val getPermissionProvidersUseCase: GetPermissionProvidersUseCase by inject()
   protected val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME).orEmpty() }
   protected val type by lazy { arguments?.getInt(EXTRA_TYPE) ?: NATIVE }
+  private var listRenderState = LibStringRenderState()
   protected val adapter by lazy {
-    LibStringAdapter(
-      packageName = packageName,
-      type = type,
+    listRenderState = listRenderState.copy(
       itemDisplayOptions = appListSettingsRepository.itemDisplayOptions,
       colorfulRuleIcon = appListSettingsRepository.colorfulRuleIcon,
-      fragmentManager = childFragmentManager,
-      buildNativeLibraryItemDisplayData = buildNativeLibraryItemDisplayData,
-      resolveAppResourceValue = resolveAppResourceValue
+      processMode = appDetailSettingsRepository.processMode
     )
+    LibStringAdapter(
+      type = type,
+      onAction = ::onAdapterAction
+    ).apply { bind(listRenderState) }
   }
   protected val emptyView by unsafeLazy {
     EmptyListView(requireContext()).apply {
@@ -148,7 +154,6 @@ abstract class BaseDetailFragment<T : ViewBinding> :
         longClickController.onLongClick(getItem(position), position)
         true
       }
-      setProcessMode(appDetailSettingsRepository.processMode)
     }
   }
 
@@ -185,9 +190,10 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     val list = mutableListOf<LibStringItemChip>().also {
       it += adapter.data
     }
+    val highlightPosition = listRenderState.highlightPosition
     val itemChip =
-      if (adapter.highlightPosition != -1 && adapter.highlightPosition < adapter.data.size) {
-        adapter.data[adapter.highlightPosition]
+      if (highlightPosition != LibStringRenderState.NO_HIGHLIGHT_POSITION && highlightPosition < adapter.data.size) {
+        adapter.data[highlightPosition]
       } else {
         null
       }
@@ -196,7 +202,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
 
     if (itemChip != null) {
       val newHighlightPosition = sortedList.indexOf(itemChip)
-      adapter.setHighlightBackgroundItem(newHighlightPosition)
+      updateListRenderState { it.withHighlightPosition(newHighlightPosition) }
     }
 
     adapter.preloadRuleChipIcons(sortedList)
@@ -227,12 +233,12 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     searchWords: String?,
     process: String?
   ) {
-    adapter.highlightText = searchWords.orEmpty()
+    updateListRenderState { it.copy(highlightText = searchWords.orEmpty()) }
     updateItemsWithFilterResult(viewModel.filterAndSortDetailItems(items, searchWords, process, type))
   }
 
   override suspend fun setItemsWithFilter(searchWords: String?, process: String?) {
-    adapter.highlightText = searchWords.orEmpty()
+    updateListRenderState { it.copy(highlightText = searchWords.orEmpty()) }
     updateItemsWithFilterResult(getFilterList(searchWords, process))
   }
 
@@ -251,7 +257,15 @@ abstract class BaseDetailFragment<T : ViewBinding> :
             getRecyclerView().addItemDecoration(dividerItemDecoration)
           }
         }
+        // Prevent BRVAH from inserting the new rows before removing its state view.
+        val shouldRestoreStateView = adapter.data.isEmpty() && it.isNotEmpty() && adapter.isStateViewEnable
+        if (shouldRestoreStateView) {
+          adapter.isStateViewEnable = false
+        }
         adapter.setDiffNewData(it.toMutableList()) {
+          if (shouldRestoreStateView) {
+            adapter.isStateViewEnable = true
+          }
           afterListReadyTask?.run()
           viewModel.filterState.updateItemsCount(type, it.size)
         }
@@ -260,9 +274,17 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   }
 
   fun setProcessMode(processMode: Boolean) {
-    if (isComponentFragment()) {
-      adapter.setProcessMode(processMode)
+    if (
+      isComponentFragment() &&
+      updateListRenderState { it.copy(processMode = processMode) }
+    ) {
+      // noinspection NotifyDataSetChanged
+      adapter.notifyDataSetChanged()
     }
+  }
+
+  protected fun bindProcessColors(processColors: Map<String, Int>) {
+    updateListRenderState { it.copy(processColors = processColors) }
   }
 
   fun setupListReadyTask() {
@@ -305,7 +327,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
       }
     }
 
-    adapter.setHighlightBackgroundItem(componentPosition)
+    updateListRenderState { it.withHighlightPosition(componentPosition) }
     //noinspection NotifyDataSetChanged
     adapter.notifyDataSetChanged()
   }
@@ -314,7 +336,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     if (position < 0 || position >= adapter.itemCount) {
       return
     }
-    when (val request = viewModel.buildDetailItemDialogRequest(adapter.getItem(position), adapter.type)) {
+    when (val request = viewModel.buildDetailItemDialogRequest(adapter.getItem(position), type)) {
       is DetailItemDialogRequest.Permission -> {
         PermissionDetailDialogFragment.newInstance(request.permissionName)
           .show(childFragmentManager, PermissionDetailDialogFragment::class.java.name)
@@ -325,6 +347,78 @@ abstract class BaseDetailFragment<T : ViewBinding> :
           .show(childFragmentManager, LibDetailDialogFragment::class.java.name)
       }
     }
+  }
+
+  private fun onMetadataResourceClick(
+    item: LibStringItemChip,
+    display: LibStringMetadataItemDisplay
+  ) {
+    if (display.isTransformed) {
+      adapter.setMetadataPreview(item, AppResourcePreview.Original)
+      return
+    }
+    val resource = display.resource ?: return
+
+    viewLifecycleOwner.lifecycleScope.launch {
+      when (
+        val resourceValue = withContext(Dispatchers.IO) {
+          resolveAppResourceValue(
+            ResolveAppResourceValueUseCase.Request(
+              packageName = packageName,
+              resourceId = resource.id,
+              resourceType = resource.type
+            )
+          )
+        }
+      ) {
+        is AppResourceValue.Text -> adapter.setMetadataPreview(
+          item,
+          AppResourcePreview.Text(resourceValue.value)
+        )
+
+        is AppResourceValue.Xml -> showXml(resourceValue.value)
+
+        is AppResourceValue.DrawablePreview -> adapter.setMetadataPreview(
+          item,
+          AppResourcePreview.DrawableValue(resourceValue.drawable)
+        )
+
+        is AppResourceValue.ColorPreview -> adapter.setMetadataPreview(
+          item,
+          AppResourcePreview.ColorValue(resourceValue.color)
+        )
+
+        null -> Unit
+      }
+    }
+  }
+
+  private fun onAdapterAction(action: LibStringAction) {
+    when (action) {
+      is LibStringAction.MetadataResourceClicked -> onMetadataResourceClick(action.item, action.display)
+    }
+  }
+
+  private fun updateListRenderState(
+    transform: (LibStringRenderState) -> LibStringRenderState
+  ): Boolean {
+    val currentAdapter = adapter
+    val state = transform(listRenderState)
+    if (state == listRenderState) {
+      return false
+    }
+    listRenderState = state
+    currentAdapter.bind(state)
+    return true
+  }
+
+  private fun showXml(xml: CharSequence) {
+    val fragmentManager = childFragmentManager
+    XmlBSDFragment().apply {
+      arguments = Bundle().apply {
+        putCharSequence(EXTRA_TEXT, xml)
+      }
+    }.show(fragmentManager, XmlBSDFragment::class.java.name)
   }
 
   fun isComponentFragment(): Boolean {

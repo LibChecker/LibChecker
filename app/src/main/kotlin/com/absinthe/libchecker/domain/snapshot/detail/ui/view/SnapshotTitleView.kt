@@ -1,26 +1,27 @@
 package com.absinthe.libchecker.domain.snapshot.detail.ui.view
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.util.AttributeSet
+import android.view.View.OnClickListener
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.text.buildSpannedString
-import androidx.core.text.scale
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.core.view.marginStart
+import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotTitlePackageSizeRenderState
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotTitleRenderState
+import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.domain.snapshot.ui.view.SnapshotPackageSizeLineBreaker
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.applyCondensedSingleLine
 import com.absinthe.libchecker.utils.extensions.applySingleLineEndEllipsize
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
-import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.app.AlwaysMarqueeTextView
 
@@ -29,7 +30,7 @@ class SnapshotTitleView(
   attributeSet: AttributeSet? = null
 ) : AViewGroup(context, attributeSet) {
 
-  val iconView = AppCompatImageView(context).apply {
+  private val iconView = AppCompatImageView(context).apply {
     val iconSize = context.getDimensionPixelSize(R.dimen.lib_detail_icon_size)
     layoutParams = LayoutParams(iconSize, iconSize)
     setImageResource(R.drawable.ic_icon_blueprint)
@@ -97,67 +98,68 @@ class SnapshotTitleView(
     addView(this)
   }
 
-  fun setPackageSizeText(item: SnapshotDiffItem, isNewOrDeleted: Boolean) {
-    if (item.packageSizeDiff.old > 0L) {
-      packageSizeView.isVisible = true
-      val sizeDiff = SnapshotDiffItem.DiffNode(
-        item.packageSizeDiff.old.sizeToString(context),
-        item.packageSizeDiff.new?.sizeToString(context)
-      )
-      val sizeDiffAppend = StringBuilder(LCAppUtils.getDiffString(sizeDiff, isNewOrDeleted))
-      var packageSizeBreakStart = -1
-      if (item.packageSizeDiff.new != null) {
-        val diffSize = item.packageSizeDiff.new - item.packageSizeDiff.old
-        val diffSizeText = buildString {
-          append(if (diffSize > 0) "+" else "")
-          append(diffSize.sizeToString(context))
-        }
-
-        if (diffSize != 0L) {
-          sizeDiffAppend.append(" ")
-          packageSizeBreakStart = sizeDiffAppend.length
-          sizeDiffAppend.append(diffSizeText)
-        }
-      }
-      packageSizeView.apply {
-        packageSizeLineBreaker.setText(sizeDiffAppend, packageSizeBreakStart)
+  fun render(data: SnapshotTitleRenderState) {
+    appNameView.apply {
+      text = data.appName
+      if (data.copyPrimaryText) {
         setLongClickCopiedToClipboard(text)
       }
-    } else {
-      packageSizeView.isVisible = false
-      packageSizeLineBreaker.clear()
+    }
+    iconView.contentDescription = data.iconContentDescription
+    packageNameView.apply {
+      text = data.packageName
+      if (data.copyPrimaryText) {
+        setLongClickCopiedToClipboard(text)
+      }
+    }
+    versionInfoView.apply {
+      text = data.versionInfo
+      if (data.copyPrimaryText) {
+        setLongClickCopiedToClipboard(text)
+      }
+    }
+    setPackageSizeText(data.packageSize)
+    apisView.apply {
+      text = data.apis
+      setLongClickCopiedToClipboard(text)
     }
   }
 
-  fun setApisText(item: SnapshotDiffItem, isNewOrDeleted: Boolean) {
-    val targetDiff = LCAppUtils.getDiffString(item.targetApiDiff, isNewOrDeleted).takeIf { item.targetApiDiff.old > 0 }
-    val minDiff = LCAppUtils.getDiffString(item.minSdkDiff, isNewOrDeleted).takeIf { item.minSdkDiff.old > 0 }
-    val compileDiff = LCAppUtils.getDiffString(item.compileSdkDiff, isNewOrDeleted).takeIf { item.compileSdkDiff.old > 0 }
-    apisView.apply {
-      text = buildSpannedString {
-        targetDiff?.let {
-          scale(1f) {
-            append("Target: ")
-          }
-          append(it)
-          append("  ")
-        }
+  fun setIconImage(bitmap: Bitmap?) {
+    if (bitmap == null) {
+      setFallbackIcon()
+    } else {
+      iconView.load(bitmap)
+    }
+  }
 
-        minDiff?.let {
-          scale(1f) {
-            append("Min: ")
-          }
-          append(it)
-          append("  ")
-        }
+  fun setIconSource(iconSource: SnapshotPackageIconSource?) {
+    when (iconSource) {
+      is SnapshotPackageIconSource.InstalledPackage -> iconView.load(iconSource.packageInfo)
 
-        compileDiff?.let {
-          scale(1f) {
-            append("Compile: ")
-          }
-          append(it)
-        }
-      }
+      SnapshotPackageIconSource.Fallback,
+      null -> setFallbackIcon()
+    }
+  }
+
+  fun setFallbackIcon() {
+    iconView.setImageResource(R.drawable.ic_icon_blueprint)
+  }
+
+  fun setIconClickListener(listener: OnClickListener?) {
+    iconView.setOnClickListener(listener)
+  }
+
+  private fun setPackageSizeText(data: SnapshotTitlePackageSizeRenderState?) {
+    if (data == null) {
+      packageSizeView.isVisible = false
+      packageSizeLineBreaker.clear()
+      return
+    }
+
+    packageSizeView.apply {
+      isVisible = true
+      packageSizeLineBreaker.setText(data.text, data.breakStart)
       setLongClickCopiedToClipboard(text)
     }
   }

@@ -5,8 +5,8 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.database.entity.Features
-import com.absinthe.libchecker.domain.app.AppIconItem
-import com.absinthe.libchecker.domain.app.VersionedFeature
+import com.absinthe.libchecker.domain.app.detail.model.AppIconItem
+import com.absinthe.libchecker.domain.app.model.VersionedFeature
 
 class BuildAppDetailFeatureItemUseCase {
 
@@ -14,81 +14,79 @@ class BuildAppDetailFeatureItemUseCase {
     val feature = request.feature
     return when (feature.featureType) {
       Features.SPLIT_APKS -> AppDetailFeatureItemData(
-        iconRes = R.drawable.ic_aab,
+        icon = resourceIcon(R.drawable.ic_aab),
         titleRes = R.string.app_bundle,
         action = AppDetailFeatureAction.SplitApks
       )
 
       Features.KOTLIN_USED -> AppDetailFeatureItemData(
-        iconRes = com.absinthe.lc.rulesbundle.R.drawable.ic_lib_kotlin,
+        icon = resourceIcon(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_kotlin),
         titleRes = R.string.kotlin_string,
         action = AppDetailFeatureAction.Kotlin(feature.extras)
       )
 
       Features.RX_JAVA -> AppDetailFeatureItemData(
-        iconRes = R.drawable.ic_reactivex,
+        icon = resourceIcon(R.drawable.ic_reactivex),
         titleRes = R.string.rxjava,
         action = AppDetailFeatureAction.RxJava(feature.version)
       )
 
       Features.RX_KOTLIN -> AppDetailFeatureItemData(
-        iconRes = R.drawable.ic_reactivex,
+        icon = resourceIcon(R.drawable.ic_reactivex, RX_KOTLIN_COLOR),
         titleRes = R.string.rxkotlin,
-        colorFilterInt = RX_KOTLIN_COLOR,
         action = AppDetailFeatureAction.RxKotlin(feature.version)
       )
 
       Features.RX_ANDROID -> AppDetailFeatureItemData(
-        iconRes = R.drawable.ic_reactivex,
+        icon = resourceIcon(R.drawable.ic_reactivex, RX_ANDROID_COLOR),
         titleRes = R.string.rxandroid,
-        colorFilterInt = RX_ANDROID_COLOR,
         action = AppDetailFeatureAction.RxAndroid(feature.version)
       )
 
       Features.AGP -> AppDetailFeatureItemData(
-        iconRes = R.drawable.ic_gradle,
+        icon = resourceIcon(R.drawable.ic_gradle),
         titleRes = R.string.agp,
         action = AppDetailFeatureAction.Agp(feature.version)
       )
 
       Features.XPOSED_MODULE -> AppDetailFeatureItemData(
-        iconRes = R.drawable.ic_xposed,
+        icon = resourceIcon(R.drawable.ic_xposed),
         titleRes = R.string.xposed_module,
         action = AppDetailFeatureAction.XposedModule
       )
 
       Features.PLAY_SIGNING -> AppDetailFeatureItemData(
-        iconRes = com.absinthe.lc.rulesbundle.R.drawable.ic_lib_play_store,
+        icon = resourceIcon(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_play_store),
         titleRes = R.string.play_app_signing,
         action = AppDetailFeatureAction.PlaySigning
       )
 
       Features.PWA -> AppDetailFeatureItemData(
-        iconRes = R.drawable.ic_pwa,
+        icon = resourceIcon(R.drawable.ic_pwa),
         titleRes = R.string.pwa,
         action = AppDetailFeatureAction.Pwa
       )
 
       Features.JETPACK_COMPOSE -> AppDetailFeatureItemData(
-        iconRes = com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetpack_compose,
+        icon = resourceIcon(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetpack_compose),
         titleRes = R.string.jetpack_compose,
         action = AppDetailFeatureAction.JetpackCompose(feature.version)
       )
 
       Features.KMP -> AppDetailFeatureItemData(
-        iconRes = com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetbrain_kmp,
+        icon = resourceIcon(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetbrain_kmp),
         titleRes = R.string.jetbrain_kmp,
         action = AppDetailFeatureAction.Kmp(feature.version)
       )
 
       Features.LIVE_UPDATE_NOTIFICATION -> AppDetailFeatureItemData(
-        iconRes = R.drawable.ic_feature_live_update,
+        icon = resourceIcon(R.drawable.ic_feature_live_update),
         titleRes = R.string.feature_live_update_notification,
         action = AppDetailFeatureAction.LiveUpdateNotification
       )
 
       Features.Ext.APPLICATION_PROP -> AppDetailFeatureItemData(
-        iconRes = R.drawable.ic_app_prop,
+        icon = resourceIcon(R.drawable.ic_app_prop),
         titleRes = R.string.lib_detail_app_props_title,
         action = AppDetailFeatureAction.AppProp,
         position = request.currentFeatureCount.coerceAtMost(PRIORITY_APP_PROP)
@@ -97,14 +95,14 @@ class BuildAppDetailFeatureItemUseCase {
       Features.Ext.APPLICATION_INSTALL_SOURCE -> buildInstallSourceItem(request)
 
       Features.Ext.ELF_PAGE_SIZE_16KB -> AppDetailFeatureItemData(
-        iconRes = R.drawable.ic_16kb_align,
+        icon = resourceIcon(R.drawable.ic_16kb_align),
         titleRes = R.string.lib_detail_dialog_title_16kb_page_size,
         action = AppDetailFeatureAction.ElfPageSize16Kb,
         position = request.currentFeatureCount.coerceAtMost(PRIORITY_16_KB_PAGE_SIZE)
       )
 
       Features.Ext.ELF_PAGE_SIZE_16KB_COMPAT -> AppDetailFeatureItemData(
-        iconRes = R.drawable.ic_16kb_compat,
+        icon = resourceIcon(R.drawable.ic_16kb_compat),
         titleRes = R.string.lib_detail_dialog_title_16kb_page_size_compat,
         action = AppDetailFeatureAction.ElfPageSize16KbCompat,
         position = request.currentFeatureCount.coerceAtMost(PRIORITY_16_KB_PAGE_SIZE_COMPAT)
@@ -122,7 +120,7 @@ class BuildAppDetailFeatureItemUseCase {
     }
 
     return AppDetailFeatureItemData(
-      iconRes = R.drawable.ic_install_source,
+      icon = resourceIcon(R.drawable.ic_install_source),
       titleRes = R.string.lib_detail_app_install_source_title,
       action = AppDetailFeatureAction.InstallSource,
       position = request.currentFeatureCount.coerceAtMost(PRIORITY_APP_INSTALL_SOURCE)
@@ -138,14 +136,13 @@ class BuildAppDetailFeatureItemUseCase {
     }
 
     return AppDetailFeatureItemData(
-      iconRes = NO_ICON_RES,
+      icon = AppDetailFeatureIcon.AppIcons,
       titleRes = R.string.dialog_themed_and_alternative_app_icons,
       action = AppDetailFeatureAction.AppIcons(isFirstMonochrome = appIcons[0].isMonochrome)
     )
   }
 
   private companion object {
-    const val NO_ICON_RES = -1
     const val PRIORITY_APP_PROP = 0
     const val PRIORITY_APP_INSTALL_SOURCE = 1
     const val PRIORITY_16_KB_PAGE_SIZE = 2
@@ -165,29 +162,46 @@ data class AppDetailFeatureItemRequest(
 )
 
 data class AppDetailFeatureItemData(
-  @DrawableRes val iconRes: Int,
+  val icon: AppDetailFeatureIcon,
   @StringRes val titleRes: Int,
-  @ColorInt val colorFilterInt: Int? = null,
   val action: AppDetailFeatureAction,
   val position: Int? = null
 )
 
+sealed interface AppDetailFeatureIcon {
+  data class Resource(
+    @DrawableRes val res: Int,
+    @ColorInt val tint: Int? = null
+  ) : AppDetailFeatureIcon
+
+  data object AppIcons : AppDetailFeatureIcon
+}
+
 sealed interface AppDetailFeatureAction {
+  sealed interface Dialog : AppDetailFeatureAction
+
   data object SplitApks : AppDetailFeatureAction
-  data class Kotlin(val extras: Map<String, String?>?) : AppDetailFeatureAction
-  data class RxJava(val version: String?) : AppDetailFeatureAction
-  data class RxKotlin(val version: String?) : AppDetailFeatureAction
-  data class RxAndroid(val version: String?) : AppDetailFeatureAction
-  data class Agp(val version: String?) : AppDetailFeatureAction
+  data class Kotlin(val extras: Map<String, String?>?) : Dialog
+  data class RxJava(val version: String?) : Dialog
+  data class RxKotlin(val version: String?) : Dialog
+  data class RxAndroid(val version: String?) : Dialog
+  data class Agp(val version: String?) : Dialog
   data object XposedModule : AppDetailFeatureAction
-  data object PlaySigning : AppDetailFeatureAction
-  data object Pwa : AppDetailFeatureAction
-  data class JetpackCompose(val version: String?) : AppDetailFeatureAction
-  data class Kmp(val version: String?) : AppDetailFeatureAction
-  data object LiveUpdateNotification : AppDetailFeatureAction
+  data object PlaySigning : Dialog
+  data object Pwa : Dialog
+  data class JetpackCompose(val version: String?) : Dialog
+  data class Kmp(val version: String?) : Dialog
+  data object LiveUpdateNotification : Dialog
   data object AppProp : AppDetailFeatureAction
   data object InstallSource : AppDetailFeatureAction
-  data object ElfPageSize16Kb : AppDetailFeatureAction
-  data object ElfPageSize16KbCompat : AppDetailFeatureAction
+  data object ElfPageSize16Kb : Dialog
+  data object ElfPageSize16KbCompat : Dialog
   data class AppIcons(val isFirstMonochrome: Boolean) : AppDetailFeatureAction
+}
+
+private fun resourceIcon(
+  @DrawableRes res: Int,
+  @ColorInt tint: Int? = null
+): AppDetailFeatureIcon.Resource {
+  return AppDetailFeatureIcon.Resource(res, tint)
 }

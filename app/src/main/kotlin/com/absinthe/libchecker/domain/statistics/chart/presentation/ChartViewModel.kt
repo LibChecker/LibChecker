@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.AppListRepository
-import com.absinthe.libchecker.domain.app.list.model.AppListItemViewState
+import com.absinthe.libchecker.domain.app.repository.AppListRepository
 import com.absinthe.libchecker.domain.statistics.chart.model.ChartType
+import com.absinthe.libchecker.domain.statistics.chart.model.ClassifyDialogState
 import com.absinthe.libchecker.domain.statistics.chart.model.LOADING_PROGRESS_MAX
 import com.absinthe.libchecker.domain.statistics.chart.repository.ChartSettingsRepository
 import com.absinthe.libchecker.domain.statistics.chart.source.BaseVariableChartDataSource
@@ -15,6 +15,7 @@ import com.absinthe.libchecker.domain.statistics.chart.source.ChartDataSourceFac
 import com.absinthe.libchecker.domain.statistics.chart.source.ChartDataSourcePlan
 import com.absinthe.libchecker.domain.statistics.chart.source.IAndroidSDKChart
 import com.absinthe.libchecker.domain.statistics.chart.source.IChartDataSource
+import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildAndroidVersionLabelDisplayDataUseCase
 import com.absinthe.libchecker.domain.statistics.chart.usecase.ChartFeatureInitializationPlan
 import com.absinthe.libchecker.domain.statistics.chart.usecase.ObserveChartFeatureInitializationPlansUseCase
 import kotlinx.coroutines.flow.Flow
@@ -30,7 +31,8 @@ class ChartViewModel internal constructor(
   private val chartDataProvider: ChartDataProvider,
   private val chartDataSourceFactory: ChartDataSourceFactory,
   private val chartSettingsRepository: ChartSettingsRepository,
-  private val observeChartFeatureInitializationPlans: ObserveChartFeatureInitializationPlansUseCase
+  private val observeChartFeatureInitializationPlans: ObserveChartFeatureInitializationPlansUseCase,
+  private val buildAndroidVersionLabelDisplayData: BuildAndroidVersionLabelDisplayDataUseCase
 ) : ViewModel() {
   private val chartUiStatePlanner = ChartUiStatePlanner()
   private var selectedChartType = ChartType.ABI
@@ -127,17 +129,19 @@ class ChartViewModel internal constructor(
     )
   }
 
-  suspend fun buildClassifyDialogPlan(
+  suspend fun buildClassifyDialogState(
     source: IChartDataSource<*>,
     x: Int,
     title: String
-  ): ChartClassifyDialogPlan {
+  ): ClassifyDialogState {
     val items = source.getListByXValue(x)
-    return ChartClassifyDialogPlan(
+    return ClassifyDialogState(
       title = title,
       items = items,
       itemViewStates = chartDataProvider.buildAppListItemViewStates(items),
-      androidVersionNode = source.getAndroidVersionNodeByXValue(x)
+      androidVersion = buildAndroidVersionLabelDisplayData(
+        source.getAndroidVersionNodeByXValue(x)
+      )
     )
   }
 
@@ -148,11 +152,4 @@ class ChartViewModel internal constructor(
     val version = (this as? BaseVariableChartDataSource<*>)?.getListKeyByXValue(x) ?: return null
     return AndroidVersions.versions.find { node -> node.version == version }
   }
-
-  data class ChartClassifyDialogPlan(
-    val title: String,
-    val items: List<LCItem>,
-    val itemViewStates: Map<String, AppListItemViewState>,
-    val androidVersionNode: AndroidVersions.Node?
-  )
 }

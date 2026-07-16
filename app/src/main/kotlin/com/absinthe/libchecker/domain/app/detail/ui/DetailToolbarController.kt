@@ -4,7 +4,9 @@ import androidx.annotation.StringRes
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.detail.model.AppDetailToolbarAction
 import com.absinthe.libchecker.domain.app.detail.model.AppDetailToolbarItem
+import com.absinthe.libchecker.domain.app.detail.model.AppDetailToolbarState
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.AppDetailToolbarAdapter
 import com.google.android.material.appbar.AppBarLayout
 import kotlin.math.abs
@@ -17,29 +19,13 @@ class DetailToolbarController(
   private val onProcessClick: () -> Unit
 ) {
 
-  private val adapter = AppDetailToolbarAdapter()
-  private var isToolbarCollapsed = false
-  private val quicklyLaunchItem = AppDetailToolbarItem(
-    icon = R.drawable.ic_launch,
-    tooltipTextRes = R.string.further_operation,
-    onClick = onQuickLaunchClick
-  )
-  private val processItem = AppDetailToolbarItem(
-    icon = R.drawable.ic_processes,
-    tooltipTextRes = R.string.menu_process,
-    onClick = onProcessClick
-  )
+  private val adapter = AppDetailToolbarAdapter(::onActionClick)
+  private var state = defaultState()
+  private var onHarmonyToggle: (() -> Unit)? = null
+  private var onCompareClick: (() -> Unit)? = null
   private val offsetChangedListener = AppBarLayout.OnOffsetChangedListener { layout, verticalOffset ->
-    isToolbarCollapsed = if (abs(verticalOffset) - layout.totalScrollRange == 0) {
-      if (!isToolbarCollapsed) {
-        addItemIfAbsent(quicklyLaunchItem)
-      }
-      true
-    } else {
-      if (isToolbarCollapsed) {
-        removeItem(quicklyLaunchItem)
-      }
-      false
+    updateState {
+      it.copy(toolbarCollapsed = abs(verticalOffset) - layout.totalScrollRange == 0)
     }
   }
 
@@ -56,58 +42,78 @@ class DetailToolbarController(
     showHarmonyToggle: Boolean,
     onHarmonyToggle: () -> Unit
   ) {
-    addItemIfAbsent(
-      AppDetailToolbarItem(R.drawable.ic_lib_sort, R.string.menu_sort, onSortClick)
-    )
-    if (showHarmonyToggle) {
-      addItemIfAbsent(
-        AppDetailToolbarItem(R.drawable.ic_harmonyos_logo, R.string.ability, onHarmonyToggle)
+    this.onHarmonyToggle = onHarmonyToggle
+    updateState {
+      it.copy(
+        baseActionsReady = true,
+        harmonyToggleVisible = showHarmonyToggle
       )
     }
   }
 
   fun addCompareAction(onCompareClick: () -> Unit) {
-    addItemIfAbsent(
-      AppDetailToolbarItem(R.drawable.ic_compare, R.string.compare_with_current, onCompareClick)
-    )
+    this.onCompareClick = onCompareClick
+    updateState { it.copy(compareVisible = true) }
   }
 
   fun setProcessActionVisible(visible: Boolean) {
-    if (visible) {
-      addItemIfAbsent(processItem)
-    } else {
-      removeItem(processItem)
-    }
+    updateState { it.copy(processVisible = visible) }
   }
 
   fun updateProcessTooltip(@StringRes tooltipTextRes: Int) {
-    if (processItem.tooltipTextRes != tooltipTextRes) {
-      processItem.tooltipTextRes = tooltipTextRes
-      adapter.data.indexOf(processItem).takeIf { it >= 0 }?.let {
-        adapter.notifyItemChanged(it)
-      }
-    }
+    updateState { it.copy(processLabel = toolbarView.context.getString(tooltipTextRes)) }
   }
 
   fun reset() {
-    adapter.setList(emptyList())
-    isToolbarCollapsed = false
-    processItem.tooltipTextRes = R.string.menu_process
+    onHarmonyToggle = null
+    onCompareClick = null
+    bindState(defaultState())
   }
 
   fun release() {
     appBarLayout.removeOnOffsetChangedListener(offsetChangedListener)
   }
 
-  private fun addItemIfAbsent(item: AppDetailToolbarItem) {
-    if (!adapter.data.contains(item)) {
-      adapter.addData(item)
+  private fun updateState(
+    transform: (AppDetailToolbarState) -> AppDetailToolbarState
+  ) {
+    bindState(transform(state))
+  }
+
+  private fun bindState(newState: AppDetailToolbarState) {
+    if (newState == state) return
+    state = newState
+    adapter.setList(state.visibleActions.map(::createItem))
+  }
+
+  private fun onActionClick(action: AppDetailToolbarAction) {
+    when (action) {
+      AppDetailToolbarAction.SORT -> onSortClick()
+      AppDetailToolbarAction.QUICK_LAUNCH -> onQuickLaunchClick()
+      AppDetailToolbarAction.PROCESS -> onProcessClick()
+      AppDetailToolbarAction.HARMONY_TOGGLE -> onHarmonyToggle?.invoke()
+      AppDetailToolbarAction.COMPARE -> onCompareClick?.invoke()
     }
   }
 
-  private fun removeItem(item: AppDetailToolbarItem) {
-    if (adapter.data.contains(item)) {
-      adapter.remove(item)
+  private fun createItem(action: AppDetailToolbarAction): AppDetailToolbarItem {
+    val (iconRes, label) = when (action) {
+      AppDetailToolbarAction.SORT -> R.drawable.ic_lib_sort to toolbarView.context.getString(R.string.menu_sort)
+      AppDetailToolbarAction.QUICK_LAUNCH -> R.drawable.ic_launch to toolbarView.context.getString(R.string.further_operation)
+      AppDetailToolbarAction.PROCESS -> R.drawable.ic_processes to state.processLabel
+      AppDetailToolbarAction.HARMONY_TOGGLE -> R.drawable.ic_harmonyos_logo to toolbarView.context.getString(R.string.ability)
+      AppDetailToolbarAction.COMPARE -> R.drawable.ic_compare to toolbarView.context.getString(R.string.compare_with_current)
     }
+    return AppDetailToolbarItem(
+      action = action,
+      iconRes = iconRes,
+      label = label
+    )
+  }
+
+  private fun defaultState(): AppDetailToolbarState {
+    return AppDetailToolbarState(
+      processLabel = toolbarView.context.getString(R.string.menu_process)
+    )
   }
 }

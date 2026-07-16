@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.domain.statistics.chart.usecase
 
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.FeatureInitializationRepository
+import com.absinthe.libchecker.domain.app.repository.FeatureInitializationRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine

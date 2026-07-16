@@ -18,6 +18,7 @@ class TrackLoadingView(
   }
 
   init {
+    clipChildren = false
     addView(loading)
     loading.setAppIconHighlightProvider(loadRandomAppIcon)
   }

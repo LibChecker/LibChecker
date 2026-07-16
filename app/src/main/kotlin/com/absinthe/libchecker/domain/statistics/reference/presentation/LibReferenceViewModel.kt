@@ -6,9 +6,9 @@ import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.AppListRepository
 import com.absinthe.libchecker.domain.app.list.model.AppListItemViewState
 import com.absinthe.libchecker.domain.app.list.usecase.BuildAppListItemViewStatesUseCase
+import com.absinthe.libchecker.domain.app.repository.AppListRepository
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReference
 import com.absinthe.libchecker.domain.statistics.reference.repository.LibReferenceSettingsRepository
 import com.absinthe.libchecker.domain.statistics.reference.usecase.BuildLibReferenceDetailDialogRequestUseCase
@@ -17,8 +17,10 @@ import com.absinthe.libchecker.domain.statistics.reference.usecase.LibReferenceD
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -38,8 +40,8 @@ class LibReferenceViewModel(
   private val _libRefListFlow = MutableSharedFlow<List<LCItem>>()
   val libRefListFlow = _libRefListFlow.asSharedFlow()
   private val dbItemsFlow: Flow<List<LCItem>> = appListRepository.items
-  private val _progress = MutableSharedFlow<Int>()
-  val progress = _progress.asSharedFlow()
+  private val _progress = MutableStateFlow(0)
+  val progress = _progress.asStateFlow()
   private val libReferenceComputationController =
     libReferenceComputationControllerFactory.create(viewModelScope, ::updateProgress)
   val libReference = libReferenceComputationController.libReference
@@ -256,9 +258,7 @@ class LibReferenceViewModel(
   }
 
   private fun updateProgress(progress: Int) {
-    viewModelScope.launch {
-      _progress.emit(progress)
-    }
+    _progress.value = progress
   }
 
   private suspend fun emitLibReferenceApps(

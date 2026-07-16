@@ -9,13 +9,20 @@ import com.absinthe.libchecker.api.bean.GetAppUpdateInfo
 import com.absinthe.libchecker.domain.app.update.AppUpdateChannel
 import com.absinthe.libchecker.domain.app.update.AppUpdateInstallResult
 import com.absinthe.libchecker.domain.app.update.BuildInAppUpdateDiffDataUseCase
+import com.absinthe.libchecker.domain.settings.model.InAppUpdateDialogAction
+import com.absinthe.libchecker.domain.settings.model.InAppUpdateDialogContent
+import com.absinthe.libchecker.domain.settings.model.InAppUpdateDialogState
+import com.absinthe.libchecker.domain.settings.model.selectChannel
+import com.absinthe.libchecker.domain.settings.model.showContent
+import com.absinthe.libchecker.domain.settings.model.showInstallProgress
 import com.absinthe.libchecker.domain.settings.presentation.SettingsViewModel
-import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotAbiDisplayDataUseCase
-import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemCardPresentation
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemDisplayData
+import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotItemDisplayDataUseCase
+import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
-import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.flow.launchIn
@@ -27,79 +34,62 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class InAppUpdateDialogFragment : BaseBottomSheetViewDialogFragment<InAppUpdateDialogView>() {
 
   private val buildInAppUpdateDiffData: BuildInAppUpdateDiffDataUseCase by inject()
-  private val buildSnapshotAbiDisplayData: BuildSnapshotAbiDisplayDataUseCase by inject()
-  private val buildSnapshotUpdateTimeDisplayData: BuildSnapshotUpdateTimeDisplayDataUseCase by inject()
+  private val buildSnapshotItemDisplayData: BuildSnapshotItemDisplayDataUseCase by inject()
   private val viewModel: SettingsViewModel by viewModel()
   private var getAppUpdateInfo: GetAppUpdateInfo? = null
-  private var selectedChannel: AppUpdateChannel = defaultUpdateChannel()
-
-  override fun initRootView(): InAppUpdateDialogView = InAppUpdateDialogView(
-    requireContext(),
-    buildSnapshotAbiDisplayData,
-    buildSnapshotUpdateTimeDisplayData,
-    selectedChannel.toButtonId()
+  private var dialogState = InAppUpdateDialogState(
+    selectedChannel = defaultUpdateChannel(),
+    content = InAppUpdateDialogContent.Loading(),
+    isChannelSelectionEnabled = true,
+    isUpdateEnabled = false
   )
+
+  override fun initRootView(): InAppUpdateDialogView = InAppUpdateDialogView(requireContext())
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {
     root.addPaddingTop(16.dp)
+    root.bind(dialogState, ::handleAction)
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    root.toggleGroup.addOnButtonCheckedListener { toggleGroup, checkedId, isChecked ->
-      if (isChecked) {
-        selectedChannel = checkedId.toAppUpdateChannel() ?: return@addOnButtonCheckedListener
-        doOnMainThreadIdle { toggleGroup.isEnabled = false }
-        root.updateButton.isEnabled = false
-        root.setItem(null)
-        root.showLoading()
-        viewModel.requestUpdate(selectedChannel)
-      }
-    }
-    root.updateButton.setOnClickListener {
-      val url = getAppUpdateInfo?.appForFlavor(BuildConfig.IS_FOSS)?.link
-      if (url == null) {
-        root.updateButton.isEnabled = false
-        root.showLoading()
-        viewModel.requestUpdate(selectedChannel)
-      } else {
-        installUpdate(url)
-      }
-    }
     viewModel.respStateFlow.onEach { result ->
-      if (result.channel != selectedChannel) {
+      if (result.channel != dialogState.selectedChannel) {
         return@onEach
       }
 
       getAppUpdateInfo = result.updateInfo
       val diffData = buildInAppUpdateDiffData(result.updateInfo)
 
-      root.apply {
-        doOnMainThreadIdle { toggleGroup.isEnabled = true }
-        updateButton.isEnabled = diffData?.hasUpdate == true
-        setItem(diffData?.item)
-        showContent()
-      }
+      render(
+        dialogState.showContent(
+          item = diffData?.item?.let(::buildUpdateDisplayData),
+          hasUpdate = diffData?.hasUpdate == true
+        )
+      )
     }.launchIn(lifecycleScope)
 
-    root.updateButton.isEnabled = false
-    viewModel.requestUpdate(selectedChannel)
+    viewModel.requestUpdate(dialogState.selectedChannel)
   }
 
-  private fun Int.toAppUpdateChannel(): AppUpdateChannel? {
-    return when (this) {
-      R.id.in_app_update_chip_stable -> AppUpdateChannel.STABLE
-      R.id.in_app_update_chip_ci -> AppUpdateChannel.CI
-      else -> null
-    }
-  }
+  private fun handleAction(action: InAppUpdateDialogAction) {
+    when (action) {
+      is InAppUpdateDialogAction.SelectChannel -> {
+        render(dialogState.selectChannel(action.channel))
+        viewModel.requestUpdate(action.channel)
+      }
 
-  private fun AppUpdateChannel.toButtonId(): Int {
-    return when (this) {
-      AppUpdateChannel.STABLE -> R.id.in_app_update_chip_stable
-      AppUpdateChannel.CI -> R.id.in_app_update_chip_ci
+      InAppUpdateDialogAction.Update -> {
+        val url = getAppUpdateInfo?.appForFlavor(BuildConfig.IS_FOSS)?.link
+        if (url == null) {
+          render(dialogState.showInstallProgress())
+          viewModel.requestUpdate(dialogState.selectedChannel)
+        } else {
+          installUpdate(url)
+        }
+      }
     }
   }
 
@@ -113,13 +103,22 @@ class InAppUpdateDialogFragment : BaseBottomSheetViewDialogFragment<InAppUpdateD
 
   private fun installUpdate(url: String) {
     lifecycleScope.launch {
-      root.updateButton.isEnabled = false
-      root.showLoading()
+      render(dialogState.showInstallProgress())
       val result = viewModel.installUpdate(url)
-      root.showContent()
-      root.updateButton.isEnabled = buildInAppUpdateDiffData(getAppUpdateInfo)?.hasUpdate == true
+      val diffData = buildInAppUpdateDiffData(getAppUpdateInfo)
+      render(
+        dialogState.showContent(
+          item = diffData?.item?.let(::buildUpdateDisplayData),
+          hasUpdate = diffData?.hasUpdate == true
+        )
+      )
       showInstallResult(result)
     }
+  }
+
+  private fun render(state: InAppUpdateDialogState) {
+    dialogState = state
+    root.bind(state, ::handleAction)
   }
 
   private fun showInstallResult(result: AppUpdateInstallResult) {
@@ -137,5 +136,21 @@ class InAppUpdateDialogFragment : BaseBottomSheetViewDialogFragment<InAppUpdateD
         Toasty.showLong(requireContext(), getString(R.string.toast_app_update_failed, message))
       }
     }
+  }
+
+  private fun buildUpdateDisplayData(item: SnapshotDiffItem): SnapshotItemDisplayData {
+    return buildSnapshotItemDisplayData(
+      BuildSnapshotItemDisplayDataUseCase.Request(
+        item = item,
+        cardPresentation = SnapshotItemCardPresentation.Rounded,
+        iconSource = null,
+        showUpdateTime = false,
+        isApexPackage = false,
+        animateStateIndicator = false,
+        tintChangedAbiBadge = false,
+        highlightDiffColor = null,
+        highlightText = ""
+      )
+    )
   }
 }

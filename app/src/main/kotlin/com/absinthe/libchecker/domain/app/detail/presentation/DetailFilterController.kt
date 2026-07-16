@@ -1,12 +1,12 @@
 package com.absinthe.libchecker.domain.app.detail.presentation
 
 import com.absinthe.libchecker.annotation.LibType
-import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.detail.content.BuildDetailProcessFilterDataUseCase
 import com.absinthe.libchecker.domain.app.detail.content.FilterAppDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.detail.content.SortAppDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.ui.MODE_SORT_BY_LIB
+import com.absinthe.libchecker.domain.app.repository.AppDetailSettingsRepository
 
 class DetailFilterController(
   private val filterAppDetailItemsUseCase: FilterAppDetailItemsUseCase,

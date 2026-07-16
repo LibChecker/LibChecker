@@ -1,6 +1,6 @@
 package com.absinthe.libchecker.domain.snapshot.list.usecase
 
-import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

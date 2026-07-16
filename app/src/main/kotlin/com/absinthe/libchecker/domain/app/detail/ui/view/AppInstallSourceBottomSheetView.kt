@@ -1,9 +1,14 @@
 package com.absinthe.libchecker.domain.app.detail.ui.view
 
 import android.content.Context
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceAction
+import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceBottomSheetDisplay
+import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceItemDisplay
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
@@ -18,67 +23,81 @@ class AppInstallSourceBottomSheetView(context: Context) :
     title.text = context.getString(R.string.lib_detail_app_install_source_title)
   }
 
-  val originatingView = AppInstallSourceItemView(context).apply {
-    layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
-    )
-    titleView.text = context.getString(R.string.lib_detail_app_install_source_originating_package)
-  }
-
-  val installingView = AppInstallSourceItemView(context).apply {
-    layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
-    )
-    titleView.text = context.getString(R.string.lib_detail_app_install_source_installing_package)
-  }
-
-  val installedTimeView = AppInstallTimeItemView(context).apply {
+  private val originatingView = AppInstallSourceItemView(
+    context,
+    context.getString(R.string.lib_detail_app_install_source_originating_package)
+  ).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     )
   }
 
-  val dexoptView = AppDexoptItemView(context).apply {
+  private val installingView = AppInstallSourceItemView(
+    context,
+    context.getString(R.string.lib_detail_app_install_source_installing_package)
+  ).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     )
   }
+
+  private val installedTimeView = AppInstallTimeItemView(context).apply {
+    layoutParams = LayoutParams(
+      ViewGroup.LayoutParams.MATCH_PARENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
+    )
+  }
+
+  private val dexoptView = AppDexoptItemView(context).apply {
+    layoutParams = LayoutParams(
+      ViewGroup.LayoutParams.MATCH_PARENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
+    )
+  }
+
+  private val contentViews: List<View> = listOf(
+    originatingView,
+    installingView,
+    installedTimeView,
+    dexoptView
+  )
 
   init {
     setPadding(24.dp, 16.dp, 24.dp, 16.dp)
     addView(header)
-    addView(originatingView)
-    addView(installingView)
-    addView(installedTimeView)
-    addView(dexoptView)
+    contentViews.forEach { addView(it) }
+  }
+
+  fun bind(
+    display: AppInstallSourceBottomSheetDisplay,
+    onAction: (AppInstallSourceAction) -> Unit
+  ) {
+    bindAppItem(originatingView, display.originatingApp, onAction)
+    bindAppItem(installingView, display.installingApp, onAction)
+
+    installedTimeView.isVisible = display.installedTime != null
+    display.installedTime?.let(installedTimeView::bind)
+
+    dexoptView.isVisible = display.dexoptInfo != null
+    display.dexoptInfo?.let(dexoptView::bind)
+    requestLayout()
+  }
+
+  private fun bindAppItem(
+    view: AppInstallSourceItemView,
+    display: AppInstallSourceItemDisplay?,
+    onAction: (AppInstallSourceAction) -> Unit
+  ) {
+    view.isVisible = display != null
+    display?.let { view.bind(it, onAction) }
   }
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     header.autoMeasure()
-    originatingView.let {
-      it.measure(
-        it.defaultWidthMeasureSpec(this),
-        if (it.isGone) 0 else it.defaultHeightMeasureSpec(this)
-      )
-    }
-    installingView.let {
-      it.measure(
-        it.defaultWidthMeasureSpec(this),
-        if (it.isGone) 0 else it.defaultHeightMeasureSpec(this)
-      )
-    }
-    installedTimeView.let {
-      it.measure(
-        it.defaultWidthMeasureSpec(this),
-        if (it.isGone) 0 else it.defaultHeightMeasureSpec(this)
-      )
-    }
-    dexoptView.let {
+    contentViews.forEach {
       it.measure(
         it.defaultWidthMeasureSpec(this),
         if (it.isGone) 0 else it.defaultHeightMeasureSpec(this)
@@ -88,23 +107,19 @@ class AppInstallSourceBottomSheetView(context: Context) :
       measuredWidth,
       paddingTop +
         header.measuredHeight +
-        (if (originatingView.isGone) 0 else originatingView.measuredHeight) +
-        (if (installingView.isGone) 0 else installingView.measuredHeight) +
-        (if (installedTimeView.isGone) 0 else installedTimeView.measuredHeight) +
-        (if (dexoptView.isGone) 0 else dexoptView.measuredHeight) +
+        contentViews.sumOf { if (it.isGone) 0 else it.measuredHeight } +
         paddingBottom
     )
   }
 
-  override fun onLayout(p0: Boolean, p1: Int, p2: Int, p3: Int, p4: Int) {
+  override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     header.layout(0, paddingTop)
-    originatingView.layout(paddingStart, header.bottom)
-    installingView.layout(paddingStart, originatingView.bottom)
-    installedTimeView.layout(paddingStart, installingView.bottom)
-    dexoptView.layout(paddingStart, installedTimeView.bottom)
+    var childTop = header.bottom
+    contentViews.forEach {
+      it.layout(paddingStart, childTop)
+      childTop = it.bottom
+    }
   }
 
-  override fun getHeaderView(): BottomSheetHeaderView {
-    return header
-  }
+  override fun getHeaderView(): BottomSheetHeaderView = header
 }

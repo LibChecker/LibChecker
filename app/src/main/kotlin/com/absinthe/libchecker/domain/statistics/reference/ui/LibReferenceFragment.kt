@@ -21,6 +21,8 @@ import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
 import com.absinthe.libchecker.domain.home.ui.INavViewContainer
 import com.absinthe.libchecker.domain.statistics.chart.ui.ChartActivity
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReference
+import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceAction
+import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceListRenderState
 import com.absinthe.libchecker.domain.statistics.reference.presentation.LibReferenceViewModel
 import com.absinthe.libchecker.domain.statistics.reference.ui.adapter.LibReferenceAdapter
 import com.absinthe.libchecker.ui.base.BaseActivity
@@ -54,11 +56,14 @@ class LibReferenceFragment :
   SearchView.OnQueryTextListener {
 
   private val libReferenceViewModel: LibReferenceViewModel by viewModel()
+  private var listRenderState = LibReferenceListRenderState()
   private val refAdapter by lazy {
-    LibReferenceAdapter(
-      initialColorfulRuleIcon = libReferenceViewModel.colorfulRuleIcon,
-      onDetailIconClick = ::showLibReferenceDetail
+    listRenderState = listRenderState.copy(
+      colorfulRuleIcon = libReferenceViewModel.colorfulRuleIcon
     )
+    LibReferenceAdapter(onAction = ::onAdapterAction).apply {
+      bind(listRenderState)
+    }
   }
   private var delayShowNavigationJob: Job? = null
   private var searchUpdateJob: Job? = null
@@ -184,12 +189,15 @@ class LibReferenceFragment :
           return@onEach
         }
         val searchResult = libReferenceViewModel.onReferenceListChanged(references)
-        refAdapter.highlightText = searchResult.query
-        refAdapter.setList(searchResult.references)
-
-        flip(VF_LIST)
-        refAdapter.setSpaceFooterView()
-        isListReady = true
+        updateListRenderState { it.copy(highlightText = searchResult.query) }
+        refAdapter.setDiffNewData(searchResult.references) {
+          if (isDetached) {
+            return@setDiffNewData
+          }
+          flip(VF_LIST)
+          refAdapter.setSpaceFooterView()
+          isListReady = true
+        }
       }.launchIn(lifecycleScope)
       showSystemAppsChanges.onEach {
         applyReferenceWork(
@@ -197,7 +205,10 @@ class LibReferenceFragment :
         )
       }.launchIn(lifecycleScope)
       colorfulRuleIconChanges.onEach { enabled ->
-        refAdapter.updateColorfulRuleIcon(enabled)
+        if (updateListRenderState { it.copy(colorfulRuleIcon = enabled) }) {
+          // noinspection NotifyDataSetChanged
+          refAdapter.notifyDataSetChanged()
+        }
       }.launchIn(lifecycleScope)
       thresholdChanges.onEach { threshold ->
         applyReferenceWork(
@@ -318,11 +329,11 @@ class LibReferenceFragment :
   }
 
   override fun onQueryTextChange(newText: String): Boolean {
-    val shouldSyncHighlight = refAdapter.highlightText != newText
+    val shouldSyncHighlight = listRenderState.highlightText != newText
     val searchChange = libReferenceViewModel.onSearchQueryChanged(newText)
     if (searchChange.shouldRefreshItems || shouldSyncHighlight) {
       isSearchTextClearOnce = newText.isEmpty()
-      refAdapter.highlightText = newText
+      updateListRenderState { it.copy(highlightText = newText) }
 
       searchUpdateJob?.cancel()
       searchUpdateJob = lifecycleScope.launch {
@@ -336,7 +347,7 @@ class LibReferenceFragment :
             progressBarShown = true
           }
           val searchResult = libReferenceViewModel.buildCurrentSearchResult() ?: return@launch
-          refAdapter.highlightText = searchResult.query
+          updateListRenderState { it.copy(highlightText = searchResult.query) }
 
           if (!isActive) {
             return@launch
@@ -361,6 +372,25 @@ class LibReferenceFragment :
       }
     }
     return false
+  }
+
+  private fun onAdapterAction(action: LibReferenceAction) {
+    when (action) {
+      is LibReferenceAction.DetailIconClicked -> showLibReferenceDetail(action.reference)
+    }
+  }
+
+  private fun updateListRenderState(
+    transform: (LibReferenceListRenderState) -> LibReferenceListRenderState
+  ): Boolean {
+    val currentAdapter = refAdapter
+    val state = transform(listRenderState)
+    if (state == listRenderState) {
+      return false
+    }
+    listRenderState = state
+    currentAdapter.bind(state)
+    return true
   }
 
   override fun onVisibilityChanged(visible: Boolean) {

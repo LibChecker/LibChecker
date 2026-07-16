@@ -2,20 +2,18 @@ package com.absinthe.libchecker.domain.snapshot.list.usecase
 
 import android.content.Context
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotSystemPropDisplayData
+import com.absinthe.libchecker.domain.snapshot.list.model.buildSnapshotSystemPropDisplayData
 
 class BuildSnapshotSystemPropDisplayDataUseCase(
   private val context: Context,
   private val getSnapshotSystemPropDiffs: GetSnapshotSystemPropDiffsUseCase
 ) {
 
-  suspend operator fun invoke(timestamp: Long): List<SnapshotSystemPropDisplayData> {
-    return getSnapshotSystemPropDiffs(timestamp).map { diff ->
-      SnapshotSystemPropDisplayData(
-        label = getSystemPropLabel(diff.prop),
-        displayValue = "${diff.previous} $ARROW ${diff.current}"
-      )
-    }
+  suspend operator fun invoke(timestamp: Long) = getSnapshotSystemPropDiffs(timestamp).map { diff ->
+    buildSnapshotSystemPropDisplayData(
+      label = getSystemPropLabel(diff.prop),
+      displayValue = "${diff.previous} $ARROW ${diff.current}"
+    )
   }
 
   private fun getSystemPropLabel(prop: SnapshotSystemProp): String {

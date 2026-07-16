@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.settings.model.GetUpdatesAction
-import com.absinthe.libchecker.domain.settings.model.GetUpdatesItem
+import com.absinthe.libchecker.domain.settings.model.GetUpdatesDialogState
 import com.absinthe.libchecker.domain.settings.ui.adapter.GetUpdatesAdapter
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.view.app.IHeaderView
@@ -20,7 +20,8 @@ class GetUpdatesDialogView(context: Context) :
     layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
     title.text = context.getString(R.string.settings_get_updates)
   }
-  private val _adapter = GetUpdatesAdapter()
+  private var onAction: (GetUpdatesAction) -> Unit = {}
+  private val adapter = GetUpdatesAdapter { onAction(it) }
 
   private val recyclerView = RecyclerView(context).apply {
     layoutParams = LayoutParams(
@@ -28,7 +29,7 @@ class GetUpdatesDialogView(context: Context) :
       LayoutParams.WRAP_CONTENT
     )
     setPadding(16.dp, 16.dp, 16.dp, 16.dp)
-    adapter = _adapter
+    adapter = this@GetUpdatesDialogView.adapter
     layoutManager = LinearLayoutManager(context)
   }
 
@@ -42,11 +43,11 @@ class GetUpdatesDialogView(context: Context) :
     return header
   }
 
-  fun setItems(
-    items: List<GetUpdatesItem>,
-    onActionClick: (GetUpdatesAction) -> Unit
+  fun bind(
+    state: GetUpdatesDialogState,
+    onAction: (GetUpdatesAction) -> Unit
   ) {
-    _adapter.setOnActionClickListener(onActionClick)
-    _adapter.setList(items)
+    this.onAction = onAction
+    adapter.setList(state.items)
   }
 }

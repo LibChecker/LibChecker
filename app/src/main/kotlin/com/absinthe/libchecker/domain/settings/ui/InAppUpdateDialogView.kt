@@ -5,13 +5,14 @@ import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.LinearLayout
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotAbiDisplayDataUseCase
-import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
-import com.absinthe.libchecker.domain.snapshot.list.ui.adapter.SnapshotAdapter
-import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
+import com.absinthe.libchecker.domain.app.update.AppUpdateChannel
+import com.absinthe.libchecker.domain.settings.model.InAppUpdateDialogAction
+import com.absinthe.libchecker.domain.settings.model.InAppUpdateDialogContent
+import com.absinthe.libchecker.domain.settings.model.InAppUpdateDialogState
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemDisplayData
+import com.absinthe.libchecker.domain.snapshot.list.ui.view.SnapshotItemView
+import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.manager.SystemBarManager
@@ -21,20 +22,20 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.loadingindicator.LoadingIndicator
 
-class InAppUpdateDialogView(
-  context: Context,
-  buildSnapshotAbiDisplayData: BuildSnapshotAbiDisplayDataUseCase,
-  buildSnapshotUpdateTimeDisplayData: BuildSnapshotUpdateTimeDisplayDataUseCase,
-  initialCheckedId: Int = R.id.in_app_update_chip_stable
-) : LinearLayout(context),
+class InAppUpdateDialogView(context: Context) :
+  LinearLayout(context),
   IHeaderView {
+
+  private var onAction: (InAppUpdateDialogAction) -> Unit = {}
+  private var isBinding = false
+  private var renderedItem: SnapshotItemDisplayData? = null
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
     title.text = context.getString(R.string.settings_get_updates)
   }
 
-  val toggleGroup = MaterialButtonToggleGroup(context).apply {
+  private val toggleGroup = MaterialButtonToggleGroup(context).apply {
     layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply {
       topMargin = 8.dp
     }
@@ -54,21 +55,13 @@ class InAppUpdateDialogView(
         text = context.getString(R.string.settings_get_updates_in_app_chip_ci)
       }
     )
-    check(initialCheckedId)
   }
 
-  private val demoAdapter = SnapshotAdapter(
-    buildSnapshotAbiDisplayData,
-    buildSnapshotUpdateTimeDisplayData,
-    SnapshotAdapter.CardMode.GET_APP_UPDATE
-  )
+  private val demoItemView = SnapshotItemView(context)
 
-  private val demoView = RecyclerView(context).apply {
+  private val demoView = FrameLayout(context).apply {
     layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
     setPadding(0, 16.dp, 0, 16.dp)
-    overScrollMode = OVER_SCROLL_NEVER
-    layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-    adapter = demoAdapter
   }
 
   private val viewFlipper = HeightAnimatableViewFlipper(context).apply {
@@ -86,7 +79,7 @@ class InAppUpdateDialogView(
     }
   }
 
-  val updateButton = MaterialButton(context).apply {
+  private val updateButton = MaterialButton(context).apply {
     layoutParams = LayoutParams(300.dp, LayoutParams.WRAP_CONTENT)
     isEnabled = false
     text = context.getString(R.string.rules_btn_update)
@@ -108,25 +101,76 @@ class InAppUpdateDialogView(
     viewFlipper.addView(loading)
     viewFlipper.addView(demoView)
     addView(updateButton)
-  }
-
-  fun showLoading() {
-    if (viewFlipper.displayedChildView != loading) {
-      viewFlipper.show(loading)
+    toggleGroup.addOnButtonCheckedListener { _, checkedId, isChecked ->
+      if (!isBinding && isChecked) {
+        checkedId.toAppUpdateChannel()?.let {
+          onAction(InAppUpdateDialogAction.SelectChannel(it))
+        }
+      }
+    }
+    updateButton.setOnClickListener {
+      onAction(InAppUpdateDialogAction.Update)
     }
   }
 
-  fun showContent() {
-    if (viewFlipper.displayedChildView != demoView) {
-      viewFlipper.show(demoView)
+  fun bind(
+    state: InAppUpdateDialogState,
+    onAction: (InAppUpdateDialogAction) -> Unit
+  ) {
+    this.onAction = onAction
+    isBinding = true
+    toggleGroup.check(state.selectedChannel.toButtonId())
+    isBinding = false
+    doOnMainThreadIdle {
+      toggleGroup.isEnabled = state.isChannelSelectionEnabled
+    }
+    updateButton.isEnabled = state.isUpdateEnabled
+
+    when (val content = state.content) {
+      is InAppUpdateDialogContent.Loading -> {
+        setItem(content.retainedItem)
+        if (viewFlipper.displayedChildView != loading) {
+          viewFlipper.show(loading)
+        }
+      }
+
+      is InAppUpdateDialogContent.Ready -> {
+        setItem(content.item)
+        if (viewFlipper.displayedChildView != demoView) {
+          viewFlipper.show(demoView)
+        }
+      }
     }
   }
 
-  fun setItem(item: SnapshotDiffItem?) {
-    demoAdapter.setList(item?.let(::listOf).orEmpty())
+  private fun setItem(data: SnapshotItemDisplayData?) {
+    if (renderedItem == data) {
+      return
+    }
+    renderedItem = data
+    demoView.removeAllViews()
+    data ?: return
+
+    demoItemView.render(data)
+    demoView.addView(demoItemView)
   }
 
   override fun getHeaderView(): BottomSheetHeaderView {
     return header
+  }
+
+  private fun Int.toAppUpdateChannel(): AppUpdateChannel? {
+    return when (this) {
+      R.id.in_app_update_chip_stable -> AppUpdateChannel.STABLE
+      R.id.in_app_update_chip_ci -> AppUpdateChannel.CI
+      else -> null
+    }
+  }
+
+  private fun AppUpdateChannel.toButtonId(): Int {
+    return when (this) {
+      AppUpdateChannel.STABLE -> R.id.in_app_update_chip_stable
+      AppUpdateChannel.CI -> R.id.in_app_update_chip_ci
+    }
   }
 }

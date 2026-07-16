@@ -2,7 +2,7 @@ package com.absinthe.libchecker.data.app
 
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
-import com.absinthe.libchecker.domain.app.PackageChangeState
+import com.absinthe.libchecker.domain.app.model.PackageChangeState
 
 interface AppDataSource {
 

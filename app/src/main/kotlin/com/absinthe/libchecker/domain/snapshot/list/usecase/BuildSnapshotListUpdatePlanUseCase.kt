@@ -1,10 +1,9 @@
 package com.absinthe.libchecker.domain.snapshot.list.usecase
 
 import com.absinthe.libchecker.constant.options.SnapshotOptions
-import com.absinthe.libchecker.domain.snapshot.SnapshotListDisplayOptions
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotListRenderState
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
-import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -21,8 +20,10 @@ class BuildSnapshotListUpdatePlanUseCase(
     val packageNames = displayPlan.items.map(SnapshotDiffItem::packageName)
 
     return displayPlan.copy(
-      packageIconSources = getSnapshotPackageIconSources(packageNames),
-      apexPackageNames = getApexPackageNames()
+      renderState = displayPlan.renderState.copy(
+        packageIconSources = getSnapshotPackageIconSources(packageNames),
+        apexPackageNames = getApexPackageNames()
+      )
     )
   }
 
@@ -39,7 +40,10 @@ class BuildSnapshotListUpdatePlanUseCase(
     if (request.highlightRefresh) {
       return Plan(
         items = sortedItems,
-        displayOptions = displayOptions,
+        renderState = SnapshotListRenderState(
+          displayOptions = displayOptions,
+          highlightText = request.searchKeyword
+        ),
         particleRemovalItemIds = emptyList(),
         consumedRemovePackageNames = emptySet()
       )
@@ -65,7 +69,10 @@ class BuildSnapshotListUpdatePlanUseCase(
 
     return Plan(
       items = sortedItems,
-      displayOptions = displayOptions,
+      renderState = SnapshotListRenderState(
+        displayOptions = displayOptions,
+        highlightText = request.searchKeyword
+      ),
       particleRemovalItemIds = particleRemovalItemIds,
       consumedRemovePackageNames = consumedRemovePackageNames
     )
@@ -90,11 +97,9 @@ class BuildSnapshotListUpdatePlanUseCase(
 
   data class Plan(
     val items: List<SnapshotDiffItem>,
-    val displayOptions: SnapshotListDisplayOptions,
+    val renderState: SnapshotListRenderState,
     val particleRemovalItemIds: List<Long>,
-    val consumedRemovePackageNames: Set<String>,
-    val packageIconSources: Map<String, SnapshotPackageIconSource> = emptyMap(),
-    val apexPackageNames: Set<String> = emptySet()
+    val consumedRemovePackageNames: Set<String>
   )
 }
 

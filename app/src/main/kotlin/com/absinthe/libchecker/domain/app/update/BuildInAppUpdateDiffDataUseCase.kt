@@ -3,7 +3,7 @@ package com.absinthe.libchecker.domain.app.update
 import android.content.pm.PackageManager
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.api.bean.GetAppUpdateInfo
-import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
@@ -23,11 +23,13 @@ class BuildInAppUpdateDiffDataUseCase(
     val localVersionCode = packageInfo.getVersionCode()
     val localCompileSdk = packageInfo.getCompileSdkVersion().toShort()
     val localPackageSize = packageInfo.getPackageSize(includeSplits = false)
-    val remoteApp = updateInfo?.appForFlavor(BuildConfig.IS_FOSS)
-    val displayedRemoteApp = remoteApp?.takeIf { it.versionCode.toLong() > localVersionCode }
+    val (displayedRemoteApp, hasUpdate) = resolveInAppUpdateDisplay(
+      remoteApp = updateInfo?.appForFlavor(BuildConfig.IS_FOSS),
+      localVersionCode = localVersionCode
+    )
 
     return InAppUpdateDiffData(
-      hasUpdate = displayedRemoteApp != null,
+      hasUpdate = hasUpdate,
       item = SnapshotDiffItem(
         packageName = packageInfo.packageName,
         updateTime = System.currentTimeMillis(),
@@ -67,6 +69,13 @@ class BuildInAppUpdateDiffDataUseCase(
       )
     )
   }
+}
+
+internal fun resolveInAppUpdateDisplay(
+  remoteApp: GetAppUpdateInfo.App?,
+  localVersionCode: Long
+): Pair<GetAppUpdateInfo.App?, Boolean> {
+  return remoteApp to (remoteApp?.versionCode?.toLong()?.let { it > localVersionCode } == true)
 }
 
 data class InAppUpdateDiffData(

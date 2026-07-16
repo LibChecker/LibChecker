@@ -1,26 +1,51 @@
 package com.absinthe.libchecker.domain.snapshot.list.ui.view
 
 import android.content.Context
+import android.graphics.Color
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
+import android.text.style.ImageSpan
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.text.buildSpannedString
+import androidx.core.text.inSpans
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.core.view.marginStart
+import coil.load
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.snapshot.display.SnapshotAbiDisplayData
+import com.absinthe.libchecker.domain.snapshot.display.SnapshotAbiDisplayItem
+import com.absinthe.libchecker.domain.snapshot.display.SnapshotUpdateTimeDisplayData
+import com.absinthe.libchecker.domain.snapshot.display.SnapshotUpdateTimeText
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemAppNameDisplayData
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemCardPresentation
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemDisplayData
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemPackageSizeDisplayData
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemPackageStateLabel
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemStateIndicatorData
+import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.domain.snapshot.ui.view.SnapshotPackageSizeLineBreaker
 import com.absinthe.libchecker.utils.extensions.applyCondensedSingleLine
 import com.absinthe.libchecker.utils.extensions.applySingleLineEndEllipsize
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
+import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
+import com.absinthe.libchecker.utils.extensions.setAlphaForAll
+import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
+import com.absinthe.libchecker.utils.extensions.tintHighlightText
 import com.absinthe.libchecker.utils.extensions.visibleHeight
 import com.absinthe.libchecker.view.AViewGroup
+import com.absinthe.libchecker.view.span.CenterAlignImageSpan
 import com.google.android.material.card.MaterialCardView
 
 class SnapshotItemView(context: Context) : MaterialCardView(context) {
 
-  val container = SnapshotItemContainerView(context).apply {
+  private val container = SnapshotItemContainerView(context).apply {
     val padding = context.getDimensionPixelSize(R.dimen.main_card_padding)
     setPadding(padding, padding, padding, padding)
   }
@@ -31,6 +56,48 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       LayoutParams.WRAP_CONTENT
     )
     addView(container)
+  }
+
+  fun render(data: SnapshotItemDisplayData) {
+    val isNewOrDeleted = data.isNewInstalled || data.isDeleted
+    setCardPresentation(data.cardPresentation)
+    container.apply {
+      setIconSource(data.iconSource)
+      setDeleted(data.isDeleted)
+      setStateIndicator(
+        data = data.stateIndicator,
+        isNewOrDeleted = isNewOrDeleted
+      )
+      setAppNameDisplay(
+        data = data.appName,
+        highlightText = data.highlightText
+      )
+      setPackageNameDisplay(data.packageName, data.highlightText)
+      setVersionDisplay(data.versionInfo)
+      setPackageSizeDisplay(data.packageSize)
+      setApiDisplay(data.apiText)
+      setAbiDisplay(
+        abiDisplayData = data.abi.abiDisplayData,
+        showChangedAbi = data.abi.showChangedAbi,
+        tintChangedAbiBadge = data.abi.tintChangedAbiBadge
+      )
+      setUpdateTimeDisplay(data.updateTimeDisplayData)
+    }
+    contentDescription = data.contentDescription
+  }
+
+  private fun setCardPresentation(cardPresentation: SnapshotItemCardPresentation) {
+    when (cardPresentation) {
+      SnapshotItemCardPresentation.Normal -> {
+        strokeColor = Color.TRANSPARENT
+        radius = 0f
+      }
+
+      SnapshotItemCardPresentation.Rounded -> {
+        setSmoothRoundCorner(16.dp)
+        strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutlineVariant)
+      }
+    }
   }
 
   class SnapshotItemContainerView(context: Context) : AViewGroup(context) {
@@ -132,6 +199,146 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       addView(this)
     }
 
+    fun setIconSource(iconSource: SnapshotPackageIconSource?) {
+      when (iconSource) {
+        is SnapshotPackageIconSource.InstalledPackage -> icon.load(iconSource.packageInfo)
+
+        SnapshotPackageIconSource.Fallback,
+        null -> icon.load(R.drawable.ic_icon_blueprint)
+      }
+    }
+
+    fun setDeleted(isDeleted: Boolean) {
+      setAlphaForAll(if (isDeleted) 0.7f else 1.0f)
+    }
+
+    fun setStateIndicator(
+      data: SnapshotItemStateIndicatorData,
+      isNewOrDeleted: Boolean
+    ) {
+      if (data.animate) {
+        stateIndicator.startDemoAnimation()
+        return
+      }
+
+      stateIndicator.stopDemoAnimation()
+      if (isNewOrDeleted) {
+        stateIndicator.added = false
+        stateIndicator.removed = false
+        stateIndicator.changed = false
+        stateIndicator.moved = false
+      } else {
+        stateIndicator.setSnapshotStateCounts(
+          data.added,
+          data.removed,
+          data.changed,
+          data.moved
+        )
+      }
+    }
+
+    fun setAppNameDisplay(
+      data: SnapshotItemAppNameDisplayData,
+      highlightText: String
+    ) {
+      val appNameLabel = buildSpannedString {
+        if (data.showTrackIcon) {
+          inSpans(ImageSpan(context, R.drawable.ic_track)) {
+            append(" ")
+          }
+        }
+        append(data.text)
+      }
+      appName.setOrHighlightText(appNameLabel, highlightText)
+      appendPackageStateLabel(data.packageStateLabel)
+    }
+
+    fun setPackageNameDisplay(text: CharSequence, highlightText: String) {
+      packageName.setOrHighlightText(text, highlightText)
+    }
+
+    private fun appendPackageStateLabel(packageStateLabel: SnapshotItemPackageStateLabel?) {
+      val labelDrawable = when (packageStateLabel) {
+        SnapshotItemPackageStateLabel.New -> R.drawable.ic_label_new_package
+        SnapshotItemPackageStateLabel.Deleted -> R.drawable.ic_label_deleted_package
+        null -> return
+      }.getDrawable(context) ?: return
+      val spanString = SpannableString("   ")
+      spanString.setSpan(
+        CenterAlignImageSpan(
+          labelDrawable.also {
+            it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+          }
+        ),
+        1,
+        2,
+        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+      )
+      appName.text = SpannableStringBuilder(appName.text).append(spanString)
+    }
+
+    fun setVersionDisplay(text: CharSequence) {
+      versionInfo.text = text
+    }
+
+    fun setAbiDisplay(
+      abiDisplayData: SnapshotAbiDisplayData,
+      showChangedAbi: Boolean,
+      tintChangedAbiBadge: Boolean
+    ) {
+      val builder = SpannableStringBuilder(
+        buildAbiSpanString(
+          item = abiDisplayData.old,
+          tintBadge = false,
+          tintAbiLabels = tintChangedAbiBadge
+        )
+      )
+      if (showChangedAbi) {
+        val changedAbiSpanString = abiDisplayData.new?.let {
+          buildAbiSpanString(
+            item = it,
+            tintBadge = true,
+            tintAbiLabels = tintChangedAbiBadge
+          )
+        } ?: SpannableString("")
+        builder.append(" $ABI_CHANGE_ARROW ").append(changedAbiSpanString)
+      }
+      abiInfo.text = builder
+    }
+
+    fun setPackageSizeDisplay(data: SnapshotItemPackageSizeDisplayData?) {
+      if (data == null) {
+        packageSizeInfo.isVisible = false
+        clearPackageSizeText()
+        return
+      }
+
+      packageSizeInfo.isVisible = true
+      setPackageSizeText(data.text, data.breakStart)
+    }
+
+    fun setApiDisplay(text: CharSequence) {
+      apisInfo.text = text
+    }
+
+    fun setUpdateTimeDisplay(updateTimeDisplayData: SnapshotUpdateTimeDisplayData?) {
+      updateTime.isVisible = updateTimeDisplayData != null
+      if (updateTimeDisplayData == null) {
+        updateTime.text = null
+        return
+      }
+
+      updateTime.text = when (val text = updateTimeDisplayData.text) {
+        SnapshotUpdateTimeText.Preinstalled -> context.getString(R.string.snapshot_preinstalled_app)
+
+        is SnapshotUpdateTimeText.LastUpdated ->
+          context.getString(R.string.format_last_updated).format(text.timeText)
+      }
+      if (updateTimeDisplayData.isApexPackage) {
+        updateTime.append(", APEX")
+      }
+    }
+
     fun setPackageSizeText(text: CharSequence, breakStart: Int) {
       packageSizeLineBreaker.setText(text, breakStart)
     }
@@ -213,4 +420,49 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       )
     }
   }
+}
+
+private const val ABI_CHANGE_ARROW = "→"
+
+private fun AppCompatTextView.setOrHighlightText(text: CharSequence, highlightText: String) {
+  if (highlightText.isNotBlank()) {
+    tintHighlightText(highlightText, text)
+  } else {
+    this.text = text
+  }
+}
+
+private fun SnapshotItemView.SnapshotItemContainerView.buildAbiSpanString(
+  item: SnapshotAbiDisplayItem,
+  tintBadge: Boolean,
+  tintAbiLabels: Boolean
+): SpannableString {
+  val badgeRes = item.badgeRes ?: return SpannableString(item.text)
+  var paddingString = "  ${item.text}"
+  if (item.isMultiArch) {
+    paddingString = "  $paddingString"
+  }
+  val spanString = SpannableString(paddingString)
+  badgeRes.getDrawable(context)?.let {
+    if (tintBadge) {
+      if (tintAbiLabels) {
+        if (badgeRes == R.drawable.ic_abi_label_64bit) {
+          it.setTint(context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary))
+        } else {
+          it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorTertiary))
+        }
+      } else {
+        it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
+      }
+    }
+    it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+    spanString.setSpan(CenterAlignImageSpan(it), 0, 1, ImageSpan.ALIGN_BOTTOM)
+  }
+  if (item.isMultiArch) {
+    R.drawable.ic_multi_arch.getDrawable(context)?.let {
+      it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+      spanString.setSpan(CenterAlignImageSpan(it), 2, 3, ImageSpan.ALIGN_BOTTOM)
+    }
+  }
+  return spanString
 }

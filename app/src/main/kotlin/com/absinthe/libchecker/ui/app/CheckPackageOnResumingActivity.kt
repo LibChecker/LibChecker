@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.ui.app
 
 import androidx.viewbinding.ViewBinding
-import com.absinthe.libchecker.domain.app.CheckRequiredPackageAvailabilityUseCase
+import com.absinthe.libchecker.domain.app.maintenance.CheckRequiredPackageAvailabilityUseCase
 import com.absinthe.libchecker.ui.base.BaseActivity
 import org.koin.android.ext.android.inject
 import timber.log.Timber

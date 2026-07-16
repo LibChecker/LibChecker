@@ -19,6 +19,8 @@ import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.URLManager
+import com.absinthe.libchecker.domain.settings.model.ExportAppsDialogAction
+import com.absinthe.libchecker.domain.settings.model.ExportAppsDialogState
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.view.app.IHeaderView
@@ -31,6 +33,8 @@ import timber.log.Timber
 class ExportAppsDialogView(context: Context) :
   LinearLayout(context),
   IHeaderView {
+
+  private var onAction: (ExportAppsDialogAction) -> Unit = {}
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
@@ -73,7 +77,7 @@ class ExportAppsDialogView(context: Context) :
     importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
   }
 
-  val exportButton = MaterialButton(context).apply {
+  private val exportButton = MaterialButton(context).apply {
     layoutParams = LayoutParams(300.dp, LayoutParams.WRAP_CONTENT).apply {
       topMargin = 16.dp
     }
@@ -95,35 +99,45 @@ class ExportAppsDialogView(context: Context) :
     addView(webUiPreview)
     addView(progressIndicator)
     addView(exportButton)
+    exportButton.setOnClickListener {
+      onAction(ExportAppsDialogAction.PrimaryButtonClick)
+    }
   }
 
-  fun showReady() {
-    progressIndicator.isVisible = false
-    progressIndicator.progress = 0
-    exportButton.isEnabled = true
-    exportButton.setText(R.string.export_apps_start)
-  }
+  fun bind(
+    state: ExportAppsDialogState,
+    onAction: (ExportAppsDialogAction) -> Unit
+  ) {
+    this.onAction = onAction
+    when (state) {
+      ExportAppsDialogState.Ready -> {
+        progressIndicator.isVisible = false
+        progressIndicator.progress = 0
+        exportButton.isEnabled = true
+        exportButton.setText(R.string.export_apps_start)
+      }
 
-  fun showPreparing() {
-    progressIndicator.isVisible = false
-    exportButton.isEnabled = false
-  }
+      ExportAppsDialogState.Preparing -> {
+        progressIndicator.isVisible = false
+        exportButton.isEnabled = false
+        exportButton.setText(R.string.export_apps_start)
+      }
 
-  fun showExporting() {
-    progressIndicator.isVisible = true
-    progressIndicator.setProgressCompat(0, false)
-    exportButton.isEnabled = false
-  }
+      is ExportAppsDialogState.Exporting -> {
+        progressIndicator.isVisible = true
+        val progress = state.progress.coerceIn(0, 100)
+        progressIndicator.setProgressCompat(progress, progress > 0)
+        exportButton.isEnabled = false
+        exportButton.setText(R.string.export_apps_start)
+      }
 
-  fun showDone() {
-    progressIndicator.isVisible = true
-    progressIndicator.setProgressCompat(100, true)
-    exportButton.isEnabled = true
-    exportButton.setText(android.R.string.ok)
-  }
-
-  fun setProgress(progress: Int) {
-    progressIndicator.setProgressCompat(progress.coerceIn(0, 100), true)
+      ExportAppsDialogState.Done -> {
+        progressIndicator.isVisible = true
+        progressIndicator.setProgressCompat(100, true)
+        exportButton.isEnabled = true
+        exportButton.setText(android.R.string.ok)
+      }
+    }
   }
 
   override fun getHeaderView(): BottomSheetHeaderView = header

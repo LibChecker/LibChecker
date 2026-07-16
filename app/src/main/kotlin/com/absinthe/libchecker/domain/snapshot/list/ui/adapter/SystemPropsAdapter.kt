@@ -23,7 +23,7 @@ class SystemPropsAdapter : BaseQuickAdapter<SnapshotSystemPropDisplayData, BaseV
     (holder.itemView as SystemPropItemView).also {
       it.tvTitle.text = item.label
       it.tvText.text = item.displayValue
-      it.contentDescription = listOf(item.label, item.displayValue).joinToString()
+      it.contentDescription = item.description
     }
   }
 }

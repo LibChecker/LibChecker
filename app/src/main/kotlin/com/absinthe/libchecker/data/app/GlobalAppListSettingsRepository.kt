@@ -2,7 +2,7 @@ package com.absinthe.libchecker.data.app
 
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.domain.app.AppListSettingsRepository
+import com.absinthe.libchecker.domain.app.repository.AppListSettingsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map

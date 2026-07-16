@@ -1,6 +1,6 @@
 package com.absinthe.libchecker.domain.snapshot.display
 
-import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 
 class SnapshotDashboardCounter(

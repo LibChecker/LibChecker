@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.data.app
 
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.domain.app.AppDetailSettingsRepository
+import com.absinthe.libchecker.domain.app.repository.AppDetailSettingsRepository
 
 class GlobalAppDetailSettingsRepository : AppDetailSettingsRepository {
   override val sortMode: Int

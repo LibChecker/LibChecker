@@ -13,11 +13,17 @@ import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.detail.model.XposedInfoAction
+import com.absinthe.libchecker.domain.app.detail.model.XposedInfoBottomSheetDisplay
+import com.absinthe.libchecker.domain.app.detail.model.XposedInfoItemDisplay
+import com.absinthe.libchecker.domain.app.detail.model.XposedInfoTextStyle
+import com.absinthe.libchecker.domain.app.detail.model.buildDetailItemDescription
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.XposedDetailItemAdapter
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
+import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.manager.SystemBarManager
@@ -33,9 +39,9 @@ class XposedInfoBottomSheetView(context: Context) :
     title.text = context.getString(R.string.xposed_module)
   }
 
-  val contentAdapter = XposedDetailItemAdapter()
+  private val contentAdapter = XposedDetailItemAdapter()
 
-  val setting = AppInfoItemView(context).apply {
+  private val setting = AppInfoItemView(context).apply {
     layoutParams = LayoutParams(
       LayoutParams.WRAP_CONTENT,
       LayoutParams.WRAP_CONTENT
@@ -76,18 +82,27 @@ class XposedInfoBottomSheetView(context: Context) :
     addView(xposedDetailContentView)
   }
 
-  override fun getHeaderView(): BottomSheetHeaderView {
-    return header
+  fun bind(
+    display: XposedInfoBottomSheetDisplay,
+    onAction: (XposedInfoAction) -> Unit
+  ) {
+    setting.setText(display.appName)
+    setting.setOnClickListener {
+      onAction(display.settingsAction)
+    }
+    contentAdapter.setList(display.items)
   }
+
+  override fun getHeaderView(): BottomSheetHeaderView = header
 
   class XposedDetailItemView(context: Context) : AViewGroup(context) {
 
-    val icon = AppCompatImageView(context).apply {
+    private val icon = AppCompatImageView(context).apply {
       layoutParams = LayoutParams(24.dp, 24.dp)
       importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     }
 
-    val tip = AppCompatTextView(context).apply {
+    private val tip = AppCompatTextView(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
@@ -98,7 +113,7 @@ class XposedInfoBottomSheetView(context: Context) :
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 10f)
     }
 
-    val text = AppCompatTextView(context).apply {
+    private val text = AppCompatTextView(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
@@ -116,11 +131,19 @@ class XposedInfoBottomSheetView(context: Context) :
       addView(text)
     }
 
-    fun updateContentDescription() {
-      contentDescription = listOf(tip.text, text.text)
-        .map { it.toString().trim() }
-        .filter(String::isNotEmpty)
-        .joinToString()
+    fun bind(item: XposedInfoItemDisplay) {
+      icon.setImageResource(item.iconRes)
+      tip.text = item.tip
+      text.text = item.text
+      text.setTextAppearance(
+        context.getResourceIdByAttr(
+          when (item.textStyle) {
+            XposedInfoTextStyle.Title -> com.google.android.material.R.attr.textAppearanceTitleSmall
+            XposedInfoTextStyle.Body -> com.google.android.material.R.attr.textAppearanceBodyMedium
+          }
+        )
+      )
+      contentDescription = buildDetailItemDescription(tip.text, text.text)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -137,7 +160,9 @@ class XposedInfoBottomSheetView(context: Context) :
       }
       setMeasuredDimension(
         measuredWidth,
-        (tip.measuredHeight + text.marginTop + text.measuredHeight).coerceAtLeast(icon.measuredHeight) + paddingTop + paddingBottom
+        (tip.measuredHeight + text.marginTop + text.measuredHeight).coerceAtLeast(icon.measuredHeight) +
+          paddingTop +
+          paddingBottom
       )
     }
 

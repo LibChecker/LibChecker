@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.domain.app.list.export
 
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.AppListRepository
+import com.absinthe.libchecker.domain.app.repository.AppListRepository
 import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.Date

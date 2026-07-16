@@ -3,7 +3,6 @@ package com.absinthe.libchecker.domain.app.detail.ui.dialog
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
-import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.absinthe.libchecker.R
@@ -54,29 +53,32 @@ class AppInfoPackageShareController(
     viewModel.exportAppPackageShareFile(shareFile, uri)
   }
 
-  fun sharePackage(view: View, packageName: String?) {
+  fun sharePackage(activity: Activity?, packageName: String?) {
     val pkg = packageName ?: run {
       Timber.e("package name is null")
       return
     }
-    val activity = view.context as Activity
+    activity ?: run {
+      Timber.e("activity is null")
+      return
+    }
     pendingSharePackageName = pkg
     showLoading(activity)
     viewModel.prepareAppPackageShareAction(activity.cacheDir, pkg, AppPackageShareTarget.SHARE)
   }
 
-  fun exportPackage(view: View, packageName: String?): Boolean {
+  fun exportPackage(activity: Activity?, packageName: String?) {
     val pkg = packageName ?: run {
       Timber.e("package name is null")
-      return true
+      return
     }
-
-    val activity = view.context as Activity
+    activity ?: run {
+      Timber.e("activity is null")
+      return
+    }
     pendingSharePackageName = pkg
     showLoading(activity)
     viewModel.prepareAppPackageShareAction(activity.cacheDir, pkg, AppPackageShareTarget.EXPORT)
-
-    return true
   }
 
   fun clear() {

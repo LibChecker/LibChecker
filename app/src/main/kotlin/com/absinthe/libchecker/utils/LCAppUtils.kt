@@ -18,7 +18,7 @@ import com.absinthe.libchecker.view.span.CenterAlignImageSpan
 
 object LCAppUtils {
 
-  fun setTitle(context: Context): Spannable {
+  fun buildAppTitle(context: Context): Spannable {
     val sb = SpannableStringBuilder(context.getString(R.string.app_name))
 
     when {

@@ -14,7 +14,7 @@ import com.absinthe.libchecker.view.AViewGroup
 
 class TimeNodeAddApkView(context: Context) : AViewGroup(context) {
 
-  val name = AppCompatTextView(
+  private val name = AppCompatTextView(
     ContextThemeWrapper(
       context,
       R.style.TextView_SansSerifCondensedMedium

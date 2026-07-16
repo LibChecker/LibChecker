@@ -260,7 +260,7 @@ val View.end: Int
 fun View?.visibleWidth() = if (this != null && isVisible) measuredWidth else 0
 fun View?.visibleHeight() = if (this != null && isVisible) measuredHeight else 0
 
-fun View.animatedBlurAction(action: () -> Unit) {
+fun View.animatedBlurAction(action: () -> Unit): ValueAnimator {
   var hasActed = false
   var supportBlur = OsUtils.atLeastS()
   val animator = ValueAnimator.ofFloat(0f, 16f).apply {
@@ -295,6 +295,7 @@ fun View.animatedBlurAction(action: () -> Unit) {
     }
   }
   animator.start()
+  return animator
 }
 
 fun MaterialCardView.setSmoothRoundCorner(radius: Int) {

@@ -4,8 +4,8 @@ import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import com.absinthe.libchecker.compat.PackageManagerCompat
-import com.absinthe.libchecker.domain.app.InstalledAppRepository
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
+import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.extensions.getSignatures
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

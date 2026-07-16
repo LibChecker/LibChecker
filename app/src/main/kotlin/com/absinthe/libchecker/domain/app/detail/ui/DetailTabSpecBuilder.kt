@@ -11,13 +11,41 @@ import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.annotation.SIGNATURES
+import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.domain.app.detail.content.BuildAppDetailTabTypesUseCase
 
-data class DetailTabSpec(
-  val types: List<Int>,
-  val titles: List<CharSequence>
+data class DetailTabItem(
+  val type: Int,
+  val title: CharSequence
 )
+
+data class DetailTabSpec(
+  val items: List<DetailTabItem> = emptyList()
+) {
+  val types: List<Int>
+    get() = items.map(DetailTabItem::type)
+
+  fun itemAt(position: Int): DetailTabItem? {
+    return items.getOrNull(position)
+  }
+
+  fun withStaticLibraryTab(title: CharSequence): DetailTabSpec {
+    if (items.any { it.type == STATIC }) {
+      return this
+    }
+    val insertionIndex = STATIC_LIBRARY_POSITION.coerceAtMost(items.size)
+    return copy(
+      items = items.toMutableList().apply {
+        add(insertionIndex, DetailTabItem(STATIC, title))
+      }
+    )
+  }
+
+  companion object {
+    const val STATIC_LIBRARY_POSITION = 1
+  }
+}
 
 class DetailTabSpecBuilder(
   private val context: Context,
@@ -31,8 +59,12 @@ class DetailTabSpecBuilder(
     )
 
     return DetailTabSpec(
-      types = types,
-      titles = types.map { context.getText(titleResOf(it, isHarmonyMode)) }
+      items = types.map { type ->
+        DetailTabItem(
+          type = type,
+          title = context.getText(titleResOf(type, isHarmonyMode))
+        )
+      }
     )
   }
 

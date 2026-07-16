@@ -9,13 +9,15 @@ import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.LinearLayoutManager
+import coil.load
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.detail.model.DetailInfoItemDisplay
+import com.absinthe.libchecker.domain.app.detail.model.DetailInfoTextStyle
+import com.absinthe.libchecker.domain.app.detail.model.ElfDetailBottomSheetState
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.LibDetailItemAdapter
-import com.absinthe.libchecker.domain.app.detail.ui.adapter.node.LibDetailItem
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
@@ -25,12 +27,11 @@ class ELFInfoBottomSheetView(context: Context) :
   IHeaderView {
 
   private val header = BottomSheetHeaderView(context).apply {
-    layoutParams =
-      LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+    layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
     title.text = context.getString(R.string.lib_detail_elf_info)
   }
 
-  val icon = AppCompatImageView(context).apply {
+  private val icon = AppCompatImageView(context).apply {
     val iconSize = 48.dp
     layoutParams = LayoutParams(iconSize, iconSize).also {
       it.topMargin = 4.dp
@@ -39,7 +40,7 @@ class ELFInfoBottomSheetView(context: Context) :
     importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
   }
 
-  val title = AppCompatTextView(
+  private val title = AppCompatTextView(
     ContextThemeWrapper(
       context,
       R.style.TextView_SansSerifCondensedMedium
@@ -53,30 +54,6 @@ class ELFInfoBottomSheetView(context: Context) :
     }
     gravity = Gravity.CENTER
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-  }
-
-  fun setContent(deps: String, entryPoints: String, isStripped: Boolean) {
-    val list = listOf(
-      LibDetailItem(
-        iconRes = R.drawable.ic_content,
-        tipRes = R.string.lib_detail_dependency_tip,
-        textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleSmall),
-        text = deps.takeIf { it.isNotEmpty() } ?: context.getString(R.string.empty_list)
-      ),
-      LibDetailItem(
-        iconRes = R.drawable.ic_content,
-        tipRes = R.string.lib_detail_entry_points_tip,
-        textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleSmall),
-        text = entryPoints.takeIf { it.isNotEmpty() } ?: context.getString(R.string.empty_list)
-      ),
-      LibDetailItem(
-        iconRes = if (isStripped) R.drawable.ic_yes else R.drawable.ic_no,
-        tipRes = R.string.lib_detail_optimization_tip,
-        textStyleRes = context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleSmall),
-        text = context.getString(if (isStripped) R.string.lib_detail_optimization_on else R.string.lib_detail_optimization_off)
-      )
-    )
-    contentAdapter.setList(list)
   }
 
   private val contentAdapter = LibDetailItemAdapter()
@@ -112,7 +89,76 @@ class ELFInfoBottomSheetView(context: Context) :
     addView(contentView)
   }
 
-  override fun getHeaderView(): BottomSheetHeaderView {
-    return header
+  fun bind(state: ElfDetailBottomSheetState) {
+    title.text = state.title
+    icon.load(state.iconRes) {
+      crossfade(true)
+    }
+    contentAdapter.setList(
+      when (state) {
+        is ElfDetailBottomSheetState.Loading -> buildLoadingItems()
+        is ElfDetailBottomSheetState.Content -> buildContentItems(state)
+      }
+    )
   }
+
+  private fun buildLoadingItems(): List<DetailInfoItemDisplay> {
+    val loading = context.getString(R.string.loading)
+    return listOf(
+      detailItem(
+        iconRes = R.drawable.ic_content,
+        tipRes = R.string.lib_detail_dependency_tip,
+        text = loading
+      ),
+      detailItem(
+        iconRes = R.drawable.ic_content,
+        tipRes = R.string.lib_detail_entry_points_tip,
+        text = loading
+      ),
+      detailItem(
+        iconRes = R.drawable.ic_no,
+        tipRes = R.string.lib_detail_optimization_tip,
+        text = context.getString(R.string.lib_detail_optimization_off)
+      )
+    )
+  }
+
+  private fun buildContentItems(state: ElfDetailBottomSheetState.Content): List<DetailInfoItemDisplay> {
+    return listOf(
+      detailItem(
+        iconRes = R.drawable.ic_content,
+        tipRes = R.string.lib_detail_dependency_tip,
+        text = state.dependenciesText.takeIf(String::isNotEmpty)
+          ?: context.getString(R.string.empty_list)
+      ),
+      detailItem(
+        iconRes = R.drawable.ic_content,
+        tipRes = R.string.lib_detail_entry_points_tip,
+        text = state.entryPointsText.takeIf(String::isNotEmpty)
+          ?: context.getString(R.string.empty_list)
+      ),
+      detailItem(
+        iconRes = if (state.isStripped) R.drawable.ic_yes else R.drawable.ic_no,
+        tipRes = R.string.lib_detail_optimization_tip,
+        text = context.getString(
+          if (state.isStripped) {
+            R.string.lib_detail_optimization_on
+          } else {
+            R.string.lib_detail_optimization_off
+          }
+        )
+      )
+    )
+  }
+
+  private fun detailItem(iconRes: Int, tipRes: Int, text: String): DetailInfoItemDisplay {
+    return DetailInfoItemDisplay(
+      iconRes = iconRes,
+      tipRes = tipRes,
+      textStyle = DetailInfoTextStyle.TITLE,
+      text = text
+    )
+  }
+
+  override fun getHeaderView(): BottomSheetHeaderView = header
 }

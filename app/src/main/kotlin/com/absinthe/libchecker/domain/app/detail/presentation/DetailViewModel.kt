@@ -7,21 +7,19 @@ import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.app.AppBundleSplitItem
-import com.absinthe.libchecker.domain.app.PrepareApkAnalysisPackageUseCase
-import com.absinthe.libchecker.domain.app.VersionedFeature
-import com.absinthe.libchecker.domain.app.detail.AppDetailAbiLabelData
-import com.absinthe.libchecker.domain.app.detail.AppDetailHeaderExtraInfo
-import com.absinthe.libchecker.domain.app.detail.RelatedAppDisplayData
+import com.absinthe.libchecker.domain.app.detail.abi.AppDetailAbiLabelData
 import com.absinthe.libchecker.domain.app.detail.action.AppElfDetail
-import com.absinthe.libchecker.domain.app.detail.action.AppInstallSourceDetails
 import com.absinthe.libchecker.domain.app.detail.action.AppLaunchAction
-import com.absinthe.libchecker.domain.app.detail.action.AppManifestProperty
 import com.absinthe.libchecker.domain.app.detail.action.AppPackageShareAction
 import com.absinthe.libchecker.domain.app.detail.action.AppPackageShareFile
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemDialogRequest
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemLongClickActions
 import com.absinthe.libchecker.domain.app.detail.feature.AppDetailFeatureItemData
+import com.absinthe.libchecker.domain.app.detail.header.AppDetailHeaderExtraInfo
+import com.absinthe.libchecker.domain.app.detail.model.AppBundleItem
+import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceBottomSheetDisplay
+import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceRequesterAccess
+import com.absinthe.libchecker.domain.app.detail.model.AppPropItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.navigation.DetailReferenceNavigation
@@ -32,6 +30,8 @@ import com.absinthe.libchecker.domain.app.detail.presentation.DetailFilterContro
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailPackageLoader
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailPackageState
 import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailContentLoader
+import com.absinthe.libchecker.domain.app.model.VersionedFeature
+import com.absinthe.libchecker.domain.app.packageinfo.PrepareApkAnalysisPackageUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
 import java.io.File
@@ -164,21 +164,19 @@ class DetailViewModel(
     val result: Result<ApkPreviewInfo>
   )
 
-  fun loadAppInstallSourceDetails(packageName: String) {
+  fun loadAppInstallSourceDetails(
+    packageName: String,
+    requesterAccess: AppInstallSourceRequesterAccess
+  ) {
     appInstallSourceDetailsJob?.cancel()
     appInstallSourceDetailsJob = viewModelScope.launch {
-      val details = detailActionLoader.getAppInstallSourceDetails(packageName)
-      val installSource = details?.installSource
       _appInstallSourceDetailsResults.emit(
         AppInstallSourceDetailsResult(
           packageName = packageName,
-          details = details,
-          originatingApp = installSource?.originatingPackageName?.let {
-            detailActionLoader.getRelatedAppDisplayData(it)
-          },
-          installingApp = installSource?.installingPackageName?.let {
-            detailActionLoader.getRelatedAppDisplayData(it)
-          }
+          display = detailActionLoader.getAppInstallSourceBottomSheetDisplay(
+            packageName,
+            requesterAccess
+          )
         )
       )
     }
@@ -186,9 +184,7 @@ class DetailViewModel(
 
   data class AppInstallSourceDetailsResult(
     val packageName: String,
-    val details: AppInstallSourceDetails?,
-    val originatingApp: RelatedAppDisplayData?,
-    val installingApp: RelatedAppDisplayData?
+    val display: AppInstallSourceBottomSheetDisplay?
   )
 
   fun loadAppLaunchAction(packageName: String?) {
@@ -337,11 +333,11 @@ class DetailViewModel(
     )
   }
 
-  suspend fun getAppBundleItems(packageInfo: PackageInfo): List<AppBundleSplitItem> {
+  suspend fun getAppBundleItems(packageInfo: PackageInfo): List<AppBundleItem> {
     return detailActionLoader.getAppBundleItems(packageInfo)
   }
 
-  suspend fun getAppInfoActions(packageName: String) = detailActionLoader.getAppInfoActions(packageName)
+  suspend fun getAppInfoBottomSheetState(packageName: String?) = detailActionLoader.getAppInfoBottomSheetState(packageName)
 
   suspend fun getAppInfoPrimaryActions(packageName: String?) = detailActionLoader.getAppInfoPrimaryActions(packageName)
 
@@ -349,14 +345,12 @@ class DetailViewModel(
 
   suspend fun getAlternativeLaunchItems(packageName: String) = detailActionLoader.getAlternativeLaunchItems(packageName)
 
-  suspend fun getAppInstallSourceDetails(packageName: String) = detailActionLoader.getAppInstallSourceDetails(packageName)
-
-  suspend fun getXposedModuleInfo(packageName: String) = detailActionLoader.getXposedModuleInfo(packageName)
+  suspend fun getXposedInfoBottomSheetDisplay(packageName: String) = detailActionLoader.getXposedInfoBottomSheetDisplay(packageName)
 
   suspend fun getAppManifestProperties(
     packageInfo: PackageInfo?,
     properties: Map<String, String>?
-  ): List<AppManifestProperty> {
+  ): List<AppPropItem> {
     return detailActionLoader.getAppManifestProperties(packageInfo, properties)
   }
 
@@ -438,10 +432,17 @@ class DetailViewModel(
     libName: String,
     @LibType type: Int,
     regexName: String?,
-    isValidLib: Boolean
-  ) = detailActionLoader.getLibraryDetailDialogData(libName, type, regexName, isValidLib)
+    isValidLib: Boolean,
+    preferredLocale: String
+  ) = detailActionLoader.getLibraryDetailDialogData(
+    libName,
+    type,
+    regexName,
+    isValidLib,
+    preferredLocale
+  )
 
-  suspend fun getOverlayDetail(item: LCItem) = detailActionLoader.getOverlayDetail(item)
+  suspend fun getOverlayDetailBottomSheetResult(item: LCItem) = detailActionLoader.getOverlayDetailBottomSheetResult(item)
 
   suspend fun getPermissionDetail(permissionName: String) = detailActionLoader.getPermissionDetail(permissionName)
 
@@ -456,8 +457,6 @@ class DetailViewModel(
   fun setFeatureLoading(loading: Boolean) {
     detailFeatureLoader.setLoading(viewModelScope, loading)
   }
-
-  suspend fun getRelatedAppDisplayData(packageName: String) = detailActionLoader.getRelatedAppDisplayData(packageName)
 
   fun buildSignatureDetailItems(detail: String) = detailActionLoader.buildSignatureDetailItems(detail)
 

@@ -5,21 +5,33 @@ import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.text.buildSpannedString
+import androidx.core.text.scale
 import androidx.core.view.marginTop
+import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.domain.app.detail.ui.view.DetailsTitleView
+import com.absinthe.libchecker.domain.app.detail.model.OverlayDetailAction
+import com.absinthe.libchecker.domain.app.detail.model.OverlayDetailBottomSheetDisplay
+import com.absinthe.libchecker.domain.app.detail.model.OverlayDetailExtraInfoDisplay
+import com.absinthe.libchecker.domain.app.detail.model.OverlayTargetPackageDisplay
+import com.absinthe.libchecker.domain.app.detail.ui.binder.RelatedAppItemBinder
 import com.absinthe.libchecker.domain.app.list.ui.view.AppItemView
+import com.absinthe.libchecker.utils.extensions.copyToClipboard
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
+import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.google.android.material.button.MaterialButton
+import me.zhanghai.android.appiconloader.AppIconLoader
 
 class OverlayDetailBottomSheetView(context: Context) :
   AViewGroup(context),
   IHeaderView {
+
+  private val relatedAppItemBinder = RelatedAppItemBinder()
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =
@@ -27,7 +39,7 @@ class OverlayDetailBottomSheetView(context: Context) :
     title.text = Constants.OVERLAY_STRING
   }
 
-  val detailsTitleView = DetailsTitleView(context).apply {
+  private val detailsTitleView = DetailsTitleView(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
@@ -36,7 +48,7 @@ class OverlayDetailBottomSheetView(context: Context) :
     }
   }
 
-  val targetTitleView = AppCompatTextView(
+  private val targetTitleView = AppCompatTextView(
     ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)
   ).apply {
     layoutParams = LayoutParams(
@@ -50,7 +62,7 @@ class OverlayDetailBottomSheetView(context: Context) :
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
   }
 
-  val targetPackageView = AppItemView(context).apply {
+  private val targetPackageView = AppItemView(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
@@ -62,7 +74,7 @@ class OverlayDetailBottomSheetView(context: Context) :
     setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSurfaceContainerHigh))
   }
 
-  val moreDetailButton = MaterialButton(context).apply {
+  private val moreDetailButton = MaterialButton(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
@@ -80,6 +92,98 @@ class OverlayDetailBottomSheetView(context: Context) :
     addView(targetTitleView)
     addView(targetPackageView)
     addView(moreDetailButton)
+  }
+
+  fun bind(
+    display: OverlayDetailBottomSheetDisplay,
+    onAction: (OverlayDetailAction) -> Unit
+  ) {
+    bindDetail(display)
+    bindTarget(display.target, onAction)
+    moreDetailButton.setOnClickListener {
+      onAction(OverlayDetailAction.OpenApp(display.item, forceDetail = true))
+    }
+    requestLayout()
+  }
+
+  private fun bindDetail(display: OverlayDetailBottomSheetDisplay) {
+    detailsTitleView.apply {
+      iconView.apply {
+        val appIconLoader = AppIconLoader(
+          resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size),
+          false,
+          context
+        )
+        display.applicationInfo?.let {
+          load(appIconLoader.loadIcon(it))
+        }
+        setOnLongClickListener {
+          copyToClipboard()
+          true
+        }
+      }
+      appNameView.apply {
+        text = display.appName
+        setLongClickCopiedToClipboard(text)
+      }
+      iconView.contentDescription = appNameView.text
+      packageNameView.apply {
+        text = display.packageName
+        setLongClickCopiedToClipboard(text)
+      }
+      versionInfoView.apply {
+        text = display.versionInfo
+        setLongClickCopiedToClipboard(text)
+      }
+      extraInfoView.text = buildOverlayExtraInfo(display.extraInfo)
+    }
+  }
+
+  private fun bindTarget(
+    target: OverlayTargetPackageDisplay,
+    onAction: (OverlayDetailAction) -> Unit
+  ) {
+    when (target) {
+      is OverlayTargetPackageDisplay.RelatedApp -> {
+        relatedAppItemBinder.bind(
+          appItemView = targetPackageView,
+          title = targetTitleView.text,
+          data = target.data,
+          showHarmonyBadge = target.showHarmonyBadge
+        ) {
+          onAction(OverlayDetailAction.OpenApp(target.data.item, forceDetail = false))
+        }
+      }
+
+      is OverlayTargetPackageDisplay.PackageName -> {
+        targetPackageView.setOnClickListener(null)
+        targetPackageView.addFloatView(target.value)
+      }
+
+      OverlayTargetPackageDisplay.Empty -> {
+        targetPackageView.setOnClickListener(null)
+      }
+    }
+  }
+
+  private fun buildOverlayExtraInfo(extraInfo: OverlayDetailExtraInfoDisplay) = buildSpannedString {
+    append(extraInfo.type).append(", ")
+    scale(0.8f) {
+      append("Target: ")
+    }
+    append(extraInfo.targetSdkInfo)
+    scale(0.8f) {
+      append(" Min: ")
+    }
+    append(extraInfo.minSdkInfo)
+    scale(0.8f) {
+      append(" Compile: ")
+    }
+    append(extraInfo.compileSdkInfo)
+    scale(0.8f) {
+      append(" Size: ")
+    }
+    append(extraInfo.sizeInfo)
   }
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -114,7 +218,7 @@ class OverlayDetailBottomSheetView(context: Context) :
     )
   }
 
-  override fun onLayout(p0: Boolean, p1: Int, p2: Int, p3: Int, p4: Int) {
+  override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     header.layout(0, paddingTop)
     detailsTitleView.layout(paddingStart, header.bottom + detailsTitleView.marginTop)
     targetTitleView.layout(paddingStart, detailsTitleView.bottom + targetTitleView.marginTop)
@@ -122,7 +226,5 @@ class OverlayDetailBottomSheetView(context: Context) :
     moreDetailButton.layout(paddingStart, targetPackageView.bottom + moreDetailButton.marginTop)
   }
 
-  override fun getHeaderView(): BottomSheetHeaderView {
-    return header
-  }
+  override fun getHeaderView(): BottomSheetHeaderView = header
 }

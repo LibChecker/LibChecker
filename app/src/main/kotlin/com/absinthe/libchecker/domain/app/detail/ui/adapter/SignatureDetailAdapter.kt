@@ -13,10 +13,6 @@ class SignatureDetailAdapter : BaseQuickAdapter<SignatureDetailItem, BaseViewHol
   }
 
   override fun convert(holder: BaseViewHolder, item: SignatureDetailItem) {
-    (holder.itemView as SignatureDetailItemView).apply {
-      type.text = item.type
-      content.text = item.content
-      contentDescription = listOf(item.type, item.content).joinToString()
-    }
+    (holder.itemView as SignatureDetailItemView).bind(item)
   }
 }

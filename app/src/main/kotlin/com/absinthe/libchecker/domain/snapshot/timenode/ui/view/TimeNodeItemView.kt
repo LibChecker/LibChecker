@@ -10,12 +10,14 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
+import com.absinthe.libchecker.domain.snapshot.timenode.model.SnapshotTimeNodeItem
 import com.absinthe.libchecker.domain.snapshot.timenode.ui.adapter.TimeNodeItemAdapter
 import com.absinthe.libchecker.view.AViewGroup
 
 class TimeNodeItemView(context: Context) : AViewGroup(context) {
 
-  val name = AppCompatTextView(
+  private val name = AppCompatTextView(
     ContextThemeWrapper(
       context,
       R.style.TextView_SansSerifCondensedMedium
@@ -26,7 +28,7 @@ class TimeNodeItemView(context: Context) : AViewGroup(context) {
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
   }
 
-  val adapter = TimeNodeItemAdapter().apply {
+  private val adapter = TimeNodeItemAdapter().apply {
     stateView =
       AppCompatTextView(
         ContextThemeWrapper(
@@ -42,6 +44,18 @@ class TimeNodeItemView(context: Context) : AViewGroup(context) {
     isStateViewEnable = true
   }
 
+  private val moreIndicator = AppCompatTextView(context).apply {
+    layoutParams = ViewGroup.LayoutParams(
+      ViewGroup.LayoutParams.WRAP_CONTENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
+    ).also {
+      gravity = Gravity.CENTER_VERTICAL
+    }
+    // noinspection AndroidLintSetTextI18n
+    text = "…"
+    setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
+  }
+
   private val rvList = RecyclerView(context).apply {
     layoutParams =
       LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -55,6 +69,20 @@ class TimeNodeItemView(context: Context) : AViewGroup(context) {
     setBackgroundResource(R.drawable.bg_lib_detail_item)
     addView(name)
     addView(rvList)
+  }
+
+  fun bind(
+    item: SnapshotTimeNodeItem,
+    packageIconSources: Map<String, SnapshotPackageIconSource>
+  ) {
+    name.text = item.timestampText
+    contentDescription = item.description
+    adapter.bind(item.topAppPackageNames, packageIconSources)
+    if (item.topAppPackageNames.size <= MAX_VISIBLE_APP_COUNT) {
+      adapter.removeAllFooterView()
+    } else {
+      adapter.setFooterView(moreIndicator)
+    }
   }
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -77,5 +105,9 @@ class TimeNodeItemView(context: Context) : AViewGroup(context) {
 
   override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
     return true
+  }
+
+  private companion object {
+    const val MAX_VISIBLE_APP_COUNT = 5
   }
 }

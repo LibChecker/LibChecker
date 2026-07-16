@@ -6,16 +6,27 @@ import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.core.view.marginTop
+import coil.load
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceAction
+import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceItemContent
+import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceItemDisplay
+import com.absinthe.libchecker.domain.app.detail.ui.binder.RelatedAppItemBinder
 import com.absinthe.libchecker.domain.app.list.ui.view.AppItemView
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.view.AViewGroup
 
-class AppInstallSourceItemView(context: Context) : AViewGroup(context) {
+class AppInstallSourceItemView(
+  context: Context,
+  initialTitle: CharSequence = ""
+) : AViewGroup(context) {
 
-  val titleView = AppCompatTextView(
+  private val relatedAppItemBinder = RelatedAppItemBinder()
+
+  private val titleView = AppCompatTextView(
     ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)
   ).apply {
     layoutParams = LayoutParams(
@@ -25,9 +36,10 @@ class AppInstallSourceItemView(context: Context) : AViewGroup(context) {
       it.topMargin = 8.dp
     }
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+    text = initialTitle
   }
 
-  val packageView = AppItemView(context).apply {
+  private val packageView = AppItemView(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
@@ -42,6 +54,45 @@ class AppInstallSourceItemView(context: Context) : AViewGroup(context) {
   init {
     addView(titleView)
     addView(packageView)
+  }
+
+  fun bind(
+    display: AppInstallSourceItemDisplay,
+    onAction: (AppInstallSourceAction) -> Unit
+  ) {
+    titleView.text = display.title
+    when (val content = display.content) {
+      is AppInstallSourceItemContent.RelatedApp -> {
+        relatedAppItemBinder.bind(
+          appItemView = packageView,
+          title = display.title,
+          data = content.data
+        ) {
+          display.action?.let(onAction)
+        }
+      }
+
+      is AppInstallSourceItemContent.Message -> bindMessage(content)
+    }
+    packageView.setItemContentDescription(display.contentDescription)
+    val action = display.action
+    if (action == null) {
+      packageView.setOnClickListener(null)
+    } else {
+      packageView.setOnClickListener { onAction(action) }
+    }
+  }
+
+  private fun bindMessage(content: AppInstallSourceItemContent.Message) {
+    packageView.container.apply {
+      icon.load(content.iconRes)
+      setAppName(content.appName)
+      setPackageName(content.packageName)
+      setVersionInfo(content.versionInfo)
+      setAbiInfo(content.abiInfo)
+      abiInfo.isVisible = content.showAbiInfo
+      setBadge(null)
+    }
   }
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

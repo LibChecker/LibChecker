@@ -3,9 +3,8 @@ package com.absinthe.libchecker.domain.app.detail.ui.dialog
 import android.content.DialogInterface
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
-import coil.load
-import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.action.AppElfDetail
+import com.absinthe.libchecker.domain.app.detail.model.ElfDetailBottomSheetState
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel.ElfDetailResult
@@ -25,6 +24,7 @@ class ELFDetailDialogFragment : BaseBottomSheetViewDialogFragment<ELFInfoBottomS
   private val viewModel: DetailViewModel by activityViewModel()
   private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME).orEmpty() }
   private val elfPath by lazy { arguments?.getString(EXTRA_ELF_PATH).orEmpty() }
+  private val elfTitle by lazy { elfPath.substringAfterLast('/') }
   private val ruleIcon by lazy {
     arguments?.getInt(EXTRA_RULE_ICON) ?: com.absinthe.lc.rulesbundle.R.drawable.ic_sdk_placeholder
   }
@@ -32,16 +32,13 @@ class ELFDetailDialogFragment : BaseBottomSheetViewDialogFragment<ELFInfoBottomS
   override fun initRootView(): ELFInfoBottomSheetView = ELFInfoBottomSheetView(requireContext())
 
   override fun init() {
-    root.apply {
-      maxPeekHeightPercentage = 0.67f
-      title.text = elfPath.split("/").last()
-      lifecycleScope.launch {
-        icon.load(ruleIcon) {
-          crossfade(true)
-        }
-        setContent(getString(R.string.loading), getString(R.string.loading), false)
-      }
-    }
+    maxPeekHeightPercentage = 0.67f
+    root.bind(
+      ElfDetailBottomSheetState.Loading(
+        title = elfTitle,
+        iconRes = ruleIcon
+      )
+    )
     collectElfDetailResults()
   }
 
@@ -68,13 +65,17 @@ class ELFDetailDialogFragment : BaseBottomSheetViewDialogFragment<ELFInfoBottomS
   }
 
   private fun renderElfDetail(info: AppElfDetail) {
-    root.apply {
-      setContent(
-        info.deps.joinToString(", "),
-        info.entryPoints.joinToString(System.lineSeparator()) { "◉${Typography.nbsp}$it" },
-        info.isStripped
+    root.bind(
+      ElfDetailBottomSheetState.Content(
+        title = elfTitle,
+        iconRes = ruleIcon,
+        dependenciesText = info.deps.joinToString(", "),
+        entryPointsText = info.entryPoints.joinToString(System.lineSeparator()) {
+          "◉${Typography.nbsp}$it"
+        },
+        isStripped = info.isStripped
       )
-    }
+    )
   }
 
   override fun show(manager: FragmentManager, tag: String?) {

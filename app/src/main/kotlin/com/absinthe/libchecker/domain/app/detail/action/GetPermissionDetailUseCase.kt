@@ -3,7 +3,8 @@ package com.absinthe.libchecker.domain.app.detail.action
 import android.content.pm.PackageManager
 import android.content.pm.PermissionInfo
 import android.graphics.drawable.Drawable
-import com.absinthe.libchecker.domain.app.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.detail.model.PermissionDetailContent
+import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.extensions.getAppName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -14,7 +15,7 @@ class GetPermissionDetailUseCase(
   private val installedAppRepository: InstalledAppRepository
 ) {
 
-  suspend operator fun invoke(permissionName: String): AppPermissionDetail = withContext(Dispatchers.IO) {
+  suspend operator fun invoke(permissionName: String): PermissionDetailContent = withContext(Dispatchers.IO) {
     val normalizedName = permissionName.substringBefore(" ")
     val permissionInfo = runCatching {
       packageManager.getPermissionInfo(normalizedName, 0)
@@ -22,7 +23,7 @@ class GetPermissionDetailUseCase(
       Timber.e(it)
     }.getOrNull()
 
-    AppPermissionDetail(
+    PermissionDetailContent(
       name = normalizedName,
       icon = permissionInfo?.loadIconOrNull(),
       label = permissionInfo?.loadLabelOrNull(),
@@ -62,11 +63,3 @@ class GetPermissionDetailUseCase(
     return installedAppRepository.getPackageInfo(packageName)?.getAppName(packageManager)
   }
 }
-
-data class AppPermissionDetail(
-  val name: String,
-  val icon: Drawable?,
-  val label: CharSequence?,
-  val description: CharSequence?,
-  val providerAppName: String?
-)
