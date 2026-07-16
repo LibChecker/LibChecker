@@ -53,4 +53,12 @@ class AdaptiveIconLayerCardGeometryTest {
     assertEquals(1f, finishedParticle, 0f)
     assertEquals(0f, calculateParticleAlpha(finishedParticle), 0f)
   }
+
+  @Test
+  fun `particle shape rounds gradually instead of flashing to a circle`() {
+    assertEquals(0f, calculateParticleRoundness(0f), 0f)
+    assertEquals(0.5f, calculateParticleRoundness(0.06f), 0.001f)
+    assertEquals(1f, calculateParticleRoundness(0.12f), 0f)
+    assertEquals(1f, calculateParticleRoundness(1f), 0f)
+  }
 }

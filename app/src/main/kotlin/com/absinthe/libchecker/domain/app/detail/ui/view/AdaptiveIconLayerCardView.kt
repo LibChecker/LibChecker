@@ -13,6 +13,8 @@ import android.graphics.Outline
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.PixelFormat
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffXfermode
 import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.drawable.AdaptiveIconDrawable
@@ -376,6 +378,11 @@ private class MaskedBackgroundDrawable(
   private val targetBounds = RectF()
   private val matrix = Matrix()
   private val transformedMask = Path()
+  private val sourceMaskMatrix = Matrix()
+  private val sourceMaskPath = Path()
+  private val sourceMaskClearPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
+  }
   private val particleClipPath = Path()
   private val particlePaint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
   private val particles = mutableListOf<BackgroundParticle>()
@@ -426,8 +433,6 @@ private class MaskedBackgroundDrawable(
 
   private fun drawDisintegratingOutside(canvas: Canvas) {
     val bitmap = ensureSourceBitmap() ?: return
-    val outsideSaveCount = canvas.save()
-    canvas.clipOutPath(transformedMask)
     val travelDistance = min(bounds.width(), bounds.height()).toFloat()
     particles.forEach { particle ->
       val localProgress = calculateParticleLocalProgress(
@@ -445,6 +450,7 @@ private class MaskedBackgroundDrawable(
       val offsetY = particle.velocityY * localProgress -
         travelDistance * PARTICLE_UPWARD_ACCELERATION * progressSquared
       val scale = 1f - PARTICLE_SCALE_REDUCTION * localProgress
+      val roundness = calculateParticleRoundness(localProgress)
       particlePaint.alpha = (drawableAlpha * alpha).roundToInt()
 
       val particleSaveCount = canvas.save()
@@ -460,15 +466,23 @@ private class MaskedBackgroundDrawable(
         particle.destination.centerX(),
         particle.destination.centerY()
       )
-      if (localProgress > 0f) {
+      if (roundness > 0f) {
+        val cornerRadius = min(
+          particle.destination.width(),
+          particle.destination.height()
+        ) * 0.5f * roundness
         particleClipPath.reset()
-        particleClipPath.addOval(particle.destination, Path.Direction.CW)
+        particleClipPath.addRoundRect(
+          particle.destination,
+          cornerRadius,
+          cornerRadius,
+          Path.Direction.CW
+        )
         canvas.clipPath(particleClipPath)
       }
       canvas.drawBitmap(bitmap, particle.source, particle.destination, particlePaint)
       canvas.restoreToCount(particleSaveCount)
     }
-    canvas.restoreToCount(outsideSaveCount)
   }
 
   private fun ensureSourceBitmap(): Bitmap? {
@@ -481,9 +495,19 @@ private class MaskedBackgroundDrawable(
     }
 
     val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+    val bitmapCanvas = Canvas(bitmap)
     background.bounds = Rect(0, 0, width, height)
     background.alpha = FULL_ALPHA
-    background.draw(Canvas(bitmap))
+    background.draw(bitmapCanvas)
+    sourceMaskMatrix.reset()
+    sourceMaskMatrix.setRectToRect(
+      ADAPTIVE_ICON_MASK_VIEWPORT,
+      RectF(0f, 0f, width.toFloat(), height.toFloat()),
+      Matrix.ScaleToFit.CENTER
+    )
+    sourceMaskPath.reset()
+    mask.transform(sourceMaskMatrix, sourceMaskPath)
+    bitmapCanvas.drawPath(sourceMaskPath, sourceMaskClearPaint)
     sourceBitmap = bitmap
     createParticles(width, height)
     return bitmap
@@ -626,6 +650,13 @@ internal fun calculateParticleAlpha(localProgress: Float): Float {
   return (1f - localProgress.coerceIn(0f, 1f)).pow(PARTICLE_ALPHA_EXPONENT)
 }
 
+internal fun calculateParticleRoundness(localProgress: Float): Float {
+  val fraction = (
+    localProgress.coerceIn(0f, 1f) / PARTICLE_ROUNDING_END_PROGRESS
+    ).coerceIn(0f, 1f)
+  return fraction * fraction * (3f - 2f * fraction)
+}
+
 private fun particleRandom(column: Int, row: Int, salt: Int): Float {
   var value = column * 73_856_093 xor row * 19_349_663 xor salt * 83_492_791
   value = value xor (value shl 13)
@@ -647,8 +678,8 @@ private fun Path.setLayerBubble(
   val tailWidth = bodyBounds.left - tipX
   val tailShoulderTop = tailCenterY - tailTopHeight
   val tailShoulderBottom = tailCenterY + tailBottomHeight
-  val tailArcRadiusX = tailWidth / (1f - TELEGRAM_TAIL_ARC_COS)
-  val tailArcRadiusY = tailTopHeight / TELEGRAM_TAIL_ARC_SIN
+  val tailArcRadiusX = tailWidth / (1f - TAIL_ARC_SWEEP_COS)
+  val tailArcRadiusY = tailTopHeight / TAIL_ARC_SWEEP_SIN
   val tailArcCenterY = tailShoulderTop
   val tailArcBounds = RectF(
     bodyBounds.left - tailArcRadiusX * 2f,
@@ -673,7 +704,7 @@ private fun Path.setLayerBubble(
     tipX,
     tailCenterY
   )
-  arcTo(tailArcBounds, TELEGRAM_TAIL_ARC_SWEEP_DEGREES, -TELEGRAM_TAIL_ARC_SWEEP_DEGREES, false)
+  arcTo(tailArcBounds, TAIL_ARC_SWEEP_DEGREES, -TAIL_ARC_SWEEP_DEGREES, false)
   lineTo(bodyBounds.left, bodyBounds.top + cornerRadius)
   quadTo(bodyBounds.left, bodyBounds.top, bodyBounds.left + cornerRadius, bodyBounds.top)
   close()
@@ -685,9 +716,9 @@ private const val CARD_ELEVATION_DP = 2
 private const val BUBBLE_TAIL_WIDTH_DP = 18
 private const val BUBBLE_TAIL_TOP_HEIGHT_DP = 6
 private const val BUBBLE_TAIL_BOTTOM_HEIGHT_DP = 17
-private const val TELEGRAM_TAIL_ARC_SWEEP_DEGREES = 83f
-private const val TELEGRAM_TAIL_ARC_COS = 0.12186934f
-private const val TELEGRAM_TAIL_ARC_SIN = 0.99254614f
+private const val TAIL_ARC_SWEEP_DEGREES = 83f
+private const val TAIL_ARC_SWEEP_COS = 0.12186934f
+private const val TAIL_ARC_SWEEP_SIN = 0.99254614f
 private const val CONTENT_PADDING_DP = 14
 private const val STITCH_INSET_DP = 5
 private const val STITCH_RADIUS_DP = 9
@@ -702,6 +733,7 @@ private const val MIN_PREVIEW_SIZE_DP = 44
 private const val FULL_ALPHA = 0xFF
 private const val PARTICLE_PROGRESS_IDLE = -1f
 private const val BACKGROUND_DISINTEGRATION_DURATION_MS = 1_500L
+private const val PARTICLE_ROUNDING_END_PROGRESS = 0.12f
 private const val PARTICLE_GRID_SIZE = 18
 private const val PARTICLE_ACTIVATION_SPREAD = 0.24f
 private const val PARTICLE_ACTIVATION_JITTER = 0.06f
