@@ -25,7 +25,6 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.graphics.ColorUtils
-import androidx.core.graphics.drawable.toBitmap
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -120,7 +119,7 @@ class AdaptiveIconLayerCardView(
 
     private val backgroundView = LayerPreviewView(
       context = context,
-      drawable = createBackgroundOutlineDrawable(icon),
+      drawable = createMaskedBackgroundDrawable(icon),
       label = context.getString(R.string.adaptive_icon_layer_background),
       actionDescription = context.getString(R.string.adaptive_icon_copy_background),
       onClick = onBackgroundClick
@@ -259,61 +258,56 @@ class AdaptiveIconLayerCardView(
   }
 }
 
-private fun createBackgroundOutlineDrawable(icon: AdaptiveIconDrawable): Drawable {
-  val background = icon.background.copyDrawable()
-  return IconMaskOutlineDrawable(
-    background = background,
+@RequiresApi(Build.VERSION_CODES.O)
+private fun createMaskedBackgroundDrawable(icon: AdaptiveIconDrawable): Drawable {
+  return MaskedBackgroundDrawable(
+    background = icon.background.copyDrawable(),
     mask = Path(icon.iconMask),
-    outlineColor = background.copyDrawable().chooseVisibleOutlineColor(),
-    strokeWidth = 2.dp.toFloat(),
-    dashLength = 7.dp.toFloat(),
-    dashGap = 5.dp.toFloat()
+    outsideAlpha = BACKGROUND_OUTSIDE_ALPHA
   )
 }
 
-private class IconMaskOutlineDrawable(
+@RequiresApi(Build.VERSION_CODES.O)
+private class MaskedBackgroundDrawable(
   private val background: Drawable,
   private val mask: Path,
-  outlineColor: Int,
-  strokeWidth: Float,
-  dashLength: Float,
-  dashGap: Float
+  private val outsideAlpha: Int
 ) : Drawable() {
 
   private val targetBounds = RectF()
   private val matrix = Matrix()
-  private val outlinePath = Path()
-  private val outlineAlpha = Color.alpha(outlineColor)
+  private val transformedMask = Path()
   private var drawableAlpha = 255
-  private val outlinePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-    style = Paint.Style.STROKE
-    strokeCap = Paint.Cap.ROUND
-    strokeJoin = Paint.Join.ROUND
-    this.strokeWidth = strokeWidth
-    color = outlineColor
-    pathEffect = DashPathEffect(floatArrayOf(dashLength, dashGap), 0f)
-  }
 
   override fun draw(canvas: Canvas) {
     background.bounds = bounds
-    background.draw(canvas)
-    if (bounds.width() <= 0 || bounds.height() <= 0 || mask.isEmpty) return
+    if (bounds.width() <= 0 || bounds.height() <= 0 || mask.isEmpty) {
+      background.alpha = drawableAlpha
+      background.draw(canvas)
+      return
+    }
 
     targetBounds.set(bounds)
-    val inset = outlinePaint.strokeWidth / 2f
-    targetBounds.inset(inset, inset)
-
     matrix.reset()
     matrix.setRectToRect(ADAPTIVE_ICON_MASK_VIEWPORT, targetBounds, Matrix.ScaleToFit.CENTER)
-    outlinePath.reset()
-    mask.transform(matrix, outlinePath)
-    outlinePaint.alpha = outlineAlpha * drawableAlpha / 255
-    canvas.drawPath(outlinePath, outlinePaint)
+    transformedMask.reset()
+    mask.transform(matrix, transformedMask)
+
+    val outsideSaveCount = canvas.save()
+    canvas.clipOutPath(transformedMask)
+    background.alpha = drawableAlpha * outsideAlpha / 255
+    background.draw(canvas)
+    canvas.restoreToCount(outsideSaveCount)
+
+    val insideSaveCount = canvas.save()
+    canvas.clipPath(transformedMask)
+    background.alpha = drawableAlpha
+    background.draw(canvas)
+    canvas.restoreToCount(insideSaveCount)
   }
 
   override fun setAlpha(alpha: Int) {
     drawableAlpha = alpha
-    background.alpha = alpha
     invalidateSelf()
   }
 
@@ -334,43 +328,6 @@ private class IconMaskOutlineDrawable(
   override fun getIntrinsicHeight(): Int {
     return background.intrinsicHeight
   }
-}
-
-private fun Drawable.chooseVisibleOutlineColor(): Int {
-  val averageColor = calculateAverageColor() ?: return Color.WHITE
-  val outlineColor = if (ColorUtils.calculateLuminance(averageColor) > 0.5) {
-    Color.BLACK
-  } else {
-    Color.WHITE
-  }
-  return ColorUtils.setAlphaComponent(outlineColor, 0xE6)
-}
-
-private fun Drawable.calculateAverageColor(): Int? {
-  val bitmap = runCatching { toBitmap(24, 24) }.getOrNull() ?: return null
-  var alphaSum = 0L
-  var redSum = 0L
-  var greenSum = 0L
-  var blueSum = 0L
-
-  for (y in 0 until bitmap.height) {
-    for (x in 0 until bitmap.width) {
-      val color = bitmap.getPixel(x, y)
-      val alpha = Color.alpha(color)
-      if (alpha == 0) continue
-      alphaSum += alpha
-      redSum += Color.red(color) * alpha
-      greenSum += Color.green(color) * alpha
-      blueSum += Color.blue(color) * alpha
-    }
-  }
-  if (alphaSum == 0L) return null
-
-  return Color.rgb(
-    (redSum / alphaSum).toInt(),
-    (greenSum / alphaSum).toInt(),
-    (blueSum / alphaSum).toInt()
-  )
 }
 
 private fun Context.createRoundedRipple(radius: Float): Drawable {
@@ -411,5 +368,6 @@ private const val PLUS_TO_FOREGROUND_GAP_DP = 0
 private const val PLUS_SIZE_DP = 24
 private const val DEFAULT_PREVIEW_SIZE_DP = 60
 private const val MIN_PREVIEW_SIZE_DP = 44
+private const val BACKGROUND_OUTSIDE_ALPHA = 0x33
 private const val LABEL_GAP_DP = 2
 private const val PREVIEW_RADIUS_DP = 12
