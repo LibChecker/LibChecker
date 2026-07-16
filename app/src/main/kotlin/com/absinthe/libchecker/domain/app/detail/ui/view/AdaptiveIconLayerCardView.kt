@@ -176,9 +176,10 @@ class AdaptiveIconLayerCardView(
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
       backgroundView.layout(paddingStart, paddingTop)
+      val previewCenterY = paddingTop + previewSize / 2
       plusView.layout(
         backgroundView.right + layerGap,
-        (measuredHeight - plusView.measuredHeight) / 2
+        previewCenterY - plusView.measuredHeight / 2
       )
       foregroundView.layout(plusView.right + layerGap, paddingTop)
     }
