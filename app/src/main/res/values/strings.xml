@@ -268,6 +268,12 @@
   <string name="snapshot_indicator_removed">Removed</string>
   <string name="snapshot_indicator_changed">Changed</string>
   <string name="snapshot_indicator_moved">Moved</string>
+  <string name="snapshot_detail_size_label">Size</string>
+  <string name="snapshot_detail_metric_description">%1$s, %2$s</string>
+  <plurals name="snapshot_detail_changes_count">
+    <item quantity="one">%d change</item>
+    <item quantity="other">%d changes</item>
+  </plurals>
   <string name="snapshot_empty_list_title">No component changes</string>
   <string name="snapshot_no_snapshot">No Snapshot</string>
   <string name="snapshot_detail_new_install_title">This app has newly installed</string>

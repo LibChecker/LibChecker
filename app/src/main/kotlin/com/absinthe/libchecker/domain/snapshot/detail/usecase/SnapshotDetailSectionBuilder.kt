@@ -1,10 +1,8 @@
 package com.absinthe.libchecker.domain.snapshot.detail.usecase
 
 import android.content.Context
-import android.graphics.Color
-import android.text.style.ForegroundColorSpan
+import android.text.style.RelativeSizeSpan
 import androidx.annotation.StringRes
-import androidx.core.graphics.ColorUtils
 import androidx.core.text.buildSpannedString
 import androidx.core.text.inSpans
 import com.absinthe.libchecker.R
@@ -19,16 +17,17 @@ import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.repository.AppListSettingsRepository
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailContent
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemStatusDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSection
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailStatusCount
-import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailItemBackgroundColor
 import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailItemDescription
 import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailReportItemText
 import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailReportSectionText
 import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailRuleChipDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailSectionDescription
+import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailSummary
 import com.absinthe.libchecker.domain.snapshot.model.ADDED
 import com.absinthe.libchecker.domain.snapshot.model.CHANGED
 import com.absinthe.libchecker.domain.snapshot.model.MOVED
@@ -36,10 +35,8 @@ import com.absinthe.libchecker.domain.snapshot.model.REMOVED
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.fromJson
-import com.absinthe.libraries.utils.utils.UiUtils
 import com.absinthe.rulesbundle.Rule
 import java.text.NumberFormat
 import java.util.Locale
@@ -52,7 +49,7 @@ class SnapshotDetailSectionBuilder(
   private val appListSettingsRepository: AppListSettingsRepository
 ) {
 
-  suspend operator fun invoke(item: SnapshotDiffItem): List<SnapshotDetailSection> = withContext(Dispatchers.IO) {
+  suspend operator fun invoke(item: SnapshotDiffItem): SnapshotDetailContent = withContext(Dispatchers.IO) {
     val list = mutableListOf<SnapshotDetailItem>()
 
     list.addAll(
@@ -98,12 +95,21 @@ class SnapshotDetailSectionBuilder(
       )
     )
 
-    buildSections(list)
+    val sections = buildSections(list)
+    SnapshotDetailContent(
+      sections = sections,
+      summary = buildSnapshotDetailSummary(sections) { count ->
+        context.resources.getQuantityString(
+          R.plurals.snapshot_detail_changes_count,
+          count,
+          count
+        )
+      }
+    )
   }
 
   private suspend fun buildSections(items: List<SnapshotDetailItem>): List<SnapshotDetailSection> {
     val colorfulRuleIcon = appListSettingsRepository.colorfulRuleIcon
-    val darkMode = UiUtils.isDarkMode()
     val ruleCache = mutableMapOf<String, Rule?>()
 
     suspend fun getRuleCached(item: SnapshotDetailItem): Rule? {
@@ -135,10 +141,6 @@ class SnapshotDetailSectionBuilder(
             ),
             reportText = buildSnapshotDetailReportItemText(item),
             status = status,
-            backgroundColor = buildSnapshotDetailItemBackgroundColor(
-              baseColor = status.colorRes.getColor(context),
-              darkMode = darkMode
-            ),
             ruleChip = ruleChip
           )
         }
@@ -174,6 +176,7 @@ class SnapshotDetailSectionBuilder(
       count.takeIf { it > 0 }?.let {
         val statusDisplayData = buildStatusDisplayData(status)
         SnapshotDetailStatusCount(
+          diffType = status,
           count = it,
           countText = NumberFormat.getIntegerInstance().format(it),
           label = context.getString(statusDisplayData.labelRes),
@@ -201,29 +204,25 @@ class SnapshotDetailSectionBuilder(
     return when (status) {
       ADDED -> SnapshotDetailItemStatusDisplayData(
         iconRes = R.drawable.ic_add,
-        colorRes = R.color.material_green_300,
-        countColorRes = R.color.material_green_200,
+        colorRes = R.color.snapshot_status_added,
         labelRes = R.string.snapshot_indicator_added
       )
 
       REMOVED -> SnapshotDetailItemStatusDisplayData(
         iconRes = R.drawable.ic_remove,
-        colorRes = R.color.material_red_300,
-        countColorRes = R.color.material_red_200,
+        colorRes = R.color.snapshot_status_removed,
         labelRes = R.string.snapshot_indicator_removed
       )
 
       CHANGED -> SnapshotDetailItemStatusDisplayData(
         iconRes = R.drawable.ic_changed,
-        colorRes = R.color.material_yellow_300,
-        countColorRes = R.color.material_yellow_200,
+        colorRes = R.color.snapshot_status_changed,
         labelRes = R.string.snapshot_indicator_changed
       )
 
       MOVED -> SnapshotDetailItemStatusDisplayData(
         iconRes = R.drawable.ic_move,
-        colorRes = R.color.material_blue_300,
-        countColorRes = R.color.material_blue_200,
+        colorRes = R.color.snapshot_status_moved,
         labelRes = R.string.snapshot_indicator_moved
       )
 
@@ -267,7 +266,7 @@ class SnapshotDetailSectionBuilder(
           val extra = buildSpannedString {
             append("${it.size.sizeToString(context)} $ARROW ${item.size.sizeToString(context)}")
             appendLine()
-            inSpans(ForegroundColorSpan(ColorUtils.setAlphaComponent(Color.BLACK, 165))) {
+            inSpans(RelativeSizeSpan(0.9f)) {
               if (diffSize > 0) {
                 append("+")
               }

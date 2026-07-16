@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.domain.snapshot.detail.model
 
-import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -13,6 +12,19 @@ import com.absinthe.libchecker.domain.snapshot.model.MOVED
 import com.absinthe.libchecker.domain.snapshot.model.REMOVED
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
 import com.absinthe.rulesbundle.Rule
+import java.text.NumberFormat
+
+data class SnapshotDetailContent(
+  val sections: List<SnapshotDetailSection>,
+  val summary: SnapshotDetailSummary
+)
+
+data class SnapshotDetailSummary(
+  val totalCount: Int,
+  val totalCountText: String,
+  val statusCounts: List<SnapshotDetailStatusCount>,
+  val description: String
+)
 
 data class SnapshotDetailSection(
   @LibType val type: Int,
@@ -31,7 +43,6 @@ data class SnapshotDetailItemDisplayData(
   val description: String,
   val reportText: String,
   val status: SnapshotDetailItemStatusDisplayData,
-  @ColorInt val backgroundColor: Int,
   val ruleChip: SnapshotDetailRuleChipDisplayData?
 )
 
@@ -63,19 +74,6 @@ private fun buildSnapshotDetailReportDiffTypeLabel(diffType: Int): String {
   }
 }
 
-@ColorInt
-fun buildSnapshotDetailItemBackgroundColor(
-  @ColorInt baseColor: Int,
-  darkMode: Boolean
-): Int {
-  val alpha = if (darkMode) {
-    (0.75f * 255).toInt() and 0xFF
-  } else {
-    (0.95f * 255).toInt() and 0xFF
-  }
-  return (baseColor and 0x00FFFFFF) or (alpha shl 24)
-}
-
 fun buildSnapshotDetailItemDescription(
   statusLabel: CharSequence?,
   title: CharSequence?,
@@ -85,6 +83,33 @@ fun buildSnapshotDetailItemDescription(
   return listOf(statusLabel, title, extra, ruleLabel)
     .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
     .joinToString()
+}
+
+fun buildSnapshotDetailSummary(
+  sections: List<SnapshotDetailSection>,
+  totalCountFormatter: (Int) -> String
+): SnapshotDetailSummary {
+  val countsByStatus = sections
+    .flatMap(SnapshotDetailSection::statusCounts)
+    .groupBy(SnapshotDetailStatusCount::diffType)
+  val statusCounts = summaryStatusOrder.mapNotNull { diffType ->
+    val counts = countsByStatus[diffType].orEmpty()
+    val count = counts.sumOf(SnapshotDetailStatusCount::count)
+    counts.firstOrNull()?.copy(
+      count = count,
+      countText = NumberFormat.getIntegerInstance().format(count)
+    )
+  }
+  val totalCount = statusCounts.sumOf(SnapshotDetailStatusCount::count)
+  val totalCountText = totalCountFormatter(totalCount)
+  return SnapshotDetailSummary(
+    totalCount = totalCount,
+    totalCountText = totalCountText,
+    statusCounts = statusCounts,
+    description = (
+      listOf(totalCountText) + statusCounts.map { "${it.label} ${it.countText}" }
+      ).joinToString()
+  )
 }
 
 fun buildSnapshotDetailSectionDescription(
@@ -119,7 +144,6 @@ fun buildSnapshotDetailRuleChipDisplayData(
 data class SnapshotDetailItemStatusDisplayData(
   @DrawableRes val iconRes: Int,
   @ColorRes val colorRes: Int,
-  @ColorRes val countColorRes: Int,
   @StringRes val labelRes: Int
 )
 
@@ -132,8 +156,11 @@ data class SnapshotDetailRuleChipDisplayData(
 )
 
 data class SnapshotDetailStatusCount(
+  val diffType: Int,
   val count: Int,
   val countText: String,
   val label: String,
   val status: SnapshotDetailItemStatusDisplayData
 )
+
+private val summaryStatusOrder = listOf(ADDED, REMOVED, CHANGED, MOVED)

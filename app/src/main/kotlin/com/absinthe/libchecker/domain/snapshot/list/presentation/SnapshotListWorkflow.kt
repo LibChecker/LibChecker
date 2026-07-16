@@ -8,7 +8,7 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotDiffsUseCase
 import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotItemWithInstalledAppUseCase
-import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSection
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailContent
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.SnapshotDetailSectionBuilder
 import com.absinthe.libchecker.domain.snapshot.display.FormatSnapshotTimestampUseCase
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotDashboardCount
@@ -126,7 +126,7 @@ class SnapshotListWorkflow(
     return compareSnapshotItemWithInstalledApp(timeStamp, packageName)
   }
 
-  suspend fun buildSnapshotDetailSections(entity: SnapshotDiffItem): List<SnapshotDetailSection> {
+  suspend fun buildSnapshotDetailContent(entity: SnapshotDiffItem): SnapshotDetailContent {
     return snapshotDetailSectionBuilder(entity)
   }
 

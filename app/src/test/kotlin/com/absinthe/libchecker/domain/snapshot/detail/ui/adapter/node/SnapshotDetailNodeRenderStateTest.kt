@@ -4,7 +4,7 @@ import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemStatusDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailRuleChipDisplayData
-import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailItemCardRenderState
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailItemViewRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailRuleChipIconStyle
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailRuleChipRenderState
 import com.absinthe.libchecker.domain.snapshot.model.MOVED
@@ -16,44 +16,32 @@ import org.junit.Test
 class SnapshotDetailNodeRenderStateTest {
 
   @Test
-  fun exposesItemRenderStateForNodeWithRuleChip() {
-    val ruleChip = SnapshotDetailRuleChipDisplayData(
-      label = "WebRTC",
-      iconRes = 20,
-      regexName = "libjingle_.*",
-      isSimpleColorIcon = false,
-      useColorfulIcon = true
-    )
+  fun exposesVisibleStatusSemanticsAndRuleAction() {
     val node = SnapshotNativeNode(
       buildDisplayData(
-        name = "libjingle_peerconnection_so.so",
-        title = "libjingle_peerconnection_so.so",
-        extra = "(12 MB)",
-        description = "Changed, libjingle_peerconnection_so.so, (12 MB), WebRTC",
-        iconRes = 10,
-        backgroundColor = 0x12345678,
-        ruleChip = ruleChip
+        ruleChip = ruleChip(colorful = true),
+        description = "Moved, libjingle.so, 12 MB, WebRTC"
       )
     )
 
     assertEquals(
       SnapshotDetailItemRenderState(
-        title = "libjingle_peerconnection_so.so",
-        extra = "(12 MB)",
+        title = "libjingle.so",
+        extra = "12 MB",
         iconRes = 10,
-        backgroundColor = 0x12345678,
-        contentDescription = "Changed, libjingle_peerconnection_so.so, (12 MB), WebRTC",
+        statusColorRes = 11,
+        statusLabelRes = 12,
+        contentDescription = "Moved, libjingle.so, 12 MB, WebRTC",
         ruleChip = SnapshotDetailRuleChipRenderState(
           label = "WebRTC",
           iconRes = 20,
-          backgroundColor = 0x12345678,
           iconStyle = SnapshotDetailRuleChipIconStyle.Original
         ),
         chipClickAction = SnapshotDetailNodeChipClickAction.OpenLibraryDetail(
           SnapshotDetailLibraryDialogTarget(
-            name = "libjingle_peerconnection_so.so",
+            name = "libjingle.so",
             type = NATIVE,
-            regexName = "libjingle_.*"
+            regexName = "libjingle.*"
           )
         )
       ),
@@ -62,159 +50,90 @@ class SnapshotDetailNodeRenderStateTest {
   }
 
   @Test
-  fun exposesItemRenderStateForNodeWithoutRuleChip() {
-    val node = SnapshotNativeNode(
-      buildDisplayData(
-        name = "libplain.so",
-        title = "libplain.so",
-        extra = "(4 KB)",
-        description = "Changed, libplain.so, (4 KB)",
-        iconRes = 11,
-        backgroundColor = 0x22334455,
-        ruleChip = null
-      )
-    )
-
-    val renderState = node.itemRenderState
-
-    assertEquals("libplain.so", renderState.title)
-    assertEquals("(4 KB)", renderState.extra)
-    assertEquals(11, renderState.iconRes)
-    assertEquals(0x22334455, renderState.backgroundColor)
-    assertEquals("Changed, libplain.so, (4 KB)", renderState.contentDescription)
-    assertNull(renderState.ruleChip)
-    assertNull(renderState.chipClickAction)
-  }
-
-  @Test
-  fun exposesCardRenderStateWithoutActions() {
-    val node = SnapshotNativeNode(
-      buildDisplayData(
-        name = "libjingle_peerconnection_so.so",
-        title = "libjingle_peerconnection_so.so",
-        extra = "(12 MB)",
-        description = "Changed, libjingle_peerconnection_so.so, (12 MB), WebRTC",
-        iconRes = 10,
-        backgroundColor = 0x12345678,
-        ruleChip = SnapshotDetailRuleChipDisplayData(
-          label = "WebRTC",
-          iconRes = 20,
-          regexName = "libjingle_.*",
-          isSimpleColorIcon = false,
-          useColorfulIcon = true
-        )
-      )
-    )
+  fun exposesViewStateWithoutAdapterAction() {
+    val node = SnapshotNativeNode(buildDisplayData(ruleChip = ruleChip(colorful = true)))
 
     assertEquals(
-      SnapshotDetailItemCardRenderState(
-        title = "libjingle_peerconnection_so.so",
-        extra = "(12 MB)",
+      SnapshotDetailItemViewRenderState(
+        title = "libjingle.so",
+        extra = "12 MB",
         iconRes = 10,
-        backgroundColor = 0x12345678,
-        contentDescription = "Changed, libjingle_peerconnection_so.so, (12 MB), WebRTC",
+        statusColorRes = 11,
+        statusLabelRes = 12,
+        contentDescription = "Moved, libjingle.so, 12 MB",
         ruleChip = SnapshotDetailRuleChipRenderState(
           label = "WebRTC",
           iconRes = 20,
-          backgroundColor = 0x12345678,
           iconStyle = SnapshotDetailRuleChipIconStyle.Original
         )
       ),
-      node.itemRenderState.cardRenderState
+      node.itemRenderState.viewRenderState
     )
   }
 
   @Test
-  fun exposesDesaturatedRuleChipRenderStateWhenColorfulIconIsDisabled() {
-    val node = SnapshotNativeNode(
-      buildDisplayData(
-        name = "libplain.so",
-        title = "libplain.so",
-        extra = "(4 KB)",
-        description = "Changed, libplain.so, (4 KB), Plain",
-        iconRes = 11,
-        backgroundColor = 0x22334455,
-        ruleChip = SnapshotDetailRuleChipDisplayData(
-          label = "Plain",
-          iconRes = 21,
-          regexName = "libplain.*",
-          isSimpleColorIcon = false,
-          useColorfulIcon = false
-        )
-      )
-    )
+  fun omitsRuleStateAndActionWhenNoRuleMatches() {
+    val state = SnapshotNativeNode(buildDisplayData(ruleChip = null)).itemRenderState
 
-    assertEquals(
-      SnapshotDetailRuleChipRenderState(
-        label = "Plain",
-        iconRes = 21,
-        backgroundColor = 0x22334455,
-        iconStyle = SnapshotDetailRuleChipIconStyle.Desaturated
-      ),
-      node.itemRenderState.ruleChip
-    )
+    assertNull(state.ruleChip)
+    assertNull(state.chipClickAction)
   }
 
   @Test
-  fun exposesBlackTintRuleChipRenderStateForSimpleColorIcon() {
-    val node = SnapshotNativeNode(
-      buildDisplayData(
-        name = "libsimple.so",
-        title = "libsimple.so",
-        extra = "(8 KB)",
-        description = "Changed, libsimple.so, (8 KB), Simple",
-        iconRes = 12,
-        backgroundColor = 0x33445566,
-        ruleChip = SnapshotDetailRuleChipDisplayData(
-          label = "Simple",
-          iconRes = 22,
-          regexName = "libsimple.*",
-          isSimpleColorIcon = true,
-          useColorfulIcon = false
-        )
-      )
-    )
+  fun desaturatesRuleIconWhenColorfulIconsAreDisabled() {
+    val state = SnapshotNativeNode(
+      buildDisplayData(ruleChip = ruleChip(colorful = false))
+    ).itemRenderState
 
-    assertEquals(
-      SnapshotDetailRuleChipRenderState(
-        label = "Simple",
-        iconRes = 22,
-        backgroundColor = 0x33445566,
-        iconStyle = SnapshotDetailRuleChipIconStyle.BlackTint
-      ),
-      node.itemRenderState.ruleChip
-    )
+    assertEquals(SnapshotDetailRuleChipIconStyle.Desaturated, state.ruleChip?.iconStyle)
+  }
+
+  @Test
+  fun usesThemeTintForSimpleRuleIcon() {
+    val state = SnapshotNativeNode(
+      buildDisplayData(
+        ruleChip = ruleChip(colorful = false, simpleColor = true)
+      )
+    ).itemRenderState
+
+    assertEquals(SnapshotDetailRuleChipIconStyle.ThemeTint, state.ruleChip?.iconStyle)
   }
 
   private fun buildDisplayData(
-    name: String,
-    title: String,
-    extra: String,
-    description: String,
-    iconRes: Int,
-    backgroundColor: Int,
-    ruleChip: SnapshotDetailRuleChipDisplayData?
+    ruleChip: SnapshotDetailRuleChipDisplayData?,
+    description: String = "Moved, libjingle.so, 12 MB"
   ): SnapshotDetailItemDisplayData {
     return SnapshotDetailItemDisplayData(
       item = SnapshotDetailItem(
-        name = name,
-        title = title,
-        extra = extra,
+        name = "libjingle.so",
+        title = "libjingle.so",
+        extra = "12 MB",
         diffType = MOVED,
         itemType = NATIVE
       ),
-      title = title,
-      extra = extra,
+      title = "libjingle.so",
+      extra = "12 MB",
       description = description,
-      reportText = "snapshot item report\n",
+      reportText = "snapshot report\n",
       status = SnapshotDetailItemStatusDisplayData(
-        iconRes = iconRes,
-        colorRes = 0,
-        countColorRes = 0,
-        labelRes = 0
+        iconRes = 10,
+        colorRes = 11,
+        labelRes = 12
       ),
-      backgroundColor = backgroundColor,
       ruleChip = ruleChip
+    )
+  }
+
+  private fun ruleChip(
+    colorful: Boolean,
+    simpleColor: Boolean = false
+  ): SnapshotDetailRuleChipDisplayData {
+    return SnapshotDetailRuleChipDisplayData(
+      label = "WebRTC",
+      iconRes = 20,
+      regexName = "libjingle.*",
+      isSimpleColorIcon = simpleColor,
+      useColorfulIcon = colorful
     )
   }
 }
