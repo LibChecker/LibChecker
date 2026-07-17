@@ -7,6 +7,7 @@ import com.absinthe.libchecker.domain.app.model.PackageChangeState
 import com.absinthe.libchecker.domain.app.repository.AppListRepository
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.extensions.getVersionCode
+import com.absinthe.libchecker.utils.extensions.isArchivedPackage
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
@@ -138,6 +139,7 @@ class SyncAppListChangesUseCase(
 
   private fun isItemOutdated(packageInfo: PackageInfo, dbItem: LCItem): Boolean {
     return dbItem.versionCode != packageInfo.getVersionCode() ||
+      dbItem.isArchived != packageInfo.isArchivedPackage() ||
       packageInfo.lastUpdateTime != dbItem.lastUpdatedTime ||
       dbItem.lastUpdatedTime == 0L
   }

@@ -14,6 +14,7 @@ import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPackageSize
 import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getVersionCode
+import com.absinthe.libchecker.utils.extensions.isArchivedPackage
 import com.absinthe.libchecker.utils.toJson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -34,8 +35,8 @@ class BuildPackageComparisonSnapshotItemUseCase(
         analysisPackage.getAppName(packageManager).toString()
       ),
       versionNameDiff = SnapshotDiffItem.DiffNode(
-        basePackage.versionName.toString(),
-        analysisPackage.versionName
+        basePackage.versionName.orEmpty(),
+        analysisPackage.versionName.orEmpty()
       ),
       versionCodeDiff = SnapshotDiffItem.DiffNode(
         basePackage.getVersionCode(),
@@ -88,6 +89,10 @@ class BuildPackageComparisonSnapshotItemUseCase(
       packageSizeDiff = SnapshotDiffItem.DiffNode(
         basePackage.getPackageSize(true),
         analysisPackage.getPackageSize(true)
+      ),
+      archivedDiff = SnapshotDiffItem.DiffNode(
+        basePackage.isArchivedPackage(),
+        analysisPackage.isArchivedPackage()
       )
     )
   }

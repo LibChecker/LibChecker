@@ -9,6 +9,7 @@ import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemSt
  * </pre>
  */
 data class SnapshotDetailCountNode(
+  val diffType: Int,
   val count: Int,
   val countText: String,
   val status: SnapshotDetailItemStatusDisplayData

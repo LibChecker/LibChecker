@@ -2,6 +2,8 @@ package com.absinthe.libchecker.domain.snapshot.list.ui
 
 import androidx.core.os.BundleCompat
 import androidx.lifecycle.lifecycleScope
+import com.absinthe.libchecker.constant.options.SnapshotOptions
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailDiffTextStyle
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotNoDiffTitleIconRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.toRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.toSnapshotNoDiffRenderState
@@ -11,9 +13,11 @@ import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotTitle
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
+import com.google.android.material.R as MaterialR
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
@@ -38,7 +42,16 @@ class SnapshotNoDiffBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotNoDi
       val titleRenderState = buildSnapshotTitleDisplayData(
         BuildSnapshotTitleDisplayDataUseCase.Request(
           item = item,
-          formatSplitPackageName = false
+          formatSplitPackageName = false,
+          diffTextStyle = SnapshotDetailDiffTextStyle(
+            highlightColor = if ((viewModel.getSnapshotOptions() and SnapshotOptions.DIFF_HIGHLIGHT) > 0) {
+              requireContext().getColorByAttr(androidx.appcompat.R.attr.colorPrimary)
+            } else {
+              null
+            },
+            emphasizeDiffs = (viewModel.getSnapshotOptions() and SnapshotOptions.DIFF_EMPHASIS) > 0,
+            arrowColor = requireContext().getColorByAttr(MaterialR.attr.colorOnSurface)
+          )
         )
       ).toRenderState(copyPrimaryText = false)
       val renderState = item.toSnapshotNoDiffRenderState(titleRenderState) ?: run {

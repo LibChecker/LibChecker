@@ -7,6 +7,7 @@ import android.view.View
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.FragmentActivity
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.LCItem
@@ -24,6 +25,10 @@ import com.absinthe.libchecker.domain.statistics.reference.ui.LibReferenceActivi
 import com.absinthe.libchecker.utils.Toasty
 
 fun FragmentActivity.launchDetailPage(item: LCItem, refName: String? = null, refType: Int = NATIVE, forceDetail: Boolean = false) {
+  if (item.isArchived) {
+    Toasty.showLong(this, R.string.toast_archived_app_detail_unavailable)
+    return
+  }
   findViewById<View>(androidx.appcompat.R.id.search_src_text)?.clearFocus()
   if (item.abi.toInt() == Constants.OVERLAY && !forceDetail) {
     OverlayDetailBottomSheetDialogFragment().apply {

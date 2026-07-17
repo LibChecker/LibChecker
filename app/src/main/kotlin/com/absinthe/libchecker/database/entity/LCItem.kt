@@ -19,4 +19,11 @@ data class LCItem(
   val features: Int,
   val targetApi: Short,
   val variant: Short
-) : Parcelable
+) : Parcelable {
+  val isArchived: Boolean
+    get() = versionName == ARCHIVED_VERSION_NAME
+
+  companion object {
+    const val ARCHIVED_VERSION_NAME = "Archived"
+  }
+}

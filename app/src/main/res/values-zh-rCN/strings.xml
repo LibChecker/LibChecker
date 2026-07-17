@@ -25,6 +25,8 @@
   <string name="get_app_list_denied_tip">请授予 LibChecker\n“读取应用列表”\n权限</string>
   <string name="advanced_menu">高级菜单</string>
   <string name="archived_app">已归档应用</string>
+  <string name="snapshot_version_archived">已归档</string>
+  <string name="toast_archived_app_detail_unavailable">应用已归档，恢复后才能查看详情</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">%s架构的应用</string>
   <string name="title_statistics_dialog_no_native_libs">无原生库的应用</string>
@@ -255,6 +257,12 @@
   <string name="snapshot_indicator_removed">移除</string>
   <string name="snapshot_indicator_changed">变更</string>
   <string name="snapshot_indicator_moved">移动</string>
+  <string name="snapshot_detail_size_label">体积</string>
+  <string name="snapshot_detail_changes_label">变更项：</string>
+  <string name="snapshot_detail_metric_description">%1$s，%2$s</string>
+  <plurals name="snapshot_detail_changes_count">
+    <item quantity="other">%d 项变更</item>
+  </plurals>
   <string name="snapshot_empty_list_title">没有组件变更</string>
   <string name="snapshot_no_snapshot">没有快照</string>
   <string name="snapshot_detail_new_install_title">这是一个全新的应用</string>
@@ -340,6 +348,7 @@
   <string name="snapshot_menu_show_update_time">显示更新时间</string>
   <string name="snapshot_menu_hide_no_component_changes">隐藏无组件变更</string>
   <string name="snapshot_menu_diff_highlight">差异高亮</string>
+  <string name="snapshot_menu_diff_emphasis">差异强调</string>
   <string name="snapshot_menu_use_iec_units">使用 IEC 单位</string>
   <!-- A11y -->
   <string name="a11y_state_expanded">展开</string>

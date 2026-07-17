@@ -95,7 +95,7 @@ class AppDetailActivity :
 
       GetAppDetailPackageUseCase.Result.Archived -> {
         Timber.w("isArchivedPackage: ${loadResult.packageName}")
-        Toasty.showLong(this, R.string.archived_app)
+        Toasty.showLong(this, R.string.toast_archived_app_detail_unavailable)
         finish()
       }
 

@@ -11,7 +11,9 @@
     style="?attr/appBarLayoutStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/colorSurface">
+    android:background="?attr/colorSurface"
+    app:liftOnScroll="false"
+    app:liftOnScrollColor="?attr/colorSurface">
 
     <com.google.android.material.appbar.CollapsingToolbarLayout
       android:id="@+id/collapsing_toolbar"
@@ -19,7 +21,7 @@
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:background="@null"
-      app:contentScrim="?attr/colorSurfaceContainer"
+      app:contentScrim="?attr/colorSurface"
       app:expandedTitleTextAppearance="?attr/textAppearanceHeadlineMedium"
       app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
@@ -29,7 +31,7 @@
         android:layout_height="match_parent"
         android:paddingHorizontal="@dimen/normal_padding"
         android:paddingTop="?attr/actionBarSize"
-        android:paddingBottom="@dimen/normal_padding"
+        android:paddingBottom="0dp"
         app:layout_collapseMode="parallax" />
 
       <androidx.appcompat.widget.ToolbarFix
@@ -53,9 +55,11 @@
       android:id="@android:id/list"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
+      android:background="?attr/colorSurface"
       android:clipToPadding="false"
       android:overScrollMode="never"
-      android:padding="@dimen/normal_padding"
+      android:paddingTop="0dp"
+      android:paddingBottom="@dimen/normal_padding"
       app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
   </LinearLayout>
