@@ -76,7 +76,7 @@ setupAppModule {
       dimension = flavorDimensions[0]
       buildConfigField("Boolean", "IS_FOSS", "false")
     }
-    all {
+    configureEach {
       manifestPlaceholders["channel"] = this.name
     }
   }
@@ -117,11 +117,6 @@ androidComponents {
   }
 }
 
-configurations.configureEach {
-  exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
-  exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
-}
-
 dependencies {
   compileOnly(dependencies.project(":hidden-api"))
 
@@ -129,7 +124,6 @@ dependencies {
   implementation(libs.kotlinX.coroutines)
   implementation(platform(libs.koin.bom))
   implementation(libs.koin.android)
-  // implementation(libs.androidX.appCompat)
   implementation(libs.androidX.core)
   implementation(libs.androidX.activity)
   implementation(libs.androidX.fragment)
@@ -153,8 +147,6 @@ dependencies {
   implementation(libs.rikka.refine.runtime)
   implementation(libs.bundles.zhaobozhen)
   implementation(libs.lc.rules)
-  // implementation(files("libs/library-release.aar"))
-
   ksp(libs.androidX.room3.compiler)
 
   testImplementation(libs.junit)
@@ -180,7 +172,6 @@ dependencies {
 
   implementation(libs.bundles.shizuku)
 
-  debugImplementation(libs.square.leakCanary)
   "marketCompileOnly"(fileTree("ohos"))
   "marketImplementation"(platform(libs.firebase.bom))
   "marketImplementation"(libs.bundles.firebase) {
@@ -201,8 +192,8 @@ protobuf {
   }
   plugins {
     generateProtoTasks {
-      all().forEach {
-        it.builtins {
+      all().configureEach {
+        builtins {
           create("java") {
             option("lite")
           }

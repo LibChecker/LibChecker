@@ -1,12 +1,6 @@
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.api.dsl.LibraryExtension
-import com.android.build.api.variant.ApplicationAndroidComponentsExtension
-import com.android.build.api.variant.ApplicationVariantBuilder
-import com.android.build.api.variant.HasAndroidTestBuilder
-import com.android.build.api.variant.HasUnitTestBuilder
-import com.android.build.api.variant.LibraryAndroidComponentsExtension
-import com.android.build.api.variant.LibraryVariantBuilder
 import java.io.File
 import org.gradle.api.Project
 
@@ -14,7 +8,6 @@ const val baseVersionName = "2.5.5"
 
 fun Project.setupLibraryModule(block: LibraryExtension.() -> Unit = {}) {
   setupBaseModule(block)
-  disableUnusedLibraryTestComponents()
 }
 
 fun Project.setupAppModule(block: ApplicationExtension.() -> Unit = {}) {
@@ -67,16 +60,14 @@ fun Project.setupAppModule(block: ApplicationExtension.() -> Unit = {}) {
         isMinifyEnabled = true
         isShrinkResources = true
       }
-      all {
+      configureEach {
         signingConfig = releaseSigning
         buildConfigField("Boolean", "IS_DEV_VERSION", projectVersion.isDev.toString())
-        //buildConfigField("String", "BUILD_TIME", "\"" + Instant.now().toString() + "\"")
       }
     }
 
     block()
   }
-  disableUnusedAppTestComponents()
 }
 
 private inline fun <reified T : CommonExtension> Project.setupBaseModule(crossinline block: T.() -> Unit = {}) {
@@ -84,42 +75,13 @@ private inline fun <reified T : CommonExtension> Project.setupBaseModule(crossin
     compileSdk = 37
     compileSdkMinor = 0
 
+    // App and compat intentionally keep Java parser and shim sources under src/*/kotlin.
     sourceSets.configureEach {
       java.directories.add("src/$name/kotlin")
     }
     includeKotlinToolingMetadataInApk()
     (this as T).block()
   }
-}
-
-private fun Project.disableUnusedAppTestComponents() {
-  // AGP 9.2 emits Gradle 10 deprecation warnings while creating unused test components.
-  if (!hasTestSourceSets()) {
-    extensions.configure<ApplicationAndroidComponentsExtension>("androidComponents") {
-      beforeVariants(selector().all()) { variantBuilder: ApplicationVariantBuilder ->
-        (variantBuilder as HasUnitTestBuilder).enableUnitTest = false
-        (variantBuilder as HasAndroidTestBuilder).enableAndroidTest = false
-      }
-    }
-  }
-}
-
-private fun Project.disableUnusedLibraryTestComponents() {
-  // AGP 9.2 emits Gradle 10 deprecation warnings while creating unused test components.
-  if (!hasTestSourceSets()) {
-    extensions.configure<LibraryAndroidComponentsExtension>("androidComponents") {
-      beforeVariants(selector().all()) { variantBuilder: LibraryVariantBuilder ->
-        (variantBuilder as HasUnitTestBuilder).enableUnitTest = false
-        (variantBuilder as HasAndroidTestBuilder).enableAndroidTest = false
-      }
-    }
-  }
-}
-
-private fun Project.hasTestSourceSets(): Boolean {
-  return file("src").listFiles()
-    ?.any { it.isDirectory && it.name.contains("test", ignoreCase = true) }
-    ?: false
 }
 
 private data class ProjectVersion(
