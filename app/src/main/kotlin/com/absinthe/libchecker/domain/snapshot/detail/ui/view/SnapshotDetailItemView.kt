@@ -26,12 +26,15 @@ import com.absinthe.libchecker.domain.snapshot.detail.ui.model.resolveSnapshotDe
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
+import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.R as MaterialR
 import com.google.android.material.chip.Chip
 
 class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
+
+  private val horizontalContentPadding = context.getDimensionPixelSize(R.dimen.normal_padding)
 
   private val statusRail = View(context).apply {
     layoutParams = ViewGroup.LayoutParams(STATUS_RAIL_WIDTH, ViewGroup.LayoutParams.MATCH_PARENT)
@@ -206,9 +209,12 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     children.filter { it !== divider }.forEach { it.autoMeasure() }
-    divider.measure(measuredWidth.toExactlyMeasureSpec(), DIVIDER_HEIGHT.toExactlyMeasureSpec())
+    val dividerWidth = (measuredWidth - horizontalContentPadding * 2).coerceAtLeast(0)
+    divider.measure(dividerWidth.toExactlyMeasureSpec(), DIVIDER_HEIGHT.toExactlyMeasureSpec())
 
-    val contentWidth = measuredWidth - STATUS_RAIL_WIDTH - CONTENT_START_GAP - CONTENT_END_PADDING
+    val contentWidth = (
+      measuredWidth - horizontalContentPadding * 2 - STATUS_RAIL_WIDTH - CONTENT_START_GAP
+      ).coerceAtLeast(0)
     val statusClusterWidth = statusIcon.measuredWidth + STATUS_LABEL_GAP + statusLabel.measuredWidth
     layoutPlan = planSnapshotDetailItemLayout(
       contentWidth = contentWidth,
@@ -255,8 +261,13 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
   }
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-    statusRail.layout(0, 0, STATUS_RAIL_WIDTH, measuredHeight)
-    val contentStart = STATUS_RAIL_WIDTH + CONTENT_START_GAP
+    statusRail.layout(
+      horizontalContentPadding,
+      0,
+      horizontalContentPadding + STATUS_RAIL_WIDTH,
+      measuredHeight
+    )
+    val contentStart = horizontalContentPadding + STATUS_RAIL_WIDTH + CONTENT_START_GAP
     val statusClusterWidth = statusIcon.measuredWidth + STATUS_LABEL_GAP + statusLabel.measuredWidth
     val statusRowHeight = maxOf(
       statusIcon.measuredHeight,
@@ -298,7 +309,12 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
       nextY + RULE_CHIP_VERTICAL_GAP
     )
     updateChipTouchDelegate()
-    divider.layout(0, measuredHeight - DIVIDER_HEIGHT)
+    divider.layout(
+      horizontalContentPadding,
+      measuredHeight - DIVIDER_HEIGHT,
+      horizontalContentPadding + divider.measuredWidth,
+      measuredHeight
+    )
   }
 
   private fun updateChipTouchDelegate() {
@@ -319,7 +335,6 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
     val STATUS_TITLE_GAP = 12.dp
     val TITLE_CHIP_GAP = 6.dp
     val CONTENT_START_GAP = 12.dp
-    val CONTENT_END_PADDING = 12.dp
     val CONTENT_TOP_PADDING = 8.dp
     val CONTENT_BOTTOM_PADDING = 8.dp
     val STACKED_TITLE_GAP = 4.dp
