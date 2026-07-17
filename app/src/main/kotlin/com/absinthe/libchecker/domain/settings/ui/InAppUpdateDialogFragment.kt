@@ -77,7 +77,11 @@ class InAppUpdateDialogFragment : BaseBottomSheetViewDialogFragment<InAppUpdateD
   private fun handleAction(action: InAppUpdateDialogAction) {
     when (action) {
       is InAppUpdateDialogAction.SelectChannel -> {
-        render(dialogState.selectChannel(action.channel))
+        val nextState = dialogState.selectChannel(action.channel)
+        if (nextState === dialogState) {
+          return
+        }
+        render(nextState)
         viewModel.requestUpdate(action.channel)
       }
 

@@ -444,7 +444,7 @@ class AppItemView(
 
     fun newIconPlaceholder(context: Context): Drawable? {
       return iconPlaceholderState?.newDrawable(context.resources)
-        ?: R.drawable.ic_icon_blueprint.getDrawable(context)
+        ?: R.mipmap.ic_app_icon_placeholder.getDrawable(context)
     }
 
     companion object {
@@ -471,7 +471,7 @@ class AppItemView(
           onSurfaceVariantColor = context.getColorByAttr(
             com.google.android.material.R.attr.colorOnSurfaceVariant
           ),
-          iconPlaceholderState = R.drawable.ic_icon_blueprint.getDrawable(context)?.constantState
+          iconPlaceholderState = R.mipmap.ic_app_icon_placeholder.getDrawable(context)?.constantState
         )
       }
     }
