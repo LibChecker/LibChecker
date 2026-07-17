@@ -18,7 +18,7 @@ import org.junit.Test
 class SettingsDialogStateTest {
 
   @Test
-  fun `in app update state retains preview while installing and clears it for a new channel`() {
+  fun `in app update state retains preview while installing and switching channels`() {
     val item = buildSnapshotItemDisplayData()
     val initial = InAppUpdateDialogState(
       selectedChannel = AppUpdateChannel.STABLE,
@@ -36,8 +36,44 @@ class SettingsDialogStateTest {
     assertSame(item, (installing.content as InAppUpdateDialogContent.Loading).retainedItem)
     assertFalse(installing.isUpdateEnabled)
     assertEquals(AppUpdateChannel.CI, switched.selectedChannel)
-    assertEquals(InAppUpdateDialogContent.Loading(), switched.content)
+    assertEquals(
+      InAppUpdateDialogContent.Loading(item, delayIndicator = true),
+      switched.content
+    )
     assertFalse(switched.isChannelSelectionEnabled)
+  }
+
+  @Test
+  fun `in app update ignores channel selection while an update request is active`() {
+    val ready = InAppUpdateDialogState(
+      selectedChannel = AppUpdateChannel.STABLE,
+      content = InAppUpdateDialogContent.Ready(buildSnapshotItemDisplayData()),
+      isChannelSelectionEnabled = true,
+      isUpdateEnabled = false
+    )
+
+    val loading = ready.selectChannel(AppUpdateChannel.CI)
+    val loadingContent = loading.content as InAppUpdateDialogContent.Loading
+
+    assertSame(
+      (ready.content as InAppUpdateDialogContent.Ready).item,
+      loadingContent.retainedItem
+    )
+    assertTrue(loadingContent.delayIndicator)
+    assertSame(loading, loading.selectChannel(AppUpdateChannel.STABLE))
+    assertSame(loading, loading.selectChannel(AppUpdateChannel.CI))
+  }
+
+  @Test
+  fun `in app update ignores selection of the current channel`() {
+    val ready = InAppUpdateDialogState(
+      selectedChannel = AppUpdateChannel.STABLE,
+      content = InAppUpdateDialogContent.Ready(buildSnapshotItemDisplayData()),
+      isChannelSelectionEnabled = true,
+      isUpdateEnabled = false
+    )
+
+    assertSame(ready, ready.selectChannel(AppUpdateChannel.STABLE))
   }
 
   @Test

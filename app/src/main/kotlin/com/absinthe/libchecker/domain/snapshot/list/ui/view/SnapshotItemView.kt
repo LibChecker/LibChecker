@@ -7,6 +7,7 @@ import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ImageSpan
 import android.view.ViewGroup
+import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.text.buildSpannedString
@@ -43,9 +44,12 @@ import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.span.CenterAlignImageSpan
 import com.google.android.material.card.MaterialCardView
 
-class SnapshotItemView(context: Context) : MaterialCardView(context) {
+class SnapshotItemView(
+  context: Context,
+  @DrawableRes placeholderIconRes: Int = R.drawable.ic_icon_blueprint
+) : MaterialCardView(context) {
 
-  private val container = SnapshotItemContainerView(context).apply {
+  private val container = SnapshotItemContainerView(context, placeholderIconRes).apply {
     val padding = context.getDimensionPixelSize(R.dimen.main_card_padding)
     setPadding(padding, padding, padding, padding)
   }
@@ -86,6 +90,10 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
     contentDescription = data.contentDescription
   }
 
+  fun setPlaceholderIconResource(@DrawableRes placeholderIconRes: Int) {
+    container.setPlaceholderIconResource(placeholderIconRes)
+  }
+
   private fun setCardPresentation(cardPresentation: SnapshotItemCardPresentation) {
     when (cardPresentation) {
       SnapshotItemCardPresentation.Normal -> {
@@ -100,7 +108,13 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
     }
   }
 
-  class SnapshotItemContainerView(context: Context) : AViewGroup(context) {
+  class SnapshotItemContainerView(
+    context: Context,
+    @DrawableRes placeholderIconRes: Int
+  ) : AViewGroup(context) {
+
+    @DrawableRes private var placeholderIconRes = placeholderIconRes
+    private var iconSource: SnapshotPackageIconSource? = null
 
     val icon = AppCompatImageView(context).apply {
       val iconSize = context.getDimensionPixelSize(R.dimen.app_icon_size)
@@ -200,11 +214,22 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
     }
 
     fun setIconSource(iconSource: SnapshotPackageIconSource?) {
+      this.iconSource = iconSource
       when (iconSource) {
         is SnapshotPackageIconSource.InstalledPackage -> icon.load(iconSource.packageInfo)
 
         SnapshotPackageIconSource.Fallback,
-        null -> icon.load(R.drawable.ic_icon_blueprint)
+        null -> icon.load(placeholderIconRes)
+      }
+    }
+
+    fun setPlaceholderIconResource(@DrawableRes placeholderIconRes: Int) {
+      if (this.placeholderIconRes == placeholderIconRes) {
+        return
+      }
+      this.placeholderIconRes = placeholderIconRes
+      if (iconSource !is SnapshotPackageIconSource.InstalledPackage) {
+        icon.load(placeholderIconRes)
       }
     }
 
