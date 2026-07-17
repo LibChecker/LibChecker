@@ -259,14 +259,24 @@ class SnapshotTitleView(
         valueWidth.toExactlyMeasureSpec(),
         packageSizeView.defaultHeightMeasureSpec(this)
       )
-      contentBottom += maxOf(packageSizeLabelView.measuredHeight, packageSizeView.measuredHeight)
+      contentBottom += planSnapshotMetricRowLayout(
+        labelHeight = packageSizeLabelView.measuredHeight,
+        labelBaseline = packageSizeLabelView.baseline,
+        valueHeight = packageSizeView.measuredHeight,
+        valueBaseline = packageSizeView.baseline
+      ).height
     }
     if (apisView.isVisible) {
       if (packageSizeView.isVisible) {
         contentBottom += METRIC_ROW_GAP
       }
       apisView.measure(valueWidth.toExactlyMeasureSpec(), apisView.defaultHeightMeasureSpec(this))
-      contentBottom += maxOf(apisLabelView.measuredHeight, apisView.measuredHeight)
+      contentBottom += planSnapshotMetricRowLayout(
+        labelHeight = apisLabelView.measuredHeight,
+        labelBaseline = apisLabelView.baseline,
+        valueHeight = apisView.measuredHeight,
+        valueBaseline = apisView.baseline
+      ).height
     }
 
     if (summaryDivider.isVisible) {
@@ -313,17 +323,29 @@ class SnapshotTitleView(
     )
     val valueX = paddingStart + labelWidth + METRIC_GAP
     if (packageSizeView.isVisible) {
-      packageSizeLabelView.layout(paddingStart, nextY)
-      packageSizeView.layout(valueX, nextY)
-      nextY += maxOf(packageSizeLabelView.measuredHeight, packageSizeView.measuredHeight)
+      val row = planSnapshotMetricRowLayout(
+        labelHeight = packageSizeLabelView.measuredHeight,
+        labelBaseline = packageSizeLabelView.baseline,
+        valueHeight = packageSizeView.measuredHeight,
+        valueBaseline = packageSizeView.baseline
+      )
+      packageSizeLabelView.layout(paddingStart, nextY + row.labelTopOffset)
+      packageSizeView.layout(valueX, nextY + row.valueTopOffset)
+      nextY += row.height
     }
     if (apisView.isVisible) {
       if (packageSizeView.isVisible) {
         nextY += METRIC_ROW_GAP
       }
-      apisLabelView.layout(paddingStart, nextY)
-      apisView.layout(valueX, nextY)
-      nextY += maxOf(apisLabelView.measuredHeight, apisView.measuredHeight)
+      val row = planSnapshotMetricRowLayout(
+        labelHeight = apisLabelView.measuredHeight,
+        labelBaseline = apisLabelView.baseline,
+        valueHeight = apisView.measuredHeight,
+        valueBaseline = apisView.baseline
+      )
+      apisLabelView.layout(paddingStart, nextY + row.labelTopOffset)
+      apisView.layout(valueX, nextY + row.valueTopOffset)
+      nextY += row.height
     }
 
     if (summaryDivider.isVisible) {
@@ -382,4 +404,29 @@ class SnapshotTitleView(
     val SUMMARY_GAP = 16.dp
     val SUMMARY_SECOND_LINE_GAP = 4.dp
   }
+}
+
+internal data class SnapshotMetricRowLayout(
+  val labelTopOffset: Int,
+  val valueTopOffset: Int,
+  val height: Int
+)
+
+internal fun planSnapshotMetricRowLayout(
+  labelHeight: Int,
+  labelBaseline: Int,
+  valueHeight: Int,
+  valueBaseline: Int
+): SnapshotMetricRowLayout {
+  val sharedBaseline = maxOf(labelBaseline, valueBaseline)
+  val labelTopOffset = sharedBaseline - labelBaseline
+  val valueTopOffset = sharedBaseline - valueBaseline
+  return SnapshotMetricRowLayout(
+    labelTopOffset = labelTopOffset,
+    valueTopOffset = valueTopOffset,
+    height = maxOf(
+      labelTopOffset + labelHeight,
+      valueTopOffset + valueHeight
+    )
+  )
 }
