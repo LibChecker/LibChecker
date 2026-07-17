@@ -2,14 +2,11 @@ package com.absinthe.libchecker.domain.snapshot.detail.ui.view
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Typeface
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
-import android.text.style.StyleSpan
 import android.text.style.TextAppearanceSpan
 import android.util.AttributeSet
-import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
@@ -24,6 +21,7 @@ import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotTitlePack
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotTitleRenderState
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.domain.snapshot.ui.view.SnapshotPackageSizeLineBreaker
+import com.absinthe.libchecker.utils.extensions.applyCondensedTypeface
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
@@ -52,7 +50,6 @@ class SnapshotTitleView(
     )
     setTextAppearance(context.getResourceIdByAttr(MaterialR.attr.textAppearanceTitleMedium))
     setTextColor(context.getColorByAttr(MaterialR.attr.colorOnSurface))
-    setTypeface(typeface, Typeface.BOLD)
     addView(this)
   }
 
@@ -80,14 +77,13 @@ class SnapshotTitleView(
 
   private val packageSizeLabelView = metricLabel(R.string.snapshot_detail_size_label)
 
-  val packageSizeView = AppCompatTextView(
-    ContextThemeWrapper(context, R.style.TextView_SansSerifCondensed)
-  ).apply {
+  val packageSizeView = AppCompatTextView(context).apply {
     layoutParams = ViewGroup.LayoutParams(
       ViewGroup.LayoutParams.WRAP_CONTENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     )
     setTextAppearance(context.getResourceIdByAttr(MaterialR.attr.textAppearanceBodyMedium))
+    applyCondensedTypeface()
     setTextColor(context.getColorByAttr(MaterialR.attr.colorOnSurface))
     maxLines = Int.MAX_VALUE
     addView(this)
@@ -96,27 +92,25 @@ class SnapshotTitleView(
 
   private val apisLabelView = metricLabel(R.string.snapshot_detail_sdk_label)
 
-  val apisView = AppCompatTextView(
-    ContextThemeWrapper(context, R.style.TextView_SansSerifCondensed)
-  ).apply {
+  val apisView = AppCompatTextView(context).apply {
     layoutParams = ViewGroup.LayoutParams(
       ViewGroup.LayoutParams.WRAP_CONTENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     )
     setTextAppearance(context.getResourceIdByAttr(MaterialR.attr.textAppearanceBodyMedium))
+    applyCondensedTypeface()
     setTextColor(context.getColorByAttr(MaterialR.attr.colorOnSurface))
     maxLines = Int.MAX_VALUE
     addView(this)
   }
 
-  private val summaryView = AppCompatTextView(
-    ContextThemeWrapper(context, R.style.TextView_SansSerifCondensed)
-  ).apply {
+  private val summaryView = AppCompatTextView(context).apply {
     layoutParams = ViewGroup.LayoutParams(
       ViewGroup.LayoutParams.WRAP_CONTENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     )
     setTextAppearance(context.getResourceIdByAttr(MaterialR.attr.textAppearanceBodyMedium))
+    applyCondensedTypeface()
     setTextColor(context.getColorByAttr(MaterialR.attr.colorOnSurface))
     maxLines = Int.MAX_VALUE
     addView(this)
@@ -144,7 +138,7 @@ class SnapshotTitleView(
     }
     setPackageSizeText(data.packageSize)
     apisView.apply {
-      text = buildBoldNumericText(data.apis)
+      text = data.apis
       isVisible = data.apis.isNotBlank()
       if (isVisible) {
         contentDescription = context.getString(
@@ -228,14 +222,7 @@ class SnapshotTitleView(
             Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
           )
           builder.append(' ')
-          val totalStart = builder.length
           builder.append(summary.totalCountText)
-          builder.setSpan(
-            StyleSpan(Typeface.BOLD),
-            totalStart,
-            builder.length,
-            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-          )
           val counts = buildSnapshotDetailCountText(context, summary.counts)
           if (counts.isNotEmpty()) {
             builder.appendSnapshotDetailCountGap()
@@ -389,28 +376,13 @@ class SnapshotTitleView(
   }
 
   private companion object {
-    val IDENTITY_GAP = 16.dp
-    val METRICS_SECTION_GAP = 16.dp
-    val METRICS_HORIZONTAL_PADDING = 12.dp
-    val METRIC_GAP = 16.dp
-    val METRIC_ROW_GAP = 8.dp
+    val IDENTITY_GAP = 12.dp
+    val METRICS_SECTION_GAP = 12.dp
+    val METRICS_HORIZONTAL_PADDING = 8.dp
+    val METRIC_GAP = 12.dp
+    val METRIC_ROW_GAP = 4.dp
   }
 }
-
-private fun buildBoldNumericText(text: CharSequence): CharSequence {
-  return SpannableStringBuilder(text).apply {
-    SDK_NUMBER_REGEX.findAll(text).forEach { match ->
-      setSpan(
-        StyleSpan(Typeface.BOLD),
-        match.range.first,
-        match.range.last + 1,
-        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-      )
-    }
-  }
-}
-
-private val SDK_NUMBER_REGEX = Regex("\\d+")
 
 internal data class SnapshotMetricRowLayout(
   val labelTopOffset: Int,
