@@ -2,10 +2,6 @@ package com.absinthe.libchecker.domain.snapshot.detail.ui.view
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.text.SpannableStringBuilder
-import android.text.Spanned
-import android.text.style.ForegroundColorSpan
-import android.text.style.TextAppearanceSpan
 import android.util.AttributeSet
 import android.view.View
 import android.view.View.OnClickListener
@@ -16,7 +12,6 @@ import androidx.core.view.children
 import androidx.core.view.isVisible
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailSummaryRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotTitlePackageSizeRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotTitleRenderState
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
@@ -104,18 +99,6 @@ class SnapshotTitleView(
     addView(this)
   }
 
-  private val summaryView = AppCompatTextView(context).apply {
-    layoutParams = ViewGroup.LayoutParams(
-      ViewGroup.LayoutParams.WRAP_CONTENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
-    )
-    setTextAppearance(context.getResourceIdByAttr(MaterialR.attr.textAppearanceBodyMedium))
-    applyCondensedTypeface()
-    setTextColor(context.getColorByAttr(MaterialR.attr.colorOnSurface))
-    maxLines = Int.MAX_VALUE
-    addView(this)
-  }
-
   fun render(data: SnapshotTitleRenderState) {
     appNameView.apply {
       text = data.appName
@@ -150,7 +133,6 @@ class SnapshotTitleView(
       }
     }
     apisLabelView.isVisible = apisView.isVisible
-    renderSummary(data.summary)
   }
 
   fun setIconImage(bitmap: Bitmap?) {
@@ -195,42 +177,6 @@ class SnapshotTitleView(
         data.text
       )
       setLongClickCopiedToClipboard(text)
-    }
-  }
-
-  private fun renderSummary(summary: SnapshotDetailSummaryRenderState?) {
-    val visible = summary != null
-    summaryView.isVisible = visible
-    if (summary != null) {
-      summaryView.apply {
-        text = SpannableStringBuilder().also { builder ->
-          val label = context.getString(R.string.snapshot_detail_changes_label)
-          builder.append(label)
-          builder.setSpan(
-            TextAppearanceSpan(
-              context,
-              context.getResourceIdByAttr(MaterialR.attr.textAppearanceLabelMedium)
-            ),
-            0,
-            label.length,
-            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-          )
-          builder.setSpan(
-            ForegroundColorSpan(context.getColorByAttr(MaterialR.attr.colorOnSurfaceVariant)),
-            0,
-            label.length,
-            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-          )
-          builder.append(' ')
-          builder.append(summary.totalCountText)
-          val counts = buildSnapshotDetailCountText(context, summary.counts)
-          if (counts.isNotEmpty()) {
-            builder.appendSnapshotDetailCountGap()
-            builder.append(counts)
-          }
-        }
-        contentDescription = summary.contentDescription
-      }
     }
   }
 
@@ -279,16 +225,6 @@ class SnapshotTitleView(
         valueHeight = apisView.measuredHeight,
         valueBaseline = apisView.baseline
       ).height
-    }
-    if (summaryView.isVisible) {
-      if (packageSizeView.isVisible || apisView.isVisible) {
-        metricsContentHeight += METRIC_ROW_GAP
-      }
-      summaryView.measure(
-        metricsContentWidth.toExactlyMeasureSpec(),
-        summaryView.defaultHeightMeasureSpec(this)
-      )
-      metricsContentHeight += summaryView.measuredHeight
     }
     if (hasVisibleMetrics()) {
       contentBottom += METRICS_SECTION_GAP +
@@ -343,12 +279,6 @@ class SnapshotTitleView(
       apisView.layout(valueX, nextY + row.valueTopOffset)
       nextY += row.height
     }
-    if (summaryView.isVisible) {
-      if (packageSizeView.isVisible || apisView.isVisible) {
-        nextY += METRIC_ROW_GAP
-      }
-      summaryView.layout(metricsContentStart, nextY)
-    }
   }
 
   private fun metricLabel(textRes: Int): AppCompatTextView {
@@ -372,7 +302,7 @@ class SnapshotTitleView(
   }
 
   private fun hasVisibleMetrics(): Boolean {
-    return packageSizeView.isVisible || apisView.isVisible || summaryView.isVisible
+    return packageSizeView.isVisible || apisView.isVisible
   }
 
   private companion object {

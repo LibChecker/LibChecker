@@ -54,20 +54,21 @@ class SnapshotDetailItemVisualStateTest {
   }
 
   @Test
-  fun blendsStatusIntoSurfaceWithoutChangingTheOpaqueBase() {
+  fun blendsStatusIntoRowAndChipSurfacesWithoutChangingTheOpaqueBase() {
     val colors = resolveSnapshotDetailItemColors(
       theme = SnapshotDetailThemeColors(
         surface = 0xFF000000.toInt(),
         onSurface = 1,
         onSurfaceVariant = 2,
         outlineVariant = 3,
-        chipSurface = 4
+        chipSurface = 0xFF000000.toInt()
       ),
       statusColor = 0xFFFFFFFF.toInt()
     )
 
     assertEquals(0xFF191919.toInt(), colors.gradientStart)
     assertEquals(0xFF0A0A0A.toInt(), colors.gradientMiddle)
+    assertEquals(0xFF1E1E1E.toInt(), colors.chipSurface)
     assertEquals(0xFF000000.toInt(), colors.surface)
   }
 
