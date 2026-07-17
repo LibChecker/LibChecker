@@ -19,6 +19,7 @@ import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailTit
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
+import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.R as MaterialR
@@ -69,7 +70,8 @@ class SnapshotDetailTitleView(context: Context) : AViewGroup(context) {
 
   init {
     minimumHeight = 52.dp
-    setPadding(12.dp, 10.dp, 12.dp, 10.dp)
+    val horizontalPadding = context.getDimensionPixelSize(R.dimen.normal_padding)
+    setPadding(horizontalPadding, 10.dp, horizontalPadding, 10.dp)
     setBackgroundColor(context.getColorByAttr(MaterialR.attr.colorSurface))
     importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
     isFocusable = true

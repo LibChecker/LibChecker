@@ -127,6 +127,9 @@ Important `:app` boundaries:
 
 ## Data, UI, and release constraints
 
+- Keep full-width selectable or hoverable list rows edge-to-edge. Put horizontal
+  page spacing in each row's content padding, not item margins or parent-list
+  horizontal padding, so selector and hover feedback have no side gaps.
 - Room schema changes require a database version bump, migration or
   auto-migration, and updated `app/schemas/`.
 - UI controllers should not call `Repositories.lcRepository` directly for new

@@ -56,7 +56,8 @@
       android:background="?attr/colorSurface"
       android:clipToPadding="false"
       android:overScrollMode="never"
-      android:padding="@dimen/normal_padding"
+      android:paddingTop="@dimen/normal_padding"
+      android:paddingBottom="@dimen/normal_padding"
       app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
   </LinearLayout>
