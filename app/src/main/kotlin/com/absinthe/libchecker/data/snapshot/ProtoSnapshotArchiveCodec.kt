@@ -23,6 +23,7 @@ class ProtoSnapshotArchiveCodec : SnapshotArchiveCodec {
       label = this@toSnapshotMessage.label
       versionName = this@toSnapshotMessage.versionName
       versionCode = this@toSnapshotMessage.versionCode
+      isArchived = this@toSnapshotMessage.isArchived
       installedTime = this@toSnapshotMessage.installedTime
       lastUpdatedTime = this@toSnapshotMessage.lastUpdatedTime
       isSystem = this@toSnapshotMessage.isSystem
@@ -49,6 +50,7 @@ class ProtoSnapshotArchiveCodec : SnapshotArchiveCodec {
       label = label,
       versionName = versionName,
       versionCode = versionCode,
+      isArchived = isArchived,
       installedTime = installedTime,
       lastUpdatedTime = lastUpdatedTime,
       isSystem = isSystem,

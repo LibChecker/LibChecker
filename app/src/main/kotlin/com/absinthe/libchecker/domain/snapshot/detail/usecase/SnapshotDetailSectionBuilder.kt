@@ -1,12 +1,9 @@
 package com.absinthe.libchecker.domain.snapshot.detail.usecase
 
 import android.content.Context
-import android.graphics.Color
-import android.text.style.ForegroundColorSpan
+import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
-import androidx.core.graphics.ColorUtils
 import androidx.core.text.buildSpannedString
-import androidx.core.text.inSpans
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.LibType
@@ -19,27 +16,30 @@ import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.repository.AppListSettingsRepository
+import com.absinthe.libchecker.domain.snapshot.detail.model.SNAPSHOT_DETAIL_DIFF_ARROW
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailContent
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailDiffTextStyle
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemStatusDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSection
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailStatusCount
-import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailItemBackgroundColor
 import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailItemDescription
 import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailReportItemText
 import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailReportSectionText
 import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailRuleChipDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailSectionDescription
+import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailSummary
+import com.absinthe.libchecker.domain.snapshot.detail.model.emphasizeSnapshotDetailDiffArrows
 import com.absinthe.libchecker.domain.snapshot.model.ADDED
 import com.absinthe.libchecker.domain.snapshot.model.CHANGED
 import com.absinthe.libchecker.domain.snapshot.model.MOVED
 import com.absinthe.libchecker.domain.snapshot.model.REMOVED
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.fromJson
-import com.absinthe.libraries.utils.utils.UiUtils
 import com.absinthe.rulesbundle.Rule
 import java.text.NumberFormat
 import java.util.Locale
@@ -52,7 +52,10 @@ class SnapshotDetailSectionBuilder(
   private val appListSettingsRepository: AppListSettingsRepository
 ) {
 
-  suspend operator fun invoke(item: SnapshotDiffItem): List<SnapshotDetailSection> = withContext(Dispatchers.IO) {
+  suspend operator fun invoke(
+    item: SnapshotDiffItem,
+    diffTextStyle: SnapshotDetailDiffTextStyle
+  ): SnapshotDetailContent = withContext(Dispatchers.IO) {
     val list = mutableListOf<SnapshotDetailItem>()
 
     list.addAll(
@@ -98,12 +101,24 @@ class SnapshotDetailSectionBuilder(
       )
     )
 
-    buildSections(list)
+    val sections = buildSections(list, diffTextStyle)
+    SnapshotDetailContent(
+      sections = sections,
+      summary = buildSnapshotDetailSummary(sections) { count ->
+        context.resources.getQuantityString(
+          R.plurals.snapshot_detail_changes_count,
+          count,
+          count
+        )
+      }
+    )
   }
 
-  private suspend fun buildSections(items: List<SnapshotDetailItem>): List<SnapshotDetailSection> {
+  private suspend fun buildSections(
+    items: List<SnapshotDetailItem>,
+    diffTextStyle: SnapshotDetailDiffTextStyle
+  ): List<SnapshotDetailSection> {
     val colorfulRuleIcon = appListSettingsRepository.colorfulRuleIcon
-    val darkMode = UiUtils.isDarkMode()
     val ruleCache = mutableMapOf<String, Rule?>()
 
     suspend fun getRuleCached(item: SnapshotDetailItem): Rule? {
@@ -123,22 +138,19 @@ class SnapshotDetailSectionBuilder(
           val status = buildStatusDisplayData(item.diffType)
           val rule = getRuleCached(item)
           val ruleChip = buildSnapshotDetailRuleChipDisplayData(rule, colorfulRuleIcon)
+          val extra = buildExtraDisplayText(item, diffTextStyle)
           SnapshotDetailItemDisplayData(
             item = item,
             title = item.title,
-            extra = item.extra,
+            extra = extra,
             description = buildSnapshotDetailItemDescription(
               statusLabel = context.getString(status.labelRes),
               title = item.title,
-              extra = item.extra,
+              extra = extra,
               ruleLabel = ruleChip?.label
             ),
             reportText = buildSnapshotDetailReportItemText(item),
             status = status,
-            backgroundColor = buildSnapshotDetailItemBackgroundColor(
-              baseColor = status.colorRes.getColor(context),
-              darkMode = darkMode
-            ),
             ruleChip = ruleChip
           )
         }
@@ -168,12 +180,51 @@ class SnapshotDetailSectionBuilder(
     }
   }
 
+  private fun buildExtraDisplayText(
+    item: SnapshotDetailItem,
+    style: SnapshotDetailDiffTextStyle
+  ): CharSequence {
+    val highlighted = if (item.diffType == CHANGED && (style.highlightColor != null || style.emphasizeDiffs)) {
+      highlightChangedExtra(item.extra, style.highlightColor, style.emphasizeDiffs)
+    } else {
+      item.extra
+    }
+    return highlighted.emphasizeSnapshotDetailDiffArrows(style.arrowColor)
+  }
+
+  private fun highlightChangedExtra(
+    extra: CharSequence,
+    @ColorInt highlightColor: Int?,
+    emphasizeDiffs: Boolean
+  ): CharSequence {
+    val rawText = extra.toString()
+    val separator = " $SNAPSHOT_DETAIL_DIFF_ARROW "
+    val firstLineEnd = rawText.indexOf('\n').takeIf { it >= 0 } ?: rawText.length
+    val separatorStart = rawText.indexOf(separator)
+    val newValueStart = separatorStart + separator.length
+    if (separatorStart <= 0 || newValueStart >= firstLineEnd) return extra
+
+    val highlighted = LCAppUtils.getHighlightDifferences(
+      oldString = rawText.substring(0, separatorStart),
+      newString = rawText.substring(newValueStart, firstLineEnd),
+      highlightDiffColor = highlightColor,
+      emphasizeDiffs = emphasizeDiffs
+    )
+    return buildSpannedString {
+      append(highlighted.first)
+      append(separator)
+      append(highlighted.second)
+      append(rawText.substring(firstLineEnd))
+    }
+  }
+
   private fun buildStatusCounts(items: List<SnapshotDetailItemDisplayData>): List<SnapshotDetailStatusCount> {
     return orderedStatuses.mapNotNull { status ->
       val count = items.count { it.item.diffType == status }
       count.takeIf { it > 0 }?.let {
         val statusDisplayData = buildStatusDisplayData(status)
         SnapshotDetailStatusCount(
+          diffType = status,
           count = it,
           countText = NumberFormat.getIntegerInstance().format(it),
           label = context.getString(statusDisplayData.labelRes),
@@ -201,29 +252,25 @@ class SnapshotDetailSectionBuilder(
     return when (status) {
       ADDED -> SnapshotDetailItemStatusDisplayData(
         iconRes = R.drawable.ic_add,
-        colorRes = R.color.material_green_300,
-        countColorRes = R.color.material_green_200,
+        colorRes = R.color.snapshot_status_added,
         labelRes = R.string.snapshot_indicator_added
       )
 
       REMOVED -> SnapshotDetailItemStatusDisplayData(
         iconRes = R.drawable.ic_remove,
-        colorRes = R.color.material_red_300,
-        countColorRes = R.color.material_red_200,
+        colorRes = R.color.snapshot_status_removed,
         labelRes = R.string.snapshot_indicator_removed
       )
 
       CHANGED -> SnapshotDetailItemStatusDisplayData(
         iconRes = R.drawable.ic_changed,
-        colorRes = R.color.material_yellow_300,
-        countColorRes = R.color.material_yellow_200,
+        colorRes = R.color.snapshot_status_changed,
         labelRes = R.string.snapshot_indicator_changed
       )
 
       MOVED -> SnapshotDetailItemStatusDisplayData(
         iconRes = R.drawable.ic_move,
-        colorRes = R.color.material_blue_300,
-        countColorRes = R.color.material_blue_200,
+        colorRes = R.color.snapshot_status_moved,
         labelRes = R.string.snapshot_indicator_moved
       )
 
@@ -264,27 +311,25 @@ class SnapshotDetailSectionBuilder(
       oldList.find { it.name == item.name }?.let {
         if (it.size != item.size) {
           val diffSize = item.size - it.size
-          val extra = buildSpannedString {
+          val extra = buildString {
             append("${it.size.sizeToString(context)} $ARROW ${item.size.sizeToString(context)}")
             appendLine()
-            inSpans(ForegroundColorSpan(ColorUtils.setAlphaComponent(Color.BLACK, 165))) {
-              if (diffSize > 0) {
-                append("+")
+            if (diffSize > 0) {
+              append("+")
+            }
+            append(diffSize.sizeToString(context))
+            append(", ")
+            if (diffSize > 0) {
+              append("+")
+            }
+            val percentage = (diffSize.toFloat() / it.size)
+            if (abs(percentage) < 0.001f) {
+              if (percentage < 0) {
+                append("-")
               }
-              append(diffSize.sizeToString(context))
-              append(", ")
-              if (diffSize > 0) {
-                append("+")
-              }
-              val percentage = (diffSize.toFloat() / it.size)
-              if (abs(percentage) < 0.001f) {
-                if (percentage < 0) {
-                  append("-")
-                }
-                append("<0.1%")
-              } else {
-                append(String.format(Locale.getDefault(), "%.1f%%", percentage * 100))
-              }
+              append("<0.1%")
+            } else {
+              append(String.format(Locale.getDefault(), "%.1f%%", percentage * 100))
             }
           }
           list.add(
@@ -352,7 +397,14 @@ class SnapshotDetailSectionBuilder(
     for (item in addList) {
       removeList.find { it.substringAfterLast(".") == item.substringAfterLast(".") }?.let {
         list.add(
-          SnapshotDetailItem(item, String.format("%s\n$ARROW\n%s", it, item), "", MOVED, type)
+          SnapshotDetailItem(
+            name = item,
+            title = String.format("%s\n$ARROW\n%s", it, item),
+            extra = "",
+            diffType = MOVED,
+            itemType = type,
+            previousName = it
+          )
         )
         pendingRemovedOldSet.add(it)
         pendingRemovedNewSet.add(item)

@@ -31,6 +31,7 @@ fun buildSnapshotMenuBottomSheetState(
       )
     )
     add(menuOption(R.string.snapshot_menu_diff_highlight, SnapshotOptions.DIFF_HIGHLIGHT, currentOptions))
+    add(menuOption(R.string.snapshot_menu_diff_emphasis, SnapshotOptions.DIFF_EMPHASIS, currentOptions))
     if (includeIecUnits) {
       add(menuOption(R.string.snapshot_menu_use_iec_units, SnapshotOptions.USE_IEC_UNITS, currentOptions))
     }

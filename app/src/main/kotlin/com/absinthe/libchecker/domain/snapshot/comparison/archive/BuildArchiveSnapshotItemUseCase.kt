@@ -18,6 +18,7 @@ import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPackageSize
 import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getVersionCode
+import com.absinthe.libchecker.utils.extensions.isArchivedPackage
 import com.absinthe.libchecker.utils.toJson
 import java.io.File
 import kotlinx.coroutines.Dispatchers
@@ -75,8 +76,9 @@ class BuildArchiveSnapshotItemUseCase(
       packageName = packageName,
       timeStamp = -1L,
       label = context.packageManager.getApplicationLabel(applicationInfo).toString(),
-      versionName = versionName.toString(),
+      versionName = versionName.orEmpty(),
       versionCode = getVersionCode(),
+      isArchived = isArchivedPackage(),
       installedTime = firstInstallTime,
       lastUpdatedTime = lastUpdateTime,
       isSystem = (applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) > 0,

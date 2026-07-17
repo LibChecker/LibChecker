@@ -20,7 +20,6 @@ class SnapshotTitleNodeMapperTest {
     val status = SnapshotDetailItemStatusDisplayData(
       iconRes = 1,
       colorRes = 2,
-      countColorRes = 3,
       labelRes = 4
     )
     val section = buildSection(
@@ -31,6 +30,7 @@ class SnapshotTitleNodeMapperTest {
       collapsedDescription = "Services, Moved 2, Collapsed",
       statusCounts = listOf(
         SnapshotDetailStatusCount(
+          diffType = MOVED,
           count = 2,
           countText = "2",
           label = "Moved",
@@ -46,7 +46,17 @@ class SnapshotTitleNodeMapperTest {
     assertEquals("[Services]\n", node.reportText)
     assertEquals("Services, Moved 2, Expanded", node.expandedDescription)
     assertEquals("Services, Moved 2, Collapsed", node.collapsedDescription)
-    assertEquals(listOf(SnapshotDetailCountNode(count = 2, countText = "2", status = status)), node.counts)
+    assertEquals(
+      listOf(
+        SnapshotDetailCountNode(
+          diffType = MOVED,
+          count = 2,
+          countText = "2",
+          status = status
+        )
+      ),
+      node.counts
+    )
   }
 
   @Test
@@ -100,10 +110,8 @@ class SnapshotTitleNodeMapperTest {
       status = SnapshotDetailItemStatusDisplayData(
         iconRes = 0,
         colorRes = 0,
-        countColorRes = 0,
         labelRes = 0
       ),
-      backgroundColor = 0,
       ruleChip = null
     )
   }

@@ -103,6 +103,7 @@ class SnapshotMenuBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotMenuBS
         } else {
           null
         },
+        emphasizeDiffs = (options and SnapshotOptions.DIFF_EMPHASIS) > 0,
         highlightText = ""
       )
     )

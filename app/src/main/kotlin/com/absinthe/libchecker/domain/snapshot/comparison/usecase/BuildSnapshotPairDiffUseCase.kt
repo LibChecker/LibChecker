@@ -27,7 +27,8 @@ class BuildSnapshotPairDiffUseCase {
       permissionsDiff = SnapshotDiffItem.DiffNode(left.permissions, right.permissions),
       metadataDiff = SnapshotDiffItem.DiffNode(left.metadata, right.metadata),
       packageSizeDiff = SnapshotDiffItem.DiffNode(left.packageSize, right.packageSize),
-      isTrackItem = false
+      isTrackItem = false,
+      archivedDiff = SnapshotDiffItem.DiffNode(left.isArchived, right.isArchived)
     )
   }
 }

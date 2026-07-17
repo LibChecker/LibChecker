@@ -15,6 +15,7 @@ import com.absinthe.libchecker.domain.snapshot.list.ui.adapter.ARROW_REVERT
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.view.span.CenterAlignImageSpan
+import com.absinthe.libchecker.view.span.DiffHighlightSpan
 
 object LCAppUtils {
 
@@ -54,14 +55,15 @@ object LCAppUtils {
     diff: SnapshotDiffItem.DiffNode<T>,
     isNewOrDeleted: Boolean = false,
     format: String = "%s",
-    highlightDiffColor: Int? = null
+    highlightDiffColor: Int? = null,
+    emphasizeDiffs: Boolean = false
   ): CharSequence {
     return if (diff.old != diff.new && diff.new != null && !isNewOrDeleted) {
       val oldString = format.format(diff.old)
       val newString = format.format(diff.new)
 
-      if (highlightDiffColor != null) {
-        val pair = getHighlightDifferences(oldString, newString, highlightDiffColor)
+      if (highlightDiffColor != null || emphasizeDiffs) {
+        val pair = getHighlightDifferences(oldString, newString, highlightDiffColor, emphasizeDiffs)
         buildSpannedString {
           append(pair.first)
           append(" $ARROW ")
@@ -85,14 +87,15 @@ object LCAppUtils {
     diff2: SnapshotDiffItem.DiffNode<*>,
     diff2Suffix: String = "",
     isNewOrDeleted: Boolean = false,
-    highlightDiffColor: Int? = null
+    highlightDiffColor: Int? = null,
+    emphasizeDiffs: Boolean = false
   ): CharSequence {
     return if ((diff1.old != diff1.new || diff2.old != diff2.new) && !isNewOrDeleted) {
-      if (highlightDiffColor != null) {
+      if (highlightDiffColor != null || emphasizeDiffs) {
         val highlightedPair1 =
-          getHighlightDifferences(diff1.old.toString(), diff1.new.toString(), highlightDiffColor)
+          getHighlightDifferences(diff1.old.toString(), diff1.new.toString(), highlightDiffColor, emphasizeDiffs)
         val highlightedPair2 =
-          getHighlightDifferences(diff2.old.toString(), diff2.new.toString(), highlightDiffColor)
+          getHighlightDifferences(diff2.old.toString(), diff2.new.toString(), highlightDiffColor, emphasizeDiffs)
         val allText = highlightedPair1.first.toString() + highlightedPair1.second + highlightedPair2.first + highlightedPair2.second + diff1Suffix + diff2Suffix
         val isRtl = BidiFormatter.getInstance().isRtl(allText)
         buildSpannedString {
@@ -121,46 +124,60 @@ object LCAppUtils {
   fun getHighlightDifferences(
     oldString: String,
     newString: String,
-    highlightDiffColor: Int
+    highlightDiffColor: Int?,
+    emphasizeDiffs: Boolean = false
   ): Pair<SpannableString, SpannableString> {
     val oldSpannable = SpannableString(oldString)
     val newSpannable = SpannableString(newString)
-    val minLength = minOf(oldString.length, newString.length)
+    var oldIndex = 0
+    var newIndex = 0
 
-    for (i in 0 until minLength) {
-      if (oldString[i] != newString[i]) {
-        oldSpannable.setSpan(
-          ForegroundColorSpan(highlightDiffColor),
-          i,
-          i + 1,
-          Spannable.SPAN_INCLUSIVE_EXCLUSIVE
-        )
-        newSpannable.setSpan(
-          ForegroundColorSpan(highlightDiffColor),
-          i,
-          i + 1,
-          Spannable.SPAN_INCLUSIVE_EXCLUSIVE
-        )
+    while (oldIndex < oldString.length && newIndex < newString.length) {
+      val oldEnd = oldString.offsetByCodePoints(oldIndex, 1)
+      val newEnd = newString.offsetByCodePoints(newIndex, 1)
+      if (oldString.codePointAt(oldIndex) != newString.codePointAt(newIndex)) {
+        oldSpannable.setDiffHighlight(oldIndex, oldEnd, highlightDiffColor, emphasizeDiffs)
+        newSpannable.setDiffHighlight(newIndex, newEnd, highlightDiffColor, emphasizeDiffs)
       }
+      oldIndex = oldEnd
+      newIndex = newEnd
     }
 
-    if (oldString.length > newString.length) {
-      oldSpannable.setSpan(
-        ForegroundColorSpan(highlightDiffColor),
-        minLength,
-        oldString.length,
-        Spannable.SPAN_INCLUSIVE_EXCLUSIVE
-      )
-    } else if (newString.length > oldString.length) {
-      newSpannable.setSpan(
-        ForegroundColorSpan(highlightDiffColor),
-        minLength,
-        newString.length,
-        Spannable.SPAN_INCLUSIVE_EXCLUSIVE
-      )
+    if (oldIndex < oldString.length) {
+      oldSpannable.setDiffHighlight(oldIndex, oldString.length, highlightDiffColor, emphasizeDiffs)
+    } else if (newIndex < newString.length) {
+      newSpannable.setDiffHighlight(newIndex, newString.length, highlightDiffColor, emphasizeDiffs)
     }
 
     return Pair(oldSpannable, newSpannable)
+  }
+
+  private fun SpannableString.setDiffHighlight(
+    start: Int,
+    end: Int,
+    @androidx.annotation.ColorInt color: Int?,
+    emphasizeDiffs: Boolean
+  ) {
+    if (emphasizeDiffs) {
+      var current = start
+      while (current < end) {
+        val next = Character.offsetByCodePoints(this, current, 1)
+        setSpan(
+          DiffHighlightSpan(color),
+          current,
+          next,
+          Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+        )
+        current = next
+      }
+    } else if (color != null) {
+      setSpan(
+        ForegroundColorSpan(color),
+        start,
+        end,
+        Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+      )
+    }
   }
 
   private fun getArrow(isRtl: Boolean): String {

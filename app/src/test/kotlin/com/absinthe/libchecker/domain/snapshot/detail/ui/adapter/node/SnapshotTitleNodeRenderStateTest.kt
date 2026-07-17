@@ -4,6 +4,7 @@ import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemStatusDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailCountRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailTitleRenderState
+import com.absinthe.libchecker.domain.snapshot.model.MOVED
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -12,12 +13,12 @@ class SnapshotTitleNodeRenderStateTest {
   @Test
   fun exposesExpandedTitleRenderState() {
     val count = SnapshotDetailCountNode(
+      diffType = MOVED,
       count = 2,
       countText = "2",
       status = SnapshotDetailItemStatusDisplayData(
         iconRes = 10,
         colorRes = 11,
-        countColorRes = 12,
         labelRes = 13
       )
     )
@@ -28,8 +29,10 @@ class SnapshotTitleNodeRenderStateTest {
         title = "Native libraries",
         counts = listOf(
           SnapshotDetailCountRenderState(
-            text = "2",
-            backgroundTintRes = 12
+            diffType = MOVED,
+            iconRes = 10,
+            countText = "2",
+            colorRes = 11
           )
         ),
         contentDescription = "Native libraries, Moved 2, Expanded",

@@ -12,5 +12,6 @@ data class SnapshotDetailItem(
   val title: String,
   val extra: CharSequence,
   val diffType: Int,
-  @LibType val itemType: Int
+  @LibType val itemType: Int,
+  val previousName: String? = null
 )
