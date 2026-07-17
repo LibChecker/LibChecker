@@ -53,7 +53,7 @@ fun resolveSnapshotDetailItemColors(
     supportingText = theme.onSurfaceVariant,
     divider = theme.outlineVariant,
     status = statusColor,
-    chipSurface = theme.chipSurface,
+    chipSurface = blendArgb(theme.chipSurface, statusColor, overlayPercent = 12),
     chipText = theme.onSurfaceVariant,
     chipOutline = theme.outlineVariant
   )

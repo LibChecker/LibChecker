@@ -8,7 +8,6 @@ import android.graphics.ColorMatrixColorFilter
 import android.graphics.Rect
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.RippleDrawable
-import android.graphics.drawable.StateListDrawable
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.Gravity
@@ -209,7 +208,7 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
         RULE_CHIP_HEIGHT
       )
       gravity = Gravity.CENTER_VERTICAL
-      setPaddingRelative(4.dp, 0, 4.dp, 0)
+      setPaddingRelative(RULE_CHIP_HORIZONTAL_PADDING, 0, RULE_CHIP_HORIZONTAL_PADDING, 0)
       compoundDrawablePadding = 4.dp
       setTextAppearance(
         context.getResourceIdByAttr(MaterialR.attr.textAppearanceLabelSmall)
@@ -383,21 +382,10 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
     }
   }
 
-  private fun buildRuleChipInteractionBackground(interactionColor: Int): RippleDrawable {
-    val states = StateListDrawable().apply {
-      addState(
-        intArrayOf(android.R.attr.state_pressed),
-        ruleChipPillDrawable(interactionColor)
-      )
-      addState(
-        intArrayOf(android.R.attr.state_hovered),
-        ruleChipPillDrawable(interactionColor)
-      )
-      addState(intArrayOf(), ruleChipPillDrawable(Color.TRANSPARENT))
-    }
+  private fun buildRuleChipInteractionBackground(backgroundColor: Int): RippleDrawable {
     return RippleDrawable(
       ColorStateList.valueOf(context.getColorByAttr(android.R.attr.colorControlHighlight)),
-      states,
+      ruleChipPillDrawable(backgroundColor),
       ruleChipPillDrawable(Color.WHITE)
     )
   }
@@ -421,10 +409,11 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
     val STATUS_CONTENT_GAP = 0.dp
     val RULE_CHIP_VERTICAL_GAP = 2.dp
     val RULE_CHIP_HEIGHT = 24.dp
+    val RULE_CHIP_HORIZONTAL_PADDING = 8.dp
     val RULE_CHIP_ICON_SIZE = 16.dp
     val RULE_CHIP_TOUCH_HEIGHT = 48.dp
     val RULE_CHIP_HORIZONTAL_TOUCH_EXPANSION = 4.dp
-    val RULE_CHIP_RADIUS = RULE_CHIP_HEIGHT / 2
+    val RULE_CHIP_RADIUS = 6.dp
     val MINIMUM_HEIGHT = 56.dp
     val DIVIDER_HEIGHT = 1.dp
   }
