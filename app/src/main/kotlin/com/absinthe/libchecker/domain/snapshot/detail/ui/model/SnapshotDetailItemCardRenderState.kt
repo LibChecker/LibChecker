@@ -51,12 +51,19 @@ fun resolveSnapshotDetailItemColors(
     gradientMiddle = blendArgb(theme.surface, statusColor, overlayPercent = 4),
     title = theme.onSurface,
     supportingText = theme.onSurfaceVariant,
-    divider = theme.outlineVariant,
+    divider = resolveSnapshotDetailDividerColor(theme.surface, theme.outlineVariant),
     status = statusColor,
     chipSurface = blendArgb(theme.chipSurface, statusColor, overlayPercent = 12),
     chipText = theme.onSurfaceVariant,
     chipOutline = theme.outlineVariant
   )
+}
+
+fun resolveSnapshotDetailDividerColor(
+  @ColorInt surface: Int,
+  @ColorInt outlineVariant: Int
+): Int {
+  return blendArgb(surface, outlineVariant, overlayPercent = 55)
 }
 
 @ColorInt

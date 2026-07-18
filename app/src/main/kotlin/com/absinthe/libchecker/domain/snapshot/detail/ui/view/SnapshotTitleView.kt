@@ -15,7 +15,6 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotTitlePackageSizeRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotTitleRenderState
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
-import com.absinthe.libchecker.domain.snapshot.ui.view.SnapshotPackageSizeLineBreaker
 import com.absinthe.libchecker.utils.extensions.applyCondensedTypeface
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -69,6 +68,7 @@ class SnapshotTitleView(
     maxLines = Int.MAX_VALUE
     addView(this)
   }
+  private val versionInfoLineBreaker = SnapshotDetailLineBreaker(versionInfoView)
 
   private val packageSizeLabelView = metricLabel(R.string.snapshot_detail_size_label)
 
@@ -83,7 +83,7 @@ class SnapshotTitleView(
     maxLines = Int.MAX_VALUE
     addView(this)
   }
-  private val packageSizeLineBreaker = SnapshotPackageSizeLineBreaker(packageSizeView)
+  private val packageSizeLineBreaker = SnapshotDetailLineBreaker(packageSizeView)
 
   private val apisLabelView = metricLabel(R.string.snapshot_detail_sdk_label)
 
@@ -114,9 +114,9 @@ class SnapshotTitleView(
       }
     }
     versionInfoView.apply {
-      text = data.versionInfo
+      versionInfoLineBreaker.setText(data.versionInfo)
       if (data.copyPrimaryText) {
-        setLongClickCopiedToClipboard(text)
+        setLongClickCopiedToClipboard(data.versionInfo)
       }
     }
     setPackageSizeText(data.packageSize)
@@ -176,7 +176,7 @@ class SnapshotTitleView(
         context.getString(R.string.snapshot_detail_size_label),
         data.text
       )
-      setLongClickCopiedToClipboard(text)
+      setLongClickCopiedToClipboard(data.text)
     }
   }
 
@@ -187,6 +187,7 @@ class SnapshotTitleView(
     val identityTextWidth = contentWidth - iconView.measuredWidth - IDENTITY_GAP
     measureToWidth(appNameView, identityTextWidth)
     measureToWidth(packageNameView, identityTextWidth)
+    versionInfoLineBreaker.apply(identityTextWidth)
     measureToWidth(versionInfoView, identityTextWidth)
 
     val identityHeight = appNameView.measuredHeight +

@@ -66,7 +66,7 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
   }
 
   private val title = AppCompatTextView(
-    ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)
+    ContextThemeWrapper(context, R.style.TextView_SansSerifCondensedMedium)
   ).apply {
     layoutParams = ViewGroup.LayoutParams(
       ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -78,7 +78,7 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
   }
 
   private val previousPackagePath = AppCompatTextView(
-    ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)
+    ContextThemeWrapper(context, R.style.TextView_SansSerifCondensedMedium)
   ).apply {
     layoutParams = ViewGroup.LayoutParams(
       ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -141,9 +141,11 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
 
   fun render(state: SnapshotDetailItemViewRenderState) {
     contentDescription = state.contentDescription
-    title.text = state.title
+    title.text = state.title.withSnapshotTechnicalPathBreakOpportunities()
     previousPackagePath.apply {
-      text = state.movedPath?.previousPackagePath ?: ""
+      text = state.movedPath?.previousPackagePath
+        ?.withSnapshotTechnicalPathBreakOpportunities()
+        ?: ""
       isVisible = state.movedPath != null
     }
     movedArrow.isVisible = state.movedPath != null
@@ -355,7 +357,12 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
       nextY + RULE_CHIP_VERTICAL_GAP
     )
     updateChipTouchDelegate()
-    divider.layout(0, measuredHeight - DIVIDER_HEIGHT, measuredWidth, measuredHeight)
+    divider.layout(
+      contentStart,
+      measuredHeight - DIVIDER_HEIGHT,
+      measuredWidth,
+      measuredHeight
+    )
   }
 
   private fun updateChipTouchDelegate() {

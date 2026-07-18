@@ -25,7 +25,7 @@ class SnapshotDetailItemVisualStateTest {
     assertEquals(1, colors.gradientMiddle)
     assertEquals(2, colors.title)
     assertEquals(3, colors.supportingText)
-    assertEquals(4, colors.divider)
+    assertEquals(2, colors.divider)
     assertEquals(6, colors.status)
     assertEquals(5, colors.chipSurface)
     assertEquals(3, colors.chipText)
@@ -48,7 +48,7 @@ class SnapshotDetailItemVisualStateTest {
     assertEquals(11, colors.surface)
     assertEquals(12, colors.title)
     assertEquals(13, colors.supportingText)
-    assertEquals(14, colors.divider)
+    assertEquals(12, colors.divider)
     assertEquals(16, colors.status)
     assertEquals(15, colors.chipSurface)
   }
@@ -70,6 +70,17 @@ class SnapshotDetailItemVisualStateTest {
     assertEquals(0xFF0A0A0A.toInt(), colors.gradientMiddle)
     assertEquals(0xFF1E1E1E.toInt(), colors.chipSurface)
     assertEquals(0xFF000000.toInt(), colors.surface)
+  }
+
+  @Test
+  fun softensDividerAgainstTheRowSurface() {
+    assertEquals(
+      0xFF8C8C8C.toInt(),
+      resolveSnapshotDetailDividerColor(
+        surface = 0xFF000000.toInt(),
+        outlineVariant = 0xFFFFFFFF.toInt()
+      )
+    )
   }
 
   @Test
