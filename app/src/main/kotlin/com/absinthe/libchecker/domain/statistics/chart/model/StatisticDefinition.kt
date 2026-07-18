@@ -4,7 +4,6 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 const val STATISTIC_SCHEMA_VERSION = 1
-const val STATISTIC_FALLBACK_ICON_ASSET = "statistics/v1/icons/fallback.svg"
 
 @JsonClass(generateAdapter = true)
 data class StatisticBundle(
@@ -40,13 +39,31 @@ data class StatisticIconSpec(
   val drawable: StatisticDrawableIcon? = null,
   val asset: String? = null,
   val renderMode: StatisticIconRenderMode = StatisticIconRenderMode.MONOCHROME,
-  val tintRole: StatisticIconTintRole = StatisticIconTintRole.ON_SURFACE
+  val tintRole: StatisticIconTintRole = StatisticIconTintRole.ON_SURFACE,
+  @Transient val localPath: String? = null
 )
 
 @JsonClass(generateAdapter = true)
 data class StatisticCalculationSpec(
   val kind: StatisticCalculationKind,
-  val nativeOperator: StatisticNativeOperator? = null
+  val nativeOperator: StatisticNativeOperator? = null,
+  val predicate: StatisticPredicateSpec? = null
+)
+
+@JsonClass(generateAdapter = true)
+data class StatisticPredicateSpec(
+  val evidence: StatisticEvidence,
+  val operator: StatisticComparisonOperator,
+  val value: StatisticPredicateValue,
+  val matchedTitle: StatisticTitleSpec,
+  val unmatchedTitle: StatisticTitleSpec
+)
+
+@JsonClass(generateAdapter = true)
+data class StatisticPredicateValue(
+  val integer: Long? = null,
+  val boolean: Boolean? = null,
+  val string: String? = null
 )
 
 enum class StatisticSource {
@@ -145,7 +162,32 @@ enum class StatisticIconTintRole {
 
 enum class StatisticCalculationKind {
   @Json(name = "native")
-  NATIVE
+  NATIVE,
+
+  @Json(name = "predicate")
+  PREDICATE
+}
+
+enum class StatisticEvidence {
+  @Json(name = "target_sdk")
+  TARGET_SDK,
+
+  @Json(name = "native_library")
+  NATIVE_LIBRARY
+}
+
+enum class StatisticComparisonOperator {
+  @Json(name = "equal")
+  EQUAL,
+
+  @Json(name = "greater_than_or_equal")
+  GREATER_THAN_OR_EQUAL,
+
+  @Json(name = "less_than_or_equal")
+  LESS_THAN_OR_EQUAL,
+
+  @Json(name = "contains")
+  CONTAINS
 }
 
 enum class StatisticNativeOperator {

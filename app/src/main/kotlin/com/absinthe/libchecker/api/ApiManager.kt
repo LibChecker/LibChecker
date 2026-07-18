@@ -39,6 +39,8 @@ object ApiManager {
     }
 
   val rulesBundleUrl = "${root}cloud/rules/v$VERSION/rules.db"
+  val chartRulesManifestUrl = "${GITHUB_ROOT_URL}chart/cloud/v1/manifest.json"
+  val chartRulesBundleUrl = "${GITHUB_ROOT_URL}chart/cloud/v1/chart.bundle"
 
   val okHttpClient by unsafeLazy {
     OkHttpClient.Builder()

@@ -3,10 +3,14 @@ package com.absinthe.libchecker.domain.statistics.chart.usecase
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticBundle
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticCalculationKind
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticCalculationSpec
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticComparisonOperator
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDefinition
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDrawableIcon
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticEvidence
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticIconSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticNativeOperator
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticPredicateSpec
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticPredicateValue
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticSource
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticTitleResource
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticTitleSpec
@@ -26,16 +30,54 @@ class ValidateStatisticCatalogUseCaseTest {
 
   @Test
   fun `accepts an official rule backed by a translated title and SVG`() {
-    val definition = builtInDefinition().copy(
-      id = "official.dex-field-usage",
-      source = StatisticSource.OFFICIAL,
-      title = StatisticTitleSpec(translations = mapOf("en" to "DEX field usage")),
-      icon = StatisticIconSpec(asset = "statistics/official/dex-field-usage.svg")
+    val definition = officialDefinition()
+
+    val errors = validate(StatisticBundle(1, listOf(definition)))
+
+    assertTrue(errors.toString(), errors.isEmpty())
+  }
+
+  @Test
+  fun `accepts a native library predicate`() {
+    val definition = officialDefinition().copy(
+      id = "official.flutter",
+      calculation = StatisticCalculationSpec(
+        kind = StatisticCalculationKind.PREDICATE,
+        predicate = StatisticPredicateSpec(
+          evidence = StatisticEvidence.NATIVE_LIBRARY,
+          operator = StatisticComparisonOperator.CONTAINS,
+          value = StatisticPredicateValue(string = "libflutter.so"),
+          matchedTitle = StatisticTitleSpec(translations = mapOf("en" to "Flutter apps")),
+          unmatchedTitle = StatisticTitleSpec(translations = mapOf("en" to "Other apps"))
+        )
+      )
     )
 
     val errors = validate(StatisticBundle(1, listOf(definition)))
 
     assertTrue(errors.toString(), errors.isEmpty())
+  }
+
+  @Test
+  fun `rejects incompatible native library predicate`() {
+    val definition = officialDefinition().copy(
+      id = "official.flutter",
+      calculation = StatisticCalculationSpec(
+        kind = StatisticCalculationKind.PREDICATE,
+        predicate = StatisticPredicateSpec(
+          evidence = StatisticEvidence.NATIVE_LIBRARY,
+          operator = StatisticComparisonOperator.EQUAL,
+          value = StatisticPredicateValue(string = "../libflutter.so"),
+          matchedTitle = StatisticTitleSpec(translations = mapOf("en" to "Flutter apps")),
+          unmatchedTitle = StatisticTitleSpec(translations = mapOf("en" to "Other apps"))
+        )
+      )
+    )
+
+    val errors = validate(StatisticBundle(1, listOf(definition)))
+
+    assertTrue(errors.any { it.startsWith("Native library predicate requires a valid library name") })
+    assertTrue(errors.any { it.startsWith("Native library predicate requires the contains operator") })
   }
 
   @Test
@@ -57,7 +99,7 @@ class ValidateStatisticCatalogUseCaseTest {
       id = "official.unsafe",
       source = StatisticSource.OFFICIAL,
       title = StatisticTitleSpec(translations = mapOf("en" to "Unsafe")),
-      icon = StatisticIconSpec(asset = "statistics/../unsafe.svg")
+      icon = StatisticIconSpec(asset = "icons/../unsafe.svg")
     )
 
     val errors = validate(StatisticBundle(1, listOf(definition)))
@@ -74,6 +116,24 @@ class ValidateStatisticCatalogUseCaseTest {
     calculation = StatisticCalculationSpec(
       kind = StatisticCalculationKind.NATIVE,
       nativeOperator = StatisticNativeOperator.ABI
+    )
+  )
+
+  private fun officialDefinition() = StatisticDefinition(
+    id = "official.target-sdk-35-plus",
+    revision = 1,
+    source = StatisticSource.OFFICIAL,
+    title = StatisticTitleSpec(translations = mapOf("en" to "Target SDK 35+")),
+    icon = StatisticIconSpec(asset = "icons/android-15.svg"),
+    calculation = StatisticCalculationSpec(
+      kind = StatisticCalculationKind.PREDICATE,
+      predicate = StatisticPredicateSpec(
+        evidence = StatisticEvidence.TARGET_SDK,
+        operator = StatisticComparisonOperator.GREATER_THAN_OR_EQUAL,
+        value = StatisticPredicateValue(integer = 35),
+        matchedTitle = StatisticTitleSpec(translations = mapOf("en" to "Target SDK 35 or newer")),
+        unmatchedTitle = StatisticTitleSpec(translations = mapOf("en" to "Target SDK 34 or older"))
+      )
     )
   )
 }

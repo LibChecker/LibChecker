@@ -2,6 +2,8 @@ package com.absinthe.libchecker.domain.statistics.chart.ui
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.widget.ImageView
 import androidx.core.widget.ImageViewCompat
 import coil.load
@@ -12,12 +14,24 @@ import com.absinthe.libchecker.domain.statistics.chart.model.StatisticIconSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticIconTintRole
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticTitleResource
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticTitleSpec
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
+import java.io.File
+import java.util.Locale
 
 internal fun StatisticTitleSpec.resolve(context: Context): String {
   resource?.let { return context.getString(it.stringRes) }
   val locale = context.resources.configuration.locales[0]
+  return resolveStatisticTranslation(translations, locale)
+}
+
+internal fun resolveStatisticTranslation(
+  translations: Map<String, String>,
+  locale: Locale
+): String {
   return translations[locale.toLanguageTag()]
+    ?: translations[listOf(locale.language, locale.script).filter(String::isNotBlank).joinToString("-")]
+    ?: translations[listOf(locale.language, locale.country).filter(String::isNotBlank).joinToString("-")]
     ?: translations[locale.language]
     ?: translations[DEFAULT_TRANSLATION]
     ?: translations.values.firstOrNull()
@@ -26,7 +40,8 @@ internal fun StatisticTitleSpec.resolve(context: Context): String {
 
 internal fun ImageView.loadStatisticIcon(
   icon: StatisticIconSpec,
-  selected: Boolean
+  selected: Boolean,
+  grayscale: Boolean = false
 ) {
   val tint = if (icon.renderMode == StatisticIconRenderMode.MONOCHROME) {
     val useSelectedAccent = selected && icon.asset != null
@@ -39,14 +54,23 @@ internal fun ImageView.loadStatisticIcon(
   } else {
     null
   }
+  clearColorFilter()
+  if (grayscale && tint == null) {
+    colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
+  }
   icon.drawable?.let { drawable ->
+    setPadding(0, 0, 0, 0)
     setImageResource(drawable.drawableRes)
     ImageViewCompat.setImageTintList(this, tint)
     return
   }
-  val asset = icon.asset ?: return
+  val imageData = icon.localPath?.let(::File)
+    ?: icon.asset?.let { "file:///android_asset/$it" }
+    ?: return
+  val remoteIconInset = REMOTE_ICON_INSET_DP.dp
+  setPadding(remoteIconInset, remoteIconInset, remoteIconInset, remoteIconInset)
   ImageViewCompat.setImageTintList(this, tint)
-  load("file:///android_asset/$asset") {
+  load(imageData) {
     crossfade(false)
     fallback(R.drawable.ic_chart)
     error(R.drawable.ic_chart)
@@ -89,3 +113,4 @@ private val StatisticIconTintRole.colorAttr: Int
   }
 
 private const val DEFAULT_TRANSLATION = "en"
+private const val REMOTE_ICON_INSET_DP = 8

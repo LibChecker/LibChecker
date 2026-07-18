@@ -110,10 +110,12 @@ class ChartFragment :
       lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
         viewModel.statisticDefinitions.collect { definitions ->
           renderStatisticSelector()
+          val selectedStatistic = viewModel.currentStatistic
+          val selectedStatisticKey = selectedStatistic?.let { "${it.id}@${it.revision}" }
           if (
             definitions.isNotEmpty() &&
-            dataSource == null &&
-            this@ChartFragment::allLCItemsStateFlow.isInitialized
+            this@ChartFragment::allLCItemsStateFlow.isInitialized &&
+            (dataSource == null || currentChartRequestKey?.statisticKey != selectedStatisticKey)
           ) {
             setData(allLCItemsStateFlow.value)
           }
@@ -196,6 +198,23 @@ class ChartFragment :
       }
       binding.featuresContainer.addView(view)
     }
+
+    val addStatisticView = ExpandingView(requireContext()).apply {
+      layoutParams = LinearLayout.LayoutParams(
+        ViewGroup.LayoutParams.WRAP_CONTENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
+      ).also { lp ->
+        lp.setMargins(4.dp, 4.dp, 4.dp, 4.dp)
+      }
+      setActionContent(R.drawable.ic_add, getString(R.string.chart_statistics_add))
+      setOnClickListener {
+        StatisticCatalogEditorBottomSheetDialogFragment().show(
+          childFragmentManager,
+          StatisticCatalogEditorBottomSheetDialogFragment::class.java.name
+        )
+      }
+    }
+    binding.featuresContainer.addView(addStatisticView)
   }
 
   private fun updateProgressIndicator() {
@@ -419,9 +438,17 @@ class ChartFragment :
               ViewGroup.LayoutParams.WRAP_CONTENT
             )
             container.apply {
-              icon.load(value.iconRes) {
-                if (value.isGrayIcon) {
-                  transformations(SaturationTransformation(0f))
+              if (value.statisticIcon != null) {
+                icon.loadStatisticIcon(
+                  icon = value.statisticIcon,
+                  selected = false,
+                  grayscale = value.isGrayIcon
+                )
+              } else {
+                icon.load(value.iconRes) {
+                  if (value.isGrayIcon) {
+                    transformations(SaturationTransformation(0f))
+                  }
                 }
               }
               labelName.text = it.getLabelByXValue(context, key)

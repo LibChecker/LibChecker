@@ -3,7 +3,10 @@ package com.absinthe.libchecker.domain.statistics.chart.usecase
 import com.absinthe.libchecker.domain.statistics.chart.model.STATISTIC_SCHEMA_VERSION
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticBundle
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticCalculationKind
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticComparisonOperator
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticEvidence
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticSource
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticTitleSpec
 
 class ValidateStatisticCatalogUseCase {
 
@@ -28,16 +31,11 @@ class ValidateStatisticCatalogUseCase {
       if (definition.revision < 1) {
         errors += "Statistic revision must be positive: ${definition.id}"
       }
-      val hasResourceTitle = definition.title.resource != null
-      val hasTranslatedTitle = definition.title.translations.isNotEmpty()
-      if (hasResourceTitle == hasTranslatedTitle) {
-        errors += "Statistic must have exactly one title source: ${definition.id}"
-      }
-      if (definition.title.translations.any { (locale, title) ->
-          !LOCALE_TAG.matches(locale) || title.isBlank() || title.length > MAX_TITLE_LENGTH
-        }
-      ) {
-        errors += "Statistic has an invalid translated title: ${definition.id}"
+      validateTitle(definition.title, definition.id, errors)
+      if (definition.source == StatisticSource.BUILTIN && definition.title.resource == null) {
+        errors += "Built-in statistic must use a resource title: ${definition.id}"
+      } else if (definition.source != StatisticSource.BUILTIN && definition.title.translations.isEmpty()) {
+        errors += "External statistic must use translated titles: ${definition.id}"
       }
       val hasDrawable = definition.icon.drawable != null
       val hasSvg = definition.icon.asset?.let(::isSafeIconAsset) == true
@@ -50,8 +48,52 @@ class ValidateStatisticCatalogUseCase {
       }
       when (definition.calculation.kind) {
         StatisticCalculationKind.NATIVE -> {
-          if (definition.calculation.nativeOperator == null) {
-            errors += "Native statistic is missing an operator: ${definition.id}"
+          if (
+            definition.calculation.nativeOperator == null ||
+            definition.calculation.predicate != null
+          ) {
+            errors += "Native statistic has an invalid calculation: ${definition.id}"
+          }
+          if (definition.source != StatisticSource.BUILTIN) {
+            errors += "External statistic cannot invoke a native chart operator: ${definition.id}"
+          }
+        }
+
+        StatisticCalculationKind.PREDICATE -> {
+          val predicate = definition.calculation.predicate
+          if (predicate == null || definition.calculation.nativeOperator != null) {
+            errors += "Predicate statistic has an invalid calculation: ${definition.id}"
+          } else {
+            validateTitle(predicate.matchedTitle, definition.id, errors)
+            validateTitle(predicate.unmatchedTitle, definition.id, errors)
+            val valueCount = listOfNotNull(
+              predicate.value.integer,
+              predicate.value.boolean,
+              predicate.value.string
+            ).size
+            if (valueCount != 1) {
+              errors += "Predicate statistic must have exactly one value: ${definition.id}"
+            }
+            when (predicate.evidence) {
+              StatisticEvidence.TARGET_SDK -> {
+                if (predicate.value.integer == null) {
+                  errors += "Target SDK predicate requires an integer value: ${definition.id}"
+                }
+                if (predicate.operator == StatisticComparisonOperator.CONTAINS) {
+                  errors += "Target SDK predicate requires a numeric operator: ${definition.id}"
+                }
+              }
+
+              StatisticEvidence.NATIVE_LIBRARY -> {
+                val libraryName = predicate.value.string
+                if (libraryName == null || !NATIVE_LIBRARY_NAME.matches(libraryName)) {
+                  errors += "Native library predicate requires a valid library name: ${definition.id}"
+                }
+                if (predicate.operator != StatisticComparisonOperator.CONTAINS) {
+                  errors += "Native library predicate requires the contains operator: ${definition.id}"
+                }
+              }
+            }
           }
         }
       }
@@ -67,6 +109,24 @@ class ValidateStatisticCatalogUseCase {
       asset.length <= MAX_ASSET_PATH_LENGTH
   }
 
+  private fun validateTitle(
+    titleSpec: StatisticTitleSpec,
+    statisticId: String,
+    errors: MutableList<String>
+  ) {
+    val hasResourceTitle = titleSpec.resource != null
+    val hasTranslatedTitle = titleSpec.translations.isNotEmpty()
+    if (hasResourceTitle == hasTranslatedTitle) {
+      errors += "Statistic must have exactly one title source: $statisticId"
+    }
+    if (titleSpec.translations.any { (locale, title) ->
+        !LOCALE_TAG.matches(locale) || title.isBlank() || title.length > MAX_TITLE_LENGTH
+      }
+    ) {
+      errors += "Statistic has an invalid translated title: $statisticId"
+    }
+  }
+
   private val StatisticSource.idPrefix: String
     get() = when (this) {
       StatisticSource.BUILTIN -> "builtin"
@@ -75,10 +135,11 @@ class ValidateStatisticCatalogUseCase {
     }
 
   private companion object {
-    const val ICON_ASSET_PREFIX = "statistics/"
+    const val ICON_ASSET_PREFIX = "icons/"
     const val MAX_ASSET_PATH_LENGTH = 160
     const val MAX_TITLE_LENGTH = 80
     val STATISTIC_ID = Regex("[a-z][a-z0-9]*(?:[.-][a-z0-9]+)+")
     val LOCALE_TAG = Regex("[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*")
+    val NATIVE_LIBRARY_NAME = Regex("[A-Za-z0-9._+-]{1,160}")
   }
 }

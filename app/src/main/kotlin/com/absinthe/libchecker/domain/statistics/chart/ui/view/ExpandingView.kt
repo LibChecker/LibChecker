@@ -10,6 +10,7 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.annotation.DrawableRes
 import androidx.core.view.isVisible
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDefinition
@@ -60,6 +61,12 @@ class ExpandingView @JvmOverloads constructor(
   fun setContent(statistic: StatisticDefinition, selected: Boolean) {
     val content = statistic.title.resolve(context)
     icon.loadStatisticIcon(statistic.icon, selected)
+    text.text = content
+    contentDescription = content
+  }
+
+  fun setActionContent(@DrawableRes iconRes: Int, content: CharSequence) {
+    icon.setImageResource(iconRes)
     text.text = content
     contentDescription = content
   }

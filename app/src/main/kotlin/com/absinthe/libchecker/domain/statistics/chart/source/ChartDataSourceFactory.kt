@@ -2,6 +2,7 @@ package com.absinthe.libchecker.domain.statistics.chart.source
 
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.statistics.chart.model.LOADING_PROGRESS_INFINITY
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticCalculationKind
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDefinition
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticNativeOperator
 import com.absinthe.libchecker.domain.statistics.chart.source.impl.AABChartDataSource
@@ -12,6 +13,7 @@ import com.absinthe.libchecker.domain.statistics.chart.source.impl.JetpackCompos
 import com.absinthe.libchecker.domain.statistics.chart.source.impl.KotlinChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.source.impl.MarketDistributionChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.source.impl.PageSize16KBChartDataSource
+import com.absinthe.libchecker.domain.statistics.chart.source.impl.PredicateStatisticChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildApiLevelChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildFeatureFlagChartDataUseCase
 import info.appdev.charting.charts.BarChart
@@ -22,6 +24,25 @@ internal class ChartDataSourceFactory(
 ) {
 
   fun create(
+    items: List<LCItem>,
+    statistic: StatisticDefinition,
+    useDetailedAbiChart: Boolean
+  ): ChartDataSourcePlan {
+    return when (statistic.calculation.kind) {
+      StatisticCalculationKind.NATIVE -> createNative(items, statistic, useDetailedAbiChart)
+
+      StatisticCalculationKind.PREDICATE -> ChartDataSourcePlan.Pie(
+        PredicateStatisticChartDataSource(
+          items = items,
+          predicate = checkNotNull(statistic.calculation.predicate),
+          icon = statistic.icon,
+          buildData = chartDataProvider::buildPredicateStatisticData
+        )
+      )
+    }
+  }
+
+  private fun createNative(
     items: List<LCItem>,
     statistic: StatisticDefinition,
     useDetailedAbiChart: Boolean

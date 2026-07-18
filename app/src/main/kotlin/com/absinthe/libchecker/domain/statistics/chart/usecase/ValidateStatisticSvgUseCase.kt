@@ -51,14 +51,14 @@ class ValidateStatisticSvgUseCase {
     return aspectRatio in MIN_ASPECT_RATIO..MAX_ASPECT_RATIO
   }
 
-  private companion object {
+  companion object {
     const val MAX_SVG_BYTES = 64 * 1024
-    const val MAX_TAG_COUNT = 512
-    const val MAX_VIEW_BOX_SIZE = 4096.0
-    const val MIN_ASPECT_RATIO = 0.5
-    const val MAX_ASPECT_RATIO = 2.0
-    val ALLOWED_TAGS = setOf("svg", "g", "path", "circle", "rect", "line", "polyline", "polygon", "ellipse")
-    val FORBIDDEN_CONTENT = listOf(
+    private const val MAX_TAG_COUNT = 512
+    private const val MAX_VIEW_BOX_SIZE = 4096.0
+    private const val MIN_ASPECT_RATIO = 0.5
+    private const val MAX_ASPECT_RATIO = 2.0
+    private val ALLOWED_TAGS = setOf("svg", "g", "path", "circle", "rect", "line", "polyline", "polygon", "ellipse")
+    private val FORBIDDEN_CONTENT = listOf(
       "<!doctype",
       "<!entity",
       "<?xml-stylesheet",
@@ -71,10 +71,10 @@ class ValidateStatisticSvgUseCase {
       "xlink:",
       "url("
     )
-    val TAG = Regex("<\\s*/?\\s*([A-Za-z][A-Za-z0-9:_-]*)\\b")
-    val SVG_START = Regex("<\\s*svg\\b[^>]*>", RegexOption.IGNORE_CASE)
-    val VIEW_BOX = Regex("\\bviewBox\\s*=\\s*[\"']([^\"']+)[\"']", RegexOption.IGNORE_CASE)
-    val EVENT_ATTRIBUTE = Regex("\\son[a-z]+\\s*=", RegexOption.IGNORE_CASE)
-    val VIEW_BOX_SEPARATOR = Regex("[\\s,]+")
+    private val TAG = Regex("<\\s*/?\\s*([A-Za-z][A-Za-z0-9:_-]*)\\b")
+    private val SVG_START = Regex("<\\s*svg\\b[^>]*>", RegexOption.IGNORE_CASE)
+    private val VIEW_BOX = Regex("\\bviewBox\\s*=\\s*[\"']([^\"']+)[\"']", RegexOption.IGNORE_CASE)
+    private val EVENT_ATTRIBUTE = Regex("\\son[a-z]+\\s*=", RegexOption.IGNORE_CASE)
+    private val VIEW_BOX_SEPARATOR = Regex("[\\s,]+")
   }
 }

@@ -13,6 +13,19 @@
   <!--  App list  -->
   <string name="menu_search">Search</string>
   <string name="menu_sort">Sort</string>
+  <string name="chart_statistics_add">Add statistics</string>
+  <string name="chart_statistics_edit">Edit statistics</string>
+  <string name="chart_statistics_added">Added</string>
+  <string name="chart_statistics_available">Available</string>
+  <string name="chart_statistics_loading_online">Loading online statistics…</string>
+  <string name="chart_statistics_online_error">Couldn’t load online statistics. Showing downloaded items.</string>
+  <string name="chart_statistics_no_available">No more statistics are available.</string>
+  <string name="chart_statistics_source_builtin">Built-in</string>
+  <string name="chart_statistics_source_online">Online</string>
+  <string name="chart_statistics_drag">Drag to reorder</string>
+  <string name="chart_statistics_drag_hint">Press and drag to reorder</string>
+  <string name="chart_statistics_remove_description">Remove %1$s</string>
+  <string name="chart_statistics_add_description">Add %1$s</string>
   <string name="menu_filter">Filter</string>
   <string name="search_hint">Search…</string>
   <string name="string_64_bit">64-bit</string>

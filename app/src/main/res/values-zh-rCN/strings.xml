@@ -13,6 +13,19 @@
   <!--  App list  -->
   <string name="menu_search">搜索</string>
   <string name="menu_sort">排序</string>
+  <string name="chart_statistics_add">添加统计项</string>
+  <string name="chart_statistics_edit">编辑统计项</string>
+  <string name="chart_statistics_added">已添加</string>
+  <string name="chart_statistics_available">可添加</string>
+  <string name="chart_statistics_loading_online">正在加载在线统计项…</string>
+  <string name="chart_statistics_online_error">无法加载在线统计项，已显示下载的内容。</string>
+  <string name="chart_statistics_no_available">没有更多可添加的统计项。</string>
+  <string name="chart_statistics_source_builtin">内置</string>
+  <string name="chart_statistics_source_online">在线</string>
+  <string name="chart_statistics_drag">拖动排序</string>
+  <string name="chart_statistics_drag_hint">拖动可调整顺序</string>
+  <string name="chart_statistics_remove_description">移除 %1$s</string>
+  <string name="chart_statistics_add_description">添加 %1$s</string>
   <string name="menu_filter">过滤</string>
   <string name="search_hint">搜索…</string>
   <string name="string_64_bit">64 位</string>
