@@ -45,7 +45,6 @@ object ShizukuManager {
   fun getAvailability(): Availability {
     return runCatching {
       when {
-        !isShizukuInstalled() && !isSui() -> Availability.NotInstalled
         !Shizuku.pingBinder() -> Availability.NotRunning
         Shizuku.getVersion() < MIN_VERSION -> Availability.LowVersion
         Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED -> Availability.PermissionDenied
@@ -135,13 +134,6 @@ object ShizukuManager {
       "System service not found: $name"
     }
     return ShizukuBinderWrapper(binder)
-  }
-
-  private fun isShizukuInstalled(): Boolean {
-    return runCatching {
-      SystemServices.packageManager.getPackageInfo(Constants.PackageNames.SHIZUKU, 0)
-      true
-    }.getOrDefault(false)
   }
 
   private fun isSui(): Boolean {
