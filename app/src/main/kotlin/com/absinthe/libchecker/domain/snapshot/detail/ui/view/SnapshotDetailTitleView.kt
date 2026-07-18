@@ -21,6 +21,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailCountRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailTitleRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.buildSnapshotDetailSignedCountText
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.resolveSnapshotDetailDividerColor
 import com.absinthe.libchecker.domain.snapshot.model.MOVED
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColor
@@ -67,7 +68,12 @@ class SnapshotDetailTitleView(context: Context) : AViewGroup(context) {
 
   private val divider = View(context).apply {
     layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 1.dp)
-    setBackgroundColor(context.getColorByAttr(MaterialR.attr.colorOutlineVariant))
+    setBackgroundColor(
+      resolveSnapshotDetailDividerColor(
+        surface = context.getColorByAttr(MaterialR.attr.colorSurface),
+        outlineVariant = context.getColorByAttr(MaterialR.attr.colorOutlineVariant)
+      )
+    )
     importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     addView(this)
   }
