@@ -4,8 +4,13 @@ import com.absinthe.libchecker.domain.statistics.chart.model.STATISTIC_SCHEMA_VE
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticBundle
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticCalculationKind
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticComparisonOperator
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticConditionSpec
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDexClassQuery
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDexMethodReference
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticEvidence
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticPredicateValue
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticSource
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticStringOperator
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticTitleSpec
 
 class ValidateStatisticCatalogUseCase {
@@ -66,33 +71,26 @@ class ValidateStatisticCatalogUseCase {
           } else {
             validateTitle(predicate.matchedTitle, definition.id, errors)
             validateTitle(predicate.unmatchedTitle, definition.id, errors)
-            val valueCount = listOfNotNull(
-              predicate.value.integer,
-              predicate.value.boolean,
-              predicate.value.string
+            val legacyPartCount = listOfNotNull(
+              predicate.evidence,
+              predicate.operator,
+              predicate.value
             ).size
-            if (valueCount != 1) {
-              errors += "Predicate statistic must have exactly one value: ${definition.id}"
-            }
-            when (predicate.evidence) {
-              StatisticEvidence.TARGET_SDK -> {
-                if (predicate.value.integer == null) {
-                  errors += "Target SDK predicate requires an integer value: ${definition.id}"
-                }
-                if (predicate.operator == StatisticComparisonOperator.CONTAINS) {
-                  errors += "Target SDK predicate requires a numeric operator: ${definition.id}"
-                }
-              }
+            val condition = when {
+              predicate.condition != null && legacyPartCount == 0 -> predicate.condition
 
-              StatisticEvidence.NATIVE_LIBRARY -> {
-                val libraryName = predicate.value.string
-                if (libraryName == null || !NATIVE_LIBRARY_NAME.matches(libraryName)) {
-                  errors += "Native library predicate requires a valid library name: ${definition.id}"
-                }
-                if (predicate.operator != StatisticComparisonOperator.CONTAINS) {
-                  errors += "Native library predicate requires the contains operator: ${definition.id}"
-                }
-              }
+              predicate.condition == null && legacyPartCount == 3 -> StatisticConditionSpec(
+                evidence = predicate.evidence,
+                operator = predicate.operator,
+                value = predicate.value
+              )
+
+              else -> null
+            }
+            if (condition == null) {
+              errors += "Predicate statistic must define exactly one complete condition: ${definition.id}"
+            } else {
+              validateCondition(condition, definition.id, errors)
             }
           }
         }
@@ -127,6 +125,184 @@ class ValidateStatisticCatalogUseCase {
     }
   }
 
+  private fun validateCondition(
+    condition: StatisticConditionSpec,
+    statisticId: String,
+    errors: MutableList<String>,
+    depth: Int = 1,
+    state: ConditionValidationState = ConditionValidationState()
+  ) {
+    state.nodes++
+    if (depth > MAX_CONDITION_DEPTH) {
+      if (!state.reportedDepth) {
+        errors += "Predicate condition exceeds maximum depth: $statisticId"
+        state.reportedDepth = true
+      }
+      return
+    }
+    if (state.nodes > MAX_CONDITION_NODES) {
+      if (!state.reportedNodes) {
+        errors += "Predicate condition has too many nodes: $statisticId"
+        state.reportedNodes = true
+      }
+      return
+    }
+
+    val hasLeaf = condition.evidence != null || condition.operator != null || condition.value != null
+    val kindCount = listOf(
+      hasLeaf,
+      condition.all != null,
+      condition.any != null,
+      condition.not != null
+    ).count { it }
+    if (kindCount != 1) {
+      errors += "Predicate condition must define exactly one operation: $statisticId"
+      return
+    }
+    if (hasLeaf) {
+      val evidence = condition.evidence
+      val operator = condition.operator
+      val value = condition.value
+      if (evidence == null || operator == null || value == null) {
+        errors += "Predicate evidence condition is incomplete: $statisticId"
+      } else {
+        validateEvidence(evidence, operator, value, statisticId, errors)
+      }
+      return
+    }
+
+    val children = condition.all ?: condition.any
+    if (children != null) {
+      if (children.isEmpty() || children.size > MAX_CONDITION_CHILDREN) {
+        errors += "Predicate logical condition has an invalid child count: $statisticId"
+        return
+      }
+      children.forEach { validateCondition(it, statisticId, errors, depth + 1, state) }
+      return
+    }
+    validateCondition(checkNotNull(condition.not), statisticId, errors, depth + 1, state)
+  }
+
+  private fun validateEvidence(
+    evidence: StatisticEvidence,
+    operator: StatisticComparisonOperator,
+    value: StatisticPredicateValue,
+    statisticId: String,
+    errors: MutableList<String>
+  ) {
+    val valueCount = listOfNotNull(
+      value.integer,
+      value.boolean,
+      value.string,
+      value.strings,
+      value.dexClasses
+    ).size
+    if (valueCount != 1) {
+      errors += "Predicate evidence must have exactly one value: $statisticId"
+    }
+    when (evidence) {
+      StatisticEvidence.TARGET_SDK -> {
+        if (value.integer == null) {
+          errors += "Target SDK predicate requires an integer value: $statisticId"
+        }
+        if (
+          operator !in setOf(
+            StatisticComparisonOperator.EQUAL,
+            StatisticComparisonOperator.GREATER_THAN_OR_EQUAL,
+            StatisticComparisonOperator.LESS_THAN_OR_EQUAL
+          )
+        ) {
+          errors += "Target SDK predicate requires a numeric operator: $statisticId"
+        }
+      }
+
+      StatisticEvidence.NATIVE_LIBRARY -> {
+        val libraryName = value.string
+        if (libraryName == null || !NATIVE_LIBRARY_NAME.matches(libraryName)) {
+          errors += "Native library predicate requires a valid library name: $statisticId"
+        }
+        if (operator != StatisticComparisonOperator.CONTAINS) {
+          errors += "Native library predicate requires the contains operator: $statisticId"
+        }
+      }
+
+      StatisticEvidence.DEX_CLASS -> {
+        val queries = value.dexClasses
+        if (queries == null || queries.isEmpty() || queries.size > MAX_DEX_CLASS_QUERIES) {
+          errors += "DEX class predicate requires valid class queries: $statisticId"
+        } else {
+          queries.forEach { validateDexClassQuery(it, statisticId, errors) }
+        }
+        if (operator != StatisticComparisonOperator.CONTAINS_ANY) {
+          errors += "DEX class predicate requires the contains_any operator: $statisticId"
+        }
+      }
+
+      StatisticEvidence.MANIFEST_RECEIVER_ACTION -> {
+        val actions = value.strings
+        if (
+          actions == null || actions.isEmpty() || actions.size > MAX_STRING_VALUES ||
+          actions.any { !MANIFEST_ACTION.matches(it) }
+        ) {
+          errors += "Manifest receiver action predicate requires valid actions: $statisticId"
+        }
+        if (operator != StatisticComparisonOperator.CONTAINS_ANY) {
+          errors += "Manifest receiver action predicate requires the contains_any operator: $statisticId"
+        }
+      }
+    }
+  }
+
+  private fun validateDexClassQuery(
+    query: StatisticDexClassQuery,
+    statisticId: String,
+    errors: MutableList<String>
+  ) {
+    if (query.name == null && query.stringConstants.isEmpty() && query.methodReferences.isEmpty()) {
+      errors += "DEX class query must define at least one constraint: $statisticId"
+    }
+    query.name?.let { pattern ->
+      if (!DEX_CLASS_PATTERN.matches(pattern.value)) {
+        errors += "DEX class query has an invalid class pattern: $statisticId"
+      }
+      if (pattern.operator == StatisticStringOperator.EQUAL && !pattern.value.endsWith(';')) {
+        errors += "Exact DEX class query must use a complete descriptor: $statisticId"
+      }
+    }
+    if (
+      query.stringConstants.size > MAX_STRING_VALUES ||
+      query.stringConstants.any { !isSafeDexString(it) }
+    ) {
+      errors += "DEX class query has invalid string constants: $statisticId"
+    }
+    if (query.methodReferences.size > MAX_METHOD_REFERENCES) {
+      errors += "DEX class query has too many method references: $statisticId"
+    }
+    query.methodReferences.forEach { validateMethodReference(it, statisticId, errors) }
+  }
+
+  private fun validateMethodReference(
+    reference: StatisticDexMethodReference,
+    statisticId: String,
+    errors: MutableList<String>
+  ) {
+    if (!DEX_CLASS_DESCRIPTOR.matches(reference.definingClass) || !DEX_METHOD_NAME.matches(reference.name)) {
+      errors += "DEX class query has an invalid method reference: $statisticId"
+    }
+    if (
+      reference.parameterTypes?.let { parameters ->
+        parameters.size > MAX_METHOD_PARAMETERS || parameters.any { !DEX_PARAMETER_TYPE.matches(it) }
+      } == true
+    ) {
+      errors += "DEX class query has invalid method parameter types: $statisticId"
+    }
+  }
+
+  private fun isSafeDexString(value: String): Boolean {
+    return value.isNotEmpty() && value.length <= MAX_EVIDENCE_STRING_LENGTH &&
+      value.all { it >= ' ' && it != '\u007f' }
+  }
+
   private val StatisticSource.idPrefix: String
     get() = when (this) {
       StatisticSource.BUILTIN -> "builtin"
@@ -138,8 +314,27 @@ class ValidateStatisticCatalogUseCase {
     const val ICON_ASSET_PREFIX = "icons/"
     const val MAX_ASSET_PATH_LENGTH = 160
     const val MAX_TITLE_LENGTH = 80
+    const val MAX_EVIDENCE_STRING_LENGTH = 160
+    const val MAX_CONDITION_DEPTH = 8
+    const val MAX_CONDITION_NODES = 64
+    const val MAX_CONDITION_CHILDREN = 16
+    const val MAX_DEX_CLASS_QUERIES = 16
+    const val MAX_STRING_VALUES = 16
+    const val MAX_METHOD_REFERENCES = 16
+    const val MAX_METHOD_PARAMETERS = 16
     val STATISTIC_ID = Regex("[a-z][a-z0-9]*(?:[.-][a-z0-9]+)+")
     val LOCALE_TAG = Regex("[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*")
     val NATIVE_LIBRARY_NAME = Regex("[A-Za-z0-9._+-]{1,160}")
+    val MANIFEST_ACTION = Regex("[A-Za-z0-9_.-]{1,160}")
+    val DEX_CLASS_PATTERN = Regex("L[A-Za-z0-9_$/-]{1,158};?")
+    val DEX_CLASS_DESCRIPTOR = Regex("L[A-Za-z0-9_$/-]{1,158};")
+    val DEX_METHOD_NAME = Regex("[A-Za-z0-9_$<>-]{1,80}")
+    val DEX_PARAMETER_TYPE = Regex("\\[*[ZBSCIJFD]|\\[*L[A-Za-z0-9_$/-]{1,158};")
   }
+
+  private data class ConditionValidationState(
+    var nodes: Int = 0,
+    var reportedDepth: Boolean = false,
+    var reportedNodes: Boolean = false
+  )
 }

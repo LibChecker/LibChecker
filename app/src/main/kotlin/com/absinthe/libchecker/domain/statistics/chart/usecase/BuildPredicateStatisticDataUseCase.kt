@@ -2,8 +2,10 @@ package com.absinthe.libchecker.domain.statistics.chart.usecase
 
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticComparisonOperator
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticConditionSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticEvidence
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticPredicateSpec
+import com.absinthe.libchecker.domain.statistics.chart.repository.StatisticArtifactQuery
 import com.absinthe.libchecker.domain.statistics.chart.repository.StatisticEvidenceRepository
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
@@ -25,11 +27,16 @@ class BuildPredicateStatisticDataUseCase(
     val unmatched = mutableListOf<LCItem>()
     val coroutineContext = currentCoroutineContext()
     val itemCount = targets.size
+    val condition = request.predicate.condition ?: StatisticConditionSpec(
+      evidence = request.predicate.evidence,
+      operator = request.predicate.operator,
+      value = request.predicate.value
+    )
     var progress = 0
 
     targets.forEachIndexed { index, item ->
       if (!coroutineContext.isActive) return null
-      if (item.matches(request.predicate)) {
+      if (item.matches(condition)) {
         matched += item
       } else {
         unmatched += item
@@ -45,17 +52,34 @@ class BuildPredicateStatisticDataUseCase(
     return PredicateStatisticData(matched, unmatched)
   }
 
-  private fun LCItem.matches(predicate: StatisticPredicateSpec): Boolean {
-    return when (predicate.evidence) {
+  private fun LCItem.matches(condition: StatisticConditionSpec): Boolean {
+    condition.all?.let { return it.all { child -> matches(child) } }
+    condition.any?.let { return it.any { child -> matches(child) } }
+    condition.not?.let { return !matches(it) }
+
+    val evidence = checkNotNull(condition.evidence)
+    val operator = checkNotNull(condition.operator)
+    val value = checkNotNull(condition.value)
+    return when (evidence) {
       StatisticEvidence.TARGET_SDK -> compare(
         actual = targetApi.toLong(),
-        expected = checkNotNull(predicate.value.integer),
-        operator = predicate.operator
+        expected = checkNotNull(value.integer),
+        operator = operator
       )
 
-      StatisticEvidence.NATIVE_LIBRARY -> evidenceRepository.hasNativeLibrary(
+      StatisticEvidence.NATIVE_LIBRARY -> evidenceRepository.matches(
         packageName = packageName,
-        libraryName = checkNotNull(predicate.value.string)
+        query = StatisticArtifactQuery.NativeLibrary(checkNotNull(value.string))
+      )
+
+      StatisticEvidence.DEX_CLASS -> evidenceRepository.matches(
+        packageName = packageName,
+        query = StatisticArtifactQuery.DexClasses(checkNotNull(value.dexClasses))
+      )
+
+      StatisticEvidence.MANIFEST_RECEIVER_ACTION -> evidenceRepository.matches(
+        packageName = packageName,
+        query = StatisticArtifactQuery.ManifestReceiverActions(checkNotNull(value.strings))
       )
     }
   }
@@ -70,6 +94,7 @@ class BuildPredicateStatisticDataUseCase(
       StatisticComparisonOperator.GREATER_THAN_OR_EQUAL -> actual >= expected
       StatisticComparisonOperator.LESS_THAN_OR_EQUAL -> actual <= expected
       StatisticComparisonOperator.CONTAINS -> false
+      StatisticComparisonOperator.CONTAINS_ANY -> false
     }
   }
 

@@ -4,13 +4,17 @@ import com.absinthe.libchecker.domain.statistics.chart.model.StatisticBundle
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticCalculationKind
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticCalculationSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticComparisonOperator
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticConditionSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDefinition
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDexClassQuery
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticEvidence
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticIconSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticPredicateSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticPredicateValue
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticRemoteManifest
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticSource
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticStringOperator
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticStringPattern
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticTitleSpec
 import com.absinthe.libchecker.domain.statistics.chart.usecase.ValidateStatisticCatalogUseCase
 import com.absinthe.libchecker.domain.statistics.chart.usecase.ValidateStatisticSvgUseCase
@@ -63,6 +67,51 @@ class OfficialStatisticBundleStoreTest {
   }
 
   @Test
+  fun `installs and reloads a recursive artifact condition`() {
+    val definition = officialDefinition().copy(
+      id = "official.artifact-evidence",
+      calculation = StatisticCalculationSpec(
+        kind = StatisticCalculationKind.PREDICATE,
+        predicate = StatisticPredicateSpec(
+          condition = StatisticConditionSpec(
+            any = listOf(
+              StatisticConditionSpec(
+                evidence = StatisticEvidence.DEX_CLASS,
+                operator = StatisticComparisonOperator.CONTAINS_ANY,
+                value = StatisticPredicateValue(
+                  dexClasses = listOf(
+                    StatisticDexClassQuery(
+                      name = StatisticStringPattern(
+                        operator = StatisticStringOperator.STARTS_WITH,
+                        value = "Lcom/example/"
+                      )
+                    )
+                  )
+                )
+              ),
+              StatisticConditionSpec(
+                evidence = StatisticEvidence.MANIFEST_RECEIVER_ACTION,
+                operator = StatisticComparisonOperator.CONTAINS_ANY,
+                value = StatisticPredicateValue(strings = listOf("com.example.ACTION"))
+              )
+            )
+          ),
+          matchedTitle = StatisticTitleSpec(translations = mapOf("en" to "Matched")),
+          unmatchedTitle = StatisticTitleSpec(translations = mapOf("en" to "Other"))
+        )
+      )
+    )
+    val store = createStore()
+    val bundleFile = createBundle(VALID_SVG, definition = definition)
+
+    val installed = store.install(manifestFor(bundleFile), bundleFile)
+    val cached = store.loadCachedStatistics()
+
+    assertEquals(listOf("official.artifact-evidence"), installed.map { it.id })
+    assertNotNull(cached.single().calculation.predicate?.condition?.any)
+  }
+
+  @Test
   fun `rejects a digest mismatch`() {
     val store = createStore()
     val bundleFile = createBundle(VALID_SVG)
@@ -99,11 +148,12 @@ class OfficialStatisticBundleStoreTest {
   private fun createBundle(
     svg: String,
     name: String = "chart.bundle",
-    includeSecondIcon: Boolean = false
+    includeSecondIcon: Boolean = false,
+    definition: StatisticDefinition = officialDefinition()
   ): File {
     val file = temporaryFolder.newFile(name)
     val definitions = buildList {
-      add(officialDefinition())
+      add(definition)
       if (includeSecondIcon) {
         add(
           officialDefinition().copy(

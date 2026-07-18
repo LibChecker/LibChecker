@@ -4,7 +4,10 @@ import com.absinthe.libchecker.domain.statistics.chart.model.StatisticBundle
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticCalculationKind
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticCalculationSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticComparisonOperator
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticConditionSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDefinition
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDexClassQuery
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDexMethodReference
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDrawableIcon
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticEvidence
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticIconSpec
@@ -12,6 +15,8 @@ import com.absinthe.libchecker.domain.statistics.chart.model.StatisticNativeOper
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticPredicateSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticPredicateValue
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticSource
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticStringOperator
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticStringPattern
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticTitleResource
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticTitleSpec
 import org.junit.Assert.assertTrue
@@ -78,6 +83,77 @@ class ValidateStatisticCatalogUseCaseTest {
 
     assertTrue(errors.any { it.startsWith("Native library predicate requires a valid library name") })
     assertTrue(errors.any { it.startsWith("Native library predicate requires the contains operator") })
+  }
+
+  @Test
+  fun `accepts composite DEX and manifest evidence without app-specific keys`() {
+    val definition = officialDefinition().copy(
+      id = "official.artifact-evidence",
+      calculation = StatisticCalculationSpec(
+        kind = StatisticCalculationKind.PREDICATE,
+        predicate = StatisticPredicateSpec(
+          condition = StatisticConditionSpec(
+            any = listOf(
+              StatisticConditionSpec(
+                evidence = StatisticEvidence.DEX_CLASS,
+                operator = StatisticComparisonOperator.CONTAINS_ANY,
+                value = StatisticPredicateValue(
+                  dexClasses = listOf(
+                    StatisticDexClassQuery(
+                      name = StatisticStringPattern(
+                        operator = StatisticStringOperator.STARTS_WITH,
+                        value = "Lcom/example/"
+                      ),
+                      stringConstants = listOf("com.example.ACTION"),
+                      methodReferences = listOf(
+                        StatisticDexMethodReference(
+                          definingClass = "Landroid/content/IntentFilter;",
+                          name = "addAction"
+                        )
+                      )
+                    )
+                  )
+                )
+              ),
+              StatisticConditionSpec(
+                evidence = StatisticEvidence.MANIFEST_RECEIVER_ACTION,
+                operator = StatisticComparisonOperator.CONTAINS_ANY,
+                value = StatisticPredicateValue(strings = listOf("com.example.ACTION"))
+              )
+            )
+          ),
+          matchedTitle = StatisticTitleSpec(translations = mapOf("en" to "Matched")),
+          unmatchedTitle = StatisticTitleSpec(translations = mapOf("en" to "Other"))
+        )
+      )
+    )
+
+    val errors = validate(StatisticBundle(1, listOf(definition)))
+
+    assertTrue(errors.toString(), errors.isEmpty())
+  }
+
+  @Test
+  fun `rejects unconstrained DEX class evidence`() {
+    val definition = officialDefinition().copy(
+      id = "official.unconstrained-dex",
+      calculation = StatisticCalculationSpec(
+        kind = StatisticCalculationKind.PREDICATE,
+        predicate = StatisticPredicateSpec(
+          condition = StatisticConditionSpec(
+            evidence = StatisticEvidence.DEX_CLASS,
+            operator = StatisticComparisonOperator.CONTAINS_ANY,
+            value = StatisticPredicateValue(dexClasses = listOf(StatisticDexClassQuery()))
+          ),
+          matchedTitle = StatisticTitleSpec(translations = mapOf("en" to "Matched")),
+          unmatchedTitle = StatisticTitleSpec(translations = mapOf("en" to "Other"))
+        )
+      )
+    )
+
+    val errors = validate(StatisticBundle(1, listOf(definition)))
+
+    assertTrue(errors.any { it.startsWith("DEX class query must define at least one constraint") })
   }
 
   @Test

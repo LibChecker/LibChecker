@@ -52,18 +52,51 @@ data class StatisticCalculationSpec(
 
 @JsonClass(generateAdapter = true)
 data class StatisticPredicateSpec(
-  val evidence: StatisticEvidence,
-  val operator: StatisticComparisonOperator,
-  val value: StatisticPredicateValue,
   val matchedTitle: StatisticTitleSpec,
-  val unmatchedTitle: StatisticTitleSpec
+  val unmatchedTitle: StatisticTitleSpec,
+  val evidence: StatisticEvidence? = null,
+  val operator: StatisticComparisonOperator? = null,
+  val value: StatisticPredicateValue? = null,
+  val condition: StatisticConditionSpec? = null
+)
+
+@JsonClass(generateAdapter = true)
+data class StatisticConditionSpec(
+  val evidence: StatisticEvidence? = null,
+  val operator: StatisticComparisonOperator? = null,
+  val value: StatisticPredicateValue? = null,
+  val all: List<StatisticConditionSpec>? = null,
+  val any: List<StatisticConditionSpec>? = null,
+  val not: StatisticConditionSpec? = null
 )
 
 @JsonClass(generateAdapter = true)
 data class StatisticPredicateValue(
   val integer: Long? = null,
   val boolean: Boolean? = null,
-  val string: String? = null
+  val string: String? = null,
+  val strings: List<String>? = null,
+  val dexClasses: List<StatisticDexClassQuery>? = null
+)
+
+@JsonClass(generateAdapter = true)
+data class StatisticDexClassQuery(
+  val name: StatisticStringPattern? = null,
+  val stringConstants: List<String> = emptyList(),
+  val methodReferences: List<StatisticDexMethodReference> = emptyList()
+)
+
+@JsonClass(generateAdapter = true)
+data class StatisticStringPattern(
+  val operator: StatisticStringOperator,
+  val value: String
+)
+
+@JsonClass(generateAdapter = true)
+data class StatisticDexMethodReference(
+  val definingClass: String,
+  val name: String,
+  val parameterTypes: List<String>? = null
 )
 
 enum class StatisticSource {
@@ -173,7 +206,13 @@ enum class StatisticEvidence {
   TARGET_SDK,
 
   @Json(name = "native_library")
-  NATIVE_LIBRARY
+  NATIVE_LIBRARY,
+
+  @Json(name = "dex_class")
+  DEX_CLASS,
+
+  @Json(name = "manifest_receiver_action")
+  MANIFEST_RECEIVER_ACTION
 }
 
 enum class StatisticComparisonOperator {
@@ -187,7 +226,18 @@ enum class StatisticComparisonOperator {
   LESS_THAN_OR_EQUAL,
 
   @Json(name = "contains")
-  CONTAINS
+  CONTAINS,
+
+  @Json(name = "contains_any")
+  CONTAINS_ANY
+}
+
+enum class StatisticStringOperator {
+  @Json(name = "equal")
+  EQUAL,
+
+  @Json(name = "starts_with")
+  STARTS_WITH
 }
 
 enum class StatisticNativeOperator {

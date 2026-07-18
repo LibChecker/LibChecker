@@ -2,10 +2,15 @@ package com.absinthe.libchecker.domain.statistics.chart.usecase
 
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticComparisonOperator
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticConditionSpec
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDexClassQuery
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticEvidence
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticPredicateSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticPredicateValue
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticStringOperator
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticStringPattern
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticTitleSpec
+import com.absinthe.libchecker.domain.statistics.chart.repository.StatisticArtifactQuery
 import com.absinthe.libchecker.domain.statistics.chart.repository.StatisticEvidenceRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -13,11 +18,11 @@ import org.junit.Test
 
 class BuildPredicateStatisticDataUseCaseTest {
 
-  private val nativeLibraries = mutableMapOf<String, Set<String>>()
+  private val artifactMatches = mutableMapOf<String, MutableSet<StatisticArtifactQuery>>()
   private val useCase = BuildPredicateStatisticDataUseCase(
     object : StatisticEvidenceRepository {
-      override fun hasNativeLibrary(packageName: String, libraryName: String): Boolean {
-        return libraryName in nativeLibraries[packageName].orEmpty()
+      override fun matches(packageName: String, query: StatisticArtifactQuery): Boolean {
+        return query in artifactMatches[packageName].orEmpty()
       }
     }
   )
@@ -62,8 +67,11 @@ class BuildPredicateStatisticDataUseCaseTest {
 
   @Test
   fun `classifies native library evidence`() = runBlocking {
-    nativeLibraries["flutter"] = setOf("libflutter.so", "libapp.so")
-    nativeLibraries["native"] = setOf("libnative.so")
+    artifactMatches["flutter"] = mutableSetOf(
+      StatisticArtifactQuery.NativeLibrary("libflutter.so"),
+      StatisticArtifactQuery.NativeLibrary("libapp.so")
+    )
+    artifactMatches["native"] = mutableSetOf(StatisticArtifactQuery.NativeLibrary("libnative.so"))
     val result = useCase(
       BuildPredicateStatisticDataUseCase.Request(
         items = listOf(item("flutter", targetApi = 35), item("native", targetApi = 35)),
@@ -80,6 +88,53 @@ class BuildPredicateStatisticDataUseCaseTest {
 
     assertEquals(listOf("flutter"), result?.matched?.map { it.packageName })
     assertEquals(listOf("native"), result?.unmatched?.map { it.packageName })
+  }
+
+  @Test
+  fun `combines generic artifact evidence from a remote condition`() = runBlocking {
+    val dexQueries = listOf(
+      StatisticDexClassQuery(
+        name = StatisticStringPattern(
+          operator = StatisticStringOperator.STARTS_WITH,
+          value = "Lcom/example/"
+        )
+      )
+    )
+    artifactMatches["dex"] = mutableSetOf(StatisticArtifactQuery.DexClasses(dexQueries))
+    artifactMatches["manifest"] = mutableSetOf(
+      StatisticArtifactQuery.ManifestReceiverActions(listOf("com.example.ACTION"))
+    )
+    val result = useCase(
+      BuildPredicateStatisticDataUseCase.Request(
+        items = listOf(
+          item("dex", targetApi = 35),
+          item("manifest", targetApi = 35),
+          item("other", targetApi = 35)
+        ),
+        predicate = StatisticPredicateSpec(
+          condition = StatisticConditionSpec(
+            any = listOf(
+              StatisticConditionSpec(
+                evidence = StatisticEvidence.DEX_CLASS,
+                operator = StatisticComparisonOperator.CONTAINS_ANY,
+                value = StatisticPredicateValue(dexClasses = dexQueries)
+              ),
+              StatisticConditionSpec(
+                evidence = StatisticEvidence.MANIFEST_RECEIVER_ACTION,
+                operator = StatisticComparisonOperator.CONTAINS_ANY,
+                value = StatisticPredicateValue(strings = listOf("com.example.ACTION"))
+              )
+            )
+          ),
+          matchedTitle = StatisticTitleSpec(translations = mapOf("en" to "Matched")),
+          unmatchedTitle = StatisticTitleSpec(translations = mapOf("en" to "Other"))
+        ),
+        showSystemApps = true
+      )
+    )
+
+    assertEquals(listOf("dex", "manifest"), result?.matched?.map { it.packageName })
+    assertEquals(listOf("other"), result?.unmatched?.map { it.packageName })
   }
 
   @Test
