@@ -5,10 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.repository.AppListRepository
-import com.absinthe.libchecker.domain.statistics.chart.model.ChartType
 import com.absinthe.libchecker.domain.statistics.chart.model.ClassifyDialogState
 import com.absinthe.libchecker.domain.statistics.chart.model.LOADING_PROGRESS_MAX
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticControl
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDefinition
 import com.absinthe.libchecker.domain.statistics.chart.repository.ChartSettingsRepository
+import com.absinthe.libchecker.domain.statistics.chart.repository.StatisticCatalogRepository
 import com.absinthe.libchecker.domain.statistics.chart.source.BaseVariableChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.source.ChartDataProvider
 import com.absinthe.libchecker.domain.statistics.chart.source.ChartDataSourceFactory
@@ -25,18 +27,23 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class ChartViewModel internal constructor(
   appListRepository: AppListRepository,
   private val chartDataProvider: ChartDataProvider,
   private val chartDataSourceFactory: ChartDataSourceFactory,
+  private val statisticCatalogRepository: StatisticCatalogRepository,
   private val chartSettingsRepository: ChartSettingsRepository,
   private val observeChartFeatureInitializationPlans: ObserveChartFeatureInitializationPlansUseCase,
   private val buildAndroidVersionLabelDisplayData: BuildAndroidVersionLabelDisplayDataUseCase
 ) : ViewModel() {
   private val chartUiStatePlanner = ChartUiStatePlanner()
-  private var selectedChartType = ChartType.ABI
+  private var selectedStatisticId: String? = null
   private var featureInitializationPending = observeChartFeatureInitializationPlans.initialPending
+
+  private val _statisticDefinitions = MutableStateFlow<List<StatisticDefinition>>(emptyList())
+  val statisticDefinitions = _statisticDefinitions.asStateFlow()
 
   private val appListItemsState = appListRepository.items
     .map<List<LCItem>, List<LCItem>?> { it }
@@ -48,8 +55,8 @@ class ChartViewModel internal constructor(
   val appListItems: Flow<List<LCItem>> = appListItemsState.filterNotNull()
   val featureInitializationPlans: Flow<ChartFeatureInitializationPlan> =
     observeChartFeatureInitializationPlans(appListItemsState)
-  val currentChartType: ChartType
-    get() = selectedChartType
+  val currentStatistic: StatisticDefinition?
+    get() = _statisticDefinitions.value.find { it.id == selectedStatisticId }
 
   private val _loadingProgress = MutableStateFlow(LOADING_PROGRESS_MAX)
   val loadingProgress = _loadingProgress.asStateFlow()
@@ -68,6 +75,13 @@ class ChartViewModel internal constructor(
 
   private val _detailAbiSwitchVisibility = MutableStateFlow(true)
   val detailAbiSwitchVisibility = _detailAbiSwitchVisibility.asStateFlow()
+
+  init {
+    viewModelScope.launch {
+      _statisticDefinitions.value = statisticCatalogRepository.getStatistics()
+      createStatisticSelectorPlan()
+    }
+  }
 
   fun setLoadingProgress(progress: Int, allowDecrease: Boolean = false) {
     val currentProgress = _loadingProgress.value
@@ -91,23 +105,26 @@ class ChartViewModel internal constructor(
 
   fun updateFeatureInitializationPlan(
     plan: ChartFeatureInitializationPlan
-  ): ChartTypeSelectorPlan {
+  ): StatisticSelectorPlan {
     featureInitializationPending = plan.isPending
-    return createChartTypeSelectorPlan()
+    return createStatisticSelectorPlan()
   }
 
-  fun selectChartType(chartType: ChartType): ChartTypeSelectorPlan {
-    selectedChartType = chartType
-    return createChartTypeSelectorPlan()
+  fun selectStatistic(statistic: StatisticDefinition): StatisticSelectorPlan {
+    selectedStatisticId = statistic.id
+    return createStatisticSelectorPlan()
   }
 
-  fun createChartTypeSelectorPlan(): ChartTypeSelectorPlan {
-    val plan = chartUiStatePlanner.planChartTypes(
-      currentChartType = selectedChartType,
+  fun createStatisticSelectorPlan(): StatisticSelectorPlan {
+    val plan = chartUiStatePlanner.planStatistics(
+      definitions = _statisticDefinitions.value,
+      currentStatisticId = selectedStatisticId,
       featureChartsAvailable = !featureInitializationPending
     )
-    selectedChartType = plan.selectedType
-    setDetailAbiSwitchVisibility(selectedChartType == ChartType.ABI)
+    selectedStatisticId = plan.selectedStatistic?.id
+    setDetailAbiSwitchVisibility(
+      plan.selectedStatistic?.hasControl(StatisticControl.DETAILED_ABI) == true
+    )
     return plan
   }
 
@@ -119,12 +136,16 @@ class ChartViewModel internal constructor(
 
   internal fun createChartDataSourcePlan(
     items: List<LCItem>,
-    chartType: ChartType = currentChartType
+    statistic: StatisticDefinition = checkNotNull(currentStatistic) {
+      "Statistic catalog has not been loaded"
+    }
   ): ChartDataSourcePlan {
-    val selectedType = selectChartType(chartType).selectedType
+    val selectedStatistic = checkNotNull(selectStatistic(statistic).selectedStatistic) {
+      "Statistic ${statistic.id} is not available"
+    }
     return chartDataSourceFactory.create(
       items = items,
-      chartType = selectedType,
+      statistic = selectedStatistic,
       useDetailedAbiChart = isDetailedAbiChart
     )
   }

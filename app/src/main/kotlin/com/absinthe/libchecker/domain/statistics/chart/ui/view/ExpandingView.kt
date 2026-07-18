@@ -12,6 +12,9 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.isVisible
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDefinition
+import com.absinthe.libchecker.domain.statistics.chart.ui.loadStatisticIcon
+import com.absinthe.libchecker.domain.statistics.chart.ui.resolve
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libraries.utils.extensions.paddingEndCompat
@@ -54,8 +57,9 @@ class ExpandingView @JvmOverloads constructor(
     addView(text)
   }
 
-  fun setContent(iconRes: Int, content: String) {
-    icon.setImageResource(iconRes)
+  fun setContent(statistic: StatisticDefinition, selected: Boolean) {
+    val content = statistic.title.resolve(context)
+    icon.loadStatisticIcon(statistic.icon, selected)
     text.text = content
     contentDescription = content
   }

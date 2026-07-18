@@ -1,8 +1,9 @@
 package com.absinthe.libchecker.domain.statistics.chart.source
 
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.statistics.chart.model.ChartType
 import com.absinthe.libchecker.domain.statistics.chart.model.LOADING_PROGRESS_INFINITY
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDefinition
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticNativeOperator
 import com.absinthe.libchecker.domain.statistics.chart.source.impl.AABChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.source.impl.ABIChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.source.impl.ApiLevelChartDataSource
@@ -22,11 +23,11 @@ internal class ChartDataSourceFactory(
 
   fun create(
     items: List<LCItem>,
-    chartType: ChartType,
+    statistic: StatisticDefinition,
     useDetailedAbiChart: Boolean
   ): ChartDataSourcePlan {
-    return when (chartType) {
-      ChartType.ABI -> {
+    return when (statistic.calculation.nativeOperator) {
+      StatisticNativeOperator.ABI -> {
         if (useDetailedAbiChart) {
           ChartDataSourcePlan.Bar(
             DetailedABIChartDataSource(items, chartDataProvider::buildDetailedAbiChartData)
@@ -38,7 +39,7 @@ internal class ChartDataSourceFactory(
         }
       }
 
-      ChartType.KOTLIN -> {
+      StatisticNativeOperator.KOTLIN -> {
         ChartDataSourcePlan.Pie(
           KotlinChartDataSource(items) { chartItems ->
             chartDataProvider.buildFeatureFlagChartData(
@@ -49,7 +50,7 @@ internal class ChartDataSourceFactory(
         )
       }
 
-      ChartType.TARGET_SDK -> {
+      StatisticNativeOperator.TARGET_SDK -> {
         ChartDataSourcePlan.Bar(
           ApiLevelChartDataSource(
             items,
@@ -59,7 +60,7 @@ internal class ChartDataSourceFactory(
         )
       }
 
-      ChartType.MIN_SDK -> {
+      StatisticNativeOperator.MIN_SDK -> {
         ChartDataSourcePlan.Bar(
           ApiLevelChartDataSource(
             items,
@@ -69,7 +70,7 @@ internal class ChartDataSourceFactory(
         )
       }
 
-      ChartType.COMPILE_SDK -> {
+      StatisticNativeOperator.COMPILE_SDK -> {
         ChartDataSourcePlan.Bar(
           ApiLevelChartDataSource(
             items,
@@ -79,7 +80,7 @@ internal class ChartDataSourceFactory(
         )
       }
 
-      ChartType.JETPACK_COMPOSE -> {
+      StatisticNativeOperator.JETPACK_COMPOSE -> {
         ChartDataSourcePlan.Pie(
           JetpackComposeChartDataSource(items) { chartItems ->
             chartDataProvider.buildFeatureFlagChartData(
@@ -90,13 +91,13 @@ internal class ChartDataSourceFactory(
         )
       }
 
-      ChartType.MARKET_DISTRIBUTION -> {
+      StatisticNativeOperator.ANDROID_DISTRIBUTION -> {
         ChartDataSourcePlan.Bar(
           MarketDistributionChartDataSource(items, chartDataProvider::getAndroidDistribution)
         )
       }
 
-      ChartType.AAB -> {
+      StatisticNativeOperator.APP_BUNDLE -> {
         ChartDataSourcePlan.Pie(
           AABChartDataSource(items) { chartItems ->
             chartDataProvider.buildFeatureFlagChartData(
@@ -107,11 +108,13 @@ internal class ChartDataSourceFactory(
         )
       }
 
-      ChartType.SUPPORT_16KB -> {
+      StatisticNativeOperator.PAGE_SIZE_16_KB -> {
         ChartDataSourcePlan.Pie(
           PageSize16KBChartDataSource(items, chartDataProvider::buildPageSize16KBChartData)
         )
       }
+
+      null -> error("Statistic ${statistic.id} does not define a native operator")
     }
   }
 }

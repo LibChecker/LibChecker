@@ -137,6 +137,7 @@ dependencies {
   implementation(libs.bundles.androidX.room3)
   implementation(libs.google.material)
   implementation(libs.coil)
+  implementation(libs.coil.svg)
   implementation(libs.square.okHttp)
   implementation(libs.square.okio)
   implementation(libs.square.retrofit)
