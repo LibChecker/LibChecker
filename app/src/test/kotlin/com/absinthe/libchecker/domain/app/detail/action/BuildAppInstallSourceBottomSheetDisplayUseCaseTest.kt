@@ -65,12 +65,8 @@ class BuildAppInstallSourceBottomSheetDisplayUseCaseTest {
   @Test
   fun `maps every unavailable requester state to its prompt action`() {
     val expectedActions = mapOf(
-      AppInstallSourceRequesterAccess.ShizukuNotInstalled to
-        AppInstallSourceAction.OpenShizukuReleasePage,
-      AppInstallSourceRequesterAccess.ShizukuNotRunning to
-        AppInstallSourceAction.LaunchShizuku,
-      AppInstallSourceRequesterAccess.ShizukuLowVersion to
-        AppInstallSourceAction.OpenShizukuReleasePage,
+      AppInstallSourceRequesterAccess.ShizukuNotRunning to null,
+      AppInstallSourceRequesterAccess.ShizukuLowVersion to null,
       AppInstallSourceRequesterAccess.ShizukuPermissionDenied to
         AppInstallSourceAction.RequestShizukuPermission
     )
@@ -166,7 +162,6 @@ class BuildAppInstallSourceBottomSheetDisplayUseCaseTest {
 
   private companion object {
     val promptAccesses = listOf(
-      AppInstallSourceRequesterAccess.ShizukuNotInstalled,
       AppInstallSourceRequesterAccess.ShizukuNotRunning,
       AppInstallSourceRequesterAccess.ShizukuLowVersion,
       AppInstallSourceRequesterAccess.ShizukuPermissionDenied

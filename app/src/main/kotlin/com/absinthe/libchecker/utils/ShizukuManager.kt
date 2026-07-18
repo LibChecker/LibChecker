@@ -6,13 +6,10 @@ import android.os.IBinder
 import android.os.Parcel
 import android.os.ParcelFileDescriptor
 import com.absinthe.libchecker.LibCheckerApp
-import com.absinthe.libchecker.app.SystemServices
-import com.absinthe.libchecker.constant.Constants
 import java.io.File
 import rikka.shizuku.Shizuku
 import rikka.shizuku.ShizukuBinderWrapper
 import rikka.shizuku.SystemServiceHelper
-import rikka.sui.Sui
 import timber.log.Timber
 
 object ShizukuManager {
@@ -22,7 +19,6 @@ object ShizukuManager {
 
   enum class Availability {
     Available,
-    NotInstalled,
     NotRunning,
     LowVersion,
     PermissionDenied
@@ -43,12 +39,23 @@ object ShizukuManager {
   }
 
   fun getAvailability(): Availability {
+    return getAvailability(
+      pingBinder = { Shizuku.pingBinder() },
+      getVersion = { Shizuku.getVersion() },
+      checkSelfPermission = { Shizuku.checkSelfPermission() }
+    )
+  }
+
+  internal fun getAvailability(
+    pingBinder: () -> Boolean,
+    getVersion: () -> Int,
+    checkSelfPermission: () -> Int
+  ): Availability {
     return runCatching {
       when {
-        !isShizukuInstalled() && !isSui() -> Availability.NotInstalled
-        !Shizuku.pingBinder() -> Availability.NotRunning
-        Shizuku.getVersion() < MIN_VERSION -> Availability.LowVersion
-        Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED -> Availability.PermissionDenied
+        !pingBinder() -> Availability.NotRunning
+        getVersion() < MIN_VERSION -> Availability.LowVersion
+        checkSelfPermission() != PackageManager.PERMISSION_GRANTED -> Availability.PermissionDenied
         else -> Availability.Available
       }
     }.onFailure {
@@ -135,18 +142,5 @@ object ShizukuManager {
       "System service not found: $name"
     }
     return ShizukuBinderWrapper(binder)
-  }
-
-  private fun isShizukuInstalled(): Boolean {
-    return runCatching {
-      SystemServices.packageManager.getPackageInfo(Constants.PackageNames.SHIZUKU, 0)
-      true
-    }.getOrDefault(false)
-  }
-
-  private fun isSui(): Boolean {
-    return runCatching {
-      Sui.isSui()
-    }.getOrDefault(false)
   }
 }

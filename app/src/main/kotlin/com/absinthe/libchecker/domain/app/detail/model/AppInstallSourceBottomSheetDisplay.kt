@@ -37,7 +37,6 @@ sealed interface AppInstallSourceItemContent {
 
 enum class AppInstallSourceRequesterAccess {
   Available,
-  ShizukuNotInstalled,
   ShizukuNotRunning,
   ShizukuLowVersion,
   ShizukuPermissionDenied
@@ -47,10 +46,6 @@ sealed interface AppInstallSourceAction {
   data class OpenApp(
     val item: LCItem
   ) : AppInstallSourceAction
-
-  data object OpenShizukuReleasePage : AppInstallSourceAction
-
-  data object LaunchShizuku : AppInstallSourceAction
 
   data object RequestShizukuPermission : AppInstallSourceAction
 }

@@ -33,17 +33,13 @@ class BuildAppInstallSourceBottomSheetDisplayUseCase(
       unknownPackageDescription = getString(R.string.lib_detail_app_install_source_empty_detail),
       shizukuUsage = getString(R.string.lib_detail_app_install_source_shizuku_usage),
       shizukuPrompts = mapOf(
-        AppInstallSourceRequesterAccess.ShizukuNotInstalled to ShizukuPromptStrings(
-          appName = getString(R.string.lib_detail_app_install_source_shizuku_uninstalled),
-          detail = getString(R.string.lib_detail_app_install_source_shizuku_uninstalled_detail)
-        ),
         AppInstallSourceRequesterAccess.ShizukuNotRunning to ShizukuPromptStrings(
-          appName = getString(R.string.lib_detail_app_install_source_shizuku_not_running),
-          detail = getString(R.string.lib_detail_app_install_source_shizuku_not_running_detail)
+          appName = getString(R.string.lib_detail_app_install_source_shizuku_unavailable),
+          detail = getString(R.string.lib_detail_app_install_source_shizuku_unavailable_detail)
         ),
         AppInstallSourceRequesterAccess.ShizukuLowVersion to ShizukuPromptStrings(
-          appName = getString(R.string.lib_detail_app_install_source_shizuku_low_version),
-          detail = getString(R.string.lib_detail_app_install_source_shizuku_low_version_detail)
+          appName = getString(R.string.lib_detail_app_install_source_shizuku_api_too_old),
+          detail = getString(R.string.lib_detail_app_install_source_shizuku_api_too_old_detail)
         ),
         AppInstallSourceRequesterAccess.ShizukuPermissionDenied to ShizukuPromptStrings(
           appName = getString(R.string.lib_detail_app_install_source_shizuku_permission_not_granted),
@@ -153,15 +149,9 @@ private fun buildShizukuPromptDisplay(
   val prompt = checkNotNull(strings.shizukuPrompts[requesterAccess]) {
     "Shizuku prompt strings are required for $requesterAccess."
   }
-  val action = when (requesterAccess) {
-    AppInstallSourceRequesterAccess.ShizukuNotInstalled,
-    AppInstallSourceRequesterAccess.ShizukuLowVersion -> {
-      AppInstallSourceAction.OpenShizukuReleasePage
-    }
-
-    AppInstallSourceRequesterAccess.ShizukuNotRunning -> {
-      AppInstallSourceAction.LaunchShizuku
-    }
+  val action: AppInstallSourceAction? = when (requesterAccess) {
+    AppInstallSourceRequesterAccess.ShizukuNotRunning,
+    AppInstallSourceRequesterAccess.ShizukuLowVersion -> null
 
     AppInstallSourceRequesterAccess.ShizukuPermissionDenied -> {
       AppInstallSourceAction.RequestShizukuPermission
