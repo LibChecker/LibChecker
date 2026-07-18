@@ -119,7 +119,8 @@ class SnapshotDetailTitleView(context: Context) : AViewGroup(context) {
     children.filter { it !== divider }.forEach { it.autoMeasure() }
     divider.measure(measuredWidth.toExactlyMeasureSpec(), 1.dp.toExactlyMeasureSpec())
 
-    val availableWidth = measuredWidth - paddingStart - paddingEnd - arrow.measuredWidth - 8.dp
+    val availableWidth = measuredWidth - paddingStart - paddingEnd -
+      arrow.measuredWidth - ARROW_TITLE_GAP
     if (title.measuredWidth > availableWidth) {
       title.measure(
         availableWidth.toExactlyMeasureSpec(),
@@ -127,7 +128,7 @@ class SnapshotDetailTitleView(context: Context) : AViewGroup(context) {
       )
     }
     countsOnSecondLine = counts.isVisible &&
-      title.measuredWidth + 12.dp + counts.measuredWidth > availableWidth
+      title.measuredWidth + TITLE_COUNT_GAP + counts.measuredWidth > availableWidth
     if (counts.isVisible && counts.measuredWidth > availableWidth) {
       counts.measure(
         availableWidth.toExactlyMeasureSpec(),
@@ -147,12 +148,12 @@ class SnapshotDetailTitleView(context: Context) : AViewGroup(context) {
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     val contentTop = paddingTop
-    val arrowLeft = measuredWidth - paddingEnd - arrow.measuredWidth + ARROW_SLOT_END_INSET
-    arrow.layout(arrowLeft, (measuredHeight - arrow.measuredHeight) / 2)
+    arrow.layout(paddingStart, (measuredHeight - arrow.measuredHeight) / 2)
+    val textStart = arrow.right + ARROW_TITLE_GAP
     if (countsOnSecondLine) {
-      title.layout(paddingStart, contentTop)
+      title.layout(textStart, contentTop)
       if (counts.isVisible) {
-        counts.layout(paddingStart, title.bottom + 2.dp)
+        counts.layout(textStart, title.bottom + 2.dp)
       }
     } else {
       val rowHeight = maxOf(
@@ -162,13 +163,12 @@ class SnapshotDetailTitleView(context: Context) : AViewGroup(context) {
       )
       val rowTop = (measuredHeight - rowHeight) / 2
       title.layout(
-        paddingStart,
+        textStart,
         rowTop + (rowHeight - title.measuredHeight) / 2
       )
       if (counts.isVisible) {
-        val arrowVisualLeft = arrowLeft + ARROW_SLOT_VISUAL_START_INSET
         counts.layout(
-          arrowVisualLeft - TITLE_COUNT_ARROW_GAP - counts.measuredWidth,
+          title.right + TITLE_COUNT_GAP,
           rowTop + (rowHeight - counts.measuredHeight) / 2
         )
       }
@@ -275,7 +275,6 @@ private class VerticallyCenteredDrawableSpan(
 private val COUNT_ICON_SIZE = 16.dp
 private val COUNT_ICON_END_GAP = 1.dp
 private val COUNT_GROUP_GAP = 8.dp
-private val TITLE_COUNT_ARROW_GAP = 8.dp
-private val ARROW_SLOT_VISUAL_START_INSET = 6.dp
-private val ARROW_SLOT_END_INSET = 6.dp
+private val ARROW_TITLE_GAP = 8.dp
+private val TITLE_COUNT_GAP = 12.dp
 private const val OBJECT_REPLACEMENT_CHARACTER = "\uFFFC"
