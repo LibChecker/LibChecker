@@ -7,21 +7,33 @@ import org.junit.Test
 class FeatureDialogSpecTest {
 
   @Test
-  fun rxKotlinDialogKeepsTintVersionAndSourceLinkAsDisplayData() {
-    val spec = AppDetailFeatureAction.RxKotlin("3.0.1").toDialogSpec()
+  fun reactiveDialogListsEveryDetectedLibraryWithoutBrandTints() {
+    val spec = AppDetailFeatureAction.Reactive(
+      listOf(
+        ReactiveLibrary(ReactiveType.RX_JAVA, "3"),
+        ReactiveLibrary(ReactiveType.RX_ANDROID, null)
+      )
+    ).toDialogSpec()
 
     assertEquals(R.drawable.ic_reactivex, spec.iconRes)
-    assertEquals(0xFF7F52FF.toInt(), spec.iconTint)
+    assertEquals(null, spec.iconTint)
+    assertEquals(R.string.reactivex, spec.titleRes)
+    assertEquals(null, spec.messageRes)
+    assertEquals(FeatureDialogEntryPlacement.MESSAGE, spec.entryPlacement)
     assertEquals(
       listOf(
         FeatureDialogTitleEntry(
-          label = FeatureDialogTitleLabel.Resource(R.string.rxkotlin),
-          value = "3.0.1"
+          label = FeatureDialogTitleLabel.Resource(R.string.rxjava),
+          value = "3"
+        ),
+        FeatureDialogTitleEntry(
+          label = FeatureDialogTitleLabel.Resource(R.string.rxandroid),
+          value = null
         )
       ),
       spec.titleEntries
     )
-    assertEquals("https://github.com/ReactiveX/RxKotlin", spec.sourceUrl)
+    assertEquals("https://reactivex.io/", spec.sourceUrl)
   }
 
   @Test

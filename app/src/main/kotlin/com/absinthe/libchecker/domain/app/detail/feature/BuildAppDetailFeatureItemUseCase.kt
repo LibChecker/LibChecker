@@ -25,24 +25,6 @@ class BuildAppDetailFeatureItemUseCase {
         action = AppDetailFeatureAction.Kotlin(feature.extras)
       )
 
-      Features.RX_JAVA -> AppDetailFeatureItemData(
-        icon = resourceIcon(R.drawable.ic_reactivex),
-        titleRes = R.string.rxjava,
-        action = AppDetailFeatureAction.RxJava(feature.version)
-      )
-
-      Features.RX_KOTLIN -> AppDetailFeatureItemData(
-        icon = resourceIcon(R.drawable.ic_reactivex, RX_KOTLIN_COLOR),
-        titleRes = R.string.rxkotlin,
-        action = AppDetailFeatureAction.RxKotlin(feature.version)
-      )
-
-      Features.RX_ANDROID -> AppDetailFeatureItemData(
-        icon = resourceIcon(R.drawable.ic_reactivex, RX_ANDROID_COLOR),
-        titleRes = R.string.rxandroid,
-        action = AppDetailFeatureAction.RxAndroid(feature.version)
-      )
-
       Features.AGP -> AppDetailFeatureItemData(
         icon = resourceIcon(R.drawable.ic_gradle),
         titleRes = R.string.agp,
@@ -110,6 +92,8 @@ class BuildAppDetailFeatureItemUseCase {
 
       Features.Ext.APPLICATION_ICONS -> buildAppIconsItem(request.appIcons, request.canShowAppIcons)
 
+      Features.Ext.REACTIVE -> buildReactiveItem(feature)
+
       else -> null
     }
   }
@@ -142,13 +126,24 @@ class BuildAppDetailFeatureItemUseCase {
     )
   }
 
+  private fun buildReactiveItem(feature: VersionedFeature): AppDetailFeatureItemData? {
+    val libraries = feature.extras.orEmpty().mapNotNull { (key, version) ->
+      ReactiveType.fromKey(key)?.let { ReactiveLibrary(it, version) }
+    }
+    if (libraries.isEmpty()) return null
+
+    return AppDetailFeatureItemData(
+      icon = resourceIcon(R.drawable.ic_reactivex),
+      titleRes = R.string.reactivex,
+      action = AppDetailFeatureAction.Reactive(libraries)
+    )
+  }
+
   private companion object {
     const val PRIORITY_APP_PROP = 0
     const val PRIORITY_APP_INSTALL_SOURCE = 1
     const val PRIORITY_16_KB_PAGE_SIZE = 2
     const val PRIORITY_16_KB_PAGE_SIZE_COMPAT = 3
-    val RX_KOTLIN_COLOR = 0xFF7F52FF.toInt()
-    val RX_ANDROID_COLOR = 0xFF3DDC84.toInt()
   }
 }
 
@@ -182,9 +177,7 @@ sealed interface AppDetailFeatureAction {
 
   data object SplitApks : AppDetailFeatureAction
   data class Kotlin(val extras: Map<String, String?>?) : Dialog
-  data class RxJava(val version: String?) : Dialog
-  data class RxKotlin(val version: String?) : Dialog
-  data class RxAndroid(val version: String?) : Dialog
+  data class Reactive(val libraries: List<ReactiveLibrary>) : Dialog
   data class Agp(val version: String?) : Dialog
   data object XposedModule : AppDetailFeatureAction
   data object PlaySigning : Dialog
@@ -198,6 +191,24 @@ sealed interface AppDetailFeatureAction {
   data object ElfPageSize16KbCompat : Dialog
   data class AppIcons(val isFirstMonochrome: Boolean) : AppDetailFeatureAction
 }
+
+enum class ReactiveType(
+  val key: String,
+  @StringRes val titleRes: Int
+) {
+  RX_JAVA("rx_java", R.string.rxjava),
+  RX_KOTLIN("rx_kotlin", R.string.rxkotlin),
+  RX_ANDROID("rx_android", R.string.rxandroid);
+
+  companion object {
+    fun fromKey(key: String): ReactiveType? = entries.find { it.key == key }
+  }
+}
+
+data class ReactiveLibrary(
+  val type: ReactiveType,
+  val version: String?
+)
 
 private fun resourceIcon(
   @DrawableRes res: Int,

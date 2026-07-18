@@ -20,6 +20,7 @@ import androidx.core.text.HtmlCompat
 import androidx.fragment.app.FragmentActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.domain.app.detail.feature.FeatureDialogEntryPlacement
 import com.absinthe.libchecker.domain.app.detail.feature.FeatureDialogSpec
 import com.absinthe.libchecker.domain.app.detail.feature.FeatureDialogTitleLabel
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_INFO
@@ -64,18 +65,28 @@ object FeaturesDialog {
     val dialog = BaseAlertDialogBuilder(context)
       .setIcon(icon)
       .setTitle(spec.titleRes)
-      .setMessage(HtmlCompat.fromHtml(context.getString(spec.messageRes), HtmlCompat.FROM_HTML_MODE_COMPACT))
       .setPositiveButton(android.R.string.ok, null)
 
+    spec.messageRes?.let { messageRes ->
+      dialog.setMessage(HtmlCompat.fromHtml(context.getString(messageRes), HtmlCompat.FROM_HTML_MODE_COMPACT))
+    }
     spec.titleEntries?.let { entries ->
-      val title = entries.joinToString(", ") { entry ->
-        val label = when (val label = entry.label) {
-          is FeatureDialogTitleLabel.Resource -> context.getString(label.res)
-          is FeatureDialogTitleLabel.Text -> label.value
+      when (spec.entryPlacement) {
+        FeatureDialogEntryPlacement.TITLE -> {
+          val title = entries.joinToString(", ") { entry ->
+            "${entry.label.resolve(context)} <b>${entry.value.orEmpty()}</b>"
+          }
+          dialog.setTitle(HtmlCompat.fromHtml(title, HtmlCompat.FROM_HTML_MODE_COMPACT))
         }
-        "$label <b>${entry.value.orEmpty()}</b>"
+
+        FeatureDialogEntryPlacement.MESSAGE -> {
+          val message = entries.joinToString("<br>") { entry ->
+            val version = entry.value?.let { " <b>$it</b>" }.orEmpty()
+            "• ${entry.label.resolve(context)}$version"
+          }
+          dialog.setMessage(HtmlCompat.fromHtml(message, HtmlCompat.FROM_HTML_MODE_COMPACT))
+        }
       }
-      dialog.setTitle(HtmlCompat.fromHtml(title, HtmlCompat.FROM_HTML_MODE_COMPACT))
     }
 
     spec.sourceUrl?.let { link ->
@@ -89,6 +100,13 @@ object FeaturesDialog {
       Constants.Event.FEATURE_DIALOG,
       mapOf(Telemetry.Param.CONTENT to context.getString(spec.titleRes))
     )
+  }
+
+  private fun FeatureDialogTitleLabel.resolve(context: Context): String {
+    return when (this) {
+      is FeatureDialogTitleLabel.Resource -> context.getString(res)
+      is FeatureDialogTitleLabel.Text -> value
+    }
   }
 
   fun showAppPropDialog(activity: FragmentActivity, packageInfo: PackageInfo?) {

@@ -9,11 +9,17 @@ import com.absinthe.libchecker.constant.URLManager.ANDROID_DEV_HOST
 data class FeatureDialogSpec(
   @DrawableRes val iconRes: Int,
   @StringRes val titleRes: Int,
-  @StringRes val messageRes: Int,
+  @StringRes val messageRes: Int? = null,
   @ColorInt val iconTint: Int? = null,
   val titleEntries: List<FeatureDialogTitleEntry>? = null,
+  val entryPlacement: FeatureDialogEntryPlacement = FeatureDialogEntryPlacement.TITLE,
   val sourceUrl: String? = null
 )
+
+enum class FeatureDialogEntryPlacement {
+  TITLE,
+  MESSAGE
+}
 
 data class FeatureDialogTitleEntry(
   val label: FeatureDialogTitleLabel,
@@ -42,30 +48,17 @@ fun AppDetailFeatureAction.Dialog.toDialogSpec(): FeatureDialogSpec {
       sourceUrl = "https://kotlinlang.org/"
     )
 
-    is AppDetailFeatureAction.RxJava -> versionDialogSpec(
+    is AppDetailFeatureAction.Reactive -> FeatureDialogSpec(
       iconRes = R.drawable.ic_reactivex,
-      titleRes = R.string.rxjava,
-      messageRes = R.string.rx_detail,
-      version = version,
+      titleRes = R.string.reactivex,
+      titleEntries = libraries.map { library ->
+        FeatureDialogTitleEntry(
+          label = FeatureDialogTitleLabel.Resource(library.type.titleRes),
+          value = library.version
+        )
+      },
+      entryPlacement = FeatureDialogEntryPlacement.MESSAGE,
       sourceUrl = "https://reactivex.io/"
-    )
-
-    is AppDetailFeatureAction.RxKotlin -> versionDialogSpec(
-      iconRes = R.drawable.ic_reactivex,
-      titleRes = R.string.rxkotlin,
-      messageRes = R.string.rx_kotlin_detail,
-      version = version,
-      iconTint = RX_KOTLIN_COLOR,
-      sourceUrl = "https://github.com/ReactiveX/RxKotlin"
-    )
-
-    is AppDetailFeatureAction.RxAndroid -> versionDialogSpec(
-      iconRes = R.drawable.ic_reactivex,
-      titleRes = R.string.rxandroid,
-      messageRes = R.string.rx_android_detail,
-      version = version,
-      iconTint = RX_ANDROID_COLOR,
-      sourceUrl = "https://github.com/ReactiveX/RxAndroid"
     )
 
     is AppDetailFeatureAction.Agp -> versionDialogSpec(
@@ -174,6 +167,3 @@ private fun versionDialogSpec(
     sourceUrl = sourceUrl
   )
 }
-
-private const val RX_KOTLIN_COLOR = 0xFF7F52FF.toInt()
-private const val RX_ANDROID_COLOR = 0xFF3DDC84.toInt()

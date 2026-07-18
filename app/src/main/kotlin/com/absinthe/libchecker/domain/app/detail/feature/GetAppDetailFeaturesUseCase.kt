@@ -102,17 +102,18 @@ class GetAppDetailFeaturesUseCase(
 
     packageInfo.applicationInfo?.sourceDir?.let { sourceDir ->
       val foundList = getFeaturesFoundDexList(feat, sourceDir)
+      val reactiveVersions = linkedMapOf<String, String?>()
       if ((feat and Features.RX_JAVA) > 0) {
-        val version = packageInfo.getRxJavaVersion(foundList)
-        emitFeature(VersionedFeature(Features.RX_JAVA, version))
+        reactiveVersions[ReactiveType.RX_JAVA.key] = packageInfo.getRxJavaVersion(foundList)
       }
       if ((feat and Features.RX_KOTLIN) > 0) {
-        val version = packageInfo.getRxKotlinVersion(foundList)
-        emitFeature(VersionedFeature(Features.RX_KOTLIN, version))
+        reactiveVersions[ReactiveType.RX_KOTLIN.key] = packageInfo.getRxKotlinVersion(foundList)
       }
       if ((feat and Features.RX_ANDROID) > 0) {
-        val version = packageInfo.getRxAndroidVersion(foundList)
-        emitFeature(VersionedFeature(Features.RX_ANDROID, version))
+        reactiveVersions[ReactiveType.RX_ANDROID.key] = packageInfo.getRxAndroidVersion(foundList)
+      }
+      if (reactiveVersions.isNotEmpty()) {
+        emitFeature(VersionedFeature(Features.Ext.REACTIVE, extras = reactiveVersions))
       }
       if (packageInfo.isUseKMP(foundList)) {
         emitFeature(VersionedFeature(Features.KMP))
