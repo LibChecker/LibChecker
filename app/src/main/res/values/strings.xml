@@ -214,7 +214,7 @@
   <string name="lib_detail_app_last_updated_time">Last installation time: </string>
   <string name="lib_detail_app_install_source_empty">Unknown</string>
   <string name="lib_detail_app_install_source_empty_detail">Shell or uninstalled app</string>
-  <string name="lib_detail_app_install_source_shizuku_usage">Because Android restricts the API to get the installation requester, we use Shizuku to get the installation requester</string>
+  <string name="lib_detail_app_install_source_shizuku_usage">Android only provides the installation requester to apps with install privileges, so Shizuku is required</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizuku not installed</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">Click here to install Shizuku</string>
   <string name="lib_detail_app_install_source_shizuku_low_version">Requires Shizuku API 10</string>
@@ -223,6 +223,10 @@
   <string name="lib_detail_app_install_source_shizuku_not_running_detail">Click here to jump to Shizuku to start it</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku not authorized</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">Click here for Shizuku authorization for installation requester</string>
+  <string name="lib_detail_app_install_source_shizuku_unavailable">Shizuku service unavailable</string>
+  <string name="lib_detail_app_install_source_shizuku_unavailable_detail">Start a compatible Shizuku manager, then return to this page</string>
+  <string name="lib_detail_app_install_source_shizuku_api_too_old">Shizuku API version is too old</string>
+  <string name="lib_detail_app_install_source_shizuku_api_too_old_detail">Update the active Shizuku-compatible manager</string>
   <string name="lib_detail_app_dexopt_title">DEX optimization</string>
   <string name="lib_detail_app_dexopt_status">Status</string>
   <string name="lib_detail_app_dexopt_reason">Reason</string>

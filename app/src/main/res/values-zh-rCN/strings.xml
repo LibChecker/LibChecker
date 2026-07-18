@@ -202,7 +202,7 @@
   <string name="lib_detail_app_last_updated_time">最近更新时间：</string>
   <string name="lib_detail_app_install_source_empty">未知</string>
   <string name="lib_detail_app_install_source_empty_detail">Shell 或已被卸载的应用</string>
-  <string name="lib_detail_app_install_source_shizuku_usage">由于 Android 限制了获取安装请求方的接口, 我们使用 Shizuku 来获取安装请求方。</string>
+  <string name="lib_detail_app_install_source_shizuku_usage">系统仅向具备安装权限的应用提供安装请求方信息，需通过 Shizuku 获取</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizuku 未安装</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">点此安装 Shizuku</string>
   <string name="lib_detail_app_install_source_shizuku_low_version">需要 Shizuku API 版本 10</string>
@@ -211,6 +211,10 @@
   <string name="lib_detail_app_install_source_shizuku_not_running_detail">点此跳转到 Shizuku 以启动它</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku 未授权</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">点此进行 Shizuku 授权以获取安装请求方</string>
+  <string name="lib_detail_app_install_source_shizuku_unavailable">Shizuku 服务不可用</string>
+  <string name="lib_detail_app_install_source_shizuku_unavailable_detail">请启动任意兼容的 Shizuku 管理器，然后返回此页面</string>
+  <string name="lib_detail_app_install_source_shizuku_api_too_old">Shizuku API 版本过低</string>
+  <string name="lib_detail_app_install_source_shizuku_api_too_old_detail">请升级当前使用的 Shizuku 兼容管理器</string>
   <string name="lib_detail_app_dexopt_title">DEX 优化</string>
   <string name="lib_detail_app_dexopt_status">状态</string>
   <string name="lib_detail_app_dexopt_reason">原因</string>
