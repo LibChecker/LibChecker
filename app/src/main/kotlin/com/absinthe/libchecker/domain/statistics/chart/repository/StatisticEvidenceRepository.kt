@@ -5,6 +5,13 @@ import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDexClassQu
 interface StatisticEvidenceRepository {
 
   fun matches(packageName: String, query: StatisticArtifactQuery): Boolean
+
+  fun matchesAll(
+    packageName: String,
+    queries: Set<StatisticArtifactQuery>
+  ): Map<StatisticArtifactQuery, Boolean> {
+    return queries.associateWith { query -> matches(packageName, query) }
+  }
 }
 
 sealed interface StatisticArtifactQuery {

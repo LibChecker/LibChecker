@@ -1,13 +1,12 @@
 package com.absinthe.libchecker.domain.statistics.chart.usecase
 
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.statistics.chart.model.StatisticConditionSpec
-import com.absinthe.libchecker.domain.statistics.chart.model.StatisticPredicateSpec
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticFacetsSpec
 import com.absinthe.libchecker.domain.statistics.chart.repository.StatisticEvidenceRepository
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
 
-class BuildPredicateStatisticDataUseCase(
+class BuildFacetStatisticDataUseCase(
   private val evidenceRepository: StatisticEvidenceRepository
 ) {
   private val conditionEvaluator = StatisticConditionEvaluator()
@@ -15,7 +14,7 @@ class BuildPredicateStatisticDataUseCase(
   suspend operator fun invoke(
     request: Request,
     onProgress: suspend (Int) -> Unit = {}
-  ): PredicateStatisticData? {
+  ): FacetStatisticData? {
     val targets = if (request.showSystemApps) {
       request.items
     } else {
@@ -23,23 +22,28 @@ class BuildPredicateStatisticDataUseCase(
     }
     val matched = mutableListOf<LCItem>()
     val unmatched = mutableListOf<LCItem>()
+    val matchedFacetIds = LinkedHashMap<String, List<String>>()
+    val artifactQueries = request.facets.items
+      .flatMapTo(LinkedHashSet()) { facet ->
+        conditionEvaluator.collectArtifactQueries(facet.condition)
+      }
     val coroutineContext = currentCoroutineContext()
     val itemCount = targets.size
-    val condition = request.predicate.condition ?: StatisticConditionSpec(
-      evidence = request.predicate.evidence,
-      operator = request.predicate.operator,
-      value = request.predicate.value
-    )
-    val artifactQueries = conditionEvaluator.collectArtifactQueries(condition)
     var progress = 0
 
     targets.forEachIndexed { index, item ->
       if (!coroutineContext.isActive) return null
       val artifactMatches = evidenceRepository.matchesAll(item.packageName, artifactQueries)
-      if (conditionEvaluator.matches(item, condition, artifactMatches)) {
-        matched += item
-      } else {
+      val facetIds = request.facets.items.mapNotNull { facet ->
+        facet.id.takeIf {
+          conditionEvaluator.matches(item, facet.condition, artifactMatches)
+        }
+      }
+      if (facetIds.isEmpty()) {
         unmatched += item
+      } else {
+        matched += item
+        matchedFacetIds[item.packageName] = facetIds
       }
       if (itemCount > 0) {
         val nextProgress = (index + 1) * LAST_COMPUTATION_PROGRESS / itemCount
@@ -49,12 +53,16 @@ class BuildPredicateStatisticDataUseCase(
         }
       }
     }
-    return PredicateStatisticData(matched, unmatched)
+    return FacetStatisticData(
+      matched = matched,
+      unmatched = unmatched,
+      matchedFacetIds = matchedFacetIds
+    )
   }
 
   data class Request(
     val items: List<LCItem>,
-    val predicate: StatisticPredicateSpec,
+    val facets: StatisticFacetsSpec,
     val showSystemApps: Boolean
   )
 
@@ -63,7 +71,8 @@ class BuildPredicateStatisticDataUseCase(
   }
 }
 
-data class PredicateStatisticData(
+data class FacetStatisticData(
   val matched: List<LCItem>,
-  val unmatched: List<LCItem>
+  val unmatched: List<LCItem>,
+  val matchedFacetIds: Map<String, List<String>>
 )

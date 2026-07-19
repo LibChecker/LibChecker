@@ -47,7 +47,8 @@ data class StatisticIconSpec(
 data class StatisticCalculationSpec(
   val kind: StatisticCalculationKind,
   val nativeOperator: StatisticNativeOperator? = null,
-  val predicate: StatisticPredicateSpec? = null
+  val predicate: StatisticPredicateSpec? = null,
+  val facets: StatisticFacetsSpec? = null
 )
 
 @JsonClass(generateAdapter = true)
@@ -58,6 +59,20 @@ data class StatisticPredicateSpec(
   val operator: StatisticComparisonOperator? = null,
   val value: StatisticPredicateValue? = null,
   val condition: StatisticConditionSpec? = null
+)
+
+@JsonClass(generateAdapter = true)
+data class StatisticFacetsSpec(
+  val matchedTitle: StatisticTitleSpec,
+  val unmatchedTitle: StatisticTitleSpec,
+  val items: List<StatisticFacetSpec>
+)
+
+@JsonClass(generateAdapter = true)
+data class StatisticFacetSpec(
+  val id: String,
+  val title: StatisticTitleSpec,
+  val condition: StatisticConditionSpec
 )
 
 @JsonClass(generateAdapter = true)
@@ -198,7 +213,10 @@ enum class StatisticCalculationKind {
   NATIVE,
 
   @Json(name = "predicate")
-  PREDICATE
+  PREDICATE,
+
+  @Json(name = "facets")
+  FACETS
 }
 
 enum class StatisticEvidence {

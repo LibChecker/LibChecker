@@ -9,6 +9,7 @@ import com.absinthe.libchecker.domain.statistics.chart.source.impl.AABChartDataS
 import com.absinthe.libchecker.domain.statistics.chart.source.impl.ABIChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.source.impl.ApiLevelChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.source.impl.DetailedABIChartDataSource
+import com.absinthe.libchecker.domain.statistics.chart.source.impl.FacetStatisticChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.source.impl.JetpackComposeChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.source.impl.KotlinChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.source.impl.MarketDistributionChartDataSource
@@ -37,6 +38,15 @@ internal class ChartDataSourceFactory(
           predicate = checkNotNull(statistic.calculation.predicate),
           icon = statistic.icon,
           buildData = chartDataProvider::buildPredicateStatisticData
+        )
+      )
+
+      StatisticCalculationKind.FACETS -> ChartDataSourcePlan.Pie(
+        FacetStatisticChartDataSource(
+          items = items,
+          facets = checkNotNull(statistic.calculation.facets),
+          icon = statistic.icon,
+          buildData = chartDataProvider::buildFacetStatisticData
         )
       )
     }

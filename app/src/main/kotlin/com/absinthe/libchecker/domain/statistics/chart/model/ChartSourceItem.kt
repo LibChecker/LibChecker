@@ -7,5 +7,6 @@ data class ChartSourceItem(
   @DrawableRes val iconRes: Int,
   val isGrayIcon: Boolean,
   val data: List<LCItem>,
-  val statisticIcon: StatisticIconSpec? = null
+  val statisticIcon: StatisticIconSpec? = null,
+  val itemChips: Map<String, List<String>> = emptyMap()
 )

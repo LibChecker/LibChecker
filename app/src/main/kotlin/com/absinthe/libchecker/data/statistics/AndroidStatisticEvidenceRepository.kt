@@ -26,64 +26,112 @@ class AndroidStatisticEvidenceRepository(
   private val manifestActionCache = LruCache<ArtifactVersion, Set<String>>(MANIFEST_CACHE_SIZE)
 
   override fun matches(packageName: String, query: StatisticArtifactQuery): Boolean {
-    return runCatching {
-      val packageInfo = installedAppRepository.getPackageInfo(packageName)
-        ?: return@runCatching false
-      when (query) {
-        is StatisticArtifactQuery.NativeLibrary -> {
-          val nativeDirectory = packageInfo.applicationInfo?.nativeLibraryDir?.let(::File)
-          val extractedLibraries = nativeDirectory?.listFiles()
-            ?.filter { it.isFile && it.extension == "so" }
-            .orEmpty()
-          if (extractedLibraries.isNotEmpty()) {
-            extractedLibraries.any { it.name == query.name }
-          } else {
-            PackageUtils.getNativeDirLibs(packageInfo, parseElf = false)
-              .any { it.name == query.name }
-          }
-        }
-
-        is StatisticArtifactQuery.DexClasses -> {
-          val version = packageInfo.applicationInfo?.sourceDir?.let {
-            ArtifactVersion(it, packageInfo.lastUpdateTime)
-          } ?: return@runCatching false
-          val cacheKey = DexMatchCacheKey(version, query.queries)
-          dexMatchCache[cacheKey] ?: matchesDexClasses(File(version.sourceDir), query.queries)
-            .also { dexMatchCache.put(cacheKey, it) }
-        }
-
-        is StatisticArtifactQuery.ManifestReceiverActions -> {
-          val version = packageInfo.applicationInfo?.sourceDir?.let {
-            ArtifactVersion(it, packageInfo.lastUpdateTime)
-          } ?: return@runCatching false
-          val actions = manifestActionCache[version] ?: readManifestReceiverActions(version.sourceDir)
-            .also { manifestActionCache.put(version, it) }
-          query.actions.any(actions::contains)
-        }
-      }
-    }.onFailure {
-      Timber.e(it)
-    }.getOrDefault(false)
+    return matchesAll(packageName, setOf(query))[query] == true
   }
 
-  private fun matchesDexClasses(
-    sourceFile: File,
-    queries: List<StatisticDexClassQuery>
-  ): Boolean {
-    if (queries.isEmpty()) return false
-    val container = FastDexFileFactory.loadDexContainer(sourceFile, Opcodes.getDefault())
-    container.dexEntryNames.forEach { entryName ->
-      val dexFile = container.getEntry(entryName)?.dexFile ?: return@forEach
-      val eligibleQueries = queries.filter { query ->
-        query.stringConstants.isEmpty() ||
-          dexFile.stringSection.any(query.stringConstants::contains)
+  override fun matchesAll(
+    packageName: String,
+    queries: Set<StatisticArtifactQuery>
+  ): Map<StatisticArtifactQuery, Boolean> {
+    if (queries.isEmpty()) return emptyMap()
+    return runCatching {
+      val packageInfo = installedAppRepository.getPackageInfo(packageName)
+        ?: return@runCatching queries.associateWith { false }
+      val results = LinkedHashMap<StatisticArtifactQuery, Boolean>(queries.size)
+      val version = packageInfo.applicationInfo?.sourceDir?.let {
+        ArtifactVersion(it, packageInfo.lastUpdateTime)
       }
-      if (eligibleQueries.isEmpty()) return@forEach
-      dexFile.classes.forEach { classDef ->
-        if (eligibleQueries.any { query -> classDef.matches(query) }) return true
+
+      val nativeQueries = queries.filterIsInstance<StatisticArtifactQuery.NativeLibrary>()
+      if (nativeQueries.isNotEmpty()) {
+        val nativeDirectory = packageInfo.applicationInfo?.nativeLibraryDir?.let(::File)
+        val extractedLibraries = nativeDirectory?.listFiles()
+          ?.filter { it.isFile && it.extension == "so" }
+          .orEmpty()
+        val libraryNames = if (extractedLibraries.isNotEmpty()) {
+          extractedLibraries.mapTo(mutableSetOf(), File::getName)
+        } else {
+          PackageUtils.getNativeDirLibs(packageInfo, parseElf = false)
+            .mapTo(mutableSetOf()) { it.name }
+        }
+        nativeQueries.forEach { query -> results[query] = query.name in libraryNames }
+      }
+
+      val manifestQueries = queries.filterIsInstance<StatisticArtifactQuery.ManifestReceiverActions>()
+      if (manifestQueries.isNotEmpty()) {
+        val actions = version?.let {
+          manifestActionCache[it] ?: readManifestReceiverActions(it.sourceDir)
+            .also { actions -> manifestActionCache.put(it, actions) }
+        }.orEmpty()
+        manifestQueries.forEach { query ->
+          results[query] = query.actions.any(actions::contains)
+        }
+      }
+
+      val dexQueries = queries.filterIsInstance<StatisticArtifactQuery.DexClasses>()
+      if (dexQueries.isNotEmpty()) {
+        if (version == null) {
+          dexQueries.forEach { query -> results[query] = false }
+        } else {
+          val pending = mutableListOf<StatisticArtifactQuery.DexClasses>()
+          dexQueries.forEach { query ->
+            val cached = dexMatchCache[DexMatchCacheKey(version, query.queries)]
+            if (cached == null) {
+              pending += query
+            } else {
+              results[query] = cached
+            }
+          }
+          if (pending.isNotEmpty()) {
+            matchesDexClassGroups(File(version.sourceDir), pending).forEach { (query, matched) ->
+              results[query] = matched
+              dexMatchCache.put(DexMatchCacheKey(version, query.queries), matched)
+            }
+          }
+        }
+      }
+
+      queries.associateWith { query -> results[query] == true }
+    }.onFailure {
+      Timber.e(it)
+    }.getOrElse {
+      queries.associateWith { false }
+    }
+  }
+
+  private fun matchesDexClassGroups(
+    sourceFile: File,
+    queryGroups: List<StatisticArtifactQuery.DexClasses>
+  ): Map<StatisticArtifactQuery.DexClasses, Boolean> {
+    if (queryGroups.isEmpty()) return emptyMap()
+    val results = queryGroups.associateWithTo(LinkedHashMap()) { false }
+    val unmatchedGroups = queryGroups.toMutableSet()
+    val container = FastDexFileFactory.loadDexContainer(sourceFile, Opcodes.getDefault())
+    for (entryName in container.dexEntryNames) {
+      if (unmatchedGroups.isEmpty()) break
+      val dexFile = container.getEntry(entryName)?.dexFile ?: continue
+      val eligibleQueries = unmatchedGroups.associateWith { group ->
+        group.queries.filter { query ->
+          query.stringConstants.isEmpty() ||
+            dexFile.stringSection.any(query.stringConstants::contains)
+        }
+      }.filterValues { it.isNotEmpty() }
+      if (eligibleQueries.isEmpty()) continue
+      val matchedGroups = mutableSetOf<StatisticArtifactQuery.DexClasses>()
+      for (classDef in dexFile.classes) {
+        eligibleQueries.forEach { (group, queries) ->
+          if (group !in matchedGroups && queries.any { query -> classDef.matches(query) }) {
+            matchedGroups += group
+          }
+        }
+        if (matchedGroups.size == eligibleQueries.size) break
+      }
+      matchedGroups.forEach { group ->
+        results[group] = true
+        unmatchedGroups -= group
       }
     }
-    return false
+    return results
   }
 
   private fun ClassDef.matches(query: StatisticDexClassQuery): Boolean {

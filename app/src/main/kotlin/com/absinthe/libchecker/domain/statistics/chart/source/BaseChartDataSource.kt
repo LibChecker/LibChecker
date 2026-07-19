@@ -15,6 +15,10 @@ abstract class BaseChartDataSource<T : View>(val items: List<LCItem>) : IChartDa
     return items
   }
 
+  override fun getItemChipsByXValue(x: Int): Map<String, List<String>> {
+    return classifiedMap[x]?.itemChips.orEmpty()
+  }
+
   fun getChartSourceItems(): Map<Int, ChartSourceItem> {
     return classifiedMap
   }

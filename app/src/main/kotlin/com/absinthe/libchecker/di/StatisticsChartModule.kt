@@ -26,6 +26,7 @@ import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildAbiChartData
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildAndroidVersionLabelDisplayDataUseCase
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildApiLevelChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildDetailedAbiChartDataUseCase
+import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildFacetStatisticDataUseCase
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildFeatureFlagChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildPageSize16KBChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildPredicateStatisticDataUseCase
@@ -83,6 +84,7 @@ val statisticsChartModule = module {
   factory { BuildFeatureFlagChartDataUseCase() }
   factory { BuildPageSize16KBChartDataUseCase(get()) }
   factory { BuildPredicateStatisticDataUseCase(get()) }
+  factory { BuildFacetStatisticDataUseCase(get()) }
   factory { GetAndroidDistributionUseCase(get()) }
   factory { ObserveChartFeatureInitializationPlansUseCase(get()) }
   factory { ValidateStatisticCatalogUseCase() }
@@ -96,6 +98,7 @@ val statisticsChartModule = module {
       buildFeatureFlagChartDataUseCase = get(),
       buildPageSize16KBChartDataUseCase = get(),
       buildPredicateStatisticDataUseCase = get(),
+      buildFacetStatisticDataUseCase = get(),
       getAndroidDistributionUseCase = get(),
       chartSettingsRepository = get()
     )

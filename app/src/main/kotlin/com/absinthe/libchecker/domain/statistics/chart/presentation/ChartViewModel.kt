@@ -241,6 +241,7 @@ class ChartViewModel internal constructor(
       title = title,
       items = items,
       itemViewStates = chartDataProvider.buildAppListItemViewStates(items),
+      itemChips = source.getItemChipsByXValue(x),
       androidVersion = buildAndroidVersionLabelDisplayData(
         source.getAndroidVersionNodeByXValue(x)
       )

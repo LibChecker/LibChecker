@@ -83,7 +83,12 @@ class ClassifyDialogView(context: Context) :
     this.onAction = onAction
     header.title.text = state.title
     bindAndroidVersion(state.androidVersion)
-    adapter.bind(AppListRenderState(itemViewStates = state.itemViewStates))
+    adapter.bind(
+      AppListRenderState(
+        itemViewStates = state.itemViewStates,
+        itemChips = state.itemChips
+      )
+    )
     adapter.setList(state.items)
   }
 

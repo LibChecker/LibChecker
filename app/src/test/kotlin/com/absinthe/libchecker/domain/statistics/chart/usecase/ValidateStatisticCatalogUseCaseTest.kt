@@ -10,6 +10,8 @@ import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDexClassQu
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDexMethodReference
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDrawableIcon
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticEvidence
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticFacetSpec
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticFacetsSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticIconSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticNativeOperator
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticPredicateSpec
@@ -134,6 +136,73 @@ class ValidateStatisticCatalogUseCaseTest {
   }
 
   @Test
+  fun `accepts an ordered facets calculation with generic conditions`() {
+    val definition = officialDefinition().copy(
+      id = "official.capabilities",
+      calculation = StatisticCalculationSpec(
+        kind = StatisticCalculationKind.FACETS,
+        facets = StatisticFacetsSpec(
+          matchedTitle = translatedTitle("Matched apps"),
+          unmatchedTitle = translatedTitle("Other apps"),
+          items = listOf(
+            StatisticFacetSpec(
+              id = "voip-service-kit",
+              title = translatedTitle("VoIP Service Kit"),
+              condition = StatisticConditionSpec(
+                evidence = StatisticEvidence.DEX_CLASS,
+                operator = StatisticComparisonOperator.CONTAINS_ANY,
+                value = StatisticPredicateValue(
+                  dexClasses = listOf(
+                    StatisticDexClassQuery(
+                      name = StatisticStringPattern(
+                        operator = StatisticStringOperator.STARTS_WITH,
+                        value = "Lcom/voip/service/"
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    )
+
+    val errors = validate(StatisticBundle(1, listOf(definition)))
+
+    assertTrue(errors.toString(), errors.isEmpty())
+  }
+
+  @Test
+  fun `rejects duplicate facet ids and missing English titles`() {
+    val facet = StatisticFacetSpec(
+      id = "capability",
+      title = StatisticTitleSpec(translations = mapOf("zh-Hans" to "能力")),
+      condition = StatisticConditionSpec(
+        evidence = StatisticEvidence.TARGET_SDK,
+        operator = StatisticComparisonOperator.GREATER_THAN_OR_EQUAL,
+        value = StatisticPredicateValue(integer = 35)
+      )
+    )
+    val definition = officialDefinition().copy(
+      id = "official.capabilities",
+      calculation = StatisticCalculationSpec(
+        kind = StatisticCalculationKind.FACETS,
+        facets = StatisticFacetsSpec(
+          matchedTitle = translatedTitle("Matched apps"),
+          unmatchedTitle = translatedTitle("Other apps"),
+          items = listOf(facet, facet)
+        )
+      )
+    )
+
+    val errors = validate(StatisticBundle(1, listOf(definition)))
+
+    assertTrue(errors.any { it.startsWith("Facets statistic has a duplicate facet id") })
+    assertTrue(errors.any { it.startsWith("External facet must provide an English title") })
+  }
+
+  @Test
   fun `rejects unconstrained DEX class evidence`() {
     val definition = officialDefinition().copy(
       id = "official.unconstrained-dex",
@@ -211,5 +280,9 @@ class ValidateStatisticCatalogUseCaseTest {
         unmatchedTitle = StatisticTitleSpec(translations = mapOf("en" to "Target SDK 34 or older"))
       )
     )
+  )
+
+  private fun translatedTitle(value: String) = StatisticTitleSpec(
+    translations = mapOf("en" to value, "zh-Hans" to value)
   )
 }

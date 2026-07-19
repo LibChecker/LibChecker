@@ -8,6 +8,7 @@ data class ClassifyDialogState(
   val title: String,
   val items: List<LCItem>,
   val itemViewStates: Map<String, AppListItemViewState>,
+  val itemChips: Map<String, List<String>> = emptyMap(),
   val androidVersion: AndroidVersionLabelDisplayData?
 )
 

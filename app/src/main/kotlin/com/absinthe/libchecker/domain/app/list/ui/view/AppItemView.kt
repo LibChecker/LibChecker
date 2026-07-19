@@ -1,16 +1,19 @@
 package com.absinthe.libchecker.domain.app.list.ui.view
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.text.SpannableString
 import android.text.TextUtils
 import android.text.style.ImageSpan
 import android.view.Gravity
+import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.isGone
 import androidx.core.view.marginStart
 import coil.dispose
 import coil.load
@@ -32,6 +35,8 @@ import com.absinthe.libchecker.utils.extensions.tintHighlightText
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.span.CenterAlignImageSpan
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 
 class AppItemView(
   context: Context,
@@ -85,11 +90,15 @@ class AppItemView(
     container.setIconDisplay(display.icon)
     setItemIdentityDisplay(display, highlightText)
     container.setMetadataDisplay(display.metadata)
+    container.setChips(display.chips)
   }
 
   fun setItemIdentityDisplay(display: AppListItemDisplay, highlightText: String) {
     container.setIdentityText(display.identity, highlightText)
-    setItemContentDescription(display.identity.contentDescription)
+    setItemContentDescription(
+      display.identity.contentDescription,
+      display.chips.joinToString().takeIf(String::isNotEmpty)
+    )
   }
 
   class AppItemContainerView(
@@ -100,6 +109,7 @@ class AppItemView(
     private val iconBadgeGap = 4.dp
     private val abiBadgeGap = 1.dp
     private val abiBadgeWidthRatio = 0.75f
+    private val chipTopGap = 4.dp
 
     val icon = AppCompatImageView(context).apply {
       layoutParams = LayoutParams(style.iconSize, style.iconSize)
@@ -156,6 +166,19 @@ class AppItemView(
       addView(this)
     }
 
+    private val chipGroup = ChipGroup(context).apply {
+      layoutParams = LayoutParams(
+        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
+      )
+      chipSpacingHorizontal = 4.dp
+      chipSpacingVertical = 2.dp
+      isSingleLine = false
+      importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
+      visibility = GONE
+      this@AppItemContainerView.addView(this)
+    }
+
     private var abiBadge: AppCompatImageView? = null
     private var multiArchBadge: AppCompatImageView? = null
     private var badge: AppCompatImageView? = null
@@ -209,6 +232,32 @@ class AppItemView(
       setVersionInfo(display.versionInfo)
       setAbiDisplay(display)
       setPackageBadge(display.packageBadge)
+    }
+
+    fun setChips(labels: List<String>) {
+      chipGroup.removeAllViews()
+      labels.forEach { label ->
+        chipGroup.addView(
+          Chip(context).apply {
+            text = label
+            isCheckable = false
+            isClickable = false
+            isFocusable = false
+            importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
+            minHeight = 0
+            chipMinHeight = 24.dp.toFloat()
+            setEnsureMinTouchTargetSize(false)
+            setTextAppearance(style.labelSmallTextAppearance)
+            setTextColor(style.onSurfaceVariantColor)
+            chipBackgroundColor = ColorStateList.valueOf(
+              context.getColorByAttr(
+                com.google.android.material.R.attr.colorSurfaceContainerHigh
+              )
+            )
+          }
+        )
+      }
+      chipGroup.isGone = labels.isEmpty()
     }
 
     private fun setAbiDisplay(display: AppListItemMetadataDisplay) {
@@ -296,7 +345,7 @@ class AppItemView(
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
       super.onMeasure(widthMeasureSpec, heightMeasureSpec)
       for (index in 0 until childCount) {
-        getChildAt(index).autoMeasure()
+        getChildAt(index).takeUnless { it === chipGroup }?.autoMeasure()
       }
       measureAbiBadges()
       val textWidth =
@@ -326,6 +375,12 @@ class AppItemView(
           abiInfo.defaultHeightMeasureSpec(this)
         )
       }
+      if (!chipGroup.isGone) {
+        chipGroup.measure(
+          textWidth.toExactlyMeasureSpec(),
+          View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        )
+      }
       val iconColumnHeight = icon.measuredHeight +
         if (abiBadge != null || multiArchBadge != null) {
           iconBadgeGap + maxOf(
@@ -339,7 +394,8 @@ class AppItemView(
         appName.measuredHeightWithVisibility +
           packageName.measuredHeightWithVisibility +
           versionInfo.measuredHeightWithVisibility +
-          abiInfo.measuredHeightWithVisibility
+          abiInfo.measuredHeightWithVisibility +
+          if (chipGroup.isGone) 0 else chipTopGap + chipGroup.measuredHeight
       setMeasuredDimension(
         measuredWidth,
         paddingTop + if (useDetachedAbiBadgeLayout) {
@@ -360,6 +416,9 @@ class AppItemView(
       packageName.layout(offsetStart, appName.bottom)
       versionInfo.layout(offsetStart, packageName.bottom)
       abiInfo.layout(offsetStart, versionInfo.bottom)
+      if (!chipGroup.isGone) {
+        chipGroup.layout(offsetStart, abiInfo.bottom + chipTopGap)
+      }
       if (hasDetachedAbiBadges()) {
         layoutAbiBadges()
       }

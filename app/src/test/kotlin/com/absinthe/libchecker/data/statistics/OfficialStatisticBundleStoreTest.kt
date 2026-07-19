@@ -8,6 +8,8 @@ import com.absinthe.libchecker.domain.statistics.chart.model.StatisticConditionS
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDefinition
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDexClassQuery
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticEvidence
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticFacetSpec
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticFacetsSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticIconSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticPredicateSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticPredicateValue
@@ -109,6 +111,48 @@ class OfficialStatisticBundleStoreTest {
 
     assertEquals(listOf("official.artifact-evidence"), installed.map { it.id })
     assertNotNull(cached.single().calculation.predicate?.condition?.any)
+  }
+
+  @Test
+  fun `installs and reloads an ordered facets calculation`() {
+    val definition = officialDefinition().copy(
+      id = "official.capabilities",
+      calculation = StatisticCalculationSpec(
+        kind = StatisticCalculationKind.FACETS,
+        facets = StatisticFacetsSpec(
+          matchedTitle = StatisticTitleSpec(translations = mapOf("en" to "Matched")),
+          unmatchedTitle = StatisticTitleSpec(translations = mapOf("en" to "Other")),
+          items = listOf(
+            StatisticFacetSpec(
+              id = "voip-service-kit",
+              title = StatisticTitleSpec(translations = mapOf("en" to "VoIP Service Kit")),
+              condition = StatisticConditionSpec(
+                evidence = StatisticEvidence.DEX_CLASS,
+                operator = StatisticComparisonOperator.CONTAINS_ANY,
+                value = StatisticPredicateValue(
+                  dexClasses = listOf(
+                    StatisticDexClassQuery(
+                      name = StatisticStringPattern(
+                        operator = StatisticStringOperator.STARTS_WITH,
+                        value = "Lcom/voip/service/"
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    )
+    val store = createStore()
+    val bundleFile = createBundle(VALID_SVG, definition = definition)
+
+    val installed = store.install(manifestFor(bundleFile), bundleFile)
+    val cached = store.loadCachedStatistics()
+
+    assertEquals(listOf("official.capabilities"), installed.map { it.id })
+    assertEquals("voip-service-kit", cached.single().calculation.facets?.items?.single()?.id)
   }
 
   @Test

@@ -55,7 +55,8 @@ class ValidateStatisticCatalogUseCase {
         StatisticCalculationKind.NATIVE -> {
           if (
             definition.calculation.nativeOperator == null ||
-            definition.calculation.predicate != null
+            definition.calculation.predicate != null ||
+            definition.calculation.facets != null
           ) {
             errors += "Native statistic has an invalid calculation: ${definition.id}"
           }
@@ -66,7 +67,11 @@ class ValidateStatisticCatalogUseCase {
 
         StatisticCalculationKind.PREDICATE -> {
           val predicate = definition.calculation.predicate
-          if (predicate == null || definition.calculation.nativeOperator != null) {
+          if (
+            predicate == null ||
+            definition.calculation.nativeOperator != null ||
+            definition.calculation.facets != null
+          ) {
             errors += "Predicate statistic has an invalid calculation: ${definition.id}"
           } else {
             validateTitle(predicate.matchedTitle, definition.id, errors)
@@ -94,6 +99,53 @@ class ValidateStatisticCatalogUseCase {
             }
           }
         }
+
+        StatisticCalculationKind.FACETS -> {
+          val facets = definition.calculation.facets
+          if (
+            facets == null ||
+            definition.calculation.nativeOperator != null ||
+            definition.calculation.predicate != null
+          ) {
+            errors += "Facets statistic has an invalid calculation: ${definition.id}"
+          } else {
+            validateTitle(facets.matchedTitle, definition.id, errors)
+            validateTitle(facets.unmatchedTitle, definition.id, errors)
+            if (facets.items.isEmpty() || facets.items.size > MAX_FACETS) {
+              errors += "Facets statistic has an invalid facet count: ${definition.id}"
+            }
+            val duplicateFacetIds = facets.items.groupingBy { it.id }.eachCount()
+              .filterValues { it > 1 }
+              .keys
+            duplicateFacetIds.forEach {
+              errors += "Facets statistic has a duplicate facet id: ${definition.id}: $it"
+            }
+            val conditionState = ConditionValidationState()
+            facets.items.forEach { facet ->
+              if (!FACET_ID.matches(facet.id)) {
+                errors += "Facets statistic has an invalid facet id: ${definition.id}: ${facet.id}"
+              }
+              validateTitle(
+                titleSpec = facet.title,
+                statisticId = definition.id,
+                errors = errors,
+                maxLength = MAX_FACET_TITLE_LENGTH
+              )
+              if (
+                definition.source != StatisticSource.BUILTIN &&
+                facet.title.translations[DEFAULT_TRANSLATION_LOCALE].isNullOrBlank()
+              ) {
+                errors += "External facet must provide an English title: ${definition.id}: ${facet.id}"
+              }
+              validateCondition(
+                condition = facet.condition,
+                statisticId = definition.id,
+                errors = errors,
+                state = conditionState
+              )
+            }
+          }
+        }
       }
     }
     return errors
@@ -110,7 +162,8 @@ class ValidateStatisticCatalogUseCase {
   private fun validateTitle(
     titleSpec: StatisticTitleSpec,
     statisticId: String,
-    errors: MutableList<String>
+    errors: MutableList<String>,
+    maxLength: Int = MAX_TITLE_LENGTH
   ) {
     val hasResourceTitle = titleSpec.resource != null
     val hasTranslatedTitle = titleSpec.translations.isNotEmpty()
@@ -118,7 +171,7 @@ class ValidateStatisticCatalogUseCase {
       errors += "Statistic must have exactly one title source: $statisticId"
     }
     if (titleSpec.translations.any { (locale, title) ->
-        !LOCALE_TAG.matches(locale) || title.isBlank() || title.length > MAX_TITLE_LENGTH
+        !LOCALE_TAG.matches(locale) || title.isBlank() || title.length > maxLength
       }
     ) {
       errors += "Statistic has an invalid translated title: $statisticId"
@@ -314,6 +367,8 @@ class ValidateStatisticCatalogUseCase {
     const val ICON_ASSET_PREFIX = "icons/"
     const val MAX_ASSET_PATH_LENGTH = 160
     const val MAX_TITLE_LENGTH = 80
+    const val MAX_FACET_TITLE_LENGTH = 40
+    const val MAX_FACETS = 8
     const val MAX_EVIDENCE_STRING_LENGTH = 160
     const val MAX_CONDITION_DEPTH = 8
     const val MAX_CONDITION_NODES = 64
@@ -323,6 +378,7 @@ class ValidateStatisticCatalogUseCase {
     const val MAX_METHOD_REFERENCES = 16
     const val MAX_METHOD_PARAMETERS = 16
     val STATISTIC_ID = Regex("[a-z][a-z0-9]*(?:[.-][a-z0-9]+)+")
+    val FACET_ID = Regex("[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*")
     val LOCALE_TAG = Regex("[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*")
     val NATIVE_LIBRARY_NAME = Regex("[A-Za-z0-9._+-]{1,160}")
     val MANIFEST_ACTION = Regex("[A-Za-z0-9_.-]{1,160}")
@@ -330,6 +386,7 @@ class ValidateStatisticCatalogUseCase {
     val DEX_CLASS_DESCRIPTOR = Regex("L[A-Za-z0-9_$/-]{1,158};")
     val DEX_METHOD_NAME = Regex("[A-Za-z0-9_$<>-]{1,80}")
     val DEX_PARAMETER_TYPE = Regex("\\[*[ZBSCIJFD]|\\[*L[A-Za-z0-9_$/-]{1,158};")
+    const val DEFAULT_TRANSLATION_LOCALE = "en"
   }
 
   private data class ConditionValidationState(
