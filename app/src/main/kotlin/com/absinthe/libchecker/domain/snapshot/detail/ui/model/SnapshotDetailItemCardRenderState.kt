@@ -24,8 +24,7 @@ data class SnapshotDetailThemeColors(
   @ColorInt val surface: Int,
   @ColorInt val onSurface: Int,
   @ColorInt val onSurfaceVariant: Int,
-  @ColorInt val outlineVariant: Int,
-  @ColorInt val chipSurface: Int
+  @ColorInt val outlineVariant: Int
 )
 
 data class SnapshotDetailItemResolvedColors(
@@ -36,7 +35,6 @@ data class SnapshotDetailItemResolvedColors(
   @ColorInt val supportingText: Int,
   @ColorInt val divider: Int,
   @ColorInt val status: Int,
-  @ColorInt val chipSurface: Int,
   @ColorInt val chipText: Int,
   @ColorInt val chipOutline: Int
 )
@@ -53,7 +51,6 @@ fun resolveSnapshotDetailItemColors(
     supportingText = theme.onSurfaceVariant,
     divider = resolveSnapshotDetailDividerColor(theme.surface, theme.outlineVariant),
     status = statusColor,
-    chipSurface = blendArgb(theme.chipSurface, statusColor, overlayPercent = 12),
     chipText = theme.onSurfaceVariant,
     chipOutline = theme.outlineVariant
   )
@@ -88,23 +85,23 @@ private fun blendArgb(
 }
 
 data class SnapshotDetailItemLayoutPlan(
-  val titleWidth: Int,
-  val chipOnTitleLine: Boolean
+  val contentWidth: Int,
+  val chipOnStatusLine: Boolean
 )
 
 fun planSnapshotDetailItemLayout(
   contentWidth: Int,
-  naturalTitleWidth: Int,
+  naturalStatusWidth: Int,
   chipWidth: Int,
   chipGap: Int
 ): SnapshotDetailItemLayoutPlan {
   val safeContentWidth = contentWidth.coerceAtLeast(0)
-  val titleWraps = naturalTitleWidth > safeContentWidth
-  val chipOnTitleLine = chipWidth > 0 &&
-    !titleWraps &&
-    naturalTitleWidth + chipGap + chipWidth <= safeContentWidth
+  val statusWraps = naturalStatusWidth > safeContentWidth
+  val chipOnStatusLine = chipWidth > 0 &&
+    !statusWraps &&
+    naturalStatusWidth + chipGap + chipWidth <= safeContentWidth
   return SnapshotDetailItemLayoutPlan(
-    titleWidth = safeContentWidth,
-    chipOnTitleLine = chipOnTitleLine
+    contentWidth = safeContentWidth,
+    chipOnStatusLine = chipOnStatusLine
   )
 }

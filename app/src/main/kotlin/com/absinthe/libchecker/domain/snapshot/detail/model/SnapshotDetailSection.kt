@@ -80,7 +80,7 @@ fun buildSnapshotDetailItemDescription(
   extra: CharSequence?,
   ruleLabel: CharSequence?
 ): String {
-  return listOf(statusLabel, title, extra, ruleLabel)
+  return listOf(statusLabel, ruleLabel, title, extra)
     .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
     .joinToString()
 }

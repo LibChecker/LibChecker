@@ -14,8 +14,7 @@ class SnapshotDetailItemVisualStateTest {
         surface = 1,
         onSurface = 2,
         onSurfaceVariant = 3,
-        outlineVariant = 4,
-        chipSurface = 5
+        outlineVariant = 4
       ),
       statusColor = 6
     )
@@ -27,7 +26,6 @@ class SnapshotDetailItemVisualStateTest {
     assertEquals(3, colors.supportingText)
     assertEquals(2, colors.divider)
     assertEquals(6, colors.status)
-    assertEquals(5, colors.chipSurface)
     assertEquals(3, colors.chipText)
     assertEquals(4, colors.chipOutline)
   }
@@ -39,8 +37,7 @@ class SnapshotDetailItemVisualStateTest {
         surface = 11,
         onSurface = 12,
         onSurfaceVariant = 13,
-        outlineVariant = 14,
-        chipSurface = 15
+        outlineVariant = 14
       ),
       statusColor = 16
     )
@@ -50,25 +47,22 @@ class SnapshotDetailItemVisualStateTest {
     assertEquals(13, colors.supportingText)
     assertEquals(12, colors.divider)
     assertEquals(16, colors.status)
-    assertEquals(15, colors.chipSurface)
   }
 
   @Test
-  fun blendsStatusIntoRowAndChipSurfacesWithoutChangingTheOpaqueBase() {
+  fun blendsStatusIntoRowWithoutChangingTheOpaqueBase() {
     val colors = resolveSnapshotDetailItemColors(
       theme = SnapshotDetailThemeColors(
         surface = 0xFF000000.toInt(),
         onSurface = 1,
         onSurfaceVariant = 2,
-        outlineVariant = 3,
-        chipSurface = 0xFF000000.toInt()
+        outlineVariant = 3
       ),
       statusColor = 0xFFFFFFFF.toInt()
     )
 
     assertEquals(0xFF191919.toInt(), colors.gradientStart)
     assertEquals(0xFF0A0A0A.toInt(), colors.gradientMiddle)
-    assertEquals(0xFF1E1E1E.toInt(), colors.chipSurface)
     assertEquals(0xFF000000.toInt(), colors.surface)
   }
 
@@ -84,40 +78,40 @@ class SnapshotDetailItemVisualStateTest {
   }
 
   @Test
-  fun givesShortTitleTheEntireContentRowBelowStatus() {
+  fun placesRuleChipAfterStatusWhenStatusRowFits() {
     val plan = planSnapshotDetailItemLayout(
       contentWidth = 300,
-      naturalTitleWidth = 100,
+      naturalStatusWidth = 80,
       chipWidth = 54,
       chipGap = 6
     )
 
-    assertEquals(300, plan.titleWidth)
-    assertTrue(plan.chipOnTitleLine)
+    assertEquals(300, plan.contentWidth)
+    assertTrue(plan.chipOnStatusLine)
   }
 
   @Test
-  fun clampsTitleRowWidthAtZero() {
+  fun clampsContentWidthAtZero() {
     val plan = planSnapshotDetailItemLayout(
       contentWidth = -1,
-      naturalTitleWidth = 140,
+      naturalStatusWidth = 80,
       chipWidth = 54,
       chipGap = 6
     )
 
-    assertEquals(0, plan.titleWidth)
-    assertFalse(plan.chipOnTitleLine)
+    assertEquals(0, plan.contentWidth)
+    assertFalse(plan.chipOnStatusLine)
   }
 
   @Test
-  fun movesRuleChipBelowWrappedClassName() {
+  fun movesRuleChipBelowWhenStatusRowCannotFitIt() {
     val plan = planSnapshotDetailItemLayout(
       contentWidth = 300,
-      naturalTitleWidth = 500,
+      naturalStatusWidth = 260,
       chipWidth = 54,
       chipGap = 6
     )
 
-    assertFalse(plan.chipOnTitleLine)
+    assertFalse(plan.chipOnStatusLine)
   }
 }
