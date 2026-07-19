@@ -14,6 +14,8 @@ import com.absinthe.libchecker.domain.statistics.chart.model.StatisticEvidence
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticFacetSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticFacetsSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticIconSpec
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticManifestAttributeQuery
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticManifestElement
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticNativeOperator
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticPredicateSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticPredicateValue
@@ -177,6 +179,61 @@ class ValidateStatisticCatalogUseCaseTest {
     val errors = validate(StatisticBundle(1, listOf(definition)))
 
     assertTrue(errors.toString(), errors.isEmpty())
+  }
+
+  @Test
+  fun `accepts an application manifest Boolean attribute`() {
+    val definition = officialDefinition().copy(
+      id = "official.predictive-back-gesture",
+      calculation = StatisticCalculationSpec(
+        kind = StatisticCalculationKind.PREDICATE,
+        predicate = StatisticPredicateSpec(
+          evidence = StatisticEvidence.MANIFEST_ATTRIBUTE,
+          operator = StatisticComparisonOperator.EQUAL,
+          value = StatisticPredicateValue(
+            manifestAttribute = StatisticManifestAttributeQuery(
+              element = StatisticManifestElement.APPLICATION,
+              name = "android:enableOnBackInvokedCallback",
+              boolean = true
+            )
+          ),
+          matchedTitle = translatedTitle("Enabled"),
+          unmatchedTitle = translatedTitle("Not enabled")
+        )
+      )
+    )
+
+    val errors = validate(StatisticBundle(1, listOf(definition)))
+
+    assertTrue(errors.toString(), errors.isEmpty())
+  }
+
+  @Test
+  fun `rejects an unsafe application manifest attribute`() {
+    val definition = officialDefinition().copy(
+      id = "official.predictive-back-gesture",
+      calculation = StatisticCalculationSpec(
+        kind = StatisticCalculationKind.PREDICATE,
+        predicate = StatisticPredicateSpec(
+          evidence = StatisticEvidence.MANIFEST_ATTRIBUTE,
+          operator = StatisticComparisonOperator.CONTAINS,
+          value = StatisticPredicateValue(
+            manifestAttribute = StatisticManifestAttributeQuery(
+              element = StatisticManifestElement.APPLICATION,
+              name = "tools:replace",
+              boolean = true
+            )
+          ),
+          matchedTitle = translatedTitle("Enabled"),
+          unmatchedTitle = translatedTitle("Not enabled")
+        )
+      )
+    )
+
+    val errors = validate(StatisticBundle(1, listOf(definition)))
+
+    assertTrue(errors.any { it.startsWith("Manifest attribute predicate requires a valid Boolean attribute") })
+    assertTrue(errors.any { it.startsWith("Manifest attribute predicate requires the equal operator") })
   }
 
   @Test

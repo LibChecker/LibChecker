@@ -55,6 +55,10 @@ internal class StatisticConditionEvaluator {
       StatisticEvidence.MANIFEST_RECEIVER_ACTION -> artifactMatches[
         StatisticArtifactQuery.ManifestReceiverActions(checkNotNull(value.strings))
       ] == true
+
+      StatisticEvidence.MANIFEST_ATTRIBUTE -> artifactMatches[
+        StatisticArtifactQuery.ManifestAttribute(checkNotNull(value.manifestAttribute))
+      ] == true
     }
   }
 
@@ -82,6 +86,10 @@ internal class StatisticConditionEvaluator {
 
       StatisticEvidence.MANIFEST_RECEIVER_ACTION -> {
         destination += StatisticArtifactQuery.ManifestReceiverActions(checkNotNull(value.strings))
+      }
+
+      StatisticEvidence.MANIFEST_ATTRIBUTE -> {
+        destination += StatisticArtifactQuery.ManifestAttribute(checkNotNull(value.manifestAttribute))
       }
     }
   }

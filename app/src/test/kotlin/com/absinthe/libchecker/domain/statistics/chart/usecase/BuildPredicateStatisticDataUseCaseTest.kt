@@ -5,6 +5,8 @@ import com.absinthe.libchecker.domain.statistics.chart.model.StatisticComparison
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticConditionSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDexClassQuery
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticEvidence
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticManifestAttributeQuery
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticManifestElement
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticPredicateSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticPredicateValue
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticStringOperator
@@ -135,6 +137,34 @@ class BuildPredicateStatisticDataUseCaseTest {
 
     assertEquals(listOf("dex", "manifest"), result?.matched?.map { it.packageName })
     assertEquals(listOf("other"), result?.unmatched?.map { it.packageName })
+  }
+
+  @Test
+  fun `classifies an application manifest Boolean attribute`() = runBlocking {
+    val manifestAttribute = StatisticManifestAttributeQuery(
+      element = StatisticManifestElement.APPLICATION,
+      name = "android:enableOnBackInvokedCallback",
+      boolean = true
+    )
+    artifactMatches["enabled"] = mutableSetOf(
+      StatisticArtifactQuery.ManifestAttribute(manifestAttribute)
+    )
+    val result = useCase(
+      BuildPredicateStatisticDataUseCase.Request(
+        items = listOf(item("enabled", targetApi = 33), item("disabled", targetApi = 36)),
+        predicate = StatisticPredicateSpec(
+          evidence = StatisticEvidence.MANIFEST_ATTRIBUTE,
+          operator = StatisticComparisonOperator.EQUAL,
+          value = StatisticPredicateValue(manifestAttribute = manifestAttribute),
+          matchedTitle = StatisticTitleSpec(translations = mapOf("en" to "Enabled")),
+          unmatchedTitle = StatisticTitleSpec(translations = mapOf("en" to "Not enabled"))
+        ),
+        showSystemApps = true
+      )
+    )
+
+    assertEquals(listOf("enabled"), result?.matched?.map { it.packageName })
+    assertEquals(listOf("disabled"), result?.unmatched?.map { it.packageName })
   }
 
   @Test

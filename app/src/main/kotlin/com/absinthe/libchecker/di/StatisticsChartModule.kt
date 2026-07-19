@@ -68,7 +68,9 @@ val statisticsChartModule = module {
     )
   }
   single<StatisticSelectionStore> { SharedPreferencesStatisticSelectionStore(SPUtils.sp) }
-  single<StatisticEvidenceRepository> { AndroidStatisticEvidenceRepository(get()) }
+  single<StatisticEvidenceRepository> {
+    AndroidStatisticEvidenceRepository(androidContext().packageManager, get())
+  }
   single<StatisticCatalogRepository> {
     DefaultStatisticCatalogRepository(
       builtIn = get(),

@@ -275,7 +275,8 @@ class ValidateStatisticCatalogUseCase {
       value.boolean,
       value.string,
       value.strings,
-      value.dexClasses
+      value.dexClasses,
+      value.manifestAttribute
     ).size
     if (valueCount != 1) {
       errors += "Predicate evidence must have exactly one value: $statisticId"
@@ -341,6 +342,16 @@ class ValidateStatisticCatalogUseCase {
         }
         if (operator != StatisticComparisonOperator.CONTAINS_ANY) {
           errors += "Manifest receiver action predicate requires the contains_any operator: $statisticId"
+        }
+      }
+
+      StatisticEvidence.MANIFEST_ATTRIBUTE -> {
+        val attribute = value.manifestAttribute
+        if (attribute == null || !MANIFEST_ATTRIBUTE_NAME.matches(attribute.name)) {
+          errors += "Manifest attribute predicate requires a valid Boolean attribute: $statisticId"
+        }
+        if (operator != StatisticComparisonOperator.EQUAL) {
+          errors += "Manifest attribute predicate requires the equal operator: $statisticId"
         }
       }
     }
@@ -431,6 +442,7 @@ class ValidateStatisticCatalogUseCase {
     val NATIVE_LIBRARY_NAME = Regex("[A-Za-z0-9._+-]{1,160}")
     val ARCHIVE_ENTRY_NAME = Regex("[A-Za-z0-9][A-Za-z0-9._+/-]{0,159}")
     val MANIFEST_ACTION = Regex("[A-Za-z0-9_.-]{1,160}")
+    val MANIFEST_ATTRIBUTE_NAME = Regex("android:[A-Za-z][A-Za-z0-9_]{0,79}")
     val DEX_CLASS_PATTERN = Regex("L[A-Za-z0-9_$/-]{1,158};?")
     val DEX_CLASS_DESCRIPTOR = Regex("L[A-Za-z0-9_$/-]{1,158};")
     val DEX_METHOD_NAME = Regex("[A-Za-z0-9_$<>-]{1,80}")

@@ -2,6 +2,7 @@ package com.absinthe.libchecker.domain.statistics.chart.repository
 
 import android.content.pm.PackageInfo
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDexClassQuery
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticManifestAttributeQuery
 
 interface StatisticEvidenceRepository {
 
@@ -35,4 +36,6 @@ sealed interface StatisticArtifactQuery {
   data class ArchiveEntries(val names: List<String>) : StatisticArtifactQuery
 
   data class ManifestReceiverActions(val actions: List<String>) : StatisticArtifactQuery
+
+  data class ManifestAttribute(val query: StatisticManifestAttributeQuery) : StatisticArtifactQuery
 }

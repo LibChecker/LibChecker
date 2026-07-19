@@ -1,18 +1,21 @@
 package com.absinthe.libchecker.data.statistics
 
 import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.util.LruCache
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.compat.ZipFileCompat
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDexClassQuery
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDexMethodReference
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticManifestElement
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticStringOperator
 import com.absinthe.libchecker.domain.statistics.chart.repository.StatisticArtifactQuery
 import com.absinthe.libchecker.domain.statistics.chart.repository.StatisticEvidenceRepository
 import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.dex.FastDexFileFactory
+import com.absinthe.libchecker.utils.manifest.ApplicationReader
 import com.android.tools.smali.dexlib2.Opcodes
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
@@ -23,12 +26,15 @@ import kotlinx.coroutines.CancellationException
 import timber.log.Timber
 
 class AndroidStatisticEvidenceRepository(
+  private val packageManager: PackageManager,
   private val installedAppRepository: InstalledAppRepository
 ) : StatisticEvidenceRepository {
   private val dexMatchCache = LruCache<DexMatchCacheKey, Boolean>(DEX_CACHE_SIZE)
   private val archiveEntryMatchCache =
     LruCache<ArchiveEntryMatchCacheKey, Boolean>(ARCHIVE_ENTRY_CACHE_SIZE)
   private val manifestActionCache = LruCache<ArtifactVersion, Set<String>>(MANIFEST_CACHE_SIZE)
+  private val manifestAttributeCache =
+    LruCache<ArtifactVersion, Map<String, Any>>(MANIFEST_CACHE_SIZE)
 
   override fun matches(packageName: String, query: StatisticArtifactQuery): Boolean {
     return matchesAll(packageName, setOf(query))[query] == true
@@ -112,6 +118,34 @@ class AndroidStatisticEvidenceRepository(
         }.orEmpty()
         manifestQueries.forEach { query ->
           results[query] = query.actions.any(actions::contains)
+        }
+      }
+
+      val manifestAttributeQueries =
+        queries.filterIsInstance<StatisticArtifactQuery.ManifestAttribute>()
+      if (manifestAttributeQueries.isNotEmpty()) {
+        val properties = version?.let {
+          manifestAttributeCache[it] ?: readApplicationManifestProperties(it.sourcePaths)
+            .also { properties -> manifestAttributeCache.put(it, properties) }
+        }.orEmpty()
+        val resources = packageInfo.applicationInfo?.let { applicationInfo ->
+          runCatching { packageManager.getResourcesForApplication(applicationInfo) }
+            .onFailure { error ->
+              Timber.w(error, "Unable to resolve statistic manifest resources for %s", packageInfo.packageName)
+            }
+            .getOrNull()
+        }
+        manifestAttributeQueries.forEach { query ->
+          val attribute = query.query
+          val rawValue = if (attribute.element == StatisticManifestElement.APPLICATION) {
+            properties[attribute.name.substringAfter(':')]
+          } else {
+            null
+          }
+          val actual = resolveManifestBooleanValue(rawValue) { resourceId ->
+            runCatching { resources?.getBoolean(resourceId) }.getOrNull()
+          }
+          results[query] = actual != null && actual == attribute.boolean
         }
       }
       onProgress(MANIFEST_PROGRESS)
@@ -312,6 +346,16 @@ class AndroidStatisticEvidenceRepository(
       .toSet()
   }
 
+  private fun readApplicationManifestProperties(sourcePaths: List<String>): Map<String, Any> {
+    val baseApk = sourcePaths.firstOrNull()?.let(::File)?.takeIf(File::isFile)
+      ?: return emptyMap()
+    return runCatching {
+      ApplicationReader.getManifestProperties(baseApk).mapValues { it.value }
+    }.onFailure { error ->
+      Timber.w(error, "Unable to scan statistic application manifest attributes from %s", baseApk)
+    }.getOrDefault(emptyMap())
+  }
+
   private fun readArchiveEntries(
     sourcePaths: List<String>,
     requestedNames: Set<String>
@@ -377,5 +421,24 @@ class AndroidStatisticEvidenceRepository(
     const val MANIFEST_PROGRESS = 30
     const val DEX_PROGRESS = 95
     const val DEX_PROGRESS_CLASS_INTERVAL = 64
+  }
+}
+
+internal fun resolveManifestBooleanValue(
+  rawValue: Any?,
+  resolveResource: (Int) -> Boolean?
+): Boolean? {
+  return when (rawValue) {
+    is Boolean -> rawValue
+
+    is Number -> resolveResource(rawValue.toInt())
+
+    is String -> when (rawValue.lowercase()) {
+      "true", "1" -> true
+      "false", "0" -> false
+      else -> null
+    }
+
+    else -> null
   }
 }

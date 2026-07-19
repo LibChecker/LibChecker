@@ -11,6 +11,8 @@ import com.absinthe.libchecker.domain.statistics.chart.model.StatisticEvidence
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticFacetSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticFacetsSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticIconSpec
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticManifestAttributeQuery
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticManifestElement
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticPredicateSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticPredicateValue
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticRemoteManifest
@@ -153,6 +155,36 @@ class OfficialStatisticBundleStoreTest {
 
     assertEquals(listOf("official.capabilities"), installed.map { it.id })
     assertEquals("voip-service-kit", cached.single().calculation.facets?.items?.single()?.id)
+  }
+
+  @Test
+  fun `installs and reloads a manifest attribute condition`() {
+    val attribute = StatisticManifestAttributeQuery(
+      element = StatisticManifestElement.APPLICATION,
+      name = "android:enableOnBackInvokedCallback",
+      boolean = true
+    )
+    val definition = officialDefinition().copy(
+      id = "official.predictive-back-gesture",
+      calculation = StatisticCalculationSpec(
+        kind = StatisticCalculationKind.PREDICATE,
+        predicate = StatisticPredicateSpec(
+          evidence = StatisticEvidence.MANIFEST_ATTRIBUTE,
+          operator = StatisticComparisonOperator.EQUAL,
+          value = StatisticPredicateValue(manifestAttribute = attribute),
+          matchedTitle = StatisticTitleSpec(translations = mapOf("en" to "Enabled")),
+          unmatchedTitle = StatisticTitleSpec(translations = mapOf("en" to "Not enabled"))
+        )
+      )
+    )
+    val store = createStore()
+    val bundleFile = createBundle(VALID_SVG, definition = definition)
+
+    val installed = store.install(manifestFor(bundleFile), bundleFile)
+    val cached = store.loadCachedStatistics()
+
+    assertEquals(listOf("official.predictive-back-gesture"), installed.map { it.id })
+    assertEquals(attribute, cached.single().calculation.predicate?.value?.manifestAttribute)
   }
 
   @Test

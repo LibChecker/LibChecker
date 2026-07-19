@@ -98,7 +98,15 @@ data class StatisticPredicateValue(
   val boolean: Boolean? = null,
   val string: String? = null,
   val strings: List<String>? = null,
-  val dexClasses: List<StatisticDexClassQuery>? = null
+  val dexClasses: List<StatisticDexClassQuery>? = null,
+  val manifestAttribute: StatisticManifestAttributeQuery? = null
+)
+
+@JsonClass(generateAdapter = true)
+data class StatisticManifestAttributeQuery(
+  val element: StatisticManifestElement,
+  val name: String,
+  val boolean: Boolean
 )
 
 @JsonClass(generateAdapter = true)
@@ -240,7 +248,15 @@ enum class StatisticEvidence {
   ARCHIVE_ENTRY,
 
   @Json(name = "manifest_receiver_action")
-  MANIFEST_RECEIVER_ACTION
+  MANIFEST_RECEIVER_ACTION,
+
+  @Json(name = "manifest_attribute")
+  MANIFEST_ATTRIBUTE
+}
+
+enum class StatisticManifestElement {
+  @Json(name = "application")
+  APPLICATION
 }
 
 enum class StatisticComparisonOperator {
