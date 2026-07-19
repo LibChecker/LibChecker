@@ -4,6 +4,8 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.RenderEffect
 import android.graphics.Shader
 import android.os.Build
@@ -12,8 +14,10 @@ import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowManager
 import android.view.animation.AccelerateDecelerateInterpolator
+import android.widget.ImageView
 import androidx.annotation.RequiresApi
 import com.absinthe.libchecker.utils.extensions.activity
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import java.util.WeakHashMap
 import java.util.function.Consumer
 import kotlin.math.abs
@@ -196,7 +200,7 @@ internal class WindowBlurCompatController(
       val radius = state.requests.values.maxOrNull() ?: 0f
       if (radius <= 0f) {
         states.remove(hostView)
-        hostView.setRenderEffect(null)
+        state.blurEffect.clear(hostView)
         return
       }
       state.blurEffect.applyRadius(hostView, radius)
@@ -210,13 +214,86 @@ internal class WindowBlurCompatController(
 
     private class HostViewBlurEffect {
       private var appliedRadius = Float.NaN
+      private var overlay: SnapshotBlurOverlay? = null
 
-      fun applyRadius(hostView: View, radius: Float) {
+      fun applyRadius(hostView: ViewGroup, radius: Float) {
         if (abs(appliedRadius - radius) < MIN_EFFECT_RADIUS_DELTA) return
         appliedRadius = radius
-        hostView.setRenderEffect(
-          RenderEffect.createBlurEffect(radius, radius, Shader.TileMode.MIRROR)
-        )
+        val currentOverlay = overlay ?: SnapshotBlurOverlay.create(hostView)?.also {
+          overlay = it
+        } ?: return
+        currentOverlay.applyRadius(radius)
+      }
+
+      fun clear(hostView: ViewGroup) {
+        overlay?.clear(hostView)
+        overlay = null
+        hostView.setRenderEffect(null)
+      }
+    }
+
+    private class SnapshotBlurOverlay(
+      private val sharpLayer: ImageView,
+      private val blurLayers: List<ImageView>
+    ) {
+      fun applyRadius(radius: Float) {
+        sharpLayer.alpha = fixedSharpLayerAlpha(radius)
+        val alphas = fixedBlurLayerAlphas(radius)
+        blurLayers.forEachIndexed { index, layer ->
+          layer.alpha = alphas[index]
+        }
+      }
+
+      fun clear(hostView: ViewGroup) {
+        (blurLayers + sharpLayer).forEach { layer ->
+          layer.setImageDrawable(null)
+          hostView.removeView(layer)
+        }
+      }
+
+      companion object {
+        fun create(hostView: ViewGroup): SnapshotBlurOverlay? {
+          val hostWidth = hostView.width
+          val hostHeight = hostView.height
+          if (hostWidth <= 0 || hostHeight <= 0) return null
+
+          val snapshot = try {
+            Bitmap.createBitmap(hostWidth, hostHeight, Bitmap.Config.ARGB_8888).also { bitmap ->
+              hostView.draw(Canvas(bitmap))
+              bitmap.prepareToDraw()
+            }
+          } catch (_: OutOfMemoryError) {
+            return null
+          }
+          val blurBackgroundColor =
+            hostView.context.getColorByAttr(android.R.attr.colorBackground)
+          fun createLayer(radius: Float?): ImageView {
+            return ImageView(hostView.context).apply {
+              setImageBitmap(snapshot)
+              scaleType = ImageView.ScaleType.FIT_XY
+              isClickable = false
+              isFocusable = false
+              importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+              alpha = if (radius == null) 1f else 0f
+              if (radius != null) {
+                if (radius > FIXED_BLUR_RADII.first()) {
+                  setBackgroundColor(blurBackgroundColor)
+                }
+                setRenderEffect(
+                  RenderEffect.createBlurEffect(radius, radius, Shader.TileMode.MIRROR)
+                )
+              }
+              layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+              )
+              hostView.addView(this)
+            }
+          }
+          val sharpLayer = createLayer(null)
+          val blurLayers = FIXED_BLUR_RADII.map(::createLayer)
+          return SnapshotBlurOverlay(sharpLayer, blurLayers)
+        }
       }
     }
   }
@@ -225,4 +302,34 @@ internal class WindowBlurCompatController(
     const val MIN_RADIUS_DELTA = 0.1f
     const val MIN_EFFECT_RADIUS_DELTA = 0.25f
   }
+}
+
+private val FIXED_BLUR_RADII = floatArrayOf(24f, 48f, 64f, 80f)
+
+internal fun fixedSharpLayerAlpha(radius: Float): Float = (radius / FIXED_BLUR_RADII.first()).coerceIn(0f, 1f)
+
+internal fun fixedBlurLayerAlphas(radius: Float): FloatArray {
+  val clampedRadius = radius.coerceAtLeast(0f)
+  val alphas = FloatArray(FIXED_BLUR_RADII.size)
+  if (clampedRadius <= 0f) return alphas
+
+  val exactIndex = FIXED_BLUR_RADII.indexOfFirst { it == clampedRadius }
+  if (exactIndex >= 0) {
+    alphas[exactIndex] = 1f
+    return alphas
+  }
+
+  val upperIndex = FIXED_BLUR_RADII.indexOfFirst { it > clampedRadius }
+  if (upperIndex < 0) {
+    alphas[alphas.lastIndex] = 1f
+    return alphas
+  }
+
+  val lowerRadius = FIXED_BLUR_RADII.getOrElse(upperIndex - 1) { 0f }
+  if (upperIndex > 0) {
+    alphas[upperIndex - 1] = 1f
+  }
+  alphas[upperIndex] =
+    (clampedRadius - lowerRadius) / (FIXED_BLUR_RADII[upperIndex] - lowerRadius)
+  return alphas
 }
