@@ -20,7 +20,6 @@ import androidx.core.text.HtmlCompat
 import androidx.fragment.app.FragmentActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.domain.app.detail.feature.FeatureDialogEntryPlacement
 import com.absinthe.libchecker.domain.app.detail.feature.FeatureDialogSpec
 import com.absinthe.libchecker.domain.app.detail.feature.FeatureDialogTitleLabel
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_INFO
@@ -71,22 +70,10 @@ object FeaturesDialog {
       dialog.setMessage(HtmlCompat.fromHtml(context.getString(messageRes), HtmlCompat.FROM_HTML_MODE_COMPACT))
     }
     spec.titleEntries?.let { entries ->
-      when (spec.entryPlacement) {
-        FeatureDialogEntryPlacement.TITLE -> {
-          val title = entries.joinToString(", ") { entry ->
-            "${entry.label.resolve(context)} <b>${entry.value.orEmpty()}</b>"
-          }
-          dialog.setTitle(HtmlCompat.fromHtml(title, HtmlCompat.FROM_HTML_MODE_COMPACT))
-        }
-
-        FeatureDialogEntryPlacement.MESSAGE -> {
-          val message = entries.joinToString("<br>") { entry ->
-            val version = entry.value?.let { " <b>$it</b>" }.orEmpty()
-            "• ${entry.label.resolve(context)}$version"
-          }
-          dialog.setMessage(HtmlCompat.fromHtml(message, HtmlCompat.FROM_HTML_MODE_COMPACT))
-        }
+      val title = entries.joinToString(", ") { entry ->
+        "${entry.label.resolve(context)} <b>${entry.value.orEmpty()}</b>"
       }
+      dialog.setTitle(HtmlCompat.fromHtml(title, HtmlCompat.FROM_HTML_MODE_COMPACT))
     }
 
     spec.sourceUrl?.let { link ->

@@ -48,6 +48,10 @@ internal class StatisticConditionEvaluator {
         StatisticArtifactQuery.DexClasses(checkNotNull(value.dexClasses))
       ] == true
 
+      StatisticEvidence.ARCHIVE_ENTRY -> artifactMatches[
+        StatisticArtifactQuery.ArchiveEntries(checkNotNull(value.strings))
+      ] == true
+
       StatisticEvidence.MANIFEST_RECEIVER_ACTION -> artifactMatches[
         StatisticArtifactQuery.ManifestReceiverActions(checkNotNull(value.strings))
       ] == true
@@ -70,6 +74,10 @@ internal class StatisticConditionEvaluator {
 
       StatisticEvidence.DEX_CLASS -> {
         destination += StatisticArtifactQuery.DexClasses(checkNotNull(value.dexClasses))
+      }
+
+      StatisticEvidence.ARCHIVE_ENTRY -> {
+        destination += StatisticArtifactQuery.ArchiveEntries(checkNotNull(value.strings))
       }
 
       StatisticEvidence.MANIFEST_RECEIVER_ACTION -> {

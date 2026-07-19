@@ -92,8 +92,6 @@ class BuildAppDetailFeatureItemUseCase {
 
       Features.Ext.APPLICATION_ICONS -> buildAppIconsItem(request.appIcons, request.canShowAppIcons)
 
-      Features.Ext.REACTIVE -> buildReactiveItem(feature)
-
       else -> null
     }
   }
@@ -123,19 +121,6 @@ class BuildAppDetailFeatureItemUseCase {
       icon = AppDetailFeatureIcon.AppIcons,
       titleRes = R.string.dialog_themed_and_alternative_app_icons,
       action = AppDetailFeatureAction.AppIcons(isFirstMonochrome = appIcons[0].isMonochrome)
-    )
-  }
-
-  private fun buildReactiveItem(feature: VersionedFeature): AppDetailFeatureItemData? {
-    val libraries = feature.extras.orEmpty().mapNotNull { (key, version) ->
-      ReactiveType.fromKey(key)?.let { ReactiveLibrary(it, version) }
-    }
-    if (libraries.isEmpty()) return null
-
-    return AppDetailFeatureItemData(
-      icon = resourceIcon(R.drawable.ic_reactivex),
-      titleRes = R.string.reactivex,
-      action = AppDetailFeatureAction.Reactive(libraries)
     )
   }
 
@@ -177,7 +162,6 @@ sealed interface AppDetailFeatureAction {
 
   data object SplitApks : AppDetailFeatureAction
   data class Kotlin(val extras: Map<String, String?>?) : Dialog
-  data class Reactive(val libraries: List<ReactiveLibrary>) : Dialog
   data class Agp(val version: String?) : Dialog
   data object XposedModule : AppDetailFeatureAction
   data object PlaySigning : Dialog
@@ -191,24 +175,6 @@ sealed interface AppDetailFeatureAction {
   data object ElfPageSize16KbCompat : Dialog
   data class AppIcons(val isFirstMonochrome: Boolean) : AppDetailFeatureAction
 }
-
-enum class ReactiveType(
-  val key: String,
-  @StringRes val titleRes: Int
-) {
-  RX_JAVA("rx_java", R.string.rxjava),
-  RX_KOTLIN("rx_kotlin", R.string.rxkotlin),
-  RX_ANDROID("rx_android", R.string.rxandroid);
-
-  companion object {
-    fun fromKey(key: String): ReactiveType? = entries.find { it.key == key }
-  }
-}
-
-data class ReactiveLibrary(
-  val type: ReactiveType,
-  val version: String?
-)
 
 private fun resourceIcon(
   @DrawableRes res: Int,

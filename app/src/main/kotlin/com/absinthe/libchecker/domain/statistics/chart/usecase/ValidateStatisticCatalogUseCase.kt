@@ -318,6 +318,19 @@ class ValidateStatisticCatalogUseCase {
         }
       }
 
+      StatisticEvidence.ARCHIVE_ENTRY -> {
+        val entries = value.strings
+        if (
+          entries == null || entries.isEmpty() || entries.size > MAX_STRING_VALUES ||
+          entries.any { !isSafeArchiveEntryName(it) }
+        ) {
+          errors += "Archive entry predicate requires valid entry names: $statisticId"
+        }
+        if (operator != StatisticComparisonOperator.CONTAINS_ANY) {
+          errors += "Archive entry predicate requires the contains_any operator: $statisticId"
+        }
+      }
+
       StatisticEvidence.MANIFEST_RECEIVER_ACTION -> {
         val actions = value.strings
         if (
@@ -383,6 +396,12 @@ class ValidateStatisticCatalogUseCase {
       value.all { it >= ' ' && it != '\u007f' }
   }
 
+  private fun isSafeArchiveEntryName(value: String): Boolean {
+    return ARCHIVE_ENTRY_NAME.matches(value) &&
+      !value.endsWith('/') &&
+      value.split('/').none { segment -> segment == "." || segment == ".." }
+  }
+
   private val StatisticSource.idPrefix: String
     get() = when (this) {
       StatisticSource.BUILTIN -> "builtin"
@@ -410,6 +429,7 @@ class ValidateStatisticCatalogUseCase {
     val FACET_ID = Regex("[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*")
     val LOCALE_TAG = Regex("[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*")
     val NATIVE_LIBRARY_NAME = Regex("[A-Za-z0-9._+-]{1,160}")
+    val ARCHIVE_ENTRY_NAME = Regex("[A-Za-z0-9][A-Za-z0-9._+/-]{0,159}")
     val MANIFEST_ACTION = Regex("[A-Za-z0-9_.-]{1,160}")
     val DEX_CLASS_PATTERN = Regex("L[A-Za-z0-9_$/-]{1,158};?")
     val DEX_CLASS_DESCRIPTOR = Regex("L[A-Za-z0-9_$/-]{1,158};")

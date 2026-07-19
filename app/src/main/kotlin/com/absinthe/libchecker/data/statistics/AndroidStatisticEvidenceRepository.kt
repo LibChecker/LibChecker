@@ -3,6 +3,7 @@ package com.absinthe.libchecker.data.statistics
 import android.content.pm.PackageInfo
 import android.util.LruCache
 import com.absinthe.libchecker.annotation.RECEIVER
+import com.absinthe.libchecker.compat.ZipFileCompat
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDexClassQuery
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDexMethodReference
@@ -25,6 +26,8 @@ class AndroidStatisticEvidenceRepository(
   private val installedAppRepository: InstalledAppRepository
 ) : StatisticEvidenceRepository {
   private val dexMatchCache = LruCache<DexMatchCacheKey, Boolean>(DEX_CACHE_SIZE)
+  private val archiveEntryMatchCache =
+    LruCache<ArchiveEntryMatchCacheKey, Boolean>(ARCHIVE_ENTRY_CACHE_SIZE)
   private val manifestActionCache = LruCache<ArtifactVersion, Set<String>>(MANIFEST_CACHE_SIZE)
 
   override fun matches(packageName: String, query: StatisticArtifactQuery): Boolean {
@@ -69,6 +72,37 @@ class AndroidStatisticEvidenceRepository(
         nativeQueries.forEach { query -> results[query] = query.name in libraryNames }
       }
       onProgress(NATIVE_PROGRESS)
+
+      val archiveQueries = queries.filterIsInstance<StatisticArtifactQuery.ArchiveEntries>()
+      if (archiveQueries.isNotEmpty()) {
+        if (version == null) {
+          archiveQueries.forEach { query -> results[query] = false }
+        } else {
+          val requestedNames = archiveQueries.flatMapTo(LinkedHashSet(), StatisticArtifactQuery.ArchiveEntries::names)
+          val matches = LinkedHashMap<String, Boolean>(requestedNames.size)
+          val pendingNames = LinkedHashSet<String>()
+          requestedNames.forEach { name ->
+            val cached = archiveEntryMatchCache[ArchiveEntryMatchCacheKey(version, name)]
+            if (cached == null) {
+              pendingNames += name
+            } else {
+              matches[name] = cached
+            }
+          }
+          if (pendingNames.isNotEmpty()) {
+            val foundNames = readArchiveEntries(version.sourcePaths, pendingNames)
+            pendingNames.forEach { name ->
+              val matched = name in foundNames
+              matches[name] = matched
+              archiveEntryMatchCache.put(ArchiveEntryMatchCacheKey(version, name), matched)
+            }
+          }
+          archiveQueries.forEach { query ->
+            results[query] = query.names.any { name -> matches[name] == true }
+          }
+        }
+      }
+      onProgress(ARCHIVE_ENTRY_PROGRESS)
 
       val manifestQueries = queries.filterIsInstance<StatisticArtifactQuery.ManifestReceiverActions>()
       if (manifestQueries.isNotEmpty()) {
@@ -278,6 +312,33 @@ class AndroidStatisticEvidenceRepository(
       .toSet()
   }
 
+  private fun readArchiveEntries(
+    sourcePaths: List<String>,
+    requestedNames: Set<String>
+  ): Set<String> {
+    val foundNames = mutableSetOf<String>()
+    val pendingNames = requestedNames.toMutableSet()
+    sourcePaths.asSequence()
+      .map(::File)
+      .filter(File::isFile)
+      .forEach { sourceFile ->
+        if (pendingNames.isEmpty()) return foundNames
+        runCatching {
+          ZipFileCompat(sourceFile).use { archive ->
+            pendingNames.toList().forEach { name ->
+              if (archive.getEntry(name) != null) {
+                foundNames += name
+                pendingNames -= name
+              }
+            }
+          }
+        }.onFailure { error ->
+          Timber.w(error, "Unable to scan statistic archive evidence from %s", sourceFile)
+        }
+      }
+    return foundNames
+  }
+
   private fun PackageInfo.artifactVersion(): ArtifactVersion? {
     val appInfo = applicationInfo ?: return null
     val sourcePaths = buildList {
@@ -302,11 +363,18 @@ class AndroidStatisticEvidenceRepository(
     val queries: List<StatisticDexClassQuery>
   )
 
+  private data class ArchiveEntryMatchCacheKey(
+    val version: ArtifactVersion,
+    val name: String
+  )
+
   private companion object {
     const val DEX_CACHE_SIZE = 512
+    const val ARCHIVE_ENTRY_CACHE_SIZE = 512
     const val MANIFEST_CACHE_SIZE = 128
-    const val NATIVE_PROGRESS = 15
-    const val MANIFEST_PROGRESS = 25
+    const val NATIVE_PROGRESS = 10
+    const val ARCHIVE_ENTRY_PROGRESS = 20
+    const val MANIFEST_PROGRESS = 30
     const val DEX_PROGRESS = 95
     const val DEX_PROGRESS_CLASS_INTERVAL = 64
   }

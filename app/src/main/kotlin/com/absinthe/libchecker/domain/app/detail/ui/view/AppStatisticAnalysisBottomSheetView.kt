@@ -217,7 +217,7 @@ private class AppStatisticAnalysisItemView(context: Context) : LinearLayout(cont
     orientation = HORIZONTAL
     gravity = Gravity.CENTER_VERTICAL
     minimumHeight = ITEM_MIN_HEIGHT_DP.dp
-    setPadding(20.dp, 10.dp, 20.dp, 10.dp)
+    setPadding(20.dp, 6.dp, 20.dp, 6.dp)
     setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackground))
     importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
 
@@ -312,7 +312,7 @@ private class AppStatisticAnalysisItemView(context: Context) : LinearLayout(cont
   }
 
   private companion object {
-    const val ITEM_MIN_HEIGHT_DP = 72
+    const val ITEM_MIN_HEIGHT_DP = 64
     const val ICON_SIZE_DP = 44
   }
 }

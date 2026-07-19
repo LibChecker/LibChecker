@@ -157,6 +157,51 @@ class ValidateStatisticCatalogUseCaseTest {
   }
 
   @Test
+  fun `accepts safe archive entry evidence`() {
+    val definition = officialDefinition().copy(
+      id = "official.archive-marker",
+      calculation = StatisticCalculationSpec(
+        kind = StatisticCalculationKind.PREDICATE,
+        predicate = StatisticPredicateSpec(
+          evidence = StatisticEvidence.ARCHIVE_ENTRY,
+          operator = StatisticComparisonOperator.CONTAINS_ANY,
+          value = StatisticPredicateValue(
+            strings = listOf("META-INF/example.properties", "assets/example.marker")
+          ),
+          matchedTitle = translatedTitle("Matched"),
+          unmatchedTitle = translatedTitle("Other")
+        )
+      )
+    )
+
+    val errors = validate(StatisticBundle(1, listOf(definition)))
+
+    assertTrue(errors.toString(), errors.isEmpty())
+  }
+
+  @Test
+  fun `rejects unsafe archive entry evidence`() {
+    val definition = officialDefinition().copy(
+      id = "official.archive-marker",
+      calculation = StatisticCalculationSpec(
+        kind = StatisticCalculationKind.PREDICATE,
+        predicate = StatisticPredicateSpec(
+          evidence = StatisticEvidence.ARCHIVE_ENTRY,
+          operator = StatisticComparisonOperator.CONTAINS,
+          value = StatisticPredicateValue(strings = listOf("../example.properties")),
+          matchedTitle = translatedTitle("Matched"),
+          unmatchedTitle = translatedTitle("Other")
+        )
+      )
+    )
+
+    val errors = validate(StatisticBundle(1, listOf(definition)))
+
+    assertTrue(errors.any { it.startsWith("Archive entry predicate requires valid entry names") })
+    assertTrue(errors.any { it.startsWith("Archive entry predicate requires the contains_any operator") })
+  }
+
+  @Test
   fun `accepts an ordered facets calculation with generic conditions`() {
     val definition = officialDefinition().copy(
       id = "official.capabilities",

@@ -12,14 +12,8 @@ data class FeatureDialogSpec(
   @StringRes val messageRes: Int? = null,
   @ColorInt val iconTint: Int? = null,
   val titleEntries: List<FeatureDialogTitleEntry>? = null,
-  val entryPlacement: FeatureDialogEntryPlacement = FeatureDialogEntryPlacement.TITLE,
   val sourceUrl: String? = null
 )
-
-enum class FeatureDialogEntryPlacement {
-  TITLE,
-  MESSAGE
-}
 
 data class FeatureDialogTitleEntry(
   val label: FeatureDialogTitleLabel,
@@ -46,19 +40,6 @@ fun AppDetailFeatureAction.Dialog.toDialogSpec(): FeatureDialogSpec {
         FeatureDialogTitleEntry(FeatureDialogTitleLabel.Text(label), version)
       },
       sourceUrl = "https://kotlinlang.org/"
-    )
-
-    is AppDetailFeatureAction.Reactive -> FeatureDialogSpec(
-      iconRes = R.drawable.ic_reactivex,
-      titleRes = R.string.reactivex,
-      titleEntries = libraries.map { library ->
-        FeatureDialogTitleEntry(
-          label = FeatureDialogTitleLabel.Resource(library.type.titleRes),
-          value = library.version
-        )
-      },
-      entryPlacement = FeatureDialogEntryPlacement.MESSAGE,
-      sourceUrl = "https://reactivex.io/"
     )
 
     is AppDetailFeatureAction.Agp -> versionDialogSpec(

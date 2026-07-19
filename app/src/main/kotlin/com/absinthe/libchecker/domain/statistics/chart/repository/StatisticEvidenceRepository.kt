@@ -32,5 +32,7 @@ sealed interface StatisticArtifactQuery {
 
   data class DexClasses(val queries: List<StatisticDexClassQuery>) : StatisticArtifactQuery
 
+  data class ArchiveEntries(val names: List<String>) : StatisticArtifactQuery
+
   data class ManifestReceiverActions(val actions: List<String>) : StatisticArtifactQuery
 }

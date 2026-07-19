@@ -77,6 +77,40 @@ class BuildFacetStatisticDataUseCaseTest {
     assertEquals(listOf(33, 66, 99), progress)
   }
 
+  @Test
+  fun `evaluates archive entry evidence without feature-specific code`() = runBlocking {
+    val archiveQuery = StatisticArtifactQuery.ArchiveEntries(
+      listOf("META-INF/example.properties")
+    )
+    artifactMatches["matched"] = setOf(archiveQuery)
+    val archiveFacets = StatisticFacetsSpec(
+      matchedTitle = title("Matched"),
+      unmatchedTitle = title("Other"),
+      items = listOf(
+        facet(
+          "archive-marker",
+          StatisticConditionSpec(
+            evidence = StatisticEvidence.ARCHIVE_ENTRY,
+            operator = StatisticComparisonOperator.CONTAINS_ANY,
+            value = StatisticPredicateValue(strings = archiveQuery.names)
+          )
+        )
+      )
+    )
+
+    val result = useCase(
+      BuildFacetStatisticDataUseCase.Request(
+        items = listOf(item("matched"), item("other")),
+        facets = archiveFacets,
+        showSystemApps = true
+      )
+    )
+
+    assertEquals(listOf("matched"), result?.matched?.map { it.packageName })
+    assertEquals(listOf("other"), result?.unmatched?.map { it.packageName })
+    assertEquals(setOf(archiveQuery), batchQueries.last())
+  }
+
   private val voipQuery = dexQuery("Lcom/voip/service/", StatisticStringOperator.STARTS_WITH)
   private val fairMemoryDexQuery = dexQuery("Lcom/example/FairMemory;", StatisticStringOperator.EQUAL)
   private val fairMemoryManifestQuery = StatisticArtifactQuery.ManifestReceiverActions(

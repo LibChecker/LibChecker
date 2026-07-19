@@ -54,8 +54,6 @@ import hidden.DexFileHidden
 import java.io.File
 import java.text.DateFormat
 import java.util.Properties
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import okio.buffer
 import okio.source
 import timber.log.Timber
@@ -321,16 +319,7 @@ fun PackageInfo.getFeatures(): Int {
   val resultList = PackageUtils.findDexClasses(
     File(sourceDir),
     listOf(
-      "androidx.compose.*".toClassDefType(),
-      "rx.schedulers.*".toClassDefType(),
-      "io.reactivex.*".toClassDefType(),
-      "io.reactivex.rxjava3.*".toClassDefType(),
-      "io.reactivex.rxjava3.kotlin.*".toClassDefType(),
-      "io.reactivex.rxkotlin".toClassDefType(),
-      "rx.lang.kotlin".toClassDefType(),
-      "io.reactivex.rxjava3.android.*".toClassDefType(),
-      "io.reactivex.android.*".toClassDefType(),
-      "rx.android.*".toClassDefType()
+      "androidx.compose.*".toClassDefType()
     )
   )
   if (isSplitsApk()) {
@@ -354,16 +343,6 @@ fun PackageInfo.getFeatures(): Int {
   if (isUseJetpackCompose(resultList)) {
     features = features or Features.JETPACK_COMPOSE
   }
-  if (isRxJavaUsed(resultList)) {
-    features = features or Features.RX_JAVA
-  }
-  if (isRxKotlinUsed(resultList)) {
-    features = features or Features.RX_KOTLIN
-  }
-  if (isRxAndroidUsed(resultList)) {
-    features = features or Features.RX_ANDROID
-  }
-
   return features
 }
 
@@ -466,181 +445,6 @@ fun PackageInfo.getJetpackComposeVersion(): String? {
   }
 
   return null
-}
-
-private const val RX_MAJOR_ONE = "1"
-private const val RX_MAJOR_TWO = "2"
-private const val RX_MAJOR_THREE = "3"
-
-/**
- * Check if an app uses RxJava framework
- * @return true if it uses RxJava framework
- */
-fun PackageInfo.isRxJavaUsed(foundList: List<String>? = null): Boolean {
-  val file = File(applicationInfo?.sourceDir ?: return false)
-  val usedInMetaInf = runCatching {
-    ZipFileCompat(file).use {
-      it.getEntry("META-INF/rxjava.properties") != null
-    }
-  }.getOrDefault(false)
-  if (usedInMetaInf) {
-    return true
-  }
-  if (foundList != null) {
-    return foundList.contains("rx.schedulers.*".toClassDefType()) ||
-      foundList.contains("io.reactivex.*".toClassDefType()) ||
-      foundList.contains("io.reactivex.rxjava3.*".toClassDefType())
-  }
-  return PackageUtils.findDexClasses(
-    file,
-    listOf(
-      "rx.schedulers.*".toClassDefType(),
-      "io.reactivex.*".toClassDefType(),
-      "io.reactivex.rxjava3.*".toClassDefType()
-    ),
-    hasAny = true
-  ).isNotEmpty()
-}
-
-private const val REACTIVEX_KEYWORD = "Implementation-Version"
-
-suspend fun PackageInfo.getRxJavaVersion(foundList: List<String>? = null): String? = withContext(Dispatchers.IO) {
-  runCatching {
-    ZipFileCompat(File(applicationInfo!!.sourceDir)).use { zipFile ->
-      zipFile.getEntry("META-INF/rxjava.properties")?.let { ze ->
-        Properties().apply {
-          load(zipFile.getInputStream(ze))
-          getProperty(REACTIVEX_KEYWORD)?.let {
-            return@withContext it
-          }
-        }
-      }
-    }
-    val resultList = foundList ?: PackageUtils.findDexClasses(
-      File(applicationInfo!!.sourceDir),
-      listOf(
-        "rx.schedulers.*".toClassDefType(),
-        "io.reactivex.*".toClassDefType(),
-        "io.reactivex.rxjava3.*".toClassDefType()
-      )
-    )
-    if (resultList.contains("io.reactivex.rxjava3.*".toClassDefType())) {
-      return@withContext RX_MAJOR_THREE
-    }
-    if (resultList.contains("io.reactivex.*".toClassDefType())) {
-      return@withContext RX_MAJOR_TWO
-    }
-    if (resultList.contains("rx.schedulers.*".toClassDefType())) {
-      return@withContext RX_MAJOR_ONE
-    }
-  }
-  return@withContext null
-}
-
-/**
- * Check if an app uses RxKotlin framework
- * @return true if it uses RxKotlin framework
- */
-fun PackageInfo.isRxKotlinUsed(foundList: List<String>? = null): Boolean {
-  val file = File(applicationInfo?.sourceDir ?: return false)
-  val usedInMetaInf = runCatching {
-    ZipFileCompat(file).use {
-      it.getEntry("META-INF/rxkotlin.properties") != null
-    }
-  }.getOrDefault(false)
-  if (usedInMetaInf) {
-    return true
-  }
-  if (foundList != null) {
-    return foundList.contains("io.reactivex.rxjava3.kotlin.*".toClassDefType()) ||
-      foundList.contains("io.reactivex.rxkotlin".toClassDefType()) ||
-      foundList.contains("rx.lang.kotlin".toClassDefType())
-  }
-  return PackageUtils.findDexClasses(
-    file,
-    listOf(
-      "io.reactivex.rxjava3.kotlin.*".toClassDefType(),
-      "io.reactivex.rxkotlin".toClassDefType(),
-      "rx.lang.kotlin".toClassDefType()
-    ),
-    hasAny = true
-  ).isNotEmpty()
-}
-
-suspend fun PackageInfo.getRxKotlinVersion(foundList: List<String>? = null): String? = withContext(Dispatchers.IO) {
-  runCatching {
-    val file = File(applicationInfo!!.sourceDir)
-    ZipFileCompat(file).use { zipFile ->
-      zipFile.getEntry("META-INF/rxkotlin.properties")?.let { ze ->
-        Properties().apply {
-          load(zipFile.getInputStream(ze))
-          getProperty(REACTIVEX_KEYWORD)?.let {
-            return@withContext it
-          }
-        }
-      }
-    }
-    val resultList = foundList ?: PackageUtils.findDexClasses(
-      file,
-      listOf(
-        "io.reactivex.rxjava3.kotlin.*".toClassDefType(),
-        "io.reactivex.rxkotlin".toClassDefType(),
-        "rx.lang.kotlin".toClassDefType()
-      )
-    )
-    if (resultList.contains("io.reactivex.rxjava3.kotlin.*".toClassDefType())) {
-      return@withContext RX_MAJOR_THREE
-    }
-    if (resultList.contains("io.reactivex.rxkotlin".toClassDefType())) {
-      return@withContext RX_MAJOR_TWO
-    }
-    if (resultList.contains("rx.lang.kotlin".toClassDefType())) {
-      return@withContext RX_MAJOR_ONE
-    }
-  }
-  return@withContext null
-}
-
-/**
- * Check if an app uses RxAndroid framework
- * @return true if it uses RxAndroid framework
- */
-fun PackageInfo.isRxAndroidUsed(foundList: List<String>? = null): Boolean {
-  if (foundList != null) {
-    return foundList.contains("io.reactivex.rxjava3.android.*".toClassDefType()) ||
-      foundList.contains("io.reactivex.android.*".toClassDefType()) ||
-      foundList.contains("rx.android.*".toClassDefType())
-  }
-  return PackageUtils.findDexClasses(
-    File(applicationInfo?.sourceDir ?: return false),
-    listOf(
-      "io.reactivex.rxjava3.android.*".toClassDefType(),
-      "io.reactivex.android.*".toClassDefType(),
-      "rx.android.*".toClassDefType()
-    ),
-    hasAny = true
-  ).isNotEmpty()
-}
-
-suspend fun PackageInfo.getRxAndroidVersion(foundList: List<String>? = null): String? = withContext(Dispatchers.IO) {
-  val resultList = foundList ?: PackageUtils.findDexClasses(
-    File(applicationInfo?.sourceDir ?: return@withContext null),
-    listOf(
-      "io.reactivex.rxjava3.android.*".toClassDefType(),
-      "io.reactivex.android.*".toClassDefType(),
-      "rx.android.*".toClassDefType()
-    )
-  )
-  if (resultList.contains("io.reactivex.rxjava3.android.*".toClassDefType())) {
-    return@withContext RX_MAJOR_THREE
-  }
-  if (resultList.contains("io.reactivex.android.*".toClassDefType())) {
-    return@withContext RX_MAJOR_TWO
-  }
-  if (resultList.contains("rx.android.*".toClassDefType())) {
-    return@withContext RX_MAJOR_ONE
-  }
-  return@withContext null
 }
 
 /**

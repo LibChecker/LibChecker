@@ -236,6 +236,9 @@ enum class StatisticEvidence {
   @Json(name = "dex_class")
   DEX_CLASS,
 
+  @Json(name = "archive_entry")
+  ARCHIVE_ENTRY,
+
   @Json(name = "manifest_receiver_action")
   MANIFEST_RECEIVER_ACTION
 }
