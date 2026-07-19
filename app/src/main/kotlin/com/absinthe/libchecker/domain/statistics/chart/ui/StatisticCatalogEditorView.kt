@@ -259,6 +259,10 @@ private class SectionView(context: Context) : TextView(context) {
 private class StatusView(context: Context) : LinearLayout(context) {
   private val progress = com.google.android.material.progressindicator.CircularProgressIndicator(context).apply {
     layoutParams = LayoutParams(24.dp, 24.dp).also { it.marginEnd = 12.dp }
+    indicatorSize = 20.dp
+    indicatorInset = 2.dp
+    trackThickness = 3.dp
+    trackCornerRadius = 1.dp
     isIndeterminate = true
   }
   private val label = TextView(context).apply {

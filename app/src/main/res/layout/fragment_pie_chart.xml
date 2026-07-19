@@ -7,15 +7,6 @@
   android:orientation="vertical"
   android:paddingTop="?actionBarSize">
 
-  <com.google.android.material.progressindicator.LinearProgressIndicator
-    android:id="@+id/progress_horizontal"
-    style="@style/App.Widget.M3E.LinearProgressIndicator.Wavy"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:max="100"
-    android:visibility="gone"
-    app:hideAnimationBehavior="outward" />
-
   <LinearLayout
     android:id="@+id/dashboard_container"
     android:layout_width="match_parent"
@@ -32,5 +23,33 @@
     app:flexDirection="row"
     app:flexWrap="wrap"
     app:justifyContent="flex_start" />
+
+  <FrameLayout
+    android:id="@+id/chart_container"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1">
+
+    <FrameLayout
+      android:id="@+id/loading_container"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:background="?attr/colorSurface"
+      android:clickable="true"
+      android:focusable="true"
+      android:visibility="gone">
+
+      <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/progress_indicator"
+        style="@style/App.Widget.M3E.CircularProgressIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:contentDescription="@string/loading"
+        android:max="100" />
+
+    </FrameLayout>
+
+  </FrameLayout>
 
 </LinearLayout>

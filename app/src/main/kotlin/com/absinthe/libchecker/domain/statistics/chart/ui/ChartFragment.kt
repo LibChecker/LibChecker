@@ -4,7 +4,9 @@ import android.graphics.Color
 import android.os.Build
 import android.view.HapticFeedbackConstants
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.LinearLayout
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -87,7 +89,7 @@ class ChartFragment :
     )
 
     chartView = generatePieChartView()
-    binding.root.addView(chartView, -1)
+    binding.chartContainer.addView(chartView, 0)
     renderStatisticSelector()
     updateProgressIndicator()
 
@@ -222,39 +224,26 @@ class ChartFragment :
     val previousPlan = currentProgressPlan
     currentProgressPlan = progressPlan
 
-    binding.progressHorizontal.let { indicator ->
-      if (!progressPlan.isVisible) {
-        if (previousPlan?.isVisible != false || indicator.isShown) {
-          indicator.isIndeterminate = false
-          indicator.setProgressCompat(progressPlan.progress, false)
-          indicator.jumpDrawablesToCurrentState()
-          indicator.hide()
-        }
-        return@let
-      }
+    binding.dashboardContainer.isVisible = !progressPlan.isVisible
+    binding.loadingContainer.isVisible = progressPlan.isVisible
+    binding.progressIndicator.let { indicator ->
+      if (!progressPlan.isVisible) return@let
 
-      val wasVisible = previousPlan?.isVisible == true
       if (previousPlan?.isIndeterminate != progressPlan.isIndeterminate) {
         indicator.isIndeterminate = progressPlan.isIndeterminate
       }
-
       if (progressPlan.isIndeterminate) {
-        if (previousPlan?.isIndeterminate != true && indicator.progress != 0) {
-          indicator.progress = 0
-        }
-      } else if (progressPlan.progress == 0) {
-        if (previousPlan?.progress != 0 || indicator.progress != 0) {
+        if (indicator.progress != 0) {
           indicator.progress = 0
         }
       } else if (
         previousPlan?.progress != progressPlan.progress ||
         previousPlan.isIndeterminateOrHidden()
       ) {
-        indicator.setProgressCompat(progressPlan.progress, wasVisible)
-      }
-
-      if (!wasVisible) {
-        indicator.show()
+        indicator.setProgressCompat(
+          progressPlan.progress,
+          previousPlan?.isVisible == true
+        )
       }
     }
   }
@@ -303,7 +292,7 @@ class ChartFragment :
   ) {
     val newChartView = generateChartView()
     viewModel.setLoadingProgress(plan.initialLoadingProgress, allowDecrease = shouldResetLoadingProgress)
-    chartDataRenderer.render(binding.root, chartView, newChartView, plan.dataSource)
+    chartDataRenderer.render(binding.chartContainer, chartView, newChartView, plan.dataSource)
     chartView = newChartView
     dataSource = plan.dataSource
   }
@@ -315,7 +304,7 @@ class ChartFragment :
   ) {
     val newChartView = generateChartView()
     viewModel.setLoadingProgress(plan.initialLoadingProgress, allowDecrease = shouldResetLoadingProgress)
-    chartDataRenderer.render(binding.root, chartView, newChartView, plan.dataSource)
+    chartDataRenderer.render(binding.chartContainer, chartView, newChartView, plan.dataSource)
     chartView = newChartView
     dataSource = plan.dataSource
   }
@@ -338,9 +327,9 @@ class ChartFragment :
     val colorOnSurface =
       requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
     return PieChart(requireContext()).apply {
-      layoutParams = LinearLayout.LayoutParams(
-        LinearLayout.LayoutParams.MATCH_PARENT,
-        LinearLayout.LayoutParams.MATCH_PARENT
+      layoutParams = FrameLayout.LayoutParams(
+        FrameLayout.LayoutParams.MATCH_PARENT,
+        FrameLayout.LayoutParams.MATCH_PARENT
       )
       dragDecelerationFrictionCoef = 0.95f
       description.isEnabled = false
@@ -369,9 +358,9 @@ class ChartFragment :
     val colorOnSurface =
       requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
     return HorizontalBarChart(requireContext()).apply {
-      layoutParams = LinearLayout.LayoutParams(
-        LinearLayout.LayoutParams.MATCH_PARENT,
-        LinearLayout.LayoutParams.MATCH_PARENT
+      layoutParams = FrameLayout.LayoutParams(
+        FrameLayout.LayoutParams.MATCH_PARENT,
+        FrameLayout.LayoutParams.MATCH_PARENT
       )
       description.isEnabled = false
       legend.isEnabled = false
