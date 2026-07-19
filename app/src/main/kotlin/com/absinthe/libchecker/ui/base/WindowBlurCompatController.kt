@@ -4,9 +4,6 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
 import android.content.Context
-import android.graphics.BlendMode
-import android.graphics.ColorMatrix
-import android.graphics.ColorMatrixColorFilter
 import android.graphics.RenderEffect
 import android.graphics.Shader
 import android.os.Build
@@ -212,50 +209,13 @@ internal class WindowBlurCompatController(
     }
 
     private class HostViewBlurEffect {
-      private val identityEffect = RenderEffect.createOffsetEffect(0f, 0f)
-      private val blurEffects = FALLBACK_BLUR_RADII.associateWith { radius ->
-        RenderEffect.createBlurEffect(radius, radius, Shader.TileMode.MIRROR)
-      }
       private var appliedRadius = Float.NaN
 
       fun applyRadius(hostView: View, radius: Float) {
         if (abs(appliedRadius - radius) < MIN_EFFECT_RADIUS_DELTA) return
         appliedRadius = radius
-
-        val upperIndex = FALLBACK_BLUR_RADII.indexOfFirst { radius < it }
-        if (upperIndex == -1) {
-          hostView.setRenderEffect(blurEffects.getValue(FALLBACK_BLUR_RADII.last()))
-          return
-        }
-
-        val upperRadius = FALLBACK_BLUR_RADII[upperIndex]
-        val lowerRadius = FALLBACK_BLUR_RADII.getOrNull(upperIndex - 1) ?: 0f
-        val lowerEffect = blurEffects[lowerRadius] ?: identityEffect
-        val upperEffect = blurEffects.getValue(upperRadius)
-        val mix = ((radius - lowerRadius) / (upperRadius - lowerRadius)).coerceIn(0f, 1f)
-
-        if (mix <= MIN_EFFECT_MIX_DELTA) {
-          hostView.setRenderEffect(lowerEffect)
-          return
-        }
-        if (mix >= 1f - MIN_EFFECT_MIX_DELTA) {
-          hostView.setRenderEffect(upperEffect)
-          return
-        }
-
-        val alphaMatrix = ColorMatrix().apply {
-          setScale(1f, 1f, 1f, mix)
-        }
-        val translucentUpperEffect = RenderEffect.createColorFilterEffect(
-          ColorMatrixColorFilter(alphaMatrix),
-          upperEffect
-        )
         hostView.setRenderEffect(
-          RenderEffect.createBlendModeEffect(
-            lowerEffect,
-            translucentUpperEffect,
-            BlendMode.SRC_OVER
-          )
+          RenderEffect.createBlurEffect(radius, radius, Shader.TileMode.MIRROR)
         )
       }
     }
@@ -264,7 +224,5 @@ internal class WindowBlurCompatController(
   private companion object {
     const val MIN_RADIUS_DELTA = 0.1f
     const val MIN_EFFECT_RADIUS_DELTA = 0.25f
-    const val MIN_EFFECT_MIX_DELTA = 0.01f
-    val FALLBACK_BLUR_RADII = listOf(8f, 20f, 40f, 60f, 80f)
   }
 }

@@ -1,11 +1,16 @@
 package com.absinthe.libchecker.domain.snapshot.list.ui.view
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ValueAnimator
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemDisplayData
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotMenuAction
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotMenuBottomSheetState
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotMenuLayoutItem
@@ -28,6 +33,8 @@ class SnapshotMenuBSDView(context: Context) :
   IHeaderView {
 
   private var onAction: (SnapshotMenuAction) -> Unit = {}
+  private var hasRenderedState = false
+  private var demoHeightAnimator: ValueAnimator? = null
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
@@ -60,7 +67,6 @@ class SnapshotMenuBSDView(context: Context) :
     clipToPadding = false
     clipChildren = false
     isNestedScrollingEnabled = true
-    setHasFixedSize(true)
   }
 
   init {
@@ -77,13 +83,19 @@ class SnapshotMenuBSDView(context: Context) :
   ) {
     this.onAction = onAction
     optionsLayout.renderOptions(state.options)
-    adapter.setList(buildSnapshotMenuLayoutItems(state.demoDisplayData))
+    adapter.submit(
+      items = buildSnapshotMenuLayoutItems(state.demoDisplayData),
+      animateDemoHeight = hasRenderedState
+    )
+    hasRenderedState = true
   }
 
   override fun getHeaderView(): BottomSheetHeaderView = header
 
   override fun onDetachedFromWindow() {
     onAction = {}
+    demoHeightAnimator?.cancel()
+    demoHeightAnimator = null
     super.onDetachedFromWindow()
   }
 
@@ -107,6 +119,13 @@ class SnapshotMenuBSDView(context: Context) :
 
   private inner class SnapshotMenuAdapter : BaseQuickAdapter<SnapshotMenuLayoutItem, BaseViewHolder>(0) {
 
+    private var animateNextDemoHeight = false
+
+    fun submit(items: List<SnapshotMenuLayoutItem>, animateDemoHeight: Boolean) {
+      animateNextDemoHeight = animateDemoHeight
+      setList(items)
+    }
+
     override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
       return BaseViewHolder(
         LinearLayout(context).apply {
@@ -124,7 +143,9 @@ class SnapshotMenuBSDView(context: Context) :
       when (item) {
         is SnapshotMenuLayoutItem.Demo -> {
           val demoView = container.ensureSnapshotDemoView()
-          demoView.render(item.displayData)
+          val animateHeight = animateNextDemoHeight
+          animateNextDemoHeight = false
+          demoView.renderWithHeightAnimation(item.displayData, animateHeight)
         }
 
         SnapshotMenuLayoutItem.Options -> {
@@ -157,5 +178,62 @@ class SnapshotMenuBSDView(context: Context) :
       removeAllViews()
       addView(child)
     }
+  }
+
+  private fun SnapshotItemView.renderWithHeightAnimation(
+    displayData: SnapshotItemDisplayData,
+    animateHeight: Boolean
+  ) {
+    val startHeight = height
+    if (!animateHeight || startHeight <= 0 || width <= 0) {
+      render(displayData)
+      return
+    }
+
+    demoHeightAnimator?.cancel()
+    val params = layoutParams
+    params.height = ViewGroup.LayoutParams.WRAP_CONTENT
+    layoutParams = params
+    render(displayData)
+    measure(
+      View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
+      View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+    )
+    val targetHeight = measuredHeight
+    if (targetHeight == startHeight) {
+      requestLayout()
+      return
+    }
+
+    params.height = startHeight
+    layoutParams = params
+    demoHeightAnimator = ValueAnimator.ofInt(startHeight, targetHeight).apply {
+      duration = DEMO_HEIGHT_ANIMATION_DURATION
+      interpolator = FastOutSlowInInterpolator()
+      addUpdateListener { animator ->
+        params.height = animator.animatedValue as Int
+        layoutParams = params
+      }
+      addListener(object : AnimatorListenerAdapter() {
+        private var cancelled = false
+
+        override fun onAnimationCancel(animation: Animator) {
+          cancelled = true
+        }
+
+        override fun onAnimationEnd(animation: Animator) {
+          if (!cancelled && demoHeightAnimator === animation) {
+            params.height = ViewGroup.LayoutParams.WRAP_CONTENT
+            layoutParams = params
+            demoHeightAnimator = null
+          }
+        }
+      })
+      start()
+    }
+  }
+
+  private companion object {
+    const val DEMO_HEIGHT_ANIMATION_DURATION = 280L
   }
 }

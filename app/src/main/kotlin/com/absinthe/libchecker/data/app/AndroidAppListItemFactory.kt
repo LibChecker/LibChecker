@@ -36,7 +36,7 @@ class AndroidAppListItemFactory(context: Context) : AppListItemFactory {
     return LCItem(
       packageInfo.packageName,
       packageInfo.getAppName(appContext.packageManager).toString(),
-      if (packageInfo.isArchivedPackage()) "Archived" else packageInfo.versionName.toString(),
+      if (packageInfo.isArchivedPackage()) LCItem.ARCHIVED_VERSION_NAME else packageInfo.versionName.orEmpty(),
       packageInfo.getVersionCode(),
       packageInfo.firstInstallTime,
       packageInfo.lastUpdateTime,

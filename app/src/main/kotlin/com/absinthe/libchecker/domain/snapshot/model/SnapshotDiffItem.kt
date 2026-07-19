@@ -28,10 +28,12 @@ data class SnapshotDiffItem(
   var moved: Int = 0,
   var newInstalled: Boolean = false,
   var deleted: Boolean = false,
-  var isTrackItem: Boolean = false
+  var isTrackItem: Boolean = false,
+  val archivedDiff: DiffNode<Boolean> = DiffNode(false)
 ) : Serializable {
   @JsonClass(generateAdapter = true)
   data class DiffNode<T>(val old: T, val new: T? = null) : Serializable
 
-  fun isNothingChanged() = added == 0 && removed == 0 && changed == 0 && moved == 0
+  fun isNothingChanged() = added == 0 && removed == 0 && changed == 0 && moved == 0 &&
+    (archivedDiff.new == null || archivedDiff.new == archivedDiff.old)
 }

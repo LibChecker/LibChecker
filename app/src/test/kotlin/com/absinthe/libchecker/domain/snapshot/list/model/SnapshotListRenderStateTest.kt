@@ -12,6 +12,7 @@ class SnapshotListRenderStateTest {
   fun `state carries all list rendering inputs together`() {
     val displayOptions = SnapshotListDisplayOptions(
       highlightDiffs = true,
+      emphasizeDiffs = true,
       showUpdateTime = true,
       tintAbiLabels = true
     )

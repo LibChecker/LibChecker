@@ -10,6 +10,7 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.utils.extensions.getPackageSize
 import com.absinthe.libchecker.utils.extensions.getVersionCode
+import com.absinthe.libchecker.utils.extensions.isArchivedPackage
 import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libchecker.utils.toJson
 import java.io.IOException
@@ -108,14 +109,19 @@ class CompareSnapshotWithInstalledAppsUseCase(
     diffList: MutableList<SnapshotDiffItem>
   ) {
     val snapshotDiffStoringItem = snapshotRepository.getSnapshotDiff(snapshotItem.packageName)
+    val presentIsArchived = presentItem.isArchivedPackage()
 
-    if (snapshotDiffStoringItem?.lastUpdatedTime != presentItem.lastUpdateTime) {
+    if (snapshotDiffStoringItem?.lastUpdatedTime != presentItem.lastUpdateTime ||
+      snapshotDiffStoringItem.isArchived != presentIsArchived ||
+      snapshotItem.isArchived != presentIsArchived
+    ) {
       createDiffItem(packageManager, snapshotItem, presentItem, trackPackageNames)?.let { item ->
         diffList.add(item)
         snapshotRepository.insertSnapshotDiff(
           SnapshotDiffStoringItem(
             packageName = presentItem.packageName,
             lastUpdatedTime = presentItem.lastUpdateTime,
+            isArchived = presentIsArchived,
             diffContent = item.toJson().orEmpty()
           )
         )
@@ -136,6 +142,7 @@ class CompareSnapshotWithInstalledAppsUseCase(
           SnapshotDiffStoringItem(
             packageName = presentItem.packageName,
             lastUpdatedTime = presentItem.lastUpdateTime,
+            isArchived = presentIsArchived,
             diffContent = item.toJson().orEmpty()
           )
         )
@@ -150,6 +157,7 @@ class CompareSnapshotWithInstalledAppsUseCase(
     trackPackageNames: Set<String>
   ): SnapshotDiffItem? {
     if (packageInfo.getVersionCode() == snapshotItem.versionCode &&
+      packageInfo.isArchivedPackage() == snapshotItem.isArchived &&
       packageInfo.lastUpdateTime == snapshotItem.lastUpdatedTime &&
       packageInfo.getPackageSize(true) == snapshotItem.packageSize &&
       snapshotItem.packageName !in trackPackageNames

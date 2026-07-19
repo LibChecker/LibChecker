@@ -63,20 +63,20 @@ interface LCDao {
   @Query("SELECT * from snapshot_table ORDER BY packageName ASC")
   suspend fun getSnapshots(): List<SnapshotItem>
 
-  @Query("SELECT id, packageName, timeStamp, label, versionName, versionCode, installedTime, lastUpdatedTime, isSystem, abi, targetApi, packageSize, compileSdk, minSdk from snapshot_table ORDER BY packageName ASC")
+  @Query("SELECT id, packageName, timeStamp, label, versionName, versionCode, isArchived, installedTime, lastUpdatedTime, isSystem, abi, targetApi, packageSize, compileSdk, minSdk from snapshot_table ORDER BY packageName ASC")
   suspend fun getSnapshotSummaries(): List<SnapshotSummaryItem>
 
   @Transaction
   @Query("SELECT * from snapshot_table WHERE timeStamp LIKE :timestamp ORDER BY packageName ASC")
   suspend fun getSnapshots(timestamp: Long): List<SnapshotItem>
 
-  @Query("SELECT id, packageName, timeStamp, label, versionName, versionCode, installedTime, lastUpdatedTime, isSystem, abi, targetApi, packageSize, compileSdk, minSdk from snapshot_table WHERE timeStamp LIKE :timestamp ORDER BY packageName ASC")
+  @Query("SELECT id, packageName, timeStamp, label, versionName, versionCode, isArchived, installedTime, lastUpdatedTime, isSystem, abi, targetApi, packageSize, compileSdk, minSdk from snapshot_table WHERE timeStamp LIKE :timestamp ORDER BY packageName ASC")
   suspend fun getSnapshotSummaries(timestamp: Long): List<SnapshotSummaryItem>
 
   @Query("SELECT * from snapshot_table WHERE timeStamp LIKE :timestamp AND packageName LIKE :packageName ORDER BY packageName ASC")
   suspend fun getSnapshot(timestamp: Long, packageName: String): SnapshotItem?
 
-  @Query("SELECT id, packageName, timeStamp, label, versionName, versionCode, installedTime, lastUpdatedTime, isSystem, abi, targetApi, packageSize, compileSdk, minSdk from snapshot_table WHERE timeStamp LIKE :timestamp AND packageName LIKE :packageName ORDER BY packageName ASC")
+  @Query("SELECT id, packageName, timeStamp, label, versionName, versionCode, isArchived, installedTime, lastUpdatedTime, isSystem, abi, targetApi, packageSize, compileSdk, minSdk from snapshot_table WHERE timeStamp LIKE :timestamp AND packageName LIKE :packageName ORDER BY packageName ASC")
   suspend fun getSnapshotSummary(timestamp: Long, packageName: String): SnapshotSummaryItem?
 
   @Query("SELECT COUNT(*) from snapshot_table WHERE timeStamp LIKE :timestamp")
@@ -98,7 +98,7 @@ interface LCDao {
   suspend fun delete(item: SnapshotItem)
 
   @Transaction
-  @Query("DELETE FROM snapshot_table WHERE id NOT IN (SELECT id FROM snapshot_table GROUP BY packageName, timeStamp, versionCode, lastUpdatedTime, packageSize)")
+  @Query("DELETE FROM snapshot_table WHERE id NOT IN (SELECT id FROM snapshot_table GROUP BY packageName, timeStamp, versionCode, isArchived, lastUpdatedTime, packageSize)")
   suspend fun deleteDuplicateSnapshotItems()
 
   @Transaction

@@ -25,6 +25,8 @@
   <string name="get_app_list_denied_tip">Please grant\n"Get info about installed apps"\npermission to LibChecker</string>
   <string name="advanced_menu">Advanced menu</string>
   <string name="archived_app">Archived app</string>
+  <string name="snapshot_version_archived">Archived</string>
+  <string name="toast_archived_app_detail_unavailable">Restore this archived app before viewing its details.</string>
 
   <!-- Statistics   -->
   <string name="title_statistics_dialog">Apps with %s ABI</string>
@@ -212,7 +214,7 @@
   <string name="lib_detail_app_last_updated_time">Last installation time: </string>
   <string name="lib_detail_app_install_source_empty">Unknown</string>
   <string name="lib_detail_app_install_source_empty_detail">Shell or uninstalled app</string>
-  <string name="lib_detail_app_install_source_shizuku_usage">Because Android restricts the API to get the installation requester, we use Shizuku to get the installation requester</string>
+  <string name="lib_detail_app_install_source_shizuku_usage">Android only provides the installation requester to apps with install privileges, so Shizuku is required</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizuku not installed</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">Click here to install Shizuku</string>
   <string name="lib_detail_app_install_source_shizuku_low_version">Requires Shizuku API 10</string>
@@ -221,6 +223,10 @@
   <string name="lib_detail_app_install_source_shizuku_not_running_detail">Click here to jump to Shizuku to start it</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku not authorized</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">Click here for Shizuku authorization for installation requester</string>
+  <string name="lib_detail_app_install_source_shizuku_unavailable">Shizuku service unavailable</string>
+  <string name="lib_detail_app_install_source_shizuku_unavailable_detail">Start a compatible Shizuku manager, then return to this page</string>
+  <string name="lib_detail_app_install_source_shizuku_api_too_old">Shizuku API version is too old</string>
+  <string name="lib_detail_app_install_source_shizuku_api_too_old_detail">Update the active Shizuku-compatible manager</string>
   <string name="lib_detail_app_dexopt_title">DEX optimization</string>
   <string name="lib_detail_app_dexopt_status">Status</string>
   <string name="lib_detail_app_dexopt_reason">Reason</string>
@@ -268,6 +274,13 @@
   <string name="snapshot_indicator_removed">Removed</string>
   <string name="snapshot_indicator_changed">Changed</string>
   <string name="snapshot_indicator_moved">Moved</string>
+  <string name="snapshot_detail_size_label">Size</string>
+  <string name="snapshot_detail_changes_label">Changes:</string>
+  <string name="snapshot_detail_metric_description">%1$s, %2$s</string>
+  <plurals name="snapshot_detail_changes_count">
+    <item quantity="one">%d change</item>
+    <item quantity="other">%d changes</item>
+  </plurals>
   <string name="snapshot_empty_list_title">No component changes</string>
   <string name="snapshot_no_snapshot">No Snapshot</string>
   <string name="snapshot_detail_new_install_title">This app has newly installed</string>
@@ -358,7 +371,8 @@
   <!--  Snapshot menu  -->
   <string name="snapshot_menu_show_update_time">Show update time</string>
   <string name="snapshot_menu_hide_no_component_changes">Hide no component changes</string>
-  <string name="snapshot_menu_diff_highlight">Differences highlight</string>
+  <string name="snapshot_menu_diff_highlight">Highlight differences</string>
+  <string name="snapshot_menu_diff_emphasis">Emphasize differences</string>
   <string name="snapshot_menu_use_iec_units">Use IEC units</string>
 
   <!-- A11y -->

@@ -20,6 +20,7 @@ import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPackageSize
 import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getVersionCode
+import com.absinthe.libchecker.utils.extensions.isArchivedPackage
 import com.absinthe.libchecker.utils.toJson
 
 class CaptureInstalledSnapshotUseCase(
@@ -103,6 +104,7 @@ class CaptureInstalledSnapshotUseCase(
     shouldSaveFullSnapshot: Boolean
   ): Boolean {
     return versionCode == packageInfo.getVersionCode() &&
+      isArchived == packageInfo.isArchivedPackage() &&
       lastUpdatedTime == packageInfo.lastUpdateTime &&
       packageSize == packageInfo.getPackageSize(true) &&
       !shouldSaveFullSnapshot
@@ -113,16 +115,25 @@ class CaptureInstalledSnapshotUseCase(
     timestamp: Long
   ): SnapshotItem? {
     val applicationInfo = packageInfo.applicationInfo ?: return null
-    val activitiesPi = installedAppRepository.getPackageInfo(
-      packageInfo.packageName,
-      PackageManager.GET_ACTIVITIES
-    ) ?: return null
-    val othersPi = installedAppRepository.getPackageInfo(
-      packageInfo.packageName,
-      PackageManager.GET_SERVICES or PackageManager.GET_RECEIVERS or
-        PackageManager.GET_PROVIDERS or PackageManager.GET_PERMISSIONS or
-        PackageManager.GET_META_DATA
-    ) ?: return null
+    val isArchived = packageInfo.isArchivedPackage()
+    val activitiesPi = if (isArchived) {
+      packageInfo
+    } else {
+      installedAppRepository.getPackageInfo(
+        packageInfo.packageName,
+        PackageManager.GET_ACTIVITIES
+      ) ?: return null
+    }
+    val othersPi = if (isArchived) {
+      packageInfo
+    } else {
+      installedAppRepository.getPackageInfo(
+        packageInfo.packageName,
+        PackageManager.GET_SERVICES or PackageManager.GET_RECEIVERS or
+          PackageManager.GET_PROVIDERS or PackageManager.GET_PERMISSIONS or
+          PackageManager.GET_META_DATA
+      ) ?: return null
+    }
     val abi = PackageUtils.getAbi(packageInfo)
     if (abi == Constants.ERROR) {
       return null
@@ -133,8 +144,9 @@ class CaptureInstalledSnapshotUseCase(
       packageName = packageInfo.packageName,
       timeStamp = timestamp,
       label = packageInfo.getAppName(packageManager).toString(),
-      versionName = packageInfo.versionName.toString(),
+      versionName = packageInfo.versionName.orEmpty(),
       versionCode = packageInfo.getVersionCode(),
+      isArchived = isArchived,
       installedTime = packageInfo.firstInstallTime,
       lastUpdatedTime = packageInfo.lastUpdateTime,
       isSystem = (applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) > 0,

@@ -100,6 +100,7 @@ class SnapshotNoDiffRenderStateTest {
       versionInfo = "12.5.0",
       packageSize = null,
       apis = "Target: 35",
+      summary = null,
       copyPrimaryText = false
     )
   }

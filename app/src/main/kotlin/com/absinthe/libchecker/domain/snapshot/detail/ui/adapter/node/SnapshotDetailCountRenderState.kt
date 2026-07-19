@@ -4,6 +4,8 @@ import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailCou
 
 val SnapshotDetailCountNode.countRenderState: SnapshotDetailCountRenderState
   get() = SnapshotDetailCountRenderState(
-    text = countText,
-    backgroundTintRes = status.countColorRes
+    diffType = diffType,
+    iconRes = status.iconRes,
+    countText = countText,
+    colorRes = status.colorRes
   )

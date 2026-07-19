@@ -37,7 +37,8 @@ class CompareSnapshotItemsUseCase {
         SnapshotDiffItem.DiffNode(targetInfo.packageSize),
         newInstalled = newInstalled,
         deleted = !newInstalled,
-        isTrackItem = targetInfo.packageName in trackPackageNames
+        isTrackItem = targetInfo.packageName in trackPackageNames,
+        archivedDiff = SnapshotDiffItem.DiffNode(targetInfo.isArchived)
       )
     } else {
       return SnapshotDiffItem(
@@ -58,7 +59,8 @@ class CompareSnapshotItemsUseCase {
         permissionsDiff = SnapshotDiffItem.DiffNode(oldInfo.permissions, newInfo.permissions),
         metadataDiff = SnapshotDiffItem.DiffNode(oldInfo.metadata, newInfo.metadata),
         packageSizeDiff = SnapshotDiffItem.DiffNode(oldInfo.packageSize, newInfo.packageSize),
-        isTrackItem = newInfo.packageName in trackPackageNames
+        isTrackItem = newInfo.packageName in trackPackageNames,
+        archivedDiff = SnapshotDiffItem.DiffNode(oldInfo.isArchived, newInfo.isArchived)
       ).apply {
         val diffIndicator = compareDiffIndicator(this)
         added = diffIndicator.added
