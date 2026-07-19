@@ -23,7 +23,7 @@
   <string name="chart_statistics_source_builtin">内置</string>
   <string name="chart_statistics_source_online">在线</string>
   <string name="chart_statistics_drag">拖动排序</string>
-  <string name="chart_statistics_drag_hint">拖动可调整顺序</string>
+  <string name="chart_statistics_drag_hint">拖动以调整排序</string>
   <string name="chart_statistics_remove_description">移除 %1$s</string>
   <string name="chart_statistics_add_description">添加 %1$s</string>
   <string name="menu_filter">过滤</string>
