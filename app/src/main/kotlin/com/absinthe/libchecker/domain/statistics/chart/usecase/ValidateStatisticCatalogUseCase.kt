@@ -12,6 +12,7 @@ import com.absinthe.libchecker.domain.statistics.chart.model.StatisticPredicateV
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticSource
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticStringOperator
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticTitleSpec
+import java.net.URI
 
 class ValidateStatisticCatalogUseCase {
 
@@ -41,6 +42,23 @@ class ValidateStatisticCatalogUseCase {
         errors += "Built-in statistic must use a resource title: ${definition.id}"
       } else if (definition.source != StatisticSource.BUILTIN && definition.title.translations.isEmpty()) {
         errors += "External statistic must use translated titles: ${definition.id}"
+      }
+      definition.details?.let { details ->
+        validateTitle(
+          titleSpec = details.description,
+          statisticId = definition.id,
+          errors = errors,
+          maxLength = MAX_DESCRIPTION_LENGTH
+        )
+        if (
+          definition.source != StatisticSource.BUILTIN &&
+          details.description.translations[DEFAULT_TRANSLATION_LOCALE].isNullOrBlank()
+        ) {
+          errors += "External statistic details must provide an English description: ${definition.id}"
+        }
+        if (!isSafeReferenceUrl(details.referenceUrl)) {
+          errors += "Statistic details have an invalid reference URL: ${definition.id}"
+        }
       }
       val hasDrawable = definition.icon.drawable != null
       val hasSvg = definition.icon.asset?.let(::isSafeIconAsset) == true
@@ -157,6 +175,15 @@ class ValidateStatisticCatalogUseCase {
       ".." !in asset &&
       '\\' !in asset &&
       asset.length <= MAX_ASSET_PATH_LENGTH
+  }
+
+  private fun isSafeReferenceUrl(url: String): Boolean {
+    if (url.length > MAX_REFERENCE_URL_LENGTH || url.any(Char::isWhitespace)) return false
+    return runCatching { URI(url) }.getOrNull()?.let { uri ->
+      uri.scheme.equals("https", ignoreCase = true) &&
+        !uri.host.isNullOrBlank() &&
+        uri.userInfo == null
+    } == true
   }
 
   private fun validateTitle(
@@ -368,6 +395,8 @@ class ValidateStatisticCatalogUseCase {
     const val MAX_ASSET_PATH_LENGTH = 160
     const val MAX_TITLE_LENGTH = 80
     const val MAX_FACET_TITLE_LENGTH = 40
+    const val MAX_DESCRIPTION_LENGTH = 1_500
+    const val MAX_REFERENCE_URL_LENGTH = 512
     const val MAX_FACETS = 8
     const val MAX_EVIDENCE_STRING_LENGTH = 160
     const val MAX_CONDITION_DEPTH = 8

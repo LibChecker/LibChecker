@@ -29,11 +29,13 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.google.android.material.progressindicator.CircularProgressIndicator
 
-class AppStatisticAnalysisBottomSheetView(context: Context) :
-  LinearLayout(context),
+class AppStatisticAnalysisBottomSheetView(
+  context: Context,
+  onAnalysisClick: (AppStatisticRuleAnalysis) -> Unit
+) : LinearLayout(context),
   IHeaderView {
 
-  private val adapter = AnalysisAdapter()
+  private val adapter = AnalysisAdapter(onAnalysisClick)
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
@@ -154,14 +156,16 @@ class AppStatisticAnalysisBottomSheetView(context: Context) :
     )
   }
 
-  private class AnalysisAdapter : BaseQuickAdapter<AppStatisticRuleAnalysis, BaseViewHolder>(0) {
+  private class AnalysisAdapter(
+    private val onAnalysisClick: (AppStatisticRuleAnalysis) -> Unit
+  ) : BaseQuickAdapter<AppStatisticRuleAnalysis, BaseViewHolder>(0) {
 
     override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
       return BaseViewHolder(AppStatisticAnalysisItemView(context))
     }
 
     override fun convert(holder: BaseViewHolder, item: AppStatisticRuleAnalysis) {
-      (holder.itemView as AppStatisticAnalysisItemView).bind(item)
+      (holder.itemView as AppStatisticAnalysisItemView).bind(item, onAnalysisClick)
     }
   }
 
@@ -214,6 +218,7 @@ private class AppStatisticAnalysisItemView(context: Context) : LinearLayout(cont
     gravity = Gravity.CENTER_VERTICAL
     minimumHeight = ITEM_MIN_HEIGHT_DP.dp
     setPadding(20.dp, 10.dp, 20.dp, 10.dp)
+    setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackground))
     importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
 
     addView(
@@ -238,7 +243,10 @@ private class AppStatisticAnalysisItemView(context: Context) : LinearLayout(cont
     )
   }
 
-  fun bind(analysis: AppStatisticRuleAnalysis) {
+  fun bind(
+    analysis: AppStatisticRuleAnalysis,
+    onAnalysisClick: (AppStatisticRuleAnalysis) -> Unit
+  ) {
     val titleText = analysis.definition.title.resolve(context)
     val detailText = analysis.resolveDetail(context)
     val statusText = context.getString(
@@ -270,6 +278,16 @@ private class AppStatisticAnalysisItemView(context: Context) : LinearLayout(cont
     contentDescription = listOf(titleText, statusText, detailText)
       .filter(String::isNotBlank)
       .joinToString(", ")
+    val hasDetails = analysis.definition.details != null
+    isClickable = hasDetails
+    isFocusable = hasDetails
+    setOnClickListener(
+      if (hasDetails) {
+        OnClickListener { onAnalysisClick(analysis) }
+      } else {
+        null
+      }
+    )
   }
 
   private fun AppStatisticRuleAnalysis.resolveDetail(context: Context): String {

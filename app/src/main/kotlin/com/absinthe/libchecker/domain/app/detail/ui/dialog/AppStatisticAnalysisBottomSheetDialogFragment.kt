@@ -22,7 +22,12 @@ class AppStatisticAnalysisBottomSheetDialogFragment : BaseBottomSheetViewDialogF
   private var analysisAllowed = true
 
   override fun initRootView(): AppStatisticAnalysisBottomSheetView {
-    return AppStatisticAnalysisBottomSheetView(requireContext())
+    return AppStatisticAnalysisBottomSheetView(
+      context = requireContext(),
+      onAnalysisClick = { analysis ->
+        AppStatisticRuleDetailsDialog.show(requireContext(), analysis)
+      }
+    )
   }
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()

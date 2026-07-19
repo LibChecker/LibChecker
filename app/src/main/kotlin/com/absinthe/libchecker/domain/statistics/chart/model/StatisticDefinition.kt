@@ -19,6 +19,7 @@ data class StatisticDefinition(
   val title: StatisticTitleSpec,
   val icon: StatisticIconSpec,
   val calculation: StatisticCalculationSpec,
+  val details: StatisticDetailsSpec? = null,
   val availability: StatisticAvailability = StatisticAvailability.ALWAYS,
   val requiresFeatureInitialization: Boolean = false,
   val controls: List<StatisticControl> = emptyList(),
@@ -32,6 +33,12 @@ data class StatisticDefinition(
 data class StatisticTitleSpec(
   val resource: StatisticTitleResource? = null,
   val translations: Map<String, String> = emptyMap()
+)
+
+@JsonClass(generateAdapter = true)
+data class StatisticDetailsSpec(
+  val description: StatisticTitleSpec,
+  val referenceUrl: String
 )
 
 @JsonClass(generateAdapter = true)

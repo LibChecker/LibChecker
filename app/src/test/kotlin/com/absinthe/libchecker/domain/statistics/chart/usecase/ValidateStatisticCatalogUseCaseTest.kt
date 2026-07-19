@@ -6,6 +6,7 @@ import com.absinthe.libchecker.domain.statistics.chart.model.StatisticCalculatio
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticComparisonOperator
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticConditionSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDefinition
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDetailsSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDexClassQuery
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDexMethodReference
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDrawableIcon
@@ -37,11 +38,31 @@ class ValidateStatisticCatalogUseCaseTest {
 
   @Test
   fun `accepts an official rule backed by a translated title and SVG`() {
-    val definition = officialDefinition()
+    val definition = officialDefinition().copy(
+      details = StatisticDetailsSpec(
+        description = translatedTitle("Rule description"),
+        referenceUrl = "https://example.com/docs"
+      )
+    )
 
     val errors = validate(StatisticBundle(1, listOf(definition)))
 
     assertTrue(errors.toString(), errors.isEmpty())
+  }
+
+  @Test
+  fun `rejects unsafe external rule details`() {
+    val definition = officialDefinition().copy(
+      details = StatisticDetailsSpec(
+        description = StatisticTitleSpec(translations = mapOf("zh-Hans" to "规则介绍")),
+        referenceUrl = "javascript:alert(1)"
+      )
+    )
+
+    val errors = validate(StatisticBundle(1, listOf(definition)))
+
+    assertTrue(errors.any { it.startsWith("External statistic details must provide an English description") })
+    assertTrue(errors.any { it.startsWith("Statistic details have an invalid reference URL") })
   }
 
   @Test

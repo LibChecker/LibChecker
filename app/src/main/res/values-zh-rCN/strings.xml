@@ -154,6 +154,7 @@
   <string name="app_detail_online_rules_error">无法分析在线规则</string>
   <string name="app_detail_online_rules_matched">符合</string>
   <string name="app_detail_online_rules_unmatched">不符合</string>
+  <string name="app_detail_online_rules_detected_features">当前应用检测到以下特性：</string>
   <string name="app_info_launch">启动</string>
   <string name="app_info_settings">设置</string>
   <string name="app_info_share">分享</string>
