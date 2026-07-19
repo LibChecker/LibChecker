@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.data.statistics
 
+import android.content.pm.PackageInfo
 import android.util.LruCache
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
@@ -17,6 +18,7 @@ import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.iface.reference.StringReference
 import java.io.File
+import kotlinx.coroutines.CancellationException
 import timber.log.Timber
 
 class AndroidStatisticEvidenceRepository(
@@ -33,14 +35,24 @@ class AndroidStatisticEvidenceRepository(
     packageName: String,
     queries: Set<StatisticArtifactQuery>
   ): Map<StatisticArtifactQuery, Boolean> {
-    if (queries.isEmpty()) return emptyMap()
-    return runCatching {
-      val packageInfo = installedAppRepository.getPackageInfo(packageName)
-        ?: return@runCatching queries.associateWith { false }
+    val packageInfo = installedAppRepository.getPackageInfo(packageName)
+      ?: return queries.associateWith { false }
+    return matchesAll(packageInfo, queries)
+  }
+
+  override fun matchesAll(
+    packageInfo: PackageInfo,
+    queries: Set<StatisticArtifactQuery>,
+    onProgress: (Int) -> Unit
+  ): Map<StatisticArtifactQuery, Boolean> {
+    if (queries.isEmpty()) {
+      onProgress(100)
+      return emptyMap()
+    }
+    return try {
+      onProgress(0)
       val results = LinkedHashMap<StatisticArtifactQuery, Boolean>(queries.size)
-      val version = packageInfo.applicationInfo?.sourceDir?.let {
-        ArtifactVersion(it, packageInfo.lastUpdateTime)
-      }
+      val version = packageInfo.artifactVersion()
 
       val nativeQueries = queries.filterIsInstance<StatisticArtifactQuery.NativeLibrary>()
       if (nativeQueries.isNotEmpty()) {
@@ -56,17 +68,19 @@ class AndroidStatisticEvidenceRepository(
         }
         nativeQueries.forEach { query -> results[query] = query.name in libraryNames }
       }
+      onProgress(NATIVE_PROGRESS)
 
       val manifestQueries = queries.filterIsInstance<StatisticArtifactQuery.ManifestReceiverActions>()
       if (manifestQueries.isNotEmpty()) {
         val actions = version?.let {
-          manifestActionCache[it] ?: readManifestReceiverActions(it.sourceDir)
+          manifestActionCache[it] ?: readManifestReceiverActions(it.sourcePaths)
             .also { actions -> manifestActionCache.put(it, actions) }
         }.orEmpty()
         manifestQueries.forEach { query ->
           results[query] = query.actions.any(actions::contains)
         }
       }
+      onProgress(MANIFEST_PROGRESS)
 
       val dexQueries = queries.filterIsInstance<StatisticArtifactQuery.DexClasses>()
       if (dexQueries.isNotEmpty()) {
@@ -83,54 +97,131 @@ class AndroidStatisticEvidenceRepository(
             }
           }
           if (pending.isNotEmpty()) {
-            matchesDexClassGroups(File(version.sourceDir), pending).forEach { (query, matched) ->
+            matchesDexClassGroups(
+              sourceFiles = version.sourcePaths.map(::File),
+              queryGroups = pending,
+              onProgress = { dexProgress ->
+                onProgress(
+                  MANIFEST_PROGRESS +
+                    dexProgress * (DEX_PROGRESS - MANIFEST_PROGRESS) / 100
+                )
+              }
+            ).forEach { (query, matched) ->
               results[query] = matched
               dexMatchCache.put(DexMatchCacheKey(version, query.queries), matched)
             }
           }
         }
       }
+      onProgress(DEX_PROGRESS)
 
-      queries.associateWith { query -> results[query] == true }
-    }.onFailure {
-      Timber.e(it)
-    }.getOrElse {
+      queries.associateWith { query -> results[query] == true }.also {
+        onProgress(100)
+      }
+    } catch (error: CancellationException) {
+      throw error
+    } catch (error: Throwable) {
+      Timber.e(error)
+      onProgress(100)
       queries.associateWith { false }
     }
   }
 
   private fun matchesDexClassGroups(
-    sourceFile: File,
-    queryGroups: List<StatisticArtifactQuery.DexClasses>
+    sourceFiles: List<File>,
+    queryGroups: List<StatisticArtifactQuery.DexClasses>,
+    onProgress: (Int) -> Unit
   ): Map<StatisticArtifactQuery.DexClasses, Boolean> {
     if (queryGroups.isEmpty()) return emptyMap()
     val results = queryGroups.associateWithTo(LinkedHashMap()) { false }
     val unmatchedGroups = queryGroups.toMutableSet()
-    val container = FastDexFileFactory.loadDexContainer(sourceFile, Opcodes.getDefault())
-    for (entryName in container.dexEntryNames) {
-      if (unmatchedGroups.isEmpty()) break
-      val dexFile = container.getEntry(entryName)?.dexFile ?: continue
-      val eligibleQueries = unmatchedGroups.associateWith { group ->
-        group.queries.filter { query ->
-          query.stringConstants.isEmpty() ||
-            dexFile.stringSection.any(query.stringConstants::contains)
-        }
-      }.filterValues { it.isNotEmpty() }
-      if (eligibleQueries.isEmpty()) continue
-      val matchedGroups = mutableSetOf<StatisticArtifactQuery.DexClasses>()
-      for (classDef in dexFile.classes) {
-        eligibleQueries.forEach { (group, queries) ->
-          if (group !in matchedGroups && queries.any { query -> classDef.matches(query) }) {
-            matchedGroups += group
-          }
-        }
-        if (matchedGroups.size == eligibleQueries.size) break
-      }
-      matchedGroups.forEach { group ->
-        results[group] = true
-        unmatchedGroups -= group
+    val readableSourceFiles = sourceFiles.filter(File::isFile)
+    if (readableSourceFiles.isEmpty()) {
+      onProgress(100)
+      return results
+    }
+    var lastProgress = 0
+
+    fun reportProgress(
+      fileIndex: Int,
+      entryIndex: Int,
+      entryCount: Int,
+      classIndex: Int,
+      classCount: Int
+    ) {
+      val fileProgress = (
+        entryIndex.toDouble() +
+          (classIndex + 1).toDouble() / classCount.coerceAtLeast(1)
+        ) / entryCount.coerceAtLeast(1)
+      val progress = (
+        (fileIndex.toDouble() + fileProgress) * 100 / readableSourceFiles.size
+        ).toInt().coerceIn(0, 100)
+      if (progress > lastProgress) {
+        lastProgress = progress
+        onProgress(progress)
       }
     }
+
+    readableSourceFiles.forEachIndexed sourceLoop@{ fileIndex, sourceFile ->
+      if (unmatchedGroups.isEmpty()) {
+        onProgress(100)
+        return results
+      }
+      val container = try {
+        FastDexFileFactory.loadDexContainer(sourceFile, Opcodes.getDefault())
+      } catch (error: CancellationException) {
+        throw error
+      } catch (error: Throwable) {
+        Timber.w(error, "Unable to scan statistic DEX evidence from %s", sourceFile)
+        reportProgress(fileIndex, 0, 1, 0, 1)
+        return@sourceLoop
+      }
+      val entryNames = container.dexEntryNames.toList()
+      if (entryNames.isEmpty()) {
+        reportProgress(fileIndex, 0, 1, 0, 1)
+        return@sourceLoop
+      }
+      entryNames.forEachIndexed entryLoop@{ entryIndex, entryName ->
+        if (unmatchedGroups.isEmpty()) {
+          onProgress(100)
+          return results
+        }
+        val dexFile = container.getEntry(entryName)?.dexFile
+        if (dexFile == null) {
+          reportProgress(fileIndex, entryIndex, entryNames.size, 0, 1)
+          return@entryLoop
+        }
+        val eligibleQueries = unmatchedGroups.associateWith { group ->
+          group.queries.filter { query ->
+            query.stringConstants.isEmpty() ||
+              dexFile.stringSection.any(query.stringConstants::contains)
+          }
+        }.filterValues { it.isNotEmpty() }
+        if (eligibleQueries.isEmpty()) {
+          reportProgress(fileIndex, entryIndex, entryNames.size, 0, 1)
+          return@entryLoop
+        }
+        val matchedGroups = mutableSetOf<StatisticArtifactQuery.DexClasses>()
+        val classCount = dexFile.classes.size.coerceAtLeast(1)
+        for ((classIndex, classDef) in dexFile.classes.withIndex()) {
+          eligibleQueries.forEach { (group, queries) ->
+            if (group !in matchedGroups && queries.any { query -> classDef.matches(query) }) {
+              matchedGroups += group
+            }
+          }
+          if (classIndex % DEX_PROGRESS_CLASS_INTERVAL == 0 || classIndex == classCount - 1) {
+            reportProgress(fileIndex, entryIndex, entryNames.size, classIndex, classCount)
+          }
+          if (matchedGroups.size == eligibleQueries.size) break
+        }
+        reportProgress(fileIndex, entryIndex, entryNames.size, classCount - 1, classCount)
+        matchedGroups.forEach { group ->
+          results[group] = true
+          unmatchedGroups -= group
+        }
+      }
+    }
+    onProgress(100)
     return results
   }
 
@@ -172,18 +263,38 @@ class AndroidStatisticEvidenceRepository(
       (expected.parameterTypes == null || parameterTypes.map(CharSequence::toString) == expected.parameterTypes)
   }
 
-  private fun readManifestReceiverActions(sourceDir: String): Set<String> {
-    return IntentFilterUtils.parseComponentsFromApk(sourceDir)
-      .asSequence()
+  private fun readManifestReceiverActions(sourcePaths: List<String>): Set<String> {
+    return sourcePaths.asSequence()
+      .flatMap { sourcePath ->
+        runCatching {
+          IntentFilterUtils.parseComponentsFromApk(sourcePath)
+        }.onFailure { error ->
+          Timber.w(error, "Unable to scan statistic manifest evidence from %s", sourcePath)
+        }.getOrDefault(emptyList()).asSequence()
+      }
       .filter { it.type == RECEIVER }
       .flatMap { it.intentFilters.asSequence() }
       .flatMap { it.actions.asSequence() }
       .toSet()
   }
 
+  private fun PackageInfo.artifactVersion(): ArtifactVersion? {
+    val appInfo = applicationInfo ?: return null
+    val sourcePaths = buildList {
+      appInfo.sourceDir?.let(::add)
+      appInfo.splitSourceDirs?.let(::addAll)
+    }.distinct()
+    if (sourcePaths.isEmpty()) return null
+    val versionToken = sourcePaths.fold(lastUpdateTime) { token, sourcePath ->
+      val sourceFile = File(sourcePath)
+      31 * token + sourceFile.lastModified() + sourceFile.length()
+    }
+    return ArtifactVersion(sourcePaths, versionToken)
+  }
+
   private data class ArtifactVersion(
-    val sourceDir: String,
-    val lastUpdateTime: Long
+    val sourcePaths: List<String>,
+    val versionToken: Long
   )
 
   private data class DexMatchCacheKey(
@@ -194,5 +305,9 @@ class AndroidStatisticEvidenceRepository(
   private companion object {
     const val DEX_CACHE_SIZE = 512
     const val MANIFEST_CACHE_SIZE = 128
+    const val NATIVE_PROGRESS = 15
+    const val MANIFEST_PROGRESS = 25
+    const val DEX_PROGRESS = 95
+    const val DEX_PROGRESS_CLASS_INTERVAL = 64
   }
 }

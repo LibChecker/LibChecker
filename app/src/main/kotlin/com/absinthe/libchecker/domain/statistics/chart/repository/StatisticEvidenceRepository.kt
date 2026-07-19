@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.domain.statistics.chart.repository
 
+import android.content.pm.PackageInfo
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDexClassQuery
 
 interface StatisticEvidenceRepository {
@@ -11,6 +12,17 @@ interface StatisticEvidenceRepository {
     queries: Set<StatisticArtifactQuery>
   ): Map<StatisticArtifactQuery, Boolean> {
     return queries.associateWith { query -> matches(packageName, query) }
+  }
+
+  fun matchesAll(
+    packageInfo: PackageInfo,
+    queries: Set<StatisticArtifactQuery>,
+    onProgress: (Int) -> Unit = {}
+  ): Map<StatisticArtifactQuery, Boolean> {
+    onProgress(0)
+    return matchesAll(packageInfo.packageName, queries).also {
+      onProgress(100)
+    }
   }
 }
 

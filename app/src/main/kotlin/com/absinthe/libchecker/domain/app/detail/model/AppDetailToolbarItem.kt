@@ -13,6 +13,7 @@ data class AppDetailToolbarItem(
 
 enum class AppDetailToolbarAction {
   SORT,
+  ONLINE_RULE_ANALYSIS,
   QUICK_LAUNCH,
   PROCESS,
   HARMONY_TOGGLE,
@@ -31,6 +32,7 @@ data class AppDetailToolbarState(
     get() = buildList {
       if (baseActionsReady) {
         add(AppDetailToolbarAction.SORT)
+        add(AppDetailToolbarAction.ONLINE_RULE_ANALYSIS)
         if (harmonyToggleVisible) {
           add(AppDetailToolbarAction.HARMONY_TOGGLE)
         }

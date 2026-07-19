@@ -30,16 +30,22 @@ import com.absinthe.libchecker.domain.app.detail.presentation.DetailFilterContro
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailPackageLoader
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailPackageState
 import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailContentLoader
+import com.absinthe.libchecker.domain.app.detail.statistics.AnalyzeAppStatisticRulesUseCase
+import com.absinthe.libchecker.domain.app.detail.statistics.AppStatisticAnalysisState
 import com.absinthe.libchecker.domain.app.model.VersionedFeature
 import com.absinthe.libchecker.domain.app.packageinfo.PrepareApkAnalysisPackageUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
 import java.io.File
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -49,7 +55,8 @@ class DetailViewModel(
   private val detailContentLoader: DetailContentLoader,
   private val detailFilterController: DetailFilterController,
   private val detailFeatureLoader: DetailFeatureLoader,
-  private val detailPackageLoader: DetailPackageLoader
+  private val detailPackageLoader: DetailPackageLoader,
+  private val analyzeAppStatisticRules: AnalyzeAppStatisticRulesUseCase
 ) : ViewModel() {
   val contentState = detailContentLoader.contentState
   val featureState = detailFeatureLoader.featureState
@@ -76,6 +83,11 @@ class DetailViewModel(
     _nativeLibraryExtractionResults.asSharedFlow()
   private val _elfDetailResults = MutableSharedFlow<ElfDetailResult>()
   val elfDetailResults: SharedFlow<ElfDetailResult> = _elfDetailResults.asSharedFlow()
+  private val _appStatisticAnalysisState = MutableStateFlow<AppStatisticAnalysisState>(
+    AppStatisticAnalysisState.Idle
+  )
+  val appStatisticAnalysisState: StateFlow<AppStatisticAnalysisState> =
+    _appStatisticAnalysisState.asStateFlow()
   private var packageLoadJob: Job? = null
   private var apkAnalysisPackageJob: Job? = null
   private var apkPreviewJob: Job? = null
@@ -85,6 +97,7 @@ class DetailViewModel(
   private var appPackageShareExportJob: Job? = null
   private var nativeLibraryExtractionJob: Job? = null
   private var elfDetailJob: Job? = null
+  private var appStatisticAnalysisJob: Job? = null
   private val packageState: DetailPackageState
     get() = detailPackageLoader.packageState
 
@@ -297,6 +310,40 @@ class DetailViewModel(
     val result: Result<AppElfDetail?>
   )
 
+  fun analyzeOnlineStatistics() {
+    if (!isPackageInfoAvailable()) return
+    appStatisticAnalysisJob?.cancel()
+    _appStatisticAnalysisState.value = AppStatisticAnalysisState.Loading(0)
+    val currentPackageInfo = packageInfo
+    appStatisticAnalysisJob = viewModelScope.launch(Dispatchers.IO) {
+      try {
+        val analyses = analyzeAppStatisticRules(currentPackageInfo) { progress ->
+          _appStatisticAnalysisState.value = AppStatisticAnalysisState.Loading(
+            progress.coerceIn(0, 100)
+          )
+        }
+        _appStatisticAnalysisState.value = if (analyses.isEmpty()) {
+          AppStatisticAnalysisState.Empty
+        } else {
+          AppStatisticAnalysisState.Results(analyses)
+        }
+      } catch (error: CancellationException) {
+        throw error
+      } catch (error: Throwable) {
+        Timber.e(error, "Unable to analyze online statistic rules")
+        _appStatisticAnalysisState.value = AppStatisticAnalysisState.Error
+      }
+    }
+  }
+
+  fun cancelOnlineStatisticAnalysis() {
+    appStatisticAnalysisJob?.cancel()
+    appStatisticAnalysisJob = null
+    if (_appStatisticAnalysisState.value is AppStatisticAnalysisState.Loading) {
+      _appStatisticAnalysisState.value = AppStatisticAnalysisState.Idle
+    }
+  }
+
   fun buildAppDetailAbiLabelData(
     abi: Int,
     abiSet: Collection<Int>,
@@ -379,6 +426,9 @@ class DetailViewModel(
 
   fun reset() {
     Timber.d("reset")
+    appStatisticAnalysisJob?.cancel()
+    appStatisticAnalysisJob = null
+    _appStatisticAnalysisState.value = AppStatisticAnalysisState.Idle
     detailContentLoader.reset()
     detailFilterController.reset()
     detailFeatureLoader.reset()

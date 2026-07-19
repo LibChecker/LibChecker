@@ -110,10 +110,11 @@
 
           <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_toolbar"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:overScrollMode="never"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/ts_component_count" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

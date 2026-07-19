@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.domain.statistics.chart.usecase
 
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.domain.statistics.chart.model.StatisticConditionSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticPredicateSpec
 import com.absinthe.libchecker.domain.statistics.chart.repository.StatisticEvidenceRepository
 import kotlinx.coroutines.currentCoroutineContext
@@ -25,11 +24,7 @@ class BuildPredicateStatisticDataUseCase(
     val unmatched = mutableListOf<LCItem>()
     val coroutineContext = currentCoroutineContext()
     val itemCount = targets.size
-    val condition = request.predicate.condition ?: StatisticConditionSpec(
-      evidence = request.predicate.evidence,
-      operator = request.predicate.operator,
-      value = request.predicate.value
-    )
+    val condition = request.predicate.toConditionSpec()
     val artifactQueries = conditionEvaluator.collectArtifactQueries(condition)
     var progress = 0
 

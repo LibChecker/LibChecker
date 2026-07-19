@@ -4,6 +4,7 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticComparisonOperator
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticConditionSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticEvidence
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticPredicateSpec
 import com.absinthe.libchecker.domain.statistics.chart.repository.StatisticArtifactQuery
 
 internal class StatisticConditionEvaluator {
@@ -18,17 +19,23 @@ internal class StatisticConditionEvaluator {
     item: LCItem,
     condition: StatisticConditionSpec,
     artifactMatches: Map<StatisticArtifactQuery, Boolean>
+  ): Boolean = matches(item.targetApi.toInt(), condition, artifactMatches)
+
+  fun matches(
+    targetApi: Int,
+    condition: StatisticConditionSpec,
+    artifactMatches: Map<StatisticArtifactQuery, Boolean>
   ): Boolean {
-    condition.all?.let { return it.all { child -> matches(item, child, artifactMatches) } }
-    condition.any?.let { return it.any { child -> matches(item, child, artifactMatches) } }
-    condition.not?.let { return !matches(item, it, artifactMatches) }
+    condition.all?.let { return it.all { child -> matches(targetApi, child, artifactMatches) } }
+    condition.any?.let { return it.any { child -> matches(targetApi, child, artifactMatches) } }
+    condition.not?.let { return !matches(targetApi, it, artifactMatches) }
 
     val evidence = checkNotNull(condition.evidence)
     val operator = checkNotNull(condition.operator)
     val value = checkNotNull(condition.value)
     return when (evidence) {
       StatisticEvidence.TARGET_SDK -> compare(
-        actual = item.targetApi.toLong(),
+        actual = targetApi.toLong(),
         expected = checkNotNull(value.integer),
         operator = operator
       )
@@ -84,4 +91,12 @@ internal class StatisticConditionEvaluator {
       StatisticComparisonOperator.CONTAINS_ANY -> false
     }
   }
+}
+
+internal fun StatisticPredicateSpec.toConditionSpec(): StatisticConditionSpec {
+  return condition ?: StatisticConditionSpec(
+    evidence = evidence,
+    operator = operator,
+    value = value
+  )
 }

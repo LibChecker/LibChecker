@@ -147,6 +147,13 @@
   <string name="kotlin_details">Kotlin 是由 JetBrains 开发的开源静态类型编程语言。Kotlin 简洁、安全、可与 Java 和其他语言互操作，并提供了许多在多个平台之间重用代码的方法，从而实现高效编程。Kotlin 适用于 JVM、Android、JavaScript、Wasm 和 Native，可用于任何类型的开发，包括服务器端、客户端 Web、Android 和多平台库。</string>
   <string name="items_count">项数：</string>
   <string name="further_operation">进一步操作</string>
+  <string name="app_detail_online_rules_action">检测在线规则</string>
+  <string name="app_detail_online_rules_title">在线规则检测</string>
+  <string name="app_detail_online_rules_loading">正在分析在线规则… %1$d%%</string>
+  <string name="app_detail_online_rules_empty">图表中尚未添加在线统计规则</string>
+  <string name="app_detail_online_rules_error">无法分析在线规则</string>
+  <string name="app_detail_online_rules_matched">符合</string>
+  <string name="app_detail_online_rules_unmatched">不符合</string>
   <string name="app_info_launch">启动</string>
   <string name="app_info_settings">设置</string>
   <string name="app_info_share">分享</string>

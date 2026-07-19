@@ -11,10 +11,16 @@ class AppDetailToolbarStateTest {
   }
 
   @Test
-  fun baseStateOnlyShowsSortAction() {
+  fun baseStateShowsSortAndOnlineRuleAnalysisActions() {
     val state = AppDetailToolbarState(baseActionsReady = true)
 
-    assertEquals(listOf(AppDetailToolbarAction.SORT), state.visibleActions)
+    assertEquals(
+      listOf(
+        AppDetailToolbarAction.SORT,
+        AppDetailToolbarAction.ONLINE_RULE_ANALYSIS
+      ),
+      state.visibleActions
+    )
   }
 
   @Test
@@ -31,6 +37,7 @@ class AppDetailToolbarStateTest {
     assertEquals(
       listOf(
         AppDetailToolbarAction.SORT,
+        AppDetailToolbarAction.ONLINE_RULE_ANALYSIS,
         AppDetailToolbarAction.HARMONY_TOGGLE,
         AppDetailToolbarAction.PROCESS,
         AppDetailToolbarAction.COMPARE,

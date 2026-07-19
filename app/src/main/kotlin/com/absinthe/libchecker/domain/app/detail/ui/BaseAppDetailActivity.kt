@@ -33,6 +33,7 @@ import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailPackageCont
 import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailStateObserverController
 import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailTabController
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.AppInfoBottomSheetDialogFragment
+import com.absinthe.libchecker.domain.app.detail.ui.dialog.AppStatisticAnalysisBottomSheetDialogFragment
 import com.absinthe.libchecker.domain.app.model.VersionedFeature
 import com.absinthe.libchecker.domain.app.repository.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.repository.AppListSettingsRepository
@@ -176,6 +177,7 @@ abstract class BaseAppDetailActivity :
       toolbarView = binding.rvToolbar,
       appBarLayout = binding.headerLayout,
       onSortClick = { listInteractionController.toggleSortMode() },
+      onOnlineRuleAnalysisClick = ::showOnlineRuleAnalysisDialog,
       onQuickLaunchClick = ::showCurrentAppInfoDialog,
       onProcessClick = { listInteractionController.toggleProcessMode() }
     )
@@ -333,6 +335,13 @@ abstract class BaseAppDetailActivity :
     if (viewModel.isPackageInfoAvailable()) {
       showAppInfoDialog(viewModel.packageInfo.packageName)
     }
+  }
+
+  private fun showOnlineRuleAnalysisDialog() {
+    if (!viewModel.isPackageInfoAvailable()) return
+    val tag = AppStatisticAnalysisBottomSheetDialogFragment::class.java.name
+    if (supportFragmentManager.findFragmentByTag(tag) != null) return
+    AppStatisticAnalysisBottomSheetDialogFragment().show(supportFragmentManager, tag)
   }
 
   private fun initAbiView(abi: Int, abiSet: Collection<Int>) {
