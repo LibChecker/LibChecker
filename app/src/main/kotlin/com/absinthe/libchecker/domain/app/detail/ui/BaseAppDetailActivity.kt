@@ -205,6 +205,7 @@ abstract class BaseAppDetailActivity :
       coroutineScope = lifecycleScope,
       onItemsCountChanged = { live -> listInteractionController.onItemsCountChanged(live) },
       onProcessToolIconVisibilityChanged = toolbarController::setProcessActionVisible,
+      onOnlineRuleAnalysisVisibilityChanged = toolbarController::setOnlineRuleAnalysisVisible,
       onProcessMapChanged = processBarController::setData,
       onFeatureAdded = ::addFeatureItem,
       onFeatureLoadingChanged = ::onFeatureLoadingChanged,
@@ -231,6 +232,11 @@ abstract class BaseAppDetailActivity :
       handler = { menuController.collapseActionView() }
     )
     stateObserverController.observe()
+  }
+
+  override fun onResume() {
+    super.onResume()
+    viewModel.refreshOnlineStatisticRulesAvailability()
   }
 
   override fun onDestroy() {

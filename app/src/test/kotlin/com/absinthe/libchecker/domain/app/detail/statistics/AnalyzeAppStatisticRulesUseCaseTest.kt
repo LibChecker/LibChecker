@@ -130,6 +130,45 @@ class AnalyzeAppStatisticRulesUseCaseTest {
     assertFalse(result.single().matched)
   }
 
+  @Test
+  fun `sorts matched rules before unmatched rules while preserving group order`() = runBlocking {
+    selectedStatistics = listOf(
+      predicateDefinition(
+        id = "official.unmatched-first",
+        source = StatisticSource.OFFICIAL,
+        predicate = targetSdkPredicate(36)
+      ),
+      predicateDefinition("official.matched-first", StatisticSource.OFFICIAL),
+      predicateDefinition(
+        id = "official.unmatched-second",
+        source = StatisticSource.OFFICIAL,
+        predicate = targetSdkPredicate(37)
+      ),
+      facetsDefinition()
+    )
+
+    val result = useCase(packageInfo())
+
+    assertEquals(
+      listOf(
+        "official.matched-first",
+        "official.itgsa",
+        "official.unmatched-first",
+        "official.unmatched-second"
+      ),
+      result.map { it.definition.id }
+    )
+  }
+
+  @Test
+  fun `reports whether selected online rules are available`() = runBlocking {
+    assertTrue(useCase.hasSelectedRules())
+
+    selectedStatistics = listOf(predicateDefinition("builtin.local", StatisticSource.BUILTIN))
+
+    assertFalse(useCase.hasSelectedRules())
+  }
+
   private fun packageInfo() = PackageInfo().apply {
     packageName = "com.example.app"
     applicationInfo = ApplicationInfo().apply {
@@ -158,6 +197,14 @@ class AnalyzeAppStatisticRulesUseCaseTest {
       kind = StatisticCalculationKind.PREDICATE,
       predicate = predicate
     )
+  )
+
+  private fun targetSdkPredicate(minimum: Long) = StatisticPredicateSpec(
+    matchedTitle = title("Modern"),
+    unmatchedTitle = title("Legacy"),
+    evidence = StatisticEvidence.TARGET_SDK,
+    operator = StatisticComparisonOperator.GREATER_THAN_OR_EQUAL,
+    value = StatisticPredicateValue(integer = minimum)
   )
 
   private fun facetsDefinition() = StatisticDefinition(

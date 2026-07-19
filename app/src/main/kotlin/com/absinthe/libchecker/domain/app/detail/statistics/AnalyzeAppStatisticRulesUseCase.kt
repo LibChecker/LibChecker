@@ -25,8 +25,7 @@ class AnalyzeAppStatisticRulesUseCase(
   ): List<AppStatisticRuleAnalysis> {
     val coroutineContext = currentCoroutineContext()
     onProgress(0)
-    val definitions = catalogRepository.getSelectedStatistics()
-      .filter { definition -> definition.source == StatisticSource.OFFICIAL }
+    val definitions = getSelectedOfficialDefinitions()
     coroutineContext.ensureActive()
     if (definitions.isEmpty()) {
       onProgress(100)
@@ -60,7 +59,17 @@ class AnalyzeAppStatisticRulesUseCase(
       analysis
     }
     onProgress(100)
-    return analyses
+    val (matched, unmatched) = analyses.partition(AppStatisticRuleAnalysis::matched)
+    return matched + unmatched
+  }
+
+  suspend fun hasSelectedRules(): Boolean {
+    return getSelectedOfficialDefinitions().isNotEmpty()
+  }
+
+  private suspend fun getSelectedOfficialDefinitions(): List<StatisticDefinition> {
+    return catalogRepository.getSelectedStatistics()
+      .filter { definition -> definition.source == StatisticSource.OFFICIAL }
   }
 
   private fun StatisticDefinition.analyze(

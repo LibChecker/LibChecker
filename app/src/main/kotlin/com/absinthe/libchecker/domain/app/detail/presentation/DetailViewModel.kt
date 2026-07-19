@@ -88,6 +88,9 @@ class DetailViewModel(
   )
   val appStatisticAnalysisState: StateFlow<AppStatisticAnalysisState> =
     _appStatisticAnalysisState.asStateFlow()
+  private val _onlineStatisticRulesAvailable = MutableStateFlow(false)
+  val onlineStatisticRulesAvailable: StateFlow<Boolean> =
+    _onlineStatisticRulesAvailable.asStateFlow()
   private var packageLoadJob: Job? = null
   private var apkAnalysisPackageJob: Job? = null
   private var apkPreviewJob: Job? = null
@@ -98,6 +101,7 @@ class DetailViewModel(
   private var nativeLibraryExtractionJob: Job? = null
   private var elfDetailJob: Job? = null
   private var appStatisticAnalysisJob: Job? = null
+  private var onlineStatisticRulesAvailabilityJob: Job? = null
   private val packageState: DetailPackageState
     get() = detailPackageLoader.packageState
 
@@ -332,6 +336,20 @@ class DetailViewModel(
       } catch (error: Throwable) {
         Timber.e(error, "Unable to analyze online statistic rules")
         _appStatisticAnalysisState.value = AppStatisticAnalysisState.Error
+      }
+    }
+  }
+
+  fun refreshOnlineStatisticRulesAvailability() {
+    onlineStatisticRulesAvailabilityJob?.cancel()
+    onlineStatisticRulesAvailabilityJob = viewModelScope.launch(Dispatchers.IO) {
+      _onlineStatisticRulesAvailable.value = try {
+        analyzeAppStatisticRules.hasSelectedRules()
+      } catch (error: CancellationException) {
+        throw error
+      } catch (error: Throwable) {
+        Timber.e(error, "Unable to check online statistic rule availability")
+        false
       }
     }
   }

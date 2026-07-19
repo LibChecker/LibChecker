@@ -23,6 +23,7 @@ enum class AppDetailToolbarAction {
 data class AppDetailToolbarState(
   val baseActionsReady: Boolean = false,
   val toolbarCollapsed: Boolean = false,
+  val onlineRuleAnalysisVisible: Boolean = false,
   val harmonyToggleVisible: Boolean = false,
   val processVisible: Boolean = false,
   val compareVisible: Boolean = false,
@@ -32,7 +33,9 @@ data class AppDetailToolbarState(
     get() = buildList {
       if (baseActionsReady) {
         add(AppDetailToolbarAction.SORT)
-        add(AppDetailToolbarAction.ONLINE_RULE_ANALYSIS)
+        if (onlineRuleAnalysisVisible) {
+          add(AppDetailToolbarAction.ONLINE_RULE_ANALYSIS)
+        }
         if (harmonyToggleVisible) {
           add(AppDetailToolbarAction.HARMONY_TOGGLE)
         }

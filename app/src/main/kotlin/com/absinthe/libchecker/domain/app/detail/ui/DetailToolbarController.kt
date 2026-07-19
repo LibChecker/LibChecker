@@ -61,6 +61,10 @@ class DetailToolbarController(
     updateState { it.copy(processVisible = visible) }
   }
 
+  fun setOnlineRuleAnalysisVisible(visible: Boolean) {
+    updateState { it.copy(onlineRuleAnalysisVisible = visible) }
+  }
+
   fun updateProcessTooltip(@StringRes tooltipTextRes: Int) {
     updateState { it.copy(processLabel = toolbarView.context.getString(tooltipTextRes)) }
   }
