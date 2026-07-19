@@ -5,6 +5,7 @@ import android.graphics.Typeface
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -279,6 +280,10 @@ private class StatusView(context: Context) : LinearLayout(context) {
 }
 
 private class StatisticEditorItemView(context: Context) : LinearLayout(context) {
+  private val dragTouchSlop = ViewConfiguration.get(context).scaledTouchSlop
+  private var dragDownX = 0f
+  private var dragDownY = 0f
+  private var isDragging = false
   private val icon = ImageView(context).apply {
     layoutParams = LayoutParams(40.dp, 40.dp).also { it.marginEnd = 8.dp }
     scaleType = ImageView.ScaleType.CENTER_INSIDE
@@ -342,13 +347,36 @@ private class StatisticEditorItemView(context: Context) : LinearLayout(context) 
     )
     action.setOnClickListener { onRemove() }
     dragHandle.isVisible = true
-    dragHandle.setOnClickListener(null)
-    dragHandle.setOnTouchListener { _, event ->
+    dragHandle.setOnClickListener { onDragHandleTap() }
+    dragHandle.setOnTouchListener { view, event ->
       when (event.actionMasked) {
-        MotionEvent.ACTION_DOWN -> onStartDrag()
-        MotionEvent.ACTION_UP -> onDragHandleTap()
+        MotionEvent.ACTION_DOWN -> {
+          dragDownX = event.x
+          dragDownY = event.y
+          isDragging = false
+          view.parent.requestDisallowInterceptTouchEvent(true)
+        }
+
+        MotionEvent.ACTION_MOVE -> {
+          val movedBeyondTouchSlop =
+            kotlin.math.abs(event.x - dragDownX) > dragTouchSlop ||
+              kotlin.math.abs(event.y - dragDownY) > dragTouchSlop
+          if (!isDragging && movedBeyondTouchSlop) {
+            isDragging = true
+            view.isPressed = false
+            view.parent.requestDisallowInterceptTouchEvent(false)
+            onStartDrag()
+          }
+        }
+
+        MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+          val wasDragging = isDragging
+          view.parent.requestDisallowInterceptTouchEvent(false)
+          isDragging = false
+          return@setOnTouchListener wasDragging
+        }
       }
-      false
+      isDragging
     }
   }
 
