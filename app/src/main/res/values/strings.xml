@@ -13,6 +13,19 @@
   <!--  App list  -->
   <string name="menu_search">Search</string>
   <string name="menu_sort">Sort</string>
+  <string name="chart_statistics_add">Add statistics</string>
+  <string name="chart_statistics_edit">Edit statistics</string>
+  <string name="chart_statistics_added">Added</string>
+  <string name="chart_statistics_available">Available</string>
+  <string name="chart_statistics_loading_online">Loading online statistics…</string>
+  <string name="chart_statistics_online_error">Couldn’t load online statistics. Showing downloaded items.</string>
+  <string name="chart_statistics_no_available">No more statistics are available.</string>
+  <string name="chart_statistics_source_builtin">Built-in</string>
+  <string name="chart_statistics_source_online">Online</string>
+  <string name="chart_statistics_drag">Drag to reorder</string>
+  <string name="chart_statistics_drag_hint">Press and drag to reorder</string>
+  <string name="chart_statistics_remove_description">Remove %1$s</string>
+  <string name="chart_statistics_add_description">Add %1$s</string>
   <string name="menu_filter">Filter</string>
   <string name="search_hint">Search…</string>
   <string name="string_64_bit">64-bit</string>
@@ -146,6 +159,14 @@
   <string name="kotlin_details">Kotlin is an open source statically typed programming language that targets the JVM, Android, JavaScript, Wasm, and Native. It\'s developed by JetBrains. Kotlin is a modern but already mature programming language designed to make developers happier. It\'s concise, safe, interoperable with Java and other languages, and provides many ways to reuse code between multiple platforms for productive programming.</string>
   <string name="items_count">Items count: </string>
   <string name="further_operation">Further operation</string>
+  <string name="app_detail_online_rules_action">Analyze online rules</string>
+  <string name="app_detail_online_rules_title">Online rule checks</string>
+  <string name="app_detail_online_rules_loading">Analyzing online rules… %1$d%%</string>
+  <string name="app_detail_online_rules_empty">No online statistics have been added to Charts</string>
+  <string name="app_detail_online_rules_error">Couldn’t analyze online rules</string>
+  <string name="app_detail_online_rules_matched">Matched</string>
+  <string name="app_detail_online_rules_unmatched">Not matched</string>
+  <string name="app_detail_online_rules_detected_features">Detected features:</string>
   <string name="app_info_launch">Launch</string>
   <string name="app_info_settings">Settings</string>
   <string name="app_info_share">Share</string>

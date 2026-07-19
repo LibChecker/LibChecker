@@ -15,6 +15,7 @@ class DetailToolbarController(
   private val toolbarView: RecyclerView,
   private val appBarLayout: AppBarLayout,
   private val onSortClick: () -> Unit,
+  private val onOnlineRuleAnalysisClick: () -> Unit,
   private val onQuickLaunchClick: () -> Unit,
   private val onProcessClick: () -> Unit
 ) {
@@ -60,6 +61,10 @@ class DetailToolbarController(
     updateState { it.copy(processVisible = visible) }
   }
 
+  fun setOnlineRuleAnalysisVisible(visible: Boolean) {
+    updateState { it.copy(onlineRuleAnalysisVisible = visible) }
+  }
+
   fun updateProcessTooltip(@StringRes tooltipTextRes: Int) {
     updateState { it.copy(processLabel = toolbarView.context.getString(tooltipTextRes)) }
   }
@@ -89,6 +94,7 @@ class DetailToolbarController(
   private fun onActionClick(action: AppDetailToolbarAction) {
     when (action) {
       AppDetailToolbarAction.SORT -> onSortClick()
+      AppDetailToolbarAction.ONLINE_RULE_ANALYSIS -> onOnlineRuleAnalysisClick()
       AppDetailToolbarAction.QUICK_LAUNCH -> onQuickLaunchClick()
       AppDetailToolbarAction.PROCESS -> onProcessClick()
       AppDetailToolbarAction.HARMONY_TOGGLE -> onHarmonyToggle?.invoke()
@@ -99,9 +105,16 @@ class DetailToolbarController(
   private fun createItem(action: AppDetailToolbarAction): AppDetailToolbarItem {
     val (iconRes, label) = when (action) {
       AppDetailToolbarAction.SORT -> R.drawable.ic_lib_sort to toolbarView.context.getString(R.string.menu_sort)
+
+      AppDetailToolbarAction.ONLINE_RULE_ANALYSIS ->
+        R.drawable.ic_cloud_rules to toolbarView.context.getString(R.string.app_detail_online_rules_action)
+
       AppDetailToolbarAction.QUICK_LAUNCH -> R.drawable.ic_launch to toolbarView.context.getString(R.string.further_operation)
+
       AppDetailToolbarAction.PROCESS -> R.drawable.ic_processes to state.processLabel
+
       AppDetailToolbarAction.HARMONY_TOGGLE -> R.drawable.ic_harmonyos_logo to toolbarView.context.getString(R.string.ability)
+
       AppDetailToolbarAction.COMPARE -> R.drawable.ic_compare to toolbarView.context.getString(R.string.compare_with_current)
     }
     return AppDetailToolbarItem(

@@ -80,7 +80,9 @@ Important `:app` boundaries:
   package-change sources to the `domain/app/` interfaces.
 - `domain/statistics/` owns statistics/reference computation rules. Keep
   package scanning, package-info lookups, and rule-matching loops out of
-  fragments, ViewModels, and chart data sources.
+  fragments, ViewModels, and chart data sources. Model built-in and external
+  charts through the same definition catalog; built-ins use drawable icon
+  keys, while external rule icons use validated SVG files.
 - `data/statistics/` adapts remote or cached statistics sources, such as Android
   version distribution, to `domain/statistics/` interfaces.
 - `domain/snapshot/` owns snapshot models, archive, capture, and diff seams;

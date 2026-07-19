@@ -35,6 +35,7 @@ class ChartDetailItemView(context: Context) : FrameLayout(context) {
       id = android.R.id.icon
       val iconSize = context.getDimensionPixelSize(R.dimen.app_icon_size)
       layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
+      scaleType = android.widget.ImageView.ScaleType.CENTER_INSIDE
       setBackgroundResource(R.drawable.bg_circle_secondary_container)
       importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
       addView(this)

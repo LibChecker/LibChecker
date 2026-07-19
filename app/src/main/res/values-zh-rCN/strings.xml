@@ -13,6 +13,19 @@
   <!--  App list  -->
   <string name="menu_search">搜索</string>
   <string name="menu_sort">排序</string>
+  <string name="chart_statistics_add">添加统计项</string>
+  <string name="chart_statistics_edit">编辑统计项</string>
+  <string name="chart_statistics_added">已添加</string>
+  <string name="chart_statistics_available">可添加</string>
+  <string name="chart_statistics_loading_online">正在加载在线统计项…</string>
+  <string name="chart_statistics_online_error">无法加载在线统计项，已显示下载的内容。</string>
+  <string name="chart_statistics_no_available">没有更多可添加的统计项。</string>
+  <string name="chart_statistics_source_builtin">内置</string>
+  <string name="chart_statistics_source_online">在线</string>
+  <string name="chart_statistics_drag">拖动排序</string>
+  <string name="chart_statistics_drag_hint">拖动以调整排序</string>
+  <string name="chart_statistics_remove_description">移除 %1$s</string>
+  <string name="chart_statistics_add_description">添加 %1$s</string>
   <string name="menu_filter">过滤</string>
   <string name="search_hint">搜索…</string>
   <string name="string_64_bit">64 位</string>
@@ -134,6 +147,14 @@
   <string name="kotlin_details">Kotlin 是由 JetBrains 开发的开源静态类型编程语言。Kotlin 简洁、安全、可与 Java 和其他语言互操作，并提供了许多在多个平台之间重用代码的方法，从而实现高效编程。Kotlin 适用于 JVM、Android、JavaScript、Wasm 和 Native，可用于任何类型的开发，包括服务器端、客户端 Web、Android 和多平台库。</string>
   <string name="items_count">项数：</string>
   <string name="further_operation">进一步操作</string>
+  <string name="app_detail_online_rules_action">检测在线规则</string>
+  <string name="app_detail_online_rules_title">在线规则检测</string>
+  <string name="app_detail_online_rules_loading">正在分析在线规则… %1$d%%</string>
+  <string name="app_detail_online_rules_empty">图表中尚未添加在线统计规则</string>
+  <string name="app_detail_online_rules_error">无法分析在线规则</string>
+  <string name="app_detail_online_rules_matched">符合</string>
+  <string name="app_detail_online_rules_unmatched">不符合</string>
+  <string name="app_detail_online_rules_detected_features">当前应用检测到以下特性：</string>
   <string name="app_info_launch">启动</string>
   <string name="app_info_settings">设置</string>
   <string name="app_info_share">分享</string>

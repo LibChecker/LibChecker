@@ -12,6 +12,7 @@ class DetailStateObserverController(
   private val coroutineScope: CoroutineScope,
   private val onItemsCountChanged: (LocatedCount) -> Unit,
   private val onProcessToolIconVisibilityChanged: (Boolean) -> Unit,
+  private val onOnlineRuleAnalysisVisibilityChanged: (Boolean) -> Unit,
   private val onProcessMapChanged: (Map<String, Int>) -> Unit,
   private val onFeatureAdded: (VersionedFeature) -> Unit,
   private val onFeatureLoadingChanged: (Boolean) -> Unit,
@@ -24,6 +25,9 @@ class DetailStateObserverController(
     }.launchIn(coroutineScope)
     viewModel.filterState.processToolIconVisibilityStateFlow.onEach { visible ->
       onProcessToolIconVisibilityChanged(visible)
+    }.launchIn(coroutineScope)
+    viewModel.onlineStatisticRulesAvailable.onEach { visible ->
+      onOnlineRuleAnalysisVisibilityChanged(visible)
     }.launchIn(coroutineScope)
     viewModel.filterState.processMapStateFlow.onEach { map ->
       onProcessMapChanged(map)

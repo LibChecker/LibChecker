@@ -5,10 +5,13 @@ import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.repository.AppListRepository
-import com.absinthe.libchecker.domain.statistics.chart.model.ChartType
 import com.absinthe.libchecker.domain.statistics.chart.model.ClassifyDialogState
 import com.absinthe.libchecker.domain.statistics.chart.model.LOADING_PROGRESS_MAX
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticCatalogEditorState
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticControl
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDefinition
 import com.absinthe.libchecker.domain.statistics.chart.repository.ChartSettingsRepository
+import com.absinthe.libchecker.domain.statistics.chart.repository.StatisticCatalogRepository
 import com.absinthe.libchecker.domain.statistics.chart.source.BaseVariableChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.source.ChartDataProvider
 import com.absinthe.libchecker.domain.statistics.chart.source.ChartDataSourceFactory
@@ -18,6 +21,7 @@ import com.absinthe.libchecker.domain.statistics.chart.source.IChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildAndroidVersionLabelDisplayDataUseCase
 import com.absinthe.libchecker.domain.statistics.chart.usecase.ChartFeatureInitializationPlan
 import com.absinthe.libchecker.domain.statistics.chart.usecase.ObserveChartFeatureInitializationPlansUseCase
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -25,18 +29,27 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class ChartViewModel internal constructor(
   appListRepository: AppListRepository,
   private val chartDataProvider: ChartDataProvider,
   private val chartDataSourceFactory: ChartDataSourceFactory,
+  private val statisticCatalogRepository: StatisticCatalogRepository,
   private val chartSettingsRepository: ChartSettingsRepository,
   private val observeChartFeatureInitializationPlans: ObserveChartFeatureInitializationPlansUseCase,
   private val buildAndroidVersionLabelDisplayData: BuildAndroidVersionLabelDisplayDataUseCase
 ) : ViewModel() {
   private val chartUiStatePlanner = ChartUiStatePlanner()
-  private var selectedChartType = ChartType.ABI
+  private var selectedStatisticId: String? = null
   private var featureInitializationPending = observeChartFeatureInitializationPlans.initialPending
+
+  private val _statisticDefinitions = MutableStateFlow<List<StatisticDefinition>>(emptyList())
+  val statisticDefinitions = _statisticDefinitions.asStateFlow()
+
+  private val _statisticCatalogEditorState = MutableStateFlow(StatisticCatalogEditorState())
+  val statisticCatalogEditorState = _statisticCatalogEditorState.asStateFlow()
+  private var statisticCatalogRefreshJob: Job? = null
 
   private val appListItemsState = appListRepository.items
     .map<List<LCItem>, List<LCItem>?> { it }
@@ -48,8 +61,8 @@ class ChartViewModel internal constructor(
   val appListItems: Flow<List<LCItem>> = appListItemsState.filterNotNull()
   val featureInitializationPlans: Flow<ChartFeatureInitializationPlan> =
     observeChartFeatureInitializationPlans(appListItemsState)
-  val currentChartType: ChartType
-    get() = selectedChartType
+  val currentStatistic: StatisticDefinition?
+    get() = _statisticDefinitions.value.find { it.id == selectedStatisticId }
 
   private val _loadingProgress = MutableStateFlow(LOADING_PROGRESS_MAX)
   val loadingProgress = _loadingProgress.asStateFlow()
@@ -68,6 +81,63 @@ class ChartViewModel internal constructor(
 
   private val _detailAbiSwitchVisibility = MutableStateFlow(true)
   val detailAbiSwitchVisibility = _detailAbiSwitchVisibility.asStateFlow()
+
+  init {
+    viewModelScope.launch {
+      applySelectedStatistics(statisticCatalogRepository.getSelectedStatistics())
+    }
+  }
+
+  fun openStatisticCatalogEditor() {
+    statisticCatalogRefreshJob?.cancel()
+    statisticCatalogRefreshJob = viewModelScope.launch {
+      val cachedAvailableStatistics = statisticCatalogRepository.getAvailableStatistics()
+      _statisticCatalogEditorState.value = StatisticCatalogEditorState(
+        selectedStatistics = _statisticDefinitions.value,
+        availableStatistics = cachedAvailableStatistics,
+        isRefreshing = true
+      )
+
+      val refreshedStatistics = statisticCatalogRepository.refreshAvailableStatistics()
+      val availableStatistics = refreshedStatistics ?: cachedAvailableStatistics
+      if (refreshedStatistics != null) {
+        val selectedIds = _statisticDefinitions.value.map(StatisticDefinition::id)
+        applySelectedStatistics(resolveStatistics(selectedIds, refreshedStatistics))
+      }
+      _statisticCatalogEditorState.value = StatisticCatalogEditorState(
+        selectedStatistics = _statisticDefinitions.value,
+        availableStatistics = availableStatistics,
+        refreshFailed = refreshedStatistics == null
+      )
+    }
+  }
+
+  fun addStatistic(statistic: StatisticDefinition) {
+    val selectedStatistics = _statisticDefinitions.value
+    if (selectedStatistics.any { it.id == statistic.id }) return
+    updateSelectedStatistics(selectedStatistics + statistic)
+  }
+
+  fun removeStatistic(statisticId: String) {
+    val selectedStatistics = _statisticDefinitions.value
+    if (selectedStatistics.size <= 1) return
+    updateSelectedStatistics(selectedStatistics.filterNot { it.id == statisticId })
+  }
+
+  fun moveStatistic(fromIndex: Int, toIndex: Int) {
+    val selectedStatistics = _statisticDefinitions.value
+    if (
+      fromIndex !in selectedStatistics.indices ||
+      toIndex !in selectedStatistics.indices ||
+      fromIndex == toIndex
+    ) {
+      return
+    }
+    val reorderedStatistics = selectedStatistics.toMutableList().apply {
+      add(toIndex, removeAt(fromIndex))
+    }
+    updateSelectedStatistics(reorderedStatistics)
+  }
 
   fun setLoadingProgress(progress: Int, allowDecrease: Boolean = false) {
     val currentProgress = _loadingProgress.value
@@ -91,23 +161,26 @@ class ChartViewModel internal constructor(
 
   fun updateFeatureInitializationPlan(
     plan: ChartFeatureInitializationPlan
-  ): ChartTypeSelectorPlan {
+  ): StatisticSelectorPlan {
     featureInitializationPending = plan.isPending
-    return createChartTypeSelectorPlan()
+    return createStatisticSelectorPlan()
   }
 
-  fun selectChartType(chartType: ChartType): ChartTypeSelectorPlan {
-    selectedChartType = chartType
-    return createChartTypeSelectorPlan()
+  fun selectStatistic(statistic: StatisticDefinition): StatisticSelectorPlan {
+    selectedStatisticId = statistic.id
+    return createStatisticSelectorPlan()
   }
 
-  fun createChartTypeSelectorPlan(): ChartTypeSelectorPlan {
-    val plan = chartUiStatePlanner.planChartTypes(
-      currentChartType = selectedChartType,
+  fun createStatisticSelectorPlan(): StatisticSelectorPlan {
+    val plan = chartUiStatePlanner.planStatistics(
+      definitions = _statisticDefinitions.value,
+      currentStatisticId = selectedStatisticId,
       featureChartsAvailable = !featureInitializationPending
     )
-    selectedChartType = plan.selectedType
-    setDetailAbiSwitchVisibility(selectedChartType == ChartType.ABI)
+    selectedStatisticId = plan.selectedStatistic?.id
+    setDetailAbiSwitchVisibility(
+      plan.selectedStatistic?.hasControl(StatisticControl.DETAILED_ABI) == true
+    )
     return plan
   }
 
@@ -119,14 +192,43 @@ class ChartViewModel internal constructor(
 
   internal fun createChartDataSourcePlan(
     items: List<LCItem>,
-    chartType: ChartType = currentChartType
+    statistic: StatisticDefinition = checkNotNull(currentStatistic) {
+      "Statistic catalog has not been loaded"
+    }
   ): ChartDataSourcePlan {
-    val selectedType = selectChartType(chartType).selectedType
+    val selectedStatistic = checkNotNull(selectStatistic(statistic).selectedStatistic) {
+      "Statistic ${statistic.id} is not available"
+    }
     return chartDataSourceFactory.create(
       items = items,
-      chartType = selectedType,
+      statistic = selectedStatistic,
       useDetailedAbiChart = isDetailedAbiChart
     )
+  }
+
+  private fun updateSelectedStatistics(statistics: List<StatisticDefinition>) {
+    applySelectedStatistics(statistics)
+    viewModelScope.launch {
+      statisticCatalogRepository.setSelectedStatisticIds(
+        statistics.map(StatisticDefinition::id)
+      )
+    }
+  }
+
+  private fun applySelectedStatistics(statistics: List<StatisticDefinition>) {
+    _statisticDefinitions.value = statistics
+    createStatisticSelectorPlan()
+    _statisticCatalogEditorState.value = _statisticCatalogEditorState.value.copy(
+      selectedStatistics = statistics
+    )
+  }
+
+  private fun resolveStatistics(
+    ids: List<String>,
+    availableStatistics: List<StatisticDefinition>
+  ): List<StatisticDefinition> {
+    val definitionsById = availableStatistics.associateBy(StatisticDefinition::id)
+    return ids.mapNotNull(definitionsById::get)
   }
 
   suspend fun buildClassifyDialogState(
@@ -139,6 +241,7 @@ class ChartViewModel internal constructor(
       title = title,
       items = items,
       itemViewStates = chartDataProvider.buildAppListItemViewStates(items),
+      itemChips = source.getItemChipsByXValue(x),
       androidVersion = buildAndroidVersionLabelDisplayData(
         source.getAndroidVersionNodeByXValue(x)
       )

@@ -103,7 +103,8 @@ class AppAdapter(
       label = item.label,
       packageName = item.packageName,
       viewState = viewState,
-      showMissingPackageStrikeThrough = viewState.isPackageMissing && cardMode != CardMode.DEMO
+      showMissingPackageStrikeThrough = viewState.isPackageMissing && cardMode != CardMode.DEMO,
+      chips = renderState.itemChips[item.packageName].orEmpty()
     )
   }
 

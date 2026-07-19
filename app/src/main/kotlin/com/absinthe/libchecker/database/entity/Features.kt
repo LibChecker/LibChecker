@@ -8,9 +8,6 @@ object Features {
   const val PLAY_SIGNING = 1 shl 4
   const val PWA = 1 shl 5
   const val JETPACK_COMPOSE = 1 shl 6
-  const val RX_JAVA = 1 shl 7
-  const val RX_KOTLIN = 1 shl 8
-  const val RX_ANDROID = 1 shl 9
   const val KMP = 1 shl 10
   const val LIVE_UPDATE_NOTIFICATION = 1 shl 11
 

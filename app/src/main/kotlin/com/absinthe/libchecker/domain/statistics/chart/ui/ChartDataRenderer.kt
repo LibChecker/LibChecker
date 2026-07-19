@@ -41,7 +41,7 @@ internal class ChartDataRenderer(
         if (currentChartView != null) {
           root.removeView(currentChartView)
         }
-        root.addView(newChartView)
+        root.addView(newChartView, 0)
         if (source.getData().isNotEmpty()) {
           onLoadingProgressChanged(LOADING_PROGRESS_MAX)
         }

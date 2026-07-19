@@ -3,14 +3,17 @@ package com.absinthe.libchecker.domain.app.list.ui.view
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
 import android.text.SpannableString
 import android.text.TextUtils
 import android.text.style.ImageSpan
 import android.view.Gravity
+import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.isGone
 import androidx.core.view.marginStart
 import coil.dispose
 import coil.load
@@ -28,6 +31,7 @@ import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
+import com.absinthe.libchecker.utils.extensions.isRtl
 import com.absinthe.libchecker.utils.extensions.tintHighlightText
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.span.CenterAlignImageSpan
@@ -85,11 +89,15 @@ class AppItemView(
     container.setIconDisplay(display.icon)
     setItemIdentityDisplay(display, highlightText)
     container.setMetadataDisplay(display.metadata)
+    container.setChips(display.chips)
   }
 
   fun setItemIdentityDisplay(display: AppListItemDisplay, highlightText: String) {
     container.setIdentityText(display.identity, highlightText)
-    setItemContentDescription(display.identity.contentDescription)
+    setItemContentDescription(
+      display.identity.contentDescription,
+      display.chips.joinToString().takeIf(String::isNotEmpty)
+    )
   }
 
   class AppItemContainerView(
@@ -100,6 +108,7 @@ class AppItemView(
     private val iconBadgeGap = 4.dp
     private val abiBadgeGap = 1.dp
     private val abiBadgeWidthRatio = 0.75f
+    private val labelTopGap = 4.dp
 
     val icon = AppCompatImageView(context).apply {
       layoutParams = LayoutParams(style.iconSize, style.iconSize)
@@ -156,6 +165,16 @@ class AppItemView(
       addView(this)
     }
 
+    private val labelGroup = PillLabelGroup(context, style).apply {
+      layoutParams = LayoutParams(
+        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
+      )
+      importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
+      visibility = GONE
+      this@AppItemContainerView.addView(this)
+    }
+
     private var abiBadge: AppCompatImageView? = null
     private var multiArchBadge: AppCompatImageView? = null
     private var badge: AppCompatImageView? = null
@@ -209,6 +228,11 @@ class AppItemView(
       setVersionInfo(display.versionInfo)
       setAbiDisplay(display)
       setPackageBadge(display.packageBadge)
+    }
+
+    fun setChips(labels: List<String>) {
+      labelGroup.setLabels(labels)
+      labelGroup.isGone = labels.isEmpty()
     }
 
     private fun setAbiDisplay(display: AppListItemMetadataDisplay) {
@@ -296,7 +320,7 @@ class AppItemView(
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
       super.onMeasure(widthMeasureSpec, heightMeasureSpec)
       for (index in 0 until childCount) {
-        getChildAt(index).autoMeasure()
+        getChildAt(index).takeUnless { it === labelGroup }?.autoMeasure()
       }
       measureAbiBadges()
       val textWidth =
@@ -326,6 +350,12 @@ class AppItemView(
           abiInfo.defaultHeightMeasureSpec(this)
         )
       }
+      if (!labelGroup.isGone) {
+        labelGroup.measure(
+          textWidth.toExactlyMeasureSpec(),
+          View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        )
+      }
       val iconColumnHeight = icon.measuredHeight +
         if (abiBadge != null || multiArchBadge != null) {
           iconBadgeGap + maxOf(
@@ -339,7 +369,8 @@ class AppItemView(
         appName.measuredHeightWithVisibility +
           packageName.measuredHeightWithVisibility +
           versionInfo.measuredHeightWithVisibility +
-          abiInfo.measuredHeightWithVisibility
+          abiInfo.measuredHeightWithVisibility +
+          if (labelGroup.isGone) 0 else labelTopGap + labelGroup.measuredHeight
       setMeasuredDimension(
         measuredWidth,
         paddingTop + if (useDetachedAbiBadgeLayout) {
@@ -360,6 +391,9 @@ class AppItemView(
       packageName.layout(offsetStart, appName.bottom)
       versionInfo.layout(offsetStart, packageName.bottom)
       abiInfo.layout(offsetStart, versionInfo.bottom)
+      if (!labelGroup.isGone) {
+        labelGroup.layout(offsetStart, abiInfo.bottom + labelTopGap)
+      }
       if (hasDetachedAbiBadges()) {
         layoutAbiBadges()
       }
@@ -426,6 +460,105 @@ class AppItemView(
         return this
       }
       return (this * intrinsicHeight.toFloat() / intrinsicWidth).toInt().coerceAtLeast(1)
+    }
+  }
+
+  private class PillLabelGroup(
+    context: Context,
+    private val style: Style
+  ) : ViewGroup(context) {
+    private val horizontalGap = 4.dp
+    private val verticalGap = 4.dp
+    private val labelHeight = 28.dp
+    private val horizontalPadding = 10.dp
+    private val strokeWidth = 1.dp
+    private val strokeColor = context.getColorByAttr(
+      com.google.android.material.R.attr.colorOutline
+    )
+
+    fun setLabels(labels: List<String>) {
+      removeAllViews()
+      labels.forEach { label ->
+        addView(
+          AppCompatTextView(context).apply {
+            layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, labelHeight)
+            text = label
+            gravity = Gravity.CENTER
+            includeFontPadding = false
+            setPadding(horizontalPadding, 0, horizontalPadding, 0)
+            setTextAppearance(style.labelSmallTextAppearance)
+            setTextColor(style.onSurfaceVariantColor)
+            importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
+            background = GradientDrawable().apply {
+              shape = GradientDrawable.RECTANGLE
+              setColor(Color.TRANSPARENT)
+              setStroke(strokeWidth, strokeColor)
+              cornerRadius = labelHeight / 2f
+            }
+          }
+        )
+      }
+      requestLayout()
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+      val availableWidth = MeasureSpec.getSize(widthMeasureSpec)
+      var rowWidth = 0
+      var rowHeight = 0
+      var contentHeight = 0
+      for (index in 0 until childCount) {
+        val child = getChildAt(index)
+        measureChild(child, widthMeasureSpec, heightMeasureSpec)
+        val nextWidth = if (rowWidth == 0) {
+          child.measuredWidth
+        } else {
+          rowWidth + horizontalGap + child.measuredWidth
+        }
+        if (rowWidth > 0 && nextWidth > availableWidth) {
+          contentHeight += rowHeight + verticalGap
+          rowWidth = child.measuredWidth
+          rowHeight = child.measuredHeight
+        } else {
+          rowWidth = nextWidth
+          rowHeight = maxOf(rowHeight, child.measuredHeight)
+        }
+      }
+      if (childCount > 0) {
+        contentHeight += rowHeight
+      }
+      setMeasuredDimension(
+        resolveSize(availableWidth, widthMeasureSpec),
+        resolveSize(contentHeight, heightMeasureSpec)
+      )
+    }
+
+    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+      val availableWidth = r - l
+      var childStart = 0
+      var childTop = 0
+      var rowHeight = 0
+      for (index in 0 until childCount) {
+        val child = getChildAt(index)
+        val nextEnd = childStart + child.measuredWidth
+        if (childStart > 0 && nextEnd > availableWidth) {
+          childStart = 0
+          childTop += rowHeight + verticalGap
+          rowHeight = 0
+        }
+        val childLeft = if (isRtl()) {
+          availableWidth - childStart - child.measuredWidth
+        } else {
+          childStart
+        }
+        child.layout(
+          childLeft,
+          childTop,
+          childLeft + child.measuredWidth,
+          childTop + child.measuredHeight
+        )
+        childStart += child.measuredWidth + horizontalGap
+        rowHeight = maxOf(rowHeight, child.measuredHeight)
+      }
     }
   }
 

@@ -18,6 +18,7 @@
   <string name="rxjava" translatable="false">RxJava</string>
   <string name="rxkotlin" translatable="false">RxKotlin</string>
   <string name="rxandroid" translatable="false">RxAndroid</string>
+  <string name="reactivex" translatable="false">ReactiveX</string>
 
   <string name="empty" translatable="false"> </string>
 

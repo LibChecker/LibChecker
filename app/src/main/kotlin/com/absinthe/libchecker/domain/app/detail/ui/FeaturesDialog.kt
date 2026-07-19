@@ -64,16 +64,14 @@ object FeaturesDialog {
     val dialog = BaseAlertDialogBuilder(context)
       .setIcon(icon)
       .setTitle(spec.titleRes)
-      .setMessage(HtmlCompat.fromHtml(context.getString(spec.messageRes), HtmlCompat.FROM_HTML_MODE_COMPACT))
       .setPositiveButton(android.R.string.ok, null)
 
+    spec.messageRes?.let { messageRes ->
+      dialog.setMessage(HtmlCompat.fromHtml(context.getString(messageRes), HtmlCompat.FROM_HTML_MODE_COMPACT))
+    }
     spec.titleEntries?.let { entries ->
       val title = entries.joinToString(", ") { entry ->
-        val label = when (val label = entry.label) {
-          is FeatureDialogTitleLabel.Resource -> context.getString(label.res)
-          is FeatureDialogTitleLabel.Text -> label.value
-        }
-        "$label <b>${entry.value.orEmpty()}</b>"
+        "${entry.label.resolve(context)} <b>${entry.value.orEmpty()}</b>"
       }
       dialog.setTitle(HtmlCompat.fromHtml(title, HtmlCompat.FROM_HTML_MODE_COMPACT))
     }
@@ -89,6 +87,13 @@ object FeaturesDialog {
       Constants.Event.FEATURE_DIALOG,
       mapOf(Telemetry.Param.CONTENT to context.getString(spec.titleRes))
     )
+  }
+
+  private fun FeatureDialogTitleLabel.resolve(context: Context): String {
+    return when (this) {
+      is FeatureDialogTitleLabel.Resource -> context.getString(res)
+      is FeatureDialogTitleLabel.Text -> value
+    }
   }
 
   fun showAppPropDialog(activity: FragmentActivity, packageInfo: PackageInfo?) {

@@ -66,6 +66,7 @@ import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailPerm
 import com.absinthe.libchecker.domain.app.detail.related.BuildRelatedAppDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.detail.related.GetRelatedAppDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.detail.resource.ResolveAppResourceValueUseCase
+import com.absinthe.libchecker.domain.app.detail.statistics.AnalyzeAppStatisticRulesUseCase
 import com.absinthe.libchecker.domain.app.packageinfo.GetApkPreviewInfoUseCase
 import com.absinthe.libchecker.domain.app.packageinfo.GetArchivePackageInfoUseCase
 import com.absinthe.libchecker.domain.app.packageinfo.GetInstalledAppComparisonPackageUseCase
@@ -138,6 +139,7 @@ val appDetailModule = module {
   factory { GetXposedModuleInfoUseCase(androidContext().packageManager, get()) }
   factory { GetAppDetailStaticLibraryTabItemsUseCase(get(), get()) }
   factory { SortAppDetailItemsUseCase() }
+  factory { AnalyzeAppStatisticRulesUseCase(get(), get()) }
   factory {
     DetailActionLoader(
       getAlternativeLaunchItemsUseCase = get(),
@@ -232,7 +234,8 @@ val appDetailModule = module {
       detailContentLoader = get(),
       detailFilterController = get(),
       detailFeatureLoader = get(),
-      detailPackageLoader = get()
+      detailPackageLoader = get(),
+      analyzeAppStatisticRules = get()
     )
   }
 }

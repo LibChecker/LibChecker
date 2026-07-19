@@ -6,6 +6,7 @@ androidX-room3 = "3.0.0"
 androidX-benchmark = "1.4.1"
 androidX-collection = "1.6.0"
 appIconLoader = "1.5.0"
+coil = "2.7.0"
 firebase-bom = "34.16.0"
 hiddenApiRefine = "4.4.0"
 kotlin = "2.4.10"
@@ -87,7 +88,8 @@ aboutlibraries-ui = { module = "com.mikepenz:aboutlibraries", version.ref = "abo
 appIconLoader = { module = "me.zhanghai.android.appiconloader:appiconloader", version.ref = "appIconLoader" }
 appIconLoader-coil = { module = "me.zhanghai.android.appiconloader:appiconloader-coil", version.ref = "appIconLoader" }
 brvah = "io.github.cymchad:BaseRecyclerViewAdapterHelper4:4.4.1"
-coil = "io.coil-kt:coil:2.7.0"
+coil = { module = "io.coil-kt:coil", version.ref = "coil" }
+coil-svg = { module = "io.coil-kt:coil-svg", version.ref = "coil" }
 commons-compress = "org.apache.commons:commons-compress:1.28.0"
 fastScroll = "me.zhanghai.android.fastscroll:library:1.3.0"
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
