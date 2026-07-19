@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.Rect
+import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.RippleDrawable
 import android.util.TypedValue
@@ -126,8 +127,8 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
   private var chipClickListener: OnClickListener? = null
   private var statusIconOpticalInset = 0
   private var layoutPlan = SnapshotDetailItemLayoutPlan(
-    titleWidth = 0,
-    chipOnTitleLine = false
+    contentWidth = 0,
+    chipOnStatusLine = false
   )
 
   init {
@@ -162,8 +163,7 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
         surface = context.getColorByAttr(MaterialR.attr.colorSurface),
         onSurface = context.getColorByAttr(MaterialR.attr.colorOnSurface),
         onSurfaceVariant = context.getColorByAttr(MaterialR.attr.colorOnSurfaceVariant),
-        outlineVariant = context.getColorByAttr(MaterialR.attr.colorOutlineVariant),
-        chipSurface = context.getColorByAttr(MaterialR.attr.colorSurfaceContainerLow)
+        outlineVariant = context.getColorByAttr(MaterialR.attr.colorOutlineVariant)
       ),
       statusColor = state.statusColorRes.getColor(context)
     )
@@ -215,6 +215,7 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
       setTextAppearance(
         context.getResourceIdByAttr(MaterialR.attr.textAppearanceLabelSmall)
       )
+      typeface = Typeface.create(RULE_CHIP_FONT_FAMILY, Typeface.NORMAL)
       importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
       isFocusable = true
       addView(this)
@@ -222,7 +223,7 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
     }
     target.apply {
       text = state.label
-      background = buildRuleChipInteractionBackground(colors.chipSurface)
+      background = buildRuleChipInteractionBackground()
       setTextColor(colors.chipText)
       val icon = requireNotNull(state.iconRes.getDrawable(context)).mutate().apply {
         setBounds(0, 0, RULE_CHIP_ICON_SIZE, RULE_CHIP_ICON_SIZE)
@@ -266,44 +267,44 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
     }
     layoutPlan = planSnapshotDetailItemLayout(
       contentWidth = contentWidth,
-      naturalTitleWidth = title.measuredWidth,
+      naturalStatusWidth = statusIcon.measuredWidth + STATUS_LABEL_GAP + statusLabel.measuredWidth,
       chipWidth = chip?.measuredWidth ?: 0,
-      chipGap = TITLE_CHIP_GAP
+      chipGap = STATUS_CHIP_GAP
     )
-    if (title.measuredWidth > layoutPlan.titleWidth) {
+    if (title.measuredWidth > layoutPlan.contentWidth) {
       title.measure(
-        layoutPlan.titleWidth.toExactlyMeasureSpec(),
+        layoutPlan.contentWidth.toExactlyMeasureSpec(),
         title.defaultHeightMeasureSpec(this)
       )
     }
-    if (previousPackagePath.isVisible && previousPackagePath.measuredWidth > layoutPlan.titleWidth) {
+    if (previousPackagePath.isVisible && previousPackagePath.measuredWidth > layoutPlan.contentWidth) {
       previousPackagePath.measure(
-        layoutPlan.titleWidth.toExactlyMeasureSpec(),
+        layoutPlan.contentWidth.toExactlyMeasureSpec(),
         previousPackagePath.defaultHeightMeasureSpec(this)
       )
     }
-    if (extra.isVisible && extra.measuredWidth > layoutPlan.titleWidth) {
+    if (extra.isVisible && extra.measuredWidth > layoutPlan.contentWidth) {
       extra.measure(
-        layoutPlan.titleWidth.toExactlyMeasureSpec(),
+        layoutPlan.contentWidth.toExactlyMeasureSpec(),
         extra.defaultHeightMeasureSpec(this)
       )
     }
 
-    val statusHeight = maxOf(statusIcon.measuredHeight, statusLabel.measuredHeight)
+    val statusHeight = maxOf(
+      statusIcon.measuredHeight,
+      statusLabel.measuredHeight,
+      chip?.takeIf { layoutPlan.chipOnStatusLine }?.measuredHeight ?: 0
+    )
     val statusBottom = CONTENT_TOP_PADDING + statusHeight
     var titleTop = statusBottom + STATUS_CONTENT_GAP
     if (previousPackagePath.isVisible) {
       titleTop += previousPackagePath.measuredHeight + movedArrow.measuredHeight
     }
-    val titleLineHeight = maxOf(
-      title.measuredHeight,
-      chip?.takeIf { layoutPlan.chipOnTitleLine }?.measuredHeight ?: 0
-    )
-    var contentBottom = titleTop + titleLineHeight
+    var contentBottom = titleTop + title.measuredHeight
     if (extra.isVisible) {
       contentBottom += extra.measuredHeight
     }
-    chip?.takeUnless { layoutPlan.chipOnTitleLine }?.let {
+    chip?.takeUnless { layoutPlan.chipOnStatusLine }?.let {
       contentBottom += RULE_CHIP_VERTICAL_GAP + it.measuredHeight
     }
     val desiredHeight = maxOf(contentBottom, statusBottom) + CONTENT_BOTTOM_PADDING
@@ -323,6 +324,12 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
       statusStart + statusIcon.measuredWidth + STATUS_LABEL_GAP,
       CONTENT_TOP_PADDING + (statusHeight - statusLabel.measuredHeight) / 2
     )
+    chip?.takeIf { layoutPlan.chipOnStatusLine }?.let { inlineChip ->
+      inlineChip.layout(
+        statusLabel.right + STATUS_CHIP_GAP,
+        CONTENT_TOP_PADDING + (statusHeight - inlineChip.measuredHeight) / 2
+      )
+    }
 
     val titleX = contentStart
     var titleY = CONTENT_TOP_PADDING + statusHeight + STATUS_CONTENT_GAP
@@ -334,25 +341,13 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
       )
       titleY = movedArrow.bottom
     }
-    val inlineChip = chip?.takeIf { layoutPlan.chipOnTitleLine }
-    val titleLineHeight = maxOf(
-      title.measuredHeight,
-      inlineChip?.measuredHeight ?: 0
-    )
-    title.layout(
-      titleX,
-      titleY + (titleLineHeight - title.measuredHeight) / 2
-    )
-    inlineChip?.layout(
-      title.right + TITLE_CHIP_GAP,
-      titleY + (titleLineHeight - inlineChip.measuredHeight) / 2
-    )
-    var nextY = titleY + titleLineHeight
+    title.layout(titleX, titleY)
+    var nextY = title.bottom
     if (extra.isVisible) {
       extra.layout(titleX, nextY)
       nextY = extra.bottom
     }
-    chip?.takeUnless { layoutPlan.chipOnTitleLine }?.layout(
+    chip?.takeUnless { layoutPlan.chipOnStatusLine }?.layout(
       titleX,
       nextY + RULE_CHIP_VERTICAL_GAP
     )
@@ -389,10 +384,10 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
     }
   }
 
-  private fun buildRuleChipInteractionBackground(backgroundColor: Int): RippleDrawable {
+  private fun buildRuleChipInteractionBackground(): RippleDrawable {
     return RippleDrawable(
       ColorStateList.valueOf(context.getColorByAttr(android.R.attr.colorControlHighlight)),
-      ruleChipPillDrawable(backgroundColor),
+      null,
       ruleChipPillDrawable(Color.WHITE)
     )
   }
@@ -409,18 +404,19 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
     val STATUS_RAIL_WIDTH = 3.dp
     val STATUS_ICON_SIZE = 16.dp
     val STATUS_LABEL_GAP = 4.dp
+    val STATUS_CHIP_GAP = 6.dp
     const val MOVED_ARROW = "↓"
-    val TITLE_CHIP_GAP = 6.dp
     val CONTENT_TOP_PADDING = 4.dp
     val CONTENT_BOTTOM_PADDING = 8.dp
     val STATUS_CONTENT_GAP = 0.dp
     val RULE_CHIP_VERTICAL_GAP = 2.dp
     val RULE_CHIP_HEIGHT = 24.dp
-    val RULE_CHIP_HORIZONTAL_PADDING = 8.dp
+    val RULE_CHIP_HORIZONTAL_PADDING = 4.dp
     val RULE_CHIP_ICON_SIZE = 16.dp
     val RULE_CHIP_TOUCH_HEIGHT = 48.dp
     val RULE_CHIP_HORIZONTAL_TOUCH_EXPANSION = 4.dp
     val RULE_CHIP_RADIUS = 6.dp
+    const val RULE_CHIP_FONT_FAMILY = "sans-serif-medium"
     val MINIMUM_HEIGHT = 56.dp
     val DIVIDER_HEIGHT = 1.dp
   }

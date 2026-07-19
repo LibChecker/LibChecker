@@ -8,9 +8,9 @@ import org.junit.Test
 class SnapshotDetailItemDisplayDataDescriptionTest {
 
   @Test
-  fun joinsStatusTitleExtraAndRuleLabel() {
+  fun followsVisualStatusRuleTitleAndExtraOrder() {
     assertEquals(
-      "Changed, libfoo.so, 42 KB, JNI",
+      "Changed, JNI, libfoo.so, 42 KB",
       buildSnapshotDetailItemDescription(
         statusLabel = "Changed",
         title = "libfoo.so",

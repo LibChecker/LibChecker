@@ -129,6 +129,7 @@ data class StatisticDexMethodReference(
   val parameterTypes: List<String>? = null
 )
 
+@JsonClass(generateAdapter = false)
 enum class StatisticSource {
   @Json(name = "builtin")
   BUILTIN,
@@ -140,6 +141,7 @@ enum class StatisticSource {
   CUSTOM
 }
 
+@JsonClass(generateAdapter = false)
 enum class StatisticTitleResource {
   @Json(name = "abi")
   ABI,
@@ -169,6 +171,7 @@ enum class StatisticTitleResource {
   PAGE_SIZE_16_KB
 }
 
+@JsonClass(generateAdapter = false)
 enum class StatisticIconRenderMode {
   @Json(name = "monochrome")
   MONOCHROME,
@@ -177,6 +180,7 @@ enum class StatisticIconRenderMode {
   ORIGINAL
 }
 
+@JsonClass(generateAdapter = false)
 enum class StatisticDrawableIcon {
   @Json(name = "abi")
   ABI,
@@ -206,6 +210,7 @@ enum class StatisticDrawableIcon {
   PAGE_SIZE_16_KB
 }
 
+@JsonClass(generateAdapter = false)
 enum class StatisticIconTintRole {
   @Json(name = "on_surface")
   ON_SURFACE,
@@ -223,6 +228,7 @@ enum class StatisticIconTintRole {
   TERTIARY
 }
 
+@JsonClass(generateAdapter = false)
 enum class StatisticCalculationKind {
   @Json(name = "native")
   NATIVE,
@@ -234,6 +240,7 @@ enum class StatisticCalculationKind {
   FACETS
 }
 
+@JsonClass(generateAdapter = false)
 enum class StatisticEvidence {
   @Json(name = "target_sdk")
   TARGET_SDK,
@@ -254,11 +261,13 @@ enum class StatisticEvidence {
   MANIFEST_ATTRIBUTE
 }
 
+@JsonClass(generateAdapter = false)
 enum class StatisticManifestElement {
   @Json(name = "application")
   APPLICATION
 }
 
+@JsonClass(generateAdapter = false)
 enum class StatisticComparisonOperator {
   @Json(name = "equal")
   EQUAL,
@@ -276,6 +285,7 @@ enum class StatisticComparisonOperator {
   CONTAINS_ANY
 }
 
+@JsonClass(generateAdapter = false)
 enum class StatisticStringOperator {
   @Json(name = "equal")
   EQUAL,
@@ -284,6 +294,7 @@ enum class StatisticStringOperator {
   STARTS_WITH
 }
 
+@JsonClass(generateAdapter = false)
 enum class StatisticNativeOperator {
   @Json(name = "abi")
   ABI,
@@ -313,6 +324,7 @@ enum class StatisticNativeOperator {
   PAGE_SIZE_16_KB
 }
 
+@JsonClass(generateAdapter = false)
 enum class StatisticAvailability {
   @Json(name = "always")
   ALWAYS,
@@ -321,11 +333,13 @@ enum class StatisticAvailability {
   PAGE_SIZE_16_KB
 }
 
+@JsonClass(generateAdapter = false)
 enum class StatisticControl {
   @Json(name = "detailed_abi")
   DETAILED_ABI
 }
 
+@JsonClass(generateAdapter = false)
 enum class StatisticDashboard {
   @Json(name = "none")
   NONE,
@@ -334,6 +348,7 @@ enum class StatisticDashboard {
   ANDROID_DISTRIBUTION
 }
 
+@JsonClass(generateAdapter = false)
 enum class StatisticFingerprint {
   @Json(name = "standard")
   STANDARD,
