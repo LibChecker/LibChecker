@@ -14,6 +14,7 @@ import coil.request.ImageRequest
 import coil.request.SuccessResult
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDrawableIcon
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticFacetSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticIconRenderMode
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticIconSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticIconTintRole
@@ -43,6 +44,9 @@ internal suspend fun StatisticIconSpec.resolveDrawable(context: Context): Drawab
     }
   }
 }
+
+internal val StatisticFacetSpec.summaryTitle: StatisticTitleSpec
+  get() = shortTitle ?: title
 
 internal fun resolveStatisticTranslation(
   translations: Map<String, String>,

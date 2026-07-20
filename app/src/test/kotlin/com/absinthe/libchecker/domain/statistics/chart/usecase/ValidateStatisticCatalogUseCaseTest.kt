@@ -271,6 +271,7 @@ class ValidateStatisticCatalogUseCaseTest {
             StatisticFacetSpec(
               id = "voip-service-kit",
               title = translatedTitle("VoIP Service Kit"),
+              shortTitle = translatedTitle("VoIP"),
               condition = StatisticConditionSpec(
                 evidence = StatisticEvidence.DEX_CLASS,
                 operator = StatisticComparisonOperator.CONTAINS_ANY,
@@ -301,6 +302,7 @@ class ValidateStatisticCatalogUseCaseTest {
     val facet = StatisticFacetSpec(
       id = "capability",
       title = StatisticTitleSpec(translations = mapOf("zh-Hans" to "能力")),
+      shortTitle = StatisticTitleSpec(translations = mapOf("zh-Hans" to "短能力")),
       condition = StatisticConditionSpec(
         evidence = StatisticEvidence.TARGET_SDK,
         operator = StatisticComparisonOperator.GREATER_THAN_OR_EQUAL,
@@ -323,6 +325,7 @@ class ValidateStatisticCatalogUseCaseTest {
 
     assertTrue(errors.any { it.startsWith("Facets statistic has a duplicate facet id") })
     assertTrue(errors.any { it.startsWith("External facet must provide an English title") })
+    assertTrue(errors.any { it.startsWith("External facet must provide an English short title") })
   }
 
   @Test

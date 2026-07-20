@@ -1,5 +1,8 @@
 package com.absinthe.libchecker.domain.statistics.chart.ui
 
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticConditionSpec
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticFacetSpec
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticTitleSpec
 import java.util.Locale
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -34,6 +37,21 @@ class StatisticPresentationTest {
     )
 
     assertEquals("其他應用程式", result)
+  }
+
+  @Test
+  fun `uses short facet title for summaries and falls back to the full title`() {
+    val fullTitle = StatisticTitleSpec(translations = mapOf("en" to "VoIP Service Kit"))
+    val shortTitle = StatisticTitleSpec(translations = mapOf("en" to "VoIP"))
+    val facet = StatisticFacetSpec(
+      id = "voip-service-kit",
+      title = fullTitle,
+      shortTitle = shortTitle,
+      condition = StatisticConditionSpec()
+    )
+
+    assertEquals(shortTitle, facet.summaryTitle)
+    assertEquals(fullTitle, facet.copy(shortTitle = null).summaryTitle)
   }
 
   @Test

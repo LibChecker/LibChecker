@@ -128,6 +128,7 @@ class OfficialStatisticBundleStoreTest {
             StatisticFacetSpec(
               id = "voip-service-kit",
               title = StatisticTitleSpec(translations = mapOf("en" to "VoIP Service Kit")),
+              shortTitle = StatisticTitleSpec(translations = mapOf("en" to "VoIP")),
               condition = StatisticConditionSpec(
                 evidence = StatisticEvidence.DEX_CLASS,
                 operator = StatisticComparisonOperator.CONTAINS_ANY,
@@ -154,7 +155,9 @@ class OfficialStatisticBundleStoreTest {
     val cached = store.loadCachedStatistics()
 
     assertEquals(listOf("official.capabilities"), installed.map { it.id })
-    assertEquals("voip-service-kit", cached.single().calculation.facets?.items?.single()?.id)
+    val cachedFacet = cached.single().calculation.facets?.items?.single()
+    assertEquals("voip-service-kit", cachedFacet?.id)
+    assertEquals("VoIP", cachedFacet?.shortTitle?.translations?.get("en"))
   }
 
   @Test
