@@ -36,6 +36,7 @@ import com.absinthe.libchecker.utils.extensions.tintHighlightText
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.span.CenterAlignImageSpan
 import com.google.android.material.card.MaterialCardView
+import me.zhanghai.android.appiconloader.AppIconLoader
 
 class AppItemView(
   context: Context,
@@ -181,14 +182,17 @@ class AppItemView(
     private var useDetachedAbiBadgeLayout = false
 
     fun setIconDisplay(display: AppListItemIconDisplay) {
-      if (!display.usePackageIcon) {
+      val packageInfo = display.packageInfo
+      if (!display.usePackageIcon || packageInfo == null) {
         icon.dispose()
         icon.setImageDrawable(style.newIconPlaceholder(context))
         return
       }
-      icon.load(display.packageInfo) {
+      icon.load(packageInfo) {
+        placeholderMemoryCacheKey(AppIconLoader.getIconKey(packageInfo, context))
         placeholder(style.newIconPlaceholder(context))
         error(style.newIconPlaceholder(context))
+        crossfade(false)
       }
     }
 

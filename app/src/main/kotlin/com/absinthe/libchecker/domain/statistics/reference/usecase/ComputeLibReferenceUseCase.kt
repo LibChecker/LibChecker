@@ -98,7 +98,7 @@ class ComputeLibReferenceUseCase(
     config: MatchConfig,
     onProgress: (Int) -> Unit
   ): List<LibReferenceItem>? {
-    val references = index.references
+    val references = index.snapshotReferences()
     val refList = mutableListOf<LibReferenceItem>()
     var progressCount = 0
 
@@ -271,15 +271,13 @@ class ComputeLibReferenceUseCase(
         PACKAGE -> {
           val split = packageName.split(".")
           val packagePrefix = split.subList(0, split.size.coerceAtMost(2)).joinToString(".")
-          index.references.getOrPut(packagePrefix) { HashSet<String>() to PACKAGE }.first.add(packageName)
+          index.addReference(packagePrefix, packageName, PACKAGE)
         }
 
         SHARED_UID -> {
           val packageInfo = getBasePackageInfo(packageName) ?: return
           if (packageInfo.sharedUserId?.isNotBlank() == true) {
-            index.references.getOrPut(packageInfo.sharedUserId!!) {
-              HashSet<String>() to SHARED_UID
-            }.first.add(packageName)
+            index.addReference(packageInfo.sharedUserId!!, packageName, SHARED_UID)
           }
         }
 
@@ -332,7 +330,7 @@ class ComputeLibReferenceUseCase(
     list: Sequence<String>?
   ) {
     list?.forEach {
-      index.references.getOrPut(it) { HashSet<String>() to type }.first.add(packageName)
+      index.addReference(it, packageName, type)
     }
   }
 
@@ -349,10 +347,24 @@ class ComputeLibReferenceUseCase(
   class ReferenceIndex internal constructor(
     internal val packageInfoByName: Map<String, PackageInfo>
   ) {
-    internal val references = HashMap<String, Pair<MutableSet<String>, Int>>()
+    private val references = HashMap<String, Pair<MutableSet<String>, Int>>()
+
+    internal fun addReference(reference: String, packageName: String, @LibType type: Int) {
+      synchronized(references) {
+        references.getOrPut(reference) { HashSet<String>() to type }.first.add(packageName)
+      }
+    }
+
+    internal fun snapshotReferences(): Map<String, Pair<Set<String>, Int>> {
+      return synchronized(references) {
+        references.mapValues { (_, value) -> value.first.toSet() to value.second }
+      }
+    }
 
     fun clear() {
-      references.clear()
+      synchronized(references) {
+        references.clear()
+      }
     }
   }
 }

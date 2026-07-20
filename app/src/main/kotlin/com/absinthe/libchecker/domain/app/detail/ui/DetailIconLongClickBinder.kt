@@ -48,11 +48,16 @@ fun ImageView.setDetailIconLongClick(applicationInfo: ApplicationInfo?, blurView
 @RequiresApi(Build.VERSION_CODES.O)
 private fun ImageView.showAdaptiveIconLayerOverlay(icon: AdaptiveIconDrawable, blurView: View) {
   val activity = context.findActivity()
-  if (activity == null) {
+  if (activity == null || !icon.hasCompleteLayers()) {
     copyToClipboard()
     return
   }
   AdaptiveIconLayerOverlay(activity, icon, this, blurView).show()
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+internal fun AdaptiveIconDrawable.hasCompleteLayers(): Boolean {
+  return background != null && foreground != null
 }
 
 private tailrec fun Context.findActivity(): Activity? {

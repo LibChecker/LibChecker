@@ -14,8 +14,9 @@ class BuildSnapshotListUpdatePlanUseCase(
 ) {
 
   suspend operator fun invoke(request: Request): Plan {
+    val stableRequest = request.freezeCollections()
     val displayPlan = withContext(Dispatchers.Default) {
-      buildDisplayPlan(request)
+      buildDisplayPlan(stableRequest)
     }
     val packageNames = displayPlan.items.map(SnapshotDiffItem::packageName)
 
@@ -93,7 +94,15 @@ class BuildSnapshotListUpdatePlanUseCase(
     val searchKeyword: String,
     val pendingRemovePackageNames: Set<String>,
     val highlightRefresh: Boolean
-  )
+  ) {
+    internal fun freezeCollections(): Request {
+      return copy(
+        currentItems = currentItems.toList(),
+        sourceItems = sourceItems.toList(),
+        pendingRemovePackageNames = pendingRemovePackageNames.toSet()
+      )
+    }
+  }
 
   data class Plan(
     val items: List<SnapshotDiffItem>,

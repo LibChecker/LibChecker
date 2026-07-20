@@ -42,6 +42,22 @@ class AppListItemDisplayTest {
   }
 
   @Test
+  fun usesPreparedIconWhileMetadataStateIsPending() {
+    val packageInfo = PackageInfo()
+
+    val display = AppListItemDisplay.create(
+      label = "Example app",
+      packageName = "com.example.app",
+      viewState = newViewState(packageInfo = null),
+      iconPackageInfo = packageInfo,
+      showMissingPackageStrikeThrough = false
+    )
+
+    assertTrue(display.icon.usePackageIcon)
+    assertSame(packageInfo, display.icon.packageInfo)
+  }
+
+  @Test
   fun keepsExampleItemOnPlaceholderIcon() {
     val display = AppListItemDisplay.create(
       label = "Example",
