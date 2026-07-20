@@ -10,6 +10,7 @@ import com.absinthe.libchecker.domain.statistics.chart.model.StatisticIconSpec
 import com.absinthe.libchecker.domain.statistics.chart.source.BaseChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.source.IHeavyWork
 import com.absinthe.libchecker.domain.statistics.chart.ui.resolve
+import com.absinthe.libchecker.domain.statistics.chart.ui.summaryTitle
 import com.absinthe.libchecker.domain.statistics.chart.usecase.FacetStatisticData
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import info.appdev.charting.charts.PieChart
@@ -47,7 +48,7 @@ class FacetStatisticChartDataSource(
         facets.unmatchedTitle.resolve(context)
       )
       val facetTitles = facets.items.associate { facet ->
-        facet.id to (facet.shortTitle?.resolve(context) ?: facet.title.resolve(context))
+        facet.id to facet.summaryTitle.resolve(context)
       }
       val itemChips = data.matchedFacetIds.mapValues { (_, facetIds) ->
         facetIds.mapNotNull(facetTitles::get)
