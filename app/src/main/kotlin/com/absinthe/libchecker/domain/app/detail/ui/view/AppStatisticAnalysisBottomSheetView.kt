@@ -303,7 +303,7 @@ private class AppStatisticAnalysisItemView(context: Context) : LinearLayout(cont
           val matchedIds = matchedFacetIds.toSet()
           facets.items
             .filter { facet -> facet.id in matchedIds }
-            .joinToString(" · ") { facet -> facet.title.resolve(context) }
+            .joinToString(" · ") { facet -> facet.shortTitle?.resolve(context) ?: facet.title.resolve(context) }
         }
       }.orEmpty()
 

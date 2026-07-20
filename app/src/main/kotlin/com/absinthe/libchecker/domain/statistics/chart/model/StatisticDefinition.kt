@@ -79,6 +79,7 @@ data class StatisticFacetsSpec(
 data class StatisticFacetSpec(
   val id: String,
   val title: StatisticTitleSpec,
+  val shortTitle: StatisticTitleSpec? = null,
   val condition: StatisticConditionSpec
 )
 
