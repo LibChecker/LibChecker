@@ -47,7 +47,7 @@ class FacetStatisticChartDataSource(
         facets.unmatchedTitle.resolve(context)
       )
       val facetTitles = facets.items.associate { facet ->
-        facet.id to facet.title.resolve(context)
+        facet.id to (facet.shortTitle?.resolve(context) ?: facet.title.resolve(context))
       }
       val itemChips = data.matchedFacetIds.mapValues { (_, facetIds) ->
         facetIds.mapNotNull(facetTitles::get)
