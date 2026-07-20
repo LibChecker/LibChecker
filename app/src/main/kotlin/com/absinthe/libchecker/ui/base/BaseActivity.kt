@@ -2,6 +2,7 @@ package com.absinthe.libchecker.ui.base
 
 import android.content.Context
 import android.content.res.Resources
+import android.os.BadParcelableException
 import android.os.Bundle
 import android.text.method.TextKeyListener
 import android.view.View
@@ -35,7 +36,7 @@ abstract class BaseActivity<VB : ViewBinding> :
     if (shouldApplyTranslucentSystemBars()) {
       onApplyTranslucentSystemBars()
     }
-    super.onCreate(savedInstanceState)
+    super.onCreate(savedInstanceState.discardIfContainsUnreadableParcelable(javaClass.classLoader))
     binding = (inflateBinding(layoutInflater) as VB).also {
       setContentView(it.root)
     }
@@ -107,6 +108,33 @@ abstract class BaseActivity<VB : ViewBinding> :
       }
     }.onFailure {
       Timber.w(it)
+    }
+  }
+}
+
+internal fun Bundle?.discardIfContainsUnreadableParcelable(classLoader: ClassLoader?): Bundle? {
+  if (this == null) {
+    return null
+  }
+  return try {
+    validateParcelableContents(classLoader)
+    this
+  } catch (exception: BadParcelableException) {
+    Timber.w(exception, "Discarding activity state that cannot be restored")
+    null
+  }
+}
+
+@Suppress("DEPRECATION")
+private fun Bundle.validateParcelableContents(classLoader: ClassLoader?) {
+  if (classLoader != null) {
+    this.classLoader = classLoader
+  }
+  keySet().forEach { key ->
+    when (val value = get(key)) {
+      is Bundle -> value.validateParcelableContents(classLoader)
+      is Array<*> -> value.filterIsInstance<Bundle>().forEach { it.validateParcelableContents(classLoader) }
+      is Iterable<*> -> value.filterIsInstance<Bundle>().forEach { it.validateParcelableContents(classLoader) }
     }
   }
 }

@@ -64,6 +64,7 @@ class SnapshotTitleView(
       ViewGroup.LayoutParams.WRAP_CONTENT
     )
     setTextAppearance(context.getResourceIdByAttr(MaterialR.attr.textAppearanceBodySmall))
+    applyCondensedTypeface()
     setTextColor(context.getColorByAttr(MaterialR.attr.colorOnSurfaceVariant))
     maxLines = Int.MAX_VALUE
     addView(this)

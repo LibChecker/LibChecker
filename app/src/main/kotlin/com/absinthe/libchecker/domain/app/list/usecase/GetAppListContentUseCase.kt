@@ -39,6 +39,9 @@ class GetAppListContentUseCase(
         )
       }
       val packageStateSnapshot = buildAppListItemViewStatesUseCase.createPackageStateSnapshot()
+      val iconPackageInfos = filteredItems.mapNotNull { item ->
+        packageStateSnapshot.applicationMap[item.packageName]?.let { item.packageName to it }
+      }.toMap()
       val itemViewStates = traceAppListSuspendSection(TRACE_APP_LIST_INITIAL_ITEM_VIEW_STATES) {
         buildAppListItemViewStatesUseCase(
           BuildAppListItemViewStatesUseCase.Request(
@@ -53,6 +56,7 @@ class GetAppListContentUseCase(
         backingPackageNames = dbItems.mapTo(mutableSetOf()) { it.packageName },
         items = filteredItems,
         renderState = AppListRenderState(
+          iconPackageInfos = iconPackageInfos,
           itemViewStates = itemViewStates,
           fallbackDisplayOptions = displayOptions,
           highlightText = request.keyword
