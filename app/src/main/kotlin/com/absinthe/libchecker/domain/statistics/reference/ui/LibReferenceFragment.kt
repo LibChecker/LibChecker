@@ -8,7 +8,9 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.FrameLayout
 import androidx.appcompat.widget.SearchView
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -178,27 +180,35 @@ class LibReferenceFragment :
       }.launchIn(lifecycleScope)
     }
     libReferenceViewModel.apply {
-      progress.onEach {
-        binding.loadingView.progressIndicator.setProgressCompat(
-          it,
-          it > 0
-        )
-      }.launchIn(lifecycleScope)
-      libReference.onEach { references ->
-        if (references == null) {
-          return@onEach
-        }
-        val searchResult = libReferenceViewModel.onReferenceListChanged(references)
-        updateListRenderState { it.copy(highlightText = searchResult.query) }
-        refAdapter.setDiffNewData(searchResult.references) {
-          if (isDetached) {
-            return@setDiffNewData
+      viewLifecycleOwner.lifecycleScope.launch {
+        viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+          launch {
+            progress.collect {
+              binding.loadingView.progressIndicator.setProgressCompat(
+                it,
+                it > 0
+              )
+            }
           }
-          flip(VF_LIST)
-          refAdapter.setSpaceFooterView()
-          isListReady = true
+          launch {
+            libReference.collect { references ->
+              if (references == null) {
+                return@collect
+              }
+              val searchResult = libReferenceViewModel.onReferenceListChanged(references)
+              updateListRenderState { it.copy(highlightText = searchResult.query) }
+              refAdapter.setDiffNewData(searchResult.references) {
+                if (isDetached) {
+                  return@setDiffNewData
+                }
+                flip(VF_LIST)
+                refAdapter.setSpaceFooterView()
+                isListReady = true
+              }
+            }
+          }
         }
-      }.launchIn(lifecycleScope)
+      }
       showSystemAppsChanges.onEach {
         applyReferenceWork(
           onShowSystemAppsChanged(isVisible = isFragmentVisible())
