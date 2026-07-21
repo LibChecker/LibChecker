@@ -2,9 +2,13 @@ package com.absinthe.libchecker.domain.statistics.chart.ui
 
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticConditionSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticFacetSpec
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticIconRenderMode
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticIconSpec
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticIconTintRole
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticTitleSpec
 import java.util.Locale
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class StatisticPresentationTest {
@@ -52,6 +56,17 @@ class StatisticPresentationTest {
 
     assertEquals(shortTitle, facet.summaryTitle)
     assertEquals(fullTitle, facet.copy(shortTitle = null).summaryTitle)
+  }
+
+  @Test
+  fun `uses the declared tint role only for monochrome icons`() {
+    val icon = StatisticIconSpec(
+      renderMode = StatisticIconRenderMode.MONOCHROME,
+      tintRole = StatisticIconTintRole.ON_SURFACE
+    )
+
+    assertEquals(StatisticIconTintRole.ON_SURFACE, icon.monochromeTintRole)
+    assertNull(icon.copy(renderMode = StatisticIconRenderMode.ORIGINAL).monochromeTintRole)
   }
 
   @Test

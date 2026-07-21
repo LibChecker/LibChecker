@@ -7,6 +7,7 @@ import android.graphics.ColorMatrixColorFilter
 import android.graphics.drawable.Drawable
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.widget.ImageViewCompat
 import coil.Coil
 import coil.load
@@ -34,19 +35,29 @@ internal fun StatisticTitleSpec.resolve(context: Context): String {
 }
 
 internal suspend fun StatisticIconSpec.resolveDrawable(context: Context): Drawable? {
-  drawable?.let { return ContextCompat.getDrawable(context, it.drawableRes) }
-  val data = localPath?.let(::File) ?: return null
-  return withContext(Dispatchers.IO) {
-    val request = ImageRequest.Builder(context).data(data).build()
-    when (val result = Coil.imageLoader(context).execute(request)) {
-      is SuccessResult -> result.drawable
-      else -> null
+  val resolvedDrawable = drawable?.let { ContextCompat.getDrawable(context, it.drawableRes) }
+    ?: localPath?.let(::File)?.let { data ->
+      withContext(Dispatchers.IO) {
+        val request = ImageRequest.Builder(context).data(data).build()
+        when (val result = Coil.imageLoader(context).execute(request)) {
+          is SuccessResult -> result.drawable
+          else -> null
+        }
+      }
     }
-  }
+    ?: return null
+  return monochromeTintRole?.let { tintRole ->
+    DrawableCompat.wrap(resolvedDrawable.mutate()).also { tintedDrawable ->
+      DrawableCompat.setTint(tintedDrawable, context.getColorByAttr(tintRole.colorAttr))
+    }
+  } ?: resolvedDrawable
 }
 
 internal val StatisticFacetSpec.summaryTitle: StatisticTitleSpec
   get() = shortTitle ?: title
+
+internal val StatisticIconSpec.monochromeTintRole: StatisticIconTintRole?
+  get() = tintRole.takeIf { renderMode == StatisticIconRenderMode.MONOCHROME }
 
 internal fun resolveStatisticTranslation(
   translations: Map<String, String>,
@@ -78,16 +89,14 @@ internal fun ImageView.loadStatisticIcon(
   selected: Boolean,
   grayscale: Boolean = false
 ) {
-  val tint = if (icon.renderMode == StatisticIconRenderMode.MONOCHROME) {
+  val tint = icon.monochromeTintRole?.let { tintRole ->
     val useSelectedAccent = selected && icon.asset != null
     val tintColor = if (useSelectedAccent) {
       context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary)
     } else {
-      context.getColorByAttr(icon.tintRole.colorAttr)
+      context.getColorByAttr(tintRole.colorAttr)
     }
     ColorStateList.valueOf(tintColor)
-  } else {
-    null
   }
   clearColorFilter()
   if (grayscale && tint == null) {
