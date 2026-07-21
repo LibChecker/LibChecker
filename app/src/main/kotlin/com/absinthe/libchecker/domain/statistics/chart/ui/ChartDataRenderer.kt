@@ -3,8 +3,6 @@ package com.absinthe.libchecker.domain.statistics.chart.ui
 import android.view.View
 import android.view.ViewGroup
 import com.absinthe.libchecker.domain.statistics.chart.model.LOADING_PROGRESS_MAX
-import com.absinthe.libchecker.domain.statistics.chart.source.IChartDataSource
-import com.absinthe.libchecker.domain.statistics.chart.source.impl.MarketDistributionChartDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -13,24 +11,33 @@ import kotlinx.coroutines.withContext
 
 internal class ChartDataRenderer(
   private val scope: CoroutineScope,
-  private val onLoadingProgressChanged: (Int) -> Unit,
-  private val onDistributionLastUpdateTimeChanged: (String) -> Unit
+  private val chartHost: ViewGroup,
+  private val onLoadingProgressChanged: (Int) -> Unit
 ) {
   private var queryJob: Job? = null
   private var renderGeneration = 0
 
+  fun showInitialChart(chartView: View) {
+    chartHost.removeAllViews()
+    chartHost.addView(chartView)
+  }
+
   fun <T : View> render(
-    root: ViewGroup,
-    currentChartView: View?,
     newChartView: T,
-    source: IChartDataSource<T>
+    fillChart: suspend (T, (Int) -> Unit) -> Unit,
+    onCommitted: (T) -> Unit
   ) {
     val generation = ++renderGeneration
     queryJob?.cancel()
     queryJob = scope.launch(Dispatchers.Default) {
-      source.fillChartView(newChartView) { progress ->
+      var terminalProgressReported = false
+      fillChart(newChartView) { progress ->
         if (generation == renderGeneration) {
-          onLoadingProgressChanged(progress)
+          if (progress >= LOADING_PROGRESS_MAX) {
+            terminalProgressReported = true
+          } else {
+            onLoadingProgressChanged(progress)
+          }
         }
       }
 
@@ -38,15 +45,11 @@ internal class ChartDataRenderer(
         if (generation != renderGeneration) {
           return@withContext
         }
-        if (currentChartView != null) {
-          root.removeView(currentChartView)
-        }
-        root.addView(newChartView, 0)
-        if (source.getData().isNotEmpty()) {
+        chartHost.removeAllViews()
+        chartHost.addView(newChartView)
+        onCommitted(newChartView)
+        if (terminalProgressReported) {
           onLoadingProgressChanged(LOADING_PROGRESS_MAX)
-        }
-        if (source is MarketDistributionChartDataSource) {
-          onDistributionLastUpdateTimeChanged(source.lastUpdateTime)
         }
       }
     }

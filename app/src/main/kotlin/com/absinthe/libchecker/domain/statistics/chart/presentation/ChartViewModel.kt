@@ -22,10 +22,15 @@ import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildAndroidVersi
 import com.absinthe.libchecker.domain.statistics.chart.usecase.ChartFeatureInitializationPlan
 import com.absinthe.libchecker.domain.statistics.chart.usecase.ObserveChartFeatureInitializationPlansUseCase
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -45,7 +50,8 @@ class ChartViewModel internal constructor(
   private var featureInitializationPending = observeChartFeatureInitializationPlans.initialPending
 
   private val _statisticDefinitions = MutableStateFlow<List<StatisticDefinition>>(emptyList())
-  val statisticDefinitions = _statisticDefinitions.asStateFlow()
+  private val _statisticSelectorPlan = MutableStateFlow(StatisticSelectorPlan(emptyList(), null))
+  val statisticSelectorPlan = _statisticSelectorPlan.asStateFlow()
 
   private val _statisticCatalogEditorState = MutableStateFlow(StatisticCatalogEditorState())
   val statisticCatalogEditorState = _statisticCatalogEditorState.asStateFlow()
@@ -58,11 +64,11 @@ class ChartViewModel internal constructor(
       started = SharingStarted.WhileSubscribed(5_000),
       initialValue = null
     )
-  val appListItems: Flow<List<LCItem>> = appListItemsState.filterNotNull()
-  val featureInitializationPlans: Flow<ChartFeatureInitializationPlan> =
+  private val appListItems: Flow<List<LCItem>> = appListItemsState.filterNotNull()
+  private val featureInitializationPlans: Flow<ChartFeatureInitializationPlan> =
     observeChartFeatureInitializationPlans(appListItemsState)
   val currentStatistic: StatisticDefinition?
-    get() = _statisticDefinitions.value.find { it.id == selectedStatisticId }
+    get() = statisticSelectorPlan.value.selectedStatistic
 
   private val _loadingProgress = MutableStateFlow(LOADING_PROGRESS_MAX)
   val loadingProgress = _loadingProgress.asStateFlow()
@@ -82,9 +88,28 @@ class ChartViewModel internal constructor(
   private val _detailAbiSwitchVisibility = MutableStateFlow(true)
   val detailAbiSwitchVisibility = _detailAbiSwitchVisibility.asStateFlow()
 
+  private val chartRenderItems = appListItems.debounceSubsequent(CHART_UPDATE_DEBOUNCE_MILLIS)
+  val chartRenderRequests: Flow<ChartRenderRequest> = combine(
+    chartRenderItems,
+    statisticSelectorPlan,
+    detailAbiSwitch
+  ) { items, selectorPlan, useDetailedAbiChart ->
+    selectorPlan.selectedStatistic?.let { statistic ->
+      createChartRenderRequest(
+        items = items,
+        statistic = statistic,
+        useDetailedAbiChart = statistic.hasControl(StatisticControl.DETAILED_ABI) && useDetailedAbiChart,
+        showSystemApps = showSystemApps
+      )
+    }
+  }.filterNotNull().distinctUntilChangedBy(ChartRenderRequest::key)
+
   init {
     viewModelScope.launch {
       applySelectedStatistics(statisticCatalogRepository.getSelectedStatistics())
+    }
+    viewModelScope.launch {
+      featureInitializationPlans.collect(::applyFeatureInitializationPlan)
     }
   }
 
@@ -159,19 +184,17 @@ class ChartViewModel internal constructor(
     _detailAbiSwitchVisibility.value = isVisible
   }
 
-  fun updateFeatureInitializationPlan(
-    plan: ChartFeatureInitializationPlan
-  ): StatisticSelectorPlan {
+  private fun applyFeatureInitializationPlan(plan: ChartFeatureInitializationPlan) {
     featureInitializationPending = plan.isPending
-    return createStatisticSelectorPlan()
+    refreshStatisticSelectorPlan()
   }
 
-  fun selectStatistic(statistic: StatisticDefinition): StatisticSelectorPlan {
-    selectedStatisticId = statistic.id
-    return createStatisticSelectorPlan()
+  fun selectStatistic(statisticId: String) {
+    selectedStatisticId = statisticId
+    refreshStatisticSelectorPlan()
   }
 
-  fun createStatisticSelectorPlan(): StatisticSelectorPlan {
+  private fun refreshStatisticSelectorPlan() {
     val plan = chartUiStatePlanner.planStatistics(
       definitions = _statisticDefinitions.value,
       currentStatisticId = selectedStatisticId,
@@ -181,7 +204,7 @@ class ChartViewModel internal constructor(
     setDetailAbiSwitchVisibility(
       plan.selectedStatistic?.hasControl(StatisticControl.DETAILED_ABI) == true
     )
-    return plan
+    _statisticSelectorPlan.value = plan
   }
 
   fun createProgressPlan(): ChartProgressPlan {
@@ -191,18 +214,12 @@ class ChartViewModel internal constructor(
   }
 
   internal fun createChartDataSourcePlan(
-    items: List<LCItem>,
-    statistic: StatisticDefinition = checkNotNull(currentStatistic) {
-      "Statistic catalog has not been loaded"
-    }
+    request: ChartRenderRequest
   ): ChartDataSourcePlan {
-    val selectedStatistic = checkNotNull(selectStatistic(statistic).selectedStatistic) {
-      "Statistic ${statistic.id} is not available"
-    }
     return chartDataSourceFactory.create(
-      items = items,
-      statistic = selectedStatistic,
-      useDetailedAbiChart = isDetailedAbiChart
+      items = request.items,
+      statistic = request.statistic,
+      useDetailedAbiChart = request.key.useDetailedAbiChart
     )
   }
 
@@ -217,7 +234,7 @@ class ChartViewModel internal constructor(
 
   private fun applySelectedStatistics(statistics: List<StatisticDefinition>) {
     _statisticDefinitions.value = statistics
-    createStatisticSelectorPlan()
+    refreshStatisticSelectorPlan()
     _statisticCatalogEditorState.value = _statisticCatalogEditorState.value.copy(
       selectedStatistics = statistics
     )
@@ -254,5 +271,20 @@ class ChartViewModel internal constructor(
     }
     val version = (this as? BaseVariableChartDataSource<*>)?.getListKeyByXValue(x) ?: return null
     return AndroidVersions.versions.find { node -> node.version == version }
+  }
+
+  private companion object {
+    const val CHART_UPDATE_DEBOUNCE_MILLIS = 2_000L
+  }
+}
+
+internal fun <T> Flow<T>.debounceSubsequent(delayMillis: Long): Flow<T> = channelFlow {
+  var hasEmitted = false
+  collectLatest { value ->
+    if (hasEmitted) {
+      delay(delayMillis)
+    }
+    send(value)
+    hasEmitted = true
   }
 }

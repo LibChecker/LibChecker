@@ -9,8 +9,8 @@ import com.absinthe.libchecker.domain.statistics.reference.usecase.GetLibReferen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class LibReferenceComputationController(
@@ -20,8 +20,8 @@ class LibReferenceComputationController(
   private val getLibReferenceConfigUseCase: GetLibReferenceConfigUseCase,
   private val updateProgress: (Int) -> Unit
 ) {
-  private val _libReference = MutableSharedFlow<List<LibReference>?>()
-  val libReference = _libReference.asSharedFlow()
+  private val _libReference = MutableStateFlow<List<LibReference>?>(null)
+  val libReference = _libReference.asStateFlow()
 
   private var _savedRefList: List<LibReference>? = null
   val savedRefList: List<LibReference>?

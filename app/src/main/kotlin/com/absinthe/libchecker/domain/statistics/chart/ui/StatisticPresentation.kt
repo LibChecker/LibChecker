@@ -30,12 +30,24 @@ internal fun resolveStatisticTranslation(
   locale: Locale
 ): String {
   return translations[locale.toLanguageTag()]
-    ?: translations[listOf(locale.language, locale.script).filter(String::isNotBlank).joinToString("-")]
+    ?: translations[locale.languageScriptTag()]
     ?: translations[listOf(locale.language, locale.country).filter(String::isNotBlank).joinToString("-")]
     ?: translations[locale.language]
     ?: translations[DEFAULT_TRANSLATION]
     ?: translations.values.firstOrNull()
       .orEmpty()
+}
+
+private fun Locale.languageScriptTag(): String {
+  val resolvedScript = script.ifBlank {
+    if (language != CHINESE_LANGUAGE) return@ifBlank ""
+    when (country) {
+      CHINA_REGION, SINGAPORE_REGION -> SIMPLIFIED_CHINESE_SCRIPT
+      HONG_KONG_REGION, MACAO_REGION, TAIWAN_REGION -> TRADITIONAL_CHINESE_SCRIPT
+      else -> ""
+    }
+  }
+  return listOf(language, resolvedScript).filter(String::isNotBlank).joinToString("-")
 }
 
 internal fun ImageView.loadStatisticIcon(
@@ -113,4 +125,12 @@ private val StatisticIconTintRole.colorAttr: Int
   }
 
 private const val DEFAULT_TRANSLATION = "en"
+private const val CHINESE_LANGUAGE = "zh"
+private const val SIMPLIFIED_CHINESE_SCRIPT = "Hans"
+private const val TRADITIONAL_CHINESE_SCRIPT = "Hant"
+private const val CHINA_REGION = "CN"
+private const val HONG_KONG_REGION = "HK"
+private const val MACAO_REGION = "MO"
+private const val SINGAPORE_REGION = "SG"
+private const val TAIWAN_REGION = "TW"
 private const val REMOTE_ICON_INSET_DP = 8

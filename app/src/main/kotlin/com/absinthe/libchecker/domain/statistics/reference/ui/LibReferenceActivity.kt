@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.ViewGroup
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTION
@@ -49,7 +50,20 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
     setIntent(intent)
     readIntentExtras()
     updateActionBar()
+    showLoading()
     initData()
+  }
+
+  override fun onStart() {
+    super.onStart()
+    if (binding.vfContainer.displayedChild == LOADING_VIEW_INDEX) {
+      binding.loading.start()
+    }
+  }
+
+  override fun onStop() {
+    binding.loading.stop()
+    super.onStop()
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -99,7 +113,7 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
           this@LibReferenceActivity,
           R.anim.anim_fade_out
         )
-        displayedChild = 0
+        displayedChild = LOADING_VIEW_INDEX
         (root as ViewGroup).bringChildToFront(appbar)
       }
       loading.setRuleIconHighlightProvider()
@@ -109,9 +123,7 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
       val itemViewStates = viewModel.buildAppListItemViewStates(it)
       adapter.bind(AppListRenderState(itemViewStates = itemViewStates))
       adapter.setList(it)
-      if (binding.vfContainer.displayedChild != 1) {
-        binding.vfContainer.displayedChild = 1
-      }
+      showList()
     }.launchIn(lifecycleScope)
 
     adapter.setOnItemClickListener { _, view, position ->
@@ -142,5 +154,22 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
         viewModel.setData(name, refType, pkgNames)
       } ?: viewModel.setData(name, refType)
     } ?: finish()
+  }
+
+  private fun showLoading() {
+    binding.vfContainer.displayedChild = LOADING_VIEW_INDEX
+    if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+      binding.loading.start()
+    }
+  }
+
+  private fun showList() {
+    binding.loading.stop()
+    binding.vfContainer.displayedChild = LIST_VIEW_INDEX
+  }
+
+  private companion object {
+    const val LOADING_VIEW_INDEX = 0
+    const val LIST_VIEW_INDEX = 1
   }
 }
