@@ -34,6 +34,7 @@ import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.utils.extensions.isRtl
 import com.absinthe.libchecker.utils.extensions.tintHighlightText
 import com.absinthe.libchecker.view.AViewGroup
+import com.absinthe.libchecker.view.app.AppIconPlaceholder
 import com.absinthe.libchecker.view.span.CenterAlignImageSpan
 import com.google.android.material.card.MaterialCardView
 import me.zhanghai.android.appiconloader.AppIconLoader
@@ -581,7 +582,7 @@ class AppItemView(
 
     fun newIconPlaceholder(context: Context): Drawable? {
       return iconPlaceholderState?.newDrawable(context.resources)
-        ?: R.mipmap.ic_app_icon_placeholder.getDrawable(context)
+        ?: AppIconPlaceholder.newDrawable(context)
     }
 
     companion object {
@@ -608,7 +609,7 @@ class AppItemView(
           onSurfaceVariantColor = context.getColorByAttr(
             com.google.android.material.R.attr.colorOnSurfaceVariant
           ),
-          iconPlaceholderState = R.mipmap.ic_app_icon_placeholder.getDrawable(context)?.constantState
+          iconPlaceholderState = AppIconPlaceholder.newDrawable(context)?.constantState
         )
       }
     }
