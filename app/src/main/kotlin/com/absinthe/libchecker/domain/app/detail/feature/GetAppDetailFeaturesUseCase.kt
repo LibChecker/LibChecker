@@ -58,8 +58,34 @@ class GetAppDetailFeaturesUseCase(
     }
 
     var feat = cachedFeatures
+    var metadataEmitted = false
+    val scannedMetadata = mutableListOf<VersionedFeature>()
     if (feat == -1) {
-      feat = packageInfo.getFeatures()
+      val sourceDir = packageInfo.applicationInfo?.sourceDir
+      feat = if (sourceDir != null) {
+        try {
+          ZipFileCompat(File(sourceDir)).use { zip ->
+            packageInfo.getFeatures(zip).also { scannedFeatures ->
+              emitFeatureApkMetadata(
+                packageInfo = packageInfo,
+                readKotlin = (scannedFeatures and Features.KOTLIN_USED) > 0,
+                readAgp = (scannedFeatures and Features.AGP) > 0,
+                readCompose = (scannedFeatures and Features.JETPACK_COMPOSE) > 0,
+                readXposedMarker = !packageInfo.hasXposedModuleMetadata(),
+                emitFeature = { scannedMetadata.add(it) },
+                openedZip = zip
+              )
+              metadataEmitted = true
+            }
+          }
+        } catch (e: CancellationException) {
+          throw e
+        } catch (_: Throwable) {
+          packageInfo.getFeatures()
+        }
+      } else {
+        packageInfo.getFeatures()
+      }
       appListRepository.updateFeatures(packageInfo.packageName, feat)
     }
 
@@ -70,14 +96,18 @@ class GetAppDetailFeaturesUseCase(
     if (hasXposedMetadata) {
       emitFeature(VersionedFeature(Features.XPOSED_MODULE))
     }
-    emitFeatureApkMetadata(
-      packageInfo = packageInfo,
-      readKotlin = (feat and Features.KOTLIN_USED) > 0,
-      readAgp = (feat and Features.AGP) > 0,
-      readCompose = (feat and Features.JETPACK_COMPOSE) > 0,
-      readXposedMarker = !hasXposedMetadata,
-      emitFeature = ::emitFeature
-    )
+    if (metadataEmitted) {
+      scannedMetadata.forEach { emitFeature(it) }
+    } else {
+      emitFeatureApkMetadata(
+        packageInfo = packageInfo,
+        readKotlin = (feat and Features.KOTLIN_USED) > 0,
+        readAgp = (feat and Features.AGP) > 0,
+        readCompose = (feat and Features.JETPACK_COMPOSE) > 0,
+        readXposedMarker = !hasXposedMetadata,
+        emitFeature = ::emitFeature
+      )
+    }
     if (packageInfo.isPlayAppSigning()) {
       emitFeature(VersionedFeature(Features.PLAY_SIGNING))
     }
@@ -108,7 +138,8 @@ class GetAppDetailFeaturesUseCase(
     readAgp: Boolean,
     readCompose: Boolean,
     readXposedMarker: Boolean,
-    emitFeature: suspend (VersionedFeature) -> Unit
+    emitFeature: suspend (VersionedFeature) -> Unit,
+    openedZip: ZipFileCompat? = null
   ) {
     if (!readKotlin && !readAgp && !readCompose && !readXposedMarker) {
       return
@@ -132,24 +163,32 @@ class GetAppDetailFeaturesUseCase(
       return
     }
 
-    val emittedFromApk = try {
-      ZipFileCompat(File(sourceDir)).use { zip ->
-        if (readKotlin) {
-          emitFeature(VersionedFeature(Features.KOTLIN_USED, extras = readKotlinPluginInfo(zip)))
-        }
-        if (readAgp) {
-          emitFeature(VersionedFeature(Features.AGP, readAgpVersion(zip)))
-        }
-        if (readCompose) {
-          emitFeature(
-            VersionedFeature(
-              Features.JETPACK_COMPOSE,
-              readFirstPresentLine(zip, COMPOSE_VERSION_ENTRIES)
-            )
+    suspend fun emitFromZip(zip: ZipFileCompat) {
+      if (readKotlin) {
+        emitFeature(VersionedFeature(Features.KOTLIN_USED, extras = readKotlinPluginInfo(zip)))
+      }
+      if (readAgp) {
+        emitFeature(VersionedFeature(Features.AGP, readAgpVersion(zip)))
+      }
+      if (readCompose) {
+        emitFeature(
+          VersionedFeature(
+            Features.JETPACK_COMPOSE,
+            readFirstPresentLine(zip, COMPOSE_VERSION_ENTRIES)
           )
-        }
-        if (readXposedMarker && zip.getEntry(XPOSED_MODULE_PROP_ENTRY) != null) {
-          emitFeature(VersionedFeature(Features.XPOSED_MODULE))
+        )
+      }
+      if (readXposedMarker && zip.getEntry(XPOSED_MODULE_PROP_ENTRY) != null) {
+        emitFeature(VersionedFeature(Features.XPOSED_MODULE))
+      }
+    }
+
+    val emittedFromApk = try {
+      if (openedZip != null) {
+        emitFromZip(openedZip)
+      } else {
+        ZipFileCompat(File(sourceDir)).use { zip ->
+          emitFromZip(zip)
         }
       }
       true
