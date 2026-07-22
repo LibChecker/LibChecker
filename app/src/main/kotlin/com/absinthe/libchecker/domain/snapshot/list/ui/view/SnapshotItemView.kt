@@ -2,6 +2,7 @@ package com.absinthe.libchecker.domain.snapshot.list.ui.view
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
@@ -15,6 +16,7 @@ import androidx.core.text.inSpans
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.core.view.marginStart
+import coil.dispose
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotAbiDisplayData
@@ -94,6 +96,10 @@ class SnapshotItemView(
     container.setPlaceholderIconResource(placeholderIconRes)
   }
 
+  fun setPlaceholderIconDrawable(placeholderIconDrawable: Drawable?) {
+    container.setPlaceholderIconDrawable(placeholderIconDrawable)
+  }
+
   private fun setCardPresentation(cardPresentation: SnapshotItemCardPresentation) {
     when (cardPresentation) {
       SnapshotItemCardPresentation.Normal -> {
@@ -114,6 +120,7 @@ class SnapshotItemView(
   ) : AViewGroup(context) {
 
     @DrawableRes private var placeholderIconRes = placeholderIconRes
+    private var placeholderIconDrawable: Drawable? = null
     private var iconSource: SnapshotPackageIconSource? = null
 
     val icon = AppCompatImageView(context).apply {
@@ -219,17 +226,35 @@ class SnapshotItemView(
         is SnapshotPackageIconSource.InstalledPackage -> icon.load(iconSource.packageInfo)
 
         SnapshotPackageIconSource.Fallback,
-        null -> icon.load(placeholderIconRes)
+        null -> loadPlaceholderIcon()
       }
     }
 
     fun setPlaceholderIconResource(@DrawableRes placeholderIconRes: Int) {
-      if (this.placeholderIconRes == placeholderIconRes) {
+      if (this.placeholderIconRes == placeholderIconRes && placeholderIconDrawable == null) {
         return
       }
       this.placeholderIconRes = placeholderIconRes
+      placeholderIconDrawable = null
       if (iconSource !is SnapshotPackageIconSource.InstalledPackage) {
+        loadPlaceholderIcon()
+      }
+    }
+
+    fun setPlaceholderIconDrawable(placeholderIconDrawable: Drawable?) {
+      this.placeholderIconDrawable = placeholderIconDrawable
+      if (iconSource !is SnapshotPackageIconSource.InstalledPackage) {
+        loadPlaceholderIcon()
+      }
+    }
+
+    private fun loadPlaceholderIcon() {
+      val drawable = placeholderIconDrawable
+      if (drawable == null) {
         icon.load(placeholderIconRes)
+      } else {
+        icon.dispose()
+        icon.setImageDrawable(drawable)
       }
     }
 

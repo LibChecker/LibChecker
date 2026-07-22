@@ -161,7 +161,8 @@ class SnapshotMenuBSDView(context: Context) :
         return child
       }
       removeAllViews()
-      return SnapshotItemView(context, AppIconPlaceholder.resourceId).apply {
+      return SnapshotItemView(context).apply {
+        setPlaceholderIconDrawable(AppIconPlaceholder.newDrawable(context))
         layoutParams = LayoutParams(
           LayoutParams.MATCH_PARENT,
           LayoutParams.WRAP_CONTENT
