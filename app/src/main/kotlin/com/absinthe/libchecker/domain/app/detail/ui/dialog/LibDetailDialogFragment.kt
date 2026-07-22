@@ -2,7 +2,9 @@ package com.absinthe.libchecker.domain.app.detail.ui.dialog
 
 import android.content.DialogInterface
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
@@ -12,16 +14,19 @@ import com.absinthe.libchecker.domain.app.detail.action.GetLibraryDetailDialogDa
 import com.absinthe.libchecker.domain.app.detail.model.LibraryDetailBottomSheetState
 import com.absinthe.libchecker.domain.app.detail.model.LibraryDetailHeaderDisplay
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
+import com.absinthe.libchecker.domain.app.detail.presentation.LibraryInsightViewModel
 import com.absinthe.libchecker.domain.app.detail.ui.view.LibDetailBottomSheetView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
+import java.util.Locale
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 const val EXTRA_LIB_NAME = "EXTRA_LIB_NAME"
@@ -36,6 +41,7 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
   private val regexName by lazy { arguments?.getString(EXTRA_REGEX_NAME) }
   private val isValidLib by lazy { arguments?.getBoolean(EXTRA_IS_VALID_LIB) != false }
   private val viewModel: DetailViewModel by activityViewModel()
+  private val insightViewModel: LibraryInsightViewModel by viewModel()
   private var isStickyEventReceived = false
   private val dialogTitle by lazy {
     if (type == ACTION) "< $libName >" else libName
@@ -50,6 +56,13 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
   override fun init() {
     maxPeekHeightPercentage = 0.8f
     root.bind(LibraryDetailBottomSheetState.Loading(dialogTitle))
+    lifecycleScope.launch {
+      lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        insightViewModel.state.collect { state ->
+          root.renderLibraryInsight(state, insightViewModel::retry)
+        }
+      }
+    }
   }
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
@@ -97,6 +110,11 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
                 header = header,
                 content = result.content
               )
+            )
+            insightViewModel.load(
+              libraryUuid = result.libraryUuid,
+              packageInfo = viewModel.packageInfo,
+              localeTag = Locale.getDefault().toLanguageTag()
             )
           }
 

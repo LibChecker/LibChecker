@@ -38,6 +38,12 @@ object ApiManager {
       else -> GITHUB_ROOT_URL
     }
 
+  val rulesRootsInPreferenceOrder: List<String>
+    get() = when (GlobalValues.repo) {
+      Constants.REPO_GITLAB -> listOf(GITLAB_ROOT_URL, GITHUB_ROOT_URL)
+      else -> listOf(GITHUB_ROOT_URL, GITLAB_ROOT_URL)
+    }
+
   val rulesBundleUrl = "${root}cloud/rules/v$VERSION/rules.db"
   val chartRulesManifestUrl = "${GITHUB_ROOT_URL}chart/cloud/v1/manifest.json"
   val chartRulesBundleUrl = "${GITHUB_ROOT_URL}chart/cloud/v1/chart.bundle"

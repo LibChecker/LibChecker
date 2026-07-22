@@ -399,4 +399,8 @@
   <!-- A11y -->
   <string name="a11y_state_expanded">Expanded</string>
   <string name="a11y_state_collapsed">Collapsed</string>
+  <string name="library_insight_loading">Detecting SDK version…</string>
+  <string name="library_insight_unavailable">Version details unavailable · Tap to retry</string>
+  <string name="library_insight_show_details">More details</string>
+  <string name="library_insight_hide_details">Fewer details</string>
 </resources>
