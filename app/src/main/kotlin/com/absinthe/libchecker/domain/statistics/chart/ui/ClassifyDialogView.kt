@@ -44,7 +44,6 @@ class ClassifyDialogView(context: Context) :
     isVerticalScrollBarEnabled = false
     clipToPadding = false
     clipChildren = false
-    isNestedScrollingEnabled = false
     setHasFixedSize(true)
     FastScrollerBuilder(this).useMd2Style().build()
   }
