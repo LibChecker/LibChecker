@@ -24,6 +24,7 @@ import com.absinthe.libchecker.domain.statistics.chart.presentation.ChartRenderR
 import com.absinthe.libchecker.domain.statistics.chart.presentation.ChartViewModel
 import com.absinthe.libchecker.domain.statistics.chart.source.BaseChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.source.ChartDataSourcePlan
+import com.absinthe.libchecker.domain.statistics.chart.source.IAndroidSDKChart
 import com.absinthe.libchecker.domain.statistics.chart.source.IChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.source.IntegerFormatter
 import com.absinthe.libchecker.domain.statistics.chart.source.impl.MarketDistributionChartDataSource
@@ -374,10 +375,17 @@ class ChartFragment :
     }
 
     val source = dataSource ?: return
-    val title = source.getLabelByXValue(requireContext(), x)
+    val itemLabel = source.getLabelByXValue(requireContext(), x)
+    val hasAndroidVersionSubtitle = source is IAndroidSDKChart
+    val title = if (!hasAndroidVersionSubtitle) {
+      viewModel.currentStatistic?.title?.resolve(requireContext()) ?: itemLabel
+    } else {
+      itemLabel
+    }
+    val subtitle = itemLabel.takeIf { !hasAndroidVersionSubtitle }
 
     showClassifyDialogJob = lifecycleScope.launch {
-      val state = viewModel.buildClassifyDialogState(source, x, title)
+      val state = viewModel.buildClassifyDialogState(source, x, title, subtitle)
       val hostActivity = activity
       if (!isAdded || hostActivity == null || dialog != null) {
         return@launch
