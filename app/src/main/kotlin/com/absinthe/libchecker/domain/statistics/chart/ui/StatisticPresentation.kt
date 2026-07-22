@@ -4,11 +4,18 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
+import android.graphics.drawable.Drawable
 import android.widget.ImageView
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.widget.ImageViewCompat
+import coil.Coil
 import coil.load
+import coil.request.ImageRequest
+import coil.request.SuccessResult
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDrawableIcon
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticFacetSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticIconRenderMode
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticIconSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticIconTintRole
@@ -18,12 +25,39 @@ import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import java.io.File
 import java.util.Locale
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 internal fun StatisticTitleSpec.resolve(context: Context): String {
   resource?.let { return context.getString(it.stringRes) }
   val locale = context.resources.configuration.locales[0]
   return resolveStatisticTranslation(translations, locale)
 }
+
+internal suspend fun StatisticIconSpec.resolveDrawable(context: Context): Drawable? {
+  val resolvedDrawable = drawable?.let { ContextCompat.getDrawable(context, it.drawableRes) }
+    ?: localPath?.let(::File)?.let { data ->
+      withContext(Dispatchers.IO) {
+        val request = ImageRequest.Builder(context).data(data).build()
+        when (val result = Coil.imageLoader(context).execute(request)) {
+          is SuccessResult -> result.drawable
+          else -> null
+        }
+      }
+    }
+    ?: return null
+  return monochromeTintRole?.let { tintRole ->
+    DrawableCompat.wrap(resolvedDrawable.mutate()).also { tintedDrawable ->
+      DrawableCompat.setTint(tintedDrawable, context.getColorByAttr(tintRole.colorAttr))
+    }
+  } ?: resolvedDrawable
+}
+
+internal val StatisticFacetSpec.summaryTitle: StatisticTitleSpec
+  get() = shortTitle ?: title
+
+internal val StatisticIconSpec.monochromeTintRole: StatisticIconTintRole?
+  get() = tintRole.takeIf { renderMode == StatisticIconRenderMode.MONOCHROME }
 
 internal fun resolveStatisticTranslation(
   translations: Map<String, String>,
@@ -55,16 +89,14 @@ internal fun ImageView.loadStatisticIcon(
   selected: Boolean,
   grayscale: Boolean = false
 ) {
-  val tint = if (icon.renderMode == StatisticIconRenderMode.MONOCHROME) {
+  val tint = icon.monochromeTintRole?.let { tintRole ->
     val useSelectedAccent = selected && icon.asset != null
     val tintColor = if (useSelectedAccent) {
       context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary)
     } else {
-      context.getColorByAttr(icon.tintRole.colorAttr)
+      context.getColorByAttr(tintRole.colorAttr)
     }
     ColorStateList.valueOf(tintColor)
-  } else {
-    null
   }
   clearColorFilter()
   if (grayscale && tint == null) {

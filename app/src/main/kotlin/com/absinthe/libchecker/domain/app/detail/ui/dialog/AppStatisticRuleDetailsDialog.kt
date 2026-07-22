@@ -7,37 +7,46 @@ import androidx.core.net.toUri
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.statistics.AppStatisticRuleAnalysis
 import com.absinthe.libchecker.domain.statistics.chart.ui.resolve
+import com.absinthe.libchecker.domain.statistics.chart.ui.resolveDrawable
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.utils.Toasty
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 object AppStatisticRuleDetailsDialog {
 
-  fun show(context: Context, analysis: AppStatisticRuleAnalysis) {
-    val details = analysis.definition.details ?: return
-    val message = buildList {
-      add(details.description.resolve(context))
-      analysis.resolveMatchedFacetTitles(context).takeIf(List<String>::isNotEmpty)?.let { titles ->
-        add(
-          buildString {
-            append(context.getString(R.string.app_detail_online_rules_detected_features))
-            titles.forEach { title ->
-              append("\n • ")
-              append(title)
+  fun show(context: Context, analysis: AppStatisticRuleAnalysis, scope: CoroutineScope) {
+    scope.launch {
+      val details = analysis.definition.details ?: return@launch
+      val message = buildList {
+        add(details.description.resolve(context))
+        analysis.resolveMatchedFacetTitles(context).takeIf(List<String>::isNotEmpty)?.let { titles ->
+          add(
+            buildString {
+              append(context.getString(R.string.app_detail_online_rules_detected_features))
+              append("\n")
+              titles.forEach { title ->
+                append("\n • ")
+                append(title)
+              }
             }
-          }
-        )
-      }
-    }.joinToString("\n\n")
+          )
+        }
+      }.joinToString("\n\n")
 
-    BaseAlertDialogBuilder(context)
-      .setTitle(analysis.definition.title.resolve(context))
-      .setMessage(message)
-      .setPositiveButton(android.R.string.ok, null)
-      .setNeutralButton(R.string.lib_detail_app_props_tip) { _, _ ->
-        openReference(context, details.referenceUrl)
-      }
-      .show()
+      val iconRes = analysis.definition.icon.resolveDrawable(context)
+
+      BaseAlertDialogBuilder(context)
+        .setIcon(iconRes)
+        .setTitle(analysis.definition.title.resolve(context))
+        .setMessage(message)
+        .setPositiveButton(android.R.string.ok, null)
+        .setNeutralButton(R.string.lib_detail_app_props_tip) { _, _ ->
+          openReference(context, details.referenceUrl)
+        }
+        .show()
+    }
   }
 
   private fun AppStatisticRuleAnalysis.resolveMatchedFacetTitles(context: Context): List<String> {

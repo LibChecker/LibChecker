@@ -25,7 +25,11 @@ class AppStatisticAnalysisBottomSheetDialogFragment : BaseBottomSheetViewDialogF
     return AppStatisticAnalysisBottomSheetView(
       context = requireContext(),
       onAnalysisClick = { analysis ->
-        AppStatisticRuleDetailsDialog.show(requireContext(), analysis)
+        AppStatisticRuleDetailsDialog.show(
+          requireContext(),
+          analysis,
+          viewLifecycleOwner.lifecycleScope
+        )
       }
     )
   }

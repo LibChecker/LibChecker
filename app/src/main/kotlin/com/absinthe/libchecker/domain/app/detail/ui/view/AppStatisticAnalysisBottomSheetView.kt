@@ -18,6 +18,7 @@ import com.absinthe.libchecker.domain.app.detail.statistics.AppStatisticRuleAnal
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticCalculationKind
 import com.absinthe.libchecker.domain.statistics.chart.ui.loadStatisticIcon
 import com.absinthe.libchecker.domain.statistics.chart.ui.resolve
+import com.absinthe.libchecker.domain.statistics.chart.ui.summaryTitle
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
@@ -303,7 +304,7 @@ private class AppStatisticAnalysisItemView(context: Context) : LinearLayout(cont
           val matchedIds = matchedFacetIds.toSet()
           facets.items
             .filter { facet -> facet.id in matchedIds }
-            .joinToString(" · ") { facet -> facet.title.resolve(context) }
+            .joinToString(" · ") { facet -> facet.summaryTitle.resolve(context) }
         }
       }.orEmpty()
 

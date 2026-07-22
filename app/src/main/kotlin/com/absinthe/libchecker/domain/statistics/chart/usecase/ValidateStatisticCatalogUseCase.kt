@@ -155,6 +155,20 @@ class ValidateStatisticCatalogUseCase {
               ) {
                 errors += "External facet must provide an English title: ${definition.id}: ${facet.id}"
               }
+              facet.shortTitle?.let { shortTitle ->
+                validateTitle(
+                  titleSpec = shortTitle,
+                  statisticId = definition.id,
+                  errors = errors,
+                  maxLength = MAX_FACET_TITLE_LENGTH
+                )
+                if (
+                  definition.source != StatisticSource.BUILTIN &&
+                  shortTitle.translations[DEFAULT_TRANSLATION_LOCALE].isNullOrBlank()
+                ) {
+                  errors += "External facet must provide an English short title: ${definition.id}: ${facet.id}"
+                }
+              }
               validateCondition(
                 condition = facet.condition,
                 statisticId = definition.id,
