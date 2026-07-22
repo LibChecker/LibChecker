@@ -19,6 +19,7 @@ import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.ui.app.MenuOptionItem
 import com.absinthe.libchecker.ui.app.MenuOptionItemView
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.view.app.AppIconPlaceholder
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -160,7 +161,7 @@ class SnapshotMenuBSDView(context: Context) :
         return child
       }
       removeAllViews()
-      return SnapshotItemView(context).apply {
+      return SnapshotItemView(context, AppIconPlaceholder.resourceId).apply {
         layoutParams = LayoutParams(
           LayoutParams.MATCH_PARENT,
           LayoutParams.WRAP_CONTENT
