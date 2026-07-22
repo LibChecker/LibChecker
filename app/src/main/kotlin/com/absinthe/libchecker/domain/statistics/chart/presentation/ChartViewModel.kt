@@ -251,11 +251,13 @@ class ChartViewModel internal constructor(
   suspend fun buildClassifyDialogState(
     source: IChartDataSource<*>,
     x: Int,
-    title: String
+    title: String,
+    subtitle: String?
   ): ClassifyDialogState {
     val items = source.getListByXValue(x)
     return ClassifyDialogState(
       title = title,
+      subtitle = subtitle?.takeUnless { it.trim() == title.trim() },
       items = items,
       itemViewStates = chartDataProvider.buildAppListItemViewStates(items),
       itemChips = source.getItemChipsByXValue(x),
