@@ -30,6 +30,9 @@ import com.absinthe.libchecker.utils.extensions.copyToClipboard
 import com.absinthe.libchecker.utils.extensions.dp
 
 fun ImageView.setDetailIconLongClick(applicationInfo: ApplicationInfo?, blurView: View) {
+  if (OsUtils.atLeastT()) {
+    post(ProgressiveBlurShaderCache::prewarm)
+  }
   setOnLongClickListener {
     if (!OsUtils.atLeastO()) {
       copyToClipboard()
@@ -88,7 +91,6 @@ private class AdaptiveIconLayerOverlay(
   private val maxBlurRadius = 24f
   private val originalBlurViewAlpha = blurView.alpha
   private var blurAnimator: ValueAnimator? = null
-  private var blurMaskShader: RuntimeShader? = null
   private var currentBlurRadius = 0f
   private var isClosing = false
   private var collapseX = 0f
@@ -362,15 +364,26 @@ private class AdaptiveIconLayerOverlay(
 
   @RequiresApi(Build.VERSION_CODES.TIRAMISU)
   private fun createProgressiveBlurEffectOnT(view: View, radius: Float): RenderEffect {
-    val shader = blurMaskShader ?: RuntimeShader(PROGRESSIVE_BLUR_MASK_SHADER).also {
-      blurMaskShader = it
-    }
+    val shader = ProgressiveBlurShaderCache.get()
     shader.setFloatUniform("size", view.width.toFloat(), view.height.toFloat())
     shader.setFloatUniform("progress", (radius / maxBlurRadius).coerceIn(0f, 1f))
     return RenderEffect.createChainEffect(
       RenderEffect.createRuntimeShaderEffect(shader, "content"),
       RenderEffect.createBlurEffect(radius, radius, Shader.TileMode.CLAMP)
     )
+  }
+}
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+private object ProgressiveBlurShaderCache {
+  private var shader: RuntimeShader? = null
+
+  fun prewarm() {
+    get()
+  }
+
+  fun get(): RuntimeShader {
+    return shader ?: RuntimeShader(PROGRESSIVE_BLUR_MASK_SHADER).also { shader = it }
   }
 }
 
