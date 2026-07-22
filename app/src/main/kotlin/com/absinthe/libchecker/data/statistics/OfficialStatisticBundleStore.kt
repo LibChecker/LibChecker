@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.data.statistics
 
+import com.absinthe.libchecker.compat.ZipFileCompat
 import com.absinthe.libchecker.domain.statistics.chart.model.STATISTIC_SCHEMA_VERSION
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticBundle
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDefinition
@@ -8,12 +9,11 @@ import com.absinthe.libchecker.domain.statistics.chart.model.StatisticSource
 import com.absinthe.libchecker.domain.statistics.chart.usecase.ValidateStatisticCatalogUseCase
 import com.absinthe.libchecker.domain.statistics.chart.usecase.ValidateStatisticSvgUseCase
 import com.absinthe.libchecker.utils.JsonUtil
-import com.absinthe.libchecker.utils.extensions.sha256
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.InputStream
+import java.security.MessageDigest
 import java.util.zip.ZipEntry
-import java.util.zip.ZipFile
 
 class OfficialStatisticBundleStore(
   private val rootDirectory: File,
@@ -44,7 +44,7 @@ class OfficialStatisticBundleStore(
     check(bundleFile.length() == manifest.bundleSize) {
       "Chart bundle size does not match its manifest"
     }
-    check(bundleFile.readBytes().sha256().lowercase() == manifest.bundleSha256) {
+    check(bundleFile.sha256() == manifest.bundleSha256) {
       "Chart bundle digest does not match its manifest"
     }
 
@@ -74,9 +74,22 @@ class OfficialStatisticBundleStore(
     return loadInstalledBundle(targetDirectory)
   }
 
+  private fun File.sha256(): String {
+    val digest = MessageDigest.getInstance("SHA-256")
+    inputStream().buffered().use { input ->
+      val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+      while (true) {
+        val read = input.read(buffer)
+        if (read < 0) break
+        digest.update(buffer, 0, read)
+      }
+    }
+    return digest.digest().joinToString("") { byte -> "%02x".format(byte) }
+  }
+
   private fun parseBundle(bundleFile: File): ParsedBundle {
-    ZipFile(bundleFile).use { archive ->
-      val allEntries = archive.entries().asSequence().toList()
+    ZipFileCompat(bundleFile).use { archive ->
+      val allEntries = archive.getZipEntries().asSequence().toList()
       check(allEntries.size <= MAX_ZIP_ENTRIES) { "Chart bundle contains too many entries" }
       check(allEntries.none(ZipEntry::isDirectory)) {
         "Chart bundle contains unexpected directory entries"

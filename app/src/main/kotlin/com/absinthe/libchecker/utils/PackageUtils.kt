@@ -34,6 +34,7 @@ import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.app.SystemServices
+import com.absinthe.libchecker.compat.IZipFile
 import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.compat.ZipFileCompat
 import com.absinthe.libchecker.constant.AndroidVersions
@@ -89,7 +90,6 @@ import java.security.interfaces.DSAPublicKey
 import java.security.interfaces.RSAPublicKey
 import java.text.DateFormat
 import java.util.zip.ZipEntry
-import java.util.zip.ZipFile
 import javax.security.cert.X509Certificate
 import timber.log.Timber
 
@@ -324,7 +324,7 @@ object PackageUtils {
 
     if (ENABLE_GET_APK_FILE_LIBS_LOG) timeRecorder.start()
     try {
-      tracePackageUtilsSection(TRACE_APK_LIBS_OPEN_ZIP) { ZipFile(file) }.use { zipFile ->
+      tracePackageUtilsSection(TRACE_APK_LIBS_OPEN_ZIP) { ZipFileCompat(file) }.use { zipFile ->
         val nativeEntries = collectNativeZipEntries(zipFile, sourceDir)
         val storedEntryOffsets by lazy {
           loadStoredEntryOffsets(file, nativeEntries.storedEntryNames)
@@ -376,13 +376,13 @@ object PackageUtils {
   }
 
   private fun collectNativeZipEntries(
-    zipFile: ZipFile,
+    zipFile: IZipFile,
     sourceDir: String?
   ): NativeZipEntries {
     return tracePackageUtilsSection(TRACE_APK_LIBS_MATCH_ENTRIES) {
       val entries = mutableListOf<ZipEntry>()
       val storedEntryNames = mutableSetOf<String>()
-      val zipEntries = zipFile.entries()
+      val zipEntries = zipFile.getZipEntries()
       while (zipEntries.hasMoreElements()) {
         val entry = zipEntries.nextElement()
         if (

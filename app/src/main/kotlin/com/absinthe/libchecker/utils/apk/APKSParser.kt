@@ -7,9 +7,6 @@ import com.absinthe.libchecker.compat.ZipFileCompat
 import com.absinthe.libchecker.utils.extensions.requireAvailableCacheDir
 import com.absinthe.libchecker.utils.extensions.use
 import java.io.File
-import okio.buffer
-import okio.sink
-import okio.source
 import timber.log.Timber
 
 class APKSParser(private val file: File, private val flags: Int = 0) {
@@ -24,14 +21,15 @@ class APKSParser(private val file: File, private val flags: Int = 0) {
 
   private fun parse(): PackageInfo {
     ZipFileCompat(file).use { zipFile ->
-      val rootDir = dumpApks(zipFile)
-      val baseApkFile = File(rootDir, "base.apk")
+      val apkFiles = dumpApks(zipFile)
+      val baseApkFile = apkFiles.firstOrNull { it.name == "base.apk" }
+        ?: throw Exception("Failed to get base.apk entry")
       return PackageManagerCompat.getPackageArchiveInfo(baseApkFile.path, flags)
         ?.also { pai ->
           pai.applicationInfo?.let { ai ->
             ai.sourceDir = baseApkFile.path
             ai.publicSourceDir = baseApkFile.path
-            ai.splitSourceDirs = rootDir.listFiles()!!
+            ai.splitSourceDirs = apkFiles
               .filter { file -> file.name.startsWith("split_") && file.extension == "apk" }
               .map { file -> file.path }
               .toTypedArray()
@@ -40,22 +38,14 @@ class APKSParser(private val file: File, private val flags: Int = 0) {
     }
   }
 
-  private fun dumpApks(zipFile: ZipFileCompat): File {
+  private fun dumpApks(zipFile: ZipFileCompat): List<File> {
     Timber.d("Dumping apks")
-    val rootDir = File(LibCheckerApp.app.requireAvailableCacheDir(), "apks" + File.separator + zipFile.hashCode())
-    rootDir.mkdirs()
-
-    zipFile.getZipEntries()
+    val entries = zipFile.getZipEntries()
       .asSequence()
       .filter { it.isDirectory.not() && it.name.endsWith(".apk") }
-      .forEach { entry ->
-        zipFile.getInputStream(entry).source().buffer().use {
-          val file = File(rootDir, entry.name.substringAfterLast(File.separator))
-          file.sink().buffer().use { sink ->
-            sink.writeAll(it)
-          }
-        }
-      }
-    return rootDir
+      .map { it to it.name.substringAfterLast(File.separator) }
+      .toList()
+    val cacheRoot = File(LibCheckerApp.app.requireAvailableCacheDir(), "apks")
+    return ApkArchiveStager.stage(file, cacheRoot, zipFile, entries)
   }
 }

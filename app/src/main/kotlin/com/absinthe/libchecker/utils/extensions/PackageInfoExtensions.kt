@@ -180,15 +180,17 @@ fun PackageInfo.isSplitsApk(): Boolean {
 fun PackageInfo.isKotlinUsed(): Boolean {
   return runCatching {
     val file = File(applicationInfo!!.sourceDir)
-
-    ZipFileCompat(file).use {
-      it.getEntry("kotlin-tooling-metadata.json") != null ||
-        it.getEntry("kotlin/kotlin.kotlin_builtins") != null ||
-        it.getEntry("META-INF/services/kotlinx.coroutines.CoroutineExceptionHandler") != null ||
-        it.getEntry("META-INF/services/kotlinx.coroutines.internal.MainDispatcherFactory") != null ||
-        PackageUtils.isKotlinUsedInClassDex(file)
-    }
+    ZipFileCompat(file).use { isKotlinUsed(it, file) }
   }.getOrDefault(false)
+}
+
+private fun isKotlinUsed(zipFile: ZipFileCompat, file: File, foundClasses: List<String>? = null): Boolean {
+  return zipFile.getEntry("kotlin-tooling-metadata.json") != null ||
+    zipFile.getEntry("kotlin/kotlin.kotlin_builtins") != null ||
+    zipFile.getEntry("META-INF/services/kotlinx.coroutines.CoroutineExceptionHandler") != null ||
+    zipFile.getEntry("META-INF/services/kotlinx.coroutines.internal.MainDispatcherFactory") != null ||
+    foundClasses?.any { it == KOTLIN_CLASS_PATTERN || it == KOTLINX_CLASS_PATTERN } == true ||
+    (foundClasses == null && PackageUtils.isKotlinUsedInClassDex(file))
 }
 
 private const val AGP_KEYWORD = "androidGradlePluginVersion"
@@ -201,39 +203,33 @@ private const val AGP_KEYWORD2 = "Created-By: Android Gradle "
 fun PackageInfo.getAGPVersion(): String? {
   runCatching {
     ZipFileCompat(File(applicationInfo!!.sourceDir)).use { zipFile ->
-      zipFile.getEntry("META-INF/com/android/build/gradle/app-metadata.properties")?.let { ze ->
-        Properties().apply {
-          load(zipFile.getInputStream(ze))
-          getProperty(AGP_KEYWORD)?.let {
-            return it
-          }
-        }
-      }
-      zipFile.getEntry("META-INF/MANIFEST.MF")?.let { ze ->
-        zipFile.getInputStream(ze).source().buffer().use {
-          while (true) {
-            it.readUtf8Line()?.let { line ->
-              if (line.startsWith(AGP_KEYWORD2)) {
-                return line.removePrefix(AGP_KEYWORD2)
-              }
-            } ?: break
-          }
-        }
-      }
-      arrayOf(
-        "META-INF/androidx.databinding_viewbinding.version",
-        "META-INF/androidx.databinding_databindingKtx.version",
-        "META-INF/androidx.databinding_library.version"
-      ).forEach { entry ->
-        zipFile.getEntry(entry)?.let { ze ->
-          zipFile.getInputStream(ze).source().buffer().use { bs ->
-            return bs.readUtf8Line().takeIf { it?.isNotBlank() == true }
-          }
-        }
-      }
+      return readAGPVersion(zipFile)
     }
   }
 
+  return null
+}
+
+private fun readAGPVersion(zipFile: ZipFileCompat): String? {
+  zipFile.getEntry("META-INF/com/android/build/gradle/app-metadata.properties")?.let { ze ->
+    Properties().apply { load(zipFile.getInputStream(ze)) }
+      .getProperty(AGP_KEYWORD)?.let { return it }
+  }
+  zipFile.getEntry("META-INF/MANIFEST.MF")?.let { ze ->
+    zipFile.getInputStream(ze).source().buffer().use {
+      while (true) {
+        val line = it.readUtf8Line() ?: break
+        if (line.startsWith(AGP_KEYWORD2)) return line.removePrefix(AGP_KEYWORD2)
+      }
+    }
+  }
+  AGP_VERSION_ENTRIES.forEach { name ->
+    zipFile.getEntry(name)?.let { ze ->
+      zipFile.getInputStream(ze).source().buffer().use { source ->
+        return source.readUtf8Line().takeIf { !it.isNullOrBlank() }
+      }
+    }
+  }
   return null
 }
 
@@ -269,10 +265,12 @@ fun PackageInfo.isXposedModule(): Boolean {
   }
   val sourceDir = applicationInfo?.sourceDir ?: return false
   return runCatching {
-    ZipFileCompat(File(sourceDir)).use {
-      it.getEntry("META-INF/xposed/module.prop") != null
-    }
+    ZipFileCompat(File(sourceDir)).use { isXposedModule(it) }
   }.getOrDefault(false)
+}
+
+private fun isXposedModule(zipFile: ZipFileCompat): Boolean {
+  return zipFile.getEntry("META-INF/xposed/module.prop") != null
 }
 
 /**
@@ -314,36 +312,43 @@ fun PackageInfo.isOverlay(): Boolean {
  * @return Features
  */
 fun PackageInfo.getFeatures(): Int {
-  var features = 0
   val sourceDir = applicationInfo?.sourceDir ?: return 0
+  return runCatching {
+    ZipFileCompat(File(sourceDir)).use { zipFile -> getFeatures(zipFile) }
+  }.getOrElse { getNonArchiveFeatures() }
+}
+
+fun PackageInfo.getFeatures(zipFile: ZipFileCompat): Int {
+  var features = getNonArchiveFeatures()
+  val sourceDir = applicationInfo?.sourceDir ?: return features
   val resultList = PackageUtils.findDexClasses(
     File(sourceDir),
     listOf(
-      "androidx.compose.*".toClassDefType()
+      COMPOSE_CLASS_PATTERN,
+      KOTLIN_CLASS_PATTERN,
+      KOTLINX_CLASS_PATTERN
     )
   )
-  if (isSplitsApk()) {
-    features = features or Features.SPLIT_APKS
-  }
-  if (isKotlinUsed()) {
-    features = features or Features.KOTLIN_USED
-  }
-  if (getAGPVersion()?.isNotBlank() == true) {
-    features = features or Features.AGP
-  }
-  if (isXposedModule()) {
-    features = features or Features.XPOSED_MODULE
-  }
-  if (isPlayAppSigning()) {
-    features = features or Features.PLAY_SIGNING
-  }
-  if (isPWA()) {
-    features = features or Features.PWA
-  }
-  if (isUseJetpackCompose(resultList)) {
-    features = features or Features.JETPACK_COMPOSE
-  }
+  val file = File(sourceDir)
+  if (isKotlinUsed(zipFile, file, resultList)) features = features or Features.KOTLIN_USED
+  if (!readAGPVersion(zipFile).isNullOrBlank()) features = features or Features.AGP
+  if (isXposedModule(zipFile)) features = features or Features.XPOSED_MODULE
+  if (isUseJetpackCompose(zipFile, resultList)) features = features or Features.JETPACK_COMPOSE
   return features
+}
+
+private fun PackageInfo.getNonArchiveFeatures(): Int {
+  var features = 0
+  if (isSplitsApk()) features = features or Features.SPLIT_APKS
+  if (hasXposedModuleMetadata()) features = features or Features.XPOSED_MODULE
+  if (isPlayAppSigning()) features = features or Features.PLAY_SIGNING
+  if (isPWA()) features = features or Features.PWA
+  return features
+}
+
+private fun PackageInfo.hasXposedModuleMetadata(): Boolean {
+  val metadata = applicationInfo?.metaData ?: return false
+  return metadata.getBoolean("xposedmodule") || metadata.containsKey("xposedminversion")
 }
 
 /**
@@ -399,19 +404,9 @@ fun PackageInfo.getKotlinPluginInfo(): Map<String, String?> {
  */
 fun PackageInfo.isUseJetpackCompose(foundList: List<String>? = null): Boolean {
   val file = File(applicationInfo?.sourceDir ?: return false)
-  val foundInMetaInf = runCatching {
-    ZipFileCompat(file).use {
-      it.getZipEntries().asSequence().any { entry ->
-        val fileName = entry.name.substringAfterLast(File.separator)
-        entry.isDirectory.not() &&
-          (fileName.startsWith("androidx.compose.ui") || fileName.startsWith("androidx.compose.material")) &&
-          fileName.endsWith(".version")
-      }
-    }
-  }.getOrDefault(false)
-  if (foundInMetaInf) {
-    return true
-  }
+  val foundInMetaInf = runCatching { ZipFileCompat(file).use { isUseJetpackCompose(it, foundList) } }
+    .getOrDefault(false)
+  if (foundInMetaInf) return true
   if (foundList != null) {
     return foundList.contains("androidx.compose.*".toClassDefType())
   }
@@ -420,6 +415,24 @@ fun PackageInfo.isUseJetpackCompose(foundList: List<String>? = null): Boolean {
     listOf("androidx.compose.*".toClassDefType())
   ).isNotEmpty()
 }
+
+private fun isUseJetpackCompose(zipFile: ZipFileCompat, foundList: List<String>?): Boolean {
+  return zipFile.getZipEntries().asSequence().any { entry ->
+    val fileName = entry.name.substringAfterLast(File.separator)
+    !entry.isDirectory &&
+      (fileName.startsWith("androidx.compose.ui") || fileName.startsWith("androidx.compose.material")) &&
+      fileName.endsWith(".version")
+  } || foundList?.contains(COMPOSE_CLASS_PATTERN) == true
+}
+
+private val COMPOSE_CLASS_PATTERN = "androidx.compose.*".toClassDefType()
+private val KOTLIN_CLASS_PATTERN = "kotlin.*".toClassDefType()
+private val KOTLINX_CLASS_PATTERN = "kotlinx.*".toClassDefType()
+private val AGP_VERSION_ENTRIES = arrayOf(
+  "META-INF/androidx.databinding_viewbinding.version",
+  "META-INF/androidx.databinding_databindingKtx.version",
+  "META-INF/androidx.databinding_library.version"
+)
 
 /**
  * Get Jetpack Compose version of an app

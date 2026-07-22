@@ -101,23 +101,75 @@ class ApkPreview(val url: String) {
     )
   }
 
-  private fun trimToEocd(bytes: ByteArray): ByteArray? {
-    for (i in 0..bytes.size - EOCD_SIGNATURE.size) {
-      var matched = true
-      for (j in EOCD_SIGNATURE.indices) {
-        if (bytes[i + j] != EOCD_SIGNATURE[j]) {
-          matched = false
-          break
-        }
-      }
-      if (matched) {
+  private fun findEocdOffset(bytes: ByteArray): Int? {
+    for (i in bytes.size - EOCD_MIN_SIZE downTo 0) {
+      if (!bytes.matchesAt(i, EOCD_SIGNATURE)) continue
+      val commentLength = ByteBuffer.wrap(bytes, i + 20, 2)
+        .order(ByteOrder.LITTLE_ENDIAN)
+        .short.toInt() and 0xFFFF
+      if (i + EOCD_MIN_SIZE + commentLength == bytes.size) {
         Timber.d("EOCD signature found at offset %d", i)
-        return bytes.copyOfRange(i, bytes.size)
+        return i
       }
     }
-
     Timber.w("EOCD signature not found in provided bytes")
     return null
+  }
+
+  private fun resolveDirectoryInfo(
+    bytes: ByteArray,
+    absoluteStart: Long,
+    fetchRecord: (Long) -> ByteArray
+  ): EocdInfo {
+    val eocdOffset = findEocdOffset(bytes) ?: error("EOCD signature not found")
+    val eocd = parseEocd(bytes.copyOfRange(eocdOffset, bytes.size))
+    val needsZip64 = eocd.totalEntries == ZIP32_MAX_ENTRIES ||
+      eocd.centralDirectorySize == ZIP32_MAX_VALUE ||
+      eocd.centralDirectoryOffset == ZIP32_MAX_VALUE
+    if (!needsZip64) return eocd
+
+    val locatorOffset = eocdOffset - ZIP64_LOCATOR_SIZE
+    require(locatorOffset >= 0 && bytes.matchesAt(locatorOffset, ZIP64_LOCATOR_SIGNATURE)) {
+      "ZIP64 EOCD locator is missing"
+    }
+    val locator = ByteBuffer.wrap(bytes, locatorOffset, ZIP64_LOCATOR_SIZE).order(ByteOrder.LITTLE_ENDIAN)
+    locator.int
+    locator.int
+    val recordOffset = locator.long
+    locator.int
+    require(recordOffset >= 0) { "Invalid ZIP64 EOCD offset" }
+
+    val relativeRecordOffset = recordOffset - absoluteStart
+    val recordBytes = if (
+      relativeRecordOffset >= 0 &&
+      relativeRecordOffset + ZIP64_EOCD_MIN_SIZE <= bytes.size
+    ) {
+      bytes.copyOfRange(
+        relativeRecordOffset.toInt(),
+        relativeRecordOffset.toInt() + ZIP64_EOCD_MIN_SIZE
+      )
+    } else {
+      fetchRecord(recordOffset)
+    }
+    return parseZip64Eocd(recordBytes)
+  }
+
+  private fun parseZip64Eocd(bytes: ByteArray): EocdInfo {
+    require(bytes.size >= ZIP64_EOCD_MIN_SIZE) { "ZIP64 EOCD is truncated" }
+    val buffer = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN)
+    require(buffer.int == ZIP64_EOCD_SIGNATURE_INT) { "Invalid ZIP64 EOCD signature" }
+    buffer.long
+    buffer.short
+    buffer.short
+    buffer.int
+    buffer.int
+    buffer.long
+    val totalEntries = buffer.long
+    val cdSize = buffer.long
+    val cdOffset = buffer.long
+    require(totalEntries in 0..Int.MAX_VALUE.toLong()) { "ZIP64 entry count is too large" }
+    require(cdSize >= 0 && cdOffset >= 0) { "Invalid ZIP64 central directory bounds" }
+    return EocdInfo(cdSize, cdOffset, totalEntries.toInt(), "")
   }
 
   private data class FileMetadata(val contentLength: Long, val supportsRange: Boolean)
@@ -374,9 +426,11 @@ class ApkPreview(val url: String) {
     val rangeStart = (contentLength - EOCD_PROBE_BYTES).coerceAtLeast(0)
     return when (val tail = downloadArchiveTail(rangeStart)) {
       is TailDownload.Partial -> {
-        val eocdBytes = trimToEocd(tail.bytes)
-          ?: throw RangeNotSupportedException("EOCD signature not found in tail region")
-        val eocd = parseEocd(eocdBytes)
+        val eocd = runCatching {
+          resolveDirectoryInfo(tail.bytes, rangeStart) { offset ->
+            downloadRange(offset, ZIP64_EOCD_MIN_SIZE.toLong())
+          }
+        }.getOrElse { throw RangeNotSupportedException(it.message ?: "Unable to parse ZIP directory") }
         Timber.d(
           "EOCD located via range: offset=%d size=%d entries=%d",
           eocd.centralDirectoryOffset,
@@ -404,8 +458,10 @@ class ApkPreview(val url: String) {
   }
 
   private fun processArchiveBytes(archive: ByteArray): ByteArray {
-    val eocdBytes = trimToEocd(archive) ?: error("EOCD signature not found")
-    val eocd = parseEocd(eocdBytes)
+    val eocd = resolveDirectoryInfo(archive, 0) { offset ->
+      require(offset + ZIP64_EOCD_MIN_SIZE <= archive.size) { "ZIP64 EOCD exceeds archive bounds" }
+      archive.copyOfRange(offset.toInt(), offset.toInt() + ZIP64_EOCD_MIN_SIZE)
+    }
     val cdStart = eocd.centralDirectoryOffset.toInt()
     val cdEnd = (eocd.centralDirectoryOffset + eocd.centralDirectorySize).toInt()
     require(cdStart >= 0 && cdEnd <= archive.size) { "Invalid central directory bounds" }
@@ -522,7 +578,12 @@ class ApkPreview(val url: String) {
 
   private companion object {
     private const val MANIFEST_ENTRY_NAME = "AndroidManifest.xml"
-    private const val EOCD_PROBE_BYTES = 65536L
+    private const val EOCD_PROBE_BYTES = 65557L
+    private const val EOCD_MIN_SIZE = 22
+    private const val ZIP64_LOCATOR_SIZE = 20
+    private const val ZIP64_EOCD_MIN_SIZE = 56
+    private const val ZIP32_MAX_ENTRIES = 0xFFFF
+    private const val ZIP32_MAX_VALUE = 0xFFFFFFFFL
     private const val LOCAL_HEADER_PROBE_BYTES = 8192L
     private const val CENTRAL_DIRECTORY_FIXED_HEADER_SIZE = 46
     private const val LOCAL_FILE_HEADER_FIXED_SIZE = 30L
@@ -530,11 +591,18 @@ class ApkPreview(val url: String) {
     private val EOCD_SIGNATURE =
       byteArrayOf(0x50.toByte(), 0x4B.toByte(), 0x05.toByte(), 0x06.toByte())
     private const val EOCD_SIGNATURE_INT = 0x06054b50
+    private val ZIP64_LOCATOR_SIGNATURE = byteArrayOf(0x50, 0x4B, 0x06, 0x07)
+    private const val ZIP64_EOCD_SIGNATURE_INT = 0x06064b50
     private const val CENTRAL_DIRECTORY_SIGNATURE_INT = 0x02014b50
     private val LOCAL_FILE_HEADER_SIGNATURE =
       byteArrayOf(0x50.toByte(), 0x4B.toByte(), 0x03.toByte(), 0x04.toByte())
     private const val LOCAL_FILE_HEADER_SIGNATURE_INT = 0x04034b50
   }
+}
+
+private fun ByteArray.matchesAt(offset: Int, expected: ByteArray): Boolean {
+  if (offset < 0 || offset + expected.size > size) return false
+  return expected.indices.all { this[offset + it] == expected[it] }
 }
 
 data class ApkPreviewInfo(

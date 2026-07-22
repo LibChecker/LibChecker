@@ -1,12 +1,12 @@
 package com.absinthe.libchecker.domain.app.detail.action
 
+import com.absinthe.libchecker.compat.ZipFileCompat
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.elf.ElfParser
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.apache.commons.compress.archivers.zip.ZipFile
 
 class GetElfDetailUseCase(
   private val installedAppRepository: InstalledAppRepository
@@ -40,16 +40,11 @@ class GetElfDetailUseCase(
   }
 
   private fun findElfDetailInApk(apk: File, elfPath: String): AppElfDetail? {
-    ZipFile.Builder().setFile(apk).get().use { zipFile ->
-      zipFile.entries
-        .asSequence()
-        .find { it.name == elfPath }
-        ?.let {
-          val parser = ElfParser(zipFile.getInputStream(it))
-          return parser.readElfDetail()
-        }
+    ZipFileCompat(apk).use { zipFile ->
+      val entry = zipFile.getEntry(elfPath) ?: return null
+      val parser = ElfParser(zipFile.getInputStream(entry))
+      return parser.readElfDetail()
     }
-    return null
   }
 
   private fun ElfParser.readElfDetail(): AppElfDetail {

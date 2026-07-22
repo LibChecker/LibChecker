@@ -2,6 +2,8 @@ package com.absinthe.libchecker.domain.statistics.chart.usecase
 
 import android.content.pm.PackageInfo
 import android.os.Trace
+import com.absinthe.libchecker.compat.IZipFile
+import com.absinthe.libchecker.compat.ZipFileCompat
 import com.absinthe.libchecker.constant.Constants.MULTI_ARCH
 import com.absinthe.libchecker.constant.GlobalFeatures
 import com.absinthe.libchecker.database.entity.LCItem
@@ -14,7 +16,6 @@ import com.absinthe.libchecker.utils.extensions.ABI_VALUE_TO_INSTRUCTION_SET_MAP
 import com.absinthe.libchecker.utils.extensions.PAGE_SIZE_16_KB
 import java.io.File
 import java.util.zip.ZipEntry
-import java.util.zip.ZipFile as JavaZipFile
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
 import timber.log.Timber
@@ -116,11 +117,7 @@ class BuildPageSize16KBChartDataUseCase(
       val abiSplitFiles = getAbiSplitFiles(packageInfo, abi)
       when (
         val baseResult = traceSection(TRACE_CHECK_BASE_SOURCE) {
-          checkApk16KBAlignment(
-            file = sourceFile,
-            abi = abi,
-            precheckNoNativeLibs = abiSplitFiles.isNotEmpty()
-          )
+          checkApk16KBAlignment(sourceFile, abi)
         }
       ) {
         PageSize16KBScanResult.Compatible -> return@traceSection true
@@ -156,24 +153,20 @@ class BuildPageSize16KBChartDataUseCase(
 
   private fun checkApk16KBAlignment(
     file: File,
-    abi: Int,
-    precheckNoNativeLibs: Boolean = false
+    abi: Int
   ): PageSize16KBScanResult {
     if (file.exists().not() || file.canRead().not()) {
       return PageSize16KBScanResult.NoNativeLibs
     }
     val abiString = ABI_STRING_MAP[abi % MULTI_ARCH] ?: return PageSize16KBScanResult.NoNativeLibs
     val sourceDir = "lib$APK_ENTRY_SEPARATOR$abiString"
-    if (precheckNoNativeLibs && hasMatchingNativeLibEntry(file, sourceDir) == false) {
-      return PageSize16KBScanResult.NoNativeLibs
-    }
     return traceSection(TRACE_SCAN_APK) {
       var hasNativeLibs = false
 
       try {
-        traceSection(TRACE_OPEN_ZIP) { JavaZipFile(file) }.use { zipFile ->
+        traceSection(TRACE_OPEN_ZIP) { ZipFileCompat(file) }.use { zipFile ->
           val nativeEntries = traceSection(TRACE_MATCH_ZIP_ENTRIES) {
-            zipFile.entries().asSequence()
+            zipFile.getZipEntries().asSequence()
               .filter { entry ->
                 !entry.isDirectory &&
                   entry.name.endsWith(".so") &&
@@ -226,30 +219,7 @@ class BuildPageSize16KBChartDataUseCase(
     }
   }
 
-  private fun hasMatchingNativeLibEntry(file: File, sourceDir: String): Boolean? {
-    return traceSection(TRACE_PRECHECK_BASE_APK) {
-      runCatching {
-        JavaZipFile(file).use { zipFile ->
-          val entries = zipFile.entries()
-          while (entries.hasMoreElements()) {
-            val entry = entries.nextElement()
-            if (
-              !entry.isDirectory &&
-              entry.name.endsWith(".so") &&
-              entry.name.startsWith(sourceDir)
-            ) {
-              return@traceSection true
-            }
-          }
-        }
-        false
-      }.onFailure {
-        Timber.w(it, "Failed to precheck 16 KB page-size native entries from ${file.absolutePath}")
-      }.getOrNull()
-    }
-  }
-
-  private fun parseElfMinPageSize(zipFile: JavaZipFile, entry: ZipEntry): Int {
+  private fun parseElfMinPageSize(zipFile: IZipFile, entry: ZipEntry): Int {
     return traceSection(TRACE_PARSE_ELF) {
       runCatching {
         ElfParser(zipFile.getInputStream(entry)).use { parser ->
@@ -337,7 +307,6 @@ class BuildPageSize16KBChartDataUseCase(
     private const val TRACE_CHECK_SOURCE = "LC 16KB checkSource"
     private const val TRACE_CHECK_BASE_SOURCE = "LC 16KB checkBaseSource"
     private const val TRACE_CHECK_SPLIT_SOURCE = "LC 16KB checkSplitSource"
-    private const val TRACE_PRECHECK_BASE_APK = "LC 16KB precheckBaseApk"
     private const val TRACE_SCAN_APK = "LC 16KB scanApk"
     private const val TRACE_OPEN_ZIP = "LC 16KB openZip"
     private const val TRACE_MATCH_ZIP_ENTRIES = "LC 16KB matchZipEntries"
