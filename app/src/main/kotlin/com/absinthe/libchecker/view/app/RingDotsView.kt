@@ -850,20 +850,6 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
     return ((cos(normalized * PI) + 1f) * 0.5f).toFloat()
   }
 
-  fun setIconBitmap(bitmap: Bitmap?) {
-    stopIconProducer()
-    highlightIconProvider = null
-    stopHighlightAnimator()
-    clearHighlightBitmaps()
-    if (bitmap == null) {
-      invalidateOnAnimationFrame()
-      return
-    }
-
-    highlightBitmapChannel.trySend(HighlightBitmap(bitmap, recyclable = false))
-    notifyBitmapQueueAvailable()
-  }
-
   fun setAppIconHighlightProvider(loadIcon: suspend () -> Drawable?) {
     setHighlightIconProvider(object : HighlightIconProvider {
       override suspend fun produce(emitter: HighlightIconEmitter) {

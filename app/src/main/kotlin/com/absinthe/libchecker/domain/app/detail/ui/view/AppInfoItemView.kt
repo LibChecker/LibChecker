@@ -102,10 +102,6 @@ class AppInfoItemView(context: Context) : LinearLayout(context) {
     icon.background = drawable
   }
 
-  fun setIconTintColorResource(@ColorRes res: Int) {
-    icon.imageTintList = res.toColorStateList(context)
-  }
-
   fun setIconTintColor(@ColorInt res: Int) {
     icon.imageTintList = res.toColorStateListByColor()
   }

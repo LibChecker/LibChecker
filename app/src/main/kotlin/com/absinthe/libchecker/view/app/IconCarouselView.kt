@@ -12,10 +12,8 @@ import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
-import androidx.annotation.DrawableRes
 import androidx.annotation.MainThread
 import androidx.appcompat.widget.AppCompatImageView
-import androidx.core.content.ContextCompat
 import androidx.core.content.res.use
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.isVisible
@@ -213,29 +211,6 @@ class IconCarouselView @JvmOverloads constructor(
   }
 
   @MainThread
-  fun setIconResources(@DrawableRes vararg iconResIds: Int) {
-    val drawables = iconResIds.map { resId ->
-      ContextCompat.getDrawable(context, resId)
-    }.filterNotNull()
-    setIconDrawables(drawables)
-  }
-
-  @MainThread
-  fun setReverse(value: Boolean) {
-    if (reverse == value) return
-    reverse = value
-    updateIconTransforms()
-  }
-
-  @MainThread
-  fun setStepDuration(durationMs: Long) {
-    val safeDuration = durationMs.coerceAtLeast(300L)
-    if (stepDuration == safeDuration) return
-    stepDuration = safeDuration
-    recreateAnimatorIfNeeded()
-  }
-
-  @MainThread
   fun start() {
     if (shouldRun && animator?.isStarted == true) return
     shouldRun = true
@@ -282,14 +257,6 @@ class IconCarouselView @JvmOverloads constructor(
       cancel()
     }
     animator = null
-  }
-
-  private fun recreateAnimatorIfNeeded() {
-    val wasRunning = animator?.isStarted == true
-    stopAnimator()
-    if (wasRunning && shouldRun && isAttachedToWindow) {
-      startAnimator()
-    }
   }
 
   private fun updateIconTransforms() {

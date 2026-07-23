@@ -2,8 +2,6 @@ package com.absinthe.libchecker.services
 
 import android.content.Intent
 import android.os.IBinder
-import android.os.RemoteCallbackList
-import android.os.RemoteException
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.domain.app.list.usecase.InitializePendingAppFeaturesUseCase
@@ -21,7 +19,6 @@ class WorkerService : LifecycleService() {
 
   private val initializePendingAppFeatures: InitializePendingAppFeaturesUseCase by inject()
   private val installedAppRepository: InstalledAppRepository by inject()
-  private val listenerList = RemoteCallbackList<OnWorkerListener>()
   private val binder by lazy { WorkerBinder(this) }
   private var initFeaturesJob: Job? = null
   private var pendingInitFeaturesRequest = false
@@ -49,19 +46,6 @@ class WorkerService : LifecycleService() {
     Timber.d("onDestroy")
     installedAppRepository.stopPackageChangeMonitoring(this)
     super.onDestroy()
-  }
-
-  @Synchronized
-  private fun notifyPackagesChanged(packageName: String, action: String) {
-    val count = listenerList.beginBroadcast()
-    for (i in 0 until count) {
-      try {
-        listenerList.getBroadcastItem(i).onReceivePackagesChanged(packageName, action)
-      } catch (e: RemoteException) {
-        Timber.e(e)
-      }
-    }
-    listenerList.finishBroadcast()
   }
 
   @Synchronized
@@ -110,22 +94,6 @@ class WorkerService : LifecycleService() {
 
     override fun initFeatures() {
       serviceRef.get()?.initFeatures()
-    }
-
-    override fun getLastPackageChangedTime(): Long {
-      return 0
-    }
-
-    override fun registerOnWorkerListener(listener: OnWorkerListener?) {
-      Timber.d("registerOnWorkerListener")
-      listener?.let {
-        serviceRef.get()?.listenerList?.register(listener)
-      }
-    }
-
-    override fun unregisterOnWorkerListener(listener: OnWorkerListener?) {
-      Timber.d("unregisterOnWorkerListener")
-      serviceRef.get()?.listenerList?.unregister(listener)
     }
   }
 

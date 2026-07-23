@@ -1,7 +1,5 @@
 package com.absinthe.libchecker.di
 
-import android.os.Build
-import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotTitleDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.SnapshotDetailSectionBuilder
 import com.absinthe.libchecker.domain.snapshot.display.FormatSnapshotTimestampUseCase
@@ -9,17 +7,12 @@ import com.absinthe.libchecker.domain.snapshot.list.capture.CaptureInstalledSnap
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotListWorkflow
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotCapturePlanUseCase
-import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotDashboardDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotListUpdatePlanUseCase
-import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotMenuDemoItemUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotSystemPropDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotTimeNodeListDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.DeleteSnapshotTimeStampUseCase
-import com.absinthe.libchecker.domain.snapshot.list.usecase.GetApexPackageNamesUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.GetSnapshotPackageIconSourcesUseCase
-import com.absinthe.libchecker.domain.snapshot.list.usecase.GetSnapshotSystemPropDiffsUseCase
-import com.absinthe.libchecker.domain.snapshot.list.usecase.UpdateSnapshotDiffItemsUseCase
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -28,18 +21,13 @@ val snapshotListModule = module {
   factory { CaptureInstalledSnapshotUseCase(androidContext().packageManager, get(), get(), get(), get(), get()) }
   factory { SnapshotDetailSectionBuilder(androidContext(), get()) }
   factory { BuildSnapshotTitleDisplayDataUseCase(androidContext()) }
-  factory { GetApexPackageNamesUseCase(get()) }
   factory { BuildSnapshotCapturePlanUseCase(get()) }
-  factory { BuildSnapshotDashboardDisplayDataUseCase(androidContext()) }
-  factory { BuildSnapshotItemDisplayDataUseCase(androidContext(), get(), get()) }
-  factory { BuildSnapshotMenuDemoItemUseCase(BuildConfig.VERSION_CODE.toLong(), Build.VERSION.SDK_INT) }
+  factory { BuildSnapshotItemDisplayDataUseCase(androidContext()) }
   factory { BuildSnapshotListUpdatePlanUseCase(get(), get(), get()) }
   factory { GetSnapshotPackageIconSourcesUseCase(get()) }
-  factory { GetSnapshotSystemPropDiffsUseCase(get()) }
   factory { BuildSnapshotSystemPropDisplayDataUseCase(androidContext(), get()) }
   factory { BuildSnapshotTimeNodeListDataUseCase(get(), get<FormatSnapshotTimestampUseCase>()::invoke) }
   factory { DeleteSnapshotTimeStampUseCase(get(), get()) }
-  factory { UpdateSnapshotDiffItemsUseCase() }
   factory {
     SnapshotListWorkflow(
       repository = get(),
@@ -59,7 +47,6 @@ val snapshotListModule = module {
       snapshotSelection = get(),
       snapshotSettingsRepository = get(),
       updateSnapshotAutoRemoveThresholdUseCase = get(),
-      updateSnapshotDiffItemsUseCase = get(),
       snapshotTrackChangeRepository = get()
     )
   }

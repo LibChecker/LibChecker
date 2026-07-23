@@ -446,7 +446,7 @@ class AppListFragment :
           appListStatus != STATUS_START_REQUEST_CHANGE
         ) {
           updateItems()
-          if (hasPackageChanged() || isFirstRequestChange) {
+          if (isFirstRequestChange) {
             isFirstRequestChange = false
             homeViewModel.requestChange()
           }

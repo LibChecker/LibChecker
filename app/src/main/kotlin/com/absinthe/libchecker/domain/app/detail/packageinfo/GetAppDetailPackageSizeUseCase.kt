@@ -1,15 +1,13 @@
 package com.absinthe.libchecker.domain.app.detail.packageinfo
 
 import android.content.pm.PackageInfo
-import com.absinthe.libchecker.domain.app.detail.content.GetAppBundleItemsUseCase
+import com.absinthe.libchecker.domain.app.detail.content.getAppBundleSplitItems
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class GetAppDetailPackageSizeUseCase(
-  private val getAppBundleItems: GetAppBundleItemsUseCase
-) {
+class GetAppDetailPackageSizeUseCase {
 
   suspend operator fun invoke(
     packageInfo: PackageInfo,
@@ -21,7 +19,7 @@ class GetAppDetailPackageSizeUseCase(
     val splitSizes = if (isApkPreview) {
       emptyList()
     } else {
-      getAppBundleItems(packageInfo).map { it.size }
+      getAppBundleSplitItems(packageInfo).map { it.size }
     }
 
     AppDetailPackageSize(baseSize, splitSizes)

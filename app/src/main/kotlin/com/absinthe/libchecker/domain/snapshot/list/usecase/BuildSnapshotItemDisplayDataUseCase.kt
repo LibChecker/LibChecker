@@ -5,8 +5,9 @@ import androidx.annotation.StringRes
 import androidx.core.text.buildSpannedString
 import androidx.core.text.scale
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotAbiDisplayDataUseCase
-import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
+import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.domain.snapshot.display.SnapshotAbiDisplayData
+import com.absinthe.libchecker.domain.snapshot.display.SnapshotAbiDisplayItem
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotUpdateTimeDisplayData
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotUpdateTimeText
 import com.absinthe.libchecker.domain.snapshot.display.buildSnapshotVersionDisplayDiff
@@ -21,16 +22,17 @@ import com.absinthe.libchecker.domain.snapshot.list.model.buildSnapshotItemAbiDe
 import com.absinthe.libchecker.domain.snapshot.list.model.buildSnapshotItemDescription
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
+import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.PREINSTALLED_TIMESTAMP
 import com.absinthe.libchecker.utils.extensions.sizeToString
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 import kotlin.math.abs
 
-class BuildSnapshotItemDisplayDataUseCase(
-  private val context: Context,
-  private val buildSnapshotAbiDisplayData: BuildSnapshotAbiDisplayDataUseCase,
-  private val buildSnapshotUpdateTimeDisplayData: BuildSnapshotUpdateTimeDisplayDataUseCase
-) {
+class BuildSnapshotItemDisplayDataUseCase(private val context: Context) {
 
   operator fun invoke(request: Request): SnapshotItemDisplayData {
     val item = request.item
@@ -77,16 +79,14 @@ class BuildSnapshotItemDisplayDataUseCase(
       emphasizeDiffs = request.emphasizeDiffs
     )
     val abi = SnapshotItemAbiDisplayData(
-      abiDisplayData = buildSnapshotAbiDisplayData(item.abiDiff),
+      abiDisplayData = buildAbiDisplayData(item.abiDiff),
       showChangedAbi = item.abiDiff.new != null && item.abiDiff.old != item.abiDiff.new,
       tintChangedAbiBadge = request.tintChangedAbiBadge
     )
-    val updateTimeDisplayData = buildSnapshotUpdateTimeDisplayData(
-      BuildSnapshotUpdateTimeDisplayDataUseCase.Request(
-        updateTime = item.updateTime,
-        isVisible = request.showUpdateTime,
-        isApexPackage = request.isApexPackage
-      )
+    val updateTimeDisplayData = buildUpdateTimeDisplayData(
+      updateTime = item.updateTime,
+      isVisible = request.showUpdateTime,
+      isApexPackage = request.isApexPackage
     )
     return SnapshotItemDisplayData(
       cardPresentation = request.cardPresentation,
@@ -269,6 +269,41 @@ class BuildSnapshotItemDisplayDataUseCase(
     } else {
       displayText
     }
+  }
+
+  private fun buildUpdateTimeDisplayData(
+    updateTime: Long,
+    isVisible: Boolean,
+    isApexPackage: Boolean
+  ): SnapshotUpdateTimeDisplayData? {
+    if (!isVisible) return null
+    val text = if (updateTime <= PREINSTALLED_TIMESTAMP) {
+      SnapshotUpdateTimeText.Preinstalled
+    } else {
+      val pattern = if (DateUtils.isTimestampToday(updateTime)) "HH:mm:ss" else "yyyy-MM-dd HH:mm:ss"
+      SnapshotUpdateTimeText.LastUpdated(
+        SimpleDateFormat(pattern, Locale.getDefault()).format(Date(updateTime))
+      )
+    }
+    return SnapshotUpdateTimeDisplayData(text, isApexPackage)
+  }
+
+  private fun buildAbiDisplayData(abiDiff: SnapshotDiffItem.DiffNode<Short>): SnapshotAbiDisplayData {
+    return SnapshotAbiDisplayData(
+      old = buildAbiDisplayItem(abiDiff.old),
+      new = abiDiff.new?.let(::buildAbiDisplayItem)
+    )
+  }
+
+  private fun buildAbiDisplayItem(abi: Short): SnapshotAbiDisplayItem {
+    val abiInt = abi.toInt()
+    return SnapshotAbiDisplayItem(
+      text = PackageUtils.getAbiString(context, abiInt, showExtraInfo = false),
+      badgeRes = PackageUtils.getAbiBadgeResource(abiInt).takeIf {
+        abiInt != Constants.ERROR && abiInt != Constants.OVERLAY && it != 0
+      },
+      isMultiArch = abi / Constants.MULTI_ARCH == 1
+    )
   }
 
   data class Request(

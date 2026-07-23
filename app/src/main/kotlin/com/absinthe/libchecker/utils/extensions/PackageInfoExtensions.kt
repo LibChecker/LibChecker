@@ -9,7 +9,6 @@ import android.content.res.Configuration
 import android.os.Build
 import androidx.collection.arrayMapOf
 import androidx.core.content.pm.PackageInfoCompat
-import androidx.core.text.isDigitsOnly
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.compat.ZipFileCompat
@@ -39,14 +38,12 @@ import com.absinthe.libchecker.constant.Constants.X86_STRING
 import com.absinthe.libchecker.constant.GlobalFeatures
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.Features
-import com.absinthe.libchecker.domain.app.detail.model.KotlinToolingMetadata
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.ShizukuManager
 import com.absinthe.libchecker.utils.apk.ApkSignatureSchemeDetector
-import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libchecker.utils.manifest.HiddenPermissionsReader
 import com.absinthe.libchecker.utils.manifest.ManifestReader
 import dev.rikka.tools.refine.Refine
@@ -195,20 +192,6 @@ private fun isKotlinUsed(zipFile: ZipFileCompat, file: File, foundClasses: List<
 
 private const val AGP_KEYWORD = "androidGradlePluginVersion"
 private const val AGP_KEYWORD2 = "Created-By: Android Gradle "
-
-/**
- * Get Android Gradle Plugin version of an app
- * @return Android Gradle Plugin version or null if not found
- */
-fun PackageInfo.getAGPVersion(): String? {
-  runCatching {
-    ZipFileCompat(File(applicationInfo!!.sourceDir)).use { zipFile ->
-      return readAGPVersion(zipFile)
-    }
-  }
-
-  return null
-}
 
 private fun readAGPVersion(zipFile: ZipFileCompat): String? {
   zipFile.getEntry("META-INF/com/android/build/gradle/app-metadata.properties")?.let { ze ->
@@ -366,39 +349,6 @@ fun ApplicationInfo.isUse32BitAbi(): Boolean {
 }
 
 /**
- * Get Kotlin plugin version of an app
- * @return Kotlin plugin version or null if not found
- */
-fun PackageInfo.getKotlinPluginInfo(): Map<String, String?> {
-  val map = mutableMapOf<String, String?>()
-  map["Kotlin"] = null
-  runCatching {
-    ZipFileCompat(applicationInfo!!.sourceDir).use { zip ->
-      val entry = zip.getEntry("kotlin-tooling-metadata.json") ?: return@runCatching null
-      zip.getInputStream(entry).source().buffer().use {
-        val json = it.readUtf8().fromJson<KotlinToolingMetadata>()
-        val kotlinAndroidTarget =
-          json?.projectTargets?.find { target -> target.target == "org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget" }
-
-        map["Kotlin"] =
-          json?.buildPluginVersion.takeIf { json?.buildPlugin == "org.jetbrains.kotlin.gradle.plugin.KotlinAndroidPluginWrapper" || kotlinAndroidTarget != null }
-        if (json?.buildSystem == "Gradle" && json.buildSystemVersion.isNotEmpty()) {
-          map["Gradle"] = json.buildSystemVersion
-        }
-
-        val sourceCompatibility = kotlinAndroidTarget?.extras?.android?.sourceCompatibility
-        if (kotlinAndroidTarget != null && sourceCompatibility?.isDigitsOnly() == true) {
-          map["Java"] = sourceCompatibility
-        }
-      }
-    }
-  }.onFailure {
-    map["Kotlin"] = null
-  }
-  return map
-}
-
-/**
  * Check if an app is using Jetpack Compose
  * @return True if is using Jetpack Compose
  */
@@ -433,32 +383,6 @@ private val AGP_VERSION_ENTRIES = arrayOf(
   "META-INF/androidx.databinding_databindingKtx.version",
   "META-INF/androidx.databinding_library.version"
 )
-
-/**
- * Get Jetpack Compose version of an app
- * @return Jetpack Compose version or null if not found
- */
-fun PackageInfo.getJetpackComposeVersion(): String? {
-  runCatching {
-    ZipFileCompat(File(applicationInfo!!.sourceDir)).use { zipFile ->
-      arrayOf(
-        "META-INF/androidx.compose.runtime_runtime.version",
-        "META-INF/androidx.compose.ui_ui.version",
-        "META-INF/androidx.compose.ui_ui-tooling-preview.version",
-        "META-INF/androidx.compose.foundation_foundation.version",
-        "META-INF/androidx.compose.animation_animation.version"
-      ).forEach { entry ->
-        zipFile.getEntry(entry)?.let { ze ->
-          zipFile.getInputStream(ze).source().buffer().use { bs ->
-            return bs.readUtf8Line().takeIf { it?.isNotBlank() == true }
-          }
-        }
-      }
-    }
-  }
-
-  return null
-}
 
 /**
  * Get signatures of an app
@@ -686,7 +610,6 @@ val ABI_STRING_RES_MAP = arrayMapOf(
 )
 
 const val PAGE_SIZE_16_KB = 0x4000
-const val PAGE_SIZE_4_KB = 0x1000
 
 /**
  *

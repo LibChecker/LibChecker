@@ -10,8 +10,6 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
-import com.absinthe.libchecker.domain.app.detail.content.BuildAppDetailContentInitPlanUseCase
-import com.absinthe.libchecker.domain.app.detail.content.BuildAppDetailTabTypesUseCase
 import com.absinthe.libchecker.domain.app.detail.model.DetailExtraBean
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
@@ -57,8 +55,6 @@ abstract class BaseAppDetailActivity :
   protected val viewModel: DetailViewModel by viewModel()
   private val appDetailSettingsRepository: AppDetailSettingsRepository by inject()
   private val appListSettingsRepository: AppListSettingsRepository by inject()
-  private val buildAppDetailContentInitPlan: BuildAppDetailContentInitPlanUseCase by inject()
-  private val buildAppDetailTabTypes: BuildAppDetailTabTypesUseCase by inject()
   protected val typeList: List<Int>
     get() = tabController.types
 
@@ -135,7 +131,7 @@ abstract class BaseAppDetailActivity :
     )
   }
   private val tabSpecBuilder by unsafeLazy {
-    DetailTabSpecBuilder(this, buildAppDetailTabTypes)
+    DetailTabSpecBuilder(this)
   }
   private val tabController: DetailTabController by unsafeLazy {
     DetailTabController(
@@ -163,7 +159,6 @@ abstract class BaseAppDetailActivity :
     DetailPackageContentController(
       viewModel = viewModel,
       coroutineScope = lifecycleScope,
-      buildAppDetailContentInitPlan = buildAppDetailContentInitPlan,
       tabSpecBuilder = tabSpecBuilder,
       tabController = tabController,
       currentUiGeneration = { packageUiGeneration },

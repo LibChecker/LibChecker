@@ -25,7 +25,6 @@ import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.navigation.DetailReferenceNavigation
 import com.absinthe.libchecker.domain.app.detail.packageinfo.GetAppDetailPackageUseCase
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailActionLoader
-import com.absinthe.libchecker.domain.app.detail.presentation.DetailFeatureLoader
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailFilterController
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailPackageLoader
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailPackageState
@@ -54,12 +53,12 @@ class DetailViewModel(
   private val detailActionLoader: DetailActionLoader,
   private val detailContentLoader: DetailContentLoader,
   private val detailFilterController: DetailFilterController,
-  private val detailFeatureLoader: DetailFeatureLoader,
+  private val detailPresentationLoader: DetailPresentationLoader,
   private val detailPackageLoader: DetailPackageLoader,
   private val analyzeAppStatisticRules: AnalyzeAppStatisticRulesUseCase
 ) : ViewModel() {
   val contentState = detailContentLoader.contentState
-  val featureState = detailFeatureLoader.featureState
+  val featureState = detailPresentationLoader.featureState
   val filterState = detailFilterController.filterState
   private val _packageLoadResults = MutableSharedFlow<PackageLoadResult>()
   val packageLoadResults: SharedFlow<PackageLoadResult> = _packageLoadResults.asSharedFlow()
@@ -70,8 +69,6 @@ class DetailViewModel(
   private val _appInstallSourceDetailsResults = MutableSharedFlow<AppInstallSourceDetailsResult>()
   val appInstallSourceDetailsResults: SharedFlow<AppInstallSourceDetailsResult> =
     _appInstallSourceDetailsResults.asSharedFlow()
-  private val _appLaunchActionResults = MutableSharedFlow<AppLaunchActionResult>()
-  val appLaunchActionResults: SharedFlow<AppLaunchActionResult> = _appLaunchActionResults.asSharedFlow()
   private val _appPackageShareActionResults = MutableSharedFlow<AppPackageShareActionResult>()
   val appPackageShareActionResults: SharedFlow<AppPackageShareActionResult> =
     _appPackageShareActionResults.asSharedFlow()
@@ -95,7 +92,6 @@ class DetailViewModel(
   private var apkAnalysisPackageJob: Job? = null
   private var apkPreviewJob: Job? = null
   private var appInstallSourceDetailsJob: Job? = null
-  private var appLaunchActionJob: Job? = null
   private var appPackageShareActionJob: Job? = null
   private var appPackageShareExportJob: Job? = null
   private var nativeLibraryExtractionJob: Job? = null
@@ -202,23 +198,6 @@ class DetailViewModel(
   data class AppInstallSourceDetailsResult(
     val packageName: String,
     val display: AppInstallSourceBottomSheetDisplay?
-  )
-
-  fun loadAppLaunchAction(packageName: String?) {
-    appLaunchActionJob?.cancel()
-    appLaunchActionJob = viewModelScope.launch {
-      _appLaunchActionResults.emit(
-        AppLaunchActionResult(
-          packageName = packageName,
-          action = detailActionLoader.getAppLaunchAction(packageName)
-        )
-      )
-    }
-  }
-
-  data class AppLaunchActionResult(
-    val packageName: String?,
-    val action: AppLaunchAction?
   )
 
   fun prepareAppPackageShareAction(
@@ -367,20 +346,20 @@ class DetailViewModel(
     abiSet: Collection<Int>,
     apkAnalyticsMode: Boolean
   ): AppDetailAbiLabelData {
-    return detailFeatureLoader.buildAppDetailAbiLabelData(abi, abiSet, apkAnalyticsMode)
+    return detailPresentationLoader.buildAppDetailAbiLabelData(abi, abiSet, apkAnalyticsMode)
   }
 
   suspend fun buildAppDetailHeaderExtraInfo(
     packageInfo: PackageInfo,
     showAndroidVersion: Boolean
   ): AppDetailHeaderExtraInfo {
-    return detailFeatureLoader.buildAppDetailHeaderExtraInfo(packageState, packageInfo, showAndroidVersion)
+    return detailPresentationLoader.buildAppDetailHeaderExtraInfo(packageState, packageInfo, showAndroidVersion)
   }
 
   fun buildAppDetailHeaderTitleData(
     packageInfo: PackageInfo,
     apkAnalyticsMode: Boolean
-  ) = detailFeatureLoader.buildAppDetailHeaderTitleData(packageState, packageInfo, apkAnalyticsMode)
+  ) = detailPresentationLoader.buildAppDetailHeaderTitleData(packageState, packageInfo, apkAnalyticsMode)
 
   fun buildAppDetailFeatureItem(
     feature: VersionedFeature,
@@ -389,7 +368,7 @@ class DetailViewModel(
     canShowInstallSource: Boolean,
     canShowAppIcons: Boolean
   ): AppDetailFeatureItemData? {
-    return detailFeatureLoader.buildAppDetailFeatureItem(
+    return detailPresentationLoader.buildAppDetailFeatureItem(
       feature = feature,
       currentFeatureCount = currentFeatureCount,
       apkAnalyticsMode = apkAnalyticsMode,
@@ -449,7 +428,7 @@ class DetailViewModel(
     _appStatisticAnalysisState.value = AppStatisticAnalysisState.Idle
     detailContentLoader.reset()
     detailFilterController.reset()
-    detailFeatureLoader.reset()
+    detailPresentationLoader.reset()
   }
 
   fun initSoAnalysisData() {
@@ -519,11 +498,11 @@ class DetailViewModel(
   }
 
   fun emitFeature(feature: VersionedFeature) {
-    detailFeatureLoader.emitFeature(viewModelScope, feature)
+    detailPresentationLoader.emitFeature(viewModelScope, feature)
   }
 
   fun setFeatureLoading(loading: Boolean) {
-    detailFeatureLoader.setLoading(viewModelScope, loading)
+    detailPresentationLoader.setLoading(viewModelScope, loading)
   }
 
   fun buildSignatureDetailItems(detail: String) = detailActionLoader.buildSignatureDetailItems(detail)
@@ -566,15 +545,15 @@ class DetailViewModel(
   }
 
   fun initFeatures(packageInfo: PackageInfo, features: Int) {
-    detailFeatureLoader.initFeatures(viewModelScope, packageState, packageInfo, features)
+    detailPresentationLoader.initFeatures(viewModelScope, packageState, packageInfo, features)
   }
 
   fun initAbiInfo(packageInfo: PackageInfo, apkAnalyticsMode: Boolean) {
-    detailFeatureLoader.initAbiInfo(viewModelScope, packageInfo, apkAnalyticsMode)
+    detailPresentationLoader.initAbiInfo(viewModelScope, packageInfo, apkAnalyticsMode)
   }
 
   fun initAbiInfo(apkPreviewInfo: ApkPreviewInfo) {
-    detailFeatureLoader.initAbiInfo(viewModelScope, apkPreviewInfo)
+    detailPresentationLoader.initAbiInfo(viewModelScope, apkPreviewInfo)
   }
 
   fun filterDetailItems(

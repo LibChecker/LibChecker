@@ -134,10 +134,6 @@ fun TextView.applyCondensedTypeface() {
   typeface = Typeface.create(SANS_SERIF_CONDENSED, Typeface.NORMAL)
 }
 
-fun TextView.applyCondensedMediumTypeface() {
-  typeface = Typeface.create(SANS_SERIF_CONDENSED_MEDIUM, Typeface.NORMAL)
-}
-
 fun TextView.applyCondensedSingleLine() {
   applySingleLineEndEllipsize()
   applyCondensedTypeface()
@@ -145,8 +141,6 @@ fun TextView.applyCondensedSingleLine() {
 }
 
 private const val SANS_SERIF_CONDENSED = "sans-serif-condensed"
-private const val SANS_SERIF_CONDENSED_MEDIUM = "sans-serif-condensed-medium"
-
 fun ViewPager2.setCurrentItem(
   item: Int,
   duration: Long,

@@ -156,16 +156,6 @@ object PackageUtils {
   }
 
   /**
-   * Get version string of an app ( 1.0.0(1) )
-   * @param versionName Version name
-   * @param versionCode Version code
-   * @return version code as String
-   */
-  fun getVersionString(versionName: String, versionCode: Long): String {
-    return "$versionName ($versionCode)"
-  }
-
-  /**
    * Get native libraries of an app
    * @param packageInfo PackageInfo
    * @param specifiedAbi Specify an ABI
@@ -1086,17 +1076,6 @@ object PackageUtils {
     }.getOrElse { emptyList() }
   }
 
-  /**
-   * Get permissions of an application with granted state
-   * @param packageName Package name of the app
-   * @return Permissions list with granted state
-   */
-  fun getStatefulPermissionsList(packageName: String): List<Pair<String, Boolean>> {
-    return runCatching {
-      getPackageInfo(packageName, PackageManager.GET_PERMISSIONS).getStatefulPermissionsList()
-    }.getOrElse { emptyList() }
-  }
-
   @RequiresApi(Build.VERSION_CODES.R)
   fun getInstallSourceInfo(packageName: String): InstallSourceInfo? {
     val origInstallSourceInfo = runCatching {
@@ -1242,18 +1221,6 @@ object PackageUtils {
       .setPackage(packageName)
     val info = PackageManagerCompat.queryIntentActivities(intent, 0)
     return info.getOrNull(0)?.activityInfo?.name.orEmpty()
-  }
-
-  fun startLaunchAppActivity(context: Context, packageName: String?) {
-    if (packageName == null) {
-      return
-    }
-    val launcherActivity = getLauncherActivity(packageName)
-    val launchIntent = Intent(Intent.ACTION_MAIN)
-      .addCategory(Intent.CATEGORY_LAUNCHER)
-      .setClassName(packageName, launcherActivity)
-      .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    context.startActivity(launchIntent)
   }
 
   fun getBuildVersionsInfo(
