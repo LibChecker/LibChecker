@@ -1,8 +1,7 @@
-package com.absinthe.libchecker.domain.snapshot.detail.ui.view
+package com.absinthe.libchecker.view
 
 import android.animation.ValueAnimator
 import android.content.Context
-import android.graphics.Bitmap
 import android.graphics.RenderEffect
 import android.graphics.Shader
 import android.graphics.Typeface
@@ -17,18 +16,16 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
-import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.R as MaterialR
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 import kotlin.math.sqrt
 
-class SnapshotCollapsedToolbarView @JvmOverloads constructor(
+class CollapsedToolbarView @JvmOverloads constructor(
   context: Context,
   attrs: AttributeSet? = null
 ) : AViewGroup(context, attrs) {
@@ -71,26 +68,17 @@ class SnapshotCollapsedToolbarView @JvmOverloads constructor(
     applyRevealProgress(0f)
   }
 
-  fun bindAppName(appName: CharSequence) {
+  fun bindTitle(appName: CharSequence) {
     titleView.text = appName
     contentDescription = appName
     requestLayout()
   }
 
-  fun setIconImage(bitmap: Bitmap?) {
-    if (bitmap == null) {
+  fun setIcon(icon: Any?) {
+    if (icon == null) {
       setFallbackIcon()
     } else {
-      iconView.load(bitmap)
-    }
-  }
-
-  fun setIconSource(iconSource: SnapshotPackageIconSource?) {
-    when (iconSource) {
-      is SnapshotPackageIconSource.InstalledPackage -> iconView.load(iconSource.packageInfo)
-
-      SnapshotPackageIconSource.Fallback,
-      null -> setFallbackIcon()
+      iconView.load(icon)
     }
   }
 
@@ -99,7 +87,7 @@ class SnapshotCollapsedToolbarView @JvmOverloads constructor(
   }
 
   fun updateCollapseFraction(collapseFraction: Float) {
-    val shouldReveal = resolveSnapshotCollapsedToolbarVisibility(
+    val shouldReveal = resolveCollapsedToolbarVisibility(
       collapseFraction = collapseFraction,
       currentlyRevealed = revealRequested
     )
@@ -192,7 +180,7 @@ class SnapshotCollapsedToolbarView @JvmOverloads constructor(
 
   private fun applyRevealProgress(progress: Float) {
     revealProgress = progress.coerceIn(0f, 1f)
-    val motion = calculateSnapshotCollapsedToolbarMotion(revealProgress)
+    val motion = calculateCollapsedToolbarMotion(revealProgress)
     visibility = if (revealProgress > 0f) VISIBLE else INVISIBLE
     alpha = motion.alpha
     translationY = ENTRY_TRANSLATION * motion.translationFraction
@@ -243,24 +231,24 @@ class SnapshotCollapsedToolbarView @JvmOverloads constructor(
   }
 }
 
-internal data class SnapshotCollapsedToolbarMotion(
+internal data class CollapsedToolbarMotion(
   val alpha: Float,
   val translationFraction: Float,
   val blurFraction: Float
 )
 
-internal fun calculateSnapshotCollapsedToolbarMotion(progress: Float): SnapshotCollapsedToolbarMotion {
+internal fun calculateCollapsedToolbarMotion(progress: Float): CollapsedToolbarMotion {
   val clampedProgress = progress.coerceIn(0f, 1f)
   val hiddenFraction = 1f - clampedProgress
   val blurFraction = sqrt(hiddenFraction)
-  return SnapshotCollapsedToolbarMotion(
+  return CollapsedToolbarMotion(
     alpha = (clampedProgress * 1.5f).coerceAtMost(1f),
     translationFraction = blurFraction,
     blurFraction = blurFraction
   )
 }
 
-internal fun resolveSnapshotCollapsedToolbarVisibility(
+internal fun resolveCollapsedToolbarVisibility(
   collapseFraction: Float,
   currentlyRevealed: Boolean
 ): Boolean {

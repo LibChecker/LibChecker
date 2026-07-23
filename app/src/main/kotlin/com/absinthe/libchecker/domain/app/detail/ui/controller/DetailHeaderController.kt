@@ -10,11 +10,12 @@ import com.absinthe.libchecker.domain.app.detail.header.DetailHeaderExtraInfoSta
 import com.absinthe.libchecker.domain.app.detail.header.DetailHeaderRenderState
 import com.absinthe.libchecker.domain.app.detail.model.DetailExtraBean
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
-import com.absinthe.libchecker.domain.app.detail.ui.AppBarStateChangeListener
 import com.absinthe.libchecker.domain.app.detail.ui.DetailHeaderBinder
 import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.view.CollapsedToolbarView
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
+import kotlin.math.abs
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -29,6 +30,7 @@ class DetailHeaderController(
   private val supportActionBar: () -> ActionBar?,
   private val collapsingToolbar: CollapsingToolbarLayout,
   private val headerLayout: AppBarLayout,
+  private val collapsedToolbarView: CollapsedToolbarView,
   private val headerBinder: DetailHeaderBinder,
   private val viewModel: DetailViewModel,
   private val coroutineScope: CoroutineScope,
@@ -38,13 +40,19 @@ class DetailHeaderController(
   private var state: DetailHeaderRenderState? = null
   private var applicationInfo: ApplicationInfo? = null
   private var extraInfoJob: Job? = null
-  private val offsetChangedListener = object : AppBarStateChangeListener() {
-    override fun onStateChanged(appBarLayout: AppBarLayout, state: State) {
-      collapsingToolbar.isTitleEnabled = state == State.COLLAPSED
+  private val offsetChangedListener = AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
+    val totalScrollRange = appBarLayout.totalScrollRange
+    val collapseFraction = if (totalScrollRange > 0) {
+      abs(verticalOffset).toFloat() / totalScrollRange
+    } else {
+      0f
     }
+    collapsedToolbarView.updateCollapseFraction(collapseFraction)
+    headerLayout.isLifted = totalScrollRange > 0 && abs(verticalOffset) >= totalScrollRange
   }
 
   init {
+    collapsingToolbar.isTitleEnabled = false
     headerLayout.addOnOffsetChangedListener(offsetChangedListener)
   }
 
@@ -66,7 +74,7 @@ class DetailHeaderController(
       supportActionBar()?.title = null
       collapsingToolbar.also {
         it.setOnApplyWindowInsetsListener(null)
-        it.title = renderState.title.title
+        it.isTitleEnabled = false
       }
       headerBinder.bind(renderState, applicationInfo)
       bindExtraInfo(packageInfo, extraBean, isHarmonyMode, renderState)

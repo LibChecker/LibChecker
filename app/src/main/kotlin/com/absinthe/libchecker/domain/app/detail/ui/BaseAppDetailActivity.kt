@@ -108,6 +108,7 @@ abstract class BaseAppDetailActivity :
   private val headerBinder by unsafeLazy {
     DetailHeaderBinder(
       detailsTitleView = binding.detailsTitle,
+      collapsedToolbarView = binding.collapsedToolbarTitle,
       blurView = binding.collapsingToolbar,
       onAppInfoClick = ::showAppInfoDialog
     )
@@ -118,6 +119,7 @@ abstract class BaseAppDetailActivity :
       supportActionBar = { supportActionBar },
       collapsingToolbar = binding.collapsingToolbar,
       headerLayout = binding.headerLayout,
+      collapsedToolbarView = binding.collapsedToolbarTitle,
       headerBinder = headerBinder,
       viewModel = viewModel,
       coroutineScope = lifecycleScope,

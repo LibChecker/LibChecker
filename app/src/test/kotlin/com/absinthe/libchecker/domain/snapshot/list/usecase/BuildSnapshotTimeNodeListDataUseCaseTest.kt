@@ -18,6 +18,26 @@ import org.junit.Test
 class BuildSnapshotTimeNodeListDataUseCaseTest {
 
   @Test
+  fun ignoresUninstalledPackageRecordsWhenResolvingIcons() = runBlocking {
+    val installedPackage = PackageInfo().apply { packageName = "com.example.installed" }
+    val uninstalledPackage = PackageInfo().apply { packageName = "com.example.uninstalled" }
+    val useCase = GetSnapshotPackageIconSourcesUseCase(
+      installedAppRepository = FakeInstalledAppRepository(
+        applications = mapOf(installedPackage.packageName to installedPackage),
+        packageInfos = mapOf(
+          installedPackage.packageName to installedPackage,
+          uninstalledPackage.packageName to uninstalledPackage
+        )
+      )
+    )
+
+    val result = useCase(listOf(installedPackage.packageName, uninstalledPackage.packageName))
+
+    assertEquals(SnapshotPackageIconSource.InstalledPackage(installedPackage), result[installedPackage.packageName])
+    assertEquals(SnapshotPackageIconSource.Fallback, result[uninstalledPackage.packageName])
+  }
+
+  @Test
   fun buildsTimeNodeDisplayTextAndDescription() = runBlocking {
     val useCase = BuildSnapshotTimeNodeListDataUseCase(
       getSnapshotPackageIconSources = GetSnapshotPackageIconSourcesUseCase(
@@ -54,13 +74,16 @@ class BuildSnapshotTimeNodeListDataUseCaseTest {
   }
 }
 
-private class FakeInstalledAppRepository : InstalledAppRepository {
+private class FakeInstalledAppRepository(
+  private val applications: Map<String, PackageInfo> = emptyMap(),
+  private val packageInfos: Map<String, PackageInfo> = emptyMap()
+) : InstalledAppRepository {
 
   override val packageChanges: SharedFlow<PackageChangeState> = MutableSharedFlow()
 
   override fun getApplicationList(forceUpdate: Boolean): List<PackageInfo> = emptyList()
 
-  override fun getApplicationMap(forceUpdate: Boolean): Map<String, PackageInfo> = emptyMap()
+  override fun getApplicationMap(forceUpdate: Boolean): Map<String, PackageInfo> = applications
 
   override fun getApplicationCount(forceUpdate: Boolean): Int = 0
 
@@ -76,7 +99,7 @@ private class FakeInstalledAppRepository : InstalledAppRepository {
     packageName: String,
     flags: Int,
     resolveFrozenArchiveInfo: Boolean
-  ): PackageInfo? = null
+  ): PackageInfo? = packageInfos[packageName]
 
   override fun isPackageInstalled(packageName: String): Boolean = false
 

@@ -6,9 +6,7 @@ import android.view.Gravity
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
-import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.appcompat.widget.Toolbar
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -38,13 +36,13 @@ import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.clickActio
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.longClickAction
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.toSnapshotTitleNode
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.toRenderState
-import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotCollapsedToolbarView
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailDeletedView
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailNewInstallView
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotEmptyView
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotTitleDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
+import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
@@ -77,7 +75,6 @@ class SnapshotDetailActivity :
   private val adapter by lazy { SnapshotDetailAdapter() }
   private val viewModel: SnapshotViewModel by viewModel()
   private val buildSnapshotTitleDisplayData: BuildSnapshotTitleDisplayDataUseCase by inject()
-  private val collapsedToolbarView by lazy { SnapshotCollapsedToolbarView(this) }
   private val _entity by unsafeLazy {
     IntentCompat.getSerializableExtra<SnapshotDiffItem>(
       intent,
@@ -131,7 +128,6 @@ class SnapshotDetailActivity :
       setDisplayShowHomeEnabled(true)
       title = null
     }
-    setupCollapsedToolbar()
 
     binding.apply {
       collapsingToolbar.also {
@@ -145,7 +141,7 @@ class SnapshotDetailActivity :
         } else {
           0f
         }
-        collapsedToolbarView.updateCollapseFraction(collapseFraction)
+        binding.collapsedToolbarTitle.updateCollapseFraction(collapseFraction)
         headerLayout.isLifted = totalScrollRange > 0 && abs(verticalOffset) >= totalScrollRange
       }
       list.apply {
@@ -171,7 +167,7 @@ class SnapshotDetailActivity :
         )
       )
       snapshotTitle.render(snapshotTitleDisplayData.toRenderState())
-      collapsedToolbarView.bindAppName(snapshotTitleDisplayData.appName)
+      binding.collapsedToolbarTitle.bindTitle(snapshotTitleDisplayData.appName)
     }
 
     adapter.stateView =
@@ -277,38 +273,27 @@ class SnapshotDetailActivity :
     val snapshotIcon = _icon?.takeIf { entity.packageName.contains("/") }
     if (snapshotIcon != null) {
       binding.snapshotTitle.setIconImage(snapshotIcon)
-      collapsedToolbarView.setIconImage(snapshotIcon)
+      binding.collapsedToolbarTitle.setIcon(snapshotIcon)
       return
     }
 
     binding.snapshotTitle.setFallbackIcon()
-    collapsedToolbarView.setFallbackIcon()
+    binding.collapsedToolbarTitle.setFallbackIcon()
     lifecycleScope.launch {
       when (val iconSource = viewModel.getSnapshotPackageIconSources(listOf(entity.packageName))[entity.packageName]) {
         null -> {
           binding.snapshotTitle.setFallbackIcon()
-          collapsedToolbarView.setFallbackIcon()
+          binding.collapsedToolbarTitle.setFallbackIcon()
         }
 
         else -> {
           binding.snapshotTitle.setIconSource(iconSource)
-          collapsedToolbarView.setIconSource(iconSource)
+          binding.collapsedToolbarTitle.setIcon(
+            (iconSource as? SnapshotPackageIconSource.InstalledPackage)?.packageInfo
+          )
         }
       }
     }
-  }
-
-  private fun setupCollapsedToolbar() {
-    if (collapsedToolbarView.parent != null) return
-    binding.toolbar.addView(
-      collapsedToolbarView,
-      Toolbar.LayoutParams(
-        ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.MATCH_PARENT
-      ).apply {
-        gravity = Gravity.START or Gravity.CENTER_VERTICAL
-      }
-    )
   }
 
   private fun generateReport() {
