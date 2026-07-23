@@ -12,7 +12,6 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.list.export.ExportAppListToUriUseCase
 import com.absinthe.libchecker.domain.app.list.export.ExportAppListUseCase
 import com.absinthe.libchecker.domain.app.list.model.AppListItemViewState
-import com.absinthe.libchecker.domain.app.list.usecase.AppListItemsEquivalenceUseCase
 import com.absinthe.libchecker.domain.app.list.usecase.BuildAppListItemViewStatesUseCase
 import com.absinthe.libchecker.domain.app.list.usecase.BuildAppListUpdatePlanUseCase
 import com.absinthe.libchecker.domain.app.list.usecase.GetAppListContentUseCase
@@ -52,13 +51,12 @@ class HomeViewModel(
   private val handleAppListSearchCommandUseCase: HandleAppListSearchCommandUseCase,
   private val appListSettingsRepository: AppListSettingsRepository,
   private val clearApkCacheUseCase: ClearApkCacheUseCase,
-  appListItemsEquivalenceUseCase: AppListItemsEquivalenceUseCase,
   observeAppListLoadingUseCase: ObserveAppListLoadingUseCase
 ) : ViewModel() {
 
   val dbItemsFlow: Flow<List<LCItem>> = appListRepository.items
   val displayItemsFlow: Flow<List<LCItem>> =
-    appListRepository.items.distinctUntilChanged(appListItemsEquivalenceUseCase::invoke)
+    appListRepository.items.distinctUntilChanged(::areAppListItemsEquivalent)
   val packageChanges = installedAppRepository.packageChanges
   val appListDisplayOptionsChanges = appListSettingsRepository.displayOptionsChanges
 
@@ -473,6 +471,20 @@ class HomeViewModel(
 
   fun clearMenuState() {
     toolbarSearchMenuState = ToolbarSearchMenuState()
+  }
+}
+
+private fun areAppListItemsEquivalent(old: List<LCItem>, new: List<LCItem>): Boolean {
+  return old.size == new.size && old.zip(new).all { (oldItem, newItem) ->
+    oldItem.packageName == newItem.packageName &&
+      oldItem.label == newItem.label &&
+      oldItem.versionName == newItem.versionName &&
+      oldItem.versionCode == newItem.versionCode &&
+      oldItem.lastUpdatedTime == newItem.lastUpdatedTime &&
+      oldItem.isSystem == newItem.isSystem &&
+      oldItem.abi == newItem.abi &&
+      oldItem.targetApi == newItem.targetApi &&
+      oldItem.variant == newItem.variant
   }
 }
 

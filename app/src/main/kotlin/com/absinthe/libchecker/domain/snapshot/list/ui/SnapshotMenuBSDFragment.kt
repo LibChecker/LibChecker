@@ -1,6 +1,8 @@
 package com.absinthe.libchecker.domain.snapshot.list.ui
 
 import android.content.DialogInterface
+import android.os.Build
+import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.SnapshotOptions
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemCardPresentation
@@ -10,8 +12,9 @@ import com.absinthe.libchecker.domain.snapshot.list.model.buildSnapshotMenuBotto
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
 import com.absinthe.libchecker.domain.snapshot.list.ui.view.SnapshotMenuBSDView
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotItemDisplayDataUseCase
-import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotMenuDemoItemUseCase
+import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
+import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.supportIECUnit
@@ -23,10 +26,7 @@ class SnapshotMenuBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotMenuBS
 
   private val viewModel: SnapshotViewModel by activityViewModel()
   private val buildSnapshotItemDisplayData: BuildSnapshotItemDisplayDataUseCase by inject()
-  private val buildSnapshotMenuDemoItem: BuildSnapshotMenuDemoItemUseCase by inject()
-  private val demoItem by lazy(LazyThreadSafetyMode.NONE) {
-    buildSnapshotMenuDemoItem()
-  }
+  private val demoItem by lazy(LazyThreadSafetyMode.NONE, ::buildDemoItem)
   private var previousAdvancedOptions: Int = 0
 
   private var onDismissCallback: (optionsDiff: Int) -> Unit = {}
@@ -106,6 +106,33 @@ class SnapshotMenuBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotMenuBS
         emphasizeDiffs = (options and SnapshotOptions.DIFF_EMPHASIS) > 0,
         highlightText = ""
       )
+    )
+  }
+
+  private fun buildDemoItem(): SnapshotDiffItem {
+    val sdkInt = Build.VERSION.SDK_INT
+    return SnapshotDiffItem(
+      packageName = Constants.EXAMPLE_PACKAGE,
+      updateTime = System.currentTimeMillis(),
+      labelDiff = SnapshotDiffItem.DiffNode(DateUtils.getCurrentSeasonString(), DateUtils.getNextSeasonString()),
+      versionNameDiff = SnapshotDiffItem.DiffNode("2020.3.19", DateUtils.getToday()),
+      versionCodeDiff = SnapshotDiffItem.DiffNode(1120, BuildConfig.VERSION_CODE.toLong()),
+      abiDiff = SnapshotDiffItem.DiffNode(Constants.ARMV7.toShort(), Constants.ARMV8.toShort()),
+      targetApiDiff = SnapshotDiffItem.DiffNode((sdkInt - 1).toShort(), sdkInt.toShort()),
+      compileSdkDiff = SnapshotDiffItem.DiffNode((sdkInt - 1).toShort(), sdkInt.toShort()),
+      minSdkDiff = SnapshotDiffItem.DiffNode((sdkInt - 11).toShort(), (sdkInt - 10).toShort()),
+      packageSizeDiff = SnapshotDiffItem.DiffNode(12345678L, 87654321L),
+      nativeLibsDiff = SnapshotDiffItem.DiffNode(""),
+      servicesDiff = SnapshotDiffItem.DiffNode(""),
+      activitiesDiff = SnapshotDiffItem.DiffNode(""),
+      receiversDiff = SnapshotDiffItem.DiffNode(""),
+      providersDiff = SnapshotDiffItem.DiffNode(""),
+      permissionsDiff = SnapshotDiffItem.DiffNode(""),
+      metadataDiff = SnapshotDiffItem.DiffNode(""),
+      added = 100,
+      removed = 100,
+      changed = 100,
+      moved = 100
     )
   }
 }

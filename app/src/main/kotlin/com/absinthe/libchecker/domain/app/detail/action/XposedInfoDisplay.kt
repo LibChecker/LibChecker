@@ -7,25 +7,23 @@ import com.absinthe.libchecker.domain.app.detail.model.XposedInfoBottomSheetDisp
 import com.absinthe.libchecker.domain.app.detail.model.XposedInfoItemDisplay
 import com.absinthe.libchecker.domain.app.detail.model.XposedInfoTextStyle
 
-class BuildXposedInfoBottomSheetDisplayUseCase(
-  private val context: Context
-) {
+fun buildXposedInfoBottomSheetDisplay(
+  context: Context,
+  info: XposedModuleInfo
+): XposedInfoBottomSheetDisplay {
+  return buildXposedInfoBottomSheetDisplay(info, context.displayStrings())
+}
 
-  operator fun invoke(info: XposedModuleInfo): XposedInfoBottomSheetDisplay {
-    return buildXposedInfoBottomSheetDisplay(info, context.displayStrings())
-  }
-
-  private fun Context.displayStrings(): XposedInfoDisplayStrings {
-    return XposedInfoDisplayStrings(
-      minVersion = getString(R.string.lib_detail_xposed_min_version),
-      targetVersion = getString(R.string.lib_detail_xposed_target_version),
-      staticScope = getString(R.string.lib_detail_xposed_static_scope),
-      defaultScope = getString(R.string.lib_detail_xposed_default_scope),
-      initClass = getString(R.string.lib_detail_xposed_init_class),
-      description = getString(R.string.lib_detail_description_tip),
-      trueValue = "True"
-    )
-  }
+private fun Context.displayStrings(): XposedInfoDisplayStrings {
+  return XposedInfoDisplayStrings(
+    minVersion = getString(R.string.lib_detail_xposed_min_version),
+    targetVersion = getString(R.string.lib_detail_xposed_target_version),
+    staticScope = getString(R.string.lib_detail_xposed_static_scope),
+    defaultScope = getString(R.string.lib_detail_xposed_default_scope),
+    initClass = getString(R.string.lib_detail_xposed_init_class),
+    description = getString(R.string.lib_detail_description_tip),
+    trueValue = "True"
+  )
 }
 
 internal data class XposedInfoDisplayStrings(

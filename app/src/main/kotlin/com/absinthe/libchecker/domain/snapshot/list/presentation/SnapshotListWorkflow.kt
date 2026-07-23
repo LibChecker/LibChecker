@@ -24,7 +24,6 @@ import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotSystemP
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotTimeNodeListDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.DeleteSnapshotTimeStampUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.GetSnapshotPackageIconSourcesUseCase
-import com.absinthe.libchecker.domain.snapshot.list.usecase.UpdateSnapshotDiffItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.domain.snapshot.selection.SnapshotSelection
@@ -52,7 +51,6 @@ class SnapshotListWorkflow(
   private val snapshotSelection: SnapshotSelection,
   private val snapshotSettingsRepository: SnapshotSettingsRepository,
   private val updateSnapshotAutoRemoveThresholdUseCase: UpdateSnapshotAutoRemoveThresholdUseCase,
-  private val updateSnapshotDiffItemsUseCase: UpdateSnapshotDiffItemsUseCase,
   private val snapshotTrackChangeRepository: SnapshotTrackChangeRepository
 ) {
 
@@ -215,22 +213,18 @@ class SnapshotListWorkflow(
   fun applyDiffItemChange(
     item: SnapshotDiffItem
   ): List<SnapshotDiffItem> {
-    val result = updateSnapshotDiffItemsUseCase.applyChange(snapshotDiffItems, item)
-    trackPendingRemovals(result)
-    snapshotDiffItems = result.items
-    return result.items
+    snapshotDiffItems = snapshotDiffItems.filterNot { it.packageName == item.packageName } + item
+    if (item.deleted) {
+      pendingParticleRemovePackageNames += item.packageName
+    }
+    return snapshotDiffItems
   }
 
   fun applyDiffItemRemove(
     packageName: String
   ): List<SnapshotDiffItem> {
-    val result = updateSnapshotDiffItemsUseCase.applyRemove(snapshotDiffItems, packageName)
-    trackPendingRemovals(result)
-    snapshotDiffItems = result.items
-    return result.items
-  }
-
-  private fun trackPendingRemovals(result: UpdateSnapshotDiffItemsUseCase.Result) {
-    pendingParticleRemovePackageNames += result.pendingRemovePackageNames
+    snapshotDiffItems = snapshotDiffItems.filterNot { it.packageName == packageName }
+    pendingParticleRemovePackageNames += packageName
+    return snapshotDiffItems
   }
 }

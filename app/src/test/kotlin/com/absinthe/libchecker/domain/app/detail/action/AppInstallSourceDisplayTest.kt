@@ -12,7 +12,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Test
 
-class BuildAppInstallSourceBottomSheetDisplayUseCaseTest {
+class AppInstallSourceDisplayTest {
 
   @Test
   fun `builds related requester and unknown installer rows`() {
@@ -135,7 +135,7 @@ class BuildAppInstallSourceBottomSheetDisplayUseCaseTest {
     installingApp: RelatedAppDisplayData? = null,
     requesterAccess: AppInstallSourceRequesterAccess
   ) = buildAppInstallSourceBottomSheetDisplay(
-    request = BuildAppInstallSourceBottomSheetDisplayUseCase.Request(
+    request = AppInstallSourceDisplayRequest(
       details = details,
       originatingApp = originatingApp,
       installingApp = installingApp,

@@ -38,11 +38,13 @@ import com.absinthe.libchecker.domain.snapshot.detail.ui.SnapshotDetailActivity
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotEmptyView
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotCapturePlan
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotDashboardAction
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotDashboardDisplayData
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotSystemPropDisplayData
+import com.absinthe.libchecker.domain.snapshot.list.model.buildSnapshotDashboardDescription
+import com.absinthe.libchecker.domain.snapshot.list.model.buildSnapshotDashboardTimestampDescription
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
 import com.absinthe.libchecker.domain.snapshot.list.ui.adapter.SnapshotAdapter
 import com.absinthe.libchecker.domain.snapshot.list.ui.view.SnapshotDashboardView
-import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotDashboardDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.timenode.ui.TimeNodeBottomSheetDialogFragment
@@ -63,6 +65,7 @@ import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
+import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
@@ -84,7 +87,6 @@ class SnapshotFragment :
   private val viewModel: SnapshotViewModel by activityViewModel()
   private val getRandomAppIcon: GetRandomAppIconUseCase by inject()
   private val buildSnapshotItemDisplayData: BuildSnapshotItemDisplayDataUseCase by inject()
-  private val buildSnapshotDashboardDisplayData: BuildSnapshotDashboardDisplayDataUseCase by inject()
   private val adapter by lazy(LazyThreadSafetyMode.NONE) {
     SnapshotAdapter(buildSnapshotItemDisplayData)
   }
@@ -162,12 +164,10 @@ class SnapshotFragment :
     }
     fun renderDashboard() {
       dashboard.bind(
-        data = buildSnapshotDashboardDisplayData(
-          BuildSnapshotDashboardDisplayDataUseCase.Request(
-            timestampText = dashboardTimestampText,
-            appsCountText = dashboardAppsCountText,
-            systemProps = dashboardSystemProps
-          )
+        data = buildDashboardDisplayData(
+          timestampText = dashboardTimestampText,
+          appsCountText = dashboardAppsCountText,
+          systemProps = dashboardSystemProps
         ),
         onAction = ::handleDashboardAction
       )
@@ -283,10 +283,7 @@ class SnapshotFragment :
     viewModel.effect.onEach {
       when (it) {
         is SnapshotViewModel.Effect.DashboardCountChange -> {
-          dashboardAppsCountText = buildSnapshotDashboardDisplayData.formatAppsCount(
-            snapshotCount = it.snapshotCount,
-            appCount = it.appCount
-          )
+          dashboardAppsCountText = String.format(Locale.getDefault(), "%d / %d", it.snapshotCount, it.appCount)
           renderDashboard()
         }
 
@@ -299,7 +296,7 @@ class SnapshotFragment :
               renderDashboard()
             }
           } else {
-            dashboardTimestampText = buildSnapshotDashboardDisplayData.noSnapshotTimestampText()
+            dashboardTimestampText = getString(R.string.snapshot_none)
             dashboardSystemProps = emptyList()
             renderDashboard()
             viewModel.clearSnapshotDiffItems()
@@ -588,5 +585,27 @@ class SnapshotFragment :
         onSystemPropsReady(displayedSystemProps)
       }
     }
+  }
+
+  private fun buildDashboardDisplayData(
+    timestampText: CharSequence,
+    appsCountText: CharSequence,
+    systemProps: List<SnapshotSystemPropDisplayData>
+  ): SnapshotDashboardDisplayData {
+    return SnapshotDashboardDisplayData(
+      timestampText = timestampText,
+      appsCountText = appsCountText,
+      systemProps = systemProps,
+      contentDescription = buildSnapshotDashboardDescription(
+        timestampTitle = getString(R.string.snapshot_current_timestamp),
+        timestampText = timestampText,
+        appsCountTitle = getString(R.string.snapshot_apps_count),
+        appsCountText = appsCountText
+      ),
+      timestampContentDescription = buildSnapshotDashboardTimestampDescription(
+        actionTitle = getString(R.string.dialog_title_change_timestamp),
+        timestampText = timestampText
+      )
+    )
   }
 }

@@ -6,7 +6,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 
-class BuildXposedInfoBottomSheetDisplayUseCaseTest {
+class XposedInfoDisplayTest {
 
   @Test
   fun `builds every available module detail in display order`() {

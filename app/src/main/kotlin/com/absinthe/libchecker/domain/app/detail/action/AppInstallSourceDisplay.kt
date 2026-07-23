@@ -10,44 +10,42 @@ import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceRequester
 import com.absinthe.libchecker.domain.app.detail.related.RelatedAppDisplayData
 import com.absinthe.libchecker.domain.app.list.model.buildAppListItemDescription
 
-class BuildAppInstallSourceBottomSheetDisplayUseCase(
-  private val context: Context
-) {
+fun buildAppInstallSourceBottomSheetDisplay(
+  context: Context,
+  request: AppInstallSourceDisplayRequest
+): AppInstallSourceBottomSheetDisplay {
+  return buildAppInstallSourceBottomSheetDisplay(request, context.displayStrings())
+}
 
-  operator fun invoke(request: Request): AppInstallSourceBottomSheetDisplay {
-    return buildAppInstallSourceBottomSheetDisplay(request, context.displayStrings())
-  }
+data class AppInstallSourceDisplayRequest(
+  val details: AppInstallSourceDetails,
+  val originatingApp: RelatedAppDisplayData?,
+  val installingApp: RelatedAppDisplayData?,
+  val requesterAccess: AppInstallSourceRequesterAccess
+)
 
-  data class Request(
-    val details: AppInstallSourceDetails,
-    val originatingApp: RelatedAppDisplayData?,
-    val installingApp: RelatedAppDisplayData?,
-    val requesterAccess: AppInstallSourceRequesterAccess
-  )
-
-  private fun Context.displayStrings(): AppInstallSourceDisplayStrings {
-    return AppInstallSourceDisplayStrings(
-      originatingTitle = getString(R.string.lib_detail_app_install_source_originating_package),
-      installingTitle = getString(R.string.lib_detail_app_install_source_installing_package),
-      unknownAppName = getString(R.string.lib_detail_app_install_source_empty),
-      unknownPackageDescription = getString(R.string.lib_detail_app_install_source_empty_detail),
-      shizukuUsage = getString(R.string.lib_detail_app_install_source_shizuku_usage),
-      shizukuPrompts = mapOf(
-        AppInstallSourceRequesterAccess.ShizukuNotRunning to ShizukuPromptStrings(
-          appName = getString(R.string.lib_detail_app_install_source_shizuku_unavailable),
-          detail = getString(R.string.lib_detail_app_install_source_shizuku_unavailable_detail)
-        ),
-        AppInstallSourceRequesterAccess.ShizukuLowVersion to ShizukuPromptStrings(
-          appName = getString(R.string.lib_detail_app_install_source_shizuku_api_too_old),
-          detail = getString(R.string.lib_detail_app_install_source_shizuku_api_too_old_detail)
-        ),
-        AppInstallSourceRequesterAccess.ShizukuPermissionDenied to ShizukuPromptStrings(
-          appName = getString(R.string.lib_detail_app_install_source_shizuku_permission_not_granted),
-          detail = getString(R.string.lib_detail_app_install_source_shizuku_permission_not_granted_detail)
-        )
+private fun Context.displayStrings(): AppInstallSourceDisplayStrings {
+  return AppInstallSourceDisplayStrings(
+    originatingTitle = getString(R.string.lib_detail_app_install_source_originating_package),
+    installingTitle = getString(R.string.lib_detail_app_install_source_installing_package),
+    unknownAppName = getString(R.string.lib_detail_app_install_source_empty),
+    unknownPackageDescription = getString(R.string.lib_detail_app_install_source_empty_detail),
+    shizukuUsage = getString(R.string.lib_detail_app_install_source_shizuku_usage),
+    shizukuPrompts = mapOf(
+      AppInstallSourceRequesterAccess.ShizukuNotRunning to ShizukuPromptStrings(
+        appName = getString(R.string.lib_detail_app_install_source_shizuku_unavailable),
+        detail = getString(R.string.lib_detail_app_install_source_shizuku_unavailable_detail)
+      ),
+      AppInstallSourceRequesterAccess.ShizukuLowVersion to ShizukuPromptStrings(
+        appName = getString(R.string.lib_detail_app_install_source_shizuku_api_too_old),
+        detail = getString(R.string.lib_detail_app_install_source_shizuku_api_too_old_detail)
+      ),
+      AppInstallSourceRequesterAccess.ShizukuPermissionDenied to ShizukuPromptStrings(
+        appName = getString(R.string.lib_detail_app_install_source_shizuku_permission_not_granted),
+        detail = getString(R.string.lib_detail_app_install_source_shizuku_permission_not_granted_detail)
       )
     )
-  }
+  )
 }
 
 internal data class AppInstallSourceDisplayStrings(
@@ -65,7 +63,7 @@ internal data class ShizukuPromptStrings(
 )
 
 internal fun buildAppInstallSourceBottomSheetDisplay(
-  request: BuildAppInstallSourceBottomSheetDisplayUseCase.Request,
+  request: AppInstallSourceDisplayRequest,
   strings: AppInstallSourceDisplayStrings
 ): AppInstallSourceBottomSheetDisplay {
   val installSource = request.details.installSource
