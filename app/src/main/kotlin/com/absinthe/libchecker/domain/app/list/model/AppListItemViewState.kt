@@ -53,7 +53,7 @@ data class AppListItemViewState(
       return AppListItemViewState(
         packageInfo = packageState.packageInfo,
         isPackageMissing = packageState.packageInfo == null && item.packageName != Constants.EXAMPLE_PACKAGE,
-        versionInfo = PackageUtils.getVersionString(item.versionName, item.versionCode),
+        versionInfo = "${item.versionName} (${item.versionCode})",
         abiInfo = abiInfo,
         accessibilityAbiInfo = accessibilityAbiInfo,
         useDetachedAbiBadges = shouldUseDetachedAbiBadges(options),

@@ -76,9 +76,10 @@ class HomeViewModel(
   private var pendingReturnTopAfterRequestChange = false
   private var hasUserScrolledAppList = false
   private var appListSearchKeyword: String = ""
+  private var workerBinder: IWorkerService? = null
+  private var pendingFeatureInitializationRequest = false
 
   private val appListChangeRequestQueue = AppListChangeRequestQueue()
-  private val featureInitializationController = WorkerFeatureInitializationController()
 
   fun reloadApps() {
     if (appListStatus != STATUS_NOT_START || (initJob?.isActive == false && requestChangeJob?.isActive == false)) {
@@ -104,19 +105,31 @@ class HomeViewModel(
   }
 
   fun connectWorkerBinder(binder: IWorkerService) {
-    featureInitializationController.connect(binder, appListStatus)
+    workerBinder = binder
+    if (pendingFeatureInitializationRequest) {
+      requestFeatureInitialization()
+    }
   }
 
   fun disconnectWorkerBinder() {
-    featureInitializationController.disconnect()
+    workerBinder = null
   }
 
   fun requestFeatureInitialization() {
-    featureInitializationController.request(appListStatus)
-  }
-
-  fun getWorkerLastPackageChangedTime(): Long? {
-    return featureInitializationController.getLastPackageChangedTime()
+    val activeBinder = workerBinder ?: run {
+      pendingFeatureInitializationRequest = true
+      return
+    }
+    if (appListStatus == STATUS_START_INIT || appListStatus == STATUS_START_REQUEST_CHANGE) {
+      pendingFeatureInitializationRequest = true
+      return
+    }
+    pendingFeatureInitializationRequest = false
+    runCatching {
+      activeBinder.initFeatures()
+    }.onFailure {
+      Timber.w(it, "requestFeatureInitialization failed")
+    }
   }
 
   private fun updateInitProgress(progress: Int) {

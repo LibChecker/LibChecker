@@ -16,7 +16,6 @@ import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotMenuDem
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotSystemPropDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotTimeNodeListDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.DeleteSnapshotTimeStampUseCase
-import com.absinthe.libchecker.domain.snapshot.list.usecase.GetApexPackageNamesUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.GetSnapshotPackageIconSourcesUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.GetSnapshotSystemPropDiffsUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.UpdateSnapshotDiffItemsUseCase
@@ -28,7 +27,6 @@ val snapshotListModule = module {
   factory { CaptureInstalledSnapshotUseCase(androidContext().packageManager, get(), get(), get(), get(), get()) }
   factory { SnapshotDetailSectionBuilder(androidContext(), get()) }
   factory { BuildSnapshotTitleDisplayDataUseCase(androidContext()) }
-  factory { GetApexPackageNamesUseCase(get()) }
   factory { BuildSnapshotCapturePlanUseCase(get()) }
   factory { BuildSnapshotDashboardDisplayDataUseCase(androidContext()) }
   factory { BuildSnapshotItemDisplayDataUseCase(androidContext(), get(), get()) }

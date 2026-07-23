@@ -11,21 +11,15 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.LayoutInflater
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
-import android.view.animation.Interpolator
-import androidx.annotation.AnimRes
 import androidx.annotation.ArrayRes
 import androidx.annotation.AttrRes
 import androidx.annotation.BoolRes
 import androidx.annotation.DimenRes
 import androidx.annotation.Dimension
 import androidx.annotation.IntegerRes
-import androidx.annotation.InterpolatorRes
 import androidx.annotation.PluralsRes
 import androidx.annotation.StyleRes
 import androidx.annotation.StyleableRes
-import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.TintTypedArray
 import androidx.core.content.res.ResourcesCompat
 import java.io.File
@@ -49,8 +43,6 @@ fun Context.requireAvailableCacheDir(): File {
   return cacheDir
 }
 
-fun Context.getAnimation(@AnimRes id: Int): Animation = AnimationUtils.loadAnimation(this, id)
-
 fun Context.getBoolean(@BoolRes id: Int) = resources.getBoolean(id)
 
 fun Context.getDimension(@DimenRes id: Int) = resources.getDimension(id)
@@ -62,8 +54,6 @@ fun Context.getDimensionPixelSize(@DimenRes id: Int) = resources.getDimensionPix
 fun Context.getFloat(@DimenRes id: Int) = resources.getFloatCompat(id)
 
 fun Context.getInteger(@IntegerRes id: Int) = resources.getInteger(id)
-
-fun Context.getInterpolator(@InterpolatorRes id: Int): Interpolator = AnimationUtils.loadInterpolator(this, id)
 
 fun Context.getQuantityString(@PluralsRes id: Int, quantity: Int): String = resources.getQuantityString(id, quantity)
 
@@ -82,21 +72,7 @@ fun Context.getColorByAttr(@AttrRes attr: Int): Int = getColorStateListByAttr(at
 fun Context.getColorStateListByAttr(@AttrRes attr: Int): ColorStateList = obtainStyledAttributesCompat(attrs = intArrayOf(attr)).use { it.getColorStateList(0) }
 
 @SuppressLint("RestrictedApi")
-fun Context.getDimensionByAttr(@AttrRes attr: Int): Float = obtainStyledAttributesCompat(attrs = intArrayOf(attr)).use { it.getDimension(0, 0f) }
-
-@SuppressLint("RestrictedApi")
-fun Context.getDimensionPixelOffsetByAttr(@AttrRes attr: Int): Int = obtainStyledAttributesCompat(attrs = intArrayOf(attr)).use {
-  it.getDimensionPixelOffset(0, 0)
-}
-
-@SuppressLint("RestrictedApi")
-fun Context.getDimensionPixelSizeByAttr(@AttrRes attr: Int): Int = obtainStyledAttributesCompat(attrs = intArrayOf(attr)).use { it.getDimensionPixelSize(0, 0) }
-
-@SuppressLint("RestrictedApi")
 fun Context.getDrawableByAttr(@AttrRes attr: Int): Drawable = obtainStyledAttributesCompat(attrs = intArrayOf(attr)).use { it.getDrawable(0) }
-
-@SuppressLint("RestrictedApi")
-fun Context.getFloatByAttr(@AttrRes attr: Int): Float = obtainStyledAttributesCompat(attrs = intArrayOf(attr)).use { it.getFloat(0, 0f) }
 
 @SuppressLint("RestrictedApi")
 fun Context.getResourceIdByAttr(@AttrRes attr: Int): Int = obtainStyledAttributesCompat(attrs = intArrayOf(attr)).use { it.getResourceId(0, 0) }
@@ -167,8 +143,6 @@ val Context.isLightTheme: Boolean
 
 val Context.layoutInflater: LayoutInflater
   get() = LayoutInflater.from(this)
-
-fun Context.withTheme(@StyleRes themeRes: Int): Context = if (themeRes != 0) ContextThemeWrapper(this, themeRes) else this
 
 fun Resources.getFloatCompat(@DimenRes id: Int) = ResourcesCompat.getFloat(this, id)
 

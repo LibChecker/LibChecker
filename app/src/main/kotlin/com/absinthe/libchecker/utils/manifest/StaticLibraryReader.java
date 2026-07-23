@@ -56,18 +56,6 @@ public class StaticLibraryReader {
     return null;
   }
 
-  public static int extractIntPart(String str) {
-    int result = 0, length = str.length();
-    for (int offset = 0; offset < length; offset++) {
-      char c = str.charAt(offset);
-      if ('0' <= c && c <= '9')
-        result = result * 10 + (c - '0');
-      else
-        break;
-    }
-    return result;
-  }
-
   private class ManifestTagVisitor extends NodeVisitor {
     public ManifestTagVisitor(NodeVisitor child) {
       super(child);

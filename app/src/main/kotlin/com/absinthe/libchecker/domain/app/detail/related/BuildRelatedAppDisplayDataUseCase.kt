@@ -34,7 +34,7 @@ class BuildRelatedAppDisplayDataUseCase(
       packageInfo = packageInfo,
       packageName = packageName,
       label = item.label,
-      versionInfo = PackageUtils.getVersionString(item.versionName, item.versionCode),
+      versionInfo = "${item.versionName} (${item.versionCode})",
       abiInfo = buildString {
         append(PackageUtils.getAbiString(context, abi, true))
         append(

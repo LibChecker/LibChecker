@@ -70,8 +70,6 @@ class DetailViewModel(
   private val _appInstallSourceDetailsResults = MutableSharedFlow<AppInstallSourceDetailsResult>()
   val appInstallSourceDetailsResults: SharedFlow<AppInstallSourceDetailsResult> =
     _appInstallSourceDetailsResults.asSharedFlow()
-  private val _appLaunchActionResults = MutableSharedFlow<AppLaunchActionResult>()
-  val appLaunchActionResults: SharedFlow<AppLaunchActionResult> = _appLaunchActionResults.asSharedFlow()
   private val _appPackageShareActionResults = MutableSharedFlow<AppPackageShareActionResult>()
   val appPackageShareActionResults: SharedFlow<AppPackageShareActionResult> =
     _appPackageShareActionResults.asSharedFlow()
@@ -95,7 +93,6 @@ class DetailViewModel(
   private var apkAnalysisPackageJob: Job? = null
   private var apkPreviewJob: Job? = null
   private var appInstallSourceDetailsJob: Job? = null
-  private var appLaunchActionJob: Job? = null
   private var appPackageShareActionJob: Job? = null
   private var appPackageShareExportJob: Job? = null
   private var nativeLibraryExtractionJob: Job? = null
@@ -202,23 +199,6 @@ class DetailViewModel(
   data class AppInstallSourceDetailsResult(
     val packageName: String,
     val display: AppInstallSourceBottomSheetDisplay?
-  )
-
-  fun loadAppLaunchAction(packageName: String?) {
-    appLaunchActionJob?.cancel()
-    appLaunchActionJob = viewModelScope.launch {
-      _appLaunchActionResults.emit(
-        AppLaunchActionResult(
-          packageName = packageName,
-          action = detailActionLoader.getAppLaunchAction(packageName)
-        )
-      )
-    }
-  }
-
-  data class AppLaunchActionResult(
-    val packageName: String?,
-    val action: AppLaunchAction?
   )
 
   fun prepareAppPackageShareAction(

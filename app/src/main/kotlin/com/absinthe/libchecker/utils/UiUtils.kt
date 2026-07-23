@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.PorterDuff
@@ -49,14 +48,6 @@ object UiUtils {
     val b = range.random()
 
     return String.format("#%02x%02x%02x", r, g, b).toColorInt()
-  }
-
-  fun isDarkColor(@ColorInt color: Int): Boolean {
-    val r = Color.red(color)
-    val g = Color.green(color)
-    val b = Color.blue(color)
-    val brightness = (r * 299 + g * 587 + b * 114) / 1000
-    return brightness >= 192
   }
 
   fun getNightMode(): Int {

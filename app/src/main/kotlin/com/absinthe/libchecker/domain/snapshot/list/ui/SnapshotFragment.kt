@@ -349,9 +349,6 @@ class SnapshotFragment :
       }
     }
 
-    if (hasPackageChanged()) {
-      viewModel.compareDiff(viewModel.selectedSnapshotTimestamp)
-    }
     (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(binding.list)
 
     if (binding.vfContainer.displayedChild == VF_LOADING) {

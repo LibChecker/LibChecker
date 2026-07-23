@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.domain.app.detail.presentation
 
-import com.absinthe.libchecker.domain.app.detail.content.DetailProcessFilterData
 import com.absinthe.libchecker.domain.app.detail.model.LocatedCount
 import kotlinx.coroutines.flow.MutableStateFlow
 

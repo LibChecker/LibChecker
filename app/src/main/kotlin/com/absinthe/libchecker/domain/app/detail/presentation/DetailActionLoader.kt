@@ -2,14 +2,18 @@ package com.absinthe.libchecker.domain.app.detail.presentation
 
 import android.content.pm.PackageInfo
 import android.net.Uri
+import com.absinthe.libchecker.annotation.ACTION
+import com.absinthe.libchecker.annotation.ACTION_IN_RULES
+import com.absinthe.libchecker.annotation.ALL
 import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.annotation.PERMISSION
+import com.absinthe.libchecker.annotation.isComponentType
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.detail.action.AppPackageShareFile
 import com.absinthe.libchecker.domain.app.detail.action.BuildAppInstallSourceBottomSheetDisplayUseCase
-import com.absinthe.libchecker.domain.app.detail.action.BuildDetailItemDialogRequestUseCase
 import com.absinthe.libchecker.domain.app.detail.action.BuildDetailItemLongClickActionsUseCase
-import com.absinthe.libchecker.domain.app.detail.action.BuildSignatureDetailItemsUseCase
 import com.absinthe.libchecker.domain.app.detail.action.BuildXposedInfoBottomSheetDisplayUseCase
+import com.absinthe.libchecker.domain.app.detail.action.DetailItemDialogRequest
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemLongClickActionRequest
 import com.absinthe.libchecker.domain.app.detail.action.ExportAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.detail.action.ExtractNativeLibraryUseCase
@@ -36,9 +40,9 @@ import com.absinthe.libchecker.domain.app.detail.model.AppPropItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.model.OverlayDetailBottomSheetResult
+import com.absinthe.libchecker.domain.app.detail.model.SignatureDetailItem
 import com.absinthe.libchecker.domain.app.detail.model.XposedInfoBottomSheetDisplay
-import com.absinthe.libchecker.domain.app.detail.navigation.BuildDetailReferenceNavigationUseCase
-import com.absinthe.libchecker.domain.app.detail.navigation.DetailReferenceNavigationRequest
+import com.absinthe.libchecker.domain.app.detail.navigation.DetailReferenceNavigation
 import com.absinthe.libchecker.domain.app.detail.related.GetRelatedAppDisplayDataUseCase
 import java.io.File
 import kotlinx.coroutines.async
@@ -61,13 +65,10 @@ class DetailActionLoader(
   private val getRelatedAppDisplayDataUseCase: GetRelatedAppDisplayDataUseCase,
   private val getXposedModuleInfoUseCase: GetXposedModuleInfoUseCase,
   private val buildXposedInfoBottomSheetDisplayUseCase: BuildXposedInfoBottomSheetDisplayUseCase,
-  private val buildDetailItemDialogRequestUseCase: BuildDetailItemDialogRequestUseCase,
   private val buildDetailItemLongClickActionsUseCase: BuildDetailItemLongClickActionsUseCase,
-  private val buildSignatureDetailItemsUseCase: BuildSignatureDetailItemsUseCase,
   private val extractNativeLibraryUseCase: ExtractNativeLibraryUseCase,
   private val prepareAppPackageShareActionUseCase: PrepareAppPackageShareActionUseCase,
-  private val exportAppPackageShareFileUseCase: ExportAppPackageShareFileUseCase,
-  private val buildDetailReferenceNavigationUseCase: BuildDetailReferenceNavigationUseCase
+  private val exportAppPackageShareFileUseCase: ExportAppPackageShareFileUseCase
 ) {
   suspend fun getAppBundleItems(packageInfo: PackageInfo): List<AppBundleItem> {
     return buildAppBundleItemDisplayDataUseCase(getAppBundleItemsUseCase(packageInfo))
@@ -210,7 +211,19 @@ class DetailActionLoader(
   fun buildDetailItemDialogRequest(
     item: LibStringItemChip,
     @LibType detailType: Int
-  ) = buildDetailItemDialogRequestUseCase(item, detailType)
+  ): DetailItemDialogRequest {
+    if (detailType == PERMISSION) {
+      return DetailItemDialogRequest.Permission(item.item.name)
+    }
+
+    val rule = item.rule
+    return DetailItemDialogRequest.Library(
+      name = rule?.libName ?: item.item.name,
+      type = if (rule?.libType == ACTION_IN_RULES) ACTION else detailType,
+      regexName = rule?.regexName,
+      isValidLib = rule != null
+    )
+  }
 
   fun buildDetailItemLongClickActions(
     item: LibStringItemChip,
@@ -230,19 +243,41 @@ class DetailActionLoader(
     )
   )
 
-  fun buildSignatureDetailItems(detail: String) = buildSignatureDetailItemsUseCase(detail)
+  fun buildSignatureDetailItems(detail: String): List<SignatureDetailItem> {
+    return detail.lines().map {
+      val values = it.split(":", limit = 2)
+      SignatureDetailItem(
+        values.getOrNull(0).orEmpty(),
+        values.getOrNull(1).orEmpty()
+      )
+    }
+  }
 
   fun buildDetailReferenceNavigation(
     packageName: String?,
     refName: String?,
     @LibType refType: Int,
     visibleTypes: List<Int>
-  ) = buildDetailReferenceNavigationUseCase(
-    DetailReferenceNavigationRequest(
-      packageName = packageName,
-      refName = refName,
-      refType = refType,
-      visibleTypes = visibleTypes
+  ): DetailReferenceNavigation? {
+    packageName ?: return null
+    refName ?: return null
+    if (refType == ALL) {
+      return null
+    }
+
+    val tabPosition = visibleTypes.indexOf(refType)
+    if (tabPosition < 0) {
+      return null
+    }
+
+    return DetailReferenceNavigation(
+      type = refType,
+      tabPosition = tabPosition,
+      targetName = if (isComponentType(refType)) {
+        refName.removePrefix(packageName)
+      } else {
+        refName
+      }
     )
-  )
+  }
 }

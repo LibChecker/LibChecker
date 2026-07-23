@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.domain.snapshot.list.usecase
 
 import com.absinthe.libchecker.constant.options.SnapshotOptions
+import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotListRenderState
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
@@ -9,7 +10,7 @@ import kotlinx.coroutines.withContext
 
 class BuildSnapshotListUpdatePlanUseCase(
   private val getSnapshotPackageIconSources: GetSnapshotPackageIconSourcesUseCase,
-  private val getApexPackageNames: GetApexPackageNamesUseCase,
+  private val installedAppRepository: InstalledAppRepository,
   private val snapshotSettingsRepository: SnapshotSettingsRepository
 ) {
 
@@ -23,7 +24,9 @@ class BuildSnapshotListUpdatePlanUseCase(
     return displayPlan.copy(
       renderState = displayPlan.renderState.copy(
         packageIconSources = getSnapshotPackageIconSources(packageNames),
-        apexPackageNames = getApexPackageNames()
+        apexPackageNames = withContext(Dispatchers.IO) {
+          installedAppRepository.getApexPackageNames()
+        }
       )
     )
   }
