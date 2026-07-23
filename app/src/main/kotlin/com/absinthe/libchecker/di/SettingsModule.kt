@@ -33,8 +33,7 @@ val settingsModule = module {
       ruleSettingsRepository = get(),
       snapshotSettingsRepository = get(),
       exportInstalledAppsToUriUseCase = get(),
-      libReferenceSettingsRepository = get(),
-      updateLibReferenceThresholdUseCase = get()
+      libReferenceSettingsRepository = get()
     )
   }
 

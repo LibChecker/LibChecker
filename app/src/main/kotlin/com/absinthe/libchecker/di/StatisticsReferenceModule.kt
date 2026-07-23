@@ -9,7 +9,6 @@ import com.absinthe.libchecker.domain.statistics.reference.usecase.ComputeLibRef
 import com.absinthe.libchecker.domain.statistics.reference.usecase.GetLibReferenceAppsUseCase
 import com.absinthe.libchecker.domain.statistics.reference.usecase.GetLibReferenceConfigUseCase
 import com.absinthe.libchecker.domain.statistics.reference.usecase.GetLibReferenceIconPackagesUseCase
-import com.absinthe.libchecker.domain.statistics.reference.usecase.UpdateLibReferenceThresholdUseCase
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
@@ -21,7 +20,6 @@ val statisticsReferenceModule = module {
   factory { GetLibReferenceIconPackagesUseCase(get()) }
   factory { GetLibReferenceAppsUseCase(get()) }
   factory { BuildLibReferenceDetailDialogRequestUseCase() }
-  factory { UpdateLibReferenceThresholdUseCase(get()) }
   factory { LibReferenceComputationController.Factory(get(), get(), get()) }
 
   viewModel {

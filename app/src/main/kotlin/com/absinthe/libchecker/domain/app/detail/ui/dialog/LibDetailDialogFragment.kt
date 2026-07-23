@@ -8,7 +8,7 @@ import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.domain.app.detail.action.GetLibraryDetailDialogDataUseCase
+import com.absinthe.libchecker.domain.app.detail.action.DetailItemResolver
 import com.absinthe.libchecker.domain.app.detail.model.LibraryDetailBottomSheetState
 import com.absinthe.libchecker.domain.app.detail.model.LibraryDetailHeaderDisplay
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
@@ -90,7 +90,7 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
         }
       }.onSuccess { (header, result) ->
         when (result) {
-          is GetLibraryDetailDialogDataUseCase.Result.Found -> {
+          is DetailItemResolver.Result.Found -> {
             root.bind(
               LibraryDetailBottomSheetState.Content(
                 title = dialogTitle,
@@ -100,7 +100,7 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
             )
           }
 
-          GetLibraryDetailDialogDataUseCase.Result.NotFound -> {
+          DetailItemResolver.Result.NotFound -> {
             showNotFoundAfterStickyEvent(header)
           }
         }

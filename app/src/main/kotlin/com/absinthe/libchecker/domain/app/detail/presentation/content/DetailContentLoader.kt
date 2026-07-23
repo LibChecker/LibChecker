@@ -1,15 +1,7 @@
 package com.absinthe.libchecker.domain.app.detail.presentation.content
 
 import com.absinthe.libchecker.database.entity.Features
-import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailAbilityChipsUseCase
-import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailComponentChipsUseCase
-import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailDexChipsUseCase
-import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailMetadataChipsUseCase
-import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailNativeLibrariesUseCase
-import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailPermissionChipsUseCase
-import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailSignatureChipsUseCase
-import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailStaticLibraryChipsUseCase
-import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailStaticLibraryTabItemsUseCase
+import com.absinthe.libchecker.domain.app.detail.content.DetailContentResolver
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailContentState
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailFeatureState
@@ -29,15 +21,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class DetailContentLoader(
-  private val getAppDetailAbilityChipsUseCase: GetAppDetailAbilityChipsUseCase,
-  private val getAppDetailComponentChipsUseCase: GetAppDetailComponentChipsUseCase,
-  private val getAppDetailDexChipsUseCase: GetAppDetailDexChipsUseCase,
-  private val getAppDetailMetadataChipsUseCase: GetAppDetailMetadataChipsUseCase,
-  private val getAppDetailNativeLibrariesUseCase: GetAppDetailNativeLibrariesUseCase,
-  private val getAppDetailPermissionChipsUseCase: GetAppDetailPermissionChipsUseCase,
-  private val getAppDetailSignatureChipsUseCase: GetAppDetailSignatureChipsUseCase,
-  private val getAppDetailStaticLibraryChipsUseCase: GetAppDetailStaticLibraryChipsUseCase,
-  private val getAppDetailStaticLibraryTabItemsUseCase: GetAppDetailStaticLibraryTabItemsUseCase,
+  private val contentResolver: DetailContentResolver,
   private val appDetailSettingsRepository: AppDetailSettingsRepository
 ) {
   val contentState = DetailContentState()
@@ -65,7 +49,7 @@ class DetailContentLoader(
       val abiBundle = featureState.abiBundleStateFlow.value
         ?: featureState.abiBundleStateFlow.filterNotNull().first()
       val nativeLibraries = traceDetailSection(TRACE_DETAIL_NATIVE_INIT_USE_CASE) {
-        getAppDetailNativeLibrariesUseCase(
+        contentResolver.getNativeLibraries(
           packageInfo = packageState.packageInfo,
           apkPreviewInfo = packageState.apkPreviewInfo,
           isApk = packageState.isApk,
@@ -89,7 +73,7 @@ class DetailContentLoader(
     contentState.nativeLibItemsFor(tab)?.let {
       scope.launch(Dispatchers.IO) {
         contentState.nativeLibItems.emit(
-          getAppDetailNativeLibrariesUseCase.buildChipList(
+          contentResolver.buildChipList(
             packageInfo = packageState.packageInfo,
             apkPreviewInfo = packageState.apkPreviewInfo,
             isApkPreview = packageState.isApkPreview,
@@ -113,7 +97,7 @@ class DetailContentLoader(
       hasData = contentState.staticLibItems.value != null
     ) {
       contentState.staticLibItems.emit(
-        getAppDetailStaticLibraryChipsUseCase(
+        contentResolver.getStaticLibraryChips(
           packageInfo = packageState.packageInfo,
           sortBySizeMode = sortBySizeMode
         )
@@ -125,7 +109,7 @@ class DetailContentLoader(
     packageState: DetailPackageState,
     packageName: String
   ): List<LibStringItemChip> {
-    return getAppDetailStaticLibraryTabItemsUseCase(
+    return contentResolver.getStaticLibraryTabItems(
       packageInfo = packageState.packageInfo,
       packageName = packageName,
       sortBySizeMode = isSortBySizeMode()
@@ -146,7 +130,7 @@ class DetailContentLoader(
       hasData = contentState.metaDataItems.value != null
     ) {
       contentState.metaDataItems.emit(
-        getAppDetailMetadataChipsUseCase(
+        contentResolver.getMetadataChips(
           packageInfo = packageState.packageInfo,
           apkPreviewInfo = packageState.apkPreviewInfo,
           isApkPreview = packageState.isApkPreview
@@ -165,7 +149,7 @@ class DetailContentLoader(
       scope = scope,
       hasData = contentState.permissionsItems.value != null
     ) {
-      val permissions = getAppDetailPermissionChipsUseCase(
+      val permissions = contentResolver.getPermissionChips(
         packageInfo = packageState.packageInfo,
         apkPreviewInfo = packageState.apkPreviewInfo,
         isApk = packageState.isApk,
@@ -189,7 +173,7 @@ class DetailContentLoader(
       hasData = contentState.dexLibItems.value != null
     ) {
       contentState.dexLibItems.emit(
-        getAppDetailDexChipsUseCase(
+        contentResolver.getDexChips(
           packageInfo = packageState.packageInfo,
           sortBySizeMode = sortBySizeMode
         )
@@ -211,7 +195,7 @@ class DetailContentLoader(
       hasData = contentState.signaturesLibItems.value != null
     ) {
       contentState.signaturesLibItems.emit(
-        getAppDetailSignatureChipsUseCase(packageState.packageInfo, packageState.isApk)
+        contentResolver.getSignatureChips(packageState.packageInfo, packageState.isApk)
       )
     }
   }
@@ -226,7 +210,7 @@ class DetailContentLoader(
       hasData = contentState.hasComponentsData()
     ) {
       try {
-        val components = getAppDetailComponentChipsUseCase(
+        val components = contentResolver.getComponentChips(
           packageState.packageInfo,
           packageState.isApk
         )
@@ -242,7 +226,7 @@ class DetailContentLoader(
     packageState: DetailPackageState
   ) = scope.launch(Dispatchers.IO) {
     val previewInfo = packageState.apkPreviewInfo ?: return@launch
-    contentState.emitComponentItems(getAppDetailComponentChipsUseCase(previewInfo))
+    contentState.emitComponentItems(contentResolver.getComponentChips(previewInfo))
   }
 
   fun initAbilities(
@@ -252,7 +236,7 @@ class DetailContentLoader(
     contentState.resetAbilities()
 
     runCatching {
-      getAppDetailAbilityChipsUseCase(packageName)
+      contentResolver.getAbilityChips(packageName)
     }.onSuccess { abilityChips ->
       contentState.emitAbilities(abilityChips)
     }.onFailure {

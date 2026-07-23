@@ -6,7 +6,7 @@ import androidx.appcompat.app.AlertDialog
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemLongClickActions
-import com.absinthe.libchecker.domain.app.detail.action.GetPermissionProvidersUseCase
+import com.absinthe.libchecker.domain.app.detail.action.DetailItemResolver
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
@@ -37,7 +37,7 @@ class DetailItemLongClickController(
   private val coroutineScope: CoroutineScope,
   private val packageName: () -> String,
   private val type: () -> Int,
-  private val getPermissionProvidersUseCase: GetPermissionProvidersUseCase
+  private val detailItemResolver: DetailItemResolver
 ) {
   private var integrationMonkeyKingBlockList: List<ShareCmpInfo.Component>? = null
   private var integrationBlockerList: List<ShareCmpInfo.Component>? = null
@@ -143,7 +143,7 @@ class DetailItemLongClickController(
       val loading = UiUtils.createLoadingDialog(fragment.requireActivity())
       loading.show()
       coroutineScope.launch {
-        val items = getPermissionProvidersUseCase(actions.componentName)
+        val items = detailItemResolver.getPermissionProviders(actions.componentName)
         loading.dismiss()
         if (items.isNotEmpty()) {
           val encodedList = items.map { "${it.packageName}|${it.providerName}" }.toTypedArray()

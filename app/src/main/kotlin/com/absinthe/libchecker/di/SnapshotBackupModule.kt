@@ -16,7 +16,6 @@ import com.absinthe.libchecker.domain.snapshot.backup.usecase.BackupSnapshotArch
 import com.absinthe.libchecker.domain.snapshot.backup.usecase.BuildSnapshotRestorePlanUseCase
 import com.absinthe.libchecker.domain.snapshot.backup.usecase.CreateSnapshotDatabaseBackupUseCase
 import com.absinthe.libchecker.domain.snapshot.backup.usecase.GetSnapshotBackupTargetUseCase
-import com.absinthe.libchecker.domain.snapshot.backup.usecase.PrepareRoomBackupRestoreFileUseCase
 import com.absinthe.libchecker.domain.snapshot.backup.usecase.RestoreSnapshotArchiveFromUriUseCase
 import com.absinthe.libchecker.domain.snapshot.backup.usecase.RestoreSnapshotDatabaseBackupUseCase
 import com.jakewharton.processphoenix.ProcessPhoenix
@@ -43,10 +42,9 @@ val snapshotBackupModule = module {
       )
     )
   }
-  factory { PrepareRoomBackupRestoreFileUseCase(androidContext().contentResolver) }
   factory { (roomBackup: RoomBackup) ->
     RestoreSnapshotDatabaseBackupUseCase(
-      prepareRoomBackupRestoreFile = get(),
+      contentResolver = androidContext().contentResolver,
       databaseBackupRestorer = LocalSnapshotDatabaseBackupRestorer(
         roomBackup = roomBackup,
         databaseName = LCDatabase.DATABASE_NAME,

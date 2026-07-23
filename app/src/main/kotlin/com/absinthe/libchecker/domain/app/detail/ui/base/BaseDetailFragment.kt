@@ -14,7 +14,7 @@ import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemDialogRequest
-import com.absinthe.libchecker.domain.app.detail.action.GetPermissionProvidersUseCase
+import com.absinthe.libchecker.domain.app.detail.action.DetailItemResolver
 import com.absinthe.libchecker.domain.app.detail.model.LibStringAction
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.model.LibStringMetadataItemDisplay
@@ -66,7 +66,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   private val appDetailSettingsRepository: AppDetailSettingsRepository by inject()
   private val appListSettingsRepository: AppListSettingsRepository by inject()
   private val resolveAppResourceValue: ResolveAppResourceValueUseCase by inject()
-  private val getPermissionProvidersUseCase: GetPermissionProvidersUseCase by inject()
+  private val detailItemResolver: DetailItemResolver by inject()
   protected val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME).orEmpty() }
   protected val type by lazy { arguments?.getInt(EXTRA_TYPE) ?: NATIVE }
   private var listRenderState = LibStringRenderState()
@@ -109,7 +109,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
       coroutineScope = lifecycleScope,
       packageName = { packageName },
       type = { type },
-      getPermissionProvidersUseCase = getPermissionProvidersUseCase
+      detailItemResolver = detailItemResolver
     )
   }
   private val longClickController by longClickControllerDelegate
