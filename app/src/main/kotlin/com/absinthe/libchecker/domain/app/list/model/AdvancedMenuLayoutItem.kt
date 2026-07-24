@@ -9,13 +9,11 @@ sealed interface AdvancedMenuLayoutItem {
   data object ComponentStyleOptions : AdvancedMenuLayoutItem
 }
 
-fun buildAdvancedMenuLayoutItems(): List<AdvancedMenuLayoutItem> {
-  return listOf(
-    AdvancedMenuLayoutItem.AppDemo,
-    AdvancedMenuLayoutItem.Sort,
-    AdvancedMenuLayoutItem.FilterOptions,
-    AdvancedMenuLayoutItem.ViewOptions,
-    AdvancedMenuLayoutItem.ComponentStyleDemo,
-    AdvancedMenuLayoutItem.ComponentStyleOptions
-  )
-}
+fun buildAdvancedMenuLayoutItems(): List<AdvancedMenuLayoutItem> = listOf(
+  AdvancedMenuLayoutItem.AppDemo,
+  AdvancedMenuLayoutItem.Sort,
+  AdvancedMenuLayoutItem.FilterOptions,
+  AdvancedMenuLayoutItem.ViewOptions,
+  AdvancedMenuLayoutItem.ComponentStyleDemo,
+  AdvancedMenuLayoutItem.ComponentStyleOptions
+)

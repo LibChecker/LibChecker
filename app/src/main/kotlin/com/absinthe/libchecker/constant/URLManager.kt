@@ -1,11 +1,8 @@
 package com.absinthe.libchecker.constant
 
-import com.absinthe.libchecker.BuildConfig
 import java.util.Locale
 
 object URLManager {
-  const val MARKET_PAGE = "market://details?id=${BuildConfig.APPLICATION_ID}"
-
   const val PLAY_STORE_DETAIL_PAGE = "https://play.google.com/store/apps/details?id=com.absinthe.libchecker"
 
   const val GITHUB_HOST = "https://github.com/"

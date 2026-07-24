@@ -10,24 +10,13 @@ import androidx.core.text.inSpans
 import androidx.core.text.strikeThrough
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemNameDisplay
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
-import com.absinthe.libchecker.utils.extensions.tintHighlightText
+import com.absinthe.libchecker.utils.extensions.setOrHighlightText
 
 internal fun TextView.setLibStringItemName(
   display: LibStringItemNameDisplay,
   highlightText: String
 ) {
   setOrHighlightText(renderLibStringItemName(display), highlightText)
-}
-
-internal fun TextView.setOrHighlightText(
-  value: CharSequence,
-  highlightText: String
-) {
-  if (highlightText.isNotBlank()) {
-    tintHighlightText(highlightText, value)
-  } else {
-    text = value
-  }
 }
 
 private fun TextView.renderLibStringItemName(display: LibStringItemNameDisplay): CharSequence {

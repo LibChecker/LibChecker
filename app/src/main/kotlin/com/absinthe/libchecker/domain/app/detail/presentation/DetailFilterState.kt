@@ -26,16 +26,8 @@ class DetailFilterState {
     itemsCountList[locate] = count
   }
 
-  fun updateProcessMap(map: Map<String, Int>) {
-    processMapStateFlow.value = map
-  }
-
-  fun updateProcessToolIconVisibility(visible: Boolean) {
-    processToolIconVisibilityStateFlow.value = visible
-  }
-
   fun updateProcessFilterData(data: DetailProcessFilterData) {
-    updateProcessMap(data.processMap)
-    updateProcessToolIconVisibility(data.processToolIconVisible)
+    processMapStateFlow.value = data.processMap
+    processToolIconVisibilityStateFlow.value = data.processToolIconVisible
   }
 }

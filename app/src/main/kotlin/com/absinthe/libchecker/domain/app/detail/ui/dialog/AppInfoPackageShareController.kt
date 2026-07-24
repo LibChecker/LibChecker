@@ -32,8 +32,12 @@ class AppInfoPackageShareController(
   private var loadingDialog: AlertDialog? = null
 
   init {
-    collectPackageShareActionResults()
-    collectPackageShareExportResults()
+    coroutineScope.launch {
+      viewModel.appPackageShareActionResults.collect(::handlePackageShareActionResult)
+    }
+    coroutineScope.launch {
+      viewModel.appPackageShareExportResults.collect(::handlePackageShareExportResult)
+    }
   }
 
   fun onExportResult(resultCode: Int, uri: Uri?) {
@@ -87,12 +91,6 @@ class AppInfoPackageShareController(
     dismissLoading()
   }
 
-  private fun collectPackageShareActionResults() {
-    coroutineScope.launch {
-      viewModel.appPackageShareActionResults.collect(::handlePackageShareActionResult)
-    }
-  }
-
   private fun handlePackageShareActionResult(loadResult: AppPackageShareActionResult) {
     if (loadResult.packageName != pendingSharePackageName) {
       return
@@ -139,12 +137,6 @@ class AppInfoPackageShareController(
           GlobalValues.longTapShareButtonTip = true
         }
       }
-    }
-  }
-
-  private fun collectPackageShareExportResults() {
-    coroutineScope.launch {
-      viewModel.appPackageShareExportResults.collect(::handlePackageShareExportResult)
     }
   }
 

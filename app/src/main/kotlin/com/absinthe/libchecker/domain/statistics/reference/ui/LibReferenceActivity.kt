@@ -123,7 +123,8 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
       val itemViewStates = viewModel.buildAppListItemViewStates(it)
       adapter.bind(AppListRenderState(itemViewStates = itemViewStates))
       adapter.setList(it)
-      showList()
+      binding.loading.stop()
+      binding.vfContainer.displayedChild = LIST_VIEW_INDEX
     }.launchIn(lifecycleScope)
 
     adapter.setOnItemClickListener { _, view, position ->
@@ -161,11 +162,6 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
     if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
       binding.loading.start()
     }
-  }
-
-  private fun showList() {
-    binding.loading.stop()
-    binding.vfContainer.displayedChild = LIST_VIEW_INDEX
   }
 
   private companion object {

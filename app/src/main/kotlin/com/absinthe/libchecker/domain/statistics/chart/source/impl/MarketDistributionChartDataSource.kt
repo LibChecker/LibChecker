@@ -83,6 +83,10 @@ class MarketDistributionChartDataSource(
     return distribution?.getOrNull(x)?.name ?: "Unknown"
   }
 
+  override fun getListByXValue(x: Int): List<LCItem> {
+    return classifiedMap[x] ?: emptyList()
+  }
+
   override fun getListKeyByXValue(x: Int): Int? {
     return distribution?.getOrNull(x)?.apiLevel
   }

@@ -27,15 +27,3 @@ fun Long.sizeToString(context: Context, showBytes: Boolean = true): String {
   }
   return if (showBytes) "$formattedSize ($this Bytes)" else formattedSize
 }
-
-fun ByteArray.toHex(): String {
-  return buildString {
-    this@toHex.forEach {
-      var hex = Integer.toHexString(it.toInt() and 0xFF)
-      if (hex.length == 1) {
-        hex = "0$hex"
-      }
-      append(hex.lowercase())
-    }
-  }
-}

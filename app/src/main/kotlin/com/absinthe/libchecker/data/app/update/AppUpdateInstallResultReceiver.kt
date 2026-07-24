@@ -41,7 +41,7 @@ class AppUpdateInstallResultReceiver : BroadcastReceiver() {
       }
 
       PackageInstaller.STATUS_PENDING_USER_ACTION -> {
-        val confirmationIntent = getPendingUserActionIntent(intent)
+        val confirmationIntent = IntentCompat.getParcelableExtra<Intent>(intent, Intent.EXTRA_INTENT)
         if (confirmationIntent == null) {
           Toasty.showLong(context, R.string.toast_app_update_pending_user_action)
           return
@@ -71,10 +71,6 @@ class AppUpdateInstallResultReceiver : BroadcastReceiver() {
         versionName = getStringExtra(EXTRA_PREVIOUS_VERSION_NAME),
         versionCode = getLongExtra(EXTRA_PREVIOUS_VERSION_CODE, -1)
       )
-    }
-
-    private fun getPendingUserActionIntent(intent: Intent): Intent? {
-      return IntentCompat.getParcelableExtra(intent, Intent.EXTRA_INTENT)
     }
 
     private fun createInstallSuccessNotification(

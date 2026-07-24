@@ -38,15 +38,7 @@ internal fun CharSequence.emphasizeSnapshotDetailDiffArrows(
 }
 
 internal fun snapshotDetailDiffArrowIndices(text: CharSequence): List<Int> {
-  val result = mutableListOf<Int>()
-  var searchStart = 0
-  while (searchStart < text.length) {
-    val index = text.indexOf(SNAPSHOT_DETAIL_DIFF_ARROW, searchStart)
-    if (index < 0) break
-    result += index
-    searchStart = index + SNAPSHOT_DETAIL_DIFF_ARROW.length
-  }
-  return result
+  return text.indices.filter { text[it] == SNAPSHOT_DETAIL_DIFF_ARROW[0] }
 }
 
 internal const val SNAPSHOT_DETAIL_DIFF_ARROW = "→"

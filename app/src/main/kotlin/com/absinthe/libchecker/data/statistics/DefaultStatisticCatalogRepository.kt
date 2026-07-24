@@ -16,7 +16,8 @@ class DefaultStatisticCatalogRepository(
       ?: builtInStatistics.map(StatisticDefinition::id).also {
         selectionStore.setSelectedStatisticIds(it)
       }
-    return resolveSelectedStatistics(selectedIds, availableStatistics)
+    val definitionsById = availableStatistics.associateBy(StatisticDefinition::id)
+    return selectedIds.mapNotNull(definitionsById::get)
   }
 
   override suspend fun getAvailableStatistics(): List<StatisticDefinition> {
@@ -37,13 +38,5 @@ class DefaultStatisticCatalogRepository(
     officialStatistics: List<StatisticDefinition>
   ): List<StatisticDefinition> {
     return (builtInStatistics + officialStatistics).distinctBy { it.id }
-  }
-
-  private fun resolveSelectedStatistics(
-    selectedIds: List<String>,
-    availableStatistics: List<StatisticDefinition>
-  ): List<StatisticDefinition> {
-    val definitionsById = availableStatistics.associateBy(StatisticDefinition::id)
-    return selectedIds.mapNotNull(definitionsById::get)
   }
 }

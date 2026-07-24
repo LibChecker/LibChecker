@@ -2,6 +2,7 @@ package com.absinthe.libchecker.domain.app.list.ui
 
 import android.content.DialogInterface
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.options.withOption
 import com.absinthe.libchecker.domain.app.list.model.AdvancedMenuAction
 import com.absinthe.libchecker.domain.app.list.model.buildAdvancedMenuBottomSheetState
 import com.absinthe.libchecker.domain.app.list.ui.view.AdvancedMenuBSDView
@@ -18,13 +19,11 @@ class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBS
 
   private var onDismissCallback: ((advancedDiff: Int, itemAdvancedDiff: Int) -> Unit)? = null
   private var currentColorfulRuleIcon = true
-  private var onDisplayOptionsChanged: (Int) -> Int = {
-    currentAdvancedOptions = it
-    it
+  private var onDisplayOptionsChanged: (Int) -> Int = { options ->
+    options
   }
-  private var onItemDisplayOptionsChanged: (Int) -> Int = {
-    currentItemAdvancedOptions = it
-    it
+  private var onItemDisplayOptionsChanged: (Int) -> Int = { options ->
+    options
   }
 
   override fun initRootView(): AdvancedMenuBSDView = AdvancedMenuBSDView(requireContext())
@@ -113,13 +112,5 @@ class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBS
 
   private fun setAdvancedOptions(options: Int) {
     currentAdvancedOptions = onDisplayOptionsChanged(options)
-  }
-}
-
-private fun Int.withOption(option: Int, isEnabled: Boolean): Int {
-  return if (isEnabled) {
-    this or option
-  } else {
-    this and option.inv()
   }
 }

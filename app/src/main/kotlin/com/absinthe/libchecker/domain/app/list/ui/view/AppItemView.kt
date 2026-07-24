@@ -32,7 +32,7 @@ import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.utils.extensions.isRtl
-import com.absinthe.libchecker.utils.extensions.tintHighlightText
+import com.absinthe.libchecker.utils.extensions.setOrHighlightText
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.app.AppIconPlaceholder
 import com.absinthe.libchecker.view.span.CenterAlignImageSpan
@@ -399,14 +399,10 @@ class AppItemView(
       if (!labelGroup.isGone) {
         labelGroup.layout(offsetStart, abiInfo.bottom + labelTopGap)
       }
-      if (hasDetachedAbiBadges()) {
+      if (abiBadge != null || multiArchBadge != null) {
         layoutAbiBadges()
       }
       badge?.layout(paddingTop, paddingEnd, fromRight = true)
-    }
-
-    private fun hasDetachedAbiBadges(): Boolean {
-      return abiBadge != null || multiArchBadge != null
     }
 
     private fun layoutAbiBadges() {
@@ -623,14 +619,6 @@ private fun TextView.setItemBackground() {
   } else {
     background = null
     alpha = 1f
-  }
-}
-
-private fun TextView.setOrHighlightText(text: CharSequence, highlightText: String) {
-  if (highlightText.isNotBlank()) {
-    tintHighlightText(highlightText, text)
-  } else {
-    this.text = text
   }
 }
 

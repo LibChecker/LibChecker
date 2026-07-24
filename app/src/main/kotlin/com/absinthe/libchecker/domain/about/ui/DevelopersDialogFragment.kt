@@ -264,16 +264,10 @@ class DevelopersDialogFragment : BaseBottomSheetViewDialogFragment<DevelopersDia
     return score
   }
 
-  private fun Int.toCommitText(): String {
-    return if (this == 1) "1 commit" else "$this commits"
-  }
-
   private fun GitHubContributorResp.toDescription(): String {
-    return if (isMaintainer()) {
-      "Maintainer, ${contributions.toCommitText()}"
-    } else {
-      "Contributor, ${contributions.toCommitText()}"
-    }
+    val role = if (isMaintainer()) "Maintainer" else "Contributor"
+    val commitText = if (contributions == 1) "1 commit" else "$contributions commits"
+    return "$role, $commitText"
   }
 
   private fun GitHubContributorResp.toDeveloperInfo(): DeveloperInfo? {

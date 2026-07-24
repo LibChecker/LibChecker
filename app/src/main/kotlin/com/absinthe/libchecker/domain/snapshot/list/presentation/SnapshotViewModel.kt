@@ -79,7 +79,7 @@ class SnapshotViewModel(
         previousTimestamp = preTimeStamp,
         currentTimestamp = currTimeStamp.takeUnless { it == CURRENT_SNAPSHOT },
         shouldClearDiff = shouldClearDiff,
-        onProgress = ::changeComparingProgress
+        onProgress = { _comparingProgress.value = it }
       )
       if (diffItems != null) {
         emitSnapshotDiffItemsUpdate()
@@ -123,11 +123,12 @@ class SnapshotViewModel(
   ) {
     val diffItem = snapshotListWorkflow.compareItemDiff(timeStamp, packageName)
 
-    diffItem?.let {
-      changeDiffItem(it)
-    } ?: run {
-      removeDiffItem(packageName)
+    if (diffItem == null) {
+      snapshotListWorkflow.applyDiffItemRemove(packageName)
+    } else {
+      snapshotListWorkflow.applyDiffItemChange(diffItem)
     }
+    emitSnapshotDiffItemsUpdate()
   }
 
   fun handlePackageChanged(packageChangeState: PackageChangeState) {
@@ -239,20 +240,6 @@ class SnapshotViewModel(
     setEffect {
       Effect.DashboardCountChange(count.snapshotCount, count.appCount, isLeft)
     }
-  }
-
-  private suspend fun changeDiffItem(item: SnapshotDiffItem) {
-    snapshotListWorkflow.applyDiffItemChange(item)
-    emitSnapshotDiffItemsUpdate()
-  }
-
-  private suspend fun removeDiffItem(packageName: String) {
-    snapshotListWorkflow.applyDiffItemRemove(packageName)
-    emitSnapshotDiffItemsUpdate()
-  }
-
-  private fun changeComparingProgress(progress: Int) {
-    _comparingProgress.value = progress
   }
 
   private fun setSelectedSnapshotTimestamp(timestamp: Long) {

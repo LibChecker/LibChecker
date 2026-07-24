@@ -14,11 +14,7 @@ import java.util.Locale
 
 object DateUtils {
   // ISO 8601 constants
-  private const val ISO_8601_PATTERN_1 = "yyyy-MM-dd'T'HH:mm:ssZ"
-  private const val ISO_8601_PATTERN_2 = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-  private val SUPPORTED_ISO_8601_PATTERNS = arrayOf(ISO_8601_PATTERN_1, ISO_8601_PATTERN_2)
-  private const val TICK_MARK_COUNT = 2
-  private const val COLON_PREFIX_COUNT = "+00".length
+  private val SUPPORTED_ISO_8601_PATTERNS = arrayOf("yyyy-MM-dd'T'HH:mm:ssZ", "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
 
   /**
    * Parses a date from the specified ISO 8601-compliant string.
@@ -31,7 +27,7 @@ object DateUtils {
     val s = string.replace("Z", "+00:00")
     for (pattern in SUPPORTED_ISO_8601_PATTERNS) {
       var str = s
-      val colonPosition = pattern.lastIndexOf('Z') - TICK_MARK_COUNT + COLON_PREFIX_COUNT
+      val colonPosition = pattern.lastIndexOf('Z') + 1
       if (str.length > colonPosition) {
         str = str.substring(0, colonPosition) + str.substring(colonPosition + 1)
       }

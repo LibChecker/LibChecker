@@ -47,7 +47,9 @@ internal class StatisticSelectorController(
 
     val selectedId = plan.selectedStatistic?.id
     if (selectedId == targetSelectedStatisticId) {
-      updateContent(selectedId)
+      entries.forEach { (id, entry) ->
+        entry.view.setContent(entry.statistic, id == selectedId)
+      }
       return
     }
 
@@ -223,12 +225,6 @@ internal class StatisticSelectorController(
         }
       )
       start()
-    }
-  }
-
-  private fun updateContent(selectedId: String?) {
-    entries.forEach { (id, entry) ->
-      entry.view.setContent(entry.statistic, id == selectedId)
     }
   }
 

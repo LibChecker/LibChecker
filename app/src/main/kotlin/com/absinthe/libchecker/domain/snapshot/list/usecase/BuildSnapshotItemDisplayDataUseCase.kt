@@ -11,6 +11,7 @@ import com.absinthe.libchecker.domain.snapshot.display.SnapshotAbiDisplayItem
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotUpdateTimeDisplayData
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotUpdateTimeText
 import com.absinthe.libchecker.domain.snapshot.display.buildSnapshotVersionDisplayDiff
+import com.absinthe.libchecker.domain.snapshot.display.formatSnapshotSizeChange
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemAbiDisplayData
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemAppNameDisplayData
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemCardPresentation
@@ -30,7 +31,6 @@ import com.absinthe.libchecker.utils.extensions.sizeToString
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlin.math.abs
 
 class BuildSnapshotItemDisplayDataUseCase(private val context: Context) {
 
@@ -151,7 +151,7 @@ class BuildSnapshotItemDisplayDataUseCase(private val context: Context) {
         if (diffSize != 0L) {
           append(" ")
           packageSizeBreakStart = length
-          append(buildPackageSizeChangeText(diffSize, packageSizeDiff.old))
+          append(formatSnapshotSizeChange(context, diffSize, packageSizeDiff.old))
         }
       }
     }
@@ -232,28 +232,6 @@ class BuildSnapshotItemDisplayDataUseCase(private val context: Context) {
   ): String? {
     return count.takeIf { it > 0 }?.let {
       "${context.getString(labelRes)} $it"
-    }
-  }
-
-  private fun buildPackageSizeChangeText(diffSize: Long, oldSize: Long): String {
-    return buildString {
-      if (diffSize > 0) {
-        append("+")
-      }
-      append(diffSize.sizeToString(context))
-      append(", ")
-      if (diffSize > 0) {
-        append("+")
-      }
-      val percentage = diffSize.toFloat() / oldSize
-      if (abs(percentage) < 0.001f) {
-        if (percentage < 0) {
-          append("-")
-        }
-        append("<0.1%")
-      } else {
-        append(String.format(Locale.getDefault(), "%.1f%%", percentage * 100))
-      }
     }
   }
 

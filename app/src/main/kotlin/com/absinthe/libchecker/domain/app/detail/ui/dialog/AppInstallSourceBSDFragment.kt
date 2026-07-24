@@ -36,19 +36,15 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
     if (packageName == null) {
       return
     }
-    collectAppInstallSourceDetailsResults()
+    lifecycleScope.launch {
+      viewModel.appInstallSourceDetailsResults.collect(::handleAppInstallSourceDetailsResult)
+    }
     registerBinderReceivedRefresh()
   }
 
   override fun onResume() {
     super.onResume()
     loadAppInstallSourceDisplay()
-  }
-
-  private fun collectAppInstallSourceDetailsResults() {
-    lifecycleScope.launch {
-      viewModel.appInstallSourceDetailsResults.collect(::handleAppInstallSourceDetailsResult)
-    }
   }
 
   private fun handleAppInstallSourceDetailsResult(loadResult: AppInstallSourceDetailsResult) {

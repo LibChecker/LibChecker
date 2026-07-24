@@ -10,8 +10,6 @@ import com.absinthe.libchecker.domain.app.detail.ui.Referable
 import com.absinthe.libchecker.domain.app.detail.ui.base.BaseDetailFragment
 import com.absinthe.libchecker.domain.app.detail.ui.base.EXTRA_TYPE
 import com.absinthe.libchecker.utils.extensions.putArguments
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 
 class ComponentsAnalysisFragment :
   BaseDetailFragment<FragmentLibComponentBinding>(),
@@ -22,8 +20,7 @@ class ComponentsAnalysisFragment :
   override fun getRecyclerView(): RecyclerView = binding.list
 
   override suspend fun getItems(): List<LibStringItemChip> {
-    val flow = viewModel.contentState.componentsMap[type]
-    return flow.value ?: flow.filterNotNull().first()
+    return viewModel.contentState.componentsMap[type].valueOrAwait()
   }
 
   override fun onItemsAvailable(items: List<LibStringItemChip>) {
@@ -33,10 +30,7 @@ class ComponentsAnalysisFragment :
       bindProcessColors(viewModel.contentState.processesMap)
       submitItemsWithFilter(items, viewModel.filterState.queriedText, viewModel.filterState.queriedProcess)
     }
-    if (!isListReady) {
-      viewModel.filterState.updateItemsCount(type, items.size)
-      isListReady = true
-    }
+    markListReady(items.size)
   }
 
   override fun init() {

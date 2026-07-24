@@ -6,6 +6,7 @@ import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.bean.GetAppUpdateInfo
+import com.absinthe.libchecker.domain.app.update.AppSelfUpdatePolicy
 import com.absinthe.libchecker.domain.app.update.AppUpdateChannel
 import com.absinthe.libchecker.domain.app.update.AppUpdateInstallResult
 import com.absinthe.libchecker.domain.app.update.BuildInAppUpdateDiffDataUseCase
@@ -38,7 +39,7 @@ class InAppUpdateDialogFragment : BaseBottomSheetViewDialogFragment<InAppUpdateD
   private val viewModel: SettingsViewModel by viewModel()
   private var getAppUpdateInfo: GetAppUpdateInfo? = null
   private var dialogState = InAppUpdateDialogState(
-    selectedChannel = defaultUpdateChannel(),
+    selectedChannel = AppSelfUpdatePolicy.defaultUpdateChannel(BuildConfig.IS_DEV_VERSION),
     content = InAppUpdateDialogContent.Loading(),
     isChannelSelectionEnabled = true,
     isUpdateEnabled = false
@@ -94,14 +95,6 @@ class InAppUpdateDialogFragment : BaseBottomSheetViewDialogFragment<InAppUpdateD
           installUpdate(url)
         }
       }
-    }
-  }
-
-  private fun defaultUpdateChannel(): AppUpdateChannel {
-    return if (BuildConfig.IS_DEV_VERSION) {
-      AppUpdateChannel.CI
-    } else {
-      AppUpdateChannel.STABLE
     }
   }
 

@@ -116,7 +116,7 @@ class BuildPageSize16KBChartDataUseCase(
     return traceSection(TRACE_CHECK_SOURCE) {
       val abiSplitFiles = getAbiSplitFiles(packageInfo, abi)
       when (
-        val baseResult = traceSection(TRACE_CHECK_BASE_SOURCE) {
+        traceSection(TRACE_CHECK_BASE_SOURCE) {
           checkApk16KBAlignment(sourceFile, abi)
         }
       ) {

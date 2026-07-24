@@ -8,10 +8,12 @@ abstract class BaseVariableChartDataSource<T : View>(val items: List<LCItem>) : 
   protected val classifiedMap: MutableMap<Int, MutableList<LCItem>> = TreeMap()
 
   override fun getListByXValue(x: Int): List<LCItem> {
-    return classifiedMap[x] ?: emptyList()
+    return classifiedMap.entries.elementAtOrNull(x)?.value ?: emptyList()
   }
 
-  abstract fun getListKeyByXValue(x: Int): Int?
+  open fun getListKeyByXValue(x: Int): Int? {
+    return classifiedMap.entries.elementAtOrNull(x)?.key
+  }
 
   override fun getData(): List<LCItem> {
     return items

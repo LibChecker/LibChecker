@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.children
 import androidx.core.view.isGone
 import androidx.core.view.marginBottom
 import androidx.core.view.marginLeft
@@ -52,16 +53,16 @@ abstract class AViewGroup(
     )
   }
 
+  protected fun autoMeasureChildren() {
+    children.forEach { it.autoMeasure() }
+  }
+
   protected fun View.toHorizontalCenter(parentView: ViewGroup): Int {
     return (parentView.measuredWidth - measuredWidth) / 2
   }
 
   protected fun View.toVerticalCenter(parentView: ViewGroup): Int {
     return (parentView.measuredHeight - measuredHeight) / 2
-  }
-
-  protected fun View.toViewHorizontalCenter(targetView: View): Int {
-    return targetView.left - (measuredWidth - targetView.measuredWidth) / 2
   }
 
   protected fun View.toViewVerticalCenter(targetView: View): Int {

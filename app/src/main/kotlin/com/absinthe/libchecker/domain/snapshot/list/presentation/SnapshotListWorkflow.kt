@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.domain.snapshot.list.presentation
 
+import com.absinthe.libchecker.constant.options.withOption
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
@@ -97,11 +98,7 @@ class SnapshotListWorkflow(
   }
 
   fun setSnapshotOption(option: Int, enabled: Boolean): Int {
-    val newOptions = if (enabled) {
-      snapshotSettingsRepository.options or option
-    } else {
-      snapshotSettingsRepository.options and option.inv()
-    }
+    val newOptions = snapshotSettingsRepository.options.withOption(option, enabled)
     snapshotSettingsRepository.options = newOptions
     return newOptions
   }

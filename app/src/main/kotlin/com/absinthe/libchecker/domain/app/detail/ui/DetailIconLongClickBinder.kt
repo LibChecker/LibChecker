@@ -24,6 +24,7 @@ import androidx.core.view.doOnPreDraw
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.ui.view.AdaptiveIconLayerCardView
+import com.absinthe.libchecker.domain.app.detail.ui.view.copyDrawable
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.extensions.copyBitmapToClipboard
 import com.absinthe.libchecker.utils.extensions.copyToClipboard
@@ -38,7 +39,7 @@ fun ImageView.setDetailIconLongClick(applicationInfo: ApplicationInfo?, blurView
       copyToClipboard()
       return@setOnLongClickListener true
     }
-    val adaptiveIcon = applicationInfo?.loadAdaptiveIconOnO(context)
+    val adaptiveIcon = applicationInfo?.loadIcon(context.packageManager) as? AdaptiveIconDrawable
     if (adaptiveIcon == null) {
       copyToClipboard()
     } else {
@@ -69,11 +70,6 @@ private tailrec fun Context.findActivity(): Activity? {
     is ContextWrapper -> baseContext.findActivity()
     else -> null
   }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-private fun ApplicationInfo.loadAdaptiveIconOnO(context: Context): AdaptiveIconDrawable? {
-  return loadIcon(context.packageManager) as? AdaptiveIconDrawable
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -110,6 +106,9 @@ private class AdaptiveIconLayerOverlay(
     sourceView.drawable?.copyDrawable() ?: icon.copyDrawable()
   ).apply {
     contentDescription = context.getString(R.string.adaptive_icon_copy_full)
+    setOnClickListener {
+      context.copyBitmapToClipboard(icon.toBitmap(itemSize, itemSize))
+    }
   }
   private val layerCardView = AdaptiveIconLayerCardView(
     context = context,
@@ -130,7 +129,6 @@ private class AdaptiveIconLayerOverlay(
 
   init {
     layerViews.forEach(overlay::addView)
-    bindLayerClickActions()
   }
 
   fun show() {
@@ -138,12 +136,6 @@ private class AdaptiveIconLayerOverlay(
     updateLayerSize(decorView.width)
     decorView.addView(overlay)
     overlay.doOnPreDraw { startLayerAnimation() }
-  }
-
-  private fun bindLayerClickActions() {
-    originalView.setOnClickListener {
-      copyFullIcon()
-    }
   }
 
   private fun createIconView(drawable: Drawable): AppCompatImageView {
@@ -331,10 +323,6 @@ private class AdaptiveIconLayerOverlay(
     (overlay.parent as? ViewGroup)?.removeView(overlay)
   }
 
-  private fun copyFullIcon() {
-    context.copyBitmapToClipboard(icon.toBitmap(itemSize, itemSize))
-  }
-
   private fun animateBlurViewAlpha(alpha: Float, endAction: (() -> Unit)? = null) {
     blurView.animate().cancel()
     blurView.animate()
@@ -418,7 +406,3 @@ half4 main(float2 coord) {
   return content.eval(coord) * mix(1.0, maskAlpha, progress);
 }
 """
-
-private fun Drawable.copyDrawable(): Drawable {
-  return constantState?.newDrawable()?.mutate() ?: mutate()
-}

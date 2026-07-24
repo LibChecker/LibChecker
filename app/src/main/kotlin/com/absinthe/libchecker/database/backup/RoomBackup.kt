@@ -10,7 +10,6 @@ import androidx.room3.RoomDatabase
 import androidx.room3.useWriterConnection
 import java.io.File
 import java.io.IOException
-import java.io.OutputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -23,6 +22,12 @@ class RoomBackup(private val context: Context) {
     const val BACKUP_FILE_LOCATION_CUSTOM_DIALOG = 3
     const val BACKUP_FILE_LOCATION_CUSTOM_FILE = 4
 
+    private val SUPPORTED_BACKUP_LOCATIONS = setOf(
+      BACKUP_FILE_LOCATION_INTERNAL,
+      BACKUP_FILE_LOCATION_EXTERNAL,
+      BACKUP_FILE_LOCATION_CUSTOM_DIALOG,
+      BACKUP_FILE_LOCATION_CUSTOM_FILE
+    )
     private const val SQLITE_DOCUMENT_MIME_TYPE = "application/vnd.sqlite3"
   }
 
@@ -161,7 +166,7 @@ class RoomBackup(private val context: Context) {
     if (validateCommonConfiguration().not()) {
       return false
     }
-    if (backupLocation !in supportedBackupLocations()) {
+    if (backupLocation !in SUPPORTED_BACKUP_LOCATIONS) {
       complete(
         success = false,
         message = "backupLocation is missing",
@@ -215,15 +220,6 @@ class RoomBackup(private val context: Context) {
     return true
   }
 
-  private fun supportedBackupLocations(): Set<Int> {
-    return setOf(
-      BACKUP_FILE_LOCATION_INTERNAL,
-      BACKUP_FILE_LOCATION_EXTERNAL,
-      BACKUP_FILE_LOCATION_CUSTOM_DIALOG,
-      BACKUP_FILE_LOCATION_CUSTOM_FILE
-    )
-  }
-
   private fun runBackup(block: suspend () -> Unit) {
     val activity = context as? ComponentActivity ?: run {
       complete(
@@ -268,7 +264,9 @@ class RoomBackup(private val context: Context) {
       requireNotNull(context.contentResolver.openOutputStream(destination)) {
         "Unable to open backup destination"
       }.use { output ->
-        copyDatabaseTo(output)
+        databaseFile().inputStream().use { input ->
+          input.copyTo(output)
+        }
       }
       if (enableLogDebug) {
         Timber.d("Database backup saved to $destination")
@@ -350,12 +348,6 @@ class RoomBackup(private val context: Context) {
           }
         }
       }
-    }
-  }
-
-  private fun copyDatabaseTo(output: OutputStream) {
-    databaseFile().inputStream().use { input ->
-      input.copyTo(output)
     }
   }
 

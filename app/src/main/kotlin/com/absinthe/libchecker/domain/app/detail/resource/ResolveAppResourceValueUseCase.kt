@@ -61,10 +61,4 @@ class ResolveAppResourceValueUseCase(
     data class DrawablePreview(val drawable: Drawable) : AppResourceValue()
     data class ColorPreview(val color: Int) : AppResourceValue()
   }
-
-  companion object {
-    fun isLinkableType(type: String?): Boolean {
-      return isAppResourcePreviewSupported(type)
-    }
-  }
 }

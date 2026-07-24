@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.view.children
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
@@ -147,9 +146,7 @@ class DetailsTitleView(
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-    children.forEach {
-      it.autoMeasure()
-    }
+    autoMeasureChildren()
     val textWidth =
       measuredWidth - paddingStart - paddingEnd - iconView.measuredWidth - appNameView.marginStart
     if (appNameView.measuredWidth > textWidth) {

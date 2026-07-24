@@ -12,7 +12,6 @@ import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.graphics.drawable.toBitmap
-import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.core.view.marginEnd
 import androidx.core.view.marginStart
@@ -22,6 +21,7 @@ import com.absinthe.libchecker.domain.app.detail.resource.AppResourcePreview
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getDrawableByAttr
+import com.absinthe.libchecker.utils.extensions.setOrHighlightText
 import com.absinthe.libchecker.utils.extensions.visibleWidth
 import com.absinthe.libchecker.view.AViewGroup
 
@@ -115,9 +115,7 @@ class MetadataLibItemView(context: Context) : AViewGroup(context) {
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-    children.forEach {
-      it.autoMeasure()
-    }
+    autoMeasureChildren()
     val libNameWidth =
       measuredWidth - paddingStart - paddingEnd - libName.marginEnd - linkToIcon.visibleWidth() - linkToIcon.marginStart
     if (libName.measuredWidth > libNameWidth) {

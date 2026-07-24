@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.domain.about.ui
 
 import android.content.Context
-import android.content.Intent
 import android.graphics.Color
 import android.text.method.LinkMovementMethod
 import android.util.TypedValue
@@ -12,8 +11,6 @@ import android.widget.LinearLayout.LayoutParams
 import android.widget.ScrollView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.browser.customtabs.CustomTabsIntent
-import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -22,8 +19,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.URLManager.ANDROID_DEV_HOST
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
-import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.openUrlInBrowser
 import com.mikepenz.aboutlibraries.LibsBuilder
 import com.mikepenz.aboutlibraries.LibsConfiguration
 import com.mikepenz.aboutlibraries.entity.Library
@@ -162,16 +159,11 @@ object AboutPageBuilder {
       .start(context)
   }
 
-  private fun getHyperLink(url: String): String {
-    return String.format("<a href=\"%s\">%s</a>", url, url)
-  }
+  private fun getHyperLink(url: String) = "<a href=\"$url\">$url</a>"
 
-  private fun getAcknowledgementHtmlString(context: Context, list: List<String>): String {
-    val sb = StringBuilder()
-
-    sb.append(context.getString(R.string.resource_declaration)).append("<br>")
-    list.forEach { sb.append(getHyperLink(it)).append("<br>") }
-    return sb.toString()
+  private fun getAcknowledgementHtmlString(context: Context, list: List<String>) = buildString {
+    append(context.getString(R.string.resource_declaration)).append("<br>")
+    list.forEach { append(getHyperLink(it)).append("<br>") }
   }
 
   private fun getFragmentManager(context: Context?): FragmentManager? {
@@ -186,21 +178,7 @@ object AboutPageBuilder {
   private fun openLibraryLink(context: Context, url: String?) {
     if (!url.isNullOrEmpty()) {
       val targetUrl = url.replace("android.com", ANDROID_DEV_HOST)
-      runCatching {
-        CustomTabsIntent.Builder().build().apply {
-          launchUrl(context, targetUrl.toUri())
-        }
-      }.onFailure {
-        Timber.e(it)
-        runCatching {
-          val intent = Intent(Intent.ACTION_VIEW)
-            .setData(targetUrl.toUri())
-          context.startActivity(intent)
-        }.onFailure { inner ->
-          Timber.e(inner)
-          Toasty.showShort(context, "No browser application")
-        }
-      }
+      context.openUrlInBrowser(targetUrl)
     }
   }
 

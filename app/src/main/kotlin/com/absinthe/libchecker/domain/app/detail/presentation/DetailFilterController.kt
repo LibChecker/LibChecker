@@ -14,10 +14,6 @@ class DetailFilterController(
 ) {
   val filterState = DetailFilterState()
 
-  fun reset() {
-    filterState.reset()
-  }
-
   fun filterDetailItems(
     items: List<LibStringItemChip>,
     searchWords: String?,
@@ -44,7 +40,7 @@ class DetailFilterController(
   }
 
   fun sortDetailItems(items: List<LibStringItemChip>, @LibType type: Int): List<LibStringItemChip> {
-    return if (isSortByLibMode()) {
+    return if (appDetailSettingsRepository.sortMode == MODE_SORT_BY_LIB) {
       if (type == NATIVE) {
         items.sortedByDescending { it.item.size }
       } else {
@@ -64,7 +60,7 @@ class DetailFilterController(
   ): DetailProcessFilterData {
     val hasNonGrantedPermissions = hasNonGrantedPermissions(type, permissionItems)
     val processMap = when {
-      isComponentDetailType(type) -> componentProcessesMap
+      isComponentType(type) -> componentProcessesMap
       hasNonGrantedPermissions -> mapOf(permissionNotGrantedLabel to permissionNotGrantedColor)
       else -> emptyMap()
     }
@@ -74,16 +70,8 @@ class DetailFilterController(
     )
   }
 
-  fun isComponentDetailType(@LibType type: Int): Boolean {
-    return isComponentType(type)
-  }
-
   fun hasNonGrantedPermissions(@LibType type: Int, permissionItems: List<LibStringItemChip>?): Boolean {
     return type == PERMISSION && permissionItems?.any { it.item.size == 0L } == true
-  }
-
-  private fun isSortByLibMode(): Boolean {
-    return appDetailSettingsRepository.sortMode == MODE_SORT_BY_LIB
   }
 
   private fun Sequence<LibStringItemChip>.filterBySearchWords(

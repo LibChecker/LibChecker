@@ -8,6 +8,9 @@ import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.compat.ZipFileCompat
 import com.absinthe.libchecker.database.entity.Features
+import com.absinthe.libchecker.domain.app.buildmetadata.COMPOSE_VERSION_ENTRIES
+import com.absinthe.libchecker.domain.app.buildmetadata.DATA_BINDING_VERSION_ENTRIES
+import com.absinthe.libchecker.domain.app.buildmetadata.readFirstPresentLine
 import com.absinthe.libchecker.domain.app.detail.model.AppIconItem
 import com.absinthe.libchecker.domain.app.detail.model.KotlinToolingMetadata
 import com.absinthe.libchecker.domain.app.model.VersionedFeature
@@ -15,6 +18,7 @@ import com.absinthe.libchecker.domain.app.repository.AppListRepository
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.extensions.getFeatures
+import com.absinthe.libchecker.utils.extensions.hasXposedModuleMetadata
 import com.absinthe.libchecker.utils.extensions.isPWA
 import com.absinthe.libchecker.utils.extensions.isPageSizeCompat
 import com.absinthe.libchecker.utils.extensions.isPlayAppSigning
@@ -174,7 +178,7 @@ class GetAppDetailFeaturesUseCase(
         emitFeature(
           VersionedFeature(
             Features.JETPACK_COMPOSE,
-            readFirstPresentLine(zip, COMPOSE_VERSION_ENTRIES)
+            zip.readFirstPresentLine(COMPOSE_VERSION_ENTRIES)
           )
         )
       }
@@ -245,24 +249,7 @@ class GetAppDetailFeaturesUseCase(
       }.getOrNull()?.let { return it }
     }
 
-    return readFirstPresentLine(zip, DATA_BINDING_VERSION_ENTRIES)
-  }
-
-  private fun readFirstPresentLine(zip: ZipFileCompat, entries: Array<String>): String? {
-    entries.forEach { name ->
-      zip.getEntry(name)?.let { entry ->
-        runCatching {
-          InputStreamReader(zip.getInputStream(entry), Charsets.UTF_8).buffered().use { it.readLine() }
-            ?.takeIf { line -> line.isNotBlank() }
-        }.getOrNull()?.let { return it }
-      }
-    }
-    return null
-  }
-
-  private fun PackageInfo.hasXposedModuleMetadata(): Boolean {
-    val metaData = applicationInfo?.metaData ?: return false
-    return metaData.getBoolean("xposedmodule") || metaData.containsKey("xposedminversion")
+    return zip.readFirstPresentLine(DATA_BINDING_VERSION_ENTRIES)
   }
 
   private fun getAllAppIcons(packageInfo: PackageInfo): List<AppIconItem> {
@@ -325,17 +312,3 @@ private const val AGP_KEYWORD = "androidGradlePluginVersion"
 private const val MANIFEST_MF_ENTRY = "META-INF/MANIFEST.MF"
 private const val AGP_MANIFEST_PREFIX = "Created-By: Android Gradle "
 private const val XPOSED_MODULE_PROP_ENTRY = "META-INF/xposed/module.prop"
-
-private val DATA_BINDING_VERSION_ENTRIES = arrayOf(
-  "META-INF/androidx.databinding_viewbinding.version",
-  "META-INF/androidx.databinding_databindingKtx.version",
-  "META-INF/androidx.databinding_library.version"
-)
-
-private val COMPOSE_VERSION_ENTRIES = arrayOf(
-  "META-INF/androidx.compose.runtime_runtime.version",
-  "META-INF/androidx.compose.ui_ui.version",
-  "META-INF/androidx.compose.ui_ui-tooling-preview.version",
-  "META-INF/androidx.compose.foundation_foundation.version",
-  "META-INF/androidx.compose.animation_animation.version"
-)

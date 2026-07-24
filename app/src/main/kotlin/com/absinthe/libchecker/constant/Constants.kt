@@ -126,7 +126,6 @@ object Constants {
   }
 
   object PackageNames {
-    const val MATERIAL_FILES = "me.zhanghai.android.files"
     const val SYSTEMUI = "com.android.systemui"
     const val ANYWHERE_ = "com.absinthe.anywhere_"
   }

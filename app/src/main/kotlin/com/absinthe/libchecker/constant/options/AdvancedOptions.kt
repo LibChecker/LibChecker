@@ -5,7 +5,6 @@ object AdvancedOptions {
   const val SHOW_OVERLAYS = 1 shl 1
   const val SHOW_64_BIT_APPS = 1 shl 2
   const val SHOW_32_BIT_APPS = 1 shl 3
-  const val SORT_BY_ASC = 1 shl 4
   const val SORT_BY_NAME = 1 shl 5
   const val SORT_BY_UPDATE_TIME = 1 shl 6
   const val SORT_BY_TARGET_API = 1 shl 7
@@ -32,4 +31,12 @@ object AdvancedOptions {
   const val ITEM_DEFAULT_OPTIONS =
     MARK_DISABLED or
       SHOW_MARKED_LIB
+}
+
+internal fun Int.withOption(option: Int, isEnabled: Boolean): Int {
+  return if (isEnabled) {
+    this or option
+  } else {
+    this and option.inv()
+  }
 }

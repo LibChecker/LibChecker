@@ -37,9 +37,8 @@ class DetailFeatureController(
       canShowAppIcons = OsUtils.atLeastT()
     ) ?: return null
 
-    val featureItem = buildFeatureItem(itemData) ?: return null
     return DetailFeatureItem(
-      item = featureItem,
+      item = buildFeatureItem(itemData) ?: return null,
       position = itemData.position
     )
   }

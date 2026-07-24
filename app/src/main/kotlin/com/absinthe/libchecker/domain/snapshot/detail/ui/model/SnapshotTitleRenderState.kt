@@ -2,7 +2,6 @@ package com.absinthe.libchecker.domain.snapshot.detail.ui.model
 
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSummary
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotTitleDisplayData
-import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotTitlePackageSizeData
 import java.text.NumberFormat
 
 data class SnapshotTitleRenderState(
@@ -36,7 +35,12 @@ fun SnapshotTitleDisplayData.toRenderState(
     iconContentDescription = appName,
     packageName = packageName,
     versionInfo = versionInfo,
-    packageSize = packageSize?.toRenderState(),
+    packageSize = packageSize?.let {
+      SnapshotTitlePackageSizeRenderState(
+        text = it.text,
+        breakStart = it.breakStart
+      )
+    },
     apis = apis,
     summary = summary?.takeIf { it.totalCount > 0 }?.toRenderState(),
     copyPrimaryText = copyPrimaryText
@@ -55,12 +59,5 @@ private fun SnapshotDetailSummary.toRenderState(): SnapshotDetailSummaryRenderSt
       )
     },
     contentDescription = description
-  )
-}
-
-private fun SnapshotTitlePackageSizeData.toRenderState(): SnapshotTitlePackageSizeRenderState {
-  return SnapshotTitlePackageSizeRenderState(
-    text = text,
-    breakStart = breakStart
   )
 }

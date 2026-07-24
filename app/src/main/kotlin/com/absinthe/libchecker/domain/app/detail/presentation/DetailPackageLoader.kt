@@ -21,46 +21,6 @@ class DetailPackageLoader(
 ) {
   val packageState = DetailPackageState()
 
-  val isApk: Boolean
-    get() = packageState.isApk
-
-  val isApkPreview: Boolean
-    get() = packageState.isApkPreview
-
-  val packageInfo: PackageInfo
-    get() = packageState.packageInfo
-
-  val apkPreviewInfo: ApkPreviewInfo?
-    get() = packageState.apkPreviewInfo
-
-  val packageInfoStateFlow = packageState.packageInfoStateFlow
-
-  fun packageName(): String = packageState.packageName()
-
-  fun initPackageInfo(packageInfo: PackageInfo) {
-    packageState.setPackageInfo(packageInfo)
-  }
-
-  fun startApkMode() {
-    packageState.startApkMode()
-  }
-
-  fun startApkPreviewMode() {
-    packageState.startApkPreviewMode()
-  }
-
-  fun setApkPreviewInfo(apkPreviewInfo: ApkPreviewInfo) {
-    packageState.apkPreviewInfo = apkPreviewInfo
-  }
-
-  fun clearApkPreviewInfo() {
-    packageState.clearApkPreviewInfo()
-  }
-
-  fun isPackageInfoAvailable(): Boolean {
-    return packageState.hasPackageInfo()
-  }
-
   suspend fun loadAppDetailPackage(packageName: String): GetAppDetailPackageUseCase.Result {
     return getAppDetailPackage(packageName)
   }

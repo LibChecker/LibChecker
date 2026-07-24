@@ -22,8 +22,6 @@ enum class AlbumItemAction {
 fun buildAlbumItemDescription(
   title: CharSequence,
   subtitle: CharSequence
-): String {
-  return listOf(title, subtitle)
-    .mapNotNull { it.toString().trim().takeIf(String::isNotEmpty) }
-    .joinToString()
-}
+): String = listOf(title, subtitle)
+  .mapNotNull { it.toString().trim().takeIf(String::isNotEmpty) }
+  .joinToString()

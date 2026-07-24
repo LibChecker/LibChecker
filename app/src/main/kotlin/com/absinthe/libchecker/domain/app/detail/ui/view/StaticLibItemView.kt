@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.text.bold
 import androidx.core.text.buildSpannedString
-import androidx.core.view.children
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.model.LibStringStaticItemDisplay
 import com.absinthe.libchecker.utils.OsUtils
@@ -68,9 +67,7 @@ class StaticLibItemView(context: Context) : RuleChipItemView(context) {
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-    children.forEach {
-      it.autoMeasure()
-    }
+    autoMeasureChildren()
     val textWidth = measuredWidth - paddingStart - paddingEnd
     if (libName.measuredWidth > textWidth) {
       libName.measure(textWidth.toExactlyMeasureSpec(), libName.defaultHeightMeasureSpec(this))

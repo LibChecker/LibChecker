@@ -41,10 +41,6 @@ class DetailPresentationLoader(
 ) {
   val featureState = DetailFeatureState()
 
-  fun reset() {
-    featureState.reset()
-  }
-
   fun buildAppDetailAbiLabelData(
     abi: Int,
     abiSet: Collection<Int>,
@@ -137,20 +133,6 @@ class DetailPresentationLoader(
     )
   )
 
-  fun emitFeature(
-    scope: CoroutineScope,
-    feature: VersionedFeature
-  ) = scope.launch {
-    featureState.emitFeature(feature)
-  }
-
-  fun setLoading(
-    scope: CoroutineScope,
-    loading: Boolean
-  ) = scope.launch {
-    featureState.setLoading(loading)
-  }
-
   fun initFeatures(
     scope: CoroutineScope,
     packageState: DetailPackageState,
@@ -187,8 +169,9 @@ class DetailPresentationLoader(
     scope: CoroutineScope,
     apkPreviewInfo: ApkPreviewInfo
   ) = scope.launch(Dispatchers.IO) {
-    getAppDetailAbi(apkPreviewInfo)?.let {
-      featureState.emitAbiBundle(it)
+    val abiSet = apkPreviewInfo.abiSet
+    abiSet.firstOrNull()?.let {
+      featureState.emitAbiBundle(buildAppDetailAbi(it, abiSet))
     }
   }
 
@@ -219,11 +202,6 @@ class DetailPresentationLoader(
       ignoreArch = true
     ).toSet()
     return buildAppDetailAbi(PackageUtils.getAbi(packageInfo, isApk = isApk, abiSet = abiSet), abiSet)
-  }
-
-  private fun getAppDetailAbi(apkPreviewInfo: ApkPreviewInfo): AppDetailAbi? {
-    val abiSet = apkPreviewInfo.abiSet
-    return abiSet.firstOrNull()?.let { buildAppDetailAbi(it, abiSet) }
   }
 
   private fun buildAppDetailAbi(abi: Int, abiSet: Collection<Int>): AppDetailAbi {

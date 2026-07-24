@@ -299,8 +299,7 @@ class DetailContentResolver(
       ?.let { sourceDir ->
         IntentFilterUtils.parseComponentsFromApk(sourceDir)
           .asSequence()
-          .map { item -> item.className to item.intentFilters }
-          .toMap()
+          .associate { item -> item.className to item.intentFilters }
       }
       .orEmpty()
 
@@ -332,7 +331,7 @@ class DetailContentResolver(
     } else {
       // Do not combine component flags here: huge apps can exceed Binder's
       // transaction limit when a single PackageInfo carries every component.
-      installedAppRepository.getPackageInfo(packageName, componentFlag(type))
+      installedAppRepository.getPackageInfo(packageName, PackageUtils.getComponentPackageInfoFlag(type))
         ?.componentInfoList(type)
     }
 
@@ -346,16 +345,6 @@ class DetailContentResolver(
       RECEIVER -> receivers
       PROVIDER -> providers
       else -> null
-    }
-  }
-
-  private fun componentFlag(@LibType type: Int): Int {
-    return when (type) {
-      SERVICE -> PackageManager.GET_SERVICES
-      ACTIVITY -> PackageManager.GET_ACTIVITIES
-      RECEIVER -> PackageManager.GET_RECEIVERS
-      PROVIDER -> PackageManager.GET_PROVIDERS
-      else -> 0
     }
   }
 

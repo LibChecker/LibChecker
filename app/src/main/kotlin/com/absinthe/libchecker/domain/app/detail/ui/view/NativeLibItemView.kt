@@ -11,7 +11,7 @@ import androidx.core.text.buildSpannedString
 import androidx.core.view.marginEnd
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.model.LibStringNativeItemDisplay
-import com.absinthe.libchecker.domain.app.detail.model.buildLibStringItemDescription
+import com.absinthe.libchecker.domain.app.detail.model.buildDetailItemDescription
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.view.drawable.CapsuleDrawable
@@ -52,7 +52,12 @@ class NativeLibItemView(context: Context) : RuleChipItemView(context) {
     colorfulRuleIcon: Boolean
   ) {
     libName.setLibStringItemName(display.name, highlightText)
-    libSize.text = buildNativeSizeText(display)
+    libSize.text = buildSpannedString {
+      append(display.sizeText)
+      display.labels.forEach { label ->
+        append(createNativeLabelSpan(label))
+      }
+    }
     bindRuleChip(display.rule, colorfulRuleIcon)
     contentDescription = display.contentDescription
   }
@@ -64,16 +69,7 @@ class NativeLibItemView(context: Context) : RuleChipItemView(context) {
     libName.text = name
     libSize.text = secondaryText
     bindRuleChip(null, false)
-    contentDescription = buildLibStringItemDescription(name, secondaryText)
-  }
-
-  private fun buildNativeSizeText(display: LibStringNativeItemDisplay): CharSequence {
-    return buildSpannedString {
-      append(display.sizeText)
-      display.labels.forEach { label ->
-        append(createNativeLabelSpan(label))
-      }
-    }
+    contentDescription = buildDetailItemDescription(name, secondaryText)
   }
 
   private fun createNativeLabelSpan(text: String): SpannedString = nativeLabelSpanCache.getOrPut(text) {

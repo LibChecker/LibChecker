@@ -3,11 +3,7 @@ package com.absinthe.libchecker.integrations.monkeyking
 import android.content.Context
 import android.os.Bundle
 import androidx.core.net.toUri
-import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.LibType
-import com.absinthe.libchecker.annotation.PROVIDER
-import com.absinthe.libchecker.annotation.RECEIVER
-import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libchecker.utils.showToast
@@ -52,7 +48,7 @@ class MonkeyKingManager {
       packageName,
       listOf(
         ShareCmpInfo.Component(
-          type = getType(type),
+          type = ShareCmpInfo.componentType(type),
           name = fullComponentName,
           block = shouldBlock
         )
@@ -66,14 +62,6 @@ class MonkeyKingManager {
     } catch (e: Exception) {
       context.showToast(e.message.toString())
     }
-  }
-
-  private fun getType(@LibType type: Int): String = when (type) {
-    ACTIVITY -> TYPE_ACTIVITY
-    SERVICE -> TYPE_SERVICE
-    RECEIVER -> TYPE_RECEIVER
-    PROVIDER -> TYPE_PROVIDER
-    else -> throw IllegalStateException("wrong type")
   }
 
   companion object {

@@ -130,7 +130,9 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> :
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View? {
-    _root = initRootView().apply { applyRootView(this) }
+    _root = initRootView().also { root ->
+      root.post { updateMaxPeekSize() }
+    }
     init()
     return _root
   }
@@ -208,12 +210,6 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> :
 
     enqueueAnimation {
       animateHeight(from = oldHeight, to = height, onEnd = { })
-    }
-  }
-
-  private fun applyRootView(root: T) {
-    root.post {
-      updateMaxPeekSize()
     }
   }
 
@@ -309,8 +305,7 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> :
 
   private fun updateBlurAndDimForOffset(offset: Float) {
     if (offset.isNaN()) return
-    val normalized = ((offset + 1f) / 1f).coerceIn(0f, 1f)
-    updateBlurAndDimFraction(normalized)
+    updateBlurAndDimFraction((offset + 1f).coerceIn(0f, 1f))
   }
 
   private fun finishBlurAnimation() {

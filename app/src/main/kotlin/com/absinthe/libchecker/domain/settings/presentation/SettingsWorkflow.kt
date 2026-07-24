@@ -73,7 +73,8 @@ class SettingsWorkflow(
     if (!AppSelfUpdatePolicy.isSelfUpdateEnabled(BuildConfig.IS_FOSS, BuildConfig.IS_DEV_VERSION)) {
       return false
     }
-    return requestUpdateInfo(defaultUpdateChannel())?.appForFlavor(BuildConfig.IS_FOSS)?.versionCode
+    return requestUpdateInfo(AppSelfUpdatePolicy.defaultUpdateChannel(BuildConfig.IS_DEV_VERSION))
+      ?.appForFlavor(BuildConfig.IS_FOSS)?.versionCode
       ?.let { it > BuildConfig.VERSION_CODE } == true
   }
 
@@ -168,14 +169,6 @@ class SettingsWorkflow(
       items
     }
     return GetUpdatesDialogState(visibleItems)
-  }
-
-  private fun defaultUpdateChannel(): AppUpdateChannel {
-    return if (BuildConfig.IS_DEV_VERSION) {
-      AppUpdateChannel.CI
-    } else {
-      AppUpdateChannel.STABLE
-    }
   }
 
   fun getLibReferenceThreshold(): Int {

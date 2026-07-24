@@ -19,6 +19,7 @@ import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.ui.app.MenuOptionItem
 import com.absinthe.libchecker.ui.app.MenuOptionItemView
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.setSingleChild
 import com.absinthe.libchecker.view.app.AppIconPlaceholder
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
@@ -170,15 +171,6 @@ class SnapshotMenuBSDView(context: Context) :
           it.topMargin = 24.dp
         }
       }.also(::addView)
-    }
-
-    private fun LinearLayout.setSingleChild(child: View) {
-      if (childCount == 1 && getChildAt(0) === child) {
-        return
-      }
-      (child.parent as? ViewGroup)?.removeView(child)
-      removeAllViews()
-      addView(child)
     }
   }
 

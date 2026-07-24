@@ -8,7 +8,6 @@ import android.widget.FrameLayout
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.text.buildSpannedString
 import androidx.core.text.italic
-import androidx.core.view.children
 import androidx.core.view.marginLeft
 import androidx.core.view.marginRight
 import com.absinthe.libchecker.R
@@ -110,9 +109,7 @@ class MultipleAppsIconItemView(context: Context) : FrameLayout(context) {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
       super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-      children.forEach {
-        it.autoMeasure()
-      }
+      autoMeasureChildren()
       val labelWidth = (
         measuredWidth -
           paddingStart -

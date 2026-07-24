@@ -13,8 +13,6 @@ data class TrackedAppListItem(
 fun buildTrackedAppListItemDescription(
   label: CharSequence?,
   packageName: CharSequence?
-): String {
-  return listOf(label, packageName)
-    .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
-    .joinToString()
-}
+): String = listOf(label, packageName)
+  .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
+  .joinToString()

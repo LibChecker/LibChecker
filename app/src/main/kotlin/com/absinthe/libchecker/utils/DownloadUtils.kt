@@ -50,7 +50,6 @@ object DownloadUtils {
 
   interface OnDownloadListener {
     fun onDownloadSuccess()
-    fun onDownloading(progress: Int)
     fun onDownloadFailed()
   }
 }

@@ -27,12 +27,8 @@ class DetailContentLoader(
   val contentState = DetailContentState()
   private val loadJobsState = DetailLoadJobsState()
 
-  private fun cancelAll() {
-    loadJobsState.cancelAll()
-  }
-
   fun reset() {
-    cancelAll()
+    loadJobsState.cancelAll()
     contentState.reset()
   }
 
@@ -114,10 +110,6 @@ class DetailContentLoader(
       packageName = packageName,
       sortBySizeMode = isSortBySizeMode()
     )
-  }
-
-  suspend fun emitStaticLibItems(items: List<LibStringItemChip>) {
-    contentState.emitStaticLibItems(items)
   }
 
   fun initMetaDataData(

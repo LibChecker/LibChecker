@@ -109,7 +109,10 @@ class ChartViewModel internal constructor(
       applySelectedStatistics(statisticCatalogRepository.getSelectedStatistics())
     }
     viewModelScope.launch {
-      featureInitializationPlans.collect(::applyFeatureInitializationPlan)
+      featureInitializationPlans.collect { plan ->
+        featureInitializationPending = plan.isPending
+        refreshStatisticSelectorPlan()
+      }
     }
   }
 
@@ -182,11 +185,6 @@ class ChartViewModel internal constructor(
 
   fun setDetailAbiSwitchVisibility(isVisible: Boolean) {
     _detailAbiSwitchVisibility.value = isVisible
-  }
-
-  private fun applyFeatureInitializationPlan(plan: ChartFeatureInitializationPlan) {
-    featureInitializationPending = plan.isPending
-    refreshStatisticSelectorPlan()
   }
 
   fun selectStatistic(statisticId: String) {

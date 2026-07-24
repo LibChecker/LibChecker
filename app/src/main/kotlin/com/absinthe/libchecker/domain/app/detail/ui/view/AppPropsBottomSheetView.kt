@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.domain.app.detail.ui.view
 
 import android.content.Context
-import android.content.Intent
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ImageSpan
@@ -9,8 +8,6 @@ import android.text.style.UnderlineSpan
 import android.view.Gravity
 import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.browser.customtabs.CustomTabsIntent
-import androidx.core.net.toUri
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.URLManager
@@ -18,14 +15,13 @@ import com.absinthe.libchecker.domain.app.detail.model.AppPropItem
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.AppPropsAdapter
 import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
-import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getDrawable
+import com.absinthe.libchecker.utils.extensions.openUrlInBrowser
 import com.absinthe.libchecker.utils.extensions.paddingBottomCompat
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libchecker.view.span.CenterAlignImageSpan
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
-import timber.log.Timber
 
 class AppPropsBottomSheetView(
   context: Context,
@@ -60,21 +56,7 @@ class AppPropsBottomSheetView(
       text = spannableString
     }
     setOnClickListener {
-      runCatching {
-        CustomTabsIntent.Builder().build().apply {
-          launchUrl(context, URLManager.ANDROID_DEV_MANIFEST_APPLICATION.toUri())
-        }
-      }.onFailure {
-        Timber.e(it)
-        runCatching {
-          val intent = Intent(Intent.ACTION_VIEW)
-            .setData(URLManager.ANDROID_DEV_MANIFEST_APPLICATION.toUri())
-          context.startActivity(intent)
-        }.onFailure { inner ->
-          Timber.e(inner)
-          Toasty.showShort(context, "No browser application")
-        }
-      }
+      context.openUrlInBrowser(URLManager.ANDROID_DEV_MANIFEST_APPLICATION)
     }
   }
 

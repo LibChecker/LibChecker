@@ -159,10 +159,7 @@ class LibCheckerApp : Application() {
   }
 
   private fun clearCache() {
-    val sharedApkDir = File(cacheDir, "shared_apk")
-    if (sharedApkDir.exists() && sharedApkDir.isDirectory) {
-      sharedApkDir.deleteRecursively()
-    }
+    File(cacheDir, "shared_apk").takeIf { it.isDirectory }?.deleteRecursively()
   }
 
   companion object {

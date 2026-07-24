@@ -129,11 +129,10 @@ class DetailHeaderController(
     packageName: String
   ): DetailHeaderExtraInfoState {
     if (!isHarmonyMode) {
-      val showAndroidVersion = isDisplayOptionEnabled(AdvancedOptions.SHOW_ANDROID_VERSION)
       return DetailHeaderExtraInfoState.Android(
         viewModel.buildAppDetailHeaderExtraInfo(
           packageInfo = packageInfo,
-          showAndroidVersion = showAndroidVersion
+          showAndroidVersion = isDisplayOptionEnabled(AdvancedOptions.SHOW_ANDROID_VERSION)
         )
       )
     }

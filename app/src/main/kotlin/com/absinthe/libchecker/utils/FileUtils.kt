@@ -11,12 +11,11 @@ object FileUtils {
     return if (file.isDirectory) {
       deleteDir(file)
     } else {
-      deleteFile(file)
+      !file.exists() || (file.isFile && file.delete())
     }
   }
 
-  private fun deleteDir(dir: File?): Boolean {
-    if (dir == null) return false
+  private fun deleteDir(dir: File): Boolean {
     // dir doesn't exist then return true
     if (!dir.exists()) return true
     // dir isn't a directory then return false
@@ -32,10 +31,6 @@ object FileUtils {
       }
     }
     return dir.delete()
-  }
-
-  private fun deleteFile(file: File?): Boolean {
-    return file != null && (!file.exists() || (file.isFile && file.delete()))
   }
 
   fun getFileSize(file: File): Long {

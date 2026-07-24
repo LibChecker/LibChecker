@@ -41,7 +41,7 @@ data class LibStringNativeItemDisplay(
         sizeText = displayData.sizeText,
         labels = labels,
         rule = rule,
-        contentDescription = buildLibStringItemDescription(
+        contentDescription = buildDetailItemDescription(
           name.text,
           secondaryText,
           rule?.label
@@ -49,8 +49,4 @@ data class LibStringNativeItemDisplay(
       )
     }
   }
-}
-
-private fun Int.isOptionEnabled(option: Int): Boolean {
-  return (this and option) > 0
 }

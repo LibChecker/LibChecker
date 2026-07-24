@@ -6,7 +6,6 @@ import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.view.children
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.model.AppBundleItem
@@ -60,9 +59,7 @@ class AppBundleItemView(context: Context) : AViewGroup(context) {
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-    children.forEach {
-      it.autoMeasure()
-    }
+    autoMeasureChildren()
     val textWidth =
       measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - name.marginStart
     if (name.measuredWidth > textWidth) {

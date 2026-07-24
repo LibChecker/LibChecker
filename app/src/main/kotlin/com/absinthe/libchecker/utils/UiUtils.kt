@@ -124,8 +124,7 @@ object UiUtils {
       )
       .setCancelable(false)
       .setPositiveButton(android.R.string.ok) { _, _ ->
-        val confirmedThreshold = slider.value.toInt()
-        onThresholdConfirmed?.invoke(confirmedThreshold)
+        onThresholdConfirmed?.invoke(slider.value.toInt())
       }
       .setNegativeButton(android.R.string.cancel, null)
       .create()

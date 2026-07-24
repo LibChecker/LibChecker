@@ -98,6 +98,7 @@ object LCAppUtils {
           getHighlightDifferences(diff2.old.toString(), diff2.new.toString(), highlightDiffColor, emphasizeDiffs)
         val allText = highlightedPair1.first.toString() + highlightedPair1.second + highlightedPair2.first + highlightedPair2.second + diff1Suffix + diff2Suffix
         val isRtl = BidiFormatter.getInstance().isRtl(allText)
+        val arrow = if (isRtl) ARROW_REVERT else ARROW
         buildSpannedString {
           append(highlightedPair1.first)
           append(diff1Suffix)
@@ -105,7 +106,7 @@ object LCAppUtils {
           append(highlightedPair2.first)
           append(diff2Suffix)
           append(")")
-          append(" ${getArrow(isRtl)} ")
+          append(" $arrow ")
           append(highlightedPair1.second)
           append(diff1Suffix)
           append(" (")
@@ -177,14 +178,6 @@ object LCAppUtils {
         end,
         Spannable.SPAN_INCLUSIVE_EXCLUSIVE
       )
-    }
-  }
-
-  private fun getArrow(isRtl: Boolean): String {
-    return if (isRtl) {
-      ARROW_REVERT
-    } else {
-      ARROW
     }
   }
 }

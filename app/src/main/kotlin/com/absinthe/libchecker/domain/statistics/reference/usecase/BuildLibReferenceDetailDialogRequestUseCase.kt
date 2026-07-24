@@ -14,7 +14,7 @@ class BuildLibReferenceDetailDialogRequestUseCase {
     name: String,
     @LibType type: Int
   ): LibReferenceDetailDialogRequest? = withContext(Dispatchers.IO) {
-    if (!canOpenDetail(type)) {
+    if (type != NATIVE && !isComponentType(type) && type != ACTION) {
       return@withContext null
     }
 
@@ -23,10 +23,6 @@ class BuildLibReferenceDetailDialogRequestUseCase {
       type = type,
       regexName = RulesRepository.getRule(name, type, true)?.regexName
     )
-  }
-
-  private fun canOpenDetail(@LibType type: Int): Boolean {
-    return type == NATIVE || isComponentType(type) || type == ACTION
   }
 }
 

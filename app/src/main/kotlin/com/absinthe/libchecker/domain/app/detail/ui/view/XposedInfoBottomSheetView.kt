@@ -8,7 +8,6 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.view.children
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -147,9 +146,7 @@ class XposedInfoBottomSheetView(context: Context) :
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
       super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-      children.forEach {
-        it.autoMeasure()
-      }
+      autoMeasureChildren()
       val textWidth = measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - tip.marginStart
       if (tip.measuredWidth > textWidth) {
         tip.measure(textWidth.toExactlyMeasureSpec(), tip.defaultHeightMeasureSpec(this))

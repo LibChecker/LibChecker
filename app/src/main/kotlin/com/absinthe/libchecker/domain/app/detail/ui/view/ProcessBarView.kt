@@ -103,12 +103,8 @@ class ProcessBarView(context: Context) : RecyclerView(context) {
       }
     }
 
-    private fun setIndicatorColor(color: Int) {
-      colorIndicator.imageTintList = color.toColorStateListByColor()
-    }
-
     fun bind(item: ProcessBarItemRenderState) {
-      setIndicatorColor(item.color)
+      colorIndicator.imageTintList = item.color.toColorStateListByColor()
       text.text = item.process
       contentDescription = item.process
       isSelected = item.selected

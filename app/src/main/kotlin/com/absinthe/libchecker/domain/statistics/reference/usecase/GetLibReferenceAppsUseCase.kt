@@ -108,7 +108,7 @@ class GetLibReferenceAppsUseCase(
 
   private fun LCItem.hasComponentReference(name: String, @LibType type: Int): Boolean {
     return runCatching {
-      val packageInfo = installedAppRepository.getPackageInfo(packageName, componentFlags(type))
+      val packageInfo = installedAppRepository.getPackageInfo(packageName, PackageUtils.getComponentPackageInfoFlag(type))
         ?: return@runCatching false
       PackageUtils.getComponentStringList(packageInfo, type, false).contains(name)
     }.onFailure {
@@ -155,16 +155,6 @@ class GetLibReferenceAppsUseCase(
     }.onFailure {
       Timber.e(it, "Failed to parse intent filters for $packageName")
     }.getOrNull()
-  }
-
-  private fun componentFlags(@LibType type: Int): Int {
-    return when (type) {
-      SERVICE -> PackageManager.GET_SERVICES
-      ACTIVITY -> PackageManager.GET_ACTIVITIES
-      RECEIVER -> PackageManager.GET_RECEIVERS
-      PROVIDER -> PackageManager.GET_PROVIDERS
-      else -> 0
-    }
   }
 
   data class Request(

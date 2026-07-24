@@ -66,15 +66,11 @@ class WorkerService : LifecycleService() {
 
     initFeaturesJob = lifecycleScope.launch(Dispatchers.IO) {
       try {
-        initPendingFeatures()
+        initializePendingAppFeatures()
       } finally {
         finishInitFeatures()
       }
     }
-  }
-
-  private suspend fun initPendingFeatures() {
-    initializePendingAppFeatures()
   }
 
   @Synchronized
@@ -105,9 +101,6 @@ class WorkerService : LifecycleService() {
 
     private val _featureInitializationState = MutableStateFlow(FeatureInitializationState())
     val featureInitializationState = _featureInitializationState.asStateFlow()
-
-    val initializingFeatures: Boolean
-      get() = featureInitializationState.value.running
 
     private fun updateFeatureInitializationState(
       running: Boolean,

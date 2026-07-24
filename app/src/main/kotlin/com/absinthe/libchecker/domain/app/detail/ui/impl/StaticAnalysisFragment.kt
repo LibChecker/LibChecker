@@ -10,8 +10,6 @@ import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.domain.app.detail.ui.base.BaseDetailFragment
 import com.absinthe.libchecker.domain.app.detail.ui.base.EXTRA_TYPE
 import com.absinthe.libchecker.utils.extensions.putArguments
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import rikka.core.util.ClipboardUtils
@@ -22,8 +20,7 @@ class StaticAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>()
   override val needShowLibDetailDialog = true
 
   override suspend fun getItems(): List<LibStringItemChip> {
-    val flow = viewModel.contentState.staticLibItems
-    return flow.value ?: flow.filterNotNull().first()
+    return viewModel.contentState.staticLibItems.valueOrAwait()
   }
 
   override fun onItemsAvailable(items: List<LibStringItemChip>) {
@@ -33,18 +30,11 @@ class StaticAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>()
       submitItemsWithFilter(items, viewModel.filterState.queriedText, null)
     }
 
-    if (!isListReady) {
-      viewModel.filterState.updateItemsCount(type, items.size)
-      isListReady = true
-    }
+    markListReady(items.size)
   }
 
   override fun init() {
-    binding.apply {
-      list.apply {
-        adapter = this@StaticAnalysisFragment.adapter
-      }
-    }
+    binding.list.adapter = adapter
 
     adapter.apply {
       animationEnable = false
@@ -57,16 +47,14 @@ class StaticAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>()
       isStateViewEnable = true
     }
 
-    viewModel.apply {
-      packageInfoStateFlow.onEach {
-        if (it != null) {
-          viewModel.initStaticData()
-        }
-      }.launchIn(lifecycleScope)
-
-      packageInfoStateFlow.value?.run {
-        contentState.staticLibItems.value ?: run { initStaticData() }
+    viewModel.packageInfoStateFlow.onEach {
+      if (it != null) {
+        viewModel.initStaticData()
       }
+    }.launchIn(lifecycleScope)
+
+    if (viewModel.packageInfoStateFlow.value != null && viewModel.contentState.staticLibItems.value == null) {
+      viewModel.initStaticData()
     }
   }
 

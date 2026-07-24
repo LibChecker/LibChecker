@@ -24,10 +24,6 @@ import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.navigation.DetailReferenceNavigation
 import com.absinthe.libchecker.domain.app.detail.packageinfo.GetAppDetailPackageUseCase
-import com.absinthe.libchecker.domain.app.detail.presentation.DetailActionLoader
-import com.absinthe.libchecker.domain.app.detail.presentation.DetailFilterController
-import com.absinthe.libchecker.domain.app.detail.presentation.DetailPackageLoader
-import com.absinthe.libchecker.domain.app.detail.presentation.DetailPackageState
 import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailContentLoader
 import com.absinthe.libchecker.domain.app.detail.statistics.AnalyzeAppStatisticRulesUseCase
 import com.absinthe.libchecker.domain.app.detail.statistics.AppStatisticAnalysisState
@@ -102,27 +98,27 @@ class DetailViewModel(
     get() = detailPackageLoader.packageState
 
   val isApk: Boolean
-    get() = detailPackageLoader.isApk
+    get() = packageState.isApk
 
   val isApkPreview: Boolean
-    get() = detailPackageLoader.isApkPreview
+    get() = packageState.isApkPreview
 
   val packageInfo: PackageInfo
-    get() = detailPackageLoader.packageInfo
+    get() = packageState.packageInfo
 
   val apkPreviewInfo: ApkPreviewInfo?
-    get() = detailPackageLoader.apkPreviewInfo
+    get() = packageState.apkPreviewInfo
 
-  val packageInfoStateFlow = detailPackageLoader.packageInfoStateFlow
+  val packageInfoStateFlow = packageState.packageInfoStateFlow
 
-  fun packageName(): String = detailPackageLoader.packageName()
+  fun packageName(): String = packageState.packageName()
 
   fun initPackageInfo(pi: PackageInfo) {
-    detailPackageLoader.initPackageInfo(pi)
+    packageState.setPackageInfo(pi)
   }
 
   fun isPackageInfoAvailable(): Boolean {
-    return detailPackageLoader.isPackageInfoAvailable()
+    return packageState.hasPackageInfo()
   }
 
   fun loadAppDetailPackage(packageName: String) {
@@ -145,8 +141,8 @@ class DetailViewModel(
   fun loadApkAnalysisPackage(cacheDir: File, uri: Uri) {
     apkAnalysisPackageJob?.cancel()
     apkPreviewJob?.cancel()
-    detailPackageLoader.startApkMode()
-    detailPackageLoader.clearApkPreviewInfo()
+    packageState.startApkMode()
+    packageState.clearApkPreviewInfo()
     apkAnalysisPackageJob = viewModelScope.launch {
       _apkAnalysisPackageResults.emit(
         ApkAnalysisPackageResult(
@@ -163,11 +159,11 @@ class DetailViewModel(
   fun loadApkPreview(url: String) {
     apkPreviewJob?.cancel()
     apkAnalysisPackageJob?.cancel()
-    detailPackageLoader.startApkPreviewMode()
-    detailPackageLoader.clearApkPreviewInfo()
+    packageState.startApkPreviewMode()
+    packageState.clearApkPreviewInfo()
     apkPreviewJob = viewModelScope.launch {
       val result = detailPackageLoader.getApkPreviewInfo(url)
-      result.getOrNull()?.let(detailPackageLoader::setApkPreviewInfo)
+      result.getOrNull()?.let { packageState.apkPreviewInfo = it }
       _apkPreviewResults.emit(ApkPreviewResult(url, result))
     }
   }
@@ -407,7 +403,7 @@ class DetailViewModel(
   }
 
   suspend fun emitStaticLibItems(items: List<LibStringItemChip>) {
-    detailContentLoader.emitStaticLibItems(items)
+    contentState.staticLibItems.emit(items)
   }
 
   suspend fun loadInstalledAppComparisonPackage(packageName: String): PackageInfo? {
@@ -427,8 +423,8 @@ class DetailViewModel(
     appStatisticAnalysisJob = null
     _appStatisticAnalysisState.value = AppStatisticAnalysisState.Idle
     detailContentLoader.reset()
-    detailFilterController.reset()
-    detailPresentationLoader.reset()
+    filterState.reset()
+    featureState.reset()
   }
 
   fun initSoAnalysisData() {
@@ -498,11 +494,15 @@ class DetailViewModel(
   }
 
   fun emitFeature(feature: VersionedFeature) {
-    detailPresentationLoader.emitFeature(viewModelScope, feature)
+    viewModelScope.launch {
+      featureState.emitFeature(feature)
+    }
   }
 
   fun setFeatureLoading(loading: Boolean) {
-    detailPresentationLoader.setLoading(viewModelScope, loading)
+    viewModelScope.launch {
+      featureState.setLoading(loading)
+    }
   }
 
   fun buildSignatureDetailItems(detail: String) = detailActionLoader.buildSignatureDetailItems(detail)
@@ -608,10 +608,6 @@ class DetailViewModel(
     permissionNotGrantedLabel = permissionNotGrantedLabel,
     permissionNotGrantedColor = permissionNotGrantedColor
   )
-
-  fun isComponentDetailType(@LibType type: Int): Boolean {
-    return detailFilterController.isComponentDetailType(type)
-  }
 
   fun hasNonGrantedPermissions(@LibType type: Int): Boolean {
     return detailFilterController.hasNonGrantedPermissions(type, contentState.permissionsItems.value)

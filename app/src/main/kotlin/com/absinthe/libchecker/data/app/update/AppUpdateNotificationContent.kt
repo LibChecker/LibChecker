@@ -40,9 +40,5 @@ internal fun buildAppUpdateNotificationContent(
   if (previous == null || current == null) {
     return null
   }
-  return "${previous.format()} → ${current.format()}"
-}
-
-private fun AppUpdateNotificationVersionInfo.format(): String {
-  return "$versionName ($versionCode)"
+  return "${previous.versionName} (${previous.versionCode}) → ${current.versionName} (${current.versionCode})"
 }

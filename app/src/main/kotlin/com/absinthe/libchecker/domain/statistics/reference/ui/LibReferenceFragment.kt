@@ -63,7 +63,11 @@ class LibReferenceFragment :
     listRenderState = listRenderState.copy(
       colorfulRuleIcon = libReferenceViewModel.colorfulRuleIcon
     )
-    LibReferenceAdapter(onAction = ::onAdapterAction).apply {
+    LibReferenceAdapter { action ->
+      when (action) {
+        is LibReferenceAction.DetailIconClicked -> showLibReferenceDetail(action.reference)
+      }
+    }.apply {
       bind(listRenderState)
     }
   }
@@ -382,12 +386,6 @@ class LibReferenceFragment :
       }
     }
     return false
-  }
-
-  private fun onAdapterAction(action: LibReferenceAction) {
-    when (action) {
-      is LibReferenceAction.DetailIconClicked -> showLibReferenceDetail(action.reference)
-    }
   }
 
   private fun updateListRenderState(

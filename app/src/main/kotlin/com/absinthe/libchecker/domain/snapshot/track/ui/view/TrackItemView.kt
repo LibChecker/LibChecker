@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.view.children
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -82,9 +81,7 @@ class TrackItemView(context: Context) : FrameLayout(context) {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
       super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-      children.forEach {
-        it.autoMeasure()
-      }
+      autoMeasureChildren()
       val textWidth =
         measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - appName.marginStart - packageName.marginStart - switch.measuredWidth
       if (appName.measuredWidth > textWidth) {

@@ -62,21 +62,19 @@ class SnapshotMenuBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotMenuBS
         demoDisplayData = buildDemoDisplayData(options),
         includeIecUnits = supportIECUnit
       ),
-      onAction = ::handleAction
-    )
-  }
-
-  private fun handleAction(action: SnapshotMenuAction) {
-    when (action) {
-      is SnapshotMenuAction.OptionChanged -> {
-        val currentOptions = updateOption(
-          labelRes = action.item.labelRes,
-          option = action.item.option,
-          isChecked = action.isChecked
-        )
-        render(currentOptions)
+      onAction = { action ->
+        when (action) {
+          is SnapshotMenuAction.OptionChanged -> {
+            val currentOptions = updateOption(
+              labelRes = action.item.labelRes,
+              option = action.item.option,
+              isChecked = action.isChecked
+            )
+            render(currentOptions)
+          }
+        }
       }
-    }
+    )
   }
 
   private fun updateOption(labelRes: Int, option: Int, isChecked: Boolean): Int {

@@ -79,11 +79,9 @@ fun buildSnapshotDetailItemDescription(
   title: CharSequence?,
   extra: CharSequence?,
   ruleLabel: CharSequence?
-): String {
-  return listOf(statusLabel, ruleLabel, title, extra)
-    .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
-    .joinToString()
-}
+): String = listOf(statusLabel, ruleLabel, title, extra)
+  .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
+  .joinToString()
 
 fun buildSnapshotDetailSummary(
   sections: List<SnapshotDetailSection>,
@@ -116,15 +114,13 @@ fun buildSnapshotDetailSectionDescription(
   title: CharSequence?,
   statusCounts: List<SnapshotDetailStatusCount>,
   expansionStateLabel: CharSequence?
-): String {
-  return (
-    listOf(title) +
-      statusCounts.map { "${it.label} ${it.countText}" } +
-      listOf(expansionStateLabel)
-    )
-    .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
-    .joinToString()
-}
+): String = (
+  listOf(title) +
+    statusCounts.map { "${it.label} ${it.countText}" } +
+    listOf(expansionStateLabel)
+  )
+  .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
+  .joinToString()
 
 fun buildSnapshotDetailRuleChipDisplayData(
   rule: Rule?,

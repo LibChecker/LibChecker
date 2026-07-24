@@ -11,7 +11,6 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.IntentCompat
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel.ApkAnalysisPackageResult
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel.ApkPreviewResult
-import com.absinthe.libchecker.domain.app.detail.ui.IDetailContainer
 import com.absinthe.libchecker.domain.app.packageinfo.PrepareApkAnalysisPackageUseCase
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.UiUtils
@@ -34,8 +33,12 @@ class ApkDetailActivity :
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    collectApkAnalysisPackageResults()
-    collectApkPreviewResults()
+    lifecycleScope.launch {
+      viewModel.apkAnalysisPackageResults.collect(::handleApkAnalysisPackageResult)
+    }
+    lifecycleScope.launch {
+      viewModel.apkPreviewResults.collect(::handleApkPreviewResult)
+    }
     resolveIntent(intent)
   }
 
@@ -92,12 +95,6 @@ class ApkDetailActivity :
     viewModel.loadApkPreview(url)
   }
 
-  private fun collectApkAnalysisPackageResults() {
-    lifecycleScope.launch {
-      viewModel.apkAnalysisPackageResults.collect(::handleApkAnalysisPackageResult)
-    }
-  }
-
   private fun handleApkAnalysisPackageResult(loadResult: ApkAnalysisPackageResult) {
     when (val result = loadResult.result) {
       is PrepareApkAnalysisPackageUseCase.Result.Available -> {
@@ -125,12 +122,6 @@ class ApkDetailActivity :
         showToast(R.string.toast_not_enough_storage_space)
         finish()
       }
-    }
-  }
-
-  private fun collectApkPreviewResults() {
-    lifecycleScope.launch {
-      viewModel.apkPreviewResults.collect(::handleApkPreviewResult)
     }
   }
 

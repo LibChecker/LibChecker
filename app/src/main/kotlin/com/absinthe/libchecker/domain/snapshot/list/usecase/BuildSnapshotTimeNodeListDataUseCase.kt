@@ -20,7 +20,9 @@ class BuildSnapshotTimeNodeListDataUseCase(
         timestamp = item.timestamp,
         timestampText = timestampText,
         description = timestampText,
-        topAppPackageNames = item.topApps.toPackageNames()
+        topAppPackageNames = item.topApps
+          ?.fromJson<List<String>>(List::class.java, String::class.java)
+          .orEmpty()
       )
     }
     val topAppPackageNames = items.asSequence()
@@ -31,9 +33,5 @@ class BuildSnapshotTimeNodeListDataUseCase(
       items = items,
       packageIconSources = getSnapshotPackageIconSources(topAppPackageNames)
     )
-  }
-
-  private fun String?.toPackageNames(): List<String> {
-    return this?.fromJson<List<String>>(List::class.java, String::class.java).orEmpty()
   }
 }

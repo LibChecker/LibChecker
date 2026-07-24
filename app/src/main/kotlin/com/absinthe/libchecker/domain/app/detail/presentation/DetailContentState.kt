@@ -55,10 +55,6 @@ class DetailContentState {
     }
   }
 
-  suspend fun emitStaticLibItems(items: List<LibStringItemChip>) {
-    staticLibItems.emit(items)
-  }
-
   fun nativeLibItemsFor(tab: String): List<LibStringItem>? {
     return nativeLibItemsByTab[tab]
   }
