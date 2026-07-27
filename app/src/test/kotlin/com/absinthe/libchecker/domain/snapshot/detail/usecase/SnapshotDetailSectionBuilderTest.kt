@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.domain.snapshot.detail.usecase
 
 import com.absinthe.libchecker.utils.dex.DexEntryInfo
+import com.absinthe.libchecker.utils.dex.ResourceEntryInfo
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -12,13 +13,16 @@ class SnapshotDetailSectionBuilderTest {
       oldEntry = DexEntryInfo(
         name = "base/classes.dex",
         size = 5_743_056,
-        classCount = 5_834
+        classCount = 5_834,
+        crc32 = 1
       ),
       newEntry = DexEntryInfo(
         name = "base/classes.dex",
         size = 6_237_668,
-        classCount = 6_108
+        classCount = 6_108,
+        crc32 = 2
       ),
+      contentChangedText = "Content changed",
       formatSize = { "$it bytes" },
       formatClassCount = { "$it classes" },
       formatSizeDelta = { "$it bytes" }
@@ -29,6 +33,33 @@ class SnapshotDetailSectionBuilderTest {
         "5834 classes → 6108 classes\n+274 classes, +4.7%",
       extra
     )
+  }
+
+  @Test
+  fun `same size dex content change explains why it changed`() {
+    val extra = buildDexChangedExtra(
+      oldEntry = DexEntryInfo("base/classes.dex", 10, 1, 1),
+      newEntry = DexEntryInfo("base/classes.dex", 10, 1, 2),
+      contentChangedText = "Content changed",
+      formatSize = { "$it bytes" },
+      formatClassCount = { "$it classes" },
+      formatSizeDelta = { "$it bytes" }
+    )
+
+    assertEquals("Content changed\n10 bytes\n1 classes", extra)
+  }
+
+  @Test
+  fun `same size resource content change explains why it changed`() {
+    val extra = buildResourceChangedExtra(
+      oldEntry = ResourceEntryInfo("base/resources.arsc", 10, 1),
+      newEntry = ResourceEntryInfo("base/resources.arsc", 10, 2),
+      contentChangedText = "Content changed",
+      formatSize = { "$it bytes" },
+      formatSizeDelta = { "$it bytes" }
+    )
+
+    assertEquals("Content changed\n10 bytes", extra)
   }
 
   @Test

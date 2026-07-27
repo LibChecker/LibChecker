@@ -84,9 +84,9 @@ class SnapshotComparisonWorkflow(
   }
 
   fun buildPairDiff(left: SnapshotItem, right: SnapshotItem): SnapshotDiffItem {
-    val hasComparableStats =
-      left.statsVersion == SnapshotItem.CURRENT_STATS_VERSION &&
-        right.statsVersion == SnapshotItem.CURRENT_STATS_VERSION
+    val hasComparableDexStats = left.hasDexStats() && right.hasDexStats()
+    val hasComparableResourceStats =
+      left.hasResourceStats() && right.hasResourceStats()
     return SnapshotDiffItem(
       packageName = "${left.packageName}/${right.packageName}",
       updateTime = -1,
@@ -105,15 +105,20 @@ class SnapshotComparisonWorkflow(
       permissionsDiff = SnapshotDiffItem.DiffNode(left.permissions, right.permissions),
       metadataDiff = SnapshotDiffItem.DiffNode(left.metadata, right.metadata),
       packageSizeDiff = SnapshotDiffItem.DiffNode(left.packageSize, right.packageSize),
-      dexInfoDiff = if (hasComparableStats) {
+      dexInfoDiff = if (hasComparableDexStats) {
         SnapshotDiffItem.DiffNode(left.dexInfo, right.dexInfo)
       } else {
         SnapshotDiffItem.DiffNode("")
       },
-      resourcesSizeDiff = if (hasComparableStats) {
+      resourcesSizeDiff = if (hasComparableResourceStats) {
         SnapshotDiffItem.DiffNode(left.resourcesSize, right.resourcesSize)
       } else {
         SnapshotDiffItem.DiffNode(0L)
+      },
+      resourceInfoDiff = if (hasComparableResourceStats) {
+        SnapshotDiffItem.DiffNode(left.resourceInfo, right.resourceInfo)
+      } else {
+        SnapshotDiffItem.DiffNode("")
       },
       isTrackItem = false,
       archivedDiff = SnapshotDiffItem.DiffNode(left.isArchived, right.isArchived)

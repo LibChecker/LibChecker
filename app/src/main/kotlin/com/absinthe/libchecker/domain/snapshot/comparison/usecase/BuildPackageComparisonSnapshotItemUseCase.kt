@@ -30,7 +30,9 @@ class BuildPackageComparisonSnapshotItemUseCase(
   ): SnapshotDiffItem = withContext(Dispatchers.IO) {
     val baseStats = DexStatsCollector.collect(basePackage)
     val analysisStats = DexStatsCollector.collect(analysisPackage)
-    val hasComparableStats = baseStats.isComplete && analysisStats.isComplete
+    val hasComparableDexStats = baseStats.isDexComplete && analysisStats.isDexComplete
+    val hasComparableResourceStats =
+      baseStats.isResourceComplete && analysisStats.isResourceComplete
     SnapshotDiffItem(
       packageName = basePackage.packageName,
       updateTime = basePackage.lastUpdateTime,
@@ -94,7 +96,7 @@ class BuildPackageComparisonSnapshotItemUseCase(
         basePackage.getPackageSize(true),
         analysisPackage.getPackageSize(true)
       ),
-      dexInfoDiff = if (hasComparableStats) {
+      dexInfoDiff = if (hasComparableDexStats) {
         SnapshotDiffItem.DiffNode(
           baseStats.entries.toJson().orEmpty(),
           analysisStats.entries.toJson().orEmpty()
@@ -102,10 +104,18 @@ class BuildPackageComparisonSnapshotItemUseCase(
       } else {
         SnapshotDiffItem.DiffNode("")
       },
-      resourcesSizeDiff = if (hasComparableStats) {
+      resourcesSizeDiff = if (hasComparableResourceStats) {
         SnapshotDiffItem.DiffNode(baseStats.resourcesSize, analysisStats.resourcesSize)
       } else {
         SnapshotDiffItem.DiffNode(0L)
+      },
+      resourceInfoDiff = if (hasComparableResourceStats) {
+        SnapshotDiffItem.DiffNode(
+          baseStats.resourceEntries.toJson().orEmpty(),
+          analysisStats.resourceEntries.toJson().orEmpty()
+        )
+      } else {
+        SnapshotDiffItem.DiffNode("")
       },
       archivedDiff = SnapshotDiffItem.DiffNode(
         basePackage.isArchivedPackage(),

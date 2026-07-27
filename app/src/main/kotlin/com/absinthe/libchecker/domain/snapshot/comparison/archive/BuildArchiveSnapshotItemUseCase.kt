@@ -100,8 +100,11 @@ class BuildArchiveSnapshotItemUseCase(
       compileSdk = getCompileSdkVersion().toShort(),
       minSdk = applicationInfo.minSdkVersion.toShort(),
       dexInfo = dexStats.entries.toJson().orEmpty(),
+      resourceInfo = dexStats.resourceEntries.toJson().orEmpty(),
       resourcesSize = dexStats.resourcesSize,
-      statsVersion = if (dexStats.isComplete) SnapshotItem.CURRENT_STATS_VERSION else 0
+      statsVersion = SnapshotItem.CURRENT_STATS_VERSION,
+      dexStatsAvailable = dexStats.isDexComplete,
+      resourceStatsAvailable = dexStats.isResourceComplete
     )
   }
 

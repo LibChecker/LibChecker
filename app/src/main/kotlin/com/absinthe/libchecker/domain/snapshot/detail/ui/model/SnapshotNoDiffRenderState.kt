@@ -45,7 +45,9 @@ fun SnapshotDiffItem.toSnapshotNoDiffRenderState(
 
 fun SnapshotDiffItem.hasOnlyPackageStatsChanges(): Boolean {
   val hasPackageStatsChanges =
-    dexInfoDiff.hasChanged() || resourcesSizeDiff.hasChanged()
+    dexInfoDiff.hasChanged() ||
+      resourcesSizeDiff.hasChanged() ||
+      resourceInfoDiff.hasChanged()
   val hasComponentChanges = listOf(
     nativeLibsDiff,
     servicesDiff,

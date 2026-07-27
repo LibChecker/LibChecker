@@ -41,6 +41,7 @@ import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.dex.DexEntryInfo
+import com.absinthe.libchecker.utils.dex.ResourceEntryInfo
 import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.rulesbundle.Rule
@@ -116,7 +117,21 @@ class SnapshotDetailSectionBuilder(
         )
       )
     )
-    getResourcesDiffItem(item.resourcesSizeDiff)?.let(list::add)
+    val resourceDiffItems = getResourceDiffList(
+      item.resourceInfoDiff.old.fromJson<List<ResourceEntryInfo>>(
+        List::class.java,
+        ResourceEntryInfo::class.java
+      ) ?: emptyList(),
+      item.resourceInfoDiff.new?.fromJson<List<ResourceEntryInfo>>(
+        List::class.java,
+        ResourceEntryInfo::class.java
+      )
+    )
+    if (resourceDiffItems.isEmpty()) {
+      getResourcesDiffItem(item.resourcesSizeDiff)?.let(list::add)
+    } else {
+      list.addAll(resourceDiffItems)
+    }
 
     val sections = buildSections(list, diffTextStyle)
     SnapshotDetailContent(
@@ -535,7 +550,7 @@ class SnapshotDetailSectionBuilder(
             itemType = DEX
           )
         )
-      } else if (oldEntry.size != newEntry.size || oldEntry.classCount != newEntry.classCount) {
+      } else if (oldEntry != newEntry) {
         list.add(
           SnapshotDetailItem(
             name = name,
@@ -543,6 +558,7 @@ class SnapshotDetailSectionBuilder(
             extra = buildDexChangedExtra(
               oldEntry = oldEntry,
               newEntry = newEntry,
+              contentChangedText = context.getString(R.string.snapshot_content_changed),
               formatSize = { it.sizeToString(context) },
               formatClassCount = { count ->
                 context.resources.getQuantityString(
@@ -589,6 +605,65 @@ class SnapshotDetailSectionBuilder(
         )
       )
     }
+  }
+
+  private fun getResourceDiffList(
+    oldList: List<ResourceEntryInfo>,
+    newList: List<ResourceEntryInfo>?
+  ): List<SnapshotDetailItem> {
+    if (newList == null) return emptyList()
+
+    val list = mutableListOf<SnapshotDetailItem>()
+    val oldByName = oldList.associateBy(ResourceEntryInfo::name)
+    val newByName = newList.associateBy(ResourceEntryInfo::name)
+    val allEntryNames = (oldByName.keys + newByName.keys).toList()
+
+    for ((name, newEntry) in newByName) {
+      val oldEntry = oldByName[name]
+      val displayName = buildDexDisplayName(name, allEntryNames)
+      when {
+        oldEntry == null -> list.add(
+          SnapshotDetailItem(
+            name = name,
+            title = displayName,
+            extra = newEntry.size.sizeToString(context),
+            diffType = ADDED,
+            itemType = DEX
+          )
+        )
+
+        oldEntry != newEntry -> list.add(
+          SnapshotDetailItem(
+            name = name,
+            title = displayName,
+            extra = buildResourceChangedExtra(
+              oldEntry = oldEntry,
+              newEntry = newEntry,
+              contentChangedText = context.getString(R.string.snapshot_content_changed),
+              formatSize = { it.sizeToString(context) },
+              formatSizeDelta = { it.sizeToString(context) }
+            ),
+            diffType = CHANGED,
+            itemType = DEX
+          )
+        )
+      }
+    }
+
+    for ((name, oldEntry) in oldByName) {
+      if (name !in newByName) {
+        list.add(
+          SnapshotDetailItem(
+            name = name,
+            title = buildDexDisplayName(name, allEntryNames),
+            extra = oldEntry.size.sizeToString(context),
+            diffType = REMOVED,
+            itemType = DEX
+          )
+        )
+      }
+    }
+    return list
   }
 
   private fun getResourcesDiffItem(
@@ -675,10 +750,19 @@ internal data class SnapshotDetailChangedLine(
 internal fun buildDexChangedExtra(
   oldEntry: DexEntryInfo,
   newEntry: DexEntryInfo,
+  contentChangedText: String,
   formatSize: (Long) -> String,
   formatClassCount: (Int) -> String,
   formatSizeDelta: (Long) -> String
 ): String {
+  if (
+    oldEntry.crc32 != newEntry.crc32 &&
+    oldEntry.size == newEntry.size &&
+    oldEntry.classCount == newEntry.classCount
+  ) {
+    return "$contentChangedText\n${formatSize(newEntry.size)}\n" +
+      formatClassCount(newEntry.classCount)
+  }
   val sizeExtra = buildMetricChangedExtra(
     oldValue = oldEntry.size,
     newValue = newEntry.size,
@@ -692,6 +776,25 @@ internal fun buildDexChangedExtra(
     formatDelta = { formatClassCount(it.toInt()) }
   )
   return "$sizeExtra\n$classesExtra"
+}
+
+internal fun buildResourceChangedExtra(
+  oldEntry: ResourceEntryInfo,
+  newEntry: ResourceEntryInfo,
+  contentChangedText: String,
+  formatSize: (Long) -> String,
+  formatSizeDelta: (Long) -> String
+): String {
+  return if (oldEntry.size == newEntry.size && oldEntry.crc32 != newEntry.crc32) {
+    "$contentChangedText\n${formatSize(newEntry.size)}"
+  } else {
+    buildSizeChangedExtra(
+      oldSize = oldEntry.size,
+      newSize = newEntry.size,
+      formatSize = formatSize,
+      formatSizeDelta = formatSizeDelta
+    )
+  }
 }
 
 internal fun buildSizeChangedExtra(

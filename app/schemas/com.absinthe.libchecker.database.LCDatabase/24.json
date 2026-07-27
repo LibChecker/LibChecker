@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 24,
-    "identityHash": "762114835a8d9cf8db49f5c0ed8621a4",
+    "identityHash": "7dac559e7c754a9a8404aa9717399ea6",
     "entities": [
       {
         "tableName": "item_table",
@@ -84,7 +84,7 @@
       },
       {
         "tableName": "snapshot_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `packageName` TEXT NOT NULL, `timeStamp` INTEGER NOT NULL, `label` TEXT NOT NULL, `versionName` TEXT NOT NULL, `versionCode` INTEGER NOT NULL, `isArchived` INTEGER NOT NULL DEFAULT 0, `installedTime` INTEGER NOT NULL, `lastUpdatedTime` INTEGER NOT NULL, `isSystem` INTEGER NOT NULL, `abi` INTEGER NOT NULL, `targetApi` INTEGER NOT NULL, `nativeLibs` TEXT NOT NULL, `services` TEXT NOT NULL, `activities` TEXT NOT NULL, `receivers` TEXT NOT NULL, `providers` TEXT NOT NULL, `permissions` TEXT NOT NULL, `metadata` TEXT NOT NULL, `packageSize` INTEGER NOT NULL, `compileSdk` INTEGER NOT NULL, `minSdk` INTEGER NOT NULL, `dexInfo` TEXT NOT NULL DEFAULT '[]', `resourcesSize` INTEGER NOT NULL DEFAULT 0, `statsVersion` INTEGER NOT NULL DEFAULT 0)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `packageName` TEXT NOT NULL, `timeStamp` INTEGER NOT NULL, `label` TEXT NOT NULL, `versionName` TEXT NOT NULL, `versionCode` INTEGER NOT NULL, `isArchived` INTEGER NOT NULL DEFAULT 0, `installedTime` INTEGER NOT NULL, `lastUpdatedTime` INTEGER NOT NULL, `isSystem` INTEGER NOT NULL, `abi` INTEGER NOT NULL, `targetApi` INTEGER NOT NULL, `nativeLibs` TEXT NOT NULL, `services` TEXT NOT NULL, `activities` TEXT NOT NULL, `receivers` TEXT NOT NULL, `providers` TEXT NOT NULL, `permissions` TEXT NOT NULL, `metadata` TEXT NOT NULL, `packageSize` INTEGER NOT NULL, `compileSdk` INTEGER NOT NULL, `minSdk` INTEGER NOT NULL, `dexInfo` TEXT NOT NULL DEFAULT '[]', `resourceInfo` TEXT NOT NULL DEFAULT '[]', `resourcesSize` INTEGER NOT NULL DEFAULT 0, `statsVersion` INTEGER NOT NULL DEFAULT 0, `dexStatsAvailable` INTEGER NOT NULL DEFAULT 0, `resourceStatsAvailable` INTEGER NOT NULL DEFAULT 0)",
         "fields": [
           {
             "fieldPath": "id",
@@ -226,6 +226,13 @@
             "defaultValue": "'[]'"
           },
           {
+            "fieldPath": "resourceInfo",
+            "columnName": "resourceInfo",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'[]'"
+          },
+          {
             "fieldPath": "resourcesSize",
             "columnName": "resourcesSize",
             "affinity": "INTEGER",
@@ -235,6 +242,20 @@
           {
             "fieldPath": "statsVersion",
             "columnName": "statsVersion",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "dexStatsAvailable",
+            "columnName": "dexStatsAvailable",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "resourceStatsAvailable",
+            "columnName": "resourceStatsAvailable",
             "affinity": "INTEGER",
             "notNull": true,
             "defaultValue": "0"
@@ -333,7 +354,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '762114835a8d9cf8db49f5c0ed8621a4')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7dac559e7c754a9a8404aa9717399ea6')"
     ]
   }
 }

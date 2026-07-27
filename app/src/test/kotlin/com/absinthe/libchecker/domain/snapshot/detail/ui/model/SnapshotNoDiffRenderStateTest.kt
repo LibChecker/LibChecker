@@ -86,6 +86,41 @@ class SnapshotNoDiffRenderStateTest {
   }
 
   @Test
+  fun mapsSameSizeResourceChangeToPackageChangesMode() {
+    val title = titleRenderState()
+    val item = snapshotDiffItem().copy(
+      resourcesSizeDiff = SnapshotDiffItem.DiffNode(10L, 10L),
+      resourceInfoDiff = SnapshotDiffItem.DiffNode("old resources", "new resources"),
+      changed = 1
+    )
+
+    assertEquals(
+      SnapshotNoDiffRenderState(
+        title = title,
+        mode = SnapshotNoDiffMode.PackageChanges
+      ),
+      item.toSnapshotNoDiffRenderState(title)
+    )
+  }
+
+  @Test
+  fun mapsResourceSizeOnlyChangeToPackageChangesMode() {
+    val title = titleRenderState()
+    val item = snapshotDiffItem().copy(
+      resourcesSizeDiff = SnapshotDiffItem.DiffNode(10L, 20L),
+      changed = 1
+    )
+
+    assertEquals(
+      SnapshotNoDiffRenderState(
+        title = title,
+        mode = SnapshotNoDiffMode.PackageChanges
+      ),
+      item.toSnapshotNoDiffRenderState(title)
+    )
+  }
+
+  @Test
   fun componentChangeWithPackageStatsStillNeedsDetailPage() {
     val item = snapshotDiffItem().copy(
       servicesDiff = SnapshotDiffItem.DiffNode("old service", "new service"),

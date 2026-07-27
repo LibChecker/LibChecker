@@ -54,7 +54,7 @@ class CaptureInstalledSnapshotUseCase(
 
       val previousSnapshotItem = snapshotRepository.getSnapshot(currentSnapshotTimestamp, packageInfo.packageName)
       val snapshotItem = previousSnapshotItem
-        ?.takeIf { it.isReusableFor(packageInfo, shouldSaveFullSnapshot) }
+        ?.takeIf { it.isReusableForCapture(packageInfo, shouldSaveFullSnapshot) }
         ?.copy()
         ?.also {
           it.id = null
@@ -98,18 +98,6 @@ class CaptureInstalledSnapshotUseCase(
       processedCount = count,
       total = total
     )
-  }
-
-  private fun SnapshotItem.isReusableFor(
-    packageInfo: PackageInfo,
-    shouldSaveFullSnapshot: Boolean
-  ): Boolean {
-    return versionCode == packageInfo.getVersionCode() &&
-      isArchived == packageInfo.isArchivedPackage() &&
-      lastUpdatedTime == packageInfo.lastUpdateTime &&
-      packageSize == packageInfo.getPackageSize(true) &&
-      (statsVersion == SnapshotItem.CURRENT_STATS_VERSION || packageInfo.isArchivedPackage()) &&
-      !shouldSaveFullSnapshot
   }
 
   private fun buildInstalledSnapshotItem(
@@ -170,8 +158,11 @@ class CaptureInstalledSnapshotUseCase(
       compileSdk = packageInfo.getCompileSdkVersion().toShort(),
       minSdk = applicationInfo.minSdkVersion.toShort(),
       dexInfo = dexStats.entries.toJson().orEmpty(),
+      resourceInfo = dexStats.resourceEntries.toJson().orEmpty(),
       resourcesSize = dexStats.resourcesSize,
-      statsVersion = if (dexStats.isComplete) SnapshotItem.CURRENT_STATS_VERSION else 0
+      statsVersion = SnapshotItem.CURRENT_STATS_VERSION,
+      dexStatsAvailable = dexStats.isDexComplete,
+      resourceStatsAvailable = dexStats.isResourceComplete
     )
   }
 
@@ -197,4 +188,23 @@ class CaptureInstalledSnapshotUseCase(
   private companion object {
     const val BATCH_SIZE = 50
   }
+}
+
+internal fun SnapshotItem.isReusableForCapture(
+  packageInfo: PackageInfo,
+  shouldSaveFullSnapshot: Boolean
+): Boolean {
+  return versionCode == packageInfo.getVersionCode() &&
+    isArchived == packageInfo.isArchivedPackage() &&
+    lastUpdatedTime == packageInfo.lastUpdateTime &&
+    packageSize == packageInfo.getPackageSize(true) &&
+    (
+      packageInfo.isArchivedPackage() ||
+        (
+          statsVersion == SnapshotItem.CURRENT_STATS_VERSION &&
+            dexStatsAvailable &&
+            resourceStatsAvailable
+          )
+      ) &&
+    !shouldSaveFullSnapshot
 }

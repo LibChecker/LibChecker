@@ -254,12 +254,19 @@ class AppListFragment :
   }
 
   override fun onQueryTextChange(newText: String): Boolean {
+    val shouldReturnTopAfterUpdate = shouldReturnAppListTopAfterSearch(
+      previousQuery = appListRenderState.highlightText,
+      newQuery = newText
+    )
     val shouldSyncHighlight = appListRenderState.highlightText != newText
     val searchChange = homeViewModel.onAppListSearchQueryChanged(newText)
     if (searchChange.shouldRefreshItems || shouldSyncHighlight) {
       isSearchTextClearOnce = newText.isEmpty()
       bindAppListRenderState(appListRenderState.copy(highlightText = newText))
-      updateItems(highlightRefresh = true)
+      updateItems(
+        highlightRefresh = true,
+        shouldReturnTopAfterUpdate = shouldReturnTopAfterUpdate
+      )
 
       when (val action = searchChange.action) {
         HomeViewModel.AppListSearchCommandAction.None -> Unit
@@ -341,8 +348,7 @@ class AppListFragment :
                 itemDisplayOptionsDiff = itemAdvancedDiff
               )
               if (dismissPlan.shouldRefreshItems) {
-                //noinspection NotifyDataSetChanged
-                appAdapter.notifyDataSetChanged()
+                updateItems()
               }
               advancedMenuBSDFragment = null
             }
@@ -461,16 +467,25 @@ class AppListFragment :
     }.launchIn(lifecycleScope)
   }
 
-  private fun updateItems(highlightRefresh: Boolean = false) {
+  private fun updateItems(
+    highlightRefresh: Boolean = false,
+    shouldReturnTopAfterUpdate: Boolean = false
+  ) {
     val generation = ++itemViewStatesGeneration
     val shouldDebounce = highlightRefresh || isListReady || appAdapter.data.isNotEmpty()
     itemViewStatesJob?.cancel()
     updateItemsJob?.cancel()
-    updateItemsJob = updateItemsImpl(highlightRefresh, generation, shouldDebounce)
+    updateItemsJob = updateItemsImpl(
+      highlightRefresh = highlightRefresh,
+      shouldReturnTopAfterUpdate = shouldReturnTopAfterUpdate,
+      generation = generation,
+      shouldDebounce = shouldDebounce
+    )
   }
 
   private fun updateItemsImpl(
     highlightRefresh: Boolean = false,
+    shouldReturnTopAfterUpdate: Boolean = false,
     generation: Int,
     shouldDebounce: Boolean
   ) = lifecycleScope.launch(Dispatchers.IO) {
@@ -536,7 +551,7 @@ class AppListFragment :
             }
 
             setSpaceFooterView()
-            if (updatePlan.shouldReturnTopAfterRequestChange) {
+            if (shouldReturnTopAfterUpdate || updatePlan.shouldReturnTopAfterRequestChange) {
               returnTopOfList()
             }
           }
@@ -656,4 +671,11 @@ class AppListFragment :
       homeViewModel.initItems()
     }
   }
+}
+
+internal fun shouldReturnAppListTopAfterSearch(
+  previousQuery: String,
+  newQuery: String
+): Boolean {
+  return previousQuery.isNotEmpty() && newQuery.isEmpty()
 }

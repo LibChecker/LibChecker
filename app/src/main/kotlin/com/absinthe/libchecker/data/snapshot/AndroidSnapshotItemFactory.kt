@@ -79,8 +79,11 @@ class AndroidSnapshotItemFactory : SnapshotItemFactory {
     val stats = DexStatsCollector.collect(packageInfo)
     return copy(
       dexInfo = stats.entries.toJson().orEmpty(),
+      resourceInfo = stats.resourceEntries.toJson().orEmpty(),
       resourcesSize = stats.resourcesSize,
-      statsVersion = if (stats.isComplete) SnapshotItem.CURRENT_STATS_VERSION else 0
+      statsVersion = SnapshotItem.CURRENT_STATS_VERSION,
+      dexStatsAvailable = stats.isDexComplete,
+      resourceStatsAvailable = stats.isResourceComplete
     )
   }
 }

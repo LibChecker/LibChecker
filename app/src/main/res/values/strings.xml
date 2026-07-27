@@ -294,6 +294,7 @@
   <string name="snapshot_indicator_added">Added</string>
   <string name="snapshot_indicator_removed">Removed</string>
   <string name="snapshot_indicator_changed">Changed</string>
+  <string name="snapshot_content_changed">Content changed</string>
   <string name="snapshot_indicator_moved">Moved</string>
   <string name="snapshot_detail_size_label">Size</string>
   <string name="snapshot_detail_changes_label">Changes:</string>

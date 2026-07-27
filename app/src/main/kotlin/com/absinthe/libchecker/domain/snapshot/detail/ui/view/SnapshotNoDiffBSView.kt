@@ -6,6 +6,7 @@ import android.view.View.OnClickListener
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailContent
@@ -46,6 +47,7 @@ class SnapshotNoDiffBSView(context: Context) :
       LayoutParams.WRAP_CONTENT
     )
     adapter = detailAdapter
+    layoutManager = LinearLayoutManager(context)
     isVisible = false
   }
 

@@ -34,7 +34,10 @@ message Snapshot {
   bool isArchived = 21;
   string dexInfo = 22;
   uint32 statsVersion = 23;
+  string resourceInfo = 24;
   int64 resourcesSize = 25;
+  bool dexStatsAvailable = 26;
+  bool resourceStatsAvailable = 27;
 }
 
 message CloudRulesBundle {

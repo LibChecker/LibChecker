@@ -32,12 +32,22 @@ data class SnapshotItem(
   val minSdk: Short,
   @ColumnInfo(defaultValue = "'[]'")
   val dexInfo: String = "[]",
+  @ColumnInfo(defaultValue = "'[]'")
+  val resourceInfo: String = "[]",
   @ColumnInfo(defaultValue = "0")
   val resourcesSize: Long = 0,
   @ColumnInfo(defaultValue = "0")
-  val statsVersion: Int = 0
+  val statsVersion: Int = 0,
+  @ColumnInfo(defaultValue = "0")
+  val dexStatsAvailable: Boolean = false,
+  @ColumnInfo(defaultValue = "0")
+  val resourceStatsAvailable: Boolean = false
 ) {
+  fun hasDexStats(): Boolean = statsVersion == CURRENT_STATS_VERSION && dexStatsAvailable
+
+  fun hasResourceStats(): Boolean = statsVersion == CURRENT_STATS_VERSION && resourceStatsAvailable
+
   companion object {
-    const val CURRENT_STATS_VERSION = 1
+    const val CURRENT_STATS_VERSION = 2
   }
 }
