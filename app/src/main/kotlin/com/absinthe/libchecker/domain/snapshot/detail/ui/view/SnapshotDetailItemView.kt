@@ -27,9 +27,11 @@ import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailIte
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailRuleChipIconStyle
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailRuleChipRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailThemeColors
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.planSnapshotDetailHorizontalLayout
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.planSnapshotDetailItemLayout
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.resolveSnapshotDetailItemColors
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.dpToDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
@@ -40,10 +42,13 @@ import com.google.android.material.R as MaterialR
 
 class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
 
-  private val contentHorizontalPadding = context.getDimensionPixelSize(R.dimen.normal_padding)
+  private val horizontalLayout = context.buildSnapshotDetailHorizontalLayoutPlan()
 
   private val statusRail = View(context).apply {
-    layoutParams = ViewGroup.LayoutParams(STATUS_RAIL_WIDTH, ViewGroup.LayoutParams.MATCH_PARENT)
+    layoutParams = ViewGroup.LayoutParams(
+      horizontalLayout.statusRailWidth,
+      ViewGroup.LayoutParams.MATCH_PARENT
+    )
     importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     addView(this)
   }
@@ -125,7 +130,7 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
 
   private var chip: AppCompatTextView? = null
   private var chipClickListener: OnClickListener? = null
-  private var statusIconOpticalInset = 0
+  private var statusLabelOpticalInset = 0
   private var layoutPlan = SnapshotDetailItemLayoutPlan(
     contentWidth = 0,
     chipOnStatusLine = false
@@ -154,7 +159,7 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
       text = state.extra
       isVisible = state.extra.isNotBlank()
     }
-    statusIconOpticalInset = resolveStatusIconOpticalInset(state.iconRes)
+    statusLabelOpticalInset = resolveStatusLabelOpticalInset(state.iconRes)
     statusIcon.setImageResource(state.iconRes)
     statusLabel.setText(state.statusLabelRes)
 
@@ -254,7 +259,7 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
     divider.measure(measuredWidth.toExactlyMeasureSpec(), DIVIDER_HEIGHT.toExactlyMeasureSpec())
 
     val contentWidth = (
-      measuredWidth - STATUS_RAIL_WIDTH - contentHorizontalPadding * 2
+      measuredWidth - horizontalLayout.itemContentStart - horizontalLayout.contentEndPadding
       ).coerceAtLeast(0)
     val maximumStatusLabelWidth = (
       contentWidth - statusIcon.measuredWidth - STATUS_LABEL_GAP
@@ -312,16 +317,16 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
   }
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-    statusRail.layout(0, 0, STATUS_RAIL_WIDTH, measuredHeight)
-    val contentStart = STATUS_RAIL_WIDTH + contentHorizontalPadding
-    val statusStart = contentStart - statusIconOpticalInset
+    statusRail.layout(0, 0, horizontalLayout.statusRailWidth, measuredHeight)
+    val contentStart = horizontalLayout.itemContentStart
+    val statusLabelStart = contentStart - statusLabelOpticalInset
     val statusHeight = maxOf(statusIcon.measuredHeight, statusLabel.measuredHeight)
     statusIcon.layout(
-      statusStart,
+      horizontalLayout.statusIndicatorStart,
       CONTENT_TOP_PADDING + (statusHeight - statusIcon.measuredHeight) / 2
     )
     statusLabel.layout(
-      statusStart + statusIcon.measuredWidth + STATUS_LABEL_GAP,
+      statusLabelStart + statusIcon.measuredWidth + STATUS_LABEL_GAP,
       CONTENT_TOP_PADDING + (statusHeight - statusLabel.measuredHeight) / 2
     )
     chip?.takeIf { layoutPlan.chipOnStatusLine }?.let { inlineChip ->
@@ -336,7 +341,8 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
     if (previousPackagePath.isVisible) {
       previousPackagePath.layout(titleX, titleY)
       movedArrow.layout(
-        statusStart + (statusIcon.measuredWidth - movedArrow.measuredWidth) / 2,
+        horizontalLayout.statusIndicatorStart +
+          (statusIcon.measuredWidth - movedArrow.measuredWidth) / 2,
         previousPackagePath.bottom
       )
       titleY = movedArrow.bottom
@@ -371,7 +377,7 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
     touchDelegate = TouchDelegate(bounds, target)
   }
 
-  private fun resolveStatusIconOpticalInset(iconRes: Int): Int {
+  private fun resolveStatusLabelOpticalInset(iconRes: Int): Int {
     return when (iconRes) {
       R.drawable.ic_add,
       R.drawable.ic_remove -> 3.dp
@@ -401,7 +407,6 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
   }
 
   private companion object {
-    val STATUS_RAIL_WIDTH = 3.dp
     val STATUS_ICON_SIZE = 16.dp
     val STATUS_LABEL_GAP = 4.dp
     val STATUS_CHIP_GAP = 6.dp
@@ -421,3 +426,12 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
     val DIVIDER_HEIGHT = 1.dp
   }
 }
+
+internal fun Context.buildSnapshotDetailHorizontalLayoutPlan() = planSnapshotDetailHorizontalLayout(
+  horizontalPadding = getDimensionPixelSize(R.dimen.normal_padding),
+  statusRailWidth = dpToDimensionPixelSize(3),
+  statusIconWidth = dpToDimensionPixelSize(16),
+  statusIconOpticalInset = dpToDimensionPixelSize(3),
+  arrowWidth = dpToDimensionPixelSize(24),
+  arrowTitleGap = dpToDimensionPixelSize(8)
+)

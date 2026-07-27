@@ -8,6 +8,30 @@ import org.junit.Test
 class SnapshotDetailItemVisualStateTest {
 
   @Test
+  fun alignsExpansionArrowCenterWithStatusIndicatorCenter() {
+    val plan = planSnapshotDetailHorizontalLayout(
+      horizontalPadding = 16,
+      statusRailWidth = 3,
+      statusIconWidth = 16,
+      statusIconOpticalInset = 3,
+      arrowWidth = 24,
+      arrowTitleGap = 8
+    )
+
+    assertEquals(12, plan.arrowStart)
+    assertEquals(
+      plan.statusIndicatorCenterTwice.toFloat(),
+      plan.arrowStart * 2 + plan.arrowWidth + plan.arrowTranslationX * 2,
+      0f
+    )
+    assertEquals(48, plan.titleContentStart)
+    assertEquals(19, plan.itemContentStart)
+    assertEquals(16, plan.contentEndPadding)
+    assertEquals(3, plan.statusRailWidth)
+    assertEquals(16, plan.statusIndicatorStart)
+  }
+
+  @Test
   fun resolvesLightThemeWithSubtleStatusGradient() {
     val colors = resolveSnapshotDetailItemColors(
       theme = SnapshotDetailThemeColors(

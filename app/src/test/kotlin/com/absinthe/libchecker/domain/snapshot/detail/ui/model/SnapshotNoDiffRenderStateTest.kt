@@ -68,56 +68,32 @@ class SnapshotNoDiffRenderStateTest {
   }
 
   @Test
-  fun mapsPackageStatsOnlyChangeToPackageChangesMode() {
-    val title = titleRenderState()
+  fun routesPackageStatsOnlyChangeToDetailPage() {
     val item = snapshotDiffItem().copy(
       dexInfoDiff = SnapshotDiffItem.DiffNode("old dex", "new dex"),
-      resourcesSizeDiff = SnapshotDiffItem.DiffNode(10L, 20L),
-      changed = 2
+      resourcesSizeDiff = SnapshotDiffItem.DiffNode(10L, 20L)
     )
 
-    assertEquals(
-      SnapshotNoDiffRenderState(
-        title = title,
-        mode = SnapshotNoDiffMode.PackageChanges
-      ),
-      item.toSnapshotNoDiffRenderState(title)
-    )
+    assertNull(item.toSnapshotNoDiffRenderState(titleRenderState()))
   }
 
   @Test
-  fun mapsSameSizeResourceChangeToPackageChangesMode() {
-    val title = titleRenderState()
+  fun routesSameSizeResourceChangeToDetailPage() {
     val item = snapshotDiffItem().copy(
       resourcesSizeDiff = SnapshotDiffItem.DiffNode(10L, 10L),
-      resourceInfoDiff = SnapshotDiffItem.DiffNode("old resources", "new resources"),
-      changed = 1
+      resourceInfoDiff = SnapshotDiffItem.DiffNode("old resources", "new resources")
     )
 
-    assertEquals(
-      SnapshotNoDiffRenderState(
-        title = title,
-        mode = SnapshotNoDiffMode.PackageChanges
-      ),
-      item.toSnapshotNoDiffRenderState(title)
-    )
+    assertNull(item.toSnapshotNoDiffRenderState(titleRenderState()))
   }
 
   @Test
-  fun mapsResourceSizeOnlyChangeToPackageChangesMode() {
-    val title = titleRenderState()
+  fun routesResourceSizeOnlyChangeToDetailPage() {
     val item = snapshotDiffItem().copy(
-      resourcesSizeDiff = SnapshotDiffItem.DiffNode(10L, 20L),
-      changed = 1
+      resourcesSizeDiff = SnapshotDiffItem.DiffNode(10L, 20L)
     )
 
-    assertEquals(
-      SnapshotNoDiffRenderState(
-        title = title,
-        mode = SnapshotNoDiffMode.PackageChanges
-      ),
-      item.toSnapshotNoDiffRenderState(title)
-    )
+    assertNull(item.toSnapshotNoDiffRenderState(titleRenderState()))
   }
 
   @Test

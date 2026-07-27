@@ -1,5 +1,7 @@
 package com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node
 
+import com.absinthe.libchecker.annotation.DEX
+import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemStatusDisplayData
@@ -66,9 +68,23 @@ class SnapshotDetailNodeLongClickActionTest {
     assertNull(node.longClickAction(ownerPackageName = "com.example.app"))
   }
 
+  @Test
+  fun returnsNullLongClickActionForDexPackageItem() {
+    val node = SnapshotComponentNode(
+      buildDisplayData(
+        name = "classes.dex",
+        ruleChip = null,
+        itemType = DEX
+      )
+    )
+
+    assertNull(node.longClickAction(ownerPackageName = "com.example.app"))
+  }
+
   private fun buildDisplayData(
     name: String,
-    ruleChip: SnapshotDetailRuleChipDisplayData?
+    ruleChip: SnapshotDetailRuleChipDisplayData?,
+    @LibType itemType: Int = SERVICE
   ): SnapshotDetailItemDisplayData {
     return SnapshotDetailItemDisplayData(
       item = SnapshotDetailItem(
@@ -76,7 +92,7 @@ class SnapshotDetailNodeLongClickActionTest {
         title = name,
         extra = "",
         diffType = MOVED,
-        itemType = SERVICE
+        itemType = itemType
       ),
       title = name,
       extra = "",

@@ -4,7 +4,6 @@ import androidx.core.os.BundleCompat
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.constant.options.SnapshotOptions
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailDiffTextStyle
-import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotNoDiffMode
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotNoDiffTitleIconRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.toRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.toSnapshotNoDiffRenderState
@@ -63,11 +62,6 @@ class SnapshotNoDiffBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotNoDi
         return@let
       }
       root.render(renderState)
-      if (renderState.mode == SnapshotNoDiffMode.PackageChanges) {
-        lifecycleScope.launch {
-          root.renderPackageChanges(viewModel.buildDiffDetailContent(item, diffTextStyle))
-        }
-      }
       bindIcon(item)
     } ?: run {
       dismiss()
