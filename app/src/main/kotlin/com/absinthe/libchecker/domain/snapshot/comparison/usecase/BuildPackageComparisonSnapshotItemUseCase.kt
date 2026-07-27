@@ -9,6 +9,7 @@ import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.dex.DexStatsCollector
 import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPackageSize
@@ -27,6 +28,11 @@ class BuildPackageComparisonSnapshotItemUseCase(
     basePackage: PackageInfo,
     analysisPackage: PackageInfo
   ): SnapshotDiffItem = withContext(Dispatchers.IO) {
+    val baseStats = DexStatsCollector.collect(basePackage)
+    val analysisStats = DexStatsCollector.collect(analysisPackage)
+    val hasComparableDexStats = baseStats.isDexComplete && analysisStats.isDexComplete
+    val hasComparableResourceStats =
+      baseStats.isResourceComplete && analysisStats.isResourceComplete
     SnapshotDiffItem(
       packageName = basePackage.packageName,
       updateTime = basePackage.lastUpdateTime,
@@ -90,6 +96,27 @@ class BuildPackageComparisonSnapshotItemUseCase(
         basePackage.getPackageSize(true),
         analysisPackage.getPackageSize(true)
       ),
+      dexInfoDiff = if (hasComparableDexStats) {
+        SnapshotDiffItem.DiffNode(
+          baseStats.entries.toJson().orEmpty(),
+          analysisStats.entries.toJson().orEmpty()
+        )
+      } else {
+        SnapshotDiffItem.DiffNode("")
+      },
+      resourcesSizeDiff = if (hasComparableResourceStats) {
+        SnapshotDiffItem.DiffNode(baseStats.resourcesSize, analysisStats.resourcesSize)
+      } else {
+        SnapshotDiffItem.DiffNode(0L)
+      },
+      resourceInfoDiff = if (hasComparableResourceStats) {
+        SnapshotDiffItem.DiffNode(
+          baseStats.resourceEntries.toJson().orEmpty(),
+          analysisStats.resourceEntries.toJson().orEmpty()
+        )
+      } else {
+        SnapshotDiffItem.DiffNode("")
+      },
       archivedDiff = SnapshotDiffItem.DiffNode(
         basePackage.isArchivedPackage(),
         analysisPackage.isArchivedPackage()

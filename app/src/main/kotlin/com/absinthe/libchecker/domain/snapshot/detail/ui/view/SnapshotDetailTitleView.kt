@@ -26,13 +26,14 @@ import com.absinthe.libchecker.domain.snapshot.model.MOVED
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
-import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.R as MaterialR
 
 class SnapshotDetailTitleView(context: Context) : AViewGroup(context) {
+
+  private val horizontalLayout = context.buildSnapshotDetailHorizontalLayoutPlan()
 
   private val title = AppCompatTextView(context).apply {
     layoutParams = ViewGroup.LayoutParams(
@@ -57,7 +58,7 @@ class SnapshotDetailTitleView(context: Context) : AViewGroup(context) {
   }
 
   private val arrow = AppCompatImageView(context).apply {
-    layoutParams = LayoutParams(24.dp, 24.dp)
+    layoutParams = LayoutParams(horizontalLayout.arrowWidth, horizontalLayout.arrowWidth)
     setImageResource(R.drawable.ic_arrow)
     imageTintList = android.content.res.ColorStateList.valueOf(
       context.getColorByAttr(MaterialR.attr.colorOnSurfaceVariant)
@@ -83,8 +84,12 @@ class SnapshotDetailTitleView(context: Context) : AViewGroup(context) {
 
   init {
     minimumHeight = 52.dp
-    val horizontalPadding = context.getDimensionPixelSize(R.dimen.normal_padding)
-    setPadding(horizontalPadding, 10.dp, horizontalPadding, 10.dp)
+    setPadding(
+      horizontalLayout.horizontalPadding,
+      10.dp,
+      horizontalLayout.contentEndPadding,
+      10.dp
+    )
     setBackgroundColor(context.getColorByAttr(MaterialR.attr.colorSurface))
     importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
     isFocusable = true
@@ -125,8 +130,9 @@ class SnapshotDetailTitleView(context: Context) : AViewGroup(context) {
     children.filter { it !== divider }.forEach { it.autoMeasure() }
     divider.measure(measuredWidth.toExactlyMeasureSpec(), 1.dp.toExactlyMeasureSpec())
 
-    val availableWidth = measuredWidth - paddingStart - paddingEnd -
-      arrow.measuredWidth - ARROW_TITLE_GAP
+    val availableWidth = measuredWidth -
+      horizontalLayout.titleContentStart -
+      horizontalLayout.contentEndPadding
     if (title.measuredWidth > availableWidth) {
       title.measure(
         availableWidth.toExactlyMeasureSpec(),
@@ -154,8 +160,12 @@ class SnapshotDetailTitleView(context: Context) : AViewGroup(context) {
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     val contentTop = paddingTop
-    arrow.layout(paddingStart, (measuredHeight - arrow.measuredHeight) / 2)
-    val textStart = arrow.right + ARROW_TITLE_GAP
+    val textStart = horizontalLayout.titleContentStart
+    arrow.layout(
+      horizontalLayout.arrowStart,
+      (measuredHeight - arrow.measuredHeight) / 2
+    )
+    arrow.translationX = horizontalLayout.arrowTranslationX
     if (countsOnSecondLine) {
       title.layout(textStart, contentTop)
       if (counts.isVisible) {
@@ -281,6 +291,5 @@ private class VerticallyCenteredDrawableSpan(
 private val COUNT_ICON_SIZE = 16.dp
 private val COUNT_ICON_END_GAP = 1.dp
 private val COUNT_GROUP_GAP = 8.dp
-private val ARROW_TITLE_GAP = 8.dp
 private val TITLE_COUNT_GAP = 12.dp
 private const val OBJECT_REPLACEMENT_CHARACTER = "\uFFFC"

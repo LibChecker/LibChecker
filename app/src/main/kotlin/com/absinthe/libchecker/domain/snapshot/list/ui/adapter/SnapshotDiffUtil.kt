@@ -18,6 +18,9 @@ class SnapshotDiffUtil : DiffUtil.ItemCallback<SnapshotDiffItem>() {
       oldItem.archivedDiff == newItem.archivedDiff &&
       oldItem.targetApiDiff == newItem.targetApiDiff &&
       oldItem.abiDiff == newItem.abiDiff &&
+      oldItem.dexInfoDiff == newItem.dexInfoDiff &&
+      oldItem.resourcesSizeDiff == newItem.resourcesSizeDiff &&
+      oldItem.resourceInfoDiff == newItem.resourceInfoDiff &&
       oldItem.added == newItem.added &&
       oldItem.removed == newItem.removed &&
       oldItem.changed == newItem.changed &&

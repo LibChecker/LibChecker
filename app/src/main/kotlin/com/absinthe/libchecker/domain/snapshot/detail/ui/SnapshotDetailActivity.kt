@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
+import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
@@ -245,7 +246,8 @@ class SnapshotDetailActivity :
         null
       },
       emphasizeDiffs = (viewModel.getSnapshotOptions() and SnapshotOptions.DIFF_EMPHASIS) > 0,
-      arrowColor = getColorByAttr(MaterialR.attr.colorOnSurface)
+      arrowColor = getColorByAttr(MaterialR.attr.colorOnSurface),
+      metricDeltaColor = getColorByAttr(MaterialR.attr.colorOnSurface)
     )
   }
 
@@ -265,6 +267,7 @@ class SnapshotDetailActivity :
       PROVIDER -> "Provider"
       PERMISSION -> "Permission"
       METADATA -> "Metadata"
+      DEX -> "Package"
       else -> "Unknown"
     }
   }

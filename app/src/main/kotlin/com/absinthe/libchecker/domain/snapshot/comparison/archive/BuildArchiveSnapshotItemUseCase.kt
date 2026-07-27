@@ -14,6 +14,7 @@ import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.apk.APKSParser
+import com.absinthe.libchecker.utils.dex.DexStatsCollector
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPackageSize
 import com.absinthe.libchecker.utils.extensions.getPermissionsList
@@ -37,7 +38,7 @@ class BuildArchiveSnapshotItemUseCase(
     destinationFile: File,
     iconSize: Int
   ): ArchiveSnapshotItem = withContext(Dispatchers.IO) {
-    var packageInfo = context.contentResolver.openInputStream(uri)?.use { inputStream ->
+    val packageInfo = context.contentResolver.openInputStream(uri)?.use { inputStream ->
       val fileSize = inputStream.available()
       val freeSize = Environment.getExternalStorageDirectory().freeSpace
 
@@ -52,13 +53,12 @@ class BuildArchiveSnapshotItemUseCase(
       }
 
       PackageManagerCompat.getPackageArchiveInfo(destinationFile.path, ARCHIVE_PACKAGE_FLAGS)
+        ?.apply {
+          applicationInfo?.sourceDir = destinationFile.path
+          applicationInfo?.publicSourceDir = destinationFile.path
+        }
         ?: APKSParser(destinationFile, ARCHIVE_PACKAGE_FLAGS).getPackageInfo()
     } ?: throw IllegalStateException("InputStream is null")
-
-    packageInfo = packageInfo.apply {
-      applicationInfo?.sourceDir = destinationFile.path
-      applicationInfo?.publicSourceDir = destinationFile.path
-    }
 
     val applicationInfo = packageInfo.applicationInfo ?: throw IllegalStateException("ApplicationInfo is null")
     val appIconLoader = AppIconLoader(iconSize, false, context)
@@ -71,6 +71,7 @@ class BuildArchiveSnapshotItemUseCase(
   private fun android.content.pm.PackageInfo.toSnapshotItem(
     applicationInfo: ApplicationInfo
   ): SnapshotItem {
+    val dexStats = DexStatsCollector.collect(this)
     return SnapshotItem(
       id = null,
       packageName = packageName,
@@ -97,7 +98,13 @@ class BuildArchiveSnapshotItemUseCase(
       metadata = PackageUtils.getMetaDataItems(this).toJson().orEmpty(),
       packageSize = getPackageSize(true),
       compileSdk = getCompileSdkVersion().toShort(),
-      minSdk = applicationInfo.minSdkVersion.toShort()
+      minSdk = applicationInfo.minSdkVersion.toShort(),
+      dexInfo = dexStats.entries.toJson().orEmpty(),
+      resourceInfo = dexStats.resourceEntries.toJson().orEmpty(),
+      resourcesSize = dexStats.resourcesSize,
+      statsVersion = SnapshotItem.CURRENT_STATS_VERSION,
+      dexStatsAvailable = dexStats.isDexComplete,
+      resourceStatsAvailable = dexStats.isResourceComplete
     )
   }
 

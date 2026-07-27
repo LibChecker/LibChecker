@@ -66,10 +66,22 @@ class AppAdapter(
     return stableAppListItemIdForKey(data[position].packageName)
   }
 
-  fun bind(state: AppListRenderState) {
+  fun bind(
+    state: AppListRenderState,
+    refreshItems: Boolean = false
+  ) {
+    val shouldRefreshItems = shouldRefreshAppAdapterItems(
+      previousState = renderState,
+      newState = state,
+      refreshItems = refreshItems,
+      itemCount = data.size
+    )
     renderState = state
     highlightText = state.highlightText
     pendingItemViewStateCache.clear()
+    if (shouldRefreshItems) {
+      notifyItemRangeChanged(0, data.size)
+    }
   }
 
   fun notifyHighlightTextChanged() {
@@ -117,4 +129,13 @@ class AppAdapter(
   private companion object {
     private val HIGHLIGHT_TEXT_PAYLOAD = Any()
   }
+}
+
+internal fun shouldRefreshAppAdapterItems(
+  previousState: AppListRenderState,
+  newState: AppListRenderState,
+  refreshItems: Boolean,
+  itemCount: Int
+): Boolean {
+  return refreshItems && previousState != newState && itemCount > 0
 }

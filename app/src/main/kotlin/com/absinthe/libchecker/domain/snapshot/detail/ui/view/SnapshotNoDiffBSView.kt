@@ -84,7 +84,7 @@ class SnapshotNoDiffBSView(context: Context) :
         }
       }
     }
-    addView(stubView)
+    stubView?.let(::addView)
   }
 
   override fun getHeaderView(): BottomSheetHeaderView {

@@ -68,6 +68,46 @@ class SnapshotNoDiffRenderStateTest {
   }
 
   @Test
+  fun routesPackageStatsOnlyChangeToDetailPage() {
+    val item = snapshotDiffItem().copy(
+      dexInfoDiff = SnapshotDiffItem.DiffNode("old dex", "new dex"),
+      resourcesSizeDiff = SnapshotDiffItem.DiffNode(10L, 20L)
+    )
+
+    assertNull(item.toSnapshotNoDiffRenderState(titleRenderState()))
+  }
+
+  @Test
+  fun routesSameSizeResourceChangeToDetailPage() {
+    val item = snapshotDiffItem().copy(
+      resourcesSizeDiff = SnapshotDiffItem.DiffNode(10L, 10L),
+      resourceInfoDiff = SnapshotDiffItem.DiffNode("old resources", "new resources")
+    )
+
+    assertNull(item.toSnapshotNoDiffRenderState(titleRenderState()))
+  }
+
+  @Test
+  fun routesResourceSizeOnlyChangeToDetailPage() {
+    val item = snapshotDiffItem().copy(
+      resourcesSizeDiff = SnapshotDiffItem.DiffNode(10L, 20L)
+    )
+
+    assertNull(item.toSnapshotNoDiffRenderState(titleRenderState()))
+  }
+
+  @Test
+  fun componentChangeWithPackageStatsStillNeedsDetailPage() {
+    val item = snapshotDiffItem().copy(
+      servicesDiff = SnapshotDiffItem.DiffNode("old service", "new service"),
+      dexInfoDiff = SnapshotDiffItem.DiffNode("old dex", "new dex"),
+      changed = 2
+    )
+
+    assertNull(item.toSnapshotNoDiffRenderState(titleRenderState()))
+  }
+
+  @Test
   fun disablesDetailClickForFallbackIconSource() {
     val state = SnapshotPackageIconSource.Fallback.toSnapshotNoDiffTitleIconRenderState()
 

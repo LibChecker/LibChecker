@@ -20,10 +20,11 @@ import kotlinx.coroutines.Dispatchers
     SnapshotItem::class, TimeStampItem::class,
     TrackItem::class, SnapshotDiffStoringItem::class
   ],
-  version = 23,
+  version = 24,
   exportSchema = true,
   autoMigrations = [
-    AutoMigration(from = 21, to = 22)
+    AutoMigration(from = 21, to = 22),
+    AutoMigration(from = 23, to = 24)
   ]
 )
 abstract class LCDatabase : RoomDatabase() {

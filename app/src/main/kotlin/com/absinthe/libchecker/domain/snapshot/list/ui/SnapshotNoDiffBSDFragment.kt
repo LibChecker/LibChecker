@@ -39,19 +39,22 @@ class SnapshotNoDiffBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotNoDi
       return
     }
     BundleCompat.getSerializable(arg, EXTRA_DIFF_ITEM, SnapshotDiffItem::class.java)?.let { item ->
+      val metricColor = requireContext().getColorByAttr(MaterialR.attr.colorOnSurface)
+      val diffTextStyle = SnapshotDetailDiffTextStyle(
+        highlightColor = if ((viewModel.getSnapshotOptions() and SnapshotOptions.DIFF_HIGHLIGHT) > 0) {
+          requireContext().getColorByAttr(androidx.appcompat.R.attr.colorPrimary)
+        } else {
+          null
+        },
+        emphasizeDiffs = (viewModel.getSnapshotOptions() and SnapshotOptions.DIFF_EMPHASIS) > 0,
+        arrowColor = metricColor,
+        metricDeltaColor = metricColor
+      )
       val titleRenderState = buildSnapshotTitleDisplayData(
         BuildSnapshotTitleDisplayDataUseCase.Request(
           item = item,
           formatSplitPackageName = false,
-          diffTextStyle = SnapshotDetailDiffTextStyle(
-            highlightColor = if ((viewModel.getSnapshotOptions() and SnapshotOptions.DIFF_HIGHLIGHT) > 0) {
-              requireContext().getColorByAttr(androidx.appcompat.R.attr.colorPrimary)
-            } else {
-              null
-            },
-            emphasizeDiffs = (viewModel.getSnapshotOptions() and SnapshotOptions.DIFF_EMPHASIS) > 0,
-            arrowColor = requireContext().getColorByAttr(MaterialR.attr.colorOnSurface)
-          )
+          diffTextStyle = diffTextStyle
         )
       ).toRenderState(copyPrimaryText = false)
       val renderState = item.toSnapshotNoDiffRenderState(titleRenderState) ?: run {

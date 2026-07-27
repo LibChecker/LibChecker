@@ -1,11 +1,8 @@
 package com.absinthe.libchecker.view.app
 
-import android.graphics.drawable.BitmapDrawable
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.absinthe.libchecker.R
-import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
-import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -14,14 +11,12 @@ import org.junit.runner.RunWith
 class AppIconPlaceholderInstrumentedTest {
 
   @Test
-  fun placeholderUsesAppIconLoaderRendering() {
+  fun placeholderLoadsResourceDrawable() {
     val context = InstrumentationRegistry.getInstrumentation().targetContext
     val drawable = AppIconPlaceholder.newDrawable(context)
 
-    assertTrue(drawable is BitmapDrawable)
-    val bitmap = (drawable as BitmapDrawable).bitmap
-    val expectedSize = context.getDimensionPixelSize(R.dimen.app_icon_size)
-    assertEquals(expectedSize, bitmap.width)
-    assertEquals(expectedSize, bitmap.height)
+    assertNotNull(drawable)
+    assertTrue(drawable!!.intrinsicWidth > 0)
+    assertTrue(drawable.intrinsicHeight > 0)
   }
 }

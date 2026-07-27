@@ -140,8 +140,15 @@ class SnapshotViewModel(
     diffTextStyle: SnapshotDetailDiffTextStyle
   ) = viewModelScope.launch {
     snapshotDetailContentFlow.emit(
-      snapshotListWorkflow.buildSnapshotDetailContent(entity, diffTextStyle)
+      buildDiffDetailContent(entity, diffTextStyle)
     )
+  }
+
+  suspend fun buildDiffDetailContent(
+    entity: SnapshotDiffItem,
+    diffTextStyle: SnapshotDetailDiffTextStyle
+  ): SnapshotDetailContent {
+    return snapshotListWorkflow.buildSnapshotDetailContent(entity, diffTextStyle)
   }
 
   suspend fun getTimeStamps(): List<TimeStampItem> {

@@ -89,6 +89,55 @@ data class SnapshotDetailItemLayoutPlan(
   val chipOnStatusLine: Boolean
 )
 
+data class SnapshotDetailHorizontalLayoutPlan(
+  val horizontalPadding: Int,
+  val arrowStart: Int,
+  val arrowWidth: Int,
+  val arrowTranslationX: Float,
+  val titleContentStart: Int,
+  val itemContentStart: Int,
+  val contentEndPadding: Int,
+  val statusRailWidth: Int,
+  val statusIndicatorStart: Int,
+  val statusIndicatorCenterTwice: Int
+)
+
+fun planSnapshotDetailHorizontalLayout(
+  horizontalPadding: Int,
+  statusRailWidth: Int,
+  statusIconWidth: Int,
+  statusIconOpticalInset: Int,
+  arrowWidth: Int,
+  arrowTitleGap: Int
+): SnapshotDetailHorizontalLayoutPlan {
+  val safeHorizontalPadding = horizontalPadding.coerceAtLeast(0)
+  val safeStatusRailWidth = statusRailWidth.coerceAtLeast(0)
+  val safeStatusIconWidth = statusIconWidth.coerceAtLeast(0)
+  val safeStatusIconOpticalInset = statusIconOpticalInset.coerceAtLeast(0)
+  val safeArrowWidth = arrowWidth.coerceAtLeast(0)
+  val safeArrowTitleGap = arrowTitleGap.coerceAtLeast(0)
+  val itemContentStart = safeStatusRailWidth + safeHorizontalPadding
+  val statusIndicatorStart = itemContentStart - safeStatusIconOpticalInset
+  val statusIndicatorCenterTwice = statusIndicatorStart * 2 + safeStatusIconWidth
+  val arrowStart = (statusIndicatorCenterTwice - safeArrowWidth) / 2
+  val arrowTranslationX = (
+    statusIndicatorCenterTwice -
+      (arrowStart * 2 + safeArrowWidth)
+    ) / 2f
+  return SnapshotDetailHorizontalLayoutPlan(
+    horizontalPadding = safeHorizontalPadding,
+    arrowStart = arrowStart,
+    arrowWidth = safeArrowWidth,
+    arrowTranslationX = arrowTranslationX,
+    titleContentStart = safeHorizontalPadding + safeArrowWidth + safeArrowTitleGap,
+    itemContentStart = itemContentStart,
+    contentEndPadding = safeHorizontalPadding,
+    statusRailWidth = safeStatusRailWidth,
+    statusIndicatorStart = statusIndicatorStart,
+    statusIndicatorCenterTwice = statusIndicatorCenterTwice
+  )
+}
+
 fun planSnapshotDetailItemLayout(
   contentWidth: Int,
   naturalStatusWidth: Int,

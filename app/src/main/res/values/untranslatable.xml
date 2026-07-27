@@ -24,5 +24,10 @@
 
   <string name="ref_category_dex" translatable="false">Dex</string>
 
+  <plurals name="snapshot_dex_classes_count" translatable="false">
+    <item quantity="one">%s class</item>
+    <item quantity="other">%s classes</item>
+  </plurals>
+
   <string name="snapshot_none" translatable="false">None</string>
 </resources>

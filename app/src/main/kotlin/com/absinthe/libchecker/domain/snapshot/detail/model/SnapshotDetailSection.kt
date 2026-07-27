@@ -3,6 +3,7 @@ package com.absinthe.libchecker.domain.snapshot.detail.model
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
@@ -56,7 +57,7 @@ fun buildSnapshotDetailReportItemText(item: SnapshotDetailItem): String {
     append(" ")
     append(item.title)
     appendLine()
-    if (item.itemType == NATIVE || item.itemType == METADATA) {
+    if (item.itemType == NATIVE || item.itemType == METADATA || item.itemType == DEX) {
       append("\t")
       append(item.extra)
       appendLine()

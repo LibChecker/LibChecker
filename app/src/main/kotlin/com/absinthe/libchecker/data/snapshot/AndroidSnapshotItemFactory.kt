@@ -10,6 +10,7 @@ import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.domain.snapshot.SnapshotItemFactory
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.dex.DexStatsCollector
 import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPackageSize
@@ -71,6 +72,18 @@ class AndroidSnapshotItemFactory : SnapshotItemFactory {
       metadata = PackageUtils.getMetaDataItems(flaggedPi).toJson().orEmpty(),
       packageSize = packageInfo.getPackageSize(true),
       isSystem = (packageInfo.applicationInfo!!.flags and ApplicationInfo.FLAG_SYSTEM) > 0
+    ).applyDecoratedStats(packageInfo)
+  }
+
+  private fun SnapshotItem.applyDecoratedStats(packageInfo: PackageInfo): SnapshotItem {
+    val stats = DexStatsCollector.collect(packageInfo)
+    return copy(
+      dexInfo = stats.entries.toJson().orEmpty(),
+      resourceInfo = stats.resourceEntries.toJson().orEmpty(),
+      resourcesSize = stats.resourcesSize,
+      statsVersion = SnapshotItem.CURRENT_STATS_VERSION,
+      dexStatsAvailable = stats.isDexComplete,
+      resourceStatsAvailable = stats.isResourceComplete
     )
   }
 }

@@ -130,7 +130,10 @@ class AdvancedMenuBSDView(context: Context) :
     onAction: (AdvancedMenuAction) -> Unit
   ) {
     this.onAction = onAction
-    demoAdapter.bind(AppListRenderState(fallbackDisplayOptions = state.displayOptions))
+    demoAdapter.bind(
+      AppListRenderState(fallbackDisplayOptions = state.displayOptions),
+      refreshItems = true
+    )
     demoAdapter.setList(listOf(state.demoItem))
     sortView.bind(state.displayOptions) {
       this.onAction(AdvancedMenuAction.SortChanged(it))

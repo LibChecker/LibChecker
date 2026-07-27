@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.domain.snapshot.detail.model
 
+import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.domain.snapshot.model.CHANGED
@@ -37,6 +38,22 @@ class SnapshotDetailReportItemTextTest {
           extra = "12 KB → 14 KB",
           diffType = CHANGED,
           itemType = NATIVE
+        )
+      )
+    )
+  }
+
+  @Test
+  fun buildsDexReportLineWithMetrics() {
+    assertEquals(
+      "🟡~ classes.dex\n\t10 KB → 12 KB\n+2 KB, +20.0%\n",
+      buildSnapshotDetailReportItemText(
+        SnapshotDetailItem(
+          name = "base/classes.dex",
+          title = "classes.dex",
+          extra = "10 KB → 12 KB\n+2 KB, +20.0%",
+          diffType = CHANGED,
+          itemType = DEX
         )
       )
     )

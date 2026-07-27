@@ -35,6 +35,7 @@ import com.absinthe.libchecker.domain.home.ui.INavViewContainer
 import com.absinthe.libchecker.domain.snapshot.album.ui.AlbumActivity
 import com.absinthe.libchecker.domain.snapshot.detail.ui.EXTRA_ENTITY
 import com.absinthe.libchecker.domain.snapshot.detail.ui.SnapshotDetailActivity
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.shouldShowSnapshotNoDiffPopup
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotEmptyView
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotCapturePlan
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotDashboardAction
@@ -200,7 +201,7 @@ class SnapshotFragment :
         }
 
         val item = getItem(position)
-        if (item.deleted || item.newInstalled || item.isNothingChanged()) {
+        if (item.shouldShowSnapshotNoDiffPopup()) {
           SnapshotNoDiffBSDFragment.newInstance(item).also {
             it.show(context.supportFragmentManager, SnapshotNoDiffBSDFragment::class.java.name)
           }
