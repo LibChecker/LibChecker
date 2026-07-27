@@ -32,9 +32,6 @@ import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.utils.OsUtils
-import com.absinthe.libraries.utils.extensions.addPaddingBottom
-import com.absinthe.libraries.utils.extensions.addPaddingEnd
-import com.absinthe.libraries.utils.extensions.addPaddingStart
 import com.absinthe.libraries.utils.extensions.addPaddingTop
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.shape.ShapeAppearanceModel
@@ -59,10 +56,6 @@ var View.paddingStartCompat: Int
   }
   get() = paddingStart
 
-fun View.addPaddingStart(padding: Int) {
-  addPaddingStart(padding)
-}
-
 var View.paddingTopCompat: Int
   set(value) {
     setPadding(paddingStart, value, paddingEnd, paddingBottom)
@@ -73,25 +66,11 @@ fun View.addPaddingTop(padding: Int) {
   addPaddingTop(padding)
 }
 
-var View.paddingEndCompat: Int
-  set(value) {
-    setPadding(paddingStart, paddingTop, value, paddingBottom)
-  }
-  get() = paddingEnd
-
-fun View.addPaddingEnd(padding: Int) {
-  addPaddingEnd(padding)
-}
-
 var View.paddingBottomCompat: Int
   set(value) {
     setPadding(paddingStart, paddingTop, paddingEnd, value)
   }
   get() = paddingBottom
-
-fun View.addPaddingBottom(padding: Int) {
-  addPaddingBottom(padding)
-}
 
 fun TextView.tintHighlightText(highlightText: String, rawText: CharSequence) {
   text = rawText
@@ -108,6 +87,14 @@ fun TextView.tintHighlightText(highlightText: String, rawText: CharSequence) {
     )
     builder.append(spannableString)
     text = builder
+  }
+}
+
+internal fun TextView.setOrHighlightText(text: CharSequence, highlightText: String) {
+  if (highlightText.isNotBlank()) {
+    tintHighlightText(highlightText, text)
+  } else {
+    this.text = text
   }
 }
 
@@ -177,6 +164,15 @@ fun ViewGroup.setAlphaForAll(alpha: Float) = children.forEach {
   it.alpha = alpha
 }
 
+internal fun ViewGroup.setSingleChild(child: View) {
+  if (childCount == 1 && getChildAt(0) === child) {
+    return
+  }
+  (child.parent as? ViewGroup)?.removeView(child)
+  removeAllViews()
+  addView(child)
+}
+
 fun TextView.startStrikeThroughAnimation(): ValueAnimator {
   val span = SpannableString(text)
   val strikeSpan = StrikethroughSpan()
@@ -243,24 +239,6 @@ fun TextView.addStrikeThroughSpan() {
 fun View.isRtl(): Boolean {
   return layoutDirection == View.LAYOUT_DIRECTION_RTL
 }
-
-val View.start: Int
-  get() {
-    return if (isRtl()) {
-      right
-    } else {
-      left
-    }
-  }
-
-val View.end: Int
-  get() {
-    return if (isRtl()) {
-      left
-    } else {
-      right
-    }
-  }
 
 fun View?.visibleWidth() = if (this != null && isVisible) measuredWidth else 0
 fun View?.visibleHeight() = if (this != null && isVisible) measuredHeight else 0

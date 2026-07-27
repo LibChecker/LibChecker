@@ -2,7 +2,6 @@ package com.absinthe.libchecker.utils
 
 import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.ApplicationInfoHidden
 import android.content.pm.ComponentInfo
@@ -567,16 +566,8 @@ object PackageUtils {
     @LibType type: Int,
     isSimpleName: Boolean
   ): List<StatefulComponent> {
-    val flag = when (type) {
-      SERVICE -> PackageManager.GET_SERVICES
-      ACTIVITY -> PackageManager.GET_ACTIVITIES
-      RECEIVER -> PackageManager.GET_RECEIVERS
-      PROVIDER -> PackageManager.GET_PROVIDERS
-      else -> 0
-    }
-
     return runCatching {
-      getComponentList(getPackageInfo(packageName, flag), type, isSimpleName)
+      getComponentList(getPackageInfo(packageName, getComponentPackageInfoFlag(type)), type, isSimpleName)
     }.getOrElse { emptyList() }
   }
 
@@ -592,17 +583,19 @@ object PackageUtils {
     @LibType type: Int,
     isSimpleName: Boolean
   ): List<String> {
-    val flag = when (type) {
+    return runCatching {
+      getComponentStringList(getPackageInfo(packageName, getComponentPackageInfoFlag(type)), type, isSimpleName)
+    }.getOrElse { emptyList() }
+  }
+
+  internal fun getComponentPackageInfoFlag(@LibType type: Int): Int {
+    return when (type) {
       SERVICE -> PackageManager.GET_SERVICES
       ACTIVITY -> PackageManager.GET_ACTIVITIES
       RECEIVER -> PackageManager.GET_RECEIVERS
       PROVIDER -> PackageManager.GET_PROVIDERS
       else -> 0
     }
-
-    return runCatching {
-      getComponentStringList(getPackageInfo(packageName, flag), type, isSimpleName)
-    }.getOrElse { emptyList() }
   }
 
   /**
@@ -825,11 +818,10 @@ object PackageUtils {
       }
 
       abiSet
-    }.onFailure {
+    }.getOrElse {
       Timber.e(it)
-      abiSet.clear()
-      abiSet.add(ERROR)
-    }.getOrDefault(abiSet)
+      mutableSetOf(ERROR)
+    }
   }
 
   /**
@@ -839,31 +831,21 @@ object PackageUtils {
    */
   private fun getAbiListByNativeDir(nativePath: String): MutableSet<Int> {
     val file = File(nativePath.substring(0, nativePath.lastIndexOf(File.separator)))
-    val abis = mutableSetOf<Int>()
-
-    val fileList = file.listFiles() ?: return mutableSetOf()
-
-    fileList.asSequence()
-      .forEach {
-        if (it.isDirectory) {
-          INSTRUCTION_SET_MAP_TO_ABI_VALUE[it.name]?.let { abi ->
-            abis.add(abi)
-          }
-        }
-      }
-
-    return abis
+    return file.listFiles()
+      ?.asSequence()
+      ?.filter { it.isDirectory }
+      ?.mapNotNullTo(mutableSetOf()) { INSTRUCTION_SET_MAP_TO_ABI_VALUE[it.name] }
+      ?: mutableSetOf()
   }
 
   private fun getAbiListBySplitApks(splitSource: Array<String>): Set<Int> {
     return splitSource.filter { source -> STRING_ABI_MAP.keys.any { source.contains(it) } }
-      .map { source ->
+      .mapNotNull { source ->
         val abiString = source.substringAfterLast(File.separator)
           .removePrefix("split_config.")
           .removeSuffix(".apk")
-        STRING_ABI_MAP[abiString] ?: ERROR
+        STRING_ABI_MAP[abiString]
       }
-      .filter { it != ERROR }
       .toSet()
   }
 
@@ -1213,14 +1195,6 @@ object PackageUtils {
       append(signature.toCharsString())
     }
     return LibStringItem(serialNumber, 0, source, null)
-  }
-
-  fun getLauncherActivity(packageName: String): String {
-    val intent = Intent(Intent.ACTION_MAIN, null)
-      .addCategory(Intent.CATEGORY_LAUNCHER)
-      .setPackage(packageName)
-    val info = PackageManagerCompat.queryIntentActivities(intent, 0)
-    return info.getOrNull(0)?.activityInfo?.name.orEmpty()
   }
 
   fun getBuildVersionsInfo(

@@ -87,7 +87,7 @@ class SnapshotBackupViewModel(
     resultAction: (RestoreBackupResult) -> Unit
   ) {
     viewModelScope.launch(Dispatchers.IO) {
-      val result = when (getRestorePlan(uri)) {
+      val result = when (buildSnapshotRestorePlanUseCase(uri)) {
         SnapshotRestorePlan.DatabaseBackup -> {
           val result = restoreDatabaseBackup(roomBackup, uri, cacheDir)
           RestoreBackupResult.DatabaseBackup(success = result?.success == true)
@@ -134,8 +134,6 @@ class SnapshotBackupViewModel(
       }
     )
   }
-
-  private suspend fun getRestorePlan(uri: Uri): SnapshotRestorePlan = buildSnapshotRestorePlanUseCase(uri)
 
   sealed interface RestoreBackupResult {
     data class DatabaseBackup(val success: Boolean) : RestoreBackupResult

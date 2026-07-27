@@ -12,7 +12,6 @@ import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.graphics.drawable.toBitmap
-import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
@@ -123,9 +122,7 @@ class AppPropItemView(context: Context) : AViewGroup(context) {
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-    children.forEach {
-      it.autoMeasure()
-    }
+    autoMeasureChildren()
     val textWidth = measuredWidth - paddingStart - paddingEnd - linkToIcon.measuredWidth - linkToIcon.marginStart
     if (tip.measuredWidth > textWidth) {
       tip.measure(textWidth.toExactlyMeasureSpec(), tip.defaultHeightMeasureSpec(this))

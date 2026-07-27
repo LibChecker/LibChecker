@@ -5,7 +5,6 @@ import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.view.children
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.model.AlternativeLaunchItem
 import com.absinthe.libchecker.view.AViewGroup
@@ -51,9 +50,7 @@ class AlternativeLaunchItemView(context: Context) : AViewGroup(context) {
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-    children.forEach {
-      it.autoMeasure()
-    }
+    autoMeasureChildren()
     val textWidth =
       measuredWidth - paddingStart - paddingEnd
     if (label.measuredWidth > textWidth) {

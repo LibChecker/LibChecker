@@ -9,9 +9,7 @@ sealed interface SnapshotMenuLayoutItem {
   data object Options : SnapshotMenuLayoutItem
 }
 
-fun buildSnapshotMenuLayoutItems(demoDisplayData: SnapshotItemDisplayData): List<SnapshotMenuLayoutItem> {
-  return listOf(
-    SnapshotMenuLayoutItem.Demo(demoDisplayData),
-    SnapshotMenuLayoutItem.Options
-  )
-}
+fun buildSnapshotMenuLayoutItems(demoDisplayData: SnapshotItemDisplayData): List<SnapshotMenuLayoutItem> = listOf(
+  SnapshotMenuLayoutItem.Demo(demoDisplayData),
+  SnapshotMenuLayoutItem.Options
+)

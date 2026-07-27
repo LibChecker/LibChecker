@@ -41,7 +41,7 @@ data class LibStringComponentItemDisplay(
         rule = markedRule,
         processName = processName,
         processIndicatorColor = processIndicatorColor.takeIf { processName != null },
-        contentDescription = buildLibStringItemDescription(
+        contentDescription = buildDetailItemDescription(
           name.text,
           ruleLabel,
           processName
@@ -49,8 +49,4 @@ data class LibStringComponentItemDisplay(
       )
     }
   }
-}
-
-private fun Int.isOptionEnabled(option: Int): Boolean {
-  return (this and option) > 0
 }

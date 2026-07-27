@@ -16,7 +16,7 @@ data class LibStringMetadataItemDisplay(
     else -> originalDisplayValue
   }
 
-  override val contentDescription: String = buildLibStringItemDescription(name.text, visibleValue)
+  override val contentDescription: String = buildDetailItemDescription(name.text, visibleValue)
 
   val isTransformed: Boolean = preview != AppResourcePreview.Original
 

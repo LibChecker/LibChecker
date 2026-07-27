@@ -2,6 +2,7 @@ package com.absinthe.libchecker.domain.statistics.reference.ui
 
 import android.content.DialogInterface
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.options.withOption
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceMenuAction
 import com.absinthe.libchecker.domain.statistics.reference.model.buildLibReferenceMenuBottomSheetState
 import com.absinthe.libchecker.domain.statistics.reference.ui.view.LibReferenceMenuBSDView
@@ -16,11 +17,7 @@ class LibReferenceMenuBSDFragment : BaseBottomSheetViewDialogFragment<LibReferen
 
   private var onDismissCallback: (optionsDiff: Int) -> Unit = {}
   private var onOptionChanged: (option: Int, isChecked: Boolean) -> Int = { option, isChecked ->
-    if (isChecked) {
-      currentAdvancedOptions or option
-    } else {
-      currentAdvancedOptions and option.inv()
-    }
+    currentAdvancedOptions.withOption(option, isChecked)
   }
 
   override fun initRootView(): LibReferenceMenuBSDView = LibReferenceMenuBSDView(requireContext())
@@ -58,23 +55,21 @@ class LibReferenceMenuBSDFragment : BaseBottomSheetViewDialogFragment<LibReferen
   private fun render() {
     root.bind(
       state = buildLibReferenceMenuBottomSheetState(currentAdvancedOptions),
-      onAction = ::handleAction
-    )
-  }
-
-  private fun handleAction(action: LibReferenceMenuAction) {
-    when (action) {
-      is LibReferenceMenuAction.OptionChanged -> {
-        currentAdvancedOptions = onOptionChanged(action.item.option, action.isChecked)
-        Telemetry.recordEvent(
-          Constants.Event.LIB_REF_ADVANCED_MENU_ITEM_CHANGED,
-          mapOf(
-            Telemetry.Param.CONTENT to getString(action.item.labelRes),
-            Telemetry.Param.VALUE to action.isChecked
-          )
-        )
-        render()
+      onAction = { action ->
+        when (action) {
+          is LibReferenceMenuAction.OptionChanged -> {
+            currentAdvancedOptions = onOptionChanged(action.item.option, action.isChecked)
+            Telemetry.recordEvent(
+              Constants.Event.LIB_REF_ADVANCED_MENU_ITEM_CHANGED,
+              mapOf(
+                Telemetry.Param.CONTENT to getString(action.item.labelRes),
+                Telemetry.Param.VALUE to action.isChecked
+              )
+            )
+            render()
+          }
+        }
       }
-    }
+    )
   }
 }

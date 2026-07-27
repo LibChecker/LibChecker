@@ -36,20 +36,6 @@ class DetailProcessBarController(
     render()
   }
 
-  private fun ensureProcessBar() {
-    if (processBarView != null) {
-      return
-    }
-
-    processBarView = ProcessBarView(container.context).also {
-      it.layoutParams = ViewGroup.LayoutParams(
-        ViewGroup.LayoutParams.MATCH_PARENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
-      )
-    }
-    container.addView(processBarView)
-  }
-
   private fun render() {
     val state = ProcessBarRenderState.create(
       processColors = processColors,
@@ -62,11 +48,23 @@ class DetailProcessBarController(
     }
     renderState = state
     if (state.items.isEmpty()) {
-      removeProcessBar()
+      processBarView?.let {
+        if (it.parent != null) {
+          (it.parent as? ViewGroup)?.removeView(it)
+        }
+      }
+      processBarView = null
       return
     }
-    ensureProcessBar()
-    processBarView?.bind(state, ::onAction)
+    val view = processBarView ?: ProcessBarView(container.context).also {
+      it.layoutParams = ViewGroup.LayoutParams(
+        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
+      )
+      container.addView(it)
+      processBarView = it
+    }
+    view.bind(state, ::onAction)
   }
 
   private fun onAction(action: ProcessBarAction) {
@@ -77,14 +75,5 @@ class DetailProcessBarController(
         onProcessFilterChanged(action.process)
       }
     }
-  }
-
-  private fun removeProcessBar() {
-    processBarView?.let {
-      if (it.parent != null) {
-        (it.parent as? ViewGroup)?.removeView(it)
-      }
-    }
-    processBarView = null
   }
 }

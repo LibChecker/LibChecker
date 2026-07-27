@@ -253,7 +253,7 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
   private fun ensureHighlightAnimator() {
     val provider = highlightIconProvider
     updateHighlightAvailability()
-    if (!shouldHighlightAnimate()) {
+    if (!isRunning || !highlightAnimationAvailable) {
       stopHighlightAnimator()
       return
     }
@@ -305,10 +305,6 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
     highlightIndex = -1
     clearCurrentHighlightBitmap()
     invalidateOnAnimationFrame()
-  }
-
-  private fun shouldHighlightAnimate(): Boolean {
-    return isRunning && highlightAnimationAvailable
   }
 
   private fun advanceHighlightBitmap(): Boolean {
@@ -825,11 +821,7 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
 
   private fun wrapIndex(index: Int, size: Int): Int {
     if (size <= 0) return 0
-    var result = index % size
-    if (result < 0) {
-      result += size
-    }
-    return result
+    return Math.floorMod(index, size)
   }
 
   private fun shortestAngleDistance(a: Float, b: Float): Float {

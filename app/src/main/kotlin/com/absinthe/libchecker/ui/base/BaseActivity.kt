@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.ui.base
 
 import android.content.Context
+import android.content.res.Configuration
 import android.content.res.Resources
 import android.os.BadParcelableException
 import android.os.Bundle
@@ -11,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.utils.LocaleUtils
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.extensions.applySystemBarsMargin
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
@@ -28,7 +28,12 @@ abstract class BaseActivity<VB : ViewBinding> :
   override fun attachBaseContext(newBase: Context) {
     val locale = GlobalValues.locale
     appliedLocale = locale
-    super.attachBaseContext(LocaleUtils.wrapContext(newBase, locale))
+    Locale.setDefault(locale)
+    val configuration = Configuration(newBase.resources.configuration).apply {
+      setLocale(locale)
+      setLayoutDirection(locale)
+    }
+    super.attachBaseContext(newBase.createConfigurationContext(configuration))
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,10 +76,6 @@ abstract class BaseActivity<VB : ViewBinding> :
 
   open fun shouldApplyTranslucentSystemBars(): Boolean {
     return true
-  }
-
-  open fun computeUserThemeKey(): String {
-    return GlobalValues.darkMode
   }
 
   open fun onApplyTranslucentSystemBars() {

@@ -5,13 +5,9 @@ import timber.log.Timber.DebugTree
 class ThreadAwareDebugTree : DebugTree() {
 
   override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-    var newTag = tag
-
-    newTag?.let {
-      val threadName = Thread.currentThread().name
-      newTag = "<LC_DEBUG><$threadName> $tag"
+    val newTag = tag?.let {
+      "<LC_DEBUG><${Thread.currentThread().name}> $it"
     }
-
     super.log(priority, newTag, message, t)
   }
 

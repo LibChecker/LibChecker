@@ -31,15 +31,12 @@ fun FragmentActivity.launchDetailPage(item: LCItem, refName: String? = null, ref
   }
   findViewById<View>(androidx.appcompat.R.id.search_src_text)?.clearFocus()
   if (item.abi.toInt() == Constants.OVERLAY && !forceDetail) {
-    OverlayDetailBottomSheetDialogFragment().apply {
-      arguments = Bundle().apply {
-        putParcelable(EXTRA_LC_ITEM, item)
-      }
-      show(
+    OverlayDetailBottomSheetDialogFragment()
+      .putArguments(EXTRA_LC_ITEM to item)
+      .show(
         supportFragmentManager,
         OverlayDetailBottomSheetDialogFragment::class.java.name
       )
-    }
   } else {
     val intent = Intent(this, AppDetailActivity::class.java)
       .putExtras(

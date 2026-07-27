@@ -201,18 +201,6 @@ internal object ZipDataOffsetReader {
     return localHeaderOffset + ZIP_LOCAL_FILE_HEADER_FIXED_SIZE + nameSize + extraSize
   }
 
-  private fun ByteArray.readUInt16Le(offset: Int): Int {
-    return (this[offset].toInt() and 0xff) or
-      ((this[offset + 1].toInt() and 0xff) shl 8)
-  }
-
-  private fun ByteArray.readUInt32Le(offset: Int): Long {
-    return (this[offset].toLong() and 0xff) or
-      ((this[offset + 1].toLong() and 0xff) shl 8) or
-      ((this[offset + 2].toLong() and 0xff) shl 16) or
-      ((this[offset + 3].toLong() and 0xff) shl 24)
-  }
-
   private fun ByteArray.readUInt64Le(offset: Int): Long? {
     if (offset < 0 || offset + Long.SIZE_BYTES > size || this[offset + 7].toInt() and 0x80 != 0) {
       return null
@@ -266,4 +254,16 @@ internal object ZipDataOffsetReader {
       isAccessible = true
     }
   }
+}
+
+internal fun ByteArray.readUInt16Le(offset: Int): Int {
+  return (this[offset].toInt() and 0xff) or
+    ((this[offset + 1].toInt() and 0xff) shl 8)
+}
+
+internal fun ByteArray.readUInt32Le(offset: Int): Long {
+  return (this[offset].toLong() and 0xff) or
+    ((this[offset + 1].toLong() and 0xff) shl 8) or
+    ((this[offset + 2].toLong() and 0xff) shl 16) or
+    ((this[offset + 3].toLong() and 0xff) shl 24)
 }

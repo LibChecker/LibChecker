@@ -33,7 +33,6 @@ import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.domain.home.model.HomeToolbarTitleState
 import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
-import com.absinthe.libchecker.domain.home.ui.INavViewContainer
 import com.absinthe.libchecker.domain.home.ui.view.HomeToolbarTitleView
 import com.absinthe.libchecker.domain.rules.CloudRulesRepository
 import com.absinthe.libchecker.services.IWorkerService
@@ -245,7 +244,10 @@ class MainActivity :
 
         // 禁止左右滑动
         isUserInputEnabled = false
-        fixViewPager2Insets(this)
+        ViewCompat.setOnApplyWindowInsetsListener(this) { _, windowInsets ->
+          /* Do nothing */
+          windowInsets
+        }
       }
 
       navView.apply {
@@ -348,13 +350,6 @@ class MainActivity :
       val navigationBarsInsets =
         ViewCompat.getRootWindowInsets(view)!!.getInsets(WindowInsetsCompat.Type.systemBars())
       view.updatePadding(bottom = navigationBarsInsets.bottom)
-      windowInsets
-    }
-  }
-
-  private fun fixViewPager2Insets(view: ViewPager2) {
-    ViewCompat.setOnApplyWindowInsetsListener(view) { _, windowInsets ->
-      /* Do nothing */
       windowInsets
     }
   }

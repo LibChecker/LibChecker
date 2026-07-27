@@ -16,7 +16,6 @@ import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_DETAIL_BEAN
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.domain.app.detail.packageinfo.GetAppDetailPackageUseCase
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel.PackageLoadResult
-import com.absinthe.libchecker.domain.app.detail.ui.IDetailContainer
 import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_NAME
 import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.Toasty
@@ -39,7 +38,9 @@ class AppDetailActivity :
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     isPackageReady = true
-    collectPackageLoadResults()
+    lifecycleScope.launch {
+      viewModel.packageLoadResults.collect(::handlePackageLoadResult)
+    }
     initPackage(intent)
   }
 
@@ -59,7 +60,7 @@ class AppDetailActivity :
 
   override fun onStop() {
     super.onStop()
-    unregisterPackageBroadcast()
+    unregisterReceiver(requestPackageReceiver)
   }
 
   private fun initPackage(intent: Intent) {
@@ -75,12 +76,6 @@ class AppDetailActivity :
     Timber.d("packageName: $pkgName")
     val packageName = pkgName ?: return
     viewModel.loadAppDetailPackage(packageName)
-  }
-
-  private fun collectPackageLoadResults() {
-    lifecycleScope.launch {
-      viewModel.packageLoadResults.collect(::handlePackageLoadResult)
-    }
   }
 
   private fun handlePackageLoadResult(loadResult: PackageLoadResult) {
@@ -131,8 +126,7 @@ class AppDetailActivity :
 
   private val requestPackageReceiver = object : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-      val pkg = intent.data?.schemeSpecificPart.orEmpty()
-      if (pkg == pkgName) {
+      if (intent.data?.schemeSpecificPart.orEmpty() == pkgName) {
         if (intent.action == Intent.ACTION_PACKAGE_REMOVED) {
           finish()
         } else {
@@ -150,9 +144,5 @@ class AppDetailActivity :
     }
 
     registerReceiver(requestPackageReceiver, intentFilter)
-  }
-
-  private fun unregisterPackageBroadcast() {
-    unregisterReceiver(requestPackageReceiver)
   }
 }

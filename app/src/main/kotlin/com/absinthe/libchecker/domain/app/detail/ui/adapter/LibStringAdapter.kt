@@ -18,6 +18,7 @@ import com.absinthe.libchecker.domain.app.detail.model.LibStringNativeItemDispla
 import com.absinthe.libchecker.domain.app.detail.model.LibStringPermissionItemDisplay
 import com.absinthe.libchecker.domain.app.detail.model.LibStringRenderState
 import com.absinthe.libchecker.domain.app.detail.model.LibStringStaticItemDisplay
+import com.absinthe.libchecker.domain.app.detail.model.isOptionEnabled
 import com.absinthe.libchecker.domain.app.detail.resource.AppResourcePreview
 import com.absinthe.libchecker.domain.app.detail.ui.view.ComponentLibItemView
 import com.absinthe.libchecker.domain.app.detail.ui.view.MetadataLibItemView
@@ -47,7 +48,7 @@ class LibStringAdapter(
   }
 
   fun preloadRuleChipIcons(items: List<LibStringItemChip>) {
-    if (isItemOptionEnabled(AdvancedOptions.SHOW_MARKED_LIB)) {
+    if (renderState.itemDisplayOptions.isOptionEnabled(AdvancedOptions.SHOW_MARKED_LIB)) {
       RuleChipIconCache.preload(context, items.asSequence().mapNotNull { it.rule })
     }
   }
@@ -176,10 +177,6 @@ class LibStringAdapter(
     )
     holder.itemView.background = drawable
     drawable.startTransition(HIGHLIGHT_TRANSITION_DURATION)
-  }
-
-  private fun isItemOptionEnabled(option: Int): Boolean {
-    return (renderState.itemDisplayOptions and option) > 0
   }
 
   private fun LibStringItemChip.metadataPreviewKey(): MetadataPreviewKey {

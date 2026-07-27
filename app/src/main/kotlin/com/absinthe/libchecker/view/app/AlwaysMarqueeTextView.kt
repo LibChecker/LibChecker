@@ -7,27 +7,20 @@ import androidx.appcompat.widget.AppCompatTextView
 
 class AlwaysMarqueeTextView : AppCompatTextView {
 
-  constructor(context: Context) : super(context) {
-    init()
-  }
-
-  constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-    init()
-  }
+  constructor(context: Context) : super(context)
+  constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
 
   constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(
     context,
     attrs,
     defStyle
-  ) {
-    init()
-  }
+  )
 
   override fun isFocused(): Boolean {
     return true
   }
 
-  private fun init() {
+  init {
     ellipsize = TextUtils.TruncateAt.MARQUEE
     isFocusable = true
     isFocusableInTouchMode = true

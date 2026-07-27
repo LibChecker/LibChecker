@@ -39,7 +39,15 @@
         style="?actionBarStyle"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        app:layout_collapseMode="pin" />
+        app:layout_collapseMode="pin">
+
+        <com.absinthe.libchecker.view.CollapsedToolbarView
+          android:id="@+id/collapsed_toolbar_title"
+          android:layout_width="wrap_content"
+          android:layout_height="match_parent"
+          android:layout_gravity="start|center_vertical" />
+
+      </androidx.appcompat.widget.ToolbarFix>
 
     </com.google.android.material.appbar.CollapsingToolbarLayout>
 

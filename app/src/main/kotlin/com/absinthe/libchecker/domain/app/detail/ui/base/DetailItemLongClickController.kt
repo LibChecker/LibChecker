@@ -45,7 +45,9 @@ class DetailItemLongClickController(
   private var loadingDialog: AlertDialog? = null
 
   init {
-    collectNativeLibraryExtractionResults()
+    coroutineScope.launch {
+      viewModel.nativeLibraryExtractionResults.collect(::handleNativeLibraryExtractionResult)
+    }
   }
 
   fun onLongClick(item: LibStringItemChip, position: Int) {
@@ -163,12 +165,6 @@ class DetailItemLongClickController(
   fun clear() {
     pendingExtractionItem = null
     dismissLoading()
-  }
-
-  private fun collectNativeLibraryExtractionResults() {
-    coroutineScope.launch {
-      viewModel.nativeLibraryExtractionResults.collect(::handleNativeLibraryExtractionResult)
-    }
   }
 
   private fun handleNativeLibraryExtractionResult(extractionResult: NativeLibraryExtractionResult) {
@@ -301,7 +297,7 @@ class DetailItemLongClickController(
 
     arrayAdapter.add(fragment.getString(com.absinthe.libchecker.R.string.integration_anywhere_menu_editor))
     actionMap[arrayAdapter.count - 1] = {
-      AnywhereManager().launchActivityEditor(
+      AnywhereManager.launchActivityEditor(
         fragment.requireContext(),
         actions.packageName,
         actions.fullComponentName

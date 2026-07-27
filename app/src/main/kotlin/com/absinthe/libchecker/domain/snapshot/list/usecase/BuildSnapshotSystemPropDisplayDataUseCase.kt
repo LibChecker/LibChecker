@@ -47,12 +47,10 @@ class BuildSnapshotSystemPropDisplayDataUseCase(
   }
 }
 
-private fun getCurrentSystemProps(): Map<String, String> {
-  return mapOf(
-    Constants.SystemProps.RO_BUILD_ID to Build.ID,
-    Constants.SystemProps.RO_BUILD_VERSION_SECURITY_PATCH to Build.VERSION.SECURITY_PATCH
-  )
-}
+private fun getCurrentSystemProps() = mapOf(
+  Constants.SystemProps.RO_BUILD_ID to Build.ID,
+  Constants.SystemProps.RO_BUILD_VERSION_SECURITY_PATCH to Build.VERSION.SECURITY_PATCH
+)
 
 private enum class SnapshotSystemProp(val key: String) {
   BUILD_ID(Constants.SystemProps.RO_BUILD_ID),

@@ -40,10 +40,17 @@ class DetailPackageContentController(
 
     insertStaticLibraryTabIfAvailable(packageName, uiGeneration)
     initFeatureItems(packageInfo, extraBean?.features ?: -1, uiGeneration)
-    initAnalysisContent(packageName, isHarmonyMode)
+    when {
+      isHarmonyMode -> viewModel.initAbilities(packageName)
+      viewModel.isApkPreview -> viewModel.initComponentsDataInPreview()
+    }
     // Detect Live Update notification
     viewModel.initPermissionData()
-    schedulePostPackageInfoAvailable()
+    // Keep the legacy hook after the current UI-thread work queue.
+    coroutineScope.launch {
+      delay(1L)
+      onPostPackageInfoAvailable()
+    }
   }
 
   private fun insertStaticLibraryTabIfAvailable(
@@ -74,24 +81,6 @@ class DetailPackageContentController(
       if (uiGeneration == currentUiGeneration()) {
         viewModel.initFeatures(packageInfo, featureMask)
       }
-    }
-  }
-
-  private fun initAnalysisContent(
-    packageName: String,
-    isHarmonyMode: Boolean
-  ) {
-    when {
-      isHarmonyMode -> viewModel.initAbilities(packageName)
-      viewModel.isApkPreview -> viewModel.initComponentsDataInPreview()
-    }
-  }
-
-  private fun schedulePostPackageInfoAvailable() {
-    // Keep the legacy hook after the current UI-thread work queue.
-    coroutineScope.launch {
-      delay(1L)
-      onPostPackageInfoAvailable()
     }
   }
 }

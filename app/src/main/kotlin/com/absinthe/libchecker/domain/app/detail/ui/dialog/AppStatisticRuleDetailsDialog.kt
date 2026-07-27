@@ -1,18 +1,14 @@
 package com.absinthe.libchecker.domain.app.detail.ui.dialog
 
 import android.content.Context
-import android.content.Intent
-import androidx.browser.customtabs.CustomTabsIntent
-import androidx.core.net.toUri
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.statistics.AppStatisticRuleAnalysis
 import com.absinthe.libchecker.domain.statistics.chart.ui.resolve
 import com.absinthe.libchecker.domain.statistics.chart.ui.resolveDrawable
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
-import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.utils.extensions.openUrlInBrowser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 object AppStatisticRuleDetailsDialog {
 
@@ -35,15 +31,13 @@ object AppStatisticRuleDetailsDialog {
         }
       }.joinToString("\n\n")
 
-      val iconRes = analysis.definition.icon.resolveDrawable(context)
-
       BaseAlertDialogBuilder(context)
-        .setIcon(iconRes)
+        .setIcon(analysis.definition.icon.resolveDrawable(context))
         .setTitle(analysis.definition.title.resolve(context))
         .setMessage(message)
         .setPositiveButton(android.R.string.ok, null)
         .setNeutralButton(R.string.lib_detail_app_props_tip) { _, _ ->
-          openReference(context, details.referenceUrl)
+          context.openUrlInBrowser(details.referenceUrl)
         }
         .show()
     }
@@ -56,19 +50,5 @@ object AppStatisticRuleDetailsDialog {
       ?.filter { facet -> facet.id in matchedIds }
       ?.map { facet -> facet.title.resolve(context) }
       .orEmpty()
-  }
-
-  private fun openReference(context: Context, url: String) {
-    runCatching {
-      CustomTabsIntent.Builder().build().launchUrl(context, url.toUri())
-    }.onFailure { error ->
-      Timber.e(error)
-      runCatching {
-        context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
-      }.onFailure { fallbackError ->
-        Timber.e(fallbackError)
-        Toasty.showShort(context, "No browser application")
-      }
-    }
   }
 }

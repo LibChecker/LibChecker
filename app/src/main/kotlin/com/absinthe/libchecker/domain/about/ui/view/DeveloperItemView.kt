@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.view.children
 import androidx.core.view.marginLeft
 import androidx.core.view.marginRight
 import coil.load
@@ -92,9 +91,7 @@ class DeveloperItemView(context: Context) : MaterialCardView(context) {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
       super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-      children.forEach {
-        it.autoMeasure()
-      }
+      autoMeasureChildren()
       val labelWidth = (
         measuredWidth -
           paddingStart -

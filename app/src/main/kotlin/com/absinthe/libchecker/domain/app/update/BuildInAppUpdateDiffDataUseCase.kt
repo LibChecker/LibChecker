@@ -77,11 +77,9 @@ internal fun resolveInAppUpdateDisplay(
   displayedRemoteApp: GetAppUpdateInfo.App?,
   installableRemoteApp: GetAppUpdateInfo.App?,
   localVersionCode: Long
-): Pair<GetAppUpdateInfo.App?, Boolean> {
-  return displayedRemoteApp to (
-    installableRemoteApp?.versionCode?.toLong()?.let { it > localVersionCode } == true
-    )
-}
+): Pair<GetAppUpdateInfo.App?, Boolean> = displayedRemoteApp to (
+  installableRemoteApp?.versionCode?.toLong()?.let { it > localVersionCode } == true
+  )
 
 data class InAppUpdateDiffData(
   val hasUpdate: Boolean,

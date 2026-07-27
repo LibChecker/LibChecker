@@ -604,7 +604,7 @@ private fun createRoundedRect(color: Int, radius: Float): Drawable {
   }
 }
 
-private fun Drawable.copyDrawable(): Drawable {
+internal fun Drawable.copyDrawable(): Drawable {
   return constantState?.newDrawable()?.mutate() ?: mutate()
 }
 

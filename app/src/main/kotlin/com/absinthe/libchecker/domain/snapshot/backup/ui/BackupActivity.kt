@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -36,7 +37,6 @@ import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.preference.applyM3eLayoutResources
 import com.absinthe.libchecker.ui.preference.buildPreferenceItemRenderState
 import com.absinthe.libchecker.ui.preference.view.PreferenceItemView
-import com.absinthe.libchecker.utils.StorageUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.addBackStateHandler
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
@@ -159,7 +159,9 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
       findPreference<Preference>(Constants.PREF_LOCAL_BACKUP)?.apply {
         setOnPreferenceClickListener {
           lifecycleScope.launch {
-            val action = viewModel.onLocalBackupRequested(StorageUtils.isExternalStorageWritable)
+            val action = viewModel.onLocalBackupRequested(
+              Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
+            )
             when (action) {
               is SnapshotBackupViewModel.LocalBackupAction.CreateArchive -> launchArchiveBackup(action.fileName)
 

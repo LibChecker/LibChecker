@@ -5,7 +5,6 @@ import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.view.children
 import androidx.core.view.marginEnd
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -64,9 +63,7 @@ class MarketDistributionDashboardView(context: Context) : AViewGroup(context) {
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-    children.forEach {
-      it.autoMeasure()
-    }
+    autoMeasureChildren()
     val chipWidth = chip.measuredWidth + title.marginEnd
     val libNameWidth = measuredWidth - paddingStart - paddingEnd - title.marginEnd - chipWidth
     if (title.measuredWidth > libNameWidth) {

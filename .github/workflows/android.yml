@@ -251,6 +251,7 @@ jobs:
           ref: main
           path: assets-main
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          fetch-depth: 0
       - name: Update assets main branch
         env:
           APK_VERSION_NAME: ${{ steps.apk-info.outputs.version-name }}
@@ -307,9 +308,21 @@ jobs:
               --compile "$COMPILE_SDK_VERSION"
           fi
 
+          if ! python3 "${{ github.workspace }}/.github/scripts/generate_apk_size_chart.py" \
+            --repository . \
+            --output apk-size-history-light.svg \
+            --dark-output apk-size-history-dark.svg \
+            --pending-commit "$GITHUB_SHA" \
+            --pending-date "$(git -C "${{ github.workspace }}" show -s --format=%cs "$GITHUB_SHA")"; then
+            echo "::warning::QuickChart unavailable; keeping previous APK size charts"
+          fi
+
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add ci.json stable.json
+          for chart in apk-size-history-light.svg apk-size-history-dark.svg; do
+            [ -f "$chart" ] && git add "$chart"
+          done
           if git diff --cached --quiet; then
             echo "No assets main changes"
           else

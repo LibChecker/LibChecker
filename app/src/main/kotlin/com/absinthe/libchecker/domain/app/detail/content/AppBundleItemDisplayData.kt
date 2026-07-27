@@ -5,7 +5,7 @@ import android.content.pm.PackageInfo
 import androidx.annotation.DrawableRes
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.model.AppBundleItem
-import com.absinthe.libchecker.domain.app.detail.model.buildAppBundleItemDescription
+import com.absinthe.libchecker.domain.app.detail.model.buildDetailItemDescription
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.STRING_ABI_MAP
@@ -52,7 +52,7 @@ internal fun buildAppBundleItemDisplayData(
       iconRes = item.kind.toIconRes(),
       nameText = item.name,
       sizeText = sizeText,
-      contentDescription = buildAppBundleItemDescription(item.name, sizeText),
+      contentDescription = buildDetailItemDescription(item.name, sizeText),
       size = item.size
     )
   }

@@ -66,13 +66,11 @@ internal fun buildComparisonDashboardDescription(
   labels: ComparisonDashboardLabels,
   timestampText: String,
   appsCountText: String
-): String {
-  return listOf(
-    labels.timestampTitle,
-    timestampText,
-    labels.appsCountTitle,
-    appsCountText
-  )
-    .mapNotNull { it.trim().takeIf(String::isNotEmpty) }
-    .joinToString()
-}
+): String = listOf(
+  labels.timestampTitle,
+  timestampText,
+  labels.appsCountTitle,
+  appsCountText
+)
+  .mapNotNull { it.trim().takeIf(String::isNotEmpty) }
+  .joinToString()

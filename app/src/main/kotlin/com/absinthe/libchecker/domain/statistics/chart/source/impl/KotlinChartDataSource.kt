@@ -52,10 +52,8 @@ class KotlinChartDataSource(
 
       // NOTE: The order of the entries when being added to the entries array determines their position around the center of
       // the chart.
-      val legendList = mutableListOf<String>()
       for (i in parties.indices) {
         entries.add(PieEntryFloat(classifiedList[i].size.toFloat(), parties[i % parties.size]))
-        legendList.add(parties[i % parties.size])
       }
       val dataSet = PieDataSet(entries, "").apply {
         isDrawIcons = false

@@ -9,8 +9,6 @@ import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.domain.app.detail.ui.base.BaseDetailFragment
 import com.absinthe.libchecker.domain.app.detail.ui.base.EXTRA_TYPE
 import com.absinthe.libchecker.utils.extensions.putArguments
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import rikka.core.util.ClipboardUtils
 
 class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
@@ -19,8 +17,7 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
   override val needShowLibDetailDialog = false
 
   override suspend fun getItems(): List<LibStringItemChip> {
-    val flow = viewModel.contentState.dexLibItems
-    return flow.value ?: flow.filterNotNull().first()
+    return viewModel.contentState.dexLibItems.valueOrAwait()
   }
 
   override fun onItemsAvailable(items: List<LibStringItemChip>) {
@@ -30,18 +27,11 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
       submitItemsWithFilter(items, viewModel.filterState.queriedText, null)
     }
 
-    if (!isListReady) {
-      viewModel.filterState.updateItemsCount(type, items.size)
-      isListReady = true
-    }
+    markListReady(items.size)
   }
 
   override fun init() {
-    binding.apply {
-      list.apply {
-        adapter = this@DexAnalysisFragment.adapter
-      }
-    }
+    binding.list.adapter = adapter
 
     adapter.apply {
       animationEnable = false
@@ -54,10 +44,8 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
       isStateViewEnable = true
     }
 
-    viewModel.apply {
-      packageInfoStateFlow.value?.run {
-        contentState.dexLibItems.value ?: run { initDexData() }
-      }
+    if (viewModel.packageInfoStateFlow.value != null && viewModel.contentState.dexLibItems.value == null) {
+      viewModel.initDexData()
     }
   }
 

@@ -51,7 +51,7 @@ data class LibStringStaticItemDisplay(
         name = name,
         detail = detail,
         rule = rule,
-        contentDescription = buildLibStringItemDescription(
+        contentDescription = buildDetailItemDescription(
           name.text,
           detail?.plainText,
           rule?.label
@@ -59,8 +59,4 @@ data class LibStringStaticItemDisplay(
       )
     }
   }
-}
-
-private fun Int.isOptionEnabled(option: Int): Boolean {
-  return (this and option) > 0
 }

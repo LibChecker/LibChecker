@@ -169,7 +169,7 @@ class DetailItemResolver(
     propertyMap.orEmpty()
       .map { property ->
         val value = property.value.toPropertyValue()
-        val resourceId = value.toResourceIdOrNull()
+        val resourceId = value.takeIf(String::maybeResourceId)?.toIntOrNull()
         val resourceName = resourceId?.let { id ->
           runCatching {
             appResources?.getResourceName(id)
@@ -198,7 +198,7 @@ class DetailItemResolver(
     if (nativePath != null) {
       File(nativePath).listFiles()
         ?.find { it.path.endsWith(elfPath) }
-        ?.let { return@withContext it.readElfDetail() }
+        ?.let { return@withContext ElfParser(it).readElfDetail() }
     }
 
     val sourceDir = packageInfo.applicationInfo?.sourceDir ?: return@withContext null
@@ -223,7 +223,9 @@ class DetailItemResolver(
       icon = permissionInfo?.loadIconOrNull(),
       label = permissionInfo?.loadLabelOrNull(),
       description = permissionInfo?.loadDescriptionOrNull(),
-      providerAppName = permissionInfo?.packageName?.let(::getProviderAppName)
+      providerAppName = permissionInfo?.packageName?.let { packageName ->
+        installedAppRepository.getPackageInfo(packageName)?.getAppName(packageManager)
+      }
     )
   }
 
@@ -274,14 +276,6 @@ class DetailItemResolver(
     }
   }
 
-  private fun String.toResourceIdOrNull(): Int? {
-    return takeIf(String::maybeResourceId)?.toIntOrNull()
-  }
-
-  private fun File.readElfDetail(): AppElfDetail {
-    return ElfParser(this).readElfDetail()
-  }
-
   private fun findElfDetailInApk(apk: File, elfPath: String): AppElfDetail? {
     ZipFileCompat(apk).use { zipFile ->
       val entry = zipFile.getEntry(elfPath) ?: return null
@@ -324,10 +318,6 @@ class DetailItemResolver(
     }.onFailure {
       Timber.e(it)
     }.getOrNull()
-  }
-
-  private fun getProviderAppName(packageName: String): String? {
-    return installedAppRepository.getPackageInfo(packageName)?.getAppName(packageManager)
   }
 
   data class HeaderRequest(

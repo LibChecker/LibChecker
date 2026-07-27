@@ -12,7 +12,6 @@ import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.text.buildSpannedString
 import androidx.core.text.italic
-import androidx.core.view.children
 import androidx.core.view.marginLeft
 import androidx.core.view.marginRight
 import com.absinthe.libchecker.R
@@ -20,7 +19,7 @@ import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceIte
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
-import com.absinthe.libchecker.utils.extensions.tintHighlightText
+import com.absinthe.libchecker.utils.extensions.setOrHighlightText
 import com.absinthe.libchecker.view.AViewGroup
 
 class LibReferenceItemView(context: Context) : FrameLayout(context) {
@@ -120,29 +119,15 @@ class LibReferenceItemView(context: Context) : FrameLayout(context) {
           append(" ")
         }
       } else {
-        setOrHighlightText(labelName, display.label, highlightText)
+        labelName.setOrHighlightText(display.label, highlightText)
       }
-      setOrHighlightText(libName, display.libName, highlightText)
+      libName.setOrHighlightText(display.libName, highlightText)
       count.text = display.count
-    }
-
-    private fun setOrHighlightText(
-      view: AppCompatTextView,
-      text: CharSequence,
-      highlightText: String
-    ) {
-      if (highlightText.isNotBlank()) {
-        view.tintHighlightText(highlightText, text)
-      } else {
-        view.text = text
-      }
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
       super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-      children.forEach {
-        it.autoMeasure()
-      }
+      autoMeasureChildren()
       val labelWidth = (
         measuredWidth -
           paddingStart -

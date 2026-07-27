@@ -9,8 +9,6 @@ import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.ui.base.BaseDetailFragment
 import com.absinthe.libchecker.domain.app.detail.ui.base.EXTRA_TYPE
 import com.absinthe.libchecker.utils.extensions.putArguments
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import rikka.core.util.ClipboardUtils
 
@@ -20,8 +18,7 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
   override val needShowLibDetailDialog = false
 
   override suspend fun getItems(): List<LibStringItemChip> {
-    val flow = viewModel.contentState.abilitiesMap[type]
-    return flow.value ?: flow.filterNotNull().first()
+    return viewModel.contentState.abilitiesMap[type].valueOrAwait()
   }
 
   override fun onItemsAvailable(items: List<LibStringItemChip>) {
@@ -30,24 +27,19 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
     } else {
       submitItemsWithFilter(items, viewModel.filterState.queriedText, viewModel.filterState.queriedProcess)
     }
-    if (!isListReady) {
-      viewModel.filterState.updateItemsCount(type, items.size)
-      isListReady = true
-    }
+    markListReady(items.size)
   }
 
   override fun init() {
-    binding.apply {
-      list.apply {
-        adapter = this@AbilityAnalysisFragment.adapter
-      }
-    }
+    binding.list.adapter = adapter
     val flow = viewModel.contentState.abilitiesMap[type]
 
     adapter.apply {
       animationEnable = false
       setOnItemLongClickListener { _, _, position ->
-        doOnLongClick(getItem(position).item.name)
+        val context = requireContext()
+        ClipboardUtils.put(context, getItem(position).item.name)
+        VersionCompat.showCopiedOnClipboardToast(context)
         true
       }
       stateView = this@AbilityAnalysisFragment.emptyView
@@ -58,13 +50,6 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
       lifecycleScope.launch {
         flow.emit(flow.value)
       }
-    }
-  }
-
-  private fun doOnLongClick(componentName: String) {
-    ClipboardUtils.put(requireContext(), componentName)
-    context?.let {
-      VersionCompat.showCopiedOnClipboardToast(it)
     }
   }
 

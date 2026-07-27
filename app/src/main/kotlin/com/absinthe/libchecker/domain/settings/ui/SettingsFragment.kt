@@ -233,7 +233,7 @@ class SettingsFragment :
         true
       }
     }
-    val getUpdatesPreference = findPreference<Preference>(Constants.PREF_GET_UPDATES)?.apply {
+    findPreference<Preference>(Constants.PREF_GET_UPDATES)?.apply {
       setOnPreferenceClickListener {
         if (AntiShakeUtils.isInvalidClick(prefRecyclerView)) {
           false
@@ -317,23 +317,20 @@ class SettingsFragment :
         true
       }
     }
-    findPreference<TwoStatePreference>(Constants.PREF_ANONYMOUS_ANALYTICS)?.apply {
-      isVisible = getBoolean(R.bool.is_foss).not()
-    }
+    findPreference<TwoStatePreference>(Constants.PREF_ANONYMOUS_ANALYTICS)?.isVisible =
+      getBoolean(R.bool.is_foss).not()
 
     bindLocalePreference(languagePreference)
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    findPreference<Preference>(Constants.PREF_GET_UPDATES)?.let(::bindGetUpdatesBadge)
-  }
-
-  private fun bindGetUpdatesBadge(preference: Preference) {
-    settingsViewModel.updateBadgeVisible.onEach { visible ->
-      isGetUpdatesBadgeVisible = visible
-      rebindVisiblePreference(preference)
-    }.launchIn(viewLifecycleOwner.lifecycleScope)
+    findPreference<Preference>(Constants.PREF_GET_UPDATES)?.let { preference ->
+      settingsViewModel.updateBadgeVisible.onEach { visible ->
+        isGetUpdatesBadgeVisible = visible
+        rebindVisiblePreference(preference)
+      }.launchIn(viewLifecycleOwner.lifecycleScope)
+    }
   }
 
   private fun bindGitHubTokenPreference(preference: Preference) {

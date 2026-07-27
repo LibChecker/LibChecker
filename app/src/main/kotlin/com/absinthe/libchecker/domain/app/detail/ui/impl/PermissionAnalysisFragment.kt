@@ -10,8 +10,6 @@ import com.absinthe.libchecker.domain.app.detail.ui.Referable
 import com.absinthe.libchecker.domain.app.detail.ui.base.BaseDetailFragment
 import com.absinthe.libchecker.domain.app.detail.ui.base.EXTRA_TYPE
 import com.absinthe.libchecker.utils.extensions.putArguments
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -24,8 +22,7 @@ class PermissionAnalysisFragment :
   override val needShowLibDetailDialog = true
 
   override suspend fun getItems(): List<LibStringItemChip> {
-    val flow = viewModel.contentState.permissionsItems
-    return flow.value ?: flow.filterNotNull().first()
+    return viewModel.contentState.permissionsItems.valueOrAwait()
   }
 
   override fun onItemsAvailable(items: List<LibStringItemChip>) {
@@ -36,18 +33,11 @@ class PermissionAnalysisFragment :
       submitItemsWithFilter(items, viewModel.filterState.queriedText, null)
     }
 
-    if (!isListReady) {
-      viewModel.filterState.updateItemsCount(type, items.size)
-      isListReady = true
-    }
+    markListReady(items.size)
   }
 
   override fun init() {
-    binding.apply {
-      list.apply {
-        adapter = this@PermissionAnalysisFragment.adapter
-      }
-    }
+    binding.list.adapter = adapter
 
     adapter.apply {
       animationEnable = false
@@ -55,16 +45,14 @@ class PermissionAnalysisFragment :
       isStateViewEnable = true
     }
 
-    viewModel.apply {
-      packageInfoStateFlow.onEach {
-        if (it != null) {
-          viewModel.initPermissionData()
-        }
-      }.launchIn(lifecycleScope)
-
-      packageInfoStateFlow.value?.run {
-        contentState.permissionsItems.value ?: run { initPermissionData() }
+    viewModel.packageInfoStateFlow.onEach {
+      if (it != null) {
+        viewModel.initPermissionData()
       }
+    }.launchIn(lifecycleScope)
+
+    if (viewModel.packageInfoStateFlow.value != null && viewModel.contentState.permissionsItems.value == null) {
+      viewModel.initPermissionData()
     }
   }
 

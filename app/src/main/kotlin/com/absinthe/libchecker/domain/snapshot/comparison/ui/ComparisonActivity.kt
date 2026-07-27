@@ -253,7 +253,12 @@ class ComparisonActivity :
           .apply {
             setCompareMode(true)
             setLeftMode(side == SnapshotComparisonSide.LEFT)
-            setOnAddApkClickListener(::chooseApk)
+            setOnAddApkClickListener { isLeft ->
+              archiveChoosingSide = SnapshotComparisonSide.fromIsLeft(isLeft)
+              chooseApkResultLauncher.launch(
+                arrayOf("application/vnd.android.package-archive", "application/octet-stream")
+              )
+            }
             setOnItemClickListener { position ->
               val item = timeStampList[position]
               viewModel.selectSnapshot(side, item.timestamp)
@@ -264,13 +269,6 @@ class ComparisonActivity :
           .show(supportFragmentManager, TimeNodeBottomSheetDialogFragment::class.java.name)
       }
     }
-  }
-
-  private fun chooseApk(isLeft: Boolean) {
-    archiveChoosingSide = SnapshotComparisonSide.fromIsLeft(isLeft)
-    chooseApkResultLauncher.launch(
-      arrayOf("application/vnd.android.package-archive", "application/octet-stream")
-    )
   }
 
   private fun parseIntent(intent: Intent) {
@@ -317,12 +315,10 @@ class ComparisonActivity :
 
   private fun renderDashboardState(state: ComparisonDashboardState) {
     dashboardState = state
-    dashboardView.bind(state, ::handleDashboardAction)
-  }
-
-  private fun handleDashboardAction(action: ComparisonDashboardAction) {
-    when (action) {
-      is ComparisonDashboardAction.SelectSide -> showTimeNodePicker(action.side)
+    dashboardView.bind(state) { action ->
+      when (action) {
+        is ComparisonDashboardAction.SelectSide -> showTimeNodePicker(action.side)
+      }
     }
   }
 
@@ -470,8 +466,6 @@ class ComparisonActivity :
           }
         )
       }
-      save()
-      restore()
     }
     return comboIcon
   }

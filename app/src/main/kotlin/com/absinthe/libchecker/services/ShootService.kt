@@ -186,7 +186,10 @@ class ShootService : LifecycleService() {
       CaptureInstalledSnapshotUseCase.Request(
         appList = appList,
         dropPrevious = dropPrevious,
-        systemProps = getSystemProps()
+        systemProps = mapOf(
+          Constants.SystemProps.RO_BUILD_VERSION_SECURITY_PATCH to Build.VERSION.SECURITY_PATCH,
+          Constants.SystemProps.RO_BUILD_ID to Build.ID
+        )
       )
     ) { progress ->
       notifyProgress(progress.percent)
@@ -205,7 +208,7 @@ class ShootService : LifecycleService() {
       builder.setProgress(0, 0, false)
         .setOngoing(false)
         .setContentTitle(getString(R.string.noti_shoot_title_saved))
-        .setContentText(getFormatDateString(timestamp))
+        .setContentText(formatSnapshotTimestamp(timestamp))
       notificationManager.notify(notificationIdShootSuccess, builder.build())
     }
 
@@ -221,17 +224,6 @@ class ShootService : LifecycleService() {
     if (stopWhenFinish) {
       stopSelf()
     }
-  }
-
-  private fun getSystemProps(): Map<String, String> {
-    return mapOf(
-      Constants.SystemProps.RO_BUILD_VERSION_SECURITY_PATCH to Build.VERSION.SECURITY_PATCH,
-      Constants.SystemProps.RO_BUILD_ID to Build.ID
-    )
-  }
-
-  private fun getFormatDateString(timestamp: Long): String {
-    return formatSnapshotTimestamp(timestamp)
   }
 
   private fun initBuilder() {

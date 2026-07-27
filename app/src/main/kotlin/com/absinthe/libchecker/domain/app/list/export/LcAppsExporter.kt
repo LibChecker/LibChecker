@@ -16,6 +16,9 @@ import android.os.SystemClock
 import androidx.core.graphics.drawable.toBitmap
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.ZipFileCompat
+import com.absinthe.libchecker.domain.app.buildmetadata.COMPOSE_VERSION_ENTRIES
+import com.absinthe.libchecker.domain.app.buildmetadata.DATA_BINDING_VERSION_ENTRIES
+import com.absinthe.libchecker.domain.app.buildmetadata.readFirstPresentLine
 import com.absinthe.libchecker.domain.app.detail.model.KotlinToolingMetadata
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.IntentFilterUtils
@@ -110,7 +113,7 @@ object LcAppsExporter {
       val jsonWriter = JsonWriter.of(sink)
       jsonWriter.beginArray()
 
-      val analyzedAt = nowIsoString()
+      val analyzedAt = Date(System.currentTimeMillis()).toIsoString()
       packages.chunked(REPORT_BATCH_SIZE).forEach { batch ->
         currentCoroutineContext().ensureActive()
         val reports = coroutineScope {
@@ -443,8 +446,8 @@ object LcAppsExporter {
     return runCatching {
       ZipFileCompat(File(sourceDir)).use { zip ->
         val kotlinInfo = readKotlinPluginInfo(zip)
-        val composeVersion = readFirstPresentLine(zip, COMPOSE_VERSION_ENTRIES)
-        val composeDetected = composeVersion != null || zip.entries().any { entry ->
+        val composeVersion = zip.readFirstPresentLine(COMPOSE_VERSION_ENTRIES)
+        val composeDetected = composeVersion != null || zip.getZipEntries().asSequence().any { entry ->
           val fileName = entry.name.substringAfterLast('/')
           entry.isDirectory.not() &&
             (fileName.startsWith("androidx.compose.ui") || fileName.startsWith("androidx.compose.material")) &&
@@ -466,10 +469,6 @@ object LcAppsExporter {
     }.onFailure {
       Timber.w(it, "Failed to read build metadata: ${packageInfo.packageName}")
     }.getOrDefault(BuildMetadataExport())
-  }
-
-  private fun ZipFileCompat.entries(): Sequence<ZipEntry> {
-    return getZipEntries().asSequence()
   }
 
   private fun readKotlinPluginInfo(zip: ZipFileCompat): KotlinPluginExport {
@@ -509,19 +508,7 @@ object LcAppsExporter {
       }.getOrNull()?.let { return it }
     }
 
-    return readFirstPresentLine(zip, DATA_BINDING_VERSION_ENTRIES)
-  }
-
-  private fun readFirstPresentLine(zip: ZipFileCompat, entries: Array<String>): String? {
-    entries.forEach { name ->
-      zip.getEntry(name)?.let { entry ->
-        runCatching {
-          InputStreamReader(zip.getInputStream(entry), Charsets.UTF_8).buffered().use { it.readLine() }
-            ?.takeIf { line -> line.isNotBlank() }
-        }.getOrNull()?.let { return it }
-      }
-    }
-    return null
+    return zip.readFirstPresentLine(DATA_BINDING_VERSION_ENTRIES)
   }
 
   private fun buildSignatures(packageInfo: PackageInfo): SignaturesExport {
@@ -705,10 +692,6 @@ object LcAppsExporter {
     return isoDateFormat.get()!!.format(this)
   }
 
-  private fun nowIsoString(): String {
-    return Date(System.currentTimeMillis()).toIsoString()
-  }
-
   private fun writeReport(writer: JsonWriter, report: ExportReport) {
     writer.beginObject()
     writer.writeString("locale", report.locale)
@@ -760,7 +743,8 @@ object LcAppsExporter {
       return
     }
     beginObject()
-    nullNameValue("resourceId")
+    name("resourceId")
+    nullValue()
     writeString("path", icon.path)
     writeString("mimeType", MIME_TYPE_PNG)
     writeNumber("size", icon.size)
@@ -999,12 +983,7 @@ object LcAppsExporter {
   }
 
   private fun JsonWriter.writeString(name: String, value: String?) {
-    name(name)
-    if (value == null) {
-      nullValue()
-    } else {
-      value(value)
-    }
+    name(name).value(value)
   }
 
   private fun JsonWriter.writeStringArray(name: String, values: List<String>) {
@@ -1015,26 +994,11 @@ object LcAppsExporter {
   }
 
   private fun JsonWriter.writeNumber(name: String, value: Number?) {
-    name(name)
-    if (value == null) {
-      nullValue()
-    } else {
-      value(value)
-    }
+    name(name).value(value)
   }
 
   private fun JsonWriter.writeBoolean(name: String, value: Boolean?) {
-    name(name)
-    if (value == null) {
-      nullValue()
-    } else {
-      value(value)
-    }
-  }
-
-  private fun JsonWriter.nullNameValue(name: String) {
-    name(name)
-    nullValue()
+    name(name).value(value)
   }
 
   private enum class ExportStage {
@@ -1108,20 +1072,6 @@ object LcAppsExporter {
   private const val ZIP_BUFFER_SIZE = 64 * 1024
   private const val AGP_KEYWORD = "androidGradlePluginVersion"
   private const val AGP_KEYWORD_MANIFEST_PREFIX = "Created-By: Android Gradle "
-
-  private val COMPOSE_VERSION_ENTRIES = arrayOf(
-    "META-INF/androidx.compose.runtime_runtime.version",
-    "META-INF/androidx.compose.ui_ui.version",
-    "META-INF/androidx.compose.ui_ui-tooling-preview.version",
-    "META-INF/androidx.compose.foundation_foundation.version",
-    "META-INF/androidx.compose.animation_animation.version"
-  )
-
-  private val DATA_BINDING_VERSION_ENTRIES = arrayOf(
-    "META-INF/androidx.databinding_viewbinding.version",
-    "META-INF/androidx.databinding_databindingKtx.version",
-    "META-INF/androidx.databinding_library.version"
-  )
 
   data class ExportResult(val appCount: Int)
 

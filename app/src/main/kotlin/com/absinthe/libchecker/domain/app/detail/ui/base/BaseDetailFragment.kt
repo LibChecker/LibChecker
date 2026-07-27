@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.annotation.isComponentType
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemDialogRequest
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemResolver
 import com.absinthe.libchecker.domain.app.detail.model.LibStringAction
@@ -39,10 +40,14 @@ import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColor
+import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.app.EmptyListView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
@@ -78,7 +83,11 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     )
     LibStringAdapter(
       type = type,
-      onAction = ::onAdapterAction
+      onAction = { action ->
+        when (action) {
+          is LibStringAction.MetadataResourceClicked -> onMetadataResourceClick(action.item, action.display)
+        }
+      }
     ).apply { bind(listRenderState) }
   }
   protected val emptyView by unsafeLazy {
@@ -99,7 +108,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
       DividerItemDecoration.VERTICAL
     )
   }
-  protected var isListReady = false
+  private var isListReady = false
   private var afterListReadyTask: Runnable? = null
   private val longClickControllerDelegate = unsafeLazy {
     DetailItemLongClickController(
@@ -121,6 +130,17 @@ abstract class BaseDetailFragment<T : ViewBinding> :
 
   protected abstract suspend fun getItems(): List<LibStringItemChip>
   protected abstract fun onItemsAvailable(items: List<LibStringItemChip>)
+
+  protected suspend fun <T : Any> StateFlow<T?>.valueOrAwait(): T {
+    return value ?: filterNotNull().first()
+  }
+
+  protected fun markListReady(itemCount: Int) {
+    if (!isListReady) {
+      viewModel.filterState.updateItemsCount(type, itemCount)
+      isListReady = true
+    }
+  }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
@@ -201,8 +221,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     val sortedList = viewModel.sortDetailItemsForDisplay(list, type)
 
     if (itemChip != null) {
-      val newHighlightPosition = sortedList.indexOf(itemChip)
-      updateListRenderState { it.withHighlightPosition(newHighlightPosition) }
+      updateListRenderState { it.withHighlightPosition(sortedList.indexOf(itemChip)) }
     }
 
     adapter.preloadRuleChipIcons(sortedList)
@@ -275,7 +294,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
 
   fun setProcessMode(processMode: Boolean) {
     if (
-      isComponentFragment() &&
+      isComponentType(type) &&
       updateListRenderState { it.copy(processMode = processMode) }
     ) {
       // noinspection NotifyDataSetChanged
@@ -393,12 +412,6 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     }
   }
 
-  private fun onAdapterAction(action: LibStringAction) {
-    when (action) {
-      is LibStringAction.MetadataResourceClicked -> onMetadataResourceClick(action.item, action.display)
-    }
-  }
-
   private fun updateListRenderState(
     transform: (LibStringRenderState) -> LibStringRenderState
   ): Boolean {
@@ -413,16 +426,9 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   }
 
   private fun showXml(xml: CharSequence) {
-    val fragmentManager = childFragmentManager
-    XmlBSDFragment().apply {
-      arguments = Bundle().apply {
-        putCharSequence(EXTRA_TEXT, xml)
-      }
-    }.show(fragmentManager, XmlBSDFragment::class.java.name)
-  }
-
-  fun isComponentFragment(): Boolean {
-    return viewModel.isComponentDetailType(type)
+    XmlBSDFragment()
+      .putArguments(EXTRA_TEXT to xml)
+      .show(childFragmentManager, XmlBSDFragment::class.java.name)
   }
 
   fun hasNonGrantedPermissions(): Boolean {

@@ -1,6 +1,33 @@
 package com.absinthe.libchecker.domain.snapshot.display
 
+import android.content.Context
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
+import com.absinthe.libchecker.utils.extensions.sizeToString
+import java.util.Locale
+import kotlin.math.abs
+
+internal fun formatSnapshotSizeChange(
+  context: Context,
+  diffSize: Long,
+  oldSize: Long
+): String = buildString {
+  if (diffSize > 0) {
+    append("+")
+  }
+  append(diffSize.sizeToString(context))
+  append(", ")
+  if (diffSize > 0) {
+    append("+")
+  }
+  append(formatSnapshotSizePercentage(diffSize.toFloat() / oldSize))
+}
+
+private fun formatSnapshotSizePercentage(percentage: Float): String {
+  if (abs(percentage) < 0.001f) {
+    return if (percentage < 0) "-<0.1%" else "<0.1%"
+  }
+  return String.format(Locale.getDefault(), "%.1f%%", percentage * 100)
+}
 
 internal fun SnapshotDiffItem.buildSnapshotVersionDisplayDiff(
   archivedLabel: String

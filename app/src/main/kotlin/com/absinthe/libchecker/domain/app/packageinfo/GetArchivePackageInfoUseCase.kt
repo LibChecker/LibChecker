@@ -50,14 +50,14 @@ class GetArchivePackageInfoUseCase {
     if (properties["overlay"] as? Boolean != true) {
       return null
     }
-    val packageName = properties["package"].asString() ?: return null
-    val overlayTarget = properties["targetPackage"].asString()
+    val packageName = properties["package"] as? String ?: return null
+    val overlayTarget = properties["targetPackage"] as? String
 
     return PackageInfo().apply {
       this.packageName = packageName
-      versionName = properties["versionName"].asString()
+      versionName = properties["versionName"] as? String
       versionCode = properties["versionCode"].asLong()?.toInt() ?: 0
-      sharedUserId = properties["sharedUserId"].asString()
+      sharedUserId = properties["sharedUserId"] as? String
       applicationInfo = buildApplicationInfo(file, packageName, properties)
       requestedPermissions = manifestReader.permissionList.toTypedArray()
       requestedPermissionsFlags = IntArray(manifestReader.permissionList.size)
@@ -109,7 +109,7 @@ private fun buildApplicationInfo(
 ): ApplicationInfo {
   return ApplicationInfo().apply {
     this.packageName = packageName
-    name = properties["name"].asString()?.toPackageClassName(packageName)
+    name = (properties["name"] as? String)?.toPackageClassName(packageName)
     className = name
     sourceDir = file.path
     publicSourceDir = file.path
@@ -119,7 +119,7 @@ private fun buildApplicationInfo(
       compileSdkVersion = properties["compileSdkVersion"].asInt() ?: 0
     }
     properties["label"].asInt()?.let { labelRes = it }
-    properties["label"].asString()?.let { nonLocalizedLabel = it }
+    (properties["label"] as? String)?.let { nonLocalizedLabel = it }
     properties["icon"].asInt()?.let { icon = it }
     properties["theme"].asInt()?.let { theme = it }
   }
@@ -158,10 +158,6 @@ private fun String.toPackageClassName(packageName: String): String {
     "." in this -> this
     else -> "$packageName.$this"
   }
-}
-
-private fun Any?.asString(): String? {
-  return this as? String
 }
 
 private fun Any?.asInt(): Int? {

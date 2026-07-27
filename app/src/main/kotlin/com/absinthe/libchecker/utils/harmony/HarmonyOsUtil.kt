@@ -13,13 +13,5 @@ object HarmonyOsUtil {
     }.getOrDefault(false)
   }
 
-  fun <T> wrapperStub(f: () -> T): T? {
-    return try {
-      f()
-    } catch (e: Throwable) {
-      null
-    }
-  }
-
   fun isHarmonyOs(): Boolean = _isHarmonyOs
 }

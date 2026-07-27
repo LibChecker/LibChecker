@@ -13,7 +13,6 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.text.buildSpannedString
 import androidx.core.text.inSpans
-import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.core.view.marginStart
 import coil.dispose
@@ -39,8 +38,8 @@ import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.utils.extensions.setAlphaForAll
+import com.absinthe.libchecker.utils.extensions.setOrHighlightText
 import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
-import com.absinthe.libchecker.utils.extensions.tintHighlightText
 import com.absinthe.libchecker.utils.extensions.visibleHeight
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.span.CenterAlignImageSpan
@@ -399,9 +398,7 @@ class SnapshotItemView(
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
       super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-      children.forEach {
-        it.autoMeasure()
-      }
+      autoMeasureChildren()
       val textWidth =
         measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - 5.dp - appName.marginStart
       if (appName.measuredWidth > textWidth) {
@@ -473,14 +470,6 @@ class SnapshotItemView(
 }
 
 private const val ABI_CHANGE_ARROW = "→"
-
-private fun AppCompatTextView.setOrHighlightText(text: CharSequence, highlightText: String) {
-  if (highlightText.isNotBlank()) {
-    tintHighlightText(highlightText, text)
-  } else {
-    this.text = text
-  }
-}
 
 private fun SnapshotItemView.SnapshotItemContainerView.buildAbiSpanString(
   item: SnapshotAbiDisplayItem,

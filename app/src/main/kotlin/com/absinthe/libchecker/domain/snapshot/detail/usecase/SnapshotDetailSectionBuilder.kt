@@ -32,6 +32,7 @@ import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailS
 import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailSummary
 import com.absinthe.libchecker.domain.snapshot.detail.model.colorSnapshotDetailMetricDeltas
 import com.absinthe.libchecker.domain.snapshot.detail.model.emphasizeSnapshotDetailDiffArrows
+import com.absinthe.libchecker.domain.snapshot.display.formatSnapshotSizeChange
 import com.absinthe.libchecker.domain.snapshot.model.ADDED
 import com.absinthe.libchecker.domain.snapshot.model.CHANGED
 import com.absinthe.libchecker.domain.snapshot.model.MOVED
@@ -334,23 +335,7 @@ class SnapshotDetailSectionBuilder(
           val extra = buildString {
             append("${it.size.sizeToString(context)} $ARROW ${item.size.sizeToString(context)}")
             appendLine()
-            if (diffSize > 0) {
-              append("+")
-            }
-            append(diffSize.sizeToString(context))
-            append(", ")
-            if (diffSize > 0) {
-              append("+")
-            }
-            val percentage = (diffSize.toFloat() / it.size)
-            if (abs(percentage) < 0.001f) {
-              if (percentage < 0) {
-                append("-")
-              }
-              append("<0.1%")
-            } else {
-              append(String.format(Locale.getDefault(), "%.1f%%", percentage * 100))
-            }
+            append(formatSnapshotSizeChange(context, diffSize, it.size))
           }
           list.add(
             SnapshotDetailItem(
