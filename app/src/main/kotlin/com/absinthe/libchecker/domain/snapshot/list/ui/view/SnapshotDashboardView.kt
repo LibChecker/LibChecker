@@ -116,7 +116,9 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context, null, 
       isNestedScrollingEnabled = false
       adapter = systemPropAdapter
       overScrollMode = OVER_SCROLL_NEVER
-      layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+      layoutManager = object : LinearLayoutManager(context, RecyclerView.VERTICAL, false) {
+        override fun canScrollVertically(): Boolean = false
+      }
     }
 
     fun bind(
