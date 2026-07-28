@@ -12,8 +12,6 @@ import com.absinthe.libchecker.domain.app.detail.ui.base.EXTRA_TYPE
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.SignatureDetailBSDFragment
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import rikka.core.util.ClipboardUtils
@@ -24,8 +22,7 @@ class SignaturesAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
   override val needShowLibDetailDialog = false
 
   override suspend fun getItems(): List<LibStringItemChip> {
-    val flow = viewModel.contentState.signaturesLibItems
-    return flow.value ?: flow.filterNotNull().first()
+    return viewModel.contentState.signaturesLibItems.valueOrAwait()
   }
 
   override fun onItemsAvailable(items: List<LibStringItemChip>) {
@@ -35,10 +32,7 @@ class SignaturesAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
       submitItemsWithFilter(items, viewModel.filterState.queriedText, null)
     }
 
-    if (!isListReady) {
-      viewModel.filterState.updateItemsCount(type, items.size)
-      isListReady = true
-    }
+    markListReady(items.size)
   }
 
   override fun init() {
@@ -50,7 +44,9 @@ class SignaturesAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
         if (AntiShakeUtils.isInvalidClick(view)) {
           return@setOnItemClickListener
         }
-        openSignatureDetailDialog(position)
+        val source = getItem(position).item.source
+        SignatureDetailBSDFragment.newInstance(source.orEmpty())
+          .show(childFragmentManager, SignatureDetailBSDFragment::class.java.name)
       }
       setOnItemLongClickListener { _, _, position ->
         ClipboardUtils.put(requireContext(), getItem(position).item.source)
@@ -61,23 +57,15 @@ class SignaturesAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
       isStateViewEnable = true
     }
 
-    viewModel.apply {
-      packageInfoStateFlow.onEach {
-        if (it != null) {
-          viewModel.initSignatures()
-        }
-      }.launchIn(lifecycleScope)
-
-      packageInfoStateFlow.value?.run {
-        contentState.signaturesLibItems.value ?: run { initSignatures() }
+    viewModel.packageInfoStateFlow.onEach {
+      if (it != null) {
+        viewModel.initSignatures()
       }
-    }
-  }
+    }.launchIn(lifecycleScope)
 
-  private fun openSignatureDetailDialog(position: Int) {
-    val source = adapter.getItem(position).item.source
-    SignatureDetailBSDFragment.newInstance(source.orEmpty())
-      .show(childFragmentManager, SignatureDetailBSDFragment::class.java.name)
+    if (viewModel.packageInfoStateFlow.value != null && viewModel.contentState.signaturesLibItems.value == null) {
+      viewModel.initSignatures()
+    }
   }
 
   companion object {

@@ -30,9 +30,6 @@ class DetailFeatureListController(
   val itemCount: Int
     get() = state.items.size
 
-  val isInitialized: Boolean
-    get() = featureListView != null
-
   fun addItem(featureItem: DetailFeatureItem) {
     val shouldAlignListStart = state.items.isEmpty() || featureItem.position == 0
     updateState { it.withItem(featureItem) }
@@ -112,7 +109,12 @@ class DetailFeatureListController(
 
   private fun renderLoading() {
     if (state.isLoading) {
-      val view = ensureLoadingView()
+      val view = loadingView ?: ToolbarConnectionLoadingView(headerContentLayout.context).apply {
+        layoutParams = RecyclerView.LayoutParams(34.dp, 36.dp)
+        contentDescription = context.getString(R.string.loading)
+      }.also {
+        loadingView = it
+      }
       adapter.setFooterView(view)
       view.start()
     } else {
@@ -152,15 +154,6 @@ class DetailFeatureListController(
         (view.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(0, 0)
         view.invalidateItemDecorations()
       }
-    }
-  }
-
-  private fun ensureLoadingView(): ToolbarConnectionLoadingView {
-    return loadingView ?: ToolbarConnectionLoadingView(headerContentLayout.context).apply {
-      layoutParams = RecyclerView.LayoutParams(34.dp, 36.dp)
-      contentDescription = context.getString(R.string.loading)
-    }.also {
-      loadingView = it
     }
   }
 }

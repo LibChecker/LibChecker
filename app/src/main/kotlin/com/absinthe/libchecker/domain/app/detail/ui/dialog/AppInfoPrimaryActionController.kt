@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.domain.app.detail.ui.dialog
 
-import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
@@ -11,6 +10,7 @@ import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.utils.showToast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -90,13 +90,10 @@ class AppInfoPrimaryActionController(
   }
 
   private fun showAlternativeLaunchDialog(packageName: String?) {
-    fragment.activity?.let {
-      AlternativeLaunchBSDFragment().apply {
-        arguments = Bundle().apply {
-          putString(EXTRA_PACKAGE_NAME, packageName)
-        }
-        show(it.supportFragmentManager, AlternativeLaunchBSDFragment::class.java.name)
-      }
+    fragment.activity?.let { activity ->
+      AlternativeLaunchBSDFragment()
+        .putArguments(EXTRA_PACKAGE_NAME to packageName)
+        .show(activity.supportFragmentManager, AlternativeLaunchBSDFragment::class.java.name)
     }
   }
 }

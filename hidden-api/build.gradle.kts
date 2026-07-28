@@ -5,6 +5,7 @@ plugins {
 
 setupLibraryModule {
   namespace = "com.absinthe.libchecker.hidden_api"
+  enableKotlin = false
 }
 
 dependencies {

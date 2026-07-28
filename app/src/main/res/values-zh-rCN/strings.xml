@@ -13,6 +13,19 @@
   <!--  App list  -->
   <string name="menu_search">搜索</string>
   <string name="menu_sort">排序</string>
+  <string name="chart_statistics_add">添加统计项</string>
+  <string name="chart_statistics_edit">编辑统计项</string>
+  <string name="chart_statistics_added">已添加</string>
+  <string name="chart_statistics_available">可添加</string>
+  <string name="chart_statistics_loading_online">正在加载在线统计项…</string>
+  <string name="chart_statistics_online_error">无法加载在线统计项，已显示下载的内容。</string>
+  <string name="chart_statistics_no_available">没有更多可添加的统计项。</string>
+  <string name="chart_statistics_source_builtin">内置</string>
+  <string name="chart_statistics_source_online">在线</string>
+  <string name="chart_statistics_drag">拖动排序</string>
+  <string name="chart_statistics_drag_hint">拖动以调整排序</string>
+  <string name="chart_statistics_remove_description">移除 %1$s</string>
+  <string name="chart_statistics_add_description">添加 %1$s</string>
   <string name="menu_filter">过滤</string>
   <string name="search_hint">搜索…</string>
   <string name="string_64_bit">64 位</string>
@@ -25,6 +38,8 @@
   <string name="get_app_list_denied_tip">请授予 LibChecker\n“读取应用列表”\n权限</string>
   <string name="advanced_menu">高级菜单</string>
   <string name="archived_app">已归档应用</string>
+  <string name="snapshot_version_archived">已归档</string>
+  <string name="toast_archived_app_detail_unavailable">应用已归档，恢复后才能查看详情</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">%s架构的应用</string>
   <string name="title_statistics_dialog_no_native_libs">无原生库的应用</string>
@@ -132,6 +147,14 @@
   <string name="kotlin_details">Kotlin 是由 JetBrains 开发的开源静态类型编程语言。Kotlin 简洁、安全、可与 Java 和其他语言互操作，并提供了许多在多个平台之间重用代码的方法，从而实现高效编程。Kotlin 适用于 JVM、Android、JavaScript、Wasm 和 Native，可用于任何类型的开发，包括服务器端、客户端 Web、Android 和多平台库。</string>
   <string name="items_count">项数：</string>
   <string name="further_operation">进一步操作</string>
+  <string name="app_detail_online_rules_action">检测在线规则</string>
+  <string name="app_detail_online_rules_title">在线规则检测</string>
+  <string name="app_detail_online_rules_loading">正在分析在线规则… %1$d%%</string>
+  <string name="app_detail_online_rules_empty">图表中尚未添加在线统计规则</string>
+  <string name="app_detail_online_rules_error">无法分析在线规则</string>
+  <string name="app_detail_online_rules_matched">符合</string>
+  <string name="app_detail_online_rules_unmatched">不符合</string>
+  <string name="app_detail_online_rules_detected_features">当前应用检测到以下特性：</string>
   <string name="app_info_launch">启动</string>
   <string name="app_info_settings">设置</string>
   <string name="app_info_share">分享</string>
@@ -200,7 +223,7 @@
   <string name="lib_detail_app_last_updated_time">最近更新时间：</string>
   <string name="lib_detail_app_install_source_empty">未知</string>
   <string name="lib_detail_app_install_source_empty_detail">Shell 或已被卸载的应用</string>
-  <string name="lib_detail_app_install_source_shizuku_usage">由于 Android 限制了获取安装请求方的接口, 我们使用 Shizuku 来获取安装请求方。</string>
+  <string name="lib_detail_app_install_source_shizuku_usage">系统仅向具备安装权限的应用提供安装请求方信息，需通过 Shizuku 获取</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizuku 未安装</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">点此安装 Shizuku</string>
   <string name="lib_detail_app_install_source_shizuku_low_version">需要 Shizuku API 版本 10</string>
@@ -209,6 +232,10 @@
   <string name="lib_detail_app_install_source_shizuku_not_running_detail">点此跳转到 Shizuku 以启动它</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku 未授权</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">点此进行 Shizuku 授权以获取安装请求方</string>
+  <string name="lib_detail_app_install_source_shizuku_unavailable">Shizuku 服务不可用</string>
+  <string name="lib_detail_app_install_source_shizuku_unavailable_detail">请启动任意兼容的 Shizuku 管理器，然后返回此页面</string>
+  <string name="lib_detail_app_install_source_shizuku_api_too_old">Shizuku API 版本过低</string>
+  <string name="lib_detail_app_install_source_shizuku_api_too_old_detail">请升级当前使用的 Shizuku 兼容管理器</string>
   <string name="lib_detail_app_dexopt_title">DEX 优化</string>
   <string name="lib_detail_app_dexopt_status">状态</string>
   <string name="lib_detail_app_dexopt_reason">原因</string>
@@ -225,6 +252,11 @@
   <string name="lib_detail_optimization_off">原生符号未剥离</string>
   <string name="apk_preview">APK 预览</string>
   <string name="apk_preview_item_not_available">无法在预览模式下显示</string>
+  <string name="adaptive_icon_layer_background">背景</string>
+  <string name="adaptive_icon_layer_foreground">前景</string>
+  <string name="adaptive_icon_copy_full">复制完整图标</string>
+  <string name="adaptive_icon_copy_background">复制背景图层</string>
+  <string name="adaptive_icon_copy_foreground">复制前景图层</string>
   <string name="feature_live_update_notification">实时更新通知</string>
   <string name="feature_live_update_notification_summary">系统会提升实时更新通知的优先级。升级的通知在系统界面上会更醒目地显示，包括在通知抽屉顶部、锁屏上以及状态栏中以微件形式显示。</string>
   <!--  Toast  -->
@@ -250,6 +282,12 @@
   <string name="snapshot_indicator_removed">移除</string>
   <string name="snapshot_indicator_changed">变更</string>
   <string name="snapshot_indicator_moved">移动</string>
+  <string name="snapshot_detail_size_label">体积</string>
+  <string name="snapshot_detail_changes_label">变更项：</string>
+  <string name="snapshot_detail_metric_description">%1$s，%2$s</string>
+  <plurals name="snapshot_detail_changes_count">
+    <item quantity="other">%d 项变更</item>
+  </plurals>
   <string name="snapshot_empty_list_title">没有组件变更</string>
   <string name="snapshot_no_snapshot">没有快照</string>
   <string name="snapshot_detail_new_install_title">这是一个全新的应用</string>
@@ -335,6 +373,7 @@
   <string name="snapshot_menu_show_update_time">显示更新时间</string>
   <string name="snapshot_menu_hide_no_component_changes">隐藏无组件变更</string>
   <string name="snapshot_menu_diff_highlight">差异高亮</string>
+  <string name="snapshot_menu_diff_emphasis">差异强调</string>
   <string name="snapshot_menu_use_iec_units">使用 IEC 单位</string>
   <!-- A11y -->
   <string name="a11y_state_expanded">展开</string>

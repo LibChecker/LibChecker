@@ -1,52 +1,71 @@
 package com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node
 
-import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailRuleChipDisplayData
-import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailItemCardRenderState
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailItemViewRenderState
+import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailMovedPathRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailRuleChipIconStyle
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailRuleChipRenderState
+import com.absinthe.libchecker.domain.snapshot.model.MOVED
+import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
 
 data class SnapshotDetailItemRenderState(
   val title: CharSequence,
   val extra: CharSequence,
   @DrawableRes val iconRes: Int,
-  @ColorInt val backgroundColor: Int,
+  @ColorRes val statusColorRes: Int,
+  @StringRes val statusLabelRes: Int,
   val contentDescription: String,
   val ruleChip: SnapshotDetailRuleChipRenderState?,
-  val chipClickAction: SnapshotDetailNodeChipClickAction?
+  val chipClickAction: SnapshotDetailNodeChipClickAction?,
+  val movedPath: SnapshotDetailMovedPathRenderState? = null
 )
 
 val BaseSnapshotNode.itemRenderState: SnapshotDetailItemRenderState
-  get() = SnapshotDetailItemRenderState(
-    title = displayData.title,
-    extra = displayData.extra,
-    iconRes = displayData.status.iconRes,
-    backgroundColor = displayData.backgroundColor,
-    contentDescription = displayData.description,
-    ruleChip = displayData.ruleChip?.toRenderState(displayData.backgroundColor),
-    chipClickAction = chipClickAction
-  )
+  get() {
+    val movedPath = item.toMovedPathRenderState()
+    return SnapshotDetailItemRenderState(
+      title = if (movedPath == null) displayData.title else item.name,
+      extra = displayData.extra,
+      iconRes = displayData.status.iconRes,
+      statusColorRes = displayData.status.colorRes,
+      statusLabelRes = displayData.status.labelRes,
+      contentDescription = displayData.description,
+      ruleChip = displayData.ruleChip?.toRenderState(),
+      chipClickAction = chipClickAction,
+      movedPath = movedPath
+    )
+  }
 
-val SnapshotDetailItemRenderState.cardRenderState: SnapshotDetailItemCardRenderState
-  get() = SnapshotDetailItemCardRenderState(
+val SnapshotDetailItemRenderState.viewRenderState: SnapshotDetailItemViewRenderState
+  get() = SnapshotDetailItemViewRenderState(
     title = title,
     extra = extra,
     iconRes = iconRes,
-    backgroundColor = backgroundColor,
+    statusColorRes = statusColorRes,
+    statusLabelRes = statusLabelRes,
     contentDescription = contentDescription,
-    ruleChip = ruleChip
+    ruleChip = ruleChip,
+    movedPath = movedPath
   )
 
-private fun SnapshotDetailRuleChipDisplayData.toRenderState(
-  @ColorInt backgroundColor: Int
-): SnapshotDetailRuleChipRenderState {
+private fun SnapshotDetailItem.toMovedPathRenderState(): SnapshotDetailMovedPathRenderState? {
+  if (diffType != MOVED) return null
+  val previousPackagePath = previousName
+    ?.substringBeforeLast('.', missingDelimiterValue = "")
+    ?.takeIf(String::isNotBlank)
+    ?: return null
+  return SnapshotDetailMovedPathRenderState(previousPackagePath)
+}
+
+private fun SnapshotDetailRuleChipDisplayData.toRenderState(): SnapshotDetailRuleChipRenderState {
   return SnapshotDetailRuleChipRenderState(
     label = label,
     iconRes = iconRes,
-    backgroundColor = backgroundColor,
     iconStyle = when {
-      isSimpleColorIcon -> SnapshotDetailRuleChipIconStyle.BlackTint
+      isSimpleColorIcon -> SnapshotDetailRuleChipIconStyle.ThemeTint
       useColorfulIcon -> SnapshotDetailRuleChipIconStyle.Original
       else -> SnapshotDetailRuleChipIconStyle.Desaturated
     }

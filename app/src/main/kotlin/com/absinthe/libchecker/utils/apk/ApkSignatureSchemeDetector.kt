@@ -50,9 +50,9 @@ object ApkSignatureSchemeDetector {
         return false
       }
 
-      val fileNameLength = directory.readUnsignedShortLe(offset + ZIP_CENTRAL_DIRECTORY_FILE_NAME_LENGTH_OFFSET)
-      val extraLength = directory.readUnsignedShortLe(offset + ZIP_CENTRAL_DIRECTORY_EXTRA_LENGTH_OFFSET)
-      val commentLength = directory.readUnsignedShortLe(offset + ZIP_CENTRAL_DIRECTORY_COMMENT_LENGTH_OFFSET)
+      val fileNameLength = directory.readUInt16Le(offset + ZIP_CENTRAL_DIRECTORY_FILE_NAME_LENGTH_OFFSET)
+      val extraLength = directory.readUInt16Le(offset + ZIP_CENTRAL_DIRECTORY_EXTRA_LENGTH_OFFSET)
+      val commentLength = directory.readUInt16Le(offset + ZIP_CENTRAL_DIRECTORY_COMMENT_LENGTH_OFFSET)
       val entrySize = ZIP_CENTRAL_DIRECTORY_HEADER_SIZE + fileNameLength + extraLength + commentLength
       if (offset + entrySize > directory.size) {
         return false
@@ -77,9 +77,9 @@ object ApkSignatureSchemeDetector {
         return false
       }
 
-      val fileNameLength = header.readUnsignedShortLe(ZIP_CENTRAL_DIRECTORY_FILE_NAME_LENGTH_OFFSET)
-      val extraLength = header.readUnsignedShortLe(ZIP_CENTRAL_DIRECTORY_EXTRA_LENGTH_OFFSET)
-      val commentLength = header.readUnsignedShortLe(ZIP_CENTRAL_DIRECTORY_COMMENT_LENGTH_OFFSET)
+      val fileNameLength = header.readUInt16Le(ZIP_CENTRAL_DIRECTORY_FILE_NAME_LENGTH_OFFSET)
+      val extraLength = header.readUInt16Le(ZIP_CENTRAL_DIRECTORY_EXTRA_LENGTH_OFFSET)
+      val commentLength = header.readUInt16Le(ZIP_CENTRAL_DIRECTORY_COMMENT_LENGTH_OFFSET)
       val entrySize = ZIP_CENTRAL_DIRECTORY_HEADER_SIZE + fileNameLength + extraLength + commentLength
       if (entrySize > remaining) {
         return false
@@ -154,11 +154,11 @@ object ApkSignatureSchemeDetector {
     for (offset in readSize - ZIP_EOCD_MIN_SIZE downTo 0) {
       if (
         buffer.readIntLe(offset) == ZIP_EOCD_SIGNATURE &&
-        buffer.readUnsignedShortLe(offset + ZIP_EOCD_COMMENT_LENGTH_OFFSET) == readSize - offset - ZIP_EOCD_MIN_SIZE
+        buffer.readUInt16Le(offset + ZIP_EOCD_COMMENT_LENGTH_OFFSET) == readSize - offset - ZIP_EOCD_MIN_SIZE
       ) {
         return ZipCentralDirectory(
-          offset = buffer.readUnsignedIntLe(offset + ZIP_EOCD_CENTRAL_DIR_OFFSET),
-          size = buffer.readUnsignedIntLe(offset + ZIP_EOCD_CENTRAL_DIR_SIZE_OFFSET)
+          offset = buffer.readUInt32Le(offset + ZIP_EOCD_CENTRAL_DIR_OFFSET),
+          size = buffer.readUInt32Le(offset + ZIP_EOCD_CENTRAL_DIR_SIZE_OFFSET)
         )
       }
     }
@@ -221,14 +221,6 @@ object ApkSignatureSchemeDetector {
       ((this[offset + 1].toInt() and 0xff) shl 8) or
       ((this[offset + 2].toInt() and 0xff) shl 16) or
       ((this[offset + 3].toInt() and 0xff) shl 24)
-  }
-
-  private fun ByteArray.readUnsignedIntLe(offset: Int): Long {
-    return readIntLe(offset).toLong() and 0xffffffffL
-  }
-
-  private fun ByteArray.readUnsignedShortLe(offset: Int): Int {
-    return (this[offset].toInt() and 0xff) or ((this[offset + 1].toInt() and 0xff) shl 8)
   }
 
   private data class ApkSignatureProbe(

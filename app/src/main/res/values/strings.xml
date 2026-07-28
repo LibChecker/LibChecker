@@ -13,6 +13,19 @@
   <!--  App list  -->
   <string name="menu_search">Search</string>
   <string name="menu_sort">Sort</string>
+  <string name="chart_statistics_add">Add statistics</string>
+  <string name="chart_statistics_edit">Edit statistics</string>
+  <string name="chart_statistics_added">Added</string>
+  <string name="chart_statistics_available">Available</string>
+  <string name="chart_statistics_loading_online">Loading online statistics…</string>
+  <string name="chart_statistics_online_error">Couldn’t load online statistics. Showing downloaded items.</string>
+  <string name="chart_statistics_no_available">No more statistics are available.</string>
+  <string name="chart_statistics_source_builtin">Built-in</string>
+  <string name="chart_statistics_source_online">Online</string>
+  <string name="chart_statistics_drag">Drag to reorder</string>
+  <string name="chart_statistics_drag_hint">Press and drag to reorder</string>
+  <string name="chart_statistics_remove_description">Remove %1$s</string>
+  <string name="chart_statistics_add_description">Add %1$s</string>
   <string name="menu_filter">Filter</string>
   <string name="search_hint">Search…</string>
   <string name="string_64_bit">64-bit</string>
@@ -25,6 +38,8 @@
   <string name="get_app_list_denied_tip">Please grant\n"Get info about installed apps"\npermission to LibChecker</string>
   <string name="advanced_menu">Advanced menu</string>
   <string name="archived_app">Archived app</string>
+  <string name="snapshot_version_archived">Archived</string>
+  <string name="toast_archived_app_detail_unavailable">Restore this archived app before viewing its details.</string>
 
   <!-- Statistics   -->
   <string name="title_statistics_dialog">Apps with %s ABI</string>
@@ -144,6 +159,14 @@
   <string name="kotlin_details">Kotlin is an open source statically typed programming language that targets the JVM, Android, JavaScript, Wasm, and Native. It\'s developed by JetBrains. Kotlin is a modern but already mature programming language designed to make developers happier. It\'s concise, safe, interoperable with Java and other languages, and provides many ways to reuse code between multiple platforms for productive programming.</string>
   <string name="items_count">Items count: </string>
   <string name="further_operation">Further operation</string>
+  <string name="app_detail_online_rules_action">Analyze online rules</string>
+  <string name="app_detail_online_rules_title">Online rule checks</string>
+  <string name="app_detail_online_rules_loading">Analyzing online rules… %1$d%%</string>
+  <string name="app_detail_online_rules_empty">No online statistics have been added to Charts</string>
+  <string name="app_detail_online_rules_error">Couldn’t analyze online rules</string>
+  <string name="app_detail_online_rules_matched">Matched</string>
+  <string name="app_detail_online_rules_unmatched">Not matched</string>
+  <string name="app_detail_online_rules_detected_features">Detected features:</string>
   <string name="app_info_launch">Launch</string>
   <string name="app_info_settings">Settings</string>
   <string name="app_info_share">Share</string>
@@ -212,7 +235,7 @@
   <string name="lib_detail_app_last_updated_time">Last installation time: </string>
   <string name="lib_detail_app_install_source_empty">Unknown</string>
   <string name="lib_detail_app_install_source_empty_detail">Shell or uninstalled app</string>
-  <string name="lib_detail_app_install_source_shizuku_usage">Because Android restricts the API to get the installation requester, we use Shizuku to get the installation requester</string>
+  <string name="lib_detail_app_install_source_shizuku_usage">Android only provides the installation requester to apps with install privileges, so Shizuku is required</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizuku not installed</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">Click here to install Shizuku</string>
   <string name="lib_detail_app_install_source_shizuku_low_version">Requires Shizuku API 10</string>
@@ -221,6 +244,10 @@
   <string name="lib_detail_app_install_source_shizuku_not_running_detail">Click here to jump to Shizuku to start it</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku not authorized</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">Click here for Shizuku authorization for installation requester</string>
+  <string name="lib_detail_app_install_source_shizuku_unavailable">Shizuku service unavailable</string>
+  <string name="lib_detail_app_install_source_shizuku_unavailable_detail">Start a compatible Shizuku manager, then return to this page</string>
+  <string name="lib_detail_app_install_source_shizuku_api_too_old">Shizuku API version is too old</string>
+  <string name="lib_detail_app_install_source_shizuku_api_too_old_detail">Update the active Shizuku-compatible manager</string>
   <string name="lib_detail_app_dexopt_title">DEX optimization</string>
   <string name="lib_detail_app_dexopt_status">Status</string>
   <string name="lib_detail_app_dexopt_reason">Reason</string>
@@ -237,6 +264,11 @@
   <string name="lib_detail_optimization_off">Native symbols are not stripped, preventing app size savings.</string>
   <string name="apk_preview">APK Preview</string>
   <string name="apk_preview_item_not_available">Cannot be displayed in preview mode</string>
+  <string name="adaptive_icon_layer_background">Background</string>
+  <string name="adaptive_icon_layer_foreground">Foreground</string>
+  <string name="adaptive_icon_copy_full">Copy full icon</string>
+  <string name="adaptive_icon_copy_background">Copy background layer</string>
+  <string name="adaptive_icon_copy_foreground">Copy foreground layer</string>
   <string name="feature_live_update_notification">Live Update notification</string>
   <string name="feature_live_update_notification_summary">The system promotes Live Update notifications. Promoted notifications appear more prominently on system surfaces, including at the top of the notification drawer and the lock screen, and as a chip in the status bar.</string>
   <!--  Toast  -->
@@ -262,7 +294,15 @@
   <string name="snapshot_indicator_added">Added</string>
   <string name="snapshot_indicator_removed">Removed</string>
   <string name="snapshot_indicator_changed">Changed</string>
+  <string name="snapshot_content_changed">Content changed</string>
   <string name="snapshot_indicator_moved">Moved</string>
+  <string name="snapshot_detail_size_label">Size</string>
+  <string name="snapshot_detail_changes_label">Changes:</string>
+  <string name="snapshot_detail_metric_description">%1$s, %2$s</string>
+  <plurals name="snapshot_detail_changes_count">
+    <item quantity="one">%d change</item>
+    <item quantity="other">%d changes</item>
+  </plurals>
   <string name="snapshot_empty_list_title">No component changes</string>
   <string name="snapshot_no_snapshot">No Snapshot</string>
   <string name="snapshot_detail_new_install_title">This app has newly installed</string>
@@ -353,7 +393,8 @@
   <!--  Snapshot menu  -->
   <string name="snapshot_menu_show_update_time">Show update time</string>
   <string name="snapshot_menu_hide_no_component_changes">Hide no component changes</string>
-  <string name="snapshot_menu_diff_highlight">Differences highlight</string>
+  <string name="snapshot_menu_diff_highlight">Highlight differences</string>
+  <string name="snapshot_menu_diff_emphasis">Emphasize differences</string>
   <string name="snapshot_menu_use_iec_units">Use IEC units</string>
 
   <!-- A11y -->

@@ -2,18 +2,20 @@ package com.absinthe.libchecker.domain.snapshot.list.ui.view
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ImageSpan
 import android.view.ViewGroup
+import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.text.buildSpannedString
 import androidx.core.text.inSpans
-import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.core.view.marginStart
+import coil.dispose
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotAbiDisplayData
@@ -36,16 +38,19 @@ import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.utils.extensions.setAlphaForAll
+import com.absinthe.libchecker.utils.extensions.setOrHighlightText
 import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
-import com.absinthe.libchecker.utils.extensions.tintHighlightText
 import com.absinthe.libchecker.utils.extensions.visibleHeight
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.span.CenterAlignImageSpan
 import com.google.android.material.card.MaterialCardView
 
-class SnapshotItemView(context: Context) : MaterialCardView(context) {
+class SnapshotItemView(
+  context: Context,
+  @DrawableRes placeholderIconRes: Int = R.drawable.ic_icon_blueprint
+) : MaterialCardView(context) {
 
-  private val container = SnapshotItemContainerView(context).apply {
+  private val container = SnapshotItemContainerView(context, placeholderIconRes).apply {
     val padding = context.getDimensionPixelSize(R.dimen.main_card_padding)
     setPadding(padding, padding, padding, padding)
   }
@@ -86,6 +91,14 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
     contentDescription = data.contentDescription
   }
 
+  fun setPlaceholderIconResource(@DrawableRes placeholderIconRes: Int) {
+    container.setPlaceholderIconResource(placeholderIconRes)
+  }
+
+  fun setPlaceholderIconDrawable(placeholderIconDrawable: Drawable?) {
+    container.setPlaceholderIconDrawable(placeholderIconDrawable)
+  }
+
   private fun setCardPresentation(cardPresentation: SnapshotItemCardPresentation) {
     when (cardPresentation) {
       SnapshotItemCardPresentation.Normal -> {
@@ -100,7 +113,14 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
     }
   }
 
-  class SnapshotItemContainerView(context: Context) : AViewGroup(context) {
+  class SnapshotItemContainerView(
+    context: Context,
+    @DrawableRes placeholderIconRes: Int
+  ) : AViewGroup(context) {
+
+    @DrawableRes private var placeholderIconRes = placeholderIconRes
+    private var placeholderIconDrawable: Drawable? = null
+    private var iconSource: SnapshotPackageIconSource? = null
 
     val icon = AppCompatImageView(context).apply {
       val iconSize = context.getDimensionPixelSize(R.dimen.app_icon_size)
@@ -200,11 +220,40 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
     }
 
     fun setIconSource(iconSource: SnapshotPackageIconSource?) {
+      this.iconSource = iconSource
       when (iconSource) {
         is SnapshotPackageIconSource.InstalledPackage -> icon.load(iconSource.packageInfo)
 
         SnapshotPackageIconSource.Fallback,
-        null -> icon.load(R.drawable.ic_icon_blueprint)
+        null -> loadPlaceholderIcon()
+      }
+    }
+
+    fun setPlaceholderIconResource(@DrawableRes placeholderIconRes: Int) {
+      if (this.placeholderIconRes == placeholderIconRes && placeholderIconDrawable == null) {
+        return
+      }
+      this.placeholderIconRes = placeholderIconRes
+      placeholderIconDrawable = null
+      if (iconSource !is SnapshotPackageIconSource.InstalledPackage) {
+        loadPlaceholderIcon()
+      }
+    }
+
+    fun setPlaceholderIconDrawable(placeholderIconDrawable: Drawable?) {
+      this.placeholderIconDrawable = placeholderIconDrawable
+      if (iconSource !is SnapshotPackageIconSource.InstalledPackage) {
+        loadPlaceholderIcon()
+      }
+    }
+
+    private fun loadPlaceholderIcon() {
+      val drawable = placeholderIconDrawable
+      if (drawable == null) {
+        icon.load(placeholderIconRes)
+      } else {
+        icon.dispose()
+        icon.setImageDrawable(drawable)
       }
     }
 
@@ -349,9 +398,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
       super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-      children.forEach {
-        it.autoMeasure()
-      }
+      autoMeasureChildren()
       val textWidth =
         measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - 5.dp - appName.marginStart
       if (appName.measuredWidth > textWidth) {
@@ -423,14 +470,6 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
 }
 
 private const val ABI_CHANGE_ARROW = "→"
-
-private fun AppCompatTextView.setOrHighlightText(text: CharSequence, highlightText: String) {
-  if (highlightText.isNotBlank()) {
-    tintHighlightText(highlightText, text)
-  } else {
-    this.text = text
-  }
-}
 
 private fun SnapshotItemView.SnapshotItemContainerView.buildAbiSpanString(
   item: SnapshotAbiDisplayItem,

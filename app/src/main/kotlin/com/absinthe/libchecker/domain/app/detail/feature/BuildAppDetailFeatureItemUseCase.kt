@@ -25,24 +25,6 @@ class BuildAppDetailFeatureItemUseCase {
         action = AppDetailFeatureAction.Kotlin(feature.extras)
       )
 
-      Features.RX_JAVA -> AppDetailFeatureItemData(
-        icon = resourceIcon(R.drawable.ic_reactivex),
-        titleRes = R.string.rxjava,
-        action = AppDetailFeatureAction.RxJava(feature.version)
-      )
-
-      Features.RX_KOTLIN -> AppDetailFeatureItemData(
-        icon = resourceIcon(R.drawable.ic_reactivex, RX_KOTLIN_COLOR),
-        titleRes = R.string.rxkotlin,
-        action = AppDetailFeatureAction.RxKotlin(feature.version)
-      )
-
-      Features.RX_ANDROID -> AppDetailFeatureItemData(
-        icon = resourceIcon(R.drawable.ic_reactivex, RX_ANDROID_COLOR),
-        titleRes = R.string.rxandroid,
-        action = AppDetailFeatureAction.RxAndroid(feature.version)
-      )
-
       Features.AGP -> AppDetailFeatureItemData(
         icon = resourceIcon(R.drawable.ic_gradle),
         titleRes = R.string.agp,
@@ -147,8 +129,6 @@ class BuildAppDetailFeatureItemUseCase {
     const val PRIORITY_APP_INSTALL_SOURCE = 1
     const val PRIORITY_16_KB_PAGE_SIZE = 2
     const val PRIORITY_16_KB_PAGE_SIZE_COMPAT = 3
-    val RX_KOTLIN_COLOR = 0xFF7F52FF.toInt()
-    val RX_ANDROID_COLOR = 0xFF3DDC84.toInt()
   }
 }
 
@@ -182,9 +162,6 @@ sealed interface AppDetailFeatureAction {
 
   data object SplitApks : AppDetailFeatureAction
   data class Kotlin(val extras: Map<String, String?>?) : Dialog
-  data class RxJava(val version: String?) : Dialog
-  data class RxKotlin(val version: String?) : Dialog
-  data class RxAndroid(val version: String?) : Dialog
   data class Agp(val version: String?) : Dialog
   data object XposedModule : AppDetailFeatureAction
   data object PlaySigning : Dialog

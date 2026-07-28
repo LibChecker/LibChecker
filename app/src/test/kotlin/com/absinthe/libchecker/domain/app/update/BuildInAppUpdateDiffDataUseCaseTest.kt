@@ -23,8 +23,34 @@ class BuildInAppUpdateDiffDataUseCaseTest {
     )
 
     val (displayedApp, hasUpdate) = resolveInAppUpdateDisplay(
-      remoteApp = stableApp,
+      displayedRemoteApp = stableApp,
+      installableRemoteApp = stableApp,
       localVersionCode = 2771L
+    )
+
+    assertEquals(stableApp, displayedApp)
+    assertFalse(hasUpdate)
+  }
+
+  @Test
+  fun displaysOnlineStableVersionWithoutOfferingFossApkToMarketBuild() {
+    val stableApp = GetAppUpdateInfo.App(
+      version = "2.5.4",
+      versionCode = 2671,
+      extra = GetAppUpdateInfo.App.Extra(
+        target = 37,
+        min = 24,
+        compile = 37,
+        packageSize = 4_779_938
+      ),
+      link = "https://example.com/foss-stable.apk",
+      note = null
+    )
+
+    val (displayedApp, hasUpdate) = resolveInAppUpdateDisplay(
+      displayedRemoteApp = stableApp,
+      installableRemoteApp = null,
+      localVersionCode = 2600L
     )
 
     assertEquals(stableApp, displayedApp)

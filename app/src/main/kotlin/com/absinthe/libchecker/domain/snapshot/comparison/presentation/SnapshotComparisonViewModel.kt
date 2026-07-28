@@ -5,15 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
-import com.absinthe.libchecker.domain.snapshot.comparison.archive.ArchiveSnapshotItem
-import com.absinthe.libchecker.domain.snapshot.comparison.archive.PrepareSnapshotComparisonArchivesUseCase
 import com.absinthe.libchecker.domain.snapshot.comparison.model.ComparisonDashboardLabels
 import com.absinthe.libchecker.domain.snapshot.comparison.model.ComparisonDashboardState
 import com.absinthe.libchecker.domain.snapshot.comparison.model.SnapshotComparisonInputs
 import com.absinthe.libchecker.domain.snapshot.comparison.model.SnapshotComparisonPlan
 import com.absinthe.libchecker.domain.snapshot.comparison.model.SnapshotComparisonSide
-import com.absinthe.libchecker.domain.snapshot.comparison.usecase.BuildSnapshotComparisonPlanUseCase
-import com.absinthe.libchecker.domain.snapshot.comparison.usecase.BuildSnapshotPairDiffUseCase
 import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotDiffsUseCase
 import com.absinthe.libchecker.domain.snapshot.display.FormatSnapshotTimestampUseCase
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotDashboardCounter
@@ -33,10 +29,8 @@ class SnapshotComparisonViewModel(
   private val compareSnapshotDiffs: CompareSnapshotDiffsUseCase,
   private val snapshotDashboardCounter: SnapshotDashboardCounter,
   private val snapshotLibrary: SnapshotLibrary,
-  private val buildSnapshotPairDiffUseCase: BuildSnapshotPairDiffUseCase,
-  private val buildSnapshotComparisonPlanUseCase: BuildSnapshotComparisonPlanUseCase,
   private val formatSnapshotTimestampUseCase: FormatSnapshotTimestampUseCase,
-  private val prepareSnapshotComparisonArchivesUseCase: PrepareSnapshotComparisonArchivesUseCase
+  private val comparisonWorkflow: SnapshotComparisonWorkflow
 ) : ViewModel() {
 
   private val _snapshotDiffItemsFlow: MutableSharedFlow<List<SnapshotDiffItem>> = MutableSharedFlow()
@@ -87,20 +81,6 @@ class SnapshotComparisonViewModel(
     emitSnapshotDiffItems(diffItems)
   }
 
-  private suspend fun prepareSnapshotComparisonArchives(
-    inputs: SnapshotComparisonInputs,
-    cacheDir: File,
-    iconSize: Int
-  ): PrepareSnapshotComparisonArchivesUseCase.Result {
-    return prepareSnapshotComparisonArchivesUseCase(
-      PrepareSnapshotComparisonArchivesUseCase.Request(
-        inputs = inputs,
-        cacheDir = cacheDir,
-        iconSize = iconSize
-      )
-    )
-  }
-
   fun canCompare(): Boolean {
     return inputs.canCompare
   }
@@ -115,7 +95,7 @@ class SnapshotComparisonViewModel(
   ): CompareAction {
     val currentInputs = inputs
     val archiveResult = if (currentInputs.hasArchiveInput) {
-      prepareSnapshotComparisonArchives(
+      comparisonWorkflow.prepareArchives(
         inputs = currentInputs,
         cacheDir = cacheDir,
         iconSize = iconSize
@@ -124,8 +104,8 @@ class SnapshotComparisonViewModel(
       null
     }
 
-    val plan = buildSnapshotComparisonPlan(
-      inputs = currentInputs,
+    val plan = comparisonWorkflow.buildPlan(
+      currentInputs,
       leftArchive = archiveResult?.leftArchive,
       rightArchive = archiveResult?.rightArchive
     )
@@ -142,30 +122,17 @@ class SnapshotComparisonViewModel(
     if (!inputs.hasArchiveInput || cacheDir == null) {
       return
     }
-    prepareSnapshotComparisonArchivesUseCase.clearCache(cacheDir)
+    comparisonWorkflow.clearArchiveCache(cacheDir)
   }
 
   fun buildSnapshotPairDiff(left: SnapshotItem, right: SnapshotItem): SnapshotDiffItem {
-    return buildSnapshotPairDiffUseCase(left, right)
+    return comparisonWorkflow.buildPairDiff(left, right)
   }
 
   internal fun buildDashboardState(
     labels: ComparisonDashboardLabels
   ): ComparisonDashboardState {
     return ComparisonDashboardStatePlanner.planState(inputs, labels, ::getFormatDateString)
-  }
-
-  private suspend fun buildSnapshotComparisonPlan(
-    inputs: SnapshotComparisonInputs,
-    leftArchive: ArchiveSnapshotItem?,
-    rightArchive: ArchiveSnapshotItem?
-  ): SnapshotComparisonPlan? {
-    return buildSnapshotComparisonPlanUseCase(
-      leftTimeStamp = inputs.left.timestamp,
-      leftArchive = leftArchive,
-      rightTimeStamp = inputs.right.timestamp,
-      rightArchive = rightArchive
-    )
   }
 
   internal fun selectSnapshot(side: SnapshotComparisonSide, timestamp: Long) {

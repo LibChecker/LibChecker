@@ -28,18 +28,16 @@ class GetUpdatesDialogFragment : BaseBottomSheetViewDialogFragment<GetUpdatesDia
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    root.bind(viewModel.buildGetUpdatesDialogState(), ::handleAction)
-  }
+    root.bind(viewModel.buildGetUpdatesDialogState()) { action ->
+      when (action) {
+        is GetUpdatesAction.OpenUri -> launchUri(action.uri)
 
-  private fun handleAction(action: GetUpdatesAction) {
-    when (action) {
-      is GetUpdatesAction.OpenUri -> launchUri(action.uri)
-
-      GetUpdatesAction.OpenInAppUpdate -> {
-        InAppUpdateDialogFragment().show(
-          childFragmentManager,
-          InAppUpdateDialogFragment::class.java.simpleName
-        )
+        GetUpdatesAction.OpenInAppUpdate -> {
+          InAppUpdateDialogFragment().show(
+            childFragmentManager,
+            InAppUpdateDialogFragment::class.java.simpleName
+          )
+        }
       }
     }
   }

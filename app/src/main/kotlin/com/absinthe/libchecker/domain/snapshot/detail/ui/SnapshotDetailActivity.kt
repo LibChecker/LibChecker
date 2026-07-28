@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
+import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
@@ -23,8 +24,9 @@ import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.compat.IntentCompat
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.options.SnapshotOptions
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
-import com.absinthe.libchecker.domain.app.detail.ui.AppBarStateChangeListener
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailDiffTextStyle
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotTitleDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailReportHeader
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.SnapshotDetailAdapter
@@ -41,17 +43,19 @@ import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotEmptyView
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotTitleDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
-import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
+import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.launchLibReferencePage
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.R as MaterialR
+import kotlin.math.abs
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -96,8 +100,9 @@ class SnapshotDetailActivity :
 
     if (_entity != null) {
       entity = _entity!!
-      initView()
-      viewModel.computeDiffDetail(entity)
+      val diffTextStyle = buildDiffTextStyle()
+      initView(diffTextStyle)
+      viewModel.computeDiffDetail(entity, diffTextStyle)
     } else {
       finish()
     }
@@ -116,7 +121,7 @@ class SnapshotDetailActivity :
     return true
   }
 
-  private fun initView() {
+  private fun initView(diffTextStyle: SnapshotDetailDiffTextStyle) {
     addMenuProvider(this, this, Lifecycle.State.CREATED)
     setSupportActionBar(binding.toolbar)
     supportActionBar?.apply {
@@ -128,19 +133,22 @@ class SnapshotDetailActivity :
     binding.apply {
       collapsingToolbar.also {
         it.setOnApplyWindowInsetsListener(null)
-        it.title = entity.labelDiff.new ?: entity.labelDiff.old
+        it.isTitleEnabled = false
       }
-      headerLayout.addOnOffsetChangedListener(object : AppBarStateChangeListener() {
-        override fun onStateChanged(appBarLayout: AppBarLayout, state: State) {
-          collapsingToolbar.isTitleEnabled = state == State.COLLAPSED
-          headerLayout.isLifted = state == State.COLLAPSED
+      headerLayout.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
+        val totalScrollRange = appBarLayout.totalScrollRange
+        val collapseFraction = if (totalScrollRange > 0) {
+          abs(verticalOffset).toFloat() / totalScrollRange
+        } else {
+          0f
         }
-      })
+        binding.collapsedToolbarTitle.updateCollapseFraction(collapseFraction)
+        headerLayout.isLifted = totalScrollRange > 0 && abs(verticalOffset) >= totalScrollRange
+      }
       list.apply {
         adapter = this@SnapshotDetailActivity.adapter
         applySystemBarsPadding(bottom = true)
         (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-        addItemDecoration(VerticalSpacesItemDecoration(4.dp))
       }
 
       snapshotTitle.apply {
@@ -155,10 +163,12 @@ class SnapshotDetailActivity :
       snapshotTitleDisplayData = buildSnapshotTitleDisplayData(
         BuildSnapshotTitleDisplayDataUseCase.Request(
           item = entity,
-          formatSplitPackageName = true
+          formatSplitPackageName = true,
+          diffTextStyle = diffTextStyle
         )
       )
       snapshotTitle.render(snapshotTitleDisplayData.toRenderState())
+      binding.collapsedToolbarTitle.bindTitle(snapshotTitleDisplayData.appName)
     }
 
     adapter.stateView =
@@ -214,8 +224,11 @@ class SnapshotDetailActivity :
       }
     }
 
-    viewModel.snapshotDetailSectionsFlow.onEach { sections ->
-      val titleList = sections.map { section ->
+    viewModel.snapshotDetailContentFlow.onEach { content ->
+      binding.snapshotTitle.render(
+        snapshotTitleDisplayData.toRenderState(summary = content.summary)
+      )
+      val titleList = content.sections.map { section ->
         recordDetailComponentCount(section.type, section.items.size)
         section.toSnapshotTitleNode()
       }
@@ -223,6 +236,19 @@ class SnapshotDetailActivity :
       adapter.isStateViewEnable = titleList.isEmpty()
       adapter.setList(titleList)
     }.launchIn(lifecycleScope)
+  }
+
+  private fun buildDiffTextStyle(): SnapshotDetailDiffTextStyle {
+    return SnapshotDetailDiffTextStyle(
+      highlightColor = if ((viewModel.getSnapshotOptions() and SnapshotOptions.DIFF_HIGHLIGHT) > 0) {
+        getColorByAttr(androidx.appcompat.R.attr.colorPrimary)
+      } else {
+        null
+      },
+      emphasizeDiffs = (viewModel.getSnapshotOptions() and SnapshotOptions.DIFF_EMPHASIS) > 0,
+      arrowColor = getColorByAttr(MaterialR.attr.colorOnSurface),
+      metricDeltaColor = getColorByAttr(MaterialR.attr.colorOnSurface)
+    )
   }
 
   private fun recordDetailComponentCount(@LibType type: Int, count: Int) {
@@ -241,6 +267,7 @@ class SnapshotDetailActivity :
       PROVIDER -> "Provider"
       PERMISSION -> "Permission"
       METADATA -> "Metadata"
+      DEX -> "Package"
       else -> "Unknown"
     }
   }
@@ -249,14 +276,25 @@ class SnapshotDetailActivity :
     val snapshotIcon = _icon?.takeIf { entity.packageName.contains("/") }
     if (snapshotIcon != null) {
       binding.snapshotTitle.setIconImage(snapshotIcon)
+      binding.collapsedToolbarTitle.setIcon(snapshotIcon)
       return
     }
 
     binding.snapshotTitle.setFallbackIcon()
+    binding.collapsedToolbarTitle.setFallbackIcon()
     lifecycleScope.launch {
       when (val iconSource = viewModel.getSnapshotPackageIconSources(listOf(entity.packageName))[entity.packageName]) {
-        null -> binding.snapshotTitle.setFallbackIcon()
-        else -> binding.snapshotTitle.setIconSource(iconSource)
+        null -> {
+          binding.snapshotTitle.setFallbackIcon()
+          binding.collapsedToolbarTitle.setFallbackIcon()
+        }
+
+        else -> {
+          binding.snapshotTitle.setIconSource(iconSource)
+          binding.collapsedToolbarTitle.setIcon(
+            (iconSource as? SnapshotPackageIconSource.InstalledPackage)?.packageInfo
+          )
+        }
       }
     }
   }

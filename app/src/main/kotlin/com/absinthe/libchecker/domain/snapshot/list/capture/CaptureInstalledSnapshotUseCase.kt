@@ -15,11 +15,13 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.selection.SnapshotSelection
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.dex.DexStatsCollector
 import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPackageSize
 import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getVersionCode
+import com.absinthe.libchecker.utils.extensions.isArchivedPackage
 import com.absinthe.libchecker.utils.toJson
 
 class CaptureInstalledSnapshotUseCase(
@@ -52,7 +54,7 @@ class CaptureInstalledSnapshotUseCase(
 
       val previousSnapshotItem = snapshotRepository.getSnapshot(currentSnapshotTimestamp, packageInfo.packageName)
       val snapshotItem = previousSnapshotItem
-        ?.takeIf { it.isReusableFor(packageInfo, shouldSaveFullSnapshot) }
+        ?.takeIf { it.isReusableForCapture(packageInfo, shouldSaveFullSnapshot) }
         ?.copy()
         ?.also {
           it.id = null
@@ -98,43 +100,44 @@ class CaptureInstalledSnapshotUseCase(
     )
   }
 
-  private fun SnapshotItem.isReusableFor(
-    packageInfo: PackageInfo,
-    shouldSaveFullSnapshot: Boolean
-  ): Boolean {
-    return versionCode == packageInfo.getVersionCode() &&
-      lastUpdatedTime == packageInfo.lastUpdateTime &&
-      packageSize == packageInfo.getPackageSize(true) &&
-      !shouldSaveFullSnapshot
-  }
-
   private fun buildInstalledSnapshotItem(
     packageInfo: PackageInfo,
     timestamp: Long
   ): SnapshotItem? {
     val applicationInfo = packageInfo.applicationInfo ?: return null
-    val activitiesPi = installedAppRepository.getPackageInfo(
-      packageInfo.packageName,
-      PackageManager.GET_ACTIVITIES
-    ) ?: return null
-    val othersPi = installedAppRepository.getPackageInfo(
-      packageInfo.packageName,
-      PackageManager.GET_SERVICES or PackageManager.GET_RECEIVERS or
-        PackageManager.GET_PROVIDERS or PackageManager.GET_PERMISSIONS or
-        PackageManager.GET_META_DATA
-    ) ?: return null
+    val isArchived = packageInfo.isArchivedPackage()
+    val activitiesPi = if (isArchived) {
+      packageInfo
+    } else {
+      installedAppRepository.getPackageInfo(
+        packageInfo.packageName,
+        PackageManager.GET_ACTIVITIES
+      ) ?: return null
+    }
+    val othersPi = if (isArchived) {
+      packageInfo
+    } else {
+      installedAppRepository.getPackageInfo(
+        packageInfo.packageName,
+        PackageManager.GET_SERVICES or PackageManager.GET_RECEIVERS or
+          PackageManager.GET_PROVIDERS or PackageManager.GET_PERMISSIONS or
+          PackageManager.GET_META_DATA
+      ) ?: return null
+    }
     val abi = PackageUtils.getAbi(packageInfo)
     if (abi == Constants.ERROR) {
       return null
     }
 
+    val dexStats = DexStatsCollector.collect(packageInfo)
     return SnapshotItem(
       id = null,
       packageName = packageInfo.packageName,
       timeStamp = timestamp,
       label = packageInfo.getAppName(packageManager).toString(),
-      versionName = packageInfo.versionName.toString(),
+      versionName = packageInfo.versionName.orEmpty(),
       versionCode = packageInfo.getVersionCode(),
+      isArchived = isArchived,
       installedTime = packageInfo.firstInstallTime,
       lastUpdatedTime = packageInfo.lastUpdateTime,
       isSystem = (applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) > 0,
@@ -153,7 +156,13 @@ class CaptureInstalledSnapshotUseCase(
       metadata = PackageUtils.getMetaDataItems(othersPi).toJson().orEmpty(),
       packageSize = packageInfo.getPackageSize(true),
       compileSdk = packageInfo.getCompileSdkVersion().toShort(),
-      minSdk = applicationInfo.minSdkVersion.toShort()
+      minSdk = applicationInfo.minSdkVersion.toShort(),
+      dexInfo = dexStats.entries.toJson().orEmpty(),
+      resourceInfo = dexStats.resourceEntries.toJson().orEmpty(),
+      resourcesSize = dexStats.resourcesSize,
+      statsVersion = SnapshotItem.CURRENT_STATS_VERSION,
+      dexStatsAvailable = dexStats.isDexComplete,
+      resourceStatsAvailable = dexStats.isResourceComplete
     )
   }
 
@@ -179,4 +188,23 @@ class CaptureInstalledSnapshotUseCase(
   private companion object {
     const val BATCH_SIZE = 50
   }
+}
+
+internal fun SnapshotItem.isReusableForCapture(
+  packageInfo: PackageInfo,
+  shouldSaveFullSnapshot: Boolean
+): Boolean {
+  return versionCode == packageInfo.getVersionCode() &&
+    isArchived == packageInfo.isArchivedPackage() &&
+    lastUpdatedTime == packageInfo.lastUpdateTime &&
+    packageSize == packageInfo.getPackageSize(true) &&
+    (
+      packageInfo.isArchivedPackage() ||
+        (
+          statsVersion == SnapshotItem.CURRENT_STATS_VERSION &&
+            dexStatsAvailable &&
+            resourceStatsAvailable
+          )
+      ) &&
+    !shouldSaveFullSnapshot
 }

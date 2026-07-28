@@ -30,7 +30,6 @@ public class ResourceParser {
 
   private static final Map<String, String> mNamespaces = new HashMap<>();
 
-  private boolean lineSpace = false; // 行间距
   private boolean markColor = false; // 着色
 
   private final XmlResourceParser mParser;
@@ -125,7 +124,6 @@ public class ResourceParser {
               builder.append("/>");
               node.isTagOpen = false;
               node.hasSubTag = false;
-              if (lineSpace) builder.append('\n');
             }
           }
           case XmlPullParser.TEXT -> {
@@ -155,7 +153,6 @@ public class ResourceParser {
                 spanTexts.add(new SpanText(builder.length() + 1, builder.length() + 3, COLOR_TAG));
                 builder.append(" />");
               }
-              if (lineSpace) builder.append('\n');
               node2.isTagOpen = false;
             }
             level--;
@@ -229,11 +226,6 @@ public class ResourceParser {
   /**
    * 设置是否显示行间距
    */
-  public ResourceParser setLineSpace(boolean lineSpace) {
-    this.lineSpace = lineSpace;
-    return this;
-  }
-
   /**
    * 设置是否标记颜色
    */

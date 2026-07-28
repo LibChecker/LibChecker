@@ -36,13 +36,11 @@ class XposedInfoDialogFragment : BaseBottomSheetViewDialogFragment<XposedInfoBot
         FeaturesDialog.show(context, xposedFeatureDialogSpec())
         return@launch
       }
-      root.bind(display, ::handleAction)
-    }
-  }
-
-  private fun handleAction(action: XposedInfoAction) {
-    when (action) {
-      is XposedInfoAction.OpenSettings -> openXposedSettings(action)
+      root.bind(display) { action ->
+        when (action) {
+          is XposedInfoAction.OpenSettings -> openXposedSettings(action)
+        }
+      }
     }
   }
 

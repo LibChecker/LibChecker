@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.constant.options.LibReferenceOptions
+import com.absinthe.libchecker.constant.options.withOption
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.list.model.AppListItemViewState
 import com.absinthe.libchecker.domain.app.list.usecase.BuildAppListItemViewStatesUseCase
@@ -43,7 +44,7 @@ class LibReferenceViewModel(
   private val _progress = MutableStateFlow(0)
   val progress = _progress.asStateFlow()
   private val libReferenceComputationController =
-    libReferenceComputationControllerFactory.create(viewModelScope, ::updateProgress)
+    libReferenceComputationControllerFactory.create(viewModelScope) { _progress.value = it }
   val libReference = libReferenceComputationController.libReference
   val thresholdChanges: Flow<Int> = libReferenceSettingsRepository.thresholdChanges
   val showSystemAppsChanges: Flow<Unit> = libReferenceSettingsRepository.showSystemAppsChanges
@@ -78,7 +79,7 @@ class LibReferenceViewModel(
       return null
     }
     hasRequestedInitialCompute = true
-    computeLibReference()
+    libReferenceComputationController.compute()
     return ReferenceWorkPlan(shouldShowLoading = needShowLoading)
   }
 
@@ -98,7 +99,7 @@ class LibReferenceViewModel(
   fun onReferencePageVisible(hasDisplayedReferences: Boolean): ReferenceWorkPlan? {
     if (!hasRequestedInitialCompute && !hasDisplayedReferences) {
       hasRequestedInitialCompute = true
-      computeLibReference()
+      libReferenceComputationController.compute()
       return ReferenceWorkPlan(shouldShowLoading = true)
     }
 
@@ -109,7 +110,7 @@ class LibReferenceViewModel(
     hasRequestedInitialCompute = true
 
     when (work) {
-      DeferredReferenceWork.COMPUTE -> computeLibReference()
+      DeferredReferenceWork.COMPUTE -> libReferenceComputationController.compute()
       DeferredReferenceWork.MATCH -> matchRules()
     }
     return ReferenceWorkPlan(shouldShowLoading = needShowLoading)
@@ -124,11 +125,7 @@ class LibReferenceViewModel(
   }
 
   fun setLibReferenceOption(option: Int, enabled: Boolean): Int {
-    val newOptions = if (enabled) {
-      libReferenceSettingsRepository.options or option
-    } else {
-      libReferenceSettingsRepository.options and option.inv()
-    }
+    val newOptions = libReferenceSettingsRepository.options.withOption(option, enabled)
     libReferenceSettingsRepository.options = newOptions
     return newOptions
   }
@@ -239,10 +236,6 @@ class LibReferenceViewModel(
     )
   }
 
-  private fun computeLibReference() {
-    libReferenceComputationController.compute()
-  }
-
   private fun matchRules() {
     libReferenceComputationController.cancelMatchingJob()
     libReferenceComputationController.match()
@@ -255,10 +248,6 @@ class LibReferenceViewModel(
       else -> work
     }
     deferredReferenceWorkNeedsLoading = deferredReferenceWorkNeedsLoading || needShowLoading
-  }
-
-  private fun updateProgress(progress: Int) {
-    _progress.value = progress
   }
 
   private suspend fun emitLibReferenceApps(

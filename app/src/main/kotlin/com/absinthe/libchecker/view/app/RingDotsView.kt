@@ -253,7 +253,7 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
   private fun ensureHighlightAnimator() {
     val provider = highlightIconProvider
     updateHighlightAvailability()
-    if (!shouldHighlightAnimate()) {
+    if (!isRunning || !highlightAnimationAvailable) {
       stopHighlightAnimator()
       return
     }
@@ -305,10 +305,6 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
     highlightIndex = -1
     clearCurrentHighlightBitmap()
     invalidateOnAnimationFrame()
-  }
-
-  private fun shouldHighlightAnimate(): Boolean {
-    return isRunning && highlightAnimationAvailable
   }
 
   private fun advanceHighlightBitmap(): Boolean {
@@ -825,11 +821,7 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
 
   private fun wrapIndex(index: Int, size: Int): Int {
     if (size <= 0) return 0
-    var result = index % size
-    if (result < 0) {
-      result += size
-    }
-    return result
+    return Math.floorMod(index, size)
   }
 
   private fun shortestAngleDistance(a: Float, b: Float): Float {
@@ -848,20 +840,6 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
     if (diffDegrees >= support) return 0f
     val normalized = (diffDegrees / support).coerceIn(0f, 1f)
     return ((cos(normalized * PI) + 1f) * 0.5f).toFloat()
-  }
-
-  fun setIconBitmap(bitmap: Bitmap?) {
-    stopIconProducer()
-    highlightIconProvider = null
-    stopHighlightAnimator()
-    clearHighlightBitmaps()
-    if (bitmap == null) {
-      invalidateOnAnimationFrame()
-      return
-    }
-
-    highlightBitmapChannel.trySend(HighlightBitmap(bitmap, recyclable = false))
-    notifyBitmapQueueAvailable()
   }
 
   fun setAppIconHighlightProvider(loadIcon: suspend () -> Drawable?) {

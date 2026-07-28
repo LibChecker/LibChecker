@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.domain.snapshot.list.presentation
 
+import com.absinthe.libchecker.constant.options.withOption
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
@@ -8,7 +9,8 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotDiffsUseCase
 import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotItemWithInstalledAppUseCase
-import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSection
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailContent
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailDiffTextStyle
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.SnapshotDetailSectionBuilder
 import com.absinthe.libchecker.domain.snapshot.display.FormatSnapshotTimestampUseCase
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotDashboardCount
@@ -23,7 +25,6 @@ import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotSystemP
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotTimeNodeListDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.DeleteSnapshotTimeStampUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.GetSnapshotPackageIconSourcesUseCase
-import com.absinthe.libchecker.domain.snapshot.list.usecase.UpdateSnapshotDiffItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.domain.snapshot.selection.SnapshotSelection
@@ -51,7 +52,6 @@ class SnapshotListWorkflow(
   private val snapshotSelection: SnapshotSelection,
   private val snapshotSettingsRepository: SnapshotSettingsRepository,
   private val updateSnapshotAutoRemoveThresholdUseCase: UpdateSnapshotAutoRemoveThresholdUseCase,
-  private val updateSnapshotDiffItemsUseCase: UpdateSnapshotDiffItemsUseCase,
   private val snapshotTrackChangeRepository: SnapshotTrackChangeRepository
 ) {
 
@@ -98,11 +98,7 @@ class SnapshotListWorkflow(
   }
 
   fun setSnapshotOption(option: Int, enabled: Boolean): Int {
-    val newOptions = if (enabled) {
-      snapshotSettingsRepository.options or option
-    } else {
-      snapshotSettingsRepository.options and option.inv()
-    }
+    val newOptions = snapshotSettingsRepository.options.withOption(option, enabled)
     snapshotSettingsRepository.options = newOptions
     return newOptions
   }
@@ -126,8 +122,11 @@ class SnapshotListWorkflow(
     return compareSnapshotItemWithInstalledApp(timeStamp, packageName)
   }
 
-  suspend fun buildSnapshotDetailSections(entity: SnapshotDiffItem): List<SnapshotDetailSection> {
-    return snapshotDetailSectionBuilder(entity)
+  suspend fun buildSnapshotDetailContent(
+    entity: SnapshotDiffItem,
+    diffTextStyle: SnapshotDetailDiffTextStyle
+  ): SnapshotDetailContent {
+    return snapshotDetailSectionBuilder(entity, diffTextStyle)
   }
 
   suspend fun getTimeStamps(): List<TimeStampItem> {
@@ -211,22 +210,18 @@ class SnapshotListWorkflow(
   fun applyDiffItemChange(
     item: SnapshotDiffItem
   ): List<SnapshotDiffItem> {
-    val result = updateSnapshotDiffItemsUseCase.applyChange(snapshotDiffItems, item)
-    trackPendingRemovals(result)
-    snapshotDiffItems = result.items
-    return result.items
+    snapshotDiffItems = snapshotDiffItems.filterNot { it.packageName == item.packageName } + item
+    if (item.deleted) {
+      pendingParticleRemovePackageNames += item.packageName
+    }
+    return snapshotDiffItems
   }
 
   fun applyDiffItemRemove(
     packageName: String
   ): List<SnapshotDiffItem> {
-    val result = updateSnapshotDiffItemsUseCase.applyRemove(snapshotDiffItems, packageName)
-    trackPendingRemovals(result)
-    snapshotDiffItems = result.items
-    return result.items
-  }
-
-  private fun trackPendingRemovals(result: UpdateSnapshotDiffItemsUseCase.Result) {
-    pendingParticleRemovePackageNames += result.pendingRemovePackageNames
+    snapshotDiffItems = snapshotDiffItems.filterNot { it.packageName == packageName }
+    pendingParticleRemovePackageNames += packageName
+    return snapshotDiffItems
   }
 }

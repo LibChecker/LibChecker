@@ -13,7 +13,6 @@ import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.annotation.SIGNATURES
 import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.constant.AbilityType
-import com.absinthe.libchecker.domain.app.detail.content.BuildAppDetailTabTypesUseCase
 
 data class DetailTabItem(
   val type: Int,
@@ -47,16 +46,12 @@ data class DetailTabSpec(
   }
 }
 
-class DetailTabSpecBuilder(
-  private val context: Context,
-  private val buildAppDetailTabTypes: BuildAppDetailTabTypesUseCase
-) {
+class DetailTabSpecBuilder(private val context: Context) {
 
   fun build(isHarmonyMode: Boolean, isApkPreview: Boolean): DetailTabSpec {
-    val types = buildAppDetailTabTypes(
-      isHarmonyMode = isHarmonyMode,
-      isApkPreview = isApkPreview
-    )
+    val types = (if (isHarmonyMode) harmonyTypes else normalTypes).let {
+      if (isApkPreview) it.filterNot { type -> type == SIGNATURES } else it
+    }
 
     return DetailTabSpec(
       items = types.map { type ->
@@ -78,6 +73,26 @@ class DetailTabSpecBuilder(
   }
 
   private companion object {
+    val normalTypes = listOf(
+      NATIVE,
+      SERVICE,
+      ACTIVITY,
+      RECEIVER,
+      PROVIDER,
+      PERMISSION,
+      METADATA,
+      SIGNATURES
+    )
+
+    val harmonyTypes = listOf(
+      NATIVE,
+      AbilityType.PAGE,
+      AbilityType.SERVICE,
+      AbilityType.WEB,
+      AbilityType.DATA,
+      SIGNATURES
+    )
+
     val normalTitleResByType = mapOf(
       NATIVE to R.string.ref_category_native,
       SERVICE to R.string.ref_category_service,

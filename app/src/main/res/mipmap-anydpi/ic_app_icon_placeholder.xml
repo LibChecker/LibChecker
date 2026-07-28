@@ -1,0 +1,5 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+  <item
+    android:drawable="@drawable/ic_icon_blueprint"
+    android:gravity="fill" />
+</layer-list>

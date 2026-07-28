@@ -27,7 +27,7 @@ data class LibStringPermissionItemDisplay(
         name = name,
         showNotGrantedIndicator = showNotGrantedIndicator,
         notGrantedLabel = visibleNotGrantedLabel,
-        contentDescription = buildLibStringItemDescription(
+        contentDescription = buildDetailItemDescription(
           name.text,
           visibleNotGrantedLabel
         )

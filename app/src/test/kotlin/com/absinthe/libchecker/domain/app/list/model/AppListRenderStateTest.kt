@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.domain.app.list.model
 
+import android.content.pm.PackageInfo
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame
 import org.junit.Test
@@ -10,7 +11,9 @@ class AppListRenderStateTest {
   fun `merges prepared rows without losing shared render inputs`() {
     val first = itemViewState("1.0")
     val second = itemViewState("2.0")
+    val packageInfo = PackageInfo()
     val initial = AppListRenderState(
+      iconPackageInfos = mapOf("second" to packageInfo),
       itemViewStates = mapOf("first" to first),
       fallbackDisplayOptions = 7,
       highlightText = "sample"
@@ -21,6 +24,7 @@ class AppListRenderStateTest {
     assertEquals(listOf("first", "second"), merged.itemViewStates.keys.toList())
     assertSame(first, merged.itemViewStates["first"])
     assertSame(second, merged.itemViewStates["second"])
+    assertSame(packageInfo, merged.iconPackageInfos["second"])
     assertEquals(7, merged.fallbackDisplayOptions)
     assertEquals("sample", merged.highlightText)
   }

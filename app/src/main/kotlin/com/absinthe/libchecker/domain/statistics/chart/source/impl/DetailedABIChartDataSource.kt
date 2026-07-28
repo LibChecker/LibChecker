@@ -76,14 +76,6 @@ class DetailedABIChartDataSource(
     }
   }
 
-  override fun getListByXValue(x: Int): List<LCItem> {
-    return classifiedMap.entries.elementAtOrNull(x)?.value ?: emptyList()
-  }
-
-  override fun getListKeyByXValue(x: Int): Int? {
-    return classifiedMap.entries.elementAtOrNull(x)?.key
-  }
-
   override fun getLabelByXValue(context: Context, x: Int): String {
     return classifiedLabels.entries.elementAtOrNull(x)?.value.orEmpty()
   }

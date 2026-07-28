@@ -27,12 +27,6 @@ class CustomViewFlipper : ViewFlipper {
     }
   }
 
-  fun getOnDisplayedChildChangedListener() = mOnDisplayedChildChangedListener
-
-  fun setOnDisplayedChildChangedListener(listener: OnDisplayedChildChangedListener) {
-    mOnDisplayedChildChangedListener = listener
-  }
-
   fun setOnDisplayedChildChangedListener(onChanged: OnDisplayedChildChangedListener.() -> Unit) {
     mOnDisplayedChildChangedListener = object : OnDisplayedChildChangedListener {
       override fun onChanged(whichChild: Int) {

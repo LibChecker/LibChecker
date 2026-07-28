@@ -13,11 +13,13 @@ import com.absinthe.libchecker.domain.app.detail.header.DetailHeaderExtraInfoSta
 import com.absinthe.libchecker.domain.app.detail.header.DetailHeaderRenderState
 import com.absinthe.libchecker.domain.app.detail.ui.view.DetailsTitleView
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
+import com.absinthe.libchecker.view.CollapsedToolbarView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import me.zhanghai.android.appiconloader.AppIconLoader
 
 class DetailHeaderBinder(
   private val detailsTitleView: DetailsTitleView,
+  private val collapsedToolbarView: CollapsedToolbarView,
   private val blurView: View,
   private val onAppInfoClick: (String) -> Unit
 ) {
@@ -43,19 +45,20 @@ class DetailHeaderBinder(
     title: AppDetailHeaderTitleData,
     applicationInfo: ApplicationInfo?
   ) {
+    val appIconLoader = AppIconLoader(
+      detailsTitleView.resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size),
+      false,
+      detailsTitleView.context
+    )
+    val icon = applicationInfo?.let { appIconLoader.loadIcon(it) } ?: R.drawable.ic_icon_blueprint
+    collapsedToolbarView.apply {
+      bindTitle(title.title)
+      setIcon(icon)
+    }
     detailsTitleView.apply {
       iconView.apply {
-        val appIconLoader = AppIconLoader(
-          resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size),
-          false,
-          context
-        )
         contentDescription = title.title
-        applicationInfo?.let {
-          load(appIconLoader.loadIcon(it))
-        } ?: run {
-          load(R.drawable.ic_icon_blueprint)
-        }
+        load(icon)
         if (title.isAppInfoAvailable) {
           setOnClickListener {
             if (AntiShakeUtils.isInvalidClick(it)) {

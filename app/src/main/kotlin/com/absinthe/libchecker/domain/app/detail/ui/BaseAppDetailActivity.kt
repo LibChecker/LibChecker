@@ -2,7 +2,6 @@ package com.absinthe.libchecker.domain.app.detail.ui
 
 import android.content.pm.PackageInfo
 import android.os.Bundle
-import androidx.annotation.StringRes
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -10,20 +9,9 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
-import com.absinthe.libchecker.domain.app.detail.content.BuildAppDetailContentInitPlanUseCase
-import com.absinthe.libchecker.domain.app.detail.content.BuildAppDetailTabTypesUseCase
 import com.absinthe.libchecker.domain.app.detail.model.DetailExtraBean
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
-import com.absinthe.libchecker.domain.app.detail.ui.DetailAbiLabelBinder
-import com.absinthe.libchecker.domain.app.detail.ui.DetailFeatureListController
-import com.absinthe.libchecker.domain.app.detail.ui.DetailFragmentManager
-import com.absinthe.libchecker.domain.app.detail.ui.DetailHeaderBinder
-import com.absinthe.libchecker.domain.app.detail.ui.DetailMenuController
-import com.absinthe.libchecker.domain.app.detail.ui.DetailProcessBarController
-import com.absinthe.libchecker.domain.app.detail.ui.DetailTabSpecBuilder
-import com.absinthe.libchecker.domain.app.detail.ui.DetailToolbarController
-import com.absinthe.libchecker.domain.app.detail.ui.IDetailContainer
 import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailAppIconDrawableBuilder
 import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailFeatureController
 import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailHeaderController
@@ -33,7 +21,7 @@ import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailPackageCont
 import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailStateObserverController
 import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailTabController
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.AppInfoBottomSheetDialogFragment
-import com.absinthe.libchecker.domain.app.model.VersionedFeature
+import com.absinthe.libchecker.domain.app.detail.ui.dialog.AppStatisticAnalysisBottomSheetDialogFragment
 import com.absinthe.libchecker.domain.app.repository.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.repository.AppListSettingsRepository
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
@@ -42,6 +30,7 @@ import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.extensions.isKeyboardShowing
+import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import kotlinx.coroutines.launch
@@ -56,8 +45,6 @@ abstract class BaseAppDetailActivity :
   protected val viewModel: DetailViewModel by viewModel()
   private val appDetailSettingsRepository: AppDetailSettingsRepository by inject()
   private val appListSettingsRepository: AppListSettingsRepository by inject()
-  private val buildAppDetailContentInitPlan: BuildAppDetailContentInitPlanUseCase by inject()
-  private val buildAppDetailTabTypes: BuildAppDetailTabTypesUseCase by inject()
   protected val typeList: List<Int>
     get() = tabController.types
 
@@ -105,12 +92,13 @@ abstract class BaseAppDetailActivity :
     DetailAbiLabelBinder(
       activity = this,
       detailsTitleView = binding.detailsTitle,
-      tintAbiLabels = { isDisplayOptionEnabled(AdvancedOptions.TINT_ABI_LABEL) }
+      tintAbiLabels = { (appListSettingsRepository.displayOptions and AdvancedOptions.TINT_ABI_LABEL) > 0 }
     )
   }
   private val headerBinder by unsafeLazy {
     DetailHeaderBinder(
       detailsTitleView = binding.detailsTitle,
+      collapsedToolbarView = binding.collapsedToolbarTitle,
       blurView = binding.collapsingToolbar,
       onAppInfoClick = ::showAppInfoDialog
     )
@@ -121,10 +109,11 @@ abstract class BaseAppDetailActivity :
       supportActionBar = { supportActionBar },
       collapsingToolbar = binding.collapsingToolbar,
       headerLayout = binding.headerLayout,
+      collapsedToolbarView = binding.collapsedToolbarTitle,
       headerBinder = headerBinder,
       viewModel = viewModel,
       coroutineScope = lifecycleScope,
-      isDisplayOptionEnabled = ::isDisplayOptionEnabled,
+      isDisplayOptionEnabled = { option -> (appListSettingsRepository.displayOptions and option) > 0 },
       harmonyBundleInfo = { packageName ->
         bundleManager?.getBundleInfo(
           packageName,
@@ -134,7 +123,7 @@ abstract class BaseAppDetailActivity :
     )
   }
   private val tabSpecBuilder by unsafeLazy {
-    DetailTabSpecBuilder(this, buildAppDetailTabTypes)
+    DetailTabSpecBuilder(this)
   }
   private val tabController: DetailTabController by unsafeLazy {
     DetailTabController(
@@ -142,7 +131,9 @@ abstract class BaseAppDetailActivity :
       viewPager = binding.viewpager,
       tabLayout = binding.tabLayout,
       onTabSelected = { type -> listInteractionController.onDetailTabSelected(type) },
-      onProcessTooltipTextChanged = ::updateProcessToolbarTooltip
+      onProcessTooltipTextChanged = { tooltipTextRes ->
+        toolbarController.updateProcessTooltip(tooltipTextRes)
+      }
     )
   }
   private val listInteractionController: DetailListInteractionController by unsafeLazy {
@@ -162,7 +153,6 @@ abstract class BaseAppDetailActivity :
     DetailPackageContentController(
       viewModel = viewModel,
       coroutineScope = lifecycleScope,
-      buildAppDetailContentInitPlan = buildAppDetailContentInitPlan,
       tabSpecBuilder = tabSpecBuilder,
       tabController = tabController,
       currentUiGeneration = { packageUiGeneration },
@@ -176,7 +166,12 @@ abstract class BaseAppDetailActivity :
       toolbarView = binding.rvToolbar,
       appBarLayout = binding.headerLayout,
       onSortClick = { listInteractionController.toggleSortMode() },
-      onQuickLaunchClick = ::showCurrentAppInfoDialog,
+      onOnlineRuleAnalysisClick = ::showOnlineRuleAnalysisDialog,
+      onQuickLaunchClick = {
+        if (viewModel.isPackageInfoAvailable()) {
+          showAppInfoDialog(viewModel.packageInfo.packageName)
+        }
+      },
       onProcessClick = { listInteractionController.toggleProcessMode() }
     )
   }
@@ -203,10 +198,25 @@ abstract class BaseAppDetailActivity :
       coroutineScope = lifecycleScope,
       onItemsCountChanged = { live -> listInteractionController.onItemsCountChanged(live) },
       onProcessToolIconVisibilityChanged = toolbarController::setProcessActionVisible,
+      onOnlineRuleAnalysisVisibilityChanged = toolbarController::setOnlineRuleAnalysisVisible,
       onProcessMapChanged = processBarController::setData,
-      onFeatureAdded = ::addFeatureItem,
-      onFeatureLoadingChanged = ::onFeatureLoadingChanged,
-      onAbiBundleChanged = ::onAbiBundleChanged
+      onFeatureAdded = { feature ->
+        featureController.build(feature, featureListController.itemCount)?.let { featureListController.addItem(it) }
+      },
+      onFeatureLoadingChanged = { loading ->
+        featureListController.setLoading(loading)
+        if (loading) {
+          doOnMainThreadIdle {
+            featureListController.attachWithAnimation()
+          }
+        }
+      },
+      onAbiBundleChanged = { abi, abiSet ->
+        initAbiView(abi, abiSet)
+        doOnMainThreadIdle {
+          featureListController.attachWithAnimation()
+        }
+      }
     )
   }
 
@@ -231,6 +241,11 @@ abstract class BaseAppDetailActivity :
     stateObserverController.observe()
   }
 
+  override fun onResume() {
+    super.onResume()
+    viewModel.refreshOnlineStatisticRulesAvailability()
+  }
+
   override fun onDestroy() {
     tabController.reset()
     toolbarController.release()
@@ -240,7 +255,9 @@ abstract class BaseAppDetailActivity :
 
   protected fun onPackageInfoAvailable(packageInfo: PackageInfo, extraBean: DetailExtraBean?) {
     val uiGeneration = ++packageUiGeneration
-    resetUiState()
+    tabController.reset()
+    featureListController.reset()
+    toolbarController.reset()
     viewModel.reset()
     val apkPreviewInfo = viewModel.apkPreviewInfo
 
@@ -285,54 +302,20 @@ abstract class BaseAppDetailActivity :
   protected open fun onStaticLibsAvailable() {}
 
   private fun showAppInfoDialog(packageName: String) {
-    AppInfoBottomSheetDialogFragment().apply {
-      arguments = Bundle().apply {
-        putString(EXTRA_PACKAGE_NAME, packageName)
-      }
-      show(supportFragmentManager, AppInfoBottomSheetDialogFragment::class.java.name)
-    }
+    AppInfoBottomSheetDialogFragment()
+      .putArguments(EXTRA_PACKAGE_NAME to packageName)
+      .show(supportFragmentManager, AppInfoBottomSheetDialogFragment::class.java.name)
   }
 
   override fun collapseAppBar() {
     binding.headerLayout.setExpanded(false, true)
   }
 
-  private fun addFeatureItem(feature: VersionedFeature) {
-    val featureItem = featureController.build(feature, featureListController.itemCount) ?: return
-    featureListController.addItem(featureItem)
-  }
-
-  private fun onFeatureLoadingChanged(loading: Boolean) {
-    featureListController.setLoading(loading)
-    if (loading) {
-      doOnMainThreadIdle {
-        featureListController.attachWithAnimation()
-      }
-    }
-  }
-
-  private fun resetUiState() {
-    tabController.reset()
-    featureListController.reset()
-    toolbarController.reset()
-  }
-
-  private fun updateProcessToolbarTooltip(@StringRes tooltipTextRes: Int) {
-    toolbarController.updateProcessTooltip(tooltipTextRes)
-  }
-
-  private fun onAbiBundleChanged(abi: Int, abiSet: Collection<Int>) {
-    initAbiView(abi, abiSet)
-
-    doOnMainThreadIdle {
-      featureListController.attachWithAnimation()
-    }
-  }
-
-  private fun showCurrentAppInfoDialog() {
-    if (viewModel.isPackageInfoAvailable()) {
-      showAppInfoDialog(viewModel.packageInfo.packageName)
-    }
+  private fun showOnlineRuleAnalysisDialog() {
+    if (!viewModel.isPackageInfoAvailable()) return
+    val tag = AppStatisticAnalysisBottomSheetDialogFragment::class.java.name
+    if (supportFragmentManager.findFragmentByTag(tag) != null) return
+    AppStatisticAnalysisBottomSheetDialogFragment().show(supportFragmentManager, tag)
   }
 
   private fun initAbiView(abi: Int, abiSet: Collection<Int>) {
@@ -346,9 +329,5 @@ abstract class BaseAppDetailActivity :
     }
 
     abiLabelBinder.bind(abiLabelData)
-  }
-
-  private fun isDisplayOptionEnabled(option: Int): Boolean {
-    return (appListSettingsRepository.displayOptions and option) > 0
   }
 }

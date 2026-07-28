@@ -12,10 +12,11 @@ class GetSnapshotPackageIconSourcesUseCase(
   suspend operator fun invoke(
     packageNames: Collection<String>
   ): Map<String, SnapshotPackageIconSource> = withContext(Dispatchers.IO) {
+    val installedApps = installedAppRepository.getApplicationMap()
     packageNames.asSequence()
       .distinct()
       .associateWith { packageName ->
-        installedAppRepository.getPackageInfo(packageName)
+        installedApps[packageName]
           ?.let(SnapshotPackageIconSource::InstalledPackage)
           ?: SnapshotPackageIconSource.Fallback
       }

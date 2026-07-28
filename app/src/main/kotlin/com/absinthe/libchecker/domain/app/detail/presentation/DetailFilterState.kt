@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.domain.app.detail.presentation
 
-import com.absinthe.libchecker.domain.app.detail.content.DetailProcessFilterData
 import com.absinthe.libchecker.domain.app.detail.model.LocatedCount
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -27,16 +26,8 @@ class DetailFilterState {
     itemsCountList[locate] = count
   }
 
-  fun updateProcessMap(map: Map<String, Int>) {
-    processMapStateFlow.value = map
-  }
-
-  fun updateProcessToolIconVisibility(visible: Boolean) {
-    processToolIconVisibilityStateFlow.value = visible
-  }
-
   fun updateProcessFilterData(data: DetailProcessFilterData) {
-    updateProcessMap(data.processMap)
-    updateProcessToolIconVisibility(data.processToolIconVisible)
+    processMapStateFlow.value = data.processMap
+    processToolIconVisibilityStateFlow.value = data.processToolIconVisible
   }
 }

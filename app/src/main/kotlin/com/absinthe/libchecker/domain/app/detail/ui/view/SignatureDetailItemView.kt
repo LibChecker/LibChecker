@@ -5,7 +5,6 @@ import android.util.TypedValue
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.view.children
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.VersionCompat
@@ -72,9 +71,7 @@ class SignatureDetailItemView(context: Context) : AViewGroup(context) {
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-    children.forEach {
-      it.autoMeasure()
-    }
+    autoMeasureChildren()
     val typeWidth =
       measuredWidth - paddingStart - paddingEnd - copyToClipboard.measuredWidth - copyToClipboard.marginStart
     val contentWidth = measuredWidth - paddingStart - paddingEnd

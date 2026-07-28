@@ -29,6 +29,7 @@ public class ZipDexContainer2 implements MultiDexContainer<DexBackedDexFile> {
   private final File zipFilePath;
   @Nullable
   private final Opcodes opcodes;
+  private final long maxEntrySize;
   private static final Pattern DEX_PATTERN = Pattern.compile("(?<=classes)\\d*\\.dex$");
 
   /**
@@ -37,8 +38,13 @@ public class ZipDexContainer2 implements MultiDexContainer<DexBackedDexFile> {
    * @param zipFilePath The path to the zip file
    */
   public ZipDexContainer2(@NonNull File zipFilePath, @Nullable Opcodes opcodes) {
+    this(zipFilePath, opcodes, Long.MAX_VALUE);
+  }
+
+  public ZipDexContainer2(@NonNull File zipFilePath, @Nullable Opcodes opcodes, long maxEntrySize) {
     this.zipFilePath = zipFilePath;
     this.opcodes = opcodes;
+    this.maxEntrySize = maxEntrySize;
   }
 
   /**
@@ -98,28 +104,51 @@ public class ZipDexContainer2 implements MultiDexContainer<DexBackedDexFile> {
 
   @NonNull
   protected DexEntry<DexBackedDexFile> loadEntry(@NonNull IZipFile zipFile, @NonNull ZipEntry zipEntry) throws IOException {
-    try (InputStream inputStream = zipFile.getInputStream(zipEntry)) {
-      byte[] buf = Okio.buffer(Okio.source(inputStream)).readByteArray();
-
-      return new DexEntry<>() {
-        @NonNull
-        @Override
-        public String getEntryName() {
-          return zipEntry.getName();
-        }
-
-        @NonNull
-        @Override
-        public DexBackedDexFile getDexFile() {
-          return new DexBackedDexFile(opcodes, buf);
-        }
-
-        @NonNull
-        @Override
-        public MultiDexContainer<DexBackedDexFile> getContainer() {
-          return ZipDexContainer2.this;
-        }
-      };
+    long declaredSize = zipEntry.getSize();
+    if (maxEntrySize == Long.MAX_VALUE) {
+      try (InputStream inputStream = zipFile.getInputStream(zipEntry)) {
+        return createEntry(zipEntry, Okio.buffer(Okio.source(inputStream)).readByteArray());
+      }
     }
+    if (declaredSize < 0 || declaredSize > maxEntrySize) {
+      throw new IOException("DEX entry exceeds the supported size");
+    }
+    try (InputStream inputStream = zipFile.getInputStream(zipEntry)) {
+      byte[] buf = new byte[(int) declaredSize];
+      int offset = 0;
+      while (offset < buf.length) {
+        int read = inputStream.read(buf, offset, buf.length - offset);
+        if (read < 0) {
+          throw new IOException("DEX entry ended before its declared size");
+        }
+        offset += read;
+      }
+      if (inputStream.read() != -1) {
+        throw new IOException("DEX entry exceeds its declared size");
+      }
+      return createEntry(zipEntry, buf);
+    }
+  }
+
+  private DexEntry<DexBackedDexFile> createEntry(@NonNull ZipEntry zipEntry, byte[] buf) {
+    return new DexEntry<>() {
+      @NonNull
+      @Override
+      public String getEntryName() {
+        return zipEntry.getName();
+      }
+
+      @NonNull
+      @Override
+      public DexBackedDexFile getDexFile() {
+        return new DexBackedDexFile(opcodes, buf);
+      }
+
+      @NonNull
+      @Override
+      public MultiDexContainer<DexBackedDexFile> getContainer() {
+        return ZipDexContainer2.this;
+      }
+    };
   }
 }

@@ -9,8 +9,6 @@ import com.absinthe.libchecker.domain.app.detail.ui.Referable
 import com.absinthe.libchecker.domain.app.detail.ui.base.BaseDetailFragment
 import com.absinthe.libchecker.domain.app.detail.ui.base.EXTRA_TYPE
 import com.absinthe.libchecker.utils.extensions.putArguments
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 
 class MetaDataAnalysisFragment :
   BaseDetailFragment<FragmentLibComponentBinding>(),
@@ -20,8 +18,7 @@ class MetaDataAnalysisFragment :
   override val needShowLibDetailDialog = false
 
   override suspend fun getItems(): List<LibStringItemChip> {
-    val flow = viewModel.contentState.metaDataItems
-    return flow.value ?: flow.filterNotNull().first()
+    return viewModel.contentState.metaDataItems.valueOrAwait()
   }
 
   override fun onItemsAvailable(items: List<LibStringItemChip>) {
@@ -31,18 +28,11 @@ class MetaDataAnalysisFragment :
       submitItemsWithFilter(items, viewModel.filterState.queriedText, null)
     }
 
-    if (!isListReady) {
-      viewModel.filterState.updateItemsCount(type, items.size)
-      isListReady = true
-    }
+    markListReady(items.size)
   }
 
   override fun init() {
-    binding.apply {
-      list.apply {
-        adapter = this@MetaDataAnalysisFragment.adapter
-      }
-    }
+    binding.list.adapter = adapter
 
     adapter.apply {
       animationEnable = false
@@ -50,10 +40,8 @@ class MetaDataAnalysisFragment :
       isStateViewEnable = true
     }
 
-    viewModel.apply {
-      packageInfoStateFlow.value?.run {
-        contentState.metaDataItems.value ?: run { initMetaDataData() }
-      }
+    if (viewModel.packageInfoStateFlow.value != null && viewModel.contentState.metaDataItems.value == null) {
+      viewModel.initMetaDataData()
     }
   }
 

@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.constant
 
-import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.LibCheckerApp
@@ -10,13 +9,11 @@ import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.constant.options.SnapshotOptions
 import com.absinthe.libchecker.domain.app.detail.ui.MODE_SORT_BY_SIZE
-import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.GitHubTokenStore
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.SPDelegates
 import com.absinthe.libchecker.utils.SPUtils
-import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import java.util.Locale
 import java.util.UUID
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -31,10 +28,6 @@ object GlobalValues {
       uuid = UUID.randomUUID().toString()
     }
     return (uuid.hashCode() + PackageUtils.getPackageInfo(app.packageName).firstInstallTime).mod(90000) + 10000
-  }
-
-  private fun getPreferences(): SharedPreferences {
-    return SPUtils.sp
   }
 
   val preferencesFlow = MutableSharedFlow<Pair<String, Any>>()
@@ -85,16 +78,16 @@ object GlobalValues {
         return token
       }
 
-      val legacyToken = getPreferences()
+      val legacyToken = SPUtils.sp
         .getString(Constants.PREF_GITHUB_API_TOKEN, null)
         ?.trim()
         .orEmpty()
       if (legacyToken.isNotEmpty()) {
         if (GitHubTokenStore.set(legacyToken)) {
-          getPreferences().edit { remove(Constants.PREF_GITHUB_API_TOKEN) }
+          SPUtils.sp.edit { remove(Constants.PREF_GITHUB_API_TOKEN) }
           return legacyToken
         }
-        getPreferences().edit { remove(Constants.PREF_GITHUB_API_TOKEN) }
+        SPUtils.sp.edit { remove(Constants.PREF_GITHUB_API_TOKEN) }
         return String()
       }
       return String()
@@ -102,11 +95,11 @@ object GlobalValues {
     set(value) {
       val token = value.trim()
       if (token == githubApiToken) {
-        getPreferences().edit { remove(Constants.PREF_GITHUB_API_TOKEN) }
+        SPUtils.sp.edit { remove(Constants.PREF_GITHUB_API_TOKEN) }
         return
       }
 
-      getPreferences().edit { remove(Constants.PREF_GITHUB_API_TOKEN) }
+      SPUtils.sp.edit { remove(Constants.PREF_GITHUB_API_TOKEN) }
       if (GitHubTokenStore.set(token)) {
         githubApiTokenVersion += 1
       }
@@ -124,8 +117,6 @@ object GlobalValues {
     return githubApiAuthorizationHeader.takeIf { url.startsWith(GITHUB_API_ROOT_URL) }
   }
 
-  val season by unsafeLazy { DateUtils.getCurrentSeason() }
-
   var locale: Locale = Locale.getDefault()
     get() {
       if (OsUtils.atLeastT()) {
@@ -134,11 +125,11 @@ object GlobalValues {
         val locale = systemSelectedLocale.get(0) ?: Locale.getDefault()
         if (locale != field) {
           field = locale
-          getPreferences().edit { putString(Constants.PREF_LOCALE, locale.toLanguageTag()) }
+          SPUtils.sp.edit { putString(Constants.PREF_LOCALE, locale.toLanguageTag()) }
         }
         return locale
       }
-      val tag = getPreferences().getString(Constants.PREF_LOCALE, null)
+      val tag = SPUtils.sp.getString(Constants.PREF_LOCALE, null)
       if (tag.isNullOrEmpty() || "SYSTEM" == tag) {
         return Locale.getDefault()
       }
@@ -146,7 +137,7 @@ object GlobalValues {
     }
     set(value) {
       field = value
-      getPreferences().edit { putString(Constants.PREF_LOCALE, value.toLanguageTag()) }
+      SPUtils.sp.edit { putString(Constants.PREF_LOCALE, value.toLanguageTag()) }
     }
 
   var uuid: String by SPDelegates(Constants.PREF_UUID, String())

@@ -2,7 +2,6 @@ package com.absinthe.libchecker.utils
 
 import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.ApplicationInfoHidden
 import android.content.pm.ComponentInfo
@@ -34,6 +33,7 @@ import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.app.SystemServices
+import com.absinthe.libchecker.compat.IZipFile
 import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.compat.ZipFileCompat
 import com.absinthe.libchecker.constant.AndroidVersions
@@ -89,7 +89,6 @@ import java.security.interfaces.DSAPublicKey
 import java.security.interfaces.RSAPublicKey
 import java.text.DateFormat
 import java.util.zip.ZipEntry
-import java.util.zip.ZipFile
 import javax.security.cert.X509Certificate
 import timber.log.Timber
 
@@ -153,16 +152,6 @@ object PackageUtils {
    */
   fun getVersionCode(packageName: String): Long {
     return getPackageInfo(packageName).getVersionCode()
-  }
-
-  /**
-   * Get version string of an app ( 1.0.0(1) )
-   * @param versionName Version name
-   * @param versionCode Version code
-   * @return version code as String
-   */
-  fun getVersionString(versionName: String, versionCode: Long): String {
-    return "$versionName ($versionCode)"
   }
 
   /**
@@ -324,7 +313,7 @@ object PackageUtils {
 
     if (ENABLE_GET_APK_FILE_LIBS_LOG) timeRecorder.start()
     try {
-      tracePackageUtilsSection(TRACE_APK_LIBS_OPEN_ZIP) { ZipFile(file) }.use { zipFile ->
+      tracePackageUtilsSection(TRACE_APK_LIBS_OPEN_ZIP) { ZipFileCompat(file) }.use { zipFile ->
         val nativeEntries = collectNativeZipEntries(zipFile, sourceDir)
         val storedEntryOffsets by lazy {
           loadStoredEntryOffsets(file, nativeEntries.storedEntryNames)
@@ -376,13 +365,13 @@ object PackageUtils {
   }
 
   private fun collectNativeZipEntries(
-    zipFile: ZipFile,
+    zipFile: IZipFile,
     sourceDir: String?
   ): NativeZipEntries {
     return tracePackageUtilsSection(TRACE_APK_LIBS_MATCH_ENTRIES) {
       val entries = mutableListOf<ZipEntry>()
       val storedEntryNames = mutableSetOf<String>()
-      val zipEntries = zipFile.entries()
+      val zipEntries = zipFile.getZipEntries()
       while (zipEntries.hasMoreElements()) {
         val entry = zipEntries.nextElement()
         if (
@@ -577,16 +566,8 @@ object PackageUtils {
     @LibType type: Int,
     isSimpleName: Boolean
   ): List<StatefulComponent> {
-    val flag = when (type) {
-      SERVICE -> PackageManager.GET_SERVICES
-      ACTIVITY -> PackageManager.GET_ACTIVITIES
-      RECEIVER -> PackageManager.GET_RECEIVERS
-      PROVIDER -> PackageManager.GET_PROVIDERS
-      else -> 0
-    }
-
     return runCatching {
-      getComponentList(getPackageInfo(packageName, flag), type, isSimpleName)
+      getComponentList(getPackageInfo(packageName, getComponentPackageInfoFlag(type)), type, isSimpleName)
     }.getOrElse { emptyList() }
   }
 
@@ -602,17 +583,19 @@ object PackageUtils {
     @LibType type: Int,
     isSimpleName: Boolean
   ): List<String> {
-    val flag = when (type) {
+    return runCatching {
+      getComponentStringList(getPackageInfo(packageName, getComponentPackageInfoFlag(type)), type, isSimpleName)
+    }.getOrElse { emptyList() }
+  }
+
+  internal fun getComponentPackageInfoFlag(@LibType type: Int): Int {
+    return when (type) {
       SERVICE -> PackageManager.GET_SERVICES
       ACTIVITY -> PackageManager.GET_ACTIVITIES
       RECEIVER -> PackageManager.GET_RECEIVERS
       PROVIDER -> PackageManager.GET_PROVIDERS
       else -> 0
     }
-
-    return runCatching {
-      getComponentStringList(getPackageInfo(packageName, flag), type, isSimpleName)
-    }.getOrElse { emptyList() }
   }
 
   /**
@@ -835,11 +818,10 @@ object PackageUtils {
       }
 
       abiSet
-    }.onFailure {
+    }.getOrElse {
       Timber.e(it)
-      abiSet.clear()
-      abiSet.add(ERROR)
-    }.getOrDefault(abiSet)
+      mutableSetOf(ERROR)
+    }
   }
 
   /**
@@ -849,31 +831,21 @@ object PackageUtils {
    */
   private fun getAbiListByNativeDir(nativePath: String): MutableSet<Int> {
     val file = File(nativePath.substring(0, nativePath.lastIndexOf(File.separator)))
-    val abis = mutableSetOf<Int>()
-
-    val fileList = file.listFiles() ?: return mutableSetOf()
-
-    fileList.asSequence()
-      .forEach {
-        if (it.isDirectory) {
-          INSTRUCTION_SET_MAP_TO_ABI_VALUE[it.name]?.let { abi ->
-            abis.add(abi)
-          }
-        }
-      }
-
-    return abis
+    return file.listFiles()
+      ?.asSequence()
+      ?.filter { it.isDirectory }
+      ?.mapNotNullTo(mutableSetOf()) { INSTRUCTION_SET_MAP_TO_ABI_VALUE[it.name] }
+      ?: mutableSetOf()
   }
 
   private fun getAbiListBySplitApks(splitSource: Array<String>): Set<Int> {
     return splitSource.filter { source -> STRING_ABI_MAP.keys.any { source.contains(it) } }
-      .map { source ->
+      .mapNotNull { source ->
         val abiString = source.substringAfterLast(File.separator)
           .removePrefix("split_config.")
           .removeSuffix(".apk")
-        STRING_ABI_MAP[abiString] ?: ERROR
+        STRING_ABI_MAP[abiString]
       }
-      .filter { it != ERROR }
       .toSet()
   }
 
@@ -1086,17 +1058,6 @@ object PackageUtils {
     }.getOrElse { emptyList() }
   }
 
-  /**
-   * Get permissions of an application with granted state
-   * @param packageName Package name of the app
-   * @return Permissions list with granted state
-   */
-  fun getStatefulPermissionsList(packageName: String): List<Pair<String, Boolean>> {
-    return runCatching {
-      getPackageInfo(packageName, PackageManager.GET_PERMISSIONS).getStatefulPermissionsList()
-    }.getOrElse { emptyList() }
-  }
-
   @RequiresApi(Build.VERSION_CODES.R)
   fun getInstallSourceInfo(packageName: String): InstallSourceInfo? {
     val origInstallSourceInfo = runCatching {
@@ -1234,26 +1195,6 @@ object PackageUtils {
       append(signature.toCharsString())
     }
     return LibStringItem(serialNumber, 0, source, null)
-  }
-
-  fun getLauncherActivity(packageName: String): String {
-    val intent = Intent(Intent.ACTION_MAIN, null)
-      .addCategory(Intent.CATEGORY_LAUNCHER)
-      .setPackage(packageName)
-    val info = PackageManagerCompat.queryIntentActivities(intent, 0)
-    return info.getOrNull(0)?.activityInfo?.name.orEmpty()
-  }
-
-  fun startLaunchAppActivity(context: Context, packageName: String?) {
-    if (packageName == null) {
-      return
-    }
-    val launcherActivity = getLauncherActivity(packageName)
-    val launchIntent = Intent(Intent.ACTION_MAIN)
-      .addCategory(Intent.CATEGORY_LAUNCHER)
-      .setClassName(packageName, launcherActivity)
-      .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    context.startActivity(launchIntent)
   }
 
   fun getBuildVersionsInfo(

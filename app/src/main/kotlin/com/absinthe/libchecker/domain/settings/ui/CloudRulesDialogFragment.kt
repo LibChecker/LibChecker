@@ -99,9 +99,6 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
           }
         }
 
-        override fun onDownloading(progress: Int) {
-        }
-
         override fun onDownloadFailed() {
           showUpdateErrorToast()
         }

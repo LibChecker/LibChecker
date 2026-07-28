@@ -73,7 +73,8 @@ object RulesRepository {
   }
 
   fun getDatabaseFile(context: Context = LibCheckerApp.app): File {
-    return File(getRuleStoreDirectory(context), "$RULE_STORE_FILE_PREFIX${getBundledVersion(context)}$RULE_STORE_FILE_EXTENSION")
+    val directory = File(context.noBackupFilesDir, RULE_STORE_DIRECTORY_NAME)
+    return File(directory, "$RULE_STORE_FILE_PREFIX${getBundledVersion(context)}$RULE_STORE_FILE_EXTENSION")
   }
 
   fun getDownloadFile(context: Context): File {
@@ -86,7 +87,7 @@ object RulesRepository {
     val target = getDatabaseFile(context)
     target.parentFile?.mkdirs()
     RikkaFileUtils.copy(source, target)
-    return target.md5() == source.md5()
+    return target.readBytes().md5() == source.readBytes().md5()
   }
 
   fun deleteDatabase(context: Context = LibCheckerApp.app) {
@@ -271,10 +272,6 @@ object RulesRepository {
 
   private fun getLegacyDatabaseFile(context: Context): File {
     return context.getDatabasePath(LEGACY_RULES_DATABASE_NAME)
-  }
-
-  private fun getRuleStoreDirectory(context: Context): File {
-    return File(context.noBackupFilesDir, RULE_STORE_DIRECTORY_NAME)
   }
 
   private fun getStoredLocalVersion(context: Context): Int? {

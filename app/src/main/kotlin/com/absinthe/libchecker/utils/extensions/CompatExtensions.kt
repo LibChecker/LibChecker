@@ -10,7 +10,6 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.TintTypedArray
 import androidx.core.content.ContextCompat
 import java.io.Closeable
-import kotlin.comparisons.reversed as kotlinReversed
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -41,8 +40,6 @@ inline fun <T : Closeable?, R> T.use(block: (T) -> R): R {
   }
   return kotlinUse(block)
 }
-
-fun <T> Comparator<T>.reversedCompat(): Comparator<T> = kotlinReversed()
 
 @OptIn(ExperimentalContracts::class)
 @SuppressLint("RestrictedApi")

@@ -1,9 +1,9 @@
 package com.absinthe.libchecker.compat
 
 import android.content.Context
+import android.os.SystemProperties
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.utils.DeviceUtils
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.toClassDefType
@@ -16,14 +16,15 @@ object VersionCompat {
 
   private val hasClipboardOverlayView: Boolean by lazy {
     runCatching {
-      if (DeviceUtils.isOppoDomestic()) return@runCatching false
+      if (SystemProperties.get("ro.oplus.image.system_ext.area") == "domestic") {
+        return@runCatching false
+      }
 
       val sourceDir =
         PackageUtils.getPackageInfo(Constants.PackageNames.SYSTEMUI).applicationInfo?.sourceDir
           ?: return@runCatching false
-      val source = File(sourceDir)
       PackageUtils.findDexClasses(
-        source,
+        File(sourceDir),
         listOf(CLASS_NAME_CLIPBOARD_OVERLAY_VIEW.toClassDefType())
       ).isNotEmpty()
     }.getOrDefault(false)

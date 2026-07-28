@@ -1,14 +1,16 @@
 package com.absinthe.libchecker.domain.snapshot.detail.model
 
+import com.absinthe.libchecker.domain.snapshot.model.ADDED
+import com.absinthe.libchecker.domain.snapshot.model.CHANGED
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class SnapshotDetailItemDisplayDataDescriptionTest {
 
   @Test
-  fun joinsStatusTitleExtraAndRuleLabel() {
+  fun followsVisualStatusRuleTitleAndExtraOrder() {
     assertEquals(
-      "Changed, libfoo.so, 42 KB, JNI",
+      "Changed, JNI, libfoo.so, 42 KB",
       buildSnapshotDetailItemDescription(
         statusLabel = "Changed",
         title = "libfoo.so",
@@ -39,16 +41,18 @@ class SnapshotDetailItemDisplayDataDescriptionTest {
         title = "Native libraries",
         statusCounts = listOf(
           SnapshotDetailStatusCount(
+            diffType = ADDED,
             count = 1,
             countText = "1",
             label = "Added",
-            status = SnapshotDetailItemStatusDisplayData(0, 0, 0, 0)
+            status = SnapshotDetailItemStatusDisplayData(0, 0, 0)
           ),
           SnapshotDetailStatusCount(
+            diffType = CHANGED,
             count = 1,
             countText = "1",
             label = "Changed",
-            status = SnapshotDetailItemStatusDisplayData(0, 0, 0, 0)
+            status = SnapshotDetailItemStatusDisplayData(0, 0, 0)
           )
         ),
         expansionStateLabel = "Expanded"

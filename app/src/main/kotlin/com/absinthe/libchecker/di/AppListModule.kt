@@ -17,8 +17,6 @@ import com.absinthe.libchecker.domain.app.list.export.BuildAppExportNativeLibrar
 import com.absinthe.libchecker.domain.app.list.export.ExportAppListToUriUseCase
 import com.absinthe.libchecker.domain.app.list.export.ExportAppListUseCase
 import com.absinthe.libchecker.domain.app.list.export.ExportInstalledAppsToUriUseCase
-import com.absinthe.libchecker.domain.app.list.related.GetRelatedAppListItemUseCase
-import com.absinthe.libchecker.domain.app.list.usecase.AppListItemsEquivalenceUseCase
 import com.absinthe.libchecker.domain.app.list.usecase.BuildAppListItemViewStatesUseCase
 import com.absinthe.libchecker.domain.app.list.usecase.BuildAppListUpdatePlanUseCase
 import com.absinthe.libchecker.domain.app.list.usecase.FilterAppListItemsUseCase
@@ -63,13 +61,11 @@ val appListModule = module {
   factory {
     ExportInstalledAppsToUriUseCase(androidContext(), androidContext().contentResolver, get(), get())
   }
-  factory { AppListItemsEquivalenceUseCase() }
   factory { BuildAppListItemViewStatesUseCase(androidContext(), get(), get()) }
   factory { BuildAppListUpdatePlanUseCase() }
   factory { ClearApkCacheUseCase(androidContext()) }
   factory { CheckRequiredPackageAvailabilityUseCase(get()) }
   factory { GetRandomAppIconUseCase(androidContext().packageManager, get()) }
-  factory { GetRelatedAppListItemUseCase(get(), get()) }
   factory { InitializePendingAppFeaturesUseCase(get(), get()) }
 
   viewModel {
@@ -85,7 +81,6 @@ val appListModule = module {
       handleAppListSearchCommandUseCase = get(),
       appListSettingsRepository = get(),
       clearApkCacheUseCase = get(),
-      appListItemsEquivalenceUseCase = get(),
       observeAppListLoadingUseCase = get()
     )
   }

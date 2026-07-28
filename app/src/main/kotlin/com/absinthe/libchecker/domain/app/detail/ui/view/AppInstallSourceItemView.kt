@@ -15,6 +15,8 @@ import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceItemConte
 import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceItemDisplay
 import com.absinthe.libchecker.domain.app.detail.ui.binder.RelatedAppItemBinder
 import com.absinthe.libchecker.domain.app.list.ui.view.AppItemView
+import com.absinthe.libchecker.utils.extensions.applyCondensedSingleLine
+import com.absinthe.libchecker.utils.extensions.applySingleLineEndEllipsize
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.view.AViewGroup
@@ -63,6 +65,7 @@ class AppInstallSourceItemView(
     titleView.text = display.title
     when (val content = display.content) {
       is AppInstallSourceItemContent.RelatedApp -> {
+        useRelatedAppTextLayout()
         relatedAppItemBinder.bind(
           appItemView = packageView,
           title = display.title,
@@ -85,6 +88,7 @@ class AppInstallSourceItemView(
 
   private fun bindMessage(content: AppInstallSourceItemContent.Message) {
     packageView.container.apply {
+      useMessageTextLayout()
       icon.load(content.iconRes)
       setAppName(content.appName)
       setPackageName(content.packageName)
@@ -92,6 +96,22 @@ class AppInstallSourceItemView(
       setAbiInfo(content.abiInfo)
       abiInfo.isVisible = content.showAbiInfo
       setBadge(null)
+    }
+  }
+
+  private fun useMessageTextLayout() {
+    packageView.container.apply {
+      packageName.maxLines = Int.MAX_VALUE
+      packageName.ellipsize = null
+      versionInfo.maxLines = Int.MAX_VALUE
+      versionInfo.ellipsize = null
+    }
+  }
+
+  private fun useRelatedAppTextLayout() {
+    packageView.container.apply {
+      packageName.applySingleLineEndEllipsize()
+      versionInfo.applyCondensedSingleLine()
     }
   }
 

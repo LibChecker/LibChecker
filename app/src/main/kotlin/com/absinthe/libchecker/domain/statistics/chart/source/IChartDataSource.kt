@@ -9,4 +9,5 @@ sealed interface IChartDataSource<T : View> {
   fun getListByXValue(x: Int): List<LCItem>
   fun getLabelByXValue(context: Context, x: Int): String
   fun getData(): List<LCItem>
+  fun getItemChipsByXValue(x: Int): Map<String, List<String>> = emptyMap()
 }

@@ -66,31 +66,31 @@ fun buildAdvancedMenuBottomSheetState(
     ),
     componentDemoItems = buildComponentDemoItems(rulePackageName),
     filterOptions = listOf(
-      menuOption(R.string.adv_show_system_apps, AdvancedOptions.SHOW_SYSTEM_APPS, displayOptions),
-      menuOption(
+      MenuOptionItem(R.string.adv_show_system_apps, AdvancedOptions.SHOW_SYSTEM_APPS, displayOptions),
+      MenuOptionItem(
         R.string.adv_show_system_framework_apps,
         AdvancedOptions.SHOW_SYSTEM_FRAMEWORK_APPS,
         displayOptions
       ),
-      menuOption(R.string.adv_show_overlays, AdvancedOptions.SHOW_OVERLAYS, displayOptions),
-      menuOption(R.string.adv_show_64_bit, AdvancedOptions.SHOW_64_BIT_APPS, displayOptions),
-      menuOption(R.string.adv_show_32_bit, AdvancedOptions.SHOW_32_BIT_APPS, displayOptions)
+      MenuOptionItem(R.string.adv_show_overlays, AdvancedOptions.SHOW_OVERLAYS, displayOptions),
+      MenuOptionItem(R.string.adv_show_64_bit, AdvancedOptions.SHOW_64_BIT_APPS, displayOptions),
+      MenuOptionItem(R.string.adv_show_32_bit, AdvancedOptions.SHOW_32_BIT_APPS, displayOptions)
     ),
     viewOptions = listOf(
-      menuOption(
+      MenuOptionItem(
         R.string.adv_show_android_version,
         AdvancedOptions.SHOW_ANDROID_VERSION,
         displayOptions
       ),
-      menuOption(R.string.adv_show_target_version, AdvancedOptions.SHOW_TARGET_API, displayOptions),
-      menuOption(R.string.adv_show_min_version, AdvancedOptions.SHOW_MIN_API, displayOptions),
-      menuOption(R.string.adv_show_compile_version, AdvancedOptions.SHOW_COMPILE_API, displayOptions),
-      menuOption(R.string.adv_tint_abi_label, AdvancedOptions.TINT_ABI_LABEL, displayOptions)
+      MenuOptionItem(R.string.adv_show_target_version, AdvancedOptions.SHOW_TARGET_API, displayOptions),
+      MenuOptionItem(R.string.adv_show_min_version, AdvancedOptions.SHOW_MIN_API, displayOptions),
+      MenuOptionItem(R.string.adv_show_compile_version, AdvancedOptions.SHOW_COMPILE_API, displayOptions),
+      MenuOptionItem(R.string.adv_tint_abi_label, AdvancedOptions.TINT_ABI_LABEL, displayOptions)
     ),
     componentOptions = listOf(
-      menuOption(R.string.adv_mark_exported, AdvancedOptions.MARK_EXPORTED, itemDisplayOptions),
-      menuOption(R.string.adv_mark_disabled, AdvancedOptions.MARK_DISABLED, itemDisplayOptions),
-      menuOption(R.string.adv_show_marked_lib, AdvancedOptions.SHOW_MARKED_LIB, itemDisplayOptions)
+      MenuOptionItem(R.string.adv_mark_exported, AdvancedOptions.MARK_EXPORTED, itemDisplayOptions),
+      MenuOptionItem(R.string.adv_mark_disabled, AdvancedOptions.MARK_DISABLED, itemDisplayOptions),
+      MenuOptionItem(R.string.adv_show_marked_lib, AdvancedOptions.SHOW_MARKED_LIB, itemDisplayOptions)
     )
   )
 }
@@ -127,15 +127,5 @@ private fun buildComponentDemoItems(rulePackageName: String): List<LibStringItem
       ),
       rule()
     )
-  )
-}
-
-private fun Int.hasOption(option: Int): Boolean = (this and option) > 0
-
-private fun menuOption(labelRes: Int, option: Int, currentOptions: Int): MenuOptionItem {
-  return MenuOptionItem(
-    labelRes = labelRes,
-    option = option,
-    isChecked = currentOptions.hasOption(option)
   )
 }

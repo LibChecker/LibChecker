@@ -17,3 +17,7 @@ data class LibStringItem(
   val process: String? = null,
   val elfInfo: ElfInfo = ElfInfo()
 ) : Parcelable
+
+internal fun Int.isOptionEnabled(option: Int): Boolean {
+  return (this and option) > 0
+}

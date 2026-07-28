@@ -25,8 +25,6 @@ abstract class BaseListControllerFragment<T : ViewBinding> :
   protected var allowRefreshing = true
   protected var menu: Menu? = null
 
-  private var lastPackageChangedTime: Long = 0
-
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     activity?.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
@@ -78,16 +76,6 @@ abstract class BaseListControllerFragment<T : ViewBinding> :
           return false
         }
         return firstLine[0] > 0 || lastLine.last() < listSize - 1
-      }
-    }
-    return false
-  }
-
-  protected fun hasPackageChanged(): Boolean {
-    homeViewModel.getWorkerLastPackageChangedTime()?.let { serverLastPackageChangedTime ->
-      if (lastPackageChangedTime < serverLastPackageChangedTime) {
-        lastPackageChangedTime = serverLastPackageChangedTime
-        return true
       }
     }
     return false

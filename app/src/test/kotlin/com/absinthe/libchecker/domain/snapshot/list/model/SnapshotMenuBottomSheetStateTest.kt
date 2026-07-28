@@ -23,11 +23,13 @@ class SnapshotMenuBottomSheetStateTest {
         SnapshotOptions.SHOW_UPDATE_TIME,
         SnapshotOptions.HIDE_NO_COMPONENT_CHANGES,
         SnapshotOptions.DIFF_HIGHLIGHT,
+        SnapshotOptions.DIFF_EMPHASIS,
         SnapshotOptions.USE_IEC_UNITS
       ),
       state.options.map { it.option }
     )
     assertTrue(state.options.first().isChecked)
+    assertFalse(state.options.first { it.option == SnapshotOptions.DIFF_EMPHASIS }.isChecked)
     assertFalse(state.options.last().isChecked)
   }
 
@@ -40,6 +42,18 @@ class SnapshotMenuBottomSheetStateTest {
     )
 
     assertFalse(state.options.any { it.option == SnapshotOptions.USE_IEC_UNITS })
+  }
+
+  @Test
+  fun `diff highlight and emphasis keep independent checked states`() {
+    val state = buildSnapshotMenuBottomSheetState(
+      currentOptions = SnapshotOptions.DIFF_EMPHASIS,
+      demoDisplayData = createSnapshotItemDisplayData(),
+      includeIecUnits = true
+    )
+
+    assertFalse(state.options.first { it.option == SnapshotOptions.DIFF_HIGHLIGHT }.isChecked)
+    assertTrue(state.options.first { it.option == SnapshotOptions.DIFF_EMPHASIS }.isChecked)
   }
 
   private fun createSnapshotItemDisplayData(): SnapshotItemDisplayData {

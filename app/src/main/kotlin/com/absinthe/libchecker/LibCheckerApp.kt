@@ -9,6 +9,7 @@ import androidx.window.embedding.RuleController
 import androidx.window.embedding.SplitController
 import coil.Coil
 import coil.ImageLoader
+import coil.decode.SvgDecoder
 import com.absinthe.libchecker.app.MainLooperFilter
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.RulesRepository
@@ -105,6 +106,7 @@ class LibCheckerApp : Application() {
       ImageLoader.Builder(this)
         .crossfade(true)
         .components {
+          add(SvgDecoder.Factory())
           add(AppIconKeyer())
           add(AppIconFetcher.Factory(40.dp, false, this@LibCheckerApp))
         }
@@ -157,10 +159,7 @@ class LibCheckerApp : Application() {
   }
 
   private fun clearCache() {
-    val sharedApkDir = File(cacheDir, "shared_apk")
-    if (sharedApkDir.exists() && sharedApkDir.isDirectory) {
-      sharedApkDir.deleteRecursively()
-    }
+    File(cacheDir, "shared_apk").takeIf { it.isDirectory }?.deleteRecursively()
   }
 
   companion object {

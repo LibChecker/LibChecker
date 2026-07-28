@@ -18,8 +18,7 @@ class CompareSnapshotItemWithInstalledAppUseCase(
     timestamp: Long,
     packageName: String
   ): SnapshotDiffItem? {
-    val flags = PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS
-    val presentInfo = installedAppRepository.getPackageInfo(packageName, flags)
+    val presentInfo = installedAppRepository.getApplicationMap(forceUpdate = true)[packageName]
       ?.let { snapshotItemFactory.create(packageManager, it) }
     val snapshotInfo = snapshotRepository.getSnapshot(timestamp, packageName)
     val trackPackageNames = snapshotRepository.getTrackItems()

@@ -4,7 +4,8 @@ import android.graphics.Color
 import android.os.Build
 import android.view.HapticFeedbackConstants
 import android.view.ViewGroup
-import android.widget.LinearLayout
+import android.widget.FrameLayout
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -14,28 +15,26 @@ import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentPieChartBinding
-import com.absinthe.libchecker.domain.statistics.chart.model.ChartType
 import com.absinthe.libchecker.domain.statistics.chart.model.LOADING_PROGRESS_MAX
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDashboard
 import com.absinthe.libchecker.domain.statistics.chart.presentation.ChartProgressPlan
-import com.absinthe.libchecker.domain.statistics.chart.presentation.ChartTypeSelectorPlan
+import com.absinthe.libchecker.domain.statistics.chart.presentation.ChartRenderRequest
+import com.absinthe.libchecker.domain.statistics.chart.presentation.ChartRenderRequestKey
 import com.absinthe.libchecker.domain.statistics.chart.presentation.ChartViewModel
 import com.absinthe.libchecker.domain.statistics.chart.source.BaseChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.source.ChartDataSourcePlan
+import com.absinthe.libchecker.domain.statistics.chart.source.IAndroidSDKChart
 import com.absinthe.libchecker.domain.statistics.chart.source.IChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.source.IntegerFormatter
 import com.absinthe.libchecker.domain.statistics.chart.source.impl.MarketDistributionChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.ui.view.ChartDetailItemView
-import com.absinthe.libchecker.domain.statistics.chart.ui.view.ExpandingView
 import com.absinthe.libchecker.domain.statistics.chart.ui.view.MarketDistributionDashboardView
-import com.absinthe.libchecker.domain.statistics.chart.usecase.ChartFeatureInitializationPlan
 import com.absinthe.libchecker.ui.base.BaseFragment
 import com.absinthe.libchecker.ui.base.SaturationTransformation
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
-import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import info.appdev.charting.animation.Easing
 import info.appdev.charting.charts.BarChart
@@ -47,14 +46,8 @@ import info.appdev.charting.components.XAxis
 import info.appdev.charting.data.EntryFloat
 import info.appdev.charting.highlight.Highlight
 import info.appdev.charting.listener.OnChartValueSelectedListener
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import rikka.core.util.ClipboardUtils
 import timber.log.Timber
@@ -65,66 +58,56 @@ class ChartFragment :
 
   private val viewModel: ChartViewModel by activityViewModel()
   private lateinit var chartView: ViewGroup
-  private lateinit var allLCItemsStateFlow: StateFlow<List<LCItem>>
   private var dataSource: IChartDataSource<*>? = null
   private var dialog: ClassifyBottomSheetDialogFragment? = null
-  private var setDataJob: Job? = null
   private var showClassifyDialogJob: Job? = null
   private lateinit var chartDataRenderer: ChartDataRenderer
-  private var currentExpandingView: ExpandingView? = null
-  private var currentChartRequestKey: ChartRequestKey? = null
+  private lateinit var statisticSelectorController: StatisticSelectorController
+  private lateinit var dashboardVisibilityController: DashboardVisibilityController
+  private var currentChartRequestKey: ChartRenderRequestKey? = null
   private var currentProgressPlan: ChartProgressPlan? = null
 
   override fun init() {
     binding.root.applySystemBarsPadding(top = true, bottom = true)
     chartDataRenderer = ChartDataRenderer(
       scope = viewLifecycleOwner.lifecycleScope,
-      onLoadingProgressChanged = viewModel::setLoadingProgress,
-      onDistributionLastUpdateTimeChanged = viewModel::setDistributionLastUpdateTime
+      chartHost = binding.chartHost,
+      onLoadingProgressChanged = viewModel::setLoadingProgress
+    )
+    statisticSelectorController = StatisticSelectorController(
+      context = requireContext(),
+      container = binding.featuresContainer,
+      chartContainer = binding.chartContainer,
+      onStatisticSelected = viewModel::selectStatistic,
+      onAddStatistic = {
+        StatisticCatalogEditorBottomSheetDialogFragment().show(
+          childFragmentManager,
+          StatisticCatalogEditorBottomSheetDialogFragment::class.java.name
+        )
+      }
+    )
+    dashboardVisibilityController = DashboardVisibilityController(
+      dashboard = binding.dashboardContainer,
+      content = binding.animatedContentContainer
     )
 
     chartView = generatePieChartView()
-    binding.root.addView(chartView, -1)
-    renderChartTypeSelector()
+    chartDataRenderer.showInitialChart(chartView)
     updateProgressIndicator()
 
     lifecycleScope.launch {
-      allLCItemsStateFlow = viewModel.appListItems.onEach {
-        setDataJob?.cancel()
-        setDataJob = lifecycleScope.launch(Dispatchers.IO) {
-          if (dataSource != null) {
-            delay(2000)
-          }
-          withContext(Dispatchers.Main) {
-            if (dataSource == null) {
-              setData(it, ChartType.ABI)
-            } else {
-              setData(it)
-            }
-          }
-        }
-      }.stateIn(this)
-    }
-    lifecycleScope.launch {
       lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
-        viewModel.loadingProgress.collect { progress ->
-          if (progress >= LOADING_PROGRESS_MAX) {
-            applyDashboardView()
-          }
-          updateProgressIndicator()
-        }
+        viewModel.statisticSelectorPlan.collect(statisticSelectorController::render)
       }
     }
     lifecycleScope.launch {
       lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
-        viewModel.featureInitializationPlans.collect { plan ->
-          renderChartTypeSelector(viewModel.updateFeatureInitializationPlan(plan))
-          updateProgressIndicator()
-
-          if (plan.shouldRefreshData && this@ChartFragment::allLCItemsStateFlow.isInitialized) {
-            setData(allLCItemsStateFlow.value)
-          }
-        }
+        viewModel.chartRenderRequests.collect(::renderChart)
+      }
+    }
+    lifecycleScope.launch {
+      lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
+        viewModel.loadingProgress.collect { updateProgressIndicator() }
       }
     }
     lifecycleScope.launch {
@@ -136,44 +119,11 @@ class ChartFragment :
         }
       }
     }
-    lifecycleScope.launch {
-      lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
-        viewModel.detailAbiSwitch.collect {
-          if (viewModel.currentChartType == ChartType.ABI && this@ChartFragment::allLCItemsStateFlow.isInitialized) {
-            setData(allLCItemsStateFlow.value)
-          }
-        }
-      }
-    }
   }
 
-  private fun renderChartTypeSelector(
-    selectorPlan: ChartTypeSelectorPlan = viewModel.createChartTypeSelectorPlan()
-  ) {
-    binding.featuresContainer.removeAllViews()
-    currentExpandingView = null
-
-    selectorPlan.visibleTypes.forEach { chartType ->
-      val view = ExpandingView(requireContext()).apply {
-        layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).also { lp ->
-          lp.setMargins(4.dp, 4.dp, 4.dp, 4.dp)
-        }
-        setContent(chartType.iconRes, getString(chartType.titleRes))
-        setOnClickListener {
-          if (viewModel.currentChartType == chartType || !this@ChartFragment::allLCItemsStateFlow.isInitialized) {
-            return@setOnClickListener
-          }
-          setData(allLCItemsStateFlow.value, chartType)
-          renderChartTypeSelector()
-        }
-      }
-
-      if (selectorPlan.selectedType == chartType) {
-        currentExpandingView = view
-        view.toggle()
-      }
-      binding.featuresContainer.addView(view)
-    }
+  override fun onDestroyView() {
+    dashboardVisibilityController.cancel()
+    super.onDestroyView()
   }
 
   private fun updateProgressIndicator() {
@@ -181,70 +131,49 @@ class ChartFragment :
     val previousPlan = currentProgressPlan
     currentProgressPlan = progressPlan
 
-    binding.progressHorizontal.let { indicator ->
-      if (!progressPlan.isVisible) {
-        if (previousPlan?.isVisible != false || indicator.isShown) {
-          indicator.isIndeterminate = false
-          indicator.setProgressCompat(progressPlan.progress, false)
-          indicator.jumpDrawablesToCurrentState()
-          indicator.hide()
-        }
-        return@let
-      }
+    dashboardVisibilityController.setVisible(
+      visible = !progressPlan.isVisible,
+      animate = previousPlan != null
+    )
+    binding.loadingContainer.isVisible = progressPlan.isVisible
+    binding.progressIndicator.let { indicator ->
+      if (!progressPlan.isVisible) return@let
 
-      val wasVisible = previousPlan?.isVisible == true
       if (previousPlan?.isIndeterminate != progressPlan.isIndeterminate) {
         indicator.isIndeterminate = progressPlan.isIndeterminate
       }
-
       if (progressPlan.isIndeterminate) {
-        if (previousPlan?.isIndeterminate != true && indicator.progress != 0) {
-          indicator.progress = 0
-        }
-      } else if (progressPlan.progress == 0) {
-        if (previousPlan?.progress != 0 || indicator.progress != 0) {
+        if (indicator.progress != 0) {
           indicator.progress = 0
         }
       } else if (
         previousPlan?.progress != progressPlan.progress ||
         previousPlan.isIndeterminateOrHidden()
       ) {
-        indicator.setProgressCompat(progressPlan.progress, wasVisible)
-      }
-
-      if (!wasVisible) {
-        indicator.show()
+        indicator.setProgressCompat(
+          progressPlan.progress,
+          previousPlan?.isVisible == true
+        )
       }
     }
   }
 
-  private fun setData(items: List<LCItem>, chartType: ChartType = viewModel.currentChartType) {
+  private fun renderChart(request: ChartRenderRequest) {
     context ?: return
-    val plan = viewModel.createChartDataSourcePlan(items, chartType)
-    val selectedChartType = viewModel.currentChartType
-    val requestKey = ChartRequestKey(
-      chartType = selectedChartType,
-      useDetailedAbiChart = selectedChartType == ChartType.ABI && viewModel.isDetailedAbiChart,
-      showSystemApps = viewModel.showSystemApps,
-      itemsHash = items.chartRequestHash(selectedChartType)
-    )
-    if (requestKey == currentChartRequestKey) {
-      return
-    }
+    val plan = viewModel.createChartDataSourcePlan(request)
     val canContinueLoadingProgress = currentChartRequestKey
-      ?.canContinueLoadingProgress(requestKey) == true
+      ?.canContinueLoadingProgress(request.key) == true
     val shouldResetLoadingProgress = !canContinueLoadingProgress || !viewModel.isChartLoading
-    currentChartRequestKey = requestKey
-
-    if (chartView.parent != null) {
-      binding.root.removeView(chartView)
-    }
+    currentChartRequestKey = request.key
 
     when (plan) {
       is ChartDataSourcePlan.Pie -> setChartData(::generatePieChartView, plan, shouldResetLoadingProgress)
       is ChartDataSourcePlan.Bar -> setChartData(::generateBarChartView, plan, shouldResetLoadingProgress)
     }
-    Telemetry.recordEvent(Constants.Event.CHART, mapOf(Telemetry.Param.ITEM_ID to selectedChartType))
+    Telemetry.recordEvent(
+      Constants.Event.CHART,
+      mapOf(Telemetry.Param.ITEM_ID to request.statistic.id)
+    )
   }
 
   private fun setChartData(
@@ -254,9 +183,15 @@ class ChartFragment :
   ) {
     val newChartView = generateChartView()
     viewModel.setLoadingProgress(plan.initialLoadingProgress, allowDecrease = shouldResetLoadingProgress)
-    chartDataRenderer.render(binding.root, chartView, newChartView, plan.dataSource)
-    chartView = newChartView
-    dataSource = plan.dataSource
+    val source = plan.dataSource
+    chartDataRenderer.render(
+      newChartView = newChartView,
+      fillChart = source::fillChartView
+    ) { committedChartView ->
+      chartView = committedChartView
+      dataSource = source
+      completeChartRender(source)
+    }
   }
 
   private fun setChartData(
@@ -266,9 +201,25 @@ class ChartFragment :
   ) {
     val newChartView = generateChartView()
     viewModel.setLoadingProgress(plan.initialLoadingProgress, allowDecrease = shouldResetLoadingProgress)
-    chartDataRenderer.render(binding.root, chartView, newChartView, plan.dataSource)
-    chartView = newChartView
-    dataSource = plan.dataSource
+    val source = plan.dataSource
+    chartDataRenderer.render(
+      newChartView = newChartView,
+      fillChart = source::fillChartView
+    ) { committedChartView ->
+      chartView = committedChartView
+      dataSource = source
+      completeChartRender(source)
+    }
+  }
+
+  private fun completeChartRender(source: IChartDataSource<*>) {
+    if (source is MarketDistributionChartDataSource) {
+      viewModel.setDistributionLastUpdateTime(source.lastUpdateTime)
+    }
+    applyDashboardView()
+    if (source.getData().isNotEmpty()) {
+      viewModel.setLoadingProgress(LOADING_PROGRESS_MAX)
+    }
   }
 
   override fun onNothingSelected() {
@@ -289,9 +240,9 @@ class ChartFragment :
     val colorOnSurface =
       requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
     return PieChart(requireContext()).apply {
-      layoutParams = LinearLayout.LayoutParams(
-        LinearLayout.LayoutParams.MATCH_PARENT,
-        LinearLayout.LayoutParams.MATCH_PARENT
+      layoutParams = FrameLayout.LayoutParams(
+        FrameLayout.LayoutParams.MATCH_PARENT,
+        FrameLayout.LayoutParams.MATCH_PARENT
       )
       dragDecelerationFrictionCoef = 0.95f
       description.isEnabled = false
@@ -320,9 +271,9 @@ class ChartFragment :
     val colorOnSurface =
       requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
     return HorizontalBarChart(requireContext()).apply {
-      layoutParams = LinearLayout.LayoutParams(
-        LinearLayout.LayoutParams.MATCH_PARENT,
-        LinearLayout.LayoutParams.MATCH_PARENT
+      layoutParams = FrameLayout.LayoutParams(
+        FrameLayout.LayoutParams.MATCH_PARENT,
+        FrameLayout.LayoutParams.MATCH_PARENT
       )
       description.isEnabled = false
       legend.isEnabled = false
@@ -364,7 +315,7 @@ class ChartFragment :
 
   private fun applyDashboardView() {
     binding.dashboardContainer.removeAllViews()
-    if (viewModel.currentChartType == ChartType.MARKET_DISTRIBUTION) {
+    if (viewModel.currentStatistic?.dashboard == StatisticDashboard.ANDROID_DISTRIBUTION) {
       val view = MarketDistributionDashboardView(requireContext()).apply {
         layoutParams = ViewGroup.LayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT,
@@ -389,9 +340,17 @@ class ChartFragment :
               ViewGroup.LayoutParams.WRAP_CONTENT
             )
             container.apply {
-              icon.load(value.iconRes) {
-                if (value.isGrayIcon) {
-                  transformations(SaturationTransformation(0f))
+              if (value.statisticIcon != null) {
+                icon.loadStatisticIcon(
+                  icon = value.statisticIcon,
+                  selected = false,
+                  grayscale = value.isGrayIcon
+                )
+              } else {
+                icon.load(value.iconRes) {
+                  if (value.isGrayIcon) {
+                    transformations(SaturationTransformation(0f))
+                  }
                 }
               }
               labelName.text = it.getLabelByXValue(context, key)
@@ -416,10 +375,17 @@ class ChartFragment :
     }
 
     val source = dataSource ?: return
-    val title = source.getLabelByXValue(requireContext(), x)
+    val itemLabel = source.getLabelByXValue(requireContext(), x)
+    val hasAndroidVersionSubtitle = source is IAndroidSDKChart
+    val title = if (!hasAndroidVersionSubtitle) {
+      viewModel.currentStatistic?.title?.resolve(requireContext()) ?: itemLabel
+    } else {
+      itemLabel
+    }
+    val subtitle = itemLabel.takeIf { !hasAndroidVersionSubtitle }
 
     showClassifyDialogJob = lifecycleScope.launch {
-      val state = viewModel.buildClassifyDialogState(source, x, title)
+      val state = viewModel.buildClassifyDialogState(source, x, title, subtitle)
       val hostActivity = activity
       if (!isAdded || hostActivity == null || dialog != null) {
         return@launch
@@ -450,56 +416,6 @@ class ChartFragment :
     }
     return getString(R.string.android_dist_subtitle_format, time) + System.lineSeparator() + "API ${Build.VERSION.SDK_INT} (Android $androidVersion)"
   }
-}
-
-private data class ChartRequestKey(
-  val chartType: ChartType,
-  val useDetailedAbiChart: Boolean,
-  val showSystemApps: Boolean,
-  val itemsHash: Int
-) {
-  fun canContinueLoadingProgress(other: ChartRequestKey): Boolean {
-    return chartType == other.chartType &&
-      useDetailedAbiChart == other.useDetailedAbiChart &&
-      showSystemApps == other.showSystemApps
-  }
-}
-
-private fun List<LCItem>.chartRequestHash(chartType: ChartType): Int {
-  return fold(1) { result, item ->
-    31 * result + item.chartRequestHash(chartType)
-  }
-}
-
-private fun LCItem.chartRequestHash(chartType: ChartType): Int {
-  if (chartType == ChartType.SUPPORT_16KB) {
-    return chart16KBRequestHash()
-  }
-  return fullChartRequestHash(includeFeatures = chartType.requiresFeatureInitialization)
-}
-
-private fun LCItem.chart16KBRequestHash(): Int {
-  var result = packageName.hashCode()
-  result = 31 * result + isSystem.hashCode()
-  result = 31 * result + abi.hashCode()
-  result = 31 * result + versionCode.hashCode()
-  result = 31 * result + lastUpdatedTime.hashCode()
-  return result
-}
-
-private fun LCItem.fullChartRequestHash(includeFeatures: Boolean): Int {
-  var result = packageName.hashCode()
-  result = 31 * result + label.hashCode()
-  result = 31 * result + versionName.hashCode()
-  result = 31 * result + versionCode.hashCode()
-  result = 31 * result + installedTime.hashCode()
-  result = 31 * result + lastUpdatedTime.hashCode()
-  result = 31 * result + isSystem.hashCode()
-  result = 31 * result + abi.hashCode()
-  result = 31 * result + if (includeFeatures) features else 0
-  result = 31 * result + targetApi.hashCode()
-  result = 31 * result + variant.hashCode()
-  return result
 }
 
 private fun ChartProgressPlan?.isIndeterminateOrHidden(): Boolean {

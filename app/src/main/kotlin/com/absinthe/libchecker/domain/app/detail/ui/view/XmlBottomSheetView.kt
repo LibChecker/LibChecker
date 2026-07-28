@@ -33,7 +33,6 @@ class XmlBottomSheetView(context: Context) :
     isVerticalScrollBarEnabled = false
     clipToPadding = false
     clipChildren = false
-    isNestedScrollingEnabled = false
   }
 
   init {

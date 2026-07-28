@@ -78,13 +78,10 @@ class LocalAppDataSource : AppDataSource {
 
   private fun loadApplications(): List<PackageInfo> {
     Timber.d("loadApplications start")
-    val list = PackageManagerCompat.getInstalledPackages(getInstalledPackageFlags())
+    val flags = if (OsUtils.atLeastV()) PackageManager.MATCH_ARCHIVED_PACKAGES else 0L
+    val list = PackageManagerCompat.getInstalledPackages(flags)
     Timber.d("loadApplications end, apps count: ${list.size}")
     return list
-  }
-
-  private fun getInstalledPackageFlags(): Long {
-    return if (OsUtils.atLeastV()) PackageManager.MATCH_ARCHIVED_PACKAGES else 0L
   }
 
   private fun loadPackageInfo(packageName: String): PackageInfo? {

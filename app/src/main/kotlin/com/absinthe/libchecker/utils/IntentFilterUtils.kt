@@ -33,9 +33,8 @@ object IntentFilterUtils {
   fun parseComponentsFromApk(apkPath: String): List<ParsedComponent> {
     return runCatching {
       parseComponentsFromManifest(apkPath)
-    }.onFailure {
-      logParseFailure("manifest", apkPath, it)
     }.getOrElse {
+      logParseFailure("manifest", apkPath, it)
       parseComponentsWithPackageParser(apkPath)
     }
   }

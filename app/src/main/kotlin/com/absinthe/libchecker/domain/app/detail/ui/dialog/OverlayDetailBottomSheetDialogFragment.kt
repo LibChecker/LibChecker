@@ -38,16 +38,12 @@ class OverlayDetailBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment
         }
 
         is OverlayDetailBottomSheetResult.Available -> {
-          root.bind(result.display, ::handleAction)
+          root.bind(result.display) { action ->
+            when (action) {
+              is OverlayDetailAction.OpenApp -> activity?.launchDetailPage(action.item, forceDetail = action.forceDetail)
+            }
+          }
         }
-      }
-    }
-  }
-
-  private fun handleAction(action: OverlayDetailAction) {
-    when (action) {
-      is OverlayDetailAction.OpenApp -> {
-        activity?.launchDetailPage(action.item, forceDetail = action.forceDetail)
       }
     }
   }

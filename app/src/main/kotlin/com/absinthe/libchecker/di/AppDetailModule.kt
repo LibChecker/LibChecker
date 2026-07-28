@@ -6,75 +6,31 @@ import com.absinthe.libchecker.api.request.RulesDocumentRequest
 import com.absinthe.libchecker.data.app.GlobalAppDetailSettingsRepository
 import com.absinthe.libchecker.data.app.RemoteLibraryDetailRepository
 import com.absinthe.libchecker.data.app.insight.RemoteLibraryInsightRepository
-import com.absinthe.libchecker.domain.app.detail.abi.BuildAppDetailAbiLabelDataUseCase
-import com.absinthe.libchecker.domain.app.detail.abi.GetAppDetailAbiUseCase
 import com.absinthe.libchecker.domain.app.detail.action.AllowFileUriExposureUseCase
-import com.absinthe.libchecker.domain.app.detail.action.BuildAppInstallSourceBottomSheetDisplayUseCase
-import com.absinthe.libchecker.domain.app.detail.action.BuildDetailItemDialogRequestUseCase
-import com.absinthe.libchecker.domain.app.detail.action.BuildDetailItemLongClickActionsUseCase
-import com.absinthe.libchecker.domain.app.detail.action.BuildSignatureDetailItemsUseCase
-import com.absinthe.libchecker.domain.app.detail.action.BuildXposedInfoBottomSheetDisplayUseCase
+import com.absinthe.libchecker.domain.app.detail.action.DetailAppInfoResolver
+import com.absinthe.libchecker.domain.app.detail.action.DetailItemResolver
 import com.absinthe.libchecker.domain.app.detail.action.ExportAppPackageShareFileUseCase
 import com.absinthe.libchecker.domain.app.detail.action.ExtractNativeLibraryUseCase
-import com.absinthe.libchecker.domain.app.detail.action.GetAlternativeLaunchItemsUseCase
-import com.absinthe.libchecker.domain.app.detail.action.GetAppInfoActionsUseCase
-import com.absinthe.libchecker.domain.app.detail.action.GetAppInfoPrimaryActionsUseCase
-import com.absinthe.libchecker.domain.app.detail.action.GetAppInstallSourceDetailsUseCase
-import com.absinthe.libchecker.domain.app.detail.action.GetAppLaunchActionUseCase
-import com.absinthe.libchecker.domain.app.detail.action.GetAppManifestPropertiesUseCase
-import com.absinthe.libchecker.domain.app.detail.action.GetElfDetailUseCase
-import com.absinthe.libchecker.domain.app.detail.action.GetLibraryDetailDialogDataUseCase
-import com.absinthe.libchecker.domain.app.detail.action.GetLibraryDetailUseCase
-import com.absinthe.libchecker.domain.app.detail.action.GetOverlayDetailUseCase
-import com.absinthe.libchecker.domain.app.detail.action.GetPermissionDetailUseCase
-import com.absinthe.libchecker.domain.app.detail.action.GetPermissionProvidersUseCase
-import com.absinthe.libchecker.domain.app.detail.action.GetXposedModuleInfoUseCase
 import com.absinthe.libchecker.domain.app.detail.action.PrepareAppPackageShareActionUseCase
 import com.absinthe.libchecker.domain.app.detail.action.PrepareAppPackageShareFileUseCase
-import com.absinthe.libchecker.domain.app.detail.content.BuildAppBundleItemDisplayDataUseCase
-import com.absinthe.libchecker.domain.app.detail.content.BuildAppDetailContentInitPlanUseCase
-import com.absinthe.libchecker.domain.app.detail.content.BuildAppDetailTabTypesUseCase
-import com.absinthe.libchecker.domain.app.detail.content.BuildDetailProcessFilterDataUseCase
-import com.absinthe.libchecker.domain.app.detail.content.BuildNativeLibraryItemDisplayDataUseCase
-import com.absinthe.libchecker.domain.app.detail.content.FilterAppDetailItemsUseCase
-import com.absinthe.libchecker.domain.app.detail.content.GetAppBundleItemsUseCase
-import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailAbilityChipsUseCase
-import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailComponentChipsUseCase
-import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailComponentsUseCase
-import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailDexChipsUseCase
-import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailMetadataChipsUseCase
-import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailNativeLibrariesUseCase
-import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailPermissionChipsUseCase
-import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailSignatureChipsUseCase
-import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailStaticLibraryChipsUseCase
-import com.absinthe.libchecker.domain.app.detail.content.GetAppDetailStaticLibraryTabItemsUseCase
-import com.absinthe.libchecker.domain.app.detail.content.SortAppDetailItemsUseCase
+import com.absinthe.libchecker.domain.app.detail.content.DetailContentResolver
 import com.absinthe.libchecker.domain.app.detail.feature.BuildAppDetailFeatureItemUseCase
 import com.absinthe.libchecker.domain.app.detail.feature.GetAppDetailFeaturesUseCase
-import com.absinthe.libchecker.domain.app.detail.header.BuildAppDetailHeaderExtraInfoUseCase
-import com.absinthe.libchecker.domain.app.detail.header.BuildAppDetailHeaderTitleDataUseCase
 import com.absinthe.libchecker.domain.app.detail.insight.LibraryInsightDefinitionValidator
 import com.absinthe.libchecker.domain.app.detail.insight.LibraryInsightProbeEngine
 import com.absinthe.libchecker.domain.app.detail.insight.LibraryInsightRepository
 import com.absinthe.libchecker.domain.app.detail.insight.ResolveLibraryInsightUseCase
-import com.absinthe.libchecker.domain.app.detail.navigation.BuildDetailReferenceNavigationUseCase
 import com.absinthe.libchecker.domain.app.detail.packageinfo.GetAppDetailPackageSizeUseCase
 import com.absinthe.libchecker.domain.app.detail.packageinfo.GetAppDetailPackageUseCase
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailActionLoader
-import com.absinthe.libchecker.domain.app.detail.presentation.DetailFeatureLoader
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailFilterController
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailPackageLoader
+import com.absinthe.libchecker.domain.app.detail.presentation.DetailPresentationLoader
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
 import com.absinthe.libchecker.domain.app.detail.presentation.LibraryInsightViewModel
-import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailChipContentLoader
-import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailComponentContentLoader
 import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailContentLoader
-import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailNativeLibContentLoader
-import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailPermissionContentLoader
-import com.absinthe.libchecker.domain.app.detail.related.BuildRelatedAppDisplayDataUseCase
-import com.absinthe.libchecker.domain.app.detail.related.GetRelatedAppDisplayDataUseCase
 import com.absinthe.libchecker.domain.app.detail.resource.ResolveAppResourceValueUseCase
-import com.absinthe.libchecker.domain.app.packageinfo.GetApkPreviewInfoUseCase
+import com.absinthe.libchecker.domain.app.detail.statistics.AnalyzeAppStatisticRulesUseCase
 import com.absinthe.libchecker.domain.app.packageinfo.GetArchivePackageInfoUseCase
 import com.absinthe.libchecker.domain.app.packageinfo.GetInstalledAppComparisonPackageUseCase
 import com.absinthe.libchecker.domain.app.packageinfo.PrepareApkAnalysisPackageUseCase
@@ -91,150 +47,59 @@ val appDetailModule = module {
     RemoteLibraryInsightRepository(ApiManager.create<RulesDocumentRequest>())
   }
   single { AllowFileUriExposureUseCase() }
-  factory { BuildAppDetailContentInitPlanUseCase() }
-  factory { BuildAppDetailTabTypesUseCase() }
-  factory { BuildDetailProcessFilterDataUseCase() }
-  factory { FilterAppDetailItemsUseCase() }
-  factory { GetAlternativeLaunchItemsUseCase(androidContext().packageManager, get()) }
-  factory { BuildAppBundleItemDisplayDataUseCase(androidContext()) }
-  factory { GetAppBundleItemsUseCase() }
-  factory { GetAppDetailAbiUseCase() }
-  factory { GetAppDetailAbilityChipsUseCase(androidContext()) }
-  factory { GetAppDetailComponentsUseCase(get()) }
-  factory { GetAppDetailComponentChipsUseCase(get()) }
-  factory { GetAppDetailDexChipsUseCase() }
+  factory { DetailAppInfoResolver(androidContext(), BuildConfig.APPLICATION_ID, get(), get(), get()) }
+  factory { DetailItemResolver(androidContext().packageManager, get(), get()) }
+  factory { DetailContentResolver(androidContext(), get()) }
   factory { GetAppDetailFeaturesUseCase(get(), get()) }
   factory { LibraryInsightDefinitionValidator() }
   factory { LibraryInsightProbeEngine() }
   factory { ResolveLibraryInsightUseCase(get(), get(), get()) }
-  factory {
-    GetAppInfoActionsUseCase(BuildConfig.APPLICATION_ID, androidContext().packageManager, get(), get())
-  }
-  factory { GetAppInstallSourceDetailsUseCase(androidContext(), get()) }
-  factory { GetAppLaunchActionUseCase() }
-  factory { GetAppInfoPrimaryActionsUseCase(BuildConfig.APPLICATION_ID, get()) }
-  factory { GetAppDetailMetadataChipsUseCase(androidContext().packageManager) }
-  factory { GetAppDetailNativeLibrariesUseCase(get(), get()) }
-  factory { GetAppDetailStaticLibraryChipsUseCase() }
   factory { GetAppDetailPackageUseCase(get()) }
-  factory { GetAppDetailPackageSizeUseCase(get()) }
+  factory { GetAppDetailPackageSizeUseCase() }
   factory { ExtractNativeLibraryUseCase(androidContext(), BuildConfig.APPLICATION_ID) }
-  factory { GetAppDetailPermissionChipsUseCase() }
-  factory { GetAppDetailSignatureChipsUseCase(androidContext(), get()) }
   factory { PrepareAppPackageShareFileUseCase(androidContext(), BuildConfig.APPLICATION_ID, get()) }
   factory { PrepareAppPackageShareActionUseCase(get()) }
   factory { ExportAppPackageShareFileUseCase(androidContext().contentResolver) }
   factory { ResolveAppResourceValueUseCase(androidContext().packageManager) }
-  factory { GetApkPreviewInfoUseCase() }
-  factory { BuildAppDetailAbiLabelDataUseCase(androidContext()) }
   factory { BuildAppDetailFeatureItemUseCase() }
-  factory { BuildAppDetailHeaderExtraInfoUseCase(androidContext(), get()) }
-  factory { BuildAppDetailHeaderTitleDataUseCase(androidContext(), get()) }
-  factory { BuildNativeLibraryItemDisplayDataUseCase(androidContext()) }
-  factory { BuildRelatedAppDisplayDataUseCase(androidContext(), get()) }
-  factory { BuildAppInstallSourceBottomSheetDisplayUseCase(androidContext()) }
-  factory { BuildDetailItemDialogRequestUseCase() }
-  factory { BuildDetailItemLongClickActionsUseCase() }
-  factory { BuildXposedInfoBottomSheetDisplayUseCase(androidContext()) }
-  factory { GetPermissionProvidersUseCase(get()) }
-  factory { BuildDetailReferenceNavigationUseCase() }
-  factory { BuildSignatureDetailItemsUseCase() }
-  factory { GetAppManifestPropertiesUseCase(androidContext().packageManager) }
   factory { GetArchivePackageInfoUseCase() }
   factory { PrepareApkAnalysisPackageUseCase(androidContext().contentResolver, get()) }
-  factory { GetElfDetailUseCase(get()) }
   factory { GetInstalledAppComparisonPackageUseCase(get()) }
-  factory { GetLibraryDetailUseCase(get()) }
-  factory { GetLibraryDetailDialogDataUseCase(get()) }
-  factory { GetOverlayDetailUseCase(androidContext(), get()) }
-  factory { GetPermissionDetailUseCase(androidContext().packageManager, get()) }
-  factory { GetRelatedAppDisplayDataUseCase(get(), get()) }
-  factory { GetXposedModuleInfoUseCase(androidContext().packageManager, get()) }
-  factory { GetAppDetailStaticLibraryTabItemsUseCase(get(), get()) }
-  factory { SortAppDetailItemsUseCase() }
+  factory { AnalyzeAppStatisticRulesUseCase(get(), get()) }
   factory {
     DetailActionLoader(
-      getAlternativeLaunchItemsUseCase = get(),
-      getAppBundleItemsUseCase = get(),
-      buildAppBundleItemDisplayDataUseCase = get(),
-      getAppInfoActionsUseCase = get(),
-      getAppInfoPrimaryActionsUseCase = get(),
-      getAppInstallSourceDetailsUseCase = get(),
-      buildAppInstallSourceBottomSheetDisplayUseCase = get(),
-      getAppLaunchActionUseCase = get(),
-      getAppManifestPropertiesUseCase = get(),
-      getElfDetailUseCase = get(),
-      getLibraryDetailDialogDataUseCase = get(),
-      getOverlayDetailUseCase = get(),
-      getPermissionDetailUseCase = get(),
-      getRelatedAppDisplayDataUseCase = get(),
-      getXposedModuleInfoUseCase = get(),
-      buildXposedInfoBottomSheetDisplayUseCase = get(),
-      buildDetailItemDialogRequestUseCase = get(),
-      buildDetailItemLongClickActionsUseCase = get(),
-      buildSignatureDetailItemsUseCase = get(),
+      context = androidContext(),
+      installedAppRepository = get(),
+      appInfoResolver = get(),
+      itemResolver = get(),
       extractNativeLibraryUseCase = get(),
       prepareAppPackageShareActionUseCase = get(),
-      exportAppPackageShareFileUseCase = get(),
-      buildDetailReferenceNavigationUseCase = get()
-    )
-  }
-  factory {
-    DetailChipContentLoader(
-      getAppDetailDexChipsUseCase = get(),
-      getAppDetailMetadataChipsUseCase = get(),
-      getAppDetailSignatureChipsUseCase = get(),
-      getAppDetailStaticLibraryChipsUseCase = get()
-    )
-  }
-  factory {
-    DetailComponentContentLoader(
-      getAppDetailComponentChipsUseCase = get()
-    )
-  }
-  factory {
-    DetailNativeLibContentLoader(
-      getAppDetailNativeLibrariesUseCase = get()
-    )
-  }
-  factory {
-    DetailPermissionContentLoader(
-      getAppDetailPermissionChipsUseCase = get()
+      exportAppPackageShareFileUseCase = get()
     )
   }
   factory {
     DetailContentLoader(
-      getAppDetailAbilityChipsUseCase = get(),
-      getAppDetailStaticLibraryTabItemsUseCase = get(),
-      detailChipContentLoader = get(),
-      detailComponentContentLoader = get(),
-      detailNativeLibContentLoader = get(),
-      detailPermissionContentLoader = get(),
+      contentResolver = get(),
       appDetailSettingsRepository = get()
     )
   }
   factory {
     DetailFilterController(
-      filterAppDetailItemsUseCase = get(),
-      sortAppDetailItemsUseCase = get(),
-      buildDetailProcessFilterDataUseCase = get(),
       appDetailSettingsRepository = get()
     )
   }
   factory {
-    DetailFeatureLoader(
-      getAppDetailAbiUseCase = get(),
+    DetailPresentationLoader(
+      context = androidContext(),
+      installedAppRepository = get(),
+      getAppDetailPackageSize = get(),
       getAppDetailFeaturesUseCase = get(),
-      buildAppDetailAbiLabelDataUseCase = get(),
-      buildAppDetailHeaderExtraInfoUseCase = get(),
-      buildAppDetailHeaderTitleDataUseCase = get(),
       buildAppDetailFeatureItemUseCase = get()
     )
   }
   factory {
     DetailPackageLoader(
       getAppDetailPackage = get(),
-      getApkPreviewInfoUseCase = get(),
       prepareApkAnalysisPackageUseCase = get(),
       getInstalledAppComparisonPackageUseCase = get(),
       buildPackageComparisonSnapshotItemUseCase = get()
@@ -245,8 +110,9 @@ val appDetailModule = module {
       detailActionLoader = get(),
       detailContentLoader = get(),
       detailFilterController = get(),
-      detailFeatureLoader = get(),
-      detailPackageLoader = get()
+      detailPresentationLoader = get(),
+      detailPackageLoader = get(),
+      analyzeAppStatisticRules = get()
     )
   }
   viewModel { LibraryInsightViewModel(get()) }

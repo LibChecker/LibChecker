@@ -22,16 +22,29 @@ data class SnapshotDiffItem(
   val permissionsDiff: DiffNode<String>,
   val metadataDiff: DiffNode<String>,
   val packageSizeDiff: DiffNode<Long>,
+  val dexInfoDiff: DiffNode<String> = DiffNode(""),
+  val resourcesSizeDiff: DiffNode<Long> = DiffNode(0L),
+  val resourceInfoDiff: DiffNode<String> = DiffNode(""),
   var added: Int = 0,
   var removed: Int = 0,
   var changed: Int = 0,
   var moved: Int = 0,
   var newInstalled: Boolean = false,
   var deleted: Boolean = false,
-  var isTrackItem: Boolean = false
+  var isTrackItem: Boolean = false,
+  val archivedDiff: DiffNode<Boolean> = DiffNode(false)
 ) : Serializable {
   @JsonClass(generateAdapter = true)
-  data class DiffNode<T>(val old: T, val new: T? = null) : Serializable
+  data class DiffNode<T>(val old: T, val new: T? = null) : Serializable {
+    private companion object {
+      const val serialVersionUID = 1L
+    }
+  }
 
-  fun isNothingChanged() = added == 0 && removed == 0 && changed == 0 && moved == 0
+  fun isNothingChanged() = added == 0 && removed == 0 && changed == 0 && moved == 0 &&
+    (archivedDiff.new == null || archivedDiff.new == archivedDiff.old)
+
+  private companion object {
+    const val serialVersionUID = 1L
+  }
 }

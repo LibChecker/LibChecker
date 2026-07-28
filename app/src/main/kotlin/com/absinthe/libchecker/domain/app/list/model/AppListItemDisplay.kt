@@ -1,9 +1,12 @@
 package com.absinthe.libchecker.domain.app.list.model
 
+import android.content.pm.PackageInfo
+
 data class AppListItemDisplay(
   val icon: AppListItemIconDisplay,
   val identity: AppListItemIdentityText,
-  val metadata: AppListItemMetadataDisplay
+  val metadata: AppListItemMetadataDisplay,
+  val chips: List<String> = emptyList()
 ) {
 
   companion object {
@@ -11,10 +14,12 @@ data class AppListItemDisplay(
       label: String,
       packageName: String,
       viewState: AppListItemViewState,
-      showMissingPackageStrikeThrough: Boolean
+      iconPackageInfo: PackageInfo? = viewState.packageInfo,
+      showMissingPackageStrikeThrough: Boolean,
+      chips: List<String> = emptyList()
     ): AppListItemDisplay {
       return AppListItemDisplay(
-        icon = AppListItemIconDisplay.create(packageName, viewState.packageInfo),
+        icon = AppListItemIconDisplay.create(packageName, iconPackageInfo),
         identity = AppListItemIdentityText.create(
           label = label,
           packageName = packageName,
@@ -22,7 +27,8 @@ data class AppListItemDisplay(
           accessibilityAbiInfo = viewState.accessibilityAbiInfo,
           showMissingPackageStrikeThrough = showMissingPackageStrikeThrough
         ),
-        metadata = AppListItemMetadataDisplay.create(viewState)
+        metadata = AppListItemMetadataDisplay.create(viewState),
+        chips = chips
       )
     }
   }

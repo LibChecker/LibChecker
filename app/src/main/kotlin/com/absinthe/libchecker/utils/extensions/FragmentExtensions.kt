@@ -3,24 +3,18 @@ package com.absinthe.libchecker.utils.extensions
 import android.os.Bundle
 import android.os.Parcelable
 import androidx.annotation.MainThread
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import java.io.Serializable
 
 @MainThread
-fun <T : Fragment> T.putArguments(bundle: Bundle): T {
-  arguments = bundle
-  return this
-}
-
-@MainThread
-fun <T : Fragment> T.putArguments(vararg pairs: Pair<String, Any?>): T = putArguments(
-  Bundle(pairs.size).apply {
+fun <T : Fragment> T.putArguments(vararg pairs: Pair<String, Any?>): T {
+  arguments = Bundle(pairs.size).apply {
     pairs.forEach { (key, value) ->
       putValue(key, value)
     }
   }
-)
+  return this
+}
 
 private fun Bundle.putValue(key: String, value: Any?) {
   when (value) {
@@ -51,5 +45,3 @@ private fun Bundle.putArrayList(key: String, value: ArrayList<*>) {
     else -> putSerializable(key, value)
   }
 }
-
-fun DialogFragment.isShowing() = this.dialog?.isShowing == true && !this.isRemoving

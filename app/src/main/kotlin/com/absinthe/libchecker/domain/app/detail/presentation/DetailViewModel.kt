@@ -24,22 +24,23 @@ import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
 import com.absinthe.libchecker.domain.app.detail.navigation.DetailReferenceNavigation
 import com.absinthe.libchecker.domain.app.detail.packageinfo.GetAppDetailPackageUseCase
-import com.absinthe.libchecker.domain.app.detail.presentation.DetailActionLoader
-import com.absinthe.libchecker.domain.app.detail.presentation.DetailFeatureLoader
-import com.absinthe.libchecker.domain.app.detail.presentation.DetailFilterController
-import com.absinthe.libchecker.domain.app.detail.presentation.DetailPackageLoader
-import com.absinthe.libchecker.domain.app.detail.presentation.DetailPackageState
 import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailContentLoader
+import com.absinthe.libchecker.domain.app.detail.statistics.AnalyzeAppStatisticRulesUseCase
+import com.absinthe.libchecker.domain.app.detail.statistics.AppStatisticAnalysisState
 import com.absinthe.libchecker.domain.app.model.VersionedFeature
 import com.absinthe.libchecker.domain.app.packageinfo.PrepareApkAnalysisPackageUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
 import java.io.File
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -48,11 +49,12 @@ class DetailViewModel(
   private val detailActionLoader: DetailActionLoader,
   private val detailContentLoader: DetailContentLoader,
   private val detailFilterController: DetailFilterController,
-  private val detailFeatureLoader: DetailFeatureLoader,
-  private val detailPackageLoader: DetailPackageLoader
+  private val detailPresentationLoader: DetailPresentationLoader,
+  private val detailPackageLoader: DetailPackageLoader,
+  private val analyzeAppStatisticRules: AnalyzeAppStatisticRulesUseCase
 ) : ViewModel() {
   val contentState = detailContentLoader.contentState
-  val featureState = detailFeatureLoader.featureState
+  val featureState = detailPresentationLoader.featureState
   val filterState = detailFilterController.filterState
   private val _packageLoadResults = MutableSharedFlow<PackageLoadResult>()
   val packageLoadResults: SharedFlow<PackageLoadResult> = _packageLoadResults.asSharedFlow()
@@ -63,8 +65,6 @@ class DetailViewModel(
   private val _appInstallSourceDetailsResults = MutableSharedFlow<AppInstallSourceDetailsResult>()
   val appInstallSourceDetailsResults: SharedFlow<AppInstallSourceDetailsResult> =
     _appInstallSourceDetailsResults.asSharedFlow()
-  private val _appLaunchActionResults = MutableSharedFlow<AppLaunchActionResult>()
-  val appLaunchActionResults: SharedFlow<AppLaunchActionResult> = _appLaunchActionResults.asSharedFlow()
   private val _appPackageShareActionResults = MutableSharedFlow<AppPackageShareActionResult>()
   val appPackageShareActionResults: SharedFlow<AppPackageShareActionResult> =
     _appPackageShareActionResults.asSharedFlow()
@@ -76,40 +76,49 @@ class DetailViewModel(
     _nativeLibraryExtractionResults.asSharedFlow()
   private val _elfDetailResults = MutableSharedFlow<ElfDetailResult>()
   val elfDetailResults: SharedFlow<ElfDetailResult> = _elfDetailResults.asSharedFlow()
+  private val _appStatisticAnalysisState = MutableStateFlow<AppStatisticAnalysisState>(
+    AppStatisticAnalysisState.Idle
+  )
+  val appStatisticAnalysisState: StateFlow<AppStatisticAnalysisState> =
+    _appStatisticAnalysisState.asStateFlow()
+  private val _onlineStatisticRulesAvailable = MutableStateFlow(false)
+  val onlineStatisticRulesAvailable: StateFlow<Boolean> =
+    _onlineStatisticRulesAvailable.asStateFlow()
   private var packageLoadJob: Job? = null
   private var apkAnalysisPackageJob: Job? = null
   private var apkPreviewJob: Job? = null
   private var appInstallSourceDetailsJob: Job? = null
-  private var appLaunchActionJob: Job? = null
   private var appPackageShareActionJob: Job? = null
   private var appPackageShareExportJob: Job? = null
   private var nativeLibraryExtractionJob: Job? = null
   private var elfDetailJob: Job? = null
+  private var appStatisticAnalysisJob: Job? = null
+  private var onlineStatisticRulesAvailabilityJob: Job? = null
   private val packageState: DetailPackageState
     get() = detailPackageLoader.packageState
 
   val isApk: Boolean
-    get() = detailPackageLoader.isApk
+    get() = packageState.isApk
 
   val isApkPreview: Boolean
-    get() = detailPackageLoader.isApkPreview
+    get() = packageState.isApkPreview
 
   val packageInfo: PackageInfo
-    get() = detailPackageLoader.packageInfo
+    get() = packageState.packageInfo
 
   val apkPreviewInfo: ApkPreviewInfo?
-    get() = detailPackageLoader.apkPreviewInfo
+    get() = packageState.apkPreviewInfo
 
-  val packageInfoStateFlow = detailPackageLoader.packageInfoStateFlow
+  val packageInfoStateFlow = packageState.packageInfoStateFlow
 
-  fun packageName(): String = detailPackageLoader.packageName()
+  fun packageName(): String = packageState.packageName()
 
   fun initPackageInfo(pi: PackageInfo) {
-    detailPackageLoader.initPackageInfo(pi)
+    packageState.setPackageInfo(pi)
   }
 
   fun isPackageInfoAvailable(): Boolean {
-    return detailPackageLoader.isPackageInfoAvailable()
+    return packageState.hasPackageInfo()
   }
 
   fun loadAppDetailPackage(packageName: String) {
@@ -132,8 +141,8 @@ class DetailViewModel(
   fun loadApkAnalysisPackage(cacheDir: File, uri: Uri) {
     apkAnalysisPackageJob?.cancel()
     apkPreviewJob?.cancel()
-    detailPackageLoader.startApkMode()
-    detailPackageLoader.clearApkPreviewInfo()
+    packageState.startApkMode()
+    packageState.clearApkPreviewInfo()
     apkAnalysisPackageJob = viewModelScope.launch {
       _apkAnalysisPackageResults.emit(
         ApkAnalysisPackageResult(
@@ -150,11 +159,11 @@ class DetailViewModel(
   fun loadApkPreview(url: String) {
     apkPreviewJob?.cancel()
     apkAnalysisPackageJob?.cancel()
-    detailPackageLoader.startApkPreviewMode()
-    detailPackageLoader.clearApkPreviewInfo()
+    packageState.startApkPreviewMode()
+    packageState.clearApkPreviewInfo()
     apkPreviewJob = viewModelScope.launch {
       val result = detailPackageLoader.getApkPreviewInfo(url)
-      result.getOrNull()?.let(detailPackageLoader::setApkPreviewInfo)
+      result.getOrNull()?.let { packageState.apkPreviewInfo = it }
       _apkPreviewResults.emit(ApkPreviewResult(url, result))
     }
   }
@@ -185,23 +194,6 @@ class DetailViewModel(
   data class AppInstallSourceDetailsResult(
     val packageName: String,
     val display: AppInstallSourceBottomSheetDisplay?
-  )
-
-  fun loadAppLaunchAction(packageName: String?) {
-    appLaunchActionJob?.cancel()
-    appLaunchActionJob = viewModelScope.launch {
-      _appLaunchActionResults.emit(
-        AppLaunchActionResult(
-          packageName = packageName,
-          action = detailActionLoader.getAppLaunchAction(packageName)
-        )
-      )
-    }
-  }
-
-  data class AppLaunchActionResult(
-    val packageName: String?,
-    val action: AppLaunchAction?
   )
 
   fun prepareAppPackageShareAction(
@@ -297,25 +289,73 @@ class DetailViewModel(
     val result: Result<AppElfDetail?>
   )
 
+  fun analyzeOnlineStatistics() {
+    if (!isPackageInfoAvailable()) return
+    appStatisticAnalysisJob?.cancel()
+    _appStatisticAnalysisState.value = AppStatisticAnalysisState.Loading(0)
+    val currentPackageInfo = packageInfo
+    appStatisticAnalysisJob = viewModelScope.launch(Dispatchers.IO) {
+      try {
+        val analyses = analyzeAppStatisticRules(currentPackageInfo) { progress ->
+          _appStatisticAnalysisState.value = AppStatisticAnalysisState.Loading(
+            progress.coerceIn(0, 100)
+          )
+        }
+        _appStatisticAnalysisState.value = if (analyses.isEmpty()) {
+          AppStatisticAnalysisState.Empty
+        } else {
+          AppStatisticAnalysisState.Results(analyses)
+        }
+      } catch (error: CancellationException) {
+        throw error
+      } catch (error: Throwable) {
+        Timber.e(error, "Unable to analyze online statistic rules")
+        _appStatisticAnalysisState.value = AppStatisticAnalysisState.Error
+      }
+    }
+  }
+
+  fun refreshOnlineStatisticRulesAvailability() {
+    onlineStatisticRulesAvailabilityJob?.cancel()
+    onlineStatisticRulesAvailabilityJob = viewModelScope.launch(Dispatchers.IO) {
+      _onlineStatisticRulesAvailable.value = try {
+        analyzeAppStatisticRules.hasSelectedRules()
+      } catch (error: CancellationException) {
+        throw error
+      } catch (error: Throwable) {
+        Timber.e(error, "Unable to check online statistic rule availability")
+        false
+      }
+    }
+  }
+
+  fun cancelOnlineStatisticAnalysis() {
+    appStatisticAnalysisJob?.cancel()
+    appStatisticAnalysisJob = null
+    if (_appStatisticAnalysisState.value is AppStatisticAnalysisState.Loading) {
+      _appStatisticAnalysisState.value = AppStatisticAnalysisState.Idle
+    }
+  }
+
   fun buildAppDetailAbiLabelData(
     abi: Int,
     abiSet: Collection<Int>,
     apkAnalyticsMode: Boolean
   ): AppDetailAbiLabelData {
-    return detailFeatureLoader.buildAppDetailAbiLabelData(abi, abiSet, apkAnalyticsMode)
+    return detailPresentationLoader.buildAppDetailAbiLabelData(abi, abiSet, apkAnalyticsMode)
   }
 
   suspend fun buildAppDetailHeaderExtraInfo(
     packageInfo: PackageInfo,
     showAndroidVersion: Boolean
   ): AppDetailHeaderExtraInfo {
-    return detailFeatureLoader.buildAppDetailHeaderExtraInfo(packageState, packageInfo, showAndroidVersion)
+    return detailPresentationLoader.buildAppDetailHeaderExtraInfo(packageState, packageInfo, showAndroidVersion)
   }
 
   fun buildAppDetailHeaderTitleData(
     packageInfo: PackageInfo,
     apkAnalyticsMode: Boolean
-  ) = detailFeatureLoader.buildAppDetailHeaderTitleData(packageState, packageInfo, apkAnalyticsMode)
+  ) = detailPresentationLoader.buildAppDetailHeaderTitleData(packageState, packageInfo, apkAnalyticsMode)
 
   fun buildAppDetailFeatureItem(
     feature: VersionedFeature,
@@ -324,7 +364,7 @@ class DetailViewModel(
     canShowInstallSource: Boolean,
     canShowAppIcons: Boolean
   ): AppDetailFeatureItemData? {
-    return detailFeatureLoader.buildAppDetailFeatureItem(
+    return detailPresentationLoader.buildAppDetailFeatureItem(
       feature = feature,
       currentFeatureCount = currentFeatureCount,
       apkAnalyticsMode = apkAnalyticsMode,
@@ -363,7 +403,7 @@ class DetailViewModel(
   }
 
   suspend fun emitStaticLibItems(items: List<LibStringItemChip>) {
-    detailContentLoader.emitStaticLibItems(items)
+    contentState.staticLibItems.emit(items)
   }
 
   suspend fun loadInstalledAppComparisonPackage(packageName: String): PackageInfo? {
@@ -379,9 +419,12 @@ class DetailViewModel(
 
   fun reset() {
     Timber.d("reset")
+    appStatisticAnalysisJob?.cancel()
+    appStatisticAnalysisJob = null
+    _appStatisticAnalysisState.value = AppStatisticAnalysisState.Idle
     detailContentLoader.reset()
-    detailFilterController.reset()
-    detailFeatureLoader.reset()
+    filterState.reset()
+    featureState.reset()
   }
 
   fun initSoAnalysisData() {
@@ -451,11 +494,15 @@ class DetailViewModel(
   }
 
   fun emitFeature(feature: VersionedFeature) {
-    detailFeatureLoader.emitFeature(viewModelScope, feature)
+    viewModelScope.launch {
+      featureState.emitFeature(feature)
+    }
   }
 
   fun setFeatureLoading(loading: Boolean) {
-    detailFeatureLoader.setLoading(viewModelScope, loading)
+    viewModelScope.launch {
+      featureState.setLoading(loading)
+    }
   }
 
   fun buildSignatureDetailItems(detail: String) = detailActionLoader.buildSignatureDetailItems(detail)
@@ -498,15 +545,15 @@ class DetailViewModel(
   }
 
   fun initFeatures(packageInfo: PackageInfo, features: Int) {
-    detailFeatureLoader.initFeatures(viewModelScope, packageState, packageInfo, features)
+    detailPresentationLoader.initFeatures(viewModelScope, packageState, packageInfo, features)
   }
 
   fun initAbiInfo(packageInfo: PackageInfo, apkAnalyticsMode: Boolean) {
-    detailFeatureLoader.initAbiInfo(viewModelScope, packageInfo, apkAnalyticsMode)
+    detailPresentationLoader.initAbiInfo(viewModelScope, packageInfo, apkAnalyticsMode)
   }
 
   fun initAbiInfo(apkPreviewInfo: ApkPreviewInfo) {
-    detailFeatureLoader.initAbiInfo(viewModelScope, apkPreviewInfo)
+    detailPresentationLoader.initAbiInfo(viewModelScope, apkPreviewInfo)
   }
 
   fun filterDetailItems(
@@ -561,10 +608,6 @@ class DetailViewModel(
     permissionNotGrantedLabel = permissionNotGrantedLabel,
     permissionNotGrantedColor = permissionNotGrantedColor
   )
-
-  fun isComponentDetailType(@LibType type: Int): Boolean {
-    return detailFilterController.isComponentDetailType(type)
-  }
 
   fun hasNonGrantedPermissions(@LibType type: Int): Boolean {
     return detailFilterController.hasNonGrantedPermissions(type, contentState.permissionsItems.value)

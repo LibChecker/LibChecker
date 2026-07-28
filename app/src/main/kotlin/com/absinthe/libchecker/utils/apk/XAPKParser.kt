@@ -9,7 +9,6 @@ import com.absinthe.libchecker.utils.extensions.use
 import com.absinthe.libchecker.utils.fromJson
 import java.io.File
 import okio.buffer
-import okio.sink
 import okio.source
 import timber.log.Timber
 
@@ -31,14 +30,15 @@ class XAPKParser(private val file: File, private val flags: Int = 0) {
       manifestIS.source().buffer().use {
         val json =
           it.readUtf8().fromJson<XAPKManifest>() ?: throw Exception("Failed to parse manifest.json")
-        val rootDir = dumpApks(zipFile, json)
-        val baseApkFile = File(rootDir, json.package_name + ".apk")
+        val apkFiles = dumpApks(zipFile, json)
+        val baseApkFile = apkFiles.firstOrNull { it.name == json.package_name + ".apk" }
+          ?: throw Exception("Failed to get base APK entry")
         return PackageManagerCompat.getPackageArchiveInfo(baseApkFile.path, flags)
           ?.also { pai ->
             pai.applicationInfo?.let { ai ->
               ai.sourceDir = baseApkFile.path
               ai.publicSourceDir = baseApkFile.path
-              ai.splitSourceDirs = rootDir.listFiles()!!
+              ai.splitSourceDirs = apkFiles
                 .filter { file -> file.name.startsWith("split_config.") }
                 .map { file -> file.path }
                 .toTypedArray()
@@ -48,21 +48,14 @@ class XAPKParser(private val file: File, private val flags: Int = 0) {
     }
   }
 
-  private fun dumpApks(zipFile: ZipFileCompat, json: XAPKManifest): File {
+  private fun dumpApks(zipFile: ZipFileCompat, json: XAPKManifest): List<File> {
     Timber.d("Dumping apks")
-    val rootDir = File(LibCheckerApp.app.requireAvailableCacheDir(), json.package_name)
-    rootDir.mkdirs()
-
-    json.split_apks.forEach { apkConfig ->
+    val entries = json.split_apks.map { apkConfig ->
       val entry =
         zipFile.getEntry(apkConfig.file) ?: throw Exception("Failed to get split entry")
-      zipFile.getInputStream(entry).source().buffer().use {
-        val file = File(rootDir, apkConfig.file.replace("config.", "split_config."))
-        file.sink().buffer().use { sink ->
-          sink.writeAll(it)
-        }
-      }
+      entry to apkConfig.file.replace("config.", "split_config.")
     }
-    return rootDir
+    val cacheRoot = File(LibCheckerApp.app.requireAvailableCacheDir(), "xapk")
+    return ApkArchiveStager.stage(file, cacheRoot, zipFile, entries)
   }
 }

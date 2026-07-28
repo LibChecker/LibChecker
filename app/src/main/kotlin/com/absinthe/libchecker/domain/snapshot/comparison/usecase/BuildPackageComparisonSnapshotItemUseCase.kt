@@ -9,11 +9,13 @@ import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.dex.DexStatsCollector
 import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPackageSize
 import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getVersionCode
+import com.absinthe.libchecker.utils.extensions.isArchivedPackage
 import com.absinthe.libchecker.utils.toJson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -26,6 +28,11 @@ class BuildPackageComparisonSnapshotItemUseCase(
     basePackage: PackageInfo,
     analysisPackage: PackageInfo
   ): SnapshotDiffItem = withContext(Dispatchers.IO) {
+    val baseStats = DexStatsCollector.collect(basePackage)
+    val analysisStats = DexStatsCollector.collect(analysisPackage)
+    val hasComparableDexStats = baseStats.isDexComplete && analysisStats.isDexComplete
+    val hasComparableResourceStats =
+      baseStats.isResourceComplete && analysisStats.isResourceComplete
     SnapshotDiffItem(
       packageName = basePackage.packageName,
       updateTime = basePackage.lastUpdateTime,
@@ -34,8 +41,8 @@ class BuildPackageComparisonSnapshotItemUseCase(
         analysisPackage.getAppName(packageManager).toString()
       ),
       versionNameDiff = SnapshotDiffItem.DiffNode(
-        basePackage.versionName.toString(),
-        analysisPackage.versionName
+        basePackage.versionName.orEmpty(),
+        analysisPackage.versionName.orEmpty()
       ),
       versionCodeDiff = SnapshotDiffItem.DiffNode(
         basePackage.getVersionCode(),
@@ -88,6 +95,31 @@ class BuildPackageComparisonSnapshotItemUseCase(
       packageSizeDiff = SnapshotDiffItem.DiffNode(
         basePackage.getPackageSize(true),
         analysisPackage.getPackageSize(true)
+      ),
+      dexInfoDiff = if (hasComparableDexStats) {
+        SnapshotDiffItem.DiffNode(
+          baseStats.entries.toJson().orEmpty(),
+          analysisStats.entries.toJson().orEmpty()
+        )
+      } else {
+        SnapshotDiffItem.DiffNode("")
+      },
+      resourcesSizeDiff = if (hasComparableResourceStats) {
+        SnapshotDiffItem.DiffNode(baseStats.resourcesSize, analysisStats.resourcesSize)
+      } else {
+        SnapshotDiffItem.DiffNode(0L)
+      },
+      resourceInfoDiff = if (hasComparableResourceStats) {
+        SnapshotDiffItem.DiffNode(
+          baseStats.resourceEntries.toJson().orEmpty(),
+          analysisStats.resourceEntries.toJson().orEmpty()
+        )
+      } else {
+        SnapshotDiffItem.DiffNode("")
+      },
+      archivedDiff = SnapshotDiffItem.DiffNode(
+        basePackage.isArchivedPackage(),
+        analysisPackage.isArchivedPackage()
       )
     )
   }

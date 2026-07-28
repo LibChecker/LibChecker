@@ -1,21 +1,24 @@
 package com.absinthe.libchecker.domain.statistics.chart.presentation
 
-import com.absinthe.libchecker.domain.statistics.chart.model.ChartType
+import com.absinthe.libchecker.constant.GlobalFeatures
 import com.absinthe.libchecker.domain.statistics.chart.model.LOADING_PROGRESS_MAX
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticAvailability
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDefinition
 
 class ChartUiStatePlanner {
 
-  fun planChartTypes(
-    currentChartType: ChartType,
+  fun planStatistics(
+    definitions: List<StatisticDefinition>,
+    currentStatisticId: String?,
     featureChartsAvailable: Boolean
-  ): ChartTypeSelectorPlan {
-    val visibleTypes = ChartType.availableTypes()
-      .filter { featureChartsAvailable || !it.requiresFeatureInitialization }
-    return ChartTypeSelectorPlan(
-      visibleTypes = visibleTypes,
-      selectedType = currentChartType.takeIf { it in visibleTypes }
-        ?: visibleTypes.firstOrNull()
-        ?: ChartType.ABI
+  ): StatisticSelectorPlan {
+    val visibleStatistics = definitions
+      .filter { definition -> definition.isAvailable() }
+      .filter { definition -> featureChartsAvailable || !definition.requiresFeatureInitialization }
+    return StatisticSelectorPlan(
+      visibleStatistics = visibleStatistics,
+      selectedStatistic = visibleStatistics.find { it.id == currentStatisticId }
+        ?: visibleStatistics.firstOrNull()
     )
   }
 
@@ -36,11 +39,18 @@ class ChartUiStatePlanner {
       )
     }
   }
+
+  private fun StatisticDefinition.isAvailable(): Boolean {
+    return when (availability) {
+      StatisticAvailability.ALWAYS -> true
+      StatisticAvailability.PAGE_SIZE_16_KB -> GlobalFeatures.ENABLE_DETECTING_16KB_PAGE_ALIGNMENT
+    }
+  }
 }
 
-data class ChartTypeSelectorPlan(
-  val visibleTypes: List<ChartType>,
-  val selectedType: ChartType
+data class StatisticSelectorPlan(
+  val visibleStatistics: List<StatisticDefinition>,
+  val selectedStatistic: StatisticDefinition?
 )
 
 data class ChartProgressPlan(

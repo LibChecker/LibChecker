@@ -23,7 +23,8 @@ class AppListItemDisplayTest {
       label = "LibChecker",
       packageName = "com.absinthe.libchecker",
       viewState = viewState,
-      showMissingPackageStrikeThrough = true
+      showMissingPackageStrikeThrough = true,
+      chips = listOf("VoIP Service Kit", "Security Paste View")
     )
 
     assertTrue(display.icon.usePackageIcon)
@@ -37,6 +38,23 @@ class AppListItemDisplayTest {
     )
     assertEquals("2.5.5 (2761)", display.metadata.versionInfo)
     assertEquals(AppListItemMetadataDisplay.PackageBadge.Frozen, display.metadata.packageBadge)
+    assertEquals(listOf("VoIP Service Kit", "Security Paste View"), display.chips)
+  }
+
+  @Test
+  fun usesPreparedIconWhileMetadataStateIsPending() {
+    val packageInfo = PackageInfo()
+
+    val display = AppListItemDisplay.create(
+      label = "Example app",
+      packageName = "com.example.app",
+      viewState = newViewState(packageInfo = null),
+      iconPackageInfo = packageInfo,
+      showMissingPackageStrikeThrough = false
+    )
+
+    assertTrue(display.icon.usePackageIcon)
+    assertSame(packageInfo, display.icon.packageInfo)
   }
 
   @Test

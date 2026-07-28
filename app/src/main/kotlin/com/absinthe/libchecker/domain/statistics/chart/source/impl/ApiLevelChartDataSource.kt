@@ -68,14 +68,6 @@ class ApiLevelChartDataSource(
     }
   }
 
-  override fun getListByXValue(x: Int): List<LCItem> {
-    return classifiedMap.entries.elementAtOrNull(x)?.value ?: emptyList()
-  }
-
-  override fun getListKeyByXValue(x: Int): Int? {
-    return classifiedMap.entries.elementAtOrNull(x)?.key
-  }
-
   override fun getLabelByXValue(context: Context, x: Int): String {
     return "${kind.label} ${classifiedMap.entries.elementAtOrNull(x)?.key ?: "?"}"
   }

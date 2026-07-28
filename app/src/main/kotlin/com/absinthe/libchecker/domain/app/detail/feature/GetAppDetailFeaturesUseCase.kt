@@ -8,22 +8,21 @@ import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.compat.ZipFileCompat
 import com.absinthe.libchecker.database.entity.Features
+import com.absinthe.libchecker.domain.app.buildmetadata.COMPOSE_VERSION_ENTRIES
+import com.absinthe.libchecker.domain.app.buildmetadata.DATA_BINDING_VERSION_ENTRIES
+import com.absinthe.libchecker.domain.app.buildmetadata.readFirstPresentLine
 import com.absinthe.libchecker.domain.app.detail.model.AppIconItem
 import com.absinthe.libchecker.domain.app.detail.model.KotlinToolingMetadata
 import com.absinthe.libchecker.domain.app.model.VersionedFeature
 import com.absinthe.libchecker.domain.app.repository.AppListRepository
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.OsUtils
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getFeatures
-import com.absinthe.libchecker.utils.extensions.getRxAndroidVersion
-import com.absinthe.libchecker.utils.extensions.getRxJavaVersion
-import com.absinthe.libchecker.utils.extensions.getRxKotlinVersion
+import com.absinthe.libchecker.utils.extensions.hasXposedModuleMetadata
 import com.absinthe.libchecker.utils.extensions.isPWA
 import com.absinthe.libchecker.utils.extensions.isPageSizeCompat
 import com.absinthe.libchecker.utils.extensions.isPlayAppSigning
 import com.absinthe.libchecker.utils.extensions.isUseKMP
-import com.absinthe.libchecker.utils.extensions.toClassDefType
 import com.absinthe.libchecker.utils.fromJson
 import java.io.File
 import java.io.InputStreamReader
@@ -63,8 +62,34 @@ class GetAppDetailFeaturesUseCase(
     }
 
     var feat = cachedFeatures
+    var metadataEmitted = false
+    val scannedMetadata = mutableListOf<VersionedFeature>()
     if (feat == -1) {
-      feat = packageInfo.getFeatures()
+      val sourceDir = packageInfo.applicationInfo?.sourceDir
+      feat = if (sourceDir != null) {
+        try {
+          ZipFileCompat(File(sourceDir)).use { zip ->
+            packageInfo.getFeatures(zip).also { scannedFeatures ->
+              emitFeatureApkMetadata(
+                packageInfo = packageInfo,
+                readKotlin = (scannedFeatures and Features.KOTLIN_USED) > 0,
+                readAgp = (scannedFeatures and Features.AGP) > 0,
+                readCompose = (scannedFeatures and Features.JETPACK_COMPOSE) > 0,
+                readXposedMarker = !packageInfo.hasXposedModuleMetadata(),
+                emitFeature = { scannedMetadata.add(it) },
+                openedZip = zip
+              )
+              metadataEmitted = true
+            }
+          }
+        } catch (e: CancellationException) {
+          throw e
+        } catch (_: Throwable) {
+          packageInfo.getFeatures()
+        }
+      } else {
+        packageInfo.getFeatures()
+      }
       appListRepository.updateFeatures(packageInfo.packageName, feat)
     }
 
@@ -75,14 +100,18 @@ class GetAppDetailFeaturesUseCase(
     if (hasXposedMetadata) {
       emitFeature(VersionedFeature(Features.XPOSED_MODULE))
     }
-    emitFeatureApkMetadata(
-      packageInfo = packageInfo,
-      readKotlin = (feat and Features.KOTLIN_USED) > 0,
-      readAgp = (feat and Features.AGP) > 0,
-      readCompose = (feat and Features.JETPACK_COMPOSE) > 0,
-      readXposedMarker = !hasXposedMetadata,
-      emitFeature = ::emitFeature
-    )
+    if (metadataEmitted) {
+      scannedMetadata.forEach { emitFeature(it) }
+    } else {
+      emitFeatureApkMetadata(
+        packageInfo = packageInfo,
+        readKotlin = (feat and Features.KOTLIN_USED) > 0,
+        readAgp = (feat and Features.AGP) > 0,
+        readCompose = (feat and Features.JETPACK_COMPOSE) > 0,
+        readXposedMarker = !hasXposedMetadata,
+        emitFeature = ::emitFeature
+      )
+    }
     if (packageInfo.isPlayAppSigning()) {
       emitFeature(VersionedFeature(Features.PLAY_SIGNING))
     }
@@ -100,23 +129,8 @@ class GetAppDetailFeaturesUseCase(
       emitFeature(VersionedFeature(Features.Ext.ELF_PAGE_SIZE_16KB_COMPAT))
     }
 
-    packageInfo.applicationInfo?.sourceDir?.let { sourceDir ->
-      val foundList = getFeaturesFoundDexList(feat, sourceDir)
-      if ((feat and Features.RX_JAVA) > 0) {
-        val version = packageInfo.getRxJavaVersion(foundList)
-        emitFeature(VersionedFeature(Features.RX_JAVA, version))
-      }
-      if ((feat and Features.RX_KOTLIN) > 0) {
-        val version = packageInfo.getRxKotlinVersion(foundList)
-        emitFeature(VersionedFeature(Features.RX_KOTLIN, version))
-      }
-      if ((feat and Features.RX_ANDROID) > 0) {
-        val version = packageInfo.getRxAndroidVersion(foundList)
-        emitFeature(VersionedFeature(Features.RX_ANDROID, version))
-      }
-      if (packageInfo.isUseKMP(foundList)) {
-        emitFeature(VersionedFeature(Features.KMP))
-      }
+    if (packageInfo.isUseKMP()) {
+      emitFeature(VersionedFeature(Features.KMP))
     }
 
     return AppDetailFeatures(features, appIcons)
@@ -128,7 +142,8 @@ class GetAppDetailFeaturesUseCase(
     readAgp: Boolean,
     readCompose: Boolean,
     readXposedMarker: Boolean,
-    emitFeature: suspend (VersionedFeature) -> Unit
+    emitFeature: suspend (VersionedFeature) -> Unit,
+    openedZip: ZipFileCompat? = null
   ) {
     if (!readKotlin && !readAgp && !readCompose && !readXposedMarker) {
       return
@@ -152,24 +167,32 @@ class GetAppDetailFeaturesUseCase(
       return
     }
 
-    val emittedFromApk = try {
-      ZipFileCompat(File(sourceDir)).use { zip ->
-        if (readKotlin) {
-          emitFeature(VersionedFeature(Features.KOTLIN_USED, extras = readKotlinPluginInfo(zip)))
-        }
-        if (readAgp) {
-          emitFeature(VersionedFeature(Features.AGP, readAgpVersion(zip)))
-        }
-        if (readCompose) {
-          emitFeature(
-            VersionedFeature(
-              Features.JETPACK_COMPOSE,
-              readFirstPresentLine(zip, COMPOSE_VERSION_ENTRIES)
-            )
+    suspend fun emitFromZip(zip: ZipFileCompat) {
+      if (readKotlin) {
+        emitFeature(VersionedFeature(Features.KOTLIN_USED, extras = readKotlinPluginInfo(zip)))
+      }
+      if (readAgp) {
+        emitFeature(VersionedFeature(Features.AGP, readAgpVersion(zip)))
+      }
+      if (readCompose) {
+        emitFeature(
+          VersionedFeature(
+            Features.JETPACK_COMPOSE,
+            zip.readFirstPresentLine(COMPOSE_VERSION_ENTRIES)
           )
-        }
-        if (readXposedMarker && zip.getEntry(XPOSED_MODULE_PROP_ENTRY) != null) {
-          emitFeature(VersionedFeature(Features.XPOSED_MODULE))
+        )
+      }
+      if (readXposedMarker && zip.getEntry(XPOSED_MODULE_PROP_ENTRY) != null) {
+        emitFeature(VersionedFeature(Features.XPOSED_MODULE))
+      }
+    }
+
+    val emittedFromApk = try {
+      if (openedZip != null) {
+        emitFromZip(openedZip)
+      } else {
+        ZipFileCompat(File(sourceDir)).use { zip ->
+          emitFromZip(zip)
         }
       }
       true
@@ -226,63 +249,7 @@ class GetAppDetailFeaturesUseCase(
       }.getOrNull()?.let { return it }
     }
 
-    return readFirstPresentLine(zip, DATA_BINDING_VERSION_ENTRIES)
-  }
-
-  private fun readFirstPresentLine(zip: ZipFileCompat, entries: Array<String>): String? {
-    entries.forEach { name ->
-      zip.getEntry(name)?.let { entry ->
-        runCatching {
-          InputStreamReader(zip.getInputStream(entry), Charsets.UTF_8).buffered().use { it.readLine() }
-            ?.takeIf { line -> line.isNotBlank() }
-        }.getOrNull()?.let { return it }
-      }
-    }
-    return null
-  }
-
-  private fun PackageInfo.hasXposedModuleMetadata(): Boolean {
-    val metaData = applicationInfo?.metaData ?: return false
-    return metaData.getBoolean("xposedmodule") || metaData.containsKey("xposedminversion")
-  }
-
-  private fun getFeaturesFoundDexList(feat: Int, sourceDir: String): List<String>? {
-    val dexList = mutableListOf<String>()
-    if ((feat and Features.RX_JAVA) > 0) {
-      dexList.addAll(
-        listOf(
-          "rx.schedulers.*".toClassDefType(),
-          "io.reactivex.*".toClassDefType(),
-          "io.reactivex.rxjava3.*".toClassDefType()
-        )
-      )
-    }
-    if ((feat and Features.RX_KOTLIN) > 0) {
-      dexList.addAll(
-        listOf(
-          "io.reactivex.rxjava3.kotlin.*".toClassDefType(),
-          "io.reactivex.rxkotlin".toClassDefType(),
-          "rx.lang.kotlin".toClassDefType()
-        )
-      )
-    }
-    if ((feat and Features.RX_ANDROID) > 0) {
-      dexList.addAll(
-        listOf(
-          "io.reactivex.rxjava3.android.*".toClassDefType(),
-          "io.reactivex.android.*".toClassDefType(),
-          "rx.android.*".toClassDefType()
-        )
-      )
-    }
-    if (dexList.isNotEmpty()) {
-      dexList.add("org.jetbrains.compose.*".toClassDefType())
-    }
-    return if (dexList.isNotEmpty()) {
-      PackageUtils.findDexClasses(File(sourceDir), dexList)
-    } else {
-      null
-    }
+    return zip.readFirstPresentLine(DATA_BINDING_VERSION_ENTRIES)
   }
 
   private fun getAllAppIcons(packageInfo: PackageInfo): List<AppIconItem> {
@@ -345,17 +312,3 @@ private const val AGP_KEYWORD = "androidGradlePluginVersion"
 private const val MANIFEST_MF_ENTRY = "META-INF/MANIFEST.MF"
 private const val AGP_MANIFEST_PREFIX = "Created-By: Android Gradle "
 private const val XPOSED_MODULE_PROP_ENTRY = "META-INF/xposed/module.prop"
-
-private val DATA_BINDING_VERSION_ENTRIES = arrayOf(
-  "META-INF/androidx.databinding_viewbinding.version",
-  "META-INF/androidx.databinding_databindingKtx.version",
-  "META-INF/androidx.databinding_library.version"
-)
-
-private val COMPOSE_VERSION_ENTRIES = arrayOf(
-  "META-INF/androidx.compose.runtime_runtime.version",
-  "META-INF/androidx.compose.ui_ui.version",
-  "META-INF/androidx.compose.ui_ui-tooling-preview.version",
-  "META-INF/androidx.compose.foundation_foundation.version",
-  "META-INF/androidx.compose.animation_animation.version"
-)

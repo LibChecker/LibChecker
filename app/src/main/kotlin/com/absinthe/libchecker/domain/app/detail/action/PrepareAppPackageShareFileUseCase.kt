@@ -11,6 +11,7 @@ import com.absinthe.libchecker.utils.extensions.isSplitsApk
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.util.zip.Deflater
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import kotlinx.coroutines.Dispatchers
@@ -97,6 +98,8 @@ class PrepareAppPackageShareFileUseCase(
   private fun buildApksArchive(targetFile: File, baseApk: File, splits: List<File>) {
     val tempFile = File(targetFile.parentFile, "${targetFile.name}.tmp")
     ZipOutputStream(BufferedOutputStream(FileOutputStream(tempFile))).use { zos ->
+      // APK files are already ZIP archives. Recompressing them wastes CPU for negligible savings.
+      zos.setLevel(Deflater.NO_COMPRESSION)
       fun putFile(file: File) {
         val entry = ZipEntry(file.name)
         entry.time = file.lastModified()

@@ -126,10 +126,8 @@ class BaseSnapshotNodeTest {
       status = SnapshotDetailItemStatusDisplayData(
         iconRes = 0,
         colorRes = 0,
-        countColorRes = 0,
         labelRes = 0
       ),
-      backgroundColor = 0,
       ruleChip = ruleChip
     )
   }

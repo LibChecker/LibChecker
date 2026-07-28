@@ -5,6 +5,12 @@
   <color name="feature_background">#15000000</color>
   <color name="feature_ripple">#40000000</color>
 
+  <!-- Snapshot detail semantic accents -->
+  <color name="snapshot_status_added">#2E7D32</color>
+  <color name="snapshot_status_removed">#C62828</color>
+  <color name="snapshot_status_changed">#A85A00</color>
+  <color name="snapshot_status_moved">#1565C0</color>
+
   <!-- Launcher adaptive icon -->
   <color name="ic_launcher_foreground">#FFFFFF</color>
   <color name="ic_launcher_background">#6200EE</color>

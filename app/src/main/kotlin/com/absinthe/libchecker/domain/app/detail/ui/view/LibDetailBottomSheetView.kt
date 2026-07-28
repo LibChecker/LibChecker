@@ -147,7 +147,6 @@ class LibDetailBottomSheetView(
     isVerticalScrollBarEnabled = false
     clipToPadding = false
     clipChildren = false
-    isNestedScrollingEnabled = false
     addItemDecoration(VerticalSpacesItemDecoration(4.dp))
   }
 

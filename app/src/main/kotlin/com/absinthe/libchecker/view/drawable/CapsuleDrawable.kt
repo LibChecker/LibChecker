@@ -12,6 +12,7 @@ import android.text.StaticLayout
 import android.text.TextPaint
 import android.text.TextUtils
 import androidx.core.graphics.withTranslation
+import com.absinthe.libchecker.utils.extensions.dpToDimensionPixelOffset
 
 class CapsuleDrawable(
   private val context: Context,
@@ -32,7 +33,7 @@ class CapsuleDrawable(
 
   private val capsuleDrawable = GradientDrawable().apply {
     shape = GradientDrawable.RECTANGLE
-    setStroke(dpToPx(borderWidth).toInt(), borderColor)
+    setStroke(context.dpToDimensionPixelOffset(borderWidth), borderColor)
     setColor(backgroundColor)
     cornerRadius = this@CapsuleDrawable.cornerRadius * 2
   }
@@ -98,10 +99,5 @@ class CapsuleDrawable(
   )
   override fun getOpacity(): Int {
     return android.graphics.PixelFormat.TRANSLUCENT
-  }
-
-  // Helper method to convert dp to pixels
-  private fun dpToPx(dp: Float): Float {
-    return dp * context.resources.displayMetrics.density
   }
 }

@@ -45,7 +45,3 @@ data class LibStringItemNameDisplay(
     }
   }
 }
-
-private fun Int.isOptionEnabled(option: Int): Boolean {
-  return (this and option) > 0
-}

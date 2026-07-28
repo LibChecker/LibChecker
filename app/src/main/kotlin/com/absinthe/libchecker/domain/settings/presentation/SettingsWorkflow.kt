@@ -30,7 +30,6 @@ import com.absinthe.libchecker.domain.settings.model.LocalePreferenceSummary
 import com.absinthe.libchecker.domain.settings.repository.AppearanceSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.domain.statistics.reference.repository.LibReferenceSettingsRepository
-import com.absinthe.libchecker.domain.statistics.reference.usecase.UpdateLibReferenceThresholdUseCase
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -51,8 +50,7 @@ class SettingsWorkflow(
   private val ruleSettingsRepository: RuleSettingsRepository,
   private val snapshotSettingsRepository: SnapshotSettingsRepository,
   private val exportInstalledAppsToUriUseCase: ExportInstalledAppsToUriUseCase,
-  private val libReferenceSettingsRepository: LibReferenceSettingsRepository,
-  private val updateLibReferenceThresholdUseCase: UpdateLibReferenceThresholdUseCase
+  private val libReferenceSettingsRepository: LibReferenceSettingsRepository
 ) {
 
   suspend fun requestUpdateInfo(channel: AppUpdateChannel): GetAppUpdateInfo? {
@@ -75,7 +73,8 @@ class SettingsWorkflow(
     if (!AppSelfUpdatePolicy.isSelfUpdateEnabled(BuildConfig.IS_FOSS, BuildConfig.IS_DEV_VERSION)) {
       return false
     }
-    return requestUpdateInfo(defaultUpdateChannel())?.appForFlavor(BuildConfig.IS_FOSS)?.versionCode
+    return requestUpdateInfo(AppSelfUpdatePolicy.defaultUpdateChannel(BuildConfig.IS_DEV_VERSION))
+      ?.appForFlavor(BuildConfig.IS_FOSS)?.versionCode
       ?.let { it > BuildConfig.VERSION_CODE } == true
   }
 
@@ -172,20 +171,12 @@ class SettingsWorkflow(
     return GetUpdatesDialogState(visibleItems)
   }
 
-  private fun defaultUpdateChannel(): AppUpdateChannel {
-    return if (BuildConfig.IS_DEV_VERSION) {
-      AppUpdateChannel.CI
-    } else {
-      AppUpdateChannel.STABLE
-    }
-  }
-
   fun getLibReferenceThreshold(): Int {
     return libReferenceSettingsRepository.threshold
   }
 
   suspend fun setLibReferenceThreshold(threshold: Int) {
-    updateLibReferenceThresholdUseCase(threshold)
+    libReferenceSettingsRepository.setThreshold(threshold.coerceIn(MIN_REFERENCE_THRESHOLD, MAX_REFERENCE_THRESHOLD))
   }
 
   fun buildLocalePreferenceData(
@@ -285,5 +276,7 @@ class SettingsWorkflow(
     const val LOG_DIR_NAME = "logs"
     const val LOG_FILE_SUFFIX = ".log"
     const val MIMETYPE_TEXT = "text/plain"
+    const val MIN_REFERENCE_THRESHOLD = 1
+    const val MAX_REFERENCE_THRESHOLD = 50
   }
 }

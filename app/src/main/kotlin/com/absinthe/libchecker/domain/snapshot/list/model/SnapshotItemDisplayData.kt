@@ -66,20 +66,18 @@ fun buildSnapshotItemDescription(
   abiText: CharSequence,
   updateTime: CharSequence?,
   stateDescription: CharSequence
-): String {
-  return listOf(
-    appName,
-    packageName,
-    versionInfo,
-    packageSize,
-    apiText,
-    abiText,
-    updateTime,
-    stateDescription
-  )
-    .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
-    .joinToString()
-}
+): String = listOf(
+  appName,
+  packageName,
+  versionInfo,
+  packageSize,
+  apiText,
+  abiText,
+  updateTime,
+  stateDescription
+)
+  .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
+  .joinToString()
 
 fun buildSnapshotItemAbiDescription(data: SnapshotItemAbiDisplayData): String {
   val oldAbi = data.abiDisplayData.old.text

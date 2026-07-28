@@ -6,7 +6,8 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.domain.app.model.PackageChangeState
-import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSection
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailContent
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailDiffTextStyle
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotCapturePlan
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotSystemPropDisplayData
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotTimeNodeListData
@@ -30,7 +31,7 @@ class SnapshotViewModel(
   val allSnapshots = snapshotListWorkflow.currentSnapshotCount
   private val _snapshotDiffItemsUpdates: MutableSharedFlow<Unit> = MutableSharedFlow()
   val snapshotDiffItemsUpdates = _snapshotDiffItemsUpdates.asSharedFlow()
-  val snapshotDetailSectionsFlow: MutableSharedFlow<List<SnapshotDetailSection>> = MutableSharedFlow()
+  val snapshotDetailContentFlow: MutableSharedFlow<SnapshotDetailContent> = MutableSharedFlow()
 
   private val _effect: MutableSharedFlow<Effect> = MutableSharedFlow()
   val effect = _effect.asSharedFlow()
@@ -78,7 +79,7 @@ class SnapshotViewModel(
         previousTimestamp = preTimeStamp,
         currentTimestamp = currTimeStamp.takeUnless { it == CURRENT_SNAPSHOT },
         shouldClearDiff = shouldClearDiff,
-        onProgress = ::changeComparingProgress
+        onProgress = { _comparingProgress.value = it }
       )
       if (diffItems != null) {
         emitSnapshotDiffItemsUpdate()
@@ -122,19 +123,32 @@ class SnapshotViewModel(
   ) {
     val diffItem = snapshotListWorkflow.compareItemDiff(timeStamp, packageName)
 
-    diffItem?.let {
-      changeDiffItem(it)
-    } ?: run {
-      removeDiffItem(packageName)
+    if (diffItem == null) {
+      snapshotListWorkflow.applyDiffItemRemove(packageName)
+    } else {
+      snapshotListWorkflow.applyDiffItemChange(diffItem)
     }
+    emitSnapshotDiffItemsUpdate()
   }
 
   fun handlePackageChanged(packageChangeState: PackageChangeState) {
     packageChangeProcessor.enqueue(viewModelScope, packageChangeState)
   }
 
-  fun computeDiffDetail(entity: SnapshotDiffItem) = viewModelScope.launch {
-    snapshotDetailSectionsFlow.emit(snapshotListWorkflow.buildSnapshotDetailSections(entity))
+  fun computeDiffDetail(
+    entity: SnapshotDiffItem,
+    diffTextStyle: SnapshotDetailDiffTextStyle
+  ) = viewModelScope.launch {
+    snapshotDetailContentFlow.emit(
+      buildDiffDetailContent(entity, diffTextStyle)
+    )
+  }
+
+  suspend fun buildDiffDetailContent(
+    entity: SnapshotDiffItem,
+    diffTextStyle: SnapshotDetailDiffTextStyle
+  ): SnapshotDetailContent {
+    return snapshotListWorkflow.buildSnapshotDetailContent(entity, diffTextStyle)
   }
 
   suspend fun getTimeStamps(): List<TimeStampItem> {
@@ -233,20 +247,6 @@ class SnapshotViewModel(
     setEffect {
       Effect.DashboardCountChange(count.snapshotCount, count.appCount, isLeft)
     }
-  }
-
-  private suspend fun changeDiffItem(item: SnapshotDiffItem) {
-    snapshotListWorkflow.applyDiffItemChange(item)
-    emitSnapshotDiffItemsUpdate()
-  }
-
-  private suspend fun removeDiffItem(packageName: String) {
-    snapshotListWorkflow.applyDiffItemRemove(packageName)
-    emitSnapshotDiffItemsUpdate()
-  }
-
-  private fun changeComparingProgress(progress: Int) {
-    _comparingProgress.value = progress
   }
 
   private fun setSelectedSnapshotTimestamp(timestamp: Long) {

@@ -145,10 +145,6 @@
     <item name="fontFamily">sans-serif-condensed-medium</item>
   </style>
 
-  <style name="TextView.MonoSpace" parent="Widget.MaterialComponents.TextView">
-    <item name="fontFamily">monospace</item>
-  </style>
-
   <!-- Cards -->
   <style name="AppListMaterialCard" parent="Widget.Material3.CardView.Outlined">
     <item name="cardCornerRadius">16dp</item>

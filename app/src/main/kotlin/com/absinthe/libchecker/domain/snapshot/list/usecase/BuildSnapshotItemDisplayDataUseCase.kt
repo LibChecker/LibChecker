@@ -5,10 +5,13 @@ import androidx.annotation.StringRes
 import androidx.core.text.buildSpannedString
 import androidx.core.text.scale
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotAbiDisplayDataUseCase
-import com.absinthe.libchecker.domain.snapshot.display.BuildSnapshotUpdateTimeDisplayDataUseCase
+import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.domain.snapshot.display.SnapshotAbiDisplayData
+import com.absinthe.libchecker.domain.snapshot.display.SnapshotAbiDisplayItem
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotUpdateTimeDisplayData
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotUpdateTimeText
+import com.absinthe.libchecker.domain.snapshot.display.buildSnapshotVersionDisplayDiff
+import com.absinthe.libchecker.domain.snapshot.display.formatSnapshotSizeChange
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemAbiDisplayData
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemAppNameDisplayData
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemCardPresentation
@@ -20,16 +23,16 @@ import com.absinthe.libchecker.domain.snapshot.list.model.buildSnapshotItemAbiDe
 import com.absinthe.libchecker.domain.snapshot.list.model.buildSnapshotItemDescription
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
+import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.PREINSTALLED_TIMESTAMP
 import com.absinthe.libchecker.utils.extensions.sizeToString
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
-import kotlin.math.abs
 
-class BuildSnapshotItemDisplayDataUseCase(
-  private val context: Context,
-  private val buildSnapshotAbiDisplayData: BuildSnapshotAbiDisplayDataUseCase,
-  private val buildSnapshotUpdateTimeDisplayData: BuildSnapshotUpdateTimeDisplayDataUseCase
-) {
+class BuildSnapshotItemDisplayDataUseCase(private val context: Context) {
 
   operator fun invoke(request: Request): SnapshotItemDisplayData {
     val item = request.item
@@ -38,7 +41,8 @@ class BuildSnapshotItemDisplayDataUseCase(
       text = LCAppUtils.getDiffString(
         diff = item.labelDiff,
         isNewOrDeleted = isNewOrDeleted,
-        highlightDiffColor = request.highlightDiffColor
+        highlightDiffColor = request.highlightDiffColor,
+        emphasizeDiffs = request.emphasizeDiffs
       ),
       showTrackIcon = item.isTrackItem,
       packageStateLabel = item.packageStateLabel
@@ -57,28 +61,32 @@ class BuildSnapshotItemDisplayDataUseCase(
       animate = request.animateStateIndicator
     )
     val versionInfo = LCAppUtils.getDiffString(
-      diff1 = item.versionNameDiff,
-      diff2 = item.versionCodeDiff,
+      diff = item.buildSnapshotVersionDisplayDiff(context.getString(R.string.snapshot_version_archived)),
       isNewOrDeleted = isNewOrDeleted,
-      highlightDiffColor = request.highlightDiffColor
+      highlightDiffColor = request.highlightDiffColor,
+      emphasizeDiffs = request.emphasizeDiffs
     )
     val packageSize = buildPackageSizeDisplayData(
       packageSizeDiff = item.packageSizeDiff,
       isNewOrDeleted = isNewOrDeleted,
-      highlightDiffColor = request.highlightDiffColor
+      highlightDiffColor = request.highlightDiffColor,
+      emphasizeDiffs = request.emphasizeDiffs
     )
-    val apiText = buildApiText(item, isNewOrDeleted, request.highlightDiffColor)
+    val apiText = buildApiText(
+      item = item,
+      isNewOrDeleted = isNewOrDeleted,
+      highlightDiffColor = request.highlightDiffColor,
+      emphasizeDiffs = request.emphasizeDiffs
+    )
     val abi = SnapshotItemAbiDisplayData(
-      abiDisplayData = buildSnapshotAbiDisplayData(item.abiDiff),
+      abiDisplayData = buildAbiDisplayData(item.abiDiff),
       showChangedAbi = item.abiDiff.new != null && item.abiDiff.old != item.abiDiff.new,
       tintChangedAbiBadge = request.tintChangedAbiBadge
     )
-    val updateTimeDisplayData = buildSnapshotUpdateTimeDisplayData(
-      BuildSnapshotUpdateTimeDisplayDataUseCase.Request(
-        updateTime = item.updateTime,
-        isVisible = request.showUpdateTime,
-        isApexPackage = request.isApexPackage
-      )
+    val updateTimeDisplayData = buildUpdateTimeDisplayData(
+      updateTime = item.updateTime,
+      isVisible = request.showUpdateTime,
+      isApexPackage = request.isApexPackage
     )
     return SnapshotItemDisplayData(
       cardPresentation = request.cardPresentation,
@@ -110,7 +118,8 @@ class BuildSnapshotItemDisplayDataUseCase(
   private fun buildPackageSizeDisplayData(
     packageSizeDiff: SnapshotDiffItem.DiffNode<Long>,
     isNewOrDeleted: Boolean,
-    highlightDiffColor: Int?
+    highlightDiffColor: Int?,
+    emphasizeDiffs: Boolean
   ): SnapshotItemPackageSizeDisplayData? {
     if (packageSizeDiff.old <= 0L) {
       return null
@@ -132,7 +141,8 @@ class BuildSnapshotItemDisplayDataUseCase(
           diff2 = bytesDiff,
           diff2Suffix = " Bytes",
           isNewOrDeleted = isNewOrDeleted,
-          highlightDiffColor = highlightDiffColor
+          highlightDiffColor = highlightDiffColor,
+          emphasizeDiffs = emphasizeDiffs
         )
       )
 
@@ -141,7 +151,7 @@ class BuildSnapshotItemDisplayDataUseCase(
         if (diffSize != 0L) {
           append(" ")
           packageSizeBreakStart = length
-          append(buildPackageSizeChangeText(diffSize, packageSizeDiff.old))
+          append(formatSnapshotSizeChange(context, diffSize, packageSizeDiff.old))
         }
       }
     }
@@ -155,11 +165,12 @@ class BuildSnapshotItemDisplayDataUseCase(
   private fun buildApiText(
     item: SnapshotDiffItem,
     isNewOrDeleted: Boolean,
-    highlightDiffColor: Int?
+    highlightDiffColor: Int?,
+    emphasizeDiffs: Boolean
   ): CharSequence {
-    val targetDiff = buildApiDiffString(item.targetApiDiff, isNewOrDeleted, highlightDiffColor)
-    val minDiff = buildApiDiffString(item.minSdkDiff, isNewOrDeleted, highlightDiffColor)
-    val compileDiff = buildApiDiffString(item.compileSdkDiff, isNewOrDeleted, highlightDiffColor)
+    val targetDiff = buildApiDiffString(item.targetApiDiff, isNewOrDeleted, highlightDiffColor, emphasizeDiffs)
+    val minDiff = buildApiDiffString(item.minSdkDiff, isNewOrDeleted, highlightDiffColor, emphasizeDiffs)
+    val compileDiff = buildApiDiffString(item.compileSdkDiff, isNewOrDeleted, highlightDiffColor, emphasizeDiffs)
 
     return buildSpannedString {
       targetDiff?.let {
@@ -190,12 +201,14 @@ class BuildSnapshotItemDisplayDataUseCase(
   private fun buildApiDiffString(
     diff: SnapshotDiffItem.DiffNode<Short>,
     isNewOrDeleted: Boolean,
-    highlightDiffColor: Int?
+    highlightDiffColor: Int?,
+    emphasizeDiffs: Boolean
   ): CharSequence? {
     return LCAppUtils.getDiffString(
       diff = diff,
       isNewOrDeleted = isNewOrDeleted,
-      highlightDiffColor = highlightDiffColor
+      highlightDiffColor = highlightDiffColor,
+      emphasizeDiffs = emphasizeDiffs
     ).takeIf { diff.old > 0 }
   }
 
@@ -222,28 +235,6 @@ class BuildSnapshotItemDisplayDataUseCase(
     }
   }
 
-  private fun buildPackageSizeChangeText(diffSize: Long, oldSize: Long): String {
-    return buildString {
-      if (diffSize > 0) {
-        append("+")
-      }
-      append(diffSize.sizeToString(context))
-      append(", ")
-      if (diffSize > 0) {
-        append("+")
-      }
-      val percentage = diffSize.toFloat() / oldSize
-      if (abs(percentage) < 0.001f) {
-        if (percentage < 0) {
-          append("-")
-        }
-        append("<0.1%")
-      } else {
-        append(String.format(Locale.getDefault(), "%.1f%%", percentage * 100))
-      }
-    }
-  }
-
   private fun SnapshotUpdateTimeDisplayData.toDisplayText(): String {
     val displayText = when (val text = text) {
       SnapshotUpdateTimeText.Preinstalled -> context.getString(R.string.snapshot_preinstalled_app)
@@ -258,6 +249,41 @@ class BuildSnapshotItemDisplayDataUseCase(
     }
   }
 
+  private fun buildUpdateTimeDisplayData(
+    updateTime: Long,
+    isVisible: Boolean,
+    isApexPackage: Boolean
+  ): SnapshotUpdateTimeDisplayData? {
+    if (!isVisible) return null
+    val text = if (updateTime <= PREINSTALLED_TIMESTAMP) {
+      SnapshotUpdateTimeText.Preinstalled
+    } else {
+      val pattern = if (DateUtils.isTimestampToday(updateTime)) "HH:mm:ss" else "yyyy-MM-dd HH:mm:ss"
+      SnapshotUpdateTimeText.LastUpdated(
+        SimpleDateFormat(pattern, Locale.getDefault()).format(Date(updateTime))
+      )
+    }
+    return SnapshotUpdateTimeDisplayData(text, isApexPackage)
+  }
+
+  private fun buildAbiDisplayData(abiDiff: SnapshotDiffItem.DiffNode<Short>): SnapshotAbiDisplayData {
+    return SnapshotAbiDisplayData(
+      old = buildAbiDisplayItem(abiDiff.old),
+      new = abiDiff.new?.let(::buildAbiDisplayItem)
+    )
+  }
+
+  private fun buildAbiDisplayItem(abi: Short): SnapshotAbiDisplayItem {
+    val abiInt = abi.toInt()
+    return SnapshotAbiDisplayItem(
+      text = PackageUtils.getAbiString(context, abiInt, showExtraInfo = false),
+      badgeRes = PackageUtils.getAbiBadgeResource(abiInt).takeIf {
+        abiInt != Constants.ERROR && abiInt != Constants.OVERLAY && it != 0
+      },
+      isMultiArch = abi / Constants.MULTI_ARCH == 1
+    )
+  }
+
   data class Request(
     val item: SnapshotDiffItem,
     val cardPresentation: SnapshotItemCardPresentation,
@@ -267,6 +293,7 @@ class BuildSnapshotItemDisplayDataUseCase(
     val animateStateIndicator: Boolean,
     val tintChangedAbiBadge: Boolean,
     val highlightDiffColor: Int?,
+    val emphasizeDiffs: Boolean,
     val highlightText: String
   )
 }

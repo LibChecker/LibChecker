@@ -17,9 +17,6 @@ Use the Gradle wrapper from the repository root. On macOS/Linux use
 - Manual device launch after installing debug should target
   `com.absinthe.libchecker.debug`; `com.absinthe.libchecker` may be a separate
   release install used for snapshot export/import checks.
-- When launching the installed debug app for UI validation, explicitly start
-  `com.absinthe.libchecker.debug/com.absinthe.libchecker.domain.home.ui.MainActivity`;
-  launching only the package can resume LeakCanary instead of LibChecker's home.
 - Release/R8/package validation: `./gradlew :app:assembleRelease`
 - Market R8 rule check when full signing is blocked:
   `./gradlew :app:minifyMarketReleaseWithR8`
@@ -83,7 +80,9 @@ Important `:app` boundaries:
   package-change sources to the `domain/app/` interfaces.
 - `domain/statistics/` owns statistics/reference computation rules. Keep
   package scanning, package-info lookups, and rule-matching loops out of
-  fragments, ViewModels, and chart data sources.
+  fragments, ViewModels, and chart data sources. Model built-in and external
+  charts through the same definition catalog; built-ins use drawable icon
+  keys, while external rule icons use validated SVG files.
 - `data/statistics/` adapts remote or cached statistics sources, such as Android
   version distribution, to `domain/statistics/` interfaces.
 - `domain/snapshot/` owns snapshot models, archive, capture, and diff seams;
@@ -127,6 +126,9 @@ Important `:app` boundaries:
 
 ## Data, UI, and release constraints
 
+- Keep full-width selectable or hoverable list rows edge-to-edge. Put horizontal
+  page spacing in each row's content padding, not item margins or parent-list
+  horizontal padding, so selector and hover feedback have no side gaps.
 - Room schema changes require a database version bump, migration or
   auto-migration, and updated `app/schemas/`.
 - UI controllers should not call `Repositories.lcRepository` directly for new

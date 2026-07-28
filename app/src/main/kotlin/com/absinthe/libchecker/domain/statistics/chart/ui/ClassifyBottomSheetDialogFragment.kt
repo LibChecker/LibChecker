@@ -46,12 +46,10 @@ class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Clas
   }
 
   private fun render(state: ClassifyDialogState) {
-    root.bind(state, ::handleAction)
-  }
-
-  private fun handleAction(action: ClassifyDialogAction) {
-    when (action) {
-      is ClassifyDialogAction.OpenApp -> activity?.launchDetailPage(action.item)
+    root.bind(state) { action ->
+      when (action) {
+        is ClassifyDialogAction.OpenApp -> activity?.launchDetailPage(action.item)
+      }
     }
   }
 }

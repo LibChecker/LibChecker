@@ -19,7 +19,6 @@ class CenterAlignImageSpan(drawable: Drawable) : ImageSpan(drawable) {
     val rect = drawable.bounds
     val drawableHeight = rect.height().toFloat()
     val paintFm = paint.fontMetrics
-    val textHeight = paintFm.descent - paintFm.ascent
 
     if (fm != null) {
       val textCenter = (paintFm.descent + paintFm.ascent) / 2

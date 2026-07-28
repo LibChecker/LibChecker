@@ -13,7 +13,7 @@ private const val ACTION_EDITOR = "com.absinthe.anywhere_.intent.action.EDITOR"
 private const val EXTRA_PACKAGE_NAME = "EXTRA_PACKAGE_NAME"
 private const val EXTRA_CLASS_NAME = "EXTRA_CLASS_NAME"
 
-class AnywhereManager {
+object AnywhereManager {
 
   fun launchActivityEditor(context: Context, packageName: String, className: String) {
     val fullClassName = if (className.startsWith(".")) {
@@ -32,9 +32,7 @@ class AnywhereManager {
     }
   }
 
-  companion object {
-    val isSupportInteraction =
-      PackageUtils.isAppInstalled(ANYWHERE_APPLICATION_ID) &&
-        PackageUtils.getVersionCode(ANYWHERE_APPLICATION_ID) >= FIRST_SUPPORT_VERSION_CODE
-  }
+  val isSupportInteraction =
+    PackageUtils.isAppInstalled(ANYWHERE_APPLICATION_ID) &&
+      PackageUtils.getVersionCode(ANYWHERE_APPLICATION_ID) >= FIRST_SUPPORT_VERSION_CODE
 }

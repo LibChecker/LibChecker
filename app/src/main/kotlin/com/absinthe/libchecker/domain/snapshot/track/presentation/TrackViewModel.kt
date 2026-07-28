@@ -3,8 +3,6 @@ package com.absinthe.libchecker.domain.snapshot.track.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.domain.snapshot.track.model.TrackedAppListItem
-import com.absinthe.libchecker.domain.snapshot.track.usecase.GetTrackListItemsUseCase
-import com.absinthe.libchecker.domain.snapshot.track.usecase.SetPackageTrackedUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,8 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class TrackViewModel(
-  private val getTrackListItemsUseCase: GetTrackListItemsUseCase,
-  private val setPackageTrackedUseCase: SetPackageTrackedUseCase
+  private val trackWorkflow: TrackWorkflow
 ) : ViewModel() {
 
   private val _uiState = MutableStateFlow(TrackListUiState())
@@ -30,7 +27,7 @@ class TrackViewModel(
     }
 
     loadJob = viewModelScope.launch(Dispatchers.IO) {
-      allItems = getTrackListItemsUseCase()
+      allItems = trackWorkflow.getItems()
       isLoaded = true
       _uiState.value = TrackListUiState(
         items = filterTrackItems(allItems, query),
@@ -54,7 +51,7 @@ class TrackViewModel(
     )
 
     viewModelScope.launch(Dispatchers.IO) {
-      setPackageTrackedUseCase(packageName, tracked)
+      trackWorkflow.setPackageTracked(packageName, tracked)
     }
   }
 

@@ -23,8 +23,10 @@ class BuildInAppUpdateDiffDataUseCase(
     val localVersionCode = packageInfo.getVersionCode()
     val localCompileSdk = packageInfo.getCompileSdkVersion().toShort()
     val localPackageSize = packageInfo.getPackageSize(includeSplits = false)
+    val installableRemoteApp = updateInfo?.appForFlavor(BuildConfig.IS_FOSS)
     val (displayedRemoteApp, hasUpdate) = resolveInAppUpdateDisplay(
-      remoteApp = updateInfo?.appForFlavor(BuildConfig.IS_FOSS),
+      displayedRemoteApp = installableRemoteApp ?: updateInfo?.app,
+      installableRemoteApp = installableRemoteApp,
       localVersionCode = localVersionCode
     )
 
@@ -72,11 +74,12 @@ class BuildInAppUpdateDiffDataUseCase(
 }
 
 internal fun resolveInAppUpdateDisplay(
-  remoteApp: GetAppUpdateInfo.App?,
+  displayedRemoteApp: GetAppUpdateInfo.App?,
+  installableRemoteApp: GetAppUpdateInfo.App?,
   localVersionCode: Long
-): Pair<GetAppUpdateInfo.App?, Boolean> {
-  return remoteApp to (remoteApp?.versionCode?.toLong()?.let { it > localVersionCode } == true)
-}
+): Pair<GetAppUpdateInfo.App?, Boolean> = displayedRemoteApp to (
+  installableRemoteApp?.versionCode?.toLong()?.let { it > localVersionCode } == true
+  )
 
 data class InAppUpdateDiffData(
   val hasUpdate: Boolean,

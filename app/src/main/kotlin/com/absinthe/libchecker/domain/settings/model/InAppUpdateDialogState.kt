@@ -12,7 +12,8 @@ data class InAppUpdateDialogState(
 
 sealed interface InAppUpdateDialogContent {
   data class Loading(
-    val retainedItem: SnapshotItemDisplayData? = null
+    val retainedItem: SnapshotItemDisplayData? = null,
+    val delayIndicator: Boolean = false
   ) : InAppUpdateDialogContent
 
   data class Ready(
@@ -29,9 +30,16 @@ sealed interface InAppUpdateDialogAction {
 }
 
 fun InAppUpdateDialogState.selectChannel(channel: AppUpdateChannel): InAppUpdateDialogState {
+  if (!isChannelSelectionEnabled || channel == selectedChannel) {
+    return this
+  }
+  val retainedItem = when (val currentContent = content) {
+    is InAppUpdateDialogContent.Loading -> currentContent.retainedItem
+    is InAppUpdateDialogContent.Ready -> currentContent.item
+  }
   return InAppUpdateDialogState(
     selectedChannel = channel,
-    content = InAppUpdateDialogContent.Loading(),
+    content = InAppUpdateDialogContent.Loading(retainedItem, delayIndicator = true),
     isChannelSelectionEnabled = false,
     isUpdateEnabled = false
   )

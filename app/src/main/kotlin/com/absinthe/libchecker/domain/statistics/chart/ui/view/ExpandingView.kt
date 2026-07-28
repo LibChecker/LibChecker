@@ -1,17 +1,19 @@
 package com.absinthe.libchecker.domain.statistics.chart.ui.view
 
-import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Typeface
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.Gravity
-import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.view.isVisible
+import androidx.annotation.DrawableRes
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDefinition
+import com.absinthe.libchecker.domain.statistics.chart.ui.loadStatisticIcon
+import com.absinthe.libchecker.domain.statistics.chart.ui.resolve
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libraries.utils.extensions.paddingEndCompat
@@ -31,6 +33,8 @@ class ExpandingView @JvmOverloads constructor(
   init {
     layoutParams = LayoutParams(collapsedSize, collapsedSize)
     orientation = HORIZONTAL
+    clipChildren = true
+    clipToPadding = true
     setBackgroundResource(R.drawable.ripple_feature_label_48dp)
     icon = ImageView(context).apply {
       layoutParams = LayoutParams(collapsedSize, collapsedSize).also {
@@ -47,48 +51,44 @@ class ExpandingView @JvmOverloads constructor(
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
       setTypeface(null, Typeface.BOLD)
-      visibility = GONE
+      importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
     }
 
     addView(icon)
     addView(text)
   }
 
-  fun setContent(iconRes: Int, content: String) {
+  fun setContent(statistic: StatisticDefinition, selected: Boolean) {
+    val content = statistic.title.resolve(context)
+    icon.loadStatisticIcon(statistic.icon, selected)
+    text.text = content
+    contentDescription = content
+  }
+
+  fun setActionContent(@DrawableRes iconRes: Int, content: CharSequence) {
     icon.setImageResource(iconRes)
     text.text = content
     contentDescription = content
   }
 
-  private fun measureExpandedWidth() {
+  private fun measureExpandedWidth(): Int {
     measureChild(icon, MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED)
     measureChild(text, MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED)
-    expandedWidth = icon.measuredWidth + text.measuredWidth + paddingLeft + paddingRight
+    return icon.measuredWidth + text.measuredWidth + paddingLeft + paddingRight
   }
 
-  fun toggle() {
-    measureExpandedWidth()
+  fun widthForState(expanded: Boolean): Int {
+    return if (expanded) measureExpandedWidth() else collapsedSize
+  }
 
-    val animator = if (isExpanded) {
-      ValueAnimator.ofInt(expandedWidth, collapsedSize)
-    } else {
-      ValueAnimator.ofInt(collapsedSize, expandedWidth)
-    }
+  fun setExpanded(expanded: Boolean) {
+    val targetWidth = widthForState(expanded)
+    if (isExpanded == expanded && expandedWidth == targetWidth) return
 
-    animator.addUpdateListener { animation ->
-      val value = animation.animatedValue as Int
-      expandedWidth = value
-      layoutParams.width = value
-      text.isVisible = value > collapsedSize
-
-      requestLayout()
-    }
-
-    animator.interpolator = AccelerateDecelerateInterpolator()
-    animator.duration = 300
-    animator.start()
-
-    isExpanded = !isExpanded
+    isExpanded = expanded
+    expandedWidth = targetWidth
+    layoutParams.width = targetWidth
+    requestLayout()
   }
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

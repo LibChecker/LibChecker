@@ -9,7 +9,3 @@ data class AppBundleItem(
   val contentDescription: String,
   val size: Long
 )
-
-fun buildAppBundleItemDescription(vararg parts: CharSequence?): String {
-  return buildDetailItemDescription(*parts)
-}

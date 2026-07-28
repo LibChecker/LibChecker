@@ -92,6 +92,7 @@ class AndroidAppUpdateRepository(
   private fun installWithPackageInstaller(body: ResponseBody, sizeBytes: Long): AppUpdateInstallResult {
     val sessionId = createSelfUpdateSession(sizeBytes)
     val session = packageInstaller.openSession(sessionId)
+    val previousVersionInfo = context.getAppUpdateNotificationVersionInfo()
     try {
       body.byteStream().use { input ->
         session.openWrite(APK_SESSION_NAME, 0, sizeBytes).use { output ->
@@ -99,7 +100,7 @@ class AndroidAppUpdateRepository(
           session.fsync(output)
         }
       }
-      session.commit(createStatusIntentSender(sessionId))
+      session.commit(createStatusIntentSender(sessionId, previousVersionInfo))
       return AppUpdateInstallResult.Started
     } catch (throwable: Throwable) {
       runCatching { session.abandon() }
@@ -165,12 +166,21 @@ class AndroidAppUpdateRepository(
     return packageInstaller.createSession(params)
   }
 
-  private fun createStatusIntentSender(sessionId: Int) = PendingIntent.getBroadcast(
+  private fun createStatusIntentSender(
+    sessionId: Int,
+    previousVersionInfo: AppUpdateNotificationVersionInfo?
+  ) = PendingIntent.getBroadcast(
     context,
     sessionId,
     Intent(context, AppUpdateInstallResultReceiver::class.java)
       .setPackage(context.packageName)
-      .putExtra(AppUpdateInstallResultReceiver.EXTRA_SESSION_ID, sessionId),
+      .putExtra(AppUpdateInstallResultReceiver.EXTRA_SESSION_ID, sessionId)
+      .apply {
+        previousVersionInfo?.let {
+          putExtra(AppUpdateInstallResultReceiver.EXTRA_PREVIOUS_VERSION_NAME, it.versionName)
+          putExtra(AppUpdateInstallResultReceiver.EXTRA_PREVIOUS_VERSION_CODE, it.versionCode)
+        }
+      },
     PendingIntent.FLAG_UPDATE_CURRENT or mutablePendingIntentFlag()
   ).intentSender
 

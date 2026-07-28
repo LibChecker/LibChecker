@@ -39,7 +39,9 @@ class ELFDetailDialogFragment : BaseBottomSheetViewDialogFragment<ELFInfoBottomS
         iconRes = ruleIcon
       )
     )
-    collectElfDetailResults()
+    lifecycleScope.launch {
+      viewModel.elfDetailResults.collect(::handleElfDetailResult)
+    }
   }
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
@@ -47,12 +49,6 @@ class ELFDetailDialogFragment : BaseBottomSheetViewDialogFragment<ELFInfoBottomS
   override fun onStart() {
     super.onStart()
     viewModel.loadElfDetail(packageName, elfPath)
-  }
-
-  private fun collectElfDetailResults() {
-    lifecycleScope.launch {
-      viewModel.elfDetailResults.collect(::handleElfDetailResult)
-    }
   }
 
   private fun handleElfDetailResult(loadResult: ElfDetailResult) {

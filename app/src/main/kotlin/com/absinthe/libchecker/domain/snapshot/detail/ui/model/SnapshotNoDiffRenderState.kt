@@ -29,16 +29,33 @@ data class SnapshotNoDiffTitleIconRenderState(
 fun SnapshotDiffItem.toSnapshotNoDiffRenderState(
   title: SnapshotTitleRenderState
 ): SnapshotNoDiffRenderState? {
+  if (!shouldShowSnapshotNoDiffPopup()) {
+    return null
+  }
   val mode = when {
     newInstalled -> SnapshotNoDiffMode.New
     deleted -> SnapshotNoDiffMode.Deleted
-    isNothingChanged() -> SnapshotNoDiffMode.NothingChanged
-    else -> return null
+    else -> SnapshotNoDiffMode.NothingChanged
   }
   return SnapshotNoDiffRenderState(
     title = title,
     mode = mode
   )
+}
+
+internal fun SnapshotDiffItem.shouldShowSnapshotNoDiffPopup(): Boolean {
+  return newInstalled ||
+    deleted ||
+    (
+      isNothingChanged() &&
+        !dexInfoDiff.hasChanged() &&
+        !resourcesSizeDiff.hasChanged() &&
+        !resourceInfoDiff.hasChanged()
+      )
+}
+
+private fun <T> SnapshotDiffItem.DiffNode<T>.hasChanged(): Boolean {
+  return new != null && new != old
 }
 
 fun SnapshotPackageIconSource?.toSnapshotNoDiffTitleIconRenderState(): SnapshotNoDiffTitleIconRenderState {

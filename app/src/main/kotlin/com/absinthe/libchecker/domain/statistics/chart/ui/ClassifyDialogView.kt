@@ -3,6 +3,8 @@ package com.absinthe.libchecker.domain.statistics.chart.ui
 import android.content.Context
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.domain.app.list.model.AppListRenderState
 import com.absinthe.libchecker.domain.app.list.ui.adapter.AppAdapter
@@ -13,6 +15,7 @@ import com.absinthe.libchecker.domain.statistics.chart.ui.view.AndroidVersionLab
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.app.EmptyListView
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
@@ -44,9 +47,15 @@ class ClassifyDialogView(context: Context) :
     isVerticalScrollBarEnabled = false
     clipToPadding = false
     clipChildren = false
-    isNestedScrollingEnabled = false
     setHasFixedSize(true)
     FastScrollerBuilder(this).useMd2Style().build()
+  }
+
+  private val subtitle = AppCompatTextView(context).apply {
+    layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+    gravity = android.view.Gravity.CENTER
+    setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleSmall))
+    setPadding(16.dp, 4.dp, 16.dp, 4.dp)
   }
 
   init {
@@ -65,6 +74,7 @@ class ClassifyDialogView(context: Context) :
       isStateViewEnable = true
     }
     addView(header)
+    addView(subtitle)
     addView(list)
   }
 
@@ -82,8 +92,15 @@ class ClassifyDialogView(context: Context) :
   ) {
     this.onAction = onAction
     header.title.text = state.title
+    subtitle.text = state.subtitle
+    subtitle.isVisible = state.subtitle != null
     bindAndroidVersion(state.androidVersion)
-    adapter.bind(AppListRenderState(itemViewStates = state.itemViewStates))
+    adapter.bind(
+      AppListRenderState(
+        itemViewStates = state.itemViewStates,
+        itemChips = state.itemChips
+      )
+    )
     adapter.setList(state.items)
   }
 
@@ -95,7 +112,7 @@ class ClassifyDialogView(context: Context) :
     } else {
       androidVersionView.bind(data)
       if (androidVersionView.parent == null) {
-        addView(androidVersionView, 1)
+        addView(androidVersionView, 2)
       }
     }
   }

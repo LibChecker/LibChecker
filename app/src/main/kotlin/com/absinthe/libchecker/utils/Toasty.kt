@@ -75,13 +75,3 @@ fun Context.showToast(@StringRes res: Int) {
   Timber.d("showToast: ${getString(res)}")
   Toasty.showShort(this, res)
 }
-
-@AnyThread
-fun Context.showLongToast(message: String) {
-  Toasty.showLong(this, message)
-}
-
-@AnyThread
-fun Context.showLongToast(@StringRes res: Int) {
-  Toasty.showLong(this, res)
-}

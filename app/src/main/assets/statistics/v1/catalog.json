@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "definitions": [
+    {
+      "id": "builtin.abi",
+      "revision": 1,
+      "source": "builtin",
+      "title": { "resource": "abi" },
+      "icon": { "drawable": "abi" },
+      "calculation": { "kind": "native", "nativeOperator": "abi" },
+      "controls": ["detailed_abi"]
+    },
+    {
+      "id": "builtin.kotlin",
+      "revision": 1,
+      "source": "builtin",
+      "title": { "resource": "kotlin" },
+      "icon": { "drawable": "kotlin", "renderMode": "original" },
+      "calculation": { "kind": "native", "nativeOperator": "kotlin" },
+      "requiresFeatureInitialization": true,
+      "fingerprint": "features"
+    },
+    {
+      "id": "builtin.target-sdk",
+      "revision": 1,
+      "source": "builtin",
+      "title": { "resource": "target_sdk" },
+      "icon": { "drawable": "target_sdk" },
+      "calculation": { "kind": "native", "nativeOperator": "target_sdk" }
+    },
+    {
+      "id": "builtin.min-sdk",
+      "revision": 1,
+      "source": "builtin",
+      "title": { "resource": "min_sdk" },
+      "icon": { "drawable": "min_sdk" },
+      "calculation": { "kind": "native", "nativeOperator": "min_sdk" }
+    },
+    {
+      "id": "builtin.compile-sdk",
+      "revision": 1,
+      "source": "builtin",
+      "title": { "resource": "compile_sdk" },
+      "icon": { "drawable": "compile_sdk" },
+      "calculation": { "kind": "native", "nativeOperator": "compile_sdk" }
+    },
+    {
+      "id": "builtin.jetpack-compose",
+      "revision": 1,
+      "source": "builtin",
+      "title": { "resource": "jetpack_compose" },
+      "icon": { "drawable": "jetpack_compose", "renderMode": "original" },
+      "calculation": { "kind": "native", "nativeOperator": "jetpack_compose" },
+      "requiresFeatureInitialization": true,
+      "fingerprint": "features"
+    },
+    {
+      "id": "builtin.android-distribution",
+      "revision": 1,
+      "source": "builtin",
+      "title": { "resource": "android_distribution" },
+      "icon": { "drawable": "android_distribution", "renderMode": "original" },
+      "calculation": { "kind": "native", "nativeOperator": "android_distribution" },
+      "dashboard": "android_distribution"
+    },
+    {
+      "id": "builtin.app-bundle",
+      "revision": 1,
+      "source": "builtin",
+      "title": { "resource": "app_bundle" },
+      "icon": { "drawable": "app_bundle", "renderMode": "original" },
+      "calculation": { "kind": "native", "nativeOperator": "app_bundle" }
+    },
+    {
+      "id": "builtin.page-size-16kb",
+      "revision": 1,
+      "source": "builtin",
+      "title": { "resource": "page_size_16kb" },
+      "icon": { "drawable": "page_size_16kb" },
+      "calculation": { "kind": "native", "nativeOperator": "page_size_16kb" },
+      "availability": "page_size_16kb",
+      "fingerprint": "artifact"
+    }
+  ]
+}

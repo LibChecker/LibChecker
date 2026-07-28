@@ -57,6 +57,7 @@ class SnapshotAdapter(
           } else {
             null
           },
+          emphasizeDiffs = renderState.displayOptions.emphasizeDiffs,
           highlightText = highlightText
         )
       )

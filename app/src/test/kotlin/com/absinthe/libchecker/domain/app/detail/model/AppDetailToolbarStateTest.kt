@@ -11,10 +11,29 @@ class AppDetailToolbarStateTest {
   }
 
   @Test
-  fun baseStateOnlyShowsSortAction() {
+  fun baseStateHidesOnlineRuleAnalysisWithoutSelectedRules() {
     val state = AppDetailToolbarState(baseActionsReady = true)
 
-    assertEquals(listOf(AppDetailToolbarAction.SORT), state.visibleActions)
+    assertEquals(
+      listOf(AppDetailToolbarAction.SORT),
+      state.visibleActions
+    )
+  }
+
+  @Test
+  fun baseStateShowsOnlineRuleAnalysisWithSelectedRules() {
+    val state = AppDetailToolbarState(
+      baseActionsReady = true,
+      onlineRuleAnalysisVisible = true
+    )
+
+    assertEquals(
+      listOf(
+        AppDetailToolbarAction.SORT,
+        AppDetailToolbarAction.ONLINE_RULE_ANALYSIS
+      ),
+      state.visibleActions
+    )
   }
 
   @Test
@@ -22,6 +41,7 @@ class AppDetailToolbarStateTest {
     val state = AppDetailToolbarState(
       baseActionsReady = true,
       toolbarCollapsed = true,
+      onlineRuleAnalysisVisible = true,
       harmonyToggleVisible = true,
       processVisible = true,
       compareVisible = true,
@@ -31,6 +51,7 @@ class AppDetailToolbarStateTest {
     assertEquals(
       listOf(
         AppDetailToolbarAction.SORT,
+        AppDetailToolbarAction.ONLINE_RULE_ANALYSIS,
         AppDetailToolbarAction.HARMONY_TOGGLE,
         AppDetailToolbarAction.PROCESS,
         AppDetailToolbarAction.COMPARE,

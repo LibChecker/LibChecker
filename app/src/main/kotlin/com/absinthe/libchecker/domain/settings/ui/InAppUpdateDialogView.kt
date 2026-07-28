@@ -3,8 +3,11 @@ package com.absinthe.libchecker.domain.settings.ui
 import android.content.Context
 import android.view.ContextThemeWrapper
 import android.view.Gravity
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import android.widget.ViewFlipper
+import androidx.annotation.DrawableRes
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.update.AppUpdateChannel
 import com.absinthe.libchecker.domain.settings.model.InAppUpdateDialogAction
@@ -12,12 +15,10 @@ import com.absinthe.libchecker.domain.settings.model.InAppUpdateDialogContent
 import com.absinthe.libchecker.domain.settings.model.InAppUpdateDialogState
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemDisplayData
 import com.absinthe.libchecker.domain.snapshot.list.ui.view.SnapshotItemView
-import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
-import com.absinthe.libraries.utils.view.HeightAnimatableViewFlipper
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.loadingindicator.LoadingIndicator
@@ -29,6 +30,7 @@ class InAppUpdateDialogView(context: Context) :
   private var onAction: (InAppUpdateDialogAction) -> Unit = {}
   private var isBinding = false
   private var renderedItem: SnapshotItemDisplayData? = null
+  private var pendingShowLoading: Runnable? = null
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
@@ -64,11 +66,9 @@ class InAppUpdateDialogView(context: Context) :
     setPadding(0, 16.dp, 0, 16.dp)
   }
 
-  private val viewFlipper = HeightAnimatableViewFlipper(context).apply {
+  private val viewFlipper = ViewFlipper(context).apply {
     layoutParams =
       LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-    setInAnimation(context, R.anim.anim_fade_in)
-    setOutAnimation(context, R.anim.anim_fade_out)
   }
 
   private val loading = LoadingIndicator(
@@ -121,24 +121,23 @@ class InAppUpdateDialogView(context: Context) :
     isBinding = true
     toggleGroup.check(state.selectedChannel.toButtonId())
     isBinding = false
-    doOnMainThreadIdle {
-      toggleGroup.isEnabled = state.isChannelSelectionEnabled
+    toggleGroup.isEnabled = state.isChannelSelectionEnabled
+    for (index in 0 until toggleGroup.childCount) {
+      toggleGroup.getChildAt(index).isEnabled = state.isChannelSelectionEnabled
     }
     updateButton.isEnabled = state.isUpdateEnabled
 
     when (val content = state.content) {
       is InAppUpdateDialogContent.Loading -> {
         setItem(content.retainedItem)
-        if (viewFlipper.displayedChildView != loading) {
-          viewFlipper.show(loading)
-        }
+        showLoading(content.delayIndicator)
       }
 
       is InAppUpdateDialogContent.Ready -> {
+        cancelPendingShowLoading()
+        demoItemView.setPlaceholderIconResource(state.selectedChannel.toUpdateIconRes())
         setItem(content.item)
-        if (viewFlipper.displayedChildView != demoView) {
-          viewFlipper.show(demoView)
-        }
+        viewFlipper.showLatest(demoView)
       }
     }
   }
@@ -155,8 +154,40 @@ class InAppUpdateDialogView(context: Context) :
     demoView.addView(demoItemView)
   }
 
+  private fun showLoading(delayWhilePreviewIsVisible: Boolean) {
+    cancelPendingShowLoading()
+    if (!delayWhilePreviewIsVisible || viewFlipper.displayedChild == viewFlipper.indexOfChild(loading)) {
+      viewFlipper.showLatest(loading)
+      return
+    }
+
+    val showLoading = Runnable {
+      pendingShowLoading = null
+      viewFlipper.showLatest(loading)
+    }
+    pendingShowLoading = showLoading
+    postDelayed(showLoading, LOADING_INDICATOR_DELAY_MILLIS)
+  }
+
+  private fun cancelPendingShowLoading() {
+    pendingShowLoading?.let(::removeCallbacks)
+    pendingShowLoading = null
+  }
+
+  private fun ViewFlipper.showLatest(view: View) {
+    val childIndex = indexOfChild(view)
+    if (displayedChild != childIndex) {
+      displayedChild = childIndex
+    }
+  }
+
   override fun getHeaderView(): BottomSheetHeaderView {
     return header
+  }
+
+  override fun onDetachedFromWindow() {
+    cancelPendingShowLoading()
+    super.onDetachedFromWindow()
   }
 
   private fun Int.toAppUpdateChannel(): AppUpdateChannel? {
@@ -173,4 +204,14 @@ class InAppUpdateDialogView(context: Context) :
       AppUpdateChannel.CI -> R.id.in_app_update_chip_ci
     }
   }
+
+  @DrawableRes
+  private fun AppUpdateChannel.toUpdateIconRes(): Int {
+    return when (this) {
+      AppUpdateChannel.STABLE -> R.mipmap.ic_launcher
+      AppUpdateChannel.CI -> R.mipmap.ic_launcher_blueprint
+    }
+  }
 }
+
+private const val LOADING_INDICATOR_DELAY_MILLIS = 250L

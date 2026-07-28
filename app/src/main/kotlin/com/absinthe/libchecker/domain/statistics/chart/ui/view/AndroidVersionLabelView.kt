@@ -34,8 +34,7 @@ class AndroidVersionLabelView(context: Context) : AViewGroup(context) {
   }
 
   fun bind(data: AndroidVersionLabelDisplayData) {
-    val id = data.iconRes ?: com.absinthe.lc.rulesbundle.R.drawable.ic_lib_android
-    icon.setImageResource(id)
+    icon.setImageResource(data.iconRes ?: com.absinthe.lc.rulesbundle.R.drawable.ic_lib_android)
     text.text = data.text
     contentDescription = data.contentDescription
   }

@@ -1,11 +1,9 @@
 package com.absinthe.libchecker.domain.app.detail.ui
 
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageInfo
 import android.graphics.drawable.Drawable
 import android.os.Build
-import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -14,8 +12,6 @@ import android.widget.ScrollView
 import androidx.annotation.OptIn
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatImageView
-import androidx.browser.customtabs.CustomTabsIntent
-import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.FragmentActivity
 import com.absinthe.libchecker.R
@@ -30,12 +26,13 @@ import com.absinthe.libchecker.domain.app.detail.ui.dialog.AppInstallSourceBSDFr
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.AppPropBottomSheetDialogFragment
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.utils.Telemetry
-import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.copyToClipboard
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.openUrlInBrowser
 import com.absinthe.libchecker.utils.extensions.paddingStartCompat
 import com.absinthe.libchecker.utils.extensions.paddingTopCompat
+import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.utils.toJson
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
@@ -44,17 +41,13 @@ import com.google.android.flexbox.JustifyContent
 import com.google.android.material.badge.BadgeDrawable
 import com.google.android.material.badge.BadgeUtils
 import com.google.android.material.badge.ExperimentalBadgeUtils
-import timber.log.Timber
 
 object FeaturesDialog {
 
   fun showSplitApksDialog(activity: FragmentActivity, packageInfo: PackageInfo) {
-    AppBundleBottomSheetDialogFragment().apply {
-      arguments = Bundle().apply {
-        putParcelable(EXTRA_PACKAGE_INFO, packageInfo)
-      }
-      show(activity.supportFragmentManager, AppBundleBottomSheetDialogFragment::class.java.name)
-    }
+    AppBundleBottomSheetDialogFragment()
+      .putArguments(EXTRA_PACKAGE_INFO to packageInfo)
+      .show(activity.supportFragmentManager, AppBundleBottomSheetDialogFragment::class.java.name)
   }
 
   fun show(context: Context, spec: FeatureDialogSpec) {
@@ -64,23 +57,21 @@ object FeaturesDialog {
     val dialog = BaseAlertDialogBuilder(context)
       .setIcon(icon)
       .setTitle(spec.titleRes)
-      .setMessage(HtmlCompat.fromHtml(context.getString(spec.messageRes), HtmlCompat.FROM_HTML_MODE_COMPACT))
       .setPositiveButton(android.R.string.ok, null)
 
+    spec.messageRes?.let { messageRes ->
+      dialog.setMessage(HtmlCompat.fromHtml(context.getString(messageRes), HtmlCompat.FROM_HTML_MODE_COMPACT))
+    }
     spec.titleEntries?.let { entries ->
       val title = entries.joinToString(", ") { entry ->
-        val label = when (val label = entry.label) {
-          is FeatureDialogTitleLabel.Resource -> context.getString(label.res)
-          is FeatureDialogTitleLabel.Text -> label.value
-        }
-        "$label <b>${entry.value.orEmpty()}</b>"
+        "${entry.label.resolve(context)} <b>${entry.value.orEmpty()}</b>"
       }
       dialog.setTitle(HtmlCompat.fromHtml(title, HtmlCompat.FROM_HTML_MODE_COMPACT))
     }
 
     spec.sourceUrl?.let { link ->
       dialog.setNeutralButton(R.string.lib_detail_app_props_tip) { _, _ ->
-        openSourceLink(context, link)
+        context.openUrlInBrowser(link)
       }
     }
 
@@ -91,34 +82,32 @@ object FeaturesDialog {
     )
   }
 
-  fun showAppPropDialog(activity: FragmentActivity, packageInfo: PackageInfo?) {
-    val pi = packageInfo ?: return
-
-    AppPropBottomSheetDialogFragment().apply {
-      arguments = Bundle().apply {
-        putParcelable(EXTRA_PACKAGE_INFO, pi)
-      }
-      show(activity.supportFragmentManager, AppPropBottomSheetDialogFragment::class.java.name)
+  private fun FeatureDialogTitleLabel.resolve(context: Context): String {
+    return when (this) {
+      is FeatureDialogTitleLabel.Resource -> context.getString(res)
+      is FeatureDialogTitleLabel.Text -> value
     }
   }
 
+  fun showAppPropDialog(activity: FragmentActivity, packageInfo: PackageInfo?) {
+    val pi = packageInfo ?: return
+
+    AppPropBottomSheetDialogFragment()
+      .putArguments(EXTRA_PACKAGE_INFO to pi)
+      .show(activity.supportFragmentManager, AppPropBottomSheetDialogFragment::class.java.name)
+  }
+
   fun showAppPropDialog(activity: FragmentActivity, props: Map<String, String>) {
-    AppPropBottomSheetDialogFragment().apply {
-      arguments = Bundle().apply {
-        putString(EXTRA_PROPS, props.toJson())
-      }
-      show(activity.supportFragmentManager, AppPropBottomSheetDialogFragment::class.java.name)
-    }
+    AppPropBottomSheetDialogFragment()
+      .putArguments(EXTRA_PROPS to props.toJson())
+      .show(activity.supportFragmentManager, AppPropBottomSheetDialogFragment::class.java.name)
   }
 
   @RequiresApi(Build.VERSION_CODES.R)
   fun showAppInstallSourceDialog(activity: FragmentActivity, packageName: String) {
-    AppInstallSourceBSDFragment().apply {
-      arguments = Bundle().apply {
-        putString(EXTRA_PACKAGE_NAME, packageName)
-      }
-      show(activity.supportFragmentManager, AppInstallSourceBSDFragment::class.java.name)
-    }
+    AppInstallSourceBSDFragment()
+      .putArguments(EXTRA_PACKAGE_NAME to packageName)
+      .show(activity.supportFragmentManager, AppInstallSourceBSDFragment::class.java.name)
   }
 
   fun showAppIconsDialog(context: Context, drawables: List<Drawable>, isFirstMonochrome: Boolean) {
@@ -184,23 +173,5 @@ object FeaturesDialog {
       Constants.Event.FEATURE_DIALOG,
       mapOf(Telemetry.Param.CONTENT to context.getString(titleRes))
     )
-  }
-
-  private fun openSourceLink(context: Context, link: String) {
-    runCatching {
-      CustomTabsIntent.Builder().build().apply {
-        launchUrl(context, link.toUri())
-      }
-    }.onFailure {
-      Timber.e(it)
-      runCatching {
-        val intent = Intent(Intent.ACTION_VIEW)
-          .setData(link.toUri())
-        context.startActivity(intent)
-      }.onFailure { inner ->
-        Timber.e(inner)
-        Toasty.showShort(context, "No browser application")
-      }
-    }
   }
 }

@@ -21,44 +21,42 @@ object LibReferenceOptions {
       PROVIDERS or
       ACTION
 
-  fun getOptionsString(options: Int): String {
-    val sb = StringBuilder()
+  fun getOptionsString(options: Int) = buildString {
     if (options and NATIVE_LIBS != 0) {
-      sb.append("NATIVE_LIBS, ")
+      append("NATIVE_LIBS, ")
     }
     if (options and SERVICES != 0) {
-      sb.append("SERVICES, ")
+      append("SERVICES, ")
     }
     if (options and ACTIVITIES != 0) {
-      sb.append("ACTIVITIES, ")
+      append("ACTIVITIES, ")
     }
     if (options and RECEIVERS != 0) {
-      sb.append("RECEIVERS, ")
+      append("RECEIVERS, ")
     }
     if (options and PROVIDERS != 0) {
-      sb.append("PROVIDERS, ")
+      append("PROVIDERS, ")
     }
     if (options and PERMISSIONS != 0) {
-      sb.append("PERMISSIONS, ")
+      append("PERMISSIONS, ")
     }
     if (options and METADATA != 0) {
-      sb.append("METADATA, ")
+      append("METADATA, ")
     }
     if (options and PACKAGES != 0) {
-      sb.append("PACKAGES, ")
+      append("PACKAGES, ")
     }
     if (options and SHARED_UID != 0) {
-      sb.append("SHARED_UID, ")
+      append("SHARED_UID, ")
     }
     if (options and ONLY_NOT_MARKED != 0) {
-      sb.append("ONLY_NOT_MARKED, ")
+      append("ONLY_NOT_MARKED, ")
     }
     if (options and ACTION != 0) {
-      sb.append("ACTION, ")
+      append("ACTION, ")
     }
-    if (sb.isNotEmpty()) {
-      sb.delete(sb.length - 2, sb.length)
+    if (isNotEmpty()) {
+      delete(length - 2, length)
     }
-    return sb.toString()
   }
 }

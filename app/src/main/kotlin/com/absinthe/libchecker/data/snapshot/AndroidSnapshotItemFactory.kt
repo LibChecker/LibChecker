@@ -10,21 +10,28 @@ import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.domain.snapshot.SnapshotItemFactory
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.dex.DexStatsCollector
 import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPackageSize
 import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getVersionCode
+import com.absinthe.libchecker.utils.extensions.isArchivedPackage
 import com.absinthe.libchecker.utils.toJson
 
 class AndroidSnapshotItemFactory : SnapshotItemFactory {
 
   override fun create(packageManager: PackageManager, packageInfo: PackageInfo): SnapshotItem {
-    val flaggedPi = PackageUtils.getPackageInfo(
-      packageInfo.packageName,
-      PackageManager.GET_SERVICES or PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS or
-        PackageManager.GET_PERMISSIONS or PackageManager.GET_META_DATA
-    )
+    val isArchived = packageInfo.isArchivedPackage()
+    val flaggedPi = if (isArchived) {
+      packageInfo
+    } else {
+      PackageUtils.getPackageInfo(
+        packageInfo.packageName,
+        PackageManager.GET_SERVICES or PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS or
+          PackageManager.GET_PERMISSIONS or PackageManager.GET_META_DATA
+      )
+    }
 
     return SnapshotItem(
       id = null,
@@ -33,8 +40,9 @@ class AndroidSnapshotItemFactory : SnapshotItemFactory {
       installedTime = packageInfo.firstInstallTime,
       lastUpdatedTime = packageInfo.lastUpdateTime,
       label = packageInfo.getAppName(packageManager).toString(),
-      versionName = packageInfo.versionName.toString(),
+      versionName = packageInfo.versionName.orEmpty(),
       versionCode = packageInfo.getVersionCode(),
+      isArchived = isArchived,
       abi = PackageUtils.getAbi(packageInfo).toShort(),
       targetApi = packageInfo.applicationInfo?.targetSdkVersion?.toShort() ?: 0,
       compileSdk = packageInfo.getCompileSdkVersion().toShort(),
@@ -45,11 +53,11 @@ class AndroidSnapshotItemFactory : SnapshotItemFactory {
         SERVICE,
         false
       ).toJson().orEmpty(),
-      activities = PackageUtils.getComponentStringList(
-        packageInfo.packageName,
-        ACTIVITY,
-        false
-      ).toJson().orEmpty(),
+      activities = if (isArchived) {
+        PackageUtils.getComponentStringList(packageInfo, ACTIVITY, false).toJson().orEmpty()
+      } else {
+        PackageUtils.getComponentStringList(packageInfo.packageName, ACTIVITY, false).toJson().orEmpty()
+      },
       receivers = PackageUtils.getComponentStringList(
         flaggedPi,
         RECEIVER,
@@ -64,6 +72,18 @@ class AndroidSnapshotItemFactory : SnapshotItemFactory {
       metadata = PackageUtils.getMetaDataItems(flaggedPi).toJson().orEmpty(),
       packageSize = packageInfo.getPackageSize(true),
       isSystem = (packageInfo.applicationInfo!!.flags and ApplicationInfo.FLAG_SYSTEM) > 0
+    ).applyDecoratedStats(packageInfo)
+  }
+
+  private fun SnapshotItem.applyDecoratedStats(packageInfo: PackageInfo): SnapshotItem {
+    val stats = DexStatsCollector.collect(packageInfo)
+    return copy(
+      dexInfo = stats.entries.toJson().orEmpty(),
+      resourceInfo = stats.resourceEntries.toJson().orEmpty(),
+      resourcesSize = stats.resourcesSize,
+      statsVersion = SnapshotItem.CURRENT_STATS_VERSION,
+      dexStatsAvailable = stats.isDexComplete,
+      resourceStatsAvailable = stats.isResourceComplete
     )
   }
 }
