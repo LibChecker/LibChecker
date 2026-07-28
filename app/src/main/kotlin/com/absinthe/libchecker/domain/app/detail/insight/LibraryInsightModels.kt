@@ -51,6 +51,7 @@ data class LibraryInsightDefinition(
   data class Capture(
     val output: String,
     val type: String,
+    val prefix: String? = null,
     @Json(name = "max_results") val maxResults: Int
   )
 

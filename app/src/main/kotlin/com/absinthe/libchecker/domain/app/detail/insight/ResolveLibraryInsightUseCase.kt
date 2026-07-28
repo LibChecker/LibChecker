@@ -61,31 +61,71 @@ class ResolveLibraryInsightUseCase(
     values: MutableMap<String, LinkedHashSet<String>>
   ) {
     lookups.forEach { lookup ->
-      values[lookup.input]
+      val inputs = values[lookup.input]
         .orEmpty()
         .asSequence()
         .filter(LibraryInsightDefinitionValidator.LOOKUP_VALUE::matches)
         .take(lookup.maxRequests)
-        .forEach inputLoop@{ input ->
-          val path = lookup.pathTemplate.replace(LibraryInsightDefinitionValidator.VALUE_PLACEHOLDER, input)
-          if (!validator.isSafeRemotePath(path)) return@inputLoop
-          val document =
-            (repository.getLookup(path) as? RemoteDocumentResult.Success)?.value ?: return@inputLoop
-          if (lookup.expectedField != null && document[lookup.expectedField] != input) return@inputLoop
-          val items = lookup.itemsField?.let { field ->
-            document[field] as? List<*> ?: return@inputLoop
-          } ?: listOf(document)
-          items.asSequence().take(lookup.maxItems).forEach itemLoop@{ rawItem ->
-            val item = rawItem as? Map<*, *> ?: return@itemLoop
-            lookup.outputs.forEach { mapping ->
-              val output = values.getOrPut(mapping.output, ::linkedSetOf)
-              when (val value = item[mapping.field]) {
-                is String -> value.takeIf(String::isNotBlank)?.let(output::add)
-                is List<*> -> value.filterIsInstance<String>().filter(String::isNotBlank).forEach(output::add)
-              }
-            }
-          }
+        .toList()
+      if (inputs.isEmpty()) return@forEach
+
+      if (LibraryInsightDefinitionValidator.VALUE_PLACEHOLDER !in lookup.pathTemplate) {
+        resolveLocalIndexLookup(lookup, inputs, values)
+        return@forEach
+      }
+
+      inputs.forEach inputLoop@{ input ->
+        val path = lookup.pathTemplate.replace(LibraryInsightDefinitionValidator.VALUE_PLACEHOLDER, input)
+        if (!validator.isSafeRemotePath(path)) return@inputLoop
+        val document =
+          (repository.getLookup(path) as? RemoteDocumentResult.Success)?.value ?: return@inputLoop
+        if (lookup.expectedField != null && document[lookup.expectedField] != input) return@inputLoop
+        val items = lookup.itemsField?.let { field ->
+          document[field] as? List<*> ?: return@inputLoop
+        } ?: listOf(document)
+        appendLookupOutputs(lookup, items.asSequence(), values)
+      }
+    }
+  }
+
+  private suspend fun resolveLocalIndexLookup(
+    lookup: LibraryInsightDefinition.Lookup,
+    inputs: List<String>,
+    values: MutableMap<String, LinkedHashSet<String>>
+  ) {
+    if (!validator.isSafeRemotePath(lookup.pathTemplate)) return
+    val expectedField = lookup.expectedField ?: return
+    val itemsField = lookup.itemsField ?: return
+    val document =
+      (repository.getLookup(lookup.pathTemplate) as? RemoteDocumentResult.Success)?.value ?: return
+    val items = document[itemsField] as? List<*> ?: return
+    appendLookupOutputs(
+      lookup = lookup,
+      items = items
+        .asSequence()
+        .take(lookup.maxItems)
+        .filter { rawItem ->
+          val item = rawItem as? Map<*, *> ?: return@filter false
+          item[expectedField] in inputs
+        },
+      values = values
+    )
+  }
+
+  private fun appendLookupOutputs(
+    lookup: LibraryInsightDefinition.Lookup,
+    items: Sequence<*>,
+    values: MutableMap<String, LinkedHashSet<String>>
+  ) {
+    items.take(lookup.maxItems).forEach itemLoop@{ rawItem ->
+      val item = rawItem as? Map<*, *> ?: return@itemLoop
+      lookup.outputs.forEach { mapping ->
+        val output = values.getOrPut(mapping.output, ::linkedSetOf)
+        when (val value = item[mapping.field]) {
+          is String -> value.takeIf(String::isNotBlank)?.let(output::add)
+          is List<*> -> value.filterIsInstance<String>().filter(String::isNotBlank).forEach(output::add)
         }
+      }
     }
   }
 

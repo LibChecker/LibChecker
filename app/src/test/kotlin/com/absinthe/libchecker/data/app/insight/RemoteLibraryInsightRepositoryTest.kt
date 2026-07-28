@@ -60,6 +60,22 @@ class RemoteLibraryInsightRepositoryTest {
   }
 
   @Test
+  fun `parses version 2 prefixed and digest captures`() = runBlocking {
+    val request = RecordingRulesDocumentRequest {
+      Response.success(V2_DEFINITION_JSON.toResponseBody())
+    }
+
+    val result = repository(request)
+      .getDefinition("sdk-details/sdks/androidx_media3/definition.json")
+
+    val definition = (result as RemoteDocumentResult.Success).value
+    assertEquals(2, definition.schemaVersion)
+    assertEquals("AndroidXMedia3/", definition.probes[0].captures.single().prefix)
+    assertEquals("file_sha256", definition.probes[1].reader.operator)
+    assertEquals("sha256", definition.probes[1].captures.single().type)
+  }
+
+  @Test
   fun `rejects an oversized catalog response`() = runBlocking {
     val request = RecordingRulesDocumentRequest {
       Response.success("x".repeat(64 * 1024 + 1).toResponseBody())
@@ -126,6 +142,66 @@ class RemoteLibraryInsightRepositoryTest {
       {
         "engine": "revision",
         "flutter": "3.24.5"
+      }
+    """.trimIndent()
+
+    val V2_DEFINITION_JSON = """
+      {
+        "schema_version": 2,
+        "sdk_id": "androidx_media3",
+        "target_uuids": ["17C5D1C7-8A5A-412F-8F4D-C16EC303F663"],
+        "probes": [
+          {
+            "id": "media3",
+            "source": {
+              "operator": "package_file",
+              "file_name": "classes.dex",
+              "archive_paths": ["classes.dex"]
+            },
+            "reader": {
+              "operator": "ascii_strings",
+              "max_bytes_per_file": 1024,
+              "max_total_bytes": 2048
+            },
+            "captures": [
+              {
+                "output": "versions",
+                "type": "prefixed_semver",
+                "prefix": "AndroidXMedia3/",
+                "max_results": 2
+              }
+            ]
+          },
+          {
+            "id": "fingerprint",
+            "source": {
+              "operator": "package_file",
+              "file_name": "module.kotlin_module",
+              "archive_paths": ["META-INF/module.kotlin_module"]
+            },
+            "reader": {
+              "operator": "file_sha256",
+              "max_bytes_per_file": 1024,
+              "max_total_bytes": 2048
+            },
+            "captures": [
+              {
+                "output": "fingerprints",
+                "type": "sha256",
+                "max_results": 2
+              }
+            ]
+          }
+        ],
+        "presentation": {
+          "summary": [
+            {
+              "label": {"default": "Version"},
+              "source": "versions",
+              "max_values": 2
+            }
+          ]
+        }
       }
     """.trimIndent()
   }

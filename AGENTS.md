@@ -88,6 +88,11 @@ Important `:app` boundaries:
 - `domain/snapshot/` owns snapshot models, archive, capture, and diff seams;
   keep package-to-snapshot conversion and diff rules out of UI controllers and
   services.
+- `domain/app/detail/insight/` owns the bounded generic interpreter for remote
+  SDK details. Keep SDK-specific UUIDs, archive paths, prefixes, artifact
+  coordinates, and fingerprint data in LibChecker-Rules rather than hardcoding
+  them in the client. Fetch fingerprint indexes by stable paths and match them
+  locally; never put locally captured fingerprints in request URLs or logs.
 - `data/snapshot/` adapts Android, protobuf archive format, and local snapshot
   storage to `domain/snapshot/` interfaces.
 - `compat/` wraps platform/API-level differences. Check here before adding new
@@ -141,6 +146,9 @@ Important `:app` boundaries:
   lookups that keep Binder payloads below transaction limits.
 - Heavy package scanning, zip reads, DEX parsing, ELF parsing, database writes,
   and network calls must run off the main thread.
+- Publish client support for a new SDK-details schema, reader, or capture type
+  before publishing remote definitions that use it; older clients safely reject
+  unknown definitions but cannot display their details.
 - Package analysis must keep working for installed apps, APK, split APK, APKS,
   XAPK, HAP, missing icons/labels, corrupted archives, and OEM/API differences.
 - Prefer `FileProvider` for sharing/exporting app files. Any legacy `file://`

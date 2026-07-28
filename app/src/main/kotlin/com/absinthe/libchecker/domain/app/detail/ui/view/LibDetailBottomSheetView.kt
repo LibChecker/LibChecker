@@ -1,8 +1,10 @@
 package com.absinthe.libchecker.domain.app.detail.ui.view
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.text.method.LinkMovementMethod
 import android.transition.ChangeBounds
 import android.transition.Fade
@@ -18,6 +20,7 @@ import android.widget.LinearLayout
 import android.widget.TableLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.graphics.ColorUtils
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isGone
 import androidx.core.view.marginTop
@@ -44,6 +47,7 @@ import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.absinthe.libraries.utils.view.HeightAnimatableViewFlipper
 import com.google.android.material.tabs.TabLayout
+import kotlin.math.roundToInt
 
 class LibDetailBottomSheetView(
   context: Context,
@@ -91,7 +95,7 @@ class LibDetailBottomSheetView(
     title = title,
     extraInfoCard = extraInfoCard
   ).apply {
-    layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).also {
+    layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).also {
       it.topMargin = 4.dp
     }
   }
@@ -211,29 +215,34 @@ class LibDetailBottomSheetView(
   }
 
   fun renderLibraryInsight(state: LibraryInsightUiState, onRetry: () -> Unit) {
-    if (
-      extraInfoCard.isGone &&
-      state != LibraryInsightUiState.Hidden &&
-      identityAndExtra.isLaidOut
-    ) {
+    val willBeGone = state == LibraryInsightUiState.Hidden
+    val shouldAnimate = extraInfoCard.isGone != willBeGone && identityAndExtra.isLaidOut
+    if (shouldAnimate) {
       TransitionManager.beginDelayedTransition(
-        identityAndExtra,
+        this,
         TransitionSet().apply {
           ordering = TransitionSet.ORDERING_TOGETHER
-          duration = INSIGHT_APPEARANCE_DURATION
+          duration = INSIGHT_VISIBILITY_DURATION
           interpolator = FastOutSlowInInterpolator()
           addTransition(
             ChangeBounds().apply {
               addTarget(icon)
               addTarget(title)
               addTarget(extraInfoCard)
+              addTarget(identityAndExtra)
+              addTarget(viewFlipper)
             }
           )
-          addTransition(Fade(Fade.IN).apply { addTarget(extraInfoCard) })
+          addTransition(
+            Fade(if (willBeGone) Fade.OUT else Fade.IN).apply {
+              addTarget(extraInfoCard)
+            }
+          )
         }
       )
     }
     extraInfoCard.render(state, onRetry)
+    identityAndExtra.setSurfaceVisible(!willBeGone, shouldAnimate)
   }
 
   private class IdentityAndExtraView(
@@ -243,83 +252,118 @@ class LibDetailBottomSheetView(
     private val extraInfoCard: View
   ) : AViewGroup(context) {
 
-    private val gap = 12.dp
-    private val identityTopInset = 8.dp
-    private var useSideBySideLayout = false
+    private val sectionGap = 16.dp
+    private val surfaceInset = 12.dp
+    private val surfaceColor =
+      context.getColorByAttr(com.google.android.material.R.attr.colorSurfaceContainerHigh)
+    private val surfaceStrokeColor =
+      context.getColorByAttr(com.google.android.material.R.attr.colorOutlineVariant)
+    private val surfaceDrawable = GradientDrawable().apply {
+      cornerRadius = 12.dp.toFloat()
+    }
+    private var surfaceVisible = false
+    private var surfaceProgress = 0f
+    private var surfaceAnimator: ValueAnimator? = null
     private var identityWidth = 0
-    private var sideBySideIdentityTop = 0
-    private var sideBySideCardTop = 0
+    private var contentHeight = 0
 
     init {
+      background = surfaceDrawable
+      applySurfaceProgress(0f)
       addView(icon)
       addView(title)
       addView(extraInfoCard)
     }
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-      val width = MeasureSpec.getSize(widthMeasureSpec)
-      val availableWidth = (width - paddingStart - paddingEnd).coerceAtLeast(0)
-      icon.measure(icon.layoutParams.width.toExactlyMeasureSpec(), icon.layoutParams.height.toExactlyMeasureSpec())
-      useSideBySideLayout = !extraInfoCard.isGone && availableWidth >= 280.dp
-      identityWidth = if (useSideBySideLayout) {
-        (availableWidth * 0.28f).toInt().coerceIn(80.dp, 104.dp)
-      } else {
-        availableWidth
+    fun setSurfaceVisible(visible: Boolean, animate: Boolean) {
+      val targetProgress = if (visible) 1f else 0f
+      if (surfaceVisible == visible && surfaceProgress == targetProgress) return
+      surfaceVisible = visible
+      requestLayout()
+      surfaceAnimator?.cancel()
+      if (!animate) {
+        applySurfaceProgress(targetProgress)
+        return
       }
+      surfaceAnimator = ValueAnimator.ofFloat(surfaceProgress, targetProgress).apply {
+        duration = INSIGHT_VISIBILITY_DURATION
+        interpolator = FastOutSlowInInterpolator()
+        addUpdateListener { applySurfaceProgress(it.animatedValue as Float) }
+        start()
+      }
+    }
+
+    private fun applySurfaceProgress(progress: Float) {
+      surfaceProgress = progress
+      surfaceDrawable.setColor(
+        ColorUtils.setAlphaComponent(
+          surfaceColor,
+          (Color.alpha(surfaceColor) * progress).roundToInt()
+        )
+      )
+      surfaceDrawable.setStroke(
+        1.dp,
+        ColorUtils.setAlphaComponent(
+          surfaceStrokeColor,
+          (Color.alpha(surfaceStrokeColor) * progress).roundToInt()
+        )
+      )
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+      val widthLimit = MeasureSpec.getSize(widthMeasureSpec)
+      val horizontalInset = if (surfaceVisible) surfaceInset else 0
+      val verticalInset = if (surfaceVisible) surfaceInset else 0
+      val availableWidth = (
+        widthLimit -
+          paddingStart -
+          paddingEnd -
+          horizontalInset * 2
+        ).coerceAtLeast(0)
+      icon.measure(icon.layoutParams.width.toExactlyMeasureSpec(), icon.layoutParams.height.toExactlyMeasureSpec())
+      title.measure(availableWidth.toAtMostMeasureSpec(), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED))
+      val identityOnlyWidth = maxOf(icon.measuredWidth, title.measuredWidth)
+      identityWidth = if (surfaceVisible) availableWidth else identityOnlyWidth
       title.measure(identityWidth.toAtMostMeasureSpec(), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED))
       val identityHeight = icon.measuredHeight + 4.dp + title.measuredHeight
 
-      val desiredHeight = when {
+      contentHeight = when {
         extraInfoCard.isGone -> identityHeight
-
-        useSideBySideLayout -> {
-          val cardWidth = (availableWidth - identityWidth - gap).coerceAtLeast(0)
-          extraInfoCard.measure(cardWidth.toExactlyMeasureSpec(), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED))
-          sideBySideIdentityTop = identityTopInset
-          sideBySideCardTop = if (extraInfoCard.measuredHeight <= identityHeight + identityTopInset) {
-            identityTopInset + (identityHeight - extraInfoCard.measuredHeight) / 2
-          } else {
-            0
-          }
-          maxOf(
-            sideBySideIdentityTop + identityHeight,
-            sideBySideCardTop + extraInfoCard.measuredHeight
-          )
-        }
 
         else -> {
           extraInfoCard.measure(availableWidth.toExactlyMeasureSpec(), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED))
-          identityHeight + gap + extraInfoCard.measuredHeight
+          identityHeight + sectionGap + extraInfoCard.measuredHeight
         }
       }
+      val desiredWidth = if (surfaceVisible) {
+        widthLimit
+      } else {
+        identityWidth + paddingStart + paddingEnd
+      }
+      val desiredHeight =
+        contentHeight + paddingTop + paddingBottom + verticalInset * 2
       setMeasuredDimension(
-        resolveSize(width, widthMeasureSpec),
-        resolveSize(desiredHeight + paddingTop + paddingBottom, heightMeasureSpec)
+        resolveSize(desiredWidth, widthMeasureSpec),
+        resolveSize(desiredHeight, heightMeasureSpec)
       )
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
       val identityHeight = icon.measuredHeight + 4.dp + title.measuredHeight
-      val identityTop = if (useSideBySideLayout) {
-        paddingTop + sideBySideIdentityTop
-      } else {
-        paddingTop
-      }
-      val iconX = paddingStart + (identityWidth - icon.measuredWidth) / 2
+      val horizontalInset = if (surfaceVisible) surfaceInset else 0
+      val verticalInset = if (surfaceVisible) surfaceInset else 0
+      val identityTop = paddingTop + verticalInset
+      val identityLeft = paddingStart + horizontalInset
+      val iconX = identityLeft + (identityWidth - icon.measuredWidth) / 2
       icon.layout(iconX, identityTop)
       title.layout(
-        paddingStart + (identityWidth - title.measuredWidth) / 2,
+        identityLeft + (identityWidth - title.measuredWidth) / 2,
         icon.bottom + 4.dp
       )
       if (extraInfoCard.isGone) return
-      if (useSideBySideLayout) {
-        extraInfoCard.layout(
-          paddingStart + identityWidth + gap,
-          paddingTop + sideBySideCardTop
-        )
-      } else {
-        extraInfoCard.layout(paddingStart, paddingTop + identityHeight + gap)
-      }
+      val cardLeft = paddingStart + horizontalInset
+      val cardTop = paddingTop + verticalInset + identityHeight + sectionGap
+      extraInfoCard.layout(cardLeft, cardTop)
     }
   }
 
@@ -370,7 +414,7 @@ class LibDetailBottomSheetView(
   override fun getHeaderView(): BottomSheetHeaderView = header
 
   private companion object {
-    const val INSIGHT_APPEARANCE_DURATION = 350L
+    const val INSIGHT_VISIBILITY_DURATION = 350L
   }
 
   private class NotFoundView(context: Context) : AViewGroup(context) {
