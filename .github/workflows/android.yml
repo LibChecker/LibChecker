@@ -101,6 +101,13 @@ jobs:
         run: ./gradlew --non-interactive clean
       - name: Build with Gradle
         run: ./gradlew --non-interactive ${{ matrix.assemble_task }}
+      - name: Upload R8 configuration analyzer report
+        if: success() && github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v7
+        with:
+          name: R8-configuration-analyzer-${{ matrix.flavor }}
+          path: app/build/outputs/mapping/${{ matrix.flavor }}Release/configanalyzer.html
+          if-no-files-found: error
       - name: Upload built APK
         if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
         uses: actions/upload-artifact@v7

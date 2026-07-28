@@ -1,0 +1,186 @@
+package com.absinthe.libchecker.domain.app.detail.insight
+
+class LibraryInsightDefinitionValidator {
+
+  fun isValid(catalog: LibraryInsightCatalog): Boolean {
+    if (catalog.schemaVersion != SUPPORTED_SCHEMA_VERSION) return false
+    if (catalog.entries.isEmpty() || catalog.entries.size > MAX_CATALOG_ENTRIES) return false
+    return catalog.entries.all { entry ->
+      SDK_ID.matches(entry.sdkId) &&
+        entry.libraryUuids.isNotEmpty() &&
+        entry.libraryUuids.size <= MAX_TARGET_UUIDS &&
+        entry.libraryUuids.distinct().size == entry.libraryUuids.size &&
+        entry.libraryUuids.all(UUID::matches) &&
+        CATALOG_DEFINITION_PATH.matches(entry.definition) &&
+        isSafeRemotePath(entry.definition)
+    }
+  }
+
+  fun isValid(
+    definition: LibraryInsightDefinition,
+    expectedSdkId: String,
+    expectedUuid: String
+  ): Boolean {
+    if (definition.schemaVersion !in SUPPORTED_DEFINITION_SCHEMA_VERSIONS) return false
+    if (definition.sdkId != expectedSdkId || !SDK_ID.matches(definition.sdkId)) return false
+    if (definition.targetUuids.isEmpty() || definition.targetUuids.size > MAX_TARGET_UUIDS) return false
+    if (definition.targetUuids.distinct().size != definition.targetUuids.size) return false
+    if (expectedUuid !in definition.targetUuids || definition.targetUuids.any { !UUID.matches(it) }) return false
+    if (definition.probes.isEmpty() || definition.probes.size > MAX_PROBES) return false
+
+    val outputs = mutableSetOf<String>()
+    val digestOutputs = mutableSetOf<String>()
+    definition.probes.forEach { probe ->
+      if (!SDK_ID.matches(probe.id)) return false
+      if (probe.source.operator != SOURCE_PACKAGE_FILE) return false
+      if (!isSafeFileName(probe.source.fileName)) return false
+      if (probe.source.archivePaths.isEmpty() || probe.source.archivePaths.size > MAX_ARCHIVE_PATHS) return false
+      if (probe.source.archivePaths.distinct().size != probe.source.archivePaths.size) return false
+      if (probe.source.archivePaths.any { !isSafeArchivePath(it) }) return false
+      val readerOperators = if (definition.schemaVersion == 1) {
+        V1_READER_OPERATORS
+      } else {
+        V2_READER_OPERATORS
+      }
+      if (probe.reader.operator !in readerOperators) return false
+      if (probe.reader.maxBytesPerFile !in 1..MAX_BYTES_PER_FILE) return false
+      if (probe.reader.maxTotalBytes !in 1..MAX_TOTAL_BYTES) return false
+      if (probe.captures.isEmpty() || probe.captures.size > MAX_CAPTURES) return false
+      val captureTypes = when {
+        definition.schemaVersion == 1 -> V1_CAPTURE_TYPES
+        probe.reader.operator == READER_FILE_SHA256 -> V2_DIGEST_CAPTURE_TYPES
+        else -> V2_ASCII_CAPTURE_TYPES
+      }
+      probe.captures.forEach { capture ->
+        if (!SDK_ID.matches(capture.output)) return false
+        if (capture.type !in captureTypes) return false
+        if (capture.type == CAPTURE_PREFIXED_SEMVER) {
+          if (!isSafeCapturePrefix(capture.prefix)) return false
+        } else if (capture.prefix != null) {
+          return false
+        }
+        if (capture.maxResults !in 1..MAX_CAPTURE_RESULTS) return false
+        outputs += capture.output
+        if (capture.type == CAPTURE_SHA256) digestOutputs += capture.output
+      }
+    }
+
+    if (definition.lookups.size > MAX_LOOKUPS) return false
+    definition.lookups.forEach { lookup ->
+      if (lookup.input !in outputs) return false
+      if (!isSafeRemotePath(lookup.pathTemplate)) return false
+      val placeholderCount = lookup.pathTemplate.countValuePlaceholder()
+      if (lookup.input in digestOutputs) {
+        if (placeholderCount != 0 || lookup.expectedField == null || lookup.itemsField == null) return false
+      } else if (placeholderCount != 1) {
+        return false
+      }
+      if (lookup.maxRequests !in 1..MAX_LOOKUP_REQUESTS) return false
+      if (lookup.maxItems !in 1..MAX_LOOKUP_ITEMS) return false
+      if (lookup.expectedField?.let(SDK_ID::matches) == false) return false
+      if (lookup.itemsField?.let(SDK_ID::matches) == false) return false
+      if (lookup.outputs.isEmpty() || lookup.outputs.size > MAX_LOOKUP_OUTPUTS) return false
+      lookup.outputs.forEach { mapping ->
+        if (!SDK_ID.matches(mapping.output) || !SDK_ID.matches(mapping.field)) return false
+        outputs += mapping.output
+      }
+    }
+
+    val summary = definition.presentation.summary
+    val details = definition.presentation.details
+    if (summary.isEmpty() || summary.size > MAX_SUMMARY_FIELDS || details.size > MAX_DETAIL_FIELDS) return false
+    return (summary + details).all { field ->
+      field.source in outputs &&
+        field.maxValues in 1..MAX_PRESENTATION_VALUES &&
+        field.label[DEFAULT_LABEL]?.isNotBlank() == true &&
+        field.label.size <= MAX_LABELS &&
+        field.label.values.all { it.isNotBlank() && it.length <= MAX_LABEL_LENGTH }
+    }
+  }
+
+  fun isSafeRemotePath(path: String): Boolean {
+    return isSafeLibraryInsightRemotePath(path)
+  }
+
+  private fun isSafeFileName(value: String): Boolean {
+    return value.isNotBlank() && value.length <= MAX_FILE_NAME_LENGTH && '/' !in value && '\\' !in value
+  }
+
+  private fun isSafeArchivePath(value: String): Boolean {
+    return value.isNotBlank() &&
+      value.length <= MAX_ARCHIVE_PATH_LENGTH &&
+      !value.startsWith('/') &&
+      !value.contains("..") &&
+      !value.contains('\\')
+  }
+
+  private fun isSafeCapturePrefix(value: String?): Boolean {
+    return value != null &&
+      value.isNotEmpty() &&
+      value.length <= MAX_CAPTURE_PREFIX_LENGTH &&
+      value.all { it.code in PRINTABLE_ASCII_RANGE }
+  }
+
+  private fun String.countValuePlaceholder(): Int = windowed(VALUE_PLACEHOLDER.length)
+    .count { it == VALUE_PLACEHOLDER }
+
+  companion object {
+    const val SUPPORTED_SCHEMA_VERSION = 1
+    const val SOURCE_PACKAGE_FILE = "package_file"
+    const val READER_ASCII_STRINGS = "ascii_strings"
+    const val READER_FILE_SHA256 = "file_sha256"
+    const val CAPTURE_SHA1 = "sha1"
+    const val CAPTURE_SEMVER_CHANNEL = "semver_channel"
+    const val CAPTURE_SEMVER = "semver"
+    const val CAPTURE_PREFIXED_SEMVER = "prefixed_semver"
+    const val CAPTURE_SHA256 = "sha256"
+    const val VALUE_PLACEHOLDER = "{value}"
+    const val DEFAULT_LABEL = "default"
+    const val MAX_BYTES_PER_FILE = 64L * 1024 * 1024
+    const val MAX_TOTAL_BYTES = 128L * 1024 * 1024
+    const val MAX_TOKEN_LENGTH = 256
+    const val SDK_DETAILS_PREFIX = "sdk-details/"
+    val LOOKUP_VALUE = Regex("^[A-Za-z0-9._-]{1,128}$")
+
+    private val SDK_ID = Regex("^[a-z0-9][a-z0-9_-]{0,63}$")
+    private val UUID = Regex("^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$")
+    private val CATALOG_DEFINITION_PATH =
+      Regex("^sdk-details/sdks/[a-z0-9_-]+/definition\\.json$")
+    private val SUPPORTED_DEFINITION_SCHEMA_VERSIONS = setOf(1, 2)
+    private val V1_READER_OPERATORS = setOf(READER_ASCII_STRINGS)
+    private val V2_READER_OPERATORS = setOf(READER_ASCII_STRINGS, READER_FILE_SHA256)
+    private val V1_CAPTURE_TYPES = setOf(CAPTURE_SHA1, CAPTURE_SEMVER_CHANNEL)
+    private val V2_ASCII_CAPTURE_TYPES = setOf(
+      CAPTURE_SHA1,
+      CAPTURE_SEMVER_CHANNEL,
+      CAPTURE_SEMVER,
+      CAPTURE_PREFIXED_SEMVER
+    )
+    private val V2_DIGEST_CAPTURE_TYPES = setOf(CAPTURE_SHA256)
+    private const val MAX_CATALOG_ENTRIES = 128
+    private const val MAX_TARGET_UUIDS = 32
+    private const val MAX_PROBES = 8
+    private const val MAX_ARCHIVE_PATHS = 16
+    private const val MAX_CAPTURES = 8
+    private const val MAX_CAPTURE_RESULTS = 16
+    private const val MAX_LOOKUPS = 8
+    private const val MAX_LOOKUP_REQUESTS = 4
+    private const val MAX_LOOKUP_ITEMS = 50
+    private const val MAX_LOOKUP_OUTPUTS = 16
+    private const val MAX_SUMMARY_FIELDS = 2
+    private const val MAX_DETAIL_FIELDS = 8
+    private const val MAX_PRESENTATION_VALUES = 8
+    private const val MAX_LABELS = 16
+    private const val MAX_LABEL_LENGTH = 80
+    private const val MAX_FILE_NAME_LENGTH = 128
+    private const val MAX_ARCHIVE_PATH_LENGTH = 256
+    private const val MAX_CAPTURE_PREFIX_LENGTH = 80
+    private val PRINTABLE_ASCII_RANGE = 0x20..0x7e
+  }
+}
+
+internal fun isSafeLibraryInsightRemotePath(path: String): Boolean {
+  return SAFE_REMOTE_PATH.matches(path) && !path.contains("..")
+}
+
+private val SAFE_REMOTE_PATH = Regex("^sdk-details/[A-Za-z0-9_./{}-]+$")
