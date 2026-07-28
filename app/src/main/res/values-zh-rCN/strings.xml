@@ -281,6 +281,7 @@
   <string name="snapshot_indicator_added">增加</string>
   <string name="snapshot_indicator_removed">移除</string>
   <string name="snapshot_indicator_changed">变更</string>
+  <string name="snapshot_content_changed">内容变更</string>
   <string name="snapshot_indicator_moved">移动</string>
   <string name="snapshot_detail_size_label">体积</string>
   <string name="snapshot_detail_changes_label">变更项：</string>
@@ -378,4 +379,8 @@
   <!-- A11y -->
   <string name="a11y_state_expanded">展开</string>
   <string name="a11y_state_collapsed">折叠</string>
+  <string name="library_insight_loading">正在检测 SDK 版本…</string>
+  <string name="library_insight_unavailable">无法获取版本详情 · 点按重试</string>
+  <string name="library_insight_show_details">展开详情</string>
+  <string name="library_insight_hide_details">收起详情</string>
 </resources>

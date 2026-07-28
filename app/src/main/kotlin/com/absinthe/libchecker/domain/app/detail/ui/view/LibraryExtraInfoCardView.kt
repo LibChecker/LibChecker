@@ -1,5 +1,8 @@
 package com.absinthe.libchecker.domain.app.detail.ui.view
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ValueAnimator
 import android.content.Context
 import android.content.res.ColorStateList
 import android.util.TypedValue
@@ -12,6 +15,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.TextViewCompat
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.insight.LibraryInsightContent
 import com.absinthe.libchecker.domain.app.detail.insight.LibraryInsightField
@@ -24,7 +28,10 @@ import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.progressindicator.CircularProgressIndicator
 
-class LibraryExtraInfoCardView(context: Context) : MaterialCardView(context) {
+class LibraryExtraInfoCardView(
+  context: Context,
+  private val onExpansionAnimationStateChange: (Boolean) -> Unit = {}
+) : MaterialCardView(context) {
 
   private val content = LinearLayout(context).apply {
     orientation = LinearLayout.VERTICAL
@@ -58,6 +65,7 @@ class LibraryExtraInfoCardView(context: Context) : MaterialCardView(context) {
     isVisible = false
   }
   private var expanded = false
+  private var expansionAnimator: ValueAnimator? = null
   private var retryAction: (() -> Unit)? = null
   private var currentContent: LibraryInsightContent? = null
 
@@ -161,12 +169,67 @@ class LibraryExtraInfoCardView(context: Context) : MaterialCardView(context) {
       return
     }
     if (content.details.isEmpty()) return
-    expanded = !expanded
-    detailsContainer.isVisible = expanded
+    if (expansionAnimator?.isRunning == true) return
+    animateDetails(shouldExpand = !expanded)
+  }
+
+  private fun animateDetails(shouldExpand: Boolean) {
+    onExpansionAnimationStateChange(true)
+    expanded = shouldExpand
+    detailsContainer.isVisible = true
+    val startHeight = if (shouldExpand) 0 else detailsContainer.height
+    val endHeight = if (shouldExpand) {
+      val availableWidth = (
+        content.width -
+          content.paddingStart -
+          content.paddingEnd
+        ).coerceAtLeast(0)
+      detailsContainer.measure(
+        MeasureSpec.makeMeasureSpec(availableWidth, MeasureSpec.EXACTLY),
+        MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
+      )
+      detailsContainer.measuredHeight
+    } else {
+      0
+    }
+    detailsContainer.layoutParams = detailsContainer.layoutParams.apply {
+      height = startHeight
+    }
+    detailsContainer.alpha = if (shouldExpand) 0f else 1f
     expandText.text = context.getString(
       if (expanded) R.string.library_insight_hide_details else R.string.library_insight_show_details
     )
-    updateContentDescription(content)
+    expansionAnimator = ValueAnimator.ofInt(startHeight, endHeight).apply {
+      duration = EXPANSION_DURATION
+      interpolator = FastOutSlowInInterpolator()
+      addUpdateListener { animator ->
+        detailsContainer.layoutParams = detailsContainer.layoutParams.apply {
+          height = animator.animatedValue as Int
+        }
+        detailsContainer.alpha = if (shouldExpand) {
+          animator.animatedFraction
+        } else {
+          1f - animator.animatedFraction
+        }
+        detailsContainer.requestLayout()
+      }
+      addListener(
+        object : AnimatorListenerAdapter() {
+          override fun onAnimationEnd(animation: Animator) {
+            detailsContainer.layoutParams = detailsContainer.layoutParams.apply {
+              height = ViewGroup.LayoutParams.WRAP_CONTENT
+            }
+            detailsContainer.isVisible = shouldExpand
+            detailsContainer.alpha = 1f
+            expansionAnimator = null
+            currentContent?.let(::updateContentDescription)
+            detailsContainer.requestLayout()
+            post { onExpansionAnimationStateChange(false) }
+          }
+        }
+      )
+      start()
+    }
   }
 
   private fun LinearLayout.replaceFields(fields: List<LibraryInsightField>) {
@@ -225,5 +288,9 @@ class LibraryExtraInfoCardView(context: Context) : MaterialCardView(context) {
         context.getString(if (expanded) R.string.a11y_state_expanded else R.string.a11y_state_collapsed)
       }
     )
+  }
+
+  private companion object {
+    const val EXPANSION_DURATION = 350L
   }
 }

@@ -4,6 +4,10 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.text.method.LinkMovementMethod
+import android.transition.ChangeBounds
+import android.transition.Fade
+import android.transition.TransitionManager
+import android.transition.TransitionSet
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.Gravity
@@ -18,6 +22,7 @@ import androidx.core.text.HtmlCompat
 import androidx.core.view.isGone
 import androidx.core.view.marginTop
 import androidx.core.widget.TextViewCompat
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
 import com.absinthe.libchecker.R
@@ -42,7 +47,8 @@ import com.google.android.material.tabs.TabLayout
 
 class LibDetailBottomSheetView(
   context: Context,
-  private val onLocaleSelected: (String) -> Unit = {}
+  private val onLocaleSelected: (String) -> Unit = {},
+  onInsightExpansionAnimationStateChange: (Boolean) -> Unit = {}
 ) : LinearLayout(context),
   IHeaderView {
 
@@ -74,7 +80,10 @@ class LibDetailBottomSheetView(
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
   }
 
-  private val extraInfoCard = LibraryExtraInfoCardView(context)
+  private val extraInfoCard = LibraryExtraInfoCardView(
+    context,
+    onInsightExpansionAnimationStateChange
+  )
 
   private val identityAndExtra = IdentityAndExtraView(
     context = context,
@@ -202,6 +211,28 @@ class LibDetailBottomSheetView(
   }
 
   fun renderLibraryInsight(state: LibraryInsightUiState, onRetry: () -> Unit) {
+    if (
+      extraInfoCard.isGone &&
+      state != LibraryInsightUiState.Hidden &&
+      identityAndExtra.isLaidOut
+    ) {
+      TransitionManager.beginDelayedTransition(
+        identityAndExtra,
+        TransitionSet().apply {
+          ordering = TransitionSet.ORDERING_TOGETHER
+          duration = INSIGHT_APPEARANCE_DURATION
+          interpolator = FastOutSlowInInterpolator()
+          addTransition(
+            ChangeBounds().apply {
+              addTarget(icon)
+              addTarget(title)
+              addTarget(extraInfoCard)
+            }
+          )
+          addTransition(Fade(Fade.IN).apply { addTarget(extraInfoCard) })
+        }
+      )
+    }
     extraInfoCard.render(state, onRetry)
   }
 
@@ -212,9 +243,12 @@ class LibDetailBottomSheetView(
     private val extraInfoCard: View
   ) : AViewGroup(context) {
 
-    private val gap = 8.dp
+    private val gap = 12.dp
+    private val identityTopInset = 8.dp
     private var useSideBySideLayout = false
     private var identityWidth = 0
+    private var sideBySideIdentityTop = 0
+    private var sideBySideCardTop = 0
 
     init {
       addView(icon)
@@ -228,7 +262,7 @@ class LibDetailBottomSheetView(
       icon.measure(icon.layoutParams.width.toExactlyMeasureSpec(), icon.layoutParams.height.toExactlyMeasureSpec())
       useSideBySideLayout = !extraInfoCard.isGone && availableWidth >= 280.dp
       identityWidth = if (useSideBySideLayout) {
-        (availableWidth * 0.34f).toInt().coerceIn(88.dp, 120.dp)
+        (availableWidth * 0.28f).toInt().coerceIn(80.dp, 104.dp)
       } else {
         availableWidth
       }
@@ -241,7 +275,16 @@ class LibDetailBottomSheetView(
         useSideBySideLayout -> {
           val cardWidth = (availableWidth - identityWidth - gap).coerceAtLeast(0)
           extraInfoCard.measure(cardWidth.toExactlyMeasureSpec(), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED))
-          maxOf(identityHeight, extraInfoCard.measuredHeight)
+          sideBySideIdentityTop = identityTopInset
+          sideBySideCardTop = if (extraInfoCard.measuredHeight <= identityHeight + identityTopInset) {
+            identityTopInset + (identityHeight - extraInfoCard.measuredHeight) / 2
+          } else {
+            0
+          }
+          maxOf(
+            sideBySideIdentityTop + identityHeight,
+            sideBySideCardTop + extraInfoCard.measuredHeight
+          )
         }
 
         else -> {
@@ -258,7 +301,7 @@ class LibDetailBottomSheetView(
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
       val identityHeight = icon.measuredHeight + 4.dp + title.measuredHeight
       val identityTop = if (useSideBySideLayout) {
-        paddingTop + (measuredHeight - paddingTop - paddingBottom - identityHeight) / 2
+        paddingTop + sideBySideIdentityTop
       } else {
         paddingTop
       }
@@ -272,7 +315,7 @@ class LibDetailBottomSheetView(
       if (useSideBySideLayout) {
         extraInfoCard.layout(
           paddingStart + identityWidth + gap,
-          paddingTop + (measuredHeight - paddingTop - paddingBottom - extraInfoCard.measuredHeight) / 2
+          paddingTop + sideBySideCardTop
         )
       } else {
         extraInfoCard.layout(paddingStart, paddingTop + identityHeight + gap)
@@ -325,6 +368,10 @@ class LibDetailBottomSheetView(
   }
 
   override fun getHeaderView(): BottomSheetHeaderView = header
+
+  private companion object {
+    const val INSIGHT_APPEARANCE_DURATION = 350L
+  }
 
   private class NotFoundView(context: Context) : AViewGroup(context) {
 

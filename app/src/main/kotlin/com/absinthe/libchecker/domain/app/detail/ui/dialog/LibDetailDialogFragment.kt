@@ -48,9 +48,13 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
   }
 
   override fun initRootView(): LibDetailBottomSheetView {
-    return LibDetailBottomSheetView(requireContext()) { locale ->
-      GlobalValues.preferredRuleLanguage = locale
-    }
+    return LibDetailBottomSheetView(
+      context = requireContext(),
+      onLocaleSelected = { locale ->
+        GlobalValues.preferredRuleLanguage = locale
+      },
+      onInsightExpansionAnimationStateChange = ::setExternalHeightAnimationRunning
+    )
   }
 
   override fun init() {

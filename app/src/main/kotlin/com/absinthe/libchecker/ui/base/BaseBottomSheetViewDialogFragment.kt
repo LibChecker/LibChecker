@@ -37,6 +37,7 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> :
 
   private var _root: T? = null
   private var isHandlerActivated = false
+  private var isExternalHeightAnimationRunning = false
   private var animator: ValueAnimator = ObjectAnimator()
   private val supportsBlur = OsUtils.atLeastS()
   private val maxBlurRadius = 80f
@@ -208,8 +209,23 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> :
       return
     }
 
+    if (isExternalHeightAnimationRunning) {
+      setClippedHeight(height)
+      return
+    }
+
     enqueueAnimation {
       animateHeight(from = oldHeight, to = height, onEnd = { })
+    }
+  }
+
+  protected fun setExternalHeightAnimationRunning(running: Boolean) {
+    if (running) {
+      animator.cancel()
+    }
+    isExternalHeightAnimationRunning = running
+    if (root.isLaidOut) {
+      setClippedHeight(root.height)
     }
   }
 

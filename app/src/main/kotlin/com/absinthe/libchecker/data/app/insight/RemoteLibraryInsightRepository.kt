@@ -13,9 +13,12 @@ import com.squareup.moshi.Types
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import okhttp3.ResponseBody
+import okio.Buffer
 
 class RemoteLibraryInsightRepository(
-  private val request: RulesDocumentRequest
+  private val request: RulesDocumentRequest,
+  private val rulesRoots: () -> List<String> = { ApiManager.rulesRootsInPreferenceOrder }
 ) : LibraryInsightRepository {
 
   private val catalogAdapter = JsonUtil.moshi.adapter(LibraryInsightCatalog::class.java)
@@ -52,7 +55,7 @@ class RemoteLibraryInsightRepository(
   ): RemoteDocumentResult<T> {
     if (!isSafePath(path)) return RemoteDocumentResult.Failure
     var foundFailure = false
-    for (root in ApiManager.rulesRootsInPreferenceOrder) {
+    for (root in rulesRoots()) {
       val response = try {
         request.get(root + path)
       } catch (exception: CancellationException) {
@@ -76,9 +79,7 @@ class RemoteLibraryInsightRepository(
         return RemoteDocumentResult.Failure
       }
       val bytes = try {
-        body.use {
-          it.source().readByteArray(maxBytes + 1)
-        }
+        body.readAtMost(maxBytes + 1)
       } catch (exception: CancellationException) {
         throw exception
       } catch (_: Exception) {
@@ -91,6 +92,16 @@ class RemoteLibraryInsightRepository(
       foundFailure = true
     }
     return if (foundFailure) RemoteDocumentResult.Failure else RemoteDocumentResult.NotFound
+  }
+
+  private fun ResponseBody.readAtMost(byteCount: Long): ByteArray = use { body ->
+    val buffer = Buffer()
+    val source = body.source()
+    while (buffer.size < byteCount) {
+      val readCount = source.read(buffer, byteCount - buffer.size)
+      if (readCount == -1L) break
+    }
+    buffer.readByteArray()
   }
 
   private fun isSafePath(path: String): Boolean {
