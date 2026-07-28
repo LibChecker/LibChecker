@@ -2,6 +2,20 @@ package com.absinthe.libchecker.domain.app.detail.insight
 
 class LibraryInsightDefinitionValidator {
 
+  fun isValid(catalog: LibraryInsightCatalog): Boolean {
+    if (catalog.schemaVersion != SUPPORTED_SCHEMA_VERSION) return false
+    if (catalog.entries.isEmpty() || catalog.entries.size > MAX_CATALOG_ENTRIES) return false
+    return catalog.entries.all { entry ->
+      SDK_ID.matches(entry.sdkId) &&
+        entry.libraryUuids.isNotEmpty() &&
+        entry.libraryUuids.size <= MAX_TARGET_UUIDS &&
+        entry.libraryUuids.distinct().size == entry.libraryUuids.size &&
+        entry.libraryUuids.all(UUID::matches) &&
+        CATALOG_DEFINITION_PATH.matches(entry.definition) &&
+        isSafeRemotePath(entry.definition)
+    }
+  }
+
   fun isValid(
     definition: LibraryInsightDefinition,
     expectedSdkId: String,
@@ -20,6 +34,7 @@ class LibraryInsightDefinitionValidator {
       if (probe.source.operator != SOURCE_PACKAGE_FILE) return false
       if (!isSafeFileName(probe.source.fileName)) return false
       if (probe.source.archivePaths.isEmpty() || probe.source.archivePaths.size > MAX_ARCHIVE_PATHS) return false
+      if (probe.source.archivePaths.distinct().size != probe.source.archivePaths.size) return false
       if (probe.source.archivePaths.any { !isSafeArchivePath(it) }) return false
       if (probe.reader.operator != READER_ASCII_STRINGS) return false
       if (probe.reader.maxBytesPerFile !in 1..MAX_BYTES_PER_FILE) return false
@@ -61,11 +76,7 @@ class LibraryInsightDefinitionValidator {
   }
 
   fun isSafeRemotePath(path: String): Boolean {
-    return path.startsWith(SDK_DETAILS_PREFIX) &&
-      !path.startsWith('/') &&
-      !path.contains("..") &&
-      !path.contains('\\') &&
-      !path.contains("://")
+    return isSafeLibraryInsightRemotePath(path)
   }
 
   private fun isSafeFileName(value: String): Boolean {
@@ -99,7 +110,10 @@ class LibraryInsightDefinitionValidator {
 
     private val SDK_ID = Regex("^[a-z0-9][a-z0-9_-]{0,63}$")
     private val UUID = Regex("^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$")
+    private val CATALOG_DEFINITION_PATH =
+      Regex("^sdk-details/sdks/[a-z0-9_-]+/definition\\.json$")
     private val CAPTURE_TYPES = setOf(CAPTURE_SHA1, CAPTURE_SEMVER_CHANNEL)
+    private const val MAX_CATALOG_ENTRIES = 128
     private const val MAX_TARGET_UUIDS = 32
     private const val MAX_PROBES = 8
     private const val MAX_ARCHIVE_PATHS = 16
@@ -118,3 +132,9 @@ class LibraryInsightDefinitionValidator {
     private const val MAX_ARCHIVE_PATH_LENGTH = 256
   }
 }
+
+internal fun isSafeLibraryInsightRemotePath(path: String): Boolean {
+  return SAFE_REMOTE_PATH.matches(path) && !path.contains("..")
+}
+
+private val SAFE_REMOTE_PATH = Regex("^sdk-details/[A-Za-z0-9_./{}-]+$")

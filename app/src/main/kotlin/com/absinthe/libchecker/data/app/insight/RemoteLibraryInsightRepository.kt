@@ -6,6 +6,7 @@ import com.absinthe.libchecker.domain.app.detail.insight.LibraryInsightCatalog
 import com.absinthe.libchecker.domain.app.detail.insight.LibraryInsightDefinition
 import com.absinthe.libchecker.domain.app.detail.insight.LibraryInsightRepository
 import com.absinthe.libchecker.domain.app.detail.insight.RemoteDocumentResult
+import com.absinthe.libchecker.domain.app.detail.insight.isSafeLibraryInsightRemotePath
 import com.absinthe.libchecker.utils.JsonUtil
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Types
@@ -93,11 +94,7 @@ class RemoteLibraryInsightRepository(
   }
 
   private fun isSafePath(path: String): Boolean {
-    return path.startsWith(SDK_DETAILS_PREFIX) &&
-      !path.startsWith('/') &&
-      !path.contains("..") &&
-      !path.contains('\\') &&
-      !path.contains("://")
+    return isSafeLibraryInsightRemotePath(path)
   }
 
   private companion object {

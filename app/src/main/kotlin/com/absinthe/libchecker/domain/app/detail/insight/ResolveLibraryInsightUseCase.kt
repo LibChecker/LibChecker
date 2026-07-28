@@ -7,7 +7,8 @@ import java.util.Locale
 class ResolveLibraryInsightUseCase(
   private val repository: LibraryInsightRepository,
   private val validator: LibraryInsightDefinitionValidator,
-  private val probeEngine: LibraryInsightProbeEngine
+  private val probeEngine: LibraryInsightProbeEngine,
+  private val resolveLanguageAndScript: (Locale) -> String? = ::resolveLikelyLanguageAndScript
 ) {
 
   suspend operator fun invoke(
@@ -22,12 +23,9 @@ class ResolveLibraryInsightUseCase(
       RemoteDocumentResult.Failure,
       RemoteDocumentResult.NotFound -> return LibraryInsightResult.NotSupported
     }
-    if (catalog.schemaVersion != LibraryInsightDefinitionValidator.SUPPORTED_SCHEMA_VERSION) {
-      return LibraryInsightResult.NotSupported
-    }
+    if (!validator.isValid(catalog)) return LibraryInsightResult.NotSupported
     val entry = catalog.entries.firstOrNull { libraryUuid in it.libraryUuids }
       ?: return LibraryInsightResult.NotSupported
-    if (!validator.isSafeRemotePath(entry.definition)) return LibraryInsightResult.NotSupported
 
     onSupported()
     val definition = when (val result = repository.getDefinition(entry.definition)) {
@@ -68,14 +66,17 @@ class ResolveLibraryInsightUseCase(
         .asSequence()
         .filter(LibraryInsightDefinitionValidator.LOOKUP_VALUE::matches)
         .take(lookup.maxRequests)
-        .forEach { input ->
+        .forEach inputLoop@{ input ->
           val path = lookup.pathTemplate.replace(LibraryInsightDefinitionValidator.VALUE_PLACEHOLDER, input)
-          if (!validator.isSafeRemotePath(path)) return@forEach
-          val document = (repository.getLookup(path) as? RemoteDocumentResult.Success)?.value ?: return@forEach
-          if (lookup.expectedField != null && document[lookup.expectedField] != input) return@forEach
-          val items = lookup.itemsField?.let { document[it] as? List<*> } ?: listOf(document)
-          items.asSequence().take(lookup.maxItems).forEach { rawItem ->
-            val item = rawItem as? Map<*, *> ?: return@forEach
+          if (!validator.isSafeRemotePath(path)) return@inputLoop
+          val document =
+            (repository.getLookup(path) as? RemoteDocumentResult.Success)?.value ?: return@inputLoop
+          if (lookup.expectedField != null && document[lookup.expectedField] != input) return@inputLoop
+          val items = lookup.itemsField?.let { field ->
+            document[field] as? List<*> ?: return@inputLoop
+          } ?: listOf(document)
+          items.asSequence().take(lookup.maxItems).forEach itemLoop@{ rawItem ->
+            val item = rawItem as? Map<*, *> ?: return@itemLoop
             lookup.outputs.forEach { mapping ->
               val output = values.getOrPut(mapping.output, ::linkedSetOf)
               when (val value = item[mapping.field]) {
@@ -103,12 +104,16 @@ class ResolveLibraryInsightUseCase(
 
   private fun Map<String, String>.localized(localeTag: String): String {
     val locale = Locale.forLanguageTag(localeTag.replace('_', '-'))
-    val likelyLocale = ULocale.addLikelySubtags(ULocale.forLocale(locale))
-    val languageAndScript = likelyLocale.script.takeIf(String::isNotBlank)?.let { "${likelyLocale.language}-$it" }
+    val languageAndScript = resolveLanguageAndScript(locale)
     return this[locale.toLanguageTag()]
       ?: languageAndScript?.let(::get)
       ?: this[locale.language]
       ?: this[LibraryInsightDefinitionValidator.DEFAULT_LABEL]
       ?: values.first()
   }
+}
+
+private fun resolveLikelyLanguageAndScript(locale: Locale): String? {
+  val likelyLocale = ULocale.addLikelySubtags(ULocale.forLocale(locale))
+  return likelyLocale.script.takeIf(String::isNotBlank)?.let { "${likelyLocale.language}-$it" }
 }
