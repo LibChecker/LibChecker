@@ -38,6 +38,7 @@ import com.absinthe.libchecker.domain.rules.CloudRulesRepository
 import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.services.WorkerService
 import com.absinthe.libchecker.ui.base.BaseActivity
+import com.absinthe.libchecker.ui.base.BaseFragment
 import com.absinthe.libchecker.ui.base.IAppBarContainer
 import com.absinthe.libchecker.ui.base.IListController
 import com.absinthe.libchecker.ui.base.IListControllerHost
@@ -239,6 +240,14 @@ class MainActivity :
             super.onPageSelected(position)
             navView.menu.findItem(HomeDestination.requirePageIndex(position).navigationItemId).isChecked = true
             appViewModel.clearMenuState()
+
+            val fragment = supportFragmentManager.findFragmentByTag("f$position") as? BaseFragment<*>
+            fragment?.onVisibilityChanged(true)
+            (0 until HomeDestination.pageCount).forEach { index ->
+              if (index != position) {
+                (supportFragmentManager.findFragmentByTag("f$index") as? BaseFragment<*>)?.onVisibilityChanged(false)
+              }
+            }
           }
         })
 

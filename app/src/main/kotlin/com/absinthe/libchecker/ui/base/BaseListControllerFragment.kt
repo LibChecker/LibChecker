@@ -29,10 +29,6 @@ abstract class BaseListControllerFragment<T : ViewBinding> :
     super.onViewCreated(view, savedInstanceState)
     activity?.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
     viewLifecycleOwner.lifecycle.addObserver(object : DefaultLifecycleObserver {
-      override fun onResume(owner: LifecycleOwner) {
-        scheduleAppbarLiftingStatus(getBorderViewDelegate()?.isShowingTopBorder == false)
-      }
-
       override fun onStop(owner: LifecycleOwner) {
         listControllerHost?.clearListController(this@BaseListControllerFragment)
       }
@@ -43,6 +39,7 @@ abstract class BaseListControllerFragment<T : ViewBinding> :
     super.onVisibilityChanged(visible)
     if (visible) {
       listControllerHost?.setListController(this)
+      scheduleAppbarLiftingStatus(getBorderViewDelegate()?.isShowingTopBorder == false)
     }
   }
 

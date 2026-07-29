@@ -225,7 +225,7 @@ class SnapshotFragment :
         layoutManager = getSuitableLayoutManagerImpl(resources.configuration)
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-            if (isResumed) {
+            if (isFragmentVisible()) {
               scheduleAppbarLiftingStatus(!top)
             }
           }
@@ -346,8 +346,6 @@ class SnapshotFragment :
         flip(VF_LOADING)
       }
     }
-
-    (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(binding.list)
 
     if (binding.vfContainer.displayedChild == VF_LOADING) {
       binding.loading.start()
@@ -490,6 +488,7 @@ class SnapshotFragment :
     super.onVisibilityChanged(visible)
     if (visible) {
       adapter.setSpaceFooterView()
+      (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(binding.list)
     }
   }
 
