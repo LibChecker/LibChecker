@@ -57,6 +57,10 @@ class SnapshotBackupViewModel(
     return buildSnapshotRestorePlanUseCase.shouldRestoreFromLaunchUri(uri)
   }
 
+  fun getActiveRestoreUri(): Uri? {
+    return activeRestoreUri.takeIf { restoreJob?.isActive == true }
+  }
+
   fun invalidateCompletedRestoreResult() {
     completedRestore = null
   }

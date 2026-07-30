@@ -55,7 +55,7 @@ class ClassifyDialogView(context: Context) :
     layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
     gravity = android.view.Gravity.CENTER
     setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleSmall))
-    setPadding(16.dp, 4.dp, 16.dp, 4.dp)
+    setPadding(16.dp, 0, 16.dp, 4.dp)
   }
 
   init {

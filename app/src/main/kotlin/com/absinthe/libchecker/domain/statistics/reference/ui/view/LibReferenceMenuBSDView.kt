@@ -30,7 +30,6 @@ class LibReferenceMenuBSDView(context: Context) :
       LayoutParams.MATCH_PARENT,
       LayoutParams.WRAP_CONTENT
     ).also {
-      it.topMargin = 8.dp
       it.bottomMargin = 8.dp
     }
     flexWrap = FlexWrap.WRAP

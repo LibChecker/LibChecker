@@ -37,7 +37,6 @@ class TimeNodeBottomSheetView(context: Context) :
       LayoutParams.WRAP_CONTENT
     ).also {
       val padding = 16.dp
-      it.topMargin = padding
       setPadding(padding, 0, padding, 0)
     }
     adapter = this@TimeNodeBottomSheetView.adapter

@@ -40,9 +40,7 @@ class AppInfoBottomSheetView(context: Context) :
     layoutParams = LayoutParams(
       LayoutParams.MATCH_PARENT,
       LayoutParams.WRAP_CONTENT
-    ).also {
-      it.topMargin = 24.dp
-    }
+    )
   }
 
   private val launch = AppInfoItemView(context).apply {

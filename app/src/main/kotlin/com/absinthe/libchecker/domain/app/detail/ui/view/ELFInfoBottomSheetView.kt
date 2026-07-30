@@ -33,9 +33,7 @@ class ELFInfoBottomSheetView(context: Context) :
 
   private val icon = AppCompatImageView(context).apply {
     val iconSize = 48.dp
-    layoutParams = LayoutParams(iconSize, iconSize).also {
-      it.topMargin = 4.dp
-    }
+    layoutParams = LayoutParams(iconSize, iconSize)
     setBackgroundResource(R.drawable.bg_circle_outline)
     importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
   }

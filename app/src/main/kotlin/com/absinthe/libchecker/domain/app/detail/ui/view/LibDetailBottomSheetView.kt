@@ -95,9 +95,7 @@ class LibDetailBottomSheetView(
     title = title,
     extraInfoCard = extraInfoCard
   ).apply {
-    layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).also {
-      it.topMargin = 4.dp
-    }
+    layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
   }
 
   private val viewFlipper = HeightAnimatableViewFlipper(context).apply {

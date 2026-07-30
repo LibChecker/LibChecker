@@ -50,10 +50,7 @@ class SnapshotBackupBottomSheetDialogFragment : BaseBottomSheetViewDialogFragmen
 
   private val restoreResultLauncher =
     registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-      uri?.let {
-        viewModel.invalidateCompletedRestoreResult()
-        restoreBackup(it)
-      }
+      uri?.let { enqueueRestoreUri(it, requireLaunchUri = false) }
     }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,19 +58,19 @@ class SnapshotBackupBottomSheetDialogFragment : BaseBottomSheetViewDialogFragmen
     val savedRestoreUris = savedInstanceState?.getStringArrayList(STATE_RESTORE_URIS)
     if (savedRestoreUris == null) {
       arguments?.getString(ARG_RESTORE_URI)?.toUri()?.let {
-        viewModel.invalidateCompletedRestoreResult()
-        pendingRestoreUris.addLast(it)
+        enqueueRestoreUri(it, requireLaunchUri = true)
       }
     } else {
-      savedRestoreUris.mapTo(pendingRestoreUris, String::toUri)
+      savedRestoreUris
+        .asSequence()
+        .map(String::toUri)
+        .take(MAX_PENDING_RESTORE_URIS)
+        .forEach(pendingRestoreUris::addLast)
     }
   }
 
   override fun onSaveInstanceState(outState: Bundle) {
-    val restoreUris = ArrayList<String>(pendingRestoreUris.size + 1)
-    activeRestoreUri?.let {
-      restoreUris += it.toString()
-    }
+    val restoreUris = ArrayList<String>(pendingRestoreUris.size)
     pendingRestoreUris.mapTo(restoreUris, Uri::toString)
     outState.putStringArrayList(STATE_RESTORE_URIS, restoreUris)
     super.onSaveInstanceState(outState)
@@ -95,10 +92,32 @@ class SnapshotBackupBottomSheetDialogFragment : BaseBottomSheetViewDialogFragmen
     maxPeekHeightPercentage = 0.82f
     isInitialLandscapeExpansionEnabled = false
     root.bind(::handleAction)
-    consumePendingRestoreUri()
+    val runningRestoreUri = viewModel.getActiveRestoreUri()
+    if (runningRestoreUri == null) {
+      consumePendingRestoreUri()
+    } else {
+      activeRestoreUri = runningRestoreUri
+      root.post { restoreBackup(runningRestoreUri) }
+    }
   }
 
   fun restoreFromLaunchUri(uri: Uri) {
+    enqueueRestoreUri(uri, requireLaunchUri = true)
+  }
+
+  private fun enqueueRestoreUri(uri: Uri, requireLaunchUri: Boolean) {
+    if (requireLaunchUri && !viewModel.shouldRestoreFromLaunchUri(uri)) {
+      Timber.w("Ignoring unsupported snapshot restore URI")
+      return
+    }
+    if (
+      uri == activeRestoreUri ||
+      pendingRestoreUris.contains(uri) ||
+      pendingRestoreUris.size >= MAX_PENDING_RESTORE_URIS
+    ) {
+      Timber.w("Ignoring duplicate or excess snapshot restore URI")
+      return
+    }
     viewModel.invalidateCompletedRestoreResult()
     pendingRestoreUris.addLast(uri)
     if (view != null && activeRestoreUri == null) {
@@ -378,6 +397,7 @@ class SnapshotBackupBottomSheetDialogFragment : BaseBottomSheetViewDialogFragmen
   companion object {
     private const val ARG_RESTORE_URI = "restore_uri"
     private const val STATE_RESTORE_URIS = "restore_uri_states"
+    private const val MAX_PENDING_RESTORE_URIS = 1
 
     fun newInstance(restoreUri: Uri? = null): SnapshotBackupBottomSheetDialogFragment {
       return SnapshotBackupBottomSheetDialogFragment().apply {

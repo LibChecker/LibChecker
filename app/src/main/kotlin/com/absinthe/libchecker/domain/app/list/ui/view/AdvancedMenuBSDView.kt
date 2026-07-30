@@ -54,7 +54,7 @@ class AdvancedMenuBSDView(context: Context) :
       LayoutParams.MATCH_PARENT,
       LayoutParams.WRAP_CONTENT
     ).also {
-      it.topMargin = 24.dp
+      it.topMargin = 8.dp
     }
     overScrollMode = OVER_SCROLL_NEVER
     layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)

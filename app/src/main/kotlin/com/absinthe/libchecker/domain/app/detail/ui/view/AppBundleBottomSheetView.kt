@@ -29,9 +29,7 @@ class AppBundleBottomSheetView(context: Context) :
     layoutParams = LayoutParams(
       LayoutParams.MATCH_PARENT,
       LayoutParams.WRAP_CONTENT
-    ).also {
-      it.topMargin = 24.dp
-    }
+    )
     overScrollMode = OVER_SCROLL_NEVER
     adapter = this@AppBundleBottomSheetView.adapter
     layoutManager = LinearLayoutManager(context)

@@ -58,7 +58,7 @@ class AppStatisticAnalysisBottomSheetView(
     overScrollMode = OVER_SCROLL_NEVER
     isVerticalScrollBarEnabled = false
     clipToPadding = false
-    setPadding(0, 4.dp, 0, 12.dp)
+    setPadding(0, 0, 0, 12.dp)
   }
 
   private val progressIndicator = CircularProgressIndicator(context).apply {

@@ -13,8 +13,10 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.core.animation.doOnEnd
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.updatePadding
 import androidx.fragment.app.FragmentManager
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import com.absinthe.libchecker.R as AppR
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libraries.utils.R
 import com.absinthe.libraries.utils.utils.UiUtils
@@ -96,6 +98,9 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> :
   abstract fun initRootView(): T
   abstract fun init()
   abstract fun getHeaderView(): BottomSheetHeaderView
+  protected open fun getHeaderContentSpacing(): Int {
+    return resources.getDimensionPixelSize(AppR.dimen.bottom_sheet_header_content_spacing)
+  }
 
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog = object : BottomSheetDialog(requireContext(), theme) {
     override fun onAttachedToWindow() {
@@ -135,6 +140,9 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> :
       root.post { updateMaxPeekSize() }
     }
     init()
+    getHeaderView().title.updatePadding(
+      bottom = getHeaderContentSpacing()
+    )
     return _root
   }
 

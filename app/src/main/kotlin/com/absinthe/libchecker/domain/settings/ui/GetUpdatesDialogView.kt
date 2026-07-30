@@ -28,7 +28,7 @@ class GetUpdatesDialogView(context: Context) :
       LayoutParams.MATCH_PARENT,
       LayoutParams.WRAP_CONTENT
     )
-    setPadding(16.dp, 16.dp, 16.dp, 16.dp)
+    setPadding(16.dp, 0, 16.dp, 16.dp)
     adapter = this@GetUpdatesDialogView.adapter
     layoutManager = LinearLayoutManager(context)
   }
