@@ -3,12 +3,14 @@ package com.absinthe.libchecker.domain.snapshot.backup.archive
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
+import com.absinthe.libchecker.domain.snapshot.timenode.usecase.RefreshSnapshotRepresentativeAppsUseCase
 import java.io.InputStream
 import java.io.OutputStream
 
 class SnapshotArchiveUseCase(
   private val repository: SnapshotRepository,
-  private val codec: SnapshotArchiveCodec
+  private val codec: SnapshotArchiveCodec,
+  private val refreshSnapshotRepresentativeApps: RefreshSnapshotRepresentativeAppsUseCase
 ) {
 
   suspend fun backup(outputStream: OutputStream): Int {
@@ -50,6 +52,7 @@ class SnapshotArchiveUseCase(
     timeStampMap.keys.forEach {
       repository.insertTimeStamp(TimeStampItem(it, null, null))
     }
+    refreshSnapshotRepresentativeApps(repository.getTimeStamps())
 
     return RestoreResult(timeStampMap)
   }

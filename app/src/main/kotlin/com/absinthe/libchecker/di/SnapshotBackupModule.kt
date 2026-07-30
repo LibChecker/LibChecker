@@ -29,7 +29,7 @@ val snapshotBackupModule = module {
   single<SnapshotDatabaseFileRepository> { LocalSnapshotDatabaseFileRepository() }
   single<SnapshotArchiveCodec> { ProtoSnapshotArchiveCodec() }
 
-  factory { SnapshotArchiveUseCase(get(), get()) }
+  factory { SnapshotArchiveUseCase(get(), get(), get()) }
   factory { BuildSnapshotRestorePlanUseCase(androidContext().contentResolver) }
   factory { GetSnapshotBackupTargetUseCase(get(), get()) }
   factory { BackupSnapshotArchiveToUriUseCase(androidContext().contentResolver, get()) }

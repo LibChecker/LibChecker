@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.domain.app.list.ui.adapter
 
 import android.content.Context
+import android.graphics.Color
 import android.view.ViewGroup
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.list.model.AppListItemDisplay
@@ -43,6 +44,9 @@ class AppAdapter(
         setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSurfaceContainerHigh))
       } else {
         radius = 0f
+        if (cardMode == CardMode.TRANSPARENT) {
+          setCardBackgroundColor(Color.TRANSPARENT)
+        }
       }
     }
     val viewState = getItemViewState(item)
@@ -123,7 +127,8 @@ class AppAdapter(
 
   enum class CardMode {
     NORMAL,
-    DEMO
+    DEMO,
+    TRANSPARENT
   }
 
   private companion object {

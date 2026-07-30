@@ -25,8 +25,16 @@ class LocalSnapshotRepository(
     return repository.getTimeStamp(timestamp)
   }
 
+  override suspend fun getSnapshotCountsByTimestamp(): Map<Long, Int> {
+    return repository.getSnapshotCountsByTimestamp()
+  }
+
   override suspend fun getSnapshots(timestamp: Long): List<SnapshotItem> {
     return repository.getSnapshots(timestamp)
+  }
+
+  override suspend fun getSnapshotSummaries(timestamp: Long): List<SnapshotItem> {
+    return repository.getSnapshotSummaries(timestamp)
   }
 
   override suspend fun getSnapshot(timestamp: Long, packageName: String): SnapshotItem? {

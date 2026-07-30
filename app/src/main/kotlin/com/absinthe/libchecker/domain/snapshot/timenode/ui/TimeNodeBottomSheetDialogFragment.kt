@@ -42,7 +42,7 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {
-    maxPeekHeightPercentage = 0.67f
+    maxPeekHeightPercentage = 0.75f
     isInitialLandscapeExpansionEnabled = false
     render(
       TimeNodeBottomSheetState(

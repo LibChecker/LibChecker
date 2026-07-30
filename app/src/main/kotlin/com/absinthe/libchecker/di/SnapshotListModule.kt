@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.di
 
+import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotTitleDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.SnapshotDetailSectionBuilder
 import com.absinthe.libchecker.domain.snapshot.display.FormatSnapshotTimestampUseCase
@@ -13,12 +14,23 @@ import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotSystemP
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotTimeNodeListDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.DeleteSnapshotTimeStampUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.GetSnapshotPackageIconSourcesUseCase
+import com.absinthe.libchecker.domain.snapshot.timenode.usecase.RefreshSnapshotRepresentativeAppsUseCase
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val snapshotListModule = module {
-  factory { CaptureInstalledSnapshotUseCase(androidContext().packageManager, get(), get(), get(), get(), get()) }
+  factory {
+    CaptureInstalledSnapshotUseCase(
+      androidContext().packageManager,
+      get(),
+      get(),
+      get(),
+      get(),
+      get(),
+      get()
+    )
+  }
   factory { SnapshotDetailSectionBuilder(androidContext(), get()) }
   factory { BuildSnapshotTitleDisplayDataUseCase(androidContext()) }
   factory { BuildSnapshotCapturePlanUseCase(get()) }
@@ -26,7 +38,15 @@ val snapshotListModule = module {
   factory { BuildSnapshotListUpdatePlanUseCase(get(), get(), get()) }
   factory { GetSnapshotPackageIconSourcesUseCase(get()) }
   factory { BuildSnapshotSystemPropDisplayDataUseCase(androidContext(), get()) }
-  factory { BuildSnapshotTimeNodeListDataUseCase(get(), get<FormatSnapshotTimestampUseCase>()::invoke) }
+  factory {
+    val snapshotRepository = get<SnapshotRepository>()
+    BuildSnapshotTimeNodeListDataUseCase(
+      getSnapshotPackageIconSources = get(),
+      getSnapshotCountsByTimestamp = snapshotRepository::getSnapshotCountsByTimestamp,
+      refreshRepresentativeApps = get<RefreshSnapshotRepresentativeAppsUseCase>()::invoke,
+      formatTimestamp = get<FormatSnapshotTimestampUseCase>()::invoke
+    )
+  }
   factory { DeleteSnapshotTimeStampUseCase(get(), get()) }
   factory {
     SnapshotListWorkflow(

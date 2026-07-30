@@ -14,6 +14,7 @@ import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.selection.SnapshotSelection
+import com.absinthe.libchecker.domain.snapshot.timenode.usecase.RefreshSnapshotRepresentativeAppsUseCase
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.dex.DexStatsCollector
 import com.absinthe.libchecker.utils.extensions.getAppName
@@ -30,7 +31,8 @@ class CaptureInstalledSnapshotUseCase(
   private val installedAppRepository: InstalledAppRepository,
   private val snapshotSelection: SnapshotSelection,
   private val snapshotSettingsRepository: SnapshotSettingsRepository,
-  private val snapshotCaptureStateRepository: SnapshotCaptureStateRepository
+  private val snapshotCaptureStateRepository: SnapshotCaptureStateRepository,
+  private val refreshSnapshotRepresentativeApps: RefreshSnapshotRepresentativeAppsUseCase
 ) {
 
   suspend operator fun invoke(
@@ -78,6 +80,10 @@ class CaptureInstalledSnapshotUseCase(
 
     snapshotRepository.insertSnapshots(snapshotItems)
     snapshotRepository.insertTimeStamp(TimeStampItem(timestamp, null, request.systemProps.toJson()))
+    refreshSnapshotRepresentativeApps.update(
+      timestamp = timestamp,
+      previousTimestamp = currentSnapshotTimestamp
+    )
 
     if (request.dropPrevious) {
       snapshotRepository.deleteSnapshotsAndTimeStamp(currentSnapshotTimestamp)

@@ -21,6 +21,10 @@ class LCRepository(private val lcDao: LCDao) {
     return lcDao.getSnapshotsCountFlow(timestamp)
   }
 
+  suspend fun getSnapshotCountsByTimestamp(): Map<Long, Int> {
+    return lcDao.getSnapshotCountsByTimestamp().associate { it.timestamp to it.count }
+  }
+
   suspend fun getLCItems(): List<LCItem> = lcDao.getItems()
 
   suspend fun getUninitializedFeaturePackageNames(): List<String> {
@@ -47,6 +51,10 @@ class LCRepository(private val lcDao: LCDao) {
       Timber.w(e, "Snapshot rows are too large, fallback to summaries: $timestamp")
       lcDao.getSnapshotSummaries(timestamp).map { it.toSnapshotItem() }
     }
+  }
+
+  suspend fun getSnapshotSummaries(timestamp: Long): List<SnapshotItem> {
+    return lcDao.getSnapshotSummaries(timestamp).map { it.toSnapshotItem() }
   }
 
   suspend fun getSnapshot(timestamp: Long, packageName: String): SnapshotItem? {

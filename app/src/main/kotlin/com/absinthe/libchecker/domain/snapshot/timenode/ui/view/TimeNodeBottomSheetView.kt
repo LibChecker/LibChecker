@@ -36,14 +36,14 @@ class TimeNodeBottomSheetView(context: Context) :
       LayoutParams.MATCH_PARENT,
       LayoutParams.WRAP_CONTENT
     ).also {
-      val padding = 16.dp
+      val padding = 12.dp
       setPadding(padding, 0, padding, 0)
     }
     adapter = this@TimeNodeBottomSheetView.adapter
     isVerticalScrollBarEnabled = false
     layoutManager = LinearLayoutManager(context)
     overScrollMode = OVER_SCROLL_NEVER
-    addItemDecoration(VerticalSpacesItemDecoration(4.dp))
+    addItemDecoration(VerticalSpacesItemDecoration(3.dp))
   }
 
   private val addApkView = TimeNodeAddApkView(context).apply {
@@ -57,7 +57,7 @@ class TimeNodeBottomSheetView(context: Context) :
 
   init {
     orientation = VERTICAL
-    setPadding(0, 16.dp, 0, 0)
+    setPadding(0, 8.dp, 0, 0)
     addView(header)
     addView(list)
     adapter.apply {
