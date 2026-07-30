@@ -6,11 +6,11 @@
     app:key="normalCategory"
     app:title="@string/pref_group_normal">
 
-    <ListPreference
+    <com.absinthe.libchecker.ui.preference.InlineListPreference
       app:defaultValue="system"
       app:entries="@array/list_dark_mode"
       app:entryValues="@array/list_dark_mode_value"
-      app:icon="@drawable/ic_dark_mode"
+      app:icon="@drawable/ic_theme_system"
       app:key="darkMode"
       app:title="@string/dark_mode" />
 
@@ -36,7 +36,7 @@
       app:summary="@string/apk_analytics_summary"
       app:title="@string/apk_analytics" />
 
-    <ListPreference
+    <com.absinthe.libchecker.ui.preference.InlineListPreference
       app:defaultValue="notify"
       app:entries="@array/snapshot_keep"
       app:entryValues="@array/snapshot_keep_value"
@@ -56,7 +56,7 @@
     app:key="rulesCategory"
     app:title="@string/pref_group_rules">
 
-    <ListPreference
+    <com.absinthe.libchecker.ui.preference.InlineListPreference
       app:defaultValue="gitlab"
       app:entries="@array/list_repo"
       app:entryValues="@array/list_repo_value"

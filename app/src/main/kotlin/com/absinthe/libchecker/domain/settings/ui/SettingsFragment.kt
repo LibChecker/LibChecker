@@ -7,16 +7,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.doOnAttach
+import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceGroupAdapter
+import androidx.preference.PreferenceScreen
+import androidx.preference.PreferenceViewHolder
 import androidx.preference.TwoStatePreference
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.BuildConfig
@@ -32,19 +39,19 @@ import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.base.IAppBarContainer
 import com.absinthe.libchecker.ui.base.IListController
 import com.absinthe.libchecker.ui.base.IListControllerHost
+import com.absinthe.libchecker.ui.base.ThemeTransitionController
 import com.absinthe.libchecker.ui.preference.applyM3eLayoutResources
 import com.absinthe.libchecker.ui.preference.buildPreferenceItemRenderState
 import com.absinthe.libchecker.ui.preference.findPreferencePosition
+import com.absinthe.libchecker.ui.preference.model.PreferenceInlineControl
 import com.absinthe.libchecker.ui.preference.view.PreferenceItemView
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.Toasty
-import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
-import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.extensions.setBottomPaddingSpace
 import com.absinthe.libraries.utils.extensions.getBoolean
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -60,12 +67,29 @@ class SettingsFragment :
   IListController {
 
   private companion object {
+    const val STATE_EXPANDED_PREFERENCE_KEY = "expanded_preference_key"
+
     val NAVIGATION_PREFERENCE_KEYS = setOf(
       Constants.PREF_ABOUT,
       Constants.PREF_TRANSLATION,
       Constants.PREF_HELP,
       Constants.PREF_RATE,
       Constants.PREF_TELEGRAM
+    )
+
+    val INLINE_CHOICE_PREFERENCE_KEYS = setOf(
+      Constants.PREF_DARK_MODE,
+      Constants.PREF_SNAPSHOT_KEEP,
+      Constants.PREF_RULES_REPO
+    )
+
+    val INLINE_PREFERENCE_KEYS =
+      INLINE_CHOICE_PREFERENCE_KEYS + Constants.PREF_LIB_REF_THRESHOLD
+
+    val DRAGGABLE_CHOICE_PREFERENCE_KEYS = setOf(
+      Constants.PREF_DARK_MODE,
+      Constants.PREF_SNAPSHOT_KEEP,
+      Constants.PREF_RULES_REPO
     )
   }
 
@@ -74,10 +98,18 @@ class SettingsFragment :
   private val homeViewModel: HomeViewModel by activityViewModels()
   private val settingsViewModel: SettingsViewModel by viewModel()
   private var isGetUpdatesBadgeVisible = false
+  private var expandedPreferenceKey: String? = null
+  private var libReferenceThreshold = LIB_REFERENCE_THRESHOLD_MIN
+  private var navigationView: View? = null
+  private var navigationLayoutChangeListener: View.OnLayoutChangeListener? = null
 
   override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+    expandedPreferenceKey = savedInstanceState?.getString(STATE_EXPANDED_PREFERENCE_KEY)
     setPreferencesFromResource(R.xml.settings, null)
     preferenceScreen.applyM3eLayoutResources()
+    libReferenceThreshold = normalizeLibReferenceThreshold(
+      settingsViewModel.getLibReferenceThreshold()
+    )
 
     findPreference<TwoStatePreference>(Constants.PREF_APK_ANALYTICS)?.apply {
       setOnPreferenceChangeListener { _, newValue ->
@@ -125,11 +157,25 @@ class SettingsFragment :
     }
     findPreference<ListPreference>(Constants.PREF_DARK_MODE)?.apply {
       summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
+      setIcon(darkModePreferenceIconRes(value))
       setOnPreferenceChangeListener { _, newValue ->
-        AppCompatDelegate.setDefaultNightMode(
-          settingsViewModel.selectDarkMode(newValue.toString())
-        )
-        activity?.recreate()
+        val selectedValue = newValue.toString()
+        val nightMode = settingsViewModel.selectDarkMode(selectedValue)
+        val applyPreferencePresentation = {
+          value = selectedValue
+          setIcon(darkModePreferenceIconRes(selectedValue))
+        }
+        val hostActivity = activity
+        if (hostActivity is AppCompatActivity) {
+          ThemeTransitionController.applyNightMode(
+            activity = hostActivity,
+            nightMode = nightMode,
+            onWindowHidden = applyPreferencePresentation
+          )
+        } else {
+          applyPreferencePresentation()
+          AppCompatDelegate.setDefaultNightMode(nightMode)
+        }
         true
       }
     }
@@ -143,24 +189,6 @@ class SettingsFragment :
             CloudRulesDialogFragment::class.java.name
           )
           recordPreferenceEvent(Constants.PREF_CLOUD_RULES)
-          true
-        }
-      }
-    }
-    findPreference<Preference>(Constants.PREF_LIB_REF_THRESHOLD)?.apply {
-      setOnPreferenceClickListener {
-        if (AntiShakeUtils.isInvalidClick(prefRecyclerView)) {
-          false
-        } else {
-          LibThresholdDialogFragment
-            .newInstance(settingsViewModel.getLibReferenceThreshold())
-            .apply {
-              setOnThresholdSelectedListener(settingsViewModel::setLibReferenceThreshold)
-            }
-            .show(
-              requireActivity().supportFragmentManager,
-              LibThresholdDialogFragment::class.java.name
-            )
           true
         }
       }
@@ -320,7 +348,15 @@ class SettingsFragment :
     findPreference<TwoStatePreference>(Constants.PREF_ANONYMOUS_ANALYTICS)?.isVisible =
       getBoolean(R.bool.is_foss).not()
 
+    bindInlinePreferenceClickListeners()
     bindLocalePreference(languagePreference)
+  }
+
+  override fun onSaveInstanceState(outState: Bundle) {
+    super.onSaveInstanceState(outState)
+    expandedPreferenceKey?.let {
+      outState.putString(STATE_EXPANDED_PREFERENCE_KEY, it)
+    }
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -392,6 +428,13 @@ class SettingsFragment :
   }
 
   private fun rebindVisiblePreference(preference: Preference) {
+    rebindVisiblePreference(preference, animateExpansion = false)
+  }
+
+  private fun rebindVisiblePreference(
+    preference: Preference,
+    animateExpansion: Boolean
+  ) {
     if (!::prefRecyclerView.isInitialized) {
       return
     }
@@ -401,8 +444,107 @@ class SettingsFragment :
       val position = adapter.findPreferencePosition(preference) ?: return@post
       val itemView = prefRecyclerView.findViewHolderForAdapterPosition(position)?.itemView
         as? PreferenceItemView ?: return@post
-      bindSettingsPreferenceItem(adapter, position, itemView)
+      bindSettingsPreferenceItem(adapter, position, itemView, animateExpansion)
     }
+  }
+
+  private fun bindInlinePreferenceClickListeners() {
+    INLINE_PREFERENCE_KEYS.forEach { key ->
+      findPreference<Preference>(key)?.setOnPreferenceClickListener { preference ->
+        toggleInlinePreference(preference)
+        true
+      }
+    }
+  }
+
+  private fun toggleInlinePreference(preference: Preference) {
+    val previousKey = expandedPreferenceKey
+    val nextKey = preference.key.takeUnless { it == previousKey }
+    expandedPreferenceKey = nextKey
+
+    previousKey
+      ?.takeUnless { it == nextKey }
+      ?.let { findPreference<Preference>(it) }
+      ?.let { rebindVisiblePreference(it, animateExpansion = true) }
+    nextKey
+      ?.takeUnless { it == previousKey }
+      ?.let { findPreference<Preference>(it) }
+      ?.let { rebindVisiblePreference(it, animateExpansion = true) }
+  }
+
+  private fun buildInlineControl(preference: Preference): PreferenceInlineControl? {
+    if (preference is ListPreference && preference.key in INLINE_CHOICE_PREFERENCE_KEYS) {
+      val entries = preference.entries.map(CharSequence::toString)
+      val entryValues = preference.entryValues.map(CharSequence::toString)
+      if (preference.key == Constants.PREF_DARK_MODE) {
+        return PreferenceInlineControl.IconSegmentedChoice(
+          accessibilityLabels = entries,
+          entryValues = entryValues,
+          iconResIds = entryValues.map(::darkModePreferenceIconRes),
+          selectedValue = preference.value,
+          deferSelectionUntilAnimationEnd = true
+        )
+      }
+      if (preference.key == Constants.PREF_SNAPSHOT_KEEP) {
+        return PreferenceInlineControl.DraggableChoice(
+          entries = entries,
+          entryValues = entryValues,
+          selectedValue = preference.value
+        )
+      }
+      if (preference.key == Constants.PREF_RULES_REPO) {
+        return PreferenceInlineControl.IconSegmentedChoice(
+          accessibilityLabels = entries,
+          entryValues = entryValues,
+          iconResIds = entryValues.map {
+            when (it) {
+              Constants.REPO_GITHUB -> R.drawable.ic_github
+              Constants.REPO_GITLAB -> R.drawable.ic_gitlab
+              else -> R.drawable.ic_repository
+            }
+          },
+          selectedValue = preference.value
+        )
+      }
+      return null
+    }
+    if (preference.key == Constants.PREF_LIB_REF_THRESHOLD) {
+      return PreferenceInlineControl.Range(
+        value = libReferenceThreshold,
+        valueFrom = LIB_REFERENCE_THRESHOLD_MIN,
+        valueTo = LIB_REFERENCE_THRESHOLD_MAX
+      )
+    }
+    return null
+  }
+
+  private fun selectInlineChoice(
+    preferenceKey: String,
+    value: String
+  ) {
+    val preference = findPreference<ListPreference>(preferenceKey) ?: return
+    if (preference.value == value || !preference.callChangeListener(value)) {
+      return
+    }
+    if (preferenceKey == Constants.PREF_DARK_MODE) {
+      return
+    }
+    preference.value = value
+    if (preferenceKey in DRAGGABLE_CHOICE_PREFERENCE_KEYS) {
+      return
+    }
+    rebindVisiblePreference(preference)
+  }
+
+  private fun selectLibReferenceThreshold(value: Int) {
+    val normalizedValue = normalizeLibReferenceThreshold(value)
+    if (normalizedValue == libReferenceThreshold) {
+      return
+    }
+    libReferenceThreshold = normalizedValue
+    settingsViewModel.setLibReferenceThreshold(normalizedValue)
+    recordPreferenceEvent(Constants.PREF_LIB_REF_THRESHOLD, normalizedValue.toLong())
+    findPreference<Preference>(Constants.PREF_LIB_REF_THRESHOLD)?.let(::rebindVisiblePreference)
   }
 
   private fun bindLocalePreference(languagePreference: ListPreference) {
@@ -456,11 +598,7 @@ class SettingsFragment :
     recyclerView.fixEdgeEffect()
     recyclerView.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
     recyclerView.isVerticalScrollBarEnabled = false
-    recyclerView.applySystemBarsPadding(bottom = true)
-
-    doOnMainThreadIdle {
-      recyclerView.setBottomPaddingSpace()
-    }
+    recyclerView.applySettingsBottomPadding()
 
     val lp = recyclerView.layoutParams
     if (lp is FrameLayout.LayoutParams) {
@@ -475,16 +613,21 @@ class SettingsFragment :
       }
 
     prefRecyclerView = recyclerView
-    recyclerView.addOnChildAttachStateChangeListener(
-      object : RecyclerView.OnChildAttachStateChangeListener {
-        override fun onChildViewAttachedToWindow(view: View) {
-          bindSettingsPreferenceItem(recyclerView, view)
-        }
-
-        override fun onChildViewDetachedFromWindow(view: View) = Unit
-      }
-    )
     return recyclerView
+  }
+
+  override fun onCreateAdapter(preferenceScreen: PreferenceScreen): RecyclerView.Adapter<*> {
+    return object : PreferenceGroupAdapter(preferenceScreen) {
+      override fun onBindViewHolder(
+        holder: PreferenceViewHolder,
+        position: Int
+      ) {
+        super.onBindViewHolder(holder, position)
+        (holder.itemView as? PreferenceItemView)?.let {
+          bindSettingsPreferenceItem(this, position, it)
+        }
+      }
+    }
   }
 
   private fun scheduleAppbarRaisingStatus(isLifted: Boolean) {
@@ -496,6 +639,15 @@ class SettingsFragment :
     (activity as? IListControllerHost)?.clearListController(this)
   }
 
+  override fun onDestroyView() {
+    navigationLayoutChangeListener?.let { listener ->
+      navigationView?.removeOnLayoutChangeListener(listener)
+    }
+    navigationLayoutChangeListener = null
+    navigationView = null
+    super.onDestroyView()
+  }
+
   override fun onReturnTop() {
     // Do nothing
   }
@@ -504,18 +656,11 @@ class SettingsFragment :
   override fun isAllowRefreshing(): Boolean = true
   override fun getSuitableLayoutManager(): RecyclerView.LayoutManager? = null
 
-  private fun bindSettingsPreferenceItem(recyclerView: RecyclerView, itemView: View) {
-    val preferenceItemView = itemView as? PreferenceItemView ?: return
-    val adapter = recyclerView.adapter as? PreferenceGroupAdapter ?: return
-    val position = recyclerView.getChildAdapterPosition(itemView)
-    if (position == RecyclerView.NO_POSITION) return
-    bindSettingsPreferenceItem(adapter, position, preferenceItemView)
-  }
-
   private fun bindSettingsPreferenceItem(
     adapter: PreferenceGroupAdapter,
     position: Int,
-    itemView: PreferenceItemView
+    itemView: PreferenceItemView,
+    animateExpansion: Boolean = false
   ) {
     val state = adapter.buildPreferenceItemRenderState(
       position = position,
@@ -526,9 +671,55 @@ class SettingsFragment :
         } else {
           null
         }
-      }
+      },
+      inlineControl = ::buildInlineControl,
+      expanded = { it.key == expandedPreferenceKey }
     ) ?: return
-    itemView.bind(state)
+    itemView.bind(
+      state = state,
+      animateExpansion = animateExpansion,
+      onChoiceSelected = { value ->
+        state.preferenceKey?.let { selectInlineChoice(it, value) }
+      },
+      onRangeValueChangeFinished = ::selectLibReferenceThreshold
+    )
+  }
+
+  private fun RecyclerView.applySettingsBottomPadding() {
+    val basePadding = resources.getDimensionPixelSize(R.dimen.settings_list_vertical_padding)
+    val appNavigationView = activity?.findViewById<View>(R.id.nav_view)
+    var systemBarBottomInset = 0
+
+    fun updateBottomPadding() {
+      val bottomNavigationHeight = (appNavigationView as? BottomNavigationView)
+        ?.height
+        ?.takeIf { it > 0 }
+      updatePadding(
+        bottom = calculateSettingsBottomPadding(
+          basePadding = basePadding,
+          systemBarBottomInset = systemBarBottomInset,
+          bottomNavigationHeight = bottomNavigationHeight
+        )
+      )
+    }
+
+    ViewCompat.setOnApplyWindowInsetsListener(this) { _, windowInsets ->
+      systemBarBottomInset =
+        windowInsets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
+      updateBottomPadding()
+      windowInsets
+    }
+
+    val listener =
+      View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> updateBottomPadding() }
+    appNavigationView?.addOnLayoutChangeListener(listener)
+    navigationView = appNavigationView
+    navigationLayoutChangeListener = listener
+
+    doOnAttach {
+      ViewCompat.requestApplyInsets(it)
+      updateBottomPadding()
+    }
   }
 
   private fun recordPreferenceEvent(key: String, value: Any = "") {

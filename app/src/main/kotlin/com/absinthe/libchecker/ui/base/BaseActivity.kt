@@ -45,6 +45,7 @@ abstract class BaseActivity<VB : ViewBinding> :
     binding = (inflateBinding(layoutInflater) as VB).also {
       setContentView(it.root)
     }
+    ThemeTransitionController.animateEnterIfNeeded(this)
     if (shouldApplyTranslucentSystemBars()) {
       onApplyContentWindowInsets()
     }
@@ -61,6 +62,7 @@ abstract class BaseActivity<VB : ViewBinding> :
 
   override fun onDestroy() {
     super.onDestroy()
+    ThemeTransitionController.onActivityDestroyed(this)
     releaseTextKeyListeners()
   }
 
