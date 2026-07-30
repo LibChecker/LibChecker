@@ -20,6 +20,7 @@ import com.absinthe.libchecker.domain.snapshot.display.FormatSnapshotTimestampUs
 import com.absinthe.libchecker.domain.snapshot.selection.SnapshotSelection
 import java.io.File
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -35,6 +36,11 @@ class SnapshotBackupViewModel(
   private val snapshotSelection: SnapshotSelection
 ) : ViewModel() {
 
+  private var activeRestoreUri: Uri? = null
+  private var restoreJob: Job? = null
+  private var restoreResultAction: ((RestoreBackupResult) -> Unit)? = null
+  private var completedRestore: CompletedRestore? = null
+
   suspend fun onLocalBackupRequested(isExternalStorageWritable: Boolean): LocalBackupAction = withContext(Dispatchers.IO) {
     if (!isExternalStorageWritable) {
       return@withContext LocalBackupAction.StorageUnavailable
@@ -49,6 +55,10 @@ class SnapshotBackupViewModel(
 
   fun shouldRestoreFromLaunchUri(uri: Uri): Boolean {
     return buildSnapshotRestorePlanUseCase.shouldRestoreFromLaunchUri(uri)
+  }
+
+  fun invalidateCompletedRestoreResult() {
+    completedRestore = null
   }
 
   fun createDatabaseBackup(
@@ -86,7 +96,21 @@ class SnapshotBackupViewModel(
     cacheDir: File,
     resultAction: (RestoreBackupResult) -> Unit
   ) {
-    viewModelScope.launch(Dispatchers.IO) {
+    completedRestore?.takeIf { it.uri == uri }?.let {
+      resultAction(it.result)
+      return
+    }
+    if (restoreJob?.isActive == true) {
+      if (activeRestoreUri == uri) {
+        restoreResultAction = resultAction
+      }
+      return
+    }
+
+    activeRestoreUri = uri
+    restoreResultAction = resultAction
+    completedRestore = null
+    restoreJob = viewModelScope.launch(Dispatchers.IO) {
       val result = when (buildSnapshotRestorePlanUseCase(uri)) {
         SnapshotRestorePlan.DatabaseBackup -> {
           val result = restoreDatabaseBackup(roomBackup, uri, cacheDir)
@@ -97,7 +121,11 @@ class SnapshotBackupViewModel(
       }
 
       withContext(Dispatchers.Main) {
-        resultAction(result)
+        activeRestoreUri = null
+        restoreJob = null
+        completedRestore = CompletedRestore(uri, result)
+        restoreResultAction?.invoke(result)
+        restoreResultAction = null
       }
     }
   }
@@ -150,6 +178,11 @@ class SnapshotBackupViewModel(
   data class ArchiveRestoreSummaryItem(
     val formattedTimestamp: String,
     val count: Int
+  )
+
+  private data class CompletedRestore(
+    val uri: Uri,
+    val result: RestoreBackupResult
   )
 
   sealed interface LocalBackupAction {

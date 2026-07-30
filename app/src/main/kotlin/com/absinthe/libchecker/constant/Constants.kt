@@ -64,9 +64,6 @@ object Constants {
   const val PREF_SNAPSHOT_TIMESTAMP = "snapshotTimestamp"
   const val PREF_DISTRIBUTION_UPDATE_TIMESTAMP = "distributionUpdateTimestamp"
 
-  const val PREF_LOCAL_BACKUP = "localBackup"
-  const val PREF_LOCAL_RESTORE = "localRestore"
-
   const val PREF_LOCALE = "locale"
 
   const val PREF_DEBUG_MODE = "debugMode"

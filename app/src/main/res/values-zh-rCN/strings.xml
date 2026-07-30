@@ -331,10 +331,13 @@
   <string name="album_item_track_subtitle">选择应用进行强制对比变化</string>
   <string name="album_backup">备份</string>
   <string name="album_backup_summary">将所有快照备份</string>
+  <string name="album_backup_sheet_backup_description">保存一份可在之后恢复的本地文件</string>
   <string name="album_backup_detail">已备份 %1$d 项</string>
   <string name="album_backup_database_detail">数据库备份完成</string>
   <string name="album_restore">恢复</string>
   <string name="album_restore_summary">从备份文件恢复快照</string>
+  <string name="album_restore_from_file">从文件恢复</string>
+  <string name="album_restore_auto_detect_summary">自动识别备份格式</string>
   <string name="album_restore_detail">%1$s : 共 %2$s 项\n</string>
   <string name="album_restore_result_summary">已恢复 %1$d 项，来自 %2$d 个快照时间点</string>
   <string name="album_restore_result_item_count">%1$d 项</string>
