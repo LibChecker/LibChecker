@@ -123,7 +123,7 @@ class AppListFragment :
         layoutManager = getSuitableLayoutManagerImpl(resources.configuration)
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-            if (isResumed) {
+            if (isFragmentVisible()) {
               scheduleAppbarLiftingStatus(!top)
             }
           }
@@ -140,8 +140,14 @@ class AppListFragment :
           }
 
           override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            if (dx != 0 || dy != 0) {
+              isSearchTextClearOnce = false
+            }
             if (dx == 0 && dy == 0) {
               // scrolled by dragging scrolling bar
+              if (!isSearchTextClearOnce) {
+                homeViewModel.onAppListUserScrolled()
+              }
               if (!firstScrollFlag) {
                 firstScrollFlag = true
                 return
@@ -149,9 +155,6 @@ class AppListFragment :
               if (delayShowNavigationJob?.isActive == true) {
                 delayShowNavigationJob?.cancel()
                 delayShowNavigationJob = null
-              }
-              if (isFragmentVisible() && !isSearchTextClearOnce && canListScroll(appAdapter.data.size)) {
-                (activity as? INavViewContainer)?.hideNavigationView()
               }
 
               val position = when (layoutManager) {
@@ -227,7 +230,6 @@ class AppListFragment :
 
   override fun onResume() {
     super.onResume()
-    (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(binding.list)
     if (homeViewModel.appListStatus == STATUS_START_INIT) {
       flip(VF_INIT)
       activity?.removeMenuProvider(this)
@@ -368,6 +370,9 @@ class AppListFragment :
     super.onVisibilityChanged(visible)
     if (visible) {
       appAdapter.setSpaceFooterView()
+      (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(binding.list)
+    } else {
+      firstScrollFlag = false
     }
   }
 

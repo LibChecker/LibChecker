@@ -87,13 +87,16 @@ class LibReferenceFragment :
         borderDelegate = borderViewDelegate
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-            if (isResumed) {
+            if (isFragmentVisible()) {
               scheduleAppbarLiftingStatus(!top)
             }
           }
         FastScrollerBuilder(this).useMd2Style().build()
         addOnScrollListener(object : RecyclerView.OnScrollListener() {
           override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            if (dx != 0 || dy != 0) {
+              isSearchTextClearOnce = false
+            }
             if (dx == 0 && dy == 0) {
               // scrolled by dragging scrolling bar
               if (!firstScrollFlag) {
@@ -103,9 +106,6 @@ class LibReferenceFragment :
               if (delayShowNavigationJob?.isActive == true) {
                 delayShowNavigationJob?.cancel()
                 delayShowNavigationJob = null
-              }
-              if (isFragmentVisible() && !isSearchTextClearOnce && canListScroll(refAdapter.data.size)) {
-                (activity as? INavViewContainer)?.hideNavigationView()
               }
 
               val position = when (layoutManager) {
@@ -237,7 +237,6 @@ class LibReferenceFragment :
 
   override fun onResume() {
     super.onResume()
-    (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(binding.list)
     if (binding.vfContainer.displayedChild == VF_LOADING) {
       binding.loadingView.loadingView.start()
     }
@@ -405,9 +404,12 @@ class LibReferenceFragment :
     super.onVisibilityChanged(visible)
     if (visible) {
       refAdapter.setSpaceFooterView()
+      (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(binding.list)
       applyReferenceWork(
         libReferenceViewModel.onReferencePageVisible(hasDisplayedReferences = refAdapter.data.isNotEmpty())
       )
+    } else {
+      firstScrollFlag = false
     }
   }
 
