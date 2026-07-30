@@ -8,6 +8,7 @@ import androidx.preference.PreferenceGroupAdapter
 import androidx.preference.SwitchPreferenceCompat
 import androidx.preference.TwoStatePreference
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.ui.preference.model.PreferenceInlineControl
 import com.absinthe.libchecker.ui.preference.model.PreferenceItemGroupPosition
 import com.absinthe.libchecker.ui.preference.model.PreferenceItemRenderState
 
@@ -41,7 +42,9 @@ fun Preference.applyM3eLayoutResources() {
 fun PreferenceGroupAdapter.buildPreferenceItemRenderState(
   position: Int,
   showChevron: (Preference) -> Boolean = { false },
-  badgeDescription: (Preference) -> String? = { null }
+  badgeDescription: (Preference) -> String? = { null },
+  inlineControl: (Preference) -> PreferenceInlineControl? = { null },
+  expanded: (Preference) -> Boolean = { false }
 ): PreferenceItemRenderState? {
   if (position !in 0 until itemCount) {
     return null
@@ -53,12 +56,15 @@ fun PreferenceGroupAdapter.buildPreferenceItemRenderState(
   val hasPreviousItem = position > 0 && getItem(position - 1).isItemPreference()
   val hasNextItem = position < itemCount - 1 && getItem(position + 1).isItemPreference()
   return PreferenceItemRenderState(
+    preferenceKey = preference.key,
     title = preference.title?.toString(),
     summary = preference.summary?.toString(),
     toggleChecked = (preference as? TwoStatePreference)?.isChecked,
     showChevron = showChevron(preference),
     badgeDescription = badgeDescription(preference),
-    groupPosition = PreferenceItemGroupPosition.from(hasPreviousItem, hasNextItem)
+    groupPosition = PreferenceItemGroupPosition.from(hasPreviousItem, hasNextItem),
+    inlineControl = inlineControl(preference),
+    expanded = expanded(preference)
   )
 }
 
