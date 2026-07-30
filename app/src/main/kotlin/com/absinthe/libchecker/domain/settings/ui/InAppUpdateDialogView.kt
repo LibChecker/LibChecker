@@ -38,9 +38,7 @@ class InAppUpdateDialogView(context: Context) :
   }
 
   private val toggleGroup = MaterialButtonToggleGroup(context).apply {
-    layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply {
-      topMargin = 8.dp
-    }
+    layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
     isSingleSelection = true
     isSelectionRequired = true
 

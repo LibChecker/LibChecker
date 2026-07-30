@@ -43,9 +43,7 @@ class OverlayDetailBottomSheetView(context: Context) :
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
-    ).also {
-      it.topMargin = 24.dp
-    }
+    )
   }
 
   private val targetTitleView = AppCompatTextView(

@@ -43,7 +43,6 @@ class ExportAppsDialogView(context: Context) :
 
   private val description = AppCompatTextView(context).apply {
     layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
-      topMargin = 8.dp
       leftMargin = 16.dp
       rightMargin = 16.dp
     }

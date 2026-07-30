@@ -49,9 +49,7 @@ class SnapshotBackupBottomSheetView(context: Context) :
   }
 
   private val itemContainer = LinearLayout(context).apply {
-    layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
-      topMargin = 8.dp
-    }
+    layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
     orientation = VERTICAL
     addView(backupItem)
     addView(restoreItem)

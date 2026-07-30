@@ -41,9 +41,7 @@ class AppPropsBottomSheetView(
     layoutParams = LayoutParams(
       LayoutParams.MATCH_PARENT,
       LayoutParams.WRAP_CONTENT
-    ).also {
-      it.topMargin = 4.dp
-    }
+    )
     gravity = Gravity.CENTER
     val tip = context.getString(R.string.lib_detail_app_props_tip)
     contentDescription = tip

@@ -51,7 +51,7 @@ class StatisticCatalogEditorView(context: Context) :
     overScrollMode = OVER_SCROLL_IF_CONTENT_SCROLLS
     isVerticalScrollBarEnabled = false
     clipToPadding = false
-    setPadding(0, 4.dp, 0, 24.dp)
+    setPadding(0, 0, 0, 24.dp)
   }
 
   init {
