@@ -196,14 +196,18 @@ abstract class BaseDetailFragment<T : ViewBinding> :
   override fun onVisibilityChanged(visible: Boolean) {
     super.onVisibilityChanged(visible)
     if (visible) {
-      viewModel.filterState.updateProcessFilterData(
-        viewModel.buildProcessFilterData(
-          type = type,
-          permissionNotGrantedLabel = getString(R.string.permission_not_granted),
-          permissionNotGrantedColor = R.color.material_red_400.getColor(requireContext())
-        )
-      )
+      refreshProcessFilterData()
     }
+  }
+
+  protected fun refreshProcessFilterData() {
+    viewModel.filterState.updateProcessFilterData(
+      viewModel.buildProcessFilterData(
+        type = type,
+        permissionNotGrantedLabel = getString(R.string.permission_not_granted),
+        permissionNotGrantedColor = R.color.material_red_400.getColor(requireContext())
+      )
+    )
   }
 
   override suspend fun sort() {
