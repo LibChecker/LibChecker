@@ -31,9 +31,6 @@
 
     <SplitPairFilter
       window:primaryActivityName="com.absinthe.libchecker.domain.snapshot.album.ui.AlbumActivity"
-      window:secondaryActivityName="com.absinthe.libchecker.domain.snapshot.backup.ui.BackupActivity" />
-    <SplitPairFilter
-      window:primaryActivityName="com.absinthe.libchecker.domain.snapshot.album.ui.AlbumActivity"
       window:secondaryActivityName="com.absinthe.libchecker.domain.snapshot.track.ui.TrackActivity" />
   </SplitPairRule>
 

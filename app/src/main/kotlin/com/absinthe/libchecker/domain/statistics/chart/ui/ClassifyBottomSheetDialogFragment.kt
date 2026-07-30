@@ -17,6 +17,8 @@ class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Clas
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
+  override fun getHeaderContentSpacing(): Int = 0
+
   override fun init() {
     maxPeekHeightPercentage = 0.67f
     isViewInitialized = true
