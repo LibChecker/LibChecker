@@ -25,8 +25,8 @@ class TimeNodeItemAdapter : BaseQuickAdapter<String, BaseViewHolder>(0) {
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return BaseViewHolder(
       AppCompatImageView(context).apply {
-        layoutParams = ViewGroup.LayoutParams(24.dp, 24.dp)
-        setPadding(0, 0, 4.dp, 0)
+        layoutParams = ViewGroup.LayoutParams(20.dp, 20.dp)
+        setPadding(0, 0, 3.dp, 0)
         importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
       }
     )

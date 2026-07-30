@@ -26,7 +26,7 @@ class ClassifyDialogView(context: Context) :
   IHeaderView {
 
   private var onAction: (ClassifyDialogAction) -> Unit = {}
-  private val adapter = AppAdapter()
+  private val adapter = AppAdapter(AppAdapter.CardMode.TRANSPARENT)
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =

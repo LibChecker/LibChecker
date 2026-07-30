@@ -308,6 +308,12 @@
   <string name="snapshot_detail_new_install_title">This app has newly installed</string>
   <string name="snapshot_detail_deleted_title">This app has been removed</string>
   <string name="snapshot_time_node_uninitialized">Uninitialized</string>
+  <string name="snapshot_time_node_current">Current</string>
+  <plurals name="snapshot_time_node_apps_count">
+    <item quantity="one">%d app</item>
+    <item quantity="other">%d apps</item>
+  </plurals>
+  <string name="snapshot_time_node_current_apps">%1$s · %2$s</string>
   <string name="snapshot_preinstalled_app">Preinstalled app</string>
   <string name="snapshot_generate_text_report">Generate text report</string>
   <string name="snapshot_scheme_tip"><![CDATA[Tip: You can now generate snapshots in the background via:<br><b>%s</b>]]></string>
@@ -322,6 +328,8 @@
   <string name="dialog_message_keep_previous_snapshot">Do you want to keep the previous snapshot?</string>
   <string name="dialog_title_select_to_delete">Choose a date to delete the snapshot</string>
   <string name="dialog_title_confirm_to_delete">Are you sure to delete this snapshot?</string>
+  <string name="dialog_message_confirm_to_delete">%s\n\nThis time node and all of its app records will be permanently deleted. This action cannot be undone.</string>
+  <string name="dialog_action_delete">Delete</string>
   <string name="btn_keep">Keep</string>
   <string name="btn_drop">Discard</string>
   <string name="dialog_title_compare_diff_apk">Attention</string>

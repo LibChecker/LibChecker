@@ -241,8 +241,13 @@ class AlbumActivity :
               val item = timeStampList[position]
               BaseAlertDialogBuilder(this@AlbumActivity)
                 .setTitle(R.string.dialog_title_confirm_to_delete)
-                .setMessage(viewModel.getFormatDateString(item.timestamp))
-                .setPositiveButton(android.R.string.ok) { _, _ ->
+                .setMessage(
+                  getString(
+                    R.string.dialog_message_confirm_to_delete,
+                    viewModel.getFormatDateString(item.timestamp)
+                  )
+                )
+                .setPositiveButton(R.string.dialog_action_delete) { _, _ ->
                   lifecycleScope.launch(Dispatchers.IO) {
                     val dialog: AlertDialog
                     withContext(Dispatchers.Main) {

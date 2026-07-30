@@ -148,9 +148,10 @@ class SnapshotListWorkflow(
   }
 
   suspend fun buildSnapshotTimeNodeListData(
-    timeStamps: List<TimeStampItem>
+    timeStamps: List<TimeStampItem>,
+    currentTimestamp: Long? = null
   ): SnapshotTimeNodeListData {
-    return buildSnapshotTimeNodeListDataUseCase(timeStamps)
+    return buildSnapshotTimeNodeListDataUseCase(timeStamps, currentTimestamp)
   }
 
   fun updateSnapshotSearchKeyword(keyword: String): Boolean {

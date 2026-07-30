@@ -9,6 +9,7 @@ import com.absinthe.libchecker.domain.app.model.AppInstallSource
 import com.absinthe.libchecker.domain.app.model.PackageChangeState
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
+import com.absinthe.libchecker.domain.snapshot.timenode.model.SnapshotRepresentativeApps
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.runBlocking
@@ -38,39 +39,77 @@ class BuildSnapshotTimeNodeListDataUseCaseTest {
   }
 
   @Test
-  fun buildsTimeNodeDisplayTextAndDescription() = runBlocking {
+  fun buildsTimeNodeDisplayTextAndFiltersUnavailableIcons() = runBlocking {
+    val installedPackage = PackageInfo().apply {
+      packageName = "com.example.alpha"
+    }
     val useCase = BuildSnapshotTimeNodeListDataUseCase(
       getSnapshotPackageIconSources = GetSnapshotPackageIconSourcesUseCase(
-        installedAppRepository = FakeInstalledAppRepository()
+        installedAppRepository = FakeInstalledAppRepository(
+          applications = mapOf(installedPackage.packageName to installedPackage)
+        )
       ),
+      getSnapshotCountsByTimestamp = { mapOf(1234L to 186) },
       formatTimestamp = { timestamp -> "formatted:$timestamp" }
     )
 
     val result = useCase(
-      listOf(
+      timeStamps = listOf(
         TimeStampItem(
           timestamp = 1234L,
           topApps = "[\"com.example.alpha\",\"com.example.beta\"]",
           systemProps = null
         )
-      )
+      ),
+      currentTimestamp = 1234L
     )
 
     assertEquals(1, result.items.size)
     assertEquals(1234L, result.items.single().timestamp)
     assertEquals("formatted:1234", result.items.single().timestampText)
     assertEquals("formatted:1234", result.items.single().description)
+    assertEquals(186, result.items.single().appCount)
+    assertEquals(true, result.items.single().isCurrent)
     assertEquals(
-      listOf("com.example.alpha", "com.example.beta"),
+      listOf("com.example.alpha"),
       result.items.single().topAppPackageNames
     )
     assertEquals(
       mapOf(
-        "com.example.alpha" to SnapshotPackageIconSource.Fallback,
-        "com.example.beta" to SnapshotPackageIconSource.Fallback
+        "com.example.alpha" to SnapshotPackageIconSource.InstalledPackage(installedPackage)
       ),
       result.packageIconSources
     )
+  }
+
+  @Test
+  fun keepsOneOverflowCandidateForMoreIndicator() = runBlocking {
+    val installedPackages = (1..7).associate { index ->
+      val packageInfo = PackageInfo().apply {
+        packageName = "com.example.$index"
+      }
+      packageInfo.packageName to packageInfo
+    }
+    val useCase = BuildSnapshotTimeNodeListDataUseCase(
+      getSnapshotPackageIconSources = GetSnapshotPackageIconSourcesUseCase(
+        installedAppRepository = FakeInstalledAppRepository(
+          applications = installedPackages
+        )
+      )
+    )
+
+    val result = useCase(
+      listOf(
+        TimeStampItem(
+          timestamp = 1234L,
+          topApps = SnapshotRepresentativeApps.encode(installedPackages.keys.toList()),
+          systemProps = null
+        )
+      )
+    )
+
+    assertEquals(7, result.items.single().topAppPackageNames.size)
+    assertEquals(installedPackages.keys.take(7), result.items.single().topAppPackageNames)
   }
 }
 

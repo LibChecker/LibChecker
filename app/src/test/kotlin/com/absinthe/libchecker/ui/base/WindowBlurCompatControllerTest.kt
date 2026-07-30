@@ -1,9 +1,17 @@
 package com.absinthe.libchecker.ui.base
 
 import org.junit.Assert.assertArrayEquals
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class WindowBlurCompatControllerTest {
+
+  @Test
+  fun newWindowInheritsExistingHostBlur() {
+    assertEquals(80f, inheritedBlurStartRadius(0f, listOf(40f, 80f)))
+    assertEquals(64f, inheritedBlurStartRadius(64f, listOf(80f)))
+    assertEquals(0f, inheritedBlurStartRadius(0f, emptyList()))
+  }
 
   @Test
   fun sharpLayerFadesIntoLiveContentAtLowRadius() {

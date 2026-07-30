@@ -49,6 +49,10 @@ internal class WindowBlurCompatController(
       stop()
     }
     if (isStarted) return
+    blurRadius = inheritedBlurStartRadius(
+      currentRadius = blurRadius,
+      activeRadii = ActiveHostBlurRegistry.radii(hostView, this)
+    )
     isStarted = true
     isStopRequested = false
     window.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
@@ -144,10 +148,12 @@ internal class WindowBlurCompatController(
     blurRadius = 0f
     isStarted = false
     isStopRequested = false
+    ActiveHostBlurRegistry.remove(hostView, this)
     HostViewBlurRegistry.remove(hostView, this)
   }
 
   private fun applyBlurRadius() {
+    ActiveHostBlurRegistry.update(hostView, this, blurRadius)
     if (isCrossWindowBlurEnabled) {
       HostViewBlurRegistry.remove(hostView, this)
       updateWindowBlurRadius(blurRadius)
@@ -298,6 +304,51 @@ internal class WindowBlurCompatController(
     }
   }
 
+  private object ActiveHostBlurRegistry {
+    private val states =
+      WeakHashMap<ViewGroup, MutableMap<WindowBlurCompatController, Float>>()
+
+    fun radii(
+      hostView: ViewGroup?,
+      owner: WindowBlurCompatController
+    ): Collection<Float> {
+      if (hostView == null) return emptyList()
+      return states[hostView]
+        ?.filterKeys { it !== owner }
+        ?.values
+        .orEmpty()
+    }
+
+    fun update(
+      hostView: ViewGroup?,
+      owner: WindowBlurCompatController,
+      radius: Float
+    ) {
+      if (hostView == null) return
+      val requests = states.getOrPut(hostView) { mutableMapOf() }
+      if (radius > 0f) {
+        requests[owner] = radius
+      } else {
+        requests.remove(owner)
+      }
+      if (requests.isEmpty()) {
+        states.remove(hostView)
+      }
+    }
+
+    fun remove(
+      hostView: ViewGroup?,
+      owner: WindowBlurCompatController
+    ) {
+      if (hostView == null) return
+      val requests = states[hostView] ?: return
+      requests.remove(owner)
+      if (requests.isEmpty()) {
+        states.remove(hostView)
+      }
+    }
+  }
+
   private companion object {
     const val MIN_RADIUS_DELTA = 0.1f
     const val MIN_EFFECT_RADIUS_DELTA = 0.25f
@@ -305,6 +356,17 @@ internal class WindowBlurCompatController(
 }
 
 private val FIXED_BLUR_RADII = floatArrayOf(24f, 48f, 64f, 80f)
+
+internal fun inheritedBlurStartRadius(
+  currentRadius: Float,
+  activeRadii: Collection<Float>
+): Float {
+  return if (currentRadius > 0f) {
+    currentRadius
+  } else {
+    activeRadii.maxOrNull()?.coerceAtLeast(0f) ?: 0f
+  }
+}
 
 internal fun fixedSharpLayerAlpha(radius: Float): Float = (radius / FIXED_BLUR_RADII.first()).coerceIn(0f, 1f)
 

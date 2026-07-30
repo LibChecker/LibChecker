@@ -168,7 +168,10 @@ class SnapshotViewModel(
   suspend fun buildSnapshotTimeNodeListData(
     timeStamps: List<TimeStampItem>
   ): SnapshotTimeNodeListData {
-    return snapshotListWorkflow.buildSnapshotTimeNodeListData(timeStamps)
+    return snapshotListWorkflow.buildSnapshotTimeNodeListData(
+      timeStamps = timeStamps,
+      currentTimestamp = currentTimeStamp
+    )
   }
 
   fun updateSnapshotSearchKeyword(keyword: String): Boolean {

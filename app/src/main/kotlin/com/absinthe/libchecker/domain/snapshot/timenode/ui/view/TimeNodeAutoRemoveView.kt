@@ -23,7 +23,7 @@ class TimeNodeAutoRemoveView(context: Context) : AViewGroup(context) {
   }
 
   init {
-    setPadding(0, 8.dp, 0, 8.dp)
+    setPadding(0, 4.dp, 0, 4.dp)
     addView(chip)
     invalidateText()
     chip.onCheckedChangeListener = { _, checked ->

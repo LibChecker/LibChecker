@@ -20,7 +20,7 @@ val snapshotComparisonModule = module {
   factory { CompareSnapshotItemsUseCase() }
   factory { CompareSnapshotListsUseCase(get()) }
   factory { CompareSnapshotWithInstalledAppsUseCase(androidContext().packageManager, get(), get(), get(), get()) }
-  factory { CompareSnapshotDiffsUseCase(get(), get(), get(), get()) }
+  factory { CompareSnapshotDiffsUseCase(get(), get(), get()) }
   factory { CompareSnapshotItemWithInstalledAppUseCase(androidContext().packageManager, get(), get(), get(), get()) }
 
   viewModel {
