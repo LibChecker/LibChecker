@@ -7,7 +7,14 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
-import android.util.TypedValue
+import android.text.Spannable
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
+import android.text.style.ForegroundColorSpan
+import android.text.style.ImageSpan
+import android.text.style.RelativeSizeSpan
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuInflater
@@ -27,6 +34,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.domain.app.list.GetRandomAppIconUseCase
@@ -63,8 +71,10 @@ import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
+import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
+import com.absinthe.libchecker.view.span.CenterAlignImageSpan
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import java.util.Locale
 import kotlinx.coroutines.Dispatchers
@@ -75,11 +85,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
+import rikka.core.util.ClipboardUtils
 import rikka.widget.borderview.BorderView
 import timber.log.Timber
 
 const val VF_LOADING = 0
 const val VF_LIST = 1
+private val SNAPSHOT_SCHEME_TIP_PREFIX = Regex("""^.{1,12}?[：:]\s*""")
 
 class SnapshotFragment :
   BaseListControllerFragment<FragmentSnapshotBinding>(),
@@ -437,8 +449,7 @@ class SnapshotFragment :
         is SnapshotCapturePlan.ConfirmKeepPrevious -> {
           BaseAlertDialogBuilder(context)
             .setTitle(R.string.dialog_title_keep_previous_snapshot)
-            .setMessage(R.string.dialog_message_keep_previous_snapshot)
-            .setView(buildSnapshotSchemeTipView(context, plan.bridgeUri))
+            .setMessage(buildSnapshotSchemeDialogContent(context, plan.bridgeUri))
             .setPositiveButton(R.string.btn_keep) { _, _ ->
               computeNewSnapshot(false)
             }
@@ -447,6 +458,8 @@ class SnapshotFragment :
             }
             .setNeutralButton(android.R.string.cancel, null)
             .show()
+            .findViewById<TextView>(android.R.id.message)
+            ?.movementMethod = LinkMovementMethod.getInstance()
         }
 
         SnapshotCapturePlan.NoAction -> Unit
@@ -471,17 +484,63 @@ class SnapshotFragment :
     return true
   }
 
-  private fun buildSnapshotSchemeTipView(context: Context, scheme: String): TextView {
-    return TextView(context).also {
-      it.layoutParams = ViewGroup.LayoutParams(
-        ViewGroup.LayoutParams.MATCH_PARENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
-      )
-      it.setPadding(24.dp, 0, 24.dp, 0)
-      it.text = HtmlCompat.fromHtml(getString(R.string.snapshot_scheme_tip, scheme), 0)
-      it.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
-      it.setLongClickCopiedToClipboard(scheme)
-    }
+  private fun buildSnapshotSchemeDialogContent(context: Context, scheme: String): CharSequence {
+    val linkText = context.getString(R.string.url)
+    val hintColor =
+      context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant)
+    val tip = HtmlCompat.fromHtml(
+      getString(R.string.snapshot_scheme_tip, linkText)
+        .replace("<br>", " ")
+        .replaceFirst(SNAPSHOT_SCHEME_TIP_PREFIX, ""),
+      HtmlCompat.FROM_HTML_MODE_COMPACT
+    )
+    return SpannableStringBuilder()
+      .append(context.getString(R.string.dialog_message_keep_previous_snapshot))
+      .append('\n')
+      .apply {
+        val iconStart = length
+        append('\uFFFC')
+        append('\u00A0')
+        append(tip)
+        android.R.drawable.ic_dialog_info.getDrawable(context)?.mutate()?.let { drawable ->
+          val iconSize = 16.dp
+          drawable.setTint(hintColor)
+          drawable.setBounds(0, 0, iconSize, iconSize)
+          setSpan(
+            CenterAlignImageSpan(drawable),
+            iconStart,
+            iconStart + 1,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+          )
+        }
+        setSpan(
+          RelativeSizeSpan(0.9f),
+          iconStart,
+          length,
+          Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        setSpan(
+          ForegroundColorSpan(hintColor),
+          iconStart,
+          length,
+          Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+        val start = indexOf(linkText)
+        if (start >= 0) {
+          setSpan(
+            object : ClickableSpan() {
+              override fun onClick(widget: View) {
+                ClipboardUtils.put(widget.context, scheme)
+                VersionCompat.showCopiedOnClipboardToast(widget.context)
+              }
+            },
+            start,
+            start + linkText.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+          )
+        }
+      }
   }
 
   override fun onVisibilityChanged(visible: Boolean) {

@@ -2,6 +2,7 @@
 <resources>
   <string name="app_name" translatable="false">LibChecker</string>
   <string name="apk" translatable="false">APK</string>
+  <string name="url" translatable="false">URL</string>
   <string name="app_bundle" translatable="false">App Bundles</string>
   <string name="abi_string" translatable="false">ABI</string>
   <string name="kotlin_string" translatable="false">Kotlin</string>

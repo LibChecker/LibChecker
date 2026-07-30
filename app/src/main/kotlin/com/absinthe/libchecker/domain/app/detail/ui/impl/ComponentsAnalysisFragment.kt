@@ -24,6 +24,9 @@ class ComponentsAnalysisFragment :
   }
 
   override fun onItemsAvailable(items: List<LibStringItemChip>) {
+    if (isFragmentVisible()) {
+      refreshProcessFilterData()
+    }
     if (items.isEmpty()) {
       emptyView.text.text = getString(R.string.empty_list)
     } else {

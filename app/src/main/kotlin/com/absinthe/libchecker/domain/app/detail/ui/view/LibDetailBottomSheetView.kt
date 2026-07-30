@@ -215,8 +215,12 @@ class LibDetailBottomSheetView(
   }
 
   fun renderLibraryInsight(state: LibraryInsightUiState, onRetry: () -> Unit) {
-    val willBeGone = state == LibraryInsightUiState.Hidden
-    val shouldAnimate = extraInfoCard.isGone != willBeGone && identityAndExtra.isLaidOut
+    val displayState = state.toDeferredDisplayState()
+    val willBeGone = displayState == LibraryInsightUiState.Hidden
+    val shouldAnimate = displayState.shouldAnimateReveal(
+      isCurrentlyGone = extraInfoCard.isGone,
+      isContainerLaidOut = identityAndExtra.isLaidOut
+    )
     if (shouldAnimate) {
       TransitionManager.beginDelayedTransition(
         this,
@@ -241,7 +245,7 @@ class LibDetailBottomSheetView(
         }
       )
     }
-    extraInfoCard.render(state, onRetry)
+    extraInfoCard.render(displayState, onRetry)
     identityAndExtra.setSurfaceVisible(!willBeGone, shouldAnimate)
   }
 
@@ -482,4 +486,19 @@ class LibDetailBottomSheetView(
       )
     }
   }
+}
+
+internal fun LibraryInsightUiState.toDeferredDisplayState(): LibraryInsightUiState {
+  return if (this == LibraryInsightUiState.Loading) {
+    LibraryInsightUiState.Hidden
+  } else {
+    this
+  }
+}
+
+internal fun LibraryInsightUiState.shouldAnimateReveal(
+  isCurrentlyGone: Boolean,
+  isContainerLaidOut: Boolean
+): Boolean {
+  return this is LibraryInsightUiState.Content && isCurrentlyGone && isContainerLaidOut
 }
