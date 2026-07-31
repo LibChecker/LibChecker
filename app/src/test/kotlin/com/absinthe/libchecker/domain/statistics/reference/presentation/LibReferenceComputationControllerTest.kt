@@ -8,6 +8,7 @@ import com.absinthe.libchecker.domain.app.model.AppInstallSource
 import com.absinthe.libchecker.domain.app.model.PackageChangeState
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.domain.statistics.reference.repository.LibReferenceSettingsRepository
+import com.absinthe.libchecker.domain.statistics.reference.repository.PermissionLabelResolver
 import com.absinthe.libchecker.domain.statistics.reference.usecase.ComputeLibReferenceUseCase
 import com.absinthe.libchecker.domain.statistics.reference.usecase.GetLibReferenceConfigUseCase
 import com.absinthe.libchecker.domain.statistics.reference.usecase.GetLibReferenceIconPackagesUseCase
@@ -38,6 +39,7 @@ class LibReferenceComputationControllerTest {
       computeLibReferenceUseCase = ComputeLibReferenceUseCase(repository),
       getLibReferenceIconPackagesUseCase = GetLibReferenceIconPackagesUseCase(repository),
       getLibReferenceConfigUseCase = GetLibReferenceConfigUseCase(FakeLibReferenceSettingsRepository()),
+      permissionLabelResolver = PermissionLabelResolver { null },
       updateProgress = {}
     )
 

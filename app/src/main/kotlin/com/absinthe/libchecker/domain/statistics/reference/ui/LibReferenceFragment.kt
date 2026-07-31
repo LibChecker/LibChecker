@@ -25,11 +25,14 @@ import com.absinthe.libchecker.domain.statistics.chart.ui.ChartActivity
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReference
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceAction
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceListRenderState
+import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceSearchLabels
 import com.absinthe.libchecker.domain.statistics.reference.presentation.LibReferenceViewModel
 import com.absinthe.libchecker.domain.statistics.reference.ui.adapter.LibReferenceAdapter
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseListControllerFragment
 import com.absinthe.libchecker.ui.base.IAppBarContainer
+import com.absinthe.libchecker.ui.base.initialListSearchState
+import com.absinthe.libchecker.ui.base.shouldHandleListSearchQueryChange
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.launchLibReferencePage
@@ -255,11 +258,17 @@ class LibReferenceFragment :
     this.menu = menu
 
     val context = (context as? BaseActivity<*>) ?: return
+    val searchMenuState = homeViewModel.getToolbarSearchMenuState()
+    val initialSearchState = initialListSearchState(
+      retainedQuery = libReferenceViewModel.getSearchQuery(),
+      toolbarState = searchMenuState
+    )
     val searchView = SearchView(context).apply {
       setIconifiedByDefault(false)
-      setOnQueryTextListener(this@LibReferenceFragment)
       queryHint = getText(R.string.search_hint)
       isQueryRefinementEnabled = true
+      setQuery(initialSearchState.query, false)
+      setOnQueryTextListener(this@LibReferenceFragment)
 
       findViewById<View>(androidx.appcompat.R.id.search_plate).apply {
         setBackgroundColor(Color.TRANSPARENT)
@@ -269,6 +278,9 @@ class LibReferenceFragment :
     menu.findItem(R.id.search).apply {
       setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW or MenuItem.SHOW_AS_ACTION_IF_ROOM)
       actionView = searchView
+      if (initialSearchState.shouldExpand) {
+        expandActionView()
+      }
 
       if (!isListReady) {
         isVisible = false
@@ -347,8 +359,19 @@ class LibReferenceFragment :
   }
 
   override fun onQueryTextChange(newText: String): Boolean {
+    if (!shouldHandleListSearchQueryChange(viewLifecycleOwner.lifecycle.currentState)) {
+      return false
+    }
     val shouldSyncHighlight = listRenderState.highlightText != newText
-    val searchChange = libReferenceViewModel.onSearchQueryChanged(newText)
+    val searchChange = libReferenceViewModel.onSearchQueryChanged(
+      query = newText,
+      labels = LibReferenceSearchLabels(
+        notMarkedLabel = getString(R.string.not_marked_lib),
+        permissionFallbackLabel = getString(R.string.ref_category_perm),
+        metadataLabel = getString(R.string.ref_category_metadata),
+        packageLabel = getString(R.string.ref_category_package)
+      )
+    )
     if (searchChange.shouldRefreshItems || shouldSyncHighlight) {
       isSearchTextClearOnce = newText.isEmpty()
       updateListRenderState { it.copy(highlightText = newText) }

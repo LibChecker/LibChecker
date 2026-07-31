@@ -15,6 +15,7 @@ import com.absinthe.libchecker.domain.statistics.reference.model.MultipleAppsIco
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
+import com.absinthe.libchecker.utils.extensions.setOrHighlightText
 import com.absinthe.libchecker.utils.extensions.tintHighlightText
 import com.absinthe.libchecker.view.AViewGroup
 
@@ -96,8 +97,12 @@ class MultipleAppsIconItemView(context: Context) : FrameLayout(context) {
       highlightText: String
     ) {
       icon.setIcons(display.iconPackages)
-      labelName.text = buildSpannedString {
-        italic { append(display.label) }
+      if (display.italicLabel) {
+        labelName.text = buildSpannedString {
+          italic { append(display.label) }
+        }
+      } else {
+        labelName.setOrHighlightText(display.label, highlightText)
       }
       if (highlightText.isNotBlank()) {
         libName.tintHighlightText(highlightText, display.libName)

@@ -190,13 +190,16 @@ class AdvancedMenuBSDView(context: Context) :
     items: List<MenuOptionItem>,
     onCheckedChanged: (MenuOptionItem, Boolean) -> Unit
   ) {
-    removeAllViews()
-    items.forEach { item ->
-      addView(
-        MenuOptionItemView(context).apply {
-          bind(item) { isChecked -> onCheckedChanged(item, isChecked) }
-        }
-      )
+    items.forEachIndexed { index, item ->
+      val itemView = getChildAt(index) as? MenuOptionItemView
+        ?: MenuOptionItemView(
+          context = context,
+          dispatchCheckedChangeImmediately = true
+        ).also { addView(it, index) }
+      itemView.bind(item) { isChecked -> onCheckedChanged(item, isChecked) }
+    }
+    while (childCount > items.size) {
+      removeViewAt(childCount - 1)
     }
   }
 

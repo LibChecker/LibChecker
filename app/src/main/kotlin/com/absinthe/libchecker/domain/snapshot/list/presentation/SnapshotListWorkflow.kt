@@ -162,6 +162,10 @@ class SnapshotListWorkflow(
     return true
   }
 
+  fun getSnapshotSearchKeyword(): String {
+    return snapshotSearchKeyword
+  }
+
   suspend fun buildSnapshotListUpdatePlan(
     currentItems: List<SnapshotDiffItem>,
     highlightRefresh: Boolean

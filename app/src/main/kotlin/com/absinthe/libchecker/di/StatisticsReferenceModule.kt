@@ -1,26 +1,30 @@
 package com.absinthe.libchecker.di
 
+import com.absinthe.libchecker.data.statistics.AndroidPermissionLabelResolver
 import com.absinthe.libchecker.data.statistics.GlobalLibReferenceSettingsRepository
 import com.absinthe.libchecker.domain.statistics.reference.presentation.LibReferenceComputationController
 import com.absinthe.libchecker.domain.statistics.reference.presentation.LibReferenceViewModel
 import com.absinthe.libchecker.domain.statistics.reference.repository.LibReferenceSettingsRepository
+import com.absinthe.libchecker.domain.statistics.reference.repository.PermissionLabelResolver
 import com.absinthe.libchecker.domain.statistics.reference.usecase.BuildLibReferenceDetailDialogRequestUseCase
 import com.absinthe.libchecker.domain.statistics.reference.usecase.ComputeLibReferenceUseCase
 import com.absinthe.libchecker.domain.statistics.reference.usecase.GetLibReferenceAppsUseCase
 import com.absinthe.libchecker.domain.statistics.reference.usecase.GetLibReferenceConfigUseCase
 import com.absinthe.libchecker.domain.statistics.reference.usecase.GetLibReferenceIconPackagesUseCase
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val statisticsReferenceModule = module {
   single<LibReferenceSettingsRepository> { GlobalLibReferenceSettingsRepository() }
+  single<PermissionLabelResolver> { AndroidPermissionLabelResolver(androidContext().packageManager) }
 
   factory { ComputeLibReferenceUseCase(get()) }
   factory { GetLibReferenceConfigUseCase(get()) }
   factory { GetLibReferenceIconPackagesUseCase(get()) }
   factory { GetLibReferenceAppsUseCase(get()) }
   factory { BuildLibReferenceDetailDialogRequestUseCase() }
-  factory { LibReferenceComputationController.Factory(get(), get(), get()) }
+  factory { LibReferenceComputationController.Factory(get(), get(), get(), get()) }
 
   viewModel {
     LibReferenceViewModel(

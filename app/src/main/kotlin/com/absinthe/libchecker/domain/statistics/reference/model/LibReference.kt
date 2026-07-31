@@ -17,6 +17,7 @@ data class LibReference(
   @LibType val type: Int,
   @IgnoredOnParcel
   val iconPackages: List<PackageInfo> = emptyList(),
+  val resolvedLabel: String? = null,
   override val childNode: @RawValue MutableList<BaseNode>? = null
 ) : BaseNode(),
   Parcelable
