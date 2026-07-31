@@ -56,7 +56,7 @@ import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.StatefulComponent
 import com.absinthe.libchecker.utils.apk.ZipDataOffsetReader
-import com.absinthe.libchecker.utils.dex.FastDexFileFactory
+import com.absinthe.libchecker.utils.dex.StreamingDexClassScanner
 import com.absinthe.libchecker.utils.elf.ElfInfo
 import com.absinthe.libchecker.utils.elf.ElfParser
 import com.absinthe.libchecker.utils.extensions.ABI_64_BIT
@@ -82,7 +82,6 @@ import com.absinthe.libchecker.utils.extensions.toClassDefType
 import com.absinthe.libchecker.utils.extensions.toHexString
 import com.absinthe.libchecker.utils.manifest.StaticLibraryReader
 import com.absinthe.libraries.utils.manager.TimeRecorder
-import com.android.tools.smali.dexlib2.Opcodes
 import dev.rikka.tools.refine.Refine
 import java.io.File
 import java.security.interfaces.DSAPublicKey
@@ -296,6 +295,7 @@ object PackageUtils {
   private const val TRACE_APK_LIBS_MATCH_ENTRIES = "LC PackageUtils apkLibsMatchEntries"
   private const val TRACE_APK_LIBS_OPEN_ZIP = "LC PackageUtils apkLibsOpenZip"
   private const val TRACE_APK_LIBS_PARSE_ELF = "LC PackageUtils apkLibsParseElf"
+  private const val TRACE_FIND_DEX_CLASSES = "LC PackageUtils findDexClasses"
 
   private fun getApkFileLibs(file: File, specifiedAbi: Int? = null, parseElf: Boolean): Map<String, MutableList<LibStringItem>> {
     if (file.exists().not() || file.canRead().not()) {
@@ -327,23 +327,29 @@ object PackageUtils {
           } else {
             -1
           }
-          val elfParser = tracePackageUtilsSection(TRACE_APK_LIBS_PARSE_ELF) {
+          val elfInfo = tracePackageUtilsSection(TRACE_APK_LIBS_PARSE_ELF) {
             runCatching {
               ElfParser(zipFile.getInputStream(entry)).use { parser ->
                 parser.parseHeader()
-                parser
+                ElfInfo(
+                  parser.getEType(),
+                  parser.getMinPageSize(),
+                  zipAlignment = currentEntryZipAlignment
+                )
               }
-            }.getOrNull()
+            }.getOrElse {
+              ElfInfo(
+                ET_NOT_ELF,
+                -1,
+                zipAlignment = currentEntryZipAlignment
+              )
+            }
           }
 
           val item = LibStringItem(
             name = getApkLibEntryFileName(entryName),
             size = entry.size,
-            elfInfo = ElfInfo(
-              elfParser?.getEType() ?: ET_NOT_ELF,
-              elfParser?.getMinPageSize() ?: -1,
-              zipAlignment = currentEntryZipAlignment
-            ),
+            elfInfo = elfInfo,
             source = entryName,
             process = file.name
           )
@@ -1012,30 +1018,32 @@ object PackageUtils {
     classes: List<String>,
     hasAny: Boolean = false
   ): List<String> {
-    val findList = mutableListOf<String>()
-    return runCatching {
-      FastDexFileFactory.loadDexContainer(sourceFile, Opcodes.getDefault()).apply {
-        dexEntryNames.forEach { entry ->
-          getEntry(entry)?.dexFile?.classes?.forEach { def ->
-            classes.forEach {
-              val foundClass = if (it.last() == '*') {
-                def.type.startsWith(it.removeSuffix("*"))
-              } else {
-                def.type == it
-              }
-              if (foundClass && !findList.contains(it)) {
-                findList.add(it)
+    if (classes.isEmpty()) return emptyList()
 
-                if (findList.size == classes.size || hasAny) {
-                  return@runCatching findList
-                }
+    val foundClasses = linkedSetOf<String>()
+    return tracePackageUtilsSection(TRACE_FIND_DEX_CLASSES) {
+      runCatching {
+        ZipFileCompat(sourceFile).use { zipFile ->
+          zipFile.getZipEntries().asSequence()
+            .filter { it.name.matches(DEX_ENTRY_REGEX) }
+            .forEach { entry ->
+              val remainingClasses = classes.filterNot(foundClasses::contains)
+              zipFile.getInputStream(entry).use { inputStream ->
+                foundClasses += StreamingDexClassScanner.findClasses(
+                  inputStream = inputStream,
+                  classPatterns = remainingClasses,
+                  hasAny = hasAny,
+                  entrySize = entry.size.takeIf { it >= 0 }
+                )
+              }
+              if ((hasAny && foundClasses.isNotEmpty()) || foundClasses.size == classes.distinct().size) {
+                return@runCatching foundClasses.toList()
               }
             }
-          }
         }
-      }
-      return findList
-    }.getOrDefault(emptyList())
+        foundClasses.toList()
+      }.getOrDefault(emptyList())
+    }
   }
 
   /**
@@ -1046,6 +1054,8 @@ object PackageUtils {
   fun getDexList(pi: PackageInfo): Collection<LibStringItem> {
     throw RuntimeException("Not implemented")
   }
+
+  private val DEX_ENTRY_REGEX = Regex("^classes(\\d*)\\.dex$")
 
   /**
    * Get permissions of an application

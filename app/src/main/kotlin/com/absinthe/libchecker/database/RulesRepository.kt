@@ -121,25 +121,42 @@ object RulesRepository {
     packageName: String? = null,
     nativeLibNames: Collection<String>? = null
   ): Rule? {
-    val ruleEntity = getRule(name, type, true) ?: return null
+    return getRulesWithRegex(
+      names = listOf(name),
+      type = type,
+      packageName = packageName,
+      nativeLibNames = nativeLibNames
+    )[name]
+  }
+
+  suspend fun getRulesWithRegex(
+    names: Collection<String>,
+    @LibType type: Int,
+    packageName: String? = null,
+    nativeLibNames: Collection<String>? = null
+  ): Map<String, Rule?> {
+    val rules = names.distinct().associateWith { getRule(it, type, true) }
     if (type != NATIVE || packageName == null) {
-      return ruleEntity
+      return rules
     }
 
-    if (!requiresNativeLibValidation(name)) {
-      return ruleEntity
+    val namesToValidate = rules
+      .filterValues { it != null }
+      .keys
+      .filter(::requiresNativeLibValidation)
+    if (namesToValidate.isEmpty()) {
+      return rules
     }
 
-    if (hasCompanionNativeLibValidation(name, nativeLibNames)) {
-      return ruleEntity
+    val source = getPackageSourceFile(packageName) ?: return rules
+    val validationResults = checkNativeLibValidations(
+      source = source,
+      nativeLibs = namesToValidate,
+      otherNativeLibNames = nativeLibNames
+    )
+    return rules.mapValues { (name, rule) ->
+      rule?.takeIf { validationResults[name] != false }
     }
-
-    val source = getPackageSourceFile(packageName) ?: return ruleEntity
-
-    if (!checkNativeLibValidation(source, name, nativeLibNames)) {
-      return null
-    }
-    return ruleEntity
   }
 
   private val NATIVE_SET_QIHOO = setOf("libjiagu.so", "libjiagu_a64.so", "libjiagu_x86.so", "libjiagu_x64.so")
@@ -147,6 +164,12 @@ object RulesRepository {
   private val NATIVE_SET_FLUTTER = setOf("libapp.so")
   private val NATIVE_SET_UNITY = setOf("libmain.so")
   private val NATIVE_ALL = NATIVE_SET_QIHOO + NATIVE_SET_SECNEO + NATIVE_SET_FLUTTER + NATIVE_SET_UNITY
+  private val CLASS_PATTERNS_QIHOO = setOf(
+    "com.qihoo.util.*".toClassDefType(),
+    "com.tianyu.util.*".toClassDefType()
+  )
+  private val CLASS_PATTERNS_SECNEO = setOf("com.secneo.apkwrapper.*".toClassDefType())
+  private val CLASS_PATTERNS_FLUTTER = setOf("io.flutter.FlutterInjector".toClassDefType())
 
   private fun requiresNativeLibValidation(nativeLib: String): Boolean {
     return nativeLib in NATIVE_ALL
@@ -188,50 +211,42 @@ object RulesRepository {
     nativeLib: String,
     otherNativeLibNames: Collection<String>? = null
   ): Boolean {
-    return when {
-      NATIVE_SET_QIHOO.contains(nativeLib) -> {
-        runCatching {
-          PackageUtils.findDexClasses(
-            source,
-            listOf(
-              "com.qihoo.util.*".toClassDefType(),
-              "com.tianyu.util.*".toClassDefType()
-            ),
-            hasAny = true
-          ).isNotEmpty()
-        }.getOrDefault(false)
-      }
+    return checkNativeLibValidations(
+      source = source,
+      nativeLibs = listOf(nativeLib),
+      otherNativeLibNames = otherNativeLibNames
+    )[nativeLib] == true
+  }
 
-      NATIVE_SET_SECNEO.contains(nativeLib) -> {
-        runCatching {
-          PackageUtils.findDexClasses(
-            source,
-            listOf(
-              "com.secneo.apkwrapper.*".toClassDefType()
-            )
-          ).isNotEmpty()
-        }.getOrDefault(false)
+  private fun checkNativeLibValidations(
+    source: File,
+    nativeLibs: Collection<String>,
+    otherNativeLibNames: Collection<String>? = null
+  ): Map<String, Boolean> {
+    val patterns = buildSet {
+      nativeLibs.forEach { nativeLib ->
+        if (!hasCompanionNativeLibValidation(nativeLib, otherNativeLibNames)) {
+          when {
+            nativeLib in NATIVE_SET_QIHOO -> addAll(CLASS_PATTERNS_QIHOO)
+            nativeLib in NATIVE_SET_SECNEO -> addAll(CLASS_PATTERNS_SECNEO)
+            nativeLib in NATIVE_SET_FLUTTER -> addAll(CLASS_PATTERNS_FLUTTER)
+          }
+        }
       }
+    }
+    val foundClasses = runCatching {
+      PackageUtils.findDexClasses(source, patterns.toList()).toSet()
+    }.getOrDefault(emptySet())
 
-      NATIVE_SET_FLUTTER.contains(nativeLib) -> {
-        runCatching {
-          otherNativeLibNames?.contains("libflutter.so") == true ||
-            PackageUtils.findDexClasses(
-              source,
-              listOf(
-                "io.flutter.FlutterInjector".toClassDefType()
-              )
-            ).isNotEmpty()
-        }.getOrDefault(false)
+    return nativeLibs.associateWith { nativeLib ->
+      when {
+        hasCompanionNativeLibValidation(nativeLib, otherNativeLibNames) -> true
+        nativeLib in NATIVE_SET_QIHOO -> foundClasses.any(CLASS_PATTERNS_QIHOO::contains)
+        nativeLib in NATIVE_SET_SECNEO -> foundClasses.any(CLASS_PATTERNS_SECNEO::contains)
+        nativeLib in NATIVE_SET_FLUTTER -> foundClasses.any(CLASS_PATTERNS_FLUTTER::contains)
+        nativeLib in NATIVE_SET_UNITY -> false
+        else -> true
       }
-
-      NATIVE_SET_UNITY.contains(nativeLib) -> {
-        runCatching {
-          otherNativeLibNames?.contains("libunity.so") == true
-        }.getOrDefault(false)
-      }
-
-      else -> true
     }
   }
 
