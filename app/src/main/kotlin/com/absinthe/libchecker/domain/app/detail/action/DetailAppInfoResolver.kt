@@ -62,13 +62,18 @@ class DetailAppInfoResolver(
     val zipInfo = sourceDir?.let(::readZipInfo)
 
     val moduleProp = zipInfo?.moduleProp
+    val targetVersion = moduleProp?.getProperty("targetApiVersion")?.takeIf(String::isNotBlank)
+    val defaultScope = getDefaultScope(zipInfo?.defaultScope, packageName, metadataBundle["xposedscope"]?.size)
+      ?.map(::getXposedScopeAppInfo)
     XposedModuleInfo(
       appName = packageInfo.getAppName(packageManager).orEmpty(),
       settingsIntent = getSettingsIntent(packageName),
       minVersion = getMinVersion(moduleProp, metadataBundle["xposedminversion"]?.source),
-      targetVersion = moduleProp?.getProperty("targetApiVersion")?.takeIf(String::isNotBlank),
+      targetVersion = targetVersion,
+      autoHotReloadDeclared = targetVersion?.toIntOrNull()?.let { it >= XPOSED_API_HOT_RELOAD } == true &&
+        moduleProp.getProperty("autoHotReload").equals("true", ignoreCase = true),
       staticScope = moduleProp?.getProperty("staticScope") == "true",
-      defaultScope = getDefaultScope(zipInfo?.defaultScope, packageName, metadataBundle["xposedscope"]?.size),
+      defaultScope = defaultScope,
       javaInitClasses = zipInfo?.javaInitClasses,
       nativeInitLibraries = zipInfo?.nativeInitLibraries,
       legacyInitClass = zipInfo?.legacyInitClass,
@@ -373,17 +378,35 @@ class DetailAppInfoResolver(
     return minVersions.minOrNull()?.toString()
   }
 
-  private fun getDefaultScope(modernScope: ZipEntryLines?, packageName: String, legacyScopeResourceId: Long?): String? {
-    if (modernScope?.exists == true) {
-      return modernScope.text
+  private fun getDefaultScope(
+    modernScope: ZipEntryLines?,
+    packageName: String,
+    legacyScopeResourceId: Long?
+  ): List<String>? {
+    val rawScope = if (modernScope?.exists == true) {
+      modernScope.text?.lineSequence()?.toList().orEmpty()
+    } else {
+      legacyScopeResourceId?.let { resourceId ->
+        runCatching {
+          packageManager.getResourcesForApplication(packageName)
+            .getStringArray(resourceId.toInt())
+            .toList()
+        }.getOrNull()
+      }.orEmpty()
     }
-    return legacyScopeResourceId?.let { resourceId ->
-      runCatching {
-        packageManager.getResourcesForApplication(packageName)
-          .getStringArray(resourceId.toInt())
-          .contentToString()
-      }.getOrNull()
-    }
+    return normalizeXposedScope(rawScope).takeIf(List<String>::isNotEmpty)
+  }
+
+  private fun getXposedScopeAppInfo(packageName: String): XposedScopeAppInfo {
+    val packageInfo = installedAppRepository.getPackageInfo(packageName)
+    val label = packageInfo?.getAppName(packageManager)
+      ?.takeIf(String::isNotBlank)
+      ?: packageName
+    return XposedScopeAppInfo(
+      packageName = packageName,
+      label = label,
+      packageInfo = packageInfo
+    )
   }
 
   private fun ZipFileCompat.readFirstEntryLine(entryName: String): String? {
@@ -426,7 +449,16 @@ class DetailAppInfoResolver(
   private companion object {
     const val CATEGORY_XPOSED_SETTINGS = "de.robv.android.xposed.category.MODULE_SETTINGS"
     const val MIMETYPE_APK = "application/vnd.android.package-archive"
+    const val XPOSED_API_HOT_RELOAD = 102
   }
+}
+
+internal fun normalizeXposedScope(values: Iterable<String>): List<String> {
+  return values.asSequence()
+    .map(String::trim)
+    .filter(String::isNotEmpty)
+    .distinct()
+    .toList()
 }
 
 data class XposedModuleInfo(
@@ -434,12 +466,19 @@ data class XposedModuleInfo(
   val settingsIntent: Intent?,
   val minVersion: String?,
   val targetVersion: String?,
+  val autoHotReloadDeclared: Boolean,
   val staticScope: Boolean,
-  val defaultScope: String?,
+  val defaultScope: List<XposedScopeAppInfo>?,
   val javaInitClasses: String?,
   val nativeInitLibraries: String?,
   val legacyInitClass: String?,
   val description: String?
+)
+
+data class XposedScopeAppInfo(
+  val packageName: String,
+  val label: String,
+  val packageInfo: PackageInfo?
 )
 
 private data class ZipEntryLines(

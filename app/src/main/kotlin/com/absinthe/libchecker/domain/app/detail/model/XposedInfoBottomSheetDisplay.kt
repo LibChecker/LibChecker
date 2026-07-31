@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.domain.app.detail.model
 
 import android.content.Intent
+import android.content.pm.PackageInfo
 import androidx.annotation.DrawableRes
 
 data class XposedInfoBottomSheetDisplay(
@@ -9,11 +10,31 @@ data class XposedInfoBottomSheetDisplay(
   val items: List<XposedInfoItemDisplay>
 )
 
-data class XposedInfoItemDisplay(
-  @DrawableRes val iconRes: Int,
-  val tip: String,
-  val text: String,
-  val textStyle: XposedInfoTextStyle
+sealed interface XposedInfoItemDisplay {
+
+  @get:DrawableRes
+  val iconRes: Int
+
+  val tip: String
+
+  data class Text(
+    @DrawableRes override val iconRes: Int,
+    override val tip: String,
+    val text: String,
+    val textStyle: XposedInfoTextStyle
+  ) : XposedInfoItemDisplay
+
+  data class ScopeApps(
+    @DrawableRes override val iconRes: Int,
+    override val tip: String,
+    val apps: List<XposedScopeAppDisplay>
+  ) : XposedInfoItemDisplay
+}
+
+data class XposedScopeAppDisplay(
+  val packageName: String,
+  val label: String,
+  val packageInfo: PackageInfo?
 )
 
 enum class XposedInfoTextStyle {
