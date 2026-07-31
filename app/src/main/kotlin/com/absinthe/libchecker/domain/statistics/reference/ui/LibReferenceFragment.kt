@@ -336,7 +336,12 @@ class LibReferenceFragment :
     lifecycleScope.launch {
       val request = libReferenceViewModel.buildDetailDialogRequest(ref.libName, ref.type) ?: return@launch
       context.findViewById<View>(androidx.appcompat.R.id.search_src_text)?.clearFocus()
-      LibDetailDialogFragment.newInstance(request.name, request.type, request.regexName)
+      LibDetailDialogFragment.newInstance(
+        libName = request.name,
+        type = request.type,
+        regexName = request.regexName,
+        enableLibraryInsight = false
+      )
         .show(context.supportFragmentManager, LibDetailDialogFragment::class.java.name)
     }
   }

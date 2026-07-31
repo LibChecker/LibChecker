@@ -366,7 +366,13 @@ abstract class BaseDetailFragment<T : ViewBinding> :
       }
 
       is DetailItemDialogRequest.Library -> {
-        LibDetailDialogFragment.newInstance(request.name, request.type, request.regexName, request.isValidLib)
+        LibDetailDialogFragment.newInstance(
+          libName = request.name,
+          type = request.type,
+          regexName = request.regexName,
+          isValidLib = request.isValidLib,
+          enableLibraryInsight = true
+        )
           .show(childFragmentManager, LibDetailDialogFragment::class.java.name)
       }
     }

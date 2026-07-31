@@ -33,6 +33,7 @@ const val EXTRA_LIB_NAME = "EXTRA_LIB_NAME"
 const val EXTRA_LIB_TYPE = "EXTRA_LIB_TYPE"
 const val EXTRA_REGEX_NAME = "EXTRA_REGEX_NAME"
 const val EXTRA_IS_VALID_LIB = "EXTRA_IS_VALID_LIB"
+const val EXTRA_ENABLE_LIBRARY_INSIGHT = "EXTRA_ENABLE_LIBRARY_INSIGHT"
 
 class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBottomSheetView>() {
 
@@ -40,6 +41,9 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
   private val type by lazy { arguments?.getInt(EXTRA_LIB_TYPE) ?: NATIVE }
   private val regexName by lazy { arguments?.getString(EXTRA_REGEX_NAME) }
   private val isValidLib by lazy { arguments?.getBoolean(EXTRA_IS_VALID_LIB) != false }
+  private val isLibraryInsightEnabled by lazy {
+    arguments?.getBoolean(EXTRA_ENABLE_LIBRARY_INSIGHT) == true
+  }
   private val viewModel: DetailViewModel by activityViewModel()
   private val insightViewModel: LibraryInsightViewModel by viewModel()
   private var isStickyEventReceived = false
@@ -115,11 +119,18 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
                 content = result.content
               )
             )
-            insightViewModel.load(
-              libraryUuid = result.libraryUuid,
-              packageInfo = viewModel.packageInfo,
-              localeTag = Locale.getDefault().toLanguageTag()
-            )
+            if (
+              shouldLoadLibraryInsight(
+                isEnabled = isLibraryInsightEnabled,
+                isPackageInfoAvailable = viewModel.isPackageInfoAvailable()
+              )
+            ) {
+              insightViewModel.load(
+                libraryUuid = result.libraryUuid,
+                packageInfo = viewModel.packageInfo,
+                localeTag = Locale.getDefault().toLanguageTag()
+              )
+            }
           }
 
           DetailItemResolver.Result.NotFound -> {
@@ -177,16 +188,23 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
       libName: String,
       @LibType type: Int,
       regexName: String? = null,
-      isValidLib: Boolean = true
+      isValidLib: Boolean = true,
+      enableLibraryInsight: Boolean = false
     ): LibDetailDialogFragment {
       return LibDetailDialogFragment().putArguments(
         EXTRA_LIB_NAME to libName,
         EXTRA_LIB_TYPE to type,
         EXTRA_REGEX_NAME to regexName,
-        EXTRA_IS_VALID_LIB to isValidLib
+        EXTRA_IS_VALID_LIB to isValidLib,
+        EXTRA_ENABLE_LIBRARY_INSIGHT to enableLibraryInsight
       )
     }
 
     var isShowing = false
   }
 }
+
+internal fun shouldLoadLibraryInsight(
+  isEnabled: Boolean,
+  isPackageInfoAvailable: Boolean
+): Boolean = isEnabled && isPackageInfoAvailable
