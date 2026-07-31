@@ -7,6 +7,11 @@ import com.chad.library.adapter.base.provider.BaseNodeProvider
 
 fun BaseNodeProvider.showSnapshotDetailLibraryDialog(target: SnapshotDetailLibraryDialogTarget) {
   val fragmentManager = (context as BaseActivity<*>).supportFragmentManager
-  LibDetailDialogFragment.newInstance(target.name, target.type, target.regexName)
+  LibDetailDialogFragment.newInstance(
+    libName = target.name,
+    type = target.type,
+    regexName = target.regexName,
+    enableLibraryInsight = false
+  )
     .show(fragmentManager, LibDetailDialogFragment::class.java.name)
 }
