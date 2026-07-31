@@ -1,16 +1,17 @@
 package com.absinthe.libchecker.utils.elf.source;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 
 public class InputStreamDataSource implements DataSource {
     private final InputStream inputStream;
     private ByteBuffer buffer;
     private ByteOrder order = ByteOrder.LITTLE_ENDIAN;
     private boolean allDataRead = false;
+    private int validLength = 0;
     private static final int INITIAL_BUFFER_SIZE = 4096;
 
     public InputStreamDataSource(InputStream inputStream) throws IOException {
@@ -20,49 +21,77 @@ public class InputStreamDataSource implements DataSource {
 
     private void readInitialBuffer() throws IOException {
         byte[] initialBytes = new byte[INITIAL_BUFFER_SIZE];
-        int totalBytesRead = 0;
         int bytesRead;
-        while (totalBytesRead < INITIAL_BUFFER_SIZE && (bytesRead = inputStream.read(initialBytes, totalBytesRead, INITIAL_BUFFER_SIZE - totalBytesRead)) != -1) {
-            totalBytesRead += bytesRead;
+        while (validLength < INITIAL_BUFFER_SIZE
+                && (bytesRead = inputStream.read(initialBytes, validLength, INITIAL_BUFFER_SIZE - validLength)) != -1) {
+            if (bytesRead == 0) {
+                int value = inputStream.read();
+                if (value == -1) {
+                    break;
+                }
+                initialBytes[validLength++] = (byte) value;
+                continue;
+            }
+            validLength += bytesRead;
         }
 
-        if (totalBytesRead > 0) {
-            if (totalBytesRead < INITIAL_BUFFER_SIZE) {
-                byte[] exactBytes = new byte[totalBytesRead];
-                System.arraycopy(initialBytes, 0, exactBytes, 0, totalBytesRead);
-                this.buffer = ByteBuffer.wrap(exactBytes);
-                allDataRead = true;
-            } else {
-                this.buffer = ByteBuffer.wrap(initialBytes);
-            }
-        } else {
-            this.buffer = ByteBuffer.wrap(new byte[0]);
+        if (validLength < INITIAL_BUFFER_SIZE) {
             allDataRead = true;
         }
+        this.buffer = ByteBuffer.wrap(initialBytes);
         this.buffer.order(order);
     }
 
     private void ensureAvailable(long offset, int length) throws IOException {
-        if (allDataRead) {
-            if (offset + length > buffer.capacity()) {
-                throw new IOException("Attempt to read past end of stream.");
-            }
+        if (offset < 0 || length < 0 || offset > Integer.MAX_VALUE - length) {
+            throw new IOException("Requested stream range is invalid.");
+        }
+
+        int requiredLength = (int) offset + length;
+        if (requiredLength <= validLength) {
             return;
         }
-        if (offset + length > buffer.capacity()) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            baos.write(buffer.array());
-            byte[] chunk = new byte[4096];
-            int n;
-            while ((n = inputStream.read(chunk)) != -1) {
-                baos.write(chunk, 0, n);
+        if (allDataRead) {
+            throw new IOException("Attempt to read past end of stream.");
+        }
+
+        while (requiredLength > validLength && !allDataRead) {
+            if (validLength == buffer.capacity()) {
+                int nextCapacity;
+                if (buffer.capacity() > Integer.MAX_VALUE / 2) {
+                    nextCapacity = requiredLength;
+                } else {
+                    nextCapacity = Math.min(requiredLength, buffer.capacity() * 2);
+                }
+                byte[] expanded = Arrays.copyOf(buffer.array(), nextCapacity);
+                this.buffer = ByteBuffer.wrap(expanded);
+                this.buffer.order(order);
             }
-            this.buffer = ByteBuffer.wrap(baos.toByteArray());
-            this.buffer.order(order);
-            allDataRead = true;
-            if (offset + length > buffer.capacity()) {
-                 throw new IOException("Attempt to read past end of stream after reading all data.");
+
+            int bytesRead = inputStream.read(
+                    buffer.array(),
+                    validLength,
+                    buffer.capacity() - validLength
+            );
+            if (bytesRead == -1) {
+                allDataRead = true;
+                continue;
             }
+            if (bytesRead > 0) {
+                validLength += bytesRead;
+                continue;
+            }
+
+            int value = inputStream.read();
+            if (value == -1) {
+                allDataRead = true;
+            } else {
+                buffer.array()[validLength++] = (byte) value;
+            }
+        }
+
+        if (requiredLength > validLength) {
+            throw new IOException("Attempt to read past end of stream.");
         }
     }
 
@@ -151,4 +180,3 @@ public class InputStreamDataSource implements DataSource {
         inputStream.close();
     }
 }
-

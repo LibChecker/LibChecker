@@ -147,10 +147,16 @@ class DetailContentResolver(
       getZygotePreloadNativeLibNames(packageInfo, apkPreviewInfo)
     }
     val nativeLibNames = resolvedItems.map { it.name }
+    val rulesByNativeLibName = traceDetailSuspendSection(TRACE_DETAIL_NATIVE_RULE_MATCH) {
+      RulesRepository.getRulesWithRegex(
+        names = nativeLibNames,
+        type = NATIVE,
+        packageName = packageName,
+        nativeLibNames = nativeLibNames
+      )
+    }
     val chipList = resolvedItems.map {
-      val rule = traceDetailSuspendSection(TRACE_DETAIL_NATIVE_RULE_MATCH) {
-        RulesRepository.getRuleWithRegex(it.name, NATIVE, packageName, nativeLibNames)
-      }
+      val rule = rulesByNativeLibName[it.name]
       val labels = mutableListOf<String>().apply {
         if (it.name in nativeActivityLibNames) {
           add(NATIVE_ACTIVITY_LABEL)
