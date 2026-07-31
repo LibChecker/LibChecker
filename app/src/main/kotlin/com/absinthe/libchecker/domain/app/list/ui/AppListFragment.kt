@@ -342,6 +342,8 @@ class AppListFragment :
         isVisible = false
       }
     }
+    searchView.setQuery(initialSearchState.query, false)
+    searchView.setOnQueryTextListener(this@AppListFragment)
   }
 
   override fun onMenuItemSelected(menuItem: MenuItem): Boolean {

@@ -419,6 +419,8 @@ class SnapshotFragment :
         isVisible = false
       }
     }
+    searchView.setQuery(initialSearchState.query, false)
+    searchView.setOnQueryTextListener(this@SnapshotFragment)
   }
 
   override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
