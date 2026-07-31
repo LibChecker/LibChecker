@@ -400,6 +400,8 @@ class SnapshotFragment :
       setIconifiedByDefault(false)
       queryHint = getText(R.string.search_hint)
       isQueryRefinementEnabled = true
+      setQuery(initialSearchState.query, false)
+      setOnQueryTextListener(this@SnapshotFragment)
 
       findViewById<View>(androidx.appcompat.R.id.search_plate).apply {
         setBackgroundColor(Color.TRANSPARENT)

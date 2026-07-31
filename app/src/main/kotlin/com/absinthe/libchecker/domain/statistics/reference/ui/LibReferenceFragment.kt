@@ -267,6 +267,8 @@ class LibReferenceFragment :
       setIconifiedByDefault(false)
       queryHint = getText(R.string.search_hint)
       isQueryRefinementEnabled = true
+      setQuery(initialSearchState.query, false)
+      setOnQueryTextListener(this@LibReferenceFragment)
 
       findViewById<View>(androidx.appcompat.R.id.search_plate).apply {
         setBackgroundColor(Color.TRANSPARENT)
