@@ -323,8 +323,6 @@ class AppListFragment :
       setIconifiedByDefault(false)
       queryHint = getText(R.string.search_hint)
       isQueryRefinementEnabled = true
-      setQuery(initialSearchState.query, false)
-      setOnQueryTextListener(this@AppListFragment)
 
       findViewById<View>(androidx.appcompat.R.id.search_plate).apply {
         setBackgroundColor(Color.TRANSPARENT)
@@ -342,6 +340,8 @@ class AppListFragment :
         isVisible = false
       }
     }
+    searchView.setQuery(initialSearchState.query, false)
+    searchView.setOnQueryTextListener(this@AppListFragment)
   }
 
   override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
