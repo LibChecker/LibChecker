@@ -37,10 +37,14 @@ class MultipleAppsIconProvider(
 
   override fun convert(helper: BaseViewHolder, item: BaseNode) {
     val state = renderState()
+    val reference = item as LibReference
+    val sharedUid = reference.iconPackages.firstNotNullOfOrNull { it.applicationInfo?.uid }
     (helper.itemView as MultipleAppsIconItemView).bind(
       display = MultipleAppsIconItemDisplay.create(
-        reference = item as LibReference,
-        notMarkedLabel = context.getString(R.string.not_marked_lib)
+        reference = reference,
+        notMarkedLabel = context.getString(R.string.not_marked_lib),
+        packageLabel = context.getString(R.string.ref_category_package),
+        sharedUidLabel = sharedUid?.let { "UID $it" } ?: "UID"
       ),
       highlightText = state.highlightText
     )

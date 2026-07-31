@@ -178,6 +178,10 @@ class SnapshotViewModel(
     return snapshotListWorkflow.updateSnapshotSearchKeyword(keyword)
   }
 
+  fun getSnapshotSearchKeyword(): String {
+    return snapshotListWorkflow.getSnapshotSearchKeyword()
+  }
+
   suspend fun buildSnapshotListUpdatePlan(
     currentItems: List<SnapshotDiffItem>,
     highlightRefresh: Boolean

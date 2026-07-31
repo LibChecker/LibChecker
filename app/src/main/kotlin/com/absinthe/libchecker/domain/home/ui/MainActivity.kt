@@ -122,8 +122,8 @@ class MainActivity :
   }
 
   override fun onPause() {
-    super.onPause()
     saveToolbarMenuState()
+    super.onPause()
   }
 
   private fun saveToolbarMenuState() {
@@ -430,9 +430,6 @@ class MainActivity :
         searchView?.let {
           if (!searchItem.isActionViewExpanded) {
             searchItem.expandActionView()
-            if (searchMenuState.query.isNotEmpty()) {
-              it.setQuery(searchMenuState.query, false)
-            }
           }
         }
       }

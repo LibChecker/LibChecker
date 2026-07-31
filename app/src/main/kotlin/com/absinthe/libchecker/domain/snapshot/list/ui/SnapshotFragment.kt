@@ -65,6 +65,8 @@ import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.base.BaseListControllerFragment
 import com.absinthe.libchecker.ui.base.IAppBarContainer
+import com.absinthe.libchecker.ui.base.initialListSearchState
+import com.absinthe.libchecker.ui.base.shouldHandleListSearchQueryChange
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.Toasty
@@ -389,11 +391,17 @@ class SnapshotFragment :
       findItem(R.id.save)?.isVisible = binding.vfContainer.displayedChild == VF_LIST
     }
     val context = context ?: return
+    val searchMenuState = homeViewModel.getToolbarSearchMenuState()
+    val initialSearchState = initialListSearchState(
+      retainedQuery = viewModel.getSnapshotSearchKeyword(),
+      toolbarState = searchMenuState
+    )
     val searchView = SearchView(context).apply {
       setIconifiedByDefault(false)
-      setOnQueryTextListener(this@SnapshotFragment)
       queryHint = getText(R.string.search_hint)
       isQueryRefinementEnabled = true
+      setQuery(initialSearchState.query, false)
+      setOnQueryTextListener(this@SnapshotFragment)
 
       findViewById<View>(androidx.appcompat.R.id.search_plate).apply {
         setBackgroundColor(Color.TRANSPARENT)
@@ -403,6 +411,9 @@ class SnapshotFragment :
     menu.findItem(R.id.search).apply {
       setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW or MenuItem.SHOW_AS_ACTION_IF_ROOM)
       actionView = searchView
+      if (initialSearchState.shouldExpand) {
+        expandActionView()
+      }
 
       if (!isListReady) {
         isVisible = false
@@ -604,6 +615,9 @@ class SnapshotFragment :
   }
 
   override fun onQueryTextChange(newText: String?): Boolean {
+    if (!shouldHandleListSearchQueryChange(viewLifecycleOwner.lifecycle.currentState)) {
+      return false
+    }
     val keyword = newText.orEmpty()
     if (viewModel.updateSnapshotSearchKeyword(keyword)) {
       updateItems(highlightRefresh = true)

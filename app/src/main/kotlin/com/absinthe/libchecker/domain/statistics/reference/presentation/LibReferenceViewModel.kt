@@ -11,6 +11,8 @@ import com.absinthe.libchecker.domain.app.list.model.AppListItemViewState
 import com.absinthe.libchecker.domain.app.list.usecase.BuildAppListItemViewStatesUseCase
 import com.absinthe.libchecker.domain.app.repository.AppListRepository
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReference
+import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceSearchLabels
+import com.absinthe.libchecker.domain.statistics.reference.model.matchesSearchQuery
 import com.absinthe.libchecker.domain.statistics.reference.repository.LibReferenceSettingsRepository
 import com.absinthe.libchecker.domain.statistics.reference.usecase.BuildLibReferenceDetailDialogRequestUseCase
 import com.absinthe.libchecker.domain.statistics.reference.usecase.GetLibReferenceAppsUseCase
@@ -60,6 +62,7 @@ class LibReferenceViewModel(
   private var deferredReferenceWork: DeferredReferenceWork? = null
   private var deferredReferenceWorkNeedsLoading = false
   private var searchQuery: String = ""
+  private var searchLabels = LibReferenceSearchLabels()
   private var searchableReferences: List<LibReference>? = null
 
   private var savedThreshold: Int
@@ -196,12 +199,20 @@ class LibReferenceViewModel(
     return buildLibReferenceDetailDialogRequestUseCase(name, type)
   }
 
-  fun onSearchQueryChanged(query: String): SearchQueryChange {
-    if (searchQuery == query) {
+  fun onSearchQueryChanged(
+    query: String,
+    labels: LibReferenceSearchLabels
+  ): SearchQueryChange {
+    if (searchQuery == query && searchLabels == labels) {
       return SearchQueryChange(shouldRefreshItems = false)
     }
     searchQuery = query
+    searchLabels = labels
     return SearchQueryChange(shouldRefreshItems = true)
+  }
+
+  fun getSearchQuery(): String {
+    return searchQuery
   }
 
   suspend fun buildCurrentSearchResult(): SearchResult? {
@@ -221,11 +232,7 @@ class LibReferenceViewModel(
         references
       } else {
         references.filter {
-          it.libName.contains(query, ignoreCase = true) ||
-            it.rule?.label?.contains(
-              query,
-              ignoreCase = true
-            ) == true
+          it.matchesSearchQuery(query, searchLabels)
         }
       }
     }

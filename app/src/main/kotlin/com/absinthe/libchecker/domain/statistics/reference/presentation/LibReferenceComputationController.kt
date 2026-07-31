@@ -1,8 +1,10 @@
 package com.absinthe.libchecker.domain.statistics.reference.presentation
 
 import android.content.pm.PackageInfo
+import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReference
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceItem
+import com.absinthe.libchecker.domain.statistics.reference.repository.PermissionLabelResolver
 import com.absinthe.libchecker.domain.statistics.reference.usecase.ComputeLibReferenceUseCase
 import com.absinthe.libchecker.domain.statistics.reference.usecase.GetLibReferenceConfigUseCase
 import com.absinthe.libchecker.domain.statistics.reference.usecase.GetLibReferenceIconPackagesUseCase
@@ -18,6 +20,7 @@ class LibReferenceComputationController(
   private val computeLibReferenceUseCase: ComputeLibReferenceUseCase,
   private val getLibReferenceIconPackagesUseCase: GetLibReferenceIconPackagesUseCase,
   private val getLibReferenceConfigUseCase: GetLibReferenceConfigUseCase,
+  private val permissionLabelResolver: PermissionLabelResolver,
   private val updateProgress: (Int) -> Unit
 ) {
   private val _libReference = MutableStateFlow<List<LibReference>?>(null)
@@ -96,14 +99,16 @@ class LibReferenceComputationController(
       rule,
       referredList,
       type,
-      iconPackages = getLibReferenceIconPackagesUseCase(referredList, packageInfoByName)
+      iconPackages = getLibReferenceIconPackagesUseCase(referredList, packageInfoByName),
+      resolvedLabel = if (type == PERMISSION) permissionLabelResolver.resolve(libName) else null
     )
   }
 
   class Factory(
     private val computeLibReferenceUseCase: ComputeLibReferenceUseCase,
     private val getLibReferenceIconPackagesUseCase: GetLibReferenceIconPackagesUseCase,
-    private val getLibReferenceConfigUseCase: GetLibReferenceConfigUseCase
+    private val getLibReferenceConfigUseCase: GetLibReferenceConfigUseCase,
+    private val permissionLabelResolver: PermissionLabelResolver
   ) {
     fun create(
       scope: CoroutineScope,
@@ -114,6 +119,7 @@ class LibReferenceComputationController(
         computeLibReferenceUseCase = computeLibReferenceUseCase,
         getLibReferenceIconPackagesUseCase = getLibReferenceIconPackagesUseCase,
         getLibReferenceConfigUseCase = getLibReferenceConfigUseCase,
+        permissionLabelResolver = permissionLabelResolver,
         updateProgress = updateProgress
       )
     }

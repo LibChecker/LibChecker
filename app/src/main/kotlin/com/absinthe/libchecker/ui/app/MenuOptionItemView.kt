@@ -8,7 +8,8 @@ import com.absinthe.libchecker.view.app.CheckableChipView
 class MenuOptionItemView(
   context: Context,
   startMarginDp: Int = 0,
-  endMarginDp: Int = 8
+  endMarginDp: Int = 8,
+  private val dispatchCheckedChangeImmediately: Boolean = false
 ) : FrameLayout(context) {
 
   private val chip = CheckableChipView(context).also {
@@ -29,10 +30,18 @@ class MenuOptionItemView(
     onCheckedChanged: (Boolean) -> Unit
   ) {
     chip.onCheckedChangeListener = null
+    chip.onCheckedTargetChangeListener = null
     chip.text = context.getString(item.labelRes)
-    chip.isChecked = item.isChecked
-    chip.onCheckedChangeListener = { _: CheckableChipView, isChecked: Boolean ->
+    if (chip.isChecked != item.isChecked) {
+      chip.isChecked = item.isChecked
+    }
+    val listener: (CheckableChipView, Boolean) -> Unit = { _, isChecked ->
       onCheckedChanged(isChecked)
+    }
+    if (dispatchCheckedChangeImmediately) {
+      chip.onCheckedTargetChangeListener = listener
+    } else {
+      chip.onCheckedChangeListener = listener
     }
   }
 }

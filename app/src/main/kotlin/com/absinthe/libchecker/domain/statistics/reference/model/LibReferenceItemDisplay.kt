@@ -4,10 +4,47 @@ import android.content.pm.PackageInfo
 import androidx.annotation.DrawableRes
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTION
+import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PACKAGE
 import com.absinthe.libchecker.annotation.PERMISSION
+import com.absinthe.libchecker.annotation.SHARED_UID
 import com.absinthe.libchecker.annotation.isComponentType
+
+data class LibReferenceSearchLabels(
+  val notMarkedLabel: String = "",
+  val permissionFallbackLabel: String = "",
+  val metadataLabel: String = "",
+  val packageLabel: String = "",
+  val sharedUidPrefix: String = "UID"
+)
+
+internal fun LibReference.matchesSearchQuery(
+  query: String,
+  labels: LibReferenceSearchLabels
+): Boolean {
+  if (libName.contains(query, ignoreCase = true)) {
+    return true
+  }
+  val displayLabel = rule?.label ?: when (type) {
+    PERMISSION ->
+      resolvedLabel
+        ?.takeUnless { it == libName }
+        ?: labels.permissionFallbackLabel
+
+    METADATA -> labels.metadataLabel
+
+    PACKAGE -> labels.packageLabel
+
+    SHARED_UID -> {
+      val uid = iconPackages.firstNotNullOfOrNull { it.applicationInfo?.uid }
+      uid?.let { "${labels.sharedUidPrefix} $it" } ?: labels.sharedUidPrefix
+    }
+
+    else -> labels.notMarkedLabel
+  }
+  return displayLabel.contains(query, ignoreCase = true)
+}
 
 data class LibReferenceItemDisplay(
   val label: String,
@@ -26,10 +63,22 @@ data class LibReferenceItemDisplay(
       reference: LibReference,
       colorfulRuleIcon: Boolean,
       notMarkedLabel: String,
+      permissionFallbackLabel: String,
+      metadataLabel: String,
       countText: String
     ): LibReferenceItemDisplay {
       val rule = reference.rule
-      val label = rule?.label ?: notMarkedLabel
+      val categoryLabel = when (reference.type) {
+        PERMISSION ->
+          reference.resolvedLabel
+            ?.takeUnless { it == reference.libName }
+            ?: permissionFallbackLabel
+
+        METADATA -> metadataLabel
+
+        else -> null
+      }
+      val label = rule?.label ?: categoryLabel ?: notMarkedLabel
       val isAndroidGroupPermission = reference.type == PERMISSION &&
         reference.libName.startsWith("android.permission")
       val isAndroidGroupAction = reference.type == ACTION &&
@@ -42,7 +91,7 @@ data class LibReferenceItemDisplay(
 
       return LibReferenceItemDisplay(
         label = label,
-        italicLabel = rule == null,
+        italicLabel = rule == null && categoryLabel == null,
         libName = reference.libName,
         count = countText,
         iconRes = iconRes,
@@ -58,6 +107,7 @@ data class LibReferenceItemDisplay(
 data class MultipleAppsIconItemDisplay(
   val iconPackages: List<PackageInfo>,
   val label: String,
+  val italicLabel: Boolean,
   val libName: String,
   val count: String,
   val contentDescription: String
@@ -66,21 +116,29 @@ data class MultipleAppsIconItemDisplay(
   companion object {
     fun create(
       reference: LibReference,
-      notMarkedLabel: String
+      notMarkedLabel: String,
+      packageLabel: String,
+      sharedUidLabel: String
     ): MultipleAppsIconItemDisplay {
-      val libName = if (reference.type == PACKAGE) {
-        reference.libName + ".*"
-      } else {
-        reference.libName
+      val categoryLabel = when (reference.type) {
+        PACKAGE -> packageLabel
+        SHARED_UID -> sharedUidLabel
+        else -> null
+      }
+      val libName = when (reference.type) {
+        PACKAGE -> reference.libName + ".*"
+        else -> reference.libName
       }
       val count = reference.referredList.size.toString()
+      val label = categoryLabel ?: notMarkedLabel
 
       return MultipleAppsIconItemDisplay(
         iconPackages = reference.iconPackages,
-        label = notMarkedLabel,
+        label = label,
+        italicLabel = categoryLabel == null,
         libName = libName,
         count = count,
-        contentDescription = buildReferenceItemDescription(notMarkedLabel, libName, count)
+        contentDescription = buildReferenceItemDescription(label, libName, count)
       )
     }
   }

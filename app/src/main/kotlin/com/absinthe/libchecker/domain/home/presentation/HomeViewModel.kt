@@ -393,6 +393,10 @@ class HomeViewModel(
     )
   }
 
+  fun getAppListSearchQuery(): String {
+    return appListSearchKeyword
+  }
+
   private fun handleAppListSearchQuery(query: String): AppListSearchCommandAction {
     return when (val result = handleAppListSearchCommandUseCase(query)) {
       HandleAppListSearchCommandUseCase.Result.None -> AppListSearchCommandAction.None

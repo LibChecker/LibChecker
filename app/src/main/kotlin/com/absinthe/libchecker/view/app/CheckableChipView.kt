@@ -120,6 +120,11 @@ class CheckableChipView @JvmOverloads constructor(
    */
   var onCheckedChangeListener: ((view: CheckableChipView, checked: Boolean) -> Unit)? = null
 
+  /**
+   * Sets the listener to be called as soon as an animated checked-state change starts.
+   */
+  var onCheckedTargetChangeListener: ((view: CheckableChipView, checked: Boolean) -> Unit)? = null
+
   var textColorPair = Color.TRANSPARENT to Color.TRANSPARENT
     set(value) {
       field = value
@@ -364,10 +369,15 @@ class CheckableChipView @JvmOverloads constructor(
    * Starts the animation to enable/disable a filter and invokes a function when done.
    */
   fun setCheckedAnimated(checked: Boolean, onEnd: (() -> Unit)?) {
+    if (checked == isChecked) {
+      return
+    }
     targetProgress = if (checked) 1f else 0f
+    onCheckedTargetChangeListener?.invoke(this, checked)
     if (targetProgress != progress) {
       progressAnimator.apply {
         removeAllListeners()
+        removeAllUpdateListeners()
         cancel()
         setFloatValues(progress, targetProgress)
         duration = if (checked) CHECKING_DURATION else UNCHECKING_DURATION

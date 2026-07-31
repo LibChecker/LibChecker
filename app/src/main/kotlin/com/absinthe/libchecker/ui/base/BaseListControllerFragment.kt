@@ -78,3 +78,24 @@ abstract class BaseListControllerFragment<T : ViewBinding> :
     return false
   }
 }
+
+internal data class InitialListSearchState(
+  val query: String,
+  val shouldExpand: Boolean
+)
+
+internal fun initialListSearchState(
+  retainedQuery: String,
+  toolbarState: HomeViewModel.ToolbarSearchMenuState
+): InitialListSearchState {
+  return InitialListSearchState(
+    query = retainedQuery,
+    shouldExpand = retainedQuery.isNotEmpty() || toolbarState.isExpanded
+  )
+}
+
+internal fun shouldHandleListSearchQueryChange(
+  lifecycleState: Lifecycle.State
+): Boolean {
+  return lifecycleState.isAtLeast(Lifecycle.State.RESUMED)
+}
