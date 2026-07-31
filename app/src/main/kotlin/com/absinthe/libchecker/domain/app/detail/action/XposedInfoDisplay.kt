@@ -6,6 +6,7 @@ import com.absinthe.libchecker.domain.app.detail.model.XposedInfoAction
 import com.absinthe.libchecker.domain.app.detail.model.XposedInfoBottomSheetDisplay
 import com.absinthe.libchecker.domain.app.detail.model.XposedInfoItemDisplay
 import com.absinthe.libchecker.domain.app.detail.model.XposedInfoTextStyle
+import com.absinthe.libchecker.domain.app.detail.model.XposedScopeAppDisplay
 
 fun buildXposedInfoBottomSheetDisplay(
   context: Context,
@@ -18,6 +19,8 @@ private fun Context.displayStrings(): XposedInfoDisplayStrings {
   return XposedInfoDisplayStrings(
     minVersion = getString(R.string.lib_detail_xposed_min_version),
     targetVersion = getString(R.string.lib_detail_xposed_target_version),
+    autoHotReload = getString(R.string.lib_detail_xposed_auto_hot_reload),
+    hotReloadDeclared = getString(R.string.lib_detail_xposed_hot_reload_declared),
     staticScope = getString(R.string.lib_detail_xposed_static_scope),
     defaultScope = getString(R.string.lib_detail_xposed_default_scope),
     initClass = getString(R.string.lib_detail_xposed_init_class),
@@ -29,6 +32,8 @@ private fun Context.displayStrings(): XposedInfoDisplayStrings {
 internal data class XposedInfoDisplayStrings(
   val minVersion: String,
   val targetVersion: String,
+  val autoHotReload: String,
+  val hotReloadDeclared: String,
   val staticScope: String,
   val defaultScope: String,
   val initClass: String,
@@ -56,9 +61,17 @@ internal fun buildXposedInfoBottomSheetDisplay(
         tip = strings.targetVersion,
         textStyle = XposedInfoTextStyle.Title
       )
+      if (info.autoHotReloadDeclared) {
+        addTextItem(
+          value = strings.hotReloadDeclared,
+          iconRes = R.drawable.ic_refresh,
+          tip = strings.autoHotReload,
+          textStyle = XposedInfoTextStyle.Title
+        )
+      }
       if (info.staticScope) {
         add(
-          XposedInfoItemDisplay(
+          XposedInfoItemDisplay.Text(
             iconRes = R.drawable.ic_app_prop,
             tip = strings.staticScope,
             text = strings.trueValue,
@@ -66,12 +79,37 @@ internal fun buildXposedInfoBottomSheetDisplay(
           )
         )
       }
-      addTextItem(
-        value = info.defaultScope,
-        iconRes = R.drawable.ic_app_prop,
-        tip = strings.defaultScope,
-        textStyle = XposedInfoTextStyle.Title
-      )
+      info.defaultScope?.takeIf(List<XposedScopeAppInfo>::isNotEmpty)?.let { scopeApps ->
+        val literalScope = scopeApps.singleOrNull()
+          ?.packageName
+          ?.takeIf { it == "*" || it == "system" }
+        if (literalScope != null) {
+          add(
+            XposedInfoItemDisplay.Text(
+              iconRes = R.drawable.ic_app_prop,
+              tip = strings.defaultScope,
+              text = literalScope,
+              textStyle = XposedInfoTextStyle.Title
+            )
+          )
+        } else {
+          add(
+            XposedInfoItemDisplay.ScopeApps(
+              iconRes = R.drawable.ic_app_prop,
+              tip = strings.defaultScope,
+              apps = scopeApps
+                .sortedBy { it.packageInfo == null }
+                .map {
+                  XposedScopeAppDisplay(
+                    packageName = it.packageName,
+                    label = it.label,
+                    packageInfo = it.packageInfo
+                  )
+                }
+            )
+          )
+        }
+      }
       addTextItem(
         value = info.javaInitClasses,
         iconRes = R.drawable.ic_app_prop,
@@ -108,7 +146,7 @@ private fun MutableList<XposedInfoItemDisplay>.addTextItem(
 ) {
   value?.takeIf(String::isNotBlank)?.let {
     add(
-      XposedInfoItemDisplay(
+      XposedInfoItemDisplay.Text(
         iconRes = iconRes,
         tip = tip,
         text = it,
