@@ -75,6 +75,8 @@ class DetailContentResolver(
   private val installedAppRepository: InstalledAppRepository
 ) {
 
+  private var nativeMetadataCache: Pair<NativeMetadataCacheKey, NativeMetadata>? = null
+
   fun getNativeLibraries(
     packageInfo: PackageInfo,
     apkPreviewInfo: ApkPreviewInfo?,
@@ -84,9 +86,18 @@ class DetailContentResolver(
   ): AppDetailNativeLibraries = traceDetailSection(TRACE_DETAIL_NATIVE_LIBS) {
     val specifiedAbi = if (abi == ERROR || abi == NO_LIBS || abi == OVERLAY) abi else null
     val parseElf = GlobalFeatures.ENABLE_DETECTING_16KB_PAGE_ALIGNMENT && !isApkPreview
+    val selectedAbiTab = ABI_STRING_MAP[abi % MULTI_ARCH]
+    val parseElfForAbi = abi.takeIf {
+      parseElf && specifiedAbi == null && selectedAbiTab != null
+    }
     val itemsByAbi = traceDetailSection(TRACE_DETAIL_SOURCE_LIBS) {
       if (!isApkPreview && apkPreviewInfo == null) {
-        PackageUtils.getSourceLibs(packageInfo, specifiedAbi = specifiedAbi, parseElf = false)
+        PackageUtils.getSourceLibs(
+          packageInfo = packageInfo,
+          specifiedAbi = specifiedAbi,
+          parseElf = false,
+          parseElfForAbi = parseElfForAbi
+        )
       } else {
         apkPreviewInfo!!.nativeLibs.map {
           ABI_STRING_MAP[it.key]!! to it.value.map { value ->
@@ -98,20 +109,9 @@ class DetailContentResolver(
         }.toMap()
       }
     }
-    val selectedAbiTab = ABI_STRING_MAP[abi % MULTI_ARCH]
-    val resolvedItemsByAbi = if (parseElf && specifiedAbi == null && selectedAbiTab != null) {
-      traceDetailSection(TRACE_DETAIL_PARSE_SELECTED_ABI) {
-        itemsByAbi.withParsedAbiItems(
-          packageInfo = packageInfo,
-          tab = selectedAbiTab
-        )
-      }
-    } else {
-      itemsByAbi
-    }
-    val selectedAbiItems = resolvedItemsByAbi[selectedAbiTab]
+    val selectedAbiItems = itemsByAbi[selectedAbiTab]
     AppDetailNativeLibraries(
-      itemsByAbi = resolvedItemsByAbi,
+      itemsByAbi = itemsByAbi,
       selectedAbiSupports16KbPageSize = traceDetailSection(TRACE_DETAIL_SUPPORTS_16KB) {
         selectedAbiItems?.let {
           !isApkPreview && packageInfo.is16KBAligned(libs = it, isApk = isApk)
@@ -140,12 +140,7 @@ class DetailContentResolver(
     }
 
     val packageName = apkPreviewInfo?.packageName ?: packageInfo.packageName
-    val nativeActivityLibNames = traceDetailSection(TRACE_DETAIL_NATIVE_ACTIVITY_NAMES) {
-      getNativeActivityLibNames(packageInfo, isApkPreview)
-    }
-    val preloadNativeLibNames = traceDetailSection(TRACE_DETAIL_PRELOAD_NATIVE_LIB_NAMES) {
-      getZygotePreloadNativeLibNames(packageInfo, apkPreviewInfo)
-    }
+    val metadata = getNativeMetadata(packageInfo, apkPreviewInfo, isApkPreview)
     val nativeLibNames = resolvedItems.map { it.name }
     val rulesByNativeLibName = traceDetailSuspendSection(TRACE_DETAIL_NATIVE_RULE_MATCH) {
       RulesRepository.getRulesWithRegex(
@@ -158,10 +153,10 @@ class DetailContentResolver(
     val chipList = resolvedItems.map {
       val rule = rulesByNativeLibName[it.name]
       val labels = mutableListOf<String>().apply {
-        if (it.name in nativeActivityLibNames) {
+        if (it.name in metadata.nativeActivityLibNames) {
           add(NATIVE_ACTIVITY_LABEL)
         }
-        if (it.name in preloadNativeLibNames) {
+        if (it.name in metadata.preloadNativeLibNames) {
           add(ZYGOTE_PRELOAD_NATIVE_LIB_LABEL)
         }
       }
@@ -179,24 +174,6 @@ class DetailContentResolver(
       chipList.sortWith(compareByDescending<LibStringItemChip> { it.rule != null }.thenByDescending { it.item.size })
     }
     chipList
-  }
-
-  private fun Map<String, List<LibStringItem>>.withParsedAbiItems(
-    packageInfo: PackageInfo,
-    tab: String
-  ): Map<String, List<LibStringItem>> {
-    val abi = STRING_ABI_MAP[tab] ?: return this
-    val parsedItems = PackageUtils.getSourceLibs(
-      packageInfo = packageInfo,
-      specifiedAbi = abi,
-      parseElf = true
-    )[tab].orEmpty()
-    if (parsedItems.isEmpty()) {
-      return this
-    }
-    return toMutableMap().apply {
-      put(tab, parsedItems)
-    }
   }
 
   private fun resolveNativeLibItemsForTab(
@@ -248,6 +225,38 @@ class DetailContentResolver(
       .toSet()
   }
 
+  private fun getNativeMetadata(
+    packageInfo: PackageInfo,
+    apkPreviewInfo: ApkPreviewInfo?,
+    isApkPreview: Boolean
+  ): NativeMetadata {
+    val sourceFile = packageInfo.applicationInfo?.sourceDir?.let(::File)
+    val cacheKey = NativeMetadataCacheKey(
+      packageName = apkPreviewInfo?.packageName ?: packageInfo.packageName,
+      lastUpdateTime = packageInfo.lastUpdateTime,
+      sourcePath = sourceFile?.absolutePath,
+      sourceLength = sourceFile?.length() ?: 0L,
+      sourceLastModified = sourceFile?.lastModified() ?: 0L,
+      isApkPreview = isApkPreview
+    )
+    nativeMetadataCache?.takeIf { it.first == cacheKey }?.let { return it.second }
+
+    val metadata = NativeMetadata(
+      nativeActivityLibNames = traceDetailSection(TRACE_DETAIL_NATIVE_ACTIVITY_NAMES) {
+        getNativeActivityLibNames(packageInfo, isApkPreview)
+      },
+      preloadNativeLibNames = traceDetailSection(TRACE_DETAIL_PRELOAD_NATIVE_LIB_NAMES) {
+        getZygotePreloadNativeLibNames(packageInfo, apkPreviewInfo)
+      }
+    )
+    nativeMetadataCache = cacheKey to metadata
+    return metadata
+  }
+
+  fun clearNativeCaches() {
+    nativeMetadataCache = null
+  }
+
   private fun getZygotePreloadNativeLibNames(
     packageInfo: PackageInfo,
     apkPreviewInfo: ApkPreviewInfo?
@@ -279,6 +288,20 @@ class DetailContentResolver(
       .removeSuffix(".so")
     return "lib$normalizedName.so"
   }
+
+  private data class NativeMetadata(
+    val nativeActivityLibNames: Set<String>,
+    val preloadNativeLibNames: Set<String>
+  )
+
+  private data class NativeMetadataCacheKey(
+    val packageName: String,
+    val lastUpdateTime: Long,
+    val sourcePath: String?,
+    val sourceLength: Long,
+    val sourceLastModified: Long,
+    val isApkPreview: Boolean
+  )
 
   suspend fun getComponentChips(
     packageInfo: PackageInfo,

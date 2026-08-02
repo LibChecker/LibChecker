@@ -81,6 +81,8 @@ private class FakeInstalledAppRepository : InstalledAppRepository {
 
   override fun getApplicationList(forceUpdate: Boolean): List<PackageInfo> = emptyList()
 
+  override fun getInstalledPackages(flags: Int): List<PackageInfo> = emptyList()
+
   override fun getApplicationMap(forceUpdate: Boolean): Map<String, PackageInfo> = emptyMap()
 
   override fun getApplicationCount(forceUpdate: Boolean): Int = 0

@@ -2,9 +2,11 @@ package com.absinthe.libchecker.macrobenchmark
 
 import android.content.Intent
 import androidx.benchmark.macro.CompilationMode
+import androidx.benchmark.macro.ExperimentalMetricApi
 import androidx.benchmark.macro.FrameTimingMetric
 import androidx.benchmark.macro.StartupMode
 import androidx.benchmark.macro.StartupTimingMetric
+import androidx.benchmark.macro.TraceSectionMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -22,13 +24,24 @@ class StatisticsBenchmark {
   val benchmarkRule = MacrobenchmarkRule()
 
   @Test
+  @OptIn(ExperimentalMetricApi::class)
   fun coldOpenStatisticsReference() = benchmarkRule.measureRepeated(
     packageName = TARGET_PACKAGE,
-    metrics = listOf(StartupTimingMetric(), FrameTimingMetric()),
+    metrics = listOf(
+      StartupTimingMetric(),
+      FrameTimingMetric(),
+      TraceSectionMetric(TRACE_REFERENCE_BUILD_INDEX),
+      TraceSectionMetric(TRACE_REFERENCE_LOAD_BATCH),
+      TraceSectionMetric(TRACE_REFERENCE_MATCH_RULES),
+      TraceSectionMetric(TRACE_REFERENCE_MAP_RESULT),
+      TraceSectionMetric(TRACE_REFERENCE_SUBMIT_RESULT),
+      TraceSectionMetric(TRACE_REFERENCE_RESULT_TO_FIRST_LAYOUT)
+    ),
     compilationMode = CompilationMode.None(),
     startupMode = StartupMode.COLD,
     iterations = 5,
     setupBlock = {
+      requireUncontaminatedBenchmarkEnvironment()
       pressHome()
     }
   ) {
@@ -54,5 +67,11 @@ class StatisticsBenchmark {
     private const val ACTION_STATISTICS = "com.absinthe.libchecker.intent.action.START_STATISTICS"
     private const val STATISTICS_READY_TEXT = "Jetpack App Startup"
     private const val UI_TIMEOUT_MS = 45_000L
+    private const val TRACE_REFERENCE_BUILD_INDEX = "LC Reference buildIndex"
+    private const val TRACE_REFERENCE_LOAD_BATCH = "LC Reference loadBatch"
+    private const val TRACE_REFERENCE_MAP_RESULT = "LC Reference mapResult"
+    private const val TRACE_REFERENCE_MATCH_RULES = "LC Reference matchRules"
+    private const val TRACE_REFERENCE_RESULT_TO_FIRST_LAYOUT = "LC Reference resultToFirstLayout"
+    private const val TRACE_REFERENCE_SUBMIT_RESULT = "LC Reference submitResult"
   }
 }

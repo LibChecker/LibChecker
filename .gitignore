@@ -89,3 +89,6 @@ app/.settings/org.eclipse.buildship.core.prefs
 
 # Kotlin 2.0
 .kotlin/sessions/*
+
+# Local Perfetto trace processor wrapper
+trace_processor

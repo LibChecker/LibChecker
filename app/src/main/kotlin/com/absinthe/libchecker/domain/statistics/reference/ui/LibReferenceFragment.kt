@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.FrameLayout
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.doOnNextLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -22,12 +23,17 @@ import com.absinthe.libchecker.domain.app.list.ui.AdvancedMenuBSDFragment
 import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
 import com.absinthe.libchecker.domain.home.ui.INavViewContainer
 import com.absinthe.libchecker.domain.statistics.chart.ui.ChartActivity
+import com.absinthe.libchecker.domain.statistics.reference.TRACE_REFERENCE_RESULT_TO_FIRST_LAYOUT
+import com.absinthe.libchecker.domain.statistics.reference.beginReferenceAsyncSection
+import com.absinthe.libchecker.domain.statistics.reference.endReferenceAsyncSection
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReference
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceAction
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceListRenderState
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceSearchLabels
 import com.absinthe.libchecker.domain.statistics.reference.presentation.LibReferenceViewModel
 import com.absinthe.libchecker.domain.statistics.reference.ui.adapter.LibReferenceAdapter
+import com.absinthe.libchecker.domain.statistics.reference.ui.adapter.provider.LIB_REFERENCE_PROVIDER
+import com.absinthe.libchecker.domain.statistics.reference.ui.adapter.provider.MULTIPLE_APPS_ICON_PROVIDER
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseListControllerFragment
 import com.absinthe.libchecker.ui.base.IAppBarContainer
@@ -79,6 +85,30 @@ class LibReferenceFragment :
   private var advancedMenuBSDFragment: LibReferenceMenuBSDFragment? = null
   private var firstScrollFlag = false
   private var isSearchTextClearOnce = false
+  private var hasReportedFirstListLayout = false
+  private var resultToFirstLayoutTraceActive = false
+  private var prewarmIndex = 0
+  private val resultToFirstLayoutTraceCookie = System.identityHashCode(this)
+  private val prewarmViewTypes = IntArray(8) { LIB_REFERENCE_PROVIDER } +
+    IntArray(4) { MULTIPLE_APPS_ICON_PROVIDER }
+  private val startLoadingAnimation = Runnable {
+    if (isResumed && binding.vfContainer.displayedChild == VF_LOADING) {
+      binding.loadingView.loadingView.start()
+    }
+  }
+  private val prewarmNextViewHolder = object : Runnable {
+    override fun run() {
+      if (prewarmIndex >= prewarmViewTypes.size || binding.vfContainer.displayedChild != VF_LOADING) {
+        return
+      }
+      val viewType = prewarmViewTypes[prewarmIndex++]
+      runCatching {
+        val holder = refAdapter.createViewHolder(binding.list, viewType)
+        binding.list.recycledViewPool.putRecycledView(holder)
+      }
+      binding.list.postOnAnimation(this)
+    }
+  }
 
   override fun init() {
     val context = (context as? BaseActivity<*>) ?: return
@@ -95,6 +125,13 @@ class LibReferenceFragment :
             }
           }
         FastScrollerBuilder(this).useMd2Style().build()
+        setRecycledViewPool(
+          recycledViewPool.apply {
+            setMaxRecycledViews(LIB_REFERENCE_PROVIDER, 8)
+            setMaxRecycledViews(MULTIPLE_APPS_ICON_PROVIDER, 4)
+          }
+        )
+        postOnAnimation(prewarmNextViewHolder)
         addOnScrollListener(object : RecyclerView.OnScrollListener() {
           override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             if (dx != 0 || dy != 0) {
@@ -146,7 +183,7 @@ class LibReferenceFragment :
           refAdapter.setSpaceFooterView()
         }
       }
-      loadingView.loadingView.setRuleIconHighlightProvider(withCircleBackground = true)
+      loadingView.loadingView.setRuleIconHighlightProvider()
     }
 
     refAdapter.apply {
@@ -204,10 +241,12 @@ class LibReferenceFragment :
               }
               val searchResult = libReferenceViewModel.onReferenceListChanged(references)
               updateListRenderState { it.copy(highlightText = searchResult.query) }
+              beginFirstListLayoutTrace()
               refAdapter.setDiffNewData(searchResult.references) {
                 if (isDetached) {
                   return@setDiffNewData
                 }
+                scheduleFirstListPresentation()
                 flip(VF_LIST)
                 refAdapter.setSpaceFooterView()
                 isListReady = true
@@ -241,7 +280,7 @@ class LibReferenceFragment :
   override fun onResume() {
     super.onResume()
     if (binding.vfContainer.displayedChild == VF_LOADING) {
-      binding.loadingView.loadingView.start()
+      scheduleLoadingAnimation()
     }
   }
 
@@ -250,7 +289,15 @@ class LibReferenceFragment :
     advancedMenuBSDFragment?.dismiss()
     advancedMenuBSDFragment = null
     (activity as? INavViewContainer)?.hideProgressBar()
+    binding.loadingView.loadingView.removeCallbacks(startLoadingAnimation)
     binding.loadingView.loadingView.stop()
+  }
+
+  override fun onDestroyView() {
+    binding.list.removeCallbacks(prewarmNextViewHolder)
+    binding.loadingView.loadingView.removeCallbacks(startLoadingAnimation)
+    finishFirstListLayoutTrace(reportFullyDrawn = false)
+    super.onDestroyView()
   }
 
   override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -461,7 +508,7 @@ class LibReferenceFragment :
     if (child == VF_LOADING) {
       menu?.findItem(R.id.search)?.isVisible = false
       if (isResumed) {
-        binding.loadingView.loadingView.start()
+        scheduleLoadingAnimation()
       }
     } else {
       menu?.findItem(R.id.search)?.isVisible = true
@@ -470,5 +517,44 @@ class LibReferenceFragment :
     }
 
     binding.vfContainer.displayedChild = child
+  }
+
+  private fun scheduleLoadingAnimation() {
+    binding.loadingView.loadingView.removeCallbacks(startLoadingAnimation)
+    binding.loadingView.loadingView.postOnAnimation(startLoadingAnimation)
+  }
+
+  private fun beginFirstListLayoutTrace() {
+    if (hasReportedFirstListLayout || resultToFirstLayoutTraceActive) {
+      return
+    }
+    resultToFirstLayoutTraceActive = true
+    beginReferenceAsyncSection(
+      TRACE_REFERENCE_RESULT_TO_FIRST_LAYOUT,
+      resultToFirstLayoutTraceCookie
+    )
+  }
+
+  private fun scheduleFirstListPresentation() {
+    binding.list.doOnNextLayout {
+      binding.list.postOnAnimation {
+        finishFirstListLayoutTrace(reportFullyDrawn = true)
+      }
+    }
+  }
+
+  private fun finishFirstListLayoutTrace(reportFullyDrawn: Boolean) {
+    if (!resultToFirstLayoutTraceActive) {
+      return
+    }
+    resultToFirstLayoutTraceActive = false
+    endReferenceAsyncSection(
+      TRACE_REFERENCE_RESULT_TO_FIRST_LAYOUT,
+      resultToFirstLayoutTraceCookie
+    )
+    if (reportFullyDrawn && !hasReportedFirstListLayout) {
+      hasReportedFirstListLayout = true
+      activity?.reportFullyDrawn()
+    }
   }
 }

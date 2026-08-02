@@ -22,6 +22,11 @@ class LibReferenceProvider(
   private val onAction: (LibReferenceAction) -> Unit
 ) : BaseNodeProvider() {
 
+  private val integerFormat by lazy { NumberFormat.getIntegerInstance() }
+  private val metadataLabel by lazy { context.getString(R.string.ref_category_metadata) }
+  private val notMarkedLabel by lazy { context.getString(R.string.not_marked_lib) }
+  private val permissionFallbackLabel by lazy { context.getString(R.string.ref_category_perm) }
+
   override val itemViewType: Int = LIB_REFERENCE_PROVIDER
   override val layoutId: Int = 0
 
@@ -50,10 +55,10 @@ class LibReferenceProvider(
       display = LibReferenceItemDisplay.create(
         reference = reference,
         colorfulRuleIcon = state.colorfulRuleIcon,
-        notMarkedLabel = context.getString(R.string.not_marked_lib),
-        permissionFallbackLabel = context.getString(R.string.ref_category_perm),
-        metadataLabel = context.getString(R.string.ref_category_metadata),
-        countText = NumberFormat.getIntegerInstance().format(reference.referredList.size)
+        notMarkedLabel = notMarkedLabel,
+        permissionFallbackLabel = permissionFallbackLabel,
+        metadataLabel = metadataLabel,
+        countText = integerFormat.format(reference.referredList.size)
       ),
       highlightText = state.highlightText
     )

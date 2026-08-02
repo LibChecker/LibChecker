@@ -220,19 +220,23 @@ object PackageUtils {
     packageInfo: PackageInfo,
     specifiedAbi: Int? = null,
     includeNativeLibsDir: Boolean = true,
-    parseElf: Boolean
+    parseElf: Boolean,
+    parseElfForAbi: Int? = null
   ): Map<String, List<LibStringItem>> {
     if (specifiedAbi == ERROR || specifiedAbi == NO_LIBS || specifiedAbi == OVERLAY) return emptyMap()
     val sourceDir = packageInfo.applicationInfo?.sourceDir ?: return emptyMap()
     val file = File(sourceDir)
-    val map = getApkFileLibs(file, specifiedAbi, parseElf).toMutableMap()
+    val map = getApkFileLibs(file, specifiedAbi, parseElf, parseElfForAbi).toMutableMap()
     if (map.isEmpty() || (map.keys.size == 1 && map.keys.first() == "assets")) {
-      map += getSplitLibs(packageInfo, specifiedAbi, parseElf)
+      map += getSplitLibs(packageInfo, specifiedAbi, parseElf, parseElfForAbi)
     }
     if (map.isEmpty() && includeNativeLibsDir) {
       val abi = specifiedAbi ?: getAbi(packageInfo)
       if (abi == ERROR || abi == NO_LIBS || abi == OVERLAY) return emptyMap()
-      val libs = getNativeDirLibs(packageInfo, specifiedAbi, parseElf).toMutableList()
+      val shouldParseNativeDir = parseElf || parseElfForAbi?.let {
+        it % MULTI_ARCH == abi % MULTI_ARCH
+      } == true
+      val libs = getNativeDirLibs(packageInfo, specifiedAbi, shouldParseNativeDir).toMutableList()
       map += mapOf(ABI_STRING_MAP[abi % MULTI_ARCH]!! to libs)
     }
     return map
@@ -243,7 +247,12 @@ object PackageUtils {
    * @param packageInfo PackageInfo
    * @return List of LibStringItem
    */
-  private fun getSplitLibs(packageInfo: PackageInfo, specifiedAbi: Int? = null, parseElf: Boolean): Map<String, MutableList<LibStringItem>> {
+  private fun getSplitLibs(
+    packageInfo: PackageInfo,
+    specifiedAbi: Int? = null,
+    parseElf: Boolean,
+    parseElfForAbi: Int? = null
+  ): Map<String, MutableList<LibStringItem>> {
     val splitList = getSplitsSourceDir(packageInfo)
     if (splitList.isNullOrEmpty()) {
       return emptyMap()
@@ -259,7 +268,11 @@ object PackageUtils {
           INSTRUCTION_SET_MAP_TO_ABI_VALUE.keys.any { key -> fileName.contains(key) }
         specifiedAvailable || isAbiSplitFile
       }.forEach { split ->
-        val splitMap = getApkFileLibs(File(split), parseElf = parseElf)
+        val splitMap = getApkFileLibs(
+          file = File(split),
+          parseElf = parseElf,
+          parseElfForAbi = parseElfForAbi
+        )
         for ((key, newList) in splitMap) {
           map.merge(key, newList) { existingList, _ ->
             existingList.apply { addAll(newList) }
@@ -297,53 +310,73 @@ object PackageUtils {
   private const val TRACE_APK_LIBS_PARSE_ELF = "LC PackageUtils apkLibsParseElf"
   private const val TRACE_FIND_DEX_CLASSES = "LC PackageUtils findDexClasses"
 
-  private fun getApkFileLibs(file: File, specifiedAbi: Int? = null, parseElf: Boolean): Map<String, MutableList<LibStringItem>> {
+  private fun getApkFileLibs(
+    file: File,
+    specifiedAbi: Int? = null,
+    parseElf: Boolean,
+    parseElfForAbi: Int? = null
+  ): Map<String, MutableList<LibStringItem>> {
     if (file.exists().not() || file.canRead().not()) {
       return emptyMap()
     }
-    if (!parseElf) {
+    if (!parseElf && parseElfForAbi == null) {
       return getApkFileLibsWithoutParsingElf(file, specifiedAbi)
     }
 
     val libDir = "lib"
     val assetsDir = "assets"
-    val sourceDir = specifiedAbi?.let { libDir + File.separator + ABI_STRING_MAP[it % MULTI_ARCH] }
+    val sourceDir = specifiedAbi?.let {
+      libDir + File.separator + ABI_STRING_MAP[it % MULTI_ARCH] + File.separator
+    }
+    val parseElfSourceDir = parseElfForAbi?.let {
+      libDir + File.separator + ABI_STRING_MAP[it % MULTI_ARCH] + File.separator
+    }
     val map = mutableMapOf<String, MutableList<LibStringItem>>()
     val timeRecorder = TimeRecorder()
 
     if (ENABLE_GET_APK_FILE_LIBS_LOG) timeRecorder.start()
     try {
       tracePackageUtilsSection(TRACE_APK_LIBS_OPEN_ZIP) { ZipFileCompat(file) }.use { zipFile ->
-        val nativeEntries = collectNativeZipEntries(zipFile, sourceDir)
+        val nativeEntries = collectNativeZipEntries(
+          zipFile = zipFile,
+          sourceDir = sourceDir,
+          parseElf = parseElf,
+          parseElfSourceDir = parseElfSourceDir
+        )
         val storedEntryOffsets by lazy {
           loadStoredEntryOffsets(file, nativeEntries.storedEntryNames)
         }
         nativeEntries.entries.forEach { entry ->
           val entryName = entry.name
           val dir = getApkLibEntryDir(entryName, libDir, assetsDir) ?: return@forEach
+          val shouldParseElf = parseElf || parseElfSourceDir?.let { entryName.startsWith(it) } == true
 
-          val currentEntryZipAlignment = if (entry.method == ZipEntry.STORED) {
+          val currentEntryZipAlignment = if (shouldParseElf && entry.method == ZipEntry.STORED) {
             getZipAlignment(storedEntryOffsets[entryName] ?: -1L)
           } else {
             -1
           }
-          val elfInfo = tracePackageUtilsSection(TRACE_APK_LIBS_PARSE_ELF) {
-            runCatching {
-              ElfParser(zipFile.getInputStream(entry)).use { parser ->
-                parser.parseHeader()
+          val elfInfo = if (shouldParseElf) {
+            tracePackageUtilsSection(TRACE_APK_LIBS_PARSE_ELF) {
+              runCatching {
+                ElfParser(zipFile.getInputStream(entry)).use { parser ->
+                  parser.parseHeader()
+                  ElfInfo(
+                    parser.getEType(),
+                    parser.getMinPageSize(),
+                    zipAlignment = currentEntryZipAlignment
+                  )
+                }
+              }.getOrElse {
                 ElfInfo(
-                  parser.getEType(),
-                  parser.getMinPageSize(),
+                  ET_NOT_ELF,
+                  -1,
                   zipAlignment = currentEntryZipAlignment
                 )
               }
-            }.getOrElse {
-              ElfInfo(
-                ET_NOT_ELF,
-                -1,
-                zipAlignment = currentEntryZipAlignment
-              )
             }
+          } else {
+            ElfInfo()
           }
 
           val item = LibStringItem(
@@ -372,7 +405,9 @@ object PackageUtils {
 
   private fun collectNativeZipEntries(
     zipFile: IZipFile,
-    sourceDir: String?
+    sourceDir: String?,
+    parseElf: Boolean,
+    parseElfSourceDir: String?
   ): NativeZipEntries {
     return tracePackageUtilsSection(TRACE_APK_LIBS_MATCH_ENTRIES) {
       val entries = mutableListOf<ZipEntry>()
@@ -386,7 +421,8 @@ object PackageUtils {
           (sourceDir == null || entry.name.startsWith(sourceDir))
         ) {
           entries.add(entry)
-          if (entry.method == ZipEntry.STORED) {
+          val shouldParseElf = parseElf || parseElfSourceDir?.let { entry.name.startsWith(it) } == true
+          if (shouldParseElf && entry.method == ZipEntry.STORED) {
             storedEntryNames.add(entry.name)
           }
         }
