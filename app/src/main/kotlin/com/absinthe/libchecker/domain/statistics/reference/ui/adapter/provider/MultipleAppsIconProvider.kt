@@ -18,6 +18,9 @@ class MultipleAppsIconProvider(
   private val renderState: () -> LibReferenceListRenderState
 ) : BaseNodeProvider() {
 
+  private val notMarkedLabel by lazy { context.getString(R.string.not_marked_lib) }
+  private val packageLabel by lazy { context.getString(R.string.ref_category_package) }
+
   override val itemViewType: Int = MULTIPLE_APPS_ICON_PROVIDER
   override val layoutId: Int = 0
 
@@ -42,8 +45,8 @@ class MultipleAppsIconProvider(
     (helper.itemView as MultipleAppsIconItemView).bind(
       display = MultipleAppsIconItemDisplay.create(
         reference = reference,
-        notMarkedLabel = context.getString(R.string.not_marked_lib),
-        packageLabel = context.getString(R.string.ref_category_package),
+        notMarkedLabel = notMarkedLabel,
+        packageLabel = packageLabel,
         sharedUidLabel = sharedUid?.let { "UID $it" } ?: "UID"
       ),
       highlightText = state.highlightText

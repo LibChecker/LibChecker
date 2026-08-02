@@ -2,9 +2,12 @@ package com.absinthe.libchecker.domain.statistics.reference.presentation
 
 import android.content.pm.PackageInfo
 import com.absinthe.libchecker.annotation.PERMISSION
+import com.absinthe.libchecker.domain.statistics.reference.TRACE_REFERENCE_MAP_RESULT
+import com.absinthe.libchecker.domain.statistics.reference.TRACE_REFERENCE_SUBMIT_RESULT
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReference
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceItem
 import com.absinthe.libchecker.domain.statistics.reference.repository.PermissionLabelResolver
+import com.absinthe.libchecker.domain.statistics.reference.traceReferenceSuspendSection
 import com.absinthe.libchecker.domain.statistics.reference.usecase.ComputeLibReferenceUseCase
 import com.absinthe.libchecker.domain.statistics.reference.usecase.GetLibReferenceConfigUseCase
 import com.absinthe.libchecker.domain.statistics.reference.usecase.GetLibReferenceIconPackagesUseCase
@@ -76,14 +79,19 @@ class LibReferenceComputationController(
     matchingJob?.cancel()
     matchingJob = scope.launch(Dispatchers.IO) {
       try {
-        val refList = computeLibReferenceUseCase.matchRules(
+        val items = computeLibReferenceUseCase.matchRules(
           index,
           getLibReferenceConfigUseCase.getMatchConfig(),
           updateProgress
-        )?.map { it.toLibReference(index.packageInfoByName) } ?: return@launch
+        ) ?: return@launch
+        val refList = traceReferenceSuspendSection(TRACE_REFERENCE_MAP_RESULT) {
+          items.map { it.toLibReference(index.packageInfoByName) }
+        }
 
-        _libReference.emit(refList)
-        _savedRefList = refList
+        traceReferenceSuspendSection(TRACE_REFERENCE_SUBMIT_RESULT) {
+          _libReference.emit(refList)
+          _savedRefList = refList
+        }
       } finally {
         if (referenceIndex === index) {
           referenceIndex = null

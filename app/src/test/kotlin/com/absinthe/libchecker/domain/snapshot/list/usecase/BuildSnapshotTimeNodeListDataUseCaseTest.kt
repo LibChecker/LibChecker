@@ -122,6 +122,8 @@ private class FakeInstalledAppRepository(
 
   override fun getApplicationList(forceUpdate: Boolean): List<PackageInfo> = emptyList()
 
+  override fun getInstalledPackages(flags: Int): List<PackageInfo> = packageInfos.values.toList()
+
   override fun getApplicationMap(forceUpdate: Boolean): Map<String, PackageInfo> = applications
 
   override fun getApplicationCount(forceUpdate: Boolean): Int = 0

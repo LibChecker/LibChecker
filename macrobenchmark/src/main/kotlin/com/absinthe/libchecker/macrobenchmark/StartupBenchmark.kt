@@ -46,6 +46,7 @@ class StartupBenchmark {
     startupMode = StartupMode.COLD,
     iterations = 5,
     setupBlock = {
+      requireUncontaminatedBenchmarkEnvironment()
       pressHome()
     }
   ) {

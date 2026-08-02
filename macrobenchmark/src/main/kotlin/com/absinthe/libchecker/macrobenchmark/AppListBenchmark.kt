@@ -27,6 +27,7 @@ class AppListBenchmark {
     compilationMode = CompilationMode.None(),
     iterations = 5,
     setupBlock = {
+      requireUncontaminatedBenchmarkEnvironment()
       pressHome()
       startActivityAndWait {
         it.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK

@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 class DetailContentState {
   private var nativeLibItemsByTab: Map<String, List<LibStringItem>> = emptyMap()
+  private val nativeChipItemsByTab = mutableMapOf<NativeChipCacheKey, List<LibStringItemChip>>()
 
   val nativeLibTabs: MutableStateFlow<Collection<String>?> = MutableStateFlow(null)
   val nativeLibItems: MutableStateFlow<List<LibStringItemChip>?> = MutableStateFlow(null)
@@ -35,6 +36,9 @@ class DetailContentState {
 
   fun reset() {
     nativeLibItemsByTab = emptyMap()
+    synchronized(nativeChipItemsByTab) {
+      nativeChipItemsByTab.clear()
+    }
     nativeLibTabs.value = null
     nativeLibItems.value = null
     staticLibItems.value = null
@@ -57,6 +61,18 @@ class DetailContentState {
 
   fun nativeLibItemsFor(tab: String): List<LibStringItem>? {
     return nativeLibItemsByTab[tab]
+  }
+
+  fun cachedNativeLibItems(tab: String, sortBySize: Boolean): List<LibStringItemChip>? {
+    return synchronized(nativeChipItemsByTab) {
+      nativeChipItemsByTab[NativeChipCacheKey(tab, sortBySize)]
+    }
+  }
+
+  fun cacheNativeLibItems(tab: String, sortBySize: Boolean, items: List<LibStringItemChip>) {
+    synchronized(nativeChipItemsByTab) {
+      nativeChipItemsByTab[NativeChipCacheKey(tab, sortBySize)] = items
+    }
   }
 
   fun hasComponentsData(): Boolean {
@@ -93,4 +109,9 @@ class DetailContentState {
       abilitiesMap[type]?.emit(items)
     }
   }
+
+  private data class NativeChipCacheKey(
+    val tab: String,
+    val sortBySize: Boolean
+  )
 }

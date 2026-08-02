@@ -2,7 +2,9 @@ package com.absinthe.libchecker.data.app
 
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import androidx.lifecycle.LifecycleOwner
+import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.domain.app.list.model.InstalledPackageState
 import com.absinthe.libchecker.domain.app.model.AppInstallSource
 import com.absinthe.libchecker.domain.app.model.PackageChangeState
@@ -23,6 +25,25 @@ class LocalInstalledAppRepository(
 
   override fun getApplicationList(forceUpdate: Boolean): List<PackageInfo> {
     return appDataSource.getApplicationList(forceUpdate)
+  }
+
+  override fun getInstalledPackages(flags: Int): List<PackageInfo> {
+    val archivedPackagesFlag = if (OsUtils.atLeastV()) PackageManager.MATCH_ARCHIVED_PACKAGES else 0L
+    val defaultFlags = PackageManager.MATCH_DISABLED_COMPONENTS or PackageManager.MATCH_UNINSTALLED_PACKAGES
+    return runCatching {
+      PackageManagerCompat.getInstalledPackages(
+        (flags or defaultFlags).toLong() or archivedPackagesFlag
+      ).map { packageInfo ->
+        val applicationInfo = packageInfo.applicationInfo
+        if (applicationInfo != null && FreezeUtils.isAppFrozen(applicationInfo)) {
+          getPackageInfo(packageInfo.packageName, flags) ?: packageInfo
+        } else {
+          packageInfo
+        }
+      }
+    }.onFailure {
+      Timber.e(it)
+    }.getOrDefault(emptyList())
   }
 
   override fun getApplicationMap(forceUpdate: Boolean): Map<String, PackageInfo> {

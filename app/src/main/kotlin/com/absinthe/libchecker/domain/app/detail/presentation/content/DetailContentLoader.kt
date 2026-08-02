@@ -15,8 +15,10 @@ import com.absinthe.libchecker.domain.app.repository.AppDetailSettingsRepository
 import com.absinthe.libchecker.utils.UiUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -26,10 +28,14 @@ class DetailContentLoader(
 ) {
   val contentState = DetailContentState()
   private val loadJobsState = DetailLoadJobsState()
+  private var nativeChipJob: Job? = null
 
   fun reset() {
+    nativeChipJob?.cancel()
+    nativeChipJob = null
     loadJobsState.cancelAll()
     contentState.reset()
+    contentResolver.clearNativeCaches()
   }
 
   fun initSoAnalysisData(
@@ -53,6 +59,9 @@ class DetailContentLoader(
           abi = abiBundle.abi
         )
       }
+      if (!isActive) {
+        return@launchIfNeeded
+      }
       contentState.emitNativeLibTabs(nativeLibraries.itemsByAbi)
       if (nativeLibraries.selectedAbiSupports16KbPageSize) {
         featureState.emitFeature(VersionedFeature(Features.Ext.ELF_PAGE_SIZE_16KB))
@@ -66,18 +75,28 @@ class DetailContentLoader(
     tab: String
   ) {
     val sortBySizeMode = isSortBySizeMode()
+    nativeChipJob?.cancel()
+    nativeChipJob = null
+    contentState.cachedNativeLibItems(tab, sortBySizeMode)?.let { cachedItems ->
+      scope.launch {
+        contentState.nativeLibItems.emit(cachedItems)
+      }
+      return
+    }
     contentState.nativeLibItemsFor(tab)?.let {
-      scope.launch(Dispatchers.IO) {
-        contentState.nativeLibItems.emit(
-          contentResolver.buildChipList(
-            packageInfo = packageState.packageInfo,
-            apkPreviewInfo = packageState.apkPreviewInfo,
-            isApkPreview = packageState.isApkPreview,
-            tab = tab,
-            items = it,
-            sortBySize = sortBySizeMode
-          )
+      nativeChipJob = scope.launch(Dispatchers.IO) {
+        val items = contentResolver.buildChipList(
+          packageInfo = packageState.packageInfo,
+          apkPreviewInfo = packageState.apkPreviewInfo,
+          isApkPreview = packageState.isApkPreview,
+          tab = tab,
+          items = it,
+          sortBySize = sortBySizeMode
         )
+        if (isActive) {
+          contentState.cacheNativeLibItems(tab, sortBySizeMode, items)
+          contentState.nativeLibItems.emit(items)
+        }
       }
     }
   }

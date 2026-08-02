@@ -21,9 +21,17 @@ import com.absinthe.libchecker.annotation.SHARED_UID
 import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
+import com.absinthe.libchecker.domain.statistics.reference.TRACE_REFERENCE_BUILD_INDEX
+import com.absinthe.libchecker.domain.statistics.reference.TRACE_REFERENCE_LOAD_BATCH
+import com.absinthe.libchecker.domain.statistics.reference.TRACE_REFERENCE_MATCH_RULES
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceItem
+import com.absinthe.libchecker.domain.statistics.reference.traceReferenceSection
+import com.absinthe.libchecker.domain.statistics.reference.traceReferenceSuspendSection
 import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
 import timber.log.Timber
@@ -35,7 +43,7 @@ class ComputeLibReferenceUseCase(
   suspend fun buildIndex(
     config: ReferenceConfig,
     onProgress: (Int) -> Unit
-  ): ReferenceIndex? {
+  ): ReferenceIndex? = traceReferenceSuspendSection(TRACE_REFERENCE_BUILD_INDEX) {
     val targets = installedAppRepository.getApplicationList()
     val packageInfoByName = targets.associateByTo(HashMap(targets.size)) { it.packageName }
     val index = ReferenceIndex(packageInfoByName)
@@ -55,7 +63,49 @@ class ComputeLibReferenceUseCase(
           ?.also { basePackageInfoCache[packageName] = it }
     }
 
+    fun getPackageInfoFlags(@LibType type: Int): Int? {
+      return when (type) {
+        SERVICE -> PackageManager.GET_SERVICES
+        ACTIVITY -> PackageManager.GET_ACTIVITIES
+        RECEIVER -> PackageManager.GET_RECEIVERS
+        PROVIDER -> PackageManager.GET_PROVIDERS
+        PERMISSION -> PackageManager.GET_PERMISSIONS
+        METADATA -> PackageManager.GET_META_DATA
+        else -> null
+      }
+    }
+
+    onProgress(0)
+
+    val batchPackageInfoByType = coroutineScope {
+      types.mapNotNull { type ->
+        val flags = getPackageInfoFlags(type) ?: return@mapNotNull null
+        async {
+          type to traceReferenceSection(TRACE_REFERENCE_LOAD_BATCH) {
+            val packages = installedAppRepository.getInstalledPackages(flags)
+            packages.associateByTo(HashMap(packages.size)) { it.packageName }
+          }
+        }
+      }.awaitAll().toMap()
+    }
+
+    fun createPackageInfoResolver(@LibType type: Int): (String) -> PackageInfo? {
+      val flags = getPackageInfoFlags(type) ?: return ::getBasePackageInfo
+      val batchByPackageName = batchPackageInfoByType[type].orEmpty()
+      val fallbackCache = HashMap<String, PackageInfo?>()
+      return { packageName ->
+        batchByPackageName[packageName] ?: if (fallbackCache.containsKey(packageName)) {
+          fallbackCache[packageName]
+        } else {
+          installedAppRepository.getPackageInfo(packageName, flags).also {
+            fallbackCache[packageName] = it
+          }
+        }
+      }
+    }
+
     suspend fun computeInternal(@LibType type: Int): Boolean {
+      val getPackageInfo = createPackageInfoResolver(type)
       for (target in targets) {
         if (!currentCoroutineContext().isActive) {
           return false
@@ -74,22 +124,20 @@ class ComputeLibReferenceUseCase(
         }
 
         updateProgress(progressCount + 1, allowComplete = false)
-        computeComponentReference(index, target.packageName, type, ::getBasePackageInfo)
+        computeComponentReference(index, target.packageName, type, getPackageInfo)
         progressCount++
         updateProgress()
       }
       return true
     }
 
-    onProgress(0)
-
     for (type in types) {
       if (!computeInternal(type)) {
-        return null
+        return@traceReferenceSuspendSection null
       }
     }
 
-    return index
+    index
   }
 
   @SuppressLint("WrongConstant")
@@ -97,7 +145,7 @@ class ComputeLibReferenceUseCase(
     index: ReferenceIndex,
     config: MatchConfig,
     onProgress: (Int) -> Unit
-  ): List<LibReferenceItem>? {
+  ): List<LibReferenceItem>? = traceReferenceSuspendSection(TRACE_REFERENCE_MATCH_RULES) {
     val references = index.snapshotReferences()
     val refList = mutableListOf<LibReferenceItem>()
     var progressCount = 0
@@ -113,13 +161,13 @@ class ComputeLibReferenceUseCase(
 
     for (entry in references) {
       if (!currentCoroutineContext().isActive) {
-        return null
+        return@traceReferenceSuspendSection null
       }
 
       updateProgress(progressCount + 1, allowComplete = false)
-      val libName = entry.key
-      val referredList = entry.value.first
-      val type = entry.value.second
+      val libName = entry.name
+      val referredList = entry.packageNames
+      val type = entry.type
       if (referredList.size >= config.threshold && libName.isNotBlank()) {
         val ruleType = if (type == ACTION) ACTION_IN_RULES else type
         val rule = if (type != PERMISSION && type != METADATA) {
@@ -133,7 +181,7 @@ class ComputeLibReferenceUseCase(
             LibReferenceItem(
               libName,
               rule,
-              referredList.toSet(),
+              referredList,
               type
             )
           )
@@ -144,7 +192,7 @@ class ComputeLibReferenceUseCase(
       updateProgress()
     }
 
-    return refList.sortedByDescending { it.referredList.size }
+    refList.sortedByDescending { it.referredList.size }
   }
 
   private fun getSelectedLibReferenceTypes(options: Int): List<Int> {
@@ -176,12 +224,12 @@ class ComputeLibReferenceUseCase(
     index: ReferenceIndex,
     packageName: String,
     @LibType type: Int,
-    getBasePackageInfo: (String) -> PackageInfo?
+    getPackageInfo: (String) -> PackageInfo?
   ) {
     try {
       when (type) {
         NATIVE -> {
-          val packageInfo = getBasePackageInfo(packageName) ?: return
+          val packageInfo = getPackageInfo(packageName) ?: return
           val list = PackageUtils.getNativeDirLibs(packageInfo)
           val nativeLibNames = list.map { it.name }
           val mapped =
@@ -197,39 +245,27 @@ class ComputeLibReferenceUseCase(
         }
 
         SERVICE -> {
-          val packageInfo = installedAppRepository.getPackageInfo(
-            packageName,
-            PackageManager.GET_SERVICES
-          ) ?: return
+          val packageInfo = getPackageInfo(packageName) ?: return
           computeComponentReferenceInternal(index, packageName, type, packageInfo.services)
         }
 
         ACTIVITY -> {
-          val packageInfo = installedAppRepository.getPackageInfo(
-            packageName,
-            PackageManager.GET_ACTIVITIES
-          ) ?: return
+          val packageInfo = getPackageInfo(packageName) ?: return
           computeComponentReferenceInternal(index, packageName, type, packageInfo.activities)
         }
 
         RECEIVER -> {
-          val packageInfo = installedAppRepository.getPackageInfo(
-            packageName,
-            PackageManager.GET_RECEIVERS
-          ) ?: return
+          val packageInfo = getPackageInfo(packageName) ?: return
           computeComponentReferenceInternal(index, packageName, type, packageInfo.receivers)
         }
 
         PROVIDER -> {
-          val packageInfo = installedAppRepository.getPackageInfo(
-            packageName,
-            PackageManager.GET_PROVIDERS
-          ) ?: return
+          val packageInfo = getPackageInfo(packageName) ?: return
           computeComponentReferenceInternal(index, packageName, type, packageInfo.providers)
         }
 
         DEX -> {
-          val packageInfo = getBasePackageInfo(packageName) ?: return
+          val packageInfo = getPackageInfo(packageName) ?: return
           val list = PackageUtils.getDexList(packageInfo)
             .asSequence()
             .filter { it.name.startsWith(packageName).not() }
@@ -243,10 +279,7 @@ class ComputeLibReferenceUseCase(
         }
 
         PERMISSION -> {
-          val packageInfo = installedAppRepository.getPackageInfo(
-            packageName,
-            PackageManager.GET_PERMISSIONS
-          ) ?: return
+          val packageInfo = getPackageInfo(packageName) ?: return
           computeReferenceInternal(
             index,
             packageName,
@@ -256,10 +289,7 @@ class ComputeLibReferenceUseCase(
         }
 
         METADATA -> {
-          val packageInfo = installedAppRepository.getPackageInfo(
-            packageName,
-            PackageManager.GET_META_DATA
-          ) ?: return
+          val packageInfo = getPackageInfo(packageName) ?: return
           computeReferenceInternal(
             index,
             packageName,
@@ -275,14 +305,14 @@ class ComputeLibReferenceUseCase(
         }
 
         SHARED_UID -> {
-          val packageInfo = getBasePackageInfo(packageName) ?: return
+          val packageInfo = getPackageInfo(packageName) ?: return
           if (packageInfo.sharedUserId?.isNotBlank() == true) {
             index.addReference(packageInfo.sharedUserId!!, packageName, SHARED_UID)
           }
         }
 
         ACTION -> {
-          val packageInfo = getBasePackageInfo(packageName) ?: return
+          val packageInfo = getPackageInfo(packageName) ?: return
           val list =
             IntentFilterUtils.parseComponentsFromApk(packageInfo.applicationInfo!!.sourceDir)
               .asSequence()
@@ -347,17 +377,19 @@ class ComputeLibReferenceUseCase(
   class ReferenceIndex internal constructor(
     internal val packageInfoByName: Map<String, PackageInfo>
   ) {
-    private val references = HashMap<String, Pair<MutableSet<String>, Int>>()
+    private val references = HashMap<String, ReferenceBucket>()
 
     internal fun addReference(reference: String, packageName: String, @LibType type: Int) {
       synchronized(references) {
-        references.getOrPut(reference) { HashSet<String>() to type }.first.add(packageName)
+        references.getOrPut(reference) { ReferenceBucket(HashSet(), type) }.packageNames.add(packageName)
       }
     }
 
-    internal fun snapshotReferences(): Map<String, Pair<Set<String>, Int>> {
+    internal fun snapshotReferences(): List<ReferenceEntry> {
       return synchronized(references) {
-        references.mapValues { (_, value) -> value.first.toSet() to value.second }
+        references.map { (name, bucket) ->
+          ReferenceEntry(name, bucket.packageNames, bucket.type)
+        }
       }
     }
 
@@ -366,5 +398,16 @@ class ComputeLibReferenceUseCase(
         references.clear()
       }
     }
+
+    private data class ReferenceBucket(
+      val packageNames: MutableSet<String>,
+      @LibType val type: Int
+    )
+
+    internal data class ReferenceEntry(
+      val name: String,
+      val packageNames: Set<String>,
+      @LibType val type: Int
+    )
   }
 }

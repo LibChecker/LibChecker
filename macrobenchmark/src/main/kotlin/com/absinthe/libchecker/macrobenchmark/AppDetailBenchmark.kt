@@ -150,6 +150,7 @@ class AppDetailBenchmark {
     compilationMode = CompilationMode.None(),
     iterations = 5,
     setupBlock = {
+      requireUncontaminatedBenchmarkEnvironment()
       pressHome()
       openGooglePlayServicesDetailScreen()
       waitForTextStartsWith(NATIVE_LIBRARY_PREFIX, "native library list")
