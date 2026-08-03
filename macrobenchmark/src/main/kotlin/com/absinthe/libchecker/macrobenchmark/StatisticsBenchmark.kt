@@ -35,7 +35,17 @@ class StatisticsBenchmark {
       TraceSectionMetric(TRACE_REFERENCE_MATCH_RULES),
       TraceSectionMetric(TRACE_REFERENCE_MAP_RESULT),
       TraceSectionMetric(TRACE_REFERENCE_SUBMIT_RESULT),
-      TraceSectionMetric(TRACE_REFERENCE_RESULT_TO_FIRST_LAYOUT)
+      TraceSectionMetric(TRACE_REFERENCE_RESULT_TO_FIRST_LAYOUT),
+      TraceSectionMetric("LC Reference compute NATIVE"),
+      TraceSectionMetric("LC Reference compute SERVICE"),
+      TraceSectionMetric("LC Reference compute ACTIVITY"),
+      TraceSectionMetric("LC Reference compute RECEIVER"),
+      TraceSectionMetric("LC Reference compute PROVIDER"),
+      TraceSectionMetric("LC Reference compute PERMISSION"),
+      TraceSectionMetric("LC Reference compute METADATA"),
+      TraceSectionMetric("LC Reference compute PACKAGE"),
+      TraceSectionMetric("LC Reference compute SHARED_UID"),
+      TraceSectionMetric("LC Reference compute ACTION")
     ),
     compilationMode = CompilationMode.None(),
     startupMode = StartupMode.COLD,
