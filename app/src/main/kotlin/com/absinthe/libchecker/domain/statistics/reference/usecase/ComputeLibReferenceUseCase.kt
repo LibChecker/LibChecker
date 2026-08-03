@@ -25,6 +25,7 @@ import com.absinthe.libchecker.domain.statistics.reference.TRACE_REFERENCE_BUILD
 import com.absinthe.libchecker.domain.statistics.reference.TRACE_REFERENCE_LOAD_BATCH
 import com.absinthe.libchecker.domain.statistics.reference.TRACE_REFERENCE_MATCH_RULES
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceItem
+import com.absinthe.libchecker.domain.statistics.reference.traceReferenceComputeTypeName
 import com.absinthe.libchecker.domain.statistics.reference.traceReferenceSection
 import com.absinthe.libchecker.domain.statistics.reference.traceReferenceSuspendSection
 import com.absinthe.libchecker.utils.IntentFilterUtils
@@ -132,7 +133,10 @@ class ComputeLibReferenceUseCase(
     }
 
     for (type in types) {
-      if (!computeInternal(type)) {
+      val completed = traceReferenceSuspendSection(traceReferenceComputeTypeName(type)) {
+        computeInternal(type)
+      }
+      if (!completed) {
         return@traceReferenceSuspendSection null
       }
     }
@@ -232,9 +236,14 @@ class ComputeLibReferenceUseCase(
           val packageInfo = getPackageInfo(packageName) ?: return
           val list = PackageUtils.getNativeDirLibs(packageInfo)
           val nativeLibNames = list.map { it.name }
+          val validationResults = RulesRepository.checkNativeLibValidations(
+            packageName = packageName,
+            nativeLibs = nativeLibNames,
+            otherNativeLibNames = nativeLibNames
+          )
           val mapped =
             list.asSequence()
-              .filter { RulesRepository.checkNativeLibValidation(packageName, it.name, nativeLibNames) }
+              .filter { validationResults[it.name] == true }
               .map { it.name }
           computeReferenceInternal(
             index,

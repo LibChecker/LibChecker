@@ -186,6 +186,18 @@ object RulesRepository {
     }
   }
 
+  private fun requiresNativeLibValidationSource(
+    nativeLib: String,
+    otherNativeLibNames: Collection<String>?
+  ): Boolean {
+    if (hasCompanionNativeLibValidation(nativeLib, otherNativeLibNames)) {
+      return false
+    }
+    return nativeLib in NATIVE_SET_QIHOO ||
+      nativeLib in NATIVE_SET_SECNEO ||
+      nativeLib in NATIVE_SET_FLUTTER
+  }
+
   private fun getPackageSourceFile(packageName: String): File? {
     return if (packageName.isTempApk()) {
       File(packageName)
@@ -202,20 +214,50 @@ object RulesRepository {
     otherNativeLibNames: Collection<String>? = null
   ): Boolean {
     if (!requiresNativeLibValidation(nativeLib)) return true
-    val source = getPackageSourceFile(packageName) ?: return false
-    return checkNativeLibValidation(source, nativeLib, otherNativeLibNames)
-  }
-
-  private fun checkNativeLibValidation(
-    source: File,
-    nativeLib: String,
-    otherNativeLibNames: Collection<String>? = null
-  ): Boolean {
     return checkNativeLibValidations(
-      source = source,
+      packageName = packageName,
       nativeLibs = listOf(nativeLib),
       otherNativeLibNames = otherNativeLibNames
     )[nativeLib] == true
+  }
+
+  fun checkNativeLibValidations(
+    packageName: String,
+    nativeLibs: Collection<String>,
+    otherNativeLibNames: Collection<String>? = null
+  ): Map<String, Boolean> {
+    return checkNativeLibValidations(
+      nativeLibs = nativeLibs,
+      otherNativeLibNames = otherNativeLibNames,
+      sourceProvider = { getPackageSourceFile(packageName) }
+    )
+  }
+
+  internal fun checkNativeLibValidations(
+    nativeLibs: Collection<String>,
+    otherNativeLibNames: Collection<String>? = null,
+    sourceProvider: () -> File?
+  ): Map<String, Boolean> {
+    val distinctNativeLibs = nativeLibs.distinct()
+    val namesToValidate = distinctNativeLibs.filter(::requiresNativeLibValidation)
+    if (namesToValidate.isEmpty()) {
+      return distinctNativeLibs.associateWith { true }
+    }
+    if (namesToValidate.none { requiresNativeLibValidationSource(it, otherNativeLibNames) }) {
+      return distinctNativeLibs.associateWith { nativeLib ->
+        nativeLib !in namesToValidate || hasCompanionNativeLibValidation(nativeLib, otherNativeLibNames)
+      }
+    }
+    val source = sourceProvider()
+      ?: return distinctNativeLibs.associateWith { nativeLib ->
+        nativeLib !in namesToValidate || hasCompanionNativeLibValidation(nativeLib, otherNativeLibNames)
+      }
+    val validationResults = checkNativeLibValidations(
+      source = source,
+      nativeLibs = namesToValidate,
+      otherNativeLibNames = otherNativeLibNames
+    )
+    return distinctNativeLibs.associateWith { validationResults[it] ?: true }
   }
 
   private fun checkNativeLibValidations(
@@ -234,9 +276,13 @@ object RulesRepository {
         }
       }
     }
-    val foundClasses = runCatching {
-      PackageUtils.findDexClasses(source, patterns.toList()).toSet()
-    }.getOrDefault(emptySet())
+    val foundClasses = if (patterns.isEmpty()) {
+      emptySet()
+    } else {
+      runCatching {
+        PackageUtils.findDexClasses(source, patterns.toList()).toSet()
+      }.getOrDefault(emptySet())
+    }
 
     return nativeLibs.associateWith { nativeLib ->
       when {

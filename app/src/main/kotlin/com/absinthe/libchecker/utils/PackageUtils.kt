@@ -169,19 +169,10 @@ object PackageUtils {
           .filter { it.isFile && it.extension == "so" }
           .distinctBy { it.name }
           .map {
-            val elfParser = runCatching {
-              ElfParser(it).use { parser ->
-                parser.parseHeader()
-                parser
-              }
-            }.getOrNull()
             LibStringItem(
               name = it.name,
               size = FileUtils.getFileSize(it),
-              elfInfo = ElfInfo(
-                elfParser?.getEType() ?: ET_NOT_ELF,
-                elfParser?.getMinPageSize() ?: -1
-              ),
+              elfInfo = parseNativeDirElfInfo(it, parseElf),
               source = it.path
             )
           }
@@ -207,6 +198,20 @@ object PackageUtils {
     }
 
     return result.distinctBy { it.name }
+  }
+
+  internal fun parseNativeDirElfInfo(file: File, parseElf: Boolean): ElfInfo {
+    if (!parseElf) {
+      return ElfInfo()
+    }
+    return runCatching {
+      ElfParser(file).use { parser ->
+        parser.parseHeader()
+        ElfInfo(parser.getEType(), parser.getMinPageSize())
+      }
+    }.getOrElse {
+      ElfInfo(ET_NOT_ELF, -1)
+    }
   }
 
   /**
