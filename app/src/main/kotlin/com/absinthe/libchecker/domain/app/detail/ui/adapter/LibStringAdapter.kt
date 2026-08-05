@@ -42,9 +42,21 @@ class LibStringAdapter(
   private val fallbackProcessColors = mutableMapOf<String, Int>()
   private val metadataPreviews = mutableMapOf<MetadataPreviewKey, AppResourcePreview>()
 
-  fun bind(state: LibStringRenderState) {
+  fun bind(
+    state: LibStringRenderState,
+    refreshItems: Boolean = false
+  ) {
+    val shouldRefreshItems = shouldRefreshLibStringAdapterItems(
+      previousState = renderState,
+      newState = state,
+      refreshItems = refreshItems,
+      itemCount = data.size
+    )
     renderState = state
     highlightText = state.highlightText
+    if (shouldRefreshItems) {
+      notifyItemRangeChanged(0, data.size)
+    }
   }
 
   fun preloadRuleChipIcons(items: List<LibStringItemChip>) {
@@ -194,4 +206,13 @@ class LibStringAdapter(
     val resourceType: String?,
     val originalValue: String?
   )
+}
+
+internal fun shouldRefreshLibStringAdapterItems(
+  previousState: LibStringRenderState,
+  newState: LibStringRenderState,
+  refreshItems: Boolean,
+  itemCount: Int
+): Boolean {
+  return refreshItems && previousState != newState && itemCount > 0
 }

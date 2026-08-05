@@ -204,13 +204,14 @@ class AdvancedMenuBSDView(context: Context) :
   }
 
   private fun bindComponentDemo(state: AdvancedMenuBottomSheetState) {
+    itemAdapter.setList(state.componentDemoItems)
     itemAdapter.bind(
       LibStringRenderState(
         itemDisplayOptions = state.itemDisplayOptions,
         colorfulRuleIcon = state.colorfulRuleIcon
-      )
+      ),
+      refreshItems = true
     )
-    itemAdapter.setList(state.componentDemoItems)
   }
 
   private inner class AdvancedMenuLayoutAdapter : BaseQuickAdapter<AdvancedMenuLayoutItem, BaseViewHolder>(0) {

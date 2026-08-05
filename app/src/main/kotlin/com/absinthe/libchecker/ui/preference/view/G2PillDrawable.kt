@@ -8,7 +8,9 @@ import android.graphics.Path
 import android.graphics.PixelFormat
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
+import android.os.Build
 import androidx.annotation.ColorInt
+import kotlin.math.min
 
 class G2PillDrawable(
   @ColorInt fillColor: Int,
@@ -146,8 +148,12 @@ class G2PillDrawable(
 
   @Suppress("DEPRECATION")
   override fun getOutline(outline: Outline) {
-    if (path.isEmpty) {
+    val outlineBounds = bounds
+    if (outlineBounds.isEmpty) {
       outline.setEmpty()
+    } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
+      val radius = min(outlineBounds.width(), outlineBounds.height()) / 2f
+      outline.setRoundRect(outlineBounds, radius)
     } else {
       outline.setConvexPath(path)
     }

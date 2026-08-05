@@ -25,6 +25,7 @@ import android.graphics.Color
 import android.graphics.Outline
 import android.graphics.Paint
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Parcel
 import android.os.Parcelable
 import android.text.Layout
@@ -191,7 +192,13 @@ class CheckableChipView @JvmOverloads constructor(
       textSize =
         getDimension(R.styleable.CheckableChipView_android_textSize, TextView(context).textSize)
 
-      clearDrawable = getDrawableOrThrow(R.styleable.CheckableChipView_ccv_clearIcon).apply {
+      val resolvedClearDrawable =
+        getDrawableOrThrow(R.styleable.CheckableChipView_ccv_clearIcon)
+      clearDrawable = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
+        resolvedClearDrawable.mutate()
+      } else {
+        resolvedClearDrawable
+      }.apply {
         setBounds(
           -intrinsicWidth / 2,
           -intrinsicHeight / 2,
