@@ -275,6 +275,7 @@
   <string name="feature_live_update_notification_summary">The system promotes Live Update notifications. Promoted notifications appear more prominently on system surfaces, including at the top of the notification drawer and the lock screen, and as a chip in the status bar.</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Copied to clipboard</string>
+  <string name="snapshot_report_share_failed">Failed to share snapshot report</string>
   <string name="toast_not_existing_market">No app store was found</string>
   <string name="toast_use_another_file_manager">Please use another file manager to open the APK</string>
   <string name="toast_cant_open_app">Can\'t open this app</string>

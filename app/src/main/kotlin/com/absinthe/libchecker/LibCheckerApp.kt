@@ -160,6 +160,7 @@ class LibCheckerApp : Application() {
 
   private fun clearCache() {
     File(cacheDir, "shared_apk").takeIf { it.isDirectory }?.deleteRecursively()
+    File(cacheDir, "shared_snapshot_reports").takeIf { it.isDirectory }?.deleteRecursively()
   }
 
   companion object {

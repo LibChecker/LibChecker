@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.domain.snapshot.detail.ui
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.Gravity
@@ -7,6 +8,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.FrameLayout
+import androidx.core.content.FileProvider
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -27,8 +29,10 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.SnapshotOptions
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailDiffTextStyle
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotReportExportTarget
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotTitleDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailReportHeader
+import com.absinthe.libchecker.domain.snapshot.detail.model.chooseSnapshotReportExportTarget
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.SnapshotDetailAdapter
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotDetailNodeClickAction
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotDetailNodeLongClickAction
@@ -53,15 +57,20 @@ import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.launchLibReferencePage
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
+import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.google.android.material.R as MaterialR
+import java.io.File
 import kotlin.math.abs
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import rikka.core.util.ClipboardUtils
+import timber.log.Timber
 
 const val EXTRA_ENTITY = "EXTRA_ENTITY"
 const val EXTRA_ICON = "EXTRA_ICON"
@@ -309,7 +318,52 @@ class SnapshotDetailActivity :
         sb.append(node.reportText)
       }
     }
-    ClipboardUtils.put(this, sb.toString())
-    VersionCompat.showCopiedOnClipboardToast(this)
+    val report = sb.toString()
+    when (chooseSnapshotReportExportTarget(report)) {
+      SnapshotReportExportTarget.CLIPBOARD -> {
+        ClipboardUtils.put(this, report)
+        VersionCompat.showCopiedOnClipboardToast(this)
+      }
+
+      SnapshotReportExportTarget.TEXT_FILE -> shareReportFile(report)
+    }
+  }
+
+  private fun shareReportFile(report: String) {
+    lifecycleScope.launch {
+      val reportUriResult = withContext(Dispatchers.IO) {
+        runCatching {
+          val reportDir = File(cacheDir, SNAPSHOT_REPORT_CACHE_DIR).apply {
+            check(exists() || mkdirs()) { "Failed to create snapshot report cache directory" }
+          }
+          val reportFile = File(
+            reportDir,
+            "LibChecker-snapshot-report-${System.currentTimeMillis()}.txt"
+          )
+          reportFile.writeText(report, Charsets.UTF_8)
+          FileProvider.getUriForFile(
+            this@SnapshotDetailActivity,
+            "$packageName.fileprovider",
+            reportFile
+          )
+        }
+      }
+
+      reportUriResult.onSuccess { reportUri ->
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+          type = "text/plain"
+          putExtra(Intent.EXTRA_STREAM, reportUri)
+          addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        startActivity(Intent.createChooser(shareIntent, getString(R.string.app_info_share)))
+      }.onFailure {
+        Timber.e(it, "Failed to share snapshot report")
+        showToast(R.string.snapshot_report_share_failed)
+      }
+    }
+  }
+
+  private companion object {
+    const val SNAPSHOT_REPORT_CACHE_DIR = "shared_snapshot_reports"
   }
 }
