@@ -11,6 +11,8 @@ import android.widget.FrameLayout
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.doOnNextLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -90,6 +92,7 @@ class AppListFragment :
   private var isSearchTextClearOnce = false
   private var firstScrollFlag = false
   private var hasInitializedItems = false
+  private var suppressImeOnNextSearchRestore = false
   private var pendingDumpAppsInfoAction: HomeViewModel.AppListSearchCommandAction.DumpAppsInfo? = null
 
   private lateinit var layoutManager: RecyclerView.LayoutManager
@@ -104,6 +107,7 @@ class AppListFragment :
         if (AntiShakeUtils.isInvalidClick(view)) {
           return@setOnItemClickListener
         }
+        suppressImeOnNextSearchRestore = menu?.findItem(R.id.search)?.isActionViewExpanded == true
         activity?.launchDetailPage(it.getItem(position))
       }
       it.setHasStableIds(true)
@@ -336,7 +340,16 @@ class AppListFragment :
       actionView = searchView
       if (initialSearchState.shouldExpand) {
         expandActionView()
+        if (
+          shouldSuppressImeAfterSearchRestore(
+            suppressImeOnNextSearchRestore = suppressImeOnNextSearchRestore,
+            shouldExpand = initialSearchState.shouldExpand
+          )
+        ) {
+          suppressImeAfterSearchRestore(searchView)
+        }
       }
+      suppressImeOnNextSearchRestore = false
 
       if (!isListReady) {
         isVisible = false
@@ -344,6 +357,19 @@ class AppListFragment :
     }
     searchView.setQuery(initialSearchState.query, false)
     searchView.setOnQueryTextListener(this@AppListFragment)
+  }
+
+  private fun suppressImeAfterSearchRestore(searchView: SearchView) {
+    searchView.clearFocus()
+    searchView.post {
+      if (!isAdded) {
+        return@post
+      }
+      searchView.clearFocus()
+      val activityWindow = requireActivity().window
+      WindowInsetsControllerCompat(activityWindow, activityWindow.decorView)
+        .hide(WindowInsetsCompat.Type.ime())
+    }
   }
 
   override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
@@ -691,6 +717,13 @@ class AppListFragment :
       homeViewModel.initItems()
     }
   }
+}
+
+internal fun shouldSuppressImeAfterSearchRestore(
+  suppressImeOnNextSearchRestore: Boolean,
+  shouldExpand: Boolean
+): Boolean {
+  return false
 }
 
 internal fun shouldReturnAppListTopAfterSearch(

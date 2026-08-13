@@ -81,6 +81,28 @@ class AppListFragmentTest {
   }
 
   @Test
+  fun `returning from detail suppresses the IME only when search is restored expanded`() {
+    assertTrue(
+      shouldSuppressImeAfterSearchRestore(
+        suppressImeOnNextSearchRestore = true,
+        shouldExpand = true
+      )
+    )
+    assertFalse(
+      shouldSuppressImeAfterSearchRestore(
+        suppressImeOnNextSearchRestore = false,
+        shouldExpand = true
+      )
+    )
+    assertFalse(
+      shouldSuppressImeAfterSearchRestore(
+        suppressImeOnNextSearchRestore = true,
+        shouldExpand = false
+      )
+    )
+  }
+
+  @Test
   fun `handles search changes while app list is resumed`() {
     assertTrue(shouldHandleListSearchQueryChange(Lifecycle.State.RESUMED))
   }
