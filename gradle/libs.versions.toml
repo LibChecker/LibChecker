@@ -49,7 +49,7 @@ androidX-browser = "androidx.browser:browser:1.10.0"
 androidX-collection = { module = "androidx.collection:collection", version.ref = "androidX-collection" }
 androidX-constraintLayout = "androidx.constraintlayout:constraintlayout:2.2.2"
 androidX-core = "androidx.core:core-ktx:1.19.0"
-androidX-fragment = "androidx.fragment:fragment-ktx:1.8.9"
+androidX-fragment = "androidx.fragment:fragment-ktx:1.9.0"
 androidX-lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "androidX-lifecycle" }
 androidX-lifecycle-viewModel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidX-lifecycle" }
 androidX-preference = "androidx.preference:preference-ktx:1.2.1"
