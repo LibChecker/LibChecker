@@ -39,7 +39,7 @@ import com.absinthe.libchecker.ui.base.BaseFragment
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.extensions.getColor
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.app.EmptyListView
@@ -205,7 +205,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
       viewModel.buildProcessFilterData(
         type = type,
         permissionNotGrantedLabel = getString(R.string.permission_not_granted),
-        permissionNotGrantedColor = R.color.material_red_400.getColor(requireContext())
+        permissionNotGrantedColor = requireContext().getColorByAttr(androidx.appcompat.R.attr.colorError)
       )
     )
   }

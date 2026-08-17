@@ -14,7 +14,6 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.model.LibStringComponentItemDisplay
 import com.absinthe.libchecker.domain.app.detail.model.LibStringPermissionItemDisplay
 import com.absinthe.libchecker.utils.UiUtils
-import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 
@@ -56,7 +55,7 @@ class ComponentLibItemView(context: Context) : RuleChipItemView(context) {
     libName.setLibStringItemName(display.name, highlightText)
     bindRuleChip(null, false)
     processLabelColor = if (display.showNotGrantedIndicator) {
-      R.color.material_red_500.getColor(context)
+      context.getColorByAttr(androidx.appcompat.R.attr.colorError)
     } else {
       -1
     }
