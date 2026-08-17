@@ -17,7 +17,7 @@ import androidx.core.view.updateLayoutParams
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.ui.preference.model.PreferenceInlineControl
 import com.absinthe.libchecker.ui.preference.model.PreferenceItemRenderState
-import com.absinthe.libchecker.utils.extensions.getColor
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.google.android.material.badge.BadgeDrawable
 import com.google.android.material.badge.BadgeUtils
 import com.google.android.material.card.MaterialCardView
@@ -299,7 +299,7 @@ class PreferenceItemView @JvmOverloads constructor(
     }
 
     badge = BadgeDrawable.create(context).apply {
-      backgroundColor = R.color.material_red_500.getColor(context)
+      backgroundColor = context.getColorByAttr(androidx.appcompat.R.attr.colorError)
       badgeGravity = BadgeDrawable.TOP_END
       clearNumber()
     }.also {
