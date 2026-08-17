@@ -232,13 +232,13 @@
   <string name="snapshot_build_id">Build ID</string>
   <string name="snapshot_build_security_patch">Патч безпеки</string>
   <!--  Dialog  -->
-  <string name="dialog_title_reload_apps">Ви впевнені, що хочете перезавантажити весь список додатків?</string>
+  <string name="dialog_title_reload_apps">Перезавантажити весь список додатків?</string>
   <string name="dialog_subtitle_reload_apps">Це може зайняти кілька секунд</string>
   <string name="dialog_title_change_timestamp">Вибір часу</string>
   <string name="dialog_title_keep_previous_snapshot">Увага</string>
   <string name="dialog_message_keep_previous_snapshot">Ви хочете зберегти попередній знімок?</string>
   <string name="dialog_title_select_to_delete">Виберіть дату, щоб видалити знімок</string>
-  <string name="dialog_title_confirm_to_delete">Ви впевнені, що хочете видалити цей знімок?</string>
+  <string name="dialog_title_confirm_to_delete">Видалити цей знімок?</string>
   <string name="btn_keep">Залишити</string>
   <string name="btn_drop">Видалити</string>
   <string name="dialog_title_compare_diff_apk">Увага</string>

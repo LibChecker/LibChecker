@@ -324,13 +324,13 @@
   <string name="snapshot_build_security_patch">Security patch</string>
 
   <!--  Dialog  -->
-  <string name="dialog_title_reload_apps">Are you sure to reload all apps?</string>
+  <string name="dialog_title_reload_apps">Reload all apps?</string>
   <string name="dialog_subtitle_reload_apps">This may take a few seconds</string>
   <string name="dialog_title_change_timestamp">Change time node</string>
   <string name="dialog_title_keep_previous_snapshot">Attention</string>
   <string name="dialog_message_keep_previous_snapshot">Do you want to keep the previous snapshot?</string>
   <string name="dialog_title_select_to_delete">Choose a date to delete the snapshot</string>
-  <string name="dialog_title_confirm_to_delete">Are you sure to delete this snapshot?</string>
+  <string name="dialog_title_confirm_to_delete">Delete this snapshot?</string>
   <string name="dialog_message_confirm_to_delete">%s\n\nThis time node and all of its app records will be permanently deleted. This action cannot be undone.</string>
   <string name="dialog_action_delete">Delete</string>
   <string name="btn_keep">Keep</string>

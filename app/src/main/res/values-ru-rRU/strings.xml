@@ -210,13 +210,13 @@
   <string name="snapshot_generate_text_report">Создать текстовый отчет</string>
   <string name="snapshot_scheme_tip"><![CDATA[Совет: Теперь вы можете генерировать снимки в фоновом режиме через:<br><b>%s</b>]]></string>
   <!--  Dialog  -->
-  <string name="dialog_title_reload_apps">Вы уверены, что хотите перезагрузить все приложения?</string>
+  <string name="dialog_title_reload_apps">Перезагрузить все приложения?</string>
   <string name="dialog_subtitle_reload_apps">Это может занять несколько секунд</string>
   <string name="dialog_title_change_timestamp">Выбор временного узла</string>
   <string name="dialog_title_keep_previous_snapshot">Внимание</string>
   <string name="dialog_message_keep_previous_snapshot">Вы хотите сохранить предыдущий снимок?</string>
   <string name="dialog_title_select_to_delete">Выберите дату для удаления снимка</string>
-  <string name="dialog_title_confirm_to_delete">Вы уверены, что хотите удалить этот снимок?</string>
+  <string name="dialog_title_confirm_to_delete">Удалить этот снимок?</string>
   <string name="btn_keep">Оставить</string>
   <string name="btn_drop">Удалить</string>
   <string name="dialog_title_compare_diff_apk">Внимание</string>

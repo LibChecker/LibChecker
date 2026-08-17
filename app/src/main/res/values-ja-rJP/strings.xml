@@ -226,7 +226,7 @@
   <string name="dialog_title_keep_previous_snapshot">注意</string>
   <string name="dialog_message_keep_previous_snapshot">前のスナップショットを保持しますか？</string>
   <string name="dialog_title_select_to_delete">スナップショットを削除する日付を選択</string>
-  <string name="dialog_title_confirm_to_delete">このスナップショットを削除してもよろしいですか？</string>
+  <string name="dialog_title_confirm_to_delete">このスナップショットを削除しますか？</string>
   <string name="btn_keep">保持</string>
   <string name="btn_drop">破棄</string>
   <string name="dialog_title_compare_diff_apk">注意</string>

@@ -220,13 +220,13 @@
   <string name="snapshot_build_id">ID Build</string>
   <string name="snapshot_build_security_patch">Patch Keamanan</string>
   <!--  Dialog  -->
-  <string name="dialog_title_reload_apps">Apakah Anda yakin untuk memuat ulang semua aplikasi?</string>
+  <string name="dialog_title_reload_apps">Muat ulang semua aplikasi?</string>
   <string name="dialog_subtitle_reload_apps">Ini mungkin memerlukan beberapa detik</string>
   <string name="dialog_title_change_timestamp">Ubah Time Node</string>
   <string name="dialog_title_keep_previous_snapshot">Perhatian</string>
   <string name="dialog_message_keep_previous_snapshot">Apakah Anda ingin menyimpan snapshot sebelumnya?</string>
   <string name="dialog_title_select_to_delete">Pilih Tanggal untuk Menghapus Snapshot</string>
-  <string name="dialog_title_confirm_to_delete">Apakah Anda yakin untuk menghapus snapshot ini?</string>
+  <string name="dialog_title_confirm_to_delete">Hapus snapshot ini?</string>
   <string name="btn_keep">Simpan</string>
   <string name="btn_drop">Buang</string>
   <string name="dialog_title_compare_diff_apk">Perhatian</string>
