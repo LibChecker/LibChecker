@@ -31,14 +31,6 @@ class SnapshotEmptyView(context: Context) : AViewGroup(context) {
     addView(this)
   }
 
-  init {
-    updateContentDescription()
-  }
-
-  fun updateContentDescription() {
-    contentDescription = text.text
-  }
-
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     setPadding(0, measuredWidth / 8, 0, measuredWidth / 8)

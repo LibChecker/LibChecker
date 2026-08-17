@@ -18,6 +18,7 @@ import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.model.LibStringMetadataItemDisplay
 import com.absinthe.libchecker.domain.app.detail.resource.AppResourcePreview
+import com.absinthe.libchecker.utils.extensions.expandChildTouchTarget
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getDrawableByAttr
@@ -136,5 +137,10 @@ class MetadataLibItemView(context: Context) : AViewGroup(context) {
     libName.layout(paddingStart, paddingTop)
     libSize.layout(paddingStart, libName.bottom)
     linkToIcon.layout(paddingEnd, linkToIcon.toVerticalCenter(this), true)
+    if (linkToIcon.isVisible) {
+      expandChildTouchTarget(linkToIcon, 48.dp)
+    } else {
+      touchDelegate = null
+    }
   }
 }

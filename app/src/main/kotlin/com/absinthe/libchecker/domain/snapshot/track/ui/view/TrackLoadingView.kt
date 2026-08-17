@@ -19,6 +19,8 @@ class TrackLoadingView(
 
   init {
     clipChildren = false
+    importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
+    contentDescription = context.getString(R.string.loading)
     addView(loading)
     loading.setAppIconHighlightProvider(loadRandomAppIcon)
   }

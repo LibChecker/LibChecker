@@ -54,7 +54,7 @@ class ChartDetailItemView(context: Context) : FrameLayout(context) {
         it.marginEnd = 8.dp
       }
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
-      setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
+      setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
       addView(this)
     }
 

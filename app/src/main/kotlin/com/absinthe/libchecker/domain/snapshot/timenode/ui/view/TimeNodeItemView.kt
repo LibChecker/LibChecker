@@ -50,7 +50,7 @@ class TimeNodeItemView(context: Context) : AViewGroup(context) {
     }
     // noinspection AndroidLintSetTextI18n
     text = "…"
-    setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
+    setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
   }
 
   private val rvList = RecyclerView(context).apply {

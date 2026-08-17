@@ -49,7 +49,7 @@ class ExpandingView @JvmOverloads constructor(
       paddingEndCompat = 16.dp
       isSingleLine = true
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
-      setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
+      setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
       setTypeface(null, Typeface.BOLD)
       importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
     }

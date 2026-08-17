@@ -31,10 +31,6 @@ class EmptyListView(context: Context) : AViewGroup(context) {
     addView(this)
   }
 
-  init {
-    contentDescription = text.text
-  }
-
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     icon.autoMeasure()

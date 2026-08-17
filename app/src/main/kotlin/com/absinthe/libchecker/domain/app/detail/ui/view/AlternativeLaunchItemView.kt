@@ -19,7 +19,7 @@ class AlternativeLaunchItemView(context: Context) : AViewGroup(context) {
       ).also {
         it.marginStart = 8.dp
       }
-      setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
+      setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
     }
 
   private val className = AppCompatTextView(
@@ -32,7 +32,7 @@ class AlternativeLaunchItemView(context: Context) : AViewGroup(context) {
       ViewGroup.LayoutParams.WRAP_CONTENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     )
-    setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
+    setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
   }
 
   init {

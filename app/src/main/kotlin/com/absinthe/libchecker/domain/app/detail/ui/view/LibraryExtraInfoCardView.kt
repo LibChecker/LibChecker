@@ -367,7 +367,7 @@ class LibraryExtraInfoCardView(
         setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
       } else {
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
+        setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
       }
       text = field.displayValue()
     }
