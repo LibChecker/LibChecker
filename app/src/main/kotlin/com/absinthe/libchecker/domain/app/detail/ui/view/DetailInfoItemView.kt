@@ -33,7 +33,7 @@ class DetailInfoItemView(context: Context) : AViewGroup(context) {
       it.marginStart = 8.dp
     }
     alpha = 0.65f
-    setTextSize(TypedValue.COMPLEX_UNIT_SP, 10f)
+    setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
   }
 
   private val text = AppCompatTextView(context).apply {

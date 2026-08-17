@@ -200,7 +200,6 @@ class SnapshotFragment :
       if (viewModel.selectedSnapshotTimestamp == 0L) {
         text.text = getString(R.string.snapshot_no_snapshot)
       }
-      updateContentDescription()
     }
 
     adapter.apply {

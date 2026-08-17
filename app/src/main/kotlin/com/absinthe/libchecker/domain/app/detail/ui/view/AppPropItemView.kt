@@ -17,6 +17,7 @@ import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.model.AppPropItem
 import com.absinthe.libchecker.domain.app.detail.resource.AppResourcePreview
+import com.absinthe.libchecker.utils.extensions.expandChildTouchTarget
 import com.absinthe.libchecker.utils.extensions.getDrawableByAttr
 import com.absinthe.libchecker.view.AViewGroup
 
@@ -46,7 +47,7 @@ class AppPropItemView(context: Context) : AViewGroup(context) {
       ViewGroup.LayoutParams.WRAP_CONTENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     )
-    setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
+    setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
   }
 
   private val value = AppCompatTextView(
@@ -59,7 +60,7 @@ class AppPropItemView(context: Context) : AViewGroup(context) {
       ViewGroup.LayoutParams.WRAP_CONTENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     )
-    setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
+    setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
     alpha = 0.65f
   }
 
@@ -144,5 +145,10 @@ class AppPropItemView(context: Context) : AViewGroup(context) {
     key.layout(paddingStart, tip.bottom)
     value.layout(paddingStart, key.bottom)
     linkToIcon.layout(paddingEnd, linkToIcon.toVerticalCenter(this), true)
+    if (linkToIcon.isVisible) {
+      expandChildTouchTarget(linkToIcon, 48.dp)
+    } else {
+      touchDelegate = null
+    }
   }
 }

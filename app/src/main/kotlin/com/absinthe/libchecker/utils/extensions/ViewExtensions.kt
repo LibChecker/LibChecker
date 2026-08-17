@@ -7,6 +7,7 @@ import android.content.ClipData
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Bitmap
+import android.graphics.Rect
 import android.graphics.RenderEffect
 import android.graphics.Shader
 import android.graphics.Typeface
@@ -17,6 +18,7 @@ import android.text.Spanned
 import android.text.TextUtils
 import android.text.style.ForegroundColorSpan
 import android.text.style.StrikethroughSpan
+import android.view.TouchDelegate
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
@@ -242,6 +244,19 @@ fun View.isRtl(): Boolean {
 
 fun View?.visibleWidth() = if (this != null && isVisible) measuredWidth else 0
 fun View?.visibleHeight() = if (this != null && isVisible) measuredHeight else 0
+
+/**
+ * Expands [target]'s touch area to at least [minSize] on both dimensions by
+ * installing a [TouchDelegate] on this parent. Call from [ViewGroup.onLayout]
+ * after the target has been laid out, and only while the target is visible.
+ */
+fun ViewGroup.expandChildTouchTarget(target: View, minSize: Int) {
+  val bounds = Rect().also(target::getHitRect)
+  val horizontalExpansion = ((minSize - bounds.width()) / 2).coerceAtLeast(0)
+  val verticalExpansion = ((minSize - bounds.height()) / 2).coerceAtLeast(0)
+  bounds.inset(-horizontalExpansion, -verticalExpansion)
+  touchDelegate = TouchDelegate(bounds, target)
+}
 
 fun View.animatedBlurAction(action: () -> Unit): ValueAnimator {
   var hasActed = false

@@ -17,6 +17,8 @@ class AppListInitialiseView(
 
   init {
     clipChildren = false
+    importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
+    contentDescription = context.getString(R.string.loading)
   }
 
   val loadingView = RingDotsView(context).apply {

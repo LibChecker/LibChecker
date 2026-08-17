@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.isGone
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
-import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.home.model.HomeToolbarTitleState
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
@@ -41,7 +40,6 @@ class HomeToolbarTitleView @JvmOverloads constructor(
     scaleX = 0.78f
     scaleY = 0.78f
     isGone = true
-    contentDescription = context.getString(R.string.loading)
   }
 
   private var loadingRequested = false

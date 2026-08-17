@@ -9,6 +9,7 @@ import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.domain.app.detail.model.SignatureDetailItem
+import com.absinthe.libchecker.utils.extensions.expandChildTouchTarget
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDrawableByAttr
 import com.absinthe.libchecker.view.AViewGroup
@@ -93,5 +94,6 @@ class SignatureDetailItemView(context: Context) : AViewGroup(context) {
     type.layout(paddingStart, paddingTop)
     content.layout(paddingStart, type.bottom)
     copyToClipboard.layout(paddingEnd, copyToClipboard.toViewVerticalCenter(type), true)
+    expandChildTouchTarget(copyToClipboard, 48.dp)
   }
 }

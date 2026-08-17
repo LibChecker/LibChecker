@@ -223,7 +223,7 @@ class AppDexoptItemView(context: Context) : AViewGroup(context) {
           ViewGroup.LayoutParams.WRAP_CONTENT,
           ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
+        setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
         setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
         maxLines = 2
         ellipsize = TextUtils.TruncateAt.END

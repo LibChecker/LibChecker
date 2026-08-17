@@ -8,7 +8,6 @@ import androidx.core.view.isGone
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.about.model.DevelopersDialogAction
 import com.absinthe.libchecker.domain.about.model.DevelopersDialogState
 import com.absinthe.libchecker.domain.about.ui.adapter.DeveloperInfoAdapter
@@ -37,7 +36,6 @@ class DevelopersDialogView(context: Context) :
     alpha = 0f
     scaleX = 0.78f
     scaleY = 0.78f
-    contentDescription = context.getString(R.string.loading)
   }
 
   private val headerContainer = FrameLayout(context).apply {
