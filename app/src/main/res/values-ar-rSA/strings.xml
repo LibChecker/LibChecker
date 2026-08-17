@@ -243,13 +243,13 @@
   <string name="snapshot_build_id">معرف البناء</string>
   <string name="snapshot_build_security_patch">تصحيح الأمان</string>
   <!--  Dialog  -->
-  <string name="dialog_title_reload_apps">هل أنت متأكد من إعادة تحميل جميع التطبيقات؟</string>
+  <string name="dialog_title_reload_apps">إعادة تحميل جميع التطبيقات؟</string>
   <string name="dialog_subtitle_reload_apps">قد يستغرق هذا بضع ثوان</string>
   <string name="dialog_title_change_timestamp">تغيير عقدة الوقت</string>
   <string name="dialog_title_keep_previous_snapshot">انتباه</string>
   <string name="dialog_message_keep_previous_snapshot">هل تريد الاحتفاظ بنقطة الاستعادة السابقة؟</string>
   <string name="dialog_title_select_to_delete">اختر تاريخا لحذف نقطة إستعادة</string>
-  <string name="dialog_title_confirm_to_delete">هل أنت متأكد من حذف نقطة الاستعادة هذه؟</string>
+  <string name="dialog_title_confirm_to_delete">حذف نقطة الاستعادة هذه؟</string>
   <string name="btn_keep">حفظ</string>
   <string name="btn_drop">تجاهل</string>
   <string name="dialog_title_compare_diff_apk">انتباه</string>

@@ -225,13 +225,13 @@
   <string name="snapshot_build_id">Build-ID</string>
   <string name="snapshot_build_security_patch">Sicherheitsupdate</string>
   <!--  Dialog  -->
-  <string name="dialog_title_reload_apps">Sind Sie sicher, dass Sie alle Apps neu laden möchten?</string>
+  <string name="dialog_title_reload_apps">Alle Apps neu laden?</string>
   <string name="dialog_subtitle_reload_apps">Dies kann einige Sekunden dauern</string>
   <string name="dialog_title_change_timestamp">Zeitpunkt ändern</string>
   <string name="dialog_title_keep_previous_snapshot">Achtung</string>
   <string name="dialog_message_keep_previous_snapshot">Möchten Sie den vorherigen Schnappschuss behalten?</string>
   <string name="dialog_title_select_to_delete">Wählen Sie ein Datum zum Löschen des Schnappschusses</string>
-  <string name="dialog_title_confirm_to_delete">Sind Sie sicher, dass Sie diesen Schnappschuss löschen möchten?</string>
+  <string name="dialog_title_confirm_to_delete">Diesen Schnappschuss löschen?</string>
   <string name="btn_keep">Behalten</string>
   <string name="btn_drop">Verwerfen</string>
   <string name="dialog_title_compare_diff_apk">Achtung</string>

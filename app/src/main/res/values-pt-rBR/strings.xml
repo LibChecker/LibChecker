@@ -232,13 +232,13 @@
   <string name="snapshot_build_id">ID da Build</string>
   <string name="snapshot_build_security_patch">Patch de Segurança</string>
   <!--  Dialog  -->
-  <string name="dialog_title_reload_apps">Tem certeza que quer recarregar todos os apps?</string>
+  <string name="dialog_title_reload_apps">Recarregar todos os apps?</string>
   <string name="dialog_subtitle_reload_apps">Isso pode levar alguns segundos</string>
   <string name="dialog_title_change_timestamp">Alterar nó de hora</string>
   <string name="dialog_title_keep_previous_snapshot">Atenção</string>
   <string name="dialog_message_keep_previous_snapshot">Você gostaria de manter a snapshot anterior?</string>
   <string name="dialog_title_select_to_delete">Encontre uma data para deletar a Snapshot</string>
-  <string name="dialog_title_confirm_to_delete">Você tem certeza que gostaria de deletar essa snapshot?</string>
+  <string name="dialog_title_confirm_to_delete">Deletar esta snapshot?</string>
   <string name="btn_keep">Manter</string>
   <string name="btn_drop">Descartar</string>
   <string name="dialog_title_compare_diff_apk">Atenção</string>

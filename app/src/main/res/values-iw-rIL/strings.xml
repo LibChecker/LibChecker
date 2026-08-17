@@ -231,13 +231,13 @@
   <string name="snapshot_build_id">Build ID</string>
   <string name="snapshot_build_security_patch">תיקון אבטחה</string>
   <!--  Dialog  -->
-  <string name="dialog_title_reload_apps">האם אתה בטוח שברצונך לטעון מחדש את כל האפליקציות?</string>
+  <string name="dialog_title_reload_apps">לטעון מחדש את כל האפליקציות?</string>
   <string name="dialog_subtitle_reload_apps">זה עשוי לקחת מספר שניות</string>
   <string name="dialog_title_change_timestamp">שנה צומת זמן</string>
   <string name="dialog_title_keep_previous_snapshot">שים לב</string>
   <string name="dialog_message_keep_previous_snapshot">האם ברצונך לשמור את תמונת המצב הקודמת?</string>
   <string name="dialog_title_select_to_delete">בחר תאריך למחוק תמונת מצב</string>
-  <string name="dialog_title_confirm_to_delete">האם אתה בטוח שברצונך למחוק את תמונת מצב זו?</string>
+  <string name="dialog_title_confirm_to_delete">למחוק את תמונת מצב זו?</string>
   <string name="btn_keep">שמור</string>
   <string name="btn_drop">השלך</string>
   <string name="dialog_title_compare_diff_apk">שים לב</string>

@@ -219,13 +219,13 @@
   <string name="snapshot_build_id">ID bản dựng</string>
   <string name="snapshot_build_security_patch">Bản vá bảo mật</string>
   <!--  Dialog  -->
-  <string name="dialog_title_reload_apps">Bạn có chắc chắn tải lại tất cả ứng dụng không?</string>
+  <string name="dialog_title_reload_apps">Tải lại tất cả ứng dụng?</string>
   <string name="dialog_subtitle_reload_apps">Điều này có thể mất một vài giây</string>
   <string name="dialog_title_change_timestamp">Thay đổi nút thời gian</string>
   <string name="dialog_title_keep_previous_snapshot">Chú ý</string>
   <string name="dialog_message_keep_previous_snapshot">Bạn có muốn giữ ảnh chụp nhanh trước đó không?</string>
   <string name="dialog_title_select_to_delete">Chọn một ngày để xóa ảnh chụp nhanh</string>
-  <string name="dialog_title_confirm_to_delete">Bạn có chắc chắn xóa ảnh chụp nhanh này không?</string>
+  <string name="dialog_title_confirm_to_delete">Xóa ảnh chụp nhanh này?</string>
   <string name="btn_keep">Giữ</string>
   <string name="btn_drop">loại bỏ</string>
   <string name="dialog_title_compare_diff_apk">Chú ý</string>

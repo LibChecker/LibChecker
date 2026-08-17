@@ -232,13 +232,13 @@
   <string name="snapshot_build_id">Yapı ID\'si</string>
   <string name="snapshot_build_security_patch">Güvenlik yaması</string>
   <!--  Dialog  -->
-  <string name="dialog_title_reload_apps">Tüm uygulamaları yeniden yüklemek istediğinizden emin misiniz?</string>
+  <string name="dialog_title_reload_apps">Tüm uygulamalar yeniden yüklensin mi?</string>
   <string name="dialog_subtitle_reload_apps">Bu işlem birkaç saniye sürebilir</string>
   <string name="dialog_title_change_timestamp">Zaman düğümünü değiştir</string>
   <string name="dialog_title_keep_previous_snapshot">Dikkat</string>
   <string name="dialog_message_keep_previous_snapshot">Önceki anlık görüntüyü saklamak istiyor musunuz?</string>
   <string name="dialog_title_select_to_delete">Anlık görüntüyü silmek için bir tarih seçin</string>
-  <string name="dialog_title_confirm_to_delete">Bu anlık görüntüyü silmek istediğinizden emin misiniz?</string>
+  <string name="dialog_title_confirm_to_delete">Bu anlık görüntü silinsin mi?</string>
   <string name="btn_keep">Sakla</string>
   <string name="btn_drop">At</string>
   <string name="dialog_title_compare_diff_apk">Dikkat</string>
