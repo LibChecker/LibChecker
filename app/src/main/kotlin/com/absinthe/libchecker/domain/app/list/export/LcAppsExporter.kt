@@ -23,6 +23,7 @@ import com.absinthe.libchecker.domain.app.detail.model.KotlinToolingMetadata
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.OsUtils
+import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.apk.ApkSignatureSchemeDetector
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPackageSize
@@ -458,7 +459,8 @@ object LcAppsExporter {
           kotlinDetected = kotlinInfo.kotlinVersion != null ||
             zip.getEntry("kotlin/kotlin.kotlin_builtins") != null ||
             zip.getEntry("META-INF/services/kotlinx.coroutines.CoroutineExceptionHandler") != null ||
-            zip.getEntry("META-INF/services/kotlinx.coroutines.internal.MainDispatcherFactory") != null,
+            zip.getEntry("META-INF/services/kotlinx.coroutines.internal.MainDispatcherFactory") != null ||
+            PackageUtils.hasKotlinRuntimeEvidenceInClassDex(zip),
           kotlinVersion = kotlinInfo.kotlinVersion,
           gradleVersion = kotlinInfo.gradleVersion,
           composeDetected = composeDetected,

@@ -3,6 +3,8 @@ package com.absinthe.libchecker.utils.dex
 import com.android.tools.smali.dexlib2.Opcodes
 import com.android.tools.smali.dexlib2.immutable.ImmutableClassDef
 import com.android.tools.smali.dexlib2.immutable.ImmutableDexFile
+import com.android.tools.smali.dexlib2.immutable.ImmutableField
+import com.android.tools.smali.dexlib2.immutable.value.ImmutableStringEncodedValue
 import com.android.tools.smali.dexlib2.writer.pool.DexPool
 import java.io.ByteArrayInputStream
 import java.io.FilterInputStream
@@ -89,6 +91,81 @@ class StreamingDexClassScannerTest {
   }
 
   @Test
+  fun findsExactStringEvidenceWithoutTreatingItAsDefinedClasses() {
+    val dex = createDex(classWithStringConstants(KOTLIN_RUNTIME_MARKERS))
+
+    val definedClasses = StreamingDexClassScanner.findClasses(
+      dex.inputStream(),
+      listOf("Lkotlin/*", "Lkotlinx/*"),
+      hasAny = true,
+      entrySize = dex.size.toLong()
+    )
+    val foundStrings = StreamingDexClassScanner.findStrings(
+      dex.inputStream(),
+      KOTLIN_RUNTIME_MARKERS + "kotlin.decoy.Missing",
+      stopAfterMatches = KOTLIN_RUNTIME_MARKERS.size,
+      entrySize = dex.size.toLong()
+    )
+
+    assertTrue(definedClasses.isEmpty())
+    assertEquals(KOTLIN_RUNTIME_MARKERS, foundStrings)
+  }
+
+  @Test
+  fun requiresTwoIndependentRuntimeMarkersForKotlinFallback() {
+    val singleMarkerDex = createDex(classWithStringConstants(KOTLIN_RUNTIME_MARKERS.take(1)))
+    val twoMarkerDex = createDex(classWithStringConstants(KOTLIN_RUNTIME_MARKERS))
+
+    val singleMarkerMatches = StreamingDexClassScanner.findStrings(
+      singleMarkerDex.inputStream(),
+      KOTLIN_RUNTIME_MARKERS,
+      stopAfterMatches = KOTLIN_RUNTIME_MARKERS.size,
+      entrySize = singleMarkerDex.size.toLong()
+    )
+    val twoMarkerMatches = StreamingDexClassScanner.findStrings(
+      twoMarkerDex.inputStream(),
+      KOTLIN_RUNTIME_MARKERS,
+      stopAfterMatches = KOTLIN_RUNTIME_MARKERS.size,
+      entrySize = twoMarkerDex.size.toLong()
+    )
+
+    assertTrue(singleMarkerMatches.size < KOTLIN_RUNTIME_MARKERS.size)
+    assertEquals(KOTLIN_RUNTIME_MARKERS.size, twoMarkerMatches.size)
+  }
+
+  @Test
+  fun findsMarkersAfterAnOversizedNonmatchingString() {
+    val dex = createDex(
+      classWithStringConstants(
+        listOf("a".repeat(MAX_DESCRIPTOR_BYTES + 1)) + KOTLIN_RUNTIME_MARKERS
+      )
+    )
+
+    val foundStrings = StreamingDexClassScanner.findStrings(
+      dex.inputStream(),
+      KOTLIN_RUNTIME_MARKERS,
+      stopAfterMatches = KOTLIN_RUNTIME_MARKERS.size,
+      entrySize = dex.size.toLong()
+    )
+
+    assertEquals(KOTLIN_RUNTIME_MARKERS, foundStrings)
+  }
+
+  @Test
+  fun findsNonAsciiExactStringEvidence() {
+    val marker = "协程"
+    val dex = createDex(classWithStringConstants(listOf(marker)))
+
+    val foundStrings = StreamingDexClassScanner.findStrings(
+      dex.inputStream(),
+      listOf(marker),
+      entrySize = dex.size.toLong()
+    )
+
+    assertEquals(listOf(marker), foundStrings)
+  }
+
+  @Test
   fun findsClassInDexVersion41ContainerHeader() {
     val dex = createDex41("Lcom/example/Container;")
 
@@ -117,12 +194,36 @@ class StreamingDexClassScannerTest {
   }
 
   private fun createDex(vararg classDefs: ImmutableClassDef): ByteArray {
-    val dexFile = temporaryFolder.newFile("classes-${classDefs.contentHashCode()}.dex")
+    val dexFile = temporaryFolder.newFile()
     DexPool.writeTo(
       dexFile.path,
       ImmutableDexFile(Opcodes.getDefault(), classDefs.toList())
     )
     return dexFile.readBytes()
+  }
+
+  private fun classWithStringConstants(values: List<String>): ImmutableClassDef {
+    val fields = values.mapIndexed { index, value ->
+      ImmutableField(
+        "Lcom/example/Obfuscated;",
+        "value$index",
+        "Ljava/lang/String;",
+        STATIC_FINAL_ACCESS_FLAGS,
+        ImmutableStringEncodedValue(value),
+        null,
+        null
+      )
+    }
+    return ImmutableClassDef(
+      "Lcom/example/Obfuscated;",
+      0x1,
+      "Ljava/lang/Object;",
+      null,
+      null,
+      null,
+      fields,
+      null
+    )
   }
 
   private fun createDex41(descriptor: String): ByteArray {
@@ -208,5 +309,11 @@ class StreamingDexClassScannerTest {
     const val ENDIAN_CONSTANT = 0x12345678
     const val UINT_SIZE = 4
     const val CLASS_DEF_ITEM_SIZE = 32
+    const val STATIC_FINAL_ACCESS_FLAGS = 0x18
+    const val MAX_DESCRIPTOR_BYTES = 1024 * 1024
+    val KOTLIN_RUNTIME_MARKERS = listOf(
+      "kotlin.jvm.functions.Function1",
+      "kotlin.coroutines.jvm.internal.BaseContinuationImpl"
+    )
   }
 }

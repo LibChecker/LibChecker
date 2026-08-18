@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets
 import java.util.Arrays
 
 /**
- * Finds defined class descriptors without materializing the complete DEX in the Java heap.
+ * Finds selected class descriptors or exact strings without materializing the complete DEX in the Java heap.
  *
  * DEX identifier tables and class definitions precede their string data. Keeping only those
  * integer tables lets us stream a compressed DEX entry and retain bounded working memory even
@@ -116,6 +116,80 @@ internal object StreamingDexClassScanner {
     return patterns.filterIndexed { index, _ -> found[index] }
   }
 
+  /** Finds exact string constants while retaining only the DEX string offset table in memory. */
+  fun findStrings(
+    inputStream: InputStream,
+    stringPatterns: List<String>,
+    stopAfterMatches: Int = stringPatterns.size,
+    entrySize: Long? = null
+  ): List<String> = findStringMatches(
+    inputStream = inputStream,
+    stringPatterns = stringPatterns,
+    stopAfterMatches = stopAfterMatches,
+    entrySize = entrySize
+  ).matches
+
+  fun findStringMatches(
+    inputStream: InputStream,
+    stringPatterns: List<String>,
+    stopAfterMatches: Int = stringPatterns.size,
+    entrySize: Long? = null,
+    maxScanBytes: Int = Int.MAX_VALUE
+  ): StringMatchResult {
+    if (stringPatterns.isEmpty()) return StringMatchResult(emptyList(), 0)
+
+    val patterns = stringPatterns.distinct()
+    val requiredMatches = stopAfterMatches.coerceIn(1, patterns.size)
+    val found = BooleanArray(patterns.size)
+    val cursor = InputCursor(inputStream)
+    val baseHeader = cursor.readBytes(DEX_HEADER_SIZE)
+    val version = baseHeader.readVersion()
+    val headerSize = if (version == DEX_CONTAINER_VERSION) {
+      DEX_CONTAINER_HEADER_SIZE
+    } else {
+      DEX_HEADER_SIZE
+    }
+    val header = if (headerSize > baseHeader.size) {
+      baseHeader + cursor.readBytes(headerSize - baseHeader.size)
+    } else {
+      baseHeader
+    }
+    validateHeader(header, version, headerSize)
+
+    val fileSize = header.readIntLe(FILE_SIZE_OFFSET)
+    val stringIdsSize = header.readIntLe(STRING_IDS_SIZE_OFFSET)
+    val stringIdsOffset = header.readIntLe(STRING_IDS_OFFSET_OFFSET)
+    val dataLimit = resolveDataLimit(header, version, headerSize, fileSize, entrySize)
+    if (stringIdsSize == 0) return StringMatchResult(emptyList(), cursor.position)
+
+    validateTable(stringIdsSize, stringIdsOffset, UINT_SIZE, headerSize, dataLimit, MAX_STRING_IDS)
+    if (stringIdsSize.toLong() * UINT_SIZE > MAX_INDEX_BYTES) {
+      throw IOException("DEX string identifiers exceed the memory budget")
+    }
+    cursor.setReadLimit(minOf(dataLimit, maxScanBytes))
+
+    cursor.skipTo(stringIdsOffset)
+    val stringDataOffsets = IntArray(stringIdsSize) { cursor.readIntLe() }
+    Arrays.sort(stringDataOffsets)
+    val patternBytes = patterns.map { it.toByteArray(StandardCharsets.UTF_8) }
+    val candidates = BooleanArray(patterns.size)
+    var matchCount = 0
+    var previousOffset = -1
+    for (stringOffset in stringDataOffsets) {
+      if (stringOffset == previousOffset) continue
+      previousOffset = stringOffset
+      if (stringOffset < cursor.position || stringOffset >= dataLimit) {
+        throw IOException("DEX string data offset is invalid")
+      }
+      cursor.skipTo(stringOffset)
+      cursor.readUleb128()
+      matchCount += cursor.matchExactStrings(patternBytes, found, candidates)
+      if (matchCount >= requiredMatches) break
+    }
+
+    return StringMatchResult(patterns.filterIndexed { index, _ -> found[index] }, cursor.position)
+  }
+
   private fun validateHeader(header: ByteArray, version: Int, expectedHeaderSize: Int) {
     if (
       header.size != expectedHeaderSize ||
@@ -218,14 +292,37 @@ internal object StreamingDexClassScanner {
     }
   }
 
+  data class StringMatchResult(
+    val matches: List<String>,
+    val bytesRead: Int
+  )
+
   private class InputCursor(private val inputStream: InputStream) {
     var position: Int = 0
       private set
+    private var readLimit: Int = Int.MAX_VALUE
+    private val readBuffer = ByteArray(INPUT_BUFFER_SIZE)
+    private var readBufferOffset = 0
+    private var readBufferSize = 0
+
+    fun setReadLimit(limit: Int) {
+      if (limit < position) throw IOException("DEX scan budget is smaller than its header")
+      readLimit = limit
+    }
 
     fun readBytes(count: Int): ByteArray {
+      requireWithinReadLimit(count)
       val result = ByteArray(count)
       var offset = 0
       while (offset < result.size) {
+        val bufferedBytes = (readBufferSize - readBufferOffset).coerceAtMost(result.size - offset)
+        if (bufferedBytes > 0) {
+          readBuffer.copyInto(result, offset, readBufferOffset, readBufferOffset + bufferedBytes)
+          readBufferOffset += bufferedBytes
+          offset += bufferedBytes
+          position += bufferedBytes
+          continue
+        }
         val read = inputStream.read(result, offset, result.size - offset)
         if (read < 0) throw IOException("Unexpected end of DEX")
         if (read == 0) continue
@@ -262,7 +359,7 @@ internal object StreamingDexClassScanner {
         }
         output.write(current)
       }
-      throw IOException("DEX class descriptor is too long")
+      throw IOException("DEX string is too long")
     }
 
     fun skipTo(targetPosition: Int) {
@@ -273,7 +370,14 @@ internal object StreamingDexClassScanner {
     }
 
     fun skip(count: Int) {
+      requireWithinReadLimit(count)
       var remaining = count
+      val bufferedBytes = (readBufferSize - readBufferOffset).coerceAtMost(remaining)
+      if (bufferedBytes > 0) {
+        readBufferOffset += bufferedBytes
+        remaining -= bufferedBytes
+        position += bufferedBytes
+      }
       while (remaining > 0) {
         val skipped = inputStream.skip(remaining.toLong()).coerceAtMost(remaining.toLong()).toInt()
         if (skipped > 0) {
@@ -287,10 +391,61 @@ internal object StreamingDexClassScanner {
     }
 
     private fun readByte(): Int {
-      val value = inputStream.read()
-      if (value < 0) throw IOException("Unexpected end of DEX")
+      requireWithinReadLimit(1)
+      if (readBufferOffset == readBufferSize) {
+        do {
+          readBufferSize = inputStream.read(readBuffer)
+        } while (readBufferSize == 0)
+        if (readBufferSize < 0) throw IOException("Unexpected end of DEX")
+        readBufferOffset = 0
+      }
+      val value = readBuffer[readBufferOffset++].toInt() and 0xff
       position++
       return value
+    }
+
+    fun matchExactStrings(
+      patterns: List<ByteArray>,
+      found: BooleanArray,
+      candidates: BooleanArray
+    ): Int {
+      var activeCandidates = 0
+      patterns.indices.forEach { index ->
+        candidates[index] = !found[index]
+        if (candidates[index]) activeCandidates++
+      }
+      var stringLength = 0
+      while (true) {
+        val current = readByte()
+        if (current == 0) break
+        if (activeCandidates > 0) {
+          patterns.indices.forEach { index ->
+            if (
+              candidates[index] &&
+              (stringLength >= patterns[index].size || current != (patterns[index][stringLength].toInt() and 0xff))
+            ) {
+              candidates[index] = false
+              activeCandidates--
+            }
+          }
+        }
+        stringLength++
+      }
+
+      var newMatches = 0
+      patterns.indices.forEach { index ->
+        if (candidates[index] && stringLength == patterns[index].size) {
+          found[index] = true
+          newMatches++
+        }
+      }
+      return newMatches
+    }
+
+    private fun requireWithinReadLimit(count: Int) {
+      if (count < 0 || position.toLong() + count > readLimit) {
+        throw IOException("DEX scan exceeds its read budget")
+      }
     }
   }
 
@@ -316,5 +471,6 @@ internal object StreamingDexClassScanner {
   private const val MAX_INDEX_BYTES = 36L * 1024 * 1024
   private const val MAX_ULEB128_BYTES = 5
   private const val MAX_DESCRIPTOR_BYTES = 1024 * 1024
+  private const val INPUT_BUFFER_SIZE = 8 * 1024
   private val SUPPORTED_DEX_VERSIONS = setOf(35, 37, 38, 39, 40, 41)
 }

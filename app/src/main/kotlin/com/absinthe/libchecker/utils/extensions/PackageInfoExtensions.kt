@@ -172,12 +172,17 @@ fun PackageInfo.isSplitsApk(): Boolean {
 }
 
 private fun isKotlinUsed(zipFile: ZipFileCompat, file: File, foundClasses: List<String>? = null): Boolean {
-  return zipFile.getEntry("kotlin-tooling-metadata.json") != null ||
+  if (
+    zipFile.getEntry("kotlin-tooling-metadata.json") != null ||
     zipFile.getEntry("kotlin/kotlin.kotlin_builtins") != null ||
     zipFile.getEntry("META-INF/services/kotlinx.coroutines.CoroutineExceptionHandler") != null ||
-    zipFile.getEntry("META-INF/services/kotlinx.coroutines.internal.MainDispatcherFactory") != null ||
-    foundClasses?.any { it == KOTLIN_CLASS_PATTERN || it == KOTLINX_CLASS_PATTERN } == true ||
-    (foundClasses == null && PackageUtils.isKotlinUsedInClassDex(file))
+    zipFile.getEntry("META-INF/services/kotlinx.coroutines.internal.MainDispatcherFactory") != null
+  ) {
+    return true
+  }
+  if (foundClasses == null) return PackageUtils.isKotlinUsedInClassDex(file)
+  return foundClasses.any { it == KOTLIN_CLASS_PATTERN || it == KOTLINX_CLASS_PATTERN } ||
+    PackageUtils.hasKotlinRuntimeEvidenceInClassDex(zipFile)
 }
 
 private const val AGP_KEYWORD = "androidGradlePluginVersion"

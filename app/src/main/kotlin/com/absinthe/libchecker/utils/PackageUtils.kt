@@ -598,7 +598,42 @@ object PackageUtils {
       file,
       listOf("kotlin.*".toClassDefType(), "kotlinx.*".toClassDefType()),
       hasAny = true
-    ).isNotEmpty()
+    ).isNotEmpty() || hasKotlinRuntimeEvidenceInClassDex(file)
+  }
+
+  /** Detects Kotlin runtime traces that remain after R8 renames and repackages class definitions. */
+  internal fun hasKotlinRuntimeEvidenceInClassDex(file: File): Boolean {
+    return runCatching {
+      ZipFileCompat(file).use(::hasKotlinRuntimeEvidenceInClassDex)
+    }.getOrDefault(false)
+  }
+
+  internal fun hasKotlinRuntimeEvidenceInClassDex(zipFile: IZipFile): Boolean {
+    val foundMarkers = linkedSetOf<String>()
+    var remainingScanBytes = MAX_KOTLIN_RUNTIME_SCAN_BYTES
+    return runCatching {
+      zipFile.getZipEntries().asSequence()
+        .filter { it.name.matches(DEX_ENTRY_REGEX) }
+        .forEach { entry ->
+          if (remainingScanBytes <= 0) return@runCatching false
+          val remainingMarkers = KOTLIN_RUNTIME_STRING_MARKERS.filterNot(foundMarkers::contains)
+          val scanResult = zipFile.getInputStream(entry).use { inputStream ->
+            StreamingDexClassScanner.findStringMatches(
+              inputStream = inputStream,
+              stringPatterns = remainingMarkers,
+              stopAfterMatches = KOTLIN_RUNTIME_STRING_THRESHOLD - foundMarkers.size,
+              entrySize = entry.size.takeIf { it >= 0 },
+              maxScanBytes = remainingScanBytes
+            )
+          }
+          remainingScanBytes -= scanResult.bytesRead
+          foundMarkers += scanResult.matches
+          if (foundMarkers.size >= KOTLIN_RUNTIME_STRING_THRESHOLD) {
+            return@runCatching true
+          }
+        }
+      false
+    }.getOrDefault(false)
   }
 
   /**
@@ -1097,6 +1132,14 @@ object PackageUtils {
   }
 
   private val DEX_ENTRY_REGEX = Regex("^classes(\\d*)\\.dex$")
+  private const val KOTLIN_RUNTIME_STRING_THRESHOLD = 2
+  private const val MAX_KOTLIN_RUNTIME_SCAN_BYTES = 32 * 1024 * 1024
+  private val KOTLIN_RUNTIME_STRING_MARKERS = listOf(
+    "kotlin.jvm.functions.Function1",
+    "kotlin.coroutines.jvm.internal.BaseContinuationImpl",
+    "kotlinx.coroutines.internal.StackTraceRecoveryKt",
+    "COROUTINE_SUSPENDED"
+  )
 
   /**
    * Get permissions of an application
