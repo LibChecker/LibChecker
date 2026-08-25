@@ -22,7 +22,7 @@ zhaobozhen = "1.1.8"
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 android-test = { id = "com.android.test", version.ref = "agp" }
-firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.7" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.8" }
 gms = { id = "com.google.gms.google-services", version = "4.5.0" }
 hiddenApiRefine = { id = "dev.rikka.tools.refine", version.ref = "hiddenApiRefine" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
