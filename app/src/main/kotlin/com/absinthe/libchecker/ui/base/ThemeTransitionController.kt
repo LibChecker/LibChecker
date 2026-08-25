@@ -37,19 +37,32 @@ object ThemeTransitionController {
       onWindowHidden = onWindowHidden
     )
 
-    decorView.animate().cancel()
-    decorView.animate()
-      .alpha(0f)
-      .setDuration(EXIT_DURATION_MS)
-      .setInterpolator(TRANSITION_INTERPOLATOR)
-      .withEndAction {
-        completePendingChange(
-          activity = activity,
-          expectedRequestId = currentRequestId,
-          canAnimateCurrentWindow = true
+    animateOut(decorView) {
+      completePendingChange(
+        activity = activity,
+        expectedRequestId = currentRequestId,
+        canAnimateCurrentWindow = true
+      )
+    }
+  }
+
+  fun recreateWithTransition(
+    activity: AppCompatActivity,
+    onWindowHidden: () -> Unit = {}
+  ) {
+    requestId += 1
+    val currentRequestId = requestId
+    val decorView = activity.window.decorView
+    animateOut(decorView) {
+      if (!activity.isFinishing && !activity.isDestroyed) {
+        onWindowHidden()
+        pendingEnter = PendingEnter(
+          activityClassName = activity.javaClass.name,
+          requestId = currentRequestId
         )
+        activity.recreate()
       }
-      .start()
+    }
   }
 
   fun onActivityDestroyed(activity: AppCompatActivity) {
@@ -128,6 +141,16 @@ object ThemeTransitionController {
       .alpha(1f)
       .setDuration(ENTER_DURATION_MS)
       .setInterpolator(TRANSITION_INTERPOLATOR)
+      .start()
+  }
+
+  private fun animateOut(view: View, onHidden: () -> Unit) {
+    view.animate().cancel()
+    view.animate()
+      .alpha(0f)
+      .setDuration(EXIT_DURATION_MS)
+      .setInterpolator(TRANSITION_INTERPOLATOR)
+      .withEndAction(onHidden)
       .start()
   }
 

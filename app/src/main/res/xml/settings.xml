@@ -30,6 +30,13 @@
       app:title="@string/colorful_icon" />
 
     <androidx.preference.SwitchPreferenceCompat
+      app:defaultValue="false"
+      app:icon="@drawable/ic_blur"
+      app:key="blurDesign"
+      app:summary="@string/blur_design_summary"
+      app:title="@string/blur_design" />
+
+    <androidx.preference.SwitchPreferenceCompat
       app:defaultValue="true"
       app:icon="@drawable/ic_apk_analytics"
       app:key="apkAnalytics"

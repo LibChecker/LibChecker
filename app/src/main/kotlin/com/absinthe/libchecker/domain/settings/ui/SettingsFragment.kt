@@ -128,6 +128,23 @@ class SettingsFragment :
         true
       }
     }
+    findPreference<TwoStatePreference>(Constants.PREF_BLUR_DESIGN)?.apply {
+      isVisible = OsUtils.atLeastT()
+      setOnPreferenceChangeListener { preference, newValue ->
+        val enabled = newValue as Boolean
+        val blurPreference = preference as TwoStatePreference
+        GlobalValues.isBlurDesign = enabled
+        val hostActivity = activity
+        if (hostActivity is AppCompatActivity) {
+          ThemeTransitionController.recreateWithTransition(hostActivity)
+        } else {
+          blurPreference.isChecked = enabled
+          (hostActivity as? IAppBarContainer)?.setBlurDesignEnabled(enabled)
+        }
+        recordPreferenceEvent(Constants.PREF_BLUR_DESIGN, enabled)
+        false
+      }
+    }
     findPreference<ListPreference>(Constants.PREF_RULES_REPO)?.apply {
       summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
       setOnPreferenceChangeListener { _, newValue ->
@@ -598,6 +615,7 @@ class SettingsFragment :
     recyclerView.fixEdgeEffect()
     recyclerView.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
     recyclerView.isVerticalScrollBarEnabled = false
+    (activity as? IAppBarContainer)?.prepareAppbarContentInset(recyclerView)
     recyclerView.applySettingsBottomPadding()
 
     val lp = recyclerView.layoutParams
@@ -631,7 +649,10 @@ class SettingsFragment :
   }
 
   private fun scheduleAppbarRaisingStatus(isLifted: Boolean) {
-    (activity as? IAppBarContainer)?.scheduleAppbarLiftingStatus(isLifted)
+    val host = activity as? IListControllerHost ?: return
+    if (host.isCurrentListController(this)) {
+      (activity as? IAppBarContainer)?.scheduleAppbarLiftingStatus(isLifted)
+    }
   }
 
   override fun onDetach() {

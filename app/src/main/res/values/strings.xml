@@ -418,4 +418,6 @@
   <string name="library_insight_unavailable">Version details unavailable · Tap to retry</string>
   <string name="library_insight_show_details">More details</string>
   <string name="library_insight_hide_details">Fewer details</string>
+  <string name="blur_design">Blur design</string>
+  <string name="blur_design_summary">Provides more blur effects throughout the interface</string>
 </resources>

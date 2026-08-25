@@ -105,6 +105,7 @@
   <string name="pref_group_about">关于与支持</string>
   <string name="apk_analytics">APK 分析</string>
   <string name="colorful_icon">多彩图标</string>
+  <string name="blur_design">模糊设计</string>
   <string name="rules_repo_title">规则仓库</string>
   <string name="lib_ref_threshold">库引用阈值</string>
   <string name="languages">语言</string>
@@ -119,6 +120,7 @@
   <string name="export_apps">导出应用信息</string>
   <string name="apk_analytics_summary">当点击一个 APK 文件时打开详情页</string>
   <string name="colorful_icon_summary">部分标记库会呈现为彩色 Logo</string>
+  <string name="blur_design_summary">为界面提供更多的模糊效果</string>
   <string name="lib_ref_threshold_summary">只有库引用数量达到阈值的库才显示在列表中</string>
   <string name="reload_apps_summary">当应用列表显示不正常时尝试此选项</string>
   <string name="export_log_summary">导出应用的日志文件</string>
