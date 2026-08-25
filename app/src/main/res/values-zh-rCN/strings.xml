@@ -99,6 +99,7 @@
   <string name="library_declaration">LibChecker 中的所有标记库信息均来自其所属的 SDK 的开发文档或代码仓库，如果信息有有误，请联系：absinthe@absinthe.life</string>
   <!--  Settings  -->
   <string name="pref_group_normal">常规</string>
+  <string name="pref_group_appearance">界面</string>
   <string name="pref_group_others">其它</string>
   <string name="pref_group_rules">规则与网络</string>
   <string name="pref_group_data">数据与工具</string>
@@ -115,11 +116,13 @@
   <string name="anonymous_statistics">匿名统计</string>
   <string name="cloud_rules">云端规则</string>
   <string name="dark_mode">深色模式</string>
+  <string name="amoled_theme">纯黑主题</string>
   <string name="snapshot_keep">快照默认保留规则</string>
   <string name="export_log">导出日志</string>
   <string name="export_apps">导出应用信息</string>
   <string name="apk_analytics_summary">当点击一个 APK 文件时打开详情页</string>
   <string name="colorful_icon_summary">部分标记库会呈现为彩色 Logo</string>
+  <string name="amoled_theme_summary">在深色模式下使用纯黑背景</string>
   <string name="blur_design_summary">为界面提供更多的模糊效果</string>
   <string name="lib_ref_threshold_summary">只有库引用数量达到阈值的库才显示在列表中</string>
   <string name="reload_apps_summary">当应用列表显示不正常时尝试此选项</string>

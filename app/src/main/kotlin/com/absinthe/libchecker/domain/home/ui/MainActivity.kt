@@ -25,6 +25,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.R
@@ -80,6 +81,14 @@ class MainActivity :
   private var listController: IListController? = null
   private val initialListTopPaddings = WeakHashMap<View, Int>()
   private var blurContainer: BlurCoordinatorLayout? = null
+  private var appbarScrollTarget: RecyclerView? = null
+  private val appbarLocation = IntArray(2)
+  private val firstListItemLocation = IntArray(2)
+  private val appbarScrollListener = object : RecyclerView.OnScrollListener() {
+    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+      updateAppbarContentUnderlap()
+    }
+  }
 
   @Suppress("DEPRECATION")
   private val navViewBehavior by lazy { InvalidatingHideBottomViewOnScrollBehavior() }
@@ -125,6 +134,8 @@ class MainActivity :
   }
 
   override fun onDestroy() {
+    appbarScrollTarget?.removeOnScrollListener(appbarScrollListener)
+    appbarScrollTarget = null
     super.onDestroy()
     unbindService(workerServiceConnection)
   }
@@ -217,7 +228,7 @@ class MainActivity :
 
   override fun scheduleAppbarLiftingStatus(isLifted: Boolean) {
     // Blur mode draws its own progressive-glass appbar; the lifted surface would paint over it.
-    blurContainer?.setAppbarContentUnderlap(isLifted)
+    updateAppbarContentUnderlap()
     if (blurContainer?.blurEnabled != true) {
       binding.appbar.isLifted = isLifted
     }
@@ -225,10 +236,9 @@ class MainActivity :
 
   override fun setBlurDesignEnabled(enabled: Boolean) {
     val appbarInset = resolveCurrentAppbarInset()
-    val contentUnderlapsAppbar = binding.appbar.isLifted
     val container = if (enabled) installBlurContainer() else blurContainer
     if (enabled) {
-      container?.setAppbarContentUnderlap(contentUnderlapsAppbar)
+      container?.setAppbarContentUnderlap(isListItemUnderAppbar())
     }
     container?.setBlurEnabled(enabled)
     if (!enabled && container != null) {
@@ -269,6 +279,28 @@ class MainActivity :
 
   override fun setLiftOnScrollTargetView(targetView: View) {
     binding.appbar.setLiftOnScrollTargetView(targetView)
+    val recyclerView = targetView as? RecyclerView
+    if (appbarScrollTarget !== recyclerView) {
+      appbarScrollTarget?.removeOnScrollListener(appbarScrollListener)
+      appbarScrollTarget = recyclerView
+      recyclerView?.addOnScrollListener(appbarScrollListener)
+    }
+    targetView.doOnLayout { updateAppbarContentUnderlap() }
+    updateAppbarContentUnderlap()
+  }
+
+  private fun updateAppbarContentUnderlap() {
+    blurContainer?.setAppbarContentUnderlap(isListItemUnderAppbar())
+  }
+
+  private fun isListItemUnderAppbar(): Boolean {
+    val firstListItem = appbarScrollTarget?.getChildAt(0) ?: return false
+    binding.appbar.getLocationOnScreen(appbarLocation)
+    firstListItem.getLocationOnScreen(firstListItemLocation)
+    return isListItemUnderAppbar(
+      appbarBottom = appbarLocation[1] + binding.appbar.height,
+      firstListItemTop = firstListItemLocation[1]
+    )
   }
 
   override fun prepareAppbarContentInset(targetView: View) {
@@ -564,4 +596,8 @@ internal fun resolveHomeListAppbarInset(
   } else {
     actionBarHeight.coerceAtLeast(0) + systemBarTopInset.coerceAtLeast(0)
   }
+}
+
+internal fun isListItemUnderAppbar(appbarBottom: Int, firstListItemTop: Int?): Boolean {
+  return appbarBottom > 0 && firstListItemTop != null && firstListItemTop < appbarBottom
 }

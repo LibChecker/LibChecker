@@ -3,6 +3,7 @@
   <attr name="bottomSheetHeaderHandlerColor" format="color" />
   <attr name="bottomSheetHeaderHandlerColorActivated" format="color" />
   <attr name="checkableChipViewStyle" format="reference"/>
+  <attr name="settingsPreferenceCardColor" format="color" />
   <attr name="state_raised" format="boolean" />
 
   <declare-styleable name="CheckableChipView">

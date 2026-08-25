@@ -182,14 +182,24 @@ internal class WindowBlurCompatController(
       } else {
         state.requests.remove(owner)
       }
-      scheduleLargestRadius(hostView, state)
+      applyOrScheduleLargestRadius(hostView, state)
     }
 
     fun remove(hostView: ViewGroup?, owner: WindowBlurCompatController) {
       if (hostView == null) return
       val state = states[hostView] ?: return
       state.requests.remove(owner)
-      scheduleLargestRadius(hostView, state)
+      applyOrScheduleLargestRadius(hostView, state)
+    }
+
+    private fun applyOrScheduleLargestRadius(hostView: ViewGroup, state: HostBlurState) {
+      val radius = state.requests.values.maxOrNull() ?: 0f
+      if (shouldApplyHostBlurImmediately(state.blurEffect.hasOverlay, radius)) {
+        state.isUpdateScheduled = false
+        applyLargestRadius(hostView, state)
+      } else {
+        scheduleLargestRadius(hostView, state)
+      }
     }
 
     private fun scheduleLargestRadius(hostView: ViewGroup, state: HostBlurState) {
@@ -221,6 +231,9 @@ internal class WindowBlurCompatController(
     private class HostViewBlurEffect {
       private var appliedRadius = Float.NaN
       private var overlay: SnapshotBlurOverlay? = null
+
+      val hasOverlay: Boolean
+        get() = overlay != null
 
       fun applyRadius(hostView: ViewGroup, radius: Float) {
         if (abs(appliedRadius - radius) < MIN_EFFECT_RADIUS_DELTA) return
@@ -368,7 +381,9 @@ internal fun inheritedBlurStartRadius(
   }
 }
 
-internal fun fixedSharpLayerAlpha(radius: Float): Float = (radius / FIXED_BLUR_RADII.first()).coerceIn(0f, 1f)
+internal fun shouldApplyHostBlurImmediately(hasOverlay: Boolean, radius: Float): Boolean = (radius > 0f) != hasOverlay
+
+internal fun fixedSharpLayerAlpha(radius: Float): Float = 0f
 
 internal fun fixedBlurLayerAlphas(radius: Float): FloatArray {
   val clampedRadius = radius.coerceAtLeast(0f)

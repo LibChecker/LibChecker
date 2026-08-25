@@ -6,7 +6,7 @@
   android:layout_marginTop="@dimen/settings_preference_card_spacing"
   android:layout_marginBottom="@dimen/settings_preference_card_spacing"
   android:foreground="?attr/selectableItemBackground"
-  app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
+  app:cardBackgroundColor="?attr/settingsPreferenceCardColor"
   app:cardCornerRadius="@dimen/settings_preference_inner_corner_radius"
   app:cardElevation="0dp"
   app:strokeWidth="0dp">

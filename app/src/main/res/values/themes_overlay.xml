@@ -1,5 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-  <style name="ThemeOverlay" />
+  <style name="ThemeOverlay">
+    <item name="settingsPreferenceCardColor">?attr/colorSurfaceContainerHigh</item>
+  </style>
+
+  <style name="ThemeOverlay.Amoled" parent="ThemeOverlay">
+    <item name="android:colorBackground">@android:color/black</item>
+    <item name="android:colorBackgroundFloating">@android:color/black</item>
+    <item name="android:windowBackground">@android:color/black</item>
+    <item name="colorSurface">@android:color/black</item>
+    <item name="colorSurfaceBright">@android:color/black</item>
+    <item name="colorSurfaceDim">@android:color/black</item>
+    <item name="colorSurfaceContainer">@android:color/black</item>
+    <item name="colorSurfaceContainerHigh">@android:color/black</item>
+    <item name="colorSurfaceContainerHighest">@android:color/black</item>
+    <item name="colorSurfaceContainerLow">@android:color/black</item>
+    <item name="colorSurfaceContainerLowest">@android:color/black</item>
+    <item name="colorSurfaceVariant">@android:color/black</item>
+    <item name="settingsPreferenceCardColor">@color/md_theme_libchecker_dark_surfaceContainerLow</item>
+  </style>
 </resources>

@@ -106,6 +106,7 @@
 
   <!--  Settings  -->
   <string name="pref_group_normal">Normal</string>
+  <string name="pref_group_appearance">Appearance</string>
   <string name="pref_group_others">Others</string>
   <string name="pref_group_rules">Rules and network</string>
   <string name="pref_group_data">Data and tools</string>
@@ -122,12 +123,14 @@
   <string name="anonymous_statistics">Anonymous statistics</string>
   <string name="cloud_rules">Cloud rules</string>
   <string name="dark_mode">Dark mode</string>
+  <string name="amoled_theme">Pure black theme</string>
   <string name="snapshot_keep">Snapshot keep rule</string>
   <string name="export_log">Export log</string>
   <string name="export_apps">Export app info</string>
 
   <string name="apk_analytics_summary">Open the details page when clicking an APK file</string>
   <string name="colorful_icon_summary">Some marked libraries will have a colored logo</string>
+  <string name="amoled_theme_summary">Use pure black surfaces in dark mode</string>
   <string name="lib_ref_threshold_summary">Only libraries with the number of library references reaching the threshold are displayed in the list</string>
   <string name="reload_apps_summary">Recommended to use when the app list is shown abnormally</string>
   <string name="export_log_summary">Export the log file of the app</string>

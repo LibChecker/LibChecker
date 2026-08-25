@@ -94,7 +94,10 @@ abstract class BaseActivity<VB : ViewBinding> :
   }
 
   open fun onApplyUserThemeResource(theme: Resources.Theme, isDecorView: Boolean) {
-    theme.applyStyle(R.style.ThemeOverlay, true)
+    theme.applyStyle(
+      resolveUserThemeOverlay(GlobalValues.isAmoledTheme, resources.configuration.uiMode),
+      true
+    )
   }
 
   protected fun isBindingInitialized(): Boolean {
@@ -112,6 +115,15 @@ abstract class BaseActivity<VB : ViewBinding> :
     }.onFailure {
       Timber.w(it)
     }
+  }
+}
+
+internal fun resolveUserThemeOverlay(isAmoledThemeEnabled: Boolean, uiMode: Int): Int {
+  val isNightMode = uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+  return if (isAmoledThemeEnabled && isNightMode) {
+    R.style.ThemeOverlay_Amoled
+  } else {
+    R.style.ThemeOverlay
   }
 }
 

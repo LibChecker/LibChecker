@@ -2,6 +2,7 @@ package com.absinthe.libchecker.ui.base
 
 import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatDelegate
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -39,5 +40,28 @@ class ThemeTransitionControllerTest {
         nightMode = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
       )
     )
+  }
+
+  @Test
+  fun `recreate setting change waits for the frozen frame`() {
+    val events = mutableListOf<String>()
+    val transition = FrozenFrameTransitionState()
+
+    assertTrue(transition.begin())
+    assertTrue(events.isEmpty())
+
+    transition.onFrameReady {
+      events += "setting changed"
+    }
+
+    assertEquals(listOf("setting changed"), events)
+  }
+
+  @Test
+  fun `recreate transition rejects another request while active`() {
+    val transition = FrozenFrameTransitionState()
+
+    assertTrue(transition.begin())
+    assertFalse(transition.begin())
   }
 }
