@@ -15,7 +15,7 @@ import android.graphics.Shader
 import android.os.Build
 import android.util.AttributeSet
 import android.view.View
-import android.view.animation.DecelerateInterpolator
+import android.view.animation.LinearInterpolator
 import androidx.annotation.RequiresApi
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.graphics.withClip
@@ -28,6 +28,7 @@ import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.pow
 import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 
 /** Draws a progressive app bar blur and a uniform bottom navigation blur on Android 13+. */
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -57,8 +58,8 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
   private var appbarDarkMaskPaint: Paint? = null
   private var appbarDarkMaskTop = Float.NaN
   private var appbarDarkMaskBottom = Float.NaN
-  private var appbarDarkMaskAnimator: ValueAnimator? = null
-  private var appbarDarkMaskProgress = 0f
+  private var appbarMaskAnimator: ValueAnimator? = null
+  private var appbarMaskProgress = 0f
   private var contentUnderlapsAppbar = false
   private var originalAppbarBackground: android.graphics.drawable.Drawable? = null
   private var originalNavBackground: android.graphics.drawable.Drawable? = null
@@ -88,7 +89,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
   fun setBlurEnabled(enabled: Boolean) {
     if (blurEnabled == enabled) return
     blurEnabled = enabled
-    updateAppbarDarkMask(animate = enabled && isLaidOut)
+    updateAppbarMask(animate = enabled && isLaidOut)
     updateBarScrollFlags()
     updateViewPagerBehavior()
     updateBarBackgrounds()
@@ -98,26 +99,26 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
   fun setAppbarContentUnderlap(underlaps: Boolean) {
     if (contentUnderlapsAppbar == underlaps) return
     contentUnderlapsAppbar = underlaps
-    updateAppbarDarkMask(animate = blurEnabled && isLaidOut)
+    updateAppbarMask(animate = blurEnabled && isLaidOut)
   }
 
-  private fun updateAppbarDarkMask(animate: Boolean) {
-    val target = appbarDarkMaskActivation(
+  private fun updateAppbarMask(animate: Boolean) {
+    val target = appbarMaskActivation(
       blurEnabled = blurEnabled,
       contentUnderlaps = contentUnderlapsAppbar
     )
-    appbarDarkMaskAnimator?.cancel()
-    appbarDarkMaskAnimator = null
-    if (!animate || abs(appbarDarkMaskProgress - target) < 0.001f) {
-      appbarDarkMaskProgress = target
+    appbarMaskAnimator?.cancel()
+    appbarMaskAnimator = null
+    if (!animate || abs(appbarMaskProgress - target) < 0.001f) {
+      appbarMaskProgress = target
       invalidate()
       return
     }
-    appbarDarkMaskAnimator = ValueAnimator.ofFloat(appbarDarkMaskProgress, target).apply {
-      duration = APPBAR_DARK_MASK_TRANSITION_DURATION_MS
-      interpolator = DecelerateInterpolator()
+    appbarMaskAnimator = ValueAnimator.ofFloat(appbarMaskProgress, target).apply {
+      duration = appbarMaskTransitionDuration(appbarMaskProgress, target)
+      interpolator = LinearInterpolator()
       addUpdateListener { animator ->
-        appbarDarkMaskProgress = animator.animatedValue as Float
+        appbarMaskProgress = animator.animatedValue as Float
         invalidate()
       }
       start()
@@ -149,7 +150,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
   }
 
   override fun dispatchDraw(canvas: Canvas) {
-    if (!blurEnabled) {
+    if (!shouldUseRenderNodeBlur(blurEnabled, canvas.isHardwareAccelerated)) {
       super.dispatchDraw(canvas)
       return
     }
@@ -403,7 +404,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
   }
 
   private fun drawAppbarSurfaceTint(canvas: Canvas, top: Float, bottom: Float) {
-    if (bottom <= top) return
+    if (bottom <= top || appbarMaskProgress <= 0f) return
     val tintColor = surfaceColor
     val paint = appbarTintPaint ?: Paint(Paint.ANTI_ALIAS_FLAG).also { appbarTintPaint = it }
     if (
@@ -432,12 +433,13 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
       appbarTintBottom = bottom
       appbarTintSurfaceColor = tintColor
     }
+    paint.alpha = (appbarMaskProgress * 255f).roundToInt()
     paint.blendMode = BlendMode.SRC_OVER
     canvas.drawRect(0f, top, width.toFloat(), bottom, paint)
   }
 
   private fun drawAppbarDarkMask(canvas: Canvas, top: Float, bottom: Float) {
-    if (bottom <= top || appbarDarkMaskProgress <= 0f) return
+    if (bottom <= top || appbarMaskProgress <= 0f) return
     val paint = appbarDarkMaskPaint ?: Paint(Paint.ANTI_ALIAS_FLAG).also {
       appbarDarkMaskPaint = it
     }
@@ -462,7 +464,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
       appbarDarkMaskTop = top
       appbarDarkMaskBottom = bottom
     }
-    paint.alpha = (appbarDarkMaskProgress * 255f).roundToInt()
+    paint.alpha = (appbarMaskProgress * 255f).roundToInt()
     paint.blendMode = BlendMode.SRC_OVER
     canvas.drawRect(0f, top, width.toFloat(), bottom, paint)
   }
@@ -644,8 +646,8 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
 
   override fun onDetachedFromWindow() {
     super.onDetachedFromWindow()
-    appbarDarkMaskAnimator?.cancel()
-    appbarDarkMaskAnimator = null
+    appbarMaskAnimator?.cancel()
+    appbarMaskAnimator = null
     contentNode = null
     appbarSourceNode = null
     navDownsampleNode = null
@@ -682,7 +684,6 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
     private const val LIGHT_MASK_INDEX = 2
     private const val PROGRESSIVE_MASK_COUNT = 3
     private const val APPBAR_TINT_STOP_COUNT = 9
-    private const val APPBAR_DARK_MASK_TRANSITION_DURATION_MS = 140L
     private const val NAV_TINT_ALPHA = 0x99
     private const val DARK_NAV_TINT_ALPHA = 0xCC
     private const val BASE_FILL_ALPHA_MASK = 0xE6FFFFFFL // 90% opaque base so empty areas still look like glass
@@ -692,6 +693,11 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
 
 internal const val APPBAR_BACKDROP_DOWNSAMPLE = 1
 internal const val NAV_BACKDROP_DOWNSAMPLE = 2
+
+internal fun shouldUseRenderNodeBlur(
+  blurEnabled: Boolean,
+  canvasIsHardwareAccelerated: Boolean
+): Boolean = blurEnabled && canvasIsHardwareAccelerated
 
 internal fun calculateBackdropContentOffset(maxBlurRadius: Float): Int = ceil(maxBlurRadius.coerceAtLeast(0f) * BLUR_KERNEL_SIGMA_OUTSET).toInt()
 
@@ -717,10 +723,15 @@ internal fun progressiveSurfaceTintAlpha(
   return maxAlpha.coerceIn(0f, 1f) * (1f - shapedProgress)
 }
 
-internal fun appbarDarkMaskActivation(
+internal fun appbarMaskActivation(
   blurEnabled: Boolean,
   contentUnderlaps: Boolean
 ): Float = if (blurEnabled && contentUnderlaps) 1f else 0f
+
+internal fun appbarMaskTransitionDuration(
+  start: Float,
+  target: Float
+): Long = (abs(target - start) * APPBAR_MASK_TRANSITION_DURATION_MS).roundToLong().coerceAtLeast(1L)
 
 internal fun progressiveDarkMaskAlpha(
   progress: Float,
@@ -737,6 +748,7 @@ private fun smoothStep(value: Float): Float {
 }
 
 private const val BLUR_KERNEL_SIGMA_OUTSET = 3f
+private const val APPBAR_MASK_TRANSITION_DURATION_MS = 100L
 private const val APPBAR_SURFACE_TINT_ALPHA = 0.3f
 private const val APPBAR_DARK_MASK_ALPHA = 0.12f
 private const val APPBAR_PROGRESSIVE_CURVE = 2.4f

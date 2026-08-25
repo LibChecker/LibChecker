@@ -14,9 +14,9 @@ class WindowBlurCompatControllerTest {
   }
 
   @Test
-  fun sharpLayerFadesIntoLiveContentAtLowRadius() {
+  fun lowRadiusBlurKeepsTheLiveHostAsItsSharpBaseline() {
     assertArrayEquals(
-      floatArrayOf(0f, 0.5f, 1f),
+      floatArrayOf(0f, 0f, 0f),
       floatArrayOf(
         fixedSharpLayerAlpha(0f),
         fixedSharpLayerAlpha(12f),
@@ -37,5 +37,13 @@ class WindowBlurCompatControllerTest {
     assertArrayEquals(floatArrayOf(1f, 0.5f, 0f, 0f), fixedBlurLayerAlphas(36f), 0f)
     assertArrayEquals(floatArrayOf(0f, 0f, 1f, 0f), fixedBlurLayerAlphas(64f), 0f)
     assertArrayEquals(floatArrayOf(0f, 0f, 0f, 1f), fixedBlurLayerAlphas(80f), 0f)
+  }
+
+  @Test
+  fun hostBlurOverlayBoundaryChangesAreAppliedImmediately() {
+    assertEquals(true, shouldApplyHostBlurImmediately(hasOverlay = false, radius = 80f))
+    assertEquals(true, shouldApplyHostBlurImmediately(hasOverlay = true, radius = 0f))
+    assertEquals(false, shouldApplyHostBlurImmediately(hasOverlay = false, radius = 0f))
+    assertEquals(false, shouldApplyHostBlurImmediately(hasOverlay = true, radius = 80f))
   }
 }

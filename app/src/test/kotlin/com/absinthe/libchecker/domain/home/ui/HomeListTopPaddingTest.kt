@@ -44,4 +44,12 @@ class HomeListTopPaddingTest {
       )
     )
   }
+
+  @Test
+  fun maskWaitsUntilARealListItemMovesUnderTheAppbar() {
+    assertEquals(false, isListItemUnderAppbar(appbarBottom = 200, firstListItemTop = null))
+    assertEquals(false, isListItemUnderAppbar(appbarBottom = 200, firstListItemTop = 240))
+    assertEquals(false, isListItemUnderAppbar(appbarBottom = 200, firstListItemTop = 200))
+    assertEquals(true, isListItemUnderAppbar(appbarBottom = 200, firstListItemTop = 199))
+  }
 }

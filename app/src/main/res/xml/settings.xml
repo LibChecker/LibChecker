@@ -6,6 +6,33 @@
     app:key="normalCategory"
     app:title="@string/pref_group_normal">
 
+    <androidx.preference.SwitchPreferenceCompat
+      app:defaultValue="true"
+      app:icon="@drawable/ic_apk_analytics"
+      app:key="apkAnalytics"
+      app:summary="@string/apk_analytics_summary"
+      app:title="@string/apk_analytics" />
+
+    <com.absinthe.libchecker.ui.preference.InlineListPreference
+      app:defaultValue="notify"
+      app:entries="@array/snapshot_keep"
+      app:entryValues="@array/snapshot_keep_value"
+      app:icon="@drawable/ic_outline_save"
+      app:key="snapshotKeep"
+      app:title="@string/snapshot_keep" />
+
+    <Preference
+      app:icon="@drawable/ic_threshold"
+      app:key="libRefThreshold"
+      app:summary="@string/lib_ref_threshold_summary"
+      app:title="@string/lib_ref_threshold" />
+
+  </PreferenceCategory>
+
+  <PreferenceCategory
+    app:key="appearanceCategory"
+    app:title="@string/pref_group_appearance">
+
     <com.absinthe.libchecker.ui.preference.InlineListPreference
       app:defaultValue="system"
       app:entries="@array/list_dark_mode"
@@ -13,6 +40,13 @@
       app:icon="@drawable/ic_theme_system"
       app:key="darkMode"
       app:title="@string/dark_mode" />
+
+    <androidx.preference.SwitchPreferenceCompat
+      app:defaultValue="false"
+      app:icon="@drawable/ic_black_hole"
+      app:key="amoledTheme"
+      app:summary="@string/amoled_theme_summary"
+      app:title="@string/amoled_theme" />
 
     <ListPreference
       app:defaultValue="SYSTEM"
@@ -35,27 +69,6 @@
       app:key="blurDesign"
       app:summary="@string/blur_design_summary"
       app:title="@string/blur_design" />
-
-    <androidx.preference.SwitchPreferenceCompat
-      app:defaultValue="true"
-      app:icon="@drawable/ic_apk_analytics"
-      app:key="apkAnalytics"
-      app:summary="@string/apk_analytics_summary"
-      app:title="@string/apk_analytics" />
-
-    <com.absinthe.libchecker.ui.preference.InlineListPreference
-      app:defaultValue="notify"
-      app:entries="@array/snapshot_keep"
-      app:entryValues="@array/snapshot_keep_value"
-      app:icon="@drawable/ic_outline_save"
-      app:key="snapshotKeep"
-      app:title="@string/snapshot_keep" />
-
-    <Preference
-      app:icon="@drawable/ic_threshold"
-      app:key="libRefThreshold"
-      app:summary="@string/lib_ref_threshold_summary"
-      app:title="@string/lib_ref_threshold" />
 
   </PreferenceCategory>
 

@@ -6,6 +6,22 @@ import org.junit.Test
 class BlurCoordinatorLayoutTest {
 
   @Test
+  fun softwareCanvasDisablesRenderNodeBlurPath() {
+    assertEquals(
+      false,
+      shouldUseRenderNodeBlur(blurEnabled = true, canvasIsHardwareAccelerated = false)
+    )
+    assertEquals(
+      true,
+      shouldUseRenderNodeBlur(blurEnabled = true, canvasIsHardwareAccelerated = true)
+    )
+    assertEquals(
+      false,
+      shouldUseRenderNodeBlur(blurEnabled = false, canvasIsHardwareAccelerated = true)
+    )
+  }
+
+  @Test
   fun appbarBackdropStaysFullResolutionWhileNavRemainsDownsampled() {
     assertEquals(1, APPBAR_BACKDROP_DOWNSAMPLE)
     assertEquals(2, NAV_BACKDROP_DOWNSAMPLE)
@@ -28,10 +44,16 @@ class BlurCoordinatorLayoutTest {
   }
 
   @Test
-  fun appbarDarkMaskOnlyActivatesWhenContentUnderlapsBlur() {
-    assertEquals(0f, appbarDarkMaskActivation(blurEnabled = false, contentUnderlaps = true))
-    assertEquals(0f, appbarDarkMaskActivation(blurEnabled = true, contentUnderlaps = false))
-    assertEquals(1f, appbarDarkMaskActivation(blurEnabled = true, contentUnderlaps = true))
+  fun appbarMasksOnlyActivateWhenContentUnderlapsBlur() {
+    assertEquals(0f, appbarMaskActivation(blurEnabled = false, contentUnderlaps = true))
+    assertEquals(0f, appbarMaskActivation(blurEnabled = true, contentUnderlaps = false))
+    assertEquals(1f, appbarMaskActivation(blurEnabled = true, contentUnderlaps = true))
+  }
+
+  @Test
+  fun appbarMaskTransitionKeepsAConstantFadeSpeedWhenReversed() {
+    assertEquals(100L, appbarMaskTransitionDuration(start = 0f, target = 1f))
+    assertEquals(40L, appbarMaskTransitionDuration(start = 0.7f, target = 0.3f))
   }
 
   @Test

@@ -68,6 +68,7 @@ class SettingsFragment :
 
   private companion object {
     const val STATE_EXPANDED_PREFERENCE_KEY = "expanded_preference_key"
+    const val TOGGLE_TRANSITION_DELAY_MS = 300L
 
     val NAVIGATION_PREFERENCE_KEYS = setOf(
       Constants.PREF_ABOUT,
@@ -128,21 +129,35 @@ class SettingsFragment :
         true
       }
     }
+    findPreference<TwoStatePreference>(Constants.PREF_AMOLED_THEME)?.apply {
+      setOnPreferenceChangeListener { _, newValue ->
+        val enabled = newValue as Boolean
+        val hostActivity = activity
+        GlobalValues.isAmoledTheme = enabled
+        if (hostActivity is AppCompatActivity) {
+          hostActivity.window.decorView.postDelayed({
+            ThemeTransitionController.recreateWithTransition(hostActivity)
+          }, TOGGLE_TRANSITION_DELAY_MS)
+        }
+        recordPreferenceEvent(Constants.PREF_AMOLED_THEME, enabled)
+        true
+      }
+    }
     findPreference<TwoStatePreference>(Constants.PREF_BLUR_DESIGN)?.apply {
       isVisible = OsUtils.atLeastT()
-      setOnPreferenceChangeListener { preference, newValue ->
+      setOnPreferenceChangeListener { _, newValue ->
         val enabled = newValue as Boolean
-        val blurPreference = preference as TwoStatePreference
-        GlobalValues.isBlurDesign = enabled
         val hostActivity = activity
+        GlobalValues.isBlurDesign = enabled
         if (hostActivity is AppCompatActivity) {
-          ThemeTransitionController.recreateWithTransition(hostActivity)
+          hostActivity.window.decorView.postDelayed({
+            ThemeTransitionController.recreateWithTransition(hostActivity)
+          }, TOGGLE_TRANSITION_DELAY_MS)
         } else {
-          blurPreference.isChecked = enabled
           (hostActivity as? IAppBarContainer)?.setBlurDesignEnabled(enabled)
         }
         recordPreferenceEvent(Constants.PREF_BLUR_DESIGN, enabled)
-        false
+        true
       }
     }
     findPreference<ListPreference>(Constants.PREF_RULES_REPO)?.apply {

@@ -69,6 +69,7 @@ object Constants {
   const val PREF_DEBUG_MODE = "debugMode"
 
   const val PREF_DARK_MODE = "darkMode"
+  const val PREF_AMOLED_THEME = "amoledTheme"
   const val DARK_MODE_OFF = "off"
   const val DARK_MODE_ON = "on"
   const val DARK_MODE_FOLLOW_SYSTEM = "system"
