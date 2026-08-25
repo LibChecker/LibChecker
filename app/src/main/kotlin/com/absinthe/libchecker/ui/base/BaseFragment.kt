@@ -35,7 +35,10 @@ abstract class BaseFragment<VB : ViewBinding> :
     super.onViewCreated(view, savedInstanceState)
     Timber.d("${javaClass.simpleName} ==> onViewCreated")
     init()
-    view.findViewById<View>(android.R.id.list)?.applySystemBarsPadding(bottom = true)
+    view.findViewById<View>(android.R.id.list)?.let { list ->
+      (activity as? IAppBarContainer)?.prepareAppbarContentInset(list)
+      list.applySystemBarsPadding(bottom = true)
+    }
   }
 
   abstract fun init()

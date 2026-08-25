@@ -104,6 +104,8 @@ object Constants {
   const val PREF_SNAPSHOT_AUTO_REMOVE_THRESHOLD = "snapshotAutoRemoveThreshold"
   const val PREF_LONG_TAP_SHARE_BUTTON_TIP = "longTapShareButtonTip"
 
+  const val PREF_BLUR_DESIGN = "blurDesign"
+
   const val GET_INSTALLED_APPS = "com.android.permission.GET_INSTALLED_APPS"
 
   object Event {

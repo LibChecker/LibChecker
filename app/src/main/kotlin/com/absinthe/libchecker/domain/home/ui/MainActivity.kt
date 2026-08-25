@@ -6,6 +6,7 @@ import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.IBinder
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.Menu
 import android.view.View
@@ -17,6 +18,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.doOnLayout
 import androidx.core.view.get
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
@@ -29,6 +31,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.STATUS_INIT_END
 import com.absinthe.libchecker.annotation.STATUS_START_INIT
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.domain.home.model.HomeToolbarTitleState
@@ -43,15 +46,18 @@ import com.absinthe.libchecker.ui.base.IAppBarContainer
 import com.absinthe.libchecker.ui.base.IListController
 import com.absinthe.libchecker.ui.base.IListControllerHost
 import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.addBackStateHandler
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.isKeyboardShowing
 import com.absinthe.libchecker.utils.extensions.setCurrentItem
-import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
+import com.absinthe.libchecker.view.app.BlurCoordinatorLayout
+import com.absinthe.libchecker.view.app.InvalidatingHideBottomViewOnScrollBehavior
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
+import java.util.WeakHashMap
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
@@ -72,9 +78,11 @@ class MainActivity :
   private val appViewModel: HomeViewModel by viewModel()
   private val cloudRulesRepository: CloudRulesRepository by inject()
   private var listController: IListController? = null
+  private val initialListTopPaddings = WeakHashMap<View, Int>()
+  private var blurContainer: BlurCoordinatorLayout? = null
 
   @Suppress("DEPRECATION")
-  private val navViewBehavior by lazy { HideBottomViewOnScrollBehavior<BottomNavigationView>() }
+  private val navViewBehavior by lazy { InvalidatingHideBottomViewOnScrollBehavior() }
   private val toolbarTitleView by lazy { HomeToolbarTitleView(this) }
   private lateinit var toolbarTitleState: HomeToolbarTitleState
   private val workerServiceConnection = object : ServiceConnection {
@@ -208,11 +216,110 @@ class MainActivity :
   }
 
   override fun scheduleAppbarLiftingStatus(isLifted: Boolean) {
-    binding.appbar.isLifted = isLifted
+    // Blur mode draws its own progressive-glass appbar; the lifted surface would paint over it.
+    blurContainer?.setAppbarContentUnderlap(isLifted)
+    if (blurContainer?.blurEnabled != true) {
+      binding.appbar.isLifted = isLifted
+    }
+  }
+
+  override fun setBlurDesignEnabled(enabled: Boolean) {
+    val appbarInset = resolveCurrentAppbarInset()
+    val contentUnderlapsAppbar = binding.appbar.isLifted
+    val container = if (enabled) installBlurContainer() else blurContainer
+    if (enabled) {
+      container?.setAppbarContentUnderlap(contentUnderlapsAppbar)
+    }
+    container?.setBlurEnabled(enabled)
+    if (!enabled && container != null) {
+      replaceMainContainer(container, binding.container)
+      blurContainer = null
+    }
+    initialListTopPaddings.entries.toList().forEach { (targetView, initialPaddingTop) ->
+      applyHomeListTopPadding(
+        targetView = targetView,
+        initialPaddingTop = initialPaddingTop,
+        appbarBottom = appbarInset
+      )
+    }
+  }
+
+  private fun installBlurContainer(): BlurCoordinatorLayout? {
+    if (!OsUtils.atLeastT()) return null
+    return blurContainer ?: BlurCoordinatorLayout(this).also { container ->
+      replaceMainContainer(binding.container, container)
+      blurContainer = container
+    }
+  }
+
+  private fun replaceMainContainer(from: ViewGroup, to: ViewGroup) {
+    val parent = from.parent as? ViewGroup ?: return
+    val index = parent.indexOfChild(from)
+    to.id = from.id
+    to.layoutParams = from.layoutParams
+    while (from.childCount > 0) {
+      val child = from.getChildAt(0)
+      from.removeViewAt(0)
+      to.addView(child)
+    }
+    parent.removeViewAt(index)
+    parent.addView(to, index)
+    to.bringChildToFront(binding.appbar)
   }
 
   override fun setLiftOnScrollTargetView(targetView: View) {
     binding.appbar.setLiftOnScrollTargetView(targetView)
+  }
+
+  override fun prepareAppbarContentInset(targetView: View) {
+    val initialPaddingTop = initialListTopPaddings.getOrPut(targetView) {
+      targetView.paddingTop
+    }
+    applyHomeListTopPadding(
+      targetView = targetView,
+      initialPaddingTop = initialPaddingTop,
+      appbarBottom = resolveCurrentAppbarInset()
+    )
+    binding.appbar.doOnLayout { appbar ->
+      applyHomeListTopPadding(
+        targetView = targetView,
+        initialPaddingTop = initialPaddingTop,
+        appbarBottom = appbar.bottom
+      )
+    }
+  }
+
+  private fun applyHomeListTopPadding(
+    targetView: View,
+    initialPaddingTop: Int,
+    appbarBottom: Int
+  ) {
+    val progressiveBlurActive = blurContainer?.blurEnabled == true
+    val targetPaddingTop = calculateHomeListTopPadding(
+      initialPaddingTop = initialPaddingTop,
+      appbarBottom = appbarBottom,
+      progressiveBlurActive = progressiveBlurActive
+    )
+    if (targetView.paddingTop == targetPaddingTop) return
+    targetView.updatePadding(top = targetPaddingTop)
+  }
+
+  private fun resolveActionBarHeight(): Int {
+    val typedValue = TypedValue()
+    if (!theme.resolveAttribute(androidx.appcompat.R.attr.actionBarSize, typedValue, true)) {
+      return 0
+    }
+    return TypedValue.complexToDimensionPixelSize(typedValue.data, resources.displayMetrics)
+  }
+
+  private fun resolveCurrentAppbarInset(): Int {
+    return resolveHomeListAppbarInset(
+      appbarBottom = binding.appbar.bottom,
+      actionBarHeight = resolveActionBarHeight(),
+      systemBarTopInset = ViewCompat.getRootWindowInsets(binding.root)
+        ?.getInsets(WindowInsetsCompat.Type.systemBars())
+        ?.top ?: 0
+    )
   }
 
   private fun initView() {
@@ -222,7 +329,7 @@ class MainActivity :
     setupToolbarTitle()
 
     binding.apply {
-      container.bringChildToFront(binding.appbar)
+      (container as ViewGroup).bringChildToFront(binding.appbar)
       viewpager.apply {
         adapter = object : FragmentStateAdapter(this@MainActivity) {
           override fun getItemCount(): Int {
@@ -308,6 +415,8 @@ class MainActivity :
       enabledState = { !isKeyboardShowing() && binding.toolbar.hasExpandedActionView() },
       handler = { binding.toolbar.collapseActionView() }
     )
+    // Apply blur config last so it wins over the behavior/background setup above.
+    setBlurDesignEnabled(GlobalValues.isBlurDesign)
   }
 
   private fun setupToolbarTitle() {
@@ -434,5 +543,25 @@ class MainActivity :
         }
       }
     }
+  }
+}
+
+internal fun calculateHomeListTopPadding(
+  initialPaddingTop: Int,
+  appbarBottom: Int,
+  progressiveBlurActive: Boolean
+): Int {
+  return initialPaddingTop + if (progressiveBlurActive) appbarBottom.coerceAtLeast(0) else 0
+}
+
+internal fun resolveHomeListAppbarInset(
+  appbarBottom: Int,
+  actionBarHeight: Int,
+  systemBarTopInset: Int
+): Int {
+  return if (appbarBottom > 0) {
+    appbarBottom
+  } else {
+    actionBarHeight.coerceAtLeast(0) + systemBarTopInset.coerceAtLeast(0)
   }
 }
