@@ -723,7 +723,7 @@ internal fun shouldSuppressImeAfterSearchRestore(
   suppressImeOnNextSearchRestore: Boolean,
   shouldExpand: Boolean
 ): Boolean {
-  return false
+  return suppressImeOnNextSearchRestore && shouldExpand
 }
 
 internal fun shouldReturnAppListTopAfterSearch(
