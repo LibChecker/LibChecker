@@ -126,17 +126,12 @@ class SnapshotBackupBottomSheetDialogFragment : BaseBottomSheetViewDialogFragmen
   }
 
   private fun consumePendingRestoreUri() {
-    if (activeRestoreUri != null) {
-      return
-    }
-    while (pendingRestoreUris.isNotEmpty()) {
-      val uri = pendingRestoreUris.removeFirst()
-      if (viewModel.shouldRestoreFromLaunchUri(uri)) {
-        activeRestoreUri = uri
-        root.post { restoreBackup(uri) }
-        return
-      }
-    }
+    val uri = takeNextPendingSnapshotRestoreRequest(
+      pendingRestoreUris = pendingRestoreUris,
+      activeRestoreUri = activeRestoreUri
+    ) ?: return
+    activeRestoreUri = uri
+    root.post { restoreBackup(uri) }
   }
 
   override fun onDestroyView() {
@@ -407,6 +402,16 @@ class SnapshotBackupBottomSheetDialogFragment : BaseBottomSheetViewDialogFragmen
       }
     }
   }
+}
+
+internal fun <T> takeNextPendingSnapshotRestoreRequest(
+  pendingRestoreUris: ArrayDeque<T>,
+  activeRestoreUri: T?
+): T? {
+  if (activeRestoreUri != null) {
+    return null
+  }
+  return pendingRestoreUris.removeFirstOrNull()
 }
 
 interface SnapshotRoomBackupOwner {
