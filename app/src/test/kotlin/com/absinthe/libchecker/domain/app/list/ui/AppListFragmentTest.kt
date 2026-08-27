@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.domain.app.list.ui
 
 import androidx.lifecycle.Lifecycle
+import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
 import com.absinthe.libchecker.ui.base.InitialListSearchState
 import com.absinthe.libchecker.ui.base.initialListSearchState
@@ -23,13 +24,29 @@ class AppListFragmentTest {
   }
 
   @Test
-  fun `typing search does not force app list to top`() {
-    assertFalse(
+  fun `typing search returns filtered app list to top`() {
+    assertTrue(
       shouldReturnAppListTopAfterSearch(
         previousQuery = "壁",
         newQuery = "壁纸"
       )
     )
+  }
+
+  @Test
+  fun `advanced filtering and sorting return app list to top`() {
+    assertTrue(shouldReturnAppListTopAfterAdvancedMenuChange(AdvancedOptions.SHOW_SYSTEM_APPS))
+    assertTrue(
+      shouldReturnAppListTopAfterAdvancedMenuChange(
+        AdvancedOptions.SORT_BY_NAME or AdvancedOptions.SORT_BY_UPDATE_TIME
+      )
+    )
+  }
+
+  @Test
+  fun `advanced presentation changes preserve app list position`() {
+    assertFalse(shouldReturnAppListTopAfterAdvancedMenuChange(AdvancedOptions.SHOW_TARGET_API))
+    assertFalse(shouldReturnAppListTopAfterAdvancedMenuChange(0))
   }
 
   @Test
