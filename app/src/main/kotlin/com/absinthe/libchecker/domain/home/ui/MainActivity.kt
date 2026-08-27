@@ -11,6 +11,7 @@ import android.view.Gravity
 import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.PathInterpolator
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -53,7 +54,6 @@ import com.absinthe.libchecker.utils.extensions.addBackStateHandler
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.isKeyboardShowing
-import com.absinthe.libchecker.utils.extensions.setCurrentItem
 import com.absinthe.libchecker.view.app.BlurCoordinatorLayout
 import com.absinthe.libchecker.view.app.InvalidatingHideBottomViewOnScrollBehavior
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -68,7 +68,11 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
-const val PAGE_TRANSFORM_DURATION = 300L
+private const val PAGE_EXIT_DURATION = 90L
+private const val PAGE_ENTER_DURATION = 160L
+private const val PAGE_TRANSITION_OFFSET_DP = 20f
+private val PAGE_EXIT_INTERPOLATOR = PathInterpolator(0.4f, 0f, 1f, 1f)
+private val PAGE_ENTER_INTERPOLATOR = PathInterpolator(0f, 0f, 0.2f, 1f)
 
 class MainActivity :
   BaseActivity<ActivityMainBinding>(),
@@ -84,6 +88,8 @@ class MainActivity :
   private var appbarScrollTarget: RecyclerView? = null
   private val appbarLocation = IntArray(2)
   private val firstListItemLocation = IntArray(2)
+  private var isPageTransitionRunning = false
+  private var pendingPageIndex: Int? = null
   private val appbarScrollListener = object : RecyclerView.OnScrollListener() {
     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
       updateAppbarContentUnderlap()
@@ -408,9 +414,13 @@ class MainActivity :
         // 当 ViewPager 切换页面时，改变 ViewPager 的显示
         setOnItemSelectedListener {
           fun performClickNavigationItem(index: Int) {
+            if (isPageTransitionRunning) {
+              pendingPageIndex = index
+              return
+            }
             if (binding.viewpager.currentItem != index) {
               if (!binding.viewpager.isFakeDragging) {
-                binding.viewpager.setCurrentItem(index, PAGE_TRANSFORM_DURATION)
+                navigateToPage(index)
               }
             } else {
               val clickFlag =
@@ -449,6 +459,39 @@ class MainActivity :
     )
     // Apply blur config last so it wins over the behavior/background setup above.
     setBlurDesignEnabled(GlobalValues.isBlurDesign)
+  }
+
+  private fun navigateToPage(index: Int) {
+    val viewPager = binding.viewpager
+    isPageTransitionRunning = true
+    val direction = if (index > viewPager.currentItem) 1f else -1f
+    val offset = PAGE_TRANSITION_OFFSET_DP * resources.displayMetrics.density
+    viewPager.animate()
+      .alpha(0f)
+      .translationX(-direction * offset)
+      .setDuration(PAGE_EXIT_DURATION)
+      .setInterpolator(PAGE_EXIT_INTERPOLATOR)
+      .withEndAction {
+        viewPager.setCurrentItem(index, false)
+        viewPager.translationX = direction * offset
+        viewPager.animate()
+          .alpha(1f)
+          .translationX(0f)
+          .setDuration(PAGE_ENTER_DURATION)
+          .setInterpolator(PAGE_ENTER_INTERPOLATOR)
+          .withEndAction(::finishPageTransition)
+          .start()
+      }
+      .start()
+  }
+
+  private fun finishPageTransition() {
+    isPageTransitionRunning = false
+    val nextPageIndex = pendingPageIndex
+    pendingPageIndex = null
+    if (nextPageIndex != null && nextPageIndex != binding.viewpager.currentItem) {
+      navigateToPage(nextPageIndex)
+    }
   }
 
   private fun setupToolbarTitle() {
