@@ -1,7 +1,5 @@
 package com.absinthe.libchecker.utils.extensions
 
-import android.animation.Animator
-import android.animation.TimeInterpolator
 import android.animation.ValueAnimator
 import android.content.ClipData
 import android.content.Context
@@ -29,7 +27,6 @@ import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.children
 import androidx.core.view.isVisible
-import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.Constants
@@ -130,37 +127,6 @@ fun TextView.applyCondensedSingleLine() {
 }
 
 private const val SANS_SERIF_CONDENSED = "sans-serif-condensed"
-fun ViewPager2.setCurrentItem(
-  item: Int,
-  duration: Long,
-  interpolator: TimeInterpolator = AccelerateDecelerateInterpolator(),
-  pagePxWidth: Int = width
-) {
-  val pxToDrag: Int = pagePxWidth * (item - currentItem) * (if (isRtl()) -1 else 1)
-  val animator = ValueAnimator.ofInt(0, pxToDrag)
-  var previousValue = 0
-  animator.addUpdateListener { valueAnimator ->
-    val currentValue = valueAnimator.animatedValue as Int
-    val currentPxToDrag = (currentValue - previousValue).toFloat()
-    fakeDragBy(-currentPxToDrag)
-    previousValue = currentValue
-  }
-  animator.addListener(object : Animator.AnimatorListener {
-    override fun onAnimationStart(animation: Animator) {
-      beginFakeDrag()
-    }
-
-    override fun onAnimationEnd(animation: Animator) {
-      endFakeDrag()
-    }
-
-    override fun onAnimationCancel(animation: Animator) {}
-    override fun onAnimationRepeat(animation: Animator) {}
-  })
-  animator.interpolator = interpolator
-  animator.duration = duration
-  animator.start()
-}
 
 fun ViewGroup.setAlphaForAll(alpha: Float) = children.forEach {
   it.alpha = alpha
