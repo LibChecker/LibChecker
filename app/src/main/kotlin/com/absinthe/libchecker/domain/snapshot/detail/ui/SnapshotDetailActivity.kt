@@ -51,6 +51,7 @@ import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
+import com.absinthe.libchecker.utils.extensions.applyDetailOpenTransition
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -105,6 +106,7 @@ class SnapshotDetailActivity :
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
+    applyDetailOpenTransition()
     super.onCreate(savedInstanceState)
 
     if (_entity != null) {
