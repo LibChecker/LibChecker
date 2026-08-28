@@ -8,7 +8,6 @@ import android.graphics.Path
 import android.graphics.PixelFormat
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
-import android.os.Build
 import androidx.annotation.ColorInt
 import kotlin.math.min
 
@@ -151,11 +150,14 @@ class G2PillDrawable(
     val outlineBounds = bounds
     if (outlineBounds.isEmpty) {
       outline.setEmpty()
-    } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
-      val radius = min(outlineBounds.width(), outlineBounds.height()) / 2f
-      outline.setRoundRect(outlineBounds, radius)
     } else {
-      outline.setConvexPath(path)
+      setConvexPathOrFallback(
+        setConvexPath = { outline.setConvexPath(path) },
+        setFallback = {
+          val radius = min(outlineBounds.width(), outlineBounds.height()) / 2f
+          outline.setRoundRect(outlineBounds, radius)
+        }
+      )
     }
   }
 
@@ -169,5 +171,14 @@ class G2PillDrawable(
     const val G2_OUTER_CONTROL_X = 0.92621285f
     const val G2_OUTER_CONTROL_Y = 0.5119993f
     const val G2_SIDE_CONTROL_Y = 0.7845774f
+  }
+}
+
+internal inline fun setConvexPathOrFallback(
+  setConvexPath: () -> Unit,
+  setFallback: () -> Unit
+) {
+  runCatching(setConvexPath).getOrElse {
+    if (it is IllegalArgumentException) setFallback() else throw it
   }
 }

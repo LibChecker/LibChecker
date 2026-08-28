@@ -11,7 +11,7 @@ import org.junit.runner.RunWith
 class G2PillDrawableInstrumentedTest {
 
   @Test
-  fun getOutlineSupportsAndroidSeven() {
+  fun getOutlineSupportsCurrentDevice() {
     val drawable = G2PillDrawable(fillColor = Color.BLACK)
     drawable.setBounds(0, 0, 240, 48)
     val outline = Outline()
@@ -19,5 +19,17 @@ class G2PillDrawableInstrumentedTest {
     drawable.getOutline(outline)
 
     assertTrue(outline.canClip())
+  }
+
+  @Test
+  fun invalidConvexPathUsesFallback() {
+    var fallbackCalled = false
+
+    setConvexPathOrFallback(
+      setConvexPath = { throw IllegalArgumentException("path must be convex") },
+      setFallback = { fallbackCalled = true }
+    )
+
+    assertTrue(fallbackCalled)
   }
 }
