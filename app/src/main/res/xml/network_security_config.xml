@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
-  <base-config cleartextTrafficPermitted="true" />
+  <!--
+    domainEncryption opts the app into Encrypted Client Hello (ECH) on API 37+. "opportunistic"
+    uses ECH only when the server publishes an ECH config list in its HTTPS DNS record, and never
+    sends GREASE, so hosts without ECH keep their current handshake. Older platforms ignore the
+    unknown element.
+  -->
+  <base-config cleartextTrafficPermitted="true">
+    <domainEncryption mode="opportunistic" />
+  </base-config>
 </network-security-config>
