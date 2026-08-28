@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.utils
 
+import com.absinthe.libchecker.compat.DnsCompat
 import java.io.File
 import java.io.IOException
 import okhttp3.Call
@@ -12,7 +13,14 @@ import okio.sink
 import okio.source
 
 object DownloadUtils {
-  private val client by lazy { OkHttpClient() }
+  private val client by lazy {
+    OkHttpClient.Builder()
+      .apply {
+        // Enables Encrypted Client Hello where the platform and network security config allow it.
+        DnsCompat.echCapableDns?.let(::dns)
+      }
+      .build()
+  }
 
   /**
    * @param url      Download URL

@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.api
 
 import com.absinthe.libchecker.api.request.VERSION
+import com.absinthe.libchecker.compat.DnsCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.JsonUtil
@@ -52,6 +53,10 @@ object ApiManager {
       .connectTimeout(30, TimeUnit.SECONDS)
       .readTimeout(30, TimeUnit.SECONDS)
       .writeTimeout(30, TimeUnit.SECONDS)
+      .apply {
+        // Enables Encrypted Client Hello where the platform and network security config allow it.
+        DnsCompat.echCapableDns?.let(::dns)
+      }
       .addInterceptor { chain ->
         val request = chain.request()
         val isOfficialGitHubApi =
