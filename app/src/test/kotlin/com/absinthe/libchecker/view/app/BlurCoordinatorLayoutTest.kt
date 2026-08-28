@@ -75,4 +75,13 @@ class BlurCoordinatorLayoutTest {
   fun backdropBackgroundIsAlwaysOpaque() {
     assertEquals(0xFF112233.toInt(), opaqueBackdropColor(0x66112233))
   }
+
+  @Test
+  fun capturedChildKeepsItsAnimatedAlphaWhenRecorded() {
+    assertEquals(OPAQUE_LAYER_ALPHA, capturedChildLayerAlpha(1f))
+    assertEquals(0, capturedChildLayerAlpha(0f))
+    assertEquals(128, capturedChildLayerAlpha(0.5f))
+    assertEquals(OPAQUE_LAYER_ALPHA, capturedChildLayerAlpha(1.5f))
+    assertEquals(0, capturedChildLayerAlpha(-0.5f))
+  }
 }
