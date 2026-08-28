@@ -471,14 +471,17 @@ class MainActivity :
       .translationX(-direction * offset)
       .setDuration(PAGE_EXIT_DURATION)
       .setInterpolator(PAGE_EXIT_INTERPOLATOR)
+      .setUpdateListener { blurContainer?.invalidate() }
       .withEndAction {
         viewPager.setCurrentItem(index, false)
         viewPager.translationX = direction * offset
+        blurContainer?.invalidate()
         viewPager.animate()
           .alpha(1f)
           .translationX(0f)
           .setDuration(PAGE_ENTER_DURATION)
           .setInterpolator(PAGE_ENTER_INTERPOLATOR)
+          .setUpdateListener { blurContainer?.invalidate() }
           .withEndAction(::finishPageTransition)
           .start()
       }
@@ -487,6 +490,7 @@ class MainActivity :
 
   private fun finishPageTransition() {
     isPageTransitionRunning = false
+    blurContainer?.invalidate()
     val nextPageIndex = pendingPageIndex
     pendingPageIndex = null
     if (nextPageIndex != null && nextPageIndex != binding.viewpager.currentItem) {

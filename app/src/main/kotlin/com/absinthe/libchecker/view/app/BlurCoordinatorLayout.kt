@@ -164,8 +164,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
       node.setRenderEffect(null)
       val recordCanvas = node.beginRecording(node.width, node.height)
       recordCanvas.drawColor(opaqueBackdropColor(contentBackgroundColor))
-      recordCanvas.translate(viewPager.left.toFloat(), viewPager.top.toFloat())
-      viewPager.draw(recordCanvas)
+      drawCapturedContent(recordCanvas, viewPager)
       node.endRecording()
       canvas.drawRenderNode(node)
       node
@@ -196,6 +195,29 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
   }
 
   private var suppressManagedChildDraw = false
+
+  /**
+   * Draws [child] into the captured content node while honoring the transform properties that
+   * [View.draw] would otherwise ignore, so page transition slide/fade animations stay visible.
+   */
+  private fun drawCapturedContent(canvas: Canvas, child: View) {
+    val layerAlpha = capturedChildLayerAlpha(child.alpha)
+    if (layerAlpha <= 0) return
+    val checkpoint = if (layerAlpha < OPAQUE_LAYER_ALPHA) {
+      canvas.saveLayerAlpha(0f, 0f, canvas.width.toFloat(), canvas.height.toFloat(), layerAlpha)
+    } else {
+      canvas.save()
+    }
+    try {
+      canvas.translate(
+        child.left + child.translationX,
+        child.top + child.translationY
+      )
+      child.draw(canvas)
+    } finally {
+      canvas.restoreToCount(checkpoint)
+    }
+  }
 
   public override fun drawChild(canvas: Canvas, child: View, drawingTime: Long): Boolean {
     val isManagedChild =
@@ -714,6 +736,8 @@ internal fun calculateDownsampledBlurRadius(
 
 internal fun opaqueBackdropColor(color: Int): Int = color or 0xFF000000.toInt()
 
+internal fun capturedChildLayerAlpha(childAlpha: Float): Int = (childAlpha.coerceIn(0f, 1f) * OPAQUE_LAYER_ALPHA).roundToInt()
+
 internal fun progressiveSurfaceTintAlpha(
   progress: Float,
   maxAlpha: Float = APPBAR_SURFACE_TINT_ALPHA,
@@ -748,6 +772,7 @@ private fun smoothStep(value: Float): Float {
 }
 
 private const val BLUR_KERNEL_SIGMA_OUTSET = 3f
+internal const val OPAQUE_LAYER_ALPHA = 255
 private const val APPBAR_MASK_TRANSITION_DURATION_MS = 100L
 private const val APPBAR_SURFACE_TINT_ALPHA = 0.3f
 private const val APPBAR_DARK_MASK_ALPHA = 0.12f
