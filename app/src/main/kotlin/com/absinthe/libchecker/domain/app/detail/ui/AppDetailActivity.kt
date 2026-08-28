@@ -19,7 +19,6 @@ import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel.Pa
 import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_NAME
 import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.Toasty
-import com.absinthe.libchecker.utils.extensions.applyDetailOpenTransition
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -37,7 +36,6 @@ class AppDetailActivity :
   override fun getToolbar() = binding.toolbar
 
   override fun onCreate(savedInstanceState: Bundle?) {
-    applyDetailOpenTransition()
     super.onCreate(savedInstanceState)
     isPackageReady = true
     lifecycleScope.launch {
