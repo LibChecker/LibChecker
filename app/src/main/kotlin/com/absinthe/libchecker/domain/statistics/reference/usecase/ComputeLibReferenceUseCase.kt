@@ -30,9 +30,6 @@ import com.absinthe.libchecker.domain.statistics.reference.traceReferenceSection
 import com.absinthe.libchecker.domain.statistics.reference.traceReferenceSuspendSection
 import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.PackageUtils
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
 import timber.log.Timber
@@ -78,17 +75,13 @@ class ComputeLibReferenceUseCase(
 
     onProgress(0)
 
-    val batchPackageInfoByType = coroutineScope {
-      types.mapNotNull { type ->
-        val flags = getPackageInfoFlags(type) ?: return@mapNotNull null
-        async {
-          type to traceReferenceSection(TRACE_REFERENCE_LOAD_BATCH) {
-            val packages = installedAppRepository.getInstalledPackages(flags)
-            packages.associateByTo(HashMap(packages.size)) { it.packageName }
-          }
-        }
-      }.awaitAll().toMap()
-    }
+    val batchPackageInfoByType = types.mapNotNull { type ->
+      val flags = getPackageInfoFlags(type) ?: return@mapNotNull null
+      type to traceReferenceSection(TRACE_REFERENCE_LOAD_BATCH) {
+        val packages = installedAppRepository.getInstalledPackages(flags)
+        packages.associateByTo(HashMap(packages.size)) { it.packageName }
+      }
+    }.toMap()
 
     fun createPackageInfoResolver(@LibType type: Int): (String) -> PackageInfo? {
       val flags = getPackageInfoFlags(type) ?: return ::getBasePackageInfo
