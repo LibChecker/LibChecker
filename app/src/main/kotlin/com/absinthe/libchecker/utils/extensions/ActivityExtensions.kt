@@ -22,7 +22,6 @@ import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_LIST
 import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_NAME
 import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_TYPE
 import com.absinthe.libchecker.domain.statistics.reference.ui.LibReferenceActivity
-import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.Toasty
 
 fun FragmentActivity.launchDetailPage(item: LCItem, refName: String? = null, refType: Int = NATIVE, forceDetail: Boolean = false) {
@@ -78,19 +77,6 @@ fun Activity.launchLibReferencePage(
       }
     )
   startActivity(intent)
-}
-
-@Suppress("DEPRECATION")
-fun Activity.applyDetailOpenTransition() {
-  if (OsUtils.atLeastU()) {
-    overrideActivityTransition(
-      Activity.OVERRIDE_TRANSITION_OPEN,
-      R.anim.anim_fade_in,
-      R.anim.anim_fade_out
-    )
-  } else {
-    overridePendingTransition(R.anim.anim_fade_in, R.anim.anim_fade_out)
-  }
 }
 
 fun Activity.isKeyboardShowing(): Boolean {
