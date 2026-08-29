@@ -106,6 +106,8 @@ class LibReferenceItemView(context: Context) : FrameLayout(context) {
         } else {
           View.IMPORTANT_FOR_ACCESSIBILITY_NO
         }
+        isClickable = display.canOpenDetail
+        isFocusable = display.canOpenDetail
         drawable?.mutate()?.colorFilter = if (display.desaturateIcon) {
           ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
         } else {

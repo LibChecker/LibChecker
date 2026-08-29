@@ -24,6 +24,7 @@
   <string name="empty" translatable="false"> </string>
 
   <string name="ref_category_dex" translatable="false">Dex</string>
+  <string name="lib_reference_demo_example_suffix" translatable="false">(Example)</string>
 
   <plurals name="snapshot_dex_classes_count" translatable="false">
     <item quantity="one">%s class</item>

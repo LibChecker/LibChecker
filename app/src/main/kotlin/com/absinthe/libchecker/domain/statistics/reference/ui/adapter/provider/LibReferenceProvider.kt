@@ -2,6 +2,7 @@ package com.absinthe.libchecker.domain.statistics.reference.ui.adapter.provider
 
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReference
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceAction
@@ -19,7 +20,9 @@ const val LIB_REFERENCE_PROVIDER = 0
 
 class LibReferenceProvider(
   private val renderState: () -> LibReferenceListRenderState,
-  private val onAction: (LibReferenceAction) -> Unit
+  private val allowDetailAction: Boolean,
+  private val onAction: (LibReferenceAction) -> Unit,
+  private val onItemBound: (LibReference, View) -> Unit
 ) : BaseNodeProvider() {
 
   private val integerFormat by lazy { NumberFormat.getIntegerInstance() }
@@ -31,13 +34,15 @@ class LibReferenceProvider(
   override val layoutId: Int = 0
 
   init {
-    addChildClickViewIds(android.R.id.icon)
+    if (allowDetailAction) {
+      addChildClickViewIds(android.R.id.icon)
+    }
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return BaseViewHolder(
       LibReferenceItemView(context).apply {
-        layoutParams = ViewGroup.MarginLayoutParams(
+        layoutParams = RecyclerView.LayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT,
           ViewGroup.LayoutParams.WRAP_CONTENT
         ).also {
@@ -58,17 +63,20 @@ class LibReferenceProvider(
         notMarkedLabel = notMarkedLabel,
         permissionFallbackLabel = permissionFallbackLabel,
         metadataLabel = metadataLabel,
-        countText = integerFormat.format(reference.referredList.size)
+        countText = integerFormat.format(reference.referredList.size),
+        allowDetailAction = allowDetailAction,
+        labelSuffix = state.labelSuffix
       ),
       highlightText = state.highlightText
     )
+    onItemBound(reference, helper.itemView)
   }
 
   override fun onChildClick(helper: BaseViewHolder, view: View, data: BaseNode, position: Int) {
     super.onChildClick(helper, view, data, position)
     if (view.id == android.R.id.icon) {
       val ref = data as? LibReference ?: return
-      if (ref.canOpenDetail()) {
+      if (ref.canOpenDetail(allowDetailAction)) {
         onAction(LibReferenceAction.DetailIconClicked(ref))
       }
     }

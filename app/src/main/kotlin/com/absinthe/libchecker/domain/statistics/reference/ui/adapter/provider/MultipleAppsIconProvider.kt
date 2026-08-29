@@ -1,7 +1,9 @@
 package com.absinthe.libchecker.domain.statistics.reference.ui.adapter.provider
 
 import android.view.ContextThemeWrapper
+import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReference
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceListRenderState
@@ -15,7 +17,8 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 const val MULTIPLE_APPS_ICON_PROVIDER = 1
 
 class MultipleAppsIconProvider(
-  private val renderState: () -> LibReferenceListRenderState
+  private val renderState: () -> LibReferenceListRenderState,
+  private val onItemBound: (LibReference, View) -> Unit
 ) : BaseNodeProvider() {
 
   private val notMarkedLabel by lazy { context.getString(R.string.not_marked_lib) }
@@ -27,7 +30,7 @@ class MultipleAppsIconProvider(
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return BaseViewHolder(
       MultipleAppsIconItemView(ContextThemeWrapper(context, R.style.AppListMaterialCard)).apply {
-        layoutParams = ViewGroup.MarginLayoutParams(
+        layoutParams = RecyclerView.LayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT,
           ViewGroup.LayoutParams.WRAP_CONTENT
         ).also {
@@ -47,9 +50,11 @@ class MultipleAppsIconProvider(
         reference = reference,
         notMarkedLabel = notMarkedLabel,
         packageLabel = packageLabel,
-        sharedUidLabel = sharedUid?.let { "UID $it" } ?: "UID"
+        sharedUidLabel = sharedUid?.let { "UID $it" } ?: "UID",
+        labelSuffix = state.labelSuffix
       ),
       highlightText = state.highlightText
     )
+    onItemBound(reference, helper.itemView)
   }
 }
