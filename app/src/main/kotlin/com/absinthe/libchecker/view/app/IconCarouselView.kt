@@ -2,8 +2,11 @@ package com.absinthe.libchecker.view.app
 
 import android.animation.ValueAnimator
 import android.content.Context
+import android.graphics.Color
 import android.graphics.RenderEffect
 import android.graphics.Shader
+import android.graphics.drawable.AdaptiveIconDrawable
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.util.AttributeSet
@@ -349,11 +352,7 @@ class IconCarouselView @JvmOverloads constructor(
         importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
         clipToOutline = true
         elevation = context.dpToDimension(3)
-        background = GradientDrawable().apply {
-          shape = GradientDrawable.RECTANGLE
-          cornerRadius = context.dpToDimension(14)
-          setColor(tileColor)
-        }
+        background = createTileBackground(context, tileColor)
       }
 
       imageView.scaleType = ImageView.ScaleType.CENTER_INSIDE
@@ -391,6 +390,21 @@ class IconCarouselView @JvmOverloads constructor(
           RenderEffect.createBlurEffect(blurRadius, blurRadius, Shader.TileMode.DECAL)
         }
       )
+    }
+  }
+}
+
+private fun createTileBackground(context: Context, tileColor: Int): Drawable {
+  return if (OsUtils.atLeastO()) {
+    AdaptiveIconDrawable(
+      ColorDrawable(tileColor),
+      ColorDrawable(Color.TRANSPARENT)
+    )
+  } else {
+    GradientDrawable().apply {
+      shape = GradientDrawable.RECTANGLE
+      cornerRadius = context.dpToDimension(14)
+      setColor(tileColor)
     }
   }
 }

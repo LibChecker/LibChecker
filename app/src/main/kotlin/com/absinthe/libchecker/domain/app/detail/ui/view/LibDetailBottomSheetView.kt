@@ -100,6 +100,8 @@ class LibDetailBottomSheetView(
 
   private val viewFlipper = HeightAnimatableViewFlipper(context).apply {
     layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+    clipChildren = false
+    clipToPadding = false
     setInAnimation(context, R.anim.anim_fade_in)
     setOutAnimation(context, R.anim.anim_fade_out)
   }
@@ -164,6 +166,8 @@ class LibDetailBottomSheetView(
   init {
     orientation = VERTICAL
     gravity = Gravity.CENTER_HORIZONTAL
+    clipChildren = false
+    clipToPadding = false
     val padding = 16.dp
     setPadding(
       padding,
