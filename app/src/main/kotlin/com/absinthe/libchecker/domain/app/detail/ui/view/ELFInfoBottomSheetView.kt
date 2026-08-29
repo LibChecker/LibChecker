@@ -5,7 +5,6 @@ import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.widget.FrameLayout
-import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,22 +13,14 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.model.DetailInfoItemDisplay
 import com.absinthe.libchecker.domain.app.detail.model.DetailInfoTextStyle
 import com.absinthe.libchecker.domain.app.detail.model.ElfDetailBottomSheetState
-import com.absinthe.libchecker.domain.app.detail.ui.adapter.LibDetailItemAdapter
-import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
+import com.absinthe.libchecker.ui.adapter.BindOnlyAdapter
+import com.absinthe.libchecker.ui.adapter.addSpacingDecoration
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.view.app.IHeaderView
+import com.absinthe.libchecker.view.app.BottomSheetScaffoldView
 import com.absinthe.libraries.utils.manager.SystemBarManager
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
-class ELFInfoBottomSheetView(context: Context) :
-  LinearLayout(context),
-  IHeaderView {
-
-  private val header = BottomSheetHeaderView(context).apply {
-    layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-    title.text = context.getString(R.string.lib_detail_elf_info)
-  }
+class ELFInfoBottomSheetView(context: Context) : BottomSheetScaffoldView(context) {
 
   private val icon = AppCompatImageView(context).apply {
     val iconSize = 48.dp
@@ -54,7 +45,7 @@ class ELFInfoBottomSheetView(context: Context) :
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
   }
 
-  private val contentAdapter = LibDetailItemAdapter()
+  private val contentAdapter = BindOnlyAdapter(::DetailInfoItemView, DetailInfoItemView::bind)
 
   private val contentView = BottomSheetRecyclerView(context).apply {
     layoutParams = FrameLayout.LayoutParams(
@@ -67,11 +58,10 @@ class ELFInfoBottomSheetView(context: Context) :
     isVerticalScrollBarEnabled = false
     clipToPadding = false
     clipChildren = false
-    addItemDecoration(VerticalSpacesItemDecoration(4.dp))
+    addSpacingDecoration(4.dp)
   }
 
   init {
-    orientation = VERTICAL
     gravity = Gravity.CENTER_HORIZONTAL
     val padding = 16.dp
     setPadding(
@@ -80,7 +70,7 @@ class ELFInfoBottomSheetView(context: Context) :
       padding,
       (padding - SystemBarManager.navigationBarSize).coerceAtLeast(0)
     )
-    addView(header)
+    header.title.text = context.getString(R.string.lib_detail_elf_info)
     addView(icon)
     addView(title)
     addView(contentView)
@@ -156,6 +146,4 @@ class ELFInfoBottomSheetView(context: Context) :
       text = text
     )
   }
-
-  override fun getHeaderView(): BottomSheetHeaderView = header
 }

@@ -1,10 +1,7 @@
 package com.absinthe.libchecker.domain.about.ui
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.browser.customtabs.CustomTabsIntent
-import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.GitHubContributorResp
@@ -19,10 +16,9 @@ import com.absinthe.libchecker.domain.about.ui.view.DevelopersDialogView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.JsonUtil
 import com.absinthe.libchecker.utils.SPUtils
-import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
+import com.absinthe.libchecker.utils.extensions.openUrlInBrowser
 import com.squareup.moshi.Types
 import java.util.Locale
 import kotlinx.coroutines.Dispatchers
@@ -36,8 +32,6 @@ class DevelopersDialogFragment : BaseBottomSheetViewDialogFragment<DevelopersDia
   private var dialogState: DevelopersDialogState? = null
 
   override fun initRootView(): DevelopersDialogView = DevelopersDialogView(requireContext())
-
-  override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {
     maxPeekHeightPercentage = 0.8f
@@ -107,21 +101,7 @@ class DevelopersDialogFragment : BaseBottomSheetViewDialogFragment<DevelopersDia
 
   private fun handleAction(action: DevelopersDialogAction) {
     when (action) {
-      is DevelopersDialogAction.OpenProfile -> launchProfile(action.url)
-    }
-  }
-
-  private fun launchProfile(url: String) {
-    runCatching {
-      CustomTabsIntent.Builder().build().launchUrl(requireContext(), url.toUri())
-    }.onFailure { throwable ->
-      Timber.e(throwable)
-      runCatching {
-        startActivity(Intent(Intent.ACTION_VIEW).setData(url.toUri()))
-      }.onFailure { inner ->
-        Timber.e(inner)
-        Toasty.showShort(requireContext(), "No browser application")
-      }
+      is DevelopersDialogAction.OpenProfile -> requireContext().openUrlInBrowser(action.url)
     }
   }
 

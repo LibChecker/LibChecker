@@ -10,7 +10,6 @@ import com.absinthe.libchecker.domain.statistics.reference.model.buildLibReferen
 import com.absinthe.libchecker.domain.statistics.reference.ui.view.LibReferenceMenuBSDView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Telemetry
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.google.android.material.motion.MotionUtils
 
 class LibReferenceMenuBSDFragment : BaseBottomSheetViewDialogFragment<LibReferenceMenuBSDView>() {
@@ -39,8 +38,6 @@ class LibReferenceMenuBSDFragment : BaseBottomSheetViewDialogFragment<LibReferen
       onDemoHeightAnimationStateChange = ::setExternalHeightAnimationRunning
     )
   }
-
-  override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {
     animationDuration = MotionUtils.resolveThemeDuration(

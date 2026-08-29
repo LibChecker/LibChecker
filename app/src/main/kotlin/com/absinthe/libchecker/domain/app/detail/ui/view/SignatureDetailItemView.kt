@@ -2,98 +2,53 @@ package com.absinthe.libchecker.domain.app.detail.ui.view
 
 import android.content.Context
 import android.util.TypedValue
-import android.view.ViewGroup
+import android.view.Gravity
+import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatImageButton
-import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.domain.app.detail.model.SignatureDetailItem
-import com.absinthe.libchecker.utils.extensions.expandChildTouchTarget
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDrawableByAttr
-import com.absinthe.libchecker.view.AViewGroup
+import com.absinthe.libchecker.view.app.TextColumnRowView
 import rikka.core.util.ClipboardUtils
 
-class SignatureDetailItemView(context: Context) : AViewGroup(context) {
+class SignatureDetailItemView(context: Context) : TextColumnRowView(context) {
 
-  private val type = AppCompatTextView(context).apply {
-    layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.WRAP_CONTENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
-    )
+  private val type = addTextLine {
     setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
   }
-
-  private val content = AppCompatTextView(context).apply {
-    layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.WRAP_CONTENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
-    ).also {
-      it.topMargin = 4.dp
-    }
+  private val content = addTextLine {
+    (layoutParams as LinearLayout.LayoutParams).topMargin = 4.dp
   }
-
   private val copyToClipboard = AppCompatImageButton(context).apply {
-    layoutParams = LayoutParams(24.dp, 24.dp).also {
-      it.marginStart = 8.dp
-    }
-    scaleX = 0.8F
-    scaleY = 0.8F
+    layoutParams = LinearLayout.LayoutParams(24.dp, 24.dp)
+    scaleX = 0.8f
+    scaleY = 0.8f
     setImageResource(R.drawable.ic_twotone_content_copy_24)
     contentDescription = context.getString(android.R.string.copy)
     setBackgroundDrawable(context.getDrawableByAttr(android.R.attr.selectableItemBackgroundBorderless))
     setOnClickListener {
-      ClipboardUtils.put(
-        context,
-        "${type.text}:${content.text}"
-      )
+      ClipboardUtils.put(context, "${type.text}:${content.text}")
       VersionCompat.showCopiedOnClipboardToast(context)
     }
   }
 
   init {
-    layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
-    )
     setPadding(8.dp, 2.dp, 8.dp, 2.dp)
-    addView(type)
-    addView(copyToClipboard)
-    addView(content)
+    minimumHeight = 40.dp
+    setTrailingView(
+      copyToClipboard,
+      gravity = Gravity.TOP,
+      touchTargetSize = 48.dp
+    )
   }
 
   fun bind(item: SignatureDetailItem) {
     type.text = item.type
     content.text = item.content
     contentDescription = item.contentDescription
-  }
-
-  override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-    super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-    autoMeasureChildren()
-    val typeWidth =
-      measuredWidth - paddingStart - paddingEnd - copyToClipboard.measuredWidth - copyToClipboard.marginStart
-    val contentWidth = measuredWidth - paddingStart - paddingEnd
-    if (type.measuredWidth > typeWidth) {
-      type.measure(typeWidth.toExactlyMeasureSpec(), type.defaultHeightMeasureSpec(this))
-    }
-    if (content.measuredWidth > contentWidth) {
-      content.measure(contentWidth.toExactlyMeasureSpec(), content.defaultHeightMeasureSpec(this))
-    }
-    setMeasuredDimension(
-      measuredWidth,
-      (type.measuredHeight + content.measuredHeight + paddingTop + paddingBottom).coerceAtLeast(
-        40.dp
-      )
-    )
-  }
-
-  override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-    type.layout(paddingStart, paddingTop)
-    content.layout(paddingStart, type.bottom)
-    copyToClipboard.layout(paddingEnd, copyToClipboard.toViewVerticalCenter(type), true)
-    expandChildTouchTarget(copyToClipboard, 48.dp)
   }
 }

@@ -5,7 +5,6 @@ import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
-import android.widget.LinearLayout
 import android.widget.ViewFlipper
 import androidx.annotation.DrawableRes
 import com.absinthe.libchecker.R
@@ -16,26 +15,18 @@ import com.absinthe.libchecker.domain.settings.model.InAppUpdateDialogState
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemDisplayData
 import com.absinthe.libchecker.domain.snapshot.list.ui.view.SnapshotItemView
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.view.app.IHeaderView
+import com.absinthe.libchecker.view.app.BottomSheetScaffoldView
 import com.absinthe.libraries.utils.manager.SystemBarManager
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.loadingindicator.LoadingIndicator
 
-class InAppUpdateDialogView(context: Context) :
-  LinearLayout(context),
-  IHeaderView {
+class InAppUpdateDialogView(context: Context) : BottomSheetScaffoldView(context) {
 
   private var onAction: (InAppUpdateDialogAction) -> Unit = {}
   private var isBinding = false
   private var renderedItem: SnapshotItemDisplayData? = null
   private var pendingShowLoading: Runnable? = null
-
-  private val header = BottomSheetHeaderView(context).apply {
-    layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-    title.text = context.getString(R.string.settings_get_updates)
-  }
 
   private val toggleGroup = MaterialButtonToggleGroup(context).apply {
     layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
@@ -84,7 +75,6 @@ class InAppUpdateDialogView(context: Context) :
   }
 
   init {
-    orientation = VERTICAL
     gravity = Gravity.CENTER_HORIZONTAL
     val padding = 16.dp
     setPadding(
@@ -93,7 +83,7 @@ class InAppUpdateDialogView(context: Context) :
       padding,
       (padding - SystemBarManager.navigationBarSize).coerceAtLeast(0)
     )
-    addView(header)
+    header.title.text = context.getString(R.string.settings_get_updates)
     addView(toggleGroup)
     addView(viewFlipper)
     viewFlipper.addView(loading)
@@ -177,10 +167,6 @@ class InAppUpdateDialogView(context: Context) :
     if (displayedChild != childIndex) {
       displayedChild = childIndex
     }
-  }
-
-  override fun getHeaderView(): BottomSheetHeaderView {
-    return header
   }
 
   override fun onDetachedFromWindow() {

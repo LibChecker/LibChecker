@@ -14,7 +14,8 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotTypeIndicatorView
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotDashboardAction
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotDashboardDisplayData
-import com.absinthe.libchecker.domain.snapshot.list.ui.adapter.SystemPropsAdapter
+import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotSystemPropDisplayData
+import com.absinthe.libchecker.ui.adapter.BindOnlyAdapter
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -105,7 +106,22 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context, null, 
         setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
       }
 
-    private val systemPropAdapter = SystemPropsAdapter()
+    private val systemPropAdapter =
+      BindOnlyAdapter<SnapshotSystemPropDisplayData, SystemPropItemView>(
+        viewFactory = { context ->
+          SystemPropItemView(context).apply {
+            layoutParams = ViewGroup.LayoutParams(
+              ViewGroup.LayoutParams.MATCH_PARENT,
+              ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+          }
+        },
+        bindView = { item ->
+          tvTitle.text = item.label
+          tvText.text = item.displayValue
+          contentDescription = item.description
+        }
+      )
 
     private val propsRecyclerView = RecyclerView(context).apply {
       layoutParams = LayoutParams(

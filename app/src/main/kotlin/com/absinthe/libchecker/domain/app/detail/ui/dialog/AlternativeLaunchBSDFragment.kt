@@ -10,7 +10,6 @@ import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
 import com.absinthe.libchecker.domain.app.detail.ui.view.AlternativeLaunchBSDView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.showToast
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
@@ -22,8 +21,6 @@ class AlternativeLaunchBSDFragment : BaseBottomSheetViewDialogFragment<Alternati
   override fun initRootView(): AlternativeLaunchBSDView {
     return AlternativeLaunchBSDView(requireContext())
   }
-
-  override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {
     maxPeekHeightPercentage = 0.67f

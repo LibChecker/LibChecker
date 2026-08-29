@@ -8,7 +8,6 @@ import com.absinthe.libchecker.domain.app.list.model.buildAdvancedMenuBottomShee
 import com.absinthe.libchecker.domain.app.list.ui.view.AdvancedMenuBSDView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Telemetry
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
 class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBSDView>() {
 
@@ -27,8 +26,6 @@ class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBS
   }
 
   override fun initRootView(): AdvancedMenuBSDView = AdvancedMenuBSDView(requireContext())
-
-  override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {
     maxPeekHeightPercentage = 0.8f

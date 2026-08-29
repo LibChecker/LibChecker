@@ -10,7 +10,7 @@ import com.absinthe.libchecker.domain.app.detail.model.DetailFeatureItem
 import com.absinthe.libchecker.domain.app.detail.model.DetailFeatureListState
 import com.absinthe.libchecker.domain.app.detail.model.FeatureItem
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.FeatureAdapter
-import com.absinthe.libchecker.ui.adapter.HorizontalSpacesItemDecoration
+import com.absinthe.libchecker.ui.adapter.addSpacingDecoration
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.view.app.ToolbarConnectionLoadingView
 
@@ -138,7 +138,7 @@ class DetailFeatureListController(
       ).also { lp ->
         lp.topMargin = 4.dp
       }
-      it.addItemDecoration(HorizontalSpacesItemDecoration(4.dp))
+      it.addSpacingDecoration(4.dp, RecyclerView.HORIZONTAL)
       it.layoutManager = LinearLayoutManager(headerContentLayout.context, LinearLayoutManager.HORIZONTAL, false)
       it.adapter = adapter
       it.itemAnimator = null

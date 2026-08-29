@@ -2,33 +2,30 @@ package com.absinthe.libchecker.domain.snapshot.timenode.ui.view
 
 import android.content.Context
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
+import com.absinthe.libchecker.domain.snapshot.timenode.model.SnapshotTimeNodeItem
 import com.absinthe.libchecker.domain.snapshot.timenode.model.TimeNodeBottomSheetAction
 import com.absinthe.libchecker.domain.snapshot.timenode.model.TimeNodeBottomSheetState
 import com.absinthe.libchecker.domain.snapshot.timenode.model.TimeNodeHeaderState
-import com.absinthe.libchecker.domain.snapshot.timenode.ui.adapter.TimeNodeAdapter
-import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
+import com.absinthe.libchecker.ui.adapter.BindOnlyAdapter
+import com.absinthe.libchecker.ui.adapter.addSpacingDecoration
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.view.app.BottomSheetScaffoldView
 import com.absinthe.libchecker.view.app.EmptyListView
-import com.absinthe.libchecker.view.app.IHeaderView
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import rikka.widget.borderview.BorderRecyclerView
 
-class TimeNodeBottomSheetView(context: Context) :
-  LinearLayout(context),
-  IHeaderView {
+class TimeNodeBottomSheetView(context: Context) : BottomSheetScaffoldView(context) {
 
   private var onAction: (TimeNodeBottomSheetAction) -> Unit = {}
   private var renderedHeader: TimeNodeHeaderState? = null
+  private var packageIconSources: Map<String, SnapshotPackageIconSource> = emptyMap()
 
-  private val adapter = TimeNodeAdapter()
-
-  private val header = BottomSheetHeaderView(context).apply {
-    layoutParams =
-      LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-    title.text = context.getString(R.string.dialog_title_change_timestamp)
+  private val adapter = BindOnlyAdapter<SnapshotTimeNodeItem, TimeNodeItemView>(
+    ::TimeNodeItemView
+  ) { item ->
+    bind(item, packageIconSources)
   }
 
   private val list = BorderRecyclerView(context).apply {
@@ -43,7 +40,7 @@ class TimeNodeBottomSheetView(context: Context) :
     isVerticalScrollBarEnabled = false
     layoutManager = LinearLayoutManager(context)
     overScrollMode = OVER_SCROLL_NEVER
-    addItemDecoration(VerticalSpacesItemDecoration(3.dp))
+    addSpacingDecoration(3.dp)
   }
 
   private val addApkView = TimeNodeAddApkView(context).apply {
@@ -56,10 +53,9 @@ class TimeNodeBottomSheetView(context: Context) :
   private val autoRemoveView = TimeNodeAutoRemoveView(context)
 
   init {
-    orientation = VERTICAL
     setPadding(0, 8.dp, 0, 0)
-    addView(header)
-    addView(list)
+    header.title.text = context.getString(R.string.dialog_title_change_timestamp)
+    addContentView(list)
     adapter.apply {
       setOnItemClickListener { _, _, position ->
         data.getOrNull(position)?.let {
@@ -86,7 +82,8 @@ class TimeNodeBottomSheetView(context: Context) :
     this.onAction = onAction
     header.title.text = state.title
     bindHeader(state.header)
-    adapter.bind(state.listData)
+    packageIconSources = state.listData.packageIconSources
+    adapter.setList(state.listData.items)
   }
 
   private fun bindHeader(header: TimeNodeHeaderState) {
@@ -110,9 +107,5 @@ class TimeNodeBottomSheetView(context: Context) :
         onAction(TimeNodeBottomSheetAction.SetAutoRemoveEnabled(it))
       }
     }
-  }
-
-  override fun getHeaderView(): BottomSheetHeaderView {
-    return header
   }
 }

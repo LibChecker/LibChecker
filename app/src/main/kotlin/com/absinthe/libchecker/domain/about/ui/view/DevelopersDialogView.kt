@@ -2,16 +2,19 @@ package com.absinthe.libchecker.domain.about.ui.view
 
 import android.content.Context
 import android.view.Gravity
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.core.view.isGone
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.absinthe.libchecker.domain.about.model.DeveloperInfo
 import com.absinthe.libchecker.domain.about.model.DevelopersDialogAction
 import com.absinthe.libchecker.domain.about.model.DevelopersDialogState
-import com.absinthe.libchecker.domain.about.ui.adapter.DeveloperInfoAdapter
-import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
+import com.absinthe.libchecker.domain.about.model.toDevelopersDialogAction
+import com.absinthe.libchecker.ui.adapter.BindOnlyAdapter
+import com.absinthe.libchecker.ui.adapter.addSpacingDecoration
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libchecker.view.app.ToolbarConnectionLoadingView
@@ -50,7 +53,19 @@ class DevelopersDialogView(context: Context) :
   }
 
   private var onAction: (DevelopersDialogAction) -> Unit = {}
-  private val adapter = DeveloperInfoAdapter { onAction(it) }
+  private val adapter = BindOnlyAdapter<DeveloperInfo, DeveloperItemView>(
+    viewFactory = { context ->
+      DeveloperItemView(context).apply {
+        layoutParams = LayoutParams(
+          ViewGroup.LayoutParams.MATCH_PARENT,
+          ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+      }
+    },
+    bindView = { item ->
+      bind(item) { onAction(item.toDevelopersDialogAction()) }
+    }
+  )
   private val visibilityInterpolator = FastOutSlowInInterpolator()
   private var loadingRequested = false
 
@@ -62,9 +77,7 @@ class DevelopersDialogView(context: Context) :
     setPadding(16.dp, 0, 16.dp, 16.dp)
     adapter = this@DevelopersDialogView.adapter
     layoutManager = LinearLayoutManager(context)
-    addItemDecoration(
-      VerticalSpacesItemDecoration(4.dp)
-    )
+    addSpacingDecoration(4.dp)
   }
 
   init {

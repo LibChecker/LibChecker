@@ -11,7 +11,6 @@ import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel.El
 import com.absinthe.libchecker.domain.app.detail.ui.view.ELFInfoBottomSheetView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.extensions.putArguments
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import timber.log.Timber
@@ -43,8 +42,6 @@ class ELFDetailDialogFragment : BaseBottomSheetViewDialogFragment<ELFInfoBottomS
       viewModel.elfDetailResults.collect(::handleElfDetailResult)
     }
   }
-
-  override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun onStart() {
     super.onStart()

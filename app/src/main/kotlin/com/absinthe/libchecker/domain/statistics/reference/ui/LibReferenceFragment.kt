@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.domain.statistics.reference.ui
 
 import android.content.Intent
-import android.graphics.Color
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -14,7 +13,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
@@ -36,8 +34,7 @@ import com.absinthe.libchecker.domain.statistics.reference.ui.adapter.provider.L
 import com.absinthe.libchecker.domain.statistics.reference.ui.adapter.provider.MULTIPLE_APPS_ICON_PROVIDER
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseListControllerFragment
-import com.absinthe.libchecker.ui.base.IAppBarContainer
-import com.absinthe.libchecker.ui.base.initialListSearchState
+import com.absinthe.libchecker.ui.base.ListScreenChrome
 import com.absinthe.libchecker.ui.base.shouldHandleListSearchQueryChange
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
@@ -56,7 +53,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import rikka.widget.borderview.BorderView
 
 const val VF_LOADING = 0
 const val VF_LIST = 1
@@ -80,11 +76,10 @@ class LibReferenceFragment :
       bind(listRenderState)
     }
   }
-  private var delayShowNavigationJob: Job? = null
   private var searchUpdateJob: Job? = null
   private var advancedMenuBSDFragment: LibReferenceMenuBSDFragment? = null
-  private var firstScrollFlag = false
   private var isSearchTextClearOnce = false
+  private var resetScrollbarNavigationReveal: (() -> Unit)? = null
   private var hasReportedFirstListLayout = false
   private var resultToFirstLayoutTraceActive = false
   private var prewarmIndex = 0
@@ -117,13 +112,7 @@ class LibReferenceFragment :
       list.apply {
         adapter = refAdapter
         layoutManager = LinearLayoutManager(context)
-        borderDelegate = borderViewDelegate
-        borderVisibilityChangedListener =
-          BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-            if (isFragmentVisible()) {
-              scheduleAppbarLiftingStatus(!top)
-            }
-          }
+        wireListScreenChrome(this)
         FastScrollerBuilder(this).useMd2Style().build()
         setRecycledViewPool(
           recycledViewPool.apply {
@@ -132,49 +121,15 @@ class LibReferenceFragment :
           }
         )
         postOnAnimation(prewarmNextViewHolder)
-        addOnScrollListener(object : RecyclerView.OnScrollListener() {
-          override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-            if (dx != 0 || dy != 0) {
-              isSearchTextClearOnce = false
-            }
-            if (dx == 0 && dy == 0) {
-              // scrolled by dragging scrolling bar
-              if (!firstScrollFlag) {
-                firstScrollFlag = true
-                return
-              }
-              if (delayShowNavigationJob?.isActive == true) {
-                delayShowNavigationJob?.cancel()
-                delayShowNavigationJob = null
-              }
-
-              val position = when (layoutManager) {
-                is LinearLayoutManager -> {
-                  (layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
-                }
-
-                is StaggeredGridLayoutManager -> {
-                  val counts = IntArray(4)
-                  (layoutManager as StaggeredGridLayoutManager).findLastVisibleItemPositions(counts)
-                  counts[0]
-                }
-
-                else -> {
-                  0
-                }
-              }
-              if (isFragmentVisible() && !isSearchTextClearOnce && position < refAdapter.itemCount - 1) {
-                delayShowNavigationJob = lifecycleScope.launch(Dispatchers.IO) {
-                  delay(400)
-                  withContext(Dispatchers.Main) {
-                    (activity as? INavViewContainer)?.showNavigationView()
-                  }
-                }
-              }
-              isSearchTextClearOnce = false
-            }
-          }
-        })
+        resetScrollbarNavigationReveal =
+          ListScreenChrome.installScrollbarNavigationReveal(
+            recyclerView = this,
+            coroutineScope = lifecycleScope,
+            isFragmentVisible = ::isFragmentVisible,
+            isSearchTextClearOnce = { isSearchTextClearOnce },
+            clearSearchTextFlag = { isSearchTextClearOnce = false },
+            revealNavigation = { (activity as? INavViewContainer)?.showNavigationView() }
+          )
       }
       vfContainer.apply {
         setInAnimation(activity, R.anim.anim_fade_in)
@@ -305,36 +260,15 @@ class LibReferenceFragment :
     this.menu = menu
 
     val context = (context as? BaseActivity<*>) ?: return
-    val searchMenuState = homeViewModel.getToolbarSearchMenuState()
-    val initialSearchState = initialListSearchState(
+    ListScreenChrome.installSearchMenuItem(
+      menuItem = menu.findItem(R.id.search),
+      context = context,
+      queryHint = getText(R.string.search_hint),
       retainedQuery = libReferenceViewModel.getSearchQuery(),
-      toolbarState = searchMenuState
+      toolbarState = homeViewModel.getToolbarSearchMenuState(),
+      listener = this,
+      isListReady = isListReady
     )
-    val searchView = SearchView(context).apply {
-      setIconifiedByDefault(false)
-      queryHint = getText(R.string.search_hint)
-      isQueryRefinementEnabled = true
-      setQuery(initialSearchState.query, false)
-      setOnQueryTextListener(this@LibReferenceFragment)
-
-      findViewById<View>(androidx.appcompat.R.id.search_plate).apply {
-        setBackgroundColor(Color.TRANSPARENT)
-      }
-    }
-
-    menu.findItem(R.id.search).apply {
-      setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW or MenuItem.SHOW_AS_ACTION_IF_ROOM)
-      actionView = searchView
-      if (initialSearchState.shouldExpand) {
-        expandActionView()
-      }
-
-      if (!isListReady) {
-        isVisible = false
-      }
-    }
-    searchView.setQuery(initialSearchState.query, false)
-    searchView.setOnQueryTextListener(this@LibReferenceFragment)
   }
 
   override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
@@ -480,14 +414,14 @@ class LibReferenceFragment :
 
   override fun onVisibilityChanged(visible: Boolean) {
     super.onVisibilityChanged(visible)
+    onListScreenVisibilityChanged(visible, binding.list)
     if (visible) {
       refAdapter.setSpaceFooterView()
-      (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(binding.list)
       applyReferenceWork(
         libReferenceViewModel.onReferencePageVisible(hasDisplayedReferences = refAdapter.data.isNotEmpty())
       )
     } else {
-      firstScrollFlag = false
+      resetScrollbarNavigationReveal?.invoke()
     }
   }
 

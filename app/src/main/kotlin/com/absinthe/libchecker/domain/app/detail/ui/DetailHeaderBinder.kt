@@ -14,6 +14,7 @@ import com.absinthe.libchecker.domain.app.detail.header.DetailHeaderRenderState
 import com.absinthe.libchecker.domain.app.detail.ui.view.DetailsTitleView
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.view.CollapsedToolbarView
+import com.absinthe.libchecker.view.app.AppIdentityHeaderRenderState
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import me.zhanghai.android.appiconloader.AppIconLoader
 
@@ -55,34 +56,27 @@ class DetailHeaderBinder(
       bindTitle(title.title)
       setIcon(icon)
     }
-    detailsTitleView.apply {
-      iconView.apply {
-        contentDescription = title.title
-        load(icon)
-        if (title.isAppInfoAvailable) {
-          setOnClickListener {
-            if (AntiShakeUtils.isInvalidClick(it)) {
-              return@setOnClickListener
-            }
-            onAppInfoClick(title.packageName)
+    detailsTitleView.renderIdentity(
+      AppIdentityHeaderRenderState(
+        appName = title.appName,
+        iconContentDescription = title.title,
+        packageName = title.packageName,
+        versionInfo = title.versionInfo
+      )
+    )
+    detailsTitleView.iconView.apply {
+      load(icon)
+      if (title.isAppInfoAvailable) {
+        setOnClickListener {
+          if (AntiShakeUtils.isInvalidClick(it)) {
+            return@setOnClickListener
           }
-        } else {
-          setOnClickListener(null)
+          onAppInfoClick(title.packageName)
         }
-        setDetailIconLongClick(applicationInfo, blurView)
+      } else {
+        setOnClickListener(null)
       }
-      appNameView.apply {
-        text = title.appName
-        setLongClickCopiedToClipboard(text)
-      }
-      packageNameView.apply {
-        text = title.packageName
-        setLongClickCopiedToClipboard(text)
-      }
-      versionInfoView.apply {
-        text = title.versionInfo
-        setLongClickCopiedToClipboard(text)
-      }
+      setDetailIconLongClick(applicationInfo, blurView)
     }
   }
 

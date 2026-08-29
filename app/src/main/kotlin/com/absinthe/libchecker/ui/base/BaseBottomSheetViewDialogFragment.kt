@@ -18,9 +18,9 @@ import androidx.fragment.app.FragmentManager
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.absinthe.libchecker.R as AppR
 import com.absinthe.libchecker.utils.OsUtils
+import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.R
 import com.absinthe.libraries.utils.utils.UiUtils
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -28,9 +28,9 @@ import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
 import timber.log.Timber
 
-abstract class BaseBottomSheetViewDialogFragment<T : View> :
+abstract class BaseBottomSheetViewDialogFragment<T> :
   BottomSheetDialogFragment(),
-  View.OnLayoutChangeListener {
+  View.OnLayoutChangeListener where T : View, T : IHeaderView {
 
   var animationDuration = 350L
   var maxPeekHeightPercentage = 0f
@@ -54,14 +54,14 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> :
         BottomSheetBehavior.STATE_DRAGGING -> {
           if (!isHandlerActivated) {
             isHandlerActivated = true
-            getHeaderView().onHandlerActivated(true)
+            root.getHeaderView().onHandlerActivated(true)
           }
         }
 
         BottomSheetBehavior.STATE_COLLAPSED -> {
           if (isHandlerActivated) {
             isHandlerActivated = false
-            getHeaderView().onHandlerActivated(false)
+            root.getHeaderView().onHandlerActivated(false)
           }
           updateBlurAndDimForOffset(0f)
         }
@@ -69,7 +69,7 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> :
         BottomSheetBehavior.STATE_EXPANDED -> {
           if (isHandlerActivated) {
             isHandlerActivated = false
-            getHeaderView().onHandlerActivated(false)
+            root.getHeaderView().onHandlerActivated(false)
           }
           updateBlurAndDimForOffset(1f)
           bottomSheet.background = createMaterialShapeDrawable(bottomSheet)
@@ -97,7 +97,6 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> :
 
   abstract fun initRootView(): T
   abstract fun init()
-  abstract fun getHeaderView(): BottomSheetHeaderView
   protected open fun getHeaderContentSpacing(): Int {
     return resources.getDimensionPixelSize(AppR.dimen.bottom_sheet_header_content_spacing)
   }
@@ -140,7 +139,7 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> :
       root.post { updateMaxPeekSize() }
     }
     init()
-    getHeaderView().title.updatePadding(
+    root.getHeaderView().title.updatePadding(
       bottom = getHeaderContentSpacing()
     )
     return _root

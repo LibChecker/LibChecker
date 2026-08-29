@@ -20,6 +20,8 @@ import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.app.AlwaysMarqueeTextView
+import com.absinthe.libchecker.view.app.AppIdentityHeaderRenderState
+import com.absinthe.libchecker.view.app.AppIdentityHeaderRenderer
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayout
@@ -70,6 +72,13 @@ class DetailsTitleView(
     addView(this)
   }
 
+  private val identityHeaderRenderer = AppIdentityHeaderRenderer(
+    iconView = iconView,
+    appNameView = appNameView,
+    packageNameView = packageNameView,
+    versionInfoView = versionInfoView
+  )
+
   val extraInfoView = AppCompatTextView(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -80,6 +89,10 @@ class DetailsTitleView(
     typeface = Typeface.create("sans-serif-condensed", Typeface.NORMAL)
     letterSpacing = 0f
     addView(this)
+  }
+
+  internal fun renderIdentity(state: AppIdentityHeaderRenderState) {
+    identityHeaderRenderer.render(state)
   }
 
   fun setAbiLabels(abis: List<AbiLabelNode>, tintAbiLabels: Boolean) {

@@ -10,7 +10,6 @@ import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
@@ -19,8 +18,6 @@ class GetUpdatesDialogFragment : BaseBottomSheetViewDialogFragment<GetUpdatesDia
   private val viewModel: SettingsViewModel by viewModel(ownerProducer = { requireParentFragment() })
 
   override fun initRootView(): GetUpdatesDialogView = GetUpdatesDialogView(requireContext())
-
-  override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {
     root.addPaddingTop(16.dp)

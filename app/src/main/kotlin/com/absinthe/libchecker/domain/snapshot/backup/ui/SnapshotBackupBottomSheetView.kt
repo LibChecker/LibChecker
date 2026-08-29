@@ -13,20 +13,12 @@ import com.absinthe.libchecker.ui.preference.model.PreferenceItemGroupPosition
 import com.absinthe.libchecker.ui.preference.model.PreferenceItemRenderState
 import com.absinthe.libchecker.ui.preference.view.PreferenceItemView
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.view.app.IHeaderView
+import com.absinthe.libchecker.view.app.BottomSheetScaffoldView
 import com.absinthe.libraries.utils.manager.SystemBarManager
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
-class SnapshotBackupBottomSheetView(context: Context) :
-  LinearLayout(context),
-  IHeaderView {
+class SnapshotBackupBottomSheetView(context: Context) : BottomSheetScaffoldView(context) {
 
   private var onAction: (SnapshotBackupBottomSheetAction) -> Unit = {}
-
-  private val header = BottomSheetHeaderView(context).apply {
-    layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-    title.text = context.getString(R.string.album_item_backup_restore_title)
-  }
 
   private val backupItem = buildPreferenceItem(
     key = "snapshot_backup",
@@ -56,7 +48,6 @@ class SnapshotBackupBottomSheetView(context: Context) :
   }
 
   init {
-    orientation = VERTICAL
     val padding = 16.dp
     setPadding(
       padding,
@@ -64,15 +55,13 @@ class SnapshotBackupBottomSheetView(context: Context) :
       padding,
       (padding - SystemBarManager.navigationBarSize).coerceAtLeast(0)
     )
-    addView(header)
+    header.title.text = context.getString(R.string.album_item_backup_restore_title)
     addView(itemContainer)
   }
 
   fun bind(onAction: (SnapshotBackupBottomSheetAction) -> Unit) {
     this.onAction = onAction
   }
-
-  override fun getHeaderView(): BottomSheetHeaderView = header
 
   private fun buildPreferenceItem(
     key: String,

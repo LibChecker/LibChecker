@@ -2,29 +2,19 @@ package com.absinthe.libchecker.domain.app.detail.ui.view
 
 import android.content.Context
 import android.view.Gravity
-import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.model.SignatureDetailItem
-import com.absinthe.libchecker.domain.app.detail.ui.adapter.SignatureDetailAdapter
-import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
+import com.absinthe.libchecker.ui.adapter.BindOnlyAdapter
+import com.absinthe.libchecker.ui.adapter.addSpacingDecoration
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.view.app.IHeaderView
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
+import com.absinthe.libchecker.view.app.BottomSheetScaffoldView
 
-class SignatureDetailBottomSheetView(context: Context) :
-  LinearLayout(context),
-  IHeaderView {
+class SignatureDetailBottomSheetView(context: Context) : BottomSheetScaffoldView(context) {
 
-  private val adapter = SignatureDetailAdapter()
-
-  private val header = BottomSheetHeaderView(context).apply {
-    layoutParams =
-      LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-    title.text = context.getString(R.string.signature_detail)
-  }
+  private val adapter = BindOnlyAdapter(::SignatureDetailItemView, SignatureDetailItemView::bind)
 
   private val icon = AppCompatImageView(context).apply {
     val iconSize = 48.dp
@@ -51,13 +41,12 @@ class SignatureDetailBottomSheetView(context: Context) :
     clipToPadding = false
     clipChildren = false
     setHasFixedSize(true)
-    addItemDecoration(VerticalSpacesItemDecoration(4.dp))
+    addSpacingDecoration(4.dp)
   }
 
   init {
-    orientation = VERTICAL
     setPadding(0, 16.dp, 0, 0)
-    addView(header)
+    header.title.text = context.getString(R.string.signature_detail)
     addView(icon)
     addView(list)
   }
@@ -71,9 +60,5 @@ class SignatureDetailBottomSheetView(context: Context) :
       true
     }
     adapter.setList(items)
-  }
-
-  override fun getHeaderView(): BottomSheetHeaderView {
-    return header
   }
 }

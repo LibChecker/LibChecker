@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.graphics.Color
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableStringBuilder
@@ -30,9 +29,6 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.Constants
@@ -59,13 +55,12 @@ import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.timenode.ui.TimeNodeBottomSheetDialogFragment
 import com.absinthe.libchecker.services.OnShootListener
 import com.absinthe.libchecker.services.ShootService
-import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
+import com.absinthe.libchecker.ui.adapter.addSpacingDecoration
 import com.absinthe.libchecker.ui.animator.ParticleRemoveItemAnimator
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.base.BaseListControllerFragment
-import com.absinthe.libchecker.ui.base.IAppBarContainer
-import com.absinthe.libchecker.ui.base.initialListSearchState
+import com.absinthe.libchecker.ui.base.ListScreenChrome
 import com.absinthe.libchecker.ui.base.shouldHandleListSearchQueryChange
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.Telemetry
@@ -88,7 +83,6 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import rikka.core.util.ClipboardUtils
-import rikka.widget.borderview.BorderView
 import timber.log.Timber
 
 const val VF_LOADING = 0
@@ -128,8 +122,6 @@ class SnapshotFragment :
   }
   private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
   private var advancedMenuBSDFragment: SnapshotMenuBSDFragment? = null
-
-  private lateinit var layoutManager: RecyclerView.LayoutManager
 
   override fun init() {
     val context = (this.context as? BaseActivity<*>) ?: return
@@ -234,17 +226,11 @@ class SnapshotFragment :
       list.apply {
         adapter = this@SnapshotFragment.adapter
         itemAnimator = particleItemAnimator
-        borderDelegate = borderViewDelegate
-        layoutManager = getSuitableLayoutManagerImpl(resources.configuration)
-        borderVisibilityChangedListener =
-          BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-            if (isFragmentVisible()) {
-              scheduleAppbarLiftingStatus(!top)
-            }
-          }
+        wireListScreenChrome(this)
+        layoutManager = createListScreenLayoutManager(resources.configuration)
 
         if (itemDecorationCount == 0) {
-          addItemDecoration(VerticalSpacesItemDecoration(4.dp, ratio = 0f))
+          addSpacingDecoration(4.dp, ratio = 0f)
         }
         scrollToPosition(0)
       }
@@ -381,7 +367,7 @@ class SnapshotFragment :
 
   override fun onConfigurationChanged(newConfig: Configuration) {
     super.onConfigurationChanged(newConfig)
-    binding.list.layoutManager = getSuitableLayoutManagerImpl(newConfig)
+    binding.list.layoutManager = createListScreenLayoutManager(newConfig)
   }
 
   override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -390,36 +376,15 @@ class SnapshotFragment :
       findItem(R.id.save)?.isVisible = binding.vfContainer.displayedChild == VF_LIST
     }
     val context = context ?: return
-    val searchMenuState = homeViewModel.getToolbarSearchMenuState()
-    val initialSearchState = initialListSearchState(
+    ListScreenChrome.installSearchMenuItem(
+      menuItem = menu.findItem(R.id.search),
+      context = context,
+      queryHint = getText(R.string.search_hint),
       retainedQuery = viewModel.getSnapshotSearchKeyword(),
-      toolbarState = searchMenuState
+      toolbarState = homeViewModel.getToolbarSearchMenuState(),
+      listener = this,
+      isListReady = isListReady
     )
-    val searchView = SearchView(context).apply {
-      setIconifiedByDefault(false)
-      queryHint = getText(R.string.search_hint)
-      isQueryRefinementEnabled = true
-      setQuery(initialSearchState.query, false)
-      setOnQueryTextListener(this@SnapshotFragment)
-
-      findViewById<View>(androidx.appcompat.R.id.search_plate).apply {
-        setBackgroundColor(Color.TRANSPARENT)
-      }
-    }
-
-    menu.findItem(R.id.search).apply {
-      setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW or MenuItem.SHOW_AS_ACTION_IF_ROOM)
-      actionView = searchView
-      if (initialSearchState.shouldExpand) {
-        expandActionView()
-      }
-
-      if (!isListReady) {
-        isVisible = false
-      }
-    }
-    searchView.setQuery(initialSearchState.query, false)
-    searchView.setOnQueryTextListener(this@SnapshotFragment)
   }
 
   override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
@@ -557,9 +522,9 @@ class SnapshotFragment :
 
   override fun onVisibilityChanged(visible: Boolean) {
     super.onVisibilityChanged(visible)
+    onListScreenVisibilityChanged(visible, binding.list)
     if (visible) {
       adapter.setSpaceFooterView()
-      (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(binding.list)
     }
   }
 
@@ -588,18 +553,6 @@ class SnapshotFragment :
   }
 
   override fun getSuitableLayoutManager() = binding.list.layoutManager
-
-  private fun getSuitableLayoutManagerImpl(configuration: Configuration): RecyclerView.LayoutManager {
-    layoutManager = when (configuration.orientation) {
-      Configuration.ORIENTATION_PORTRAIT -> LinearLayoutManager(requireContext())
-
-      Configuration.ORIENTATION_LANDSCAPE ->
-        StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
-
-      else -> throw IllegalStateException("Wrong orientation at SnapshotFragment.")
-    }
-    return layoutManager
-  }
 
   override fun onReturnTop() {
     val context = context ?: return

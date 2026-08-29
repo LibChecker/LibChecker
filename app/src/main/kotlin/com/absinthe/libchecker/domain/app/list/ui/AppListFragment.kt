@@ -2,7 +2,6 @@ package com.absinthe.libchecker.domain.app.list.ui
 
 import android.content.Context
 import android.content.res.Configuration
-import android.graphics.Color
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -39,12 +38,11 @@ import com.absinthe.libchecker.domain.app.list.ui.adapter.AppAdapter
 import com.absinthe.libchecker.domain.app.list.usecase.GetAppListPackageStatesUseCase
 import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
 import com.absinthe.libchecker.domain.home.ui.INavViewContainer
-import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
+import com.absinthe.libchecker.ui.adapter.addSpacingDecoration
 import com.absinthe.libchecker.ui.animator.ParticleRemoveItemAnimator
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseListControllerFragment
-import com.absinthe.libchecker.ui.base.IAppBarContainer
-import com.absinthe.libchecker.ui.base.initialListSearchState
+import com.absinthe.libchecker.ui.base.ListScreenChrome
 import com.absinthe.libchecker.ui.base.shouldHandleListSearchQueryChange
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
@@ -66,7 +64,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import org.koin.android.ext.android.inject
-import rikka.widget.borderview.BorderView
 import timber.log.Timber
 
 const val VF_LOADING = 0
@@ -96,16 +93,14 @@ class AppListFragment :
   private var updateItemsJob: Job? = null
   private var itemViewStatesJob: Job? = null
   private var itemViewStatesGeneration = 0
-  private var delayShowNavigationJob: Job? = null
   private var advancedMenuBSDFragment: AdvancedMenuBSDFragment? = null
   private var isFirstRequestChange = true
   private var isSearchTextClearOnce = false
-  private var firstScrollFlag = false
   private var hasInitializedItems = false
   private var suppressImeOnNextSearchRestore = false
   private var pendingDumpAppsInfoAction: HomeViewModel.AppListSearchCommandAction.DumpAppsInfo? = null
 
-  private lateinit var layoutManager: RecyclerView.LayoutManager
+  private var resetScrollbarNavigationReveal: (() -> Unit)? = null
   private lateinit var dumpAppsInfoResultLauncher: ActivityResultLauncher<String>
   private lateinit var queryAllPackagesPermissionLauncher: ActivityResultLauncher<String>
 
@@ -135,68 +130,27 @@ class AppListFragment :
       list.apply {
         adapter = appAdapter
         itemAnimator = particleItemAnimator
-        borderDelegate = borderViewDelegate
-        layoutManager = getSuitableLayoutManagerImpl(resources.configuration)
-        borderVisibilityChangedListener =
-          BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-            if (isFragmentVisible()) {
-              scheduleAppbarLiftingStatus(!top)
-            }
-          }
+        wireListScreenChrome(this)
+        layoutManager = createListScreenLayoutManager(resources.configuration)
         if (itemDecorationCount == 0) {
-          addItemDecoration(VerticalSpacesItemDecoration(4.dp, ratio = 0f))
+          addSpacingDecoration(4.dp, ratio = 0f)
         }
         setHasFixedSize(true)
         FastScrollerBuilder(this).useMd2Style().build()
+        resetScrollbarNavigationReveal =
+          ListScreenChrome.installScrollbarNavigationReveal(
+            recyclerView = this,
+            coroutineScope = lifecycleScope,
+            isFragmentVisible = ::isFragmentVisible,
+            isSearchTextClearOnce = { isSearchTextClearOnce },
+            clearSearchTextFlag = { isSearchTextClearOnce = false },
+            revealNavigation = { (activity as? INavViewContainer)?.showNavigationView() },
+            onScrollbarScrolled = homeViewModel::onAppListUserScrolled
+          )
         addOnScrollListener(object : RecyclerView.OnScrollListener() {
           override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
               homeViewModel.onAppListUserScrolled()
-            }
-          }
-
-          override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-            if (dx != 0 || dy != 0) {
-              isSearchTextClearOnce = false
-            }
-            if (dx == 0 && dy == 0) {
-              // scrolled by dragging scrolling bar
-              if (!isSearchTextClearOnce) {
-                homeViewModel.onAppListUserScrolled()
-              }
-              if (!firstScrollFlag) {
-                firstScrollFlag = true
-                return
-              }
-              if (delayShowNavigationJob?.isActive == true) {
-                delayShowNavigationJob?.cancel()
-                delayShowNavigationJob = null
-              }
-
-              val position = when (layoutManager) {
-                is LinearLayoutManager -> {
-                  (layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
-                }
-
-                is StaggeredGridLayoutManager -> {
-                  val counts = IntArray(4)
-                  (layoutManager as StaggeredGridLayoutManager).findLastVisibleItemPositions(counts)
-                  counts[0]
-                }
-
-                else -> {
-                  0
-                }
-              }
-              if (isFragmentVisible() && !isSearchTextClearOnce && position < appAdapter.itemCount - 1) {
-                delayShowNavigationJob = lifecycleScope.launch(Dispatchers.IO) {
-                  delay(400)
-                  withContext(Dispatchers.Main) {
-                    (activity as? INavViewContainer)?.showNavigationView()
-                  }
-                }
-              }
-              isSearchTextClearOnce = false
             }
           }
         })
@@ -264,7 +218,7 @@ class AppListFragment :
 
   override fun onConfigurationChanged(newConfig: Configuration) {
     super.onConfigurationChanged(newConfig)
-    binding.list.layoutManager = getSuitableLayoutManagerImpl(newConfig)
+    binding.list.layoutManager = createListScreenLayoutManager(newConfig)
   }
 
   override fun onQueryTextSubmit(query: String?): Boolean {
@@ -328,45 +282,21 @@ class AppListFragment :
     this.menu = menu
 
     val context = context ?: return
-    val searchMenuState = homeViewModel.getToolbarSearchMenuState()
-    val initialSearchState = initialListSearchState(
+    ListScreenChrome.installSearchMenuItem(
+      menuItem = menu.findItem(R.id.search),
+      context = context,
+      queryHint = getText(R.string.search_hint),
       retainedQuery = homeViewModel.getAppListSearchQuery(),
-      toolbarState = searchMenuState
-    )
-    val searchView = SearchView(context).apply {
-      setIconifiedByDefault(false)
-      queryHint = getText(R.string.search_hint)
-      isQueryRefinementEnabled = true
-      setQuery(initialSearchState.query, false)
-      setOnQueryTextListener(this@AppListFragment)
-
-      findViewById<View>(androidx.appcompat.R.id.search_plate).apply {
-        setBackgroundColor(Color.TRANSPARENT)
-      }
-    }
-
-    menu.findItem(R.id.search).apply {
-      setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW or MenuItem.SHOW_AS_ACTION_IF_ROOM)
-      actionView = searchView
-      if (initialSearchState.shouldExpand) {
-        expandActionView()
-        if (
-          shouldSuppressImeAfterSearchRestore(
-            suppressImeOnNextSearchRestore = suppressImeOnNextSearchRestore,
-            shouldExpand = initialSearchState.shouldExpand
-          )
-        ) {
+      toolbarState = homeViewModel.getToolbarSearchMenuState(),
+      listener = this,
+      isListReady = isListReady,
+      onExpanded = { searchView ->
+        if (shouldSuppressImeAfterSearchRestore(suppressImeOnNextSearchRestore, true)) {
           suppressImeAfterSearchRestore(searchView)
         }
       }
-      suppressImeOnNextSearchRestore = false
-
-      if (!isListReady) {
-        isVisible = false
-      }
-    }
-    searchView.setQuery(initialSearchState.query, false)
-    searchView.setOnQueryTextListener(this@AppListFragment)
+    )
+    suppressImeOnNextSearchRestore = false
   }
 
   private fun suppressImeAfterSearchRestore(searchView: SearchView) {
@@ -422,11 +352,11 @@ class AppListFragment :
 
   override fun onVisibilityChanged(visible: Boolean) {
     super.onVisibilityChanged(visible)
+    onListScreenVisibilityChanged(visible, binding.list)
     if (visible) {
       appAdapter.setSpaceFooterView()
-      (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(binding.list)
     } else {
-      firstScrollFlag = false
+      resetScrollbarNavigationReveal?.invoke()
     }
   }
 
@@ -686,18 +616,6 @@ class AppListFragment :
         }
       }
     }
-  }
-
-  private fun getSuitableLayoutManagerImpl(configuration: Configuration): RecyclerView.LayoutManager {
-    layoutManager = when (configuration.orientation) {
-      Configuration.ORIENTATION_PORTRAIT -> LinearLayoutManager(requireContext())
-
-      Configuration.ORIENTATION_LANDSCAPE ->
-        StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
-
-      else -> throw IllegalStateException("Wrong orientation at AppListFragment.")
-    }
-    return layoutManager
   }
 
   private fun flip(page: Int) = lifecycleScope.launch(Dispatchers.Main) {

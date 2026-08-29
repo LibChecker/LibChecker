@@ -8,7 +8,6 @@ import com.absinthe.libchecker.domain.app.detail.ui.view.SignatureDetailBottomSh
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import rikka.core.util.ClipboardUtils
 
@@ -20,8 +19,6 @@ class SignatureDetailBSDFragment : BaseBottomSheetViewDialogFragment<SignatureDe
   private val viewModel: DetailViewModel by activityViewModel()
 
   override fun initRootView(): SignatureDetailBottomSheetView = SignatureDetailBottomSheetView(requireContext())
-
-  override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {
     maxPeekHeightPercentage = 0.67f

@@ -5,21 +5,26 @@ import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.MotionEvent
+import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.domain.snapshot.timenode.model.SnapshotTimeNodeItem
-import com.absinthe.libchecker.domain.snapshot.timenode.ui.adapter.TimeNodeItemAdapter
+import com.absinthe.libchecker.ui.adapter.BindOnlyAdapter
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.view.AViewGroup
 
 class TimeNodeItemView(context: Context) : AViewGroup(context) {
 
   private val defaultNameColor: Int
+  private var packageIconSources: Map<String, SnapshotPackageIconSource> = emptyMap()
 
   private val name = AppCompatTextView(
     ContextThemeWrapper(
@@ -39,7 +44,23 @@ class TimeNodeItemView(context: Context) : AViewGroup(context) {
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
   }
 
-  private val adapter = TimeNodeItemAdapter()
+  private val adapter = BindOnlyAdapter<String, AppCompatImageView>(
+    viewFactory = {
+      AppCompatImageView(it).apply {
+        layoutParams = ViewGroup.LayoutParams(20.dp, 20.dp)
+        setPadding(0, 0, 3.dp, 0)
+        importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+      }
+    },
+    bindView = { packageName ->
+      when (val iconSource = packageIconSources[packageName]) {
+        is SnapshotPackageIconSource.InstalledPackage -> load(iconSource.packageInfo)
+
+        SnapshotPackageIconSource.Fallback,
+        null -> load(R.drawable.ic_icon_blueprint)
+      }
+    }
+  )
 
   private val moreIndicator = AppCompatTextView(context).apply {
     layoutParams = ViewGroup.LayoutParams(
@@ -102,7 +123,8 @@ class TimeNodeItemView(context: Context) : AViewGroup(context) {
       .map(CharSequence::toString)
       .filter(String::isNotBlank)
       .joinToString()
-    adapter.bind(item.topAppPackageNames.take(MAX_VISIBLE_APP_COUNT), packageIconSources)
+    this.packageIconSources = packageIconSources
+    adapter.setList(item.topAppPackageNames.take(MAX_VISIBLE_APP_COUNT))
     rvList.isVisible = item.topAppPackageNames.isNotEmpty()
     if (item.topAppPackageNames.size <= MAX_VISIBLE_APP_COUNT) {
       adapter.removeAllFooterView()

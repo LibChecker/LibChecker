@@ -16,7 +16,6 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.LinearLayout
 import android.widget.TableLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
@@ -34,17 +33,16 @@ import com.absinthe.libchecker.domain.app.detail.insight.LibraryInsightUiState
 import com.absinthe.libchecker.domain.app.detail.model.LibraryDetailBottomSheetState
 import com.absinthe.libchecker.domain.app.detail.model.LibraryDetailContentDisplay
 import com.absinthe.libchecker.domain.app.detail.model.LibraryDetailHeaderDisplay
-import com.absinthe.libchecker.domain.app.detail.ui.adapter.LibDetailItemAdapter
-import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
+import com.absinthe.libchecker.ui.adapter.BindOnlyAdapter
+import com.absinthe.libchecker.ui.adapter.addSpacingDecoration
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
-import com.absinthe.libchecker.view.app.IHeaderView
+import com.absinthe.libchecker.view.app.BottomSheetScaffoldView
 import com.absinthe.libchecker.view.app.RuleLoadingView
 import com.absinthe.libraries.utils.manager.SystemBarManager
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.absinthe.libraries.utils.view.HeightAnimatableViewFlipper
 import com.google.android.material.tabs.TabLayout
 import kotlin.math.roundToInt
@@ -53,13 +51,7 @@ class LibDetailBottomSheetView(
   context: Context,
   private val onLocaleSelected: (String) -> Unit = {},
   onInsightExpansionAnimationStateChange: (Boolean) -> Unit = {}
-) : LinearLayout(context),
-  IHeaderView {
-
-  private val header = BottomSheetHeaderView(context).apply {
-    layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-    title.text = context.getString(R.string.lib_detail_dialog_title)
-  }
+) : BottomSheetScaffoldView(context) {
 
   private val icon = AppCompatImageView(context).apply {
     val iconSize = 48.dp
@@ -145,7 +137,7 @@ class LibDetailBottomSheetView(
     })
   }
 
-  private val contentAdapter = LibDetailItemAdapter().apply {
+  private val contentAdapter = BindOnlyAdapter(::DetailInfoItemView, DetailInfoItemView::bind).apply {
     addHeaderView(tabLayout)
   }
 
@@ -160,11 +152,10 @@ class LibDetailBottomSheetView(
     isVerticalScrollBarEnabled = false
     clipToPadding = false
     clipChildren = false
-    addItemDecoration(VerticalSpacesItemDecoration(4.dp))
+    addSpacingDecoration(4.dp)
   }
 
   init {
-    orientation = VERTICAL
     gravity = Gravity.CENTER_HORIZONTAL
     clipChildren = false
     clipToPadding = false
@@ -175,7 +166,7 @@ class LibDetailBottomSheetView(
       padding,
       (padding - SystemBarManager.navigationBarSize).coerceAtLeast(0)
     )
-    addView(header)
+    header.title.text = context.getString(R.string.lib_detail_dialog_title)
     addView(identityAndExtra)
     addView(viewFlipper)
     viewFlipper.addView(loading)
@@ -416,8 +407,6 @@ class LibDetailBottomSheetView(
       viewFlipper.show(notFoundView)
     }
   }
-
-  override fun getHeaderView(): BottomSheetHeaderView = header
 
   private companion object {
     const val INSIGHT_VISIBILITY_DURATION = 350L

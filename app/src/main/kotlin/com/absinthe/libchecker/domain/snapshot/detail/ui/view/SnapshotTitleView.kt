@@ -23,6 +23,8 @@ import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.app.AlwaysMarqueeTextView
+import com.absinthe.libchecker.view.app.AppIdentityHeaderRenderState
+import com.absinthe.libchecker.view.app.AppIdentityHeaderRenderer
 import com.google.android.material.R as MaterialR
 
 class SnapshotTitleView(
@@ -70,6 +72,13 @@ class SnapshotTitleView(
     addView(this)
   }
   private val versionInfoLineBreaker = SnapshotDetailLineBreaker(versionInfoView)
+  private val identityHeaderRenderer = AppIdentityHeaderRenderer(
+    iconView = iconView,
+    appNameView = appNameView,
+    packageNameView = packageNameView,
+    versionInfoView = versionInfoView,
+    setVersionInfo = versionInfoLineBreaker::setText
+  )
 
   private val packageSizeLabelView = metricLabel(R.string.snapshot_detail_size_label)
 
@@ -101,25 +110,15 @@ class SnapshotTitleView(
   }
 
   fun render(data: SnapshotTitleRenderState) {
-    appNameView.apply {
-      text = data.appName
-      if (data.copyPrimaryText) {
-        setLongClickCopiedToClipboard(text)
-      }
-    }
-    iconView.contentDescription = data.iconContentDescription
-    packageNameView.apply {
-      text = data.packageName
-      if (data.copyPrimaryText) {
-        setLongClickCopiedToClipboard(text)
-      }
-    }
-    versionInfoView.apply {
-      versionInfoLineBreaker.setText(data.versionInfo)
-      if (data.copyPrimaryText) {
-        setLongClickCopiedToClipboard(data.versionInfo)
-      }
-    }
+    identityHeaderRenderer.render(
+      AppIdentityHeaderRenderState(
+        appName = data.appName,
+        iconContentDescription = data.iconContentDescription,
+        packageName = data.packageName,
+        versionInfo = data.versionInfo,
+        copyPrimaryText = data.copyPrimaryText
+      )
+    )
     setPackageSizeText(data.packageSize)
     apisView.apply {
       text = data.apis

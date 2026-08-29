@@ -12,7 +12,6 @@ import com.absinthe.libchecker.domain.app.detail.ui.view.OverlayDetailBottomShee
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
@@ -23,8 +22,6 @@ class OverlayDetailBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment
   override fun initRootView(): OverlayDetailBottomSheetView {
     return OverlayDetailBottomSheetView(requireContext())
   }
-
-  override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {
     val lcItem = arguments?.let {

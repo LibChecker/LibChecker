@@ -18,7 +18,6 @@ import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.supportIECUnit
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
@@ -32,8 +31,6 @@ class SnapshotMenuBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotMenuBS
   private var onDismissCallback: (optionsDiff: Int) -> Unit = {}
 
   override fun initRootView(): SnapshotMenuBSDView = SnapshotMenuBSDView(requireContext())
-
-  override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {
     maxPeekHeightPercentage = 0.8f

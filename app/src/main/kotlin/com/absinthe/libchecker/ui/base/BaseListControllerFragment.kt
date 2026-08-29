@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.ui.base
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.Menu
 import android.view.View
@@ -9,9 +10,12 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
+import rikka.widget.borderview.BorderRecyclerView
+import rikka.widget.borderview.BorderView
 import rikka.widget.borderview.BorderViewDelegate
 
 abstract class BaseListControllerFragment<T : ViewBinding> :
@@ -52,6 +56,33 @@ abstract class BaseListControllerFragment<T : ViewBinding> :
 
   protected fun scheduleAppbarLiftingStatus(isLifted: Boolean) {
     (activity as? IAppBarContainer)?.scheduleAppbarLiftingStatus(isLifted)
+  }
+
+  protected fun wireListScreenChrome(recyclerView: BorderRecyclerView) {
+    borderDelegate = recyclerView.borderViewDelegate
+    recyclerView.borderVisibilityChangedListener =
+      BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
+        if (isFragmentVisible()) {
+          scheduleAppbarLiftingStatus(!top)
+        }
+      }
+  }
+
+  protected fun createListScreenLayoutManager(configuration: Configuration): RecyclerView.LayoutManager {
+    return when (configuration.orientation) {
+      Configuration.ORIENTATION_PORTRAIT -> LinearLayoutManager(requireContext())
+
+      Configuration.ORIENTATION_LANDSCAPE ->
+        StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+
+      else -> error("Wrong orientation at ${javaClass.simpleName}.")
+    }
+  }
+
+  protected fun onListScreenVisibilityChanged(visible: Boolean, recyclerView: RecyclerView) {
+    if (visible) {
+      (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(recyclerView)
+    }
   }
 
   protected fun canListScroll(listSize: Int): Boolean {
