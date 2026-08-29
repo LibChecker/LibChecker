@@ -344,6 +344,7 @@ class LibReferenceFragment :
       advancedMenuBSDFragment = LibReferenceMenuBSDFragment().apply {
         setOptionChangeListener(
           initialOptions = libReferenceViewModel.getLibReferenceOptions(),
+          colorfulRuleIcon = libReferenceViewModel.colorfulRuleIcon,
           onOptionChanged = libReferenceViewModel::setLibReferenceOption
         )
         setOnDismissListener { optionsDiff ->

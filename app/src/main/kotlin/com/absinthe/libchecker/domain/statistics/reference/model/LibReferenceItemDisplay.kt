@@ -65,7 +65,9 @@ data class LibReferenceItemDisplay(
       notMarkedLabel: String,
       permissionFallbackLabel: String,
       metadataLabel: String,
-      countText: String
+      countText: String,
+      allowDetailAction: Boolean = true,
+      labelSuffix: String = ""
     ): LibReferenceItemDisplay {
       val rule = reference.rule
       val categoryLabel = when (reference.type) {
@@ -78,7 +80,7 @@ data class LibReferenceItemDisplay(
 
         else -> null
       }
-      val label = rule?.label ?: categoryLabel ?: notMarkedLabel
+      val label = (rule?.label ?: categoryLabel ?: notMarkedLabel) + labelSuffix
       val isAndroidGroupPermission = reference.type == PERMISSION &&
         reference.libName.startsWith("android.permission")
       val isAndroidGroupAction = reference.type == ACTION &&
@@ -97,7 +99,7 @@ data class LibReferenceItemDisplay(
         iconRes = iconRes,
         iconContentDescription = rule?.label ?: reference.libName,
         desaturateIcon = rule != null && !colorfulRuleIcon && !rule.isSimpleColorIcon,
-        canOpenDetail = reference.canOpenDetail(),
+        canOpenDetail = reference.canOpenDetail(allowDetailAction),
         contentDescription = buildReferenceItemDescription(label, reference.libName, countText)
       )
     }
@@ -118,7 +120,8 @@ data class MultipleAppsIconItemDisplay(
       reference: LibReference,
       notMarkedLabel: String,
       packageLabel: String,
-      sharedUidLabel: String
+      sharedUidLabel: String,
+      labelSuffix: String = ""
     ): MultipleAppsIconItemDisplay {
       val categoryLabel = when (reference.type) {
         PACKAGE -> packageLabel
@@ -130,7 +133,7 @@ data class MultipleAppsIconItemDisplay(
         else -> reference.libName
       }
       val count = reference.referredList.size.toString()
-      val label = categoryLabel ?: notMarkedLabel
+      val label = (categoryLabel ?: notMarkedLabel) + labelSuffix
 
       return MultipleAppsIconItemDisplay(
         iconPackages = reference.iconPackages,
@@ -146,6 +149,10 @@ data class MultipleAppsIconItemDisplay(
 
 fun LibReference.canOpenDetail(): Boolean {
   return type == NATIVE || isComponentType(type) || type == ACTION
+}
+
+fun LibReference.canOpenDetail(allowDetailAction: Boolean): Boolean {
+  return allowDetailAction && canOpenDetail()
 }
 
 private fun buildReferenceItemDescription(vararg parts: String): String {

@@ -58,6 +58,51 @@ class LibReferenceItemDisplayTest {
   }
 
   @Test
+  fun disablesDetailActionForNonInteractiveDemoDisplay() {
+    val reference = LibReference(
+      libName = "libsample.so",
+      rule = Rule("libsample.so", NATIVE, "Sample SDK", 42, null, null, false),
+      referredList = setOf("one"),
+      type = NATIVE
+    )
+
+    val display = LibReferenceItemDisplay.create(
+      reference = reference,
+      colorfulRuleIcon = true,
+      notMarkedLabel = "Not marked",
+      permissionFallbackLabel = "Permission",
+      metadataLabel = "Metadata",
+      countText = "1",
+      allowDetailAction = false
+    )
+
+    assertFalse(display.canOpenDetail)
+    assertFalse(reference.canOpenDetail(allowDetailAction = false))
+    assertTrue(reference.canOpenDetail(allowDetailAction = true))
+  }
+
+  @Test
+  fun appendsLabelSuffixToReferenceDisplay() {
+    val display = LibReferenceItemDisplay.create(
+      reference = LibReference(
+        libName = "libsample.so",
+        rule = Rule("libsample.so", NATIVE, "Sample SDK", 42, null, null, false),
+        referredList = setOf("one"),
+        type = NATIVE
+      ),
+      colorfulRuleIcon = true,
+      notMarkedLabel = "Not marked",
+      permissionFallbackLabel = "Permission",
+      metadataLabel = "Metadata",
+      countText = "1",
+      labelSuffix = "(Example)"
+    )
+
+    assertEquals("Sample SDK(Example)", display.label)
+    assertEquals("Sample SDK(Example), libsample.so, 1", display.contentDescription)
+  }
+
+  @Test
   fun buildsAndroidPermissionDisplayWithPermissionLabel() {
     val display = LibReferenceItemDisplay.create(
       reference = LibReference(
@@ -174,6 +219,25 @@ class LibReferenceItemDisplayTest {
     assertEquals("2", display.count)
     assertTrue(display.iconPackages.isEmpty())
     assertEquals("Package, com.example.*, 2", display.contentDescription)
+  }
+
+  @Test
+  fun appendsLabelSuffixToMultipleAppsDisplay() {
+    val display = MultipleAppsIconItemDisplay.create(
+      reference = LibReference(
+        libName = "com.example",
+        rule = null,
+        referredList = setOf("one"),
+        type = PACKAGE
+      ),
+      notMarkedLabel = "Not marked",
+      packageLabel = "Package",
+      sharedUidLabel = "UID 1000",
+      labelSuffix = "(Example)"
+    )
+
+    assertEquals("Package(Example)", display.label)
+    assertEquals("Package(Example), com.example.*, 1", display.contentDescription)
   }
 
   @Test
