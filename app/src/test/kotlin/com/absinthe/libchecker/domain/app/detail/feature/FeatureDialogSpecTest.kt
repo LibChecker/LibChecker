@@ -1,5 +1,7 @@
 package com.absinthe.libchecker.domain.app.detail.feature
 
+import com.absinthe.libchecker.domain.app.buildmetadata.KotlinBuildMetadata
+import com.absinthe.libchecker.domain.app.buildmetadata.KotlinVersionSource
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -20,6 +22,19 @@ class FeatureDialogSpecTest {
         FeatureDialogTitleEntry(FeatureDialogTitleLabel.Text("Compose Compiler"), null)
       ),
       spec.titleEntries
+    )
+  }
+
+  @Test
+  fun kotlinDialogShowsVersionWithoutInferenceSource() {
+    val metadata = KotlinBuildMetadata(
+      kotlinVersion = "2.1.x",
+      kotlinVersionSource = KotlinVersionSource.DEX_ENTRY_POINTS
+    )
+
+    assertEquals(
+      linkedMapOf("Kotlin" to "2.1.x"),
+      metadata.toKotlinDialogEntries()
     )
   }
 }

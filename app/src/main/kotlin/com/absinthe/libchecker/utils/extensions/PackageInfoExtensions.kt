@@ -39,6 +39,7 @@ import com.absinthe.libchecker.constant.GlobalFeatures
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.domain.app.buildmetadata.DATA_BINDING_VERSION_ENTRIES
+import com.absinthe.libchecker.domain.app.buildmetadata.KotlinBuildMetadataDetector
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.OsUtils
@@ -176,7 +177,8 @@ private fun isKotlinUsed(zipFile: ZipFileCompat, file: File, foundClasses: List<
     zipFile.getEntry("kotlin-tooling-metadata.json") != null ||
     zipFile.getEntry("kotlin/kotlin.kotlin_builtins") != null ||
     zipFile.getEntry("META-INF/services/kotlinx.coroutines.CoroutineExceptionHandler") != null ||
-    zipFile.getEntry("META-INF/services/kotlinx.coroutines.internal.MainDispatcherFactory") != null
+    zipFile.getEntry("META-INF/services/kotlinx.coroutines.internal.MainDispatcherFactory") != null ||
+    KotlinBuildMetadataDetector.hasKotlinModuleMetadata(zipFile)
   ) {
     return true
   }
