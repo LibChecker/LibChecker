@@ -144,11 +144,8 @@ class ShootService : LifecycleService() {
     listenerList.finishBroadcast()
   }
 
-  private fun computeSnapshots(dropPrevious: Boolean = false, stopWhenFinish: Boolean = false) = lifecycleScope.launch(Dispatchers.IO) {
-    computeSnapshotsImpl(installedAppRepository.getApplicationList(true), dropPrevious, stopWhenFinish)
-  }
-
-  private suspend fun computeSnapshotsImpl(appList: List<PackageInfo>, dropPrevious: Boolean = false, stopWhenFinish: Boolean = false) {
+  @Synchronized
+  private fun computeSnapshots(dropPrevious: Boolean = false, stopWhenFinish: Boolean = false) {
     if (isComputing) {
       Timber.w("computeSnapshots isComputing, ignored")
       return
@@ -167,13 +164,30 @@ class ShootService : LifecycleService() {
         notificationPermissionGranted
 
     notificationManager.cancel(notificationIdShootSuccess)
-    areNotificationsEnabled = showNotification() && canPostNotification
+    val foregroundStarted = showNotification()
+    areNotificationsEnabled = foregroundStarted && canPostNotification
+    if (foregroundStarted.not() && stopWhenFinish) {
+      _isShooting = false
+      isComputing = false
+      stopSelf()
+      return
+    }
 
     if (areNotificationsEnabled) {
       builder.foregroundServiceBehavior = NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE
       notificationManager.notify(notificationIdShoot, builder.build())
     }
 
+    lifecycleScope.launch(Dispatchers.IO) {
+      computeSnapshotsImpl(
+        installedAppRepository.getApplicationList(true),
+        dropPrevious,
+        stopWhenFinish
+      )
+    }
+  }
+
+  private suspend fun computeSnapshotsImpl(appList: List<PackageInfo>, dropPrevious: Boolean = false, stopWhenFinish: Boolean = false) {
     val timer = TimeRecorder().also {
       it.start()
     }
