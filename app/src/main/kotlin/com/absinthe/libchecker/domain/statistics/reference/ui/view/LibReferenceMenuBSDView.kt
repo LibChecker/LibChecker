@@ -26,8 +26,7 @@ import com.absinthe.libchecker.ui.app.MenuOptionItemView
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.setSingleChild
-import com.absinthe.libchecker.view.app.IHeaderView
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
+import com.absinthe.libchecker.view.app.BottomSheetScaffoldView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.google.android.flexbox.FlexDirection
@@ -40,8 +39,7 @@ import com.google.android.material.motion.MotionUtils
 class LibReferenceMenuBSDView(
   context: Context,
   private val onDemoHeightAnimationStateChange: (Boolean) -> Unit = {}
-) : LinearLayout(context),
-  IHeaderView {
+) : BottomSheetScaffoldView(context) {
 
   private var onAction: (LibReferenceMenuAction) -> Unit = {}
   private var hasRenderedState = false
@@ -80,11 +78,6 @@ class LibReferenceMenuBSDView(
         finishDemoHeightAnimationAfterLayout(activeHeightSpringGeneration)
       }
     }
-  }
-
-  private val header = BottomSheetHeaderView(context).apply {
-    layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-    title.text = context.getString(R.string.advanced_menu)
   }
 
   private val demoAdapter = LibReferenceAdapter(
@@ -154,10 +147,9 @@ class LibReferenceMenuBSDView(
   }
 
   init {
-    orientation = VERTICAL
     val padding = 16.dp
     setPadding(padding, padding, padding, 0)
-    addView(header)
+    header.title.text = context.getString(R.string.advanced_menu)
     addView(list)
     optionsAdapter.setList(listOf(Unit))
   }
@@ -217,8 +209,6 @@ class LibReferenceMenuBSDView(
       completeDemoTransition(transitionGeneration)
     }
   }
-
-  override fun getHeaderView(): BottomSheetHeaderView = header
 
   override fun onDetachedFromWindow() {
     demoTransitionQueue.clear()

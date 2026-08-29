@@ -16,7 +16,6 @@ import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.putArguments
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.google.android.material.R as MaterialR
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -30,8 +29,6 @@ class SnapshotNoDiffBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotNoDi
   private val buildSnapshotTitleDisplayData: BuildSnapshotTitleDisplayDataUseCase by inject()
 
   override fun initRootView(): SnapshotNoDiffBSView = SnapshotNoDiffBSView(requireContext())
-
-  override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {
     val arg = arguments ?: run {

@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.view.ViewCompat
@@ -49,6 +48,7 @@ import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.openUrlInBrowser
 import com.absinthe.libraries.utils.extensions.getBoolean
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -61,6 +61,17 @@ import rikka.widget.borderview.BorderRecyclerView
 import rikka.widget.borderview.BorderView
 import rikka.widget.borderview.BorderViewDelegate
 import timber.log.Timber
+
+internal inline fun dispatchPreferenceClick(
+  isInvalidClick: Boolean,
+  action: () -> Unit
+): Boolean {
+  if (isInvalidClick) {
+    return false
+  }
+  action()
+  return true
+}
 
 class SettingsFragment :
   PreferenceFragmentCompat(),
@@ -211,170 +222,92 @@ class SettingsFragment :
         true
       }
     }
-    findPreference<Preference>(Constants.PREF_CLOUD_RULES)?.apply {
-      setOnPreferenceClickListener {
-        if (AntiShakeUtils.isInvalidClick(prefRecyclerView)) {
-          false
-        } else {
-          CloudRulesDialogFragment().show(
-            childFragmentManager,
-            CloudRulesDialogFragment::class.java.name
-          )
-          recordPreferenceEvent(Constants.PREF_CLOUD_RULES)
-          true
-        }
-      }
+    findPreference<Preference>(Constants.PREF_CLOUD_RULES)?.bindDebouncedClick {
+      CloudRulesDialogFragment().show(
+        childFragmentManager,
+        CloudRulesDialogFragment::class.java.name
+      )
+      recordPreferenceEvent(Constants.PREF_CLOUD_RULES)
     }
-    findPreference<Preference>(Constants.PREF_RELOAD_APPS)?.apply {
-      setOnPreferenceClickListener {
-        if (AntiShakeUtils.isInvalidClick(prefRecyclerView)) {
-          false
-        } else {
-          BaseAlertDialogBuilder(requireContext())
-            .setTitle(R.string.dialog_title_reload_apps)
-            .setMessage(R.string.dialog_subtitle_reload_apps)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-              homeViewModel.reloadApps()
-              recordPreferenceEvent(Constants.PREF_RELOAD_APPS)
-            }
-            .setNegativeButton(android.R.string.cancel, null)
-            .create()
-            .show()
-          true
+    findPreference<Preference>(Constants.PREF_RELOAD_APPS)?.bindDebouncedClick {
+      BaseAlertDialogBuilder(requireContext())
+        .setTitle(R.string.dialog_title_reload_apps)
+        .setMessage(R.string.dialog_subtitle_reload_apps)
+        .setPositiveButton(android.R.string.ok) { _, _ ->
+          homeViewModel.reloadApps()
+          recordPreferenceEvent(Constants.PREF_RELOAD_APPS)
         }
-      }
+        .setNegativeButton(android.R.string.cancel, null)
+        .create()
+        .show()
     }
 
-    findPreference<Preference>(Constants.PREF_EXPORT_LOG)?.apply {
-      setOnPreferenceClickListener {
-        if (AntiShakeUtils.isInvalidClick(prefRecyclerView)) {
-          false
-        } else {
-          lifecycleScope.launch {
-            val logShareIntent = settingsViewModel.buildLogShareIntent().getOrElse { e ->
-              Timber.e(e)
-              Toasty.showShort(requireContext(), e.toString())
-              recordPreferenceEvent(Constants.PREF_EXPORT_LOG)
-              return@launch
-            } ?: return@launch
+    findPreference<Preference>(Constants.PREF_EXPORT_LOG)?.bindDebouncedClick {
+      lifecycleScope.launch {
+        val logShareIntent = settingsViewModel.buildLogShareIntent().getOrElse { e ->
+          Timber.e(e)
+          Toasty.showShort(requireContext(), e.toString())
+          recordPreferenceEvent(Constants.PREF_EXPORT_LOG)
+          return@launch
+        } ?: return@launch
 
-            runCatching {
-              startActivity(Intent.createChooser(logShareIntent, getString(R.string.export_log)))
-            }.onFailure { e ->
-              Timber.e(e)
-              Toasty.showShort(requireContext(), e.toString())
-            }
-            recordPreferenceEvent(Constants.PREF_EXPORT_LOG)
-          }
-          true
+        runCatching {
+          startActivity(Intent.createChooser(logShareIntent, getString(R.string.export_log)))
+        }.onFailure { e ->
+          Timber.e(e)
+          Toasty.showShort(requireContext(), e.toString())
         }
+        recordPreferenceEvent(Constants.PREF_EXPORT_LOG)
       }
     }
 
-    findPreference<Preference>(Constants.PREF_EXPORT_APPS)?.apply {
-      setOnPreferenceClickListener {
-        if (AntiShakeUtils.isInvalidClick(prefRecyclerView)) {
-          false
-        } else {
-          ExportAppsDialogFragment().show(
-            childFragmentManager,
-            ExportAppsDialogFragment::class.java.name
-          )
-          recordPreferenceEvent(Constants.PREF_EXPORT_APPS)
-          true
-        }
-      }
+    findPreference<Preference>(Constants.PREF_EXPORT_APPS)?.bindDebouncedClick {
+      ExportAppsDialogFragment().show(
+        childFragmentManager,
+        ExportAppsDialogFragment::class.java.name
+      )
+      recordPreferenceEvent(Constants.PREF_EXPORT_APPS)
     }
 
     findPreference<Preference>(Constants.PREF_ABOUT)?.apply {
       summary = "${BuildConfig.VERSION_NAME}(${BuildConfig.VERSION_CODE})"
-      setOnPreferenceClickListener {
-        AboutPageBuilder.start(requireContext())
-        true
-      }
+      bindClick { AboutPageBuilder.start(requireContext()) }
     }
-    findPreference<Preference>(Constants.PREF_GET_UPDATES)?.apply {
-      setOnPreferenceClickListener {
-        if (AntiShakeUtils.isInvalidClick(prefRecyclerView)) {
-          false
-        } else {
-          GetUpdatesDialogFragment().show(
-            childFragmentManager,
-            GetUpdatesDialogFragment::class.java.name
-          )
-          recordPreferenceEvent(Constants.PREF_GET_UPDATES)
-          true
-        }
-      }
+    findPreference<Preference>(Constants.PREF_GET_UPDATES)?.bindDebouncedClick {
+      GetUpdatesDialogFragment().show(
+        childFragmentManager,
+        GetUpdatesDialogFragment::class.java.name
+      )
+      recordPreferenceEvent(Constants.PREF_GET_UPDATES)
     }
     findPreference<Preference>(Constants.PREF_GITHUB_API_TOKEN)?.let(::bindGitHubTokenPreference)
-    findPreference<Preference>(Constants.PREF_TRANSLATION)?.apply {
-      setOnPreferenceClickListener {
-        runCatching {
-          CustomTabsIntent.Builder().build().apply {
-            launchUrl(requireActivity(), URLManager.CROWDIN_PAGE.toUri())
+    findPreference<Preference>(Constants.PREF_TRANSLATION)?.bindClick {
+      requireContext().openUrlInBrowser(URLManager.CROWDIN_PAGE)
+    }
+    findPreference<Preference>(Constants.PREF_HELP)?.bindClick {
+      requireContext().openUrlInBrowser(URLManager.DOCS_PAGE)
+    }
+    findPreference<Preference>(Constants.PREF_RATE)?.bindClick {
+      try {
+        startActivity(
+          Intent(Intent.ACTION_VIEW).apply {
+            data = URLManager.PLAY_STORE_DETAIL_PAGE.toUri()
           }
-        }.onFailure {
-          Timber.e(it)
-          runCatching {
-            val intent = Intent(Intent.ACTION_VIEW)
-              .setData(URLManager.CROWDIN_PAGE.toUri())
-            requireActivity().startActivity(intent)
-          }.onFailure { inner ->
-            Timber.e(inner)
-            Toasty.showShort(requireActivity(), "No browser application")
-          }
-        }
-        true
+        )
+        recordPreferenceEvent(Constants.PREF_RATE)
+      } catch (e: ActivityNotFoundException) {
+        Timber.e(e)
       }
     }
-    findPreference<Preference>(Constants.PREF_HELP)?.apply {
-      setOnPreferenceClickListener {
-        runCatching {
-          CustomTabsIntent.Builder().build().apply {
-            launchUrl(requireActivity(), URLManager.DOCS_PAGE.toUri())
-          }
-        }.onFailure {
-          Timber.e(it)
-          runCatching {
-            val intent = Intent(Intent.ACTION_VIEW)
-              .setData(URLManager.DOCS_PAGE.toUri())
-            requireActivity().startActivity(intent)
-          }.onFailure { inner ->
-            Timber.e(inner)
-            Toasty.showShort(requireActivity(), "No browser application")
-          }
-        }
-        true
-      }
-    }
-    findPreference<Preference>(Constants.PREF_RATE)?.apply {
-      setOnPreferenceClickListener {
-        try {
-          startActivity(
-            Intent(Intent.ACTION_VIEW).apply {
-              data = URLManager.PLAY_STORE_DETAIL_PAGE.toUri()
-            }
-          )
-          recordPreferenceEvent(Constants.PREF_RATE)
-        } catch (e: ActivityNotFoundException) {
-          Timber.e(e)
-        }
-        true
-      }
-    }
-    findPreference<Preference>(Constants.PREF_TELEGRAM)?.apply {
-      setOnPreferenceClickListener {
-        try {
-          startActivity(
-            Intent(Intent.ACTION_VIEW, URLManager.TELEGRAM_GROUP.toUri())
-              .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-          )
-          recordPreferenceEvent(Constants.PREF_TELEGRAM)
-        } catch (e: ActivityNotFoundException) {
-          Timber.e(e)
-        }
-        true
+    findPreference<Preference>(Constants.PREF_TELEGRAM)?.bindClick {
+      try {
+        startActivity(
+          Intent(Intent.ACTION_VIEW, URLManager.TELEGRAM_GROUP.toUri())
+            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        )
+        recordPreferenceEvent(Constants.PREF_TELEGRAM)
+      } catch (e: ActivityNotFoundException) {
+        Timber.e(e)
       }
     }
     findPreference<TwoStatePreference>(Constants.PREF_ANONYMOUS_ANALYTICS)?.isVisible =
@@ -401,15 +334,20 @@ class SettingsFragment :
     }
   }
 
+  private fun Preference.bindClick(action: () -> Unit) {
+    setOnPreferenceClickListener { dispatchPreferenceClick(false, action) }
+  }
+
+  private fun Preference.bindDebouncedClick(action: () -> Unit) {
+    setOnPreferenceClickListener {
+      dispatchPreferenceClick(AntiShakeUtils.isInvalidClick(prefRecyclerView), action)
+    }
+  }
+
   private fun bindGitHubTokenPreference(preference: Preference) {
     updateGitHubTokenPreference(preference)
-    preference.setOnPreferenceClickListener {
-      if (AntiShakeUtils.isInvalidClick(prefRecyclerView)) {
-        false
-      } else {
-        showGitHubTokenDialog(preference)
-        true
-      }
+    preference.bindDebouncedClick {
+      showGitHubTokenDialog(preference)
     }
   }
 

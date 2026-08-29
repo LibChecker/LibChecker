@@ -6,36 +6,27 @@ import android.text.SpannableString
 import android.text.style.ImageSpan
 import android.text.style.UnderlineSpan
 import android.view.Gravity
-import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.domain.app.detail.model.AppPropItem
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.AppPropsAdapter
-import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
+import com.absinthe.libchecker.ui.adapter.addSpacingDecoration
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.openUrlInBrowser
 import com.absinthe.libchecker.utils.extensions.paddingBottomCompat
-import com.absinthe.libchecker.view.app.IHeaderView
+import com.absinthe.libchecker.view.app.BottomSheetScaffoldView
 import com.absinthe.libchecker.view.span.CenterAlignImageSpan
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
 class AppPropsBottomSheetView(
   context: Context,
   onResourceClick: (AppPropItem) -> Unit
-) : LinearLayout(context),
-  IHeaderView {
+) : BottomSheetScaffoldView(context) {
 
   private val adapter = AppPropsAdapter(onResourceClick)
-
-  private val header = BottomSheetHeaderView(context).apply {
-    layoutParams =
-      LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-    title.text = context.getString(R.string.lib_detail_app_props_title)
-  }
 
   private val tipView = AppCompatTextView(context).apply {
     layoutParams = LayoutParams(
@@ -72,15 +63,14 @@ class AppPropsBottomSheetView(
     clipToPadding = false
     clipChildren = false
     setHasFixedSize(true)
-    addItemDecoration(VerticalSpacesItemDecoration(4.dp))
+    addSpacingDecoration(4.dp)
     paddingBottomCompat = 16.dp
   }
 
   init {
-    orientation = VERTICAL
     val padding = 16.dp
     setPadding(padding, padding, padding, 0)
-    addView(header)
+    header.title.text = context.getString(R.string.lib_detail_app_props_title)
     addView(tipView)
     addView(list)
   }
@@ -91,10 +81,6 @@ class AppPropsBottomSheetView(
 
   fun updateItem(item: AppPropItem) {
     adapter.replace(item)
-  }
-
-  override fun getHeaderView(): BottomSheetHeaderView {
-    return header
   }
 
   private companion object {

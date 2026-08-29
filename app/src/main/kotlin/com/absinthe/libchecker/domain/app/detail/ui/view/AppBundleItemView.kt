@@ -2,52 +2,30 @@ package com.absinthe.libchecker.domain.app.detail.ui.view
 
 import android.content.Context
 import android.util.TypedValue
-import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
-import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.model.AppBundleItem
-import com.absinthe.libchecker.view.AViewGroup
+import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.view.app.TextColumnRowView
 
-class AppBundleItemView(context: Context) : AViewGroup(context) {
+class AppBundleItemView(context: Context) : TextColumnRowView(context) {
 
   private val icon = AppCompatImageView(context).apply {
-    layoutParams = LayoutParams(24.dp, 24.dp)
+    layoutParams = ViewGroup.LayoutParams(24.dp, 24.dp)
     importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
   }
-
-  private val name =
-    AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)).apply {
-      layoutParams = LayoutParams(
-        ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
-      ).also {
-        it.marginStart = 8.dp
-      }
-      setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-    }
-
-  private val size = AppCompatTextView(
-    ContextThemeWrapper(
-      context,
-      R.style.TextView_SansSerifCondensedMedium
-    )
-  ).apply {
-    layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.WRAP_CONTENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
-    )
+  private val name = addTextLine(R.style.TextView_SansSerifMedium) {
+    setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+  }
+  private val size = addTextLine(R.style.TextView_SansSerifCondensedMedium) {
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
   }
 
   init {
     setPadding(8.dp, 8.dp, 8.dp, 8.dp)
     setBackgroundResource(R.drawable.bg_lib_detail_item)
-    addView(icon)
-    addView(name)
-    addView(size)
+    setLeadingView(icon)
   }
 
   fun bind(item: AppBundleItem) {
@@ -55,28 +33,5 @@ class AppBundleItemView(context: Context) : AViewGroup(context) {
     name.text = item.nameText
     size.text = item.sizeText
     contentDescription = item.contentDescription
-  }
-
-  override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-    super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-    autoMeasureChildren()
-    val textWidth =
-      measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - name.marginStart
-    if (name.measuredWidth > textWidth) {
-      name.measure(textWidth.toExactlyMeasureSpec(), name.defaultHeightMeasureSpec(this))
-    }
-    if (size.measuredWidth > textWidth) {
-      size.measure(textWidth.toExactlyMeasureSpec(), size.defaultHeightMeasureSpec(this))
-    }
-    setMeasuredDimension(
-      measuredWidth,
-      paddingTop + paddingBottom + name.measuredHeight + size.measuredHeight
-    )
-  }
-
-  override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-    icon.layout(paddingStart, icon.toVerticalCenter(this))
-    name.layout(paddingStart + icon.measuredWidth + name.marginStart, paddingTop)
-    size.layout(paddingStart + icon.measuredWidth + name.marginStart, name.bottom)
   }
 }

@@ -10,7 +10,6 @@ import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
 import com.absinthe.libchecker.domain.app.detail.statistics.AppStatisticAnalysisState
 import com.absinthe.libchecker.domain.app.detail.ui.view.AppStatisticAnalysisBottomSheetView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -33,8 +32,6 @@ class AppStatisticAnalysisBottomSheetDialogFragment : BaseBottomSheetViewDialogF
       }
     )
   }
-
-  override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {
     maxPeekHeightPercentage = 0.75f

@@ -2,7 +2,6 @@ package com.absinthe.libchecker.domain.statistics.chart.ui
 
 import android.content.Context
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,22 +15,14 @@ import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
+import com.absinthe.libchecker.view.app.BottomSheetScaffoldView
 import com.absinthe.libchecker.view.app.EmptyListView
-import com.absinthe.libchecker.view.app.IHeaderView
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 
-class ClassifyDialogView(context: Context) :
-  LinearLayout(context),
-  IHeaderView {
+class ClassifyDialogView(context: Context) : BottomSheetScaffoldView(context) {
 
   private var onAction: (ClassifyDialogAction) -> Unit = {}
   private val adapter = AppAdapter(AppAdapter.CardMode.TRANSPARENT)
-
-  private val header = BottomSheetHeaderView(context).apply {
-    layoutParams =
-      LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-  }
 
   private val list = BottomSheetRecyclerView(context).apply {
     layoutParams = LayoutParams(
@@ -59,7 +50,6 @@ class ClassifyDialogView(context: Context) :
   }
 
   init {
-    orientation = VERTICAL
     addPaddingTop(16.dp)
     adapter.apply {
       setOnItemClickListener { _, _, position ->
@@ -73,7 +63,6 @@ class ClassifyDialogView(context: Context) :
         }
       isStateViewEnable = true
     }
-    addView(header)
     addView(subtitle)
     addView(list)
   }
@@ -115,9 +104,5 @@ class ClassifyDialogView(context: Context) :
         addView(androidVersionView, 2)
       }
     }
-  }
-
-  override fun getHeaderView(): BottomSheetHeaderView {
-    return header
   }
 }

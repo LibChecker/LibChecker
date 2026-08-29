@@ -1,8 +1,6 @@
 package com.absinthe.libchecker.domain.settings.ui
 
-import android.content.ActivityNotFoundException
 import android.content.Context
-import android.content.Intent
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.method.LinkMovementMethod
@@ -11,35 +9,23 @@ import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.View
 import android.widget.ImageView
-import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.browser.customtabs.CustomTabsIntent
-import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.domain.settings.model.ExportAppsDialogAction
 import com.absinthe.libchecker.domain.settings.model.ExportAppsDialogState
-import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.view.app.IHeaderView
+import com.absinthe.libchecker.utils.extensions.openUrlInBrowser
+import com.absinthe.libchecker.view.app.BottomSheetScaffoldView
 import com.absinthe.libraries.utils.manager.SystemBarManager
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.progressindicator.LinearProgressIndicator
-import timber.log.Timber
 
-class ExportAppsDialogView(context: Context) :
-  LinearLayout(context),
-  IHeaderView {
+class ExportAppsDialogView(context: Context) : BottomSheetScaffoldView(context) {
 
   private var onAction: (ExportAppsDialogAction) -> Unit = {}
-
-  private val header = BottomSheetHeaderView(context).apply {
-    layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-    title.text = context.getString(R.string.export_apps)
-  }
 
   private val description = AppCompatTextView(context).apply {
     layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
@@ -84,7 +70,6 @@ class ExportAppsDialogView(context: Context) :
   }
 
   init {
-    orientation = VERTICAL
     gravity = Gravity.CENTER_HORIZONTAL
     val padding = 16.dp
     setPadding(
@@ -93,7 +78,7 @@ class ExportAppsDialogView(context: Context) :
       padding,
       (padding - SystemBarManager.navigationBarSize).coerceAtLeast(0)
     )
-    addView(header)
+    header.title.text = context.getString(R.string.export_apps)
     addView(description)
     addView(webUiPreview)
     addView(progressIndicator)
@@ -139,8 +124,6 @@ class ExportAppsDialogView(context: Context) :
     }
   }
 
-  override fun getHeaderView(): BottomSheetHeaderView = header
-
   private fun buildDescriptionText(context: Context): SpannableString {
     val text = context.getString(R.string.export_apps_webui_tip)
     val span = SpannableString(text)
@@ -149,7 +132,7 @@ class ExportAppsDialogView(context: Context) :
       span.setSpan(
         object : ClickableSpan() {
           override fun onClick(widget: View) {
-            openWebUi(widget.context)
+            widget.context.openUrlInBrowser(URLManager.WEBUI_PAGE)
           }
         },
         start,
@@ -158,22 +141,6 @@ class ExportAppsDialogView(context: Context) :
       )
     }
     return span
-  }
-
-  private fun openWebUi(context: Context) {
-    runCatching {
-      CustomTabsIntent.Builder().build().launchUrl(context, URLManager.WEBUI_PAGE.toUri())
-    }.onFailure {
-      Timber.e(it)
-      runCatching {
-        context.startActivity(Intent(Intent.ACTION_VIEW, URLManager.WEBUI_PAGE.toUri()))
-      }.onFailure { inner ->
-        Timber.e(inner)
-        if (inner is ActivityNotFoundException) {
-          Toasty.showShort(context, "No browser application")
-        }
-      }
-    }
   }
 
   private companion object {

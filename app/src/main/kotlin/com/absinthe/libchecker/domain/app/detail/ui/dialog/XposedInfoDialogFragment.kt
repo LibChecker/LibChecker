@@ -13,7 +13,6 @@ import com.absinthe.libchecker.domain.app.detail.ui.view.XposedInfoBottomSheetVi
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.putArguments
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
@@ -56,8 +55,6 @@ class XposedInfoDialogFragment : BaseBottomSheetViewDialogFragment<XposedInfoBot
       Toasty.showShort(activity, it.message.toString())
     }
   }
-
-  override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun show(manager: FragmentManager, tag: String?) {
     if (!isShowing) {

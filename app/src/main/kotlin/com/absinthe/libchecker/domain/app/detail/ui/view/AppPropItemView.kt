@@ -1,154 +1,35 @@
 package com.absinthe.libchecker.domain.app.detail.ui.view
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.drawable.ShapeDrawable
-import android.graphics.drawable.shapes.OvalShape
 import android.util.TypedValue
-import android.view.ContextThemeWrapper
-import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
-import androidx.appcompat.widget.AppCompatImageButton
-import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.graphics.drawable.toBitmap
-import androidx.core.view.isVisible
-import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.model.AppPropItem
-import com.absinthe.libchecker.domain.app.detail.resource.AppResourcePreview
-import com.absinthe.libchecker.utils.extensions.expandChildTouchTarget
-import com.absinthe.libchecker.utils.extensions.getDrawableByAttr
-import com.absinthe.libchecker.view.AViewGroup
+import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.view.app.ResourcePreviewButton
+import com.absinthe.libchecker.view.app.TextColumnRowView
 
-class AppPropItemView(context: Context) : AViewGroup(context) {
+class AppPropItemView(context: Context) : TextColumnRowView(context) {
 
-  private val tip = AppCompatTextView(
-    ContextThemeWrapper(
-      context,
-      R.style.TextView_SansSerif
-    )
-  ).apply {
-    layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.WRAP_CONTENT,
-      ViewGroup.LayoutParams.MATCH_PARENT
-    )
-    setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
-    alpha = 0.85f
-  }
-
-  private val key = AppCompatTextView(
-    ContextThemeWrapper(
-      context,
-      R.style.TextView_SansSerifCondensedMedium
-    )
-  ).apply {
-    layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.WRAP_CONTENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
-    )
+  private val key = addTextLine(R.style.TextView_SansSerifCondensedMedium) {
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
   }
-
-  private val value = AppCompatTextView(
-    ContextThemeWrapper(
-      context,
-      R.style.TextView_SansSerifCondensedMedium
-    )
-  ).apply {
-    layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.WRAP_CONTENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
-    )
+  private val value = addTextLine(R.style.TextView_SansSerifCondensedMedium) {
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
     alpha = 0.65f
   }
-
-  private val linkToIcon = AppCompatImageButton(context).apply {
-    layoutParams = LayoutParams(24.dp, 24.dp).also {
-      it.marginStart = 8.dp
-    }
-    scaleType = ImageView.ScaleType.CENTER
-    setImageResource(R.drawable.ic_outline_change_circle_24)
-    contentDescription = context.getString(R.string.lib_detail_app_props_tip)
-    setBackgroundDrawable(context.getDrawableByAttr(android.R.attr.selectableItemBackgroundBorderless))
-    isVisible = false
-  }
+  private val resourcePreview = ResourcePreviewButton(context)
 
   init {
-    addView(tip)
-    addView(key)
-    addView(value)
-    addView(linkToIcon)
+    setTrailingView(resourcePreview, touchTargetSize = 48.dp)
   }
 
   fun bind(item: AppPropItem, onResourceClick: (AppPropItem) -> Unit) {
     key.text = item.key
     value.text = item.visibleValue
     contentDescription = item.contentDescription
-
-    linkToIcon.apply {
-      isVisible = item.resource != null
-      setOnClickListener(if (item.resource != null) View.OnClickListener { onResourceClick(item) } else null)
-      when (val preview = item.preview) {
-        is AppResourcePreview.DrawableValue -> setImageBitmap(
-          preview.drawable.toBitmap(
-            previewWidth,
-            previewHeight,
-            Bitmap.Config.ARGB_8888
-          )
-        )
-
-        is AppResourcePreview.ColorValue -> setImageBitmap(
-          ShapeDrawable(OvalShape()).apply {
-            paint.color = preview.color
-          }.toBitmap(
-            previewWidth,
-            previewHeight,
-            Bitmap.Config.ARGB_8888
-          )
-        )
-
-        AppResourcePreview.Original,
-        is AppResourcePreview.Text -> setImageResource(R.drawable.ic_outline_change_circle_24)
-      }
-    }
-  }
-
-  private val AppCompatImageButton.previewWidth: Int
-    get() = measuredWidth.takeIf { it > 0 } ?: layoutParams.width
-
-  private val AppCompatImageButton.previewHeight: Int
-    get() = measuredHeight.takeIf { it > 0 } ?: layoutParams.height
-
-  override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-    super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-    autoMeasureChildren()
-    val textWidth = measuredWidth - paddingStart - paddingEnd - linkToIcon.measuredWidth - linkToIcon.marginStart
-    if (tip.measuredWidth > textWidth) {
-      tip.measure(textWidth.toExactlyMeasureSpec(), tip.defaultHeightMeasureSpec(this))
-    }
-    if (key.measuredWidth > textWidth) {
-      key.measure(textWidth.toExactlyMeasureSpec(), key.defaultHeightMeasureSpec(this))
-    }
-    if (value.measuredWidth > textWidth) {
-      value.measure(textWidth.toExactlyMeasureSpec(), value.defaultHeightMeasureSpec(this))
-    }
-    setMeasuredDimension(
-      measuredWidth,
-      paddingTop + paddingBottom + tip.measuredHeight + key.measuredHeight + value.measuredHeight
+    resourcePreview.bind(
+      preview = item.preview,
+      onClick = item.resource?.let { { onResourceClick(item) } }
     )
-  }
-
-  override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-    tip.layout(paddingStart, paddingTop)
-    key.layout(paddingStart, tip.bottom)
-    value.layout(paddingStart, key.bottom)
-    linkToIcon.layout(paddingEnd, linkToIcon.toVerticalCenter(this), true)
-    if (linkToIcon.isVisible) {
-      expandChildTouchTarget(linkToIcon, 48.dp)
-    } else {
-      touchDelegate = null
-    }
   }
 }

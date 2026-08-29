@@ -15,7 +15,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.model.ProcessBarAction
 import com.absinthe.libchecker.domain.app.detail.model.ProcessBarItemRenderState
 import com.absinthe.libchecker.domain.app.detail.model.ProcessBarRenderState
-import com.absinthe.libchecker.domain.app.detail.ui.adapter.ProcessBarAdapter
+import com.absinthe.libchecker.ui.adapter.BindOnlyAdapter
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.utils.extensions.tintTextToPrimary
@@ -24,7 +24,7 @@ import com.absinthe.libchecker.view.AViewGroup
 
 class ProcessBarView(context: Context) : RecyclerView(context) {
 
-  private val processBarAdapter = ProcessBarAdapter()
+  private val processBarAdapter = BindOnlyAdapter(::ProcessBarItemView, ProcessBarItemView::bind)
   private var onAction: (ProcessBarAction) -> Unit = {}
 
   init {

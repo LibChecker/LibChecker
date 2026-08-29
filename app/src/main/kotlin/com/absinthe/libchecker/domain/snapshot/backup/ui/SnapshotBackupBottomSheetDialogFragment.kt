@@ -29,7 +29,6 @@ import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.utils.extensions.requireAvailableCacheDir
 import com.absinthe.libchecker.utils.showToast
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -85,8 +84,6 @@ class SnapshotBackupBottomSheetDialogFragment : BaseBottomSheetViewDialogFragmen
   override fun initRootView(): SnapshotBackupBottomSheetView {
     return SnapshotBackupBottomSheetView(requireContext())
   }
-
-  override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {
     maxPeekHeightPercentage = 0.82f

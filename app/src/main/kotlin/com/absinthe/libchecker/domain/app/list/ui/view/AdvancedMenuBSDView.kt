@@ -23,8 +23,7 @@ import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.utils.extensions.setSingleChild
 import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
-import com.absinthe.libchecker.view.app.IHeaderView
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
+import com.absinthe.libchecker.view.app.BottomSheetScaffoldView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.google.android.flexbox.FlexDirection
@@ -33,16 +32,9 @@ import com.google.android.flexbox.FlexboxLayout
 import com.google.android.flexbox.JustifyContent
 import com.google.android.material.card.MaterialCardView
 
-class AdvancedMenuBSDView(context: Context) :
-  LinearLayout(context),
-  IHeaderView {
+class AdvancedMenuBSDView(context: Context) : BottomSheetScaffoldView(context) {
 
   private var onAction: (AdvancedMenuAction) -> Unit = {}
-
-  private val header = BottomSheetHeaderView(context).apply {
-    layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-    title.text = context.getString(R.string.advanced_menu)
-  }
 
   private val adapter = AdvancedMenuLayoutAdapter()
   private val layoutItems = buildAdvancedMenuLayoutItems()
@@ -118,11 +110,10 @@ class AdvancedMenuBSDView(context: Context) :
   }
 
   init {
-    orientation = VERTICAL
     val padding = 16.dp
     setPadding(padding, padding, padding, 0)
-    addView(header)
-    addView(list)
+    header.title.text = context.getString(R.string.advanced_menu)
+    addContentView(list)
   }
 
   fun bind(
@@ -164,8 +155,6 @@ class AdvancedMenuBSDView(context: Context) :
     }
     bindComponentDemo(state)
   }
-
-  override fun getHeaderView(): BottomSheetHeaderView = header
 
   override fun onDetachedFromWindow() {
     onAction = {}

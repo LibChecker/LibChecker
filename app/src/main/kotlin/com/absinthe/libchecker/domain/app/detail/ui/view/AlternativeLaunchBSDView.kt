@@ -1,29 +1,19 @@
 package com.absinthe.libchecker.domain.app.detail.ui.view
 
 import android.content.Context
-import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.model.AlternativeLaunchAction
 import com.absinthe.libchecker.domain.app.detail.model.AlternativeLaunchItem
-import com.absinthe.libchecker.domain.app.detail.ui.adapter.AlternativeLaunchAdapter
-import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
+import com.absinthe.libchecker.ui.adapter.BindOnlyAdapter
+import com.absinthe.libchecker.ui.adapter.addSpacingDecoration
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.view.app.IHeaderView
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
+import com.absinthe.libchecker.view.app.BottomSheetScaffoldView
 
-class AlternativeLaunchBSDView(context: Context) :
-  LinearLayout(context),
-  IHeaderView {
+class AlternativeLaunchBSDView(context: Context) : BottomSheetScaffoldView(context) {
 
-  private val adapter = AlternativeLaunchAdapter()
-
-  private val header = BottomSheetHeaderView(context).apply {
-    layoutParams =
-      LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-    title.text = context.getString(R.string.alternative_launch_method)
-  }
+  private val adapter = BindOnlyAdapter(::AlternativeLaunchItemView, AlternativeLaunchItemView::bind)
 
   private val list = BottomSheetRecyclerView(context).apply {
     layoutParams = LayoutParams(
@@ -37,14 +27,13 @@ class AlternativeLaunchBSDView(context: Context) :
     clipToPadding = false
     clipChildren = false
     setHasFixedSize(true)
-    addItemDecoration(VerticalSpacesItemDecoration(4.dp))
+    addSpacingDecoration(4.dp)
   }
 
   init {
-    orientation = VERTICAL
     val padding = 16.dp
     setPadding(padding, padding, padding, 0)
-    addView(header)
+    header.title.text = context.getString(R.string.alternative_launch_method)
     addView(list)
   }
 
@@ -59,6 +48,4 @@ class AlternativeLaunchBSDView(context: Context) :
     }
     adapter.setList(items)
   }
-
-  override fun getHeaderView(): BottomSheetHeaderView = header
 }

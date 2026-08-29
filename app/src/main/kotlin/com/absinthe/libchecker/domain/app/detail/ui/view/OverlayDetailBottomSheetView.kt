@@ -20,8 +20,8 @@ import com.absinthe.libchecker.domain.app.list.ui.view.AppItemView
 import com.absinthe.libchecker.utils.extensions.copyToClipboard
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
-import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.view.AViewGroup
+import com.absinthe.libchecker.view.app.AppIdentityHeaderRenderState
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.google.android.material.button.MaterialButton
@@ -105,6 +105,14 @@ class OverlayDetailBottomSheetView(context: Context) :
   }
 
   private fun bindDetail(display: OverlayDetailBottomSheetDisplay) {
+    detailsTitleView.renderIdentity(
+      AppIdentityHeaderRenderState(
+        appName = display.appName,
+        iconContentDescription = display.appName.orEmpty(),
+        packageName = display.packageName,
+        versionInfo = display.versionInfo
+      )
+    )
     detailsTitleView.apply {
       iconView.apply {
         val appIconLoader = AppIconLoader(
@@ -119,19 +127,6 @@ class OverlayDetailBottomSheetView(context: Context) :
           copyToClipboard()
           true
         }
-      }
-      appNameView.apply {
-        text = display.appName
-        setLongClickCopiedToClipboard(text)
-      }
-      iconView.contentDescription = appNameView.text
-      packageNameView.apply {
-        text = display.packageName
-        setLongClickCopiedToClipboard(text)
-      }
-      versionInfoView.apply {
-        text = display.versionInfo
-        setLongClickCopiedToClipboard(text)
       }
       extraInfoView.text = buildOverlayExtraInfo(display.extraInfo)
     }

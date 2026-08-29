@@ -24,8 +24,7 @@ import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
-import com.absinthe.libchecker.view.app.IHeaderView
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
+import com.absinthe.libchecker.view.app.BottomSheetScaffoldView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.google.android.material.progressindicator.CircularProgressIndicator
@@ -33,15 +32,9 @@ import com.google.android.material.progressindicator.CircularProgressIndicator
 class AppStatisticAnalysisBottomSheetView(
   context: Context,
   onAnalysisClick: (AppStatisticRuleAnalysis) -> Unit
-) : LinearLayout(context),
-  IHeaderView {
+) : BottomSheetScaffoldView(context) {
 
   private val adapter = AnalysisAdapter(onAnalysisClick)
-
-  private val header = BottomSheetHeaderView(context).apply {
-    layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-    title.text = context.getString(R.string.app_detail_online_rules_title)
-  }
 
   private val content = FrameLayout(context).apply {
     layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, CONTENT_HEIGHT_DP.dp)
@@ -91,11 +84,10 @@ class AppStatisticAnalysisBottomSheetView(
   }
 
   init {
-    orientation = VERTICAL
     addPaddingTop(16.dp)
     content.addView(list)
     content.addView(messageContainer)
-    addView(header)
+    header.title.text = context.getString(R.string.app_detail_online_rules_title)
     addView(content)
   }
 
@@ -118,8 +110,6 @@ class AppStatisticAnalysisBottomSheetView(
       )
     }
   }
-
-  override fun getHeaderView(): BottomSheetHeaderView = header
 
   private fun showLoading(progress: Int) {
     list.isVisible = false

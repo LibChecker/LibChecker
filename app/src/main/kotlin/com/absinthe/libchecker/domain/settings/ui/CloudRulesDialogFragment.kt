@@ -18,7 +18,6 @@ import com.absinthe.libchecker.utils.DownloadUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.showToast
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.jakewharton.processphoenix.ProcessPhoenix
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -30,8 +29,6 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
   private var versionInfo: CloudRulesVersionInfo? = null
 
   override fun initRootView(): CloudRulesDialogView = CloudRulesDialogView(requireContext())
-
-  override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {
     root.addPaddingTop(16.dp)

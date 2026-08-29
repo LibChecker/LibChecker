@@ -7,7 +7,6 @@ import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_INFO
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
 import com.absinthe.libchecker.domain.app.detail.ui.view.AppBundleBottomSheetView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
@@ -17,8 +16,6 @@ class AppBundleBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<App
   private val viewModel: DetailViewModel by activityViewModel()
 
   override fun initRootView(): AppBundleBottomSheetView = AppBundleBottomSheetView(requireContext())
-
-  override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {
     maxPeekHeightPercentage = 0.67f

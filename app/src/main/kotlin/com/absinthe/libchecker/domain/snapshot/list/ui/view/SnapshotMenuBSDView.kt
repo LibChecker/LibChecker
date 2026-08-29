@@ -21,8 +21,7 @@ import com.absinthe.libchecker.ui.app.MenuOptionItemView
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.setSingleChild
 import com.absinthe.libchecker.view.app.AppIconPlaceholder
-import com.absinthe.libchecker.view.app.IHeaderView
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
+import com.absinthe.libchecker.view.app.BottomSheetScaffoldView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.google.android.flexbox.FlexDirection
@@ -30,18 +29,11 @@ import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.flexbox.JustifyContent
 
-class SnapshotMenuBSDView(context: Context) :
-  LinearLayout(context),
-  IHeaderView {
+class SnapshotMenuBSDView(context: Context) : BottomSheetScaffoldView(context) {
 
   private var onAction: (SnapshotMenuAction) -> Unit = {}
   private var hasRenderedState = false
   private var demoHeightAnimator: ValueAnimator? = null
-
-  private val header = BottomSheetHeaderView(context).apply {
-    layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-    title.text = context.getString(R.string.advanced_menu)
-  }
 
   private val adapter = SnapshotMenuAdapter()
 
@@ -72,11 +64,10 @@ class SnapshotMenuBSDView(context: Context) :
   }
 
   init {
-    orientation = VERTICAL
     val padding = 16.dp
     setPadding(padding, padding, padding, 0)
-    addView(header)
-    addView(list)
+    header.title.text = context.getString(R.string.advanced_menu)
+    addContentView(list)
   }
 
   fun bind(
@@ -91,8 +82,6 @@ class SnapshotMenuBSDView(context: Context) :
     )
     hasRenderedState = true
   }
-
-  override fun getHeaderView(): BottomSheetHeaderView = header
 
   override fun onDetachedFromWindow() {
     onAction = {}

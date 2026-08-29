@@ -20,15 +20,51 @@ import com.absinthe.libchecker.domain.app.detail.ui.view.SignatureDetailBottomSh
 import com.absinthe.libchecker.domain.app.detail.ui.view.XmlBottomSheetView
 import com.absinthe.libchecker.domain.app.detail.ui.view.XposedInfoBottomSheetView
 import com.absinthe.libchecker.domain.statistics.chart.ui.ClassifyDialogView
+import com.absinthe.libchecker.view.app.BottomSheetScaffoldView
+import com.absinthe.libchecker.view.app.TextColumnRowView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class BottomSheetRecyclerViewInstrumentedTest {
+
+  @Test
+  fun sharedItemRowConsumesAvailableWidth() {
+    val instrumentation = InstrumentationRegistry.getInstrumentation()
+
+    instrumentation.runOnMainSync {
+      val context = ContextThemeWrapper(instrumentation.targetContext, R.style.AppTheme)
+      val row = TextColumnRowView(context)
+      row.measure(
+        View.MeasureSpec.makeMeasureSpec(720, View.MeasureSpec.AT_MOST),
+        View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+      )
+
+      assertEquals(720, row.measuredWidth)
+    }
+  }
+
+  @Test
+  fun scaffoldKeepsHeaderBeforeContentAndExposesItThroughHeaderContract() {
+    val instrumentation = InstrumentationRegistry.getInstrumentation()
+
+    instrumentation.runOnMainSync {
+      val context = ContextThemeWrapper(instrumentation.targetContext, R.style.AppTheme)
+      val scaffold = BottomSheetScaffoldView(context)
+      val content = View(context)
+
+      scaffold.addContentView(content)
+
+      assertEquals(2, scaffold.childCount)
+      assertSame(scaffold.getHeaderView(), scaffold.getChildAt(0))
+      assertSame(content, scaffold.getChildAt(1))
+    }
+  }
 
   @Test
   fun downwardScrollMovesSheetOnlyAfterListReachesTop() {

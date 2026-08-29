@@ -2,27 +2,17 @@ package com.absinthe.libchecker.domain.app.detail.ui.view
 
 import android.content.Context
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
-import com.absinthe.libchecker.view.app.IHeaderView
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
+import com.absinthe.libchecker.view.app.BottomSheetScaffoldView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
-class XmlBottomSheetView(context: Context) :
-  LinearLayout(context),
-  IHeaderView {
+class XmlBottomSheetView(context: Context) : BottomSheetScaffoldView(context) {
 
   private val adapter = Adapter()
-
-  private val header = BottomSheetHeaderView(context).apply {
-    layoutParams =
-      LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-    title.text = context.getString(R.string.xml_detail)
-  }
 
   private val container = BottomSheetRecyclerView(context).apply {
     layoutParams =
@@ -36,17 +26,12 @@ class XmlBottomSheetView(context: Context) :
   }
 
   init {
-    orientation = VERTICAL
-    addView(header)
-    addView(container)
+    header.title.text = context.getString(R.string.xml_detail)
+    addContentView(container)
   }
 
   fun setText(text: CharSequence?) {
     adapter.setList(listOf(text ?: "", ""))
-  }
-
-  override fun getHeaderView(): BottomSheetHeaderView {
-    return header
   }
 
   class Adapter : BaseQuickAdapter<CharSequence, BaseViewHolder>(0) {

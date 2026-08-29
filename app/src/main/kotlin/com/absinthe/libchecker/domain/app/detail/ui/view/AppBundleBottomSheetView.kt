@@ -1,29 +1,19 @@
 package com.absinthe.libchecker.domain.app.detail.ui.view
 
 import android.content.Context
-import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.model.AppBundleItem
-import com.absinthe.libchecker.domain.app.detail.ui.adapter.AppBundleAdapter
-import com.absinthe.libchecker.ui.adapter.VerticalSpacesItemDecoration
+import com.absinthe.libchecker.ui.adapter.BindOnlyAdapter
+import com.absinthe.libchecker.ui.adapter.addSpacingDecoration
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.view.app.IHeaderView
+import com.absinthe.libchecker.view.app.BottomSheetScaffoldView
 import com.absinthe.libraries.utils.manager.SystemBarManager
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
-class AppBundleBottomSheetView(context: Context) :
-  LinearLayout(context),
-  IHeaderView {
+class AppBundleBottomSheetView(context: Context) : BottomSheetScaffoldView(context) {
 
-  private val adapter = AppBundleAdapter()
-
-  private val header = BottomSheetHeaderView(context).apply {
-    layoutParams =
-      LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-    title.text = context.getString(R.string.app_bundle)
-  }
+  private val adapter = BindOnlyAdapter(::AppBundleItemView, AppBundleItemView::bind)
 
   private val list = BottomSheetRecyclerView(context).apply {
     layoutParams = LayoutParams(
@@ -37,11 +27,10 @@ class AppBundleBottomSheetView(context: Context) :
     clipToPadding = false
     clipChildren = false
     setHasFixedSize(true)
-    addItemDecoration(VerticalSpacesItemDecoration(4.dp))
+    addSpacingDecoration(4.dp)
   }
 
   init {
-    orientation = VERTICAL
     val padding = 16.dp
     setPadding(
       padding,
@@ -49,15 +38,11 @@ class AppBundleBottomSheetView(context: Context) :
       padding,
       (padding - SystemBarManager.navigationBarSize).coerceAtLeast(0)
     )
-    addView(header)
+    header.title.text = context.getString(R.string.app_bundle)
     addView(list)
   }
 
   fun bind(items: List<AppBundleItem>) {
     adapter.setList(items)
-  }
-
-  override fun getHeaderView(): BottomSheetHeaderView {
-    return header
   }
 }

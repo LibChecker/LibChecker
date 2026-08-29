@@ -5,7 +5,6 @@ import com.absinthe.libchecker.domain.statistics.chart.model.ClassifyDialogActio
 import com.absinthe.libchecker.domain.statistics.chart.model.ClassifyDialogState
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
 class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<ClassifyDialogView>() {
 
@@ -14,8 +13,6 @@ class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Clas
   private var isViewInitialized = false
 
   override fun initRootView(): ClassifyDialogView = ClassifyDialogView(requireContext())
-
-  override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun getHeaderContentSpacing(): Int = 0
 

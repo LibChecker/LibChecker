@@ -100,20 +100,29 @@ class TrackActivity :
 
   private fun renderTrackList(state: TrackListUiState) {
     menu?.findItem(R.id.search)?.isVisible = state.isSearchVisible
-    if (!state.isLoading && !isEmptyStateViewReady) {
-      adapter.stateView =
-        EmptyListView(this@TrackActivity).apply {
-          layoutParams = FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.MATCH_PARENT,
-            FrameLayout.LayoutParams.MATCH_PARENT
-          ).also {
-            it.gravity = Gravity.CENTER
-          }
-        }
-      adapter.isStateViewEnable = true
-      isEmptyStateViewReady = true
+    // Prevent BRVAH from inserting the new rows before removing its state view.
+    val shouldRestoreStateView =
+      adapter.data.isEmpty() && state.items.isNotEmpty() && adapter.isStateViewEnable
+    if (shouldRestoreStateView) {
+      adapter.isStateViewEnable = false
     }
-    adapter.setDiffNewData(state.items.toMutableList())
+    adapter.setDiffNewData(state.items.toMutableList()) {
+      if (!state.isLoading && !isEmptyStateViewReady) {
+        adapter.stateView =
+          EmptyListView(this@TrackActivity).apply {
+            layoutParams = FrameLayout.LayoutParams(
+              FrameLayout.LayoutParams.MATCH_PARENT,
+              FrameLayout.LayoutParams.MATCH_PARENT
+            ).also {
+              it.gravity = Gravity.CENTER
+            }
+          }
+        isEmptyStateViewReady = true
+      }
+      if (shouldRestoreStateView) {
+        adapter.isStateViewEnable = true
+      }
+    }
   }
 
   override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {

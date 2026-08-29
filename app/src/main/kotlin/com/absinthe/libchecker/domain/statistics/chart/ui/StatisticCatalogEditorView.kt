@@ -24,12 +24,9 @@ import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.utils.showToast
-import com.absinthe.libchecker.view.app.IHeaderView
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
+import com.absinthe.libchecker.view.app.BottomSheetScaffoldView
 
-class StatisticCatalogEditorView(context: Context) :
-  LinearLayout(context),
-  IHeaderView {
+class StatisticCatalogEditorView(context: Context) : BottomSheetScaffoldView(context) {
 
   private var onAction: (StatisticCatalogEditorAction) -> Unit = {}
   private val editorAdapter = StatisticCatalogEditorAdapter(context) { action ->
@@ -38,11 +35,6 @@ class StatisticCatalogEditorView(context: Context) :
   private val itemTouchHelper = ItemTouchHelper(
     StatisticItemTouchCallback(editorAdapter)
   )
-
-  private val header = BottomSheetHeaderView(context).apply {
-    layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-    title.text = context.getString(R.string.chart_statistics_edit)
-  }
 
   private val list = BottomSheetRecyclerView(context).apply {
     layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, 0, 1f)
@@ -55,13 +47,12 @@ class StatisticCatalogEditorView(context: Context) :
   }
 
   init {
-    orientation = VERTICAL
     layoutParams = ViewGroup.LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
       ViewGroup.LayoutParams.MATCH_PARENT
     )
     setPadding(0, 16.dp, 0, 0)
-    addView(header)
+    header.title.text = context.getString(R.string.chart_statistics_edit)
     addView(list)
     itemTouchHelper.attachToRecyclerView(list)
     editorAdapter.startDrag = itemTouchHelper::startDrag
@@ -74,8 +65,6 @@ class StatisticCatalogEditorView(context: Context) :
     this.onAction = onAction
     editorAdapter.bind(state)
   }
-
-  override fun getHeaderView(): BottomSheetHeaderView = header
 }
 
 sealed interface StatisticCatalogEditorAction {

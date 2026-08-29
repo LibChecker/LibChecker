@@ -13,7 +13,6 @@ import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
 import com.absinthe.libchecker.domain.app.detail.ui.view.AppInfoBottomSheetView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Toasty
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
@@ -54,8 +53,6 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
   override fun initRootView(): AppInfoBottomSheetView {
     return AppInfoBottomSheetView(requireContext())
   }
-
-  override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun onDestroyView() {
     if (shareControllerDelegate.isInitialized()) {

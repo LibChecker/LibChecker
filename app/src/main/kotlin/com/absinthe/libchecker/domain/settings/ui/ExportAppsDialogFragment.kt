@@ -9,7 +9,6 @@ import com.absinthe.libchecker.domain.settings.model.ExportAppsDialogState
 import com.absinthe.libchecker.domain.settings.presentation.SettingsViewModel
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Toasty
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -39,8 +38,6 @@ class ExportAppsDialogFragment : BaseBottomSheetViewDialogFragment<ExportAppsDia
   override fun init() {
     root.bind(dialogState, ::handleAction)
   }
-
-  override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun onDestroyView() {
     exportJob?.cancel()

@@ -13,7 +13,6 @@ import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.ShizukuManager
 import com.absinthe.libchecker.utils.ShizukuManager.Availability
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
@@ -28,8 +27,6 @@ class AppInstallSourceBSDFragment : BaseBottomSheetViewDialogFragment<AppInstall
   override fun initRootView(): AppInstallSourceBottomSheetView {
     return AppInstallSourceBottomSheetView(requireContext())
   }
-
-  override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {
     maxPeekHeightPercentage = 0.67f

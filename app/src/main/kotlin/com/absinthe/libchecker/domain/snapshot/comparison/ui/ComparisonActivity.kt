@@ -45,7 +45,7 @@ import com.absinthe.libchecker.domain.snapshot.list.ui.adapter.SnapshotAdapter
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.usecase.GetSnapshotPackageIconSourcesUseCase
 import com.absinthe.libchecker.domain.snapshot.timenode.ui.TimeNodeBottomSheetDialogFragment
-import com.absinthe.libchecker.ui.adapter.HorizontalSpacesItemDecoration
+import com.absinthe.libchecker.ui.adapter.addSpacingDecoration
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.utils.UiUtils
@@ -171,10 +171,9 @@ class ComparisonActivity :
           }
 
         if (itemDecorationCount == 0) {
-          addItemDecoration(
-            HorizontalSpacesItemDecoration(
-              resources.getDimension(R.dimen.normal_padding).toInt() / 2
-            )
+          addSpacingDecoration(
+            resources.getDimension(R.dimen.normal_padding).toInt() / 2,
+            RecyclerView.HORIZONTAL
           )
         }
       }
