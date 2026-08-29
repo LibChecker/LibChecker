@@ -10,9 +10,11 @@ import com.absinthe.libchecker.compat.ZipFileCompat
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.domain.app.buildmetadata.COMPOSE_VERSION_ENTRIES
 import com.absinthe.libchecker.domain.app.buildmetadata.DATA_BINDING_VERSION_ENTRIES
+import com.absinthe.libchecker.domain.app.buildmetadata.KotlinBuildMetadata
+import com.absinthe.libchecker.domain.app.buildmetadata.KotlinBuildMetadataDetector
+import com.absinthe.libchecker.domain.app.buildmetadata.KotlinVersionInferenceHints
 import com.absinthe.libchecker.domain.app.buildmetadata.readFirstPresentLine
 import com.absinthe.libchecker.domain.app.detail.model.AppIconItem
-import com.absinthe.libchecker.domain.app.detail.model.KotlinToolingMetadata
 import com.absinthe.libchecker.domain.app.model.VersionedFeature
 import com.absinthe.libchecker.domain.app.repository.AppListRepository
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
@@ -23,7 +25,6 @@ import com.absinthe.libchecker.utils.extensions.isPWA
 import com.absinthe.libchecker.utils.extensions.isPageSizeCompat
 import com.absinthe.libchecker.utils.extensions.isPlayAppSigning
 import com.absinthe.libchecker.utils.extensions.isUseKMP
-import com.absinthe.libchecker.utils.fromJson
 import java.io.File
 import java.io.InputStreamReader
 import java.util.Properties
@@ -76,6 +77,7 @@ class GetAppDetailFeaturesUseCase(
                 readAgp = (scannedFeatures and Features.AGP) > 0,
                 readCompose = (scannedFeatures and Features.JETPACK_COMPOSE) > 0,
                 readXposedMarker = !packageInfo.hasXposedModuleMetadata(),
+                isApk = isApk,
                 emitFeature = { scannedMetadata.add(it) },
                 openedZip = zip
               )
@@ -109,6 +111,7 @@ class GetAppDetailFeaturesUseCase(
         readAgp = (feat and Features.AGP) > 0,
         readCompose = (feat and Features.JETPACK_COMPOSE) > 0,
         readXposedMarker = !hasXposedMetadata,
+        isApk = isApk,
         emitFeature = ::emitFeature
       )
     }
@@ -142,6 +145,7 @@ class GetAppDetailFeaturesUseCase(
     readAgp: Boolean,
     readCompose: Boolean,
     readXposedMarker: Boolean,
+    isApk: Boolean,
     emitFeature: suspend (VersionedFeature) -> Unit,
     openedZip: ZipFileCompat? = null
   ) {
@@ -169,7 +173,12 @@ class GetAppDetailFeaturesUseCase(
 
     suspend fun emitFromZip(zip: ZipFileCompat) {
       if (readKotlin) {
-        emitFeature(VersionedFeature(Features.KOTLIN_USED, extras = readKotlinPluginInfo(zip)))
+        emitFeature(
+          VersionedFeature(
+            Features.KOTLIN_USED,
+            extras = readKotlinBuildInfo(packageInfo, File(sourceDir), zip, isApk)
+          )
+        )
       }
       if (readAgp) {
         emitFeature(VersionedFeature(Features.AGP, readAgpVersion(zip)))
@@ -207,27 +216,26 @@ class GetAppDetailFeaturesUseCase(
     }
   }
 
-  private fun readKotlinPluginInfo(zip: ZipFileCompat): Map<String, String?> {
-    val map = DEFAULT_KOTLIN_PLUGIN_INFO.toMutableMap()
-    val entry = zip.getEntry(KOTLIN_TOOLING_METADATA_ENTRY) ?: return map
-    return runCatching {
-      val json = InputStreamReader(zip.getInputStream(entry), Charsets.UTF_8).use { it.readText() }
-      val metadata = json.fromJson<KotlinToolingMetadata>() ?: return@runCatching map
-      val kotlinAndroidTarget =
-        metadata.projectTargets?.find { target -> target.target == KOTLIN_ANDROID_TARGET }
-
-      map["Kotlin"] =
-        metadata.buildPluginVersion.takeIf { metadata.buildPlugin == KOTLIN_ANDROID_PLUGIN || kotlinAndroidTarget != null }
-      if (metadata.buildSystem == GRADLE_BUILD_SYSTEM && metadata.buildSystemVersion.isNotEmpty()) {
-        map["Gradle"] = metadata.buildSystemVersion
-      }
-
-      val sourceCompatibility = kotlinAndroidTarget?.extras?.android?.sourceCompatibility
-      if (kotlinAndroidTarget != null && sourceCompatibility?.all { it.isDigit() } == true) {
-        map["Java"] = sourceCompatibility
-      }
-      map
-    }.getOrDefault(DEFAULT_KOTLIN_PLUGIN_INFO)
+  private fun readKotlinBuildInfo(
+    packageInfo: PackageInfo,
+    apk: File,
+    zip: ZipFileCompat,
+    isApk: Boolean
+  ): Map<String, String?> {
+    val componentPackageInfo = if (isApk) {
+      null
+    } else {
+      installedAppRepository.getPackageInfo(
+        packageName = packageInfo.packageName,
+        flags = KOTLIN_INFERENCE_PACKAGE_FLAGS,
+        resolveFrozenArchiveInfo = false
+      )
+    }
+    return KotlinBuildMetadataDetector.detect(
+      apk = apk,
+      zip = zip,
+      inferenceHints = KotlinVersionInferenceHints.from(packageInfo, componentPackageInfo)
+    ).toKotlinDialogEntries()
   }
 
   private fun readAgpVersion(zip: ZipFileCompat): String? {
@@ -303,12 +311,21 @@ data class AppDetailFeatures(
 
 private val DEFAULT_KOTLIN_PLUGIN_INFO: Map<String, String?> = mapOf("Kotlin" to null)
 
-private const val KOTLIN_TOOLING_METADATA_ENTRY = "kotlin-tooling-metadata.json"
-private const val KOTLIN_ANDROID_TARGET = "org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget"
-private const val KOTLIN_ANDROID_PLUGIN = "org.jetbrains.kotlin.gradle.plugin.KotlinAndroidPluginWrapper"
-private const val GRADLE_BUILD_SYSTEM = "Gradle"
 private const val AGP_METADATA_ENTRY = "META-INF/com/android/build/gradle/app-metadata.properties"
 private const val AGP_KEYWORD = "androidGradlePluginVersion"
 private const val MANIFEST_MF_ENTRY = "META-INF/MANIFEST.MF"
 private const val AGP_MANIFEST_PREFIX = "Created-By: Android Gradle "
 private const val XPOSED_MODULE_PROP_ENTRY = "META-INF/xposed/module.prop"
+
+private const val KOTLIN_INFERENCE_PACKAGE_FLAGS = PackageManager.GET_ACTIVITIES or
+  PackageManager.GET_SERVICES or
+  PackageManager.GET_RECEIVERS or
+  PackageManager.GET_PROVIDERS or
+  PackageManager.GET_INSTRUMENTATION
+
+internal fun KotlinBuildMetadata.toKotlinDialogEntries(): Map<String, String?> {
+  return linkedMapOf<String, String?>("Kotlin" to kotlinVersion).apply {
+    gradleVersion?.let { version -> put("Gradle", version) }
+    javaVersion?.let { version -> put("Java", version) }
+  }
+}

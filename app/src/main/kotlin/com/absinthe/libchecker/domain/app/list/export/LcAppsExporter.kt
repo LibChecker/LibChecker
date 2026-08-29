@@ -18,8 +18,9 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.ZipFileCompat
 import com.absinthe.libchecker.domain.app.buildmetadata.COMPOSE_VERSION_ENTRIES
 import com.absinthe.libchecker.domain.app.buildmetadata.DATA_BINDING_VERSION_ENTRIES
+import com.absinthe.libchecker.domain.app.buildmetadata.KotlinBuildMetadataDetector
+import com.absinthe.libchecker.domain.app.buildmetadata.KotlinVersionInferenceHints
 import com.absinthe.libchecker.domain.app.buildmetadata.readFirstPresentLine
-import com.absinthe.libchecker.domain.app.detail.model.KotlinToolingMetadata
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.OsUtils
@@ -32,7 +33,6 @@ import com.absinthe.libchecker.utils.extensions.md5
 import com.absinthe.libchecker.utils.extensions.sha1
 import com.absinthe.libchecker.utils.extensions.sha256
 import com.absinthe.libchecker.utils.extensions.toHexString
-import com.absinthe.libchecker.utils.fromJson
 import com.squareup.moshi.JsonWriter
 import java.io.BufferedOutputStream
 import java.io.ByteArrayInputStream
@@ -316,6 +316,7 @@ object LcAppsExporter {
       PackageManager.GET_SERVICES or
       PackageManager.GET_RECEIVERS or
       PackageManager.GET_PROVIDERS or
+      PackageManager.GET_INSTRUMENTATION or
       PackageManager.GET_PERMISSIONS or
       PackageManager.GET_META_DATA or
       PackageManager.GET_SIGNATURES or
@@ -445,8 +446,21 @@ object LcAppsExporter {
   private fun readBuildMetadata(packageInfo: PackageInfo): BuildMetadataExport {
     val sourceDir = packageInfo.applicationInfo?.sourceDir ?: return BuildMetadataExport()
     return runCatching {
-      ZipFileCompat(File(sourceDir)).use { zip ->
-        val kotlinInfo = readKotlinPluginInfo(zip)
+      val sourceFile = File(sourceDir)
+      ZipFileCompat(sourceFile).use { zip ->
+        val kotlinDetected =
+          zip.getEntry(KOTLIN_TOOLING_METADATA_ENTRY) != null ||
+            zip.getEntry("kotlin/kotlin.kotlin_builtins") != null ||
+            zip.getEntry("META-INF/services/kotlinx.coroutines.CoroutineExceptionHandler") != null ||
+            zip.getEntry("META-INF/services/kotlinx.coroutines.internal.MainDispatcherFactory") != null ||
+            KotlinBuildMetadataDetector.hasKotlinModuleMetadata(zip) ||
+            PackageUtils.hasKotlinRuntimeEvidenceInClassDex(zip)
+        val kotlinInfo = KotlinBuildMetadataDetector.detect(
+          apk = sourceFile,
+          zip = zip,
+          inferVersion = kotlinDetected,
+          inferenceHints = KotlinVersionInferenceHints.from(packageInfo)
+        )
         val composeVersion = zip.readFirstPresentLine(COMPOSE_VERSION_ENTRIES)
         val composeDetected = composeVersion != null || zip.getZipEntries().asSequence().any { entry ->
           val fileName = entry.name.substringAfterLast('/')
@@ -456,11 +470,7 @@ object LcAppsExporter {
         }
 
         BuildMetadataExport(
-          kotlinDetected = kotlinInfo.kotlinVersion != null ||
-            zip.getEntry("kotlin/kotlin.kotlin_builtins") != null ||
-            zip.getEntry("META-INF/services/kotlinx.coroutines.CoroutineExceptionHandler") != null ||
-            zip.getEntry("META-INF/services/kotlinx.coroutines.internal.MainDispatcherFactory") != null ||
-            PackageUtils.hasKotlinRuntimeEvidenceInClassDex(zip),
+          kotlinDetected = kotlinDetected,
           kotlinVersion = kotlinInfo.kotlinVersion,
           gradleVersion = kotlinInfo.gradleVersion,
           composeDetected = composeDetected,
@@ -471,24 +481,6 @@ object LcAppsExporter {
     }.onFailure {
       Timber.w(it, "Failed to read build metadata: ${packageInfo.packageName}")
     }.getOrDefault(BuildMetadataExport())
-  }
-
-  private fun readKotlinPluginInfo(zip: ZipFileCompat): KotlinPluginExport {
-    val entry = zip.getEntry("kotlin-tooling-metadata.json") ?: return KotlinPluginExport()
-    return runCatching {
-      val json = InputStreamReader(zip.getInputStream(entry), Charsets.UTF_8).use { it.readText() }
-      val metadata = json.fromJson<KotlinToolingMetadata>() ?: return@runCatching KotlinPluginExport()
-      val kotlinAndroidTarget =
-        metadata.projectTargets?.find { target -> target.target == "org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget" }
-      KotlinPluginExport(
-        kotlinVersion = metadata.buildPluginVersion.takeIf {
-          metadata.buildPlugin == "org.jetbrains.kotlin.gradle.plugin.KotlinAndroidPluginWrapper" || kotlinAndroidTarget != null
-        },
-        gradleVersion = metadata.buildSystemVersion.takeIf {
-          metadata.buildSystem == "Gradle" && metadata.buildSystemVersion.isNotEmpty()
-        }
-      )
-    }.getOrDefault(KotlinPluginExport())
   }
 
   private fun readAgpVersion(zip: ZipFileCompat): String? {
@@ -1072,6 +1064,7 @@ object LcAppsExporter {
   private const val ICON_BATCH_SIZE = 8
   private const val REPORT_BATCH_SIZE = 8
   private const val ZIP_BUFFER_SIZE = 64 * 1024
+  private const val KOTLIN_TOOLING_METADATA_ENTRY = "kotlin-tooling-metadata.json"
   private const val AGP_KEYWORD = "androidGradlePluginVersion"
   private const val AGP_KEYWORD_MANIFEST_PREFIX = "Created-By: Android Gradle "
 
@@ -1180,11 +1173,6 @@ object LcAppsExporter {
     val composeDetected: Boolean = false,
     val composeVersion: String? = null,
     val agpVersion: String? = null
-  )
-
-  private data class KotlinPluginExport(
-    val kotlinVersion: String? = null,
-    val gradleVersion: String? = null
   )
 
   private data class SignaturesExport(
