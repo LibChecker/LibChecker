@@ -30,6 +30,9 @@ Use the Gradle wrapper from the repository root. On macOS/Linux use
   real complex packages instead of trivial sample apps when available.
 - For snapshot checks, prefer importing an existing backup from the device
   `Download` directory before exporting a new snapshot.
+- Files generated on test devices must be created only under `/data/local/tmp`
+  (including screenshots, recordings, logs, traces, and snapshot exports).
+  Never generate files in `/sdcard`, `Download`, or any other device directory.
 
 For docs-only changes, a Gradle build is usually unnecessary. For source
 changes, run the narrowest command that covers the touched files plus

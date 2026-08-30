@@ -28,18 +28,16 @@ import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.SnapshotOptions
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
+import com.absinthe.libchecker.domain.app.detail.ui.dialog.LibDetailDialogFragment
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailDiffTextStyle
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotReportExportTarget
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotTitleDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailReportHeader
 import com.absinthe.libchecker.domain.snapshot.detail.model.chooseSnapshotReportExportTarget
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.SnapshotDetailAdapter
-import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotDetailNodeClickAction
-import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotDetailNodeLongClickAction
-import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.SnapshotReportNode
-import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.clickAction
-import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.longClickAction
-import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.node.toSnapshotTitleNode
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.SnapshotDetailRow
+import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.interactionPolicy
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.toRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailDeletedView
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailNewInstallView
@@ -82,7 +80,7 @@ class SnapshotDetailActivity :
   private lateinit var entity: SnapshotDiffItem
   private lateinit var snapshotTitleDisplayData: SnapshotTitleDisplayData
 
-  private val adapter by lazy { SnapshotDetailAdapter() }
+  private val adapter by lazy { SnapshotDetailAdapter(::showSnapshotDetailLibraryDialog) }
   private val viewModel: SnapshotViewModel by viewModel()
   private val buildSnapshotTitleDisplayData: BuildSnapshotTitleDisplayDataUseCase by inject()
   private val _entity by unsafeLazy {
@@ -198,22 +196,26 @@ class SnapshotDetailActivity :
       }
     adapter.isStateViewEnable = entity.newInstalled || entity.deleted
     adapter.setOnItemClickListener { _, view, position ->
-      when (val action = adapter.data[position].clickAction) {
-        SnapshotDetailNodeClickAction.ToggleSection -> {
-          adapter.expandOrCollapse(position)
+      when (val row = adapter.itemAt(position)) {
+        is SnapshotDetailRow.Header -> {
+          adapter.toggleSectionAt(position)
           return@setOnItemClickListener
         }
 
-        is SnapshotDetailNodeClickAction.OpenDetail -> {
+        is SnapshotDetailRow.Item -> {
+          if (!row.interactionPolicy(entity.packageName).opensDetail) {
+            return@setOnItemClickListener
+          }
           if (AntiShakeUtils.isInvalidClick(view)) {
             return@setOnItemClickListener
           }
+          val item = row.displayData.item
           lifecycleScope.launch {
             val lcItem = viewModel.getAppListItem(entity.packageName) ?: return@launch
             launchDetailPage(
               item = lcItem,
-              refName = action.target.refName,
-              refType = action.target.refType
+              refName = item.name,
+              refType = item.itemType
             )
           }
         }
@@ -222,14 +224,18 @@ class SnapshotDetailActivity :
       }
     }
     adapter.setOnItemLongClickListener { _, _, position ->
-      when (val action = adapter.data[position].longClickAction(entity.packageName)) {
-        is SnapshotDetailNodeLongClickAction.OpenReference -> {
-          val target = action.target
-          launchLibReferencePage(target.refName, target.label, target.refType, null)
+      when (val row = adapter.itemAt(position)) {
+        is SnapshotDetailRow.Item -> {
+          val policy = row.interactionPolicy(entity.packageName)
+          if (!policy.opensReference) {
+            return@setOnItemLongClickListener false
+          }
+          val item = row.displayData.item
+          launchLibReferencePage(item.name, policy.referenceLabel, item.itemType, null)
           true
         }
 
-        null -> false
+        else -> false
       }
     }
 
@@ -237,13 +243,11 @@ class SnapshotDetailActivity :
       binding.snapshotTitle.render(
         snapshotTitleDisplayData.toRenderState(summary = content.summary)
       )
-      val titleList = content.sections.map { section ->
+      content.sections.forEach { section ->
         recordDetailComponentCount(section.type, section.items.size)
-        section.toSnapshotTitleNode()
       }
-
-      adapter.isStateViewEnable = titleList.isEmpty()
-      adapter.setList(titleList)
+      adapter.isStateViewEnable = content.sections.isEmpty()
+      adapter.submitSections(content.sections)
     }.launchIn(lifecycleScope)
   }
 
@@ -312,12 +316,7 @@ class SnapshotDetailActivity :
     val sb = StringBuilder()
     sb.append(buildSnapshotDetailReportHeader(snapshotTitleDisplayData))
     sb.appendLine()
-
-    adapter.data.forEach { node ->
-      if (node is SnapshotReportNode) {
-        sb.append(node.reportText)
-      }
-    }
+    sb.append(adapter.reportText())
     val report = sb.toString()
     when (chooseSnapshotReportExportTarget(report)) {
       SnapshotReportExportTarget.CLIPBOARD -> {
@@ -366,4 +365,16 @@ class SnapshotDetailActivity :
   private companion object {
     const val SNAPSHOT_REPORT_CACHE_DIR = "shared_snapshot_reports"
   }
+}
+
+private fun SnapshotDetailActivity.showSnapshotDetailLibraryDialog(
+  displayData: SnapshotDetailItemDisplayData
+) {
+  val item = displayData.item
+  LibDetailDialogFragment.newInstance(
+    item.name,
+    item.itemType,
+    regexName = displayData.ruleChip?.regexName,
+    enableLibraryInsight = false
+  ).show(supportFragmentManager, LibDetailDialogFragment::class.java.name)
 }
