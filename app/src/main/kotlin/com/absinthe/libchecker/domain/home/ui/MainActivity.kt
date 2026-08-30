@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
+import android.graphics.PointF
 import android.os.Bundle
 import android.os.IBinder
 import android.util.TypedValue
@@ -14,11 +15,13 @@ import android.view.ViewGroup
 import android.view.animation.PathInterpolator
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
+import androidx.appcompat.widget.TooltipCompat
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.doOnLayout
 import androidx.core.view.get
 import androidx.core.view.updatePadding
@@ -36,9 +39,15 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.databinding.ActivityMainBinding
+import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
+import com.absinthe.libchecker.domain.app.detail.ui.AppDetailActivity
 import com.absinthe.libchecker.domain.home.model.HomeToolbarTitleState
 import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
+import com.absinthe.libchecker.domain.home.presentation.RecentVisitsViewModel
 import com.absinthe.libchecker.domain.home.ui.view.HomeToolbarTitleView
+import com.absinthe.libchecker.domain.home.ui.view.RecentVisitItem
+import com.absinthe.libchecker.domain.home.ui.view.RecentVisitsPopup
+import com.absinthe.libchecker.domain.home.ui.view.startRecentVisitDrag
 import com.absinthe.libchecker.domain.rules.CloudRulesRepository
 import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.services.WorkerService
@@ -54,6 +63,8 @@ import com.absinthe.libchecker.utils.extensions.addBackStateHandler
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.isKeyboardShowing
+import com.absinthe.libchecker.utils.extensions.launchDetailPage
+import com.absinthe.libchecker.utils.extensions.launchLibReferencePage
 import com.absinthe.libchecker.view.app.BlurCoordinatorLayout
 import com.absinthe.libchecker.view.app.InvalidatingHideBottomViewOnScrollBehavior
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -81,6 +92,8 @@ class MainActivity :
   IListControllerHost {
 
   private val appViewModel: HomeViewModel by viewModel()
+  private val recentVisitsViewModel: RecentVisitsViewModel by viewModel()
+  private var recentVisitsPopup: RecentVisitsPopup? = null
   private val cloudRulesRepository: CloudRulesRepository by inject()
   private var listController: IListController? = null
   private val initialListTopPaddings = WeakHashMap<View, Int>()
@@ -140,6 +153,8 @@ class MainActivity :
   }
 
   override fun onDestroy() {
+    recentVisitsPopup?.dismissImmediately()
+    recentVisitsPopup = null
     appbarScrollTarget?.removeOnScrollListener(appbarScrollListener)
     appbarScrollTarget = null
     super.onDestroy()
@@ -147,6 +162,8 @@ class MainActivity :
   }
 
   override fun onPause() {
+    recentVisitsPopup?.dismissImmediately()
+    recentVisitsPopup = null
     saveToolbarMenuState()
     super.onPause()
   }
@@ -384,6 +401,7 @@ class MainActivity :
           override fun onPageSelected(position: Int) {
             super.onPageSelected(position)
             navView.menu.findItem(HomeDestination.requirePageIndex(position).navigationItemId).isChecked = true
+            navView.post { bindRecentVisitsShortcuts(navView) }
             appViewModel.clearMenuState()
 
             val fragment = supportFragmentManager.findFragmentByTag("f$position") as? BaseFragment<*>
@@ -452,6 +470,14 @@ class MainActivity :
       }
     }
 
+    bindRecentVisitsShortcuts(navView)
+    navView.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> bindRecentVisitsShortcuts(navView) }
+    recentVisitsViewModel.items.onEach { lists ->
+      recentVisitsPopup?.takeIf { it.isShowing }?.let { popup ->
+        popup.updateItems(if (popup.libraries) lists?.libraries else lists?.apps)
+      }
+    }.launchIn(lifecycleScope)
+
     onBackPressedDispatcher.addBackStateHandler(
       lifecycleOwner = this,
       enabledState = { !isKeyboardShowing() && binding.toolbar.hasExpandedActionView() },
@@ -459,6 +485,79 @@ class MainActivity :
     )
     // Apply blur config last so it wins over the behavior/background setup above.
     setBlurDesignEnabled(GlobalValues.isBlurDesign)
+  }
+
+  private fun bindRecentVisitsShortcuts(navView: NavigationBarView) {
+    for (index in 0 until navView.menu.size()) {
+      val id = navView.menu.getItem(index).itemId
+      val tab = navView.findViewById<View>(id) ?: continue
+      TooltipCompat.setTooltipText(tab, null)
+      if (id == R.id.navigation_app_list || id == R.id.navigation_classify) {
+        val libraries = id == R.id.navigation_classify
+        tab.setOnLongClickListener {
+          showRecentVisits(tab, libraries)
+          true
+        }
+        ViewCompat.replaceAccessibilityAction(
+          tab,
+          AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_LONG_CLICK,
+          getString(if (libraries) R.string.recent_libraries else R.string.recent_apps)
+        ) { _, _ ->
+          showRecentVisits(tab, libraries)
+          true
+        }
+      }
+    }
+  }
+
+  private fun showRecentVisits(anchor: View, libraries: Boolean) {
+    if (recentVisitsPopup?.isShowing == true) return
+    recentVisitsPopup = createRecentVisitsPopup(anchor, libraries).also {
+      val lists = recentVisitsViewModel.items.value
+      it.show(if (libraries) lists?.libraries else lists?.apps)
+    }
+  }
+
+  private fun createRecentVisitsPopup(anchor: View, libraries: Boolean) = RecentVisitsPopup(
+    binding.root,
+    binding.navView,
+    anchor,
+    libraries,
+    ::openRecentVisit,
+    recentVisitsViewModel::pin,
+    { recentVisitsViewModel.remove(it.visit) }
+  )
+
+  fun pinListItem(source: View, touch: PointF?, item: RecentVisitItem): Boolean {
+    if (recentVisitsPopup?.isShowing == true) return false
+    val libraries = item.visit.isLibrary
+    val anchor = binding.navView.findViewById<View>(if (libraries) R.id.navigation_classify else R.id.navigation_app_list) ?: return false
+    if (binding.navView is BottomNavigationView) {
+      navViewBehavior.slideUp(binding.navView as BottomNavigationView, false)
+    }
+    val popup = createRecentVisitsPopup(anchor, libraries)
+    if (touch != null) {
+      val token = popup.prepareDrag(item, source, touch)
+      if (!startRecentVisitDrag(source, item, token, popup::finishDrag)) return false
+    } else {
+      // TalkBack's labelled action offers the same operation without a spatial gesture.
+      recentVisitsViewModel.pin(item)
+    }
+    recentVisitsPopup = popup
+    val lists = recentVisitsViewModel.items.value
+    popup.show(if (libraries) lists?.libraries else lists?.apps)
+    return true
+  }
+
+  private fun openRecentVisit(item: RecentVisitItem) {
+    val visit = item.visit
+    if (visit.type != null) {
+      launchLibReferencePage(visit.name, visit.label ?: item.label, visit.type, visit.referredList?.toTypedArray())
+    } else if (item.app != null) {
+      launchDetailPage(item.app)
+    } else {
+      startActivity(Intent(this, AppDetailActivity::class.java).putExtra(EXTRA_PACKAGE_NAME, visit.name))
+    }
   }
 
   private fun navigateToPage(index: Int) {
@@ -522,6 +621,7 @@ class MainActivity :
 
   override fun onResume() {
     super.onResume()
+    recentVisitsViewModel.refresh()
     if (appViewModel.shouldCheckPackagesPermissionOnResume()) {
       val granted =
         ContextCompat.checkSelfPermission(

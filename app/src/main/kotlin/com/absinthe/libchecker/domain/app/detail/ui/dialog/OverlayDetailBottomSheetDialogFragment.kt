@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.domain.app.detail.ui.dialog
 
+import android.os.Bundle
 import androidx.core.os.BundleCompat
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
@@ -9,6 +10,8 @@ import com.absinthe.libchecker.domain.app.detail.model.OverlayDetailBottomSheetR
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_LC_ITEM
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
 import com.absinthe.libchecker.domain.app.detail.ui.view.OverlayDetailBottomSheetView
+import com.absinthe.libchecker.domain.home.presentation.RecentVisitsViewModel
+import com.absinthe.libchecker.domain.home.recent.RecentVisit
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
@@ -18,6 +21,13 @@ import org.koin.androidx.viewmodel.ext.android.activityViewModel
 class OverlayDetailBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<OverlayDetailBottomSheetView>() {
 
   private val viewModel: DetailViewModel by activityViewModel()
+  private val recentVisitsViewModel: RecentVisitsViewModel by activityViewModel()
+  private var recordVisit = true
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    recordVisit = savedInstanceState == null
+  }
 
   override fun initRootView(): OverlayDetailBottomSheetView {
     return OverlayDetailBottomSheetView(requireContext())
@@ -35,6 +45,10 @@ class OverlayDetailBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment
         }
 
         is OverlayDetailBottomSheetResult.Available -> {
+          if (recordVisit) {
+            recordVisit = false
+            recentVisitsViewModel.record(RecentVisit(lcItem.packageName))
+          }
           root.bind(result.display) { action ->
             when (action) {
               is OverlayDetailAction.OpenApp -> activity?.launchDetailPage(action.item, forceDetail = action.forceDetail)

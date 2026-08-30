@@ -10,6 +10,7 @@ import com.absinthe.libchecker.annotation.PACKAGE
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.SHARED_UID
 import com.absinthe.libchecker.annotation.isComponentType
+import com.absinthe.rulesbundle.Rule
 
 data class LibReferenceSearchLabels(
   val notMarkedLabel: String = "",
@@ -81,15 +82,7 @@ data class LibReferenceItemDisplay(
         else -> null
       }
       val label = (rule?.label ?: categoryLabel ?: notMarkedLabel) + labelSuffix
-      val isAndroidGroupPermission = reference.type == PERMISSION &&
-        reference.libName.startsWith("android.permission")
-      val isAndroidGroupAction = reference.type == ACTION &&
-        reference.libName.startsWith("android.intent.action")
-      val iconRes = rule?.iconRes ?: if (isAndroidGroupPermission || isAndroidGroupAction) {
-        com.absinthe.lc.rulesbundle.R.drawable.ic_lib_android
-      } else {
-        R.drawable.ic_question
-      }
+      val iconRes = resolveReferenceIcon(reference.libName, reference.type, rule)
 
       return LibReferenceItemDisplay(
         label = label,
@@ -103,6 +96,17 @@ data class LibReferenceItemDisplay(
         contentDescription = buildReferenceItemDescription(label, reference.libName, countText)
       )
     }
+  }
+}
+
+@DrawableRes
+fun resolveReferenceIcon(name: String, type: Int, rule: Rule?): Int {
+  val isAndroidPermission = type == PERMISSION && name.startsWith("android.permission")
+  val isAndroidAction = type == ACTION && name.startsWith("android.intent.action")
+  return rule?.iconRes ?: if (isAndroidPermission || isAndroidAction) {
+    com.absinthe.lc.rulesbundle.R.drawable.ic_lib_android
+  } else {
+    R.drawable.ic_question
   }
 }
 

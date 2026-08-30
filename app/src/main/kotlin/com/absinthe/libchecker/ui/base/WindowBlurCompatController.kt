@@ -368,7 +368,7 @@ internal class WindowBlurCompatController(
   }
 }
 
-private val FIXED_BLUR_RADII = floatArrayOf(24f, 48f, 64f, 80f)
+internal val FIXED_BLUR_RADII = floatArrayOf(24f, 48f, 64f, 80f)
 
 internal fun inheritedBlurStartRadius(
   currentRadius: Float,

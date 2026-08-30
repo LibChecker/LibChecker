@@ -7,6 +7,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.FrameLayout
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
 import androidx.core.view.doOnNextLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -19,7 +20,11 @@ import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.LibDetailDialogFragment
 import com.absinthe.libchecker.domain.app.list.ui.AdvancedMenuBSDFragment
 import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
+import com.absinthe.libchecker.domain.home.recent.RecentVisit
 import com.absinthe.libchecker.domain.home.ui.INavViewContainer
+import com.absinthe.libchecker.domain.home.ui.MainActivity
+import com.absinthe.libchecker.domain.home.ui.view.RecentVisitItem
+import com.absinthe.libchecker.domain.home.ui.view.installRecentVisitDrag
 import com.absinthe.libchecker.domain.statistics.chart.ui.ChartActivity
 import com.absinthe.libchecker.domain.statistics.reference.TRACE_REFERENCE_RESULT_TO_FIRST_LAYOUT
 import com.absinthe.libchecker.domain.statistics.reference.beginReferenceAsyncSection
@@ -28,6 +33,7 @@ import com.absinthe.libchecker.domain.statistics.reference.model.LibReference
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceAction
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceListRenderState
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceSearchLabels
+import com.absinthe.libchecker.domain.statistics.reference.model.resolveReferenceIcon
 import com.absinthe.libchecker.domain.statistics.reference.presentation.LibReferenceViewModel
 import com.absinthe.libchecker.domain.statistics.reference.ui.adapter.LibReferenceAdapter
 import com.absinthe.libchecker.domain.statistics.reference.ui.adapter.provider.LIB_REFERENCE_PROVIDER
@@ -111,6 +117,18 @@ class LibReferenceFragment :
     binding.apply {
       list.apply {
         adapter = refAdapter
+        installRecentVisitDrag(this) { row, position, touch ->
+          val item = refAdapter.data.getOrNull(position) as? LibReference ?: return@installRecentVisitDrag false
+          val label = item.rule?.label?.takeIf(String::isNotBlank) ?: item.resolvedLabel ?: item.libName
+          val iconRes = resolveReferenceIcon(item.libName, item.type, item.rule)
+          val icon = ContextCompat.getDrawable(context, iconRes) ?: return@installRecentVisitDrag false
+          val visit = RecentVisit(item.libName, item.type, label, item.referredList.toList())
+          (activity as? MainActivity)?.pinListItem(
+            row,
+            touch,
+            RecentVisitItem(visit, label, icon, tintIcon = item.rule?.isSimpleColorIcon == true || iconRes == R.drawable.ic_question)
+          ) == true
+        }
         layoutManager = LinearLayoutManager(context)
         wireListScreenChrome(this)
         FastScrollerBuilder(this).useMd2Style().build()
