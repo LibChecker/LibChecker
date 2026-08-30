@@ -4,6 +4,9 @@ import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemDisplayData
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailRuleChipDisplayData
+import com.absinthe.libchecker.domain.snapshot.model.MOVED
 
 data class SnapshotDetailItemViewRenderState(
   val title: CharSequence,
@@ -152,5 +155,40 @@ fun planSnapshotDetailItemLayout(
   return SnapshotDetailItemLayoutPlan(
     contentWidth = safeContentWidth,
     chipOnStatusLine = chipOnStatusLine
+  )
+}
+
+fun SnapshotDetailItemDisplayData.toItemViewRenderState(): SnapshotDetailItemViewRenderState {
+  val movedPath = item.toMovedPathRenderState()
+  return SnapshotDetailItemViewRenderState(
+    title = if (movedPath == null) title else item.name,
+    extra = extra,
+    iconRes = status.iconRes,
+    statusColorRes = status.colorRes,
+    statusLabelRes = status.labelRes,
+    contentDescription = description,
+    ruleChip = ruleChip?.toRenderState(),
+    movedPath = movedPath
+  )
+}
+
+private fun com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem.toMovedPathRenderState(): SnapshotDetailMovedPathRenderState? {
+  if (diffType != MOVED) return null
+  val previousPackagePath = previousName
+    ?.substringBeforeLast('.', missingDelimiterValue = "")
+    ?.takeIf(String::isNotBlank)
+    ?: return null
+  return SnapshotDetailMovedPathRenderState(previousPackagePath)
+}
+
+private fun SnapshotDetailRuleChipDisplayData.toRenderState(): SnapshotDetailRuleChipRenderState {
+  return SnapshotDetailRuleChipRenderState(
+    label = label,
+    iconRes = iconRes,
+    iconStyle = when {
+      isSimpleColorIcon -> SnapshotDetailRuleChipIconStyle.ThemeTint
+      useColorfulIcon -> SnapshotDetailRuleChipIconStyle.Original
+      else -> SnapshotDetailRuleChipIconStyle.Desaturated
+    }
   )
 }
