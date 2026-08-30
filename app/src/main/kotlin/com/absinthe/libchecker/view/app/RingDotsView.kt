@@ -17,14 +17,15 @@ import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.drawable.toBitmap
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.UiUtils
-import com.absinthe.libchecker.utils.UiUtils.toCircularBitmap
 import com.absinthe.libchecker.utils.extensions.dpToDimension
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.rulesbundle.IconResMap
-import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
+import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToInt
 import kotlin.math.sin
 import kotlin.random.Random
 import kotlinx.coroutines.CancellationException
@@ -39,10 +40,14 @@ import kotlinx.coroutines.launch
 class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context, attrs) {
 
   companion object {
+    private const val DOT_COUNT = 24
     private const val ROTATE_DURATION = 12000L
     private const val HIGHLIGHT_DURATION = 850L
     private const val HIGHLIGHT_HOLD_DURATION = 1250L
     private const val HIGHLIGHT_RING_PUSH = 0.09f
+    private const val HIGHLIGHT_INNER_RING_PUSH = 0.14f
+    private const val HIGHLIGHT_MAX_SCALE = 3.4f
+    private const val HIGHLIGHT_HALO_SCALE = 1.12f
     private const val MAX_HIGHLIGHT_BITMAP_BYTES = 150 * 1024 * 1024
     private const val RING_ALPHA = 232
     private const val RULE_ICON_POOL_COUNT = 100
@@ -70,6 +75,7 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
     isFilterBitmap = true
   }
   private val highlightDst = RectF()
+  private val highlightSurfaceColor = context.getColorByAttr(com.google.android.material.R.attr.colorSurface)
   private val gradientStops = intArrayOf(
     0xFF64D2FF.toInt(),
     0xFF0A84FF.toInt(),
@@ -79,6 +85,12 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
     0xFF30D158.toInt()
   )
   private val gradientPositions = floatArrayOf(0f, 0.18f, 0.39f, 0.62f, 0.82f, 1f)
+  private val dotColors = Array(ringSpecs.size) { ringIndex ->
+    IntArray(DOT_COUNT) { dotIndex ->
+      sampleGradient(normalizeUnit(dotIndex * (360f / DOT_COUNT) / 360f + ringSpecs[ringIndex].colorShift))
+    }
+  }
+  private val highlightGapPx = context.dpToDimension(3f)
   private val ringRotations = FloatArray(ringSpecs.size)
   private val phaseOffsets = computePhaseOffsets()
   private var ringRadii = FloatArray(ringSpecs.size)
@@ -127,8 +139,8 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
     val cy = height / 2f
     val highlightAngle = resolveHighlightAngle()
 
-    ringSpecs.forEachIndexed { ringIndex, spec ->
-      drawRing(canvas, cx, cy, ringIndex, spec, highlightAngle)
+    for (ringIndex in ringSpecs.indices) {
+      drawRing(canvas, cx, cy, ringIndex, ringSpecs[ringIndex], highlightAngle)
     }
     drawHighlight(canvas, cx, cy)
   }
@@ -179,8 +191,8 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
           delta += 360f
         }
         if (delta != 0f) {
-          ringSpecs.forEachIndexed { index, spec ->
-            ringRotations[index] = normalizeDegrees(ringRotations[index] + delta * spec.rotationScale)
+          for (index in ringSpecs.indices) {
+            ringRotations[index] = normalizeDegrees(ringRotations[index] + delta * ringSpecs[index].rotationScale)
           }
         }
         lastAnimatorValue = value
@@ -331,7 +343,7 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
         misses = delayAfterMisses(misses)
         continue
       }
-      return icon.toCircularBitmap()
+      return icon.toHighlightBitmap()
     }
   }
 
@@ -361,8 +373,19 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
       } else {
         drawable
       }
-      return icon.toBitmap()
+      return icon.toHighlightBitmap()
     }
+  }
+
+  private fun Drawable.toHighlightBitmap(): Bitmap {
+    val width = intrinsicWidth.coerceAtLeast(1)
+    val height = intrinsicHeight.coerceAtLeast(1)
+    val scale = ringSpecs.last().dotRadiusPx * HIGHLIGHT_MAX_SCALE * 2f / max(width, height)
+    // Own the bitmap so releasing a highlight cannot recycle a provider's cached icon.
+    return toBitmap(
+      (width * scale).roundToInt().coerceAtLeast(1),
+      (height * scale).roundToInt().coerceAtLeast(1)
+    ).copy(Bitmap.Config.ARGB_8888, false)
   }
 
   private suspend fun delayAfterMisses(previousMisses: Int): Int {
@@ -380,86 +403,92 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
     spec: RingSpec,
     highlightAngle: Float?
   ) {
-    val dotCount = 24
-    val angleStep = 360f / dotCount
+    val angleStep = 360f / DOT_COUNT
+    val colors = dotColors[ringIndex]
     val baseRadius = ringRadii.getOrElse(ringIndex) { 0f }
     val phaseOffset = phaseOffsets.getOrElse(ringIndex) { 0f }
     val rotation = ringRotations.getOrElse(ringIndex) { 0f }
-    paint.alpha = RING_ALPHA
+    val highlightOrbit = ringRadii.last() * (1f + HIGHLIGHT_RING_PUSH * highlightProgress)
+    val highlightRadians = Math.toRadians((highlightAngle ?: 0f).toDouble())
+    val highlightX = cx + (cos(highlightRadians) * highlightOrbit).toFloat()
+    val highlightY = cy + (sin(highlightRadians) * highlightOrbit).toFloat()
+    val clearance = ringSpecs.last().dotRadiusPx * (1f + highlightProgress * (HIGHLIGHT_MAX_SCALE - 1f)) +
+      spec.dotRadiusPx + highlightGapPx * highlightProgress
+    val clearanceSquared = clearance * clearance
 
-    for (dotIndex in 0 until dotCount) {
+    for (dotIndex in 0 until DOT_COUNT) {
       val baseAngle = dotIndex * angleStep
       val angle = normalizeDegrees(baseAngle + phaseOffset + rotation)
-      val radiusScale = resolveRadiusScale(ringIndex, dotIndex, angle, highlightAngle, angleStep)
-      val radius = baseRadius * radiusScale
+      val isHighlightDot = ringIndex == ringSpecs.lastIndex && dotIndex == highlightIndex
+      var radius = if (isHighlightDot) highlightOrbit else baseRadius
+      if (highlightAngle != null && ringIndex < ringSpecs.lastIndex) {
+        val distance = abs((angle - highlightAngle + 540f) % 360f - 180f)
+        val influence = (1f - distance / (angleStep * 2.5f)).coerceIn(0f, 1f)
+        val pressure = influence * influence * (3f - 2f * influence) * highlightProgress
+        // Move the inner rings together to preserve spacing as the icon presses inward.
+        radius *= 1f - HIGHLIGHT_INNER_RING_PUSH * pressure
+      }
       val angleRad = Math.toRadians(angle.toDouble())
-      paint.color = sampleGradient(normalizeUnit(baseAngle / 360f + spec.colorShift))
-      canvas.drawCircle(
-        cx + (cos(angleRad) * radius).toFloat(),
-        cy + (sin(angleRad) * radius).toFloat(),
-        spec.dotRadiusPx,
-        paint
-      )
+      var x = cx + (cos(angleRad) * radius).toFloat()
+      var y = cy + (sin(angleRad) * radius).toFloat()
+      if (highlightAngle != null && highlightProgress > 0f && ringIndex == ringSpecs.lastIndex && !isHighlightDot) {
+        val dx = x - highlightX
+        val dy = y - highlightY
+        if (dx * dx + dy * dy < clearanceSquared) {
+          val distance = hypot(dx, dy).coerceAtLeast(0.001f)
+          val displacement = (clearance - distance).coerceAtLeast(0f) / distance
+          x += dx * displacement
+          y += dy * displacement
+        }
+      }
+      val alpha = if (isHighlightDot) {
+        (RING_ALPHA * (1f - highlightProgress)).roundToInt()
+      } else {
+        RING_ALPHA
+      }
+      paint.color = ColorUtils.setAlphaComponent(colors[dotIndex], alpha)
+      canvas.drawCircle(x, y, spec.dotRadiusPx, paint)
     }
     paint.alpha = 255
   }
 
-  private fun resolveRadiusScale(
-    ringIndex: Int,
-    dotIndex: Int,
-    angle: Float,
-    highlightAngle: Float?,
-    angleStep: Float
-  ): Float {
-    if (highlightAngle == null || highlightProgress <= 0f) return 1f
-    val highlightRingIndex = ringSpecs.lastIndex
-    val push = HIGHLIGHT_RING_PUSH * highlightProgress
-    if (ringIndex == highlightRingIndex) {
-      val distance = circularIndexDistance(dotIndex, highlightIndex, 24)
-      return when (distance) {
-        0 -> 1f + push
-        1 -> 1f + push * 0.55f
-        else -> 1f
-      }
-    }
-    if (ringIndex == highlightRingIndex - 1) {
-      val diff = abs(shortestAngleDistance(highlightAngle, angle))
-      return 1f + push * 0.6f * computeInnerDisplacementWeight(diff, angleStep)
-    }
-    return 1f
-  }
-
   private fun drawHighlight(canvas: Canvas, cx: Float, cy: Float) {
     val bitmap = currentHighlightBitmap?.takeUnless { it.isRecycled } ?: return
-    if (highlightIndex < 0 || highlightProgress <= 0.12f) return
+    if (highlightIndex < 0 || highlightProgress <= 0f) return
 
     val ringIndex = ringSpecs.lastIndex
     val spec = ringSpecs[ringIndex]
-    val baseAngle = highlightIndex * (360f / 24f)
+    val baseAngle = highlightIndex * (360f / DOT_COUNT)
     val angle = normalizeDegrees(baseAngle + phaseOffsets[ringIndex] + ringRotations[ringIndex])
     val radius = ringRadii[ringIndex] * (1f + HIGHLIGHT_RING_PUSH * highlightProgress)
     val angleRad = Math.toRadians(angle.toDouble())
     val x = cx + (cos(angleRad) * radius).toFloat()
     val y = cy + (sin(angleRad) * radius).toFloat()
-    val size = spec.dotRadiusPx * (1.1f + highlightProgress * 2.35f)
-    val tint = sampleGradient(normalizeUnit(baseAngle / 360f + spec.colorShift))
+    val size = spec.dotRadiusPx * (1f + highlightProgress * (HIGHLIGHT_MAX_SCALE - 1f))
+    val tint = dotColors[ringIndex][highlightIndex]
     val alpha = (255 * highlightProgress).toInt().coerceIn(0, 255)
 
-    paint.color = ColorUtils.setAlphaComponent(tint, (alpha * 0.24f).toInt())
-    canvas.drawCircle(x, y, size * 1.22f, paint)
-    paint.color = ColorUtils.setAlphaComponent(tint, (alpha * 0.62f).toInt())
+    paint.color = ColorUtils.setAlphaComponent(tint, (alpha * 0.12f).toInt())
+    canvas.drawCircle(x, y, size * HIGHLIGHT_HALO_SCALE, paint)
+    paint.color = ColorUtils.setAlphaComponent(ColorUtils.blendARGB(highlightSurfaceColor, tint, 0.06f), alpha)
     canvas.drawCircle(x, y, size, paint)
 
-    val inset = size * 0.12f
-    highlightDst.set(x - size + inset, y - size + inset, x + size - inset, y + size - inset)
-    bitmapPaint.alpha = (170 + 85 * highlightProgress).toInt().coerceIn(0, 255)
+    val iconScale = size * 0.86f / max(bitmap.width, bitmap.height)
+    val halfWidth = bitmap.width * iconScale
+    val halfHeight = bitmap.height * iconScale
+    highlightDst.set(x - halfWidth, y - halfHeight, x + halfWidth, y + halfHeight)
+    bitmapPaint.alpha = alpha
     canvas.drawBitmap(bitmap, null, highlightDst, bitmapPaint)
     bitmapPaint.alpha = 255
   }
 
   private fun updateRingRadii() {
     val largestDot = ringSpecs.maxOf { it.dotRadiusPx }
-    val outerRadius = (min(width, height) / 2f - largestDot * 1.5f).coerceAtLeast(0f)
+    val highlightOutset = largestDot * HIGHLIGHT_MAX_SCALE * HIGHLIGHT_HALO_SCALE
+    val outerRadius = (
+      (min(width, height) / 2f - highlightOutset - context.dpToDimension(1f)) /
+        (1f + HIGHLIGHT_RING_PUSH)
+      ).coerceAtLeast(0f)
     var nextRadius = outerRadius
     ringRadii = FloatArray(ringSpecs.size)
     for (index in ringSpecs.lastIndex downTo 0) {
@@ -475,7 +504,7 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
   }
 
   private fun computePhaseOffsets(): FloatArray {
-    val angleStep = 360f / 24f
+    val angleStep = 360f / DOT_COUNT
     return FloatArray(ringSpecs.size) { index ->
       normalizeDegrees((ringSpecs.lastIndex - index) * angleStep / 2f)
     }
@@ -492,7 +521,7 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
       else -> {
         val progress = ((elapsed - growDuration - HIGHLIGHT_HOLD_DURATION) / shrinkDuration)
           .coerceIn(0f, 1f)
-        (1f - easeOutQuint(progress)).coerceIn(0f, 1f)
+        (1f - easeOutCubic(progress)).coerceIn(0f, 1f)
       }
     }
   }
@@ -500,7 +529,7 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
   private fun pickNextHighlight(previous: Int): Int {
     var next: Int
     do {
-      next = Random.nextInt(24)
+      next = Random.nextInt(DOT_COUNT)
     } while (next == previous)
     return next
   }
@@ -518,39 +547,15 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
     return gradientStops.last()
   }
 
-  private fun computeInnerDisplacementWeight(diffDegrees: Float, angleStep: Float): Float {
-    val support = angleStep * 1.6f
-    if (diffDegrees >= support) return 0f
-    val normalized = (diffDegrees / support).coerceIn(0f, 1f)
-    return ((cos(normalized * PI) + 1f) * 0.5f).toFloat()
-  }
-
   private fun resolveHighlightAngle(): Float? {
     if (currentHighlightBitmap == null || highlightIndex < 0) return null
     val ringIndex = ringSpecs.lastIndex
-    return normalizeDegrees(highlightIndex * (360f / 24f) + phaseOffsets[ringIndex] + ringRotations[ringIndex])
-  }
-
-  private fun circularIndexDistance(first: Int, second: Int, size: Int): Int {
-    val direct = abs(first - second)
-    return min(direct, size - direct)
-  }
-
-  private fun shortestAngleDistance(first: Float, second: Float): Float {
-    var difference = (first - second) % 360f
-    if (difference > 180f) difference -= 360f
-    if (difference < -180f) difference += 360f
-    return difference
+    return normalizeDegrees(highlightIndex * (360f / DOT_COUNT) + phaseOffsets[ringIndex] + ringRotations[ringIndex])
   }
 
   private fun easeOutCubic(value: Float): Float {
     val inverse = 1f - value
     return 1f - inverse * inverse * inverse
-  }
-
-  private fun easeOutQuint(value: Float): Float {
-    val inverse = 1f - value
-    return 1f - inverse * inverse * inverse * inverse * inverse
   }
 
   private fun resetRotations() {
