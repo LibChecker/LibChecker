@@ -34,6 +34,15 @@
   <string name="cannot_read">Can\'t read</string>
   <string name="unknown">Unknown</string>
   <string name="empty_list">Empty list</string>
+  <string name="recent_apps">Recently viewed apps</string>
+  <string name="recent_libraries">Recently viewed libraries</string>
+  <string name="recent_visits_empty">Nothing viewed recently</string>
+  <string name="shortcuts_pinned">Pinned</string>
+  <string name="shortcuts_recent">Recent</string>
+  <string name="shortcuts_pin">Pin shortcut</string>
+  <string name="shortcuts_drag_hint">Hold a list item, then drag it here</string>
+  <string name="shortcuts_drop_hint">Release to pin</string>
+  <string name="shortcuts_pinned_feedback">Pinned %s</string>
   <string name="uncharted_territory">Uncharted territory</string>
   <string name="get_app_list_denied_tip">Please grant\n"Get info about installed apps"\npermission to LibChecker</string>
   <string name="advanced_menu">Advanced menu</string>

@@ -35,9 +35,14 @@ import com.absinthe.libchecker.domain.app.list.model.AppListRenderState
 import com.absinthe.libchecker.domain.app.list.traceAppListSection
 import com.absinthe.libchecker.domain.app.list.traceAppListSuspendSection
 import com.absinthe.libchecker.domain.app.list.ui.adapter.AppAdapter
+import com.absinthe.libchecker.domain.app.list.ui.view.AppItemView
 import com.absinthe.libchecker.domain.app.list.usecase.GetAppListPackageStatesUseCase
 import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
+import com.absinthe.libchecker.domain.home.recent.RecentVisit
 import com.absinthe.libchecker.domain.home.ui.INavViewContainer
+import com.absinthe.libchecker.domain.home.ui.MainActivity
+import com.absinthe.libchecker.domain.home.ui.view.RecentVisitItem
+import com.absinthe.libchecker.domain.home.ui.view.installRecentVisitDrag
 import com.absinthe.libchecker.ui.adapter.addSpacingDecoration
 import com.absinthe.libchecker.ui.animator.ParticleRemoveItemAnimator
 import com.absinthe.libchecker.ui.base.BaseActivity
@@ -129,6 +134,11 @@ class AppListFragment :
     binding.apply {
       list.apply {
         adapter = appAdapter
+        installRecentVisitDrag(this) { row, position, touch ->
+          val item = appAdapter.data.getOrNull(position) ?: return@installRecentVisitDrag false
+          val icon = (row as? AppItemView)?.container?.icon?.drawable ?: return@installRecentVisitDrag false
+          (activity as? MainActivity)?.pinListItem(row, touch, RecentVisitItem(RecentVisit(item.packageName), item.label, icon, item)) == true
+        }
         itemAnimator = particleItemAnimator
         wireListScreenChrome(this)
         layoutManager = createListScreenLayoutManager(resources.configuration)

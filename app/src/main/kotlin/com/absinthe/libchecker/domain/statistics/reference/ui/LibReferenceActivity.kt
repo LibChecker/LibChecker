@@ -13,6 +13,8 @@ import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
 import com.absinthe.libchecker.domain.app.list.model.AppListRenderState
 import com.absinthe.libchecker.domain.app.list.ui.adapter.AppAdapter
+import com.absinthe.libchecker.domain.home.presentation.RecentVisitsViewModel
+import com.absinthe.libchecker.domain.home.recent.RecentVisit
 import com.absinthe.libchecker.domain.statistics.reference.presentation.LibReferenceViewModel
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
@@ -33,6 +35,8 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
 
   private val adapter = AppAdapter()
   private val viewModel: LibReferenceViewModel by viewModel()
+  private val recentVisitsViewModel: RecentVisitsViewModel by viewModel()
+  private var recordVisit = true
   private var refName: String? = null
   private var refLabel: String? = null
   private var refType: Int = NATIVE
@@ -40,6 +44,7 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    recordVisit = savedInstanceState == null
     readIntentExtras()
     initView()
     initData()
@@ -47,6 +52,7 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
 
   override fun onNewIntent(intent: Intent) {
     super.onNewIntent(intent)
+    recordVisit = true
     setIntent(intent)
     readIntentExtras()
     updateActionBar()
@@ -125,6 +131,12 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
       adapter.setList(it)
       binding.loading.stop()
       binding.vfContainer.displayedChild = LIST_VIEW_INDEX
+      if (recordVisit) {
+        refName?.let { name ->
+          recentVisitsViewModel.record(RecentVisit(name, refType, refLabel, refList?.toList()))
+          recordVisit = false
+        }
+      }
     }.launchIn(lifecycleScope)
 
     adapter.setOnItemClickListener { _, view, position ->

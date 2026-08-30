@@ -6,6 +6,15 @@
   <string name="title_snapshot">快照</string>
   <string name="title_settings">设置</string>
   <string name="title_album">相簿</string>
+  <string name="recent_apps">最近打开的应用</string>
+  <string name="recent_libraries">最近打开的库引用</string>
+  <string name="recent_visits_empty">暂无近期记录</string>
+  <string name="shortcuts_pinned">固定</string>
+  <string name="shortcuts_recent">近期</string>
+  <string name="shortcuts_pin">固定快捷项</string>
+  <string name="shortcuts_drag_hint">长按列表项，拖到这里固定</string>
+  <string name="shortcuts_drop_hint">松手即可固定</string>
+  <string name="shortcuts_pinned_feedback">已固定 %s</string>
   <string name="loading">加载中…</string>
   <string name="channel_shoot">保存快照</string>
   <string name="noti_shoot_title">正在保存当前快照</string>

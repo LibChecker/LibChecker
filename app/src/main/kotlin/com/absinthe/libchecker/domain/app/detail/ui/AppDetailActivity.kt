@@ -16,10 +16,13 @@ import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_DETAIL_BEAN
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.domain.app.detail.packageinfo.GetAppDetailPackageUseCase
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel.PackageLoadResult
+import com.absinthe.libchecker.domain.home.presentation.RecentVisitsViewModel
+import com.absinthe.libchecker.domain.home.recent.RecentVisit
 import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_NAME
 import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.Toasty
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 class AppDetailActivity :
@@ -30,6 +33,8 @@ class AppDetailActivity :
   private var refName: String? = null
   private var refType: Int? = null
   private var extraBean: DetailExtraBean? = null
+  private val recentVisitsViewModel: RecentVisitsViewModel by viewModel()
+  private var recordVisit = true
 
   override val apkAnalyticsMode: Boolean = false
   override fun requirePackageName() = pkgName
@@ -37,6 +42,7 @@ class AppDetailActivity :
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    recordVisit = savedInstanceState == null
     isPackageReady = true
     lifecycleScope.launch {
       viewModel.packageLoadResults.collect(::handlePackageLoadResult)
@@ -46,6 +52,7 @@ class AppDetailActivity :
 
   override fun onNewIntent(intent: Intent, caller: ComponentCaller) {
     super.onNewIntent(intent, caller)
+    recordVisit = true
     initPackage(intent)
   }
 
@@ -86,15 +93,21 @@ class AppDetailActivity :
     when (val result = loadResult.result) {
       is GetAppDetailPackageUseCase.Result.Available -> {
         onPackageInfoAvailable(result.packageInfo, extraBean)
+        if (recordVisit) {
+          recordVisit = false
+          recentVisitsViewModel.record(RecentVisit(loadResult.packageName))
+        }
       }
 
       GetAppDetailPackageUseCase.Result.Archived -> {
+        recentVisitsViewModel.remove(RecentVisit(loadResult.packageName))
         Timber.w("isArchivedPackage: ${loadResult.packageName}")
         Toasty.showLong(this, R.string.toast_archived_app_detail_unavailable)
         finish()
       }
 
       GetAppDetailPackageUseCase.Result.NotFound -> {
+        recentVisitsViewModel.remove(RecentVisit(loadResult.packageName))
         Timber.d("getPackageInfo: ${loadResult.packageName} failed")
         finish()
       }
