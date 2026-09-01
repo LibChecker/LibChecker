@@ -16,6 +16,7 @@ object ApkSignatureSchemeDetector {
       if (APK_SIGNATURE_SCHEME_V2_BLOCK_ID in signatureProbe.signingBlockIds) add("V2")
       if (APK_SIGNATURE_SCHEME_V3_BLOCK_ID in signatureProbe.signingBlockIds) add("V3")
       if (APK_SIGNATURE_SCHEME_V31_BLOCK_ID in signatureProbe.signingBlockIds) add("V3.1")
+      if (APK_SIGNATURE_SCHEME_V32_BLOCK_ID in signatureProbe.signingBlockIds) add("V3.2")
       if (File("${apk.absolutePath}.idsig").exists()) add("V4")
     }
   }
@@ -254,6 +255,7 @@ object ApkSignatureSchemeDetector {
   private const val APK_SIGNATURE_SCHEME_V2_BLOCK_ID = 0x7109871a
   private const val APK_SIGNATURE_SCHEME_V3_BLOCK_ID = -262969152
   private const val APK_SIGNATURE_SCHEME_V31_BLOCK_ID = 0x1b93ad61
+  private const val APK_SIGNATURE_SCHEME_V32_BLOCK_ID = 0x70e1c89f
   private const val ASCII_LOWERCASE_A = 0x61
   private const val ASCII_LOWERCASE_Z = 0x7a
   private const val ASCII_CASE_DISTANCE = 0x20
