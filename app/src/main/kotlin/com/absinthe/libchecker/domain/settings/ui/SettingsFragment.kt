@@ -160,12 +160,15 @@ class SettingsFragment :
         val enabled = newValue as Boolean
         val hostActivity = activity
         GlobalValues.isBlurDesign = enabled
-        if (hostActivity is AppCompatActivity) {
+        // Blur only changes how the app bar and bottom bar are drawn, so swap it
+        // in place. Recreating the window here made the whole screen flash.
+        val appBarContainer = hostActivity as? IAppBarContainer
+        if (appBarContainer != null) {
+          appBarContainer.setBlurDesignEnabled(enabled)
+        } else if (hostActivity is AppCompatActivity) {
           hostActivity.window.decorView.postDelayed({
             ThemeTransitionController.recreateWithTransition(hostActivity)
           }, TOGGLE_TRANSITION_DELAY_MS)
-        } else {
-          (hostActivity as? IAppBarContainer)?.setBlurDesignEnabled(enabled)
         }
         recordPreferenceEvent(Constants.PREF_BLUR_DESIGN, enabled)
         true

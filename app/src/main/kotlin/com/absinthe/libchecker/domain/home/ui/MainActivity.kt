@@ -3,7 +3,9 @@ package com.absinthe.libchecker.domain.home.ui
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.graphics.PointF
 import android.os.Bundle
 import android.os.IBinder
@@ -12,6 +14,7 @@ import android.view.Gravity
 import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.view.animation.PathInterpolator
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
@@ -82,8 +85,15 @@ import timber.log.Timber
 private const val PAGE_EXIT_DURATION = 90L
 private const val PAGE_ENTER_DURATION = 160L
 private const val PAGE_TRANSITION_OFFSET_DP = 20f
+private const val SDR_HDR_HEADROOM = 1f
 private val PAGE_EXIT_INTERPOLATOR = PathInterpolator(0.4f, 0f, 1f, 1f)
 private val PAGE_ENTER_INTERPOLATOR = PathInterpolator(0f, 0f, 0.2f, 1f)
+
+private data class RecyclerViewScreenAnchor(
+  val recyclerView: RecyclerView,
+  val adapterPosition: Int,
+  val screenTop: Int
+)
 
 class MainActivity :
   BaseActivity<ActivityMainBinding>(),
@@ -100,7 +110,9 @@ class MainActivity :
   private var blurContainer: BlurCoordinatorLayout? = null
   private var appbarScrollTarget: RecyclerView? = null
   private val appbarLocation = IntArray(2)
-  private val firstListItemLocation = IntArray(2)
+  private val appbarScrollTargetLocation = IntArray(2)
+  private var pendingAnchorRestoreObserver: ViewTreeObserver? = null
+  private var pendingAnchorRestoreListener: ViewTreeObserver.OnPreDrawListener? = null
   private var isPageTransitionRunning = false
   private var pendingPageIndex: Int? = null
   private val appbarScrollListener = object : RecyclerView.OnScrollListener() {
@@ -111,7 +123,11 @@ class MainActivity :
 
   @Suppress("DEPRECATION")
   private val navViewBehavior by lazy { InvalidatingHideBottomViewOnScrollBehavior() }
-  private val toolbarTitleView by lazy { HomeToolbarTitleView(this) }
+  private val toolbarTitleView by lazy {
+    HomeToolbarTitleView(this).apply {
+      setHdrHeadroomChangedListener(::updateWindowHdrHeadroom)
+    }
+  }
   private lateinit var toolbarTitleState: HomeToolbarTitleState
   private val workerServiceConnection = object : ServiceConnection {
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -128,6 +144,7 @@ class MainActivity :
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    configureHdrWindow()
 
     if (intent.getBooleanExtra(Constants.PP_FROM_CLOUD_RULES_UPDATE, false)) {
       Timber.w("Reinitializing updated rule database")
@@ -157,6 +174,7 @@ class MainActivity :
     recentVisitsPopup = null
     appbarScrollTarget?.removeOnScrollListener(appbarScrollListener)
     appbarScrollTarget = null
+    cancelPendingAnchorRestore()
     super.onDestroy()
     unbindService(workerServiceConnection)
   }
@@ -258,12 +276,16 @@ class MainActivity :
   }
 
   override fun setBlurDesignEnabled(enabled: Boolean) {
+    val scrollAnchor = captureAppbarScrollAnchor()
     val appbarInset = resolveCurrentAppbarInset()
     val container = if (enabled) installBlurContainer() else blurContainer
+    val contentUnderlaps = isListItemUnderAppbar()
     if (enabled) {
-      container?.setAppbarContentUnderlap(isListItemUnderAppbar())
+      container?.setAppbarContentUnderlap(contentUnderlaps)
     }
     container?.setBlurEnabled(enabled)
+    val progressiveBlurActive = container?.blurEnabled == true
+    updateToolbarHdrHighlight(contentUnderlaps, animate = enabled)
     if (!enabled && container != null) {
       replaceMainContainer(container, binding.container)
       blurContainer = null
@@ -275,6 +297,7 @@ class MainActivity :
         appbarBottom = appbarInset
       )
     }
+    restoreAppbarScrollAnchorAfterLayout(scrollAnchor, progressiveBlurActive)
   }
 
   private fun installBlurContainer(): BlurCoordinatorLayout? {
@@ -313,16 +336,112 @@ class MainActivity :
   }
 
   private fun updateAppbarContentUnderlap() {
-    blurContainer?.setAppbarContentUnderlap(isListItemUnderAppbar())
+    val contentUnderlaps = isListItemUnderAppbar()
+    blurContainer?.setAppbarContentUnderlap(contentUnderlaps)
+    updateToolbarHdrHighlight(contentUnderlaps)
+  }
+
+  private fun updateToolbarHdrHighlight(
+    contentUnderlaps: Boolean,
+    animate: Boolean = true
+  ) {
+    toolbarTitleView.setHdrHighlightEnabled(
+      enabled = shouldEnableToolbarHdrHighlight(
+        blurEnabled = blurContainer?.blurEnabled == true,
+        contentUnderlaps = contentUnderlaps,
+        darkModeEnabled = resources.configuration.uiMode and
+          Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES,
+        pageTransitionRunning = isPageTransitionRunning
+      ),
+      animate = animate
+    )
+  }
+
+  private fun captureAppbarScrollAnchor(): RecyclerViewScreenAnchor? {
+    val recyclerView = appbarScrollTarget ?: return null
+    val anchorView = recyclerView.findTopmostChild() ?: return null
+    val adapterPosition = recyclerView.getChildAdapterPosition(anchorView)
+    if (adapterPosition == RecyclerView.NO_POSITION) return null
+    val recyclerLocation = IntArray(2)
+    recyclerView.getLocationOnScreen(recyclerLocation)
+    val anchorScreenTop = recyclerLocation[1] + anchorView.top
+    return RecyclerViewScreenAnchor(
+      recyclerView = recyclerView,
+      adapterPosition = adapterPosition,
+      screenTop = anchorScreenTop
+    )
+  }
+
+  private fun restoreAppbarScrollAnchorAfterLayout(
+    anchor: RecyclerViewScreenAnchor?,
+    progressiveBlurActive: Boolean
+  ) {
+    cancelPendingAnchorRestore()
+    if (anchor == null) return
+    val recyclerView = anchor.recyclerView
+    val observer = recyclerView.viewTreeObserver
+    val rootLocation = IntArray(2)
+    binding.root.getLocationOnScreen(rootLocation)
+    binding.appbar.getLocationOnScreen(appbarLocation)
+    val expectedRecyclerScreenTop = expectedAppbarScrollTargetScreenTop(
+      rootScreenTop = rootLocation[1],
+      appbarScreenTop = appbarLocation[1],
+      appbarHeight = binding.appbar.height,
+      progressiveBlurActive = progressiveBlurActive
+    )
+    var remainingSettleAttempts = MAX_APPBAR_LAYOUT_SETTLE_PREDRAWS
+    val listener = object : ViewTreeObserver.OnPreDrawListener {
+      override fun onPreDraw(): Boolean {
+        val recyclerLocation = IntArray(2)
+        recyclerView.getLocationOnScreen(recyclerLocation)
+        if (
+          recyclerLocation[1] != expectedRecyclerScreenTop &&
+          remainingSettleAttempts > 0
+        ) {
+          remainingSettleAttempts--
+          binding.viewpager.requestLayout()
+          recyclerView.postInvalidateOnAnimation()
+          return false
+        }
+        cancelPendingAnchorRestore()
+        val anchorView = recyclerView.layoutManager
+          ?.findViewByPosition(anchor.adapterPosition)
+          ?: return true
+        val currentScreenTop = recyclerLocation[1] + anchorView.top
+        val correction = recyclerAnchorScrollCorrection(
+          previousScreenTop = anchor.screenTop,
+          currentScreenTop = currentScreenTop
+        )
+        if (correction != 0) {
+          recyclerView.scrollBy(0, correction)
+        }
+        return true
+      }
+    }
+    pendingAnchorRestoreObserver = observer
+    pendingAnchorRestoreListener = listener
+    observer.addOnPreDrawListener(listener)
+  }
+
+  private fun cancelPendingAnchorRestore() {
+    val observer = pendingAnchorRestoreObserver
+    val listener = pendingAnchorRestoreListener
+    if (observer?.isAlive == true && listener != null) {
+      observer.removeOnPreDrawListener(listener)
+    }
+    pendingAnchorRestoreObserver = null
+    pendingAnchorRestoreListener = null
   }
 
   private fun isListItemUnderAppbar(): Boolean {
-    val firstListItem = appbarScrollTarget?.getChildAt(0) ?: return false
+    val recyclerView = appbarScrollTarget ?: return false
+    val firstListItem = recyclerView.findTopmostChild() ?: return false
     binding.appbar.getLocationOnScreen(appbarLocation)
-    firstListItem.getLocationOnScreen(firstListItemLocation)
+    recyclerView.getLocationOnScreen(appbarScrollTargetLocation)
+    val appbarBottom = appbarLocation[1] + binding.appbar.height
     return isListItemUnderAppbar(
-      appbarBottom = appbarLocation[1] + binding.appbar.height,
-      firstListItemTop = firstListItemLocation[1]
+      appbarBottom = appbarBottom,
+      firstListItemTop = appbarScrollTargetLocation[1] + firstListItem.top
     )
   }
 
@@ -563,6 +682,7 @@ class MainActivity :
   private fun navigateToPage(index: Int) {
     val viewPager = binding.viewpager
     isPageTransitionRunning = true
+    updateAppbarContentUnderlap()
     val direction = if (index > viewPager.currentItem) 1f else -1f
     val offset = PAGE_TRANSITION_OFFSET_DP * resources.displayMetrics.density
     viewPager.animate()
@@ -594,7 +714,9 @@ class MainActivity :
     pendingPageIndex = null
     if (nextPageIndex != null && nextPageIndex != binding.viewpager.currentItem) {
       navigateToPage(nextPageIndex)
+      return
     }
+    updateAppbarContentUnderlap()
   }
 
   private fun setupToolbarTitle() {
@@ -633,6 +755,28 @@ class MainActivity :
         appViewModel.initItems()
       }
     }
+  }
+
+  /**
+   * Opt the window into HDR while starting at SDR headroom. The title's
+   * transition updates the requested headroom only while its HDR highlight is
+   * active, so an otherwise SDR page does not keep an HDR layer alive.
+   * `Window.setDesiredHdrHeadroom` only exists on API 35+, so below that the
+   * title falls back to plain SDR rendering.
+   */
+  private fun configureHdrWindow() {
+    if (!OsUtils.atLeastV()) {
+      return
+    }
+    window.colorMode = ActivityInfo.COLOR_MODE_HDR
+    window.desiredHdrHeadroom = SDR_HDR_HEADROOM
+  }
+
+  private fun updateWindowHdrHeadroom(headroom: Float) {
+    if (!OsUtils.atLeastV()) {
+      return
+    }
+    window.desiredHdrHeadroom = headroom
   }
 
   /**
@@ -747,4 +891,42 @@ internal fun resolveHomeListAppbarInset(
 
 internal fun isListItemUnderAppbar(appbarBottom: Int, firstListItemTop: Int?): Boolean {
   return appbarBottom > 0 && firstListItemTop != null && firstListItemTop < appbarBottom
+}
+
+internal fun shouldEnableToolbarHdrHighlight(
+  blurEnabled: Boolean,
+  contentUnderlaps: Boolean,
+  darkModeEnabled: Boolean,
+  pageTransitionRunning: Boolean = false
+): Boolean = blurEnabled && contentUnderlaps && darkModeEnabled && !pageTransitionRunning
+
+internal fun recyclerAnchorScrollCorrection(
+  previousScreenTop: Int,
+  currentScreenTop: Int
+): Int = currentScreenTop - previousScreenTop
+
+internal fun expectedAppbarScrollTargetScreenTop(
+  rootScreenTop: Int,
+  appbarScreenTop: Int,
+  appbarHeight: Int,
+  progressiveBlurActive: Boolean
+): Int {
+  return if (progressiveBlurActive) {
+    rootScreenTop
+  } else {
+    appbarScreenTop + appbarHeight.coerceAtLeast(0)
+  }
+}
+
+private const val MAX_APPBAR_LAYOUT_SETTLE_PREDRAWS = 4
+
+private fun RecyclerView.findTopmostChild(): View? {
+  var topmostChild: View? = null
+  for (index in 0 until childCount) {
+    val child = getChildAt(index)
+    if (topmostChild == null || child.top < topmostChild.top) {
+      topmostChild = child
+    }
+  }
+  return topmostChild
 }
