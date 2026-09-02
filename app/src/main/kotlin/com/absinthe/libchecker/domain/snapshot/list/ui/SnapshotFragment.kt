@@ -89,6 +89,13 @@ const val VF_LOADING = 0
 const val VF_LIST = 1
 private val SNAPSHOT_SCHEME_TIP_PREFIX = Regex("""^.{1,12}?[：:]\s*""")
 
+internal fun resolveSnapshotDisplayedChild(
+  isListReady: Boolean,
+  isComparingActive: Boolean
+): Int {
+  return if (isListReady && !isComparingActive) VF_LIST else VF_LOADING
+}
+
 class SnapshotFragment :
   BaseListControllerFragment<FragmentSnapshotBinding>(),
   SearchView.OnQueryTextListener {
@@ -247,6 +254,7 @@ class SnapshotFragment :
     viewModel.apply {
       allSnapshots.onEach {
         if (viewModel.shouldAutoCompareSnapshot()) {
+          flip(VF_LOADING)
           viewModel.refreshSelectedSnapshot()
         }
       }.launchIn(lifecycleScope)
@@ -339,11 +347,12 @@ class SnapshotFragment :
     }
 
     if (viewModel.shouldAutoCompareSnapshot()) {
-      if (!viewModel.isComparingActive()) {
-        flip(VF_LIST)
-      } else {
-        flip(VF_LOADING)
-      }
+      flip(
+        resolveSnapshotDisplayedChild(
+          isListReady = isListReady,
+          isComparingActive = viewModel.isComparingActive()
+        )
+      )
     }
 
     if (binding.vfContainer.displayedChild == VF_LOADING) {
