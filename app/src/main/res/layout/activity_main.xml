@@ -40,11 +40,12 @@
       android:visibility="gone"
       app:hideAnimationBehavior="outward" />
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
+    <com.absinthe.libchecker.view.app.FloatingBottomNavigationView
       android:id="@+id/nav_view"
       style="@style/App.Widget.M3E.BottomNavigationView"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
+      android:layout_gravity="bottom"
       app:layout_anchor="@id/viewpager"
       app:layout_anchorGravity="bottom"
       app:layout_behavior="@string/hide_bottom_view_on_scroll_behavior"

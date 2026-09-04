@@ -432,4 +432,6 @@
   <string name="library_insight_hide_details">Fewer details</string>
   <string name="blur_design">Blur design</string>
   <string name="blur_design_summary">Provides more blur effects throughout the interface</string>
+  <string name="floating_nav_bar">Floating navigation</string>
+  <string name="floating_nav_bar_summary">Show the navigation bar in a floating style</string>
 </resources>

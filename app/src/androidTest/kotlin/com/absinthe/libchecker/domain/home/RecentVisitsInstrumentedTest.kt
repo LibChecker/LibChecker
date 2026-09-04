@@ -345,7 +345,10 @@ class RecentVisitsInstrumentedTest {
     var popup: RecentVisitsPopup? = null
     val navigationBounds = Rect()
     try {
-      instrumentation.runOnMainSync { activity.setBlurDesignEnabled(blurDesign) }
+      instrumentation.runOnMainSync {
+        activity.setFloatingNavBarEnabled(true)
+        activity.setBlurDesignEnabled(blurDesign)
+      }
       assertTrue(
         waitUntil {
           activity.findViewById<View>(R.id.navigation_classify)?.let { it.isShown && it.width > 0 } == true
@@ -364,9 +367,10 @@ class RecentVisitsInstrumentedTest {
         navigationBounds.set(location[0], location[1], location[0] + nav.width, location[1] + nav.height)
       }
       val baseline = checkNotNull(instrumentation.uiAutomation.takeScreenshot()).copy(Bitmap.Config.ARGB_8888, false)
+      var selectedItemId = 0
       instrumentation.runOnMainSync {
         val nav = activity.findViewById<NavigationBarView>(R.id.nav_view)
-        val selected = nav.selectedItemId
+        selectedItemId = nav.selectedItemId
         for (index in 0 until nav.menu.size()) {
           if (OsUtils.atLeastO()) {
             assertNull(nav.findViewById<View>(nav.menu.getItem(index).itemId).tooltipText)
@@ -375,7 +379,7 @@ class RecentVisitsInstrumentedTest {
         assertTrue(activity.findViewById<View>(R.id.navigation_classify).performLongClick())
         popup = activity.popup()
         assertTrue(checkNotNull(popup).libraries)
-        assertEquals(selected, nav.selectedItemId)
+        assertEquals(selectedItemId, nav.selectedItemId)
       }
       assertTrue(waitUntil { (checkNotNull(popup).field("progress") as Float) == 1f })
       instrumentation.runOnMainSync {
@@ -387,6 +391,22 @@ class RecentVisitsInstrumentedTest {
       }
       val opened = checkNotNull(instrumentation.uiAutomation.takeScreenshot()).copy(Bitmap.Config.ARGB_8888, false)
       assertNavigationUnchanged(baseline, opened, navigationBounds)
+      instrumentation.runOnMainSync {
+        val nav = activity.findViewById<NavigationBarView>(R.id.nav_view)
+        val anchor = activity.findViewById<View>(R.id.navigation_classify)
+        val downTime = SystemClock.uptimeMillis()
+        fun dispatch(action: Int, x: Float) {
+          MotionEvent.obtain(downTime, SystemClock.uptimeMillis(), action, x, nav.height / 2f, 0).also {
+            nav.dispatchTouchEvent(it)
+            it.recycle()
+          }
+        }
+        dispatch(MotionEvent.ACTION_DOWN, anchor.left + anchor.width / 2f)
+        assertTrue(anchor.performLongClick())
+        dispatch(MotionEvent.ACTION_MOVE, nav.width - 1f)
+        dispatch(MotionEvent.ACTION_UP, nav.width - 1f)
+        assertEquals(selectedItemId, nav.selectedItemId)
+      }
       if (OsUtils.atLeastS()) {
         val sharpEnergy = backgroundEdgeEnergy(baseline)
         val blurredEnergy = backgroundEdgeEnergy(opened)
@@ -580,7 +600,8 @@ class RecentVisitsInstrumentedTest {
   private fun assertNavigationUnchanged(before: Bitmap, after: Bitmap, bounds: Rect) {
     var difference = 0L
     var samples = 0
-    for (y in bounds.top + 4 until minOf(bounds.bottom, before.height) - 4 step 2) {
+    val verticalInset = bounds.height() / 4
+    for (y in bounds.top + verticalInset until minOf(bounds.bottom, before.height) - verticalInset step 2) {
       for (x in bounds.left + 4 until minOf(bounds.right, before.width) - 4 step 2) {
         val a = before.getPixel(x, y)
         val b = after.getPixel(x, y)

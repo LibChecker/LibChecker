@@ -11,6 +11,8 @@ Use the Gradle wrapper from the repository root. On macOS/Linux use
 - Format check: `./gradlew spotlessCheck`
 - Apply Kotlin/Gradle formatting: `./gradlew spotlessApply`
 - Fast Kotlin compile: `./gradlew :app:compileFossDebugKotlin`
+- JVM tests: `./gradlew :app:testFossDebugUnitTest`
+  Add `--tests '<fully-qualified-test-class>'` for a focused run.
 - Build a runnable debug APK: `./gradlew :app:assembleFossDebug`
 - Install the default debug flavor on a connected device:
   `./gradlew :app:installFossDebug`
@@ -24,6 +26,8 @@ Use the Gradle wrapper from the repository root. On macOS/Linux use
   `ANDROID_SERIAL=<serial> ./gradlew :macrobenchmark:connectedFossBenchmarkAndroidTest --no-configuration-cache`
   Add `-Pandroid.testInstrumentationRunnerArguments.class=<BenchmarkClass#method>`
   to run one startup, app-list, or detail scenario.
+- App instrumented test:
+  `ANDROID_SERIAL=<serial> ./gradlew :app:connectedFossDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=<TestClass#method>`
 - Device UI validation: prefer AndroMeld MCP Phone Screen sessions for visible
   launch, navigation, and UI-state checks. Use Gradle/adb for install and
   package-state operations only when needed. For performance/detail checks, use
@@ -45,12 +49,13 @@ or release behavior changes, run the matching assemble/minify task.
 - SDK levels are configured in `build-logic/src/main/kotlin/Projects.kt`
   (`compileSdk = 37`, `targetSdk = 37`, `minSdk = 24`).
 - `foss` is the default flavor. `market` adds Google/Firebase integrations.
-- There is no dedicated unit-test gate today. If tests are added, put JVM tests
-  under `src/test` and instrumented tests under `src/androidTest`.
+- Put JVM tests under `app/src/test` and device tests under
+  `app/src/androidTest`. CI does not currently run either suite, so run the
+  narrowest relevant tests locally.
 - Version name/code come from `baseVersionName` plus git state in
   `build-logic/src/main/kotlin/Projects.kt`; build from a real git checkout.
-- CI runs `./gradlew --non-interactive spotlessCheck` and
-  `./gradlew --non-interactive app:assembleRelease`.
+- CI runs workflow-script tests, `spotlessCheck`, and separate
+  `assembleFossRelease`/`assembleMarketRelease` builds.
 
 ## Module boundaries
 
@@ -66,28 +71,20 @@ or release behavior changes, run the matching assemble/minify task.
 
 Important `:app` boundaries:
 
-- `features/*` is legacy user-facing flow structure. When touching it for
-  refactors, prefer migrating a focused vertical slice into the matching
-  `domain/*` product package with clear `presentation`, `ui`, `model`,
-  `usecase`, and `repository` subpackages. Keep view constants, spans, and
-  adapter-only icon types in UI; move reusable parsing/data preparation behind
-  workflow-focused modules instead of flat directories of tiny use cases.
-- Shared `view/` widgets own rendering, accessibility metadata, and animation
-  only; pass feature/domain data in through providers instead of importing
-  `data/*`.
+- User-facing flows live in focused `domain/<product>/` vertical slices. Keep
+  presentation state, UI, models, use cases, and repository contracts with the
+  owning product; do not recreate the removed `features/*` structure.
+- `domain/*` owns product policy and repository contracts. Matching `data/*`
+  packages adapt Android APIs, persistence, and remote sources.
 - `domain/app/` owns app-list use cases and repository/factory interfaces.
   Keep package-list synchronization rules here instead of in UI controllers.
   Put feature-specific app-domain use cases and display models in focused
   subpackages instead of growing the root package by default.
-- `data/app/` adapts Android package APIs, Room repositories, and local
-  package-change sources to the `domain/app/` interfaces.
 - `domain/statistics/` owns statistics/reference computation rules. Keep
   package scanning, package-info lookups, and rule-matching loops out of
   fragments, ViewModels, and chart data sources. Model built-in and external
   charts through the same definition catalog; built-ins use drawable icon
   keys, while external rule icons use validated SVG files.
-- `data/statistics/` adapts remote or cached statistics sources, such as Android
-  version distribution, to `domain/statistics/` interfaces.
 - `domain/snapshot/` owns snapshot models, archive, capture, and diff seams;
   keep package-to-snapshot conversion and diff rules out of UI controllers and
   services.
@@ -96,8 +93,13 @@ Important `:app` boundaries:
   coordinates, and fingerprint data in LibChecker-Rules rather than hardcoding
   them in the client. Fetch fingerprint indexes by stable paths and match them
   locally; never put locally captured fingerprints in request URLs or logs.
-- `data/snapshot/` adapts Android, protobuf archive format, and local snapshot
-  storage to `domain/snapshot/` interfaces.
+- `ui/base/` owns shared screen/controller behavior; `view/app/` owns reusable
+  rendering widgets. Reuse `BaseListControllerFragment`, `ListScreenChrome`,
+  `BaseBottomSheetViewDialogFragment`, `BottomSheetScaffoldView`,
+  `BindOnlyAdapter`, and `addSpacingDecoration` before adding screen-local
+  equivalents.
+- Shared views own rendering, accessibility metadata, and animation only. Pass
+  prepared domain/display data in; do not import `data/*` from views.
 - `compat/` wraps platform/API-level differences. Check here before adding new
   SDK-version branches.
 - `utils/apk`, `utils/manifest`, `utils/dex`, `utils/elf`, `PackageUtils`,
@@ -137,6 +139,8 @@ Important `:app` boundaries:
 - Keep full-width selectable or hoverable list rows edge-to-edge. Put horizontal
   page spacing in each row's content padding, not item margins or parent-list
   horizontal padding, so selector and hover feedback have no side gaps.
+- Prefer flat display/render-state rows and reusable item views over
+  one-class-per-row adapter or provider hierarchies.
 - Room schema changes require a database version bump, migration or
   auto-migration, and updated `app/schemas/`.
 - UI controllers should not call `Repositories.lcRepository` directly for new
@@ -190,58 +194,29 @@ Important `:app` boundaries:
 
 ## NEVER
 
-- Never revert or overwrite user changes unless explicitly asked.
-- Never commit generated build output, `.gradle/`, `.kotlin/`, `app/build/`,
-  `app/foss/`, or `app/market/`.
-- Never move runtime logic into `:hidden-api`.
-- Never add Google/Firebase behavior to `foss`.
+- Never revert or overwrite user changes, and never commit generated build
+  output (`.gradle/`, `.kotlin/`, `app/build/`, `app/foss/`, or `app/market/`).
+- Never move runtime logic into `:hidden-api` or add Google/Firebase behavior
+  to `foss`.
 - Never hand-update all translated `values-*` resources unless explicitly asked;
   Crowdin handles synchronization.
 - Never block the main thread with package parsing, database, zip, DEX, ELF, or
   network work.
-- Never add inline dependency versions or project-level repositories.
+- Never add inline dependency versions or module-level repositories.
 - Never broaden a narrow bug fix into an unrelated refactor.
-- Never remove `projects.hiddenApi` or `TYPESAFE_PROJECT_ACCESSORS` just because
-  of an upstream Gradle/AGP warning.
 - Never use destructive git commands such as `git reset --hard`, `git clean`, or
   checkout-based reverts unless the user explicitly requests them.
-
-## Agent roles for complex tasks
-
-When the user asks to use the `explorer/implementer/verifier/scribe` flow,
-prefer reusing project context and keep each role's scope separate:
-
-- `explorer`: read-only scanning only. Find feasible approaches, risks, and
-  exact change points.
-- `implementer`: make the smallest implementation that follows the explorer's
-  conclusion.
-- `verifier`: only run builds, tests, device checks, or browser validation.
-- `scribe`: summarize the thread, update durable project notes such as
-  `AGENTS.md` or task records when warranted, and recommend threads to archive.
-
-Use this split for complex tasks so exploration, implementation, validation,
-and cleanup do not muddy a single working context.
-
-## Thread management
-
-- Keep one fixed main thread for this long-running project. Use it only for
-  background, current status, and next steps.
-- Open separate task threads for concrete implementation work. Archive them
-  after the task is complete and any durable context has been written back.
-- Use separate verification threads for Android device, Playwright, MCP, or
-  other environment/tooling checks so project context stays clean.
+- Never remove `projects.hiddenApi` or `TYPESAFE_PROJECT_ACCESSORS` just because
+  of an upstream Gradle/AGP warning.
 
 ## Agent workflow
 
 1. Start with `git status --short`.
 2. Inspect the smallest relevant area with `rg` or `rg --files`.
 3. Read existing local patterns before editing.
-4. For refactors, prefer cohesive batches that move an entire boundary before
-   polishing details. Prioritize high-traffic flows and oversized controllers
-   before low-frequency tooling. Keep domain package-layout cleanup separate
-   from behavior changes; group crowded use-case/interface/model packages in a
-   mechanical slice. Avoid thin pass-through extractions and
-   generated/build-output churn.
+4. For refactors, move one cohesive vertical slice at a time. Keep package
+   moves mechanical and separate from behavior; avoid thin pass-through types
+   and generated/build-output churn.
 5. Run `spotlessApply` only when formatting needs fixing.
 6. Run the narrowest relevant validation command. If adapters, view-state
    mapping, menus, navigation, visible strings, or performance-sensitive paths
@@ -257,12 +232,10 @@ and cleanup do not muddy a single working context.
 
 If context is compacted, preserve these facts:
 
-- Current user request and any exact issue/PR/comment/commit links.
-- Files already read and files changed.
+- Current request, exact links, and constraints such as flavor, release, R8,
+  accessibility, or copyability requirements.
+- Files read/changed, current git status, and change ownership.
 - Commands run and their pass/fail/blocker results.
-- Any user constraints, especially flavor, release, R8, accessibility, or
-  copyability requirements.
-- Current git status and whether changes are user-owned or agent-owned.
 - Environment workaround state, including temp Gradle/Android homes and Kotlin
   in-process/VFS flags.
 - Any unresolved decision that must not be guessed after compaction.

@@ -6,14 +6,11 @@
   <group
     android:pivotX="12"
     android:pivotY="12"
-    android:rotation="90">
+    android:rotation="-90">
     <path
-      android:fillColor="@android:color/transparent"
-      android:pathData="M8,2H16C17.66,2 19,3.34 19,5V19C19,20.66 17.66,22 16,22H8C6.34,22 5,20.66 5,19V5C5,3.34 6.34,2 8,2Z"
-      android:strokeColor="#000000"
-      android:strokeLineCap="round"
-      android:strokeLineJoin="round"
-      android:strokeWidth="2" />
+      android:fillColor="#000000"
+      android:fillType="evenOdd"
+      android:pathData="M8,2H16C17.66,2 19,3.34 19,5V19C19,20.66 17.66,22 16,22H8C6.34,22 5,20.66 5,19V5C5,3.34 6.34,2 8,2Z M8,4C7.45,4 7,4.45 7,5V19C7,19.55 7.45,20 8,20H16C16.55,20 17,19.55 17,19V5C17,4.45 16.55,4 16,4H8Z" />
     <path
       android:fillColor="#000000"
       android:pathData="M12,3.5A1,1 0,1 0,12,5.5A1,1 0,1 0,12,3.5Z" />

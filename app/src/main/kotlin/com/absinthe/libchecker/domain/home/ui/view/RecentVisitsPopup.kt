@@ -46,6 +46,7 @@ import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.extensions.activity
 import com.absinthe.libchecker.utils.extensions.dpToDimension
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
+import com.absinthe.libchecker.view.app.FloatingNavigationBar
 import com.absinthe.libchecker.view.drawable.setG2Shape
 import com.google.android.material.navigationrail.NavigationRailView
 import java.util.UUID
@@ -515,6 +516,7 @@ class RecentVisitsPopup(
 
   private inner class BackdropView : FrameLayout(context) {
     private val contentClip = Path().apply { fillType = Path.FillType.EVEN_ODD }
+    private val navigationCutout = Path()
     private val scrimPaint = Paint().apply { color = Color.BLACK }
     private val colorMatrix = ColorMatrix()
     private val ditherShader by lazy {
@@ -545,9 +547,23 @@ class RecentVisitsPopup(
       val hostY = hostLocation[1] - origin[1]
       val navX = (navLocation[0] - origin[0]).toFloat()
       val navY = (navLocation[1] - origin[1]).toFloat()
-      contentClip.rewind()
+      // reset() preserves EVEN_ODD; rewind() resets it and turns the navigation cutout solid.
+      contentClip.reset()
       contentClip.addRect(0f, 0f, width.toFloat(), height.toFloat(), Path.Direction.CW)
-      contentClip.addRect(navX, navY, navX + navigation.width, navY + navigation.height, Path.Direction.CW)
+      val floatingProgress = (navigation as? FloatingNavigationBar)?.currentFloatingProgress ?: 0f
+      if (floatingProgress > 0f) {
+        navigationCutout.setG2Shape(
+          navX,
+          navY,
+          navX + navigation.width,
+          navY + navigation.height,
+          navigation.height / 2f * floatingProgress,
+          cornerSmoothing = 1f
+        )
+        contentClip.addPath(navigationCutout)
+      } else {
+        contentClip.addRect(navX, navY, navX + navigation.width, navY + navigation.height, Path.Direction.CW)
+      }
       val window = context.activity?.window
       if (!OsUtils.atLeastS() || !host.isHardwareAccelerated || window == null) {
         onReady()

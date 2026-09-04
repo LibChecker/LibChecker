@@ -106,6 +106,7 @@ object Constants {
   const val PREF_LONG_TAP_SHARE_BUTTON_TIP = "longTapShareButtonTip"
 
   const val PREF_BLUR_DESIGN = "blurDesign"
+  const val PREF_FLOATING_NAV_BAR = "floatingNavBar"
 
   const val GET_INSTALLED_APPS = "com.android.permission.GET_INSTALLED_APPS"
 

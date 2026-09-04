@@ -11,29 +11,62 @@ fun Path.setG2Shape(
   cornerRadius: Float,
   tailCenter: Float? = null,
   tailWidth: Float = 0f,
-  tailHeight: Float = 0f
+  tailHeight: Float = 0f,
+  cornerSmoothing: Float? = null
 ) {
   rewind()
   if (right <= left || bottom <= top) return
   val r = cornerRadius.coerceIn(0f, minOf(right - left, bottom - top) / 2f)
-  val a = r * 0.05893696f
-  val b = r * 0.41421357f
-  val d = r * 0.70710677f
-  val inset = r - d
-  // A pill joins its two curved halves directly. A rounded rectangle also needs zero
-  // curvature at the vertical edges, so mirror the first half across the diagonal.
+  val smoothing = cornerSmoothing?.coerceIn(0f, 1f)
+  val firstControl = r * if (smoothing == null) 0.05893696f else 0.0847f + 0.0215f * smoothing
+  val secondControl = r * if (smoothing == null) 0.41421357f else 0.4377467f + 0.0217334f * smoothing
+  val diagonal = r * if (smoothing == null) 0.70710677f else 0.7188733f + 0.0108668f * smoothing
+  val diagonalInset = r - diagonal
   val hasStraightSides = bottom - top > 2f * r
-  val x = if (hasStraightSides) r else r * 0.92621285f
-  val y = if (hasStraightSides) r - b else r * 0.5119993f
-  val side = if (hasStraightSides) r - a else r * 0.7845774f
+  val outerControlX = if (smoothing == null) {
+    if (hasStraightSides) r else r * 0.92621285f
+  } else {
+    r
+  }
+  val outerControlY = if (smoothing == null) {
+    if (hasStraightSides) r - secondControl else r * 0.5119993f
+  } else {
+    diagonalInset * 2f
+  }
+  val sideControl = if (smoothing == null) {
+    if (hasStraightSides) r - firstControl else r * 0.7845774f
+  } else {
+    r - firstControl
+  }
 
   moveTo(left + r, top)
   lineTo(right - r, top)
-  cubicTo(right - r + a, top, right - r + b, top, right - r + d, top + inset)
-  cubicTo(right - r + x, top + y, right, top + side, right, top + r)
+  cubicTo(
+    right - r + firstControl,
+    top,
+    right - r + secondControl,
+    top,
+    right - r + diagonal,
+    top + diagonalInset
+  )
+  cubicTo(right - r + outerControlX, top + outerControlY, right, top + sideControl, right, top + r)
   lineTo(right, bottom - r)
-  cubicTo(right, bottom - side, right - r + x, bottom - y, right - r + d, bottom - inset)
-  cubicTo(right - r + b, bottom, right - r + a, bottom, right - r, bottom)
+  cubicTo(
+    right,
+    bottom - sideControl,
+    right - r + outerControlX,
+    bottom - outerControlY,
+    right - r + diagonal,
+    bottom - diagonalInset
+  )
+  cubicTo(
+    right - r + secondControl,
+    bottom,
+    right - r + firstControl,
+    bottom,
+    right - r,
+    bottom
+  )
 
   if (tailCenter != null && tailWidth > 0f && tailHeight > 0f) {
     val w = minOf(tailWidth / 2f, (right - left - 2f * r) / 2f)
@@ -48,10 +81,31 @@ fun Path.setG2Shape(
   }
 
   lineTo(left + r, bottom)
-  cubicTo(left + r - a, bottom, left + r - b, bottom, left + inset, bottom - inset)
-  cubicTo(left + r - x, bottom - y, left, bottom - side, left, bottom - r)
+  cubicTo(
+    left + r - firstControl,
+    bottom,
+    left + r - secondControl,
+    bottom,
+    left + diagonalInset,
+    bottom - diagonalInset
+  )
+  cubicTo(left + r - outerControlX, bottom - outerControlY, left, bottom - sideControl, left, bottom - r)
   lineTo(left, top + r)
-  cubicTo(left, top + side, left + r - x, top + y, left + inset, top + inset)
-  cubicTo(left + r - b, top, left + r - a, top, left + r, top)
+  cubicTo(
+    left,
+    top + sideControl,
+    left + r - outerControlX,
+    top + outerControlY,
+    left + diagonalInset,
+    top + diagonalInset
+  )
+  cubicTo(
+    left + r - secondControl,
+    top,
+    left + r - firstControl,
+    top,
+    left + r,
+    top
+  )
   close()
 }

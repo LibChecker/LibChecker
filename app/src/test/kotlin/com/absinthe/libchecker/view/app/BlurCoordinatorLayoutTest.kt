@@ -84,4 +84,18 @@ class BlurCoordinatorLayoutTest {
     assertEquals(OPAQUE_LAYER_ALPHA, capturedChildLayerAlpha(1.5f))
     assertEquals(0, capturedChildLayerAlpha(-0.5f))
   }
+
+  @Test
+  fun barBackgroundFadesAgainstTheBlurLayer() {
+    assertEquals(255, blurBackgroundAlpha(0f))
+    assertEquals(128, blurBackgroundAlpha(0.5f))
+    assertEquals(0, blurBackgroundAlpha(1f))
+  }
+
+  @Test
+  fun attachedDividerFadesAsFloatingOutlineAppears() {
+    assertEquals(64, fadingNavDividerAlpha(baseAlpha = 64, floatingProgress = 0f))
+    assertEquals(32, fadingNavDividerAlpha(baseAlpha = 64, floatingProgress = 0.5f))
+    assertEquals(0, fadingNavDividerAlpha(baseAlpha = 64, floatingProgress = 1f))
+  }
 }

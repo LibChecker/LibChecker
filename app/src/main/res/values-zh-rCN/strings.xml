@@ -116,6 +116,7 @@
   <string name="apk_analytics">APK 分析</string>
   <string name="colorful_icon">多彩图标</string>
   <string name="blur_design">模糊设计</string>
+  <string name="floating_nav_bar">悬浮导航</string>
   <string name="rules_repo_title">规则仓库</string>
   <string name="lib_ref_threshold">库引用阈值</string>
   <string name="languages">语言</string>
@@ -133,6 +134,7 @@
   <string name="colorful_icon_summary">部分标记库会呈现为彩色 Logo</string>
   <string name="amoled_theme_summary">在深色模式下使用纯黑背景</string>
   <string name="blur_design_summary">为界面提供更多的模糊效果</string>
+  <string name="floating_nav_bar_summary">以悬浮形式显示导航栏</string>
   <string name="lib_ref_threshold_summary">只有库引用数量达到阈值的库才显示在列表中</string>
   <string name="reload_apps_summary">当应用列表显示不正常时尝试此选项</string>
   <string name="export_log_summary">导出应用的日志文件</string>
