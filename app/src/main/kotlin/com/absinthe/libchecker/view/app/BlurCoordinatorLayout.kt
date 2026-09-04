@@ -8,6 +8,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.RenderEffect
 import android.graphics.RenderNode
 import android.graphics.RuntimeShader
@@ -18,12 +19,16 @@ import android.view.View
 import android.view.animation.LinearInterpolator
 import androidx.annotation.RequiresApi
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.animation.addListener
 import androidx.core.graphics.withClip
 import androidx.core.graphics.withScale
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.view.drawable.setG2Shape
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.motion.MotionUtils
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.pow
@@ -60,12 +65,13 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
   private var appbarDarkMaskBottom = Float.NaN
   private var appbarMaskAnimator: ValueAnimator? = null
   private var appbarMaskProgress = 0f
+  private var blurAnimator: ValueAnimator? = null
+  private var blurProgress = 0f
   private var contentUnderlapsAppbar = false
-  private var originalAppbarBackground: android.graphics.drawable.Drawable? = null
-  private var originalNavBackground: android.graphics.drawable.Drawable? = null
-  private var originalToolbarBackground: android.graphics.drawable.Drawable? = null
-  private var originalAppbarElevation: Float = 0f
   private var originalNavElevation: Float = 0f
+  private var floatingNavProgress: Float = 0f
+  private val navClipPath = Path()
+  private val navStrokePath = Path()
   private var originalViewPagerBehavior: CoordinatorLayout.Behavior<*>? = null
   private val contentBackgroundColor by lazy(LazyThreadSafetyMode.NONE) {
     resolveThemeColor(android.R.attr.colorBackground) ?: Color.BLACK
@@ -86,20 +92,77 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
   var blurEnabled: Boolean = false
     private set
 
-  fun setBlurEnabled(enabled: Boolean) {
-    if (blurEnabled == enabled) return
-    blurEnabled = enabled
-    updateAppbarMask(animate = enabled && isLaidOut)
-    updateBarScrollFlags()
-    updateViewPagerBehavior()
-    updateBarBackgrounds()
-    invalidate()
+  fun setBlurEnabled(enabled: Boolean, onTransitionEnd: () -> Unit = {}) {
+    val targetProgress = if (enabled) 1f else 0f
+    if (blurAnimator == null && blurEnabled == enabled && blurProgress == targetProgress) {
+      onTransitionEnd()
+      return
+    }
+
+    blurAnimator?.cancel()
+    if (!enabled) {
+      updateBarScrollFlags(blurActive = false)
+    }
+    if (enabled && !blurEnabled) {
+      blurEnabled = true
+      updateAppbarMask(animate = isLaidOut)
+      updateViewPagerBehavior()
+      captureBarBackgrounds()
+    }
+    updateBarVisuals()
+
+    if (!isLaidOut || blurProgress == targetProgress) {
+      completeBlurTransition(enabled)
+      onTransitionEnd()
+      return
+    }
+
+    var cancelled = false
+    blurAnimator = ValueAnimator.ofFloat(blurProgress, targetProgress).apply {
+      duration = MotionUtils.resolveThemeDuration(
+        context,
+        com.google.android.material.R.attr.motionDurationLong2,
+        BLUR_TRANSITION_DURATION_MS
+      ).toLong()
+      interpolator = MotionUtils.resolveThemeInterpolator(
+        context,
+        com.google.android.material.R.attr.motionEasingEmphasizedInterpolator,
+        FastOutSlowInInterpolator()
+      )
+      addUpdateListener { animator ->
+        blurProgress = animator.animatedValue as Float
+        updateBarVisuals()
+        invalidate()
+      }
+      addListener(
+        onCancel = { cancelled = true },
+        onEnd = {
+          if (!cancelled) {
+            blurAnimator = null
+            completeBlurTransition(enabled)
+            onTransitionEnd()
+          }
+        }
+      )
+      start()
+    }
   }
 
   fun setAppbarContentUnderlap(underlaps: Boolean) {
     if (contentUnderlapsAppbar == underlaps) return
     contentUnderlapsAppbar = underlaps
     updateAppbarMask(animate = blurEnabled && isLaidOut)
+  }
+
+  fun setFloatingNavProgress(progress: Float) {
+    if (floatingNavProgress == progress) return
+    floatingNavProgress = progress
+    if (blurEnabled) {
+      val density = resources.displayMetrics.density
+      originalNavElevation = (3f + 3f * progress) * density
+      updateBarVisuals()
+    }
+    invalidate()
   }
 
   private fun updateAppbarMask(animate: Boolean) {
@@ -125,13 +188,13 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
     }
   }
 
-  private fun updateBarScrollFlags() {
+  private fun updateBarScrollFlags(blurActive: Boolean) {
     val appbar = findViewById<AppBarLayout>(R.id.appbar) ?: return
-    appbar.isLiftOnScroll = !blurEnabled
-    appbar.isLifted = !blurEnabled && contentUnderlapsAppbar
+    appbar.isLiftOnScroll = !blurActive
+    appbar.isLifted = !blurActive && contentUnderlapsAppbar
 
     appbar.bringToFront()
-    val navView = findViewById<BottomNavigationView>(R.id.nav_view) ?: return
+    val navView = findViewById<View>(R.id.nav_view) ?: return
     navView.bringToFront()
   }
 
@@ -156,7 +219,8 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
     }
 
     val appbar = findViewById<AppBarLayout>(R.id.appbar)
-    val navView = findViewById<BottomNavigationView>(R.id.nav_view)
+    val navigation = findViewById<View>(R.id.nav_view)
+    val navView = navigation as? BottomNavigationView
     val viewPager = findViewById<ViewPager2>(R.id.viewpager)
 
     val capturedContent = if (viewPager != null && width > 0 && height > 0) {
@@ -191,7 +255,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
     }
 
     appbar?.let { drawChild(canvas, it, drawingTime) }
-    navView?.let { drawChild(canvas, it, drawingTime) }
+    navigation?.let { drawChild(canvas, it, drawingTime) }
   }
 
   private var suppressManagedChildDraw = false
@@ -552,32 +616,77 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
     source: RenderNode,
     navView: BottomNavigationView
   ) {
-    val top = navView.top + navView.translationY
-    if (top >= height) return
-    val bottom = height.toFloat()
+    if (floatingNavProgress > 0f) {
+      val left = (navView.left + navView.translationX).coerceAtLeast(0f)
+      val right = (navView.right + navView.translationX).coerceAtMost(width.toFloat())
+      val top = navView.top + navView.translationY
+      val bottom = navView.bottom + navView.translationY
+      if (top >= height || bottom <= top || left >= right) return
 
-    canvas.withClip(0f, top, width.toFloat(), bottom) {
-      val basePaint = obtainScrimPaint()
-      basePaint.shader = null
-      basePaint.blendMode = BlendMode.SRC_OVER
-      basePaint.color = surfaceColor and BASE_FILL_ALPHA_MASK.toInt()
-      drawRect(0f, top, width.toFloat(), bottom, basePaint)
+      val cornerRadius = ((bottom - top) / 2f) * floatingNavProgress
+      navClipPath.setG2Shape(left, top, right, bottom, cornerRadius, cornerSmoothing = 1f)
+      canvas.withClip(navClipPath) {
+        drawNavBackdrop(this, source, left, top, right, bottom)
+      }
 
-      drawNavBlurredSource(this, source, top)
-      drawSurfaceTint(this, top, bottom)
-
-      val dividerPaint = obtainScrimPaint()
-      dividerPaint.shader = null
-      dividerPaint.blendMode = BlendMode.SRC_OVER
-      dividerPaint.color = outlineColor
-      drawRect(
-        0f,
-        top,
-        width.toFloat(),
-        top + dividerHeightPx(),
-        dividerPaint
+      val strokeWidth = dividerHeightPx()
+      val strokePaint = obtainScrimPaint()
+      strokePaint.shader = null
+      strokePaint.style = Paint.Style.STROKE
+      strokePaint.strokeWidth = strokeWidth
+      strokePaint.blendMode = BlendMode.SRC_OVER
+      val strokeAlpha = ((outlineColor ushr 24) * floatingNavProgress).roundToInt()
+      strokePaint.color = (outlineColor and 0x00FFFFFF) or (strokeAlpha shl 24)
+      val halfStroke = strokeWidth / 2f
+      navStrokePath.setG2Shape(
+        left + halfStroke,
+        top + halfStroke,
+        right - halfStroke,
+        bottom - halfStroke,
+        (cornerRadius - halfStroke).coerceAtLeast(0f),
+        cornerSmoothing = 1f
       )
+      canvas.drawPath(navStrokePath, strokePaint)
+      drawNavDivider(canvas, top, floatingNavProgress)
+    } else {
+      val top = navView.top + navView.translationY
+      if (top >= height) return
+      val bottom = height.toFloat()
+
+      canvas.withClip(0f, top, width.toFloat(), bottom) {
+        drawNavBackdrop(this, source, 0f, top, width.toFloat(), bottom)
+        drawNavDivider(this, top, 0f)
+      }
     }
+  }
+
+  private fun drawNavBackdrop(
+    canvas: Canvas,
+    source: RenderNode,
+    left: Float,
+    top: Float,
+    right: Float,
+    bottom: Float
+  ) {
+    val paint = obtainScrimPaint()
+    paint.shader = null
+    paint.style = Paint.Style.FILL
+    paint.blendMode = BlendMode.SRC_OVER
+    paint.color = surfaceColor and BASE_FILL_ALPHA_MASK.toInt()
+    canvas.drawRect(left, top, right, bottom, paint)
+    drawNavBlurredSource(canvas, source, top)
+    drawSurfaceTint(canvas, top, bottom)
+  }
+
+  private fun drawNavDivider(canvas: Canvas, top: Float, floatingProgress: Float) {
+    val alpha = fadingNavDividerAlpha(outlineColor ushr 24, floatingProgress)
+    if (alpha == 0) return
+    val paint = obtainScrimPaint()
+    paint.shader = null
+    paint.style = Paint.Style.FILL
+    paint.blendMode = BlendMode.SRC_OVER
+    paint.color = (outlineColor and 0x00FFFFFF) or (alpha shl 24)
+    canvas.drawRect(0f, top, width.toFloat(), top + dividerHeightPx(), paint)
   }
 
   private fun drawSurfaceTint(canvas: Canvas, top: Float, bottom: Float) {
@@ -632,42 +741,46 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
     calculateBackdropContentOffset(NAV_BLUR_RADIUS_PX).toFloat()
   }
 
-  private fun updateBarBackgrounds() {
-    val appbar = findViewById<AppBarLayout>(R.id.appbar)
-    val navView = findViewById<BottomNavigationView>(R.id.nav_view)
+  private fun captureBarBackgrounds() {
+    val navView = findViewById<View>(R.id.nav_view)
     val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
 
-    if (blurEnabled) {
-      if (originalAppbarBackground == null) {
-        originalAppbarBackground = appbar?.background
-        originalNavBackground = navView?.background
-        originalToolbarBackground = toolbar?.background
-        originalAppbarElevation = appbar?.elevation ?: 0f
-        originalNavElevation = navView?.elevation ?: 0f
-      }
-      appbar?.setBackgroundColor(Color.TRANSPARENT)
-      navView?.setBackgroundColor(Color.TRANSPARENT)
-      // The toolbar's actionBarStyle background is opaque and covers the progressive blur.
-      toolbar?.background = null
-      appbar?.elevation = 0f
-      navView?.elevation = 0f
-    } else {
-      originalAppbarBackground?.let { appbar?.background = it }
-      originalNavBackground?.let { navView?.background = it }
-      originalToolbarBackground?.let { toolbar?.background = it }
-      appbar?.elevation = originalAppbarElevation
-      navView?.elevation = originalNavElevation
-      originalAppbarBackground = null
-      originalNavBackground = null
-      originalToolbarBackground = null
-      originalAppbarElevation = 0f
+    findViewById<AppBarLayout>(R.id.appbar)?.background?.mutate()
+    navView?.background?.mutate()
+    toolbar?.background?.mutate()
+    originalNavElevation = navView?.elevation ?: 0f
+  }
+
+  private fun completeBlurTransition(enabled: Boolean) {
+    blurProgress = if (enabled) 1f else 0f
+    updateBarVisuals()
+    if (enabled) {
+      updateBarScrollFlags(blurActive = true)
+    }
+    if (!enabled) {
+      blurEnabled = false
+      updateAppbarMask(animate = false)
+      updateViewPagerBehavior()
       originalNavElevation = 0f
     }
     invalidate()
   }
 
+  private fun updateBarVisuals() {
+    val backgroundAlpha = blurBackgroundAlpha(blurProgress)
+    findViewById<AppBarLayout>(R.id.appbar)?.background?.alpha = backgroundAlpha
+    findViewById<View>(R.id.nav_view)?.let { navView ->
+      navView.background?.alpha = backgroundAlpha
+      navView.elevation = originalNavElevation * (1f - blurProgress)
+      (navView as? FloatingNavigationBar)?.setBlurProgress(blurProgress)
+    }
+    findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)?.background?.alpha = backgroundAlpha
+  }
+
   override fun onDetachedFromWindow() {
     super.onDetachedFromWindow()
+    blurAnimator?.cancel()
+    blurAnimator = null
     appbarMaskAnimator?.cancel()
     appbarMaskAnimator = null
     contentNode = null
@@ -738,6 +851,10 @@ internal fun opaqueBackdropColor(color: Int): Int = color or 0xFF000000.toInt()
 
 internal fun capturedChildLayerAlpha(childAlpha: Float): Int = (childAlpha.coerceIn(0f, 1f) * OPAQUE_LAYER_ALPHA).roundToInt()
 
+internal fun blurBackgroundAlpha(progress: Float): Int = ((1f - progress.coerceIn(0f, 1f)) * OPAQUE_LAYER_ALPHA).roundToInt()
+
+internal fun fadingNavDividerAlpha(baseAlpha: Int, floatingProgress: Float): Int = (baseAlpha.coerceIn(0, 255) * (1f - floatingProgress.coerceIn(0f, 1f))).roundToInt()
+
 internal fun progressiveSurfaceTintAlpha(
   progress: Float,
   maxAlpha: Float = APPBAR_SURFACE_TINT_ALPHA,
@@ -774,6 +891,7 @@ private fun smoothStep(value: Float): Float {
 private const val BLUR_KERNEL_SIGMA_OUTSET = 3f
 internal const val OPAQUE_LAYER_ALPHA = 255
 private const val APPBAR_MASK_TRANSITION_DURATION_MS = 100L
+private const val BLUR_TRANSITION_DURATION_MS = 500
 private const val APPBAR_SURFACE_TINT_ALPHA = 0.3f
 private const val APPBAR_DARK_MASK_ALPHA = 0.12f
 private const val APPBAR_PROGRESSIVE_CURVE = 2.4f

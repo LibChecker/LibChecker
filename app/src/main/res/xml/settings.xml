@@ -70,6 +70,13 @@
       app:summary="@string/blur_design_summary"
       app:title="@string/blur_design" />
 
+    <androidx.preference.SwitchPreferenceCompat
+      app:defaultValue="false"
+      app:icon="@drawable/ic_floating_bar"
+      app:key="floatingNavBar"
+      app:summary="@string/floating_nav_bar_summary"
+      app:title="@string/floating_nav_bar" />
+
   </PreferenceCategory>
 
   <PreferenceCategory

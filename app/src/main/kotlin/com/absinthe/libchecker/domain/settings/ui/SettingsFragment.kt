@@ -164,13 +164,38 @@ class SettingsFragment :
         // in place. Recreating the window here made the whole screen flash.
         val appBarContainer = hostActivity as? IAppBarContainer
         if (appBarContainer != null) {
-          appBarContainer.setBlurDesignEnabled(enabled)
+          hostActivity.window.decorView.postDelayed({
+            if (GlobalValues.isBlurDesign == enabled) {
+              appBarContainer.setBlurDesignEnabled(enabled)
+            }
+          }, TOGGLE_TRANSITION_DELAY_MS)
         } else if (hostActivity is AppCompatActivity) {
           hostActivity.window.decorView.postDelayed({
             ThemeTransitionController.recreateWithTransition(hostActivity)
           }, TOGGLE_TRANSITION_DELAY_MS)
         }
         recordPreferenceEvent(Constants.PREF_BLUR_DESIGN, enabled)
+        true
+      }
+    }
+    findPreference<TwoStatePreference>(Constants.PREF_FLOATING_NAV_BAR)?.apply {
+      setOnPreferenceChangeListener { _, newValue ->
+        val enabled = newValue as Boolean
+        val hostActivity = activity
+        GlobalValues.isFloatingNavBar = enabled
+        val appBarContainer = hostActivity as? IAppBarContainer
+        if (appBarContainer != null) {
+          hostActivity.window.decorView.postDelayed({
+            if (GlobalValues.isFloatingNavBar == enabled) {
+              appBarContainer.setFloatingNavBarEnabled(enabled)
+            }
+          }, TOGGLE_TRANSITION_DELAY_MS)
+        } else if (hostActivity is AppCompatActivity) {
+          hostActivity.window.decorView.postDelayed({
+            ThemeTransitionController.recreateWithTransition(hostActivity)
+          }, TOGGLE_TRANSITION_DELAY_MS)
+        }
+        recordPreferenceEvent(Constants.PREF_FLOATING_NAV_BAR, enabled)
         true
       }
     }
@@ -668,14 +693,18 @@ class SettingsFragment :
     var systemBarBottomInset = 0
 
     fun updateBottomPadding() {
-      val bottomNavigationHeight = (appNavigationView as? BottomNavigationView)
+      val bottomNavigationView = appNavigationView as? BottomNavigationView
+      val bottomNavigationHeight = bottomNavigationView
         ?.height
         ?.takeIf { it > 0 }
+      val bottomNavigationBottomMargin = (bottomNavigationView?.layoutParams as? ViewGroup.MarginLayoutParams)
+        ?.bottomMargin ?: 0
       updatePadding(
         bottom = calculateSettingsBottomPadding(
           basePadding = basePadding,
           systemBarBottomInset = systemBarBottomInset,
-          bottomNavigationHeight = bottomNavigationHeight
+          bottomNavigationHeight = bottomNavigationHeight,
+          bottomNavigationBottomMargin = bottomNavigationBottomMargin
         )
       )
     }

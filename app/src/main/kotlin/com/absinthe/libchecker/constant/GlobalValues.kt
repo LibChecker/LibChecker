@@ -66,6 +66,7 @@ object GlobalValues {
   var isColorfulIcon: Boolean by SPDelegates(Constants.PREF_COLORFUL_ICON, true)
 
   var isBlurDesign: Boolean by SPDelegates(Constants.PREF_BLUR_DESIGN, false)
+  var isFloatingNavBar: Boolean by SPDelegates(Constants.PREF_FLOATING_NAV_BAR, false)
 
   val isAnonymousAnalyticsEnabled: Boolean by SPDelegates(Constants.PREF_ANONYMOUS_ANALYTICS, true)
 

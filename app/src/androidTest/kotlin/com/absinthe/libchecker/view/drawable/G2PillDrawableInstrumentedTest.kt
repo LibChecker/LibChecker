@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.ui.preference.view
+package com.absinthe.libchecker.view.drawable
 
 import android.graphics.Color
 import android.graphics.Outline

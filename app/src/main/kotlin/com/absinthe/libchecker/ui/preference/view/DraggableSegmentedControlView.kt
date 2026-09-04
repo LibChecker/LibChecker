@@ -21,6 +21,7 @@ import androidx.core.widget.TextViewCompat
 import com.absinthe.libchecker.ui.preference.model.PreferenceInlineControl
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
+import com.absinthe.libchecker.view.drawable.G2PillDrawable
 import com.google.android.material.R as MaterialR
 import kotlin.math.abs
 
