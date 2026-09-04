@@ -338,14 +338,18 @@ internal class FloatingNavigationThumbController(
   private fun captureNormalIndicatorGeometry() {
     if (host.menu.size() == 0) return
     val firstItemView = host.findViewById<View>(host.menu.getItem(0).itemId) ?: return
-    val indicator = firstItemView.findViewById<View>(MaterialR.id.navigation_bar_item_active_indicator_view) ?: return
-    if (indicator.width <= 0 || indicator.height <= 0) return
-    val bounds = Rect(0, 0, indicator.width, indicator.height)
-    host.offsetDescendantRectToMyCoords(indicator, bounds)
-    normalIndicatorLeft = bounds.left.toFloat()
-    normalIndicatorTop = bounds.top.toFloat()
-    normalIndicatorWidth = bounds.width().toFloat()
-    normalIndicatorHeight = bounds.height().toFloat()
+    val firstIndicator = firstItemView.findViewById<View>(MaterialR.id.navigation_bar_item_active_indicator_view) ?: return
+    val selectedItemView = host.findViewById<View>(host.selectedItemId) ?: return
+    val selectedIndicator = selectedItemView.findViewById<View>(MaterialR.id.navigation_bar_item_active_indicator_view) ?: return
+    if (firstIndicator.width <= 0 || firstIndicator.height <= 0 || selectedIndicator.width <= 0 || selectedIndicator.height <= 0) return
+    val firstIndicatorBounds = Rect(0, 0, firstIndicator.width, firstIndicator.height)
+    val selectedIndicatorBounds = Rect(0, 0, selectedIndicator.width, selectedIndicator.height)
+    host.offsetDescendantRectToMyCoords(firstIndicator, firstIndicatorBounds)
+    host.offsetDescendantRectToMyCoords(selectedIndicator, selectedIndicatorBounds)
+    normalIndicatorLeft = if (vertical) selectedIndicatorBounds.left.toFloat() else firstIndicatorBounds.left.toFloat()
+    normalIndicatorTop = if (vertical) firstIndicatorBounds.top.toFloat() else selectedIndicatorBounds.top.toFloat()
+    normalIndicatorWidth = selectedIndicatorBounds.width().toFloat()
+    normalIndicatorHeight = selectedIndicatorBounds.height().toFloat()
 
     if (host.menu.size() > 1) {
       val secondItemView = host.findViewById<View>(host.menu.getItem(1).itemId) ?: return
