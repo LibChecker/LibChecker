@@ -31,6 +31,54 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class FloatingNavigationPreferenceInstrumentedTest {
   @Test
+  fun attachedGeometryMatchesSelectedSettingsIndicator() {
+    val instrumentation = InstrumentationRegistry.getInstrumentation()
+    val monitor = instrumentation.addMonitor(MainActivity::class.java.name, null, false)
+    val originalFloatingNavigation = GlobalValues.isFloatingNavBar
+    var activity: MainActivity? = null
+    try {
+      assertTrue(instrumentation.uiAutomation.setRotation(UiAutomation.ROTATION_FREEZE_0))
+      GlobalValues.isFloatingNavBar = false
+      instrumentation.targetContext.startActivity(
+        Intent(instrumentation.targetContext, MainActivity::class.java)
+          .setAction(Intent.ACTION_APPLICATION_PREFERENCES)
+          .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+      )
+      val launchedActivity = instrumentation.waitForMonitorWithTimeout(monitor, 10_000L) as MainActivity
+      activity = launchedActivity
+      val navView = launchedActivity.findViewById<NavigationBarView>(R.id.nav_view)
+      assertTrue(
+        waitUntil(instrumentation) {
+          navView.isLaidOut && navView.selectedItemId == R.id.navigation_settings &&
+            navView.nativeIndicatorReady(navView.selectedItemId) &&
+            (navView as FloatingNavigationBar).currentFloatingProgress == 0f
+        }
+      )
+
+      var selectedTop = Float.NaN
+      instrumentation.runOnMainSync {
+        selectedTop = navView.nativeIndicatorTop(navView.selectedItemId)
+        launchedActivity.setFloatingNavBarEnabled(true)
+      }
+      assertTrue(
+        waitUntil(instrumentation) {
+          (navView as FloatingNavigationBar).currentFloatingProgress == 1f
+        }
+      )
+      var capturedTop = Float.NaN
+      instrumentation.runOnMainSync {
+        capturedTop = navView.capturedNormalIndicatorTop()
+      }
+      assertEquals("Captured geometry did not use the selected indicator", selectedTop, capturedTop, 1f)
+    } finally {
+      instrumentation.runOnMainSync { activity?.finish() }
+      GlobalValues.isFloatingNavBar = originalFloatingNavigation
+      instrumentation.removeMonitor(monitor)
+      instrumentation.uiAutomation.setRotation(UiAutomation.ROTATION_UNFREEZE)
+    }
+  }
+
+  @Test
   fun persistedFloatingNavigationCapturesAttachedIndicatorBeforeFirstDisable() {
     val instrumentation = InstrumentationRegistry.getInstrumentation()
     val monitor = instrumentation.addMonitor(MainActivity::class.java.name, null, false)
@@ -299,11 +347,21 @@ class FloatingNavigationPreferenceInstrumentedTest {
   }
 
   private fun NavigationBarView.firstNativeIndicatorTop(): Float {
-    val firstItem = requireNotNull(findViewById<View>(menu.getItem(0).itemId))
-    val indicator = requireNotNull(firstItem.findViewById<View>(MaterialR.id.navigation_bar_item_active_indicator_view))
+    return nativeIndicatorTop(menu.getItem(0).itemId)
+  }
+
+  private fun NavigationBarView.nativeIndicatorTop(itemId: Int): Float {
+    val item = requireNotNull(findViewById<View>(itemId))
+    val indicator = requireNotNull(item.findViewById<View>(MaterialR.id.navigation_bar_item_active_indicator_view))
     val bounds = Rect(0, 0, indicator.width, indicator.height)
     offsetDescendantRectToMyCoords(indicator, bounds)
     return bounds.top.toFloat()
+  }
+
+  private fun NavigationBarView.nativeIndicatorReady(itemId: Int): Boolean {
+    val item = findViewById<View>(itemId) ?: return false
+    val indicator = item.findViewById<View>(MaterialR.id.navigation_bar_item_active_indicator_view) ?: return false
+    return indicator.width > 0 && indicator.height > 0
   }
 
   private fun assertAppbarRemainsLiftedDuringTransition(
