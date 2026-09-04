@@ -3,6 +3,7 @@ package com.absinthe.libchecker.domain.settings.ui
 import android.app.Instrumentation
 import android.app.UiAutomation
 import android.content.Intent
+import android.graphics.Rect
 import android.os.SystemClock
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -12,11 +13,15 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.domain.home.ui.MainActivity
 import com.absinthe.libchecker.view.app.BlurCoordinatorLayout
+import com.absinthe.libchecker.view.app.FloatingNavigationBar
+import com.google.android.material.R as MaterialR
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.navigation.NavigationBarView
 import java.util.concurrent.atomic.AtomicBoolean
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
@@ -25,6 +30,49 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class FloatingNavigationPreferenceInstrumentedTest {
+  @Test
+  fun persistedFloatingNavigationCapturesAttachedIndicatorBeforeFirstDisable() {
+    val instrumentation = InstrumentationRegistry.getInstrumentation()
+    val monitor = instrumentation.addMonitor(MainActivity::class.java.name, null, false)
+    val originalFloatingNavigation = GlobalValues.isFloatingNavBar
+    var activity: MainActivity? = null
+    try {
+      assertTrue(instrumentation.uiAutomation.setRotation(UiAutomation.ROTATION_FREEZE_0))
+      GlobalValues.isFloatingNavBar = true
+      instrumentation.targetContext.startActivity(
+        Intent(instrumentation.targetContext, MainActivity::class.java)
+          .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+      )
+      val launchedActivity = instrumentation.waitForMonitorWithTimeout(monitor, 10_000L) as MainActivity
+      activity = launchedActivity
+      val navView = launchedActivity.findViewById<NavigationBarView>(R.id.nav_view)
+      assertTrue(
+        waitUntil(instrumentation) {
+          navView.isLaidOut && (navView as FloatingNavigationBar).currentFloatingProgress == 1f
+        }
+      )
+
+      var capturedTop = Float.NaN
+      instrumentation.runOnMainSync { capturedTop = navView.capturedNormalIndicatorTop() }
+      assertTrue("Attached indicator geometry was not captured before entering floating mode", !capturedTop.isNaN())
+
+      instrumentation.runOnMainSync { launchedActivity.setFloatingNavBarEnabled(false) }
+      assertTrue(
+        waitUntil(instrumentation) {
+          (navView as FloatingNavigationBar).currentFloatingProgress == 0f
+        }
+      )
+      var attachedTop = Float.NaN
+      instrumentation.runOnMainSync { attachedTop = navView.firstNativeIndicatorTop() }
+      assertEquals(attachedTop, capturedTop, 1f)
+    } finally {
+      instrumentation.runOnMainSync { activity?.finish() }
+      GlobalValues.isFloatingNavBar = originalFloatingNavigation
+      instrumentation.removeMonitor(monitor)
+      instrumentation.uiAutomation.setRotation(UiAutomation.ROTATION_UNFREEZE)
+    }
+  }
+
   @Test
   fun appbarLiftStateSurvivesAppearanceLayoutChanges() {
     val instrumentation = InstrumentationRegistry.getInstrumentation()
@@ -237,6 +285,25 @@ class FloatingNavigationPreferenceInstrumentedTest {
     val checked = !preference.isChecked
     check(preference.callChangeListener(checked))
     preference.isChecked = checked
+  }
+
+  private fun NavigationBarView.capturedNormalIndicatorTop(): Float {
+    val controller = javaClass.getDeclaredField("thumbController").run {
+      isAccessible = true
+      get(this@capturedNormalIndicatorTop)
+    }
+    return controller.javaClass.getDeclaredField("normalIndicatorTop").run {
+      isAccessible = true
+      getFloat(controller)
+    }
+  }
+
+  private fun NavigationBarView.firstNativeIndicatorTop(): Float {
+    val firstItem = requireNotNull(findViewById<View>(menu.getItem(0).itemId))
+    val indicator = requireNotNull(firstItem.findViewById<View>(MaterialR.id.navigation_bar_item_active_indicator_view))
+    val bounds = Rect(0, 0, indicator.width, indicator.height)
+    offsetDescendantRectToMyCoords(indicator, bounds)
+    return bounds.top.toFloat()
   }
 
   private fun assertAppbarRemainsLiftedDuringTransition(

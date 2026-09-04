@@ -29,6 +29,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.doOnLayout
+import androidx.core.view.doOnNextLayout
 import androidx.core.view.get
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
@@ -295,13 +296,7 @@ class MainActivity :
     val contentUnderlaps = isListItemUnderAppbar()
     val container = installBlurContainer()
     val finishLayoutTransition = { progressiveBlurActive: Boolean ->
-      initialListTopPaddings.entries.toList().forEach { (targetView, initialPaddingTop) ->
-        applyHomeListTopPadding(
-          targetView = targetView,
-          initialPaddingTop = initialPaddingTop,
-          appbarBottom = appbarInset
-        )
-      }
+      applyHomeListTopPaddings(appbarInset)
       restoreAppbarScrollAnchorAfterLayout(scrollAnchor, progressiveBlurActive)
     }
     container?.setAppbarContentUnderlap(contentUnderlaps)
@@ -402,10 +397,19 @@ class MainActivity :
       it.setSelectedIndex(binding.viewpager.currentItem, animate = false)
       it.isFloating = floatingNavEnabled
     }
-    floatingNavProgress = if (floatingNavEnabled) 1f else 0f
-    applyFloatingNavProgress(navView, floatingNavProgress)
-    if (navView !is BottomNavigationView) {
-      navView.doOnLayout { applyFloatingNavProgress(navView, floatingNavProgress) }
+    val targetProgress = if (floatingNavEnabled) 1f else 0f
+    if (floatingNavEnabled && !navView.isLaidOut) {
+      applyFloatingNavProgress(navView, 0f)
+      navView.doOnLayout {
+        navView.post {
+          navView.doOnNextLayout { applyFloatingNavProgress(navView, targetProgress) }
+        }
+      }
+    } else {
+      applyFloatingNavProgress(navView, targetProgress)
+      if (navView !is BottomNavigationView) {
+        navView.doOnLayout { applyFloatingNavProgress(navView, targetProgress) }
+      }
     }
   }
 
@@ -661,11 +665,14 @@ class MainActivity :
       initialPaddingTop = initialPaddingTop,
       appbarBottom = resolveCurrentAppbarInset()
     )
-    binding.appbar.doOnLayout { appbar ->
+  }
+
+  private fun applyHomeListTopPaddings(appbarBottom: Int) {
+    initialListTopPaddings.entries.toList().forEach { (targetView, initialPaddingTop) ->
       applyHomeListTopPadding(
         targetView = targetView,
         initialPaddingTop = initialPaddingTop,
-        appbarBottom = appbar.bottom
+        appbarBottom = appbarBottom
       )
     }
   }
@@ -706,6 +713,9 @@ class MainActivity :
   private fun initView() {
     val navView = binding.navView as NavigationBarView
     val floatingNavView = navView as? FloatingNavigationBar
+    binding.appbar.addOnLayoutChangeListener { appbar, _, _, _, _, _, _, _, _ ->
+      applyHomeListTopPaddings(appbar.bottom)
+    }
     setSupportActionBar(binding.toolbar)
     binding.toolbar.isBackInvokedCallbackEnabled = false
     setupToolbarTitle()
