@@ -186,6 +186,9 @@ object PackageUtils {
     }
 
     if (result.isEmpty()) {
+      if (specifiedAbi == null && !parseElf) {
+        return getDefaultAbiNativeLibs(packageInfo, checkCancelled).distinctBy { it.name }
+      }
       val abi =
         specifiedAbi ?: runCatching { getAbi(packageInfo) }.getOrNull() ?: return emptyList()
 
@@ -204,6 +207,43 @@ object PackageUtils {
     }
 
     return result.distinctBy { it.name }
+  }
+
+  // ABI discovery already visits every base APK entry. Keep only the matching
+  // library records so the default, non-ELF path does not enumerate that ZIP twice.
+  private fun getDefaultAbiNativeLibs(packageInfo: PackageInfo, checkCancelled: () -> Unit): List<LibStringItem> {
+    val applicationInfo = packageInfo.applicationInfo ?: return emptyList()
+    val sourceDir = applicationInfo.sourceDir ?: return emptyList()
+    val baseLibs = mutableMapOf<String, MutableList<LibStringItem>>()
+    val abiSet = runCatching {
+      if (packageInfo.isArchivedPackage() || packageInfo.isOverlay()) return emptyList()
+      scanAbiSet(
+        file = File(sourceDir),
+        packageInfo = packageInfo,
+        isApk = false,
+        ignoreArch = true,
+        checkCancelled = checkCancelled
+      ) { entry, abiName ->
+        baseLibs.getOrPut(abiName) { mutableListOf() }.add(
+          LibStringItem(name = getApkLibEntryFileName(entry.name), size = entry.size, elfInfo = ElfInfo())
+        )
+      }
+    }.getOrElse {
+      if (it is CancellationException) throw it
+      return emptyList()
+    }
+    checkCancelled()
+    val abi = runCatching { getAbi(packageInfo, abiSet = abiSet) }.getOrNull() ?: return emptyList()
+    if (abi == ERROR || abi == NO_LIBS || abi == OVERLAY) return emptyList()
+    val abiName = ABI_STRING_MAP[abi % MULTI_ARCH]
+    // A failed scan may have collected only part of the archive. Preserve the
+    // existing reader/fallback behavior instead of returning partial records.
+    if (ERROR in abiSet) {
+      baseLibs.clear()
+      return getSourceLibs(packageInfo, abi, includeNativeLibsDir = false, parseElf = false, checkCancelled = checkCancelled)[abiName].orEmpty()
+    }
+    return baseLibs[abiName]?.takeIf { it.isNotEmpty() }
+      ?: getSplitLibs(packageInfo, abi, parseElf = false, checkCancelled = checkCancelled)[abiName].orEmpty()
   }
 
   internal fun parseNativeDirElfInfo(file: File, parseElf: Boolean, checkCancelled: () -> Unit = {}): ElfInfo {
@@ -892,6 +932,18 @@ object PackageUtils {
     isApk: Boolean = false,
     ignoreArch: Boolean = false
   ): Set<Int> {
+    return scanAbiSet(file, packageInfo, isApk, ignoreArch)
+  }
+
+  private fun scanAbiSet(
+    file: File,
+    packageInfo: PackageInfo,
+    isApk: Boolean,
+    ignoreArch: Boolean,
+    checkCancelled: () -> Unit = {},
+    onNativeEntry: ((ZipEntry, String) -> Unit)? = null
+  ): Set<Int> {
+    checkCancelled()
     val abiSet = mutableSetOf<Int>()
 
     if (file.exists().not()) {
@@ -910,10 +962,14 @@ object PackageUtils {
       ZipFileCompat(file).use { zipFile ->
         zipFile.getZipEntries()
           .asSequence()
-          .filter { !it.isDirectory && it.name.startsWith(libDirPrefix) && it.name.endsWith(".so") }
+          .filter {
+            checkCancelled()
+            !it.isDirectory && it.name.startsWith(libDirPrefix) && it.name.endsWith(".so")
+          }
           .mapNotNull { entry ->
             STRING_ABI_MAP.entries.find { entry.name.startsWith("$libDirPrefix${it.key}") }
               ?.takeIf { (string, _) -> ignoreArch || Build.SUPPORTED_ABIS.contains(string) }
+              ?.also { (abiName, _) -> onNativeEntry?.invoke(entry, abiName) }
               ?.value
           }
           .toCollection(abiSet)
@@ -934,6 +990,7 @@ object PackageUtils {
 
       abiSet
     }.getOrElse {
+      if (it is CancellationException) throw it
       Timber.e(it)
       mutableSetOf(ERROR)
     }

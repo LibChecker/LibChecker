@@ -30,6 +30,7 @@ import com.absinthe.libchecker.domain.statistics.reference.traceReferenceSection
 import com.absinthe.libchecker.domain.statistics.reference.traceReferenceSuspendSection
 import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
@@ -80,21 +81,16 @@ class ComputeLibReferenceUseCase(
       }
     }
 
-    val batchPackageInfoByType = types.mapNotNull { type ->
-      currentCoroutineContext().ensureActive()
-      val flags = getPackageInfoFlags(type) ?: return@mapNotNull null
-      type to traceReferenceSection(TRACE_REFERENCE_LOAD_BATCH) {
-        val packages = installedAppRepository.getInstalledPackages(flags)
-        currentCoroutineContext().ensureActive()
-        packages.associateByTo(HashMap(packages.size)) { it.packageName }
-      }
-    }.toMap()
-
     onProgress(0)
 
-    fun createPackageInfoResolver(@LibType type: Int): (String) -> PackageInfo? {
+    fun createPackageInfoResolver(@LibType type: Int, checkCancelled: () -> Unit): (String) -> PackageInfo? {
+      checkCancelled()
       val flags = getPackageInfoFlags(type) ?: return ::getBasePackageInfo
-      val batchByPackageName = batchPackageInfoByType[type].orEmpty()
+      val batchByPackageName = traceReferenceSection(TRACE_REFERENCE_LOAD_BATCH) {
+        val packages = installedAppRepository.getInstalledPackages(flags)
+        checkCancelled()
+        packages.associateByTo(HashMap(packages.size)) { it.packageName }
+      }
       val fallbackCache = HashMap<String, PackageInfo?>()
       return { packageName ->
         batchByPackageName[packageName] ?: if (fallbackCache.containsKey(packageName)) {
@@ -107,11 +103,12 @@ class ComputeLibReferenceUseCase(
       }
     }
 
-    suspend fun computeInternal(@LibType type: Int): Boolean {
-      val coroutineContext = currentCoroutineContext()
-      val getPackageInfo = createPackageInfoResolver(type)
+    // Keep each batch and its fallback cache on this synchronous call's stack. Only
+    // reference names/package names escape into the index before the next type loads.
+    fun computeInternal(@LibType type: Int, coroutineContext: CoroutineContext): Boolean {
+      val getPackageInfo = createPackageInfoResolver(type, coroutineContext::ensureActive)
       for (target in targets) {
-        if (!currentCoroutineContext().isActive) {
+        if (!coroutineContext.isActive) {
           return false
         }
 
@@ -128,7 +125,7 @@ class ComputeLibReferenceUseCase(
         }
 
         computeComponentReference(index, target.packageName, type, getPackageInfo, coroutineContext::ensureActive)
-        currentCoroutineContext().ensureActive()
+        coroutineContext.ensureActive()
         progressCount++
         updateProgress()
       }
@@ -137,7 +134,7 @@ class ComputeLibReferenceUseCase(
 
     for (type in types) {
       val completed = traceReferenceSuspendSection(traceReferenceComputeTypeName(type)) {
-        computeInternal(type)
+        computeInternal(type, currentCoroutineContext())
       }
       if (!completed) {
         return@traceReferenceSuspendSection null
