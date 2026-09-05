@@ -12,7 +12,7 @@
   <dimen name="settings_preference_inner_corner_radius">4dp</dimen>
   <dimen name="settings_preference_icon_container_size">40dp</dimen>
   <dimen name="settings_preference_icon_size">26dp</dimen>
-  <dimen name="settings_preference_inline_content_start">82dp</dimen>
+  <dimen name="settings_preference_inline_content_start">64dp</dimen>
   <dimen name="settings_preference_inline_padding_bottom">14dp</dimen>
   <dimen name="bottom_sheet_header_content_spacing">16dp</dimen>
 

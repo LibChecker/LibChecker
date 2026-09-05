@@ -24,16 +24,16 @@
       android:gravity="center_vertical"
       android:minHeight="@dimen/settings_preference_min_height"
       android:orientation="horizontal"
-      android:paddingStart="24dp"
+      android:paddingStart="@dimen/normal_padding"
       android:paddingTop="10dp"
-      android:paddingEnd="16dp"
+      android:paddingEnd="@dimen/normal_padding"
       android:paddingBottom="10dp">
 
       <FrameLayout
         android:id="@+id/icon_frame"
         android:layout_width="@dimen/settings_preference_icon_container_size"
         android:layout_height="@dimen/settings_preference_icon_container_size"
-        android:layout_marginEnd="18dp">
+        android:layout_marginEnd="8dp">
 
         <ImageView
           android:id="@android:id/icon"
@@ -100,7 +100,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:paddingStart="@dimen/settings_preference_inline_content_start"
-      android:paddingEnd="16dp"
+      android:paddingEnd="@dimen/normal_padding"
       android:paddingBottom="@dimen/settings_preference_inline_padding_bottom"
       android:visibility="gone" />
   </LinearLayout>

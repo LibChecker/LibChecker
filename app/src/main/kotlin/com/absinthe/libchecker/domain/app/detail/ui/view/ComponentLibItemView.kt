@@ -5,7 +5,6 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.PointF
-import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
@@ -16,6 +15,7 @@ import com.absinthe.libchecker.domain.app.detail.model.LibStringPermissionItemDi
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
+import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 
 class ComponentLibItemView(context: Context) : RuleChipItemView(context) {
 
@@ -33,7 +33,7 @@ class ComponentLibItemView(context: Context) : RuleChipItemView(context) {
         it.marginEnd = context.getDimensionPixelSize(R.dimen.normal_padding)
       }
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
-      setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleSmall))
       addView(this)
     }
 

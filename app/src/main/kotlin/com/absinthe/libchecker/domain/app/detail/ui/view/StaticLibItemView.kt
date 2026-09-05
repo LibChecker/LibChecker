@@ -3,7 +3,6 @@ package com.absinthe.libchecker.domain.app.detail.ui.view
 import android.content.Context
 import android.graphics.text.LineBreaker
 import android.text.Layout
-import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
@@ -13,6 +12,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.model.LibStringStaticItemDisplay
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
+import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 
 class StaticLibItemView(context: Context) : RuleChipItemView(context) {
 
@@ -23,17 +23,18 @@ class StaticLibItemView(context: Context) : RuleChipItemView(context) {
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
-      setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleSmall))
       addView(this)
     }
 
   private val libDetail =
-    AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifCondensed)).apply {
+    AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
-      setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
+      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBodySmall))
+      setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
       if (OsUtils.atLeastQ()) {
         breakStrategy = LineBreaker.BREAK_STRATEGY_SIMPLE
       } else if (OsUtils.atLeastO()) {
