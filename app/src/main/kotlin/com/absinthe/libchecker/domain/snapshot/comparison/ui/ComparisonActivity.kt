@@ -7,7 +7,6 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.os.Bundle
 import android.view.ContextThemeWrapper
-import android.view.Gravity
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -49,7 +48,6 @@ import com.absinthe.libchecker.ui.adapter.addSpacingDecoration
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.utils.UiUtils
-import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -190,12 +188,10 @@ class ComparisonActivity :
         layoutParams = FrameLayout.LayoutParams(
           FrameLayout.LayoutParams.MATCH_PARENT,
           FrameLayout.LayoutParams.WRAP_CONTENT
-        ).also {
-          it.gravity = Gravity.CENTER_HORIZONTAL
-        }
-        addPaddingTop(96.dp)
+        )
       }
       stateView = emptyView
+      isUseStateViewSize = true
       isStateViewEnable = true
       setHeaderView(dashboardView)
       setOnItemClickListener { _, view, position ->

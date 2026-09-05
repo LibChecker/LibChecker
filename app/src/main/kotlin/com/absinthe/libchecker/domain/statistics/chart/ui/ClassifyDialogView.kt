@@ -59,7 +59,7 @@ class ClassifyDialogView(context: Context) : BottomSheetScaffoldView(context) {
       }
       stateView =
         EmptyListView(context).apply {
-          layoutParams = ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, 500.dp)
+          layoutParams = ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
         }
       isStateViewEnable = true
     }

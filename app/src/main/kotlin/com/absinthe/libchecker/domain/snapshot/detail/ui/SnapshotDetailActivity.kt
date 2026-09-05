@@ -3,7 +3,6 @@ package com.absinthe.libchecker.domain.snapshot.detail.ui
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.view.Gravity
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -48,9 +47,7 @@ import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.utils.Telemetry
-import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
-import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.launchLibReferencePage
@@ -187,11 +184,8 @@ class SnapshotDetailActivity :
         else -> SnapshotEmptyView(this).apply {
           layoutParams = FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.MATCH_PARENT,
-            FrameLayout.LayoutParams.WRAP_CONTENT
-          ).also {
-            it.gravity = Gravity.CENTER_HORIZONTAL
-          }
-          addPaddingTop(96.dp)
+            FrameLayout.LayoutParams.MATCH_PARENT
+          )
         }
       }
     adapter.isStateViewEnable = entity.newInstalled || entity.deleted
