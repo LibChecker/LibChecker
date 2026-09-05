@@ -4,17 +4,22 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import androidx.lifecycle.LifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.domain.app.list.model.InstalledPackageState
 import com.absinthe.libchecker.domain.app.model.AppInstallSource
 import com.absinthe.libchecker.domain.app.model.PackageChangeState
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import java.util.concurrent.atomic.AtomicInteger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -36,9 +41,73 @@ class ComputeLibReferenceUseCaseInstrumentedTest {
 
     assertEquals(1, repository.maxConcurrentBatchQueries)
   }
+
+  @Test
+  fun scanningProgressStartsAfterBatchLoadAndCountsCompletedTargets() = runBlocking {
+    val progress = mutableListOf<Int>()
+    val repository = RecordingInstalledAppRepository(
+      targets = List(2) { number ->
+        PackageInfo().apply {
+          packageName = "test.package$number"
+          applicationInfo = ApplicationInfo()
+        }
+      },
+      onBatch = { assertTrue(progress.isEmpty()) }
+    )
+    ComputeLibReferenceUseCase(repository).buildIndex(
+      ComputeLibReferenceUseCase.ReferenceConfig(true, LibReferenceOptions.SERVICES),
+      progress::add
+    )
+    assertEquals(listOf(0, 50, 100), progress)
+  }
+
+  @Test
+  fun matchingProgressCountsCompletedReferences() = runBlocking {
+    val index = ComputeLibReferenceUseCase.ReferenceIndex(emptyMap()).apply {
+      addReference("test.permission.ONE", "test.package", PERMISSION)
+      addReference("test.permission.TWO", "test.package", PERMISSION)
+    }
+    val progress = mutableListOf<Int>()
+    val result = ComputeLibReferenceUseCase(RecordingInstalledAppRepository()).matchRules(
+      index,
+      ComputeLibReferenceUseCase.MatchConfig(threshold = 1, onlyNotMarked = false),
+      progress::add
+    )
+    assertEquals(2, result?.size)
+    assertEquals(listOf(0, 50, 100), progress)
+  }
+
+  @Test
+  fun cancellationDuringBatchStopsRemainingTypesAndProgress() = runBlocking {
+    val job = Job()
+    var batchCalls = 0
+    val progress = mutableListOf<Int>()
+    val repository = RecordingInstalledAppRepository(onBatch = {
+      batchCalls++
+      job.cancel()
+    })
+    try {
+      withContext(job) {
+        ComputeLibReferenceUseCase(repository).buildIndex(
+          ComputeLibReferenceUseCase.ReferenceConfig(
+            true,
+            LibReferenceOptions.SERVICES or LibReferenceOptions.ACTIVITIES
+          ),
+          progress::add
+        )
+      }
+    } catch (_: CancellationException) {
+      // The synchronous batch completes, then cancellation must propagate.
+    }
+    assertEquals(1, batchCalls)
+    assertTrue(progress.isEmpty())
+  }
 }
 
-private class RecordingInstalledAppRepository : InstalledAppRepository {
+private class RecordingInstalledAppRepository(
+  private val targets: List<PackageInfo> = listOf(PackageInfo().apply { packageName = "test.package" }),
+  private val onBatch: () -> Unit = {}
+) : InstalledAppRepository {
   private val activeBatchQueries = AtomicInteger()
   private val highestConcurrentBatchQueries = AtomicInteger()
 
@@ -47,9 +116,10 @@ private class RecordingInstalledAppRepository : InstalledAppRepository {
 
   override val packageChanges: SharedFlow<PackageChangeState> = MutableSharedFlow()
 
-  override fun getApplicationList(forceUpdate: Boolean): List<PackageInfo> = emptyList()
+  override fun getApplicationList(forceUpdate: Boolean): List<PackageInfo> = targets
 
   override fun getInstalledPackages(flags: Int): List<PackageInfo> {
+    onBatch()
     val activeQueries = activeBatchQueries.incrementAndGet()
     highestConcurrentBatchQueries.updateAndGet { maxOf(it, activeQueries) }
     return try {

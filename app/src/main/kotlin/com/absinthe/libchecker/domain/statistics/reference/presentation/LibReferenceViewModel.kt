@@ -11,6 +11,7 @@ import com.absinthe.libchecker.domain.app.list.model.AppListItemViewState
 import com.absinthe.libchecker.domain.app.list.usecase.BuildAppListItemViewStatesUseCase
 import com.absinthe.libchecker.domain.app.repository.AppListRepository
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReference
+import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceLoadingState
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceSearchLabels
 import com.absinthe.libchecker.domain.statistics.reference.model.matchesSearchQuery
 import com.absinthe.libchecker.domain.statistics.reference.repository.LibReferenceSettingsRepository
@@ -43,10 +44,10 @@ class LibReferenceViewModel(
   private val _libRefListFlow = MutableSharedFlow<List<LCItem>>()
   val libRefListFlow = _libRefListFlow.asSharedFlow()
   private val dbItemsFlow: Flow<List<LCItem>> = appListRepository.items
-  private val _progress = MutableStateFlow(0)
-  val progress = _progress.asStateFlow()
+  private val _loadingState = MutableStateFlow<LibReferenceLoadingState>(LibReferenceLoadingState.Preparing)
+  val loadingState = _loadingState.asStateFlow()
   private val libReferenceComputationController =
-    libReferenceComputationControllerFactory.create(viewModelScope) { _progress.value = it }
+    libReferenceComputationControllerFactory.create(viewModelScope) { _loadingState.value = it }
   val libReference = libReferenceComputationController.libReference
   val thresholdChanges: Flow<Int> = libReferenceSettingsRepository.thresholdChanges
   val showSystemAppsChanges: Flow<Unit> = libReferenceSettingsRepository.showSystemAppsChanges
@@ -244,7 +245,6 @@ class LibReferenceViewModel(
   }
 
   private fun matchRules() {
-    libReferenceComputationController.cancelMatchingJob()
     libReferenceComputationController.match()
   }
 

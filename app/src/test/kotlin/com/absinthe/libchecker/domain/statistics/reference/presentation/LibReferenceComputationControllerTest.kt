@@ -7,11 +7,15 @@ import com.absinthe.libchecker.domain.app.list.model.InstalledPackageState
 import com.absinthe.libchecker.domain.app.model.AppInstallSource
 import com.absinthe.libchecker.domain.app.model.PackageChangeState
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
+import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceLoadingState
 import com.absinthe.libchecker.domain.statistics.reference.repository.LibReferenceSettingsRepository
 import com.absinthe.libchecker.domain.statistics.reference.repository.PermissionLabelResolver
 import com.absinthe.libchecker.domain.statistics.reference.usecase.ComputeLibReferenceUseCase
 import com.absinthe.libchecker.domain.statistics.reference.usecase.GetLibReferenceConfigUseCase
 import com.absinthe.libchecker.domain.statistics.reference.usecase.GetLibReferenceIconPackagesUseCase
+import java.util.Collections
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -26,6 +30,8 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.yield
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class LibReferenceComputationControllerTest {
@@ -40,7 +46,7 @@ class LibReferenceComputationControllerTest {
       getLibReferenceIconPackagesUseCase = GetLibReferenceIconPackagesUseCase(repository),
       getLibReferenceConfigUseCase = GetLibReferenceConfigUseCase(FakeLibReferenceSettingsRepository()),
       permissionLabelResolver = PermissionLabelResolver { null },
-      updateProgress = {}
+      updateLoadingState = {}
     )
 
     controller.compute()
@@ -56,6 +62,95 @@ class LibReferenceComputationControllerTest {
 
     assertEquals(emptyList<Any>(), replayedResult)
     scope.cancel()
+  }
+
+  @Test
+  fun replacementWaitsForCancelledPreparationAndOnlyPublishesLatestResult() = runBlocking {
+    val entered = CountDownLatch(1)
+    val release = CountDownLatch(1)
+    val secondEntered = CountDownLatch(1)
+    val states = Collections.synchronizedList(mutableListOf<LibReferenceLoadingState>())
+    var calls = 0
+    val repository = FakeInstalledAppRepository {
+      calls++
+      if (calls == 1) {
+        entered.countDown()
+        check(release.await(5, TimeUnit.SECONDS))
+      } else {
+        secondEntered.countDown()
+      }
+    }
+    val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    val controller = LibReferenceComputationController(
+      scope,
+      ComputeLibReferenceUseCase(repository),
+      GetLibReferenceIconPackagesUseCase(repository),
+      GetLibReferenceConfigUseCase(FakeLibReferenceSettingsRepository()),
+      PermissionLabelResolver { null },
+      states::add
+    )
+    try {
+      controller.compute()
+      assertTrue(entered.await(5, TimeUnit.SECONDS))
+      assertEquals(listOf(LibReferenceLoadingState.Preparing), states.toList())
+      controller.compute()
+      assertFalse(secondEntered.await(100, TimeUnit.MILLISECONDS))
+      assertEquals(1, calls)
+      assertEquals(null, controller.libReference.value)
+      release.countDown()
+      withTimeout(TEST_TIMEOUT_MILLIS) {
+        controller.libReference.filterNotNull().first()
+      }
+      assertEquals(2, calls)
+      assertEquals(
+        listOf(
+          LibReferenceLoadingState.Preparing,
+          LibReferenceLoadingState.Preparing,
+          LibReferenceLoadingState.Matching(),
+          LibReferenceLoadingState.Organizing()
+        ),
+        states.toList()
+      )
+    } finally {
+      release.countDown()
+      scope.cancel()
+    }
+  }
+
+  @Test
+  fun refreshDoesNotExposeCachedResultDuringNewScan() = runBlocking {
+    val entered = CountDownLatch(1)
+    val release = CountDownLatch(1)
+    var calls = 0
+    val repository = FakeInstalledAppRepository {
+      if (++calls == 2) {
+        entered.countDown()
+        check(release.await(5, TimeUnit.SECONDS))
+      }
+    }
+    val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    val controller = LibReferenceComputationController(
+      scope,
+      ComputeLibReferenceUseCase(repository),
+      GetLibReferenceIconPackagesUseCase(repository),
+      GetLibReferenceConfigUseCase(FakeLibReferenceSettingsRepository()),
+      PermissionLabelResolver { null },
+      updateLoadingState = {}
+    )
+    try {
+      controller.compute()
+      withTimeout(TEST_TIMEOUT_MILLIS) { controller.libReference.filterNotNull().first() }
+      controller.compute()
+      assertTrue(entered.await(5, TimeUnit.SECONDS))
+      controller.refresh().join()
+      assertEquals(null, controller.libReference.value)
+      release.countDown()
+      val result = withTimeout(TEST_TIMEOUT_MILLIS) { controller.libReference.filterNotNull().first() }
+      assertEquals(emptyList<Any>(), result)
+    } finally {
+      release.countDown()
+      scope.cancel()
+    }
   }
 
   private companion object {
@@ -76,10 +171,15 @@ private class FakeLibReferenceSettingsRepository : LibReferenceSettingsRepositor
   override suspend fun setThreshold(threshold: Int) = Unit
 }
 
-private class FakeInstalledAppRepository : InstalledAppRepository {
+private class FakeInstalledAppRepository(
+  private val onLoad: () -> Unit = {}
+) : InstalledAppRepository {
   override val packageChanges: SharedFlow<PackageChangeState> = MutableSharedFlow()
 
-  override fun getApplicationList(forceUpdate: Boolean): List<PackageInfo> = emptyList()
+  override fun getApplicationList(forceUpdate: Boolean): List<PackageInfo> {
+    onLoad()
+    return emptyList()
+  }
 
   override fun getInstalledPackages(flags: Int): List<PackageInfo> = emptyList()
 

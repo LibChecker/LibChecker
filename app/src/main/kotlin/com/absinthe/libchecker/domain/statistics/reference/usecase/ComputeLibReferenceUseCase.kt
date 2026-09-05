@@ -30,7 +30,9 @@ import com.absinthe.libchecker.domain.statistics.reference.traceReferenceSection
 import com.absinthe.libchecker.domain.statistics.reference.traceReferenceSuspendSection
 import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.isActive
 import timber.log.Timber
 
@@ -42,10 +44,15 @@ class ComputeLibReferenceUseCase(
     config: ReferenceConfig,
     onProgress: (Int) -> Unit
   ): ReferenceIndex? = traceReferenceSuspendSection(TRACE_REFERENCE_BUILD_INDEX) {
+    currentCoroutineContext().ensureActive()
     val targets = installedAppRepository.getApplicationList()
+    currentCoroutineContext().ensureActive()
     val packageInfoByName = targets.associateByTo(HashMap(targets.size)) { it.packageName }
     val index = ReferenceIndex(packageInfoByName)
     val types = getSelectedLibReferenceTypes(config.options)
+    if (targets.isEmpty() || types.isEmpty()) {
+      return@traceReferenceSuspendSection index
+    }
     val basePackageInfoCache = HashMap<String, PackageInfo>()
     val progressTotal = (targets.size * types.size).coerceAtLeast(1)
     var progressCount = 0
@@ -73,15 +80,17 @@ class ComputeLibReferenceUseCase(
       }
     }
 
-    onProgress(0)
-
     val batchPackageInfoByType = types.mapNotNull { type ->
+      currentCoroutineContext().ensureActive()
       val flags = getPackageInfoFlags(type) ?: return@mapNotNull null
       type to traceReferenceSection(TRACE_REFERENCE_LOAD_BATCH) {
         val packages = installedAppRepository.getInstalledPackages(flags)
+        currentCoroutineContext().ensureActive()
         packages.associateByTo(HashMap(packages.size)) { it.packageName }
       }
     }.toMap()
+
+    onProgress(0)
 
     fun createPackageInfoResolver(@LibType type: Int): (String) -> PackageInfo? {
       val flags = getPackageInfoFlags(type) ?: return ::getBasePackageInfo
@@ -117,8 +126,8 @@ class ComputeLibReferenceUseCase(
           continue
         }
 
-        updateProgress(progressCount + 1, allowComplete = false)
         computeComponentReference(index, target.packageName, type, getPackageInfo)
+        currentCoroutineContext().ensureActive()
         progressCount++
         updateProgress()
       }
@@ -143,6 +152,7 @@ class ComputeLibReferenceUseCase(
     config: MatchConfig,
     onProgress: (Int) -> Unit
   ): List<LibReferenceItem>? = traceReferenceSuspendSection(TRACE_REFERENCE_MATCH_RULES) {
+    currentCoroutineContext().ensureActive()
     val references = index.snapshotReferences()
     val refList = mutableListOf<LibReferenceItem>()
     var progressCount = 0
@@ -161,7 +171,6 @@ class ComputeLibReferenceUseCase(
         return@traceReferenceSuspendSection null
       }
 
-      updateProgress(progressCount + 1, allowComplete = false)
       val libName = entry.name
       val referredList = entry.packageNames
       val type = entry.type
@@ -333,6 +342,8 @@ class ComputeLibReferenceUseCase(
 
         else -> {}
       }
+    } catch (e: CancellationException) {
+      throw e
     } catch (e: Exception) {
       Timber.e(e)
     }
