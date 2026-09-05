@@ -14,7 +14,6 @@ import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.ImageSpan
 import android.text.style.RelativeSizeSpan
-import android.view.Gravity
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -28,6 +27,8 @@ import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
+import androidx.core.view.marginBottom
+import androidx.core.view.marginTop
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.VersionCompat
@@ -65,7 +66,6 @@ import com.absinthe.libchecker.ui.base.shouldHandleListSearchQueryChange
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.Toasty
-import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -192,20 +192,40 @@ class SnapshotFragment :
       layoutParams = FrameLayout.LayoutParams(
         FrameLayout.LayoutParams.MATCH_PARENT,
         FrameLayout.LayoutParams.WRAP_CONTENT
-      ).also {
-        it.gravity = Gravity.CENTER_HORIZONTAL
-      }
-      addPaddingTop(96.dp)
+      )
       if (viewModel.selectedSnapshotTimestamp == 0L) {
         text.text = getString(R.string.snapshot_no_snapshot)
       }
     }
+
+    // The dashboard shares the RecyclerView with the empty state. Center the latter
+    // in the remaining viewport instead of giving it another full screen of height.
+    fun updateEmptyStateHeight() {
+      val list = binding.list
+      if (list.height == 0) return
+      val availableHeight = (
+        list.height - list.paddingTop - list.paddingBottom -
+          dashboard.height - dashboard.marginTop - dashboard.marginBottom - 16.dp
+        ).takeIf { it > 0 } ?: ViewGroup.LayoutParams.WRAP_CONTENT
+      if (emptyView.layoutParams.height != availableHeight) {
+        emptyView.layoutParams = emptyView.layoutParams.apply { height = availableHeight }
+      }
+      // BRVAH copies the state view size into its wrapper when creating the row.
+      (emptyView.parent as? View)?.let { container ->
+        if (container.layoutParams.height != availableHeight) {
+          container.layoutParams = container.layoutParams.apply { height = availableHeight }
+        }
+      }
+    }
+    binding.list.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> updateEmptyStateHeight() }
+    dashboard.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> updateEmptyStateHeight() }
 
     adapter.apply {
       dashboard.also {
         setHeaderView(it)
       }
       stateView = emptyView
+      isUseStateViewSize = true
       isStateViewEnable = true
       setOnItemClickListener { _, view, position ->
         if (AntiShakeUtils.isInvalidClick(view)) {
