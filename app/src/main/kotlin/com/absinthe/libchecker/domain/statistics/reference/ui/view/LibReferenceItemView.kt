@@ -3,6 +3,7 @@ package com.absinthe.libchecker.domain.statistics.reference.ui.view
 import android.content.Context
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
+import android.text.TextUtils
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
@@ -30,10 +31,14 @@ class LibReferenceItemView(context: Context) : TextColumnRowView(context) {
   private val labelName = addTextLine(R.style.TextView_SansSerifMedium) {
     setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+    maxLines = 1
+    ellipsize = TextUtils.TruncateAt.MIDDLE
   }
   private val libName = addTextLine(R.style.TextView_SansSerif) {
-    setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
+    setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+    maxLines = 1
+    ellipsize = TextUtils.TruncateAt.MIDDLE
   }
   private val count = createTextView(R.style.TextView_SansSerif) {
     setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadlineMedium))
