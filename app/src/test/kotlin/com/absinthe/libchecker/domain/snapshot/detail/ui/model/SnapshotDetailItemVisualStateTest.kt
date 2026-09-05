@@ -85,8 +85,8 @@ class SnapshotDetailItemVisualStateTest {
       statusColor = 0xFFFFFFFF.toInt()
     )
 
-    assertEquals(0xFF191919.toInt(), colors.gradientStart)
-    assertEquals(0xFF0A0A0A.toInt(), colors.gradientMiddle)
+    assertEquals(0xFF232323.toInt(), colors.gradientStart)
+    assertEquals(0xFF0F0F0F.toInt(), colors.gradientMiddle)
     assertEquals(0xFF000000.toInt(), colors.surface)
   }
 

@@ -48,8 +48,8 @@ fun resolveSnapshotDetailItemColors(
 ): SnapshotDetailItemResolvedColors {
   return SnapshotDetailItemResolvedColors(
     surface = theme.surface,
-    gradientStart = blendArgb(theme.surface, statusColor, overlayPercent = 10),
-    gradientMiddle = blendArgb(theme.surface, statusColor, overlayPercent = 4),
+    gradientStart = blendArgb(theme.surface, statusColor, overlayPercent = 14),
+    gradientMiddle = blendArgb(theme.surface, statusColor, overlayPercent = 6),
     title = theme.onSurface,
     supportingText = theme.onSurfaceVariant,
     divider = resolveSnapshotDetailDividerColor(theme.surface, theme.outlineVariant),

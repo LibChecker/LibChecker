@@ -168,6 +168,9 @@ class StreamingDexClassScannerTest {
   @Test
   fun findsClassInDexVersion41ContainerHeader() {
     val dex = createDex41("Lcom/example/Container;")
+    val headerInput = dex.inputStream()
+    assertEquals(1, StreamingDexClassScanner.countClasses(headerInput, dex.size.toLong()))
+    assertEquals(dex.size - DEX_CONTAINER_HEADER_SIZE, headerInput.available())
 
     val found = StreamingDexClassScanner.findClasses(
       dex.inputStream(),

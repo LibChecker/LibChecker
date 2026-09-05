@@ -7,10 +7,14 @@ import com.android.tools.smali.dexlib2.immutable.ImmutableClassDef
 import com.android.tools.smali.dexlib2.immutable.ImmutableDexFile
 import com.android.tools.smali.dexlib2.writer.pool.DexPool
 import java.io.File
+import java.io.IOException
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -20,6 +24,25 @@ class DexStatsCollectorTest {
 
   @get:Rule
   val temporaryFolder = TemporaryFolder()
+
+  @Test
+  fun countsFromHeaderWithoutReadingDexBodyAndRejectsInvalidBounds() {
+    val dex = createDex("Lcom/example/HeaderOnly;")
+    val input = dex.inputStream()
+    assertEquals(1, StreamingDexClassScanner.countClasses(input, dex.size.toLong()))
+    assertEquals(dex.size - 112, input.available())
+    assertThrows(IOException::class.java) {
+      StreamingDexClassScanner.countClasses(dex.copyOf(111).inputStream(), dex.size.toLong())
+    }
+    assertThrows(IOException::class.java) {
+      StreamingDexClassScanner.countClasses(dex.inputStream(), 112)
+    }
+    val invalid = dex.copyOf()
+    ByteBuffer.wrap(invalid).order(ByteOrder.LITTLE_ENDIAN).putInt(0x60, Int.MAX_VALUE)
+    assertThrows(IOException::class.java) {
+      StreamingDexClassScanner.countClasses(invalid.inputStream(), invalid.size.toLong())
+    }
+  }
 
   @Test
   fun collectsRootDexAndResourcesAcrossBaseAndSplits() {

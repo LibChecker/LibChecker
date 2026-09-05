@@ -86,27 +86,10 @@ object DexStatsCollector {
           remainingDexEntries -= stats.dexEntries?.size ?: 0
         }
       }
-      val dexEntries = sourceStats.flatMap { it.dexEntries.orEmpty() }
-      require(dexEntries.size <= MAX_DEX_ENTRY_COUNT)
-      require(dexEntries.sumOf(DexEntry::size) <= MAX_TOTAL_DEX_SIZE)
-
+      val collectedEntries = sourceStats.flatMap { it.dexEntries.orEmpty() }.sortedBy(DexEntryInfo::name)
+      require(collectedEntries.size <= MAX_DEX_ENTRY_COUNT)
+      require(collectedEntries.sumOf(DexEntryInfo::size) <= MAX_TOTAL_DEX_SIZE)
       var isDexComplete = sourceStats.all { it.dexEntries != null }
-      val collectedEntries = sourceStats.flatMap { stats ->
-        val sourceDexEntries = stats.dexEntries.orEmpty()
-        val entryNames = sourceDexEntries.map(DexEntry::entryName)
-        val classCounts = countClassesPerDex(File(stats.source.path), entryNames).orEmpty()
-        if (entryNames.isNotEmpty() && classCounts.isEmpty()) {
-          isDexComplete = false
-        }
-        sourceDexEntries.map { entry ->
-          DexEntryInfo(
-            name = "${stats.source.name}/${entry.entryName}",
-            size = entry.size,
-            classCount = classCounts[entry.entryName] ?: 0,
-            crc32 = entry.crc32
-          )
-        }
-      }.sortedBy(DexEntryInfo::name)
       val resourceEntries = sourceStats
         .flatMap { it.resourceEntries.orEmpty() }
         .sortedBy(ResourceEntryInfo::name)
@@ -180,8 +163,10 @@ object DexStatsCollector {
             }
             .take(remainingDexEntries + 1)
             .map { entry ->
-              DexEntry(
-                entryName = entry.name,
+              require(entry.size in 0..MAX_DEX_ENTRY_SIZE && entry.crc in 0..MAX_CRC32)
+              DexEntryInfo(
+                name = "${source.name}/${entry.name}",
+                classCount = zipFile.getInputStream(entry).use { StreamingDexClassScanner.countClasses(it, entry.size) },
                 size = entry.size,
                 crc32 = entry.crc
               )
@@ -189,12 +174,7 @@ object DexStatsCollector {
             .toList()
             .also { entries ->
               require(entries.size <= remainingDexEntries)
-              require(entries.distinctBy(DexEntry::entryName).size == entries.size)
-              require(
-                entries.all {
-                  it.size in 0..MAX_DEX_ENTRY_SIZE && it.crc32 in 0..MAX_CRC32
-                }
-              )
+              require(entries.distinctBy(DexEntryInfo::name).size == entries.size)
             }
         }.getOrNull()
         val resourceEntries = runCatching {
@@ -211,42 +191,21 @@ object DexStatsCollector {
           }.orEmpty()
         }.getOrNull()
         SourceStats(
-          source = source,
           dexEntries = dexEntries,
           resourceEntries = resourceEntries
         )
       }
     }.getOrElse {
       SourceStats(
-        source = source,
         dexEntries = null,
         resourceEntries = null
       )
     }
   }
 
-  private fun countClassesPerDex(sourceFile: File, entryNames: List<String>): Map<String, Int>? {
-    if (entryNames.isEmpty()) {
-      return emptyMap()
-    }
-    return runCatching {
-      val container = ZipDexContainer2(sourceFile, null, MAX_DEX_ENTRY_SIZE)
-      entryNames.associateWith { entryName ->
-        container.getEntry(entryName)?.dexFile?.classes?.size ?: 0
-      }
-    }.getOrNull()
-  }
-
   private data class SourceStats(
-    val source: DexSource,
-    val dexEntries: List<DexEntry>?,
+    val dexEntries: List<DexEntryInfo>?,
     val resourceEntries: List<ResourceEntryInfo>?
-  )
-
-  private data class DexEntry(
-    val entryName: String,
-    val size: Long,
-    val crc32: Long
   )
 
   private const val BASE_SOURCE_NAME = "base"
