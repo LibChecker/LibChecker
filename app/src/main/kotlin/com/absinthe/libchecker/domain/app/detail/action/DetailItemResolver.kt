@@ -215,18 +215,14 @@ class DetailItemResolver(
 
   suspend fun getPermissionDetail(permissionName: String): PermissionDetailContent = withContext(Dispatchers.IO) {
     val normalizedName = permissionName.substringBefore(" ")
-    val permissionInfo = runCatching {
-      packageManager.getPermissionInfo(normalizedName, 0)
-    }.onFailure {
-      Timber.e(it)
-    }.getOrNull()
+    val permissionInfo = packageManager.getPermissionInfo(normalizedName, 0)
 
     PermissionDetailContent(
       name = normalizedName,
-      icon = permissionInfo?.loadIconOrNull(),
-      label = permissionInfo?.loadLabelOrNull(),
-      description = permissionInfo?.loadDescriptionOrNull(),
-      providerAppName = permissionInfo?.packageName?.let { packageName ->
+      icon = permissionInfo.loadIconOrNull(),
+      label = permissionInfo.loadLabelOrNull(),
+      description = permissionInfo.loadDescriptionOrNull(),
+      providerAppName = permissionInfo.packageName?.let { packageName ->
         installedAppRepository.getPackageInfo(packageName)?.getAppName(packageManager)
       }
     )
@@ -308,19 +304,11 @@ class DetailItemResolver(
   }
 
   private fun PermissionInfo.loadLabelOrNull(): CharSequence? {
-    return runCatching {
-      loadLabel(packageManager).takeIf(CharSequence::isNotEmpty)
-    }.onFailure {
-      Timber.e(it)
-    }.getOrNull()
+    return loadLabel(packageManager).takeIf(CharSequence::isNotBlank)
   }
 
   private fun PermissionInfo.loadDescriptionOrNull(): CharSequence? {
-    return runCatching {
-      loadDescription(packageManager)?.takeIf(CharSequence::isNotEmpty)
-    }.onFailure {
-      Timber.e(it)
-    }.getOrNull()
+    return loadDescription(packageManager)?.takeIf(CharSequence::isNotBlank)
   }
 
   data class HeaderRequest(

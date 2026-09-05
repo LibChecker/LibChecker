@@ -17,6 +17,11 @@ sealed interface PermissionDetailBottomSheetState {
     override val permissionName: String
   ) : PermissionDetailBottomSheetState
 
+  data class Unavailable(
+    override val permissionName: String,
+    val notFound: Boolean
+  ) : PermissionDetailBottomSheetState
+
   data class Content(
     val detail: PermissionDetailContent
   ) : PermissionDetailBottomSheetState {

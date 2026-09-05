@@ -83,10 +83,26 @@ class PermissionInfoBottomSheetView(context: Context) :
         append(context.getString(R.string.lib_permission_provided_by_format, it))
       }
     }
-    permissionContentView.bind(
-      label = detail?.label ?: context.getText(R.string.not_found),
-      description = detail?.description ?: context.getText(R.string.not_found)
-    )
+    when (state) {
+      is PermissionDetailBottomSheetState.Loading -> permissionContentView.bind(
+        label = context.getText(R.string.loading),
+        description = context.getText(R.string.loading)
+      )
+
+      is PermissionDetailBottomSheetState.Content -> permissionContentView.bind(
+        label = state.detail.label?.takeIf { it.isNotBlank() }
+          ?: context.getText(R.string.lib_permission_label_not_provided),
+        description = state.detail.description?.takeIf { it.isNotBlank() }
+          ?: context.getText(R.string.lib_permission_description_not_provided)
+      )
+
+      is PermissionDetailBottomSheetState.Unavailable -> {
+        val message = context.getText(
+          if (state.notFound) R.string.not_found else R.string.lib_permission_load_failed
+        )
+        permissionContentView.bind(label = message, description = message)
+      }
+    }
   }
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
