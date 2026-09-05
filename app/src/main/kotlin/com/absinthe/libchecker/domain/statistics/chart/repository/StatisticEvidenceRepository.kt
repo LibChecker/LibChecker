@@ -16,6 +16,25 @@ interface StatisticEvidenceRepository {
   }
 
   fun matchesAll(
+    packageName: String,
+    queries: Set<StatisticArtifactQuery>,
+    checkCancellation: () -> Unit
+  ): Map<StatisticArtifactQuery, Boolean> {
+    checkCancellation()
+    return matchesAll(packageName, queries).also { checkCancellation() }
+  }
+
+  fun matchesAll(
+    packageInfo: PackageInfo,
+    queries: Set<StatisticArtifactQuery>,
+    onProgress: (Int) -> Unit,
+    checkCancellation: () -> Unit
+  ): Map<StatisticArtifactQuery, Boolean> {
+    checkCancellation()
+    return matchesAll(packageInfo, queries, onProgress).also { checkCancellation() }
+  }
+
+  fun matchesAll(
     packageInfo: PackageInfo,
     queries: Set<StatisticArtifactQuery>,
     onProgress: (Int) -> Unit = {}

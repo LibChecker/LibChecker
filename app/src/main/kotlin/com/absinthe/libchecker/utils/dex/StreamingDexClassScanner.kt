@@ -16,8 +16,8 @@ import java.util.Arrays
 internal object StreamingDexClassScanner {
 
   /** Reads only the header; class definitions do not need to be decoded to count them. */
-  fun countClasses(inputStream: InputStream, entrySize: Long): Int {
-    val cursor = InputCursor(inputStream)
+  fun countClasses(inputStream: InputStream, entrySize: Long, checkCancelled: () -> Unit = {}): Int {
+    val cursor = InputCursor(inputStream, checkCancelled)
     val baseHeader = cursor.readBytes(DEX_HEADER_SIZE)
     val version = baseHeader.readVersion()
     val headerSize = if (version == DEX_CONTAINER_VERSION) DEX_CONTAINER_HEADER_SIZE else DEX_HEADER_SIZE
@@ -40,13 +40,14 @@ internal object StreamingDexClassScanner {
     inputStream: InputStream,
     classPatterns: List<String>,
     hasAny: Boolean = false,
-    entrySize: Long? = null
+    entrySize: Long? = null,
+    checkCancelled: () -> Unit = {}
   ): List<String> {
     if (classPatterns.isEmpty()) return emptyList()
 
     val patterns = classPatterns.distinct()
     val found = BooleanArray(patterns.size)
-    val cursor = InputCursor(inputStream)
+    val cursor = InputCursor(inputStream, checkCancelled)
     val baseHeader = cursor.readBytes(DEX_HEADER_SIZE)
     val version = baseHeader.readVersion()
     val headerSize = if (version == DEX_CONTAINER_VERSION) {
@@ -112,7 +113,9 @@ internal object StreamingDexClassScanner {
       cursor.skip(CLASS_DEF_ITEM_SIZE - UINT_SIZE)
     }
 
+    checkCancelled()
     Arrays.sort(classDescriptorOffsets)
+    checkCancelled()
     var previousOffset = -1
     for (descriptorOffset in classDescriptorOffsets) {
       if (descriptorOffset == previousOffset) continue
@@ -142,12 +145,14 @@ internal object StreamingDexClassScanner {
     inputStream: InputStream,
     stringPatterns: List<String>,
     stopAfterMatches: Int = stringPatterns.size,
-    entrySize: Long? = null
+    entrySize: Long? = null,
+    checkCancelled: () -> Unit = {}
   ): List<String> = findStringMatches(
     inputStream = inputStream,
     stringPatterns = stringPatterns,
     stopAfterMatches = stopAfterMatches,
-    entrySize = entrySize
+    entrySize = entrySize,
+    checkCancelled = checkCancelled
   ).matches
 
   fun findStringMatches(
@@ -155,14 +160,15 @@ internal object StreamingDexClassScanner {
     stringPatterns: List<String>,
     stopAfterMatches: Int = stringPatterns.size,
     entrySize: Long? = null,
-    maxScanBytes: Int = Int.MAX_VALUE
+    maxScanBytes: Int = Int.MAX_VALUE,
+    checkCancelled: () -> Unit = {}
   ): StringMatchResult {
     if (stringPatterns.isEmpty()) return StringMatchResult(emptyList(), 0)
 
     val patterns = stringPatterns.distinct()
     val requiredMatches = stopAfterMatches.coerceIn(1, patterns.size)
     val found = BooleanArray(patterns.size)
-    val cursor = InputCursor(inputStream)
+    val cursor = InputCursor(inputStream, checkCancelled)
     val baseHeader = cursor.readBytes(DEX_HEADER_SIZE)
     val version = baseHeader.readVersion()
     val headerSize = if (version == DEX_CONTAINER_VERSION) {
@@ -191,7 +197,9 @@ internal object StreamingDexClassScanner {
 
     cursor.skipTo(stringIdsOffset)
     val stringDataOffsets = IntArray(stringIdsSize) { cursor.readIntLe() }
+    checkCancelled()
     Arrays.sort(stringDataOffsets)
+    checkCancelled()
     val patternBytes = patterns.map { it.toByteArray(StandardCharsets.UTF_8) }
     val candidates = BooleanArray(patterns.size)
     var matchCount = 0
@@ -318,7 +326,7 @@ internal object StreamingDexClassScanner {
     val bytesRead: Int
   )
 
-  private class InputCursor(private val inputStream: InputStream) {
+  private class InputCursor(private val inputStream: InputStream, private val checkCancelled: () -> Unit) {
     var position: Int = 0
       private set
     private var readLimit: Int = Int.MAX_VALUE
@@ -332,10 +340,12 @@ internal object StreamingDexClassScanner {
     }
 
     fun readBytes(count: Int): ByteArray {
+      checkCancelled()
       requireWithinReadLimit(count)
       val result = ByteArray(count)
       var offset = 0
       while (offset < result.size) {
+        checkCancelled()
         val bufferedBytes = (readBufferSize - readBufferOffset).coerceAtMost(result.size - offset)
         if (bufferedBytes > 0) {
           readBuffer.copyInto(result, offset, readBufferOffset, readBufferOffset + bufferedBytes)
@@ -391,6 +401,7 @@ internal object StreamingDexClassScanner {
     }
 
     fun skip(count: Int) {
+      checkCancelled()
       requireWithinReadLimit(count)
       var remaining = count
       val bufferedBytes = (readBufferSize - readBufferOffset).coerceAtMost(remaining)
@@ -400,7 +411,8 @@ internal object StreamingDexClassScanner {
         position += bufferedBytes
       }
       while (remaining > 0) {
-        val skipped = inputStream.skip(remaining.toLong()).coerceAtMost(remaining.toLong()).toInt()
+        checkCancelled()
+        val skipped = inputStream.skip(minOf(remaining, INPUT_BUFFER_SIZE).toLong()).coerceAtMost(remaining.toLong()).toInt()
         if (skipped > 0) {
           remaining -= skipped
           position += skipped
@@ -415,6 +427,7 @@ internal object StreamingDexClassScanner {
       requireWithinReadLimit(1)
       if (readBufferOffset == readBufferSize) {
         do {
+          checkCancelled()
           readBufferSize = inputStream.read(readBuffer)
         } while (readBufferSize == 0)
         if (readBufferSize < 0) throw IOException("Unexpected end of DEX")

@@ -3,6 +3,7 @@ package com.absinthe.libchecker.utils.elf.source
 import java.io.ByteArrayInputStream
 import java.io.FilterInputStream
 import java.io.IOException
+import java.util.concurrent.CancellationException
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
@@ -54,6 +55,32 @@ class InputStreamDataSourceTest {
     }
 
     assertTrue(input.maxRequestedLength <= 4 * 1024)
+  }
+
+  @Test
+  fun cancellationStopsDistantReadWithinOneCopyBlock() {
+    val input = CountingInputStream(ByteArrayInputStream(ByteArray(1024 * 1024)))
+    InputStreamDataSource(input) {
+      if (input.bytesRead >= 12 * 1024) throw CancellationException()
+    }.use { source ->
+      assertThrows(CancellationException::class.java) { source.readInt(900_000) }
+      assertTrue(input.bytesRead <= 20 * 1024)
+    }
+  }
+
+  @Test
+  fun cancellationDuringConstructionClosesInput() {
+    var closed = false
+    val input = object : ByteArrayInputStream(ByteArray(4096)) {
+      override fun close() {
+        closed = true
+        super.close()
+      }
+    }
+    assertThrows(CancellationException::class.java) {
+      InputStreamDataSource(input) { throw CancellationException() }
+    }
+    assertTrue(closed)
   }
 
   private class CountingInputStream(

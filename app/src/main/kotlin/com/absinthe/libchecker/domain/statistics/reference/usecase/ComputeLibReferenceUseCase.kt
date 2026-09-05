@@ -108,6 +108,7 @@ class ComputeLibReferenceUseCase(
     }
 
     suspend fun computeInternal(@LibType type: Int): Boolean {
+      val coroutineContext = currentCoroutineContext()
       val getPackageInfo = createPackageInfoResolver(type)
       for (target in targets) {
         if (!currentCoroutineContext().isActive) {
@@ -126,7 +127,7 @@ class ComputeLibReferenceUseCase(
           continue
         }
 
-        computeComponentReference(index, target.packageName, type, getPackageInfo)
+        computeComponentReference(index, target.packageName, type, getPackageInfo, coroutineContext::ensureActive)
         currentCoroutineContext().ensureActive()
         progressCount++
         updateProgress()
@@ -230,13 +231,14 @@ class ComputeLibReferenceUseCase(
     index: ReferenceIndex,
     packageName: String,
     @LibType type: Int,
-    getPackageInfo: (String) -> PackageInfo?
+    getPackageInfo: (String) -> PackageInfo?,
+    checkCancelled: () -> Unit
   ) {
     try {
       when (type) {
         NATIVE -> {
           val packageInfo = getPackageInfo(packageName) ?: return
-          val list = PackageUtils.getNativeDirLibs(packageInfo)
+          val list = PackageUtils.getNativeDirLibs(packageInfo, checkCancelled = checkCancelled)
           val nativeLibNames = list.map { it.name }
           val validationResults = RulesRepository.checkNativeLibValidations(
             packageName = packageName,

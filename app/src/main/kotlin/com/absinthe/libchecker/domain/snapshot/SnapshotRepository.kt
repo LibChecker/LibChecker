@@ -13,6 +13,7 @@ interface SnapshotRepository {
   suspend fun getTimeStamp(timestamp: Long): TimeStampItem?
   suspend fun getSnapshotCountsByTimestamp(): Map<Long, Int>
   suspend fun getSnapshots(timestamp: Long): List<SnapshotItem>
+  suspend fun getSnapshots(timestamp: Long, packageNames: List<String>): List<SnapshotItem>
   suspend fun getSnapshotSummaries(timestamp: Long): List<SnapshotItem>
   suspend fun getSnapshot(timestamp: Long, packageName: String): SnapshotItem?
   suspend fun getSnapshotDiff(packageName: String): SnapshotDiffStoringItem?

@@ -17,6 +17,7 @@ import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.repository.AppListSettingsRepository
+import com.absinthe.libchecker.domain.snapshot.comparison.usecase.SnapshotNameIndex
 import com.absinthe.libchecker.domain.snapshot.detail.model.SNAPSHOT_DETAIL_DIFF_ARROW
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailContent
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailDiffTextStyle
@@ -324,12 +325,16 @@ class SnapshotDetailSectionBuilder(
       return list
     }
 
-    val tempOldList = oldList.toMutableList()
-    val tempNewList = newList.toMutableList()
-    val intersectList = mutableListOf<LibStringItem>()
+    val index = SnapshotNameIndex(oldList)
+    val addedItems = mutableListOf<LibStringItem>()
 
-    for (item in tempNewList) {
-      oldList.find { it.name == item.name }?.let {
+    for (item in newList) {
+      val old = index.match(item.name)
+      if (old == null) {
+        addedItems.add(item)
+        continue
+      }
+      old.let {
         if (it.size != item.size) {
           val diffSize = item.size - it.size
           val extra = buildString {
@@ -347,16 +352,10 @@ class SnapshotDetailSectionBuilder(
             )
           )
         }
-        intersectList.add(item)
       }
     }
 
-    for (item in intersectList) {
-      tempOldList.remove(tempOldList.find { it.name == item.name })
-      tempNewList.remove(tempNewList.find { it.name == item.name })
-    }
-
-    for (item in tempOldList) {
+    for (item in index.remainingItems()) {
       list.add(
         SnapshotDetailItem(
           item.name,
@@ -367,7 +366,7 @@ class SnapshotDetailSectionBuilder(
         )
       )
     }
-    for (item in tempNewList) {
+    for (item in addedItems) {
       list.add(
         SnapshotDetailItem(
           item.name,
@@ -399,8 +398,9 @@ class SnapshotDetailSectionBuilder(
     val pendingRemovedOldSet = mutableSetOf<String>()
     val pendingRemovedNewSet = mutableSetOf<String>()
 
+    val firstRemovedByShortName = removeList.reversed().associateBy { it.substringAfterLast(".") }
     for (item in addList) {
-      removeList.find { it.substringAfterLast(".") == item.substringAfterLast(".") }?.let {
+      firstRemovedByShortName[item.substringAfterLast(".")]?.let {
         list.add(
           SnapshotDetailItem(
             name = item,
@@ -469,12 +469,16 @@ class SnapshotDetailSectionBuilder(
       return list
     }
 
-    val tempOldList = oldList.toMutableList()
-    val tempNewList = newList.toMutableList()
-    val intersectList = mutableListOf<LibStringItem>()
+    val index = SnapshotNameIndex(oldList)
+    val addedItems = mutableListOf<LibStringItem>()
 
-    for (item in tempNewList) {
-      oldList.find { it.name == item.name }?.let {
+    for (item in newList) {
+      val old = index.match(item.name)
+      if (old == null) {
+        addedItems.add(item)
+        continue
+      }
+      old.let {
         if (it.source != item.source) {
           val extra =
             "${it.source.orEmpty()} $ARROW ${item.source.orEmpty()}"
@@ -488,21 +492,15 @@ class SnapshotDetailSectionBuilder(
             )
           )
         }
-        intersectList.add(item)
       }
     }
 
-    for (item in intersectList) {
-      tempOldList.remove(tempOldList.find { it.name == item.name })
-      tempNewList.remove(tempNewList.find { it.name == item.name })
-    }
-
-    for (item in tempOldList) {
+    for (item in index.remainingItems()) {
       list.add(
         SnapshotDetailItem(item.name, item.name, item.source.orEmpty(), REMOVED, METADATA)
       )
     }
-    for (item in tempNewList) {
+    for (item in addedItems) {
       list.add(
         SnapshotDetailItem(item.name, item.name, item.source.orEmpty(), ADDED, METADATA)
       )
@@ -520,11 +518,11 @@ class SnapshotDetailSectionBuilder(
 
     val oldByName = oldList.associateBy { it.name }
     val newByName = newList.associateBy { it.name }
-    val allEntryNames = (oldByName.keys + newByName.keys).toList()
+    val hasSplitSource = (oldByName.keys + newByName.keys).any { it.startsWith("split:") }
 
     for ((name, newEntry) in newByName) {
       val oldEntry = oldByName[name]
-      val displayName = buildDexDisplayName(name, allEntryNames)
+      val displayName = buildDexDisplayName(name, hasSplitSource)
       if (oldEntry == null) {
         list.add(
           SnapshotDetailItem(
@@ -566,7 +564,7 @@ class SnapshotDetailSectionBuilder(
         list.add(
           SnapshotDetailItem(
             name = name,
-            title = buildDexDisplayName(name, allEntryNames),
+            title = buildDexDisplayName(name, hasSplitSource),
             extra = buildDexExtra(oldEntry),
             diffType = REMOVED,
             itemType = DEX
@@ -601,11 +599,11 @@ class SnapshotDetailSectionBuilder(
     val list = mutableListOf<SnapshotDetailItem>()
     val oldByName = oldList.associateBy(ResourceEntryInfo::name)
     val newByName = newList.associateBy(ResourceEntryInfo::name)
-    val allEntryNames = (oldByName.keys + newByName.keys).toList()
+    val hasSplitSource = (oldByName.keys + newByName.keys).any { it.startsWith("split:") }
 
     for ((name, newEntry) in newByName) {
       val oldEntry = oldByName[name]
-      val displayName = buildDexDisplayName(name, allEntryNames)
+      val displayName = buildDexDisplayName(name, hasSplitSource)
       when {
         oldEntry == null -> list.add(
           SnapshotDetailItem(
@@ -640,7 +638,7 @@ class SnapshotDetailSectionBuilder(
         list.add(
           SnapshotDetailItem(
             name = name,
-            title = buildDexDisplayName(name, allEntryNames),
+            title = buildDexDisplayName(name, hasSplitSource),
             extra = oldEntry.size.sizeToString(context),
             diffType = REMOVED,
             itemType = DEX
@@ -801,6 +799,10 @@ internal fun buildDexDisplayName(
   allEntryNames: Collection<String>
 ): String {
   val hasSplitSource = allEntryNames.any { it.startsWith("split:") }
+  return buildDexDisplayName(name, hasSplitSource)
+}
+
+private fun buildDexDisplayName(name: String, hasSplitSource: Boolean): String {
   return if (!hasSplitSource) name.removePrefix("base/") else name
 }
 

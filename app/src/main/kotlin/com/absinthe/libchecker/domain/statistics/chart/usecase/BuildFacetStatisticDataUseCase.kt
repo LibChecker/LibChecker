@@ -4,7 +4,7 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticFacetsSpec
 import com.absinthe.libchecker.domain.statistics.chart.repository.StatisticEvidenceRepository
 import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.isActive
+import kotlinx.coroutines.ensureActive
 
 class BuildFacetStatisticDataUseCase(
   private val evidenceRepository: StatisticEvidenceRepository
@@ -23,22 +23,16 @@ class BuildFacetStatisticDataUseCase(
     val matched = mutableListOf<LCItem>()
     val unmatched = mutableListOf<LCItem>()
     val matchedFacetIds = LinkedHashMap<String, List<String>>()
-    val artifactQueries = request.facets.items
-      .flatMapTo(LinkedHashSet()) { facet ->
-        conditionEvaluator.collectArtifactQueries(facet.condition)
-      }
     val coroutineContext = currentCoroutineContext()
     val itemCount = targets.size
     var progress = 0
 
     targets.forEachIndexed { index, item ->
-      if (!coroutineContext.isActive) return null
-      val artifactMatches = evidenceRepository.matchesAll(item.packageName, artifactQueries)
-      val facetIds = request.facets.items.mapNotNull { facet ->
-        facet.id.takeIf {
-          conditionEvaluator.matches(item, facet.condition, artifactMatches)
-        }
+      coroutineContext.ensureActive()
+      val matches = conditionEvaluator.evaluateStaged(item, request.facets.items.map { it.condition }) { queries ->
+        evidenceRepository.matchesAll(item.packageName, queries, coroutineContext::ensureActive)
       }
+      val facetIds = request.facets.items.filterIndexed { facetIndex, _ -> matches[facetIndex] }.map { it.id }
       if (facetIds.isEmpty()) {
         unmatched += item
       } else {

@@ -57,6 +57,16 @@ class LCRepository(private val lcDao: LCDao) {
     return lcDao.getSnapshotSummaries(timestamp).map { it.toSnapshotItem() }
   }
 
+  suspend fun getSnapshots(timestamp: Long, packageNames: List<String>): List<SnapshotItem> {
+    if (packageNames.isEmpty()) return emptyList()
+    return try {
+      lcDao.getSnapshots(timestamp, packageNames)
+    } catch (e: SQLiteBlobTooBigException) {
+      // Preserve the per-row summary fallback for oversized archive rows.
+      packageNames.mapNotNull { getSnapshot(timestamp, it) }
+    }
+  }
+
   suspend fun getSnapshot(timestamp: Long, packageName: String): SnapshotItem? {
     return try {
       lcDao.getSnapshot(timestamp, packageName)

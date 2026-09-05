@@ -16,8 +16,9 @@ import com.absinthe.libchecker.utils.extensions.ABI_VALUE_TO_INSTRUCTION_SET_MAP
 import com.absinthe.libchecker.utils.extensions.PAGE_SIZE_16_KB
 import java.io.File
 import java.util.zip.ZipEntry
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.isActive
+import kotlinx.coroutines.ensureActive
 import timber.log.Timber
 
 class BuildPageSize16KBChartDataUseCase(
@@ -42,9 +43,7 @@ class BuildPageSize16KBChartDataUseCase(
     var progress = 0
 
     targets.forEachIndexed { index, item ->
-      if (!coroutineContext.isActive) {
-        return null
-      }
+      coroutineContext.ensureActive()
 
       runCatching {
         val abi = item.abi.toInt()
@@ -56,12 +55,13 @@ class BuildPageSize16KBChartDataUseCase(
         val packageInfo = traceSection(TRACE_GET_PACKAGE_INFO) {
           installedAppRepository.getPackageInfo(item.packageName)
         } ?: return@runCatching
-        if (is16KBAligned(packageInfo, abi)) {
+        if (is16KBAligned(packageInfo, abi, coroutineContext::ensureActive)) {
           support16KB.add(item)
         } else {
           notSupport16KB.add(item)
         }
       }.onFailure {
+        if (it is CancellationException) throw it
         Timber.e(it)
       }
 
@@ -86,7 +86,7 @@ class BuildPageSize16KBChartDataUseCase(
     val showSystemApps: Boolean
   )
 
-  private fun is16KBAligned(packageInfo: PackageInfo, abi: Int): Boolean {
+  private fun is16KBAligned(packageInfo: PackageInfo, abi: Int, checkCancellation: () -> Unit): Boolean {
     if (GlobalFeatures.ENABLE_DETECTING_16KB_PAGE_ALIGNMENT.not()) {
       return false
     }
@@ -104,20 +104,21 @@ class BuildPageSize16KBChartDataUseCase(
       splitSourceDirs = PackageUtils.getSplitsSourceDir(packageInfo)?.toList().orEmpty()
     )
     return alignmentCache.getOrPut(cacheKey) {
-      checkSource16KBAlignment(packageInfo, abi, sourceFile)
+      checkSource16KBAlignment(packageInfo, abi, sourceFile, checkCancellation)
     }
   }
 
   private fun checkSource16KBAlignment(
     packageInfo: PackageInfo,
     abi: Int,
-    sourceFile: File
+    sourceFile: File,
+    checkCancellation: () -> Unit
   ): Boolean {
     return traceSection(TRACE_CHECK_SOURCE) {
       val abiSplitFiles = getAbiSplitFiles(packageInfo, abi)
       when (
         traceSection(TRACE_CHECK_BASE_SOURCE) {
-          checkApk16KBAlignment(sourceFile, abi)
+          checkApk16KBAlignment(sourceFile, abi, checkCancellation)
         }
       ) {
         PageSize16KBScanResult.Compatible -> return@traceSection true
@@ -127,7 +128,8 @@ class BuildPageSize16KBChartDataUseCase(
 
       var hasSplitNativeLibs = false
       abiSplitFiles.forEach { split ->
-        when (traceSection(TRACE_CHECK_SPLIT_SOURCE) { checkApk16KBAlignment(split, abi) }) {
+        checkCancellation()
+        when (traceSection(TRACE_CHECK_SPLIT_SOURCE) { checkApk16KBAlignment(split, abi, checkCancellation) }) {
           PageSize16KBScanResult.Compatible -> hasSplitNativeLibs = true
           PageSize16KBScanResult.Incompatible -> return@traceSection false
           PageSize16KBScanResult.NoNativeLibs -> Unit
@@ -137,7 +139,7 @@ class BuildPageSize16KBChartDataUseCase(
         return@traceSection true
       }
 
-      checkNativeLibraryDir16KBAlignment(packageInfo)
+      checkNativeLibraryDir16KBAlignment(packageInfo, checkCancellation)
     }
   }
 
@@ -153,8 +155,10 @@ class BuildPageSize16KBChartDataUseCase(
 
   private fun checkApk16KBAlignment(
     file: File,
-    abi: Int
+    abi: Int,
+    checkCancellation: () -> Unit
   ): PageSize16KBScanResult {
+    checkCancellation()
     if (file.exists().not() || file.canRead().not()) {
       return PageSize16KBScanResult.NoNativeLibs
     }
@@ -168,6 +172,7 @@ class BuildPageSize16KBChartDataUseCase(
           val nativeEntries = traceSection(TRACE_MATCH_ZIP_ENTRIES) {
             zipFile.getZipEntries().asSequence()
               .filter { entry ->
+                checkCancellation()
                 !entry.isDirectory &&
                   entry.name.endsWith(".so") &&
                   entry.name.startsWith(sourceDir)
@@ -180,10 +185,11 @@ class BuildPageSize16KBChartDataUseCase(
             .map { it.name }
             .toSet()
           val storedEntryOffsets by lazy {
-            getZipDataOffsets(file, storedEntryNames)
+            getZipDataOffsets(file, storedEntryNames, checkCancellation)
           }
           nativeEntries.forEach { entry ->
-            val pageSize = parseElfMinPageSize(zipFile, entry)
+            checkCancellation()
+            val pageSize = parseElfMinPageSize(zipFile, entry, checkCancellation)
             if (pageSize <= 0) {
               return@forEach
             }
@@ -206,6 +212,8 @@ class BuildPageSize16KBChartDataUseCase(
       } catch (e: OutOfMemoryError) {
         Timber.w(e, "Failed to check 16 KB page-size alignment from ${file.absolutePath}")
         return@traceSection PageSize16KBScanResult.Incompatible
+      } catch (e: CancellationException) {
+        throw e
       } catch (e: Exception) {
         Timber.w(e, "Failed to check 16 KB page-size alignment from ${file.absolutePath}")
         return@traceSection PageSize16KBScanResult.Incompatible
@@ -219,23 +227,23 @@ class BuildPageSize16KBChartDataUseCase(
     }
   }
 
-  private fun parseElfMinPageSize(zipFile: IZipFile, entry: ZipEntry): Int {
+  private fun parseElfMinPageSize(zipFile: IZipFile, entry: ZipEntry, checkCancellation: () -> Unit): Int {
     return traceSection(TRACE_PARSE_ELF) {
       runCatching {
-        ElfParser(zipFile.getInputStream(entry)).use { parser ->
+        ElfParser(zipFile.getInputStream(entry), checkCancellation).use { parser ->
           parser.parseHeader()
           parser.getMinPageSize()
         }
-      }.getOrDefault(-1)
+      }.onFailure { if (it is CancellationException) throw it }.getOrDefault(-1)
     }
   }
 
-  private fun getZipDataOffsets(file: File, entryNames: Set<String>): Map<String, Long> {
+  private fun getZipDataOffsets(file: File, entryNames: Set<String>, checkCancellation: () -> Unit): Map<String, Long> {
     if (entryNames.isEmpty()) {
       return emptyMap()
     }
     return traceSection(TRACE_ZIP_DATA_OFFSET) {
-      ZipDataOffsetReader.read(file, entryNames)
+      ZipDataOffsetReader.read(file, entryNames, checkCancellation)
     }
   }
 
@@ -249,7 +257,7 @@ class BuildPageSize16KBChartDataUseCase(
     }
   }
 
-  private fun checkNativeLibraryDir16KBAlignment(packageInfo: PackageInfo): Boolean {
+  private fun checkNativeLibraryDir16KBAlignment(packageInfo: PackageInfo, checkCancellation: () -> Unit): Boolean {
     return traceSection(TRACE_NATIVE_DIR) {
       val nativePath = packageInfo.applicationInfo?.nativeLibraryDir ?: return@traceSection false
       val nativeLibs = File(nativePath).listFiles()
@@ -260,12 +268,13 @@ class BuildPageSize16KBChartDataUseCase(
 
       var hasNativeLibs = false
       nativeLibs.forEach { lib ->
+        checkCancellation()
         val pageSize = runCatching {
-          ElfParser(lib).use { parser ->
+          ElfParser(lib, checkCancellation).use { parser ->
             parser.parseHeader()
             parser.getMinPageSize()
           }
-        }.getOrDefault(-1)
+        }.onFailure { if (it is CancellationException) throw it }.getOrDefault(-1)
         if (pageSize <= 0) {
           return@forEach
         }

@@ -8,6 +8,7 @@ import java.util.Arrays;
 
 public class InputStreamDataSource implements DataSource {
     private final InputStream inputStream;
+    private final Runnable checkCancellation;
     private ByteBuffer buffer;
     private ByteOrder order = ByteOrder.LITTLE_ENDIAN;
     private boolean allDataRead = false;
@@ -15,15 +16,27 @@ public class InputStreamDataSource implements DataSource {
     private static final int INITIAL_BUFFER_SIZE = 4096;
 
     public InputStreamDataSource(InputStream inputStream) throws IOException {
+        this(inputStream, () -> {});
+    }
+
+    public InputStreamDataSource(InputStream inputStream, Runnable checkCancellation) throws IOException {
+        this.checkCancellation = checkCancellation;
         this.inputStream = inputStream;
-        readInitialBuffer();
+        try {
+            readInitialBuffer();
+        } catch (IOException | RuntimeException | Error error) {
+            try { inputStream.close(); } catch (IOException closeError) { error.addSuppressed(closeError); }
+            throw error;
+        }
     }
 
     private void readInitialBuffer() throws IOException {
+        checkCancellation.run();
         byte[] initialBytes = new byte[INITIAL_BUFFER_SIZE];
         int bytesRead;
         while (validLength < INITIAL_BUFFER_SIZE
                 && (bytesRead = inputStream.read(initialBytes, validLength, INITIAL_BUFFER_SIZE - validLength)) != -1) {
+            checkCancellation.run();
             if (bytesRead == 0) {
                 int value = inputStream.read();
                 if (value == -1) {
@@ -43,6 +56,7 @@ public class InputStreamDataSource implements DataSource {
     }
 
     private void ensureAvailable(long offset, int length) throws IOException {
+        checkCancellation.run();
         if (offset < 0 || length < 0 || offset > Integer.MAX_VALUE - length) {
             throw new IOException("Requested stream range is invalid.");
         }
@@ -56,6 +70,7 @@ public class InputStreamDataSource implements DataSource {
         }
 
         while (requiredLength > validLength && !allDataRead) {
+            checkCancellation.run();
             if (validLength == buffer.capacity()) {
                 int nextCapacity;
                 if (buffer.capacity() > Integer.MAX_VALUE / 2) {
@@ -71,7 +86,7 @@ public class InputStreamDataSource implements DataSource {
             int bytesRead = inputStream.read(
                     buffer.array(),
                     validLength,
-                    buffer.capacity() - validLength
+                    Math.min(8192, buffer.capacity() - validLength)
             );
             if (bytesRead == -1) {
                 allDataRead = true;

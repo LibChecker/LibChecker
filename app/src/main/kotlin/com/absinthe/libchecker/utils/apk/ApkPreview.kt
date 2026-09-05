@@ -1,43 +1,104 @@
 package com.absinthe.libchecker.utils.apk
 
+import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.utils.extensions.STRING_ABI_MAP
 import com.absinthe.libchecker.utils.manifest.FullManifestReader
 import com.absinthe.libraries.utils.manager.TimeRecorder
+import java.io.ByteArrayOutputStream
+import java.io.File
 import java.io.IOException
+import java.io.InputStream
+import java.io.RandomAccessFile
 import java.net.HttpURLConnection
 import java.net.SocketTimeoutException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.charset.Charset
+import java.util.concurrent.atomic.AtomicReference
 import java.util.zip.Inflater
 import java.util.zip.InflaterInputStream
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
+import okhttp3.Call
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.Response
 import timber.log.Timber
 
-class ApkPreview(val url: String) {
-  private val client = ApiManager.okHttpClient
+class ApkPreview internal constructor(
+  val url: String,
+  private val client: OkHttpClient,
+  private val cacheDir: File
+) {
+  constructor(url: String) : this(url, ApiManager.okHttpClient, LibCheckerApp.app.cacheDir)
+
   private val httpUrl = url.toHttpUrlOrNull()
   private val elfMap: MutableMap<Int, MutableList<Pair<String, Int>>> = mutableMapOf()
+  private val activeCall = AtomicReference<Call?>()
+  private val readMutex = Mutex()
+  private var rangeArchiveLength: Long? = null
+  private var checkCancelled: () -> Unit = {}
 
-  fun parse(): Result<ApkPreviewInfo> = runCatching {
+  private suspend fun <T> cancellableRead(block: () -> T): T = readMutex.withLock {
+    withContext(Dispatchers.IO) {
+      readCancellableArchive(block)
+    }
+  }
+
+  private suspend fun <T> readCancellableArchive(block: () -> T): T = coroutineScope {
+    val context = currentCoroutineContext()
+    checkCancelled = { context.ensureActive() }
+    // Keep cancellation connected after headers arrive, including a blocked body read.
+    val cancellation = launch(Dispatchers.IO, start = CoroutineStart.UNDISPATCHED) {
+      try {
+        awaitCancellation()
+      } finally {
+        activeCall.get()?.cancel()
+      }
+    }
+    try {
+      checkCancelled()
+      block()
+    } catch (e: Exception) {
+      context.ensureActive()
+      throw e
+    } finally {
+      cancellation.cancel()
+    }
+  }
+
+  suspend fun parse(): Result<ApkPreviewInfo> = try {
+    Result.success(cancellableRead { parseArchive() })
+  } catch (e: CancellationException) {
+    throw e
+  } catch (e: Exception) {
+    Result.failure(e)
+  }
+
+  internal suspend fun readManifestBytes(): ByteArray = cancellableRead {
+    fetchManifest(fetchMetadata())
+  }
+
+  private fun parseArchive(): ApkPreviewInfo {
     if (httpUrl == null) {
       throw IllegalArgumentException("Invalid URL: $url")
     }
     val recorder = TimeRecorder().apply { start() }
     val metadata = fetchMetadata()
 
-    val manifestBytes = try {
-      if (metadata.supportsRange && metadata.contentLength > 0) {
-        fetchManifestWithRanges(metadata.contentLength)
-      } else {
-        fetchManifestWithFullArchive()
-      }
-    } catch (e: RangeNotSupportedException) {
-      Timber.w(e, "Falling back to full download for %s", url)
-      fetchManifestWithFullArchive()
-    }
+    val manifestBytes = fetchManifest(metadata)
+    checkCancelled()
 
     @Suppress("UNCHECKED_CAST")
     val manifestReader = FullManifestReader(manifestBytes, null)
@@ -47,7 +108,7 @@ class ApkPreview(val url: String) {
     Timber.d("Parsed manifest preview from %s in %s", url, recorder)
     Timber.d("Parsed manifest preview  %s", manifestProperties["minSdkVersion"])
 
-    ApkPreviewInfo(
+    return ApkPreviewInfo(
       packageName = (manifestProperties["package"] as? String).orEmpty(),
       versionCode = (manifestProperties["versionCode"] as? String)?.toLong() ?: -1L,
       versionName = (manifestProperties["versionName"] as? String).orEmpty(),
@@ -55,9 +116,9 @@ class ApkPreview(val url: String) {
       targetSdkVersion = (manifestProperties["targetSdkVersion"] as? String)?.toInt() ?: -1,
       minSdkVersion = (manifestProperties["minSdkVersion"] as? String)?.toInt() ?: -1,
       packageSize = metadata.contentLength,
-      abiSet = elfMap.keys,
+      abiSet = elfMap.keys.toSet(),
       appProps = manifestReader.properties.map { it -> it.key to (it.value?.toString() ?: "") }.toMap(),
-      nativeLibs = elfMap,
+      nativeLibs = elfMap.mapValues { it.value.toList() },
       services = manifestReader.services,
       activities = manifestReader.activities,
       receivers = manifestReader.receivers,
@@ -65,6 +126,22 @@ class ApkPreview(val url: String) {
       permissions = manifestReader.permissionList,
       metadata = manifestReader.metadata
     )
+  }
+
+  private fun fetchManifest(metadata: FileMetadata): ByteArray {
+    elfMap.clear()
+    rangeArchiveLength = metadata.contentLength.takeIf { it > 0 }
+    return try {
+      if (metadata.supportsRange && metadata.contentLength > 0) {
+        fetchManifestWithRanges(metadata.contentLength)
+      } else {
+        fetchManifestWithFullArchive()
+      }
+    } catch (e: RangeNotSupportedException) {
+      Timber.w(e, "Falling back to full download for %s", url)
+      elfMap.clear()
+      fetchManifestWithFullArchive()
+    }
   }
 
   data class EocdInfo(
@@ -176,7 +253,7 @@ class ApkPreview(val url: String) {
 
   private sealed class TailDownload {
     data class Partial(val bytes: ByteArray) : TailDownload()
-    data class Full(val bytes: ByteArray) : TailDownload()
+    data class Full(val manifest: ByteArray) : TailDownload()
   }
 
   private data class CdEntry(
@@ -196,6 +273,7 @@ class ApkPreview(val url: String) {
     fun remainingFrom(i: Int) = cdBytes.size - i
 
     while (index + 4 <= cdBytes.size) {
+      if (index % 1024 == 0) checkCancelled()
       if (cdBytes[index] != 0x50.toByte() ||
         cdBytes[index + 1] != 0x4B.toByte() ||
         cdBytes[index + 2] != 0x01.toByte() ||
@@ -304,6 +382,8 @@ class ApkPreview(val url: String) {
 
       val usesUtf8 = (generalPurposeBitFlag and (1 shl 11)) != 0
 
+      checkCancelled()
+      require(entries.size < MAX_DIRECTORY_ENTRIES) { "Too many ZIP entries for preview" }
       entries.add(
         CdEntry(
           name = name,
@@ -361,6 +441,7 @@ class ApkPreview(val url: String) {
   private fun downloadEntryWithRanges(entry: CdEntry): ByteArray {
     Timber.d("Downloading entry %s", entry.name)
 
+    validateManifest(entry)
     val localHeader = readLocalHeader(entry.localHeaderOffset)
     val dataStart =
       entry.localHeaderOffset + LOCAL_FILE_HEADER_FIXED_SIZE + localHeader.nameLength + localHeader.extraLength
@@ -372,12 +453,19 @@ class ApkPreview(val url: String) {
   }
 
   private fun decompressEntry(compressedData: ByteArray, method: Int): ByteArray = when (method) {
-    0 -> compressedData
+    0 -> compressedData.also { require(it.size <= MAX_MANIFEST_BYTES) { "Manifest exceeds preview budget" } }
 
     8 -> if (compressedData.isEmpty()) {
       ByteArray(0)
     } else {
-      InflaterInputStream(compressedData.inputStream(), Inflater(true)).use { it.readBytes() }
+      val inflater = Inflater(true)
+      try {
+        InflaterInputStream(compressedData.inputStream(), inflater).use {
+          readBounded(it, MAX_MANIFEST_BYTES)
+        }
+      } finally {
+        inflater.end()
+      }
     }
 
     else -> error("Unsupported compression method: $method")
@@ -391,7 +479,13 @@ class ApkPreview(val url: String) {
 
     if (!isAwsPresignedUrl) {
       val headRequest = newRequestBuilder().head().build()
-      val headResult = runCatching { executeRequest(headRequest) }.getOrNull()
+      val headResult = try {
+        executeRequest(headRequest)
+      } catch (e: CancellationException) {
+        throw e
+      } catch (_: Exception) {
+        null
+      }
 
       headResult?.use { response ->
         if (response.isSuccessful) {
@@ -424,13 +518,17 @@ class ApkPreview(val url: String) {
 
   private fun fetchManifestWithRanges(contentLength: Long): ByteArray {
     val rangeStart = (contentLength - EOCD_PROBE_BYTES).coerceAtLeast(0)
-    return when (val tail = downloadArchiveTail(rangeStart)) {
+    return when (val tail = downloadArchiveTail(rangeStart, contentLength)) {
       is TailDownload.Partial -> {
         val eocd = runCatching {
           resolveDirectoryInfo(tail.bytes, rangeStart) { offset ->
             downloadRange(offset, ZIP64_EOCD_MIN_SIZE.toLong())
           }
-        }.getOrElse { throw RangeNotSupportedException(it.message ?: "Unable to parse ZIP directory") }
+        }.getOrElse {
+          if (it is CancellationException) throw it
+          throw RangeNotSupportedException(it.message ?: "Unable to parse ZIP directory")
+        }
+        validateDirectory(eocd, contentLength)
         Timber.d(
           "EOCD located via range: offset=%d size=%d entries=%d",
           eocd.centralDirectoryOffset,
@@ -448,35 +546,94 @@ class ApkPreview(val url: String) {
         downloadEntryWithRanges(entry)
       }
 
-      is TailDownload.Full -> processArchiveBytes(tail.bytes)
+      is TailDownload.Full -> tail.manifest
     }
   }
 
   private fun fetchManifestWithFullArchive(): ByteArray {
-    val archive = downloadEntireArchive()
-    return processArchiveBytes(archive)
+    executeRequest(newRequestBuilder().get().build()).use { response ->
+      check(response.code == HttpURLConnection.HTTP_OK) { "Full download failed: ${response.code}" }
+      return processFullResponse(response)
+    }
   }
 
-  private fun processArchiveBytes(archive: ByteArray): ByteArray {
-    val eocd = resolveDirectoryInfo(archive, 0) { offset ->
-      require(offset + ZIP64_EOCD_MIN_SIZE <= archive.size) { "ZIP64 EOCD exceeds archive bounds" }
-      archive.copyOfRange(offset.toInt(), offset.toInt() + ZIP64_EOCD_MIN_SIZE)
+  private fun processFullResponse(response: Response): ByteArray {
+    val archive = File.createTempFile("apk-preview-", ".zip", cacheDir)
+    try {
+      response.body.byteStream().use { input ->
+        archive.outputStream().use { output ->
+          val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+          while (true) {
+            checkCancelled()
+            val count = input.read(buffer)
+            if (count < 0) break
+            output.write(buffer, 0, count)
+          }
+        }
+      }
+      return RandomAccessFile(archive, "r").use { file ->
+        val tailStart = (file.length() - EOCD_PROBE_BYTES).coerceAtLeast(0)
+        val tail = readRange(file, tailStart, file.length() - tailStart)
+        val eocd = resolveDirectoryInfo(tail, tailStart) { offset ->
+          readRange(file, offset, ZIP64_EOCD_MIN_SIZE.toLong())
+        }
+        validateDirectory(eocd, file.length())
+        val entries = parseCentralDirectory(readRange(file, eocd.centralDirectoryOffset, eocd.centralDirectorySize))
+        val entry = entries.firstOrNull { it.name == MANIFEST_ENTRY_NAME }
+          ?: error("Target entry $MANIFEST_ENTRY_NAME not found")
+        parseElfFiles(entries)
+        validateManifest(entry)
+        val header = ByteBuffer.wrap(readRange(file, entry.localHeaderOffset, LOCAL_FILE_HEADER_FIXED_SIZE))
+          .order(ByteOrder.LITTLE_ENDIAN)
+        require(header.int == LOCAL_FILE_HEADER_SIGNATURE_INT) { "Invalid local header signature" }
+        val method = header.getShort(8).toInt() and 0xFFFF
+        val nameLength = header.getShort(26).toInt() and 0xFFFF
+        val extraLength = header.getShort(28).toInt() and 0xFFFF
+        val dataStart = entry.localHeaderOffset + LOCAL_FILE_HEADER_FIXED_SIZE + nameLength + extraLength
+        decompressEntry(readRange(file, dataStart, entry.compressedSize), method)
+      }
+    } finally {
+      archive.delete()
     }
-    val cdStart = eocd.centralDirectoryOffset.toInt()
-    val cdEnd = (eocd.centralDirectoryOffset + eocd.centralDirectorySize).toInt()
-    require(cdStart >= 0 && cdEnd <= archive.size) { "Invalid central directory bounds" }
+  }
 
-    val entries = parseCentralDirectory(archive.copyOfRange(cdStart, cdEnd))
-    val entry = entries.firstOrNull { it.name == MANIFEST_ENTRY_NAME }
-      ?: error("Target entry $MANIFEST_ENTRY_NAME not found")
+  private fun validateDirectory(eocd: EocdInfo, archiveLength: Long) {
+    require(eocd.centralDirectorySize in 0..MAX_RANGE_BYTES.toLong()) { "Central directory exceeds preview budget" }
+    require(eocd.totalEntries in 0..MAX_DIRECTORY_ENTRIES) { "Too many ZIP entries for preview" }
+    require(
+      eocd.centralDirectoryOffset in 0..archiveLength &&
+        eocd.centralDirectorySize <= archiveLength - eocd.centralDirectoryOffset
+    ) { "Invalid central directory bounds" }
+  }
 
-    parseElfFiles(entries)
+  private fun validateManifest(entry: CdEntry) {
+    require(
+      entry.compressedSize in 0..MAX_MANIFEST_BYTES.toLong() &&
+        entry.uncompressedSize in 0..MAX_MANIFEST_BYTES.toLong()
+    ) { "Manifest exceeds preview budget" }
+  }
 
-    return extractEntryFromArchive(archive, entry)
+  private fun readRange(file: RandomAccessFile, offset: Long, length: Long): ByteArray {
+    require(
+      offset in 0..file.length() && length in 0..MAX_RANGE_BYTES.toLong() &&
+        length <= file.length() - offset
+    ) { "Invalid ZIP range" }
+    checkCancelled()
+    file.seek(offset)
+    val bytes = ByteArray(length.toInt())
+    var position = 0
+    while (position < bytes.size) {
+      checkCancelled()
+      val count = minOf(DEFAULT_BUFFER_SIZE, bytes.size - position)
+      file.readFully(bytes, position, count)
+      position += count
+    }
+    return bytes
   }
 
   private fun parseElfFiles(cdEntries: List<CdEntry>) {
     cdEntries.forEach {
+      checkCancelled()
       val path = it.name.split("/")
       if (path.size == 3 && path[0] == "lib" && path[2].endsWith(".so")) {
         val abi = STRING_ABI_MAP[path[1]] ?: return@forEach
@@ -487,39 +644,7 @@ class ApkPreview(val url: String) {
     }
   }
 
-  private fun extractEntryFromArchive(archive: ByteArray, entry: CdEntry): ByteArray {
-    require(entry.localHeaderOffset >= 0) { "Invalid local header offset" }
-    require(entry.localHeaderOffset <= Int.MAX_VALUE.toLong()) { "Local header offset exceeds supported range" }
-
-    val offset = entry.localHeaderOffset.toInt()
-    require(offset + LOCAL_FILE_HEADER_FIXED_SIZE_INT <= archive.size) { "Local header exceeds archive bounds" }
-
-    val buffer =
-      ByteBuffer.wrap(archive, offset, archive.size - offset).order(ByteOrder.LITTLE_ENDIAN)
-    val signature = buffer.int
-    require(signature == LOCAL_FILE_HEADER_SIGNATURE_INT) { "Invalid local header signature" }
-
-    buffer.short
-    buffer.short
-    val compressionMethod = buffer.short.toInt() and 0xFFFF
-    buffer.short
-    buffer.short
-    buffer.int
-    buffer.int
-    buffer.int
-    val nameLen = buffer.short.toInt() and 0xFFFF
-    val extraLen = buffer.short.toInt() and 0xFFFF
-
-    val dataStart = offset + LOCAL_FILE_HEADER_FIXED_SIZE_INT + nameLen + extraLen
-    require(entry.compressedSize <= Int.MAX_VALUE.toLong()) { "Compressed size exceeds supported range" }
-    val dataEnd = dataStart + entry.compressedSize.toInt()
-    require(dataEnd <= archive.size) { "Compressed data exceeds archive bounds" }
-
-    val compressedData = archive.copyOfRange(dataStart, dataEnd)
-    return decompressEntry(compressedData, compressionMethod)
-  }
-
-  private fun downloadArchiveTail(rangeStart: Long): TailDownload {
+  private fun downloadArchiveTail(rangeStart: Long, contentLength: Long): TailDownload {
     val request = newRequestBuilder()
       .header("Range", "bytes=$rangeStart-")
       .build()
@@ -529,17 +654,26 @@ class ApkPreview(val url: String) {
         throw RangeNotSupportedException("Tail request failed with code ${response.code}")
       }
 
-      val body = response.body.bytes()
       return when (response.code) {
-        HttpURLConnection.HTTP_PARTIAL -> TailDownload.Partial(body)
-        HttpURLConnection.HTTP_OK -> TailDownload.Full(body)
+        HttpURLConnection.HTTP_PARTIAL -> {
+          validateContentRange(response, rangeStart, contentLength - 1, contentLength)
+          val bytes = readBounded(response.body.byteStream(), EOCD_PROBE_BYTES.toInt())
+          require(bytes.size.toLong() == contentLength - rangeStart) { "Truncated tail response" }
+          TailDownload.Partial(bytes)
+        }
+
+        HttpURLConnection.HTTP_OK -> TailDownload.Full(processFullResponse(response))
+
         else -> throw RangeNotSupportedException("Unexpected response code ${response.code} for tail request")
       }
     }
   }
 
   private fun downloadRange(offset: Long, length: Long): ByteArray {
-    if (length <= 0) {
+    require(offset >= 0 && length in 0..MAX_RANGE_BYTES.toLong() && offset <= Long.MAX_VALUE - length) {
+      "Invalid or excessive preview range"
+    }
+    if (length == 0L) {
       return ByteArray(0)
     }
     val end = offset + length - 1
@@ -551,17 +685,38 @@ class ApkPreview(val url: String) {
       if (response.code != HttpURLConnection.HTTP_PARTIAL) {
         throw RangeNotSupportedException("Range request $offset-$end failed with code ${response.code}")
       }
-      return response.body.bytes()
+      validateContentRange(response, offset, end, rangeArchiveLength)
+      val bytes = readBounded(response.body.byteStream(), length.toInt())
+      require(bytes.size.toLong() == length) { "Truncated range response" }
+      return bytes
     }
   }
 
-  private fun downloadEntireArchive(): ByteArray {
-    executeRequest(newRequestBuilder().get().build()).use { response ->
-      if (!response.isSuccessful) {
-        error("Full download failed: ${response.code}")
-      }
-      return response.body.bytes()
+  private fun validateContentRange(response: Response, start: Long, end: Long, total: Long? = null) {
+    val match = CONTENT_RANGE.matchEntire(response.header("Content-Range").orEmpty())
+      ?: throw RangeNotSupportedException("Missing or invalid Content-Range")
+    val actualStart = match.groupValues[1].toLongOrNull()
+    val actualEnd = match.groupValues[2].toLongOrNull()
+    val actualTotal = match.groupValues[3].toLongOrNull()
+    if (actualStart != start || actualEnd == null || actualEnd < start || actualEnd != end ||
+      (actualTotal != null && actualEnd >= actualTotal) ||
+      (total != null && actualTotal != total)
+    ) {
+      throw RangeNotSupportedException("Unexpected Content-Range")
     }
+  }
+
+  private fun readBounded(input: InputStream, budget: Int): ByteArray {
+    val output = ByteArrayOutputStream(minOf(DEFAULT_BUFFER_SIZE, budget))
+    val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+    while (true) {
+      checkCancelled()
+      val count = input.read(buffer, 0, minOf(buffer.size, budget - output.size() + 1))
+      if (count < 0) break
+      require(count <= budget - output.size()) { "Response exceeds preview budget" }
+      output.write(buffer, 0, count)
+    }
+    return output.toByteArray()
   }
 
   private fun newRequestBuilder(): Request.Builder = Request.Builder()
@@ -569,25 +724,36 @@ class ApkPreview(val url: String) {
     .header("Accept-Encoding", "identity")
 
   private fun executeRequest(request: Request) = try {
-    client.newCall(request).execute()
+    checkCancelled()
+    val call = client.newCall(request)
+    activeCall.set(call)
+    checkCancelled()
+    call.execute()
   } catch (e: SocketTimeoutException) {
+    checkCancelled()
     throw ApkPreviewNetworkException("Request to $url timed out", e)
   } catch (e: IOException) {
+    checkCancelled()
     throw ApkPreviewNetworkException("Request to $url failed", e)
   }
 
   private companion object {
     private const val MANIFEST_ENTRY_NAME = "AndroidManifest.xml"
-    private const val EOCD_PROBE_BYTES = 65557L
     private const val EOCD_MIN_SIZE = 22
     private const val ZIP64_LOCATOR_SIZE = 20
     private const val ZIP64_EOCD_MIN_SIZE = 56
+    private const val EOCD_PROBE_BYTES = 65557L + ZIP64_LOCATOR_SIZE + ZIP64_EOCD_MIN_SIZE
     private const val ZIP32_MAX_ENTRIES = 0xFFFF
     private const val ZIP32_MAX_VALUE = 0xFFFFFFFFL
-    private const val LOCAL_HEADER_PROBE_BYTES = 8192L
+    private const val LOCAL_HEADER_PROBE_BYTES = 30L
+
+    // Bound only preview structures, never the complete APK streamed to disk.
+    private const val MAX_RANGE_BYTES = 32 * 1024 * 1024
+    private const val MAX_MANIFEST_BYTES = 16 * 1024 * 1024
+    private const val MAX_DIRECTORY_ENTRIES = 250_000
+    private val CONTENT_RANGE = Regex("bytes ([0-9]+)-([0-9]+)/([0-9]+|\\*)")
     private const val CENTRAL_DIRECTORY_FIXED_HEADER_SIZE = 46
     private const val LOCAL_FILE_HEADER_FIXED_SIZE = 30L
-    private const val LOCAL_FILE_HEADER_FIXED_SIZE_INT = 30
     private val EOCD_SIGNATURE =
       byteArrayOf(0x50.toByte(), 0x4B.toByte(), 0x05.toByte(), 0x06.toByte())
     private const val EOCD_SIGNATURE_INT = 0x06054b50

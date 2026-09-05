@@ -2,26 +2,28 @@ package com.absinthe.libchecker.utils.apk
 
 import android.os.Trace
 import java.io.File
+import kotlinx.coroutines.CancellationException
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
 import org.apache.commons.compress.archivers.zip.ZipFile
 import timber.log.Timber
 
 internal object ZipDataOffsetReader {
 
-  fun read(file: File, entryNames: Set<String>): Map<String, Long> {
+  fun read(file: File, entryNames: Set<String>, checkCancelled: () -> Unit = {}): Map<String, Long> {
+    checkCancelled()
     if (entryNames.isEmpty()) {
       return emptyMap()
     }
     val offsets = traceSection(TRACE_ZIP_DATA_OFFSET_CENTRAL_DIRECTORY) {
-      readFromCentralDirectory(file, entryNames)
+      readFromCentralDirectory(file, entryNames, checkCancelled)
     }
     if (offsets.keys.containsAll(entryNames)) {
       return offsets
     }
-    return readWithApache(file, entryNames)
+    return readWithApache(file, entryNames, checkCancelled)
   }
 
-  internal fun readFromCentralDirectory(file: File, entryNames: Set<String>): Map<String, Long> {
+  internal fun readFromCentralDirectory(file: File, entryNames: Set<String>, checkCancelled: () -> Unit = {}): Map<String, Long> {
     return runCatching {
       FileSeekableInput(file).use { input ->
         val eocdOffset = input.findEndOfCentralDirectoryOffset()
@@ -40,6 +42,7 @@ internal object ZipDataOffsetReader {
         var remainingBytes = directory.size
         input.position = directory.offset
         while (remainingBytes >= ZIP_CENTRAL_DIRECTORY_FIXED_SIZE && remainingEntryNames.isNotEmpty()) {
+          checkCancelled()
           val entryOffset = input.position
           val header = ByteArray(ZIP_CENTRAL_DIRECTORY_FIXED_SIZE)
           input.readFully(header)
@@ -76,21 +79,24 @@ internal object ZipDataOffsetReader {
         offsets
       }
     }.onFailure {
+      if (it is CancellationException) throw it
       Timber.w(it, "Failed to read ZIP data offsets from ${file.absolutePath}")
     }.getOrDefault(emptyMap())
   }
 
-  private fun readWithApache(file: File, entryNames: Set<String>): Map<String, Long> {
+  private fun readWithApache(file: File, entryNames: Set<String>, checkCancelled: () -> Unit): Map<String, Long> {
     return traceSection(TRACE_ZIP_DATA_OFFSET_APACHE) {
       runCatching {
         ZipFile.Builder().setFile(file).get().use { zipFile ->
           entryNames.associateWith { entryName ->
+            checkCancelled()
             val entry = zipFile.getEntry(entryName)
               ?: throw IllegalArgumentException("ZIP entry $entryName was not found in ${file.absolutePath}")
             getDataOffsetMethod.invoke(zipFile, entry) as Long
           }
         }
       }.onFailure {
+        if (it is CancellationException) throw it
         Timber.w(it, "Failed to read ZIP data offsets with Commons Compress from ${file.absolutePath}")
       }.getOrDefault(emptyMap())
     }

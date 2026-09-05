@@ -192,31 +192,7 @@ class CompareSnapshotItemsUseCase {
       return DiffIndicator(removed = Int.MAX_VALUE)
     }
 
-    val tempOldList = oldList.toMutableList()
-    val tempNewList = newList.toMutableList()
-    val node = DiffIndicator()
-
-    val iterator = tempNewList.iterator()
-    var nextItem: LibStringItem
-
-    while (iterator.hasNext()) {
-      nextItem = iterator.next()
-      oldList.find { it.name == nextItem.name }?.let {
-        if (it.size != nextItem.size) {
-          node.changed += 1
-        }
-        iterator.remove()
-        tempOldList.remove(tempOldList.find { item -> item.name == nextItem.name })
-      }
-    }
-
-    if (tempOldList.isNotEmpty()) {
-      node.removed = tempOldList.size
-    }
-    if (tempNewList.isNotEmpty()) {
-      node.added = tempNewList.size
-    }
-    return node
+    return compareNamedItems(oldList, newList) { old, new -> old.size != new.size }
   }
 
   private fun compareComponentsDiff(diffNode: SnapshotDiffItem.DiffNode<String>): DiffIndicator {
@@ -239,8 +215,9 @@ class CompareSnapshotItemsUseCase {
     val pendingRemovedOldSet = mutableSetOf<String>()
     val pendingRemovedNewSet = mutableSetOf<String>()
 
+    val firstRemovedByShortName = removeList.reversed().associateBy { it.substringAfterLast(".") }
     for (item in addList) {
-      removeList.find { it.substringAfterLast(".") == item.substringAfterLast(".") }?.let {
+      firstRemovedByShortName[item.substringAfterLast(".")]?.let {
         node.moved += 1
         pendingRemovedOldSet += it
         pendingRemovedNewSet += item
@@ -287,30 +264,25 @@ class CompareSnapshotItemsUseCase {
       return DiffIndicator(removed = Int.MAX_VALUE)
     }
 
-    val tempOldList = oldList.toMutableList()
-    val tempNewList = newList.toMutableList()
+    return compareNamedItems(oldList, newList) { old, new -> old.source != new.source }
+  }
+
+  private fun compareNamedItems(
+    oldList: List<LibStringItem>,
+    newList: List<LibStringItem>,
+    changed: (LibStringItem, LibStringItem) -> Boolean
+  ): DiffIndicator {
+    val index = SnapshotNameIndex(oldList)
     val node = DiffIndicator()
-
-    val iterator = tempNewList.iterator()
-    var nextItem: LibStringItem
-
-    while (iterator.hasNext()) {
-      nextItem = iterator.next()
-      oldList.find { it.name == nextItem.name }?.let {
-        if (it.source != nextItem.source) {
-          node.changed += 1
-        }
-        iterator.remove()
-        tempOldList.remove(tempOldList.find { item -> item.name == nextItem.name })
+    for (item in newList) {
+      val old = index.match(item.name)
+      if (old == null) {
+        node.added++
+      } else if (changed(old, item)) {
+        node.changed++
       }
     }
-
-    if (tempOldList.isNotEmpty()) {
-      node.removed = tempOldList.size
-    }
-    if (tempNewList.isNotEmpty()) {
-      node.added = tempNewList.size
-    }
+    node.removed = index.remainingItems().size
     return node
   }
 

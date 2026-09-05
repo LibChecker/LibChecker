@@ -68,19 +68,22 @@ interface LCDao {
   suspend fun getSnapshotSummaries(): List<SnapshotSummaryItem>
 
   @Transaction
-  @Query("SELECT * from snapshot_table WHERE timeStamp LIKE :timestamp ORDER BY packageName ASC")
+  @Query("SELECT * from snapshot_table WHERE timeStamp = :timestamp ORDER BY packageName ASC")
   suspend fun getSnapshots(timestamp: Long): List<SnapshotItem>
 
-  @Query("SELECT id, packageName, timeStamp, label, versionName, versionCode, isArchived, installedTime, lastUpdatedTime, isSystem, abi, targetApi, packageSize, compileSdk, minSdk, dexInfo, resourceInfo, resourcesSize, statsVersion, dexStatsAvailable, resourceStatsAvailable from snapshot_table WHERE timeStamp LIKE :timestamp ORDER BY packageName ASC")
+  @Query("SELECT id, packageName, timeStamp, label, versionName, versionCode, isArchived, installedTime, lastUpdatedTime, isSystem, abi, targetApi, packageSize, compileSdk, minSdk, dexInfo, resourceInfo, resourcesSize, statsVersion, dexStatsAvailable, resourceStatsAvailable from snapshot_table WHERE timeStamp = :timestamp ORDER BY packageName ASC")
   suspend fun getSnapshotSummaries(timestamp: Long): List<SnapshotSummaryItem>
 
-  @Query("SELECT * from snapshot_table WHERE timeStamp LIKE :timestamp AND packageName LIKE :packageName ORDER BY packageName ASC")
+  @Query("SELECT * from snapshot_table WHERE timeStamp = :timestamp AND packageName = :packageName ORDER BY packageName ASC")
   suspend fun getSnapshot(timestamp: Long, packageName: String): SnapshotItem?
 
-  @Query("SELECT id, packageName, timeStamp, label, versionName, versionCode, isArchived, installedTime, lastUpdatedTime, isSystem, abi, targetApi, packageSize, compileSdk, minSdk, dexInfo, resourceInfo, resourcesSize, statsVersion, dexStatsAvailable, resourceStatsAvailable from snapshot_table WHERE timeStamp LIKE :timestamp AND packageName LIKE :packageName ORDER BY packageName ASC")
+  @Query("SELECT * FROM snapshot_table WHERE timeStamp = :timestamp AND packageName IN (:packageNames) ORDER BY packageName ASC, id ASC")
+  suspend fun getSnapshots(timestamp: Long, packageNames: List<String>): List<SnapshotItem>
+
+  @Query("SELECT id, packageName, timeStamp, label, versionName, versionCode, isArchived, installedTime, lastUpdatedTime, isSystem, abi, targetApi, packageSize, compileSdk, minSdk, dexInfo, resourceInfo, resourcesSize, statsVersion, dexStatsAvailable, resourceStatsAvailable from snapshot_table WHERE timeStamp = :timestamp AND packageName = :packageName ORDER BY packageName ASC")
   suspend fun getSnapshotSummary(timestamp: Long, packageName: String): SnapshotSummaryItem?
 
-  @Query("SELECT COUNT(*) from snapshot_table WHERE timeStamp LIKE :timestamp")
+  @Query("SELECT COUNT(*) from snapshot_table WHERE timeStamp = :timestamp")
   fun getSnapshotsCountFlow(timestamp: Long): Flow<Int>
 
   @Query("SELECT timeStamp AS timestamp, COUNT(*) AS count FROM snapshot_table GROUP BY timeStamp")
@@ -124,13 +127,13 @@ interface LCDao {
   @Query("SELECT * from timestamp_table ORDER BY timestamp DESC")
   suspend fun getTimeStamps(): List<TimeStampItem>
 
-  @Query("SELECT * from timestamp_table WHERE timeStamp LIKE :timestamp")
+  @Query("SELECT * from timestamp_table WHERE timeStamp = :timestamp")
   suspend fun getTimeStamp(timestamp: Long): TimeStampItem?
 
   @Delete
   suspend fun delete(item: TimeStampItem)
 
-  @Query("DELETE from timestamp_table WHERE timestamp LIKE :timestamp")
+  @Query("DELETE from timestamp_table WHERE timestamp = :timestamp")
   suspend fun deleteByTimeStamp(timestamp: Long)
 
   @Update
@@ -159,6 +162,6 @@ interface LCDao {
   @Query("DELETE FROM diff_table")
   suspend fun deleteAllSnapshotDiffItems()
 
-  @Query("SELECT * from diff_table WHERE packageName LIKE :packageName")
+  @Query("SELECT * from diff_table WHERE packageName = :packageName")
   suspend fun getSnapshotDiff(packageName: String): SnapshotDiffStoringItem?
 }
