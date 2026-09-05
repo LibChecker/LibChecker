@@ -107,6 +107,10 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
   private var highlightIndex = -1
   private var highlightStartedAt = 0L
   private var highlightProgress = 0f
+  private var outgoingHighlightBitmap: Bitmap? = null
+  private var outgoingHighlightIndex = -1
+  private var outgoingHighlightStartedAt = 0L
+  private var outgoingHighlightProgress = 0f
 
   override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
     super.onSizeChanged(w, h, oldw, oldh)
@@ -137,11 +141,10 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
     }
     val cx = width / 2f
     val cy = height / 2f
-    val highlightAngle = resolveHighlightAngle()
-
     for (ringIndex in ringSpecs.indices) {
-      drawRing(canvas, cx, cy, ringIndex, ringSpecs[ringIndex], highlightAngle)
+      drawRing(canvas, cx, cy, ringIndex, ringSpecs[ringIndex])
     }
+    drawHighlight(canvas, cx, cy, outgoingHighlightBitmap, outgoingHighlightIndex, outgoingHighlightProgress)
     drawHighlight(canvas, cx, cy)
   }
 
@@ -213,6 +216,10 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
   }
 
   private fun updateHighlight(now: Long) {
+    if (outgoingHighlightBitmap != null) {
+      outgoingHighlightProgress = computeHighlightProgress((now - outgoingHighlightStartedAt).coerceAtLeast(0L))
+      if (outgoingHighlightProgress <= 0f) clearOutgoingHighlight()
+    }
     if (currentHighlightBitmap == null) {
       pendingHighlightBitmap?.let { bitmap ->
         pendingHighlightBitmap = null
@@ -224,7 +231,18 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
 
     val elapsed = (now - highlightStartedAt).coerceAtLeast(0L)
     val cycleDuration = HIGHLIGHT_DURATION + HIGHLIGHT_HOLD_DURATION
-    if (elapsed >= cycleDuration) {
+    val shrinkStartedAt = HIGHLIGHT_DURATION * 0.3f + HIGHLIGHT_HOLD_DURATION
+    if (elapsed >= shrinkStartedAt && pendingHighlightBitmap != null) {
+      clearOutgoingHighlight()
+      outgoingHighlightBitmap = currentHighlightBitmap
+      outgoingHighlightIndex = highlightIndex
+      outgoingHighlightStartedAt = highlightStartedAt
+      outgoingHighlightProgress = computeHighlightProgress(elapsed)
+      val next = checkNotNull(pendingHighlightBitmap)
+      pendingHighlightBitmap = null
+      activateHighlight(next, now)
+      requestHighlight()
+    } else if (elapsed >= cycleDuration) {
       clearCurrentHighlight()
       pendingHighlightBitmap?.let { bitmap ->
         pendingHighlightBitmap = null
@@ -319,8 +337,16 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
 
   private fun clearHighlightBitmaps() {
     clearCurrentHighlight()
+    clearOutgoingHighlight()
     pendingHighlightBitmap?.let(::recycleBitmap)
     pendingHighlightBitmap = null
+  }
+
+  private fun clearOutgoingHighlight() {
+    outgoingHighlightBitmap?.let(::recycleBitmap)
+    outgoingHighlightBitmap = null
+    outgoingHighlightIndex = -1
+    outgoingHighlightProgress = 0f
   }
 
   private fun clearCurrentHighlight() {
@@ -400,49 +426,60 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
     cx: Float,
     cy: Float,
     ringIndex: Int,
-    spec: RingSpec,
-    highlightAngle: Float?
+    spec: RingSpec
   ) {
     val angleStep = 360f / DOT_COUNT
     val colors = dotColors[ringIndex]
     val baseRadius = ringRadii.getOrElse(ringIndex) { 0f }
     val phaseOffset = phaseOffsets.getOrElse(ringIndex) { 0f }
     val rotation = ringRotations.getOrElse(ringIndex) { 0f }
-    val highlightOrbit = ringRadii.last() * (1f + HIGHLIGHT_RING_PUSH * highlightProgress)
-    val highlightRadians = Math.toRadians((highlightAngle ?: 0f).toDouble())
-    val highlightX = cx + (cos(highlightRadians) * highlightOrbit).toFloat()
-    val highlightY = cy + (sin(highlightRadians) * highlightOrbit).toFloat()
-    val clearance = ringSpecs.last().dotRadiusPx * (1f + highlightProgress * (HIGHLIGHT_MAX_SCALE - 1f)) +
-      spec.dotRadiusPx + highlightGapPx * highlightProgress
-    val clearanceSquared = clearance * clearance
-
     for (dotIndex in 0 until DOT_COUNT) {
       val baseAngle = dotIndex * angleStep
       val angle = normalizeDegrees(baseAngle + phaseOffset + rotation)
-      val isHighlightDot = ringIndex == ringSpecs.lastIndex && dotIndex == highlightIndex
-      var radius = if (isHighlightDot) highlightOrbit else baseRadius
-      if (highlightAngle != null && ringIndex < ringSpecs.lastIndex) {
+      val dotProgress = when (dotIndex) {
+        highlightIndex -> highlightProgress
+        outgoingHighlightIndex -> outgoingHighlightProgress
+        else -> 0f
+      }
+      val isHighlightDot = ringIndex == ringSpecs.lastIndex && dotProgress > 0f
+      var pressure = 0f
+      for (slot in 0..1) {
+        val index = if (slot == 0) highlightIndex else outgoingHighlightIndex
+        val progress = if (slot == 0) highlightProgress else outgoingHighlightProgress
+        val highlightAngle = resolveHighlightAngle(index) ?: continue
         val distance = abs((angle - highlightAngle + 540f) % 360f - 180f)
         val influence = (1f - distance / (angleStep * 2.5f)).coerceIn(0f, 1f)
-        val pressure = influence * influence * (3f - 2f * influence) * highlightProgress
-        // Move the inner rings together to preserve spacing as the icon presses inward.
-        radius *= 1f - HIGHLIGHT_INNER_RING_PUSH * pressure
+        pressure = max(pressure, influence * influence * (3f - 2f * influence) * progress)
+      }
+      val radius = when {
+        isHighlightDot -> baseRadius * (1f + HIGHLIGHT_RING_PUSH * dotProgress)
+        ringIndex < ringSpecs.lastIndex -> baseRadius * (1f - HIGHLIGHT_INNER_RING_PUSH * pressure)
+        else -> baseRadius
       }
       val angleRad = Math.toRadians(angle.toDouble())
       var x = cx + (cos(angleRad) * radius).toFloat()
       var y = cy + (sin(angleRad) * radius).toFloat()
-      if (highlightAngle != null && highlightProgress > 0f && ringIndex == ringSpecs.lastIndex && !isHighlightDot) {
-        val dx = x - highlightX
-        val dy = y - highlightY
-        if (dx * dx + dy * dy < clearanceSquared) {
-          val distance = hypot(dx, dy).coerceAtLeast(0.001f)
-          val displacement = (clearance - distance).coerceAtLeast(0f) / distance
-          x += dx * displacement
-          y += dy * displacement
+      if (ringIndex == ringSpecs.lastIndex && !isHighlightDot) {
+        for (slot in 0..1) {
+          val index = if (slot == 0) highlightIndex else outgoingHighlightIndex
+          val progress = if (slot == 0) highlightProgress else outgoingHighlightProgress
+          val highlightAngle = resolveHighlightAngle(index) ?: continue
+          if (progress <= 0f) continue
+          val orbit = baseRadius * (1f + HIGHLIGHT_RING_PUSH * progress)
+          val radians = Math.toRadians(highlightAngle.toDouble())
+          val dx = x - cx - (cos(radians) * orbit).toFloat()
+          val dy = y - cy - (sin(radians) * orbit).toFloat()
+          val clearance = spec.dotRadiusPx * (2f + progress * (HIGHLIGHT_MAX_SCALE - 1f)) + highlightGapPx * progress
+          if (dx * dx + dy * dy < clearance * clearance) {
+            val distance = hypot(dx, dy).coerceAtLeast(0.001f)
+            val displacement = (clearance - distance).coerceAtLeast(0f) / distance
+            x += dx * displacement
+            y += dy * displacement
+          }
         }
       }
       val alpha = if (isHighlightDot) {
-        (RING_ALPHA * (1f - highlightProgress)).roundToInt()
+        (RING_ALPHA * (1f - dotProgress)).roundToInt()
       } else {
         RING_ALPHA
       }
@@ -453,7 +490,11 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
   }
 
   private fun drawHighlight(canvas: Canvas, cx: Float, cy: Float) {
-    val bitmap = currentHighlightBitmap?.takeUnless { it.isRecycled } ?: return
+    drawHighlight(canvas, cx, cy, currentHighlightBitmap, highlightIndex, highlightProgress)
+  }
+
+  private fun drawHighlight(canvas: Canvas, cx: Float, cy: Float, icon: Bitmap?, highlightIndex: Int, highlightProgress: Float) {
+    val bitmap = icon?.takeUnless { it.isRecycled } ?: return
     if (highlightIndex < 0 || highlightProgress <= 0f) return
 
     val ringIndex = ringSpecs.lastIndex
@@ -527,11 +568,9 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
   }
 
   private fun pickNextHighlight(previous: Int): Int {
-    var next: Int
-    do {
-      next = Random.nextInt(DOT_COUNT)
-    } while (next == previous)
-    return next
+    if (previous < 0) return Random.nextInt(DOT_COUNT)
+    // Keep the incoming and outgoing icons apart during their overlap.
+    return (previous + Random.nextInt(DOT_COUNT / 4, DOT_COUNT * 3 / 4 + 1)) % DOT_COUNT
   }
 
   private fun sampleGradient(position: Float): Int {
@@ -547,8 +586,8 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
     return gradientStops.last()
   }
 
-  private fun resolveHighlightAngle(): Float? {
-    if (currentHighlightBitmap == null || highlightIndex < 0) return null
+  private fun resolveHighlightAngle(highlightIndex: Int): Float? {
+    if (highlightIndex < 0) return null
     val ringIndex = ringSpecs.lastIndex
     return normalizeDegrees(highlightIndex * (360f / DOT_COUNT) + phaseOffsets[ringIndex] + ringRotations[ringIndex])
   }

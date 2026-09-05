@@ -5,6 +5,7 @@ import android.app.UiAutomation
 import android.content.Intent
 import android.graphics.Rect
 import android.os.SystemClock
+import android.view.MotionEvent
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.preference.TwoStatePreference
@@ -30,6 +31,58 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class FloatingNavigationPreferenceInstrumentedTest {
+  @Test
+  fun pressingAnotherTabMovesAndShrinksBeforeReleaseAndCancelRestoresSelection() {
+    val instrumentation = InstrumentationRegistry.getInstrumentation()
+    val monitor = instrumentation.addMonitor(MainActivity::class.java.name, null, false)
+    val originalFloatingNavigation = GlobalValues.isFloatingNavBar
+    var activity: MainActivity? = null
+    try {
+      assertTrue(instrumentation.uiAutomation.setRotation(UiAutomation.ROTATION_FREEZE_0))
+      GlobalValues.isFloatingNavBar = true
+      instrumentation.targetContext.startActivity(
+        Intent(instrumentation.targetContext, MainActivity::class.java)
+          .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+      )
+      val launchedActivity = instrumentation.waitForMonitorWithTimeout(monitor, 10_000L) as MainActivity
+      activity = launchedActivity
+      val navView = launchedActivity.findViewById<NavigationBarView>(R.id.nav_view)
+      assertTrue(waitUntil(instrumentation) { navView.isLaidOut && (navView as FloatingNavigationBar).currentFloatingProgress == 1f })
+      val thumb = navView.getChildAt(0)
+      var originalSelection = 0
+      var originalTranslation = 0f
+      val target = Rect()
+      val downTime = SystemClock.uptimeMillis()
+      fun sendTouch(action: Int) {
+        instrumentation.runOnMainSync {
+          val event = MotionEvent.obtain(downTime, SystemClock.uptimeMillis(), action, target.exactCenterX(), target.exactCenterY(), 0)
+          navView.dispatchTouchEvent(event)
+          event.recycle()
+        }
+      }
+      instrumentation.runOnMainSync {
+        originalSelection = navView.selectedItemId
+        originalTranslation = thumb.translationX
+        val item = navView.findViewById<View>(R.id.navigation_settings)
+        target.set(0, 0, item.width, item.height)
+        navView.offsetDescendantRectToMyCoords(item, target)
+      }
+      sendTouch(MotionEvent.ACTION_DOWN)
+      assertTrue(waitUntil(instrumentation) { thumb.translationX > originalTranslation + 20f && thumb.scaleX < 0.99f })
+      instrumentation.runOnMainSync { assertEquals(originalSelection, navView.selectedItemId) }
+      sendTouch(MotionEvent.ACTION_CANCEL)
+      assertTrue(waitUntil(instrumentation) { kotlin.math.abs(thumb.translationX - originalTranslation) < 1f && kotlin.math.abs(thumb.scaleX - 1f) < 0.01f })
+      sendTouch(MotionEvent.ACTION_DOWN)
+      sendTouch(MotionEvent.ACTION_UP)
+      assertTrue(waitUntil(instrumentation) { navView.selectedItemId == R.id.navigation_settings && thumb.translationX > originalTranslation + 20f && kotlin.math.abs(thumb.scaleX - 1f) < 0.01f })
+    } finally {
+      instrumentation.runOnMainSync { activity?.finish() }
+      GlobalValues.isFloatingNavBar = originalFloatingNavigation
+      instrumentation.removeMonitor(monitor)
+      instrumentation.uiAutomation.setRotation(UiAutomation.ROTATION_UNFREEZE)
+    }
+  }
+
   @Test
   fun attachedGeometryMatchesSelectedSettingsIndicator() {
     val instrumentation = InstrumentationRegistry.getInstrumentation()

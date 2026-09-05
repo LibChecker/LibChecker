@@ -624,7 +624,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
       if (top >= height || bottom <= top || left >= right) return
 
       val cornerRadius = ((bottom - top) / 2f) * floatingNavProgress
-      navClipPath.setG2Shape(left, top, right, bottom, cornerRadius, cornerSmoothing = 1f)
+      navClipPath.setG2Shape(left, top, right, bottom, cornerRadius)
       canvas.withClip(navClipPath) {
         drawNavBackdrop(this, source, left, top, right, bottom)
       }
@@ -643,8 +643,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
         top + halfStroke,
         right - halfStroke,
         bottom - halfStroke,
-        (cornerRadius - halfStroke).coerceAtLeast(0f),
-        cornerSmoothing = 1f
+        (cornerRadius - halfStroke).coerceAtLeast(0f)
       )
       canvas.drawPath(navStrokePath, strokePaint)
       drawNavDivider(canvas, top, floatingNavProgress)

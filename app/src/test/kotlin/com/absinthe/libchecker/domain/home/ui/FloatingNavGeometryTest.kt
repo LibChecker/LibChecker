@@ -13,35 +13,42 @@ class FloatingNavGeometryTest {
   fun `geometry interpolates from attached to floating state`() {
     listOf(
       0f to FloatingNavGeometry(0, 0, systemBarBottomInset),
-      0.5f to FloatingNavGeometry(24, 36, 36),
-      1f to FloatingNavGeometry(maxHorizontalMargin, systemBarBottomInset, 0)
+      0.5f to FloatingNavGeometry(24, 48, 36),
+      1f to FloatingNavGeometry(maxHorizontalMargin, 96, 0)
     ).forEach { (progress, expected) ->
-      val actual = calculateFloatingNavGeometry(progress, maxHorizontalMargin, systemBarBottomInset)
+      val actual = calculateFloatingNavGeometry(progress, maxHorizontalMargin, systemBarBottomInset, 24)
       assertEquals("progress=$progress", expected, actual)
-      assertEquals(systemBarBottomInset, actual.bottomMargin + actual.bottomPadding)
+      assertEquals(systemBarBottomInset + (24 * progress).toInt(), actual.bottomMargin + actual.bottomPadding)
     }
   }
 
   @Test
-  fun `zero inset produces zero bottom margin and padding`() {
+  fun `zero inset keeps minimum floating clearance without internal padding`() {
     listOf(0f, 0.5f, 1f).forEach { progress ->
       val geometry = calculateFloatingNavGeometry(
         progress = progress,
         maxHorizontalMargin = maxHorizontalMargin,
-        systemBarBottomInset = 0
+        systemBarBottomInset = 0,
+        extraBottomSpacing = 24
       )
-      assertEquals(0, geometry.bottomMargin)
+      assertEquals(((maxHorizontalMargin + 24) * progress).toInt(), geometry.bottomMargin)
       assertEquals(0, geometry.bottomPadding)
     }
+  }
+
+  @Test
+  fun `small inset keeps minimum clearance and nonnegative padding`() {
+    assertEquals(FloatingNavGeometry(24, 36, 6), calculateFloatingNavGeometry(0.5f, 48, 12, 24))
+    assertEquals(FloatingNavGeometry(48, 72, 0), calculateFloatingNavGeometry(1f, 48, 12, 24))
   }
 
   @Test
   fun `progress is clamped to 0 and 1`() {
     listOf(
       -0.5f to FloatingNavGeometry(0, 0, systemBarBottomInset),
-      1.5f to FloatingNavGeometry(maxHorizontalMargin, systemBarBottomInset, 0)
+      1.5f to FloatingNavGeometry(maxHorizontalMargin, 96, 0)
     ).forEach { (progress, expected) ->
-      assertEquals(expected, calculateFloatingNavGeometry(progress, maxHorizontalMargin, systemBarBottomInset))
+      assertEquals(expected, calculateFloatingNavGeometry(progress, maxHorizontalMargin, systemBarBottomInset, 24))
     }
   }
 

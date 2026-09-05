@@ -31,5 +31,5 @@
 
   <dimen name="detail_toolbar_size">48dp</dimen>
   <dimen name="floating_nav_bar_margin_horizontal">16dp</dimen>
-  <dimen name="floating_nav_rail_width">72dp</dimen>
+  <dimen name="floating_nav_rail_width">68dp</dimen>
 </resources>

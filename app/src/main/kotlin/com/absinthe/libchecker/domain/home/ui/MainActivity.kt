@@ -387,8 +387,7 @@ class MainActivity :
     originalLabelVisibilityMode = navView.labelVisibilityMode
     originalNavBackground = navView.background
     navPillDrawable = G2PillDrawable(
-      fillColor = getColorByAttr(com.google.android.material.R.attr.colorSurfaceContainer),
-      cornerSmoothing = 1f
+      fillColor = getColorByAttr(com.google.android.material.R.attr.colorSurfaceContainer)
     )
     if (floatingNavEnabled) {
       navView.background = navPillDrawable
@@ -439,7 +438,8 @@ class MainActivity :
       val geometry = calculateFloatingNavGeometry(
         progress = progress,
         maxHorizontalMargin = maxHorizontalMargin,
-        systemBarBottomInset = systemBarBottomInset
+        systemBarBottomInset = systemBarBottomInset,
+        extraBottomSpacing = (8 * density).roundToInt()
       )
       if (lp != null) {
         lp.leftMargin = geometry.horizontalMargin
@@ -455,7 +455,11 @@ class MainActivity :
       )
       val floatingWidth = resources.getDimensionPixelSize(R.dimen.floating_nav_rail_width)
       val parentHeight = (view.parent as? View)?.height ?: 0
-      lp.marginStart = margin
+      val insets = ViewCompat.getRootWindowInsets(view)?.getInsets(
+        WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
+      )
+      val startInset = if (view.layoutDirection == View.LAYOUT_DIRECTION_RTL) insets?.right else insets?.left
+      lp.marginStart = margin + (startInset ?: 0)
       lp.topMargin = margin
       lp.bottomMargin = margin
       lp.width = normalWidth + ((floatingWidth - normalWidth) * clampedProgress).roundToInt()
@@ -481,9 +485,10 @@ class MainActivity :
         lp.height = parentHeight + ((floatingHeight - parentHeight) * clampedProgress).roundToInt()
       }
       view.minimumWidth = 0
-      ViewCompat.getRootWindowInsets(view)?.getInsets(WindowInsetsCompat.Type.systemBars())?.let { insets ->
+      insets?.let { insets ->
         applyNavigationRailPadding(view, insets, clampedProgress)
       }
+      view.layoutParams = lp
     }
     view.requestLayout()
 
@@ -883,7 +888,7 @@ class MainActivity :
     val popup = createRecentVisitsPopup(anchor, libraries)
     if (touch != null) {
       val token = popup.prepareDrag(item, source, touch)
-      if (!startRecentVisitDrag(source, item, token, popup::finishDrag)) return false
+      if (!startRecentVisitDrag(source, item, token, popup::finishDrag) { x, y -> popup.updateDragLocation(source, x, y) }) return false
     } else {
       // TalkBack's labelled action offers the same operation without a spatial gesture.
       recentVisitsViewModel.pin(item)
@@ -1025,8 +1030,7 @@ class MainActivity :
 
   private fun fixNavigationRailInsets(view: NavigationRailView) {
     ViewCompat.setOnApplyWindowInsetsListener(view) { _, windowInsets ->
-      val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-      applyNavigationRailPadding(view, insets, floatingNavProgress)
+      applyFloatingNavProgress(view, floatingNavProgress)
       windowInsets
     }
     ViewCompat.requestApplyInsets(view)
@@ -1147,12 +1151,14 @@ internal data class FloatingNavGeometry(
 internal fun calculateFloatingNavGeometry(
   progress: Float,
   maxHorizontalMargin: Int,
-  systemBarBottomInset: Int
+  systemBarBottomInset: Int,
+  extraBottomSpacing: Int
 ): FloatingNavGeometry {
   val clampedProgress = progress.coerceIn(0f, 1f)
   val hMargin = (maxHorizontalMargin * clampedProgress).roundToInt()
-  val bMargin = (systemBarBottomInset.coerceAtLeast(0) * clampedProgress).roundToInt()
-  val bPadding = systemBarBottomInset.coerceAtLeast(0) - bMargin
+  val inset = systemBarBottomInset.coerceAtLeast(0)
+  val bMargin = ((maxOf(inset, maxHorizontalMargin) + extraBottomSpacing) * clampedProgress).roundToInt()
+  val bPadding = inset - (inset * clampedProgress).roundToInt()
   return FloatingNavGeometry(
     horizontalMargin = hMargin,
     bottomMargin = bMargin,
