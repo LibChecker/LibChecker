@@ -262,25 +262,12 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
   private var suppressManagedChildDraw = false
 
   /**
-   * Draws [child] into the captured content node while honoring the transform properties that
-   * [View.draw] would otherwise ignore, so page transition slide/fade animations stay visible.
+   * Use the normal child drawing path so Android can reuse its display list and refresh dirty
+   * descendants, while applying scroll, matrix, alpha and animation properties consistently.
    */
   private fun drawCapturedContent(canvas: Canvas, child: View) {
-    val layerAlpha = capturedChildLayerAlpha(child.alpha)
-    if (layerAlpha <= 0) return
-    val checkpoint = if (layerAlpha < OPAQUE_LAYER_ALPHA) {
-      canvas.saveLayerAlpha(0f, 0f, canvas.width.toFloat(), canvas.height.toFloat(), layerAlpha)
-    } else {
-      canvas.save()
-    }
-    try {
-      canvas.translate(
-        child.left + child.translationX,
-        child.top + child.translationY
-      )
-      child.draw(canvas)
-    } finally {
-      canvas.restoreToCount(checkpoint)
+    if (child.visibility == VISIBLE || child.animation != null) {
+      super.drawChild(canvas, child, drawingTime)
     }
   }
 
@@ -848,8 +835,6 @@ internal fun calculateDownsampledBlurRadius(
 }
 
 internal fun opaqueBackdropColor(color: Int): Int = color or 0xFF000000.toInt()
-
-internal fun capturedChildLayerAlpha(childAlpha: Float): Int = (childAlpha.coerceIn(0f, 1f) * OPAQUE_LAYER_ALPHA).roundToInt()
 
 internal fun blurBackgroundAlpha(progress: Float): Int = ((1f - progress.coerceIn(0f, 1f)) * OPAQUE_LAYER_ALPHA).roundToInt()
 

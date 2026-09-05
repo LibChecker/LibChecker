@@ -77,15 +77,6 @@ class BlurCoordinatorLayoutTest {
   }
 
   @Test
-  fun capturedChildKeepsItsAnimatedAlphaWhenRecorded() {
-    assertEquals(OPAQUE_LAYER_ALPHA, capturedChildLayerAlpha(1f))
-    assertEquals(0, capturedChildLayerAlpha(0f))
-    assertEquals(128, capturedChildLayerAlpha(0.5f))
-    assertEquals(OPAQUE_LAYER_ALPHA, capturedChildLayerAlpha(1.5f))
-    assertEquals(0, capturedChildLayerAlpha(-0.5f))
-  }
-
-  @Test
   fun barBackgroundFadesAgainstTheBlurLayer() {
     assertEquals(255, blurBackgroundAlpha(0f))
     assertEquals(128, blurBackgroundAlpha(0.5f))
