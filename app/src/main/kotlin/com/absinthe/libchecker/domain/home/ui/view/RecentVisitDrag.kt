@@ -208,7 +208,8 @@ internal class RecentVisitDragPreview(
   }
 
   fun start() {
-    animator = ValueAnimator.ofFloat(0f, 1f).apply {
+    animator?.cancel()
+    animator = ValueAnimator.ofFloat(fraction, 1f).apply {
       duration = 200L
       interpolator = PathInterpolator(.2f, 0f, 0f, 1f)
       addUpdateListener {
@@ -220,6 +221,7 @@ internal class RecentVisitDragPreview(
   }
 
   fun stop() {
+    animate().cancel()
     animator?.cancel()
     animator = null
     // The display list can still reference these bitmaps until the next render pass.

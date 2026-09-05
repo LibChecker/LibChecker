@@ -39,11 +39,14 @@ internal class FloatingNavigationThumbController(
   private val thumbDrawable: G2PillDrawable
   private val touchSlop = ViewConfiguration.get(host.context).scaledTouchSlop
   private val originalIndicatorColor: ColorStateList? = host.itemActiveIndicatorColor
+  private val originalRippleColor = host.itemRippleColor
   private var downX = 0f
   private var downY = 0f
   private var dragging = false
   private var suppressDrag = false
   private var isThumbAnimating = false
+  private var pointerPressed = false
+  private var thumbTargetTranslation = 0f
   private var thumbScaleAnimator: ValueAnimator? = null
   private var pendingIndex = 0
   private var floatingProgress = 0f
@@ -62,7 +65,7 @@ internal class FloatingNavigationThumbController(
 
   init {
     val thumbColor = host.context.getColorByAttr(MaterialR.attr.colorSecondaryContainer)
-    thumbDrawable = G2PillDrawable(fillColor = thumbColor, cornerSmoothing = 0f)
+    thumbDrawable = G2PillDrawable(fillColor = thumbColor)
     thumbView.background = thumbDrawable
     thumbView.visibility = View.GONE
     host.addView(thumbView, 0, FrameLayout.LayoutParams(0, 0))
@@ -75,12 +78,16 @@ internal class FloatingNavigationThumbController(
       if (thumbView.visibility != View.VISIBLE) {
         thumbView.visibility = View.VISIBLE
         host.itemActiveIndicatorColor = originalIndicatorColor?.withAlpha(0)
+        host.itemRippleColor = null
       }
     } else {
+      cancelThumbAnimation()
+      pointerPressed = false
       releaseThumbScale(animate = false)
       if (thumbView.visibility != View.GONE) {
         thumbView.visibility = View.GONE
         host.itemActiveIndicatorColor = originalIndicatorColor
+        host.itemRippleColor = originalRippleColor
       }
     }
   }
@@ -100,13 +107,30 @@ internal class FloatingNavigationThumbController(
     when (event.actionMasked) {
       MotionEvent.ACTION_DOWN -> {
         suppressDrag = false
+        pointerPressed = true
         animateThumbScale(THUMB_PRESSED_SCALE)
+        val bounds = Rect()
+        for (index in 0 until host.menu.size()) {
+          val item = host.findViewById<View>(host.menu.getItem(index).itemId) ?: continue
+          bounds.set(0, 0, item.width, item.height)
+          host.offsetDescendantRectToMyCoords(item, bounds)
+          if (bounds.contains(event.x.toInt(), event.y.toInt())) {
+            animateThumbTo(index * segmentExtent())
+            break
+          }
+        }
       }
 
-      MotionEvent.ACTION_UP,
-      MotionEvent.ACTION_CANCEL -> {
+      MotionEvent.ACTION_UP -> {
+        pointerPressed = false
         suppressDrag = false
-        releaseThumbScale()
+        if (!isThumbAnimating) releaseThumbScale()
+      }
+
+      MotionEvent.ACTION_CANCEL -> {
+        pointerPressed = false
+        suppressDrag = false
+        if (!dragging) animateThumbTo(selectedIndex * segmentExtent())
       }
     }
   }
@@ -213,6 +237,8 @@ internal class FloatingNavigationThumbController(
   }
 
   fun onDetachedFromWindow() {
+    cancelThumbAnimation()
+    pointerPressed = false
     thumbScaleAnimator?.cancel()
     thumbScaleAnimator = null
     releaseThumbScale(animate = false)
@@ -265,7 +291,6 @@ internal class FloatingNavigationThumbController(
 
   private fun finishDrag(commit: Boolean, segmentExtent: Float) {
     dragging = false
-    releaseThumbScale()
     host.parent?.requestDisallowInterceptTouchEvent(false)
     val targetIndex = if (commit) pendingIndex else selectedIndex
     animateThumbTo(targetIndex * segmentExtent)
@@ -278,12 +303,24 @@ internal class FloatingNavigationThumbController(
   }
 
   private fun animateThumbTo(targetTranslation: Float) {
+    if (isThumbAnimating && thumbTargetTranslation == targetTranslation) return
+    cancelThumbAnimation()
+    thumbTargetTranslation = targetTranslation
+    val currentTranslation = if (vertical) thumbView.translationY else thumbView.translationX * horizontalDirection()
+    if (abs(currentTranslation - targetTranslation) < 0.5f) {
+      if (!pointerPressed) releaseThumbScale()
+      return
+    }
+    animateThumbScale(THUMB_PRESSED_SCALE)
     isThumbAnimating = true
-    thumbView.animate().cancel()
     val animator = thumbView.animate()
       .setDuration(THUMB_ANIMATION_DURATION_MS)
       .setInterpolator(THUMB_INTERPOLATOR)
-      .withEndAction { isThumbAnimating = false }
+      .setUpdateListener { host.invalidate() }
+      .withEndAction {
+        isThumbAnimating = false
+        if (!pointerPressed) releaseThumbScale()
+      }
     if (vertical) {
       animator.translationY(targetTranslation)
     } else {
@@ -416,7 +453,7 @@ internal class FloatingNavigationThumbController(
     const val THUMB_PRESS_DURATION_MS = 180L
     const val THUMB_RELEASE_DURATION_MS = 280L
     const val THUMB_PRESSED_SCALE = 0.9f
-    val THUMB_INTERPOLATOR = PathInterpolator(0.22f, 1f, 0.36f, 1f)
+    val THUMB_INTERPOLATOR = PathInterpolator(0.4f, 0f, 0.2f, 1f)
     val THUMB_PRESS_INTERPOLATOR = PathInterpolator(0.4f, 0f, 0.2f, 1f)
     val THUMB_RELEASE_INTERPOLATOR = OvershootInterpolator(1.5f)
   }

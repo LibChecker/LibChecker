@@ -3,10 +3,26 @@
 Root instructions for coding agents in this repository. Keep this file short,
 operational, and focused on decisions that are easy to get wrong.
 
+## Task scope and follow-through
+
+- Investigation, review, and explicit planning requests produce findings or a
+  plan. Requests to fix, implement, or apply an approved plan authorize that
+  work; continue through relevant verification without asking again.
+- Make reasonable assumptions for reversible implementation details. Ask only
+  when missing information materially changes scope or correctness, or an
+  action needs authorization not already provided in the current task.
+- Follow explicit user instructions over skill guidelines, within runtime
+  permissions. If a skill blocks progress, name its file and quote the blocking
+  instruction instead of silently adding an approval step.
+- Report the result, relevant verification, and remaining blockers concisely.
+  Distinguish build/test evidence from device-visible behavior.
+
 ## Core commands
 
 Use the Gradle wrapper from the repository root. On macOS/Linux use
 `./gradlew`; on Windows use `.\gradlew.bat`. CI uses `./gradlew`.
+For device commands on PowerShell, set `$env:ANDROID_SERIAL = '<serial>'`
+before invoking the wrapper instead of using the POSIX inline assignment.
 
 - Format check: `./gradlew spotlessCheck`
 - Apply Kotlin/Gradle formatting: `./gradlew spotlessApply`
@@ -42,6 +58,9 @@ For docs-only changes, a Gradle build is usually unnecessary. For source
 changes, run the narrowest command that covers the touched files plus
 `spotlessCheck` when practical. For resource, manifest, packaging, R8, flavor,
 or release behavior changes, run the matching assemble/minify task.
+Use meaningful regression checks for changed behavior; avoid tests that merely
+repeat the implementation. Once relevant checks pass, broaden or repeat them
+only for new changes, failures, or unresolved concerns.
 
 ## Build facts
 
@@ -170,50 +189,39 @@ Important `:app` boundaries:
 - Update keep rules when adding reflection, generated binding entry points,
   JavaScript interfaces, Parcelable creators, or hidden/private API access.
 
-## Environment gotchas
+## Build and device environment
 
-- If Gradle/Kotlin validation fails because local writes under `~/.gradle`,
-  `~/.android`, file watchers, or the Kotlin daemon are blocked, retry with:
-  `GRADLE_USER_HOME=/private/tmp/libchecker-gradle-home`
-  `ANDROID_USER_HOME=/private/tmp/libchecker-android-home`
-  `-Dorg.gradle.vfs.watch=false`
-  `-Dkotlin.compiler.execution.strategy=in-process`
-- Keep `ANDROID_USER_HOME` stable across debug installs. Switching debug
-  keystores can cause `INSTALL_FAILED_UPDATE_INCOMPATIBLE`; prefer the existing
-  temp Android home before uninstalling debug.
-- Do not treat every Gradle deprecation trace as repo-owned. Recent AGP traces
-  such as `VariantDependenciesBuilder.createTestComponents` were upstream/plugin
-  noise, not a reason to rewrite project dependency access.
+- Use existing Gradle and Android homes. If validation is blocked by environment
+  permissions, follow the runtime approval flow; do not change cache locations
+  to bypass it. Any authorized temporary home must use a writable path for the
+  current OS, with `ANDROID_USER_HOME` and the debug keystore kept stable across
+  installs.
 - Keep `TYPESAFE_PROJECT_ACCESSORS` while `app/build.gradle.kts` uses
-  `projects.hiddenApi`.
-- Release signing may fail locally because debug/release keystore creation is
-  blocked. For R8 rule proof, inspect generated
+  `projects.hiddenApi`; trace warnings to their owner before changing build
+  configuration.
+- For R8 rule validation, inspect generated
   `app/build/outputs/mapping/*/configuration.txt` and `mapping.txt`.
-- Disable or whitelist device freezer/background-management tools before
-  macrobenchmark runs; they can kill freshly installed instrumentation packages.
+  R8 validation alone does not prove release signing or packaging succeeds.
+- Ensure device freezer/background-management settings allow instrumentation
+  packages to run during macrobenchmarks.
 
 ## NEVER
 
 - Never revert or overwrite user changes, and never commit generated build
   output (`.gradle/`, `.kotlin/`, `app/build/`, `app/foss/`, or `app/market/`).
-- Never move runtime logic into `:hidden-api` or add Google/Firebase behavior
-  to `foss`.
 - Never hand-update all translated `values-*` resources unless explicitly asked;
   Crowdin handles synchronization.
-- Never block the main thread with package parsing, database, zip, DEX, ELF, or
-  network work.
-- Never add inline dependency versions or module-level repositories.
 - Never broaden a narrow bug fix into an unrelated refactor.
 - Never use destructive git commands such as `git reset --hard`, `git clean`, or
   checkout-based reverts unless the user explicitly requests them.
-- Never remove `projects.hiddenApi` or `TYPESAFE_PROJECT_ACCESSORS` just because
-  of an upstream Gradle/AGP warning.
 
 ## Agent workflow
 
 1. Start with `git status --short`.
 2. Inspect the smallest relevant area with `rg` or `rg --files`.
-3. Read existing local patterns before editing.
+3. Read existing local patterns and trace affected callers before editing.
+   Batch independent reads; use available subagents for independent work only
+   when they save time or improve coverage. Keep dependent edits sequential.
 4. For refactors, move one cohesive vertical slice at a time. Keep package
    moves mechanical and separate from behavior; avoid thin pass-through types
    and generated/build-output churn.
@@ -236,6 +244,6 @@ If context is compacted, preserve these facts:
   accessibility, or copyability requirements.
 - Files read/changed, current git status, and change ownership.
 - Commands run and their pass/fail/blocker results.
-- Environment workaround state, including temp Gradle/Android homes and Kotlin
-  in-process/VFS flags.
+- Active build environment, including any temporary Gradle/Android homes and
+  validation flags.
 - Any unresolved decision that must not be guessed after compaction.

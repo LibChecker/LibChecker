@@ -20,6 +20,42 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class RingDotsViewInstrumentedTest {
+  @Test
+  fun nextIconExpandsWhilePreviousIconShrinksAndBothAreReleased() {
+    InstrumentationRegistry.getInstrumentation().runOnMainSync {
+      val context = ContextThemeWrapper(InstrumentationRegistry.getInstrumentation().targetContext, R.style.AppTheme)
+      val size = (200 * context.resources.displayMetrics.density).toInt()
+      val view = RingDotsView(context).apply { layout(0, 0, size, size) }
+      val outgoing = createBitmap(40, 40).apply { eraseColor(Color.RED) }
+      val incoming = createBitmap(40, 40).apply { eraseColor(Color.GREEN) }
+      view.setField("currentHighlightBitmap", outgoing)
+      view.setField("pendingHighlightBitmap", incoming)
+      view.setField("highlightIndex", 0)
+      view.setField("highlightStartedAt", 1000L)
+      val update = view.javaClass.getDeclaredMethod("updateHighlight", Long::class.javaPrimitiveType).apply { isAccessible = true }
+      update.invoke(view, 2505L)
+      assertTrue(view.field("outgoingHighlightBitmap") === outgoing)
+      assertTrue(view.field("currentHighlightBitmap") === incoming)
+      update.invoke(view, 2605L)
+      val shrinking = view.field("outgoingHighlightProgress") as Float
+      val growing = view.field("highlightProgress") as Float
+      assertTrue("Outgoing icon must still be visible", shrinking > 0f && shrinking < 1f)
+      assertTrue("Incoming icon must already be growing", growing > 0f && growing < 1f)
+      val frame = createBitmap(size, size)
+      view.draw(Canvas(frame))
+      update.invoke(view, 2655L)
+      assertTrue((view.field("outgoingHighlightProgress") as Float) < shrinking)
+      assertTrue((view.field("highlightProgress") as Float) > growing)
+      assertTrue(!outgoing.isRecycled)
+      update.invoke(view, 3100L)
+      assertTrue(outgoing.isRecycled)
+      assertTrue(!incoming.isRecycled)
+      view.setAppIconHighlightProvider { null }
+      assertTrue(incoming.isRecycled)
+      assertTrue(view.field("outgoingHighlightBitmap") == null)
+      frame.recycle()
+    }
+  }
 
   @Test
   fun neighborDotIsPushedAsideWithoutFadingAndReturnsToItsOrbit() {

@@ -71,7 +71,19 @@ class RecentVisitFrameTimingTest {
         val start = System.nanoTime()
         val down = SystemClock.uptimeMillis()
         pointer(MotionEvent.ACTION_DOWN, down, bounds.centerX().toFloat(), bounds.centerY().toFloat())
-        SystemClock.sleep(holdMs + 550)
+        if (index == 3) {
+          var showing = false
+          val showDeadline = SystemClock.uptimeMillis() + 5_000L
+          while (!showing && SystemClock.uptimeMillis() < showDeadline) {
+            instrumentation.runOnMainSync {
+              showing = (popupField.get(activity) as? RecentVisitsPopup)?.isShowing == true
+            }
+            if (!showing) SystemClock.sleep(16)
+          }
+          assertTrue("Quick release never reached the popup", showing)
+        } else {
+          SystemClock.sleep(holdMs + 550)
+        }
         instrumentation.runOnMainSync {
           Trace.endAsyncSection("ShortcutHold$index", index)
           Choreographer.getInstance().removeFrameCallback(callback)
@@ -83,6 +95,9 @@ class RecentVisitFrameTimingTest {
         }
         pointer(MotionEvent.ACTION_UP, down, bounds.centerX().toFloat(), bounds.centerY().toFloat())
         SystemClock.sleep(700)
+        instrumentation.runOnMainSync {
+          assertTrue("Released drag left the popup open", (popupField.get(activity) as? RecentVisitsPopup)?.isShowing != true)
+        }
       }
     } finally {
       pointer(MotionEvent.ACTION_CANCEL, SystemClock.uptimeMillis(), 0f, 0f)
