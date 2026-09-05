@@ -200,11 +200,8 @@ class LibReferenceFragment :
       viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
           launch {
-            progress.collect {
-              binding.loadingView.progressIndicator.setProgressCompat(
-                it,
-                it > 0
-              )
+            loadingState.collect {
+              binding.loadingView.bind(it)
             }
           }
           launch {
@@ -216,7 +213,7 @@ class LibReferenceFragment :
               updateListRenderState { it.copy(highlightText = searchResult.query) }
               beginFirstListLayoutTrace()
               refAdapter.setDiffNewData(searchResult.references) {
-                if (isDetached) {
+                if (isDetached || libReferenceViewModel.libReference.value !== references) {
                   return@setDiffNewData
                 }
                 scheduleFirstListPresentation()

@@ -6,6 +6,7 @@ import com.absinthe.libchecker.domain.statistics.reference.TRACE_REFERENCE_MAP_R
 import com.absinthe.libchecker.domain.statistics.reference.TRACE_REFERENCE_SUBMIT_RESULT
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReference
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceItem
+import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceLoadingState
 import com.absinthe.libchecker.domain.statistics.reference.repository.PermissionLabelResolver
 import com.absinthe.libchecker.domain.statistics.reference.traceReferenceSuspendSection
 import com.absinthe.libchecker.domain.statistics.reference.usecase.ComputeLibReferenceUseCase
@@ -14,9 +15,13 @@ import com.absinthe.libchecker.domain.statistics.reference.usecase.GetLibReferen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 class LibReferenceComputationController(
   private val scope: CoroutineScope,
@@ -24,79 +29,91 @@ class LibReferenceComputationController(
   private val getLibReferenceIconPackagesUseCase: GetLibReferenceIconPackagesUseCase,
   private val getLibReferenceConfigUseCase: GetLibReferenceConfigUseCase,
   private val permissionLabelResolver: PermissionLabelResolver,
-  private val updateProgress: (Int) -> Unit
+  private val updateLoadingState: (LibReferenceLoadingState) -> Unit
 ) {
   private val _libReference = MutableStateFlow<List<LibReference>?>(null)
   val libReference = _libReference.asStateFlow()
 
   private var _savedRefList: List<LibReference>? = null
   val savedRefList: List<LibReference>?
-    get() = _savedRefList
+    get() = synchronized(requestLock) { _savedRefList }
 
-  private var referenceIndex: ComputeLibReferenceUseCase.ReferenceIndex? = null
   var savedThreshold = getLibReferenceConfigUseCase.threshold
 
-  private var computeLibReferenceJob: Job? = null
-  private var matchingJob: Job? = null
+  private val requestLock = Any()
+  private val computationMutex = Mutex()
+  private var generation = 0L
+  private var computationJob: Job? = null
 
-  fun compute() {
-    computeLibReferenceJob?.cancel()
-    cancelMatchingJob()
-    computeLibReferenceJob = scope.launch(Dispatchers.IO) {
-      referenceIndex?.clear()
-      referenceIndex = null
-      _libReference.emit(null)
-      val index = computeLibReferenceUseCase.buildIndex(
-        getLibReferenceConfigUseCase.getReferenceConfig(),
-        updateProgress
-      ) ?: return@launch
-      referenceIndex = index
-      match(index)
+  fun compute() = synchronized(requestLock) {
+    computationJob?.cancel()
+    val request = ++generation
+    updateLoadingState(LibReferenceLoadingState.Preparing)
+    _libReference.value = null
+    val referenceConfig = getLibReferenceConfigUseCase.getReferenceConfig()
+    computationJob = scope.launch(Dispatchers.IO) {
+      computationMutex.withLock {
+        currentCoroutineContext().ensureActive()
+        val index = computeLibReferenceUseCase.buildIndex(referenceConfig) {
+          publish(request) { updateLoadingState(LibReferenceLoadingState.Scanning(it)) }
+        } ?: return@withLock
+        try {
+          currentCoroutineContext().ensureActive()
+          publish(request) { updateLoadingState(LibReferenceLoadingState.Matching()) }
+          val items = computeLibReferenceUseCase.matchRules(
+            index,
+            getLibReferenceConfigUseCase.getMatchConfig(),
+            onProgress = { progress ->
+              publish(request) { updateLoadingState(LibReferenceLoadingState.Matching(progress)) }
+            }
+          ) ?: return@withLock
+          currentCoroutineContext().ensureActive()
+          publish(request) { updateLoadingState(LibReferenceLoadingState.Organizing()) }
+          val refList = traceReferenceSuspendSection(TRACE_REFERENCE_MAP_RESULT) {
+            items.mapIndexed { position, item ->
+              currentCoroutineContext().ensureActive()
+              val reference = item.toLibReference(index.packageInfoByName)
+              currentCoroutineContext().ensureActive()
+              val progress = ((position + 1).toLong() * 100 / items.size).toInt()
+              publish(request) { updateLoadingState(LibReferenceLoadingState.Organizing(progress)) }
+              reference
+            }
+          }
+          currentCoroutineContext().ensureActive()
+          traceReferenceSuspendSection(TRACE_REFERENCE_SUBMIT_RESULT) {
+            publish(request) {
+              _savedRefList = refList
+              _libReference.value = refList
+            }
+          }
+        } finally {
+          index.clear()
+        }
+      }
     }
   }
 
-  fun match() {
-    val index = referenceIndex ?: run {
-      compute()
-      return
-    }
-    match(index)
-  }
-
-  fun cancelMatchingJob() {
-    matchingJob?.cancel()
-    matchingJob = null
-  }
+  // Completed indexes are released; changing the match config requires a fresh scan.
+  fun match() = compute()
 
   fun refresh() = scope.launch(Dispatchers.IO) {
-    _savedRefList?.let { ref ->
+    val snapshot = synchronized(requestLock) { generation to _savedRefList }
+    snapshot.second?.let { ref ->
       val threshold = getLibReferenceConfigUseCase.threshold
-      _libReference.emit(ref.filter { it.referredList.size >= threshold })
+      val filtered = ref.filter { it.referredList.size >= threshold }
+      currentCoroutineContext().ensureActive()
+      publish(snapshot.first) {
+        if (_savedRefList === ref && _libReference.value != null) {
+          _libReference.value = filtered
+        }
+      }
     }
   }
 
-  private fun match(index: ComputeLibReferenceUseCase.ReferenceIndex) {
-    matchingJob?.cancel()
-    matchingJob = scope.launch(Dispatchers.IO) {
-      try {
-        val items = computeLibReferenceUseCase.matchRules(
-          index,
-          getLibReferenceConfigUseCase.getMatchConfig(),
-          updateProgress
-        ) ?: return@launch
-        val refList = traceReferenceSuspendSection(TRACE_REFERENCE_MAP_RESULT) {
-          items.map { it.toLibReference(index.packageInfoByName) }
-        }
-
-        traceReferenceSuspendSection(TRACE_REFERENCE_SUBMIT_RESULT) {
-          _libReference.emit(refList)
-          _savedRefList = refList
-        }
-      } finally {
-        if (referenceIndex === index) {
-          referenceIndex = null
-        }
-        index.clear()
+  private inline fun publish(request: Long, block: () -> Unit) {
+    synchronized(requestLock) {
+      if (request == generation) {
+        block()
       }
     }
   }
@@ -120,7 +137,7 @@ class LibReferenceComputationController(
   ) {
     fun create(
       scope: CoroutineScope,
-      updateProgress: (Int) -> Unit
+      updateLoadingState: (LibReferenceLoadingState) -> Unit
     ): LibReferenceComputationController {
       return LibReferenceComputationController(
         scope = scope,
@@ -128,7 +145,7 @@ class LibReferenceComputationController(
         getLibReferenceIconPackagesUseCase = getLibReferenceIconPackagesUseCase,
         getLibReferenceConfigUseCase = getLibReferenceConfigUseCase,
         permissionLabelResolver = permissionLabelResolver,
-        updateProgress = updateProgress
+        updateLoadingState = updateLoadingState
       )
     }
   }
