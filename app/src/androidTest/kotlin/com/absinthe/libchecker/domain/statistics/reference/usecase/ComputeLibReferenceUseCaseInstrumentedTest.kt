@@ -43,7 +43,7 @@ class ComputeLibReferenceUseCaseInstrumentedTest {
   }
 
   @Test
-  fun scanningProgressStartsAfterBatchLoadAndCountsCompletedTargets() = runBlocking {
+  fun scanningProgressStartsBeforeBatchLoadAndCountsCompletedTargets() = runBlocking {
     val progress = mutableListOf<Int>()
     val repository = RecordingInstalledAppRepository(
       targets = List(2) { number ->
@@ -52,7 +52,7 @@ class ComputeLibReferenceUseCaseInstrumentedTest {
           applicationInfo = ApplicationInfo()
         }
       },
-      onBatch = { assertTrue(progress.isEmpty()) }
+      onBatch = { assertEquals(listOf(0), progress) }
     )
     ComputeLibReferenceUseCase(repository).buildIndex(
       ComputeLibReferenceUseCase.ReferenceConfig(true, LibReferenceOptions.SERVICES),
@@ -100,7 +100,7 @@ class ComputeLibReferenceUseCaseInstrumentedTest {
       // The synchronous batch completes, then cancellation must propagate.
     }
     assertEquals(1, batchCalls)
-    assertTrue(progress.isEmpty())
+    assertEquals(listOf(0), progress)
   }
 }
 
