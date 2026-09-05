@@ -3,7 +3,6 @@ package com.absinthe.libchecker.domain.app.detail.ui.view
 import android.content.Context
 import android.text.Spanned
 import android.text.SpannedString
-import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
@@ -14,6 +13,7 @@ import com.absinthe.libchecker.domain.app.detail.model.LibStringNativeItemDispla
 import com.absinthe.libchecker.domain.app.detail.model.buildDetailItemDescription
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
+import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.drawable.CapsuleDrawable
 import com.absinthe.libchecker.view.span.CenterAlignImageSpan
 
@@ -28,18 +28,19 @@ class NativeLibItemView(context: Context) : RuleChipItemView(context) {
         it.marginEnd = context.getDimensionPixelSize(R.dimen.normal_padding)
       }
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
-      setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleSmall))
       addView(this)
     }
 
   private val libSize =
-    AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifCondensed)).apply {
+    AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
       setPadding(0, 1.dp, 0, 1.dp)
-      setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
+      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBodySmall))
+      setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
       setLineSpacing(2.dp.toFloat(), 1.2f)
       addView(this)
     }
