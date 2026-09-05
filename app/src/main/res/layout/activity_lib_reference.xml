@@ -6,55 +6,61 @@
   android:layout_height="match_parent"
   tools:context=".domain.statistics.reference.ui.LibReferenceActivity">
 
-  <com.google.android.material.appbar.AppBarLayout
-    android:id="@+id/appbar"
-    style="?attr/appBarLayoutStyle"
+  <androidx.coordinatorlayout.widget.CoordinatorLayout
+    android:id="@+id/container"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:layout_constraintTop_toTopOf="parent">
+    android:layout_height="match_parent">
 
-    <androidx.appcompat.widget.ToolbarFix
-      android:id="@+id/toolbar"
-      style="?actionBarStyle"
+    <com.google.android.material.appbar.AppBarLayout
+      android:id="@+id/appbar"
+      style="?attr/appBarLayoutStyle"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:background="@null" />
+      android:layout_gravity="top">
 
-  </com.google.android.material.appbar.AppBarLayout>
+      <androidx.appcompat.widget.ToolbarFix
+        android:id="@+id/toolbar"
+        style="?actionBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@null" />
 
-  <ViewFlipper
-    android:id="@+id/vf_container"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@null"
-    android:clipChildren="true">
+    </com.google.android.material.appbar.AppBarLayout>
 
-    <LinearLayout
+    <ViewFlipper
+      android:id="@+id/vf_container"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:background="@null"
-      android:clipChildren="false"
-      android:gravity="center">
+      android:clipChildren="true">
 
-      <com.absinthe.libchecker.view.app.RingDotsView
-        android:id="@+id/loading"
-        android:layout_width="@dimen/general_loading_size"
-        android:layout_height="@dimen/general_loading_size" />
+      <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@null"
+        android:clipChildren="false"
+        android:gravity="center">
 
-    </LinearLayout>
+        <com.absinthe.libchecker.view.app.RingDotsView
+          android:id="@+id/loading"
+          android:layout_width="@dimen/general_loading_size"
+          android:layout_height="@dimen/general_loading_size" />
 
-    <rikka.widget.borderview.BorderRecyclerView
-      android:id="@android:id/list"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:clipToPadding="false"
-      android:paddingTop="?actionBarSize"
-      android:scrollbars="none"
-      app:borderBottomVisibility="never"
-      app:borderTopDrawable="@null"
-      app:borderTopVisibility="whenTop"
-      app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+      </LinearLayout>
 
-  </ViewFlipper>
+      <rikka.widget.borderview.BorderRecyclerView
+        android:id="@android:id/list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingTop="?actionBarSize"
+        android:scrollbars="none"
+        app:borderBottomVisibility="never"
+        app:borderTopDrawable="@null"
+        app:borderTopVisibility="whenTop"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+    </ViewFlipper>
+  </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
