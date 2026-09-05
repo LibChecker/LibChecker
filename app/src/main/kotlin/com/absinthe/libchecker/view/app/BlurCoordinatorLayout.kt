@@ -39,7 +39,8 @@ import kotlin.math.roundToLong
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 class BlurCoordinatorLayout @JvmOverloads constructor(
   context: Context,
-  attrs: AttributeSet? = null
+  attrs: AttributeSet? = null,
+  private val contentViewId: Int = R.id.viewpager
 ) : CoordinatorLayout(context, attrs) {
 
   private var contentNode: RenderNode? = null
@@ -221,14 +222,14 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
     val appbar = findViewById<AppBarLayout>(R.id.appbar)
     val navigation = findViewById<View>(R.id.nav_view)
     val navView = navigation as? BottomNavigationView
-    val viewPager = findViewById<ViewPager2>(R.id.viewpager)
+    val contentView = findViewById<View>(contentViewId)
 
-    val capturedContent = if (viewPager != null && width > 0 && height > 0) {
+    val capturedContent = if (contentView != null && width > 0 && height > 0) {
       val node = obtainContentNode()
       node.setRenderEffect(null)
       val recordCanvas = node.beginRecording(node.width, node.height)
       recordCanvas.drawColor(opaqueBackdropColor(contentBackgroundColor))
-      drawCapturedContent(recordCanvas, viewPager)
+      drawCapturedContent(recordCanvas, contentView)
       node.endRecording()
       canvas.drawRenderNode(node)
       node
@@ -285,7 +286,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
 
   public override fun drawChild(canvas: Canvas, child: View, drawingTime: Long): Boolean {
     val isManagedChild =
-      child.id == R.id.viewpager || child.id == R.id.appbar || child.id == R.id.nav_view
+      child.id == contentViewId || child.id == R.id.appbar || child.id == R.id.nav_view
     if (suppressManagedChildDraw && isManagedChild) {
       return false
     }

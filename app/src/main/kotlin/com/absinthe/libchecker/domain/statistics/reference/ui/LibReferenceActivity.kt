@@ -10,6 +10,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PROVIDER
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
 import com.absinthe.libchecker.domain.app.list.model.AppListRenderState
 import com.absinthe.libchecker.domain.app.list.ui.adapter.AppAdapter
@@ -17,8 +18,10 @@ import com.absinthe.libchecker.domain.home.presentation.RecentVisitsViewModel
 import com.absinthe.libchecker.domain.home.recent.RecentVisit
 import com.absinthe.libchecker.domain.statistics.reference.presentation.LibReferenceViewModel
 import com.absinthe.libchecker.ui.base.BaseActivity
+import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
+import com.absinthe.libchecker.view.app.BlurCoordinatorLayout
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -33,6 +36,7 @@ const val EXTRA_REF_LIST = "REF_LIST"
 
 class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
 
+  private var blurContainer: BlurCoordinatorLayout? = null
   private val adapter = AppAdapter()
   private val viewModel: LibReferenceViewModel by viewModel()
   private val recentVisitsViewModel: RecentVisitsViewModel by viewModel()
@@ -62,6 +66,7 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
 
   override fun onStart() {
     super.onStart()
+    blurContainer?.setBlurEnabled(GlobalValues.isBlurDesign)
     if (binding.vfContainer.displayedChild == LOADING_VIEW_INDEX) {
       binding.loading.start()
     }
@@ -98,14 +103,18 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
     updateActionBar()
     binding.apply {
       supportActionBar?.setDisplayHomeAsUpEnabled(true)
-      (root as ViewGroup).bringChildToFront(appbar)
+      installBlurContainer()
+      (appbar.parent as ViewGroup).bringChildToFront(appbar)
 
       list.apply {
         adapter = this@LibReferenceActivity.adapter
         applySystemBarsPadding(top = true, bottom = true)
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-            binding.appbar.isLifted = !top
+            blurContainer?.setAppbarContentUnderlap(!top)
+            if (blurContainer?.blurEnabled != true) {
+              binding.appbar.isLifted = !top
+            }
           }
         setHasFixedSize(true)
         FastScrollerBuilder(this).useMd2Style().build()
@@ -120,7 +129,7 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
           R.anim.anim_fade_out
         )
         displayedChild = LOADING_VIEW_INDEX
-        (root as ViewGroup).bringChildToFront(appbar)
+        (appbar.parent as ViewGroup).bringChildToFront(appbar)
       }
       loading.setRuleIconHighlightProvider()
     }
@@ -158,6 +167,25 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
 
       launchDetailPage(item = item, refName = name, refType = type)
     }
+  }
+
+  private fun installBlurContainer() {
+    if (!OsUtils.atLeastT()) return
+    val original = binding.container
+    val parent = original.parent as ViewGroup
+    val index = parent.indexOfChild(original)
+    val container = BlurCoordinatorLayout(this, contentViewId = R.id.vf_container)
+    container.id = original.id
+    container.layoutParams = original.layoutParams
+    while (original.childCount > 0) {
+      val child = original.getChildAt(0)
+      original.removeViewAt(0)
+      container.addView(child)
+    }
+    parent.removeViewAt(index)
+    parent.addView(container, index)
+    blurContainer = container
+    container.setBlurEnabled(GlobalValues.isBlurDesign)
   }
 
   private fun initData() {
