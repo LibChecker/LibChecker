@@ -15,6 +15,27 @@ import java.util.Arrays
  */
 internal object StreamingDexClassScanner {
 
+  /** Reads only the header; class definitions do not need to be decoded to count them. */
+  fun countClasses(inputStream: InputStream, entrySize: Long): Int {
+    val cursor = InputCursor(inputStream)
+    val baseHeader = cursor.readBytes(DEX_HEADER_SIZE)
+    val version = baseHeader.readVersion()
+    val headerSize = if (version == DEX_CONTAINER_VERSION) DEX_CONTAINER_HEADER_SIZE else DEX_HEADER_SIZE
+    val header = if (headerSize > baseHeader.size) {
+      baseHeader + cursor.readBytes(headerSize - baseHeader.size)
+    } else {
+      baseHeader
+    }
+    validateHeader(header, version, headerSize)
+    val dataLimit = resolveDataLimit(header, version, headerSize, header.readIntLe(FILE_SIZE_OFFSET), entrySize)
+    val count = header.readIntLe(CLASS_DEFS_SIZE_OFFSET)
+    val typeCount = header.readIntLe(TYPE_IDS_SIZE_OFFSET)
+    validateTable(typeCount, header.readIntLe(TYPE_IDS_OFFSET_OFFSET), UINT_SIZE, headerSize, dataLimit, MAX_TYPE_IDS)
+    validateTable(count, header.readIntLe(CLASS_DEFS_OFFSET_OFFSET), CLASS_DEF_ITEM_SIZE, headerSize, dataLimit, MAX_TYPE_IDS)
+    if (count > typeCount) throw IOException("DEX class count exceeds its type count")
+    return count
+  }
+
   fun findClasses(
     inputStream: InputStream,
     classPatterns: List<String>,

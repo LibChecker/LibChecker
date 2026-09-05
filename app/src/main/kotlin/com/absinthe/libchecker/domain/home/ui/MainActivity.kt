@@ -459,10 +459,11 @@ class MainActivity :
         WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
       )
       val startInset = if (view.layoutDirection == View.LAYOUT_DIRECTION_RTL) insets?.right else insets?.left
-      lp.marginStart = margin + (startInset ?: 0)
+      val attachedInset = ((startInset ?: 0) * (1f - clampedProgress)).roundToInt()
+      lp.marginStart = margin + (startInset ?: 0) - attachedInset
       lp.topMargin = margin
       lp.bottomMargin = margin
-      lp.width = normalWidth + ((floatingWidth - normalWidth) * clampedProgress).roundToInt()
+      lp.width = normalWidth + ((floatingWidth - normalWidth) * clampedProgress).roundToInt() + attachedInset
       val container = blurContainer ?: binding.container
       container.setPaddingRelative(
         lp.marginStart + lp.width,
@@ -1049,6 +1050,8 @@ class MainActivity :
     val floatingWidth = resources.getDimensionPixelSize(R.dimen.floating_nav_rail_width)
     val floatingContentPadding = ((floatingWidth - floatingNavigationRailItemHeight(view)) / 2).coerceAtLeast(0)
     view.updatePadding(
+      left = if (view.layoutDirection == View.LAYOUT_DIRECTION_RTL) 0 else (insets.left * attachedProgress).roundToInt(),
+      right = if (view.layoutDirection == View.LAYOUT_DIRECTION_RTL) (insets.right * attachedProgress).roundToInt() else 0,
       top = (
         (insets.top + contentMarginTop) * attachedProgress +
           floatingContentPadding * floatingProgress

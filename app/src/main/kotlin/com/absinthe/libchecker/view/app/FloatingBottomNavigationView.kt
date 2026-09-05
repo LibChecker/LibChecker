@@ -11,7 +11,6 @@ class FloatingBottomNavigationView @JvmOverloads constructor(
   attrs: AttributeSet? = null
 ) : BottomNavigationView(context, attrs),
   FloatingNavigationBar {
-  private val attachedMinimumHeight = minimumHeight
   private val thumbController = FloatingNavigationThumbController(
     host = this,
     vertical = false
@@ -26,10 +25,7 @@ class FloatingBottomNavigationView @JvmOverloads constructor(
   override val currentFloatingProgress: Float
     get() = thumbController.currentFloatingProgress
 
-  override fun setFloatingProgress(progress: Float) {
-    thumbController.setFloatingProgress(progress)
-    minimumHeight = (attachedMinimumHeight + (56 * resources.displayMetrics.density - attachedMinimumHeight) * progress.coerceIn(0f, 1f)).roundToInt()
-  }
+  override fun setFloatingProgress(progress: Float) = thumbController.setFloatingProgress(progress)
 
   override fun setBlurProgress(progress: Float) = thumbController.setBlurProgress(progress)
 
@@ -43,15 +39,16 @@ class FloatingBottomNavigationView @JvmOverloads constructor(
   }
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-    val resolvedHeightSpec = if (currentFloatingProgress > 0f) {
-      MeasureSpec.makeMeasureSpec(
-        resolveSize(minimumHeight + paddingTop + paddingBottom, heightMeasureSpec),
+    super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+    if (currentFloatingProgress > 0f) {
+      val floatingHeight = 56 * resources.displayMetrics.density + paddingTop + paddingBottom
+      val height = (measuredHeight + (floatingHeight - measuredHeight) * currentFloatingProgress).roundToInt()
+      val resolvedHeightSpec = MeasureSpec.makeMeasureSpec(
+        resolveSize(height, heightMeasureSpec),
         MeasureSpec.EXACTLY
       )
-    } else {
-      heightMeasureSpec
+      super.onMeasure(widthMeasureSpec, resolvedHeightSpec)
     }
-    super.onMeasure(widthMeasureSpec, resolvedHeightSpec)
     thumbController.onMeasure()
   }
 

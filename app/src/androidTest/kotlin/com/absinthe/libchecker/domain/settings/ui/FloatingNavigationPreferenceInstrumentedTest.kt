@@ -32,6 +32,36 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class FloatingNavigationPreferenceInstrumentedTest {
   @Test
+  fun bottomNavigationDisableEndsAtItsNativeMeasuredHeight() {
+    val instrumentation = InstrumentationRegistry.getInstrumentation()
+    instrumentation.runOnMainSync {
+      val context = androidx.appcompat.view.ContextThemeWrapper(instrumentation.targetContext, R.style.AppTheme)
+      val nav = com.absinthe.libchecker.view.app.FloatingBottomNavigationView(context)
+      nav.inflateMenu(R.menu.bottom_nav_menu)
+      nav.labelVisibilityMode = NavigationBarView.LABEL_VISIBILITY_LABELED
+      val density = context.resources.displayMetrics.density
+      val widthSpec = View.MeasureSpec.makeMeasureSpec((400 * density).toInt(), View.MeasureSpec.EXACTLY)
+      val heightSpec = View.MeasureSpec.makeMeasureSpec((200 * density).toInt(), View.MeasureSpec.AT_MOST)
+      for (bottomInset in listOf(0, (24 * density).toInt())) {
+        nav.setPadding(0, 0, 0, bottomInset)
+        nav.setFloatingProgress(0f)
+        nav.measure(widthSpec, heightSpec)
+        val attachedHeight = nav.measuredHeight
+        for (progress in listOf(1f, 0.001f, 0f, 0.001f, 0f)) {
+          nav.setFloatingProgress(progress)
+          nav.forceLayout()
+          nav.measure(widthSpec, heightSpec)
+          if (progress == 1f) {
+            assertEquals((56 * density).toInt() + bottomInset, nav.measuredHeight)
+          } else {
+            assertTrue("Height jumped at the attached endpoint", kotlin.math.abs(nav.measuredHeight - attachedHeight) <= 1)
+          }
+        }
+      }
+    }
+  }
+
+  @Test
   fun pressingAnotherTabMovesAndShrinksBeforeReleaseAndCancelRestoresSelection() {
     val instrumentation = InstrumentationRegistry.getInstrumentation()
     val monitor = instrumentation.addMonitor(MainActivity::class.java.name, null, false)
