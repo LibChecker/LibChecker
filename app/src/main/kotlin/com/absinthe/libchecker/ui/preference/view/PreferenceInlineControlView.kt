@@ -18,31 +18,56 @@ class PreferenceInlineControlView @JvmOverloads constructor(
   defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
+  private var renderedControl: PreferenceInlineControl? = null
+  private var renderedTitle: String? = null
+  private var choiceSelected: (String) -> Unit = {}
+  private var rangeValueChangeFinished: (Int) -> Unit = {}
+
+  private val dispatchChoice: (String) -> Unit = { value ->
+    renderedControl = null
+    choiceSelected(value)
+  }
+  private val dispatchRange: (Int) -> Unit = { value ->
+    renderedControl = null
+    rangeValueChangeFinished(value)
+  }
+
   fun bind(
     title: String?,
     control: PreferenceInlineControl,
     onChoiceSelected: (String) -> Unit,
     onRangeValueChangeFinished: (Int) -> Unit
   ) {
+    if (renderedControl == control && renderedTitle == title) {
+      choiceSelected = onChoiceSelected
+      rangeValueChangeFinished = onRangeValueChangeFinished
+      return
+    }
+    // Detaching a segmented control may finish its pending selection. Keep its old callback
+    // until it has been removed, so a recycled row cannot commit to a different preference.
     removeAllViews()
+    choiceSelected = onChoiceSelected
+    rangeValueChangeFinished = onRangeValueChangeFinished
+    renderedControl = control
+    renderedTitle = title
     when (control) {
       is PreferenceInlineControl.DraggableChoice -> {
         addView(
-          DraggableSegmentedControlView(context, control, onChoiceSelected),
+          DraggableSegmentedControlView(context, control, dispatchChoice),
           LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
         )
       }
 
       is PreferenceInlineControl.IconSegmentedChoice -> {
         addView(
-          DraggableSegmentedControlView(context, control, onChoiceSelected),
+          DraggableSegmentedControlView(context, control, dispatchChoice),
           LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
         )
       }
 
       is PreferenceInlineControl.Range -> {
         addView(
-          buildRangeControl(title, control, onRangeValueChangeFinished),
+          buildRangeControl(title, control, dispatchRange),
           LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
         )
       }
