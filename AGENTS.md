@@ -32,6 +32,10 @@ before invoking the wrapper instead of using the POSIX inline assignment.
 - Build a runnable debug APK: `./gradlew :app:assembleFossDebug`
 - Install the default debug flavor on a connected device:
   `./gradlew :app:installFossDebug`
+- Keep `com.absinthe.libchecker.debug` installed after builds, tests, and UI
+  validation. Update it in place and preserve its app data; never uninstall it
+  unless the user explicitly requests removal. If a test runner removes the
+  debug app during cleanup, reinstall the latest debug APK before finishing.
 - Manual device launch after installing debug should target
   `com.absinthe.libchecker.debug`; `com.absinthe.libchecker` may be a separate
   release install used for snapshot export/import checks.
