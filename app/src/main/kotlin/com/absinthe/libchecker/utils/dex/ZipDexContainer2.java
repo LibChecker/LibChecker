@@ -30,6 +30,8 @@ public class ZipDexContainer2 implements MultiDexContainer<DexBackedDexFile> {
   @Nullable
   private final Opcodes opcodes;
   private final long maxEntrySize;
+  @Nullable
+  private final IZipFile openedZipFile;
   private static final Pattern DEX_PATTERN = Pattern.compile("(?<=classes)\\d*\\.dex$");
 
   /**
@@ -42,9 +44,18 @@ public class ZipDexContainer2 implements MultiDexContainer<DexBackedDexFile> {
   }
 
   public ZipDexContainer2(@NonNull File zipFilePath, @Nullable Opcodes opcodes, long maxEntrySize) {
+    this.openedZipFile = null;
     this.zipFilePath = zipFilePath;
     this.opcodes = opcodes;
     this.maxEntrySize = maxEntrySize;
+  }
+
+  /** Borrows an already open archive. The caller retains ownership. */
+  public ZipDexContainer2(@NonNull File zipFilePath, @Nullable Opcodes opcodes, @NonNull IZipFile openedZipFile) {
+    this.zipFilePath = zipFilePath;
+    this.opcodes = opcodes;
+    this.maxEntrySize = Long.MAX_VALUE;
+    this.openedZipFile = openedZipFile;
   }
 
   /**
@@ -55,23 +66,24 @@ public class ZipDexContainer2 implements MultiDexContainer<DexBackedDexFile> {
   @NonNull
   @Override
   public List<String> getDexEntryNames() throws IOException {
-    List<String> entryNames = new ArrayList<>();
+    if (openedZipFile != null) {
+      return getDexEntryNames(openedZipFile);
+    }
     try (IZipFile zipFile = getZipFile()) {
-      Enumeration<? extends ZipEntry> entriesEnumeration = zipFile.getZipEntries();
+      return getDexEntryNames(zipFile);
+    }
+  }
 
-      while (entriesEnumeration.hasMoreElements()) {
-        ZipEntry entry = entriesEnumeration.nextElement();
-
-        String name = entry.getName();
-        if (!DEX_PATTERN.matcher(name).find()) {
-          continue;
-        }
-
+  private List<String> getDexEntryNames(IZipFile zipFile) {
+    List<String> entryNames = new ArrayList<>();
+    Enumeration<? extends ZipEntry> entriesEnumeration = zipFile.getZipEntries();
+    while (entriesEnumeration.hasMoreElements()) {
+      String name = entriesEnumeration.nextElement().getName();
+      if (DEX_PATTERN.matcher(name).find()) {
         entryNames.add(name);
       }
-
-      return entryNames;
     }
+    return entryNames;
   }
 
   /**
@@ -84,14 +96,17 @@ public class ZipDexContainer2 implements MultiDexContainer<DexBackedDexFile> {
   @Nullable
   @Override
   public DexEntry<DexBackedDexFile> getEntry(@NonNull String entryName) throws IOException {
-    try (IZipFile zipFile = getZipFile()) {
-      ZipEntry entry = zipFile.getEntry(entryName);
-      if (entry == null) {
-        return null;
-      }
-
-      return loadEntry(zipFile, entry);
+    if (openedZipFile != null) {
+      return getEntry(openedZipFile, entryName);
     }
+    try (IZipFile zipFile = getZipFile()) {
+      return getEntry(zipFile, entryName);
+    }
+  }
+
+  private DexEntry<DexBackedDexFile> getEntry(IZipFile zipFile, String entryName) throws IOException {
+    ZipEntry entry = zipFile.getEntry(entryName);
+    return entry == null ? null : loadEntry(zipFile, entry);
   }
 
   protected IZipFile getZipFile() {

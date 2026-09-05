@@ -3,15 +3,17 @@ package com.absinthe.libchecker.domain.app.buildmetadata
 import android.content.pm.PackageInfo
 import com.absinthe.libchecker.compat.IZipFile
 import com.absinthe.libchecker.domain.app.detail.model.KotlinToolingMetadata
-import com.absinthe.libchecker.utils.dex.FastDexFileFactory
+import com.absinthe.libchecker.utils.dex.ZipDexContainer2
 import com.absinthe.libchecker.utils.fromJson
 import com.android.tools.smali.dexlib2.Opcodes
+import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.value.ArrayEncodedValue
 import com.android.tools.smali.dexlib2.iface.value.IntEncodedValue
 import java.io.BufferedInputStream
 import java.io.DataInputStream
 import java.io.File
 import java.io.InputStreamReader
+import kotlinx.coroutines.CancellationException
 
 internal data class KotlinBuildMetadata(
   val kotlinVersion: String? = null,
@@ -78,9 +80,13 @@ internal object KotlinBuildMetadataDetector {
     apk: File,
     zip: IZipFile,
     inferVersion: Boolean = true,
-    inferenceHints: KotlinVersionInferenceHints? = null
+    inferenceHints: KotlinVersionInferenceHints? = null,
+    loadInferenceHints: (() -> KotlinVersionInferenceHints?)? = null,
+    checkCancelled: () -> Unit = {},
+    onReadFailure: () -> Unit = {}
   ): KotlinBuildMetadata {
-    val toolingMetadata = readToolingMetadata(zip)
+    checkCancelled()
+    val toolingMetadata = readToolingMetadata(zip, onReadFailure)
     if (toolingMetadata.kotlinVersion != null) {
       return toolingMetadata
     }
@@ -88,8 +94,10 @@ internal object KotlinBuildMetadataDetector {
       return toolingMetadata
     }
 
-    val dexMetadata = readDexMetadataVersions(apk)
-    val scopedDexVersions = dexMetadata.selectVersions(inferenceHints)
+    val hints = loadInferenceHints?.invoke() ?: inferenceHints
+    val container = ZipDexContainer2(apk, Opcodes.getDefault(), zip)
+    val dexMetadata = readDexMetadataVersions(container, checkCancelled, onReadFailure)
+    val scopedDexVersions = dexMetadata.selectVersions(hints)
     if (scopedDexVersions != null) {
       val version = scopedDexVersions.versions.singleOrNull() ?: return toolingMetadata
       return toolingMetadata.copy(
@@ -98,7 +106,7 @@ internal object KotlinBuildMetadataDetector {
       )
     }
 
-    val moduleVersions = readKotlinModuleVersions(zip)
+    val moduleVersions = readKotlinModuleVersions(zip, checkCancelled, onReadFailure)
     val moduleVersion = moduleVersions.singleOrNull()
     if (moduleVersion != null) {
       return toolingMetadata.copy(
@@ -115,11 +123,14 @@ internal object KotlinBuildMetadataDetector {
     }
   }
 
-  private fun readToolingMetadata(zip: IZipFile): KotlinBuildMetadata {
+  private fun readToolingMetadata(zip: IZipFile, onReadFailure: () -> Unit): KotlinBuildMetadata {
     val entry = zip.getEntry(KOTLIN_TOOLING_METADATA_ENTRY) ?: return KotlinBuildMetadata()
     return runCatching {
       val json = InputStreamReader(zip.getInputStream(entry), Charsets.UTF_8).use { it.readText() }
-      val metadata = json.fromJson<KotlinToolingMetadata>() ?: return@runCatching KotlinBuildMetadata()
+      val metadata = json.fromJson<KotlinToolingMetadata>() ?: run {
+        onReadFailure()
+        return@runCatching KotlinBuildMetadata()
+      }
       val kotlinAndroidTarget = metadata.projectTargets?.find { target ->
         target.target == KOTLIN_ANDROID_TARGET
       }
@@ -140,32 +151,45 @@ internal object KotlinBuildMetadataDetector {
         gradleVersion = gradleVersion,
         javaVersion = javaVersion
       )
-    }.getOrDefault(KotlinBuildMetadata())
+    }.getOrElse {
+      if (it is CancellationException) throw it
+      onReadFailure()
+      KotlinBuildMetadata()
+    }
   }
 
-  private fun readDexMetadataVersions(apk: File): List<ClassMetadataVersion> {
+  private fun readDexMetadataVersions(
+    container: ZipDexContainer2,
+    checkCancelled: () -> Unit,
+    onReadFailure: () -> Unit
+  ): List<ClassMetadataVersion> {
     return runCatching {
-      val container = FastDexFileFactory.loadDexContainer(apk, Opcodes.getDefault())
       buildList {
         container.dexEntryNames.forEach entryLoop@{ entryName ->
+          checkCancelled()
           val dexFile = container.getEntry(entryName)?.dexFile ?: return@entryLoop
-          dexFile.classes.forEach classLoop@{ classDef ->
-            val metadata = classDef.annotations.firstOrNull { annotation ->
-              annotation.type == KOTLIN_METADATA_ANNOTATION
-            } ?: return@classLoop
-            val metadataVersion = metadata.elements
-              .firstOrNull { element -> element.name == KOTLIN_METADATA_VERSION_ELEMENT }
-              ?.value as? ArrayEncodedValue
-            metadataVersion?.value
-              ?.mapNotNull { value -> (value as? IntEncodedValue)?.value }
-              ?.toMetadataVersion()
-              ?.let { version ->
-                add(ClassMetadataVersion(classDef.type.toClassName(), version))
-              }
+          dexFile.classes.forEachIndexed { index, classDef ->
+            if (index % 256 == 0) checkCancelled()
+            readClassMetadata(classDef)?.let(::add)
           }
         }
       }
-    }.getOrDefault(emptyList())
+    }.getOrElse {
+      if (it is CancellationException) throw it
+      onReadFailure()
+      emptyList()
+    }
+  }
+
+  private fun readClassMetadata(classDef: ClassDef): ClassMetadataVersion? {
+    val metadata = classDef.annotations.firstOrNull { it.type == KOTLIN_METADATA_ANNOTATION } ?: return null
+    val metadataVersion = metadata.elements
+      .firstOrNull { it.name == KOTLIN_METADATA_VERSION_ELEMENT }
+      ?.value as? ArrayEncodedValue
+    val version = metadataVersion?.value
+      ?.mapNotNull { (it as? IntEncodedValue)?.value }
+      ?.toMetadataVersion() ?: return null
+    return ClassMetadataVersion(classDef.type.toClassName(), version)
   }
 
   private fun List<ClassMetadataVersion>.selectVersions(
@@ -224,10 +248,15 @@ internal object KotlinBuildMetadataDetector {
     }
   }
 
-  private fun readKotlinModuleVersions(zip: IZipFile): Set<MetadataVersion> {
+  private fun readKotlinModuleVersions(
+    zip: IZipFile,
+    checkCancelled: () -> Unit,
+    onReadFailure: () -> Unit
+  ): Set<MetadataVersion> {
     return zip.getZipEntries().asSequence()
       .filter { entry -> entry.isDirectory.not() && entry.name.isKotlinModuleMetadataEntry() }
       .mapNotNull { entry ->
+        checkCancelled()
         runCatching {
           DataInputStream(BufferedInputStream(zip.getInputStream(entry))).use { input ->
             val componentCount = input.readInt()
@@ -236,7 +265,11 @@ internal object KotlinBuildMetadataDetector {
             }
             List(componentCount) { input.readInt() }.toMetadataVersion()
           }
-        }.getOrNull()
+        }.getOrElse {
+          if (it is CancellationException) throw it
+          onReadFailure()
+          null
+        }
       }
       .toSet()
   }

@@ -4,6 +4,7 @@ import android.content.pm.ActivityInfo
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.ServiceInfo
+import com.absinthe.libchecker.compat.IZipFile
 import com.absinthe.libchecker.compat.ZipFileCompat
 import com.android.tools.smali.dexlib2.AnnotationVisibility
 import com.android.tools.smali.dexlib2.Opcodes
@@ -19,6 +20,7 @@ import java.io.DataOutputStream
 import java.io.File
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+import kotlinx.coroutines.CancellationException
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -229,6 +231,75 @@ class KotlinBuildMetadataDetectorTest {
     assertEquals(KotlinVersionSource.KOTLIN_MODULE, result.kotlinVersionSource)
   }
 
+  @Test
+  fun exactMetadataDoesNotLoadComponentsOrDex() {
+    val apk = createApk(toolingMetadata = TOOLING_METADATA, dexMetadataVersions = listOf(listOf(1, 9, 0)))
+    ZipFileCompat(apk).use { archive ->
+      val zip = object : IZipFile by archive {
+        override fun getInputStream(entry: ZipEntry) = archive.getInputStream(entry).also {
+          check(!entry.name.endsWith(".dex"))
+        }
+      }
+      val result = KotlinBuildMetadataDetector.detect(apk, zip, loadInferenceHints = { error("Unnecessary component lookup") })
+      assertEquals("2.3.20", result.kotlinVersion)
+    }
+  }
+
+  @Test
+  fun borrowsArchiveWithoutReopeningApkOrClosingCallerArchive() {
+    val apk = createApk(dexMetadataVersions = listOf(listOf(2, 1, 0)))
+    ZipFileCompat(apk).use { zip ->
+      val result = KotlinBuildMetadataDetector.detect(File(apk.parentFile, "missing.apk"), zip)
+      assertEquals("2.1.x", result.kotlinVersion)
+      check(zip.getEntry("classes.dex") != null)
+    }
+  }
+
+  @Test(expected = CancellationException::class)
+  fun cancellationInsideDexScanPropagates() {
+    val apk = createApk(dexMetadataVersions = listOf(listOf(2, 1, 0)))
+    var checks = 0
+    ZipFileCompat(apk).use { zip ->
+      KotlinBuildMetadataDetector.detect(apk, zip, checkCancelled = {
+        if (++checks == 3) throw CancellationException("cancel during class scan")
+      })
+    }
+  }
+
+  @Test
+  fun missingScopedMetadataFallsBackToUnrelatedClasses() {
+    val apk = createApk(dexMetadataVersions = listOf(listOf(1, 9, 0)))
+    assertEquals("1.9.x", detect(apk, KotlinVersionInferenceHints("com.example.app", setOf("com.example.app.Main"))).kotlinVersion)
+  }
+
+  @Test
+  fun appEntryPointInLaterDexOverridesEarlierLibraryEntryPoint() {
+    val apk = createApk(
+      dexMetadataClasses = listOf(DexMetadataFixture("androidx.startup.Provider", listOf(1, 7, 0))),
+      secondDexClasses = listOf(DexMetadataFixture("com.example.app.Main", listOf(2, 1, 0)))
+    )
+    val result = detect(
+      apk,
+      KotlinVersionInferenceHints(
+        "com.example.app",
+        setOf("androidx.startup.Provider", "com.example.app.Main")
+      )
+    )
+    assertEquals("2.1.x", result.kotlinVersion)
+    assertEquals(KotlinVersionSource.DEX_ENTRY_POINTS, result.kotlinVersionSource)
+  }
+
+  @Test
+  fun namespaceLookupExcludesAdjacentNamespaceAndIncludesExactClassName() {
+    val apk = createApk(
+      dexMetadataClasses = listOf(
+        DexMetadataFixture("com.example.app", listOf(2, 1, 0)),
+        DexMetadataFixture("com.example.application.Feature", listOf(1, 7, 0))
+      )
+    )
+    assertEquals("2.1.x", detect(apk, KotlinVersionInferenceHints("com.example.app", emptySet())).kotlinVersion)
+  }
+
   private fun detect(
     apk: File,
     inferenceHints: KotlinVersionInferenceHints? = null
@@ -242,7 +313,8 @@ class KotlinBuildMetadataDetectorTest {
     toolingMetadata: String? = null,
     dexMetadataVersions: List<List<Int>> = emptyList(),
     dexMetadataClasses: List<DexMetadataFixture> = emptyList(),
-    kotlinModuleVersion: List<Int>? = null
+    kotlinModuleVersion: List<Int>? = null,
+    secondDexClasses: List<DexMetadataFixture> = emptyList()
   ): File {
     return temporaryFolder.newFile("fixture-${System.nanoTime()}.apk").apply {
       outputStream().use { output ->
@@ -260,6 +332,11 @@ class KotlinBuildMetadataDetectorTest {
           if (dexFixtures.isNotEmpty()) {
             zip.putNextEntry(ZipEntry("classes.dex"))
             zip.write(createDex(dexFixtures))
+            zip.closeEntry()
+          }
+          if (secondDexClasses.isNotEmpty()) {
+            zip.putNextEntry(ZipEntry("classes2.dex"))
+            zip.write(createDex(secondDexClasses))
             zip.closeEntry()
           }
           kotlinModuleVersion?.let { version ->
