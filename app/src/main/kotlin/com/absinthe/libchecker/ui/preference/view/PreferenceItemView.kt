@@ -195,12 +195,15 @@ class PreferenceItemView @JvmOverloads constructor(
       return
     }
 
-    inlineControl.bind(
-      title = state.title,
-      control = control,
-      onChoiceSelected = onChoiceSelected,
-      onRangeValueChangeFinished = onRangeValueChangeFinished
-    )
+    // Collapsed rows need no child controls. Keep existing children for collapse animations.
+    if (state.expanded) {
+      inlineControl.bind(
+        title = state.title,
+        control = control,
+        onChoiceSelected = onChoiceSelected,
+        onRangeValueChangeFinished = onRangeValueChangeFinished
+      )
+    }
 
     val previousExpanded = renderedExpanded
     when {
