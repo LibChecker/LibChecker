@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.domain.statistics.chart.usecase
 
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticBundle
+import com.absinthe.libchecker.domain.statistics.chart.model.StatisticControl
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticSource
 import com.absinthe.libchecker.utils.JsonUtil
 import java.io.File
@@ -22,6 +23,7 @@ class BuiltInStatisticCatalogTest {
     assertNotNull(bundle)
     bundle ?: return
     assertEquals(9, bundle.definitions.size)
+    assertTrue(bundle.definitions.first { it.id == "builtin.kotlin" }.hasControl(StatisticControl.DETAILED_ABI))
     assertTrue(bundle.definitions.all { it.source == StatisticSource.BUILTIN })
     assertTrue(bundle.definitions.all { it.icon.drawable != null && it.icon.asset == null })
     assertTrue(ValidateStatisticCatalogUseCase()(bundle).isEmpty())
