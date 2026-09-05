@@ -11,6 +11,7 @@ import com.absinthe.libchecker.domain.statistics.chart.usecase.AndroidDistributi
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildAbiChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildApiLevelChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildDetailedAbiChartDataUseCase
+import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildDetailedKotlinChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildFacetStatisticDataUseCase
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildFeatureFlagChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildPageSize16KBChartDataUseCase
@@ -19,6 +20,7 @@ import com.absinthe.libchecker.domain.statistics.chart.usecase.DetailedAbiChartD
 import com.absinthe.libchecker.domain.statistics.chart.usecase.FacetStatisticData
 import com.absinthe.libchecker.domain.statistics.chart.usecase.FeatureFlagChartData
 import com.absinthe.libchecker.domain.statistics.chart.usecase.GetAndroidDistributionUseCase
+import com.absinthe.libchecker.domain.statistics.chart.usecase.KotlinVersionChartGroup
 import com.absinthe.libchecker.domain.statistics.chart.usecase.PageSize16KBChartData
 import com.absinthe.libchecker.domain.statistics.chart.usecase.PredicateStatisticData
 
@@ -27,6 +29,7 @@ class ChartDataProvider(
   private val buildAbiChartDataUseCase: BuildAbiChartDataUseCase,
   private val buildApiLevelChartDataUseCase: BuildApiLevelChartDataUseCase,
   private val buildDetailedAbiChartDataUseCase: BuildDetailedAbiChartDataUseCase,
+  private val buildDetailedKotlinChartDataUseCase: BuildDetailedKotlinChartDataUseCase,
   private val buildFeatureFlagChartDataUseCase: BuildFeatureFlagChartDataUseCase,
   private val buildPageSize16KBChartDataUseCase: BuildPageSize16KBChartDataUseCase,
   private val buildPredicateStatisticDataUseCase: BuildPredicateStatisticDataUseCase,
@@ -77,6 +80,13 @@ class ChartDataProvider(
       ),
       onProgress
     )
+  }
+
+  suspend fun buildDetailedKotlinChartData(
+    items: List<LCItem>,
+    onProgress: suspend (Int) -> Unit
+  ): List<KotlinVersionChartGroup> {
+    return buildDetailedKotlinChartDataUseCase(items, chartSettingsRepository.showSystemApps, onProgress)
   }
 
   suspend fun buildFeatureFlagChartData(

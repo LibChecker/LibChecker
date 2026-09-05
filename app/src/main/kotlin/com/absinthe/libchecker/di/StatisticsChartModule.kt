@@ -2,6 +2,7 @@ package com.absinthe.libchecker.di
 
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.api.ApiManager
+import com.absinthe.libchecker.data.statistics.AndroidKotlinVersionRepository
 import com.absinthe.libchecker.data.statistics.AndroidStatisticEvidenceRepository
 import com.absinthe.libchecker.data.statistics.AssetStatisticCatalogDataSource
 import com.absinthe.libchecker.data.statistics.BuiltInStatisticCatalogDataSource
@@ -18,6 +19,7 @@ import com.absinthe.libchecker.data.statistics.StatisticSelectionStore
 import com.absinthe.libchecker.domain.statistics.chart.presentation.ChartViewModel
 import com.absinthe.libchecker.domain.statistics.chart.repository.AndroidDistributionRepository
 import com.absinthe.libchecker.domain.statistics.chart.repository.ChartSettingsRepository
+import com.absinthe.libchecker.domain.statistics.chart.repository.KotlinVersionRepository
 import com.absinthe.libchecker.domain.statistics.chart.repository.StatisticCatalogRepository
 import com.absinthe.libchecker.domain.statistics.chart.repository.StatisticEvidenceRepository
 import com.absinthe.libchecker.domain.statistics.chart.source.ChartDataProvider
@@ -26,6 +28,7 @@ import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildAbiChartData
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildAndroidVersionLabelDisplayDataUseCase
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildApiLevelChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildDetailedAbiChartDataUseCase
+import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildDetailedKotlinChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildFacetStatisticDataUseCase
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildFeatureFlagChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildPageSize16KBChartDataUseCase
@@ -83,6 +86,8 @@ val statisticsChartModule = module {
   factory { BuildAndroidVersionLabelDisplayDataUseCase() }
   factory { BuildApiLevelChartDataUseCase(get()) }
   factory { BuildDetailedAbiChartDataUseCase(androidContext(), get()) }
+  single<KotlinVersionRepository> { AndroidKotlinVersionRepository(get()) }
+  factory { BuildDetailedKotlinChartDataUseCase(get()) }
   factory { BuildFeatureFlagChartDataUseCase() }
   factory { BuildPageSize16KBChartDataUseCase(get()) }
   factory { BuildPredicateStatisticDataUseCase(get()) }
@@ -97,6 +102,7 @@ val statisticsChartModule = module {
       buildAbiChartDataUseCase = get(),
       buildApiLevelChartDataUseCase = get(),
       buildDetailedAbiChartDataUseCase = get(),
+      buildDetailedKotlinChartDataUseCase = get(),
       buildFeatureFlagChartDataUseCase = get(),
       buildPageSize16KBChartDataUseCase = get(),
       buildPredicateStatisticDataUseCase = get(),

@@ -17,6 +17,7 @@
       "title": { "resource": "kotlin" },
       "icon": { "drawable": "kotlin", "renderMode": "original" },
       "calculation": { "kind": "native", "nativeOperator": "kotlin" },
+      "controls": ["detailed_abi"],
       "requiresFeatureInitialization": true,
       "fingerprint": "features"
     },

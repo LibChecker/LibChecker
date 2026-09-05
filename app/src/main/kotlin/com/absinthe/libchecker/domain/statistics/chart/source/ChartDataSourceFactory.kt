@@ -9,6 +9,7 @@ import com.absinthe.libchecker.domain.statistics.chart.source.impl.AABChartDataS
 import com.absinthe.libchecker.domain.statistics.chart.source.impl.ABIChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.source.impl.ApiLevelChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.source.impl.DetailedABIChartDataSource
+import com.absinthe.libchecker.domain.statistics.chart.source.impl.DetailedKotlinChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.source.impl.FacetStatisticChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.source.impl.JetpackComposeChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.source.impl.KotlinChartDataSource
@@ -71,14 +72,20 @@ internal class ChartDataSourceFactory(
       }
 
       StatisticNativeOperator.KOTLIN -> {
-        ChartDataSourcePlan.Pie(
-          KotlinChartDataSource(items) { chartItems ->
-            chartDataProvider.buildFeatureFlagChartData(
-              chartItems,
-              BuildFeatureFlagChartDataUseCase.Kind.Kotlin
-            )
-          }
-        )
+        if (useDetailedAbiChart) {
+          ChartDataSourcePlan.Bar(
+            DetailedKotlinChartDataSource(items, chartDataProvider::buildDetailedKotlinChartData)
+          )
+        } else {
+          ChartDataSourcePlan.Pie(
+            KotlinChartDataSource(items) { chartItems ->
+              chartDataProvider.buildFeatureFlagChartData(
+                chartItems,
+                BuildFeatureFlagChartDataUseCase.Kind.Kotlin
+              )
+            }
+          )
+        }
       }
 
       StatisticNativeOperator.TARGET_SDK -> {
