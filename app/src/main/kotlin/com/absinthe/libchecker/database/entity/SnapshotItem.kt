@@ -2,9 +2,13 @@ package com.absinthe.libchecker.database.entity
 
 import androidx.room3.ColumnInfo
 import androidx.room3.Entity
+import androidx.room3.Index
 import androidx.room3.PrimaryKey
 
-@Entity(tableName = "snapshot_table")
+@Entity(
+  tableName = "snapshot_table",
+  indices = [Index(value = ["timeStamp", "packageName"])]
+)
 data class SnapshotItem(
   @PrimaryKey(autoGenerate = true)
   var id: Int?,

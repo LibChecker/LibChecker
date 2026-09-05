@@ -29,6 +29,8 @@ import java.io.File
 import java.io.InputStreamReader
 import java.util.Properties
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 
 class GetAppDetailFeaturesUseCase(
   private val appListRepository: AppListRepository,
@@ -62,6 +64,7 @@ class GetAppDetailFeaturesUseCase(
       }
     }
 
+    val featureContext = currentCoroutineContext()
     var feat = cachedFeatures
     var metadataEmitted = false
     val scannedMetadata = mutableListOf<VersionedFeature>()
@@ -70,7 +73,7 @@ class GetAppDetailFeaturesUseCase(
       feat = if (sourceDir != null) {
         try {
           ZipFileCompat(File(sourceDir)).use { zip ->
-            packageInfo.getFeatures(zip).also { scannedFeatures ->
+            packageInfo.getFeatures(zip) { featureContext.ensureActive() }.also { scannedFeatures ->
               emitFeatureApkMetadata(
                 packageInfo = packageInfo,
                 readKotlin = (scannedFeatures and Features.KOTLIN_USED) > 0,
@@ -87,10 +90,10 @@ class GetAppDetailFeaturesUseCase(
         } catch (e: CancellationException) {
           throw e
         } catch (_: Throwable) {
-          packageInfo.getFeatures()
+          packageInfo.getFeatures { featureContext.ensureActive() }
         }
       } else {
-        packageInfo.getFeatures()
+        packageInfo.getFeatures { featureContext.ensureActive() }
       }
       appListRepository.updateFeatures(packageInfo.packageName, feat)
     }

@@ -9,6 +9,61 @@ import com.absinthe.libchecker.domain.statistics.chart.repository.StatisticArtif
 
 internal class StatisticConditionEvaluator {
 
+  /** Resolve cheap facts first, then batch only evidence still needed by unresolved branches. */
+  fun evaluateStaged(
+    item: LCItem,
+    conditions: List<StatisticConditionSpec>,
+    resolve: (Set<StatisticArtifactQuery>) -> Map<StatisticArtifactQuery, Boolean>
+  ): List<Boolean> {
+    val known = LinkedHashMap<StatisticArtifactQuery, Boolean>()
+    while (true) {
+      val pending = LinkedHashSet<StatisticArtifactQuery>()
+      val results = conditions.map { partial(item, it, known, pending) }
+      if (results.all { it != null }) return results.map { checkNotNull(it) }
+      val stage = pending.minOf(::cost)
+      val queries = pending.filterTo(LinkedHashSet()) { cost(it) == stage }
+      val resolved = resolve(queries)
+      queries.forEach { known[it] = resolved[it] == true }
+    }
+  }
+
+  private fun partial(
+    item: LCItem,
+    condition: StatisticConditionSpec,
+    known: Map<StatisticArtifactQuery, Boolean>,
+    pending: MutableSet<StatisticArtifactQuery>
+  ): Boolean? {
+    val children = condition.all ?: condition.any
+    if (children != null) {
+      val childPending = LinkedHashSet<StatisticArtifactQuery>()
+      val isAll = condition.all != null
+      var unknown = false
+      for (child in children) {
+        val result = partial(item, child, known, childPending)
+        if (result == !isAll) return !isAll
+        if (result == null) unknown = true
+      }
+      if (!unknown) return isAll
+      pending += childPending
+      return null
+    }
+    condition.not?.let { return partial(item, it, known, pending)?.not() }
+    if (condition.evidence == StatisticEvidence.TARGET_SDK) {
+      return matches(item, condition, known)
+    }
+    val query = collectArtifactQueries(condition).single()
+    return known[query] ?: run {
+      pending += query
+      null
+    }
+  }
+
+  private fun cost(query: StatisticArtifactQuery): Int = when (query) {
+    is StatisticArtifactQuery.NativeLibrary, is StatisticArtifactQuery.ArchiveEntries -> 0
+    is StatisticArtifactQuery.ManifestReceiverActions, is StatisticArtifactQuery.ManifestAttribute -> 1
+    is StatisticArtifactQuery.DexClasses -> 2
+  }
+
   fun collectArtifactQueries(condition: StatisticConditionSpec): Set<StatisticArtifactQuery> {
     val queries = LinkedHashSet<StatisticArtifactQuery>()
     condition.collectArtifactQueries(queries)

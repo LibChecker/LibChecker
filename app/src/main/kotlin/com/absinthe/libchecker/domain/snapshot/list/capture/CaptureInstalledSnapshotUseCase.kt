@@ -24,6 +24,8 @@ import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.extensions.isArchivedPackage
 import com.absinthe.libchecker.utils.toJson
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 
 class CaptureInstalledSnapshotUseCase(
   private val packageManager: PackageManager,
@@ -49,32 +51,44 @@ class CaptureInstalledSnapshotUseCase(
     var count = 0
     var lastProgress = 0
 
-    for (packageInfo in request.appList) {
-      if (packageInfo.applicationInfo == null) {
-        continue
+    for (packages in request.appList.chunked(BATCH_SIZE)) {
+      currentCoroutineContext().ensureActive()
+      val previousByPackage = if (shouldSaveFullSnapshot) {
+        emptyMap()
+      } else {
+        snapshotRepository.getSnapshots(
+          currentSnapshotTimestamp,
+          packages.filter { it.applicationInfo != null }.map { it.packageName }.distinct()
+        ).asReversed().associateBy { it.packageName }
       }
-
-      val previousSnapshotItem = snapshotRepository.getSnapshot(currentSnapshotTimestamp, packageInfo.packageName)
-      val snapshotItem = previousSnapshotItem
-        ?.takeIf { it.isReusableForCapture(packageInfo, shouldSaveFullSnapshot) }
-        ?.copy()
-        ?.also {
-          it.id = null
-          it.timeStamp = timestamp
+      for (packageInfo in packages) {
+        currentCoroutineContext().ensureActive()
+        if (packageInfo.applicationInfo == null) {
+          continue
         }
-        ?: buildInstalledSnapshotItem(packageInfo, timestamp)
-      snapshotItem?.let(snapshotItems::add)
 
-      count++
-      val currentProgress = if (total == 0) 0 else count * 100 / total
-      if (currentProgress > lastProgress) {
-        lastProgress = currentProgress
-        onProgress(Progress(count, total, currentProgress))
-      }
+        val previousSnapshotItem = previousByPackage[packageInfo.packageName]
+        val snapshotItem = previousSnapshotItem
+          ?.takeIf { it.isReusableForCapture(packageInfo, shouldSaveFullSnapshot) }
+          ?.copy()
+          ?.also {
+            it.id = null
+            it.timeStamp = timestamp
+          }
+          ?: buildInstalledSnapshotItem(packageInfo, timestamp)
+        snapshotItem?.let(snapshotItems::add)
 
-      if (snapshotItems.size >= BATCH_SIZE) {
-        snapshotRepository.insertSnapshots(snapshotItems)
-        snapshotItems.clear()
+        count++
+        val currentProgress = if (total == 0) 0 else count * 100 / total
+        if (currentProgress > lastProgress) {
+          lastProgress = currentProgress
+          onProgress(Progress(count, total, currentProgress))
+        }
+
+        if (snapshotItems.size >= BATCH_SIZE) {
+          snapshotRepository.insertSnapshots(snapshotItems)
+          snapshotItems.clear()
+        }
       }
     }
 

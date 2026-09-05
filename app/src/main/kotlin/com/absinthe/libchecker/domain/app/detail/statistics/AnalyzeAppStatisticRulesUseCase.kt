@@ -39,6 +39,7 @@ class AnalyzeAppStatisticRulesUseCase(
     val artifactMatches = evidenceRepository.matchesAll(
       packageInfo = packageInfo,
       queries = artifactQueries,
+      checkCancellation = coroutineContext::ensureActive,
       onProgress = { evidenceProgress ->
         coroutineContext.ensureActive()
         onProgress(

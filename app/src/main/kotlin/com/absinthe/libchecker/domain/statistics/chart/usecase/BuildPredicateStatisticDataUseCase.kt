@@ -4,7 +4,7 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticPredicateSpec
 import com.absinthe.libchecker.domain.statistics.chart.repository.StatisticEvidenceRepository
 import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.isActive
+import kotlinx.coroutines.ensureActive
 
 class BuildPredicateStatisticDataUseCase(
   private val evidenceRepository: StatisticEvidenceRepository
@@ -25,13 +25,14 @@ class BuildPredicateStatisticDataUseCase(
     val coroutineContext = currentCoroutineContext()
     val itemCount = targets.size
     val condition = request.predicate.toConditionSpec()
-    val artifactQueries = conditionEvaluator.collectArtifactQueries(condition)
     var progress = 0
 
     targets.forEachIndexed { index, item ->
-      if (!coroutineContext.isActive) return null
-      val artifactMatches = evidenceRepository.matchesAll(item.packageName, artifactQueries)
-      if (conditionEvaluator.matches(item, condition, artifactMatches)) {
+      coroutineContext.ensureActive()
+      val matches = conditionEvaluator.evaluateStaged(item, listOf(condition)) { queries ->
+        evidenceRepository.matchesAll(item.packageName, queries, coroutineContext::ensureActive)
+      }.single()
+      if (matches) {
         matched += item
       } else {
         unmatched += item

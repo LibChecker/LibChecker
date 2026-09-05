@@ -89,6 +89,7 @@ import java.security.interfaces.RSAPublicKey
 import java.text.DateFormat
 import java.util.zip.ZipEntry
 import javax.security.cert.X509Certificate
+import kotlinx.coroutines.CancellationException
 import timber.log.Timber
 
 object PackageUtils {
@@ -159,20 +160,24 @@ object PackageUtils {
    * @param specifiedAbi Specify an ABI
    * @return List of LibStringItem
    */
-  fun getNativeDirLibs(packageInfo: PackageInfo, specifiedAbi: Int? = null, parseElf: Boolean = false): List<LibStringItem> {
+  fun getNativeDirLibs(packageInfo: PackageInfo, specifiedAbi: Int? = null, parseElf: Boolean = false, checkCancelled: () -> Unit = {}): List<LibStringItem> {
+    checkCancelled()
     val nativePath = packageInfo.applicationInfo?.nativeLibraryDir
     val result = mutableListOf<LibStringItem>()
 
     if (nativePath != null) {
       File(nativePath).listFiles()?.let { files ->
         val libs = files.asSequence()
-          .filter { it.isFile && it.extension == "so" }
+          .filter {
+            checkCancelled()
+            it.isFile && it.extension == "so"
+          }
           .distinctBy { it.name }
           .map {
             LibStringItem(
               name = it.name,
               size = FileUtils.getFileSize(it),
-              elfInfo = parseNativeDirElfInfo(it, parseElf),
+              elfInfo = parseNativeDirElfInfo(it, parseElf, checkCancelled),
               source = it.path
             )
           }
@@ -192,7 +197,8 @@ object PackageUtils {
         packageInfo = packageInfo,
         specifiedAbi = abi,
         includeNativeLibsDir = false,
-        parseElf = parseElf
+        parseElf = parseElf,
+        checkCancelled = checkCancelled
       )[sourceDir] ?: emptyList()
       result.addAll(libs)
     }
@@ -200,16 +206,18 @@ object PackageUtils {
     return result.distinctBy { it.name }
   }
 
-  internal fun parseNativeDirElfInfo(file: File, parseElf: Boolean): ElfInfo {
+  internal fun parseNativeDirElfInfo(file: File, parseElf: Boolean, checkCancelled: () -> Unit = {}): ElfInfo {
+    checkCancelled()
     if (!parseElf) {
       return ElfInfo()
     }
     return runCatching {
-      ElfParser(file).use { parser ->
+      ElfParser(file, checkCancelled).use { parser ->
         parser.parseHeader()
         ElfInfo(parser.getEType(), parser.getMinPageSize())
       }
     }.getOrElse {
+      if (it is CancellationException) throw it
       ElfInfo(ET_NOT_ELF, -1)
     }
   }
@@ -226,14 +234,15 @@ object PackageUtils {
     specifiedAbi: Int? = null,
     includeNativeLibsDir: Boolean = true,
     parseElf: Boolean,
-    parseElfForAbi: Int? = null
+    parseElfForAbi: Int? = null,
+    checkCancelled: () -> Unit = {}
   ): Map<String, List<LibStringItem>> {
     if (specifiedAbi == ERROR || specifiedAbi == NO_LIBS || specifiedAbi == OVERLAY) return emptyMap()
     val sourceDir = packageInfo.applicationInfo?.sourceDir ?: return emptyMap()
     val file = File(sourceDir)
-    val map = getApkFileLibs(file, specifiedAbi, parseElf, parseElfForAbi).toMutableMap()
+    val map = getApkFileLibs(file, specifiedAbi, parseElf, parseElfForAbi, checkCancelled).toMutableMap()
     if (map.isEmpty() || (map.keys.size == 1 && map.keys.first() == "assets")) {
-      map += getSplitLibs(packageInfo, specifiedAbi, parseElf, parseElfForAbi)
+      map += getSplitLibs(packageInfo, specifiedAbi, parseElf, parseElfForAbi, checkCancelled)
     }
     if (map.isEmpty() && includeNativeLibsDir) {
       val abi = specifiedAbi ?: getAbi(packageInfo)
@@ -241,7 +250,7 @@ object PackageUtils {
       val shouldParseNativeDir = parseElf || parseElfForAbi?.let {
         it % MULTI_ARCH == abi % MULTI_ARCH
       } == true
-      val libs = getNativeDirLibs(packageInfo, specifiedAbi, shouldParseNativeDir).toMutableList()
+      val libs = getNativeDirLibs(packageInfo, specifiedAbi, shouldParseNativeDir, checkCancelled).toMutableList()
       map += mapOf(ABI_STRING_MAP[abi % MULTI_ARCH]!! to libs)
     }
     return map
@@ -256,7 +265,8 @@ object PackageUtils {
     packageInfo: PackageInfo,
     specifiedAbi: Int? = null,
     parseElf: Boolean,
-    parseElfForAbi: Int? = null
+    parseElfForAbi: Int? = null,
+    checkCancelled: () -> Unit = {}
   ): Map<String, MutableList<LibStringItem>> {
     val splitList = getSplitsSourceDir(packageInfo)
     if (splitList.isNullOrEmpty()) {
@@ -273,10 +283,12 @@ object PackageUtils {
           INSTRUCTION_SET_MAP_TO_ABI_VALUE.keys.any { key -> fileName.contains(key) }
         specifiedAvailable || isAbiSplitFile
       }.forEach { split ->
+        checkCancelled()
         val splitMap = getApkFileLibs(
           file = File(split),
           parseElf = parseElf,
-          parseElfForAbi = parseElfForAbi
+          parseElfForAbi = parseElfForAbi,
+          checkCancelled = checkCancelled
         )
         for ((key, newList) in splitMap) {
           map.merge(key, newList) { existingList, _ ->
@@ -319,13 +331,15 @@ object PackageUtils {
     file: File,
     specifiedAbi: Int? = null,
     parseElf: Boolean,
-    parseElfForAbi: Int? = null
+    parseElfForAbi: Int? = null,
+    checkCancelled: () -> Unit = {}
   ): Map<String, MutableList<LibStringItem>> {
+    checkCancelled()
     if (file.exists().not() || file.canRead().not()) {
       return emptyMap()
     }
     if (!parseElf && parseElfForAbi == null) {
-      return getApkFileLibsWithoutParsingElf(file, specifiedAbi)
+      return getApkFileLibsWithoutParsingElf(file, specifiedAbi, checkCancelled)
     }
 
     val libDir = "lib"
@@ -346,12 +360,14 @@ object PackageUtils {
           zipFile = zipFile,
           sourceDir = sourceDir,
           parseElf = parseElf,
-          parseElfSourceDir = parseElfSourceDir
+          parseElfSourceDir = parseElfSourceDir,
+          checkCancelled = checkCancelled
         )
         val storedEntryOffsets by lazy {
-          loadStoredEntryOffsets(file, nativeEntries.storedEntryNames)
+          loadStoredEntryOffsets(file, nativeEntries.storedEntryNames, checkCancelled)
         }
         nativeEntries.entries.forEach { entry ->
+          checkCancelled()
           val entryName = entry.name
           val dir = getApkLibEntryDir(entryName, libDir, assetsDir) ?: return@forEach
           val shouldParseElf = parseElf || parseElfSourceDir?.let { entryName.startsWith(it) } == true
@@ -364,7 +380,7 @@ object PackageUtils {
           val elfInfo = if (shouldParseElf) {
             tracePackageUtilsSection(TRACE_APK_LIBS_PARSE_ELF) {
               runCatching {
-                ElfParser(zipFile.getInputStream(entry)).use { parser ->
+                ElfParser(zipFile.getInputStream(entry), checkCancelled).use { parser ->
                   parser.parseHeader()
                   ElfInfo(
                     parser.getEType(),
@@ -373,6 +389,7 @@ object PackageUtils {
                   )
                 }
               }.getOrElse {
+                if (it is CancellationException) throw it
                 ElfInfo(
                   ET_NOT_ELF,
                   -1,
@@ -397,9 +414,11 @@ object PackageUtils {
     } catch (e: OutOfMemoryError) {
       logApkFileLibsFailure(file, parseElf = true, e)
       return emptyMap()
+    } catch (e: CancellationException) {
+      throw e
     } catch (e: Exception) {
       logApkFileLibsFailure(file, parseElf = true, e)
-      return getApkFileLibsWithoutParsingElf(file, specifiedAbi)
+      return getApkFileLibsWithoutParsingElf(file, specifiedAbi, checkCancelled)
     }
     if (ENABLE_GET_APK_FILE_LIBS_LOG) {
       timeRecorder.end()
@@ -412,13 +431,15 @@ object PackageUtils {
     zipFile: IZipFile,
     sourceDir: String?,
     parseElf: Boolean,
-    parseElfSourceDir: String?
+    parseElfSourceDir: String?,
+    checkCancelled: () -> Unit
   ): NativeZipEntries {
     return tracePackageUtilsSection(TRACE_APK_LIBS_MATCH_ENTRIES) {
       val entries = mutableListOf<ZipEntry>()
       val storedEntryNames = mutableSetOf<String>()
       val zipEntries = zipFile.getZipEntries()
       while (zipEntries.hasMoreElements()) {
+        checkCancelled()
         val entry = zipEntries.nextElement()
         if (
           !entry.isDirectory &&
@@ -443,9 +464,9 @@ object PackageUtils {
     return java.lang.Long.lowestOneBit(offset)
   }
 
-  private fun loadStoredEntryOffsets(file: File, entryNames: Set<String>): Map<String, Long> {
+  private fun loadStoredEntryOffsets(file: File, entryNames: Set<String>, checkCancelled: () -> Unit): Map<String, Long> {
     return tracePackageUtilsSection(TRACE_APK_LIBS_DATA_OFFSET) {
-      ZipDataOffsetReader.read(file, entryNames).also { offsets ->
+      ZipDataOffsetReader.read(file, entryNames, checkCancelled).also { offsets ->
         check(offsets.keys.containsAll(entryNames)) {
           "ZIP data offsets are incomplete for ${file.absolutePath}"
         }
@@ -467,7 +488,8 @@ object PackageUtils {
     }
   }
 
-  private fun getApkFileLibsWithoutParsingElf(file: File, specifiedAbi: Int? = null): Map<String, MutableList<LibStringItem>> {
+  private fun getApkFileLibsWithoutParsingElf(file: File, specifiedAbi: Int? = null, checkCancelled: () -> Unit = {}): Map<String, MutableList<LibStringItem>> {
+    checkCancelled()
     if (file.exists().not()) {
       return emptyMap()
     }
@@ -481,6 +503,7 @@ object PackageUtils {
         zipFile.getZipEntries()
           .asSequence()
           .filter {
+            checkCancelled()
             it.isDirectory.not() && it.name.endsWith(".so") && (sourceDir == null || it.name.startsWith(sourceDir))
           }
           .forEach { entry ->
@@ -497,6 +520,8 @@ object PackageUtils {
     } catch (e: OutOfMemoryError) {
       logApkFileLibsFailure(file, parseElf = false, e)
       return emptyMap()
+    } catch (e: CancellationException) {
+      throw e
     } catch (e: Exception) {
       logApkFileLibsFailure(file, parseElf = false, e)
       return emptyMap()
@@ -604,17 +629,21 @@ object PackageUtils {
   /** Detects Kotlin runtime traces that remain after R8 renames and repackages class definitions. */
   internal fun hasKotlinRuntimeEvidenceInClassDex(file: File): Boolean {
     return runCatching {
-      ZipFileCompat(file).use(::hasKotlinRuntimeEvidenceInClassDex)
+      ZipFileCompat(file).use { hasKotlinRuntimeEvidenceInClassDex(it) }
     }.getOrDefault(false)
   }
 
-  internal fun hasKotlinRuntimeEvidenceInClassDex(zipFile: IZipFile): Boolean {
+  internal fun hasKotlinRuntimeEvidenceInClassDex(zipFile: IZipFile, checkCancelled: () -> Unit = {}): Boolean {
     val foundMarkers = linkedSetOf<String>()
     var remainingScanBytes = MAX_KOTLIN_RUNTIME_SCAN_BYTES
     return runCatching {
       zipFile.getZipEntries().asSequence()
-        .filter { it.name.matches(DEX_ENTRY_REGEX) }
+        .filter {
+          checkCancelled()
+          it.name.matches(DEX_ENTRY_REGEX)
+        }
         .forEach { entry ->
+          checkCancelled()
           if (remainingScanBytes <= 0) return@runCatching false
           val remainingMarkers = KOTLIN_RUNTIME_STRING_MARKERS.filterNot(foundMarkers::contains)
           val scanResult = zipFile.getInputStream(entry).use { inputStream ->
@@ -623,7 +652,8 @@ object PackageUtils {
               stringPatterns = remainingMarkers,
               stopAfterMatches = KOTLIN_RUNTIME_STRING_THRESHOLD - foundMarkers.size,
               entrySize = entry.size.takeIf { it >= 0 },
-              maxScanBytes = remainingScanBytes
+              maxScanBytes = remainingScanBytes,
+              checkCancelled = checkCancelled
             )
           }
           remainingScanBytes -= scanResult.bytesRead
@@ -633,7 +663,10 @@ object PackageUtils {
           }
         }
       false
-    }.getOrDefault(false)
+    }.getOrElse {
+      if (it is java.util.concurrent.CancellationException) throw it
+      false
+    }
   }
 
   /**
@@ -1092,33 +1125,52 @@ object PackageUtils {
   fun findDexClasses(
     sourceFile: File,
     classes: List<String>,
-    hasAny: Boolean = false
+    hasAny: Boolean = false,
+    checkCancelled: () -> Unit = {}
+  ): List<String> = runCatching {
+    checkCancelled()
+    ZipFileCompat(sourceFile).use { findDexClasses(it, classes, hasAny, checkCancelled) }
+  }.getOrElse {
+    if (it is java.util.concurrent.CancellationException) throw it
+    emptyList()
+  }
+
+  fun findDexClasses(
+    zipFile: IZipFile,
+    classes: List<String>,
+    hasAny: Boolean = false,
+    checkCancelled: () -> Unit = {}
   ): List<String> {
     if (classes.isEmpty()) return emptyList()
-
     val foundClasses = linkedSetOf<String>()
     return tracePackageUtilsSection(TRACE_FIND_DEX_CLASSES) {
       runCatching {
-        ZipFileCompat(sourceFile).use { zipFile ->
-          zipFile.getZipEntries().asSequence()
-            .filter { it.name.matches(DEX_ENTRY_REGEX) }
-            .forEach { entry ->
-              val remainingClasses = classes.filterNot(foundClasses::contains)
-              zipFile.getInputStream(entry).use { inputStream ->
-                foundClasses += StreamingDexClassScanner.findClasses(
-                  inputStream = inputStream,
-                  classPatterns = remainingClasses,
-                  hasAny = hasAny,
-                  entrySize = entry.size.takeIf { it >= 0 }
-                )
-              }
-              if ((hasAny && foundClasses.isNotEmpty()) || foundClasses.size == classes.distinct().size) {
-                return@runCatching foundClasses.toList()
-              }
+        zipFile.getZipEntries().asSequence()
+          .filter {
+            checkCancelled()
+            it.name.matches(DEX_ENTRY_REGEX)
+          }
+          .forEach { entry ->
+            checkCancelled()
+            val remainingClasses = classes.filterNot(foundClasses::contains)
+            zipFile.getInputStream(entry).use { inputStream ->
+              foundClasses += StreamingDexClassScanner.findClasses(
+                inputStream = inputStream,
+                classPatterns = remainingClasses,
+                hasAny = hasAny,
+                entrySize = entry.size.takeIf { it >= 0 },
+                checkCancelled = checkCancelled
+              )
             }
-        }
+            if ((hasAny && foundClasses.isNotEmpty()) || foundClasses.size == classes.distinct().size) {
+              return@runCatching foundClasses.toList()
+            }
+          }
         foundClasses.toList()
-      }.getOrDefault(emptyList())
+      }.getOrElse {
+        if (it is java.util.concurrent.CancellationException) throw it
+        emptyList()
+      }
     }
   }
 

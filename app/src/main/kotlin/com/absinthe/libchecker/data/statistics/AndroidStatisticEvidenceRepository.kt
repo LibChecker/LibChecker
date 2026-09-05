@@ -44,21 +44,41 @@ class AndroidStatisticEvidenceRepository(
     packageName: String,
     queries: Set<StatisticArtifactQuery>
   ): Map<StatisticArtifactQuery, Boolean> {
+    return matchesAll(packageName, queries) {}
+  }
+
+  override fun matchesAll(
+    packageName: String,
+    queries: Set<StatisticArtifactQuery>,
+    checkCancellation: () -> Unit
+  ): Map<StatisticArtifactQuery, Boolean> {
+    checkCancellation()
+    if (queries.isEmpty()) return emptyMap()
     val packageInfo = installedAppRepository.getPackageInfo(packageName)
       ?: return queries.associateWith { false }
-    return matchesAll(packageInfo, queries)
+    return matchesAll(packageInfo, queries, {}, checkCancellation)
   }
 
   override fun matchesAll(
     packageInfo: PackageInfo,
     queries: Set<StatisticArtifactQuery>,
     onProgress: (Int) -> Unit
+  ): Map<StatisticArtifactQuery, Boolean> = matchesAll(packageInfo, queries, onProgress) {}
+
+  override fun matchesAll(
+    packageInfo: PackageInfo,
+    queries: Set<StatisticArtifactQuery>,
+    onProgress: (Int) -> Unit,
+    checkCancellation: () -> Unit
   ): Map<StatisticArtifactQuery, Boolean> {
+    checkCancellation()
     if (queries.isEmpty()) {
+      checkCancellation()
       onProgress(100)
       return emptyMap()
     }
     return try {
+      checkCancellation()
       onProgress(0)
       val results = LinkedHashMap<StatisticArtifactQuery, Boolean>(queries.size)
       val version = packageInfo.artifactVersion()
@@ -72,11 +92,12 @@ class AndroidStatisticEvidenceRepository(
         val libraryNames = if (extractedLibraries.isNotEmpty()) {
           extractedLibraries.mapTo(mutableSetOf(), File::getName)
         } else {
-          PackageUtils.getNativeDirLibs(packageInfo, parseElf = false)
+          PackageUtils.getNativeDirLibs(packageInfo, parseElf = false, checkCancelled = checkCancellation)
             .mapTo(mutableSetOf()) { it.name }
         }
         nativeQueries.forEach { query -> results[query] = query.name in libraryNames }
       }
+      checkCancellation()
       onProgress(NATIVE_PROGRESS)
 
       val archiveQueries = queries.filterIsInstance<StatisticArtifactQuery.ArchiveEntries>()
@@ -96,7 +117,7 @@ class AndroidStatisticEvidenceRepository(
             }
           }
           if (pendingNames.isNotEmpty()) {
-            val foundNames = readArchiveEntries(version.sourcePaths, pendingNames)
+            val foundNames = readArchiveEntries(version.sourcePaths, pendingNames, checkCancellation)
             pendingNames.forEach { name ->
               val matched = name in foundNames
               matches[name] = matched
@@ -108,12 +129,13 @@ class AndroidStatisticEvidenceRepository(
           }
         }
       }
+      checkCancellation()
       onProgress(ARCHIVE_ENTRY_PROGRESS)
 
       val manifestQueries = queries.filterIsInstance<StatisticArtifactQuery.ManifestReceiverActions>()
       if (manifestQueries.isNotEmpty()) {
         val actions = version?.let {
-          manifestActionCache[it] ?: readManifestReceiverActions(it.sourcePaths)
+          manifestActionCache[it] ?: readManifestReceiverActions(it.sourcePaths, checkCancellation)
             .also { actions -> manifestActionCache.put(it, actions) }
         }.orEmpty()
         manifestQueries.forEach { query ->
@@ -125,12 +147,13 @@ class AndroidStatisticEvidenceRepository(
         queries.filterIsInstance<StatisticArtifactQuery.ManifestAttribute>()
       if (manifestAttributeQueries.isNotEmpty()) {
         val properties = version?.let {
-          manifestAttributeCache[it] ?: readApplicationManifestProperties(it.sourcePaths)
+          manifestAttributeCache[it] ?: readApplicationManifestProperties(it.sourcePaths, checkCancellation)
             .also { properties -> manifestAttributeCache.put(it, properties) }
         }.orEmpty()
         val resources = packageInfo.applicationInfo?.let { applicationInfo ->
           runCatching { packageManager.getResourcesForApplication(applicationInfo) }
             .onFailure { error ->
+              if (error is CancellationException) throw error
               Timber.w(error, "Unable to resolve statistic manifest resources for %s", packageInfo.packageName)
             }
             .getOrNull()
@@ -148,6 +171,7 @@ class AndroidStatisticEvidenceRepository(
           results[query] = actual != null && actual == attribute.boolean
         }
       }
+      checkCancellation()
       onProgress(MANIFEST_PROGRESS)
 
       val dexQueries = queries.filterIsInstance<StatisticArtifactQuery.DexClasses>()
@@ -168,7 +192,9 @@ class AndroidStatisticEvidenceRepository(
             matchesDexClassGroups(
               sourceFiles = version.sourcePaths.map(::File),
               queryGroups = pending,
+              checkCancellation = checkCancellation,
               onProgress = { dexProgress ->
+                checkCancellation()
                 onProgress(
                   MANIFEST_PROGRESS +
                     dexProgress * (DEX_PROGRESS - MANIFEST_PROGRESS) / 100
@@ -181,15 +207,18 @@ class AndroidStatisticEvidenceRepository(
           }
         }
       }
+      checkCancellation()
       onProgress(DEX_PROGRESS)
 
       queries.associateWith { query -> results[query] == true }.also {
+        checkCancellation()
         onProgress(100)
       }
     } catch (error: CancellationException) {
       throw error
     } catch (error: Throwable) {
       Timber.e(error)
+      checkCancellation()
       onProgress(100)
       queries.associateWith { false }
     }
@@ -198,6 +227,7 @@ class AndroidStatisticEvidenceRepository(
   private fun matchesDexClassGroups(
     sourceFiles: List<File>,
     queryGroups: List<StatisticArtifactQuery.DexClasses>,
+    checkCancellation: () -> Unit,
     onProgress: (Int) -> Unit
   ): Map<StatisticArtifactQuery.DexClasses, Boolean> {
     if (queryGroups.isEmpty()) return emptyMap()
@@ -205,6 +235,7 @@ class AndroidStatisticEvidenceRepository(
     val unmatchedGroups = queryGroups.toMutableSet()
     val readableSourceFiles = sourceFiles.filter(File::isFile)
     if (readableSourceFiles.isEmpty()) {
+      checkCancellation()
       onProgress(100)
       return results
     }
@@ -226,17 +257,20 @@ class AndroidStatisticEvidenceRepository(
         ).toInt().coerceIn(0, 100)
       if (progress > lastProgress) {
         lastProgress = progress
+        checkCancellation()
         onProgress(progress)
       }
     }
 
     readableSourceFiles.forEachIndexed sourceLoop@{ fileIndex, sourceFile ->
       if (unmatchedGroups.isEmpty()) {
+        checkCancellation()
         onProgress(100)
         return results
       }
+      checkCancellation()
       val container = try {
-        FastDexFileFactory.loadDexContainer(sourceFile, Opcodes.getDefault())
+        FastDexFileFactory.loadDexContainer(sourceFile, Opcodes.getDefault(), checkCancellation)
       } catch (error: CancellationException) {
         throw error
       } catch (error: Throwable) {
@@ -251,9 +285,11 @@ class AndroidStatisticEvidenceRepository(
       }
       entryNames.forEachIndexed entryLoop@{ entryIndex, entryName ->
         if (unmatchedGroups.isEmpty()) {
+          checkCancellation()
           onProgress(100)
           return results
         }
+        checkCancellation()
         val dexFile = container.getEntry(entryName)?.dexFile
         if (dexFile == null) {
           reportProgress(fileIndex, entryIndex, entryNames.size, 0, 1)
@@ -262,7 +298,10 @@ class AndroidStatisticEvidenceRepository(
         val eligibleQueries = unmatchedGroups.associateWith { group ->
           group.queries.filter { query ->
             query.stringConstants.isEmpty() ||
-              dexFile.stringSection.any(query.stringConstants::contains)
+              dexFile.stringSection.withIndex().any { (index, value) ->
+                if (index % DEX_PROGRESS_CLASS_INTERVAL == 0) checkCancellation()
+                value in query.stringConstants
+              }
           }
         }.filterValues { it.isNotEmpty() }
         if (eligibleQueries.isEmpty()) {
@@ -272,8 +311,9 @@ class AndroidStatisticEvidenceRepository(
         val matchedGroups = mutableSetOf<StatisticArtifactQuery.DexClasses>()
         val classCount = dexFile.classes.size.coerceAtLeast(1)
         for ((classIndex, classDef) in dexFile.classes.withIndex()) {
+          if (classIndex % DEX_PROGRESS_CLASS_INTERVAL == 0) checkCancellation()
           eligibleQueries.forEach { (group, queries) ->
-            if (group !in matchedGroups && queries.any { query -> classDef.matches(query) }) {
+            if (group !in matchedGroups && queries.any { query -> classDef.matches(query, checkCancellation) }) {
               matchedGroups += group
             }
           }
@@ -293,7 +333,7 @@ class AndroidStatisticEvidenceRepository(
     return results
   }
 
-  private fun ClassDef.matches(query: StatisticDexClassQuery): Boolean {
+  private fun ClassDef.matches(query: StatisticDexClassQuery, checkCancellation: () -> Unit): Boolean {
     val nameMatches = query.name?.let { pattern ->
       when (pattern.operator) {
         StatisticStringOperator.EQUAL -> type == pattern.value
@@ -306,10 +346,12 @@ class AndroidStatisticEvidenceRepository(
     var stringMatches = query.stringConstants.isEmpty()
     var methodMatches = query.methodReferences.isEmpty()
     methods.forEach { method ->
-      method.implementation?.instructions?.forEach { instruction ->
+      checkCancellation()
+      method.implementation?.instructions?.forEachIndexed { instructionIndex, instruction ->
+        if (instructionIndex % DEX_PROGRESS_CLASS_INTERVAL == 0) checkCancellation()
         val reference = (instruction as? ReferenceInstruction)?.let {
           runCatching { it.reference }.getOrNull()
-        } ?: return@forEach
+        } ?: return@forEachIndexed
         when (reference) {
           is StringReference -> {
             if (reference.string in query.stringConstants) stringMatches = true
@@ -331,12 +373,14 @@ class AndroidStatisticEvidenceRepository(
       (expected.parameterTypes == null || parameterTypes.map(CharSequence::toString) == expected.parameterTypes)
   }
 
-  private fun readManifestReceiverActions(sourcePaths: List<String>): Set<String> {
+  private fun readManifestReceiverActions(sourcePaths: List<String>, checkCancellation: () -> Unit): Set<String> {
     return sourcePaths.asSequence()
       .flatMap { sourcePath ->
+        checkCancellation()
         runCatching {
           IntentFilterUtils.parseComponentsFromApk(sourcePath)
         }.onFailure { error ->
+          if (error is CancellationException) throw error
           Timber.w(error, "Unable to scan statistic manifest evidence from %s", sourcePath)
         }.getOrDefault(emptyList()).asSequence()
       }
@@ -346,19 +390,22 @@ class AndroidStatisticEvidenceRepository(
       .toSet()
   }
 
-  private fun readApplicationManifestProperties(sourcePaths: List<String>): Map<String, Any> {
+  private fun readApplicationManifestProperties(sourcePaths: List<String>, checkCancellation: () -> Unit): Map<String, Any> {
+    checkCancellation()
     val baseApk = sourcePaths.firstOrNull()?.let(::File)?.takeIf(File::isFile)
       ?: return emptyMap()
     return runCatching {
       ApplicationReader.getManifestProperties(baseApk).mapValues { it.value }
     }.onFailure { error ->
+      if (error is CancellationException) throw error
       Timber.w(error, "Unable to scan statistic application manifest attributes from %s", baseApk)
     }.getOrDefault(emptyMap())
   }
 
   private fun readArchiveEntries(
     sourcePaths: List<String>,
-    requestedNames: Set<String>
+    requestedNames: Set<String>,
+    checkCancellation: () -> Unit
   ): Set<String> {
     val foundNames = mutableSetOf<String>()
     val pendingNames = requestedNames.toMutableSet()
@@ -366,10 +413,12 @@ class AndroidStatisticEvidenceRepository(
       .map(::File)
       .filter(File::isFile)
       .forEach { sourceFile ->
+        checkCancellation()
         if (pendingNames.isEmpty()) return foundNames
         runCatching {
           ZipFileCompat(sourceFile).use { archive ->
             pendingNames.toList().forEach { name ->
+              checkCancellation()
               if (archive.getEntry(name) != null) {
                 foundNames += name
                 pendingNames -= name
@@ -377,6 +426,7 @@ class AndroidStatisticEvidenceRepository(
             }
           }
         }.onFailure { error ->
+          if (error is CancellationException) throw error
           Timber.w(error, "Unable to scan statistic archive evidence from %s", sourceFile)
         }
       }

@@ -15,10 +15,16 @@ import java.io.IOException;
 public class FastDexFileFactory {
   public static MultiDexContainer<? extends DexBackedDexFile> loadDexContainer(
     @NonNull File file, @Nullable final Opcodes opcodes) throws IOException {
+    return loadDexContainer(file, opcodes, () -> {});
+  }
+
+  public static MultiDexContainer<? extends DexBackedDexFile> loadDexContainer(
+    @NonNull File file, @Nullable final Opcodes opcodes, Runnable checkCancellation) throws IOException {
+    checkCancellation.run();
     if (!file.exists()) {
       throw new DexFileFactory.DexFileNotFoundException("%s does not exist", file.getName());
     }
 
-    return new ZipDexContainer2(file, opcodes);
+    return new ZipDexContainer2(file, opcodes, Long.MAX_VALUE, checkCancellation);
   }
 }

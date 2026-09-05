@@ -7,6 +7,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 internal class ChartDataRenderer(
@@ -14,6 +16,7 @@ internal class ChartDataRenderer(
   private val chartHost: ViewGroup,
   private val onLoadingProgressChanged: (Int) -> Unit
 ) {
+  private val computationMutex = Mutex()
   private var queryJob: Job? = null
   private var renderGeneration = 0
 
@@ -31,12 +34,14 @@ internal class ChartDataRenderer(
     queryJob?.cancel()
     queryJob = scope.launch(Dispatchers.Default) {
       var terminalProgressReported = false
-      fillChart(newChartView) { progress ->
-        if (generation == renderGeneration) {
-          if (progress >= LOADING_PROGRESS_MAX) {
-            terminalProgressReported = true
-          } else {
-            onLoadingProgressChanged(progress)
+      computationMutex.withLock {
+        fillChart(newChartView) { progress ->
+          if (generation == renderGeneration) {
+            if (progress >= LOADING_PROGRESS_MAX) {
+              terminalProgressReported = true
+            } else {
+              onLoadingProgressChanged(progress)
+            }
           }
         }
       }

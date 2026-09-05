@@ -60,20 +60,30 @@ class BuildFacetStatisticDataUseCaseTest {
   }
 
   @Test
-  fun `batches all artifact evidence once per app and reports determinate progress`() = runBlocking {
+  fun `batches unresolved facets by cost and skips DEX for a manifest matched facet`() = runBlocking {
     val progress = mutableListOf<Int>()
+    artifactMatches["two"] = setOf(fairMemoryManifestQuery)
 
     useCase(
       BuildFacetStatisticDataUseCase.Request(
         items = listOf(item("one"), item("two"), item("three")),
-        facets = facets,
+        facets = facets.copy(items = facets.items + facet("shared-voip-evidence", condition(voipQuery))),
         showSystemApps = true
       ),
       progress::add
     )
 
-    assertEquals(3, batchQueries.size)
-    assertEquals(setOf(voipQuery, fairMemoryDexQuery, fairMemoryManifestQuery, securityPasteQuery), batchQueries.first())
+    assertEquals(
+      listOf(
+        setOf(fairMemoryManifestQuery),
+        setOf(voipQuery, fairMemoryDexQuery, securityPasteQuery),
+        setOf(fairMemoryManifestQuery),
+        setOf(voipQuery, securityPasteQuery),
+        setOf(fairMemoryManifestQuery),
+        setOf(voipQuery, fairMemoryDexQuery, securityPasteQuery)
+      ),
+      batchQueries
+    )
     assertEquals(listOf(33, 66, 99), progress)
   }
 

@@ -11,6 +11,7 @@ import androidx.collection.arrayMapOf
 import androidx.core.content.pm.PackageInfoCompat
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.app.SystemServices
+import com.absinthe.libchecker.compat.IZipFile
 import com.absinthe.libchecker.compat.ZipFileCompat
 import com.absinthe.libchecker.constant.Constants.ARMV5
 import com.absinthe.libchecker.constant.Constants.ARMV5_STRING
@@ -51,6 +52,8 @@ import com.absinthe.libchecker.utils.manifest.ManifestReader
 import dev.rikka.tools.refine.Refine
 import hidden.DexFileHidden
 import java.io.File
+import java.io.FilterInputStream
+import java.io.InputStream
 import java.text.DateFormat
 import java.util.Properties
 import okio.buffer
@@ -172,32 +175,36 @@ fun PackageInfo.isSplitsApk(): Boolean {
   return !applicationInfo?.splitSourceDirs.isNullOrEmpty()
 }
 
-private fun isKotlinUsed(zipFile: ZipFileCompat, file: File, foundClasses: List<String>? = null): Boolean {
-  if (
-    zipFile.getEntry("kotlin-tooling-metadata.json") != null ||
-    zipFile.getEntry("kotlin/kotlin.kotlin_builtins") != null ||
-    zipFile.getEntry("META-INF/services/kotlinx.coroutines.CoroutineExceptionHandler") != null ||
-    zipFile.getEntry("META-INF/services/kotlinx.coroutines.internal.MainDispatcherFactory") != null ||
-    KotlinBuildMetadataDetector.hasKotlinModuleMetadata(zipFile)
-  ) {
-    return true
+private fun hasKotlinArchiveEvidence(zipFile: IZipFile, checkCancelled: () -> Unit): Boolean = zipFile.getEntry("kotlin-tooling-metadata.json") != null ||
+  zipFile.getEntry("kotlin/kotlin.kotlin_builtins") != null ||
+  zipFile.getEntry("META-INF/services/kotlinx.coroutines.CoroutineExceptionHandler") != null ||
+  zipFile.getEntry("META-INF/services/kotlinx.coroutines.internal.MainDispatcherFactory") != null ||
+  KotlinBuildMetadataDetector.hasKotlinModuleMetadata(zipFile, checkCancelled)
+
+private fun InputStream.cancellable(checkCancelled: () -> Unit): InputStream = object : FilterInputStream(this) {
+  override fun read(): Int {
+    checkCancelled()
+    return super.read()
   }
-  if (foundClasses == null) return PackageUtils.isKotlinUsedInClassDex(file)
-  return foundClasses.any { it == KOTLIN_CLASS_PATTERN || it == KOTLINX_CLASS_PATTERN } ||
-    PackageUtils.hasKotlinRuntimeEvidenceInClassDex(zipFile)
+
+  override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
+    checkCancelled()
+    return `in`.read(buffer, offset, minOf(length, DEFAULT_BUFFER_SIZE))
+  }
 }
 
 private const val AGP_KEYWORD = "androidGradlePluginVersion"
 private const val AGP_KEYWORD2 = "Created-By: Android Gradle "
 
-private fun readAGPVersion(zipFile: ZipFileCompat): String? {
+private fun readAGPVersion(zipFile: IZipFile, checkCancelled: () -> Unit): String? {
   zipFile.getEntry("META-INF/com/android/build/gradle/app-metadata.properties")?.let { ze ->
-    Properties().apply { load(zipFile.getInputStream(ze)) }
+    Properties().apply { zipFile.getInputStream(ze).cancellable(checkCancelled).use { load(it) } }
       .getProperty(AGP_KEYWORD)?.let { return it }
   }
   zipFile.getEntry("META-INF/MANIFEST.MF")?.let { ze ->
-    zipFile.getInputStream(ze).source().buffer().use {
+    zipFile.getInputStream(ze).cancellable(checkCancelled).source().buffer().use {
       while (true) {
+        checkCancelled()
         val line = it.readUtf8Line() ?: break
         if (line.startsWith(AGP_KEYWORD2)) return line.removePrefix(AGP_KEYWORD2)
       }
@@ -205,7 +212,7 @@ private fun readAGPVersion(zipFile: ZipFileCompat): String? {
   }
   DATA_BINDING_VERSION_ENTRIES.forEach { name ->
     zipFile.getEntry(name)?.let { ze ->
-      zipFile.getInputStream(ze).source().buffer().use { source ->
+      zipFile.getInputStream(ze).cancellable(checkCancelled).source().buffer().use { source ->
         return source.readUtf8Line().takeIf { !it.isNullOrBlank() }
       }
     }
@@ -272,29 +279,42 @@ fun PackageInfo.isOverlay(): Boolean {
  * Get features of an app
  * @return Features
  */
-fun PackageInfo.getFeatures(): Int {
+fun PackageInfo.getFeatures(checkCancelled: () -> Unit = {}): Int {
+  checkCancelled()
   val sourceDir = applicationInfo?.sourceDir ?: return 0
   return runCatching {
-    ZipFileCompat(File(sourceDir)).use { zipFile -> getFeatures(zipFile) }
-  }.getOrElse { getNonArchiveFeatures() }
+    ZipFileCompat(File(sourceDir)).use { zipFile -> getFeatures(zipFile, checkCancelled) }
+  }.getOrElse {
+    if (it is java.util.concurrent.CancellationException) throw it
+    getNonArchiveFeatures()
+  }
 }
 
-fun PackageInfo.getFeatures(zipFile: ZipFileCompat): Int {
+fun PackageInfo.getFeatures(zipFile: IZipFile, checkCancelled: () -> Unit = {}): Int {
+  checkCancelled()
   var features = getNonArchiveFeatures()
-  val sourceDir = applicationInfo?.sourceDir ?: return features
-  val resultList = PackageUtils.findDexClasses(
-    File(sourceDir),
-    listOf(
-      COMPOSE_CLASS_PATTERN,
-      KOTLIN_CLASS_PATTERN,
-      KOTLINX_CLASS_PATTERN
-    )
-  )
-  val file = File(sourceDir)
-  if (isKotlinUsed(zipFile, file, resultList)) features = features or Features.KOTLIN_USED
-  if (!readAGPVersion(zipFile).isNullOrBlank()) features = features or Features.AGP
+  if (applicationInfo?.sourceDir == null) return features
+  val kotlinEvidence = hasKotlinArchiveEvidence(zipFile, checkCancelled)
+  val composeEvidence = isUseJetpackCompose(zipFile, null, checkCancelled)
+  val patterns = buildList {
+    if (!composeEvidence) add(COMPOSE_CLASS_PATTERN)
+    if (!kotlinEvidence) {
+      add(KOTLIN_CLASS_PATTERN)
+      add(KOTLINX_CLASS_PATTERN)
+    }
+  }
+  checkCancelled()
+  val resultList = PackageUtils.findDexClasses(zipFile, patterns, checkCancelled = checkCancelled)
+  if (
+    kotlinEvidence || resultList.any { it == KOTLIN_CLASS_PATTERN || it == KOTLINX_CLASS_PATTERN } ||
+    PackageUtils.hasKotlinRuntimeEvidenceInClassDex(zipFile, checkCancelled)
+  ) {
+    features = features or Features.KOTLIN_USED
+  }
+  checkCancelled()
+  if (!readAGPVersion(zipFile, checkCancelled).isNullOrBlank()) features = features or Features.AGP
   if (zipFile.getEntry("META-INF/xposed/module.prop") != null) features = features or Features.XPOSED_MODULE
-  if (isUseJetpackCompose(zipFile, resultList)) features = features or Features.JETPACK_COMPOSE
+  if (composeEvidence || resultList.contains(COMPOSE_CLASS_PATTERN)) features = features or Features.JETPACK_COMPOSE
   return features
 }
 
@@ -326,8 +346,9 @@ fun ApplicationInfo.isUse32BitAbi(): Boolean {
   }.getOrElse { false }
 }
 
-private fun isUseJetpackCompose(zipFile: ZipFileCompat, foundList: List<String>?): Boolean {
+private fun isUseJetpackCompose(zipFile: IZipFile, foundList: List<String>?, checkCancelled: () -> Unit): Boolean {
   return zipFile.getZipEntries().asSequence().any { entry ->
+    checkCancelled()
     val fileName = entry.name.substringAfterLast(File.separator)
     !entry.isDirectory &&
       (fileName.startsWith("androidx.compose.ui") || fileName.startsWith("androidx.compose.material")) &&

@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 
-import okio.Okio;
+import okio.Buffer;
 
 /**
  * Represents a zip file that contains dex files (i.e. an apk or jar file)
@@ -30,6 +30,7 @@ public class ZipDexContainer2 implements MultiDexContainer<DexBackedDexFile> {
   @Nullable
   private final Opcodes opcodes;
   private final long maxEntrySize;
+  private final Runnable checkCancellation;
   @Nullable
   private final IZipFile openedZipFile;
   private static final Pattern DEX_PATTERN = Pattern.compile("(?<=classes)\\d*\\.dex$");
@@ -44,6 +45,11 @@ public class ZipDexContainer2 implements MultiDexContainer<DexBackedDexFile> {
   }
 
   public ZipDexContainer2(@NonNull File zipFilePath, @Nullable Opcodes opcodes, long maxEntrySize) {
+    this(zipFilePath, opcodes, maxEntrySize, () -> {});
+  }
+
+  public ZipDexContainer2(@NonNull File zipFilePath, @Nullable Opcodes opcodes, long maxEntrySize, Runnable checkCancellation) {
+    this.checkCancellation = checkCancellation;
     this.openedZipFile = null;
     this.zipFilePath = zipFilePath;
     this.opcodes = opcodes;
@@ -56,6 +62,7 @@ public class ZipDexContainer2 implements MultiDexContainer<DexBackedDexFile> {
     this.opcodes = opcodes;
     this.maxEntrySize = Long.MAX_VALUE;
     this.openedZipFile = openedZipFile;
+    this.checkCancellation = () -> {};
   }
 
   /**
@@ -66,6 +73,7 @@ public class ZipDexContainer2 implements MultiDexContainer<DexBackedDexFile> {
   @NonNull
   @Override
   public List<String> getDexEntryNames() throws IOException {
+    checkCancellation.run();
     if (openedZipFile != null) {
       return getDexEntryNames(openedZipFile);
     }
@@ -78,6 +86,7 @@ public class ZipDexContainer2 implements MultiDexContainer<DexBackedDexFile> {
     List<String> entryNames = new ArrayList<>();
     Enumeration<? extends ZipEntry> entriesEnumeration = zipFile.getZipEntries();
     while (entriesEnumeration.hasMoreElements()) {
+      checkCancellation.run();
       String name = entriesEnumeration.nextElement().getName();
       if (DEX_PATTERN.matcher(name).find()) {
         entryNames.add(name);
@@ -96,6 +105,7 @@ public class ZipDexContainer2 implements MultiDexContainer<DexBackedDexFile> {
   @Nullable
   @Override
   public DexEntry<DexBackedDexFile> getEntry(@NonNull String entryName) throws IOException {
+    checkCancellation.run();
     if (openedZipFile != null) {
       return getEntry(openedZipFile, entryName);
     }
@@ -122,7 +132,22 @@ public class ZipDexContainer2 implements MultiDexContainer<DexBackedDexFile> {
     long declaredSize = zipEntry.getSize();
     if (maxEntrySize == Long.MAX_VALUE) {
       try (InputStream inputStream = zipFile.getInputStream(zipEntry)) {
-        return createEntry(zipEntry, Okio.buffer(Okio.source(inputStream)).readByteArray());
+        Buffer output = new Buffer();
+        byte[] block = new byte[8192];
+        while (true) {
+          checkCancellation.run();
+          int read = inputStream.read(block);
+          if (read == -1) break;
+          if (read == 0) {
+            int value = inputStream.read();
+            if (value == -1) break;
+            output.writeByte(value);
+          } else {
+            output.write(block, 0, read);
+          }
+        }
+        checkCancellation.run();
+        return createEntry(zipEntry, output.readByteArray());
       }
     }
     if (declaredSize < 0 || declaredSize > maxEntrySize) {
@@ -132,11 +157,18 @@ public class ZipDexContainer2 implements MultiDexContainer<DexBackedDexFile> {
       byte[] buf = new byte[(int) declaredSize];
       int offset = 0;
       while (offset < buf.length) {
-        int read = inputStream.read(buf, offset, buf.length - offset);
+        checkCancellation.run();
+        int read = inputStream.read(buf, offset, Math.min(8192, buf.length - offset));
         if (read < 0) {
           throw new IOException("DEX entry ended before its declared size");
         }
-        offset += read;
+        if (read == 0) {
+          int value = inputStream.read();
+          if (value == -1) throw new IOException("DEX entry ended before its declared size");
+          buf[offset++] = (byte) value;
+        } else {
+          offset += read;
+        }
       }
       if (inputStream.read() != -1) {
         throw new IOException("DEX entry exceeds its declared size");

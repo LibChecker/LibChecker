@@ -20,7 +20,7 @@ import kotlinx.coroutines.Dispatchers
     SnapshotItem::class, TimeStampItem::class,
     TrackItem::class, SnapshotDiffStoringItem::class
   ],
-  version = 24,
+  version = 25,
   exportSchema = true,
   autoMigrations = [
     AutoMigration(from = 21, to = 22),
@@ -48,7 +48,7 @@ abstract class LCDatabase : RoomDatabase() {
           MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13,
           MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16,
           MIGRATION_16_17, MIGRATION_17_18, MIGRATION_18_19,
-          MIGRATION_19_20, MIGRATION_20_21, MIGRATION_22_23
+          MIGRATION_19_20, MIGRATION_20_21, MIGRATION_22_23, MIGRATION_24_25
         )
         .build()
     }
@@ -337,6 +337,15 @@ abstract class LCDatabase : RoomDatabase() {
         )
         connection.execSQL(
           "ALTER TABLE snapshot_table ADD COLUMN minSdk INTEGER NOT NULL DEFAULT 0"
+        )
+      }
+    }
+
+    internal val MIGRATION_24_25: Migration = object : Migration(24, 25) {
+      override suspend fun migrate(connection: SQLiteConnection) {
+        connection.execSQL(
+          "CREATE INDEX IF NOT EXISTS `index_snapshot_table_timeStamp_packageName` " +
+            "ON `snapshot_table` (`timeStamp`, `packageName`)"
         )
       }
     }

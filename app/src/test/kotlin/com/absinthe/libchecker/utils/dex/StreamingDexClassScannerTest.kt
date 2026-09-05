@@ -9,6 +9,7 @@ import com.android.tools.smali.dexlib2.writer.pool.DexPool
 import java.io.ByteArrayInputStream
 import java.io.FilterInputStream
 import java.io.IOException
+import java.util.concurrent.CancellationException
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
@@ -196,6 +197,26 @@ class StreamingDexClassScannerTest {
     assertEquals(DEX_HEADER_SIZE.toLong(), input.bytesRead)
   }
 
+  @Test
+  fun cancellationStopsClassScanBeforeReadingNextBlock() {
+    val dex = createDex41("Lcom/example/" + "a".repeat(50_000) + ";")
+    var bytesRead = 0
+    val input = object : FilterInputStream(dex.inputStream()) {
+      override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
+        return super.read(buffer, offset, length).also { if (it > 0) bytesRead += it }
+      }
+    }
+    assertThrows(CancellationException::class.java) {
+      StreamingDexClassScanner.findClasses(
+        input,
+        listOf("Lmissing;"),
+        entrySize = dex.size.toLong(),
+        checkCancelled = { if (bytesRead >= 8192) throw CancellationException() }
+      )
+    }
+    assertTrue(bytesRead < 17_000)
+  }
+
   private fun createDex(vararg classDefs: ImmutableClassDef): ByteArray {
     val dexFile = temporaryFolder.newFile()
     DexPool.writeTo(
@@ -231,11 +252,19 @@ class StreamingDexClassScannerTest {
 
   private fun createDex41(descriptor: String): ByteArray {
     val descriptorBytes = descriptor.toByteArray()
+    val lengthBytes = buildList<Byte> {
+      var remaining = descriptor.length
+      do {
+        val value = remaining and 0x7f
+        remaining = remaining ushr 7
+        add((value or if (remaining != 0) 0x80 else 0).toByte())
+      } while (remaining != 0)
+    }.toByteArray()
     val stringIdsOffset = DEX_CONTAINER_HEADER_SIZE
     val typeIdsOffset = stringIdsOffset + UINT_SIZE
     val classDefsOffset = typeIdsOffset + UINT_SIZE
     val descriptorOffset = classDefsOffset + CLASS_DEF_ITEM_SIZE
-    val dex = ByteArray(descriptorOffset + 1 + descriptorBytes.size + 1)
+    val dex = ByteArray(descriptorOffset + lengthBytes.size + descriptorBytes.size + 1)
     "dex\n041\u0000".toByteArray().copyInto(dex)
     dex.writeIntLe(FILE_SIZE_OFFSET, dex.size)
     dex.writeIntLe(HEADER_SIZE_OFFSET, DEX_CONTAINER_HEADER_SIZE)
@@ -251,8 +280,8 @@ class StreamingDexClassScannerTest {
     dex.writeIntLe(stringIdsOffset, descriptorOffset)
     dex.writeIntLe(typeIdsOffset, 0)
     dex.writeIntLe(classDefsOffset, 0)
-    dex[descriptorOffset] = descriptor.length.toByte()
-    descriptorBytes.copyInto(dex, descriptorOffset + 1)
+    lengthBytes.copyInto(dex, descriptorOffset)
+    descriptorBytes.copyInto(dex, descriptorOffset + lengthBytes.size)
     return dex
   }
 

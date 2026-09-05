@@ -36,9 +36,16 @@ import timber.log.Timber;
 
 public class ElfParser implements Closeable, Elf {
   private final DataSource dataSource;
+  private final Runnable checkCancellation;
   private Elf.Header mHeader;
 
   public ElfParser(final File file) throws IOException {
+    this(file, () -> {});
+  }
+
+  public ElfParser(final File file, Runnable checkCancellation) throws IOException {
+    this.checkCancellation = checkCancellation;
+    checkCancellation.run();
     if (file == null || !file.exists()) {
       throw new IllegalArgumentException("File is null or does not exist");
     }
@@ -48,7 +55,12 @@ public class ElfParser implements Closeable, Elf {
   }
 
   public ElfParser(final InputStream is) throws IOException {
-    this.dataSource = new InputStreamDataSource(is);
+    this(is, () -> {});
+  }
+
+  public ElfParser(final InputStream is, Runnable checkCancellation) throws IOException {
+    this.checkCancellation = checkCancellation;
+    this.dataSource = new InputStreamDataSource(is, checkCancellation);
   }
 
   public int getEType() {
@@ -77,6 +89,7 @@ public class ElfParser implements Closeable, Elf {
 
     long minAlign = Long.MAX_VALUE;
     for (long i = 0; i < mHeader.phnum; ++i) {
+      checkCancellation.run();
       final ProgramHeader ph;
       try {
         ph = mHeader.getProgramHeader(i);
@@ -96,6 +109,7 @@ public class ElfParser implements Closeable, Elf {
       return mHeader;
     }
 
+    checkCancellation.run();
     dataSource.position(0);
 
     final int MAGIC = 0x464C457F;
@@ -109,6 +123,7 @@ public class ElfParser implements Closeable, Elf {
     final short elf_class = dataSource.readByte(4);
     final short elf_byte_order = dataSource.readByte(5);
 
+    checkCancellation.run();
     dataSource.position(0);
 
     boolean isBigEndian = elf_byte_order == Header.ELFDATA2MSB;
@@ -126,6 +141,7 @@ public class ElfParser implements Closeable, Elf {
   }
 
   public List<String> parseNeededDependencies() throws IOException {
+    checkCancellation.run();
     dataSource.position(0);
     final List<String> dependencies = new ArrayList<>();
     if (mHeader == null) {
@@ -150,6 +166,7 @@ public class ElfParser implements Closeable, Elf {
 
     long dynamicSectionOff = 0;
     for (long i = 0; i < numProgramHeaderEntries; ++i) {
+      checkCancellation.run();
       final Elf.ProgramHeader programHeader = header.getProgramHeader(i);
       if (programHeader.type == ProgramHeader.PT_DYNAMIC) {
         dynamicSectionOff = programHeader.offset;
@@ -168,6 +185,7 @@ public class ElfParser implements Closeable, Elf {
     boolean stringTableFound = false;
     Elf.DynamicStructure dynStructure;
     do {
+      checkCancellation.run();
       dynStructure = header.getDynamicStructure(dynamicSectionOff, i);
       if (dynStructure.tag == DynamicStructure.DT_NEEDED) {
         neededOffsets.add(dynStructure.val);
@@ -191,11 +209,14 @@ public class ElfParser implements Closeable, Elf {
     final long stringTableOff;
     try {
       stringTableOff = offsetFromVma(header, numProgramHeaderEntries, vStringTableOff);
+    } catch (java.util.concurrent.CancellationException e) {
+      throw e;
     } catch (IllegalStateException e) {
       Timber.w(e, "Could not map ELF string table to file offset");
       return Collections.unmodifiableList(dependencies);
     }
     for (final Long strOff : neededOffsets) {
+      checkCancellation.run();
       dependencies.add(dataSource.readString(stringTableOff + strOff));
     }
 
@@ -205,6 +226,7 @@ public class ElfParser implements Closeable, Elf {
   private long offsetFromVma(final Elf.Header header, final long numEntries, final long vma)
     throws IOException {
     for (long i = 0; i < numEntries; ++i) {
+      checkCancellation.run();
       final Elf.ProgramHeader programHeader = header.getProgramHeader(i);
       if (programHeader.type == ProgramHeader.PT_LOAD) {
         // Within memsz instead of filesz to be more tolerant
@@ -229,6 +251,7 @@ public class ElfParser implements Closeable, Elf {
     }
 
     for (int i = 0; i < mHeader.shnum; ++i) {
+      checkCancellation.run();
       final Elf.SectionHeader sh = mHeader.getSectionHeader(i);
       if (sh.type == Elf.SectionHeader.SHT_SYMTAB || sh.type == Elf.SectionHeader.SHT_DYNSYM) {
         symtabOff = sh.offset;
@@ -248,6 +271,7 @@ public class ElfParser implements Closeable, Elf {
     final List<String> entryPoints = new ArrayList<>();
     final long numSymbols = symtabSize / symtabEntSize;
     for (long i = 0; i < numSymbols; ++i) {
+      checkCancellation.run();
       final Elf.Symbol symbol = mHeader.getSymbol(symtabOff + i * symtabEntSize);
       if (symbol.getType() == Elf.Symbol.STT_FUNC &&
         symbol.getBinding() == Elf.Symbol.STB_GLOBAL &&
@@ -269,6 +293,7 @@ public class ElfParser implements Closeable, Elf {
     }
 
     for (int i = 0; i < mHeader.shnum; ++i) {
+      checkCancellation.run();
       final Elf.SectionHeader sh = mHeader.getSectionHeader(i);
       if (sh.type == Elf.SectionHeader.SHT_SYMTAB) {
         return false;

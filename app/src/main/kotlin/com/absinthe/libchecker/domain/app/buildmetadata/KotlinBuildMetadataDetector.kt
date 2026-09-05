@@ -117,8 +117,9 @@ internal object KotlinBuildMetadataDetector {
     return toolingMetadata
   }
 
-  fun hasKotlinModuleMetadata(zip: IZipFile): Boolean {
+  fun hasKotlinModuleMetadata(zip: IZipFile, checkCancelled: () -> Unit = {}): Boolean {
     return zip.getZipEntries().asSequence().any { entry ->
+      checkCancelled()
       entry.isDirectory.not() && entry.name.isKotlinModuleMetadataEntry()
     }
   }

@@ -33,6 +33,10 @@ class LocalSnapshotRepository(
     return repository.getSnapshots(timestamp)
   }
 
+  override suspend fun getSnapshots(timestamp: Long, packageNames: List<String>): List<SnapshotItem> {
+    return repository.getSnapshots(timestamp, packageNames)
+  }
+
   override suspend fun getSnapshotSummaries(timestamp: Long): List<SnapshotItem> {
     return repository.getSnapshotSummaries(timestamp)
   }

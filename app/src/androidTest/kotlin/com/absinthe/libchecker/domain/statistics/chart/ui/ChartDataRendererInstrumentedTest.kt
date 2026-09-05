@@ -15,7 +15,9 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -55,11 +57,12 @@ class ChartDataRendererInstrumentedTest {
   }
 
   @Test
-  fun latestRenderAtomicallyOwnsChartHost() = runBlocking {
+  fun latestRenderWaitsForPreviousComputationAndAtomicallyOwnsChartHost() = runBlocking {
     val context = InstrumentationRegistry.getInstrumentation().targetContext
     val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     val firstRenderStarted = CompletableDeferred<Unit>()
     val releaseFirstRender = CompletableDeferred<Unit>()
+    val latestRenderStarted = CompletableDeferred<Unit>()
     val latestRenderCommitted = CompletableDeferred<Unit>()
     val reportedProgress = Collections.synchronizedList(mutableListOf<Int>())
     lateinit var chartHost: FrameLayout
@@ -93,13 +96,18 @@ class ChartDataRendererInstrumentedTest {
       assertSame(initialChart, chartHost.getChildAt(0))
       renderer.render(
         newChartView = latestChart,
-        fillChart = { _, onProgress -> onProgress(LATEST_PROGRESS) },
+        fillChart = { _, onProgress ->
+          latestRenderStarted.complete(Unit)
+          onProgress(LATEST_PROGRESS)
+        },
         onCommitted = { latestRenderCommitted.complete(Unit) }
       )
     }
 
-    latestRenderCommitted.await()
+    delay(STALE_RENDER_SETTLE_MILLIS)
+    assertFalse(latestRenderStarted.isCompleted)
     releaseFirstRender.complete(Unit)
+    withTimeout(5_000) { latestRenderCommitted.await() }
     delay(STALE_RENDER_SETTLE_MILLIS)
 
     withContext(Dispatchers.Main) {

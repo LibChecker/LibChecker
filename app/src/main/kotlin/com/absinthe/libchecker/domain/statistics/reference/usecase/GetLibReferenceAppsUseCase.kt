@@ -16,7 +16,9 @@ import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getPermissionsList
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.isActive
 import timber.log.Timber
 
@@ -57,7 +59,7 @@ class GetLibReferenceAppsUseCase(
         if (!coroutineContext.isActive) {
           return Result(result, actionTargets)
         }
-        if (item.references(request.name, request.type, actionTargets)) {
+        if (item.references(request.name, request.type, actionTargets, coroutineContext::ensureActive)) {
           result.add(item)
         }
       }
@@ -70,10 +72,11 @@ class GetLibReferenceAppsUseCase(
   private fun LCItem.references(
     name: String,
     @LibType type: Int,
-    actionTargets: MutableMap<String, ActionTarget>
+    actionTargets: MutableMap<String, ActionTarget>,
+    checkCancelled: () -> Unit
   ): Boolean {
     return when (type) {
-      NATIVE -> hasNativeReference(name)
+      NATIVE -> hasNativeReference(name, checkCancelled)
 
       SERVICE, ACTIVITY, RECEIVER, PROVIDER -> hasComponentReference(name, type)
 
@@ -95,13 +98,14 @@ class GetLibReferenceAppsUseCase(
     }
   }
 
-  private fun LCItem.hasNativeReference(name: String): Boolean {
+  private fun LCItem.hasNativeReference(name: String, checkCancelled: () -> Unit): Boolean {
     return runCatching {
       val packageInfo = installedAppRepository.getPackageInfo(packageName) ?: return@runCatching false
-      PackageUtils.getNativeDirLibs(packageInfo).any {
+      PackageUtils.getNativeDirLibs(packageInfo, checkCancelled = checkCancelled).any {
         it.name == name && RulesRepository.checkNativeLibValidation(packageName, name)
       }
     }.onFailure {
+      if (it is CancellationException) throw it
       Timber.e(it)
     }.getOrDefault(false)
   }
@@ -112,6 +116,7 @@ class GetLibReferenceAppsUseCase(
         ?: return@runCatching false
       PackageUtils.getComponentStringList(packageInfo, type, false).contains(name)
     }.onFailure {
+      if (it is CancellationException) throw it
       Timber.e(it)
     }.getOrDefault(false)
   }
@@ -122,6 +127,7 @@ class GetLibReferenceAppsUseCase(
         ?: return@runCatching false
       packageInfo.getPermissionsList().contains(name)
     }.onFailure {
+      if (it is CancellationException) throw it
       Timber.e(it)
     }.getOrDefault(false)
   }
