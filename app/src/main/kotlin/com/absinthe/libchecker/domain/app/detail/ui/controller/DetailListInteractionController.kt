@@ -22,7 +22,7 @@ class DetailListInteractionController(
 
   fun onSearchTextChanged(newText: String) {
     viewModel.filterState.queriedText = newText
-    detailFragmentManager.deliverFilterItemsByText(newText, coroutineScope)
+    detailFragmentManager.deliverFilterItems(newText, null, coroutineScope)
   }
 
   fun onProcessFilterChanged(process: String?) {

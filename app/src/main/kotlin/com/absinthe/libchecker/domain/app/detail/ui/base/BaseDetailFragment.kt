@@ -31,7 +31,6 @@ import com.absinthe.libchecker.domain.app.detail.resource.ResolveAppResourceValu
 import com.absinthe.libchecker.domain.app.detail.resource.ResolveAppResourceValueUseCase.AppResourceValue
 import com.absinthe.libchecker.domain.app.detail.ui.DetailFragmentManager
 import com.absinthe.libchecker.domain.app.detail.ui.IDetailContainer
-import com.absinthe.libchecker.domain.app.detail.ui.Sortable
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.LibStringAdapter
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.LibDetailDialogFragment
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.PermissionDetailDialogFragment
@@ -66,9 +65,7 @@ import timber.log.Timber
 
 const val EXTRA_TYPE = "EXTRA_TYPE"
 
-abstract class BaseDetailFragment<T : ViewBinding> :
-  BaseFragment<T>(),
-  Sortable {
+abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>() {
 
   protected val viewModel: DetailViewModel by activityViewModel()
   private val appDetailSettingsRepository: AppDetailSettingsRepository by inject()
@@ -244,7 +241,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     )
   }
 
-  override suspend fun sort() {
+  suspend fun sort() {
     val list = mutableListOf<LibStringItemChip>().also {
       it += adapter.data
     }
@@ -294,7 +291,7 @@ abstract class BaseDetailFragment<T : ViewBinding> :
     updateItemsWithFilterResult(viewModel.filterAndSortDetailItems(items, searchWords, process, type))
   }
 
-  override suspend fun setItemsWithFilter(searchWords: String?, process: String?) {
+  suspend fun setItemsWithFilter(searchWords: String?, process: String?) {
     updateListRenderState { it.copy(highlightText = searchWords.orEmpty()) }
     updateItemsWithFilterResult(getFilterList(searchWords, process))
   }

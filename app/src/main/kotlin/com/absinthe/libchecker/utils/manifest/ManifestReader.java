@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import pxb.android.Res_value;
 import pxb.android.axml.AxmlReader;
@@ -24,36 +25,12 @@ public class ManifestReader {
 
   private ManifestReader(File apk, String[] demands) {
     this.demands = demands;
-    try (IZipFile zip = new ZipFileCompat(apk)) {
-      InputStream is = zip.getInputStream(zip.getEntry("AndroidManifest.xml"));
-      byte[] bytes = getBytesFromInputStream(is);
-      AxmlReader reader = new AxmlReader(bytes != null ? bytes : new byte[0]);
-      reader.accept(new AxmlVisitor() {
-        @Override
-        public NodeVisitor child(String ns, String name) {
-          NodeVisitor child = super.child(ns, name);
-          return new ManifestTagVisitor(child);
-        }
-      });
-    } catch (Exception e) {
-      Timber.w(e);
-    }
+    acceptManifest(apk, () -> new ManifestTagVisitor(null));
   }
 
   private ManifestReader(byte[] bytes, String[] demands) {
     this.demands = demands;
-    try {
-      AxmlReader reader = new AxmlReader(bytes != null ? bytes : new byte[0]);
-      reader.accept(new AxmlVisitor() {
-        @Override
-        public NodeVisitor child(String ns, String name) {
-          NodeVisitor child = super.child(ns, name);
-          return new ManifestTagVisitor(child);
-        }
-      });
-    } catch (Exception e) {
-      Timber.w(e);
-    }
+    acceptManifest(bytes, () -> new ManifestTagVisitor(null));
   }
 
   public static Map<String, Object> getManifestProperties(byte[] bytes, String[] demands) throws IOException {
@@ -76,6 +53,27 @@ public class ManifestReader {
       Timber.w(e);
     }
     return null;
+  }
+
+  static void acceptManifest(File apk, Supplier<NodeVisitor> visitor) {
+    try (IZipFile zip = new ZipFileCompat(apk)) {
+      acceptManifest(getBytesFromInputStream(zip.getInputStream(zip.getEntry("AndroidManifest.xml"))), visitor);
+    } catch (Exception e) {
+      Timber.w(e);
+    }
+  }
+
+  static void acceptManifest(byte[] bytes, Supplier<NodeVisitor> visitor) {
+    try {
+      new AxmlReader(bytes != null ? bytes : new byte[0]).accept(new AxmlVisitor() {
+        @Override
+        public NodeVisitor child(String ns, String name) {
+          return visitor.get();
+        }
+      });
+    } catch (Exception e) {
+      Timber.w(e);
+    }
   }
 
   private boolean contains(String name) {

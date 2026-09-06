@@ -19,10 +19,6 @@ class DetailFragmentManager {
     get() = map[selectedPosition]
     private set
 
-  var currentSortable: Sortable? = null
-    get() = map[selectedPosition]
-    private set
-
   private val map = SparseArray<BaseDetailFragment<*>>()
   private var deliverFilterJob: Job? = null
 
@@ -37,15 +33,6 @@ class DetailFragmentManager {
   fun sortAll(scope: CoroutineScope) {
     map.forEach { _, value ->
       scope.launch { value.sort() }
-    }
-  }
-
-  fun deliverFilterItemsByText(text: String, coroutineScope: CoroutineScope) {
-    deliverFilterJob?.cancel()
-    deliverFilterJob = coroutineScope.launch {
-      map.forEach { _, value ->
-        value.setItemsWithFilter(text, null)
-      }
     }
   }
 

@@ -2,21 +2,14 @@ package com.absinthe.libchecker.utils.manifest;
 
 import androidx.collection.ArrayMap;
 
-import com.absinthe.libchecker.compat.IZipFile;
-import com.absinthe.libchecker.compat.ZipFileCompat;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Map;
 
 import pxb.android.Res_value;
-import pxb.android.axml.AxmlReader;
-import pxb.android.axml.AxmlVisitor;
 import pxb.android.axml.NodeVisitor;
-import timber.log.Timber;
 
 
 public class FullManifestReader {
@@ -31,36 +24,12 @@ public class FullManifestReader {
 
   public FullManifestReader(File apk, String[] demands) {
     this.demands = demands;
-    try (IZipFile zip = new ZipFileCompat(apk)) {
-      InputStream is = zip.getInputStream(zip.getEntry("AndroidManifest.xml"));
-      byte[] bytes = getBytesFromInputStream(is);
-      AxmlReader reader = new AxmlReader(bytes != null ? bytes : new byte[0]);
-      reader.accept(new AxmlVisitor() {
-        @Override
-        public NodeVisitor child(String ns, String name) {
-          NodeVisitor child = super.child(ns, name);
-          return new ManifestTagVisitor(child);
-        }
-      });
-    } catch (Exception e) {
-      Timber.w(e);
-    }
+    ManifestReader.acceptManifest(apk, () -> new ManifestTagVisitor(null));
   }
 
   public FullManifestReader(byte[] bytes, String[] demands) {
     this.demands = demands;
-    try {
-      AxmlReader reader = new AxmlReader(bytes != null ? bytes : new byte[0]);
-      reader.accept(new AxmlVisitor() {
-        @Override
-        public NodeVisitor child(String ns, String name) {
-          NodeVisitor child = super.child(ns, name);
-          return new ManifestTagVisitor(child);
-        }
-      });
-    } catch (Exception e) {
-      Timber.w(e);
-    }
+    ManifestReader.acceptManifest(bytes, () -> new ManifestTagVisitor(null));
   }
 
   public static Map<String, Object> getManifestProperties(byte[] bytes, String[] demands) throws IOException {
@@ -69,20 +38,6 @@ public class FullManifestReader {
 
   public static Map<String, Object> getManifestProperties(File apk, String[] demands) throws IOException {
     return new FullManifestReader(apk, demands).properties;
-  }
-
-  public static byte[] getBytesFromInputStream(InputStream inputStream) {
-    try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-      byte[] b = new byte[1024];
-      int n;
-      while ((n = inputStream.read(b)) != -1) {
-        bos.write(b, 0, n);
-      }
-      return bos.toByteArray();
-    } catch (Exception e) {
-      Timber.w(e);
-    }
-    return null;
   }
 
   private boolean contains(String name) {
