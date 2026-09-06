@@ -4,17 +4,23 @@ import android.content.Context
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 
-class SnapshotDetailNewInstallView(context: Context) : AViewGroup(context) {
+class SnapshotPackageChangeView(
+  context: Context,
+  @DrawableRes illustration: Int,
+  @StringRes message: Int
+) : AViewGroup(context) {
 
   private val image = ImageView(context).apply {
     layoutParams = LayoutParams(150.dp, 150.dp)
-    setImageResource(R.drawable.ic_yes)
+    setImageResource(illustration)
     importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
     addView(this)
   }
@@ -27,7 +33,7 @@ class SnapshotDetailNewInstallView(context: Context) : AViewGroup(context) {
       ).also {
         it.topMargin = 16.dp
       }
-      text = context.getString(R.string.snapshot_detail_new_install_title)
+      text = context.getString(message)
       setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceTitleLarge))
       addView(this)
     }

@@ -51,14 +51,14 @@ class SnapshotNoDiffBSView(context: Context) : BottomSheetScaffoldView(context) 
     }
     when (mode) {
       SnapshotNoDiffMode.New -> {
-        stubView = SnapshotDetailNewInstallView(context).apply {
+        stubView = SnapshotPackageChangeView(context, R.drawable.ic_yes, R.string.snapshot_detail_new_install_title).apply {
           layoutParams =
             LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
         }
       }
 
       SnapshotNoDiffMode.Deleted -> {
-        stubView = SnapshotDetailDeletedView(context).apply {
+        stubView = SnapshotPackageChangeView(context, R.drawable.ic_no, R.string.snapshot_detail_deleted_title).apply {
           layoutParams =
             LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
         }

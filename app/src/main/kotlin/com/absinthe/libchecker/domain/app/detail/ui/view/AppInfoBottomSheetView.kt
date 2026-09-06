@@ -5,13 +5,14 @@ import android.graphics.Color
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.domain.app.detail.model.AppInfoActionItem
 import com.absinthe.libchecker.domain.app.detail.model.AppInfoBottomSheetAction
 import com.absinthe.libchecker.domain.app.detail.model.AppInfoBottomSheetState
 import com.absinthe.libchecker.domain.app.detail.model.externalActions
 import com.absinthe.libchecker.domain.app.detail.model.launchAction
 import com.absinthe.libchecker.domain.app.detail.model.launcherActivityCopyText
 import com.absinthe.libchecker.domain.app.detail.model.settingsAction
-import com.absinthe.libchecker.domain.app.detail.ui.adapter.AppInfoAdapter
+import com.absinthe.libchecker.ui.adapter.BindOnlyAdapter
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
@@ -22,8 +23,8 @@ class AppInfoBottomSheetView(context: Context) : BottomSheetScaffoldView(context
 
   private var onAction: (AppInfoBottomSheetAction) -> Unit = {}
 
-  private val actionAdapter = AppInfoAdapter { item ->
-    onAction(AppInfoBottomSheetAction.OpenExternal(item))
+  private val actionAdapter = BindOnlyAdapter(::AppInfoItemView) { item: AppInfoActionItem ->
+    bind(item) { onAction(AppInfoBottomSheetAction.OpenExternal(it)) }
   }
 
   private val functionsContainer = FlexboxLayout(context).apply {

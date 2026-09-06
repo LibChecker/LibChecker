@@ -38,9 +38,8 @@ import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.SnapshotDetailA
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.SnapshotDetailRow
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.interactionPolicy
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.toRenderState
-import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailDeletedView
-import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailNewInstallView
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotEmptyView
+import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotPackageChangeView
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotTitleDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
@@ -177,9 +176,9 @@ class SnapshotDetailActivity :
 
     adapter.stateView =
       when {
-        entity.newInstalled -> SnapshotDetailNewInstallView(this)
+        entity.newInstalled -> SnapshotPackageChangeView(this, R.drawable.ic_yes, R.string.snapshot_detail_new_install_title)
 
-        entity.deleted -> SnapshotDetailDeletedView(this)
+        entity.deleted -> SnapshotPackageChangeView(this, R.drawable.ic_no, R.string.snapshot_detail_deleted_title)
 
         else -> SnapshotEmptyView(this).apply {
           layoutParams = FrameLayout.LayoutParams(

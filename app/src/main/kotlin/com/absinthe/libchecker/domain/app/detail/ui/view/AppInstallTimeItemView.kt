@@ -1,67 +1,18 @@
 package com.absinthe.libchecker.domain.app.detail.ui.view
 
 import android.content.Context
-import android.util.TypedValue
-import android.view.ContextThemeWrapper
 import android.view.ViewGroup
-import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.view.isGone
 import androidx.core.view.marginBottom
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.action.AppInstalledTimeDisplayData
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.extensions.getColorByAttr
-import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
-import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
 import com.absinthe.libchecker.view.AViewGroup
-import com.google.android.material.card.MaterialCardView
 
-class AppInstallTimeItemView(context: Context) : AViewGroup(context) {
+class AppInstallTimeItemView(context: Context) : AppInstallDetailSectionView(context, R.string.lib_detail_app_installed_time) {
 
-  private val titleView = AppCompatTextView(
-    ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)
-  ).apply {
-    layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.WRAP_CONTENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
-    ).also {
-      it.topMargin = 8.dp
-    }
-    setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-    text = context.getString(R.string.lib_detail_app_installed_time)
-  }
-
-  private val contentView = ContentView(context).apply {
-    layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
-    )
-    isClickable = false
-    isLongClickable = false
-    isFocusable = false
-    isFocusableInTouchMode = false
-  }
-
-  private val container = MaterialCardView(context).apply {
-    layoutParams = LayoutParams(
-      ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
-    ).also {
-      it.topMargin = 8.dp
-    }
-    setSmoothRoundCorner(12.dp)
-    strokeWidth = 1.dp
-    strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutlineVariant)
-    setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSurfaceContainerHigh))
-  }
-
-  init {
-    addView(titleView)
-    container.addView(contentView)
-    addView(container)
-  }
+  private val contentView = ContentView(context).also(::setContentView)
 
   fun bind(display: AppInstalledTimeDisplayData) {
     contentView.bind(
@@ -69,30 +20,6 @@ class AppInstallTimeItemView(context: Context) : AViewGroup(context) {
       lastUpdatedTime = display.lastUpdatedTime
     )
     container.setLongClickCopiedToClipboard(contentView.getAllContentText())
-  }
-
-  override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-    val parent = parent as ViewGroup
-    super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-    titleView.autoMeasure()
-    container.let {
-      it.measure(
-        (measuredWidth - parent.paddingStart - parent.paddingEnd).toExactlyMeasureSpec(),
-        if (it.isGone) 0 else it.defaultHeightMeasureSpec(parent)
-      )
-    }
-    setMeasuredDimension(
-      measuredWidth,
-      titleView.marginTop +
-        titleView.measuredHeight +
-        container.marginTop +
-        container.measuredHeight
-    )
-  }
-
-  override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-    titleView.layout(paddingStart, titleView.marginTop)
-    container.layout(paddingStart, titleView.bottom + container.marginTop)
   }
 
   private class ContentView(context: Context) : AViewGroup(context) {

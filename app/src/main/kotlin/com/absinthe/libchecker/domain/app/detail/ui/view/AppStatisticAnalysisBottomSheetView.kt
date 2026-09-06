@@ -19,14 +19,13 @@ import com.absinthe.libchecker.domain.statistics.chart.model.StatisticCalculatio
 import com.absinthe.libchecker.domain.statistics.chart.ui.loadStatisticIcon
 import com.absinthe.libchecker.domain.statistics.chart.ui.resolve
 import com.absinthe.libchecker.domain.statistics.chart.ui.summaryTitle
+import com.absinthe.libchecker.ui.adapter.BindOnlyAdapter
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.app.BottomSheetScaffoldView
-import com.chad.library.adapter.base.BaseQuickAdapter
-import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.google.android.material.progressindicator.CircularProgressIndicator
 
 class AppStatisticAnalysisBottomSheetView(
@@ -34,7 +33,9 @@ class AppStatisticAnalysisBottomSheetView(
   onAnalysisClick: (AppStatisticRuleAnalysis) -> Unit
 ) : BottomSheetScaffoldView(context) {
 
-  private val adapter = AnalysisAdapter(onAnalysisClick)
+  private val adapter = BindOnlyAdapter(::AppStatisticAnalysisItemView) { item: AppStatisticRuleAnalysis ->
+    bind(item, onAnalysisClick)
+  }
 
   private val content = FrameLayout(context).apply {
     layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, CONTENT_HEIGHT_DP.dp)
@@ -145,19 +146,6 @@ class AppStatisticAnalysisBottomSheetView(
         }
       )
     )
-  }
-
-  private class AnalysisAdapter(
-    private val onAnalysisClick: (AppStatisticRuleAnalysis) -> Unit
-  ) : BaseQuickAdapter<AppStatisticRuleAnalysis, BaseViewHolder>(0) {
-
-    override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-      return BaseViewHolder(AppStatisticAnalysisItemView(context))
-    }
-
-    override fun convert(holder: BaseViewHolder, item: AppStatisticRuleAnalysis) {
-      (holder.itemView as AppStatisticAnalysisItemView).bind(item, onAnalysisClick)
-    }
   }
 
   private companion object {
