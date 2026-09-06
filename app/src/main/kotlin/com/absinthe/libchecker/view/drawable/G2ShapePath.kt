@@ -18,6 +18,10 @@ fun Path.setG2Shape(
   if (right <= left || bottom <= top) return
   val r = cornerRadius.coerceIn(0f, minOf(right - left, bottom - top) / 2f)
   val smoothing = cornerSmoothing?.coerceIn(0f, 1f)
+  if (smoothing == 0f && (tailCenter == null || tailWidth <= 0f || tailHeight <= 0f)) {
+    addRoundRect(left, top, right, bottom, r, r, Path.Direction.CW)
+    return
+  }
   val firstControl = r * if (smoothing == null) 0.05893696f else 0.0847f + 0.0215f * smoothing
   val secondControl = r * if (smoothing == null) 0.41421357f else 0.4377467f + 0.0217334f * smoothing
   val diagonal = r * if (smoothing == null) 0.70710677f else 0.7188733f + 0.0108668f * smoothing

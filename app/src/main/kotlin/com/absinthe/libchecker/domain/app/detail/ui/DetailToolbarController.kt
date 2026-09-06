@@ -15,6 +15,7 @@ class DetailToolbarController(
   private val toolbarView: RecyclerView,
   private val appBarLayout: AppBarLayout,
   private val onSortClick: () -> Unit,
+  private val onAdvancedMenuClick: () -> Unit,
   private val onOnlineRuleAnalysisClick: () -> Unit,
   private val onQuickLaunchClick: () -> Unit,
   private val onProcessClick: () -> Unit
@@ -57,6 +58,10 @@ class DetailToolbarController(
     updateState { it.copy(compareVisible = true) }
   }
 
+  fun setSelectedType(type: Int) {
+    updateState { it.copy(selectedType = type) }
+  }
+
   fun setProcessActionVisible(visible: Boolean) {
     updateState { it.copy(processVisible = visible) }
   }
@@ -94,6 +99,7 @@ class DetailToolbarController(
   private fun onActionClick(action: AppDetailToolbarAction) {
     when (action) {
       AppDetailToolbarAction.SORT -> onSortClick()
+      AppDetailToolbarAction.ADVANCED_MENU -> onAdvancedMenuClick()
       AppDetailToolbarAction.ONLINE_RULE_ANALYSIS -> onOnlineRuleAnalysisClick()
       AppDetailToolbarAction.QUICK_LAUNCH -> onQuickLaunchClick()
       AppDetailToolbarAction.PROCESS -> onProcessClick()
@@ -105,6 +111,8 @@ class DetailToolbarController(
   private fun createItem(action: AppDetailToolbarAction): AppDetailToolbarItem {
     val (iconRes, label) = when (action) {
       AppDetailToolbarAction.SORT -> R.drawable.ic_lib_sort to toolbarView.context.getString(R.string.menu_sort)
+
+      AppDetailToolbarAction.ADVANCED_MENU -> R.drawable.ic_menu to toolbarView.context.getString(R.string.advanced_menu)
 
       AppDetailToolbarAction.ONLINE_RULE_ANALYSIS ->
         R.drawable.ic_cloud_rules to toolbarView.context.getString(R.string.app_detail_online_rules_action)

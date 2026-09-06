@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.PERMISSION
+import com.absinthe.libchecker.constant.options.withOption
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.detail.abi.AppDetailAbiLabelData
 import com.absinthe.libchecker.domain.app.detail.action.AppElfDetail
@@ -22,6 +23,7 @@ import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceRequester
 import com.absinthe.libchecker.domain.app.detail.model.AppPropItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
+import com.absinthe.libchecker.domain.app.detail.model.buildComponentMenuState
 import com.absinthe.libchecker.domain.app.detail.navigation.DetailReferenceNavigation
 import com.absinthe.libchecker.domain.app.detail.packageinfo.GetAppDetailPackageUseCase
 import com.absinthe.libchecker.domain.app.detail.presentation.content.DetailContentLoader
@@ -29,6 +31,7 @@ import com.absinthe.libchecker.domain.app.detail.statistics.AnalyzeAppStatisticR
 import com.absinthe.libchecker.domain.app.detail.statistics.AppStatisticAnalysisState
 import com.absinthe.libchecker.domain.app.model.VersionedFeature
 import com.absinthe.libchecker.domain.app.packageinfo.PrepareApkAnalysisPackageUseCase
+import com.absinthe.libchecker.domain.app.repository.AppListSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
 import java.io.File
@@ -51,8 +54,24 @@ class DetailViewModel(
   private val detailFilterController: DetailFilterController,
   private val detailPresentationLoader: DetailPresentationLoader,
   private val detailPackageLoader: DetailPackageLoader,
+  private val appListSettingsRepository: AppListSettingsRepository,
   private val analyzeAppStatisticRules: AnalyzeAppStatisticRulesUseCase
 ) : ViewModel() {
+  private val _itemDisplayOptions = MutableStateFlow(appListSettingsRepository.itemDisplayOptions)
+  val itemDisplayOptions = _itemDisplayOptions.asStateFlow()
+
+  fun getComponentMenuState(rulePackageName: String) = buildComponentMenuState(
+    options = appListSettingsRepository.itemDisplayOptions,
+    colorfulRuleIcon = appListSettingsRepository.colorfulRuleIcon,
+    rulePackageName = rulePackageName
+  )
+
+  fun setComponentDisplayOption(option: Int, checked: Boolean) {
+    val options = appListSettingsRepository.itemDisplayOptions.withOption(option, checked)
+    appListSettingsRepository.setItemDisplayOptions(options)
+    _itemDisplayOptions.value = options
+  }
+
   val contentState = detailContentLoader.contentState
   val featureState = detailPresentationLoader.featureState
   val filterState = detailFilterController.filterState

@@ -65,7 +65,7 @@ internal class FloatingNavigationThumbController(
 
   init {
     val thumbColor = host.context.getColorByAttr(MaterialR.attr.colorSecondaryContainer)
-    thumbDrawable = G2PillDrawable(fillColor = thumbColor)
+    thumbDrawable = G2PillDrawable(fillColor = thumbColor, cornerSmoothing = if (vertical) null else 0f)
     thumbView.background = thumbDrawable
     thumbView.visibility = View.GONE
     host.addView(thumbView, 0, FrameLayout.LayoutParams(0, 0))

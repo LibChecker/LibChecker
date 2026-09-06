@@ -412,4 +412,6 @@
   <string name="library_insight_unavailable">无法获取版本详情 · 点按重试</string>
   <string name="library_insight_show_details">展开详情</string>
   <string name="library_insight_hide_details">收起详情</string>
+  <string name="adv_app_filter">应用筛选</string>
+  <string name="adv_app_appearance">应用列表外观</string>
 </resources>

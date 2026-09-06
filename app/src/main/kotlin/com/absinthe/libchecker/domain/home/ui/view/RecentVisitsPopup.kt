@@ -572,7 +572,8 @@ class RecentVisitsPopup(
           navY + inset,
           navX + navigation.width - inset,
           navY + navigation.height - inset,
-          (navigation.height / 2f - inset) * floatingProgress
+          (navigation.height / 2f - inset) * floatingProgress,
+          cornerSmoothing = if (navigation is com.google.android.material.bottomnavigation.BottomNavigationView) 0f else null
         )
         contentClip.addPath(navigationCutout)
       } else {

@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -144,6 +146,15 @@ abstract class BaseDetailFragment<T : ViewBinding> :
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewModel.itemDisplayOptions.collect { options ->
+          val currentAdapter = adapter
+          listRenderState = listRenderState.copy(itemDisplayOptions = options)
+          currentAdapter.bind(listRenderState, refreshItems = true)
+        }
+      }
+    }
     if (!autoLoadItems) {
       return
     }

@@ -331,17 +331,14 @@ class AppListFragment :
             val menuState = homeViewModel.getAppListAdvancedMenuState()
             setOptionChangeListener(
               displayOptions = menuState.displayOptions,
-              itemDisplayOptions = menuState.itemDisplayOptions,
-              colorfulRuleIcon = menuState.colorfulRuleIcon,
-              onDisplayOptionsChanged = homeViewModel::setAppListDisplayOptions,
-              onItemDisplayOptionsChanged = homeViewModel::setAppListItemDisplayOptions
+              onDisplayOptionsChanged = homeViewModel::setAppListDisplayOptions
             )
-            setOnDismissListener { advancedDiff, itemAdvancedDiff ->
+            setOnDismissListener { advancedDiff ->
               val shouldReturnTopAfterUpdate =
                 shouldReturnAppListTopAfterAdvancedMenuChange(advancedDiff)
               val dismissPlan = homeViewModel.onAppListAdvancedMenuDismissed(
                 displayOptionsDiff = advancedDiff,
-                itemDisplayOptionsDiff = itemAdvancedDiff
+                itemDisplayOptionsDiff = 0
               )
               if (dismissPlan.shouldRefreshItems) {
                 updateItems(shouldReturnTopAfterUpdate = shouldReturnTopAfterUpdate)

@@ -10,11 +10,9 @@ class AdvancedMenuLayoutItemTest {
     assertEquals(
       listOf(
         AdvancedMenuLayoutItem.AppDemo,
-        AdvancedMenuLayoutItem.Sort,
-        AdvancedMenuLayoutItem.FilterOptions,
         AdvancedMenuLayoutItem.ViewOptions,
-        AdvancedMenuLayoutItem.ComponentStyleDemo,
-        AdvancedMenuLayoutItem.ComponentStyleOptions
+        AdvancedMenuLayoutItem.Sort,
+        AdvancedMenuLayoutItem.FilterOptions
       ),
       buildAdvancedMenuLayoutItems()
     )

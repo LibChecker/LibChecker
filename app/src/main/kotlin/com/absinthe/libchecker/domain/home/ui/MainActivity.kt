@@ -387,7 +387,8 @@ class MainActivity :
     originalLabelVisibilityMode = navView.labelVisibilityMode
     originalNavBackground = navView.background
     navPillDrawable = G2PillDrawable(
-      fillColor = getColorByAttr(com.google.android.material.R.attr.colorSurfaceContainer)
+      fillColor = getColorByAttr(com.google.android.material.R.attr.colorSurfaceContainer),
+      cornerSmoothing = if (navView is BottomNavigationView) 0f else null
     )
     if (floatingNavEnabled) {
       navView.background = navPillDrawable

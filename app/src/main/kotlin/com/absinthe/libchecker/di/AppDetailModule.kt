@@ -112,6 +112,7 @@ val appDetailModule = module {
       detailFilterController = get(),
       detailPresentationLoader = get(),
       detailPackageLoader = get(),
+      appListSettingsRepository = get(),
       analyzeAppStatisticRules = get()
     )
   }

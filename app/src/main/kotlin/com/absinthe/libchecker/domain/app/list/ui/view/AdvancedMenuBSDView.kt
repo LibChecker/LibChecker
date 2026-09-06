@@ -1,14 +1,14 @@
 package com.absinthe.libchecker.domain.app.list.ui.view
 
 import android.content.Context
+import android.graphics.Typeface
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.annotation.ACTIVITY
-import com.absinthe.libchecker.domain.app.detail.model.LibStringRenderState
-import com.absinthe.libchecker.domain.app.detail.ui.adapter.LibStringAdapter
 import com.absinthe.libchecker.domain.app.list.model.AdvancedMenuAction
 import com.absinthe.libchecker.domain.app.list.model.AdvancedMenuBottomSheetState
 import com.absinthe.libchecker.domain.app.list.model.AdvancedMenuLayoutItem
@@ -19,10 +19,7 @@ import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.ui.app.MenuOptionItem
 import com.absinthe.libchecker.ui.app.MenuOptionItemView
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.extensions.getColorByAttr
-import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.utils.extensions.setSingleChild
-import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
 import com.absinthe.libchecker.view.app.BottomSheetScaffoldView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
@@ -30,7 +27,6 @@ import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.flexbox.JustifyContent
-import com.google.android.material.card.MaterialCardView
 
 class AdvancedMenuBSDView(context: Context) : BottomSheetScaffoldView(context) {
 
@@ -39,7 +35,6 @@ class AdvancedMenuBSDView(context: Context) : BottomSheetScaffoldView(context) {
   private val adapter = AdvancedMenuLayoutAdapter()
   private val layoutItems = buildAdvancedMenuLayoutItems()
   private val demoAdapter = AppAdapter(AppAdapter.CardMode.DEMO)
-  private val itemAdapter = LibStringAdapter(type = ACTIVITY)
 
   private val demoView = RecyclerView(context).apply {
     layoutParams = LayoutParams(
@@ -49,6 +44,7 @@ class AdvancedMenuBSDView(context: Context) : BottomSheetScaffoldView(context) {
       it.topMargin = 8.dp
     }
     overScrollMode = OVER_SCROLL_NEVER
+    isNestedScrollingEnabled = false
     layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
     adapter = demoAdapter
   }
@@ -64,33 +60,20 @@ class AdvancedMenuBSDView(context: Context) : BottomSheetScaffoldView(context) {
 
   private val filterOptionsLayout = createOptionsLayout()
   private val viewOptionsLayout = createOptionsLayout()
-
-  private val componentStyleDemoView = RecyclerView(context).apply {
-    setPadding(0, 8.dp, 0, 8.dp)
-    overScrollMode = OVER_SCROLL_NEVER
-    layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-    adapter = itemAdapter
+  private val abiOptionsLayout = createOptionsLayout().apply {
+    (layoutParams as LayoutParams).topMargin = 0
   }
-
-  private val itemView = MaterialCardView(context).apply {
-    layoutParams = LayoutParams(
-      LayoutParams.MATCH_PARENT,
-      LayoutParams.WRAP_CONTENT
-    ).also {
-      it.topMargin = 8.dp
-    }
-    setSmoothRoundCorner(20.dp)
-    overScrollMode = OVER_SCROLL_NEVER
-    strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutlineVariant)
-    setCardBackgroundColor(
-      context.getColorStateListByAttr(
-        com.google.android.material.R.attr.colorSurfaceContainerHigh
-      )
-    )
-    addView(componentStyleDemoView)
+  private val filterSection = LinearLayout(context).apply {
+    orientation = VERTICAL
+    addView(sectionTitle(R.string.adv_app_filter))
+    addView(filterOptionsLayout)
+    addView(abiOptionsLayout)
   }
-
-  private val componentOptionsLayout = createOptionsLayout()
+  private val appearanceSection = LinearLayout(context).apply {
+    orientation = VERTICAL
+    addView(sectionTitle(R.string.adv_app_appearance, topMarginDp = 0))
+    addView(demoView)
+  }
 
   private val list = BottomSheetRecyclerView(context).apply {
     layoutParams = LayoutParams(
@@ -103,6 +86,7 @@ class AdvancedMenuBSDView(context: Context) : BottomSheetScaffoldView(context) {
     isVerticalScrollBarEnabled = false
     clipToPadding = false
     clipChildren = false
+    setPadding(0, 0, 0, 16.dp)
     isNestedScrollingEnabled = true
     setHasFixedSize(true)
 
@@ -129,13 +113,16 @@ class AdvancedMenuBSDView(context: Context) : BottomSheetScaffoldView(context) {
     sortView.bind(state.displayOptions) {
       this.onAction(AdvancedMenuAction.SortChanged(it))
     }
-    filterOptionsLayout.renderOptions(state.filterOptions) { item, isChecked ->
+    filterOptionsLayout.renderOptions(state.filterOptions.take(3)) { item, isChecked ->
       this.onAction(
         AdvancedMenuAction.DisplayOptionChanged(
           item = item,
           isChecked = isChecked
         )
       )
+    }
+    abiOptionsLayout.renderOptions(state.filterOptions.drop(3)) { item, isChecked ->
+      this.onAction(AdvancedMenuAction.DisplayOptionChanged(item, isChecked))
     }
     viewOptionsLayout.renderOptions(state.viewOptions) { item, isChecked ->
       this.onAction(
@@ -145,20 +132,20 @@ class AdvancedMenuBSDView(context: Context) : BottomSheetScaffoldView(context) {
         )
       )
     }
-    componentOptionsLayout.renderOptions(state.componentOptions) { item, isChecked ->
-      this.onAction(
-        AdvancedMenuAction.ItemDisplayOptionChanged(
-          item = item,
-          isChecked = isChecked
-        )
-      )
-    }
-    bindComponentDemo(state)
   }
 
   override fun onDetachedFromWindow() {
     onAction = {}
     super.onDetachedFromWindow()
+  }
+
+  private fun sectionTitle(titleRes: Int, topMarginDp: Int = 12) = AppCompatTextView(context).apply {
+    layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).also {
+      it.topMargin = topMarginDp.dp
+    }
+    setTypeface(null, Typeface.BOLD)
+    setText(titleRes)
+    ViewCompat.setAccessibilityHeading(this, true)
   }
 
   private fun createOptionsLayout(): FlexboxLayout {
@@ -192,17 +179,6 @@ class AdvancedMenuBSDView(context: Context) : BottomSheetScaffoldView(context) {
     }
   }
 
-  private fun bindComponentDemo(state: AdvancedMenuBottomSheetState) {
-    itemAdapter.setList(state.componentDemoItems)
-    itemAdapter.bind(
-      LibStringRenderState(
-        itemDisplayOptions = state.itemDisplayOptions,
-        colorfulRuleIcon = state.colorfulRuleIcon
-      ),
-      refreshItems = true
-    )
-  }
-
   private inner class AdvancedMenuLayoutAdapter : BaseQuickAdapter<AdvancedMenuLayoutItem, BaseViewHolder>(0) {
 
     override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
@@ -220,12 +196,10 @@ class AdvancedMenuBSDView(context: Context) : BottomSheetScaffoldView(context) {
     override fun convert(holder: BaseViewHolder, item: AdvancedMenuLayoutItem) {
       val container = holder.itemView as LinearLayout
       val child = when (item) {
-        AdvancedMenuLayoutItem.AppDemo -> demoView
+        AdvancedMenuLayoutItem.AppDemo -> appearanceSection
         AdvancedMenuLayoutItem.Sort -> sortView
-        AdvancedMenuLayoutItem.FilterOptions -> filterOptionsLayout
+        AdvancedMenuLayoutItem.FilterOptions -> filterSection
         AdvancedMenuLayoutItem.ViewOptions -> viewOptionsLayout
-        AdvancedMenuLayoutItem.ComponentStyleDemo -> itemView
-        AdvancedMenuLayoutItem.ComponentStyleOptions -> componentOptionsLayout
       }
       container.setSingleChild(child)
     }

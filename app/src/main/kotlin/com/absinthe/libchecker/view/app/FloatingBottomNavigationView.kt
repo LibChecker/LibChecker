@@ -41,7 +41,7 @@ class FloatingBottomNavigationView @JvmOverloads constructor(
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     if (currentFloatingProgress > 0f) {
-      val floatingHeight = 56 * resources.displayMetrics.density + paddingTop + paddingBottom
+      val floatingHeight = 64 * resources.displayMetrics.density + paddingTop + paddingBottom
       val height = (measuredHeight + (floatingHeight - measuredHeight) * currentFloatingProgress).roundToInt()
       val resolvedHeightSpec = MeasureSpec.makeMeasureSpec(
         resolveSize(height, heightMeasureSpec),

@@ -3,6 +3,8 @@ package com.absinthe.libchecker.domain.settings.ui
 import android.app.Instrumentation
 import android.app.UiAutomation
 import android.content.Intent
+import android.graphics.Path
+import android.graphics.PathMeasure
 import android.graphics.Rect
 import android.os.SystemClock
 import android.view.MotionEvent
@@ -18,6 +20,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.domain.home.ui.MainActivity
 import com.absinthe.libchecker.view.app.BlurCoordinatorLayout
 import com.absinthe.libchecker.view.app.FloatingNavigationBar
+import com.absinthe.libchecker.view.drawable.setG2Shape
 import com.google.android.material.R as MaterialR
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.navigation.NavigationBarView
@@ -31,6 +34,15 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class FloatingNavigationPreferenceInstrumentedTest {
+  @Test
+  fun floatingBottomNavigationHasSemicircularEnds() {
+    val path = Path().apply {
+      setG2Shape(0f, 0f, 320f, 64f, 32f, cornerSmoothing = 0f)
+    }
+    val perimeter = 2 * (320 - 64) + Math.PI * 64
+    assertEquals(perimeter.toFloat(), PathMeasure(path, true).length, 0.2f)
+  }
+
   @Test
   fun bottomNavigationDisableEndsAtItsNativeMeasuredHeight() {
     val instrumentation = InstrumentationRegistry.getInstrumentation()
@@ -52,7 +64,7 @@ class FloatingNavigationPreferenceInstrumentedTest {
           nav.forceLayout()
           nav.measure(widthSpec, heightSpec)
           if (progress == 1f) {
-            assertEquals((56 * density).toInt() + bottomInset, nav.measuredHeight)
+            assertEquals((64 * density).toInt() + bottomInset, nav.measuredHeight)
           } else {
             assertTrue("Height jumped at the attached endpoint", kotlin.math.abs(nav.measuredHeight - attachedHeight) <= 1)
           }

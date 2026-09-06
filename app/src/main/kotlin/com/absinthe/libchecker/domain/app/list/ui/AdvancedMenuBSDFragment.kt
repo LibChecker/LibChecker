@@ -1,27 +1,19 @@
 package com.absinthe.libchecker.domain.app.list.ui
 
 import android.content.DialogInterface
-import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.withOption
 import com.absinthe.libchecker.domain.app.list.model.AdvancedMenuAction
 import com.absinthe.libchecker.domain.app.list.model.buildAdvancedMenuBottomSheetState
 import com.absinthe.libchecker.domain.app.list.ui.view.AdvancedMenuBSDView
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
-import com.absinthe.libchecker.utils.Telemetry
 
 class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBSDView>() {
 
   private var previousAdvancedOptions = 0
-  private var previousItemAdvancedOptions = 0
   private var currentAdvancedOptions = 0
-  private var currentItemAdvancedOptions = 0
 
-  private var onDismissCallback: ((advancedDiff: Int, itemAdvancedDiff: Int) -> Unit)? = null
-  private var currentColorfulRuleIcon = true
+  private var onDismissCallback: ((advancedDiff: Int) -> Unit)? = null
   private var onDisplayOptionsChanged: (Int) -> Int = { options ->
-    options
-  }
-  private var onItemDisplayOptionsChanged: (Int) -> Int = { options ->
     options
   }
 
@@ -32,8 +24,7 @@ class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBS
     render()
     dialog?.setOnDismissListener {
       onDismissCallback?.invoke(
-        previousAdvancedOptions.xor(currentAdvancedOptions),
-        previousItemAdvancedOptions.xor(currentItemAdvancedOptions)
+        previousAdvancedOptions.xor(currentAdvancedOptions)
       )
     }
   }
@@ -45,33 +36,23 @@ class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBS
     }
   }
 
-  fun setOnDismissListener(action: (advancedDiff: Int, itemAdvancedDiff: Int) -> Unit) {
+  fun setOnDismissListener(action: (advancedDiff: Int) -> Unit) {
     onDismissCallback = action
   }
 
   fun setOptionChangeListener(
     displayOptions: Int,
-    itemDisplayOptions: Int,
-    colorfulRuleIcon: Boolean,
-    onDisplayOptionsChanged: (Int) -> Int,
-    onItemDisplayOptionsChanged: (Int) -> Int
+    onDisplayOptionsChanged: (Int) -> Int
   ) {
     previousAdvancedOptions = displayOptions
-    previousItemAdvancedOptions = itemDisplayOptions
     currentAdvancedOptions = displayOptions
-    currentItemAdvancedOptions = itemDisplayOptions
-    currentColorfulRuleIcon = colorfulRuleIcon
     this.onDisplayOptionsChanged = onDisplayOptionsChanged
-    this.onItemDisplayOptionsChanged = onItemDisplayOptionsChanged
   }
 
   private fun render() {
     root.bind(
       state = buildAdvancedMenuBottomSheetState(
-        displayOptions = currentAdvancedOptions,
-        itemDisplayOptions = currentItemAdvancedOptions,
-        colorfulRuleIcon = currentColorfulRuleIcon,
-        rulePackageName = requireContext().packageName
+        displayOptions = currentAdvancedOptions
       ),
       onAction = ::handleAction
     )
@@ -86,21 +67,6 @@ class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBS
       is AdvancedMenuAction.DisplayOptionChanged -> {
         setAdvancedOptions(
           currentAdvancedOptions.withOption(action.item.option, action.isChecked)
-        )
-      }
-
-      is AdvancedMenuAction.ItemDisplayOptionChanged -> {
-        currentItemAdvancedOptions = currentItemAdvancedOptions.withOption(
-          action.item.option,
-          action.isChecked
-        )
-        currentItemAdvancedOptions = onItemDisplayOptionsChanged(currentItemAdvancedOptions)
-        Telemetry.recordEvent(
-          Constants.Event.APP_LIST_ADVANCED_MENU_ITEM_CHANGED,
-          mapOf(
-            Telemetry.Param.CONTENT to getString(action.item.labelRes),
-            Telemetry.Param.VALUE to action.isChecked
-          )
         )
       }
     }

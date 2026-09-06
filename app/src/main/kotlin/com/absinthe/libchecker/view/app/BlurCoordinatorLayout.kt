@@ -246,7 +246,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
 
     capturedContent?.let { content ->
       if (appbar != null && appbar.visibility == VISIBLE && appbar.height > 0) {
-        val appbarSource = obtainAppbarSourceNode(content, appbar.bottom)
+        val appbarSource = obtainAppbarSourceNode(content, appbar.bottom + appbarBlurOffsetPx.roundToInt())
         drawAppbarBlur(canvas, appbarSource)
       }
       if (navView != null && navView.visibility == VISIBLE && navView.alpha > 0f) {
@@ -459,10 +459,11 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
     if (appbar.visibility != VISIBLE || appbar.height <= 0) return
 
     val top = appbar.top.toFloat()
-    val bottom = appbar.bottom.toFloat()
+    // Move the blur band, not the app bar or its content; keep the fade below the title.
+    val bottom = appbar.bottom + appbarBlurOffsetPx
     val downsample = APPBAR_BACKDROP_DOWNSAMPLE
     val contentOffset = appbarBackdropContentOffset
-    val nodeRampTop = contentOffset + top / downsample
+    val nodeRampTop = contentOffset + (top + appbarBlurOffsetPx) / downsample
     val nodeRampBottom = contentOffset + bottom / downsample
     val effectNode = obtainAppbarEffectNode(source)
 
@@ -479,7 +480,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
 
   private fun drawAppbarSurfaceTint(canvas: Canvas, top: Float, bottom: Float) {
     if (bottom <= top || appbarMaskProgress <= 0f) return
-    val tintColor = surfaceColor
+    val tintColor = if (isNightMode) Color.BLACK else surfaceColor
     val paint = appbarTintPaint ?: Paint(Paint.ANTI_ALIAS_FLAG).also { appbarTintPaint = it }
     if (
       appbarTintTop != top ||
@@ -496,7 +497,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
       }
       paint.shader = LinearGradient(
         0f,
-        top,
+        top + appbarBlurOffsetPx,
         0f,
         bottom,
         colors,
@@ -528,7 +529,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
       }
       paint.shader = LinearGradient(
         0f,
-        top,
+        top + appbarBlurOffsetPx,
         0f,
         bottom,
         colors,
@@ -612,7 +613,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
       if (top >= height || bottom <= top || left >= right) return
 
       val cornerRadius = ((bottom - top) / 2f) * floatingNavProgress
-      navClipPath.setG2Shape(left, top, right, bottom, cornerRadius)
+      navClipPath.setG2Shape(left, top, right, bottom, cornerRadius, cornerSmoothing = 0f)
       canvas.withClip(navClipPath) {
         drawNavBackdrop(this, source, left, top, right, bottom)
       }
@@ -631,7 +632,8 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
         top + halfStroke,
         right - halfStroke,
         bottom - halfStroke,
-        (cornerRadius - halfStroke).coerceAtLeast(0f)
+        (cornerRadius - halfStroke).coerceAtLeast(0f),
+        cornerSmoothing = 0f
       )
       canvas.drawPath(navStrokePath, strokePaint)
       drawNavDivider(canvas, top, floatingNavProgress)
@@ -714,6 +716,9 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
 
   private fun dividerHeightPx(): Float = DIVIDER_HEIGHT_DP * resources.displayMetrics.density
 
+  private val appbarBlurOffsetPx: Float
+    get() = APPBAR_BLUR_OFFSET_DP * resources.displayMetrics.density
+
   private val appbarBlurRadiusPx by lazy(LazyThreadSafetyMode.NONE) {
     calculateDownsampledBlurRadius(
       blurRadiusDp = APPBAR_BLUR_RADIUS_DP,
@@ -794,6 +799,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
   companion object {
     // Miuix's progressive app bar recipe uses a 10dp radius and a 30% surface blend.
     private const val APPBAR_BLUR_RADIUS_DP = 10f
+    private const val APPBAR_BLUR_OFFSET_DP = 24f
     private const val NAV_BLUR_RADIUS_PX = 10f
     private const val MEDIUM_BLUR_RADIUS_FRACTION = 0.4f
     private const val LIGHT_BLUR_RADIUS_FRACTION = 0.13f

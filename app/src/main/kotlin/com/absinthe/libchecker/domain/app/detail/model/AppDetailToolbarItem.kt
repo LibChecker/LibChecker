@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.domain.app.detail.model
 
 import androidx.annotation.DrawableRes
+import com.absinthe.libchecker.annotation.isComponentType
 
 data class AppDetailToolbarItem(
   val action: AppDetailToolbarAction,
@@ -13,6 +14,7 @@ data class AppDetailToolbarItem(
 
 enum class AppDetailToolbarAction {
   SORT,
+  ADVANCED_MENU,
   ONLINE_RULE_ANALYSIS,
   QUICK_LAUNCH,
   PROCESS,
@@ -22,6 +24,7 @@ enum class AppDetailToolbarAction {
 
 data class AppDetailToolbarState(
   val baseActionsReady: Boolean = false,
+  val selectedType: Int? = null,
   val toolbarCollapsed: Boolean = false,
   val onlineRuleAnalysisVisible: Boolean = false,
   val harmonyToggleVisible: Boolean = false,
@@ -42,6 +45,9 @@ data class AppDetailToolbarState(
       }
       if (processVisible) {
         add(AppDetailToolbarAction.PROCESS)
+      }
+      if (baseActionsReady && selectedType?.let(::isComponentType) == true) {
+        add(AppDetailToolbarAction.ADVANCED_MENU)
       }
       if (compareVisible) {
         add(AppDetailToolbarAction.COMPARE)

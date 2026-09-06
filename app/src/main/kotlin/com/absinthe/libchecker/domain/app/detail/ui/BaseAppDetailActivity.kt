@@ -22,6 +22,7 @@ import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailStateObserv
 import com.absinthe.libchecker.domain.app.detail.ui.controller.DetailTabController
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.AppInfoBottomSheetDialogFragment
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.AppStatisticAnalysisBottomSheetDialogFragment
+import com.absinthe.libchecker.domain.app.detail.ui.dialog.ComponentMenuDialogFragment
 import com.absinthe.libchecker.domain.app.repository.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.repository.AppListSettingsRepository
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
@@ -130,7 +131,10 @@ abstract class BaseAppDetailActivity :
       activity = this,
       viewPager = binding.viewpager,
       tabLayout = binding.tabLayout,
-      onTabSelected = { type -> listInteractionController.onDetailTabSelected(type) },
+      onTabSelected = { type ->
+        listInteractionController.onDetailTabSelected(type)
+        toolbarController.setSelectedType(type)
+      },
       onProcessTooltipTextChanged = { tooltipTextRes ->
         toolbarController.updateProcessTooltip(tooltipTextRes)
       }
@@ -166,6 +170,12 @@ abstract class BaseAppDetailActivity :
       toolbarView = binding.rvToolbar,
       appBarLayout = binding.headerLayout,
       onSortClick = { listInteractionController.toggleSortMode() },
+      onAdvancedMenuClick = {
+        val tag = ComponentMenuDialogFragment::class.java.name
+        if (supportFragmentManager.findFragmentByTag(tag) == null) {
+          ComponentMenuDialogFragment().show(supportFragmentManager, tag)
+        }
+      },
       onOnlineRuleAnalysisClick = ::showOnlineRuleAnalysisDialog,
       onQuickLaunchClick = {
         if (viewModel.isPackageInfoAvailable()) {

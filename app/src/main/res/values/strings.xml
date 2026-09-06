@@ -401,6 +401,8 @@
   <string name="rules_btn_update">Update</string>
 
   <!-- Advanced menu -->
+  <string name="adv_app_filter">App filters</string>
+  <string name="adv_app_appearance">App list appearance</string>
   <string name="adv_show_system_apps">Show system apps</string>
   <string name="adv_show_overlays">Show overlays</string>
   <string name="adv_show_64_bit">Show 64-bit apps</string>
