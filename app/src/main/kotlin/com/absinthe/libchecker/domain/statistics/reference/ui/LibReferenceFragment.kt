@@ -35,9 +35,9 @@ import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceLis
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceSearchLabels
 import com.absinthe.libchecker.domain.statistics.reference.model.resolveReferenceIcon
 import com.absinthe.libchecker.domain.statistics.reference.presentation.LibReferenceViewModel
+import com.absinthe.libchecker.domain.statistics.reference.ui.adapter.LIB_REFERENCE_PROVIDER
 import com.absinthe.libchecker.domain.statistics.reference.ui.adapter.LibReferenceAdapter
-import com.absinthe.libchecker.domain.statistics.reference.ui.adapter.provider.LIB_REFERENCE_PROVIDER
-import com.absinthe.libchecker.domain.statistics.reference.ui.adapter.provider.MULTIPLE_APPS_ICON_PROVIDER
+import com.absinthe.libchecker.domain.statistics.reference.ui.adapter.MULTIPLE_APPS_ICON_PROVIDER
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseListControllerFragment
 import com.absinthe.libchecker.ui.base.ListScreenChrome
@@ -118,7 +118,7 @@ class LibReferenceFragment :
       list.apply {
         adapter = refAdapter
         installRecentVisitDrag(this) { row, position, touch ->
-          val item = refAdapter.data.getOrNull(position) as? LibReference ?: return@installRecentVisitDrag false
+          val item = refAdapter.data.getOrNull(position) ?: return@installRecentVisitDrag false
           val label = item.rule?.label?.takeIf(String::isNotBlank) ?: item.resolvedLabel ?: item.libName
           val iconRes = resolveReferenceIcon(item.libName, item.type, item.rule)
           val icon = ContextCompat.getDrawable(context, iconRes) ?: return@installRecentVisitDrag false
@@ -167,7 +167,7 @@ class LibReferenceFragment :
         }
         context.findViewById<View>(androidx.appcompat.R.id.search_src_text)?.clearFocus()
 
-        val item = refAdapter.data[position] as? LibReference ?: return@setOnItemClickListener
+        val item = refAdapter.data[position]
         activity?.launchLibReferencePage(
           item.libName,
           item.rule?.label,

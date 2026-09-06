@@ -169,7 +169,7 @@ class LibReferenceMenuBSDView(
     val transitionGeneration = demoTransitionGate.advance()
     cancelOngoingDemoTransition()
     onAction = pendingBind.onAction
-    val currentDemoItems = demoAdapter.data.filterIsInstance<LibReference>()
+    val currentDemoItems = demoAdapter.data.toList()
     demoAdapter.bind(
       LibReferenceListRenderState(
         colorfulRuleIcon = state.colorfulRuleIcon,
@@ -546,7 +546,7 @@ class LibReferenceMenuBSDView(
   }
 
   private fun demoItemsChanged(items: List<LibReference>): Boolean {
-    val currentItems = demoAdapter.data.filterIsInstance<LibReference>()
+    val currentItems = demoAdapter.data.toList()
     if (currentItems.size != items.size) return true
     return currentItems.zip(items).any { (current, next) ->
       current.libName != next.libName || current.type != next.type

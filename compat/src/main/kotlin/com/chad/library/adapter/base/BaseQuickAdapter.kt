@@ -22,9 +22,7 @@ abstract class BaseQuickAdapter<T : Any, VH : RecyclerView.ViewHolder>(
   val data: MutableList<T> = AdapterDataList(this)
 
   private val childClickViewIds = linkedSetOf<Int>()
-  private val childLongClickViewIds = linkedSetOf<Int>()
   private var legacyChildClickListener: ((BaseQuickAdapter<T, VH>, View, Int) -> Unit)? = null
-  private var legacyChildLongClickListener: ((BaseQuickAdapter<T, VH>, View, Int) -> Boolean)? = null
 
   private val headerAdapters = mutableListOf<SingleViewAdapter>()
   private val footerAdapters = mutableListOf<SingleViewAdapter>()
@@ -109,16 +107,6 @@ abstract class BaseQuickAdapter<T : Any, VH : RecyclerView.ViewHolder>(
     }
   }
 
-  fun addChildLongClickViewIds(@IdRes vararg ids: Int) {
-    ids.forEach { id ->
-      if (childLongClickViewIds.add(id)) {
-        legacyChildLongClickListener?.let { listener ->
-          addOnItemChildLongClickListener(id) { _, view, position -> listener(this, view, position) }
-        }
-      }
-    }
-  }
-
   fun setOnItemChildClickListener(
     listener: ((BaseQuickAdapter<T, VH>, View, Int) -> Unit)?
   ) = apply {
@@ -127,18 +115,6 @@ abstract class BaseQuickAdapter<T : Any, VH : RecyclerView.ViewHolder>(
       removeOnItemChildClickListener(id)
       listener?.let {
         addOnItemChildClickListener(id) { _, view, position -> it(this, view, position) }
-      }
-    }
-  }
-
-  fun setOnItemChildLongClickListener(
-    listener: ((BaseQuickAdapter<T, VH>, View, Int) -> Boolean)?
-  ) = apply {
-    legacyChildLongClickListener = listener
-    childLongClickViewIds.forEach { id ->
-      removeOnItemChildLongClickListener(id)
-      listener?.let {
-        addOnItemChildLongClickListener(id) { _, view, position -> it(this, view, position) }
       }
     }
   }
