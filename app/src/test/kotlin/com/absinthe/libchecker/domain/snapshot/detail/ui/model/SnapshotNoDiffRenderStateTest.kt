@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.domain.snapshot.detail.ui.model
 
 import android.content.pm.PackageInfo
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotTitleDisplayData
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import org.junit.Assert.assertEquals
@@ -132,16 +133,13 @@ class SnapshotNoDiffRenderStateTest {
     assertTrue(state.opensDetailOnClick)
   }
 
-  private fun titleRenderState(): SnapshotTitleRenderState {
-    return SnapshotTitleRenderState(
+  private fun titleRenderState(): SnapshotTitleDisplayData {
+    return SnapshotTitleDisplayData(
       appName = "X",
-      iconContentDescription = "X",
       packageName = "com.twitter.android",
       versionInfo = "12.5.0",
       packageSize = null,
-      apis = "Target: 35",
-      summary = null,
-      copyPrimaryText = false
+      apis = "Target: 35"
     )
   }
 

@@ -5,7 +5,11 @@ import androidx.appcompat.view.ContextThemeWrapper
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailItemViewRenderState
+import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemDisplayData
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemStatusDisplayData
+import com.absinthe.libchecker.domain.snapshot.model.ADDED
+import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -39,13 +43,13 @@ class SnapshotDetailHorizontalAlignmentInstrumentedTest {
       ).forEach { (iconRes, statusLabelRes) ->
         val itemView = SnapshotDetailItemView(context)
         itemView.render(
-          SnapshotDetailItemViewRenderState(
+          SnapshotDetailItemDisplayData(
+            item = SnapshotDetailItem("Item", "Item", "", ADDED, NATIVE),
             title = "Item",
             extra = "",
-            iconRes = iconRes,
-            statusColorRes = R.color.snapshot_status_added,
-            statusLabelRes = statusLabelRes,
-            contentDescription = "Snapshot item",
+            status = SnapshotDetailItemStatusDisplayData(iconRes, R.color.snapshot_status_added, statusLabelRes),
+            description = "Snapshot item",
+            reportText = "Item",
             ruleChip = null
           )
         )

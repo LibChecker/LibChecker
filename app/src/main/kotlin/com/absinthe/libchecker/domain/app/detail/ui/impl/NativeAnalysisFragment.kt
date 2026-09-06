@@ -37,8 +37,8 @@ class NativeAnalysisFragment :
   }
 
   override fun init() {
+    initializeList()
     binding.apply {
-      list.adapter = this@NativeAnalysisFragment.adapter
       tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
         override fun onTabSelected(tab: TabLayout.Tab) {
           viewModel.loadSoAnalysisData(tab.text.toString())
@@ -47,12 +47,6 @@ class NativeAnalysisFragment :
         override fun onTabUnselected(tab: TabLayout.Tab?) {}
         override fun onTabReselected(tab: TabLayout.Tab?) {}
       })
-    }
-
-    adapter.apply {
-      animationEnable = false
-      stateView = this@NativeAnalysisFragment.emptyView
-      isStateViewEnable = true
     }
 
     viewModel.packageInfoStateFlow.onEach {

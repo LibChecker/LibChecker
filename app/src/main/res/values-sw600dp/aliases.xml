@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <item name="activity_main" type="layout">@layout/activity_main_rail</item>
+  <item name="ic_theme_system" type="drawable">@drawable/ic_theme_system_horizontal</item>
+  <item name="ic_floating_bar" type="drawable">@drawable/ic_floating_bar_horizontal</item>
+</resources>

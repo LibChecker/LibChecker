@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.domain.app.detail.ui.impl
 
 import androidx.lifecycle.lifecycleScope
-import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
@@ -22,28 +21,20 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
   }
 
   override fun onItemsAvailable(items: List<LibStringItemChip>) {
-    if (items.isEmpty()) {
-      emptyView.text.text = getString(R.string.empty_list)
-    } else {
-      submitItemsWithFilter(items, viewModel.filterState.queriedText, viewModel.filterState.queriedProcess)
-    }
-    markListReady(items.size)
+    showInitialItems(items, process = viewModel.filterState.queriedProcess)
   }
 
   override fun init() {
-    binding.list.adapter = adapter
+    initializeList()
     val flow = viewModel.contentState.abilitiesMap[type]
 
     adapter.apply {
-      animationEnable = false
       setOnItemLongClickListener { _, _, position ->
         val context = requireContext()
         ClipboardUtils.put(context, getItem(position).item.name)
         VersionCompat.showCopiedOnClipboardToast(context)
         true
       }
-      stateView = this@AbilityAnalysisFragment.emptyView
-      isStateViewEnable = true
     }
 
     if (flow?.value?.isNotEmpty() == true) {

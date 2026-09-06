@@ -37,7 +37,6 @@ import com.absinthe.libchecker.domain.snapshot.detail.model.chooseSnapshotReport
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.SnapshotDetailAdapter
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.SnapshotDetailRow
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.interactionPolicy
-import com.absinthe.libchecker.domain.snapshot.detail.ui.model.toRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotEmptyView
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotPackageChangeView
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.BuildSnapshotTitleDisplayDataUseCase
@@ -170,7 +169,7 @@ class SnapshotDetailActivity :
           diffTextStyle = diffTextStyle
         )
       )
-      snapshotTitle.render(snapshotTitleDisplayData.toRenderState())
+      snapshotTitle.render(snapshotTitleDisplayData)
       binding.collapsedToolbarTitle.bindTitle(snapshotTitleDisplayData.appName)
     }
 
@@ -233,14 +232,11 @@ class SnapshotDetailActivity :
     }
 
     viewModel.snapshotDetailContentFlow.onEach { content ->
-      binding.snapshotTitle.render(
-        snapshotTitleDisplayData.toRenderState(summary = content.summary)
-      )
-      content.sections.forEach { section ->
+      content.forEach { section ->
         recordDetailComponentCount(section.type, section.items.size)
       }
-      adapter.isStateViewEnable = content.sections.isEmpty()
-      adapter.submitSections(content.sections)
+      adapter.isStateViewEnable = content.isEmpty()
+      adapter.submitSections(content)
     }.launchIn(lifecycleScope)
   }
 

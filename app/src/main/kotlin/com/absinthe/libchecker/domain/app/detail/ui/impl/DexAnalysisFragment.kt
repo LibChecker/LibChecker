@@ -21,27 +21,18 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
   }
 
   override fun onItemsAvailable(items: List<LibStringItemChip>) {
-    if (items.isEmpty()) {
-      emptyView.text.text = getString(R.string.uncharted_territory)
-    } else {
-      submitItemsWithFilter(items, viewModel.filterState.queriedText, null)
-    }
-
-    markListReady(items.size)
+    showInitialItems(items, emptyMessage = R.string.uncharted_territory)
   }
 
   override fun init() {
-    binding.list.adapter = adapter
+    initializeList()
 
     adapter.apply {
-      animationEnable = false
       setOnItemLongClickListener { _, _, position ->
         ClipboardUtils.put(requireContext(), getItem(position).item.name)
         VersionCompat.showCopiedOnClipboardToast(context)
         true
       }
-      stateView = this@DexAnalysisFragment.emptyView
-      isStateViewEnable = true
     }
 
     if (viewModel.packageInfoStateFlow.value != null && viewModel.contentState.dexLibItems.value == null) {

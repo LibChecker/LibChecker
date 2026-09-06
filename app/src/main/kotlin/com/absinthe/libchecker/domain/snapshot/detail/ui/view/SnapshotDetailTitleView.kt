@@ -18,8 +18,8 @@ import androidx.core.text.inSpans
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailCountRenderState
-import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotDetailTitleRenderState
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSection
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailStatusCount
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.buildSnapshotDetailSignedCountText
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.resolveSnapshotDetailDividerColor
 import com.absinthe.libchecker.domain.snapshot.model.MOVED
@@ -98,14 +98,14 @@ class SnapshotDetailTitleView(context: Context) : AViewGroup(context) {
     )
   }
 
-  fun render(state: SnapshotDetailTitleRenderState) {
-    contentDescription = state.contentDescription
+  fun render(state: SnapshotDetailSection, expanded: Boolean) {
+    contentDescription = if (expanded) state.expandedDescription else state.collapsedDescription
     title.text = state.title
     counts.apply {
-      text = buildSnapshotDetailCountText(context, state.counts)
-      isVisible = state.counts.isNotEmpty()
+      text = buildSnapshotDetailCountText(context, state.statusCounts)
+      isVisible = state.statusCounts.isNotEmpty()
     }
-    renderExpansion(state.expanded)
+    renderExpansion(expanded)
   }
 
   private fun renderExpansion(expanded: Boolean) {
@@ -195,7 +195,7 @@ class SnapshotDetailTitleView(context: Context) : AViewGroup(context) {
 
 internal fun buildSnapshotDetailCountText(
   context: Context,
-  counts: List<SnapshotDetailCountRenderState>
+  counts: List<SnapshotDetailStatusCount>
 ): CharSequence {
   return SpannableStringBuilder().apply {
     counts.forEachIndexed { index, count ->
@@ -203,13 +203,13 @@ internal fun buildSnapshotDetailCountText(
         appendSnapshotDetailCountGap()
       }
       inSpans(
-        ForegroundColorSpan(count.colorRes.getColor(context)),
+        ForegroundColorSpan(count.status.colorRes.getColor(context)),
         StyleSpan(Typeface.BOLD)
       ) {
         if (count.diffType == MOVED) {
-          val icon = requireNotNull(count.iconRes.getDrawable(context)).mutate().also {
+          val icon = requireNotNull(count.status.iconRes.getDrawable(context)).mutate().also {
             it.setBounds(0, 0, COUNT_ICON_SIZE, COUNT_ICON_SIZE)
-            DrawableCompat.setTint(it, count.colorRes.getColor(context))
+            DrawableCompat.setTint(it, count.status.colorRes.getColor(context))
           }
           inSpans(VerticallyCenteredDrawableSpan(icon, COUNT_ICON_END_GAP)) {
             append(OBJECT_REPLACEMENT_CHARACTER)

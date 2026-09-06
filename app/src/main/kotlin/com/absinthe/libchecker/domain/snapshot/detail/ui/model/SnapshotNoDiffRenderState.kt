@@ -1,10 +1,11 @@
 package com.absinthe.libchecker.domain.snapshot.detail.ui.model
 
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotTitleDisplayData
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 
 data class SnapshotNoDiffRenderState(
-  val title: SnapshotTitleRenderState,
+  val title: SnapshotTitleDisplayData,
   val mode: SnapshotNoDiffMode
 )
 
@@ -27,7 +28,7 @@ data class SnapshotNoDiffTitleIconRenderState(
 }
 
 fun SnapshotDiffItem.toSnapshotNoDiffRenderState(
-  title: SnapshotTitleRenderState
+  title: SnapshotTitleDisplayData
 ): SnapshotNoDiffRenderState? {
   if (!shouldShowSnapshotNoDiffPopup()) {
     return null

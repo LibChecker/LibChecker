@@ -5,7 +5,6 @@ import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.constant.options.SnapshotOptions
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailDiffTextStyle
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotNoDiffTitleIconRenderState
-import com.absinthe.libchecker.domain.snapshot.detail.ui.model.toRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.toSnapshotNoDiffRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.toSnapshotNoDiffTitleIconRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotNoDiffBSView
@@ -53,7 +52,7 @@ class SnapshotNoDiffBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotNoDi
           formatSplitPackageName = false,
           diffTextStyle = diffTextStyle
         )
-      ).toRenderState(copyPrimaryText = false)
+      )
       val renderState = item.toSnapshotNoDiffRenderState(titleRenderState) ?: run {
         dismiss()
         return@let

@@ -10,11 +10,13 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.action.AppInstalledTimeDisplayData
 import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceBottomSheetDisplay
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotTitleDisplayData
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotTitlePackageSizeData
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotNoDiffMode
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotNoDiffRenderState
-import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotTitleRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotNoDiffBSView
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotPackageChangeView
+import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotTitleView
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.DexFileOptimizationInfo
 import com.google.android.material.card.MaterialCardView
@@ -32,7 +34,7 @@ class SharedDetailViewsInstrumentedTest {
   fun snapshotMessagesKeepGeometryInPageAndSheet() = instrumentation.runOnMainSync {
     val context = ContextThemeWrapper(instrumentation.targetContext, R.style.AppTheme)
     val sheet = SnapshotNoDiffBSView(context)
-    val title = SnapshotTitleRenderState("App", "App", "package", "1", null, "", null, false)
+    val title = SnapshotTitleDisplayData("App", "package", "1", null, "")
     listOf(
       Triple(SnapshotNoDiffMode.New, R.drawable.ic_yes, R.string.snapshot_detail_new_install_title),
       Triple(SnapshotNoDiffMode.Deleted, R.drawable.ic_no, R.string.snapshot_detail_deleted_title)
@@ -91,6 +93,40 @@ class SharedDetailViewsInstrumentedTest {
     val text = list.getChildAt(0) as TextView
     assertEquals("<manifest />", text.text.toString())
     assertTrue(text.isTextSelectable)
+  }
+
+  @Test
+  fun snapshotTitleKeepsTextAccessibilityAndCopyPolicyWhenRebound() = instrumentation.runOnMainSync {
+    val context = ContextThemeWrapper(instrumentation.targetContext, R.style.AppTheme)
+    val title = SnapshotTitleView(context)
+    val data = SnapshotTitleDisplayData(
+      "App",
+      "com.example.app",
+      "1 → 2",
+      SnapshotTitlePackageSizeData("10 MB → 12 MB", 5),
+      "Target: 35 → 37"
+    )
+    title.render(data)
+    title.measureAndLayout()
+    assertEquals(data.appName, title.appNameView.text.toString())
+    assertEquals(data.packageName, title.packageNameView.text.toString())
+    assertEquals(data.versionInfo, title.versionInfoView.text.toString())
+    assertEquals(data.packageSize!!.text, title.packageSizeView.text.toString())
+    assertEquals(data.apis, title.apisView.text.toString())
+    assertEquals(data.appName, title.getChildAt(0).contentDescription)
+    val primaryTextViews = listOf(title.appNameView, title.packageNameView, title.versionInfoView)
+    assertTrue(primaryTextViews.all { it.isLongClickable })
+    title.render(data.copy(packageSize = null, apis = ""))
+    assertEquals(View.GONE, title.packageSizeView.visibility)
+    assertEquals(View.GONE, title.apisView.visibility)
+    title.render(data)
+    assertTrue(primaryTextViews.all { it.isLongClickable })
+    val sheet = SnapshotNoDiffBSView(context)
+    sheet.render(SnapshotNoDiffRenderState(data, SnapshotNoDiffMode.NothingChanged))
+    val sheetTitle = sheet.children.filterIsInstance<SnapshotTitleView>().single()
+    assertFalse(sheetTitle.appNameView.isLongClickable)
+    assertFalse(sheetTitle.packageNameView.isLongClickable)
+    assertFalse(sheetTitle.versionInfoView.isLongClickable)
   }
 
   private val Int.dp: Int get() = (this * instrumentation.targetContext.resources.displayMetrics.density + 0.5f).toInt()

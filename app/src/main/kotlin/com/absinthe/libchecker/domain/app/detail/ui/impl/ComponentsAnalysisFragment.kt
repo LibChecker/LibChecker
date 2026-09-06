@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.domain.app.detail.ui.impl
 
 import androidx.recyclerview.widget.RecyclerView
-import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
@@ -27,23 +26,14 @@ class ComponentsAnalysisFragment :
     if (isFragmentVisible()) {
       refreshProcessFilterData()
     }
-    if (items.isEmpty()) {
-      emptyView.text.text = getString(R.string.empty_list)
-    } else {
+    if (items.isNotEmpty()) {
       bindProcessColors(viewModel.contentState.processesMap)
-      submitItemsWithFilter(items, viewModel.filterState.queriedText, viewModel.filterState.queriedProcess)
     }
-    markListReady(items.size)
+    showInitialItems(items, process = viewModel.filterState.queriedProcess)
   }
 
   override fun init() {
-    binding.list.adapter = adapter
-
-    adapter.apply {
-      animationEnable = false
-      stateView = this@ComponentsAnalysisFragment.emptyView
-      isStateViewEnable = true
-    }
+    initializeList()
   }
 
   override fun onVisibilityChanged(visible: Boolean) {

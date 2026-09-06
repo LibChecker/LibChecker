@@ -19,7 +19,6 @@ import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.repository.AppListSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.comparison.usecase.SnapshotNameIndex
 import com.absinthe.libchecker.domain.snapshot.detail.model.SNAPSHOT_DETAIL_DIFF_ARROW
-import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailContent
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailDiffTextStyle
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemStatusDisplayData
@@ -30,7 +29,6 @@ import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailR
 import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailReportSectionText
 import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailRuleChipDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailSectionDescription
-import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailSummary
 import com.absinthe.libchecker.domain.snapshot.detail.model.colorSnapshotDetailMetricDeltas
 import com.absinthe.libchecker.domain.snapshot.detail.model.emphasizeSnapshotDetailDiffArrows
 import com.absinthe.libchecker.domain.snapshot.display.formatSnapshotSizeChange
@@ -61,7 +59,7 @@ class SnapshotDetailSectionBuilder(
   suspend operator fun invoke(
     item: SnapshotDiffItem,
     diffTextStyle: SnapshotDetailDiffTextStyle
-  ): SnapshotDetailContent = withContext(Dispatchers.IO) {
+  ): List<SnapshotDetailSection> = withContext(Dispatchers.IO) {
     val list = mutableListOf<SnapshotDetailItem>()
 
     list.addAll(
@@ -135,17 +133,7 @@ class SnapshotDetailSectionBuilder(
       list.addAll(resourceDiffItems)
     }
 
-    val sections = buildSections(list, diffTextStyle)
-    SnapshotDetailContent(
-      sections = sections,
-      summary = buildSnapshotDetailSummary(sections) { count ->
-        context.resources.getQuantityString(
-          R.plurals.snapshot_detail_changes_count,
-          count,
-          count
-        )
-      }
-    )
+    buildSections(list, diffTextStyle)
   }
 
   private suspend fun buildSections(

@@ -26,20 +26,13 @@ class SignaturesAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
   }
 
   override fun onItemsAvailable(items: List<LibStringItemChip>) {
-    if (items.isEmpty()) {
-      emptyView.text.text = getString(R.string.uncharted_territory)
-    } else {
-      submitItemsWithFilter(items, viewModel.filterState.queriedText, null)
-    }
-
-    markListReady(items.size)
+    showInitialItems(items, emptyMessage = R.string.uncharted_territory)
   }
 
   override fun init() {
-    binding.list.adapter = adapter
+    initializeList()
 
     adapter.apply {
-      animationEnable = false
       setOnItemClickListener { _, view, position ->
         if (AntiShakeUtils.isInvalidClick(view)) {
           return@setOnItemClickListener
@@ -53,8 +46,6 @@ class SignaturesAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
         VersionCompat.showCopiedOnClipboardToast(context)
         true
       }
-      stateView = this@SignaturesAnalysisFragment.emptyView
-      isStateViewEnable = true
     }
 
     viewModel.packageInfoStateFlow.onEach {

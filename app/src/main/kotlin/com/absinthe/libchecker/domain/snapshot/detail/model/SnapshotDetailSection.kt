@@ -13,19 +13,6 @@ import com.absinthe.libchecker.domain.snapshot.model.MOVED
 import com.absinthe.libchecker.domain.snapshot.model.REMOVED
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
 import com.absinthe.rulesbundle.Rule
-import java.text.NumberFormat
-
-data class SnapshotDetailContent(
-  val sections: List<SnapshotDetailSection>,
-  val summary: SnapshotDetailSummary
-)
-
-data class SnapshotDetailSummary(
-  val totalCount: Int,
-  val totalCountText: String,
-  val statusCounts: List<SnapshotDetailStatusCount>,
-  val description: String
-)
 
 data class SnapshotDetailSection(
   @LibType val type: Int,
@@ -45,7 +32,13 @@ data class SnapshotDetailItemDisplayData(
   val reportText: String,
   val status: SnapshotDetailItemStatusDisplayData,
   val ruleChip: SnapshotDetailRuleChipDisplayData?
-)
+) {
+  val previousPackagePath: CharSequence? = if (item.diffType == MOVED) {
+    item.previousName?.substringBeforeLast('.', missingDelimiterValue = "")?.takeIf(String::isNotBlank)
+  } else {
+    null
+  }
+}
 
 fun buildSnapshotDetailReportSectionText(title: CharSequence): String {
   return "[$title]\n"
@@ -83,33 +76,6 @@ fun buildSnapshotDetailItemDescription(
 ): String = listOf(statusLabel, ruleLabel, title, extra)
   .mapNotNull { it?.toString()?.trim()?.takeIf(String::isNotEmpty) }
   .joinToString()
-
-fun buildSnapshotDetailSummary(
-  sections: List<SnapshotDetailSection>,
-  totalCountFormatter: (Int) -> String
-): SnapshotDetailSummary {
-  val countsByStatus = sections
-    .flatMap(SnapshotDetailSection::statusCounts)
-    .groupBy(SnapshotDetailStatusCount::diffType)
-  val statusCounts = summaryStatusOrder.mapNotNull { diffType ->
-    val counts = countsByStatus[diffType].orEmpty()
-    val count = counts.sumOf(SnapshotDetailStatusCount::count)
-    counts.firstOrNull()?.copy(
-      count = count,
-      countText = NumberFormat.getIntegerInstance().format(count)
-    )
-  }
-  val totalCount = statusCounts.sumOf(SnapshotDetailStatusCount::count)
-  val totalCountText = totalCountFormatter(totalCount)
-  return SnapshotDetailSummary(
-    totalCount = totalCount,
-    totalCountText = totalCountText,
-    statusCounts = statusCounts,
-    description = (
-      listOf(totalCountText) + statusCounts.map { "${it.label} ${it.countText}" }
-      ).joinToString()
-  )
-}
 
 fun buildSnapshotDetailSectionDescription(
   title: CharSequence?,
@@ -159,5 +125,3 @@ data class SnapshotDetailStatusCount(
   val label: String,
   val status: SnapshotDetailItemStatusDisplayData
 )
-
-private val summaryStatusOrder = listOf(ADDED, REMOVED, CHANGED, MOVED)

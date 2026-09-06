@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.domain.app.detail.ui.impl
 
 import androidx.lifecycle.lifecycleScope
-import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
@@ -24,27 +23,18 @@ class StaticAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>()
   }
 
   override fun onItemsAvailable(items: List<LibStringItemChip>) {
-    if (items.isEmpty()) {
-      emptyView.text.text = getString(R.string.empty_list)
-    } else {
-      submitItemsWithFilter(items, viewModel.filterState.queriedText, null)
-    }
-
-    markListReady(items.size)
+    showInitialItems(items)
   }
 
   override fun init() {
-    binding.list.adapter = adapter
+    initializeList()
 
     adapter.apply {
-      animationEnable = false
       setOnItemLongClickListener { _, _, position ->
         ClipboardUtils.put(requireContext(), getItem(position).item.name)
         VersionCompat.showCopiedOnClipboardToast(context)
         true
       }
-      stateView = this@StaticAnalysisFragment.emptyView
-      isStateViewEnable = true
     }
 
     viewModel.packageInfoStateFlow.onEach {

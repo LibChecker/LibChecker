@@ -31,7 +31,7 @@ class SnapshotNoDiffBSView(context: Context) : BottomSheetScaffoldView(context) 
   }
 
   fun render(state: SnapshotNoDiffRenderState) {
-    title.render(state.title)
+    title.render(state.title, copyPrimaryText = false)
     setMode(state.mode)
   }
 

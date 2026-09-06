@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
+import androidx.annotation.StringRes
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -132,6 +133,28 @@ abstract class BaseDetailFragment<T : ViewBinding> :
 
   protected abstract suspend fun getItems(): List<LibStringItemChip>
   protected abstract fun onItemsAvailable(items: List<LibStringItemChip>)
+
+  protected fun initializeList() {
+    getRecyclerView().adapter = adapter
+    adapter.apply {
+      animationEnable = false
+      stateView = this@BaseDetailFragment.emptyView
+      isStateViewEnable = true
+    }
+  }
+
+  protected fun showInitialItems(
+    items: List<LibStringItemChip>,
+    @StringRes emptyMessage: Int = R.string.empty_list,
+    process: String? = null
+  ) {
+    if (items.isEmpty()) {
+      emptyView.text.text = getString(emptyMessage)
+    } else {
+      submitItemsWithFilter(items, viewModel.filterState.queriedText, process)
+    }
+    markListReady(items.size)
+  }
 
   protected suspend fun <T : Any> StateFlow<T?>.valueOrAwait(): T {
     return value ?: filterNotNull().first()

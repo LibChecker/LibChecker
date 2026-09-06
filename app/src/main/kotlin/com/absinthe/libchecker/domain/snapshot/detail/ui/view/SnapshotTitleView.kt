@@ -12,8 +12,8 @@ import androidx.core.view.children
 import androidx.core.view.isVisible
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotTitlePackageSizeRenderState
-import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotTitleRenderState
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotTitleDisplayData
+import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotTitlePackageSizeData
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.utils.extensions.applyCondensedTypeface
 import com.absinthe.libchecker.utils.extensions.dp
@@ -109,14 +109,14 @@ class SnapshotTitleView(
     addView(this)
   }
 
-  fun render(data: SnapshotTitleRenderState) {
+  fun render(data: SnapshotTitleDisplayData, copyPrimaryText: Boolean = true) {
     identityHeaderRenderer.render(
       AppIdentityHeaderRenderState(
         appName = data.appName,
-        iconContentDescription = data.iconContentDescription,
+        iconContentDescription = data.appName,
         packageName = data.packageName,
         versionInfo = data.versionInfo,
-        copyPrimaryText = data.copyPrimaryText
+        copyPrimaryText = copyPrimaryText
       )
     )
     setPackageSizeText(data.packageSize)
@@ -160,7 +160,7 @@ class SnapshotTitleView(
     iconView.setOnClickListener(listener)
   }
 
-  private fun setPackageSizeText(data: SnapshotTitlePackageSizeRenderState?) {
+  private fun setPackageSizeText(data: SnapshotTitlePackageSizeData?) {
     if (data == null) {
       packageSizeView.isVisible = false
       packageSizeLabelView.isVisible = false

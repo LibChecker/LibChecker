@@ -8,8 +8,6 @@ import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.isComponentType
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSection
-import com.absinthe.libchecker.domain.snapshot.detail.ui.model.toItemViewRenderState
-import com.absinthe.libchecker.domain.snapshot.detail.ui.model.toTitleRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailItemView
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailTitleView
 import com.absinthe.libchecker.domain.snapshot.model.REMOVED
@@ -141,13 +139,14 @@ class SnapshotDetailAdapter(
     when (item) {
       is SnapshotDetailRow.Header -> {
         (holder.itemView as SnapshotDetailTitleView).render(
-          item.section.toTitleRenderState(expanded = item.expanded)
+          item.section,
+          item.expanded
         )
       }
 
       is SnapshotDetailRow.Item -> {
         val itemView = holder.itemView as SnapshotDetailItemView
-        itemView.render(item.displayData.toItemViewRenderState())
+        itemView.render(item.displayData)
         val ruleChip = item.displayData.ruleChip
         if (ruleChip == null) {
           itemView.setChipOnClickListener(null)
