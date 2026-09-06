@@ -5,16 +5,12 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.statistics.chart.model.ChartSourceItem
 import com.absinthe.libchecker.domain.statistics.chart.source.BaseChartDataSource
+import com.absinthe.libchecker.domain.statistics.chart.source.showPieData
 import com.absinthe.libchecker.domain.statistics.chart.usecase.AbiChartData
 import com.absinthe.libchecker.utils.OsUtils
-import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import info.appdev.charting.charts.PieChart
-import info.appdev.charting.data.PieData
-import info.appdev.charting.data.PieDataSet
 import info.appdev.charting.data.PieEntryFloat
-import info.appdev.charting.formatter.PercentFormatter
 import info.appdev.charting.utils.ColorTemplate
-import info.appdev.charting.utils.PointF
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -33,7 +29,6 @@ class ABIChartDataSource(
         context.resources.getString(R.string.no_libs)
       )
       val entries: ArrayList<PieEntryFloat> = ArrayList()
-      val colorOnSurface = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
       val classifiedList = listOf(
         mutableListOf<LCItem>(),
         mutableListOf(),
@@ -55,17 +50,6 @@ class ABIChartDataSource(
       for (i in parties.indices) {
         entries.add(PieEntryFloat(classifiedList[i].size.toFloat(), parties[i % parties.size]))
       }
-      val dataSet = PieDataSet(entries, "").apply {
-        isDrawIcons = false
-        sliceSpace = 3f
-        iconsOffset = PointF(0f, 40f)
-        selectionShift = 5f
-        xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
-        yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
-        valueLineColor = colorOnSurface
-      }
-
-      // add a lot of colors
       val colors: ArrayList<Int> = ArrayList()
 
       if (OsUtils.atLeastS()) {
@@ -82,22 +66,7 @@ class ABIChartDataSource(
         for (c in ColorTemplate.MATERIAL_COLORS) colors.add(c)
       }
 
-      dataSet.setColors(colors)
-      // dataSet.setSelectionShift(0f);
-      val data = PieData(dataSet).apply {
-        setValueFormatter(PercentFormatter())
-        setValueTextSize(10f)
-        setValueTextColor(colorOnSurface)
-      }
-
-      withContext(Dispatchers.Main) {
-        chartView.apply {
-          this.data = data
-          setEntryLabelColor(colorOnSurface)
-          highlightValues(null)
-          invalidate()
-        }
-      }
+      chartView.showPieData(entries, colors)
     }
   }
 

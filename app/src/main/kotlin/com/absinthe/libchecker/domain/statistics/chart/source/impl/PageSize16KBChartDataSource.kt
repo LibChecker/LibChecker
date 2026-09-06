@@ -6,16 +6,12 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.statistics.chart.model.ChartSourceItem
 import com.absinthe.libchecker.domain.statistics.chart.source.BaseChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.source.IHeavyWork
+import com.absinthe.libchecker.domain.statistics.chart.source.showPieData
 import com.absinthe.libchecker.domain.statistics.chart.usecase.PageSize16KBChartData
 import com.absinthe.libchecker.utils.OsUtils
-import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import info.appdev.charting.charts.PieChart
-import info.appdev.charting.data.PieData
-import info.appdev.charting.data.PieDataSet
 import info.appdev.charting.data.PieEntryFloat
-import info.appdev.charting.formatter.PercentFormatter
 import info.appdev.charting.utils.ColorTemplate
-import info.appdev.charting.utils.PointF
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -35,7 +31,6 @@ class PageSize16KBChartDataSource(
         context.resources.getString(R.string.title_statistics_dialog_no_native_libs)
       )
       val entries: ArrayList<PieEntryFloat> = ArrayList()
-      val colorOnSurface = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
       val classifiedList = listOf(mutableListOf<LCItem>(), mutableListOf(), mutableListOf())
       classifiedMap.clear()
       val chartData = buildPageSize16KBChartData(items) { progress ->
@@ -69,17 +64,6 @@ class PageSize16KBChartDataSource(
       for (i in parties.indices) {
         entries.add(PieEntryFloat(classifiedList[i].size.toFloat(), parties[i % parties.size]))
       }
-      val dataSet = PieDataSet(entries, "").apply {
-        isDrawIcons = false
-        sliceSpace = 3f
-        iconsOffset = PointF(0f, 40f)
-        selectionShift = 5f
-        xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
-        yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
-        valueLineColor = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
-      }
-
-      // add a lot of colors
       val colors: ArrayList<Int> = ArrayList()
 
       if (OsUtils.atLeastS()) {
@@ -96,22 +80,7 @@ class PageSize16KBChartDataSource(
         for (c in ColorTemplate.MATERIAL_COLORS) colors.add(c)
       }
 
-      dataSet.setColors(colors)
-      // dataSet.setSelectionShift(0f);
-      val data = PieData(dataSet).apply {
-        setValueFormatter(PercentFormatter())
-        setValueTextSize(10f)
-        setValueTextColor(colorOnSurface)
-      }
-
-      withContext(Dispatchers.Main) {
-        chartView.apply {
-          this.data = data
-          setEntryLabelColor(colorOnSurface)
-          highlightValues(null)
-          invalidate()
-        }
-      }
+      chartView.showPieData(entries, colors)
     }
   }
 
