@@ -27,7 +27,7 @@ val snapshotComparisonModule = module {
     SnapshotComparisonViewModel(
       compareSnapshotDiffs = get(),
       snapshotDashboardCounter = get(),
-      snapshotLibrary = get(),
+      snapshotRepository = get(),
       formatSnapshotTimestampUseCase = get(),
       comparisonWorkflow = get()
     )

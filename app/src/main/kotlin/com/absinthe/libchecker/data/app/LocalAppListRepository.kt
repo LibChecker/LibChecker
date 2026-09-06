@@ -1,53 +1,53 @@
 package com.absinthe.libchecker.data.app
 
-import com.absinthe.libchecker.database.LCRepository
+import com.absinthe.libchecker.database.LCDao
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.repository.AppListRepository
 import kotlinx.coroutines.flow.Flow
 
 class LocalAppListRepository(
-  private val lcRepository: LCRepository
+  private val dao: LCDao
 ) : AppListRepository {
 
-  override val items: Flow<List<LCItem>> = lcRepository.allLCItemsFlow
+  override val items: Flow<List<LCItem>> = dao.getItemsFlow()
 
   override suspend fun getItems(): List<LCItem> {
-    return lcRepository.getLCItems()
+    return dao.getItems()
   }
 
   override suspend fun getItem(packageName: String): LCItem? {
-    return lcRepository.getItem(packageName)
+    return dao.getItem(packageName)
   }
 
   override suspend fun getUninitializedFeaturePackageNames(): List<String> {
-    return lcRepository.getUninitializedFeaturePackageNames()
+    return dao.getUninitializedFeaturePackageNames()
   }
 
   override suspend fun clearItems() {
-    lcRepository.deleteAllItems()
+    dao.deleteAllItems()
   }
 
   override suspend fun insertItem(item: LCItem) {
-    lcRepository.insert(item)
+    dao.insert(item)
   }
 
   override suspend fun insertItems(items: List<LCItem>) {
-    lcRepository.insert(items)
+    dao.insert(items)
   }
 
   override suspend fun updateItem(item: LCItem) {
-    lcRepository.update(item)
+    dao.update(item)
   }
 
   override suspend fun updateFeatures(packageName: String, features: Int) {
-    lcRepository.updateFeatures(packageName, features)
+    dao.updateFeatures(packageName, features)
   }
 
   override suspend fun updateFeatures(featuresMap: Map<String, Int>) {
-    lcRepository.updateFeatures(featuresMap)
+    dao.updateFeatures(featuresMap)
   }
 
   override suspend fun deleteItemByPackageName(packageName: String) {
-    lcRepository.deleteLCItemByPackageName(packageName)
+    dao.deleteLCItemByPackageName(packageName)
   }
 }

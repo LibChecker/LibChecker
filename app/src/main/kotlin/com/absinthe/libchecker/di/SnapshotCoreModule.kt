@@ -9,7 +9,6 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotItemFactory
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotDashboardCounter
-import com.absinthe.libchecker.domain.snapshot.library.SnapshotLibrary
 import com.absinthe.libchecker.domain.snapshot.list.capture.SnapshotCaptureStateRepository
 import com.absinthe.libchecker.domain.snapshot.selection.SnapshotSelection
 import com.absinthe.libchecker.domain.snapshot.selection.SnapshotSelectionRepository
@@ -25,7 +24,6 @@ val snapshotCoreModule = module {
   single<SnapshotRepository> { LocalSnapshotRepository(get(), get()) }
 
   factory { SnapshotDashboardCounter(get(), get()) }
-  factory { SnapshotLibrary(get()) }
   factory { SnapshotSelection(get()) }
   factory { SelectSnapshotRepresentativeAppsUseCase() }
   factory { RefreshSnapshotRepresentativeAppsUseCase(get(), get()) }

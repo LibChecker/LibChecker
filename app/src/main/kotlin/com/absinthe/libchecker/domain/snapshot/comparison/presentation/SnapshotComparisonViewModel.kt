@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
+import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.comparison.model.ComparisonDashboardLabels
 import com.absinthe.libchecker.domain.snapshot.comparison.model.ComparisonDashboardState
 import com.absinthe.libchecker.domain.snapshot.comparison.model.SnapshotComparisonInputs
@@ -13,7 +14,6 @@ import com.absinthe.libchecker.domain.snapshot.comparison.model.SnapshotComparis
 import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotDiffsUseCase
 import com.absinthe.libchecker.domain.snapshot.display.FormatSnapshotTimestampUseCase
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotDashboardCounter
-import com.absinthe.libchecker.domain.snapshot.library.SnapshotLibrary
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import java.io.File
@@ -28,7 +28,7 @@ import timber.log.Timber
 class SnapshotComparisonViewModel(
   private val compareSnapshotDiffs: CompareSnapshotDiffsUseCase,
   private val snapshotDashboardCounter: SnapshotDashboardCounter,
-  private val snapshotLibrary: SnapshotLibrary,
+  private val snapshotRepository: SnapshotRepository,
   private val formatSnapshotTimestampUseCase: FormatSnapshotTimestampUseCase,
   private val comparisonWorkflow: SnapshotComparisonWorkflow
 ) : ViewModel() {
@@ -144,7 +144,7 @@ class SnapshotComparisonViewModel(
   }
 
   suspend fun getTimeStamps(): List<TimeStampItem> {
-    return snapshotLibrary.getTimeStamps()
+    return snapshotRepository.getTimeStamps()
   }
 
   fun getFormatDateString(timestamp: Long): String {

@@ -120,20 +120,11 @@ class LocalAppDataSource : AppDataSource {
       }
       val packageName = state.packageName
       when (state) {
-        is PackageChangeState.Added -> {
-          val packageInfo = loadPackageInfo(packageName)
-          if (packageInfo?.isVisiblePackageInfo() == true) {
-            applicationMap[packageName] = packageInfo
-          } else {
-            applicationMap.remove(packageName)
-          }
-        }
-
         is PackageChangeState.Removed -> {
           applicationMap.remove(packageName)
         }
 
-        is PackageChangeState.Replaced -> {
+        is PackageChangeState.Added, is PackageChangeState.Replaced -> {
           val packageInfo = loadPackageInfo(packageName)
           if (packageInfo?.isVisiblePackageInfo() == true) {
             applicationMap[packageName] = packageInfo

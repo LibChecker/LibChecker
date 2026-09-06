@@ -1,12 +1,12 @@
 package com.absinthe.libchecker.domain.snapshot.timenode.usecase
 
 import com.absinthe.libchecker.database.entity.TimeStampItem
+import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
-import com.absinthe.libchecker.domain.snapshot.library.SnapshotLibrary
 
 class UpdateSnapshotAutoRemoveThresholdUseCase(
   private val snapshotSettingsRepository: SnapshotSettingsRepository,
-  private val snapshotLibrary: SnapshotLibrary
+  private val snapshotRepository: SnapshotRepository
 ) {
 
   val currentThreshold: Int
@@ -18,7 +18,8 @@ class UpdateSnapshotAutoRemoveThresholdUseCase(
 
   suspend fun enableAndRetainLatest(threshold: Int): List<TimeStampItem> {
     snapshotSettingsRepository.autoRemoveThreshold = threshold
-    return snapshotLibrary.retainLatestSnapshotsAndGetTimeStamps(threshold)
+    snapshotRepository.retainLatestSnapshots(threshold)
+    return snapshotRepository.getTimeStamps()
   }
 
   private companion object {

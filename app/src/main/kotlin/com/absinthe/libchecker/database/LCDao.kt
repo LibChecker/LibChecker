@@ -116,10 +116,6 @@ interface LCDao {
   @Query("DELETE FROM snapshot_table WHERE timeStamp = :timestamp")
   suspend fun deleteSnapshots(timestamp: Long)
 
-  @Transaction
-  @Delete
-  suspend fun deleteSnapshots(list: List<SnapshotItem>)
-
   // TimeStamp Table
   @Upsert
   suspend fun insert(item: TimeStampItem)
