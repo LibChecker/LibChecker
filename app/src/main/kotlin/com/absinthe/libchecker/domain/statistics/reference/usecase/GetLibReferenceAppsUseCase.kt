@@ -101,9 +101,8 @@ class GetLibReferenceAppsUseCase(
   private fun LCItem.hasNativeReference(name: String, checkCancelled: () -> Unit): Boolean {
     return runCatching {
       val packageInfo = installedAppRepository.getPackageInfo(packageName) ?: return@runCatching false
-      PackageUtils.getNativeDirLibs(packageInfo, checkCancelled = checkCancelled).any {
-        it.name == name && RulesRepository.checkNativeLibValidation(packageName, name)
-      }
+      val nativeLibNames = PackageUtils.getNativeDirLibs(packageInfo, checkCancelled = checkCancelled).map { it.name }
+      name in nativeLibNames && RulesRepository.checkNativeLibValidation(packageName, name, nativeLibNames)
     }.onFailure {
       if (it is CancellationException) throw it
       Timber.e(it)

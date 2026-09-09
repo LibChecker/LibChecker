@@ -9,7 +9,9 @@ import android.util.Base64
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
+import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.constant.Constants.ARMV8
+import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.PackageUtils
 import java.io.ByteArrayOutputStream
@@ -17,6 +19,7 @@ import java.io.File
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -25,6 +28,43 @@ import org.koin.core.context.GlobalContext
 
 @RunWith(AndroidJUnit4::class)
 class NativeLibScanReuseInstrumentedTest {
+  @Test
+  @SdkSuppress(minSdkVersion = 31)
+  fun referenceAppsKeepCompanionValidatedLibraries() = runBlocking {
+    val directory = "/data/local/tmp/lc-native-reference-${SystemClock.uptimeMillis()}"
+    val libraries = mapOf(
+      "flutter" to listOf("libapp.so", "libflutter.so"),
+      "unity" to listOf("libmain.so", "libunity.so"),
+      "unrelated" to listOf("libapp.so", "libmain.so"),
+      "missing" to listOf("libexample.so")
+    )
+    val installed = GlobalContext.get().get<InstalledAppRepository>()
+    val repository = object : InstalledAppRepository by installed {
+      override fun getPackageInfo(packageName: String, flags: Int, resolveFrozenArchiveInfo: Boolean): PackageInfo = PackageInfo().apply {
+        this.packageName = packageName
+        applicationInfo = ApplicationInfo().apply { nativeLibraryDir = "$directory/${packageName.substringAfterLast('.')}" }
+      }
+    }
+    val items = libraries.keys.map { LCItem("test.reference.$it", it, "1", 1, 0, 0, false, ARMV8.toShort(), 0, 24, 0) }
+    try {
+      libraries.forEach { (name, libs) ->
+        shell("mkdir -p $directory/$name")
+        libs.forEach { shell("touch $directory/$name/$it") }
+      }
+      val useCase = GetLibReferenceAppsUseCase(repository)
+      for ((name, expected) in mapOf("libapp.so" to "flutter", "libflutter.so" to "flutter", "libmain.so" to "unity")) {
+        val result = useCase(GetLibReferenceAppsUseCase.Request(items, name, NATIVE, true))
+        assertEquals(name, listOf("test.reference.$expected"), result.items.map { it.packageName })
+      }
+    } finally {
+      libraries.forEach { (name, libs) ->
+        libs.forEach { shell("rm -f $directory/$name/$it") }
+        shell("rmdir $directory/$name")
+      }
+      shell("rmdir $directory")
+    }
+  }
+
   @Test
   fun installedAppsMatchOriginalReader() {
     val targets = GlobalContext.get().get<InstalledAppRepository>().getApplicationList()
