@@ -7,6 +7,7 @@ import android.content.ServiceConnection
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.graphics.Outline
 import android.graphics.PointF
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -16,6 +17,7 @@ import android.view.Gravity
 import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewOutlineProvider
 import android.view.ViewTreeObserver
 import android.view.animation.PathInterpolator
 import androidx.appcompat.widget.SearchView
@@ -312,7 +314,7 @@ class MainActivity :
         (binding.navView as? NavigationBarView)?.let { navView ->
           reconcileNavigationBackground(navView)
           val density = resources.displayMetrics.density
-          navView.elevation = (3f + 3f * floatingNavProgress) * density
+          navView.elevation = (3f - 2f * floatingNavProgress) * density
         }
         updateToolbarHdrHighlight(contentUnderlaps, animate = false)
         finishLayoutTransition(false)
@@ -390,6 +392,17 @@ class MainActivity :
       fillColor = getColorByAttr(com.google.android.material.R.attr.colorSurfaceContainer),
       cornerSmoothing = if (navView is BottomNavigationView) 0f else null
     )
+    val attachedOutlineProvider = navView.outlineProvider
+    navView.outlineProvider = object : ViewOutlineProvider() {
+      override fun getOutline(view: View, outline: Outline) {
+        if (view is BottomNavigationView && floatingNavProgress > 0f) {
+          outline.setRoundRect(0, 0, view.width, view.height, view.height / 2f * floatingNavProgress)
+          outline.alpha = 1f
+        } else {
+          attachedOutlineProvider?.getOutline(view, outline)
+        }
+      }
+    }
     if (floatingNavEnabled) {
       navView.background = navPillDrawable
     }
@@ -429,7 +442,7 @@ class MainActivity :
     val maxHorizontalMargin = resources.getDimensionPixelSize(R.dimen.floating_nav_bar_margin_horizontal)
     val density = resources.displayMetrics.density
     val normalElevation = 3f * density
-    val floatingElevation = 6f * density
+    val floatingElevation = 1f * density
     val lp = view.layoutParams as? ViewGroup.MarginLayoutParams
 
     if (view is BottomNavigationView) {
@@ -500,6 +513,12 @@ class MainActivity :
 
     navPillDrawable?.setStroke(density * progress, strokeColorInt)
     navPillDrawable?.setCornerProgress(progress)
+    view.invalidateOutline()
+    if (OsUtils.atLeastP()) {
+      val shadowColor = (0x66 * progress).roundToInt() shl 24
+      view.outlineAmbientShadowColor = shadowColor
+      view.outlineSpotShadowColor = shadowColor
+    }
 
     if (!isNavigationBackgroundManagedByBlur(view)) {
       view.elevation = normalElevation + (floatingElevation - normalElevation) * progress

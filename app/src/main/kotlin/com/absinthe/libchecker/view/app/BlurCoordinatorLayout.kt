@@ -21,6 +21,7 @@ import androidx.annotation.RequiresApi
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.animation.addListener
 import androidx.core.graphics.withClip
+import androidx.core.graphics.withSave
 import androidx.core.graphics.withScale
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.viewpager2.widget.ViewPager2
@@ -160,7 +161,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
     floatingNavProgress = progress
     if (blurEnabled) {
       val density = resources.displayMetrics.density
-      originalNavElevation = (3f + 3f * progress) * density
+      originalNavElevation = (3f - 2f * progress) * density
       updateBarVisuals()
     }
     invalidate()
@@ -256,7 +257,17 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
     }
 
     appbar?.let { drawChild(canvas, it, drawingTime) }
-    navigation?.let { drawChild(canvas, it, drawingTime) }
+    navigation?.let {
+      val floatingBottom = it is BottomNavigationView && floatingNavProgress > 0f
+      canvas.withSave {
+        // The translucent navigation background must not receive its own shadow.
+        if (floatingBottom) clipOutPath(navClipPath)
+        enableZ()
+        drawChild(this, it, drawingTime)
+        disableZ()
+      }
+      if (floatingBottom) drawChild(canvas, it, drawingTime)
+    }
   }
 
   private var suppressManagedChildDraw = false
@@ -763,7 +774,8 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
     findViewById<AppBarLayout>(R.id.appbar)?.background?.alpha = backgroundAlpha
     findViewById<View>(R.id.nav_view)?.let { navView ->
       navView.background?.alpha = backgroundAlpha
-      navView.elevation = originalNavElevation * (1f - blurProgress)
+      val floatingElevation = 1f * resources.displayMetrics.density * floatingNavProgress
+      navView.elevation = originalNavElevation * (1f - blurProgress) + floatingElevation * blurProgress
       (navView as? FloatingNavigationBar)?.setBlurProgress(blurProgress)
     }
     findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)?.background?.alpha = backgroundAlpha

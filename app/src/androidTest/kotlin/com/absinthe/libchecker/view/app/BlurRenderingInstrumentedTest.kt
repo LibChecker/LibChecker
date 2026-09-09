@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Rect
 import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
@@ -41,6 +42,58 @@ import org.junit.runner.RunWith
 @SdkSuppress(minSdkVersion = 33)
 class BlurRenderingInstrumentedTest {
   private val instrumentation = InstrumentationRegistry.getInstrumentation()
+
+  @Test
+  fun floatingNavigationCastsShadowWithAndWithoutBlur() = withActivity { activity ->
+    val originalFloating = GlobalValues.isFloatingNavBar
+    try {
+      val nav = activity.findViewById<NavigationBarView>(R.id.nav_view)
+      instrumentation.runOnMainSync {
+        nav.selectedItemId = R.id.navigation_settings
+        activity.setFloatingNavBarEnabled(true)
+      }
+      SystemClock.sleep(2000)
+      for (blur in listOf(false, true)) {
+        instrumentation.runOnMainSync { activity.setBlurDesignEnabled(blur) }
+        SystemClock.sleep(1000)
+        val bounds = Rect()
+        instrumentation.runOnMainSync {
+          assertEquals(1f * nav.resources.displayMetrics.density, nav.elevation, 0.1f)
+          nav.getGlobalVisibleRect(bounds)
+        }
+        val shadow = checkNotNull(instrumentation.uiAutomation.takeScreenshot())
+        instrumentation.runOnMainSync { nav.elevation = 0f }
+        settle()
+        val baseline = checkNotNull(instrumentation.uiAutomation.takeScreenshot())
+        try {
+          assertEquals(
+            "Shadow must not darken the navigation surface",
+            baseline.getPixel(bounds.centerX(), bounds.centerY()),
+            shadow.getPixel(bounds.centerX(), bounds.centerY())
+          )
+          var darkerPixels = 0
+          val outset = (12 * nav.resources.displayMetrics.density).toInt()
+          for (y in (bounds.top - outset).coerceAtLeast(0) until (bounds.bottom + outset).coerceAtMost(shadow.height)) {
+            for (x in (bounds.left - outset).coerceAtLeast(0) until (bounds.right + outset).coerceAtMost(shadow.width)) {
+              if (bounds.contains(x, y)) continue
+              if (Color.red(baseline.getPixel(x, y)) - Color.red(shadow.getPixel(x, y)) > 2) darkerPixels++
+            }
+          }
+          instrumentation.sendStatus(0, Bundle().apply { putString("floatingShadow", "blur=$blur darkerPixels=$darkerPixels") })
+          assertTrue("No visible elevation shadow with blur=$blur", darkerPixels > 10)
+        } finally {
+          shadow.recycle()
+          baseline.recycle()
+          instrumentation.runOnMainSync { nav.elevation = 1f * nav.resources.displayMetrics.density }
+        }
+      }
+      instrumentation.runOnMainSync { activity.setFloatingNavBarEnabled(false) }
+      SystemClock.sleep(1000)
+      instrumentation.runOnMainSync { assertEquals(0f, nav.elevation, 0.1f) }
+    } finally {
+      GlobalValues.isFloatingNavBar = originalFloating
+    }
+  }
 
   @Test
   fun capturedContentReusesDisplayListAndRefreshesAfterInvalidation() = withActivity { activity ->
