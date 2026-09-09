@@ -426,11 +426,7 @@ class LibReferenceFragment :
   }
 
   override fun onReturnTop() {
-    binding.list.apply {
-      if (canScrollVertically(-1)) {
-        smoothScrollToPosition(0)
-      }
-    }
+    animateReturnTop(binding.list)
   }
 
   override fun getSuitableLayoutManager(): RecyclerView.LayoutManager? = binding.list.layoutManager

@@ -125,6 +125,7 @@ class MainActivity :
   private val initialListTopPaddings = WeakHashMap<View, Int>()
   private var blurContainer: BlurCoordinatorLayout? = null
   private var appbarScrollTarget: RecyclerView? = null
+  private var appbarReturnTopRunning = false
   private val appbarLocation = IntArray(2)
   private val appbarScrollTargetLocation = IntArray(2)
   private var pendingAnchorRestoreObserver: ViewTreeObserver? = null
@@ -293,6 +294,12 @@ class MainActivity :
 
   override fun scheduleAppbarLiftingStatus(isLifted: Boolean) {
     updateAppbarContentUnderlap(isLiftedHint = isLifted)
+  }
+
+  override fun setAppbarReturnTopRunning(running: Boolean) {
+    appbarReturnTopRunning = running
+    binding.appbar.isLiftOnScroll = !running && blurContainer?.blurEnabled != true
+    updateAppbarContentUnderlap()
   }
 
   override fun setBlurDesignEnabled(enabled: Boolean) {
@@ -580,7 +587,7 @@ class MainActivity :
   }
 
   private fun updateAppbarContentUnderlap(isLiftedHint: Boolean = false) {
-    val contentUnderlaps = isLiftedHint || isListItemUnderAppbar()
+    val contentUnderlaps = !appbarReturnTopRunning && (isLiftedHint || isListItemUnderAppbar())
     blurContainer?.setAppbarContentUnderlap(contentUnderlaps)
     if (blurContainer?.blurEnabled != true) {
       binding.appbar.isLifted = contentUnderlaps

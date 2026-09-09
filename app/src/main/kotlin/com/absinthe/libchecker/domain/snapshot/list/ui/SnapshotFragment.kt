@@ -575,10 +575,7 @@ class SnapshotFragment :
   override fun getSuitableLayoutManager() = binding.list.layoutManager
 
   override fun onReturnTop() {
-    val context = context ?: return
-    if (binding.list.canScrollVertically(-1)) {
-      binding.list.smoothScrollToPosition(0)
-    } else {
+    if (!animateReturnTop(binding.list)) {
       flip(VF_LOADING)
       viewModel.compareDiff(viewModel.selectedSnapshotTimestamp)
     }

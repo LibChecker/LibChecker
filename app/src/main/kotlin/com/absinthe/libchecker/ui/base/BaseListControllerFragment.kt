@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.ui.base
 
+import android.animation.ValueAnimator
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.Menu
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
+import com.absinthe.libchecker.ui.animator.createReturnTopAnimator
 import rikka.widget.borderview.BorderRecyclerView
 import rikka.widget.borderview.BorderView
 import rikka.widget.borderview.BorderViewDelegate
@@ -28,6 +30,7 @@ abstract class BaseListControllerFragment<T : ViewBinding> :
   protected var isListReady = false
   protected var allowRefreshing = true
   protected var menu: Menu? = null
+  private var returnTopAnimator: ValueAnimator? = null
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
@@ -40,6 +43,7 @@ abstract class BaseListControllerFragment<T : ViewBinding> :
   }
 
   override fun onVisibilityChanged(visible: Boolean) {
+    if (!visible) cancelReturnTopAnimation()
     super.onVisibilityChanged(visible)
     if (visible) {
       listControllerHost?.setListController(this)
@@ -58,7 +62,39 @@ abstract class BaseListControllerFragment<T : ViewBinding> :
     (activity as? IAppBarContainer)?.scheduleAppbarLiftingStatus(isLifted)
   }
 
+  protected fun animateReturnTop(recyclerView: RecyclerView): Boolean {
+    if (returnTopAnimator != null) return true
+    if (!recyclerView.canScrollVertically(-1)) return false
+    val appbar = activity as? IAppBarContainer
+    appbar?.setAppbarReturnTopRunning(true)
+    returnTopAnimator = recyclerView.createReturnTopAnimator {
+      returnTopAnimator = null
+      appbar?.setAppbarReturnTopRunning(false)
+    }
+    returnTopAnimator?.start()
+    return true
+  }
+
+  protected fun cancelReturnTopAnimation() {
+    returnTopAnimator?.cancel()
+  }
+
+  override fun onConfigurationChanged(newConfig: Configuration) {
+    cancelReturnTopAnimation()
+    super.onConfigurationChanged(newConfig)
+  }
+
+  override fun onDestroyView() {
+    cancelReturnTopAnimation()
+    super.onDestroyView()
+  }
+
   protected fun wireListScreenChrome(recyclerView: BorderRecyclerView) {
+    recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+      override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+        if (newState == RecyclerView.SCROLL_STATE_DRAGGING) cancelReturnTopAnimation()
+      }
+    })
     borderDelegate = recyclerView.borderViewDelegate
     recyclerView.borderVisibilityChangedListener =
       BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
