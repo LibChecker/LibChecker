@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.ViewGroup
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTION
@@ -67,14 +66,6 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
   override fun onStart() {
     super.onStart()
     blurContainer?.setBlurEnabled(GlobalValues.isBlurDesign)
-    if (binding.vfContainer.displayedChild == LOADING_VIEW_INDEX) {
-      binding.loading.start()
-    }
-  }
-
-  override fun onStop() {
-    binding.loading.stop()
-    super.onStop()
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -131,14 +122,13 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
         displayedChild = LOADING_VIEW_INDEX
         (appbar.parent as ViewGroup).bringChildToFront(appbar)
       }
-      loading.setRuleIconHighlightProvider()
+      loading.loadingView.setRuleIconHighlightProvider()
     }
 
     viewModel.libRefListFlow.onEach {
       val itemViewStates = viewModel.buildAppListItemViewStates(it)
       adapter.bind(AppListRenderState(itemViewStates = itemViewStates))
       adapter.setList(it)
-      binding.loading.stop()
       binding.vfContainer.displayedChild = LIST_VIEW_INDEX
       if (recordVisit) {
         refName?.let { name ->
@@ -199,9 +189,6 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
 
   private fun showLoading() {
     binding.vfContainer.displayedChild = LOADING_VIEW_INDEX
-    if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
-      binding.loading.start()
-    }
   }
 
   private companion object {

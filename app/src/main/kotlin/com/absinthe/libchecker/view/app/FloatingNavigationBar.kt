@@ -18,6 +18,9 @@ import com.google.android.material.navigation.NavigationBarView
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
+// Keep circular end caps; smoothing changes their silhouette into a squircle.
+internal const val FLOATING_NAV_CORNER_SMOOTHING = 0f
+
 interface FloatingNavigationBar {
   var isFloating: Boolean
   val currentFloatingProgress: Float
@@ -65,7 +68,7 @@ internal class FloatingNavigationThumbController(
 
   init {
     val thumbColor = host.context.getColorByAttr(MaterialR.attr.colorSecondaryContainer)
-    thumbDrawable = G2PillDrawable(fillColor = thumbColor, cornerSmoothing = if (vertical) null else 0f)
+    thumbDrawable = G2PillDrawable(fillColor = thumbColor, cornerSmoothing = if (vertical) null else FLOATING_NAV_CORNER_SMOOTHING)
     thumbView.background = thumbDrawable
     thumbView.visibility = View.GONE
     host.addView(thumbView, 0, FrameLayout.LayoutParams(0, 0))

@@ -46,6 +46,7 @@ import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.extensions.activity
 import com.absinthe.libchecker.utils.extensions.dpToDimension
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
+import com.absinthe.libchecker.view.app.FLOATING_NAV_CORNER_SMOOTHING
 import com.absinthe.libchecker.view.app.FloatingNavigationBar
 import com.absinthe.libchecker.view.drawable.setG2Shape
 import com.google.android.material.navigationrail.NavigationRailView
@@ -573,7 +574,7 @@ class RecentVisitsPopup(
           navX + navigation.width - inset,
           navY + navigation.height - inset,
           (navigation.height / 2f - inset) * floatingProgress,
-          cornerSmoothing = if (navigation is com.google.android.material.bottomnavigation.BottomNavigationView) 0f else null
+          cornerSmoothing = if (navigation is com.google.android.material.bottomnavigation.BottomNavigationView) FLOATING_NAV_CORNER_SMOOTHING else null
         )
         contentClip.addPath(navigationCutout)
       } else {

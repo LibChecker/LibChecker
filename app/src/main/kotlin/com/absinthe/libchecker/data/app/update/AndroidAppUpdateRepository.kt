@@ -31,11 +31,14 @@ import retrofit2.HttpException
 
 class AndroidAppUpdateRepository(
   private val context: Context,
-  private val packageInstaller: PackageInstaller = context.packageManager.packageInstaller,
-  private val request: GetAppUpdateRequest = ApiManager.create(),
-  private val okHttpClient: OkHttpClient = ApiManager.okHttpClient,
+  packageInstaller: PackageInstaller? = null,
+  request: GetAppUpdateRequest? = null,
+  okHttpClient: OkHttpClient? = null,
   private val sdkInt: Int = Build.VERSION.SDK_INT
 ) : AppUpdateRepository {
+  private val packageInstaller by lazy { packageInstaller ?: context.packageManager.packageInstaller }
+  private val request by lazy { request ?: ApiManager.create<GetAppUpdateRequest>() }
+  private val okHttpClient by lazy { okHttpClient ?: ApiManager.okHttpClient }
 
   override suspend fun requestUpdateInfo(channel: AppUpdateChannel): GetAppUpdateInfo? {
     val requestValue = channel.requestValue

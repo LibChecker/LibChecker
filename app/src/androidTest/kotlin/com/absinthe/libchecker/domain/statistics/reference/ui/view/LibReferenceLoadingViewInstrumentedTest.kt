@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.domain.statistics.reference.ui.view
 
+import android.view.View
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.view.children
@@ -16,6 +17,25 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class LibReferenceLoadingViewInstrumentedTest {
+  @Test
+  fun inactiveProgressStaysHiddenWhileItsStateChanges() {
+    InstrumentationRegistry.getInstrumentation().runOnMainSync {
+      val context = ContextThemeWrapper(InstrumentationRegistry.getInstrumentation().targetContext, R.style.AppTheme)
+      val view = LibReferenceLoadingView(context)
+      val indicator = view.children.filterIsInstance<CircularProgressIndicator>().single()
+      assertEquals(View.INVISIBLE, indicator.visibility)
+      view.setActive(true)
+      assertEquals(View.VISIBLE, indicator.visibility)
+      view.setActive(false)
+      view.bind(LibReferenceLoadingState.Scanning(50))
+      view.bind(LibReferenceLoadingState.Preparing)
+      assertEquals(View.INVISIBLE, indicator.visibility)
+      assertEquals(View.VISIBLE, view.visibility)
+      view.setActive(true)
+      assertEquals(View.VISIBLE, indicator.visibility)
+    }
+  }
+
   @Test
   fun postScanStagesNeverReturnToIndeterminateModeOrMoveBackwards() {
     val instrumentation = InstrumentationRegistry.getInstrumentation()

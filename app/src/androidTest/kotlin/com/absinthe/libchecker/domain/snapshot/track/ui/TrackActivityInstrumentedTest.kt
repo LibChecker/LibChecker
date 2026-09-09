@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.absinthe.libchecker.domain.snapshot.track.ui.adapter.TrackAdapter
-import com.absinthe.libchecker.domain.snapshot.track.ui.view.TrackLoadingView
+import com.absinthe.libchecker.view.app.DotLoadingView
 import com.absinthe.libchecker.view.app.EmptyListView
 import java.util.concurrent.atomic.AtomicBoolean
 import org.junit.Assert.assertFalse
@@ -36,7 +36,7 @@ class TrackActivityInstrumentedTest {
       instrumentation.runOnMainSync {
         val trackAdapter = activity.findViewById<RecyclerView>(android.R.id.list).adapter as TrackAdapter
         adapter = trackAdapter
-        assertTrue("The initial adapter state is not loading", trackAdapter.stateView is TrackLoadingView)
+        assertTrue("The initial adapter state is not loading", trackAdapter.stateView is DotLoadingView)
         assertTrue("The initial state holder is not enabled", trackAdapter.isStateViewEnable)
         val commitObserver = object : RecyclerView.AdapterDataObserver() {
           override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {

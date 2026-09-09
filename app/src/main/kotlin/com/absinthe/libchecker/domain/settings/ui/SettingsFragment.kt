@@ -3,6 +3,7 @@ package com.absinthe.libchecker.domain.settings.ui
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
+import android.os.SystemClock
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +17,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnAttach
 import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.ListPreference
 import androidx.preference.Preference
@@ -52,6 +54,7 @@ import com.absinthe.libchecker.utils.extensions.openUrlInBrowser
 import com.absinthe.libraries.utils.extensions.getBoolean
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -354,6 +357,7 @@ class SettingsFragment :
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+    prepareVisiblePreferenceRows()
     findPreference<Preference>(Constants.PREF_GET_UPDATES)?.let { preference ->
       settingsViewModel.updateBadgeVisible.onEach { visible ->
         isGetUpdatesBadgeVisible = visible
@@ -546,6 +550,7 @@ class SettingsFragment :
   }
 
   private fun bindLocalePreference(languagePreference: ListPreference) {
+    if (!languagePreference.isVisible) return
     val tag = languagePreference.value
     val displayData = settingsViewModel.buildLocalePreferenceData(
       entries = languagePreference.entries.toList(),
@@ -624,6 +629,55 @@ class SettingsFragment :
         super.onBindViewHolder(holder, position)
         (holder.itemView as? PreferenceItemView)?.let {
           bindSettingsPreferenceItem(this, position, it)
+        }
+      }
+    }
+  }
+
+  private fun prepareVisiblePreferenceRows() {
+    val recyclerView = prefRecyclerView
+    val adapter = recyclerView.adapter as? PreferenceGroupAdapter ?: return
+    val owner = viewLifecycleOwner
+    recyclerView.swapAdapter(null, false)
+    owner.lifecycleScope.launch {
+      try {
+        while (!recyclerView.isLaidOut) awaitFrame()
+        val viewportHeight = recyclerView.height - recyclerView.paddingTop - recyclerView.paddingBottom
+        val widthSpec = View.MeasureSpec.makeMeasureSpec(
+          recyclerView.width - recyclerView.paddingLeft - recyclerView.paddingRight,
+          View.MeasureSpec.EXACTLY
+        )
+        val heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        val batchBudgetMillis = (500f / (recyclerView.display?.refreshRate ?: 60f)).toLong().coerceAtLeast(1)
+        val counts = mutableMapOf<Int, Int>()
+        val holders = mutableListOf<PreferenceViewHolder>()
+        var preparedHeight = 0
+        var position = 0
+        // Prepare only the requested viewport, yielding between small batches.
+        while (position < adapter.itemCount && preparedHeight < viewportHeight) {
+          awaitFrame()
+          val deadline = SystemClock.uptimeMillis() + batchBudgetMillis
+          do {
+            val type = adapter.getItemViewType(position)
+            val holder = adapter.createViewHolder(recyclerView, type)
+            adapter.bindViewHolder(holder, position++)
+            holder.itemView.measure(widthSpec, heightSpec)
+            val margins = holder.itemView.layoutParams as? ViewGroup.MarginLayoutParams
+            preparedHeight += holder.itemView.measuredHeight +
+              (margins?.topMargin ?: 0) + (margins?.bottomMargin ?: 0)
+            val count = (counts[type] ?: 0) + 1
+            counts[type] = count
+            recyclerView.recycledViewPool.setMaxRecycledViews(type, maxOf(5, count))
+            holders += holder
+          } while (
+            position < adapter.itemCount && preparedHeight < viewportHeight &&
+            SystemClock.uptimeMillis() < deadline
+          )
+        }
+        holders.asReversed().forEach(recyclerView.recycledViewPool::putRecycledView)
+      } finally {
+        if (owner.lifecycle.currentState != Lifecycle.State.DESTROYED) {
+          recyclerView.swapAdapter(adapter, false)
         }
       }
     }

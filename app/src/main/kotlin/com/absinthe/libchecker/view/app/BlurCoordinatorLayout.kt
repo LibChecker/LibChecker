@@ -20,6 +20,7 @@ import android.view.animation.LinearInterpolator
 import androidx.annotation.RequiresApi
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.animation.addListener
+import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.withClip
 import androidx.core.graphics.withSave
 import androidx.core.graphics.withScale
@@ -74,12 +75,18 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
   private var floatingNavProgress: Float = 0f
   private val navClipPath = Path()
   private val navStrokePath = Path()
+  private var navStrokeGradient: LinearGradient? = null
+  private var navStrokeTop = Float.NaN
+  private var navStrokeBottom = Float.NaN
   private var originalViewPagerBehavior: CoordinatorLayout.Behavior<*>? = null
   private val contentBackgroundColor by lazy(LazyThreadSafetyMode.NONE) {
     resolveThemeColor(android.R.attr.colorBackground) ?: Color.BLACK
   }
   private val surfaceColor by lazy(LazyThreadSafetyMode.NONE) {
     resolveThemeColor(androidx.appcompat.R.attr.colorBackgroundFloating) ?: contentBackgroundColor
+  }
+  private val floatingSurfaceColor by lazy(LazyThreadSafetyMode.NONE) {
+    resolveThemeColor(com.google.android.material.R.attr.colorSurfaceContainer) ?: surfaceColor
   }
   private val isNightMode by lazy(LazyThreadSafetyMode.NONE) {
     val nightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
@@ -624,7 +631,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
       if (top >= height || bottom <= top || left >= right) return
 
       val cornerRadius = ((bottom - top) / 2f) * floatingNavProgress
-      navClipPath.setG2Shape(left, top, right, bottom, cornerRadius, cornerSmoothing = 0f)
+      navClipPath.setG2Shape(left, top, right, bottom, cornerRadius, cornerSmoothing = FLOATING_NAV_CORNER_SMOOTHING)
       canvas.withClip(navClipPath) {
         drawNavBackdrop(this, source, left, top, right, bottom)
       }
@@ -637,6 +644,23 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
       strokePaint.blendMode = BlendMode.SRC_OVER
       val strokeAlpha = ((outlineColor ushr 24) * floatingNavProgress).roundToInt()
       strokePaint.color = (outlineColor and 0x00FFFFFF) or (strokeAlpha shl 24)
+      if (isNightMode) {
+        if (navStrokeGradient == null || navStrokeTop != top || navStrokeBottom != bottom) {
+          navStrokeGradient = LinearGradient(
+            0f,
+            top,
+            0f,
+            bottom,
+            0x52FFFFFF,
+            0x14FFFFFF,
+            Shader.TileMode.CLAMP
+          )
+          navStrokeTop = top
+          navStrokeBottom = bottom
+        }
+        strokePaint.shader = navStrokeGradient
+        strokePaint.alpha = (255 * floatingNavProgress).roundToInt()
+      }
       val halfStroke = strokeWidth / 2f
       navStrokePath.setG2Shape(
         left + halfStroke,
@@ -644,7 +668,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
         right - halfStroke,
         bottom - halfStroke,
         (cornerRadius - halfStroke).coerceAtLeast(0f),
-        cornerSmoothing = 0f
+        cornerSmoothing = FLOATING_NAV_CORNER_SMOOTHING
       )
       canvas.drawPath(navStrokePath, strokePaint)
       drawNavDivider(canvas, top, floatingNavProgress)
@@ -694,7 +718,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
     paint.shader = null
     paint.blendMode = BlendMode.SRC_OVER
     paint.color = if (isNightMode) {
-      DARK_NAV_TINT_ALPHA shl 24
+      darkNavigationTintColor(floatingSurfaceColor, floatingNavProgress)
     } else {
       (surfaceColor and 0x00FFFFFF) or (NAV_TINT_ALPHA shl 24)
     }
@@ -774,7 +798,8 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
     findViewById<AppBarLayout>(R.id.appbar)?.background?.alpha = backgroundAlpha
     findViewById<View>(R.id.nav_view)?.let { navView ->
       navView.background?.alpha = backgroundAlpha
-      val floatingElevation = 1f * resources.displayMetrics.density * floatingNavProgress
+      val elevationDp = if (isNightMode && navView is BottomNavigationView) 6f else 1f
+      val floatingElevation = elevationDp * resources.displayMetrics.density * floatingNavProgress
       navView.elevation = originalNavElevation * (1f - blurProgress) + floatingElevation * blurProgress
       (navView as? FloatingNavigationBar)?.setBlurProgress(blurProgress)
     }
@@ -799,6 +824,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
     progressiveBlurEffect = null
     progressiveMaskShaders.fill(null)
     scrimPaint = null
+    navStrokeGradient = null
     appbarTintPaint = null
     appbarTintTop = Float.NaN
     appbarTintBottom = Float.NaN
@@ -825,7 +851,6 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
     private const val PROGRESSIVE_MASK_COUNT = 3
     private const val APPBAR_TINT_STOP_COUNT = 9
     private const val NAV_TINT_ALPHA = 0x99
-    private const val DARK_NAV_TINT_ALPHA = 0xCC
     private const val BASE_FILL_ALPHA_MASK = 0xE6FFFFFFL // 90% opaque base so empty areas still look like glass
     private const val DIVIDER_HEIGHT_DP = 1f
   }
@@ -857,6 +882,12 @@ internal fun opaqueBackdropColor(color: Int): Int = color or 0xFF000000.toInt()
 internal fun blurBackgroundAlpha(progress: Float): Int = ((1f - progress.coerceIn(0f, 1f)) * OPAQUE_LAYER_ALPHA).roundToInt()
 
 internal fun fadingNavDividerAlpha(baseAlpha: Int, floatingProgress: Float): Int = (baseAlpha.coerceIn(0, 255) * (1f - floatingProgress.coerceIn(0f, 1f))).roundToInt()
+
+internal fun darkNavigationTintColor(surfaceColor: Int, floatingProgress: Float): Int = ColorUtils.blendARGB(
+  0xCC000000.toInt(),
+  (surfaceColor and 0x00FFFFFF) or 0x8C000000.toInt(),
+  floatingProgress.coerceIn(0f, 1f)
+)
 
 internal fun progressiveSurfaceTintAlpha(
   progress: Float,

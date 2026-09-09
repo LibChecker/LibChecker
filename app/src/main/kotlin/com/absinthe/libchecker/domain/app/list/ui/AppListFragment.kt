@@ -181,6 +181,7 @@ class AppListFragment :
           Timber.e(e)
         }
       }
+      initView.setProgress(0, false)
       initView.loadingView.setAppIconHighlightProvider { getRandomAppIcon() }
     }
 
@@ -214,16 +215,12 @@ class AppListFragment :
       flip(VF_INIT)
       removeMenuProviderPreservingSearch()
     }
-    if (binding.vfContainer.displayedChild == VF_INIT) {
-      binding.initView.loadingView.start()
-    }
   }
 
   override fun onPause() {
     super.onPause()
     advancedMenuBSDFragment?.dismiss()
     advancedMenuBSDFragment = null
-    binding.initView.loadingView.stop()
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {
@@ -392,7 +389,7 @@ class AppListFragment :
           }
 
           is HomeViewModel.Effect.UpdateInitProgress -> {
-            binding.initView.progressIndicator.setProgressCompat(it.progress, true)
+            binding.initView.setProgress(it.progress, true)
           }
 
           is HomeViewModel.Effect.PackageChanged -> {
@@ -637,12 +634,8 @@ class AppListFragment :
     }
     if (page == VF_INIT) {
       menu?.findItem(R.id.search)?.isVisible = false
-      if (isResumed) {
-        binding.initView.loadingView.start()
-      }
     } else {
       menu?.findItem(R.id.search)?.isVisible = true
-      binding.initView.loadingView.stop()
     }
   }
 

@@ -23,9 +23,9 @@ import com.absinthe.libchecker.domain.snapshot.track.presentation.TrackListUiSta
 import com.absinthe.libchecker.domain.snapshot.track.presentation.TrackViewModel
 import com.absinthe.libchecker.domain.snapshot.track.ui.adapter.TrackAdapter
 import com.absinthe.libchecker.domain.snapshot.track.ui.view.TrackItemView
-import com.absinthe.libchecker.domain.snapshot.track.ui.view.TrackLoadingView
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
+import com.absinthe.libchecker.view.app.DotLoadingView
 import com.absinthe.libchecker.view.app.EmptyListView
 import kotlinx.coroutines.launch
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
@@ -85,7 +85,9 @@ class TrackActivity :
           doSaveItemState(position, (view as Checkable).isChecked)
         }
       }
-      stateView = TrackLoadingView(this@TrackActivity) { getRandomAppIcon() }
+      stateView = DotLoadingView(this@TrackActivity).apply {
+        loadingView.setAppIconHighlightProvider { getRandomAppIcon() }
+      }
       isStateViewEnable = true
     }
   }

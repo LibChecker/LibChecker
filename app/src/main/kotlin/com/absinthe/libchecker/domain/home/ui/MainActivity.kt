@@ -8,6 +8,7 @@ import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Outline
+import android.graphics.Path
 import android.graphics.PointF
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -76,9 +77,12 @@ import com.absinthe.libchecker.utils.extensions.isKeyboardShowing
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.launchLibReferencePage
 import com.absinthe.libchecker.view.app.BlurCoordinatorLayout
+import com.absinthe.libchecker.view.app.FLOATING_NAV_CORNER_SMOOTHING
 import com.absinthe.libchecker.view.app.FloatingNavigationBar
 import com.absinthe.libchecker.view.app.InvalidatingHideBottomViewOnScrollBehavior
 import com.absinthe.libchecker.view.drawable.G2PillDrawable
+import com.absinthe.libchecker.view.drawable.setConvexPathOrFallback
+import com.absinthe.libchecker.view.drawable.setG2Shape
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.motion.MotionUtils
 import com.google.android.material.navigation.NavigationBarView
@@ -390,13 +394,21 @@ class MainActivity :
     originalNavBackground = navView.background
     navPillDrawable = G2PillDrawable(
       fillColor = getColorByAttr(com.google.android.material.R.attr.colorSurfaceContainer),
-      cornerSmoothing = if (navView is BottomNavigationView) 0f else null
+      cornerSmoothing = if (navView is BottomNavigationView) FLOATING_NAV_CORNER_SMOOTHING else null
     )
     val attachedOutlineProvider = navView.outlineProvider
     navView.outlineProvider = object : ViewOutlineProvider() {
+      private val path = Path()
+
+      @Suppress("DEPRECATION")
       override fun getOutline(view: View, outline: Outline) {
         if (view is BottomNavigationView && floatingNavProgress > 0f) {
-          outline.setRoundRect(0, 0, view.width, view.height, view.height / 2f * floatingNavProgress)
+          val radius = view.height / 2f * floatingNavProgress
+          path.setG2Shape(0f, 0f, view.width.toFloat(), view.height.toFloat(), radius, cornerSmoothing = FLOATING_NAV_CORNER_SMOOTHING)
+          setConvexPathOrFallback(
+            setConvexPath = { outline.setConvexPath(path) },
+            setFallback = { outline.setRoundRect(0, 0, view.width, view.height, radius) }
+          )
           outline.alpha = 1f
         } else {
           attachedOutlineProvider?.getOutline(view, outline)

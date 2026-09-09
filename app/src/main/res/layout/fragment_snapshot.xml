@@ -11,26 +11,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <FrameLayout
+    <com.absinthe.libchecker.view.app.DotLoadingView
+      android:id="@+id/loading"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:clipChildren="false"
-      android:paddingTop="?actionBarSize">
-
-      <com.absinthe.libchecker.view.app.RingDotsView
-        android:id="@+id/loading"
-        android:layout_width="@dimen/general_loading_size"
-        android:layout_height="@dimen/general_loading_size"
-        android:layout_gravity="center" />
-
-      <com.google.android.material.progressindicator.CircularProgressIndicator
-        android:id="@+id/progress_indicator"
-        style="@style/App.Widget.M3E.CircularProgressIndicator"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center" />
-
-    </FrameLayout>
+      android:paddingTop="?actionBarSize" />
 
     <rikka.widget.borderview.BorderRecyclerView
       android:id="@android:id/list"

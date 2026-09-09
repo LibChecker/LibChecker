@@ -34,19 +34,11 @@
       android:background="@null"
       android:clipChildren="true">
 
-      <LinearLayout
+      <com.absinthe.libchecker.view.app.DotLoadingView
+        android:id="@+id/loading"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@null"
-        android:clipChildren="false"
-        android:gravity="center">
-
-        <com.absinthe.libchecker.view.app.RingDotsView
-          android:id="@+id/loading"
-          android:layout_width="@dimen/general_loading_size"
-          android:layout_height="@dimen/general_loading_size" />
-
-      </LinearLayout>
+        android:paddingTop="?actionBarSize" />
 
       <rikka.widget.borderview.BorderRecyclerView
         android:id="@android:id/list"

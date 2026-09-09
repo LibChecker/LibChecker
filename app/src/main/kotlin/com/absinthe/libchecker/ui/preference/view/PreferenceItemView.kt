@@ -5,12 +5,15 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewStub
 import android.view.animation.PathInterpolator
 import android.widget.FrameLayout
+import android.widget.LinearLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -20,13 +23,23 @@ import com.absinthe.libchecker.ui.preference.model.PreferenceItemRenderState
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.google.android.material.badge.BadgeDrawable
 import com.google.android.material.badge.BadgeUtils
-import com.google.android.material.card.MaterialCardView
+import com.google.android.material.shape.MaterialShapeDrawable
 
 class PreferenceItemView @JvmOverloads constructor(
   context: Context,
   attrs: AttributeSet? = null,
   defStyleAttr: Int = 0
-) : MaterialCardView(context, attrs, defStyleAttr) {
+) : LinearLayout(context, attrs, defStyleAttr) {
+
+  private val shapeBackground = MaterialShapeDrawable().apply {
+    fillColor = ColorStateList.valueOf(context.getColorByAttr(R.attr.settingsPreferenceCardColor))
+  }
+
+  init {
+    orientation = VERTICAL
+    background = shapeBackground
+    clipToOutline = true
+  }
 
   private val iconFrame by lazy { findViewById<FrameLayout>(R.id.icon_frame) }
   private val icon by lazy { findViewById<View>(android.R.id.icon) }
@@ -34,9 +47,10 @@ class PreferenceItemView @JvmOverloads constructor(
   private val chevron by lazy { findViewById<View>(R.id.settings_preference_chevron) }
   private val title by lazy { findViewById<View>(android.R.id.title) }
   private val summary by lazy { findViewById<View>(android.R.id.summary) }
-  private val inlineControl by lazy {
-    findViewById<PreferenceInlineControlView>(R.id.settings_preference_inline_control)
+  private val inlineControlDelegate = lazy {
+    findViewById<ViewStub>(R.id.settings_preference_inline_stub).inflate() as PreferenceInlineControlView
   }
+  private val inlineControl by inlineControlDelegate
   private var badge: BadgeDrawable? = null
   private var shapeAnimator: ValueAnimator? = null
   private var inlineAnimator: ValueAnimator? = null
@@ -170,7 +184,7 @@ class PreferenceItemView @JvmOverloads constructor(
     topRadius: Float,
     bottomRadius: Float
   ) {
-    shapeAppearanceModel = shapeAppearanceModel.toBuilder()
+    shapeBackground.shapeAppearanceModel = shapeBackground.shapeAppearanceModel.toBuilder()
       .setTopLeftCornerSize(topRadius)
       .setTopRightCornerSize(topRadius)
       .setBottomLeftCornerSize(bottomRadius)
@@ -185,6 +199,11 @@ class PreferenceItemView @JvmOverloads constructor(
     onRangeValueChangeFinished: (Int) -> Unit
   ) {
     val control = state.inlineControl
+    if ((control == null || !state.expanded) && !inlineControlDelegate.isInitialized()) {
+      renderedExpanded = false
+      chevron.rotation = 0f
+      return
+    }
     if (control == null) {
       inlineAnimator?.cancel()
       inlineControl.isVisible = false

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.absinthe.libchecker.ui.preference.view.PreferenceInlineControlView xmlns:android="http://schemas.android.com/apk/res/android"
+  android:id="@+id/settings_preference_inline_control"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:paddingStart="@dimen/settings_preference_inline_content_start"
+  android:paddingEnd="@dimen/normal_padding"
+  android:paddingBottom="@dimen/settings_preference_inline_padding_bottom"
+  android:visibility="gone" />

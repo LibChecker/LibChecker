@@ -5,6 +5,7 @@ import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.annotation.StringRes
 import androidx.appcompat.widget.AppCompatTextView
@@ -15,7 +16,16 @@ import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.utils.extensions.setSmoothRoundCorner
 import com.google.android.material.card.MaterialCardView
 
-open class AppInstallDetailSectionView(context: Context, @StringRes title: Int) : LinearLayout(context) {
+open class AppInstallDetailSectionView(
+  context: Context,
+  @StringRes title: Int,
+  protected val container: FrameLayout = MaterialCardView(context).apply {
+    setSmoothRoundCorner(12.dp)
+    strokeWidth = 1.dp
+    strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutlineVariant)
+    setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSurfaceContainerHigh))
+  }
+) : LinearLayout(context) {
 
   private val titleView = AppCompatTextView(
     ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)
@@ -30,20 +40,13 @@ open class AppInstallDetailSectionView(context: Context, @StringRes title: Int) 
     setText(title)
   }
 
-  protected val container = MaterialCardView(context).apply {
-    layoutParams = LayoutParams(
+  init {
+    container.layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     ).also {
       it.topMargin = 8.dp
     }
-    setSmoothRoundCorner(12.dp)
-    strokeWidth = 1.dp
-    strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutlineVariant)
-    setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSurfaceContainerHigh))
-  }
-
-  init {
     orientation = VERTICAL
     addView(titleView)
     addView(container)

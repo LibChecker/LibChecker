@@ -17,7 +17,8 @@ class G2PillDrawable(
   @ColorInt strokeColor: Int? = null,
   private var strokeWidth: Float = 0f,
   private val cornerSmoothing: Float? = null,
-  private var cornerProgress: Float = 1f
+  private var cornerProgress: Float = 1f,
+  private val cornerRadius: Float? = null
 ) : Drawable() {
   private val path = Path()
   private var fillColor = fillColor
@@ -74,7 +75,7 @@ class G2PillDrawable(
       top,
       right,
       bottom,
-      (bottom - top) / 2f * cornerProgress,
+      (cornerRadius ?: ((bottom - top) / 2f)) * cornerProgress,
       cornerSmoothing = cornerSmoothing
     )
   }
@@ -112,7 +113,8 @@ class G2PillDrawable(
       setConvexPathOrFallback(
         setConvexPath = { outline.setConvexPath(path) },
         setFallback = {
-          val radius = min(outlineBounds.width(), outlineBounds.height()) / 2f
+          val maxRadius = min(outlineBounds.width(), outlineBounds.height()) / 2f
+          val radius = (cornerRadius ?: maxRadius).coerceIn(0f, maxRadius) * cornerProgress
           outline.setRoundRect(outlineBounds, radius)
         }
       )

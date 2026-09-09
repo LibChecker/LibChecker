@@ -92,11 +92,6 @@ class LibReferenceFragment :
   private val resultToFirstLayoutTraceCookie = System.identityHashCode(this)
   private val prewarmViewTypes = IntArray(8) { LIB_REFERENCE_PROVIDER } +
     IntArray(4) { MULTIPLE_APPS_ICON_PROVIDER }
-  private val startLoadingAnimation = Runnable {
-    if (isResumed && binding.vfContainer.displayedChild == VF_LOADING) {
-      binding.loadingView.loadingView.start()
-    }
-  }
   private val prewarmNextViewHolder = object : Runnable {
     override fun run() {
       if (prewarmIndex >= prewarmViewTypes.size || binding.vfContainer.displayedChild != VF_LOADING) {
@@ -247,25 +242,15 @@ class LibReferenceFragment :
     }
   }
 
-  override fun onResume() {
-    super.onResume()
-    if (binding.vfContainer.displayedChild == VF_LOADING) {
-      scheduleLoadingAnimation()
-    }
-  }
-
   override fun onPause() {
     super.onPause()
     advancedMenuBSDFragment?.dismiss()
     advancedMenuBSDFragment = null
     (activity as? INavViewContainer)?.hideProgressBar()
-    binding.loadingView.loadingView.removeCallbacks(startLoadingAnimation)
-    binding.loadingView.loadingView.stop()
   }
 
   override fun onDestroyView() {
     binding.list.removeCallbacks(prewarmNextViewHolder)
-    binding.loadingView.loadingView.removeCallbacks(startLoadingAnimation)
     finishFirstListLayoutTrace(reportFullyDrawn = false)
     super.onDestroyView()
   }
@@ -457,21 +442,12 @@ class LibReferenceFragment :
     }
     if (child == VF_LOADING) {
       menu?.findItem(R.id.search)?.isVisible = false
-      if (isResumed) {
-        scheduleLoadingAnimation()
-      }
     } else {
       menu?.findItem(R.id.search)?.isVisible = true
-      binding.loadingView.loadingView.stop()
       binding.list.scrollToPosition(0)
     }
 
     binding.vfContainer.displayedChild = child
-  }
-
-  private fun scheduleLoadingAnimation() {
-    binding.loadingView.loadingView.removeCallbacks(startLoadingAnimation)
-    binding.loadingView.loadingView.postOnAnimation(startLoadingAnimation)
   }
 
   private fun beginFirstListLayoutTrace() {

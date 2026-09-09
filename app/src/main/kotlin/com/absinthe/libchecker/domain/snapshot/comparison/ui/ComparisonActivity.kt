@@ -180,7 +180,7 @@ class ComparisonActivity :
         setOutAnimation(this@ComparisonActivity, R.anim.anim_fade_out)
         displayedChild = VF_LIST
       }
-      loading.setAppIconHighlightProvider { getRandomAppIcon() }
+      loading.loadingView.setAppIconHighlightProvider { getRandomAppIcon() }
     }
 
     adapter.apply {
@@ -429,11 +429,6 @@ class ComparisonActivity :
   private fun flip(child: Int) = lifecycleScope.launch(Dispatchers.Main) {
     if (binding.vfContainer.displayedChild == child) {
       return@launch
-    }
-    if (child == VF_LOADING) {
-      binding.loading.start()
-    } else {
-      binding.loading.stop()
     }
 
     binding.vfContainer.displayedChild = child

@@ -12,6 +12,7 @@ import com.absinthe.libchecker.ui.preference.model.PreferenceItemGroupPosition
 import com.absinthe.libchecker.ui.preference.model.PreferenceItemRenderState
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotSame
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,7 +28,6 @@ class PreferenceInlineControlInstrumentedTest {
       }
       val item = LayoutInflater.from(context)
         .inflate(R.layout.preference_m3e, FrameLayout(context), false) as PreferenceItemView
-      val inline = item.findViewById<PreferenceInlineControlView>(R.id.settings_preference_inline_control)
       val state = PreferenceItemRenderState(
         preferenceKey = "range",
         title = "Range",
@@ -39,8 +39,11 @@ class PreferenceInlineControlInstrumentedTest {
         inlineControl = PreferenceInlineControl.Range(2, 1, 10)
       )
       repeat(10) { item.bind(state) }
-      assertEquals(0, inline.childCount)
+      assertNull(item.findViewById<PreferenceInlineControlView>(R.id.settings_preference_inline_control))
+      item.bind(state.copy(inlineControl = null))
+      assertNull(item.findViewById<PreferenceInlineControlView>(R.id.settings_preference_inline_control))
       item.bind(state.copy(expanded = true))
+      val inline = item.findViewById<PreferenceInlineControlView>(R.id.settings_preference_inline_control)
       assertEquals(1, inline.childCount)
       val child = inline.getChildAt(0)
       item.bind(state)

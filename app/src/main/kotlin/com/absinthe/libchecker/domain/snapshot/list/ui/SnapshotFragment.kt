@@ -119,7 +119,7 @@ class SnapshotFragment :
       lifecycleScope.launch(Dispatchers.Main) {
         flip(VF_LOADING)
         runCatching {
-          binding.progressIndicator.setProgressCompat(progress, true)
+          binding.loading.setProgress(progress, true)
         }
       }
     }
@@ -268,7 +268,7 @@ class SnapshotFragment :
           adapter.setSpaceFooterView()
         }
       }
-      loading.setAppIconHighlightProvider { getRandomAppIcon() }
+      loading.loadingView.setAppIconHighlightProvider { getRandomAppIcon() }
     }
 
     viewModel.apply {
@@ -294,7 +294,7 @@ class SnapshotFragment :
         }
       }.launchIn(lifecycleScope)
       comparingProgress.onEach {
-        binding.progressIndicator.setProgressCompat(it, it != 1)
+        binding.loading.setProgress(it, it != 1)
       }.launchIn(lifecycleScope)
     }
     homeViewModel.effect.onEach {
@@ -374,17 +374,12 @@ class SnapshotFragment :
         )
       )
     }
-
-    if (binding.vfContainer.displayedChild == VF_LOADING) {
-      binding.loading.start()
-    }
   }
 
   override fun onPause() {
     super.onPause()
     advancedMenuBSDFragment?.dismiss()
     advancedMenuBSDFragment = null
-    binding.loading.stop()
   }
 
   override fun onDestroyView() {
@@ -566,13 +561,9 @@ class SnapshotFragment :
       return
     }
     if (child == VF_LOADING) {
-      if (isResumed) {
-        binding.loading.start()
-      }
       menu?.findItem(R.id.save)?.isVisible = false
       menu?.findItem(R.id.search)?.isVisible = false
     } else {
-      binding.loading.stop()
       binding.list.scrollToPosition(0)
       menu?.findItem(R.id.save)?.isVisible = true
       menu?.findItem(R.id.search)?.isVisible = true

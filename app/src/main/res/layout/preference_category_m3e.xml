@@ -1,29 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+  android:id="@android:id/title"
   android:layout_width="match_parent"
   android:layout_height="wrap_content"
   android:layout_marginTop="18dp"
   android:layout_marginBottom="8dp"
-  android:orientation="vertical"
+  android:ellipsize="end"
+  android:maxLines="1"
   android:paddingStart="@dimen/normal_padding"
-  android:paddingEnd="@dimen/normal_padding">
-
-  <TextView
-    android:id="@android:id/title"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:ellipsize="end"
-    android:maxLines="1"
-    android:textAppearance="@style/App.TextAppearance.M3E.Preference.Category" />
-
-  <TextView
-    android:id="@android:id/summary"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="2dp"
-    android:ellipsize="end"
-    android:maxLines="2"
-    android:textAppearance="?attr/textAppearanceBodyMedium"
-    android:textColor="?attr/colorOnSurfaceVariant"
-    android:visibility="gone" />
-</LinearLayout>
+  android:paddingEnd="@dimen/normal_padding"
+  android:textAppearance="@style/App.TextAppearance.M3E.Preference.Category" />

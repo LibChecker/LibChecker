@@ -10,10 +10,11 @@ import com.absinthe.libchecker.domain.rules.CloudRulesVersionInfo
 
 class AndroidCloudRulesRepository(
   context: Context,
-  private val request: CloudRuleBundleRequest = ApiManager.create()
+  request: CloudRuleBundleRequest? = null
 ) : CloudRulesRepository {
 
   private val appContext = context.applicationContext
+  private val request by lazy { request ?: ApiManager.create<CloudRuleBundleRequest>() }
 
   override suspend fun getVersionInfo(): CloudRulesVersionInfo? {
     val remoteInfo = request.requestCloudRuleInfo() ?: return null
