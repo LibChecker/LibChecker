@@ -17,6 +17,8 @@ class LibReferenceMenuBSDFragment : BaseBottomSheetViewDialogFragment<LibReferen
   private var previousAdvancedOptions: Int = 0
   private var currentAdvancedOptions: Int = 0
   private var colorfulRuleIcon: Boolean = true
+  private var isTreemap = false
+  private var onDisplayModeChanged: (Boolean) -> Unit = {}
 
   private val demoIconPackages by lazy {
     listOf(
@@ -74,7 +76,21 @@ class LibReferenceMenuBSDFragment : BaseBottomSheetViewDialogFragment<LibReferen
     this.onOptionChanged = onOptionChanged
   }
 
+  fun setDisplayModeListener(isTreemap: Boolean, onChanged: (Boolean) -> Unit) {
+    this.isTreemap = isTreemap
+    onDisplayModeChanged = onChanged
+  }
+
+  private fun renderDisplayMode() {
+    root.bindDisplayMode(isTreemap) {
+      isTreemap = !isTreemap
+      onDisplayModeChanged(isTreemap)
+      renderDisplayMode()
+    }
+  }
+
   private fun render() {
+    renderDisplayMode()
     root.bind(
       state = buildLibReferenceMenuBottomSheetState(
         currentOptions = currentAdvancedOptions,

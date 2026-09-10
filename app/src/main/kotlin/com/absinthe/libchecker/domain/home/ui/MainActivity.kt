@@ -33,6 +33,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.doOnLayout
 import androidx.core.view.doOnNextLayout
+import androidx.core.view.doOnPreDraw
 import androidx.core.view.get
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
@@ -122,6 +123,17 @@ class MainActivity :
   private var recentVisitsPopup: RecentVisitsPopup? = null
   private val cloudRulesRepository: CloudRulesRepository by inject()
   private var listController: IListController? = null
+  private var imeController: HomeImeAnimationController? = null
+  val keyboardNavigationOffset: Float get() = imeController?.navigationOffset ?: 0f
+
+  fun registerHomeListInsets(view: View, owner: LifecycleOwner) {
+    imeController?.registerList(view, owner)
+  }
+
+  fun observeKeyboardInsets(owner: LifecycleOwner, frame: (WindowInsetsCompat) -> Unit, end: () -> Unit) {
+    imeController?.observe(owner, frame, end)
+  }
+
   private val initialListTopPaddings = WeakHashMap<View, Int>()
   private var blurContainer: BlurCoordinatorLayout? = null
   private var appbarScrollTarget: RecyclerView? = null
@@ -195,6 +207,7 @@ class MainActivity :
   }
 
   override fun onDestroy() {
+    imeController?.dispose()
     recentVisitsPopup?.dismissImmediately()
     recentVisitsPopup = null
     appbarScrollTarget?.removeOnScrollListener(appbarScrollListener)
@@ -255,6 +268,7 @@ class MainActivity :
   }
 
   override fun showNavigationView() {
+    if (imeController?.miniActive == true) return
     // NavigationRailView 不需要隐藏，所以不需要显示
     if (binding.navView is BottomNavigationView) {
       navViewBehavior.slideUp(binding.navView as BottomNavigationView)
@@ -262,6 +276,7 @@ class MainActivity :
   }
 
   override fun hideNavigationView() {
+    if (imeController?.miniActive == true) return
     // NavigationRailView 不需要隐藏
     if (binding.navView is BottomNavigationView) {
       navViewBehavior.slideDown(binding.navView as BottomNavigationView)
@@ -543,6 +558,7 @@ class MainActivity :
       view.elevation = normalElevation + (floatingElevation - normalElevation) * progress
     }
     blurContainer?.setFloatingNavProgress(progress)
+    imeController?.refresh()
   }
 
   private fun installBlurContainer(): BlurCoordinatorLayout? {
@@ -755,9 +771,15 @@ class MainActivity :
     )
   }
 
+  fun updateStatisticsIcon(treemap: Boolean) {
+    (binding.navView as NavigationBarView).menu.findItem(R.id.navigation_classify)
+      .setIcon(if (treemap) R.drawable.ic_reference_treemap else R.drawable.ic_reference_list)
+  }
+
   private fun initView() {
     val navView = binding.navView as NavigationBarView
     val floatingNavView = navView as? FloatingNavigationBar
+    updateStatisticsIcon(GlobalValues.libReferenceTreemap)
     binding.appbar.addOnLayoutChangeListener { appbar, _, _, _, _, _, _, _, _ ->
       applyHomeListTopPaddings(appbar.bottom)
     }
@@ -842,6 +864,9 @@ class MainActivity :
           }
 
           HomeDestination.fromNavigationItemId(it.itemId)?.let { destination ->
+            if (destination.pageIndex != viewpager.currentItem && imeController?.miniActive == true) {
+              imeController?.hideKeyboard(window)
+            }
             performClickNavigationItem(destination.pageIndex)
             true
           } ?: false
@@ -872,14 +897,24 @@ class MainActivity :
     )
     // Apply floating nav bar config before blur design replaces the background with transparency.
     initFloatingNavBar(navView)
+    imeController = HomeImeAnimationController(
+      root = binding.root,
+      navigation = navView,
+      floatingEnabled = { floatingNavEnabled },
+      revealNavigation = { (navView as? BottomNavigationView)?.let { navViewBehavior.slideUp(it, false) } },
+      invalidateBackdrop = { blurContainer?.invalidate() }
+    )
     // Apply blur config last so it wins over the behavior/background setup above.
     setBlurDesignEnabled(GlobalValues.isBlurDesign)
   }
+
+  private val boundRecentVisitTabs = WeakHashMap<View, Unit>()
 
   private fun bindRecentVisitsShortcuts(navView: NavigationBarView) {
     for (index in 0 until navView.menu.size()) {
       val id = navView.menu.getItem(index).itemId
       val tab = navView.findViewById<View>(id) ?: continue
+      if (boundRecentVisitTabs.put(tab, Unit) != null) continue
       TooltipCompat.setTooltipText(tab, null)
       if (id == R.id.navigation_app_list || id == R.id.navigation_classify) {
         val libraries = id == R.id.navigation_classify
@@ -963,7 +998,9 @@ class MainActivity :
       .setInterpolator(PAGE_EXIT_INTERPOLATOR)
       .setUpdateListener { blurContainer?.invalidate() }
       .withEndAction {
-        viewPager.setCurrentItem(index, false)
+        val destination = pendingPageIndex ?: index
+        pendingPageIndex = null
+        viewPager.setCurrentItem(destination, false)
         viewPager.translationX = direction * offset
         blurContainer?.invalidate()
         viewPager.animate()

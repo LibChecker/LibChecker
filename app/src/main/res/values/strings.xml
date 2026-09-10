@@ -439,4 +439,8 @@
   <string name="blur_design_summary">Provides more blur effects throughout the interface</string>
   <string name="floating_nav_bar">Floating navigation</string>
   <string name="floating_nav_bar_summary">Show the navigation bar in a floating style</string>
+  <string name="lib_reference_switch_to_treemap">Switch to treemap</string>
+  <string name="lib_reference_switch_to_list">Switch to list</string>
+  <string name="lib_reference_other">Other</string>
+  <string name="lib_reference_other_description">Other: %1$d libraries, %2$d references</string>
 </resources>

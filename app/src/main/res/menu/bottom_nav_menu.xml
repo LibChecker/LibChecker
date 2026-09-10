@@ -8,7 +8,7 @@
 
   <item
     android:id="@+id/navigation_classify"
-    android:icon="@drawable/ic_classify"
+    android:icon="@drawable/ic_reference_list"
     android:title="@string/title_statistics" />
 
   <item

@@ -45,7 +45,7 @@ class AppItemView(
 ) : MaterialCardView(context) {
 
   val container = AppItemContainerView(context, style).apply {
-    setPadding(style.cardPadding, style.cardPadding, style.cardPadding, style.cardPadding)
+    setPadding(style.horizontalPadding, style.cardPadding, style.horizontalPadding, style.cardPadding)
   }
 
   private val floatView by lazy {
@@ -565,6 +565,7 @@ class AppItemView(
 
   class Style private constructor(
     val cardPadding: Int,
+    val horizontalPadding: Int,
     val iconSize: Int,
     val titleMediumTextAppearance: Int,
     val bodyMediumTextAppearance: Int,
@@ -585,6 +586,7 @@ class AppItemView(
       fun create(context: Context): Style {
         return Style(
           cardPadding = context.getDimensionPixelSize(R.dimen.main_card_padding),
+          horizontalPadding = context.getDimensionPixelSize(R.dimen.main_list_horizontal_padding),
           iconSize = context.getDimensionPixelSize(R.dimen.app_icon_size),
           titleMediumTextAppearance = context.getResourceIdByAttr(
             com.google.android.material.R.attr.textAppearanceTitleMedium

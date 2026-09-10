@@ -414,4 +414,8 @@
   <string name="library_insight_hide_details">收起详情</string>
   <string name="adv_app_filter">应用筛选</string>
   <string name="adv_app_appearance">应用列表外观</string>
+  <string name="lib_reference_switch_to_treemap">切换为矩形树图</string>
+  <string name="lib_reference_switch_to_list">切换为列表</string>
+  <string name="lib_reference_other">其他</string>
+  <string name="lib_reference_other_description">其他：%1$d 个库，%2$d 次引用</string>
 </resources>

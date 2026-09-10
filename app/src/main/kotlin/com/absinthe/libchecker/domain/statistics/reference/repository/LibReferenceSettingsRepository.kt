@@ -6,6 +6,8 @@ interface LibReferenceSettingsRepository {
   val appListDisplayOptions: Int
   val threshold: Int
   var options: Int
+  var treemapEnabled: Boolean
+  var pinchHintShown: Boolean
   val showSystemApps: Boolean
   val colorfulRuleIcon: Boolean
   val thresholdChanges: Flow<Int>

@@ -53,6 +53,18 @@ class LibReferenceViewModel(
   val showSystemAppsChanges: Flow<Unit> = libReferenceSettingsRepository.showSystemAppsChanges
   val colorfulRuleIconChanges: Flow<Boolean> = libReferenceSettingsRepository.colorfulRuleIconChanges
 
+  var pinchHintShown: Boolean
+    get() = libReferenceSettingsRepository.pinchHintShown
+    set(value) {
+      libReferenceSettingsRepository.pinchHintShown = value
+    }
+
+  var treemapEnabled: Boolean
+    get() = libReferenceSettingsRepository.treemapEnabled
+    set(value) {
+      libReferenceSettingsRepository.treemapEnabled = value
+    }
+
   val colorfulRuleIcon: Boolean
     get() = libReferenceSettingsRepository.colorfulRuleIcon
 

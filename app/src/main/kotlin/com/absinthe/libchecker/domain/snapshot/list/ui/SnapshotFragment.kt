@@ -56,7 +56,6 @@ import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.timenode.ui.TimeNodeBottomSheetDialogFragment
 import com.absinthe.libchecker.services.OnShootListener
 import com.absinthe.libchecker.services.ShootService
-import com.absinthe.libchecker.ui.adapter.addSpacingDecoration
 import com.absinthe.libchecker.ui.animator.ParticleRemoveItemAnimator
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
@@ -140,7 +139,8 @@ class SnapshotFragment :
           ViewGroup.LayoutParams.MATCH_PARENT,
           ViewGroup.LayoutParams.WRAP_CONTENT
         ).also {
-          it.setMargins(8.dp, 2.dp, 8.dp, 2.dp)
+          val horizontalMargin = resources.getDimensionPixelSize(R.dimen.main_list_horizontal_padding)
+          it.setMargins(horizontalMargin, 2.dp, horizontalMargin, 2.dp)
         }
       }
 
@@ -256,9 +256,6 @@ class SnapshotFragment :
         wireListScreenChrome(this)
         layoutManager = createListScreenLayoutManager(resources.configuration)
 
-        if (itemDecorationCount == 0) {
-          addSpacingDecoration(4.dp, ratio = 0f)
-        }
         scrollToPosition(0)
       }
       vfContainer.apply {

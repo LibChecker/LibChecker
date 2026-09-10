@@ -1,14 +1,22 @@
 package com.absinthe.libchecker.domain.statistics.reference.ui
 
 import android.content.Intent
+import android.graphics.Rect
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnNextLayout
+import androidx.core.view.doOnPreDraw
+import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -40,10 +48,12 @@ import com.absinthe.libchecker.domain.statistics.reference.ui.adapter.LibReferen
 import com.absinthe.libchecker.domain.statistics.reference.ui.adapter.MULTIPLE_APPS_ICON_PROVIDER
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseListControllerFragment
+import com.absinthe.libchecker.ui.base.IAppBarContainer
 import com.absinthe.libchecker.ui.base.ListScreenChrome
 import com.absinthe.libchecker.ui.base.shouldHandleListSearchQueryChange
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.launchLibReferencePage
 import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libchecker.utils.showToast
@@ -62,6 +72,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 const val VF_LOADING = 0
 const val VF_LIST = 1
+private const val VF_TREEMAP = 2
 private const val SEARCH_UPDATE_DELAY_MILLIS = 160L
 
 class LibReferenceFragment :
@@ -82,6 +93,45 @@ class LibReferenceFragment :
       bind(listRenderState)
     }
   }
+  private var isTreemap: Boolean
+    get() = libReferenceViewModel.treemapEnabled
+    set(value) {
+      libReferenceViewModel.treemapEnabled = value
+      (activity as? MainActivity)?.updateStatisticsIcon(value)
+    }
+  private var displayedReferences = emptyList<LibReference>()
+  private val insetBounds = Rect()
+  private val contentLocation = IntArray(2)
+  private val chromeLocation = IntArray(2)
+  private var animatedTreemapInsets: WindowInsetsCompat? = null
+  private val treemapInsetsListener = ViewTreeObserver.OnPreDrawListener {
+    if (isResumed && isTreemap && isBindingInitialized()) {
+      updateTreemapInsets()
+      if (!libReferenceViewModel.pinchHintShown && advancedMenuBSDFragment?.dialog?.isShowing != true &&
+        binding.treemap.showPinchHint()
+      ) {
+        libReferenceViewModel.pinchHintShown = true
+      }
+    }
+    true
+  }
+  private var treemapInsetsObserver: ViewTreeObserver? = null
+  private val treemapAttachListener = object : View.OnAttachStateChangeListener {
+    override fun onViewAttachedToWindow(v: View) {
+      removeTreemapInsetsListener()
+      treemapInsetsObserver = v.viewTreeObserver.also { it.addOnPreDrawListener(treemapInsetsListener) }
+    }
+
+    override fun onViewDetachedFromWindow(v: View) {
+      removeTreemapInsetsListener()
+    }
+  }
+
+  private fun removeTreemapInsetsListener() {
+    treemapInsetsObserver?.takeIf { it.isAlive }?.removeOnPreDrawListener(treemapInsetsListener)
+    treemapInsetsObserver = null
+  }
+
   private var searchUpdateJob: Job? = null
   private var advancedMenuBSDFragment: LibReferenceMenuBSDFragment? = null
   private var isSearchTextClearOnce = false
@@ -152,6 +202,27 @@ class LibReferenceFragment :
         }
       }
       loadingView.loadingView.setRuleIconHighlightProvider()
+      treemap.colorfulRuleIcon = libReferenceViewModel.colorfulRuleIcon
+      treemap.onReferenceClick = ::openReferenceApps
+      (activity as? MainActivity)?.observeKeyboardInsets(
+        viewLifecycleOwner,
+        frame = { insets ->
+          animatedTreemapInsets = insets
+          if (isResumed && isTreemap) updateTreemapInsets()
+        },
+        end = {
+          if (isResumed && isTreemap) {
+            updateTreemapInsets()
+            val currentRoot = root
+            currentRoot.doOnPreDraw {
+              if (isBindingInitialized() && binding.root === currentRoot && isResumed && isTreemap) treemap.reflowForViewport()
+            }
+            currentRoot.postInvalidateOnAnimation()
+          }
+        }
+      )
+      root.addOnAttachStateChangeListener(treemapAttachListener)
+      if (root.isAttachedToWindow) treemapAttachListener.onViewAttachedToWindow(root)
     }
 
     refAdapter.apply {
@@ -160,15 +231,7 @@ class LibReferenceFragment :
         if (AntiShakeUtils.isInvalidClick(view)) {
           return@setOnItemClickListener
         }
-        context.findViewById<View>(androidx.appcompat.R.id.search_src_text)?.clearFocus()
-
-        val item = refAdapter.data[position]
-        activity?.launchLibReferencePage(
-          item.libName,
-          item.rule?.label,
-          item.type,
-          item.referredList.toTypedArray()
-        )
+        openReferenceApps(refAdapter.data[position])
       }
       stateView =
         EmptyListView(context).apply {
@@ -211,10 +274,11 @@ class LibReferenceFragment :
                 if (isDetached || libReferenceViewModel.libReference.value !== references) {
                   return@setDiffNewData
                 }
-                scheduleFirstListPresentation()
-                flip(VF_LIST)
-                refAdapter.setSpaceFooterView()
+                displayedReferences = searchResult.references
                 isListReady = true
+                flip(VF_LIST)
+                scheduleFirstListPresentation()
+                refAdapter.setSpaceFooterView()
               }
             }
           }
@@ -226,6 +290,7 @@ class LibReferenceFragment :
         )
       }.launchIn(lifecycleScope)
       colorfulRuleIconChanges.onEach { enabled ->
+        binding.treemap.colorfulRuleIcon = enabled
         if (updateListRenderState { it.copy(colorfulRuleIcon = enabled) }) {
           // noinspection NotifyDataSetChanged
           refAdapter.notifyDataSetChanged()
@@ -250,6 +315,10 @@ class LibReferenceFragment :
   }
 
   override fun onDestroyView() {
+    animatedTreemapInsets = null
+    binding.root.removeOnAttachStateChangeListener(treemapAttachListener)
+    removeTreemapInsetsListener()
+    searchUpdateJob?.cancel()
     binding.list.removeCallbacks(prewarmNextViewHolder)
     finishFirstListLayoutTrace(reportFullyDrawn = false)
     super.onDestroyView()
@@ -276,6 +345,10 @@ class LibReferenceFragment :
     if (menuItem.itemId == R.id.filter) {
       advancedMenuBSDFragment?.dismiss()
       advancedMenuBSDFragment = LibReferenceMenuBSDFragment().apply {
+        setDisplayModeListener(isTreemap) { enabled ->
+          isTreemap = enabled
+          if (isListReady) flip(VF_LIST)
+        }
         setOptionChangeListener(
           initialOptions = libReferenceViewModel.getLibReferenceOptions(),
           colorfulRuleIcon = libReferenceViewModel.colorfulRuleIcon,
@@ -377,7 +450,9 @@ class LibReferenceFragment :
           if (!isActive) {
             return@launch
           }
+          displayedReferences = searchResult.references
           refAdapter.setList(searchResult.references)
+          if (isTreemap && isListReady) renderTreemap(animate = true)
           doOnMainThreadIdle {
             refAdapter.setSpaceFooterView()
           }
@@ -414,7 +489,12 @@ class LibReferenceFragment :
 
   override fun onVisibilityChanged(visible: Boolean) {
     super.onVisibilityChanged(visible)
-    onListScreenVisibilityChanged(visible, binding.list)
+    if (visible && isTreemap) {
+      (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(binding.treemap)
+      (activity as? INavViewContainer)?.showNavigationView()
+    } else {
+      onListScreenVisibilityChanged(visible, binding.list)
+    }
     if (visible) {
       refAdapter.setSpaceFooterView()
       applyReferenceWork(
@@ -426,24 +506,93 @@ class LibReferenceFragment :
   }
 
   override fun onReturnTop() {
-    animateReturnTop(binding.list)
+    if (!isTreemap) animateReturnTop(binding.list)
   }
 
-  override fun getSuitableLayoutManager(): RecyclerView.LayoutManager? = binding.list.layoutManager
+  override fun getSuitableLayoutManager(): RecyclerView.LayoutManager? = if (isTreemap) null else binding.list.layoutManager
+
+  private fun openReferenceApps(item: LibReference) {
+    activity?.findViewById<View>(androidx.appcompat.R.id.search_src_text)?.clearFocus()
+    activity?.launchLibReferencePage(
+      item.libName,
+      item.rule?.label,
+      item.type,
+      item.referredList.toTypedArray()
+    )
+  }
+
+  private fun renderTreemap(animate: Boolean = false) {
+    binding.treemap.isVisible = true
+    binding.treemapEmpty.isVisible = displayedReferences.isEmpty()
+    binding.treemap.submitReferences(displayedReferences, animate)
+  }
 
   private fun flip(child: Int) {
-    allowRefreshing = child == VF_LIST
-    if (binding.vfContainer.displayedChild == child) {
-      return
+    val target = if (child == VF_LIST && isTreemap) VF_TREEMAP else child
+    allowRefreshing = target == VF_LIST
+    if (target == VF_TREEMAP) {
+      renderTreemap()
+      cancelReturnTopAnimation()
+      if (isFragmentVisible()) {
+        (activity as? INavViewContainer)?.showNavigationView()
+        (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(binding.treemap)
+      }
+    } else if (target == VF_LIST && isFragmentVisible()) {
+      onListScreenVisibilityChanged(true, binding.list)
     }
-    if (child == VF_LOADING) {
-      menu?.findItem(R.id.search)?.isVisible = false
-    } else {
-      menu?.findItem(R.id.search)?.isVisible = true
+    menu?.findItem(R.id.search)?.isVisible = child != VF_LOADING
+    if (binding.vfContainer.displayedChild == target) return
+    if (target == VF_LIST && binding.vfContainer.displayedChild == VF_LOADING) {
       binding.list.scrollToPosition(0)
     }
+    binding.vfContainer.displayedChild = target
+  }
 
-    binding.vfContainer.displayedChild = child
+  private fun updateTreemapInsets() {
+    val container = binding.treemapContainer
+    if (container.width == 0 || container.height == 0) return
+    val decor = activity?.window?.decorView as? ViewGroup ?: return
+
+    // Insets follow layout bounds, not the page/nav translation used during tab transitions.
+    fun layoutLocation(view: View, result: IntArray) {
+      insetBounds.setEmpty()
+      decor.offsetDescendantRectToMyCoords(view, insetBounds)
+      result[0] = insetBounds.left
+      result[1] = insetBounds.top
+    }
+    val insets = (animatedTreemapInsets ?: ViewCompat.getRootWindowInsets(container))
+      ?.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout() or WindowInsetsCompat.Type.ime())
+    layoutLocation(container, contentLocation)
+    layoutLocation(decor, chromeLocation)
+    var left = ((insets?.left ?: 0) + chromeLocation[0] - contentLocation[0]).coerceAtLeast(0)
+    var top = ((insets?.top ?: 0) + chromeLocation[1] - contentLocation[1]).coerceAtLeast(0)
+    var right = (contentLocation[0] + container.width - chromeLocation[0] - decor.width + (insets?.right ?: 0)).coerceAtLeast(0)
+    var bottom = (contentLocation[1] + container.height - chromeLocation[1] - decor.height + (insets?.bottom ?: 0)).coerceAtLeast(0)
+    activity?.findViewById<View>(R.id.appbar)?.takeIf { it.isShown }?.let { appbar ->
+      layoutLocation(appbar, chromeLocation)
+      top = maxOf(top, chromeLocation[1] + appbar.height - contentLocation[1])
+    }
+    activity?.findViewById<View>(R.id.nav_view)?.takeIf { it.isShown }?.let { nav ->
+      layoutLocation(nav, chromeLocation)
+      if (nav.width > nav.height) {
+        chromeLocation[1] += (activity as? MainActivity)?.keyboardNavigationOffset?.toInt() ?: 0
+        bottom = maxOf(bottom, contentLocation[1] + container.height - chromeLocation[1])
+      } else if (chromeLocation[0] < contentLocation[0] + container.width / 2) {
+        left = maxOf(left, chromeLocation[0] + nav.width - contentLocation[0])
+      } else {
+        right = maxOf(right, contentLocation[0] + container.width - chromeLocation[0])
+      }
+    }
+    val gap = 3.dp
+    // Cells already inset their painted bounds by half the 3dp gutter.
+    val horizontalGap = (resources.getDimension(R.dimen.main_list_horizontal_padding) - 1.5f * resources.displayMetrics.density).toInt().coerceAtLeast(0)
+    left = (left + horizontalGap).coerceIn(0, container.width)
+    right = (right + horizontalGap).coerceIn(0, container.width - left)
+    top = (top + gap).coerceIn(0, container.height)
+    bottom = (bottom + horizontalGap).coerceIn(0, container.height - top)
+    if (container.paddingLeft != left || container.paddingTop != top || container.paddingRight != right || container.paddingBottom != bottom) {
+      container.updatePadding(left = left, top = top, right = right, bottom = bottom)
+    }
   }
 
   private fun beginFirstListLayoutTrace() {
@@ -458,8 +607,9 @@ class LibReferenceFragment :
   }
 
   private fun scheduleFirstListPresentation() {
-    binding.list.doOnNextLayout {
-      binding.list.postOnAnimation {
+    val content = if (isTreemap) binding.treemapContainer else binding.list
+    content.doOnNextLayout {
+      content.postOnAnimation {
         finishFirstListLayoutTrace(reportFullyDrawn = true)
       }
     }

@@ -41,7 +41,6 @@ import com.absinthe.libchecker.domain.home.ui.INavViewContainer
 import com.absinthe.libchecker.domain.home.ui.MainActivity
 import com.absinthe.libchecker.domain.home.ui.view.RecentVisitItem
 import com.absinthe.libchecker.domain.home.ui.view.installRecentVisitDrag
-import com.absinthe.libchecker.ui.adapter.addSpacingDecoration
 import com.absinthe.libchecker.ui.animator.ParticleRemoveItemAnimator
 import com.absinthe.libchecker.ui.animator.positionAtTop
 import com.absinthe.libchecker.ui.base.BaseActivity
@@ -50,7 +49,6 @@ import com.absinthe.libchecker.ui.base.ListScreenChrome
 import com.absinthe.libchecker.ui.base.shouldHandleListSearchQueryChange
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
-import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
@@ -141,9 +139,6 @@ class AppListFragment :
         itemAnimator = particleItemAnimator
         wireListScreenChrome(this)
         layoutManager = createListScreenLayoutManager(resources.configuration)
-        if (itemDecorationCount == 0) {
-          addSpacingDecoration(4.dp, ratio = 0f)
-        }
         setHasFixedSize(true)
         FastScrollerBuilder(this).useMd2Style().build()
         resetScrollbarNavigationReveal =

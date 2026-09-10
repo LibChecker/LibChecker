@@ -11,6 +11,13 @@ class FloatingBottomNavigationView @JvmOverloads constructor(
   attrs: AttributeSet? = null
 ) : BottomNavigationView(context, attrs),
   FloatingNavigationBar {
+  var miniProgress: Float = 0f
+    set(value) {
+      if (field == value) return
+      field = value
+      requestLayout()
+    }
+
   private val thumbController = FloatingNavigationThumbController(
     host = this,
     vertical = false
@@ -39,9 +46,15 @@ class FloatingBottomNavigationView @JvmOverloads constructor(
   }
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+    if (currentFloatingProgress == 1f) {
+      val height = ((64 - 16 * miniProgress) * resources.displayMetrics.density).roundToInt() + paddingTop + paddingBottom
+      super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(resolveSize(height, heightMeasureSpec), MeasureSpec.EXACTLY))
+      thumbController.onMeasure()
+      return
+    }
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     if (currentFloatingProgress > 0f) {
-      val floatingHeight = 64 * resources.displayMetrics.density + paddingTop + paddingBottom
+      val floatingHeight = (64 - 16 * miniProgress) * resources.displayMetrics.density + paddingTop + paddingBottom
       val height = (measuredHeight + (floatingHeight - measuredHeight) * currentFloatingProgress).roundToInt()
       val resolvedHeightSpec = MeasureSpec.makeMeasureSpec(
         resolveSize(height, heightMeasureSpec),

@@ -93,6 +93,8 @@ object Constants {
   const val PREF_UUID = "uuid"
   const val PREF_ADVANCED_OPTIONS = "advancedOptions"
   const val PREF_ITEM_ADVANCED_OPTIONS = "itemAdvancedOptions"
+  const val PREF_LIB_REF_PINCH_HINT_SHOWN = "libRefPinchHintShown"
+  const val PREF_LIB_REF_TREEMAP = "libRefTreemap"
   const val PREF_LIB_REF_OPTIONS = "libRefOptions"
   const val PREF_SNAPSHOT_OPTIONS = "snapshotOptions"
 

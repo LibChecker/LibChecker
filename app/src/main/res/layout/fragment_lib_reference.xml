@@ -26,6 +26,28 @@
       app:borderTopDrawable="@null"
       app:borderTopVisibility="whenTop" />
 
+    <FrameLayout
+      android:id="@+id/treemap_container"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent">
+
+      <com.absinthe.libchecker.domain.statistics.reference.ui.view.LibReferenceTreemapView
+        android:id="@+id/treemap"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+      <TextView
+        android:id="@+id/treemap_empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:padding="24dp"
+        android:text="@string/empty_list"
+        android:textAppearance="?attr/textAppearanceTitleMedium"
+        android:visibility="gone" />
+
+    </FrameLayout>
+
   </com.absinthe.libchecker.view.app.CustomViewFlipper>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

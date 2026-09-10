@@ -37,7 +37,8 @@ abstract class BaseFragment<VB : ViewBinding> :
     init()
     view.findViewById<View>(android.R.id.list)?.let { list ->
       (activity as? IAppBarContainer)?.prepareAppbarContentInset(list)
-      list.applySystemBarsPadding(bottom = true)
+      val home = activity as? com.absinthe.libchecker.domain.home.ui.MainActivity
+      if (home != null) home.registerHomeListInsets(list, viewLifecycleOwner) else list.applySystemBarsPadding(bottom = true)
     }
   }
 

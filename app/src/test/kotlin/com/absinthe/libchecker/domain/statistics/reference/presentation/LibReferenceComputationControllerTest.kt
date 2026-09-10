@@ -162,6 +162,8 @@ private class FakeLibReferenceSettingsRepository : LibReferenceSettingsRepositor
   override val appListDisplayOptions = 0
   override val threshold = 1
   override var options = 0
+  override var treemapEnabled = false
+  override var pinchHintShown = false
   override val showSystemApps = true
   override val colorfulRuleIcon = true
   override val thresholdChanges: Flow<Int> = emptyFlow()

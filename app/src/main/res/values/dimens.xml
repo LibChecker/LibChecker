@@ -22,6 +22,7 @@
 
   <dimen name="main_card_margin">4dp</dimen>
   <dimen name="main_card_padding">8dp</dimen>
+  <dimen name="main_list_horizontal_padding">16dp</dimen>
 
   <dimen name="album_item_margin_horizontal">8dp</dimen>
   <dimen name="album_item_margin_vertical">4dp</dimen>

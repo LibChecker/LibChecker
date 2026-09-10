@@ -45,8 +45,9 @@ class LibReferenceItemView(context: Context) : TextColumnRowView(context) {
   }
 
   init {
-    val padding = context.getDimensionPixelSize(R.dimen.main_card_padding)
-    setPadding(padding, padding, padding, padding)
+    val padding = context.getDimensionPixelSize(R.dimen.main_card_padding) + context.getDimensionPixelSize(R.dimen.main_card_margin)
+    val horizontalPadding = context.getDimensionPixelSize(R.dimen.main_list_horizontal_padding)
+    setPadding(horizontalPadding, padding, horizontalPadding, padding)
     setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackground))
     setLeadingView(icon)
     setTrailingView(count)

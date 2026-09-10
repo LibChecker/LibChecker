@@ -15,7 +15,6 @@ import com.absinthe.libchecker.domain.statistics.reference.model.MultipleAppsIco
 import com.absinthe.libchecker.domain.statistics.reference.model.canOpenDetail
 import com.absinthe.libchecker.domain.statistics.reference.ui.view.LibReferenceItemView
 import com.absinthe.libchecker.domain.statistics.reference.ui.view.MultipleAppsIconItemView
-import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import java.text.NumberFormat
@@ -56,10 +55,7 @@ class LibReferenceAdapter(
     view.layoutParams = RecyclerView.LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
-    ).also {
-      val margin = context.getDimensionPixelSize(R.dimen.main_card_margin)
-      it.setMargins(0, margin, 0, margin)
-    }
+    )
     return BaseViewHolder(view)
   }
 

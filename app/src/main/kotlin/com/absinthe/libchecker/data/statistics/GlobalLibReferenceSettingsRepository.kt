@@ -21,6 +21,18 @@ class GlobalLibReferenceSettingsRepository : LibReferenceSettingsRepository {
       GlobalValues.libReferenceOptions = value
     }
 
+  override var pinchHintShown: Boolean
+    get() = GlobalValues.libReferencePinchHintShown
+    set(value) {
+      GlobalValues.libReferencePinchHintShown = value
+    }
+
+  override var treemapEnabled: Boolean
+    get() = GlobalValues.libReferenceTreemap
+    set(value) {
+      GlobalValues.libReferenceTreemap = value
+    }
+
   override val showSystemApps: Boolean
     get() = GlobalValues.isShowSystemApps
 

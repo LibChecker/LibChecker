@@ -36,6 +36,8 @@ object GlobalValues {
 
   var itemAdvancedOptions: Int by SPDelegates(Constants.PREF_ITEM_ADVANCED_OPTIONS, AdvancedOptions.ITEM_DEFAULT_OPTIONS)
 
+  var libReferencePinchHintShown: Boolean by SPDelegates(Constants.PREF_LIB_REF_PINCH_HINT_SHOWN, false)
+  var libReferenceTreemap: Boolean by SPDelegates(Constants.PREF_LIB_REF_TREEMAP, false)
   var libReferenceOptions: Int by SPDelegates(Constants.PREF_LIB_REF_OPTIONS, LibReferenceOptions.DEFAULT_OPTIONS)
 
   var snapshotOptions: Int by SPDelegates(Constants.PREF_SNAPSHOT_OPTIONS, SnapshotOptions.DEFAULT_OPTIONS)
