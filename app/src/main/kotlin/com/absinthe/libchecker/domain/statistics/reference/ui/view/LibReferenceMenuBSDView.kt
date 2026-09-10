@@ -13,6 +13,7 @@ import androidx.dynamicanimation.animation.SpringAnimation
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReference
@@ -222,6 +223,7 @@ class LibReferenceMenuBSDView(
     val plan = planLibReferenceDemoUpdate(currentItems, nextState.demoItems)
     if (plan !is LibReferenceDemoUpdatePlan.AnimateInsertion) return false
     val insertedItem = nextState.demoItems[plan.insertedIndex]
+    val anchorInsertionToTop = plan.insertedIndex == 0 && !list.canScrollVertically(-1)
 
     setDemoHeightAnimationRunning(true)
     list.itemAnimator = null
@@ -246,6 +248,10 @@ class LibReferenceMenuBSDView(
     renderDemoDivider(nextState)
     demoAdapter.setDiffNewData(nextState.demoItems) {
       if (!demoTransitionGate.isCurrent(transitionGeneration)) return@setDiffNewData
+      if (anchorInsertionToTop) {
+        // Keep the zero-height new row as the anchor instead of the previous first row.
+        (list.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(0, 0)
+      }
       list.doOnNextLayout {
         if (!demoTransitionGate.isCurrent(transitionGeneration)) return@doOnNextLayout
         val preparedInsertion = preparedDemoInsertion
@@ -258,6 +264,7 @@ class LibReferenceMenuBSDView(
         } else {
           animatePreparedDemoInsertion(
             preparedInsertion = preparedInsertion,
+            anchorInsertionToTop = anchorInsertionToTop,
             transitionGeneration = transitionGeneration,
             expandDivider = expandDivider,
             dividerParams = dividerParams,
@@ -304,6 +311,7 @@ class LibReferenceMenuBSDView(
 
   private fun animatePreparedDemoInsertion(
     preparedInsertion: PreparedDemoInsertion,
+    anchorInsertionToTop: Boolean,
     transitionGeneration: Int,
     expandDivider: Boolean,
     dividerParams: ViewGroup.MarginLayoutParams,
@@ -330,6 +338,9 @@ class LibReferenceMenuBSDView(
         marginParams?.bottomMargin = (preparedInsertion.targetBottomMargin * progress).toInt()
         preparedInsertion.itemView.layoutParams = preparedInsertion.itemParams
         preparedInsertion.itemView.alpha = progress
+        if (anchorInsertionToTop) {
+          (list.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(0, 0)
+        }
         if (expandDivider) {
           dividerParams.height = (dividerTargetHeight * progress).toInt()
           dividerParams.topMargin = (dividerTargetTopMargin * progress).toInt()
