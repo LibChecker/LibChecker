@@ -6,10 +6,15 @@ import android.graphics.Canvas
 import android.view.View
 import android.widget.LinearLayout
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.recyclerview.widget.RecyclerView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotEmptyView
+import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
+import com.chad.library.adapter.base.BaseQuickAdapter
+import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -17,6 +22,29 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class EmptyStateViewInstrumentedTest {
+
+  @Test
+  fun emptyStateReservesBottomSpaceBeforeFirstLayout() {
+    val instrumentation = InstrumentationRegistry.getInstrumentation()
+    instrumentation.runOnMainSync {
+      val context = ContextThemeWrapper(instrumentation.targetContext, R.style.AppTheme)
+      val adapter = object : BaseQuickAdapter<String, BaseViewHolder>() {
+        override fun convert(holder: BaseViewHolder, item: String) = Unit
+      }
+      adapter.setHeaderView(View(context))
+      adapter.stateView = SnapshotEmptyView(context)
+      adapter.isStateViewEnable = true
+      val list = RecyclerView(context)
+      list.setPadding(0, 0, 12, 20)
+      list.adapter = adapter
+      assertEquals(0, list.childCount)
+      adapter.setSpaceFooterView()
+      assertEquals(20 + 96.dp, list.paddingBottom)
+      adapter.setSpaceFooterView()
+      assertEquals(20 + 96.dp, list.paddingBottom)
+      assertEquals(12, list.paddingRight)
+    }
+  }
 
   @Test
   fun copyWrapsAndRemainsReachableInNarrowAndShortContainers() {
