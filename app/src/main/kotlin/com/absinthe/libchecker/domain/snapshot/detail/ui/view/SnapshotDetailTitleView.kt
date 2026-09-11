@@ -58,8 +58,8 @@ class SnapshotDetailTitleView(context: Context) : AViewGroup(context) {
   }
 
   private val arrow = AppCompatImageView(context).apply {
-    layoutParams = LayoutParams(horizontalLayout.arrowWidth, horizontalLayout.arrowWidth)
-    setImageResource(R.drawable.ic_arrow)
+    layoutParams = LayoutParams(12.dp, 12.dp)
+    setImageResource(R.drawable.ic_snapshot_expand)
     imageTintList = android.content.res.ColorStateList.valueOf(
       context.getColorByAttr(MaterialR.attr.colorOnSurfaceVariant)
     )
@@ -162,10 +162,9 @@ class SnapshotDetailTitleView(context: Context) : AViewGroup(context) {
     val contentTop = paddingTop
     val textStart = horizontalLayout.titleContentStart
     arrow.layout(
-      horizontalLayout.arrowStart,
+      horizontalLayout.itemContentStart,
       (measuredHeight - arrow.measuredHeight) / 2
     )
-    arrow.translationX = horizontalLayout.arrowTranslationX
     if (countsOnSecondLine) {
       title.layout(textStart, contentTop)
       if (counts.isVisible) {

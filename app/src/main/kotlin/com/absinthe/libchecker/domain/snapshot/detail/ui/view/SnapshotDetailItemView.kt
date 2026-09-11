@@ -161,6 +161,14 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
     }
     statusLabelOpticalInset = resolveStatusLabelOpticalInset(state.status.iconRes)
     statusIcon.setImageResource(state.status.iconRes)
+    val iconInsetFraction = when (state.status.iconRes) {
+      R.drawable.ic_add, R.drawable.ic_remove -> 5f / 24f
+      R.drawable.ic_changed -> 249.25f / 1024f
+      R.drawable.ic_move -> 120f / 1024f
+      else -> 0f
+    }
+    statusIcon.translationX = horizontalLayout.itemContentStart -
+      horizontalLayout.statusIndicatorStart - STATUS_ICON_SIZE * iconInsetFraction
     statusLabel.setText(state.status.labelRes)
 
     val colors = resolveSnapshotDetailItemColors(
@@ -424,7 +432,7 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
 }
 
 internal fun Context.buildSnapshotDetailHorizontalLayoutPlan() = planSnapshotDetailHorizontalLayout(
-  horizontalPadding = getDimensionPixelSize(R.dimen.normal_padding),
+  horizontalPadding = getDimensionPixelSize(R.dimen.normal_padding) + dpToDimensionPixelSize(4),
   statusRailWidth = dpToDimensionPixelSize(3),
   statusIconWidth = dpToDimensionPixelSize(16),
   statusIconOpticalInset = dpToDimensionPixelSize(3),

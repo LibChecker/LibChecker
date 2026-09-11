@@ -54,8 +54,6 @@ class SnapshotItemView(
     val padding = context.getDimensionPixelSize(R.dimen.main_card_padding)
     val horizontalPadding = context.getDimensionPixelSize(R.dimen.main_list_horizontal_padding)
     setPadding(horizontalPadding, padding, horizontalPadding, padding)
-    // The state indicator stays outside the content's horizontal padding.
-    clipToPadding = false
   }
 
   init {
@@ -464,7 +462,7 @@ class SnapshotItemView(
         if (updateTime.isVisible) updateTime.bottom else apisInfo.bottom
       )
       stateIndicator.layout(
-        context.getDimensionPixelSize(R.dimen.main_card_padding),
+        paddingEnd,
         stateIndicator.toVerticalCenter(this),
         fromRight = true
       )

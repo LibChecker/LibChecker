@@ -1,5 +1,8 @@
 package com.absinthe.libchecker.domain.snapshot.detail.ui.view
 
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
 import android.os.SystemClock
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
@@ -54,6 +57,11 @@ class SnapshotDetailTitleViewInstrumentedTest {
       val context = ContextThemeWrapper(instrumentation.targetContext, R.style.AppTheme)
       view = SnapshotDetailTitleView(context)
       view.render(section, expanded = false)
+      view.measure(View.MeasureSpec.makeMeasureSpec(1080, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED))
+      view.layout(0, 0, view.measuredWidth, view.measuredHeight)
+      val arrow = view.getChildAt(2)
+      assertEquals(view.paddingLeft.toFloat(), arrow.x, 0.01f)
+      assertVisibleStartEdge(arrow)
       val title = view.getChildAt(0) as TextView
       val counts = view.getChildAt(1) as TextView
       assertEquals("Services", title.text.toString())
@@ -80,11 +88,25 @@ class SnapshotDetailTitleViewInstrumentedTest {
     }
     instrumentation.runOnMainSync {
       assertEquals(90f, view.getChildAt(2).rotation, 0f)
+      val arrow = view.getChildAt(2)
+      assertEquals(view.paddingLeft.toFloat(), arrow.x, 0.01f)
+      assertVisibleStartEdge(arrow)
       view.render(section.copy(title = "Empty", statusCounts = emptyList()), expanded = true)
       assertEquals("Empty", (view.getChildAt(0) as TextView).text.toString())
       assertEquals(View.GONE, view.getChildAt(1).visibility)
       assertEquals("", (view.getChildAt(1) as TextView).text.toString())
       assertEquals(90f, view.getChildAt(2).rotation, 0f)
     }
+  }
+  private fun assertVisibleStartEdge(arrow: View) {
+    val bitmap = Bitmap.createBitmap(arrow.width, arrow.height, Bitmap.Config.ARGB_8888)
+    val canvas = Canvas(bitmap)
+    canvas.rotate(arrow.rotation, arrow.width / 2f, arrow.height / 2f)
+    arrow.draw(canvas)
+    val firstVisibleColumn = (0 until bitmap.width).first { x ->
+      (0 until bitmap.height).any { y -> Color.alpha(bitmap.getPixel(x, y)) >= 128 }
+    }
+    assertEquals(0, firstVisibleColumn)
+    bitmap.recycle()
   }
 }

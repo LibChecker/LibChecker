@@ -14,7 +14,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class SnapshotItemIndicatorInstrumentedTest {
   @Test
-  fun indicatorRemainsVisibleOutsideContentPadding() {
+  fun indicatorAlignsWithContentEndPadding() {
     ActivityScenario.launch(TrackActivity::class.java).use { scenario ->
       scenario.onActivity { activity ->
         val item = SnapshotItemView(activity)
@@ -25,7 +25,7 @@ class SnapshotItemIndicatorInstrumentedTest {
         val bitmap = Bitmap.createBitmap(item.width, item.height, Bitmap.Config.ARGB_8888)
         item.draw(Canvas(bitmap))
         val indicator = container.stateIndicator
-        assertEquals(activity.resources.getDimensionPixelSize(R.dimen.main_card_padding), container.width - indicator.right)
+        assertEquals(activity.resources.getDimensionPixelSize(R.dimen.main_list_horizontal_padding), container.width - indicator.right)
         assertEquals(activity.getColor(R.color.material_green_300), bitmap.getPixel(container.left + indicator.left + indicator.width / 2, container.top + indicator.top + indicator.height / 2))
         bitmap.recycle()
       }

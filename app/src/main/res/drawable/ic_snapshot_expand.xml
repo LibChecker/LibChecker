@@ -1,0 +1,10 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+  android:width="12dp"
+  android:height="12dp"
+  android:viewportWidth="12"
+  android:viewportHeight="12">
+  <!-- The visible start edge is zero both before and after a quarter turn. -->
+  <path
+    android:fillColor="#000000"
+    android:pathData="M0,10.59L4.58,6L0,1.41L1.41,0L7.41,6L1.41,12Z" />
+</vector>

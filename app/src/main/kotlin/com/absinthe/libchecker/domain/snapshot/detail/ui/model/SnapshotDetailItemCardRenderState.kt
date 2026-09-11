@@ -98,7 +98,7 @@ fun planSnapshotDetailHorizontalLayout(
   val safeStatusIconOpticalInset = statusIconOpticalInset.coerceAtLeast(0)
   val safeArrowWidth = arrowWidth.coerceAtLeast(0)
   val safeArrowTitleGap = arrowTitleGap.coerceAtLeast(0)
-  val itemContentStart = safeStatusRailWidth + safeHorizontalPadding
+  val itemContentStart = safeHorizontalPadding
   val statusIndicatorStart = itemContentStart - safeStatusIconOpticalInset
   val statusIndicatorCenterTwice = statusIndicatorStart * 2 + safeStatusIconWidth
   val arrowStart = (statusIndicatorCenterTwice - safeArrowWidth) / 2

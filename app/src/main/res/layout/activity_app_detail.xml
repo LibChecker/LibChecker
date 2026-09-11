@@ -29,7 +29,6 @@
         android:id="@+id/header_content_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/normal_padding"
         android:clipChildren="false"
         android:clipToPadding="false"
         android:orientation="vertical"

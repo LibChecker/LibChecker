@@ -2,6 +2,9 @@ package com.absinthe.libchecker.domain.snapshot.detail.ui.view
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.RelativeSizeSpan
 import android.util.AttributeSet
 import android.view.View
 import android.view.View.OnClickListener
@@ -18,7 +21,6 @@ import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.utils.extensions.applyCondensedTypeface
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
-import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.view.AViewGroup
@@ -33,7 +35,7 @@ class SnapshotTitleView(
 ) : AViewGroup(context, attributeSet) {
 
   private val iconView = AppCompatImageView(context).apply {
-    val iconSize = context.getDimensionPixelSize(R.dimen.lib_detail_icon_size)
+    val iconSize = 40.dp
     layoutParams = LayoutParams(iconSize, iconSize)
     setImageResource(R.drawable.ic_icon_blueprint)
     addView(this)
@@ -65,13 +67,14 @@ class SnapshotTitleView(
       ViewGroup.LayoutParams.WRAP_CONTENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     )
-    setTextAppearance(context.getResourceIdByAttr(MaterialR.attr.textAppearanceBodySmall))
+    setTextAppearance(context.getResourceIdByAttr(MaterialR.attr.textAppearanceBodyMedium))
     applyCondensedTypeface()
     setTextColor(context.getColorByAttr(MaterialR.attr.colorOnSurfaceVariant))
     maxLines = Int.MAX_VALUE
     addView(this)
   }
   private val versionInfoLineBreaker = SnapshotDetailLineBreaker(versionInfoView)
+  private val versionLabelView = metricLabel(R.string.signature_version)
   private val identityHeaderRenderer = AppIdentityHeaderRenderer(
     iconView = iconView,
     appNameView = appNameView,
@@ -119,6 +122,8 @@ class SnapshotTitleView(
         copyPrimaryText = copyPrimaryText
       )
     )
+    versionInfoView.isVisible = data.versionInfo.isNotBlank()
+    versionLabelView.isVisible = versionInfoView.isVisible
     setPackageSizeText(data.packageSize)
     apisView.apply {
       text = data.apis
@@ -170,7 +175,11 @@ class SnapshotTitleView(
     packageSizeLabelView.isVisible = true
     packageSizeView.apply {
       isVisible = true
-      packageSizeLineBreaker.setText(data.text, data.breakStart)
+      val displayText = SpannableStringBuilder(data.text)
+      Regex("\\([^()]* Bytes\\)").findAll(data.text).forEach { match ->
+        displayText.setSpan(RelativeSizeSpan(0.85f), match.range.first, match.range.last + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+      }
+      packageSizeLineBreaker.setText(displayText, data.breakStart)
       contentDescription = context.getString(
         R.string.snapshot_detail_metric_description,
         context.getString(R.string.snapshot_detail_size_label),
@@ -180,104 +189,50 @@ class SnapshotTitleView(
     }
   }
 
+  private fun metricRows() = listOf(
+    versionLabelView to versionInfoView,
+    apisLabelView to apisView,
+    packageSizeLabelView to packageSizeView
+  ).filter { it.second.isVisible }
+
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     children.forEach { it.autoMeasure() }
     val contentWidth = measuredWidth - paddingStart - paddingEnd
-    val identityTextWidth = contentWidth - iconView.measuredWidth - IDENTITY_GAP
+    val identityTextWidth = (contentWidth - iconView.measuredWidth - IDENTITY_GAP).coerceAtLeast(0)
     measureToWidth(appNameView, identityTextWidth)
     measureToWidth(packageNameView, identityTextWidth)
-    versionInfoLineBreaker.apply(identityTextWidth)
-    measureToWidth(versionInfoView, identityTextWidth)
-
-    val identityHeight = appNameView.measuredHeight +
-      packageNameView.measuredHeight +
-      versionInfoView.measuredHeight
-    var contentBottom = paddingTop + maxOf(iconView.measuredHeight, identityHeight)
-
-    val metricsContentWidth = (contentWidth - METRICS_HORIZONTAL_PADDING * 2).coerceAtLeast(0)
-    val labelWidth = maxOf(
-      packageSizeLabelView.takeIf { it.isVisible }?.measuredWidth ?: 0,
-      apisLabelView.takeIf { it.isVisible }?.measuredWidth ?: 0
-    )
-    val valueWidth = (metricsContentWidth - labelWidth - METRIC_GAP).coerceAtLeast(0)
-    var metricsContentHeight = 0
-    if (packageSizeView.isVisible) {
-      packageSizeLineBreaker.apply(valueWidth)
-      packageSizeView.measure(
-        valueWidth.toExactlyMeasureSpec(),
-        packageSizeView.defaultHeightMeasureSpec(this)
-      )
-      metricsContentHeight += planSnapshotMetricRowLayout(
-        labelHeight = packageSizeLabelView.measuredHeight,
-        labelBaseline = packageSizeLabelView.baseline,
-        valueHeight = packageSizeView.measuredHeight,
-        valueBaseline = packageSizeView.baseline
-      ).height
+    val identityHeight = maxOf(iconView.measuredHeight, appNameView.measuredHeight + packageNameView.measuredHeight)
+    val rows = metricRows()
+    val labelWidth = rows.maxOfOrNull { it.first.measuredWidth } ?: 0
+    val valueWidth = (contentWidth - labelWidth - METRIC_GAP).coerceAtLeast(0)
+    var height = paddingTop + identityHeight
+    rows.forEachIndexed { index, (label, value) ->
+      if (value === versionInfoView) versionInfoLineBreaker.apply(valueWidth)
+      if (value === packageSizeView) packageSizeLineBreaker.apply(valueWidth)
+      value.measure(valueWidth.toExactlyMeasureSpec(), value.defaultHeightMeasureSpec(this))
+      height += if (index == 0) METRICS_SECTION_GAP else METRIC_ROW_GAP
+      height += planSnapshotMetricRowLayout(label.measuredHeight, label.baseline, value.measuredHeight, value.baseline).height
     }
-    if (apisView.isVisible) {
-      if (packageSizeView.isVisible) {
-        metricsContentHeight += METRIC_ROW_GAP
-      }
-      apisView.measure(valueWidth.toExactlyMeasureSpec(), apisView.defaultHeightMeasureSpec(this))
-      metricsContentHeight += planSnapshotMetricRowLayout(
-        labelHeight = apisLabelView.measuredHeight,
-        labelBaseline = apisLabelView.baseline,
-        valueHeight = apisView.measuredHeight,
-        valueBaseline = apisView.baseline
-      ).height
-    }
-    if (hasVisibleMetrics()) {
-      contentBottom += METRICS_SECTION_GAP +
-        metricsContentHeight
-    }
-
-    setMeasuredDimension(measuredWidth, contentBottom + paddingBottom)
+    setMeasuredDimension(measuredWidth, height + paddingBottom)
   }
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     val identityTextX = paddingStart + iconView.measuredWidth + IDENTITY_GAP
-    iconView.layout(paddingStart, paddingTop)
-    appNameView.layout(identityTextX, paddingTop)
+    val textHeight = appNameView.measuredHeight + packageNameView.measuredHeight
+    val identityHeight = maxOf(iconView.measuredHeight, textHeight)
+    iconView.layout(paddingStart, paddingTop + (identityHeight - iconView.measuredHeight) / 2)
+    appNameView.layout(identityTextX, paddingTop + (identityHeight - textHeight) / 2)
     packageNameView.layout(identityTextX, appNameView.bottom)
-    versionInfoView.layout(identityTextX, packageNameView.bottom)
-    var nextY = paddingTop + maxOf(
-      iconView.measuredHeight,
-      appNameView.measuredHeight + packageNameView.measuredHeight + versionInfoView.measuredHeight
-    )
-
-    if (hasVisibleMetrics()) {
-      nextY += METRICS_SECTION_GAP
-    }
-    val labelWidth = maxOf(
-      packageSizeLabelView.takeIf { it.isVisible }?.measuredWidth ?: 0,
-      apisLabelView.takeIf { it.isVisible }?.measuredWidth ?: 0
-    )
-    val metricsContentStart = paddingStart + METRICS_HORIZONTAL_PADDING
-    val valueX = metricsContentStart + labelWidth + METRIC_GAP
-    if (packageSizeView.isVisible) {
-      val row = planSnapshotMetricRowLayout(
-        labelHeight = packageSizeLabelView.measuredHeight,
-        labelBaseline = packageSizeLabelView.baseline,
-        valueHeight = packageSizeView.measuredHeight,
-        valueBaseline = packageSizeView.baseline
-      )
-      packageSizeLabelView.layout(metricsContentStart, nextY + row.labelTopOffset)
-      packageSizeView.layout(valueX, nextY + row.valueTopOffset)
-      nextY += row.height
-    }
-    if (apisView.isVisible) {
-      if (packageSizeView.isVisible) {
-        nextY += METRIC_ROW_GAP
-      }
-      val row = planSnapshotMetricRowLayout(
-        labelHeight = apisLabelView.measuredHeight,
-        labelBaseline = apisLabelView.baseline,
-        valueHeight = apisView.measuredHeight,
-        valueBaseline = apisView.baseline
-      )
-      apisLabelView.layout(metricsContentStart, nextY + row.labelTopOffset)
-      apisView.layout(valueX, nextY + row.valueTopOffset)
+    var nextY = paddingTop + identityHeight
+    val rows = metricRows()
+    val labelWidth = rows.maxOfOrNull { it.first.measuredWidth } ?: 0
+    val valueX = paddingStart + labelWidth + METRIC_GAP
+    rows.forEachIndexed { index, (label, value) ->
+      nextY += if (index == 0) METRICS_SECTION_GAP else METRIC_ROW_GAP
+      val row = planSnapshotMetricRowLayout(label.measuredHeight, label.baseline, value.measuredHeight, value.baseline)
+      label.layout(paddingStart, nextY + row.labelTopOffset)
+      value.layout(valueX, nextY + row.valueTopOffset)
       nextY += row.height
     }
   }
@@ -302,14 +257,9 @@ class SnapshotTitleView(
     }
   }
 
-  private fun hasVisibleMetrics(): Boolean {
-    return packageSizeView.isVisible || apisView.isVisible
-  }
-
   private companion object {
     val IDENTITY_GAP = 12.dp
     val METRICS_SECTION_GAP = 12.dp
-    val METRICS_HORIZONTAL_PADDING = 8.dp
     val METRIC_GAP = 12.dp
     val METRIC_ROW_GAP = 4.dp
   }

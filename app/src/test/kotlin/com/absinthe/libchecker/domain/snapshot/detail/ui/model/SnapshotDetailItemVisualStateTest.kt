@@ -18,17 +18,17 @@ class SnapshotDetailItemVisualStateTest {
       arrowTitleGap = 8
     )
 
-    assertEquals(12, plan.arrowStart)
+    assertEquals(9, plan.arrowStart)
     assertEquals(
       plan.statusIndicatorCenterTwice.toFloat(),
       plan.arrowStart * 2 + plan.arrowWidth + plan.arrowTranslationX * 2,
       0f
     )
     assertEquals(48, plan.titleContentStart)
-    assertEquals(19, plan.itemContentStart)
+    assertEquals(plan.horizontalPadding, plan.itemContentStart)
     assertEquals(16, plan.contentEndPadding)
     assertEquals(3, plan.statusRailWidth)
-    assertEquals(16, plan.statusIndicatorStart)
+    assertEquals(13, plan.statusIndicatorStart)
   }
 
   @Test
