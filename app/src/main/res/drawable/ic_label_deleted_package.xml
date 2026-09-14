@@ -4,7 +4,7 @@
   android:viewportWidth="596"
   android:viewportHeight="160">
   <path
-    android:fillColor="#E57373"
+    android:fillColor="@color/material_red_300"
     android:pathData="M80,6L516,6A74,74 0,0 1,590 80L590,80A74,74 0,0 1,516 154L80,154A74,74 0,0 1,6 80L6,80A74,74 0,0 1,80 6z" />
   <path
     android:fillColor="#ffffff"
@@ -13,5 +13,5 @@
     android:fillColor="#00000000"
     android:pathData="M80,6L516,6A74,74 0,0 1,590 80L590,80A74,74 0,0 1,516 154L80,154A74,74 0,0 1,6 80L6,80A74,74 0,0 1,80 6z"
     android:strokeWidth="12"
-    android:strokeColor="#333333" />
+    android:strokeColor="@color/package_label_stroke" />
 </vector>

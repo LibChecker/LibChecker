@@ -31,7 +31,6 @@
         android:layout_height="match_parent"
         android:paddingHorizontal="@dimen/normal_padding"
         android:paddingTop="?attr/actionBarSize"
-        android:paddingBottom="0dp"
         app:layout_collapseMode="parallax" />
 
       <androidx.appcompat.widget.ToolbarFix
@@ -53,23 +52,15 @@
 
   </com.google.android.material.appbar.AppBarLayout>
 
-  <LinearLayout
+  <rikka.widget.borderview.BorderRecyclerView
+    android:id="@android:id/list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
-
-    <rikka.widget.borderview.BorderRecyclerView
-      android:id="@android:id/list"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:background="?attr/colorSurface"
-      android:clipToPadding="false"
-      android:overScrollMode="never"
-      android:paddingTop="0dp"
-      android:paddingBottom="@dimen/normal_padding"
-      app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
-
-  </LinearLayout>
+    android:background="?attr/colorSurface"
+    android:clipToPadding="false"
+    android:overScrollMode="never"
+    android:paddingBottom="@dimen/normal_padding"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

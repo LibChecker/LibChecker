@@ -8,7 +8,6 @@ import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
-import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.IBinder
 import android.os.Process
@@ -18,6 +17,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
@@ -252,7 +252,7 @@ class ShootService : LifecycleService() {
     )
     builder.setContentTitle(getString(R.string.noti_shoot_title))
       .setSmallIcon(R.drawable.ic_logo)
-      .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher))
+      .setLargeIcon(ContextCompat.getDrawable(this, R.mipmap.ic_launcher)?.toBitmap())
       .setPriority(NotificationCompat.PRIORITY_LOW)
       .setContentIntent(pi)
       .setProgress(0, 0, true)

@@ -124,6 +124,7 @@
     <item name="cornerSizeBottomLeft">0dp</item>
   </style>
 
+
   <!-- Font family helpers -->
   <style name="TextView.SansSerif" parent="Widget.MaterialComponents.TextView">
     <item name="fontFamily">sans-serif</item>

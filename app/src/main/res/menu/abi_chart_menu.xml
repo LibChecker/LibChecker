@@ -3,7 +3,7 @@
 
   <item
     android:id="@+id/action_switch"
-    android:title=""
+    android:title="@string/chart_abi_detailed"
     app:actionLayout="@layout/layout_abi_chart_switch"
     app:showAsAction="always" />
 </menu>

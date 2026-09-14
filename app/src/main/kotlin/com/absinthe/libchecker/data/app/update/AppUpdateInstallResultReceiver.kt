@@ -11,10 +11,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInstaller
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.IntentCompat
 import com.absinthe.libchecker.domain.home.ui.MainActivity
@@ -89,7 +89,7 @@ class AppUpdateInstallResultReceiver : BroadcastReceiver() {
           contentText?.let(::setContentText)
         }
         .setSmallIcon(R.drawable.ic_logo)
-        .setLargeIcon(BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher))
+        .setLargeIcon(ContextCompat.getDrawable(context, R.mipmap.ic_launcher)?.toBitmap())
         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
         .setContentIntent(pendingIntent)
         .setAutoCancel(true)

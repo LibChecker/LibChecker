@@ -1,58 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools"
+  android:id="@+id/container"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
   tools:context=".domain.statistics.reference.ui.LibReferenceActivity">
 
-  <androidx.coordinatorlayout.widget.CoordinatorLayout
-    android:id="@+id/container"
+  <com.google.android.material.appbar.AppBarLayout
+    android:id="@+id/appbar"
+    style="?attr/appBarLayoutStyle"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:layout_gravity="top">
 
-    <com.google.android.material.appbar.AppBarLayout
-      android:id="@+id/appbar"
-      style="?attr/appBarLayoutStyle"
+    <androidx.appcompat.widget.ToolbarFix
+      android:id="@+id/toolbar"
+      style="?actionBarStyle"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:layout_gravity="top">
+      android:background="@null" />
 
-      <androidx.appcompat.widget.ToolbarFix
-        android:id="@+id/toolbar"
-        style="?actionBarStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@null" />
+  </com.google.android.material.appbar.AppBarLayout>
 
-    </com.google.android.material.appbar.AppBarLayout>
+  <ViewFlipper
+    android:id="@+id/vf_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@null"
+    android:clipChildren="true">
 
-    <ViewFlipper
-      android:id="@+id/vf_container"
+    <com.absinthe.libchecker.view.app.DotLoadingView
+      android:id="@+id/loading"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:background="@null"
-      android:clipChildren="true">
+      android:paddingTop="?actionBarSize" />
 
-      <com.absinthe.libchecker.view.app.DotLoadingView
-        android:id="@+id/loading"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingTop="?actionBarSize" />
+    <rikka.widget.borderview.BorderRecyclerView
+      android:id="@android:id/list"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:clipToPadding="false"
+      android:paddingTop="?actionBarSize"
+      android:scrollbars="none"
+      app:borderBottomVisibility="never"
+      app:borderTopDrawable="@null"
+      app:borderTopVisibility="whenTop"
+      app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-      <rikka.widget.borderview.BorderRecyclerView
-        android:id="@android:id/list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:paddingTop="?actionBarSize"
-        android:scrollbars="none"
-        app:borderBottomVisibility="never"
-        app:borderTopDrawable="@null"
-        app:borderTopVisibility="whenTop"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+  </ViewFlipper>
 
-    </ViewFlipper>
-  </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

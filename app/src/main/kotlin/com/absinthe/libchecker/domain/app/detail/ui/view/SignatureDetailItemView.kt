@@ -27,7 +27,7 @@ class SignatureDetailItemView(context: Context) : TextColumnRowView(context) {
     layoutParams = LinearLayout.LayoutParams(24.dp, 24.dp)
     scaleX = 0.8f
     scaleY = 0.8f
-    setImageResource(R.drawable.ic_twotone_content_copy_24)
+    setImageResource(R.drawable.ic_content_copy)
     contentDescription = context.getString(android.R.string.copy)
     setBackgroundDrawable(context.getDrawableByAttr(android.R.attr.selectableItemBackgroundBorderless))
     setOnClickListener {

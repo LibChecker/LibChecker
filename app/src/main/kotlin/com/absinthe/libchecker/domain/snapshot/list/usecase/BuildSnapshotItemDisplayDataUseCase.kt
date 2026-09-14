@@ -249,6 +249,18 @@ class BuildSnapshotItemDisplayDataUseCase(private val context: Context) {
     }
   }
 
+  private val todayDateFormat = object : ThreadLocal<SimpleDateFormat>() {
+    override fun initialValue(): SimpleDateFormat {
+      return SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+    }
+  }
+
+  private val fullDateFormat = object : ThreadLocal<SimpleDateFormat>() {
+    override fun initialValue(): SimpleDateFormat {
+      return SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+    }
+  }
+
   private fun buildUpdateTimeDisplayData(
     updateTime: Long,
     isVisible: Boolean,
@@ -258,9 +270,13 @@ class BuildSnapshotItemDisplayDataUseCase(private val context: Context) {
     val text = if (updateTime <= PREINSTALLED_TIMESTAMP) {
       SnapshotUpdateTimeText.Preinstalled
     } else {
-      val pattern = if (DateUtils.isTimestampToday(updateTime)) "HH:mm:ss" else "yyyy-MM-dd HH:mm:ss"
+      val formatter = if (DateUtils.isTimestampToday(updateTime)) {
+        todayDateFormat.get() ?: SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+      } else {
+        fullDateFormat.get() ?: SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+      }
       SnapshotUpdateTimeText.LastUpdated(
-        SimpleDateFormat(pattern, Locale.getDefault()).format(Date(updateTime))
+        formatter.format(Date(updateTime))
       )
     }
     return SnapshotUpdateTimeDisplayData(text, isApexPackage)

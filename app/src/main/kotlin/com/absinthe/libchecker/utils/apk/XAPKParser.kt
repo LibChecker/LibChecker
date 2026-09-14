@@ -5,7 +5,6 @@ import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.compat.ZipFileCompat
 import com.absinthe.libchecker.utils.extensions.requireAvailableCacheDir
-import com.absinthe.libchecker.utils.extensions.use
 import com.absinthe.libchecker.utils.fromJson
 import java.io.File
 import okio.buffer

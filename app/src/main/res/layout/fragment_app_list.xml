@@ -1,54 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.absinthe.libchecker.view.app.CustomViewFlipper xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools"
+  android:id="@+id/vf_container"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
+  android:clipChildren="false"
   tools:context=".domain.app.list.ui.AppListFragment">
 
-  <com.absinthe.libchecker.view.app.CustomViewFlipper
-    android:id="@+id/vf_container"
+  <FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ViewStub
+      android:id="@+id/loading_view_stub"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout="@layout/view_app_list_loading"
+      android:layout_gravity="center"
+      android:inflatedId="@+id/loading_view" />
+
+  </FrameLayout>
+
+  <rikka.widget.borderview.BorderRecyclerView
+    android:id="@android:id/list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clipChildren="false">
+    android:clipToPadding="false"
+    android:scrollbars="none"
+    app:borderBottomVisibility="never"
+    app:borderTopDrawable="@null"
+    app:borderTopVisibility="whenTop" />
 
-    <FrameLayout
-      android:id="@+id/loading_view_container"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent">
+  <com.absinthe.libchecker.view.app.DotLoadingView
+    android:id="@+id/init_view"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center" />
 
-      <ViewStub
-        android:id="@+id/loading_view_stub"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout="@layout/view_app_list_loading"
-        android:layout_gravity="center"
-        android:inflatedId="@+id/loading_view" />
+  <com.absinthe.libchecker.domain.app.list.ui.view.AppListRejectView
+    android:id="@+id/reject_view"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center" />
 
-    </FrameLayout>
-
-    <rikka.widget.borderview.BorderRecyclerView
-      android:id="@android:id/list"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:clipToPadding="false"
-      android:scrollbars="none"
-      app:borderBottomVisibility="never"
-      app:borderTopDrawable="@null"
-      app:borderTopVisibility="whenTop" />
-
-    <com.absinthe.libchecker.view.app.DotLoadingView
-      android:id="@+id/init_view"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_gravity="center" />
-
-    <com.absinthe.libchecker.domain.app.list.ui.view.AppListRejectView
-      android:id="@+id/reject_view"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_gravity="center" />
-
-  </com.absinthe.libchecker.view.app.CustomViewFlipper>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</com.absinthe.libchecker.view.app.CustomViewFlipper>

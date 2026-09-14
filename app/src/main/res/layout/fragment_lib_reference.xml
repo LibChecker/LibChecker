@@ -1,53 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.absinthe.libchecker.view.app.CustomViewFlipper xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools"
+  android:id="@+id/vf_container"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
   tools:context=".domain.statistics.reference.ui.LibReferenceFragment">
 
-  <com.absinthe.libchecker.view.app.CustomViewFlipper
-    android:id="@+id/vf_container"
+  <com.absinthe.libchecker.domain.statistics.reference.ui.view.LibReferenceLoadingView
+    android:id="@+id/loading_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" />
+
+  <rikka.widget.borderview.BorderRecyclerView
+    android:id="@android:id/list"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:scrollbars="none"
+    app:borderBottomVisibility="never"
+    app:borderTopDrawable="@null"
+    app:borderTopVisibility="whenTop" />
+
+  <FrameLayout
+    android:id="@+id/treemap_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.absinthe.libchecker.domain.statistics.reference.ui.view.LibReferenceLoadingView
-      android:id="@+id/loading_view"
+    <com.absinthe.libchecker.domain.statistics.reference.ui.view.LibReferenceTreemapView
+      android:id="@+id/treemap"
       android:layout_width="match_parent"
       android:layout_height="match_parent" />
 
-    <rikka.widget.borderview.BorderRecyclerView
-      android:id="@android:id/list"
+    <TextView
+      android:id="@+id/treemap_empty"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:clipToPadding="false"
-      android:scrollbars="none"
-      app:borderBottomVisibility="never"
-      app:borderTopDrawable="@null"
-      app:borderTopVisibility="whenTop" />
+      android:gravity="center"
+      android:padding="24dp"
+      android:text="@string/empty_list"
+      android:textAppearance="?attr/textAppearanceTitleMedium"
+      android:visibility="gone" />
 
-    <FrameLayout
-      android:id="@+id/treemap_container"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent">
+  </FrameLayout>
 
-      <com.absinthe.libchecker.domain.statistics.reference.ui.view.LibReferenceTreemapView
-        android:id="@+id/treemap"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-      <TextView
-        android:id="@+id/treemap_empty"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:padding="24dp"
-        android:text="@string/empty_list"
-        android:textAppearance="?attr/textAppearanceTitleMedium"
-        android:visibility="gone" />
-
-    </FrameLayout>
-
-  </com.absinthe.libchecker.view.app.CustomViewFlipper>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</com.absinthe.libchecker.view.app.CustomViewFlipper>

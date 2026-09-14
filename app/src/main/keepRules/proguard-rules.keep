@@ -14,11 +14,6 @@
     @android.webkit.JavascriptInterface <methods>;
 }
 
-# The support libraries contains references to newer platform versions.
-# Don't warn about those in case this app is linking against an older
-# platform version. We know about them, and they are safe.
--dontnote android.support.**
--dontwarn android.support.**
 
 -dontwarn javax.annotation.**
 -dontwarn org.xmlpull.v1.XmlPullParser
@@ -44,10 +39,6 @@
   public static * inflate(android.view.LayoutInflater);
 }
 
-# BottomSheetBehavior
--keepclassmembers public class com.google.android.material.bottomsheet.BottomSheetBehavior {
-  void setStateInternal(int);
-}
 
 # R8 full mode
 # Once

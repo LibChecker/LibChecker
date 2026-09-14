@@ -6,9 +6,15 @@ import java.util.Locale
 
 class FormatSnapshotTimestampUseCase {
 
+  private val dateFormat = object : ThreadLocal<SimpleDateFormat>() {
+    override fun initialValue(): SimpleDateFormat {
+      return SimpleDateFormat(DISPLAY_PATTERN, Locale.getDefault())
+    }
+  }
+
   operator fun invoke(timestamp: Long): String {
-    return SimpleDateFormat(DISPLAY_PATTERN, Locale.getDefault())
-      .format(Date(timestamp))
+    val formatter = dateFormat.get() ?: SimpleDateFormat(DISPLAY_PATTERN, Locale.getDefault())
+    return formatter.format(Date(timestamp))
   }
 
   private companion object {

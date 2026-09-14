@@ -46,7 +46,6 @@
   <string name="uncharted_territory">未知领域</string>
   <string name="get_app_list_denied_tip">请授予 LibChecker\n“读取应用列表”\n权限</string>
   <string name="advanced_menu">高级菜单</string>
-  <string name="archived_app">已归档应用</string>
   <string name="snapshot_version_archived">已归档</string>
   <string name="toast_archived_app_detail_unavailable">应用已归档，恢复后才能查看详情</string>
   <!-- Statistics   -->
@@ -55,9 +54,6 @@
   <string name="tab_chart">图表</string>
   <string name="tab_lib_reference_statistics">库引用统计</string>
   <string name="not_marked_lib">未标记的库</string>
-  <string name="submenu_title_component">组件</string>
-  <string name="submenu_title_manifest">清单</string>
-  <string name="ref_category_all">全部</string>
   <string name="ref_category_native">原生库</string>
   <string name="ref_category_service">服务</string>
   <string name="ref_category_activity">活动</string>
@@ -103,13 +99,11 @@
   <string name="settings_github_token_dialog_hint">个人访问令牌</string>
   <string name="settings_github_token_clear">清除</string>
   <string name="about_info">本应用用来查看设备上的应用使用到的第三方库的情况。</string>
-  <string name="toolbar_rate">评分</string>
   <string name="resource_declaration">应用中的部分素材来自：</string>
   <string name="library_declaration">LibChecker 中的所有标记库信息均来自其所属的 SDK 的开发文档或代码仓库，如果信息有有误，请联系：absinthe@absinthe.life</string>
   <!--  Settings  -->
   <string name="pref_group_normal">常规</string>
   <string name="pref_group_appearance">界面</string>
-  <string name="pref_group_others">其它</string>
   <string name="pref_group_rules">规则与网络</string>
   <string name="pref_group_data">数据与工具</string>
   <string name="pref_group_about">关于与支持</string>
@@ -148,9 +142,7 @@
   <string name="cloud_rules_summary">在此更新最新的标记库</string>
   <string name="array_dark_mode_off">关闭</string>
   <string name="array_dark_mode_on">开启</string>
-  <string name="array_dark_mode_auto">自动</string>
   <string name="array_dark_mode_system">系统默认</string>
-  <string name="array_dark_mode_battery">由省电模式设置</string>
   <string name="array_snapshot_default">询问</string>
   <string name="array_snapshot_keep">保留</string>
   <string name="array_snapshot_discard">丢弃</string>
@@ -159,7 +151,6 @@
   <string name="detail_label">查看应用详情</string>
   <string name="not_found">未找到</string>
   <string name="create_an_issue">协助我们来补充信息</string>
-  <string name="app_bundle_details">Android App Bundle 是一种发布格式，其中包含了应用的所有已编译代码和资源，并将 APK 的生成与签名工作交由 Google Play 处理。\nGoogle Play 会根据你的 App Bundle 为每种设备配置生成并分发经过优化的 APK，这样每台设备只会下载其运行应用所需的代码和资源。你不再需要为了不同设备手动构建、签名和管理多个 APK，从而简化了流程；同时，用户也能获得更小、更优化的下载包。</string>
   <string name="kotlin_details">Kotlin 是由 JetBrains 开发的开源静态类型编程语言。Kotlin 简洁、安全、可与 Java 和其他语言互操作，并提供了许多在多个平台之间重用代码的方法，从而实现高效编程。Kotlin 适用于 JVM、Android、JavaScript、Wasm 和 Native，可用于任何类型的开发，包括服务器端、客户端 Web、Android 和多平台库。</string>
   <string name="items_count">项数：</string>
   <string name="further_operation">进一步操作</string>
@@ -186,7 +177,6 @@
   <string name="jetpack_compose_details">Jetpack Compose 是用于构建原生 Android 界面的新工具包。它可简化并加快 Android 上的界面开发，使用更少的代码、强大的工具和直观的 Kotlin API，快速打造生动而精彩的应用。</string>
   <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform 是一个由 JetBrains 开发的现代化声明式和响应式 UI 框架，它提供了一种只需少量 Kotlin 代码即可构建用户界面的简单方法。它还允许您只需编写一次用户界面，即可在任何支持的平台——iOS、Android、桌面（Windows、macOS、Linux）和 Web——上运行。</string>
   <string name="multi_arch_dialog_details"><![CDATA[如果某个应用提供了可供其他应用（32 位或 64 位）使用的 API，为避免可能出现的错误，必须在该应用的清单中将 <b>android:multiarch</b> 属性设为 true。]]></string>
-  <string name="extract_native_libs_tip">该应用声明了 </string>
   <string name="xml_detail">XML 详情</string>
   <string name="lib_detail_dialog_title_16kb_page_size">16 KB 页大小支持</string>
   <string name="lib_detail_dialog_content_16kb_page_size">历史上，Android 仅支持 4 KB 的内存页大小，这优化了系统内存性能，适用于 Android 设备通常拥有的平均总内存量。自 Android 15 开始，AOSP 支持配置为使用 16 KB 页大小的设备（16 KB 设备）。如果您的应用程序直接或通过 SDK 间接使用任何 NDK 库，那么您需要重新构建您的应用程序，以便其在这些 16 KB 设备上正常运行。</string>
@@ -197,9 +187,6 @@
   <string name="menu_split">模块</string>
   <string name="alternative_launch_method">备选的启动方式</string>
   <string name="compare_with_current">与当前包比较</string>
-  <string name="rx_detail">RxJava 是 Reactive Extensions 的 Java VM 实现：一个使用可观察序列组成异步和基于事件的程序的库。</string>
-  <string name="rx_android_detail">适用于 Android 的 Reactive Extensions</string>
-  <string name="rx_kotlin_detail">RxJava 的 Kotlin 扩展</string>
   <string name="permission_not_granted">未授予</string>
   <string name="signature_detail">签名详情</string>
   <string name="signature_scheme_version">签名方案</string>
@@ -242,12 +229,6 @@
   <string name="lib_detail_app_install_source_empty">未知</string>
   <string name="lib_detail_app_install_source_empty_detail">Shell 或已被卸载的应用</string>
   <string name="lib_detail_app_install_source_shizuku_usage">系统仅向具备安装权限的应用提供安装请求方信息，需通过 Shizuku 获取</string>
-  <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizuku 未安装</string>
-  <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">点此安装 Shizuku</string>
-  <string name="lib_detail_app_install_source_shizuku_low_version">需要 Shizuku API 版本 10</string>
-  <string name="lib_detail_app_install_source_shizuku_low_version_detail">点此升级 Shizuku</string>
-  <string name="lib_detail_app_install_source_shizuku_not_running">Shizuku 未启动</string>
-  <string name="lib_detail_app_install_source_shizuku_not_running_detail">点此跳转到 Shizuku 以启动它</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku 未授权</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">点此进行 Shizuku 授权以获取安装请求方</string>
   <string name="lib_detail_app_install_source_shizuku_unavailable">Shizuku 服务不可用</string>
@@ -280,12 +261,10 @@
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已复制到剪贴板</string>
   <string name="snapshot_report_share_failed">分享快照报告失败</string>
-  <string name="toast_not_existing_market">设备中不存在应用市场</string>
   <string name="toast_use_another_file_manager">请使用其它文件管理器打开此 APK</string>
   <string name="toast_cant_open_app">无法启动此应用</string>
   <string name="toast_cloud_rules_update_error">云端规则更新失败，请重试</string>
   <string name="toast_not_enough_storage_space">存储空间不足</string>
-  <string name="toast_downloading_app">已请求下载</string>
   <string name="toast_app_update_started">正在准备更新</string>
   <string name="toast_app_update_installed">更新已完成</string>
   <string name="toast_app_update_unsupported">此设备暂不支持应用内更新</string>
@@ -303,7 +282,6 @@
   <string name="snapshot_content_changed">内容变更</string>
   <string name="snapshot_indicator_moved">移动</string>
   <string name="snapshot_detail_size_label">体积</string>
-  <string name="snapshot_detail_changes_label">变更项：</string>
   <string name="snapshot_detail_metric_description">%1$s，%2$s</string>
   <plurals name="snapshot_detail_changes_count">
     <item quantity="other">%d 项变更</item>
@@ -312,7 +290,6 @@
   <string name="snapshot_no_snapshot">没有快照</string>
   <string name="snapshot_detail_new_install_title">这是一个全新的应用</string>
   <string name="snapshot_detail_deleted_title">此应用已被移除</string>
-  <string name="snapshot_time_node_uninitialized">（未初始化）</string>
   <string name="snapshot_time_node_current">当前</string>
   <plurals name="snapshot_time_node_apps_count">
     <item quantity="other">%d 个应用</item>
@@ -340,7 +317,6 @@
   <string name="dialog_themed_and_alternative_app_icons">主题和备选的图标</string>
   <string name="dialog_themed">主题</string>
   <!--  Album  -->
-  <string name="album_compare">对比</string>
   <string name="album_item_comparison_title">对比</string>
   <string name="album_item_comparison_subtitle">对比两个快照</string>
   <string name="album_item_comparison_invalid_compare">无效的对比</string>
@@ -361,15 +337,11 @@
   <string name="album_backup_detail">已备份 %1$d 项</string>
   <string name="album_backup_database_detail">数据库备份完成</string>
   <string name="album_restore">恢复</string>
-  <string name="album_restore_summary">从备份文件恢复快照</string>
   <string name="album_restore_from_file">从文件恢复</string>
   <string name="album_restore_auto_detect_summary">自动识别备份格式</string>
-  <string name="album_restore_detail">%1$s : 共 %2$s 项\n</string>
   <string name="album_restore_result_summary">已恢复 %1$d 项，来自 %2$d 个快照时间点</string>
   <string name="album_restore_result_item_count">%1$d 项</string>
   <string name="album_click_to_choose">点击选择</string>
-  <string name="album_dialog_delete_snapshot_message">处理中…</string>
-  <string name="album_snapshot_top_apps_not_initialized">尚未加载</string>
   <!--  Integration  -->
   <string name="integration_monkey_king_menu_block">使用「大圣净化」禁用此组件</string>
   <string name="integration_monkey_king_menu_unblock">使用「大圣净化」解禁此组件</string>

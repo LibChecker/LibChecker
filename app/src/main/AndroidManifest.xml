@@ -140,7 +140,9 @@
     <service android:name=".services.ShootService"
       android:foregroundServiceType="shortService"
       android:exported="false" />
-    <service android:name=".services.WorkerService" />
+    <service
+      android:name=".services.WorkerService"
+      android:exported="false" />
 
     <receiver
       android:name=".data.app.update.AppUpdateInstallResultReceiver"

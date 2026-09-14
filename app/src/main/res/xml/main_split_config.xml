@@ -18,9 +18,6 @@
     <SplitPairFilter
       window:primaryActivityName="com.absinthe.libchecker.domain.home.ui.MainActivity"
       window:secondaryActivityName="com.absinthe.libchecker.domain.snapshot.detail.ui.SnapshotDetailActivity" />
-    <SplitPairFilter
-      window:primaryActivityName="com.absinthe.libchecker.domain.home.ui.MainActivity"
-      window:secondaryActivityName="com.absinthe.libchecker.domain.about.ui.AboutActivity" />
 
     <SplitPairFilter
       window:primaryActivityName="com.absinthe.libchecker.domain.statistics.reference.ui.LibReferenceActivity"

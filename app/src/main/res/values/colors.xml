@@ -15,4 +15,11 @@
   <color name="ic_launcher_foreground">#FFFFFF</color>
   <color name="ic_launcher_background">#6200EE</color>
   <color name="ic_launcher_back">#6200EE</color>
+
+  <!-- Third-party brand accents -->
+  <color name="ic_gradle_tint">#02303A</color>
+
+  <!-- Package status and CI labels -->
+  <color name="package_label_stroke">#333333</color>
+  <color name="ci_label_bg">#E6E6E6</color>
 </resources>

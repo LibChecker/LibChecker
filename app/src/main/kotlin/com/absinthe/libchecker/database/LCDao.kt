@@ -30,7 +30,7 @@ interface LCDao {
   @Query("SELECT packageName from item_table WHERE features = -1")
   suspend fun getUninitializedFeaturePackageNames(): List<String>
 
-  @Query("SELECT * from item_table WHERE packageName LIKE :packageName")
+  @Query("SELECT * from item_table WHERE packageName = :packageName")
   suspend fun getItem(packageName: String): LCItem?
 
   @Insert(onConflict = OnConflictStrategy.IGNORE)

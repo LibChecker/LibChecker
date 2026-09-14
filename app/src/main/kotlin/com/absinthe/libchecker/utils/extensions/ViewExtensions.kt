@@ -31,7 +31,6 @@ import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.utils.OsUtils
-import com.absinthe.libraries.utils.extensions.addPaddingTop
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.shape.ShapeAppearanceModel
 import com.google.android.material.shape.SuperEllipseCornerTreatment
@@ -62,7 +61,7 @@ var View.paddingTopCompat: Int
   get() = paddingTop
 
 fun View.addPaddingTop(padding: Int) {
-  addPaddingTop(padding)
+  setPadding(paddingStart, paddingTop + padding, paddingEnd, paddingBottom)
 }
 
 var View.paddingBottomCompat: Int

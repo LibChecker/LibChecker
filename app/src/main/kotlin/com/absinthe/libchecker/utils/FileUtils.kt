@@ -7,30 +7,7 @@ import java.nio.file.Paths
 object FileUtils {
 
   fun delete(file: File?): Boolean {
-    if (file == null) return false
-    return if (file.isDirectory) {
-      deleteDir(file)
-    } else {
-      !file.exists() || (file.isFile && file.delete())
-    }
-  }
-
-  private fun deleteDir(dir: File): Boolean {
-    // dir doesn't exist then return true
-    if (!dir.exists()) return true
-    // dir isn't a directory then return false
-    if (!dir.isDirectory) return false
-    val files = dir.listFiles()
-    if (files != null && files.isNotEmpty()) {
-      for (file in files) {
-        if (file.isFile) {
-          if (!file.delete()) return false
-        } else if (file.isDirectory) {
-          if (!deleteDir(file)) return false
-        }
-      }
-    }
-    return dir.delete()
+    return file?.deleteRecursively() ?: false
   }
 
   fun getFileSize(file: File): Long {

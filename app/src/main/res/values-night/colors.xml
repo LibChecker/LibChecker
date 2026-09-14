@@ -14,4 +14,11 @@
   <!-- Launcher adaptive icon -->
   <color name="ic_launcher_foreground">#6200EE</color>
   <color name="ic_launcher_background">#E1F5FE</color>
+
+  <!-- Third-party brand accents -->
+  <color name="ic_gradle_tint">#FFFFFF</color>
+
+  <!-- Package status and CI labels -->
+  <color name="package_label_stroke">#CCCCCC</color>
+  <color name="ci_label_bg">#3C3C3C</color>
 </resources>

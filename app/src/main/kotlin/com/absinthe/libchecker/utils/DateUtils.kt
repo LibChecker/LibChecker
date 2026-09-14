@@ -62,11 +62,12 @@ object DateUtils {
     return month == Calendar.JANUARY && date == 1
   }
 
+  private val ZODIAC_LIST = arrayOf("🐒", "🐔", "🐶", "🐷", "🐭", "🐮", "🐯", "🐰", "🐲", "🐍", "🐴", "🐑", "🐒", "🐔", "🐶", "🐷")
+
   fun getChineseZodiac(): String {
     val cc = Calendar.getInstance(Locale.CHINA) as GregorianCalendar
     val animalIndex = cc.get(Calendar.YEAR) % 12
-    val zodiacList = listOf("🐒", "🐔", "🐶", "🐷", "🐭", "🐮", "🐯", "🐰", "🐲", "🐍", "🐴", "🐑", "🐒", "🐔", "🐶", "🐷")
-    return zodiacList[animalIndex]
+    return ZODIAC_LIST[animalIndex]
   }
 
   fun getToday(): String {
@@ -78,19 +79,7 @@ object DateUtils {
   }
 
   fun isTimestampToday(timestamp: Long): Boolean {
-    val calendar = Calendar.getInstance()
-    calendar.timeInMillis = timestamp
-
-    val today = Calendar.getInstance()
-    val todayYear = today.get(Calendar.YEAR)
-    val todayMonth = today.get(Calendar.MONTH)
-    val todayDay = today.get(Calendar.DAY_OF_MONTH)
-
-    val timestampYear = calendar.get(Calendar.YEAR)
-    val timestampMonth = calendar.get(Calendar.MONTH)
-    val timestampDay = calendar.get(Calendar.DAY_OF_MONTH)
-
-    return todayYear == timestampYear && todayMonth == timestampMonth && todayDay == timestampDay
+    return android.text.format.DateUtils.isToday(timestamp)
   }
 
   fun isTimestampThisMonth(timestamp: Long): Boolean {

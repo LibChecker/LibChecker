@@ -5,6 +5,6 @@
   <item
     android:id="@+id/compare"
     android:icon="@drawable/ic_compare"
-    android:title="@string/advanced_menu"
+    android:title="@string/album_item_comparison_title"
     app:showAsAction="always" />
 </menu>
