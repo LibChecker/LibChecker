@@ -19,6 +19,8 @@ import com.absinthe.libchecker.view.span.DiffHighlightSpan
 
 object LCAppUtils {
 
+  private val bidiFormatter by lazy { BidiFormatter.getInstance() }
+
   fun buildAppTitle(context: Context): Spannable {
     val sb = SpannableStringBuilder(context.getString(R.string.app_name))
 
@@ -97,7 +99,7 @@ object LCAppUtils {
         val highlightedPair2 =
           getHighlightDifferences(diff2.old.toString(), diff2.new.toString(), highlightDiffColor, emphasizeDiffs)
         val allText = highlightedPair1.first.toString() + highlightedPair1.second + highlightedPair2.first + highlightedPair2.second + diff1Suffix + diff2Suffix
-        val isRtl = BidiFormatter.getInstance().isRtl(allText)
+        val isRtl = bidiFormatter.isRtl(allText)
         val arrow = if (isRtl) ARROW_REVERT else ARROW
         buildSpannedString {
           append(highlightedPair1.first)

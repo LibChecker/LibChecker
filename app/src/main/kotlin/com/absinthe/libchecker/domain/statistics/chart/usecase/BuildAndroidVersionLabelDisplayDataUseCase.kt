@@ -10,7 +10,7 @@ import java.util.Locale
 class BuildAndroidVersionLabelDisplayDataUseCase(
   private val sdkInt: Int = Build.VERSION.SDK_INT,
   private val formatReleaseDate: (Date) -> String = { date ->
-    SimpleDateFormat(RELEASE_DATE_PATTERN, Locale.getDefault()).format(date)
+    (releaseDateFormat.get() ?: SimpleDateFormat(RELEASE_DATE_PATTERN, Locale.getDefault())).format(date)
   }
 ) {
 
@@ -36,5 +36,10 @@ class BuildAndroidVersionLabelDisplayDataUseCase(
 
   private companion object {
     const val RELEASE_DATE_PATTERN = "yyyy-MM"
+    private val releaseDateFormat = object : ThreadLocal<SimpleDateFormat>() {
+      override fun initialValue(): SimpleDateFormat {
+        return SimpleDateFormat(RELEASE_DATE_PATTERN, Locale.getDefault())
+      }
+    }
   }
 }

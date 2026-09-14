@@ -48,6 +48,9 @@ object DateUtils {
   }
 
   fun isChineseNewYearEve(): Boolean {
+    val today = Calendar.getInstance()
+    val gMonth = today.get(Calendar.MONTH)
+    if (gMonth != Calendar.JANUARY && gMonth != Calendar.FEBRUARY) return false
     val calendar = ChineseCalendar()
     val date = calendar.get(Calendar.DATE)
     val month = calendar.get(Calendar.MONTH)
@@ -56,6 +59,9 @@ object DateUtils {
   }
 
   fun isChineseNewYear(): Boolean {
+    val today = Calendar.getInstance()
+    val gMonth = today.get(Calendar.MONTH)
+    if (gMonth != Calendar.JANUARY && gMonth != Calendar.FEBRUARY) return false
     val calendar = ChineseCalendar()
     val date = calendar.get(Calendar.DATE)
     val month = calendar.get(Calendar.MONTH)
@@ -84,12 +90,10 @@ object DateUtils {
 
   fun isTimestampThisMonth(timestamp: Long): Boolean {
     val calendar = Calendar.getInstance()
+    val todayYear = calendar.get(Calendar.YEAR)
+    val todayMonth = calendar.get(Calendar.MONTH)
+
     calendar.timeInMillis = timestamp
-
-    val today = Calendar.getInstance()
-    val todayYear = today.get(Calendar.YEAR)
-    val todayMonth = today.get(Calendar.MONTH)
-
     val timestampYear = calendar.get(Calendar.YEAR)
     val timestampMonth = calendar.get(Calendar.MONTH)
 
