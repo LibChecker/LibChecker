@@ -87,7 +87,7 @@ object RulesRepository {
     val target = getDatabaseFile(context)
     target.parentFile?.mkdirs()
     RikkaFileUtils.copy(source, target)
-    return target.readBytes().md5() == source.readBytes().md5()
+    return target.md5() == source.md5()
   }
 
   fun deleteDatabase(context: Context = LibCheckerApp.app) {

@@ -340,8 +340,6 @@ object PackageUtils {
     return map
   }
 
-  private val regex_splits by lazy { Regex("split_(.*)\\.apk") }
-
   /**
    * Get split apks dirs
    * @param packageInfo PackageInfo
@@ -351,7 +349,7 @@ object PackageUtils {
     val ai = packageInfo.applicationInfo ?: return null
     if (FreezeUtils.isAppFrozen(ai)) {
       File(ai.sourceDir).parentFile?.takeIf { it.exists() }?.let { files ->
-        return files.listFiles { file -> file.name.matches(regex_splits) }
+        return files.listFiles { file -> file.name.startsWith("split_") && file.name.endsWith(".apk") }
           ?.map { it.absolutePath }
           ?.toTypedArray()
       }
@@ -680,7 +678,7 @@ object PackageUtils {
       zipFile.getZipEntries().asSequence()
         .filter {
           checkCancelled()
-          it.name.matches(DEX_ENTRY_REGEX)
+          isDexEntryName(it.name)
         }
         .forEach { entry ->
           checkCancelled()
@@ -1200,12 +1198,13 @@ object PackageUtils {
   ): List<String> {
     if (classes.isEmpty()) return emptyList()
     val foundClasses = linkedSetOf<String>()
+    val distinctClassCount = classes.distinct().size
     return tracePackageUtilsSection(TRACE_FIND_DEX_CLASSES) {
       runCatching {
         zipFile.getZipEntries().asSequence()
           .filter {
             checkCancelled()
-            it.name.matches(DEX_ENTRY_REGEX)
+            isDexEntryName(it.name)
           }
           .forEach { entry ->
             checkCancelled()
@@ -1219,7 +1218,7 @@ object PackageUtils {
                 checkCancelled = checkCancelled
               )
             }
-            if ((hasAny && foundClasses.isNotEmpty()) || foundClasses.size == classes.distinct().size) {
+            if ((hasAny && foundClasses.isNotEmpty()) || foundClasses.size == distinctClassCount) {
               return@runCatching foundClasses.toList()
             }
           }
@@ -1240,7 +1239,15 @@ object PackageUtils {
     throw RuntimeException("Not implemented")
   }
 
-  private val DEX_ENTRY_REGEX = Regex("^classes(\\d*)\\.dex$")
+  private fun isDexEntryName(name: String): Boolean {
+    val len = name.length
+    if (len < 11 || !name.startsWith("classes") || !name.endsWith(".dex")) return false
+    for (i in 7 until len - 4) {
+      val c = name[i]
+      if (c < '0' || c > '9') return false
+    }
+    return true
+  }
   private const val KOTLIN_RUNTIME_STRING_THRESHOLD = 2
   private const val MAX_KOTLIN_RUNTIME_SCAN_BYTES = 32 * 1024 * 1024
   private val KOTLIN_RUNTIME_STRING_MARKERS = listOf(

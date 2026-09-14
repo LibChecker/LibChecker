@@ -24,18 +24,8 @@ object LCAppUtils {
   fun buildAppTitle(context: Context): Spannable {
     val sb = SpannableStringBuilder(context.getString(R.string.app_name))
 
-    when {
-      DateUtils.isChristmas() -> {
-        sb.append("\uD83C\uDF84")
-      }
-
-      DateUtils.isChineseNewYearEve() -> {
-        sb.append("\uD83C\uDFEE")
-      }
-
-      DateUtils.isChineseNewYear() -> {
-        sb.append(DateUtils.getChineseZodiac())
-      }
+    DateUtils.getHolidayEmoji()?.let {
+      sb.append(it)
     }
 
     if (BuildConfig.IS_DEV_VERSION) {

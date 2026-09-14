@@ -40,6 +40,28 @@ object DateUtils {
     return null
   }
 
+  fun getHolidayEmoji(): String? {
+    val today = Calendar.getInstance()
+    val month = today.get(Calendar.MONTH)
+    val date = today.get(Calendar.DATE)
+    if (month == Calendar.DECEMBER && date == 25) {
+      return "\uD83C\uDF84"
+    }
+    if (month == Calendar.JANUARY || month == Calendar.FEBRUARY) {
+      val calendar = ChineseCalendar()
+      val cMonth = calendar.get(Calendar.MONTH)
+      val cDate = calendar.get(Calendar.DATE)
+      if (cMonth == Calendar.DECEMBER && cDate == calendar.getActualMaximum(Calendar.DATE)) {
+        return "\uD83C\uDFEE"
+      }
+      if (cMonth == Calendar.JANUARY && cDate == 1) {
+        val animalIndex = today.get(Calendar.YEAR) % 12
+        return ZODIAC_LIST.getOrNull(animalIndex)
+      }
+    }
+    return null
+  }
+
   fun isChristmas(): Boolean {
     val today = Calendar.getInstance()
     val month = today.get(Calendar.MONTH)
