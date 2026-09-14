@@ -50,9 +50,10 @@ object LCAppUtils {
     highlightDiffColor: Int? = null,
     emphasizeDiffs: Boolean = false
   ): CharSequence {
+    fun formatValue(value: Any?): String = if (format == "%s") value.toString() else format.format(value)
     return if (diff.old != diff.new && diff.new != null && !isNewOrDeleted) {
-      val oldString = format.format(diff.old)
-      val newString = format.format(diff.new)
+      val oldString = formatValue(diff.old)
+      val newString = formatValue(diff.new)
 
       if (highlightDiffColor != null || emphasizeDiffs) {
         val pair = getHighlightDifferences(oldString, newString, highlightDiffColor, emphasizeDiffs)
@@ -69,7 +70,7 @@ object LCAppUtils {
         }
       }
     } else {
-      format.format(diff.old)
+      formatValue(diff.old)
     }
   }
 

@@ -309,8 +309,9 @@ class ComputeLibReferenceUseCase(
         }
 
         PACKAGE -> {
-          val split = packageName.split(".")
-          val packagePrefix = split.subList(0, split.size.coerceAtMost(2)).joinToString(".")
+          val firstDot = packageName.indexOf('.')
+          val secondDot = if (firstDot >= 0) packageName.indexOf('.', firstDot + 1) else -1
+          val packagePrefix = if (secondDot >= 0) packageName.substring(0, secondDot) else packageName
           index.addReference(packagePrefix, packageName, PACKAGE)
         }
 

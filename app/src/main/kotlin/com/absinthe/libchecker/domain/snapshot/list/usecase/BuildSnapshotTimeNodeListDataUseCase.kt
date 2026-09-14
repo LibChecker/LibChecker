@@ -23,9 +23,10 @@ class BuildSnapshotTimeNodeListDataUseCase(
   ): SnapshotTimeNodeListData = withContext(Dispatchers.Default) {
     val refreshedTimeStamps = refreshRepresentativeApps(timeStamps)
     val snapshotCounts = getSnapshotCountsByTimestamp()
-    val candidatePackageNamesByTimestamp = refreshedTimeStamps.associate { item ->
-      item.timestamp to SnapshotRepresentativeApps.decode(item.topApps)
-    }
+    val candidatePackageNamesByTimestamp = refreshedTimeStamps.associateBy(
+      keySelector = { it.timestamp },
+      valueTransform = { SnapshotRepresentativeApps.decode(it.topApps) }
+    )
     val candidatePackageNames = candidatePackageNamesByTimestamp.values
       .asSequence()
       .flatten()

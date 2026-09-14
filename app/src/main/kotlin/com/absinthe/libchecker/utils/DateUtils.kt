@@ -16,6 +16,14 @@ object DateUtils {
   // ISO 8601 constants
   private val SUPPORTED_ISO_8601_PATTERNS = arrayOf("yyyy-MM-dd'T'HH:mm:ssZ", "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
 
+  private val iso8601Formatters = object : ThreadLocal<Array<SimpleDateFormat>>() {
+    override fun initialValue(): Array<SimpleDateFormat> {
+      return Array(SUPPORTED_ISO_8601_PATTERNS.size) {
+        SimpleDateFormat(SUPPORTED_ISO_8601_PATTERNS[it], Locale.US)
+      }
+    }
+  }
+
   /**
    * Parses a date from the specified ISO 8601-compliant string.
    *
@@ -25,14 +33,17 @@ object DateUtils {
    */
   fun parseIso8601DateTime(string: String): Date? {
     val s = string.replace("Z", "+00:00")
-    for (pattern in SUPPORTED_ISO_8601_PATTERNS) {
+    val formatters = iso8601Formatters.get()
+    for (i in SUPPORTED_ISO_8601_PATTERNS.indices) {
+      val pattern = SUPPORTED_ISO_8601_PATTERNS[i]
       var str = s
       val colonPosition = pattern.lastIndexOf('Z') + 1
       if (str.length > colonPosition) {
         str = str.substring(0, colonPosition) + str.substring(colonPosition + 1)
       }
       try {
-        return SimpleDateFormat(pattern, Locale.US).parse(str)
+        val formatter = formatters?.getOrNull(i) ?: SimpleDateFormat(pattern, Locale.US)
+        return formatter.parse(str)
       } catch (e: ParseException) {
         // try the next one
       }

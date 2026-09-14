@@ -16,5 +16,5 @@ fun String.maybeResourceId(): Boolean {
 }
 
 fun String.removeNonDigits(): String {
-  return this.replace(Regex("\\D"), "")
+  return this.filter { it.isDigit() }
 }

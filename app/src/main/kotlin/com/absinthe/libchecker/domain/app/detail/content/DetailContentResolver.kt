@@ -169,9 +169,12 @@ class DetailContentResolver(
     }.toMutableList()
 
     if (sortBySize) {
-      chipList.sortByDescending { it.item.size }
+      chipList.sortWith { a, b -> b.item.size.compareTo(a.item.size) }
     } else {
-      chipList.sortWith(compareByDescending<LibStringItemChip> { it.rule != null }.thenByDescending { it.item.size })
+      chipList.sortWith { a, b ->
+        val ruleCompare = (b.rule != null).compareTo(a.rule != null)
+        if (ruleCompare != 0) ruleCompare else b.item.size.compareTo(a.item.size)
+      }
     }
     chipList
   }
@@ -327,8 +330,10 @@ class DetailContentResolver(
     val parsedIntentFiltersByClassName = packageInfo.applicationInfo?.sourceDir
       ?.let { sourceDir ->
         IntentFilterUtils.parseComponentsFromApk(sourceDir)
-          .asSequence()
-          .associate { item -> item.className to item.intentFilters }
+          .associateBy(
+            keySelector = { it.className },
+            valueTransform = { it.intentFilters }
+          )
       }
       .orEmpty()
 
@@ -489,15 +494,15 @@ class DetailContentResolver(
       return emptyList()
     }
 
-    return items.map {
+    val chipList = items.mapTo(ArrayList(items.size)) {
       LibStringItemChip(it, RulesRepository.getRule(it.name, DEX, true))
-    }.sortedWith(
-      if (sortBySizeMode) {
-        compareByDescending { it.item.name }
-      } else {
-        compareByDescending { it.rule != null }
-      }
-    )
+    }
+    if (sortBySizeMode) {
+      chipList.sortByDescending { it.item.name }
+    } else {
+      chipList.sortWith { a, b -> (b.rule != null).compareTo(a.rule != null) }
+    }
+    return chipList
   }
 
   fun getMetadataChips(
@@ -637,15 +642,15 @@ class DetailContentResolver(
       return emptyList()
     }
 
-    return items.map {
+    val chipList = items.mapTo(ArrayList(items.size)) {
       LibStringItemChip(it, RulesRepository.getRule(it.name, STATIC, false))
-    }.sortedWith(
-      if (sortBySizeMode) {
-        compareByDescending { it.item.name }
-      } else {
-        compareByDescending { it.rule != null }
-      }
-    )
+    }
+    if (sortBySizeMode) {
+      chipList.sortByDescending { it.item.name }
+    } else {
+      chipList.sortWith { a, b -> (b.rule != null).compareTo(a.rule != null) }
+    }
+    return chipList
   }
 
   suspend fun getStaticLibraryTabItems(

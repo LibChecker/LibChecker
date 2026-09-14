@@ -39,7 +39,7 @@ import com.absinthe.libchecker.utils.extensions.getVersionString
 import com.absinthe.libchecker.utils.extensions.sizeToString
 import dev.rikka.tools.refine.Refine
 import java.io.File
-import java.text.SimpleDateFormat
+import java.text.DateFormat
 import java.util.Properties
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -324,11 +324,17 @@ class DetailAppInfoResolver(
     )
   }
 
+  private val installedTimeDateFormat = object : ThreadLocal<DateFormat>() {
+    override fun initialValue(): DateFormat {
+      return DateFormat.getDateTimeInstance()
+    }
+  }
+
   private fun Long.toInstalledTimeText(): String {
     return if (this <= PREINSTALLED_TIMESTAMP) {
       context.getString(R.string.snapshot_preinstalled_app)
     } else {
-      SimpleDateFormat.getDateTimeInstance().format(this)
+      (installedTimeDateFormat.get() ?: DateFormat.getDateTimeInstance()).format(this)
     }
   }
 
