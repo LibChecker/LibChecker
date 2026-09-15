@@ -128,17 +128,11 @@ class DetailItemResolver(
     }.getOrNull()
   }
 
-  private val repoUpdatedDateFormat = object : ThreadLocal<SimpleDateFormat>() {
-    override fun initialValue(): SimpleDateFormat {
-      return SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-    }
-  }
-
   private suspend fun getRepoUpdatedTime(owner: String, repo: String): String? {
     val pushedAt = DateUtils.parseIso8601DateTime(
       libraryDetailRepository.getRepoPushedAt(owner, repo) ?: return null
     ) ?: return null
-    return (repoUpdatedDateFormat.get() ?: SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())).format(pushedAt)
+    return SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(pushedAt)
   }
 
   private fun Int.toCategoryDir(isRegex: Boolean): String {

@@ -44,6 +44,38 @@ class BlurRenderingInstrumentedTest {
   private val instrumentation = InstrumentationRegistry.getInstrumentation()
 
   @Test
+  fun blurredFloatingNavigationCanReturnToAttachedIndicator() = withActivity { activity ->
+    val nav = activity.findViewById<NavigationBarView>(R.id.nav_view)
+    instrumentation.runOnMainSync {
+      nav.selectedItemId = R.id.navigation_settings
+      activity.setBlurDesignEnabled(true)
+      activity.setFloatingNavBarEnabled(true)
+    }
+    SystemClock.sleep(1000)
+    instrumentation.runOnMainSync {
+      assertEquals(1f, (nav as FloatingNavigationBar).currentFloatingProgress)
+      activity.setFloatingNavBarEnabled(false)
+    }
+    SystemClock.sleep(1000)
+    val indicatorBounds = Rect()
+    var indicatorColor = Color.TRANSPARENT
+    instrumentation.runOnMainSync {
+      assertEquals(0f, (nav as FloatingNavigationBar).currentFloatingProgress)
+      val indicator = nav.findViewById<View>(nav.selectedItemId)
+        .findViewById<View>(com.google.android.material.R.id.navigation_bar_item_active_indicator_view)
+      assertTrue(indicator.getGlobalVisibleRect(indicatorBounds))
+      indicatorColor = requireNotNull(nav.itemActiveIndicatorColor).defaultColor
+    }
+    val screenshot = checkNotNull(instrumentation.uiAutomation.takeScreenshot())
+    try {
+      // Sample the solid fill above the icon, away from rounded edges.
+      assertEquals(indicatorColor, screenshot.getPixel(indicatorBounds.centerX(), indicatorBounds.top + 3))
+    } finally {
+      screenshot.recycle()
+    }
+  }
+
+  @Test
   fun floatingNavigationCastsShadowWithAndWithoutBlur() = withActivity { activity ->
     val originalFloating = GlobalValues.isFloatingNavBar
     try {

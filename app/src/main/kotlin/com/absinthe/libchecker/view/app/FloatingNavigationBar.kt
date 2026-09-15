@@ -53,6 +53,7 @@ internal class FloatingNavigationThumbController(
   private var thumbScaleAnimator: ValueAnimator? = null
   private var pendingIndex = 0
   private var floatingProgress = 0f
+  private var blurProgress = 0f
   private var normalIndicatorLeft = Float.NaN
   private var normalIndicatorTop = Float.NaN
   private var normalIndicatorWidth = 0f
@@ -77,6 +78,7 @@ internal class FloatingNavigationThumbController(
   override fun setFloatingProgress(progress: Float) {
     val clampedProgress = progress.coerceIn(0f, 1f)
     floatingProgress = clampedProgress
+    updateThumbAlpha()
     if (clampedProgress > 0f) {
       if (thumbView.visibility != View.VISIBLE) {
         thumbView.visibility = View.VISIBLE
@@ -96,7 +98,12 @@ internal class FloatingNavigationThumbController(
   }
 
   override fun setBlurProgress(progress: Float) {
-    thumbDrawable.setAlpha((255f - 55f * progress.coerceIn(0f, 1f)).roundToInt())
+    blurProgress = progress.coerceIn(0f, 1f)
+    updateThumbAlpha()
+  }
+
+  private fun updateThumbAlpha() {
+    thumbDrawable.setAlpha((255f - 55f * blurProgress * floatingProgress).roundToInt())
   }
 
   override fun suppressDragUntilRelease() {

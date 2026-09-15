@@ -14,6 +14,7 @@ import com.absinthe.libchecker.utils.extensions.isArchivedPackage
 import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libchecker.utils.toJson
 import java.io.IOException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
 import timber.log.Timber
@@ -77,7 +78,14 @@ class CompareSnapshotWithInstalledAppsUseCase(
       }
     }
 
-    val storedDiffMap = snapshotRepository.getSnapshotDiffs().associateByTo(HashMap(currentMap.size)) { it.packageName }
+    val storedDiffMap = try {
+      snapshotRepository.getSnapshotDiffs().associateBy { it.packageName }
+    } catch (e: CancellationException) {
+      throw e
+    } catch (e: Exception) {
+      Timber.w(e, "Failed to read snapshot diff cache")
+      emptyMap()
+    }
     val pendingDiffStoreItems = mutableListOf<SnapshotDiffStoringItem>()
 
     for ((_, snapshotItem) in previousMap) {
@@ -104,7 +112,13 @@ class CompareSnapshotWithInstalledAppsUseCase(
     }
 
     if (pendingDiffStoreItems.isNotEmpty()) {
-      snapshotRepository.insertSnapshotDiffs(pendingDiffStoreItems)
+      try {
+        snapshotRepository.insertSnapshotDiffs(pendingDiffStoreItems)
+      } catch (e: CancellationException) {
+        throw e
+      } catch (e: Exception) {
+        Timber.w(e, "Failed to write snapshot diff cache")
+      }
     }
 
     return diffList

@@ -15,7 +15,7 @@
   <string name="jetpack_compose" translatable="false">Jetpack Compose</string>
   <string name="jetpack_compose_short" translatable="false">Compose</string>
   <string name="jetbrain_kmp" translatable="false">Compose Multiplatform</string>
- 
+
   <string name="lib_reference_demo_example_suffix" translatable="false">(Example)</string>
 
   <plurals name="snapshot_dex_classes_count" translatable="false">

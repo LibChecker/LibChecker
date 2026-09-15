@@ -9,6 +9,13 @@ import org.junit.Test
 
 class BuildAndroidVersionLabelDisplayDataUseCaseTest {
 
+  @Test
+  fun `builds label from the initialized Android version catalog`() {
+    val node = AndroidVersions.versions.single { it.version == 35 }
+    assertEquals("15", AndroidVersions.simpleVersions[35])
+    assertEquals("Vanilla Ice Cream, 15, 2024-01", useCase(node)?.text)
+  }
+
   private val useCase = BuildAndroidVersionLabelDisplayDataUseCase(
     sdkInt = 35,
     formatReleaseDate = { "2024-01" }

@@ -51,9 +51,8 @@ object AndroidVersions {
     it.version to it.versionName.takeWhile { c -> c != ' ' }
   }
 
-  private val calendar by lazy { Calendar.getInstance() }
-
   private fun getDate(year: Int, month: Int): Date {
+    val calendar = Calendar.getInstance()
     calendar.clear()
     calendar.set(year, month - 1, 1)
     return calendar.time

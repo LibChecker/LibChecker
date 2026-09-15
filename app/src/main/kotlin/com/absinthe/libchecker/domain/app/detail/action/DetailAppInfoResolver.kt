@@ -324,17 +324,11 @@ class DetailAppInfoResolver(
     )
   }
 
-  private val installedTimeDateFormat = object : ThreadLocal<DateFormat>() {
-    override fun initialValue(): DateFormat {
-      return DateFormat.getDateTimeInstance()
-    }
-  }
-
   private fun Long.toInstalledTimeText(): String {
     return if (this <= PREINSTALLED_TIMESTAMP) {
       context.getString(R.string.snapshot_preinstalled_app)
     } else {
-      (installedTimeDateFormat.get() ?: DateFormat.getDateTimeInstance()).format(this)
+      DateFormat.getDateTimeInstance().format(this)
     }
   }
 

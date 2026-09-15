@@ -35,7 +35,7 @@
     <item name="android:windowNoTitle">true</item>
     <item name="windowActionBar">false</item>
     <item name="windowNoTitle">true</item>
- 
+
     <item name="chipStyle">@style/App.LibChip.Material3</item>
   </style>
 

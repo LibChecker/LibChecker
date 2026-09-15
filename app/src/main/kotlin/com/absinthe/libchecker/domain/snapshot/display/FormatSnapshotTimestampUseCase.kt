@@ -6,14 +6,8 @@ import java.util.Locale
 
 class FormatSnapshotTimestampUseCase {
 
-  private val dateFormat = object : ThreadLocal<SimpleDateFormat>() {
-    override fun initialValue(): SimpleDateFormat {
-      return SimpleDateFormat(DISPLAY_PATTERN, Locale.getDefault())
-    }
-  }
-
   operator fun invoke(timestamp: Long): String {
-    val formatter = dateFormat.get() ?: SimpleDateFormat(DISPLAY_PATTERN, Locale.getDefault())
+    val formatter = SimpleDateFormat(DISPLAY_PATTERN, Locale.getDefault())
     return formatter.format(Date(timestamp))
   }
 

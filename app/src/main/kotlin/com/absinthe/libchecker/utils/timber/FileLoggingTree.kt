@@ -36,7 +36,7 @@ class FileLoggingTree(context: Context) : Timber.DebugTree() {
   }
 
   override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-    val formatter = logDateFormat.get() ?: SimpleDateFormat(LOG_DATE_PATTERN, Locale.getDefault())
+    val formatter = SimpleDateFormat(LOG_DATE_PATTERN, Locale.getDefault())
     val logTimeStamp = formatter.format(Date())
     val priorityChar = when (priority) {
       Log.VERBOSE -> "V"
@@ -67,10 +67,5 @@ class FileLoggingTree(context: Context) : Timber.DebugTree() {
 
   private companion object {
     private const val LOG_DATE_PATTERN = "yyyy-MM-dd HH:mm:ss.SSS"
-    private val logDateFormat = object : ThreadLocal<SimpleDateFormat>() {
-      override fun initialValue(): SimpleDateFormat {
-        return SimpleDateFormat(LOG_DATE_PATTERN, Locale.getDefault())
-      }
-    }
   }
 }
