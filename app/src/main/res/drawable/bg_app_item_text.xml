@@ -4,10 +4,6 @@
 
   <solid android:color="?attr/colorOnSurface" />
 
-  <corners
-    android:bottomLeftRadius="2dp"
-    android:bottomRightRadius="2dp"
-    android:topLeftRadius="2dp"
-    android:topRightRadius="2dp" />
+  <corners android:radius="2dp" />
 
 </shape>

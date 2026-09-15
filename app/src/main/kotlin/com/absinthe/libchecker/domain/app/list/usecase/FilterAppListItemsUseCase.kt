@@ -53,15 +53,18 @@ class FilterAppListItemsUseCase(
     return filterSequence.toMutableList().apply {
       when {
         (request.options and AdvancedOptions.SORT_BY_NAME) > 0 -> {
-          sortWith(compareBy({ it.abi }, { it.label }))
+          sortWith { a, b ->
+            val abiCompare = a.abi.compareTo(b.abi)
+            if (abiCompare != 0) abiCompare else a.label.compareTo(b.label)
+          }
         }
 
         (request.options and AdvancedOptions.SORT_BY_UPDATE_TIME) > 0 -> {
-          sortByDescending { it.lastUpdatedTime }
+          sortWith { a, b -> b.lastUpdatedTime.compareTo(a.lastUpdatedTime) }
         }
 
         (request.options and AdvancedOptions.SORT_BY_TARGET_API) > 0 -> {
-          sortByDescending { it.targetApi }
+          sortWith { a, b -> b.targetApi.compareTo(a.targetApi) }
         }
       }
     }

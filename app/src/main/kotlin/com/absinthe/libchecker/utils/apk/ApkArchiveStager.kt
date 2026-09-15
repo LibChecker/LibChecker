@@ -36,7 +36,8 @@ internal object ApkArchiveStager {
       }
       entry to safeName
     }
-    require(normalized.map { it.second }.distinct().size == normalized.size) {
+    val uniqueNames = HashSet<String>(normalized.size)
+    require(normalized.all { uniqueNames.add(it.second) }) {
       "Archive contains duplicate APK filenames"
     }
     require(normalized.all { (entry, _) -> entry.size in -1..MAX_ENTRY_BYTES }) {

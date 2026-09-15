@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<path>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
   <external-cache-path
     name="lc_temp_icon.png"
     path="." />
   <cache-path name="logs" path="." />
-</path>
+</paths>

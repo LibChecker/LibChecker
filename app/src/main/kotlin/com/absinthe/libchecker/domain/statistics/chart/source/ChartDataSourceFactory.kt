@@ -49,7 +49,7 @@ internal class ChartDataSourceFactory(
         ChartDataSourcePlan.Pie(
           BinaryStatisticChartDataSource(items, facets.matchedTitle, facets.unmatchedTitle, statistic.icon) { context, sourceItems, progress ->
             chartDataProvider.buildFacetStatisticData(sourceItems, facets, progress)?.let { data ->
-              val titles = facets.items.associate { it.id to it.summaryTitle.resolve(context) }
+              val titles = facets.items.associateBy(keySelector = { it.id }, valueTransform = { it.summaryTitle.resolve(context) })
               BinaryStatisticChartData(
                 data.matched,
                 data.unmatched,

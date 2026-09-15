@@ -17,10 +17,12 @@ interface SnapshotRepository {
   suspend fun getSnapshotSummaries(timestamp: Long): List<SnapshotItem>
   suspend fun getSnapshot(timestamp: Long, packageName: String): SnapshotItem?
   suspend fun getSnapshotDiff(packageName: String): SnapshotDiffStoringItem?
+  suspend fun getSnapshotDiffs(): List<SnapshotDiffStoringItem>
   suspend fun getTrackItems(): List<TrackItem>
   suspend fun insertSnapshots(items: List<SnapshotItem>)
   suspend fun insertTimeStamp(item: TimeStampItem)
   suspend fun insertSnapshotDiff(item: SnapshotDiffStoringItem)
+  suspend fun insertSnapshotDiffs(items: List<SnapshotDiffStoringItem>)
   suspend fun insertTrackItem(item: TrackItem)
   suspend fun updateTimeStamp(item: TimeStampItem)
   suspend fun deleteSnapshotsAndTimeStamp(timestamp: Long)

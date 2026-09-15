@@ -27,16 +27,12 @@
   <string name="uncharted_territory">Unerforschtes Gebiet</string>
   <string name="get_app_list_denied_tip">Bitte erteilen Sie\n\"Informationen über installierte Apps\"\nBerechtigung für LibChecker</string>
   <string name="advanced_menu">Erweitertes Menü</string>
-  <string name="archived_app">Archivierte App</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">Apps mit %s ABI</string>
   <string name="title_statistics_dialog_no_native_libs">Apps ohne native Bibliotheken</string>
   <string name="tab_chart">Diagramm</string>
   <string name="tab_lib_reference_statistics">Bibliotheken Referenz</string>
   <string name="not_marked_lib">Nicht markierte Bibliothek</string>
-  <string name="submenu_title_component">Komponente</string>
-  <string name="submenu_title_manifest">Manifest</string>
-  <string name="ref_category_all">Alle</string>
   <string name="ref_category_native">Native Bibliotheken</string>
   <string name="ref_category_service">Services</string>
   <string name="ref_category_activity">Activities</string>
@@ -76,12 +72,10 @@
   <string name="settings_github_token">GitHub-Zugangsschlüssel</string>
   <string name="settings_github_token_dialog_title">GitHub-Zugangsschlüssel</string>
   <string name="about_info">Diese App wird verwendet, um die von Anwendungen auf Ihrem Gerät verwendeten Bibliotheken von Drittanbietern anzuzeigen.</string>
-  <string name="toolbar_rate">Bewerten sie diese App</string>
   <string name="resource_declaration">Ein Teil der Ressourcen in der Anwendung stammt aus: </string>
   <string name="library_declaration">Alle in LibChecker markierten Bibliotheksinformationen stammen aus der Entwicklungsdokumentation oder dem Code Repository des SDK, zu dem es gehört. Wenn die Informationen falsch sind, kontaktieren Sie bitte die folgende E-Mail-Adresse: absinthe@absinthe.life</string>
   <!--  Settings  -->
   <string name="pref_group_normal">Normal</string>
-  <string name="pref_group_others">Sonstige</string>
   <string name="apk_analytics">APK-Analyse</string>
   <string name="colorful_icon">Buntes Icon</string>
   <string name="rules_repo_title">Regelrepo</string>
@@ -106,9 +100,7 @@
   <string name="cloud_rules_summary">Aktualisieren Sie hier die neuesten markierten Bibliotheksregeln</string>
   <string name="array_dark_mode_off">Aus</string>
   <string name="array_dark_mode_on">An</string>
-  <string name="array_dark_mode_auto">Auto</string>
   <string name="array_dark_mode_system">Systemstandard</string>
-  <string name="array_dark_mode_battery">Vom Energiesparmodus festgelegt</string>
   <string name="array_snapshot_default">Benachrichtigen</string>
   <string name="array_snapshot_keep">Behalten</string>
   <string name="array_snapshot_discard">Verwerfen</string>
@@ -117,7 +109,6 @@
   <string name="detail_label">App-Details anzeigen</string>
   <string name="not_found">Nicht gefunden</string>
   <string name="create_an_issue">Helfen Sie uns, die Informationen zu ergänzen</string>
-  <string name="app_bundle_details">Das Android App Bundle ist das neue, offizielle Veröffentlichungsformat von Android, das eine effizientere Möglichkeit bietet, Ihre App zu erstellen und zu veröffentlichen. Das Android App Bundle ermöglicht es Ihnen, eine großartige Nutzererfahrung mit einer kleineren App-Größe bereitzustellen, was den Installationserfolg verbessern und Deinstallationen verringern kann. Der Wechsel ist einfach. Sie müssen Ihren Code nicht umstrukturieren, um von einer kleineren App zu profitieren. Und nach dem Wechsel profitieren Sie von modularer App-Entwicklung und anpassbarer Feature-Auslieferung.</string>
   <string name="kotlin_details">Kotlin ist eine quelloffene, statisch typisierte Programmiersprache, die auf die JVM, Android, JavaScript, Wasm und Native abzielt. Sie wurde von JetBrains entwickelt. Kotlin ist eine moderne, aber bereits ausgereifte Programmiersprache, die Entwicklern mehr Freude am Programmieren bereiten soll. Sie ist prägnant, sicher, interoperabel mit Java und anderen Sprachen und bietet viele Möglichkeiten zur Wiederverwendung von Code zwischen mehreren Plattformen für produktives Programmieren.</string>
   <string name="items_count">Elementanzahl: </string>
   <string name="further_operation">Weitere Aktionen</string>
@@ -134,7 +125,6 @@
   <string name="jetpack_compose_details">Jetpack Compose ist das moderne Toolkit von Android zur Erstellung nativer Benutzeroberflächen. Es vereinfacht und beschleunigt die UI-Entwicklung unter Android. Bringen Sie Ihre App schnell zum Leben – mit weniger Code, leistungsstarken Tools und intuitiven Kotlin-APIs.</string>
   <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform ist ein modernes, deklaratives und reaktives UI-Framework, das von JetBrains entwickelt wurde und eine einfache Möglichkeit bietet, Benutzeroberflächen mit wenig Kotlin-Code zu erstellen. Es ermöglicht außerdem, die UI einmal zu schreiben und auf allen unterstützten Plattformen auszuführen – iOS, Android, Desktop (Windows, macOS, Linux) und Web.</string>
   <string name="multi_arch_dialog_details"><![CDATA[Wenn eine App eine API für andere Apps bereitstellt, die entweder 32- oder 64-Bit sein kann, muss im Manifest der App die Eigenschaft <b>android:multiarch</b> auf „true“ gesetzt werden, um mögliche Fehler zu vermeiden.]]></string>
-  <string name="extract_native_libs_tip">Die App deklariert </string>
   <string name="xml_detail">XML-Details</string>
   <string name="lib_detail_dialog_title_16kb_page_size">16-KB-Seitengrößen-Unterstützung</string>
   <string name="lib_detail_dialog_content_16kb_page_size">.</string>
@@ -145,9 +135,6 @@
   <string name="menu_split">Teilen</string>
   <string name="alternative_launch_method">Alternative Startmethode</string>
   <string name="compare_with_current">Mit aktuellem Paket vergleichen</string>
-  <string name="rx_detail">.</string>
-  <string name="rx_android_detail">Reactive Extensions für Android</string>
-  <string name="rx_kotlin_detail">Kotlin-Erweiterungen für RxJava</string>
   <string name="permission_not_granted">Nicht gewährt</string>
   <string name="signature_detail">Signaturdetails</string>
   <string name="signature_scheme_version">Signaturschema</string>
@@ -186,12 +173,6 @@
   <string name="lib_detail_app_install_source_empty">Unbekannt</string>
   <string name="lib_detail_app_install_source_empty_detail">Shell- oder deinstallierte App</string>
   <string name="lib_detail_app_install_source_shizuku_usage">Da Android die API zum Abrufen des Installationsantragstellers einschränkt, verwenden wir Shizuku, um den Installationsantragsteller zu ermitteln.</string>
-  <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizuku nicht installiert</string>
-  <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">Hier klicken, um Shizuku zu installieren</string>
-  <string name="lib_detail_app_install_source_shizuku_low_version">Benötigt Shizuku API 10</string>
-  <string name="lib_detail_app_install_source_shizuku_low_version_detail">Hier klicken, um Shizuku zu aktualisieren</string>
-  <string name="lib_detail_app_install_source_shizuku_not_running">Shizuku läuft nicht</string>
-  <string name="lib_detail_app_install_source_shizuku_not_running_detail">Hier klicken, um zu Shizuku zu wechseln und es zu starten</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku nicht autorisiert</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">Hier klicken für Shizuku-Autorisierung für den Installationsanforderer</string>
   <string name="lib_detail_elf_info">Mehr Infos</string>
@@ -199,12 +180,10 @@
   <string name="lib_detail_entry_points_tip">Einstiegspunkte</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">In die Zwischenablage kopiert</string>
-  <string name="toast_not_existing_market">Kein App-Store vorhanden</string>
   <string name="toast_use_another_file_manager">Bitte verwenden Sie einen anderen Dateimanager, um die APK zu öffnen</string>
   <string name="toast_cant_open_app">Diese App kann nicht geöffnet werden</string>
   <string name="toast_cloud_rules_update_error">Cloud-Regeln konnten nicht aktualisiert werden. Bitte versuchen Sie es erneut.</string>
   <string name="toast_not_enough_storage_space">Nicht genügend Speicherplatz</string>
-  <string name="toast_downloading_app">Download angefordert</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">Aktuellen Schnappschuss speichern</string>
   <string name="snapshot_current_timestamp">Zeitstempel des aktuellen Schnappschusses</string>
@@ -218,7 +197,6 @@
   <string name="snapshot_no_snapshot">Kein Schnappschuss</string>
   <string name="snapshot_detail_new_install_title">Diese App wurde neu installiert</string>
   <string name="snapshot_detail_deleted_title">Diese App wurde entfernt</string>
-  <string name="snapshot_time_node_uninitialized">Nicht initialisiert</string>
   <string name="snapshot_preinstalled_app">Vorinstallierte App</string>
   <string name="snapshot_generate_text_report">Textbericht generieren</string>
   <string name="snapshot_scheme_tip"><![CDATA[Tipp: Sie können jetzt Schnappschüsse im Hintergrund erstellen über:<br><b>%s</b>]]></string>
@@ -237,7 +215,6 @@
   <string name="dialog_title_compare_diff_apk">Achtung</string>
   <string name="dialog_message_compare_diff_apk">Möchten Sie zwei unterschiedliche APKs vergleichen?</string>
   <!--  Album  -->
-  <string name="album_compare">Vergleichen</string>
   <string name="album_item_comparison_title">Vergleich</string>
   <string name="album_item_comparison_subtitle">Mit zwei Schnappschüssen vergleichen</string>
   <string name="album_item_comparison_invalid_compare">Ungültiger Vergleich</string>
@@ -255,11 +232,7 @@
   <string name="album_backup">Sicherung</string>
   <string name="album_backup_summary">Alle Schnappschüsse sichern</string>
   <string name="album_restore">Wiederherstellen</string>
-  <string name="album_restore_summary">Schnappschüsse aus der Sicherungsdatei wiederherstellen</string>
-  <string name="album_restore_detail">%1$s: %2$s Elemente insgesamt\n</string>
   <string name="album_click_to_choose">Zum Auswählen klicken</string>
-  <string name="album_dialog_delete_snapshot_message">Verarbeitung…</string>
-  <string name="album_snapshot_top_apps_not_initialized">Noch nicht geladen</string>
   <!--  Integration  -->
   <string name="integration_monkey_king_menu_block">Über „MonkeyKing Purify“ blockieren</string>
   <string name="integration_monkey_king_menu_unblock">Über „MonkeyKing Purify“ entsperren</string>

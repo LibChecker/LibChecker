@@ -260,10 +260,7 @@ class BuildPageSize16KBChartDataUseCase(
   private fun checkNativeLibraryDir16KBAlignment(packageInfo: PackageInfo, checkCancellation: () -> Unit): Boolean {
     return traceSection(TRACE_NATIVE_DIR) {
       val nativePath = packageInfo.applicationInfo?.nativeLibraryDir ?: return@traceSection false
-      val nativeLibs = File(nativePath).listFiles()
-        ?.asSequence()
-        ?.filter { it.isFile && it.extension == "so" }
-        ?.distinctBy { it.name }
+      val nativeLibs = File(nativePath).listFiles { file -> file.isFile && file.name.endsWith(".so") }
         ?: return@traceSection false
 
       var hasNativeLibs = false

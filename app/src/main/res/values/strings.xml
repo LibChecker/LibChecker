@@ -49,7 +49,6 @@
   <string name="uncharted_territory">Uncharted territory</string>
   <string name="get_app_list_denied_tip">Please grant\n"Get info about installed apps"\npermission to LibChecker</string>
   <string name="advanced_menu">Advanced menu</string>
-  <string name="archived_app">Archived app</string>
   <string name="snapshot_version_archived">Archived</string>
   <string name="toast_archived_app_detail_unavailable">Restore this archived app before viewing its details.</string>
 
@@ -59,10 +58,6 @@
   <string name="tab_chart">Chart</string>
   <string name="tab_lib_reference_statistics">Lib Reference</string>
   <string name="not_marked_lib">Unmarked library</string>
-
-  <string name="submenu_title_component">Component</string>
-  <string name="submenu_title_manifest">Manifest</string>
-  <string name="ref_category_all">All</string>
   <string name="ref_category_native">Native libraries</string>
   <string name="ref_category_service">Services</string>
   <string name="ref_category_activity">Activities</string>
@@ -112,14 +107,12 @@
   <string name="settings_github_token_dialog_hint">Personal access token</string>
   <string name="settings_github_token_clear">Clear</string>
   <string name="about_info">This app is used to view the third-party libraries used by applications in your device.</string>
-  <string name="toolbar_rate">Rate</string>
   <string name="resource_declaration">Part of the resources in the application comes from: </string>
   <string name="library_declaration">All marked libraries information in LibChecker comes from the development documentation or code repository of the SDK to which it belongs. If the information is incorrect, please contact: absinthe@absinthe.life</string>
 
   <!--  Settings  -->
   <string name="pref_group_normal">Normal</string>
   <string name="pref_group_appearance">Appearance</string>
-  <string name="pref_group_others">Others</string>
   <string name="pref_group_rules">Rules and network</string>
   <string name="pref_group_data">Data and tools</string>
   <string name="pref_group_about">About and support</string>
@@ -157,9 +150,7 @@
 
   <string name="array_dark_mode_off">Off</string>
   <string name="array_dark_mode_on">On</string>
-  <string name="array_dark_mode_auto">Auto</string>
   <string name="array_dark_mode_system">System default</string>
-  <string name="array_dark_mode_battery">Set by battery saver</string>
 
   <string name="array_snapshot_default">Notify</string>
   <string name="array_snapshot_keep">Keep</string>
@@ -170,7 +161,6 @@
   <string name="detail_label">View app details</string>
   <string name="not_found">Not found</string>
   <string name="create_an_issue">Help us supplement the information</string>
-  <string name="app_bundle_details">An Android App Bundle is a publishing format that includes all your app\'s compiled code and resources, and defers APK generation and signing to Google Play.\nGoogle Play uses your app bundle to generate and serve optimized APKs for each device configuration, so only the code and resources that are needed for a specific device are downloaded to run your app. You no longer have to build, sign, and manage multiple APKs to optimize support for different devices, and users get smaller, more-optimized downloads.</string>
   <string name="kotlin_details">Kotlin is an open source statically typed programming language that targets the JVM, Android, JavaScript, Wasm, and Native. It\'s developed by JetBrains. Kotlin is a modern but already mature programming language designed to make developers happier. It\'s concise, safe, interoperable with Java and other languages, and provides many ways to reuse code between multiple platforms for productive programming.</string>
   <string name="items_count">Items count: </string>
   <string name="further_operation">Further operation</string>
@@ -197,7 +187,6 @@
   <string name="jetpack_compose_details">Jetpack Compose is Android’s modern toolkit for building native UI. It simplifies and accelerates UI development on Android. Quickly bring your app to life with less code, powerful tools, and intuitive Kotlin APIs.</string>
   <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform is a modern declarative and reactive UI framework developed by JetBrains that provides a simple way to build user interfaces with a small amount of Kotlin code. It also allows you to write your UI once and run it on any of the supported platforms – iOS, Android, desktop (Windows, macOS, Linux), and web.</string>
   <string name="multi_arch_dialog_details"><![CDATA[If an app exposes an API to other apps that can be either 32-bit or 64-bit, the app must have the <b>android:multiarch</b> property set to true within its manifest to avoid potential errors.]]></string>
-  <string name="extract_native_libs_tip">The app declares </string>
   <string name="xml_detail">XML Detail</string>
   <string name="lib_detail_dialog_title_16kb_page_size">16 KB page size support</string>
   <string name="lib_detail_dialog_content_16kb_page_size">Historically, Android has only supported 4 KB memory page sizes, which has optimized system memory performance for the average amount of total memory that Android devices have typically had. Beginning with Android 15, AOSP supports devices that are configured to use a page size of 16 KB (16 KB devices). If your app uses any NDK libraries, either directly or indirectly through an SDK, then you will need to rebuild your app for it to work on these 16 KB devices.</string>
@@ -208,9 +197,6 @@
   <string name="menu_split">Split</string>
   <string name="alternative_launch_method">Alternative launch method</string>
   <string name="compare_with_current">Compare with current package</string>
-  <string name="rx_detail">RxJava is a Java VM implementation of Reactive Extensions: a library for composing asynchronous and event-based programs by using observable sequences.</string>
-  <string name="rx_android_detail">Reactive Extensions for Android</string>
-  <string name="rx_kotlin_detail">Kotlin Extensions for RxJava</string>
   <string name="permission_not_granted">Not granted</string>
   <string name="signature_detail">Signature detail</string>
   <string name="signature_scheme_version">Signature scheme</string>
@@ -253,12 +239,6 @@
   <string name="lib_detail_app_install_source_empty">Unknown</string>
   <string name="lib_detail_app_install_source_empty_detail">Shell or uninstalled app</string>
   <string name="lib_detail_app_install_source_shizuku_usage">Android only provides the installation requester to apps with install privileges, so Shizuku is required</string>
-  <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizuku not installed</string>
-  <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">Click here to install Shizuku</string>
-  <string name="lib_detail_app_install_source_shizuku_low_version">Requires Shizuku API 10</string>
-  <string name="lib_detail_app_install_source_shizuku_low_version_detail">Click here to update Shizuku</string>
-  <string name="lib_detail_app_install_source_shizuku_not_running">Shizuku not running</string>
-  <string name="lib_detail_app_install_source_shizuku_not_running_detail">Click here to jump to Shizuku to start it</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku not authorized</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">Click here for Shizuku authorization for installation requester</string>
   <string name="lib_detail_app_install_source_shizuku_unavailable">Shizuku service unavailable</string>
@@ -291,12 +271,10 @@
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Copied to clipboard</string>
   <string name="snapshot_report_share_failed">Failed to share snapshot report</string>
-  <string name="toast_not_existing_market">No app store was found</string>
   <string name="toast_use_another_file_manager">Please use another file manager to open the APK</string>
   <string name="toast_cant_open_app">Can\'t open this app</string>
   <string name="toast_cloud_rules_update_error">Failed to update cloud rules. Please try again</string>
   <string name="toast_not_enough_storage_space">Not enough storage space</string>
-  <string name="toast_downloading_app">Download requested</string>
   <string name="toast_app_update_started">Preparing update</string>
   <string name="toast_app_update_installed">Update complete</string>
   <string name="toast_app_update_unsupported">In-app updates aren’t available on this device</string>
@@ -315,7 +293,6 @@
   <string name="snapshot_content_changed">Content changed</string>
   <string name="snapshot_indicator_moved">Moved</string>
   <string name="snapshot_detail_size_label">Size</string>
-  <string name="snapshot_detail_changes_label">Changes:</string>
   <string name="snapshot_detail_metric_description">%1$s, %2$s</string>
   <plurals name="snapshot_detail_changes_count">
     <item quantity="one">%d change</item>
@@ -325,7 +302,6 @@
   <string name="snapshot_no_snapshot">No Snapshot</string>
   <string name="snapshot_detail_new_install_title">This app has newly installed</string>
   <string name="snapshot_detail_deleted_title">This app has been removed</string>
-  <string name="snapshot_time_node_uninitialized">Uninitialized</string>
   <string name="snapshot_time_node_current">Current</string>
   <plurals name="snapshot_time_node_apps_count">
     <item quantity="one">%d app</item>
@@ -356,7 +332,6 @@
   <string name="dialog_themed">Themed</string>
 
   <!--  Album  -->
-  <string name="album_compare">Compare</string>
   <string name="album_item_comparison_title">Comparison</string>
   <string name="album_item_comparison_subtitle">Compare with two snapshots</string>
   <string name="album_item_comparison_invalid_compare">Invalid comparison</string>
@@ -377,15 +352,11 @@
   <string name="album_backup_detail">Backed up %1$d items</string>
   <string name="album_backup_database_detail">Database backup completed</string>
   <string name="album_restore">Restore</string>
-  <string name="album_restore_summary">Restore snapshots from a backup file</string>
   <string name="album_restore_from_file">Restore from file</string>
   <string name="album_restore_auto_detect_summary">Detect backup format automatically</string>
-  <string name="album_restore_detail">%1$s: %2$s items in total\n</string>
   <string name="album_restore_result_summary">Restored %1$d items from %2$d snapshot points</string>
   <string name="album_restore_result_item_count">%1$d items</string>
   <string name="album_click_to_choose">Click to choose</string>
-  <string name="album_dialog_delete_snapshot_message">Processing…</string>
-  <string name="album_snapshot_top_apps_not_initialized">Not loaded yet</string>
 
   <!--  Integration  -->
   <string name="integration_monkey_king_menu_block">Block it via \"MonkeyKing Purify\"</string>

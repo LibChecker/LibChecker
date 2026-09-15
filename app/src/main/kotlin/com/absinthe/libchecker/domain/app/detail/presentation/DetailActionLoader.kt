@@ -263,13 +263,17 @@ class DetailActionLoader(
   }
 
   fun buildSignatureDetailItems(detail: String): List<SignatureDetailItem> {
-    return detail.lines().map {
-      val values = it.split(":", limit = 2)
-      SignatureDetailItem(
-        values.getOrNull(0).orEmpty(),
-        values.getOrNull(1).orEmpty()
-      )
-    }
+    return detail.lineSequence().map { line ->
+      val colonIndex = line.indexOf(':')
+      if (colonIndex >= 0) {
+        SignatureDetailItem(
+          line.substring(0, colonIndex),
+          line.substring(colonIndex + 1)
+        )
+      } else {
+        SignatureDetailItem(line, "")
+      }
+    }.toList()
   }
 
   fun buildDetailReferenceNavigation(

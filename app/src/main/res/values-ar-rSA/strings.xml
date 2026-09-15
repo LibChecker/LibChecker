@@ -24,16 +24,12 @@
   <string name="uncharted_territory">منطقة مجهولة</string>
   <string name="get_app_list_denied_tip">الرجاء منح إذن \n \"الحصول على معلومات حول التطبيقات المثبتة\" \n  لـLibChecker</string>
   <string name="advanced_menu">قائمة متقدمة</string>
-  <string name="archived_app">تطبيق مؤرشف</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">التطبيقات ذات %s ABI</string>
   <string name="title_statistics_dialog_no_native_libs">تطبيقات بدون مكتبات أصلية</string>
   <string name="tab_chart">جدول</string>
   <string name="tab_lib_reference_statistics">مرجع المكتبة</string>
   <string name="not_marked_lib">مكتبة بدون علامات</string>
-  <string name="submenu_title_component">مكون</string>
-  <string name="submenu_title_manifest">Manifest</string>
-  <string name="ref_category_all">الكل</string>
   <string name="ref_category_native">المكتبات الأصلية</string>
   <string name="ref_category_service">الخدمات</string>
   <string name="ref_category_activity">الأنشطة</string>
@@ -71,12 +67,10 @@
   <string name="settings_get_updates_in_app_chip_stable">إصدار ثابت</string>
   <string name="settings_get_updates_in_app_chip_ci">CI</string>
   <string name="about_info">يستخدم هذا التطبيق لعرض مكتبات الجهات الخارجية التي تستخدمها التطبيقات في جهازك.</string>
-  <string name="toolbar_rate">تقييم</string>
   <string name="resource_declaration">جزء من الموارد في التطبيق يأتي من: </string>
   <string name="library_declaration">تأتي جميع معلومات المكتبات المميزة في LibChecker من وثائق التطوير أو مستودع التعليمات البرمجية ل SDK الذي تنتمي إليه. إذا كانت المعلومات غير صحيحة ، يرجى الاتصال بـ: absinthe@absinthe.life</string>
   <!--  Settings  -->
   <string name="pref_group_normal">عادي</string>
-  <string name="pref_group_others">الاُخْرى</string>
   <string name="apk_analytics">تحليلات APK</string>
   <string name="colorful_icon">أيقونة ملونة</string>
   <string name="rules_repo_title">مستودع القواعد</string>
@@ -106,9 +100,7 @@
   <string name="cloud_rules_summary">قم بتحديث أحدث قواعد المكتبة المميزة هنا</string>
   <string name="array_dark_mode_off">إيقاف</string>
   <string name="array_dark_mode_on">تشغيل</string>
-  <string name="array_dark_mode_auto">تلقائي</string>
   <string name="array_dark_mode_system">النظام الافتراضي</string>
-  <string name="array_dark_mode_battery">نمط توفير البطارية</string>
   <string name="array_snapshot_default">إشعار</string>
   <string name="array_snapshot_keep">حفظ</string>
   <string name="array_snapshot_discard">تجاهل</string>
@@ -117,7 +109,6 @@
   <string name="detail_label">عرض تفاصيل التطبيق</string>
   <string name="not_found">غير موجود</string>
   <string name="create_an_issue">مساعدتنا في استكمال المعلومات</string>
-  <string name="app_bundle_details">حزمة تطبيقات Android أو (Bundle) هي تنسيق النشر الرسمي الجديد لنظام Android والذي يوفر طريقة أكثر فاعلية لإنشاء تطبيقك وإصداره. تتيح لك حزمة تطبيقات Android تقديم تجربة رائعة بسهولة أكبر بحجم تطبيق أصغر، مما يمكن أن يحسن نجاح التثبيت ويقلل من عمليات إلغاء التثبيت. من السهل التبديل. لا تحتاج إلى إعادة بناء التعليمات البرمجية الخاصة بك لبدء الاستفادة من تطبيق أصغر. وبمجرد التبديل ، ستستفيد من تطوير التطبيقات المعيارية وتسليم الميزات القابلة للتخصيص.</string>
   <string name="kotlin_details">Kotlin هي لغة برمجة للأغراض العامة عبر الأنظمة الأساسية ، مكتوبة بشكل ثابت ، مع استدلال النوع. تم تصميم Kotlin للتفاعل بشكل كامل مع Java ، ويعتمد إصدار JVM من مكتبة Kotlin القياسية على مكتبة فئة Java ، لكن استدلال النوع يسمح ببناء الجملة الخاص به ليكون أكثر إيجازا أو اختصارا.</string>
   <string name="items_count">عدد العناصر: </string>
   <string name="further_operation">مزيد من العمليات</string>
@@ -136,7 +127,6 @@
   <string name="jetpack_compose_details">(Jetpack Compose) هي مجموعة أدوات Android الحديثة لبناء واجهة مستخدم أصلية. إنه يبسط ويسرع تطوير واجهة المستخدم على Android. اجعل تطبيقك ينبض بالحياة بسرعة باستخدام تعليمات برمجية أقل وأدوات قوية وواجهات برمجة تطبيقات Kotlin سهلة الاستخدام.</string>
   <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform هو إطار واجهة مستخدم حديث تفاعلي وتعبيري طورته شركة JetBrains، ويوفر طريقة بسيطة لإنشاء واجهات المستخدم بقليل من كود كوتلن. كما يسمح لك بكتابة واجهتك مرة واحدة وتشغيلها على أي من المنصات المدعومة – iOS وأندرويد وسطح المكتب (Windows, macOS, Linux) والويب.</string>
   <string name="multi_arch_dialog_details"><![CDATA[إذا كان أحد التطبيقات يوفر واجهة برمجة تطبيقات (API) لتطبيقات أخرى يمكن أن تكون 32 بت أو 64 بت، يجب تعيين الخاصية <b>android:multiarch</b> إلى true داخل ملف Manifest لتجنب حدوث أخطاء محتملة.]]></string>
-  <string name="extract_native_libs_tip">تصريح التطبيق </string>
   <string name="xml_detail">تفاصيل XML</string>
   <string name="lib_detail_dialog_title_16kb_page_size">دعم حجم الصفحة 16 كيلوبايت</string>
   <string name="lib_detail_dialog_content_16kb_page_size">تاريخياً، كان نظام أندرويد يدعم فقط أحجام صفحات الذاكرة بمقدار 4 كيلوبايت، مما أدى إلى تحسين أداء الذاكرة للنظام مع متوسط حجم الذاكرة الكلي للأجهزة غالباً. بدءاً من أندرويد 15، يدعم مشروع أندرويد مفتوح المصدر (AOSP) الأجهزة المضبوطة لاستخدام حجم صفحة 16 كيلوبايت (أجهزة 16 كيلوبايت). إذا كان تطبيقك يستخدم أية مكتبات NDK سواء بشكل مباشر أو غير مباشر من خلال حزمة SDK، عندها سوف تحتاج إلى إعادة بناء تطبيقك ليعمل على هذه الأجهزة بحجم صفحة 16 كيلوبايت.</string>
@@ -147,9 +137,6 @@
   <string name="menu_split">مقسم</string>
   <string name="alternative_launch_method">طريقة تشغيل بديلة</string>
   <string name="compare_with_current">مقارنة مع الحزمة الحالية</string>
-  <string name="rx_detail">\"RxJava\" هو تطبيق Java VM للملحقات التفاعلية: مكتبة لإنشاء برامج غير متزامنة وقائمة على الأحداث باستخدام تسلسلات يمكن ملاحظتها.</string>
-  <string name="rx_android_detail">ملحقات تفاعلية لنظام Android</string>
-  <string name="rx_kotlin_detail">ملحقات Kotlin لـRxJava</string>
   <string name="permission_not_granted">لم يتم المنح</string>
   <string name="signature_detail">تفاصيل التوقيع</string>
   <string name="signature_scheme_version">آلية التوقيع</string>
@@ -190,12 +177,6 @@
   <string name="lib_detail_app_install_source_empty">غير معروف</string>
   <string name="lib_detail_app_install_source_empty_detail">Shell أو تطبيق غير مثبت</string>
   <string name="lib_detail_app_install_source_shizuku_usage">نظرا لأن Android يقيد واجهة برمجة التطبيقات للحصول على مقدم التثبيت ، فإننا نستخدم Shizuku للحصول على طالب التثبيت.</string>
-  <string name="lib_detail_app_install_source_shizuku_uninstalled">شيزوكو غير مثبت</string>
-  <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">انقر هنا لتثبيت شيزوكو</string>
-  <string name="lib_detail_app_install_source_shizuku_low_version">يتطلب شيزوكو API 10</string>
-  <string name="lib_detail_app_install_source_shizuku_low_version_detail">انقر هنا لتحديث شيزوكو</string>
-  <string name="lib_detail_app_install_source_shizuku_not_running">شيزوكو لا يعمل</string>
-  <string name="lib_detail_app_install_source_shizuku_not_running_detail">انقر هنا للانتقال إلى شيزوكو لبدء تشغيله</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">شيزوكو غير مصرح به</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">انقر هنا للحصول على إذن Shizuku مقدم التثبيت</string>
   <string name="lib_detail_app_dexopt_title">تحسين ملفات DEX</string>
@@ -216,12 +197,10 @@
   <string name="feature_live_update_notification_summary">ويعزز النظام إشعارات التحديث المباشر. الإشعارات الترويجية تظهر بشكل أكثر بروزا على أسطح النظام، بما في ذلك في الجزء العلوي من درج الإشعارات وشاشة القفل، وكشريحة في شريط الحالة.</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">نسخ إلى الحافظة</string>
-  <string name="toast_not_existing_market">لا يوجد أي سوق تطبيقات موجود</string>
   <string name="toast_use_another_file_manager">الرجاء استخدام مدير ملفات آخر لفتح APK</string>
   <string name="toast_cant_open_app">لا يمكن فتح هذا التطبيق</string>
   <string name="toast_cloud_rules_update_error">فشل تحديث قواعد السحابة. يرجى المحاولة مرة أخرى.</string>
   <string name="toast_not_enough_storage_space">لا توجد مساحة تخزين كافية</string>
-  <string name="toast_downloading_app">تم طلب التنزيل</string>
   <string name="toast_long_tap_share_button_tip">اضغط مطولاً على زر \"مشاركة\" لاختيار مكان للحفظ</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">حفظ نقطة الاستعادة الحالية</string>
@@ -236,7 +215,6 @@
   <string name="snapshot_no_snapshot">نقطة استعادة أو Snapshot</string>
   <string name="snapshot_detail_new_install_title">تم تثبيت هذا التطبيق حديثا</string>
   <string name="snapshot_detail_deleted_title">تمت إزالة هذا التطبيق</string>
-  <string name="snapshot_time_node_uninitialized">(غير مهيأ)</string>
   <string name="snapshot_preinstalled_app">التطبيق المثبت مسبقا</string>
   <string name="snapshot_generate_text_report">إنشاء تقرير نصي</string>
   <string name="snapshot_scheme_tip"><![CDATA[نصيحة: يمكنك الآن إنشاء نقاط استعادة في الخلفية عبر:<br><b>%s</b>]]></string>
@@ -257,7 +235,6 @@
   <string name="dialog_themed_and_alternative_app_icons">أيقونات بديلة ومخصّصة</string>
   <string name="dialog_themed">السمة</string>
   <!--  Album  -->
-  <string name="album_compare">مقارنة</string>
   <string name="album_item_comparison_title">المقارنة</string>
   <string name="album_item_comparison_subtitle">مقارنة مع نقطتي الاستعادة</string>
   <string name="album_item_comparison_invalid_compare">المقارنة غير صحيحة</string>
@@ -275,11 +252,7 @@
   <string name="album_backup">النسخ الاحتياطي</string>
   <string name="album_backup_summary">إدارة جميع نقاط الاستعادة</string>
   <string name="album_restore">استعادة</string>
-  <string name="album_restore_summary">استعادة نقاط الاستعادة من ملف النسخ الاحتياطي</string>
-  <string name="album_restore_detail">%1$s: %2$s مجموع العناصر\n</string>
   <string name="album_click_to_choose">انقر للاختيار</string>
-  <string name="album_dialog_delete_snapshot_message">جارٍ المعالجة…</string>
-  <string name="album_snapshot_top_apps_not_initialized">لم يتم التحميل بعد</string>
   <!--  Integration  -->
   <string name="integration_monkey_king_menu_block">حظره عبر \"MonkeyKing Purify\"</string>
   <string name="integration_monkey_king_menu_unblock">إلغاء حظره عبر \"MonkeyKing Purify\"</string>

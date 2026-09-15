@@ -31,7 +31,6 @@ import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.utils.OsUtils
-import com.absinthe.libraries.utils.extensions.addPaddingTop
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.shape.ShapeAppearanceModel
 import com.google.android.material.shape.SuperEllipseCornerTreatment
@@ -62,7 +61,7 @@ var View.paddingTopCompat: Int
   get() = paddingTop
 
 fun View.addPaddingTop(padding: Int) {
-  addPaddingTop(padding)
+  setPadding(paddingStart, paddingTop + padding, paddingEnd, paddingBottom)
 }
 
 var View.paddingBottomCompat: Int
@@ -72,11 +71,9 @@ var View.paddingBottomCompat: Int
   get() = paddingBottom
 
 fun TextView.tintHighlightText(highlightText: String, rawText: CharSequence) {
-  text = rawText
-  if (text.contains(highlightText, true)) {
-    val builder = SpannableStringBuilder()
-    val spannableString = SpannableString(text.toString())
-    val start = text.indexOf(highlightText, 0, true)
+  val start = rawText.indexOf(highlightText, 0, true)
+  if (start >= 0) {
+    val spannableString = SpannableString(rawText)
     val color = context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary)
     spannableString.setSpan(
       ForegroundColorSpan(color),
@@ -84,8 +81,9 @@ fun TextView.tintHighlightText(highlightText: String, rawText: CharSequence) {
       start + highlightText.length,
       Spannable.SPAN_INCLUSIVE_EXCLUSIVE
     )
-    builder.append(spannableString)
-    text = builder
+    text = spannableString
+  } else {
+    text = rawText
   }
 }
 
@@ -98,17 +96,15 @@ internal fun TextView.setOrHighlightText(text: CharSequence, highlightText: Stri
 }
 
 fun TextView.tintTextToPrimary() {
-  val builder = SpannableStringBuilder()
-  val spannableString = SpannableString(text.toString())
+  val spannableString = SpannableString(text)
   val color = context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary)
   spannableString.setSpan(
     ForegroundColorSpan(color),
     0,
-    text.length,
+    spannableString.length,
     Spannable.SPAN_INCLUSIVE_EXCLUSIVE
   )
-  builder.append(spannableString)
-  text = builder
+  text = spannableString
 }
 
 fun TextView.applySingleLineEndEllipsize() {

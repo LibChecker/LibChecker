@@ -37,9 +37,9 @@ internal inline fun visitComponentSnapshotDiff(
   val movedOld = mutableSetOf<String>()
   val movedNew = mutableSetOf<String>()
   // Preserve first-short-name matching, including multiple new names matching one old name.
-  val firstRemoved = removed.reversed().associateBy { it.substringAfterLast(".") }
+  val firstRemoved = removed.reversed().associateBy { it.substringAfterLast('.') }
   for (name in added) {
-    firstRemoved[name.substringAfterLast(".")]?.let { old ->
+    firstRemoved[name.substringAfterLast('.')]?.let { old ->
       emit(MOVED, old, name)
       movedOld.add(old)
       movedNew.add(name)
@@ -47,7 +47,8 @@ internal inline fun visitComponentSnapshotDiff(
   }
   removed.removeAll(movedOld)
   added.removeAll(movedNew)
-  visitSetSnapshotDiff(removed, added, emit)
+  removed.forEach { emit(REMOVED, it, null) }
+  added.forEach { emit(ADDED, null, it) }
 }
 
 internal inline fun visitSetSnapshotDiff(
@@ -55,8 +56,16 @@ internal inline fun visitSetSnapshotDiff(
   newItems: Set<String>,
   emit: (Int, String?, String?) -> Unit
 ) {
-  (oldItems - newItems).forEach { emit(REMOVED, it, null) }
-  (newItems - oldItems).forEach { emit(ADDED, null, it) }
+  for (item in oldItems) {
+    if (item !in newItems) {
+      emit(REMOVED, item, null)
+    }
+  }
+  for (item in newItems) {
+    if (item !in oldItems) {
+      emit(ADDED, null, item)
+    }
+  }
 }
 
 internal inline fun <T : Any> visitKeyedSnapshotDiff(

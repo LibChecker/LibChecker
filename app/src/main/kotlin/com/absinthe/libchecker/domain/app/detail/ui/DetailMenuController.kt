@@ -20,7 +20,7 @@ class DetailMenuController(
   SearchView.OnQueryTextListener {
 
   override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-    menuInflater.inflate(R.menu.app_detail_menu, menu)
+    menuInflater.inflate(R.menu.common_search_menu, menu)
 
     val searchView = SearchView(context).apply {
       setIconifiedByDefault(false)

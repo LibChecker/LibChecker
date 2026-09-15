@@ -1,6 +1,6 @@
 package com.absinthe.libchecker.utils
 
-import androidx.core.os.bundleOf
+import android.os.Bundle
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
@@ -18,7 +18,18 @@ object Telemetry {
   }
 
   fun recordEvent(name: String, params: Map<String, Any>) {
-    Firebase.analytics.logEvent(name.replace(" ", "_"), bundleOf(*params.toList().toTypedArray()))
+    val bundle = Bundle()
+    params.forEach { (key, value) ->
+      when (value) {
+        is String -> bundle.putString(key, value)
+        is Int -> bundle.putInt(key, value)
+        is Long -> bundle.putLong(key, value)
+        is Double -> bundle.putDouble(key, value)
+        is Boolean -> bundle.putBoolean(key, value)
+        else -> bundle.putString(key, value.toString())
+      }
+    }
+    Firebase.analytics.logEvent(name.replace(" ", "_"), bundle)
   }
 
   object Param {

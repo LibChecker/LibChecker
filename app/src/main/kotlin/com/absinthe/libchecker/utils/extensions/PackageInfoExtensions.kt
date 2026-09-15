@@ -134,6 +134,7 @@ fun PackageInfo.getPermissionsList(): List<String> {
  * @return Stateful permissions list
  */
 fun PackageInfo.getStatefulPermissionsList(): List<Pair<String, Boolean>> {
+  val permissions = requestedPermissions ?: return emptyList()
   val flags = requestedPermissionsFlags
   val hidden by unsafeLazy {
     val sourceDir = applicationInfo?.sourceDir ?: return@unsafeLazy emptyMap<String, Int>()
@@ -142,29 +143,23 @@ fun PackageInfo.getStatefulPermissionsList(): List<Pair<String, Boolean>> {
     }
   }
 
-  if (flags?.size != requestedPermissions?.size) {
-    return requestedPermissions?.mapNotNull { permission ->
-      permission?.let { it to true }
-    }?.toMutableList()?.apply {
-      if (hidden.isNotEmpty()) {
-        hidden.forEach { (p, v) ->
-          add("$p (maxSdkVersion: $v)" to false)
-        }
+  val hasMatchingFlags = flags != null && flags.size == permissions.size
+  return buildList(permissions.size + 4) {
+    for (i in permissions.indices) {
+      val perm = permissions[i] ?: continue
+      val isGranted = if (hasMatchingFlags) {
+        (flags[i] and PackageInfo.REQUESTED_PERMISSION_GRANTED) != 0
+      } else {
+        true
       }
-    } ?: emptyList()
-  }
-
-  return requestedPermissions?.mapIndexedNotNull { index, permission ->
-    permission?.let {
-      it to ((flags?.get(index) ?: 0) and PackageInfo.REQUESTED_PERMISSION_GRANTED != 0)
+      add(perm to isGranted)
     }
-  }?.toMutableList()?.apply {
     if (hidden.isNotEmpty()) {
       hidden.forEach { (p, v) ->
         add("$p (maxSdkVersion: $v)" to false)
       }
     }
-  } ?: emptyList()
+  }
 }
 
 /**
@@ -357,6 +352,8 @@ private fun isUseJetpackCompose(zipFile: IZipFile, foundList: List<String>?, che
 }
 
 private val COMPOSE_CLASS_PATTERN = "androidx.compose.*".toClassDefType()
+private val JETBRAINS_COMPOSE_CLASS_PATTERN = "org.jetbrains.compose.*".toClassDefType()
+private val JETBRAINS_COMPOSE_CLASS_PATTERNS = listOf(JETBRAINS_COMPOSE_CLASS_PATTERN)
 private val KOTLIN_CLASS_PATTERN = "kotlin.*".toClassDefType()
 private val KOTLINX_CLASS_PATTERN = "kotlinx.*".toClassDefType()
 
@@ -618,8 +615,10 @@ fun PackageInfo.is16KBAligned(libs: List<LibStringItem>? = null, isApk: Boolean 
     ).filter { it.elfInfo.pageSize > 0 }
 
   return nativeLibs.isNotEmpty() &&
-    nativeLibs.all { it.elfInfo.pageSize % PAGE_SIZE_16_KB == 0 } &&
-    nativeLibs.all { it.elfInfo.zipAlignment <= 0L || it.elfInfo.zipAlignment >= PAGE_SIZE_16_KB }
+    nativeLibs.all {
+      it.elfInfo.pageSize % PAGE_SIZE_16_KB == 0 &&
+        (it.elfInfo.zipAlignment <= 0L || it.elfInfo.zipAlignment >= PAGE_SIZE_16_KB)
+    }
 }
 
 /**
@@ -639,9 +638,9 @@ fun PackageInfo.isUseKMP(foundList: List<String>? = null): Boolean {
   val file = File(applicationInfo?.sourceDir ?: return false)
   val realFoundList = foundList ?: PackageUtils.findDexClasses(
     file,
-    listOf("org.jetbrains.compose.*".toClassDefType())
+    JETBRAINS_COMPOSE_CLASS_PATTERNS
   )
-  return realFoundList.contains("org.jetbrains.compose.*".toClassDefType())
+  return realFoundList.contains(JETBRAINS_COMPOSE_CLASS_PATTERN)
 }
 
 fun PackageInfo.isArchivedPackage(): Boolean {

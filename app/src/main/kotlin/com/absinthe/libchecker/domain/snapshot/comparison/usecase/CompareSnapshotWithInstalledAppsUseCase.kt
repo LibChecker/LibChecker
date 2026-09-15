@@ -14,6 +14,7 @@ import com.absinthe.libchecker.utils.extensions.isArchivedPackage
 import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libchecker.utils.toJson
 import java.io.IOException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
 import timber.log.Timber
@@ -77,6 +78,16 @@ class CompareSnapshotWithInstalledAppsUseCase(
       }
     }
 
+    val storedDiffMap = try {
+      snapshotRepository.getSnapshotDiffs().associateBy { it.packageName }
+    } catch (e: CancellationException) {
+      throw e
+    } catch (e: Exception) {
+      Timber.w(e, "Failed to read snapshot diff cache")
+      emptyMap()
+    }
+    val pendingDiffStoreItems = mutableListOf<SnapshotDiffStoringItem>()
+
     for ((_, snapshotItem) in previousMap) {
       if (!currentCoroutineContext().isActive) {
         return null
@@ -88,7 +99,9 @@ class CompareSnapshotWithInstalledAppsUseCase(
           snapshotItem = snapshotItem,
           presentItem = presentItem,
           trackPackageNames = trackPackageNames,
-          diffList = diffList
+          storedDiffItem = storedDiffMap[snapshotItem.packageName],
+          diffList = diffList,
+          pendingDiffStoreItems = pendingDiffStoreItems
         )
       } catch (e: Exception) {
         Timber.e(e)
@@ -98,26 +111,37 @@ class CompareSnapshotWithInstalledAppsUseCase(
       }
     }
 
+    if (pendingDiffStoreItems.isNotEmpty()) {
+      try {
+        snapshotRepository.insertSnapshotDiffs(pendingDiffStoreItems)
+      } catch (e: CancellationException) {
+        throw e
+      } catch (e: Exception) {
+        Timber.w(e, "Failed to write snapshot diff cache")
+      }
+    }
+
     return diffList
   }
 
-  private suspend fun addChangedSnapshotDiff(
+  private fun addChangedSnapshotDiff(
     packageManager: PackageManager,
     snapshotItem: SnapshotItem,
     presentItem: PackageInfo,
     trackPackageNames: Set<String>,
-    diffList: MutableList<SnapshotDiffItem>
+    storedDiffItem: SnapshotDiffStoringItem?,
+    diffList: MutableList<SnapshotDiffItem>,
+    pendingDiffStoreItems: MutableList<SnapshotDiffStoringItem>
   ) {
-    val snapshotDiffStoringItem = snapshotRepository.getSnapshotDiff(snapshotItem.packageName)
     val presentIsArchived = presentItem.isArchivedPackage()
 
-    if (snapshotDiffStoringItem?.lastUpdatedTime != presentItem.lastUpdateTime ||
-      snapshotDiffStoringItem.isArchived != presentIsArchived ||
+    if (storedDiffItem?.lastUpdatedTime != presentItem.lastUpdateTime ||
+      storedDiffItem.isArchived != presentIsArchived ||
       snapshotItem.isArchived != presentIsArchived
     ) {
       createDiffItem(packageManager, snapshotItem, presentItem, trackPackageNames)?.let { item ->
         diffList.add(item)
-        snapshotRepository.insertSnapshotDiff(
+        pendingDiffStoreItems.add(
           SnapshotDiffStoringItem(
             packageName = presentItem.packageName,
             lastUpdatedTime = presentItem.lastUpdateTime,
@@ -130,7 +154,7 @@ class CompareSnapshotWithInstalledAppsUseCase(
     }
 
     try {
-      snapshotDiffStoringItem.diffContent.fromJson<SnapshotDiffItem>()?.let { item ->
+      storedDiffItem.diffContent.fromJson<SnapshotDiffItem>()?.let { item ->
         diffList.add(item)
       }
     } catch (e: IOException) {
@@ -138,7 +162,7 @@ class CompareSnapshotWithInstalledAppsUseCase(
 
       createDiffItem(packageManager, snapshotItem, presentItem, trackPackageNames)?.let { item ->
         diffList.add(item)
-        snapshotRepository.insertSnapshotDiff(
+        pendingDiffStoreItems.add(
           SnapshotDiffStoringItem(
             packageName = presentItem.packageName,
             lastUpdatedTime = presentItem.lastUpdateTime,

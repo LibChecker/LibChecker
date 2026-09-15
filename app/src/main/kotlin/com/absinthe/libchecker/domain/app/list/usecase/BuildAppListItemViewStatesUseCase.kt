@@ -29,15 +29,18 @@ class BuildAppListItemViewStatesUseCase(
       }
       val apexPackageNames = installedAppRepository.getApexPackageNames()
       traceAppListSection(TRACE_APP_LIST_CREATE_ITEM_VIEW_STATES) {
-        request.items.associate { item ->
-          item.packageName to AppListItemViewState.create(
-            context = context,
-            item = item,
-            packageState = packageStates.getValue(item.packageName),
-            options = request.options,
-            isApexPackage = item.packageName in apexPackageNames
-          )
-        }
+        request.items.associateBy(
+          keySelector = { it.packageName },
+          valueTransform = { item ->
+            AppListItemViewState.create(
+              context = context,
+              item = item,
+              packageState = packageStates.getValue(item.packageName),
+              options = request.options,
+              isApexPackage = item.packageName in apexPackageNames
+            )
+          }
+        )
       }
     }
   }

@@ -82,8 +82,7 @@
       style="@style/App.Widget.M3E.ToolbarCard"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:backgroundTint="?android:colorBackground"
-      app:layout_constraintTop_toTopOf="parent">
+      android:backgroundTint="?android:colorBackground">
 
       <LinearLayout
         android:id="@+id/detail_toolbar_container"
@@ -105,7 +104,7 @@
             android:layout_marginStart="@dimen/normal_padding"
             android:gravity="center"
             android:text="@string/items_count"
-            android:textColor="?attr/colorControlNormal"
+            android:textColor="?attr/colorOnSurfaceVariant"
             app:layout_constraintStart_toStartOf="parent" />
 
           <com.absinthe.libchecker.domain.app.detail.ui.view.TextSwitcherView
@@ -133,7 +132,8 @@
     <androidx.viewpager2.widget.ViewPager2
       android:id="@+id/viewpager"
       android:layout_width="match_parent"
-      android:layout_height="match_parent" />
+      android:layout_height="0dp"
+      android:layout_weight="1" />
 
   </LinearLayout>
 

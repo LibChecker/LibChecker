@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.ViewFlipper
 import androidx.fragment.app.findFragment
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.ui.base.BaseFragment
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +20,9 @@ class CustomViewFlipper : ViewFlipper {
 
   override fun setDisplayedChild(whichChild: Int) {
     super.setDisplayedChild(whichChild)
-    findFragment<BaseFragment<*>>().lifecycleScope.launch(Dispatchers.IO) {
+    val lifecycleScope = findViewTreeLifecycleOwner()?.lifecycleScope
+      ?: runCatching { findFragment<BaseFragment<*>>().lifecycleScope }.getOrNull()
+    lifecycleScope?.launch(Dispatchers.IO) {
       delay(250)
       withContext(Dispatchers.Main) {
         mOnDisplayedChildChangedListener?.onChanged(whichChild)

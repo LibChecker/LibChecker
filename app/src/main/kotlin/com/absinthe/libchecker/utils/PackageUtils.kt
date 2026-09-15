@@ -170,7 +170,7 @@ object PackageUtils {
         val libs = files.asSequence()
           .filter {
             checkCancelled()
-            it.isFile && it.extension == "so"
+            it.isFile && it.name.endsWith(".so")
           }
           .distinctBy { it.name }
           .map {
@@ -314,11 +314,11 @@ object PackageUtils {
     }
 
     val map = mutableMapOf<String, MutableList<LibStringItem>>()
+    val targetInstructionSet = specifiedAbi?.let { ABI_VALUE_TO_INSTRUCTION_SET_MAP[it] }
     splitList.asSequence()
       .filter {
         val fileName = it.substringAfterLast(File.separator)
-        val specifiedAvailable = specifiedAbi != null &&
-          fileName.contains(ABI_VALUE_TO_INSTRUCTION_SET_MAP[specifiedAbi].toString())
+        val specifiedAvailable = targetInstructionSet != null && fileName.contains(targetInstructionSet)
         val isAbiSplitFile = specifiedAbi == null &&
           INSTRUCTION_SET_MAP_TO_ABI_VALUE.keys.any { key -> fileName.contains(key) }
         specifiedAvailable || isAbiSplitFile
@@ -340,8 +340,6 @@ object PackageUtils {
     return map
   }
 
-  private val regex_splits by lazy { Regex("split_(.*)\\.apk") }
-
   /**
    * Get split apks dirs
    * @param packageInfo PackageInfo
@@ -351,9 +349,8 @@ object PackageUtils {
     val ai = packageInfo.applicationInfo ?: return null
     if (FreezeUtils.isAppFrozen(ai)) {
       File(ai.sourceDir).parentFile?.takeIf { it.exists() }?.let { files ->
-        return files.listFiles { file -> file.name.matches(regex_splits) }
-          ?.map { it.absolutePath }
-          ?.toTypedArray()
+        return files.listFiles { file -> file.name.startsWith("split_") && file.name.endsWith(".apk") }
+          ?.let { list -> Array(list.size) { list[it].absolutePath } }
       }
     }
     return ai.splitSourceDirs
@@ -481,15 +478,16 @@ object PackageUtils {
       while (zipEntries.hasMoreElements()) {
         checkCancelled()
         val entry = zipEntries.nextElement()
+        val entryName = entry.name
         if (
           !entry.isDirectory &&
-          entry.name.endsWith(".so") &&
-          (sourceDir == null || entry.name.startsWith(sourceDir))
+          entryName.endsWith(".so") &&
+          (sourceDir == null || entryName.startsWith(sourceDir))
         ) {
           entries.add(entry)
-          val shouldParseElf = parseElf || parseElfSourceDir?.let { entry.name.startsWith(it) } == true
+          val shouldParseElf = parseElf || parseElfSourceDir?.let { entryName.startsWith(it) } == true
           if (shouldParseElf && entry.method == ZipEntry.STORED) {
-            storedEntryNames.add(entry.name)
+            storedEntryNames.add(entryName)
           }
         }
       }
@@ -584,7 +582,17 @@ object PackageUtils {
 
     return when (firstSegment) {
       assetsDir -> assetsDir
-      libDir -> STRING_ABI_MAP.keys.find { entryName.startsWith("$libDir$APK_ENTRY_SEPARATOR$it") }
+
+      libDir -> {
+        val secondSeparator = entryName.indexOf(APK_ENTRY_SEPARATOR, firstSeparator + 1)
+        val secondSegment = if (secondSeparator >= 0) {
+          entryName.substring(firstSeparator + 1, secondSeparator)
+        } else {
+          entryName.substring(firstSeparator + 1)
+        }
+        secondSegment.takeIf { STRING_ABI_MAP.containsKey(it) }
+      }
+
       else -> null
     }
   }
@@ -653,6 +661,12 @@ object PackageUtils {
       .toList()
   }
 
+  private val KOTLIN_DEX_PATTERNS = listOf(
+    "kotlin.*".toClassDefType(),
+    "kotlinx.*".toClassDefType()
+  )
+  private val UNKNOWN_ABI_RES = listOf(R.string.unknown)
+
   /**
    * Check if an app uses Kotlin language from classes.dex
    * @param file APK file of the app
@@ -661,7 +675,7 @@ object PackageUtils {
   fun isKotlinUsedInClassDex(file: File): Boolean {
     return findDexClasses(
       file,
-      listOf("kotlin.*".toClassDefType(), "kotlinx.*".toClassDefType()),
+      KOTLIN_DEX_PATTERNS,
       hasAny = true
     ).isNotEmpty() || hasKotlinRuntimeEvidenceInClassDex(file)
   }
@@ -680,7 +694,7 @@ object PackageUtils {
       zipFile.getZipEntries().asSequence()
         .filter {
           checkCancelled()
-          it.name.matches(DEX_ENTRY_REGEX)
+          isDexEntryName(it.name)
         }
         .forEach { entry ->
           checkCancelled()
@@ -847,21 +861,19 @@ object PackageUtils {
     if (list.isNullOrEmpty()) {
       return emptyList()
     }
-    return list.asSequence()
-      .map {
-        val name = if (isSimpleName) {
-          it.name.orEmpty().shortenComponentName(packageName)
-        } else {
-          it.name.orEmpty()
-        }
-        StatefulComponent(
-          name,
-          isComponentEnabled(it),
-          isComponentExported(it),
-          it.processName.orEmpty().removePrefix(it.packageName)
-        )
+    return list.map {
+      val name = if (isSimpleName) {
+        it.name.orEmpty().shortenComponentName(packageName)
+      } else {
+        it.name.orEmpty()
       }
-      .toList()
+      StatefulComponent(
+        name,
+        isComponentEnabled(it),
+        isComponentExported(it),
+        it.processName.orEmpty().removePrefix(it.packageName)
+      )
+    }
   }
 
   fun getComponentList(
@@ -872,16 +884,14 @@ object PackageUtils {
     if (list.isEmpty()) {
       return emptyList()
     }
-    return list.asSequence()
-      .map {
-        val name = if (isSimpleName) {
-          it.shortenComponentName(packageName)
-        } else {
-          it
-        }
-        StatefulComponent(componentName = name, enabled = true, exported = true, processName = "")
+    return list.map {
+      val name = if (isSimpleName) {
+        it.shortenComponentName(packageName)
+      } else {
+        it
       }
-      .toList()
+      StatefulComponent(componentName = name, enabled = true, exported = true, processName = "")
+    }
   }
 
   /**
@@ -899,20 +909,22 @@ object PackageUtils {
     if (list.isNullOrEmpty()) {
       return emptyList()
     }
-    return list.asSequence()
-      .map {
-        if (isSimpleName) {
-          it.name.shortenComponentName(packageName)
-        } else {
-          it.name
-        }
+    return list.map {
+      if (isSimpleName) {
+        it.name.shortenComponentName(packageName)
+      } else {
+        it.name
       }
-      .toList()
+    }
   }
 
   private fun String.shortenComponentName(packageName: String): String {
-    return if (packageName.isNotEmpty() && startsWith("$packageName.")) {
-      removePrefix(packageName)
+    return if (packageName.isNotEmpty() &&
+      length > packageName.length &&
+      this[packageName.length] == '.' &&
+      startsWith(packageName)
+    ) {
+      substring(packageName.length)
     } else {
       this
     }
@@ -967,10 +979,16 @@ object PackageUtils {
             !it.isDirectory && it.name.startsWith(libDirPrefix) && it.name.endsWith(".so")
           }
           .mapNotNull { entry ->
-            STRING_ABI_MAP.entries.find { entry.name.startsWith("$libDirPrefix${it.key}") }
-              ?.takeIf { (string, _) -> ignoreArch || Build.SUPPORTED_ABIS.contains(string) }
-              ?.also { (abiName, _) -> onNativeEntry?.invoke(entry, abiName) }
-              ?.value
+            val abiName = entry.name.removePrefix(libDirPrefix)
+              .substringBefore('/')
+              .substringBefore(File.separatorChar)
+            val abi = STRING_ABI_MAP[abiName]
+            if (abi != null && (ignoreArch || Build.SUPPORTED_ABIS.contains(abiName))) {
+              onNativeEntry?.invoke(entry, abiName)
+              abi
+            } else {
+              null
+            }
           }
           .toCollection(abiSet)
       }
@@ -1011,14 +1029,15 @@ object PackageUtils {
   }
 
   private fun getAbiListBySplitApks(splitSource: Array<String>): Set<Int> {
-    return splitSource.filter { source -> STRING_ABI_MAP.keys.any { source.contains(it) } }
-      .mapNotNull { source ->
-        val abiString = source.substringAfterLast(File.separator)
-          .removePrefix("split_config.")
-          .removeSuffix(".apk")
+    return splitSource.mapNotNullTo(mutableSetOf()) { source ->
+      val fileName = source.substringAfterLast(File.separator)
+      if (fileName.startsWith("split_config.") && fileName.endsWith(".apk")) {
+        val abiString = fileName.substring("split_config.".length, fileName.length - 4)
         STRING_ABI_MAP[abiString]
+      } else {
+        null
       }
-      .toSet()
+    }
   }
 
   /**
@@ -1096,9 +1115,9 @@ object PackageUtils {
       return Constants.OVERLAY_STRING
     }
     val resList = if (!showExtraInfo && abi >= MULTI_ARCH) {
-      ABI_STRING_RES_MAP[abi % MULTI_ARCH] ?: listOf(R.string.unknown)
+      ABI_STRING_RES_MAP[abi % MULTI_ARCH] ?: UNKNOWN_ABI_RES
     } else {
-      ABI_STRING_RES_MAP[abi] ?: listOf(R.string.unknown)
+      ABI_STRING_RES_MAP[abi] ?: UNKNOWN_ABI_RES
     }
     return resList.joinToString { context.getString(it) }
   }
@@ -1200,12 +1219,13 @@ object PackageUtils {
   ): List<String> {
     if (classes.isEmpty()) return emptyList()
     val foundClasses = linkedSetOf<String>()
+    val distinctClassCount = classes.toSet().size
     return tracePackageUtilsSection(TRACE_FIND_DEX_CLASSES) {
       runCatching {
         zipFile.getZipEntries().asSequence()
           .filter {
             checkCancelled()
-            it.name.matches(DEX_ENTRY_REGEX)
+            isDexEntryName(it.name)
           }
           .forEach { entry ->
             checkCancelled()
@@ -1219,7 +1239,7 @@ object PackageUtils {
                 checkCancelled = checkCancelled
               )
             }
-            if ((hasAny && foundClasses.isNotEmpty()) || foundClasses.size == classes.distinct().size) {
+            if ((hasAny && foundClasses.isNotEmpty()) || foundClasses.size == distinctClassCount) {
               return@runCatching foundClasses.toList()
             }
           }
@@ -1240,7 +1260,15 @@ object PackageUtils {
     throw RuntimeException("Not implemented")
   }
 
-  private val DEX_ENTRY_REGEX = Regex("^classes(\\d*)\\.dex$")
+  internal fun isDexEntryName(name: String): Boolean {
+    val len = name.length
+    if (len < 11 || !name.startsWith("classes") || !name.endsWith(".dex")) return false
+    for (i in 7 until len - 4) {
+      val c = name[i]
+      if (c < '0' || c > '9') return false
+    }
+    return true
+  }
   private const val KOTLIN_RUNTIME_STRING_THRESHOLD = 2
   private const val MAX_KOTLIN_RUNTIME_SCAN_BYTES = 32 * 1024 * 1024
   private val KOTLIN_RUNTIME_STRING_MARKERS = listOf(

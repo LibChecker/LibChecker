@@ -478,28 +478,38 @@ class AppItemView(
     )
 
     fun setLabels(labels: List<String>) {
-      removeAllViews()
-      labels.forEach { label ->
-        addView(
-          AppCompatTextView(context).apply {
-            layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, labelHeight)
-            text = label
-            gravity = Gravity.CENTER
-            includeFontPadding = false
-            setPadding(horizontalPadding, 0, horizontalPadding, 0)
-            setTextAppearance(style.labelSmallTextAppearance)
-            setTextColor(style.onSurfaceVariantColor)
-            importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
-            background = GradientDrawable().apply {
-              shape = GradientDrawable.RECTANGLE
-              setColor(Color.TRANSPARENT)
-              setStroke(strokeWidth, strokeColor)
-              cornerRadius = labelHeight / 2f
-            }
-          }
-        )
+      val existingCount = childCount
+      val newCount = labels.size
+      for (index in 0 until minOf(existingCount, newCount)) {
+        val child = getChildAt(index) as TextView
+        child.text = labels[index]
+      }
+      for (index in existingCount until newCount) {
+        addView(createLabelView(labels[index]))
+      }
+      if (existingCount > newCount) {
+        removeViews(newCount, existingCount - newCount)
       }
       requestLayout()
+    }
+
+    private fun createLabelView(label: String): View {
+      return AppCompatTextView(context).apply {
+        layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, labelHeight)
+        text = label
+        gravity = Gravity.CENTER
+        includeFontPadding = false
+        setPadding(horizontalPadding, 0, horizontalPadding, 0)
+        setTextAppearance(style.labelSmallTextAppearance)
+        setTextColor(style.onSurfaceVariantColor)
+        importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
+        background = GradientDrawable().apply {
+          shape = GradientDrawable.RECTANGLE
+          setColor(Color.TRANSPARENT)
+          setStroke(strokeWidth, strokeColor)
+          cornerRadius = labelHeight / 2f
+        }
+      }
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -615,7 +625,7 @@ class AppItemView(
 }
 
 private fun TextView.setItemBackground() {
-  if (text.trim().isEmpty()) {
+  if (text.isBlank()) {
     setBackgroundResource(R.drawable.bg_app_item_text_inset)
     alpha = 0.65f
   } else {

@@ -4,10 +4,6 @@
 
   <solid android:color="?attr/colorSurfaceInverse" />
 
-  <corners
-    android:bottomLeftRadius="@dimen/toast_radius"
-    android:bottomRightRadius="@dimen/toast_radius"
-    android:topLeftRadius="@dimen/toast_radius"
-    android:topRightRadius="@dimen/toast_radius" />
+  <corners android:radius="@dimen/toast_radius" />
 
 </shape>

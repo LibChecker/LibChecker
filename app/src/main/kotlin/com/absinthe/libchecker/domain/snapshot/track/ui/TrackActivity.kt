@@ -128,7 +128,7 @@ class TrackActivity :
   }
 
   override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-    menuInflater.inflate(R.menu.track_menu, menu)
+    menuInflater.inflate(R.menu.common_search_menu, menu)
     this.menu = menu
 
     val searchView = SearchView(this).apply {

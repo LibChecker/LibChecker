@@ -159,7 +159,7 @@ object DexStatsCollector {
           zipFile.getZipEntries()
             .asSequence()
             .filter { entry ->
-              entry.name.matches(DEX_ENTRY_REGEX)
+              PackageUtils.isDexEntryName(entry.name)
             }
             .take(remainingDexEntries + 1)
             .map { entry ->
@@ -220,7 +220,6 @@ object DexStatsCollector {
   private const val MAX_CRC32 = 0xffffffffL
   internal const val MAX_STORED_STATS_JSON_LENGTH = 64 * 1024
   private val INCOMPLETE_STATS = DexStats(emptyList(), emptyList(), false, false)
-  private val DEX_ENTRY_REGEX = Regex("^classes(\\d*)\\.dex$")
   private val STORED_DEX_ENTRY_REGEX = Regex("^(base|split:[^/\\r\\n]+)/classes(\\d*)\\.dex$")
   private val STORED_RESOURCE_ENTRY_REGEX =
     Regex("^(base|split:[^/\\r\\n]+)/resources\\.arsc$")

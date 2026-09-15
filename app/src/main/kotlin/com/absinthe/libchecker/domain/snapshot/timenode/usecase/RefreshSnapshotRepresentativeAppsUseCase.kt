@@ -45,14 +45,16 @@ class RefreshSnapshotRepresentativeAppsUseCase(
     val refreshIndexes = sortedTimeStamps.indices.filter {
       SnapshotRepresentativeApps.needsRefresh(sortedTimeStamps[it].topApps)
     }
-    val requiredIndexes = refreshIndexes
-      .flatMap { index -> listOf(index - 1, index) }
-      .filter(sortedTimeStamps.indices::contains)
-      .toSet()
-    val snapshotsByTimestamp = requiredIndexes.associate { index ->
-      val timestamp = sortedTimeStamps[index].timestamp
-      timestamp to snapshotRepository.getSnapshotSummaries(timestamp)
-    }
+    val requiredIndexes = buildSet {
+      for (index in refreshIndexes) {
+        if (index > 0) add(index - 1)
+        add(index)
+      }
+    }.filter(sortedTimeStamps.indices::contains)
+    val snapshotsByTimestamp = requiredIndexes.associateBy(
+      keySelector = { sortedTimeStamps[it].timestamp },
+      valueTransform = { snapshotRepository.getSnapshotSummaries(sortedTimeStamps[it].timestamp) }
+    )
     val trackPackageNames = getTrackPackageNames()
     val updatedTimeStamps = sortedTimeStamps.mapIndexed { index, item ->
       if (!SnapshotRepresentativeApps.needsRefresh(item.topApps)) {

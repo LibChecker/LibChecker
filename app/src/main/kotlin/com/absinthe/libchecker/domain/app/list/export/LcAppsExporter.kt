@@ -347,12 +347,15 @@ object LcAppsExporter {
     val sourceDir = packageInfo.applicationInfo?.sourceDir ?: return emptyMap()
     return runCatching {
       IntentFilterUtils.parseComponentsFromApk(sourceDir)
-        .associate { component ->
-          component.className to component.intentFilters
-            .flatMap { it.actions }
-            .distinct()
-            .sorted()
-        }
+        .associateBy(
+          keySelector = { it.className },
+          valueTransform = { component ->
+            component.intentFilters
+              .flatMap { it.actions }
+              .distinct()
+              .sorted()
+          }
+        )
     }.onFailure {
       Timber.w(it, "Failed to parse intent actions: ${packageInfo.packageName}")
     }.getOrDefault(emptyMap())

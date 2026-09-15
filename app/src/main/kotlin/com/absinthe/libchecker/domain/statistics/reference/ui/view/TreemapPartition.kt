@@ -30,7 +30,7 @@ internal class TreemapPartition(entries: List<TreemapLayout.Entry>, width: Doubl
 
   private val root = TreemapLayout.layout(entries, width, height)
     .takeIf { it.isNotEmpty() }
-    ?.let { build(it, entries.associate { entry -> entry.id to entry.weight }) }
+    ?.let { build(it, entries.associateBy(keySelector = { it.id }, valueTransform = { it.weight })) }
 
   fun layout(width: Double, height: Double, from: Set<String>?, to: Set<String>?, progress: Float): List<TreemapLayout.Tile> {
     if (width <= 0 || height <= 0) return emptyList()

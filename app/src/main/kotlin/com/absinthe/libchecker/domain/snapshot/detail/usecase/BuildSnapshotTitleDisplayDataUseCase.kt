@@ -2,6 +2,8 @@ package com.absinthe.libchecker.domain.snapshot.detail.usecase
 
 import android.content.Context
 import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.RelativeSizeSpan
 import androidx.core.text.buildSpannedString
 import androidx.core.text.scale
 import com.absinthe.libchecker.R
@@ -53,10 +55,13 @@ class BuildSnapshotTitleDisplayDataUseCase(
       return item.packageName
     }
 
-    val packageSplits = item.packageName.split("/")
-    val first = packageSplits[0]
-    val second = packageSplits.getOrNull(1)
-    return if (second != null && second != first) "$first $ARROW $second" else first
+    val slashIndex = item.packageName.indexOf('/')
+    if (slashIndex < 0) {
+      return item.packageName
+    }
+    val first = item.packageName.substring(0, slashIndex)
+    val second = item.packageName.substring(slashIndex + 1)
+    return if (second.isNotEmpty() && second != first) "$first $ARROW $second" else first
   }
 
   private fun buildPackageSize(
@@ -85,11 +90,34 @@ class BuildSnapshotTitleDisplayDataUseCase(
         text.append(diffSize.sizeToString(context))
       }
     }
+    applyPackageSizeBytesScale(text)
 
     return SnapshotTitlePackageSizeData(
       text = text,
       breakStart = breakStart
     )
+  }
+
+  private fun applyPackageSizeBytesScale(text: SpannableStringBuilder) {
+    var searchIndex = 0
+    while (searchIndex < text.length) {
+      val suffixIndex = text.indexOf(BYTES_SUFFIX, searchIndex)
+      if (suffixIndex == -1) break
+      val startIndex = text.lastIndexOf('(', suffixIndex)
+      val spanEnd = suffixIndex + BYTES_SUFFIX.length
+      if (startIndex >= searchIndex) {
+        val intermediateClosingParen = text.indexOf(')', startIndex)
+        if (intermediateClosingParen == spanEnd - 1) {
+          text.setSpan(
+            RelativeSizeSpan(PACKAGE_SIZE_BYTES_SCALE),
+            startIndex,
+            spanEnd,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+          )
+        }
+      }
+      searchIndex = spanEnd
+    }
   }
 
   private fun buildApis(
@@ -135,5 +163,7 @@ class BuildSnapshotTitleDisplayDataUseCase(
 
   private companion object {
     const val ARROW = "→"
+    const val PACKAGE_SIZE_BYTES_SCALE = 0.85f
+    const val BYTES_SUFFIX = " Bytes)"
   }
 }

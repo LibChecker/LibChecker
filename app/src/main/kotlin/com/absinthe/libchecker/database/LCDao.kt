@@ -30,7 +30,7 @@ interface LCDao {
   @Query("SELECT packageName from item_table WHERE features = -1")
   suspend fun getUninitializedFeaturePackageNames(): List<String>
 
-  @Query("SELECT * from item_table WHERE packageName LIKE :packageName")
+  @Query("SELECT * from item_table WHERE packageName = :packageName")
   suspend fun getItem(packageName: String): LCItem?
 
   @Insert(onConflict = OnConflictStrategy.IGNORE)
@@ -42,11 +42,17 @@ interface LCDao {
   @Update
   suspend fun update(item: LCItem)
 
+  @Update
+  suspend fun updateLCItems(items: List<LCItem>)
+
   @Delete
   suspend fun delete(item: LCItem)
 
   @Query("DELETE FROM item_table WHERE packageName = :packageName")
   suspend fun deleteLCItemByPackageName(packageName: String)
+
+  @Query("DELETE FROM item_table WHERE packageName IN (:packageNames)")
+  suspend fun deleteLCItemsByPackageNames(packageNames: List<String>)
 
   @Query("DELETE FROM item_table")
   suspend fun deleteAllItems()
@@ -149,6 +155,9 @@ interface LCDao {
   @Upsert
   suspend fun insertSnapshotDiff(item: SnapshotDiffStoringItem)
 
+  @Upsert
+  suspend fun insertSnapshotDiffs(items: List<SnapshotDiffStoringItem>)
+
   @Update
   suspend fun updateSnapshotDiff(item: SnapshotDiffStoringItem)
 
@@ -160,4 +169,7 @@ interface LCDao {
 
   @Query("SELECT * from diff_table WHERE packageName = :packageName")
   suspend fun getSnapshotDiff(packageName: String): SnapshotDiffStoringItem?
+
+  @Query("SELECT * from diff_table")
+  suspend fun getSnapshotDiffs(): List<SnapshotDiffStoringItem>
 }

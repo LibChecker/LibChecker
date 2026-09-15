@@ -7,8 +7,8 @@ import java.util.Locale
 class FormatSnapshotTimestampUseCase {
 
   operator fun invoke(timestamp: Long): String {
-    return SimpleDateFormat(DISPLAY_PATTERN, Locale.getDefault())
-      .format(Date(timestamp))
+    val formatter = SimpleDateFormat(DISPLAY_PATTERN, Locale.getDefault())
+    return formatter.format(Date(timestamp))
   }
 
   private companion object {

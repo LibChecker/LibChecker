@@ -2,9 +2,6 @@ package com.absinthe.libchecker.domain.snapshot.detail.ui.view
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.text.SpannableStringBuilder
-import android.text.Spanned
-import android.text.style.RelativeSizeSpan
 import android.util.AttributeSet
 import android.view.View
 import android.view.View.OnClickListener
@@ -175,11 +172,7 @@ class SnapshotTitleView(
     packageSizeLabelView.isVisible = true
     packageSizeView.apply {
       isVisible = true
-      val displayText = SpannableStringBuilder(data.text)
-      Regex("\\([^()]* Bytes\\)").findAll(data.text).forEach { match ->
-        displayText.setSpan(RelativeSizeSpan(0.85f), match.range.first, match.range.last + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-      }
-      packageSizeLineBreaker.setText(displayText, data.breakStart)
+      packageSizeLineBreaker.setText(data.text, data.breakStart)
       contentDescription = context.getString(
         R.string.snapshot_detail_metric_description,
         context.getString(R.string.snapshot_detail_size_label),

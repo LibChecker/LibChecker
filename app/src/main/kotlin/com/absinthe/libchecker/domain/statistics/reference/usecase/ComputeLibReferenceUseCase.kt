@@ -30,6 +30,7 @@ import com.absinthe.libchecker.domain.statistics.reference.traceReferenceSection
 import com.absinthe.libchecker.domain.statistics.reference.traceReferenceSuspendSection
 import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.rulesbundle.Rule
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.currentCoroutineContext
@@ -153,6 +154,7 @@ class ComputeLibReferenceUseCase(
     currentCoroutineContext().ensureActive()
     val references = index.snapshotReferences()
     val refList = mutableListOf<LibReferenceItem>()
+    val ruleCache = HashMap<String, Rule?>()
     var progressCount = 0
 
     fun updateProgress(count: Int = progressCount, allowComplete: Boolean = true) {
@@ -175,7 +177,14 @@ class ComputeLibReferenceUseCase(
       if (referredList.size >= config.threshold && libName.isNotBlank()) {
         val ruleType = if (type == ACTION) ACTION_IN_RULES else type
         val rule = if (type != PERMISSION && type != METADATA) {
-          RulesRepository.getRule(libName, ruleType, true)
+          val cacheKey = "$ruleType:$libName"
+          if (ruleCache.containsKey(cacheKey)) {
+            ruleCache[cacheKey]
+          } else {
+            RulesRepository.getRule(libName, ruleType, true).also {
+              ruleCache[cacheKey] = it
+            }
+          }
         } else {
           null
         }
@@ -196,7 +205,8 @@ class ComputeLibReferenceUseCase(
       updateProgress()
     }
 
-    refList.sortedByDescending { it.referredList.size }
+    refList.sortWith { a, b -> b.referredList.size.compareTo(a.referredList.size) }
+    refList
   }
 
   private fun getSelectedLibReferenceTypes(options: Int): List<Int> {
@@ -309,8 +319,9 @@ class ComputeLibReferenceUseCase(
         }
 
         PACKAGE -> {
-          val split = packageName.split(".")
-          val packagePrefix = split.subList(0, split.size.coerceAtMost(2)).joinToString(".")
+          val firstDot = packageName.indexOf('.')
+          val secondDot = if (firstDot >= 0) packageName.indexOf('.', firstDot + 1) else -1
+          val packagePrefix = if (secondDot >= 0) packageName.substring(0, secondDot) else packageName
           index.addReference(packagePrefix, packageName, PACKAGE)
         }
 

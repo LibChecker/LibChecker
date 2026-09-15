@@ -25,7 +25,7 @@ class FileLoggingTree(context: Context) : Timber.DebugTree() {
       Timber.e(e)
     }
     // Remove old log files, keeping the latest 3
-    val logFiles = logDir.listFiles { file -> file.isFile && file.extension == "log" }
+    val logFiles = logDir.listFiles { file -> file.isFile && file.name.endsWith(".log") }
     logFiles?.sortedByDescending { it.lastModified() }?.drop(3)?.forEach { file ->
       try {
         file.delete()
@@ -36,8 +36,8 @@ class FileLoggingTree(context: Context) : Timber.DebugTree() {
   }
 
   override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-    val logTimeStamp =
-      SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault()).format(Date())
+    val formatter = SimpleDateFormat(LOG_DATE_PATTERN, Locale.getDefault())
+    val logTimeStamp = formatter.format(Date())
     val priorityChar = when (priority) {
       Log.VERBOSE -> "V"
       Log.DEBUG -> "D"
@@ -53,12 +53,19 @@ class FileLoggingTree(context: Context) : Timber.DebugTree() {
         logFile.parentFile?.mkdirs()
         logFile.createNewFile()
       }
-      logFile.appendText("$logTimeStamp $priorityChar/$tag: $message\n")
-      t?.let {
-        logFile.appendText(Log.getStackTraceString(it) + "\n")
+      val textToAppend = buildString {
+        append(logTimeStamp).append(' ').append(priorityChar).append('/').append(tag).append(": ").append(message).append('\n')
+        if (t != null) {
+          append(Log.getStackTraceString(t)).append('\n')
+        }
       }
+      logFile.appendText(textToAppend)
     }.onFailure {
       Log.e("FileLoggingTree", "Failed to append log file", it)
     }
+  }
+
+  private companion object {
+    private const val LOG_DATE_PATTERN = "yyyy-MM-dd HH:mm:ss.SSS"
   }
 }

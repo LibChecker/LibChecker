@@ -31,18 +31,21 @@ class GetAppListPackageStatesUseCase(
     }
     val applicationMap = snapshot?.applicationMap ?: createSnapshot().applicationMap
     return traceAppListSection(TRACE_APP_LIST_RESOLVE_PACKAGE_STATES) {
-      items.associate { item ->
-        item.packageName to if (item.packageName == Constants.EXAMPLE_PACKAGE) {
-          InstalledPackageState(packageInfo = null, isFrozen = false)
-        } else {
-          applicationMap[item.packageName]?.let { packageInfo ->
-            InstalledPackageState(
-              packageInfo = packageInfo,
-              isFrozen = packageInfo.applicationInfo?.let(FreezeUtils::isAppFrozen) ?: true
-            )
-          } ?: installedAppRepository.getPackageState(item.packageName)
+      items.associateBy(
+        keySelector = { it.packageName },
+        valueTransform = { item ->
+          if (item.packageName == Constants.EXAMPLE_PACKAGE) {
+            InstalledPackageState(packageInfo = null, isFrozen = false)
+          } else {
+            applicationMap[item.packageName]?.let { packageInfo ->
+              InstalledPackageState(
+                packageInfo = packageInfo,
+                isFrozen = packageInfo.applicationInfo?.let(FreezeUtils::isAppFrozen) ?: true
+              )
+            } ?: installedAppRepository.getPackageState(item.packageName)
+          }
         }
-      }
+      )
     }
   }
 

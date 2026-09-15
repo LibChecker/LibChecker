@@ -19,21 +19,13 @@ import com.absinthe.libchecker.view.span.DiffHighlightSpan
 
 object LCAppUtils {
 
+  private val bidiFormatter by lazy { BidiFormatter.getInstance() }
+
   fun buildAppTitle(context: Context): Spannable {
     val sb = SpannableStringBuilder(context.getString(R.string.app_name))
 
-    when {
-      DateUtils.isChristmas() -> {
-        sb.append("\uD83C\uDF84")
-      }
-
-      DateUtils.isChineseNewYearEve() -> {
-        sb.append("\uD83C\uDFEE")
-      }
-
-      DateUtils.isChineseNewYear() -> {
-        sb.append(DateUtils.getChineseZodiac())
-      }
+    DateUtils.getHolidayEmoji()?.let {
+      sb.append(it)
     }
 
     if (BuildConfig.IS_DEV_VERSION) {
@@ -58,9 +50,10 @@ object LCAppUtils {
     highlightDiffColor: Int? = null,
     emphasizeDiffs: Boolean = false
   ): CharSequence {
+    fun formatValue(value: Any?): String = if (format == "%s") value.toString() else format.format(value)
     return if (diff.old != diff.new && diff.new != null && !isNewOrDeleted) {
-      val oldString = format.format(diff.old)
-      val newString = format.format(diff.new)
+      val oldString = formatValue(diff.old)
+      val newString = formatValue(diff.new)
 
       if (highlightDiffColor != null || emphasizeDiffs) {
         val pair = getHighlightDifferences(oldString, newString, highlightDiffColor, emphasizeDiffs)
@@ -77,7 +70,7 @@ object LCAppUtils {
         }
       }
     } else {
-      format.format(diff.old)
+      formatValue(diff.old)
     }
   }
 
@@ -97,7 +90,7 @@ object LCAppUtils {
         val highlightedPair2 =
           getHighlightDifferences(diff2.old.toString(), diff2.new.toString(), highlightDiffColor, emphasizeDiffs)
         val allText = highlightedPair1.first.toString() + highlightedPair1.second + highlightedPair2.first + highlightedPair2.second + diff1Suffix + diff2Suffix
-        val isRtl = BidiFormatter.getInstance().isRtl(allText)
+        val isRtl = bidiFormatter.isRtl(allText)
         val arrow = if (isRtl) ARROW_REVERT else ARROW
         buildSpannedString {
           append(highlightedPair1.first)

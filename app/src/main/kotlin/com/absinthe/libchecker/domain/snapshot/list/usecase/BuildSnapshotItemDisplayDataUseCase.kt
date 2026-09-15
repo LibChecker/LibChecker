@@ -258,9 +258,13 @@ class BuildSnapshotItemDisplayDataUseCase(private val context: Context) {
     val text = if (updateTime <= PREINSTALLED_TIMESTAMP) {
       SnapshotUpdateTimeText.Preinstalled
     } else {
-      val pattern = if (DateUtils.isTimestampToday(updateTime)) "HH:mm:ss" else "yyyy-MM-dd HH:mm:ss"
+      val formatter = if (DateUtils.isTimestampToday(updateTime)) {
+        SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+      } else {
+        SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+      }
       SnapshotUpdateTimeText.LastUpdated(
-        SimpleDateFormat(pattern, Locale.getDefault()).format(Date(updateTime))
+        formatter.format(Date(updateTime))
       )
     }
     return SnapshotUpdateTimeDisplayData(text, isApexPackage)

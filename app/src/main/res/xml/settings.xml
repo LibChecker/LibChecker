@@ -43,7 +43,7 @@
 
     <androidx.preference.SwitchPreferenceCompat
       app:defaultValue="false"
-      app:icon="@drawable/ic_black_hole"
+      app:icon="@drawable/ic_theme_amoled"
       app:key="amoledTheme"
       app:summary="@string/amoled_theme_summary"
       app:title="@string/amoled_theme" />
@@ -137,49 +137,37 @@
       app:icon="@drawable/ic_upgrade"
       app:key="getUpdates"
       app:summary="@string/settings_get_updates_summary"
-      app:title="@string/settings_get_updates">
-
-    </Preference>
+      app:title="@string/settings_get_updates" />
 
     <Preference
       app:icon="@drawable/ic_logo"
       app:key="about"
       app:summary="@string/settings_about_summary"
-      app:title="@string/settings_about">
-
-    </Preference>
+      app:title="@string/settings_about" />
 
     <Preference
-      app:icon="@drawable/ic_help"
+      app:icon="@drawable/ic_question"
       app:key="help"
       app:summary="@string/help_docs_summary"
-      app:title="@string/help_docs">
-
-    </Preference>
+      app:title="@string/help_docs" />
 
     <Preference
       app:icon="@drawable/ic_translate"
       app:key="translation"
       app:summary="@string/settings_translate_summary"
-      app:title="@string/settings_translate">
-
-    </Preference>
+      app:title="@string/settings_translate" />
 
     <Preference
-      android:icon="@drawable/ic_favorite"
+      app:icon="@drawable/ic_favorite"
       app:key="rate"
       app:summary="@string/settings_rate_us_summary"
-      app:title="@string/settings_rate_us">
-
-    </Preference>
+      app:title="@string/settings_rate_us" />
 
     <Preference
       app:icon="@drawable/ic_lib_telegram"
       app:key="tg"
       app:summary="@string/join_telegram_group_summary"
-      app:title="@string/join_telegram_group">
-
-    </Preference>
+      app:title="@string/join_telegram_group" />
 
     <androidx.preference.SwitchPreferenceCompat
       app:defaultValue="true"
