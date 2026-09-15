@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.database
 
 import android.content.Context
+import android.database.sqlite.SQLiteDatabaseCorruptException
 import android.database.sqlite.SQLiteException
 import android.os.SystemClock
 import com.absinthe.libchecker.LibCheckerApp
@@ -103,15 +104,15 @@ object RulesRepository {
     return try {
       LCRules.getRule(name, type, regex)
     } catch (e: SQLiteException) {
-      if (!e.isMissingRulesTable()) {
-        throw e
-      }
+      if (!e.isRecoverableRulesDatabaseFailure()) throw e
       recover(e)
-      runCatching {
+      try {
         LCRules.getRule(name, type, regex)
-      }.onFailure {
-        Timber.e(it)
-      }.getOrNull()
+      } catch (retryFailure: SQLiteException) {
+        if (!retryFailure.isRecoverableRulesDatabaseFailure()) throw retryFailure
+        Timber.e(retryFailure)
+        null
+      }
     }
   }
 
@@ -297,8 +298,9 @@ object RulesRepository {
     }
   }
 
-  private fun SQLiteException.isMissingRulesTable(): Boolean {
-    return message?.contains(MISSING_RULES_TABLE_MESSAGE, ignoreCase = true) == true
+  private fun SQLiteException.isRecoverableRulesDatabaseFailure(): Boolean {
+    return this is SQLiteDatabaseCorruptException ||
+      message?.contains(MISSING_RULES_TABLE_MESSAGE, ignoreCase = true) == true
   }
 
   private fun recover(cause: SQLiteException) {
@@ -309,7 +311,8 @@ object RulesRepository {
       }
       lastRecoveryUptime = now
 
-      Timber.w(cause, "Rules database is missing rules_table, rebuilding.")
+      Timber.w(cause, "Rules database is missing or corrupt, rebuilding.")
+      LCRules.close()
       deleteDatabase()
       reinitialize()
     }

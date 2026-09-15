@@ -6,6 +6,7 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.domain.app.model.PackageChangeState
+import com.absinthe.libchecker.domain.app.repository.PackageListLoadException
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailDiffTextStyle
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSection
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotCapturePlan
@@ -16,11 +17,14 @@ import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.sync.SnapshotPackageChangeProcessor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 const val CURRENT_SNAPSHOT = -1L
 
@@ -60,6 +64,11 @@ class SnapshotViewModel(
     snapshotAutoCompareEnabled = false
   }
 
+  fun onSnapshotCaptureFailed() {
+    snapshotAutoCompareEnabled = true
+    setEffect { Effect.PackageListLoadFailed }
+  }
+
   fun onSnapshotCaptureFinished(timestamp: Long) {
     refreshSnapshotTimestamp(timestamp)
     snapshotAutoCompareEnabled = true
@@ -70,22 +79,42 @@ class SnapshotViewModel(
     currTimeStamp: Long = CURRENT_SNAPSHOT,
     shouldClearDiff: Boolean = false
   ) {
-    if (compareDiffJob?.isActive == true) {
-      compareDiffJob?.cancel()
-    }
-    compareDiffJob = viewModelScope.launch(Dispatchers.IO) {
-      currentTimeStamp = preTimeStamp
-      val diffItems = snapshotListWorkflow.compareDiff(
-        previousTimestamp = preTimeStamp,
-        currentTimestamp = currTimeStamp.takeUnless { it == CURRENT_SNAPSHOT },
-        shouldClearDiff = shouldClearDiff,
-        onProgress = { _comparingProgress.value = it }
-      )
+    compareDiffJob?.cancel()
+    compareDiffJob = viewModelScope.launch {
+      val diffItems = try {
+        withContext(Dispatchers.IO) {
+          snapshotListWorkflow.compareDiff(
+            previousTimestamp = preTimeStamp,
+            currentTimestamp = currTimeStamp.takeUnless { it == CURRENT_SNAPSHOT },
+            shouldClearDiff = shouldClearDiff,
+            onProgress = { _comparingProgress.value = it }
+          )
+        }
+      } catch (e: PackageListLoadException) {
+        ensureActive()
+        Timber.w(e)
+        val previousTimestamp = currentTimeStamp
+        val previousSnapshotExists = withContext(Dispatchers.IO) {
+          snapshotListWorkflow.getTimeStamps().any { it.timestamp == previousTimestamp }
+        }
+        if (previousSnapshotExists && currentTimeStamp == previousTimestamp) {
+          setSelectedSnapshotTimestamp(previousTimestamp)
+        } else {
+          currentTimeStamp = 0L
+          clearSnapshotDiffItems()
+        }
+        showCurrentSnapshot()
+        setEffect { Effect.PackageListLoadFailed }
+        return@launch
+      }
       if (diffItems != null) {
+        snapshotListWorkflow.applyDiffItems(diffItems)
+        currentTimeStamp = preTimeStamp
+        setSelectedSnapshotTimestamp(preTimeStamp)
+        showCurrentSnapshot()
+        getDashboardCount(preTimeStamp, true)
         emitSnapshotDiffItemsUpdate()
       }
-    }.also {
-      it.start()
     }
   }
 
@@ -118,17 +147,28 @@ class SnapshotViewModel(
   }
 
   suspend fun compareItemDiff(
-    timeStamp: Long = selectedSnapshotTimestamp,
+    timeStamp: Long = currentTimeStamp,
     packageName: String
   ) {
-    val diffItem = snapshotListWorkflow.compareItemDiff(timeStamp, packageName)
-
-    if (diffItem == null) {
-      snapshotListWorkflow.applyDiffItemRemove(packageName)
-    } else {
-      snapshotListWorkflow.applyDiffItemChange(diffItem)
+    val diffItem = try {
+      snapshotListWorkflow.compareItemDiff(timeStamp, packageName)
+    } catch (e: PackageListLoadException) {
+      Timber.w(e)
+      setEffect { Effect.PackageListLoadFailed }
+      return
     }
-    emitSnapshotDiffItemsUpdate()
+
+    withContext(Dispatchers.Main.immediate) {
+      if (timeStamp != currentTimeStamp) {
+        return@withContext
+      }
+      if (diffItem == null) {
+        snapshotListWorkflow.applyDiffItemRemove(packageName)
+      } else {
+        snapshotListWorkflow.applyDiffItemChange(diffItem)
+      }
+      emitSnapshotDiffItemsUpdate()
+    }
   }
 
   fun handlePackageChanged(packageChangeState: PackageChangeState) {
@@ -203,7 +243,13 @@ class SnapshotViewModel(
 
   suspend fun deleteSnapshotTimeStamp(timestamp: Long): List<TimeStampItem> {
     val result = snapshotListWorkflow.deleteSnapshotTimeStamp(timestamp)
-    currentTimeStamp = result.selectedTimestamp
+    withContext(Dispatchers.Main.immediate) {
+      if (timestamp == currentTimeStamp) {
+        currentTimeStamp = 0L
+        clearSnapshotDiffItems()
+        showCurrentSnapshot()
+      }
+    }
     return result.remainingTimeStamps
   }
 
@@ -215,10 +261,9 @@ class SnapshotViewModel(
     return snapshotListWorkflow.consumeTrackItemsChanged()
   }
 
-  fun changeTimeStamp(timestamp: Long) {
-    setSelectedSnapshotTimestamp(timestamp)
+  fun showCurrentSnapshot() {
     setEffect {
-      Effect.TimeStampChange(timestamp)
+      Effect.TimeStampChange(currentTimeStamp)
     }
   }
 
@@ -230,8 +275,7 @@ class SnapshotViewModel(
     timestamp: Long,
     shouldClearDiff: Boolean = false
   ) {
-    changeTimeStamp(timestamp)
-    getDashboardCount(timestamp, true)
+    setSelectedSnapshotTimestamp(timestamp)
     compareDiff(timestamp, shouldClearDiff = shouldClearDiff)
   }
 
@@ -246,19 +290,28 @@ class SnapshotViewModel(
 
   private suspend fun processPackageChange(packageChangeState: PackageChangeState) {
     compareItemDiff(packageName = packageChangeState.packageName)
-    emitDashboardCount(selectedSnapshotTimestamp, true)
+    emitDashboardCount(currentTimeStamp, true)
   }
 
   private suspend fun emitDashboardCount(timestamp: Long, isLeft: Boolean) {
-    val count = snapshotListWorkflow.getDashboardCount(timestamp)
-    setEffect {
-      Effect.DashboardCountChange(count.snapshotCount, count.appCount, isLeft)
+    val count = try {
+      snapshotListWorkflow.getDashboardCount(timestamp)
+    } catch (e: PackageListLoadException) {
+      Timber.w(e)
+      setEffect { Effect.PackageListLoadFailed }
+      return
+    }
+    withContext(Dispatchers.Main.immediate) {
+      if (timestamp == currentTimeStamp) {
+        setEffect {
+          Effect.DashboardCountChange(count.snapshotCount, count.appCount, isLeft)
+        }
+      }
     }
   }
 
   private fun setSelectedSnapshotTimestamp(timestamp: Long) {
     snapshotListWorkflow.setSelectedSnapshotTimestamp(timestamp)
-    currentTimeStamp = timestamp
   }
 
   private fun setEffect(builder: () -> Effect) {
@@ -273,6 +326,7 @@ class SnapshotViewModel(
   }
 
   sealed class Effect {
+    data object PackageListLoadFailed : Effect()
     data class DashboardCountChange(
       val snapshotCount: Int,
       val appCount: Int,

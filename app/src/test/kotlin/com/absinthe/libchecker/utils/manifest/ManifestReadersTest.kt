@@ -1,9 +1,11 @@
 package com.absinthe.libchecker.utils.manifest
 
 import com.absinthe.libchecker.domain.app.detail.model.StaticLibItem
+import java.io.InputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -15,6 +17,21 @@ import pxb.android.axml.NodeVisitor
 class ManifestReadersTest {
   @get:Rule
   val temporaryFolder = TemporaryFolder()
+
+  @Test
+  fun stopsReadingAnUnboundedManifest() {
+    var bytesRead = 0
+    val input = object : InputStream() {
+      override fun read(): Int = 0
+      override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
+        bytesRead += length
+        check(bytesRead <= ManifestReader.MAX_MANIFEST_BYTES + 1024)
+        return length
+      }
+    }
+    assertNull(ManifestReader.getBytesFromInputStream(input))
+    assertEquals(ManifestReader.MAX_MANIFEST_BYTES + 1024, bytesRead)
+  }
 
   @Test
   fun readsAllFiveViewsOfTheSameManifest() {

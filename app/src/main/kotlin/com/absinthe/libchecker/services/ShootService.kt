@@ -23,6 +23,7 @@ import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.repository.PackageListLoadException
 import com.absinthe.libchecker.domain.home.ui.MainActivity
 import com.absinthe.libchecker.domain.snapshot.display.FormatSnapshotTimestampUseCase
 import com.absinthe.libchecker.domain.snapshot.list.capture.CaptureInstalledSnapshotUseCase
@@ -117,13 +118,17 @@ class ShootService : LifecycleService() {
   }
 
   @Synchronized
-  private fun notifyFinished(timestamp: Long) {
+  private fun notifyFinished(timestamp: Long?) {
     Timber.i("notifyFinished start")
     val count = listenerList.beginBroadcast()
     for (i in 0 until count) {
       try {
         Timber.i("notifyFinished $i")
-        listenerList.getBroadcastItem(i).onShootFinished(timestamp)
+        if (timestamp == null) {
+          listenerList.getBroadcastItem(i).onShootFailed()
+        } else {
+          listenerList.getBroadcastItem(i).onShootFinished(timestamp)
+        }
       } catch (e: RemoteException) {
         Timber.e(e)
       }
@@ -179,15 +184,18 @@ class ShootService : LifecycleService() {
     }
 
     lifecycleScope.launch(Dispatchers.IO) {
-      computeSnapshotsImpl(
-        installedAppRepository.getApplicationList(true),
-        dropPrevious,
-        stopWhenFinish
-      )
+      var timestamp: Long? = null
+      try {
+        timestamp = computeSnapshotsImpl(installedAppRepository.getApplicationList(true), dropPrevious)
+      } catch (e: PackageListLoadException) {
+        Timber.w(e)
+      } finally {
+        finishShooting(timestamp, stopWhenFinish)
+      }
     }
   }
 
-  private suspend fun computeSnapshotsImpl(appList: List<PackageInfo>, dropPrevious: Boolean = false, stopWhenFinish: Boolean = false) {
+  private suspend fun computeSnapshotsImpl(appList: List<PackageInfo>, dropPrevious: Boolean): Long {
     val timer = TimeRecorder().also {
       it.start()
     }
@@ -212,31 +220,29 @@ class ShootService : LifecycleService() {
         notificationManager.notify(notificationIdShoot, builder.build())
       }
     }
-    val timestamp = result.timestamp
-
-    if (areNotificationsEnabled) {
-      builder.setProgress(result.total, result.processedCount, false)
-      notificationManager.notify(notificationIdShoot, builder.build())
-      notificationManager.cancel(notificationIdShoot)
-
-      builder.setProgress(0, 0, false)
-        .setOngoing(false)
-        .setContentTitle(getString(R.string.noti_shoot_title_saved))
-        .setContentText(formatSnapshotTimestamp(timestamp))
-      notificationManager.notify(notificationIdShootSuccess, builder.build())
-    }
-
     timer.end()
     Timber.d("computeSnapshots: $timer")
+    return result.timestamp
+  }
 
-    _isShooting = false
-    notifyFinished(timestamp)
-    ServiceCompat.stopForeground(this@ShootService, ServiceCompat.STOP_FOREGROUND_REMOVE)
-    Timber.i("computeSnapshots end")
-    isComputing = false
-
-    if (stopWhenFinish) {
-      stopSelf()
+  @Synchronized
+  private fun finishShooting(timestamp: Long?, stopWhenFinish: Boolean) {
+    try {
+      ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
+      notificationManager.cancel(notificationIdShoot)
+      if (areNotificationsEnabled) {
+        val title = if (timestamp == null) R.string.package_list_load_failed else R.string.noti_shoot_title_saved
+        builder.setProgress(0, 0, false)
+          .setOngoing(false)
+          .setContentTitle(getString(title))
+          .setContentText(timestamp?.let(formatSnapshotTimestamp::invoke))
+        notificationManager.notify(notificationIdShootSuccess, builder.build())
+      }
+    } finally {
+      _isShooting = false
+      isComputing = false
+      notifyFinished(timestamp)
+      if (stopWhenFinish) stopSelf()
     }
   }
 

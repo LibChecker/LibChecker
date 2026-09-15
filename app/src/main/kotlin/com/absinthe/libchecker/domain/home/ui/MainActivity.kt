@@ -1165,6 +1165,10 @@ class MainActivity :
 
       effect.onEach {
         when (it) {
+          HomeViewModel.Effect.PackageListLoadFailed -> {
+            doOnMainThreadIdle { showNavigationView() }
+          }
+
           is HomeViewModel.Effect.ReloadApps -> {
             binding.viewpager.setCurrentItem(HomeDestination.APP_LIST.pageIndex, true)
           }

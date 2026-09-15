@@ -6,15 +6,19 @@ import android.content.pm.PackageManager
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.domain.app.model.PackageChangeState
+import com.absinthe.libchecker.domain.app.repository.PackageListLoadException
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.isArchivedPackage
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write
+import kotlinx.coroutines.CancellationException
 import timber.log.Timber
 
-class LocalAppDataSource : AppDataSource {
+class LocalAppDataSource(
+  private val readInstalledPackages: (Long) -> List<PackageInfo> = PackageManagerCompat::getInstalledPackages
+) : AppDataSource {
 
   private val applicationsLock = ReentrantReadWriteLock()
   private val applicationMap: MutableMap<String, PackageInfo> = linkedMapOf()
@@ -67,11 +71,17 @@ class LocalAppDataSource : AppDataSource {
   }
 
   private fun refreshApplicationsLocked() {
+    val refreshed = try {
+      loadApplications()
+        .filter { it.isVisiblePackageInfo() }
+        .associateBy { it.packageName }
+    } catch (e: CancellationException) {
+      throw e
+    } catch (e: Exception) {
+      throw PackageListLoadException(e)
+    }
     applicationMap.clear()
-    loadApplications()
-      .asSequence()
-      .filter { it.isVisiblePackageInfo() }
-      .forEach { applicationMap[it.packageName] = it }
+    applicationMap.putAll(refreshed)
     updateSnapshotsLocked()
     applicationsLoaded = true
   }
@@ -79,7 +89,7 @@ class LocalAppDataSource : AppDataSource {
   private fun loadApplications(): List<PackageInfo> {
     Timber.d("loadApplications start")
     val flags = if (OsUtils.atLeastV()) PackageManager.MATCH_ARCHIVED_PACKAGES else 0L
-    val list = PackageManagerCompat.getInstalledPackages(flags)
+    val list = readInstalledPackages(flags)
     Timber.d("loadApplications end, apps count: ${list.size}")
     return list
   }
@@ -116,7 +126,8 @@ class LocalAppDataSource : AppDataSource {
   override fun updateApplications(state: PackageChangeState) {
     applicationsLock.write {
       if (!applicationsLoaded) {
-        refreshApplicationsLocked()
+        // A later explicit load retries. Broadcasts must not publish a partial initial cache.
+        return
       }
       val packageName = state.packageName
       when (state) {

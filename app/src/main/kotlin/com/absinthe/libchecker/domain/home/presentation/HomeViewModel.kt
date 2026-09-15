@@ -23,6 +23,7 @@ import com.absinthe.libchecker.domain.app.model.PackageChangeState
 import com.absinthe.libchecker.domain.app.repository.AppListRepository
 import com.absinthe.libchecker.domain.app.repository.AppListSettingsRepository
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.repository.PackageListLoadException
 import com.absinthe.libchecker.domain.app.search.HandleAppListSearchCommandUseCase
 import com.absinthe.libchecker.domain.app.sync.AppListChangeRequestQueue
 import com.absinthe.libchecker.domain.app.sync.SyncAppListChangesUseCase
@@ -287,7 +288,14 @@ class HomeViewModel(
 
   private suspend fun initItemsImpl() {
     updateAppListStatus(STATUS_START_INIT)
-    if (!initializeAppListUseCase(::updateInitProgress)) return
+    try {
+      if (!initializeAppListUseCase(::updateInitProgress)) return
+    } catch (e: PackageListLoadException) {
+      Timber.w(e)
+      updateAppListStatus(STATUS_NOT_START)
+      setEffect { Effect.PackageListLoadFailed }
+      return
+    }
     updateAppListStatus(STATUS_INIT_END)
 
     updateAppListStatus(STATUS_NOT_START)
@@ -347,6 +355,9 @@ class HomeViewModel(
       }
 
       updateAppListStatus(STATUS_START_REQUEST_CHANGE_END)
+    } catch (e: PackageListLoadException) {
+      Timber.w(e)
+      setEffect { Effect.PackageListLoadFailed }
     } finally {
       if (appListChangeRequestQueue.isCurrent(changeRequest)) {
         if (showLoadingFeedback) {
@@ -417,6 +428,7 @@ class HomeViewModel(
   }
 
   sealed class Effect {
+    data object PackageListLoadFailed : Effect()
     data class ReloadApps(val obj: Any? = null) : Effect()
     data class UpdateInitProgress(val progress: Int) : Effect()
     data class UpdateAppListStatus(val status: Int) : Effect()

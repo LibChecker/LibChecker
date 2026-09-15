@@ -50,12 +50,10 @@ class ApkDetailActivity :
 
   override fun onDestroy() {
     dismissLoadingDialog()
-    tempFile?.delete()
     super.onDestroy()
   }
 
   private fun resolveIntent(intent: Intent?) {
-    tempFile?.delete()
     tempFile = null
     intent?.let { i ->
       when {

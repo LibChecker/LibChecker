@@ -3,6 +3,7 @@ package com.absinthe.libchecker.domain.app.detail.ui.base
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemLongClickActions
@@ -15,6 +16,7 @@ import com.absinthe.libchecker.domain.app.detail.ui.Referable
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.LibStringAdapter
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.ELFDetailDialogFragment
 import com.absinthe.libchecker.domain.app.detail.ui.impl.ComponentsAnalysisFragment
+import com.absinthe.libchecker.domain.app.repository.PackageListLoadException
 import com.absinthe.libchecker.integrations.anywhere.AnywhereManager
 import com.absinthe.libchecker.integrations.blocker.BlockerManager
 import com.absinthe.libchecker.integrations.monkeyking.MonkeyKingManager
@@ -145,8 +147,14 @@ class DetailItemLongClickController(
       val loading = UiUtils.createLoadingDialog(fragment.requireActivity())
       loading.show()
       coroutineScope.launch {
-        val items = detailItemResolver.getPermissionProviders(actions.componentName)
-        loading.dismiss()
+        val items = try {
+          detailItemResolver.getPermissionProviders(actions.componentName)
+        } catch (_: PackageListLoadException) {
+          context.showToast(R.string.package_list_load_failed)
+          return@launch
+        } finally {
+          loading.dismiss()
+        }
         if (items.isNotEmpty()) {
           val encodedList = items.map { "${it.packageName}|${it.providerName}" }.toTypedArray()
           fragment.activity?.launchLibReferencePage(

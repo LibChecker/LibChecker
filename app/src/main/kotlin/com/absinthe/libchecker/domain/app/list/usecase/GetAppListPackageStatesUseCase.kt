@@ -8,6 +8,7 @@ import com.absinthe.libchecker.domain.app.list.TRACE_APP_LIST_RESOLVE_PACKAGE_ST
 import com.absinthe.libchecker.domain.app.list.model.InstalledPackageState
 import com.absinthe.libchecker.domain.app.list.traceAppListSection
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.repository.PackageListLoadException
 import com.absinthe.libchecker.utils.FreezeUtils
 
 class GetAppListPackageStatesUseCase(
@@ -17,7 +18,11 @@ class GetAppListPackageStatesUseCase(
   fun createSnapshot(): PackageStateSnapshot {
     return PackageStateSnapshot(
       applicationMap = traceAppListSection(TRACE_APP_LIST_GET_APPLICATION_MAP) {
-        installedAppRepository.getApplicationMap()
+        try {
+          installedAppRepository.getApplicationMap()
+        } catch (_: PackageListLoadException) {
+          emptyMap()
+        }
       }
     )
   }
