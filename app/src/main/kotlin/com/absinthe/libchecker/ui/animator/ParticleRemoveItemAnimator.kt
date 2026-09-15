@@ -174,7 +174,7 @@ class ParticleRemoveItemAnimator : DefaultItemAnimator() {
     }
 
     private fun invalidateHost() {
-      if (recyclerView != null) recyclerView.invalidateItemDecorations() else overlayDrawable.invalidateSelf()
+      if (recyclerView == null) overlayDrawable.invalidateSelf()
       host.postInvalidateOnAnimation()
     }
 
@@ -312,15 +312,20 @@ class ParticleRemoveItemAnimator : DefaultItemAnimator() {
       animator?.removeAllListeners()
       animator = null
       host.removeOnAttachStateChangeListener(this)
-      if (decorationAdded) {
-        runCatching {
-          if (recyclerView != null) recyclerView.removeItemDecoration(this) else host.overlay.remove(overlayDrawable)
-        }
-        decorationAdded = false
-      }
+      removeDecoration()
       invalidateHost()
       onCleanUp(this)
       recycleBitmap()
+    }
+
+    private fun removeDecoration() {
+      if (!decorationAdded) return
+      if (recyclerView?.isComputingLayout == true) {
+        host.post { removeDecoration() }
+        return
+      }
+      if (recyclerView != null) recyclerView.removeItemDecoration(this) else host.overlay.remove(overlayDrawable)
+      decorationAdded = false
     }
 
     private fun recycleBitmap() {

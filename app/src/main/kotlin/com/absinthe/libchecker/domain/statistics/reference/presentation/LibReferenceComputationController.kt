@@ -2,6 +2,7 @@ package com.absinthe.libchecker.domain.statistics.reference.presentation
 
 import android.content.pm.PackageInfo
 import com.absinthe.libchecker.annotation.PERMISSION
+import com.absinthe.libchecker.domain.app.repository.PackageListLoadException
 import com.absinthe.libchecker.domain.statistics.reference.TRACE_REFERENCE_MAP_RESULT
 import com.absinthe.libchecker.domain.statistics.reference.TRACE_REFERENCE_SUBMIT_RESULT
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReference
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import timber.log.Timber
 
 class LibReferenceComputationController(
   private val scope: CoroutineScope,
@@ -54,8 +56,14 @@ class LibReferenceComputationController(
     computationJob = scope.launch(Dispatchers.IO) {
       computationMutex.withLock {
         currentCoroutineContext().ensureActive()
-        val index = computeLibReferenceUseCase.buildIndex(referenceConfig) {
-          publish(request) { updateLoadingState(LibReferenceLoadingState.Scanning(it)) }
+        val index = try {
+          computeLibReferenceUseCase.buildIndex(referenceConfig) {
+            publish(request) { updateLoadingState(LibReferenceLoadingState.Scanning(it)) }
+          }
+        } catch (e: PackageListLoadException) {
+          Timber.w(e)
+          publish(request) { updateLoadingState(LibReferenceLoadingState.Failed) }
+          return@withLock
         } ?: return@withLock
         try {
           currentCoroutineContext().ensureActive()

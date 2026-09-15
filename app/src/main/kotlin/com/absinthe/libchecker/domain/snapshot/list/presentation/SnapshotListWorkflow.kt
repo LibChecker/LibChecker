@@ -78,9 +78,6 @@ class SnapshotListWorkflow(
     )
     timer.end()
     Timber.d("compareDiff: $timer")
-    if (diffItems != null) {
-      snapshotDiffItems = diffItems
-    }
     return diffItems
   }
 
@@ -191,6 +188,10 @@ class SnapshotListWorkflow(
 
   fun clearSnapshotDiffItems() {
     snapshotDiffItems = emptyList()
+  }
+
+  fun applyDiffItems(items: List<SnapshotDiffItem>) {
+    snapshotDiffItems = items
   }
 
   suspend fun deleteSnapshotTimeStamp(timestamp: Long): DeleteSnapshotTimeStampUseCase.Result {

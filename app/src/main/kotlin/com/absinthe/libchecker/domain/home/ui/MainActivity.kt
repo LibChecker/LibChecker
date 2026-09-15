@@ -707,6 +707,9 @@ class MainActivity :
   private fun isListItemUnderAppbar(): Boolean {
     val recyclerView = appbarScrollTarget ?: return false
     if (recyclerView.canScrollVertically(-1)) return true
+    // Without blur, the scrolling behavior keeps content below the appbar. A newly attached
+    // page can still report pre-layout screen coordinates while ViewPager2 switches fragments.
+    if (blurContainer?.blurEnabled != true) return false
     val firstListItem = recyclerView.findTopmostChild() ?: return false
     binding.appbar.getLocationOnScreen(appbarLocation)
     recyclerView.getLocationOnScreen(appbarScrollTargetLocation)
@@ -1165,6 +1168,10 @@ class MainActivity :
 
       effect.onEach {
         when (it) {
+          HomeViewModel.Effect.PackageListLoadFailed -> {
+            doOnMainThreadIdle { showNavigationView() }
+          }
+
           is HomeViewModel.Effect.ReloadApps -> {
             binding.viewpager.setCurrentItem(HomeDestination.APP_LIST.pageIndex, true)
           }

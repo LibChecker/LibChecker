@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.function.Supplier;
+import java.util.zip.ZipEntry;
 
 import pxb.android.Res_value;
 import pxb.android.axml.AxmlReader;
@@ -20,6 +21,7 @@ import timber.log.Timber;
 
 
 public class ManifestReader {
+  static final int MAX_MANIFEST_BYTES = 16 * 1024 * 1024;
   private final ArrayMap<String, Object> properties = new ArrayMap<>();
   private final String[] demands;
 
@@ -46,6 +48,9 @@ public class ManifestReader {
       byte[] b = new byte[1024];
       int n;
       while ((n = inputStream.read(b)) != -1) {
+        if (n > MAX_MANIFEST_BYTES - bos.size()) {
+          throw new IOException("Manifest exceeds size limit");
+        }
         bos.write(b, 0, n);
       }
       return bos.toByteArray();
@@ -57,15 +62,20 @@ public class ManifestReader {
 
   static void acceptManifest(File apk, Supplier<NodeVisitor> visitor) {
     try (IZipFile zip = new ZipFileCompat(apk)) {
-      acceptManifest(getBytesFromInputStream(zip.getInputStream(zip.getEntry("AndroidManifest.xml"))), visitor);
+      ZipEntry entry = zip.getEntry("AndroidManifest.xml");
+      if (entry == null || entry.getSize() > MAX_MANIFEST_BYTES) return;
+      try (InputStream input = zip.getInputStream(entry)) {
+        acceptManifest(getBytesFromInputStream(input), visitor);
+      }
     } catch (Exception e) {
       Timber.w(e);
     }
   }
 
   static void acceptManifest(byte[] bytes, Supplier<NodeVisitor> visitor) {
+    if (bytes == null || bytes.length > MAX_MANIFEST_BYTES) return;
     try {
-      new AxmlReader(bytes != null ? bytes : new byte[0]).accept(new AxmlVisitor() {
+      new AxmlReader(bytes).accept(new AxmlVisitor() {
         @Override
         public NodeVisitor child(String ns, String name) {
           return visitor.get();

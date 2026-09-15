@@ -127,9 +127,12 @@ object GlobalValues {
   var locale: Locale = Locale.getDefault()
     get() {
       if (OsUtils.atLeastT()) {
-        val systemSelectedLocale = SystemServices.localeManager.getApplicationLocales(LibCheckerApp.app.packageName)
-        Timber.d("System selected locale: $systemSelectedLocale")
-        val locale = systemSelectedLocale.get(0) ?: Locale.getDefault()
+        val locale = try {
+          SystemServices.localeManager.getApplicationLocales(LibCheckerApp.app.packageName).get(0) ?: Locale.getDefault()
+        } catch (e: SecurityException) {
+          Timber.w(e, "Unable to read application locales")
+          Locale.getDefault()
+        }
         if (locale != field) {
           field = locale
           SPUtils.sp.edit { putString(Constants.PREF_LOCALE, locale.toLanguageTag()) }

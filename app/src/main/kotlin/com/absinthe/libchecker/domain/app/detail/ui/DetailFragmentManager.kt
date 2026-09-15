@@ -5,6 +5,7 @@ import androidx.core.util.forEach
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.domain.app.detail.ui.base.BaseDetailFragment
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
@@ -44,9 +45,12 @@ class DetailFragmentManager {
 
   fun deliverFilterItems(searchWords: String?, process: String?, coroutineScope: CoroutineScope) {
     deliverFilterJob?.cancel()
-    deliverFilterJob = coroutineScope.launch {
-      map.forEach { _, value ->
-        value.setItemsWithFilter(searchWords, process)
+    deliverFilterJob = coroutineScope.launch(Dispatchers.Main.immediate) {
+      val fragments = List(map.size()) { map.valueAt(it) }
+      fragments.forEach { fragment ->
+        if (map.indexOfValue(fragment) >= 0) {
+          fragment.setItemsWithFilter(searchWords, process)
+        }
       }
     }
   }

@@ -162,7 +162,7 @@ internal fun initialListSearchState(
 }
 
 internal fun shouldHandleListSearchQueryChange(
-  lifecycleState: Lifecycle.State
+  lifecycleState: Lifecycle.State?
 ): Boolean {
-  return lifecycleState.isAtLeast(Lifecycle.State.RESUMED)
+  return lifecycleState?.isAtLeast(Lifecycle.State.RESUMED) == true
 }

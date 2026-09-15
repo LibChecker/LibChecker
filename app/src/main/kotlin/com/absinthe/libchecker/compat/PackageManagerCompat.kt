@@ -7,6 +7,8 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.utils.OsUtils
+import kotlinx.coroutines.CancellationException
+import timber.log.Timber
 
 object PackageManagerCompat {
   fun getPackageInfo(packageName: String, flags: Int): PackageInfo {
@@ -45,10 +47,28 @@ object PackageManagerCompat {
   }
 
   fun getInstalledPackages(flags: Long): List<PackageInfo> {
-    return if (OsUtils.atLeastT()) {
-      SystemServices.packageManager.getInstalledPackages(PackageManager.PackageInfoFlags.of(flags))
-    } else {
-      SystemServices.packageManager.getInstalledPackages(flags.toInt())
+    return try {
+      if (OsUtils.atLeastT()) {
+        SystemServices.packageManager.getInstalledPackages(PackageManager.PackageInfoFlags.of(flags))
+      } else {
+        SystemServices.packageManager.getInstalledPackages(flags.toInt())
+      }
+    } catch (e: Exception) {
+      if (e is CancellationException) throw e
+      Timber.w(e, "Batch package lookup failed; reading packages individually")
+      val applications = if (OsUtils.atLeastT()) {
+        SystemServices.packageManager.getInstalledApplications(PackageManager.ApplicationInfoFlags.of(flags))
+      } else {
+        SystemServices.packageManager.getInstalledApplications(flags.toInt())
+      }
+      // Abort on any failed lookup: a partial list can delete valid app records.
+      applications.map { app ->
+        if (OsUtils.atLeastT()) {
+          SystemServices.packageManager.getPackageInfo(app.packageName, PackageManager.PackageInfoFlags.of(flags))
+        } else {
+          SystemServices.packageManager.getPackageInfo(app.packageName, flags.toInt())
+        }
+      }
     }
   }
 

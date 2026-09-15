@@ -13,7 +13,6 @@ import com.absinthe.libchecker.domain.snapshot.comparison.model.SnapshotComparis
 import com.absinthe.libchecker.domain.snapshot.comparison.model.SnapshotComparisonSide
 import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotDiffsUseCase
 import com.absinthe.libchecker.domain.snapshot.display.FormatSnapshotTimestampUseCase
-import com.absinthe.libchecker.domain.snapshot.display.SnapshotDashboardCounter
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import java.io.File
@@ -27,7 +26,6 @@ import timber.log.Timber
 
 class SnapshotComparisonViewModel(
   private val compareSnapshotDiffs: CompareSnapshotDiffsUseCase,
-  private val snapshotDashboardCounter: SnapshotDashboardCounter,
   private val snapshotRepository: SnapshotRepository,
   private val formatSnapshotTimestampUseCase: FormatSnapshotTimestampUseCase,
   private val comparisonWorkflow: SnapshotComparisonWorkflow
@@ -153,9 +151,9 @@ class SnapshotComparisonViewModel(
 
   fun getDashboardCount(timestamp: Long, isLeft: Boolean) = viewModelScope.launch(Dispatchers.IO) {
     Timber.d("getComparisonDashboardCount: $timestamp, $isLeft")
-    val count = snapshotDashboardCounter(timestamp)
+    val count = snapshotRepository.getSnapshots(timestamp).size
     setEffect {
-      Effect.DashboardCountChange(count.snapshotCount, isLeft)
+      Effect.DashboardCountChange(count, isLeft)
     }
   }
 

@@ -5,12 +5,13 @@ sealed interface LibReferenceLoadingState {
   // Reserve the last percent until the result list is presented.
   val overallProgress: Int?
     get() = when (this) {
-      Preparing -> null
+      Preparing, Failed -> null
       is Scanning -> progress.coerceIn(0, 100) * 80 / 100
       is Matching -> 80 + progress.coerceIn(0, 100) * 15 / 100
       is Organizing -> 95 + progress.coerceIn(0, 100) * 4 / 100
     }
 
+  data object Failed : LibReferenceLoadingState
   data object Preparing : LibReferenceLoadingState
   data class Scanning(val progress: Int) : LibReferenceLoadingState
   data class Matching(val progress: Int = 0) : LibReferenceLoadingState

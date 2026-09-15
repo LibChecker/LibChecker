@@ -25,6 +25,14 @@ class SnapshotIndexMigrationInstrumentedTest {
       database.execSQL("INSERT INTO snapshot_table VALUES (3, 123, 'com.a_b', 'history')")
 
       LCDatabase.MIGRATION_24_25.migrate(migrationConnection(database))
+      LCDatabase.MIGRATION_24_25.migrate(migrationConnection(database))
+
+      database.rawQuery("SELECT resourceInfo, dexStatsAvailable, resourceStatsAvailable FROM snapshot_table", null).use {
+        assertTrue(it.moveToFirst())
+        assertEquals("[]", it.getString(0))
+        assertEquals(0, it.getInt(1))
+        assertEquals(0, it.getInt(2))
+      }
 
       database.rawQuery("SELECT COUNT(*), SUM(id) FROM snapshot_table", null).use {
         assertTrue(it.moveToFirst())
@@ -53,17 +61,24 @@ class SnapshotIndexMigrationInstrumentedTest {
     ) { _, method, args ->
       check(method.name == "prepare") { "Unexpected migration operation: ${method.name}" }
       val sql = args!![0] as String
+      val cursor = if (sql.startsWith("PRAGMA")) database.rawQuery(sql, null) else null
       Proxy.newProxyInstance(
         SQLiteStatement::class.java.classLoader,
         arrayOf(SQLiteStatement::class.java)
-      ) { _, statementMethod, _ ->
+      ) { _, statementMethod, statementArgs ->
         when (statementMethod.name) {
           "step" -> {
-            database.execSQL(sql)
-            false
+            if (cursor != null) {
+              cursor.moveToNext()
+            } else {
+              database.execSQL(sql)
+              false
+            }
           }
 
-          "close" -> null
+          "getText" -> requireNotNull(cursor).getString(statementArgs!![0] as Int)
+
+          "close" -> cursor?.close()
 
           else -> error("Unexpected migration statement operation: ${statementMethod.name}")
         }

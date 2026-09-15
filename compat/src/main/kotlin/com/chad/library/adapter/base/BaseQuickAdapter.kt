@@ -28,6 +28,7 @@ abstract class BaseQuickAdapter<T : Any, VH : RecyclerView.ViewHolder>(
   private val footerAdapters = mutableListOf<SingleViewAdapter>()
   private var concatAdapter: ConcatAdapter? = null
   private var syncingHeaderFooter = false
+  private var submitGeneration = 0
 
   override val recyclerViewOrNull: RecyclerView?
     get() = runCatching { recyclerView }.getOrNull()
@@ -72,6 +73,18 @@ abstract class BaseQuickAdapter<T : Any, VH : RecyclerView.ViewHolder>(
   }
 
   fun createBaseViewHolder(view: View): BaseViewHolder = BaseViewHolder(view)
+
+  override fun submitList(list: List<T>?, commitCallback: Runnable?) {
+    val generation = ++submitGeneration
+    val host = recyclerViewOrNull
+    if (host?.isComputingLayout == true) {
+      host.post {
+        if (generation == submitGeneration) submitList(list, commitCallback)
+      }
+    } else {
+      super.submitList(list, commitCallback)
+    }
+  }
 
   fun setList(list: Collection<T>?) {
     submitList(list?.toList().orEmpty())

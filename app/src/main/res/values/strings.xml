@@ -1,4 +1,5 @@
 <resources>
+  <string name="package_list_load_failed">Unable to load installed apps. Please try again.</string>
   <!--  General  -->
   <string name="title_app_list">Apps</string>
   <string name="title_statistics">Statistics</string>
