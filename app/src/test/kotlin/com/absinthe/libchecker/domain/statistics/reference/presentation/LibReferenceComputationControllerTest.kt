@@ -7,12 +7,14 @@ import com.absinthe.libchecker.domain.app.list.model.InstalledPackageState
 import com.absinthe.libchecker.domain.app.model.AppInstallSource
 import com.absinthe.libchecker.domain.app.model.PackageChangeState
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
+import com.absinthe.libchecker.domain.app.repository.PackageListLoadException
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceLoadingState
 import com.absinthe.libchecker.domain.statistics.reference.repository.LibReferenceSettingsRepository
 import com.absinthe.libchecker.domain.statistics.reference.repository.PermissionLabelResolver
 import com.absinthe.libchecker.domain.statistics.reference.usecase.ComputeLibReferenceUseCase
 import com.absinthe.libchecker.domain.statistics.reference.usecase.GetLibReferenceConfigUseCase
 import com.absinthe.libchecker.domain.statistics.reference.usecase.GetLibReferenceIconPackagesUseCase
+import java.io.IOException
 import java.util.Collections
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -22,6 +24,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -31,10 +34,46 @@ import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.yield
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class LibReferenceComputationControllerTest {
+
+  @Test
+  fun failedScanCanRetryWithoutRepublishingPreviousResults() = runBlocking {
+    for (failedCall in 1..2) {
+      var calls = 0
+      val repository = FakeInstalledAppRepository {
+        if (++calls == failedCall) throw PackageListLoadException(IOException("Package scan failed"))
+      }
+      val state = MutableStateFlow<LibReferenceLoadingState>(LibReferenceLoadingState.Preparing)
+      val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+      val controller = LibReferenceComputationController(
+        scope,
+        ComputeLibReferenceUseCase(repository),
+        GetLibReferenceIconPackagesUseCase(repository),
+        GetLibReferenceConfigUseCase(FakeLibReferenceSettingsRepository()),
+        PermissionLabelResolver { null },
+        updateLoadingState = { state.value = it }
+      )
+      try {
+        if (failedCall == 2) {
+          controller.compute()
+          withTimeout(TEST_TIMEOUT_MILLIS) { controller.libReference.filterNotNull().first() }
+        }
+        controller.compute()
+        withTimeout(TEST_TIMEOUT_MILLIS) { state.first { it == LibReferenceLoadingState.Failed } }
+        assertNull("Failure must not publish a successful list that hides the retry page", controller.libReference.value)
+        controller.compute()
+        val result = withTimeout(TEST_TIMEOUT_MILLIS) { controller.libReference.filterNotNull().first() }
+        assertEquals(emptyList<Any>(), result)
+        assertEquals(failedCall + 1, calls)
+      } finally {
+        scope.cancel()
+      }
+    }
+  }
 
   @Test
   fun completedReferenceResultIsReplayedToLateCollector() = runBlocking {

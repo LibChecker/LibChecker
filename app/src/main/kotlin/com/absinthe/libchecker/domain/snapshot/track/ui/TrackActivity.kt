@@ -101,6 +101,14 @@ class TrackActivity :
   }
 
   private fun renderTrackList(state: TrackListUiState) {
+    if (state.loadFailed) {
+      adapter.stateView = EmptyListView(this).apply {
+        text.setText(R.string.package_list_load_failed)
+        isFocusable = true
+        setOnClickListener { viewModel.loadTrackList() }
+      }
+      return
+    }
     menu?.findItem(R.id.search)?.isVisible = state.isSearchVisible
     // Prevent BRVAH from inserting the new rows before removing its state view.
     val shouldRestoreStateView =

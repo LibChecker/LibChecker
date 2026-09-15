@@ -6,4 +6,5 @@ package com.absinthe.libchecker.services;
 interface OnShootListener {
     void onShootFinished(in long timestamp);
     void onProgressUpdated(in int progress);
+    void onShootFailed();
 }

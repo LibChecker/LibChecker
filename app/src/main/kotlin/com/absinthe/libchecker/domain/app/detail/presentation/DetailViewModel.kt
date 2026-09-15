@@ -31,6 +31,7 @@ import com.absinthe.libchecker.domain.app.detail.statistics.AnalyzeAppStatisticR
 import com.absinthe.libchecker.domain.app.detail.statistics.AppStatisticAnalysisState
 import com.absinthe.libchecker.domain.app.model.VersionedFeature
 import com.absinthe.libchecker.domain.app.packageinfo.PrepareApkAnalysisPackageUseCase
+import com.absinthe.libchecker.domain.app.packageinfo.deleteApkAnalysisCache
 import com.absinthe.libchecker.domain.app.repository.AppListSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
@@ -105,6 +106,7 @@ class DetailViewModel(
     _onlineStatisticRulesAvailable.asStateFlow()
   private var packageLoadJob: Job? = null
   private var apkAnalysisPackageJob: Job? = null
+  private var apkAnalysisFile: File? = null
   private var apkPreviewJob: Job? = null
   private var appInstallSourceDetailsJob: Job? = null
   private var appPackageShareActionJob: Job? = null
@@ -160,15 +162,25 @@ class DetailViewModel(
   fun loadApkAnalysisPackage(cacheDir: File, uri: Uri) {
     apkAnalysisPackageJob?.cancel()
     apkPreviewJob?.cancel()
+    clearApkAnalysisFile()
     packageState.startApkMode()
     packageState.clearApkPreviewInfo()
     apkAnalysisPackageJob = viewModelScope.launch {
-      _apkAnalysisPackageResults.emit(
-        ApkAnalysisPackageResult(
-          result = detailPackageLoader.prepareApkAnalysisPackage(cacheDir, uri)
-        )
-      )
+      val result = detailPackageLoader.prepareApkAnalysisPackage(cacheDir, uri)
+      // Own the file before emitting, including when no Activity is collecting.
+      apkAnalysisFile = result.file
+      _apkAnalysisPackageResults.emit(ApkAnalysisPackageResult(result))
     }
+  }
+
+  override fun onCleared() {
+    clearApkAnalysisFile()
+    super.onCleared()
+  }
+
+  private fun clearApkAnalysisFile() {
+    apkAnalysisFile?.deleteApkAnalysisCache()
+    apkAnalysisFile = null
   }
 
   data class ApkAnalysisPackageResult(
@@ -178,6 +190,7 @@ class DetailViewModel(
   fun loadApkPreview(url: String) {
     apkPreviewJob?.cancel()
     apkAnalysisPackageJob?.cancel()
+    clearApkAnalysisFile()
     packageState.startApkPreviewMode()
     packageState.clearApkPreviewInfo()
     apkPreviewJob = viewModelScope.launch {

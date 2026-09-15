@@ -102,7 +102,7 @@ class DetailContentResolver(
           parseElfForAbi = parseElfForAbi
         )
       } else {
-        apkPreviewInfo!!.nativeLibs.map {
+        apkPreviewInfo?.nativeLibs.orEmpty().map {
           ABI_STRING_MAP[it.key]!! to it.value.map { value ->
             LibStringItem(
               name = value.first,
@@ -528,7 +528,7 @@ class DetailContentResolver(
     val items = if (!isApkPreview && apkPreviewInfo == null) {
       getInstalledMetadataChips(packageInfo)
     } else {
-      apkPreviewInfo!!.metadata
+      apkPreviewInfo?.metadata.orEmpty()
         .map { metadata ->
           var flag = 0L
           val value = if (metadata.value is Long || (metadata.value as? String)?.maybeResourceId() == true) {
@@ -609,7 +609,7 @@ class DetailContentResolver(
           )
         }
     } else {
-      apkPreviewInfo!!.permissions.asSequence()
+      apkPreviewInfo?.permissions.orEmpty().asSequence()
         .map { permission ->
           LibStringItemChip(
             LibStringItem(name = permission, size = 0, source = null, process = null),
@@ -639,13 +639,8 @@ class DetailContentResolver(
       } else {
         PackageManagerCompat.getPackageArchiveInfo(packageInfo.applicationInfo!!.sourceDir, flags)!!
           .getSignatures(context)
-      }
-    }.onFailure {
-      Timber.e(it)
-    }.getOrDefault(emptySequence())
-      .map {
-        LibStringItemChip(it, null)
-      }.toList()
+      }.map { LibStringItemChip(it, null) }.toList()
+    }.onFailure { Timber.e(it) }.getOrDefault(emptyList())
   }
 
   suspend fun getStaticLibraryChips(

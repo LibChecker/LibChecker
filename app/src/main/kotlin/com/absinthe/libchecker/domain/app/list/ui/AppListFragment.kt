@@ -144,7 +144,7 @@ class AppListFragment :
         resetScrollbarNavigationReveal =
           ListScreenChrome.installScrollbarNavigationReveal(
             recyclerView = this,
-            coroutineScope = lifecycleScope,
+            coroutineScope = viewLifecycleOwner.lifecycleScope,
             isFragmentVisible = ::isFragmentVisible,
             isSearchTextClearOnce = { isSearchTextClearOnce },
             clearSearchTextFlag = { isSearchTextClearOnce = false },
@@ -227,7 +227,7 @@ class AppListFragment :
   }
 
   override fun onQueryTextChange(newText: String): Boolean {
-    if (!shouldHandleListSearchQueryChange(viewLifecycleOwner.lifecycle.currentState)) {
+    if (!shouldHandleListSearchQueryChange(viewLifecycleOwnerLiveData.value?.lifecycle?.currentState)) {
       return false
     }
     val shouldReturnTopAfterUpdate = shouldReturnAppListTopAfterSearch(
@@ -365,18 +365,28 @@ class AppListFragment :
       if (!isListReady || appAdapter.data.isEmpty()) {
         flip(VF_LOADING)
       }
-      homeViewModel.requestChange(showLoadingFeedback = true)
+      if (isFirstLaunch) {
+        initApps()
+      } else {
+        homeViewModel.requestChange(showLoadingFeedback = true)
+      }
     }
   }
 
   private fun initObserver() {
+    val viewScope = viewLifecycleOwner.lifecycleScope
     homeViewModel.apply {
       effect.onEach {
         when (it) {
+          HomeViewModel.Effect.PackageListLoadFailed -> {
+            flip(VF_LIST)
+            context?.showToast(R.string.package_list_load_failed)
+          }
+
           is HomeViewModel.Effect.ReloadApps -> {
             Once.clearDone(OnceTag.FIRST_LAUNCH)
             doOnMainThreadIdle {
-              initApps()
+              viewScope.launch { initApps() }
             }
           }
 
@@ -428,7 +438,7 @@ class AppListFragment :
             updateItems()
           }
         }
-      }.launchIn(lifecycleScope)
+      }.launchIn(viewScope)
       displayItemsFlow.onEach {
         if (it.isEmpty() || (isFirstLaunch && !hasInitializedItems)) {
           initApps()
@@ -442,14 +452,14 @@ class AppListFragment :
             homeViewModel.requestChange()
           }
         }
-      }.launchIn(lifecycleScope)
+      }.launchIn(viewScope)
     }
 
     homeViewModel.appListDisplayOptionsChanges.onEach {
       if (isListReady) {
         updateItems()
       }
-    }.launchIn(lifecycleScope)
+    }.launchIn(viewScope)
   }
 
   private fun removeMenuProviderPreservingSearch() {
@@ -611,7 +621,7 @@ class AppListFragment :
     }
   }
 
-  private fun flip(page: Int) = lifecycleScope.launch(Dispatchers.Main) {
+  private fun flip(page: Int) = viewLifecycleOwnerLiveData.value?.lifecycleScope?.launch(Dispatchers.Main) {
     allowRefreshing = page == VF_LIST
     homeViewModel.setPackagesPermissionCheckPending(page == VF_REJECT)
     if (page == VF_LOADING && binding.loadingViewStub.parent != null) {

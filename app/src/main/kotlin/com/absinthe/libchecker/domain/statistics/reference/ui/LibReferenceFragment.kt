@@ -40,6 +40,7 @@ import com.absinthe.libchecker.domain.statistics.reference.endReferenceAsyncSect
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReference
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceAction
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceListRenderState
+import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceLoadingState
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceSearchLabels
 import com.absinthe.libchecker.domain.statistics.reference.model.resolveReferenceIcon
 import com.absinthe.libchecker.domain.statistics.reference.presentation.LibReferenceViewModel
@@ -73,6 +74,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 const val VF_LOADING = 0
 const val VF_LIST = 1
 private const val VF_TREEMAP = 2
+private const val VF_FAILED = 3
 private const val SEARCH_UPDATE_DELAY_MILLIS = 160L
 
 class LibReferenceFragment :
@@ -195,6 +197,13 @@ class LibReferenceFragment :
           )
       }
       vfContainer.apply {
+        addView(
+          EmptyListView(context).apply {
+            text.setText(R.string.package_list_load_failed)
+            isFocusable = true
+            setOnClickListener { requestComputeRef(true) }
+          }
+        )
         setInAnimation(activity, R.anim.anim_fade_in)
         setOutAnimation(activity, R.anim.anim_fade_out)
         setOnDisplayedChildChangedListener {
@@ -259,7 +268,11 @@ class LibReferenceFragment :
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
           launch {
             loadingState.collect {
-              binding.loadingView.bind(it)
+              if (it == LibReferenceLoadingState.Failed) {
+                flip(VF_FAILED)
+              } else {
+                binding.loadingView.bind(it)
+              }
             }
           }
           launch {
@@ -416,7 +429,7 @@ class LibReferenceFragment :
   }
 
   override fun onQueryTextChange(newText: String): Boolean {
-    if (!shouldHandleListSearchQueryChange(viewLifecycleOwner.lifecycle.currentState)) {
+    if (!shouldHandleListSearchQueryChange(viewLifecycleOwnerLiveData.value?.lifecycle?.currentState)) {
       return false
     }
     val shouldSyncHighlight = listRenderState.highlightText != newText
@@ -540,7 +553,7 @@ class LibReferenceFragment :
     } else if (target == VF_LIST && isFragmentVisible()) {
       onListScreenVisibilityChanged(true, binding.list)
     }
-    menu?.findItem(R.id.search)?.isVisible = child != VF_LOADING
+    menu?.findItem(R.id.search)?.isVisible = child == VF_LIST
     if (binding.vfContainer.displayedChild == target) return
     if (target == VF_LIST && binding.vfContainer.displayedChild == VF_LOADING) {
       binding.list.scrollToPosition(0)
@@ -549,9 +562,11 @@ class LibReferenceFragment :
   }
 
   private fun updateTreemapInsets() {
+    if (!isBindingInitialized()) return
     val container = binding.treemapContainer
     if (container.width == 0 || container.height == 0) return
     val decor = activity?.window?.decorView as? ViewGroup ?: return
+    if (container.rootView !== decor) return
 
     // Insets follow layout bounds, not the page/nav translation used during tab transitions.
     fun layoutLocation(view: View, result: IntArray) {

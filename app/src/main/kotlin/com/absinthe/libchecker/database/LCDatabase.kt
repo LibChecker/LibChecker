@@ -343,6 +343,21 @@ abstract class LCDatabase : RoomDatabase() {
 
     internal val MIGRATION_24_25: Migration = object : Migration(24, 25) {
       override suspend fun migrate(connection: SQLiteConnection) {
+        val columns = connection.prepare("PRAGMA table_info(`snapshot_table`)").use { statement ->
+          buildSet {
+            while (statement.step()) add(statement.getText(1))
+          }
+        }
+        // Early v24 builds shipped before these snapshot statistics fields were added.
+        mapOf(
+          "resourceInfo" to "TEXT NOT NULL DEFAULT '[]'",
+          "dexStatsAvailable" to "INTEGER NOT NULL DEFAULT 0",
+          "resourceStatsAvailable" to "INTEGER NOT NULL DEFAULT 0"
+        ).forEach { (name, definition) ->
+          if (name !in columns) {
+            connection.execSQL("ALTER TABLE snapshot_table ADD COLUMN `$name` $definition")
+          }
+        }
         connection.execSQL(
           "CREATE INDEX IF NOT EXISTS `index_snapshot_table_timeStamp_packageName` " +
             "ON `snapshot_table` (`timeStamp`, `packageName`)"

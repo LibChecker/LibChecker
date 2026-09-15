@@ -3,6 +3,7 @@ package com.absinthe.libchecker.domain.snapshot.timenode.ui
 import android.view.ContextThemeWrapper
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.BundleCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
@@ -35,6 +36,7 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
   private var isCompareMode: Boolean = false
   private var isLeftMode: Boolean = false
   private var dialogState: TimeNodeBottomSheetState? = null
+  private var autoRemoveDialog: AlertDialog? = null
 
   override fun initRootView(): TimeNodeBottomSheetView = TimeNodeBottomSheetView(requireContext())
 
@@ -55,7 +57,7 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
     arguments?.let {
       BundleCompat.getParcelableArrayList(it, EXTRA_TIMESTAMP_ITEMS, TimeStampItem::class.java)
         ?.let { timestampItems ->
-          lifecycleScope.launch {
+          viewLifecycleOwner.lifecycleScope.launch {
             bindTimeStampItems(timestampItems)
           }
         }
@@ -84,6 +86,7 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
   }
 
   private fun showAutoRemoveThresholdDialog() {
+    val owner = viewLifecycleOwnerLiveData.value ?: return
     val ctw = context as? ContextThemeWrapper
     if (ctw == null) {
       updateAutoRemoveThreshold(viewModel.getSnapshotAutoRemoveThreshold())
@@ -95,11 +98,15 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
       ctw,
       viewModel.getSnapshotAutoRemoveThreshold()
     ) { threshold ->
+      if (!owner.lifecycle.currentState.isAtLeast(Lifecycle.State.CREATED)) return@createSnapshotAutoRemoveThresholdDialog
       confirmedThreshold = threshold
       updateAutoRemoveThreshold(threshold)
       recordAutoRemoveChanged(checked = true, threshold = threshold)
     }
+    autoRemoveDialog = dialog
     dialog.setOnDismissListener {
+      if (!owner.lifecycle.currentState.isAtLeast(Lifecycle.State.CREATED)) return@setOnDismissListener
+      autoRemoveDialog = null
       val threshold = confirmedThreshold
       if (threshold == null) {
         updateAutoRemoveThreshold(viewModel.getSnapshotAutoRemoveThreshold())
@@ -114,20 +121,25 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
     context: ContextThemeWrapper,
     threshold: Int
   ) {
-    lifecycleScope.launch(Dispatchers.IO) {
-      var loadingDialog: AlertDialog? = null
+    viewLifecycleOwner.lifecycleScope.launch {
+      val loadingDialog = UiUtils.createLoadingDialog(context).also { it.show() }
       try {
-        withContext(Dispatchers.Main) {
-          loadingDialog = UiUtils.createLoadingDialog(context).also { it.show() }
+        val timestampList = withContext(Dispatchers.IO) {
+          viewModel.enableSnapshotAutoRemoveAndRetainLatest(threshold)
         }
-        val timestampList = viewModel.enableSnapshotAutoRemoveAndRetainLatest(threshold)
         bindTimeStampItems(timestampList)
       } finally {
-        withContext(Dispatchers.Main) {
-          loadingDialog?.dismiss()
-        }
+        loadingDialog.dismiss()
       }
     }
+  }
+
+  override fun onDestroyView() {
+    autoRemoveDialog?.setOnDismissListener(null)
+    autoRemoveDialog?.dismiss()
+    autoRemoveDialog = null
+    dialogState = null
+    super.onDestroyView()
   }
 
   private fun updateAutoRemoveThreshold(threshold: Int) {

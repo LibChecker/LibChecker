@@ -2,12 +2,14 @@ package com.absinthe.libchecker.domain.snapshot.track.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.absinthe.libchecker.domain.app.repository.PackageListLoadException
 import com.absinthe.libchecker.domain.snapshot.track.model.TrackedAppListItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class TrackViewModel(
   private val trackWorkflow: TrackWorkflow
@@ -27,7 +29,13 @@ class TrackViewModel(
     }
 
     loadJob = viewModelScope.launch(Dispatchers.IO) {
-      allItems = trackWorkflow.getItems()
+      allItems = try {
+        trackWorkflow.getItems()
+      } catch (e: PackageListLoadException) {
+        Timber.w(e)
+        _uiState.value = _uiState.value.copy(isLoading = false, loadFailed = true)
+        return@launch
+      }
       isLoaded = true
       _uiState.value = TrackListUiState(
         items = filterTrackItems(allItems, query),
@@ -85,5 +93,6 @@ class TrackViewModel(
 data class TrackListUiState(
   val items: List<TrackedAppListItem> = emptyList(),
   val isLoading: Boolean = true,
+  val loadFailed: Boolean = false,
   val isSearchVisible: Boolean = false
 )
