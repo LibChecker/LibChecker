@@ -55,10 +55,13 @@ class BuildSnapshotTitleDisplayDataUseCase(
       return item.packageName
     }
 
-    val packageSplits = item.packageName.split("/")
-    val first = packageSplits[0]
-    val second = packageSplits.getOrNull(1)
-    return if (second != null && second != first) "$first $ARROW $second" else first
+    val slashIndex = item.packageName.indexOf('/')
+    if (slashIndex < 0) {
+      return item.packageName
+    }
+    val first = item.packageName.substring(0, slashIndex)
+    val second = item.packageName.substring(slashIndex + 1)
+    return if (second.isNotEmpty() && second != first) "$first $ARROW $second" else first
   }
 
   private fun buildPackageSize(

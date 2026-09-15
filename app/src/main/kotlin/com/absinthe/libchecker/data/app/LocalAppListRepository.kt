@@ -39,6 +39,10 @@ class LocalAppListRepository(
     dao.update(item)
   }
 
+  override suspend fun updateItems(items: List<LCItem>) {
+    dao.updateLCItems(items)
+  }
+
   override suspend fun updateFeatures(packageName: String, features: Int) {
     dao.updateFeatures(packageName, features)
   }
@@ -49,5 +53,9 @@ class LocalAppListRepository(
 
   override suspend fun deleteItemByPackageName(packageName: String) {
     dao.deleteLCItemByPackageName(packageName)
+  }
+
+  override suspend fun deleteItemsByPackageNames(packageNames: List<String>) {
+    dao.deleteLCItemsByPackageNames(packageNames)
   }
 }

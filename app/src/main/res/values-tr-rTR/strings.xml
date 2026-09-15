@@ -24,16 +24,12 @@
   <string name="uncharted_territory">Keşfedilmemiş bölge</string>
   <string name="get_app_list_denied_tip">Lütfen LibChecker\'a\n\"Yüklü uygulamalar hakkında bilgi al\"\niznini verin</string>
   <string name="advanced_menu">Gelişmiş menü</string>
-  <string name="archived_app">Arşivlenmiş uygulama</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">%s ABI\'ye sahip uygulamalar</string>
   <string name="title_statistics_dialog_no_native_libs">Yerel kütüphanesi olmayan uygulamalar</string>
   <string name="tab_chart">Grafik</string>
   <string name="tab_lib_reference_statistics">Kütüphane Referansı</string>
   <string name="not_marked_lib">İşaretlenmemiş kütüphane</string>
-  <string name="submenu_title_component">Bileşen</string>
-  <string name="submenu_title_manifest">Manifest</string>
-  <string name="ref_category_all">Tümü</string>
   <string name="ref_category_native">Yerel kütüphaneler</string>
   <string name="ref_category_service">Servisler</string>
   <string name="ref_category_activity">Aktiviteler</string>
@@ -71,12 +67,10 @@
   <string name="settings_get_updates_in_app_chip_stable">Kararlı</string>
   <string name="settings_get_updates_in_app_chip_ci">CI</string>
   <string name="about_info">Bu uygulama, cihazınızdaki uygulamaların kullandığı üçüncü taraf kütüphaneleri görüntülemek için kullanılır.</string>
-  <string name="toolbar_rate">Değerlendir</string>
   <string name="resource_declaration">Uygulamadaki kaynakların bir kısmı şuradan gelir: </string>
   <string name="library_declaration">LibChecker\'daki tüm işaretli kütüphane bilgileri, ait oldukları SDK\'nın geliştirme belgelerinden veya kod deposundan gelir. Bilgiler yanlışsa, lütfen iletişime geçin: absinthe@absinthe.life</string>
   <!--  Settings  -->
   <string name="pref_group_normal">Normal</string>
-  <string name="pref_group_others">Diğerleri</string>
   <string name="apk_analytics">APK Analizi</string>
   <string name="colorful_icon">Renkli simge</string>
   <string name="rules_repo_title">Kural deposu</string>
@@ -101,9 +95,7 @@
   <string name="cloud_rules_summary">En son işaretlenmiş kütüphane kurallarını buradan güncelleyin</string>
   <string name="array_dark_mode_off">Kapalı</string>
   <string name="array_dark_mode_on">Açık</string>
-  <string name="array_dark_mode_auto">Otomatik</string>
   <string name="array_dark_mode_system">Sistem varsayılanı</string>
-  <string name="array_dark_mode_battery">Pil tasarrufuna göre ayarla</string>
   <string name="array_snapshot_default">Bildir</string>
   <string name="array_snapshot_keep">Sakla</string>
   <string name="array_snapshot_discard">At</string>
@@ -112,7 +104,6 @@
   <string name="detail_label">Uygulama ayrıntılarını görüntüle</string>
   <string name="not_found">Bulunamadı</string>
   <string name="create_an_issue">Bilgileri tamamlamamıza yardımcı olun</string>
-  <string name="app_bundle_details">Android App Bundle, uygulamanızın derlenmiş tüm kodunu ve kaynaklarını içeren ve APK oluşturma ile imzalamayı Google Play\'e erteleyen bir yayınlama biçimidir.\nGoogle Play, uygulama paketinizi her cihaz yapılandırması için optimize edilmiş APK\'lar oluşturmak ve sunmak için kullanır, böylece uygulamanızı çalıştırmak için yalnızca belirli bir cihaza gereken kod ve kaynaklar indirilir. Farklı cihazlar için desteği optimize etmek amacıyla artık birden fazla APK oluşturmanız, imzalamanız ve yönetmeniz gerekmez ve kullanıcılar daha küçük, daha optimize indirmeler elde eder.</string>
   <string name="kotlin_details">Kotlin; JVM, Android, JavaScript, Wasm ve Native\'i hedefleyen, açık kaynaklı, statik olarak yazılan bir programlama dilidir. JetBrains tarafından geliştirilmiştir. Kotlin, geliştiricileri daha mutlu etmek için tasarlanmış modern ama aynı zamanda olgun bir programlama dilidir. Kısa ve özdür, güvenlidir, Java ve diğer dillerle birlikte çalışabilir ve üretken programlama için birden fazla platform arasında kodu yeniden kullanmanın birçok yolunu sunar.</string>
   <string name="items_count">Öğe sayısı: </string>
   <string name="further_operation">Daha fazla işlem</string>
@@ -131,7 +122,6 @@
   <string name="jetpack_compose_details">Jetpack Compose, Android\'in yerel kullanıcı arayüzü oluşturmak için modern araç setidir. Android\'de kullanıcı arayüzü geliştirmeyi basitleştirir ve hızlandırır. Daha az kod, güçlü araçlar ve sezgisel Kotlin API\'leri ile uygulamanızı hızlıca hayata geçirin.</string>
   <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform, JetBrains tarafından geliştirilen modern, deklaratif ve tepkisel bir UI (kullanıcı arayüzü) framework\'üdür. Az miktarda Kotlin kodu ile kullanıcı arayüzleri oluşturmanın basit bir yolunu sunar. Ayrıca, kullanıcı arayüzünüzü bir kez yazıp desteklenen tüm platformlarda – iOS, Android, masaüstü (Windows, macOS, Linux) ve web – çalıştırmanıza olanak tanır.</string>
   <string name="multi_arch_dialog_details"><![CDATA[Bir uygulama, 32-bit veya 64-bit olabilen diğer uygulamalara bir API sunuyorsa, olası hataları önlemek için manifest dosyasında <b>android:multiarch</b> özelliğinin true olarak ayarlanması gerekir.]]></string>
-  <string name="extract_native_libs_tip">Uygulama şunu beyan eder: </string>
   <string name="xml_detail">XML Ayrıntısı</string>
   <string name="lib_detail_dialog_title_16kb_page_size">16 KB sayfa boyutu desteği</string>
   <string name="lib_detail_dialog_content_16kb_page_size">Tarihsel olarak, Android yalnızca 4 KB bellek sayfa boyutlarını desteklemiş ve bu da Android cihazların tipik olarak sahip olduğu ortalama toplam bellek miktarı için sistem belleği performansını optimize etmiştir. Android 15\'ten itibaren AOSP, 16 KB sayfa boyutu (16 KB cihazlar) kullanacak şekilde yapılandırılmış cihazları desteklemektedir. Uygulamanız doğrudan veya dolaylı olarak bir SDK aracılığıyla herhangi bir NDK kütüphanesi kullanıyorsa, uygulamanızı bu 16 KB cihazlarda çalışması için yeniden oluşturmanız gerekecektir.</string>
@@ -142,9 +132,6 @@
   <string name="menu_split">Böl</string>
   <string name="alternative_launch_method">Alternatif başlatma yöntemi</string>
   <string name="compare_with_current">Mevcut paket ile karşılaştır</string>
-  <string name="rx_detail">RxJava, Reactive Extensions\'ın Java VM uygulamasıdır: gözlemlenebilir dizileri kullanarak asenkron ve olay tabanlı programlar oluşturmak için bir kütüphanedir.</string>
-  <string name="rx_android_detail">Android için Reactive Extensions</string>
-  <string name="rx_kotlin_detail">RxJava için Kotlin Uzantıları</string>
   <string name="permission_not_granted">Verilmedi</string>
   <string name="signature_detail">İmza detayı</string>
   <string name="signature_scheme_version">İmza şeması</string>
@@ -185,12 +172,6 @@
   <string name="lib_detail_app_install_source_empty">Bilinmiyor</string>
   <string name="lib_detail_app_install_source_empty_detail">Shell veya kaldırılmış uygulama</string>
   <string name="lib_detail_app_install_source_shizuku_usage">Android, yükleme isteyicisini alma API\'sini kısıtladığı için, yükleme isteyicisini almak üzere Shizuku kullanıyoruz</string>
-  <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizuku yüklü değil</string>
-  <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">Shizuku\'yu yüklemek için buraya tıklayın</string>
-  <string name="lib_detail_app_install_source_shizuku_low_version">Shizuku API 10 gerekiyor</string>
-  <string name="lib_detail_app_install_source_shizuku_low_version_detail">Shizuku\'yu güncellemek için buraya tıklayın</string>
-  <string name="lib_detail_app_install_source_shizuku_not_running">Shizuku çalışmıyor</string>
-  <string name="lib_detail_app_install_source_shizuku_not_running_detail">Başlatmak için Shizuku\'ya atlamak için buraya tıklayın</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku yetkilendirilmedi</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">Yükleme isteyicisi için Shizuku yetkilendirmesi için buraya tıklayın</string>
   <string name="lib_detail_elf_info">Daha fazla ayrıntı</string>
@@ -205,12 +186,10 @@
   <string name="feature_live_update_notification_summary">Sistem, Canlı Güncelleme bildirimlerini öne çıkarır. Öne çıkarılan bildirimler, bildirim çekmecesinin ve kilit ekranının üst kısmı ile durum çubuğundaki bir çip de dahil olmak üzere sistem yüzeylerinde daha belirgin bir şekilde görünür.</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Panoya kopyalandı</string>
-  <string name="toast_not_existing_market">Uygulama mağazası bulunamadı</string>
   <string name="toast_use_another_file_manager">Lütfen APK\'yı açmak için başka bir dosya yöneticisi kullanın</string>
   <string name="toast_cant_open_app">Bu uygulama açılamıyor</string>
   <string name="toast_cloud_rules_update_error">Bulut kuralları güncellenemedi. Lütfen tekrar deneyin</string>
   <string name="toast_not_enough_storage_space">Yeterli depolama alanı yok</string>
-  <string name="toast_downloading_app">İndirme talep edildi</string>
   <string name="toast_long_tap_share_button_tip">Nereye kaydedeceğinizi seçmek için \"Paylaş\" düğmesine uzun basın</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">Mevcut anlık görüntüyü kaydet</string>
@@ -225,7 +204,6 @@
   <string name="snapshot_no_snapshot">Anlık Görüntü Yok</string>
   <string name="snapshot_detail_new_install_title">Bu uygulama yeni yüklendi</string>
   <string name="snapshot_detail_deleted_title">Bu uygulama kaldırıldı</string>
-  <string name="snapshot_time_node_uninitialized">Başlatılmamış</string>
   <string name="snapshot_preinstalled_app">Önceden yüklenmiş uygulama</string>
   <string name="snapshot_generate_text_report">Metin raporu oluştur</string>
   <string name="snapshot_scheme_tip"><![CDATA[İpucu: Artık arka planda şu yolla anlık görüntüler oluşturabilirsiniz:<br><b>%s</b>]]></string>
@@ -246,7 +224,6 @@
   <string name="dialog_themed_and_alternative_app_icons">Temalı ve alternatif simgeler</string>
   <string name="dialog_themed">Temalı</string>
   <!--  Album  -->
-  <string name="album_compare">Karşılaştır</string>
   <string name="album_item_comparison_title">Karşılaştırma</string>
   <string name="album_item_comparison_subtitle">İki anlık görüntüyü karşılaştır</string>
   <string name="album_item_comparison_invalid_compare">Geçersiz karşılaştırma</string>
@@ -264,11 +241,7 @@
   <string name="album_backup">Yedekle</string>
   <string name="album_backup_summary">Tüm anlık görüntüleri yedekle</string>
   <string name="album_restore">Geri Yükle</string>
-  <string name="album_restore_summary">Bir yedekleme dosyasından anlık görüntüleri geri yükle</string>
-  <string name="album_restore_detail">%1$s: toplam %2$s öğe\n</string>
   <string name="album_click_to_choose">Seçmek için tıkla</string>
-  <string name="album_dialog_delete_snapshot_message">İşleniyor…</string>
-  <string name="album_snapshot_top_apps_not_initialized">Henüz yüklenmedi</string>
   <!--  Integration  -->
   <string name="integration_monkey_king_menu_block">\"MonkeyKing Purify\" ile engelle</string>
   <string name="integration_monkey_king_menu_unblock">\"MonkeyKing Purify\" ile engeli kaldır</string>

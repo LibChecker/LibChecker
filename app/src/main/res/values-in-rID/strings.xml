@@ -24,16 +24,12 @@
   <string name="uncharted_territory">Territory tidak terpetakan</string>
   <string name="get_app_list_denied_tip">Tolong izinkan\n\"Dapatkan info tentang aplikasi yang terinstal\"\nizin untuk LibChecker</string>
   <string name="advanced_menu">Menu Lanjutan</string>
-  <string name="archived_app">Aplikasi yang diarsipkan</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">Aplikasi dengan ABI %s</string>
   <string name="title_statistics_dialog_no_native_libs">Aplikasi tanpa library native</string>
   <string name="tab_chart">Chart</string>
   <string name="tab_lib_reference_statistics">Referensi lib</string>
   <string name="not_marked_lib">Library tak ditandai</string>
-  <string name="submenu_title_component">Component</string>
-  <string name="submenu_title_manifest">Manifest</string>
-  <string name="ref_category_all">Semua</string>
   <string name="ref_category_native">Library Native</string>
   <string name="ref_category_service">Layanan</string>
   <string name="ref_category_activity">Aktivitas</string>
@@ -71,12 +67,10 @@
   <string name="settings_get_updates_in_app_chip_stable">Stabil</string>
   <string name="settings_get_updates_in_app_chip_ci">CI</string>
   <string name="about_info">Aplikasi ini digunakan untuk melihat library pihak ketiga yang digunakan oleh aplikasi di perangkat Anda.</string>
-  <string name="toolbar_rate">Nilai</string>
   <string name="resource_declaration">Sebagian resource aplikasi berasal dari: </string>
   <string name="library_declaration">Semua informasi library yang ditandai di LibChecker berasal dari dokumentasi pengembangan atau repositori kode dari SDK yang digunakan. Jika informasinya salah, silakan hubungi: absinthe@absinthe.life</string>
   <!--  Settings  -->
   <string name="pref_group_normal">Normal</string>
-  <string name="pref_group_others">Lainnya</string>
   <string name="apk_analytics">APK Analytics</string>
   <string name="colorful_icon">Ikon Berwarna</string>
   <string name="rules_repo_title">Rules Repo</string>
@@ -101,9 +95,7 @@
   <string name="cloud_rules_summary">Perbarui rule library yang ditandai terbaru di sini</string>
   <string name="array_dark_mode_off">Mati</string>
   <string name="array_dark_mode_on">Hidup</string>
-  <string name="array_dark_mode_auto">Otomatis</string>
   <string name="array_dark_mode_system">Bawaan Sistem</string>
-  <string name="array_dark_mode_battery">Diatur oleh Penghemat Baterai</string>
   <string name="array_snapshot_default">Beritahu</string>
   <string name="array_snapshot_keep">Tetap</string>
   <string name="array_snapshot_discard">Buang</string>
@@ -112,7 +104,6 @@
   <string name="detail_label">Lihat Detail Aplikasi</string>
   <string name="not_found">Tidak ditemukan</string>
   <string name="create_an_issue">Bantu kami untuk melengkapi informasi</string>
-  <string name="app_bundle_details">Android App Bundle adalah format penerbitan resmi baru Android yang menawarkan cara yang lebih efisien untuk membuat dan merilis aplikasi Anda. Android App Bundle memungkinkan Anda memberikan pengalaman yang luar biasa dengan lebih mudah dalam ukuran aplikasi yang lebih kecil, yang dapat meningkatkan keberhasilan pemasangan dan mengurangi pencopotan pemasangan. Sangat mudah untuk beralih. Anda tidak perlu merefaktor kode Anda untuk mulai mendapatkan manfaat dari aplikasi yang lebih kecil. Dan setelah Anda beralih, Anda akan mendapatkan manfaat dari pengembangan aplikasi modular dan pengiriman fitur yang dapat disesuaikan.</string>
   <string name="kotlin_details">Kotlin adalah bahasa pemrograman lintas platform, diketik secara statis, dan memiliki inferensi tipe. Kotlin didesain untuk dapat beroperasi secara penuh dengan Java, dan versi JVM dari library standar Kotlin bergantung pada Java Class Library, tetapi inferensi tipe memungkinkan sintaksnya menjadi lebih ringkas.</string>
   <string name="items_count">Jumlah item: </string>
   <string name="further_operation">Operasi Lebih Lanjut</string>
@@ -129,7 +120,6 @@
   <string name="jetpack_compose_details">Jetpack Compose adalah toolkit modern Android untuk membangun UI native. Ini menyederhanakan dan mempercepat pengembangan UI di Android. Dengan cepat mewujudkan aplikasi Anda dengan kode yang lebih sedikit, alat yang powerful, dan API Kotlin yang intuitif.</string>
   <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform adalah framework UI deklaratif dan reaktif modern yang dikembangkan oleh JetBrains yang menyediakan cara sederhana untuk membangun antarmuka pengguna dengan sedikit kode Kotlin. Framework ini juga memungkinkan Anda menulis UI sekali dan menjalankannya di semua platform yang didukung – iOS, Android, desktop (Windows, macOS, Linux), dan web.</string>
   <string name="multi_arch_dialog_details"><![CDATA[Jika sebuah aplikasi mengekspos API ke aplikasi lain yang dapat berupa 32 bit atau 64 bit, aplikasi harus memiliki properti <b>android:multiarch</b> disetel ke true di dalam manifest-nya untuk menghindari potensi kesalahan.]]></string>
-  <string name="extract_native_libs_tip">Aplikasi menyatakan </string>
   <string name="xml_detail">Detail XML</string>
   <string name="lib_detail_dialog_title_16kb_page_size">Dukungan Ukuran Halaman 16 KB</string>
   <string name="lib_detail_dialog_content_16kb_page_size">Secara historis, Android hanya mendukung ukuran halaman memori 4 KB, yang telah mengoptimalkan kinerja memori sistem untuk jumlah rata-rata total memori yang biasanya dimiliki perangkat Android. Mulai Android 15, AOSP mendukung perangkat yang dikonfigurasi untuk menggunakan ukuran halaman 16 KB (perangkat 16 KB). Jika aplikasi Anda menggunakan library NDK, baik secara langsung maupun tidak langsung melalui SDK, maka Anda perlu membangun ulang aplikasi Anda agar dapat berfungsi pada perangkat 16 KB ini.</string>
@@ -140,9 +130,6 @@
   <string name="menu_split">Pisah</string>
   <string name="alternative_launch_method">Metode Peluncuran Alternatif</string>
   <string name="compare_with_current">Bandingkan dengan paket saat ini</string>
-  <string name="rx_detail">RxJava adalah implementasi Java VM untuk Reactive Extensions: sebuah library untuk membuat program asynchronous dan event-based dengan menggunakan urutan yang dapat diobservasi.</string>
-  <string name="rx_android_detail">Reactive Extensions for Android</string>
-  <string name="rx_kotlin_detail">Kotlin Extensions for RxJava</string>
   <string name="permission_not_granted">Tidak Diberikan</string>
   <string name="signature_detail">Detail Tanda Tangan</string>
   <string name="signature_scheme_version">Skema Tanda Tangan</string>
@@ -181,12 +168,6 @@
   <string name="lib_detail_app_install_source_empty">Tidak diketahui</string>
   <string name="lib_detail_app_install_source_empty_detail">Shell atau aplikasi yang dihapus instalasinya</string>
   <string name="lib_detail_app_install_source_shizuku_usage">Karena Android membatasi API untuk mendapatkan pengaju instalasi, kami menggunakan Shizuku untuk mendapatkan pengaju instalasi.</string>
-  <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizuku belum terpasang</string>
-  <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">Klik di sini untuk menginstal Shizuku</string>
-  <string name="lib_detail_app_install_source_shizuku_low_version">Memerlukan Shizuku API 10</string>
-  <string name="lib_detail_app_install_source_shizuku_low_version_detail">Klik di sini untuk memperbarui Shizuku</string>
-  <string name="lib_detail_app_install_source_shizuku_not_running">Shizuku tidak berjalan</string>
-  <string name="lib_detail_app_install_source_shizuku_not_running_detail">Klik di sini untuk beralih ke Shizuku dan memulainya</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Tidak diizinkan Shizuku</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">Klik di sini untuk permintaan otorisasi Shizuku untuk pengajuan instalasi</string>
   <string name="lib_detail_elf_info">Info Selengkapnya</string>
@@ -194,12 +175,10 @@
   <string name="lib_detail_entry_points_tip">Entry Point</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Tersalin ke papan klip</string>
-  <string name="toast_not_existing_market">Tidak ada di market aplikasi apa pun</string>
   <string name="toast_use_another_file_manager">Silakan gunakan File Manager lain untuk membuka APK</string>
   <string name="toast_cant_open_app">Tidak dapat membuka aplikasi ini</string>
   <string name="toast_cloud_rules_update_error">Gagal memperbarui rule cloud. Silakan coba lagi.</string>
   <string name="toast_not_enough_storage_space">Tidak cukup ruang penyimpanan</string>
-  <string name="toast_downloading_app">Permintaan unduhan</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">Simpan snapshot terkini</string>
   <string name="snapshot_current_timestamp">Timestamp Snapshot Terkini</string>
@@ -213,7 +192,6 @@
   <string name="snapshot_no_snapshot">Tidak ada Snapshot</string>
   <string name="snapshot_detail_new_install_title">Aplikasi ini baru saja dipasang</string>
   <string name="snapshot_detail_deleted_title">Aplikasi ini telah dihapus</string>
-  <string name="snapshot_time_node_uninitialized">(Tidak diinisialisasi)</string>
   <string name="snapshot_preinstalled_app">Prainstal apl.</string>
   <string name="snapshot_generate_text_report">Buat Catatan Laporan</string>
   <string name="snapshot_scheme_tip"><![CDATA[Tip: Anda sekarang dapat menghasilkan snapshot di latar belakang via:<br><b>%s</b>]]></string>
@@ -232,7 +210,6 @@
   <string name="dialog_title_compare_diff_apk">Perhatian</string>
   <string name="dialog_message_compare_diff_apk">Apakah Anda ingin membandingkan dua APK yang berbeda?</string>
   <!--  Album  -->
-  <string name="album_compare">Bandingkan</string>
   <string name="album_item_comparison_title">Perbandingan</string>
   <string name="album_item_comparison_subtitle">Bandingkan dengan dua snapshot</string>
   <string name="album_item_comparison_invalid_compare">Perbandingan tidak valid</string>
@@ -250,11 +227,7 @@
   <string name="album_backup">Cadangkan</string>
   <string name="album_backup_summary">Cadangkan semua snapshot</string>
   <string name="album_restore">Pulihkan</string>
-  <string name="album_restore_summary">Pulihkan snapshot dari file cadangan</string>
-  <string name="album_restore_detail">%1$s: %2$s item secara total\n</string>
   <string name="album_click_to_choose">Klik untuk Memilih</string>
-  <string name="album_dialog_delete_snapshot_message">Memproses…</string>
-  <string name="album_snapshot_top_apps_not_initialized">Belum dimuat</string>
   <!--  Integration  -->
   <string name="integration_monkey_king_menu_block">Blokir via \"MonkeyKing Purify\"</string>
   <string name="integration_monkey_king_menu_unblock">Buka blokir via \"MonkeyKing Purify\"</string>

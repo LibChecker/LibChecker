@@ -634,13 +634,20 @@ class ApkPreview internal constructor(
   private fun parseElfFiles(cdEntries: List<CdEntry>) {
     cdEntries.forEach {
       checkCancelled()
-      val path = it.name.split("/")
-      if (path.size == 3 && path[0] == "lib" && path[2].endsWith(".so")) {
-        val abi = STRING_ABI_MAP[path[1]] ?: return@forEach
-        val elfSize = it.uncompressedSize.toInt()
-        elfMap.getOrPut(abi) { mutableListOf() }
-          .add(Pair(path[2], elfSize))
+      val name = it.name
+      if (!name.startsWith("lib/") || !name.endsWith(".so")) {
+        return@forEach
       }
+      val secondSlash = name.indexOf('/', startIndex = 4)
+      if (secondSlash == -1 || name.indexOf('/', startIndex = secondSlash + 1) != -1) {
+        return@forEach
+      }
+      val abiName = name.substring(4, secondSlash)
+      val abi = STRING_ABI_MAP[abiName] ?: return@forEach
+      val elfSize = it.uncompressedSize.toInt()
+      val soName = name.substring(secondSlash + 1)
+      elfMap.getOrPut(abi) { mutableListOf() }
+        .add(Pair(soName, elfSize))
     }
   }
 

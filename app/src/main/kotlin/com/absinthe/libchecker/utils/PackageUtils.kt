@@ -350,8 +350,7 @@ object PackageUtils {
     if (FreezeUtils.isAppFrozen(ai)) {
       File(ai.sourceDir).parentFile?.takeIf { it.exists() }?.let { files ->
         return files.listFiles { file -> file.name.startsWith("split_") && file.name.endsWith(".apk") }
-          ?.map { it.absolutePath }
-          ?.toTypedArray()
+          ?.let { list -> Array(list.size) { list[it].absolutePath } }
       }
     }
     return ai.splitSourceDirs

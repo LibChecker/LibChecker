@@ -506,7 +506,7 @@ internal fun parseSnapshotDetailChangedLines(
   extra: CharSequence
 ): List<SnapshotDetailChangedLine> {
   val separator = " $SNAPSHOT_DETAIL_DIFF_ARROW "
-  return extra.toString().split('\n').map { line ->
+  return extra.lineSequence().map { line ->
     val separatorStart = line.indexOf(separator)
     val newValueStart = separatorStart + separator.length
     if (separatorStart <= 0 || newValueStart >= line.length) {
@@ -518,7 +518,7 @@ internal fun parseSnapshotDetailChangedLines(
         newValue = line.substring(newValueStart)
       )
     }
-  }
+  }.toList()
 }
 
 internal data class SnapshotDetailChangedLine(

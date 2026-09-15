@@ -21,9 +21,13 @@ interface AppListRepository {
 
   suspend fun updateItem(item: LCItem)
 
+  suspend fun updateItems(items: List<LCItem>)
+
   suspend fun updateFeatures(packageName: String, features: Int)
 
   suspend fun updateFeatures(featuresMap: Map<String, Int>)
 
   suspend fun deleteItemByPackageName(packageName: String)
+
+  suspend fun deleteItemsByPackageNames(packageNames: List<String>)
 }

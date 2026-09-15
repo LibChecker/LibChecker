@@ -25,7 +25,7 @@ class FileLoggingTree(context: Context) : Timber.DebugTree() {
       Timber.e(e)
     }
     // Remove old log files, keeping the latest 3
-    val logFiles = logDir.listFiles { file -> file.isFile && file.extension == "log" }
+    val logFiles = logDir.listFiles { file -> file.isFile && file.name.endsWith(".log") }
     logFiles?.sortedByDescending { it.lastModified() }?.drop(3)?.forEach { file ->
       try {
         file.delete()

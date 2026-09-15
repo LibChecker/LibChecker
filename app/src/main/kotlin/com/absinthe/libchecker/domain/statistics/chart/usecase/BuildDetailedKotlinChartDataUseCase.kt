@@ -64,8 +64,10 @@ class BuildDetailedKotlinChartDataUseCase(
     for (index in 0 until maxOf(a.size, b.size)) {
       val x = a.getOrNull(index).orEmpty()
       val y = b.getOrNull(index).orEmpty()
-      val comparison = if (x.toIntOrNull() != null && y.toIntOrNull() != null) {
-        x.toInt().compareTo(y.toInt())
+      val xInt = x.toIntOrNull()
+      val yInt = y.toIntOrNull()
+      val comparison = if (xInt != null && yInt != null) {
+        xInt.compareTo(yInt)
       } else {
         x.compareTo(y)
       }

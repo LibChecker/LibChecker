@@ -31,24 +31,22 @@ class AppAdapter(
           ViewGroup.LayoutParams.MATCH_PARENT,
           ViewGroup.LayoutParams.WRAP_CONTENT
         )
+        if (cardMode == CardMode.DEMO) {
+          setSmoothRoundCorner(20.dp)
+          strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutlineVariant)
+          setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSurfaceContainerHigh))
+        } else {
+          radius = 0f
+          if (cardMode == CardMode.TRANSPARENT) {
+            setCardBackgroundColor(Color.TRANSPARENT)
+          }
+        }
       }
     )
   }
 
   override fun convert(holder: BaseViewHolder, item: LCItem) {
     val root = holder.itemView as AppItemView
-    root.apply {
-      if (cardMode == CardMode.DEMO) {
-        setSmoothRoundCorner(20.dp)
-        strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutlineVariant)
-        setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSurfaceContainerHigh))
-      } else {
-        radius = 0f
-        if (cardMode == CardMode.TRANSPARENT) {
-          setCardBackgroundColor(Color.TRANSPARENT)
-        }
-      }
-    }
     val viewState = getItemViewState(item)
     root.setItemDisplay(createItemDisplay(item, viewState), highlightText)
   }

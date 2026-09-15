@@ -134,6 +134,7 @@ fun PackageInfo.getPermissionsList(): List<String> {
  * @return Stateful permissions list
  */
 fun PackageInfo.getStatefulPermissionsList(): List<Pair<String, Boolean>> {
+  val permissions = requestedPermissions ?: return emptyList()
   val flags = requestedPermissionsFlags
   val hidden by unsafeLazy {
     val sourceDir = applicationInfo?.sourceDir ?: return@unsafeLazy emptyMap<String, Int>()
@@ -142,29 +143,23 @@ fun PackageInfo.getStatefulPermissionsList(): List<Pair<String, Boolean>> {
     }
   }
 
-  if (flags?.size != requestedPermissions?.size) {
-    return requestedPermissions?.mapNotNull { permission ->
-      permission?.let { it to true }
-    }?.toMutableList()?.apply {
-      if (hidden.isNotEmpty()) {
-        hidden.forEach { (p, v) ->
-          add("$p (maxSdkVersion: $v)" to false)
-        }
+  val hasMatchingFlags = flags != null && flags.size == permissions.size
+  return buildList(permissions.size + 4) {
+    for (i in permissions.indices) {
+      val perm = permissions[i] ?: continue
+      val isGranted = if (hasMatchingFlags) {
+        (flags[i] and PackageInfo.REQUESTED_PERMISSION_GRANTED) != 0
+      } else {
+        true
       }
-    } ?: emptyList()
-  }
-
-  return requestedPermissions?.mapIndexedNotNull { index, permission ->
-    permission?.let {
-      it to ((flags?.get(index) ?: 0) and PackageInfo.REQUESTED_PERMISSION_GRANTED != 0)
+      add(perm to isGranted)
     }
-  }?.toMutableList()?.apply {
     if (hidden.isNotEmpty()) {
       hidden.forEach { (p, v) ->
         add("$p (maxSdkVersion: $v)" to false)
       }
     }
-  } ?: emptyList()
+  }
 }
 
 /**

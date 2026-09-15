@@ -24,16 +24,12 @@
   <string name="uncharted_territory">Vùng chưa được khám phá</string>
   <string name="get_app_list_denied_tip">Vui lòng cấp\n\"Nhận thông tin về các ứng dụng đã cài đặt\"\n Và cấp quyền cho LibChecker</string>
   <string name="advanced_menu">Cài đặt nâng cấp cao</string>
-  <string name="archived_app">Ứng dụng đã lưu trữ</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">Ứng dụng có %s ABI</string>
   <string name="title_statistics_dialog_no_native_libs">Ứng dụng không có thư viện gốc</string>
   <string name="tab_chart">Biểu đồ biểu tượng</string>
   <string name="tab_lib_reference_statistics">Tham khảo thư viện</string>
   <string name="not_marked_lib">Thư viện chưa được đánh dấu</string>
-  <string name="submenu_title_component">Thành phần</string>
-  <string name="submenu_title_manifest">kế khai</string>
-  <string name="ref_category_all">Tất cả</string>
   <string name="ref_category_native">Thư viện gốc</string>
   <string name="ref_category_service">Dịch vụ</string>
   <string name="ref_category_activity">Hoạt động</string>
@@ -70,12 +66,10 @@
   <string name="settings_get_updates_in_app_chip_stable">Ổn định</string>
   <string name="settings_get_updates_in_app_chip_ci">CI</string>
   <string name="about_info">Ứng dụng này được sử dụng để xem các thư viện của bên thứ ba được sử dụng bởi các ứng dụng trong thiết bị của bạn.</string>
-  <string name="toolbar_rate">Tỷ lệ</string>
   <string name="resource_declaration">Một phần tài nguyên trong ứng dụng đến từ:</string>
   <string name="library_declaration">Tất cả thông tin thư viện được đánh dấu trong LibChecker đều đến từ kho lưu trữ tài liệu phát triển hoặc mã của SDK chứa thông tin đó. Nếu thông tin không chính xác, vui lòng liên hệ: absinthe@absinthe.life</string>
   <!--  Settings  -->
   <string name="pref_group_normal">Bình thường</string>
-  <string name="pref_group_others">Người khác</string>
   <string name="apk_analytics">Phân tích APK</string>
   <string name="colorful_icon">Biểu tượng đầy màu sắc</string>
   <string name="rules_repo_title">Quy tắc repo</string>
@@ -100,9 +94,7 @@
   <string name="cloud_rules_summary">Cập nhật nội quy thư viện được đánh dấu mới nhất tại đây</string>
   <string name="array_dark_mode_off">TẮT</string>
   <string name="array_dark_mode_on">MỞ</string>
-  <string name="array_dark_mode_auto">Tự động</string>
   <string name="array_dark_mode_system">Mặc định hệ thống</string>
-  <string name="array_dark_mode_battery">Đặt theo Trình tiết kiệm pin</string>
   <string name="array_snapshot_default">Thông báo</string>
   <string name="array_snapshot_keep">Giữ</string>
   <string name="array_snapshot_discard">loại bỏ</string>
@@ -111,7 +103,6 @@
   <string name="detail_label">Xem chi tiết ứng dụng</string>
   <string name="not_found">Không tìm thấy</string>
   <string name="create_an_issue">Hỗ trợ chúng tôi bổ sung thông tin</string>
-  <string name="app_bundle_details">Android App Bundle là định dạng xuất bản chính thức, mới của Android, cung cấp một cách hiệu quả hơn để xây dựng và phát hành ứng dụng của bạn. Android App Bundle cho phép bạn dễ dàng cung cấp trải nghiệm tuyệt vời hơn trong một ứng dụng có kích thước nhỏ hơn, điều này có thể cải thiện khả năng cài đặt thành công và giảm số lượt gỡ cài đặt. Thật dễ dàng để chuyển đổi. Bạn không cần cấu trúc lại mã của mình để bắt đầu hưởng lợi từ một ứng dụng nhỏ hơn. Và khi bạn đã chuyển đổi, bạn sẽ được hưởng lợi từ việc phát triển ứng dụng theo mô-đun và cung cấp tính năng có thể tùy chỉnh.</string>
   <string name="kotlin_details">Kotlin là một ngôn ngữ lập trình đa nền tảng, được gõ tĩnh, có mục đích chung với suy luận kiểu. Kotlin được thiết kế để tương tác hoàn toàn với Java và phiên bản JVM của thư viện chuẩn của Kotlin phụ thuộc vào Thư viện lớp Java, nhưng suy luận kiểu cho phép cú pháp của nó ngắn gọn hơn.</string>
   <string name="items_count">Số lượng vật phẩm:</string>
   <string name="further_operation">hoạt động thêm</string>
@@ -128,7 +119,6 @@
   <string name="jetpack_compose_details">Jetpack Compose là bộ công cụ hiện đại của Android để xây dựng giao diện người dùng gốc. Nó đơn giản hóa và tăng tốc phát triển giao diện người dùng trên Android. Nhanh chóng đưa ứng dụng của bạn vào cuộc sống với ít mã hơn, công cụ mạnh mẽ và API Kotlin trực quan.</string>
   <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform là một framework UI hiện đại khai báo và phản ứng do JetBrains phát triển, cung cấp cách đơn giản để xây dựng giao diện người dùng với một lượng mã Kotlin nhỏ. Nó cũng cho phép bạn viết UI một lần và chạy trên bất kỳ nền tảng nào được hỗ trợ – iOS, Android, desktop (Windows, macOS, Linux) và web.</string>
   <string name="multi_arch_dialog_details"><![CDATA[Nếu một ứng dụng cung cấp API cho ứng dụng khác có thể là 32 bit hoặc 64 bit, ứng dụng đó phải có thuộc tính <b>android:multiarch</b> đặt là true trong manifest để tránh lỗi tiềm ẩn.]]></string>
-  <string name="extract_native_libs_tip">Ứng dụng tuyên bố </string>
   <string name="xml_detail">Chi tiết XML</string>
   <string name="lib_detail_dialog_title_16kb_page_size">Hỗ trợ kích thước trang 16 KB</string>
   <string name="lib_detail_dialog_content_16kb_page_size">Lịch sử, Android chỉ hỗ trợ kích thước trang bộ nhớ 4 KB, điều này đã tối ưu hóa hiệu suất bộ nhớ hệ thống dựa trên lượng bộ nhớ tổng trung bình của các thiết bị Android. Bắt đầu từ Android 15, AOSP hỗ trợ các thiết bị cấu hình sử dụng kích thước trang 16 KB (thiết bị 16 KB). Nếu ứng dụng của bạn sử dụng thư viện NDK, trực tiếp hoặc gián tiếp qua SDK, bạn cần biên dịch lại ứng dụng để sử dụng trên các thiết bị 16 KB này.</string>
@@ -139,9 +129,6 @@
   <string name="menu_split">Tách</string>
   <string name="alternative_launch_method">Phương pháp chia sẻ thay thế</string>
   <string name="compare_with_current">So sánh với gói hiện tại</string>
-  <string name="rx_detail">RxJava là một sự phát triển khai thác máy ảo Java của Tiện ích mở rộng phản ứng: một thư viện để tạo các chương trình không đồng bộ và dựa trên sự kiện bằng cách sử dụng các chuỗi có thể quan sát được.</string>
-  <string name="rx_android_detail">Tiện ích mở rộng Reactive cho Android</string>
-  <string name="rx_kotlin_detail">Tiện ích mở rộng của Kotlin cho RxJava</string>
   <string name="permission_not_granted">Chưa cấp quyền</string>
   <string name="signature_detail">Chi tiết chữ ký</string>
   <string name="signature_scheme_version">Phiên bản kiểu ký</string>
@@ -180,12 +167,6 @@
   <string name="lib_detail_app_install_source_empty">không xác định</string>
   <string name="lib_detail_app_install_source_empty_detail">Shell hoặc ứng dụng đã gỡ cài đặt</string>
   <string name="lib_detail_app_install_source_shizuku_usage">Vì Android hạn chế API nhận trình yêu cầu cài đặt nên chúng tôi sử dụng Shizuku để nhận trình yêu cầu cài đặt.</string>
-  <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizuku chưa được cài đặt</string>
-  <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">Nhấn vào đây để cài đặt Shizuku</string>
-  <string name="lib_detail_app_install_source_shizuku_low_version">Yêu cầu Shizuku API 10</string>
-  <string name="lib_detail_app_install_source_shizuku_low_version_detail">Nhấn vào đây để cập nhật Shizuku</string>
-  <string name="lib_detail_app_install_source_shizuku_not_running">Shizuku không chạy</string>
-  <string name="lib_detail_app_install_source_shizuku_not_running_detail">Nhấn vào đây để chuyển đến Shizuku để bắt đầu nó</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku không được phép</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">Nhấp vào đây để Shizuku ủy quyền cho người yêu cầu cài đặt</string>
   <string name="lib_detail_elf_info">Thông tin thêm</string>
@@ -193,12 +174,10 @@
   <string name="lib_detail_entry_points_tip">Điểm vào</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Sao chép vào clipboard</string>
-  <string name="toast_not_existing_market">Không tồn tại bất kỳ thị trường ứng dụng nào</string>
   <string name="toast_use_another_file_manager">Vui lòng sử dụng Trình quản lý tệp khác để mở APK</string>
   <string name="toast_cant_open_app">Không thể mở ứng dụng này</string>
   <string name="toast_cloud_rules_update_error">Không thể cập nhật quy tắc đám mây. Vui lòng thử lại.</string>
   <string name="toast_not_enough_storage_space">Không đủ dung lượng lưu trữ</string>
-  <string name="toast_downloading_app">Yêu cầu tải xuống</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">Lưu ảnh chụp nhanh hiện tại</string>
   <string name="snapshot_current_timestamp">Dấu thời gian của ảnh chụp nhanh hiện tại</string>
@@ -212,7 +191,6 @@
   <string name="snapshot_no_snapshot">Không có ảnh chụp nhanh</string>
   <string name="snapshot_detail_new_install_title">Ứng dụng này đã được cài đặt mới</string>
   <string name="snapshot_detail_deleted_title">Ứng dụng này đã bị xóa</string>
-  <string name="snapshot_time_node_uninitialized">(Chưa khởi tạo)</string>
   <string name="snapshot_preinstalled_app">ứng dụng được cài đặt sẵn</string>
   <string name="snapshot_generate_text_report">Tạo báo cáo văn bản</string>
   <string name="snapshot_scheme_tip"><![CDATA[Tip: Giờ đây, bạn có thể tạo ảnh chụp nhanh ở chế độ nền thông qua:<br><b>%s</b>]]></string>
@@ -231,7 +209,6 @@
   <string name="dialog_title_compare_diff_apk">Chú ý</string>
   <string name="dialog_message_compare_diff_apk">Bạn có muốn so sánh hai APK khác nhau không?</string>
   <!--  Album  -->
-  <string name="album_compare">So sánh</string>
   <string name="album_item_comparison_title">So sánh</string>
   <string name="album_item_comparison_subtitle">So sánh với hai ảnh chụp nhanh</string>
   <string name="album_item_comparison_invalid_compare">So sánh không hợp lệ</string>
@@ -249,11 +226,7 @@
   <string name="album_backup">Hỗ trợ</string>
   <string name="album_backup_summary">Sao lưu tất cả ảnh chụp nhanh</string>
   <string name="album_restore">Khôi phục</string>
-  <string name="album_restore_summary">Khôi phục ảnh chụp nhanh từ tệp sao lưu</string>
-  <string name="album_restore_detail">%1$s : tổng cộng %2$s mục\n</string>
   <string name="album_click_to_choose">Bấm để chọn</string>
-  <string name="album_dialog_delete_snapshot_message">Processing…</string>
-  <string name="album_snapshot_top_apps_not_initialized">Chưa tải lên</string>
   <!--  Integration  -->
   <string name="integration_monkey_king_menu_block">Chặn nó qua \"MonkeyKing Purify\"</string>
   <string name="integration_monkey_king_menu_unblock">Bỏ chặn nó qua \"MonkeyKing Purify\"</string>

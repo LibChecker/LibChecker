@@ -24,16 +24,12 @@
   <string name="uncharted_territory">未知の領域</string>
   <string name="get_app_list_denied_tip">インストールされているアプリに関する情報を取得する為に\nLibCheckerの権限を許可してください。</string>
   <string name="advanced_menu">詳細メニュー</string>
-  <string name="archived_app">アーカイブ済みアプリ</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">%s ABI のアプリ</string>
   <string name="title_statistics_dialog_no_native_libs">ネイティブライブラリのないアプリ</string>
   <string name="tab_chart">チャート</string>
   <string name="tab_lib_reference_statistics">ライブラリ参照</string>
   <string name="not_marked_lib">マークされていないライブラリ</string>
-  <string name="submenu_title_component">コンポーネント</string>
-  <string name="submenu_title_manifest">マニフェスト</string>
-  <string name="ref_category_all">すべて</string>
   <string name="ref_category_native">ネイティブライブラリ</string>
   <string name="ref_category_service">サービス</string>
   <string name="ref_category_activity">アクティビティ</string>
@@ -71,12 +67,10 @@
   <string name="settings_get_updates_in_app_chip_stable">安定版</string>
   <string name="settings_get_updates_in_app_chip_ci">CI</string>
   <string name="about_info">このアプリは、デバイス内のアプリケーションで使用されているサードパーティのライブラリを表示するために使用されます。</string>
-  <string name="toolbar_rate">評価</string>
   <string name="resource_declaration">アプリケーションの一部のリソースは、以下から提供されています。</string>
   <string name="library_declaration">LibCheckerのすべてのマークされたライブラリ情報は、それに属するSDKの開発ドキュメントまたはコードリポジトリから来ています。情報が正しくない場合は、次のアドレスに連絡してください：absinthe@absinthe.life</string>
   <!--  Settings  -->
   <string name="pref_group_normal">通常</string>
-  <string name="pref_group_others">その他</string>
   <string name="apk_analytics">APKアナリティクス</string>
   <string name="colorful_icon">カラフルなアイコン</string>
   <string name="rules_repo_title">ルールリポジトリ</string>
@@ -101,9 +95,7 @@
   <string name="cloud_rules_summary">ここで最新のマークされたライブラリルールを更新してください</string>
   <string name="array_dark_mode_off">オフ</string>
   <string name="array_dark_mode_on">オン</string>
-  <string name="array_dark_mode_auto">自動</string>
   <string name="array_dark_mode_system">システムの標準</string>
-  <string name="array_dark_mode_battery">バッテリーセーバーによる設定</string>
   <string name="array_snapshot_default">通知</string>
   <string name="array_snapshot_keep">保持</string>
   <string name="array_snapshot_discard">破棄</string>
@@ -112,7 +104,6 @@
   <string name="detail_label">アプリ詳細を表示</string>
   <string name="not_found">見つかりません</string>
   <string name="create_an_issue">情報の補足を手伝ってください</string>
-  <string name="app_bundle_details">Android App Bundleは、Androidの新しい公式の公開形式で、より効率的な方法でアプリをビルドおよびリリースできます。Android App Bundleを使用すると、より小さいアプリサイズで素晴らしいエクスペリエンスを簡単に提供できるため、インストール成功が向上し、アンインストールが減少します。切り替えは簡単です。アプリのサイズを小さくするために、コードをリファクタリングする必要はありません。切り替えると、モジュラーアプリ開発とカスタマイズ可能な機能提供のメリットが得られます。</string>
   <string name="kotlin_details">Kotlinは、型推論を持つクロスプラットフォームの静的型付け汎用プログラミング言語です。KotlinはJavaと完全に相互運用可能に設計されており、Kotlinの標準ライブラリのJVMバージョンはJavaクラスライブラリに依存していますが、型推論により構文がより簡潔になります。</string>
   <string name="items_count">アイテム数：</string>
   <string name="further_operation">さらなる操作</string>
@@ -129,7 +120,6 @@
   <string name="jetpack_compose_details">Jetpack Composeは、AndroidのネイティブUIを構築するための現代的なツールキットです。これにより、AndroidでのUI開発が簡略化され、加速します。少ないコード、強力なツール、直感的なKotlin APIを使用して、すぐにアプリを実現します。</string>
   <string name="jetbrain_compose_multiplatform_details">Compose Multiplatformは、JetBrainsが開発した最新の宣言型・リアクティブUIフレームワークで、少量のKotlinコードでユーザーインターフェイスを簡単に構築できます。また、UIを一度記述すれば、対応するすべてのプラットフォーム（iOS、Android、デスクトップ（Windows、macOS、Linux）、Web）で動作させることができます。</string>
   <string name="multi_arch_dialog_details"><![CDATA[アプリが他のアプリに対して32ビットまたは64ビットのAPIを公開できる場合、潜在的なエラーを回避するため、マニフェスト内で<b>android:multiarch</b>プロパティをtrueに設定する必要があります。]]></string>
-  <string name="extract_native_libs_tip">アプリは次のものを宣言します</string>
   <string name="xml_detail">XML詳細</string>
   <string name="lib_detail_dialog_title_16kb_page_size">16KBページサイズのサポート</string>
   <string name="lib_detail_dialog_content_16kb_page_size">これまでAndroidは4KBのメモリページサイズのみをサポートしており、Androidデバイスの通常の合計メモリ量に最適化されたシステムメモリパフォーマンスを実現していました。Android 15からは、AOSPが16KBのページサイズ（16KBデバイス）を使用するように構成されたデバイスをサポートします。アプリでNDKライブラリを直接またはSDKを通じて間接的に使用している場合、これらの16KBデバイスで動作させるにはアプリを再ビルドする必要があります。</string>
@@ -140,9 +130,6 @@
   <string name="menu_split">分割</string>
   <string name="alternative_launch_method">代替起動方法</string>
   <string name="compare_with_current">現在のパッケージと比較</string>
-  <string name="rx_detail">RxJavaは、Reactive ExtensionsのJava VM実装です。これは、観察可能なシーケンスを使用して非同期およびイベントベースのプログラムを構成するためのライブラリです。</string>
-  <string name="rx_android_detail">Android向けのReactive Extensions</string>
-  <string name="rx_kotlin_detail">RxJavaのKotlin Extensions</string>
   <string name="permission_not_granted">許可されていません</string>
   <string name="signature_detail">署名の詳細</string>
   <string name="signature_scheme_version">署名方式</string>
@@ -181,12 +168,6 @@
   <string name="lib_detail_app_install_source_empty">不明</string>
   <string name="lib_detail_app_install_source_empty_detail">Shellまたはアンインストール済みのアプリ</string>
   <string name="lib_detail_app_install_source_shizuku_usage">Androidはインストールを要求したアプリを取得するAPIを制限しているため、Shizukuを使用してインストールを要求したアプリを取得します。</string>
-  <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizukuがインストールされていません</string>
-  <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">ここをクリックしてShizukuをインストール</string>
-  <string name="lib_detail_app_install_source_shizuku_low_version">Shizuku API 10が必要です</string>
-  <string name="lib_detail_app_install_source_shizuku_low_version_detail">ここをクリックしてShizukuを更新</string>
-  <string name="lib_detail_app_install_source_shizuku_not_running">Shizukuが起動していません</string>
-  <string name="lib_detail_app_install_source_shizuku_not_running_detail">ここをクリックしてShizukuにジャンプして起動します</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizukuが承認されていません</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">ここをクリックしてShizukuのインストールリクエスターに承認します</string>
   <string name="lib_detail_elf_info">詳細情報</string>
@@ -194,12 +175,10 @@
   <string name="lib_detail_entry_points_tip">エントリーポイント</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">クリップボードにコピーされました</string>
-  <string name="toast_not_existing_market">アプリマーケットが存在しません</string>
   <string name="toast_use_another_file_manager">他のファイルマネージャーを使用してAPKを開いてください</string>
   <string name="toast_cant_open_app">このアプリを開くことができません</string>
   <string name="toast_cloud_rules_update_error">クラウドルールの更新に失敗しました。再試行してください。</string>
   <string name="toast_not_enough_storage_space">ストレージスペースが不足しています</string>
-  <string name="toast_downloading_app">ダウンロードをリクエストしました</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">現在のスナップショットを保存</string>
   <string name="snapshot_current_timestamp">現在のスナップショットのタイムスタンプ</string>
@@ -213,7 +192,6 @@
   <string name="snapshot_no_snapshot">スナップショットなし</string>
   <string name="snapshot_detail_new_install_title">このアプリは新たにインストールされました</string>
   <string name="snapshot_detail_deleted_title">このアプリは削除されました</string>
-  <string name="snapshot_time_node_uninitialized">(初期化されていません)</string>
   <string name="snapshot_preinstalled_app">事前にインストールされたアプリ</string>
   <string name="snapshot_generate_text_report">テキストレポートを生成</string>
   <string name="snapshot_scheme_tip"><![CDATA[ヒント：現在、次のようにバックグラウンドでスナップショットを生成できます：<br><b>%s</b>]]></string>
@@ -232,7 +210,6 @@
   <string name="dialog_title_compare_diff_apk">注意</string>
   <string name="dialog_message_compare_diff_apk">異なる2つのAPKを比較しますか？</string>
   <!--  Album  -->
-  <string name="album_compare">比較</string>
   <string name="album_item_comparison_title">比較</string>
   <string name="album_item_comparison_subtitle">2つのスナップショットを比較</string>
   <string name="album_item_comparison_invalid_compare">無効な比較</string>
@@ -250,11 +227,7 @@
   <string name="album_backup">バックアップ</string>
   <string name="album_backup_summary">すべてのスナップショットをバックアップ</string>
   <string name="album_restore">復元</string>
-  <string name="album_restore_summary">バックアップファイルからスナップショットを復元</string>
-  <string name="album_restore_detail">%1$s : 合計で%2$s件のアイテム\n</string>
   <string name="album_click_to_choose">クリックで選択</string>
-  <string name="album_dialog_delete_snapshot_message">処理中…</string>
-  <string name="album_snapshot_top_apps_not_initialized">まだ読み込まれていません</string>
   <!--  Integration  -->
   <string name="integration_monkey_king_menu_block">MonkeyKing Purifyでブロックをする</string>
   <string name="integration_monkey_king_menu_unblock">MonkeyKing Purifyでのブロックを解除</string>

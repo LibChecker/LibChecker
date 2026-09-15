@@ -28,7 +28,7 @@ class LocalSnapshotRepository(
   }
 
   override suspend fun getSnapshotCountsByTimestamp(): Map<Long, Int> {
-    return dao.getSnapshotCountsByTimestamp().associate { it.timestamp to it.count }
+    return dao.getSnapshotCountsByTimestamp().associateBy(keySelector = { it.timestamp }, valueTransform = { it.count })
   }
 
   override suspend fun getSnapshots(timestamp: Long): List<SnapshotItem> {
@@ -67,6 +67,10 @@ class LocalSnapshotRepository(
     return dao.getSnapshotDiff(packageName)
   }
 
+  override suspend fun getSnapshotDiffs(): List<SnapshotDiffStoringItem> {
+    return dao.getSnapshotDiffs()
+  }
+
   override suspend fun getTrackItems(): List<TrackItem> {
     return dao.getTrackItems()
   }
@@ -81,6 +85,10 @@ class LocalSnapshotRepository(
 
   override suspend fun insertSnapshotDiff(item: SnapshotDiffStoringItem) {
     dao.insertSnapshotDiff(item)
+  }
+
+  override suspend fun insertSnapshotDiffs(items: List<SnapshotDiffStoringItem>) {
+    dao.insertSnapshotDiffs(items)
   }
 
   override suspend fun insertTrackItem(item: TrackItem) {

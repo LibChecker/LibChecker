@@ -477,7 +477,7 @@ class LibReferenceTreemapView @JvmOverloads constructor(
   }
 
   private fun rebuildCells(animateContent: Boolean = false) {
-    val previousOpacity = if (animateContent) cells.associate { it.id to it.contentOpacity } else emptyMap()
+    val previousOpacity = if (animateContent) cells.associateBy(keySelector = { it.id }, valueTransform = { it.contentOpacity }) else emptyMap()
     contentFadeAnimator?.cancel()
     contentFadeAnimator = null
     cancelFilterAnimation()

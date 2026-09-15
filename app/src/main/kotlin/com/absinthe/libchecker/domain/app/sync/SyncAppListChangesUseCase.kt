@@ -91,39 +91,50 @@ class SyncAppListChangesUseCase(
       applications = installedAppRepository.getApplicationMap(true)
     }
 
+    val toInsert = mutableListOf<LCItem>()
     for (packageInfo in applications.values) {
       if (packageInfo.packageName in dbItemMap) continue
       if (!currentCoroutineContext().isActive) return Result.Canceled
 
       runCatching {
-        appListRepository.insertItem(appListItemFactory.create(packageInfo, true))
-      }.onSuccess {
-        changed = true
+        toInsert.add(appListItemFactory.create(packageInfo, true))
       }.onFailure { e ->
         Timber.e(e, "requestChange: ${packageInfo.packageName}")
       }
     }
 
+    val toDelete = mutableListOf<String>()
     for (packageName in dbItemMap.keys) {
       if (packageName in applications) continue
       if (!currentCoroutineContext().isActive) return Result.Canceled
 
-      appListRepository.deleteItemByPackageName(packageName)
-      changed = true
+      toDelete.add(packageName)
     }
 
+    val toUpdate = mutableListOf<LCItem>()
     for (packageInfo in applications.values) {
       val dbItem = dbItemMap[packageInfo.packageName] ?: continue
       if (!isItemOutdated(packageInfo, dbItem)) continue
       if (!currentCoroutineContext().isActive) return Result.Canceled
 
       runCatching {
-        appListRepository.updateItem(appListItemFactory.create(packageInfo, true))
-      }.onSuccess {
-        changed = true
+        toUpdate.add(appListItemFactory.create(packageInfo, true))
       }.onFailure { e ->
         Timber.e(e, "requestChange: ${packageInfo.packageName}")
       }
+    }
+
+    if (toInsert.isNotEmpty()) {
+      appListRepository.insertItems(toInsert)
+      changed = true
+    }
+    if (toDelete.isNotEmpty()) {
+      appListRepository.deleteItemsByPackageNames(toDelete)
+      changed = true
+    }
+    if (toUpdate.isNotEmpty()) {
+      appListRepository.updateItems(toUpdate)
+      changed = true
     }
 
     return if (changed) Result.Changed else Result.NoChanges
