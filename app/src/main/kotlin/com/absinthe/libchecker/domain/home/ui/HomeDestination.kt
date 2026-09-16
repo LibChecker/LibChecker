@@ -6,7 +6,7 @@ import androidx.fragment.app.Fragment
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.domain.app.list.ui.AppListFragment
-import com.absinthe.libchecker.domain.settings.ui.SettingsFragment
+import com.absinthe.libchecker.domain.settings.ui.SettingsContainerFragment
 import com.absinthe.libchecker.domain.snapshot.list.ui.SnapshotFragment
 import com.absinthe.libchecker.domain.statistics.reference.ui.LibReferenceFragment
 
@@ -44,7 +44,7 @@ enum class HomeDestination(
     navigationItemId = R.id.navigation_settings,
     launchAction = Intent.ACTION_APPLICATION_PREFERENCES
   ) {
-    override fun createFragment(): Fragment = SettingsFragment()
+    override fun createFragment(): Fragment = SettingsContainerFragment()
   };
 
   abstract fun createFragment(): Fragment

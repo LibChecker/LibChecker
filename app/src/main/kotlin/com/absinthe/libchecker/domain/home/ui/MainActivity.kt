@@ -61,6 +61,7 @@ import com.absinthe.libchecker.domain.home.ui.view.RecentVisitItem
 import com.absinthe.libchecker.domain.home.ui.view.RecentVisitsPopup
 import com.absinthe.libchecker.domain.home.ui.view.startRecentVisitDrag
 import com.absinthe.libchecker.domain.rules.CloudRulesRepository
+import com.absinthe.libchecker.domain.settings.ui.SettingsContainerFragment
 import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.services.WorkerService
 import com.absinthe.libchecker.ui.base.BaseActivity
@@ -807,6 +808,12 @@ class MainActivity :
         registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
           override fun onPageSelected(position: Int) {
             super.onPageSelected(position)
+            viewpager.post {
+              if (viewpager.currentItem != HomeDestination.SETTINGS.pageIndex) {
+                settingsContainer()?.closeAppearance()
+              }
+              updateSettingsNavigation()
+            }
             navView.menu.findItem(HomeDestination.requirePageIndex(position).navigationItemId).isChecked = true
             navView.post { bindRecentVisitsShortcuts(navView) }
             appViewModel.clearMenuState()
@@ -989,6 +996,7 @@ class MainActivity :
   }
 
   private fun navigateToPage(index: Int) {
+    settingsContainer()?.closeAppearance()
     val viewPager = binding.viewpager
     isPageTransitionRunning = true
     updateAppbarContentUnderlap()
@@ -1050,7 +1058,24 @@ class MainActivity :
 
   private fun renderToolbarTitle(state: HomeToolbarTitleState) {
     toolbarTitleState = state
-    toolbarTitleView.bind(state)
+    toolbarTitleView.bind(
+      if (isAppearanceVisible()) {
+        HomeToolbarTitleState(title = getString(R.string.pref_group_appearance))
+      } else {
+        state
+      }
+    )
+  }
+
+  private fun settingsContainer(): SettingsContainerFragment? = supportFragmentManager.findFragmentByTag("f${HomeDestination.SETTINGS.pageIndex}") as? SettingsContainerFragment
+
+  private fun isAppearanceVisible(): Boolean = binding.viewpager.currentItem == HomeDestination.SETTINGS.pageIndex &&
+    settingsContainer()?.isAppearanceVisible == true
+
+  fun updateSettingsNavigation() {
+    supportActionBar?.setDisplayHomeAsUpEnabled(isAppearanceVisible())
+    binding.toolbar.setNavigationOnClickListener { settingsContainer()?.closeAppearance() }
+    if (::toolbarTitleState.isInitialized) renderToolbarTitle(toolbarTitleState)
   }
 
   override fun onResume() {
