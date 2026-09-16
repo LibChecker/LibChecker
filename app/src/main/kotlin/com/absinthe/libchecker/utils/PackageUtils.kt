@@ -62,7 +62,6 @@ import com.absinthe.libchecker.utils.elf.ElfParser
 import com.absinthe.libchecker.utils.extensions.ABI_64_BIT
 import com.absinthe.libchecker.utils.extensions.ABI_STRING_MAP
 import com.absinthe.libchecker.utils.extensions.ABI_STRING_RES_MAP
-import com.absinthe.libchecker.utils.extensions.ABI_VALUE_TO_INSTRUCTION_SET_MAP
 import com.absinthe.libchecker.utils.extensions.INSTRUCTION_SET_MAP_TO_ABI_VALUE
 import com.absinthe.libchecker.utils.extensions.PAGE_SIZE_16_KB
 import com.absinthe.libchecker.utils.extensions.STRING_ABI_MAP
@@ -242,8 +241,8 @@ object PackageUtils {
       baseLibs.clear()
       return getSourceLibs(packageInfo, abi, includeNativeLibsDir = false, parseElf = false, checkCancelled = checkCancelled)[abiName].orEmpty()
     }
-    return baseLibs[abiName]?.takeIf { it.isNotEmpty() }
-      ?: getSplitLibs(packageInfo, abi, parseElf = false, checkCancelled = checkCancelled)[abiName].orEmpty()
+    return baseLibs[abiName].orEmpty() +
+      getSplitLibs(packageInfo, abi, parseElf = false, checkCancelled = checkCancelled)[abiName].orEmpty()
   }
 
   internal fun parseNativeDirElfInfo(file: File, parseElf: Boolean, checkCancelled: () -> Unit = {}): ElfInfo {
@@ -281,8 +280,8 @@ object PackageUtils {
     val sourceDir = packageInfo.applicationInfo?.sourceDir ?: return emptyMap()
     val file = File(sourceDir)
     val map = getApkFileLibs(file, specifiedAbi, parseElf, parseElfForAbi, checkCancelled).toMutableMap()
-    if (map.isEmpty() || (map.keys.size == 1 && map.keys.first() == "assets")) {
-      map += getSplitLibs(packageInfo, specifiedAbi, parseElf, parseElfForAbi, checkCancelled)
+    for ((abi, libs) in getSplitLibs(packageInfo, specifiedAbi, parseElf, parseElfForAbi, checkCancelled)) {
+      map.getOrPut(abi) { mutableListOf() }.addAll(libs)
     }
     if (map.isEmpty() && includeNativeLibsDir) {
       val abi = specifiedAbi ?: getAbi(packageInfo)
@@ -314,28 +313,21 @@ object PackageUtils {
     }
 
     val map = mutableMapOf<String, MutableList<LibStringItem>>()
-    val targetInstructionSet = specifiedAbi?.let { ABI_VALUE_TO_INSTRUCTION_SET_MAP[it] }
-    splitList.asSequence()
-      .filter {
-        val fileName = it.substringAfterLast(File.separator)
-        val specifiedAvailable = targetInstructionSet != null && fileName.contains(targetInstructionSet)
-        val isAbiSplitFile = specifiedAbi == null &&
-          INSTRUCTION_SET_MAP_TO_ABI_VALUE.keys.any { key -> fileName.contains(key) }
-        specifiedAvailable || isAbiSplitFile
-      }.forEach { split ->
-        checkCancelled()
-        val splitMap = getApkFileLibs(
-          file = File(split),
-          parseElf = parseElf,
-          parseElfForAbi = parseElfForAbi,
-          checkCancelled = checkCancelled
-        )
-        for ((key, newList) in splitMap) {
-          map.merge(key, newList) { existingList, _ ->
-            existingList.apply { addAll(newList) }
-          }
+    splitList.forEach { split ->
+      checkCancelled()
+      val splitMap = getApkFileLibs(
+        file = File(split),
+        specifiedAbi = specifiedAbi,
+        parseElf = parseElf,
+        parseElfForAbi = parseElfForAbi,
+        checkCancelled = checkCancelled
+      )
+      for ((key, newList) in splitMap) {
+        map.merge(key, newList) { existingList, _ ->
+          existingList.apply { addAll(newList) }
         }
       }
+    }
 
     return map
   }
