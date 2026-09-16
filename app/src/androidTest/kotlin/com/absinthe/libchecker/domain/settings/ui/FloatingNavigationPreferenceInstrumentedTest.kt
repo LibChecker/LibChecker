@@ -55,20 +55,20 @@ class FloatingNavigationPreferenceInstrumentedTest {
       )
       instrumentation.waitForIdleSync()
       instrumentation.runOnMainSync {
-        assertTrue(host.supportFragmentManager.fragments.none { it is SettingsFragment })
+        assertTrue(host.settingsFragment() == null)
         val nav = host.findViewById<NavigationBarView>(R.id.nav_view)
         assertEquals(R.id.navigation_app_list, nav.selectedItemId)
         nav.selectedItemId = R.id.navigation_settings
       }
       assertTrue(
         waitUntil(instrumentation) {
-          val settings = host.supportFragmentManager.fragments.filterIsInstance<SettingsFragment>().firstOrNull()
+          val settings = host.settingsFragment()
           settings?.isResumed == true &&
             settings.listView.findViewHolderForAdapterPosition(1)?.itemView?.getGlobalVisibleRect(Rect()) == true
         }
       )
       instrumentation.runOnMainSync {
-        val settings = host.supportFragmentManager.fragments.filterIsInstance<SettingsFragment>().single()
+        val settings = requireNotNull(host.settingsFragment())
         val settingsView = settings.requireView()
         val visibleBounds = Rect()
         assertTrue(settingsView.getGlobalVisibleRect(visibleBounds))
@@ -274,8 +274,11 @@ class FloatingNavigationPreferenceInstrumentedTest {
   fun appbarLiftStateSurvivesAppearanceLayoutChanges() {
     val instrumentation = InstrumentationRegistry.getInstrumentation()
     val monitor = instrumentation.addMonitor(MainActivity::class.java.name, null, false)
+    val originalBlur = GlobalValues.isBlurDesign
+    val originalFloating = GlobalValues.isFloatingNavBar
     var activity: MainActivity? = null
     try {
+      assertTrue(instrumentation.uiAutomation.setRotation(UiAutomation.ROTATION_FREEZE_90))
       instrumentation.targetContext.startActivity(
         Intent(instrumentation.targetContext, MainActivity::class.java)
           .setAction(Intent.ACTION_APPLICATION_PREFERENCES)
@@ -290,6 +293,7 @@ class FloatingNavigationPreferenceInstrumentedTest {
           } == true
         }
       )
+      openAppearance(instrumentation, launchedActivity)
       instrumentation.runOnMainSync {
         if (launchedActivity.preferenceChecked(Constants.PREF_BLUR_DESIGN)) {
           launchedActivity.togglePreference(Constants.PREF_BLUR_DESIGN)
@@ -373,7 +377,10 @@ class FloatingNavigationPreferenceInstrumentedTest {
       )
     } finally {
       instrumentation.runOnMainSync { activity?.finish() }
+      GlobalValues.isBlurDesign = originalBlur
+      GlobalValues.isFloatingNavBar = originalFloating
       instrumentation.removeMonitor(monitor)
+      instrumentation.uiAutomation.setRotation(UiAutomation.ROTATION_UNFREEZE)
     }
   }
 
@@ -394,6 +401,7 @@ class FloatingNavigationPreferenceInstrumentedTest {
       instrumentation.runOnMainSync {
         initialActivity.findViewById<NavigationBarView>(R.id.nav_view).selectedItemId = R.id.navigation_settings
       }
+      openAppearance(instrumentation, initialActivity)
       assertTrue(waitUntil(instrumentation) { initialActivity.floatingNavigationPreferenceVisible() })
 
       recreationMonitor = instrumentation.addMonitor(MainActivity::class.java.name, null, false)
@@ -460,6 +468,20 @@ class FloatingNavigationPreferenceInstrumentedTest {
     }
   }
 
+  private fun openAppearance(instrumentation: Instrumentation, activity: MainActivity) {
+    assertTrue(waitUntil(instrumentation) { activity.settingsFragment()?.isResumed == true })
+    instrumentation.runOnMainSync {
+      val settings = requireNotNull(activity.settingsFragment())
+      (settings.parentFragment as SettingsContainerFragment).openAppearance()
+    }
+    assertTrue(
+      waitUntil(instrumentation) {
+        val settings = activity.settingsFragment()
+        settings is AppearanceSettingsFragment && settings.isResumed && settings.listView.childCount > 0
+      }
+    )
+  }
+
   private fun MainActivity.floatingNavigationPreferenceVisible(): Boolean {
     val settings = settingsFragment() ?: return false
     return settings.findPreference<androidx.preference.Preference>(Constants.PREF_FLOATING_NAV_BAR)?.isVisible == true
@@ -469,7 +491,7 @@ class FloatingNavigationPreferenceInstrumentedTest {
     return settingsFragment()?.view?.findViewById(android.R.id.list)
   }
 
-  private fun MainActivity.settingsFragment(): SettingsFragment? {
+  private fun MainActivity.settingsFragment(): BaseSettingsFragment? {
     return supportFragmentManager.fragments.firstNotNullOfOrNull { it.findSettingsFragment() }
   }
 
@@ -568,8 +590,8 @@ class FloatingNavigationPreferenceInstrumentedTest {
     }
   }
 
-  private fun Fragment.findSettingsFragment(): SettingsFragment? {
-    if (this is SettingsFragment) return this
+  private fun Fragment.findSettingsFragment(): BaseSettingsFragment? {
+    if (this is BaseSettingsFragment && view != null) return this
     return childFragmentManager.fragments.firstNotNullOfOrNull { it.findSettingsFragment() }
   }
 
