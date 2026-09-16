@@ -12,6 +12,7 @@ import com.absinthe.libchecker.domain.snapshot.display.SnapshotDashboardCounter
 import com.absinthe.libchecker.domain.snapshot.list.capture.SnapshotCaptureStateRepository
 import com.absinthe.libchecker.domain.snapshot.selection.SnapshotSelection
 import com.absinthe.libchecker.domain.snapshot.selection.SnapshotSelectionRepository
+import com.absinthe.libchecker.domain.snapshot.timenode.usecase.ComputeSnapshotContributionsUseCase
 import com.absinthe.libchecker.domain.snapshot.timenode.usecase.RefreshSnapshotRepresentativeAppsUseCase
 import com.absinthe.libchecker.domain.snapshot.timenode.usecase.SelectSnapshotRepresentativeAppsUseCase
 import org.koin.dsl.module
@@ -27,4 +28,5 @@ val snapshotCoreModule = module {
   factory { SnapshotSelection(get()) }
   factory { SelectSnapshotRepresentativeAppsUseCase() }
   factory { RefreshSnapshotRepresentativeAppsUseCase(get(), get()) }
+  factory { ComputeSnapshotContributionsUseCase(get(), getOrNull()) }
 }

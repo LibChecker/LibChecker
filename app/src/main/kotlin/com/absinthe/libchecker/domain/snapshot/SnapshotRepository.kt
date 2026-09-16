@@ -2,6 +2,7 @@ package com.absinthe.libchecker.domain.snapshot
 
 import com.absinthe.libchecker.database.entity.SnapshotDiffStoringItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
+import com.absinthe.libchecker.database.entity.SnapshotUpdatedApp
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.database.entity.TrackItem
 import kotlinx.coroutines.flow.Flow
@@ -12,6 +13,8 @@ interface SnapshotRepository {
   suspend fun getTimeStamps(): List<TimeStampItem>
   suspend fun getTimeStamp(timestamp: Long): TimeStampItem?
   suspend fun getSnapshotCountsByTimestamp(): Map<Long, Int>
+  suspend fun getSnapshotLastUpdatedTimes(timestamp: Long): List<Long>
+  suspend fun getSnapshotUpdatedApps(timestamp: Long): List<SnapshotUpdatedApp>
   suspend fun getSnapshots(timestamp: Long): List<SnapshotItem>
   suspend fun getSnapshots(timestamp: Long, packageNames: List<String>): List<SnapshotItem>
   suspend fun getSnapshotSummaries(timestamp: Long): List<SnapshotItem>

@@ -314,6 +314,16 @@
   <string name="snapshot_scheme_tip"><![CDATA[Tip: You can now generate snapshots in the background via:<br><b>%s</b>]]></string>
   <string name="snapshot_build_id">Build ID</string>
   <string name="snapshot_build_security_patch">Security patch</string>
+  <plurals name="snapshot_contribution_updates_count">
+    <item quantity="one">%d update</item>
+    <item quantity="other">%d updates</item>
+  </plurals>
+  <string name="snapshot_contribution_recent_days">Recent %d days</string>
+  <string name="snapshot_contribution_tile_detail">%1$s: %2$s</string>
+  <string name="snapshot_contribution_tile_detail_with_snapshot">%1$s: %2$s · Snapshot captured</string>
+  <string name="snapshot_contribution_hint">Tap a tile to view daily updates</string>
+  <string name="snapshot_contribution_no_updates">No app updates on this day</string>
+  <string name="snapshot_contribution_snapshot_captured">Snapshot captured</string>
 
   <!--  Dialog  -->
   <string name="dialog_title_reload_apps">Reload all apps?</string>

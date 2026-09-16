@@ -6,12 +6,14 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Paint
 import android.graphics.Rect
 import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.SystemClock
 import android.view.FrameMetrics
+import android.view.Gravity
 import android.view.PixelCopy
 import android.view.View
 import android.view.Window
@@ -29,6 +31,7 @@ import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_NAME
 import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_TYPE
 import com.absinthe.libchecker.domain.statistics.reference.ui.LibReferenceActivity
 import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
 import java.util.Collections
 import java.util.concurrent.CountDownLatch
@@ -42,6 +45,38 @@ import org.junit.runner.RunWith
 @SdkSuppress(minSdkVersion = 33)
 class BlurRenderingInstrumentedTest {
   private val instrumentation = InstrumentationRegistry.getInstrumentation()
+
+  @Test
+  fun translatedNavigationSamplesTheBackdropAtItsVisiblePosition() = withActivity { activity ->
+    lateinit var container: BlurCoordinatorLayout
+    lateinit var nav: BottomNavigationView
+    instrumentation.runOnMainSync {
+      container = BlurCoordinatorLayout(activity, contentViewId = R.id.vf_container)
+      val content = object : View(activity) {
+        private val paint = Paint().apply { color = Color.GREEN }
+        override fun onDraw(canvas: Canvas) {
+          canvas.drawColor(Color.RED)
+          canvas.drawRect(0f, 0f, width.toFloat(), height / 2f, paint)
+        }
+      }.apply { id = R.id.vf_container }
+      container.addView(content, CoordinatorLayout.LayoutParams(-1, -1))
+      nav = BottomNavigationView(activity).apply { id = R.id.nav_view }
+      container.addView(nav, CoordinatorLayout.LayoutParams(-1, 160).apply { gravity = Gravity.BOTTOM })
+      container.setFloatingNavProgress(1f)
+      container.setBlurEnabled(true)
+      activity.setContentView(container)
+    }
+    settle()
+    val bottomColor = pixel(activity, container, container.width / 2, nav.top + nav.height / 2)
+    assertTrue("Bottom navigation should sample the red lower half", Color.red(bottomColor) > Color.green(bottomColor) + 20)
+    instrumentation.runOnMainSync {
+      nav.translationY = -container.height * 0.65f
+      container.invalidate()
+    }
+    settle()
+    val raisedColor = pixel(activity, container, container.width / 2, (nav.y + nav.height / 2).toInt())
+    assertTrue("Raised navigation should sample the green upper half", Color.green(raisedColor) > Color.red(raisedColor) + 20)
+  }
 
   @Test
   fun blurredFloatingNavigationCanReturnToAttachedIndicator() = withActivity { activity ->

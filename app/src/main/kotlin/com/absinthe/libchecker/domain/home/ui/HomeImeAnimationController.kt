@@ -144,7 +144,7 @@ internal class HomeImeAnimationController(
       (imeBottom.toFloat() / imeExtent.coerceAtLeast(1)).coerceIn(0f, 1f)
     }
     if (progress == 0f && !wasMini) return
-    if (progress > 0f && !wasMini) {
+    if ((progress > 0f) != wasMini) {
       revealNavigation()
       nav.animate().cancel()
     }

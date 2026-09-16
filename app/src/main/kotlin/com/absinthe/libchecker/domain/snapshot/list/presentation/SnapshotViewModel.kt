@@ -15,6 +15,7 @@ import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotTimeNodeListDa
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotListUpdatePlanUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.sync.SnapshotPackageChangeProcessor
+import com.absinthe.libchecker.domain.snapshot.timenode.model.SnapshotContributionData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.ensureActive
@@ -171,6 +172,14 @@ class SnapshotViewModel(
     }
   }
 
+  suspend fun getPackageSnapshotDiff(
+    packageName: String,
+    previousTimestamp: Long?,
+    currentTimestamp: Long?
+  ): SnapshotDiffItem? {
+    return snapshotListWorkflow.getPackageSnapshotDiff(packageName, previousTimestamp, currentTimestamp)
+  }
+
   fun handlePackageChanged(packageChangeState: PackageChangeState) {
     packageChangeProcessor.enqueue(viewModelScope, packageChangeState)
   }
@@ -212,6 +221,12 @@ class SnapshotViewModel(
       timeStamps = timeStamps,
       currentTimestamp = currentTimeStamp
     )
+  }
+
+  suspend fun computeSnapshotContributions(
+    timeStamps: List<TimeStampItem>
+  ): SnapshotContributionData {
+    return snapshotListWorkflow.computeSnapshotContributions(timeStamps)
   }
 
   fun updateSnapshotSearchKeyword(keyword: String): Boolean {

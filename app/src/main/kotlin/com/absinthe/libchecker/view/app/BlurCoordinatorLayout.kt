@@ -258,7 +258,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
         drawAppbarBlur(canvas, appbarSource)
       }
       if (navView != null && navView.visibility == VISIBLE && navView.alpha > 0f) {
-        val navSource = obtainNavDownsampleNode(content, navView.top)
+        val navSource = obtainNavDownsampleNode(content)
         drawNavBlur(canvas, navSource, navView)
       }
     }
@@ -346,11 +346,10 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
     }
   }
 
-  private fun obtainNavDownsampleNode(source: RenderNode, navTop: Int): RenderNode {
+  private fun obtainNavDownsampleNode(source: RenderNode): RenderNode {
     val downsample = NAV_BACKDROP_DOWNSAMPLE
     val targetW = (source.width / downsample).coerceAtLeast(1)
-    val sourceTop = (navTop / downsample).coerceAtLeast(0)
-    val sourceH = ((source.height - navTop) / downsample).coerceAtLeast(1)
+    val sourceH = (source.height / downsample).coerceAtLeast(1)
     val contentOffset = calculateBackdropContentOffset(NAV_BLUR_RADIUS_PX)
     val targetH = calculateBackdropTextureHeight(sourceH, contentOffset)
     navDownsampleNode?.let { node ->
@@ -363,8 +362,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
         targetWidth = targetW,
         targetHeight = targetH,
         contentOffset = contentOffset,
-        downsample = downsample,
-        sourceTop = sourceTop
+        downsample = downsample
       )
       return node
     }
@@ -375,8 +373,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
         targetWidth = targetW,
         targetHeight = targetH,
         contentOffset = contentOffset,
-        downsample = downsample,
-        sourceTop = sourceTop
+        downsample = downsample
       )
       navDownsampleNode = node
     }
@@ -388,13 +385,12 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
     targetWidth: Int,
     targetHeight: Int,
     contentOffset: Int,
-    downsample: Int,
-    sourceTop: Int = 0
+    downsample: Int
   ) {
     node.setPosition(0, 0, targetWidth, targetHeight)
     val canvas = node.beginRecording(targetWidth, targetHeight)
     canvas.drawColor(opaqueBackdropColor(contentBackgroundColor))
-    canvas.translate(0f, (contentOffset - sourceTop).toFloat())
+    canvas.translate(0f, contentOffset.toFloat())
     canvas.scale(1f / downsample, 1f / downsample)
     canvas.drawRenderNode(source)
     node.endRecording()
@@ -698,7 +694,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
     paint.blendMode = BlendMode.SRC_OVER
     paint.color = surfaceColor and BASE_FILL_ALPHA_MASK.toInt()
     canvas.drawRect(left, top, right, bottom, paint)
-    drawNavBlurredSource(canvas, source, top)
+    drawNavBlurredSource(canvas, source)
     drawSurfaceTint(canvas, top, bottom)
   }
 
@@ -725,12 +721,13 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
     canvas.drawRect(0f, top, width.toFloat(), bottom, paint)
   }
 
-  private fun drawNavBlurredSource(canvas: Canvas, source: RenderNode, navTop: Float) {
+  private fun drawNavBlurredSource(canvas: Canvas, source: RenderNode) {
     val effectNode = obtainNavEffectNode(source)
     effectNode.setRenderEffect(obtainNavBlurEffect())
     val downsample = NAV_BACKDROP_DOWNSAMPLE
     canvas.withScale(downsample.toFloat(), downsample.toFloat()) {
-      translate(0f, navTop / downsample - navBackdropContentOffset)
+      // Keep the backdrop in parent coordinates as the navigation moves above the IME.
+      translate(0f, -navBackdropContentOffset)
       drawRenderNode(effectNode)
     }
   }
