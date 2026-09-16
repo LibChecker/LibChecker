@@ -114,6 +114,7 @@
   <!--  Settings  -->
   <string name="pref_group_normal">Normal</string>
   <string name="pref_group_appearance">Appearance</string>
+  <string name="pref_appearance_summary">Personalize the interface</string>
   <string name="pref_group_rules">Rules and network</string>
   <string name="pref_group_data">Data and tools</string>
   <string name="pref_group_about">About and support</string>
@@ -425,4 +426,6 @@
   <string name="lib_reference_switch_to_list">Switch to list</string>
   <string name="lib_reference_other">Other</string>
   <string name="lib_reference_other_description">Other: %1$d libraries, %2$d references</string>
+  <string name="legacy_snapshot_detail">Legacy snapshot detail page</string>
+  <string name="legacy_snapshot_detail_summary">Use the classic card layout for snapshot details</string>
 </resources>

@@ -13,11 +13,6 @@
       app:summary="@string/apk_analytics_summary"
       app:title="@string/apk_analytics" />
 
-    <Preference
-      app:icon="@drawable/ic_color_palette"
-      app:key="appearance"
-      app:title="@string/pref_group_appearance" />
-
     <com.absinthe.libchecker.ui.preference.InlineListPreference
       app:defaultValue="notify"
       app:entries="@array/snapshot_keep"
@@ -31,6 +26,12 @@
       app:key="libRefThreshold"
       app:summary="@string/lib_ref_threshold_summary"
       app:title="@string/lib_ref_threshold" />
+
+    <Preference
+      app:icon="@drawable/ic_color_palette"
+      app:key="appearance"
+      app:summary="@string/pref_appearance_summary"
+      app:title="@string/pref_group_appearance" />
 
   </PreferenceCategory>
 

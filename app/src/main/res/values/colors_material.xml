@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <color name="material_red_200">#EF9A9A</color>
   <color name="material_red_300">#E57373</color>
   <color name="material_red_900">#B71C1C</color>
   <color name="material_deep_purple_300">#9575CD</color>
   <color name="material_indigo_300">#7986CB</color>
+  <color name="material_blue_200">#90CAF9</color>
   <color name="material_blue_300">#64B5F6</color>
   <color name="material_blue_900">#0D47A1</color>
+  <color name="material_green_200">#A5D6A7</color>
   <color name="material_green_300">#81C784</color>
   <color name="material_green_900">#1B5E20</color>
+  <color name="material_yellow_200">#FFF590</color>
   <color name="material_yellow_300">#FFF176</color>
+  <color name="material_grey_800">#424242</color>
   <color name="material_orange_300">#FFB74D</color>
   <color name="material_orange_900">#E65100</color>
   <color name="material_blue_grey_300">#90A4AE</color>

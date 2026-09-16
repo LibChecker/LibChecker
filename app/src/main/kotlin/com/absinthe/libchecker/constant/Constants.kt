@@ -55,6 +55,7 @@ object Constants {
   const val PREF_TELEGRAM = "tg"
   const val PREF_ANONYMOUS_ANALYTICS = "analytics"
   const val PREF_CLOUD_RULES = "cloudRules"
+  const val PREF_LEGACY_SNAPSHOT_DETAIL = "legacySnapshotDetail"
   const val PREF_SNAPSHOT_KEEP = "snapshotKeep"
   const val PREF_GITHUB_API_TOKEN = "githubApiToken"
   const val PREF_GITHUB_API_TOKEN_VERSION = "githubApiTokenVersion"
