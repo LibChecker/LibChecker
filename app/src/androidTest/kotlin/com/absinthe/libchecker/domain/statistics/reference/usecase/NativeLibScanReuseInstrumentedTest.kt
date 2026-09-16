@@ -12,6 +12,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.constant.Constants.ARMV8
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.app.detail.content.DetailContentResolver
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.PackageUtils
 import java.io.ByteArrayOutputStream
@@ -109,7 +110,7 @@ class NativeLibScanReuseInstrumentedTest {
           }
           val expected = BaselineNativeLibReader.getNativeDirLibs(target)
           assertEquals("$base split=$split", expected, PackageUtils.getNativeDirLibs(target))
-          if (base == "base.apk") assertEquals(listOf("libfixture.so"), expected.map { it.name })
+          if (base == "base.apk") assertEquals(listOfNotNull("libfixture.so", "libsplit.so".takeIf { split }), expected.map { it.name })
           if (base == "empty.apk" && split) assertEquals(listOf("libsplit.so"), expected.map { it.name })
           for (parseElf in listOf(false, true)) {
             assertEquals(
@@ -137,6 +138,73 @@ class NativeLibScanReuseInstrumentedTest {
     } finally {
       shell("rm -f " + fixtures.keys.joinToString(" ") { "$directory/$it" })
       shell("rmdir $directory")
+    }
+  }
+
+  @Test
+  @SdkSuppress(minSdkVersion = 31)
+  fun mergesBaseAndFeatureSplitLibraries() {
+    val directory = "/data/local/tmp/lc-native-splits-${SystemClock.uptimeMillis()}"
+    val fixtures = mapOf(
+      "base.apk" to archive("lib/arm64-v8a/libapp.so"),
+      "split_preload.apk" to archive("lib/arm64-v8a/libflutter.so", "lib/armeabi-v7a/libother.so")
+    )
+    shell("mkdir -p $directory")
+    try {
+      fixtures.forEach { (name, bytes) ->
+        val encoded = Base64.encodeToString(bytes, Base64.NO_WRAP)
+        shell("printf '%s' '$encoded' | base64 -d > $directory/$name")
+      }
+      val target = PackageInfo().apply {
+        packageName = "test.native.splits"
+        applicationInfo = ApplicationInfo().apply {
+          sourceDir = "$directory/base.apk"
+          splitSourceDirs = arrayOf("$directory/split_preload.apk")
+        }
+      }
+      for (parseElf in listOf(false, true)) {
+        for (abi in listOf(null, ARMV8)) {
+          val result = PackageUtils.getSourceLibs(target, specifiedAbi = abi, parseElf = parseElf)
+          assertEquals(setOf("libapp.so", "libflutter.so"), result["arm64-v8a"].orEmpty().map { it.name }.toSet())
+          assertEquals(abi == null, "armeabi-v7a" in result)
+        }
+      }
+      assertEquals(setOf("libapp.so", "libflutter.so"), PackageUtils.getNativeDirLibs(target).map { it.name }.toSet())
+    } finally {
+      shell("rm -f " + fixtures.keys.joinToString(" ") { "$directory/$it" })
+      shell("rmdir $directory")
+    }
+  }
+
+  @Test
+  fun installedDingdingDetailIncludesFlutter() = runBlocking {
+    val repository = GlobalContext.get().get<InstalledAppRepository>()
+    val target = repository.getPackageInfo("com.alibaba.android.rimet")
+    org.junit.Assume.assumeNotNull(target)
+    val resolver = DetailContentResolver(InstrumentationRegistry.getInstrumentation().targetContext, repository)
+    val items = resolver.getNativeLibraries(target!!, null, false, false, ARMV8).itemsByAbi["arm64-v8a"].orEmpty()
+    assertTrue(items.any { it.name == "libflutter.so" })
+    val chips = resolver.buildChipList(target, null, false, "arm64-v8a", items, false)
+    assertEquals("Flutter", chips.single { it.item.name == "libapp.so" }.rule?.label)
+  }
+
+  @Test
+  fun measureDingdingNativeReaders() {
+    val target = GlobalContext.get().get<InstalledAppRepository>().getPackageInfo("com.alibaba.android.rimet")!!
+    val readers = linkedMapOf<String, () -> Any>(
+      "source-list" to { PackageUtils.getSourceLibs(target, parseElf = false) },
+      "source-selected-elf" to { PackageUtils.getSourceLibs(target, parseElf = false, parseElfForAbi = ARMV8) },
+      "source-explicit-elf" to { PackageUtils.getSourceLibs(target, specifiedAbi = ARMV8, parseElf = true) },
+      "statistics-native-dir" to { PackageUtils.getNativeDirLibs(target) }
+    )
+    readers.forEach { (name, read) ->
+      repeat(3) { read() }
+      val times = List(15) {
+        val start = SystemClock.elapsedRealtimeNanos()
+        read()
+        (SystemClock.elapsedRealtimeNanos() - start) / 1_000_000.0
+      }.sorted()
+      println("NATIVE_TIMING $name median=${times[7]} min=${times.first()} max=${times.last()}")
     }
   }
 
