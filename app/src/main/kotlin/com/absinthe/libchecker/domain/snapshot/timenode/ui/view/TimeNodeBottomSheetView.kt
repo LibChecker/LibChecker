@@ -2,6 +2,7 @@ package com.absinthe.libchecker.domain.snapshot.timenode.ui.view
 
 import android.content.Context
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
@@ -28,10 +29,16 @@ class TimeNodeBottomSheetView(context: Context) : BottomSheetScaffoldView(contex
     bind(item, packageIconSources)
   }
 
+  private val contributionWallView = SnapshotContributionWallView(context).apply {
+    layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+    isVisible = false
+  }
+
   private val list = BorderRecyclerView(context).apply {
     layoutParams = LayoutParams(
       LayoutParams.MATCH_PARENT,
-      LayoutParams.WRAP_CONTENT
+      0,
+      1f
     ).also {
       val padding = 12.dp
       setPadding(padding, 0, padding, 0)
@@ -55,7 +62,11 @@ class TimeNodeBottomSheetView(context: Context) : BottomSheetScaffoldView(contex
   init {
     setPadding(0, 8.dp, 0, 0)
     header.title.text = context.getString(R.string.dialog_title_change_timestamp)
+    addContentView(contributionWallView)
     addContentView(list)
+    contributionWallView.setOnDayClickListener { dayContrib, anchorRect ->
+      onAction(TimeNodeBottomSheetAction.SelectTile(dayContrib, anchorRect))
+    }
     adapter.apply {
       setOnItemClickListener { _, _, position ->
         data.getOrNull(position)?.let {
@@ -84,6 +95,26 @@ class TimeNodeBottomSheetView(context: Context) : BottomSheetScaffoldView(contex
     bindHeader(state.header)
     packageIconSources = state.listData.packageIconSources
     adapter.setList(state.listData.items)
+
+    val contributionData = state.contributionData
+    if (state.header !is TimeNodeHeaderState.AddApk && contributionData != null && contributionData.days.isNotEmpty()) {
+      contributionWallView.isVisible = true
+      contributionWallView.bind(contributionData, state.selectedDate)
+    } else {
+      contributionWallView.isVisible = false
+    }
+  }
+
+  fun scrollToSnapshot(timestamp: Long) {
+    contributionWallView.scrollToSnapshot(timestamp)
+    scrollListToSnapshot(timestamp)
+  }
+
+  fun scrollListToSnapshot(timestamp: Long) {
+    val index = adapter.data.indexOfFirst { it.timestamp == timestamp }
+    if (index != -1) {
+      list.smoothScrollToPosition(index)
+    }
   }
 
   private fun bindHeader(header: TimeNodeHeaderState) {

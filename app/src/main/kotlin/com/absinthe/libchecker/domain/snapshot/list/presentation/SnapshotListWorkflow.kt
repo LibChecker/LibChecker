@@ -9,6 +9,7 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotDiffsUseCase
 import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotItemWithInstalledAppUseCase
+import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotItemsUseCase
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailDiffTextStyle
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSection
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.SnapshotDetailSectionBuilder
@@ -27,6 +28,8 @@ import com.absinthe.libchecker.domain.snapshot.list.usecase.GetSnapshotPackageIc
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.domain.snapshot.selection.SnapshotSelection
+import com.absinthe.libchecker.domain.snapshot.timenode.model.SnapshotContributionData
+import com.absinthe.libchecker.domain.snapshot.timenode.usecase.ComputeSnapshotContributionsUseCase
 import com.absinthe.libchecker.domain.snapshot.timenode.usecase.UpdateSnapshotAutoRemoveThresholdUseCase
 import com.absinthe.libchecker.domain.snapshot.track.repository.SnapshotTrackChangeRepository
 import com.absinthe.libraries.utils.manager.TimeRecorder
@@ -38,6 +41,7 @@ class SnapshotListWorkflow(
   private val appListRepository: AppListRepository,
   private val compareSnapshotDiffs: CompareSnapshotDiffsUseCase,
   private val compareSnapshotItemWithInstalledApp: CompareSnapshotItemWithInstalledAppUseCase,
+  private val compareSnapshotItems: CompareSnapshotItemsUseCase,
   private val snapshotDashboardCounter: SnapshotDashboardCounter,
   private val snapshotDetailSectionBuilder: SnapshotDetailSectionBuilder,
   private val snapshotRepository: SnapshotRepository,
@@ -51,7 +55,8 @@ class SnapshotListWorkflow(
   private val snapshotSelection: SnapshotSelection,
   private val snapshotSettingsRepository: SnapshotSettingsRepository,
   private val updateSnapshotAutoRemoveThresholdUseCase: UpdateSnapshotAutoRemoveThresholdUseCase,
-  private val snapshotTrackChangeRepository: SnapshotTrackChangeRepository
+  private val snapshotTrackChangeRepository: SnapshotTrackChangeRepository,
+  private val computeSnapshotContributionsUseCase: ComputeSnapshotContributionsUseCase
 ) {
 
   val currentSnapshotCount: Flow<Int> = repository.currentSnapshotCount
@@ -118,6 +123,32 @@ class SnapshotListWorkflow(
     return compareSnapshotItemWithInstalledApp(timeStamp, packageName)
   }
 
+  suspend fun getPackageSnapshotDiff(
+    packageName: String,
+    previousTimestamp: Long?,
+    currentTimestamp: Long?
+  ): SnapshotDiffItem? {
+    if (previousTimestamp == null && currentTimestamp == null) {
+      return null
+    }
+    if (currentTimestamp == null && previousTimestamp != null) {
+      return compareSnapshotItemWithInstalledApp(previousTimestamp, packageName)
+    }
+    val oldInfo = previousTimestamp?.let { snapshotRepository.getSnapshot(it, packageName) }
+    val newInfo = currentTimestamp?.let { snapshotRepository.getSnapshot(it, packageName) }
+    if (oldInfo == null && newInfo == null) {
+      if (previousTimestamp != null) {
+        return compareSnapshotItemWithInstalledApp(previousTimestamp, packageName)
+      }
+      return null
+    }
+    val trackPackageNames = snapshotRepository.getTrackItems()
+      .asSequence()
+      .map { it.packageName }
+      .toSet()
+    return compareSnapshotItems(oldInfo, newInfo, trackPackageNames)
+  }
+
   suspend fun buildSnapshotDetailContent(
     entity: SnapshotDiffItem,
     diffTextStyle: SnapshotDetailDiffTextStyle
@@ -151,6 +182,12 @@ class SnapshotListWorkflow(
     currentTimestamp: Long? = null
   ): SnapshotTimeNodeListData {
     return buildSnapshotTimeNodeListDataUseCase(timeStamps, currentTimestamp)
+  }
+
+  suspend fun computeSnapshotContributions(
+    timeStamps: List<TimeStampItem>
+  ): SnapshotContributionData {
+    return computeSnapshotContributionsUseCase(timeStamps)
   }
 
   fun updateSnapshotSearchKeyword(keyword: String): Boolean {

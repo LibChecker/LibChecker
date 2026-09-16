@@ -221,6 +221,15 @@
   <string name="snapshot_scheme_tip"><![CDATA[提示：現在您可以透過<br><b>%s</b><br>在背景產生快照。]]></string>
   <string name="snapshot_build_id">Build ID</string>
   <string name="snapshot_build_security_patch">安全性修補程式</string>
+  <plurals name="snapshot_contribution_updates_count">
+    <item quantity="other">%d 次更新</item>
+  </plurals>
+  <string name="snapshot_contribution_recent_days">最近 %d 天</string>
+  <string name="snapshot_contribution_tile_detail">%1$s：%2$s</string>
+  <string name="snapshot_contribution_tile_detail_with_snapshot">%1$s：%2$s · 已記錄快照</string>
+  <string name="snapshot_contribution_hint">點擊圖磚查看當日應用程式更新</string>
+  <string name="snapshot_contribution_no_updates">當日無應用程式更新</string>
+  <string name="snapshot_contribution_snapshot_captured">快照已記錄</string>
   <!--  Dialog  -->
   <string name="dialog_title_reload_apps">重新載入應用程式清單？</string>
   <string name="dialog_subtitle_reload_apps">這可能會花費幾秒鐘的時間</string>

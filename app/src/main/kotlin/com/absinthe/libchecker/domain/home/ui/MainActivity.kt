@@ -151,7 +151,7 @@ class MainActivity :
   }
 
   @Suppress("DEPRECATION")
-  private val navViewBehavior by lazy { InvalidatingHideBottomViewOnScrollBehavior() }
+  private val navViewBehavior by lazy { InvalidatingHideBottomViewOnScrollBehavior { imeController?.miniActive != true } }
   private var navPillDrawable: G2PillDrawable? = null
   private var originalNavBackground: Drawable? = null
   private var floatingNavBarAnimator: ValueAnimator? = null

@@ -6,5 +6,7 @@ data class SnapshotTimeNodeItem(
   val description: String,
   val topAppPackageNames: List<String>,
   val appCount: Int = 0,
-  val isCurrent: Boolean = false
+  val isCurrent: Boolean = false,
+  val isSelected: Boolean = false,
+  val tagColor: Int? = null
 )

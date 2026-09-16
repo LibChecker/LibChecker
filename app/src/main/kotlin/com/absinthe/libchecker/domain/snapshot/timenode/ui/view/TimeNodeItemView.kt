@@ -1,6 +1,9 @@
 package com.absinthe.libchecker.domain.snapshot.timenode.ui.view
 
 import android.content.Context
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.Gravity
@@ -20,11 +23,29 @@ import com.absinthe.libchecker.ui.adapter.BindOnlyAdapter
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.view.AViewGroup
+import com.google.android.material.R as MaterialR
+import com.google.android.material.shape.MaterialShapeDrawable
+import com.google.android.material.shape.ShapeAppearanceModel
+import com.google.android.material.shape.SuperEllipseCornerTreatment
 
 class TimeNodeItemView(context: Context) : AViewGroup(context) {
 
   private val defaultNameColor: Int
   private var packageIconSources: Map<String, SnapshotPackageIconSource> = emptyMap()
+
+  private val itemBackground = MaterialShapeDrawable(
+    ShapeAppearanceModel.builder()
+      .setAllCorners(SuperEllipseCornerTreatment(16.dp.toFloat()))
+      .build()
+  ).apply {
+    strokeWidth = 1.dp.toFloat()
+    strokeColor = ColorStateList.valueOf(context.getColorByAttr(MaterialR.attr.colorOutlineVariant))
+    fillColor = ColorStateList.valueOf(Color.TRANSPARENT)
+  }
+
+  private val tagIndicator = View(context).apply {
+    layoutParams = LayoutParams(8.dp, 8.dp)
+  }
 
   private val name = AppCompatTextView(
     ContextThemeWrapper(
@@ -42,6 +63,13 @@ class TimeNodeItemView(context: Context) : AViewGroup(context) {
       LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     setTextColor(context.getColorByAttr(android.R.attr.textColorSecondary))
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
+  }
+
+  private val checkIndicator = AppCompatImageView(context).apply {
+    layoutParams = LayoutParams(20.dp, 20.dp)
+    setImageResource(R.drawable.ic_check)
+    setColorFilter(context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary))
+    isVisible = false
   }
 
   private val adapter = BindOnlyAdapter<String, AppCompatImageView>(
@@ -85,9 +113,11 @@ class TimeNodeItemView(context: Context) : AViewGroup(context) {
   init {
     defaultNameColor = name.currentTextColor
     setPadding(10.dp, 6.dp, 10.dp, 6.dp)
-    setBackgroundResource(R.drawable.bg_lib_detail_item)
+    background = itemBackground
+    addView(tagIndicator)
     addView(name)
     addView(summary)
+    addView(checkIndicator)
     addView(rvList)
   }
 
@@ -101,24 +131,43 @@ class TimeNodeItemView(context: Context) : AViewGroup(context) {
       item.appCount,
       item.appCount
     )
-    summary.text = if (item.isCurrent) {
-      context.getString(
-        R.string.snapshot_time_node_current_apps,
-        context.getString(R.string.snapshot_time_node_current),
-        appCountText
-      )
-    } else {
-      appCountText
-    }
+    summary.text = appCountText
+
     val primaryColor = context.getColorByAttr(androidx.appcompat.R.attr.colorPrimary)
-    name.setTextColor(if (item.isCurrent) primaryColor else defaultNameColor)
+    val isItemActive = item.isSelected
+    name.setTextColor(if (isItemActive) primaryColor else defaultNameColor)
     summary.setTextColor(
-      if (item.isCurrent) {
+      if (isItemActive) {
         primaryColor
       } else {
         context.getColorByAttr(android.R.attr.textColorSecondary)
       }
     )
+
+    checkIndicator.isVisible = item.isSelected
+
+    if (item.tagColor != null) {
+      tagIndicator.isVisible = true
+      tagIndicator.background = GradientDrawable().apply {
+        shape = GradientDrawable.OVAL
+        setColor(item.tagColor)
+      }
+    } else {
+      tagIndicator.isVisible = false
+    }
+
+    val outlineVariant = context.getColorByAttr(MaterialR.attr.colorOutlineVariant)
+    val surfaceHigh = context.getColorByAttr(MaterialR.attr.colorSurfaceContainerHigh)
+    if (item.isSelected) {
+      itemBackground.strokeWidth = 2.dp.toFloat()
+      itemBackground.strokeColor = ColorStateList.valueOf(primaryColor)
+      itemBackground.fillColor = ColorStateList.valueOf(surfaceHigh)
+    } else {
+      itemBackground.strokeWidth = 1.dp.toFloat()
+      itemBackground.strokeColor = ColorStateList.valueOf(outlineVariant)
+      itemBackground.fillColor = ColorStateList.valueOf(Color.TRANSPARENT)
+    }
+
     contentDescription = listOf(item.description, summary.text)
       .map(CharSequence::toString)
       .filter(String::isNotBlank)
@@ -135,32 +184,69 @@ class TimeNodeItemView(context: Context) : AViewGroup(context) {
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+    if (tagIndicator.isVisible) {
+      tagIndicator.measure(8.dp.toExactlyMeasureSpec(), 8.dp.toExactlyMeasureSpec())
+    }
+    if (checkIndicator.isVisible) {
+      checkIndicator.measure(20.dp.toExactlyMeasureSpec(), 20.dp.toExactlyMeasureSpec())
+    }
     summary.autoMeasure()
+
+    val tagWidth = if (tagIndicator.isVisible) tagIndicator.measuredWidth + TAG_GAP.dp else 0
+    val availableNameWidth = (measuredWidth - paddingStart - paddingEnd - tagWidth - summary.measuredWidth - TITLE_GAP.dp)
+      .coerceAtLeast(0)
+
+    name.measure(
+      availableNameWidth.toExactlyMeasureSpec(),
+      name.defaultHeightMeasureSpec(this)
+    )
+
+    val startX = paddingStart + tagWidth
+    val checkWidth = if (checkIndicator.isVisible) checkIndicator.measuredWidth + 8.dp else 0
+    val availableRvWidth = (measuredWidth - startX - paddingEnd - checkWidth).coerceAtLeast(0)
+
     if (rvList.isVisible) {
-      rvList.autoMeasure()
+      rvList.measure(
+        availableRvWidth.toAtMostMeasureSpec(),
+        rvList.defaultHeightMeasureSpec(this)
+      )
     } else {
       rvList.measure(0.toExactlyMeasureSpec(), 0.toExactlyMeasureSpec())
     }
-    name.measure(
-      (measuredWidth - paddingStart - paddingEnd - summary.measuredWidth - TITLE_GAP.dp)
-        .coerceAtLeast(0)
-        .toExactlyMeasureSpec(),
-      name.defaultHeightMeasureSpec(this)
+
+    val row2Height = maxOf(
+      if (rvList.isVisible) rvList.measuredHeight else 0,
+      if (checkIndicator.isVisible) checkIndicator.measuredHeight else 0
     )
     setMeasuredDimension(
       measuredWidth,
       maxOf(
         MIN_HEIGHT.dp,
-        paddingTop + paddingBottom + name.measuredHeight + rvList.measuredHeight
+        paddingTop + paddingBottom + name.measuredHeight + row2Height
       )
     )
   }
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-    name.layout(paddingStart, paddingTop)
+    var startX = paddingStart
+    if (tagIndicator.isVisible) {
+      tagIndicator.layout(startX, tagIndicator.toViewVerticalCenter(name))
+      startX += tagIndicator.measuredWidth + TAG_GAP.dp
+    }
+    name.layout(startX, paddingTop)
     summary.layout(paddingEnd, summary.toViewVerticalCenter(name), fromRight = true)
+
+    val row2Top = name.bottom
     if (rvList.isVisible) {
-      rvList.layout(paddingStart, name.bottom)
+      rvList.layout(startX, row2Top)
+    }
+    if (checkIndicator.isVisible) {
+      val checkTop = if (rvList.isVisible) {
+        checkIndicator.toViewVerticalCenter(rvList)
+      } else {
+        row2Top
+      }
+      checkIndicator.layout(paddingEnd, checkTop, fromRight = true)
     }
   }
 
@@ -172,5 +258,6 @@ class TimeNodeItemView(context: Context) : AViewGroup(context) {
     const val MAX_VISIBLE_APP_COUNT = 6
     const val MIN_HEIGHT = 44
     const val TITLE_GAP = 8
+    const val TAG_GAP = 6
   }
 }

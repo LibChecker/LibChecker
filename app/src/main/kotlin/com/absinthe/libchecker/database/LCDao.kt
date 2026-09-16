@@ -13,6 +13,7 @@ import com.absinthe.libchecker.database.entity.SnapshotDiffStoringItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.SnapshotSummaryItem
 import com.absinthe.libchecker.database.entity.SnapshotTimestampCount
+import com.absinthe.libchecker.database.entity.SnapshotUpdatedApp
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.database.entity.TrackItem
 import kotlinx.coroutines.flow.Flow
@@ -94,6 +95,12 @@ interface LCDao {
 
   @Query("SELECT timeStamp AS timestamp, COUNT(*) AS count FROM snapshot_table GROUP BY timeStamp")
   suspend fun getSnapshotCountsByTimestamp(): List<SnapshotTimestampCount>
+
+  @Query("SELECT lastUpdatedTime FROM snapshot_table WHERE timeStamp = :timestamp")
+  suspend fun getSnapshotLastUpdatedTimes(timestamp: Long): List<Long>
+
+  @Query("SELECT packageName, label, lastUpdatedTime FROM snapshot_table WHERE timeStamp = :timestamp")
+  suspend fun getSnapshotUpdatedApps(timestamp: Long): List<SnapshotUpdatedApp>
 
   @Upsert
   suspend fun insert(item: SnapshotItem)

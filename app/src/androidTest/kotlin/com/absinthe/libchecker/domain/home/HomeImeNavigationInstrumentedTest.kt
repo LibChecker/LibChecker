@@ -5,25 +5,77 @@ import android.content.res.Configuration
 import android.os.SystemClock
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.Toolbar
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.domain.home.ui.HomeImeAnimationController
 import com.absinthe.libchecker.domain.home.ui.MainActivity
 import com.absinthe.libchecker.view.app.FloatingBottomNavigationView
+import com.absinthe.libchecker.view.app.InvalidatingHideBottomViewOnScrollBehavior
 import com.google.android.material.navigation.NavigationBarView
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class HomeImeNavigationInstrumentedTest {
+  @Test
+  fun closingImeRestoresHiddenBehaviorStateAndVisibility() {
+    val instrumentation = InstrumentationRegistry.getInstrumentation()
+    instrumentation.runOnMainSync {
+      val configuration = Configuration(instrumentation.targetContext.resources.configuration).apply {
+        orientation = Configuration.ORIENTATION_PORTRAIT
+      }
+      val context = ContextThemeWrapper(instrumentation.targetContext.createConfigurationContext(configuration), R.style.AppTheme)
+      val root = CoordinatorLayout(context)
+      val nav = FloatingBottomNavigationView(context)
+      root.addView(nav, CoordinatorLayout.LayoutParams(800, 160))
+      val behavior = InvalidatingHideBottomViewOnScrollBehavior()
+      val controller = HomeImeAnimationController(root, nav, { true }, { behavior.slideUp(nav, false) }, {})
+      fun dispatchIme(bottom: Int) {
+        ViewCompat.dispatchApplyWindowInsets(
+          root,
+          WindowInsetsCompat.Builder()
+            .setInsets(WindowInsetsCompat.Type.systemBars(), Insets.of(0, 24, 0, 24))
+            .setInsets(WindowInsetsCompat.Type.ime(), Insets.of(0, 0, 0, bottom))
+            .setVisible(WindowInsetsCompat.Type.ime(), bottom > 0)
+            .build()
+        )
+      }
+      try {
+        behavior.slideDown(nav, false)
+        dispatchIme(600)
+        assertTrue(controller.miniActive)
+        assertTrue(behavior.isScrolledUp)
+        assertEquals(View.VISIBLE, nav.visibility)
+        assertEquals(-576f, nav.translationY, 0.01f)
+        // Reproduce a stale hidden state from an external animation before IME dismissal.
+        behavior.slideDown(nav, false)
+        assertEquals(View.INVISIBLE, nav.visibility)
+        dispatchIme(0)
+        assertFalse(controller.miniActive)
+        assertTrue(behavior.isScrolledUp)
+        assertEquals(View.VISIBLE, nav.visibility)
+        assertEquals(0f, nav.translationY, 0.01f)
+        assertTrue(nav.importantForAccessibility != View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS)
+      } finally {
+        controller.dispose()
+      }
+    }
+  }
+
   @Test
   fun listsFollowImeWhileTabsSwitchAndMiniNavigationRestores() {
     val originalFloating = GlobalValues.isFloatingNavBar
@@ -73,6 +125,22 @@ class HomeImeNavigationInstrumentedTest {
           }
           awaitState("Mini navigation did not appear") { it.findViewById<FloatingBottomNavigationView>(R.id.nav_view).miniProgress >= 0.99f }
           SystemClock.sleep(400)
+          scenario.onActivity {
+            val nav = it.findViewById<FloatingBottomNavigationView>(R.id.nav_view)
+            val parent = nav.parent as CoordinatorLayout
+            val behavior = (nav.layoutParams as CoordinatorLayout.LayoutParams).behavior as InvalidatingHideBottomViewOnScrollBehavior
+            val offset = nav.translationY
+            for (type in listOf(ViewCompat.TYPE_TOUCH, ViewCompat.TYPE_NON_TOUCH)) {
+              assertFalse(behavior.onStartNestedScroll(parent, nav, list, list, ViewCompat.SCROLL_AXIS_VERTICAL, type))
+              for (dy in listOf(80, -80)) {
+                behavior.onNestedScroll(parent, nav, list, 0, dy, 0, 0, type, IntArray(2))
+              }
+            }
+            behavior.slideDown(nav, false)
+            assertTrue(behavior.isScrolledUp)
+            assertEquals(View.VISIBLE, nav.visibility)
+            assertEquals(offset, nav.translationY, 0.01f)
+          }
           var overlappingAnimations = false
           lateinit var animationObserver: android.view.ViewTreeObserver.OnPreDrawListener
           scenario.onActivity {
@@ -114,6 +182,10 @@ class HomeImeNavigationInstrumentedTest {
             assertEquals(normalWidth, nav.width)
             assertEquals(normalHeight, nav.height)
             assertEquals(0f, nav.translationY, 0.01f)
+            val behavior = (nav.layoutParams as CoordinatorLayout.LayoutParams).behavior as InvalidatingHideBottomViewOnScrollBehavior
+            assertTrue(behavior.isScrolledUp)
+            assertEquals(View.VISIBLE, nav.visibility)
+            assertTrue(behavior.onStartNestedScroll(nav.parent as CoordinatorLayout, nav, list, list, ViewCompat.SCROLL_AXIS_VERTICAL, ViewCompat.TYPE_TOUCH))
             assertTrue("Closing IME also updates intermediate padding", paddings.distinct().size > 2)
             list.removeOnLayoutChangeListener(listener)
           }

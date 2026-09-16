@@ -54,6 +54,7 @@ val snapshotListModule = module {
       appListRepository = get(),
       compareSnapshotDiffs = get(),
       compareSnapshotItemWithInstalledApp = get(),
+      compareSnapshotItems = get(),
       snapshotDashboardCounter = get(),
       snapshotDetailSectionBuilder = get(),
       snapshotRepository = get(),
@@ -67,7 +68,8 @@ val snapshotListModule = module {
       snapshotSelection = get(),
       snapshotSettingsRepository = get(),
       updateSnapshotAutoRemoveThresholdUseCase = get(),
-      snapshotTrackChangeRepository = get()
+      snapshotTrackChangeRepository = get(),
+      computeSnapshotContributionsUseCase = get()
     )
   }
 

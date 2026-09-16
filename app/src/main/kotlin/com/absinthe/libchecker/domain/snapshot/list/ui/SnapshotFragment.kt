@@ -157,19 +157,26 @@ class SnapshotFragment :
       lifecycleScope.launch(Dispatchers.IO) {
         val timeStampList = viewModel.getTimeStamps()
         withContext(Dispatchers.Main) {
-          TimeNodeBottomSheetDialogFragment.newInstance(ArrayList(timeStampList))
-            .apply {
-              setOnItemClickListener { position ->
-                val item = timeStampList[position]
-                viewModel.refreshSnapshotTimestamp(item.timestamp, shouldClearDiff = true)
+          TimeNodeBottomSheetDialogFragment.newInstance(
+            ArrayList(timeStampList),
+            viewModel.selectedSnapshotTimestamp
+          ).apply {
+            setOnItemClickListener { _, item ->
+              if (viewModel.selectedSnapshotTimestamp != item.timestamp) {
                 flip(VF_LOADING)
-                dismiss()
+                viewModel.refreshSnapshotTimestamp(item.timestamp, shouldClearDiff = true)
               }
             }
-            .show(
-              context.supportFragmentManager,
-              TimeNodeBottomSheetDialogFragment::class.java.name
-            )
+            setOnDismissListener {
+              if (viewModel.currentTimeStamp != viewModel.selectedSnapshotTimestamp) {
+                flip(VF_LOADING)
+                viewModel.refreshSelectedSnapshot(shouldClearDiff = true)
+              }
+            }
+          }.show(
+            context.supportFragmentManager,
+            TimeNodeBottomSheetDialogFragment::class.java.name
+          )
         }
       }
     }

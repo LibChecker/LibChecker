@@ -4,6 +4,7 @@ import android.database.sqlite.SQLiteBlobTooBigException
 import com.absinthe.libchecker.database.LCDao
 import com.absinthe.libchecker.database.entity.SnapshotDiffStoringItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
+import com.absinthe.libchecker.database.entity.SnapshotUpdatedApp
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.database.entity.TrackItem
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
@@ -29,6 +30,14 @@ class LocalSnapshotRepository(
 
   override suspend fun getSnapshotCountsByTimestamp(): Map<Long, Int> {
     return dao.getSnapshotCountsByTimestamp().associateBy(keySelector = { it.timestamp }, valueTransform = { it.count })
+  }
+
+  override suspend fun getSnapshotLastUpdatedTimes(timestamp: Long): List<Long> {
+    return dao.getSnapshotLastUpdatedTimes(timestamp)
+  }
+
+  override suspend fun getSnapshotUpdatedApps(timestamp: Long): List<SnapshotUpdatedApp> {
+    return dao.getSnapshotUpdatedApps(timestamp)
   }
 
   override suspend fun getSnapshots(timestamp: Long): List<SnapshotItem> {
