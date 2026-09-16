@@ -46,4 +46,11 @@
     app:summary="@string/floating_nav_bar_summary"
     app:title="@string/floating_nav_bar" />
 
+  <androidx.preference.SwitchPreferenceCompat
+    app:defaultValue="false"
+    app:icon="@drawable/ic_snapshot"
+    app:key="legacySnapshotDetail"
+    app:summary="@string/legacy_snapshot_detail_summary"
+    app:title="@string/legacy_snapshot_detail" />
+
 </PreferenceScreen>

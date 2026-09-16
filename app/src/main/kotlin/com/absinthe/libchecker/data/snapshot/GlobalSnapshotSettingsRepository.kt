@@ -1,12 +1,17 @@
 package com.absinthe.libchecker.data.snapshot
 
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.constant.options.SnapshotOptions
 import com.absinthe.libchecker.domain.snapshot.SnapshotListDisplayOptions
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
+import com.absinthe.libchecker.utils.SPUtils
 
 class GlobalSnapshotSettingsRepository : SnapshotSettingsRepository {
+  override val legacyDetail: Boolean
+    get() = SPUtils.getValue(Constants.PREF_LEGACY_SNAPSHOT_DETAIL, false)
+
   override var options: Int
     get() = GlobalValues.snapshotOptions
     set(value) {

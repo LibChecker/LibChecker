@@ -2,6 +2,7 @@ package com.absinthe.libchecker.domain.snapshot.detail.ui
 
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
@@ -28,6 +29,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.SnapshotOptions
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.LibDetailDialogFragment
+import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailDiffTextStyle
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotReportExportTarget
@@ -75,7 +77,11 @@ class SnapshotDetailActivity :
   private lateinit var entity: SnapshotDiffItem
   private lateinit var snapshotTitleDisplayData: SnapshotTitleDisplayData
 
-  private val adapter by lazy { SnapshotDetailAdapter(::showSnapshotDetailLibraryDialog) }
+  private val snapshotSettings: SnapshotSettingsRepository by inject()
+  private val legacyDetail by lazy { snapshotSettings.legacyDetail }
+  private val adapter by lazy {
+    SnapshotDetailAdapter(::showSnapshotDetailLibraryDialog, legacyDetail)
+  }
   private val viewModel: SnapshotViewModel by viewModel()
   private val buildSnapshotTitleDisplayData: BuildSnapshotTitleDisplayDataUseCase by inject()
   private val _entity by unsafeLazy {
@@ -104,7 +110,18 @@ class SnapshotDetailActivity :
       entity = _entity!!
       val diffTextStyle = buildDiffTextStyle()
       initView(diffTextStyle)
-      viewModel.computeDiffDetail(entity, diffTextStyle)
+      viewModel.computeDiffDetail(
+        entity,
+        if (legacyDetail) {
+          diffTextStyle.copy(
+            highlightColor = diffTextStyle.highlightColor?.let { getColor(R.color.material_blue_900) },
+            arrowColor = Color.BLACK,
+            metricDeltaColor = Color.BLACK
+          )
+        } else {
+          diffTextStyle
+        }
+      )
     } else {
       finish()
     }
@@ -132,6 +149,7 @@ class SnapshotDetailActivity :
       title = null
     }
 
+    binding.snapshotTitle.useLegacyLayout = legacyDetail
     binding.apply {
       collapsingToolbar.also {
         it.setOnApplyWindowInsetsListener(null)

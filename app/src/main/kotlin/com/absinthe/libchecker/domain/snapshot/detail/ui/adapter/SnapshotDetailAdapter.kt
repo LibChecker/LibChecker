@@ -8,6 +8,8 @@ import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.isComponentType
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSection
+import com.absinthe.libchecker.domain.snapshot.detail.ui.view.LegacySnapshotDetailItemView
+import com.absinthe.libchecker.domain.snapshot.detail.ui.view.LegacySnapshotDetailSectionView
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailItemView
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotDetailTitleView
 import com.absinthe.libchecker.domain.snapshot.model.REMOVED
@@ -86,7 +88,8 @@ internal fun SnapshotDetailRow.Item.interactionPolicy(
 }
 
 class SnapshotDetailAdapter(
-  private val onRuleChipClick: (SnapshotDetailItemDisplayData) -> Unit = {}
+  private val onRuleChipClick: (SnapshotDetailItemDisplayData) -> Unit = {},
+  private val legacyDetail: Boolean = false
 ) : BaseQuickAdapter<SnapshotDetailRow, BaseViewHolder>() {
 
   fun submitSections(sections: List<SnapshotDetailSection>) {
@@ -116,13 +119,15 @@ class SnapshotDetailAdapter(
 
   override fun getItemViewType(position: Int, list: List<SnapshotDetailRow>): Int {
     return when (list[position]) {
-      is SnapshotDetailRow.Header -> VIEW_TYPE_HEADER
-      is SnapshotDetailRow.Item -> VIEW_TYPE_ITEM
+      is SnapshotDetailRow.Header -> if (legacyDetail) VIEW_TYPE_LEGACY_HEADER else VIEW_TYPE_HEADER
+      is SnapshotDetailRow.Item -> if (legacyDetail) VIEW_TYPE_LEGACY_ITEM else VIEW_TYPE_ITEM
     }
   }
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     val itemView = when (viewType) {
+      VIEW_TYPE_LEGACY_HEADER -> LegacySnapshotDetailSectionView(parent.context)
+      VIEW_TYPE_LEGACY_ITEM -> LegacySnapshotDetailItemView(parent.context)
       VIEW_TYPE_HEADER -> SnapshotDetailTitleView(parent.context)
       VIEW_TYPE_ITEM -> SnapshotDetailItemView(parent.context)
       else -> throw IllegalArgumentException("Unknown viewType: $viewType")
@@ -138,33 +143,38 @@ class SnapshotDetailAdapter(
   override fun convert(holder: BaseViewHolder, item: SnapshotDetailRow) {
     when (item) {
       is SnapshotDetailRow.Header -> {
-        (holder.itemView as SnapshotDetailTitleView).render(
-          item.section,
-          item.expanded
-        )
+        when (val view = holder.itemView) {
+          is LegacySnapshotDetailSectionView -> view.render(item.section, item.expanded)
+          is SnapshotDetailTitleView -> view.render(item.section, item.expanded)
+        }
       }
 
       is SnapshotDetailRow.Item -> {
-        val itemView = holder.itemView as SnapshotDetailItemView
-        itemView.render(item.displayData)
-        val ruleChip = item.displayData.ruleChip
-        if (ruleChip == null) {
-          itemView.setChipOnClickListener(null)
+        val listener = if (item.displayData.ruleChip == null) {
+          null
         } else {
-          itemView.setChipOnClickListener(
-            View.OnClickListener { view ->
-              if (AntiShakeUtils.isInvalidClick(view)) {
-                return@OnClickListener
-              }
-              onRuleChipClick(item.displayData)
-            }
-          )
+          View.OnClickListener { view ->
+            if (!AntiShakeUtils.isInvalidClick(view)) onRuleChipClick(item.displayData)
+          }
+        }
+        when (val view = holder.itemView) {
+          is LegacySnapshotDetailItemView -> {
+            view.render(item.displayData)
+            view.setChipOnClickListener(listener)
+          }
+
+          is SnapshotDetailItemView -> {
+            view.render(item.displayData)
+            view.setChipOnClickListener(listener)
+          }
         }
       }
     }
   }
 
   private companion object {
+    const val VIEW_TYPE_LEGACY_HEADER = 3
+    const val VIEW_TYPE_LEGACY_ITEM = 4
     const val VIEW_TYPE_HEADER = 1
     const val VIEW_TYPE_ITEM = 2
   }

@@ -31,6 +31,30 @@ class SnapshotTitleView(
   attributeSet: AttributeSet? = null
 ) : AViewGroup(context, attributeSet) {
 
+  var useLegacyLayout: Boolean = false
+    set(value) {
+      if (field == value) return
+      field = value
+      listOf(versionInfoView, packageSizeView, apisView).forEach {
+        it.setTextAppearance(
+          context.getResourceIdByAttr(
+            if (value) MaterialR.attr.textAppearanceBodySmall else MaterialR.attr.textAppearanceBodyMedium
+          )
+        )
+        it.applyCondensedTypeface()
+        if (value) it.letterSpacing = 0f
+        it.setTextColor(
+          context.getColorByAttr(
+            if (value || it === versionInfoView) MaterialR.attr.colorOnSurfaceVariant else MaterialR.attr.colorOnSurface
+          )
+        )
+      }
+      versionLabelView.isVisible = !value && versionInfoView.isVisible
+      packageSizeLabelView.isVisible = !value && packageSizeView.isVisible
+      apisLabelView.isVisible = !value && apisView.isVisible
+      requestLayout()
+    }
+
   private val iconView = AppCompatImageView(context).apply {
     val iconSize = 40.dp
     layoutParams = LayoutParams(iconSize, iconSize)
@@ -120,7 +144,7 @@ class SnapshotTitleView(
       )
     )
     versionInfoView.isVisible = data.versionInfo.isNotBlank()
-    versionLabelView.isVisible = versionInfoView.isVisible
+    versionLabelView.isVisible = !useLegacyLayout && versionInfoView.isVisible
     setPackageSizeText(data.packageSize)
     apisView.apply {
       text = data.apis
@@ -134,7 +158,7 @@ class SnapshotTitleView(
         setLongClickCopiedToClipboard(data.apis)
       }
     }
-    apisLabelView.isVisible = apisView.isVisible
+    apisLabelView.isVisible = !useLegacyLayout && apisView.isVisible
   }
 
   fun setIconImage(bitmap: Bitmap?) {
@@ -169,7 +193,7 @@ class SnapshotTitleView(
       packageSizeLineBreaker.clear()
       return
     }
-    packageSizeLabelView.isVisible = true
+    packageSizeLabelView.isVisible = !useLegacyLayout
     packageSizeView.apply {
       isVisible = true
       packageSizeLineBreaker.setText(data.text, data.breakStart)
@@ -181,6 +205,8 @@ class SnapshotTitleView(
       setLongClickCopiedToClipboard(data.text)
     }
   }
+
+  private fun legacyValues() = listOf(versionInfoView, packageSizeView, apisView).filter { it.isVisible }
 
   private fun metricRows() = listOf(
     versionLabelView to versionInfoView,
@@ -195,6 +221,17 @@ class SnapshotTitleView(
     val identityTextWidth = (contentWidth - iconView.measuredWidth - IDENTITY_GAP).coerceAtLeast(0)
     measureToWidth(appNameView, identityTextWidth)
     measureToWidth(packageNameView, identityTextWidth)
+    if (useLegacyLayout) {
+      val values = legacyValues()
+      values.forEach { value ->
+        if (value === versionInfoView) versionInfoLineBreaker.apply(identityTextWidth)
+        if (value === packageSizeView) packageSizeLineBreaker.apply(identityTextWidth)
+        value.measure(identityTextWidth.toExactlyMeasureSpec(), value.defaultHeightMeasureSpec(this))
+      }
+      val textHeight = appNameView.measuredHeight + packageNameView.measuredHeight + values.sumOf { it.measuredHeight }
+      setMeasuredDimension(measuredWidth, paddingTop + maxOf(iconView.measuredHeight, textHeight) + paddingBottom + 16.dp)
+      return
+    }
     val identityHeight = maxOf(iconView.measuredHeight, appNameView.measuredHeight + packageNameView.measuredHeight)
     val rows = metricRows()
     val labelWidth = rows.maxOfOrNull { it.first.measuredWidth } ?: 0
@@ -212,6 +249,18 @@ class SnapshotTitleView(
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     val identityTextX = paddingStart + iconView.measuredWidth + IDENTITY_GAP
+    if (useLegacyLayout) {
+      val values = listOf(appNameView, packageNameView) + legacyValues()
+      val textHeight = values.sumOf { it.measuredHeight }
+      val contentHeight = maxOf(iconView.measuredHeight, textHeight)
+      iconView.layout(paddingStart, paddingTop + (contentHeight - iconView.measuredHeight) / 2)
+      var y = paddingTop + (contentHeight - textHeight) / 2
+      values.forEach {
+        it.layout(identityTextX, y)
+        y += it.measuredHeight
+      }
+      return
+    }
     val textHeight = appNameView.measuredHeight + packageNameView.measuredHeight
     val identityHeight = maxOf(iconView.measuredHeight, textHeight)
     iconView.layout(paddingStart, paddingTop + (identityHeight - iconView.measuredHeight) / 2)

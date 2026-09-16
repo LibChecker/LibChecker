@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.domain.snapshot
 
 interface SnapshotSettingsRepository {
+  val legacyDetail: Boolean
   var options: Int
   var autoRemoveThreshold: Int
   var keepRule: String
