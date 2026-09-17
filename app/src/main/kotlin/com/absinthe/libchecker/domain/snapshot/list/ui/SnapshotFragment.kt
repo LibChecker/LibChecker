@@ -322,7 +322,7 @@ class SnapshotFragment :
       when (it) {
         SnapshotViewModel.Effect.PackageListLoadFailed -> {
           flip(VF_LIST)
-          context?.let { context -> Toasty.showShort(context, R.string.package_list_load_failed) }
+          Toasty.showShort(context, R.string.package_list_load_failed)
         }
 
         is SnapshotViewModel.Effect.DashboardCountChange -> {

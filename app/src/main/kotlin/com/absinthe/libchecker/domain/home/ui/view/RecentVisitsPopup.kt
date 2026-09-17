@@ -258,6 +258,7 @@ class RecentVisitsPopup(
   private fun addItem(item: RecentVisitItem, pinned: Boolean) {
     rows.addView(
       RecentVisitRow(context, item).apply {
+        if (pinned) ViewCompat.setStateDescription(this, context.getString(R.string.shortcuts_pinned))
         setOnClickListener { close { onItemClick(item) } }
         setOnHoldToRemove(onDrag = if (pinned) null else { touch -> startRecentDrag(this, item, touch) }) {
           removeRow(this, item)
@@ -361,7 +362,6 @@ class RecentVisitsPopup(
     draggedItem = null
     updateItems(current.copy(pinned = listOf(item) + others))
     onPin(item)
-    surface.announceForAccessibility(context.getString(R.string.shortcuts_pinned_feedback, item.label))
   }
 
   private fun setDropHovered(hovered: Boolean) {
