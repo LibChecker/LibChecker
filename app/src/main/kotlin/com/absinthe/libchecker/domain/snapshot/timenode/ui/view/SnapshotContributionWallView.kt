@@ -225,7 +225,7 @@ class SnapshotContributionWallView(context: Context) : LinearLayout(context) {
         val day = dayForId(virtualViewId)
         node.contentDescription = day?.let(::describeDay) ?: context.getString(R.string.snapshot_contribution_hint)
         node.className = Button::class.java.name
-        node.setBoundsInParent(boundsForDay(virtualViewId))
+        setBoundsInScreenFromBoundsInParent(node, boundsForDay(virtualViewId))
         node.isClickable = day != null
         node.isSelected = day != null && day.date == selectedDate
         if (day != null) node.addAction(AccessibilityNodeInfoCompat.ACTION_CLICK)

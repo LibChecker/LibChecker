@@ -18,6 +18,7 @@ import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.InputDevice
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -138,11 +139,11 @@ class LibReferenceTreemapView @JvmOverloads constructor(
   private val outerPath = Path()
   private val fill = Paint(Paint.ANTI_ALIAS_FLAG)
   private val labelPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-    textSize = 14 * resources.displayMetrics.scaledDensity
+    textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 14f, resources.displayMetrics)
     typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
   }
   private val countPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-    textSize = 12 * resources.displayMetrics.scaledDensity
+    textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12f, resources.displayMetrics)
   }
   private data class IconStyle(val drawable: Drawable, val background: Int, val foreground: Int)
   private val surfaceColor = context.getColorByAttr(MaterialR.attr.colorSurfaceContainer)
@@ -295,7 +296,8 @@ class LibReferenceTreemapView @JvmOverloads constructor(
       val cell = cells.getOrNull(virtualViewId)
       node.contentDescription = cell?.description ?: "0"
       node.className = if (cell?.reference != null) Button::class.java.name else View::class.java.name
-      node.setBoundsInParent(
+      setBoundsInScreenFromBoundsInParent(
+        node,
         Rect().apply {
           cell?.bounds?.let { bounds ->
             bounds.roundOut(this)

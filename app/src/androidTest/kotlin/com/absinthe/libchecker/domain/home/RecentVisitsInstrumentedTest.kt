@@ -276,6 +276,10 @@ class RecentVisitsInstrumentedTest {
             instrumentation.runOnMainSync {
               val rows = popup.field("rows") as ViewGroup
               pinnedRow = (0 until rows.childCount).map(rows::getChildAt).first { it.contentDescription == item.label }
+              assertEquals(
+                activity.getString(R.string.shortcuts_pinned),
+                androidx.core.view.ViewCompat.getStateDescription(checkNotNull(pinnedRow))
+              )
               assertTrue(
                 checkNotNull(pinnedRow).createAccessibilityNodeInfo().actionList.any {
                   it.id == android.view.accessibility.AccessibilityNodeInfo.ACTION_LONG_CLICK
