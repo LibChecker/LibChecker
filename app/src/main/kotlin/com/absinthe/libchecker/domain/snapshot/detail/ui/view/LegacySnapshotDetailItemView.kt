@@ -57,7 +57,7 @@ class LegacySnapshotDetailItemView(context: Context) : LinearLayout(context) {
     setPadding(16.dp, 4.dp, 16.dp, 4.dp)
     isFocusable = true
     importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
-    foreground = legacySnapshotRipple()
+    foreground = legacySnapshotRipple(strokeWidth = 1.dp.toFloat())
     addView(card, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
     card.addView(statusIcon, LayoutParams(16.dp, 16.dp))
     card.addView(content, LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f).apply { marginStart = 8.dp })
@@ -78,7 +78,12 @@ class LegacySnapshotDetailItemView(context: Context) : LinearLayout(context) {
       ContextCompat.getColor(context, legacySnapshotStatusColor(data.item.diffType)),
       if (dark) 0.75f else 0.95f
     )
-    card.background = G2PillDrawable(fillColor = color, cornerRadius = LEGACY_CARD_CORNER_RADIUS)
+    card.background = G2PillDrawable(
+      fillColor = color,
+      strokeColor = ColorUtils.compositeColors(0x20000000, color),
+      strokeWidth = 1.dp.toFloat(),
+      cornerRadius = LEGACY_CARD_CORNER_RADIUS
+    )
     chip.isVisible = data.ruleChip != null
     data.ruleChip?.let { rule ->
       chip.text = rule.label
@@ -115,11 +120,16 @@ internal fun legacySnapshotStatusColor(diffType: Int): Int = when (diffType) {
   else -> error("Unknown snapshot diff type: $diffType")
 }
 
-internal fun View.legacySnapshotRipple(): RippleDrawable = RippleDrawable(
+internal fun View.legacySnapshotRipple(strokeWidth: Float = 0f): RippleDrawable = RippleDrawable(
   ColorStateList.valueOf(context.getColorByAttr(androidx.appcompat.R.attr.colorControlHighlight)),
   null,
   InsetDrawable(
-    G2PillDrawable(fillColor = Color.WHITE, cornerRadius = LEGACY_CARD_CORNER_RADIUS),
+    G2PillDrawable(
+      fillColor = Color.WHITE,
+      strokeColor = Color.WHITE,
+      strokeWidth = strokeWidth,
+      cornerRadius = LEGACY_CARD_CORNER_RADIUS
+    ),
     paddingLeft,
     paddingTop,
     paddingRight,

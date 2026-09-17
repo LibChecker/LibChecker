@@ -114,7 +114,8 @@ class SnapshotDetailActivity :
         entity,
         if (legacyDetail) {
           diffTextStyle.copy(
-            highlightColor = diffTextStyle.highlightColor?.let { getColor(R.color.material_blue_900) },
+            highlightColor = null,
+            emphasizeDiffs = false,
             arrowColor = Color.BLACK,
             metricDeltaColor = Color.BLACK
           )
