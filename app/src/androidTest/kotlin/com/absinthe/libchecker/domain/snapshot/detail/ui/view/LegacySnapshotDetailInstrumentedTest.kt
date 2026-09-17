@@ -87,6 +87,12 @@ class LegacySnapshotDetailInstrumentedTest {
         val fill = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
         background.setBounds(card.left, card.top, card.right, card.bottom)
         background.draw(Canvas(fill))
+        val centerColor = fill.getPixel(card.left + card.width / 2, card.top + card.height / 2)
+        val edgeColor = fill.getPixel(card.left + card.width / 2, card.top + 1)
+        assertTrue(
+          Color.red(edgeColor) + Color.green(edgeColor) + Color.blue(edgeColor) <
+            Color.red(centerColor) + Color.green(centerColor) + Color.blue(centerColor)
+        )
         for (y in 0 until card.height) {
           for (x in 0 until card.width) {
             assertEquals(Color.alpha(fill.getPixel(card.left + x, card.top + y)), Color.alpha(bitmap.getPixel(card.left + x, card.top + y)))
