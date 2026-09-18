@@ -26,6 +26,7 @@ import timber.log.Timber
 class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDialogView>() {
 
   private val viewModel: SettingsViewModel by viewModel(ownerProducer = { requireParentFragment() })
+  private var downloading = false
   private var versionInfo: CloudRulesVersionInfo? = null
 
   override fun initRootView(): CloudRulesDialogView = CloudRulesDialogView(requireContext())
@@ -63,7 +64,9 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
   }
 
   private fun requestBundle() {
+    if (downloading) return
     val remoteVersion = versionInfo?.remoteVersion ?: return showUpdateErrorToast()
+    downloading = true
     val downloadRequest = viewModel.getCloudRulesDownloadRequest()
     DownloadUtils.download(
       downloadRequest.url,
@@ -104,6 +107,7 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
   }
 
   private fun showUpdateErrorToast() {
+    downloading = false
     lifecycleScope.launch {
       context?.showToast(R.string.toast_cloud_rules_update_error)
     }

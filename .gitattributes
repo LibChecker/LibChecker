@@ -3,6 +3,8 @@
 *.bat text eol=crlf
 
 *.jar binary
+*.aar binary
+*.zip binary
 *.png binary
 *.jpg binary
 *.jpeg binary

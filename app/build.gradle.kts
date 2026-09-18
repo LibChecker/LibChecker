@@ -1,4 +1,5 @@
 import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
+import java.security.MessageDigest
 
 plugins {
   alias(libs.plugins.android.application)
@@ -15,6 +16,24 @@ plugins {
   id("res-opt")
   id("market-stable-manifest")
 }
+
+val rulesReaderFile = providers.gradleProperty("rulesBundleAar")
+  .map { file(it) }
+  .getOrElse(rootProject.file("third-party/rules-reader/library-release.aar"))
+val rulesReaderSha256 = providers.gradleProperty("rulesBundleSha256")
+  .getOrElse(rootProject.file("third-party/rules-reader/SHA256").readText().trim())
+val verifyRulesReader by tasks.registering {
+  val archive = rulesReaderFile
+  val expected = rulesReaderSha256
+  inputs.file(rulesReaderFile)
+  inputs.property("sha256", rulesReaderSha256)
+  doLast {
+    val actual = MessageDigest.getInstance("SHA-256").digest(archive.readBytes())
+      .joinToString("") { "%02x".format(it) }
+    check(actual == expected) { "Rules reader AAR does not match its locked SHA-256" }
+  }
+}
+tasks.named("preBuild") { dependsOn(verifyRulesReader) }
 
 ksp {
   arg("moshi.generated", "javax.annotation.Generated")
@@ -147,7 +166,7 @@ dependencies {
   implementation(libs.google.dexlib2)
   implementation(libs.rikka.refine.runtime)
   implementation(libs.bundles.zhaobozhen)
-  implementation(libs.lc.rules)
+  implementation(files(rulesReaderFile))
   ksp(libs.androidX.room3.compiler)
 
   testImplementation(libs.junit)

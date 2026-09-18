@@ -58,12 +58,14 @@ data class LibraryInsightDefinition(
   @JsonClass(generateAdapter = true)
   data class Lookup(
     val input: String,
-    @Json(name = "path_template") val pathTemplate: String,
+    @Json(name = "path_template") val pathTemplate: String = "",
     @Json(name = "expected_field") val expectedField: String? = null,
     @Json(name = "items_field") val itemsField: String? = null,
     @Json(name = "max_requests") val maxRequests: Int,
     @Json(name = "max_items") val maxItems: Int,
-    val outputs: List<Output>
+    val outputs: List<Output>,
+    @Json(name = "index_path") val indexPath: String? = null,
+    @Json(name = "entries_field") val entriesField: String? = null
   )
 
   @JsonClass(generateAdapter = true)

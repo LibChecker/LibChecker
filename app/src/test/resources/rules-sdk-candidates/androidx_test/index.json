@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "sdk_id": "androidx_test",
+  "entries": [
+    {
+      "sha256": "00ec61173e4df9fad2f9c91faa4ebc57b8b86a8b61219dfa0c33fd0bfdfd49fa",
+      "releases": [
+        {
+          "artifact": "core",
+          "version": "1.5.0",
+          "entry": "META-INF/androidx.test.core.kotlin_module"
+        },
+        {
+          "artifact": "core",
+          "version": "1.5.0-rc01",
+          "entry": "META-INF/androidx.test.core.kotlin_module"
+        },
+        {
+          "artifact": "core",
+          "version": "1.5.0-beta01",
+          "entry": "META-INF/androidx.test.core.kotlin_module"
+        }
+      ]
+    },
+    {
+      "sha256": "034e257ea3a6c5df1ed6e1bdad8d5eeddef724ce0c4ca3369257725f1a8c780c",
+      "releases": [
+        {
+          "artifact": "core",
+          "version": "1.7.0-alpha02",
+          "entry": "META-INF/core_java_androidx_test_core-core_internal_kt.kotlin_module"
+        }
+      ]
+    },
+    {
+      "sha256": "a4a359591d2533ec4e732b708b642b3f2449970d7192fc9a1d862233ef4b2f7b",
+      "releases": [
+        {
+          "artifact": "core",
+          "version": "1.6.0-alpha01",
+          "entry": "META-INF/core_java_androidx_test_core-core_internal_kt.kotlin_module"
+        }
+      ]
+    },
+    {
+      "sha256": "cebb126984313eec6707302d81b562b21c5578af26fdde104ccb558802a0e2dc",
+      "releases": [
+        {
+          "artifact": "core",
+          "version": "1.7.0-alpha01",
+          "entry": "META-INF/core_java_androidx_test_core-core_internal_kt.kotlin_module"
+        },
+        {
+          "artifact": "core",
+          "version": "1.6.1",
+          "entry": "META-INF/core_java_androidx_test_core-core_internal_kt.kotlin_module"
+        },
+        {
+          "artifact": "core",
+          "version": "1.6.0",
+          "entry": "META-INF/core_java_androidx_test_core-core_internal_kt.kotlin_module"
+        },
+        {
+          "artifact": "core",
+          "version": "1.6.0-rc01",
+          "entry": "META-INF/core_java_androidx_test_core-core_internal_kt.kotlin_module"
+        },
+        {
+          "artifact": "core",
+          "version": "1.6.0-beta01",
+          "entry": "META-INF/core_java_androidx_test_core-core_internal_kt.kotlin_module"
+        },
+        {
+          "artifact": "core",
+          "version": "1.6.0-alpha06",
+          "entry": "META-INF/core_java_androidx_test_core-core_internal_kt.kotlin_module"
+        },
+        {
+          "artifact": "core",
+          "version": "1.6.0-alpha05",
+          "entry": "META-INF/core_java_androidx_test_core-core_internal_kt.kotlin_module"
+        },
+        {
+          "artifact": "core",
+          "version": "1.6.0-alpha04",
+          "entry": "META-INF/core_java_androidx_test_core-core_internal_kt.kotlin_module"
+        },
+        {
+          "artifact": "core",
+          "version": "1.6.0-alpha03",
+          "entry": "META-INF/core_java_androidx_test_core-core_internal_kt.kotlin_module"
+        },
+        {
+          "artifact": "core",
+          "version": "1.6.0-alpha02",
+          "entry": "META-INF/core_java_androidx_test_core-core_internal_kt.kotlin_module"
+        }
+      ]
+    },
+    {
+      "sha256": "d0eae33721d666fc3e7e644c6cf48df1045099b5c5de9dab5ad5dce734d87d1f",
+      "releases": [
+        {
+          "artifact": "core",
+          "version": "1.4.1-alpha06",
+          "entry": "META-INF/androidx.test.core.kotlin_module"
+        },
+        {
+          "artifact": "core",
+          "version": "1.4.1-alpha05",
+          "entry": "META-INF/androidx.test.core.kotlin_module"
+        },
+        {
+          "artifact": "core",
+          "version": "1.4.1-alpha04",
+          "entry": "META-INF/androidx.test.core.kotlin_module"
+        },
+        {
+          "artifact": "core",
+          "version": "1.4.1-alpha03",
+          "entry": "META-INF/androidx.test.core.kotlin_module"
+        }
+      ]
+    },
+    {
+      "sha256": "ef2db8a173d13dd428689ae4a85ea5b6655b44c052e943e401a83ebd89b33cf7",
+      "releases": [
+        {
+          "artifact": "core",
+          "version": "1.7.0",
+          "entry": "META-INF/core_java_androidx_test_core-core_kt.kotlin_module"
+        },
+        {
+          "artifact": "core",
+          "version": "1.7.0-rc01",
+          "entry": "META-INF/core_java_androidx_test_core-core_kt.kotlin_module"
+        },
+        {
+          "artifact": "core",
+          "version": "1.7.0-beta01",
+          "entry": "META-INF/core_java_androidx_test_core-core_kt.kotlin_module"
+        },
+        {
+          "artifact": "core",
+          "version": "1.7.0-alpha03",
+          "entry": "META-INF/core_java_androidx_test_core-core_internal_kt.kotlin_module"
+        }
+      ]
+    },
+    {
+      "sha256": "fcc9a9f1363af9792ffad0cf0ba8c81874bae807ca6cfd152d664f27780285a1",
+      "releases": [
+        {
+          "artifact": "core",
+          "version": "1.5.0-alpha02",
+          "entry": "META-INF/androidx.test.core.kotlin_module"
+        },
+        {
+          "artifact": "core",
+          "version": "1.5.0-alpha01",
+          "entry": "META-INF/androidx.test.core.kotlin_module"
+        },
+        {
+          "artifact": "core",
+          "version": "1.4.1-alpha07",
+          "entry": "META-INF/androidx.test.core.kotlin_module"
+        }
+      ]
+    }
+  ]
+}

@@ -113,6 +113,6 @@ class RemoteLibraryInsightRepository(
     const val CATALOG_PATH = "sdk-details/catalog.json"
     const val MAX_CATALOG_BYTES = 64L * 1024
     const val MAX_DEFINITION_BYTES = 128L * 1024
-    const val MAX_LOOKUP_BYTES = 64L * 1024
+    const val MAX_LOOKUP_BYTES = 1024L * 1024
   }
 }

@@ -1,0 +1,62 @@
+{
+  "schema_version": 2,
+  "sdk_id": "androidx_test",
+  "target_uuids": [
+    "88269B1E-863C-45A3-892B-8D9BC8597589"
+  ],
+  "probes": [
+    {
+      "id": "test_core_module",
+      "source": {
+        "operator": "package_file",
+        "file_name": "androidx.test.core.kotlin_module",
+        "archive_paths": [
+          "META-INF/androidx.test.core.kotlin_module",
+          "META-INF/core_java_androidx_test_core-core_internal_kt.kotlin_module",
+          "META-INF/core_java_androidx_test_core-core_kt.kotlin_module"
+        ]
+      },
+      "reader": {
+        "operator": "file_sha256",
+        "max_bytes_per_file": 65536,
+        "max_total_bytes": 262144
+      },
+      "captures": [
+        {
+          "output": "fingerprints",
+          "type": "sha256",
+          "max_results": 8
+        }
+      ]
+    }
+  ],
+  "lookups": [
+    {
+      "input": "fingerprints",
+      "expected_field": "sha256",
+      "items_field": "releases",
+      "max_requests": 4,
+      "max_items": 50,
+      "outputs": [
+        {
+          "output": "versions",
+          "field": "version"
+        }
+      ],
+      "index_path": "sdk-details/sdks/androidx_test/data/index.json",
+      "entries_field": "entries"
+    }
+  ],
+  "presentation": {
+    "summary": [
+      {
+        "label": {
+          "default": "Version",
+          "zh-Hans": "版本"
+        },
+        "source": "versions",
+        "max_values": 8
+      }
+    ]
+  }
+}
