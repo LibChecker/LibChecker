@@ -102,15 +102,7 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
       }
 
       is TimeNodeBottomSheetAction.SelectTile -> {
-        val targetTimestamp = action.dayContribution.snapshotTimestamp
-        val targetPos = dialogState?.listData?.items.orEmpty().indexOfFirst { it.timestamp == targetTimestamp }
-        val timeStampItem = rawTimeStampItems.find { it.timestamp == targetTimestamp }
-        if (targetTimestamp != null && (targetPos < 0 || timeStampItem == null)) return
         dialogState?.withSelectedTile(action.dayContribution)?.let(::render)
-        if (timeStampItem != null) {
-          root.scrollListToSnapshot(timeStampItem.timestamp)
-          itemClickAction?.invoke(targetPos, timeStampItem)
-        }
         showContributionUpdatesPopup(action.dayContribution, action.anchorRect)
       }
 
