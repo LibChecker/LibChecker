@@ -402,7 +402,7 @@ class AppItemView(
       if (abiBadge != null || multiArchBadge != null) {
         layoutAbiBadges()
       }
-      badge?.layout(paddingTop, paddingEnd, fromRight = true)
+      badge?.layout(paddingEnd, paddingTop, fromRight = true)
     }
 
     private fun layoutAbiBadges() {
