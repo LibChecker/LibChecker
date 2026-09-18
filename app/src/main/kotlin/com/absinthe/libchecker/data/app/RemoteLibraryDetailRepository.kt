@@ -4,6 +4,7 @@ import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.LibDetailBean
 import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
 import com.absinthe.libchecker.api.request.LibDetailRequest
+import com.absinthe.libchecker.api.request.libraryDetailUrl
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.domain.app.repository.LibraryDetailRepository
 import retrofit2.HttpException
@@ -13,7 +14,7 @@ object RemoteLibraryDetailRepository : LibraryDetailRepository {
   private val cloudRuleBundleRequest: CloudRuleBundleRequest = ApiManager.create()
 
   override suspend fun requestLibraryDetail(categoryDir: String, libPath: String): LibDetailBean {
-    return libDetailRequest.requestLibDetail(categoryDir, libPath)
+    return libDetailRequest.requestLibDetail(libraryDetailUrl(ApiManager.root, categoryDir, libPath))
   }
 
   override suspend fun getRepoPushedAt(owner: String, repo: String): String? {

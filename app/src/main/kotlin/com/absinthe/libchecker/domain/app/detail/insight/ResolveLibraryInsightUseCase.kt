@@ -69,47 +69,31 @@ class ResolveLibraryInsightUseCase(
         .toList()
       if (inputs.isEmpty()) return@forEach
 
-      if (LibraryInsightDefinitionValidator.VALUE_PLACEHOLDER !in lookup.pathTemplate) {
-        resolveLocalIndexLookup(lookup, inputs, values)
-        return@forEach
-      }
-
-      inputs.forEach inputLoop@{ input ->
-        val path = lookup.pathTemplate.replace(LibraryInsightDefinitionValidator.VALUE_PLACEHOLDER, input)
-        if (!validator.isSafeRemotePath(path)) return@inputLoop
-        val document =
-          (repository.getLookup(path) as? RemoteDocumentResult.Success)?.value ?: return@inputLoop
-        if (lookup.expectedField != null && document[lookup.expectedField] != input) return@inputLoop
-        val items = lookup.itemsField?.let { field ->
-          document[field] as? List<*> ?: return@inputLoop
-        } ?: listOf(document)
-        appendLookupOutputs(lookup, items.asSequence(), values)
-      }
+      resolveLocalIndexLookup(lookup, inputs, values)
     }
   }
 
-  private suspend fun resolveLocalIndexLookup(
+  internal suspend fun resolveLocalIndexLookup(
     lookup: LibraryInsightDefinition.Lookup,
     inputs: List<String>,
     values: MutableMap<String, LinkedHashSet<String>>
   ) {
-    if (!validator.isSafeRemotePath(lookup.pathTemplate)) return
+    val path = lookup.indexPath ?: lookup.pathTemplate
+    if (!validator.isSafeRemotePath(path)) return
     val expectedField = lookup.expectedField ?: return
-    val itemsField = lookup.itemsField ?: return
-    val document =
-      (repository.getLookup(lookup.pathTemplate) as? RemoteDocumentResult.Success)?.value ?: return
-    val items = document[itemsField] as? List<*> ?: return
-    appendLookupOutputs(
-      lookup = lookup,
-      items = items
-        .asSequence()
-        .take(lookup.maxItems)
-        .filter { rawItem ->
-          val item = rawItem as? Map<*, *> ?: return@filter false
-          item[expectedField] in inputs
-        },
-      values = values
-    )
+    val entriesField = lookup.entriesField ?: lookup.itemsField ?: return
+    val document = (repository.getLookup(path) as? RemoteDocumentResult.Success)?.value ?: return
+    val entries = document[entriesField] as? List<*> ?: return
+    val matched = entries.asSequence().filter { raw ->
+      val entry = raw as? Map<*, *> ?: return@filter false
+      entry[expectedField] in inputs
+    }
+    val items = if (lookup.indexPath != null && lookup.itemsField != null) {
+      matched.flatMap { ((it as Map<*, *>)[lookup.itemsField] as? List<*>).orEmpty().asSequence() }
+    } else {
+      matched
+    }
+    appendLookupOutputs(lookup, items, values)
   }
 
   private fun appendLookupOutputs(

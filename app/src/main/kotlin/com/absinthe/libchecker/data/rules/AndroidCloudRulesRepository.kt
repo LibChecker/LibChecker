@@ -7,6 +7,7 @@ import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.domain.rules.CloudRulesDownloadRequest
 import com.absinthe.libchecker.domain.rules.CloudRulesRepository
 import com.absinthe.libchecker.domain.rules.CloudRulesVersionInfo
+import com.absinthe.libchecker.domain.rules.RuleBundleManifest
 
 class AndroidCloudRulesRepository(
   context: Context,
@@ -16,27 +17,27 @@ class AndroidCloudRulesRepository(
   private val appContext = context.applicationContext
   private val request by lazy { request ?: ApiManager.create<CloudRuleBundleRequest>() }
 
+  private var manifest: RuleBundleManifest? = null
+
   override suspend fun getVersionInfo(): CloudRulesVersionInfo? {
-    val remoteInfo = request.requestCloudRuleInfo() ?: return null
-    return CloudRulesVersionInfo(
-      localVersion = RulesRepository.getLocalVersion(appContext),
-      remoteVersion = remoteInfo.version
-    )
+    manifest = null
+    val remote = request.requestV5Manifest()?.also { it.androidArtifact() } ?: return null
+    manifest = remote
+    return CloudRulesVersionInfo(RulesRepository.getLocalVersion(appContext), remote.dataVersion)
   }
 
   override fun getDownloadRequest(): CloudRulesDownloadRequest {
+    val selected = checkNotNull(manifest)
     return CloudRulesDownloadRequest(
-      url = ApiManager.rulesBundleUrl,
-      destination = RulesRepository.getDownloadFile(appContext)
+      url = ApiManager.rulesV5Root + selected.androidArtifact().path,
+      destination = RulesRepository.getDownloadFile(appContext),
+      manifest = selected
     )
   }
 
   override fun installDownloadedRules(downloadRequest: CloudRulesDownloadRequest, remoteVersion: Int): Boolean {
-    if (!RulesRepository.replaceDatabase(downloadRequest.destination, appContext)) {
-      return false
-    }
-    RulesRepository.setLocalVersion(appContext, remoteVersion)
-    return true
+    val selected = downloadRequest.manifest
+    return selected.dataVersion == remoteVersion && RulesRepository.installBundle(appContext, selected, downloadRequest.destination)
   }
 
   override fun reinitializeRules() {

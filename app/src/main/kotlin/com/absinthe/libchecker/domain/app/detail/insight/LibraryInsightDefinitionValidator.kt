@@ -29,7 +29,6 @@ class LibraryInsightDefinitionValidator {
     if (definition.probes.isEmpty() || definition.probes.size > MAX_PROBES) return false
 
     val outputs = mutableSetOf<String>()
-    val digestOutputs = mutableSetOf<String>()
     definition.probes.forEach { probe ->
       if (!SDK_ID.matches(probe.id)) return false
       if (probe.source.operator != SOURCE_PACKAGE_FILE) return false
@@ -61,23 +60,24 @@ class LibraryInsightDefinitionValidator {
         }
         if (capture.maxResults !in 1..MAX_CAPTURE_RESULTS) return false
         outputs += capture.output
-        if (capture.type == CAPTURE_SHA256) digestOutputs += capture.output
       }
     }
 
     if (definition.lookups.size > MAX_LOOKUPS) return false
     definition.lookups.forEach { lookup ->
       if (lookup.input !in outputs) return false
-      if (!isSafeRemotePath(lookup.pathTemplate)) return false
-      val placeholderCount = lookup.pathTemplate.countValuePlaceholder()
-      if (lookup.input in digestOutputs) {
+      val path = lookup.indexPath ?: lookup.pathTemplate
+      if (!isSafeRemotePath(path)) return false
+      val placeholderCount = path.countValuePlaceholder()
+      if (lookup.indexPath != null) {
+        if (lookup.pathTemplate.isNotEmpty() || placeholderCount != 0 || lookup.expectedField == null || lookup.entriesField == null) return false
+        if (!SDK_ID.matches(lookup.entriesField)) return false
+      } else {
         if (placeholderCount != 0 || lookup.expectedField == null || lookup.itemsField == null) return false
-      } else if (placeholderCount != 1) {
-        return false
       }
       if (lookup.maxRequests !in 1..MAX_LOOKUP_REQUESTS) return false
       if (lookup.maxItems !in 1..MAX_LOOKUP_ITEMS) return false
-      if (lookup.expectedField?.let(SDK_ID::matches) == false) return false
+      if (!SDK_ID.matches(lookup.expectedField)) return false
       if (lookup.itemsField?.let(SDK_ID::matches) == false) return false
       if (lookup.outputs.isEmpty() || lookup.outputs.size > MAX_LOOKUP_OUTPUTS) return false
       lookup.outputs.forEach { mapping ->

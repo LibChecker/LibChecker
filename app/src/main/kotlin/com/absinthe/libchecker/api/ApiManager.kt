@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.api
 
-import com.absinthe.libchecker.api.request.VERSION
 import com.absinthe.libchecker.compat.DnsCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
@@ -44,7 +43,8 @@ object ApiManager {
       else -> listOf(GITHUB_ROOT_URL, GITLAB_ROOT_URL)
     }
 
-  val rulesBundleUrl = "${root}cloud/rules/v$VERSION/rules.db"
+  val rulesV5Root get() = root.replace("/v4/", "/rules-data/")
+
   val chartRulesManifestUrl = "${GITHUB_ROOT_URL}chart/cloud/v1/manifest.json"
   val chartRulesBundleUrl = "${GITHUB_ROOT_URL}chart/cloud/v1/chart.bundle"
 

@@ -1,0 +1,112 @@
+{
+  "schema_version": 2,
+  "sdk_id": "flutter",
+  "target_uuids": [
+    "AEF9680F-4A43-4EDC-A5B8-8119D23BCD21"
+  ],
+  "probes": [
+    {
+      "id": "flutter_engine",
+      "source": {
+        "operator": "package_file",
+        "file_name": "libflutter.so",
+        "archive_paths": [
+          "lib/arm64-v8a/libflutter.so",
+          "lib/armeabi-v7a/libflutter.so",
+          "lib/x86_64/libflutter.so",
+          "lib/x86/libflutter.so"
+        ]
+      },
+      "reader": {
+        "operator": "ascii_strings",
+        "max_bytes_per_file": 67108864,
+        "max_total_bytes": 134217728
+      },
+      "captures": [
+        {
+          "output": "engine_revisions",
+          "type": "sha1",
+          "max_results": 2
+        },
+        {
+          "output": "dart_versions",
+          "type": "semver_channel",
+          "max_results": 2
+        }
+      ]
+    }
+  ],
+  "lookups": [
+    {
+      "input": "engine_revisions",
+      "expected_field": "engine",
+      "items_field": "releases",
+      "max_requests": 2,
+      "max_items": 20,
+      "outputs": [
+        {
+          "output": "flutter_versions",
+          "field": "flutter"
+        },
+        {
+          "output": "dart_versions",
+          "field": "dart"
+        },
+        {
+          "output": "channels",
+          "field": "channel"
+        },
+        {
+          "output": "framework_revisions",
+          "field": "framework"
+        }
+      ],
+      "index_path": "sdk-details/sdks/flutter/data/index.json",
+      "entries_field": "entries"
+    }
+  ],
+  "presentation": {
+    "summary": [
+      {
+        "label": {
+          "default": "Flutter"
+        },
+        "source": "flutter_versions",
+        "max_values": 3
+      },
+      {
+        "label": {
+          "default": "Dart"
+        },
+        "source": "dart_versions",
+        "max_values": 3
+      }
+    ],
+    "details": [
+      {
+        "label": {
+          "default": "Channel",
+          "zh-Hans": "渠道"
+        },
+        "source": "channels",
+        "max_values": 3
+      },
+      {
+        "label": {
+          "default": "Engine revision",
+          "zh-Hans": "引擎版本"
+        },
+        "source": "engine_revisions",
+        "max_values": 2
+      },
+      {
+        "label": {
+          "default": "Framework revision",
+          "zh-Hans": "框架版本"
+        },
+        "source": "framework_revisions",
+        "max_values": 3
+      }
+    ]
+  }
+}
