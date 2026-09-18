@@ -99,17 +99,8 @@ fun TimeNodeBottomSheetState.withSelectedTimestamp(
 fun TimeNodeBottomSheetState.withSelectedTile(
   dayContribution: DayContribution
 ): TimeNodeBottomSheetState {
-  val timestamp = dayContribution.snapshotTimestamp
-  val updatedItems = listData.items.map {
-    it.copy(
-      isSelected = it.timestamp == timestamp,
-      isCurrent = it.timestamp == timestamp
-    )
-  }
   return copy(
-    selectedTimestamp = timestamp ?: selectedTimestamp,
-    selectedDate = dayContribution.date,
-    listData = listData.copy(items = updatedItems)
+    selectedDate = dayContribution.date
   )
 }
 

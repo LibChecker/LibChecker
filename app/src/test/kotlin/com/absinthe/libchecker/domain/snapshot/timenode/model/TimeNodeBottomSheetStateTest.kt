@@ -53,12 +53,19 @@ class TimeNodeBottomSheetStateTest {
   }
 
   @Test
-  fun `withSelectedTile switches selectedDate to clicked tile and selects matching snapshot if present`() {
+  fun `withSelectedTile switches selectedDate to clicked tile without mutating selected snapshot or list selection`() {
     val initial = TimeNodeBottomSheetState(
       title = "Snapshots",
       header = TimeNodeHeaderState.AutoRemove(threshold = -1),
       listData = SnapshotTimeNodeListData(
         items = listOf(
+          SnapshotTimeNodeItem(
+            timestamp = 500L,
+            timestampText = "Snapshot 500",
+            description = "Snapshot 500",
+            topAppPackageNames = emptyList(),
+            isSelected = true
+          ),
           SnapshotTimeNodeItem(
             timestamp = 1000L,
             timestampText = "Snapshot 1000",
@@ -69,8 +76,8 @@ class TimeNodeBottomSheetStateTest {
         ),
         packageIconSources = emptyMap()
       ),
-      selectedTimestamp = null,
-      selectedDate = null
+      selectedTimestamp = 500L,
+      selectedDate = LocalDate.of(2026, 9, 1)
     )
 
     val nonSnapshotDayTile = DayContribution(
@@ -82,8 +89,9 @@ class TimeNodeBottomSheetStateTest {
 
     val tileSelected = initial.withSelectedTile(nonSnapshotDayTile)
     assertEquals(LocalDate.of(2026, 9, 5), tileSelected.selectedDate)
-    assertEquals(1000L, tileSelected.selectedTimestamp)
-    assertEquals(true, tileSelected.listData.items.first().isSelected)
+    assertEquals(500L, tileSelected.selectedTimestamp)
+    assertEquals(true, tileSelected.listData.items[0].isSelected)
+    assertEquals(false, tileSelected.listData.items[1].isSelected)
 
     val unassociatedTile = DayContribution(
       date = LocalDate.of(2026, 8, 1),
@@ -94,7 +102,9 @@ class TimeNodeBottomSheetStateTest {
 
     val unassociatedSelected = tileSelected.withSelectedTile(unassociatedTile)
     assertEquals(LocalDate.of(2026, 8, 1), unassociatedSelected.selectedDate)
-    assertEquals(false, unassociatedSelected.listData.items.first().isSelected)
+    assertEquals(500L, unassociatedSelected.selectedTimestamp)
+    assertEquals(true, unassociatedSelected.listData.items[0].isSelected)
+    assertEquals(false, unassociatedSelected.listData.items[1].isSelected)
   }
 
   @Test
