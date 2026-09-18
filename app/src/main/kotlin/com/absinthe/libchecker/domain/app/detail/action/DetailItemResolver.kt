@@ -419,6 +419,7 @@ internal fun buildLibraryDetailContentDisplay(
   val selectedLocaleTag = locales
     .firstOrNull { it.localeTag == preferredLocale }
     ?.localeTag
+    ?: locales.firstOrNull { it.localeTag == "en" }?.localeTag
     ?: locales.first().localeTag
   return LibraryDetailContentDisplay(
     locales = locales,

@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.PERMISSION
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.withOption
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.detail.abi.AppDetailAbiLabelData
@@ -45,6 +46,8 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -74,6 +77,12 @@ class DetailViewModel(
   }
 
   val contentState = detailContentLoader.contentState
+
+  init {
+    viewModelScope.launch {
+      GlobalValues.ruleLanguage.drop(1).collectLatest { detailContentLoader.refreshRuleLabels() }
+    }
+  }
   val featureState = detailPresentationLoader.featureState
   val filterState = detailFilterController.filterState
   private val _packageLoadResults = MutableSharedFlow<PackageLoadResult>()

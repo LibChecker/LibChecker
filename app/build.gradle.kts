@@ -16,6 +16,16 @@ plugins {
   id("market-stable-manifest")
 }
 
+val rulesBundleTestData = configurations.create("rulesBundleTestData") {
+  isCanBeConsumed = false
+  isTransitive = false
+}
+tasks.withType<Test>().configureEach {
+  val archive = files(rulesBundleTestData)
+  inputs.files(archive)
+  doFirst { systemProperty("rulesBundleAar", archive.singleFile.absolutePath) }
+}
+
 ksp {
   arg("moshi.generated", "javax.annotation.Generated")
 }
@@ -148,6 +158,7 @@ dependencies {
   implementation(libs.rikka.refine.runtime)
   implementation(libs.bundles.zhaobozhen)
   implementation(libs.lc.rules)
+  add(rulesBundleTestData.name, libs.lc.rules)
   ksp(libs.androidX.room3.compiler)
 
   testImplementation(libs.junit)
