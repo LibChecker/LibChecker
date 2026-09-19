@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <string name="package_list_load_failed">無法載入已安裝的應用程式。請再試一次。</string>
   <!--  General  -->
   <string name="title_app_list">應用程式</string>
   <string name="title_statistics">統計資料</string>
@@ -7,12 +8,28 @@
   <string name="title_settings">設定</string>
   <string name="title_album">相簿</string>
   <string name="loading">載入中…</string>
+  <string name="lib_permission_label_not_provided">未提供標籤</string>
+  <string name="lib_permission_description_not_provided">未提供描述</string>
+  <string name="lib_permission_load_failed">無法載入權限詳細資料</string>
   <string name="channel_shoot">儲存快照</string>
   <string name="noti_shoot_title">正在儲存目前快照</string>
   <string name="noti_shoot_title_saved">快照已儲存</string>
   <!--  App list  -->
   <string name="menu_search">搜尋</string>
   <string name="menu_sort">排序</string>
+  <string name="chart_statistics_add">新增統計資料</string>
+  <string name="chart_statistics_edit">編輯統計資料</string>
+  <string name="chart_statistics_added">已新增</string>
+  <string name="chart_statistics_available">可用</string>
+  <string name="chart_statistics_loading_online">正在載入線上統計資料…</string>
+  <string name="chart_statistics_online_error">無法載入線上統計資料。將會顯示已下載的項目。</string>
+  <string name="chart_statistics_no_available">沒有可用的統計資料。</string>
+  <string name="chart_statistics_source_builtin">內建</string>
+  <string name="chart_statistics_source_online">線上</string>
+  <string name="chart_statistics_drag">拖曳以重新排序</string>
+  <string name="chart_statistics_drag_hint">按住並拖曳以重新排序</string>
+  <string name="chart_statistics_remove_description">移除 %1$s</string>
+  <string name="chart_statistics_add_description">新增 %1$s</string>
   <string name="menu_filter">過濾</string>
   <string name="search_hint">搜尋…</string>
   <string name="string_64_bit">64 位元</string>
@@ -21,6 +38,8 @@
   <string name="cannot_read">無法讀取</string>
   <string name="unknown">不明</string>
   <string name="empty_list">空白清單</string>
+  <string name="recent_apps">最常檢視的應用程式</string>
+  <string name="recent_libraries">最常檢視的庫</string>
   <string name="uncharted_territory">未知領域</string>
   <string name="get_app_list_denied_tip">請授予 LibChecker\n「讀取應用程式清單」\n權限</string>
   <string name="advanced_menu">進階選單</string>
