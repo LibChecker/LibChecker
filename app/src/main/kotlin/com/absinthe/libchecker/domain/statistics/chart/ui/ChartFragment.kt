@@ -28,6 +28,7 @@ import com.absinthe.libchecker.domain.statistics.chart.source.IAndroidSDKChart
 import com.absinthe.libchecker.domain.statistics.chart.source.IChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.source.IntegerFormatter
 import com.absinthe.libchecker.domain.statistics.chart.source.impl.MarketDistributionChartDataSource
+import com.absinthe.libchecker.domain.statistics.chart.ui.view.AsymmetricBarChartRenderer
 import com.absinthe.libchecker.domain.statistics.chart.ui.view.ChartDetailItemView
 import com.absinthe.libchecker.domain.statistics.chart.ui.view.MarketDistributionDashboardView
 import com.absinthe.libchecker.ui.base.BaseFragment
@@ -36,16 +37,16 @@ import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
-import info.appdev.charting.animation.Easing
-import info.appdev.charting.charts.BarChart
-import info.appdev.charting.charts.Chart
-import info.appdev.charting.charts.HorizontalBarChart
-import info.appdev.charting.charts.PieChart
-import info.appdev.charting.components.Legend
-import info.appdev.charting.components.XAxis
-import info.appdev.charting.data.EntryFloat
-import info.appdev.charting.highlight.Highlight
-import info.appdev.charting.listener.OnChartValueSelectedListener
+import com.github.mikephil.charting.animation.Easing
+import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.charts.Chart
+import com.github.mikephil.charting.charts.HorizontalBarChart
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.components.Legend
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
@@ -226,14 +227,14 @@ class ChartFragment :
     Timber.d("Nothing selected")
   }
 
-  override fun onValueSelected(entryFloat: EntryFloat, highlight: Highlight) {
+  override fun onValueSelected(e: Entry<*>, h: Highlight) {
     if (dialog != null || showClassifyDialogJob?.isActive == true) return
     if (dataSource is MarketDistributionChartDataSource) {
       (chartView as? Chart<*>)?.highlightValue(null)
       return
     }
 
-    applyItemSelect(highlight.x.toInt())
+    applyItemSelect(h.x.toInt())
   }
 
   private fun generatePieChartView(): PieChart {
@@ -255,15 +256,15 @@ class ChartFragment :
         yEntrySpace = 0f
         isWordWrapEnabled = true
       }
-      isUsePercentValues = true
-      animateY(800, Easing.easeInOutQuad)
-      setExtraOffsets(24f, 0f, 24f, 0f)
-      setEntryLabelColor(colorOnSurface)
-      setEntryLabelTextSize(11f)
-      setNoDataText(getString(R.string.loading))
-      setNoDataTextColor(colorOnSurface)
-      setOnChartValueSelectedListener(this@ChartFragment)
-      setHoleColor(Color.TRANSPARENT)
+      isUsePercentValuesEnabled = true
+      animateY(800, Easing.EaseInOutQuad)
+      setExtraOffsets(32f, 0f, 32f, 0f)
+      entryLabelColor = colorOnSurface
+      entryLabelTextSize = 11f
+      noDataText = getString(R.string.loading)
+      noDataTextColor = colorOnSurface
+      onChartValueSelectedListener = this@ChartFragment
+      holeColor = Color.TRANSPARENT
     }
   }
 
@@ -271,6 +272,7 @@ class ChartFragment :
     val colorOnSurface =
       requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
     return HorizontalBarChart(requireContext()).apply {
+      renderer = AsymmetricBarChartRenderer(this)
       layoutParams = FrameLayout.LayoutParams(
         FrameLayout.LayoutParams.MATCH_PARENT,
         FrameLayout.LayoutParams.MATCH_PARENT
@@ -278,38 +280,38 @@ class ChartFragment :
       description.isEnabled = false
       legend.isEnabled = false
       isDragEnabled = false
-      setDrawBorders(false)
-      setDrawGridBackground(false)
-      setFitBars(true)
+      isDrawBordersEnabled = false
+      isDrawGridBackgroundEnabled = false
+      isFitBarsEnabled = true
       xAxis.apply {
         position = XAxis.XAxisPosition.BOTTOM
-        isDrawGridLines = false
+        isDrawGridLinesEnabled = false
         granularity = 1f
         textSize = 10f
         textColor = colorOnSurface
-        setDrawLabels(true)
+        isDrawLabelsEnabled = true
       }
       axisLeft.apply {
         valueFormatter = IntegerFormatter()
-        isDrawGridLines = false
-        isDrawZeroLine = false
+        isDrawGridLinesEnabled = false
+        isDrawZeroLineEnabled = false
         textColor = colorOnSurface
       }
       axisRight.apply {
         valueFormatter = IntegerFormatter()
-        isDrawGridLines = false
-        isDrawZeroLine = false
+        isDrawGridLinesEnabled = false
+        isDrawZeroLineEnabled = false
         textColor = colorOnSurface
       }
-      animateY(650, Easing.easeInOutQuad)
-      setMaxVisibleValueCount(50)
-      setDrawGridBackground(false)
-      setDrawBorders(false)
+      animateY(650, Easing.EaseInOutQuad)
+      maxVisibleCount = 50
+      isDrawGridBackgroundEnabled = false
+      isDrawBordersEnabled = false
       isDrawMarkersEnabled = false
       setExtraOffsets(12f, 0f, 24f, 0f)
-      setNoDataText(getString(R.string.loading))
-      setNoDataTextColor(colorOnSurface)
-      setOnChartValueSelectedListener(this@ChartFragment)
+      noDataText = getString(R.string.loading)
+      noDataTextColor = colorOnSurface
+      onChartValueSelectedListener = this@ChartFragment
     }
   }
 

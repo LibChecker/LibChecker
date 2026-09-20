@@ -8,9 +8,9 @@ import com.absinthe.libchecker.domain.statistics.chart.source.BaseChartDataSourc
 import com.absinthe.libchecker.domain.statistics.chart.source.showPieData
 import com.absinthe.libchecker.domain.statistics.chart.usecase.AbiChartData
 import com.absinthe.libchecker.utils.OsUtils
-import info.appdev.charting.charts.PieChart
-import info.appdev.charting.data.PieEntryFloat
-import info.appdev.charting.utils.ColorTemplate
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.utils.ColorTemplate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -28,7 +28,7 @@ class ABIChartDataSource(
         context.resources.getString(R.string.string_32_bit),
         context.resources.getString(R.string.no_libs)
       )
-      val entries: ArrayList<PieEntryFloat> = ArrayList()
+      val entries: ArrayList<PieEntry<*>> = ArrayList()
       val classifiedList = listOf(
         mutableListOf<LCItem>(),
         mutableListOf(),
@@ -48,7 +48,7 @@ class ABIChartDataSource(
       // NOTE: The order of the entries when being added to the entries array determines their position around the center of
       // the chart.
       for (i in parties.indices) {
-        entries.add(PieEntryFloat(classifiedList[i].size.toFloat(), parties[i % parties.size]))
+        entries.add(PieEntry(classifiedList[i].size.toFloat(), parties[i % parties.size]))
       }
       val colors: ArrayList<Int> = ArrayList()
 

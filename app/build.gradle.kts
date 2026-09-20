@@ -56,10 +56,6 @@ setupAppModule {
     release {
       optimization {
         enable = true
-        keepRules {
-          // https://github.com/AppDevNext/AndroidChart/blob/master/chartLib/proguard-lib.pro
-          ignoreFrom(libs.mpAndroidChart.get().module.toString())
-        }
       }
     }
     create("benchmark") {
@@ -188,6 +184,12 @@ dependencies {
   "marketImplementation"(platform(libs.firebase.bom))
   "marketImplementation"(libs.bundles.firebase) {
     exclude(group = "com.google.android.gms", module = "play-services-ads-identifier")
+  }
+}
+
+aboutLibraries {
+  collect {
+    configPath = file("aboutlibraries")
   }
 }
 

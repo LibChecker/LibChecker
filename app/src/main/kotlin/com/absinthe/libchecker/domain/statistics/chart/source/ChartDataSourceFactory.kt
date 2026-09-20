@@ -18,8 +18,8 @@ import com.absinthe.libchecker.domain.statistics.chart.ui.resolve
 import com.absinthe.libchecker.domain.statistics.chart.ui.summaryTitle
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildApiLevelChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildFeatureFlagChartDataUseCase
-import info.appdev.charting.charts.BarChart
-import info.appdev.charting.charts.PieChart
+import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.charts.PieChart
 
 internal class ChartDataSourceFactory(
   private val chartDataProvider: ChartDataProvider
