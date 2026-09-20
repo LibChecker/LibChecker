@@ -7,7 +7,7 @@ import com.absinthe.libchecker.domain.statistics.chart.source.BaseVariableChartD
 import com.absinthe.libchecker.domain.statistics.chart.source.IHeavyWork
 import com.absinthe.libchecker.domain.statistics.chart.source.applySizeBarData
 import com.absinthe.libchecker.domain.statistics.chart.usecase.DetailedAbiChartData
-import info.appdev.charting.charts.BarChart
+import com.github.mikephil.charting.charts.BarChart
 import java.util.TreeMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

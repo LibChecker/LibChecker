@@ -11,8 +11,8 @@ import com.absinthe.libchecker.domain.statistics.chart.source.BaseChartDataSourc
 import com.absinthe.libchecker.domain.statistics.chart.source.IHeavyWork
 import com.absinthe.libchecker.domain.statistics.chart.source.showPieData
 import com.absinthe.libchecker.domain.statistics.chart.ui.resolve
-import info.appdev.charting.charts.PieChart
-import info.appdev.charting.data.PieEntryFloat
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.data.PieEntry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -37,7 +37,7 @@ internal class BinaryStatisticChartDataSource(
       classifiedMap.clear()
       classifiedMap.putAll(data.toChartSourceItems(icon))
       val entries = listOf(matchedTitle, unmatchedTitle).mapIndexed { index, title ->
-        PieEntryFloat(classifiedMap.getValue(index).data.size.toFloat(), title.resolve(context))
+        PieEntry(classifiedMap.getValue(index).data.size.toFloat(), title.resolve(context))
       }
       chartView.showPieData(entries, listOf("#3ddc84".toColorInt(), "#073042".toColorInt()))
     }

@@ -9,8 +9,8 @@ import com.absinthe.libchecker.domain.statistics.chart.source.BaseChartDataSourc
 import com.absinthe.libchecker.domain.statistics.chart.source.showPieData
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildFeatureFlagChartDataUseCase.Kind
 import com.absinthe.libchecker.domain.statistics.chart.usecase.FeatureFlagChartData
-import info.appdev.charting.charts.PieChart
-import info.appdev.charting.data.PieEntryFloat
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.data.PieEntry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -47,7 +47,7 @@ class FeatureFlagChartDataSource(
       }
       chartView.showPieData(
         groups.mapIndexed { index, group ->
-          PieEntryFloat(group.size.toFloat(), getLabelByXValue(chartView.context, index))
+          PieEntry(group.size.toFloat(), getLabelByXValue(chartView.context, index))
         },
         colors
       )

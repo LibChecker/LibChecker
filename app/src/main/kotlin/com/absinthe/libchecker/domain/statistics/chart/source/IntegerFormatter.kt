@@ -1,10 +1,10 @@
 package com.absinthe.libchecker.domain.statistics.chart.source
 
-import info.appdev.charting.components.AxisBase
-import info.appdev.charting.data.EntryFloat
-import info.appdev.charting.formatter.IAxisValueFormatter
-import info.appdev.charting.formatter.IValueFormatter
-import info.appdev.charting.utils.ViewPortHandler
+import com.github.mikephil.charting.components.AxisBase
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.formatter.IAxisValueFormatter
+import com.github.mikephil.charting.formatter.IValueFormatter
+import com.github.mikephil.charting.utils.ViewPortHandler
 import java.text.DecimalFormat
 
 class IntegerFormatter :
@@ -13,15 +13,15 @@ class IntegerFormatter :
 
   private val formatter = DecimalFormat("###,###,##0")
 
-  override fun getFormattedValue(value: Float, axis: AxisBase?): String {
+  override fun getFormattedValue(value: Float, axis: AxisBase): String {
     return formatter.format(value)
   }
 
   override fun getFormattedValue(
     value: Float,
-    entryFloat: EntryFloat?,
+    entry: Entry<*>,
     dataSetIndex: Int,
-    viewPortHandler: ViewPortHandler?
+    viewPortHandler: ViewPortHandler
   ): String {
     return formatter.format(value)
   }

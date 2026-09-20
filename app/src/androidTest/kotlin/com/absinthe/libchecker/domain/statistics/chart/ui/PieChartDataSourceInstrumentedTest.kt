@@ -12,8 +12,8 @@ import com.absinthe.libchecker.domain.statistics.chart.source.impl.PageSize16KBC
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildFeatureFlagChartDataUseCase
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildFeatureFlagChartDataUseCase.Kind
 import com.absinthe.libchecker.domain.statistics.chart.usecase.PageSize16KBChartData
-import info.appdev.charting.charts.PieChart
-import info.appdev.charting.formatter.PercentFormatter
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.formatter.PercentFormatter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -51,9 +51,9 @@ class PieChartDataSourceInstrumentedTest {
       withContext(Dispatchers.Main) {
         val data = chart.data!!.dataSet
         assertEquals(2, data.entryCount)
-        assertEquals(chart.context.getString(label), data.getEntryForIndex(0)!!.label)
-        assertEquals(1f, data.getEntryForIndex(0)!!.y, 0f)
-        assertEquals(1f, data.getEntryForIndex(1)!!.y, 0f)
+        assertEquals(chart.context.getString(label), data.getEntryForIndex(0).label)
+        assertEquals(1f, data.getEntryForIndex(0).y, 0f)
+        assertEquals(1f, data.getEntryForIndex(1).y, 0f)
         assertEquals(listOf(colors.first.toColorInt(), colors.second.toColorInt()), data.colors)
         assertTrue(data.valueFormatter is PercentFormatter)
       }
@@ -77,7 +77,7 @@ class PieChartDataSourceInstrumentedTest {
     assertEquals(listOf(supported), source.getListByXValue(0))
     withContext(Dispatchers.Main) {
       assertEquals(3, chart.data!!.dataSet.entryCount)
-      assertEquals(0f, chart.data!!.dataSet.getEntryForIndex(2)!!.y, 0f)
+      assertEquals(0f, chart.data!!.dataSet.getEntryForIndex(2).y, 0f)
     }
   }
 

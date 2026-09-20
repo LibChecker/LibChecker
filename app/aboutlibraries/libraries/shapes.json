@@ -1,0 +1,13 @@
+{
+  "uniqueId": "com.kyant:shapes",
+  "name": "Shapes",
+  "description": "Continuous-curvature rounded rectangle algorithm adapted for LibChecker's G2 shapes.",
+  "website": "https://github.com/Kyant0/Shapes",
+  "developers": [
+    {
+      "name": "Kyant",
+      "organisationUrl": "https://github.com/Kyant0"
+    }
+  ],
+  "licenses": ["Apache-2.0"]
+}

@@ -7,7 +7,7 @@ import com.absinthe.libchecker.domain.statistics.chart.source.IAndroidSDKChart
 import com.absinthe.libchecker.domain.statistics.chart.source.OsVersionAxisFormatter
 import com.absinthe.libchecker.domain.statistics.chart.source.applySizeBarData
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildApiLevelChartDataUseCase
-import info.appdev.charting.charts.BarChart
+import com.github.mikephil.charting.charts.BarChart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

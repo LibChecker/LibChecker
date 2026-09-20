@@ -5,16 +5,19 @@ import androidx.appcompat.view.ContextThemeWrapper
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.api.bean.AndroidDistribution
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticIconSpec
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticTitleSpec
 import com.absinthe.libchecker.domain.statistics.chart.source.impl.BinaryStatisticChartData
 import com.absinthe.libchecker.domain.statistics.chart.source.impl.BinaryStatisticChartDataSource
 import com.absinthe.libchecker.domain.statistics.chart.source.impl.DetailedABIChartDataSource
+import com.absinthe.libchecker.domain.statistics.chart.source.impl.MarketDistributionChartDataSource
+import com.absinthe.libchecker.domain.statistics.chart.usecase.AndroidDistributionChartData
 import com.absinthe.libchecker.domain.statistics.chart.usecase.DetailedAbiChartData
 import com.absinthe.libchecker.domain.statistics.chart.usecase.DetailedAbiChartGroup
-import info.appdev.charting.charts.BarChart
-import info.appdev.charting.charts.PieChart
+import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.charts.PieChart
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -24,6 +27,37 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class SharedChartDataSourceInstrumentedTest {
+  @Test
+  fun marketDistributionRefreshesOnMainThreadAndFormatsPercentages() = runBlocking {
+    val instrumentation = InstrumentationRegistry.getInstrumentation()
+    val context = ContextThemeWrapper(instrumentation.targetContext, R.style.AppTheme)
+    lateinit var chart: BarChart
+    instrumentation.runOnMainSync {
+      chart = object : BarChart(context) {
+        override fun notifyDataSetChanged() {
+          assertEquals(Looper.getMainLooper(), Looper.myLooper())
+          super.notifyDataSetChanged()
+        }
+      }
+    }
+    val source = MarketDistributionChartDataSource(emptyList()) {
+      AndroidDistributionChartData(
+        listOf(AndroidDistribution("Android 16", "16", 36, 0.25, "", emptyList())),
+        "2026-09-20"
+      )
+    }
+    source.fillChartView(chart) {}
+    instrumentation.runOnMainSync {
+      val dataSet = chart.data!!.getDataSetByIndex(0)!!
+      val entry = dataSet.getEntryForIndex(0)
+      assertEquals(0.25f, entry.y, 0f)
+      val expected = java.text.DecimalFormat("###,###,##0.00%").format(0.25)
+      assertEquals(expected, dataSet.valueFormatter.getFormattedValue(entry.y, entry, 0, chart.viewPortHandler))
+      assertEquals(expected, chart.axisLeft.valueFormatter.getFormattedValue(entry.y, chart.axisLeft))
+      assertEquals("0", chart.axisRight.valueFormatter.getFormattedValue(0f, chart.axisRight))
+    }
+  }
+
   @Test
   fun preservesOrderingSelectionProgressAndClearsEmptyData() = runBlocking {
     val instrumentation = InstrumentationRegistry.getInstrumentation()
@@ -53,8 +87,8 @@ class SharedChartDataSourceInstrumentedTest {
     assertEquals("Two", source.getLabelByXValue(context, 0))
     instrumentation.runOnMainSync {
       assertEquals(2, bar.data!!.entryCount)
-      assertEquals(2f, bar.data!!.getDataSetByIndex(0)!!.getEntryForIndex(0)!!.y, 0f)
-      assertEquals("Two", bar.xAxis.valueFormatter!!.getFormattedValue(0f, bar.xAxis))
+      assertEquals(2f, bar.data!!.getDataSetByIndex(0)!!.getEntryForIndex(0).y, 0f)
+      assertEquals("Two", bar.xAxis.valueFormatter.getFormattedValue(0f, bar.xAxis))
     }
     groups = emptyList()
     source.fillChartView(bar) {}

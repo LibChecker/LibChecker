@@ -9,10 +9,10 @@ import com.absinthe.libchecker.domain.statistics.chart.source.PercentageFormatte
 import com.absinthe.libchecker.domain.statistics.chart.usecase.AndroidDistributionChartData
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
-import info.appdev.charting.charts.BarChart
-import info.appdev.charting.data.BarData
-import info.appdev.charting.data.BarDataSet
-import info.appdev.charting.data.BarEntryFloat
+import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -38,12 +38,12 @@ class MarketDistributionChartDataSource(
       lastUpdateTime = chartData.lastUpdateTime
       val dist = chartData.distributions
       val parties = dist.map { it.name }
-      val entries: ArrayList<BarEntryFloat> = ArrayList()
+      val entries: ArrayList<BarEntry<*>> = ArrayList()
       for (i in parties.indices) {
-        entries.add(BarEntryFloat(i.toFloat(), dist[i].distributionPercentage.toFloat()))
+        entries.add(BarEntry(i.toFloat(), dist[i].distributionPercentage.toFloat()))
       }
       val dataSet = BarDataSet(entries, "").apply {
-        isDrawIcons = false
+        isDrawIconsEnabled = false
         valueFormatter = PercentageFormatter()
       }
 
@@ -53,27 +53,24 @@ class MarketDistributionChartDataSource(
         colors.add(UiUtils.getRandomColor())
       }
 
-      dataSet.setColors(colors)
+      dataSet.colors = colors
       // dataSet.setSelectionShift(0f);
       val data = BarData(dataSet).apply {
         setValueTextSize(10f)
         setValueTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
       }
 
-      chartView.apply {
-        xAxis.apply {
-          valueFormatter = OsVersionAxisFormatter(dist.map { entry -> entry.apiLevel })
-          setLabelCount(dist.size, false)
-        }
-        axisLeft.valueFormatter = PercentageFormatter()
-        axisRight.valueFormatter = PercentageFormatter()
-        this.data = data
-      }
-
       withContext(Dispatchers.Main) {
         chartView.apply {
-          highlightValues(null)
-          invalidate()
+          xAxis.apply {
+            valueFormatter = OsVersionAxisFormatter(dist.map { entry -> entry.apiLevel })
+            labelCount = dist.size
+            isForceLabelsEnabled = false
+          }
+          axisLeft.valueFormatter = PercentageFormatter()
+          axisRight.valueFormatter = PercentageFormatter()
+          this.data = data
+          highlightValues(emptyList())
         }
       }
     }
