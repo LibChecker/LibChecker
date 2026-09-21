@@ -123,5 +123,5 @@ val appDetailModule = module {
       analyzeAppStatisticRules = get()
     )
   }
-  viewModel { LibraryInsightViewModel(get()) }
+  viewModel { LibraryInsightViewModel(get(), get()) }
 }

@@ -3,7 +3,10 @@ package com.absinthe.libchecker.domain.app.detail.insight
 import android.content.pm.PackageInfo
 import android.icu.util.ULocale
 import java.util.Locale
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 
 class ResolveLibraryInsightUseCase(
@@ -49,11 +52,23 @@ class ResolveLibraryInsightUseCase(
       return LibraryInsightResult.Unavailable
     }
 
-    val probeResult = probeEngine.probe(packageInfo, definition)
-    if (!probeResult.evidenceFound) return LibraryInsightResult.NotSupported
     val values = linkedMapOf<String, LinkedHashSet<String>>()
-    probeResult.values.forEach { (key, result) -> values.getOrPut(key, ::linkedSetOf).addAll(result) }
-    resolveLookups(definition.lookups, values)
+    val evidenceFound = coroutineScope {
+      // Paths are fixed and validated; downloading them does not depend on local fingerprints.
+      val documents = definition.lookups.map { it.indexPath ?: it.pathTemplate }.distinct()
+        .associateWith { path -> async { repository.getLookup(path) } }
+      try {
+        val probeResult = probeEngine.probe(packageInfo, definition)
+        if (probeResult.evidenceFound) {
+          probeResult.values.forEach { (key, result) -> values.getOrPut(key, ::linkedSetOf).addAll(result) }
+          resolveLookups(definition.lookups, values, documents)
+        }
+        probeResult.evidenceFound
+      } finally {
+        documents.values.forEach { it.cancel() }
+      }
+    }
+    if (!evidenceFound) return LibraryInsightResult.NotSupported
 
     val summary = definition.presentation.summary.mapNotNull { it.toDisplayField(values, localeTag) }
     if (summary.isEmpty()) return LibraryInsightResult.Unavailable
@@ -69,7 +84,8 @@ class ResolveLibraryInsightUseCase(
 
   private suspend fun resolveLookups(
     lookups: List<LibraryInsightDefinition.Lookup>,
-    values: MutableMap<String, LinkedHashSet<String>>
+    values: MutableMap<String, LinkedHashSet<String>>,
+    documents: Map<String, Deferred<RemoteDocumentResult<Map<String, Any?>>>>
   ) {
     lookups.forEach { lookup ->
       val inputs = values[lookup.input]
@@ -80,20 +96,20 @@ class ResolveLibraryInsightUseCase(
         .toList()
       if (inputs.isEmpty()) return@forEach
 
-      resolveLocalIndexLookup(lookup, inputs, values)
+      val path = lookup.indexPath ?: lookup.pathTemplate
+      val document = (documents.getValue(path).await() as? RemoteDocumentResult.Success)?.value ?: return@forEach
+      resolveLocalIndexLookup(lookup, inputs, values, document)
     }
   }
 
-  internal suspend fun resolveLocalIndexLookup(
+  private suspend fun resolveLocalIndexLookup(
     lookup: LibraryInsightDefinition.Lookup,
     inputs: List<String>,
-    values: MutableMap<String, LinkedHashSet<String>>
+    values: MutableMap<String, LinkedHashSet<String>>,
+    document: Map<String, Any?>
   ) = withContext(Dispatchers.Default) {
-    val path = lookup.indexPath ?: lookup.pathTemplate
-    if (!validator.isSafeRemotePath(path)) return@withContext
     val expectedField = lookup.expectedField ?: return@withContext
     val entriesField = lookup.entriesField ?: lookup.itemsField ?: return@withContext
-    val document = (repository.getLookup(path) as? RemoteDocumentResult.Success)?.value ?: return@withContext
     val entries = document[entriesField] as? List<*> ?: return@withContext
     val matched = entries.asSequence().filter { raw ->
       val entry = raw as? Map<*, *> ?: return@filter false

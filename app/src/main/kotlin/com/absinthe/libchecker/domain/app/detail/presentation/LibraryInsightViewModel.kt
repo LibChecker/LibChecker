@@ -3,6 +3,7 @@ package com.absinthe.libchecker.domain.app.detail.presentation
 import android.content.pm.PackageInfo
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.absinthe.libchecker.domain.app.detail.insight.LibraryInsightRepository
 import com.absinthe.libchecker.domain.app.detail.insight.LibraryInsightResult
 import com.absinthe.libchecker.domain.app.detail.insight.LibraryInsightUiState
 import com.absinthe.libchecker.domain.app.detail.insight.ResolveLibraryInsightUseCase
@@ -14,13 +15,21 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class LibraryInsightViewModel(
-  private val resolveLibraryInsight: ResolveLibraryInsightUseCase
+  private val resolveLibraryInsight: ResolveLibraryInsightUseCase,
+  private val repository: LibraryInsightRepository
 ) : ViewModel() {
 
   private val _state = MutableStateFlow<LibraryInsightUiState>(LibraryInsightUiState.Hidden)
   val state: StateFlow<LibraryInsightUiState> = _state.asStateFlow()
   private var request: Request? = null
   private var job: Job? = null
+  private var preloadJob: Job? = null
+
+  fun preload() {
+    if (preloadJob == null) {
+      preloadJob = viewModelScope.launch { repository.getCatalog() }
+    }
+  }
 
   fun load(libraryUuid: String, packageInfo: PackageInfo, localeTag: String) {
     request = Request(libraryUuid, packageInfo, localeTag)
@@ -37,6 +46,7 @@ class LibraryInsightViewModel(
     job = viewModelScope.launch {
       var supported = false
       try {
+        preloadJob?.join()
         when (
           val result = resolveLibraryInsight(
             libraryUuid = request.libraryUuid,
