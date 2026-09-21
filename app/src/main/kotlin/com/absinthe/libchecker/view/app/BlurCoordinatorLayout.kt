@@ -737,13 +737,9 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
   }
 
   private fun resolveThemeColor(attribute: Int): Int? {
-    val typedValue = android.util.TypedValue()
-    val resolved = context.theme.resolveAttribute(
-      attribute,
-      typedValue,
-      true
-    )
-    return typedValue.data.takeIf { resolved }
+    return context.obtainStyledAttributes(intArrayOf(attribute)).use {
+      it.getColorStateList(0)?.defaultColor
+    }
   }
 
   private fun dividerHeightPx(): Float = DIVIDER_HEIGHT_DP * resources.displayMetrics.density

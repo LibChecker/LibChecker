@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <style name="ThemeOverlay.BlurXmlBackground" parent="">
+    <item name="android:colorBackground">@color/m3_ref_palette_dynamic_neutral_variant98</item>
+  </style>
+</resources>
