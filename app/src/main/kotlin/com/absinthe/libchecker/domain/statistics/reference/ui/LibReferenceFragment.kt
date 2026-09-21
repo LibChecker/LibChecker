@@ -288,6 +288,7 @@ class LibReferenceFragment :
                   return@setDiffNewData
                 }
                 displayedReferences = searchResult.references
+                onSearchResultsApplied(searchResult.query, searchResult.references.isEmpty())
                 isListReady = true
                 flip(VF_LIST)
                 scheduleFirstListPresentation()
@@ -465,6 +466,7 @@ class LibReferenceFragment :
           }
           displayedReferences = searchResult.references
           refAdapter.setList(searchResult.references)
+          onSearchResultsApplied(searchResult.query, searchResult.references.isEmpty())
           if (isTreemap && isListReady) renderTreemap(animate = true)
           doOnMainThreadIdle {
             refAdapter.setSpaceFooterView()

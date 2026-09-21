@@ -36,6 +36,8 @@ import com.absinthe.libchecker.domain.app.packageinfo.GetInstalledAppComparisonP
 import com.absinthe.libchecker.domain.app.packageinfo.PrepareApkAnalysisPackageUseCase
 import com.absinthe.libchecker.domain.app.repository.AppDetailSettingsRepository
 import com.absinthe.libchecker.domain.app.repository.LibraryDetailRepository
+import java.io.File
+import okhttp3.Cache
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -44,7 +46,12 @@ val appDetailModule = module {
   single<AppDetailSettingsRepository> { GlobalAppDetailSettingsRepository() }
   single<LibraryDetailRepository> { RemoteLibraryDetailRepository }
   single<LibraryInsightRepository> {
-    RemoteLibraryInsightRepository(ApiManager.create<RulesDocumentRequest>())
+    val client = ApiManager.okHttpClient.newBuilder()
+      .cache(Cache(File(androidContext().cacheDir, "sdk-details-http"), 8L * 1024 * 1024))
+      .build()
+    val request = ApiManager.retrofit.newBuilder().client(client).build()
+      .create(RulesDocumentRequest::class.java)
+    RemoteLibraryInsightRepository(request)
   }
   single { AllowFileUriExposureUseCase() }
   factory { DetailAppInfoResolver(androidContext(), BuildConfig.APPLICATION_ID, get(), get(), get()) }
@@ -52,7 +59,7 @@ val appDetailModule = module {
   factory { DetailContentResolver(androidContext(), get()) }
   factory { GetAppDetailFeaturesUseCase(get(), get()) }
   factory { LibraryInsightDefinitionValidator() }
-  factory { LibraryInsightProbeEngine() }
+  single { LibraryInsightProbeEngine() }
   factory { ResolveLibraryInsightUseCase(get(), get(), get()) }
   factory { GetAppDetailPackageUseCase(get()) }
   factory { GetAppDetailPackageSizeUseCase() }

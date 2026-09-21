@@ -15,12 +15,22 @@ import kotlinx.coroutines.withContext
 
 class LibraryInsightProbeEngine {
 
+  // ponytail: retain only the latest probe; use a bounded cache if cross-library reuse is needed.
+  @Volatile
+  private var cachedProbe: Pair<ProbeCacheKey, LibraryInsightProbeResult>? = null
+
   suspend fun probe(
     packageInfo: PackageInfo,
     definition: LibraryInsightDefinition
   ): LibraryInsightProbeResult = withContext(Dispatchers.IO) {
+    val files = packageArchiveFiles(packageInfo) + definition.probes.mapNotNull { probe ->
+      packageInfo.applicationInfo?.nativeLibraryDir?.let { File(it, probe.source.fileName) }
+    }
+    val cacheKey = ProbeCacheKey(definition.probes, files.map(::fileStamp))
+    cachedProbe?.takeIf { it.first == cacheKey }?.let { return@withContext it.second }
     val values = linkedMapOf<String, LinkedHashSet<String>>()
     var evidenceFound = false
+    var readFailed = false
 
     definition.probes.forEach { probe ->
       coroutineContext.ensureActive()
@@ -70,6 +80,7 @@ class LibraryInsightProbeEngine {
         } catch (exception: CancellationException) {
           throw exception
         } catch (_: Exception) {
+          readFailed = true
           // Fall back to the packaged copy below.
         }
       }
@@ -94,6 +105,7 @@ class LibraryInsightProbeEngine {
           } catch (exception: CancellationException) {
             throw exception
           } catch (_: Exception) {
+            readFailed = true
             // A broken split must not prevent checking the remaining package files.
           }
         }
@@ -103,8 +115,18 @@ class LibraryInsightProbeEngine {
     LibraryInsightProbeResult(
       evidenceFound = evidenceFound,
       values = values.mapValues { it.value.toList() }
-    )
+    ).also { result ->
+      if (!readFailed && result.values.values.any { it.isNotEmpty() } && cacheKey.files == files.map(::fileStamp)) {
+        cachedProbe = cacheKey to result
+      }
+    }
   }
+
+  private fun fileStamp(file: File) = FileStamp(file.absolutePath, file.length(), file.lastModified(), file.canRead())
+
+  private data class ProbeCacheKey(val probes: List<LibraryInsightDefinition.Probe>, val files: List<FileStamp>)
+
+  private data class FileStamp(val path: String, val size: Long, val modified: Long, val readable: Boolean)
 
   private fun scanAsciiStrings(
     input: InputStream,

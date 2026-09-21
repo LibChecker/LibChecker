@@ -13,11 +13,13 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.core.animation.doOnEnd
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.doOnLayout
 import androidx.core.view.updatePadding
 import androidx.fragment.app.FragmentManager
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.absinthe.libchecker.R as AppR
 import com.absinthe.libchecker.utils.OsUtils
+import com.absinthe.libchecker.view.app.BottomSheetBackgroundDrawable
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.R
 import com.absinthe.libraries.utils.utils.UiUtils
@@ -25,7 +27,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.shape.MaterialShapeDrawable
-import com.google.android.material.shape.ShapeAppearanceModel
 import timber.log.Timber
 
 abstract class BaseBottomSheetViewDialogFragment<T> :
@@ -72,7 +73,6 @@ abstract class BaseBottomSheetViewDialogFragment<T> :
             root.getHeaderView().onHandlerActivated(false)
           }
           updateBlurAndDimForOffset(1f)
-          bottomSheet.background = createMaterialShapeDrawable(bottomSheet)
         }
 
         BottomSheetBehavior.STATE_HALF_EXPANDED -> {
@@ -147,6 +147,11 @@ abstract class BaseBottomSheetViewDialogFragment<T> :
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+    view.setOnApplyWindowInsetsListener { _, insets ->
+      ((view.parent as? View)?.background as? BottomSheetBackgroundDrawable)
+        ?.updateCorners(view.rootWindowInsets)
+      insets
+    }
     view.viewTreeObserver.addOnGlobalLayoutListener(object :
       ViewTreeObserver.OnGlobalLayoutListener {
       override fun onGlobalLayout() {
@@ -160,6 +165,13 @@ abstract class BaseBottomSheetViewDialogFragment<T> :
 
   override fun onStart() {
     super.onStart()
+    (root.parent as View).doOnLayout { bottomSheet ->
+      // Install after Material's first layout, independently of its expanded-corner animation.
+      val background = bottomSheet.background as? BottomSheetBackgroundDrawable
+        ?: BottomSheetBackgroundDrawable(bottomSheet.context, bottomSheet.background as MaterialShapeDrawable)
+          .also { bottomSheet.background = it }
+      background.updateCorners(bottomSheet.rootWindowInsets)
+    }
     updateMaxPeekSize()
     behavior.addBottomSheetCallback(bottomSheetCallback)
     root.addOnLayoutChangeListener(this)
@@ -241,29 +253,6 @@ abstract class BaseBottomSheetViewDialogFragment<T> :
       maxPeekSize = ((dialog?.window?.decorView?.height ?: 0) * maxPeekHeightPercentage).toInt()
     } else {
       throw IllegalArgumentException("maxPeekHeightPercentage must be greater than 0")
-    }
-  }
-
-  private fun createMaterialShapeDrawable(bottomSheet: View): MaterialShapeDrawable {
-    // Create a ShapeAppearanceModel with the same shapeAppearanceOverlay used in the style
-    val shapeAppearanceModel =
-      ShapeAppearanceModel.builder(
-        context,
-        0,
-        com.absinthe.libchecker.R.style.App_ShapeAppearance_M3E_BottomSheetDialog
-      )
-        .build()
-
-    // Create a new MaterialShapeDrawable (you can't use the original MaterialShapeDrawable in the BottomSheet)
-    val currentMaterialShapeDrawable = bottomSheet.background as MaterialShapeDrawable
-    return MaterialShapeDrawable(shapeAppearanceModel).apply {
-      // Copy the attributes in the new MaterialShapeDrawable
-      initializeElevationOverlay(context)
-      fillColor = currentMaterialShapeDrawable.fillColor
-      tintList = currentMaterialShapeDrawable.tintList
-      elevation = currentMaterialShapeDrawable.elevation
-      strokeWidth = currentMaterialShapeDrawable.strokeWidth
-      strokeColor = currentMaterialShapeDrawable.strokeColor
     }
   }
 

@@ -3,6 +3,8 @@ package com.absinthe.libchecker.domain.app.detail.insight
 import android.content.pm.PackageInfo
 import android.icu.util.ULocale
 import java.util.Locale
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class ResolveLibraryInsightUseCase(
   private val repository: LibraryInsightRepository,
@@ -28,11 +30,20 @@ class ResolveLibraryInsightUseCase(
       ?: return LibraryInsightResult.NotSupported
 
     onSupported()
-    val definition = when (val result = repository.getDefinition(entry.definition)) {
+    var definition = when (val result = repository.getDefinition(entry.definition)) {
       is RemoteDocumentResult.Success -> result.value
 
       RemoteDocumentResult.Failure,
       RemoteDocumentResult.NotFound -> return LibraryInsightResult.Unavailable
+    }
+    // Fixed-index definitions are staged separately while older clients still use URL templates.
+    if (definition.lookups.any { LibraryInsightDefinitionValidator.VALUE_PLACEHOLDER in it.pathTemplate }) {
+      definition = when (val result = repository.getDefinition("sdk-details/candidates/${entry.sdkId}/definition.json")) {
+        is RemoteDocumentResult.Success -> result.value
+
+        RemoteDocumentResult.Failure,
+        RemoteDocumentResult.NotFound -> return LibraryInsightResult.Unavailable
+      }
     }
     if (!validator.isValid(definition, entry.sdkId, libraryUuid)) {
       return LibraryInsightResult.Unavailable
@@ -77,13 +88,13 @@ class ResolveLibraryInsightUseCase(
     lookup: LibraryInsightDefinition.Lookup,
     inputs: List<String>,
     values: MutableMap<String, LinkedHashSet<String>>
-  ) {
+  ) = withContext(Dispatchers.Default) {
     val path = lookup.indexPath ?: lookup.pathTemplate
-    if (!validator.isSafeRemotePath(path)) return
-    val expectedField = lookup.expectedField ?: return
-    val entriesField = lookup.entriesField ?: lookup.itemsField ?: return
-    val document = (repository.getLookup(path) as? RemoteDocumentResult.Success)?.value ?: return
-    val entries = document[entriesField] as? List<*> ?: return
+    if (!validator.isSafeRemotePath(path)) return@withContext
+    val expectedField = lookup.expectedField ?: return@withContext
+    val entriesField = lookup.entriesField ?: lookup.itemsField ?: return@withContext
+    val document = (repository.getLookup(path) as? RemoteDocumentResult.Success)?.value ?: return@withContext
+    val entries = document[entriesField] as? List<*> ?: return@withContext
     val matched = entries.asSequence().filter { raw ->
       val entry = raw as? Map<*, *> ?: return@filter false
       entry[expectedField] in inputs

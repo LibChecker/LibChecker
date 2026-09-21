@@ -2,16 +2,116 @@ package com.absinthe.libchecker.data.app.insight
 
 import com.absinthe.libchecker.api.request.RulesDocumentRequest
 import com.absinthe.libchecker.domain.app.detail.insight.RemoteDocumentResult
+import com.sun.net.httpserver.HttpServer
+import java.net.InetSocketAddress
 import java.net.URI
+import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.runBlocking
+import okhttp3.Cache
+import okhttp3.OkHttpClient
+import okhttp3.Protocol
 import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
+import okio.Buffer
+import okio.ForwardingSource
+import okio.buffer
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotSame
 import org.junit.Assert.assertTrue
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 import retrofit2.Response
+import retrofit2.Retrofit
 
 class RemoteLibraryInsightRepositoryTest {
+
+  @get:Rule
+  val temporaryFolder = TemporaryFolder()
+
+  @Test
+  fun `reuses fresh responses and revalidates stale responses across repository instances`() = runBlocking {
+    for (maxAge in listOf(3600, 0)) {
+      val requests = AtomicInteger()
+      val validations = AtomicInteger()
+      val server = HttpServer.create(InetSocketAddress("127.0.0.1", 0), 0)
+      server.createContext("/") { exchange ->
+        exchange.use {
+          requests.incrementAndGet()
+          exchange.responseHeaders.add("Cache-Control", "max-age=$maxAge")
+          exchange.responseHeaders.add("ETag", "\"revision-1\"")
+          if (exchange.requestHeaders.getFirst("If-None-Match") == "\"revision-1\"") {
+            validations.incrementAndGet()
+            exchange.sendResponseHeaders(304, -1)
+          } else {
+            val bytes = LOOKUP_JSON.toByteArray()
+            exchange.sendResponseHeaders(200, bytes.size.toLong())
+            exchange.responseBody.write(bytes)
+          }
+        }
+      }
+      server.start()
+      try {
+        val root = "http://127.0.0.1:${server.address.port}/"
+        val directory = temporaryFolder.newFolder()
+        repeat(2) {
+          Cache(directory, 1024 * 1024).use { cache ->
+            val client = OkHttpClient.Builder().cache(cache).build()
+            val request = Retrofit.Builder().baseUrl(root).client(client).build()
+              .create(RulesDocumentRequest::class.java)
+            val result = RemoteLibraryInsightRepository(request) { listOf(root) }
+              .getLookup("sdk-details/sdks/flutter/data/index.json")
+            assertEquals("3.24.5", (result as RemoteDocumentResult.Success).value["flutter"])
+            client.connectionPool.evictAll()
+            client.dispatcher.executorService.shutdown()
+          }
+        }
+        assertEquals(if (maxAge == 0) 2 else 1, requests.get())
+        assertEquals(if (maxAge == 0) 1 else 0, validations.get())
+      } finally {
+        server.stop(0)
+      }
+    }
+  }
+
+  @Test
+  fun `streams unknown length responses off the caller thread and stops at the limit`() = runBlocking {
+    val callerThread = Thread.currentThread()
+    var bytesRead = 0L
+    var closed = false
+    val source = object : ForwardingSource(Buffer().writeUtf8("x".repeat(2 * 1024 * 1024))) {
+      override fun read(sink: Buffer, byteCount: Long): Long {
+        assertNotSame(callerThread, Thread.currentThread())
+        return super.read(sink, byteCount).also { if (it > 0) bytesRead += it }
+      }
+
+      override fun close() {
+        closed = true
+        super.close()
+      }
+    }.buffer()
+    val body = object : ResponseBody() {
+      override fun contentType() = null
+      override fun contentLength() = -1L
+      override fun source() = source
+    }
+    val client = OkHttpClient.Builder().addInterceptor { chain ->
+      okhttp3.Response.Builder().request(chain.request()).protocol(Protocol.HTTP_1_1)
+        .code(200).message("OK").body(body).build()
+    }.build()
+    try {
+      val root = "https://example.com/"
+      val request = Retrofit.Builder().baseUrl(root).client(client).build()
+        .create(RulesDocumentRequest::class.java)
+      val result = RemoteLibraryInsightRepository(request) { listOf(root) }
+        .getLookup("sdk-details/sdks/flutter/data/index.json")
+      assertEquals(RemoteDocumentResult.Failure, result)
+      assertTrue(bytesRead in (1024L * 1024 + 1)..(1024L * 1024 + 8192))
+      assertTrue(closed)
+    } finally {
+      client.dispatcher.executorService.shutdown()
+    }
+  }
 
   @Test
   fun `parses a short catalog response after repository fallback`() = runBlocking {
