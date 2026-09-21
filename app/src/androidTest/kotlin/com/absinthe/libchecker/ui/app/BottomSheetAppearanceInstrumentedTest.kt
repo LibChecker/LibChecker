@@ -4,7 +4,9 @@ import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Path
 import android.graphics.RectF
+import android.graphics.Region
 import android.os.SystemClock
 import android.view.RoundedCorner
 import android.view.View
@@ -17,9 +19,11 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.list.ui.AdvancedMenuBSDFragment
 import com.absinthe.libchecker.domain.home.ui.MainActivity
 import com.absinthe.libchecker.view.app.BottomSheetBackgroundDrawable
+import com.absinthe.libchecker.view.drawable.setG2Shape
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
+import com.google.android.material.shape.ShapeAppearancePathProvider
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
@@ -44,12 +48,27 @@ class BottomSheetAppearanceInstrumentedTest {
     val bounds = RectF(drawable.bounds)
     assertEquals(40f, drawable.shapeAppearanceModel.topLeftCornerSize.getCornerSize(bounds), 0f)
     assertEquals(24f, drawable.shapeAppearanceModel.topRightCornerSize.getCornerSize(bounds), 0f)
+    val actualPath = Path()
+    ShapeAppearancePathProvider.getInstance().calculatePath(drawable.shapeAppearanceModel, 1f, bounds, actualPath)
+    val sharedPath = Path().apply { setG2Shape(0f, 0f, 240f, 160f, 40f, rightCornerRadius = 24f) }
+    val topHalf = Region(0, 0, 240, 80)
+    val difference = Region().apply { setPath(actualPath, topHalf) }
+    difference.op(Region().apply { setPath(sharedPath, topHalf) }, Region.Op.XOR)
+    assertTrue("Sheet corners must match the existing G2 shape", difference.isEmpty)
     val bitmap = Bitmap.createBitmap(240, 160, Bitmap.Config.ARGB_8888)
     drawable.draw(Canvas(bitmap))
     assertEquals("Rounded corner must remain transparent", 0, Color.alpha(bitmap.getPixel(0, 0)))
     assertTrue("Top edge must have a visible stroke", bitmap.getPixel(120, 1) != Color.BLACK)
     val edgeColor = bitmap.getPixel(120, 1)
     assertTrue("Stroke must stay close to the sheet background", maxOf(Color.red(edgeColor), Color.green(edgeColor), Color.blue(edgeColor)) <= 11)
+    val centerBrightness = maxOf(Color.red(edgeColor), Color.green(edgeColor), Color.blue(edgeColor))
+    for (x in listOf(1, 238)) {
+      val edgeBrightness = (0 until 80).maxOf { y ->
+        val pixel = bitmap.getPixel(x, y)
+        maxOf(Color.red(pixel), Color.green(pixel), Color.blue(pixel)) * Color.alpha(pixel) / 255
+      }
+      assertTrue("Stroke must fade away at both screen edges", edgeBrightness <= centerBrightness / 3)
+    }
     assertTrue("Left arc must have a visible stroke", (10..14).any { bitmap.getPixel(it, it) != Color.BLACK && Color.alpha(bitmap.getPixel(it, it)) > 0 })
     assertEquals("Side must not be outlined", Color.BLACK, bitmap.getPixel(1, 100))
     assertEquals("Bottom must not be outlined", Color.BLACK, bitmap.getPixel(120, 159))

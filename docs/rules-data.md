@@ -90,6 +90,10 @@ with decoded-size limits and parsed off the main thread; matching also runs off
 the main thread. Only the latest successful package probe is retained in memory;
 changes to probe definitions or source paths, sizes, modification times and
 readability invalidate it. Failed reads are not cached.
+The library dialog warms the catalog cache alongside its description request.
+After definition validation, fixed indexes download concurrently with the local
+probe; lookups still apply in definition order. Duplicate index paths share one
+request per query, and unused downloads are cancelled when probing finds no evidence.
 
 ## Local verification boundaries
 

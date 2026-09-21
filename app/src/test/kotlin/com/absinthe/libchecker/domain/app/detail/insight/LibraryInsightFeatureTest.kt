@@ -5,7 +5,9 @@ import android.content.pm.PackageInfo
 import java.io.File
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertSame
@@ -408,6 +410,45 @@ class LibraryInsightFeatureTest {
     assertEquals(listOf("3.22.1", "3.4.0"), content.summary[1].values)
     assertEquals("渠道", content.details[0].label)
     assertEquals(listOf("stable"), content.details[0].values)
+  }
+
+  @Test
+  fun `prefetches distinct indexes concurrently but applies dependent lookups in order`() = runBlocking {
+    val secondPath = "sdk-details/sdks/flutter/data/versions.json"
+    val firstLookup = definition().lookups.single()
+    val definition = definition().copy(
+      schemaVersion = 2,
+      lookups = listOf(firstLookup, firstLookup, firstLookup.copy(indexPath = secondPath, input = "flutter_versions"))
+    )
+    val delegate = FakeLibraryInsightRepository(
+      catalog = catalog(),
+      definition = definition,
+      lookupDocuments = mapOf(
+        lookupPath() to mapOf("entries" to listOf(mapOf("engine" to ENGINE_REVISION, "releases" to listOf(mapOf("flutter" to "3.22.0"))))),
+        secondPath to mapOf("entries" to listOf(mapOf("engine" to "3.22.0", "releases" to listOf(mapOf("dart" to "3.4.0")))))
+      )
+    )
+    val bothStarted = CompletableDeferred<Unit>()
+    val paths = mutableListOf<String>()
+    val repository = object : LibraryInsightRepository by delegate {
+      override suspend fun getLookup(path: String): RemoteDocumentResult<Map<String, Any?>> {
+        paths += path
+        if (paths.size == 2) bothStarted.complete(Unit)
+        bothStarted.await()
+        return delegate.getLookup(path)
+      }
+    }
+    val result = withTimeout(5000) {
+      ResolveLibraryInsightUseCase(repository, validator, LibraryInsightProbeEngine(), { null })(
+        LIBRARY_UUID,
+        packageInfoWithEngine("\u0000$ENGINE_REVISION\u0000"),
+        "en"
+      )
+    } as LibraryInsightResult.Content
+    assertEquals(listOf(lookupPath(), secondPath), paths)
+    assertEquals(listOf(DEFINITION_PATH), delegate.requestedDefinitionPaths)
+    assertEquals(listOf("3.22.0"), result.content.summary[0].values)
+    assertEquals(listOf("3.4.0"), result.content.summary[1].values)
   }
 
   @Test

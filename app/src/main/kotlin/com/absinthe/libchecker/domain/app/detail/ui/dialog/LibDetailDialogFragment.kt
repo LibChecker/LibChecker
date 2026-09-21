@@ -83,6 +83,9 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
       )
       return
     }
+    if (shouldLoadLibraryInsight(isLibraryInsightEnabled, viewModel.isPackageInfoAvailable())) {
+      insightViewModel.preload()
+    }
     lifecycleScope.launch {
       runCatching {
         coroutineScope {
