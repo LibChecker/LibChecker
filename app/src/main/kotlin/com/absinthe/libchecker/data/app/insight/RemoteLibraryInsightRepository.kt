@@ -10,9 +10,11 @@ import com.absinthe.libchecker.domain.app.detail.insight.isSafeLibraryInsightRem
 import com.absinthe.libchecker.utils.JsonUtil
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Types
+import kotlin.coroutines.coroutineContext
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
 import okio.Buffer
 
@@ -26,17 +28,7 @@ class RemoteLibraryInsightRepository(
   private val lookupAdapter: JsonAdapter<Map<String, Any?>> = JsonUtil.moshi.adapter(
     Types.newParameterizedType(Map::class.java, String::class.java, Any::class.java)
   )
-  private val catalogMutex = Mutex()
-  private var catalogCache: LibraryInsightCatalog? = null
-
-  override suspend fun getCatalog(): RemoteDocumentResult<LibraryInsightCatalog> = catalogMutex.withLock {
-    catalogCache?.let { return RemoteDocumentResult.Success(it) }
-    fetch(CATALOG_PATH, MAX_CATALOG_BYTES, catalogAdapter).also { result ->
-      if (result is RemoteDocumentResult.Success) {
-        catalogCache = result.value
-      }
-    }
-  }
+  override suspend fun getCatalog(): RemoteDocumentResult<LibraryInsightCatalog> = fetch(CATALOG_PATH, MAX_CATALOG_BYTES, catalogAdapter)
 
   override suspend fun getDefinition(path: String): RemoteDocumentResult<LibraryInsightDefinition> {
     if (!isSafePath(path)) return RemoteDocumentResult.Failure
@@ -52,8 +44,8 @@ class RemoteLibraryInsightRepository(
     path: String,
     maxBytes: Long,
     adapter: JsonAdapter<T>
-  ): RemoteDocumentResult<T> {
-    if (!isSafePath(path)) return RemoteDocumentResult.Failure
+  ): RemoteDocumentResult<T> = withContext(Dispatchers.IO) {
+    if (!isSafePath(path)) return@withContext RemoteDocumentResult.Failure
     var foundFailure = false
     for (root in rulesRoots()) {
       val response = try {
@@ -76,7 +68,7 @@ class RemoteLibraryInsightRepository(
       }
       if (body.contentLength() > maxBytes) {
         body.close()
-        return RemoteDocumentResult.Failure
+        return@withContext RemoteDocumentResult.Failure
       }
       val bytes = try {
         body.readAtMost(maxBytes + 1)
@@ -86,18 +78,20 @@ class RemoteLibraryInsightRepository(
         foundFailure = true
         continue
       }
-      if (bytes.size > maxBytes) return RemoteDocumentResult.Failure
+      if (bytes.size > maxBytes) return@withContext RemoteDocumentResult.Failure
+      coroutineContext.ensureActive()
       val value = runCatching { adapter.fromJson(bytes.decodeToString()) }.getOrNull()
-      if (value != null) return RemoteDocumentResult.Success(value)
+      if (value != null) return@withContext RemoteDocumentResult.Success(value)
       foundFailure = true
     }
-    return if (foundFailure) RemoteDocumentResult.Failure else RemoteDocumentResult.NotFound
+    if (foundFailure) RemoteDocumentResult.Failure else RemoteDocumentResult.NotFound
   }
 
-  private fun ResponseBody.readAtMost(byteCount: Long): ByteArray = use { body ->
+  private suspend fun ResponseBody.readAtMost(byteCount: Long): ByteArray = use { body ->
     val buffer = Buffer()
     val source = body.source()
     while (buffer.size < byteCount) {
+      coroutineContext.ensureActive()
       val readCount = source.read(buffer, byteCount - buffer.size)
       if (readCount == -1L) break
     }
@@ -109,7 +103,6 @@ class RemoteLibraryInsightRepository(
   }
 
   private companion object {
-    const val SDK_DETAILS_PREFIX = "sdk-details/"
     const val CATALOG_PATH = "sdk-details/catalog.json"
     const val MAX_CATALOG_BYTES = 64L * 1024
     const val MAX_DEFINITION_BYTES = 128L * 1024

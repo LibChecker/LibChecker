@@ -78,8 +78,18 @@ a changed published release still requires a higher dataVersion.
 
 SDK definition `index_path` and `entries_field` fetch fixed indexes. App compares
 captured values locally using `expected_field`, then expands `items_field` and
-maps outputs. Fixed indexes are bounded to 1 MiB. Captured-value URL templates
-are rejected. Remote activation must follow deployment of this client support.
+maps outputs. Fixed indexes are bounded to 1 MiB. When an active definition still
+uses a captured-value URL template, compatible clients fetch the corresponding
+`sdk-details/candidates/<sdk_id>/definition.json` and validate it before probing.
+Captured-value URLs are never requested. This allows staged fixed-index definitions
+to work without replacing the definitions consumed by older clients.
+
+SDK details use a dedicated 8 MiB OkHttp disk cache under `cacheDir`, honoring the
+selected source's HTTP freshness and ETag headers. Response bodies are streamed
+with decoded-size limits and parsed off the main thread; matching also runs off
+the main thread. Only the latest successful package probe is retained in memory;
+changes to probe definitions or source paths, sizes, modification times and
+readability invalidate it. Failed reads are not cached.
 
 ## Local verification boundaries
 
@@ -121,8 +131,7 @@ repair; the bundled baseline needs no duplicate archive. On the existing Pixel 9
 the earlier DB-only transition removed the 18,796 KiB full-content preview without
 clearing app data. The subsequent AAR transition removes App's old baseline copy.
 
-The independent SDK version card remains unavailable because candidate definitions
-are not published. Other rendering surfaces are compiled but not individually
+Other rendering surfaces are compiled but not individually
 exercised on device. The device has no old v4 directories to remove; precise cleanup
 and a high old version marker are covered in JVM temporary-directory tests.
 

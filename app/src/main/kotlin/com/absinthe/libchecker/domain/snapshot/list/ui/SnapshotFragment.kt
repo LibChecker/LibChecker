@@ -626,6 +626,7 @@ class SnapshotFragment :
       }
       isListReady = true
       flip(VF_LIST)
+      onSearchResultsApplied(updatePlan.renderState.highlightText, updatePlan.items.isEmpty())
       adapter.setSpaceFooterView()
 
       if (highlightRefresh) {

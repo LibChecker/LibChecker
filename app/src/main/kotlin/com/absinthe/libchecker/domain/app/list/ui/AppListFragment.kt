@@ -533,6 +533,7 @@ class AppListFragment :
             }
             flip(VF_LIST)
             isListReady = true
+            onSearchResultsApplied(updatePlan.content.renderState.highlightText, updatePlan.content.items.isEmpty())
             val initialItemViewStateCount = updatePlan.content.renderState.itemViewStates.size
             if (initialItemViewStateCount > 0) {
               notifyItemRangeChanged(0, initialItemViewStateCount.coerceAtMost(data.size))

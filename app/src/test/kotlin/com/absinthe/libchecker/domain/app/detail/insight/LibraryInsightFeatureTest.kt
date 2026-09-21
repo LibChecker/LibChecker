@@ -8,6 +8,7 @@ import java.util.zip.ZipOutputStream
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -69,6 +70,49 @@ class LibraryInsightFeatureTest {
     assertTrue(result.evidenceFound)
     assertEquals(listOf(ENGINE_REVISION), result.values["engine_revisions"])
     assertEquals(listOf("3.22.1"), result.values["dart_versions"])
+  }
+
+  @Test
+  fun `reuses probes until the split or capture definition changes`() = runBlocking {
+    val otherRevision = "1".repeat(40)
+    val packageInfo = packageInfoWithEngine("\u0000$ENGINE_REVISION\u0000$otherRevision\u0000")
+    val engine = LibraryInsightProbeEngine()
+    val definition = definition()
+    val first = engine.probe(packageInfo, definition)
+    assertSame(first, engine.probe(packageInfo, definition))
+    val limited = definition.copy(
+      probes = definition.probes.map { probe ->
+        probe.copy(captures = probe.captures.map { it.copy(maxResults = 1) })
+      }
+    )
+    assertEquals(listOf(ENGINE_REVISION), engine.probe(packageInfo, limited).values["engine_revisions"])
+
+    val split = File(packageInfo.applicationInfo!!.splitSourceDirs!!.single())
+    ZipOutputStream(split.outputStream()).use { output ->
+      output.putNextEntry(ZipEntry(ENGINE_ARCHIVE_PATH))
+      output.write("\u0000$otherRevision\u0000".toByteArray())
+      output.closeEntry()
+    }
+    assertEquals(listOf(otherRevision), engine.probe(packageInfo, definition).values["engine_revisions"])
+  }
+
+  @Test
+  fun `invalidates probes when a direct native library appears changes or disappears`() = runBlocking {
+    val packageInfo = packageInfoWithEngine("\u0000$ENGINE_REVISION\u0000")
+    val directory = temporaryFolder.newFolder()
+    packageInfo.applicationInfo!!.nativeLibraryDir = directory.path
+    val engine = LibraryInsightProbeEngine()
+    val definition = definition()
+    assertEquals(listOf(ENGINE_REVISION), engine.probe(packageInfo, definition).values["engine_revisions"])
+    val directFile = File(directory, "libflutter.so")
+    directFile.writeText("\u0000${"1".repeat(40)}\u0000")
+    assertEquals(listOf("1".repeat(40)), engine.probe(packageInfo, definition).values["engine_revisions"])
+    val previousModified = directFile.lastModified()
+    directFile.writeText("\u0000${"2".repeat(40)}\u0000")
+    assertTrue(directFile.setLastModified(previousModified + 2000))
+    assertEquals(listOf("2".repeat(40)), engine.probe(packageInfo, definition).values["engine_revisions"])
+    assertTrue(directFile.delete())
+    assertEquals(listOf(ENGINE_REVISION), engine.probe(packageInfo, definition).values["engine_revisions"])
   }
 
   @Test
@@ -321,7 +365,8 @@ class LibraryInsightFeatureTest {
   fun `resolves lookup values and localized presentation fields`() = runBlocking {
     val repository = FakeLibraryInsightRepository(
       catalog = catalog(),
-      definition = definition(),
+      definition = legacyDefinition(),
+      candidate = definition(),
       lookupDocuments = mapOf(
         lookupPath() to mapOf(
           "entries" to listOf(
@@ -354,6 +399,7 @@ class LibraryInsightFeatureTest {
     )
 
     assertTrue(supported)
+    assertEquals(listOf(DEFINITION_PATH, CANDIDATE_PATH), repository.requestedDefinitionPaths)
     assertEquals(listOf(lookupPath()), repository.requestedLookupPaths)
     assertFalse(repository.requestedLookupPaths.single().contains(ENGINE_REVISION))
     val content = (result as LibraryInsightResult.Content).content
@@ -362,6 +408,27 @@ class LibraryInsightFeatureTest {
     assertEquals(listOf("3.22.1", "3.4.0"), content.summary[1].values)
     assertEquals("渠道", content.details[0].label)
     assertEquals(listOf("stable"), content.details[0].values)
+  }
+
+  @Test
+  fun `rejects missing mismatched and unsupported migration candidates without requesting fingerprints`() = runBlocking {
+    val packageInfo = packageInfoWithEngine("\u0000$ENGINE_REVISION\u0000")
+    for (candidate in listOf(null, definition().copy(sdkId = "other"), definition().copy(schemaVersion = 3), legacyDefinition())) {
+      val repository = FakeLibraryInsightRepository(
+        catalog = catalog(),
+        definition = legacyDefinition(),
+        candidate = candidate,
+        lookupDocuments = emptyMap()
+      )
+      val result = ResolveLibraryInsightUseCase(repository, validator, LibraryInsightProbeEngine())(
+        LIBRARY_UUID,
+        packageInfo,
+        "en"
+      )
+      assertEquals(LibraryInsightResult.Unavailable, result)
+      assertEquals(listOf(DEFINITION_PATH, CANDIDATE_PATH), repository.requestedDefinitionPaths)
+      assertTrue(repository.requestedLookupPaths.isEmpty())
+    }
   }
 
   @Test
@@ -605,22 +672,39 @@ class LibraryInsightFeatureTest {
     )
   }
 
+  private fun legacyDefinition(): LibraryInsightDefinition = definition().let { definition ->
+    definition.copy(
+      lookups = definition.lookups.map {
+        it.copy(
+          indexPath = null,
+          entriesField = null,
+          pathTemplate = "sdk-details/sdks/flutter/data/engine/{value}.json"
+        )
+      }
+    )
+  }
+
   private class FakeLibraryInsightRepository(
     private val catalog: LibraryInsightCatalog,
     private val definition: LibraryInsightDefinition,
     private val definitionPath: String = DEFINITION_PATH,
+    private val candidate: LibraryInsightDefinition? = null,
     private val lookupDocuments: Map<String, Map<String, Any?>>
   ) : LibraryInsightRepository {
 
     val requestedLookupPaths = mutableListOf<String>()
+    val requestedDefinitionPaths = mutableListOf<String>()
 
     override suspend fun getCatalog(): RemoteDocumentResult<LibraryInsightCatalog> {
       return RemoteDocumentResult.Success(catalog)
     }
 
     override suspend fun getDefinition(path: String): RemoteDocumentResult<LibraryInsightDefinition> {
+      requestedDefinitionPaths += path
       return if (path == definitionPath) {
         RemoteDocumentResult.Success(definition)
+      } else if (path == CANDIDATE_PATH && candidate != null) {
+        RemoteDocumentResult.Success(candidate)
       } else {
         RemoteDocumentResult.NotFound
       }
@@ -639,6 +723,7 @@ class LibraryInsightFeatureTest {
     const val ENGINE_REVISION = "d3ea636dc5d16b56819f3266241e1f708979c233"
     const val ENGINE_ARCHIVE_PATH = "lib/arm64-v8a/libflutter.so"
     const val DEFINITION_PATH = "sdk-details/sdks/flutter/definition.json"
+    const val CANDIDATE_PATH = "sdk-details/candidates/flutter/definition.json"
     const val LOOKUP_PATH_TEMPLATE = "sdk-details/sdks/flutter/data/index.json"
     const val ANDROIDX_SDK_ID = "androidx_activity"
     const val ANDROIDX_LIBRARY_UUID = "DF93DF56-63D0-4D3B-AF4B-39CA3C785A18"
