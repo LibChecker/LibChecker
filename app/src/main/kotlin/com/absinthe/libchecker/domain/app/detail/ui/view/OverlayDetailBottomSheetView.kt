@@ -1,12 +1,16 @@
 package com.absinthe.libchecker.domain.app.detail.ui.view
 
 import android.content.Context
+import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
+import android.text.style.TypefaceSpan
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.graphics.ColorUtils
 import androidx.core.text.buildSpannedString
-import androidx.core.text.scale
+import androidx.core.text.inSpans
 import androidx.core.view.marginTop
 import coil.load
 import com.absinthe.libchecker.R
@@ -161,22 +165,28 @@ class OverlayDetailBottomSheetView(context: Context) :
 
   private fun buildOverlayExtraInfo(extraInfo: OverlayDetailExtraInfoDisplay) = buildSpannedString {
     append(extraInfo.type).append(", ")
-    scale(0.8f) {
-      append("Target: ")
-    }
+    appendLabel("Target: ")
     append(extraInfo.targetSdkInfo)
-    scale(0.8f) {
-      append(" Min: ")
-    }
+    appendLabel(" Min: ")
     append(extraInfo.minSdkInfo)
-    scale(0.8f) {
-      append(" Compile: ")
-    }
+    appendLabel(" Compile: ")
     append(extraInfo.compileSdkInfo)
-    scale(0.8f) {
-      append(" Size: ")
-    }
+    appendLabel(" Size: ")
     append(extraInfo.sizeInfo)
+  }
+
+  private fun SpannableStringBuilder.appendLabel(label: String) {
+    val labelColor = ColorUtils.blendARGB(
+      detailsTitleView.extraInfoView.currentTextColor,
+      context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface),
+      0.3f
+    )
+    inSpans(
+      TypefaceSpan("sans-serif-condensed-medium"),
+      ForegroundColorSpan(labelColor)
+    ) {
+      append(label)
+    }
   }
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

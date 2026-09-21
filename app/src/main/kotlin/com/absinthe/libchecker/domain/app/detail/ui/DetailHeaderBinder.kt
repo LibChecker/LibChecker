@@ -2,9 +2,12 @@ package com.absinthe.libchecker.domain.app.detail.ui
 
 import android.content.pm.ApplicationInfo
 import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
+import android.text.style.TypefaceSpan
 import android.view.View
+import androidx.core.graphics.ColorUtils
 import androidx.core.text.buildSpannedString
-import androidx.core.text.scale
+import androidx.core.text.inSpans
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.header.AppDetailHeaderExtraInfo
@@ -12,6 +15,7 @@ import com.absinthe.libchecker.domain.app.detail.header.AppDetailHeaderTitleData
 import com.absinthe.libchecker.domain.app.detail.header.DetailHeaderExtraInfoState
 import com.absinthe.libchecker.domain.app.detail.header.DetailHeaderRenderState
 import com.absinthe.libchecker.domain.app.detail.ui.view.DetailsTitleView
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.view.CollapsedToolbarView
 import com.absinthe.libchecker.view.app.AppIdentityHeaderRenderState
@@ -122,7 +126,15 @@ class DetailHeaderBinder(
   }
 
   private fun SpannableStringBuilder.appendLabel(label: String) {
-    scale(0.8f) {
+    val labelColor = ColorUtils.blendARGB(
+      detailsTitleView.extraInfoView.currentTextColor,
+      detailsTitleView.context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface),
+      0.3f
+    )
+    inSpans(
+      TypefaceSpan("sans-serif-condensed-medium"),
+      ForegroundColorSpan(labelColor)
+    ) {
       append(label)
     }
   }
