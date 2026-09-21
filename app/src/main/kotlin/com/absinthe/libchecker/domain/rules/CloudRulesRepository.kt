@@ -22,5 +22,6 @@ data class CloudRulesVersionInfo(
 
 data class CloudRulesDownloadRequest(
   val url: String,
-  val destination: File
+  val destination: File,
+  val manifest: RuleBundleManifest
 )

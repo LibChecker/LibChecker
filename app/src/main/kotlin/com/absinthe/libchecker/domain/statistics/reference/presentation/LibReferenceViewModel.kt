@@ -4,8 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.constant.options.withOption
+import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.list.model.AppListItemViewState
 import com.absinthe.libchecker.domain.app.list.usecase.BuildAppListItemViewStatesUseCase
@@ -26,6 +28,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
@@ -48,7 +51,12 @@ class LibReferenceViewModel(
   val loadingState = _loadingState.asStateFlow()
   private val libReferenceComputationController =
     libReferenceComputationControllerFactory.create(viewModelScope) { _loadingState.value = it }
-  val libReference = libReferenceComputationController.libReference
+  val libReference = combine(libReferenceComputationController.libReference, GlobalValues.ruleLanguage) { references, _ ->
+    references?.map { reference ->
+      val rule = reference.rule ?: return@map reference
+      reference.copy(rule = RulesRepository.getRule(rule.libName, rule.libType, true))
+    }
+  }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
   val thresholdChanges: Flow<Int> = libReferenceSettingsRepository.thresholdChanges
   val showSystemAppsChanges: Flow<Unit> = libReferenceSettingsRepository.showSystemAppsChanges
   val colorfulRuleIconChanges: Flow<Boolean> = libReferenceSettingsRepository.colorfulRuleIconChanges

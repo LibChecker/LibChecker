@@ -132,7 +132,9 @@ class LibDetailBottomSheetView(
 
       override fun onTabUnselected(tab: TabLayout.Tab?) = Unit
 
-      override fun onTabReselected(tab: TabLayout.Tab?) = Unit
+      override fun onTabReselected(tab: TabLayout.Tab?) {
+        tab?.let { bindLocale(it.position, notifySelection = !suppressLocaleSelected) }
+      }
     })
   }
 

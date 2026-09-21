@@ -26,6 +26,7 @@ import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.compat.IntentCompat
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.options.SnapshotOptions
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
 import com.absinthe.libchecker.domain.app.detail.ui.dialog.LibDetailDialogFragment
@@ -58,6 +59,7 @@ import com.google.android.material.R as MaterialR
 import java.io.File
 import kotlin.math.abs
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -110,19 +112,25 @@ class SnapshotDetailActivity :
       entity = _entity!!
       val diffTextStyle = buildDiffTextStyle()
       initView(diffTextStyle)
-      viewModel.computeDiffDetail(
-        entity,
-        if (legacyDetail) {
-          diffTextStyle.copy(
-            highlightColor = null,
-            emphasizeDiffs = false,
-            arrowColor = Color.BLACK,
-            metricDeltaColor = Color.BLACK
+      lifecycleScope.launch {
+        GlobalValues.ruleLanguage.collectLatest {
+          viewModel.snapshotDetailContentFlow.emit(
+            viewModel.buildDiffDetailContent(
+              entity,
+              if (legacyDetail) {
+                diffTextStyle.copy(
+                  highlightColor = null,
+                  emphasizeDiffs = false,
+                  arrowColor = Color.BLACK,
+                  metricDeltaColor = Color.BLACK
+                )
+              } else {
+                diffTextStyle
+              }
+            )
           )
-        } else {
-          diffTextStyle
         }
-      )
+      }
     } else {
       finish()
     }

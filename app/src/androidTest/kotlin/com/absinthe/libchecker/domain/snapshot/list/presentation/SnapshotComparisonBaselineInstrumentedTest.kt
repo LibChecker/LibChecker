@@ -263,12 +263,26 @@ class SnapshotComparisonBaselineInstrumentedTest {
       val iconSources = GetSnapshotPackageIconSourcesUseCase(installed)
       return SnapshotViewModel(
         SnapshotListWorkflow(
-          repository, koin.get(), compare, koin.get(), SnapshotDashboardCounter(repository, installed),
-          koin.get(), repository, koin.get(), iconSources,
-          BuildSnapshotListUpdatePlanUseCase(iconSources, installed, settings),
-          koin.get(), koin.get(), DeleteSnapshotTimeStampUseCase(repository, selection), koin.get(),
-          selection,
-          settings, koin.get(), koin.get()
+          repository = repository,
+          appListRepository = koin.get(),
+          compareSnapshotDiffs = compare,
+          compareSnapshotItemWithInstalledApp = koin.get(),
+          compareSnapshotItems = compareItems,
+          snapshotDashboardCounter = SnapshotDashboardCounter(repository, installed),
+          snapshotDetailSectionBuilder = koin.get(),
+          snapshotRepository = repository,
+          buildSnapshotCapturePlanUseCase = koin.get(),
+          getSnapshotPackageIconSourcesUseCase = iconSources,
+          buildSnapshotListUpdatePlanUseCase = BuildSnapshotListUpdatePlanUseCase(iconSources, installed, settings),
+          buildSnapshotSystemPropDisplayDataUseCase = koin.get(),
+          buildSnapshotTimeNodeListDataUseCase = koin.get(),
+          deleteSnapshotTimeStampUseCase = DeleteSnapshotTimeStampUseCase(repository, selection),
+          formatSnapshotTimestampUseCase = koin.get(),
+          snapshotSelection = selection,
+          snapshotSettingsRepository = settings,
+          updateSnapshotAutoRemoveThresholdUseCase = koin.get(),
+          snapshotTrackChangeRepository = koin.get(),
+          computeSnapshotContributionsUseCase = koin.get()
         )
       )
     }

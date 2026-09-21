@@ -9,6 +9,10 @@ import kotlinx.coroutines.launch
 class DetailLoadJobsState {
   private val jobs = mutableMapOf<Key, Job>()
 
+  suspend fun awaitCurrentLoads() {
+    jobs.values.toList().forEach { it.join() }
+  }
+
   fun cancelAll() {
     jobs.values.forEach { it.cancel() }
     jobs.clear()

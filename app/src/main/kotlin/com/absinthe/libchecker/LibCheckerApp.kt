@@ -92,7 +92,7 @@ class LibCheckerApp : Application() {
       )
     }
     Telemetry.setEnable(GlobalValues.isAnonymousAnalyticsEnabled)
-    RulesRepository.init(this)
+    appScope.launch(Dispatchers.IO) { RulesRepository.init(this@LibCheckerApp) }
     Utility.init(this)
     if (OsUtils.atLeastT()) {
       AppCompatDelegate.setApplicationLocales(LocaleListCompat.create(GlobalValues.locale))

@@ -1,8 +1,6 @@
 package com.absinthe.libchecker.api.request
 
-import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.api.ApiManager
-import com.absinthe.libchecker.api.bean.CloudRuleInfo
 import com.absinthe.libchecker.api.bean.GitHubContributorResp
 import com.absinthe.libchecker.api.bean.RepoInfoResp
 import retrofit2.http.GET
@@ -10,12 +8,11 @@ import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.Path
 import retrofit2.http.Query
-
-const val VERSION = 4
+import retrofit2.http.Url
 
 interface CloudRuleBundleRequest {
-  @GET("cloud/md5/v$VERSION")
-  suspend fun requestCloudRuleInfo(@Header("Referer") referer: String = BuildConfig.APPLICATION_ID): CloudRuleInfo?
+  @GET
+  suspend fun requestV5Manifest(@Url url: String = ApiManager.rulesV5Root + "manifest.json"): com.absinthe.libchecker.domain.rules.RuleBundleManifest?
 
   @Headers(
     "Accept: application/vnd.github+json",

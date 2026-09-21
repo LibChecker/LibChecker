@@ -324,12 +324,16 @@ class LibraryInsightFeatureTest {
       definition = definition(),
       lookupDocuments = mapOf(
         lookupPath() to mapOf(
-          "engine" to ENGINE_REVISION,
-          "releases" to listOf(
+          "entries" to listOf(
             mapOf(
-              "flutter" to "3.22.0",
-              "dart" to "3.4.0",
-              "channel" to "stable"
+              "engine" to ENGINE_REVISION,
+              "releases" to listOf(
+                mapOf(
+                  "flutter" to "3.22.0",
+                  "dart" to "3.4.0",
+                  "channel" to "stable"
+                )
+              )
             )
           )
         )
@@ -351,6 +355,7 @@ class LibraryInsightFeatureTest {
 
     assertTrue(supported)
     assertEquals(listOf(lookupPath()), repository.requestedLookupPaths)
+    assertFalse(repository.requestedLookupPaths.single().contains(ENGINE_REVISION))
     val content = (result as LibraryInsightResult.Content).content
     assertEquals("Flutter", content.summary[0].label)
     assertEquals(listOf("3.22.0"), content.summary[0].values)
@@ -495,7 +500,8 @@ class LibraryInsightFeatureTest {
     lookups = listOf(
       LibraryInsightDefinition.Lookup(
         input = "engine_revisions",
-        pathTemplate = LOOKUP_PATH_TEMPLATE,
+        indexPath = LOOKUP_PATH_TEMPLATE,
+        entriesField = "entries",
         expectedField = "engine",
         itemsField = "releases",
         maxRequests = 2,
@@ -633,7 +639,7 @@ class LibraryInsightFeatureTest {
     const val ENGINE_REVISION = "d3ea636dc5d16b56819f3266241e1f708979c233"
     const val ENGINE_ARCHIVE_PATH = "lib/arm64-v8a/libflutter.so"
     const val DEFINITION_PATH = "sdk-details/sdks/flutter/definition.json"
-    const val LOOKUP_PATH_TEMPLATE = "sdk-details/sdks/flutter/data/engine/{value}.json"
+    const val LOOKUP_PATH_TEMPLATE = "sdk-details/sdks/flutter/data/index.json"
     const val ANDROIDX_SDK_ID = "androidx_activity"
     const val ANDROIDX_LIBRARY_UUID = "DF93DF56-63D0-4D3B-AF4B-39CA3C785A18"
     const val ANDROIDX_VERSION_PATH = "META-INF/androidx.activity_activity.version"

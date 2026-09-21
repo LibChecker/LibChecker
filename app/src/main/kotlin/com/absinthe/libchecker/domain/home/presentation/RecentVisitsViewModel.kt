@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.PERMISSION
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.domain.app.repository.AppListRepository
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
@@ -27,6 +28,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -45,7 +47,7 @@ class RecentVisitsViewModel(
   fun refresh() {
     observation?.cancel()
     observation = viewModelScope.launch {
-      repository.revision.collectLatest {
+      combine(repository.revision, GlobalValues.ruleLanguage) { revision, _ -> revision }.collectLatest {
         _items.value = withContext(Dispatchers.IO) {
           RecentVisitLists(loadGroup(false), loadGroup(true))
         }

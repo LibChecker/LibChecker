@@ -7,6 +7,7 @@ import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.constant.AbilityType
+import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.domain.app.detail.content.AppDetailComponentChips
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItemChip
@@ -33,6 +34,20 @@ class DetailContentState {
 
   var processesMap: Map<String, Int> = emptyMap()
     private set
+
+  suspend fun refreshRuleLabels() {
+    synchronized(nativeChipItemsByTab) { nativeChipItemsByTab.clear() }
+    val flows = listOf(nativeLibItems, staticLibItems, metaDataItems, permissionsItems, dexLibItems, signaturesLibItems) +
+      (0 until componentsMap.size()).map { componentsMap.valueAt(it) }
+    flows.forEach { flow ->
+      val items = flow.value ?: return@forEach
+      val updated = items.map { item ->
+        val rule = item.rule ?: return@map item
+        item.copy(rule = RulesRepository.getRule(rule.libName, rule.libType, true))
+      }
+      flow.compareAndSet(items, updated)
+    }
+  }
 
   fun reset() {
     nativeLibItemsByTab = emptyMap()

@@ -17,6 +17,8 @@ import com.absinthe.libchecker.utils.SPUtils
 import java.util.Locale
 import java.util.UUID
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import timber.log.Timber
 
 const val SP_NAME = "${BuildConfig.APPLICATION_ID}_preferences"
@@ -74,7 +76,16 @@ object GlobalValues {
 
   var isDetailedAbiChart: Boolean by SPDelegates(Constants.PREF_DETAILED_ABI_CHART, false)
 
-  var preferredRuleLanguage: String by SPDelegates(Constants.PREF_RULE_LANGUAGE, "zh-Hans")
+  private var storedRuleLanguage: String by SPDelegates(Constants.PREF_RULE_LANGUAGE, "en")
+  private val ruleLanguageState by lazy { MutableStateFlow(storedRuleLanguage) }
+  val ruleLanguage get() = ruleLanguageState.asStateFlow()
+
+  var preferredRuleLanguage: String
+    get() = storedRuleLanguage
+    set(value) {
+      storedRuleLanguage = value
+      ruleLanguageState.value = value
+    }
 
   var githubApiTokenVersion: Int by SPDelegates(Constants.PREF_GITHUB_API_TOKEN_VERSION, 0)
 

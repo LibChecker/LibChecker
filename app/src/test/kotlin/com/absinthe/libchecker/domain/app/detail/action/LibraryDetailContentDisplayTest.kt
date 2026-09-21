@@ -35,13 +35,13 @@ class LibraryDetailContentDisplayTest {
   }
 
   @Test
-  fun `falls back to the first locale when the preference is absent`() {
+  fun `falls back to English when the preference is absent`() {
     val display = checkNotNull(
       buildLibraryDetailContentDisplay(
         detail = LibDetailBean(
           data = listOf(
-            localizedDetail(locale = "en", label = "English label"),
-            localizedDetail(locale = "ja", label = "Japanese label")
+            localizedDetail(locale = "ja", label = "Japanese label"),
+            localizedDetail(locale = "en", label = "English label")
           ),
           uuid = "test"
         ),

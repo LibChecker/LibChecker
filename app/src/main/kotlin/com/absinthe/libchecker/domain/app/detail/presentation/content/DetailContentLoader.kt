@@ -30,6 +30,13 @@ class DetailContentLoader(
   private val loadJobsState = DetailLoadJobsState()
   private var nativeChipJob: Job? = null
 
+  suspend fun refreshRuleLabels() {
+    // Finish loads started under the old preference before replacing their prepared labels.
+    loadJobsState.awaitCurrentLoads()
+    nativeChipJob?.join()
+    contentState.refreshRuleLabels()
+  }
+
   fun reset() {
     nativeChipJob?.cancel()
     nativeChipJob = null
