@@ -12,6 +12,8 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.SystemClock
+import android.util.TypedValue
+import android.view.ContextThemeWrapper
 import android.view.FrameMetrics
 import android.view.Gravity
 import android.view.PixelCopy
@@ -30,6 +32,7 @@ import com.absinthe.libchecker.domain.home.ui.MainActivity
 import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_NAME
 import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_TYPE
 import com.absinthe.libchecker.domain.statistics.reference.ui.LibReferenceActivity
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
@@ -45,6 +48,34 @@ import org.junit.runner.RunWith
 @SdkSuppress(minSdkVersion = 33)
 class BlurRenderingInstrumentedTest {
   private val instrumentation = InstrumentationRegistry.getInstrumentation()
+
+  @Test
+  fun xmlBackgroundColorIsResolvedBeforeDrawing() = withActivity { activity ->
+    lateinit var container: BlurCoordinatorLayout
+    var expectedColor = Color.TRANSPARENT
+    instrumentation.runOnMainSync {
+      // Keep the Android 13 XML palette path even on newer platform versions.
+      val context = ContextThemeWrapper(activity, R.style.ThemeOverlay_BlurXmlBackground)
+      val value = TypedValue()
+      assertTrue(context.theme.resolveAttribute(android.R.attr.colorBackground, value, true))
+      assertEquals(TypedValue.TYPE_STRING, value.type)
+      expectedColor = context.getColorByAttr(android.R.attr.colorBackground)
+      container = BlurCoordinatorLayout(context, contentViewId = R.id.vf_container)
+      container.addView(
+        View(context).apply { id = R.id.vf_container },
+        CoordinatorLayout.LayoutParams(-1, -1)
+      )
+      container.addView(
+        AppBarLayout(context).apply { id = R.id.appbar },
+        CoordinatorLayout.LayoutParams(-1, 150)
+      )
+      container.setBlurEnabled(true)
+      activity.setContentView(container)
+    }
+    settle()
+    assertPixel(activity, container, 200, 75, expectedColor)
+    assertPixel(activity, container, 200, 250, expectedColor)
+  }
 
   @Test
   fun translatedNavigationSamplesTheBackdropAtItsVisiblePosition() = withActivity { activity ->
