@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto">
 
   <com.absinthe.libchecker.ui.preference.InlineListPreference
@@ -17,7 +17,7 @@
     app:summary="@string/amoled_theme_summary"
     app:title="@string/amoled_theme" />
 
-  <ListPreference
+  <androidx.preference.ListPreference
     app:defaultValue="SYSTEM"
     app:entries="@array/language"
     app:entryValues="@array/language_value"
@@ -53,4 +53,4 @@
     app:summary="@string/legacy_snapshot_detail_summary"
     app:title="@string/legacy_snapshot_detail" />
 
-</PreferenceScreen>
+</androidx.preference.PreferenceScreen>

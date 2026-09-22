@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.domain.app.detail.ui.impl
 
+import android.view.LayoutInflater
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
@@ -13,6 +14,8 @@ import com.absinthe.libchecker.utils.extensions.putArguments
 class ComponentsAnalysisFragment :
   BaseDetailFragment<FragmentLibComponentBinding>(),
   Referable {
+
+  override fun inflateBinding(inflater: LayoutInflater) = FragmentLibComponentBinding.inflate(inflater)
 
   override val needShowLibDetailDialog: Boolean = true
 

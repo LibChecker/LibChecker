@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.domain.app.detail.ui.impl
 
+import android.view.LayoutInflater
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
@@ -16,6 +17,8 @@ import timber.log.Timber
 class PermissionAnalysisFragment :
   BaseDetailFragment<FragmentLibComponentBinding>(),
   Referable {
+
+  override fun inflateBinding(inflater: LayoutInflater) = FragmentLibComponentBinding.inflate(inflater)
 
   override fun getRecyclerView() = binding.list
   override val needShowLibDetailDialog = true

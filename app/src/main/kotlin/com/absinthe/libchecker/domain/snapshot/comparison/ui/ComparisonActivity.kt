@@ -7,6 +7,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.os.Bundle
 import android.view.ContextThemeWrapper
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -69,6 +70,8 @@ const val VF_LIST = 1
 class ComparisonActivity :
   BaseActivity<ActivityComparisonBinding>(),
   MenuProvider {
+
+  override fun inflateBinding(inflater: LayoutInflater) = ActivityComparisonBinding.inflate(inflater)
 
   private val viewModel: SnapshotComparisonViewModel by viewModel()
   private val getRandomAppIcon: GetRandomAppIconUseCase by inject()

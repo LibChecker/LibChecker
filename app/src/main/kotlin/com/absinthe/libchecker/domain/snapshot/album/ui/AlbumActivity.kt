@@ -3,6 +3,7 @@ package com.absinthe.libchecker.domain.snapshot.album.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
@@ -41,6 +42,8 @@ import timber.log.Timber
 class AlbumActivity :
   BaseActivity<ActivityAlbumBinding>(),
   SnapshotRoomBackupOwner {
+
+  override fun inflateBinding(inflater: LayoutInflater) = ActivityAlbumBinding.inflate(inflater)
 
   private val viewModel: SnapshotViewModel by viewModel()
   private val adapter = AlbumAdapter()

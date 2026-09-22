@@ -14,6 +14,7 @@ import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.ImageSpan
 import android.text.style.RelativeSizeSpan
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -98,6 +99,8 @@ internal fun resolveSnapshotDisplayedChild(
 class SnapshotFragment :
   BaseListControllerFragment<FragmentSnapshotBinding>(),
   SearchView.OnQueryTextListener {
+
+  override fun inflateBinding(inflater: LayoutInflater) = FragmentSnapshotBinding.inflate(inflater)
 
   private val viewModel: SnapshotViewModel by activityViewModel()
   private val getRandomAppIcon: GetRandomAppIconUseCase by inject()

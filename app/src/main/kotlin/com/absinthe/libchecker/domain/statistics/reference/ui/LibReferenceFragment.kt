@@ -2,6 +2,7 @@ package com.absinthe.libchecker.domain.statistics.reference.ui
 
 import android.content.Intent
 import android.graphics.Rect
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -80,6 +81,8 @@ private const val SEARCH_UPDATE_DELAY_MILLIS = 160L
 class LibReferenceFragment :
   BaseListControllerFragment<FragmentLibReferenceBinding>(),
   SearchView.OnQueryTextListener {
+
+  override fun inflateBinding(inflater: LayoutInflater) = FragmentLibReferenceBinding.inflate(inflater)
 
   private val libReferenceViewModel: LibReferenceViewModel by viewModel()
   private var listRenderState = LibReferenceListRenderState()

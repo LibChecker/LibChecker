@@ -34,19 +34,9 @@
 -keepattributes SourceFile,LineNumberTable
 -renamesourcefileattribute SourceFile
 
-# ViewBinding
--keep,allowoptimization public class * extends androidx.viewbinding.ViewBinding {
-  public static * inflate(android.view.LayoutInflater);
-}
-
-
 # R8 full mode
 # Once
 -keep,allowobfuscation,allowshrinking class jonathanfinerty.once.PersistedMap
-
-# ViewBinding
--keep,allowobfuscation,allowshrinking class com.absinthe.libchecker.ui.base.BaseActivity
--keep,allowobfuscation,allowshrinking class * extends com.absinthe.libchecker.ui.base.BaseActivity
 
 # FragmentFactory calls these constructors by reflection, including class-based transactions.
 -keepclassmembers,allowoptimization class * extends androidx.fragment.app.Fragment {

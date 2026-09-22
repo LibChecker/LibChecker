@@ -2,6 +2,7 @@ package com.absinthe.libchecker.domain.app.detail.ui
 
 import android.content.pm.PackageInfo
 import android.os.Bundle
+import android.view.LayoutInflater
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -42,6 +43,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 abstract class BaseAppDetailActivity :
   CheckPackageOnResumingActivity<ActivityAppDetailBinding>(),
   IDetailContainer {
+
+  override fun inflateBinding(inflater: LayoutInflater) = ActivityAppDetailBinding.inflate(inflater)
 
   protected val viewModel: DetailViewModel by viewModel()
   private val appDetailSettingsRepository: AppDetailSettingsRepository by inject()

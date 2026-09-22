@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.domain.app.detail.ui.impl
 
+import android.view.LayoutInflater
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.compat.VersionCompat
@@ -12,6 +13,8 @@ import com.absinthe.libchecker.utils.extensions.putArguments
 import rikka.core.util.ClipboardUtils
 
 class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
+
+  override fun inflateBinding(inflater: LayoutInflater) = FragmentLibComponentBinding.inflate(inflater)
 
   override fun getRecyclerView() = binding.list
   override val needShowLibDetailDialog = false

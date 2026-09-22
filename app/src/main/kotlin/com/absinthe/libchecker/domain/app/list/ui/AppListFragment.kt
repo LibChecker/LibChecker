@@ -2,6 +2,7 @@ package com.absinthe.libchecker.domain.app.list.ui
 
 import android.content.Context
 import android.content.res.Configuration
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -86,6 +87,8 @@ private const val APP_LIST_FILTER_AND_SORT_OPTIONS =
 class AppListFragment :
   BaseListControllerFragment<FragmentAppListBinding>(),
   SearchView.OnQueryTextListener {
+
+  override fun inflateBinding(inflater: LayoutInflater) = FragmentAppListBinding.inflate(inflater)
 
   private val isFirstLaunch get() = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
   private val getRandomAppIcon: GetRandomAppIconUseCase by inject()
