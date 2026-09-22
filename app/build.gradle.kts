@@ -56,6 +56,11 @@ setupAppModule {
     release {
       optimization {
         enable = true
+        // Scope chart @Keep annotations in our rules; retain all other annotation semantics.
+        keepRules {
+          includeDefault = false
+          ignoreFrom("androidx.annotation:annotation-jvm:1.10.0")
+        }
       }
     }
     create("benchmark") {
@@ -80,6 +85,9 @@ setupAppModule {
     }
     create("market") {
       dimension = flavorDimensions[0]
+      optimization {
+        keepRules { ignoreFrom("com.google.android.gms:play-services-basement:18.9.0") }
+      }
       buildConfigField("Boolean", "IS_FOSS", "false")
     }
     configureEach {

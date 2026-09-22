@@ -21,6 +21,8 @@ gradlePlugin {
 
 dependencies {
   implementation(libs.gradlePlugin.android)
+  implementation(libs.gradlePlugin.aapt2Proto)
+  implementation(libs.gradlePlugin.protobuf)
   implementation(libs.gradlePlugin.kotlin)
   implementation(libs.gradlePlugin.spotless)
 }
