@@ -149,9 +149,9 @@ class FloatingNavigationPreferenceInstrumentedTest {
       var originalTranslation = 0f
       val target = Rect()
       val downTime = SystemClock.uptimeMillis()
-      fun sendTouch(action: Int) {
+      fun sendTouch(action: Int, y: Float = target.exactCenterY()) {
         instrumentation.runOnMainSync {
-          val event = MotionEvent.obtain(downTime, SystemClock.uptimeMillis(), action, target.exactCenterX(), target.exactCenterY(), 0)
+          val event = MotionEvent.obtain(downTime, SystemClock.uptimeMillis(), action, target.exactCenterX(), y, 0)
           navView.dispatchTouchEvent(event)
           event.recycle()
         }
@@ -168,6 +168,25 @@ class FloatingNavigationPreferenceInstrumentedTest {
       instrumentation.runOnMainSync { assertEquals(originalSelection, navView.selectedItemId) }
       sendTouch(MotionEvent.ACTION_CANCEL)
       assertTrue(waitUntil(instrumentation) { kotlin.math.abs(thumb.translationX - originalTranslation) < 1f && kotlin.math.abs(thumb.scaleX - 1f) < 0.01f })
+      // Sliding out vertically cancels the item's click, but the bar still receives UP.
+      sendTouch(MotionEvent.ACTION_DOWN)
+      assertTrue(waitUntil(instrumentation) { thumb.translationX > originalTranslation + 20f })
+      sendTouch(MotionEvent.ACTION_MOVE, -navView.height.toFloat())
+      sendTouch(MotionEvent.ACTION_UP, -navView.height.toFloat())
+      assertTrue(
+        "Releasing outside a tab left its preview selected",
+        waitUntil(instrumentation) {
+          navView.selectedItemId == originalSelection && kotlin.math.abs(thumb.translationX - originalTranslation) < 1f && kotlin.math.abs(thumb.scaleX - 1f) < 0.01f
+        }
+      )
+      sendTouch(MotionEvent.ACTION_DOWN)
+      assertTrue(waitUntil(instrumentation) { thumb.translationX > originalTranslation + 20f })
+      instrumentation.runOnMainSync { (navView as FloatingNavigationBar).setSelectedIndex(0) }
+      assertTrue(
+        "The current page must override an in-flight preview for another tab",
+        waitUntil(instrumentation) { kotlin.math.abs(thumb.translationX - originalTranslation) < 1f }
+      )
+      sendTouch(MotionEvent.ACTION_CANCEL)
       sendTouch(MotionEvent.ACTION_DOWN)
       sendTouch(MotionEvent.ACTION_UP)
       assertTrue(waitUntil(instrumentation) { navView.selectedItemId == R.id.navigation_settings && thumb.translationX > originalTranslation + 20f && kotlin.math.abs(thumb.scaleX - 1f) < 0.01f })
