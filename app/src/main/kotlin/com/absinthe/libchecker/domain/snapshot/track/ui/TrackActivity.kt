@@ -3,6 +3,7 @@ package com.absinthe.libchecker.domain.snapshot.track.ui
 import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -37,6 +38,8 @@ class TrackActivity :
   BaseActivity<ActivityTrackBinding>(),
   SearchView.OnQueryTextListener,
   MenuProvider {
+
+  override fun inflateBinding(inflater: LayoutInflater) = ActivityTrackBinding.inflate(inflater)
 
   private val viewModel: TrackViewModel by viewModel()
   private val getRandomAppIcon: GetRandomAppIconUseCase by inject()

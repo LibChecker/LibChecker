@@ -3,6 +3,7 @@ package com.absinthe.libchecker.domain.statistics.chart.ui
 import android.graphics.Color
 import android.os.Build
 import android.view.HapticFeedbackConstants
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.view.isVisible
@@ -56,6 +57,8 @@ import timber.log.Timber
 class ChartFragment :
   BaseFragment<FragmentPieChartBinding>(),
   OnChartValueSelectedListener {
+
+  override fun inflateBinding(inflater: LayoutInflater) = FragmentPieChartBinding.inflate(inflater)
 
   private val viewModel: ChartViewModel by activityViewModel()
   private lateinit var chartView: ViewGroup

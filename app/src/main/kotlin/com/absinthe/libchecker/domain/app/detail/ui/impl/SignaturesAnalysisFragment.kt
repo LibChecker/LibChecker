@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.domain.app.detail.ui.impl
 
+import android.view.LayoutInflater
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.SIGNATURES
@@ -17,6 +18,8 @@ import kotlinx.coroutines.flow.onEach
 import rikka.core.util.ClipboardUtils
 
 class SignaturesAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
+
+  override fun inflateBinding(inflater: LayoutInflater) = FragmentLibComponentBinding.inflate(inflater)
 
   override fun getRecyclerView() = binding.list
   override val needShowLibDetailDialog = false

@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.domain.app.detail.ui.impl
 
+import android.view.LayoutInflater
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
@@ -23,6 +24,8 @@ import kotlinx.coroutines.launch
 class NativeAnalysisFragment :
   BaseDetailFragment<FragmentLibNativeBinding>(),
   Referable {
+
+  override fun inflateBinding(inflater: LayoutInflater) = FragmentLibNativeBinding.inflate(inflater)
 
   override fun getRecyclerView() = binding.list
   override val needShowLibDetailDialog = true

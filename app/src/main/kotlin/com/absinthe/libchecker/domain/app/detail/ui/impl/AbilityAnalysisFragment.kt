@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.domain.app.detail.ui.impl
 
+import android.view.LayoutInflater
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.compat.VersionCompat
@@ -12,6 +13,8 @@ import kotlinx.coroutines.launch
 import rikka.core.util.ClipboardUtils
 
 class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
+
+  override fun inflateBinding(inflater: LayoutInflater) = FragmentLibComponentBinding.inflate(inflater)
 
   override fun getRecyclerView() = binding.list
   override val needShowLibDetailDialog = false

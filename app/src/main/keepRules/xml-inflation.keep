@@ -1,0 +1,31 @@
+# Material 1.14.0 and CoordinatorLayout 1.1.0 consumer rules; resync on upgrade.
+# Only these behaviors are inflated by name from app layouts or BottomSheetDialog.
+# Other behaviors are constructed directly; no view uses @DefaultBehavior.
+-keep public class com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior,
+                   com.google.android.material.behavior.HideBottomViewOnScrollBehavior,
+                   com.google.android.material.bottomsheet.BottomSheetBehavior {
+    public <init>(android.content.Context, android.util.AttributeSet);
+}
+
+# Preserve the remaining upstream annotation, inflater, and drawable rules.
+-keepattributes *Annotation*
+
+-if class androidx.appcompat.app.AppCompatViewInflater
+-keep class com.google.android.material.theme.MaterialComponentsViewInflater {
+    <init>();
+}
+
+-keep class com.google.android.material.focus.FocusRingDrawable {
+    <init>();
+}
+
+# RecyclerView 1.4.0: only LinearLayoutManager is named in XML.
+# Grid, staggered, and custom layout managers are constructed directly.
+-keep public class androidx.recyclerview.widget.LinearLayoutManager {
+    public <init>(android.content.Context, android.util.AttributeSet, int, int);
+}
+
+-keepclassmembers class androidx.recyclerview.widget.RecyclerView {
+    public void suppressLayout(boolean);
+    public boolean isLayoutSuppressed();
+}

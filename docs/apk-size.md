@@ -43,14 +43,35 @@ dependencies track AGP; they are not packaged into the application.
 
 ## Keep-rule boundaries
 
-- `android-defaults.keep` mirrors AGP 9.4.1 defaults except that MPAndroidChart
-  properties and enums are not retained for reflection. Resync it when upgrading AGP.
+- `android-defaults.keep` mirrors AGP 9.4.1 defaults without blanket `View`
+  property retention. Current app and dependency animations use typed properties,
+  `ValueAnimator`, or named platform properties. Keep custom named targets
+  explicitly if introducing them, including ConstraintLayout custom attributes
+  or MotionLayout scenes. Recheck animation targets when upgrading dependencies;
+  resync defaults when upgrading AGP.
+- App and MPAndroidChart enums use direct callers instead of blanket reflection
+  retention. App JSON enums retain Moshi's `@JsonClass(generateAdapter = false)`
+  rules; keep that annotation when adding JSON enums.
+- Pages implement `IBinding.inflateBinding` with direct generated binding calls.
+  Do not restore a blanket ViewBinding keep rule or generic-superclass reflection:
+  it retains unused dependency bindings and their layouts as well as app bindings.
 - `androidx-annotations.keep` mirrors AndroidX annotation 1.10.0 rules except
   the class-wide `@Keep` on MPAndroidChart classes. Resync it when upgrading
   AndroidX annotation. Other annotation behavior is unchanged.
 - Market's `play-services-basement.keep` similarly scopes its duplicate chart
   retention. Dependency filters match exact versions so an upgraded dependency
   retains its new consumer rules until the local copy is reviewed.
+- `xml-inflation.keep` replaces the broad Behavior rule from
+  Material 1.14.0 and CoordinatorLayout 1.1.0. Keep the named behaviors used by
+  app layouts and BottomSheetDialog; other behaviors are constructed directly.
+  Add a matching keep rule when introducing another `layout_behavior` name or
+  a view with `@DefaultBehavior`. Preserve the other upstream consumer rules.
+- Its RecyclerView 1.4.0 rules keep the LinearLayoutManager XML constructor.
+  Other layout managers are constructed directly; add a keep rule for any new
+  `layoutManager` XML class name.
+- Preference 1.2.1's broad constructor rules are replaced by AAPT-generated rules.
+  Use fully qualified class names in settings XML, including the root and groups,
+  so AAPT retains the actual reflection entry points.
 - MPAndroidChart 4 charts are constructed and configured directly; its animation
   uses `ValueAnimator`. Recheck these assumptions when upgrading the library or
   introducing XML inflation or property-name animation.

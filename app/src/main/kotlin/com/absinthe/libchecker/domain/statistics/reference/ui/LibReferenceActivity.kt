@@ -2,6 +2,7 @@ package com.absinthe.libchecker.domain.statistics.reference.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
@@ -34,6 +35,8 @@ const val EXTRA_REF_TYPE = "REF_TYPE"
 const val EXTRA_REF_LIST = "REF_LIST"
 
 class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
+
+  override fun inflateBinding(inflater: LayoutInflater) = ActivityLibReferenceBinding.inflate(inflater)
 
   private var blurContainer: BlurCoordinatorLayout? = null
   private val adapter = AppAdapter()

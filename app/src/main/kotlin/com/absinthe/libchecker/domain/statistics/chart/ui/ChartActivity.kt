@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -27,6 +28,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class ChartActivity :
   BaseActivity<ActivityChartBinding>(),
   MenuProvider {
+
+  override fun inflateBinding(inflater: LayoutInflater) = ActivityChartBinding.inflate(inflater)
   private val viewModel: ChartViewModel by viewModel()
   private var detailedAbiSwitch: MaterialSwitch? = null
   private var isWorkerServiceBound = false

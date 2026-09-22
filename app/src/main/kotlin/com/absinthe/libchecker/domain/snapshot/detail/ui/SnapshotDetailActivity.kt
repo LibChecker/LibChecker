@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -75,6 +76,8 @@ const val EXTRA_ICON = "EXTRA_ICON"
 class SnapshotDetailActivity :
   CheckPackageOnResumingActivity<ActivitySnapshotDetailBinding>(),
   MenuProvider {
+
+  override fun inflateBinding(inflater: LayoutInflater) = ActivitySnapshotDetailBinding.inflate(inflater)
 
   private lateinit var entity: SnapshotDiffItem
   private lateinit var snapshotTitleDisplayData: SnapshotTitleDisplayData
