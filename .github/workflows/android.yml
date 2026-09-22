@@ -28,10 +28,7 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'workflow_dispatch' && github.run_id || github.ref }}
   cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
-
-env:
-  APP_CENTER_SECRET: ${{secrets.APP_CENTER_SECRET}}
-
+  
 jobs:
   check:
     name: Check
