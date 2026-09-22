@@ -134,6 +134,8 @@ internal class FloatingNavigationThumbController(
       MotionEvent.ACTION_UP -> {
         pointerPressed = false
         suppressDrag = false
+        // A press preview may end outside the item without committing a selection.
+        if (!dragging) animateThumbTo(selectedIndex * segmentExtent())
         if (!isThumbAnimating) releaseThumbScale()
       }
 
@@ -232,7 +234,6 @@ internal class FloatingNavigationThumbController(
 
   override fun setSelectedIndex(index: Int, animate: Boolean) {
     val targetIndex = index.coerceIn(0, (host.menu.size() - 1).coerceAtLeast(0))
-    if (targetIndex == selectedIndex && isThumbAnimating) return
     selectedIndex = targetIndex
     if (dragging) return
 
