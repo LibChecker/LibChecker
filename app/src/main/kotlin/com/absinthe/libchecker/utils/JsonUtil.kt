@@ -15,7 +15,7 @@ object JsonUtil {
     null
   }
 
-  inline fun <reified T> fromJson(
+  fun <T> fromJson(
     @Language("JSON") string: String,
     rawType: Class<*>,
     vararg typeArguments: Class<*>
@@ -37,7 +37,7 @@ object JsonUtil {
 
 inline fun <reified T> String.fromJson(): T? = JsonUtil.fromJson(this)
 
-inline fun <reified T> String.fromJson(rawType: Class<*>, vararg typeArguments: Class<*>): T? = JsonUtil.fromJson(this, rawType, *typeArguments)
+fun <T> String.fromJson(rawType: Class<*>, vararg typeArguments: Class<*>): T? = JsonUtil.fromJson(this, rawType, *typeArguments)
 
 @Language("JSON")
 fun Any?.toJson(): String? = JsonUtil.toJson(this)

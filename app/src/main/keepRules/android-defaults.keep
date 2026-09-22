@@ -28,9 +28,9 @@
 }
 
 # App JSON enums are covered by Moshi's @JsonClass rules; other app enums have direct callers.
+# Dependency enum reflection and collections need values(), not the generated valueOf(String).
 -keepclassmembers enum !com.absinthe.libchecker.**,!com.github.mikephil.charting.**,** {
     public static **[] values();
-    public static ** valueOf(java.lang.String);
 }
 
 -keepclassmembers class * implements android.os.Parcelable {

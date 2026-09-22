@@ -52,6 +52,10 @@ dependencies track AGP; they are not packaged into the application.
 - App and MPAndroidChart enums use direct callers instead of blanket reflection
   retention. App JSON enums retain Moshi's `@JsonClass(generateAdapter = false)`
   rules; keep that annotation when adding JSON enums.
+- Dependency enums retain `values()` for enum reflection and collections, but
+  unused generated `valueOf(String)` methods can shrink. Current dependencies
+  do not look up that method by name; add a targeted rule if introducing such
+  reflection.
 - Pages implement `IBinding.inflateBinding` with direct generated binding calls.
   Do not restore a blanket ViewBinding keep rule or generic-superclass reflection:
   it retains unused dependency bindings and their layouts as well as app bindings.
@@ -79,6 +83,11 @@ dependencies track AGP; they are not packaged into the application.
   reflection, including class-based transactions. A successful build can otherwise
   hide missing settings screens and their resources.
 - FOSS deliberately retains class names for reproducible-build diagnostics.
+
+The parameterized JSON overload receives its runtime types explicitly and does
+not need `reified`. Keep its parsing body and the shared snapshot-diff traversals
+out of forced Kotlin inlining; R8 can choose which call sites benefit from
+inlining. Compare both flavors before changing this tradeoff.
 
 Resource equivalence does not validate R8 behavior. Smoke-test a minified
 `fossBenchmark` build on the device, including charts, chart detail navigation,

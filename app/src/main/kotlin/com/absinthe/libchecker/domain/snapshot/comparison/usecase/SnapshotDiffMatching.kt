@@ -7,7 +7,7 @@ import com.absinthe.libchecker.domain.snapshot.model.MOVED
 import com.absinthe.libchecker.domain.snapshot.model.REMOVED
 
 // Emit differences directly so counting does not allocate display rows or formatted text.
-internal inline fun visitNamedSnapshotDiff(
+internal fun visitNamedSnapshotDiff(
   oldItems: List<LibStringItem>,
   newItems: List<LibStringItem>,
   changed: (LibStringItem, LibStringItem) -> Boolean,
@@ -27,7 +27,7 @@ internal inline fun visitNamedSnapshotDiff(
   added.forEach { emit(ADDED, null, it) }
 }
 
-internal inline fun visitComponentSnapshotDiff(
+internal fun visitComponentSnapshotDiff(
   oldItems: Set<String>,
   newItems: Set<String>,
   emit: (Int, String?, String?) -> Unit
@@ -51,7 +51,7 @@ internal inline fun visitComponentSnapshotDiff(
   added.forEach { emit(ADDED, null, it) }
 }
 
-internal inline fun visitSetSnapshotDiff(
+internal fun visitSetSnapshotDiff(
   oldItems: Set<String>,
   newItems: Set<String>,
   emit: (Int, String?, String?) -> Unit
@@ -68,7 +68,7 @@ internal inline fun visitSetSnapshotDiff(
   }
 }
 
-internal inline fun <T : Any> visitKeyedSnapshotDiff(
+internal fun <T : Any> visitKeyedSnapshotDiff(
   oldItems: Map<String, T>,
   newItems: Map<String, T>,
   emit: (Int, T?, T?) -> Unit
