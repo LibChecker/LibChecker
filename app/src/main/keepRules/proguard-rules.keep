@@ -48,6 +48,11 @@
 -keep,allowobfuscation,allowshrinking class com.absinthe.libchecker.ui.base.BaseActivity
 -keep,allowobfuscation,allowshrinking class * extends com.absinthe.libchecker.ui.base.BaseActivity
 
+# FragmentFactory calls these constructors by reflection, including class-based transactions.
+-keepclassmembers,allowoptimization class * extends androidx.fragment.app.Fragment {
+    public <init>();
+}
+
 # exclude com.google.android.gms:play-services-ads-identifier
 -dontwarn com.google.android.gms.ads.identifier.AdvertisingIdClient$Info
 -dontwarn com.google.android.gms.ads.identifier.AdvertisingIdClient

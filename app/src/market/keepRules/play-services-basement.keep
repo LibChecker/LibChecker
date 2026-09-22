@@ -1,0 +1,58 @@
+# Play services basement 18.9.0 consumer rules; only chart @Keep scope differs.
+# Update alongside the version-specific ignoreFrom entry in app/build.gradle.kts.
+-dontwarn android.security.NetworkSecurityPolicy
+
+-dontwarn android.app.Notification
+
+-dontwarn sun.misc.Unsafe
+-dontwarn libcore.io.Memory
+
+-dontwarn com.google.android.apps.common.proguard.**
+
+-dontwarn javax.annotation.**
+-dontwarn org.checkerframework.**
+-dontwarn com.google.errorprone.annotations.**
+-dontwarn org.jspecify.annotations.NullMarked
+
+-dontwarn com.google.android.gms.common.util.VisibleForTesting
+
+
+-keepclassmembers public class com.google.android.gms.common.internal.safeparcel.SafeParcelable {
+    public static final *** NULL;
+}
+
+-keep class com.google.android.gms.common.internal.ReflectedParcelable
+-keepnames class * implements com.google.android.gms.common.internal.ReflectedParcelable
+-keepclassmembers class * implements android.os.Parcelable {
+  public static final *** CREATOR;
+}
+
+-keep @interface android.support.annotation.Keep
+-keep @androidx.annotation.Keep class !com.github.mikephil.charting.**,**
+-keepclasseswithmembers class * {
+  @androidx.annotation.Keep <fields>;
+}
+-keepclasseswithmembers class * {
+  @androidx.annotation.Keep <methods>;
+}
+
+-keep @interface androidx.annotation.Keep
+-keep @androidx.annotation.Keep class !com.github.mikephil.charting.**,**
+-keepclasseswithmembers class * {
+  @androidx.annotation.Keep <fields>;
+}
+-keepclasseswithmembers class * {
+  @androidx.annotation.Keep <methods>;
+}
+
+-keep @interface com.google.android.gms.common.annotation.KeepName
+-keepnames @com.google.android.gms.common.annotation.KeepName class *
+-keepclassmembernames class * {
+  @com.google.android.gms.common.annotation.KeepName *;
+}
+
+-keep @interface com.google.android.gms.common.util.DynamiteApi
+-keep @com.google.android.gms.common.util.DynamiteApi public class * {
+  public <fields>;
+  public <methods>;
+}

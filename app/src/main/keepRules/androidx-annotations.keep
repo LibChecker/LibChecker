@@ -1,0 +1,21 @@
+# AndroidX annotation 1.10.0 consumer rules, with MPAndroidChart allowed to shrink.
+# Our UI constructs HorizontalBarChart and PieChart directly; chart animations
+# use ValueAnimator. No chart class or property is accessed by name.
+-keep,allowobfuscation @interface androidx.annotation.Keep
+-keep @androidx.annotation.Keep class !com.github.mikephil.charting.**,** {*;}
+
+-keepclasseswithmembers class * {
+    @androidx.annotation.Keep <methods>;
+}
+
+-keepclasseswithmembers class * {
+    @androidx.annotation.Keep <fields>;
+}
+
+-keepclasseswithmembers class * {
+    @androidx.annotation.Keep <init>(...);
+}
+
+-keepclassmembers,allowobfuscation class * {
+    @androidx.annotation.DoNotInline <methods>;
+}
