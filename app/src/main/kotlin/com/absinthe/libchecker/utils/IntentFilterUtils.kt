@@ -9,6 +9,7 @@ import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.compat.ZipFileCompat
+import com.absinthe.libchecker.utils.manifest.ManifestReader
 import java.io.File
 import pxb.android.Res_value
 import pxb.android.axml.AxmlReader
@@ -43,7 +44,7 @@ object IntentFilterUtils {
     val parsedComponents = mutableListOf<ParsedComponent>()
     ZipFileCompat(File(apkPath)).use { zip ->
       val entry = zip.getEntry(MANIFEST_ENTRY_NAME) ?: return emptyList()
-      val bytes = zip.getInputStream(entry).use { it.readBytes() }
+      val bytes = zip.getInputStream(entry).use { requireNotNull(ManifestReader.getBytesFromInputStream(it)) }
       AxmlReader(bytes).accept(object : AxmlVisitor() {
         override fun child(ns: String?, name: String?): NodeVisitor {
           val child = super.child(ns, name)

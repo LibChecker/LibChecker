@@ -8,6 +8,8 @@ import com.absinthe.libchecker.utils.dex.DexStatsCollector
 import com.absinthe.libchecker.utils.dex.ResourceEntryInfo
 import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libchecker.utils.toJson
+import com.google.protobuf.CodedInputStream
+import java.io.DataInputStream
 import java.io.InputStream
 import java.io.OutputStream
 
@@ -129,38 +131,13 @@ class ProtoSnapshotArchiveCodec : SnapshotArchiveCodec {
   }
 
   private fun readDelimitedSnapshot(inputStream: InputStream): Snapshot? {
-    val messageSize = readRawVarint32(inputStream) ?: return null
+    val firstByte = inputStream.read()
+    if (firstByte < 0) return null
+    val messageSize = CodedInputStream.readRawVarint32(firstByte, inputStream)
     require(messageSize in 0..MAX_SNAPSHOT_MESSAGE_SIZE)
     val message = ByteArray(messageSize)
-    var offset = 0
-    while (offset < message.size) {
-      val read = inputStream.read(message, offset, message.size - offset)
-      require(read >= 0)
-      offset += read
-    }
+    DataInputStream(inputStream).readFully(message)
     return Snapshot.parseFrom(message)
-  }
-
-  private fun readRawVarint32(inputStream: InputStream): Int? {
-    var result = 0
-    for (shift in 0 until 32 step 7) {
-      val next = inputStream.read()
-      if (next < 0) {
-        return if (shift == 0) null else throw IllegalArgumentException("Truncated size")
-      }
-      result = result or ((next and 0x7f) shl shift)
-      if (next and 0x80 == 0) {
-        return result
-      }
-    }
-    repeat(5) {
-      val next = inputStream.read()
-      require(next >= 0)
-      if (next and 0x80 == 0) {
-        return result
-      }
-    }
-    throw IllegalArgumentException("Malformed size")
   }
 
   private companion object {

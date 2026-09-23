@@ -3,7 +3,6 @@ package com.absinthe.libchecker.utils.apk
 import android.os.Trace
 import java.io.File
 import kotlinx.coroutines.CancellationException
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
 import org.apache.commons.compress.archivers.zip.ZipFile
 import timber.log.Timber
 
@@ -87,12 +86,13 @@ internal object ZipDataOffsetReader {
   private fun readWithApache(file: File, entryNames: Set<String>, checkCancelled: () -> Unit): Map<String, Long> {
     return traceSection(TRACE_ZIP_DATA_OFFSET_APACHE) {
       runCatching {
+        // The default builder resolves local headers and initializes each entry's data offset.
         ZipFile.Builder().setFile(file).get().use { zipFile ->
           entryNames.associateWith { entryName ->
             checkCancelled()
             val entry = zipFile.getEntry(entryName)
               ?: throw IllegalArgumentException("ZIP entry $entryName was not found in ${file.absolutePath}")
-            getDataOffsetMethod.invoke(zipFile, entry) as Long
+            entry.dataOffset
           }
         }
       }.onFailure {
@@ -255,11 +255,6 @@ internal object ZipDataOffsetReader {
   private const val ZIP_UINT32_MAX = 0xffffffffL
   private const val TRACE_ZIP_DATA_OFFSET_APACHE = "LC ZipDataOffset apache"
   private const val TRACE_ZIP_DATA_OFFSET_CENTRAL_DIRECTORY = "LC ZipDataOffset central"
-  private val getDataOffsetMethod by lazy {
-    ZipFile::class.java.getDeclaredMethod("getDataOffset", ZipArchiveEntry::class.java).apply {
-      isAccessible = true
-    }
-  }
 }
 
 internal fun ByteArray.readUInt16Le(offset: Int): Int {

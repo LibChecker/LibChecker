@@ -7,8 +7,12 @@ import com.absinthe.libchecker.utils.JsonUtil
 import com.absinthe.rulesbundle.RuleReader
 import java.io.File
 import java.io.FileOutputStream
-import java.security.MessageDigest
 import java.util.zip.ZipFile
+import okio.HashingSink
+import okio.blackholeSink
+import okio.buffer
+import okio.source
+import org.apache.commons.io.IOUtils
 
 /** Immutable directories remain available to readers until process restart. */
 class RuleBundleStore(
@@ -115,16 +119,9 @@ class RuleBundleStore(
         require(allowedPath(entry.name))
         val file = File(installed.directory, entry.name)
         require(file.isFile && file.length() == entry.size)
-        val digest = MessageDigest.getInstance("SHA-256")
-        zip.getInputStream(entry).use { input ->
-          val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
-          while (true) {
-            val count = input.read(buffer)
-            if (count < 0) break
-            digest.update(buffer, 0, count)
-          }
-        }
-        require(file.sha256() == digest.digest().joinToString("") { "%02x".format(it) }) { "Installed rule file changed" }
+        val sink = HashingSink.sha256(blackholeSink())
+        zip.getInputStream(entry).source().buffer().use { it.readAll(sink) }
+        require(file.sha256() == sink.hash.hex()) { "Installed rule file changed" }
       }
     }
     val metadata = JsonUtil.moshi.adapter(RuleBundleMetadata::class.java).fromJson(File(installed.directory, "metadata.json").readText())
@@ -148,16 +145,11 @@ class RuleBundleStore(
         check(destination.parentFile!!.mkdirs() || destination.parentFile!!.isDirectory)
         zip.getInputStream(entry).use { input ->
           FileOutputStream(destination).use { output ->
-            val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
-            var count = 0L
-            while (true) {
-              val read = input.read(buffer)
-              if (read < 0) break
-              count += read
-              total += read
-              require(count <= maximum && total <= MAX_EXPANDED_BYTES) { "Rule archive exceeds extraction limits" }
-              output.write(buffer, 0, read)
-            }
+            val copyLimit = minOf(maximum, MAX_EXPANDED_BYTES - total)
+            require(copyLimit >= 0) { "Rule archive exceeds extraction limits" }
+            val count = IOUtils.copyLarge(input, output, 0, copyLimit)
+            require(count < copyLimit || input.read() == -1) { "Rule archive exceeds extraction limits" }
+            total += count
             output.fd.sync()
           }
         }
@@ -188,16 +180,9 @@ class RuleBundleStore(
     fun parseManifest(text: String): RuleBundleManifest = requireNotNull(JsonUtil.moshi.adapter(RuleBundleManifest::class.java).fromJson(text)).also { it.androidArtifact() }
 
     internal fun File.sha256(): String {
-      val digest = MessageDigest.getInstance("SHA-256")
-      inputStream().use { input ->
-        val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
-        while (true) {
-          val read = input.read(buffer)
-          if (read < 0) break
-          digest.update(buffer, 0, read)
-        }
-      }
-      return digest.digest().joinToString("") { "%02x".format(it) }
+      val sink = HashingSink.sha256(blackholeSink())
+      source().buffer().use { it.readAll(sink) }
+      return sink.hash.hex()
     }
 
     private fun File.writeSynced(bytes: ByteArray) = FileOutputStream(this).use {

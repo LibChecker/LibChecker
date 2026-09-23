@@ -8,6 +8,7 @@ import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import org.apache.commons.io.IOUtils
 
 object DownloadUtils {
   private val client by lazy {
@@ -42,15 +43,9 @@ object DownloadUtils {
             file.parentFile?.mkdirs()
             it.body.byteStream().use { input ->
               file.outputStream().use { output ->
-                val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
-                var total = 0L
-                while (true) {
-                  val count = input.read(buffer)
-                  if (count < 0) break
-                  total += count
-                  check(total <= maximumBytes) { "Download is too large" }
-                  output.write(buffer, 0, count)
-                }
+                val limit = maximumBytes.coerceAtLeast(0)
+                val count = IOUtils.copyLarge(input, output, 0, limit)
+                check(count < limit || input.read() == -1) { "Download is too large" }
                 output.fd.sync()
               }
             }

@@ -47,11 +47,6 @@
 -dontwarn com.google.android.gms.ads.identifier.AdvertisingIdClient$Info
 -dontwarn com.google.android.gms.ads.identifier.AdvertisingIdClient
 
-# org.apache.commons:commons-compress
--keepclassmembers class org.apache.commons.compress.archivers.zip.ZipFile {
-    private long getDataOffset(org.apache.commons.compress.archivers.zip.ZipArchiveEntry);
-}
-
 # Protobuf javalite reflects generated message fields by their original names.
 -keepclassmembers,allowoptimization class com.absinthe.libchecker.protocol.** extends com.google.protobuf.GeneratedMessageLite {
     <fields>;

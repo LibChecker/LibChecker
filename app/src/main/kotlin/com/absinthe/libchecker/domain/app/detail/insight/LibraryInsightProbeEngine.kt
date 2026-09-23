@@ -12,6 +12,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
+import okio.ByteString.Companion.toByteString
 
 class LibraryInsightProbeEngine {
 
@@ -201,16 +202,8 @@ class LibraryInsightProbeEngine {
       consumed += count
       digest.update(buffer, 0, count)
     }
-    onDigest(digest.digest().toHexString())
+    onDigest(digest.digest().toByteString().hex())
     return consumed
-  }
-
-  private fun ByteArray.toHexString(): String = buildString(size * 2) {
-    this@toHexString.forEach { value ->
-      val byte = value.toInt() and 0xff
-      append(HEX_DIGITS[byte ushr 4])
-      append(HEX_DIGITS[byte and 0x0f])
-    }
   }
 
   private fun LibraryInsightDefinition.Capture.findValue(token: String): String? {
@@ -250,7 +243,6 @@ class LibraryInsightProbeEngine {
     const val MIN_TOKEN_LENGTH = 4
     const val SEMVER_VALUE_PATTERN =
       "[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z][0-9A-Za-z.-]*)?(?:\\+[0-9A-Za-z][0-9A-Za-z.-]*)?"
-    const val HEX_DIGITS = "0123456789abcdef"
     val PRINTABLE_ASCII_RANGE = 0x20..0x7e
     val SHA1 = Regex("(?i)(?<![0-9a-f])[0-9a-f]{40}(?![0-9a-f])")
     val SHA256 = Regex("(?i)(?<![0-9a-f])[0-9a-f]{64}(?![0-9a-f])")

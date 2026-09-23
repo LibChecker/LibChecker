@@ -2,13 +2,10 @@ package com.absinthe.libchecker.utils.apk
 
 import com.absinthe.libchecker.compat.ZipFileCompat
 import java.io.File
-import java.security.MessageDigest
 import java.util.UUID
 import java.util.zip.ZipEntry
-import okio.Buffer
-import okio.buffer
-import okio.sink
-import okio.source
+import okio.ByteString.Companion.encodeUtf8
+import org.apache.commons.io.IOUtils
 
 internal object ApkArchiveStager {
 
@@ -63,19 +60,14 @@ internal object ApkArchiveStager {
       var totalBytes = 0L
       val staged = normalized.map { (entry, safeName) ->
         val output = File(stagingDir, safeName)
-        var entryBytes = 0L
-        zipFile.getInputStream(entry).source().buffer().use { source ->
-          output.sink().buffer().use { sink ->
-            val buffer = Buffer()
-            while (true) {
-              val read = source.read(buffer, DEFAULT_BUFFER_SIZE.toLong())
-              if (read < 0) break
-              totalBytes += read
-              entryBytes += read
-              check(entryBytes <= MAX_ENTRY_BYTES) { "Expanded APK entry is too large" }
-              check(totalBytes <= MAX_TOTAL_BYTES) { "Expanded APK archive is too large" }
-              sink.write(buffer, read)
+        zipFile.getInputStream(entry).use { input ->
+          output.outputStream().buffered().use { sink ->
+            val limit = minOf(MAX_ENTRY_BYTES, MAX_TOTAL_BYTES - totalBytes)
+            val count = IOUtils.copyLarge(input, sink, 0, limit)
+            check(count < limit || input.read() == -1) {
+              if (limit == MAX_ENTRY_BYTES) "Expanded APK entry is too large" else "Expanded APK archive is too large"
             }
+            totalBytes += count
           }
         }
         check(entry.size < 0 || output.length() == entry.size) {
@@ -110,9 +102,6 @@ internal object ApkArchiveStager {
 
   private fun File.cacheKey(): String {
     val identity = "$canonicalPath\u0000${length()}\u0000${lastModified()}"
-    return MessageDigest.getInstance("SHA-256")
-      .digest(identity.toByteArray())
-      .take(16)
-      .joinToString("") { byte -> "%02x".format(byte) }
+    return identity.encodeUtf8().sha256().substring(0, 16).hex()
   }
 }

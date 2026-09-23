@@ -12,8 +12,12 @@ import com.absinthe.libchecker.utils.JsonUtil
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.InputStream
-import java.security.MessageDigest
 import java.util.zip.ZipEntry
+import okio.HashingSink
+import okio.blackholeSink
+import okio.buffer
+import okio.source
+import org.apache.commons.io.IOUtils
 
 class OfficialStatisticBundleStore(
   private val rootDirectory: File,
@@ -75,16 +79,9 @@ class OfficialStatisticBundleStore(
   }
 
   private fun File.sha256(): String {
-    val digest = MessageDigest.getInstance("SHA-256")
-    inputStream().buffered().use { input ->
-      val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
-      while (true) {
-        val read = input.read(buffer)
-        if (read < 0) break
-        digest.update(buffer, 0, read)
-      }
-    }
-    return digest.digest().joinToString("") { byte -> "%02x".format(byte) }
+    val sink = HashingSink.sha256(blackholeSink())
+    source().buffer().use { it.readAll(sink) }
+    return sink.hash.hex()
   }
 
   private fun parseBundle(bundleFile: File): ParsedBundle {
@@ -201,14 +198,9 @@ class OfficialStatisticBundleStore(
 
   private fun InputStream.readLimited(maximumBytes: Int): ByteArray {
     val output = ByteArrayOutputStream()
-    val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
-    var total = 0
-    while (true) {
-      val count = read(buffer)
-      if (count < 0) break
-      total += count
-      check(total <= maximumBytes) { "Chart bundle entry is too large" }
-      output.write(buffer, 0, count)
+    val count = IOUtils.copyLarge(this, output, 0, maximumBytes.toLong())
+    check(count < maximumBytes || read() == -1) {
+      "Chart bundle entry is too large"
     }
     return output.toByteArray()
   }

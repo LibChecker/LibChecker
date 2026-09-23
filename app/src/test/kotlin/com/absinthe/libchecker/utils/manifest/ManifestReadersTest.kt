@@ -1,11 +1,17 @@
 package com.absinthe.libchecker.utils.manifest
 
 import com.absinthe.libchecker.domain.app.detail.model.StaticLibItem
+import com.absinthe.libchecker.utils.IntentFilterUtils
+import java.io.ByteArrayInputStream
 import java.io.InputStream
+import java.lang.reflect.InvocationTargetException
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -22,15 +28,47 @@ class ManifestReadersTest {
   fun stopsReadingAnUnboundedManifest() {
     var bytesRead = 0
     val input = object : InputStream() {
-      override fun read(): Int = 0
+      override fun read(): Int {
+        bytesRead++
+        return 0
+      }
       override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         bytesRead += length
-        check(bytesRead <= ManifestReader.MAX_MANIFEST_BYTES + 1024)
+        check(bytesRead <= ManifestReader.MAX_MANIFEST_BYTES + 1)
         return length
       }
     }
     assertNull(ManifestReader.getBytesFromInputStream(input))
-    assertEquals(ManifestReader.MAX_MANIFEST_BYTES + 1024, bytesRead)
+    assertEquals(ManifestReader.MAX_MANIFEST_BYTES + 1, bytesRead)
+  }
+
+  @Test
+  fun preservesContentAndCallerStreamOwnershipAtTheLimit() {
+    for (size in listOf(0, 19, ManifestReader.MAX_MANIFEST_BYTES)) {
+      val bytes = ByteArray(size) { it.toByte() }
+      var closed = false
+      val input = object : ByteArrayInputStream(bytes) {
+        override fun read(buffer: ByteArray, offset: Int, length: Int): Int = super.read(buffer, offset, minOf(length, 997))
+
+        override fun close() {
+          closed = true
+        }
+      }
+      assertArrayEquals(bytes, ManifestReader.getBytesFromInputStream(input))
+      assertFalse(closed)
+    }
+  }
+
+  @Test
+  fun oversizedIntentFilterManifestFailsBeforeAxmlParsing() {
+    val apk = archive(ByteArray(ManifestReader.MAX_MANIFEST_BYTES + 1))
+    val parse = IntentFilterUtils::class.java.getDeclaredMethod("parseComponentsFromManifest", String::class.java)
+    parse.isAccessible = true
+
+    val failure = assertThrows(InvocationTargetException::class.java) {
+      parse.invoke(IntentFilterUtils, apk.absolutePath)
+    }
+    assertTrue(failure.cause is IllegalArgumentException)
   }
 
   @Test

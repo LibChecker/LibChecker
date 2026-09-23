@@ -20,6 +20,11 @@ import org.junit.rules.TemporaryFolder
 class RuleBundleStoreTest {
   @get:Rule val temporary = TemporaryFolder()
 
+  @Test fun usesCanonicalLowercaseSha256() {
+    val file = temporary.newFile("digest.txt").apply { writeText("abc") }
+    assertEquals("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad", file.sha256())
+  }
+
   private val archive: File by lazy {
     temporary.newFile("android-v5.zip").also { archive ->
       ZipFile(File(requireNotNull(System.getProperty("rulesBundleAar")))).use { aar ->
@@ -68,6 +73,44 @@ class RuleBundleStoreTest {
     val repaired = store.install(expected, archive, repairExisting = true)
     store.validateInstalled(repaired)
     assertEquals(expected.dataVersion, store.candidates().single().manifest.dataVersion)
+  }
+
+  @Test fun metadataSizeLimitPreservesCurrentAndCleansFailedStaging() {
+    val store = store()
+    var expected = manifest()
+    var current = store.install(expected, archive)
+    for (size in listOf(64 * 1024, 64 * 1024 + 1)) {
+      expected = expected.copy(dataVersion = expected.dataVersion + 1)
+      val candidate = temporary.newFile("metadata-$size.zip")
+      ZipOutputStream(candidate.outputStream()).use { output ->
+        ZipFile(archive).use { input ->
+          output.putNextEntry(ZipEntry("rules.db"))
+          input.getInputStream(input.getEntry("rules.db")).use { it.copyTo(output) }
+          output.closeEntry()
+        }
+        output.putNextEntry(ZipEntry("metadata.json"))
+        output.write(JsonUtil.moshi.adapter(RuleBundleMetadata::class.java).toJson(expected.metadata).padEnd(size, ' ').toByteArray())
+        output.closeEntry()
+      }
+      expected = expected.copy(
+        artifacts = mapOf(
+          "android" to expected.artifacts.getValue("android").copy(
+            path = "releases/${expected.dataVersion}/android-v5.zip",
+            sha256 = candidate.sha256(),
+            size = candidate.length()
+          )
+        )
+      )
+      if (size == 64 * 1024) {
+        current = store.install(expected, candidate)
+      } else {
+        val failure = assertThrows(IllegalArgumentException::class.java) { store.install(expected, candidate) }
+        assertEquals("Rule archive exceeds extraction limits", failure.message)
+      }
+      assertEquals(current.manifest, store.candidates().first().manifest)
+      assertTrue(!File(temporary.root, "staging").exists())
+      store.validateInstalled(current)
+    }
   }
 
   @Test fun removesOnlyRetiredDatabaseFilesAndVersionMarkers() {

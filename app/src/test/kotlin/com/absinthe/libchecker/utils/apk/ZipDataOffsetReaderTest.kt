@@ -6,6 +6,8 @@ import java.io.RandomAccessFile
 import java.util.zip.CRC32
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
+import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -52,6 +54,33 @@ class ZipDataOffsetReaderTest {
 
     assertEquals((LOCAL_FILE_HEADER_SIZE + entryName.toByteArray().size).toLong(), offset)
     assertEntryContent(archive, offset, content)
+  }
+
+  @Test
+  fun `falls back to Commons for Unicode extra field names`() {
+    val entryName = "lib/arm64-v8a/lib库.so"
+    val content = "unicode-entry".toByteArray()
+    val archive = temporaryFolder.newFile("unicode.zip")
+    ZipArchiveOutputStream(archive).use { zip ->
+      zip.setEncoding("US-ASCII")
+      zip.setUseLanguageEncodingFlag(false)
+      zip.setCreateUnicodeExtraFields(ZipArchiveOutputStream.UnicodeExtraFieldPolicy.ALWAYS)
+      zip.putArchiveEntry(
+        ZipArchiveEntry(entryName).apply {
+          method = ZipEntry.STORED
+          size = content.size.toLong()
+          crc = CRC32().apply { update(content) }.value
+        }
+      )
+      zip.write(content)
+      zip.closeArchiveEntry()
+    }
+
+    assertEquals(emptyMap<String, Long>(), ZipDataOffsetReader.readFromCentralDirectory(archive, setOf(entryName)))
+    val offset = checkNotNull(ZipDataOffsetReader.read(archive, setOf(entryName))[entryName])
+
+    assertEntryContent(archive, offset, content)
+    assertEquals(emptyMap<String, Long>(), ZipDataOffsetReader.read(archive, setOf(entryName, "missing")))
   }
 
   private fun assertEntryContent(file: File, offset: Long, expected: ByteArray) {
