@@ -3,8 +3,10 @@ package com.absinthe.libchecker.data.snapshot
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.io.IOException
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -83,6 +85,58 @@ class ProtoSnapshotArchiveCodecTest {
     assertThrows(IllegalArgumentException::class.java) {
       codec.read(ByteArrayInputStream(output.toByteArray()))
     }
+  }
+
+  @Test
+  fun `consecutive records survive short reads and end at EOF`() {
+    val codec = ProtoSnapshotArchiveCodec()
+    val items = listOf(snapshotItem(), snapshotItem().copy(packageName = "com.example.second"))
+    val output = ByteArrayOutputStream()
+    items.forEach { codec.write(it, output) }
+    var closed = false
+    val input = object : ByteArrayInputStream(output.toByteArray()) {
+      override fun read(buffer: ByteArray, offset: Int, length: Int): Int = super.read(buffer, offset, minOf(length, 3))
+
+      override fun close() {
+        closed = true
+      }
+    }
+
+    items.forEach { assertEquals(it, codec.read(input)) }
+    assertNull(codec.read(input))
+    assertFalse(closed)
+    assertNull(codec.read(ByteArrayInputStream(byteArrayOf())))
+  }
+
+  @Test
+  fun `truncated and malformed frames are rejected`() {
+    val codec = ProtoSnapshotArchiveCodec()
+    val output = ByteArrayOutputStream()
+    codec.write(snapshotItem(), output)
+
+    listOf(
+      byteArrayOf(0x80.toByte()),
+      ByteArray(10) { 0x80.toByte() },
+      output.toByteArray().dropLast(1).toByteArray()
+    ).forEach { bytes ->
+      assertThrows(IOException::class.java) {
+        codec.read(ByteArrayInputStream(bytes))
+      }
+    }
+    assertThrows(IllegalArgumentException::class.java) {
+      codec.read(ByteArrayInputStream(byteArrayOf(-1, -1, -1, -1, 0x0f)))
+    }
+  }
+
+  @Test
+  fun `overlong valid length prefix remains compatible`() {
+    val codec = ProtoSnapshotArchiveCodec()
+    val input = ByteArrayInputStream(ByteArray(9) { 0x80.toByte() } + byteArrayOf(0, 0))
+
+    assertEquals(codec.read(ByteArrayInputStream(byteArrayOf(0))), codec.read(input))
+    assertEquals(1, input.available())
+    assertFalse(codec.read(input) == null)
+    assertNull(codec.read(input))
   }
 
   private fun snapshotItem(): SnapshotItem {

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.PorterDuff
@@ -19,7 +20,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.graphics.drawable.toDrawable
-import androidx.core.graphics.toColorInt
 import androidx.core.graphics.withClip
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.app.SystemServices
@@ -47,7 +47,7 @@ object UiUtils {
     val g = range.random()
     val b = range.random()
 
-    return String.format("#%02x%02x%02x", r, g, b).toColorInt()
+    return Color.rgb(r, g, b)
   }
 
   fun getNightMode(): Int {

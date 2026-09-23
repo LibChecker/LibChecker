@@ -218,6 +218,24 @@ class OfficialStatisticBundleStoreTest {
     assertEquals(listOf("official.target-sdk-35-plus"), store.loadCachedStatistics().map { it.id })
   }
 
+  @Test
+  fun `accepts exact size limit and rejects one extra byte without replacing bundle`() {
+    val store = createStore()
+    val exactSvg = VALID_SVG.padEnd(ValidateStatisticSvgUseCase.MAX_SVG_BYTES, ' ')
+    val validBundle = createBundle(exactSvg, "exact.bundle")
+    val manifest = manifestFor(validBundle)
+    store.install(manifest, validBundle)
+    val oversizedBundle = createBundle("$exactSvg ", "oversized.bundle")
+
+    val failure = assertThrows(IllegalStateException::class.java) {
+      store.install(manifestFor(oversizedBundle, version = 2), oversizedBundle)
+    }
+
+    assertEquals("Chart bundle entry is too large", failure.message)
+    assertEquals(manifest.bundleSha256, store.currentSha256)
+    assertEquals(listOf("official.target-sdk-35-plus"), store.loadCachedStatistics().map { it.id })
+  }
+
   private fun createStore() = OfficialStatisticBundleStore(
     rootDirectory = temporaryFolder.newFolder("store-${System.nanoTime()}"),
     validateCatalog = ValidateStatisticCatalogUseCase(),

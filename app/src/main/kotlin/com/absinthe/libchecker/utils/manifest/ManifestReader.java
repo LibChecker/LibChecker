@@ -5,6 +5,8 @@ import androidx.collection.ArrayMap;
 import com.absinthe.libchecker.compat.IZipFile;
 import com.absinthe.libchecker.compat.ZipFileCompat;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -45,13 +47,9 @@ public class ManifestReader {
 
   public static byte[] getBytesFromInputStream(InputStream inputStream) {
     try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-      byte[] b = new byte[1024];
-      int n;
-      while ((n = inputStream.read(b)) != -1) {
-        if (n > MAX_MANIFEST_BYTES - bos.size()) {
-          throw new IOException("Manifest exceeds size limit");
-        }
-        bos.write(b, 0, n);
+      if (IOUtils.copyLarge(inputStream, bos, 0, MAX_MANIFEST_BYTES) == MAX_MANIFEST_BYTES
+          && inputStream.read() != -1) {
+        throw new IOException("Manifest exceeds size limit");
       }
       return bos.toByteArray();
     } catch (Exception e) {

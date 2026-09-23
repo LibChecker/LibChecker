@@ -11,6 +11,7 @@ import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import org.apache.commons.io.IOUtils
 
 interface OfficialStatisticRemoteSource {
   suspend fun getManifest(): StatisticRemoteManifest
@@ -70,16 +71,10 @@ class HttpOfficialStatisticRemoteSource(
       }
       destination.outputStream().buffered().use { output ->
         response.body.byteStream().use { input ->
-          val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
-          var total = 0L
-          while (true) {
-            val count = input.read(buffer)
-            if (count < 0) break
-            total += count
-            if (total > maximumBytes) {
-              throw IOException("Chart bundle is larger than its manifest")
-            }
-            output.write(buffer, 0, count)
+          val limit = maximumBytes.coerceAtLeast(0)
+          val count = IOUtils.copyLarge(input, output, 0, limit)
+          if (count == limit && input.read() != -1) {
+            throw IOException("Chart bundle is larger than its manifest")
           }
         }
       }
