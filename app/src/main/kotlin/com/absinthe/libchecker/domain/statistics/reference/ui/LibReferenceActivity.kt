@@ -98,6 +98,7 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
     binding.apply {
       supportActionBar?.setDisplayHomeAsUpEnabled(true)
       installBlurContainer()
+      appbar.setLiftOnScrollTargetView(list)
       (appbar.parent as ViewGroup).bringChildToFront(appbar)
 
       list.apply {

@@ -339,6 +339,61 @@ class BlurRenderingInstrumentedTest {
   }
 
   @Test
+  fun referenceAppbarKeepsLiftAfterRelayoutAndBlurToggle() {
+    val originalBlur = GlobalValues.isBlurDesign
+    var activity: LibReferenceActivity? = null
+    try {
+      instrumentation.runOnMainSync { GlobalValues.isBlurDesign = false }
+      activity = instrumentation.startActivitySync(
+        Intent(instrumentation.targetContext, LibReferenceActivity::class.java)
+          .putExtra(EXTRA_REF_NAME, "android.permission.INTERNET")
+          .putExtra(EXTRA_REF_TYPE, PERMISSION)
+          .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+      ) as LibReferenceActivity
+      val list = activity.findViewById<RecyclerView>(android.R.id.list)
+      val appbar = activity.findViewById<AppBarLayout>(R.id.appbar)
+      val container = activity.findViewById<BlurCoordinatorLayout>(R.id.container)
+      var ready = false
+      val deadline = SystemClock.uptimeMillis() + 20_000L
+      while (!ready && SystemClock.uptimeMillis() < deadline) {
+        instrumentation.runOnMainSync { ready = list.isShown && list.canScrollVertically(1) }
+        if (!ready) SystemClock.sleep(100)
+      }
+      assertTrue("Reference list must contain enough installed apps to scroll", ready)
+      for (blur in listOf(false, true, false)) {
+        instrumentation.runOnMainSync {
+          container.setBlurEnabled(blur)
+          list.scrollToPosition(0)
+        }
+        SystemClock.sleep(600)
+        instrumentation.runOnMainSync { list.scrollBy(0, 600) }
+        settle()
+        instrumentation.runOnMainSync {
+          assertTrue(list.canScrollVertically(-1))
+          assertEquals("Lift after scrolling, blur=$blur", !blur, appbar.isLifted)
+          // Material re-evaluates lift during layout, independently of the border callback.
+          container.requestLayout()
+        }
+        settle()
+        instrumentation.runOnMainSync {
+          assertEquals("Lift after relayout, blur=$blur", !blur, appbar.isLifted)
+          list.scrollToPosition(0)
+        }
+        settle()
+        instrumentation.runOnMainSync {
+          assertTrue(!list.canScrollVertically(-1))
+          assertEquals(false, appbar.isLifted)
+        }
+      }
+    } finally {
+      instrumentation.runOnMainSync {
+        GlobalValues.isBlurDesign = originalBlur
+        activity?.finish()
+      }
+    }
+  }
+
+  @Test
   fun measureLibraryReferenceScrollAndIdle() {
     val monitor = instrumentation.addMonitor(LibReferenceActivity::class.java.name, null, false)
     val originalBlur = GlobalValues.isBlurDesign
