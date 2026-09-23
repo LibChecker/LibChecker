@@ -19,6 +19,12 @@ interface GetAppUpdateRequest {
     @Header("Referer") referer: String = BuildConfig.APPLICATION_ID
   ): GetAppUpdateInfo?
 
+  @GET("https://raw.githubusercontent.com/LibChecker/assets/main/{$CHANNEL}.json")
+  suspend fun requestDirectAppUpdateInfo(
+    @Path(CHANNEL) channel: String,
+    @Header("Referer") referer: String = BuildConfig.APPLICATION_ID
+  ): GetAppUpdateInfo?
+
   @GET("${ApiManager.ASSETS_REPO_FALLBACK_BASE_URL}{$CHANNEL}.json")
   suspend fun requestFallbackAppUpdateInfo(
     @Path(CHANNEL) channel: String,

@@ -48,17 +48,19 @@ class AndroidAppUpdateRepository(
     } catch (e: CancellationException) {
       throw e
     } catch (e: Throwable) {
-      if (
-        e !is IOException &&
-        e !is HttpException &&
-        e !is JsonDataException &&
-        e !is JsonEncodingException
-      ) {
-        throw e
+      if (!e.isUpdateRequestFailure()) throw e
+      try {
+        request.requestDirectAppUpdateInfo(requestValue)
+      } catch (directError: CancellationException) {
+        throw directError
+      } catch (directError: Throwable) {
+        if (!directError.isUpdateRequestFailure()) throw directError
+        request.requestFallbackAppUpdateInfo(requestValue)
       }
-      request.requestFallbackAppUpdateInfo(requestValue)
     }
   }
+
+  private fun Throwable.isUpdateRequestFailure(): Boolean = this is IOException || this is HttpException || this is JsonDataException || this is JsonEncodingException
 
   override suspend fun installUpdate(url: String): AppUpdateInstallResult = withContext(Dispatchers.IO) {
     if (!AppSelfUpdatePolicy.isSelfUpdateEnabled(BuildConfig.IS_FOSS, BuildConfig.IS_DEV_VERSION)) {

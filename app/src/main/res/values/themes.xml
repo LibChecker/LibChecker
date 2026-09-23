@@ -36,6 +36,9 @@
     <item name="windowActionBar">false</item>
     <item name="windowNoTitle">true</item>
 
+    <item name="bottomSheetHeaderHandlerColor">?attr/colorOutlineVariant</item>
+    <item name="bottomSheetHeaderHandlerColorActivated">?attr/colorOnSurface</item>
+
     <item name="chipStyle">@style/App.LibChip.Material3</item>
   </style>
 
