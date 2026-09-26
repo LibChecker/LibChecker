@@ -6,6 +6,7 @@ import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.core.graphics.ColorUtils
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -17,7 +18,6 @@ import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.databinding.FragmentPieChartBinding
-import com.absinthe.libchecker.domain.statistics.chart.model.LOADING_PROGRESS_MAX
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDashboard
 import com.absinthe.libchecker.domain.statistics.chart.presentation.ChartProgressPlan
 import com.absinthe.libchecker.domain.statistics.chart.presentation.ChartRenderRequest
@@ -38,7 +38,6 @@ import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
-import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.Chart
 import com.github.mikephil.charting.charts.HorizontalBarChart
@@ -69,6 +68,7 @@ class ChartFragment :
   private lateinit var statisticSelectorController: StatisticSelectorController
   private lateinit var dashboardVisibilityController: DashboardVisibilityController
   private var currentChartRequestKey: ChartRenderRequestKey? = null
+  private var committedChartRequestKey: ChartRenderRequestKey? = null
   private var currentProgressPlan: ChartProgressPlan? = null
 
   override fun init() {
@@ -96,6 +96,7 @@ class ChartFragment :
     )
 
     chartView = generatePieChartView()
+    committedChartRequestKey = null
     chartDataRenderer.showInitialChart(chartView)
     updateProgressIndicator()
 
@@ -126,6 +127,7 @@ class ChartFragment :
   }
 
   override fun onDestroyView() {
+    (chartView as? Chart<*>)?.stopAnimations()
     dashboardVisibilityController.cancel()
     super.onDestroyView()
   }
@@ -171,8 +173,8 @@ class ChartFragment :
     currentChartRequestKey = request.key
 
     when (plan) {
-      is ChartDataSourcePlan.Pie -> setChartData(::generatePieChartView, plan, shouldResetLoadingProgress)
-      is ChartDataSourcePlan.Bar -> setChartData(::generateBarChartView, plan, shouldResetLoadingProgress)
+      is ChartDataSourcePlan.Pie -> setChartData(::generatePieChartView, plan, request.key, shouldResetLoadingProgress)
+      is ChartDataSourcePlan.Bar -> setChartData(::generateBarChartView, plan, request.key, shouldResetLoadingProgress)
     }
     Telemetry.recordEvent(
       Constants.Event.CHART,
@@ -183,6 +185,7 @@ class ChartFragment :
   private fun setChartData(
     generateChartView: () -> PieChart,
     plan: ChartDataSourcePlan.Pie,
+    requestKey: ChartRenderRequestKey,
     shouldResetLoadingProgress: Boolean
   ) {
     val newChartView = generateChartView()
@@ -190,9 +193,19 @@ class ChartFragment :
     val source = plan.dataSource
     chartDataRenderer.render(
       newChartView = newChartView,
-      fillChart = source::fillChartView
+      fillChart = source::fillChartView,
+      commitChart = { preparedChart ->
+        val currentChart = chartView as? PieChart
+        if (currentChart != null && committedChartRequestKey?.statisticKey == requestKey.statisticKey) {
+          currentChart.apply { updateFrom(preparedChart) }
+        } else {
+          preparedChart
+        }
+      }
     ) { committedChartView ->
+      if (chartView !== committedChartView) committedChartView.animateEntrance()
       chartView = committedChartView
+      committedChartRequestKey = requestKey
       dataSource = source
       completeChartRender(source)
     }
@@ -201,6 +214,7 @@ class ChartFragment :
   private fun setChartData(
     generateChartView: () -> BarChart,
     plan: ChartDataSourcePlan.Bar,
+    requestKey: ChartRenderRequestKey,
     shouldResetLoadingProgress: Boolean
   ) {
     val newChartView = generateChartView()
@@ -208,9 +222,19 @@ class ChartFragment :
     val source = plan.dataSource
     chartDataRenderer.render(
       newChartView = newChartView,
-      fillChart = source::fillChartView
+      fillChart = source::fillChartView,
+      commitChart = { preparedChart ->
+        val currentChart = chartView as? BarChart
+        if (currentChart != null && committedChartRequestKey?.statisticKey == requestKey.statisticKey) {
+          currentChart.apply { updateFrom(preparedChart) }
+        } else {
+          preparedChart
+        }
+      }
     ) { committedChartView ->
+      if (chartView !== committedChartView) committedChartView.animateEntrance()
       chartView = committedChartView
+      committedChartRequestKey = requestKey
       dataSource = source
       completeChartRender(source)
     }
@@ -221,9 +245,6 @@ class ChartFragment :
       viewModel.setDistributionLastUpdateTime(source.lastUpdateTime)
     }
     applyDashboardView()
-    if (source.getData().isNotEmpty()) {
-      viewModel.setLoadingProgress(LOADING_PROGRESS_MAX)
-    }
   }
 
   override fun onNothingSelected() {
@@ -260,12 +281,10 @@ class ChartFragment :
         isWordWrapEnabled = true
       }
       isUsePercentValuesEnabled = true
-      animateY(800, Easing.EaseInOutQuad)
       setExtraOffsets(32f, 0f, 32f, 0f)
       entryLabelColor = colorOnSurface
       entryLabelTextSize = 11f
-      noDataText = getString(R.string.loading)
-      noDataTextColor = colorOnSurface
+      configureEmptyState()
       onChartValueSelectedListener = this@ChartFragment
       holeColor = Color.TRANSPARENT
     }
@@ -306,16 +325,22 @@ class ChartFragment :
         isDrawZeroLineEnabled = false
         textColor = colorOnSurface
       }
-      animateY(650, Easing.EaseInOutQuad)
       maxVisibleCount = 50
       isDrawGridBackgroundEnabled = false
       isDrawBordersEnabled = false
       isDrawMarkersEnabled = false
       setExtraOffsets(12f, 0f, 24f, 0f)
-      noDataText = getString(R.string.loading)
-      noDataTextColor = colorOnSurface
+      configureEmptyState()
       onChartValueSelectedListener = this@ChartFragment
     }
+  }
+
+  private fun Chart<*>.configureEmptyState() {
+    val color = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant)
+    noDataText = getString(R.string.chart_no_data)
+    loadingText = getString(R.string.loading)
+    noDataTextColor = color
+    noDataIconColor = ColorUtils.setAlphaComponent(color, 84)
   }
 
   private fun applyDashboardView() {
