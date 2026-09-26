@@ -7,6 +7,7 @@
   <string name="title_settings">Settings</string>
   <string name="title_album">Album</string>
   <string name="loading">Loading…</string>
+  <string name="chart_no_data">No chart data available</string>
   <string name="lib_permission_label_not_provided">No label provided</string>
   <string name="lib_permission_description_not_provided">No description provided</string>
   <string name="lib_permission_load_failed">Unable to load permission details</string>

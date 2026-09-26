@@ -12,7 +12,9 @@ import kotlinx.coroutines.withContext
 
 internal suspend fun PieChart.showPieData(entries: List<PieEntry<*>>, colors: List<Int>) {
   val colorOnSurface = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
-  val dataSet = PieDataSet(entries, "").apply {
+  // Keep zero-sized categories for selection indices, but an all-zero pie is an empty result.
+  val visibleEntries = entries.takeIf { values -> values.any { it.y > 0f } }.orEmpty()
+  val dataSet = PieDataSet(visibleEntries, "").apply {
     isDrawIconsEnabled = false
     sliceSpace = 3f
     iconsOffset = MPPointF(0f, 40f)
