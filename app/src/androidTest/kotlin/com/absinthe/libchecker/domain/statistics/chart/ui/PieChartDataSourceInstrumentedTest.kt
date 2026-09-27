@@ -49,7 +49,7 @@ class PieChartDataSourceInstrumentedTest {
       assertFalse(source.getChartSourceItems().getValue(0).isGrayIcon)
       assertTrue(source.getChartSourceItems().getValue(1).isGrayIcon)
       withContext(Dispatchers.Main) {
-        val data = chart.data!!.dataSet
+        val data = requireNotNull(chart.data!!.dataSet)
         assertEquals(2, data.entryCount)
         assertEquals(chart.context.getString(label), data.getEntryForIndex(0).label)
         assertEquals(1f, data.getEntryForIndex(0).y, 0f)
@@ -76,9 +76,27 @@ class PieChartDataSourceInstrumentedTest {
     assertEquals(listOf(50), progress)
     assertEquals(listOf(supported), source.getListByXValue(0))
     withContext(Dispatchers.Main) {
-      assertEquals(3, chart.data!!.dataSet.entryCount)
-      assertEquals(0f, chart.data!!.dataSet.getEntryForIndex(2).y, 0f)
+      val data = requireNotNull(chart.data!!.dataSet)
+      assertEquals(3, data.entryCount)
+      assertEquals(0f, data.getEntryForIndex(2).y, 0f)
     }
+  }
+
+  @Test
+  fun noMatchingAppsProducesTheNativeEmptyStateInsteadOfAnAllZeroPie() = runBlocking {
+    val systemApp = item("system", Kind.Kotlin.featureFlag).copy(isSystem = true)
+    val source = FeatureFlagChartDataSource(listOf(systemApp), Kind.Kotlin) { targets, feature ->
+      BuildFeatureFlagChartDataUseCase()(BuildFeatureFlagChartDataUseCase.Request(targets, feature, false))
+    }
+    val chart = newChart()
+    source.fillChartView(chart) {}
+
+    withContext(Dispatchers.Main) {
+      assertTrue(chart.isEmpty)
+      assertEquals(0, chart.data!!.entryCount)
+    }
+    assertTrue(source.getListByXValue(0).isEmpty())
+    assertTrue(source.getListByXValue(1).isEmpty())
   }
 
   private suspend fun newChart(): PieChart = withContext(Dispatchers.Main) {

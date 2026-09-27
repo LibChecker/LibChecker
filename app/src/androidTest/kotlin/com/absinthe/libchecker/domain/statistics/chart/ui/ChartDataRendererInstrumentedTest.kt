@@ -5,6 +5,7 @@ import android.widget.FrameLayout
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.absinthe.libchecker.domain.statistics.chart.model.LOADING_PROGRESS_MAX
+import com.github.mikephil.charting.charts.PieChart
 import java.util.Collections
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -25,6 +26,43 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class ChartDataRendererInstrumentedTest {
+
+  @Test
+  fun emptyResultFinishesLoadingEvenWithoutSourceProgress() = runBlocking {
+    val context = InstrumentationRegistry.getInstrumentation().targetContext
+    val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    val committed = CompletableDeferred<Unit>()
+    val events = mutableListOf<String>()
+    try {
+      withContext(Dispatchers.Main) {
+        val chartHost = FrameLayout(context)
+        val chart = PieChart(context)
+        val renderer = ChartDataRenderer(scope, chartHost) { progress ->
+          events += "progress:$progress"
+          if (progress == LOADING_PROGRESS_MAX) committed.complete(Unit)
+        }
+        renderer.showInitialChart(chart)
+        assertTrue(chart.isLoading)
+        renderer.render(
+          newChartView = PieChart(context),
+          fillChart = { _, _ -> },
+          commitChart = { chart },
+          onCommitted = {
+            assertSame(chart, it)
+            assertSame(chart, chartHost.getChildAt(0))
+            assertEquals(1, chartHost.childCount)
+            assertFalse(chart.isLoading)
+            assertTrue(chart.isEmpty)
+            events += "committed"
+          }
+        )
+      }
+      withTimeout(5_000) { committed.await() }
+      assertEquals(listOf("committed", "progress:$LOADING_PROGRESS_MAX"), events)
+    } finally {
+      scope.cancel()
+    }
+  }
 
   @Test
   fun terminalProgressIsReportedAfterChartCommit() = runBlocking {
