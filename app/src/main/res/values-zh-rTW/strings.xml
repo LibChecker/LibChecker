@@ -8,6 +8,7 @@
   <string name="title_settings">設定</string>
   <string name="title_album">相簿</string>
   <string name="loading">載入中…</string>
+  <string name="chart_no_data">查無圖表資料</string>
   <string name="lib_permission_label_not_provided">未提供標籤</string>
   <string name="lib_permission_description_not_provided">未提供描述</string>
   <string name="lib_permission_load_failed">無法載入權限詳細資料</string>
@@ -40,9 +41,18 @@
   <string name="empty_list">空白清單</string>
   <string name="recent_apps">最常檢視的應用程式</string>
   <string name="recent_libraries">最常檢視的庫</string>
+  <string name="recent_visits_empty">近期無檢視紀錄</string>
+  <string name="shortcuts_pinned">已釘選</string>
+  <string name="shortcuts_recent">最近</string>
+  <string name="shortcuts_pin">釘選捷徑</string>
+  <string name="shortcuts_drag_hint">長按清單項目並拖曳至此處以釘選</string>
+  <string name="shortcuts_drop_hint">放開即可釘選</string>
+  <string name="shortcuts_pinned_feedback">已釘選 %s</string>
   <string name="uncharted_territory">未知領域</string>
   <string name="get_app_list_denied_tip">請授予 LibChecker\n「讀取應用程式清單」\n權限</string>
   <string name="advanced_menu">進階選單</string>
+  <string name="snapshot_version_archived">已封存</string>
+  <string name="toast_archived_app_detail_unavailable">請先還原此已封存的應用程式，才能檢視其詳細資訊。</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">%s架構的應用程式</string>
   <string name="title_statistics_dialog_no_native_libs">無原生庫的應用程式</string>
@@ -86,12 +96,23 @@
   <string name="settings_get_updates_in_app">In-app</string>
   <string name="settings_get_updates_in_app_chip_stable">穩定版</string>
   <string name="settings_get_updates_in_app_chip_ci">CI</string>
-  <string name="settings_github_token_dialog_message">僅用於官方 GitHub API 請求，並在使用系統保護的金鑰加密後儲存於本地。它不會透過任何其他路徑洩漏。</string>
+  <string name="settings_github_token">GitHub 權杖</string>
+  <string name="settings_github_token_summary_not_set">未設定</string>
+  <string name="settings_github_token_summary_set">已設定</string>
+  <string name="settings_github_token_dialog_title">GitHub 權杖</string>
+  <string name="settings_github_token_dialog_message">僅用於官方 GitHub API 請求，並在透過系統金鑰加密後儲存於本機，不會透過任何其他途徑公開。</string>
+  <string name="settings_github_token_dialog_hint">個人存取權杖</string>
+  <string name="settings_github_token_clear">清除</string>
   <string name="about_info">本應用程式用於檢視裝置上的應用程式使用第三方程式庫的狀況。</string>
   <string name="resource_declaration">應用程式中的部分資源來自於：</string>
   <string name="library_declaration">LibChecker 中所有標示的程式庫資訊均來自於其所屬的 SDK 的開發文件或程式碼存放庫，如果資訊有有誤，請聯絡：absinthe@absinthe.life</string>
   <!--  Settings  -->
   <string name="pref_group_normal">一般</string>
+  <string name="pref_group_appearance">外觀</string>
+  <string name="pref_appearance_summary">自訂介面外觀</string>
+  <string name="pref_group_rules">規則與網路</string>
+  <string name="pref_group_data">資料與工具</string>
+  <string name="pref_group_about">關於與支援</string>
   <string name="apk_analytics">APK 分析</string>
   <string name="colorful_icon">多彩圖示</string>
   <string name="rules_repo_title">規則存放庫</string>
@@ -103,15 +124,18 @@
   <string name="anonymous_statistics">匿名統計資料</string>
   <string name="cloud_rules">雲端規則</string>
   <string name="dark_mode">深色模式</string>
+  <string name="amoled_theme">純黑主題</string>
   <string name="snapshot_keep">快照預設保留規則</string>
   <string name="export_log">匯出日誌</string>
+  <string name="export_apps">匯出應用程式資訊</string>
   <string name="apk_analytics_summary">按下 APK 檔案時開啟詳細資料頁面</string>
   <string name="colorful_icon_summary">部分標示庫會呈現為彩色標誌</string>
+  <string name="amoled_theme_summary">在深色模式下使用純黑背景</string>
   <string name="lib_ref_threshold_summary">只有庫參考數量達到閾值的庫才顯示在清單中</string>
   <string name="reload_apps_summary">應用程式清單顯示不正常時嘗試此選項</string>
   <string name="export_log_summary">匯出應用程式的日誌檔</string>
-  <string name="export_apps_webui_tip">可在 WebUI 上檢視已匯出的應用</string>
-  <string name="export_apps_start">开始</string>
+  <string name="export_apps_webui_tip">匯出的應用程式可在 WebUI 上檢視</string>
+  <string name="export_apps_start">開始</string>
   <string name="export_apps_success">已匯出 %1$d 個應用程式</string>
   <string name="export_apps_failed">匯出應用程式失敗：%1$s</string>
   <string name="help_docs_summary">學習如何使用 LibChecker</string>
@@ -132,9 +156,17 @@
   <string name="kotlin_details">Kotlin 是一種在 Java 虛擬機上執行的靜態類型程式設計語言。雖然與 Java 語法並不相容，但在 JVM 環境中 Kotlin 被設計成可以和 Java 程式碼相互運作，並可以重複使用如 Java 集合架構等的現有 Java 參考的函式庫。</string>
   <string name="items_count">項數：</string>
   <string name="further_operation">進一步作業</string>
+  <string name="app_detail_online_rules_action">分析線上規則</string>
+  <string name="app_detail_online_rules_title">線上規則檢測</string>
+  <string name="app_detail_online_rules_loading">正在分析線上規則… %1$d%%</string>
+  <string name="app_detail_online_rules_empty">尚未將線上統計新增至圖表</string>
+  <string name="app_detail_online_rules_error">無法分析線上規則</string>
+  <string name="app_detail_online_rules_matched">符合</string>
+  <string name="app_detail_online_rules_unmatched">不符合</string>
+  <string name="app_detail_online_rules_detected_features">偵測到以下特性：</string>
   <string name="app_info_launch">啟動</string>
   <string name="app_info_settings">設定</string>
-  <string name="app_info_share">共享</string>
+  <string name="app_info_share">分享</string>
   <string name="lib_detail_dialog_title">庫詳細資料</string>
   <string name="lib_permission_dialog_title">權限詳細資料</string>
   <string name="lib_permission_provided_by_format">由 %s 提供</string>
@@ -185,6 +217,8 @@
   <string name="lib_detail_app_props_tip">更多資訊</string>
   <string name="lib_detail_xposed_min_version">Min 版本</string>
   <string name="lib_detail_xposed_target_version">目標版本</string>
+  <string name="lib_detail_xposed_auto_hot_reload">自動熱重載</string>
+  <string name="lib_detail_xposed_hot_reload_declared">已宣告</string>
   <string name="lib_detail_xposed_static_scope">靜態範圍</string>
   <string name="lib_detail_xposed_default_scope">預設範圍</string>
   <string name="lib_detail_xposed_init_class">初始類別</string>
@@ -196,20 +230,31 @@
   <string name="lib_detail_app_last_updated_time">最後安裝時間：</string>
   <string name="lib_detail_app_install_source_empty">未知</string>
   <string name="lib_detail_app_install_source_empty_detail">Shell 或已解除安裝的應用程式</string>
-  <string name="lib_detail_app_install_source_shizuku_usage">因為 Android 限制了取得安裝要求者的 API，我們使用 Shizuku 以取得安裝要求者。</string>
+  <string name="lib_detail_app_install_source_shizuku_usage">Android 僅向具有安裝權限的應用程式提供安裝發起者資訊，因此需要使用 Shizuku</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku 未經授權</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">按一下這裡進行 Shizuku 授權以取得安裝要求者</string>
+  <string name="lib_detail_app_install_source_shizuku_unavailable">Shizuku 服務無法使用</string>
+  <string name="lib_detail_app_install_source_shizuku_unavailable_detail">請啟動相容的 Shizuku 管理器，然後返回此頁面</string>
+  <string name="lib_detail_app_install_source_shizuku_api_too_old">Shizuku API 版本過舊</string>
+  <string name="lib_detail_app_install_source_shizuku_api_too_old_detail">請更新目前使用的 Shizuku 相容管理器</string>
+  <string name="lib_detail_app_dexopt_title">DEX 最佳化</string>
+  <string name="lib_detail_app_dexopt_status">狀態</string>
+  <string name="lib_detail_app_dexopt_reason">原因</string>
   <string name="lib_detail_elf_info">更多細節</string>
   <string name="lib_detail_elf_extract">擷取</string>
   <string name="lib_detail_elf_extract_success">ELF 檔案已儲存至下載區</string>
   <string name="lib_detail_elf_extract_failed">無法擷取 ELF 檔案</string>
-  <string name="lib_detail_permission_providers_empty">無內容提供者使用此權限</string>
+  <string name="lib_detail_permission_providers">內容提供者參照</string>
+  <string name="lib_detail_permission_providers_empty">沒有內容提供者使用此權限</string>
   <string name="lib_detail_dependency_tip">相依關係</string>
   <string name="lib_detail_entry_points_tip">入口</string>
+  <string name="lib_detail_optimization_tip">最佳化</string>
+  <string name="lib_detail_optimization_on">原生符號已去除，可減少應用程式大小。</string>
+  <string name="lib_detail_optimization_off">原生符號未去除，無法減少應用程式大小。</string>
   <string name="apk_preview">APK 預覽</string>
   <string name="apk_preview_item_not_available">無法在預覽模式下顯示</string>
-  <string name="adaptive_icon_layer_background">背景</string>
-  <string name="adaptive_icon_layer_foreground">前景</string>
+  <string name="adaptive_icon_layer_background">背景圖層</string>
+  <string name="adaptive_icon_layer_foreground">前景圖層</string>
   <string name="adaptive_icon_copy_full">複製完整圖示</string>
   <string name="adaptive_icon_copy_background">複製背景圖層</string>
   <string name="adaptive_icon_copy_foreground">複製前景圖層</string>
@@ -217,10 +262,16 @@
   <string name="feature_live_update_notification_summary">系統會推廣即時更新通知。推廣的通知會在系統介面上更顯眼地顯示，包括顯示於通知抽屜頂端和鎖定畫面，並以狀態列中的晶片形式呈現。</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已複製到剪貼簿</string>
+  <string name="snapshot_report_share_failed">分享快照報告失敗</string>
   <string name="toast_use_another_file_manager">請使用其它檔案管理員開啟此 APK</string>
   <string name="toast_cant_open_app">無法啟動此應用程式</string>
   <string name="toast_cloud_rules_update_error">無法更新雲端規則，請再試一次</string>
   <string name="toast_not_enough_storage_space">儲存空間不足</string>
+  <string name="toast_app_update_started">正在準備更新</string>
+  <string name="toast_app_update_installed">更新完成</string>
+  <string name="toast_app_update_unsupported">此裝置不支援應用程式內更新</string>
+  <string name="toast_app_update_pending_user_action">此裝置需要確認後才能安裝更新</string>
+  <string name="toast_app_update_failed">更新失敗：%s</string>
   <string name="toast_long_tap_share_button_tip">長按「分享」按鈕選擇存檔位置</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">儲存目前快照</string>
@@ -230,11 +281,22 @@
   <string name="snapshot_indicator_added">新增</string>
   <string name="snapshot_indicator_removed">移除</string>
   <string name="snapshot_indicator_changed">變更</string>
+  <string name="snapshot_content_changed">內容變更</string>
   <string name="snapshot_indicator_moved">移動</string>
+  <string name="snapshot_detail_size_label">大小</string>
+  <string name="snapshot_detail_metric_description">%1$s, %2$s</string>
+  <plurals name="snapshot_detail_changes_count">
+    <item quantity="other">%d 項變更</item>
+  </plurals>
   <string name="snapshot_empty_list_title">沒有元件變更</string>
   <string name="snapshot_no_snapshot">沒有快照</string>
   <string name="snapshot_detail_new_install_title">這是一個全新的應用程式</string>
   <string name="snapshot_detail_deleted_title">此應用程式已被移除</string>
+  <string name="snapshot_time_node_current">目前</string>
+  <plurals name="snapshot_time_node_apps_count">
+    <item quantity="other">%d 個應用程式</item>
+  </plurals>
+  <string name="snapshot_time_node_current_apps">%1$s · %2$s</string>
   <string name="snapshot_preinstalled_app">內建應用程式</string>
   <string name="snapshot_generate_text_report">產生文字報告</string>
   <string name="snapshot_scheme_tip"><![CDATA[提示：現在您可以透過<br><b>%s</b><br>在背景產生快照。]]></string>
@@ -244,19 +306,21 @@
     <item quantity="other">%d 次更新</item>
   </plurals>
   <string name="snapshot_contribution_recent_days">最近 %d 天</string>
-  <string name="snapshot_contribution_tile_detail">%1$s：%2$s</string>
-  <string name="snapshot_contribution_tile_detail_with_snapshot">%1$s：%2$s · 已記錄快照</string>
-  <string name="snapshot_contribution_hint">點擊圖磚查看當日應用程式更新</string>
-  <string name="snapshot_contribution_no_updates">當日無應用程式更新</string>
-  <string name="snapshot_contribution_snapshot_captured">快照已記錄</string>
+  <string name="snapshot_contribution_tile_detail">%1$s: %2$s</string>
+  <string name="snapshot_contribution_tile_detail_with_snapshot">%1$s: %2$s · 已擷取快照</string>
+  <string name="snapshot_contribution_hint">輕觸圖格以檢視當日更新</string>
+  <string name="snapshot_contribution_no_updates">當天沒有應用程式更新</string>
+  <string name="snapshot_contribution_snapshot_captured">已擷取快照</string>
   <!--  Dialog  -->
-  <string name="dialog_title_reload_apps">重新載入應用程式清單？</string>
+  <string name="dialog_title_reload_apps">要重新載入所有應用程式嗎？</string>
   <string name="dialog_subtitle_reload_apps">這可能會花費幾秒鐘的時間</string>
   <string name="dialog_title_change_timestamp">變更時間節點</string>
   <string name="dialog_title_keep_previous_snapshot">注意</string>
   <string name="dialog_message_keep_previous_snapshot">是否保留上一張快照？</string>
   <string name="dialog_title_select_to_delete">選擇日期以刪除快照</string>
-  <string name="dialog_title_confirm_to_delete">刪除這個快照？</string>
+  <string name="dialog_title_confirm_to_delete">要刪除此快照嗎？</string>
+  <string name="dialog_message_confirm_to_delete">%s\n\n此時間節點及其所有應用程式記錄將被永久刪除，且無法復原此操作。</string>
+  <string name="dialog_action_delete">刪除</string>
   <string name="btn_keep">保留</string>
   <string name="btn_drop">捨棄</string>
   <string name="dialog_title_compare_diff_apk">注意</string>
@@ -280,10 +344,13 @@
   <string name="album_item_track_subtitle">選取應用程式強制進行比較變更</string>
   <string name="album_backup">備份</string>
   <string name="album_backup_summary">備份所有快照</string>
+  <string name="album_backup_sheet_backup_description">儲存一份日後可還原的本機檔案</string>
   <string name="album_backup_detail">已備份 %1$d 個項目</string>
   <string name="album_backup_database_detail">資料庫備份完成</string>
   <string name="album_restore">還原</string>
-  <string name="album_restore_result_summary">已從 %2$d 個快照點復原了 %1$d 個項目</string>
+  <string name="album_restore_from_file">從檔案還原</string>
+  <string name="album_restore_auto_detect_summary">自動偵測備份格式</string>
+  <string name="album_restore_result_summary">已從 %2$d 個快照節點還原 %1$d 個項目</string>
   <string name="album_restore_result_item_count">%1$d 個項目</string>
   <string name="album_click_to_choose">按下以選擇</string>
   <!--  Integration  -->
@@ -298,6 +365,8 @@
   <string name="rules_btn_restart_to_update">重啟以更新</string>
   <string name="rules_btn_update">更新</string>
   <!-- Advanced menu -->
+  <string name="adv_app_filter">應用程式篩選</string>
+  <string name="adv_app_appearance">應用程式清單外觀</string>
   <string name="adv_show_system_apps">顯示系統應用程式</string>
   <string name="adv_show_overlays">顯示 Overlay</string>
   <string name="adv_show_64_bit">顯示 64 位元應用程式</string>
@@ -318,7 +387,24 @@
   <!--  Snapshot menu  -->
   <string name="snapshot_menu_show_update_time">顯示更新時間</string>
   <string name="snapshot_menu_hide_no_component_changes">隱藏沒有元件變更</string>
-  <string name="snapshot_menu_diff_highlight">重點標示差異</string>
+  <string name="snapshot_menu_diff_highlight">醒目提示差異</string>
+  <string name="snapshot_menu_diff_emphasis">強調差異</string>
   <string name="snapshot_menu_use_iec_units">使用 IEC 單元</string>
   <!-- A11y -->
+  <string name="a11y_state_expanded">已展開</string>
+  <string name="a11y_state_collapsed">已摺疊</string>
+  <string name="library_insight_loading">正在偵測 SDK 版本…</string>
+  <string name="library_insight_unavailable">無法取得版本詳細資訊 · 輕觸以重試</string>
+  <string name="library_insight_show_details">展開詳細資訊</string>
+  <string name="library_insight_hide_details">收合詳細資訊</string>
+  <string name="blur_design">模糊效果</string>
+  <string name="blur_design_summary">在整個介面中提供更多模糊效果</string>
+  <string name="floating_nav_bar">懸浮導覽列</string>
+  <string name="floating_nav_bar_summary">以懸浮樣式顯示導覽列</string>
+  <string name="lib_reference_switch_to_treemap">切換為矩形樹狀圖</string>
+  <string name="lib_reference_switch_to_list">切換為清單</string>
+  <string name="lib_reference_other">其他</string>
+  <string name="lib_reference_other_description">其他：%1$d 個函式庫，%2$d 次參照</string>
+  <string name="legacy_snapshot_detail">舊版快照詳細資訊頁面</string>
+  <string name="legacy_snapshot_detail_summary">使用經典卡片配置檢視快照詳細資訊</string>
 </resources>

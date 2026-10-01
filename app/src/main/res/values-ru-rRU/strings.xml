@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <string name="package_list_load_failed">Не удалось загрузить установленные приложения. Пожалуйста, попробуйте снова.</string>
   <!--  General  -->
   <string name="title_app_list">Приложения</string>
   <string name="title_statistics">Статистика</string>
@@ -7,12 +8,29 @@
   <string name="title_settings">Настройки</string>
   <string name="title_album">Альбом</string>
   <string name="loading">Загрузка…</string>
+  <string name="chart_no_data">Нет данных</string>
+  <string name="lib_permission_label_not_provided">Метка не указана</string>
+  <string name="lib_permission_description_not_provided">Описание не указано</string>
+  <string name="lib_permission_load_failed">Не удается загрузить детали разрешения</string>
   <string name="channel_shoot">Сохранить</string>
   <string name="noti_shoot_title">Сохранение текущего снимка</string>
   <string name="noti_shoot_title_saved">Снимок сохранен</string>
   <!--  App list  -->
   <string name="menu_search">Поиск</string>
   <string name="menu_sort">Сортировка</string>
+  <string name="chart_statistics_add">Добавить статистику</string>
+  <string name="chart_statistics_edit">Редактировать статистику</string>
+  <string name="chart_statistics_added">Добавлено</string>
+  <string name="chart_statistics_available">Доступно</string>
+  <string name="chart_statistics_loading_online">Загрузка онлайн статистики…</string>
+  <string name="chart_statistics_online_error">Не удалось загрузить онлайн статистику. Показаны загруженные элементы.</string>
+  <string name="chart_statistics_no_available">Статистика недоступна.</string>
+  <string name="chart_statistics_source_builtin">Встроенная</string>
+  <string name="chart_statistics_source_online">Онлайн</string>
+  <string name="chart_statistics_drag">Перетащите для сортировки</string>
+  <string name="chart_statistics_drag_hint">Нажмите и перетащите для изменения порядка</string>
+  <string name="chart_statistics_remove_description">Удалить %1$s</string>
+  <string name="chart_statistics_add_description">Добавить %1$s</string>
   <string name="menu_filter">Фильтр</string>
   <string name="search_hint">Поиск…</string>
   <string name="string_64_bit">64 бит</string>
@@ -21,6 +39,10 @@
   <string name="cannot_read">Невозможно прочитать</string>
   <string name="unknown">Неизвестно</string>
   <string name="empty_list">Список пуст</string>
+  <string name="recent_apps">Недавно просмотренные</string>
+  <string name="recent_libraries">Недавно просмотренные библиотеки</string>
+  <string name="recent_visits_empty">В последнее время ничего не просмотрено</string>
+  <string name="shortcuts_pinned">Закреплённые</string>
   <string name="uncharted_territory">Неизученная территория</string>
   <string name="get_app_list_denied_tip">Пожалуйста, предоставьте\nLibChecker разрешение получить\nинформацию об установленных приложениях</string>
   <string name="advanced_menu">Расширенное меню</string>
