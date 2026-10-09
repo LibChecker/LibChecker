@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <string name="package_list_load_failed"></string>
   <!--  General  -->
   <string name="title_app_list">Ứng dụng</string>
   <string name="title_statistics">Hệ thống dữ liệu</string>
