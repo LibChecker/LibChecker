@@ -7,7 +7,7 @@
 
 	"features": {
 		"ghcr.io/devcontainers/features/java:1": {},
-		"ghcr.io/nordcominc/devcontainer-features/android-sdk:1": {}
+		"ghcr.io/nordcominc/devcontainer-features/android-sdk:2": {}
 	}
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
