@@ -10,6 +10,7 @@ import android.view.ViewConfiguration
 import android.view.animation.OvershootInterpolator
 import android.view.animation.PathInterpolator
 import android.widget.FrameLayout
+import androidx.core.animation.doOnEnd
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.view.drawable.G2PillDrawable
 import com.absinthe.libchecker.view.drawable.calculateFloatingNavSliderBounds
@@ -47,9 +48,11 @@ internal class FloatingNavigationThumbController(
   private var downY = 0f
   private var dragging = false
   private var suppressDrag = false
-  private var isThumbAnimating = false
+  private val isThumbAnimating: Boolean
+    get() = thumbPositionAnimator != null
   private var pointerPressed = false
-  private var thumbTargetTranslation = 0f
+  private var thumbTargetIndex = 0
+  private var thumbPositionAnimator: ValueAnimator? = null
   private var thumbScaleAnimator: ValueAnimator? = null
   private var pendingIndex = 0
   private var floatingProgress = 0f
@@ -125,7 +128,7 @@ internal class FloatingNavigationThumbController(
           bounds.set(0, 0, item.width, item.height)
           host.offsetDescendantRectToMyCoords(item, bounds)
           if (bounds.contains(event.x.toInt(), event.y.toInt())) {
-            animateThumbTo(index * segmentExtent())
+            animateThumbTo(index)
             break
           }
         }
@@ -135,14 +138,14 @@ internal class FloatingNavigationThumbController(
         pointerPressed = false
         suppressDrag = false
         // A press preview may end outside the item without committing a selection.
-        if (!dragging) animateThumbTo(selectedIndex * segmentExtent())
+        if (!dragging) animateThumbTo(selectedIndex)
         if (!isThumbAnimating) releaseThumbScale()
       }
 
       MotionEvent.ACTION_CANCEL -> {
         pointerPressed = false
         suppressDrag = false
-        if (!dragging) animateThumbTo(selectedIndex * segmentExtent())
+        if (!dragging) animateThumbTo(selectedIndex)
       }
     }
   }
@@ -172,8 +175,9 @@ internal class FloatingNavigationThumbController(
       thumbLeft + thumbView.measuredWidth,
       thumbTop + thumbView.measuredHeight
     )
-    if (!dragging && !isThumbAnimating) {
-      setThumbTranslation(selectedIndex * currentItemStride(containerWidth, containerHeight))
+    if (!dragging) {
+      val position = thumbPositionAnimator?.animatedValue as? Float ?: selectedIndex.toFloat()
+      setThumbTranslation(position * currentItemStride(containerWidth, containerHeight))
     }
   }
 
@@ -217,14 +221,14 @@ internal class FloatingNavigationThumbController(
       MotionEvent.ACTION_UP -> {
         if (dragging) {
           updateDrag(pointerPosition(event), segmentExtent)
-          finishDrag(commit = true, segmentExtent)
+          finishDrag(commit = true)
           return true
         }
       }
 
       MotionEvent.ACTION_CANCEL -> {
         if (dragging) {
-          finishDrag(commit = false, segmentExtent)
+          finishDrag(commit = false)
           return true
         }
       }
@@ -240,7 +244,7 @@ internal class FloatingNavigationThumbController(
     val (containerWidth, containerHeight) = containerSize()
     val targetTranslation = targetIndex * currentItemStride(containerWidth, containerHeight)
     if (animate && host.isAttachedToWindow && segmentExtent() > 0f) {
-      animateThumbTo(targetTranslation)
+      animateThumbTo(targetIndex)
     } else {
       cancelThumbAnimation()
       setThumbTranslation(targetTranslation)
@@ -300,11 +304,11 @@ internal class FloatingNavigationThumbController(
     }
   }
 
-  private fun finishDrag(commit: Boolean, segmentExtent: Float) {
+  private fun finishDrag(commit: Boolean) {
     dragging = false
     host.parent?.requestDisallowInterceptTouchEvent(false)
     val targetIndex = if (commit) pendingIndex else selectedIndex
-    animateThumbTo(targetIndex * segmentExtent)
+    animateThumbTo(targetIndex)
 
     if (commit && targetIndex != selectedIndex && targetIndex in 0 until host.menu.size()) {
       selectedIndex = targetIndex
@@ -313,31 +317,32 @@ internal class FloatingNavigationThumbController(
     }
   }
 
-  private fun animateThumbTo(targetTranslation: Float) {
-    if (isThumbAnimating && thumbTargetTranslation == targetTranslation) return
+  private fun animateThumbTo(targetIndex: Int) {
+    if (isThumbAnimating && thumbTargetIndex == targetIndex) return
     cancelThumbAnimation()
-    thumbTargetTranslation = targetTranslation
+    thumbTargetIndex = targetIndex
+    val stride = segmentExtent()
+    val targetTranslation = targetIndex * stride
     val currentTranslation = if (vertical) thumbView.translationY else thumbView.translationX * horizontalDirection()
-    if (abs(currentTranslation - targetTranslation) < 0.5f) {
+    if (stride <= 0f || abs(currentTranslation - targetTranslation) < 0.5f) {
       if (!pointerPressed) releaseThumbScale()
       return
     }
     animateThumbScale(THUMB_PRESSED_SCALE)
-    isThumbAnimating = true
-    val animator = thumbView.animate()
-      .setDuration(THUMB_ANIMATION_DURATION_MS)
-      .setInterpolator(THUMB_INTERPOLATOR)
-      .setUpdateListener { host.invalidate() }
-      .withEndAction {
-        isThumbAnimating = false
+    // IME resizing changes the stride while the selection animation is running.
+    thumbPositionAnimator = ValueAnimator.ofFloat(currentTranslation / stride, targetIndex.toFloat()).apply {
+      duration = THUMB_ANIMATION_DURATION_MS
+      interpolator = THUMB_INTERPOLATOR
+      addUpdateListener {
+        setThumbTranslation((it.animatedValue as Float) * segmentExtent())
+        host.invalidate()
+      }
+      doOnEnd {
+        thumbPositionAnimator = null
         if (!pointerPressed) releaseThumbScale()
       }
-    if (vertical) {
-      animator.translationY(targetTranslation)
-    } else {
-      animator.translationX(horizontalDirection() * targetTranslation)
     }
-    animator.start()
+    thumbPositionAnimator?.start()
   }
 
   private fun setThumbTranslation(translation: Float) {
@@ -431,8 +436,9 @@ internal class FloatingNavigationThumbController(
   }
 
   private fun cancelThumbAnimation() {
-    isThumbAnimating = false
-    thumbView.animate().cancel()
+    thumbPositionAnimator?.removeAllListeners()
+    thumbPositionAnimator?.cancel()
+    thumbPositionAnimator = null
   }
 
   private fun animateThumbScale(target: Float, animate: Boolean = true) {

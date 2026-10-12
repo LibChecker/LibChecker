@@ -5,6 +5,8 @@ import android.content.res.Configuration
 import android.os.SystemClock
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
+import android.widget.FrameLayout
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -31,6 +33,54 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class HomeImeNavigationInstrumentedTest {
+  @Test
+  fun selectionAnimationFollowsResizedNavigationInBothLayoutDirections() {
+    val instrumentation = InstrumentationRegistry.getInstrumentation()
+    ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+      for (direction in listOf(View.LAYOUT_DIRECTION_LTR, View.LAYOUT_DIRECTION_RTL)) {
+        lateinit var nav: FloatingBottomNavigationView
+        var resizedDuringAnimation = false
+        scenario.onActivity { activity ->
+          nav = FloatingBottomNavigationView(activity).apply {
+            layoutDirection = direction
+            inflateMenu(R.menu.bottom_nav_menu)
+            isFloating = true
+            setFloatingProgress(1f)
+          }
+          activity.addContentView(nav, FrameLayout.LayoutParams(400, 200))
+        }
+        instrumentation.waitForIdleSync()
+        scenario.onActivity {
+          assertEquals(400, nav.width)
+          val thumb = nav.getChildAt(0)
+          nav.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
+              val translation = kotlin.math.abs(thumb.translationX)
+              if (translation > 0f && translation < 200f) {
+                resizedDuringAnimation = true
+                nav.viewTreeObserver.removeOnPreDrawListener(this)
+                nav.layoutParams = nav.layoutParams.apply { width = 800 }
+              }
+              return true
+            }
+          })
+          nav.setSelectedIndex(2)
+        }
+        SystemClock.sleep(700)
+        scenario.onActivity {
+          try {
+            assertTrue("The resize must overlap the selection animation", resizedDuringAnimation)
+            assertEquals(800, nav.width)
+            val sign = if (direction == View.LAYOUT_DIRECTION_RTL) -1f else 1f
+            assertEquals("The thumb must use the final item width", sign * 400f, nav.getChildAt(0).translationX, 1f)
+          } finally {
+            (nav.parent as ViewGroup).removeView(nav)
+          }
+        }
+      }
+    }
+  }
+
   @Test
   fun closingImeRestoresHiddenBehaviorStateAndVisibility() {
     val instrumentation = InstrumentationRegistry.getInstrumentation()
@@ -182,6 +232,16 @@ class HomeImeNavigationInstrumentedTest {
             assertEquals(normalWidth, nav.width)
             assertEquals(normalHeight, nav.height)
             assertEquals(0f, nav.translationY, 0.01f)
+            val thumb = nav.getChildAt(0)
+            val selectedItem = nav.findViewById<View>(target)
+            val selectedBounds = android.graphics.Rect(0, 0, selectedItem.width, selectedItem.height)
+            nav.offsetDescendantRectToMyCoords(selectedItem, selectedBounds)
+            assertEquals(
+              "The thumb must settle over the selected tab after IME resizing",
+              selectedBounds.exactCenterX(),
+              thumb.x + thumb.width / 2f,
+              1f
+            )
             val behavior = (nav.layoutParams as CoordinatorLayout.LayoutParams).behavior as InvalidatingHideBottomViewOnScrollBehavior
             assertTrue(behavior.isScrolledUp)
             assertEquals(View.VISIBLE, nav.visibility)
