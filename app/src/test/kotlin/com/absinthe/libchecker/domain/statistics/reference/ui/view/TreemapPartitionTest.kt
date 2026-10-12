@@ -6,6 +6,49 @@ import org.junit.Test
 
 class TreemapPartitionTest {
   @Test
+  fun preparedTransitionsKeepWeightedAreasWhenReusedAndInterleaved() {
+    val entries = (1..30).map { TreemapLayout.Entry("$it", it.toDouble()) }
+    val partition = TreemapPartition(entries, 400.0, 800.0)
+    val selected = setOf("4", "13", "22")
+    val zoomIn = partition.prepareTransition(null, selected)
+    val zoomOut = partition.prepareTransition(selected, null)
+    for (step in 0..100) {
+      val progress = step / 100f
+      val weights = entries.associate { it.id to it.weight * if (it.id in selected) 1.0 else 1 - progress.toDouble() }
+      for ((transition, p) in listOf(zoomIn to progress, zoomOut to (1f - progress))) {
+        val tiles = transition.tiles(400.0, 800.0, p)
+        assertEquals(weights.filterValues { it > 0 }.keys, tiles.map { it.id }.toSet())
+        for (tile in tiles) {
+          val area = (tile.right - tile.left) * (tile.bottom - tile.top)
+          assertEquals(weights.getValue(tile.id) / weights.values.sum() * 320000, area, 0.02)
+        }
+      }
+    }
+  }
+
+  @Test
+  fun preparedTransitionPreservesIntermediateCutAndCanChangeViewport() {
+    val partition = TreemapPartition(listOf(TreemapLayout.Entry("large", 3.0), TreemapLayout.Entry("small", 1.0)), 100.0, 100.0)
+    val transition = partition.prepareTransition(null, setOf("small"))
+    assertEquals(
+      listOf(TreemapLayout.Tile("large", 0.0, 0.0, 60.0, 100.0), TreemapLayout.Tile("small", 60.0, 0.0, 100.0, 100.0)),
+      transition.tiles(100.0, 100.0, 0.5f)
+    )
+    assertEquals(listOf(TreemapLayout.Tile("small", 0.0, 0.0, 200.0, 50.0)), transition.tiles(200.0, 50.0, 1f))
+    assertTrue(transition.tiles(0.0, 50.0, 0.5f).isEmpty())
+    assertTrue(partition.prepareTransition(emptySet(), emptySet()).tiles(100.0, 100.0, 0.5f).isEmpty())
+    assertTrue(TreemapPartition(emptyList(), 100.0, 100.0).prepareTransition(null, null).tiles(100.0, 100.0, 0.5f).isEmpty())
+  }
+
+  private fun TreemapPartition.Transition.tiles(width: Double, height: Double, progress: Float): List<TreemapLayout.Tile> {
+    val tiles = mutableListOf<TreemapLayout.Tile>()
+    layout(width, height, progress) { id, left, top, right, bottom ->
+      tiles += TreemapLayout.Tile(id, left, top, right, bottom)
+    }
+    return tiles
+  }
+
+  @Test
   fun similarWeightsDoNotBecomeThinStrips() {
     val entries = listOf(102.0, 101.0, 100.0).mapIndexed { index, weight -> TreemapLayout.Entry("$index", weight) }
     for ((width, height) in listOf(200.0 to 300.0, 300.0 to 200.0)) {

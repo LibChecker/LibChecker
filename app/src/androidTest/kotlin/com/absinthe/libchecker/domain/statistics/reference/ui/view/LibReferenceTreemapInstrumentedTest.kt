@@ -46,6 +46,45 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class LibReferenceTreemapInstrumentedTest {
   @Test
+  fun zoomPreviewReusesLayoutAndCancellationKeepsOriginalCells() {
+    ActivityScenario.launch(TrackActivity::class.java).use { scenario ->
+      scenario.onActivity { activity ->
+        val view = LibReferenceTreemapView(activity)
+        activity.setContentView(view)
+        view.layout(0, 0, 600, 900)
+        view.submitReferences((1..80).map { LibReference("lib$it", null, (1..(it + 5)).map { n -> "pkg$n" }.toSet(), NATIVE) })
+        fun field(name: String) = LibReferenceTreemapView::class.java.getDeclaredField(name).apply { isAccessible = true }
+        val originalCells = field("cells").get(view)
+        var clicks = 0
+        view.onReferenceClick = { clicks++ }
+        val updatePreview = LibReferenceTreemapView::class.java.getDeclaredMethod("updateZoomPreview").apply { isAccessible = true }
+        field("zoomFocusX").setFloat(view, 300f)
+        field("zoomFocusY").setFloat(view, 450f)
+        field("zoom").setFloat(view, 1.1f)
+        updatePreview.invoke(view)
+        val layout = field("previewLayout").get(view)
+        assertNotNull("Zoom preview must prepare a transition", layout)
+        field("zoom").setFloat(view, 1.4f)
+        updatePreview.invoke(view)
+        assertSame("Gesture frames must reuse the prepared layout", layout, field("previewLayout").get(view))
+        field("transformedGesture").setBoolean(view, true)
+        val now = SystemClock.uptimeMillis()
+        val cancel = MotionEvent.obtain(now, now, MotionEvent.ACTION_CANCEL, 300f, 450f, 0)
+        try {
+          assertTrue(view.onTouchEvent(cancel))
+        } finally {
+          cancel.recycle()
+        }
+        (field("zoomAnimator").get(view) as ValueAnimator).end()
+        assertSame(originalCells, field("cells").get(view))
+        assertEquals(null, field("previewLayout").get(view))
+        assertTrue((field("zoomHistory").get(view) as List<*>).isEmpty())
+        assertEquals(0, clicks)
+      }
+    }
+  }
+
+  @Test
   fun mouseWheelZoomsInStagesAndReturnsToDefault() {
     ActivityScenario.launch(TrackActivity::class.java).use { scenario ->
       scenario.onActivity { activity ->
@@ -636,6 +675,9 @@ class LibReferenceTreemapInstrumentedTest {
           val size = (sizeDp * activity.resources.displayMetrics.density).toInt()
           val height = (heightDp * activity.resources.displayMetrics.density).toInt()
           view.layout(0, 0, size, height)
+          // Assert the settled content, after the resize visibility animation.
+          val fade = LibReferenceTreemapView::class.java.getDeclaredField("contentFadeAnimator").apply { isAccessible = true }
+          (fade.get(view) as? ValueAnimator)?.end()
           val bitmap = Bitmap.createBitmap(size, height, Bitmap.Config.ARGB_8888)
           view.draw(Canvas(bitmap))
           val pixels = IntArray(size * height)
