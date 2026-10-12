@@ -196,7 +196,10 @@ class LibReferenceTreemapView @JvmOverloads constructor(
   private var partitionWidth = 0
   private var partitionHeight = 0
   private var previewCells: List<Cell>? = null
-  private data class TransitionCell(val outgoing: Cell, val incoming: Cell, val fromAlpha: Float, val toAlpha: Float, val sourceIndex: Int)
+  private var previewLayout: TreemapPartition.Transition? = null
+  private data class TransitionCell(val outgoing: Cell, val incoming: Cell, val fromAlpha: Float, val toAlpha: Float, val sourceIndex: Int) {
+    val sameLines = outgoing.lines == incoming.lines
+  }
   private var transitionCells = emptyMap<String, TransitionCell>()
   private var previewIds: Set<String>? = null
   private var previewDirection = 0
@@ -244,11 +247,13 @@ class LibReferenceTreemapView @JvmOverloads constructor(
       previewCells = target
       val old = cells.associateBy { it.id }
       val new = target.associateBy { it.id }
+      val oldIndices = cells.withIndex().associate { it.value.id to it.index }
       transitionCells = (old.keys + new.keys).associateWith { id ->
         val outgoing = old[id] ?: new.getValue(id)
         val incoming = new[id] ?: old.getValue(id)
-        TransitionCell(outgoing.copy(bounds = RectF()), incoming.copy(bounds = RectF()), old[id]?.contentOpacity ?: 0f, new[id]?.contentOpacity ?: 0f, cells.indexOfFirst { it.id == id })
+        TransitionCell(outgoing.copy(bounds = RectF()), incoming.copy(bounds = RectF()), old[id]?.contentOpacity ?: 0f, new[id]?.contentOpacity ?: 0f, oldIndices[id] ?: -1)
       }
+      previewLayout = partition?.prepareTransition(visibleIds, previewIds)
     }
     previewProgress = (if (direction > 0) zoom - 1f else (1f - zoom) * 2f).coerceIn(0f, 1f)
   }
@@ -433,6 +438,7 @@ class LibReferenceTreemapView @JvmOverloads constructor(
 
   private fun clearPreview() {
     previewCells = null
+    previewLayout = null
     transitionCells = emptyMap()
     previewProgress = 0f
     textTransitionProgress = 0f
@@ -581,11 +587,11 @@ class LibReferenceTreemapView @JvmOverloads constructor(
   override fun onDraw(canvas: Canvas) {
     super.onDraw(canvas)
     canvas.save()
-    canvas.clipPath(outerPath)
+    val clipPreviewCells = canvas.isHardwareAccelerated && filterCells.isEmpty() && previewCells != null
+    if (!clipPreviewCells) canvas.clipPath(outerPath)
     if (filterCells.isNotEmpty()) {
       val progress = filterAnimator?.animatedValue as? Float ?: 1f
       filterCells.forEach { cell ->
-        val layer = canvas.saveLayerAlpha(cell.rendered.bounds, (cell.alpha * 255).toInt())
         val textProgress = ((progress - 0.4f) / 0.6f).coerceIn(0f, 1f)
         val sameContent = cell.from.lines == cell.to.lines && cell.from.count == cell.to.count
         cell.rendered.contentOpacity = if (sameContent) {
@@ -593,6 +599,10 @@ class LibReferenceTreemapView @JvmOverloads constructor(
         } else {
           cell.from.contentOpacity * (1f - textProgress)
         }
+        val alpha = (cell.alpha * 255).toInt()
+        if (alpha <= 0) return@forEach
+        // This group also preserves antialiased cell edges when its opacity reaches one.
+        val layer = canvas.saveLayerAlpha(cell.rendered.bounds, alpha)
         drawCell(canvas, cell.rendered, -1)
         if (!sameContent && textProgress > 0f) {
           val target = cell.incoming
@@ -606,39 +616,64 @@ class LibReferenceTreemapView @JvmOverloads constructor(
     } else if (previewCells == null) {
       cells.forEachIndexed { index, cell -> drawCell(canvas, cell, index) }
     } else {
-      val layout = partition?.layout(
+      previewLayout?.layout(
         (width - paddingLeft - paddingRight).toDouble(),
         (height - paddingTop - paddingBottom).toDouble(),
-        visibleIds,
-        previewIds,
         previewProgress
-      ).orEmpty()
-      layout.forEach { tile ->
-        val transition = transitionCells.getValue(tile.id)
+      ) { id, left, top, right, bottom ->
+        val transition = transitionCells.getValue(id)
         val outgoing = transition.outgoing
         val incoming = transition.incoming
-        outgoing.bounds.set(tile.left.toFloat() + paddingLeft, tile.top.toFloat() + paddingTop, tile.right.toFloat() + paddingLeft, tile.bottom.toFloat() + paddingTop)
+        outgoing.bounds.set(left.toFloat() + paddingLeft, top.toFloat() + paddingTop, right.toFloat() + paddingLeft, bottom.toFloat() + paddingTop)
         outgoing.bounds.inset(minOf(1.5f * density, outgoing.bounds.width() / 4), minOf(1.5f * density, outgoing.bounds.height() / 4))
-        incoming.bounds.set(outgoing.bounds)
         updateContentScale(outgoing)
-        updateContentScale(incoming)
-        val sameLines = outgoing.lines == incoming.lines
-        outgoing.contentOpacity = if (sameLines) {
+        outgoing.contentOpacity = if (transition.sameLines) {
           transition.fromAlpha + (transition.toAlpha - transition.fromAlpha) * previewProgress
         } else {
           transition.fromAlpha * (1f - textTransitionProgress)
         }
-        incoming.contentOpacity = if (sameLines) 0f else transition.toAlpha * textTransitionProgress
+        incoming.contentOpacity = if (transition.sameLines) 0f else transition.toAlpha * textTransitionProgress
+        val clipCell = clipPreviewCells && !canSkipPreviewClip(outgoing.bounds, transition.sourceIndex)
+        if (clipCell) {
+          canvas.save()
+          canvas.clipPath(outerPath)
+        }
         drawCell(canvas, outgoing, transition.sourceIndex)
-        if (incoming.contentOpacity > 0f) drawCell(canvas, incoming, -1, drawBackground = false)
+        if (incoming.contentOpacity > 0f) {
+          incoming.bounds.set(outgoing.bounds)
+          updateContentScale(incoming)
+          drawCell(canvas, incoming, -1, drawBackground = false)
+        }
+        if (clipCell) canvas.restore()
       }
     }
+    if (clipPreviewCells) canvas.clipPath(outerPath)
     drawPinchHint(canvas)
     canvas.restore()
   }
 
   private fun updateContentScale(cell: Cell) {
     cell.contentScale = minOf(1f, cell.bounds.width() / (cell.contentWidth + cell.contentPadding * 2), cell.bounds.height() / (cell.contentHeight + cell.contentPadding * 2))
+  }
+
+  private fun canDrawWithoutLayer(canvas: Canvas, bounds: RectF): Boolean {
+    return canvas.isHardwareAccelerated && isAwayFromOuterCorners(bounds)
+  }
+
+  private fun canSkipPreviewClip(bounds: RectF, index: Int): Boolean {
+    if (index >= 0 && (index == accessibility.keyboardFocusedVirtualViewId || index == accessibility.accessibilityFocusedVirtualViewId)) return false
+    // Keep edge antialiasing and focus strokes on the original clipping path.
+    val edgeInset = 1.5f * density + 1f
+    return bounds.left >= paddingLeft + edgeInset && bounds.right <= width - paddingRight - edgeInset &&
+      bounds.top >= paddingTop + edgeInset && bounds.bottom <= height - paddingBottom - edgeInset &&
+      isAwayFromOuterCorners(bounds)
+  }
+
+  private fun isAwayFromOuterCorners(bounds: RectF): Boolean {
+    // G2 corners extend up to twice the radius; retain group compositing under their antialiased clip.
+    val cornerInset = (1.5f + 2 * 24f) * density
+    return (bounds.left >= paddingLeft + cornerInset && bounds.right <= width - paddingRight - cornerInset) ||
+      (bounds.top >= paddingTop + cornerInset && bounds.bottom <= height - paddingBottom - cornerInset)
   }
 
   private fun drawCell(canvas: Canvas, cell: Cell, index: Int, drawBackground: Boolean = true) {
@@ -656,12 +691,14 @@ class LibReferenceTreemapView @JvmOverloads constructor(
         fill.style = Paint.Style.FILL
       }
     }
-    if (cell.contentOpacity <= 0f) {
+    val contentAlpha = (cell.contentOpacity * 255).toInt()
+    if (contentAlpha <= 0) {
       canvas.restore()
       return
     }
     canvas.clipRect(bounds)
-    val contentLayer = canvas.saveLayerAlpha(bounds, (cell.contentOpacity * 255).toInt())
+    // Software layers affect edge rasterization even when fully opaque.
+    val contentLayer = if (contentAlpha == 255 && canDrawWithoutLayer(canvas, bounds)) canvas.save() else canvas.saveLayerAlpha(bounds, contentAlpha)
     labelPaint.color = cell.style.foreground
     countPaint.color = labelPaint.color
     canvas.translate(bounds.left, bounds.top)
