@@ -269,8 +269,9 @@ class AndroidStatisticEvidenceRepository(
         return results
       }
       checkCancellation()
-      val container = try {
-        FastDexFileFactory.loadDexContainer(sourceFile, Opcodes.getDefault(), checkCancellation)
+      val (container, entryNames) = try {
+        val loaded = FastDexFileFactory.loadDexContainer(sourceFile, Opcodes.getDefault(), checkCancellation)
+        loaded to loaded.dexEntryNames.toList()
       } catch (error: CancellationException) {
         throw error
       } catch (error: Throwable) {
@@ -278,7 +279,6 @@ class AndroidStatisticEvidenceRepository(
         reportProgress(fileIndex, 0, 1, 0, 1)
         return@sourceLoop
       }
-      val entryNames = container.dexEntryNames.toList()
       if (entryNames.isEmpty()) {
         reportProgress(fileIndex, 0, 1, 0, 1)
         return@sourceLoop
@@ -290,41 +290,48 @@ class AndroidStatisticEvidenceRepository(
           return results
         }
         checkCancellation()
-        val dexFile = container.getEntry(entryName)?.dexFile
-        if (dexFile == null) {
-          reportProgress(fileIndex, entryIndex, entryNames.size, 0, 1)
-          return@entryLoop
-        }
-        val stringSection = dexFile.stringSection
-        val eligibleQueries = unmatchedGroups.associateWith { group ->
-          group.queries.filter { query ->
-            checkCancellation()
-            query.stringConstants.isEmpty() ||
-              query.stringConstants.any { constant -> stringSection.binarySearch(constant) >= 0 }
+        try {
+          val dexFile = container.getEntry(entryName)?.dexFile
+          if (dexFile == null) {
+            reportProgress(fileIndex, entryIndex, entryNames.size, 0, 1)
+            return@entryLoop
           }
-        }.filterValues { it.isNotEmpty() }
-        if (eligibleQueries.isEmpty()) {
-          reportProgress(fileIndex, entryIndex, entryNames.size, 0, 1)
-          return@entryLoop
-        }
-        val matchedGroups = mutableSetOf<StatisticArtifactQuery.DexClasses>()
-        val classCount = dexFile.classes.size.coerceAtLeast(1)
-        for ((classIndex, classDef) in dexFile.classes.withIndex()) {
-          if (classIndex % DEX_PROGRESS_CLASS_INTERVAL == 0) checkCancellation()
-          eligibleQueries.forEach { (group, queries) ->
-            if (group !in matchedGroups && queries.any { query -> classDef.matches(query, checkCancellation) }) {
-              matchedGroups += group
+          val stringSection = dexFile.stringSection
+          val eligibleQueries = unmatchedGroups.associateWith { group ->
+            group.queries.filter { query ->
+              checkCancellation()
+              query.stringConstants.isEmpty() ||
+                query.stringConstants.any { constant -> stringSection.binarySearch(constant) >= 0 }
             }
+          }.filterValues { it.isNotEmpty() }
+          if (eligibleQueries.isEmpty()) {
+            reportProgress(fileIndex, entryIndex, entryNames.size, 0, 1)
+            return@entryLoop
           }
-          if (classIndex % DEX_PROGRESS_CLASS_INTERVAL == 0 || classIndex == classCount - 1) {
-            reportProgress(fileIndex, entryIndex, entryNames.size, classIndex, classCount)
+          val matchedGroups = mutableSetOf<StatisticArtifactQuery.DexClasses>()
+          val classCount = dexFile.classes.size.coerceAtLeast(1)
+          for ((classIndex, classDef) in dexFile.classes.withIndex()) {
+            if (classIndex % DEX_PROGRESS_CLASS_INTERVAL == 0) checkCancellation()
+            eligibleQueries.forEach { (group, queries) ->
+              if (group !in matchedGroups && queries.any { query -> classDef.matches(query, checkCancellation) }) {
+                matchedGroups += group
+              }
+            }
+            if (classIndex % DEX_PROGRESS_CLASS_INTERVAL == 0 || classIndex == classCount - 1) {
+              reportProgress(fileIndex, entryIndex, entryNames.size, classIndex, classCount)
+            }
+            if (matchedGroups.size == eligibleQueries.size) break
           }
-          if (matchedGroups.size == eligibleQueries.size) break
-        }
-        reportProgress(fileIndex, entryIndex, entryNames.size, classCount - 1, classCount)
-        matchedGroups.forEach { group ->
-          results[group] = true
-          unmatchedGroups -= group
+          reportProgress(fileIndex, entryIndex, entryNames.size, classCount - 1, classCount)
+          matchedGroups.forEach { group ->
+            results[group] = true
+            unmatchedGroups -= group
+          }
+        } catch (error: CancellationException) {
+          throw error
+        } catch (error: Throwable) {
+          Timber.w(error, "Unable to scan statistic DEX entry %s from %s", entryName, sourceFile)
+          reportProgress(fileIndex, entryIndex, entryNames.size, 0, 1)
         }
       }
     }

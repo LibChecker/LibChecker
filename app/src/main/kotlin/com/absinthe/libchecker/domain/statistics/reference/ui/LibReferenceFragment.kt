@@ -149,7 +149,7 @@ class LibReferenceFragment :
     IntArray(4) { MULTIPLE_APPS_ICON_PROVIDER }
   private val prewarmNextViewHolder = object : Runnable {
     override fun run() {
-      if (prewarmIndex >= prewarmViewTypes.size || binding.vfContainer.displayedChild != VF_LOADING) {
+      if (!isBindingInitialized() || prewarmIndex >= prewarmViewTypes.size || binding.vfContainer.displayedChild != VF_LOADING) {
         return
       }
       val viewType = prewarmViewTypes[prewarmIndex++]
@@ -286,8 +286,11 @@ class LibReferenceFragment :
               val searchResult = libReferenceViewModel.onReferenceListChanged(references)
               updateListRenderState { it.copy(highlightText = searchResult.query) }
               beginFirstListLayoutTrace()
+              val submittedViewLifecycle = viewLifecycleOwner.lifecycle
               refAdapter.setDiffNewData(searchResult.references) {
-                if (isDetached || libReferenceViewModel.libReference.value !== references) {
+                if (submittedViewLifecycle.currentState == Lifecycle.State.DESTROYED ||
+                  libReferenceViewModel.libReference.value !== references
+                ) {
                   return@setDiffNewData
                 }
                 displayedReferences = searchResult.references

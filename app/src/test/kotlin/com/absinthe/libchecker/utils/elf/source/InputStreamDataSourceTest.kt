@@ -83,6 +83,31 @@ class InputStreamDataSourceTest {
     assertTrue(closed)
   }
 
+  @Test
+  fun spillsLargeStreamPastInMemoryLimitAndSupportsBackwardReads() {
+    val distantOffset = InputStreamDataSource.MAX_IN_MEMORY_BYTES + 12_345
+    val totalSize = distantOffset + 16
+    val data = ByteArray(totalSize)
+    data[16] = 0x11
+    data[17] = 0x22
+    data[18] = 0x33
+    data[19] = 0x44
+    data[distantOffset] = 0x08
+    data[distantOffset + 1] = 0x07
+    data[distantOffset + 2] = 0x06
+    data[distantOffset + 3] = 0x05
+    data[distantOffset + 4] = 0x04
+    data[distantOffset + 5] = 0x03
+    data[distantOffset + 6] = 0x02
+    data[distantOffset + 7] = 0x01
+
+    InputStreamDataSource(ByteArrayInputStream(data)).use { source ->
+      assertEquals(0x0102030405060708L, source.readLong(distantOffset.toLong()))
+      assertEquals(0, source.bufferedInMemoryBytes())
+      assertEquals(0x44332211, source.readInt(16))
+    }
+  }
+
   private class CountingInputStream(
     input: ByteArrayInputStream
   ) : FilterInputStream(input) {

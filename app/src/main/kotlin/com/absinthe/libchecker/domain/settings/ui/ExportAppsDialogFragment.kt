@@ -9,6 +9,7 @@ import com.absinthe.libchecker.domain.settings.model.ExportAppsDialogState
 import com.absinthe.libchecker.domain.settings.presentation.SettingsViewModel
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.utils.extensions.launchDocument
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -51,7 +52,10 @@ class ExportAppsDialogFragment : BaseBottomSheetViewDialogFragment<ExportAppsDia
           ExportAppsDialogState.Ready -> {
             render(ExportAppsDialogState.Preparing)
             isCancelable = false
-            createDocumentLauncher.launch(viewModel.buildInstalledAppsExportFileName())
+            if (!createDocumentLauncher.launchDocument(requireContext(), viewModel.buildInstalledAppsExportFileName())) {
+              render(ExportAppsDialogState.Ready)
+              isCancelable = true
+            }
           }
 
           ExportAppsDialogState.Done -> dismissAllowingStateLoss()

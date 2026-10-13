@@ -31,6 +31,7 @@ import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotItemStateIndic
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.domain.snapshot.ui.view.SnapshotPackageSizeLineBreaker
 import com.absinthe.libchecker.utils.extensions.applyCondensedSingleLine
+import com.absinthe.libchecker.utils.extensions.applyCondensedTypeface
 import com.absinthe.libchecker.utils.extensions.applySingleLineEndEllipsize
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -160,7 +161,8 @@ class SnapshotItemView(
       )
       setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceLabelSmall))
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
-      applyCondensedSingleLine()
+      applyCondensedTypeface()
+      letterSpacing = 0f
       addView(this)
     }
 

@@ -52,6 +52,7 @@ import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
+import com.absinthe.libchecker.utils.extensions.launchDocument
 import com.absinthe.libchecker.utils.extensions.requireAvailableCacheDir
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -253,7 +254,8 @@ class ComparisonActivity :
             setLeftMode(side == SnapshotComparisonSide.LEFT)
             setOnAddApkClickListener { isLeft ->
               archiveChoosingSide = SnapshotComparisonSide.fromIsLeft(isLeft)
-              chooseApkResultLauncher.launch(
+              chooseApkResultLauncher.launchDocument(
+                this@ComparisonActivity,
                 arrayOf("application/vnd.android.package-archive", "application/octet-stream")
               )
             }
