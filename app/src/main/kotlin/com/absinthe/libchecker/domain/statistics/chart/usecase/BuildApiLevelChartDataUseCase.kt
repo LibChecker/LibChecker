@@ -20,13 +20,16 @@ class BuildApiLevelChartDataUseCase(
     }
     val result = TreeMap<Int, MutableList<LCItem>>()
     val coroutineContext = currentCoroutineContext()
+    val applicationMap = runCatching { installedAppRepository.getApplicationMap() }.getOrDefault(emptyMap())
 
     for (item in targets) {
       if (!coroutineContext.isActive) {
         break
       }
       val apiLevel = runCatching {
-        val packageInfo = installedAppRepository.getPackageInfo(item.packageName) ?: return@runCatching null
+        val packageInfo = applicationMap[item.packageName]
+          ?: installedAppRepository.getPackageInfo(item.packageName)
+          ?: return@runCatching null
         when (request.kind) {
           Kind.TargetSdk -> packageInfo.applicationInfo?.targetSdkVersion
           Kind.MinSdk -> packageInfo.applicationInfo?.minSdkVersion

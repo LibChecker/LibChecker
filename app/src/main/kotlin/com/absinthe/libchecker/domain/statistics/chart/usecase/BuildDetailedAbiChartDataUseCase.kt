@@ -26,6 +26,7 @@ class BuildDetailedAbiChartDataUseCase(
     }
     val result = TreeMap<Int, MutableList<LCItem>>()
     val coroutineContext = currentCoroutineContext()
+    val applicationMap = runCatching { installedAppRepository.getApplicationMap() }.getOrDefault(emptyMap())
     val itemCount = targets.size
     var progress = 0
 
@@ -35,7 +36,9 @@ class BuildDetailedAbiChartDataUseCase(
       }
 
       runCatching {
-        val packageInfo = installedAppRepository.getPackageInfo(item.packageName) ?: return@runCatching
+        val packageInfo = applicationMap[item.packageName]
+          ?: installedAppRepository.getPackageInfo(item.packageName)
+          ?: return@runCatching
         val source = packageInfo.applicationInfo?.sourceDir ?: return@runCatching
         PackageUtils.getAbiSet(
           file = File(source),

@@ -295,13 +295,12 @@ class AndroidStatisticEvidenceRepository(
           reportProgress(fileIndex, entryIndex, entryNames.size, 0, 1)
           return@entryLoop
         }
+        val stringSection = dexFile.stringSection
         val eligibleQueries = unmatchedGroups.associateWith { group ->
           group.queries.filter { query ->
+            checkCancellation()
             query.stringConstants.isEmpty() ||
-              dexFile.stringSection.withIndex().any { (index, value) ->
-                if (index % DEX_PROGRESS_CLASS_INTERVAL == 0) checkCancellation()
-                value in query.stringConstants
-              }
+              query.stringConstants.any { constant -> stringSection.binarySearch(constant) >= 0 }
           }
         }.filterValues { it.isNotEmpty() }
         if (eligibleQueries.isEmpty()) {
@@ -370,7 +369,7 @@ class AndroidStatisticEvidenceRepository(
   private fun MethodReference.matches(expected: StatisticDexMethodReference): Boolean {
     return definingClass == expected.definingClass &&
       name == expected.name &&
-      (expected.parameterTypes == null || parameterTypes.map(CharSequence::toString) == expected.parameterTypes)
+      matchesParameterTypes(parameterTypes, expected.parameterTypes)
   }
 
   private fun readManifestReceiverActions(sourcePaths: List<String>, checkCancellation: () -> Unit): Set<String> {
@@ -491,4 +490,16 @@ internal fun resolveManifestBooleanValue(
 
     else -> null
   }
+}
+
+internal fun matchesParameterTypes(
+  actual: List<CharSequence>,
+  expected: List<String>?
+): Boolean {
+  if (expected == null) return true
+  if (actual.size != expected.size) return false
+  for (index in actual.indices) {
+    if (actual[index].toString() != expected[index]) return false
+  }
+  return true
 }

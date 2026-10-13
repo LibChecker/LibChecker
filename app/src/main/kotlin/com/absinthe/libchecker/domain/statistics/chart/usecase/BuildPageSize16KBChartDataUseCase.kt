@@ -39,6 +39,7 @@ class BuildPageSize16KBChartDataUseCase(
     val notSupport16KB = mutableListOf<LCItem>()
     val noNativeLibs = mutableListOf<LCItem>()
     val coroutineContext = currentCoroutineContext()
+    val applicationMap = runCatching { installedAppRepository.getApplicationMap() }.getOrDefault(emptyMap())
     val itemCount = targets.size
     var progress = 0
 
@@ -53,7 +54,7 @@ class BuildPageSize16KBChartDataUseCase(
         }
 
         val packageInfo = traceSection(TRACE_GET_PACKAGE_INFO) {
-          installedAppRepository.getPackageInfo(item.packageName)
+          applicationMap[item.packageName] ?: installedAppRepository.getPackageInfo(item.packageName)
         } ?: return@runCatching
         if (is16KBAligned(packageInfo, abi, coroutineContext::ensureActive)) {
           support16KB.add(item)
