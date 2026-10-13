@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.AsyncDifferConfig
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.chad.library.adapter4.BaseQuickAdapter as BaseQuickAdapter4
 import java.util.concurrent.atomic.AtomicLong
@@ -82,7 +83,17 @@ abstract class BaseQuickAdapter<T : Any, VH : RecyclerView.ViewHolder>(
         if (generation == submitGeneration) submitList(list, commitCallback)
       }
     } else {
-      super.submitList(list, commitCallback)
+      val shouldRestoreStateView =
+        items.isEmpty() && !list.isNullOrEmpty() && isStateViewEnable && stateView != null
+      if (shouldRestoreStateView) {
+        isStateViewEnable = false
+      }
+      super.submitList(list) {
+        if (shouldRestoreStateView) {
+          isStateViewEnable = true
+        }
+        commitCallback?.run()
+      }
     }
   }
 
@@ -255,10 +266,34 @@ abstract class BaseQuickAdapter<T : Any, VH : RecyclerView.ViewHolder>(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
       (view.parent as? ViewGroup)?.removeView(view)
+      if ((parent as? RecyclerView)?.layoutManager is StaggeredGridLayoutManager) {
+        val current = view.layoutParams
+        view.layoutParams = when (current) {
+          is StaggeredGridLayoutManager.LayoutParams -> current
+
+          is ViewGroup.MarginLayoutParams -> StaggeredGridLayoutManager.LayoutParams(current)
+
+          null -> StaggeredGridLayoutManager.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+          )
+
+          else -> StaggeredGridLayoutManager.LayoutParams(current)
+        }.apply {
+          isFullSpan = true
+        }
+      }
       return BaseViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: BaseViewHolder, position: Int) = Unit
+    override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
+      (holder.itemView.layoutParams as? StaggeredGridLayoutManager.LayoutParams)?.isFullSpan = true
+    }
+
+    override fun onViewAttachedToWindow(holder: BaseViewHolder) {
+      super.onViewAttachedToWindow(holder)
+      (holder.itemView.layoutParams as? StaggeredGridLayoutManager.LayoutParams)?.isFullSpan = true
+    }
 
     override fun getItemCount(): Int = 1
 

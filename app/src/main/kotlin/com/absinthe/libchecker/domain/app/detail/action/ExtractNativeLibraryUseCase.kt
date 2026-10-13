@@ -109,21 +109,26 @@ class ExtractNativeLibraryUseCase(
     } ?: error("Failed to open output stream")
   }
 
-  private fun writeElfToDownloads(
+  internal fun writeElfToDownloads(
     dir: String,
     elfFileName: String,
-    inputStream: InputStream
-  ) {
-    val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-    val parentDir = downloadsDir.resolve(dir)
-    if (!parentDir.exists() && !parentDir.mkdirs()) {
-      error("Failed to create ${parentDir.absolutePath}")
-    }
+    inputStream: InputStream,
+    downloadsDir: File = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+  ): File {
+    val parentDir = downloadsDir.resolve(dir).takeIf { it.exists() || it.mkdirs() }
+      ?: (context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) ?: File(context.filesDir, Environment.DIRECTORY_DOWNLOADS))
+        .resolve(dir)
+        .apply {
+          if (!exists() && !mkdirs()) {
+            error("Failed to create $absolutePath")
+          }
+        }
 
     val targetFile = parentDir.resolve(elfFileName)
     targetFile.createNewFile()
     targetFile.outputStream().use { outputStream ->
       inputStream.copyTo(outputStream)
     }
+    return targetFile
   }
 }

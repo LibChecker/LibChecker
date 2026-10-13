@@ -624,7 +624,7 @@ class SnapshotFragment :
 
     adapter.bind(updatePlan.renderState)
     adapter.setDiffNewData(updatePlan.items.toMutableList()) {
-      if (isDetached) {
+      if (isDetached || !isBindingInitialized()) {
         return@setDiffNewData
       }
       isListReady = true

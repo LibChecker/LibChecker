@@ -19,6 +19,7 @@ import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.showToast
 import com.jakewharton.processphoenix.ProcessPhoenix
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
@@ -46,12 +47,15 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
             try {
               root.bind(it.toCloudRulesDialogState(), ::handleAction)
             } catch (e: Exception) {
-              Timber.e(e)
+              Timber.w(e)
               context?.showToast(R.string.toast_cloud_rules_update_error)
             }
           }
+        } catch (e: CancellationException) {
+          throw e
         } catch (t: Throwable) {
-          Timber.e(t)
+          Timber.w(t)
+          context?.showToast(R.string.toast_cloud_rules_update_error)
         }
       }
     }
