@@ -170,11 +170,35 @@ fun PackageInfo.isSplitsApk(): Boolean {
   return !applicationInfo?.splitSourceDirs.isNullOrEmpty()
 }
 
-private fun hasKotlinArchiveEvidence(zipFile: IZipFile, checkCancelled: () -> Unit): Boolean = zipFile.getEntry("kotlin-tooling-metadata.json") != null ||
-  zipFile.getEntry("kotlin/kotlin.kotlin_builtins") != null ||
-  zipFile.getEntry("META-INF/services/kotlinx.coroutines.CoroutineExceptionHandler") != null ||
-  zipFile.getEntry("META-INF/services/kotlinx.coroutines.internal.MainDispatcherFactory") != null ||
-  KotlinBuildMetadataDetector.hasKotlinModuleMetadata(zipFile, checkCancelled)
+private data class ArchiveFeatureEvidence(
+  val hasKotlinEvidence: Boolean,
+  val hasComposeEvidence: Boolean
+)
+
+private fun scanArchiveFeatureEvidence(zipFile: IZipFile, checkCancelled: () -> Unit): ArchiveFeatureEvidence {
+  var hasKotlinEvidence = zipFile.getEntry("kotlin-tooling-metadata.json") != null ||
+    zipFile.getEntry("kotlin/kotlin.kotlin_builtins") != null ||
+    zipFile.getEntry("META-INF/services/kotlinx.coroutines.CoroutineExceptionHandler") != null ||
+    zipFile.getEntry("META-INF/services/kotlinx.coroutines.internal.MainDispatcherFactory") != null
+  var hasComposeEvidence = false
+
+  for (entry in zipFile.getZipEntries()) {
+    checkCancelled()
+    if (entry.isDirectory) continue
+    val entryName = entry.name
+    if (!hasKotlinEvidence && entryName.startsWith("META-INF/") && entryName.endsWith(".kotlin_module")) {
+      hasKotlinEvidence = true
+    }
+    if (!hasComposeEvidence && entryName.endsWith(".version")) {
+      val fileName = entryName.substringAfterLast(File.separator)
+      if (fileName.startsWith("androidx.compose.ui") || fileName.startsWith("androidx.compose.material")) {
+        hasComposeEvidence = true
+      }
+    }
+    if (hasKotlinEvidence && hasComposeEvidence) break
+  }
+  return ArchiveFeatureEvidence(hasKotlinEvidence, hasComposeEvidence)
+}
 
 private fun InputStream.cancellable(checkCancelled: () -> Unit): InputStream = object : FilterInputStream(this) {
   override fun read(): Int {
@@ -289,8 +313,9 @@ fun PackageInfo.getFeatures(zipFile: IZipFile, checkCancelled: () -> Unit = {}):
   checkCancelled()
   var features = getNonArchiveFeatures()
   if (applicationInfo?.sourceDir == null) return features
-  val kotlinEvidence = hasKotlinArchiveEvidence(zipFile, checkCancelled)
-  val composeEvidence = isUseJetpackCompose(zipFile, null, checkCancelled)
+  val archiveEvidence = scanArchiveFeatureEvidence(zipFile, checkCancelled)
+  val kotlinEvidence = archiveEvidence.hasKotlinEvidence
+  val composeEvidence = archiveEvidence.hasComposeEvidence
   val patterns = buildList {
     if (!composeEvidence) add(COMPOSE_CLASS_PATTERN)
     if (!kotlinEvidence) {
@@ -339,16 +364,6 @@ fun ApplicationInfo.isUse32BitAbi(): Boolean {
     )
     demands["use32bitAbi"] as? Boolean == true
   }.getOrElse { false }
-}
-
-private fun isUseJetpackCompose(zipFile: IZipFile, foundList: List<String>?, checkCancelled: () -> Unit): Boolean {
-  return zipFile.getZipEntries().asSequence().any { entry ->
-    checkCancelled()
-    val fileName = entry.name.substringAfterLast(File.separator)
-    !entry.isDirectory &&
-      (fileName.startsWith("androidx.compose.ui") || fileName.startsWith("androidx.compose.material")) &&
-      fileName.endsWith(".version")
-  } || foundList?.contains(COMPOSE_CLASS_PATTERN) == true
 }
 
 private val COMPOSE_CLASS_PATTERN = "androidx.compose.*".toClassDefType()
@@ -625,21 +640,31 @@ fun PackageInfo.is16KBAligned(libs: List<LibStringItem>? = null, isApk: Boolean 
  * Check if an app is using Kotlin Multiplatform
  * @return True if is using Kotlin Multiplatform
  */
-fun PackageInfo.isUseKMP(foundList: List<String>? = null): Boolean {
-  val providers = runCatching {
+private fun PackageInfo.hasKmpContextProvider(): Boolean {
+  if (packageName.isNullOrBlank()) return false
+  val resolvedProviders = providers ?: runCatching {
     PackageUtils.getPackageInfo(
       packageName,
       PackageManager.GET_PROVIDERS
     )
   }.getOrNull()?.providers
-  if (providers != null && providers.any { it.name == "org.jetbrains.compose.resources.AndroidContextProvider" }) {
+  return resolvedProviders?.any { it.name == "org.jetbrains.compose.resources.AndroidContextProvider" } == true
+}
+
+fun PackageInfo.isUseKMP(foundList: List<String>? = null, openedZip: IZipFile? = null): Boolean {
+  if (hasKmpContextProvider()) {
     return true
   }
-  val file = File(applicationInfo?.sourceDir ?: return false)
-  val realFoundList = foundList ?: PackageUtils.findDexClasses(
-    file,
-    JETBRAINS_COMPOSE_CLASS_PATTERNS
-  )
+  val realFoundList = when {
+    foundList != null -> foundList
+
+    openedZip != null -> PackageUtils.findDexClasses(openedZip, JETBRAINS_COMPOSE_CLASS_PATTERNS)
+
+    else -> {
+      val file = File(applicationInfo?.sourceDir ?: return false)
+      PackageUtils.findDexClasses(file, JETBRAINS_COMPOSE_CLASS_PATTERNS)
+    }
+  }
   return realFoundList.contains(JETBRAINS_COMPOSE_CLASS_PATTERN)
 }
 
@@ -652,12 +677,19 @@ fun PackageInfo.isArchivedPackage(): Boolean {
  * @return True if is 16 kb backcompat
  * https://source.android.com/docs/core/architecture/16kb-page-size/16kb-backcompat-option
  */
-fun PackageInfo.isPageSizeCompat(): Boolean {
+fun PackageInfo.isPageSizeCompat(openedZip: IZipFile? = null): Boolean {
   return runCatching {
-    val demands = ManifestReader.getManifestProperties(
-      File(applicationInfo!!.sourceDir),
-      arrayOf("pageSizeCompat")
-    )
+    val demands = if (openedZip != null) {
+      val entry = openedZip.getEntry("AndroidManifest.xml") ?: return@runCatching false
+      val bytes = openedZip.getInputStream(entry).use(ManifestReader::getBytesFromInputStream)
+        ?: return@runCatching false
+      ManifestReader.getManifestProperties(bytes, arrayOf("pageSizeCompat"))
+    } else {
+      ManifestReader.getManifestProperties(
+        File(applicationInfo!!.sourceDir),
+        arrayOf("pageSizeCompat")
+      )
+    }
     demands["pageSizeCompat"] as? String == "enabled"
   }.getOrElse { false }
 }

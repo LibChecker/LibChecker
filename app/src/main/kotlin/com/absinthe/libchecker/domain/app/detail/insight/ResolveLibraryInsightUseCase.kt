@@ -93,7 +93,7 @@ class ResolveLibraryInsightUseCase(
         .asSequence()
         .filter(LibraryInsightDefinitionValidator.LOOKUP_VALUE::matches)
         .take(lookup.maxRequests)
-        .toList()
+        .toSet()
       if (inputs.isEmpty()) return@forEach
 
       val path = lookup.indexPath ?: lookup.pathTemplate
@@ -104,7 +104,7 @@ class ResolveLibraryInsightUseCase(
 
   private suspend fun resolveLocalIndexLookup(
     lookup: LibraryInsightDefinition.Lookup,
-    inputs: List<String>,
+    inputs: Set<String>,
     values: MutableMap<String, LinkedHashSet<String>>,
     document: Map<String, Any?>
   ) = withContext(Dispatchers.Default) {

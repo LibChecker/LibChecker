@@ -2,6 +2,7 @@ package com.absinthe.libchecker.utils.extensions
 
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
+import android.content.pm.ProviderInfo
 import com.absinthe.libchecker.compat.IZipFile
 import com.absinthe.libchecker.database.entity.Features
 import java.io.ByteArrayInputStream
@@ -10,18 +11,42 @@ import java.util.Collections
 import java.util.concurrent.CancellationException
 import java.util.zip.ZipEntry
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class PackageFeaturesTest {
   @Test
-  fun metadataDeterminesBothFeaturesWithoutOpeningDex() {
+  fun metadataDeterminesBothFeaturesInSingleEntryEnumerationWithoutOpeningDex() {
     val zip = TrackingZip(listOf("META-INF/app.kotlin_module", "META-INF/androidx.compose.ui_ui.version", "classes.dex"))
     val features = packageInfo().getFeatures(zip)
     assertTrue(features and Features.KOTLIN_USED != 0)
     assertTrue(features and Features.JETPACK_COMPOSE != 0)
     assertEquals(0, zip.dexOpens)
+    assertEquals(1, zip.entryEnumerations)
+  }
+
+  @Test
+  fun isUseKmpChecksProviderAndReusesOpenedZipWithoutExtraDexOpens() {
+    val zip = TrackingZip(listOf("classes.dex"))
+    val piWithProvider = packageInfo().apply {
+      packageName = "com.example.kmp"
+      providers = arrayOf(
+        ProviderInfo().apply {
+          name = "org.jetbrains.compose.resources.AndroidContextProvider"
+        }
+      )
+    }
+    assertTrue(piWithProvider.isUseKMP(openedZip = zip))
+    assertEquals(0, zip.dexOpens)
+
+    val piWithoutProvider = packageInfo().apply {
+      packageName = "com.example.nonkmp"
+      providers = emptyArray()
+    }
+    assertFalse(piWithoutProvider.isUseKMP(openedZip = zip))
+    assertEquals(1, zip.dexOpens)
   }
 
   @Test
@@ -31,6 +56,7 @@ class PackageFeaturesTest {
     assertTrue(features and Features.KOTLIN_USED != 0)
     assertEquals(0, features and Features.JETPACK_COMPOSE)
     assertEquals(1, zip.dexOpens)
+    assertEquals(2, zip.entryEnumerations)
   }
 
   @Test
@@ -50,7 +76,8 @@ class PackageFeaturesTest {
   private class TrackingZip(names: List<String>) : IZipFile {
     private val entries = names.map(::ZipEntry)
     var dexOpens = 0
-    override fun getZipEntries() = Collections.enumeration(entries)
+    var entryEnumerations = 0
+    override fun getZipEntries() = Collections.enumeration(entries).also { entryEnumerations++ }
     override fun getEntry(name: String) = entries.find { it.name == name }
     override fun getInputStream(entry: ZipEntry): InputStream {
       if (entry.name.endsWith(".dex")) dexOpens++

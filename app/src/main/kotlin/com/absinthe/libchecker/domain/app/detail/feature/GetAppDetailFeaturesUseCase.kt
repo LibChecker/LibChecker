@@ -65,6 +65,10 @@ class GetAppDetailFeaturesUseCase(
     val featureContext = currentCoroutineContext()
     var feat = cachedFeatures
     var metadataEmitted = false
+    var pageSizeCompatChecked = false
+    var isPageSizeCompat = false
+    var kmpChecked = false
+    var isKmp = false
     val scannedMetadata = mutableListOf<VersionedFeature>()
     if (feat == -1) {
       val sourceDir = packageInfo.applicationInfo?.sourceDir
@@ -82,6 +86,12 @@ class GetAppDetailFeaturesUseCase(
                 emitFeature = { scannedMetadata.add(it) },
                 openedZip = zip
               )
+              if (OsUtils.atLeastBaklava()) {
+                isPageSizeCompat = packageInfo.isPageSizeCompat(zip)
+                pageSizeCompatChecked = true
+              }
+              isKmp = (scannedFeatures and Features.KOTLIN_USED) > 0 && packageInfo.isUseKMP(openedZip = zip)
+              kmpChecked = true
               metadataEmitted = true
             }
           }
@@ -106,15 +116,51 @@ class GetAppDetailFeaturesUseCase(
     if (metadataEmitted) {
       scannedMetadata.forEach { emitFeature(it) }
     } else {
-      emitFeatureApkMetadata(
-        packageInfo = packageInfo,
-        readKotlin = (feat and Features.KOTLIN_USED) > 0,
-        readAgp = (feat and Features.AGP) > 0,
-        readCompose = (feat and Features.JETPACK_COMPOSE) > 0,
-        readXposedMarker = !hasXposedMetadata,
-        isApk = isApk,
-        emitFeature = ::emitFeature
-      )
+      val sourceDir = packageInfo.applicationInfo?.sourceDir
+      if (sourceDir != null) {
+        try {
+          ZipFileCompat(File(sourceDir)).use { zip ->
+            emitFeatureApkMetadata(
+              packageInfo = packageInfo,
+              readKotlin = (feat and Features.KOTLIN_USED) > 0,
+              readAgp = (feat and Features.AGP) > 0,
+              readCompose = (feat and Features.JETPACK_COMPOSE) > 0,
+              readXposedMarker = !hasXposedMetadata,
+              isApk = isApk,
+              emitFeature = ::emitFeature,
+              openedZip = zip
+            )
+            if (OsUtils.atLeastBaklava()) {
+              isPageSizeCompat = packageInfo.isPageSizeCompat(zip)
+              pageSizeCompatChecked = true
+            }
+            isKmp = (feat and Features.KOTLIN_USED) > 0 && packageInfo.isUseKMP(openedZip = zip)
+            kmpChecked = true
+          }
+        } catch (e: CancellationException) {
+          throw e
+        } catch (_: Throwable) {
+          emitFeatureApkMetadata(
+            packageInfo = packageInfo,
+            readKotlin = (feat and Features.KOTLIN_USED) > 0,
+            readAgp = (feat and Features.AGP) > 0,
+            readCompose = (feat and Features.JETPACK_COMPOSE) > 0,
+            readXposedMarker = !hasXposedMetadata,
+            isApk = isApk,
+            emitFeature = ::emitFeature
+          )
+        }
+      } else {
+        emitFeatureApkMetadata(
+          packageInfo = packageInfo,
+          readKotlin = (feat and Features.KOTLIN_USED) > 0,
+          readAgp = (feat and Features.AGP) > 0,
+          readCompose = (feat and Features.JETPACK_COMPOSE) > 0,
+          readXposedMarker = !hasXposedMetadata,
+          isApk = isApk,
+          emitFeature = ::emitFeature
+        )
+      }
     }
     if (packageInfo.isPlayAppSigning()) {
       emitFeature(VersionedFeature(Features.PLAY_SIGNING))
@@ -129,11 +175,16 @@ class GetAppDetailFeaturesUseCase(
       emitFeature(VersionedFeature(Features.Ext.APPLICATION_ICONS))
     }
 
-    if (OsUtils.atLeastBaklava() && packageInfo.isPageSizeCompat()) {
+    if (OsUtils.atLeastBaklava() && (if (pageSizeCompatChecked) isPageSizeCompat else packageInfo.isPageSizeCompat())) {
       emitFeature(VersionedFeature(Features.Ext.ELF_PAGE_SIZE_16KB_COMPAT))
     }
 
-    if (packageInfo.isUseKMP()) {
+    val hasKmp = if (kmpChecked) {
+      isKmp
+    } else {
+      (feat and Features.KOTLIN_USED) > 0 && packageInfo.isUseKMP()
+    }
+    if (hasKmp) {
       emitFeature(VersionedFeature(Features.KMP))
     }
 
