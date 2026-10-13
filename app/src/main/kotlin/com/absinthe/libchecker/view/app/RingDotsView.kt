@@ -14,7 +14,7 @@ import android.view.animation.LinearInterpolator
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
-import androidx.core.graphics.drawable.toBitmap
+import androidx.core.graphics.createBitmap
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.dpToDimension
@@ -282,6 +282,9 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
       } catch (_: Exception) {
         delay(HIGHLIGHT_PROVIDER_RETRY_DELAY_MS)
         null
+      } catch (_: OutOfMemoryError) {
+        delay(HIGHLIGHT_PROVIDER_RETRY_DELAY_MS)
+        null
       }
       val accepted = bitmap?.takeUnless { it.isRecycled || it.byteCount > MAX_HIGHLIGHT_BITMAP_BYTES }
       if (accepted !== bitmap) {
@@ -355,21 +358,26 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
     highlightProgress = 0f
   }
 
-  private suspend fun loadAppHighlightBitmap(loadIcon: suspend () -> Drawable?): Bitmap? {
-    val defaultIcon = context.packageManager.defaultActivityIcon
-    var misses = 0
-    while (true) {
-      currentCoroutineContext().ensureActive()
-      val icon = loadIcon()
-      if (icon == null) {
-        delay(HIGHLIGHT_PROVIDER_RETRY_DELAY_MS)
-        continue
+  internal suspend fun loadAppHighlightBitmap(loadIcon: suspend () -> Drawable?): Bitmap? {
+    val defaultBitmap = context.packageManager.defaultActivityIcon.toHighlightBitmap()
+    try {
+      repeat(HIGHLIGHT_PROVIDER_MAX_MISSES) {
+        currentCoroutineContext().ensureActive()
+        val icon = loadIcon()
+        if (icon == null) {
+          delay(HIGHLIGHT_PROVIDER_RETRY_DELAY_MS)
+          return@repeat
+        }
+        val bitmap = icon.toHighlightBitmap()
+        if (!bitmap.sameAs(defaultBitmap)) {
+          return bitmap
+        }
+        recycleBitmap(bitmap)
       }
-      if (UiUtils.drawablesAreEqual(icon, defaultIcon)) {
-        misses = delayAfterMisses(misses)
-        continue
-      }
-      return icon.toHighlightBitmap()
+      delay(HIGHLIGHT_PROVIDER_RETRY_DELAY_MS)
+      return null
+    } finally {
+      recycleBitmap(defaultBitmap)
     }
   }
 
@@ -407,11 +415,14 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
     val width = intrinsicWidth.coerceAtLeast(1)
     val height = intrinsicHeight.coerceAtLeast(1)
     val scale = ringSpecs.last().dotRadiusPx * HIGHLIGHT_MAX_SCALE * 2f / max(width, height)
+    val targetWidth = (width * scale).roundToInt().coerceAtLeast(1)
+    val targetHeight = (height * scale).roundToInt().coerceAtLeast(1)
     // Own the bitmap so releasing a highlight cannot recycle a provider's cached icon.
-    return toBitmap(
-      (width * scale).roundToInt().coerceAtLeast(1),
-      (height * scale).roundToInt().coerceAtLeast(1)
-    ).copy(Bitmap.Config.ARGB_8888, false)
+    return createBitmap(targetWidth, targetHeight).also { bitmap ->
+      val canvas = Canvas(bitmap)
+      setBounds(0, 0, targetWidth, targetHeight)
+      draw(canvas)
+    }
   }
 
   private suspend fun delayAfterMisses(previousMisses: Int): Int {

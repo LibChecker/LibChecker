@@ -1,9 +1,12 @@
 package com.absinthe.libchecker.utils.extensions
 
 import android.app.Activity
+import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.activity.result.ActivityResultLauncher
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.FragmentActivity
@@ -23,6 +26,18 @@ import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_NAME
 import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_TYPE
 import com.absinthe.libchecker.domain.statistics.reference.ui.LibReferenceActivity
 import com.absinthe.libchecker.utils.Toasty
+import timber.log.Timber
+
+fun <I> ActivityResultLauncher<I>.launchDocument(context: Context, input: I): Boolean {
+  return try {
+    launch(input)
+    true
+  } catch (e: ActivityNotFoundException) {
+    Timber.w(e)
+    Toasty.showLong(context, R.string.toast_document_picker_unavailable)
+    false
+  }
+}
 
 fun FragmentActivity.launchDetailPage(item: LCItem, refName: String? = null, refType: Int = NATIVE, forceDetail: Boolean = false) {
   if (item.isArchived) {

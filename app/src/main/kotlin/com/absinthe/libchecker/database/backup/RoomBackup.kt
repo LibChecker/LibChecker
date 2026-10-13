@@ -8,6 +8,7 @@ import androidx.activity.result.contract.ActivityResultContracts.CreateDocument
 import androidx.lifecycle.lifecycleScope
 import androidx.room3.RoomDatabase
 import androidx.room3.useWriterConnection
+import com.absinthe.libchecker.utils.extensions.launchDocument
 import java.io.File
 import java.io.IOException
 import kotlinx.coroutines.Dispatchers
@@ -123,7 +124,13 @@ class RoomBackup(private val context: Context) {
           )
           return
         }
-        launcher.launch(resolveBackupFileName())
+        if (!launcher.launchDocument(context, resolveBackupFileName())) {
+          complete(
+            success = false,
+            message = "Document API not available",
+            exitCode = OnCompleteListener.EXIT_CODE_ERROR_BACKUP_FILE_CREATOR
+          )
+        }
       }
 
       BACKUP_FILE_LOCATION_CUSTOM_FILE -> {

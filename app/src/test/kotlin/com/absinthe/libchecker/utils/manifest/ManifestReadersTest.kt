@@ -60,6 +60,23 @@ class ManifestReadersTest {
   }
 
   @Test
+  fun oversizedHiddenPermissionsManifestReturnsNoPermissions() {
+    val writer = AxmlWriter()
+    val manifest = writer.child(null, "manifest")
+    manifest.child(null, "uses-permission").apply {
+      attribute("name", "sample.permission")
+      attribute("maxSdkVersion", 30)
+      end()
+    }
+    manifest.end()
+    writer.end()
+    val bytes = writer.toByteArray()
+    assertEquals(mapOf("sample.permission" to 30), HiddenPermissionsReader.getHiddenPermissions(archive(bytes)))
+    val apk = archive(bytes.copyOf(16 * 1024 * 1024 + 1))
+    assertTrue(HiddenPermissionsReader.getHiddenPermissions(apk).isEmpty())
+  }
+
+  @Test
   fun oversizedIntentFilterManifestFailsBeforeAxmlParsing() {
     val apk = archive(ByteArray(ManifestReader.MAX_MANIFEST_BYTES + 1))
     val parse = IntentFilterUtils::class.java.getDeclaredMethod("parseComponentsFromManifest", String::class.java)

@@ -11,7 +11,9 @@ class GetRandomAppIconUseCase(
 
   operator fun invoke(): Drawable? {
     return runCatching {
-      installedAppRepository.getRandomApplicationInfo()?.loadIcon(packageManager)
+      installedAppRepository.getRandomApplicationInfo()
+        ?.takeIf { it.icon != 0 }
+        ?.loadIcon(packageManager)
     }.getOrNull()
   }
 }

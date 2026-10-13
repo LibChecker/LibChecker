@@ -4,6 +4,9 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertThrows
+import org.junit.Assert.assertTrue
+import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
@@ -29,6 +32,25 @@ class ZipFileCompatTest {
 
       assertEquals("value-73", zip.getInputStream(entry).bufferedReader().use { it.readText() })
       assertNull(zip.getEntry("assets/missing.txt"))
+    }
+  }
+
+  @Test
+  fun `does not fall back to ApacheZipFileDelegate when archive is unreadable`() {
+    val archive = temporaryFolder.newFile("unreadable.apk").apply {
+      writeBytes("not-readable".toByteArray())
+    }
+    assumeTrue(archive.setReadable(false))
+    try {
+      val error = assertThrows(Exception::class.java) {
+        ZipFileCompat(archive).close()
+      }
+      assertTrue(
+        "Unreadable files must fail directly without ApacheZipFileDelegate fallback: $error (${error.suppressed.toList()})",
+        error.suppressed.isEmpty() && error.stackTrace.none { it.className.contains("ApacheZipFileDelegate") }
+      )
+    } finally {
+      archive.setReadable(true)
     }
   }
 }

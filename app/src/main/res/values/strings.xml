@@ -275,6 +275,7 @@
   <string name="toast_copied_to_clipboard">Copied to clipboard</string>
   <string name="snapshot_report_share_failed">Failed to share snapshot report</string>
   <string name="toast_use_another_file_manager">Please use another file manager to open the APK</string>
+  <string name="toast_document_picker_unavailable">No system file picker is available. Enable a document provider and try again.</string>
   <string name="toast_cant_open_app">Can\'t open this app</string>
   <string name="toast_cloud_rules_update_error">Failed to update cloud rules. Please try again</string>
   <string name="toast_not_enough_storage_space">Not enough storage space</string>

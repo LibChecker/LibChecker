@@ -27,6 +27,7 @@ import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
+import com.absinthe.libchecker.utils.extensions.launchDocument
 import com.absinthe.libchecker.utils.extensions.requireAvailableCacheDir
 import com.absinthe.libchecker.utils.showToast
 import kotlinx.coroutines.Dispatchers
@@ -168,7 +169,7 @@ class SnapshotBackupBottomSheetDialogFragment : BaseBottomSheetViewDialogFragmen
 
   private fun launchArchiveBackup(fileName: String) {
     runCatching {
-      backupResultLauncher.launch(fileName)
+      backupResultLauncher.launchDocument(requireContext(), fileName)
     }.onFailure {
       Timber.e(it)
       context?.showToast("Document API not working")
@@ -177,7 +178,7 @@ class SnapshotBackupBottomSheetDialogFragment : BaseBottomSheetViewDialogFragmen
 
   private fun launchRestorePicker() {
     runCatching {
-      restoreResultLauncher.launch("*/*")
+      restoreResultLauncher.launchDocument(requireContext(), "*/*")
     }.onFailure {
       Timber.e(it)
       context?.showToast("Document API not working")

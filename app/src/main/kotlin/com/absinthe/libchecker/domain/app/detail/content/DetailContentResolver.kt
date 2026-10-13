@@ -637,8 +637,10 @@ class DetailContentResolver(
           ?.getSignatures(context)
           ?: emptySequence()
       } else {
-        PackageManagerCompat.getPackageArchiveInfo(packageInfo.applicationInfo!!.sourceDir, flags)!!
-          .getSignatures(context)
+        packageInfo.applicationInfo?.sourceDir
+          ?.let { PackageManagerCompat.getPackageArchiveInfo(it, flags) }
+          ?.getSignatures(context)
+          ?: emptySequence()
       }.map { LibStringItemChip(it, null) }.toList()
     }.onFailure { Timber.e(it) }.getOrDefault(emptyList())
   }

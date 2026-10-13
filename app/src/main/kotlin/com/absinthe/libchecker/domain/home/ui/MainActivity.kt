@@ -822,10 +822,12 @@ class MainActivity :
             appViewModel.clearMenuState()
 
             val fragment = supportFragmentManager.findFragmentByTag("f$position") as? BaseFragment<*>
-            fragment?.onVisibilityChanged(true)
+            fragment?.takeIf { it.isBindingInitialized() }?.onVisibilityChanged(true)
             (0 until HomeDestination.pageCount).forEach { index ->
               if (index != position) {
-                (supportFragmentManager.findFragmentByTag("f$index") as? BaseFragment<*>)?.onVisibilityChanged(false)
+                (supportFragmentManager.findFragmentByTag("f$index") as? BaseFragment<*>)
+                  ?.takeIf { it.isBindingInitialized() }
+                  ?.onVisibilityChanged(false)
               }
             }
             floatingNavView?.setSelectedIndex(position, animate = true)

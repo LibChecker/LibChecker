@@ -42,7 +42,7 @@ class ZipFileCompat(file: File) : IZipFile {
       val javaZipFile = runCatching {
         JavaZipFile(file)
       }.getOrElse { javaZipFailure ->
-        if (isApacheZipFileSupported.not()) {
+        if (isApacheZipFileSupported.not() || file.exists().not() || file.canRead().not()) {
           throw javaZipFailure
         }
 

@@ -1001,7 +1001,7 @@ object PackageUtils {
       abiSet
     }.getOrElse {
       if (it is CancellationException) throw it
-      Timber.e(it)
+      Timber.w(it, "Failed to scan ABI set from ${file.absolutePath}")
       mutableSetOf(ERROR)
     }
   }

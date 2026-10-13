@@ -51,6 +51,7 @@ import com.absinthe.libchecker.ui.base.shouldHandleListSearchQueryChange
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
+import com.absinthe.libchecker.utils.extensions.launchDocument
 import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libchecker.utils.showToast
@@ -92,7 +93,7 @@ class AppListFragment :
 
   private val isFirstLaunch get() = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
   private val getRandomAppIcon: GetRandomAppIconUseCase by inject()
-  private val appAdapter = AppAdapter()
+  private val appAdapter = AppAdapter().apply { setHasStableIds(true) }
   private val particleItemAnimator = ParticleRemoveItemAnimator()
   private var appListRenderState = AppListRenderState()
   private var updateItemsJob: Job? = null
@@ -120,7 +121,6 @@ class AppListFragment :
         suppressImeOnNextSearchRestore = menu?.findItem(R.id.search)?.isActionViewExpanded == true
         activity?.launchDetailPage(it.getItem(position))
       }
-      it.setHasStableIds(true)
       it.stateView =
         EmptyListView(context).apply {
           layoutParams = FrameLayout.LayoutParams(
@@ -214,6 +214,11 @@ class AppListFragment :
     }
   }
 
+  override fun onDestroyView() {
+    binding.list.adapter = null
+    super.onDestroyView()
+  }
+
   override fun onPause() {
     super.onPause()
     advancedMenuBSDFragment?.dismiss()
@@ -269,7 +274,9 @@ class AppListFragment :
         is HomeViewModel.AppListSearchCommandAction.DumpAppsInfo -> {
           pendingDumpAppsInfoAction = action
           runCatching {
-            dumpAppsInfoResultLauncher.launch(action.fileName)
+            if (!dumpAppsInfoResultLauncher.launchDocument(requireContext(), action.fileName)) {
+              pendingDumpAppsInfoAction = null
+            }
           }.onFailure {
             pendingDumpAppsInfoAction = null
             Timber.e(it)
