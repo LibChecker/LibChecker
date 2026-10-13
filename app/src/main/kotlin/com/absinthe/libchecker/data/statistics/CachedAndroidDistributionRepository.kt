@@ -10,6 +10,7 @@ import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libchecker.utils.toJson
 import java.io.File
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -35,7 +36,8 @@ class CachedAndroidDistributionRepository(
         AndroidDistribution::class.java
       )
     }.onFailure {
-      Timber.e(it)
+      if (it is CancellationException) throw it
+      Timber.w(it)
     }.getOrNull()
   }
 

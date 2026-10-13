@@ -545,20 +545,35 @@ class AppListFragment :
             isListReady = true
             onSearchResultsApplied(updatePlan.content.renderState.highlightText, updatePlan.content.items.isEmpty())
             val initialItemViewStateCount = updatePlan.content.renderState.itemViewStates.size
-            if (initialItemViewStateCount > 0) {
-              notifyItemRangeChanged(0, initialItemViewStateCount.coerceAtMost(data.size))
+            val notifyRangeCount = if (currentItems.isEmpty()) {
+              0
+            } else {
+              initialItemViewStateCount.coerceAtMost(data.size)
+            }
+            val deferRangeRefresh = binding.list.hasPendingAdapterUpdates()
+            if (!deferRangeRefresh) {
+              if (notifyRangeCount > 0) {
+                notifyItemRangeChanged(0, notifyRangeCount)
+              }
+              if (highlightRefresh) {
+                notifyHighlightTextChanged()
+              }
             }
             binding.list.doOnNextLayout {
+              if (deferRangeRefresh) {
+                if (notifyRangeCount > 0) {
+                  notifyItemRangeChanged(0, notifyRangeCount)
+                }
+                if (highlightRefresh) {
+                  notifyHighlightTextChanged()
+                }
+              }
               updateRemainingItemViewStates(
                 items = updatePlan.content.items,
                 initialItemViewStateCount = initialItemViewStateCount,
                 packageStateSnapshot = updatePlan.content.packageStateSnapshot,
                 updateGeneration = generation
               )
-            }
-
-            if (highlightRefresh) {
-              notifyHighlightTextChanged()
             }
 
             setSpaceFooterView()

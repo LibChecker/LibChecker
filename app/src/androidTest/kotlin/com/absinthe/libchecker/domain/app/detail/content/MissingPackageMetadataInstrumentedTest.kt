@@ -7,13 +7,20 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.util.Log
 import android.view.ContextThemeWrapper
+import android.view.View
+import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants.ERROR
 import com.absinthe.libchecker.data.statistics.AndroidStatisticEvidenceRepository
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.app.detail.action.ExtractNativeLibraryUseCase
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
+import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotEmptyView
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDexClassQuery
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticStringOperator
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticStringPattern
@@ -21,12 +28,19 @@ import com.absinthe.libchecker.domain.statistics.chart.repository.StatisticArtif
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildDetailedAbiChartDataUseCase
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.view.app.RingDotsView
+import com.chad.library.adapter.base.BaseQuickAdapter
+import com.chad.library.adapter.base.viewholder.BaseViewHolder
+import java.io.ByteArrayInputStream
 import java.io.File
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -194,6 +208,83 @@ class MissingPackageMetadataInstrumentedTest {
     }
     assertNotNull(bitmap)
     checkNotNull(bitmap).recycle()
+  }
+
+  @Test
+  fun writeElfToDownloadsFallsBackWhenPublicDirectoryCannotBeCreated() {
+    val useCase = ExtractNativeLibraryUseCase(context, context.packageName)
+    val expected = byteArrayOf(0x7f, 0x45, 0x4c, 0x46)
+    val target = useCase.writeElfToDownloads(
+      dir = "test-elf-fallback",
+      elfFileName = "libsample.so",
+      inputStream = ByteArrayInputStream(expected),
+      downloadsDir = File("/proc/unwritable-downloads")
+    )
+    try {
+      assertTrue(target.isFile)
+      assertEquals(expected.toList(), target.readBytes().toList())
+    } finally {
+      target.delete()
+      target.parentFile?.delete()
+    }
+  }
+
+  @Test
+  fun staggeredGridHeaderUsesFullSpanAndStateViewDisablesBeforeRowInsertion() {
+    val instrumentation = InstrumentationRegistry.getInstrumentation()
+    val stateEnabledDuringInsert = AtomicBoolean(true)
+    val committed = CountDownLatch(1)
+    lateinit var adapter: BaseQuickAdapter<String, BaseViewHolder>
+    instrumentation.runOnMainSync {
+      val themed = ContextThemeWrapper(context, R.style.AppTheme)
+      val diff = object : DiffUtil.ItemCallback<String>() {
+        override fun areItemsTheSame(oldItem: String, newItem: String) = oldItem == newItem
+        override fun areContentsTheSame(oldItem: String, newItem: String) = oldItem == newItem
+      }
+      adapter = object : BaseQuickAdapter<String, BaseViewHolder>(0, diff) {
+        override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int) = createBaseViewHolder(View(parent.context))
+        override fun convert(holder: BaseViewHolder, item: String) = Unit
+      }
+      val header = View(themed).apply {
+        layoutParams = ViewGroup.MarginLayoutParams(
+          ViewGroup.LayoutParams.MATCH_PARENT,
+          40
+        )
+      }
+      adapter.setHeaderView(header)
+      adapter.stateView = SnapshotEmptyView(themed)
+      adapter.isStateViewEnable = true
+
+      val list = RecyclerView(themed).apply {
+        layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        this.adapter = adapter
+        measure(
+          View.MeasureSpec.makeMeasureSpec(400, View.MeasureSpec.EXACTLY),
+          View.MeasureSpec.makeMeasureSpec(600, View.MeasureSpec.EXACTLY)
+        )
+        layout(0, 0, 400, 600)
+      }
+      assertEquals(2, list.childCount)
+      val headerLp = header.layoutParams as? StaggeredGridLayoutManager.LayoutParams
+      assertNotNull("Header must use StaggeredGridLayoutManager.LayoutParams", headerLp)
+      assertTrue("Header must span all StaggeredGrid columns", checkNotNull(headerLp).isFullSpan)
+
+      adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+        override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+          if (itemCount > 0 && adapter.data.isNotEmpty()) {
+            stateEnabledDuringInsert.set(adapter.isStateViewEnable)
+          }
+        }
+      })
+      adapter.setDiffNewData(mutableListOf("a", "b")) {
+        committed.countDown()
+      }
+    }
+    assertTrue("Async diff must commit", committed.await(5, TimeUnit.SECONDS))
+    instrumentation.runOnMainSync {
+      assertFalse("Empty state view must be disabled before inserting rows", stateEnabledDuringInsert.get())
+      assertTrue(adapter.isStateViewEnable)
+    }
   }
 
   private fun errorTree(errors: MutableList<Throwable>) = object : Timber.Tree() {
