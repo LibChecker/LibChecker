@@ -421,9 +421,8 @@ class ChartFragment :
         return@launch
       }
 
+      viewModel.classifyDialogState = state
       dialog = ClassifyBottomSheetDialogFragment().also {
-        it.setState(state)
-
         it.setOnDismiss {
           this@ChartFragment.dialog = null
           (chartView as? Chart<*>)?.highlightValue(null)

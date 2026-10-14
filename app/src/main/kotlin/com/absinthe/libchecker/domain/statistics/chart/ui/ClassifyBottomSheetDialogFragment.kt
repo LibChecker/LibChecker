@@ -3,14 +3,15 @@ package com.absinthe.libchecker.domain.statistics.chart.ui
 import android.content.DialogInterface
 import com.absinthe.libchecker.domain.statistics.chart.model.ClassifyDialogAction
 import com.absinthe.libchecker.domain.statistics.chart.model.ClassifyDialogState
+import com.absinthe.libchecker.domain.statistics.chart.presentation.ChartViewModel
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<ClassifyDialogView>() {
 
   private var onDismissAction: (() -> Unit)? = null
-  private var dialogState: ClassifyDialogState? = null
-  private var isViewInitialized = false
+  private val viewModel: ChartViewModel by activityViewModel()
 
   override fun initRootView(): ClassifyDialogView = ClassifyDialogView(requireContext())
 
@@ -18,26 +19,16 @@ class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Clas
 
   override fun init() {
     maxPeekHeightPercentage = 0.67f
-    isViewInitialized = true
-    dialogState?.let(::render)
-  }
-
-  override fun onDestroyView() {
-    isViewInitialized = false
-    super.onDestroyView()
+    viewModel.classifyDialogState?.let(::render) ?: dismiss()
   }
 
   override fun onDismiss(dialog: DialogInterface) {
     super.onDismiss(dialog)
+    if (activity?.isChangingConfigurations != true) {
+      viewModel.classifyDialogState = null
+    }
     onDismissAction?.invoke()
     onDismissAction = null
-  }
-
-  fun setState(state: ClassifyDialogState) {
-    dialogState = state
-    if (isViewInitialized) {
-      render(state)
-    }
   }
 
   fun setOnDismiss(action: () -> Unit) {
