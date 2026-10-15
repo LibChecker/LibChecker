@@ -33,7 +33,6 @@ class ClassifyDialogView(context: Context) : BottomSheetScaffoldView(context) {
       it.topMargin = 4.dp
     }
     adapter = this@ClassifyDialogView.adapter
-    setHasFixedSize(true)
     FastScrollerBuilder(this).useMd2Style().build()
   }
 

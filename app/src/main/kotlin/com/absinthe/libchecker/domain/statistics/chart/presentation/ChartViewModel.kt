@@ -45,6 +45,8 @@ class ChartViewModel internal constructor(
   private val observeChartFeatureInitializationPlans: ObserveChartFeatureInitializationPlansUseCase,
   private val buildAndroidVersionLabelDisplayData: BuildAndroidVersionLabelDisplayDataUseCase
 ) : ViewModel() {
+  var classifyDialogState: ClassifyDialogState? = null
+
   private val chartUiStatePlanner = ChartUiStatePlanner()
   private var selectedStatisticId: String? = null
   private var featureInitializationPending = observeChartFeatureInitializationPlans.initialPending
