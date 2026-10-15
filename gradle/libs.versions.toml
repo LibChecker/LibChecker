@@ -9,7 +9,7 @@ appIconLoader = "1.5.0"
 coil = "2.7.0"
 firebase-bom = "34.19.0"
 hiddenApiRefine = "4.4.0"
-kotlin = "2.4.20"
+kotlin = "2.4.21"
 ktlint = "1.8.0"
 koin-bom = "4.2.2"
 protoc = "4.36.2"
@@ -29,7 +29,7 @@ kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref =
 ksp = { id = "com.google.devtools.ksp", version = "2.3.12" }
 androidX-room3 = { id = "androidx.room3", version.ref = "androidX-room3" }
 protobuf = { id = "com.google.protobuf", version = "0.10.0" }
-moshiX = "dev.zacsweers.moshix:0.37.0"
+moshiX = "dev.zacsweers.moshix:0.38.0"
 aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin.android", version.ref = "aboutlibraries" }
 
 [libraries]
