@@ -131,7 +131,7 @@
   <string name="apk_analytics_summary">Bir APK dosyasına dokunulduğunda doğrudan ayrıntı sayfasını aç</string>
   <string name="colorful_icon_summary">Tanımlanmış bazı kütüphaneleri kendi özgün renkli logolarıyla göster</string>
   <string name="amoled_theme_summary">Karanlık modda saf siyah arka planlar kullanarak pil tasarrufu sağla</string>
-  <string name="lib_ref_threshold_summary">Yalnızca buradaki eşik değerinden fazla uygulamada kullanılan kütüphaneler listelenir</string>
+  <string name="lib_ref_threshold_summary">Yalnızca buradaki eşik değeri kadar veya daha fazla uygulamada kullanılan kütüphaneler listelenir</string>
   <string name="reload_apps_summary">Uygulama listesinde eksik veya tutarsızlık hissederseniz kullanmanız önerilir</string>
   <string name="export_log_summary">Uygulamanın hata ve işlem kaydını dışa aktarır</string>
   <string name="export_apps_webui_tip">Dışa aktarılan uygulamalar WebUI üzerinden rahatça incelenebilir</string>
