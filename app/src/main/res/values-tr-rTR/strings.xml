@@ -147,7 +147,7 @@
   <string name="array_dark_mode_system">Sistem varsayılanı</string>
   <string name="array_snapshot_default">Bildir</string>
   <string name="array_snapshot_keep">Koru</string>
-  <string name="array_snapshot_discard">Yoksay</string>
+  <string name="array_snapshot_discard">Sil</string>
   <!--  Detail  -->
   <string name="detail">Ayrıntılar</string>
   <string name="detail_label">Uygulama ayrıntılarını gör</string>
