@@ -1,0 +1,96 @@
+package com.absinthe.libchecker.domain.app.detail.ui.view
+
+import android.graphics.Rect
+import android.view.View
+import androidx.appcompat.view.ContextThemeWrapper
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import com.absinthe.libchecker.R
+import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.domain.app.detail.ui.adapter.node.AbiLabelNode
+import com.google.android.flexbox.FlexboxLayout
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import org.junit.runner.RunWith
+
+@RunWith(AndroidJUnit4::class)
+class DetailsTitleAccessibilityInstrumentedTest {
+  @Test
+  fun badgesAreSeparateSpeakingNodesWithLocalBoundsInBothDirections() {
+    val instrumentation = InstrumentationRegistry.getInstrumentation()
+    instrumentation.runOnMainSync {
+      val context = ContextThemeWrapper(instrumentation.targetContext, R.style.AppTheme)
+      val abis = listOf(
+        Constants.ARMV8, Constants.ARMV7, Constants.ARMV5, Constants.X86_64,
+        Constants.X86, Constants.MIPS64, Constants.MIPS, Constants.RISCV64,
+        Constants.RISCV32, Constants.MULTI_ARCH
+      )
+      for (direction in listOf(View.LAYOUT_DIRECTION_LTR, View.LAYOUT_DIRECTION_RTL)) {
+        for (tinted in listOf(false, true)) {
+          var clicks = 0
+          val title = DetailsTitleView(context).apply {
+            layoutDirection = direction
+            appNameView.text = "Example"
+            packageNameView.text = "com.example"
+            versionInfoView.text = "1.0"
+            extraInfoView.text = "Size: 10 MB"
+            setAbiLabels(
+              abis.mapIndexed { index, abi ->
+                AbiLabelNode(
+                  abi = abi,
+                  active = index % 2 == 0,
+                  contentDescription = "ABI $abi",
+                  is64Bit = index % 2 == 0,
+                  action = if (abi == Constants.MULTI_ARCH) ({ clicks++ }) else null
+                )
+              },
+              tintAbiLabels = tinted
+            )
+          }
+          val badges = title.getChildAt(title.childCount - 1) as FlexboxLayout
+          // Exercise wrapping as well as the ordinary single-badge case below.
+          val width = (240 * context.resources.displayMetrics.density).toInt()
+          title.measure(View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY), 0)
+          title.layout(0, 0, title.measuredWidth, title.measuredHeight)
+          assertTrue(badges.top >= title.extraInfoView.bottom)
+          for (index in abis.indices) {
+            val badge = badges.getChildAt(index)
+            val node = AccessibilityNodeInfoCompat.wrap(badge.createAccessibilityNodeInfo())
+            assertEquals("ABI ${abis[index]}", node.contentDescription.toString())
+            // A description alone lets TalkBack absorb this into a focusable ancestor.
+            assertTrue(node.isScreenReaderFocusable)
+            assertEquals(View.IMPORTANT_FOR_ACCESSIBILITY_YES, badge.importantForAccessibility)
+            assertEquals(index % 2 == 0, badge.alpha == 1f)
+            val bounds = Rect()
+            node.getBoundsInParent(bounds)
+            assertEquals(Rect(badge.left, badge.top, badge.right, badge.bottom), bounds)
+            assertEquals((42 * context.resources.displayMetrics.density + 0.5f).toInt(), bounds.width())
+            assertEquals((28 * context.resources.displayMetrics.density + 0.5f).toInt(), bounds.height())
+            bounds.offset(badges.left, badges.top)
+            assertTrue(bounds.top >= title.extraInfoView.bottom)
+            assertFalse(bounds.contains(title.iconView.left, title.iconView.top))
+            assertEquals(abis[index] == Constants.MULTI_ARCH, node.isClickable)
+          }
+          badges.getChildAt(abis.lastIndex).performClick()
+          assertEquals(1, clicks)
+          for (visibility in listOf(View.INVISIBLE, View.GONE)) {
+            val hiddenBadge = badges.getChildAt(0)
+            hiddenBadge.visibility = visibility
+            val accessibleChildren = ArrayList<View>()
+            badges.addChildrenForAccessibility(accessibleChildren)
+            assertFalse(accessibleChildren.contains(hiddenBadge))
+            assertTrue(accessibleChildren.contains(badges.getChildAt(1)))
+          }
+          title.setAbiLabels(listOf(AbiLabelNode(Constants.ARMV8, true, "arm64-v8a", true)), tinted)
+          assertEquals(1, badges.childCount)
+          assertTrue(AccessibilityNodeInfoCompat.wrap(badges.getChildAt(0).createAccessibilityNodeInfo()).isScreenReaderFocusable)
+          title.setAbiLabels(emptyList(), tinted)
+          assertEquals(0, badges.childCount)
+        }
+      }
+    }
+  }
+}

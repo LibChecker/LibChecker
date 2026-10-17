@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.ViewCompat
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
@@ -120,6 +121,8 @@ class DetailsTitleView(
         v.setImageResource(res)
         v.contentDescription = it.contentDescription
         v.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
+        // Keep the description on the badge instead of a focusable scrolling ancestor.
+        ViewCompat.setScreenReaderFocusable(v, true)
         v.alpha = if (it.active) 1f else 0.5f
         it.action?.let { action ->
           v.setOnClickListener { action.invoke() }
