@@ -157,8 +157,7 @@ class SnapshotDetailSectionBuilder(
     }
 
     return orderedTypes.mapNotNull { type ->
-      val sectionItems = items
-        .filter { it.itemType == type }
+      val sectionItems = orderSnapshotDetailSectionItems(items, type)
         .map { item ->
           val status = buildStatusDisplayData(item.diffType)
           val rule = getRuleCached(item)
