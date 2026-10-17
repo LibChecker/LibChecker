@@ -1,7 +1,10 @@
 package com.absinthe.libchecker.domain.app.detail.ui.view
 
+import android.content.Intent
 import android.graphics.Rect
 import android.view.View
+import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -9,6 +12,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.domain.app.detail.ui.adapter.node.AbiLabelNode
+import com.absinthe.libchecker.domain.snapshot.track.ui.TrackActivity
 import com.google.android.flexbox.FlexboxLayout
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -19,10 +23,9 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class DetailsTitleAccessibilityInstrumentedTest {
   @Test
-  fun badgesAreSeparateSpeakingNodesWithLocalBoundsInBothDirections() {
-    val instrumentation = InstrumentationRegistry.getInstrumentation()
-    instrumentation.runOnMainSync {
-      val context = ContextThemeWrapper(instrumentation.targetContext, R.style.AppTheme)
+  fun badgesAreSeparateSpeakingNodesWithScreenBoundsInBothDirections() {
+    withAttachedContainer { parent ->
+      val context = ContextThemeWrapper(parent.context, R.style.AppTheme)
       val abis = listOf(
         Constants.ARMV8, Constants.ARMV7, Constants.ARMV5, Constants.X86_64,
         Constants.X86, Constants.MIPS64, Constants.MIPS, Constants.RISCV64,
@@ -50,7 +53,10 @@ class DetailsTitleAccessibilityInstrumentedTest {
               tintAbiLabels = tinted
             )
           }
+          parent.addView(title)
           val badges = title.getChildAt(title.childCount - 1) as FlexboxLayout
+          assertTrue(title.isAttachedToWindow)
+          assertTrue(badges.getChildAt(0).isAttachedToWindow)
           // Exercise wrapping as well as the ordinary single-badge case below.
           val width = (240 * context.resources.displayMetrics.density).toInt()
           title.measure(View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY), 0)
@@ -65,11 +71,15 @@ class DetailsTitleAccessibilityInstrumentedTest {
             assertEquals(View.IMPORTANT_FOR_ACCESSIBILITY_YES, badge.importantForAccessibility)
             assertEquals(index % 2 == 0, badge.alpha == 1f)
             val bounds = Rect()
-            node.getBoundsInParent(bounds)
-            assertEquals(Rect(badge.left, badge.top, badge.right, badge.bottom), bounds)
+            node.getBoundsInScreen(bounds)
+            val location = IntArray(2)
+            badge.getLocationOnScreen(location)
+            assertEquals(Rect(location[0], location[1], location[0] + badge.width, location[1] + badge.height), bounds)
             assertEquals((42 * context.resources.displayMetrics.density + 0.5f).toInt(), bounds.width())
             assertEquals((28 * context.resources.displayMetrics.density + 0.5f).toInt(), bounds.height())
-            bounds.offset(badges.left, badges.top)
+            val titleLocation = IntArray(2)
+            title.getLocationOnScreen(titleLocation)
+            bounds.offset(-titleLocation[0], -titleLocation[1])
             assertTrue(bounds.top >= title.extraInfoView.bottom)
             assertFalse(bounds.contains(title.iconView.left, title.iconView.top))
             assertEquals(abis[index] == Constants.MULTI_ARCH, node.isClickable)
@@ -89,8 +99,35 @@ class DetailsTitleAccessibilityInstrumentedTest {
           assertTrue(AccessibilityNodeInfoCompat.wrap(badges.getChildAt(0).createAccessibilityNodeInfo()).isScreenReaderFocusable)
           title.setAbiLabels(emptyList(), tinted)
           assertEquals(0, badges.childCount)
+          parent.removeView(title)
         }
       }
+    }
+  }
+
+  private fun withAttachedContainer(block: (FrameLayout) -> Unit) {
+    val instrumentation = InstrumentationRegistry.getInstrumentation()
+    val activity = instrumentation.startActivitySync(
+      Intent(instrumentation.targetContext, TrackActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    )
+    try {
+      lateinit var parent: FrameLayout
+      instrumentation.runOnMainSync {
+        parent = FrameLayout(activity)
+        activity.addContentView(
+          parent,
+          ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        )
+      }
+      instrumentation.waitForIdleSync()
+      instrumentation.runOnMainSync {
+        // View.includeForAccessibility() excludes every child without window attachment.
+        assertTrue(parent.isAttachedToWindow)
+        assertTrue(parent.width > 0 && parent.height > 0)
+        block(parent)
+      }
+    } finally {
+      instrumentation.runOnMainSync { activity.finish() }
     }
   }
 }
