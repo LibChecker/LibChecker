@@ -17,6 +17,7 @@ import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.core.content.edit
 import androidx.core.view.doOnLayout
 import androidx.recyclerview.widget.RecyclerView
@@ -32,6 +33,7 @@ import com.absinthe.libchecker.domain.home.ui.MainActivity
 import com.absinthe.libchecker.domain.home.ui.view.RecentVisitGroup
 import com.absinthe.libchecker.domain.home.ui.view.RecentVisitItem
 import com.absinthe.libchecker.domain.home.ui.view.RecentVisitsPopup
+import com.absinthe.libchecker.domain.snapshot.track.ui.TrackActivity
 import com.absinthe.libchecker.utils.OsUtils
 import com.google.android.material.navigation.NavigationBarView
 import kotlin.math.abs
@@ -107,6 +109,63 @@ class RecentVisitsInstrumentedTest {
   @Test
   fun popupKeepsNavigationSharpWithProgressiveBarBlur() {
     if (OsUtils.atLeastT()) checkPopup(blurDesign = true)
+  }
+
+  @Test
+  fun popupStopsHostFlingScrolling() {
+    val instrumentation = InstrumentationRegistry.getInstrumentation()
+    val activity = instrumentation.startActivitySync(
+      Intent(instrumentation.targetContext, TrackActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    )
+    try {
+      lateinit var host: FrameLayout
+      lateinit var list: RecyclerView
+      lateinit var popup: RecentVisitsPopup
+      instrumentation.runOnMainSync {
+        host = FrameLayout(activity)
+        list = RecyclerView(activity).apply {
+          layoutManager = androidx.recyclerview.widget.LinearLayoutManager(activity)
+          adapter = object : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = object : RecyclerView.ViewHolder(
+              View(activity).apply {
+                layoutParams = ViewGroup.LayoutParams(100, 100)
+              }
+            ) {}
+            override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {}
+            override fun getItemCount() = 100
+          }
+        }
+        host.addView(list, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 200))
+        activity.addContentView(
+          host,
+          ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        )
+      }
+      instrumentation.waitForIdleSync()
+      instrumentation.runOnMainSync {
+        list.isNestedScrollingEnabled = false
+        assertTrue("List fling should start", list.fling(0, 5000))
+        assertEquals(RecyclerView.SCROLL_STATE_SETTLING, list.scrollState)
+
+        val anchor = View(activity)
+        popup = RecentVisitsPopup(
+          host = host,
+          navigation = anchor,
+          anchor = anchor,
+          libraries = false,
+          onItemClick = {},
+          onPin = {},
+          onRemove = {}
+        )
+        popup.show(null)
+        assertEquals(RecyclerView.SCROLL_STATE_IDLE, list.scrollState)
+      }
+      instrumentation.runOnMainSync {
+        popup.dismissImmediately()
+      }
+    } finally {
+      instrumentation.runOnMainSync { activity.finish() }
+    }
   }
 
   @Test

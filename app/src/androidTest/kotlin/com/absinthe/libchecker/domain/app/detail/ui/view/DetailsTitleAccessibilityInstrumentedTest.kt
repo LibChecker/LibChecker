@@ -62,6 +62,11 @@ class DetailsTitleAccessibilityInstrumentedTest {
           title.measure(View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY), 0)
           title.layout(0, 0, title.measuredWidth, title.measuredHeight)
           assertTrue(badges.top >= title.extraInfoView.bottom)
+          if (direction == View.LAYOUT_DIRECTION_RTL) {
+            assertEquals(title.appNameView.right, badges.right)
+          } else {
+            assertEquals(title.appNameView.left, badges.left)
+          }
           for (index in abis.indices) {
             val badge = badges.getChildAt(index)
             val node = AccessibilityNodeInfoCompat.wrap(badge.createAccessibilityNodeInfo())
