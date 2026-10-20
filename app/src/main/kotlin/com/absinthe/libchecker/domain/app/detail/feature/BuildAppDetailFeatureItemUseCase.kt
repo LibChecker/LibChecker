@@ -55,10 +55,10 @@ class BuildAppDetailFeatureItemUseCase {
         action = AppDetailFeatureAction.JetpackCompose(feature.version)
       )
 
-      Features.KMP -> AppDetailFeatureItemData(
+      Features.COMPOSE_MULTIPLATFORM_RESOURCES -> AppDetailFeatureItemData(
         icon = resourceIcon(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetbrain_kmp),
-        titleRes = R.string.jetbrain_kmp,
-        action = AppDetailFeatureAction.Kmp(feature.version)
+        titleRes = R.string.compose_multiplatform_resources,
+        action = AppDetailFeatureAction.ComposeMultiplatformResources(feature.version)
       )
 
       Features.LIVE_UPDATE_NOTIFICATION -> AppDetailFeatureItemData(
@@ -167,7 +167,7 @@ sealed interface AppDetailFeatureAction {
   data object PlaySigning : Dialog
   data object Pwa : Dialog
   data class JetpackCompose(val version: String?) : Dialog
-  data class Kmp(val version: String?) : Dialog
+  data class ComposeMultiplatformResources(val version: String?) : Dialog
   data object LiveUpdateNotification : Dialog
   data object AppProp : AppDetailFeatureAction
   data object InstallSource : AppDetailFeatureAction

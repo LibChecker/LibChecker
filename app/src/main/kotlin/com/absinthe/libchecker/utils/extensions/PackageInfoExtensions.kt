@@ -56,6 +56,7 @@ import java.io.FilterInputStream
 import java.io.InputStream
 import java.text.DateFormat
 import java.util.Properties
+import java.util.concurrent.CancellationException
 import okio.buffer
 import okio.source
 import timber.log.Timber
@@ -367,8 +368,10 @@ fun ApplicationInfo.isUse32BitAbi(): Boolean {
 }
 
 private val COMPOSE_CLASS_PATTERN = "androidx.compose.*".toClassDefType()
-private val JETBRAINS_COMPOSE_CLASS_PATTERN = "org.jetbrains.compose.*".toClassDefType()
-private val JETBRAINS_COMPOSE_CLASS_PATTERNS = listOf(JETBRAINS_COMPOSE_CLASS_PATTERN)
+private const val COMPOSE_RESOURCES_ASSET_PREFIX = "assets/composeResources/"
+private const val COMPOSE_RESOURCES_PROVIDER = "org.jetbrains.compose.resources.AndroidContextProvider"
+private val COMPOSE_RESOURCES_CLASS_PATTERN = "org.jetbrains.compose.resources.*".toClassDefType()
+private val COMPOSE_RESOURCES_CLASS_PATTERNS = listOf(COMPOSE_RESOURCES_CLASS_PATTERN)
 private val KOTLIN_CLASS_PATTERN = "kotlin.*".toClassDefType()
 private val KOTLINX_CLASS_PATTERN = "kotlinx.*".toClassDefType()
 
@@ -636,36 +639,67 @@ fun PackageInfo.is16KBAligned(libs: List<LibStringItem>? = null, isApk: Boolean 
     }
 }
 
-/**
- * Check if an app is using Kotlin Multiplatform
- * @return True if is using Kotlin Multiplatform
- */
-private fun PackageInfo.hasKmpContextProvider(): Boolean {
-  if (packageName.isNullOrBlank()) return false
-  val resolvedProviders = providers ?: runCatching {
-    PackageUtils.getPackageInfo(
-      packageName,
-      PackageManager.GET_PROVIDERS
-    )
-  }.getOrNull()?.providers
-  return resolvedProviders?.any { it.name == "org.jetbrains.compose.resources.AndroidContextProvider" } == true
+fun PackageInfo.usesComposeMultiplatformResources(openedBaseZip: IZipFile? = null): Boolean {
+  val sourceDir = applicationInfo?.sourceDir ?: return false
+  val openedSplits = mutableListOf<IZipFile>()
+  return try {
+    val apkFiles = buildList {
+      add(File(sourceDir))
+      applicationInfo?.splitSourceDirs?.forEach { add(File(it)) }
+      PackageUtils.getSplitsSourceDir(this@usesComposeMultiplatformResources)?.forEach { add(File(it)) }
+    }.distinct()
+    if (apkFiles.any { !it.isFile || !it.canRead() }) return false
+
+    val apkZips = apkFiles.map { apkFile ->
+      if (apkFile.path == sourceDir && openedBaseZip != null) {
+        openedBaseZip
+      } else {
+        ZipFileCompat(apkFile).also(openedSplits::add)
+      }
+    }
+    hasMatchingComposeResourcesApkSet(apkZips) && hasComposeMultiplatformResources(apkZips)
+  } catch (e: Throwable) {
+    if (e is CancellationException) throw e
+    false
+  } finally {
+    openedSplits.forEach(IZipFile::close)
+  }
 }
 
-fun PackageInfo.isUseKMP(foundList: List<String>? = null, openedZip: IZipFile? = null): Boolean {
-  if (hasKmpContextProvider()) {
-    return true
+private fun PackageInfo.hasMatchingComposeResourcesApkSet(apkZips: List<IZipFile>): Boolean {
+  val manifests = apkZips.map { zip ->
+    val entry = zip.getEntry("AndroidManifest.xml") ?: return false
+    val bytes = zip.getInputStream(entry).use(ManifestReader::getBytesFromInputStream) ?: return false
+    ManifestReader.getApkIdentity(bytes)
   }
-  val realFoundList = when {
-    foundList != null -> foundList
+  val base = manifests.first()
+  if (packageName.isNullOrBlank() || base["package"] != packageName || base.containsKey("split")) return false
+  val splitNames = mutableSetOf<String>()
+  return manifests.all { manifest ->
+    manifest["package"] == packageName &&
+      listOf("versionCode", "versionCodeMajor").all { attribute ->
+        java.lang.Long.decode(manifest[attribute] ?: "0") ==
+          java.lang.Long.decode(base[attribute] ?: "0")
+      }
+  } && manifests.drop(1).all { manifest ->
+    val splitName = manifest["split"]
+    splitName.isNullOrBlank().not() && splitNames.add(splitName)
+  }
+}
 
-    openedZip != null -> PackageUtils.findDexClasses(openedZip, JETBRAINS_COMPOSE_CLASS_PATTERNS)
-
-    else -> {
-      val file = File(applicationInfo?.sourceDir ?: return false)
-      PackageUtils.findDexClasses(file, JETBRAINS_COMPOSE_CLASS_PATTERNS)
+internal fun PackageInfo.hasComposeMultiplatformResources(apkZips: List<IZipFile>): Boolean {
+  val hasResourcesPayload = apkZips.any { zip ->
+    zip.getZipEntries().asSequence().any { entry ->
+      !entry.isDirectory && entry.name.startsWith(COMPOSE_RESOURCES_ASSET_PREFIX)
     }
   }
-  return realFoundList.contains(JETBRAINS_COMPOSE_CLASS_PATTERN)
+  if (!hasResourcesPayload) return false
+
+  val hasResourcesProvider = providers?.any { it.name == COMPOSE_RESOURCES_PROVIDER } == true
+  return hasResourcesProvider || apkZips.any { zip ->
+    PackageUtils.findDexClasses(zip, COMPOSE_RESOURCES_CLASS_PATTERNS)
+      .contains(COMPOSE_RESOURCES_CLASS_PATTERN)
+  }
 }
 
 fun PackageInfo.isArchivedPackage(): Boolean {

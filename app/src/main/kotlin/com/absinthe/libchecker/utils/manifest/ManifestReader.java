@@ -45,6 +45,41 @@ public class ManifestReader {
     return new ManifestReader(apk, demands).properties;
   }
 
+  public static Map<String, String> getApkIdentity(byte[] bytes) throws IOException {
+    if (bytes == null || bytes.length > MAX_MANIFEST_BYTES) {
+      throw new IOException("Invalid manifest size");
+    }
+    Map<String, String> identity = new ArrayMap<>();
+    new AxmlReader(bytes).accept(new AxmlVisitor() {
+      private boolean visitedRoot;
+
+      @Override
+      public NodeVisitor child(String ns, String name) {
+        if (visitedRoot || ns != null || !"manifest".equals(name)) {
+          throw new IllegalArgumentException("Invalid manifest root");
+        }
+        visitedRoot = true;
+        return new NodeVisitor() {
+          @Override
+          public void attr(String ns, String name, int resourceId, String raw, Res_value value) {
+            boolean text = "package".equals(name) || "split".equals(name);
+            boolean version = "versionCode".equals(name) || "versionCodeMajor".equals(name);
+            if (!text && !version) return;
+            if (text ? ns != null : !"http://schemas.android.com/apk/res/android".equals(ns)) return;
+            if (text ? value.type != Res_value.TYPE_STRING
+                : value.type != Res_value.TYPE_INT_DEC && value.type != Res_value.TYPE_INT_HEX) {
+              throw new IllegalArgumentException("Invalid APK identity attribute");
+            }
+            if (identity.put(name, value.toString()) != null) {
+              throw new IllegalArgumentException("Duplicate APK identity attribute");
+            }
+          }
+        };
+      }
+    });
+    return identity;
+  }
+
   public static byte[] getBytesFromInputStream(InputStream inputStream) {
     try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
       if (IOUtils.copyLarge(inputStream, bos, 0, MAX_MANIFEST_BYTES) == MAX_MANIFEST_BYTES

@@ -25,6 +25,33 @@ class ManifestReadersTest {
   val temporaryFolder = TemporaryFolder()
 
   @Test
+  fun apkIdentityUsesOnlyRootAttributesInTheirExpectedNamespace() {
+    val android = "http://schemas.android.com/apk/res/android"
+    val writer = AxmlWriter()
+    writer.ns("android", android, 1)
+    val root = writer.child(null, "manifest")
+    root.attribute("package", "sample.app")
+    root.attribute("split", "config.resources")
+    root.attr(android, "versionCode", 0x0101021b, null, Res_value(Res_value.TYPE_INT_DEC, 7, null, null))
+    root.attribute("versionCode", 99)
+    root.child(null, "application").apply {
+      attribute("package", "other.app")
+      attribute("split", "other.split")
+      attr(android, "versionCode", 0x0101021b, null, Res_value(Res_value.TYPE_INT_DEC, 99, null, null))
+      end()
+    }
+    root.end()
+    writer.end()
+    assertEquals(
+      mapOf("package" to "sample.app", "split" to "config.resources", "versionCode" to "7"),
+      ManifestReader.getApkIdentity(writer.toByteArray())
+    )
+    assertThrows(Exception::class.java) {
+      ManifestReader.getApkIdentity(byteArrayOf(1, 2, 3))
+    }
+  }
+
+  @Test
   fun stopsReadingAnUnboundedManifest() {
     var bytesRead = 0
     val input = object : InputStream() {

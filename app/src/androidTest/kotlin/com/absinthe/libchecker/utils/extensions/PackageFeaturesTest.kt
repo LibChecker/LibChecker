@@ -28,25 +28,38 @@ class PackageFeaturesTest {
   }
 
   @Test
-  fun isUseKmpChecksProviderAndReusesOpenedZipWithoutExtraDexOpens() {
-    val zip = TrackingZip(listOf("classes.dex"))
+  fun composeResourcesRequiresPayloadAndOwnRuntimeEvidenceAcrossApks() {
+    val baseZip = TrackingZip(listOf("classes.dex"))
+    val resourceSplitZip = TrackingZip(listOf("assets/composeResources/example.generated.resources/files/config.json"))
     val piWithProvider = packageInfo().apply {
-      packageName = "com.example.kmp"
+      packageName = "com.example.resources"
       providers = arrayOf(
         ProviderInfo().apply {
           name = "org.jetbrains.compose.resources.AndroidContextProvider"
         }
       )
     }
-    assertTrue(piWithProvider.isUseKMP(openedZip = zip))
-    assertEquals(0, zip.dexOpens)
+    assertTrue(piWithProvider.hasComposeMultiplatformResources(listOf(baseZip, resourceSplitZip)))
+    assertEquals(0, baseZip.dexOpens)
+    assertEquals(0, resourceSplitZip.dexOpens)
+
+    assertFalse(piWithProvider.hasComposeMultiplatformResources(listOf(baseZip)))
+    assertFalse(
+      piWithProvider.hasComposeMultiplatformResources(
+        listOf(TrackingZip(listOf("assets/composeResources/", "assets/composeResources/example/")))
+      )
+    )
+    assertFalse(
+      piWithProvider.hasComposeMultiplatformResources(
+        listOf(TrackingZip(listOf("assets/composeresources/example/files/config.json")))
+      )
+    )
 
     val piWithoutProvider = packageInfo().apply {
-      packageName = "com.example.nonkmp"
-      providers = emptyArray()
+      packageName = "com.example.no-provider"
+      providers = null
     }
-    assertFalse(piWithoutProvider.isUseKMP(openedZip = zip))
-    assertEquals(1, zip.dexOpens)
+    assertFalse(piWithoutProvider.hasComposeMultiplatformResources(listOf(resourceSplitZip)))
   }
 
   @Test
