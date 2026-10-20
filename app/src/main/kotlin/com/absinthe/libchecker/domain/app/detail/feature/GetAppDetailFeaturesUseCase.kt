@@ -24,7 +24,7 @@ import com.absinthe.libchecker.utils.extensions.hasXposedModuleMetadata
 import com.absinthe.libchecker.utils.extensions.isPWA
 import com.absinthe.libchecker.utils.extensions.isPageSizeCompat
 import com.absinthe.libchecker.utils.extensions.isPlayAppSigning
-import com.absinthe.libchecker.utils.extensions.isUseKMP
+import com.absinthe.libchecker.utils.extensions.usesComposeMultiplatformResources
 import java.io.File
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.currentCoroutineContext
@@ -67,8 +67,8 @@ class GetAppDetailFeaturesUseCase(
     var metadataEmitted = false
     var pageSizeCompatChecked = false
     var isPageSizeCompat = false
-    var kmpChecked = false
-    var isKmp = false
+    var composeResourcesChecked = false
+    var usesComposeResources = false
     val scannedMetadata = mutableListOf<VersionedFeature>()
     if (feat == -1) {
       val sourceDir = packageInfo.applicationInfo?.sourceDir
@@ -90,8 +90,8 @@ class GetAppDetailFeaturesUseCase(
                 isPageSizeCompat = packageInfo.isPageSizeCompat(zip)
                 pageSizeCompatChecked = true
               }
-              isKmp = (scannedFeatures and Features.KOTLIN_USED) > 0 && packageInfo.isUseKMP(openedZip = zip)
-              kmpChecked = true
+              usesComposeResources = packageInfo.usesComposeMultiplatformResources(openedBaseZip = zip)
+              composeResourcesChecked = true
               metadataEmitted = true
             }
           }
@@ -134,8 +134,8 @@ class GetAppDetailFeaturesUseCase(
               isPageSizeCompat = packageInfo.isPageSizeCompat(zip)
               pageSizeCompatChecked = true
             }
-            isKmp = (feat and Features.KOTLIN_USED) > 0 && packageInfo.isUseKMP(openedZip = zip)
-            kmpChecked = true
+            usesComposeResources = packageInfo.usesComposeMultiplatformResources(openedBaseZip = zip)
+            composeResourcesChecked = true
           }
         } catch (e: CancellationException) {
           throw e
@@ -179,13 +179,13 @@ class GetAppDetailFeaturesUseCase(
       emitFeature(VersionedFeature(Features.Ext.ELF_PAGE_SIZE_16KB_COMPAT))
     }
 
-    val hasKmp = if (kmpChecked) {
-      isKmp
+    val hasComposeResources = if (composeResourcesChecked) {
+      usesComposeResources
     } else {
-      (feat and Features.KOTLIN_USED) > 0 && packageInfo.isUseKMP()
+      packageInfo.usesComposeMultiplatformResources()
     }
-    if (hasKmp) {
-      emitFeature(VersionedFeature(Features.KMP))
+    if (hasComposeResources) {
+      emitFeature(VersionedFeature(Features.COMPOSE_MULTIPLATFORM_RESOURCES))
     }
 
     return AppDetailFeatures(features, appIcons)

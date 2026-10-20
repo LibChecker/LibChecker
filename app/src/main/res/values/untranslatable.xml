@@ -14,7 +14,7 @@
   <string name="pwa" translatable="false">Progressive Web Apps</string>
   <string name="jetpack_compose" translatable="false">Jetpack Compose</string>
   <string name="jetpack_compose_short" translatable="false">Compose</string>
-  <string name="jetbrain_kmp" translatable="false">Compose Multiplatform</string>
+  <string name="compose_multiplatform_resources" translatable="false">Compose Multiplatform Resources</string>
 
   <string name="lib_reference_demo_example_suffix" translatable="false">(Example)</string>
 

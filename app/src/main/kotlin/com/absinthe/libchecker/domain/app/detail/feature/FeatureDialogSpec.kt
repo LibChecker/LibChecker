@@ -73,10 +73,10 @@ fun AppDetailFeatureAction.Dialog.toDialogSpec(): FeatureDialogSpec {
       sourceUrl = "https://developer.$ANDROID_DEV_HOST/compose"
     )
 
-    is AppDetailFeatureAction.Kmp -> versionDialogSpec(
+    is AppDetailFeatureAction.ComposeMultiplatformResources -> versionDialogSpec(
       iconRes = com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetbrain_kmp,
-      titleRes = R.string.jetbrain_kmp,
-      messageRes = R.string.jetbrain_compose_multiplatform_details,
+      titleRes = R.string.compose_multiplatform_resources,
+      messageRes = R.string.compose_multiplatform_resources_details,
       version = version,
       sourceUrl = "https://www.jetbrains.com/compose-multiplatform/"
     )
