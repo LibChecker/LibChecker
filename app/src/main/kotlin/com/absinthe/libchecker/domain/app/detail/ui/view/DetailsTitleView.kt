@@ -147,8 +147,6 @@ class DetailsTitleView(
       ViewGroup.LayoutParams.WRAP_CONTENT
     ).also {
       it.topMargin = 4.dp
-      it.marginStart = (-4).dp
-      it.bottomMargin = (-4).dp
     }
     overScrollMode = OVER_SCROLL_NEVER
     isHorizontalScrollBarEnabled = false
@@ -217,6 +215,6 @@ class DetailsTitleView(
     packageNameView.layout(appNameXOffset, appNameView.bottom)
     versionInfoView.layout(appNameXOffset, packageNameView.bottom)
     extraInfoView.layout(appNameXOffset, versionInfoView.bottom)
-    abiLabelsFlexLayout.layout(appNameXOffset + abiLabelsFlexLayout.marginStart, extraInfoView.bottom + abiLabelsFlexLayout.marginTop)
+    abiLabelsFlexLayout.layout(appNameXOffset, extraInfoView.bottom + abiLabelsFlexLayout.marginTop)
   }
 }

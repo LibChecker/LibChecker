@@ -38,6 +38,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.doOnLayout
+import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.ui.animator.ParticleRemoveItemAnimator
 import com.absinthe.libchecker.ui.base.FIXED_BLUR_RADII
@@ -160,6 +161,7 @@ class RecentVisitsPopup(
   }
 
   fun show(items: RecentVisitGroup?) {
+    stopScrolling(host)
     updateItems(items)
     showAtLocation(host, Gravity.NO_GRAVITY, 0, 0)
     overlay.doOnLayout {
@@ -185,6 +187,7 @@ class RecentVisitsPopup(
   }
 
   fun prepareDrag(item: RecentVisitItem, source: View, touch: PointF): String {
+    stopScrolling(host)
     draggedItem = item
     cancelDrag = source::cancelDragAndDrop
     val location = IntArray(2).also(source::getLocationOnScreen)
@@ -527,6 +530,18 @@ class RecentVisitsPopup(
   }
 
   private fun dp(value: Int) = context.dpToDimension(value.toFloat()).roundToInt()
+
+  private fun stopScrolling(view: View) {
+    if (view is RecyclerView) {
+      view.stopScroll()
+      view.stopNestedScroll()
+    }
+    if (view is ViewGroup) {
+      for (i in 0 until view.childCount) {
+        stopScrolling(view.getChildAt(i))
+      }
+    }
+  }
 
   private inner class BackdropView : FrameLayout(context) {
     private val contentClip = Path().apply { fillType = Path.FillType.EVEN_ODD }
