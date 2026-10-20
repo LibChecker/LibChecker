@@ -27,6 +27,7 @@ class ToolbarConnectionLoadingView @JvmOverloads constructor(
   private val travelY = context.dpToDimensionPixelSize(3)
   private val phaseInterpolator = FastOutSlowInInterpolator()
   private var progress = 0f
+  private var loadingRequested = false
   private var animator: ValueAnimator? = null
 
   init {
@@ -56,6 +57,13 @@ class ToolbarConnectionLoadingView @JvmOverloads constructor(
   }
 
   fun start() {
+    loadingRequested = true
+    if (isAttachedToWindow) {
+      startAnimator()
+    }
+  }
+
+  private fun startAnimator() {
     if (animator?.isStarted == true) {
       return
     }
@@ -72,14 +80,26 @@ class ToolbarConnectionLoadingView @JvmOverloads constructor(
   }
 
   fun stop() {
+    loadingRequested = false
+    stopAnimator()
+  }
+
+  private fun stopAnimator() {
     animator?.cancel()
     animator = null
     progress = 0f
     invalidate()
   }
 
+  override fun onAttachedToWindow() {
+    super.onAttachedToWindow()
+    if (loadingRequested) {
+      startAnimator()
+    }
+  }
+
   override fun onDetachedFromWindow() {
-    stop()
+    stopAnimator()
     super.onDetachedFromWindow()
   }
 
