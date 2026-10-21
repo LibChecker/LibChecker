@@ -26,7 +26,7 @@ sealed interface AppInstallSourceItemContent {
   ) : AppInstallSourceItemContent
 
   data class Message(
-    @DrawableRes val iconRes: Int,
+    @DrawableRes val iconRes: Int = 0,
     val appName: String,
     val packageName: String,
     val versionInfo: String,

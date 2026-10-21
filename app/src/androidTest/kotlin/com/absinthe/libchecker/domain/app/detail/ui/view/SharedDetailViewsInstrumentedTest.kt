@@ -10,6 +10,9 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.action.AppInstalledTimeDisplayData
 import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceBottomSheetDisplay
+import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceItemContent
+import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceItemDisplay
+import com.absinthe.libchecker.domain.app.list.ui.view.AppItemView
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotTitleDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotTitlePackageSizeData
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotNoDiffMode
@@ -19,6 +22,7 @@ import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotPackageCha
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotTitleView
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
 import com.absinthe.libchecker.utils.extensions.DexFileOptimizationInfo
+import com.absinthe.libchecker.view.app.AppIconPlaceholder
 import com.google.android.material.card.MaterialCardView
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -81,6 +85,30 @@ class SharedDetailViewsInstrumentedTest {
     sheet.measureAndLayout()
     assertTrue(sheet.height < expandedHeight)
     assertTrue(sheet.children.filterIsInstance<AppInstallDetailSectionView>().all { it.visibility == View.GONE })
+  }
+
+  @Test
+  fun installSourceDefaultIconUsesSystemIconPlaceholder() = instrumentation.runOnMainSync {
+    val context = ContextThemeWrapper(instrumentation.targetContext, R.style.AppTheme)
+    val view = AppInstallSourceItemView(context)
+    val message = AppInstallSourceItemContent.Message(
+      iconRes = 0,
+      appName = "Unknown",
+      packageName = "Shell",
+      versionInfo = "",
+      abiInfo = "",
+      showAbiInfo = false
+    )
+    view.bind(
+      AppInstallSourceItemDisplay("Title", message, "Description", null)
+    ) {}
+    val card = view.children.filterIsInstance<AppItemView>().single()
+    val expectedDrawableClass = AppIconPlaceholder.newDrawable(context)?.javaClass
+    assertEquals(expectedDrawableClass, card.container.icon.drawable?.javaClass)
+    view.bind(
+      AppInstallSourceItemDisplay("Title", message.copy(iconRes = R.drawable.ic_icon_blueprint), "Description", null)
+    ) {}
+    assertEquals(expectedDrawableClass, card.container.icon.drawable?.javaClass)
   }
 
   @Test

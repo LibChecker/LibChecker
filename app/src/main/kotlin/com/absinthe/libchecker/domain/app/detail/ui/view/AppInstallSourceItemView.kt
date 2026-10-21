@@ -19,6 +19,7 @@ import com.absinthe.libchecker.utils.extensions.applySingleLineEndEllipsize
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
+import com.absinthe.libchecker.view.app.AppIconPlaceholder
 
 class AppInstallSourceItemView(
   context: Context,
@@ -89,7 +90,11 @@ class AppInstallSourceItemView(
   private fun bindMessage(content: AppInstallSourceItemContent.Message) {
     packageView.container.apply {
       useMessageTextLayout()
-      icon.load(content.iconRes)
+      if (content.iconRes == 0 || content.iconRes == R.drawable.ic_icon_blueprint || content.iconRes == AppIconPlaceholder.resourceId) {
+        resetIconToPlaceholder()
+      } else {
+        icon.load(content.iconRes)
+      }
       setAppName(content.appName)
       setPackageName(content.packageName)
       setVersionInfo(content.versionInfo)
