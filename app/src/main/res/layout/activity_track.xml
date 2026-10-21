@@ -6,35 +6,39 @@
   android:layout_height="match_parent"
   tools:context=".domain.snapshot.track.ui.TrackActivity">
 
-  <com.google.android.material.appbar.AppBarLayout
-    android:id="@+id/appbar"
-    style="?attr/appBarLayoutStyle"
+  <androidx.coordinatorlayout.widget.CoordinatorLayout
+    android:id="@+id/container"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:layout_constraintTop_toTopOf="parent">
+    android:layout_height="match_parent">
 
-    <androidx.appcompat.widget.ToolbarFix
-      android:id="@+id/toolbar"
-      style="?actionBarStyle"
+    <com.google.android.material.appbar.AppBarLayout
+      android:id="@+id/appbar"
+      style="?attr/appBarLayoutStyle"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:background="@null" />
+      android:layout_gravity="top">
 
-  </com.google.android.material.appbar.AppBarLayout>
+      <androidx.appcompat.widget.ToolbarFix
+        android:id="@+id/toolbar"
+        style="?actionBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@null" />
 
-  <rikka.widget.borderview.BorderRecyclerView
-    android:id="@android:id/list"
-    android:layout_width="0dp"
-    android:layout_height="0dp"
-    android:clipToPadding="false"
-    android:paddingTop="?actionBarSize"
-    android:scrollbars="none"
-    app:borderBottomVisibility="never"
-    app:borderTopDrawable="@null"
-    app:borderTopVisibility="whenTop"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <rikka.widget.borderview.BorderRecyclerView
+      android:id="@android:id/list"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:clipToPadding="false"
+      android:paddingTop="?actionBarSize"
+      android:scrollbars="none"
+      app:borderBottomVisibility="never"
+      app:borderTopDrawable="@null"
+      app:borderTopVisibility="whenTop"
+      app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+  </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
