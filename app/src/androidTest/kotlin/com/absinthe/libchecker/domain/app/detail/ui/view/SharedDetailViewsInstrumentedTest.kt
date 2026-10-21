@@ -2,6 +2,7 @@ package com.absinthe.libchecker.domain.app.detail.ui.view
 
 import android.view.View
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.view.children
@@ -109,6 +110,13 @@ class SharedDetailViewsInstrumentedTest {
       AppInstallSourceItemDisplay("Title", message.copy(iconRes = R.drawable.ic_icon_blueprint), "Description", null)
     ) {}
     assertEquals(expectedDrawableClass, card.container.icon.drawable?.javaClass)
+  }
+
+  @Test
+  fun featureLabelViewUsesFitXyScaleType() = instrumentation.runOnMainSync {
+    val context = ContextThemeWrapper(instrumentation.targetContext, R.style.AppTheme)
+    val view = FeatureLabelView(context)
+    assertEquals(ImageView.ScaleType.FIT_XY, view.scaleType)
   }
 
   @Test
