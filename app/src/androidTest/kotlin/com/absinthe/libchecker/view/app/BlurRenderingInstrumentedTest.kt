@@ -29,6 +29,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.domain.home.ui.MainActivity
+import com.absinthe.libchecker.domain.snapshot.track.ui.TrackActivity
 import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_NAME
 import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_TYPE
 import com.absinthe.libchecker.domain.statistics.reference.ui.LibReferenceActivity
@@ -330,6 +331,58 @@ class BlurRenderingInstrumentedTest {
     assertTrue("PixelCopy timed out", ready.await(5, TimeUnit.SECONDS))
     assertEquals(PixelCopy.SUCCESS, result)
     return bitmap.getPixel(location[0] + x, location[1] + y).also { bitmap.recycle() }
+  }
+
+  @Test
+  fun trackAppbarKeepsLiftAfterRelayoutAndBlurToggle() {
+    val originalBlur = GlobalValues.isBlurDesign
+    var activity: TrackActivity? = null
+    try {
+      instrumentation.runOnMainSync { GlobalValues.isBlurDesign = false }
+      activity = instrumentation.startActivitySync(
+        Intent(instrumentation.targetContext, TrackActivity::class.java)
+          .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+      ) as TrackActivity
+      val list = activity.findViewById<RecyclerView>(android.R.id.list)
+      val appbar = activity.findViewById<AppBarLayout>(R.id.appbar)
+      val container = activity.findViewById<BlurCoordinatorLayout>(R.id.container)
+      var ready = false
+      val deadline = SystemClock.uptimeMillis() + 20_000L
+      while (!ready && SystemClock.uptimeMillis() < deadline) {
+        instrumentation.runOnMainSync { ready = list.isShown && list.canScrollVertically(1) }
+        if (!ready) SystemClock.sleep(100)
+      }
+      assertTrue("Track list must contain enough apps to scroll", ready)
+      for (blur in listOf(false, true, false)) {
+        instrumentation.runOnMainSync {
+          container.setBlurEnabled(blur)
+          list.scrollToPosition(0)
+        }
+        SystemClock.sleep(600)
+        instrumentation.runOnMainSync { list.scrollBy(0, 600) }
+        settle()
+        instrumentation.runOnMainSync {
+          assertTrue(list.canScrollVertically(-1))
+          assertEquals("Lift after scrolling, blur=$blur", !blur, appbar.isLifted)
+          container.requestLayout()
+        }
+        settle()
+        instrumentation.runOnMainSync {
+          assertEquals("Lift after relayout, blur=$blur", !blur, appbar.isLifted)
+          list.scrollToPosition(0)
+        }
+        settle()
+        instrumentation.runOnMainSync {
+          assertTrue(!list.canScrollVertically(-1))
+          assertEquals(false, appbar.isLifted)
+        }
+      }
+    } finally {
+      instrumentation.runOnMainSync {
+        GlobalValues.isBlurDesign = originalBlur
+        activity?.finish()
+      }
+    }
   }
 
   /** Outputs raw per-frame nanoseconds without writing artifacts outside /data/local/tmp. */

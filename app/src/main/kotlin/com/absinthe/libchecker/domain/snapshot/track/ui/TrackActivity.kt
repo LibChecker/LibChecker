@@ -18,6 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityTrackBinding
 import com.absinthe.libchecker.domain.app.list.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.snapshot.track.presentation.TrackListUiState
@@ -25,7 +26,9 @@ import com.absinthe.libchecker.domain.snapshot.track.presentation.TrackViewModel
 import com.absinthe.libchecker.domain.snapshot.track.ui.adapter.TrackAdapter
 import com.absinthe.libchecker.domain.snapshot.track.ui.view.TrackItemView
 import com.absinthe.libchecker.ui.base.BaseActivity
+import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
+import com.absinthe.libchecker.view.app.BlurCoordinatorLayout
 import com.absinthe.libchecker.view.app.DotLoadingView
 import com.absinthe.libchecker.view.app.EmptyListView
 import kotlinx.coroutines.launch
@@ -46,6 +49,7 @@ class TrackActivity :
   private val adapter = TrackAdapter()
   private var menu: Menu? = null
   private var isEmptyStateViewReady = false
+  private var blurContainer: BlurCoordinatorLayout? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -57,7 +61,9 @@ class TrackActivity :
   private fun initView() {
     addMenuProvider(this, this, Lifecycle.State.CREATED)
     setSupportActionBar(binding.toolbar)
-    (binding.root as ViewGroup).bringChildToFront(binding.appbar)
+    installBlurContainer()
+    binding.appbar.setLiftOnScrollTargetView(binding.list)
+    (binding.appbar.parent as ViewGroup).bringChildToFront(binding.appbar)
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
     binding.toolbar.title = getString(R.string.album_item_track_title)
 
@@ -67,7 +73,10 @@ class TrackActivity :
       layoutManager = LinearLayoutManager(this@TrackActivity)
       borderVisibilityChangedListener =
         BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-          binding.appbar.isLifted = !top
+          blurContainer?.setAppbarContentUnderlap(!top)
+          if (blurContainer?.blurEnabled != true) {
+            binding.appbar.isLifted = !top
+          }
         }
       FastScrollerBuilder(this).useMd2Style().build()
     }
@@ -93,6 +102,30 @@ class TrackActivity :
       }
       isStateViewEnable = true
     }
+  }
+
+  override fun onStart() {
+    super.onStart()
+    blurContainer?.setBlurEnabled(GlobalValues.isBlurDesign)
+  }
+
+  private fun installBlurContainer() {
+    if (!OsUtils.atLeastT()) return
+    val original = binding.container
+    val parent = original.parent as ViewGroup
+    val index = parent.indexOfChild(original)
+    val container = BlurCoordinatorLayout(this, contentViewId = android.R.id.list)
+    container.id = original.id
+    container.layoutParams = original.layoutParams
+    while (original.childCount > 0) {
+      val child = original.getChildAt(0)
+      original.removeViewAt(0)
+      container.addView(child)
+    }
+    parent.removeViewAt(index)
+    parent.addView(container, index)
+    blurContainer = container
+    container.setBlurEnabled(GlobalValues.isBlurDesign)
   }
 
   private fun observeTrackList() {
