@@ -32,7 +32,7 @@ class FeatureLabelView(context: Context) : AppCompatImageButton(context) {
     layoutParams = ViewGroup.MarginLayoutParams(36.dp, 36.dp)
     setPadding(6.dp, 6.dp, 6.dp, 6.dp)
     setBackgroundResource(R.drawable.ripple_feature_label_36dp)
-    scaleType = ScaleType.CENTER_CROP
+    scaleType = ScaleType.FIT_XY
     clipToOutline = false
   }
 
@@ -62,7 +62,7 @@ class FeatureLabelView(context: Context) : AppCompatImageButton(context) {
 
   private fun initDrawables(drawables: List<Drawable>) {
     this.drawables = drawables.map { drawable ->
-      drawable.mutate().apply {
+      (drawable.constantState?.newDrawable(resources)?.mutate() ?: drawable.mutate()).apply {
         setBounds(0, 0, innerIconSize, innerIconSize)
       }
     }

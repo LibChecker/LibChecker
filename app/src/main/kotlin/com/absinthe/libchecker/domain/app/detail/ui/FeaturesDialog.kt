@@ -111,6 +111,9 @@ object FeaturesDialog {
   }
 
   fun showAppIconsDialog(context: Context, drawables: List<Drawable>, isFirstMonochrome: Boolean) {
+    val dialogDrawables = drawables.map { drawable ->
+      drawable.constantState?.newDrawable(context.resources)?.mutate() ?: drawable
+    }
     val flexLayout = FlexboxLayout(context).apply {
       layoutParams = LayoutParams(
         LayoutParams.MATCH_PARENT,
@@ -133,13 +136,13 @@ object FeaturesDialog {
     }
 
     val titleRes = R.string.dialog_themed_and_alternative_app_icons
-    drawables.forEach { drawable ->
+    dialogDrawables.forEach { drawable ->
       flexLayout.addView(
         AppCompatImageView(context).apply {
           layoutParams = ViewGroup.MarginLayoutParams(48.dp, 48.dp).apply {
             setMargins(0, 8.dp, 16.dp, 8.dp)
           }
-          scaleType = ImageView.ScaleType.CENTER_CROP
+          scaleType = ImageView.ScaleType.FIT_XY
           setImageDrawable(drawable)
           contentDescription = context.getString(titleRes)
           setOnLongClickListener {
@@ -163,7 +166,11 @@ object FeaturesDialog {
     }
 
     val dialog = BaseAlertDialogBuilder(context)
-      .setIcon(drawables[0])
+      .setIcon(
+        dialogDrawables.firstOrNull()?.let {
+          it.constantState?.newDrawable(context.resources)?.mutate() ?: it
+        }
+      )
       .setTitle(titleRes)
       .setView(scrollView)
       .setPositiveButton(android.R.string.ok, null)
