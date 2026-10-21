@@ -109,7 +109,7 @@ private fun buildPackageItemDisplay(
     return AppInstallSourceItemDisplay(
       title = title,
       content = AppInstallSourceItemContent.Message(
-        iconRes = R.drawable.ic_icon_blueprint,
+        iconRes = 0,
         appName = strings.unknownAppName,
         packageName = strings.unknownPackageDescription,
         versionInfo = VERSION_PLACEHOLDER,

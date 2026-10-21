@@ -182,6 +182,11 @@ class AppItemView(
     private var badge: AppCompatImageView? = null
     private var useDetachedAbiBadgeLayout = false
 
+    fun resetIconToPlaceholder() {
+      icon.dispose()
+      icon.setImageDrawable(style.newIconPlaceholder(context))
+    }
+
     fun setIconDisplay(display: AppListItemIconDisplay) {
       val packageInfo = display.packageInfo
       if (!display.usePackageIcon || packageInfo == null) {

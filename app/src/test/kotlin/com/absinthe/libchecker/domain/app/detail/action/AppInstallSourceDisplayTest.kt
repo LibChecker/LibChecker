@@ -54,6 +54,7 @@ class AppInstallSourceDisplayTest {
 
     val installer = checkNotNull(display.installingApp)
     val installerMessage = installer.content as AppInstallSourceItemContent.Message
+    assertEquals(0, installerMessage.iconRes)
     assertEquals("Unknown", installerMessage.appName)
     assertEquals("Shell or removed app", installerMessage.packageName)
     assertEquals(true, installerMessage.showAbiInfo)
