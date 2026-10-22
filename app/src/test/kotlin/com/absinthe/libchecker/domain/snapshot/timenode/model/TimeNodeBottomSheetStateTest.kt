@@ -1,8 +1,9 @@
 package com.absinthe.libchecker.domain.snapshot.timenode.model
 
+import com.absinthe.libchecker.compat.LocalDateCompat
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotTimeNodeListData
 import java.time.LocalDate
-import java.time.ZoneId
+import java.util.TimeZone
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
@@ -77,31 +78,31 @@ class TimeNodeBottomSheetStateTest {
         packageIconSources = emptyMap()
       ),
       selectedTimestamp = 500L,
-      selectedDate = LocalDate.of(2026, 9, 1)
+      selectedDate = LocalDateCompat(LocalDate.of(2026, 9, 1).toEpochDay())
     )
 
     val nonSnapshotDayTile = DayContribution(
-      date = LocalDate.of(2026, 9, 5),
+      date = LocalDateCompat(LocalDate.of(2026, 9, 5).toEpochDay()),
       updateCount = 3,
       snapshotTimestamp = 1000L,
       isSnapshotDay = false
     )
 
     val tileSelected = initial.withSelectedTile(nonSnapshotDayTile)
-    assertEquals(LocalDate.of(2026, 9, 5), tileSelected.selectedDate)
+    assertEquals(LocalDateCompat(LocalDate.of(2026, 9, 5).toEpochDay()), tileSelected.selectedDate)
     assertEquals(500L, tileSelected.selectedTimestamp)
     assertEquals(true, tileSelected.listData.items[0].isSelected)
     assertEquals(false, tileSelected.listData.items[1].isSelected)
 
     val unassociatedTile = DayContribution(
-      date = LocalDate.of(2026, 8, 1),
+      date = LocalDateCompat(LocalDate.of(2026, 8, 1).toEpochDay()),
       updateCount = 0,
       snapshotTimestamp = null,
       isSnapshotDay = false
     )
 
     val unassociatedSelected = tileSelected.withSelectedTile(unassociatedTile)
-    assertEquals(LocalDate.of(2026, 8, 1), unassociatedSelected.selectedDate)
+    assertEquals(LocalDateCompat(LocalDate.of(2026, 8, 1).toEpochDay()), unassociatedSelected.selectedDate)
     assertEquals(500L, unassociatedSelected.selectedTimestamp)
     assertEquals(true, unassociatedSelected.listData.items[0].isSelected)
     assertEquals(false, unassociatedSelected.listData.items[1].isSelected)
@@ -109,7 +110,7 @@ class TimeNodeBottomSheetStateTest {
 
   @Test
   fun `withSelectedTimestamp updates selectedDate to the matching date`() {
-    val zone = ZoneId.of("UTC")
+    val zone = TimeZone.getTimeZone("UTC")
     val state = TimeNodeBottomSheetState(
       title = "Snapshots",
       header = TimeNodeHeaderState.AutoRemove(threshold = -1),
@@ -128,13 +129,13 @@ class TimeNodeBottomSheetStateTest {
 
     val updated = state.withSelectedTimestamp(1725148800000L, zone)
     assertEquals(1725148800000L, updated.selectedTimestamp)
-    assertEquals(LocalDate.of(2024, 9, 1), updated.selectedDate)
+    assertEquals(LocalDateCompat(LocalDate.of(2024, 9, 1).toEpochDay()), updated.selectedDate)
     assertEquals(true, updated.listData.items.first().isSelected)
   }
 
   @Test
   fun `removing a snapshot clears stale contributions and selects a remaining snapshot`() {
-    val date = LocalDate.now()
+    val date = LocalDateCompat.now()
     val state = TimeNodeBottomSheetState(
       title = "Snapshots",
       header = TimeNodeHeaderState.AutoRemove(-1),

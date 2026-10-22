@@ -38,8 +38,6 @@ import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.extensions.dpToDimension
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.view.drawable.setG2Shape
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 import kotlin.math.roundToInt
 
 class SnapshotContributionUpdatesPopup(
@@ -115,8 +113,7 @@ class SnapshotContributionUpdatesPopup(
       orientation = LinearLayout.VERTICAL
       setPadding(dp(16), dp(10), dp(16), dp(6))
     }
-    val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
-    val dateStr = day.date.format(formatter)
+    val dateStr = day.date.formatMedium()
 
     val title = AppCompatTextView(context).apply {
       text = dateStr

@@ -34,6 +34,7 @@ import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.isVisible
 import androidx.customview.widget.ExploreByTouchHelper
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.compat.LocalDateCompat
 import com.absinthe.libchecker.domain.snapshot.timenode.model.DayContribution
 import com.absinthe.libchecker.domain.snapshot.timenode.model.SnapshotContributionData
 import com.absinthe.libchecker.domain.snapshot.timenode.usecase.ComputeSnapshotContributionsUseCase
@@ -43,19 +44,12 @@ import com.google.android.material.R as MaterialR
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
 import com.google.android.material.shape.SuperEllipseCornerTreatment
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
-import java.util.Locale
 
 class SnapshotContributionWallView(context: Context) : LinearLayout(context) {
 
   private var contributionData: SnapshotContributionData? = null
   private var currentSnapshotTimestamp: Long? = null
   private var onDayClickListener: ((DayContribution, Rect) -> Unit)? = null
-  private val dayDetailFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
 
   private val titleView = AppCompatTextView(
     ContextThemeWrapper(context, R.style.TextView_SansSerifCondensedMedium)
@@ -107,7 +101,7 @@ class SnapshotContributionWallView(context: Context) : LinearLayout(context) {
 
   fun bind(
     data: SnapshotContributionData,
-    selectedDate: LocalDate? = null
+    selectedDate: LocalDateCompat? = null
   ) {
     contributionData = data
     isVisible = data.days.isNotEmpty()
@@ -131,7 +125,7 @@ class SnapshotContributionWallView(context: Context) : LinearLayout(context) {
 
   fun scrollToSnapshot(timestamp: Long) {
     val data = contributionData ?: return
-    val targetDate = Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDate()
+    val targetDate = LocalDateCompat.fromTimestamp(timestamp)
     gridView.setSelectedDate(targetDate)
     updateDetailText(data.days[targetDate])
     if (currentSnapshotTimestamp != timestamp) {
@@ -159,7 +153,7 @@ class SnapshotContributionWallView(context: Context) : LinearLayout(context) {
   }
 
   private fun describeDay(dayContribution: DayContribution): String {
-    val dateStr = dayDetailFormatter.format(dayContribution.date)
+    val dateStr = dayContribution.date.formatIso()
     val updateStr = resources.getQuantityString(
       R.plurals.snapshot_contribution_updates_count,
       dayContribution.updateCount,
@@ -176,7 +170,7 @@ class SnapshotContributionWallView(context: Context) : LinearLayout(context) {
   private inner class ContributionGridView(context: Context) : View(context) {
 
     private var data: SnapshotContributionData? = null
-    private var selectedDate: LocalDate? = null
+    private var selectedDate: LocalDateCompat? = null
     private var animatingSnapshotTimestamp: Long? = null
     private var highlightProgress: Float = 0f
     private var highlightAnimator: ValueAnimator? = null
@@ -241,7 +235,7 @@ class SnapshotContributionWallView(context: Context) : LinearLayout(context) {
     }
 
     private fun dayCount(): Int = data?.let {
-      (ChronoUnit.DAYS.between(it.startDate, it.endDate).toInt() + 1).coerceAtLeast(0)
+      (it.startDate.daysUntil(it.endDate).toInt() + 1).coerceAtLeast(0)
     } ?: 0
 
     private fun dayForId(id: Int): DayContribution? {
@@ -319,7 +313,7 @@ class SnapshotContributionWallView(context: Context) : LinearLayout(context) {
       }
     }
 
-    fun setData(data: SnapshotContributionData, selected: LocalDate?) {
+    fun setData(data: SnapshotContributionData, selected: LocalDateCompat?) {
       this.data = data
       this.selectedDate = selected
       accessibility.invalidateRoot()
@@ -327,7 +321,7 @@ class SnapshotContributionWallView(context: Context) : LinearLayout(context) {
       invalidate()
     }
 
-    fun setSelectedDate(date: LocalDate) {
+    fun setSelectedDate(date: LocalDateCompat) {
       if (selectedDate != date) {
         selectedDate = date
         accessibility.invalidateRoot()
@@ -373,7 +367,7 @@ class SnapshotContributionWallView(context: Context) : LinearLayout(context) {
         return
       }
 
-      val totalDays = ChronoUnit.DAYS.between(contribData.startDate, contribData.endDate).toInt() + 1
+      val totalDays = contribData.startDate.daysUntil(contribData.endDate).toInt() + 1
       val cols = (totalDays + 6) / 7
       val availableWidth = (width - paddingStart - paddingEnd).toFloat()
       val tileSize = if (cols > 0) (availableWidth - (cols - 1) * tileGap) / cols else 0f
@@ -385,7 +379,7 @@ class SnapshotContributionWallView(context: Context) : LinearLayout(context) {
       super.onDraw(canvas)
       val contribData = data ?: return
 
-      val totalDays = ChronoUnit.DAYS.between(contribData.startDate, contribData.endDate).toInt() + 1
+      val totalDays = contribData.startDate.daysUntil(contribData.endDate).toInt() + 1
       val cols = (totalDays + 6) / 7
       if (cols <= 0) return
 

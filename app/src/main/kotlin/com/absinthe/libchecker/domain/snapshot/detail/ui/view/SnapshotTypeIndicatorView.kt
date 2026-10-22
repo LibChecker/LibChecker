@@ -74,7 +74,7 @@ class SnapshotTypeIndicatorView(context: Context) : AViewGroup(context) {
               0,
               measuredWidth,
               measuredHeight,
-              (measuredWidth / 2).toFloat()
+              minOf(measuredWidth, measuredHeight) / 2f
             )
           }
         }
