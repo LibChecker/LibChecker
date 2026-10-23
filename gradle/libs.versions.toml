@@ -5,6 +5,7 @@ androidX-lifecycle = "2.11.0"
 androidX-room3 = "3.0.3"
 androidX-benchmark = "1.5.0"
 androidX-collection = "1.7.0"
+androidX-appfunctions = "1.0.0-beta01"
 appIconLoader = "1.5.0"
 coil = "2.7.0"
 firebase-bom = "35.1.0"
@@ -46,6 +47,8 @@ koin-android = { module = "io.insert-koin:koin-android" }
 
 androidX-activity = "androidx.activity:activity-ktx:1.13.0"
 androidX-annotation = "androidx.annotation:annotation:1.11.0"
+androidX-appfunctions = { module = "androidx.appfunctions:appfunctions", version.ref = "androidX-appfunctions" }
+androidX-appfunctions-compiler = { module = "androidx.appfunctions:appfunctions-compiler", version.ref = "androidX-appfunctions" }
 androidX-benchmark-macro-junit4 = { module = "androidx.benchmark:benchmark-macro-junit4", version.ref = "androidX-benchmark" }
 androidX-browser = "androidx.browser:browser:1.10.0"
 androidX-collection = { module = "androidx.collection:collection", version.ref = "androidX-collection" }

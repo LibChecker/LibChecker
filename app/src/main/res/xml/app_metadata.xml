@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AppFunctionAppMetadata xmlns:appfn="http://schemas.android.com/apk/androidx.appfunctions"
+  appfn:description="LibChecker queries installed app technical evidence and saved snapshot differences. Results describe detected artifacts, not app safety or runtime behavior. Package names from findApps and timestamps from listSnapshots identify analysis targets. Queries do not create or delete snapshots, change settings, install packages, or export files. App inventories may contain private information. Empty or partial detection is not proof of absence. Pages use stable package-name ordering, but live installations can change between calls."
+  appfn:displayDescription="@string/app_name" />
