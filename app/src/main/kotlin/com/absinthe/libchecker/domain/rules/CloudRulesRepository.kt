@@ -3,6 +3,8 @@ package com.absinthe.libchecker.domain.rules
 import java.io.File
 
 interface CloudRulesRepository {
+  suspend fun getLocalVersion(): Int
+
   suspend fun getVersionInfo(): CloudRulesVersionInfo?
 
   fun getDownloadRequest(): CloudRulesDownloadRequest

@@ -74,6 +74,10 @@ class SettingsViewModel(
     return settingsWorkflow.getCloudRulesVersionInfo()
   }
 
+  suspend fun getCloudRulesLocalVersion(): Int {
+    return settingsWorkflow.getCloudRulesLocalVersion()
+  }
+
   fun getCloudRulesDownloadRequest(): CloudRulesDownloadRequest {
     return settingsWorkflow.getCloudRulesDownloadRequest()
   }

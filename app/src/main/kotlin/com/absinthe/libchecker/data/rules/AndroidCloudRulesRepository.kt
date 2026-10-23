@@ -19,11 +19,13 @@ class AndroidCloudRulesRepository(
 
   private var manifest: RuleBundleManifest? = null
 
+  override suspend fun getLocalVersion(): Int = RulesRepository.getLocalVersion(appContext)
+
   override suspend fun getVersionInfo(): CloudRulesVersionInfo? {
     manifest = null
     val remote = request.requestV5Manifest()?.also { it.androidArtifact() } ?: return null
     manifest = remote
-    return CloudRulesVersionInfo(RulesRepository.getLocalVersion(appContext), remote.dataVersion)
+    return CloudRulesVersionInfo(getLocalVersion(), remote.dataVersion)
   }
 
   override fun getDownloadRequest(): CloudRulesDownloadRequest {

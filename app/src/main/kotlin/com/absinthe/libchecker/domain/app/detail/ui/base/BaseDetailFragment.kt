@@ -106,7 +106,12 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>() {
     DividerItemDecoration(
       requireContext(),
       DividerItemDecoration.VERTICAL
-    )
+    ).apply {
+      drawable?.mutate()?.let {
+        it.alpha = (it.alpha * 0.5f).toInt()
+        setDrawable(it)
+      }
+    }
   }
   private var isListReady = false
   private var afterListReadyTask: Runnable? = null

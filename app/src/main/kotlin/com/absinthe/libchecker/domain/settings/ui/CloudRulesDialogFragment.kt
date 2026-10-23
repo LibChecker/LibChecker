@@ -20,6 +20,9 @@ import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.showToast
 import com.jakewharton.processphoenix.ProcessPhoenix
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
@@ -29,6 +32,7 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
   private val viewModel: SettingsViewModel by viewModel(ownerProducer = { requireParentFragment() })
   private var downloading = false
   private var versionInfo: CloudRulesVersionInfo? = null
+  private val retryRequests = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
   override fun initRootView(): CloudRulesDialogView = CloudRulesDialogView(requireContext())
 
@@ -39,30 +43,41 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    lifecycleScope.launch {
-      lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-        try {
-          viewModel.getCloudRulesVersionInfo()?.let {
-            versionInfo = it
-            try {
-              root.bind(it.toCloudRulesDialogState(), ::handleAction)
-            } catch (e: Exception) {
-              Timber.w(e)
-              context?.showToast(R.string.toast_cloud_rules_update_error)
-            }
-          }
-        } catch (e: CancellationException) {
-          throw e
-        } catch (t: Throwable) {
-          Timber.w(t)
-          context?.showToast(R.string.toast_cloud_rules_update_error)
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+        retryRequests.onStart { emit(Unit) }.collectLatest {
+          loadVersionInfo()
         }
       }
     }
   }
 
+  private suspend fun loadVersionInfo() {
+    versionInfo = null
+    root.bind(CloudRulesDialogState.Loading, ::handleAction)
+    val localVersion = try {
+      viewModel.getCloudRulesLocalVersion()
+    } catch (e: CancellationException) {
+      throw e
+    } catch (e: Exception) {
+      Timber.w(e)
+      null
+    }
+    val state = try {
+      viewModel.getCloudRulesVersionInfo().also { versionInfo = it }
+        ?.toCloudRulesDialogState() ?: CloudRulesDialogState.Error(localVersion)
+    } catch (e: CancellationException) {
+      throw e
+    } catch (e: Exception) {
+      Timber.w(e)
+      CloudRulesDialogState.Error(localVersion)
+    }
+    root.bind(state, ::handleAction)
+  }
+
   private fun handleAction(action: CloudRulesDialogAction) {
     when (action) {
+      CloudRulesDialogAction.Retry -> retryRequests.tryEmit(Unit)
       CloudRulesDialogAction.Update -> requestBundle()
     }
   }

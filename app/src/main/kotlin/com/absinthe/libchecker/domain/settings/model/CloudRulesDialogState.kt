@@ -4,6 +4,7 @@ import com.absinthe.libchecker.domain.rules.CloudRulesVersionInfo
 
 sealed interface CloudRulesDialogState {
   data object Loading : CloudRulesDialogState
+  data class Error(val localVersion: Int?) : CloudRulesDialogState
 
   data class Content(
     val localVersion: Int,
@@ -13,6 +14,7 @@ sealed interface CloudRulesDialogState {
 }
 
 sealed interface CloudRulesDialogAction {
+  data object Retry : CloudRulesDialogAction
   data object Update : CloudRulesDialogAction
 }
 
