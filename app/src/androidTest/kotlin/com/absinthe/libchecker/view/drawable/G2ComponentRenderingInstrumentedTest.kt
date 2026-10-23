@@ -10,13 +10,13 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.compat.LocalDateCompat
 import com.absinthe.libchecker.domain.home.ui.MainActivity
 import com.absinthe.libchecker.domain.snapshot.timenode.model.DayContribution
 import com.absinthe.libchecker.domain.snapshot.timenode.ui.view.SnapshotContributionUpdatesPopup
 import com.absinthe.libchecker.ui.preference.model.PreferenceInlineControl
 import com.absinthe.libchecker.ui.preference.view.DraggableSegmentedControlView
 import com.absinthe.libchecker.view.app.CheckableChipView
-import java.time.LocalDate
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -57,7 +57,7 @@ class G2ComponentRenderingInstrumentedTest {
           popup = SnapshotContributionUpdatesPopup(
             host,
             Rect(host.width / 2 - 10, y, host.width / 2 + 10, y + 20),
-            DayContribution(LocalDate.of(2026, 9, 20)),
+            DayContribution(LocalDateCompat(20716L)),
             emptyMap()
           ) {}
           popup.show()

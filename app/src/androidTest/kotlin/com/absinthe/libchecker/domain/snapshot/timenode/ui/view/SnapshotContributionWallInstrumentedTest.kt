@@ -8,10 +8,10 @@ import androidx.appcompat.view.ContextThemeWrapper
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.compat.LocalDateCompat
 import com.absinthe.libchecker.domain.snapshot.timenode.model.DayContribution
 import com.absinthe.libchecker.domain.snapshot.timenode.model.SnapshotContributionData
 import com.absinthe.libchecker.utils.extensions.dp
-import java.time.LocalDate
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
@@ -25,7 +25,7 @@ class SnapshotContributionWallInstrumentedTest {
     val instrumentation = InstrumentationRegistry.getInstrumentation()
     instrumentation.runOnMainSync {
       val context = ContextThemeWrapper(instrumentation.targetContext, R.style.AppTheme)
-      val start = LocalDate.of(2026, 9, 7)
+      val start = LocalDateCompat(20703L)
       val days = (0L..8L).associate { offset ->
         val date = start.plusDays(offset)
         date to DayContribution(date, updateCount = offset.toInt(), isSnapshotDay = offset == 0L)

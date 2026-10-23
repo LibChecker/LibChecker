@@ -1,8 +1,8 @@
 package com.absinthe.libchecker.domain.snapshot.timenode.model
 
 import android.graphics.Color
+import com.absinthe.libchecker.compat.LocalDateCompat
 import com.absinthe.libraries.utils.utils.UiUtils
-import java.time.LocalDate
 import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.roundToInt
@@ -97,7 +97,7 @@ data class SnapshotUpdatedAppItem(
 )
 
 data class DayContribution(
-  val date: LocalDate,
+  val date: LocalDateCompat,
   val updateCount: Int = 0,
   val snapshotTimestamp: Long? = null,
   val snapshotColor: Int? = null,
@@ -108,9 +108,9 @@ data class DayContribution(
 )
 
 data class SnapshotContributionData(
-  val days: Map<LocalDate, DayContribution>,
-  val startDate: LocalDate,
-  val endDate: LocalDate,
+  val days: Map<LocalDateCompat, DayContribution>,
+  val startDate: LocalDateCompat,
+  val endDate: LocalDateCompat,
   val snapshotColors: Map<Long, Int>,
   val totalUpdates: Int
 )

@@ -1,10 +1,9 @@
 package com.absinthe.libchecker.domain.snapshot.timenode.model
 
 import android.graphics.Rect
+import com.absinthe.libchecker.compat.LocalDateCompat
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotTimeNodeListData
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
+import java.util.TimeZone
 
 data class TimeNodeBottomSheetState(
   val title: String,
@@ -15,7 +14,7 @@ data class TimeNodeBottomSheetState(
   ),
   val contributionData: SnapshotContributionData? = null,
   val selectedTimestamp: Long? = null,
-  val selectedDate: LocalDate? = null
+  val selectedDate: LocalDateCompat? = null
 )
 
 sealed interface TimeNodeHeaderState {
@@ -78,7 +77,7 @@ fun TimeNodeBottomSheetState.withContributionData(
 
 fun TimeNodeBottomSheetState.withSelectedTimestamp(
   timestamp: Long?,
-  zoneId: ZoneId = ZoneId.systemDefault()
+  timeZone: TimeZone = TimeZone.getDefault()
 ): TimeNodeBottomSheetState {
   val updatedItems = listData.items.map {
     it.copy(
@@ -87,7 +86,7 @@ fun TimeNodeBottomSheetState.withSelectedTimestamp(
     )
   }
   val targetDate = timestamp?.let {
-    Instant.ofEpochMilli(it).atZone(zoneId).toLocalDate()
+    LocalDateCompat.fromTimestamp(it, timeZone)
   }
   return copy(
     selectedTimestamp = timestamp,

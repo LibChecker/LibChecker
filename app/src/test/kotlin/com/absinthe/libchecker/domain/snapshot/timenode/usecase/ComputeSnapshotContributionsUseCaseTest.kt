@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.domain.snapshot.timenode.usecase
 
+import com.absinthe.libchecker.compat.LocalDateCompat
 import com.absinthe.libchecker.database.entity.SnapshotDiffStoringItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.SnapshotUpdatedApp
@@ -9,6 +10,7 @@ import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.timenode.model.SnapshotPalette
 import java.time.LocalDate
 import java.time.ZoneId
+import java.util.TimeZone
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.runBlocking
@@ -84,7 +86,7 @@ class ComputeSnapshotContributionsUseCaseTest {
       TimeStampItem(t1, null, null)
     )
 
-    val result = useCase(timeStamps, testZoneId)
+    val result = useCase(timeStamps, TimeZone.getTimeZone(testZoneId))
 
     // Palette check
     val expectedColor1 = SnapshotPalette.getColor(0)
@@ -92,12 +94,12 @@ class ComputeSnapshotContributionsUseCaseTest {
     assertEquals(expectedColor1, result.snapshotColors[t1])
     assertEquals(expectedColor2, result.snapshotColors[t2])
 
-    val first = result.days[firstDay]
+    val first = result.days[LocalDateCompat(firstDay.toEpochDay())]
     assertNotNull(first)
     assertTrue(first!!.isSnapshotDay)
     assertEquals(t1, first.snapshotTimestamp)
 
-    val middle = result.days[middleDay]
+    val middle = result.days[LocalDateCompat(middleDay.toEpochDay())]
     assertNotNull(middle)
     assertEquals(2, middle!!.updateCount)
     assertEquals(t1, middle.snapshotTimestamp)
@@ -110,7 +112,7 @@ class ComputeSnapshotContributionsUseCaseTest {
     assertEquals(t1, middle.updatedApps[1].previousSnapshotTimestamp)
     assertEquals(t2, middle.updatedApps[1].currentSnapshotTimestamp)
 
-    val next = result.days[nextDay]
+    val next = result.days[LocalDateCompat(nextDay.toEpochDay())]
     assertNotNull(next)
     assertTrue(next!!.isSnapshotDay)
     assertEquals(1, next.updateCount)
@@ -129,7 +131,7 @@ class ComputeSnapshotContributionsUseCaseTest {
     val repository = FakeSnapshotRepository()
     val result = ComputeSnapshotContributionsUseCase(repository)(
       listOf(TimeStampItem(old, null, null), TimeStampItem(recent, null, null)),
-      testZoneId
+      TimeZone.getTimeZone(testZoneId)
     )
     assertTrue(result.days.isNotEmpty())
     assertEquals(listOf(recent), repository.queriedTimestamps)
@@ -140,7 +142,7 @@ class ComputeSnapshotContributionsUseCaseTest {
     val repository = FakeSnapshotRepository()
     val result = ComputeSnapshotContributionsUseCase(repository)(
       listOf(TimeStampItem(Long.MIN_VALUE, null, null), TimeStampItem(Long.MAX_VALUE, null, null)),
-      testZoneId
+      TimeZone.getTimeZone(testZoneId)
     )
     assertTrue(result.days.size in 120..126)
     assertEquals(result.startDate, result.days.keys.minOrNull())
@@ -156,9 +158,9 @@ class ComputeSnapshotContributionsUseCaseTest {
     val update = day.atTime(10, 0).atZone(testZoneId).toInstant().toEpochMilli()
     val result = ComputeSnapshotContributionsUseCase(FakeSnapshotRepository(mapOf(snapshot to listOf(update))))(
       listOf(TimeStampItem(snapshot, null, null)),
-      testZoneId
+      TimeZone.getTimeZone(testZoneId)
     )
-    val app = result.days.getValue(day).updatedApps.single()
+    val app = result.days.getValue(LocalDateCompat(day.toEpochDay())).updatedApps.single()
     assertEquals(null, app.previousSnapshotTimestamp)
     assertEquals(snapshot, app.currentSnapshotTimestamp)
   }
