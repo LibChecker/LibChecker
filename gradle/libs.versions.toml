@@ -89,7 +89,7 @@ aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref
 aboutlibraries-ui = { module = "com.mikepenz:aboutlibraries", version.ref = "aboutlibraries" }
 appIconLoader = { module = "me.zhanghai.android.appiconloader:appiconloader", version.ref = "appIconLoader" }
 appIconLoader-coil = { module = "me.zhanghai.android.appiconloader:appiconloader-coil", version.ref = "appIconLoader" }
-brvah = "io.github.cymchad:BaseRecyclerViewAdapterHelper4:4.4.1"
+brvah = "io.github.cymchad:BaseRecyclerViewAdapterHelper4:4.4.2"
 coil = { module = "io.coil-kt:coil", version.ref = "coil" }
 coil-svg = { module = "io.coil-kt:coil-svg", version.ref = "coil" }
 commons-compress = "org.apache.commons:commons-compress:1.28.0"
