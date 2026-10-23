@@ -27,8 +27,7 @@ class CloudRulesDialogView(context: Context) : BottomSheetScaffoldView(context) 
   private val viewFlipper = HeightAnimatableViewFlipper(context).apply {
     layoutParams =
       LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-    setInAnimation(context, R.anim.anim_fade_in)
-    setOutAnimation(context, R.anim.anim_fade_out)
+    // This flipper already animates child alpha; XML fades would compete with it.
   }
 
   private val loading = RuleLoadingView(context).apply {
@@ -39,7 +38,8 @@ class CloudRulesDialogView(context: Context) : BottomSheetScaffoldView(context) 
 
   private val cloudRulesContentView = CloudRulesContentView(
     context = context,
-    onUpdate = { onAction(CloudRulesDialogAction.Update) }
+    onUpdate = { onAction(CloudRulesDialogAction.Update) },
+    onRetry = { onAction(CloudRulesDialogAction.Retry) }
   ).apply {
     layoutParams = FrameLayout.LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
@@ -56,7 +56,8 @@ class CloudRulesDialogView(context: Context) : BottomSheetScaffoldView(context) 
 
   private class CloudRulesContentView(
     context: Context,
-    onUpdate: () -> Unit
+    private val onUpdate: () -> Unit,
+    private val onRetry: () -> Unit
   ) : AViewGroup(context) {
 
     private val localVersion = CloudRulesVersionView(
@@ -104,8 +105,9 @@ class CloudRulesDialogView(context: Context) : BottomSheetScaffoldView(context) 
     }
 
     fun bind(state: CloudRulesDialogState.Content) {
-      localVersion.bind(state.localVersion)
-      remoteVersion.bind(state.remoteVersion)
+      updateButton.setOnClickListener { onUpdate() }
+      localVersion.bind(state.localVersion.toString())
+      remoteVersion.bind(state.remoteVersion.toString())
       if (state.updateAvailable) {
         updateButton.apply {
           isEnabled = true
@@ -117,6 +119,16 @@ class CloudRulesDialogView(context: Context) : BottomSheetScaffoldView(context) 
           text = context.getString(R.string.rules_btn_update)
         }
       }
+    }
+
+    fun showRetryError(version: Int?) {
+      localVersion.bind(version?.toString() ?: "?")
+      remoteVersion.bind("?")
+      updateButton.apply {
+        isEnabled = true
+        text = context.getString(R.string.toast_cloud_rules_update_error)
+      }
+      updateButton.setOnClickListener { onRetry() }
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -176,8 +188,8 @@ class CloudRulesDialogView(context: Context) : BottomSheetScaffoldView(context) 
       addView(desc)
     }
 
-    fun bind(value: Int) {
-      version.text = value.toString()
+    fun bind(value: CharSequence) {
+      version.text = value
       contentDescription = listOf(desc.text, version.text)
         .map { it.toString().trim() }
         .filter(String::isNotEmpty)
@@ -191,6 +203,14 @@ class CloudRulesDialogView(context: Context) : BottomSheetScaffoldView(context) 
   ) {
     this.onAction = onAction
     when (state) {
+      is CloudRulesDialogState.Error -> {
+        cloudRulesContentView.showRetryError(state.localVersion)
+        loading.stop()
+        if (viewFlipper.displayedChildView != cloudRulesContentView) {
+          viewFlipper.show(cloudRulesContentView)
+        }
+      }
+
       CloudRulesDialogState.Loading -> {
         loading.start()
         if (viewFlipper.displayedChildView != loading) {

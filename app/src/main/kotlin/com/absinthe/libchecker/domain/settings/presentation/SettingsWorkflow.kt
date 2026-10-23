@@ -106,6 +106,10 @@ class SettingsWorkflow(
     cloudRulesRepository.getVersionInfo()
   }
 
+  suspend fun getCloudRulesLocalVersion(): Int = withContext(Dispatchers.IO) {
+    cloudRulesRepository.getLocalVersion()
+  }
+
   fun getCloudRulesDownloadRequest(): CloudRulesDownloadRequest {
     return cloudRulesRepository.getDownloadRequest()
   }

@@ -31,6 +31,7 @@ class DetailInfoItemView(context: Context) : TextColumnRowView(context) {
   init {
     setPadding(8.dp, 8.dp, 8.dp, 8.dp)
     setBackgroundResource(R.drawable.bg_lib_detail_item)
+    background.mutate().alpha = 128
     setLeadingView(icon)
   }
 
