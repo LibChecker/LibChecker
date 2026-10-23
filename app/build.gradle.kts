@@ -27,6 +27,7 @@ tasks.withType<Test>().configureEach {
 }
 
 ksp {
+  arg("appfunctions:aggregateAppFunctions", "true")
   arg("moshi.generated", "javax.annotation.Generated")
 }
 
@@ -143,6 +144,7 @@ dependencies {
   implementation(libs.koin.android)
   implementation(libs.androidX.core)
   implementation(libs.androidX.activity)
+  implementation(libs.androidX.appfunctions)
   implementation(libs.androidX.fragment)
   implementation(libs.androidX.constraintLayout)
   implementation(libs.androidX.browser)
@@ -167,6 +169,7 @@ dependencies {
   implementation(libs.lc.rules)
   add(rulesBundleTestData.name, libs.lc.rules)
   ksp(libs.androidX.room3.compiler)
+  ksp(libs.androidX.appfunctions.compiler)
 
   testImplementation(libs.junit)
 
