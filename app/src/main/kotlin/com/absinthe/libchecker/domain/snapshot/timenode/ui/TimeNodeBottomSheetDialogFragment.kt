@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.domain.snapshot.timenode.ui
 
 import android.content.DialogInterface
-import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.ContextThemeWrapper
@@ -13,8 +12,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.LocalDateCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.TimeStampItem
-import com.absinthe.libchecker.domain.snapshot.detail.ui.EXTRA_ENTITY
-import com.absinthe.libchecker.domain.snapshot.detail.ui.SnapshotDetailActivity
+import com.absinthe.libchecker.domain.snapshot.detail.ui.launchSnapshotDetail
 import com.absinthe.libchecker.domain.snapshot.list.presentation.SnapshotViewModel
 import com.absinthe.libchecker.domain.snapshot.timenode.model.DayContribution
 import com.absinthe.libchecker.domain.snapshot.timenode.model.SnapshotUpdatedAppItem
@@ -325,14 +323,7 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
       }
 
       if (diffItem != null) {
-        val intent = Intent(ctw, SnapshotDetailActivity::class.java).apply {
-          putExtras(
-            Bundle().apply {
-              putSerializable(EXTRA_ENTITY, diffItem)
-            }
-          )
-        }
-        startActivity(intent)
+        ctw.launchSnapshotDetail(viewLifecycleOwner, diffItem)
       } else {
         Toasty.showLong(ctw, R.string.toast_cant_open_app)
       }

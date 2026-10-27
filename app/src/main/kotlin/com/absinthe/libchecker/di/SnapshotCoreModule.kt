@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.di
 
 import com.absinthe.libchecker.data.snapshot.AndroidSnapshotItemFactory
+import com.absinthe.libchecker.data.snapshot.FileSnapshotDetailPayloadRepository
 import com.absinthe.libchecker.data.snapshot.GlobalSnapshotSelectionRepository
 import com.absinthe.libchecker.data.snapshot.GlobalSnapshotSettingsRepository
 import com.absinthe.libchecker.data.snapshot.LocalSnapshotRepository
@@ -8,6 +9,7 @@ import com.absinthe.libchecker.data.snapshot.OnceSnapshotCaptureStateRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotItemFactory
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotSettingsRepository
+import com.absinthe.libchecker.domain.snapshot.detail.repository.SnapshotDetailPayloadRepository
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotDashboardCounter
 import com.absinthe.libchecker.domain.snapshot.list.capture.SnapshotCaptureStateRepository
 import com.absinthe.libchecker.domain.snapshot.selection.SnapshotSelection
@@ -15,9 +17,14 @@ import com.absinthe.libchecker.domain.snapshot.selection.SnapshotSelectionReposi
 import com.absinthe.libchecker.domain.snapshot.timenode.usecase.ComputeSnapshotContributionsUseCase
 import com.absinthe.libchecker.domain.snapshot.timenode.usecase.RefreshSnapshotRepresentativeAppsUseCase
 import com.absinthe.libchecker.domain.snapshot.timenode.usecase.SelectSnapshotRepresentativeAppsUseCase
+import java.io.File
+import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 val snapshotCoreModule = module {
+  single<SnapshotDetailPayloadRepository> {
+    FileSnapshotDetailPayloadRepository(File(androidContext().cacheDir, "snapshot_details"))
+  }
   single<SnapshotItemFactory> { AndroidSnapshotItemFactory() }
   single<SnapshotCaptureStateRepository> { OnceSnapshotCaptureStateRepository() }
   single<SnapshotSelectionRepository> { GlobalSnapshotSelectionRepository() }
