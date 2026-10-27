@@ -17,4 +17,12 @@
     android:name="android.permission.ACCESS_ADSERVICES_ATTRIBUTION"
     tools:node="remove" />
 
+  <application>
+    <meta-data
+      android:name="firebase_analytics_collection_enabled"
+      android:value="false" />
+    <meta-data
+      android:name="google_analytics_automatic_screen_reporting_enabled"
+      android:value="false" />
+  </application>
 </manifest>
