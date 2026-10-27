@@ -38,6 +38,7 @@ import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotReportExport
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotTitleDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.buildSnapshotDetailReportHeader
 import com.absinthe.libchecker.domain.snapshot.detail.model.chooseSnapshotReportExportTarget
+import com.absinthe.libchecker.domain.snapshot.detail.repository.SnapshotDetailPayloadRepository
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.SnapshotDetailAdapter
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.SnapshotDetailRow
 import com.absinthe.libchecker.domain.snapshot.detail.ui.adapter.interactionPolicy
@@ -59,6 +60,7 @@ import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.google.android.material.R as MaterialR
 import java.io.File
 import kotlin.math.abs
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
@@ -70,7 +72,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import rikka.core.util.ClipboardUtils
 import timber.log.Timber
 
-const val EXTRA_ENTITY = "EXTRA_ENTITY"
 const val EXTRA_ICON = "EXTRA_ICON"
 
 class SnapshotDetailActivity :
@@ -89,12 +90,7 @@ class SnapshotDetailActivity :
   }
   private val viewModel: SnapshotViewModel by viewModel()
   private val buildSnapshotTitleDisplayData: BuildSnapshotTitleDisplayDataUseCase by inject()
-  private val _entity by unsafeLazy {
-    IntentCompat.getSerializableExtra<SnapshotDiffItem>(
-      intent,
-      EXTRA_ENTITY
-    )
-  }
+  private val payloadRepository: SnapshotDetailPayloadRepository by inject()
   private val _icon by unsafeLazy {
     IntentCompat.getParcelableExtra<Bitmap>(
       intent,
@@ -102,7 +98,11 @@ class SnapshotDetailActivity :
     )
   }
 
-  override fun requirePackageName() = entity.packageName.takeIf { it.contains("/").not() }
+  override fun requirePackageName() = if (::entity.isInitialized) {
+    entity.packageName.takeIf { it.contains("/").not() }
+  } else {
+    null
+  }
 
   override fun onApplyContentWindowInsets() {
     binding.root.applySystemBarsPadding(left = true, top = true, right = true)
@@ -111,8 +111,21 @@ class SnapshotDetailActivity :
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    if (_entity != null) {
-      entity = _entity!!
+    lifecycleScope.launch {
+      val loaded = try {
+        intent.getStringExtra(EXTRA_PAYLOAD_ID)?.let { payloadRepository.load(it) }
+      } catch (e: CancellationException) {
+        throw e
+      } catch (e: Exception) {
+        Timber.e(e, "Failed to load snapshot detail")
+        null
+      }
+      if (loaded == null) {
+        showToast(R.string.toast_cant_open_app)
+        finish()
+        return@launch
+      }
+      entity = loaded
       val diffTextStyle = buildDiffTextStyle()
       initView(diffTextStyle)
       lifecycleScope.launch {
@@ -134,8 +147,6 @@ class SnapshotDetailActivity :
           )
         }
       }
-    } else {
-      finish()
     }
   }
 

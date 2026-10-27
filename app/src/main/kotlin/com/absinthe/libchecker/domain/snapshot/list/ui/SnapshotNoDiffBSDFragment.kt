@@ -1,9 +1,12 @@
 package com.absinthe.libchecker.domain.snapshot.list.ui
 
-import androidx.core.os.BundleCompat
+import android.os.Bundle
+import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.constant.options.SnapshotOptions
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailDiffTextStyle
+import com.absinthe.libchecker.domain.snapshot.detail.repository.SnapshotDetailPayloadRepository
+import com.absinthe.libchecker.domain.snapshot.detail.ui.EXTRA_PAYLOAD_ID
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotNoDiffTitleIconRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.toSnapshotNoDiffRenderState
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.toSnapshotNoDiffTitleIconRenderState
@@ -16,25 +19,37 @@ import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.google.android.material.R as MaterialR
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
-
-const val EXTRA_DIFF_ITEM = "EXTRA_DIFF_ITEM"
+import timber.log.Timber
 
 class SnapshotNoDiffBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotNoDiffBSView>() {
 
   private val viewModel: SnapshotViewModel by activityViewModel()
   private val buildSnapshotTitleDisplayData: BuildSnapshotTitleDisplayDataUseCase by inject()
+  private val payloadRepository: SnapshotDetailPayloadRepository by inject()
 
   override fun initRootView(): SnapshotNoDiffBSView = SnapshotNoDiffBSView(requireContext())
 
-  override fun init() {
-    val arg = arguments ?: run {
-      dismiss()
-      return
-    }
-    BundleCompat.getSerializable(arg, EXTRA_DIFF_ITEM, SnapshotDiffItem::class.java)?.let { item ->
+  override fun init() = Unit
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    viewLifecycleOwner.lifecycleScope.launch {
+      val item = try {
+        arguments?.getString(EXTRA_PAYLOAD_ID)?.let { payloadRepository.load(it) }
+      } catch (e: CancellationException) {
+        throw e
+      } catch (e: Exception) {
+        Timber.e(e, "Failed to load snapshot popup")
+        null
+      }
+      if (item == null) {
+        dismissAllowingStateLoss()
+        return@launch
+      }
       val metricColor = requireContext().getColorByAttr(MaterialR.attr.colorOnSurface)
       val diffTextStyle = SnapshotDetailDiffTextStyle(
         highlightColor = if ((viewModel.getSnapshotOptions() and SnapshotOptions.DIFF_HIGHLIGHT) > 0) {
@@ -54,23 +69,21 @@ class SnapshotNoDiffBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotNoDi
         )
       )
       val renderState = item.toSnapshotNoDiffRenderState(titleRenderState) ?: run {
-        dismiss()
-        return@let
+        dismissAllowingStateLoss()
+        return@launch
       }
       root.render(renderState)
       bindIcon(item)
-    } ?: run {
-      dismiss()
     }
   }
 
   private fun bindIcon(item: SnapshotDiffItem) {
     root.renderTitleIcon(SnapshotNoDiffTitleIconRenderState.Fallback)
-    lifecycleScope.launch {
+    viewLifecycleOwner.lifecycleScope.launch {
       val iconState = viewModel.getSnapshotPackageIconSources(listOf(item.packageName))[item.packageName]
         .toSnapshotNoDiffTitleIconRenderState()
       root.renderTitleIcon(iconState) {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
           val lcItem = viewModel.getAppListItem(item.packageName) ?: return@launch
           activity?.launchDetailPage(lcItem)
         }
@@ -79,9 +92,9 @@ class SnapshotNoDiffBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotNoDi
   }
 
   companion object {
-    fun newInstance(snapshotDiffItem: SnapshotDiffItem): SnapshotNoDiffBSDFragment {
+    fun newInstance(payloadId: String): SnapshotNoDiffBSDFragment {
       return SnapshotNoDiffBSDFragment().putArguments(
-        EXTRA_DIFF_ITEM to snapshotDiffItem
+        EXTRA_PAYLOAD_ID to payloadId
       )
     }
   }

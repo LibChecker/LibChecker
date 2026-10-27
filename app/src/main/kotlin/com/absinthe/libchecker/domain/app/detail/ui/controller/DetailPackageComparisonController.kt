@@ -1,14 +1,11 @@
 package com.absinthe.libchecker.domain.app.detail.ui.controller
 
-import android.content.Intent
 import android.content.pm.PackageInfo
-import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.presentation.DetailViewModel
 import com.absinthe.libchecker.domain.app.detail.ui.DetailToolbarController
-import com.absinthe.libchecker.domain.snapshot.detail.ui.EXTRA_ENTITY
-import com.absinthe.libchecker.domain.snapshot.detail.ui.SnapshotDetailActivity
+import com.absinthe.libchecker.domain.snapshot.detail.ui.launchSnapshotDetail
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.UiUtils
 import kotlinx.coroutines.CoroutineScope
@@ -55,13 +52,7 @@ class DetailPackageComparisonController(
       val diff = viewModel.buildPackageComparisonSnapshotItem(basePackage, analysisPackage)
       dialog.dismiss()
 
-      val intent = Intent(activity, SnapshotDetailActivity::class.java)
-        .putExtras(
-          Bundle().apply {
-            putSerializable(EXTRA_ENTITY, diff)
-          }
-        )
-      activity.startActivity(intent)
+      activity.launchSnapshotDetail(activity, diff)
     }
   }
 }

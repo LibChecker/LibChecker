@@ -39,10 +39,11 @@ import com.absinthe.libchecker.domain.app.list.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
 import com.absinthe.libchecker.domain.home.ui.INavViewContainer
 import com.absinthe.libchecker.domain.snapshot.album.ui.AlbumActivity
-import com.absinthe.libchecker.domain.snapshot.detail.ui.EXTRA_ENTITY
-import com.absinthe.libchecker.domain.snapshot.detail.ui.SnapshotDetailActivity
+import com.absinthe.libchecker.domain.snapshot.detail.repository.SnapshotDetailPayloadRepository
+import com.absinthe.libchecker.domain.snapshot.detail.ui.launchSnapshotDetail
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.shouldShowSnapshotNoDiffPopup
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotEmptyView
+import com.absinthe.libchecker.domain.snapshot.detail.ui.whileSnapshotNavigationResumed
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotCapturePlan
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotDashboardAction
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotDashboardDisplayData
@@ -74,6 +75,7 @@ import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libchecker.view.span.CenterAlignImageSpan
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import java.util.Locale
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
@@ -104,6 +106,7 @@ class SnapshotFragment :
 
   private val viewModel: SnapshotViewModel by activityViewModel()
   private val getRandomAppIcon: GetRandomAppIconUseCase by inject()
+  private val payloadRepository: SnapshotDetailPayloadRepository by inject()
   private val buildSnapshotItemDisplayData: BuildSnapshotItemDisplayDataUseCase by inject()
   private val adapter by lazy(LazyThreadSafetyMode.NONE) {
     SnapshotAdapter(buildSnapshotItemDisplayData)
@@ -250,17 +253,24 @@ class SnapshotFragment :
 
         val item = getItem(position)
         if (item.shouldShowSnapshotNoDiffPopup()) {
-          SnapshotNoDiffBSDFragment.newInstance(item).also {
-            it.show(context.supportFragmentManager, SnapshotNoDiffBSDFragment::class.java.name)
+          viewLifecycleOwner.lifecycleScope.launch {
+            try {
+              whileSnapshotNavigationResumed(viewLifecycleOwner.lifecycle) {
+                val id = payloadRepository.save(item)
+                SnapshotNoDiffBSDFragment.newInstance(id)
+                  .show(context.supportFragmentManager, SnapshotNoDiffBSDFragment::class.java.name)
+              }
+            } catch (e: CancellationException) {
+              throw e
+            } catch (e: Exception) {
+              Timber.e(e, "Failed to open snapshot popup")
+              Toasty.showLong(context, R.string.toast_cant_open_app)
+            }
           }
         } else {
-          val intent = Intent(context, SnapshotDetailActivity::class.java)
-            .putExtras(
-              Bundle().apply {
-                putSerializable(EXTRA_ENTITY, item)
-              }
-            )
-          startActivity(intent)
+          viewLifecycleOwner.lifecycleScope.launch {
+            context.launchSnapshotDetail(viewLifecycleOwner, item)
+          }
         }
       }
     }

@@ -35,9 +35,7 @@ import com.absinthe.libchecker.domain.snapshot.comparison.model.SnapshotComparis
 import com.absinthe.libchecker.domain.snapshot.comparison.presentation.ComparisonShareIntentParser
 import com.absinthe.libchecker.domain.snapshot.comparison.presentation.SnapshotComparisonViewModel
 import com.absinthe.libchecker.domain.snapshot.comparison.ui.view.ComparisonDashboardView
-import com.absinthe.libchecker.domain.snapshot.detail.ui.EXTRA_ENTITY
-import com.absinthe.libchecker.domain.snapshot.detail.ui.EXTRA_ICON
-import com.absinthe.libchecker.domain.snapshot.detail.ui.SnapshotDetailActivity
+import com.absinthe.libchecker.domain.snapshot.detail.ui.launchSnapshotDetail
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotEmptyView
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotListRenderState
 import com.absinthe.libchecker.domain.snapshot.list.ui.VF_LIST
@@ -203,14 +201,10 @@ class ComparisonActivity :
           return@setOnItemClickListener
         }
 
-        val intent = Intent(this@ComparisonActivity, SnapshotDetailActivity::class.java)
-          .putExtras(
-            Bundle().apply {
-              putSerializable(EXTRA_ENTITY, getItem(position))
-            }
-          )
-
-        startActivity(intent)
+        val item = getItem(position)
+        lifecycleScope.launch {
+          launchSnapshotDetail(this@ComparisonActivity, item)
+        }
       }
     }
 
@@ -408,14 +402,9 @@ class ComparisonActivity :
     leftIcon: Bitmap,
     rightIcon: Bitmap
   ) {
-    val intent = Intent(this, SnapshotDetailActivity::class.java)
-      .putExtras(
-        Bundle().apply {
-          putSerializable(EXTRA_ENTITY, viewModel.buildSnapshotPairDiff(left, right))
-          putParcelable(EXTRA_ICON, getIconsCombo(leftIcon, rightIcon))
-        }
-      )
-    startActivity(intent)
+    lifecycleScope.launch {
+      launchSnapshotDetail(this@ComparisonActivity, viewModel.buildSnapshotPairDiff(left, right), getIconsCombo(leftIcon, rightIcon))
+    }
   }
 
   private fun getSuitableLayoutManager(): RecyclerView.LayoutManager {
