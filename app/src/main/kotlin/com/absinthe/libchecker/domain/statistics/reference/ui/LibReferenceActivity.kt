@@ -23,8 +23,10 @@ import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.view.app.BlurCoordinatorLayout
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import rikka.widget.borderview.BorderView
@@ -47,6 +49,7 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
   private var refLabel: String? = null
   private var refType: Int = NATIVE
   private var refList: Array<String>? = null
+  private var actionBarIconJob: Job? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -89,6 +92,13 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
     supportActionBar?.apply {
       refLabel?.let { title = it }
       subtitle = refName
+    }
+    actionBarIconJob?.cancel()
+    supportActionBar?.setIcon(null)
+    val name = refName ?: return
+    val type = refType
+    actionBarIconJob = lifecycleScope.launch {
+      supportActionBar?.setIcon(viewModel.getReferenceIcon(name, type))
     }
   }
 

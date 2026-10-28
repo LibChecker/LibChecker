@@ -16,6 +16,7 @@ import com.absinthe.libchecker.domain.statistics.reference.model.LibReference
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceLoadingState
 import com.absinthe.libchecker.domain.statistics.reference.model.LibReferenceSearchLabels
 import com.absinthe.libchecker.domain.statistics.reference.model.matchesSearchQuery
+import com.absinthe.libchecker.domain.statistics.reference.model.resolveReferenceIcon
 import com.absinthe.libchecker.domain.statistics.reference.repository.LibReferenceSettingsRepository
 import com.absinthe.libchecker.domain.statistics.reference.usecase.BuildLibReferenceDetailDialogRequestUseCase
 import com.absinthe.libchecker.domain.statistics.reference.usecase.GetLibReferenceAppsUseCase
@@ -218,6 +219,10 @@ class LibReferenceViewModel(
     @LibType type: Int
   ): LibReferenceDetailDialogRequest? {
     return buildLibReferenceDetailDialogRequestUseCase(name, type)
+  }
+
+  suspend fun getReferenceIcon(name: String, @LibType type: Int): Int {
+    return resolveReferenceIcon(name, type, RulesRepository.getRule(name, type, true))
   }
 
   fun onSearchQueryChanged(
