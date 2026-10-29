@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginEnd
 import com.absinthe.libchecker.R
@@ -50,7 +51,7 @@ class MarketDistributionDashboardView(context: Context) : AViewGroup(context) {
   val chip = Chip(context).apply {
     isClickable = false
     layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 48.dp)
-    chipIcon = context.getDrawable(R.drawable.ic_open_in_new)
+    chipIcon = AppCompatResources.getDrawable(context, R.drawable.ic_open_in_new)
     setText(R.string.android_dist_source)
     addView(this)
   }

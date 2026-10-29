@@ -15,6 +15,7 @@ import android.view.Gravity
 import android.view.TouchDelegate
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.graphics.drawable.DrawableCompat
@@ -139,7 +140,8 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
     minimumHeight = MINIMUM_HEIGHT
     importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
     isFocusable = true
-    foreground = context.getDrawable(
+    foreground = AppCompatResources.getDrawable(
+      context,
       context.getResourceIdByAttr(android.R.attr.selectableItemBackground)
     )
   }
